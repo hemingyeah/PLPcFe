@@ -22,7 +22,9 @@ module.exports = {
   genEntry(){
     let entry = {};
     for(let name in modules){
-      entry[name] = modules[name].entry;
+      //为支持热更新，必须为数组
+      if(!Array.isArray(entry[name])) entry[name] = [];
+      entry[name].push(modules[name].entry) ;
     }
     return entry;
   },

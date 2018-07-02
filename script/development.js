@@ -4,10 +4,10 @@ process.env.NODE_ENV = 'development';
 const server = require('../server')
 const koaWebpack = require('koa-webpack')
 
-const webpackDevConfig = require('../config/webpack.base.conf')
+const webpackDevConfig = require('../config/webpack.dev.conf')
 const koaWebpackConfig = {
   config: webpackDevConfig,
-  hotClient: false,
+  hotClient: {}
 };
 
 koaWebpack(koaWebpackConfig).then(middleware => {
