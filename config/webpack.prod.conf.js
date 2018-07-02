@@ -5,16 +5,19 @@ const path = require('path');
 const merge = require('webpack-merge');
 const baseConfig = require('./webpack.base.conf')
 
+//https://github.com/jantimon/html-webpack-plugin
+//const HtmlWebpackPlugin = require('html-webpack-plugin');
 //https://github.com/webpack-contrib/mini-css-extract-plugin
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = merge(baseConfig, {
   mode: 'production',
   output: {
     publicPath: '/',
-    filename: '[name].[chunkhash:8].js',
+    filename: 'js/[name].[chunkhash:8].js',
     chunkFilename: 'chunks/[name].[chunkhash:8].js'
   },
   optimization: {
@@ -29,5 +32,6 @@ module.exports = merge(baseConfig, {
       chunkFilename: 'css/[name].[chunkhash:8].css'
     }),
     new OptimizeCSSPlugin(),
+    new LodashModuleReplacementPlugin()
   ]
 });
