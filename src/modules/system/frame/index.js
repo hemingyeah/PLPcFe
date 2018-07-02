@@ -1,3 +1,5 @@
+import 'src/assets/scss/index.scss'
+
 import Vue from 'vue'
 import FrameView from './FrameView.vue';
 

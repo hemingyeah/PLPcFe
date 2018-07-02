@@ -8,6 +8,9 @@ const util = require('./util')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
+
+console.log(util.genSassResourceLoader())
+
 module.exports = {
   mode: 'development',
   entry: util.genEntry(),
