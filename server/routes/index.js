@@ -1,15 +1,16 @@
 const KoaRouter = require('koa-router')
-const ResultMessage = require('../../model/ResultMessage')
 const HttpProxy = require('../util/HttpProxy')
 const Template = require('../util/Template')
 
+const modules = require('../../config/modules')
 const router = new KoaRouter();
 
 router.get('/', async ctx => {
+  let modConfig = modules['system.frame'];
   let data = {};
   let script = ['/system.frame.js'];
 
-  ctx.body = Template.render(data, script)
+  ctx.body = Template.render('售后宝', data, script, modConfig.template)
 })
 
 router.get('/home', async ctx => {
@@ -18,7 +19,7 @@ router.get('/home', async ctx => {
 
   let data = {};
   let script = ['/system.home.js'];
-  ctx.body = Template.render(data, script)
+  ctx.body = Template.render('首页' ,data, script)
 })
 
 router.all('/dd/*', ctx => HttpProxy.forward(ctx))

@@ -4,9 +4,9 @@ const path = require('path');
 
 const merge = require('webpack-merge');
 const baseConfig = require('./webpack.base.conf')
+const util = require('./util')
 
-//https://github.com/jantimon/html-webpack-plugin
-//const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 //https://github.com/webpack-contrib/mini-css-extract-plugin
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -32,6 +32,7 @@ module.exports = merge(baseConfig, {
       chunkFilename: 'css/[name].[chunkhash:8].css'
     }),
     new OptimizeCSSPlugin(),
-    new LodashModuleReplacementPlugin()
+    new LodashModuleReplacementPlugin(),
+    ...util.genHtmlPlugins()
   ]
 });

@@ -18,7 +18,7 @@ export default {
     }
   },
   mounted(){
-    this.login();
+    //this.login();
   }
 }
 </script>

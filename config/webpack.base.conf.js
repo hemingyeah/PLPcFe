@@ -4,14 +4,13 @@ const IS_PRODUCTION = process.env.NODE_ENV == 'production';
 const path = require('path')
 
 const util = require('./util')
-const entry = require('./entry')
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
   mode: 'development',
-  entry: entry,
+  entry: util.genEntry(),
   output: {
     publicPath: '/'
   },
@@ -87,5 +86,14 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin()
-  ]
+  ],
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js',
+      'src': path.join(__dirname,'../src'),
+    }
+  },
+  externals: {
+    jQuery: 'jQuery'
+  }
 }
