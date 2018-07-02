@@ -3,6 +3,7 @@
 const IS_PRODUCTION = process.env.NODE_ENV == 'production';
 
 const util = require('./util')
+const entry = require('./entry')
 const webpack = require('webpack');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -10,10 +11,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
   mode: 'development',
-  entry: {
-    'system.frame': './src/modules/system/frame/index.js',
-    'system.home': './src/modules/system/home/index.js'
-  },
+  entry: entry,
   output: {
     publicPath: '/'
   },
