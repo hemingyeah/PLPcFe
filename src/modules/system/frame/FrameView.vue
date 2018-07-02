@@ -2,6 +2,7 @@
   <div>
     index
     <a href="/home">home</a>
+
   </div>
 </template>
 
@@ -9,7 +10,7 @@
 export default {
   name: 'frame-view',
   mounted(){
-    console.log('caooo')
+    console.log('hello')
   }
 }
 </script>
