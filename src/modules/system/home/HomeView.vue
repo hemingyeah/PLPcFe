@@ -1,8 +1,12 @@
 <template>
-  <div>home</div>
+  <div>home
+    <a href="javascript:;" @click="open">open</a>
+  </div>
 </template>
 
 <script>
+import platform from 'src/platform';
+
 export default {
   name: 'home-view',
   methods: {
@@ -15,6 +19,9 @@ export default {
       xhr.onerror = function(e) {console.log(e)}
       xhr.open("post", url, true);
       xhr.send();
+    },
+    open(){
+      platform.openTab({title:"home2",url:"/home2"})
     }
   },
   mounted(){
