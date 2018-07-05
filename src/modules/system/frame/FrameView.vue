@@ -1,15 +1,24 @@
 <template>
   <div class="app">
-    <div>
-      <a href="/home" @click.prevent="open">home</a>
-      <a href="/home2" @click.prevent="open">home2</a>
-    </div>
-    <div>
-      <frame-tabs :tabs="frameTabs" @jump="jumpFrameTab" @close="closeFrameTab"></frame-tabs>
-    </div>
-    <div>
-      <div class="frame-tab-window" v-for="tab in frameTabs" v-show="tab.show">
-        <iframe :src="tab.url"></iframe>
+    <nav class="app-nav" :class="{'app-nav-collapse': collapse}">
+      <div>logo</div>
+      <div class="app-menu">
+        <a href="/home" @click.prevent="open">home</a>
+        <a href="/demo" @click.prevent="open">demo</a>
+        <a href="/setting" @click.prevent="open">setting</a>
+        <a href="/demo2" @click.prevent="open">demo2</a>
+      </div>
+    </nav>
+    <div class="app-main">
+      <header class="app-header">
+        <button @click="collapse = !collapse">收起</button>
+        <span>user</span>
+      </header>
+      
+      <frame-tabs :frame-tabs="frameTabs" @jump="jumpFrameTab" @close="closeFrameTab" @reload="reloadFrameTab"/>
+
+      <div class="app-content">
+        <frame-tab-content v-for="tab in frameTabs" :key="tab.url" :frame-tab="tab"/>
       </div>
     </div>
   </div>
@@ -18,6 +27,7 @@
 <script>
 import _ from 'lodash';
 import FrameTabs from './component/FrameTabs.vue';
+import FrameTabContent from './component/FrameTabContent.vue'
 
 export default {
   name: 'frame-view',
@@ -25,7 +35,8 @@ export default {
     let homeFrameTab = new FrameTab({url: '/home', title: '首页', show: true})
 
     return {
-      frameTabs: [homeFrameTab]
+      frameTabs: [homeFrameTab],
+      collapse: false
     }
   },
   methods: {
@@ -61,6 +72,10 @@ export default {
         }
       }
     },
+    reloadFrameTab(frameTabId){
+      let iframe = document.getElementById(`frame_${frameTabId}`);
+      iframe && iframe.contentWindow && iframe.contentWindow.location.reload();
+    },
     //处理接受到的消息
     receiveMessage(event){
       //不接收其他域名发送的信息
@@ -73,21 +88,24 @@ export default {
       let action = eventData.action;
 
       if(action == 'shb.system.openFrameTab') this.openFrameTab(eventData.data);
+      if(action == 'shb.system.reloadFrameTab') this.reloadFrameTab(eventData.data);
     },
     //兼容旧页面，迁移完成后删除
-    addTabs(){
-      console.warn('不推荐调用该该方法，使用platform.openFrameTab替代')
+    addTabs(option){
+      console.warn('不推荐调用该该方法，使用platform.openFrameTab替代');
+      this.openFrameTab(option)
     }
   },
   created(){
-
+    //todo
   },
   mounted(){
     window.addEventListener("message", this.receiveMessage, false);
     window.addTabs = this.addTabs;
   },
   components: {
-    [FrameTabs.name]: FrameTabs
+    [FrameTabs.name]: FrameTabs,
+    [FrameTabContent.name]: FrameTabContent
   }
 }
 
@@ -99,12 +117,12 @@ function FrameTab(options = {}){
   //首页不允许关闭
   if(options.url == '/home') closeable = false;
 
-  this.id = options.id;
+  this.id = options.id || Math.random() * 10000000 >> 0;
   this.title = options.title || '';
   this.url = options.url || '';
   this.closeable = closeable !== false;
   this.show = options.show === true;
-  //this.fromId = null;
+  this.fromId = options.fromId;
 }
 </script>
 
@@ -114,7 +132,39 @@ html, body, .app{
   overflow: hidden;
 }
 
-.frame-tab-window{
+.app{
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.app-nav{
+  width: 200px;
+  border-right: 1px solid #ddd;
+  transition: width ease .15s;
+}
+
+.app-nav.app-nav-collapse{
+  width: 50px;
+}
+
+.app-main{
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.app-header{
+  border-bottom: 1px solid #ddd;  
+}
+
+.app-content{
+  flex: 1;
+}
+
+.app-frame-tab-window{
+  height: 100%;
+
   iframe{
     display: block;
     width: 100%;

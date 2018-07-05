@@ -22,13 +22,16 @@ router.get('/home', async ctx => {
   ctx.body = Template.render('首页' ,data, script)
 })
 
-router.get('/home2', async ctx => {
-  //let result = await HttpProxy.request('/', 'get', null, {headers: ctx.request.headers});
-  //console.log(result)
+router.get('/demo', async ctx => {
+  ctx.body = `hello demo`
+})
 
-  let data = {};
-  let script = ['/system.home.js'];
-  ctx.body = Template.render('首页2' ,data, script)
+router.get('/setting', async ctx => {
+  ctx.body = `setting`
+})
+
+router.get('/demo2', async ctx => {
+  ctx.body = `demo2`
 })
 
 router.all('/dd/*', ctx => HttpProxy.forward(ctx))

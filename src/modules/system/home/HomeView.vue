@@ -21,11 +21,11 @@ export default {
       xhr.send();
     },
     open(){
-      platform.openTab({title:"home2",url:"/home2"})
+      platform.openTab({title:"demo",url:"/demo"})
     }
   },
   mounted(){
-    //this.login();
+    //todo
   }
 }
 </script>
