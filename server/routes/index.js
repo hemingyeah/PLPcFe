@@ -1,5 +1,5 @@
 const KoaRouter = require('koa-router')
-const HttpProxy = require('../util/HttpProxy')
+const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
 const modules = require('../../config/modules')
@@ -34,6 +34,7 @@ router.get('/demo2', async ctx => {
   ctx.body = `demo2`
 })
 
-router.all('/dd/*', ctx => HttpProxy.forward(ctx))
+router.all('/dd/*', ctx => HttpClient.forward(ctx))
+router.all('/files/*', ctx => HttpClient.forward(ctx))
 
 module.exports = router;
