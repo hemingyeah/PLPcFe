@@ -1,6 +1,6 @@
 <template>
   <div>home
-    <a @click="login">登录</a>
+    <a href="javascript:;" @click="login">登录</a>
     <br>
     <a href="/files/get?fileId=f2e38e1e-810a-11e8-8546-00163e304a25">下载</a>
     <br>

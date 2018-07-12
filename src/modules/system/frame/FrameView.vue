@@ -1,22 +1,12 @@
 <template>
   <div class="app">
-    <nav class="app-nav" :class="{'app-nav-collapse': collapse}">
-      <div>logo</div>
-      <div class="app-menu">
-        <a href="/home" @click.prevent="open">home</a>
-        <a href="/demo" @click.prevent="open">demo</a>
-        <a href="/setting" @click.prevent="open">setting</a>
-        <a href="/demo2" @click.prevent="open">demo2</a>
-      </div>
-    </nav>
+    <frame-nav :collapse="collapse" @open="openFrameTab"></frame-nav>
     <div class="app-main">
       <header class="app-header">
         <button @click="collapse = !collapse">收起</button>
         <span>user</span>
       </header>
-      
       <frame-tabs :frame-tabs="frameTabs" @jump="jumpFrameTab" @close="closeFrameTab" @reload="reloadFrameTab"/>
-
       <div class="app-content">
         <frame-tab-content v-for="tab in frameTabs" :key="tab.url" :frame-tab="tab"/>
       </div>
@@ -26,6 +16,7 @@
 
 <script>
 import _ from 'lodash';
+import FrameNav from './component/FrameNav.vue';
 import FrameTabs from './component/FrameTabs.vue';
 import FrameTabContent from './component/FrameTabContent.vue'
 
@@ -40,10 +31,6 @@ export default {
     }
   },
   methods: {
-    open(event){
-      let target = event.target;
-      this.openFrameTab({url: target.getAttribute('href'), title: target.innerText})
-    },
     jumpFrameTab(frameTab){
       this.frameTabs.forEach(item => item.show = false);
       frameTab.show = true;
@@ -105,7 +92,8 @@ export default {
   },
   components: {
     [FrameTabs.name]: FrameTabs,
-    [FrameTabContent.name]: FrameTabContent
+    [FrameTabContent.name]: FrameTabContent,
+    [FrameNav.name]: FrameNav
   }
 }
 
@@ -135,16 +123,6 @@ html, body, .app{
 .app{
   display: flex;
   flex-flow: row nowrap;
-}
-
-.app-nav{
-  width: 200px;
-  border-right: 1px solid #ddd;
-  transition: width ease .15s;
-}
-
-.app-nav.app-nav-collapse{
-  width: 50px;
 }
 
 .app-main{
