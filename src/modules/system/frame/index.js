@@ -1,7 +1,10 @@
 import 'src/assets/scss/index.scss'
 
-import Vue from 'vue'
+import Vue from 'vue';
+import component from 'src/component';
 import FrameView from './FrameView.vue';
+
+Vue.use(component);
 
 const app = new Vue({
   render: h => h(FrameView)

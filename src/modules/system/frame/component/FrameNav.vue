@@ -2,10 +2,17 @@
   <nav class="frame-nav" :class="{'frame-nav-collapse': collapse}">
     <div>logo</div>
     <div class="app-menu" @click.prevent="open">
-      <a href="/home"><span>home</span></a>
-      <a href="/demo">demo</a>
-      <a href="/setting">setting</a>
-      <a href="/demo2">demo2</a>
+      <ul>
+        <li><a href="/home"><span>home</span></a></li>
+        <li><a href="/demo">demo</a></li>
+        <li>
+          <a href="/setting">setting</a>
+          <ul>
+            <li><a href="/demo">demo</a></li>
+          </ul>
+        </li>
+        <li> <a href="/demo2">demo2</a></li>
+      </ul>
     </div>
   </nav>
 </template>
