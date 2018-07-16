@@ -10,6 +10,9 @@ const app = new Vue({
   render: h => h(FrameView)
 })
 
-app.$mount('#app')
+//TODO: 钉钉签名
+//console.log(window.DingTalkPC)
+
+app.$mount('#app');
 
 export default app;
