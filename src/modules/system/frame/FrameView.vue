@@ -4,18 +4,26 @@
     <div class="app-main">
       <header class="app-header">
         <button @click="collapse = !collapse">收起</button>
-        <span>user</span>
+        <span @click="versionModal = !versionModal">user</span>
+
+        <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
+        <a href="/logout" @click.prevent="logout">登出</a>
       </header>
       <frame-tabs :frame-tabs="frameTabs" @jump="jumpFrameTab" @close="closeFrameTab" @reload="reloadFrameTab"/>
       <div class="app-content">
         <frame-tab-content v-for="tab in frameTabs" :key="tab.url" :frame-tab="tab"/>
       </div>
     </div>
+
+    <base-modal class="version-modal" title="版本说明" :show.sync="versionModal" >
+      
+    </base-modal>
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
+import platform from 'src/platform'
 import FrameNav from './component/FrameNav.vue';
 import FrameTabs from './component/FrameTabs.vue';
 import FrameTabContent from './component/FrameTabContent.vue'
@@ -27,10 +35,17 @@ export default {
 
     return {
       frameTabs: [homeFrameTab],
-      collapse: false
+      collapse: false,
+      versionModal: false //版本信息modal
     }
   },
   methods: {
+    logout(){
+      console.log('logout')
+    },
+    openHelpDoc(event){
+      platform.openLink(event.target.href);
+    },
     jumpFrameTab(frameTab){
       this.frameTabs.forEach(item => item.show = false);
       frameTab.show = true;
