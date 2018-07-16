@@ -14,7 +14,7 @@ router.get('/', async ctx => {
 })
 
 router.get('/home', async ctx => {
-  //let result = await HttpProxy.request('/', 'get', null, {headers: ctx.request.headers});
+  //let result = await HttpClient.request('/', 'get', null, {headers: ctx.request.headers});
   //console.log(result)
 
   let data = {};
@@ -34,7 +34,7 @@ router.get('/demo2', async ctx => {
   ctx.body = `demo2`
 })
 
-router.all('/dd/*', ctx => HttpClient.forward(ctx))
-router.all('/files/*', ctx => HttpClient.forward(ctx))
+router.all('/dd/*', ctx => HttpClient.proxy(ctx))
+router.all('/files/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;

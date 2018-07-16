@@ -1,5 +1,4 @@
-/** @author dongls */
-//TODO: 重写
+/** 请求代理 @author dongls */
 const http = require('http');
 
 const DEFAULT_OPIONS = {
@@ -43,8 +42,8 @@ function getBody(response, body, error){
 
 module.exports = {
     /**
-   * 发起一个请求
-   * 如果请求地址需要登录，请在options中传入对应的headers
+   * 发起一个请求,不能处理附件类请求
+   * 如果请求地址需要登录，请在options的headers中传入对应的cookie
    * 
    * @param {*} path 请求路径
    * @param {*} method 请求方法
@@ -62,7 +61,6 @@ module.exports = {
     proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, options.headers)
     proxyOptions.agent = AGENT;
 
-    //TODO: 超时处理
     return new Promise((resolve, reject) => {
       let req = http.request(proxyOptions, res => {
         let chunks = [];
@@ -78,15 +76,13 @@ module.exports = {
           //拼接返回数据
           let body = Buffer.concat(chunks, size).toString();
           
-          //处理json
+          //处理返回值
           let contentType = res.headers['content-type'];
-          if(contentType && contentType.indexOf('application/json' >= 0)){
+          if(contentType && contentType.indexOf('application/json' >= 0)) {
             body = toJSON(body)
-          } 
+          }
           
-          let resBody = getBody(res, body, null);
-
-          resolve(resBody);
+          resolve(getBody(res, body, null));
         });
       })
 
@@ -102,10 +98,11 @@ module.exports = {
     });
   },
   /**
-   * 转发请求，无需对返回数据处理时用
+   * 转发请求，无需对返回数据处理时用，可处理附件类请求
    * @param {*} ctx 
+   * @param {*} options
    */
-  forward(ctx, options = {}){
+  proxy(ctx, options = {}){
     let request = ctx.request;
     let response = ctx.response;
 
@@ -127,25 +124,29 @@ module.exports = {
 
     return new Promise((resolve, reject) => {
       let req = http.request(proxyOptions, res => {
+        //设定response的header
         let headers = res.headers;
         for(let name in headers){
           response.set(name, headers[name])
         }
         
+        //设定请求状态
         response.status = res.statusCode;
         res.pipe(response.res, {end: false})
         
         res.on('end', () => {
+          //此处需要手动调用
           response.res.end()
           resolve()
         })
       })
-  
+      
       req.on('error', error => {
         console.log(error)
         reject(error)
       });
       
+      //非附件类请求需要调用end
       if(!isMultipart){
         if(rawBody) req.write(rawBody)
         req.end();
