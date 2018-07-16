@@ -1,13 +1,13 @@
 <template>
   <transition 
     name="slide-down"
-    @after-leave="$emit('transitionend')">
-    <div v-show="show" class="base-modal-mask">
+    @after-leave="$emit('closed')">
+    <div v-show="show" class="base-modal-mask" @click.self="maskClose">
       <div class="base-modal transition-container" :style="{width: width}">
         <div class="base-modal-header">
           <slot name="header">
             <h3>{{ title }}</h3>
-            <button type="button" class="btn-text base-modal-header-close" @click="close">
+            <button type="button" class="btn-text base-modal-header-close" @click="close" v-if="closeable">
               <i class="iconfont icon-guanbi"></i>
             </button>
           </slot>
@@ -36,16 +36,27 @@ export default {
     width: {
       type: String,
       default: '640px'
+    },
+    closeable: {
+      type: Boolean,
+      default: true
+    },
+    maskCloseable: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {
     close(){
-      this.$emit('modal-close');
+      this.$emit('close');
       //兼容sync
       this.$emit('update:show', false);
     },
+    maskClose(){
+      if(this.closeable && this.maskCloseable) this.close();
+    },
     escClose(event){
-      if(this.show && event.keyCode == 27){
+      if(this.show && this.closeable && event.keyCode == 27){
         this.close();
       }
     }
@@ -62,7 +73,7 @@ export default {
 <style lang="scss">
 .base-modal-mask{
   @include mask();
-  z-index: 9999;
+  z-index: 999;
   overflow: auto;
 }
 
@@ -71,7 +82,7 @@ export default {
   margin: 50px auto;
   background-color: #fff;
   border-radius: 1px;
-  box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 1px 1px 8px rgba(0,0,0,0.15);
   color: #333;
 }
 
@@ -105,6 +116,8 @@ export default {
 
     font-size: 14px;
     color: #999;
+
+    transition: color ease .15s;
 
     &:hover{
       color: #e84040;
