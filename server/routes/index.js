@@ -14,8 +14,8 @@ router.get('/', async ctx => {
 })
 
 router.get('/home', async ctx => {
-  //let result = await HttpClient.request('/', 'get', null, {headers: ctx.request.headers});
-  //console.log(result)
+  //let result = await HttpClient.request('/v3', 'get', null, {headers: ctx.request.headers});
+  //console.log(Template.parseHtml(result.body))
 
   let data = {};
   let script = ['/system.home.js'];

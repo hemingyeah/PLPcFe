@@ -26,4 +26,11 @@ module.exports = {
 
     return template;    
   },
+  /** 提取script中的数据 */
+  parseHtml(html){
+    let scriptReg = /<script data-init="js">([\s\S]*)<\/script>/;
+    let result = scriptReg.exec(html);
+
+    return result ? result[1] : null;
+  }
 }
