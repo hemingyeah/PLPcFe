@@ -28,7 +28,7 @@ module.exports = {
   },
   /** 提取script中的数据 */
   parseHtml(html){
-    let scriptReg = /<script data-init="js">([\s\S]*)<\/script>/;
+    let scriptReg = /<script data-init="js">([^<]*)<\/script>/;
     let result = scriptReg.exec(html);
 
     return result ? result[1] : null;

@@ -16,7 +16,7 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 module.exports = merge(baseConfig, {
   mode: 'production',
   output: {
-    publicPath: '/',
+    publicPath: '/resource/pc-fe/',
     filename: 'js/[name].[chunkhash:8].js',
     chunkFilename: 'chunks/[name].[chunkhash:8].js'
   },

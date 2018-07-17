@@ -6,6 +6,7 @@
         <button @click="collapse = !collapse">收起</button>
         <span @click="versionModal = !versionModal">user</span>
 
+        <a href="/">旧版</a>
         <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
         <a href="/logout" @click.prevent="logout">登出</a>
       </header>
