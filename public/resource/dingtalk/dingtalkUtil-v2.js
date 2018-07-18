@@ -1,40 +1,8 @@
 /** @deprecated 只用于兼容旧版本，新页面不推荐使用 Created by dongls on 2017/5/6. */
 (function () {
-  var host = '';
-  var corpId = '';
-
   //判断是否在钉钉pc端
   window.inDingTalkPC = function () {
     return DingTalkPC && DingTalkPC.ua.isDesktop;
-  }
-
-  //签名
-  window.config = function (config_info, callback) {
-    host = config_info._host;
-    corpId = config_info.corpId;
-
-    DingTalkPC.config({
-      agentId: config_info.agentId,
-      corpId: config_info.corpId,
-      timeStamp: config_info.timeStamp,
-      nonceStr: config_info.nonceStr,
-      signature: config_info.signature,
-      jsApiList: ['runtime.permission.requestAuthCode', 'biz.util.openLink', 'device.notification.alert', 'service.request.httpOverLwp', 'biz.ding.post']
-    });
-
-    DingTalkPC.ready(function () {
-      callback && typeof callback == 'function' && callback();
-      console.log("==========DingTalkPC ready==========");
-    });
-
-    DingTalkPC.error(function (error) {
-      var msg = "";
-      for (var key in error) {
-        msg += key + ":" + error[key] + ";";
-      }
-      console.log("==========DingTalkPC error==========");
-      console.log(msg);
-    });
   }
 
   //============================alert实现=================================
@@ -152,7 +120,7 @@
   window.send_ding_message = function (users, text) {
     DingTalkPC.biz.ding.post({
       users: users,//用户列表，userid
-      corpId: corpId, //加密的企业id
+      corpId: window._global_data_corpId, //加密的企业id
       type: 1, //钉类型 1：image  2：link
       alertType: 2,
       alertDate: { "format": "yyyy-MM-dd HH:mm", "value": "" },
@@ -165,20 +133,20 @@
     })
   }
   window.send_link_ding_message = function (users, text, id) {
-    var url = host + '/v_open/jump';
-    var query = '?dd_nav_bgcolor=ff00ac9&type=1&id=' + id + '&corpId=' + corpId;
+    var url = window.location.origin + '/v_open/jump';
+    var query = '?dd_nav_bgcolor=ff00ac9&type=1&id=' + id + '&corpId=' + window._global_data_corpId;
     url = url + query;
     var bodyText = '您有一个工单（' + text + '）需要关注';
     DingTalkPC.biz.ding.post({
       users: users, //用户列表，userid
-      corpId: corpId, //企业id
+      corpId: window._global_data_corpId, //企业id
       type: 2, //钉类型 1：image  2：link
       alertType: 2,
       alertDate: { "format": "yyyy-MM-dd HH:mm", "value": "" },
       attachment: {
         title: '工单信息（仅支持移动端查看）', //附件的标题
         url: url, //附件点击后跳转url
-        image: host + '/resource/images/att.png', //附件显示时的图片 【可选】
+        image: window.location.origin + '/resource/images/att.png', //附件显示时的图片 【可选】
         text: text //附件显示时的消息体 【可选】
       },
       text: bodyText, //消息体

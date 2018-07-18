@@ -4,11 +4,19 @@
     <div class="app-main">
       <header class="app-header">
         <button @click="collapse = !collapse">收起</button>
-        <span @click="versionModal = !versionModal">user</span>
 
-        <a href="/">旧版</a>
-        <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
-        <a href="/logout" @click.prevent="logout">登出</a>
+        <div style="float:right;">
+          <a href="/">旧版</a>
+          <span @click="versionModal = !versionModal">版本说明</span>
+          <span>
+            <img :src="loginUser.head" style="display:inline-block; width:32px;height:32px; border-radius:50%;"/>  
+            {{loginUser.displayName}}
+          </span>
+          <span>专属客服</span>
+          <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
+          <a href="/logout" @click.prevent="logout">登出</a>
+        </div>
+        
       </header>
       <frame-tabs :frame-tabs="frameTabs" @jump="jumpFrameTab" @close="closeFrameTab" @reload="reloadFrameTab"/>
       <div class="app-content">
@@ -16,8 +24,9 @@
       </div>
     </div>
 
-    <base-modal class="version-modal" title="版本说明" :show.sync="versionModal" >
-      
+    <base-modal class="version-modal" title="版本说明" :show.sync="versionModal" :closeable="false">
+      说明信息
+      <button @click="versionModal = false">关闭</button>
     </base-modal>
   </div>
 </template>
@@ -31,19 +40,36 @@ import FrameTabContent from './component/FrameTabContent.vue'
 
 export default {
   name: 'frame-view',
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data(){
     let homeFrameTab = new FrameTab({url: '/home', title: '首页', show: true})
-
+    let menus = this.initData.menus || [];
     return {
       frameTabs: [homeFrameTab],
       collapse: false,
       versionModal: false, //版本信息modal
-      menus: []
+      menus: menus
+    }
+  },
+  computed: {
+    loginUser(){
+      return this.initData.user || {};
     }
   },
   methods: {
-    logout(){
-      console.log('logout')
+    async logout(){
+      if(await platform.confirm('您确定要退出系统吗？')){
+        if(platform.inDingTalk()){
+            window.location.href = '/smlogin/pc/logout'
+        }else{
+            window.location.href = '/logout'
+        }
+      }
     },
     openHelpDoc(event){
       platform.openLink(event.target.href);
@@ -101,14 +127,7 @@ export default {
     }
   },
   created(){
-    let initData = {};
-    try {
-      initData = JSON.parse(window._init);
-    } catch (error) {
-      console.error('no init data')
-    }
     
-    this.menus = initData.menus || [];
   },
   mounted(){
     window.addEventListener("message", this.receiveMessage, false);
@@ -155,11 +174,12 @@ html, body, .app{
 }
 
 .app-header{
+  height: 33px;
   border-bottom: 1px solid #ddd;  
 }
 
 .app-content{
-  height: calc(100% - 65px);
+  height: calc(100% - 73px);
 }
 
 .app-frame-tab-window{
