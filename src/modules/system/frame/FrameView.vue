@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <frame-nav :collapse="collapse" @open="openFrameTab"></frame-nav>
+    <frame-nav :collapse="collapse" @open="openFrameTab" :menus="menus"></frame-nav>
     <div class="app-main">
       <header class="app-header">
         <button @click="collapse = !collapse">收起</button>
@@ -37,7 +37,8 @@ export default {
     return {
       frameTabs: [homeFrameTab],
       collapse: false,
-      versionModal: false //版本信息modal
+      versionModal: false, //版本信息modal
+      menus: []
     }
   },
   methods: {
@@ -100,7 +101,14 @@ export default {
     }
   },
   created(){
-    //todo
+    let initData = {};
+    try {
+      initData = JSON.parse(window._init);
+    } catch (error) {
+      console.error('no init data')
+    }
+    
+    this.menus = initData.menus || [];
   },
   mounted(){
     window.addEventListener("message", this.receiveMessage, false);
@@ -144,8 +152,6 @@ html, body, .app{
 .app-main{
   flex: 1;
   height: 100%;
-  display: flex;
-  flex-flow: column nowrap;
 }
 
 .app-header{
@@ -153,7 +159,7 @@ html, body, .app{
 }
 
 .app-content{
-  flex: 1;
+  height: calc(100% - 65px);
 }
 
 .app-frame-tab-window{

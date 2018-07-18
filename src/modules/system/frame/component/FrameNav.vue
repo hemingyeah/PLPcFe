@@ -3,15 +3,16 @@
     <div>logo</div>
     <div class="app-menu" @click.prevent="open">
       <ul>
-        <li><a href="/home"><span>home</span></a></li>
-        <li><a href="/demo">demo</a></li>
-        <li>
-          <a href="/setting">setting</a>
-          <ul>
-            <li><a href="/demo">demo</a></li>
-          </ul>
+        <li v-for="menu in menus" :key="menu.menuKey">
+          <a :href="menu.url">{{menu.name}}</a>
+          <template v-if="menu.subMenu.length > 0">
+            <ul>
+              <li v-for="sub in menu.subMenu" :key="sub.menuKey">
+                <a :href="sub.url">{{sub.name}}</a>
+              </li>
+            </ul>
+          </template>
         </li>
-        <li> <a href="/demo2">demo2</a></li>
       </ul>
     </div>
   </nav>
@@ -24,6 +25,10 @@ export default {
     collapse: {
       type: Boolean,
       default: false
+    },
+    menus: {
+      type: Array,
+      default: () => []
     }
   },
   methods: {
@@ -45,9 +50,14 @@ export default {
   width: 200px;
   border-right: 1px solid #ddd;
   transition: width ease .15s;
+   overflow: auto;
 }
 
 .frame-nav.frame-nav-collapse{
   width: 50px;
+}
+
+.app-menu{
+ 
 }
 </style>

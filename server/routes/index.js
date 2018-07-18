@@ -7,19 +7,14 @@ const router = new KoaRouter();
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
-  let data = {};
   let script = ['/system.frame.js'];
-
-  ctx.body = Template.render('售后宝', data, script, modConfig.template)
+  let result = await HttpClient.request('/v3', 'get', null, {headers: ctx.request.headers});
+  ctx.body = Template.renderWithHtml('首页', result.body, script, modConfig.template)
 })
 
 router.get('/home', async ctx => {
-  //let result = await HttpClient.request('/v3', 'get', null, {headers: ctx.request.headers});
-  //console.log(Template.parseHtml(result.body))
-
-  let data = {};
   let script = ['/system.home.js'];
-  ctx.body = Template.render('首页' ,data, script)
+  ctx.body = Template.renderWithData('首页', {}, script)
 })
 
 router.get('/demo', async ctx => {
