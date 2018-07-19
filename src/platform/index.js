@@ -97,7 +97,7 @@ function confirm(message = '', title = '提示'){
   let dingtalk = getDingTalkPC();
   if(!inDingTalk(dingtalk)) return Promise.resolve(window.confirm(message));
     
-  return new Promise((resolve,reject) => {  
+  return new Promise((resolve, reject) => {  
     dingtalk.device.notification.confirm({
       message: message,
       title: title,

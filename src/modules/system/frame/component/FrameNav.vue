@@ -1,14 +1,20 @@
 <template>
   <nav class="frame-nav" :class="{'frame-nav-collapse': collapse}">
     <div>logo</div>
-    <div class="app-menu" @click.prevent="open">
-      <ul>
-        <li v-for="menu in menus" :key="menu.menuKey">
-          <a :href="menu.url">{{menu.name}}</a>
-          <template v-if="menu.subMenu.length > 0">
-            <ul>
-              <li v-for="sub in menu.subMenu" :key="sub.menuKey">
-                <a :href="sub.url">{{sub.name}}</a>
+    <div class="app-menu">
+      <ul class="frame-nav-menu">
+        <li v-for="menu in menus" :key="menu.menuKey" class="frame-nav-menu-item" :class="{'frame-nav-menu-expand': menu.expand}">
+          <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">
+            <i class="iconfont icon-gongdanbiaodanshezhi"></i>
+            <span>{{menu.name}}</span>
+          </a>
+          <template v-if="menu.children && menu.children.length > 0">
+            <ul class="frame-nav-menu">
+              <li v-for="children in menu.children" :key="children.menuKey">
+                <a :href="children.url ? children.url : 'javascript:;'" @click.prevent="open(children)">
+                  <i class="iconfont icon-gongdanbiaodanshezhi"></i>
+                  <span>{{children.name}}</span>
+                </a>
               </li>
             </ul>
           </template>
@@ -19,6 +25,8 @@
 </template>
 
 <script>
+import _ from 'lodash';
+
 export default {
   name: 'frame-nav',
   props: {
@@ -26,21 +34,56 @@ export default {
       type: Boolean,
       default: false
     },
-    menus: {
+    source: {
       type: Array,
       default: () => []
     }
   },
+  data(){
+    let menus = this.buildMenus(_.cloneDeep(this.source));
+
+    return {
+      menus: menus
+    };
+  },
   methods: {
-    open(event){
-      let a = event.target.closest('.app-menu a')
-      if(a == null) return;
-      
+    buildMenus(menus){
+      return menus.map(item => {
+        let menu = {};
+
+        menu.name = item.name;
+        menu.url = item.url;
+        menu.key = item.menuKey;
+        menu.parent = item.parent;
+        menu.children = this.buildMenus(item.subMenu || []);
+
+        if(menu.children.length > 0){
+          menu.isDirectory = true;
+          menu.expand = false;
+        }
+
+        return menu;
+      })
+    },
+    open(menu){
+      if(menu.isDirectory) {
+        menu.expand = !menu.expand;
+        return
+      }
+
+      if(!menu.url) return
+
       this.$emit('open', {
-        url: a.getAttribute('href'),
-        title: a.textContent
+        url: menu.url,
+        title: menu.name
       })
     }
+  },
+  mounted(){
+    //
+  },
+  components: {
+
   }
 }
 </script>
@@ -50,14 +93,32 @@ export default {
   width: 200px;
   border-right: 1px solid #ddd;
   transition: width ease .15s;
-   overflow: auto;
+  overflow: auto;
+
+
 }
 
 .frame-nav.frame-nav-collapse{
-  width: 50px;
+  width: 150px;
 }
 
-.app-menu{
- 
+.frame-nav-menu{
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
+.frame-nav-menu .frame-nav-menu{
+  padding-left: 15px;
+}
+
+.frame-nav-menu-item > .frame-nav-menu{
+  display: none;
+}
+
+.frame-nav-menu-item.frame-nav-menu-expand > .frame-nav-menu{
+  display: block;
+}
+
+
+
 </style>

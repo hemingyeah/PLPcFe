@@ -4,7 +4,7 @@ import Vue from 'vue';
 import component from 'src/component';
 import FrameView from './FrameView.vue';
 
-import dingtalk from 'src/util/dingtalk'
+import dingtalk from 'src/util/dingtalk';
 
 Vue.use(component);
 

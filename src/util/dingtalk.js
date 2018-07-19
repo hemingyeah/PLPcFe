@@ -26,13 +26,8 @@ function sign(config){
     });
     
     //签名失败
-    DingTalkPC.error(function (error) {
-      var msg = "";
-      for (var key in error) {
-          msg += key + ":" + error[key] + ";";
-      }
+    DingTalkPC.error(function (error) {  
       console.log("==========DingTalkPC error==========");
-      console.log(msg);
       reject(error)
     });
   });

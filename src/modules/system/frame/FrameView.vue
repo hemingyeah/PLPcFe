@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <frame-nav :collapse="collapse" @open="openFrameTab" :menus="menus"></frame-nav>
+    <frame-nav :collapse="collapse" @open="openFrameTab" :source="initData.menus"></frame-nav>
     <div class="app-main">
       <header class="app-header">
         <button @click="collapse = !collapse">收起</button>
@@ -8,15 +8,15 @@
         <div style="float:right;">
           <a href="/">旧版</a>
           <span @click="versionModal = !versionModal">版本说明</span>
-          <span>
+          <a :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
             <img :src="loginUser.head" style="display:inline-block; width:32px;height:32px; border-radius:50%;"/>  
             {{loginUser.displayName}}
-          </span>
+            <span>{{loginUser.state}}</span>
+          </a>
           <span>专属客服</span>
           <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
-          <a href="/logout" @click.prevent="logout">登出</a>
+          <a href="/logout" @click.prevent="logout">注销</a>
         </div>
-        
       </header>
       <frame-tabs :frame-tabs="frameTabs" @jump="jumpFrameTab" @close="closeFrameTab" @reload="reloadFrameTab"/>
       <div class="app-content">
@@ -34,9 +34,11 @@
 <script>
 import _ from 'lodash';
 import platform from 'src/platform'
+import http from 'src/util/http';
+
 import FrameNav from './component/FrameNav.vue';
 import FrameTabs from './component/FrameTabs.vue';
-import FrameTabContent from './component/FrameTabContent.vue'
+import FrameTabContent from './component/FrameTabContent.vue';
 
 export default {
   name: 'frame-view',
@@ -48,12 +50,11 @@ export default {
   },
   data(){
     let homeFrameTab = new FrameTab({url: '/home', title: '首页', show: true})
-    let menus = this.initData.menus || [];
+    
     return {
       frameTabs: [homeFrameTab],
       collapse: false,
-      versionModal: false, //版本信息modal
-      menus: menus
+      versionModal: false //版本信息modal
     }
   },
   computed: {
@@ -62,6 +63,13 @@ export default {
     }
   },
   methods: {
+    async updateUser(){
+      let result = await http.get(`/security/user/get/${this.loginUser.userId}`);
+      if(result.status == 0){
+        //暂时只更新状态
+        this.loginUser.state = result.data.state;
+      }
+    },
     async logout(){
       if(await platform.confirm('您确定要退出系统吗？')){
         if(platform.inDingTalk()){
@@ -73,6 +81,14 @@ export default {
     },
     openHelpDoc(event){
       platform.openLink(event.target.href);
+    },
+    openUserView(event){
+      let a = event.target.closest('a')
+      //addTabs({id: "userCenter", title: "正在加载", close: true, url: "/mine/" + currentLoginUserId});
+      this.openFrameTab({
+        url: a.getAttribute('href'),
+        title: '个人中心'
+      })
     },
     jumpFrameTab(frameTab){
       this.frameTabs.forEach(item => item.show = false);
@@ -127,11 +143,13 @@ export default {
     }
   },
   created(){
-    
+    //
   },
   mounted(){
     window.addEventListener("message", this.receiveMessage, false);
     window.addTabs = this.addTabs;
+
+    this.updateUser();
   },
   components: {
     [FrameTabs.name]: FrameTabs,

@@ -74,6 +74,8 @@ function gen(directory, fileName){
       template = template.replace(/#\{(.*)\}/g, "${$1}");
       //注入jsp头部信息
       template = '<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>\n' + template;
+      //注入构建信息
+      template += `\n<!-- build on ${new Date().toLocaleString()}. -->`;
       
       let dirPath = path.resolve(directory, 'jsp');
       if(!existsSync(dirPath)) {
