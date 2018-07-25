@@ -1,8 +1,9 @@
 /*global DingTalkPC:true*/
 
 /** 钉钉api签名 */
-function sign(config){
+function sign(config = {}){
   window._global_data_corpId = config.corpId;
+
   return new Promise((resolve, reject) => {
     DingTalkPC.config({
       agentId:config.agentId,
@@ -22,12 +23,12 @@ function sign(config){
     //签名成功
     DingTalkPC.ready(function () {
       resolve();
-      console.log("==========DingTalkPC ready==========");
+      console.log("========== DingTalkPC ready ==========");
     });
     
     //签名失败
     DingTalkPC.error(function (error) {  
-      console.log("==========DingTalkPC error==========");
+      console.log("========== DingTalkPC error ==========");
       reject(error)
     });
   });
