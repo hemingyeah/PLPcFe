@@ -132,6 +132,7 @@
       onFail: function() { }
     })
   }
+  
   window.send_link_ding_message = function (users, text, id) {
     var url = window.location.origin + '/v_open/jump';
     var query = '?dd_nav_bgcolor=ff00ac9&type=1&id=' + id + '&corpId=' + window._global_data_corpId;

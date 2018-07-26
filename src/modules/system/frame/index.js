@@ -1,11 +1,15 @@
 import 'src/assets/scss/index.scss'
 
 import Vue from 'vue';
+
+import directive from 'src/directive';
 import component from 'src/component';
-import FrameView from './FrameView.vue';
 
 import dingtalk from 'src/util/dingtalk';
 
+import FrameView from './FrameView.vue';
+
+Vue.use(directive);
 Vue.use(component);
 
 //处理注入的参数
@@ -17,7 +21,7 @@ try {
   console.error('no init data')
 }
 
-const FrameViewComp = Vue.extend(FrameView)
+const FrameViewComp = Vue.extend(FrameView);
 const app = new FrameViewComp({
   propsData: {
     initData

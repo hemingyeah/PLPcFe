@@ -13,8 +13,9 @@
             {{loginUser.displayName}}
             <span>{{loginUser.state}}</span>
           </a>
-          <span>专属客服</span>
-          <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
+
+          <span title="hello tooltip" v-tooltip>专属客服</span>
+          <a href="http://help.shb.ltd" @click.prevent="openHelpDoc" title="帮助文档" v-tooltip>帮助文档</a>
           <a href="/logout" @click.prevent="logout">注销</a>
         </div>
       </header>
@@ -25,7 +26,7 @@
     </div>
 
     <base-modal class="version-modal" title="版本说明" :show.sync="versionModal" :closeable="false">
-      说明信息
+      <span>说明信息</span>
       <button @click="versionModal = false">关闭</button>
     </base-modal>
   </div>
@@ -209,5 +210,7 @@ html, body, .app{
     height: 100%;
   }
 }
+
+
 </style>
 
