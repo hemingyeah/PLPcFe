@@ -14,7 +14,8 @@
 </template>
 
 <script>
-  import BaseGallery from '../component/BaseGallery';
+  import BaseGallery from '../BaseGallery/index';
+  import platform from 'src/platform/index';
 
   export default {
     name: "ui-file-item",
@@ -60,11 +61,11 @@
         let currUrl = window.location.origin + file.url;
         if (this.judgedFileType(file) !== 'img') {
           // download
-          return this.$platform.openLink(currUrl);
+          return platform.openLink(currUrl);
         }
         // image preview
         let images = this.$el.querySelectorAll('.img-for-preview');
-        this.$platform.imagePreview({
+        platform.imagePreview({
           imageDom: images[0],
           imgUrl: currUrl,
         });
@@ -111,7 +112,7 @@
         height: 44px;
         width: 44px;
         background-repeat: no-repeat;
-        background-image: url("../assets/img/file-icon.png");
+        background-image: url("../../assets/img/file-icon.png");
         background-size: 44px;
         border-radius: 4px;
         overflow: hidden;

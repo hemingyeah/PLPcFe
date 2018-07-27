@@ -5,13 +5,14 @@
     <a href="javascript:;" @click="open">open</a>
     <br>
 
-    <file-upload v-on:update-files="updateFiles"></file-upload>
+    <base-file-upload v-on:update-files="updateFiles"></base-file-upload>
   </div>
 </template>
 
 <script>
 import platform from 'src/platform';
 import FileUpload from '../../../component/BaseFileUpload';
+import BaseFileUpload from "../../../component/BaseFileUpload/BaseFileUpload";
 
 export default {
   name: 'home-view',
@@ -49,6 +50,7 @@ export default {
     //
   },
   components: {
+    BaseFileUpload,
     [FileUpload.name]: FileUpload,
   }
 }

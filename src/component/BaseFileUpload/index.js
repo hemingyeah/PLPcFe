@@ -1,3 +1,3 @@
-import FileUpload from './FileUpload'
+import BaseFileUpload from './BaseFileUpload'
 
-export default FileUpload;
+export default BaseFileUpload;
