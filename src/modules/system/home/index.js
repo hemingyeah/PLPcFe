@@ -1,3 +1,6 @@
+import 'src/assets/scss/index.scss'
+import 'src/common/polyfill'
+
 import Vue from 'vue'
 import HomeView from './HomeView.vue';
 

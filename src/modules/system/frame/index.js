@@ -1,4 +1,5 @@
-import 'src/assets/scss/index.scss'
+import 'src/assets/scss/index.scss';
+import 'src/common/polyfill'
 
 import Vue from 'vue';
 
@@ -28,7 +29,7 @@ const app = new FrameViewComp({
   }
 });
 
-dingtalk.sign(initData.ddConfig);
+if(window.DingTalkPC) dingtalk.sign(initData.ddConfig);
 
 app.$mount('#app');
 
