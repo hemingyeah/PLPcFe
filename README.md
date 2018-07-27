@@ -5,5 +5,6 @@
 
 ## todolist
  * tooltip 指令
- * modal 组件
- 
+ * 文件上传组件
+ * 图片预览 兼容钉钉 兼容文件上传组件
+ * toast 兼容钉钉
