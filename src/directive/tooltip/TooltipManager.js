@@ -1,23 +1,17 @@
 export default class TooltipManager{
   constructor(){
-    this.contexts = {};
+    this.instances = {};
   }
 
-  getContext(id){
-    return this.contexts[id];
+  get(id){
+    return this.instances[id]
   }
 
-  saveContext(id, context){
-    this.contexts[id] = context;
+  save(id, instances){
+    this.instances[id] = instances;
   }
 
-  removeComponent(id){
-    let ctx = this.getContext(id);
-    delete ctx.component;
-  }
-
-  saveComponent(id, component){
-    let ctx = this.getContext(id);
-    ctx.component = component;
+  remove(id){
+    delete this.instances[id];
   }
 }

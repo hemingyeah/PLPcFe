@@ -4,7 +4,7 @@
     <div class="app-menu">
       <ul class="frame-nav-menu">
         <li v-for="menu in menus" :key="menu.menuKey" class="frame-nav-menu-item" :class="{'frame-nav-menu-expand': menu.expand}">
-          <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">
+          <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)" title="hello tooltip" v-tooltip data-placement="right">
             <i class="iconfont icon-gongdanbiaodanshezhi"></i>
             <span>{{menu.name}}</span>
           </a>

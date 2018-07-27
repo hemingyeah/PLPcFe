@@ -15,7 +15,7 @@
           </a>
 
           <span title="hello tooltip" v-tooltip>专属客服</span>
-          <a href="http://help.shb.ltd" @click.prevent="openHelpDoc" title="帮助文档" v-tooltip>帮助文档</a>
+          <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
           <a href="/logout" @click.prevent="logout">注销</a>
         </div>
       </header>
@@ -151,6 +151,8 @@ export default {
     window.addTabs = this.addTabs;
 
     this.updateUser();
+
+    setTimeout(() => this.title += ' update', 1000)
   },
   components: {
     [FrameTabs.name]: FrameTabs,

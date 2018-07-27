@@ -1,8 +1,8 @@
 /** tooltip指令，替代原生浏览器title属性 @author dongls */
 import './tooltip.scss';
 
-import Vue from 'vue';
-import Popper from 'popper.js';
+import _ from 'lodash';
+import Tooltip from './Tooltip';
 import TooltipManager from './TooltipManager';
 
 let manager = new TooltipManager();
@@ -10,52 +10,17 @@ let manager = new TooltipManager();
 function showToolTip(event){
   let el = event.target;
   let id = el.dataset.tooltip;
+  let tooltip = manager.get(id);
 
-  let {option, component} = manager.getContext(id);
-
-  if(null == component){
-    component = createTooltip(option)
-    manager.saveComponent(id, component);
-    component.init();
-  }
+  if(tooltip) tooltip.show();
 }
 
 function hideToolTip(event){
   let el = event.target;
   let id = el.dataset.tooltip;
+  let tooltip = manager.get(id);
 
-  let {component} = manager.getContext(id);
-
-  component.destroy();
-  manager.removeComponent(id)
-}
-
-function createTooltip(option){
-  return new Vue({
-    data: {
-      popper: null
-    },
-    render(){
-      return (
-        <div class="base-tooltip">
-          {option.content}
-          <div class="base-tooltip__arrow" x-arrow></div>
-        </div>
-      )
-    },
-    methods: {
-      init(){
-        let mountEl = document.createElement('div');
-        document.body.appendChild(mountEl);
-
-        this.$mount(mountEl);
-        this.popper = new Popper(option.target, this.$el);
-      },
-      destroy(){
-        this.popper.destroy()
-      }
-    }
-  })
+  if(tooltip) tooltip.hide();
 }
 
 /**
@@ -64,35 +29,48 @@ function createTooltip(option){
  * 
  * @param {*} option 传入的配置
  * @param {*} el 
+ * @param {*} insOption 当前配置，更新选项时用
  */
-function getOption(option, el){
-  //默认取title上的值
-  let content = el.title;
+function parseOption(value, el, insOption = {}){
+  //如果传入string类型值，该值会被当做conent
+  if(typeof value != 'object') {
+    value = value == null ? {} : {content: value}
+  }
+  //指令传入的选项  
+  let option = _.assign({}, value, {target: el});
+  //如果是新绑定的，指定id
+  insOption.id = insOption.id || `tooltip-${Math.random() * 1000000 >> 0}-${Math.random() * 1000000 >> 0}`;
+  
+  //来自dom的参数
+  let domOption = {
+    content: el.title,
+    placement: el.dataset.placement || 'bottom'
+  }
+
   //删除tilte阻止浏览器默认行为
   el.removeAttribute('title');
-
-  //如果传入string类型值，该值会被当做conent
-  if(typeof option == 'string') content = option;
-
-  if(typeof value == 'object'){
-    if(option.content != null) content = option.content
-  }
   
-  return {
-    content,
-    target: el,
-    id: `tooltip-${Math.random() * 1000000 >> 0}-${Math.random() * 1000000 >> 0}`
-  };
+  return _.assign({}, domOption, insOption, option)
 }
 
 export default {
-  bind(el, bind, vnode){
-    let option = getOption(bind.value, el);
+  bind(el, bind){
+    let option = parseOption(bind.value, el);
+    //设置tooltipid，根据该id标记该实例
     el.dataset.tooltip = option.id;
-    manager.saveContext(option.id, {option})
+    
+    let tooltip = new Tooltip(option);
+    manager.save(option.id, tooltip)
 
     el.addEventListener('mouseenter', showToolTip)
     el.addEventListener('mouseleave', hideToolTip)
+  },
+  update(el, bind){
+    let id = el.dataset.tooltip;
+    let tooltip = manager.get(id);
+    let option = parseOption(bind.value, el, tooltip.option);
+    
+    tooltip.updateOption(option)
   },
   unbind(el){
     el.removeEventListener('mouseenter', showToolTip)
