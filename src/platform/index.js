@@ -1,5 +1,6 @@
 /** 用于抹平浏览器和钉钉之间的差异 @author dongls */
 import dingtalk from 'src/util/dingtalk';
+import BaseGallery from 'src/component/BaseGallery';
 
 /**
  * 用于获取顶层window
@@ -116,6 +117,7 @@ function confirm(message = '', title = '提示'){
  * 
  * @param {*} url 
  */
+
 function openLink(url){
   let dingtalk = getDingTalkPC();
   if(!inDingTalk(dingtalk)) return window.open(url)
@@ -138,6 +140,27 @@ function openTab(data){
   win.postMessage(message, origin)
 }
 
+
+/**
+ * 图片预览
+ *
+ * @param {*} imageDom - img dom
+ * @param {*} imgUrl - 图片链接
+ */
+
+function imagePreview({ imageDom, imgUrl, }) {
+
+  if(!inDingTalk(dingtalk)) {
+    return BaseGallery.preview(imageDom);
+  }
+  dingtalk.biz.util.previewImage({
+    urls: [imgUrl],
+    current: imgUrl,
+    onSuccess : function(result) {},
+    onFail : function() {}
+  })
+}
+
 export default {
   getRootWindow,
   getDingTalkPC,
@@ -145,5 +168,6 @@ export default {
   alert,
   confirm,
   openTab,
-  openLink
+  openLink,
+  imagePreview
 };

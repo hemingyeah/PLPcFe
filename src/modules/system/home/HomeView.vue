@@ -4,18 +4,29 @@
     <br>
     <a href="javascript:;" @click="open">open</a>
     <br>
-    <input type="file" @change="upload">
+
+    <file-upload v-on:update-files="updateFiles"></file-upload>
   </div>
 </template>
 
 <script>
 import platform from 'src/platform';
+import FileUpload from '../../../component/BaseFileUpload';
 
 export default {
   name: 'home-view',
+  data: () => {
+    return {
+      files: [],
+    }
+  },
   methods: {
+    updateFiles(files) {
+      this.files = files;
+      console.log('$emit', files);
+    },
     open(){
-      platform.openTab({title:"demo",url:"/demo"})
+      platform.openTab({title:"demo",url:"/demo"});
     },
     upload(event){
       const files = event.target.files;
@@ -36,6 +47,9 @@ export default {
   },
   mounted(){
     //
+  },
+  components: {
+    [FileUpload.name]: FileUpload,
   }
 }
 </script>
