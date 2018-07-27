@@ -21,3 +21,27 @@ export function fromHtml(html = ''){
   tempEl.innerHTML = html.trim();
   return tempEl.childNodes[0];
 }
+
+/** 获取滚动条的宽度 */
+export function scrollBarWidth(){  
+  let el = document.createElement('div');
+
+  let styles = {
+    width: '100px',
+    height: '100px',
+    overflowY: 'scroll'
+  };
+
+  for (let i in styles) el.style[i] = styles[i];
+
+  document.body.appendChild(el);
+  let scrollbarWidth = el.offsetWidth - el.clientWidth;
+  el.remove();
+
+  //下次直接返回结果
+  scrollBarWidth = function(){ //eslint-disable-line
+    return scrollbarWidth;
+  }
+
+  return scrollbarWidth;
+}

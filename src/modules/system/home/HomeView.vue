@@ -1,11 +1,11 @@
 <template>
-  <div>home
-    <a href="/files/get?fileId=f2e38e1e-810a-11e8-8546-00163e304a25">下载</a>
+  <div style="height: 1000px">
+    home
     <br>
     <a href="javascript:;" @click="open">open</a>
     <br>
 
-    <base-file-upload v-on:update-files="updateFiles"></base-file-upload>
+    <base-file-upload @:update-files="updateFiles"></base-file-upload>
   </div>
 </template>
 
