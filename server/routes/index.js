@@ -17,12 +17,14 @@ router.get('/', async ctx => {
   //请求失败,模拟登陆
   if(!result.status){
     let loginRes = await HttpClient.request('/dd/login?code=dev_code&corpId=dev_corpId', 'get', null);
-    let cookie = loginRes.headers['set-cookie'];
-    headers['set-cookie'] = cookie;
-    reqHeaders['cookie'] = cookie[0];
+    if(loginRes.status){
+      let cookie = loginRes.headers['set-cookie'] || {};
+      headers['set-cookie'] = cookie;
+      reqHeaders['cookie'] = cookie[0];
 
-    //再次请求
-    result = await HttpClient.request('/v3', 'get', null, {headers: reqHeaders});
+      //再次请求
+      result = await HttpClient.request('/v3', 'get', null, {headers: reqHeaders});
+    }
   }
 
   headers = Object.assign(headers, result.headers);
