@@ -1,7 +1,8 @@
 <template>
   <nav class="frame-nav" :class="{'frame-nav-collapse': collapse}">
-    <div>logo</div>
+    <div class="frame-bar"></div>
     <div class="app-menu">
+      <h3>title</h3>
       <ul class="frame-nav-menu">
         <li v-for="menu in menus" :key="menu.menuKey" class="frame-nav-menu-item" :class="{'frame-nav-menu-expand': menu.expand}">
           <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">
@@ -93,13 +94,25 @@ export default {
   width: 200px;
   border-right: 1px solid #ddd;
   transition: width ease .15s;
-  overflow: auto;
+  overflow: hidden;
 
+  display: flex;
+  flex-flow: row nowrap;
+}
 
+.frame-bar{
+  height: 100%;
+  width: 48px;
+  background-color: #00ac97;
 }
 
 .frame-nav.frame-nav-collapse{
-  width: 150px;
+  width: 48px;
+
+  .app-menu{
+    width: 0;
+    //display: none;
+  }
 }
 
 .frame-nav-menu{
@@ -118,7 +131,4 @@ export default {
 .frame-nav-menu-item.frame-nav-menu-expand > .frame-nav-menu{
   display: block;
 }
-
-
-
 </style>

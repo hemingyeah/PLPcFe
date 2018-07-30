@@ -19,9 +19,27 @@
           <a href="/logout" @click.prevent="logout">注销</a>
         </div>
       </header>
-      <frame-tabs :frame-tabs="frameTabs" @jump="jumpFrameTab" @close="closeFrameTab" @reload="reloadFrameTab"/>
+
+      <div class="app-tabs">
+        <div>
+          <button @click="prevFrameTab">←</button>
+        </div>
+        <div class="frame-tabs-scroll" ref="scroll">
+          <div class="frame-tabs-list" ref="list" :style="{transform: `translateX(-${offset}px)`}">
+            <frame-tab v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
+              @reload="reloadFrameTab(tab)" @close="closeFrameTab(tab)" @jump="jumpFrameTab(tab)"/>
+          </div>
+        </div>
+        <div>
+          <button @click="nextFrameTab">→</button>
+          <button>更多</button>
+        </div>
+      </div>
+
       <div class="app-content">
-        <frame-tab-content v-for="tab in frameTabs" :key="tab.url" :frame-tab="tab"/>
+        <div class="app-frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
+          <iframe :id="`frame_${tab.id}`" :data-id="tab.id" :src="tab.url" @load="updateTab"></iframe>
+        </div>
       </div>
     </div>
 
@@ -36,10 +54,10 @@
 import _ from 'lodash';
 import platform from 'src/platform'
 import http from 'src/util/http';
+import Tab from './model/Tab'
 
 import FrameNav from './component/FrameNav.vue';
-import FrameTabs from './component/FrameTabs.vue';
-import FrameTabContent from './component/FrameTabContent.vue';
+import FrameTab from './component/FrameTab.vue';
 
 export default {
   name: 'frame-view',
@@ -50,10 +68,11 @@ export default {
     }
   },
   data(){
-    let homeFrameTab = new FrameTab({url: '/home', title: '首页', show: true})
+    let homeFrameTab = new Tab({url: '/home', title: '首页', show: true})
     
     return {
       frameTabs: [homeFrameTab],
+      offset: 0,
       collapse: false,
       versionModal: false //版本信息modal
     }
@@ -91,6 +110,53 @@ export default {
         title: '个人中心'
       })
     },
+    updateTab(event){
+      let frame = event.target;
+      let id = frame.dataset.id;
+
+      let index = _.findIndex(this.frameTabs, tab => tab.id == id);
+      if(index >= 0){
+        let tab = this.frameTabs[index];
+        tab.loading = false;
+        tab.title = frame.contentWindow.document.title || tab.originTitle;
+      }
+    },
+     /** 显示上一页tab */
+    prevFrameTab(){
+      let scrollEl = this.$refs.scroll;
+      let scrollOffset = scrollEl.offsetWidth;
+      this.offset = this.offset - scrollOffset < 0 ? 0 : this.offset - scrollOffset;
+    },
+    /** 显示下一页tab */
+    nextFrameTab(){
+      let scrollEl = this.$refs.scroll;
+      let listEl = this.$refs.list;
+
+      let scrollOffset = scrollEl.offsetWidth;
+      let listWidth = listEl.offsetWidth;
+      
+      this.offset = this.offset + scrollOffset < listWidth - scrollOffset ? this.offset + scrollOffset : listWidth - scrollOffset;
+    },
+    /** 显示已激活的tab */
+    showActiveTab(tabs){
+      let activeTabs = tabs.filter(item => item.show);
+      if(activeTabs.length > 0) {
+        let tab = activeTabs[0];
+        let tabEl = this.$el.querySelector(`#tab_${tab.id}`);
+        let scrollOffsetWidth = this.$refs.scroll.offsetWidth;
+
+        //左侧不可见
+        if(tabEl.offsetLeft < this.offset){
+          this.offset = tabEl.offsetLeft;
+          return
+        }
+
+        //右侧不可见
+        if(this.offset < tabEl.offsetLeft + tabEl.offsetWidth - scrollOffsetWidth){
+          this.offset = tabEl.offsetLeft + tabEl.offsetWidth - scrollOffsetWidth;
+        }
+      }
+    },
     jumpFrameTab(frameTab){
       this.frameTabs.forEach(item => item.show = false);
       frameTab.show = true;
@@ -104,10 +170,10 @@ export default {
       //隐藏其他iframe 
       this.frameTabs.forEach(item => item.show = false);
 
-      let frameTab = new FrameTab(option);
-      frameTab.show = true;
+      let tab = new Tab(option);
+      tab.show = true;
 
-      this.frameTabs.push(frameTab)
+      this.frameTabs.push(tab)
     },
     //关闭frameTab
     closeFrameTab(frameTab){
@@ -119,9 +185,14 @@ export default {
         }
       }
     },
-    reloadFrameTab(frameTabId){
-      let iframe = document.getElementById(`frame_${frameTabId}`);
-      iframe && iframe.contentWindow && iframe.contentWindow.location.reload();
+    reloadFrameTab(tab){
+      let iframe = document.getElementById(`frame_${tab.id}`);
+      if(null != iframe){
+        tab.loading = true;
+        tab.title = '正在加载...';
+
+        iframe.contentWindow && iframe.contentWindow.location.reload();
+      }
     },
     //处理接受到的消息
     receiveMessage(event){
@@ -155,27 +226,13 @@ export default {
     setTimeout(() => this.title += ' update', 1000)
   },
   components: {
-    [FrameTabs.name]: FrameTabs,
-    [FrameTabContent.name]: FrameTabContent,
+    [FrameTab.name]: FrameTab,
     [FrameNav.name]: FrameNav
   }
 }
 
 //FrameTab对象
-function FrameTab(options = {}){
-  let closeable = options.close;
-  //close closeable属性作用一样，但是closeable会覆盖close
-  if(undefined !== options.closeable) closeable = options.closeable;
-  //首页不允许关闭
-  if(options.url == '/home') closeable = false;
 
-  this.id = options.id || Math.random() * 10000000 >> 0;
-  this.title = options.title || '';
-  this.url = options.url || '';
-  this.closeable = closeable !== false;
-  this.show = options.show === true;
-  this.fromId = options.fromId;
-}
 </script>
 
 <style lang="scss">
@@ -212,7 +269,29 @@ html, body, .app{
     height: 100%;
   }
 }
-
-
 </style>
 
+<!-- tab相关 -->
+<style lang="scss">
+.app-tabs{
+  width: 100%;
+  display: flex;
+  flex-flow: row  nowrap;
+  overflow: hidden;
+  height: 41px;
+
+  border-bottom: 1px solid #ddd;
+}
+
+.frame-tabs-scroll{
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.frame-tabs-list{
+  position: absolute;
+  white-space: nowrap;
+  transition: transform ease .3s;
+}
+</style>
