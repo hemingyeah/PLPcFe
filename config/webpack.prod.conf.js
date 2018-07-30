@@ -20,6 +20,11 @@ module.exports = merge(baseConfig, {
     filename: 'js/[name].[chunkhash:8].js',
     chunkFilename: 'chunks/[name].[chunkhash:8].js'
   },
+  resolve: {
+    alias: {
+      'app.config': path.resolve(__dirname,'../src/config/production.js'),
+    }
+  },
   optimization: {
     
   },

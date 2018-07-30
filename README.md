@@ -17,6 +17,7 @@
 │   ├── assets                    资源文件
 │   ├── common                    公共脚本
 │   ├── component                 组件
+│   ├── component                 项目配置
 │   ├── directive                 vue 指令
 │   ├── filter                    vue filter
 │   ├── modules                   模块，所有页面在此开发
@@ -31,7 +32,7 @@
 ```
 
 ## todolist
- * tooltip 指令
  * 文件上传组件
  * 图片预览 兼容钉钉 兼容文件上传组件
  * toast 兼容钉钉
+ * 前端链接
