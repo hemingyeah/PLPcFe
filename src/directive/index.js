@@ -8,7 +8,7 @@ Vue.directive('loadmore', loadmore)
 Vue.directive('tooltip', tooltip)
 
 export default {
-  install: function(Vue, opts = {}){
+  install(Vue, opts = {}){
     Vue.directive('loadmore', loadmore)
     Vue.directive('tooltip', tooltip)
   }
