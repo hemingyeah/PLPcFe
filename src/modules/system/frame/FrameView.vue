@@ -3,20 +3,35 @@
     <frame-nav :collapse="collapse" @open="openFrameTab" :source="initData.menus"></frame-nav>
     <div class="app-main">
       <header class="app-header">
-        <button @click="collapse = !collapse">收起</button>
-
-        <div style="float:right;">
+        <div class="app-header-left">
+          <button @click="collapse = !collapse">
+            <i :class="['iconfont', collapse ? 'icon-open': 'icon-open']"></i>
+          </button>
+        </div>
+        <div class="app-header-right">
           <a href="/">旧版</a>
-          <span @click="versionModal = !versionModal">版本说明</span>
-          <a :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
-            <img :src="loginUser.head" style="display:inline-block; width:32px;height:32px; border-radius:50%;"/>  
-            {{loginUser.displayName}}
-            <span>{{loginUser.state}}</span>
-          </a>
+          
+          <button type="button" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button>
+          <button type="button" @click="openHelpDoc" title="帮助文档" v-tooltip><i class="iconfont icon-help"></i></button>
+          <button type="button" title="导出下载" v-tooltip><i class="iconfont icon-download"></i></button>
+          <button type="button" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
+          <!-- <a href="http://help.shb.ltd" >帮助文档</a> -->
+          
+          <div class="user-profile">
+            <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
+              <img :src="loginUser.head"/>
+            </a>
+            
+            <div class="user-info">
+              <p>{{loginUser.displayName}}</p>
+              <p>{{loginUser.state}}</p>
+            </div>
 
-          <span title="hello tooltip" v-tooltip>专属客服</span>
-          <a href="http://help.shb.ltd" @click.prevent="openHelpDoc">帮助文档</a>
-          <a href="/logout" @click.prevent="logout">注销</a>
+            <div class="user-profile-menu">
+              <div><a href="javascript:;">个人中心</a></div>
+              <div><a href="javascript:;" @click.prevent="logout">注销</a></div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -54,6 +69,8 @@
 import _ from 'lodash';
 import platform from 'src/platform'
 import http from 'src/util/http';
+import eventBus from 'src/util/eventBus';
+
 import Tab from './model/Tab'
 
 import FrameNav from './component/FrameNav.vue';
@@ -73,7 +90,7 @@ export default {
     return {
       frameTabs: [homeFrameTab],
       offset: 0,
-      collapse: false,
+      collapse: true,
       versionModal: false //版本信息modal
     }
   },
@@ -83,6 +100,9 @@ export default {
     }
   },
   methods: {
+    toggleCollapse(){
+      eventBus.$emit('es.frame.toggleCollapse');
+    },
     async updateUser(){
       let result = await http.get(`/security/user/get/${this.loginUser.userId}`);
       if(result.status == 0){
@@ -100,7 +120,7 @@ export default {
       }
     },
     openHelpDoc(event){
-      platform.openLink(event.target.href);
+      platform.openLink("https://help.shb.ltd");
     },
     openUserView(event){
       let a = event.target.closest('a')
@@ -221,7 +241,7 @@ export default {
     window.addEventListener("message", this.receiveMessage, false);
     window.addTabs = this.addTabs;
 
-    this.updateUser();
+    //this.updateUser();
 
     setTimeout(() => this.title += ' update', 1000)
   },
@@ -251,11 +271,6 @@ html, body, .app{
   height: 100%;
 }
 
-.app-header{
-  height: 33px;
-  border-bottom: 1px solid #ddd;  
-}
-
 .app-content{
   height: calc(100% - 73px);
 }
@@ -269,8 +284,84 @@ html, body, .app{
     height: 100%;
   }
 }
-</style>
 
+
+/* header */
+.app-header{
+  display: flex;
+  padding: 6px 8px;
+  align-items: center;
+
+  button{
+    background-color: transparent;
+    color: #7A7E88;
+    border: none;
+
+    i{
+      font-size: 18px;
+    }
+
+    &:hover{
+      color: #00ac97;
+    }
+  }
+
+  &:after {
+    display: block;
+    content: "";
+    clear: both;
+  }
+}
+
+.app-header-left{
+  flex: 1;
+}
+
+.app-header-right{
+  align-self: flex-end;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.user-profile{
+  display: flex;
+  align-items: center;
+  width: 100px;
+  position: relative;
+}
+
+.user-avatar{
+  img{
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+}
+
+.user-info{
+  p{
+    font-size: 12px;
+    margin: 0;
+    line-height: 20px;
+  }
+}
+
+.user-profile-menu{
+  display: none;
+  position: absolute;
+  top:100%;
+  width: 80px;
+  left: 0;
+}
+
+.user-profile:hover{
+  .user-profile-menu{
+    display: block;
+  }
+}
+</style>
+ 
 <!-- tab相关 -->
 <style lang="scss">
 .app-tabs{
@@ -279,8 +370,6 @@ html, body, .app{
   flex-flow: row  nowrap;
   overflow: hidden;
   height: 41px;
-
-  border-bottom: 1px solid #ddd;
 }
 
 .frame-tabs-scroll{

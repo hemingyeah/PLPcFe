@@ -1,24 +1,32 @@
 <template>
   <nav class="frame-nav" :class="{'frame-nav-collapse': collapse}">
-    <div class="frame-bar"></div>
-    <div class="app-menu">
-      <h3>title</h3>
-      <ul class="frame-nav-menu">
-        <li v-for="menu in menus" :key="menu.menuKey" class="frame-nav-menu-item" :class="{'frame-nav-menu-expand': menu.expand}">
+    <div class="frame-bar">
+      <div class="logo">
+        <img src="../../../../assets/svg/logo.svg">
+      </div>
+      
+      <div class="frame-bar-menu" v-for="menu in menus" :key="menu.url">
+        <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)"> 
+          <i :class="['iconfont', menuIcon[menu.menuKey]]"></i>
+        </a>
+        <div class="frame-float-menu-wrap" v-if="collapse && menu.children.length > 0">
+          <div class="frame-float-menu-title">{{menu.name}}</div>
+          <ul class="frame-float-menu">
+            <li v-for="menu in menu.children" :key="menu.menuKey">
+              <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+            </li>
+          </ul>
+        </div> 
+      </div>
+    </div>
+
+    <div class="frame-second-menu-wrap" v-if="!collapse && currMenu">
+      <h3 class="frame-second-menu-title">{{currMenu.name}}</h3>
+      <ul class="frame-second-menu">
+        <li v-for="menu in currMenu.children" :key="menu.menuKey">
           <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">
-            <i class="iconfont icon-gongdanbiaodanshezhi"></i>
             <span>{{menu.name}}</span>
           </a>
-          <template v-if="menu.children && menu.children.length > 0">
-            <ul class="frame-nav-menu">
-              <li v-for="children in menu.children" :key="children.menuKey">
-                <a :href="children.url ? children.url : 'javascript:;'" @click.prevent="open(children)">
-                  <i class="iconfont icon-gongdanbiaodanshezhi"></i>
-                  <span>{{children.name}}</span>
-                </a>
-              </li>
-            </ul>
-          </template>
         </li>
       </ul>
     </div>
@@ -27,6 +35,7 @@
 
 <script>
 import _ from 'lodash';
+import MenuIcon from '../model/MenuIcon';
 
 export default {
   name: 'frame-nav',
@@ -41,34 +50,44 @@ export default {
     }
   },
   data(){
-    let menus = this.buildMenus(_.cloneDeep(this.source));
+    let {subMenus} = this.buildMenus(_.cloneDeep(this.source), null);
 
     return {
-      menus: menus
+      menus: subMenus,
+      menuIcon: MenuIcon,
+      currMenu: subMenus[0]
     };
   },
   methods: {
-    buildMenus(menus){
-      return menus.map(item => {
-        let menu = {};
+    buildMenus(menus, parent){
+      let subMenus = [];
+      let otherMenus = [];
 
-        menu.name = item.name;
-        menu.url = item.url;
-        menu.key = item.menuKey;
-        menu.parent = item.parent;
-        menu.children = this.buildMenus(item.subMenu || []);
-
-        if(menu.children.length > 0){
-          menu.isDirectory = true;
-          menu.expand = false;
+      for(let i = 0; i < menus.length; i++){
+        let menu = menus[i]
+        if(menu.parent == parent){
+          subMenus.push(menu);
+        }else{
+          otherMenus.push(menu)
         }
+      }
 
-        return menu;
-      })
+      if(subMenus.length > 0){
+        for(let j = 0; j < subMenus.length; j++){
+          let subMenu = subMenus[j];
+          let subRes = this.buildMenus(otherMenus, subMenu.menuKey);
+
+          subMenu.children = subRes.subMenus;
+          otherMenus = subRes.otherMenus;
+        }
+      }
+
+
+      return {subMenus, otherMenus};
     },
     open(menu){
-      if(menu.isDirectory) {
-        menu.expand = !menu.expand;
+      if(menu.children && menu.children.length > 0) {
+        this.currMenu = menu;
         return
       }
 
@@ -81,7 +100,7 @@ export default {
     }
   },
   mounted(){
-    //
+    this.menus.forEach(item => console.log(item.menuKey))
   },
   components: {
 
@@ -91,44 +110,129 @@ export default {
 
 <style lang="scss">
 .frame-nav{
-  width: 200px;
-  border-right: 1px solid #ddd;
-  transition: width ease .15s;
-  overflow: hidden;
+  position: relative;
+  padding-left: 52px;
 
-  display: flex;
-  flex-flow: row nowrap;
+  box-shadow: 0 0 12px rgba(0,0,0,.125);
 }
 
 .frame-bar{
-  height: 100%;
-  width: 48px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 52px;
   background-color: #00ac97;
 }
 
-.frame-nav.frame-nav-collapse{
-  width: 48px;
+.logo{
+  width: 52px;
+  height: 52px;
+  padding: 8px;
 
-  .app-menu{
-    width: 0;
-    //display: none;
+  img{
+    display: block;
+    margin: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 
-.frame-nav-menu{
-  list-style: none;
+.frame-bar-menu{
+  width: 52px;
+  height: 52px;
+  position: relative;
+
+  &:hover > a{
+    color: #fff;
+    background-color: #037a6d;
+  }
+
+  & > a{
+    display: block;
+    width: 100%;
+    height: 100%;
+    line-height: 52px;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+    background-color: #00ac97;
+
+    color: #e5e5e5;
+  }
+}
+
+.frame-float-menu-wrap{
+  display: none;
+  position: absolute;
+  left: 52px;
+  top: 0;
+  width: 200px;
+  color: #333;
+  background-color: #f0f0f0;
+  border-radius: 0 4px 4px 0;
+  z-index: 99;
+  overflow: hidden;
+
+  a{
+    color: #444;
+  }
+}
+
+.frame-float-menu-title{
+  font-size: 16px;
+  height: 52px;
+  color: #fff;
+  padding-left: 8px;
+  background-color: #037a6d;
+}
+
+.frame-float-menu{
   padding: 0;
   margin: 0;
-}
-.frame-nav-menu .frame-nav-menu{
-  padding-left: 15px;
+  list-style: none;
+
+  li{
+
+  }
+
+  a{
+    display: block;
+    padding: 5px 8px;
+  }
 }
 
-.frame-nav-menu-item > .frame-nav-menu{
-  display: none;
+.frame-bar-menu:hover{
+  .frame-float-menu-wrap{
+    display: block;
+  }
 }
 
-.frame-nav-menu-item.frame-nav-menu-expand > .frame-nav-menu{
-  display: block;
+
+.frame-second-menu-wrap{
+  width: 180px;
+  overflow: hidden;
+}
+.frame-second-menu-title{
+  height: 52px;
+  margin: 0;
+  padding: 0 10px;
+  line-height:  52px;
+}
+
+.frame-second-menu{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  a{
+    padding: 10px;
+  }
+}
+
+.frame-nav.frame-nav-collapse{
+  .frame-second-menu{
+    width: 0;
+  }
 }
 </style>
