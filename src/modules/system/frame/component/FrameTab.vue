@@ -9,11 +9,11 @@
           <circle class="frame-loading-path" cx="25" cy="25" r="20" fill="none"/>
         </svg>
       </i>
-      <i class="iconfont icon-shuaxin" @click="$emit('reload', tab.id)" v-else></i>
+      <i class="iconfont icon-shuaxin" @click="$emit('reload', tab)" v-else></i>
 
       <span>{{tab.title}}</span>
-      <button class="frame-close-btn" @click.stop="$emit('close', tab)" v-if="tab.closeable">
-        <i class="frame-close-icon"></i>
+      <button class="btn-text frame-close-btn" @click.stop="$emit('close', tab)" v-if="tab.closeable">
+        <i class="iconfont icon-guanbi"></i>
       </button>
     </div>
   </div>
@@ -104,52 +104,19 @@ export default {
 
 .frame-close-btn{
   vertical-align: middle;
-  background-color: transparent;
   margin: 0;
   padding: 0;
-  border: none;
-  outline: none;
-  padding: 2px;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
-  transition: background-color ease .15s;
+  line-height: 20px;
+  color: #9a9a9a;
+
+  i.icon-guanbi{
+    font-size: 14px;
+  }
  
   &:hover{
-    background-color: #f0f0f0;
-    box-shadow: 0 0 8px rgba(0, 0, 0, .15);
-
-    .frame-close-icon:after,
-    .frame-close-icon:before{
-      background-color: #ed3f14;
-    }
-  }
-}
-
-.frame-close-icon{
-  display: block;
-  position: relative;
-  width: 16px;
-  height: 16px;
-
-  &:before,
-  &:after{
-    content: "";
-    position: absolute;
-    left: 2px;
-    top: 7px;
-    width: 12px;
-    height: 2px;
-    background-color: #ddd;
-    transition: background-color ease .15s;
-  }
-
-  &:before{
-    transform: rotate(45deg)
-  }
-
-  &:after{
-    transform: rotate(-45deg)
+    color: #ed3f14 !important;
   }
 }
 
@@ -157,9 +124,8 @@ export default {
   .frame-tab-inner{
     background-color: #00ac97;
     
-    .frame-close-icon:after,
-    .frame-close-icon:before{
-      background-color: #fff;
+    .frame-close-btn{
+      color: #fff;
     }
   }
 }

@@ -1,9 +1,9 @@
 <template>
   <nav class="frame-nav" :class="{'frame-nav-collapse': collapse}">
     <div class="frame-bar">
-      <div class="logo">
+      <a class="logo" href="/">
         <img src="../../../../assets/svg/logo.svg">
-      </div>
+      </a>
       
       <div class="frame-bar-menu" v-for="menu in menus" :key="menu.url">
         <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)"> 
@@ -20,16 +20,16 @@
       </div>
     </div>
 
-    <div class="frame-second-menu-wrap" v-if="!collapse && currMenu">
-      <h3 class="frame-second-menu-title">{{currMenu.name}}</h3>
-      <ul class="frame-second-menu">
-        <li v-for="menu in currMenu.children" :key="menu.menuKey">
-          <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">
-            <span>{{menu.name}}</span>
-          </a>
-        </li>
-      </ul>
-    </div>
+    <transition name="collapse">
+      <div class="frame-second-menu-wrap" v-if="!collapse && currMenu">
+        <h3 class="frame-second-menu-title">{{currMenu.name}}</h3>
+        <ul class="frame-second-menu">
+          <li v-for="menu in currMenu.children" :key="menu.menuKey" :class="{'frame-second-menu-active': menu.url == currUrl}">
+            <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+          </li>
+        </ul>
+      </div>
+    </transition>
   </nav>
 </template>
 
@@ -47,6 +47,10 @@ export default {
     source: {
       type: Array,
       default: () => []
+    },
+    currUrl: {
+      type: String,
+      default: ""
     }
   },
   data(){
@@ -91,16 +95,13 @@ export default {
         return
       }
 
-      if(!menu.url) return
+      if(!menu.url) return;
 
-      this.$emit('open', {
-        url: menu.url,
-        title: menu.name
-      })
+      this.$emit('open', menu)
     }
   },
   mounted(){
-    this.menus.forEach(item => console.log(item.menuKey))
+    
   },
   components: {
 
@@ -113,7 +114,7 @@ export default {
   position: relative;
   padding-left: 52px;
 
-  box-shadow: 0 0 12px rgba(0,0,0,.125);
+  border-right: 1px solid #f4f7f5;
 }
 
 .frame-bar{
@@ -126,9 +127,10 @@ export default {
 }
 
 .logo{
+  display: block;
   width: 52px;
   height: 52px;
-  padding: 8px;
+  padding: 12px;
 
   img{
     display: block;
@@ -144,21 +146,20 @@ export default {
   position: relative;
 
   &:hover > a{
-    color: #fff;
     background-color: #037a6d;
+    color: #fff;
   }
 
   & > a{
     display: block;
     width: 100%;
     height: 100%;
+    color: #ededed;
     line-height: 52px;
     text-decoration: none;
     cursor: pointer;
     text-align: center;
     background-color: #00ac97;
-
-    color: #e5e5e5;
   }
 }
 
@@ -169,19 +170,26 @@ export default {
   top: 0;
   width: 200px;
   color: #333;
-  background-color: #f0f0f0;
+  background-color: #f4f7f5;
   border-radius: 0 4px 4px 0;
   z-index: 99;
   overflow: hidden;
 
   a{
-    color: #444;
+    padding: 8px 8px;
+    color: #314659;
+    text-decoration: none;
+
+    &:hover{
+      color: #00ac97;
+    }
   }
 }
 
 .frame-float-menu-title{
   font-size: 16px;
   height: 52px;
+  line-height: 52px;
   color: #fff;
   padding-left: 8px;
   background-color: #037a6d;
@@ -193,10 +201,11 @@ export default {
   list-style: none;
 
   li{
-
+    width: 100%;
   }
 
   a{
+    width: 100%;
     display: block;
     padding: 5px 8px;
   }
@@ -208,26 +217,57 @@ export default {
   }
 }
 
-
 .frame-second-menu-wrap{
   width: 180px;
   overflow: hidden;
 }
+
 .frame-second-menu-title{
+  width: 100%;
   height: 52px;
   margin: 0;
   padding: 0 10px;
   line-height:  52px;
+  color: #00ac97;
+  font-size: 14px;
+  white-space: nowrap;  
+  text-align: center;
+  border-bottom: 1px solid #fafafa;
 }
 
 .frame-second-menu{
   margin: 0;
   padding: 0;
   list-style: none;
+  width: 100%;
+  display: block;
+
+  li{
+    width: 100%;
+    display: block;
+    transition: background-color ease .3s;
+    
+    &:hover{
+      background-color: rgba(0,172,151, .1)
+    }
+  }
 
   a{
-    padding: 10px;
+    display: block;
+    width: 100%;
+    height: 52px;
+    line-height: 52px;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0 10px;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
   }
+}
+
+.frame-second-menu-active{
+  background-color: rgba(0,172,151, .1)
 }
 
 .frame-nav.frame-nav-collapse{

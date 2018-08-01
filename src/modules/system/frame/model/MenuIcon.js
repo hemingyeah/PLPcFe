@@ -1,5 +1,5 @@
 export default {
-  "M_CASE": "icon-reception", //服务台
+  "M_CASE": "icon-Servicedesk", //服务台
   "M_TASK": "icon-list", //工单中心
   "M_CUSTOMER": "icon-man", //客户信息
   "M_VIP_SPAREPART": "icon-part", //备件管理

@@ -8,9 +8,15 @@ const koaWebpack = require('koa-webpack')
 const webpackDevConfig = require('../config/webpack.dev.conf')
 const koaWebpackConfig = {
   config: webpackDevConfig,
+  devMiddleware: {
+    watchOptions: {
+      aggregateTimeout: 1500, // The default
+      ignored: ['dist', 'public', 'node_modules']
+    }
+  },
   //IE11对websocket报SecurityError
   //解决方案： Internet选项->安全->本地Internet->站点，把所有勾选取消
-  hotClient: {}
+  hotClient: false
 };
 
 koaWebpack(koaWebpackConfig).then(middleware => {

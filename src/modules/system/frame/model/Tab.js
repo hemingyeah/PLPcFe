@@ -15,9 +15,7 @@ export default class Tab{
     this.url = options.url || '';
 
     this.closeable = closeable !== false;
-    this.show = options.show === true;
+    this.show = options.show !== false;
     this.loading = true;
   }
-
-  
 }

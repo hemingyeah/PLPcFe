@@ -1,3 +1,3 @@
 module.exports = {
-  targetRootPath: 'E:/publink/sm4'
+  targetRootPath: '/Users/dongls/Desktop/work//sm4'
 }

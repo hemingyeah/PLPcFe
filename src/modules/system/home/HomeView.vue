@@ -4,6 +4,7 @@
     <br>
     <a href="javascript:;" @click="open">open</a>
     <br>
+    <a href="http://www.baidu.com">jump</a>
 
     <base-file-upload @:update-files="updateFiles"></base-file-upload>
   </div>
@@ -14,8 +15,11 @@ import platform from 'src/platform';
 import FileUpload from '../../../component/BaseFileUpload';
 import BaseFileUpload from "../../../component/BaseFileUpload/BaseFileUpload";
 
+import frameReload from 'src/mixin/frameReload'
+
 export default {
   name: 'home-view',
+  mixins: [frameReload],
   data: () => {
     return {
       files: [],

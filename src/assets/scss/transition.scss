@@ -18,3 +18,15 @@
     transform-style: preserve-3d; /*保留3D空间*/
   }
 }
+
+.collapse-enter-active,
+.collapse-leave-active{
+  transition: width ease .3s,
+             opacity ease .3s;
+}
+
+.collapse-enter,
+.collapse-leave-active{
+  width: 0 !important;
+  opacity: 0;
+}
