@@ -2,16 +2,16 @@
   <div class="frame-main">
     <!-- tabs -->
     <div class="frame-tabs">
-      <button class="btn-text frame-tabs-button" @click="prev">
+      <button class="btn-text frame-tabs-prev" @click="prev">
         <i class="iconfont icon-left"></i>
       </button>
-      <div class="frame-tabs-scroll" ref="scroll" @mousewheel="scroll">
-        <div class="frame-tabs-list" ref="list" :style="{transform: `translateX(-${offset}px)`}">
+      <div class="frame-tabs-scroll" ref="scroll" @wheel="scroll">
+        <div class="frame-tabs-list" ref="list" :style="{transform: `translateX(${-offset}px)`}">
           <frame-tab v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
             @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
         </div>
       </div>
-      <button class="btn-text app-tabs-button" @click="next">
+      <button class="btn-text frame-tabs-next" @click="next">
         <i class="iconfont icon-right"></i>
       </button>
     </div>
@@ -136,12 +136,21 @@ export default {
         }
       }
     },
-    scroll(event){
-      //console.log(event)
+    scroll(event){ 
+      return; 
+      let scrollEl = this.$refs.scroll;
+      let listEl = this.$refs.list;
+      
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) return;
+      
+      event.deltaY > 0 ? this.next() : this.prev()
     },
      /** 显示上一页tab */
     prev(){
       let scrollEl = this.$refs.scroll;
+      let listEl = this.$refs.list;
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) return;
+
       let scrollOffset = scrollEl.offsetWidth;
       this.offset = this.offset - scrollOffset < 0 ? 0 : this.offset - scrollOffset;
     },
@@ -149,6 +158,7 @@ export default {
     next(){
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) return;
 
       let scrollOffset = scrollEl.offsetWidth;
       let listWidth = listEl.offsetWidth;
@@ -175,6 +185,7 @@ export default {
 .frame-main{
   height: calc(100% - 53px);
 }
+
 .frame-tabs{
   width: 100%;
   display: flex;
@@ -192,14 +203,25 @@ export default {
 
 .frame-tabs-list{
   position: absolute;
+  height: 40px;
   white-space: nowrap;
   transition: transform ease .3s;
 }
 
-.frame-tabs-button{
-  i{
-    font-size: 14px;
-  }
+.frame-tabs-prev,
+.frame-tabs-next{
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+}
+
+.frame-tabs-prev{
+  border-right: 1px solid #f4f7f5;
+}
+
+.frame-tabs-next{
+  border-left: 1px solid #f4f7f5;
 }
 
 .frame-tab-content{

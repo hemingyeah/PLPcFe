@@ -10,12 +10,14 @@
           <i :class="['iconfont', menuIcon[menu.menuKey]]"></i>
         </a>
         <div class="frame-float-menu-wrap" v-if="collapse && menu.children.length > 0">
-          <div class="frame-float-menu-title">{{menu.name}}</div>
-          <ul class="frame-float-menu">
-            <li v-for="menu in menu.children" :key="menu.menuKey">
-              <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
-            </li>
-          </ul>
+          <div class="frame-float-menu">
+            <div class="frame-float-menu-title">{{menu.name}}</div>
+            <ul class="frame-float-menu-item">
+              <li v-for="menu in menu.children" :key="menu.menuKey">
+                <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+              </li>
+            </ul>
+          </div>
         </div> 
       </div>
     </div>
@@ -99,12 +101,6 @@ export default {
 
       this.$emit('open', menu)
     }
-  },
-  mounted(){
-    
-  },
-  components: {
-
   }
 }
 </script>
@@ -123,7 +119,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 52px;
-  background-color: #00ac97;
+  background-color: $color-primary;
 }
 
 .logo{
@@ -144,9 +140,10 @@ export default {
   width: 52px;
   height: 52px;
   position: relative;
+  z-index: 10;
 
   &:hover > a{
-    background-color: #037a6d;
+    background-color: lighten($color-primary, 8.5);
     color: #fff;
   }
 
@@ -159,7 +156,7 @@ export default {
     text-decoration: none;
     cursor: pointer;
     text-align: center;
-    background-color: #00ac97;
+    background-color: $color-primary;
   }
 }
 
@@ -168,22 +165,12 @@ export default {
   position: absolute;
   left: 52px;
   top: 0;
-  width: 200px;
-  color: #333;
-  background-color: #f4f7f5;
-  border-radius: 0 4px 4px 0;
-  z-index: 99;
+}
+
+.frame-float-menu{
   overflow: hidden;
-
-  a{
-    padding: 8px 8px;
-    color: #314659;
-    text-decoration: none;
-
-    &:hover{
-      color: #00ac97;
-    }
-  }
+  width: 174px;
+  background-color: #fcfcfc;
 }
 
 .frame-float-menu-title{
@@ -191,11 +178,11 @@ export default {
   height: 52px;
   line-height: 52px;
   color: #fff;
-  padding-left: 8px;
-  background-color: #037a6d;
+  padding-left: 15px;
+  background-color: lighten($color-primary, 8.5);
 }
 
-.frame-float-menu{
+.frame-float-menu-item{
   padding: 0;
   margin: 0;
   list-style: none;
@@ -207,7 +194,13 @@ export default {
   a{
     width: 100%;
     display: block;
-    padding: 5px 8px;
+    padding: 10px 15px;
+    color: $text-color-primary;
+    text-decoration: none;
+
+    &:hover{
+      color: $color-primary;
+    }
   }
 }
 
@@ -228,11 +221,11 @@ export default {
   margin: 0;
   padding: 0 10px;
   line-height:  52px;
-  color: #00ac97;
+  color: $color-primary;
   font-size: 14px;
   white-space: nowrap;  
   text-align: center;
-  border-bottom: 1px solid #fafafa;
+  border-bottom: 1px solid #f4f7f5;
 }
 
 .frame-second-menu{
@@ -248,7 +241,7 @@ export default {
     transition: background-color ease .3s;
     
     &:hover{
-      background-color: rgba(0,172,151, .1)
+      background-color: $color-primay-hover;
     }
   }
 
@@ -261,13 +254,13 @@ export default {
     white-space: nowrap;
     padding: 0 10px;
     font-size: 14px;
-    color: #333;
+    color: $text-color-primary;
     text-decoration: none;
   }
 }
 
 .frame-second-menu-active{
-  background-color: rgba(0,172,151, .1)
+  background-color: $color-primay-hover;
 }
 
 .frame-nav.frame-nav-collapse{

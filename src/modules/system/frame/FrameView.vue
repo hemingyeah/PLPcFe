@@ -26,14 +26,17 @@
               <p>{{loginUser.state}}</p>
             </div>
 
-            <div class="user-profile-menu">
-              <div class="user-profile-item">
-                <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-man"></i>个人中心</a>
-              </div>
-              <div class="user-profile-item logout">
-                <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-signout"></i>注销</a>
+            <div class="user-profile-menu-wrap">
+              <div class="user-profile-menu">
+                <div class="user-profile-item">
+                  <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
+                </div>
+                <div class="user-profile-item logout">
+                  <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-Signout"></i>注销</a>
+                </div>
               </div>
             </div>
+            
           </div>
         </div>
       </header>
@@ -185,7 +188,7 @@ html, body, .frame{
   display: flex;
   align-items: center;
 
-  border-bottom: 1px solid #fafafa;
+  border-bottom: 1px solid #f4f7f5;
 }
 
 .frame-header-left{
@@ -221,7 +224,7 @@ html, body, .frame{
     }
 
     &:hover{
-      background-color: rgba(0,172,151, .1)
+      background-color: $color-primay-hover;
     }
   }
 }
@@ -235,7 +238,7 @@ html, body, .frame{
   transition: background-color ease .3s;
   
   &:hover{
-    background-color: rgba(0,172,151, .1)
+    background-color: $color-primay-hover;
   }
 }
 
@@ -271,23 +274,28 @@ html, body, .frame{
   }
 }
 
-.user-profile-menu{
+.user-profile-menu-wrap{
   display: none;
   position: absolute;
   top: 51px;
-  left: 0;
-  width: 150px;
+  right: 0;
+  padding-top: 5px;
+  z-index: 10;
+}
+
+.user-profile-menu{
+  width: 160px;
   background-color: #fff;
   padding: 5px 0;
-  z-index: 10;
+  
   border-radius: 0 2px 2px 0;
   box-shadow: 1px 1px 5px rgba(0,21,41, .15);
   transition: background-color ease .3s;
 }
 
 .user-profile-item{
-  height: 36px;
-  line-height: 36px;
+  height: 40px;
+  line-height: 40px;
   padding: 0 10px;
   transition: background-color ease .3s;
   
@@ -297,13 +305,13 @@ html, body, .frame{
   }
 
   &:hover{
-    background-color: rgba(0,172,151, .1);
+    background-color: $color-primay-hover;
   }
 
   a{
     display: block;
     width: 100%;
-    color: #314659;
+    color: #797e89;
     text-decoration: none;
   }
 }
@@ -313,7 +321,7 @@ html, body, .frame{
 }
 
 .user-profile:hover{
-  .user-profile-menu{
+  .user-profile-menu-wrap{
     display: block;
   }
 }

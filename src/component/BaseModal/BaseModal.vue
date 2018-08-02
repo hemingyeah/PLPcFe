@@ -8,7 +8,7 @@
           <slot name="header">
             <h3>{{ title }}</h3>
             <button type="button" class="btn-text base-modal-header-close" @click="close" v-if="closeable">
-              <i class="iconfont icon-guanbi"></i>
+              <i class="iconfont icon-close"></i>
             </button>
           </slot>
         </div>
@@ -113,18 +113,18 @@ export default {
     padding: 8px;
     margin: 0;
     outline: none;
-
-    font-size: 14px;
     color: #999;
 
     transition: color ease .15s;
+
+    i{
+      font-size: 14px;
+    }
 
     &:hover{
       color: #e84040;
     }
   }
 }
-.base-modal-body{
-
-}
+.base-modal-body{}
 </style>

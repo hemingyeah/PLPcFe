@@ -28,7 +28,6 @@ router.get('/', async ctx => {
       console.log(loginRes)
     }
   }
-  console.log(result)
 
   headers = Object.assign(headers, result.headers);
   body = result.body;
