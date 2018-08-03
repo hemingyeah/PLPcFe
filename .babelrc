@@ -2,15 +2,15 @@
   "presets": [
     ["env", { 
       "modules": false,
+      "useBuiltIns": "usage",
       "targets": {
-        "browsers": ["> 1%","last 2 versions","ie >= 10"]
+        "browsers": ["> 5% in CN", "ie >= 10", "chrome >= 49"]
       }
     }]
   ],
   "plugins": [
     "lodash",
     "syntax-dynamic-import",
-    "transform-runtime",
     "transform-object-rest-spread",
     "transform-async-to-generator",
     "transform-decorators-legacy",

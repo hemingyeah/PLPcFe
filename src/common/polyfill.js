@@ -1,7 +1,9 @@
 /** @author dongls */
 
 //Promise polyfill
-import 'es6-promise/auto';
+//import 'es6-promise/auto';
+
+import "babel-polyfill";
 
 if (!Element.prototype.matches) {
   Element.prototype.matches =

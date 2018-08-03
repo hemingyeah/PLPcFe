@@ -12,6 +12,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+//https://www.npmjs.com/package/webpack-bundle-analyzer
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = merge(baseConfig, {
   mode: 'production',
@@ -26,7 +28,25 @@ module.exports = merge(baseConfig, {
     }
   },
   optimization: {
-    
+    //runtimeChunk: true
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          name: 'vendors',
+          test: /[\\/]node_modules[\\/]/,
+          //https://github.com/webpack/webpack/blob/master/lib/optimize/SplitChunksPlugin.js#L283 
+          // test(module, chunks){
+          //   if(module.nameForCondition){
+          //     let name = module.nameForCondition();
+          //     console.log(name)
+          //   }
+          //   return false;
+          // },
+          priority: 1,
+          chunks: 'all'
+        }
+      }
+    }
   },
   plugins: [
     new CleanWebpackPlugin(['dist'], {
@@ -38,6 +58,7 @@ module.exports = merge(baseConfig, {
     }),
     new OptimizeCSSPlugin(),
     new LodashModuleReplacementPlugin(),
-    ...util.genHtmlPlugins()
+    ...util.genHtmlPlugins(),
+    //new BundleAnalyzerPlugin()
   ]
 });

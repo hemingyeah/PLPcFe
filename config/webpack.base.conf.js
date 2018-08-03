@@ -96,5 +96,8 @@ module.exports = {
   },
   externals: {
     jQuery: 'jQuery'
+  },
+  performance: {
+    maxEntrypointSize: 1048576
   }
 }

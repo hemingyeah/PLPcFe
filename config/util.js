@@ -32,7 +32,7 @@ module.exports = {
   genHtmlPlugins(){
     return Object.keys(modules).map(modName => {
       let mod = modules[modName];
-      let chunks = [modName];
+      let chunks = ['vendors',modName];
       return new HtmlWebpackPlugin({
         filename: modName + '.html',
         template: mod.template ? mod.template : 'src/index.html',
