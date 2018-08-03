@@ -9,16 +9,21 @@
         <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)"> 
           <i :class="['iconfont', menuIcon[menu.menuKey]]"></i>
         </a>
-        <div class="frame-float-menu-wrap" v-if="collapse && menu.children.length > 0">
+        <div class="frame-float-menu-wrap" v-if="collapse">
           <div class="frame-float-menu">
-            <div class="frame-float-menu-title">{{menu.name}}</div>
+            <div class="frame-float-menu-title">
+              <template v-if="menu.children.length > 0">{{menu.name}}</template>
+              <template v-else>
+                <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+              </template>
+            </div>
             <ul class="frame-float-menu-item">
               <li v-for="menu in menu.children" :key="menu.menuKey">
                 <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
               </li>
             </ul>
           </div>
-        </div> 
+        </div>
       </div>
     </div>
 
@@ -143,7 +148,7 @@ export default {
   z-index: 10;
 
   &:hover > a{
-    background-color: lighten($color-primary, 8.5);
+    background-color: lighten($color-primary, 3%);
     color: #fff;
   }
 
@@ -171,6 +176,7 @@ export default {
   overflow: hidden;
   width: 174px;
   background-color: #fcfcfc;
+  box-shadow: 2px 1px 2px rgba(0,0,0, .15)
 }
 
 .frame-float-menu-title{
@@ -179,7 +185,14 @@ export default {
   line-height: 52px;
   color: #fff;
   padding-left: 15px;
-  background-color: lighten($color-primary, 8.5);
+  background-color: lighten($color-primary, 3%);
+
+  a{
+    color: #fff;
+    text-decoration: none;
+    width: 100%;
+    display: block;
+  }
 }
 
 .frame-float-menu-item{
@@ -216,7 +229,7 @@ export default {
 }
 
 .frame-second-menu-title{
-  width: 100%;
+  width: 180px;
   height: 52px;
   margin: 0;
   padding: 0 10px;
@@ -232,7 +245,7 @@ export default {
   margin: 0;
   padding: 0;
   list-style: none;
-  width: 100%;
+  width: 180px;
   display: block;
 
   li{
@@ -261,11 +274,5 @@ export default {
 
 .frame-second-menu-active{
   background-color: $color-primay-hover;
-}
-
-.frame-nav.frame-nav-collapse{
-  .frame-second-menu{
-    width: 0;
-  }
 }
 </style>

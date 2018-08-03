@@ -13,9 +13,9 @@
           
           <button type="button" class="btn-text" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button>
           <button type="button" class="btn-text" @click="openHelpDoc" title="帮助文档" v-tooltip><i class="iconfont icon-help"></i></button>
-          <button type="button" class="btn-text" title="导出下载" v-tooltip><i class="iconfont icon-download"></i></button>
           <button type="button" class="btn-text" @click="saleManagerModal = !saleManagerModal" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
-          
+          <button type="button" class="btn-text" @click="exportModal = !exportModal" title="导出下载" v-tooltip><i class="iconfont icon-download"></i></button>
+
           <div class="user-profile">
             <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
               <img :src="loginUser.head"/>
@@ -55,6 +55,23 @@
       <p style="margin: 0;">统一客服电话：010-86461890</p>
       <p style="margin: 0;">服务监督电话：13356880540</p>
     </base-modal>
+
+    <base-modal :title="`导出下载(${exportList.length || 0})`" :show.sync="exportModal">
+      <div class="exportDiv" >
+        <div v-for="item in exportList" :key="item.id" class="export-row">
+          <img src="/resource/images/excel.png">
+          <div>
+            <h4>{{item.name}}</h4>
+            <p>{{item.createTime | fmt_datetime}}</p>
+          </div>
+          <div>{{item.isFinished == 0?'导出中':'已完成'}}</div>
+          <div>
+            <a v-if="item.isFinished == 1" href="javascript:void(0);" @click="downloadFile(item)">下载</a>
+            <a v-if="item.isFinished == 0" href="javascript:void(0);" @click="cancelExport(item)">取消</a>
+          </div>
+        </div>
+      </div>
+    </base-modal>
   </div>
 </template>
 
@@ -82,7 +99,11 @@ export default {
       collapse: true,
       versionModal: false, //版本信息modal
       saleManagerModal: false,
-      currUrl: '/home'
+      currUrl: '/home',
+
+      exportTimer: null,
+      exportModal: false,
+      exportList: []
     }
   },
   computed: {
@@ -141,10 +162,38 @@ export default {
     checkVersion(){
       let currVersion = localStorage.getItem(VERSION_NUM_KEY);
       let versionNum = this.version.versionNum;
-      if(!currVersion || currVersion != versionNum){
+      if(versionNum && (!currVersion || currVersion != versionNum)){
         this.versionModal = true;
         localStorage.setItem(VERSION_NUM_KEY, versionNum)
       }
+    },
+
+    downloadFile(item){
+      let frame = document.createElement("iframe");
+      frame.style.display = 'none';
+      frame.src = `/export/download?id=${item.id}`;
+      frame.onload = event => setTimeout(() => document.body.removeChild(frame), 1500)
+      document.body.appendChild(frame);
+    },
+    async cancelExport(item){
+      try {
+        await http.post('export/cancel', {id: item.id}, false)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async fetchExportList(){
+      try {
+        this.exportList = await http.get('/export/getList');
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    updateExportList(){
+      if(this.exportTimer) clearInterval(this.exportTimer);
+      
+      this.fetchExportList();
+      setInterval(() => this.fetchExportList(), 30000)
     }
   },
   created(){
@@ -152,6 +201,7 @@ export default {
   },
   mounted(){
     window.addTabs = this.addTabs;
+    window.showExportList = this.updateExportList;
 
     //处理消息跳转url
     if(this.initData.pcUrl){
@@ -159,6 +209,7 @@ export default {
     }
 
     this.checkVersion();
+    this.updateExportList();
   },
   components: {
     [FrameNav.name]: FrameNav,
@@ -324,5 +375,10 @@ html, body, .frame{
   .user-profile-menu-wrap{
     display: block;
   }
+}
+
+.export-row{
+  display: flex;
+  flex-flow: row nowrap;
 }
 </style>

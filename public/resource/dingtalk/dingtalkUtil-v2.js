@@ -2,13 +2,13 @@
 (function () {
   //判断是否在钉钉pc端
   window.inDingTalkPC = function () {
-    return DingTalkPC && DingTalkPC.ua.isDesktop;
+    return window.DingTalkPC && window.DingTalkPC.ua.isDesktop;
   }
 
   //============================alert实现=================================
   window.dd_alert = function (message, title, buttonName, id, callback) {
-    if (DingTalkPC && DingTalkPC.ua.isDesktop) {
-      DingTalkPC.device.notification.alert({
+    if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
+      window.DingTalkPC.device.notification.alert({
         message: message,
         title: title || '提示',//可传空
         buttonName: buttonName || '确定',
@@ -22,8 +22,8 @@
 
   //====================================confirm 实现========================================
   window.dd_confirm = function (message, callback, title, buttonNames) {
-    if (DingTalkPC && DingTalkPC.ua.isDesktop) {
-      DingTalkPC.device.notification.confirm({
+    if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
+      window.DingTalkPC.device.notification.confirm({
         message: message,
         title: title || '提示',//可传空
         buttonLabels: buttonNames || ['是', '否'],
@@ -118,7 +118,8 @@
   window.common_http_encodeParams = encodeParams;
 
   window.send_ding_message = function (users, text) {
-    DingTalkPC.biz.ding.post({
+    if(!window.DingTalkPC) return;
+    window.DingTalkPC.biz.ding.post({
       users: users,//用户列表，userid
       corpId: window._global_data_corpId, //加密的企业id
       type: 1, //钉类型 1：image  2：link
@@ -134,11 +135,13 @@
   }
   
   window.send_link_ding_message = function (users, text, id) {
+    if(!window.DingTalkPC) return;
+
     var url = window.location.origin + '/v_open/jump';
     var query = '?dd_nav_bgcolor=ff00ac9&type=1&id=' + id + '&corpId=' + window._global_data_corpId;
     url = url + query;
     var bodyText = '您有一个工单（' + text + '）需要关注';
-    DingTalkPC.biz.ding.post({
+    window.DingTalkPC.biz.ding.post({
       users: users, //用户列表，userid
       corpId: window._global_data_corpId, //企业id
       type: 2, //钉类型 1：image  2：link
@@ -157,8 +160,8 @@
   }
 
   window.openHelp = function (url) {
-    if (DingTalkPC && DingTalkPC.ua.isDesktop) {
-      DingTalkPC.biz.util.openLink({
+    if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
+      window.DingTalkPC.biz.util.openLink({
         "url": url,
         onSuccess: function (result) {},
         onFail: function (error) {}

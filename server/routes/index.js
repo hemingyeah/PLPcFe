@@ -62,5 +62,6 @@ router.all('/dd/*', ctx => HttpClient.proxy(ctx))
 router.all('/files/*', ctx => HttpClient.proxy(ctx))
 router.all('/mine/*', ctx => HttpClient.proxy(ctx))
 router.all('/security/user/*', ctx => HttpClient.proxy(ctx))
+router.all('/export/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;

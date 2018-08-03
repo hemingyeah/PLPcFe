@@ -61,7 +61,7 @@ module.exports = {
         options: IS_PRODUCTION ? {
           limit: 4096,
           path:'',
-          name: 'img/[name.[hash:8].[ext]',
+          name: 'img/[name].[hash:8].[ext]',
         } : undefined
       },
       { //gif单独处理

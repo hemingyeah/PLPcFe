@@ -128,12 +128,24 @@ export default {
     closeFrameTab(frameTab){
       let index = this.frameTabs.indexOf(frameTab);
       if(index >= 0) {
-        this.frameTabs.splice(index, 1);
-        if(this.frameTabs.length > 0) {
-          let prevTab = this.frameTabs[this.frameTabs.length - 1];
-          prevTab.show = true;
-          this.$emit('input', prevTab.url)
+        let currTab = this.frameTabs.splice(index, 1)[0];
+        if(currTab.show){
+          let prevTab = this.frameTabs[index - 1];
+
+          if(prevTab ){
+            prevTab.show = true;
+            this.$emit('input', prevTab.url);
+          }
         }
+
+        this.$nextTick(() => {
+          let scrollEl = this.$refs.scroll;
+          let listEl = this.$refs.list;
+          
+          let offset = listEl.offsetWidth - scrollEl.offsetWidth;
+          if(offset < 0) offset = 0;
+          this.offset = offset;
+        })
       }
     },
     scroll(event){ 
