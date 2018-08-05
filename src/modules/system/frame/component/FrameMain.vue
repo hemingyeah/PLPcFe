@@ -7,7 +7,8 @@
       </button>
       <div class="frame-tabs-scroll" ref="scroll" @wheel="scroll">
         <div class="frame-tabs-list" ref="list" :style="{transform: `translateX(${-offset}px)`}">
-          <frame-tab v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
+          <frame-tab 
+            v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
             @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
         </div>
       </div>
@@ -70,8 +71,13 @@ export default {
       this.openFrameTab(tab)
     },
     openFrameTab(tab){
-      let index = _.findIndex(this.frameTabs, item => item.url == tab.url);
-      if(index >= 0) return this.jumpFrameTab(this.frameTabs[index]);
+      let index = _.findIndex(this.frameTabs, item => item.id == tab.id);
+      if(index >= 0){
+        let oldTab = this.frameTabs[index];
+        if(tab.reload) oldTab.merge(tab)
+        
+        return this.jumpFrameTab(oldTab);
+      }
 
       this.frameTabs.forEach(item => item.show = false);
       this.frameTabs.push(tab)
@@ -83,8 +89,9 @@ export default {
       this.frameTabs.forEach(item => item.show = false);
       frameTab.show = true;
       this.$emit('input', frameTab.url)
-
       this.showActiveTab(frameTab);
+
+      if(frameTab.reload) this.reloadFrameTab(frameTab)
     },
     /** 显示已激活的tab */
     showActiveTab(frameTab){
@@ -106,8 +113,9 @@ export default {
     updateFrameTab(event, tab){
       let frame = event.target;
 
-      tab.loading = false;
       tab.title = frame.contentWindow.document.title || tab.originTitle;
+      tab.loading = false;
+      tab.reload = false;
     },
     reloadFrameTab(tab){
       let iframe = document.getElementById(`frame_${tab.id}`);
@@ -115,7 +123,12 @@ export default {
         tab.loading = true;
         tab.title = '正在加载...';
 
-        iframe.contentWindow && iframe.contentWindow.location.reload();
+        let originUrl = iframe.getAttribute("src");
+        if(originUrl != tab.url){
+          iframe.src = tab.url;
+        }else{
+          iframe.contentWindow.location.reload();
+        }
       }
     },
     reloadFrameTabById(id){
@@ -150,12 +163,12 @@ export default {
     },
     scroll(event){ 
       return; 
-      let scrollEl = this.$refs.scroll;
-      let listEl = this.$refs.list;
+      // let scrollEl = this.$refs.scroll;
+      // let listEl = this.$refs.list;
       
-      if(listEl.offsetWidth <= scrollEl.offsetWidth) return;
+      // if(listEl.offsetWidth <= scrollEl.offsetWidth) return;
       
-      event.deltaY > 0 ? this.next() : this.prev()
+      // event.deltaY > 0 ? this.next() : this.prev()
     },
      /** 显示上一页tab */
     prev(){
@@ -183,9 +196,6 @@ export default {
 
     let homeTab = new Tab({url: '/home', title: '首页', show: true})
     this.openFrameTab(homeTab);
-  },
-  mounted(){
-
   },
   components: {
     [FrameTab.name]: FrameTab

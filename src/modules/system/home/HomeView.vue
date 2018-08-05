@@ -3,6 +3,8 @@
     home
     <br>
     <a href="javascript:;" @click="open">open</a>
+    <a href="javascript:;" @click="open2">open2</a>
+    <a href="javascript:;" @click="open3">open3</a>
     <br>
     <a href="http://www.baidu.com">jump</a>
 
@@ -31,7 +33,14 @@ export default {
       console.log('$emit', files);
     },
     open(){
-      platform.openTab({title:"demo",url:"/demo"});
+      platform.openTab({id:'demo', title:"demo",url:"/demo", reload: true});
+    },
+    open2(){
+      platform.openTab({id:'demo', title:"demo",url:"/mine/cf12d356-4130-11e7-a318-00163e304a25", reload: true});
+    },
+    
+    open3(){
+      platform.openTab({id:'demo', title:"demo",url:"/demo"});
     },
     upload(event){
       const files = event.target.files;

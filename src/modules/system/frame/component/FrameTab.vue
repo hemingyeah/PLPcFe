@@ -1,16 +1,16 @@
 <template>
-  <div :id="`tab_` + tab.id"
+  <div 
+    :id="`tab_` + tab.id"
     class="frame-tab" :class="{'frame-tab-active': tab.show}"
     @click="$emit('jump', tab)">
 
     <div class="frame-tab-inner">
-      <i class="frame-loading-spinner frame-loading" v-if="tab.loading">
+      <i class="frame-loading-spinner" v-if="tab.loading">
         <svg class="frame-loading-circular " viewBox="0 0 50 50">
           <circle class="frame-loading-path" cx="25" cy="25" r="20" fill="none"/>
         </svg>
       </i>
       <i class="iconfont icon-updete frame-loading" @click="$emit('reload', tab)" v-else></i>
-
       <span>{{tab.title}}</span>
       <button class="btn-text frame-close-btn" @click.stop="$emit('close', tab)" v-if="tab.closeable">
         <i class="iconfont icon-close"></i>
@@ -35,7 +35,6 @@ export default {
 .frame-tab{
   position: relative;
   display: inline-block;
-  user-select: none;
 }
 .frame-tab + .frame-tab{
   margin-left: 1px;
@@ -51,6 +50,10 @@ export default {
 }
 
 .frame-tab-inner{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+
   transition: all ease .15s;
   line-height: 24px;
   padding: 8px 15px;
@@ -58,28 +61,33 @@ export default {
   span{
     display: inline-block;
     vertical-align: middle;
+    cursor: default;
+    user-select: none;
+    padding: 0 5px;
   }
 }
 
 .frame-loading-spinner,
 .frame-loading{
-  display: inline-block;
-  height: 20px;
-  width: 20px;
+  display: block;
+  height: 18px;
+  width: 18px;
   margin: 0;
-  vertical-align: middle;
-  margin-right: 5px;
 }
 
-.frame-loading{
-  line-height: 20px;
+.icon-updete.frame-loading{
+  line-height: 18px;
   text-align: center;
+  cursor: pointer;
+  font-size: 18px;
 }
 
 .frame-loading-spinner .frame-loading-circular{
   display: block;
-  height: 18px;
-  width: 18px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  will-change: transform;
   animation: frame-loading-rotate 2s linear infinite;
 }
 
@@ -98,7 +106,7 @@ export default {
 
 @keyframes frame-loading-rotate{
   100% {
-    transform: rotate(1turn);
+    transform: rotateZ(1turn);
   }
 }
 
@@ -135,7 +143,6 @@ export default {
   height: 20px;
   line-height: 20px;
   color: #9a9a9a;
-  margin-left: 5px;
 
   i.icon-close{
     font-size: 12px;

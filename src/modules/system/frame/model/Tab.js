@@ -17,5 +17,12 @@ export default class Tab{
     this.closeable = closeable !== false;
     this.show = options.show !== false;
     this.loading = true;
+
+    this.reload = options.reload === true; //标记tab是否需要更新
+  }
+
+  merge(other = {}){
+    this.reload = other.reload === true;
+    this.url = other.url;
   }
 }

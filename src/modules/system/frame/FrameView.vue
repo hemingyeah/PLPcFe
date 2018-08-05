@@ -67,7 +67,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import platform from 'src/platform'
 import http from 'src/util/http';
 import eventBus from 'src/util/eventBus';
@@ -131,6 +130,7 @@ export default {
     openUserView(event){
       let a = event.target
       this.openFrameTab({
+        id: "userCenter",
         url: a.getAttribute('href'),
         title: '个人中心'
       })

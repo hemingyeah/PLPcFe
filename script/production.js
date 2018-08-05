@@ -29,7 +29,7 @@ webpack(webpackConfig, function (err, stats) {
   }) + '\n');
 
   //读取html生成jsp
-  //genJSP(path.resolve(__dirname, '../dist'));
+  genJSP(path.resolve(__dirname, '../dist'));
 });
 
 async function genJSP(directory){
