@@ -113,7 +113,7 @@ export default {
     padding: 8px;
     margin: 0;
     outline: none;
-    color: #999;
+    color: #666;
 
     transition: color ease .15s;
 

@@ -1,3 +1,10 @@
+.btn{
+
+  &:active{
+    opacity: 0.85;
+  }
+}
+
 .btn-text{
   outline: none;
   border:none;

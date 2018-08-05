@@ -1,6 +1,6 @@
 <template>
   <div class="frame">
-    <frame-nav :collapse="collapse" @open="openForNav" :source="initData.menus" :currUrl="currUrl"/>
+    <frame-nav :collapse="collapse" @open="openForNav" :source="initData.menus" :curr-url="currUrl"/>
     <div class="frame-content">
       <header class="frame-header">
         <div class="frame-header-left">
@@ -13,7 +13,7 @@
           
           <button type="button" class="btn-text" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button>
           <button type="button" class="btn-text" @click="openHelpDoc" title="帮助文档" v-tooltip><i class="iconfont icon-help"></i></button>
-          <button type="button" class="btn-text" @click="saleManagerModal = !saleManagerModal" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
+          <button type="button" class="btn-text" @click="saleManagerShow = !saleManagerShow" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
           <button type="button" class="btn-text" @click="exportModal = !exportModal" title="导出下载" v-tooltip><i class="iconfont icon-download"></i></button>
 
           <div class="user-profile">
@@ -44,17 +44,8 @@
       <frame-main ref="frameMain" v-model="currUrl"/>
     </div>
 
-    <base-modal class="version-modal" title="版本说明" :show.sync="versionModal" :closeable="false">
-      <div v-html="version.description"></div>
-      <button @click="versionModal = false">关闭</button>
-    </base-modal>
-
-    <base-modal title="专属客服" :show.sync="saleManagerModal">
-      <p style="margin: 0 0 10px 0;font-size: 16px;">钉钉扫码联系专属客服</p>
-      <img style="margin-bottom: 5px;" :src="saleManagerQRCode"  height="200" width="200"/>
-      <p style="margin: 0;">统一客服电话：010-86461890</p>
-      <p style="margin: 0;">服务监督电话：13356880540</p>
-    </base-modal>
+    <version :version="initData.version" :show.sync="versionShow"/>
+    <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
 
     <base-modal :title="`导出下载(${exportList.length || 0})`" :show.sync="exportModal">
       <div class="exportDiv" >
@@ -83,6 +74,8 @@ import eventBus from 'src/util/eventBus';
 
 import FrameNav from './component/FrameNav.vue';
 import FrameMain from './component/FrameMain.vue';
+import Version from './component/Version.vue';
+import SaleManager from './component/SaleManager.vue';
 
 const VERSION_NUM_KEY = 'shb_version_num';
 
@@ -97,9 +90,10 @@ export default {
   data(){
     return {
       collapse: true,
-      versionModal: false, //版本信息modal
-      saleManagerModal: false,
       currUrl: '/home',
+
+      versionShow: false, //是否显示版本信息
+      saleManagerShow: false, // 是否显示专属客服
 
       exportTimer: null,
       exportModal: false,
@@ -109,13 +103,6 @@ export default {
   computed: {
     loginUser(){
       return this.initData.user || {};
-    },
-    version(){
-      return this.initData.version || {};
-    },
-    saleManagerQRCode(){
-      let saleManagerQRCode = this.initData.saleManagerQRCode;
-      return `/files/getQrcode?fileName=${saleManagerQRCode}`;
     }
   },
   methods: {
@@ -159,11 +146,12 @@ export default {
       console.warn('不推荐调用该方法，使用platform.openFrameTab替代');
       this.openFrameTab(option)
     },
+    /** 检测是否有版本更新提示 */
     checkVersion(){
       let currVersion = localStorage.getItem(VERSION_NUM_KEY);
-      let versionNum = this.version.versionNum;
+      let versionNum = (this.initData.version || {}).versionNum;
       if(versionNum && (!currVersion || currVersion != versionNum)){
-        this.versionModal = true;
+        this.versionShow = true;
         localStorage.setItem(VERSION_NUM_KEY, versionNum)
       }
     },
@@ -196,9 +184,6 @@ export default {
       setInterval(() => this.fetchExportList(), 30000)
     }
   },
-  created(){
-
-  },
   mounted(){
     window.addTabs = this.addTabs;
     window.showExportList = this.updateExportList;
@@ -213,7 +198,9 @@ export default {
   },
   components: {
     [FrameNav.name]: FrameNav,
-    [FrameMain.name]: FrameMain
+    [FrameMain.name]: FrameMain,
+    [Version.name]: Version,
+    [SaleManager.name]: SaleManager
   }
 }
 </script>
