@@ -58,18 +58,18 @@ export default {
 
 .saleManager{
   position: relative;
-  margin: 120px auto;
+  margin: 100px auto 20px auto;
 
   background-color: #fff;
-  width: 480px;
+  width: 420px;
   box-shadow: 1px 1px 8px rgba(0,0,0,0.15);
   color: #333;
 }
 
 .saleManager-close{
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 12px;
+  right: 12px;
   width: 30px;
   height: 30px;
   padding: 0;
@@ -83,7 +83,7 @@ export default {
 
 .saleManager-header{
   position: relative;
-  padding: 15px 0;
+  padding: 12px 0;
 
   h3{
     text-align: center;
@@ -94,19 +94,19 @@ export default {
 }
 
 .saleManager-qrcode{
-  padding: 0 0 15px 0;
+  padding: 0 0 8px 0;
   img{
     display: block;
     margin: 0 auto;
-    width: 300px;
-    height: 300px;
+    width: 268px;
+    height: 268px;
   }
 
   p{
     color: #797e89;
     text-align: center;
-    font-size: 14px;
-    margin: 5px 0 0 0;
+    font-size: 12px;
+    margin: 2px 0 0 0;
   }
 }
 
@@ -118,11 +118,11 @@ export default {
 }
 
 .saleManager-contact{
-  padding: 15px 0 15px 145px;
+  padding: 10px 0 10px 110px;
   p{
     font-size: 14px;
     margin: 0;
-    line-height: 30px;
+    line-height: 24px;
     color: #797e89;
   }
 }

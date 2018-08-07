@@ -410,6 +410,5 @@ html, body, .frame{
     padding: 5px 8px;
     color: red;
   }
-
 }
 </style>

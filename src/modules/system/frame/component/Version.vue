@@ -3,9 +3,9 @@
     <div class="version-mask" v-if="show">
       <div class="version transition-container">
         <div class="version-banner">
-          <img src="../../../../assets/img/version.png">
+          <img src="../../../../assets/img/version-banner.png">
         </div>
-        <h3 class="version-title">售后宝 | {{version.versionNum}} 更新内容</h3>
+        <h3 class="version-title">售后宝 | {{version.versionNum}} 更新说明</h3>
         <div class="version-description" v-html="version.description"></div>
         <div class="version-bottom">
           <button type="button" class="btn btn-text version-btn" @click="close">开始使用</button>
@@ -45,9 +45,9 @@ export default {
 
 .version{
   position: relative;
-  margin: 120px auto;
+  margin: 100px auto 20px auto;
   background-color: #fff;
-  width: 522px;
+  width: 420px;
   box-shadow: 1px 1px 8px rgba(0,0,0,0.15);
   color: #333;
 }
@@ -60,19 +60,29 @@ export default {
     width: 100%;
     display: block;
     overflow: hidden;
-    margin: -54px 0 0 0;
+    margin: -35px 0 0 0;
   }
 }
 
 .version-title{
   font-size: 20px;
   text-align: center;
-  padding: 10px 0 20px 0;
+  padding: 8px 0 15px 0;
   margin: 0;
 }
 
 .version-description{
-  padding: 0 36px;
+  padding: 0 15px;
+  max-height: 240px;
+  overflow: auto;
+
+  p{
+    margin-bottom: 8px !important;
+
+    &:last-child{
+      margin-bottom: 0 !important;
+    }
+  }
 }
 
 .version-description p{
@@ -84,18 +94,18 @@ export default {
 }
 .version-bottom{
   text-align: center;
-  padding: 20px 0;
+  padding: 10px 15px;
 }
 
 .version-btn{
   background-color: $color-primary;
   color: #fff;
-  width: 450px;
+  width: 100%;
   margin: 0 auto;
-  font-size: 20px;
+  font-size: 18px;
   padding: 0;
-  height: 45px;
-  line-height: 45px;
+  height: 42px;
+  line-height: 42px;
   border-radius: 1px;
 }
 </style>
