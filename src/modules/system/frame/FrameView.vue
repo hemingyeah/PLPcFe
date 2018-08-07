@@ -93,6 +93,7 @@ export default {
   },
   data(){
     return {
+      loginUser: this.initData.user || {},
       collapse: true,
       currUrl: '/home',
 
@@ -105,20 +106,22 @@ export default {
     }
   },
   computed: {
-    loginUser(){
-      return this.initData.user || {};
-    }
+    
   },
   methods: {
     toggleCollapse(){
       eventBus.$emit('es.frame.toggleCollapse');
     },
+    /** @deprecated */
     async updateUser(){
       let result = await http.get(`/security/user/get/${this.loginUser.userId}`);
       if(result.status == 0){
         //暂时只更新状态
         this.loginUser.state = result.data.state;
       }
+    },
+    updateUserState(state){
+      this.loginUser.state = state;
     },
     async logout(){
       if(await platform.confirm('您确定要退出系统吗？')){
@@ -192,17 +195,19 @@ export default {
       localStorage.clear();
     }
   },
-  mounted(){
+  created(){
     window.addTabs = this.addTabs;
+    window.updateUserState = this.updateUserState;
     window.showExportList = this.updateExportList;
 
     //处理消息跳转url
     if(this.initData.pcUrl){
       this.openFrameTab({id: "PcUrl", title: "正在加载", close: true, url: this.initData.pcUrl});
     }
-
+  },
+  mounted(){
     this.checkVersion();
-    this.updateExportList();
+    //this.updateExportList();
   },
   components: {
     [FrameNav.name]: FrameNav,
