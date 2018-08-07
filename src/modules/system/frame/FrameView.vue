@@ -10,7 +10,7 @@
         </div>
         <div class="frame-header-right">
           <div><a href="/" style="line-height: 40px;">返回旧版</a></div>
-          <div class="dev-tool" v-if="$appConfig.env != 'production'">
+          <div class="dev-tool" v-if="showDevTool">
             <span>测试工具</span>
             <div class="dev-tool-menu">
               <a href="javascript:;" @click="clearStorage">清空缓存</a>
@@ -20,7 +20,7 @@
           <button type="button" class="btn-text frame-header-btn" @click="openHelpDoc"><i class="iconfont icon-help"></i> 帮助文档</button>
           <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow"><i class="iconfont icon-customerservice"></i> 专属客服</button>
           
-          <!--11-->
+          <!--导出下载-->
           <div class="export-wrap">
             <div class="export-btn"><i class="iconfont icon-download"></i> 导出下载</div>
  
@@ -116,7 +116,9 @@ export default {
     }
   },
   computed: {
-    
+    showDevTool(){
+      return this.$appConfig.appConfig != 'production' || this.initData.env != 'production';
+    }
   },
   methods: {
     toggleCollapse(){
