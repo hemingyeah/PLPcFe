@@ -34,7 +34,7 @@ export default {
 <style lang="scss">
 .frame-tab{
   position: relative;
-  display: inline-block;
+  display: block;
 }
 .frame-tab + .frame-tab{
   margin-left: 1px;

@@ -16,21 +16,46 @@
               <a href="javascript:;" @click="clearStorage">清空缓存</a>
             </div>
           </div>
-          <button type="button" class="btn-text" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button>
-          <button type="button" class="btn-text" @click="openHelpDoc" title="帮助文档" v-tooltip><i class="iconfont icon-help"></i></button>
-          <button type="button" class="btn-text" @click="saleManagerShow = !saleManagerShow" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
-          <button type="button" class="btn-text" @click="exportModal = !exportModal" title="导出下载" v-tooltip><i class="iconfont icon-download"></i></button>
+          <button type="button" class="btn-text frame-header-btn" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button>
+          <button type="button" class="btn-text frame-header-btn" @click="openHelpDoc" title="帮助文档" v-tooltip><i class="iconfont icon-help"></i></button>
+          <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
+          
+          <!--11-->
+          <div class="export-wrap">
+            <div class="export-btn"><i class="iconfont icon-download"></i></div>
+ 
+            <div class="export-panel-wrap">
+              <div class="export-panel">
+                <template v-if="exportList.length > 0">
+                  <div v-for="item in exportList" :key="item.id" class="export-row">
+                    <img src="../../../assets/img/excel.png">
+                    <div class="export-row-info">
+                      <h4>{{item.name}}</h4>
+                      <p>{{item.createTime | fmt_datetime}}</p>
+                    </div>  
+                    <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
+                    <a href="javascript:void(0);" @click="execExportFile(item)">{{item.isFinished == 0 ? '取消' : '下载'}}</a>
+                  </div>
+                </template>
 
-          <div class="user-profile">
-            <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
-              <img :src="loginUser.head"/>
-            </a>
-            
-            <div class="user-info">
-              <h4>{{loginUser.displayName}}</h4>
-              <p>{{loginUser.state}}</p>
+                <p class="export-empty" v-else>暂无待下载的文件</p>
+              </div>
             </div>
+          </div>
 
+          <!-- 个人信息 -->
+          <div class="user-profile-wrap">
+            <div class="user-profile">
+              <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
+                <img :src="loginUser.head"/>
+              </a>
+              
+              <div class="user-info">
+                <h4>{{loginUser.displayName}}</h4>
+                <p>{{loginUser.state}}</p>
+              </div>
+            </div>
+           
             <div class="user-profile-menu-wrap">
               <div class="user-profile-menu">
                 <div class="user-profile-item">
@@ -51,23 +76,6 @@
 
     <version :version="initData.version" :show.sync="versionShow"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
-
-    <base-modal :title="`导出下载(${exportList.length || 0})`" :show.sync="exportModal">
-      <div class="exportDiv" >
-        <div v-for="item in exportList" :key="item.id" class="export-row">
-          <img src="/resource/images/excel.png">
-          <div>
-            <h4>{{item.name}}</h4>
-            <p>{{item.createTime | fmt_datetime}}</p>
-          </div>
-          <div>{{item.isFinished == 0?'导出中':'已完成'}}</div>
-          <div>
-            <a v-if="item.isFinished == 1" href="javascript:void(0);" @click="downloadFile(item)">下载</a>
-            <a v-if="item.isFinished == 0" href="javascript:void(0);" @click="cancelExport(item)">取消</a>
-          </div>
-        </div>
-      </div>
-    </base-modal>
   </div>
 </template>
 
@@ -100,9 +108,11 @@ export default {
       versionShow: false, //是否显示版本信息
       saleManagerShow: false, // 是否显示专属客服
 
+      //导出相关变量
       exportTimer: null,
-      exportModal: false,
-      exportList: []
+      exportList: [],
+      autoFetchExportList: true,
+      downloadList: []
     }
   },
   computed: {
@@ -163,33 +173,57 @@ export default {
         localStorage.setItem(VERSION_NUM_KEY, versionNum)
       }
     },
-
-    downloadFile(item){
-      let frame = document.createElement("iframe");
-      frame.style.display = 'none';
-      frame.src = `/export/download?id=${item.id}`;
-      frame.onload = event => setTimeout(() => document.body.removeChild(frame), 1500)
-      document.body.appendChild(frame);
-    },
-    async cancelExport(item){
-      try {
-        await http.post('export/cancel', {id: item.id}, false)
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    async fetchExportList(){
+    /** 检测是否有导出 */
+    async checkExports(){
       try {
         this.exportList = await http.get('/export/getList');
+
+        let autoFetchExportList = this.exportList.length > 0 && this.exportList.some(item => item.isFinished == 0);
+        //如果文件仍被抓取到，说明文件还没下载完成，仍需刷新导出列表
+        if(this.downloadList.length > 0){
+          this.downloadList = this.downloadList.filter(item => this.exportList.some(exp => exp.id == item.id))
+          this.autoFetchExportList = true;
+        }
+
+        this.autoFetchExportList = autoFetchExportList;
+        
+        //如果不需要更新，清空定时器
+        if(!this.autoFetchExportList){
+          if(this.exportTimer){
+            clearInterval(this.exportTimer);
+            this.exportTimer = null;
+          }
+          return;
+        }
+
+        //如果需要更新,设置定时抓取数据
+        if(!this.exportTimer) this.exportTimer = setInterval(() => this.checkExports(), 15000);
       } catch (error) {
-        console.log(error)
+        console.log(error);
+        if(this.exportTimer){
+          clearInterval(this.exportTimer);
+          this.exportTimer = null;
+        }
       }
     },
-    updateExportList(){
-      if(this.exportTimer) clearInterval(this.exportTimer);
-      
-      this.fetchExportList();
-      setInterval(() => this.fetchExportList(), 30000)
+    async execExportFile(item){
+      //下载文件
+      if(item.isFinished == 1){
+        let frame = document.createElement("iframe");
+        frame.style.display = 'none';
+        frame.src = `/export/download?id=${item.id}`;
+        document.body.appendChild(frame);
+
+        this.downloadList.push(item.id)
+        this.checkExports();
+        return
+      }
+
+      //取消下载
+      if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
+        let result = await http.post('export/cancel', {id: item.id}, false);
+        if(result.status == 0) this.checkExports();
+      }
     },
     clearStorage(){
       localStorage.clear();
@@ -198,7 +232,7 @@ export default {
   created(){
     window.addTabs = this.addTabs;
     window.updateUserState = this.updateUserState;
-    window.showExportList = this.updateExportList;
+    window.showExportList = this.checkExports;
 
     //处理消息跳转url
     if(this.initData.pcUrl){
@@ -207,7 +241,7 @@ export default {
   },
   mounted(){
     this.checkVersion();
-    //this.updateExportList();
+    this.checkExports();
   },
   components: {
     [FrameNav.name]: FrameNav,
@@ -260,41 +294,139 @@ html, body, .frame{
   flex-flow: row nowrap;
   height: 51px;
   align-items: center;
-  padding-right: 10px;
-
-  button{
-    color: #797e89;
-    width: 60px;
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    transition: background-color ease .3s;
-
-    i{
-      font-size: 16px;
-    }
-
-    &:hover{
-      background-color: $color-primay-hover;
-    }
-  }
+  padding-right: 8px;
 }
 
-.user-profile{
+.frame-header-btn,
+.export-wrap,
+.user-profile-wrap{
   position: relative;
-  display: flex;
-  align-items: center;
-  width: 150px;
+  color: #797e89;
+  width: 60px;
+  margin: 0;
+  padding: 0;
   height: 100%;
   transition: background-color ease .3s;
-  
+  z-index: 11;
+  i{
+    font-size: 16px;
+  }
+
   &:hover{
     background-color: $color-primay-hover;
   }
 }
 
+.export-btn{
+  height: 100%;
+  line-height: 50px;
+  text-align: center;
+}
+
+.export-panel-wrap{
+  display: none;
+  position: absolute;
+  top: 51px;
+  right: 0;
+  padding-top: 5px;
+}
+
+.export-panel{
+  width: 380px;
+  max-height: 520px;
+  overflow: auto;
+  background-color: #fff;
+  box-shadow: 1px 1px 5px rgba(0,21,41, .15);
+}
+
+.export-wrap:hover{
+  .export-panel-wrap{
+    display: block;
+  }
+}
+
+.export-row{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 8px;
+  transition: background-color ease .3s;
+
+  img{
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 2px;
+  }
+
+  a{
+    text-decoration: none;
+    margin-left: 5px;
+  }
+
+  &:hover{
+    background-color: $color-primay-hover;
+  }
+}
+
+.export-empty{
+  margin: 0;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.export-row-info{
+  flex: 1;
+  overflow: hidden;
+  padding: 0 5px;
+
+  h4,p{
+    margin: 0;
+  }
+
+  h4{
+    font-size: 14px;
+    line-height: 18px;
+    color: $text-color-primary;
+    @include text-ellipsis;
+  }
+
+  p{
+    line-height: 14px;
+    font-size: 12px;
+    color: #797e89;
+  }
+}
+
+.export-row-badge{
+  border-radius: 4px;
+  background-color: #409EFF;
+  font-size: 12px;
+  color: #fff;
+  text-align: center;
+  padding: 4px 6px;
+  line-height: 1;
+  margin: 0 5px;
+}
+
+.export-row-badge-finished{
+  background-color: #6cc87f;
+}
+
+.user-profile-wrap{
+  width: 150px;
+}
+
+.user-profile{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
 .user-avatar{
   padding: 0 10px;
+
   img{
     display: block;
     width: 36px;
@@ -311,11 +443,13 @@ html, body, .frame{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    cursor: default;
   }
 
   h4{
     font-size: 14px;
     line-height: 24px;
+    color: $text-color-primary;
   }
 
   p{
@@ -331,7 +465,6 @@ html, body, .frame{
   top: 51px;
   right: 0;
   padding-top: 5px;
-  z-index: 10;
 }
 
 .user-profile-menu{
@@ -371,7 +504,7 @@ html, body, .frame{
   color: #ed3f14;
 }
 
-.user-profile:hover{
+.user-profile-wrap:hover{
   .user-profile-menu-wrap{
     display: block;
   }

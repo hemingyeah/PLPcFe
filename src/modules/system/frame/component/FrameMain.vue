@@ -226,6 +226,9 @@ export default {
 .frame-tabs-list{
   position: absolute;
   height: 40px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
   white-space: nowrap;
   transition: transform ease .3s;
 }
