@@ -10,7 +10,12 @@
         </div>
         <div class="frame-header-right">
           <div><a href="/" style="line-height: 40px;">返回旧版</a></div>
-          
+          <div class="dev-tool" v-if="$appConfig.env != 'production'">
+            <span>测试工具</span>
+            <div class="dev-tool-menu">
+              <a href="javascript:;" @click="clearStorage">清空缓存</a>
+            </div>
+          </div>
           <button type="button" class="btn-text" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button>
           <button type="button" class="btn-text" @click="openHelpDoc" title="帮助文档" v-tooltip><i class="iconfont icon-help"></i></button>
           <button type="button" class="btn-text" @click="saleManagerShow = !saleManagerShow" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
@@ -182,6 +187,9 @@ export default {
       
       this.fetchExportList();
       setInterval(() => this.fetchExportList(), 30000)
+    },
+    clearStorage(){
+      localStorage.clear();
     }
   },
   mounted(){
@@ -367,5 +375,41 @@ html, body, .frame{
 .export-row{
   display: flex;
   flex-flow: row nowrap;
+}
+
+
+.dev-tool{
+  position: relative;
+  color: red;
+  cursor: default;
+  margin: 0 5px;
+  height: 20px;
+  line-height: 20px;
+  z-index: 90;
+}
+
+.dev-tool:hover{
+  .dev-tool-menu{
+    display: block;
+  }
+}
+.dev-tool-menu{
+  display: none;
+  position: absolute;
+  top: 20px;
+  left: -5px;
+  min-width: 100px;
+  background-color: #ddd;
+
+  max-height: 360px;
+  overflow: auto;
+
+  a{
+    display: block;
+    width: 100%;
+    padding: 5px 8px;
+    color: red;
+  }
+
 }
 </style>
