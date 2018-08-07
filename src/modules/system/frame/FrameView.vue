@@ -16,13 +16,13 @@
               <a href="javascript:;" @click="clearStorage">清空缓存</a>
             </div>
           </div>
-          <button type="button" class="btn-text frame-header-btn" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button>
-          <button type="button" class="btn-text frame-header-btn" @click="openHelpDoc" title="帮助文档" v-tooltip><i class="iconfont icon-help"></i></button>
-          <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow" title="专属客服" v-tooltip><i class="iconfont icon-customerservice"></i></button>
+          <!-- <button type="button" class="btn-text frame-header-btn" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button> -->
+          <button type="button" class="btn-text frame-header-btn" @click="openHelpDoc"><i class="iconfont icon-help"></i> 帮助文档</button>
+          <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow"><i class="iconfont icon-customerservice"></i> 专属客服</button>
           
           <!--11-->
           <div class="export-wrap">
-            <div class="export-btn"><i class="iconfont icon-download"></i></div>
+            <div class="export-btn"><i class="iconfont icon-download"></i> 导出下载</div>
  
             <div class="export-panel-wrap">
               <div class="export-panel">
@@ -49,11 +49,11 @@
               <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
                 <img :src="loginUser.head"/>
               </a>
-              
               <div class="user-info">
                 <h4>{{loginUser.displayName}}</h4>
                 <p>{{loginUser.state}}</p>
               </div>
+              <!-- <i class="iconfont icon-triangle-down user-profile-down"></i> -->
             </div>
            
             <div class="user-profile-menu-wrap">
@@ -227,12 +227,23 @@ export default {
     },
     clearStorage(){
       localStorage.clear();
+    },
+    /** @deprecated */
+    clearCachedIds(){
+      let cachedKey = localStorage.getItem('cachedKey');
+      let cachedkeyArray = [];
+
+      if(cachedKey) cachedkeyArray = cachedKey.split(",")
+      cachedkeyArray.forEach(key => localStorage.setItem(key,[]))
+      localStorage.removeItem('cachedKey');
     }
   },
   created(){
     window.addTabs = this.addTabs;
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
+
+    this.clearCachedIds();
 
     //处理消息跳转url
     if(this.initData.pcUrl){
@@ -302,7 +313,7 @@ html, body, .frame{
 .user-profile-wrap{
   position: relative;
   color: #797e89;
-  width: 60px;
+  width: 100px;
   margin: 0;
   padding: 0;
   height: 100%;
@@ -321,6 +332,7 @@ html, body, .frame{
   height: 100%;
   line-height: 50px;
   text-align: center;
+  cursor: default;
 }
 
 .export-panel-wrap{
@@ -388,6 +400,7 @@ html, body, .frame{
     font-size: 14px;
     line-height: 18px;
     color: $text-color-primary;
+    font-weight: 400;
     @include text-ellipsis;
   }
 
@@ -414,7 +427,7 @@ html, body, .frame{
 }
 
 .user-profile-wrap{
-  width: 150px;
+  width: 160px;
 }
 
 .user-profile{
@@ -436,6 +449,7 @@ html, body, .frame{
 }
 
 .user-info{
+  flex: 1;
   overflow: hidden;
 
   h4,p{
@@ -457,6 +471,12 @@ html, body, .frame{
     line-height: 16px;
     color: #797e89;
   }
+}
+
+.user-profile-down{
+  font-size: 12px;
+  padding: 0 5px;
+  color: #797e89;
 }
 
 .user-profile-menu-wrap{

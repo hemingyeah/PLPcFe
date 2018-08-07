@@ -139,6 +139,9 @@ export default {
     },
     //关闭frameTab
     closeFrameTab(frameTab){
+      //迁移完成后删除
+      localStorage.removeItem("frame_"+ frameTab.id+"_idArray");
+
       let index = this.frameTabs.indexOf(frameTab);
       if(index >= 0) {
         let currTab = this.frameTabs.splice(index, 1)[0];
