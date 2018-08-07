@@ -97,6 +97,10 @@ export default {
       return {subMenus, otherMenus};
     },
     open(menu){
+      if(null == menu.parent && menu.children.length == 0){
+        this.$emit('update:collapse', true);
+      }
+
       if(menu.children && menu.children.length > 0) {
         this.currMenu = menu;
         return

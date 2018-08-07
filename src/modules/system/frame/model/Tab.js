@@ -13,6 +13,7 @@ export default class Tab{
     this.originTitle = options.title;
 
     this.url = options.url || '';
+    this.currentUrl = this.url;
 
     this.closeable = closeable !== false;
     this.show = options.show !== false;
@@ -22,7 +23,11 @@ export default class Tab{
   }
 
   merge(other = {}){
-    this.reload = other.reload === true;
+    this.reload = other.reload === true || other.url != this.currentUrl;
     this.url = other.url;
+  }
+
+  get isUrlChange(){
+    return this.url != this.currentUrl;
   }
 }

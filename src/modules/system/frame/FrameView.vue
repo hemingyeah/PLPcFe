@@ -1,6 +1,6 @@
 <template>
   <div class="frame">
-    <frame-nav :collapse="collapse" @open="openForNav" :source="initData.menus" :curr-url="currUrl"/>
+    <frame-nav :collapse.sync="collapse" @open="openForNav" :source="initData.menus" :curr-url="currUrl"/>
     <div class="frame-content">
       <header class="frame-header">
         <div class="frame-header-left">
@@ -244,6 +244,9 @@ export default {
     window.addTabs = this.addTabs;
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
+    window.resizeFrame = function(){
+      console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
+    }
 
     this.clearCachedIds();
 

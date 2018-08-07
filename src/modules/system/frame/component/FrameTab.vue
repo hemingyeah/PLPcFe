@@ -100,10 +100,6 @@ export default {
   stroke-linecap: round;
 }
 
-.frame-tab-active .frame-loading-path{
-  stroke: #fff !important;
-}
-
 @keyframes frame-loading-rotate{
   100% {
     transform: rotateZ(1turn);
@@ -156,13 +152,18 @@ export default {
 
 .frame-tab-active,
 .frame-tab:hover{
+
   .frame-tab-inner{
     background-color: $color-primary;
     color: #fff;
-    
+      
     .frame-close-btn{
       color: #fff;
     }
+  }
+
+  .frame-loading-path{
+    stroke: #fff !important;
   }
 }
 </style>

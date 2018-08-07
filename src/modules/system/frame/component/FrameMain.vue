@@ -73,10 +73,9 @@ export default {
     openFrameTab(tab){
       let index = _.findIndex(this.frameTabs, item => item.id == tab.id);
       if(index >= 0){
-        let oldTab = this.frameTabs[index];
-        if(tab.reload) oldTab.merge(tab)
-        
-        return this.jumpFrameTab(oldTab);
+        let target = this.frameTabs[index];
+        target.merge(tab);
+        return this.jumpFrameTab(target);
       }
 
       this.frameTabs.forEach(item => item.show = false);
@@ -91,7 +90,7 @@ export default {
       this.$emit('input', frameTab.url)
       this.showActiveTab(frameTab);
 
-      if(frameTab.reload) this.reloadFrameTab(frameTab)
+      if(frameTab.reload) this.reloadFrameTab(frameTab, frameTab.isUrlChange)
     },
     /** 显示已激活的tab */
     showActiveTab(frameTab){
@@ -116,15 +115,15 @@ export default {
       tab.title = frame.contentWindow.document.title || tab.originTitle;
       tab.loading = false;
       tab.reload = false;
+      tab.currentUrl = frame.contentWindow.location.pathname;
     },
-    reloadFrameTab(tab){
+    reloadFrameTab(tab, redirect = false){
       let iframe = document.getElementById(`frame_${tab.id}`);
       if(null != iframe){
         tab.loading = true;
         tab.title = '正在加载...';
 
-        let originUrl = iframe.getAttribute("src");
-        if(originUrl != tab.url){
+        if(redirect){
           iframe.src = tab.url;
         }else{
           iframe.contentWindow.location.reload();
