@@ -183,7 +183,7 @@ export default {
         let autoFetchExportList = this.exportList.length > 0 && this.exportList.some(item => item.isFinished == 0);
         //如果文件仍被抓取到，说明文件还没下载完成，仍需刷新导出列表
         if(this.downloadList.length > 0){
-          this.downloadList = this.downloadList.filter(item => this.exportList.some(exp => exp.id == item.id))
+          this.downloadList = this.downloadList.filter(item => this.exportList.some(exp => exp.id == item))
           this.autoFetchExportList = true;
         }
 
