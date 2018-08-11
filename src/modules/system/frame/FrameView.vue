@@ -323,7 +323,8 @@ html, body, .frame{
   padding: 0;
   height: 100%;
   transition: background-color ease .3s;
-  z-index: 11;
+  z-index: 98;
+  
   i{
     font-size: 16px;
   }

@@ -53,7 +53,7 @@ function parseOption(value, el, insOption = {}){
   return _.assign({}, domOption, insOption, option)
 }
 
-export default {
+const directive = {
   bind(el, bind){
     let option = parseOption(bind.value, el);
     //设置tooltipid，根据该id标记该实例
@@ -77,3 +77,5 @@ export default {
     el.removeEventListener('mouseleave', hideToolTip)
   }
 };
+
+export default directive;

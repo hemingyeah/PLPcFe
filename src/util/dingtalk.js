@@ -34,6 +34,8 @@ function sign(config = {}){
   });
 }
 
-export default {
+const dingtalk = {
   sign
 }
+
+export default dingtalk;

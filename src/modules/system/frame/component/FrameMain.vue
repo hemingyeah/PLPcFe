@@ -2,7 +2,7 @@
   <div class="frame-main">
     <!-- tabs -->
     <div class="frame-tabs">
-      <button class="btn-text frame-tabs-prev" @click="prev">
+      <button class="btn-text frame-tabs-prev" :class="{'frame-tab-highlight': prevBtnEnable}" @click="prev">
         <i class="iconfont icon-left"></i>
       </button>
       <div class="frame-tabs-scroll" ref="scroll" @wheel="scroll">
@@ -12,7 +12,7 @@
             @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
         </div>
       </div>
-      <button class="btn-text frame-tabs-next" @click="next">
+      <button class="btn-text frame-tabs-next" :class="{'frame-tab-highlight': nextBtnEnable}" @click="next">
         <i class="iconfont icon-right"></i>
       </button>
     </div>
@@ -37,11 +37,13 @@ export default {
   data(){
     return {
       frameTabs: [],
-      offset: 0
+      offset: 0,
+      nextBtnEnable: false,
+      prevBtnEnable: false
     }
   },
   computed: {
-    
+   
   },
   methods: {
     receiveMessage(event){
@@ -87,6 +89,7 @@ export default {
     jumpFrameTab(frameTab){
       this.frameTabs.forEach(item => item.show = false);
       frameTab.show = true;
+
       this.$emit('input', frameTab.url)
       this.showActiveTab(frameTab);
 
@@ -146,8 +149,7 @@ export default {
         let currTab = this.frameTabs.splice(index, 1)[0];
         if(currTab.show){
           let prevTab = this.frameTabs[index - 1];
-
-          if(prevTab ){
+          if(prevTab){
             prevTab.show = true;
             this.$emit('input', prevTab.url);
           }
@@ -178,7 +180,10 @@ export default {
     prev(){
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
-      if(listEl.offsetWidth <= scrollEl.offsetWidth) return;
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) {
+        this.offset = 0;
+        return;
+      }
 
       let scrollOffset = scrollEl.offsetWidth;
       this.offset = this.offset - scrollOffset < 0 ? 0 : this.offset - scrollOffset;
@@ -187,23 +192,33 @@ export default {
     next(){
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
-      if(listEl.offsetWidth <= scrollEl.offsetWidth) return;
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) {
+        this.offset = 0;
+        return;
+      }
 
       let scrollOffset = scrollEl.offsetWidth;
       let listWidth = listEl.offsetWidth;
       
       this.offset = this.offset + scrollOffset < listWidth - scrollOffset ? this.offset + scrollOffset : listWidth - scrollOffset;
-    },
-    resetOffset(){
-      console.log('hhhhhh')
     }
   },
   created(){
     window.addEventListener("message", this.receiveMessage);
-    window.addEventListener("resize", _.throttle(this.resetOffset, 150));
 
     let homeTab = new Tab({url: '/home', title: '首页', show: true})
     this.openFrameTab(homeTab);
+  },
+  watch: {
+    offset(value){
+      let scrollEl = this.$refs.scroll;
+      let listEl = this.$refs.list;
+
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) return false;
+
+      this.prevBtnEnable = value > 0;
+      this.nextBtnEnable = value < listEl.offsetWidth - scrollEl.offsetWidth;
+    }
   },
   components: {
     [FrameTab.name]: FrameTab
@@ -248,17 +263,22 @@ export default {
   height: 40px;
   text-align: center;
   line-height: 40px;
-  z-index: 89;
+  z-index: 11;
 }
 
 .frame-tabs-prev{
   border-right: 1px solid #f4f7f5;
-  box-shadow: 1px 0 18px rgba(0, 0, 0, .15);
+  &.frame-tab-highlight{
+    box-shadow: 1px 0 18px rgba(0, 0, 0, .15);
+  }
 }
 
 .frame-tabs-next{
   border-left: 1px solid #f4f7f5;
-  box-shadow: -1px 0 18px rgba(0, 0, 0, .15);
+  
+  &.frame-tab-highlight{
+    box-shadow: -1px 0 18px rgba(0, 0, 0, .15);
+  }
 }
 
 .frame-tab-content{
@@ -274,4 +294,6 @@ export default {
     height: 100%;
   }
 }
+
+
 </style>

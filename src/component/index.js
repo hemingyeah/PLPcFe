@@ -6,6 +6,6 @@ const components = [
 
 export default {
   install: function(Vue, opts = {}){
-    components.forEach(component => Vue.component(component.name, component))
+    components.forEach(component => Vue.use(component))
   }
 }

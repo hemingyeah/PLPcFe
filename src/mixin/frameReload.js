@@ -8,7 +8,7 @@ function getRootWindow(win) {
   return getRootWindow(win.parent);
 }
 
-export default {
+const FrameReloadMixin = {
   created(){
     if(window == window.top) return;
     
@@ -25,3 +25,5 @@ export default {
     }
   }
 }
+
+export default FrameReloadMixin;

@@ -1,6 +1,6 @@
 import * as Lang from 'src/util/lang'
 
-export default {
+const fmt = {
   /** 格式化日期，支持毫秒 */
   fmt_date(value){
     if(value instanceof Date || (typeof value == 'number' && !isNaN(value) && isFinite(value))){
@@ -53,3 +53,5 @@ export default {
     return province + city + dist + address;
   }
 };
+
+export default fmt;

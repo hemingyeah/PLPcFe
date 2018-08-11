@@ -1,13 +1,12 @@
 /** Vue 常用过滤器 @author dongls */
-import _ from 'lodash';
-
 import common from './common';
 import fmt from './fmt';
 
-const filters = _.assign({}, common, fmt);
-
-export default {
+const filter = {
   install(Vue){
-    for(let key in filters) Vue.filter(key, filters[key])
+    let filterObj = {...common, ...fmt};
+    for(let key in filterObj) Vue.filter(key, filterObj[key])
   }
 }
+
+export default filter

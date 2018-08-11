@@ -10,6 +10,9 @@
     <a href="javascript:;" @click="fullScreen">全屏</a>
 
     <base-file-upload @:update-files="updateFiles"></base-file-upload>
+
+    <button type="button" @click="inserText">替换</button>
+    <textarea id="textarea" style="width: 320px; height: 180px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis, arcu vitae adipiscing placerat, nisl lectus accumsan nisi, vitae iaculis sem neque vel lectus. Praesent tristique commodo lorem quis fringilla. Sed ac tellus eros. Sed consectetur eleifend felis vitae luctus. Praesent sagittis, est eget bibendum tincidunt, ligula diam tincidunt augue, a fermentum odio velit eget mi. Phasellus mattis, elit id fringilla semper, orci magna cursus ligula, non venenatis lacus augue sit amet dui. Pellentesque lacinia odio id nisi pulvinar commodo tempus at odio. Ut consectetur eros porttitor nunc mollis ultrices. Aenean porttitor, purus sollicitudin viverra auctor, neque erat blandit sapien, sit amet tincidunt massa mi ac nibh. Proin nibh sem, bibendum ut placerat nec, cursus et lacus. Phasellus vel augue turpis. Nunc eu mauris eu leo blandit mollis interdum eget lorem. </textarea>
   </div>
 </template>
 
@@ -30,6 +33,17 @@ export default {
     }
   },
   methods: {
+    inserText(){
+      var text = '(0_0)'
+      var textarea = document.getElementById("textarea")
+      var selectionStart = textarea.selectionStart;
+      var selectionEnd = textarea.selectionEnd;
+      var value = textarea.value;
+
+      textarea.value = value.substring(0, selectionStart) + text + value.substring(selectionEnd)
+      textarea.setSelectionRange(selectionEnd + text.length, selectionEnd + text.length);
+      textarea.focus();
+    },
     fullScreen(event){
       dom.fullScreen(document.body)
     },
@@ -73,6 +87,7 @@ export default {
   }
 }
 </script>
+
 <style>
 body{
   font-size: 15px;

@@ -1,2 +1,4 @@
 /** 基础配置 @author dongls */
-export default {};
+const base = {};
+
+export default base;

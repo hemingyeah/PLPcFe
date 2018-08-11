@@ -156,12 +156,12 @@ function imagePreview({ imageDom, imgUrl, }) {
   dingtalk.biz.util.previewImage({
     urls: [imgUrl],
     current: imgUrl,
-    onSuccess : function(result) {},
-    onFail : function() {}
+    onSuccess: function(result) {}, //eslint-disable-line
+    onFail: function(){} //eslint-disable-line
   })
 }
 
-export default {
+const platform = {
   getRootWindow,
   getDingTalkPC,
   inDingTalk,
@@ -170,4 +170,6 @@ export default {
   openTab,
   openLink,
   imagePreview
-};
+}
+
+export default platform;

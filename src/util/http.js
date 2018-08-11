@@ -28,4 +28,6 @@ function axios_http(method = 'get', url = '', params = {}, emulateJSON = true, c
   });
 }
 
-export default { get, post };
+const http = {get, post};
+
+export default http;

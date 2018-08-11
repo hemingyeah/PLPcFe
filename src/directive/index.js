@@ -7,9 +7,11 @@ import tooltip from './tooltip'
 Vue.directive('loadmore', loadmore)
 Vue.directive('tooltip', tooltip)
 
-export default {
+const directives = {
   install(Vue, opts = {}){
     Vue.directive('loadmore', loadmore)
     Vue.directive('tooltip', tooltip)
   }
 }
+
+export default directives;

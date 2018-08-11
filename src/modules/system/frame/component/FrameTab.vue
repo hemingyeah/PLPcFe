@@ -64,6 +64,7 @@ export default {
     cursor: default;
     user-select: none;
     padding: 0 5px;
+    min-width: 80px;
   }
 }
 

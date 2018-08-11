@@ -22,7 +22,7 @@ function handler(event){
   typeof callback == 'function' && callback(event);
 }
 
-export default {
+const directive = {
   bind(el, binding, vnode){
     let option = binding.value || {};
 
@@ -37,3 +37,4 @@ export default {
   }
 };
 
+export default directive;
