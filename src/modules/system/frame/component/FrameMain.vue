@@ -20,7 +20,7 @@
     <!-- content-->
     <div class="frame-tab-content">
       <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
-        <iframe :id="`frame_${tab.id}`" :data-id="tab.id" :src="tab.url" @load="updateFrameTab($event,tab)"/>
+        <iframe :id="`frame_${tab.id}`" :data-id="tab.id" :src="tab.url" @load="updateFrameTab($event,tab)" allowfullscreen/>
       </div>
     </div>
   </div>
@@ -164,6 +164,8 @@ export default {
       }
     },
     scroll(event){ 
+      console.log('event')      
+
       return; 
       // let scrollEl = this.$refs.scroll;
       // let listEl = this.$refs.list;
@@ -192,9 +194,13 @@ export default {
       
       this.offset = this.offset + scrollOffset < listWidth - scrollOffset ? this.offset + scrollOffset : listWidth - scrollOffset;
     },
+    resetOffset(){
+      console.log('hhhhhh')
+    }
   },
   created(){
     window.addEventListener("message", this.receiveMessage);
+    window.addEventListener("resize", _.throttle(this.resetOffset, 150));
 
     let homeTab = new Tab({url: '/home', title: '首页', show: true})
     this.openFrameTab(homeTab);
@@ -237,18 +243,22 @@ export default {
 
 .frame-tabs-prev,
 .frame-tabs-next{
+  position: relative;
   width: 40px;
   height: 40px;
   text-align: center;
   line-height: 40px;
+  z-index: 89;
 }
 
 .frame-tabs-prev{
   border-right: 1px solid #f4f7f5;
+  box-shadow: 1px 0 18px rgba(0, 0, 0, .15);
 }
 
 .frame-tabs-next{
   border-left: 1px solid #f4f7f5;
+  box-shadow: -1px 0 18px rgba(0, 0, 0, .15);
 }
 
 .frame-tab-content{

@@ -7,6 +7,7 @@
     <a href="javascript:;" @click="open3">open3</a>
     <br>
     <a href="http://www.baidu.com">jump</a>
+    <a href="javascript:;" @click="fullScreen">全屏</a>
 
     <base-file-upload @:update-files="updateFiles"></base-file-upload>
   </div>
@@ -16,6 +17,7 @@
 import platform from 'src/platform';
 import FileUpload from '../../../component/BaseFileUpload';
 import BaseFileUpload from "../../../component/BaseFileUpload/BaseFileUpload";
+import * as dom from 'src/util/dom';
 
 import frameReload from 'src/mixin/frameReload'
 
@@ -28,6 +30,9 @@ export default {
     }
   },
   methods: {
+    fullScreen(event){
+      dom.fullScreen(document.body)
+    },
     updateFiles(files) {
       this.files = files;
       console.log('$emit', files);

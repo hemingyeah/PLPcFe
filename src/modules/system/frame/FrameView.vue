@@ -329,7 +329,7 @@ html, body, .frame{
   }
 
   &:hover{
-    background-color: $color-primay-hover;
+    background-color: $color-primary-hover;
   }
 }
 
@@ -382,7 +382,7 @@ html, body, .frame{
   }
 
   &:hover{
-    background-color: $color-primay-hover;
+    background-color: $color-primary-hover;
   }
 }
 
@@ -514,7 +514,7 @@ html, body, .frame{
   }
 
   &:hover{
-    background-color: $color-primay-hover;
+    background-color: $color-primary-hover;
   }
 
   a{

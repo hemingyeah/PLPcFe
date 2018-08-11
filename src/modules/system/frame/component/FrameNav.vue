@@ -11,17 +11,17 @@
         </a>
         <div class="frame-float-menu-wrap" v-if="collapse">
           <div class="frame-float-menu">
-            <div class="frame-float-menu-title">
-              <template v-if="menu.children.length > 0">{{menu.name}}</template>
-              <template v-else>
-                <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
-              </template>
-            </div>
-            <ul class="frame-float-menu-item">
-              <li v-for="menu in menu.children" :key="menu.menuKey">
-                <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
-              </li>
-            </ul>
+            <template v-if="menu.children.length > 0">
+              <div class="frame-float-menu-title">{{menu.name}}</div>
+              <ul class="frame-float-menu-item">
+                <li v-for="menu in menu.children" :key="menu.menuKey">
+                  <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+                </li>
+              </ul>
+            </template>
+            <template v-else>
+              <a :href="menu.url" class="frame-float-title-menu" @click.prevent="open(menu)">{{menu.name}}</a>
+            </template>
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@
       <div class="frame-second-menu-wrap" v-if="!collapse && currMenu">
         <h3 class="frame-second-menu-title">{{currMenu.name}}</h3>
         <ul class="frame-second-menu">
-          <li v-for="menu in currMenu.children" :key="menu.menuKey" :class="{'frame-second-menu-active': menu.url == currUrl}">
+          <li v-for="menu in currMenu.children" :key="menu.menuKey" :class="{'frame-menu-active': menu.url == currUrl}">
             <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
           </li>
         </ul>
@@ -149,7 +149,7 @@ export default {
   width: 52px;
   height: 52px;
   position: relative;
-  z-index: 10;
+  z-index: 90;
 
   &:hover > a{
     background-color: lighten($color-primary, 3%);
@@ -157,15 +157,18 @@ export default {
   }
 
   & > a{
-    display: block;
-    width: 100%;
     height: 100%;
     color: #ededed;
     line-height: 52px;
-    text-decoration: none;
-    cursor: pointer;
     text-align: center;
     background-color: $color-primary;
+  }
+
+  a{
+    text-decoration: none;
+    cursor: pointer;
+    display: block;
+    width: 100%;
   }
 }
 
@@ -174,26 +177,27 @@ export default {
   position: absolute;
   left: 52px;
   top: 0;
+  padding-left: 5px;
 }
 
 .frame-float-menu{
   overflow: hidden;
   width: 174px;
-  background-color: #fcfcfc;
-  box-shadow: 2px 1px 2px rgba(0,0,0, .15)
+  background-color: #fff;
+  box-shadow: 1px 1px 8px 0 rgba(0,0,0,.15);
 }
 
 .frame-float-menu-title{
+  border-top: 4px solid lighten($color-primary, 3%);
   font-size: 16px;
-  height: 52px;
-  line-height: 52px;
-  color: #fff;
-  padding-left: 15px;
-  background-color: lighten($color-primary, 3%);
+  padding: 12px 15px;
+  line-height: 24px;
+  //color: $text-color-primary;
+  color: #303133;
+  border-bottom: 1px solid #ebeef5;
 
   a{
-    color: #fff;
-    text-decoration: none;
+    color: $text-color-primary;
     width: 100%;
     display: block;
   }
@@ -206,18 +210,36 @@ export default {
 
   li{
     width: 100%;
+    //color: $text-color-primary;
+    color: #303133;
+    transition: background-color ease .3s, color ease .3s;
+
+    &:hover{
+      background-color: $color-primary-hover;
+      color: $color-primary;
+    }
   }
 
   a{
     width: 100%;
     display: block;
     padding: 10px 15px;
-    color: $text-color-primary;
-    text-decoration: none;
+    line-height: 24px;
+    color: inherit;
+  }
+}
 
-    &:hover{
-      color: $color-primary;
-    }
+.frame-float-title-menu{
+  display: block;
+  width: 100%;
+  font-size: 16px;
+  padding: 14px 15px;
+  line-height: 24px;
+  color: #303133;
+
+  &:hover{
+    background-color: $color-primary-hover;
+    color: $color-primary;
   }
 }
 
@@ -255,10 +277,14 @@ export default {
   li{
     width: 100%;
     display: block;
-    transition: background-color ease .3s;
-    
-    &:hover{
-      background-color: $color-primay-hover;
+    color: $text-color-primary;
+    margin-bottom: 1px;
+    transition: background-color ease .3s, color ease .3s;
+
+    &:hover,
+    &.frame-second-menu-active{
+      background-color: $color-primary-hover;
+      color: $color-primary;
     }
   }
 
@@ -271,12 +297,13 @@ export default {
     white-space: nowrap;
     padding: 0 10px;
     font-size: 14px;
-    color: $text-color-primary;
+    color: inherit;
     text-decoration: none;
   }
 }
 
-.frame-second-menu-active{
-  background-color: $color-primay-hover;
+.frame-menu-active{
+  background-color: $color-primary-hover !important;
+  color: $color-primary !important;
 }
 </style>

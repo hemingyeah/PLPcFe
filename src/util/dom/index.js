@@ -1,6 +1,6 @@
 //公用dom, 使用前请确保清空内容
 //禁止插入文档中，禁止添加或修改属性，如有需要自行创建dom
-let tempEl = null; 
+let tempEl = null;
 
 /** 动态加载一个js, 返回一个Promise */
 export function importScript(url) {
@@ -15,8 +15,8 @@ export function importScript(url) {
 }
 
 /** 从html创建一个dom */
-export function fromHtml(html = ''){
-  if(null == tempEl){
+export function fromHtml(html = '') {
+  if (null == tempEl) {
     tempEl = document.createElement('div')
   }
 
@@ -25,7 +25,7 @@ export function fromHtml(html = ''){
 }
 
 /** 获取滚动条的宽度 */
-export function scrollBarWidth(){  
+export function scrollBarWidth() {
   let el = document.createElement('div');
 
   let styles = {
@@ -43,7 +43,7 @@ export function scrollBarWidth(){
   el = null;
 
   //下次直接返回结果
-  scrollBarWidth = function(){ //eslint-disable-line
+  scrollBarWidth = function () { //eslint-disable-line
     return scrollbarWidth;
   }
 
@@ -51,8 +51,8 @@ export function scrollBarWidth(){
 }
 
 /** 反转义html */
-export function decodeHTML(text){
-  if(null == tempEl){
+export function decodeHTML(text) {
+  if (null == tempEl) {
     tempEl = document.createElement('div')
   }
 
@@ -60,9 +60,18 @@ export function decodeHTML(text){
   return tempEl.innerText || tempEl.textContent;
 }
 
-/** 反转义json*/
-export function decodeJSON(text){
-  let json = decodeHTML(text);
-window.json = json;
-  return json.replace(/\r\n/g, "\\r\n")
+/** 
+ * 将元素全屏
+ * 注：frame需要加allowfullscreen属性
+ * @see https://developer.mozilla.org/zh-CN/docs/Web/API/Element/requestFullScreen
+ */
+export function fullScreen(dom) {
+  if(!(dom instanceof Element)) return;
+
+  if(dom.requestFullscreen) return dom.requestFullScreen();
+  if(dom.webkitRequestFullScreen) return dom.webkitRequestFullScreen();
+  if(dom.mozRequestFullScreen) return dom.mozRequestFullScreen();
+  if(dom.msRequestFullscreen) return dom.msRequestFullscreen();
+  
+  return alert('您的浏览器不支持全屏，请升级您的浏览器');
 }
