@@ -1,4 +1,4 @@
-import * as dom from 'src/util/dom';
+import * as dom from '@src/util/dom';
 import Popper from 'popper.js'
 
 export default class Tooltip{

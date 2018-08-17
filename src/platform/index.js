@@ -1,6 +1,6 @@
 /** 用于抹平浏览器和钉钉之间的差异 @author dongls */
-import dingtalk from 'src/util/dingtalk';
-import BaseGallery from 'src/component/BaseGallery';
+import dingtalk from '@src/util/dingtalk';
+import BaseGallery from '@src/component/BaseGallery';
 
 /**
  * 用于获取顶层window

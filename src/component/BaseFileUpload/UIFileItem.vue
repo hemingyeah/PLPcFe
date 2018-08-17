@@ -15,7 +15,7 @@
 
 <script>
   import BaseGallery from '../BaseGallery/index';
-  import platform from 'src/platform/index';
+  import platform from '@src/platform/index';
 
   export default {
     name: "ui-file-item",

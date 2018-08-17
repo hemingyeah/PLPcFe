@@ -19,7 +19,7 @@
 <script>
   import Uploader from './uploader';
   import UIFileItem from './UIFileItem';
-  import platform from 'src/platform';
+  import platform from '@src/platform';
 
   export default {
     name: "base-file-upload",

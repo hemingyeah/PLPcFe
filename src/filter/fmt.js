@@ -1,4 +1,4 @@
-import * as Lang from 'src/util/lang'
+import * as Lang from '@src/util/lang'
 
 const fmt = {
   /** 格式化日期，支持毫秒 */

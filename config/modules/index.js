@@ -3,10 +3,10 @@
  */
 module.exports = {
   'system.frame': {
-    entry: 'src/modules/system/frame/index.js',
+    entry: './src/modules/system/frame/index.js',
     template: 'src/modules/system/frame/index.html'
   },
   'system.home': {
-    entry: 'src/modules/system/home/index.js'
+    entry: './src/modules/system/home/index.js'
   }
 }

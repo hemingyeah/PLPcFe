@@ -80,9 +80,9 @@
 </template>
 
 <script>
-import platform from 'src/platform'
-import http from 'src/util/http';
-import eventBus from 'src/util/eventBus';
+import platform from '@src/platform'
+import http from '@src/util/http';
+import eventBus from '@src/util/eventBus';
 
 import FrameNav from './component/FrameNav.vue';
 import FrameMain from './component/FrameMain.vue';

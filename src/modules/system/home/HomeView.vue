@@ -1,7 +1,7 @@
 <template>
   <div style="height: 1000px">
-    home
-    <br>
+<!--   
+    
     <a href="javascript:;" @click="open">open</a>
     <a href="javascript:;" @click="open2">open2</a>
     <a href="javascript:;" @click="open3">open3</a>
@@ -13,23 +13,46 @@
 
     <button type="button" @click="inserText">替换</button>
     <textarea id="textarea" style="width: 320px; height: 180px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis, arcu vitae adipiscing placerat, nisl lectus accumsan nisi, vitae iaculis sem neque vel lectus. Praesent tristique commodo lorem quis fringilla. Sed ac tellus eros. Sed consectetur eleifend felis vitae luctus. Praesent sagittis, est eget bibendum tincidunt, ligula diam tincidunt augue, a fermentum odio velit eget mi. Phasellus mattis, elit id fringilla semper, orci magna cursus ligula, non venenatis lacus augue sit amet dui. Pellentesque lacinia odio id nisi pulvinar commodo tempus at odio. Ut consectetur eros porttitor nunc mollis ultrices. Aenean porttitor, purus sollicitudin viverra auctor, neque erat blandit sapien, sit amet tincidunt massa mi ac nibh. Proin nibh sem, bibendum ut placerat nec, cursus et lacus. Phasellus vel augue turpis. Nunc eu mauris eu leo blandit mollis interdum eget lorem. </textarea>
+  -->
+    <div>{{fields}}</div>
+    <button @click="save">保存</button>
+    <div style="height: 600px"><form-design v-model="fields"></form-design></div>
+    
   </div>
 </template>
 
 <script>
-import platform from 'src/platform';
-import FileUpload from '../../../component/BaseFileUpload';
-import BaseFileUpload from "../../../component/BaseFileUpload/BaseFileUpload";
-import * as dom from 'src/util/dom';
+import platform from '@src/platform';
+import FileUpload from '@src/component/BaseFileUpload';
+import BaseFileUpload from "@src/component/BaseFileUpload/BaseFileUpload";
+import * as dom from '@src/util/dom';
 
-import frameReload from 'src/mixin/frameReload'
+import frameReload from '@src/mixin/frameReload';
 
 export default {
   name: 'home-view',
   mixins: [frameReload],
-  data: () => {
+  data(){
     return {
+      fields: [],
       files: [],
+       tableData: [{
+            date: '2016-05-02',
+            name: '王小虎',
+            address: '上海市普陀区金沙江路 1518 弄'
+          }, {
+            date: '2016-05-04',
+            name: '王小虎',
+            address: '上海市普陀区金沙江路 1517 弄'
+          }, {
+            date: '2016-05-01',
+            name: '王小虎',
+            address: '上海市普陀区金沙江路 1519 弄'
+          }, {
+            date: '2016-05-03',
+            name: '王小虎',
+            address: '上海市普陀区金沙江路 1516 弄'
+          }]
     }
   },
   methods: {
@@ -76,6 +99,9 @@ export default {
       
       xhr.open("post", '/files/upload', true);
       xhr.send(form);
+    },
+    save(){
+      this.fields.forEach(item =>item.toField())
     }
   },
   mounted(){
@@ -83,7 +109,7 @@ export default {
   },
   components: {
     BaseFileUpload,
-    [FileUpload.name]: FileUpload,
+    [FileUpload.name]: FileUpload
   }
 }
 </script>

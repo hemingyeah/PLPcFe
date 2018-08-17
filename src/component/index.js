@@ -1,7 +1,9 @@
-import BaseModal from './BaseModal';
+import BaseModal from './common/BaseModal';
+import Form from './form';
 
 const components = [
-  BaseModal
+  BaseModal,
+  Form
 ] 
 
 export default {

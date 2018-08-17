@@ -1,12 +1,15 @@
-import 'src/assets/scss/index.scss'
-import 'src/common/polyfill';
+import '@src/assets/scss/index.scss'
+import '@src/common/polyfill';
 
 import Vue from 'vue';
-import ElementUI from 'src/component/ElementUI';
+import ElementUI from '@src/component/element-ui';
+import component from '@src/component';
+import platform from '@src/platform';
+
 import HomeView from './HomeView.vue';
-import platform from '../../../platform';
 
 Vue.use(ElementUI)
+Vue.use(component)
 
 Vue.prototype.$platform = platform;
 
