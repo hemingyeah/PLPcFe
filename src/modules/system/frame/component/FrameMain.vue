@@ -160,7 +160,12 @@ export default {
           let listEl = this.$refs.list;
           
           let offset = listEl.offsetWidth - scrollEl.offsetWidth;
-          if(offset < 0) offset = 0;
+          if(offset < 0) {
+            offset = 0;
+            this.nextBtnEnable = false;
+            this.prevBtnEnable = false;
+          }
+
           this.offset = offset;
         })
       }
@@ -294,6 +299,4 @@ export default {
     height: 100%;
   }
 }
-
-
 </style>
