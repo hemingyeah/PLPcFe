@@ -1,8 +1,4 @@
-/** @author dongls */
-
-//Promise polyfill
-//import 'es6-promise/auto';
-
+/** 全局polyfill @author dongls */
 import "babel-polyfill";
 
 if (!Element.prototype.matches) {
