@@ -3,7 +3,7 @@
     name="slide-down"
     @after-leave="$emit('closed')">
     <div v-show="show" class="base-modal-mask" @click.self="maskClose">
-      <div class="base-modal transition-container" :style="{width: width}">
+      <div class="base-modal transition__container" :style="{width: width}">
         <div class="base-modal-header">
           <slot name="header">
             <h3>{{ title }}</h3>

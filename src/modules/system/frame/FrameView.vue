@@ -13,6 +13,7 @@
           <div class="dev-tool" v-if="showDevTool">
             <span>测试工具</span>
             <div class="dev-tool-menu">
+              <a href="javascript:;" @click="openDemo">demo</a>
               <a href="javascript:;" @click="clearStorage">清空缓存</a>
             </div>
           </div>
@@ -21,8 +22,8 @@
           <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow"><i class="iconfont icon-customerservice"></i> 专属客服</button>
           
           <!--导出下载-->
-          <div class="export-wrap">
-            <div class="export-btn"><i class="iconfont icon-download"></i> 导出下载</div>
+          <div class="export-wrap" @click="exportPanelShow = true">
+            <div class="export-btn" ><i class="iconfont icon-download"></i> 导出下载</div>
  
             <div class="export-panel-wrap">
               <div class="export-panel">
@@ -71,7 +72,24 @@
         </div>
       </header>
 
-      <frame-main ref="frameMain" v-model="currUrl"/>
+      <frame-main ref="frameMain" v-model="currUrl">
+        <base-panel :show.sync="exportPanelShow">
+          <h3>导出下载</h3>
+          <template v-if="exportList.length > 0">
+            <div v-for="item in exportList" :key="item.id" class="export-row">
+              <img src="../../../assets/img/excel.png">
+              <div class="export-row-info">
+                <h4>{{item.name}}</h4>
+                <p>{{item.createTime | fmt_datetime}}</p>
+              </div>  
+              <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
+              <a href="javascript:void(0);" @click="execExportFile(item)">{{item.isFinished == 0 ? '取消' : '下载'}}</a>
+            </div>
+          </template>
+
+          <p class="export-empty" v-else>暂无待下载的文件</p>
+        </base-panel>
+      </frame-main>
     </div>
 
     <version :version="initData.version" :show.sync="versionShow"/>
@@ -109,6 +127,7 @@ export default {
       saleManagerShow: false, // 是否显示专属客服
 
       //导出相关变量
+      exportPanelShow: false,
       exportTimer: null,
       exportList: [],
       autoFetchExportList: true,
@@ -121,6 +140,13 @@ export default {
     }
   },
   methods: {
+    openDemo(){
+      this.openFrameTab({
+        id: "demo",
+        url: '/demo',
+        title: 'demo'
+      })
+    },
     toggleCollapse(){
       eventBus.$emit('es.frame.toggleCollapse');
     },
@@ -244,7 +270,7 @@ export default {
     window.addTabs = this.addTabs;
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
-    window.resizeFrame = function(){
+    window.removeHistoryUrl = window.resizeFrame = function(){
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     }
 

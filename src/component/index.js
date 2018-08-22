@@ -1,8 +1,11 @@
 import BaseModal from './common/BaseModal';
+import BasePanel from './common/BasePanel';
+
 import Form from './form';
 
 const components = [
   BaseModal,
+  BasePanel,
   Form
 ] 
 

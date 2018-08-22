@@ -3,7 +3,7 @@
 .slide-down-leave-active{
   transition: opacity ease .3s;
 
-  .transition-container{
+  .transition__container{
     transition: transform ease .3s;
   }
 }
@@ -12,13 +12,35 @@
 .slide-down-leave-active{
   opacity: 0;
 
-  .transition-container{
+  .transition__container{
     transform: translate3d(0, -120px, 0);
     backface-visibility: hidden; /*元素旋转时隐藏背面*/
     transform-style: preserve-3d; /*保留3D空间*/
   }
 }
 
+// ------------------ slide left ------------------
+.slide-left-enter-active,
+.slide-left-leave-active{
+  transition: opacity ease .3s;
+
+  .transition__container{
+    transition: transform ease .3s;
+  }
+}
+
+.slide-left-enter,
+.slide-left-leave-active{
+  opacity: 0;
+
+  .transition__container{
+    transform: translate3d(100%, 0, 0);
+    backface-visibility: hidden; /*元素旋转时隐藏背面*/
+    transform-style: preserve-3d; /*保留3D空间*/
+  }
+}
+
+// ------------------ collapse ------------------
 .collapse-enter-active,
 .collapse-leave-active{
   transition: width ease .3s,

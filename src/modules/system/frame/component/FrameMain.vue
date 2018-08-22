@@ -23,6 +23,8 @@
         <iframe :id="`frame_${tab.id}`" :data-id="tab.id" :src="tab.url" @load="updateFrameTab($event,tab)" allowfullscreen/>
       </div>
     </div>
+
+    <slot></slot>
   </div>
 </template>
 
@@ -102,15 +104,11 @@ export default {
       let scrollOffsetWidth = this.$refs.scroll.offsetWidth;
 
       //左侧不可见
-      if(tabEl.offsetLeft < this.offset){
-        this.offset = tabEl.offsetLeft;
-        return
-      }
+      if(tabEl.offsetLeft < this.offset) return this.setOffset(tabEl.offsetLeft)
 
       //右侧不可见
-      if(this.offset < tabEl.offsetLeft + tabEl.offsetWidth - scrollOffsetWidth){
-        this.offset = tabEl.offsetLeft + tabEl.offsetWidth - scrollOffsetWidth;
-      }
+      let rightOffset = tabEl.offsetLeft + tabEl.offsetWidth - scrollOffsetWidth
+      if(this.offset < rightOffset) this.setOffset(rightOffset)
     },
     updateFrameTab(event, tab){
       let frame = event.target;
@@ -160,19 +158,13 @@ export default {
           let listEl = this.$refs.list;
           
           let offset = listEl.offsetWidth - scrollEl.offsetWidth;
-          if(offset < 0) {
-            offset = 0;
-            this.nextBtnEnable = false;
-            this.prevBtnEnable = false;
-          }
+          if(offset < 0) offset = 0;
 
-          this.offset = offset;
+          this.setOffset(offset)
         })
       }
     },
     scroll(event){ 
-      console.log('event')      
-
       return; 
       // let scrollEl = this.$refs.scroll;
       // let listEl = this.$refs.list;
@@ -185,45 +177,51 @@ export default {
     prev(){
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
-      if(listEl.offsetWidth <= scrollEl.offsetWidth) {
-        this.offset = 0;
-        return;
-      }
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) return this.setOffset(0);
 
       let scrollOffset = scrollEl.offsetWidth;
-      this.offset = this.offset - scrollOffset < 0 ? 0 : this.offset - scrollOffset;
+      this.setOffset(this.offset - scrollOffset < 0 ? 0 : this.offset - scrollOffset);
     },
     /** 显示下一页tab */
     next(){
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
-      if(listEl.offsetWidth <= scrollEl.offsetWidth) {
-        this.offset = 0;
-        return;
-      }
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) return this.setOffset(0)
 
       let scrollOffset = scrollEl.offsetWidth;
       let listWidth = listEl.offsetWidth;
       
-      this.offset = this.offset + scrollOffset < listWidth - scrollOffset ? this.offset + scrollOffset : listWidth - scrollOffset;
+      this.setOffset(this.offset + scrollOffset < listWidth - scrollOffset ? this.offset + scrollOffset : listWidth - scrollOffset);
+    },
+    /** 响应页面变化 */
+    resizeHanler(){
+      this.resetBtnClass();
+    },
+    /** 重置翻页按钮样式 */
+    resetBtnClass(){
+      let scrollEl = this.$refs.scroll;
+      let listEl = this.$refs.list;
+
+      if(listEl.offsetWidth <= scrollEl.offsetWidth) {
+        this.prevBtnEnable = this.nextBtnEnable = false;
+        return;
+      }
+
+      this.prevBtnEnable = this.offset > 0;
+      this.nextBtnEnable = this.offset < listEl.offsetWidth - scrollEl.offsetWidth;
+    },
+    /** 设置偏移量 */
+    setOffset(offset){
+      this.offset = offset;
+      this.resetBtnClass(); 
     }
   },
   created(){
     window.addEventListener("message", this.receiveMessage);
+    window.addEventListener("resize", _.throttle(this.resizeHanler))
 
     let homeTab = new Tab({url: '/home', title: '首页', show: true})
     this.openFrameTab(homeTab);
-  },
-  watch: {
-    offset(value){
-      let scrollEl = this.$refs.scroll;
-      let listEl = this.$refs.list;
-
-      if(listEl.offsetWidth <= scrollEl.offsetWidth) return false;
-
-      this.prevBtnEnable = value > 0;
-      this.nextBtnEnable = value < listEl.offsetWidth - scrollEl.offsetWidth;
-    }
   },
   components: {
     [FrameTab.name]: FrameTab
@@ -233,6 +231,7 @@ export default {
 
 <style lang="scss">
 .frame-main{
+  position: relative;
   height: calc(100% - 53px);
 }
 

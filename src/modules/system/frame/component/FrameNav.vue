@@ -184,7 +184,7 @@ export default {
   overflow: hidden;
   width: 174px;
   background-color: #fff;
-  box-shadow: 1px 1px 8px 0 rgba(0,0,0,.15);
+  box-shadow: 1px 2px 8px 0 rgba(0,0,0,.125);
 }
 
 .frame-float-menu-title{
