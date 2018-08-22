@@ -25,7 +25,8 @@ koaWebpack(koaWebpackConfig).then(middleware => {
   })
 
   server.use(middleware);
-});
+  server.init();
 
-//启动server
-server.listen(9000)
+  //启动server
+  server.listen(9000)
+});

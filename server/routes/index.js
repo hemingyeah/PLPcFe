@@ -2,8 +2,10 @@ const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
-const modules = require('../../config/modules')
+const modules = require('../../config/modules');
 const router = new KoaRouter();
+
+const customerRouter = require('./customer')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -41,27 +43,17 @@ router.get('/', async ctx => {
   ctx.body = Template.renderWithHtml('首页', body, script, modConfig.template)
 })
 
-router.get('/home', async ctx => {
-  let script = ['/system.home.js'];
-  ctx.body = Template.renderWithData('首页', {}, script)
-})
+// router.get('/home', async ctx => {
+//   let script = ['/system.home.js'];
+//   ctx.body = Template.renderWithData('首页', {}, script)
+// })
 
 router.get('/demo', async ctx => {
-  ctx.body = `hello demo`
+  let script = ['/system.demo.js'];
+  ctx.body = Template.renderWithData('demo', {}, script)
 })
 
-router.get('/setting', async ctx => {
-  ctx.body = `setting`
-})
-
-router.get('/demo2', async ctx => {
-  ctx.body = `demo2`
-})
-
-router.all('/dd/*', ctx => HttpClient.proxy(ctx))
-router.all('/files/*', ctx => HttpClient.proxy(ctx))
-router.all('/mine/*', ctx => HttpClient.proxy(ctx))
-router.all('/security/user/*', ctx => HttpClient.proxy(ctx))
-router.all('/export/*', ctx => HttpClient.proxy(ctx))
+router.use("", customerRouter.routes(), customerRouter.allowedMethods())
+router.all('/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;

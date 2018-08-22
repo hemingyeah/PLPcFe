@@ -1,6 +1,5 @@
-/**
- * 定义各个模块的配置，路径相对于项目根路径
- */
+/** 定义各个模块的配置，路径相对于项目根路径 @author dongls */
+
 module.exports = {
   'system.frame': {
     entry: './src/modules/system/frame/index.js',
@@ -8,5 +7,13 @@ module.exports = {
   },
   'system.home': {
     entry: './src/modules/system/home/index.js'
+  },
+  'system.demo': {
+    entry: './src/modules/system/demo/index.js'
+  },
+
+  // ------------ 客户 ------------
+  "customer.list": {
+    entry: './src/modules/customer/list/index.js'
   }
 }
