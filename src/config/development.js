@@ -2,7 +2,8 @@
 import base from './base';
 
 const development = {...base, ...{
-  env: 'development'   
+  env: 'development',
+  debug: true  
 }}
 
 export default development;

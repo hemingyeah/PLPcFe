@@ -22,7 +22,7 @@
           <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow"><i class="iconfont icon-customerservice"></i> 专属客服</button>
           
           <!--导出下载-->
-          <div class="export-wrap" @click="exportPanelShow = true">
+          <div class="export-wrap">
             <div class="export-btn" ><i class="iconfont icon-download"></i> 导出下载</div>
  
             <div class="export-panel-wrap">
@@ -72,24 +72,7 @@
         </div>
       </header>
 
-      <frame-main ref="frameMain" v-model="currUrl">
-        <base-panel :show.sync="exportPanelShow">
-          <h3>导出下载</h3>
-          <template v-if="exportList.length > 0">
-            <div v-for="item in exportList" :key="item.id" class="export-row">
-              <img src="../../../assets/img/excel.png">
-              <div class="export-row-info">
-                <h4>{{item.name}}</h4>
-                <p>{{item.createTime | fmt_datetime}}</p>
-              </div>  
-              <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
-              <a href="javascript:void(0);" @click="execExportFile(item)">{{item.isFinished == 0 ? '取消' : '下载'}}</a>
-            </div>
-          </template>
-
-          <p class="export-empty" v-else>暂无待下载的文件</p>
-        </base-panel>
-      </frame-main>
+      <frame-main ref="frameMain" v-model="currUrl"></frame-main>
     </div>
 
     <version :version="newVersion" :show.sync="versionShow"/>

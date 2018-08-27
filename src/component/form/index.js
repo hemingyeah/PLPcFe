@@ -1,31 +1,13 @@
-import './FormDesign.scss';
-
-import FormText from './FormText';
-import FormSelect from './FormSelect';
+import './common.scss';
 
 import FormDesign from './FormDesign';
-import FormBuilder from './FormBuilder';
+import FormBuilder from './FormBuilder'
 
-const FORM_FIELD = [
-  FormText,
-  FormSelect
-];
-
-const MODES = {
-  base: {
-    fields: [FormText.formType, FormSelect.formType]
-  },
-  task: {
-    fields: [FormText.formType]
+const Form = {
+  install(Vue){
+    Vue.component(FormDesign.name, FormDesign)
+    Vue.component(FormBuilder.name, FormBuilder)
   }
-}
-
-const FormDesignIns = new FormDesign(FORM_FIELD, MODES);
-const FormDesignCopm = FormDesignIns.genComponent();
-
-const Form = {};
-Form.install = function(Vue){
-  Vue.component(FormDesignCopm.name, FormDesignCopm)
-}
+};
 
 export default Form;

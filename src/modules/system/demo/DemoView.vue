@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 1000px">
+  <div>
 <!--   
     
     <a href="javascript:;" @click="open">open</a>
@@ -14,9 +14,16 @@
     <button type="button" @click="inserText">替换</button>
     <textarea id="textarea" style="width: 320px; height: 180px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis, arcu vitae adipiscing placerat, nisl lectus accumsan nisi, vitae iaculis sem neque vel lectus. Praesent tristique commodo lorem quis fringilla. Sed ac tellus eros. Sed consectetur eleifend felis vitae luctus. Praesent sagittis, est eget bibendum tincidunt, ligula diam tincidunt augue, a fermentum odio velit eget mi. Phasellus mattis, elit id fringilla semper, orci magna cursus ligula, non venenatis lacus augue sit amet dui. Pellentesque lacinia odio id nisi pulvinar commodo tempus at odio. Ut consectetur eros porttitor nunc mollis ultrices. Aenean porttitor, purus sollicitudin viverra auctor, neque erat blandit sapien, sit amet tincidunt massa mi ac nibh. Proin nibh sem, bibendum ut placerat nec, cursus et lacus. Phasellus vel augue turpis. Nunc eu mauris eu leo blandit mollis interdum eget lorem. </textarea>
   -->
-    <div>{{fields}}</div>
-    <button @click="save">保存</button>
-    <div style="height: 600px"><form-design v-model="fields"></form-design></div>
+    
+    <div style="height: 400px"><form-design v-model="fields"></form-design></div>
+
+    <div><textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
+    <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a></div>
+
+    <div style="display:flex;">
+      <form-builder :fields="buildFields" :value="form" @update="update" style="flex: 1;"></form-builder>
+      <textarea style="width: 400px;" :value="JSON.stringify(form)"></textarea>
+    </div>
     
   </div>
 </template>
@@ -28,6 +35,7 @@ import BaseFileUpload from "@src/component/BaseFileUpload/BaseFileUpload";
 import * as dom from '@src/util/dom';
 
 import frameReload from '@src/mixin/frameReload';
+import * as FormUtil from '@src/component/form/util';
 
 export default {
   name: 'demo-view',
@@ -36,26 +44,26 @@ export default {
     return {
       fields: [],
       files: [],
-       tableData: [{
-            date: '2016-05-02',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-          }, {
-            date: '2016-05-04',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1517 弄'
-          }, {
-            date: '2016-05-01',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1519 弄'
-          }, {
-            date: '2016-05-03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1516 弄'
-          }]
+      form: {}
+    }
+  },
+  computed: {
+    buildFields(){
+      return FormUtil.toField(this.fields);
     }
   },
   methods: {
+    update({field, newValue, oldValue}){
+      let {fieldName, displayName} = field;
+      if(this.$appConfig.debug){
+        console.log(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+
+      this.$set(this.form, fieldName, newValue)
+    },
+    toCreateCustomer(){
+       platform.openTab({id:'customer_create', title:"新建客户",url:"/customer/create", reload: true});
+    },
     inserText(){
       var text = '(0_0)'
       var textarea = document.getElementById("textarea")

@@ -1,7 +1,7 @@
 <template>
   <transition name="slide-down">
     <div class="saleManager-mask" @click.self="close" v-if="show">
-      <div class="saleManager transition-container">
+      <div class="saleManager transition__container">
         <div class="saleManager-header">
           <h3>专属客服</h3>
           <button type="button" class="btn-text saleManager-close" @click="close">

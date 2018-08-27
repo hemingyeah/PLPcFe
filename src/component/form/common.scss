@@ -33,6 +33,10 @@
 .form-design-preview-item{
   display: flex;
   flex-flow: row nowrap;
+
+  &.form-design-preview-selected{
+    background-color: red;
+  }
 }
 
 .form-design-setting{
@@ -97,10 +101,7 @@
   cursor: pointer;
   padding: 0 10px;
   flex: 1;
-
-  &:hover{
-    background-color: #fafafa;
-  }
+  overflow: hidden;
 }
 
 .form-design-preview-group{

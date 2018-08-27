@@ -1,14 +1,18 @@
 import FormTextSetting from './FormTextSetting.vue';
 import FormTextPreview from './FormTextPreview.vue';
+import FormTextBuild from './FormTextBuild'
 
-export default {
+let FormTextField = {
   formType: 'text', // 字段类型
   name: '单行文本',
+  isSys: false,
   component: {
     setting: FormTextSetting,
     preview: FormTextPreview,
-    build: {}
+    build: FormTextBuild
   }
-}
+};
+
+export default FormTextField;
 
 

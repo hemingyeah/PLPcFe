@@ -13,8 +13,8 @@ import appConfig from 'app.config';
 import FrameView from './FrameView.vue';
 
 Vue.use(directive);
-Vue.use(component);
 Vue.use(filter);
+Vue.use(component);
 
 Vue.prototype.$appConfig = appConfig;
 

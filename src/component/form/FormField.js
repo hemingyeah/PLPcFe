@@ -1,34 +1,27 @@
-/** 字段类 @author dongls */
+/**
+ * 用于表单设计的字段类
+ * 后端给出的字段数据需要调用 util.toFormField 转换成该格式
+ * 
+ * @author dongls 
+ */
 export default class FormField{
   /** 默认构造函数，不接收任何参数 */
-  constructor(){
-    // this.id = null;
-    // this.tenantId = null;
-    // this.tableName = null;
-    // this.isSystem = 0;
-    // this.fieldName = null;
-    // this.displayName = null;
-    // this.formType = null;
-    // this.isNull = 1;
-    // this.isSearch = 0;
-    // this.isAdd = 1;
-    // this.placeHolder = null;
-    // this.setting = {};
-    // this.orderId = null;
-    // this.templateId = null;
-    // this.templateName = null;
-    // this.defaultValue = null;
-    // this.enabled = 1;
+  constructor(formType){
+    let options = [];
 
-    this.fieldName = null; //传入的field数据
-    this.formType = null; //字段类型
-    this.displayName = null; //标题
+    if(formType == 'select'){
+      options.push({value: '选项1', isDefault: false})
+    }
+
+    this.fieldName = 'field_' + (Math.random() * 100000 >> 0);
+    this.formType = formType; //字段类型
+    this.displayName = '标题'; //标题
     this.isNull = 1; //是否必填
     this.isSearch = 0; //是否允许搜索
     this.placeHolder = null; //提示信息
     this.defaultValue = null; //默认值
 
-    this.options = []; //下拉菜单类型选项
+    this.options = options; //下拉菜单类型选项
     this.isMulti = false; //是否为多选
   }
 
@@ -45,11 +38,5 @@ export default class FormField{
     formField.displayName = o.displayName;
 
     return formField;
-  }
-
-  /** 转换成Filed类型 */
-  toField(){
-    console.log('to field')
-    //todo
   }
 }

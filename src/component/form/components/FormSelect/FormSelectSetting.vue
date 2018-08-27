@@ -1,15 +1,17 @@
-x`x`<template>
+<template>
   <div class="form-design-setting-panel">
     <h3>基础设置</h3>
     <div class="form-design-form-group">
-      <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="update">
+      <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="update" maxlength="6">
     </div>
     <div class="form-design-form-group">
       <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="update"></textarea>
     </div>
     <div class="form-design-form-group">
       <label><input type="checkbox" :value="field.isNull == 0" @input="update" data-prop="isNull">是否必填</label>
-      <label><input type="checkbox" :value="field.isSearch == 1" @input="update" data-prop="isSearch">是否搜索</label>
+      <label title="勾选后该字段可在高级搜索中查询" v-tooltip>
+        <input type="checkbox" :value="field.isSearch == 1" @input="update" data-prop="isSearch">是否搜索
+      </label>
     </div>
     <h3>
       选项设置

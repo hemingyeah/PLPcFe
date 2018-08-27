@@ -40,7 +40,7 @@ router.get('/', async ctx => {
   }
 
   //返回html
-  ctx.body = Template.renderWithHtml('首页', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('售后宝', body, script, modConfig.template)
 })
 
 // router.get('/home', async ctx => {
