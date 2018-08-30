@@ -12,8 +12,10 @@
       @select="selectRow"
       @select-all="selectAll"
       @sort-change="sortChange"
+
+      row-key="serialNumber"
       @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
-      <el-table-column type="selection" width="35"></el-table-column>
+      <el-table-column type="selection" width="35" reserve-selection></el-table-column>
       <el-table-column
         v-for="column in columns"
         :key="column.field"
@@ -92,7 +94,8 @@
           totalItems: 0,
           totalPages: 0,
         },
-        multipleSelection: []
+        multipleSelection: [],
+        allSelection: [],
       };
     },
     props: {
@@ -215,9 +218,17 @@
             this.paginationInfo.totalItems = total;
             this.paginationInfo.totalPages = pages;
             this.paginationInfo.pageNum = pageNum;
+            this.matchSelected();
 
+            // 把选中的匹配出来
             return res;
           })
+      },
+      matchSelected() {
+        if (!this.multipleSelection.length) return;
+        const selected = this.customers
+          .filter(c => this.multipleSelection.some(sc => sc.id === c.id)) || [];
+        this.toggleSelection(selected);
       },
       jump(pageNum) {
         this.$eventBridge.$emit('modifySearchParams', { pageNum, });
@@ -249,6 +260,7 @@
           });
         } else {
           this.$refs.multipleTable.clearSelection();
+          this.multipleSelection = []; ;
         }
       },
       handleSelectionChange(val) {
@@ -308,14 +320,6 @@
         }, {
           label: '启用/禁用',
           field: 'status',
-          show: true,
-        }, {
-          label: '工单数(未完成数/总数)',
-          field: 'sale3', //
-          show: true,
-        }, {
-          label: '产品',
-          field: 'sale4', //
           show: true,
         }, {
           label: '创建时间',
@@ -388,11 +392,6 @@
       .el-pagination__jump {
         margin-left: 0;
       }
-
-      /*.customer-table-pagination {*/
-        /*!*padding-top: 14px;*!*/
-
-      /*}*/
     }
   }
 
