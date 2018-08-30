@@ -10,6 +10,8 @@
       stripe
       :data="customers"
       @select="selectRow"
+      @select-all="selectAll"
+      @sort-change="sortChange"
       @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
       <el-table-column type="selection" width="35"></el-table-column>
       <el-table-column
@@ -19,6 +21,7 @@
         :width="column.width"
         :prop="column.field"
         v-if="column.show"
+        :sortable="column.sortable"
         show-overflow-tooltip>
 
         <template slot-scope="scope">
@@ -109,6 +112,7 @@
               field: field.fieldName,
               show: field.show,
               formType: field.formType,
+              sortable: field.sortable,
               isSystem: 0,
             }));
         }
@@ -131,6 +135,10 @@
       }
     },
     methods: {
+      sortChange(column, prop, order) {
+        console.log('column, prop, order', column, prop, order);
+
+      },
       modifyColumnsDisplay(newColumns) {
         const selectedColumns = newColumns.filter(f => f.show);
         this.$emit('modify-dynamic-columns-display', selectedColumns);
@@ -199,13 +207,14 @@
         return obj[nameKeys[0]];
       },
       fetchCustomerData(params) {
-        return this.$http.post('/v2/customer/list', null)
+        return this.$http.get('/v2/customer/list', params)
           .then(res => {
             this.customers = this.processRawData(res.list);
 
-            const {pages, total, } = res;
+            const {pages, total, pageNum, } = res;
             this.paginationInfo.totalItems = total;
             this.paginationInfo.totalPages = pages;
+            this.paginationInfo.pageNum = pageNum;
 
             return res;
           })
@@ -215,16 +224,23 @@
       },
       handleSizeChange(pageSize) {
         this.saveDataToStorage('pageSize', pageSize);
+        this.paginationInfo.pageNum = 1;
         this.$eventBridge.$emit('modifySearchParams', { pageSize, });
       },
       selectRow(selection, row) {
-        console.log('selection',selection);
-        console.log('row',row);
+        console.log('selectRow selection',selection);
+        console.log('selectRow row',row);
 
         if (selection.length < this.multipleSelection.length) {
           this.multipleSelection = this.multipleSelection
             .filter(sRow => sRow.id !== row.id);
         }
+      },
+      selectAll(selection) {
+        console.log('selectAll selection',selection);
+        if (selection.length) return;
+        this.multipleSelection = this.multipleSelection
+          .filter(sR => this.customers.every(c => c.id !== sR.id));
       },
       toggleSelection(rows) {
         if (rows) {
@@ -305,6 +321,8 @@
           label: '创建时间',
           field: 'createTime',
           show: true,
+          sortable: 'custom',
+          width: '100px',
         }
           , {
             label: '创建人',

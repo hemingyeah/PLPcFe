@@ -51,6 +51,11 @@ export default {
               } else {
                 f.show = false;
               }
+
+              if (['date', 'datetime', 'number'].indexOf(f.formType) >= 0) {
+                f.sortable = 'custom';
+              }
+
               return f;
             });
           this.customerConfig = customerConfig;
@@ -74,6 +79,10 @@ export default {
       let instance = this.$loading.show(this.$refs.customerListPage);
       this.$refs.customerList.fetchCustomerData(params)
         .then(() => {
+          this.$nextTick(() => {
+            console.log('scrollTop');
+            this.$refs.customerListPage.scrollTop = 0;
+          });
           instance.hide();
         })
         .catch(err => {
