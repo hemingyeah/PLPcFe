@@ -2,112 +2,112 @@
   <div class="customer-list-container" ref="customerListPage">
     <!--搜索-->
     <div class="customer-list-search-group-container">
-      <div class="base-search">
+      <form @submit.prevent="search" class="base-search">
         <div>
           <el-input v-model="params.keyword" placeholder="根据客户信息搜索"></el-input>
-          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button type="primary" @click="search" native-type="submit">搜索</el-button>
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
         </div>
         <el-button type="primary"  @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
-      </div>
+      </form>
 
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
         <h4 class="panel-title">高级搜索</h4>
-        <el-form ref="form" :model="form" label-width="100px" class="advanced-search-form">
-          <el-form-item label="客户编号">
-            <el-input type="text" v-model="form.serialNumber"></el-input>
+        <el-form class="advanced-search-form">
+          <el-form-item label-width="100px" label="客户编号">
+            <el-input type="text" v-model="params.serialNumber"></el-input>
           </el-form-item>
-          <el-form-item label="联系人">
+          <el-form-item label-width="100px" label="联系人">
             <el-select
-              v-model="form.linkmanId"
+              v-model="params.linkmanId"
               filterable
               remote
               reserve-keyword
               placeholder="请输入关键词"
-              :loading="searchLinkmanLoading"
+              :loading="inputRemoteSearch.linkman.loading"
               :remote-method="searchLinkman">
               <el-option
-                v-for="item in linkmanOptions"
+                v-for="item in inputRemoteSearch.linkman.options"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="选择团队">
+          <el-form-item label-width="100px" label="选择团队">
             <el-select
-              v-model="form.tagId"
+              v-model="params.tagId"
               filterable
               remote
               reserve-keyword
               placeholder="请输入关键词"
-              :loading="searchTagLoading"
+              :loading="inputRemoteSearch.tag.loading"
               :remote-method="searchTag">
               <el-option
-                v-for="item in tagOptions"
+                v-for="item in inputRemoteSearch.tag.options"
                 :key="item.id"
                 :label="item.tagName"
                 :value="item.id">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="区域">
-            <base-dist-picker field="address" v-on:city-selector-change="handleCitySelectorChange"></base-dist-picker>
+          <el-form-item label-width="100px" label="区域">
+            <base-dist-picker v-on:city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
           </el-form-item>
-          <el-form-item label="详细地址">
-            <el-input type="text" v-model="form.adAddress"></el-input>
+          <el-form-item label-width="100px" label="详细地址">
+            <el-input type="text" v-model="params.customerAddress.adAddress"></el-input>
           </el-form-item>
-          <el-form-item label="有无提醒">
-            <el-select v-model="form.hasRemind" placeholder="请选择">
+          <el-form-item label-width="100px" label="有无提醒">
+            <el-select v-model="params.hasRemind" placeholder="请选择">
               <el-option :value="null" label="全部"></el-option>
               <el-option :value="1" label="有"></el-option>
               <el-option :value="0" label="无"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="状态">
-            <el-select v-model="form.status" placeholder="请选择">
+          <el-form-item label-width="100px" label="状态">
+            <el-select v-model="params.status" placeholder="请选择">
               <el-option :value="null" label="全部"></el-option>
               <el-option :value="1" label="启用"></el-option>
               <el-option :value="0" label="禁用"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="创建人">
+          <el-form-item label-width="100px" label="创建人">
             <el-select
-              v-model="form.createUser"
+              v-model="params.createUser"
               filterable
               remote
               reserve-keyword
               placeholder="请输入关键词"
-              :loading="searchCreatorLoading"
+              :loading="inputRemoteSearch.creator.loading"
               :remote-method="searchCreator">
               <el-option
-                v-for="item in creatorOptions"
+                v-for="item in inputRemoteSearch.creator.options"
                 :key="item.userId"
                 :label="item.displayName"
                 :value="item.userId">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="客户负责人">
+          <el-form-item label-width="100px" label="客户负责人">
             <el-select
-              v-model="form.customerManager"
+              v-model="params.customerManager"
               filterable
               remote
               reserve-keyword
               placeholder="请输入关键词"
-              :loading="searchCustomerManagerLoading"
+              :loading="inputRemoteSearch.customerManager.loading"
               :remote-method="searchCustomerManager">
               <el-option
-                v-for="item in customerManagerOptions"
+                v-for="item in inputRemoteSearch.customerManager.options"
                 :key="item.userId"
                 :label="item.displayName"
                 :value="item.userId">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="创建时间">
+          <el-form-item label-width="100px" label="创建时间">
             <el-date-picker
-              v-model="form.createTime"
+              v-model="params.createTime"
               type="daterange"
               align="right"
               unlink-panels
@@ -119,12 +119,12 @@
           </el-form-item>
 
           <!-- 动态搜索框 -->
-          <el-form-item :label="field.displayName" v-for="field in searchFields" :key="field.fieldName">
+          <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields" :key="field.fieldName">
             <template v-if="field.formType === 'text' || field.formType === 'code'">
-              <el-input v-model="form[field.fieldName]" :placeholder="field.placeHolder" type="text"></el-input>
+              <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="text"></el-input>
             </template>
             <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-              <el-select v-model="form[field.fieldName]" :placeholder="field.placeHolder">
+              <el-select v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder">
                 <el-option
                   v-for="item in field.setting.dataSource"
                   :key="item"
@@ -135,11 +135,11 @@
               </el-select>
             </template>
             <template v-else-if="field.formType === 'number'">
-              <el-input v-model="form[field.fieldName]" :placeholder="field.placeHolder" type="number"></el-input>
+              <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="number"></el-input>
             </template>
             <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
               <el-date-picker
-                v-model="form[field.fieldName]"
+                v-model="customizedSearchModel[field.fieldName]['value']"
                 type="daterange"
                 align="right"
                 unlink-panels
@@ -151,15 +151,15 @@
             </template>
             <template v-else-if="field.formType === 'user'">
               <el-select
-                v-model="form[field.fieldName]"
+                v-model="customizedSearchModel[field.fieldName]['value']"
                 filterable
                 remote
                 reserve-keyword
                 placeholder="请输入关键词"
-                :loading="searchCreatorLoading"
+                :loading="inputRemoteSearch.creator.loading"
                 :remote-method="searchCreator">
                 <el-option
-                  v-for="item in creatorOptions"
+                  v-for="item in inputRemoteSearch.creator.options"
                   :key="item.userId"
                   :label="item.displayName"
                   :value="item.userId">
@@ -168,7 +168,7 @@
 
             </template>
             <template v-else>
-              <el-input v-model="form[field.fieldName]" :placeholder="field.placeHolder"></el-input>
+              <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder"></el-input>
             </template>
           </el-form-item>
 
@@ -213,7 +213,7 @@
             </el-button>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.label">
-                <el-checkbox v-model="item.show" :label="item.label">{{item.label}}</el-checkbox>
+                <el-checkbox v-model="item.show" @input="modifyColumnStatus($event)" :label="item.label">{{item.label}}</el-checkbox>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -240,7 +240,7 @@
         @sort-change="sortChange"
         row-key="serialNumber"
         @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
-        <el-table-column type="selection" width="35" reserve-selection></el-table-column>
+        <el-table-column type="selection" width="35"></el-table-column>
         <el-table-column
           v-for="column in columns"
           :key="column.field"
@@ -289,6 +289,7 @@
           background
           @current-change="jump"
           @size-change="handleSizeChange"
+          :page-sizes="[10, 20, 50]"
           :page-size="paginationInfo.pageSize"
           :current-page="paginationInfo.pageNum"
           layout="prev, pager, next, sizes, jumper"
@@ -324,6 +325,8 @@
 
 <script>
   import _ from 'lodash';
+  import { formatDate, } from '../../../util/lang';
+
   import BaseDistPicker from '../../../component/common/BaseDistPicker';
   import BasePanel from '../../../component/common/BasePanel';
   import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
@@ -335,46 +338,24 @@
   name: 'customer-list-view',
   data() {
     return {
-      // search data
-      linkmanOptions: [],
-      tagOptions: [],
-      creatorOptions: [],
-      customerManagerOptions: [],
-      searchLinkmanLoading: false,
-      searchTagLoading: false,
-      searchCreatorLoading: false,
-      searchCustomerManagerLoading: false,
+      // self state
+      pending: false,
       advancedSearchPanelShow: false,
-      form: {
-        serialNumber: null,
-        linkmanId: null,
-        tagId: null,
-        address: [],
-        customerAddress: {
-          adProvince: '',
-          adCity: '',
-          adDist: '',
-          adAddress: '',
-        },
-        hasRemind: null,
-        status: null,
-        createUser: null,
-        createTime: null,
-      },
+      address: [],
+      customizedSearchModel: {},
       params: {
         linkmanName: '',
         createUserName: '',
         tagName: '',
         customerManagerName: '',
         keyword: '',
-        isAdvanced: 0,
         viewId: '',
         serialNumber: '',
         linkmanId: '',
         customerAddress: {
-          adProvince: '',
-          adCity: '',
-          adDist: '',
+          // adProvince: '',
+          // adCity: '',
+          // adDist: '',
           adAddress: '',
         },
         hasRemind: '',
@@ -384,7 +365,6 @@
         createTime: '',
         pageNum: 1,
         pageSize: 10,
-
       },
       createTimePickerOptions: {
         shortcuts: [{
@@ -413,10 +393,6 @@
           }
         }]
       },
-      searchFields: [],
-      // search end
-      // list start
-      customers: [],
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -424,14 +400,30 @@
         totalPages: 0,
       },
       multipleSelection: [],
-      allSelection: [],
+      // allSelection: [],
+      // data from remote
+      customers: [],
       columns: [],
-      // list end
-      // operation start
-      pending: false,
-      // operation end
-      // view
       customerConfig: {},
+      searchFields: [],
+      inputRemoteSearch: {
+        linkman: {
+          options: [],
+          loading: false,
+        },
+        tag: {
+          options: [],
+          loading: false,
+        },
+        creator: {
+          options: [],
+          loading: false,
+        },
+        customerManager: {
+          options: [],
+          loading: false,
+        },
+      },
     };
   },
   mounted() {
@@ -445,40 +437,22 @@
     this.search();
   },
   methods: {
-    fetchConfig() {
-      const localStorageData = this.getLocalStorageData();
-
-      this.$http.get('/v2/customer/getConfig')
-        .then(result => {
-          const customerConfig = result;
-          customerConfig.fieldInfo = result.fieldInfo
-            .map(f => {
-              if (['date', 'datetime', 'number'].indexOf(f.formType) >= 0) {
-                f.sortable = 'custom';
-              }
-
-              if (f.isSearch) {
-                // 需要搜索的字段
-                this.$set(this.form, f.fieldName, null);
-                this.searchFields.push(f);
-              }
-
-              return f;
-            });
-          this.customerConfig = customerConfig;
-          this.columns = this.buildTableColumn();
-        });
-    },
-    handleChange(value) {
-      console.log('handleChange value', value);
-
-    },
     search() {
       let instance = this.$loading.show(this.$refs.customerListPage);
       const params = this.buildParams();
 
-      console.log('search');
-      this.fetchCustomerData(params)
+      this.$http.post('/v2/customer/list', params)
+        .then(res => {
+          this.customers = this.processRawData(res.list);
+
+          const { pages, total, pageNum, } = res;
+          this.paginationInfo.totalItems = total;
+          this.paginationInfo.totalPages = pages;
+          this.paginationInfo.pageNum = pageNum;
+          this.matchSelected();          // 把选中的匹配出来
+
+          return res;
+        })
         .then(() => {
           this.$refs.customerListPage.scrollTop = 0;
           instance.hide();
@@ -488,120 +462,125 @@
           console.log('err', err);
         })
     },
+    fetchConfig() {
+      this.$http.get('/v2/customer/getConfig')
+        .then(result => {
+          const customerConfig = result;
+          customerConfig.fieldInfo = result.fieldInfo
+            .map(f => {
+              if (f.isSearch) {
+                // 需要搜索的字段
+                this.$set(this.customizedSearchModel, f.fieldName, {
+                  fieldName: f.fieldName,
+                  value: null,
+                  operator: this.matchOperator(f.formType),
+                  formType: f.formType,
+                });
+                this.searchFields.push(f);
+              }
+              return f;
+            });
+          this.customerConfig = customerConfig;
+          this.columns = this.buildTableColumn();
+        });
+    },
+    // process raw data
     buildParams() {
+      let tv = null; // tv means temporary variable that used inside the loop.
       let params = _.cloneDeep(this.params);
+      params.conditions = [];
+      console.log('enter buildParams this.params', this.params);
+
+      if (this.address.length) {
+        params.customerAddress = {
+          adProvince: this.address[0],
+          adCity: this.address[1] || '',
+          adDist: this.address[2] || '',
+          adAddress: params.customerAddress.adAddress || '',
+        };
+      }
+
+      if (params.createTime && params.createTime.length) {
+        params.createTimeStart = formatDate(params.createTime[0]);
+        params.createTimeEnd = `${formatDate(params.createTime[1])} 23:59:59`;
+        delete params.createTime;
+      }
+
       for(let key in params.customerAddress) {
-        if (!params.customerAddress[key]) {
+        tv = params.customerAddress[key];
+        if (!tv && tv !== 0) {
           delete params.customerAddress[key];
         }
       }
+
+      Object.keys(this.customizedSearchModel)
+        .map(key => {
+          tv = this.customizedSearchModel[key];
+          if (tv.value && tv.formType === 'date') {
+            return params.conditions.push({
+              property: tv.fieldName,
+              operator: tv.operator,
+              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
+              betweenValue2: formatDate(tv.value[1], 'YYYY-MM-DD'),
+            });
+          }
+          if (tv.value && tv.formType === 'datetime') {
+            return params.conditions.push({
+              property: tv.fieldName,
+              operator: tv.operator,
+              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
+              betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
+            });
+          }
+
+          if (tv.value) {
+            params.conditions.push({
+              property: tv.fieldName,
+              operator: tv.operator,
+              value: tv.value,
+            });
+          }
+        });
       for(let key in params) {
-        if (!params[key] || (typeof params[key] === 'object' && !Object.keys(params[key]).length)) {
+        tv = params[key];
+        if ((!tv && tv !== 0) || (typeof tv === 'object' && !Object.keys(tv).length)) {
           delete params[key];
         }
-
       }
+
+      console.log('buildParams params', params);
+
+      // params.sortBy["customer.createTime"] = true;
       return params;
     },
-    resetParams() {
-      this.params = {
-        linkmanName: '',
-        createUserName: '',
-        tagName: '',
-        customerManagerName: '',
-        keyword: '',
-        isAdvanced: 0,
-        viewId: '',
-        serialNumber: '',
-        linkmanId: '',
-        customerAddress: {
-          adProvince: '',
-          adCity: '',
-          adDist: '',
-          adAddress: '',
-        },
-        hasRemind: '',
-        status: '',
-        createUser: '',
-        customerManager: '',
-        createTime: '',
-        pageNum: 1,
-        pageSize: 10,
-
-      }
-      this.search();
-    },
-    handleCitySelectorChange(city) {
-      this.form[city.field] = city.value;
-    },
-    // input search method
-    searchCustomerManager(keyword) {
-      this.searchCustomerManagerLoading = true;
-      this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.customerManagerOptions = res.list;
-          this.searchCustomerManagerLoading = false;
-        })
-    },
-    searchCreator(keyword) {
-      this.searchCreatorLoading = true;
-      this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.creatorOptions = res.list;
-          this.searchCreatorLoading = false;
-        })
-    },
-    searchLinkman(keyword) {
-      this.searchLinkmanLoading = true;
-      this.$http.get('/linkman/getListAsyn', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.linkmanOptions = res.list;
-          this.searchLinkmanLoading = false;
-        })
-    },
-    searchTag(keyword) {
-      this.searchTagLoading = true;
-      this.$http.get('/task/tag/list', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.tagOptions = res.list;
-          this.searchTagLoading = false;
-        })
-    },
-
-    // search method end
-    // list method start
-    sortChange(column, prop, order) {
-      console.log('column, prop, order', column, prop, order);
-
-    },
     processRawData(cl) {
-      //  cl is customer list.
+      //  cl means customer list.
       let temp = null;
-      let nameTemp = null;
-      let nameKey = null;
+      let tv = null; // tv means temporary variable that used inside the loop.
 
-      return cl.map(c => {
+      return cl.map(c => { // c means customer.
         temp = c.customerAddress;
         c.customerAddress.str = `${temp.adProvince}-${temp.adCity}-${temp.adDist}`;
         c.tagsStr = c.tags.map(t => t.tagName).join(' ');
 
+        // c.attribute is the object that includes all customized field.
         Object.keys(c.attribute)
           .map(key => {
-            if (typeof c.attribute[key] === "string") return key;
+            tv = c.attribute[key];
 
             if (Array.isArray(c.attribute[key]) && (typeof c.attribute[key][0] === "string")) {
-              c.attribute[key] = JSON.stringify(c.attribute[key]);
-              c.attribute[key] = c.attribute[key].replace(/"/g, '',);
+              tv = JSON.stringify(tv);
+              c.attribute[key] = tv.replace(/"/g, '',);
               return key;
             }
 
-            if (Array.isArray(c.attribute[key]) && (typeof c.attribute[key][0] === "object")) {
-              c.attribute[key] = c.attribute[key].map(a => this.getNameFromObject(a)).join(',');
+            if (Array.isArray(tv) && (typeof tv[0] === "object")) {
+              c.attribute[key] = tv.map(a => this.getNameFromObject(a)).join(',');
               return key;
             }
 
-            if (typeof c.attribute[key] === "object") {
-              c.attribute[key] = this.getNameFromObject(c.attribute[key]);
+            if (typeof tv === "object") {
+              c.attribute[key] = this.getNameFromObject(tv);
               return key;
             }
           });
@@ -610,7 +589,6 @@
     },
     getNameFromObject(obj) {
       if (!obj) return;
-      let name = '';
       let objKeys = Object.keys(obj) || [];
       let nameKeys = [];
 
@@ -622,28 +600,49 @@
       if (!nameKeys[0]) return obj[objKeys[0]];
       return obj[nameKeys[0]];
     },
-    fetchCustomerData(params) {
-      return this.$http.get('/v2/customer/list', params)
-        .then(res => {
-          this.customers = this.processRawData(res.list);
-
-          console.log('this.customers', this.customers);
-
-          const {pages, total, pageNum, } = res;
-          this.paginationInfo.totalItems = total;
-          this.paginationInfo.totalPages = pages;
-          this.paginationInfo.pageNum = pageNum;
-          this.matchSelected();
-
-          // 把选中的匹配出来
-          return res;
-        })
-    },
     matchSelected() {
       if (!this.multipleSelection.length) return;
       const selected = this.customers
         .filter(c => this.multipleSelection.some(sc => sc.id === c.id)) || [];
-      this.toggleSelection(selected);
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
+    },
+    matchOperator(formType) {
+      let operator = '';
+      switch (formType) {
+        case 'date':
+          operator = 'between';
+          break;
+        case 'datetime':
+          operator = 'between';
+          break;
+        case 'select':
+          operator = 'eq';
+          break;
+        case 'selectMulti':
+          operator = 'contain';
+          break;
+        case 'user':
+          operator = 'user';
+          break;
+        default:
+          operator = 'like';
+          break;
+      }
+      return operator;
+    },
+
+    handleCitySelectorChange(city) {
+      this.address = city;
+      console.log('this.address', this.address);
+    },
+
+    // search method end
+    // list method start
+    sortChange(column, prop, order) {
+      console.log('column, prop, order', column, prop, order);
+
     },
     jump(pageNum) {
       this.params.pageNum = pageNum;
@@ -673,6 +672,7 @@
     toggleSelection(rows) {
       if (rows) {
         rows.forEach(row => {
+          console.log('row.name', row.name);
           this.$refs.multipleTable.toggleRowSelection(row);
         });
       } else {
@@ -686,7 +686,7 @@
 
     // list method end
 
-    // operation method start
+    // operation dialog
     openDialog(category) {
       console.log('category', category);
       if (category === 'sendMessage') {
@@ -721,7 +721,12 @@
     remindMultipleCustomer() {
       // console.log('remindMultipleCustomer');
     },
-    // operation method end
+
+    // columns
+    modifyColumnStatus() {
+      const showColumns = this.columns.filter(c => c.show).map(c => c.field);
+      this.saveDataToStorage('columnStatus', showColumns);
+    },
 
     // common methods
     getLocalStorageData() {
@@ -735,7 +740,7 @@
     },
     buildTableColumn() {
       const localStorageData = this.getLocalStorageData();
-      let columnStatus = [];
+      let columnStatus = localStorageData.columnStatus || [];
       let baseColumns = [{
         label: '客户',
         field: 'name',
@@ -800,28 +805,98 @@
 
       dynamicColumns = this.customerConfig.fieldInfo
         .filter(f => !f.isSystem)
-        .map(field => ({
-          label: field.displayName,
-          field: field.fieldName,
-          show: field.show,
-          formType: field.formType,
-          sortable: field.sortable,
-          isSystem: 0,
-        }));
+        .map(field => {
+          let sortable = false;
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+            sortable = 'custom';
+          }
+
+          return {
+            label: field.displayName,
+            field: field.fieldName,
+            formType: field.formType,
+            sortable,
+            isSystem: 0,
+          };
+        });
       columns = [...baseColumns, ...dynamicColumns];
 
-      if (!localStorageData || !localStorageData.columnStatus || !localStorageData.columnStatus.length) {
+      if (!columnStatus || !columnStatus.length) {
         return columns;
       }
 
-      columnStatus = localStorageData.columnStatus;
       columns = columns.map(bc => {
-        bc.show = columnStatus.some(sc => sc.field === bc.field);
+        bc.show = columnStatus.some(sc => sc === bc.field);
         return bc;
       });
-
       return columns;
     },
+    resetParams() {
+      this.params = {
+        linkmanName: '',
+        createUserName: '',
+        tagName: '',
+        customerManagerName: '',
+        keyword: '',
+        // isAdvanced: 0,
+        viewId: '',
+        serialNumber: '',
+        linkmanId: '',
+        customerAddress: {
+          // adProvince: '',
+          // adCity: '',
+          // adDist: '',
+          adAddress: '',
+        },
+        hasRemind: '',
+        status: '',
+        createUser: '',
+        customerManager: '',
+        createTime: '',
+        pageNum: 1,
+        pageSize: 10,
+
+      };
+      for (let key in this.customizedSearchModel) {
+        this.customizedSearchModel[key].value = null;
+      }
+      this.$refs.baseDistPicker.clearValue();
+      this.search();
+    },
+    // input search method
+    searchCustomerManager(keyword) {
+      this.inputRemoteSearch.customerManager.loading = true;
+      this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
+        .then(res => {
+          this.inputRemoteSearch.customerManager.options = res.list;
+          this.inputRemoteSearch.customerManager.loading = false;
+        })
+    },
+    searchCreator(keyword) {
+      this.inputRemoteSearch.creator.loading = true;
+      this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
+        .then(res => {
+          this.inputRemoteSearch.creator.options = res.list;
+          this.inputRemoteSearch.creator.loading = false;
+        })
+    },
+    searchLinkman(keyword) {
+      this.inputRemoteSearch.linkman.loading = true;
+      this.$http.get('/linkman/getListAsyn', { keyword: keyword, pageNum: 1, })
+        .then(res => {
+          this.inputRemoteSearch.linkman.options = res.list;
+          this.inputRemoteSearch.linkman.loading = false;
+        })
+    },
+    searchTag(keyword) {
+      this.inputRemoteSearch.tag.loading = true;
+      this.$http.get('/task/tag/list', { keyword: keyword, pageNum: 1, })
+        .then(res => {
+          this.inputRemoteSearch.tag.options = res.list;
+          this.inputRemoteSearch.tag.loading = false;
+        })
+    },
+
   },
   components: {
     [BasePanel.name]: BasePanel,

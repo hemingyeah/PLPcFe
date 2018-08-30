@@ -1,9 +1,11 @@
 <template>
   <div class="base-dist-picker">
     <el-cascader
+      clearable
       :props="props"
       :options="options"
       change-on-select
+      :value="value"
       @change="handleChange"
     ></el-cascader>
 
@@ -27,17 +29,18 @@
       }
     },
     props: {
-      field: {
-        type: String,
-        default: '',
-      }
+      // field: {
+      //   type: String,
+      //   default: '',
+      // }
     },
     methods: {
+      clearValue() {
+        this.value = [];
+        this.$emit('city-selector-change', []);
+      },
       handleChange(value) {
-        this.$emit('city-selector-change', {
-          value,
-          field: this.field,
-        });
+        this.$emit('city-selector-change', value);
       },
     }
   }
