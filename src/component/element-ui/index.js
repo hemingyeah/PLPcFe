@@ -15,7 +15,22 @@ import {
   DatePicker,
   Select,
   Option,
-  Popover
+  Popover,
+  Button,
+  ButtonGroup,
+  Row,
+  Col,
+  Cascader,
+  DropdownMenu,
+  DropdownItem,
+  Dropdown,
+  Checkbox,
+  Dialog, //待删除
+  Form,
+  FormItem,
+  RadioGroup,
+  Radio,
+  TimePicker,
 } from 'element-ui';
 
 const ElementUI = {
@@ -29,11 +44,30 @@ const ElementUI = {
     Vue.use(Table);
     Vue.use(TableColumn);
 
+    Vue.use(Form);
     Vue.use(Input);
     Vue.use(DatePicker);
     Vue.use(Select);
     Vue.use(Option);
     Vue.use(Popover)
+    Vue.use(Button);
+    Vue.use(ButtonGroup);
+    Vue.use(Cascader);
+    Vue.use(DropdownMenu);
+    Vue.use(DropdownItem);
+    Vue.use(Dropdown);
+    Vue.use(Checkbox);
+    Vue.use(Dialog);
+    Vue.use(FormItem);
+    Vue.use(RadioGroup);
+    Vue.use(Radio);
+    Vue.use(TimePicker);
+
+    // layout
+    Vue.use(Row);
+    Vue.use(Col);
+
+
   }
 };
 
