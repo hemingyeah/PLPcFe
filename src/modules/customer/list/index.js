@@ -1,4 +1,6 @@
 import '@src/assets/scss/index.scss'
+import '@src/assets/scss/_mixins.scss'
+import '@src/assets/scss/_variables.scss'
 import '@src/common/polyfill';
 
 import Vue from 'vue';

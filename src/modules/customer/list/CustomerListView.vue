@@ -12,7 +12,10 @@
       </form>
 
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
-        <h4 class="panel-title">高级搜索</h4>
+        <h4 class="panel-title">
+          高级搜索
+          <i class="iconfont icon-guanbi" @click="advancedSearchPanelShow = false"></i>
+        </h4>
         <el-form class="advanced-search-form">
           <el-form-item label-width="100px" label="客户编号">
             <el-input type="text" v-model="params.serialNumber"></el-input>
@@ -55,7 +58,7 @@
             <base-dist-picker v-on:city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
           </el-form-item>
           <el-form-item label-width="100px" label="详细地址">
-            <el-input type="text" v-model="params.customerAddress.adAddress"></el-input>
+            <el-input type="text" v-model="specialParams.adAddress"></el-input>
           </el-form-item>
           <el-form-item label-width="100px" label="有无提醒">
             <el-select v-model="params.hasRemind" placeholder="请选择">
@@ -249,6 +252,7 @@
           :prop="column.field"
           v-if="column.show"
           :sortable="column.sortable"
+          align="center"
           show-overflow-tooltip>
           <template slot-scope="scope">
             <template v-if="column.field === 'customerAddress'">
@@ -261,7 +265,7 @@
               {{scope.row.tagsStr}}
             </template>
             <template v-else-if="column.field === 'status'">
-              <el-checkbox v-model="scope.row.status === 1"></el-checkbox>
+              <el-checkbox :class="{'not-checked': !scope.row.status}" v-model="scope.row.status" @change="toggleStatus(scope.row)"></el-checkbox>
             </template>
             <template v-else-if="column.field === 'createUser'">
               {{scope.row.createUserName}}
@@ -281,7 +285,7 @@
 
       <div class="table-footer">
         <div class="list-info">
-          已选中 <span class="selectedCount">{{multipleSelection.length}}</span> 条 <a href="javasript:;" class="clearSelectedBtn" @click="toggleSelection()">清空</a>
+          已选中 <span class="selectedCount"  @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条 <a href="javasript:;" class="clearSelectedBtn" @click="toggleSelection()">清空</a>
           共 {{paginationInfo.totalItems}} 记录  共 {{paginationInfo.totalPages}} 页
         </div>
         <el-pagination
@@ -319,6 +323,26 @@
 
     </batch-reminding-customer-dialog>
 
+    <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
+      <h4 class="panel-title">
+        已选择({{multipleSelection.length}})
+        <i class="iconfont icon-guanbi" @click="multipleSelectionPanelShow = false"></i>
+      </h4>
+      <dl class="selected-customer-list">
+        <dt>
+          <span class="name-column">客户</span>
+          <span class="sn-column">编号</span>
+          <i></i>
+        </dt>
+        <dd v-for="c in multipleSelection" :key="c.id" @click="cancelSelectCustomer(c)">
+          <span class="name-column">{{c.name}}</span>
+          <span class="sn">{{c.serialNumber}}</span>
+          <i class="iconfont icon-close"></i>
+        </dd>
+      </dl>
+      <el-button type="info" class="cancel-select-customer-btn" @click="toggleSelection()">清除</el-button>
+    </base-panel>
+
 
   </div>
 </template>
@@ -341,8 +365,15 @@
       // self state
       pending: false,
       advancedSearchPanelShow: false,
-      address: [],
+      multipleSelectionPanelShow: false,
       customizedSearchModel: {},
+      specialParams: {
+        sortBy: {
+          'customer.createTime': null,
+        },
+        addressSelector: [],
+        adAddress: '',
+      },
       params: {
         linkmanName: '',
         createUserName: '',
@@ -352,12 +383,7 @@
         viewId: '',
         serialNumber: '',
         linkmanId: '',
-        customerAddress: {
-          // adProvince: '',
-          // adCity: '',
-          // adDist: '',
-          adAddress: '',
-        },
+        customerAddress: {},
         hasRemind: '',
         status: '',
         createUser: '',
@@ -400,7 +426,6 @@
         totalPages: 0,
       },
       multipleSelection: [],
-      // allSelection: [],
       // data from remote
       customers: [],
       columns: [],
@@ -435,14 +460,47 @@
     }
 
     this.search();
+
+    // const test = this.deleteValueFromObject({
+    //   test1: 0,
+    //   testNull: null,
+    //   testFalse: false,
+    //   testUndefined: undefined,
+    //   subObj: {
+    //     test1: 0,
+    //     testNull: null,
+    //     testFalse: false,
+    //     testUndefined: undefined,
+    //   }
+    // });
+    // console.log('test', test);
   },
   methods: {
+    cancelSelectCustomer(customer) {
+      if (!customer || !customer.id) return;
+      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
+      this.toggleSelection([customer]);
+    },
+    toggleStatus(row) {
+      const formData = new FormData();
+      formData.set('id', row.id);
+      formData.set('status', Number(row.status));
+
+      this.$http.post('/customer/changeState', formData)
+    },
     search() {
       let instance = this.$loading.show(this.$refs.customerListPage);
       const params = this.buildParams();
 
       this.$http.post('/v2/customer/list', params)
         .then(res => {
+          if (!res || !res.list) {
+            return this.customers = [];
+            this.paginationInfo.totalItems = 0;
+            this.paginationInfo.totalPages = 0;
+            this.paginationInfo.pageNum = 1;
+          }
+
           this.customers = this.processRawData(res.list);
 
           const { pages, total, pageNum, } = res;
@@ -477,7 +535,15 @@
                   formType: f.formType,
                 });
                 this.searchFields.push(f);
+                // console.log('f', f);
+                if (f.formType === 'number') {
+                  this.$set(this.specialParams, `lpad(myOrderConvertor(customer.attribute->>'$.${f.fieldName}'),16,0)`, '')
+                }
+                if (f.formType === 'date' || f.formType === 'datetime') {
+                  this.$set(this.specialParams, `myOrderConvertor(customer.attribute->>'$.${f.fieldName}')`, '')
+                }
               }
+
               return f;
             });
           this.customerConfig = customerConfig;
@@ -487,37 +553,37 @@
     // process raw data
     buildParams() {
       let tv = null; // tv means temporary variable that used inside the loop.
-      let params = _.cloneDeep(this.params);
-      params.conditions = [];
-      console.log('enter buildParams this.params', this.params);
+      const conditions = [];
+      let params = {
+        ..._.cloneDeep(this.params),
+        ..._.cloneDeep(this.specialParams),
+      };
 
-      if (this.address.length) {
-        params.customerAddress = {
-          adProvince: this.address[0],
-          adCity: this.address[1] || '',
-          adDist: this.address[2] || '',
-          adAddress: params.customerAddress.adAddress || '',
-        };
-      }
-
+      // createTime
       if (params.createTime && params.createTime.length) {
         params.createTimeStart = formatDate(params.createTime[0]);
         params.createTimeEnd = `${formatDate(params.createTime[1])} 23:59:59`;
         delete params.createTime;
       }
 
-      for(let key in params.customerAddress) {
-        tv = params.customerAddress[key];
-        if (!tv && tv !== 0) {
-          delete params.customerAddress[key];
-        }
+      // address
+      if (this.specialParams.addressSelector.length) {
+        params.customerAddress = {
+          adProvince: this.specialParams.addressSelector[0],
+          adCity: this.specialParams.addressSelector[1] || '',
+          adDist: this.specialParams.addressSelector[2] || '',
+        };
       }
+      params.customerAddress.adAddress = this.specialParams.adAddress || '';
 
+      params = this.deleteValueFromObject(params, [0, false]);
+
+      // build customized search fields
       Object.keys(this.customizedSearchModel)
         .map(key => {
           tv = this.customizedSearchModel[key];
           if (tv.value && tv.formType === 'date') {
-            return params.conditions.push({
+            return conditions.push({
               property: tv.fieldName,
               operator: tv.operator,
               betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
@@ -525,7 +591,7 @@
             });
           }
           if (tv.value && tv.formType === 'datetime') {
-            return params.conditions.push({
+            return conditions.push({
               property: tv.fieldName,
               operator: tv.operator,
               betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
@@ -534,24 +600,48 @@
           }
 
           if (tv.value) {
-            params.conditions.push({
+            conditions.push({
               property: tv.fieldName,
               operator: tv.operator,
               value: tv.value,
             });
           }
         });
-      for(let key in params) {
-        tv = params[key];
-        if ((!tv && tv !== 0) || (typeof tv === 'object' && !Object.keys(tv).length)) {
-          delete params[key];
-        }
+
+      if (conditions.length) {
+        params.conditions = conditions;
       }
 
-      console.log('buildParams params', params);
-
-      // params.sortBy["customer.createTime"] = true;
+      console.log('[build params end]params', params);
       return params;
+    },
+    deleteValueFromObject(obj, except = [] ) {
+      if (except.length) {
+        Object.keys(obj)
+          .map(key => {
+            if (typeof obj[key] === 'object' && obj[key]) {
+              obj[key] = this.deleteValueFromObject(obj[key], except);
+            }
+            if (!obj[key] && except.every(ex => ex !== obj[key])) {
+              delete obj[key];
+            }
+          });
+      } else {
+        Object.keys(obj)
+          .map(key => {
+            if (typeof obj[key] === 'object' && obj[key]) {
+              obj[key] = this.deleteValueFromObject(obj[key]);
+            }
+            if (!obj[key]) {
+              delete obj[key];
+            }
+          });
+      }
+      if (Object.keys(obj).length) {
+        return obj;
+      } else {
+        return undefined;
+      }
     },
     processRawData(cl) {
       //  cl means customer list.
@@ -562,6 +652,7 @@
         temp = c.customerAddress;
         c.customerAddress.str = `${temp.adProvince}-${temp.adCity}-${temp.adDist}`;
         c.tagsStr = c.tags.map(t => t.tagName).join(' ');
+        c.status = Boolean(c.status);
 
         // c.attribute is the object that includes all customized field.
         Object.keys(c.attribute)
@@ -587,62 +678,37 @@
         return c;
       })
     },
-    getNameFromObject(obj) {
-      if (!obj) return;
-      let objKeys = Object.keys(obj) || [];
-      let nameKeys = [];
-
-      nameKeys = objKeys
-        .filter(aKey => /name/gi.test(aKey)) || [];
-
-      if (!objKeys.length) return null;
-
-      if (!nameKeys[0]) return obj[objKeys[0]];
-      return obj[nameKeys[0]];
-    },
-    matchSelected() {
-      if (!this.multipleSelection.length) return;
-      const selected = this.customers
-        .filter(c => this.multipleSelection.some(sc => sc.id === c.id)) || [];
-      this.$nextTick(() => {
-        this.toggleSelection(selected);
-      });
-    },
-    matchOperator(formType) {
-      let operator = '';
-      switch (formType) {
-        case 'date':
-          operator = 'between';
-          break;
-        case 'datetime':
-          operator = 'between';
-          break;
-        case 'select':
-          operator = 'eq';
-          break;
-        case 'selectMulti':
-          operator = 'contain';
-          break;
-        case 'user':
-          operator = 'user';
-          break;
-        default:
-          operator = 'like';
-          break;
-      }
-      return operator;
-    },
 
     handleCitySelectorChange(city) {
-      this.address = city;
-      console.log('this.address', this.address);
+      this.specialParams.addressSelector = city;
     },
 
     // search method end
     // list method start
-    sortChange(column, prop, order) {
-      console.log('column, prop, order', column, prop, order);
+    sortChange(option) {
+      const { column, prop, order } = option;
+      if (!column || !prop || !order) return;
+      const numberField = `lpad(myOrderConvertor(customer.attribute->>'$.${prop}'),16,0)`;
+      const dateField = `myOrderConvertor(customer.attribute->>'$.${prop}')`;
+      let type = null;
 
+      if (prop === 'createTime') {
+        this.specialParams.sortBy = {
+          'customer.createTime': this.matchSortValue(order),
+          [numberField]: '',
+          [dateField]: '',
+        }
+      } else {
+        type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
+      }
+      if (type === 'number') {
+        this.specialParams.sortBy = {
+          'customer.createTime': '',
+          [numberField]: this.matchSortValue(order),
+          [dateField]: '',
+        }
+      }
+      this.search();
     },
     jump(pageNum) {
       this.params.pageNum = pageNum;
@@ -654,17 +720,14 @@
       this.params.pageSize = pageSize;
       this.search();
     },
+    // select customer
     selectRow(selection, row) {
-      console.log('selectRow selection',selection);
-      console.log('selectRow row',row);
-
       if (selection.length < this.multipleSelection.length) {
         this.multipleSelection = this.multipleSelection
           .filter(sRow => sRow.id !== row.id);
       }
     },
     selectAll(selection) {
-      console.log('selectAll selection',selection);
       if (selection.length) return;
       this.multipleSelection = this.multipleSelection
         .filter(sR => this.customers.every(c => c.id !== sR.id));
@@ -672,7 +735,6 @@
     toggleSelection(rows) {
       if (rows) {
         rows.forEach(row => {
-          console.log('row.name', row.name);
           this.$refs.multipleTable.toggleRowSelection(row);
         });
       } else {
@@ -683,14 +745,11 @@
     handleSelectionChange(val) {
       this.multipleSelection = _.uniqWith([...this.multipleSelection, ...val], _.isEqual);
     },
-
     // list method end
 
     // operation dialog
     openDialog(category) {
-      console.log('category', category);
       if (category === 'sendMessage') {
-        console.log('this.$ref.messageDialog', this.$refs.messageDialog);
         this.$refs.messageDialog.openSendMessageDialog();
       }
       if (category === 'edit') {
@@ -842,12 +901,7 @@
         viewId: '',
         serialNumber: '',
         linkmanId: '',
-        customerAddress: {
-          // adProvince: '',
-          // adCity: '',
-          // adDist: '',
-          adAddress: '',
-        },
+        customerAddress: {},
         hasRemind: '',
         status: '',
         createUser: '',
@@ -857,6 +911,12 @@
         pageSize: 10,
 
       };
+      for (let key in this.specialParams.sortBy) {
+        this.specialParams.sortBy[key] = '';
+      }
+      this.specialParams.addressSelector = [];
+      this.specialParams.adAddress = '';
+
       for (let key in this.customizedSearchModel) {
         this.customizedSearchModel[key].value = null;
       }
@@ -896,7 +956,70 @@
           this.inputRemoteSearch.tag.loading = false;
         })
     },
+    // match data
+    matchOperator(formType) {
+      let operator = '';
+      switch (formType) {
+        case 'date':
+          operator = 'between';
+          break;
+        case 'datetime':
+          operator = 'between';
+          break;
+        case 'select':
+          operator = 'eq';
+          break;
+        case 'selectMulti':
+          operator = 'contain';
+          break;
+        case 'user':
+          operator = 'user';
+          break;
+        default:
+          operator = 'like';
+          break;
+      }
+      return operator;
+    },
+    matchSortValue(order) {
+      let value = '';
+      switch (order) {
+        case null:
+          value = '';
+          break;
+        case 'descending':
+          value = false;
+          break;
+        case 'ascending':
+          value = true;
+          break;
+        default:
+          value = '';
+          break;
+      }
+      return value;
+    },
+    matchSelected() {
+      if (!this.multipleSelection.length) return;
+      const selected = this.customers
+        .filter(c => this.multipleSelection.some(sc => sc.id === c.id)) || [];
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
+    },
+    getNameFromObject(obj) {
+      if (!obj) return;
+      let objKeys = Object.keys(obj) || [];
+      let nameKeys = [];
 
+      nameKeys = objKeys
+        .filter(aKey => /name/gi.test(aKey)) || [];
+
+      if (!objKeys.length) return null;
+
+      if (!nameKeys[0]) return obj[objKeys[0]];
+      return obj[nameKeys[0]];
+    },
   },
   components: {
     [BasePanel.name]: BasePanel,
@@ -909,15 +1032,59 @@
 </script>
 
 <style lang="scss">
-  html, body {
-    height: 100%;
+  .not-checked {
+    .el-checkbox__input {
+
+      .el-checkbox__inner {
+        border-color: $color-primary;
+      }
+      .el-checkbox__inner:after {
+        content: "";
+        position: absolute;
+        display: block;
+        background-color: $color-primary;
+        height: 2px;
+        transform: rotateZ(45deg);
+        left: 0;
+        right: 0;
+        top: 5px;
+        width: 12px;
+        border: none;
+      }
+
+      .el-checkbox__inner:before {
+        content: "";
+        position: absolute;
+        display: block;
+        background-color: $color-primary;
+        height: 2px;
+        width: 12px;
+        transform: rotateZ(135deg);
+        left: 0;
+        right: 0;
+        top: 5px;
+        border: none;
+      }
+    }
   }
+
 
   .customer-list-container {
     height: 100%;
     overflow: auto;
     background: #f4f7f5;
     padding: 10px;
+
+    .panel-title {
+      font-size: 18px;
+      line-height: 60px;
+      padding: 0 25px;
+      color: rgb(132, 138, 147);
+      border-bottom: 1px solid rgb(242, 248, 247);
+      font-weight: normal;
+      display: flex;
+      justify-content: space-between;
+    }
   }
   // search
   .customer-list-search-group-container {
@@ -956,21 +1123,13 @@
         font-weight: lighter;
         height: 32px;
         line-height: 12px;
-        color: #00ac97;
-        border-color: #00ac97;
+        color: $color-primary;
+        border-color: $color-primary;
         background: #fff;
       }
     }
 
     .advanced-search-form-wrap {
-      .panel-title {
-        font-size: 18px;
-        line-height: 60px;
-        padding-left: 25px;
-        color: rgb(132, 138, 147);
-        border-bottom: 1px solid rgb(242, 248, 247);
-        font-weight: normal;
-      }
       .advanced-search-form {
         .el-form-item {
           .el-form-item__content,
@@ -1048,14 +1207,69 @@
         margin: 0;
         color: #767e89;
         .selectedCount {
-          color: #00ac97;
+          color: $color-primary;
           padding: 0 3px;
+          &:hover {
+            cursor: pointer;
+          }
         }
       }
 
       .el-pagination__jump {
         margin-left: 0;
       }
+    }
+  }
+
+  //
+  .selected-customer-panel {
+
+
+    .selected-customer-list {
+      overflow-y: scroll;
+      padding: 0 20px;
+      line-height: 40px;
+      font-size: 14px;
+      height: calc(100% - 130px);
+      dt, dd {
+        display: flex;
+        border-bottom: 1px dashed #F0F5F5;
+        font-weight: normal;
+      }
+
+      dd {
+        &:hover {
+          cursor: pointer;
+          .iconfont {
+            display: block;
+          }
+        }
+        span.name-column, .iconfont {
+          color: $color-primary;
+        }
+        .iconfont {
+          display: none;
+        }
+      }
+
+      .name-column {
+        padding: 0 5px;
+        width: 120px;
+        @include text-ellipsis;
+      }
+      .sn {
+        padding: 0 5px;
+        @include text-ellipsis;
+        width: 220px;
+      }
+    }
+
+    .cancel-select-customer-btn {
+      margin-right: 20px;
+      float: right;
+      background: #E5E8F0;
+      border-color: #E5E8F0;
+      color: #646B78;
     }
   }
 
