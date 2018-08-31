@@ -22,10 +22,11 @@ const FormBuilder = {
     }
   },
   render(h){
-    
     let formGroups = this.fields.map(field => {
-      let formType = field.formType;
-      let comp = FormFieldMap.get(formType);
+      let comp = FormFieldMap.get(field.formType);
+      if(comp == null) return;
+
+      console.log(comp)
 
       let data = {
         props: {
@@ -36,8 +37,8 @@ const FormBuilder = {
         }
       };
 
-      return h(comp.build, data)
-    });
+      return h(comp.build, data);
+    }).filter(item => item != null);
 
     return (
       <div class="form-builder">

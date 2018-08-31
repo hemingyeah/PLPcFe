@@ -3,13 +3,15 @@ import FormTextarea from './FormTextarea';
 import FormNumber from './FormNumber';
 import FormSelect from './FormSelect';
 import FormCode from './FormCode';
+import FormAttachment from './FormAttachment'
 
 const FormFields = [
   FormText,
   FormTextarea,
   FormNumber,
   FormSelect,
-  FormCode
+  FormCode,
+  FormAttachment
 ];
 
 const Modes = {
@@ -19,7 +21,8 @@ const Modes = {
       FormTextarea.formType,
       FormNumber.formType,
       FormSelect.formType,
-      FormCode.formType
+      FormCode.formType,
+      FormAttachment.formType
     ]
   },
   // task: {
@@ -61,7 +64,7 @@ for(let i = 0; i < FormFields.length; i++){
 FormFieldMap.get = function(formType){
   let field = FormFieldMap[formType];
 
-  if(field.alias){
+  if(field && field.alias){
     let aliasField = FormFieldMap[field.alias];
     field.preview = aliasField.preview;
     field.setting = aliasField.setting;

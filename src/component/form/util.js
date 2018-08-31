@@ -45,3 +45,19 @@ export function toField(fields, mode){
 export function toFormField(){
 
 }
+
+/** 迁移旧有字段至新类型，主要用于兼容客户、产品旧字段 */
+export function migration(fields){
+  return fields.map(field => {
+    //多选格式调整
+    if(field.formType == 'selectMulti'){
+      field.formType = 'select';
+      let setting = field.setting || {};
+      setting.isMulti = true;
+
+      field.setting = setting;
+    }
+
+    return field;
+  })
+}

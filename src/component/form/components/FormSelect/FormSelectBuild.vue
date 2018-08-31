@@ -3,7 +3,7 @@
     <div>{{field.displayName}}</div>
     <div>
       <select @change="input" :multiple="isMulti">
-        <option :value="option" v-for="option in field.setting.dataSource">{{option}}</option>
+        <option :value="option" v-for="option in field.setting.dataSource" :key="option">{{option}}</option>
       </select>
     </div>
   </div>

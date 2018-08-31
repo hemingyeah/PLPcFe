@@ -30,8 +30,6 @@
 
 <script>
 import platform from '@src/platform';
-import FileUpload from '@src/component/BaseFileUpload';
-import BaseFileUpload from "@src/component/BaseFileUpload/BaseFileUpload";
 import * as dom from '@src/util/dom';
 
 import frameReload from '@src/mixin/frameReload';
@@ -116,8 +114,6 @@ export default {
     //
   },
   components: {
-    BaseFileUpload,
-    [FileUpload.name]: FileUpload
   }
 }
 </script>

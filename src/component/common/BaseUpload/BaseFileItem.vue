@@ -1,0 +1,197 @@
+<template>
+  <div class="base-file-item">
+    <div :class="clazz" :style="styl" @click.prevent.stop="preview">
+      <img :data-origin="file.url">
+    </div>  
+    <div class="base-file-info">
+      <a :href="file.url" @click.prevent.stop="download">{{file.fileName}}</a>
+      <p>{{file.fileSize}}</p>
+    </div>
+    <button type="button" class="base-file-del" @click="deleteFile">
+      <i class="iconfont icon-guanbi-fill"></i>
+    </button>
+  </div>
+</template>
+
+<script>
+import platform from '@src/platform/index';
+
+export default {
+  name: "base-file-item",
+  props: {
+    file: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  computed:{
+    icon(){
+      let file = this.file;
+
+      if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(file.fileName)) {
+        return "img";
+      }
+      if (/\.(ppt|pptx)$/i.test(file.fileName)) {
+        return 'ppt-file-icon';
+      }
+      if (/\.(mp3)$/i.test(file.fileName)) {
+        return 'voice-file-icon';
+      }
+      if (/\.(mp4)$/i.test(file.fileName)) {
+        return 'video-file-icon';
+      }
+      if (/\.(zip)$/i.test(file.fileName)) {
+        return 'zip-file-icon';
+      }
+      if (/\.(pdf)$/i.test(file.fileName)) {
+        return 'pdf-file-icon';
+      }
+      if (/\.(xls|xlsx)$/i.test(file.fileName)) {
+        return 'xls-file-icon';
+      }
+      if (/\.(doc|docx)$/i.test(file.fileName)) {
+        return 'doc-file-icon';
+      }
+      if (/\.(txt)$/i.test(file.fileName)) {
+        return 'txt-file-icon';
+      }
+
+      return 'other-file-icon';
+    },
+    clazz(){
+      let clazz = ['base-file-preview'];
+
+      if(this.icon != 'img'){
+        clazz = clazz.concat(['base-file-icon', this.icon])
+      }
+
+      return clazz;
+    },
+    styl(){
+      let styl = {};
+  
+      if(this.icon == 'img') {
+        let url = `${this.file.url}${this.file.url.indexOf('?') >= 0 ? '&' : '?'}isCmp=true`;
+        styl.backgroundImage = `url(${url})`;
+        styl.cursor = 'pointer';
+      }
+
+      return styl;
+    }
+  },
+  methods: {
+    download(event){
+      if(!this.file.url) return;
+
+      window.location.href = window.location.origin + this.file.url;
+    },
+    preview(event){
+      let element = event.target.querySelector('img');
+      if(this.icon != 'img' || !element) return;
+    
+      platform.imagePreview({
+        imageDom: element,
+        imgUrl: window.location.origin + element.dataset.origin
+      });
+    },
+    async deleteFile(){
+      if(await platform.confirm('确定要删除该附件？\n' + this.file.fileName)){
+        this.$emit('delete', this.file);
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+.base-file-item{
+  display: flex;
+  flex-flow: row nowrap;
+  height: 44px;
+  align-items: center;
+}
+
+.base-file-item + .base-file-item{
+  margin-top: 5px;
+}
+
+.base-file-info {
+  flex: 1;
+  overflow: hidden;
+  margin: 0 5px;
+
+  & > p {
+    margin: 0;
+    padding: 0;
+    height: 20px;
+    line-height: 20px;
+    color: #9a9a9a;
+    font-size: 12px;
+  }
+
+  & > a{
+    display: block;
+    height: 24px;
+    line-height: 24px;
+    font-size: 14px;
+    @include text-ellipsis;
+  }
+}
+
+.base-file-preview{
+  width: 44px;
+  height: 44px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.base-file-icon{
+  background-image: url("../../../assets/img/file-icon.png");
+  background-size: 44px;
+}
+
+.ppt-file-icon {
+  background-position: left 0 top 0;
+}
+.voice-file-icon {
+  background-position: left 0 top -44px;
+}
+.other-file-icon {
+  background-position: left 0 top -88px;
+}
+.video-file-icon {
+  background-position: left 0 top -132px;
+}
+.zip-file-icon {
+  background-position: left 0 top -176px;
+}
+.pdf-file-icon {
+  background-position: left 0 top -220px;
+}
+.xls-file-icon {
+  background-position: left 0 top -264px;
+}
+.doc-file-icon {
+  background-position: left 0 bottom -44px;
+}
+.txt-file-icon {
+  background-position: left 0 bottom 0px;
+}
+
+.base-file-del{
+  width: 34px;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+
+  .iconfont{
+    color: #ef9f9f;
+    font-size: 18px;
+  }
+}
+</style>

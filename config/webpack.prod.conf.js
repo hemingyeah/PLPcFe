@@ -19,7 +19,7 @@ module.exports = merge(baseConfig, {
   mode: 'production',
   output: {
     publicPath: '/resource/pc-fe/',
-    filename: 'js/[name].[chunkhash:8].js',
+    filename: 'chunks/[name].[chunkhash:8].js',
     chunkFilename: 'chunks/[name].[chunkhash:8].js'
   },
   resolve: {

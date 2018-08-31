@@ -1,6 +1,6 @@
 /** 用于抹平浏览器和钉钉之间的差异 @author dongls */
 import dingtalk from '@src/util/dingtalk';
-import BaseGallery from '@src/component/BaseGallery';
+import BaseGallery from '@src/component/common/BaseGallery';
 
 /**
  * 用于获取顶层window
@@ -148,16 +148,16 @@ function openTab(data){
  * @param {*} imgUrl - 图片链接
  */
 
-function imagePreview({ imageDom, imgUrl, }) {
-
+function imagePreview({ imageDom, imgUrl}) {
   if(!inDingTalk(dingtalk)) {
     return BaseGallery.preview(imageDom);
   }
+  
   dingtalk.biz.util.previewImage({
     urls: [imgUrl],
     current: imgUrl,
     onSuccess: function(result) {}, //eslint-disable-line
-    onFail: function(){} //eslint-disable-line
+    onFail: function() {} //eslint-disable-line
   })
 }
 

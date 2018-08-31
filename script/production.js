@@ -44,8 +44,8 @@ async function genJSP(directory){
 
   //复制文件
   let distOriginPath = path.resolve(__dirname, '../dist');
-  let distTargetPath = config.targetRootPath + '/src/main/webapp/resource/pc-fe';
-  let jspTatgetPath = config.targetRootPath + '/src/main/webapp/WEB-INF/views/dist'
+  let distTargetPath = config.targetRootPath + '/shb-web/src/main/webapp/resource/pc-fe';
+  let jspTatgetPath = config.targetRootPath + '/shb-web/src/main/webapp/WEB-INF/views/dist'
   
   //复制静态资源
   shell.rm('-rf', distTargetPath);
