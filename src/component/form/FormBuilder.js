@@ -26,8 +26,6 @@ const FormBuilder = {
       let comp = FormFieldMap.get(field.formType);
       if(comp == null) return;
 
-      console.log(comp)
-
       let data = {
         props: {
           field

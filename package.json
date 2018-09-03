@@ -8,7 +8,7 @@
     "url": "git@code.aliyun.com:publink/shb-pc-fe.git"
   },
   "scripts": {
-    "dev": "node script/development.js",
+    "dev": "node --max-old-space-size=4096 script/development.js",
     "build": "node script/production.js"
   },
   "author": "dongls",
@@ -66,6 +66,7 @@
     "fecha": "^2.3.3",
     "lodash": "^4.17.10",
     "popper.js": "^1.14.3",
+    "qs": "^6.5.2",
     "viewerjs": "^1.2.0",
     "vue": "^2.5.16"
   },

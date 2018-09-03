@@ -2,7 +2,7 @@
   <div>
     <div>{{field.displayName}}</div>
     <div>
-      <base-upload></base-upload>
+      <base-upload @input="input"></base-upload>
     </div>
   </div>
 </template>
@@ -14,6 +14,12 @@ export default {
     field: {
       type: Object,
       default: () => ({})
+    }
+  },
+  methods: {
+    input(newValue) {
+      let oldValue = null;
+      this.$emit('input', {newValue, oldValue});
     }
   }
 }

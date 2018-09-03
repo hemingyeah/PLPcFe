@@ -19,6 +19,7 @@
 
     <div><textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
     <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a></div>
+    <button @click="contact">contatc</button>
 
     <div style="display:flex;">
       <form-builder :fields="buildFields" :value="form" @update="update" style="flex: 1;"></form-builder>
@@ -51,6 +52,12 @@ export default {
     }
   },
   methods: {
+    contact(){
+      this.$fast.contact.choose('dept', {
+        title: '请选择负责人',
+        max: 10
+      })
+    },
     update({field, newValue, oldValue}){
       let {fieldName, displayName} = field;
       if(this.$appConfig.debug){

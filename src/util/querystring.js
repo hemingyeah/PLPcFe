@@ -1,3 +1,4 @@
+/** @deprecated 不推荐, 用qs库替代 */
 import * as Lang from './lang';
 
 /**

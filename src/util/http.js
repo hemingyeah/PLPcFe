@@ -1,33 +1,83 @@
-import * as qs from './querystring';
+//https://github.com/ljharb/qs
+import qs from 'qs';
 //https://github.com/axios/axios
-import axios from 'axios'; 
+import axios from 'axios';
 
-function get(url = '', params = {}, option = {}){
+const axiosIns = axios.create({
+  // put, post, patch 请求参数转换
+  transformRequest: [function (data, headers) {
+    if(headers['Content-Type'] == 'application/x-www-form-urlencoded'){
+      data = qs.stringify(data)
+    }
+ 
+    return data;
+  }],
+  //get 请求参数序列化
+  paramsSerializer: function(params) {
+    return qs.stringify(params, {arrayFormat: 'brackets'})
+  },
+})
+
+let CancelToken = axios.CancelToken; //取消令牌
+let requstPool = {}; //请求池
+
+function removeFromPool(key){
+  let cancelFn = requstPool[key];
+  if(typeof cancelFn == 'function') cancelFn('Request cancelled.');
+}
+
+//添加请求拦截器
+axiosIns.interceptors.request.use(config => {
+  if(config.cancelable){ //如果请求可取消
+    let key = config.method + '_' + config.url;
+    removeFromPool(key); //取消重复请求
+
+    //生成取消token
+    config.cancelToken = new CancelToken(function(c) {
+      requstPool[key] = c;
+    })
+  }
+
+  return config;
+},error => {
+  return Promise.reject(error);
+});
+
+//添加响应拦截器
+axios.interceptors.response.use(response => {
+  let config = response.config;
+  let key = config.method + '_' + config.url;
+  removeFromPool(key);
+  return response;
+}, error => {
+  return Promise.reject(error); //返回一个空对象，主要是防止控制台报错
+});
+
+function get(url = '', params = {}, option = {}) {
   return axios_http('get', url, params, true, option);
 }
 
-function post(url = '', params = {}, emulateJSON = true, option = {}){
-  return axios_http('post',url, params, emulateJSON, option);
+function post(url = '', params = {}, emulateJSON = true, option = {}) {
+  return axios_http('post', url, params, emulateJSON, option);
 }
 
-function axios_http(method = 'get', url = '', params = {}, emulateJSON = true, config = {}){
+function axios_http(method = 'get', url = '', params = {}, emulateJSON = true, config = {}) {
   if(method == 'get'){
-    let _encodeParams = qs.stringify(params);  
-    _encodeParams && (url += url.indexOf('?') != -1 ? "&" : "?" + _encodeParams);
+    config.params = params;
   }
 
-  if(method == 'post'){
-    emulateJSON ? config.data = params : config.data = qs.stringify(params);
+  if(method == 'post' && !emulateJSON) {
+    if(!config.headers) config.headers = {};
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
   }
 
   config.url = url;
   config.method = method;
+  config.cancelable = config.cancelable !== false; //请求是否可取消
 
-  return axios.request(config).then(response => {
-    return response.data
-  });
+  return axiosIns.request(config).then(response => response.data);
 }
 
-const http = {get, post};
+const http = { get, post };
 
 export default http;

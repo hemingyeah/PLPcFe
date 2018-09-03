@@ -83,7 +83,6 @@ export default {
   background-color: #fff;
   border-radius: 1px;
   box-shadow: 1px 1px 8px rgba(0,0,0,0.15);
-  color: #333;
 }
 
 .base-modal-header{
