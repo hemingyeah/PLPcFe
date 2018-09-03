@@ -92,7 +92,7 @@
       </frame-main>
     </div>
 
-    <version :version="initData.version" :show.sync="versionShow"/>
+    <version :version="newVersion" :show.sync="versionShow"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
   </div>
 </template>
@@ -125,6 +125,7 @@ export default {
 
       versionShow: false, //是否显示版本信息
       saleManagerShow: false, // 是否显示专属客服
+      newVersion:{}, //跟新了的版本信息
 
       //导出相关变量
       exportPanelShow: false,
@@ -193,12 +194,18 @@ export default {
       this.openFrameTab(option)
     },
     /** 检测是否有版本更新提示 */
-    checkVersion(){
+    async checkVersion(){
       let currVersion = localStorage.getItem(VERSION_NUM_KEY);
-      let versionNum = (this.initData.version || {}).versionNum;
+      let versionNum = this.initData.releaseVersion || '';
       if(versionNum && (!currVersion || currVersion != versionNum)){
-        this.versionShow = true;
-        localStorage.setItem(VERSION_NUM_KEY, versionNum)
+        try {
+          let version = await http.get('/getLastVersion');
+          this.newVersion = version.data;
+          this.versionShow = true;
+          localStorage.setItem(VERSION_NUM_KEY, versionNum);
+        } catch (error) {
+          console.log(error);
+        }               
       }
     },
     /** 检测是否有导出 */
