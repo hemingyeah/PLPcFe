@@ -69,6 +69,7 @@ function axios_http(method = 'get', url = '', params = {}, emulateJSON = true, c
   if(method == 'post' && !emulateJSON) {
     if(!config.headers) config.headers = {};
     config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    config.data = params;
   }
 
   config.url = url;
