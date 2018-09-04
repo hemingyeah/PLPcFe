@@ -8,6 +8,8 @@ const axiosIns = axios.create({
   transformRequest: [function (data, headers) {
     if(headers['Content-Type'] == 'application/x-www-form-urlencoded'){
       data = qs.stringify(data)
+    }else{
+      data = JSON.stringify(data);
     }
  
     return data;
@@ -67,10 +69,9 @@ function axios_http(method = 'get', url = '', params = {}, emulateJSON = true, c
   }
 
   if(method == 'post') {
-    if(!emulateJSON){
-      if(!config.headers) config.headers = {};
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-    }
+    if(!config.headers) config.headers = {};
+
+    config.headers['Content-Type'] = emulateJSON ? 'application/json' : 'application/x-www-form-urlencoded';
     config.data = params;
   }
 
