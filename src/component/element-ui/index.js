@@ -31,6 +31,7 @@ import {
   RadioGroup,
   Radio,
   TimePicker,
+  Loading,
 } from 'element-ui';
 
 const ElementUI = {
@@ -62,6 +63,7 @@ const ElementUI = {
     Vue.use(RadioGroup);
     Vue.use(Radio);
     Vue.use(TimePicker);
+    Vue.use(Loading);
 
     // layout
     Vue.use(Row);

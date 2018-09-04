@@ -1,5 +1,5 @@
 <template>
-  <div class="customer-list-container" ref="customerListPage">
+  <div class="customer-list-container" ref="customerListPage" v-loading.fullscreen.lock="loadingListData">
     <!--搜索-->
     <div class="customer-list-search-group-container">
       <form @submit.prevent="search" class="base-search">
@@ -10,7 +10,7 @@
         </div>
         <el-button type="primary"  @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
       </form>
-
+      <!--高级搜索-->
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
         <h4 class="panel-title">
           高级搜索
@@ -306,22 +306,17 @@
     <!-- dialog of operation -->
     <send-message-dialog
       ref="messageDialog"
-      :selectedCustomer="multipleSelection">
-
-    </send-message-dialog>
+      :selectedCustomer="multipleSelection"/>
 
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
-      :selectedCustomer="multipleSelection">
-
-    </batch-editing-customer-dialog>
+      :fields="customerConfig.fieldInfo"
+      :selectedIds="selectedIds"/>
     <!--batch-reminding-customer-dialog-->
 
     <batch-reminding-customer-dialog
       ref="batchRemindingCustomerDialog"
-      :selectedCustomer="multipleSelection">
-
-    </batch-reminding-customer-dialog>
+      :selectedCustomer="multipleSelection"/>
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
       <h4 class="panel-title">
@@ -364,6 +359,7 @@
     return {
       // self state
       pending: false,
+      loadingListData: false,
       advancedSearchPanelShow: false,
       multipleSelectionPanelShow: false,
       customizedSearchModel: {},
@@ -451,6 +447,12 @@
       },
     };
   },
+
+  computed: {
+    selectedIds() {
+      return this.multipleSelection.map(c => c.id) || [];
+    },
+  },
   mounted() {
     this.fetchConfig();
     const localStorageData = this.getLocalStorageData();
@@ -489,8 +491,8 @@
       this.$http.post('/customer/changeState', formData)
     },
     search() {
-      let instance = this.$loading.show(this.$refs.customerListPage);
       const params = this.buildParams();
+      this.loadingListData = true;
 
       this.$http.post('/v2/customer/list', params)
         .then(res => {
@@ -513,10 +515,11 @@
         })
         .then(() => {
           this.$refs.customerListPage.scrollTop = 0;
-          instance.hide();
+          this.loadingListData = false;
         })
+
         .catch(err => {
-          instance.hide();
+          this.loadingListData = false;
           console.log('err', err);
         })
     },
@@ -759,17 +762,25 @@
         this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
       }
     },
-    deleteCustomer() {
+    async deleteCustomer() {
       if (!this.multipleSelection.length) {
         return this.$platform.alert('请选择需要删除的客户');
       }
+      try {
+        const result = this.$platform.confirm('确定要删除选择的客户？');
+        if (!result) return;
 
-      this.$platform.confirm('确定要删除选择的客户？')
-        .then(result => {
-          if (!result) return;
-          console.log('确定要删除选择的客户!!!!', result)
+        this.$http.get(`/customer/delete/${this.selectedIds.join(',')}`)
+          .then(res => {
+            this.multipleSelection = [];
+            this.search();
+          })
+          .catch(err => console.error('deleteCustomer err', err));
 
-        })
+
+      } catch (e) {
+        console.error('deleteCustomer catch error', e);
+      }
     },
     sendMessage() {
       console.log('sendMessage');
@@ -931,6 +942,7 @@
           this.inputRemoteSearch.customerManager.options = res.list;
           this.inputRemoteSearch.customerManager.loading = false;
         })
+        .catch(err => console.error('searchCustomerManager function catch err', err));
     },
     searchCreator(keyword) {
       this.inputRemoteSearch.creator.loading = true;
@@ -939,6 +951,7 @@
           this.inputRemoteSearch.creator.options = res.list;
           this.inputRemoteSearch.creator.loading = false;
         })
+        .catch(err => console.error('searchCreator function catch err', err));
     },
     searchLinkman(keyword) {
       this.inputRemoteSearch.linkman.loading = true;
@@ -947,6 +960,7 @@
           this.inputRemoteSearch.linkman.options = res.list;
           this.inputRemoteSearch.linkman.loading = false;
         })
+        .catch(err => console.error('searchLinkman function catch err', err));
     },
     searchTag(keyword) {
       this.inputRemoteSearch.tag.loading = true;
@@ -955,6 +969,7 @@
           this.inputRemoteSearch.tag.options = res.list;
           this.inputRemoteSearch.tag.loading = false;
         })
+        .catch(err => console.error('searchTag function catch err', err));
     },
     // match data
     matchOperator(formType) {

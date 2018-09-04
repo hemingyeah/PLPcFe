@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="添加提醒" :visible.sync="batchRemindingCustomerDialog" width="600px" custom-class="batch-remind-customer-dialog">
+  <base-modal title="添加提醒" :show.sync="batchRemindingCustomerDialog" width="600px" class="batch-remind-customer-dialog">
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
@@ -41,10 +41,12 @@
       <el-button @click="batchRemindingCustomerDialog = false">取 消</el-button>
       <el-button type="primary" @click="onSubmit" :disabled="pending">确 定</el-button>
     </div>
-  </el-dialog>
+  </base-modal>
 </template>
 
 <script>
+  import BaseModal from '../../../../component/common/BaseModal';
+
   export default {
     name: "batch-reminding-customer-dialog",
     data: () => {
@@ -120,6 +122,9 @@
       onSubmit() {
         console.log('submit!');
       }
+    },
+    components: {
+      [BaseModal.name]: BaseModal,
     }
   }
 </script>
@@ -127,9 +132,18 @@
 <style lang="scss">
 
   .batch-remind-customer-dialog {
-    .el-dialog__body {
-      padding-top: 0;
-      padding-bottom: 0;
+    .base-modal-body {
+      padding: 10px;
+    }
+
+    .el-form-item {
+      margin: 0;
+    }
+
+    .dialog-footer {
+      padding: 10px 50px;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 
