@@ -2,13 +2,13 @@
   <div class="base-tree-node">
     <div class="base-tree-node-content" :class="{'base-tree-selected': isSelected}" :style="{paddingLeft: `${16 * deep}px`}">
       <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle"><i class="iconfont icon-arrow-right" v-if="node.subDepartments.length > 0"></i></span>
-      <span class="base-tree-node-name"  @click.stop="transmit(node)">{{node.name}}</span>
+      <span class="base-tree-node-name" @click.stop="transmit(node)">{{node.name}}</span>
     </div>
     
     <template v-if="isExpand">
       <base-tree-node v-for="n in node.subDepartments" :key="n.id"
-        :node="n" :selected="selected" :deep="deep + 1"
-        @node-click="transmit"/>  
+                      :node="n" :selected="selected" :deep="deep + 1"
+                      @node-click="transmit"/>  
     </template>
   </div>
 </template>

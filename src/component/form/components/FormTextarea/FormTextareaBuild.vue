@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>{{field.displayName}}</div>
-    <div><textarea @input="input"></textarea></div>
+    <div><textarea @input="input" :value="value"></textarea></div>
   </div>
 </template>
 
@@ -12,6 +12,10 @@ export default {
     field: {
       type: Object,
       default: () => ({})
+    },
+    value: {
+      type: String,
+      default: ''
     }
   },
   methods: {

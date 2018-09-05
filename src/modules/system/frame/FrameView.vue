@@ -187,7 +187,7 @@ export default {
           this.versionShow = true;
           localStorage.setItem(VERSION_NUM_KEY, versionNum);
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }               
       }
     },
@@ -217,7 +217,8 @@ export default {
         //如果需要更新,设置定时抓取数据
         if(!this.exportTimer) this.exportTimer = setInterval(() => this.checkExports(), 15000);
       } catch (error) {
-        console.log(error);
+        console.error(error);
+
         if(this.exportTimer){
           clearInterval(this.exportTimer);
           this.exportTimer = null;

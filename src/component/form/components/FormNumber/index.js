@@ -1,6 +1,6 @@
 import FormNumberSetting from './FormNumberSetting.vue';
 import FormNumberPreview from './FormNumberPreview.vue';
-import FormNumberBuild from './FormNumberBuild'
+import FormNumberBuild from './FormNumberBuild.vue'
 
 let FormNumberField = {
   formType: 'number', // 字段类型

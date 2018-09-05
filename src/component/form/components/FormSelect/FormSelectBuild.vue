@@ -2,9 +2,16 @@
   <div>
     <div>{{field.displayName}}</div>
     <div>
-      <select @change="input" :multiple="isMulti">
-        <option :value="option" v-for="option in field.setting.dataSource" :key="option">{{option}}</option>
-      </select>
+      <el-select 
+        placeholder="请选择"
+        clearable
+        :multiple="isMulti"
+        :value="value" @input="input">
+        <el-option
+          v-for="item in options" :key="item"
+          :label="item" :value="item">
+        </el-option>
+      </el-select>
     </div>
   </div>
 </template>
@@ -16,30 +23,22 @@ export default {
     field: {
       type: Object,
       default: () => ({})
-    }
+    },
+    value: [String, Array]
   },
   computed: {
     isMulti(){
       let setting = this.field.setting || {}
       return setting.isMulti;
+    },
+    options(){
+      let setting = this.field.setting || {};
+      return setting.dataSource || [];
     }
   },
   methods: {
-    input(event){
+    input(newValue){
       let oldValue = null;
-      let newValue = null;
-
-      if(!this.isMulti){
-        newValue = event.target.value;
-      }else{
-        newValue = [];
-        let options = event.target.options;
-        for(let i = 0; i < options.length; i++){
-          let option = options[i];
-          if(option.selected) newValue.push(option.value)
-        }
-      }
-  
       this.$emit('input', {newValue, oldValue})
     }
   }

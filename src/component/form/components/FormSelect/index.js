@@ -1,6 +1,6 @@
 import FormSelectSetting from './FormSelectSetting.vue';
 import FormSelectPreview from './FormSelectPreview.vue';
-import FormSelectBuild from './FormSelectBuild';
+import FormSelectBuild from './FormSelectBuild.vue';
 
 let FormSelectField = {
   formType: 'select', // 字段类型

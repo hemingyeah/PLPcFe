@@ -28,7 +28,8 @@ const FormBuilder = {
 
       let data = {
         props: {
-          field
+          field,
+          value: this.value[field.fieldName]
         },
         on: {
           input: event => this.update(field, event.newValue, event.oldValue)

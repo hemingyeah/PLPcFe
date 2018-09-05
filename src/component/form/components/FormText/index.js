@@ -1,6 +1,6 @@
 import FormTextSetting from './FormTextSetting.vue';
 import FormTextPreview from './FormTextPreview.vue';
-import FormTextBuild from './FormTextBuild'
+import FormTextBuild from './FormTextBuild.vue'
 
 let FormTextField = {
   formType: 'text', // 字段类型

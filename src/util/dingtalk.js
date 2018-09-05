@@ -23,12 +23,12 @@ function sign(config = {}){
     //签名成功
     DingTalkPC.ready(function () {
       resolve();
-      console.log("========== DingTalkPC ready ==========");
+      console.info("========== DingTalkPC ready ==========");
     });
     
     //签名失败
     DingTalkPC.error(function (error) {  
-      console.log("========== DingTalkPC error ==========");
+      console.info("========== DingTalkPC error ==========");
       reject(error)
     });
   });

@@ -3,7 +3,10 @@ import FormTextarea from './FormTextarea';
 import FormNumber from './FormNumber';
 import FormSelect from './FormSelect';
 import FormCode from './FormCode';
-import FormAttachment from './FormAttachment'
+import FormAttachment from './FormAttachment';
+import FormUser from './FormUser';
+import FormDate from './FormDate';
+import FormDatetime from './FormDatetime';
 
 const FormFields = [
   FormText,
@@ -11,7 +14,10 @@ const FormFields = [
   FormNumber,
   FormSelect,
   FormCode,
-  FormAttachment
+  FormAttachment,
+  FormUser,
+  FormDate,
+  FormDatetime
 ];
 
 const Modes = {
@@ -22,7 +28,10 @@ const Modes = {
       FormNumber.formType,
       FormSelect.formType,
       FormCode.formType,
-      FormAttachment.formType
+      FormAttachment.formType,
+      FormUser.formType,
+      FormDate.formType,
+      FormDatetime.formType
     ]
   },
   // task: {

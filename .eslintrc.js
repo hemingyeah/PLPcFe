@@ -50,6 +50,16 @@ module.exports = {
     "vue/max-attributes-per-line": "off",
     "vue/html-indent": "warn",
     "vue/mustache-interpolation-spacing": "off",
-    "vue/name-property-casing": ["error", "kebab-case"]
-  }
+    "vue/name-property-casing": ["error", "kebab-case"],
+    "vue/comment-directives": "off",
+    "vue/require-default-prop": "off"
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*"],
+      "rules": {
+        "no-console": ["warn", { allow: ["info", "warn", "error"] }] //禁用 console.log
+      }  
+    }
+  ]
 };

@@ -1,6 +1,6 @@
 <template>
   <div>
-<!--   
+    <!--   
     
     <a href="javascript:;" @click="open">open</a>
     <a href="javascript:;" @click="open2">open2</a>
@@ -19,11 +19,11 @@
 
     <div><textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
     <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a></div>
-    <button @click="contact">contatc</button>
+    <!-- <button @click="contact">contatc</button> -->
 
     <div style="display:flex;">
       <form-builder :fields="buildFields" :value="form" @update="update" style="flex: 1;"></form-builder>
-      <textarea style="width: 400px;" :value="JSON.stringify(form)"></textarea>
+      <textarea style="width: 400px;" rows="5" :value="JSON.stringify(form)"></textarea>
     </div>
     
   </div>

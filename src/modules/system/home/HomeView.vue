@@ -1,6 +1,6 @@
 <template>
   <div style="height: 1000px">
-<!--   
+    <!--   
     
     <a href="javascript:;" @click="open">open</a>
     <a href="javascript:;" @click="open2">open2</a>

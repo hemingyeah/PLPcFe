@@ -6,7 +6,6 @@ import Vue from 'vue';
 import directive from '@src/directive';
 import filter from '@src/filter';
 import component from '@src/component';
-import ElementUI from '@src/component/element-ui';
 
 import appConfig from 'app.config';
 
@@ -16,7 +15,6 @@ import DemoView from './DemoView.vue';
 Vue.use(directive)
 Vue.use(filter)
 Vue.use(component)
-Vue.use(ElementUI)
 
 Vue.prototype.$platform = platform;
 Vue.prototype.$appConfig = appConfig;

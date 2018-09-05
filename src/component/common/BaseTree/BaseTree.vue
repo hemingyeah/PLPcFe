@@ -1,8 +1,8 @@
 <template>
   <div class="base-tree">
     <base-tree-node v-for="node in data" :key="node.id" 
-      :node="node" :selected="selected"
-      @node-click="transmit"/>
+                    :node="node" :selected="selected"
+                    @node-click="transmit"/>
   </div>  
 </template>
 

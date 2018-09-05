@@ -20,7 +20,7 @@ const axiosIns = axios.create({
   //get 请求参数序列化
   paramsSerializer: function(params) {
     return qs.stringify(params, {arrayFormat: 'brackets'})
-  },
+  }
 })
 
 let CancelToken = axios.CancelToken; //取消令牌
@@ -28,10 +28,13 @@ let requstPool = {}; //请求池
 
 function removeFromPool(key){
   let cancelFn = requstPool[key];
-  if(typeof cancelFn == 'function') cancelFn('Request cancelled.');
+  if(typeof cancelFn == 'function'){
+    cancelFn('Request cancelled.');
+    delete requstPool[key];
+  }
 }
 
-//添加请求拦截器
+/** 请求拦截，取消对同一地址的重复请求，只保留最后一次请求 */
 axiosIns.interceptors.request.use(config => {
   if(config.cancelable){ //如果请求可取消
     let key = config.method + '_' + config.url;

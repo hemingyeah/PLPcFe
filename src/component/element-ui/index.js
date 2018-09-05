@@ -11,7 +11,10 @@ import {
   Pagination,
   Table,
   TableColumn,
-  Input
+  Input,
+  DatePicker,
+  Select,
+  Option
 } from 'element-ui';
 
 const ElementUI = {
@@ -26,6 +29,9 @@ const ElementUI = {
     Vue.use(TableColumn);
 
     Vue.use(Input);
+    Vue.use(DatePicker);
+    Vue.use(Select);
+    Vue.use(Option)
   }
 };
 

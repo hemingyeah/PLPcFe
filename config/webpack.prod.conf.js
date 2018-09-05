@@ -13,7 +13,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 //https://www.npmjs.com/package/webpack-bundle-analyzer
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = merge(baseConfig, {
   mode: 'production',

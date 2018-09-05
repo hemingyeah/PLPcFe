@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import Dept from './Dept.vue';
+import Department from './Department.vue';
 
-const DeptComponent = Vue.extend(Dept);
+const DeptComponent = Vue.extend(Department);
 
 function choose(type = 'dept', options = {}){
   if(type == 'dept') return dept(options);
@@ -26,14 +26,14 @@ function dept(options){
   });
   let ele = document.createElement("div");
   let body = document.body;
-  let pending = true;
+  let pending = false;
 
   return new Promise((resolve, reject) => {
     instance.$on('destroy', event => {
       setTimeout(() => destory(instance), 1500);
     })
 
-    instance.$on('choose', user => {
+    instance.$on('input', user => {
       if(pending) return;
 
       pending = true;

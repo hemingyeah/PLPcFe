@@ -2,29 +2,34 @@
   <div>
     <div>{{field.displayName}}</div>
     <div>
-      <base-upload @input="input" :value="value"></base-upload>
+      <el-date-picker
+        type="datetime"
+        value-format="yyyy-MM-dd HH:mm:ss"
+        placeholder="选择日期时间"
+        :value="value" @input="choose"/>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'form-attachment-build',
+  name: "form-datetime-build",
   props: {
     field: {
       type: Object,
       default: () => ({})
     },
     value: {
-      type: Array,
-      default: () => []
+      type: String,
+      default: ''
     }
   },
   methods: {
-    input(newValue) {
+    choose(newValue){
       let oldValue = null;
       this.$emit('input', {newValue, oldValue});
     }
   }
 }
 </script>
+

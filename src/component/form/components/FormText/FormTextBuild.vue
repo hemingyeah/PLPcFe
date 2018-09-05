@@ -12,6 +12,10 @@ export default {
     field: {
       type: Object,
       default: () => ({})
+    },
+    value: {
+      type: String,
+      default: ''
     }
   },
   methods: {

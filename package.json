@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "node --max-old-space-size=4096 script/development.js",
-    "build": "node script/production.js"
+    "build": "node script/production.js",
+    "lint": "eslint --fix --ext .js,.vue src"
   },
   "author": "dongls",
   "license": "ISC",

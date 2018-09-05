@@ -1,9 +1,10 @@
 <template>
-  <base-modal :title="title" width="800px"
+  <base-modal 
+    :title="title" width="800px"
     :show.sync="show" @closed="$emit('destroy')">
     <div class="bc-dept-wrap">
       <div class="bc-dept">
-        <base-tree :data="depts" :selected="selectedDept" @node-selected="chooseDept"></base-tree>
+        <base-tree :data="depts" :selected="selectedDept" @node-selected="chooseDept"/>
       </div>
       <div class="bc-user">
         <div class="bc-search">
@@ -41,7 +42,7 @@
       <button type="button" class="bc-contact-choose" @click="post">确定{{btnText}}</button>
     </div>
   </base-modal>
-</template>
+</template> 
 
 <script>
 import _ from 'lodash';
@@ -182,7 +183,12 @@ export default {
       //单选则直接返回
       if(!this.isMulti) {
         this.show = false;
-        //this.$emit('input',JSON.parse(JSON.stringify(user)))
+        this.$emit('input', {
+          userId: user.userId,
+          displayName: user.displayName,
+          staffId: user.staffId,
+          head: user.head || ''
+        })
         return;
       }
 
@@ -231,7 +237,7 @@ export default {
         let userPage = await this.fetchUser(this.params);
         this.userPage.merge(Page.as(userPage));
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
 
       this.loading = false
@@ -253,7 +259,7 @@ export default {
 
         this.userPage.merge(Page.as(userPage));
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
 
       this.loading = false;
@@ -269,7 +275,7 @@ export default {
         let userPage = await this.fetchUser(this.params)
         this.userPage.merge(Page.as(userPage));
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
 
       this.loading = false;
@@ -331,7 +337,7 @@ export default {
         this.depts = await this.fetchDept();
         this.chooseDept(this.depts[0]); //默认选中第一个
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     },
     head(user){
