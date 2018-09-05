@@ -32,6 +32,7 @@ import {
   Radio,
   TimePicker,
   Loading,
+  CheckboxGroup
 } from 'element-ui';
 
 const ElementUI = {
@@ -64,6 +65,7 @@ const ElementUI = {
     Vue.use(Radio);
     Vue.use(TimePicker);
     Vue.use(Loading);
+    Vue.use(CheckboxGroup);
 
     // layout
     Vue.use(Row);

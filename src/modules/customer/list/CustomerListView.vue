@@ -225,10 +225,18 @@
               更多操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>导入客户</el-dropdown-item>
-              <el-dropdown-item>导入联系人</el-dropdown-item>
-              <el-dropdown-item>导出</el-dropdown-item>
-              <el-dropdown-item>导出全部</el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="openDialog('importCustomer')">导入客户</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="openDialog('importLinkman')">导入联系人</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="exportCustomer(false)">导出</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="exportCustomer(true)">导出全部</div>
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -318,6 +326,35 @@
       ref="batchRemindingCustomerDialog"
       :selectedCustomer="multipleSelection"/>
 
+    <base-import
+      ref="importCustomerModal"
+      @success="importSucc"
+      action="/customer/import">
+      <div slot="tip">
+        <div class="base-import-warn">
+          请先下载<a href="/customer/import/template">导入模版 </a>，填写完成后再上传导入。
+        </div>
+      </div>
+    </base-import>
+
+    <base-import
+      ref="importLinkmanModal"
+      @success="importSucc"
+      action="/contacts/import">
+      <div slot="tip">
+        <div class="base-import-warn">
+          <p style="margin: 0">请先下载<a href="/contacts/import/template">导入模版 </a>，填写完成后再上传导入。</p>
+          <p style="margin: 0">联系人导入可以先下载 <a href="/contacts/import/mesTemplate">产品数据模版文档</a>，导入信息可以依照此模板填写。</p>
+          <p style="margin: 0">联系人导入可以先下载 <a href="/contacts/import/getAllCustomerId">客户数据模版文档</a>，导入信息可以依照此模板填写。</p>
+        </div>
+      </div>
+    </base-import>
+
+    <base-export
+      ref="exportPanel"
+      :columns="columns"
+      action="/customer/export" />
+
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
       <h4 class="panel-title">
         已选择({{multipleSelection.length}})
@@ -338,7 +375,6 @@
       <el-button type="info" class="cancel-select-customer-btn" @click="toggleSelection()">清除</el-button>
     </base-panel>
 
-
   </div>
 </template>
 
@@ -351,7 +387,8 @@
   import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
   import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
   import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
-
+  import BaseImport from '../../../component/common/BaseImport';
+  import BaseExport from '../../../component/common/BaseExport';
 
   export default {
   name: 'customer-list-view',
@@ -478,6 +515,36 @@
     // console.log('test', test);
   },
   methods: {
+    buildExportParams(checkedArr, ids) {
+      let params = {};
+
+      if (ids && ids.length) {
+        params = {
+          customerChecked: checkedArr,
+          data: ids,
+          exportSearchModel: '',
+        };
+      } else {
+        params = {
+          customerChecked: checkedArr,
+          data: '',
+          exportSearchModel: JSON.stringify(this.buildParams() || {}),
+        }
+      }
+      return params;
+    },
+    exportCustomer(exportAll){
+      let ids = [];
+      let fileName = `${formatDate(new Date(),'YYYY-MM-dd')}客户数据.xlsx`;
+      if(!exportAll){
+        if(!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+        ids = this.selectedIds;
+      }
+      this.$refs.exportPanel.open(ids, fileName);
+    },
+    importSucc() {
+
+    },
     cancelSelectCustomer(customer) {
       if (!customer || !customer.id) return;
       this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
@@ -761,6 +828,12 @@
       if (category === 'remind') {
         this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
       }
+      if (category === 'importCustomer') {
+        this.$refs.importCustomerModal.open();
+      }
+      if (category === 'importLinkman') {
+        this.$refs.importLinkmanModal.open();
+      }
     },
     async deleteCustomer() {
       if (!this.multipleSelection.length) {
@@ -1042,6 +1115,8 @@
     [SendMessageDialog.name]: SendMessageDialog,
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [BatchRemindingCustomerDialog.name]: BatchRemindingCustomerDialog,
+    [BaseImport.name]: BaseImport,
+    [BaseExport.name]: BaseExport,
   }
 }
 </script>
