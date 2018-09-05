@@ -1,3 +1,4 @@
+import _ from 'lodash';
 //https://github.com/ljharb/qs
 import qs from 'qs';
 //https://github.com/axios/axios
@@ -6,10 +7,12 @@ import axios from 'axios';
 const axiosIns = axios.create({
   // put, post, patch 请求参数转换
   transformRequest: [function (data, headers) {
-    if(headers['Content-Type'] == 'application/x-www-form-urlencoded'){
+    if(headers['Content-Type'] == 'application/x-www-form-urlencoded' && _.isPlainObject(data)){
       data = qs.stringify(data)
-    }else{
-      data = JSON.stringify(data);
+    }
+
+    if(headers['Content-Type'] == 'application/json'){
+      data = JSON.stringify(data)
     }
  
     return data;
