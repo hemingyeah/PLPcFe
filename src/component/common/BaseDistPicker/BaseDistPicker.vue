@@ -6,20 +6,16 @@
       :options="options"
       change-on-select
       :value="value"
-      @change="handleChange"
-    ></el-cascader>
-
+      @change="handleChange"/>
   </div>
 </template>
 
 <script>
-  import city from './city';
-
   export default {
     name: "base-dist-picker",
     data() {
       return {
-        options: city,
+        options: [],
         value: [],
         props: {
           value: 'name',
@@ -42,10 +38,13 @@
       handleChange(value) {
         this.$emit('city-selector-change', value);
       },
+      /** 异步加载区域数据 */
+      loadDistData(){
+        return import(/* webpackChunkName: "dist.data" */ './city').then(_module => _module.default);
+      }
+    },
+    async mounted(){
+      this.options = await this.loadDistData();
     }
   }
 </script>
-
-<style scoped>
-
-</style>
