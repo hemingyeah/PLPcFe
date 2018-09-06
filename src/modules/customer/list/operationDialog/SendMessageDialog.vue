@@ -108,21 +108,23 @@
         const params = this.buildParams();
         this.pending = true;
 
-        console.log('params', params);
-        this.$http.post('/customer/sendSmsBatch', params)
+        this.$http.post('/customer/sendSmsBatch', params, false)
           .then(res => {
-            console.log('res', res);
-            this.pending = false;
-            this.sendMessageDialog = false;
-            this.$platform.alert('批量发送短信成功');
+            if (res.status === 0) {
+              this.pending = false;
+              this.sendMessageDialog = false;
+              this.$platform.alert('批量发送短信成功');
+            } else {
+              return Promise.reject('status !== 0');
+            }
           })
           .catch(err => {
             this.pending = false;
+            this.$platform.alert('批量发送短信失败');
             console.error('sendSmsBatch err', err);
           })
       },
       openSendMessageDialog() {
-        console.log('openSendMessageDialog');
         if (!this.selectedCustomer.length) {
           return this.$platform.alert('请选择需要批量发送短信的客户');
         }
@@ -132,7 +134,7 @@
       fetchCount() {
         if (!this.needFetchCount) return;
         const params = {
-          ids: this.selectedIds,
+          ids: this.selectedIds.join(','),
           isAllLm: this.form.isAllLm,
         };
         this.$http.get('/customer/computeSendNum', params)
@@ -166,16 +168,15 @@
       },
       buildParams() {
         const { smsTemplateId, isAllLm, sendDate, sendTime, } = this.form;
-        const formData = new FormData();
         const date = formatDate(sendDate, 'YYYY-MM-DD');
         const time = formatDate(sendTime, 'HH:mm:ss');
 
-        formData.set('smsTemplateId', smsTemplateId);
-        formData.set('isAllLm', isAllLm);
-        formData.set('sendTime', `${date} ${time}`);
-        formData.set('ids', this.selectedIds);
-
-        return formData;
+        return {
+          smsTemplateId,
+          isAllLm,
+          sendTime: `${date} ${time}`,
+          ids: this.selectedIds.join(','),
+        }
       }
     },
     components: {

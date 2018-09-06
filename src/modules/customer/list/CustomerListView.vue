@@ -199,13 +199,13 @@
             </el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item >
-                <span @click="openDialog('sendMessage')">发送短信</span>
+                <div @click="openDialog('sendMessage')">发送短信</div>
               </el-dropdown-item>
               <el-dropdown-item>
-                <span @click="openDialog('edit')">批量编辑</span>
+                <div @click="openDialog('edit')">批量编辑</div>
               </el-dropdown-item>
               <el-dropdown-item>
-                <span @click="openDialog('remind')">批量提醒</span>
+                <div @click="openDialog('remind')">批量提醒</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -324,7 +324,7 @@
 
     <batch-reminding-customer-dialog
       ref="batchRemindingCustomerDialog"
-      :selectedCustomer="multipleSelection"/>
+      :selectedIds="selectedIds"/>
 
     <base-import
       ref="importCustomerModal"
@@ -551,11 +551,15 @@
       this.toggleSelection([customer]);
     },
     toggleStatus(row) {
-      const formData = new FormData();
-      formData.set('id', row.id);
-      formData.set('status', Number(row.status));
+      const params = {
+        id: row.id,
+        status: Number(row.status),
+      };
 
-      this.$http.post('/customer/changeState', formData)
+      this.$http.post('/customer/changeState', params, false)
+        .catch(err => {
+          console.error('toggleStatus catch err', err);
+        })
     },
     search() {
       const params = this.buildParams();

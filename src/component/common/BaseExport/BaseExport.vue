@@ -75,6 +75,7 @@ export default {
       //   checked: this.checkedArr.join(','),
       //   ids: this.ids.join(','),
       // };
+      // doubt
       let params = this.$parent.buildExportParams(this.checkedArr, this.ids);
 
       // let params = {

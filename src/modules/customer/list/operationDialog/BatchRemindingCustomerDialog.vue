@@ -3,39 +3,42 @@
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
-        <el-select v-model="form.region" placeholder="请选择短信模板">
-          <el-option v-for="item in messageTemplate" :label="item.label" :value="item.value" :key="item.value"></el-option>
+        <el-select v-model="form.remindId" placeholder="请选择短信模板">
+          <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
-
       <el-form-item label="提醒内容">
-        <!--<el-input v-model="form.name"></el-input>-->
-        测试
+        {{selectedRemind.content}}
       </el-form-item>
       <el-form-item label="提醒规则">
-        重复通知：根据1次保养时间后1小时，每1天发出提醒
+        {{remindRule}}
       </el-form-item>
       <el-form-item label="通知人">
-        <!--重复通知：根据1次保养时间后1小时，每1天发出提醒-->
-        <el-select
-          v-model="value9"
-          multiple
-          filterable
-          remote
-          reserve-keyword
-          placeholder="请输入关键词"
-          :remote-method="remoteMethod"
-          :loading="loading">
-          <el-option
-            v-for="item in options4"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+        <template v-if="selectedRemind.isDdResponse">
+          <el-select
+            v-model="form.users"
+            filterable
+            remote
+            multiple
+            reserve-keyword
+            placeholder="请输入关键词"
+            :loading="remoteSearchCM.loading"
+            :remote-method="searchCustomerManager">
+            <el-option
+              v-for="item in remoteSearchCM.options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </template>
+        <template v-else>
+          <el-radio-group v-model="form.isAllLm">
+            <el-radio :label="0" :style="{ width: '120px'}">默认联系人</el-radio>
+            <el-radio :label="1" :style="{ width: '120px'}">所有联系人</el-radio>
+          </el-radio-group>
+        </template>
       </el-form-item>
-
-
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="batchRemindingCustomerDialog = false">取 消</el-button>
@@ -51,77 +54,127 @@
     name: "batch-reminding-customer-dialog",
     data: () => {
       return {
-        form: {
-          name: '',
-          region: '',
+        remindTemplate: [],
+        remoteSearchCM: {
+          loading: false,
+          options: [],
         },
+        form: {
+          ids: '',
+          isAllLm:0,
+          remindId: null,
+          users: [],
+        },
+
         batchRemindingCustomerDialog: false,
         pending: false,
-        messageTemplate: [{
-          label: '节日问候',
-          value: '1',
-        }, {
-          label: '服务到期提醒',
-          value: '2',
-        }],
-        options4: [],
-        value9: [],
-        list: [],
-        loading: false,
-        states: ["Alabama", "Alaska", "Arizona",
-          "Arkansas", "California", "Colorado",
-          "Connecticut", "Delaware", "Florida",
-          "Georgia", "Hawaii", "Idaho", "Illinois",
-          "Indiana", "Iowa", "Kansas", "Kentucky",
-          "Louisiana", "Maine", "Maryland",
-          "Massachusetts", "Michigan", "Minnesota",
-          "Mississippi", "Missouri", "Montana",
-          "Nebraska", "Nevada", "New Hampshire",
-          "New Jersey", "New Mexico", "New York",
-          "North Carolina", "North Dakota", "Ohio",
-          "Oklahoma", "Oregon", "Pennsylvania",
-          "Rhode Island", "South Carolina",
-          "South Dakota", "Tennessee", "Texas",
-          "Utah", "Vermont", "Virginia",
-          "Washington", "West Virginia", "Wisconsin",
-          "Wyoming"]
       }
     },
     props: {
-      selectedCustomer: {
+      selectedIds: {
         type: Array,
         default: () => ([]),
       },
     },
+    computed: {
+      selectedRemind() {
+        return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
+      },
+      remindRule() {
+        const { isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit, } = this.selectedRemind;
+        let unit = '';
+        if (periodUnit === 'day') {
+          unit = '天';
+        }
+        if (isRepeat) {
+          if(period){
+            return `重复通知：${fieldDisplayName+(isAhead+hours)}小时，每${period+unit}发出提醒`;
+          }else{
+            return '无';
+          }
+        } else {
+          if(fieldDisplayName){
+            return `单次通知：根据${fieldDisplayName+(isAhead+hours)}小时提醒`;
+          }else{
+            return '无'
+          }
+        }
+      }
+    },
     mounted() {
-      this.list = this.states.map(item => {
-        return { value: item, label: item };
-      });
+      this.fetchData();
     },
     methods: {
-      remoteMethod(query) {
-        if (query !== '') {
-          this.loading = true;
-          setTimeout(() => {
-            this.loading = false;
-            this.options4 = this.list.filter(item => {
-              return item.label.toLowerCase()
-                .indexOf(query.toLowerCase()) > -1;
-            });
-          }, 200);
+      onSubmit() {
+        const params = this.buildParams();
+        this.$http.post('/scheduler/buildBatch', params)
+          .then(res => {
+            if (res.status === 0) {
+              this.$platform.alert('批量添加提醒成功');
+            }
+            if (res.status === 1 && res.data) {
+              this.$platform.alert(`批量添加提醒失败，以下客户已存在该提醒：${res.data.join(',')}`);
+            }
+            this.batchRemindingCustomerDialog = false;
+            console.log('post to /scheduler/buildBatch err', res);
+          })
+          .catch(err => {
+            this.$platform.alert('批量添加提醒失败');
+            console.error('post to /scheduler/buildBatch err', err)
+          });
+      },
+      buildParams() {
+        let params = {
+          ids: this.selectedIds.join(','),
+          remindId: this.form.remindId,
+        };
+
+        if (this.selectedRemind.isDdResponse) {
+          params.isAllLm = 0;
+          params.users = this.selectedRemind.users;
         } else {
-          this.options4 = [];
+          params.isAllLm = this.form.isAllLm;
+          params.users = [];
         }
+        return params;
       },
       openBatchRemindingCustomerDialog() {
-        if (!this.selectedCustomer.length) {
+        if (!this.selectedIds.length) {
           return this.$platform.alert('请选择需要批量提醒的客户');
         }
         this.batchRemindingCustomerDialog = true;
       },
-      onSubmit() {
-        console.log('submit!');
-      }
+      fetchData() {
+        this.$http.get('/v2/customer/getReminds', { pageSize: 0, })
+          .then(res => {
+            let tv = null;
+            if (res) {
+              this.remindTemplate = res.list || [];
+              tv = this.remindTemplate[0];
+              if (tv) {
+                this.form.remindId = tv.id;
+                this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0: 1;
+                this.form.users = tv.users.map(c => c.id);
+                this.remoteSearchCM.options = tv.users;
+              }
+            }
+          })
+          .catch(err => console.error('err', err));
+      },
+      searchCustomerManager(keyword) {
+        this.remoteSearchCM.loading = true;
+        this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
+          .then(res => {
+            this.remoteSearchCM.options = res.list
+              .map(c => ({
+                id: c.staffId,
+                name: c.displayName,
+              }));
+            this.remoteSearchCM.loading = false;
+          })
+          .catch(err => console.error('searchCustomerManager function catch err', err));
+      },
+
     },
     components: {
       [BaseModal.name]: BaseModal,
