@@ -45,7 +45,42 @@
           </div>
 
           <!-- 个人信息 -->
-          <div class="user-profile-wrap">
+          <el-popover class="user-profile-wrap" popper-class="user-profile-menu" v-model="profilePopperVisible">
+            <div class="user-profile" slot="reference">
+              <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
+                <img :src="loginUser.head"/>
+              </a>
+              <div class="user-info">
+                <h4>{{loginUser.displayName}}</h4>
+                <p>{{loginUser.state}}</p>
+              </div>
+              <i class="iconfont icon-triangle-down user-profile-down"></i>
+            </div>
+
+            <template>
+              <el-popover placement="left-start" popper-class="user-state-popper" v-model="userStatePopperVisible">
+                <div class="user-profile-item" slot="reference">
+                  <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-userstatus"></i>工作状态</a>
+                </div>
+
+                <div 
+                  class="user-profile-item" 
+                  v-for="(color, state) in userStateMap" :key="state"
+                  @click="chooseUserState(state)">
+                  <span style="display:inline-block;width: 24px;height:24px;" :style="{backgroundColor: color}"></span>
+                  <span>{{state}}</span>
+                </div>
+              </el-popover>
+              
+              <div class="user-profile-item">
+                <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
+              </div>
+              <div class="user-profile-item logout">
+                <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-Signout"></i>注销</a>
+              </div>
+            </template>
+          </el-popover>
+          <!-- <div class="user-profile-wrap">
             <div class="user-profile">
               <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
                 <img :src="loginUser.head"/>
@@ -54,7 +89,7 @@
                 <h4>{{loginUser.displayName}}</h4>
                 <p>{{loginUser.state}}</p>
               </div>
-              <!-- <i class="iconfont icon-triangle-down user-profile-down"></i> -->
+             
             </div>
            
             <div class="user-profile-menu-wrap">
@@ -68,7 +103,7 @@
               </div>
             </div>
             
-          </div>
+          </div> -->
         </div>
       </header>
 
@@ -102,6 +137,9 @@ export default {
   },
   data(){
     return {
+      profilePopperVisible: false, 
+      userStatePopperVisible: false,
+
       loginUser: this.initData.user || {},
       collapse: true,
       currUrl: '/home',
@@ -121,6 +159,9 @@ export default {
   computed: {
     showDevTool(){
       return this.$appConfig.appConfig != 'production' || this.initData.env != 'production';
+    },
+    userStateMap(){
+      return this.initData.userStateMap || {};
     }
   },
   methods: {
@@ -141,6 +182,11 @@ export default {
         //暂时只更新状态
         this.loginUser.state = result.data.state;
       }
+    },
+    chooseUserState(state){
+      this.userStatePopperVisible = false;
+      this.profilePopperVisible = false;
+      console.log(state)
     },
     updateUserState(state){
       this.loginUser.state = state;
@@ -502,20 +548,14 @@ html, body, .frame{
   color: #797e89;
 }
 
-.user-profile-menu-wrap{
-  display: none;
-  position: absolute;
-  top: 51px;
-  right: 0;
-  padding-top: 5px;
-}
-
 .user-profile-menu{
   width: 160px;
   background-color: #fff;
   padding: 5px 0;
+
   
-  border-radius: 0 2px 2px 0;
+  border-radius: 2px;
+  border: none;
   box-shadow: 1px 1px 5px rgba(0,21,41, .15);
   transition: background-color ease .3s;
 }
@@ -524,6 +564,7 @@ html, body, .frame{
   height: 40px;
   line-height: 40px;
   padding: 0 10px;
+  cursor: pointer;
   transition: background-color ease .3s;
   
   i{
@@ -558,7 +599,6 @@ html, body, .frame{
   flex-flow: row nowrap;
 }
 
-
 .dev-tool{
   position: relative;
   color: red;
@@ -591,5 +631,16 @@ html, body, .frame{
     padding: 5px 8px;
     color: red;
   }
+}
+
+.user-state-popper{
+  margin-top: -5px;
+  background-color: #fff;
+  padding: 5px 0;
+  
+  border-radius: 2px;
+  border: none;
+  box-shadow: 1px 1px 5px rgba(0,21,41, .15);
+  transition: background-color ease .3s;
 }
 </style>

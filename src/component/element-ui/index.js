@@ -14,7 +14,8 @@ import {
   Input,
   DatePicker,
   Select,
-  Option
+  Option,
+  Popover
 } from 'element-ui';
 
 const ElementUI = {
@@ -31,7 +32,8 @@ const ElementUI = {
     Vue.use(Input);
     Vue.use(DatePicker);
     Vue.use(Select);
-    Vue.use(Option)
+    Vue.use(Option);
+    Vue.use(Popover)
   }
 };
 
