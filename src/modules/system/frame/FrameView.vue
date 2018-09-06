@@ -21,28 +21,31 @@
           <button type="button" class="btn-text frame-header-btn" @click="openHelpDoc"><i class="iconfont icon-help"></i> 帮助文档</button>
           <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow"><i class="iconfont icon-customerservice"></i> 专属客服</button>
           
-          <!--导出下载-->
-          <div class="export-wrap">
-            <div class="export-btn" ><i class="iconfont icon-download"></i> 导出下载</div>
- 
-            <div class="export-panel-wrap">
-              <div class="export-panel">
-                <template v-if="exportList.length > 0">
-                  <div v-for="item in exportList" :key="item.id" class="export-row">
-                    <img src="../../../assets/img/excel.png">
-                    <div class="export-row-info">
-                      <h4>{{item.name}}</h4>
-                      <p>{{item.createTime | fmt_datetime}}</p>
-                    </div>  
-                    <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
-                    <a href="javascript:void(0);" @click="execExportFile(item)">{{item.isFinished == 0 ? '取消' : '下载'}}</a>
-                  </div>
-                </template>
+          <el-popover class="export-wrap" popper-class="export-panel-popper" placement="bottom-end">
+            <div class="export-btn" slot="reference"><i class="iconfont icon-download"></i> 导出下载</div>
 
-                <p class="export-empty" v-else>暂无待下载的文件</p>
-              </div>
+            <div class="export-panel">
+              <template v-if="exportList.length > 0">
+                <div v-for="item in exportList" :key="item.id" class="export-row">
+                  <img src="../../../assets/img/excel.png">
+                  <div class="export-row-info">
+                    <h4>{{item.name}}</h4>
+                    <p>{{item.createTime | fmt_datetime}}</p>
+                  </div>  
+                  <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
+                  <a href="javascript:void(0);" @click="execExportFile(item)">{{item.isFinished == 0 ? '取消' : '下载'}}</a>
+                </div>
+              </template>
+
+              <p class="export-empty" v-else>暂无待下载的文件</p>
             </div>
-          </div>
+          </el-popover>
+          <!--导出下载-->
+          <!-- <div class="export-wrap">
+            
+ 
+            
+          </div> -->
 
           <!-- 个人信息 -->
           <el-popover class="user-profile-wrap" popper-class="user-profile-menu" v-model="profilePopperVisible">
@@ -52,58 +55,33 @@
               </a>
               <div class="user-info">
                 <h4>{{loginUser.displayName}}</h4>
-                <p>{{loginUser.state}}</p>
+                <p><span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> {{loginUser.state}}</p>
               </div>
               <i class="iconfont icon-triangle-down user-profile-down"></i>
             </div>
+            
+            <el-popover placement="left-start" popper-class="user-state-popper" v-model="userStatePopperVisible">
+              <div class="user-profile-item" slot="reference"><i class="iconfont icon-userstatus"></i>工作状态</div>
 
-            <template>
-              <el-popover placement="left-start" popper-class="user-state-popper" v-model="userStatePopperVisible">
-                <div class="user-profile-item" slot="reference">
-                  <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-userstatus"></i>工作状态</a>
-                </div>
-
+              <div class="user-state-panel">
                 <div 
-                  class="user-profile-item" 
+                  class="user-profile-item user-state-item" 
                   v-for="(color, state) in userStateMap" :key="state"
                   @click="chooseUserState(state)">
-                  <span style="display:inline-block;width: 24px;height:24px;" :style="{backgroundColor: color}"></span>
+                  <span class="user-color-icon" :style="{backgroundColor: color}"></span>
                   <span>{{state}}</span>
                 </div>
-              </el-popover>
-              
-              <div class="user-profile-item">
-                <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
               </div>
-              <div class="user-profile-item logout">
-                <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-Signout"></i>注销</a>
-              </div>
-            </template>
-          </el-popover>
-          <!-- <div class="user-profile-wrap">
-            <div class="user-profile">
-              <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.prevent="openUserView">
-                <img :src="loginUser.head"/>
-              </a>
-              <div class="user-info">
-                <h4>{{loginUser.displayName}}</h4>
-                <p>{{loginUser.state}}</p>
-              </div>
-             
+            </el-popover>
+            
+            <div class="user-profile-item">
+              <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
             </div>
-           
-            <div class="user-profile-menu-wrap">
-              <div class="user-profile-menu">
-                <div class="user-profile-item">
-                  <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
-                </div>
-                <div class="user-profile-item logout">
-                  <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-Signout"></i>注销</a>
-                </div>
-              </div>
+            <div class="user-profile-item logout">
+              <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-Signout"></i>注销</a>
             </div>
             
-          </div> -->
+          </el-popover>
         </div>
       </header>
 
@@ -157,11 +135,18 @@ export default {
     }
   },
   computed: {
+    /** 是否显示devtool */
     showDevTool(){
       return this.$appConfig.appConfig != 'production' || this.initData.env != 'production';
     },
+    /** 用户工作状态颜色配置 */
     userStateMap(){
       return this.initData.userStateMap || {};
+    },
+    /** 用户工作状态颜色 */
+    userStateColor(){
+      let state = this.loginUser.state;
+      return this.userStateMap[state];
     }
   },
   methods: {
@@ -183,10 +168,20 @@ export default {
         this.loginUser.state = result.data.state;
       }
     },
-    chooseUserState(state){
+    /** 选择用户状态 */
+    async chooseUserState(state){
       this.userStatePopperVisible = false;
       this.profilePopperVisible = false;
-      console.log(state)
+      try {
+        let result = await http.post('/security/user/updateState', {state}, false);
+        if(result.status == 0) {
+          this.updateUserState(state)
+        }else{
+          platform.alert(result.message)
+        }
+      } catch (error) {
+        console.error(error)
+      }
     },
     updateUserState(state){
       this.loginUser.state = state;
@@ -365,7 +360,7 @@ html, body, .frame{
   line-height: 20px;
   text-align: center;
   margin: 0;
-  color: #797e89;
+  color: $text-color-second;
 }
 
 .frame-header-right{
@@ -374,19 +369,21 @@ html, body, .frame{
   height: 51px;
   align-items: center;
   padding-right: 8px;
+  user-select: none;
 }
 
 .frame-header-btn,
 .export-wrap,
 .user-profile-wrap{
   position: relative;
-  color: #797e89;
+  color: $text-color-second;
   width: 100px;
   margin: 0;
   padding: 0;
   height: 100%;
   transition: background-color ease .3s;
   z-index: 98;
+  cursor: pointer;
   
   i{
     font-size: 16px;
@@ -401,29 +398,21 @@ html, body, .frame{
   height: 100%;
   line-height: 50px;
   text-align: center;
-  cursor: default;
 }
 
-.export-panel-wrap{
-  display: none;
-  position: absolute;
-  top: 51px;
-  right: 0;
-  padding-top: 5px;
+.export-panel-popper{
+  width: 380px;
+  background-color: #fff;
+  box-shadow: 1px 1px 5px rgba(0,21,41, .15);
+  border: none;
+  padding: 0;
+  border-radius: 2px;
 }
 
 .export-panel{
-  width: 380px;
+  padding: 5px 0;
   max-height: 520px;
   overflow: auto;
-  background-color: #fff;
-  box-shadow: 1px 1px 5px rgba(0,21,41, .15);
-}
-
-.export-wrap:hover{
-  .export-panel-wrap{
-    display: block;
-  }
 }
 
 .export-row{
@@ -507,7 +496,7 @@ html, body, .frame{
 }
 
 .user-avatar{
-  padding: 0 10px;
+  padding: 0 8px;
 
   img{
     display: block;
@@ -552,8 +541,6 @@ html, body, .frame{
   width: 160px;
   background-color: #fff;
   padding: 5px 0;
-
-  
   border-radius: 2px;
   border: none;
   box-shadow: 1px 1px 5px rgba(0,21,41, .15);
@@ -565,6 +552,7 @@ html, body, .frame{
   line-height: 40px;
   padding: 0 10px;
   cursor: pointer;
+  color: #797e89;
   transition: background-color ease .3s;
   
   i{
@@ -579,19 +567,13 @@ html, body, .frame{
   a{
     display: block;
     width: 100%;
-    color: #797e89;
+    color: inherit;
     text-decoration: none;
   }
 }
 
 .logout:hover a{
   color: #ed3f14;
-}
-
-.user-profile-wrap:hover{
-  .user-profile-menu-wrap{
-    display: block;
-  }
 }
 
 .export-row{
@@ -607,13 +589,14 @@ html, body, .frame{
   height: 20px;
   line-height: 20px;
   z-index: 90;
-}
 
-.dev-tool:hover{
-  .dev-tool-menu{
-    display: block;
+  &:hover{
+    .dev-tool-menu{
+      display: block;
+    }
   }
 }
+
 .dev-tool-menu{
   display: none;
   position: absolute;
@@ -636,11 +619,40 @@ html, body, .frame{
 .user-state-popper{
   margin-top: -5px;
   background-color: #fff;
-  padding: 5px 0;
+  padding: 0;
   
   border-radius: 2px;
   border: none;
   box-shadow: 1px 1px 5px rgba(0,21,41, .15);
   transition: background-color ease .3s;
+}
+
+.user-state-panel{
+  padding: 5px 0;
+  max-height: 620px;
+  overflow-y: auto;
+}
+
+.user-state-item{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.user-color-icon{
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 8px;
+  background-color: $text-color-second;
+}
+
+.user-color-icon-mini{
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 2px;
+  vertical-align: middle;
 }
 </style>
