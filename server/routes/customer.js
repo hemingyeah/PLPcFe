@@ -11,7 +11,6 @@ router.get('/customer', async ctx => {
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request('/v2/customer/jump', 'get', null, {headers: reqHeaders});
   let body = result.body;
-  console.log('body', body);
 
   ctx.body = Template.renderWithHtml('客户管理', body, script, modConfig.template)
 });

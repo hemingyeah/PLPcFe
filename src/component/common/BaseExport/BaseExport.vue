@@ -78,8 +78,9 @@ export default {
       // doubt
 
       if (this.buildParams) {
-        params = this.buildParams();
+        params = this.buildParams(this.checkedArr, this.ids);
       }
+
 
 
 

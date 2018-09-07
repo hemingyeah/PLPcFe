@@ -8,7 +8,7 @@
           <el-button type="primary" @click="search">搜索</el-button>
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
         </div>
-        <el-button type="primary"  @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
+        <el-button type="primary" @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
       </form>
       <!--高级搜索-->
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
@@ -26,7 +26,7 @@
               filterable
               remote
               reserve-keyword
-              placeholder="请输入关键词"
+              placeholder=""
               :loading="inputRemoteSearch.linkman.loading"
               :remote-method="searchLinkman">
               <el-option
@@ -43,7 +43,7 @@
               filterable
               remote
               reserve-keyword
-              placeholder="请输入关键词"
+              placeholder=""
               :loading="inputRemoteSearch.tag.loading"
               :remote-method="searchTag">
               <el-option
@@ -55,7 +55,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label-width="100px" label="区域">
-            <base-dist-picker v-on:city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
+            <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
           </el-form-item>
           <el-form-item label-width="100px" label="详细地址">
             <el-input type="text" v-model="specialParams.adAddress"></el-input>
@@ -80,7 +80,7 @@
               filterable
               remote
               reserve-keyword
-              placeholder="请输入关键词"
+              placeholder=""
               :loading="inputRemoteSearch.creator.loading"
               :remote-method="searchCreator">
               <el-option
@@ -97,7 +97,7 @@
               filterable
               remote
               reserve-keyword
-              placeholder="请输入关键词"
+              placeholder=""
               :loading="inputRemoteSearch.customerManager.loading"
               :remote-method="searchCustomerManager">
               <el-option
@@ -158,7 +158,7 @@
                 filterable
                 remote
                 reserve-keyword
-                placeholder="请输入关键词"
+                placeholder="                   "
                 :loading="inputRemoteSearch.creator.loading"
                 :remote-method="searchCreator">
                 <el-option
@@ -210,7 +210,6 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown >
-          <!--<el-dropdown trigger="click">-->
             <el-button type="primary">
               更多操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -298,7 +297,7 @@
       <div class="table-footer">
         <div class="list-info">
           <i class="iconfont icon-abnormal"></i>
-          已选中 <span class="selectedCount"  @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条
+          已选中 <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条
           <span class="selectedCount" @click="toggleSelection()">清空</span>
           <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录</span>
           <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalPages}}</span>页</span>
@@ -320,18 +319,17 @@
 
     <!-- dialog of operation -->
     <send-message-dialog
-      ref="messageDialog"
-      :selectedCustomer="multipleSelection"/>
+      ref="messageDialog" :selected-customer="multipleSelection"/>
 
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
       :fields="customerConfig.fieldInfo"
-      :selectedIds="selectedIds"/>
+      :selected-ids="selectedIds"/>
     <!--batch-reminding-customer-dialog-->
 
     <batch-reminding-customer-dialog
       ref="batchRemindingCustomerDialog"
-      :selectedIds="selectedIds"/>
+      :selected-ids="selectedIds"/>
 
     <base-import
       ref="importCustomerModal"
@@ -360,7 +358,7 @@
     <base-export
       ref="exportPanel"
       :columns="columns"
-      :buildParams="buildExportParams"
+      :build-params="buildExportParams"
       action="/customer/export" />
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
@@ -547,13 +545,13 @@
 
       if (ids && ids.length) {
         params = {
-          customerChecked: checkedArr,
-          data: ids,
+          customerChecked: checkedArr.join(','),
+          data: ids.join(','),
           exportSearchModel: '',
         };
       } else {
         params = {
-          customerChecked: checkedArr,
+          customerChecked: checkedArr.join(','),
           data: '',
           exportSearchModel: JSON.stringify(this.buildParams() || {}),
         }
@@ -570,7 +568,7 @@
       this.$refs.exportPanel.open(ids, fileName);
     },
     importSucc() {
-
+      console.log('importSucc');
     },
     search() {
       const params = this.buildParams();
@@ -1373,6 +1371,10 @@
       font-weight: lighter;
       font-size: 14px;
     }
+
+    /*.el-dropdown-menu li {*/
+      /*font-size: 13px;*/
+    /*}*/
 
     .delete-customer-btn {
       background: #fff;

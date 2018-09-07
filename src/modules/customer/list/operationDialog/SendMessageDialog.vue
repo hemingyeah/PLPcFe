@@ -1,8 +1,8 @@
 <template>
-  <base-modal title="发送短信" :show.sync="sendMessageDialog" width="600px" class="send-message-to-customer-dialog">
+  <base-modal title="发送短信" @closed="reset" :show.sync="sendMessageDialog" width="600px" class="send-message-to-customer-dialog">
     <el-form ref="form" :model="form" label-width="100px">
       <el-form-item label="接收人">
-        <el-radio-group v-model="form.isAllLm" @change="fetchCount">
+        <el-radio-group v-model="form.isAllLm" @change="fetchCount" :disabled="pending">
           <el-radio label="0" :style="{ width: '120px'}">默认联系人</el-radio>
           <el-radio label="1" :style="{ width: '120px'}">全部联系人</el-radio>
         </el-radio-group>
@@ -84,10 +84,7 @@
         if (this.form.isAllLm === '0' && this.count.default.loaded) {
           return false;
         }
-        if (this.form.isAllLm === '1' && this.count.all.loaded) {
-          return false;
-        }
-        return true;
+        return !(this.form.isAllLm === '1' && this.count.all.loaded)
       },
       displayCount() {
         if (this.form.isAllLm === '0') {
@@ -131,6 +128,7 @@
       },
       fetchCount() {
         if (!this.needFetchCount) return;
+        this.pending = true;
         const params = {
           ids: this.selectedIds.join(','),
           isAllLm: this.form.isAllLm,
@@ -144,8 +142,10 @@
               this.count.all.value = res.data;
               this.count.all.loaded = true;
             }
+            this.pending = false;
           })
           .catch(err => {
+            this.pending = false;
             console.error('fetchCount err', err);
           })
       },
@@ -172,6 +172,18 @@
           sendTime: formatDate(sendTime, 'YYYY-MM-DD HH:mm:ss'),
           ids: this.selectedIds.join(','),
         }
+      },
+      reset() {
+        this.count = {
+          default: {
+            value: 0,
+              loaded: false,
+          },
+          all: {
+            value: 0,
+              loaded: false,
+          },
+        };
       }
     },
     components: {

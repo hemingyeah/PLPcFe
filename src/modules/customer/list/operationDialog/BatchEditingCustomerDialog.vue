@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="批量编辑" :show.sync="batchEditingCustomerDialog" width="500px" class="batch-editing-customer-dialog">
+  <base-modal title="批量编辑" @closed="reset" :show.sync="batchEditingCustomerDialog" width="500px" class="batch-editing-customer-dialog">
     <el-form ref="editCustomerForm" :model="form" label-width="100px">
       <el-form-item label="修改字段">
         <el-select v-model="selectedFieldName" @change="handleFieldIdChange">
@@ -9,6 +9,7 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-if="selectedField.formType === 'text' || selectedField.formType === 'code'">
         <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50" type="text"></el-input>
@@ -16,14 +17,16 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'address'">
-        <base-dist-picker v-on:city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
+        <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
         <el-input placeholder="" v-model="form.address.address" type="text" />
       </el-form-item>
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'tags'">
         <el-select
@@ -49,6 +52,7 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'manager' || selectedField.formType === 'user'">
         <el-select
@@ -71,6 +75,7 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'selectMulti'">
         <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
@@ -85,6 +90,7 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'select'">
         <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
@@ -99,6 +105,7 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'textarea'">
         <el-input v-model="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="textarea" maxlength="500" rows="10" resize="none"></el-input>
@@ -113,6 +120,7 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'datetime'">
         <el-date-picker
@@ -125,6 +133,7 @@
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
+        :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'date'">
         <el-date-picker
@@ -234,6 +243,11 @@
           }
           console.error('onSubmit editBatch catch e', e);
         }
+      },
+      reset() {
+        this.selectedFieldName = this.editableFields[0].fieldName;
+        this.form = JSON.parse(JSON.stringify(this.formBackup));
+        this.$refs.editCustomerForm.resetFields();
       },
       handleCitySelectorChange(city) {
         this.addressSelector = city;
