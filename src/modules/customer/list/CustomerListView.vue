@@ -193,7 +193,7 @@
         </div>
 
         <div>
-          <el-dropdown trigger="click">
+          <el-dropdown>
             <el-button type="primary">
               批量操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -209,7 +209,8 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown>
+          <el-dropdown >
+          <!--<el-dropdown trigger="click">-->
             <el-button type="primary">
               更多操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -228,7 +229,7 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
+          <el-dropdown :hide-on-click="false" :show-timeout="150">
             <el-button type="primary">
               选择列<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -702,6 +703,8 @@
       let temp = null;
       let tv = null; // tv means temporary variable that used inside the loop.
 
+      if (!cl || !cl.length) return [];
+
       return cl.map(c => { // c means customer.
         temp = c.customerAddress;
         c.customerAddress.str = `${temp.adProvince}-${temp.adCity}-${temp.adDist}`;
@@ -1116,6 +1119,10 @@
 </script>
 
 <style lang="scss">
+  html, body {
+    height: 100%;
+  }
+
   .level-padding {
     padding: 0 5px;
   }

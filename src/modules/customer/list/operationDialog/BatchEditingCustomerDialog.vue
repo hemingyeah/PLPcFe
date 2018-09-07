@@ -32,6 +32,7 @@
         filterable
         remote
         reserve-keyword
+        clearable
         placeholder=""
         @change="selectTag"
         :loading="inputRemoteSearch.tag.loading"
@@ -56,6 +57,7 @@
           remote
           reserve-keyword
           placeholder=""
+          clearable
           :loading="inputRemoteSearch.customerManager.loading"
           :remote-method="searchCustomerManager">
           <el-option
@@ -71,7 +73,7 @@
         :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'selectMulti'">
-        <el-select v-model="form[selectedField.fieldName]" multiple placeholder="请选择">
+        <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
           <el-option
             v-for="item in selectedField.setting.dataSource"
             :key="item"
@@ -85,7 +87,7 @@
         :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'select'">
-        <el-select v-model="form[selectedField.fieldName]" placeholder="请选择">
+        <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
           <el-option
             v-for="item in selectedField.setting.dataSource"
             :key="item"
