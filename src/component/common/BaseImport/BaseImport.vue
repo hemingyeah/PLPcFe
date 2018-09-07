@@ -132,6 +132,9 @@ export default {
   background-color: #fdf6ec;
   color: #e6a23c;
   margin-bottom: 15px;
+  a {
+    color: #00ac97;
+  }
 }
 
 

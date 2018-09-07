@@ -8,21 +8,20 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="选择短信模板">
-        <el-select v-model="form.smsTemplateId" placeholder="请选择短信模板">
+        <el-select v-model="form.smsTemplateId" placeholder="请选择短信模板" style="width: 220px">
           <el-option v-for="item in messageTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="模板内容">
-        <el-input type="textarea" v-model="template"></el-input>
+        <el-input type="textarea" v-model="template" rows="5" resize="none"></el-input>
       </el-form-item>
       <el-form-item label="发送时间">
-        <el-col :span="11">
-          <el-date-picker type="date" placeholder="选择日期" v-model="form.sendDate" style="width: 100%;"></el-date-picker>
-        </el-col>
-        <el-col class="line" :span="2">-</el-col>
-        <el-col :span="11">
-          <el-time-picker type="fixed-time" placeholder="选择时间" v-model="form.sendTime" style="width: 100%;"></el-time-picker>
-        </el-col>
+        <el-date-picker
+          v-model="form.sendTime"
+          type="datetime"
+          placeholder="选择日期时间"
+          default-time="12:00:00">
+        </el-date-picker>
       </el-form-item>
       <el-form-item>
         <p>本次发送：合计共{{selectedCustomer.length}}个</p>
@@ -50,7 +49,6 @@
         form: {
           smsTemplateId: '',
           isAllLm: '0',
-          sendDate: new Date(),
           sendTime: new Date(),
         },
         count: {
@@ -154,7 +152,6 @@
       fetchTemplate() {
         this.$http.get('/vipsms/getTemplates', { pageSize:'100', pageNum:'1', })
           .then(res => {
-            console.log('res', res);
             if (res.status !== 0) return;
             this.messageTemplate = res.data.list;
             if (this.messageTemplate.length) {
@@ -167,14 +164,12 @@
           })
       },
       buildParams() {
-        const { smsTemplateId, isAllLm, sendDate, sendTime, } = this.form;
-        const date = formatDate(sendDate, 'YYYY-MM-DD');
-        const time = formatDate(sendTime, 'HH:mm:ss');
+        const { smsTemplateId, isAllLm, sendTime, } = this.form;
 
         return {
           smsTemplateId,
           isAllLm,
-          sendTime: `${date} ${time}`,
+          sendTime: formatDate(sendTime, 'YYYY-MM-DD HH:mm:ss'),
           ids: this.selectedIds.join(','),
         }
       }

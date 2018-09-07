@@ -1,9 +1,8 @@
 <template>
   <base-modal title="导出列选择" :show.sync="visible" width="600px" class="base-export-modal">
-    <template slot="title">
-      <span class="base-export-title">{{title}}</span>
+    <div>
       <el-checkbox v-model="isCheckedAll" @change="toggle">全选</el-checkbox>
-    </template>
+    </div>
     <el-checkbox-group v-model="checkedArr" @change="handleChange" style="width:100%;" class="base-export-field-wrap">
       <el-checkbox v-for="col in filterColumns" :key="col.field" :label="col.exportAlias ? col.exportAlias : col.field" >{{col.label}}</el-checkbox>
     </el-checkbox-group>
@@ -18,9 +17,9 @@
 </template>
 
 <script>
+import qs from 'qs';
 import BaseModal from '../BaseModal';
 import Platform from '@src/platform';
-import { stringify, } from '@src/util/querystring';
 import http from '@src/util/http';
 
 export default {
@@ -28,6 +27,7 @@ export default {
   props: {
     columns: Array,
     action: String,
+    buildParams: Function,
     title: {
       type: String,
       default: '导出列选择'
@@ -71,40 +71,26 @@ export default {
       if(this.checkedArr.length == 0) return Platform.alert('请至少选择一列导出');
 
       this.pending = true;
-      // let model = {
-      //   checked: this.checkedArr.join(','),
-      //   ids: this.ids.join(','),
-      // };
+      let params = {
+        checked: this.checkedArr.join(','),
+        ids: this.ids.join(','),
+      };
       // doubt
-      let params = this.$parent.buildExportParams(this.checkedArr, this.ids);
 
-      // let params = {
-      //   customerChecked: this.checkedArr,
-      //   data: '',
-      //   exportSearchModel: JSON.stringify(this.$parent.buildParams() || {}),
-      // };
-      //
-      // if (this.ids.length) {
-      //   params = {
-      //     customerChecked: this.checkedArr,
-      //     data: this.ids,
-      //     exportSearchModel: '',
-      //   };
-      // }
+      if (this.buildParams) {
+        params = this.buildParams();
+      }
 
 
-      // console.log('model', model);
-      console.log('params', params);
 
       let ua = navigator.userAgent;
       if (ua.indexOf('Trident') >= 0){
-        window.location.href = `${this.action}?${stringify(params)}`;
+        window.location.href = `${this.action}?${qs.stringify(params)}`;
         this.visible = false;
         return
       }
 
-      // http.get(`${this.action}`, params, {responseType: 'blob'}).then(blob => {
-      http.get(`${this.action}?${stringify(params)}`, {}, {responseType: 'blob'}).then(blob => {
+      http.get(`${this.action}?${qs.stringify(params)}`, {}, {responseType: 'blob'}).then(blob => {
         let link = document.createElement('a');
         let url = URL.createObjectURL(blob);
         link.download = this.fileName;

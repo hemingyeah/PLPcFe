@@ -18,21 +18,22 @@ import {
   Popover,
   Button,
   ButtonGroup,
-  Row,
-  Col,
+  // Row,
+  // Col,
   Cascader,
   DropdownMenu,
   DropdownItem,
   Dropdown,
   Checkbox,
-  Dialog, //待删除
+  // Dialog, //待删除
   Form,
   FormItem,
   RadioGroup,
   Radio,
   TimePicker,
   Loading,
-  CheckboxGroup
+  CheckboxGroup,
+  Switch
 } from 'element-ui';
 
 const ElementUI = {
@@ -51,7 +52,7 @@ const ElementUI = {
     Vue.use(DatePicker);
     Vue.use(Select);
     Vue.use(Option);
-    Vue.use(Popover)
+    Vue.use(Popover);
     Vue.use(Button);
     Vue.use(ButtonGroup);
     Vue.use(Cascader);
@@ -59,17 +60,18 @@ const ElementUI = {
     Vue.use(DropdownItem);
     Vue.use(Dropdown);
     Vue.use(Checkbox);
-    Vue.use(Dialog);
+    // Vue.use(Dialog);
     Vue.use(FormItem);
     Vue.use(RadioGroup);
     Vue.use(Radio);
     Vue.use(TimePicker);
     Vue.use(Loading);
     Vue.use(CheckboxGroup);
+    Vue.use(Switch);
 
     // layout
-    Vue.use(Row);
-    Vue.use(Col);
+    // Vue.use(Row);
+    // Vue.use(Col);
 
 
   }

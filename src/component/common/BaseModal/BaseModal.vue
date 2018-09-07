@@ -8,7 +8,7 @@
           <slot name="header">
             <h3>{{ title }}</h3>
             <button type="button" class="btn-text base-modal-header-close" @click="close" v-if="closeable">
-              <i class="iconfont icon-close"></i>
+              <i class="iconfont icon-guanbi"></i>
             </button>
           </slot>
         </div>

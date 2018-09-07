@@ -7,7 +7,13 @@ const modules = require('../../config/modules');
 
 router.get('/customer', async ctx => {
   let script = ['/customer.list.js'];
-  ctx.body = Template.renderWithData('客户管理', {}, script)
+  let modConfig = modules['customer.list'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request('/v2/customer/jump', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  console.log('body', body);
+
+  ctx.body = Template.renderWithHtml('客户管理', body, script, modConfig.template)
 });
 
 router.get('/customer/create', async ctx => {

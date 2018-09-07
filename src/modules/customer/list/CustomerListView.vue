@@ -5,7 +5,7 @@
       <form @submit.prevent="search" class="base-search">
         <div>
           <el-input v-model="params.keyword" placeholder="根据客户信息搜索"></el-input>
-          <el-button type="primary" @click="search" native-type="submit">搜索</el-button>
+          <el-button type="primary" @click="search">搜索</el-button>
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
         </div>
         <el-button type="primary"  @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
@@ -187,10 +187,10 @@
     <div class="customer-list-component">
       <!--operation bar start-->
       <div class="operation-bar-container">
-        <el-button-group>
-          <el-button type="primary" icon="el-icon-plus">新建</el-button>
-          <el-button type="primary" icon="el-icon-delete" @click="deleteCustomer">删除</el-button>
-        </el-button-group>
+        <div class="top-btn-group">
+          <el-button type="primary" icon="el-icon-plus" @click="jumpPage">新建</el-button>
+          <el-button type="primary" icon="el-icon-delete" @click="deleteCustomer" class="delete-customer-btn">删除</el-button>
+        </div>
 
         <div>
           <el-dropdown trigger="click">
@@ -206,17 +206,6 @@
               </el-dropdown-item>
               <el-dropdown-item>
                 <div @click="openDialog('remind')">批量提醒</div>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-
-          <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
-            <el-button type="primary">
-              选择列<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
-            <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
-              <el-dropdown-item v-for="item in columns" :key="item.label">
-                <el-checkbox v-model="item.show" @input="modifyColumnStatus($event)" :label="item.label">{{item.label}}</el-checkbox>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -239,6 +228,16 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
+          <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
+            <el-button type="primary">
+              选择列<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
+              <el-dropdown-item v-for="item in columns" :key="item.label">
+                <el-checkbox v-model="item.show" @input="modifyColumnStatus($event)" :label="item.label">{{item.label}}</el-checkbox>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
       </div>
       <!--operation bar end-->
@@ -251,7 +250,7 @@
         @sort-change="sortChange"
         row-key="serialNumber"
         @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
-        <el-table-column type="selection" width="35"></el-table-column>
+        <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
         <el-table-column
           v-for="column in columns"
           :key="column.field"
@@ -260,7 +259,7 @@
           :prop="column.field"
           v-if="column.show"
           :sortable="column.sortable"
-          align="center"
+          :align="column.align"
           show-overflow-tooltip>
           <template slot-scope="scope">
             <template v-if="column.field === 'customerAddress'">
@@ -273,7 +272,11 @@
               {{scope.row.tagsStr}}
             </template>
             <template v-else-if="column.field === 'status'">
-              <el-checkbox :class="{'not-checked': !scope.row.status}" v-model="scope.row.status" @change="toggleStatus(scope.row)"></el-checkbox>
+              <el-switch
+                :disabled="pending"
+                @change="toggleStatus(scope.row)"
+                v-model="scope.row.status">
+              </el-switch>
             </template>
             <template v-else-if="column.field === 'createUser'">
               {{scope.row.createUserName}}
@@ -293,8 +296,11 @@
 
       <div class="table-footer">
         <div class="list-info">
-          已选中 <span class="selectedCount"  @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条 <a href="javasript:;" class="clearSelectedBtn" @click="toggleSelection()">清空</a>
-          共 {{paginationInfo.totalItems}} 记录  共 {{paginationInfo.totalPages}} 页
+          <i class="iconfont icon-abnormal"></i>
+          已选中 <span class="selectedCount"  @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条
+          <span class="selectedCount" @click="toggleSelection()">清空</span>
+          <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录</span>
+          <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalPages}}</span>页</span>
         </div>
         <el-pagination
           class="customer-table-pagination"
@@ -353,6 +359,7 @@
     <base-export
       ref="exportPanel"
       :columns="columns"
+      :buildParams="buildExportParams"
       action="/customer/export" />
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
@@ -362,13 +369,13 @@
       </h4>
       <dl class="selected-customer-list">
         <dt>
+          <span class="sn">编号</span>
           <span class="name-column">客户</span>
-          <span class="sn-column">编号</span>
           <i></i>
         </dt>
         <dd v-for="c in multipleSelection" :key="c.id" @click="cancelSelectCustomer(c)">
-          <span class="name-column">{{c.name}}</span>
           <span class="sn">{{c.serialNumber}}</span>
+          <span class="name-column">{{c.name}}</span>
           <i class="iconfont icon-close"></i>
         </dd>
       </dl>
@@ -461,7 +468,7 @@
       multipleSelection: [],
       // data from remote
       customers: [],
-      columns: [],
+      columns: this.fixedColumns(),
       customerConfig: {},
       searchFields: [],
       inputRemoteSearch: {
@@ -484,37 +491,56 @@
       },
     };
   },
-
   computed: {
     selectedIds() {
       return this.multipleSelection.map(c => c.id) || [];
     },
   },
   mounted() {
-    this.fetchConfig();
+    let initData = JSON.parse(window._init) || {};
     const localStorageData = this.getLocalStorageData();
     if (localStorageData.pageSize) {
       this.params.pageSize = Number(localStorageData.pageSize);
       this.paginationInfo.pageSize = Number(localStorageData.pageSize);
     }
+    this.customerConfig = {
+      customerAddressConfig: initData.customerAddressConfig,
+      customerConfig: initData.customerConfig,
+      fieldInfo: initData.fieldInfo,
+    };
+
+    this.buildConfig();
 
     this.search();
-
-    // const test = this.deleteValueFromObject({
-    //   test1: 0,
-    //   testNull: null,
-    //   testFalse: false,
-    //   testUndefined: undefined,
-    //   subObj: {
-    //     test1: 0,
-    //     testNull: null,
-    //     testFalse: false,
-    //     testUndefined: undefined,
-    //   }
-    // });
-    // console.log('test', test);
   },
   methods: {
+    buildConfig() {
+      this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
+        .map(f => {
+          if (f.isSearch) {
+            // 需要搜索的字段
+            this.$set(this.customizedSearchModel, f.fieldName, {
+              fieldName: f.fieldName,
+              value: null,
+              operator: this.matchOperator(f.formType),
+              formType: f.formType,
+            });
+            this.searchFields.push(f);
+            if (f.formType === 'number') {
+              this.$set(this.specialParams, `lpad(myOrderConvertor(customer.attribute->>'$.${f.fieldName}'),16,0)`, '')
+            }
+            if (f.formType === 'date' || f.formType === 'datetime') {
+              this.$set(this.specialParams, `myOrderConvertor(customer.attribute->>'$.${f.fieldName}')`, '')
+            }
+          }
+
+          return f;
+        });
+      this.columns = this.buildTableColumn();
+    },
+    jumpPage() {
+      window.location = '/customer/create';
+    },
     buildExportParams(checkedArr, ids) {
       let params = {};
 
@@ -545,22 +571,6 @@
     importSucc() {
 
     },
-    cancelSelectCustomer(customer) {
-      if (!customer || !customer.id) return;
-      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
-      this.toggleSelection([customer]);
-    },
-    toggleStatus(row) {
-      const params = {
-        id: row.id,
-        status: Number(row.status),
-      };
-
-      this.$http.post('/customer/changeState', params, false)
-        .catch(err => {
-          console.error('toggleStatus catch err', err);
-        })
-    },
     search() {
       const params = this.buildParams();
       this.loadingListData = true;
@@ -568,7 +578,7 @@
       this.$http.post('/v2/customer/list', params)
         .then(res => {
           if (!res || !res.list) {
-            return this.customers = [];
+            this.customers = [];
             this.paginationInfo.totalItems = 0;
             this.paginationInfo.totalPages = 0;
             this.paginationInfo.pageNum = 1;
@@ -591,38 +601,8 @@
 
         .catch(err => {
           this.loadingListData = false;
-          console.log('err', err);
+          console.error('err', err);
         })
-    },
-    fetchConfig() {
-      this.$http.get('/v2/customer/getConfig')
-        .then(result => {
-          const customerConfig = result;
-          customerConfig.fieldInfo = result.fieldInfo
-            .map(f => {
-              if (f.isSearch) {
-                // 需要搜索的字段
-                this.$set(this.customizedSearchModel, f.fieldName, {
-                  fieldName: f.fieldName,
-                  value: null,
-                  operator: this.matchOperator(f.formType),
-                  formType: f.formType,
-                });
-                this.searchFields.push(f);
-                // console.log('f', f);
-                if (f.formType === 'number') {
-                  this.$set(this.specialParams, `lpad(myOrderConvertor(customer.attribute->>'$.${f.fieldName}'),16,0)`, '')
-                }
-                if (f.formType === 'date' || f.formType === 'datetime') {
-                  this.$set(this.specialParams, `myOrderConvertor(customer.attribute->>'$.${f.fieldName}')`, '')
-                }
-              }
-
-              return f;
-            });
-          this.customerConfig = customerConfig;
-          this.columns = this.buildTableColumn();
-        });
     },
     // process raw data
     buildParams() {
@@ -686,13 +666,13 @@
         params.conditions = conditions;
       }
 
-      console.log('[build params end]params', params);
+      // console.log('[build params end]params', params);
       return params;
     },
     deleteValueFromObject(obj, except = [] ) {
       if (except.length) {
         Object.keys(obj)
-          .map(key => {
+          .forEach(key => {
             if (typeof obj[key] === 'object' && obj[key]) {
               obj[key] = this.deleteValueFromObject(obj[key], except);
             }
@@ -702,7 +682,7 @@
           });
       } else {
         Object.keys(obj)
-          .map(key => {
+          .forEach(key => {
             if (typeof obj[key] === 'object' && obj[key]) {
               obj[key] = this.deleteValueFromObject(obj[key]);
             }
@@ -730,7 +710,7 @@
 
         // c.attribute is the object that includes all customized field.
         Object.keys(c.attribute)
-          .map(key => {
+          .forEach(key => {
             tv = c.attribute[key];
 
             if (Array.isArray(c.attribute[key]) && (typeof c.attribute[key][0] === "string")) {
@@ -752,13 +732,30 @@
         return c;
       })
     },
-
     handleCitySelectorChange(city) {
       this.specialParams.addressSelector = city;
     },
+    cancelSelectCustomer(customer) {
+      if (!customer || !customer.id) return;
+      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
+      this.toggleSelection([customer]);
+    },
+    toggleStatus(row) {
+      const params = {
+        id: row.id,
+        status: Number(row.status),
+      };
 
-    // search method end
-    // list method start
+      this.pending = true;
+      this.$http.post('/customer/changeState', params, false)
+        .then(res => {
+          this.pending = false;
+        })
+        .catch(err => {
+          this.pending = false;
+          console.error('toggleStatus catch err', err);
+        })
+    },
     sortChange(option) {
       const { column, prop, order } = option;
       if (!column || !prop || !order) return;
@@ -853,28 +850,15 @@
             this.search();
           })
           .catch(err => console.error('deleteCustomer err', err));
-
-
       } catch (e) {
         console.error('deleteCustomer catch error', e);
       }
     },
-    sendMessage() {
-      console.log('sendMessage');
-    },
-    batchEditCustomer() {
-      // console.log('batchEditCustomer');
-    },
-    remindMultipleCustomer() {
-      // console.log('remindMultipleCustomer');
-    },
-
     // columns
     modifyColumnStatus() {
       const showColumns = this.columns.filter(c => c.show).map(c => c.field);
       this.saveDataToStorage('columnStatus', showColumns);
     },
-
     // common methods
     getLocalStorageData() {
       const dataStr = localStorage.getItem('customerListData') || '{}';
@@ -888,65 +872,8 @@
     buildTableColumn() {
       const localStorageData = this.getLocalStorageData();
       let columnStatus = localStorageData.columnStatus || [];
-      let baseColumns = [{
-        label: '客户',
-        field: 'name',
-        show: true,
-        // width: '100px',
-      }, {
-        label: '客户编号',
-        field: 'serialNumber',
-        show: true,
-        // width: '100px',
-      }, {
-        label: '联系人',
-        field: 'lmName',
-        show: true,
-        // width: '100px',
-      }, {
-        label: '电话',
-        field: 'lmPhone',
-        show: true,
-        // width: '120px',
-      }, {
-        label: '区域',
-        field: 'customerAddress',
-        show: true,
-        // width: '150px',
-      }, {
-        label: '详细地址',
-        field: 'detailAddress',
-        show: true,
-        // width: '100px',
-      }, {
-        label: '服务团队',
-        field: 'tags',
-        show: true,
-        // width: '100px',
-      }, {
-        label: '客户负责人',
-        field: 'customerManagerName',
-        show: true,
-      }, {
-        label: '启用/禁用',
-        field: 'status',
-        show: true,
-      }, {
-        label: '创建时间',
-        field: 'createTime',
-        show: true,
-        sortable: 'custom',
-        width: '100px',
-      }
-        , {
-          label: '创建人',
-          field: 'createUser',
-          show: true,
-        }, {
-          label: '提醒数量',
-          field: 'remindCount',
-          show: true,
-        }]
+
+      let baseColumns = this.fixedColumns();
       let dynamicColumns = [];
       let columns = [];
 
@@ -1094,7 +1021,14 @@
     matchSelected() {
       if (!this.multipleSelection.length) return;
       const selected = this.customers
-        .filter(c => this.multipleSelection.some(sc => sc.id === c.id)) || [];
+        .filter(c => {
+          if (this.multipleSelection.some(sc => sc.id === c.id)) {
+            this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
+            this.multipleSelection.push(c);
+            return c;
+          }
+        }) || [];
+
       this.$nextTick(() => {
         this.toggleSelection(selected);
       });
@@ -1112,6 +1046,62 @@
       if (!nameKeys[0]) return obj[objKeys[0]];
       return obj[nameKeys[0]];
     },
+    fixedColumns() {
+      return [{
+        label: '客户',
+        field: 'name',
+        show: true,
+      }, {
+        label: '客户编号',
+        field: 'serialNumber',
+        show: true,
+      }, {
+        label: '联系人',
+        field: 'lmName',
+        show: true,
+      }, {
+        label: '电话',
+        field: 'lmPhone',
+        show: true,
+      }, {
+        label: '区域',
+        field: 'customerAddress',
+        show: true,
+      }, {
+        label: '详细地址',
+        field: 'detailAddress',
+        show: true,
+      }, {
+        label: '服务团队',
+        field: 'tags',
+        show: true,
+      }, {
+        label: '客户负责人',
+        field: 'customerManagerName',
+        show: true,
+        width: '100px',
+      }, {
+        label: '启用/禁用',
+        field: 'status',
+        show: true,
+        align: 'center'
+      }, {
+        label: '创建时间',
+        field: 'createTime',
+        show: true,
+        sortable: 'custom',
+        width: '100px',
+      }, {
+        label: '创建人',
+        field: 'createUser',
+        show: true,
+      }, {
+        label: '提醒数量',
+        field: 'remindCount',
+        show: true,
+      }]
+    }
+
   },
   components: {
     [BasePanel.name]: BasePanel,
@@ -1126,42 +1116,9 @@
 </script>
 
 <style lang="scss">
-  .not-checked {
-    .el-checkbox__input {
-
-      .el-checkbox__inner {
-        border-color: $color-primary;
-      }
-      .el-checkbox__inner:after {
-        content: "";
-        position: absolute;
-        display: block;
-        background-color: $color-primary;
-        height: 2px;
-        transform: rotateZ(45deg);
-        left: 0;
-        right: 0;
-        top: 5px;
-        width: 12px;
-        border: none;
-      }
-
-      .el-checkbox__inner:before {
-        content: "";
-        position: absolute;
-        display: block;
-        background-color: $color-primary;
-        height: 2px;
-        width: 12px;
-        transform: rotateZ(135deg);
-        left: 0;
-        right: 0;
-        top: 5px;
-        border: none;
-      }
-    }
+  .level-padding {
+    padding: 0 5px;
   }
-
 
   .customer-list-container {
     height: 100%;
@@ -1170,7 +1127,7 @@
     padding: 10px;
 
     .panel-title {
-      font-size: 18px;
+      font-size: 16px;
       line-height: 60px;
       padding: 0 25px;
       color: rgb(132, 138, 147);
@@ -1178,6 +1135,9 @@
       font-weight: normal;
       display: flex;
       justify-content: space-between;
+      .iconfont:hover {
+        cursor: pointer;
+      }
     }
   }
   // search
@@ -1192,7 +1152,7 @@
       font-size: 14px;
       display: flex;
       justify-content: space-between;
-      padding: 12px 24px;
+      padding: 12px 10px;
 
       div {
         .el-input {
@@ -1285,8 +1245,21 @@
     padding-top: 10px;
 
     .customer-table {
-      margin-top: 10px;
       border-radius: 3px;
+      th {
+        color: #606266;
+        font-size: 14px;
+      }
+      td {
+        color: #909399;
+        font-size: 13px;
+      }
+
+
+      .select-column .el-checkbox {
+        position: relative;
+        top: 3px;
+      }
     }
 
     .table-footer {
@@ -1300,9 +1273,15 @@
         line-height: 28px;
         margin: 0;
         color: #767e89;
+        .iconfont {
+          position: relative;
+          top: 1px;
+        }
         .selectedCount {
           color: $color-primary;
           padding: 0 3px;
+          width: 15px;
+          text-align: center;
           &:hover {
             cursor: pointer;
           }
@@ -1322,7 +1301,7 @@
     .selected-customer-list {
       overflow-y: scroll;
       padding: 0 20px;
-      line-height: 40px;
+      line-height: 30px;
       font-size: 14px;
       height: calc(100% - 130px);
       dt, dd {
@@ -1348,13 +1327,13 @@
 
       .name-column {
         padding: 0 5px;
-        width: 120px;
+        width: 220px;
         @include text-ellipsis;
       }
       .sn {
         padding: 0 5px;
         @include text-ellipsis;
-        width: 220px;
+        width: 120px;
       }
     }
 
@@ -1382,5 +1361,17 @@
     display: flex;
     justify-content: space-between;
     padding: 10px;
+
+    .top-btn-group .el-button, .el-button {
+      font-weight: lighter;
+      font-size: 14px;
+    }
+
+    .delete-customer-btn {
+      background: #fff;
+      color: #81848F;
+      border-color: rgb(218, 218, 220);
+      margin-left: 5px;
+    }
   }
 </style>

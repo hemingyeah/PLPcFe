@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="添加提醒" :show.sync="batchRemindingCustomerDialog" width="600px" class="batch-remind-customer-dialog">
+  <base-modal title="添加提醒" :show.sync="batchRemindingCustomerDialog" width="500px" class="batch-remind-customer-dialog">
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
@@ -7,7 +7,7 @@
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="提醒内容">
+      <el-form-item label="提醒内容" class="content-item">
         {{selectedRemind.content}}
       </el-form-item>
       <el-form-item label="提醒规则">
@@ -116,7 +116,7 @@
               this.$platform.alert(`批量添加提醒失败，以下客户已存在该提醒：${res.data.join(',')}`);
             }
             this.batchRemindingCustomerDialog = false;
-            console.log('post to /scheduler/buildBatch err', res);
+            // console.log('post to /scheduler/buildBatch err', res);
           })
           .catch(err => {
             this.$platform.alert('批量添加提醒失败');
@@ -191,6 +191,21 @@
 
     .el-form-item {
       margin: 0;
+    }
+    .el-radio {
+      line-height: 32px;
+    }
+
+    .el-select {
+      width: 90%;
+    }
+
+    .content-item {
+      width: 93%;
+      .el-form-item__content{
+        max-height: 200px;
+        overflow-y: auto;
+      }
     }
 
     .dialog-footer {

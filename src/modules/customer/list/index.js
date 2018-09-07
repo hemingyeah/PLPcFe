@@ -10,7 +10,6 @@ import platform from '@src/platform';
 
 
 import http from '../../../util/http';
-import Loading from '../../../component/BaseLoading'
 
 import CustomerListView from './CustomerListView.vue';
 
@@ -19,8 +18,6 @@ Vue.use(component);
 
 Vue.prototype.$http = http;
 Vue.prototype.$platform = platform;
-// Vue.prototype.$loading = Loading;
-// Vue.prototype.$eventBridge = new Vue();
 
 const CustomerListViewComp = Vue.extend(CustomerListView);
 const app = new CustomerListViewComp({

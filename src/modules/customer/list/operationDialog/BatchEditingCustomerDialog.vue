@@ -1,6 +1,5 @@
 <template>
-
-  <base-modal title="批量编辑" :show.sync="batchEditingCustomerDialog" width="600px" class="batch-editing-customer-dialog">
+  <base-modal title="批量编辑" :show.sync="batchEditingCustomerDialog" width="500px" class="batch-editing-customer-dialog">
     <el-form ref="editCustomerForm" :model="form" label-width="100px">
       <el-form-item label="修改字段">
         <el-select v-model="selectedFieldName" @change="handleFieldIdChange">
@@ -9,14 +8,14 @@
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-if="selectedField.formType === 'text' || selectedField.formType === 'code'">
         <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50" type="text"></el-input>
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'address'">
         <base-dist-picker v-on:city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
@@ -24,10 +23,9 @@
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'tags'">
-
         <el-select
         v-model="form.tags"
         multiple
@@ -35,6 +33,7 @@
         remote
         reserve-keyword
         placeholder=""
+        @change="selectTag"
         :loading="inputRemoteSearch.tag.loading"
         :remote-method="searchTag">
           <el-option
@@ -48,7 +47,7 @@
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'manager' || selectedField.formType === 'user'">
         <el-select
@@ -69,7 +68,7 @@
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'selectMulti'">
         <el-select v-model="form[selectedField.fieldName]" multiple placeholder="请选择">
@@ -83,7 +82,7 @@
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'select'">
         <el-select v-model="form[selectedField.fieldName]" placeholder="请选择">
@@ -97,21 +96,21 @@
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'textarea'">
         <el-input v-model="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="textarea" maxlength="500" rows="10" resize="none"></el-input>
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'number'">
         <el-input v-model.number="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="number" maxlength="60"></el-input>
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'datetime'">
         <el-date-picker
@@ -123,7 +122,7 @@
       </el-form-item>
       <el-form-item
         label="修改为"
-        :prop="selectedField.fieldName"
+        :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'date'">
         <el-date-picker
@@ -144,6 +143,7 @@
 <script>
   import BaseModal from '../../../../component/common/BaseModal';
   import BaseDistPicker from '../../../../component/common/BaseDistPicker';
+  import { formatDate, } from '../../../../util/lang';
 
   export default {
     name: "batch-editing-customer-dialog",
@@ -159,15 +159,6 @@
             options: [],
             loading: false,
           },
-
-          linkman: {
-            options: [],
-            loading: false,
-          },
-          creator: {
-            options: [],
-            loading: false,
-          },
         },
 
         form: {
@@ -179,16 +170,20 @@
             city: '',
             dist: '',
             address: '',
+            addressType: 0,
+            latitude: '',
+            longitude: '',
           },
           tags: [],
           manager: '',
         },
         selectedFieldName: '',
-        selectedField: {},
         batchEditingCustomerDialog: false,
         pending: false,
         editableFields: [],
         fixedFieldsCount: 6,
+        selectedTags: [],
+        formBackup: {},
       }
     },
     props: {
@@ -202,64 +197,54 @@
       }
     },
     computed: {
+      selectedField() {
+        return this.editableFields.filter(ef => ef.fieldName === this.selectedFieldName)[0] || {};
+      }
     },
     mounted() {
-      console.log('mounted');
       this.buildFields();
     },
     methods: {
       async onSubmit() {
-        console.log('submit!');
         try {
-          const valid = await this.$refs.editCustomerForm.validate;
+          const valid = await this.$refs.editCustomerForm.validate();
           if (!valid) return;
 
-          const params = {
-            mapJson: JSON.stringify({
-              [this.selectedFieldName]: this.form[this.selectedFieldName],
-            }),
-            ids: this.selectedIds.join(','),
-          };
+          this.pending = true;
+          const params = this.buildParams();
 
           const res = await this.$http.post('/customer/editBatch', params, false);
 
           if (res.status === 0) {
-            // success
-            this.batchEditingCustomerDialog = false;
+            this.$parent.search();
           }
 
+          if (res.status === 1 && res.message) {
+            this.$platform.alert(res.message);
+          }
 
+          this.batchEditingCustomerDialog = false;
+          this.pending = false;
         } catch (e) {
+          if (e !== false) {
+            this.batchEditingCustomerDialog = false;
+            this.pending = false;
+          }
           console.error('onSubmit editBatch catch e', e);
         }
       },
       handleCitySelectorChange(city) {
         this.addressSelector = city;
-        this.form.address = {
-          adProvince: city[0],
-          adCity: city[1] || '',
-          adDist: city[2] || '',
-        }
+
+        this.form.address.province = city[0];
+        this.form.address.city = city[1] || '';
+        this.form.address.dist = city[2] || '';
       },
       handleFieldIdChange() {
-        this.editableFields.forEach(ef => {
-          if (ef.fieldName === this.selectedFieldName) {
-            this.selectedField = ef;
-            console.log('this.selectedField', this.selectedField);
-          } else {
-            this.form[ef.fieldName] = ef.formType === 'selectMulti' ? [] : '';
-          }
+        this.$nextTick(() => {
+          this.form = JSON.parse(JSON.stringify(this.formBackup));
+          this.$refs.editCustomerForm.resetFields();
         });
-        this.form.address = {
-          province: '',
-            city: '',
-            dist: '',
-            address: '',
-        };
-        this.form.tags = [];
-        this.form.manager = '';
-
-        this.$refs.editCustomerForm.resetFields();
       },
       openBatchEditingCustomerDialog() {
         if (!this.selectedIds.length) {
@@ -267,6 +252,15 @@
         }
         this.batchEditingCustomerDialog = true;
         this.buildDynamicField();
+      },
+      selectTag(val) {
+        const ts = this.inputRemoteSearch.tag.options;
+        this.selectedTags = ts
+          .filter(t => val.some(v => v === t.id))
+          .map(t => ({
+            id: t.id,
+            tagName: t.tagName,
+          }));
       },
       buildDynamicField() {
         if (this.editableFields.length > this.fixedFieldsCount) return;
@@ -306,6 +300,7 @@
             return f;
           });
 
+        this.formBackup = JSON.parse(JSON.stringify(this.form));
         this.editableFields = [...this.editableFields, ...customizedField];
       },
       buildFields() {
@@ -348,7 +343,7 @@
           rules: [{
             trigger: ['blur', 'change'],
             validator(rule, value, callback) {
-              if (!value.adProvince || !value.address) {
+              if (!value.province || !value.address) {
                 callback(new Error('请输入客户地址'));
               }
               callback();
@@ -367,7 +362,7 @@
           formType: "manager",
           displayName: '客户负责人',
           rules: [{
-            trigger: ['blur', 'change'],
+            trigger: ['change'],
             required: true, message: '请选择客户负责人',
           }]
 
@@ -375,7 +370,43 @@
 
         this.editableFields = [...fixedFields];
         this.selectedFieldName = this.editableFields[0].fieldName;
-        this.selectedField = this.editableFields[0];
+      },
+      buildParams() {
+        let tv = null;
+        let params = {
+          mapJson: JSON.stringify({
+            [this.selectedFieldName]: this.form[this.selectedFieldName],
+          }),
+          ids: this.selectedIds.join(','),
+        };
+
+        if (this.selectedFieldName === 'tags') {
+          params.mapJson = JSON.stringify({
+            [this.selectedFieldName]: this.selectedTags,
+          })
+        }
+        if (this.selectedFieldName === 'manager' || this.selectedField.formType === 'user') {
+          tv = this.inputRemoteSearch.customerManager.options
+            .filter(cm => cm.userId === this.form[this.selectedFieldName])[0] || {};
+
+          params.mapJson = JSON.stringify({
+            [this.selectedFieldName]: {
+              id: tv.userId,
+              name: tv.displayName,
+            },
+          })
+        }
+        if (this.selectedField.formType === 'datetime') {
+          params.mapJson = JSON.stringify({
+            [this.selectedFieldName]: formatDate(this.form[this.selectedFieldName], 'YYYY-MM-DD HH:mm:ss'),
+          })
+        }
+        if (this.selectedField.formType === 'date') {
+          params.mapJson = JSON.stringify({
+            [this.selectedFieldName]: formatDate(this.form[this.selectedFieldName], 'YYYY-MM-DD'),
+          })
+        }
+        return params;
       },
       searchTag(keyword) {
         this.inputRemoteSearch.tag.loading = true;
@@ -409,16 +440,25 @@
 
     .base-modal-body {
       padding: 10px;
-      padding-right: 100px;
+      padding-right: 50px;
+    }
+
+    .el-form-item.is-required .el-form-item__label:before {
+      content: '';
     }
 
     .el-form-item {
       margin: 0;
+
       .el-select {
         width: 100%;
       }
       .base-dist-picker {
         margin-bottom: 10px;
+      }
+
+      .el-form-item__error {
+        line-height: 24px;
       }
     }
 
