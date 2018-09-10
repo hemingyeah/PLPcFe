@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Department from './Department.vue';
+import * as dom from '@src/util/dom';
 
 const DeptComponent = Vue.extend(Department);
 
@@ -24,27 +25,28 @@ function dept(options){
       max,
     }
   });
+
   let ele = document.createElement("div");
   let body = document.body;
   let pending = false;
 
   return new Promise((resolve, reject) => {
     instance.$on('destroy', event => {
-      setTimeout(() => destory(instance), 1500);
+      setTimeout(() => dom.destroyComponent(instance), 1500);
     })
 
     instance.$on('input', user => {
       if(pending) return;
 
       pending = true;
-      resolve(user);
+      resolve({status: 0, data: user});
     });
     
     instance.$on('cancel', () => {
       if(pending) return;
-      
+
       pending = true;
-      reject('cancel')
+      resolve({status: 1, message: 'cancel'});
     })
 
     body.appendChild(ele);
@@ -52,21 +54,10 @@ function dept(options){
   })
 }
 
-/** 销毁组件 */
-function destory(instance){
-  let el = instance.$el;
-  let parent = el.parentNode;
-
-  instance.$destroy(true);
-  instance = null;
-  parent.removeChild(el); 
-}
-
 const BaseContact = {
-  choose,
-  install(Vue){
-    if(!Vue.prototype.$fast) Vue.prototype.$fast = {};
-    Vue.prototype.$fast.contact = BaseContact;
+  namespace: 'contact',
+  props: {
+    choose
   }
 };
 

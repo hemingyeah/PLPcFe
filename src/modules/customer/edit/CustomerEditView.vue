@@ -1,35 +1,37 @@
 <template>
   <div>
     <form @submit.prevent="submit">
-      <div>
-        <label>客户编号*</label>
-        <input>
-      </div>
-      <div>
-        <label>客户*</label>
-        <input>
-      </div>
-      <div>
-        <label>联系人*</label>
-        <input>
-      </div>
-      <div>
-        <label>电话*</label>
-        <input>
-      </div>
-      <div>
-        <label>地址*</label>
-        <input>
-      </div>
-      <div>
-        <label>服务团队*</label>
-        <input>
-      </div>
-      <div>
-        <label>客户负责人*</label>
-        <input>
-      </div>
-      <form-builder :fields="fields" :value="form" @update="update"></form-builder>
+      <form-builder :fields="fields" :value="form" @update="update">
+        <div>
+          <label>客户编号*</label>
+          <input>
+        </div>
+        <div>
+          <label>客户*</label>
+          <input>
+        </div>
+        <div>
+          <label>联系人*</label>
+          <input>
+        </div>
+        <div>
+          <label>电话*</label>
+          <input>
+        </div>
+        <div>
+          <label>地址*</label>
+          <input>
+          <button type="button" @click="chooseMap">地址选址</button>
+        </div>
+        <div>
+          <label>服务团队*</label>
+          <input>
+        </div>
+        <div>
+          <label>客户负责人*</label>
+          <input>
+        </div>
+      </form-builder>
       <button type="submit">提交</button>
     </form>
   </div>
@@ -47,7 +49,8 @@ export default {
   },
   data(){
     return {
-      form: {}
+      form: {},
+      address: {}
     }
   },
   computed: {
@@ -66,7 +69,14 @@ export default {
       this.$set(this.form, fieldName, newValue)
     },
     submit(){
-      console.log(this.for)
+
+    },
+    chooseMap(){
+      this.$fast.map.picker(this.address, {defaultArea: "临沂市"}).then(result => {
+        console.log(result)
+        if(result.status == 0) this.address = result.data
+      })
+      .catch(err => console.log(err));
     }
   },
   mounted(){

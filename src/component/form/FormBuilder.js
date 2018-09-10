@@ -41,6 +41,7 @@ const FormBuilder = {
 
     return (
       <div class="form-builder">
+      {this.$slots.default}
       {formGroups}
       </div>
     )

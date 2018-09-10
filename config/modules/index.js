@@ -17,6 +17,7 @@ module.exports = {
     entry: './src/modules/customer/list/index.js'
   },
   "customer.edit": {
-    entry: './src/modules/customer/edit/index.js'
+    entry: './src/modules/customer/edit/index.js',
+    template: 'src/modules/customer/edit/index.html'
   }
 }

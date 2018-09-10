@@ -1,18 +1,18 @@
 <template>
   <transition 
     name="slide-down"
-    @after-leave="$emit('closed')">
+    @after-leave="closed">
     <div v-show="show" class="base-modal-mask" @click.self="maskClose">
       <div class="base-modal transition__container" :style="{width: width}">
         <div class="base-modal-header">
           <slot name="header">
             <h3>{{ title }}</h3>
-            <button type="button" class="btn-text base-modal-header-close" @click="close" v-if="closeable">
+            <button type="button" class="btn-text base-modal-header-close" @click="cancel" v-if="closeable">
               <i class="iconfont icon-guanbi"></i>
             </button>
           </slot>
         </div>
-        <div class="base-modal-body"><slot></slot></div>  
+        <div :class="['base-modal-body', bodyClass]"><slot></slot></div>  
         <div class="base-modal-footer" v-if="$slots.footer">
           <slot name="footer"></slot>
         </div>
@@ -37,27 +37,37 @@ export default {
       type: String,
       default: '640px'
     },
-    closeable: {
+    closeable: { //是否能手动关闭
       type: Boolean,
       default: true
     },
-    maskCloseable: {
+    maskCloseable: {//是否允许点击遮罩关闭
       type: Boolean,
       default: true
-    }
+    },
+    bodyClass: String
   },
   methods: {
+    closed(){
+      this.$emit('closed'); //关闭动画结束时触发
+    },
     close(){
-      this.$emit('close');
+      this.$emit('close'); //关闭时触发
       //兼容sync
       this.$emit('update:show', false);
     },
+    cancel(){
+      this.$emit('cancel'); //点击关闭按钮，或遮罩层关闭时触发
+      this.close();
+    },
     maskClose(){
-      if(this.closeable && this.maskCloseable) this.close();
+      if(this.closeable && this.maskCloseable){
+        this.cancel();
+      }
     },
     escClose(event){
       if(this.show && this.closeable && event.keyCode == 27){
-        this.close();
+        this.cancel();
       }
     }
   },

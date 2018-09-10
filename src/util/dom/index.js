@@ -75,3 +75,13 @@ export function fullScreen(dom) {
   
   return alert('您的浏览器不支持全屏，请升级您的浏览器');
 }
+
+/** 销毁组件实例 */
+export function destroyComponent(instance){
+  let el = instance.$el;
+  let parent = el.parentNode;
+
+  instance.$destroy(true);
+  instance = null;
+  parent.removeChild(el); 
+}

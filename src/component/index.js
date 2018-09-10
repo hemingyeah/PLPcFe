@@ -4,9 +4,11 @@ import BasePanel from './common/BasePanel';
 import BaseUpload from './common/BaseUpload';
 import BaseTree from './common/BaseTree';
 import BaseContact from './common/BaseContact';
+import BaseMapPicker from './common/BaseMapPicker';
+import BaseDistPicker from './common/BaseDistPicker'
 
 import Form from './form';
-
+import Fast from './fast'
 
 const components = [
   ElementUI,
@@ -15,7 +17,10 @@ const components = [
   BaseUpload,
   BaseTree,
   BaseContact,
-  Form
+  BaseMapPicker,
+  BaseDistPicker,
+  Form,
+  Fast
 ] 
 
 export default {

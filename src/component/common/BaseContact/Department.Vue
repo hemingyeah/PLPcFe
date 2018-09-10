@@ -1,7 +1,9 @@
 <template>
   <base-modal 
     :title="title" width="800px"
-    :show.sync="show" @closed="$emit('destroy')">
+    :show.sync="show" 
+    @closed="$emit('destory')"
+    @cancel="$emit('canel')">
     <div class="bc-dept-wrap">
       <div class="bc-dept">
         <base-tree :data="depts" :selected="selectedDept" @node-selected="chooseDept"/>

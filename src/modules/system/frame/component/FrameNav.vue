@@ -188,9 +188,9 @@ export default {
 }
 
 .frame-float-menu-title{
-  border-top: 4px solid lighten($color-primary, 3%);
+  //border-top: 4px solid lighten($color-primary, 3%);
   font-size: 16px;
-  padding: 12px 15px;
+  padding: 14px 14px;
   line-height: 24px;
   //color: $text-color-primary;
   color: #303133;
