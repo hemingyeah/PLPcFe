@@ -3,16 +3,18 @@ const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
 const router = new KoaRouter();
-const modules = require('../../config/modules');
 
 router.get('/v_open/dailyReport', async ctx => {
   let script = ['/open.dailyReport.js'];
-  // let modConfig = modules['report.subscibe'];
-  // let reqHeaders = ctx.request.headers;
-  // let result = await HttpClient.request('/v2/report/subscibe', 'get', null, {headers: reqHeaders});
-  // let body = result.body; ctx.body = Template.renderWithData('demo', {}, script)
+  let reqHeaders = ctx.request.headers;
+  let queryString = ctx.request.querystring;
+  let path = `/v_open/dailyReport?${queryString}`
 
-  ctx.body = Template.renderWithData('订阅汇总信息每日通知日报', {}, script)
+  //let path = '/v_open/dailyReport?tenantId=7416b42a-25cc-11e7-a500-00163e12f748&module=personal&staffId=1159676932953183&appId=3397';
+  let result = await HttpClient.request(path, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+ 
+  ctx.body = Template.renderWithHtml('订阅汇总信息每日通知日报', body, script)
 });
 
 module.exports = router;

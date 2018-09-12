@@ -1,67 +1,30 @@
 <template>
   <div class="daily-report">
-    <!-- <img :src="`/files/getDailyBanner?module=${item.module}`" alt=""> -->
-    <div v-for="item in items.details" :key="item.key" class="report-list">
-      <div class="name"><div>{{item.name}}</div></div>
-      <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}">{{item.result}}</strong>
-    </div>
-    <div class="message"><p>如需自定义日报，请到</p><p><strong>售后宝PC端[系统管理>订阅通知管理]</strong>中进行配置</p></div>
-    <div @click="jump" class="to-index-btn">进入售后宝查看详情</div>
+    <img :src="`/files/getDailyBanner?module=${items.module}`" alt="">
+    <div class="information">
+      <div v-for="item in items.details" :key="item.key" class="report-list">
+        <div class="name"><div>{{item.name}}</div></div>
+        <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}">{{item.result}}</strong>
+      </div>
+      <div class="message"><p>如需自定义日报，请到</p><p><strong>售后宝PC端[系统管理>订阅通知管理]</strong>中进行配置</p></div>
+      <div @click="jump" class="to-index-btn">进入售后宝查看详情</div>
+    </div>    
   </div>
 </template>
 
 <script>
   import '../../../assets/specile_font.css'
   export default {
-    name: "daily-report",
+    name: "daily-report-view",
+    props: {
+      initData: {
+        type: Object,
+        default: () => ({})
+      }
+    },
     data: function data() {
       return {
-        items:{
-          pcUrl:'dingtalk://dingtalkclient/action/openapp?corpid=ding73b203abd39ac5e935c2f4657eb6378f&container_type=work_platform&app_id=3397&redirect_type=jump&redirect_url=https://pubapp.shb.ltd/client/pc?corpId=ding73b203abd39ac5e935c2f4657eb6378f',
-          module: "manager", //personal
-          details:[
-            {
-              key:"1",
-              name: "今日计划工单",
-              result: 37438479312
-            },
-            {
-              key:"2",
-              name: "未完成的服务台事件",
-              result: "26479865234"
-            },
-            {
-              key:"3",
-              name: "今日计划今日计划工单今日计划工单工单",
-              result: "374384793"
-            },
-            {
-              key:"4",
-              name: "未完成的服务台事件",
-              result: "26479865"
-            },
-            {
-              key:"5",
-              name: "今日计划工单",
-              result: "3648490"
-            },
-            {
-              key:"6",
-              name: "未完成的服务台事件",
-              result: "264950"
-            },
-            {
-              key:"7",
-              name: "今日计划工单",
-              result: "26485"
-            },
-            {
-              key:"8",
-              name: "未完成的服务台事件",
-              result: "33"
-            }
-          ]
-        }
+        items:{}
       }
     },
     computed:{
@@ -74,20 +37,11 @@
         return '30px';      
       },
       jump() {
-        window.location.href = this.item.pcUrl
+        window.location.href = this.items.pcUrl;
       },
-      fetchData(){
-        let params = {};
-        this.$http.get('/dd/statistic/getDailyReport', params).then(result => {
-          this.list = result.data;
-        }).catch(err => console.log(err)) 
-      }
     },
     mounted() {
-      let params = {};
-      // params.module = ;
-      // params.staffId = ;
-      //this.fetchData();
+      this.items = this.initData;
     }
   }
 </script>
@@ -98,11 +52,14 @@ body, html{
 }
 .daily-report{
   height:100%;
-  padding-bottom:10px;
   background:#f4f7f5;
   img{
     display:block;
     width:100%;
+  }
+  .information{
+    background:#f4f7f5;
+    padding-bottom:10px;
   }
   .report-list{
     margin:8px 10px;
@@ -130,7 +87,7 @@ body, html{
       font-size:30px;
       text-align: right;
       overflow: hidden;
-      font-family: DINCondensed-Bold;
+      //font-family: DINCondensed-Bold;
     }
   }
   .to-index-btn{
