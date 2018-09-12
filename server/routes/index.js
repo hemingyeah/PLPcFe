@@ -15,7 +15,7 @@ router.get('/', async ctx => {
   let headers = {};
   let body = null;
 
-  let result = await HttpClient.request('/v3', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
 
   //请求失败,模拟登陆
   if(!result.status){
@@ -26,7 +26,7 @@ router.get('/', async ctx => {
       reqHeaders['cookie'] = cookie[0];
 
       //再次请求
-      result = await HttpClient.request('/v3', 'get', null, {headers: reqHeaders});
+      result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
     }else{
       console.log(loginRes)
     }
