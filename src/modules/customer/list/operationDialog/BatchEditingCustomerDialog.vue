@@ -1,9 +1,11 @@
 <template>
-  <base-modal title="批量编辑" @closed="reset" :show.sync="batchEditingCustomerDialog" width="500px" class="batch-editing-customer-dialog">
+  <base-modal title="批量编辑" @closed="reset" :show.sync="batchEditingCustomerDialog" width="500px"
+              class="batch-editing-customer-dialog">
     <el-form ref="editCustomerForm" :model="form" label-width="100px">
       <el-form-item label="修改字段">
         <el-select v-model="selectedFieldName" @change="handleFieldIdChange">
-          <el-option v-for="item in editableFields" :label="item.displayName" :value="item.fieldName" :key="item.fieldName"></el-option>
+          <el-option v-for="item in editableFields" :label="item.displayName" :value="item.fieldName"
+                     :key="item.fieldName"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item
@@ -12,7 +14,8 @@
         :key="selectedFieldName"
         :rules="selectedField.rules"
         v-if="selectedField.formType === 'text' || selectedField.formType === 'code'">
-        <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50" type="text"></el-input>
+        <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50"
+                  type="text"></el-input>
       </el-form-item>
       <el-form-item
         label="修改为"
@@ -21,7 +24,7 @@
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'address'">
         <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
-        <el-input placeholder="" v-model="form.address.address" type="text" />
+        <el-input placeholder="" v-model="form.address.address" type="text"/>
       </el-form-item>
       <el-form-item
         label="修改为"
@@ -30,21 +33,21 @@
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'tags'">
         <el-select
-        v-model="form.tags"
-        multiple
-        filterable
-        remote
-        reserve-keyword
-        clearable
-        placeholder=""
-        @change="selectTag"
-        :loading="inputRemoteSearch.tag.loading"
-        :remote-method="searchTag">
+          v-model="form.tags"
+          multiple
+          filterable
+          remote
+          reserve-keyword
+          clearable
+          placeholder="请输入关键词搜索"
+          @change="selectTag"
+          :loading="inputRemoteSearch.tag.loading"
+          :remote-method="searchTag">
           <el-option
-          v-for="item in inputRemoteSearch.tag.options"
-          :key="item.id"
-          :label="item.tagName"
-          :value="item.id">
+            v-for="item in inputRemoteSearch.tag.options"
+            :key="item.id"
+            :label="item.tagName"
+            :value="item.id">
           </el-option>
         </el-select>
 
@@ -60,7 +63,7 @@
           filterable
           remote
           reserve-keyword
-          placeholder=""
+          placeholder="请输入关键词搜索"
           clearable
           :loading="inputRemoteSearch.customerManager.loading"
           :remote-method="searchCustomerManager">
@@ -108,14 +111,16 @@
         :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'textarea'">
-        <el-input v-model="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="textarea" maxlength="500" rows="10" resize="none"></el-input>
+        <el-input v-model="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="textarea"
+                  maxlength="500" rows="10" resize="none"></el-input>
       </el-form-item>
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'number'">
-        <el-input v-model.number="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="number" maxlength="60"></el-input>
+        <el-input v-model.number="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="number"
+                  maxlength="60"></el-input>
       </el-form-item>
       <el-form-item
         label="修改为"
@@ -124,10 +129,10 @@
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'datetime'">
         <el-date-picker
-        v-model="form[selectedFieldName]"
-        type="datetime"
-        placeholder="选择日期时间"
-        default-time="12:00:00">
+          v-model="form[selectedFieldName]"
+          type="datetime"
+          placeholder="选择日期时间"
+          default-time="12:00:00">
         </el-date-picker>
       </el-form-item>
       <el-form-item
@@ -137,9 +142,9 @@
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'date'">
         <el-date-picker
-        v-model="form[selectedFieldName]"
-        type="date"
-        placeholder="选择日期">
+          v-model="form[selectedFieldName]"
+          type="date"
+          placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
     </el-form>
@@ -152,9 +157,7 @@
 </template>
 
 <script>
-  import BaseModal from '../../../../component/common/BaseModal';
-  import BaseDistPicker from '../../../../component/common/BaseDistPicker';
-  import { formatDate, } from '../../../../util/lang';
+  import {formatDate,} from '@src/util/lang';
 
   export default {
     name: "batch-editing-customer-dialog",
@@ -227,7 +230,7 @@
           const res = await this.$http.post('/customer/editBatch', params, false);
 
           if (res.status === 0) {
-            this.$parent.search();
+            this.$emit('submit-callback');
           }
 
           if (res.status === 1 && res.message) {
@@ -426,7 +429,7 @@
       },
       searchTag(keyword) {
         this.inputRemoteSearch.tag.loading = true;
-        this.$http.get('/task/tag/list', { keyword: keyword, pageNum: 1, })
+        this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
           .then(res => {
             this.inputRemoteSearch.tag.options = res.list;
             this.inputRemoteSearch.tag.loading = false;
@@ -435,7 +438,7 @@
       },
       searchCustomerManager(keyword) {
         this.inputRemoteSearch.customerManager.loading = true;
-        this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
+        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
           .then(res => {
             this.inputRemoteSearch.customerManager.options = res.list;
             this.inputRemoteSearch.customerManager.loading = false;
@@ -443,10 +446,6 @@
           .catch(err => console.error('searchCustomerManager function catch err', err));
       },
     },
-    components: {
-      [BaseModal.name]: BaseModal,
-      [BaseDistPicker.name]: BaseDistPicker,
-    }
   }
 </script>
 

@@ -1,19 +1,17 @@
 import '@src/assets/scss/index.scss'
-import '@src/assets/scss/_mixins.scss'
-import '@src/assets/scss/_variables.scss'
 import '@src/common/polyfill';
 
 import Vue from 'vue';
-import ElementUI from '@src/component/element-ui';
 import component from '@src/component';
 import platform from '@src/platform';
+import filter from '@src/filter';
 
 
 import http from '../../../util/http';
 
 import CustomerListView from './CustomerListView.vue';
 
-Vue.use(ElementUI);
+Vue.use(filter);
 Vue.use(component);
 
 Vue.prototype.$http = http;

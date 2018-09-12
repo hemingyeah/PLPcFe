@@ -2,10 +2,10 @@
   <div class="customer-list-container" ref="customerListPage" v-loading.fullscreen.lock="loadingListData">
     <!--搜索-->
     <div class="customer-list-search-group-container">
-      <form @submit.prevent="search" class="base-search">
+      <form class="base-search">
         <div>
           <el-input v-model="params.keyword" placeholder="根据客户信息搜索"></el-input>
-          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button type="primary" native-type="submit" @click.prevent="search({ pageNum: 1, })">搜索</el-button>
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
         </div>
         <el-button type="primary" @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
@@ -24,11 +24,14 @@
             <el-select
               v-model="params.linkmanId"
               filterable
+              clearable
               remote
               reserve-keyword
-              placeholder=""
+              placeholder="请输入关键词搜索"
               :loading="inputRemoteSearch.linkman.loading"
               :remote-method="searchLinkman">
+
+
               <el-option
                 v-for="item in inputRemoteSearch.linkman.options"
                 :key="item.id"
@@ -41,11 +44,13 @@
             <el-select
               v-model="params.tagId"
               filterable
+              clearable
               remote
               reserve-keyword
-              placeholder=""
+              placeholder="请输入关键词搜索"
               :loading="inputRemoteSearch.tag.loading"
               :remote-method="searchTag">
+
               <el-option
                 v-for="item in inputRemoteSearch.tag.options"
                 :key="item.id"
@@ -61,14 +66,14 @@
             <el-input type="text" v-model="specialParams.adAddress"></el-input>
           </el-form-item>
           <el-form-item label-width="100px" label="有无提醒">
-            <el-select v-model="params.hasRemind" placeholder="请选择">
+            <el-select v-model="params.hasRemind" clearable placeholder="请选择">
               <el-option :value="null" label="全部"></el-option>
               <el-option :value="1" label="有"></el-option>
               <el-option :value="0" label="无"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label-width="100px" label="状态">
-            <el-select v-model="params.status" placeholder="请选择">
+            <el-select v-model="params.status" clearable placeholder="请选择">
               <el-option :value="null" label="全部"></el-option>
               <el-option :value="1" label="启用"></el-option>
               <el-option :value="0" label="禁用"></el-option>
@@ -78,9 +83,10 @@
             <el-select
               v-model="params.createUser"
               filterable
+              clearable
               remote
               reserve-keyword
-              placeholder=""
+              placeholder="请输入关键词搜索"
               :loading="inputRemoteSearch.creator.loading"
               :remote-method="searchCreator">
               <el-option
@@ -95,9 +101,10 @@
             <el-select
               v-model="params.customerManager"
               filterable
+              clearable
               remote
               reserve-keyword
-              placeholder=""
+              placeholder="请输入关键词搜索"
               :loading="inputRemoteSearch.customerManager.loading"
               :remote-method="searchCustomerManager">
               <el-option
@@ -127,7 +134,7 @@
               <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="text"></el-input>
             </template>
             <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-              <el-select v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder">
+              <el-select v-model="customizedSearchModel[field.fieldName]['value']" clearable :placeholder="field.placeHolder">
                 <el-option
                   v-for="item in field.setting.dataSource"
                   :key="item"
@@ -156,9 +163,10 @@
               <el-select
                 v-model="customizedSearchModel[field.fieldName]['value']"
                 filterable
+                clearable
                 remote
                 reserve-keyword
-                placeholder="                   "
+                placeholder=""
                 :loading="inputRemoteSearch.creator.loading"
                 :remote-method="searchCreator">
                 <el-option
@@ -168,16 +176,14 @@
                   :value="item.userId">
                 </el-option>
               </el-select>
-
             </template>
             <template v-else>
               <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder"></el-input>
             </template>
           </el-form-item>
-
           <div class="advanced-search-btn-group">
             <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
-            <el-button type="primary" class="search-btn" @click="search">搜索</el-button>
+            <el-button type="primary" class="search-btn" native-type="submit" @click.prevent="search({ pageNum: 1, })">搜索</el-button>
           </div>
         </el-form>
       </base-panel>
@@ -189,7 +195,8 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <el-button type="primary" icon="el-icon-plus" @click="jumpPage">新建</el-button>
-          <el-button type="primary" icon="el-icon-delete" @click="deleteCustomer" class="delete-customer-btn">删除</el-button>
+          <el-button type="primary" icon="el-icon-delete" @click="deleteCustomer" class="delete-customer-btn">删除
+          </el-button>
         </div>
 
         <div>
@@ -198,7 +205,7 @@
               批量操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item >
+              <el-dropdown-item>
                 <div @click="openDialog('sendMessage')">发送短信</div>
               </el-dropdown-item>
               <el-dropdown-item>
@@ -209,7 +216,7 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown >
+          <el-dropdown>
             <el-button type="primary">
               更多操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -234,7 +241,9 @@
             </el-button>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.label">
-                <el-checkbox v-model="item.show" @input="modifyColumnStatus($event)" :label="item.label">{{item.label}}</el-checkbox>
+                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label">
+                  {{item.label}}
+                </el-checkbox>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -242,62 +251,76 @@
       </div>
       <!--operation bar end-->
 
-      <el-table
-        stripe
-        :data="customers"
-        @select="selectRow"
-        @select-all="selectAll"
-        @sort-change="sortChange"
-        row-key="serialNumber"
-        @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
-        <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
-        <el-table-column
-          v-for="column in columns"
-          :key="column.field"
-          :label="column.label"
-          :width="column.width"
-          :prop="column.field"
-          v-if="column.show"
-          :sortable="column.sortable"
-          :align="column.align"
-          show-overflow-tooltip>
-          <template slot-scope="scope">
-            <template v-if="column.field === 'customerAddress'">
-              {{scope.row[column.field].str}}
+      <div class="table-wrap">
+        <el-table
+          stripe
+          :data="customers"
+          @select="selectRow"
+          @select-all="selectAll"
+          @sort-change="sortChange"
+          row-key="serialNumber"
+          @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
+          <el-table-column fixed type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+          <el-table-column
+            v-for="column in columns"
+            :key="column.field"
+            :label="column.label"
+            :width="column.width"
+            :min-width="column.minWidth"
+            :prop="column.field"
+            v-if="column.show"
+            :fixed="column.fixed"
+            :sortable="column.sortable"
+            :align="column.align"
+            show-overflow-tooltip>
+            <template slot-scope="scope">
+              <template v-if="column.field === 'customerAddress'">
+                {{scope.row[column.field] | fmt_address}}
+              </template>
+              <template v-else-if="column.field === 'detailAddress'">
+                {{scope.row.customerAddress.adAddress}}
+              </template>
+              <template v-else-if="column.field === 'tags' && scope.row.tags">
+                {{scope.row.tags.map(t => t.tagName).join(' ')}}
+              </template>
+              <template v-else-if="column.field === 'status'">
+                <el-switch
+                  :disabled="pending"
+                  @change="toggleStatus(scope.row)"
+                  :value="Boolean(scope.row.status)">
+                </el-switch>
+              </template>
+              <template v-else-if="column.field === 'createUser'">
+                {{scope.row.createUserName}}
+              </template>
+              <template v-else-if="column.field === 'remindCount'">
+                {{scope.row.attribute.remindCount}}
+              </template>
+              <template v-else-if="column.formType === 'selectMulti' && scope.row.attribute[column.field]">
+                {{scope.row.attribute[column.field].join(',')}}
+              </template>
+              <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+                {{scope.row.attribute[column.field].displayName}}
+              </template>
+              <template v-else-if="column.formType === 'attachment' && scope.row.attribute[column.field]">
+                {{scope.row.attribute[column.field].map(a => a.filename).join(',')}}
+              </template>
+              <template v-else-if="column.isSystem === 0">
+                {{scope.row.attribute[column.field]}}
+              </template>
+              <template v-else>
+                {{scope.row[column.field]}}
+              </template>
             </template>
-            <template v-else-if="column.field === 'detailAddress'">
-              {{scope.row.customerAddress.adAddress}}
-            </template>
-            <template v-else-if="column.field === 'tags'">
-              {{scope.row.tagsStr}}
-            </template>
-            <template v-else-if="column.field === 'status'">
-              <el-switch
-                :disabled="pending"
-                @change="toggleStatus(scope.row)"
-                v-model="scope.row.status">
-              </el-switch>
-            </template>
-            <template v-else-if="column.field === 'createUser'">
-              {{scope.row.createUserName}}
-            </template>
-            <template v-else-if="column.field === 'remindCount'">
-              {{scope.row.attribute.remindCount}}
-            </template>
-            <template v-else-if="column.isSystem === 0">
-              {{scope.row.attribute[column.field]}}
-            </template>
-            <template v-else>
-              {{scope.row[column.field]}}
-            </template>
-          </template>
-        </el-table-column>
-      </el-table>
+          </el-table-column>
+        </el-table>
+      </div>
 
       <div class="table-footer">
         <div class="list-info">
           <i class="iconfont icon-abnormal"></i>
-          已选中 <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条
+          已选中 <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>
+          条
           <span class="selectedCount" @click="toggleSelection()">清空</span>
           <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录</span>
           <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalPages}}</span>页</span>
@@ -318,18 +341,13 @@
     <!--list end-->
 
     <!-- dialog of operation -->
-    <send-message-dialog
-      ref="messageDialog" :selected-customer="multipleSelection"/>
-
+    <batch-reminding-customer-dialog ref="batchRemindingCustomerDialog" :selected-ids="selectedIds" @success-callback="remindSuccess"></batch-reminding-customer-dialog>
+    <send-message-dialog ref="messageDialog" :selected-ids="selectedIds"></send-message-dialog>
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
       :fields="customerConfig.fieldInfo"
-      :selected-ids="selectedIds"/>
-    <!--batch-reminding-customer-dialog-->
-
-    <batch-reminding-customer-dialog
-      ref="batchRemindingCustomerDialog"
-      :selected-ids="selectedIds"/>
+      @submit-callback="search"
+      :selected-ids="selectedIds"></batch-editing-customer-dialog>
 
     <base-import
       ref="importCustomerModal"
@@ -359,7 +377,7 @@
       ref="exportPanel"
       :columns="columns"
       :build-params="buildExportParams"
-      action="/customer/export" />
+      action="/customer/export"/>
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
       <h4 class="panel-title">
@@ -386,734 +404,753 @@
 
 <script>
   import _ from 'lodash';
-  import { formatDate, } from '../../../util/lang';
-
-  import BaseDistPicker from '../../../component/common/BaseDistPicker';
-  import BasePanel from '../../../component/common/BasePanel';
+  import {formatDate,} from '../../../util/lang';
   import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
   import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
   import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
-  import BaseImport from '../../../component/common/BaseImport';
-  import BaseExport from '../../../component/common/BaseExport';
 
   export default {
-  name: 'customer-list-view',
-  data() {
-    return {
-      // self state
-      pending: false,
-      loadingListData: false,
-      advancedSearchPanelShow: false,
-      multipleSelectionPanelShow: false,
-      customizedSearchModel: {},
-      specialParams: {
-        sortBy: {
-          'customer.createTime': null,
+    name: 'customer-list-view',
+    data() {
+      return {
+        // self state
+        pending: false,
+        loadingListData: false,
+        advancedSearchPanelShow: false,
+        multipleSelectionPanelShow: false,
+        customizedSearchModel: {},
+        specialParams: {
+          sortBy: {
+            'customer.createTime': null,
+          },
+          addressSelector: [],
+          adAddress: '',
         },
-        addressSelector: [],
-        adAddress: '',
-      },
-      params: {
-        linkmanName: '',
-        createUserName: '',
-        tagName: '',
-        customerManagerName: '',
-        keyword: '',
-        viewId: '',
-        serialNumber: '',
-        linkmanId: '',
-        customerAddress: {},
-        hasRemind: '',
-        status: '',
-        createUser: '',
-        customerManager: '',
-        createTime: '',
-        pageNum: 1,
-        pageSize: 10,
-      },
-      createTimePickerOptions: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-      },
-      paginationInfo: {
-        pageSize: 10,
-        pageNum: 1,
-        totalItems: 0,
-        totalPages: 0,
-      },
-      multipleSelection: [],
-      // data from remote
-      customers: [],
-      columns: this.fixedColumns(),
-      customerConfig: {},
-      searchFields: [],
-      inputRemoteSearch: {
-        linkman: {
-          options: [],
-          loading: false,
+        params: {
+          // linkmanName: '',
+          // tagName: '',
+          createUserName: '',
+          customerManagerName: '',
+          keyword: '',
+          serialNumber: '',
+          linkmanId: '',
+          tagId: '',
+          customerAddress: {},
+          hasRemind: '',
+          status: '',
+          createUser: '',
+          customerManager: '',
+          createTime: '',
+          pageNum: 1,
+          pageSize: 10,
         },
-        tag: {
-          options: [],
-          loading: false,
-        },
-        creator: {
-          options: [],
-          loading: false,
-        },
-        customerManager: {
-          options: [],
-          loading: false,
-        },
-      },
-    };
-  },
-  computed: {
-    selectedIds() {
-      return this.multipleSelection.map(c => c.id) || [];
-    },
-  },
-  mounted() {
-    let initData = JSON.parse(window._init) || {};
-    const localStorageData = this.getLocalStorageData();
-    if (localStorageData.pageSize) {
-      this.params.pageSize = Number(localStorageData.pageSize);
-      this.paginationInfo.pageSize = Number(localStorageData.pageSize);
-    }
-    this.customerConfig = {
-      customerAddressConfig: initData.customerAddressConfig,
-      customerConfig: initData.customerConfig,
-      fieldInfo: initData.fieldInfo,
-    };
-
-    this.buildConfig();
-
-    this.search();
-  },
-  methods: {
-    buildConfig() {
-      this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
-        .map(f => {
-          if (f.isSearch) {
-            // 需要搜索的字段
-            this.$set(this.customizedSearchModel, f.fieldName, {
-              fieldName: f.fieldName,
-              value: null,
-              operator: this.matchOperator(f.formType),
-              formType: f.formType,
-            });
-            this.searchFields.push(f);
-            if (f.formType === 'number') {
-              this.$set(this.specialParams, `lpad(myOrderConvertor(customer.attribute->>'$.${f.fieldName}'),16,0)`, '')
+        createTimePickerOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
             }
-            if (f.formType === 'date' || f.formType === 'datetime') {
-              this.$set(this.specialParams, `myOrderConvertor(customer.attribute->>'$.${f.fieldName}')`, '')
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
             }
-          }
-
-          return f;
-        });
-      this.columns = this.buildTableColumn();
-    },
-    jumpPage() {
-      window.location = '/customer/create';
-    },
-    buildExportParams(checkedArr, ids) {
-      let params = {};
-
-      if (ids && ids.length) {
-        params = {
-          customerChecked: checkedArr.join(','),
-          data: ids.join(','),
-          exportSearchModel: '',
-        };
-      } else {
-        params = {
-          customerChecked: checkedArr.join(','),
-          data: '',
-          exportSearchModel: JSON.stringify(this.buildParams() || {}),
-        }
-      }
-      return params;
-    },
-    exportCustomer(exportAll){
-      let ids = [];
-      let fileName = `${formatDate(new Date(),'YYYY-MM-dd')}客户数据.xlsx`;
-      if(!exportAll){
-        if(!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
-        ids = this.selectedIds;
-      }
-      this.$refs.exportPanel.open(ids, fileName);
-    },
-    importSucc() {
-      console.log('importSucc');
-    },
-    search() {
-      const params = this.buildParams();
-      this.loadingListData = true;
-
-      this.$http.post('/v2/customer/list', params)
-        .then(res => {
-          if (!res || !res.list) {
-            this.customers = [];
-            this.paginationInfo.totalItems = 0;
-            this.paginationInfo.totalPages = 0;
-            this.paginationInfo.pageNum = 1;
-          }
-
-          this.customers = this.processRawData(res.list);
-
-          const { pages, total, pageNum, } = res;
-          this.paginationInfo.totalItems = total;
-          this.paginationInfo.totalPages = pages;
-          this.paginationInfo.pageNum = pageNum;
-          this.matchSelected();          // 把选中的匹配出来
-
-          return res;
-        })
-        .then(() => {
-          this.$refs.customerListPage.scrollTop = 0;
-          this.loadingListData = false;
-        })
-
-        .catch(err => {
-          this.loadingListData = false;
-          console.error('err', err);
-        })
-    },
-    // process raw data
-    buildParams() {
-      let tv = null; // tv means temporary variable that used inside the loop.
-      const conditions = [];
-      let params = {
-        ..._.cloneDeep(this.params),
-        ..._.cloneDeep(this.specialParams),
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
+        paginationInfo: {
+          pageSize: 10,
+          pageNum: 1,
+          totalItems: 0,
+          totalPages: 0,
+        },
+        multipleSelection: [],
+        // data from remote
+        customers: [],
+        columns: this.fixedColumns(),
+        customerConfig: {},
+        searchFields: [],
+        inputRemoteSearch: {
+          linkman: {
+            options: [],
+            loading: false,
+          },
+          tag: {
+            options: [],
+            loading: false,
+          },
+          creator: {
+            options: [],
+            loading: false,
+          },
+          customerManager: {
+            options: [],
+            loading: false,
+          },
+        },
       };
-
-      // createTime
-      if (params.createTime && params.createTime.length) {
-        params.createTimeStart = formatDate(params.createTime[0]);
-        params.createTimeEnd = `${formatDate(params.createTime[1])} 23:59:59`;
-        delete params.createTime;
-      }
-
-      // address
-      if (this.specialParams.addressSelector.length) {
-        params.customerAddress = {
-          adProvince: this.specialParams.addressSelector[0],
-          adCity: this.specialParams.addressSelector[1] || '',
-          adDist: this.specialParams.addressSelector[2] || '',
-        };
-      }
-      params.customerAddress.adAddress = this.specialParams.adAddress || '';
-
-      params = this.deleteValueFromObject(params, [0, false]);
-
-      // build customized search fields
-      Object.keys(this.customizedSearchModel)
-        .map(key => {
-          tv = this.customizedSearchModel[key];
-          if (tv.value && tv.formType === 'date') {
-            return conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
-              betweenValue2: formatDate(tv.value[1], 'YYYY-MM-DD'),
-            });
-          }
-          if (tv.value && tv.formType === 'datetime') {
-            return conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
-              betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
-            });
-          }
-
-          if (tv.value) {
-            conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              value: tv.value,
-            });
-          }
-        });
-
-      if (conditions.length) {
-        params.conditions = conditions;
-      }
-
-      // console.log('[build params end]params', params);
-      return params;
     },
-    deleteValueFromObject(obj, except = [] ) {
-      if (except.length) {
-        Object.keys(obj)
-          .forEach(key => {
-            if (typeof obj[key] === 'object' && obj[key]) {
-              obj[key] = this.deleteValueFromObject(obj[key], except);
-            }
-            if (!obj[key] && except.every(ex => ex !== obj[key])) {
-              delete obj[key];
-            }
-          });
-      } else {
-        Object.keys(obj)
-          .forEach(key => {
-            if (typeof obj[key] === 'object' && obj[key]) {
-              obj[key] = this.deleteValueFromObject(obj[key]);
-            }
-            if (!obj[key]) {
-              delete obj[key];
-            }
-          });
-      }
-      if (Object.keys(obj).length) {
-        return obj;
-      } else {
-        return undefined;
-      }
+    computed: {
+      selectedIds() {
+        return this.multipleSelection.map(c => c.id) || [];
+      },
     },
-    processRawData(cl) {
-      //  cl means customer list.
-      let temp = null;
-      let tv = null; // tv means temporary variable that used inside the loop.
-
-      if (!cl || !cl.length) return [];
-
-      return cl.map(c => { // c means customer.
-        temp = c.customerAddress;
-        c.customerAddress.str = `${temp.adProvince}-${temp.adCity}-${temp.adDist}`;
-        c.tagsStr = c.tags.map(t => t.tagName).join(' ');
-        c.status = Boolean(c.status);
-
-        // c.attribute is the object that includes all customized field.
-        Object.keys(c.attribute)
-          .forEach(key => {
-            tv = c.attribute[key];
-
-            if (Array.isArray(c.attribute[key]) && (typeof c.attribute[key][0] === "string")) {
-              tv = JSON.stringify(tv);
-              c.attribute[key] = tv.replace(/"/g, '',);
-              return key;
-            }
-
-            if (Array.isArray(tv) && (typeof tv[0] === "object")) {
-              c.attribute[key] = tv.map(a => this.getNameFromObject(a)).join(',');
-              return key;
-            }
-
-            if (typeof tv === "object") {
-              c.attribute[key] = this.getNameFromObject(tv);
-              return key;
-            }
-          });
-        return c;
-      })
-    },
-    handleCitySelectorChange(city) {
-      this.specialParams.addressSelector = city;
-    },
-    cancelSelectCustomer(customer) {
-      if (!customer || !customer.id) return;
-      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
-      this.toggleSelection([customer]);
-    },
-    toggleStatus(row) {
-      const params = {
-        id: row.id,
-        status: Number(row.status),
-      };
-
-      this.pending = true;
-      this.$http.post('/customer/changeState', params, false)
-        .then(res => {
-          this.pending = false;
-        })
-        .catch(err => {
-          this.pending = false;
-          console.error('toggleStatus catch err', err);
-        })
-    },
-    sortChange(option) {
-      const { column, prop, order } = option;
-      if (!column || !prop || !order) return;
-      const numberField = `lpad(myOrderConvertor(customer.attribute->>'$.${prop}'),16,0)`;
-      const dateField = `myOrderConvertor(customer.attribute->>'$.${prop}')`;
-      let type = null;
-
-      if (prop === 'createTime') {
-        this.specialParams.sortBy = {
-          'customer.createTime': this.matchSortValue(order),
-          [numberField]: '',
-          [dateField]: '',
-        }
-      } else {
-        type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
-      }
-      if (type === 'number') {
-        this.specialParams.sortBy = {
-          'customer.createTime': '',
-          [numberField]: this.matchSortValue(order),
-          [dateField]: '',
-        }
-      }
-      this.search();
-    },
-    jump(pageNum) {
-      this.params.pageNum = pageNum;
-      this.search();
-    },
-    handleSizeChange(pageSize) {
-      this.saveDataToStorage('pageSize', pageSize);
-      this.params.pageNum = 1;
-      this.params.pageSize = pageSize;
-      this.search();
-    },
-    // select customer
-    selectRow(selection, row) {
-      if (selection.length < this.multipleSelection.length) {
-        this.multipleSelection = this.multipleSelection
-          .filter(sRow => sRow.id !== row.id);
-      }
-    },
-    selectAll(selection) {
-      if (selection.length) return;
-      this.multipleSelection = this.multipleSelection
-        .filter(sR => this.customers.every(c => c.id !== sR.id));
-    },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-        this.multipleSelection = [];
-      }
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = _.uniqWith([...this.multipleSelection, ...val], _.isEqual);
-    },
-    // list method end
-
-    // operation dialog
-    openDialog(category) {
-      if (category === 'sendMessage') {
-        this.$refs.messageDialog.openSendMessageDialog();
-      }
-      if (category === 'edit') {
-        this.$refs.batchEditingCustomerDialog.openBatchEditingCustomerDialog();
-      }
-      if (category === 'remind') {
-        this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
-      }
-      if (category === 'importCustomer') {
-        this.$refs.importCustomerModal.open();
-      }
-      if (category === 'importLinkman') {
-        this.$refs.importLinkmanModal.open();
-      }
-    },
-    async deleteCustomer() {
-      if (!this.multipleSelection.length) {
-        return this.$platform.alert('请选择需要删除的客户');
-      }
-      try {
-        const result = this.$platform.confirm('确定要删除选择的客户？');
-        if (!result) return;
-
-        this.$http.get(`/customer/delete/${this.selectedIds.join(',')}`)
-          .then(res => {
-            this.multipleSelection = [];
-            this.search();
-          })
-          .catch(err => console.error('deleteCustomer err', err));
-      } catch (e) {
-        console.error('deleteCustomer catch error', e);
-      }
-    },
-    // columns
-    modifyColumnStatus() {
-      const showColumns = this.columns.filter(c => c.show).map(c => c.field);
-      this.saveDataToStorage('columnStatus', showColumns);
-    },
-    // common methods
-    getLocalStorageData() {
-      const dataStr = localStorage.getItem('customerListData') || '{}';
-      return JSON.parse(dataStr);
-    },
-    saveDataToStorage(key, value) {
-      const data = this.getLocalStorageData();
-      data[key] = value;
-      localStorage.setItem('customerListData', JSON.stringify(data));
-    },
-    buildTableColumn() {
+    mounted() {
+      let initData = JSON.parse(window._init) || {};
       const localStorageData = this.getLocalStorageData();
-      let columnStatus = localStorageData.columnStatus || [];
-
-      let baseColumns = this.fixedColumns();
-      let dynamicColumns = [];
-      let columns = [];
-
-      dynamicColumns = this.customerConfig.fieldInfo
-        .filter(f => !f.isSystem)
-        .map(field => {
-          let sortable = false;
-          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
-            sortable = 'custom';
-          }
-
-          return {
-            label: field.displayName,
-            field: field.fieldName,
-            formType: field.formType,
-            sortable,
-            isSystem: 0,
-          };
-        });
-      columns = [...baseColumns, ...dynamicColumns];
-
-      if (!columnStatus || !columnStatus.length) {
-        return columns;
+      if (localStorageData.pageSize) {
+        this.params.pageSize = Number(localStorageData.pageSize);
+        this.paginationInfo.pageSize = Number(localStorageData.pageSize);
       }
-
-      columns = columns.map(bc => {
-        bc.show = columnStatus.some(sc => sc === bc.field);
-        return bc;
-      });
-      return columns;
-    },
-    resetParams() {
-      this.params = {
-        linkmanName: '',
-        createUserName: '',
-        tagName: '',
-        customerManagerName: '',
-        keyword: '',
-        // isAdvanced: 0,
-        viewId: '',
-        serialNumber: '',
-        linkmanId: '',
-        customerAddress: {},
-        hasRemind: '',
-        status: '',
-        createUser: '',
-        customerManager: '',
-        createTime: '',
-        pageNum: 1,
-        pageSize: 10,
-
+      this.customerConfig = {
+        customerAddressConfig: initData.customerAddressConfig,
+        customerConfig: initData.customerConfig,
+        fieldInfo: initData.fieldInfo,
       };
-      for (let key in this.specialParams.sortBy) {
-        this.specialParams.sortBy[key] = '';
-      }
-      this.specialParams.addressSelector = [];
-      this.specialParams.adAddress = '';
 
-      for (let key in this.customizedSearchModel) {
-        this.customizedSearchModel[key].value = null;
-      }
-      this.$refs.baseDistPicker.clearValue();
+      this.buildConfig();
+
       this.search();
-    },
-    // input search method
-    searchCustomerManager(keyword) {
-      this.inputRemoteSearch.customerManager.loading = true;
-      this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.inputRemoteSearch.customerManager.options = res.list;
-          this.inputRemoteSearch.customerManager.loading = false;
-        })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
-    searchCreator(keyword) {
-      this.inputRemoteSearch.creator.loading = true;
-      this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.inputRemoteSearch.creator.options = res.list;
-          this.inputRemoteSearch.creator.loading = false;
-        })
-        .catch(err => console.error('searchCreator function catch err', err));
-    },
-    searchLinkman(keyword) {
-      this.inputRemoteSearch.linkman.loading = true;
-      this.$http.get('/linkman/getListAsyn', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.inputRemoteSearch.linkman.options = res.list;
-          this.inputRemoteSearch.linkman.loading = false;
-        })
-        .catch(err => console.error('searchLinkman function catch err', err));
-    },
-    searchTag(keyword) {
-      this.inputRemoteSearch.tag.loading = true;
-      this.$http.get('/task/tag/list', { keyword: keyword, pageNum: 1, })
-        .then(res => {
-          this.inputRemoteSearch.tag.options = res.list;
-          this.inputRemoteSearch.tag.loading = false;
-        })
-        .catch(err => console.error('searchTag function catch err', err));
-    },
-    // match data
-    matchOperator(formType) {
-      let operator = '';
-      switch (formType) {
-        case 'date':
-          operator = 'between';
-          break;
-        case 'datetime':
-          operator = 'between';
-          break;
-        case 'select':
-          operator = 'eq';
-          break;
-        case 'selectMulti':
-          operator = 'contain';
-          break;
-        case 'user':
-          operator = 'user';
-          break;
-        default:
-          operator = 'like';
-          break;
-      }
-      return operator;
-    },
-    matchSortValue(order) {
-      let value = '';
-      switch (order) {
-        case null:
-          value = '';
-          break;
-        case 'descending':
-          value = false;
-          break;
-        case 'ascending':
-          value = true;
-          break;
-        default:
-          value = '';
-          break;
-      }
-      return value;
-    },
-    matchSelected() {
-      if (!this.multipleSelection.length) return;
-      const selected = this.customers
-        .filter(c => {
-          if (this.multipleSelection.some(sc => sc.id === c.id)) {
-            this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
-            this.multipleSelection.push(c);
-            return c;
-          }
-        }) || [];
-
-      this.$nextTick(() => {
-        this.toggleSelection(selected);
-      });
-    },
-    getNameFromObject(obj) {
-      if (!obj) return;
-      let objKeys = Object.keys(obj) || [];
-      let nameKeys = [];
-
-      nameKeys = objKeys
-        .filter(aKey => /name/gi.test(aKey)) || [];
-
-      if (!objKeys.length) return null;
-
-      if (!nameKeys[0]) return obj[objKeys[0]];
-      return obj[nameKeys[0]];
-    },
-    fixedColumns() {
-      return [{
-        label: '客户',
-        field: 'name',
-        show: true,
-      }, {
-        label: '客户编号',
-        field: 'serialNumber',
-        show: true,
-      }, {
-        label: '联系人',
-        field: 'lmName',
-        show: true,
-      }, {
-        label: '电话',
-        field: 'lmPhone',
-        show: true,
-      }, {
-        label: '区域',
-        field: 'customerAddress',
-        show: true,
-      }, {
-        label: '详细地址',
-        field: 'detailAddress',
-        show: true,
-      }, {
-        label: '服务团队',
-        field: 'tags',
-        show: true,
-      }, {
-        label: '客户负责人',
-        field: 'customerManagerName',
-        show: true,
-        width: '100px',
-      }, {
-        label: '启用/禁用',
-        field: 'status',
-        show: true,
-        align: 'center'
-      }, {
-        label: '创建时间',
-        field: 'createTime',
-        show: true,
-        sortable: 'custom',
-        width: '100px',
-      }, {
-        label: '创建人',
-        field: 'createUser',
-        show: true,
-      }, {
-        label: '提醒数量',
-        field: 'remindCount',
-        show: true,
-      }]
-    }
-
   },
-  components: {
-    [BasePanel.name]: BasePanel,
-    [BaseDistPicker.name]: BaseDistPicker,
-    [SendMessageDialog.name]: SendMessageDialog,
-    [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
-    [BatchRemindingCustomerDialog.name]: BatchRemindingCustomerDialog,
-    [BaseImport.name]: BaseImport,
-    [BaseExport.name]: BaseExport,
+    methods: {
+      // remoteInputFocus(action) {
+      //   if (this.inputRemoteSearch[action].options.length) return;
+      //   let fn = () => ({});
+      //   if (action === 'tag') {
+      //     fn = this.searchTag;
+      //   } else if (action === 'linkman') {
+      //     fn = this.searchLinkman;
+      //   } else if (action === 'creator') {
+      //     fn = this.searchCreator;
+      //   } else if (action === 'customerManager') {
+      //     fn = this.searchCustomerManager;
+      //   }
+      //   setTimeout(fn, 200);
+      // },
+      remindSuccess(ids) {
+        let tv = false;
+        if (!ids || !ids.length) return;
+
+        this.customers.forEach(c => {
+          tv = ids.some(id => c.id === id);
+          if (!tv) return;
+          if (!c.attribute.remindCount) {
+            c.attribute.remindCount = 1;
+          } else {
+            c.attribute.remindCount += 1;
+          }
+        });
+      },
+      buildConfig() {
+        this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
+          .map(f => {
+            if (f.isSearch) {
+              // 需要搜索的字段
+              this.$set(this.customizedSearchModel, f.fieldName, {
+                fieldName: f.fieldName,
+                value: null,
+                operator: this.matchOperator(f.formType),
+                formType: f.formType,
+              });
+              this.searchFields.push(f);
+              if (f.formType === 'number') {
+                this.$set(this.specialParams, `lpad(myOrderConvertor(customer.attribute->>'$.${f.fieldName}'),16,0)`, '')
+              }
+              if (f.formType === 'date' || f.formType === 'datetime') {
+                this.$set(this.specialParams, `myOrderConvertor(customer.attribute->>'$.${f.fieldName}')`, '')
+              }
+            }
+
+            return f;
+          });
+        this.columns = this.buildTableColumn();
+      },
+      jumpPage() {
+        window.location = '/customer/create';
+      },
+      buildExportParams(checkedArr, ids) {
+        let params = {};
+
+        if (ids && ids.length) {
+          params = {
+            customerChecked: checkedArr.join(','),
+            data: ids.join(','),
+            exportSearchModel: '',
+          };
+        } else {
+          params = {
+            customerChecked: checkedArr.join(','),
+            data: '',
+            exportSearchModel: JSON.stringify(this.buildParams() || {}),
+          }
+        }
+        return params;
+      },
+      exportCustomer(exportAll) {
+        let ids = [];
+        let fileName = `${formatDate(new Date(), 'YYYY-MM-dd')}客户数据.xlsx`;
+        if (!exportAll) {
+          if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+          ids = this.selectedIds;
+        }
+        this.$refs.exportPanel.open(ids, fileName);
+      },
+      importSucc() {
+        console.log('importSucc');
+      },
+      search(cp) {
+        // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
+        console.log('cp', cp);
+        let params = this.buildParams();
+        this.loadingListData = true;
+
+        if (cp) {
+          params = {
+            ...params,
+            ...cp,
+          }
+        }
+
+        this.$http.post('/v2/customer/list', params)
+          .then(res => {
+            if (!res || !res.list) {
+              this.customers = [];
+              this.paginationInfo.totalItems = 0;
+              this.paginationInfo.totalPages = 0;
+              this.paginationInfo.pageNum = 1;
+            } else {
+              const {pages, total, pageNum, list, } = res;
+
+              this.customers = list;
+              this.paginationInfo.totalItems = total;
+              this.paginationInfo.totalPages = pages;
+              this.paginationInfo.pageNum = pageNum;
+              this.matchSelected();  // 把选中的匹配出来
+            }
+
+            return res;
+          })
+          .then(() => {
+            this.$refs.customerListPage.scrollTop = 0;
+            this.loadingListData = false;
+          })
+          .catch(err => {
+            this.loadingListData = false;
+            console.error('err', err);
+          })
+      },
+      buildParams() {
+        let tv = null; // tv means temporary variable that used inside the loop.
+        const conditions = [];
+        let params = {
+          ..._.cloneDeep(this.params),
+          ..._.cloneDeep(this.specialParams),
+        };
+
+        // createTime
+        if (params.createTime && params.createTime.length) {
+          params.createTimeStart = formatDate(params.createTime[0]);
+          params.createTimeEnd = `${formatDate(params.createTime[1])} 23:59:59`;
+          delete params.createTime;
+        }
+
+        // address
+        if (this.specialParams.addressSelector.length) {
+          params.customerAddress = {
+            adProvince: this.specialParams.addressSelector[0],
+            adCity: this.specialParams.addressSelector[1] || '',
+            adDist: this.specialParams.addressSelector[2] || '',
+          };
+        }
+        params.customerAddress.adAddress = this.specialParams.adAddress || '';
+
+        params = this.deleteValueFromObject(params, [0, false]);
+
+        // build customized search fields
+        Object.keys(this.customizedSearchModel)
+          .forEach(key => {
+            tv = this.customizedSearchModel[key];
+            if (tv.value && tv.formType === 'date') {
+              return conditions.push({
+                property: tv.fieldName,
+                operator: tv.operator,
+                betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
+                betweenValue2: formatDate(tv.value[1], 'YYYY-MM-DD'),
+              });
+            }
+            if (tv.value && tv.formType === 'datetime') {
+              return conditions.push({
+                property: tv.fieldName,
+                operator: tv.operator,
+                betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
+                betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
+              });
+            }
+
+            if (tv.value) {
+              conditions.push({
+                property: tv.fieldName,
+                operator: tv.operator,
+                value: tv.value,
+              });
+            }
+          });
+
+        if (conditions.length) {
+          params.conditions = conditions;
+        }
+
+        // console.log('[build params end]params', params);
+        return params;
+      },
+      // 把对象中!!为false的值去除（eg. false, undefined, null...），except 可以把想保留的值留下(eg.[0])
+      // 主要用于向后端传参，把无用的空值过滤掉
+      // var a = { a: 0, b: 1, c: null, d: undefined, e: false}
+      //deleteValueFromObject(a) =>  {b: 1}
+      //deleteValueFromObject(a, [0]) =>  {a: 0, b: 1}
+      deleteValueFromObject(sourceObj, except = []) {
+        let obj = _.cloneDeep(sourceObj);
+        if (except.length) {
+          Object.keys(obj)
+            .forEach(key => {
+              if (typeof obj[key] === 'object' && obj[key]) {
+                obj[key] = this.deleteValueFromObject(obj[key], except);
+              }
+              if (!obj[key] && except.every(ex => ex !== obj[key])) {
+                delete obj[key];
+              }
+            });
+        } else {
+          Object.keys(obj)
+            .forEach(key => {
+              if (typeof obj[key] === 'object' && obj[key]) {
+                obj[key] = this.deleteValueFromObject(obj[key]);
+              }
+              if (!obj[key]) {
+                delete obj[key];
+              }
+            });
+        }
+        if (Object.keys(obj).length) {
+          return obj;
+        } else {
+          return undefined;
+        }
+      },
+      handleCitySelectorChange(city) {
+        this.specialParams.addressSelector = city;
+      },
+      cancelSelectCustomer(customer) {
+        if (!customer || !customer.id) return;
+        this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
+        this.toggleSelection([customer]);
+      },
+      toggleStatus(row) {
+        const ns = row.status ? 0 : 1;
+        const params = {
+          id: row.id,
+          status: ns,
+        };
+
+        this.pending = true;
+        this.$http.post('/customer/changeState', params, false)
+          .then(res => {
+            this.pending = false;
+            this.customers.forEach(c => {
+              if (c.id === row.id) {
+                c.status = ns;
+              }
+            })
+          })
+          .catch(err => {
+            this.pending = false;
+            console.error('toggleStatus catch err', err);
+          })
+      },
+      sortChange(option) {
+        const {column, prop, order} = option;
+        if (!column || !prop || !order) return;
+        const numberField = `lpad(myOrderConvertor(customer.attribute->>'$.${prop}'),16,0)`;
+        const dateField = `myOrderConvertor(customer.attribute->>'$.${prop}')`;
+        let type = null;
+
+        if (prop === 'createTime') {
+          this.specialParams.sortBy = {
+            'customer.createTime': this.matchSortValue(order),
+            [numberField]: '',
+            [dateField]: '',
+          }
+        } else {
+          type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
+        }
+        if (type === 'number') {
+          this.specialParams.sortBy = {
+            'customer.createTime': '',
+            [numberField]: this.matchSortValue(order),
+            [dateField]: '',
+          }
+        }
+        this.search();
+      },
+      jump(pageNum) {
+        this.params.pageNum = pageNum;
+        this.search();
+      },
+      handleSizeChange(pageSize) {
+        this.saveDataToStorage('pageSize', pageSize);
+        this.params.pageNum = 1;
+        this.params.pageSize = pageSize;
+        this.search();
+      },
+      // select customer
+      selectRow(selection, row) {
+        if (selection.length < this.multipleSelection.length) {
+          this.multipleSelection = this.multipleSelection
+            .filter(sRow => sRow.id !== row.id);
+        }
+      },
+      selectAll(selection) {
+        if (selection.length) return;
+        this.multipleSelection = this.multipleSelection
+          .filter(sR => this.customers.every(c => c.id !== sR.id));
+      },
+      toggleSelection(rows) {
+        if (rows) {
+          rows.forEach(row => {
+            this.$refs.multipleTable.toggleRowSelection(row);
+          });
+        } else {
+          this.$refs.multipleTable.clearSelection();
+          this.multipleSelection = [];
+        }
+      },
+      handleSelectionChange(val) {
+        this.multipleSelection = _.uniqWith([...this.multipleSelection, ...val], _.isEqual);
+      },
+      // list method end
+
+      // operation dialog
+      openDialog(category) {
+        if (category === 'sendMessage') {
+          this.$refs.messageDialog.openSendMessageDialog();
+        }
+        if (category === 'edit') {
+          this.$refs.batchEditingCustomerDialog.openBatchEditingCustomerDialog();
+        }
+        if (category === 'remind') {
+          this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
+        }
+        if (category === 'importCustomer') {
+          this.$refs.importCustomerModal.open();
+        }
+        if (category === 'importLinkman') {
+          this.$refs.importLinkmanModal.open();
+        }
+      },
+      async deleteCustomer() {
+        if (!this.multipleSelection.length) {
+          return this.$platform.alert('请选择需要删除的客户');
+        }
+        try {
+          const result = await this.$platform.confirm('确定要删除选择的客户？');
+          if (!result) return;
+
+          this.$http.get(`/customer/delete/${this.selectedIds.join(',')}`)
+            .then(res => {
+              this.multipleSelection = [];
+              this.search();
+            })
+            .catch(err => console.error('deleteCustomer err', err));
+        } catch (e) {
+          console.error('deleteCustomer catch error', e);
+        }
+      },
+      // columns
+      modifyColumnStatus(val, column) {
+        this.columns = this.columns
+          .map(c => {
+            if (c.field === column.field) {
+              c.show = val;
+            }
+            return c;
+          });
+        const showColumns = this.columns.filter(c => c.show).map(c => c.field);
+        this.saveDataToStorage('columnStatus', showColumns);
+      },
+      // common methods
+      getLocalStorageData() {
+        const dataStr = localStorage.getItem('customerListData') || '{}';
+        return JSON.parse(dataStr);
+      },
+      saveDataToStorage(key, value) {
+        const data = this.getLocalStorageData();
+        data[key] = value;
+        localStorage.setItem('customerListData', JSON.stringify(data));
+      },
+      buildTableColumn() {
+        const localStorageData = this.getLocalStorageData();
+        let columnStatus = localStorageData.columnStatus || [];
+        let minWidth = 80;
+
+        let baseColumns = this.fixedColumns();
+        let dynamicColumns = [];
+        let columns = [];
+        let sortable = false;
+
+        dynamicColumns = this.customerConfig.fieldInfo
+          .filter(f => !f.isSystem)
+          .map(field => {
+            sortable = false;
+            minWidth = 80;
+            if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+              sortable = 'custom';
+              minWidth = 100;
+            }
+
+            if (field.displayName.length > 4) {
+              minWidth = field.displayName.length * 20;
+            }
+
+            if (sortable && field.displayName.length >= 4) {
+              minWidth += 25;
+            }
+
+            return {
+              label: field.displayName,
+              field: field.fieldName,
+              formType: field.formType,
+              minWidth: `${minWidth}px`,
+              sortable,
+              isSystem: 0,
+            };
+          });
+
+        columns = [...baseColumns, ...dynamicColumns];
+
+        if (!columnStatus || !columnStatus.length) {
+          return columns;
+        }
+
+        columns = columns.map(bc => {
+          bc.show = columnStatus.some(sc => sc === bc.field);
+          return bc;
+        });
+        return columns;
+      },
+      resetParams() {
+        this.params = {
+          // linkmanName: '',
+          // tagName: '',
+          createUserName: '',
+          customerManagerName: '',
+          keyword: '',
+          serialNumber: '',
+          linkmanId: '',
+          tagId: '',
+          customerAddress: {},
+          hasRemind: '',
+          status: '',
+          createUser: '',
+          customerManager: '',
+          createTime: '',
+          pageNum: 1,
+          pageSize: 10,
+
+        };
+        for (let key in this.specialParams.sortBy) {
+          this.specialParams.sortBy[key] = '';
+        }
+        this.specialParams.addressSelector = [];
+        this.specialParams.adAddress = '';
+
+        for (let key in this.customizedSearchModel) {
+          this.customizedSearchModel[key].value = null;
+        }
+        this.$refs.baseDistPicker.clearValue();
+        this.search();
+      },
+      // input search method
+      searchCustomerManager(keyword) {
+        this.inputRemoteSearch.customerManager.loading = true;
+        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+          .then(res => {
+            this.inputRemoteSearch.customerManager.options = res.list;
+            this.inputRemoteSearch.customerManager.loading = false;
+          })
+          .catch(err => console.error('searchCustomerManager function catch err', err));
+      },
+      searchCreator(keyword) {
+        this.inputRemoteSearch.creator.loading = true;
+        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+          .then(res => {
+            this.inputRemoteSearch.creator.options = res.list;
+            this.inputRemoteSearch.creator.loading = false;
+          })
+          .catch(err => console.error('searchCreator function catch err', err));
+      },
+      searchLinkman(keyword) {
+        this.inputRemoteSearch.linkman.loading = true;
+        this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
+          .then(res => {
+            this.inputRemoteSearch.linkman.options = res.list;
+            this.inputRemoteSearch.linkman.loading = false;
+          })
+          .catch(err => console.error('searchLinkman function catch err', err));
+      },
+      searchTag(keyword) {
+        this.inputRemoteSearch.tag.loading = true;
+        this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
+          .then(res => {
+            this.inputRemoteSearch.tag.options = res.list;
+            this.inputRemoteSearch.tag.loading = false;
+          })
+          .catch(err => console.error('searchTag function catch err', err));
+      },
+      // match data
+      matchOperator(formType) {
+        let operator = '';
+        switch (formType) {
+          case 'date':
+            operator = 'between';
+            break;
+          case 'datetime':
+            operator = 'between';
+            break;
+          case 'select':
+            operator = 'eq';
+            break;
+          case 'selectMulti':
+            operator = 'contain';
+            break;
+          case 'user':
+            operator = 'user';
+            break;
+          default:
+            operator = 'like';
+            break;
+        }
+        return operator;
+      },
+      matchSortValue(order) {
+        let value = '';
+        switch (order) {
+          case null:
+            value = '';
+            break;
+          case 'descending':
+            value = false;
+            break;
+          case 'ascending':
+            value = true;
+            break;
+          default:
+            value = '';
+            break;
+        }
+        return value;
+      },
+      matchSelected() {
+        if (!this.multipleSelection.length) return;
+        const selected = this.customers
+          .filter(c => {
+            if (this.multipleSelection.some(sc => sc.id === c.id)) {
+              this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
+              this.multipleSelection.push(c);
+              return c;
+            }
+          }) || [];
+
+        this.$nextTick(() => {
+          this.toggleSelection(selected);
+        });
+      },
+      fixedColumns() {
+        return [{
+          label: '客户',
+          field: 'name',
+          show: true,
+          fixed: true,
+          minWidth: '100px',
+        }, {
+          label: '客户编号',
+          field: 'serialNumber',
+          width: '110px',
+          fixed: true,
+          show: true,
+        }, {
+          label: '联系人',
+          field: 'lmName',
+          minWidth: '80px',
+          show: true,
+        }, {
+          label: '电话',
+          field: 'lmPhone',
+          width: '110px',
+          show: true,
+        }, {
+          label: '区域',
+          field: 'customerAddress',
+          minWidth: '110px',
+          show: true,
+        }, {
+          label: '详细地址',
+          field: 'detailAddress',
+          minWidth: '110px',
+          show: true,
+        }, {
+          label: '服务团队',
+          field: 'tags',
+          minWidth: '110px',
+          show: true,
+        }, {
+          label: '客户负责人',
+          field: 'customerManagerName',
+          show: true,
+          minWidth: '110px',
+        // }, {
+        //   label: '启用/禁用',
+        //   field: 'status',
+        //   show: true,
+        //   align: 'center',
+        //   width: '100px',
+        }, {
+          label: '创建时间',
+          field: 'createTime',
+          show: true,
+          sortable: 'custom',
+          minWidth: '110px',
+        }, {
+          label: '创建人',
+          field: 'createUser',
+          minWidth: '80px',
+          show: true,
+        }, {
+          label: '提醒数量',
+          field: 'remindCount',
+          minWidth: '80px',
+          show: true,
+        }]
+      }
+    },
+    components: {
+      [SendMessageDialog.name]: SendMessageDialog,
+      [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
+      [BatchRemindingCustomerDialog.name]: BatchRemindingCustomerDialog,
+    }
   }
-}
 </script>
 
 <style lang="scss">
@@ -1145,6 +1182,7 @@
       }
     }
   }
+
   // search
   .customer-list-search-group-container {
 
@@ -1189,14 +1227,15 @@
     }
 
     .advanced-search-form-wrap {
+
       .advanced-search-form {
+
         .el-form-item {
           .el-form-item__content,
           .el-select,
           .base-dist-picker,
           .el-cascader,
-          .el-date-editor
-          {
+          .el-date-editor {
             width: 290px;
           }
         }
@@ -1242,12 +1281,12 @@
 
     }
 
-
   }
 
   // list
   .customer-list-component {
     padding-top: 10px;
+    /*min-height: calc(100% - 100px);*/
 
     .customer-table {
       border-radius: 3px;
@@ -1259,7 +1298,6 @@
         color: #909399;
         font-size: 13px;
       }
-
 
       .select-column .el-checkbox {
         position: relative;
@@ -1301,7 +1339,6 @@
 
   //
   .selected-customer-panel {
-
 
     .selected-customer-list {
       overflow-y: scroll;
@@ -1371,10 +1408,6 @@
       font-weight: lighter;
       font-size: 14px;
     }
-
-    /*.el-dropdown-menu li {*/
-      /*font-size: 13px;*/
-    /*}*/
 
     .delete-customer-btn {
       background: #fff;

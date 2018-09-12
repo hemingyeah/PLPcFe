@@ -1,5 +1,6 @@
 <template>
-  <base-modal title="发送短信" @closed="reset" :show.sync="sendMessageDialog" width="600px" class="send-message-to-customer-dialog">
+  <base-modal title="发送短信" @closed="reset" :show.sync="sendMessageDialog" width="600px"
+              class="send-message-to-customer-dialog">
     <el-form ref="form" :model="form" label-width="100px">
       <el-form-item label="接收人">
         <el-radio-group v-model="form.isAllLm" @change="fetchCount" :disabled="pending">
@@ -24,7 +25,7 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <p>本次发送：合计共{{selectedCustomer.length}}个</p>
+        <p>本次发送：合计共{{selectedIds.length}}个</p>
         <p>当前短信余额：{{displayCount}}条</p>
         <p>如需查看发送记录请到系统管理-短信设置-发送记录查询</p>
         <p>一次性发送100条以上时将会因审核略有延迟，100条以下则无需审核</p>
@@ -39,8 +40,7 @@
 </template>
 
 <script>
-  import BaseModal from '../../../../component/common/BaseModal';
-  import { formatDate, } from '../../../../util/lang';
+  import { formatDate, } from '@src/util/lang';
 
   export default {
     name: "send-message-dialog",
@@ -67,7 +67,7 @@
       }
     },
     props: {
-      selectedCustomer: {
+      selectedIds: {
         type: Array,
         default: () => ([]),
       },
@@ -76,9 +76,6 @@
       template() {
         return this.messageTemplate.filter(t => t.id === this.form.smsTemplateId)
           .map(t => t.allowContent).join('');
-      },
-      selectedIds() {
-        return this.selectedCustomer.map(c => c.id);
       },
       needFetchCount() {
         if (this.form.isAllLm === '0' && this.count.default.loaded) {
@@ -120,7 +117,7 @@
           })
       },
       openSendMessageDialog() {
-        if (!this.selectedCustomer.length) {
+        if (!this.selectedIds.length) {
           return this.$platform.alert('请选择需要批量发送短信的客户');
         }
         this.sendMessageDialog = true;
@@ -150,7 +147,7 @@
           })
       },
       fetchTemplate() {
-        this.$http.get('/vipsms/getTemplates', { pageSize:'100', pageNum:'1', })
+        this.$http.get('/vipsms/getTemplates', {pageSize: '100', pageNum: '1',})
           .then(res => {
             if (res.status !== 0) return;
             this.messageTemplate = res.data.list;
@@ -164,7 +161,7 @@
           })
       },
       buildParams() {
-        const { smsTemplateId, isAllLm, sendTime, } = this.form;
+        const {smsTemplateId, isAllLm, sendTime,} = this.form;
 
         return {
           smsTemplateId,
@@ -177,18 +174,15 @@
         this.count = {
           default: {
             value: 0,
-              loaded: false,
+            loaded: false,
           },
           all: {
             value: 0,
-              loaded: false,
+            loaded: false,
           },
         };
       }
     },
-    components: {
-      [BaseModal.name]: BaseModal,
-    }
   }
 </script>
 

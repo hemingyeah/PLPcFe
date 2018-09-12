@@ -48,8 +48,6 @@
 </template>
 
 <script>
-  import BaseModal from '../../../../component/common/BaseModal';
-
   export default {
     name: "batch-reminding-customer-dialog",
     data: () => {
@@ -61,7 +59,7 @@
         },
         form: {
           ids: '',
-          isAllLm:0,
+          isAllLm: 0,
           remindId: null,
           users: [],
         },
@@ -81,21 +79,21 @@
         return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
       },
       remindRule() {
-        const { isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit, } = this.selectedRemind;
+        const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
         let unit = '';
         if (periodUnit === 'day') {
           unit = '天';
         }
         if (isRepeat) {
-          if(period){
-            return `重复通知：${fieldDisplayName+(isAhead+hours)}小时，每${period+unit}发出提醒`;
-          }else{
+          if (period) {
+            return `重复通知：${fieldDisplayName + (isAhead + hours)}小时，每${period + unit}发出提醒`;
+          } else {
             return '无';
           }
         } else {
-          if(fieldDisplayName){
-            return `单次通知：根据${fieldDisplayName+(isAhead+hours)}小时提醒`;
-          }else{
+          if (fieldDisplayName) {
+            return `单次通知：根据${fieldDisplayName + (isAhead + hours)}小时提醒`;
+          } else {
             return '无'
           }
         }
@@ -107,6 +105,7 @@
     methods: {
       onSubmit() {
         const params = this.buildParams();
+        this.pending = true;
         this.$http.post('/scheduler/buildBatch', params)
           .then(res => {
             if (res.status === 0) {
@@ -116,10 +115,14 @@
               this.$platform.alert(`批量添加提醒失败，以下客户已存在该提醒：${res.data.join(',')}`);
             }
             this.batchRemindingCustomerDialog = false;
+            this.pending = false;
+
+            this.$emit('success-callback', this.selectedIds);
             // console.log('post to /scheduler/buildBatch err', res);
           })
           .catch(err => {
             this.$platform.alert('批量添加提醒失败');
+            this.pending = false;
             console.error('post to /scheduler/buildBatch err', err)
           });
       },
@@ -145,7 +148,7 @@
         this.batchRemindingCustomerDialog = true;
       },
       fetchData() {
-        this.$http.get('/v2/customer/getReminds', { pageSize: 0, })
+        this.$http.get('/v2/customer/getReminds', {pageSize: 0,})
           .then(res => {
             let tv = null;
             if (res) {
@@ -153,7 +156,7 @@
               tv = this.remindTemplate[0];
               if (tv) {
                 this.form.remindId = tv.id;
-                this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0: 1;
+                this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0 : 1;
                 this.form.users = tv.users.map(c => c.id);
                 this.remoteSearchCM.options = tv.users;
               }
@@ -163,7 +166,7 @@
       },
       searchCustomerManager(keyword) {
         this.remoteSearchCM.loading = true;
-        this.$http.get('/customer/userTag/list', { keyword: keyword, pageNum: 1, })
+        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
           .then(res => {
             this.remoteSearchCM.options = res.list
               .map(c => ({
@@ -174,11 +177,7 @@
           })
           .catch(err => console.error('searchCustomerManager function catch err', err));
       },
-
     },
-    components: {
-      [BaseModal.name]: BaseModal,
-    }
   }
 </script>
 
@@ -202,7 +201,7 @@
 
     .content-item {
       width: 93%;
-      .el-form-item__content{
+      .el-form-item__content {
         max-height: 200px;
         overflow-y: auto;
       }

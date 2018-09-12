@@ -5,7 +5,7 @@ const DEFAULT_OPIONS = {
   host: 'dev.api.shb.ltd',
   port: 8080,
   headers: {}
-}
+};
 
 const AGENT = new http.Agent({
   keepAlive: true,

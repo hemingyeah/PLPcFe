@@ -5,7 +5,9 @@ import BaseUpload from './common/BaseUpload';
 import BaseTree from './common/BaseTree';
 import BaseContact from './common/BaseContact';
 import BaseMapPicker from './common/BaseMapPicker';
-import BaseDistPicker from './common/BaseDistPicker'
+import BaseDistPicker from './common/BaseDistPicker';
+import BaseImport from './common/BaseImport';
+import BaseExport from './common/BaseExport';
 
 import Form from './form';
 import Fast from './fast'
@@ -20,8 +22,10 @@ const components = [
   BaseMapPicker,
   BaseDistPicker,
   Form,
-  Fast
-] 
+  Fast,
+  BaseImport,
+  BaseExport,
+];
 
 export default {
   install: function(Vue, opts = {}){
