@@ -6,7 +6,7 @@ const router = new KoaRouter();
 const modules = require('../../config/modules');
 
 router.get('/v_open/dailyReport', async ctx => {
-  let script = ['/open.subscibe.js'];
+  let script = ['/open.dailyReport.js'];
   // let modConfig = modules['report.subscibe'];
   // let reqHeaders = ctx.request.headers;
   // let result = await HttpClient.request('/v2/report/subscibe', 'get', null, {headers: reqHeaders});

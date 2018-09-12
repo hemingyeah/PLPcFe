@@ -22,7 +22,7 @@ module.exports = {
   },
 
   // ------------ 订阅通知日报 ------------
-  "open.subscibe": {
-    entry: './src/modules/open/subscibe/index.js'
+  "open.dailyReport": {
+    entry: './src/modules/open/DailyReport/index.js'
   }
 }
