@@ -19,5 +19,10 @@ module.exports = {
   "customer.edit": {
     entry: './src/modules/customer/edit/index.js',
     template: 'src/modules/customer/edit/index.html'
+  },
+
+  // ------------ 订阅通知日报 ------------
+  "open.subscibe": {
+    entry: './src/modules/open/subscibe/index.js'
   }
 }
