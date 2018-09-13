@@ -2,7 +2,8 @@
 const http = require('http');
 
 const DEFAULT_OPIONS = {
-  host: 'dev.api.shb.ltd',
+  // host: 'dev.api.shb.ltd',
+  host: '192.168.31.254',
   port: 8080,
   headers: {}
 };
@@ -57,6 +58,7 @@ module.exports = {
     proxyOptions.port = options.port || DEFAULT_OPIONS.port;
     proxyOptions.method = method;
     proxyOptions.path = path;
+    // proxyOptions.path = '/sm4-web/' + path;
 
     proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, options.headers)
     proxyOptions.agent = AGENT;
@@ -116,6 +118,7 @@ module.exports = {
     proxyOptions.port = options.port || DEFAULT_OPIONS.port;
     proxyOptions.method = method;
     proxyOptions.path = path;
+    // proxyOptions.path = '/sm4-web/' + path;
 
     proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, request.headers, options.headers)
     proxyOptions.agent = AGENT;

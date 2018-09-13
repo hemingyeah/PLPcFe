@@ -194,13 +194,13 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <el-button type="primary" icon="el-icon-plus" @click="jumpPage">新建</el-button>
-          <el-button type="primary" icon="el-icon-delete" @click="deleteCustomer" class="delete-customer-btn">删除
+          <el-button v-if="editedPermission" type="primary" icon="el-icon-plus" @click="jumpPage">新建</el-button>
+          <el-button v-if="highLevelPermission" type="primary" icon="el-icon-delete" @click="deleteCustomer" class="delete-customer-btn">删除
           </el-button>
         </div>
 
         <div>
-          <el-dropdown>
+          <el-dropdown trigger="click" v-if="highLevelPermission">
             <el-button type="primary">
               批量操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -216,7 +216,7 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown>
+          <el-dropdown trigger="click" v-if="exportPermission">
             <el-button type="primary">
               更多操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -235,7 +235,7 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown :hide-on-click="false" :show-timeout="150">
+          <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
             <el-button type="primary">
               选择列<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -250,71 +250,69 @@
         </div>
       </div>
       <!--operation bar end-->
+      <el-table
+        stripe
+        :data="customers"
+        @select="handleSelection"
+        @select-all="handleSelection"
+        @sort-change="sortChange"
+        row-key="serialNumber"
+        @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
+        <el-table-column fixed type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+        <el-table-column
+          v-for="column in columns"
+          :key="column.field"
+          :label="column.label"
+          :width="column.width"
+          :min-width="column.minWidth"
+          :prop="column.field"
+          v-if="column.show"
+          :fixed="column.fixed"
+          :sortable="column.sortable"
+          show-overflow-tooltip
+          :align="column.align">
 
-      <div class="table-wrap">
-        <el-table
-          stripe
-          :data="customers"
-          @select="selectRow"
-          @select-all="selectAll"
-          @sort-change="sortChange"
-          row-key="serialNumber"
-          @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
-          <el-table-column fixed type="selection" width="48" align="center" class-name="select-column"></el-table-column>
-          <el-table-column
-            v-for="column in columns"
-            :key="column.field"
-            :label="column.label"
-            :width="column.width"
-            :min-width="column.minWidth"
-            :prop="column.field"
-            v-if="column.show"
-            :fixed="column.fixed"
-            :sortable="column.sortable"
-            :align="column.align"
-            show-overflow-tooltip>
-            <template slot-scope="scope">
-              <template v-if="column.field === 'customerAddress'">
-                {{scope.row[column.field] | fmt_address}}
-              </template>
-              <template v-else-if="column.field === 'detailAddress'">
-                {{scope.row.customerAddress.adAddress}}
-              </template>
-              <template v-else-if="column.field === 'tags' && scope.row.tags">
-                {{scope.row.tags.map(t => t.tagName).join(' ')}}
-              </template>
-              <template v-else-if="column.field === 'status'">
-                <el-switch
-                  :disabled="pending"
-                  @change="toggleStatus(scope.row)"
-                  :value="Boolean(scope.row.status)">
-                </el-switch>
-              </template>
-              <template v-else-if="column.field === 'createUser'">
-                {{scope.row.createUserName}}
-              </template>
-              <template v-else-if="column.field === 'remindCount'">
-                {{scope.row.attribute.remindCount}}
-              </template>
-              <template v-else-if="column.formType === 'selectMulti' && scope.row.attribute[column.field]">
-                {{scope.row.attribute[column.field].join(',')}}
-              </template>
-              <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-                {{scope.row.attribute[column.field].displayName}}
-              </template>
-              <template v-else-if="column.formType === 'attachment' && scope.row.attribute[column.field]">
-                {{scope.row.attribute[column.field].map(a => a.filename).join(',')}}
-              </template>
-              <template v-else-if="column.isSystem === 0">
-                {{scope.row.attribute[column.field]}}
-              </template>
-              <template v-else>
-                {{scope.row[column.field]}}
-              </template>
+          <template slot-scope="scope">
+            <template v-if="column.field === 'name'">
+              <el-button @click="viewCustomerDetail(scope.row)" type="text" style="font-size: 13px">{{scope.row[column.field]}}</el-button>
             </template>
-          </el-table-column>
-        </el-table>
-      </div>
+            <template v-else-if="column.field === 'customerAddress'">
+              {{formatAddress(scope.row[column.field])}}
+            </template>
+            <template v-else-if="column.field === 'detailAddress'">
+              {{scope.row.customerAddress.adAddress}}
+            </template>
+            <template v-else-if="column.field === 'tags' && scope.row.tags">
+              {{scope.row.tags.map(t => t.tagName).join('，')}}
+            </template>
+            <template v-else-if="column.field === 'status'">
+              <el-switch
+                :disabled="pending"
+                @change="toggleStatus(scope.row)"
+                :value="Boolean(scope.row.status)">
+              </el-switch>
+            </template>
+            <template v-else-if="column.field === 'createUser'">
+              {{scope.row.createUserName}}
+            </template>
+            <template v-else-if="column.field === 'remindCount'">
+              {{scope.row.attribute.remindCount}}
+            </template>
+            <template v-else-if="column.formType === 'selectMulti' && scope.row.attribute[column.field]">
+              {{scope.row.attribute[column.field].join('，')}}
+            </template>
+            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+              {{scope.row.attribute[column.field].displayName}}
+            </template>
+            <template v-else-if="column.isSystem === 0">
+              {{scope.row.attribute[column.field]}}
+            </template>
+            <template v-else>
+              {{scope.row[column.field]}}
+            </template>
+          </template>
+        </el-table-column>
+      </el-table>
 
       <div class="table-footer">
         <div class="list-info">
@@ -501,9 +499,20 @@
             loading: false,
           },
         },
+        selectedLimit: 100,
+        auth: {},
       };
     },
     computed: {
+      editedPermission() {
+        return this.auth.CUSTOMER_EDIT;
+      },
+      highLevelPermission() {
+        return this.auth.CUSTOMER_EDIT === 3;
+      },
+      exportPermission() {
+        return this.auth.EXPORT_IN;
+      },
       selectedIds() {
         return this.multipleSelection.map(c => c.id) || [];
       },
@@ -520,12 +529,23 @@
         customerConfig: initData.customerConfig,
         fieldInfo: initData.fieldInfo,
       };
+      this.auth = initData.auth || {};
+
+      // console.log('initData', initData);
 
       this.buildConfig();
 
       this.search();
   },
     methods: {
+      formatAddress(ad) {
+        const { adCountry, adProvince, adCity, adDist, } = ad;
+        return [ adCountry, adProvince, adCity, adDist, ]
+          .filter(d => !!d).join('-');
+      },
+      viewCustomerDetail(cs) {
+        window.location = `/sm4-web/customer/view/${cs.id}`;
+      },
       // remoteInputFocus(action) {
       //   if (this.inputRemoteSearch[action].options.length) return;
       //   let fn = () => ({});
@@ -613,7 +633,6 @@
       },
       search(cp) {
         // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
-        console.log('cp', cp);
         let params = this.buildParams();
         this.loadingListData = true;
 
@@ -816,16 +835,27 @@
         this.search();
       },
       // select customer
-      selectRow(selection, row) {
-        if (selection.length < this.multipleSelection.length) {
-          this.multipleSelection = this.multipleSelection
-            .filter(sRow => sRow.id !== row.id);
+      handleSelection(selection) {
+        let tv = this.computeSelection(selection);
+        let original = this.multipleSelection
+          .filter(ms => this.customers.some(cs => cs.id === ms.id));
+        let unSelected = this.customers
+          .filter(c => original.every(oc => oc.id !== c.id));
+
+        if (tv.length > this.selectedLimit) {
+          unSelected.forEach(row => {
+            this.$refs.multipleTable.toggleRowSelection(row, false);
+          });
+          return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
         }
+        this.multipleSelection = tv;
       },
-      selectAll(selection) {
-        if (selection.length) return;
-        this.multipleSelection = this.multipleSelection
-          .filter(sR => this.customers.every(c => c.id !== sR.id));
+      computeSelection(selection) {
+        let tv = [];
+        tv = this.multipleSelection
+          .filter(ms => this.customers.every(c => c.id !== ms.id));
+        tv = _.uniqWith([...tv, ...selection], _.isEqual);
+        return tv;
       },
       toggleSelection(rows) {
         if (rows) {
@@ -838,7 +868,7 @@
         }
       },
       handleSelectionChange(val) {
-        this.multipleSelection = _.uniqWith([...this.multipleSelection, ...val], _.isEqual);
+        // 表格选中change事件
       },
       // list method end
 
@@ -903,7 +933,7 @@
       buildTableColumn() {
         const localStorageData = this.getLocalStorageData();
         let columnStatus = localStorageData.columnStatus || [];
-        let minWidth = 80;
+        let minWidth = 100;
 
         let baseColumns = this.fixedColumns();
         let dynamicColumns = [];
@@ -911,10 +941,10 @@
         let sortable = false;
 
         dynamicColumns = this.customerConfig.fieldInfo
-          .filter(f => !f.isSystem)
+          .filter(f => !f.isSystem && f.formType !== 'attachment')
           .map(field => {
             sortable = false;
-            minWidth = 80;
+            minWidth = 100;
             if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
               sortable = 'custom';
               minWidth = 100;
@@ -926,6 +956,10 @@
 
             if (sortable && field.displayName.length >= 4) {
               minWidth += 25;
+            }
+
+            if (field.formType === 'datetime') {
+              minWidth = 150;
             }
 
             return {
@@ -1083,32 +1117,32 @@
           field: 'name',
           show: true,
           fixed: true,
-          minWidth: '100px',
+          minWidth: '150px',
         }, {
           label: '客户编号',
           field: 'serialNumber',
-          width: '110px',
+          width: '150px',
           fixed: true,
           show: true,
         }, {
           label: '联系人',
           field: 'lmName',
-          minWidth: '80px',
+          minWidth: '100px',
           show: true,
         }, {
           label: '电话',
           field: 'lmPhone',
-          width: '110px',
+          width: '130px',
           show: true,
         }, {
           label: '区域',
           field: 'customerAddress',
-          minWidth: '110px',
+          minWidth: '180px',
           show: true,
         }, {
           label: '详细地址',
           field: 'detailAddress',
-          minWidth: '110px',
+          minWidth: '160px',
           show: true,
         }, {
           label: '服务团队',
@@ -1120,18 +1154,18 @@
           field: 'customerManagerName',
           show: true,
           minWidth: '110px',
-        // }, {
-        //   label: '启用/禁用',
-        //   field: 'status',
-        //   show: true,
-        //   align: 'center',
-        //   width: '100px',
+        }, {
+          label: '启用/禁用',
+          field: 'status',
+          show: true,
+          align: 'center',
+          width: '100px',
         }, {
           label: '创建时间',
           field: 'createTime',
           show: true,
           sortable: 'custom',
-          minWidth: '110px',
+          minWidth: '150px',
         }, {
           label: '创建人',
           field: 'createUser',
