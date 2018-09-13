@@ -9,7 +9,7 @@
           </button>
         </div>
         <div class="frame-header-right">
-          <div><a href="/" style="line-height: 40px;">返回旧版</a></div>
+          <div><a href="/v3" style="line-height: 40px;">返回旧版</a></div>
           <div class="dev-tool" v-if="showDevTool">
             <span>测试工具</span>
             <div class="dev-tool-menu">
@@ -41,17 +41,12 @@
             </div>
           </el-popover>
           <!--导出下载-->
-          <!-- <div class="export-wrap">
-            
- 
-            
-          </div> -->
-
+    
           <!-- 个人信息 -->
           <el-popover class="user-profile-wrap" popper-class="user-profile-menu" v-model="profilePopperVisible">
             <div class="user-profile" slot="reference">
               <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
-                <img :src="loginUser.head"/>
+                <img :src="userAvatar"/>
               </a>
               <div class="user-info">
                 <h4>{{loginUser.displayName}}</h4>
@@ -61,7 +56,7 @@
             </div>
             
             <el-popover placement="left-start" popper-class="user-state-popper" v-model="userStatePopperVisible">
-              <div class="user-profile-item" slot="reference"><i class="iconfont icon-userstatus"></i>工作状态</div>
+              <div class="user-profile-item" slot="reference"><i class="iconfont icon-user-status"></i>工作状态</div>
 
               <div class="user-state-panel">
                 <div 
@@ -103,6 +98,8 @@ import FrameMain from './component/FrameMain.vue';
 import Version from './component/Version.vue';
 import SaleManager from './component/SaleManager.vue';
 
+import DefaultHead from '@src/assets/img/user-avatar.png';
+
 const VERSION_NUM_KEY = 'shb_version_num';
 
 export default {
@@ -115,10 +112,11 @@ export default {
   },
   data(){
     return {
+      loginUser: this.initData.user || {}, //当前登录的用户
+
       profilePopperVisible: false, 
       userStatePopperVisible: false,
 
-      loginUser: this.initData.user || {},
       collapse: true,
       currUrl: '/home',
 
@@ -147,6 +145,10 @@ export default {
     userStateColor(){
       let state = this.loginUser.state;
       return this.userStateMap[state];
+    },
+    /** 用户头像 */
+    userAvatar(){
+      return this.loginUser.head || DefaultHead;
     }
   },
   methods: {
@@ -199,10 +201,9 @@ export default {
       platform.openLink("https://help.shb.ltd");
     },
     openUserView(event){
-      let a = event.target
       this.openFrameTab({
         id: "userCenter",
-        url: a.getAttribute('href'),
+        url: `/mine/` + this.loginUser.userId,
         title: '个人中心'
       })
     },
