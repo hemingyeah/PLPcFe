@@ -275,7 +275,7 @@
 
           <template slot-scope="scope">
             <template v-if="column.field === 'name'">
-              <el-button @click="viewCustomerDetail(scope.row)" type="text" style="font-size: 13px">{{scope.row[column.field]}}</el-button>
+              <a :href="`/customer/view/${scope.row.id}`" class="view-detail-btn">{{scope.row[column.field]}}</a>
             </template>
             <template v-else-if="column.field === 'customerAddress'">
               {{formatAddress(scope.row[column.field])}}
@@ -540,12 +540,9 @@
   },
     methods: {
       formatAddress(ad) {
-        const { adCountry, adProvince, adCity, adDist, } = ad;
-        return [ adCountry, adProvince, adCity, adDist, ]
+        const { adProvince, adCity, adDist, } = ad;
+        return [ adProvince, adCity, adDist, ]
           .filter(d => !!d).join('-');
-      },
-      viewCustomerDetail(cs) {
-        window.location = `/sm4-web/customer/view/${cs.id}`;
       },
       // remoteInputFocus(action) {
       //   if (this.inputRemoteSearch[action].options.length) return;
@@ -1332,6 +1329,10 @@
       td {
         color: #909399;
         font-size: 13px;
+      }
+
+      .view-detail-btn {
+        color: $color-primary;
       }
 
       .select-column .el-checkbox {
