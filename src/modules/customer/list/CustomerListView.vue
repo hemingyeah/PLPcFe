@@ -241,7 +241,7 @@
               选择列<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
-              <el-dropdown-item v-for="item in columns" :key="item.label">
+              <el-dropdown-item v-for="item in columns" :key="item.field">
                 <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label">
                   {{item.label}}
                 </el-checkbox>
@@ -252,23 +252,24 @@
       </div>
       <!--operation bar end-->
       <el-table
-        stripe
         :data="customers"
+        stripe
         @select="handleSelection"
         @select-all="handleSelection"
         @sort-change="sortChange"
-        row-key="serialNumber"
-        @selection-change="handleSelectionChange" ref="multipleTable" class="customer-table">
+        :highlight-current-row="false"
+        ref="multipleTable" class="customer-table">
+        <!--row-key="serialNumber"-->
+
         <el-table-column fixed type="selection" width="48" align="center" class-name="select-column"></el-table-column>
         <el-table-column
           v-for="column in columns"
+          v-if="column.show"
           :key="column.field"
           :label="column.label"
-          :width="column.width"
-          :min-width="column.minWidth"
           :prop="column.field"
-          v-if="column.show"
           :fixed="column.fixed"
+          :width="column.width"
           :sortable="column.sortable"
           show-overflow-tooltip
           :align="column.align">
@@ -288,7 +289,7 @@
             </template>
             <template v-else-if="column.field === 'status'">
               <el-switch
-                :disabled="pending"
+                :disabled="scope.row.pending"
                 @change="toggleStatus(scope.row)"
                 :value="Boolean(scope.row.status)">
               </el-switch>
@@ -500,7 +501,7 @@
             loading: false,
           },
         },
-        selectedLimit: 100,
+        selectedLimit: 200,
         auth: {},
       };
     },
@@ -651,7 +652,12 @@
             } else {
               const {pages, total, pageNum, list, } = res;
 
-              this.customers = list;
+              this.customers = list
+                .map(c => {
+                  c.pending = false;
+                  return c;
+                });
+
               this.paginationInfo.totalItems = total;
               this.paginationInfo.totalPages = pages;
               this.paginationInfo.pageNum = pageNum;
@@ -777,15 +783,15 @@
       },
       toggleStatus(row) {
         const ns = row.status ? 0 : 1;
+        row.pending = true;
         const params = {
           id: row.id,
           status: ns,
         };
 
-        this.pending = true;
         this.$http.post('/customer/changeState', params, false)
           .then(res => {
-            this.pending = false;
+            row.pending = false;
             this.customers.forEach(c => {
               if (c.id === row.id) {
                 c.status = ns;
@@ -793,7 +799,7 @@
             })
           })
           .catch(err => {
-            this.pending = false;
+            row.pending = false;
             console.error('toggleStatus catch err', err);
           })
       },
@@ -964,7 +970,7 @@
               label: field.displayName,
               field: field.fieldName,
               formType: field.formType,
-              minWidth: `${minWidth}px`,
+              width: `${minWidth}px`,
               sortable,
               isSystem: 0,
             };
@@ -1115,43 +1121,43 @@
           field: 'name',
           show: true,
           fixed: true,
-          minWidth: '150px',
+          // width: '150px',
         }, {
           label: '客户编号',
           field: 'serialNumber',
-          width: '150px',
+          // width: '150px',
           fixed: true,
           show: true,
         }, {
           label: '联系人',
           field: 'lmName',
-          minWidth: '100px',
+          // width: '100px',
           show: true,
         }, {
           label: '电话',
           field: 'lmPhone',
-          width: '130px',
+          // width: '130px',
           show: true,
         }, {
           label: '区域',
           field: 'customerAddress',
-          minWidth: '180px',
+          // width: '180px',
           show: true,
         }, {
           label: '详细地址',
           field: 'detailAddress',
-          minWidth: '160px',
+          // width: '160px',
           show: true,
         }, {
           label: '服务团队',
           field: 'tags',
-          minWidth: '110px',
+          // width: '110px',
           show: true,
         }, {
           label: '客户负责人',
           field: 'customerManagerName',
           show: true,
-          minWidth: '110px',
+          width: '110px',
         }, {
           label: '启用/禁用',
           field: 'status',
@@ -1163,16 +1169,16 @@
           field: 'createTime',
           show: true,
           sortable: 'custom',
-          minWidth: '150px',
+          width: '150px',
         }, {
           label: '创建人',
           field: 'createUser',
-          minWidth: '80px',
+          // width: '80px',
           show: true,
         }, {
           label: '提醒数量',
           field: 'remindCount',
-          minWidth: '80px',
+          // width: '80px',
           show: true,
         }]
       }
@@ -1379,7 +1385,7 @@
     .selected-customer-list {
       overflow-y: scroll;
       padding: 0 20px;
-      line-height: 30px;
+      line-height: 45px;
       font-size: 14px;
       height: calc(100% - 130px);
       dt, dd {
@@ -1389,13 +1395,14 @@
       }
 
       dd {
+        margin: 0;
         &:hover {
           cursor: pointer;
           .iconfont {
             display: block;
           }
         }
-        span.name-column, .iconfont {
+        .iconfont {
           color: $color-primary;
         }
         .iconfont {
