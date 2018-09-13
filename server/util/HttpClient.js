@@ -2,8 +2,8 @@
 const http = require('http');
 
 const DEFAULT_OPIONS = {
-  // host: 'dev.api.shb.ltd',
-  host: '192.168.31.254',
+  host: 'dev.api.shb.ltd',
+  // host: '192.168.31.254',
   port: 8080,
   headers: {}
 };

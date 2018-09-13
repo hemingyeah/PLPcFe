@@ -7,6 +7,7 @@
           <el-input v-model="params.keyword" placeholder="根据客户信息搜索"></el-input>
           <el-button type="primary" native-type="submit" @click.prevent="search({ pageNum: 1, })">搜索</el-button>
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
+          <a href="/customer">返回旧版</a>
         </div>
         <el-button type="primary" @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
       </form>
