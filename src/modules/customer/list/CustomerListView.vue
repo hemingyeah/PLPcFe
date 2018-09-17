@@ -64,7 +64,7 @@
             <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
           </el-form-item>
           <el-form-item label-width="100px" label="详细地址">
-            <el-input type="text" v-model="specialParams.adAddress"></el-input>
+            <el-input type="text" v-model="params.specialSearchModel.adAddress"></el-input>
           </el-form-item>
           <el-form-item label-width="100px" label="有无提醒">
             <el-select v-model="params.hasRemind" clearable placeholder="请选择">
@@ -132,10 +132,10 @@
           <!-- 动态搜索框 -->
           <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields" :key="field.fieldName">
             <template v-if="field.formType === 'text' || field.formType === 'code'">
-              <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="text"></el-input>
+              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="text"></el-input>
             </template>
             <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-              <el-select v-model="customizedSearchModel[field.fieldName]['value']" clearable :placeholder="field.placeHolder">
+              <el-select v-model="params.customizedSearchModel[field.fieldName]['value']" clearable :placeholder="field.placeHolder">
                 <el-option
                   v-for="item in field.setting.dataSource"
                   :key="item"
@@ -146,11 +146,11 @@
               </el-select>
             </template>
             <template v-else-if="field.formType === 'number'">
-              <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="number"></el-input>
+              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="number"></el-input>
             </template>
             <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
               <el-date-picker
-                v-model="customizedSearchModel[field.fieldName]['value']"
+                v-model="params.customizedSearchModel[field.fieldName]['value']"
                 type="daterange"
                 align="right"
                 unlink-panels
@@ -162,7 +162,7 @@
             </template>
             <template v-else-if="field.formType === 'user'">
               <el-select
-                v-model="customizedSearchModel[field.fieldName]['value']"
+                v-model="params.customizedSearchModel[field.fieldName]['value']"
                 filterable
                 clearable
                 remote
@@ -179,7 +179,7 @@
               </el-select>
             </template>
             <template v-else>
-              <el-input v-model="customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder"></el-input>
+              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder"></el-input>
             </template>
           </el-form-item>
           <div class="advanced-search-btn-group">
@@ -218,7 +218,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown trigger="click" v-if="exportPermission">
-            <el-button type="primary">
+            <el-button type="primary" class="delete-customer-btn">
               更多操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown">
@@ -237,7 +237,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
-            <el-button type="primary">
+            <el-button type="primary" class="delete-customer-btn">
               选择列<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
@@ -418,24 +418,18 @@
         loadingListData: false,
         advancedSearchPanelShow: false,
         multipleSelectionPanelShow: false,
-        customizedSearchModel: {},
-        specialParams: {
-          sortBy: {
-            'customer.createTime': null,
-          },
-          addressSelector: [],
-          adAddress: '',
-        },
         params: {
-          // linkmanName: '',
-          // tagName: '',
+          specialSearchModel: {
+            addressSelector: [],
+            adAddress: '',
+          },
+          customizedSearchModel: {},
           createUserName: '',
           customerManagerName: '',
           keyword: '',
           serialNumber: '',
           linkmanId: '',
           tagId: '',
-          customerAddress: {},
           hasRemind: '',
           status: '',
           createUser: '',
@@ -443,6 +437,8 @@
           createTime: '',
           pageNum: 1,
           pageSize: 10,
+          customerAddress: {},
+          orderDetail: {},
         },
         createTimePickerOptions: {
           shortcuts: [{
@@ -578,19 +574,13 @@
           .map(f => {
             if (f.isSearch) {
               // 需要搜索的字段
-              this.$set(this.customizedSearchModel, f.fieldName, {
+              this.$set(this.params.customizedSearchModel, f.fieldName, {
                 fieldName: f.fieldName,
                 value: null,
                 operator: this.matchOperator(f.formType),
                 formType: f.formType,
               });
               this.searchFields.push(f);
-              if (f.formType === 'number') {
-                this.$set(this.specialParams, `lpad(myOrderConvertor(customer.attribute->>'$.${f.fieldName}'),16,0)`, '')
-              }
-              if (f.formType === 'date' || f.formType === 'datetime') {
-                this.$set(this.specialParams, `myOrderConvertor(customer.attribute->>'$.${f.fieldName}')`, '')
-              }
             }
 
             return f;
@@ -633,6 +623,7 @@
       search(cp) {
         // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
         let params = this.buildParams();
+        console.log('params', params);
         this.loadingListData = true;
 
         if (cp) {
@@ -680,7 +671,7 @@
         const conditions = [];
         let params = {
           ..._.cloneDeep(this.params),
-          ..._.cloneDeep(this.specialParams),
+          // ..._.cloneDeep(this.specialParams),
         };
 
         // createTime
@@ -691,21 +682,21 @@
         }
 
         // address
-        if (this.specialParams.addressSelector.length) {
+        if (this.params.specialSearchModel.addressSelector.length) {
           params.customerAddress = {
-            adProvince: this.specialParams.addressSelector[0],
-            adCity: this.specialParams.addressSelector[1] || '',
-            adDist: this.specialParams.addressSelector[2] || '',
+            adProvince: this.params.specialSearchModel.addressSelector[0],
+            adCity: this.params.specialSearchModel.addressSelector[1] || '',
+            adDist: this.params.specialSearchModel.addressSelector[2] || '',
           };
         }
-        params.customerAddress.adAddress = this.specialParams.adAddress || '';
+        params.customerAddress.adAddress = this.params.specialSearchModel.adAddress || '';
 
         params = this.deleteValueFromObject(params, [0, false]);
 
         // build customized search fields
-        Object.keys(this.customizedSearchModel)
+        Object.keys(this.params.customizedSearchModel)
           .forEach(key => {
-            tv = this.customizedSearchModel[key];
+            tv = this.params.customizedSearchModel[key];
             if (tv.value && tv.formType === 'date') {
               return conditions.push({
                 property: tv.fieldName,
@@ -735,6 +726,8 @@
         if (conditions.length) {
           params.conditions = conditions;
         }
+
+        delete params.customizedSearchModel;
 
         // console.log('[build params end]params', params);
         return params;
@@ -774,7 +767,7 @@
         }
       },
       handleCitySelectorChange(city) {
-        this.specialParams.addressSelector = city;
+        this.params.specialSearchModel.addressSelector = city;
       },
       cancelSelectCustomer(customer) {
         if (!customer || !customer.id) return;
@@ -803,29 +796,36 @@
             console.error('toggleStatus catch err', err);
           })
       },
+      // todo  还需优化
       sortChange(option) {
-        const {column, prop, order} = option;
-        if (!column || !prop || !order) return;
-        const numberField = `lpad(myOrderConvertor(customer.attribute->>'$.${prop}'),16,0)`;
-        const dateField = `myOrderConvertor(customer.attribute->>'$.${prop}')`;
-        let type = null;
+        const {prop, order} = option;
+        if (!order) {
+          this.params.orderDetail = {};
+          return this.search();
+        }
+
+        let sortModel = {
+          isSystem: prop === 'createTime' ? 1 : 0,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+        };
+
+        if (sortModel.isSystem) {
+          sortModel.column = `customer.${prop}`;
+        } else {
+          sortModel.column = prop;
+        }
 
         if (prop === 'createTime') {
-          this.specialParams.sortBy = {
-            'customer.createTime': this.matchSortValue(order),
-            [numberField]: '',
-            [dateField]: '',
-          }
+          sortModel.type = 'date';
         } else {
-          type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
+          sortModel.type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
         }
-        if (type === 'number') {
-          this.specialParams.sortBy = {
-            'customer.createTime': '',
-            [numberField]: this.matchSortValue(order),
-            [dateField]: '',
-          }
+
+        if (sortModel.type === 'datetime') {
+          sortModel.type = 'date';
         }
+        this.params.orderDetail = sortModel;
+
         this.search();
       },
       jump(pageNum) {
@@ -990,15 +990,12 @@
       },
       resetParams() {
         this.params = {
-          // linkmanName: '',
-          // tagName: '',
           createUserName: '',
           customerManagerName: '',
           keyword: '',
           serialNumber: '',
           linkmanId: '',
           tagId: '',
-          customerAddress: {},
           hasRemind: '',
           status: '',
           createUser: '',
@@ -1006,16 +1003,24 @@
           createTime: '',
           pageNum: 1,
           pageSize: 10,
-
+          customerAddress: {},
+          orderDetail: {},
+          specialSearchModel: {
+            addressSelector: [],
+            adAddress: '',
+          },
+          customizedSearchModel: {
+            ...this.params.customizedSearchModel,
+          },
         };
-        for (let key in this.specialParams.sortBy) {
-          this.specialParams.sortBy[key] = '';
-        }
-        this.specialParams.addressSelector = [];
-        this.specialParams.adAddress = '';
+        // for (let key in this.specialParams.sortBy) {
+        //   this.specialParams.sortBy[key] = '';
+        // }
+        this.params.specialSearchModel.addressSelector = [];
+        this.params.specialSearchModel.adAddress = '';
 
-        for (let key in this.customizedSearchModel) {
-          this.customizedSearchModel[key].value = null;
+        for (let key in this.params.customizedSearchModel) {
+          this.params.customizedSearchModel[key].value = null;
         }
         this.$refs.baseDistPicker.clearValue();
         this.search();
@@ -1390,7 +1395,7 @@
       height: calc(100% - 130px);
       dt, dd {
         display: flex;
-        border-bottom: 1px dashed #F0F5F5;
+        border-bottom: 1px solid #F0F5F5;
         font-weight: normal;
       }
 
