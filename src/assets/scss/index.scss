@@ -32,3 +32,26 @@ iframe {
 button {
   cursor: pointer;
 }
+
+input,textarea{
+  padding: 3px 10px;
+  line-height: 24px;
+  border: 1px solid #e0e1e2;
+  border-radius: 2px;
+  margin: 0;
+  outline: none;
+  transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  
+  &:focus{
+    border-color: $color-primary;
+  }
+
+  &:hover{
+    border-color: #c0c4cc;
+  }
+}
+
+textarea{
+  min-height: 32px;
+  max-height: 320px;
+}

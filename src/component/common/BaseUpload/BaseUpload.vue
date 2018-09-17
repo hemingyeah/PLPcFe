@@ -2,11 +2,11 @@
   <div class="base-upload-container">
     <input type="file" ref="input" @change="handleChange" :multiple="multiple">
 
-    <div class="base-file-list">
+    <div class="base-file-list" >
       <base-file-item v-for="file in uploadedFiles" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
     
-    <button type="button" class="base-upload-btn" @click="chooseFile" :disabled="pending">
+    <button type="button" class="base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
       <span>{{pending ? '正在上传' : '点击上传'}}</span>
     </button>
   </div>
@@ -35,6 +35,10 @@
       multiple: {
         type: Boolean,
         default: true
+      },
+      forId: {
+        type: String,
+        default: ''
       }
     },
     methods: {
@@ -164,7 +168,7 @@
   border: none;
   outline: none;
   color: #fff;
-  background-color: #409EFF;
+  background-color: $color-primary;
 
   user-select: none;
   cursor: pointer;
@@ -180,18 +184,16 @@
 
   &:hover,
   &:focus{
-    background: #66b1ff;
-    color: #fff;
+    background: #33bdac;
   }
 
   &:disabled{
-    background: #66b1ff;
+    background: #33bdac;
     cursor: not-allowed;
   }
 
   &:active{
-    background: #3a8ee6;
-    color: #fff;
+    background: #009b88;
   }
 }
 </style>

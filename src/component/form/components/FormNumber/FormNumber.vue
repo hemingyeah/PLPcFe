@@ -1,5 +1,7 @@
 <template>
-  <div><input type="number" @input="input" :value="value"></div>
+  <div class="form-number">
+    <input :id="`form_${field.fieldName}`" type="number" @input="input" :value="value">
+  </div>
 </template>
 
 <script>
@@ -21,3 +23,12 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.form-number{
+  width: 100%;
+   input{
+     width: 100%;
+   }
+}
+</style>

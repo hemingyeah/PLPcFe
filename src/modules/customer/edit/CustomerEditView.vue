@@ -1,35 +1,29 @@
 <template>
   <div>
-    <form @submit.prevent="submit">
+    <form @submit.prevent="submit" style="width: 640px;">
       <form-builder ref="form" :fields="fields" :value="form" @input="update">
         <form-item label="客户编号" :field="customerSNField">
           <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
         </form-item>
-        <div>
-          <label>客户*</label>
-          <input>
-        </div>
-        <div>
-          <label>联系人*</label>
-          <input>
-        </div>
-        <div>
-          <label>电话*</label>
-          <input>
-        </div>
-        <div>
-          <label>地址*</label>
-          <input>
-          <button type="button" @click="chooseMap">地址选址</button>
-        </div>
-        <div>
-          <label>服务团队*</label>
-          <input>
-        </div>
-        <div>
-          <label>客户负责人*</label>
-          <input>
-        </div>
+        <form-item label="客户" :field="customerSNField">
+          <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
+        </form-item>
+        <form-item label="联系人" :field="customerSNField">
+          <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
+        </form-item>
+        <form-item label="电话" :field="customerSNField">
+          <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
+        </form-item>
+        <form-item label="地址" :field="customerSNField">
+          <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
+        </form-item>
+        <form-item label="服务团队" :field="customerSNField">
+          <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
+          <!-- <button type="button" @click="chooseMap">地址选址</button> -->
+        </form-item>
+        <form-item label="客户负责人" :field="customerSNField">
+          <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
+        </form-item>
       </form-builder>
       <button type="submit">提交</button>
     </form>

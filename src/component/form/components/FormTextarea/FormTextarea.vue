@@ -1,5 +1,7 @@
 <template>
-  <div><textarea @input="input" :value="value"></textarea></div>
+  <div class="form-textarea">
+    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3"></textarea>
+  </div>
 </template>
 
 <script>
@@ -24,3 +26,14 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.form-textarea{
+  width: 100%;
+
+  textarea{
+    width: 100%;
+  }
+}
+</style>
+

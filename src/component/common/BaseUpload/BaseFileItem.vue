@@ -111,8 +111,8 @@ export default {
   align-items: center;
 }
 
-.base-file-item + .base-file-item{
-  margin-top: 5px;
+.base-file-item{
+  margin-bottom: 5px;
 }
 
 .base-file-info {

@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="form-select">
     <el-select 
+      :id="`form_${field.fieldName}`"
       placeholder="请选择"
       clearable
       :multiple="isMulti"
@@ -41,3 +42,14 @@ export default {
   }
 }
 </script>
+
+
+<style lang="scss">
+.form-select{
+  width: 100%;
+
+  .el-select{
+    width: 100%;
+  }
+}
+</style>

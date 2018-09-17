@@ -3,5 +3,11 @@ $--color-primary: #00ac97;
 
 /* 改变 icon 字体路径变量，必需 */
 $--font-path: '~element-ui/lib/theme-chalk/fonts';
+$--border-radius-base: 2px !default; //边框圆角
+$--border-color-base: #e0e1e2 !default;
 
 @import "~element-ui/packages/theme-chalk/src/index";
+
+.el-input__inner{
+  padding-left: 10px;
+}

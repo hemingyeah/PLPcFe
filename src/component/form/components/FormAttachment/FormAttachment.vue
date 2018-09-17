@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <base-upload @input="input" :value="value"></base-upload>
+  <div class="form-attachment">
+    <base-upload @input="input" :value="value" :for-id="`form_${field.fieldName}`"></base-upload>
   </div>
 </template>
 
@@ -25,3 +25,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.form-attachment{
+  width: 100%;
+}
+</style>

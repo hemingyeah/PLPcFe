@@ -1,9 +1,9 @@
 <template>
   <div class="form-item" @validate.native="validate">
-    <label>{{label}}</label>
-    <div>
+    <label :for="`form_${field.fieldName}`"><span class="form-item-required" v-if="isRequired">*</span>{{label}}</label>
+    <div class="form-item-control">
       <slot></slot>
-      <div v-if="errMessage">{{errMessage}}</div>
+      <div class="form-item-error" v-if="errMessage">{{errMessage}}</div>
     </div>
   </div>
 </template>
@@ -24,6 +24,12 @@ export default {
     return {
       errMessage: '',
       valueFn: null, //function 用于获取注册字段的值和
+    }
+  },
+  computed: {
+    /** 字段是否必填 */
+    isRequired(){
+      return this.field.isNull == 0;
     }
   },
   methods: {
@@ -67,6 +73,30 @@ export default {
 .form-item{
   display: flex;
   flex-flow: row nowrap;
+  font-size: 14px;
+  margin-bottom: 10px;
+
+  label{
+    display: block;
+    width: 120px;
+    padding: 4px 10px 0 0;
+    line-height: 24px;
+    text-align: right;
+    margin: 0;
+  }
+}
+
+.form-item-required{
+  color: red;
+}
+
+.form-item-control{
+  flex: 1;
+}
+
+.form-item-error{
+  font-size: 12px;
+  line-height: 20px;
 }
 </style>
 

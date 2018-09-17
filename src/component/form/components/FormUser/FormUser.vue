@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <input readonly @click="choose" :value="displayName">
+  <div class="form-user">
+    <input :id="`form_${field.fieldName}`" readonly @click="choose" :value="displayName">
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    value: [Object, Array]
+    value: Object
   },
   computed: {
     displayName(){
@@ -26,12 +26,25 @@ export default {
         title: `请选择${this.field.displayName}`,
         max: 1
       };
-      return this.$fast.contact.choose('dept', options).then(users => {
-        let oldValue = null;
-        this.$emit('input', {newValue: users, oldValue, field: this.field});
+      return this.$fast.contact.choose('dept', options).then(result => {
+        if(result.status == 0){
+          let oldValue = null;
+          this.$emit('input', {newValue: result.data, oldValue, field: this.field});
+        }
       })
       .catch(err => console.error(err))
     }
   }
 }
 </script>
+
+<style lang="scss">
+.form-user{
+  width: 100%;
+
+  input{
+    width: 100%;
+    cursor: pointer;
+  }
+}
+</style>

@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="form-datetime">
     <el-date-picker
+      :id="`form_${field.fieldName}`"
       type="datetime"
       value-format="yyyy-MM-dd HH:mm:ss"
       placeholder="选择日期时间"
@@ -30,3 +31,12 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.form-datetime{
+  width: 100%;
+
+  .el-date-editor{
+    width: 100%;
+  }
+}
+</style>
