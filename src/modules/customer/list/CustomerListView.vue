@@ -218,7 +218,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown trigger="click" v-if="exportPermission">
-            <el-button type="primary">
+            <el-button type="primary" class="delete-customer-btn">
               更多操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown">
@@ -237,7 +237,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
-            <el-button type="primary">
+            <el-button type="primary" class="delete-customer-btn">
               选择列<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
@@ -419,6 +419,7 @@
         advancedSearchPanelShow: false,
         multipleSelectionPanelShow: false,
         customizedSearchModel: {},
+        paramsBackup: {},
         specialParams: {
           sortBy: {
             'customer.createTime': null,
@@ -427,15 +428,12 @@
           adAddress: '',
         },
         params: {
-          // linkmanName: '',
-          // tagName: '',
           createUserName: '',
           customerManagerName: '',
           keyword: '',
           serialNumber: '',
           linkmanId: '',
           tagId: '',
-          customerAddress: {},
           hasRemind: '',
           status: '',
           createUser: '',
@@ -443,6 +441,8 @@
           createTime: '',
           pageNum: 1,
           pageSize: 10,
+          customerAddress: {},
+          orderDetail: {},
         },
         createTimePickerOptions: {
           shortcuts: [{
@@ -804,28 +804,25 @@
           })
       },
       sortChange(option) {
-        const {column, prop, order} = option;
-        if (!column || !prop || !order) return;
-        const numberField = `lpad(myOrderConvertor(customer.attribute->>'$.${prop}'),16,0)`;
-        const dateField = `myOrderConvertor(customer.attribute->>'$.${prop}')`;
-        let type = null;
+        const {prop, order} = option;
+        if (!order) {
+          this.params.orderDetail = {};
+          return this.search();
+        }
+
+        let sortModel = {
+          column: `customer.${prop}`,
+          isSystem: prop === 'createTime' ? 1 : 0,
+          sequence: order === 'ascending' ? 'asc' : 'desc',
+        };
 
         if (prop === 'createTime') {
-          this.specialParams.sortBy = {
-            'customer.createTime': this.matchSortValue(order),
-            [numberField]: '',
-            [dateField]: '',
-          }
+          sortModel.type = 'date';
         } else {
-          type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
+          sortModel.type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
         }
-        if (type === 'number') {
-          this.specialParams.sortBy = {
-            'customer.createTime': '',
-            [numberField]: this.matchSortValue(order),
-            [dateField]: '',
-          }
-        }
+        this.params.orderDetail = sortModel;
+
         this.search();
       },
       jump(pageNum) {
@@ -1390,7 +1387,7 @@
       height: calc(100% - 130px);
       dt, dd {
         display: flex;
-        border-bottom: 1px dashed #F0F5F5;
+        border-bottom: 1px solid #F0F5F5;
         font-weight: normal;
       }
 
