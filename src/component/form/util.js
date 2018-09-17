@@ -43,7 +43,7 @@ export function toField(fields, mode){
 }
 
 export function toFormField(){
-
+  //
 }
 
 /** 迁移旧有字段至新类型，主要用于兼容客户、产品旧字段 */

@@ -1,6 +1,6 @@
 import FormSelectSetting from './FormSelectSetting.vue';
 import FormSelectPreview from './FormSelectPreview.vue';
-import FormSelectBuild from './FormSelectBuild.vue';
+import FormSelect from './FormSelect.vue';
 
 let FormSelectField = {
   formType: 'select', // 字段类型
@@ -9,7 +9,7 @@ let FormSelectField = {
   component: {
     setting: FormSelectSetting,
     preview: FormSelectPreview,
-    build: FormSelectBuild
+    build: FormSelect
   }
 };
 

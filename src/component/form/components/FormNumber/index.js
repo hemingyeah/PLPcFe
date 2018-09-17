@@ -1,6 +1,6 @@
 import FormNumberSetting from './FormNumberSetting.vue';
 import FormNumberPreview from './FormNumberPreview.vue';
-import FormNumberBuild from './FormNumberBuild.vue'
+import FormNumber from './FormNumber.vue'
 
 let FormNumberField = {
   formType: 'number', // 字段类型
@@ -9,7 +9,7 @@ let FormNumberField = {
   component: {
     setting: FormNumberSetting,
     preview: FormNumberPreview,
-    build: FormNumberBuild
+    build: FormNumber
   }
 };
 

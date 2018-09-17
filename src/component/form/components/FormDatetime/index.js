@@ -1,6 +1,6 @@
 import FormDatetimeSetting from './FormDatetimeSetting.vue';
 import FormDatetimePreview from './FormDatetimePreview.vue';
-import FormDatetimeBuild from './FormDatetimeBuild.vue'
+import FormDatetime from './FormDatetime.vue'
 
 let FormDatetimeField = {
   formType: 'datetime', // 字段类型
@@ -9,7 +9,7 @@ let FormDatetimeField = {
   component: {
     setting: FormDatetimeSetting,
     preview: FormDatetimePreview,
-    build: FormDatetimeBuild
+    build: FormDatetime
   }
 };
 

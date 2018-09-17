@@ -1,11 +1,10 @@
 <template>
   <div>
     <form @submit.prevent="submit">
-      <form-builder :fields="fields" :value="form" @update="update">
-        <div>
-          <label>客户编号*</label>
-          <input>
-        </div>
+      <form-builder ref="form" :fields="fields" :value="form" @input="update">
+        <form-item label="客户编号" :field="customerSNField">
+          <form-text :field="customerSNField" :value="form.serialNumber" @input="update"></form-text>
+        </form-item>
         <div>
           <label>客户*</label>
           <input>
@@ -49,6 +48,14 @@ export default {
   },
   data(){
     return {
+      //serialNumber
+      customerSNField: { //客户编号字段
+        formType: 'text',
+        fieldName: 'serialNumber',
+        displayName: "客户编号",
+        isNull: 0
+      },
+
       form: {},
       address: {}
     }
@@ -69,7 +76,11 @@ export default {
       this.$set(this.form, fieldName, newValue)
     },
     submit(){
-
+      this.$refs.form.validate().then(valid => {
+        if(!valid) return Promise.reject('validate fail.')
+        console.log(this.form)
+      })
+      .catch(err => console.error(err))
     },
     chooseMap(){
       this.$fast.map.picker(this.address, {defaultArea: "临沂市"}).then(result => {
@@ -80,7 +91,7 @@ export default {
     }
   },
   mounted(){
-    console.log(this.initData)
+    //console.log(this.initData)
   }
 }
 </script>

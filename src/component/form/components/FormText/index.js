@@ -1,6 +1,6 @@
 import FormTextSetting from './FormTextSetting.vue';
 import FormTextPreview from './FormTextPreview.vue';
-import FormTextBuild from './FormTextBuild.vue'
+import FormText from './FormText.vue'
 
 let FormTextField = {
   formType: 'text', // 字段类型
@@ -9,7 +9,7 @@ let FormTextField = {
   component: {
     setting: FormTextSetting,
     preview: FormTextPreview,
-    build: FormTextBuild
+    build: FormText
   }
 };
 

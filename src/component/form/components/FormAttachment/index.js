@@ -1,6 +1,6 @@
 import FormAttachmentSetting from './FormAttachmentSetting.vue';
 import FormAttachmentPreview from './FormAttachmentPreview.vue';
-import FormAttachmentBuild from './FormAttachmentBuild.vue'
+import FormAttachment from './FormAttachment.vue'
 
 let FormAttachmentField = {
   formType: 'attachment', // 字段类型
@@ -9,7 +9,7 @@ let FormAttachmentField = {
   component: {
     setting: FormAttachmentSetting,
     preview: FormAttachmentPreview,
-    build: FormAttachmentBuild
+    build: FormAttachment
   }
 };
 

@@ -1,6 +1,6 @@
 import FormDateSetting from './FormDateSetting.vue';
 import FormDatePreview from './FormDatePreview.vue';
-import FormDateBuild from './FormDateBuild.vue'
+import FormDate from './FormDate.vue'
 
 let FormDateField = {
   formType: 'date', // 字段类型
@@ -9,7 +9,7 @@ let FormDateField = {
   component: {
     setting: FormDateSetting,
     preview: FormDatePreview,
-    build: FormDateBuild
+    build: FormDate
   }
 };
 

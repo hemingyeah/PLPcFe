@@ -1,15 +1,12 @@
 <template>
   <div>
-    <div>{{field.displayName}}</div>
-    <div>
-      <base-upload @input="input" :value="value"></base-upload>
-    </div>
+    <base-upload @input="input" :value="value"></base-upload>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'form-attachment-build',
+  name: 'form-attachment',
   props: {
     field: {
       type: Object,
@@ -23,7 +20,7 @@ export default {
   methods: {
     input(newValue) {
       let oldValue = null;
-      this.$emit('input', {newValue, oldValue});
+      this.$emit('input', {newValue, oldValue, field: this.field});
     }
   }
 }

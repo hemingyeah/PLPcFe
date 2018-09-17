@@ -1,13 +1,16 @@
 <template>
   <div>
-    <div>{{field.displayName}}</div>
-    <div><textarea @input="input" :value="value"></textarea></div>
+    <el-date-picker
+      type="date"
+      value-format="yyyy-MM-dd"
+      placeholder="选择日期"
+      :value="value" @input="choose"/>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'form-textarae-build',
+  name: "form-date",
   props: {
     field: {
       type: Object,
@@ -19,11 +22,11 @@ export default {
     }
   },
   methods: {
-    input(event){
+    choose(newValue){
       let oldValue = null;
-      let newValue = event.target.value;
-      this.$emit('input', {newValue, oldValue});
+      this.$emit('input', {newValue, oldValue, field: this.field});
     }
   }
 }
 </script>
+

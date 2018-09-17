@@ -1,13 +1,12 @@
 <template>
   <div>
-    <div>{{field.displayName}}</div>
     <input readonly @click="choose" :value="displayName">
   </div>
 </template>
 
 <script>
 export default {
-  name: 'form-user-build',
+  name: 'form-user',
   props: {
     field: {
       type: Object,
@@ -29,7 +28,7 @@ export default {
       };
       return this.$fast.contact.choose('dept', options).then(users => {
         let oldValue = null;
-        this.$emit('input', {newValue: users, oldValue});
+        this.$emit('input', {newValue: users, oldValue, field: this.field});
       })
       .catch(err => console.error(err))
     }
