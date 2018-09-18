@@ -4,8 +4,8 @@
     <div class="customer-list-search-group-container">
       <form class="base-search">
         <div>
-          <el-input v-model="params.keyword" placeholder="根据客户信息搜索"></el-input>
-          <el-button type="primary" native-type="submit" @click.prevent="search({ pageNum: 1, })">搜索</el-button>
+          <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索"></el-input>
+          <el-button type="primary" native-type="submit" @click.prevent="search({ pageNum: 1, }, true)">搜索</el-button>
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
           <a href="/customer">返回旧版</a>
         </div>
@@ -184,7 +184,7 @@
           </el-form-item>
           <div class="advanced-search-btn-group">
             <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
-            <el-button type="primary" class="search-btn" native-type="submit" @click.prevent="search({ pageNum: 1, })">搜索</el-button>
+            <el-button type="primary" class="search-btn" native-type="submit" @click.prevent="search({ pageNum: 1, }, true)">搜索</el-button>
           </div>
         </el-form>
       </base-panel>
@@ -418,7 +418,7 @@
         loadingListData: false,
         advancedSearchPanelShow: false,
         multipleSelectionPanelShow: false,
-        params: {
+        paramsBackup: {
           specialSearchModel: {
             addressSelector: [],
             adAddress: '',
@@ -426,7 +426,6 @@
           customizedSearchModel: {},
           createUserName: '',
           customerManagerName: '',
-          keyword: '',
           serialNumber: '',
           linkmanId: '',
           tagId: '',
@@ -435,8 +434,28 @@
           createUser: '',
           customerManager: '',
           createTime: '',
+          customerAddress: {},
+          orderDetail: {},
+          keyword: '',
           pageNum: 1,
           pageSize: 10,
+        },
+        params: {
+          specialSearchModel: {
+            addressSelector: [],
+            adAddress: '',
+          },
+          customizedSearchModel: {},
+          createUserName: '',
+          customerManagerName: '',
+          serialNumber: '',
+          linkmanId: '',
+          tagId: '',
+          hasRemind: '',
+          status: '',
+          createUser: '',
+          customerManager: '',
+          createTime: '',
           customerAddress: {},
           orderDetail: {},
         },
@@ -519,7 +538,7 @@
       let initData = JSON.parse(window._init) || {};
       const localStorageData = this.getLocalStorageData();
       if (localStorageData.pageSize) {
-        this.params.pageSize = Number(localStorageData.pageSize);
+        this.paramsBackup.pageSize = Number(localStorageData.pageSize);
         this.paginationInfo.pageSize = Number(localStorageData.pageSize);
       }
       this.customerConfig = {
@@ -528,11 +547,9 @@
         fieldInfo: initData.fieldInfo,
       };
       this.auth = initData.auth || {};
-
-      // console.log('initData', initData);
+      console.log('initData', initData);
 
       this.buildConfig();
-
       this.search();
   },
     methods: {
@@ -620,18 +637,22 @@
       importSucc() {
         console.log('importSucc');
       },
-      search(cp) {
+      search(cp = {}, fullSearch) {
         // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
-        let params = this.buildParams();
-        console.log('params', params);
+        let params = {};
         this.loadingListData = true;
 
-        if (cp) {
-          params = {
-            ...params,
-            ...cp,
-          }
+        if (fullSearch) {
+          this.paramsBackup = {
+            ...this.paramsBackup,
+            ..._.cloneDeep(this.params),
+          };
         }
+
+        params = {
+          ...this.buildParams(),
+          ...cp,
+        };
 
         this.$http.post('/v2/customer/list', params)
           .then(res => {
@@ -669,10 +690,7 @@
       buildParams() {
         let tv = null; // tv means temporary variable that used inside the loop.
         const conditions = [];
-        let params = {
-          ..._.cloneDeep(this.params),
-          // ..._.cloneDeep(this.specialParams),
-        };
+        let params = _.cloneDeep(this.paramsBackup);
 
         // createTime
         if (params.createTime && params.createTime.length) {
@@ -689,7 +707,7 @@
             adDist: this.params.specialSearchModel.addressSelector[2] || '',
           };
         }
-        params.customerAddress.adAddress = this.params.specialSearchModel.adAddress || '';
+        params.customerAddress.adAddress = this.paramsBackup.specialSearchModel.adAddress || '';
 
         params = this.deleteValueFromObject(params, [0, false]);
 
@@ -796,11 +814,10 @@
             console.error('toggleStatus catch err', err);
           })
       },
-      // todo  还需优化
       sortChange(option) {
         const {prop, order} = option;
         if (!order) {
-          this.params.orderDetail = {};
+          this.paramsBackup.orderDetail = {};
           return this.search();
         }
 
@@ -809,33 +826,24 @@
           sequence: order === 'ascending' ? 'ASC' : 'DESC',
         };
 
-        if (sortModel.isSystem) {
-          sortModel.column = `customer.${prop}`;
-        } else {
-          sortModel.column = prop;
-        }
-
-        if (prop === 'createTime') {
-          sortModel.type = 'date';
-        } else {
-          sortModel.type = this.searchFields.filter(sf => sf.fieldName === prop)[0].formType;
-        }
+        sortModel.column = sortModel.isSystem ? `customer.${prop}` : prop;
+        sortModel.type = this.customerConfig.fieldInfo.filter(sf => sf.fieldName === prop)[0].formType;
 
         if (sortModel.type === 'datetime') {
           sortModel.type = 'date';
         }
-        this.params.orderDetail = sortModel;
+        this.paramsBackup.orderDetail = sortModel;
 
         this.search();
       },
       jump(pageNum) {
-        this.params.pageNum = pageNum;
+        this.paramsBackup.pageNum = pageNum;
         this.search();
       },
       handleSizeChange(pageSize) {
         this.saveDataToStorage('pageSize', pageSize);
-        this.params.pageNum = 1;
-        this.params.pageSize = pageSize;
+        this.paramsBackup.pageNum = 1;
+        this.paramsBackup.pageSize = pageSize;
         this.search();
       },
       // select customer
@@ -870,9 +878,6 @@
           this.$refs.multipleTable.clearSelection();
           this.multipleSelection = [];
         }
-      },
-      handleSelectionChange(val) {
-        // 表格选中change事件
       },
       // list method end
 
@@ -989,10 +994,15 @@
         return columns;
       },
       resetParams() {
-        this.params = {
+
+        this.paramsBackup = {
+          specialSearchModel: {
+            addressSelector: [],
+            adAddress: '',
+          },
+          customizedSearchModel: {},
           createUserName: '',
           customerManagerName: '',
-          keyword: '',
           serialNumber: '',
           linkmanId: '',
           tagId: '',
@@ -1001,8 +1011,25 @@
           createUser: '',
           customerManager: '',
           createTime: '',
+          customerAddress: {},
+          orderDetail: {},
+          keyword: '',
           pageNum: 1,
           pageSize: 10,
+
+        };
+
+        this.params = {
+          createUserName: '',
+          customerManagerName: '',
+          serialNumber: '',
+          linkmanId: '',
+          tagId: '',
+          hasRemind: '',
+          status: '',
+          createUser: '',
+          customerManager: '',
+          createTime: '',
           customerAddress: {},
           orderDetail: {},
           specialSearchModel: {
@@ -1013,9 +1040,6 @@
             ...this.params.customizedSearchModel,
           },
         };
-        // for (let key in this.specialParams.sortBy) {
-        //   this.specialParams.sortBy[key] = '';
-        // }
         this.params.specialSearchModel.addressSelector = [];
         this.params.specialSearchModel.adAddress = '';
 
