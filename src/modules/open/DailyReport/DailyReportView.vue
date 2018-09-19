@@ -1,19 +1,19 @@
 <template>
-  <div class="daily-report">
-    <img :src="`/files/getDailyBanner?module=${items.module}`" alt="">
+  <div class="daily-report" v-if="items.module">
+    <img :style="{'height':17*width/32+'px'}" :src="`/files/getDailyBanner?module=${items.module}`" alt="">
     <div class="information">
       <div v-for="item in items.details" :key="item.key" class="report-list">
         <div class="name"><div>{{item.name}}</div></div>
         <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}">{{item.result}}</strong>
       </div>
-      <div class="message"><p>如需自定义日报，请到</p><p><strong>售后宝PC端[系统管理>订阅通知管理]</strong>中进行配置</p></div>
+      <div class="message"><p>如需自定义日报，请到</p><p><span>售后宝PC端[系统管理>订阅通知管理]</span>中进行配置</p></div>
       <div @click="jump" class="to-index-btn">进入售后宝查看详情</div>
     </div>    
   </div>
 </template>
 
 <script>
-  import '../../../assets/specile_font.css'
+  var width = document.body.offsetWidth;
   export default {
     name: "daily-report-view",
     props: {
@@ -24,7 +24,8 @@
     },
     data: function data() {
       return {
-        items:{}
+        items:{},
+        width:width
       }
     },
     computed:{
@@ -87,7 +88,6 @@ body, html{
       font-size:30px;
       text-align: right;
       overflow: hidden;
-      //font-family: DINCondensed-Bold;
     }
   }
   .to-index-btn{
@@ -107,7 +107,7 @@ body, html{
     line-height:1.5;
     color:#999;
     p{margin:0;}
-    strong{
+    span{
       color:#00ac97;            
     }
   }
