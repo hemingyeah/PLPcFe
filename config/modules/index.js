@@ -23,6 +23,7 @@ module.exports = {
 
   // ------------ 订阅通知日报 ------------
   "open.dailyReport": {
-    entry: './src/modules/open/DailyReport/index.js'
+    entry: './src/modules/open/DailyReport/index.js',
+    exclude: ['common']
   }
 }

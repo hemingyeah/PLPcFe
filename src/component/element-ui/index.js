@@ -6,7 +6,6 @@
  * @see http://element-cn.eleme.io/#/zh-CN/component/quickstart 
  */
 
-import './element-variables.scss'
 import {
   Pagination,
   Table,
@@ -18,14 +17,11 @@ import {
   Popover,
   Button,
   ButtonGroup,
-  // Row,
-  // Col,
   Cascader,
   DropdownMenu,
   DropdownItem,
   Dropdown,
   Checkbox,
-  // Dialog, //待删除
   Form,
   FormItem,
   RadioGroup,
@@ -35,6 +31,7 @@ import {
   CheckboxGroup,
   Switch
 } from 'element-ui';
+import './element-variables.scss'
 
 const ElementUI = {
   install(Vue){
@@ -60,7 +57,6 @@ const ElementUI = {
     Vue.use(DropdownItem);
     Vue.use(Dropdown);
     Vue.use(Checkbox);
-    // Vue.use(Dialog);
     Vue.use(FormItem);
     Vue.use(RadioGroup);
     Vue.use(Radio);
@@ -68,12 +64,6 @@ const ElementUI = {
     Vue.use(Loading);
     Vue.use(CheckboxGroup);
     Vue.use(Switch);
-
-    // layout
-    // Vue.use(Row);
-    // Vue.use(Col);
-
-
   }
 };
 

@@ -42,8 +42,24 @@ module.exports = merge(baseConfig, {
           //   }
           //   return false;
           // },
-          priority: 1,
-          chunks: 'all'
+          priority: -1,
+          chunks: 'initial'
+        },
+        common: {
+          name: 'common',
+          //test: /[\\/]src[\\/]component[\\/]/,
+          test(module, chunks){
+            let commonReg = /[\\/]src[\\/](assets|common|component|config|directive|filter|mixin|platform|util)/;
+            let elementUIReg = /[\\/]node_modules[\\/]element-ui[\\/]/;
+
+            if(module.nameForCondition){
+              let name = module.nameForCondition();
+              return commonReg.test(name) || elementUIReg.test(name)
+            }
+            return false;
+          },
+          priority: 20,
+          chunks: 'initial'
         }
       }
     }

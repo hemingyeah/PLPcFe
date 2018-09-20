@@ -32,12 +32,16 @@ module.exports = {
   genHtmlPlugins(){
     return Object.keys(modules).map(modName => {
       let mod = modules[modName];
-      let chunks = ['vendors',modName];
+      let chunks = ['vendors', "common", modName];
+      
+      if(mod.exclude) chunks = chunks.filter(item => mod.exclude.indexOf(item) < 0);
+    
       return new HtmlWebpackPlugin({
         filename: modName + '.html',
         template: mod.template ? mod.template : 'src/index.html',
         inject: true,
-        chunks: chunks
+        chunks: chunks,
+        chunksSortMode: "manual"
       }); 
     })
   }

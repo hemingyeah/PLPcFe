@@ -9,7 +9,7 @@
           </button>
         </div>
         <div class="frame-header-right">
-          <div><a href="/v3" style="line-height: 40px;">返回旧版</a></div>
+          <div><a href="/" style="line-height: 40px;">返回旧版</a></div>
           <div class="dev-tool" v-if="showDevTool">
             <span>测试工具</span>
             <div class="dev-tool-menu">
