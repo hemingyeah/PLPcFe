@@ -1,13 +1,13 @@
 <template>
   <div class="daily-report" v-if="items.module">
-    <img :style="{'height':width/2+'px'}" :src="`/files/getDailyBanner?module=${items.module}`" alt="">
+    <img :style="{'height':396*width/750+'px'}" :src="`/files/getDailyBanner?module=${items.module}`" alt="">
     <div class="information">
       <div v-for="item in items.details" :key="item.key" class="report-list">
         <div class="name"><div>{{item.name}}</div></div>
         <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}">{{item.result}}</strong>
       </div>
       <div class="message"><p>如需自定义日报，请到</p><p><span>售后宝PC端[系统管理>订阅通知管理]</span>中进行配置</p></div>
-      <div @click="jump" class="to-index-btn">进入售后宝查看详情</div>
+      <div @click="jump" class="to-index-btn">进入售后宝</div>
     </div>    
   </div>
 </template>
