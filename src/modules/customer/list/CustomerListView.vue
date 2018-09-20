@@ -4,7 +4,9 @@
     <div class="customer-list-search-group-container">
       <form class="base-search">
         <div>
-          <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索"></el-input>
+          <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
+            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+          </el-input>
           <el-button type="primary" native-type="submit" @click.prevent="search({ pageNum: 1, }, true)">搜索</el-button>
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
           <a href="/customer">返回旧版</a>
@@ -1267,7 +1269,7 @@
       div {
         .el-input {
           width: 260px;
-          margin-right: 10px;
+          margin-right: 5px;
         }
         .el-button {
           font-size: 14px;
@@ -1279,6 +1281,7 @@
           color: #9398a0;
           border-color: #e0e1e2;
           background: #fff;
+          margin-left: 6px;
         }
       }
 

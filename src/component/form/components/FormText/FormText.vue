@@ -1,6 +1,10 @@
 <template>
   <div class="form-text">
-    <input :id="`form_${field.fieldName}`" type="text" @input="input"/>
+    <input
+      type="text"
+      @input="input"
+      :placeholder="placeHolder"
+      :id="`form_${field.fieldName}`"/>
   </div>
 </template>
 
@@ -11,6 +15,10 @@ export default {
     field: {
       type: Object,
       default: () => ({})
+    },
+    placeHolder: {
+      type: String,
+      default: ''
     },
     value: {
       type: String,

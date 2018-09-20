@@ -7,6 +7,7 @@ import FormAttachment from './FormAttachment';
 import FormUser from './FormUser';
 import FormDate from './FormDate';
 import FormDatetime from './FormDatetime';
+import FormPhone from './FormPhone';
 
 const FormFields = [
   FormText,
@@ -17,7 +18,8 @@ const FormFields = [
   FormAttachment,
   FormUser,
   FormDate,
-  FormDatetime
+  FormDatetime,
+  FormPhone
 ];
 
 const Modes = {
@@ -31,7 +33,8 @@ const Modes = {
       FormAttachment.formType,
       FormUser.formType,
       FormDate.formType,
-      FormDatetime.formType
+      FormDatetime.formType,
+      FormPhone.formType,
     ]
   },
   // task: {

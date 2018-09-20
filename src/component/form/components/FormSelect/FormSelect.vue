@@ -2,13 +2,15 @@
   <div class="form-select">
     <el-select 
       :id="`form_${field.fieldName}`"
-      placeholder="请选择"
+      :placeholder="placeHolder"
       clearable
       :multiple="isMulti"
-      :value="value" @input="input">
+      :value="value" @change="input">
       <el-option
-        v-for="item in options" :key="item"
-        :label="item" :value="item">
+        v-for="item in options"
+        :key="item"
+        :label="item"
+        :value="item">
       </el-option>
     </el-select>
   </div>
@@ -22,11 +24,24 @@ export default {
       type: Object,
       default: () => ({})
     },
-    value: [String, Array]
+    placeHolder: {
+      type: String,
+      default: ''
+    },
+    value: {
+      type: [String, Array],
+      // 多选的时候一定要设置默认的空数组
+      // 否则 el-select 内部 handleOptionSelect 对数组操作时却得到一个undefined 会报错
+      default() {
+        let setting = this.field.setting || {};
+        if (setting.isMulti) return [];
+        return ''
+      },
+    },
   },
   computed: {
     isMulti(){
-      let setting = this.field.setting || {}
+      let setting = this.field.setting || {};
       return setting.isMulti;
     },
     options(){
@@ -37,8 +52,26 @@ export default {
   methods: {
     input(newValue){
       let oldValue = null;
-      this.$emit('input', {newValue, oldValue, field: this.field})
+      this.$emit('input', {newValue, oldValue, field: this.field});
+
+      this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+    },
+    getValue(){
+      return this.value;
     }
+  },
+  mounted(){
+    //触发注册事件，用于注册字段到外层formitem组件，和formbuilder组件
+    let params = {value: this.getValue, fieldName: this.field.fieldName};
+    console.log('mounted params', params);
+    let event = new CustomEvent('form.add.field', {detail: params, bubbles: true});
+    this.$nextTick(() => this.$el.dispatchEvent(event));
+  },
+  destroyed(){
+    //注册解绑事件，用于解绑组件
+    let params = {fieldName: this.field.fieldName}
+    let event = new CustomEvent('form.remove.field', {detail: params, bubbles: true});
+    this.$el.dispatchEvent(event)
   }
 }
 </script>
