@@ -1,6 +1,6 @@
 <template>
   <div class="daily-report" v-if="items.module">
-    <img :style="{'height':17*width/32+'px'}" :src="`/files/getDailyBanner?module=${items.module}`" alt="">
+    <img :style="{'height':width/2+'px'}" :src="`/files/getDailyBanner?module=${items.module}`" alt="">
     <div class="information">
       <div v-for="item in items.details" :key="item.key" class="report-list">
         <div class="name"><div>{{item.name}}</div></div>
