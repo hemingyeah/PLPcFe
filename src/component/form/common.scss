@@ -22,21 +22,12 @@
   user-select: none;
 }
 
-.form-design-preview{
+.form-design-list{
   box-shadow: 0 0 4px rgba(0,0,0,.15);
   min-height: 50%;
   max-height: 100%;
   overflow: auto; 
   border-radius: 2px;
-}
-
-.form-design-preview-item{
-  display: flex;
-  flex-flow: row nowrap;
-
-  &.form-design-preview-selected{
-    background-color: red;
-  }
 }
 
 .form-design-setting{
@@ -139,4 +130,22 @@
 
 .form-design-notNull{
   color: red;
+}
+
+// -- drag 
+.form-design-preview{
+  display: flex;
+  flex-flow: row nowrap;
+  background-color: #fff;
+
+  &.form-design-preview-selected{
+   // background-color: red;
+  }
+}
+
+.form-drag-handle{
+  width: 10px;
+  background-color: #eee;
+  cursor: move;
+  line-height: 52px; //temp
 }

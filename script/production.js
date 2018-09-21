@@ -45,17 +45,19 @@ async function genJSP(directory){
   //复制文件
   let distOriginPath = path.resolve(__dirname, '../dist');
   let distTargetPath = config.targetRootPath + '/shb-web/src/main/webapp/resource/pc-fe';
-  let jspTatgetPath = config.targetRootPath + '/shb-web/src/main/webapp/WEB-INF/views/dist'
-  
-  //复制静态资源
-  shell.rm('-rf', distTargetPath);
-  shell.mkdir('-p', distTargetPath);
-  shell.cp('-r', distOriginPath + '/*', distTargetPath);
+  let jspTatgetPath = config.targetRootPath + '/shb-web/src/main/webapp/WEB-INF/views/dist';
 
   //复制jsp
   shell.rm('-rf', jspTatgetPath);
   shell.mkdir('-p', jspTatgetPath);
   shell.cp('-r', distOriginPath + '/jsp/*', jspTatgetPath);
+  //清空jsp
+  shell.rm('-rf', distOriginPath + '/jsp/*');
+  
+  //复制静态资源
+  shell.rm('-rf', distTargetPath);
+  shell.mkdir('-p', distTargetPath);
+  shell.cp('-r', distOriginPath + '/*', distTargetPath);
 
   console.log(`build on ${new Date().toLocaleString()}`)
 }

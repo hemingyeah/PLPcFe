@@ -31,7 +31,7 @@ import {
   CheckboxGroup,
   Switch
 } from 'element-ui';
-import './element-variables.scss'
+import './element-variables.scss';
 
 const ElementUI = {
   install(Vue){

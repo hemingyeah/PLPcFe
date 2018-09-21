@@ -1,6 +1,6 @@
-//TODO: 拖拽排序
 //TODO: 拖拽添加
 //TODO: 数据转换工具
+import _ from 'lodash'
 import FormField from './FormField';
 import {
   Modes, 
@@ -33,7 +33,9 @@ const FormDesign = {
 
     return {
       availableFields: modeFields.map(formType => FormFieldMap.get(formType)), //当前模式下可用字段
-      currField: null //当前选择的字段
+      currField: null, //当前选择的字段
+      dragEl: null,
+      enterEl: null
     }
   },
   methods: {
@@ -58,6 +60,51 @@ const FormDesign = {
         value.splice(index, 1);
         this.$emit('input', value)
       }
+    },
+    initDrag(event){
+      let dragEl = event.target.closest('.form-design-preview');
+      dragEl.draggable = true;
+    },
+    //记录被拖拽的元素
+    dragStart(event, index){
+      this.dragEl = event.target.closest('.form-design-preview');
+      this.dragEl.__sortIndex = index;
+    },
+    dragEnter(event, index){
+      let enterEl = event.target.closest('.form-design-preview');
+      if(enterEl == this.dragEl) return;
+      
+      this.enterEl = enterEl;
+      this.enterEl.__sortIndex = index;
+    },
+    dragEnd(event){
+      if(this.dragEl == null || this.enterEl == null) return;
+
+      let arr = _.cloneDeep(this.value);
+
+      let dragIndex = this.dragEl.__sortIndex;
+      let enterIndex = this.enterEl.__sortIndex;
+
+      let distance = dragIndex < enterIndex ? 1 : 0
+
+      let dragField = arr[dragIndex];
+      let enterField = arr[enterIndex];
+
+      arr.splice(dragIndex, 1);
+      let insertIndex = arr.indexOf(enterField) ;
+      arr.splice(insertIndex + distance, 0, dragField);
+
+      //insertIndex < 0 ? arr.unshift(dragField) : arr.splice(insertIndex, 0, dragField);
+
+      this.$emit('input', arr);
+
+      this.dragEl = null;
+      this.enterEl = null;
+      this.disableDrag(event.target)
+    },
+    //禁用拖拽
+    disableDrag(el){
+      el.closest('.form-design-preview').draggable = false;
     }
   },
   mounted(){
@@ -70,23 +117,33 @@ const FormDesign = {
     });
     
     //当前已选字段列表
-    let previewList = this.value.map(currField => { 
+    let previewList = this.value.map((currField, index) => { 
       let formType = currField.formType;
       let comp = FormFieldMap.get(formType);
 
-      let data = {
+      let fieldPreview = h(comp.preview, {
         props: {
           field: currField
         },
         on: {
           chooseField: event => this.editField(event, currField)
         }
-      };
-      let fieldPreview = h(comp.preview, data);
+      });
 
+      let previewClass = {
+        'form-design-preview': true,
+        'form-design-preview-selected': currField == this.currField
+      }
+
+      //key
       return (
-        <div class={{'form-design-preview-item': true,'form-design-preview-selected': currField == this.currField}}>
-          <div style="width: 2px; background-color: #ddd;"></div>
+        <div class={previewClass}
+          onDragstart={e => this.dragStart(e, index)}
+          onDragenter={e => this.dragEnter(e, index)}
+          onDragend={e => this.dragEnd(e)}>
+          <div class="form-drag-handle" 
+            onMousedown={e => this.initDrag(e)}
+            onMouseup={e => this.disableDrag(e.target)}>::</div>
           {fieldPreview}
           <button type="button" onClick={e => this.deleteField(e, currField)}>删除</button>
         </div>
@@ -119,7 +176,7 @@ const FormDesign = {
       <div class="form-design">
         <div class="form-design-panel">{fieldList}</div>
         <div class="form-design-main">
-          <div class="form-design-preview">{previewList}</div>
+          <div class="form-design-list">{previewList}</div>
         </div>
         <div class="form-design-setting">{fieldSetting}</div>
       </div>
