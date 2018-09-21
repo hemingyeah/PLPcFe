@@ -1,9 +1,5 @@
-import '@src/assets/scss/index.scss';
 import Vue from 'vue';
 import DailyReportView from './DailyReportView.vue';
-import http from '../../../util/http';
-
-Vue.prototype.$http = http;
 
 //处理注入的参数
 let initData = {};

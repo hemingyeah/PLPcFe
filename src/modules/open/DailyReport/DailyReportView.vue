@@ -1,15 +1,13 @@
 <template>
   <div class="daily-report" v-if="items.module">
     <img :style="{'height':396*width/750+'px'}" :src="`/files/getDailyBanner?module=${items.module}`" alt="">
-    <div class="information">
-      <div v-for="item in items.details" :key="item.key" class="report-list">
-        <div class="name"><div>{{item.name}}</div></div>
-        <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}">{{item.result}}</strong>
-      </div>
-      <div class="message"><p>如需自定义日报，请到</p><p><span>售后宝PC端[系统管理>订阅通知管理]</span>中进行配置</p></div>
-      <div @click="jump" class="to-index-btn">进入售后宝</div>
-    </div>    
-  </div>
+    <div v-for="item in items.details" :key="item.key" class="report-list">
+      <div class="name"><div>{{item.name}}</div></div>
+      <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}">{{item.result}}</strong>
+    </div>
+    <div class="message"><p>如需自定义日报，请到</p><p><span>售后宝PC端[系统管理>订阅通知管理]</span>中进行配置</p></div>
+    <div @click="jump" class="to-index-btn">进入售后宝</div>
+  </div>    
 </template>
 
 <script>
@@ -49,18 +47,15 @@
 
 <style lang="scss">
 body, html{
-  height:100%;
+  background:#f4f7f5;
+  margin:0;
+  padding:0;
 }
 .daily-report{
-  height:100%;
-  background:#f4f7f5;
+  height:100%;  
   img{
     display:block;
     width:100%;
-  }
-  .information{
-    background:#f4f7f5;
-    padding-bottom:10px;
   }
   .report-list{
     margin:8px 10px;
@@ -91,7 +86,7 @@ body, html{
     }
   }
   .to-index-btn{
-    margin:0 10px;
+    margin:0 10px 10px;
     text-align: center;
     margin-top: 10px;
     background:#00ac97; 
