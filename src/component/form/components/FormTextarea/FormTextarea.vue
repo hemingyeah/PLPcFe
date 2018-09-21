@@ -1,6 +1,6 @@
 <template>
   <div class="form-textarea">
-    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeHolder"></textarea>
+    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeholder"></textarea>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    placeHolder: {
+    placeholder: {
       type: String,
       default: ''
     },

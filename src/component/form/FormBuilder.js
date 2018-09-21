@@ -115,7 +115,7 @@ const util = {
   }
 };
 
-function placeholder(field, defaultText = ''){
+function buildPlaceholder(field, defaultText = ''){
   let text = '';
   if(field.isNull == 0) {
     text += (util.isSelect(field) || util.isMultiSelect(field)) ? "[必选]" : "[必填]"
@@ -139,13 +139,12 @@ function placeholder(field, defaultText = ''){
 }
 
 function createFormField(h, field, comp){
-  const placeHolder = placeholder(field);
-  console.log('placeHolder', placeHolder);
+  const placeholder = buildPlaceholder(field);
   let data = {
     props: {
       field,
       value: this.value[field.fieldName],
-      placeHolder,
+      placeholder,
     },
     on: {
       input: event => this.$emit('input', event)

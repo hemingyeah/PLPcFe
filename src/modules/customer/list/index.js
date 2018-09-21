@@ -7,7 +7,7 @@ import platform from '@src/platform';
 import filter from '@src/filter';
 
 
-import http from '../../../util/http';
+import http from '@src/util/http';
 
 import CustomerListView from './CustomerListView.vue';
 

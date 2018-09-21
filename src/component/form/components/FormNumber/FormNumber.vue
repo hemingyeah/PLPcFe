@@ -1,6 +1,6 @@
 <template>
   <div class="form-number">
-    <input :id="`form_${field.fieldName}`" type="number" @input="input" :value="value" :placeholder="placeHolder">
+    <input :id="`form_${field.fieldName}`" type="number" @input="input" :value="value" :placeholder="placeholder">
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    placeHolder: {
+    placeholder: {
       type: String,
       default: ''
     },
@@ -37,7 +37,6 @@ export default {
   mounted(){
     //触发注册事件，用于注册字段到外层formitem组件，和formbuilder组件
     let params = {value: this.getValue, fieldName: this.field.fieldName};
-    console.log('mounted params', params);
     let event = new CustomEvent('form.add.field', {detail: params, bubbles: true});
     this.$nextTick(() => this.$el.dispatchEvent(event));
   },

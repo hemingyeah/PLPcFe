@@ -25,10 +25,18 @@
       }
     },
     props: {
-      // field: {
-      //   type: String,
-      //   default: '',
-      // }
+      defaultValue: {
+        type: Array,
+        default: () => ([]),
+      }
+    },
+    watch: {
+      defaultValue: {
+        handler: function(newValue) {
+          this.value = newValue;
+        },
+        deep: true
+      }
     },
     methods: {
       clearValue() {

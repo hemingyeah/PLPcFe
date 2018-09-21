@@ -2,7 +2,7 @@
 let FormPhoneField = {
   formType: 'phone', // 字段类型
   name: '电话',
-  isSys: false,
+  isSys: true,
   alias: 'text'
 };
 

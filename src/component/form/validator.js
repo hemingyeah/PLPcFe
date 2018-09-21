@@ -22,6 +22,7 @@ const RuleMap = {
   phone,
   user,
   attachment,
+  address,
 };
 
 /** 单行文本验证，50字以内 */
@@ -118,6 +119,18 @@ function user(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
     if (!value || !value.toString().length) return resolve('必选');
+    resolve(null);
+  });
+}
+
+function address(value, field = {}) {
+  return new Promise(resolve => {
+    if (field.isNull) return resolve(null);
+    if (!value || !value.toString().length) return resolve('必选');
+    const {adProvince, adCity, adAddress, } = value;
+    if (!adProvince || !adCity || !adAddress) {
+      return resolve('必填');
+    }
     resolve(null);
   });
 }

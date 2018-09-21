@@ -108,7 +108,6 @@ const FormDesign = {
     }
   },
   mounted(){
-    //console.log(this.mode)
   },
   render(h){
     //可用字段列表

@@ -39,7 +39,11 @@
       /** 字段是否必填 */
       isRequired() {
         return this.field.isNull == 0;
-      }
+      },
+      /** 字段是否需要远程验证 **/
+      needRemoteValidation() {
+        return !!this.field.remoteValidation;
+      },
     },
     methods: {
       /** 默认返回true, 确保不影响表单提交 */
@@ -55,14 +59,14 @@
       validate() {
         if (typeof this.valueFn != 'function') return true;
         let value = this.valueFn();
-        if (this.remoteValidation.need && value) {
+        if (this.needRemoteValidation && value) {
           this.remoteValidation.status = 1;
           this.remoteValidation.msg = '';
           this.errMessage = '';
         }
         return Validator.validate(value, this.field)
           .then(res => {
-            if (this.remoteValidation.need && value) {
+            if (this.needRemoteValidation && value) {
               this.remoteValidation.status = 2;
               this.remoteValidation.msg = res.ok === '' ? '' : res.error;
               return;
@@ -92,10 +96,6 @@
       this.$el.addEventListener('form.validate', this.validateHandler);
       this.$el.addEventListener('form.add.field', this.addFieldHandler);
       this.$el.addEventListener('form.remove.field', this.removeFieldHandler);
-
-      if (this.field.remoteValidation) {
-        this.remoteValidation.need = true;
-      }
     },
     destroyed() {
       this.$el.removeEventListener('form.validate', this.handler)
@@ -107,7 +107,7 @@
 
 <style lang="scss">
   .form-item.err {
-    input {
+    input, textarea {
       border-color: #f56c6c!important;
     }
 

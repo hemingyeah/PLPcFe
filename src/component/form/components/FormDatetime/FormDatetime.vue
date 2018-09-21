@@ -4,7 +4,7 @@
       :id="`form_${field.fieldName}`"
       type="datetime"
       value-format="yyyy-MM-dd HH:mm:ss"
-      :placeholder="placeHolder"
+      :placeholder="placeholder"
       :value="value" @input="choose"/>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    placeHolder: {
+    placeholder: {
       type: String,
       default: ''
     },
@@ -40,7 +40,6 @@ export default {
   mounted(){
     //触发注册事件，用于注册字段到外层formitem组件，和formbuilder组件
     let params = {value: this.getValue, fieldName: this.field.fieldName};
-    console.log('mounted params', params);
     let event = new CustomEvent('form.add.field', {detail: params, bubbles: true});
     this.$nextTick(() => this.$el.dispatchEvent(event));
   },

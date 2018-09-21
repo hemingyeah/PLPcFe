@@ -2,8 +2,9 @@
   <div class="form-text">
     <input
       type="text"
+      :value="value"
       @input="input"
-      :placeholder="placeHolder"
+      :placeholder="placeholder"
       :id="`form_${field.fieldName}`"/>
   </div>
 </template>
@@ -16,7 +17,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    placeHolder: {
+    placeholder: {
       type: String,
       default: ''
     },
