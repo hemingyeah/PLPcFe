@@ -24,4 +24,13 @@ router.get('/customer/create', async ctx => {
   ctx.body = Template.renderWithHtml('新建客户', body, script, modConfig.template)
 });
 
+router.get('/customer/edit/:id', async ctx => {
+  let modConfig = modules['customer.edit'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/customer.edit.js'];
+  let result = await HttpClient.request(`/v2/customer/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  ctx.body = Template.renderWithHtml('编辑客户', body, script, modConfig.template)
+});
+
 module.exports = router;

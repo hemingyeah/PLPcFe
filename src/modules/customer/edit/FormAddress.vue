@@ -19,13 +19,12 @@
   export default {
     name: "form-address",
     components: {BaseDistPicker,},
-    data() {
 
-      return {
-        addressBackup: {},
-      }
-    },
     props: {
+      addressBackup: {
+        type: Object,
+        default: () => ({})
+      },
       field: {
         type: Object,
         default: () => ({})
@@ -57,12 +56,13 @@
 
         if (!this.diffAddress(newAddress, this.addressBackup)) {
           newAddress.addressType = 0;
-          newAddress.latitude = '';
-          newAddress.longitude = '';
+          newAddress.adLatitude = '';
+          newAddress.adLongitude = '';
         } else {
+
           newAddress.addressType = 1;
-          newAddress.latitude = this.addressBackup.latitude;
-          newAddress.longitude = this.addressBackup.longitude;
+          newAddress.adLatitude = this.addressBackup.adLatitude;
+          newAddress.adLongitude = this.addressBackup.adLongitude;
         }
 
         this.updateValue(newAddress)
@@ -79,9 +79,11 @@
 
         if (!val || !val.length) {
           newAddress = {
-            ...this.value,
             adAddress: [],
             detail: '',
+            adLongitude: '',
+            adLatitude: '',
+            addressType: 0,
           };
 
         } else {
@@ -90,6 +92,9 @@
             adProvince: val[0] || '',
             adCity: val[1] || '',
             adDist: val[2] || '',
+            adLongitude: '',
+            adLatitude: '',
+            addressType: 0,
           };
         }
 
@@ -108,15 +113,18 @@
 
           const { province, city, dist, address, latitude, longitude} = result.data;
 
-          this.addressBackup = {
+          const newVal = {
             adAddress: [ province, city, dist,],
             detail: address,
-            latitude,
-            longitude,
+            adLatitude: latitude,
+            adLongitude: longitude,
             addressType: 1,
           };
 
-          this.updateValue(this.addressBackup);
+
+          this.$emit('update-address-backup', newVal);
+
+          this.updateValue(newVal);
         })
           .catch(err => console.error(err));
       },
@@ -131,7 +139,7 @@
       let event = new CustomEvent('form.add.field', {detail: params, bubbles: true})
       this.$nextTick(() => this.$el.dispatchEvent(event));
 
-      this.addressBackup = this.value;
+      // this.addressBackup = this.value;
     },
     destroyed(){
       //注册解绑事件，用于解绑组件

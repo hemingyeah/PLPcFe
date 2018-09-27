@@ -30,6 +30,7 @@
         </form-item>
         <form-item label="地址" :field="baseField.addressField">
           <form-address ref="addressForm" :field="baseField.addressField" :value="form.customerAddress" @input="update"
+                        @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
                         :placeholder="baseField.addressField.placeholder"></form-address>
         </form-item>
         <form-item v-if="config.isDivideByTag" label="服务团队" :field="baseField.tagField">
@@ -50,7 +51,7 @@
 
 <script>
   import * as FormUtil from '@src/component/form/util';
-  import formatCustomer from '@src/util/customer';
+  import { formatCustomer, convertCustomerToForm, } from '@src/util/customer';
   import BaseDistPicker from '@src/component/common/BaseDistPicker';
   import FormText from "@src/component/form/components/FormText/FormText";
   import FormUser from "@src/component/form/components/FormUser/FormUser";
@@ -66,7 +67,11 @@
       }
     },
     data() {
+      const initData = JSON.parse(window._init) || {};
+      let addressBackup = {};
+
       const data = {
+        addressBackup,
         baseField: {
           serialNumberField: {
             formType: 'text',
@@ -78,7 +83,7 @@
               action: '/customer/unique',
               buildParams() {
                 const params = {
-                  id: '',
+                  id: initData.id || '',
                   fieldName: 'serialNumber',
                 };
                 return params;
@@ -95,7 +100,7 @@
               action: '/customer/unique',
               buildParams() {
                 const params = {
-                  id: '',
+                  id: initData.id || '',
                   fieldName: 'name',
                 };
                 return params;
@@ -119,8 +124,8 @@
               action: '/linkman/checkUnique4Phone',
               buildParams() {
                 const params = {
-                  customerId: '',
-                  phone: 12312,
+                  customerId: initData.id || '',
+                  phone: '',
                 };
                 return params;
               }
@@ -160,8 +165,9 @@
           customerAddress: {
             adAddress: [],
             detail: '',
-            longitude: '',
-            latitude: '',
+            adLongitude: '',
+            adLatitude: '',
+            addressType: 0,
           },
           tags: [],
           customerManager: null,
@@ -180,6 +186,12 @@
       return data;
     },
     computed: {
+      action() {
+        return this.initData.action;
+      },
+      editId() {
+        return this.initData.id || '';
+      },
       config() {
         const { customerAddress, isAutoSerialNumber, isDivideByTag, isCustomerNameDuplicate, isPhoneUnique, } = this.initData;
         return {
@@ -214,20 +226,43 @@
 
         this.$set(this.form, fieldName, newValue)
       },
+
       submit() {
-        this.$refs.form.validate().then(valid => {
+        this.$refs.form.validate()
+        .then(valid => {
           if (!valid) return Promise.reject('validate fail.');
           const params = formatCustomer(this.form, this.initData.tags);
 
-          this.$http.post('/customer/create', params)
-            .then(res => {
-
-              if (res.status) return this.$platform.alert('创建客户失败');
-              window.location.href = `/customer/view/${res.data.customerId}`;
-            })
-
+          if (this.action === 'edit') {
+            return this.updateMethod(params);
+          }
+          this.createMethod(params);
         })
-          .catch(err => console.error(err))
+        .catch(err => console.error(err))
+      },
+      createMethod(params) {
+  
+        this.$http.post('/customer/create', params)
+        .then(res => {
+    
+          if (res.status) return this.$platform.alert('创建客户失败');
+          window.location.href = `/customer/view/${res.data.customerId}`;
+          // window.location.href = `/customer/edit/${res.data.customerId}`;
+        })
+        .catch(err => console.error('err', err));
+        
+      },
+      updateMethod(params) {
+
+
+        this.$http.post(`/customer/update?id=${this.editId}`, params)
+        .then(res => {
+
+          if (res.status) return this.$platform.alert('更新客户失败');
+          window.location.href = `/customer/view/${res.data}`;
+        })
+        .catch(err => console.error('err', err));
+        
       },
       copyName() {
         const {name,} = this.form;
@@ -275,36 +310,38 @@
         const newVal = {
           adAddress: [adProvince, adCity, adDist,].filter(ad => ad),
           detail: '',
-          longitude: '',
-          latitude: '',
+          adLongitude: '',
+          adLatitude: '',
         };
         this.form.customerAddress = newVal;
+        this.addressBackup = this.form.customerAddress;
       },
+      fetchCustomer(id) {
+        this.$http.get(`/v2/customer/getForEdit`, {id})
+        .then(res => {
+          if (res.status) return;
+          this.form = convertCustomerToForm(res.data);
+          this.addressBackup = this.form.customerAddress;
+        })
+      },
+      updateAddressBackup(ad) {
+        this.addressBackup = ad;
+      }
     },
     mounted() {
       this.initData = JSON.parse(window._init) || {};
       if (this.initData.customerAddress) {
         this.setDefaultAddress(this.initData.customerAddress);
       }
+
+      if (this.initData.action === 'edit' && this.initData.id) {
+        this.fetchCustomer(this.initData.id);
+      }
     },
   }
 </script>
 
 <style lang="scss">
-
-
-  .form-address {
-    input {
-      width: 100%;
-    }
-    .input-and-btn {
-      display: flex !important;
-      justify-content: space-between;
-      .form-item, .form-text {
-        width: 400px;
-      }
-    }
-  }
 
   .customer-container {
     height: 100%;
@@ -354,7 +391,7 @@
       .input-and-btn {
         display: flex !important;
         justify-content: space-between;
-        .form-item, .form-text {
+        .form-item, .form-text, .form-select {
           width: 430px;
         }
       }
