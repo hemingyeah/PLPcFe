@@ -12,4 +12,11 @@ $--button-small-border-radius: $--border-radius-base !default;
   padding-left: 10px;
 }
 
-@import "~element-ui/packages/theme-chalk/src/index";
+
+
+@import "~element-ui/packages/theme-chalk/src/button-group.scss";
+@import "~element-ui/packages/theme-chalk/src/button.scss";
+@import "~element-ui/packages/theme-chalk/src/checkbox-button.scss";
+@import "~element-ui/packages/theme-chalk/src/radio-button.scss";
+@import "~element-ui/packages/theme-chalk/src/switch.scss";
+@import "~element-ui/packages/theme-chalk/src/pagination.scss";
