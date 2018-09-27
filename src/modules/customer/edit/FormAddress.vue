@@ -1,11 +1,12 @@
 <template>
   <div class="form-address">
     <div class="input-and-btn">
-      <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker" :default-value="locationValue"></base-dist-picker>
+      <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker" :default-value="value.adAddress"></base-dist-picker>
       <el-button type="button" @click="chooseMap" style="margin-bottom: 10px">地图选址</el-button>
     </div>
     <input
       type="text"
+      :value="value.detail"
       @input="input"
       :placeholder="placeholder"
       :id="`form_${field.fieldName}`"/>
@@ -14,11 +15,16 @@
 
 <script>
   import BaseDistPicker from '@src/component/common/BaseDistPicker';
-  import FormText from '../FormText/FormText';
 
   export default {
     name: "form-address",
-    components: {FormText, BaseDistPicker,},
+    components: {BaseDistPicker,},
+    data() {
+
+      return {
+        addressBackup: {},
+      }
+    },
     props: {
       field: {
         type: Object,
@@ -33,49 +39,88 @@
         default: () => ({})
       }
     },
-
-    computed: {
-      locationValue() {
-        const {adProvince, adCity, adDist, } = this.value;
-        return [adProvince, adCity, adDist, ].filter(l => l);
+    watch: {
+      value: {
+        handler: function(newValue) {
+          const adArr = newValue.adAddress || [];
+          this.$refs.baseDistPicker.updateVal(adArr);
+        },
+        deep: true
       }
     },
     methods: {
       input(event) {
-        console.log('this.value', this.value);
-        const newAddress = {
+        let newAddress = {
           ...this.value,
-          adAddress: event.target.value,
+          detail: event.target.value,
         };
+
+        if (!this.diffAddress(newAddress, this.addressBackup)) {
+          newAddress.addressType = 0;
+          newAddress.latitude = '';
+          newAddress.longitude = '';
+        } else {
+          newAddress.addressType = 1;
+          newAddress.latitude = this.addressBackup.latitude;
+          newAddress.longitude = this.addressBackup.longitude;
+        }
+
         this.updateValue(newAddress)
       },
+      diffAddress(newVal, oldVal) {
+        if (newVal.detail === oldVal.detail &&
+          newVal.adAddress.toString() === oldVal.adAddress.toString()) {
+          return true;
+        }
+        return false;
+      },
       handleCitySelectorChange(val) {
+        let newAddress = {};
 
-        if (!val || !val.length) return;
+        if (!val || !val.length) {
+          newAddress = {
+            ...this.value,
+            adAddress: [],
+            detail: '',
+          };
 
-        const newAddress = {
-          ...this.value,
-          adProvince: val[0] || '',
-          adCity: val[1] || '',
-          adDist: val[2] || '',
-        };
+        } else {
+          newAddress = {
+            ...this.value,
+            adProvince: val[0] || '',
+            adCity: val[1] || '',
+            adDist: val[2] || '',
+          };
+        }
+
         this.updateValue(newAddress);
 
-        console.log('handleCitySelectorChange val', val);
       },
       updateValue(newValue) {
         let oldValue = null;
-        console.log('newValue', newValue);
         this.$emit('input', {newValue, oldValue, field: this.field});
         this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
       },
       chooseMap() {
-        this.$fast.map.picker(this.address, {defaultArea: "临沂市"}).then(result => {
-          console.log(result)
-          if (result.status == 0) this.address = result.data
+        this.$fast.map.picker(this.addressBackup, {defaultArea: "临沂市"}).then(result => {
+
+          if (result.status === 1) return;
+
+          const { province, city, dist, address, latitude, longitude} = result.data;
+
+          this.addressBackup = {
+            adAddress: [ province, city, dist,],
+            detail: address,
+            latitude,
+            longitude,
+            addressType: 1,
+          };
+
+          this.updateValue(this.addressBackup);
         })
-          .catch(err => console.log(err));
+          .catch(err => console.error(err));
       },
+
       getValue(){
         return this.value;
       },
@@ -86,8 +131,7 @@
       let event = new CustomEvent('form.add.field', {detail: params, bubbles: true})
       this.$nextTick(() => this.$el.dispatchEvent(event));
 
-
-      console.log('mounted svalue', this.value);
+      this.addressBackup = this.value;
     },
     destroyed(){
       //注册解绑事件，用于解绑组件
@@ -105,7 +149,6 @@
       width: 100%;
     }
   }
-
 
   .input-and-btn {
     display: flex !important;

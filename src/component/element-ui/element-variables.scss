@@ -11,3 +11,5 @@ $--button-small-border-radius: $--border-radius-base !default;
 .el-input__inner{
   padding-left: 10px;
 }
+
+@import "~element-ui/packages/theme-chalk/src/index";

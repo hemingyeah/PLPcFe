@@ -1,6 +1,6 @@
 <template>
   <div class="form-select">
-    <el-select 
+    <el-select
       :id="`form_${field.fieldName}`"
       :placeholder="placeholder"
       clearable
@@ -8,9 +8,9 @@
       :value="value" @change="input">
       <el-option
         v-for="item in options"
-        :key="item"
-        :label="item"
-        :value="item">
+        :key="item.value"
+        :label="item.text"
+        :value="item.value">
       </el-option>
     </el-select>
   </div>
@@ -38,6 +38,9 @@ export default {
         return ''
       },
     },
+    source: {
+      type: Array,
+    }
   },
   computed: {
     isMulti(){
@@ -46,7 +49,14 @@ export default {
     },
     options(){
       let setting = this.field.setting || {};
-      return setting.dataSource || [];
+      let dataSource = setting.dataSource || [];
+
+      dataSource = dataSource.map(d => ({
+        text: d,
+        value: d,
+      }));
+
+      return this.source || dataSource || [];
     }
   },
   methods: {

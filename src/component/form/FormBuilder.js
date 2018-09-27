@@ -176,7 +176,7 @@ const FormBuilder = {
      * 检测所有字段的结果，都验证通过，返回true, 否则返回false
      */
     validate(){
-      let promises = Object.keys(this.validateMap).map(key => this.validateMap[key]())
+      let promises = Object.keys(this.validateMap).map(key => this.validateMap[key]());
       
       return Promise.all(promises).then(results => results.every(msg => msg == null))
     },

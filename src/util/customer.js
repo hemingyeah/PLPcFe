@@ -1,46 +1,63 @@
 //
-function formatCustomer(originalCustomer) {
+function formatCustomer(originalCustomer, allTags) {
   const {
+    id,
     name,
     serialNumber,
     lmName,
     lmPhone,
-    tag,
+    tags,
     customerManager,
     customerAddress,
   } = originalCustomer;
   const keys = Object.keys(originalCustomer);
   const notSysFields = keys.filter(k => /^field_.+/g.test(k) && originalCustomer[k]);
-  let customer = {};
+  let customer = {
+    id: id || null,
+    name,
+    serialNumber,
+    lmName,
+    lmPhone,
+  };
   let attribute = {};
-
+  
+  // attribute
   notSysFields.forEach(key => {
     attribute[key] = originalCustomer[key];
   });
-
-  customer = {
-    id: null,
-    name: name,
-    serialNumber: serialNumber,
-    lmName: lmName,
-    lmPhone: lmPhone,
-    attribute,
-  };
-
-  if (tag && Array.isArray(tag) && tag.length) {
-    customer.tag = tag;
+  
+  if (Object.keys(attribute).length) {
+    customer.attribute = attribute;
   }
-
+  // tags
+  if (tags && Array.isArray(tags) && tags.length) {
+    customer.tags = tags.map(tag => {
+      const t =  allTags.filter(at => at.id === tag)[0];
+      return {
+        id: t.id,
+        tagName: t.tagName,
+      }
+    });
+  }
+  // customer manager
   if (customerManager && customerManager.userId) {
     customer.customerManager = customerManager.userId;
-    customer.customerManagerName = customerManager.displayName || null;
+    customer.customerManagerName = customerManager.displayName || '';
   }
-
+  // address
   customer.customerAddress = {
-    ...customerAddress,
     adCountry: '',
-    addressType: 0,
-  }
+    adProvince: customerAddress.adAddress[0],
+    adCity: customerAddress.adAddress[1],
+    adDist: customerAddress.adAddress[2],
+    latitude: customerAddress.latitude || '',
+    longitude: customerAddress.longitude || '',
+    addressType: customerAddress.addressType || 0,
+    adAddress: customerAddress.detail,
+  };
+  
+  // console.log('formatCustomer', customer);
+  
 
   return customer;
 }

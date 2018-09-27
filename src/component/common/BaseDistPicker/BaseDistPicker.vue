@@ -30,15 +30,10 @@
         default: () => ([]),
       }
     },
-    watch: {
-      defaultValue: {
-        handler: function(newValue) {
-          this.value = newValue;
-        },
-        deep: true
-      }
-    },
     methods: {
+      updateVal(newVal) {
+        this.value = newVal;
+      },
       clearValue() {
         this.value = [];
         this.$emit('city-selector-change', []);

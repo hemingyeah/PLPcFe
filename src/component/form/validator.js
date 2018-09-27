@@ -76,6 +76,13 @@ function phone(value, field = {}) {
     if(field.isNull) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`必填`);
     if (!PHONE_REG.test(value)) return resolve('请输入正确的电话或者手机号');
+    if (field.remoteValidation) {
+      const { action, buildParams, } = field.remoteValidation;
+      let params = buildParams();
+      params.phone = value;
+  
+      return resolve(http.post(action, params, false));
+    }
     resolve(null);
   });
 }
@@ -127,8 +134,9 @@ function address(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull) return resolve(null);
     if (!value || !value.toString().length) return resolve('必选');
-    const {adProvince, adCity, adAddress, } = value;
-    if (!adProvince || !adCity || !adAddress) {
+    
+    const {adAddress, detail, } = value;
+    if (!adAddress || !adAddress.length || !detail) {
       return resolve('必填');
     }
     resolve(null);

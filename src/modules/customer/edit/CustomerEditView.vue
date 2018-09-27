@@ -1,13 +1,15 @@
 <template>
   <div class="customer-container">
     <form @submit.prevent="submit" style="width: 640px;">
-      <div class="btn-group-container">
-        <el-button><i class="iconfont icon-shuaxin"></i>返回</el-button>
-        <el-button native-type="submit" type="primary"><i class="iconfont icon-chulizhong"></i>提交</el-button>
-      </div>
-      <div class="line"></div>
+      <h1 class="page-title">
+        <strong>基本信息</strong>
+        <div class="btn-group-container">
+          <el-button><i class="iconfont icon-return"></i>返回</el-button>
+          <el-button native-type="submit" type="primary"><i class="iconfont icon-commit1"></i>提交</el-button>
+        </div>
+      </h1>
       <form-builder ref="form" :fields="fields" :value="form" @input="update">
-        <form-item label="客户编号" :field="baseField.serialNumberField">
+        <form-item v-if="!config.isAutoSerialNumber" label="客户编号" :field="baseField.serialNumberField">
           <form-text :field="baseField.serialNumberField" :value="form.serialNumber" @input="update"
                      :placeholder="baseField.serialNumberField.placeholder"></form-text>
         </form-item>
@@ -27,14 +29,14 @@
                      :placeholder="baseField.lmPhoneField.placeholder"></form-text>
         </form-item>
         <form-item label="地址" :field="baseField.addressField">
-          <form-address :field="baseField.addressField" :value="form.customerAddress" @input="update"
+          <form-address ref="addressForm" :field="baseField.addressField" :value="form.customerAddress" @input="update"
                         :placeholder="baseField.addressField.placeholder"></form-address>
         </form-item>
-        <form-item label="服务团队" :field="baseField.tagField">
+        <form-item v-if="config.isDivideByTag" label="服务团队" :field="baseField.tagField">
           <div class="input-and-btn">
-            <form-text :field="baseField.tagField" :value="form.tags" @input="update"
-                       :placeholder="baseField.tagField.placeholder"></form-text>
-            <el-button type="button">自动分配</el-button>
+            <form-select :field="baseField.tagField" :value="form.tags" @input="update" :source="selectTagOptions || []"
+                         :placeholder="baseField.tagField.placeholder"></form-select>
+            <el-button type="button" @click="autoAssign">自动分配</el-button>
           </div>
         </form-item>
         <form-item label="客户负责人" :field="baseField.customerManagerField">
@@ -52,10 +54,11 @@
   import BaseDistPicker from '@src/component/common/BaseDistPicker';
   import FormText from "@src/component/form/components/FormText/FormText";
   import FormUser from "@src/component/form/components/FormUser/FormUser";
+  import FormAddress from './FormAddress.vue';
 
   export default {
     name: 'customer-edit-view',
-    components: {FormText, BaseDistPicker, FormUser,},
+    components: {FormText, BaseDistPicker, FormUser, FormAddress,},
     props: {
       initData: {
         type: Object,
@@ -63,7 +66,7 @@
       }
     },
     data() {
-      return {
+      const data = {
         baseField: {
           serialNumberField: {
             formType: 'text',
@@ -112,6 +115,17 @@
             displayName: "电话",
             placeholder: '建议使用手机号,可发送短信通知',
             isNull: 0,
+            remoteValidation: {
+              action: '/linkman/checkUnique4Phone',
+              buildParams() {
+                const params = {
+                  customerId: '',
+                  phone: 12312,
+                };
+                return params;
+              }
+            },
+
           },
           addressField: {
             formType: 'address',
@@ -121,11 +135,15 @@
             isNull: 0,
           },
           tagField: {
-            formType: 'select',
+            formType: 'selectMulti',
             fieldName: 'tags',
             displayName: "服务团队",
             placeholder: '请先选择团队',
             isNull: 1,
+            setting: {
+              isMulti: true,
+              dataSource: [],
+            }
           },
           customerManagerField: {
             formType: 'select',
@@ -140,18 +158,48 @@
           name: null,
           lmName: null,
           customerAddress: {
-            adProvince: '',
-            adCity: '',
-            adDist: '',
-            adAddress: '',
+            adAddress: [],
+            detail: '',
+            longitude: '',
+            latitude: '',
           },
-          tags: null,
+          tags: [],
           customerManager: null,
         },
         address: {}
+      };
+
+      if (this.initData.isCustomerNameDuplicate) {
+        delete data.baseField.nameField.remoteValidation;
       }
+
+      if (!this.initData.isPhoneUnique) {
+        delete data.baseField.lmPhoneField.remoteValidation;
+      }
+
+      return data;
     },
     computed: {
+      config() {
+        const { customerAddress, isAutoSerialNumber, isDivideByTag, isCustomerNameDuplicate, isPhoneUnique, } = this.initData;
+        return {
+          isCustomerNameDuplicate,
+          isAutoSerialNumber,
+          customerAddress,
+          isDivideByTag,
+          isPhoneUnique,
+        }
+      },
+      tags() {
+        return this.initData.tags || [];
+      },
+      selectTagOptions() {
+        return this.initData.tags
+        .map(tag => ({
+          text: tag.tagName,
+          value: tag.id,
+        })) || [];
+      },
       fields() {
         let originFields = this.initData.fieldInfo || [];
         return FormUtil.migration(originFields);
@@ -168,14 +216,14 @@
       },
       submit() {
         this.$refs.form.validate().then(valid => {
-          console.log(this.form);
           if (!valid) return Promise.reject('validate fail.');
-          console.log(this.form);
-          const params = formatCustomer(this.form);
-          console.log('format params', params);
+          const params = formatCustomer(this.form, this.initData.tags);
+
           this.$http.post('/customer/create', params)
             .then(res => {
-              console.log('res', res);
+
+              if (res.status) return this.$platform.alert('创建客户失败');
+              window.location.href = `/customer/view/${res.data.customerId}`;
             })
 
         })
@@ -186,24 +234,77 @@
         if (!name) return;
         this.form.lmName = name;
       },
-      handleCitySelectorChange(location) {
-        console.log('location', location);
+      autoAssign(){
+        let adr = this.form.customerAddress;
+        let adProvince, adCity, adDist;
+
+        if (adr.adAddress && Array.isArray(adr.adAddress) && adr.adAddress.length) {
+          adProvince = adr.adAddress[0];
+          adCity = adr.adAddress[1];
+          adDist = adr.adAddress[2];
+        }
+
+        if(!adProvince || !adCity) return this.$platform.alert('请先补全客户地址');
+
+        let province = adProvince;
+        let city = adCity;
+        let dist = adDist;
+
+        let tags = [];
+        this.tags.forEach(team => {
+          let places = team.places || [];
+          for(let i = 0; i < places.length; i++){
+            let place = places[i];
+            let placeProvince = (place.province || "").replace("所有省", "");
+            let placeCity = (place.city || "").replace("所有市", "");
+            let placeDist = (place.dist || "").replace("所有区", "");
+
+            let placeStr = placeProvince + placeCity + placeDist;
+            let adrStr = province + city + dist;
+            if(placeStr && adrStr.indexOf(placeStr) == 0) tags.push(team.id);
+          }
+        });
+
+        if(tags.length == 0) return this.$platform.alert('未能按照规则分配成功，请到服务团队中设置负责区域');
+
+        this.form.tags = tags;
       },
-      chooseMap() {
-        this.$fast.map.picker(this.address, {defaultArea: "临沂市"}).then(result => {
-          console.log(result)
-          if (result.status == 0) this.address = result.data
-        })
-          .catch(err => console.log(err));
+      setDefaultAddress(ad) {
+        const { adProvince, adCity, adDist, } = ad;
+        if (!adProvince || !adCity) return;
+        const newVal = {
+          adAddress: [adProvince, adCity, adDist,].filter(ad => ad),
+          detail: '',
+          longitude: '',
+          latitude: '',
+        };
+        this.form.customerAddress = newVal;
       },
     },
     mounted() {
-      //
-    }
+      this.initData = JSON.parse(window._init) || {};
+      if (this.initData.customerAddress) {
+        this.setDefaultAddress(this.initData.customerAddress);
+      }
+    },
   }
 </script>
 
 <style lang="scss">
+
+
+  .form-address {
+    input {
+      width: 100%;
+    }
+    .input-and-btn {
+      display: flex !important;
+      justify-content: space-between;
+      .form-item, .form-text {
+        width: 400px;
+      }
+    }
+  }
 
   .customer-container {
     height: 100%;
@@ -211,19 +312,26 @@
     background: #f4f7f5;
     padding: 10px;
 
-    .btn-group-container {
-      padding: 10px;
-      .iconfont {
-        font-size: 12px;
+    .page-title {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #f4f7f5;
+      padding-left: 10px;
+
+      strong {
+        line-height: 62px;
+        font-weight: normal;
+        font-size: 16px;
+      }
+
+      .btn-group-container {
+        padding: 10px;
+        .iconfont {
+          font-size: 12px;
+        }
       }
     }
 
-    .line {
-      height: 10px;
-      width: 100%;
-      background: #f4f7f5;
-      margin-bottom: 10px;
-    }
 
     form {
       background: #fff;
