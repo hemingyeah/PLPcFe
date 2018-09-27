@@ -134,13 +134,16 @@
 
 // -- drag 
 .form-design-preview{
-  display: flex;
-  flex-flow: row nowrap;
-  background-color: #fff;
 
   &.form-design-preview-selected{
    // background-color: red;
   }
+}
+
+.form-design-drag{
+  display: flex;
+  flex-flow: row nowrap;
+  background-color: #fff;
 }
 
 .form-drag-handle{
@@ -148,4 +151,8 @@
   background-color: #eee;
   cursor: move;
   line-height: 52px; //temp
+}
+
+.form-design-preview-enter{
+  background-color: red;
 }

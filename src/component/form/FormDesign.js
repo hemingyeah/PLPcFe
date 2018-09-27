@@ -1,4 +1,3 @@
-//TODO: 拖拽添加
 //TODO: 数据转换工具
 import _ from 'lodash'
 import FormField from './FormField';
@@ -35,14 +34,19 @@ const FormDesign = {
       availableFields: modeFields.map(formType => FormFieldMap.get(formType)), //当前模式下可用字段
       currField: null, //当前选择的字段
       dragEl: null,
-      enterEl: null
+      enterEl: null,
+      dragMode: null, //sort -- 排序 insert -- 添加字段
     }
   },
   methods: {
     /** 添加新字段 */
     addField(event, option){
       //TODO: 限制字段数量
-      let newField = new FormField(option.formType);
+      let fieldOptions = {
+        formType: option.formType,
+        displayName: option.name
+      };
+      let newField = new FormField(fieldOptions);
 
       this.currField = newField;
       this.value.push(newField);
@@ -62,39 +66,39 @@ const FormDesign = {
       }
     },
     initDrag(event){
-      let dragEl = event.target.closest('.form-design-preview');
+      let dragEl = event.target.closest('.form-design-drag');
       dragEl.draggable = true;
     },
     //记录被拖拽的元素
-    dragStart(event, index){
-      this.dragEl = event.target.closest('.form-design-preview');
-      this.dragEl.__sortIndex = index;
+    dragStart(event, fieldId){
+      event.dataTransfer.effectAllowed = 'move';
+
+      this.dragEl = event.target.closest('.form-design-drag');
+      this.dragEl._fd_fieldId = fieldId;
     },
-    dragEnter(event, index){
-      let enterEl = event.target.closest('.form-design-preview');
-      if(enterEl == this.dragEl) return;
+    dragEnter(event, fieldId){
+      event.preventDefault();
+      let enterEl = event.target.closest('.form-design-drag');
       
       this.enterEl = enterEl;
-      this.enterEl.__sortIndex = index;
+      this.enterEl._fd_fieldId = fieldId;
     },
     dragEnd(event){
-      if(this.dragEl == null || this.enterEl == null) return;
+      event.dataTransfer.dropEffect = 'move';
+
+      if(this.dragEl == null || this.enterEl == null || this.dragEl == this.enterEl) return;
 
       let arr = _.cloneDeep(this.value);
 
-      let dragIndex = this.dragEl.__sortIndex;
-      let enterIndex = this.enterEl.__sortIndex;
-
+      let dragIndex = arr.findIndex(item => item._id == this.dragEl._fd_fieldId);
+      let enterIndex = arr.findIndex(item => item._id == this.enterEl._fd_fieldId);
       let distance = dragIndex < enterIndex ? 1 : 0
-
-      let dragField = arr[dragIndex];
-      let enterField = arr[enterIndex];
+      let dragField = arr[dragIndex]; //拖拽的字段
+      let enterField = arr[enterIndex]; //目标字段
 
       arr.splice(dragIndex, 1);
       let insertIndex = arr.indexOf(enterField) ;
       arr.splice(insertIndex + distance, 0, dragField);
-
-      //insertIndex < 0 ? arr.unshift(dragField) : arr.splice(insertIndex, 0, dragField);
 
       this.$emit('input', arr);
 
@@ -104,7 +108,34 @@ const FormDesign = {
     },
     //禁用拖拽
     disableDrag(el){
-      el.closest('.form-design-preview').draggable = false;
+      let dragEl = el.closest('.form-design-drag');
+      dragEl.draggable = false;
+    },
+    copyField(event, field){
+      event.dataTransfer.effectAllowed = "copy";
+      event.dataTransfer.setData('text/plain', JSON.stringify(field));
+    },
+    dropField(event){
+      console.log('--- drop ---')
+      let dropEl = event.target.closest('.form-design-drag');
+      let data = event.dataTransfer.getData('text/plain');
+      let newFieldOption = JSON.parse(data);
+      console.log(newFieldOption)
+
+      let fieldId = dropEl._fd_fieldId;
+      console.log(fieldId);
+
+      let fieldOptions = {
+        formType: newFieldOption.formType,
+        displayName: newFieldOption.name
+      };
+      let newField = new FormField(fieldOptions);
+
+      let index = this.value.findIndex(item => item._id == fieldId);
+      this.value.splice(index, 0, newField)
+      
+      console.log(event)
+      console.log(event.dataTransfer.getData('text/plain'))
     }
   },
   mounted(){
@@ -112,11 +143,18 @@ const FormDesign = {
   render(h){
     //可用字段列表
     let fieldList = this.availableFields.map(field => {
-      return <div class="form-design-field" onClick={e => this.addField(e, field)}>{field.name}</div>
+      return (
+        <div class="form-design-field" draggable
+          onClick={e => this.addField(e, field)}
+          onDragstart={e => this.copyField(e, field)}>
+          {field.name}
+        </div>)
     });
     
     //当前已选字段列表
-    let previewList = this.value.map((currField, index) => { 
+    let previewList = this.value.map(currField => { 
+      let currFieldId = currField._id;
+
       let formType = currField.formType;
       let comp = FormFieldMap.get(formType);
 
@@ -134,17 +172,27 @@ const FormDesign = {
         'form-design-preview-selected': currField == this.currField
       }
 
+      let dragClass = {
+        'form-design-drag': true,
+        'form-design-preview-enter': currFieldId == (this.enterEl ? this.enterEl._fd_fieldId : null)
+      }
+
       //key
       return (
-        <div class={previewClass}
-          onDragstart={e => this.dragStart(e, index)}
-          onDragenter={e => this.dragEnter(e, index)}
-          onDragend={e => this.dragEnd(e)}>
-          <div class="form-drag-handle" 
-            onMousedown={e => this.initDrag(e)}
-            onMouseup={e => this.disableDrag(e.target)}>::</div>
-          {fieldPreview}
-          <button type="button" onClick={e => this.deleteField(e, currField)}>删除</button>
+        <div class={previewClass}>
+          <div class={dragClass}
+            onDragstart={e => this.dragStart(e, currFieldId)}
+            onDragenter={e => this.dragEnter(e, currFieldId)}
+            onDragend={e => this.dragEnd(e)}
+            onDragover={e => e.preventDefault()}
+            onDrop={e => this.dropField(e)}
+            >
+            <div class="form-drag-handle" 
+              onMousedown={e => this.initDrag(e)}
+              onMouseup={e => this.disableDrag(e.target)}>::</div>
+            {fieldPreview}
+            <button type="button" onClick={e => this.deleteField(e, currField)}>删除</button>
+          </div>
         </div>
       )
     });

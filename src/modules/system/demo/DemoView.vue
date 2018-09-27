@@ -16,7 +16,6 @@
   -->
     
     <div style="height: 100vh;"><form-design v-model="fields"></form-design></div>
-
     <!-- <div>
       <textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
       <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a>
@@ -45,136 +44,256 @@ export default {
     return {
       fields: [
         {
-          fieldName: "field_19627",
+          fieldName: null,
           formType: "text",
-          displayName: "标题1",
+          displayName: "单行文本",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_3584"
         },
         {
-          fieldName: "field_37667",
+          fieldName: null,
           formType: "textarea",
-          displayName: "标题2",
+          displayName: "多行文本",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_14261"
         },
         {
-          fieldName: "field_47762",
+          fieldName: null,
           formType: "number",
-          displayName: "标题3",
+          displayName: "数字",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_36397"
         },
         {
-          fieldName: "field_51551",
+          fieldName: null,
           formType: "select",
-          displayName: "标题4",
+          displayName: "下拉菜单",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [{ value: "选项1", isDefault: false }],
-          isMulti: false
+          isMulti: false,
+          _id: "field_5672"
         },
         {
-          fieldName: "field_21116",
+          fieldName: null,
           formType: "code",
-          displayName: "标题5",
+          displayName: "扫码",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_40138"
         },
         {
-          fieldName: "field_13320",
+          fieldName: null,
           formType: "attachment",
-          displayName: "标题6",
+          displayName: "附件",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_40127"
         },
         {
-          fieldName: "field_57518",
-          formType: "date",
-          displayName: "标题7",
-          isNull: 1,
-          isSearch: 0,
-          placeHolder: null,
-          defaultValue: null,
-          options: [],
-          isMulti: false
-        },
-        {
-          fieldName: "field_85065",
-          formType: "datetime",
-          displayName: "标题8",
-          isNull: 1,
-          isSearch: 0,
-          placeHolder: null,
-          defaultValue: null,
-          options: [],
-          isMulti: false
-        },
-        {
-          fieldName: "field_81707",
-          formType: "phone",
-          displayName: "标题9",
-          isNull: 1,
-          isSearch: 0,
-          placeHolder: null,
-          defaultValue: null,
-          options: [],
-          isMulti: false
-        },
-        {
-          fieldName: "field_90171",
+          fieldName: null,
           formType: "user",
-          displayName: "标题10",
+          displayName: "人员",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_41998"
         },
         {
-          fieldName: "field_87233",
+          fieldName: null,
           formType: "date",
-          displayName: "标题11",
+          displayName: "日期",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_66988"
         },
         {
-          fieldName: "field_27377",
-          formType: "phone",
-          displayName: "标题12",
+          fieldName: null,
+          formType: "datetime",
+          displayName: "日期时间",
           isNull: 1,
           isSearch: 0,
           placeHolder: null,
           defaultValue: null,
           options: [],
-          isMulti: false
+          isMulti: false,
+          _id: "field_15176"
+        },
+        {
+          fieldName: null,
+          formType: "phone",
+          displayName: "电话",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_10333"
+        },
+        {
+          fieldName: null,
+          formType: "address",
+          displayName: "地址",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_47485"
+        },
+        {
+          fieldName: null,
+          formType: "text",
+          displayName: "单行文本",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_62023"
+        },
+        {
+          fieldName: null,
+          formType: "textarea",
+          displayName: "多行文本",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_84756"
+        },
+        {
+          fieldName: null,
+          formType: "number",
+          displayName: "数字",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_19152"
+        },
+        {
+          fieldName: null,
+          formType: "select",
+          displayName: "下拉菜单",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [{ value: "选项1", isDefault: false }],
+          isMulti: false,
+          _id: "field_28524"
+        },
+        {
+          fieldName: null,
+          formType: "code",
+          displayName: "扫码",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_39805"
+        },
+        {
+          fieldName: null,
+          formType: "attachment",
+          displayName: "附件",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_68372"
+        },
+        {
+          fieldName: null,
+          formType: "user",
+          displayName: "人员",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_51088"
+        },
+        {
+          fieldName: null,
+          formType: "datetime",
+          displayName: "日期时间",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_27273"
+        },
+        {
+          fieldName: null,
+          formType: "phone",
+          displayName: "电话",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_6164"
+        },
+        {
+          fieldName: null,
+          formType: "address",
+          displayName: "地址",
+          isNull: 1,
+          isSearch: 0,
+          placeHolder: null,
+          defaultValue: null,
+          options: [],
+          isMulti: false,
+          _id: "field_54593"
         }
       ],
       files: [],
