@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     choose(){
-      this.$emit('chooseField')
+      this.$emit('chooseField', this.field)
     }
   }
 }

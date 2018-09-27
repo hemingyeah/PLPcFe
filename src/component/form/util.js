@@ -61,3 +61,9 @@ export function migration(fields){
     return field;
   })
 }
+
+/** 返回一个随机key */
+export function genRandomKey(){
+  let random = Math.random() * 100000000 >> 0;
+  return random.toString(16);
+} 

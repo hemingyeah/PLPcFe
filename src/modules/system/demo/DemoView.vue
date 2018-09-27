@@ -15,7 +15,7 @@
     <textarea id="textarea" style="width: 320px; height: 180px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis, arcu vitae adipiscing placerat, nisl lectus accumsan nisi, vitae iaculis sem neque vel lectus. Praesent tristique commodo lorem quis fringilla. Sed ac tellus eros. Sed consectetur eleifend felis vitae luctus. Praesent sagittis, est eget bibendum tincidunt, ligula diam tincidunt augue, a fermentum odio velit eget mi. Phasellus mattis, elit id fringilla semper, orci magna cursus ligula, non venenatis lacus augue sit amet dui. Pellentesque lacinia odio id nisi pulvinar commodo tempus at odio. Ut consectetur eros porttitor nunc mollis ultrices. Aenean porttitor, purus sollicitudin viverra auctor, neque erat blandit sapien, sit amet tincidunt massa mi ac nibh. Proin nibh sem, bibendum ut placerat nec, cursus et lacus. Phasellus vel augue turpis. Nunc eu mauris eu leo blandit mollis interdum eget lorem. </textarea>
   -->
     
-    <div style="height: 100vh;"><form-design v-model="fields"></form-design></div>
+    <div style="height: 100vh;"><form-design :value="fields" @input="updateFields"></form-design></div>
     <!-- <div>
       <textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
       <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a>
@@ -306,6 +306,10 @@ export default {
     }
   },
   methods: {
+    updateFields(value){
+      this.fields = value;
+      //console.log(value)
+    },
     contact() {
       this.$fast.contact.choose("dept", {
         title: "请选择负责人",

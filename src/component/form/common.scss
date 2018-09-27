@@ -22,14 +22,6 @@
   user-select: none;
 }
 
-.form-design-list{
-  box-shadow: 0 0 4px rgba(0,0,0,.15);
-  min-height: 50%;
-  max-height: 100%;
-  overflow: auto; 
-  border-radius: 2px;
-}
-
 .form-design-setting{
   width: 320px;
   height: 100%;
@@ -102,7 +94,6 @@
   padding: 10px 0;
   border-bottom: 1px solid #ddd;
 
-
   label{
     display: block;
     margin: 0;
@@ -132,11 +123,44 @@
   color: red;
 }
 
-// -- drag 
-.form-design-preview{
+.form-design-preview-delete{
+  border: none;
+  background-color: transparent;
+  outline: none;
+}
 
-  &.form-design-preview-selected{
-   // background-color: red;
+// -- drag 
+.form-design-list{
+  box-shadow: 0 0 4px rgba(0,0,0,.15);
+  min-height: 50%;
+  max-height: 100%;
+  overflow: auto; 
+  border-radius: 2px;
+}
+
+.form-design-dragging{
+  .form-design-drag-handle{
+    visibility: hidden !important;
+  }
+}
+
+.form-design-preview{
+  margin: 5px 0;
+  background-color: #f0f0f0;
+
+  &.form-design-ghost{
+    border: 1px dashed #333;
+    .form-design-drag{
+      opacity: .35;
+    }
+  
+    
+  }
+
+  &.form-design-selected{
+    .form-design-drag{
+      background-color: #f0f0f0;
+    }
   }
 }
 
@@ -144,15 +168,20 @@
   display: flex;
   flex-flow: row nowrap;
   background-color: #fff;
+
+  &:hover .form-design-drag-handle{
+    visibility: visible;
+  }
 }
 
-.form-drag-handle{
+.form-design-drag-handle{
   width: 10px;
   background-color: #eee;
   cursor: move;
   line-height: 52px; //temp
+  visibility: hidden;
 }
 
-.form-design-preview-enter{
-  background-color: red;
+.form-design-enter{
+  border: 1px dashed #333;
 }

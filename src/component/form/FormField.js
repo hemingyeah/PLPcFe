@@ -1,3 +1,5 @@
+import {genRandomKey} from './util';
+
 /**
  * 用于表单设计的字段类
  * 后端给出的字段数据需要调用 util.toFormField 转换成该格式
@@ -23,7 +25,11 @@ export default class FormField{
 
     this.options = options; //下拉菜单类型选项
     this.isMulti = false; //是否为多选
-    this._id = this.fieldName || 'field_' + (Math.random() * 100000000 >> 0);
+    this._id = this.fieldName || `field_${genRandomKey()}`;
+
+    //辅助字段
+    this.dragging = false; //当前字段时候正在被拖拽
+
   }
 
   /** 从Filed构建 */
