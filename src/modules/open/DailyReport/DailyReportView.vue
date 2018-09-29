@@ -3,7 +3,7 @@
     <img :style="{'height':396*width/750+'px'}" :src="`/files/getDailyBanner?module=${items.module}`" alt="">
     <div v-for="item in items.details" :key="item.key" class="report-list">
       <div class="name"><div>{{item.name}}</div></div>
-      <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}">{{item.result}}</strong>
+      <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}" v-html="getNum(item.result)"></strong>
     </div>
     <div class="message"><p>如需自定义日报，请到</p><p><span>售后宝PC端[系统管理>订阅通知管理]</span>中进行配置</p></div>
     <div @click="jump" class="to-index-btn">进入售后宝</div>
@@ -30,6 +30,13 @@
       
     },
     methods: {
+      getNum(value){
+        let val = value.toString();
+        if(val.indexOf('%') > 0 && val.substring(val.length - 1) == '%') {
+          val = val.substring(0, val.length - 1) + '<small>%</small>'
+        }
+        return val;
+      },
       fontSize(len){
         if(len > 5 && len <= 9) return 30 * (1 - (len - 5) / 5 + (len - 5) / 12) + 'px';
         if(len > 9) return '12px';
@@ -50,6 +57,7 @@ body, html{
   background:#f4f7f5;
   margin:0;
   padding:0;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
 }
 .daily-report{
   height:100%;  
@@ -83,6 +91,10 @@ body, html{
       font-size:30px;
       text-align: right;
       overflow: hidden;
+      small{
+        font-size:60%;
+        margin-left:3px;
+      }
     }
   }
   .to-index-btn{
