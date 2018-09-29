@@ -553,7 +553,13 @@
 
       this.buildConfig();
       this.search();
-  },
+
+      this.searchLinkman();
+      this.searchTag();
+      this.searchCreator();
+      setTimeout(this.searchCustomerManager, 2000)
+
+    },
     methods: {
       formatAddress(ad) {
         const { adProvince, adCity, adDist, } = ad;

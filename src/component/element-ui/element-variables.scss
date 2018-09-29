@@ -12,11 +12,28 @@ $--button-small-border-radius: $--border-radius-base !default;
   padding-left: 10px;
 }
 
-
-
-@import "~element-ui/packages/theme-chalk/src/button-group.scss";
-@import "~element-ui/packages/theme-chalk/src/button.scss";
-@import "~element-ui/packages/theme-chalk/src/checkbox-button.scss";
-@import "~element-ui/packages/theme-chalk/src/radio-button.scss";
-@import "~element-ui/packages/theme-chalk/src/switch.scss";
 @import "~element-ui/packages/theme-chalk/src/pagination.scss";
+@import "~element-ui/packages/theme-chalk/src/table.scss";
+@import "~element-ui/packages/theme-chalk/src/table-column.scss";
+@import "~element-ui/packages/theme-chalk/src/form.scss";
+@import "~element-ui/packages/theme-chalk/src/input.scss";
+@import "~element-ui/packages/theme-chalk/src/date-picker.scss";
+@import "~element-ui/packages/theme-chalk/src/select.scss";
+
+@import "~element-ui/packages/theme-chalk/src/popover.scss";
+@import "~element-ui/packages/theme-chalk/src/button.scss";
+@import "~element-ui/packages/theme-chalk/src/button-group.scss";
+@import "~element-ui/packages/theme-chalk/src/cascader.scss";
+@import "~element-ui/packages/theme-chalk/src/dropdown-menu.scss";
+@import "~element-ui/packages/theme-chalk/src/dropdown-item.scss";
+@import "~element-ui/packages/theme-chalk/src/dropdown.scss";
+@import "~element-ui/packages/theme-chalk/src/checkbox.scss";
+@import "~element-ui/packages/theme-chalk/src/form-item.scss";
+@import "~element-ui/packages/theme-chalk/src/radio.scss";
+@import "~element-ui/packages/theme-chalk/src/radio-group.scss";
+@import "~element-ui/packages/theme-chalk/src/radio-button.scss";
+@import "~element-ui/packages/theme-chalk/src/time-picker.scss";
+@import "~element-ui/packages/theme-chalk/src/loading.scss";
+@import "~element-ui/packages/theme-chalk/src/checkbox-group.scss";
+@import "~element-ui/packages/theme-chalk/src/checkbox-button.scss";
+@import "~element-ui/packages/theme-chalk/src/switch.scss";
