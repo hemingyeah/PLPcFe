@@ -8,12 +8,7 @@
   <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_769637_9r6uf5gy3dc.css">
   <script>window.__root_window_ = 'root';</script>
   <script data-init="js">window._init = '#{initJson}';</script>
-  <script>
-    var ua = window.navigator.userAgent;
-    if(/DingTalk/.test(ua)){
-      document.write('<script src="//g.alicdn.com/dingding/dingtalk-pc-api/2.8.0/index.js"><\/script>')
-    }
-  </script>
+  <script>/DingTalk/.test(window.navigator.userAgent) && document.write('<script src="//g.alicdn.com/dingding/dingtalk-pc-api/2.8.0/index.js"><\/script>')</script>
   <script src="/resource/plugins/jQuery/jquery-3.1.1.min.js" async></script>
   <script src="/resource/dingtalk/dingtalkUtil-v2.js" async></script>
 </head>

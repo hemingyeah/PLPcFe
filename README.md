@@ -2,7 +2,7 @@
 
 ## 浏览器兼容性
   IE 10+, Edge, Firefox, Chrome 49+, Safari
-  > IE最低支持至10，是因为IE10支持flexbox
+  > IE最低支持至10，是因为IE10支持flexbox, websocket
   >
   > Chrome最低支持至49，是因为Chrome 49是windows xp最后一个版本，也是windows钉钉客户端包含的浏览器版本 
 
@@ -38,7 +38,10 @@
 ```
 
 ## todolist
- * 文件上传组件
+
  * 图片预览 兼容钉钉 兼容文件上传组件
  * toast 兼容钉钉
  * 层管理 popmanager
+ * 合并sm4_pc_components项目
+ * git规范
+ * 重写table组件

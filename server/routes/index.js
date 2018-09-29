@@ -22,6 +22,7 @@ router.get('/', async ctx => {
   //请求失败,模拟登陆
   if(!result.status){
     let loginRes = await HttpClient.request('/dd/mockLogin?code=dev_code&corpId=dev_corpId', 'get', null);
+    
     if(loginRes.status){
       let cookie = loginRes.headers['set-cookie'] || {};
       headers['set-cookie'] = cookie;
