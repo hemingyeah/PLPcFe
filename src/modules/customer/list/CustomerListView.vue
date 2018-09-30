@@ -549,16 +549,20 @@
         fieldInfo: initData.fieldInfo,
       };
       this.auth = initData.auth || {};
-      console.log('initData', initData);
 
       this.buildConfig();
       this.search();
 
-      this.searchLinkman();
-      this.searchTag();
-      this.searchCreator();
-      setTimeout(this.searchCustomerManager, 2000)
-
+      // 团队、人员等搜索、默认加载部分数据
+      Promise.all([
+        this.searchCreator(),
+        this.searchLinkman(),
+        this.searchTag(),
+      ])
+      .then(res => {
+        this.inputRemoteSearch.customerManager.options = res[0].list;
+      })
+      .catch(err => console.error('err', err));
     },
     methods: {
       formatAddress(ad) {
@@ -566,20 +570,6 @@
         return [ adProvince, adCity, adDist, ]
           .filter(d => !!d).join('-');
       },
-      // remoteInputFocus(action) {
-      //   if (this.inputRemoteSearch[action].options.length) return;
-      //   let fn = () => ({});
-      //   if (action === 'tag') {
-      //     fn = this.searchTag;
-      //   } else if (action === 'linkman') {
-      //     fn = this.searchLinkman;
-      //   } else if (action === 'creator') {
-      //     fn = this.searchCreator;
-      //   } else if (action === 'customerManager') {
-      //     fn = this.searchCustomerManager;
-      //   }
-      //   setTimeout(fn, 200);
-      // },
       remindSuccess(ids) {
         let tv = false;
         if (!ids || !ids.length) return;
@@ -643,7 +633,7 @@
         this.$refs.exportPanel.open(ids, fileName);
       },
       importSucc() {
-        console.log('importSucc');
+        // console.log('importSucc');
       },
       search(cp = {}, fullSearch) {
         // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
@@ -708,11 +698,11 @@
         }
 
         // address
-        if (this.params.specialSearchModel.addressSelector.length) {
+        if (this.paramsBackup.specialSearchModel.addressSelector.length) {
           params.customerAddress = {
-            adProvince: this.params.specialSearchModel.addressSelector[0],
-            adCity: this.params.specialSearchModel.addressSelector[1] || '',
-            adDist: this.params.specialSearchModel.addressSelector[2] || '',
+            adProvince: this.paramsBackup.specialSearchModel.addressSelector[0],
+            adCity: this.paramsBackup.specialSearchModel.addressSelector[1] || '',
+            adDist: this.paramsBackup.specialSearchModel.addressSelector[2] || '',
           };
         }
         params.customerAddress.adAddress = this.paramsBackup.specialSearchModel.adAddress || '';
@@ -720,9 +710,9 @@
         params = this.deleteValueFromObject(params, [0, false]);
 
         // build customized search fields
-        Object.keys(this.params.customizedSearchModel)
+        Object.keys(this.paramsBackup.customizedSearchModel)
           .forEach(key => {
-            tv = this.params.customizedSearchModel[key];
+            tv = this.paramsBackup.customizedSearchModel[key];
             if (tv.value && tv.formType === 'date') {
               return conditions.push({
                 property: tv.fieldName,
@@ -1060,37 +1050,41 @@
       // input search method
       searchCustomerManager(keyword) {
         this.inputRemoteSearch.customerManager.loading = true;
-        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+        return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
           .then(res => {
             this.inputRemoteSearch.customerManager.options = res.list;
             this.inputRemoteSearch.customerManager.loading = false;
+            return res;
           })
           .catch(err => console.error('searchCustomerManager function catch err', err));
       },
       searchCreator(keyword) {
         this.inputRemoteSearch.creator.loading = true;
-        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+        return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
           .then(res => {
             this.inputRemoteSearch.creator.options = res.list;
             this.inputRemoteSearch.creator.loading = false;
+            return res;
           })
           .catch(err => console.error('searchCreator function catch err', err));
       },
       searchLinkman(keyword) {
         this.inputRemoteSearch.linkman.loading = true;
-        this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
+        return this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
           .then(res => {
             this.inputRemoteSearch.linkman.options = res.list;
             this.inputRemoteSearch.linkman.loading = false;
+            return res;
           })
           .catch(err => console.error('searchLinkman function catch err', err));
       },
       searchTag(keyword) {
         this.inputRemoteSearch.tag.loading = true;
-        this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
+        return this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
           .then(res => {
             this.inputRemoteSearch.tag.options = res.list;
             this.inputRemoteSearch.tag.loading = false;
+            return res;
           })
           .catch(err => console.error('searchTag function catch err', err));
       },
