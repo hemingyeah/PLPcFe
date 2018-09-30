@@ -28,7 +28,7 @@ module.exports = merge(baseConfig, {
     }
   },
   optimization: {
-    //runtimeChunk: true
+    //runtimeChunk: true,
     splitChunks: {
       cacheGroups: {
         vendors: {
@@ -47,14 +47,16 @@ module.exports = merge(baseConfig, {
         },
         common: {
           name: 'common',
-          //test: /[\\/]src[\\/]component[\\/]/,
           test(module, chunks){
-            let commonReg = /[\\/]src[\\/](assets|common|component|config|directive|filter|mixin|platform|util)/;
-            let elementUIReg = /[\\/]node_modules[\\/]element-ui[\\/]/;
-
+            let conditions = [
+              /[\\/]src[\\/](assets|common|component|config|directive|filter|mixin|platform|util)/,
+              /[\\/]node_modules[\\/]element-ui[\\/]/,
+              /[\\/]node_modules[\\/]viewerjs[\\/]/
+            ];
+            
             if(module.nameForCondition){
               let name = module.nameForCondition();
-              return commonReg.test(name) || elementUIReg.test(name)
+              return conditions.some(reg => reg.test(name))
             }
             return false;
           },

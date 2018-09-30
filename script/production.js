@@ -52,7 +52,7 @@ async function genJSP(directory){
   shell.mkdir('-p', jspTatgetPath);
   shell.cp('-r', distOriginPath + '/jsp/*', jspTatgetPath);
   //清空jsp
-  shell.rm('-rf', distOriginPath + '/jsp/*');
+  shell.rm('-rf', distOriginPath + '/jsp');
   
   //复制静态资源
   shell.rm('-rf', distTargetPath);
