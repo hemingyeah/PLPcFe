@@ -165,18 +165,6 @@ export default {
         },
         {
           fieldName: null,
-          formType: "address",
-          displayName: "地址",
-          isNull: 1,
-          isSearch: 0,
-          placeHolder: null,
-          defaultValue: null,
-          options: [],
-          isMulti: false,
-          _id: "field_47485"
-        },
-        {
-          fieldName: null,
           formType: "text",
           displayName: "单行文本",
           isNull: 1,
@@ -282,18 +270,6 @@ export default {
           options: [],
           isMulti: false,
           _id: "field_6164"
-        },
-        {
-          fieldName: null,
-          formType: "address",
-          displayName: "地址",
-          isNull: 1,
-          isSearch: 0,
-          placeHolder: null,
-          defaultValue: null,
-          options: [],
-          isMulti: false,
-          _id: "field_54593"
         }
       ],
       files: [],

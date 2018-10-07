@@ -13,7 +13,7 @@ import {
 function createPreviewComp(h, field){
   let currFieldId = field._id;
   let previewComp = FormFieldMap.get(field.formType);
-  
+
   //根据字段配置创建预览内容
   let fieldPreview = h(previewComp.preview, {
     props: { field },
@@ -44,6 +44,18 @@ function createPreviewComp(h, field){
   )
 }
 
+/**
+ * 判断元素是否可见
+ * @param {*} el 判断的元素
+ */
+function isVisibility(el){
+  let container = this.$el.querySelector('.form-design-list');
+  let min = container.scrollTop;
+  let max = min + container.offsetHeight;
+
+  return min <= el.offsetTop && (el.offsetTop + el.offsetHeight) <= max;
+}
+
 const FormDesign = {
   name: 'form-design',
   props: {
@@ -67,9 +79,9 @@ const FormDesign = {
       enterEl: null,
       dragMode: null, //sort -- 排序 insert -- 添加字段
       
-      insertFieldOption: null, //待插入字段的选项
       originValue: null, //插入前的值
-      insertField: null //插入的字段
+      insertedFieldOption: null, //待插入字段的选项
+      insertedField: null //插入的字段
     }
   },
   methods: {
@@ -84,8 +96,8 @@ const FormDesign = {
       let dragFieldId = dragEl._fd_fieldId;
       let dragField = this.value.find(item => item._id == dragFieldId);
 
-      dragEl.draggable = false;
-      dragField.dragging = false;
+      if(dragEl) dragEl.draggable = false;
+      if(dragField) dragField.dragging = false;
 
       this.dragEl = null;
       this.enterEl = null;
@@ -94,7 +106,7 @@ const FormDesign = {
     //记录被拖拽的元素，用于字段排序
     dragStart(event, field){
       event.dataTransfer.effectAllowed = 'copyMove';
-      
+      event.dataTransfer.dropEffect = 'move';
       this.dragMode = 'sort';
       this.dragEl = event.target.closest('.form-design-drag');
       this.dragEl._fd_fieldId = field._id;
@@ -112,22 +124,25 @@ const FormDesign = {
       let enterEl = event.target.closest('.form-design-drag');
       enterEl._fd_fieldId = fieldId;
       this.enterEl = enterEl;
-      let enterIndex = this.value.findIndex(item => item._id == fieldId);
-
+      
       if(this.dragMode == 'sort'){
+        let enterIndex = this.value.findIndex(item => item._id == fieldId);
         let dragIndex = this.value.findIndex(item => item._id == this.dragEl._fd_fieldId);
       
         return this.sort(dragIndex, enterIndex);
       }
 
       if(this.dragMode == 'insert'){
-        if(this.insertField){//已经插入，对数字进行排序
-          let dragIndex = this.value.findIndex(item => item._id == this.insertField._id);
+        if(this.insertedField){//已经插入，对数字进行排序
+          let enterIndex = this.value.findIndex(item => item._id == fieldId);
+          let dragIndex = this.value.findIndex(item => item._id == this.insertedField._id);
           this.sort(dragIndex, enterIndex);
           return;
         }
+
         let value = this.originValue;
-        this.addField(this.insertFieldOption, value, value.findIndex(item => item._id == fieldId))
+        let index = value.findIndex(item => item._id == fieldId)
+        this.insertField(this.insertedFieldOption, value, index)
       }
     },
     //禁用拖拽
@@ -155,9 +170,16 @@ const FormDesign = {
     //选中字段
     chooseField(field){
       this.currField = field;
+
+      this.$nextTick(() => {
+        let el = this.$el.querySelector('.form-design-selected');
+        let visible = isVisibility.call(this, el);
+        
+        if(!visible) el.scrollIntoView();
+      })
     },
     //添加新字段 
-    addField(option = {}, value, index){
+    insertField(option = {}, value, index){
       let newField = new FormField({
         formType: option.formType,
         displayName: option.name
@@ -165,23 +187,29 @@ const FormDesign = {
       
       let arr = _.cloneDeep(value ? value : this.value);
       index == null ? arr.push(newField) : arr.splice(index, 0, newField);
-      this.insertField = newField;
+      this.insertedField = newField;
       this.$emit('input', arr); 
 
       //选中新添加的字段
       this.chooseField(newField)
     },
+    //点击标签添加字段
+    addField(field){
+      this.insertField(field);
+    },
     //拖拽字段，用于拖拽添加字段
     dragField(event, option){
+      //event.dataTransfer.copyMove = 'copy';
+      //event.dataTransfer.dropEffect = 'copy';
       this.dragMode = 'insert';
-      this.insertFieldOption = option;
+      this.insertedFieldOption = option;
       this.originValue = _.cloneDeep(this.value);
     },
     //拖拽添加，处理样式
     dragFieldEnd(event, field){
       this.enterEl = null;
-      this.insertFieldOption = null;
-      this.insertField = null;
+      this.insertedFieldOption = null;
+      this.insertedField = null;
       this.dragMode = null;
     },
     //拖拽添加字段至指定位置
