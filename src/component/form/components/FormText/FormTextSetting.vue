@@ -1,6 +1,6 @@
 <template>
   <div class="form-design-setting-panel">
-    <h3>基础设置</h3>
+    <h3>基础设置 <small>单行文本</small></h3>
     <div class="form-design-form-group">
       <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="update" maxlength="6">
     </div>

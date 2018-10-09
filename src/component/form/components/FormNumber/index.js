@@ -5,7 +5,7 @@ import FormNumber from './FormNumber.vue'
 let FormNumberField = {
   formType: 'number', // 字段类型
   name: '数字',
-  isSys: false,
+  isSystem: 0,
   component: {
     setting: FormNumberSetting,
     preview: FormNumberPreview,

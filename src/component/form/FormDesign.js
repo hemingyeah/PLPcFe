@@ -70,10 +70,30 @@ const FormDesign = {
   },
   data(){
     let mode = Modes[this.mode];
-    let modeFields = mode.fields || [];
+    let modeFormTypes = mode.fields || [];
+
+    let hasSystemField = false;
+    let availableFields = [];
+
+    modeFormTypes.forEach(item => {
+      let field = FormFieldMap.get(item);
+      if(null == field) return;
+
+      if(field.isSystem == 1) hasSystemField = true;
+      availableFields.push(field)
+    })
 
     return {
-      availableFields: modeFields.map(formType => FormFieldMap.get(formType)), //当前模式下可用字段
+      //当前模式下可用字段
+      availableFields,
+      //是否显示系统字段tab 
+      hasSystemField,
+      //当前显示的字段 0 -- 基础组件  1 -- 系统组件
+      fieldGroup: 0,
+      
+      
+      
+      
       currField: null, //当前选择的字段
       dragEl: null,
       enterEl: null,
@@ -84,7 +104,18 @@ const FormDesign = {
       insertedField: null //插入的字段
     }
   },
+  computed: {
+    //根据fieldMode筛选后的字段
+    filterFields(){
+      return this.availableFields.filter(item => item.isSystem == this.fieldGroup);
+    }
+  },
   methods: {
+    // -------------- 组件列表 --------------
+ 
+
+
+
     //允许字段可拖拽
     enableDrag(event){
       let dragEl = event.target.closest('.form-design-drag');
@@ -247,13 +278,13 @@ const FormDesign = {
   },
   render(h){
     //可用字段列表
-    let fieldList = this.availableFields.map(field => {
+    let fieldList = this.filterFields.map(field => {
       return (
         <div class="form-design-field" draggable
           onClick={e => this.addField(field)}
           onDragstart={e => this.dragField(e, field)}
           onDragend={e => this.dragFieldEnd(e, field)}>
-          {field.name}
+          {field.name}<i class="iconfont icon-people"></i>
         </div>)
     });
     
@@ -289,7 +320,13 @@ const FormDesign = {
 
     return (
       <div class="form-design">
-        <div class="form-design-panel">{fieldList}</div>
+        <div class="form-design-panel">
+          <div class={["form-design-tabs", this.hasSystemField ? 'form-design-withSys' : '']}>
+            <div class="form-design-tab" onClick={e => this.fieldGroup = 0}>基础组件</div>
+            {this.hasSystemField && <div class="form-design-tab" onClick={e => this.fieldGroup = 1}>系统组件</div>}
+          </div>
+          <div class="form-design-tabs-content">{fieldList}</div>
+        </div>
         <div class="form-design-main">
           <div class={designListClass}>{previewList}</div>
         </div>

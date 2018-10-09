@@ -52,7 +52,8 @@ for(let i = 0; i < FormFields.length; i++){
   let field = {
     formType: formField.formType, //组件类型
     name: formField.name, //组件显示名称
-    alias: formField.alias //组件别名
+    alias: formField.alias, //组件别名
+    isSystem: formField.isSystem //是否为为系统组件
   }
 
   if(!formField.alias){

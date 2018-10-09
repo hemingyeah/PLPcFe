@@ -2,7 +2,7 @@
 let FormCodeField = {
   formType: 'code', // 字段类型
   name: '扫码',
-  isSys: false,
+  isSystem: 0,
   alias: 'text'
 };
 

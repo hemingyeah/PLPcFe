@@ -383,8 +383,3 @@ export default {
 };
 </script>
 
-<style>
-body {
-  font-size: 15px;
-}
-</style>

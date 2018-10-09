@@ -22,6 +22,7 @@ export default class FormField{
     this.isSearch = 0; //是否允许搜索
     this.placeHolder = null; //提示信息
     this.defaultValue = null; //默认值
+    this.isSystem = params.isSystem || 0; //是否为系统字段
 
     this.options = options; //下拉菜单类型选项
     this.isMulti = false; //是否为多选

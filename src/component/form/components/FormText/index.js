@@ -5,7 +5,7 @@ import FormText from './FormText.vue'
 let FormTextField = {
   formType: 'text', // 字段类型
   name: '单行文本',
-  isSys: false,
+  isSystem: 0,
   component: {
     setting: FormTextSetting,
     preview: FormTextPreview,

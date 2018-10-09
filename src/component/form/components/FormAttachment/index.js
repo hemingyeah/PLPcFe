@@ -5,7 +5,7 @@ import FormAttachment from './FormAttachment.vue'
 let FormAttachmentField = {
   formType: 'attachment', // 字段类型
   name: '附件',
-  isSys: false,
+  isSystem: 0,
   component: {
     setting: FormAttachmentSetting,
     preview: FormAttachmentPreview,

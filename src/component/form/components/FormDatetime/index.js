@@ -5,7 +5,7 @@ import FormDatetime from './FormDatetime.vue'
 let FormDatetimeField = {
   formType: 'datetime', // 字段类型
   name: '日期时间',
-  isSys: false,
+  isSystem: 0,
   component: {
     setting: FormDatetimeSetting,
     preview: FormDatetimePreview,

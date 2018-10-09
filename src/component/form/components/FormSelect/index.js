@@ -5,7 +5,7 @@ import FormSelect from './FormSelect.vue';
 let FormSelectField = {
   formType: 'select', // 字段类型
   name: '下拉菜单',
-  isSys: false,
+  isSystem: 0,
   component: {
     setting: FormSelectSetting,
     preview: FormSelectPreview,
