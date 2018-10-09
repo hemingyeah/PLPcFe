@@ -1,7 +1,7 @@
 <template>
   <div class="form-address">
     <div class="input-and-btn">
-      <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker" :default-value="value.adAddress"></base-dist-picker>
+      <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker" :value="value.adAddress"></base-dist-picker>
       <el-button type="button" @click="chooseMap" style="margin-bottom: 10px">地图选址</el-button>
     </div>
     <input
@@ -36,15 +36,6 @@
       value: {
         type: Object,
         default: () => ({})
-      }
-    },
-    watch: {
-      value: {
-        handler: function(newValue) {
-          const adArr = newValue.adAddress || [];
-          this.$refs.baseDistPicker.updateVal(adArr);
-        },
-        deep: true
       }
     },
     methods: {
@@ -107,7 +98,9 @@
         this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
       },
       chooseMap() {
-        this.$fast.map.picker(this.addressBackup, {defaultArea: "临沂市"}).then(result => {
+        let defaultArea = this.addressBackup.adAddress.filter(a => a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
+
+        this.$fast.map.picker(this.addressBackup, {defaultArea: defaultArea[defaultArea.length - 1],}).then(result => {
 
           if (result.status === 1) return;
 
@@ -155,6 +148,10 @@
   .form-address {
     input {
       width: 100%;
+    }
+
+    .el-input__inner:hover {
+      border-color: #00ac97;
     }
   }
 

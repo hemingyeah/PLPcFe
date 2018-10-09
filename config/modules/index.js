@@ -14,7 +14,8 @@ module.exports = {
 
   // ------------ 客户 ------------
   "customer.list": {
-    entry: './src/modules/customer/list/index.js'
+    entry: './src/modules/customer/list/index.js',
+    template: 'src/modules/customer/list/index.html'
   },
   "customer.edit": {
     entry: './src/modules/customer/edit/index.js',

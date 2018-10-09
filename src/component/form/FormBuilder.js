@@ -179,6 +179,11 @@ const FormBuilder = {
       let promises = Object.keys(this.validateMap).map(key => this.validateMap[key]());
       
       return Promise.all(promises).then(results => results.every(msg => msg == null))
+      .catch(err => {
+        
+        
+        console.error('validate error', err);
+      })
     },
     /** 注册待验证的组件 */
     addFieldHandler(event){

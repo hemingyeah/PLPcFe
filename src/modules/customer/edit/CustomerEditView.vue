@@ -1,11 +1,11 @@
 <template>
-  <div class="customer-container">
+  <div class="customer-container" v-loading.fullscreen.lock="loadingPage">
     <form @submit.prevent="submit" style="width: 640px;">
       <h1 class="page-title">
         <strong>基本信息</strong>
         <div class="btn-group-container">
           <el-button><i class="iconfont icon-return"></i>返回</el-button>
-          <el-button native-type="submit" type="primary"><i class="iconfont icon-commit1"></i>提交</el-button>
+          <el-button :disabled="submitting" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i>提交</el-button>
         </div>
       </h1>
       <form-builder ref="form" :fields="fields" :value="form" @input="update">
@@ -51,15 +51,12 @@
 
 <script>
   import * as FormUtil from '@src/component/form/util';
-  import { formatCustomer, convertCustomerToForm, } from '@src/util/customer';
-  import BaseDistPicker from '@src/component/common/BaseDistPicker';
-  import FormText from "@src/component/form/components/FormText/FormText";
-  import FormUser from "@src/component/form/components/FormUser/FormUser";
+  import { formatCustomer, convertCustomerToForm, } from './customer';
   import FormAddress from './FormAddress.vue';
 
   export default {
     name: 'customer-edit-view',
-    components: {FormText, BaseDistPicker, FormUser, FormAddress,},
+    components: {FormAddress,},
     props: {
       initData: {
         type: Object,
@@ -67,11 +64,11 @@
       }
     },
     data() {
-      const initData = JSON.parse(window._init) || {};
-      let addressBackup = {};
-
+      const customerId = this.initData.id || '';
       const data = {
-        addressBackup,
+        submitting: false,
+        loadingPage: false,
+        addressBackup: {},
         baseField: {
           serialNumberField: {
             formType: 'text',
@@ -83,7 +80,7 @@
               action: '/customer/unique',
               buildParams() {
                 const params = {
-                  id: initData.id || '',
+                  id: customerId,
                   fieldName: 'serialNumber',
                 };
                 return params;
@@ -100,7 +97,7 @@
               action: '/customer/unique',
               buildParams() {
                 const params = {
-                  id: initData.id || '',
+                  id: customerId,
                   fieldName: 'name',
                 };
                 return params;
@@ -124,7 +121,7 @@
               action: '/linkman/checkUnique4Phone',
               buildParams() {
                 const params = {
-                  customerId: initData.id || '',
+                  customerId: customerId,
                   phone: '',
                 };
                 return params;
@@ -231,14 +228,20 @@
         this.$refs.form.validate()
         .then(valid => {
           if (!valid) return Promise.reject('validate fail.');
-          const params = formatCustomer(this.form, this.initData.tags);
+          const params = formatCustomer(this.form, this.initData.tags, this.fields);
 
+          this.submitting = true;
+          this.loadingPage = true;
           if (this.action === 'edit') {
             return this.updateMethod(params);
           }
           this.createMethod(params);
         })
-        .catch(err => console.error(err))
+        .catch(err => {
+          console.error(err);
+          this.submitting = false;
+          this.loadingPage = false;
+        });
       },
       createMethod(params) {
   
@@ -253,7 +256,6 @@
         
       },
       updateMethod(params) {
-
 
         this.$http.post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
@@ -329,7 +331,7 @@
       }
     },
     mounted() {
-      this.initData = JSON.parse(window._init) || {};
+      // this.initData = JSON.parse(window._init) || {};
       if (this.initData.customerAddress) {
         this.setDefaultAddress(this.initData.customerAddress);
       }

@@ -23,8 +23,11 @@
         :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'address'">
-        <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
-        <el-input placeholder="" v-model="form.address.address" type="text"/>
+        <div class="address-picker">
+          <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker" :value="form.address.adAddress"></base-dist-picker>
+          <el-button type="button" @click="chooseMap" style="margin-bottom: 10px">地图选址</el-button>
+        </div>
+        <el-input placeholder="" @input="handleAddressChange" :value="form.address.detail" type="text"/>
       </el-form-item>
       <el-form-item
         label="修改为"
@@ -163,7 +166,6 @@
     name: "batch-editing-customer-dialog",
     data: () => {
       return {
-        addressSelector: [],
         inputRemoteSearch: {
           tag: {
             options: [],
@@ -174,16 +176,14 @@
             loading: false,
           },
         },
-
+        addressBackup: {},
         form: {
           cusName: '',
           lmName: '',
           lmPhone: '',
           address: {
-            province: '',
-            city: '',
-            dist: '',
-            address: '',
+            adAddress: [],
+            detail: '',
             addressType: 0,
             latitude: '',
             longitude: '',
@@ -208,6 +208,18 @@
       fields: {
         type: Array,
         default: () => ([]),
+      },
+      defaultAddress: {
+        type: Array,
+        default: () => ([]),
+      }
+    },
+    watch: {
+      defaultAddress: {
+        handler: function(newValue) {
+          this.form.address.adAddress = newValue;
+        },
+        deep: true
       }
     },
     computed: {
@@ -252,12 +264,40 @@
         this.form = JSON.parse(JSON.stringify(this.formBackup));
         this.$refs.editCustomerForm.resetFields();
       },
-      handleCitySelectorChange(city) {
-        this.addressSelector = city;
+      handleAddressChange(val) {
+        const newVal = {
+          adAddress: this.form.address.adAddress,
+          detail: val,
+          latitude: '',
+          longitude: '',
+          addressType: 0,
+        };
 
-        this.form.address.province = city[0];
-        this.form.address.city = city[1] || '';
-        this.form.address.dist = city[2] || '';
+        if (this.diffAddress(newVal, this.addressBackup)) {
+          this.form.address = this.addressBackup;
+        }
+        this.form.address = newVal;
+      },
+      handleCitySelectorChange(val) {
+        const newVal = {
+          detail: this.form.address.detail,
+          adAddress: val,
+          latitude: '',
+          longitude: '',
+          addressType: 0,
+        };
+
+        if (this.diffAddress(newVal, this.addressBackup)) {
+          this.form.address = this.addressBackup;
+        }
+        this.form.address = newVal;
+      },
+      diffAddress(newVal, oldVal) {
+        if (newVal.detail === oldVal.detail &&
+          newVal.adAddress.toString() === oldVal.adAddress.toString()) {
+          return true;
+        }
+        return false;
       },
       handleFieldIdChange() {
         this.$nextTick(() => {
@@ -280,6 +320,27 @@
             id: t.id,
             tagName: t.tagName,
           }));
+      },
+      chooseMap() {
+        let defaultArea = this.form.address.adAddress.filter(a => a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
+
+        this.$fast.map.picker({}, { defaultArea: defaultArea[defaultArea.length - 1]}).then(result => {
+
+          if (result.status === 1) return;
+
+          const { province, city, dist, address, latitude, longitude} = result.data;
+
+          const newVal = {
+            adAddress: [ province, city, dist,],
+            detail: address,
+            latitude,
+            longitude,
+            addressType: 1,
+          };
+          this.form.address = newVal;
+          this.addressBackup = newVal;
+        })
+        .catch(err => console.error(err));
       },
       buildDynamicField() {
         if (this.editableFields.length > this.fixedFieldsCount) return;
@@ -362,9 +423,10 @@
           rules: [{
             trigger: ['blur', 'change'],
             validator(rule, value, callback) {
-              if (!value.province || !value.address) {
+              if (value.adAddress.length < 2 || !value.detail) {
                 callback(new Error('请输入客户地址'));
               }
+
               callback();
             }
           }]
@@ -416,13 +478,30 @@
           })
         }
         if (this.selectedField.formType === 'datetime') {
+          tv = this.form[this.selectedFieldName];
           params.mapJson = JSON.stringify({
-            [this.selectedFieldName]: formatDate(this.form[this.selectedFieldName], 'YYYY-MM-DD HH:mm:ss'),
+            [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD HH:mm:ss'),
           })
         }
         if (this.selectedField.formType === 'date') {
+          tv = this.form[this.selectedFieldName];
           params.mapJson = JSON.stringify({
-            [this.selectedFieldName]: formatDate(this.form[this.selectedFieldName], 'YYYY-MM-DD'),
+            [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD'),
+          })
+        }
+
+        if (this.selectedField.formType === 'address') {
+          tv = this.form[this.selectedFieldName];
+          params.mapJson = JSON.stringify({
+            [this.selectedFieldName]: {
+              province: tv.adAddress[0] || '',
+              city: tv.adAddress[1] || '',
+              dist: tv.adAddress[2] || '',
+              address: tv.detail,
+              addressType: tv.addressType,
+              latitude: tv.latitude,
+              longitude: tv.longitude,
+            },
           })
         }
         return params;
@@ -475,6 +554,16 @@
       .el-form-item__error {
         line-height: 24px;
       }
+    }
+
+    .address-picker {
+      display: flex;
+      justify-content: space-between;
+
+      .el-cascader {
+        width: 250px;
+      }
+
     }
 
     .dialog-footer {

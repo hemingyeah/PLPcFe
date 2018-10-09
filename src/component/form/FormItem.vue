@@ -68,7 +68,7 @@
           .then(res => {
             if (this.needRemoteValidation && value) {
               this.remoteValidation.status = 2;
-              this.remoteValidation.msg = res.ok === '' ? '' : res.error;
+              this.remoteValidation.msg = res.error ? res.error : '';
               return;
             }
 
@@ -77,7 +77,7 @@
             this.remoteValidation.status = 0;
             return res;
           })
-          .catch(err => console.error('err', err));
+          .catch(err => console.error('validate err', err));
       },
       validateHandler(event) {
         event.stopPropagation(); //阻止事件继续冒泡

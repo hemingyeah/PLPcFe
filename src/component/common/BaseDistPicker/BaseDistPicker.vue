@@ -16,7 +16,6 @@
     data() {
       return {
         options: [],
-        value: [],
         props: {
           value: 'name',
           label: 'name',
@@ -25,21 +24,19 @@
       }
     },
     props: {
-      defaultValue: {
+      value: {
         type: Array,
         default: () => ([]),
       }
     },
     methods: {
-      updateVal(newVal) {
-        this.value = newVal;
-      },
       clearValue() {
         this.value = [];
-        this.$emit('city-selector-change', []);
+        this.$emit('input', []);
       },
       handleChange(value) {
-        this.$emit('city-selector-change', value);
+        this.$emit('input', value);
+
       },
       /** 异步加载区域数据 */
       loadDistData(){

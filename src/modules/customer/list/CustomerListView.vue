@@ -63,7 +63,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label-width="100px" label="区域">
-            <base-dist-picker @city-selector-change="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
+            <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
           </el-form-item>
           <el-form-item label-width="100px" label="详细地址">
             <el-input type="text" v-model="params.specialSearchModel.adAddress"></el-input>
@@ -348,6 +348,7 @@
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
       :fields="customerConfig.fieldInfo"
+      :default-address="defaultAddress"
       @submit-callback="search"
       :selected-ids="selectedIds"></batch-editing-customer-dialog>
 
@@ -495,6 +496,7 @@
           totalPages: 0,
         },
         multipleSelection: [],
+        defaultAddress: [],
         // data from remote
         customers: [],
         columns: this.fixedColumns(),
@@ -549,6 +551,9 @@
         fieldInfo: initData.fieldInfo,
       };
       this.auth = initData.auth || {};
+
+      const { adProvince, adCity, adDist, } = this.customerConfig.customerAddressConfig;
+      this.defaultAddress = [adProvince, adCity, adDist,];
 
       this.buildConfig();
       this.search();
@@ -1013,8 +1018,7 @@
           orderDetail: {},
           keyword: '',
           pageNum: 1,
-          pageSize: 10,
-
+          pageSize: this.paramsBackup.pageSize,
         };
 
         this.params = {

@@ -56,6 +56,10 @@ export default {
 .form-datetime{
   width: 100%;
 
+  .el-input__inner:hover {
+    border-color: #00ac97;
+  }
+
   .el-date-editor{
     width: 100%;
   }
