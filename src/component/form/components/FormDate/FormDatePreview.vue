@@ -1,10 +1,8 @@
 <template>
-  <div class="form-design-form-preview" @click="choose">
-    <div class="form-design-preview-group">
-      <label>{{field.displayName}} <span class="form-design-notNull" v-if="field.isNull == 0">*</span></label>
-      <div class="form-design-preview-mock">
-        <p>{{field.placeHolder}}</p>
-      </div>
+  <div class="form-design-group" @click="choose">
+    <label>{{field.displayName}} <span class="form-design-notNull" v-if="field.isNull == 0">*</span></label>
+    <div class="form-design-mock">
+      <p>{{field.placeHolder}}</p>
     </div>
   </div>
 </template>

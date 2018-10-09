@@ -9,7 +9,7 @@
     </div>
     <div class="form-design-form-group">
       <label>
-        <input type="checkbox" :value="field.isNull == 0" @input="update" data-prop="isNull"> 是否必填
+        <input type="checkbox" :checked="field.isNull == 0" @input="update" data-prop="isNull"> 是否必填
       </label>
     </div>
   </div>

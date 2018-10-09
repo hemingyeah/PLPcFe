@@ -1,11 +1,7 @@
 <template>
-  <div class="form-design-form-preview" @click="choose">
-    <div class="form-design-preview-group">
-      <label>{{field.displayName}} <span class="form-design-notNull" v-if="field.isNull == 0">*</span></label>
-      <div class="form-design-preview-mock">
-        <p>{{field.placeHolder}}</p>
-      </div>
-    </div>
+  <div class="form-design-group form-design-textarea" @click="choose">
+    <label>{{field.displayName}} <span class="form-design-notNull" v-if="field.isNull == 0">*</span></label>
+    <div class="form-design-mock">{{field.placeHolder}}</div>
   </div>
 </template>
 
@@ -26,3 +22,10 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.form-design-textarea{
+  .form-design-mock{
+    height: 92px;
+  }
+}
+</style>

@@ -15,7 +15,8 @@
     <textarea id="textarea" style="width: 320px; height: 180px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis, arcu vitae adipiscing placerat, nisl lectus accumsan nisi, vitae iaculis sem neque vel lectus. Praesent tristique commodo lorem quis fringilla. Sed ac tellus eros. Sed consectetur eleifend felis vitae luctus. Praesent sagittis, est eget bibendum tincidunt, ligula diam tincidunt augue, a fermentum odio velit eget mi. Phasellus mattis, elit id fringilla semper, orci magna cursus ligula, non venenatis lacus augue sit amet dui. Pellentesque lacinia odio id nisi pulvinar commodo tempus at odio. Ut consectetur eros porttitor nunc mollis ultrices. Aenean porttitor, purus sollicitudin viverra auctor, neque erat blandit sapien, sit amet tincidunt massa mi ac nibh. Proin nibh sem, bibendum ut placerat nec, cursus et lacus. Phasellus vel augue turpis. Nunc eu mauris eu leo blandit mollis interdum eget lorem. </textarea>
   -->
     
-    <div style="height: 100vh;"><form-design :value="fields" @input="updateFields"></form-design></div>
+    <div style="height: 100vh; min-width:1000px"><form-design :value="fields" @input="updateFields"></form-design></div>
+    <textarea :value="JSON.stringify(buildFields)" style="width: 100%; height: 150px;"></textarea>
     <!-- <div>
       <textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
       <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a>
@@ -42,7 +43,8 @@ export default {
   mixins: [frameReload],
   data() {
     return {
-      fields: [
+      fields: [],
+      fields2: [
         {
           fieldName: null,
           formType: "text",
@@ -272,12 +274,321 @@ export default {
           _id: "field_6164"
         }
       ],
+      fieldInfo: [
+        {
+          "fieldId": "30153",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_gF2uHmI4",
+          "displayName": "单选",
+          "formType": "select",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 1,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {
+            "dataSource": [
+              "单选1",
+              "单选2",
+              "单选3"
+            ]
+          },
+          "orderId": 0,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30155",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_HEVZRFgZ",
+          "displayName": "单行",
+          "formType": "text",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 1,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 1,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30150",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_6gOv2Tq7",
+          "displayName": "多选",
+          "formType": "selectMulti",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 1,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {
+            "dataSource": [
+              "选项1",
+              "选项2",
+              "选项3"
+            ]
+          },
+          "orderId": 2,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30157",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_2wz34vyH",
+          "displayName": "数字",
+          "formType": "number",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 1,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 3,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30158",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_B5e86l1f",
+          "displayName": "日期时间",
+          "formType": "datetime",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 1,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 4,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30156",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_nvl96FTd",
+          "displayName": "多行",
+          "formType": "textarea",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 0,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 5,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30159",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_wDGwyh9E",
+          "displayName": "日期",
+          "formType": "date",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 1,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 6,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30160",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_tdaMB58A",
+          "displayName": "人员",
+          "formType": "user",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 1,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 7,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30161",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_XzsqzdRe",
+          "displayName": "附件",
+          "formType": "attachment",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 0,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 8,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30162",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_Cp82p2KQ",
+          "displayName": "扫码",
+          "formType": "code",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 0,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 9,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30166",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_SwN9sJ9b",
+          "displayName": "测试1",
+          "formType": "text",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 0,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 10,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30167",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_hXZ0m4dz",
+          "displayName": "测试1",
+          "formType": "text",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 0,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 11,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30168",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_PQiBLIoj",
+          "displayName": "测试1",
+          "formType": "text",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 0,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "",
+          "setting": {},
+          "orderId": 12,
+          "tableChsName": ""
+        },
+        {
+          "fieldId": "30169",
+          "tableName": "customer",
+          "isSystem": 0,
+          "fieldName": "field_VwoVdMkB",
+          "displayName": "测试1",
+          "formType": "text",
+          "defaultValue": null,
+          "maxLength": 0,
+          "dotLength": 0,
+          "isNull": 1,
+          "isValidate": 0,
+          "enabled": false,
+          "isSearch": 0,
+          "isAdd": 1,
+          "isReadonly": 0,
+          "placeHolder": "cao",
+          "setting": {},
+          "orderId": 13,
+          "tableChsName": ""
+        }
+      ],
       files: [],
       form: {}
     };
   },
   computed: {
     buildFields() {
+      console.log(FormUtil.toField(this.fields))
       return FormUtil.toField(this.fields);
     }
   },
@@ -377,7 +688,8 @@ export default {
     }
   },
   mounted() {
-    //
+    this.fields = FormUtil.toFormField(this.fieldInfo);
+    console.log(this.fields)
   },
   components: {}
 };
