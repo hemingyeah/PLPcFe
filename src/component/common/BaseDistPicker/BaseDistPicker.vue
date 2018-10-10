@@ -31,7 +31,6 @@
     },
     methods: {
       clearValue() {
-        this.value = [];
         this.$emit('input', []);
       },
       handleChange(value) {

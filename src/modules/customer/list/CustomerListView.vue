@@ -235,6 +235,8 @@
               </el-dropdown-item>
               <el-dropdown-item>
                 <div @click="exportCustomer(true)">导出全部</div>
+              </el-dropdown-item>  <el-dropdown-item>
+                <div @click="openDialog('update')">批量更新</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -300,7 +302,7 @@
               {{scope.row.createUserName}}
             </template>
             <template v-else-if="column.field === 'remindCount'">
-              {{scope.row.attribute.remindCount}}
+              {{scope.row.attribute.remindCount || 0}}
             </template>
             <template v-else-if="column.formType === 'selectMulti' && scope.row.attribute[column.field]">
               {{scope.row.attribute[column.field].join('，')}}
@@ -351,6 +353,14 @@
       :default-address="defaultAddress"
       @submit-callback="search"
       :selected-ids="selectedIds"></batch-editing-customer-dialog>
+    <batch-update-customer-dialog
+      ref="batchUpdateCustomerDialog"
+      :selected-ids="selectedIds"
+      :total-items="paginationInfo.totalItems"
+      :build-download-params="buildParams"
+      action="/customer/importCover"
+    ></batch-update-customer-dialog>
+
 
     <base-import
       ref="importCustomerModal"
@@ -378,7 +388,7 @@
 
     <base-export
       ref="exportPanel"
-      :columns="columns"
+      :columns="exportColumns"
       :build-params="buildExportParams"
       action="/customer/export"/>
 
@@ -411,6 +421,7 @@
   import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
   import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
   import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
+  import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
 
   export default {
     name: 'customer-list-view',
@@ -537,6 +548,31 @@
       selectedIds() {
         return this.multipleSelection.map(c => c.id) || [];
       },
+      exportColumns() {
+        return this.columns.map(c => {
+          if (c.field !== 'customerAddress' && c.field !== 'remindCount') {
+            c.export = true;
+          }
+
+          if (c.field === 'detailAddress') {
+            c.exportAlias = 'customerAddress';
+          }
+
+          if (c.field === 'tags') {
+            c.exportAlias = 'customerTags';
+          }
+
+          if (c.field === 'customerManagerName') {
+            c.exportAlias = 'customerManager';
+          }
+
+          if (c.field === 'status') {
+            c.label = '状态';
+          }
+
+          return c;
+        });
+      }
     },
     mounted() {
       let initData = JSON.parse(window._init) || {};
@@ -630,7 +666,7 @@
       },
       exportCustomer(exportAll) {
         let ids = [];
-        let fileName = `${formatDate(new Date(), 'YYYY-MM-dd')}客户数据.xlsx`;
+        let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}客户数据.xlsx`;
         if (!exportAll) {
           if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
           ids = this.selectedIds;
@@ -900,6 +936,9 @@
         }
         if (category === 'importLinkman') {
           this.$refs.importLinkmanModal.open();
+        }
+        if (category === 'update') {
+          this.$refs.batchUpdateCustomerDialog.openBatchUpdateCustomerDialog();
         }
       },
       async deleteCustomer() {
@@ -1222,6 +1261,7 @@
       [SendMessageDialog.name]: SendMessageDialog,
       [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
       [BatchRemindingCustomerDialog.name]: BatchRemindingCustomerDialog,
+      [BatchUpdateCustomerDialog.name]: BatchUpdateCustomerDialog,
     }
   }
 </script>

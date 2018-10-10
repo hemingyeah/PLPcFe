@@ -150,7 +150,8 @@
         this.$http.get('/vipsms/getTemplates', {pageSize: '100', pageNum: '1',})
           .then(res => {
             if (res.status !== 0) return;
-            this.messageTemplate = res.data.list;
+            this.messageTemplate = res.data.list
+            .filter(t => t.notice === '自定义通知' && t.status === 'pass_approval');
             if (this.messageTemplate.length) {
               this.form.smsTemplateId = this.messageTemplate[0].id;
             }

@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     filterColumns(){
-      return this.columns.filter(item => item.export !== false)
+      return this.columns.filter(item => item.export)
     }
   },
   methods: {

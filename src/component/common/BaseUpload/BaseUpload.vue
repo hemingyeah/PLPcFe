@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import Uploader from './uploader';
+  import Uploader from '@src/util/uploader';
   import BaseFileItem from './BaseFileItem';
   import platform from '@src/platform';
 

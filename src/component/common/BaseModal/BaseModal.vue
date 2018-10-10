@@ -6,7 +6,10 @@
       <div class="base-modal transition__container" :style="{width: width}">
         <div class="base-modal-header">
           <slot name="header">
-            <h3>{{ title }}</h3>
+            <h3 v-if="title">{{ title }}</h3>
+            <template v-else>
+              <slot name="cHeader"></slot>
+            </template>
             <button type="button" class="btn-text base-modal-header-close" @click="cancel" v-if="closeable">
               <i class="iconfont icon-guanbi"></i>
             </button>

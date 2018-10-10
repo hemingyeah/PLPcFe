@@ -26,7 +26,7 @@
 <script>
 
 import BaseModal from '../BaseModal';
-import Uploader from './uploader';
+import Uploader from '@src/util/uploader';
 import Platform from '@src/platform';
 
 export default {
