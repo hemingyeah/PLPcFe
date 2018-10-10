@@ -289,7 +289,7 @@
               {{scope.row.customerAddress.adAddress}}
             </template>
             <template v-else-if="column.field === 'tags' && scope.row.tags">
-              {{scope.row.tags.map(t => t.tagName).join('，')}}
+              {{scope.row.tags | tagName}}
             </template>
             <template v-else-if="column.field === 'status'">
               <el-switch
@@ -305,7 +305,7 @@
               {{scope.row.attribute.remindCount || 0}}
             </template>
             <template v-else-if="column.formType === 'selectMulti' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field].join('，')}}
+              {{scope.row.attribute[column.field] | displaySelectMulti}}
             </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
               {{scope.row.attribute[column.field].displayName}}
@@ -573,6 +573,21 @@
           return c;
         });
       }
+    },
+    filters: {
+      tagName: function (value) {
+        if (!value || !Array.isArray(value) || !value.length) return '';
+
+        return value
+        .filter(tag => tag && tag.tagName)
+        .map(tag => tag.tagName)
+        .join('，');
+      },
+      displaySelectMulti(value) {
+        if (!value || !Array.isArray(value) || !value.length) return '';
+
+        return value.join('，');
+      },
     },
     mounted() {
       let initData = JSON.parse(window._init) || {};
