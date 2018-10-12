@@ -16,7 +16,7 @@ function createPreviewComp(h, field){
   //根据字段配置创建预览内容
   let fieldPreview = h(previewComp.preview, {
     'class': 'form-design__ghost',
-    props: { field },
+    props: { field , setting: previewComp},
     on: { chooseField: this.chooseField }
   });
 
@@ -34,6 +34,7 @@ function createPreviewComp(h, field){
         onClick={e => this.deleteField(field)}>
           <i class="iconfont icon-close"></i>
       </button> 
+      <div class="form-design-cover"></div>
     </div>
   )
 }
@@ -206,7 +207,7 @@ const FormDesign = {
       //初始化ghostEL
       if(!dragEvent.initGhost){
         ghostEl.style.display = 'block';
-        ghostEl.innerHTML = getTemplate(dragEl)
+        ghostEl.querySelector('.form-design__template').innerHTML = getTemplate(dragEl)
         ghostEl.style.width = dragEl.offsetWidth + 'px';
 
         if(this.currField) this.currField.dragging = true;
@@ -218,7 +219,7 @@ const FormDesign = {
       let y = event.clientY - dragEvent.offsetY;
       let x = event.clientX - dragEvent.offsetX
       ghostEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      dragEvent.direction = event.clientY - dragEvent.prevClientY > 0 ? 1 : -1;
+      dragEvent.direction = event.clientY - dragEvent.prevClientY >= 0 ? 1 : -1;
       dragEvent.prevClientY = event.clientY;
       
       //判断ghostEl是否在容器内
@@ -239,6 +240,7 @@ const FormDesign = {
         //已经插入但是当前拖拽元素不在容器内，删除该字段
         if(!inContainer && this.insertField){
           this.insertedField = null;
+          this.currField = null;
           this.$emit('input', this.originValue)
           return;
         }
@@ -351,6 +353,9 @@ const FormDesign = {
       let index = value.indexOf(item);
 
       if(index >= 0){
+        //如果是选中的字段，清除选中
+        if(this.currField == item) this.currField = null;
+
         value.splice(index, 1);
         this.$emit('input', value)
       }
@@ -415,7 +420,10 @@ const FormDesign = {
           </div>
         </div>
         <div class="form-design-setting">{fieldSetting}</div>
-        <div class="form-design-ghost"></div>
+        <div class="form-design-ghost">
+          <div class="form-design__template"></div>
+          <div class="form-design-cover"></div>
+        </div>
       </div>
     );
   },

@@ -1,8 +1,8 @@
 <template>
-  <div class="form-design-group" @click="choose">
-    <label>{{field.displayName}} <span class="form-design-notNull" v-if="field.isNull == 0">*</span></label>
-    <div class="form-design-mock">
-      <p>{{field.placeHolder}}</p>
+  <div class="form-preview-group" @click="choose">
+    <label>{{field.displayName}} <span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
+    <div class="form-preview-mock">
+      <p class="form-preview-control">{{field.placeHolder}}</p>
     </div>
   </div>
 </template>
@@ -12,6 +12,10 @@ export default {
   name: 'form-number-preview',
   props: {
     field: {
+      type: Object,
+      default: () => ({})
+    },
+    setting: {
       type: Object,
       default: () => ({})
     }

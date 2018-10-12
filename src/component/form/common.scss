@@ -76,7 +76,8 @@
   height: 100%;
 }
 
-.form-design-setting-panel{
+// ------------ setting ------------
+.form-setting-panel{
   height: 100%;
   overflow: auto;
   padding: 0 8px 10px 8px;
@@ -91,7 +92,7 @@
   }
 }
 
-.form-design-form-group{
+.form-setting-group{
   margin-bottom: 5px;
 
   input[type='text'], 
@@ -114,13 +115,8 @@
   }
 }
 
-.form-design-form-preview{
-  padding: 0 10px;
-  flex: 1;
-  overflow: hidden;
-}
-
-.form-design-group{
+// ------------ preview ------------
+.form-preview-group{
   display: flex;
   flex-flow: row nowrap;
   overflow: hidden;
@@ -134,25 +130,46 @@
 
     @include text-ellipsis();
   }
+}
 
-  .form-design-mock{
-    flex: 1;
-    border-radius: 1px;
-    padding: 0 4px;
-    border: 1px solid #ddd;
-    line-height: 30px;
+.form-preview-mock{
+  flex: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.form-preview-control{
+  width: 100%;
+  border-radius: 4px;
+  padding: 0 5px;
+  border: 1px solid #ddd;
+  line-height: 30px;
+  height: 32px;
+  color: #9a9a9a;
+  margin: 0;
+  @include text-ellipsis();  
+}
+
+.form-preview-withIcon{
+  padding-right: 24px;
+  position: relative;
+
+  i.iconfont{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
     height: 32px;
-    overflow: hidden;
-    color: #9a9a9a;
-    @include text-ellipsis();  
+    line-height: 30px;
+    font-size: 16px;
   }
 }
 
-.form-design-notNull{
+.form-preview-notNull{
   color: red;
 }
 
-// -- drag 
+// ------------ design ------------
 .form-design-list{
   position: relative;
   box-shadow: 0 0 4px rgba(0,0,0,.15);
@@ -199,7 +216,7 @@
   z-index: 9;
   cursor: move !important;
   background-color: rgba(255, 255, 255,.95);
-  box-shadow: 0 0 4px rgba(0,0,0,.45);
+  box-shadow: 0 0 8px rgba(0,0,0,.125);
 
   .form-design-field{
     background-color: #fff;
@@ -209,7 +226,6 @@
 .form-design-preview{
   position: relative;
   border: 1px dashed transparent;
-  cursor: move;
  
   &.form-design-selected{
     border-style: solid;
@@ -244,8 +260,20 @@
   height: 26px;
   padding: 0;
   margin: 0;
+  z-index: 9;
+  cursor: pointer;
 
   i{
     font-size: 14px;
   }
+}
+
+.form-design-cover{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  cursor: move;
 }

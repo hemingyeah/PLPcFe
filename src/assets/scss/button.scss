@@ -1,4 +1,17 @@
 .btn{
+  display: inline-block;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  padding: 3px 10px;
+  line-height: 24px;
+  border-radius: 2px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: backgroud-color .15s ease;
 
   &:active{
     opacity: 0.85;
@@ -9,4 +22,20 @@
   outline: none;
   border:none;
   background-color: transparent;
+}
+
+.btn-primary{
+  color: #fff;
+  background-color: $color-primary;
+
+  &:hover{
+    //background: #33bdac;
+    background-color: lighten($color-primary, 3%);
+  }
+
+  &:disabled{
+    //background: #33bdac;
+    background-color: lighten($color-primary, 3%);
+    cursor: not-allowed;
+  }
 }

@@ -6,7 +6,7 @@
       <base-file-item v-for="file in uploadedFiles" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
     
-    <button type="button" class="base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
+    <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
       <span>{{pending ? '正在上传' : '点击上传'}}</span>
     </button>
   </div>
@@ -154,46 +154,12 @@
 }
 
 .base-upload-btn{
-  display: inline-block;
-  line-height: 1;
-
-  margin: 0;
-  padding: 8px 10px;
-  font-size: 14px;
-  font-weight: 400;
-  text-align: center;
-  white-space: nowrap;
-
-  border-radius: 2px;
-  border: none;
-  outline: none;
-  color: #fff;
-  background-color: $color-primary;
-
-  user-select: none;
-  cursor: pointer;
-  transition: backgroud-color .15s ease;
-
   span, i{
     color: #fff;
   }
 
   i{
     margin-right: 4px;
-  }
-
-  &:hover,
-  &:focus{
-    background: #33bdac;
-  }
-
-  &:disabled{
-    background: #33bdac;
-    cursor: not-allowed;
-  }
-
-  &:active{
-    background: #009b88;
   }
 }
 </style>
