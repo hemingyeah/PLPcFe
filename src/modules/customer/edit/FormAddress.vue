@@ -153,6 +153,14 @@
     .el-input__inner:hover {
       border-color: #00ac97;
     }
+
+    .base-dist-picker {
+      flex-grow: 1;
+      padding-right: 10px;
+      .el-cascader {
+        width: 100%;
+      }
+    }
   }
 
   .input-and-btn {

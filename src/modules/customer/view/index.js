@@ -11,7 +11,7 @@ import platform from '@src/platform';
 
 import appConfig from 'app.config';
 
-import CustomerEditView from './CustomerEditView.vue';
+import CustomerDetailView from './CustomerDetailView.vue';
 
 Vue.use(directive);
 Vue.use(filter);
@@ -30,8 +30,8 @@ try {
   console.error('no init data')
 }
 
-const CustomerEditViewComp = Vue.extend(CustomerEditView);
-const app = new CustomerEditViewComp({
+const CustomerDetailViewComp = Vue.extend(CustomerDetailView);
+const app = new CustomerDetailViewComp({
   propsData: {
     initData
   }

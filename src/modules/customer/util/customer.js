@@ -128,5 +128,69 @@ function convertCustomerToForm(originalCustomer) {
 }
 
 
+function convertCustomerForDisplay(originalCustomer, fields) {
+  const {
+    id,
+    name,
+    lmName,
+    lmPhone,
+    serialNumber,
+    attribute,
+    customerAddress,
+    tags,
+    customerManagerName,
+    customerManager,
+    createTime,
+    createUser,
+  } = originalCustomer;
+  let customer = {
+    id,
+    name,
+    lmName,
+    lmPhone,
+    serialNumber,
+    customerManagerName,
+    createTime,
+    createUser,
+    address: '',
+    tag: '',
+    attribute: {},
+  };
+  let tv = null;
+  
+  if (customerAddress) {
+    customer.address = {
+      area: `${customerAddress.adProvince}-${customerAddress.adCity}-${customerAddress.adDist}`,
+      detail: customerAddress.adAddress,
+    }
+  }
+  
+  if (tags && tags.length) {
+    customer.tag = tags.map(t => t.tagName).join(' ');
+  }
+  // 被删除的相关属性
 
-export { formatCustomer, convertCustomerToForm, };
+  // 自定义属性
+  if (attribute) {
+    Object.keys(attribute)
+    .forEach(key => {
+      tv = fields.filter(field => field.fieldName === key)[0] || {};
+      customer.attribute[key] = {
+        fieldName: tv.fieldName,
+        displayName: tv.displayName,
+        value: attribute[key],
+      };
+      
+      if (Array.isArray(attribute[key])) {
+        customer.attribute[key].value = attribute[key].join(' ');
+      }
+    })
+  
+  }
+  
+  return customer;
+}
+
+
+
+export { formatCustomer, convertCustomerToForm, convertCustomerForDisplay, };

@@ -51,7 +51,7 @@
 
 <script>
   import * as FormUtil from '@src/component/form/util';
-  import { formatCustomer, convertCustomerToForm, } from './customer';
+  import { formatCustomer, convertCustomerToForm, } from '../util/customer';
   import FormAddress from './FormAddress.vue';
 
   export default {
