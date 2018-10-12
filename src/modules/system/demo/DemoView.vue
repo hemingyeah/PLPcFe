@@ -15,8 +15,11 @@
     <textarea id="textarea" style="width: 320px; height: 180px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis, arcu vitae adipiscing placerat, nisl lectus accumsan nisi, vitae iaculis sem neque vel lectus. Praesent tristique commodo lorem quis fringilla. Sed ac tellus eros. Sed consectetur eleifend felis vitae luctus. Praesent sagittis, est eget bibendum tincidunt, ligula diam tincidunt augue, a fermentum odio velit eget mi. Phasellus mattis, elit id fringilla semper, orci magna cursus ligula, non venenatis lacus augue sit amet dui. Pellentesque lacinia odio id nisi pulvinar commodo tempus at odio. Ut consectetur eros porttitor nunc mollis ultrices. Aenean porttitor, purus sollicitudin viverra auctor, neque erat blandit sapien, sit amet tincidunt massa mi ac nibh. Proin nibh sem, bibendum ut placerat nec, cursus et lacus. Phasellus vel augue turpis. Nunc eu mauris eu leo blandit mollis interdum eget lorem. </textarea>
   -->
     
-    <div style="height: 100vh; min-width:1000px"><form-design :value="fields" @input="updateFields"></form-design></div>
-    <textarea :value="JSON.stringify(buildFields)" style="width: 100%; height: 150px;"></textarea>
+    <div style="height: 720px; min-width:1000px">
+      <form-design v-model="fields"></form-design>
+      <button type="button" @click="saveToLocal">本地存储</button>
+    </div>
+    <!-- <textarea :value="JSON.stringify(buildFields)" style="width: 100%; height: 150px;"></textarea> -->
     <!-- <div>
       <textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
       <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a>
@@ -37,6 +40,8 @@ import * as dom from "@src/util/dom";
 
 import frameReload from "@src/mixin/frameReload";
 import * as FormUtil from "@src/component/form/util";
+
+const FORM_DESIGN_FIELDS = 'demo_form_design_fields'
 
 export default {
   name: "demo-view",
@@ -274,7 +279,8 @@ export default {
           _id: "field_6164"
         }
       ],
-      fieldInfo: [
+      fieldInfo: [],
+      fieldInfo2: [
         {
           "fieldId": "30153",
           "tableName": "customer",
@@ -587,15 +593,14 @@ export default {
     };
   },
   computed: {
-    buildFields() {
-      console.log(FormUtil.toField(this.fields))
-      return FormUtil.toField(this.fields);
-    }
+    // buildFields() {
+    //   return FormUtil.toField(this.fields);
+    // }
   },
   methods: {
-    updateFields(value){
-      this.fields = value;
-      //console.log(value)
+    saveToLocal(){
+      let fields = FormUtil.toField(this.fields);
+      localStorage.setItem(FORM_DESIGN_FIELDS, JSON.stringify(fields))
     },
     contact() {
       this.$fast.contact.choose("dept", {
@@ -688,8 +693,17 @@ export default {
     }
   },
   mounted() {
-    this.fields = FormUtil.toFormField(this.fieldInfo);
-    console.log(this.fields)
+    //this.fields = FormUtil.toFormField(this.fieldInfo);
+
+    let fieldsJson = localStorage.getItem(FORM_DESIGN_FIELDS);
+    let fields = [];
+    try {
+      fields = JSON.parse(fieldsJson);
+    } catch (error) {
+      console.error(error)
+    }
+    
+    this.fields = FormUtil.toFormField(fields || [])
   },
   components: {}
 };

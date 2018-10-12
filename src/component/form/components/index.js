@@ -68,6 +68,7 @@ for(let i = 0; i < FormFields.length; i++){
     field.preview = previewComp.name, //预览组件名
     field.setting = settingComp.name, //设置组件名
     field.build = buildComp.name //表单组件名
+    field.name = formField.name
   }
 
   FormFieldMap[formField.formType] = field;

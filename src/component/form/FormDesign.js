@@ -1,5 +1,3 @@
-//TODO: 数据转换工具
-
 import _ from 'lodash'
 import FormField from './FormField';
 import Platform from '../../platform';
@@ -49,12 +47,9 @@ function createSettingComp(h, field){
 
   return h(comp.setting, {
     key: field._id,
-    props: { field },
+    props: { field , setting: comp},
     on: {
-      input: event => {
-        let {prop, value} = event;
-        this.currField[prop] = value;
-      }
+      input: event => field[event.prop] = event.value
     }
   });
 }
@@ -150,6 +145,10 @@ const FormDesign = {
     //根据fieldMode筛选后的字段
     filterFields(){
       return this.availableFields.filter(item => item.isSystem == this.fieldGroup);
+    },
+    //是否为空
+    isEmpty(){
+      return !Array.isArray(this.value) || this.value.length == 0;
     }
   },
   methods: {
@@ -360,7 +359,7 @@ const FormDesign = {
     insertField(option = {}, value, index){
       let newField = new FormField({
         formType: option.formType,
-        displayName: option.name
+        displayName: '标题'
       });
       
       let arr = _.cloneDeep(value ? value : this.value);
@@ -399,16 +398,20 @@ const FormDesign = {
           </div>
           <div class="form-design-tabs-content">{fieldList}</div>
           
-          <div>{this.value.length} <a href="javscript:;" onClick={e => {
+          {/* <div>{this.value.length} <a href="javscript:;" onClick={e => {
             let copy = _.cloneDeep(this.value);
             copy.forEach(item => item._id = 'field_' + (Math.random() * 100000000 >> 0).toString(16))
             this.$emit('input',copy.concat(this.value))
-          }}>复制</a></div>
+          }}>复制</a></div> */}
           
         </div>
         <div class="form-design-main">
           <div class={["form-design-list", this.silence ? 'form-design-silence' : null]}>
-            {previewList}
+            {!this.isEmpty ? previewList : (
+              <div class="form-design-tip">
+                <p>选择左侧控件拖动到此处</p>
+              </div>
+            )}
           </div>
         </div>
         <div class="form-design-setting">{fieldSetting}</div>

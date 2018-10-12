@@ -75,10 +75,10 @@ export default {
     }
   },
   mounted(){
-    document.addEventListener('keydown', this.escClose)
+    //document.addEventListener('keydown', this.escClose)
   },
   destroyed(){
-    document.removeEventListener('keydown', this.escClose)
+    //document.removeEventListener('keydown', this.escClose)
   }
 }
 </script>
@@ -139,4 +139,7 @@ export default {
   }
 }
 .base-modal-body{}
+.base-modal-footer{
+  border-top: 1px solid #e9ecef;
+}
 </style>

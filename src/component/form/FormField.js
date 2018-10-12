@@ -52,7 +52,17 @@ export default class FormField{
 
     if(field.formType == 'select'){
       let dataSource = setting.dataSource || [];
-      newField.options = dataSource.map(item => ({value: item, isDefault: item == field.defaultValue}))
+      let initDefault = false;
+      newField.options = dataSource.map(value => {
+        let isDefault = false;
+        //只有第一个默认值生效
+        if(!initDefault && value == field.defaultValue){
+          isDefault = true;
+          initDefault = true;
+        }
+
+        return {value,isDefault};
+      })
       newField.isMulti = setting.isMulti === true
     }
 
@@ -82,7 +92,10 @@ export default class FormField{
       for(let i = 0; i < opts.length; i++){
         let opt = opts[i];
         dataSource.push(opt.value);
-        if(opt.isDefault) defaultValue = opt.value;
+        //只有第一个默认值生效
+        if(opt.isDefault && !defaultValue) {
+          defaultValue = opt.value;
+        }
       }
       setting.isMulti = field.isMulti;
       setting.dataSource = dataSource;

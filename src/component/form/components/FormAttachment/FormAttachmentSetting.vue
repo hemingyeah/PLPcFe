@@ -1,6 +1,6 @@
 <template>
   <div class="form-design-setting-panel">
-    <h3>基础设置</h3>
+    <h3>基础设置 -- {{setting.name}}</h3>
     <div class="form-design-form-group">
       <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="update" maxlength="6">
     </div>
@@ -9,7 +9,7 @@
     </div>
     <div class="form-design-form-group">
       <label>
-        <input type="checkbox" :checked="field.isNull == 0" @input="update" data-prop="isNull"> 是否必填
+        <input type="checkbox" :checked="field.isNull == 0" @input="update" data-prop="isNull"> 必填
       </label>
     </div>
   </div>
@@ -20,6 +20,10 @@ export default {
   name: 'form-attachment-setting',
   props: {
     field: {
+      type: Object,
+      default: () => ({})
+    },
+    setting: {
       type: Object,
       default: () => ({})
     }
