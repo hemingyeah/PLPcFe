@@ -255,6 +255,7 @@ const FormDesign = {
           }
 
           //插入字段
+          dragEvent.direction = 0;
           let insertIndex = this.calcIndex(y);
           let newField = this.insertField(dragEvent.insertFieldOption, this.value, insertIndex)
           this.insertedField = newField;
@@ -283,8 +284,8 @@ const FormDesign = {
       let offsetTop = distance - containerRect.top + containerEl.scrollTop;
       let direction = dragEvent.direction;
 
-      //如果是向上移动
-      if(direction < 0){
+      //如果是向上移动 或 插入时
+      if(direction <= 0){
         for(let i = 0; i < previewDoms.length; i++){
           let dom = previewDoms[i];
           if(dom.offsetTop + dom.offsetHeight / 2 > offsetTop){
