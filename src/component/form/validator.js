@@ -10,6 +10,9 @@ export const PHONE_REG = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-
 export const DATE_REG = /^\d{4}-\d{1,2}-\d{1,2}$/;
 //日期时间格式
 export const DATETIME_REG = /^\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}$/;
+//邮箱格式
+export const EMAIL_REG = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+
 
 const RuleMap = {
   text,
@@ -20,6 +23,7 @@ const RuleMap = {
   date,
   datetime,
   phone,
+  email,
   user,
   attachment,
   address,
@@ -87,6 +91,16 @@ function phone(value, field = {}) {
     }
     resolve(null);
   });
+}
+
+function email(value, field = {}) {
+  return new Promise(resolve => {
+    if(field.isNull && !value) return resolve(null);
+    if(value == null || !value.toString().length) return resolve(`必填`);
+    if (!EMAIL_REG.test(value)) return resolve('请输入正确的邮箱');
+    resolve(null);
+  });
+  
 }
 
 function date(value, field = {}) {

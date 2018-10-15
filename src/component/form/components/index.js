@@ -8,6 +8,7 @@ import FormUser from './FormUser';
 import FormDate from './FormDate';
 import FormDatetime from './FormDatetime';
 import FormPhone from './FormPhone';
+import FormEmail from './FormEmail';
 
 const FormFields = [
   FormText,
@@ -20,6 +21,7 @@ const FormFields = [
   FormDate,
   FormDatetime,
   FormPhone,
+  FormEmail,
 ];
 
 const Modes = {
@@ -35,6 +37,7 @@ const Modes = {
       FormDate.formType,
       FormDatetime.formType,
       FormPhone.formType,
+      FormEmail.formType,
     ]
   },
   // task: {

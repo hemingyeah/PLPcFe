@@ -142,6 +142,7 @@ function convertCustomerForDisplay(originalCustomer, fields) {
     customerManager,
     createTime,
     createUser,
+    createLoginUser,
   } = originalCustomer;
   let customer = {
     id,
@@ -151,9 +152,12 @@ function convertCustomerForDisplay(originalCustomer, fields) {
     serialNumber,
     customerManagerName,
     createTime,
-    createUser,
     address: '',
     tag: '',
+    createUser: {
+      id: createUser,
+      name: createLoginUser ? createLoginUser.displayName : '',
+    },
     attribute: {},
   };
   let tv = null;
@@ -179,9 +183,10 @@ function convertCustomerForDisplay(originalCustomer, fields) {
         fieldName: tv.fieldName,
         displayName: tv.displayName,
         value: attribute[key],
+        formType: tv.formType,
       };
       
-      if (Array.isArray(attribute[key])) {
+      if (Array.isArray(attribute[key]) && tv.formType !== 'attachment') {
         customer.attribute[key].value = attribute[key].join(' ');
       }
     })

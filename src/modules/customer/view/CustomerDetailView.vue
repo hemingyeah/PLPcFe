@@ -3,7 +3,7 @@
     <div class="top-tool-bar">
       <div>
         <el-button type="primary" icon="el-icon-search">返回</el-button>
-        <el-button type="primary" icon="el-icon-search">编辑</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="jump">编辑</el-button>
         <el-button type="danger" icon="el-icon-search">删除</el-button>
       </div>
 
@@ -76,7 +76,7 @@
           </li>
           <li>
             <label for="">创建人：</label>
-            {{customer.createUser}}
+            {{customer.createUser.name}}
           </li>
           <li>
             <label for="">创建时间：</label>
@@ -91,8 +91,14 @@
             {{customer.deleteRecord.operateTime}}
           </li>
           <li v-for="field in customer.attribute" :key="field.fieldName">
-            <label for="">{{field.displayName}}：</label>
-            {{field.value}}
+            <template v-if="field.formType === 'attachment'">
+              <label for="">{{field.displayName}}：</label>
+              <base-file-item v-for="file in field.value" :file="file" :key="file.url" :del="false"></base-file-item>
+            </template>
+            <template v-else>
+              <label for="">{{field.displayName}}：</label>
+              {{field.value}}
+            </template>
           </li>
         </ul>
       </div>
@@ -113,8 +119,8 @@
       </div>
     </div>
 
-    <add-address-dialog ref="addAddressDialog"></add-address-dialog>
-    <add-contact-dialog ref="addContactDialog"></add-contact-dialog>
+    <add-address-dialog ref="addAddressDialog" :customer-id="customer.id" :default-address="initData.customerAddress"></add-address-dialog>
+    <add-contact-dialog ref="addContactDialog" :customer="originalCustomer"></add-contact-dialog>
     <add-remark-dialog ref="addRemarkDialog" :customer="customer" @reload-remark="reloadRemark"></add-remark-dialog>
   </div>
 </template>
@@ -129,6 +135,7 @@
   import AddAddressDialog from './operationDialog/AddAddressDialog.vue';
   import AddContactDialog from './operationDialog/AddContactDialog.vue';
   import AddRemarkDialog from './operationDialog/AddRemarkDialog.vue';
+  import BasFileItem from '@src/component/common/BaseFileItem';
 
   export default {
     name: "customer-detail-view",
@@ -141,25 +148,30 @@
     data() {
       return {
         tab: 'customer-info-record',
+        originalCustomer: {},
         customer: {
           address: {},
           attribute: {},
+          createUser: {},
         },
       }
     },
     mounted() {
-      console.log('mounted', this.initData);
+      console.log('%c customer-detail-view mounted', 'color:red', this.initData);
+
       this.fetchCustomer(this.initData.id);
     },
     methods: {
       fetchCustomer(id) {
-        this.$http.get(`/v2/customer/getForEdit`, {id})
+        this.$http.get(`/v2/customer/get`, {id})
         .then(res => {
           if (res.status) return;
+          this.originalCustomer = res.data;
           let tv = convertCustomerForDisplay(res.data, this.initData.fieldInfo);
           this.customer = Object.freeze(tv);
-          console.log('this.customer', this.customer);
+          console.log('%c customer-detail-view fetchCustomer ', 'color:blue', this.customer);
         })
+        .catch(err => console.error('customer-detail-view fetchCustomer catch error /n', err));
       },
       openDialog(action) {
         if (action === 'address') {
@@ -180,7 +192,9 @@
         // /remind/list
 
       },
-      
+      jump() {
+        window.location.href = `/customer/edit/${this.initData.id}`
+      },
       reloadRemark() {
 
       },
@@ -193,6 +207,7 @@
       AddAddressDialog,
       AddContactDialog,
       AddRemarkDialog,
+      [BasFileItem.name]: BasFileItem,
     }
   }
 </script>
@@ -244,6 +259,8 @@
           color: #333;
           line-height: 26px;
           font-size: 12px;
+          display: flex;
+
           label {
             font-size: 12px;
             width: 120px;

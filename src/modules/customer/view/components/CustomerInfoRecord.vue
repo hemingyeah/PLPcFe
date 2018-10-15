@@ -15,7 +15,7 @@
             <template v-if="r.formatInfo.displayMark">
               <p v-if="r.content.updateType === 'ptRecord'">{{r.content.updateContent}}</p>
               <div v-if="r.attachments && r.attachments.length">
-                <base-file-item v-for="file in r.attachments" :file="file" :key="file.url"></base-file-item>
+                <base-file-item v-for="file in r.attachments" :file="file" :key="file.url" :del="false"></base-file-item>
               </div>
             </template>
           </div>
@@ -45,20 +45,20 @@
             <span>{{r.createTime}}</span>
           </p>
           <div v-if="r.attachments && r.attachments.length">
-            <base-file-item v-for="file in r.attachments" :file="file" :key="file.url"></base-file-item>
+            <base-file-item v-for="file in r.attachments" :file="file" :key="file.url" :del="false"></base-file-item>
           </div>
         </div>
       </li>
     </ul>
     <p style="line-height: 20px; text-align: center;">
-      <a href="javascript:;" @click="loadMore">加载更多</a>
+      <a href="javascript:;" @click="loadMore">{{btnText}}</a>
     </p>
 
   </div>
 </template>
 
 <script>
-  import BasFileItem from '@src/component/common/BaseUpload/BaseFileItem.vue';
+  import BasFileItem from '@src/component/common/BaseFileItem';
   import {formatDate,} from '@src/util/lang';
 
   export default {
@@ -76,6 +76,12 @@
           pageSize: 10,
         },
         records: [],
+        loadedAllRecord: false,
+      }
+    },
+    computed: {
+      btnText() {
+        return this.loadedAllRecord ? '已加载全部' : '加载更多';
       }
     },
     mounted() {
@@ -84,6 +90,7 @@
     },
     methods: {
       loadMore() {
+        if (this.loadedAllRecord) return;
         this.params.pageNum++;
         this.fetchRecord();
       },
@@ -92,10 +99,11 @@
           primaryId: this.customerId,
           ...this.params,
         };
-        this.$http.get('/customer/cRecord', params)
+        this.$http.get('/v2/customer/cRecord', params)
         .then(res => {
-          this.records = [...this.records, ...this.processRawData(res)];
-          console.log('res', res);
+          this.records = [...this.records, ...this.processRawData(res.list)];
+
+          this.loadedAllRecord = res.total === this.records.length;
         })
         .catch(err => {
           console.error('fetchRecord err', err);

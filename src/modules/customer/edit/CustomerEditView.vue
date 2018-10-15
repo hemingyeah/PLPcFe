@@ -127,7 +127,6 @@
                 return params;
               }
             },
-
           },
           addressField: {
             formType: 'address',

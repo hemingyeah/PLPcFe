@@ -9,7 +9,7 @@
         </form-item>
       </form-builder>
       <div class="dialog-footer">
-        <el-button @click="addRemarkDialog = false">关闭</el-button>
+        <el-button @click="addAddressDialog = false">关闭</el-button>
         <el-button native-type="submit" type="primary" :disabled="pending">保存</el-button>
       </div>
     </form>
@@ -22,6 +22,16 @@
 
   export default {
     name: "add-address-dialog",
+    props: {
+      customerId: {
+        type: String,
+        default: '',
+      },
+      defaultAddress: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
     data() {
       return {
         addAddressDialog: false,
@@ -40,7 +50,7 @@
         },
         addressField: {
           formType: 'address',
-          fieldName: 'address',
+          fieldName: 'customerAddress',
           displayName: "地址",
           placeholder: '请输入详细地址[最多50字]',
           isNull: 0,
@@ -51,17 +61,40 @@
 
     },
     methods: {
-      openDialog() {
-        this.addAddressDialog = true;
-      },
       async submit() {
         try {
           const validateRes = await this.$refs.form.validate();
-          console.log('validateRes', validateRes);
+          if (!validateRes) return;
 
+          const params = this.buildParams();
+          await this.$http.post('/customer/address/create', params, false);
+          // todo reload customer address
+          this.addAddressDialog = false;
         } catch (e) {
           console.error('add-address-dialog catch err', e);
         }
+      },
+      buildParams() {
+        const { adAddress, detail,} = this.form.customerAddress;
+        const { adAddress: adAddressBp, detail: detailBp, adLongitude, adLatitude, } = this.addressBackup;
+        let params = {
+          id: '',
+          customerId: this.customerId,
+          province: adAddress[0] || '',
+          city: adAddress[1] || '',
+          dist: adAddress[2] || '',
+          addressType: 0,
+          longitude: '',
+          latitude: '',
+          address: detail,
+        };
+        if (adAddress.join('') === adAddressBp.join('') && detail === detailBp) {
+          params.longitude = adLongitude;
+          params.latitude = adLatitude;
+          params.addressType = 1;
+        }
+
+        return params;
       },
       update({field, newValue, oldValue}) {
         let {fieldName, displayName} = field;
@@ -72,7 +105,16 @@
       },
       updateAddressBackup(ad) {
         this.addressBackup = ad;
-      }
+      },
+      setDefaultAddress(ad) {
+        const { adProvince, adCity, adDist, } = ad;
+        if (!adProvince || !adCity) return;
+        this.form.customerAddress.adAddress = [adProvince, adCity, adDist,].filter(ad => ad);
+      },
+      openDialog() {
+        this.addAddressDialog = true;
+        this.setDefaultAddress(this.defaultAddress)
+      },
     },
     components: {
       FormAddress,

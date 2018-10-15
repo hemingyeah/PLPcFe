@@ -15,7 +15,7 @@
 
 <script>
   import Uploader from '@src/util/uploader';
-  import BaseFileItem from './BaseFileItem';
+  import BaseFileItem from '../BaseFileItem';
   import platform from '@src/platform';
 
   export default {

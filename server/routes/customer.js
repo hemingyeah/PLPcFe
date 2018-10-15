@@ -37,7 +37,7 @@ router.get('/customer/view/:id', async ctx => {
   let modConfig = modules['customer.view'];
   let reqHeaders = ctx.request.headers;
   let script = ['/customer.view.js'];
-  let result = await HttpClient.request(`/v2/customer/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request(`/v2/customer/view/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
   
   let body = result.body;
   ctx.body = Template.renderWithHtml('客户信息', body, script, modConfig.template)

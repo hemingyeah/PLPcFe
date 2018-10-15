@@ -7,7 +7,7 @@
       <a :href="file.url" @click.prevent.stop="download">{{file.fileName}}</a>
       <p>{{file.fileSize}}</p>
     </div>
-    <button type="button" class="base-file-del" @click="deleteFile">
+    <button type="button" class="base-file-del" @click="deleteFile" v-if="del">
       <i class="iconfont icon-guanbi-fill"></i>
     </button>
   </div>
@@ -22,7 +22,11 @@ export default {
     file: {
       type: Object,
       default: () => ({})
-    }
+    },
+    del: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed:{
     icon(){
