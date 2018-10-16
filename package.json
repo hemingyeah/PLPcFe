@@ -11,7 +11,8 @@
     "dev": "node --max-old-space-size=4096 script/development.js",
     "build": "node script/production.js",
     "lint": "eslint --fix --ext .js,.vue src",
-    "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json"
+    "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
+    "comp": "node script/component.js"
   },
   "author": "dongls",
   "license": "ISC",

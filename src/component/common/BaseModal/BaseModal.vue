@@ -10,7 +10,7 @@
             <template v-else>
               <slot name="cHeader"></slot>
             </template>
-            <button type="button" class="btn-text base-modal-header-close" @click="cancel" v-if="closeable">
+            <button type="button" class="base-modal-header-close" @click="cancel" v-if="closeable">
               <i class="iconfont icon-guanbi"></i>
             </button>
           </slot>
@@ -46,7 +46,7 @@ export default {
     },
     maskCloseable: {//是否允许点击遮罩关闭
       type: Boolean,
-      default: true
+      default: false
     },
     bodyClass: String
   },
@@ -126,6 +126,8 @@ export default {
     margin: 0;
     outline: none;
     color: #666;
+    border: none;
+    background-color: transparent;
 
     transition: color ease .15s;
 
@@ -138,7 +140,6 @@ export default {
     }
   }
 }
-.base-modal-body{}
 .base-modal-footer{
   border-top: 1px solid #e9ecef;
 }

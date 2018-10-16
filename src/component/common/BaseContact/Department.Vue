@@ -1,12 +1,12 @@
 <template>
   <base-modal 
     :title="title" width="800px"
-    :show.sync="show" 
-    @closed="$emit('destory')"
-    @cancel="$emit('canel')">
+    :show.sync="show" @closed="$emit('destory')" @cancel="$emit('canel')">
     <div class="bc-dept-wrap">
       <div class="bc-dept">
-        <base-tree :data="depts" :selected="selectedDept" @node-selected="chooseDept"/>
+        <base-tree 
+          :data="depts" :selected="selectedDept" :show-checkbox="allowCheckDept"
+          @node-selected="initDeptUser" @node-check="chooseDept"/>
       </div>
       <div class="bc-user">
         <div class="bc-search">
@@ -20,8 +20,10 @@
           <p class="bc-contact-search-tip" v-if="mode == 'search' && !loading">为您查询到相关记录{{userPage.total || 0}}条</p>
 
           <contact-user-item 
-            v-for="user in userPage.list" :key="user.userId" :user="user"
-            @toggle="chooseUser"/>
+            v-for="user in userPage.list" :key="user.userId" 
+            :user="user" @toggle="chooseUser" 
+            :show-user-state="showUserState" :state-color="stateColor"
+            :show-location="showLocation"/>
           
           <div class="bc-contact-loading" v-if="loading">正在加载，请稍等...</div>
           <div v-if="userPage.total == 0 && !loading && mode == 'choose'" class="bc-contact-empty">
@@ -31,17 +33,29 @@
         </div>
       </div>
       <div class="bc-chosen" v-if="isMulti">
-        <div class="bc-chosen-user" v-for="user in chosen" :key="user.userId">
-          <div class="bc-chosen-user-head" :style="{backgroundImage: `url(${head(user)})`}"></div>
-          <span>{{user.displayName}}</span>
-          <i class="iconfont icon-guanbi" @click="removeUser(user)"></i>
-        </div>
+        <template v-if="allowCheckDept && chosenDept.length > 0">
+          <h4>已选部门</h4>
+          <div 
+            class="bc-chosen-user" 
+            v-for="dept in chosenDept" :key="dept.id">
+            <span>{{dept.name}}</span>
+            <i class="iconfont icon-guanbi" @click="chooseDept({node: dept, value: false})"></i>
+          </div>
+        </template>
+        <template v-if="chosen.length > 0">
+          <h4 v-if="allowCheckDept">已选人员</h4>
+          <div class="bc-chosen-user" v-for="user in chosen" :key="user.userId">
+            <div class="bc-chosen-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
+            <span>{{user.displayName}}</span>
+            <i class="iconfont icon-guanbi" @click="removeUser(user)"></i>
+          </div>
+        </template>
       </div>
     </div>
     <div class="bc-contact-footer" v-if="isMulti">
-      <span class="bc-contact-chosen-count" v-if="max <= 0">当前已选{{chosen.length}}人</span>
+      <span class="bc-contact-chosen-count">{{summary}}</span>
       <button type="button" class="bc-contact-cancel" @click="show = false">关闭</button>
-      <button type="button" class="bc-contact-choose" @click="post">确定{{btnText}}</button>
+      <button type="button" class="bc-contact-choose" @click="post">确定</button>
     </div>
   </base-modal>
 </template> 
@@ -100,16 +114,16 @@ export default {
       default: ''
       // default: '113.961467'
     },
-    allotMap: {
-      type: String,
-      default: ''
+    //是否显示定位信息
+    showLocation: { 
+      type: Boolean,
+      default: false
     },
-
-
-    // allot: { //弃用
-    //   type: Boolean,
-    //   default: false
-    // },
+    //是否允许选中部门
+    showDeptCheckbox: {
+      type: Boolean,
+      default: false
+    }
   },
   data(){
     return {
@@ -123,15 +137,18 @@ export default {
 
       depts: [], //部门
       selectedDept: {}, //选中的部门
-      chosen: [], //已选中的人
+      chosenDept: [], //选择的部门
+      chosen: [], //已选择的人
 
       params: {
         keyword: '', //搜索关键词
         deptId: '',
         pageNum: 1,
-        pageSize: 100
+        pageSize: 50
       }, //参数
-      userPage: new Page()
+      userPage: new Page(),
+
+      stateColor: {} //用户工作状态颜色
     }
   },
   computed: {
@@ -144,22 +161,41 @@ export default {
     },
     //是否允许添加用户
     allowAddUser(){
-      let chosenLen = this.chosen.length;
-      let max = this.max <= 0 ? 5 : this.max;
-      return chosenLen < max;
+      return this.chosen.length < this.max;
+    },
+    //当前已选概览
+    summary(){
+      let text = `当前已选${this.chosen.length}人`;
+      if(this.allowCheckDept) text += `, 部门${this.chosenDept.length}个`;
+      return text;
+    },
+    //是否允许选中部门
+    allowCheckDept(){
+      return this.isMulti && this.showDeptCheckbox;
     }
   },
   methods: {
     post(){
-      let data = this.chosen.map(item => {
-        let user = {
+      let data = {};
+      let users = this.chosen.map(item => {
+        return {
           userId: item.userId,
           displayName: item.displayName,
           staffId: item.staffId,
           head: item.head || ''
-        }
-        return user;
+        };
       });
+      data.users = users;
+
+      if(this.allowCheckDept){
+        let depts = this.chosenDept.map(item => {
+          return {
+            id: item.id,
+            name: item.name
+          }
+        }) 
+        data.depts = depts;
+      }
 
       this.show = false;
       this.$emit('input',data);
@@ -172,7 +208,7 @@ export default {
     search: _.debounce(function(){
       if(!this.params.keyword){ //空值  显示团队
         this.mode = 'choose';
-        this.chooseDept(this.selectedDept);
+        this.initDeptUser(this.selectedDept);
         return;
       }
 
@@ -186,10 +222,12 @@ export default {
       if(!this.isMulti) {
         this.show = false;
         this.$emit('input', {
-          userId: user.userId,
-          displayName: user.displayName,
-          staffId: user.staffId,
-          head: user.head || ''
+          users: [{
+            userId: user.userId,
+            displayName: user.displayName,
+            staffId: user.staffId,
+            head: user.head || ''
+          }]
         })
         return;
       }
@@ -198,7 +236,7 @@ export default {
     },
     /** 添加人员 */
     addUser(user){
-      if(!this.allowAddUser) return Platform.alert('人数已达上限');
+      if(!this.allowAddUser) return Platform.alert(`最多选择${this.max}人`);
     
       user.selected = true;
 
@@ -235,6 +273,11 @@ export default {
 
         this.params.deptId = 'root';
         this.params.pageNum = 1;
+
+        if(this.showLocation){
+          this.params.lat = this.lat;
+          this.params.lng = this.lng;
+        }
         
         let userPage = await this.fetchUser(this.params);
         this.userPage.merge(Page.as(userPage));
@@ -246,16 +289,22 @@ export default {
       this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
     },
     /** 选中一个部门 */
-    async chooseDept(dept){
+    async initDeptUser(dept){
       try {
         this.mode = 'choose';
         this.selectedDept = dept;
         this.userPage.list = [];
         this.loading = true;
 
+        //查询用户
         this.params.keyword = '';
         this.params.deptId = this.selectedDept.id;
         this.params.pageNum = 1;
+
+        if(this.showLocation){
+          this.params.lat = this.lat;
+          this.params.lng = this.lng;
+        }
 
         let userPage = await this.fetchUser(this.params);
 
@@ -266,6 +315,33 @@ export default {
 
       this.loading = false;
       this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
+    },
+    /** 选择部门 */
+    chooseDept(event){
+      let {node, value} = event;
+      this.toggleDeptCheckStatus(node, value);
+      this.chosenDept = this.filterChosenDept(this.depts);
+    },
+    /** 切换该部门及子部门选中状态 */
+    toggleDeptCheckStatus(dept, value){
+      this.$set(dept, 'isChecked', value);
+
+      let subDepts = dept.subDepartments || [];
+      if(subDepts.length > 0){
+        subDepts.forEach(item => this.toggleDeptCheckStatus(item, value))
+      }
+    },
+    //筛选所有被选中的部门
+    filterChosenDept(depts){
+      if(!Array.isArray(depts) || depts.length == 0) return [];
+
+      let chosen = [];
+      for(let i = 0; i < depts.length; i++){
+        let dept = depts[i];
+        if(dept.isChecked) chosen.push(dept);
+        if(dept.subDepartments) chosen = chosen.concat(this.filterChosenDept(dept.subDepartments))
+      }
+      return chosen;
     },
     async loadmore(){
       this.loadmoreOptions.disabled = true;
@@ -310,7 +386,7 @@ export default {
         return page;
       });
     },
-    /** 抓取团队数据 */
+    /** 抓取部门数据 */
     fetchDept(){
       return http.get('/security/department/tree').then(result => {
         if(result.status == 1) return [];
@@ -330,18 +406,34 @@ export default {
           let arr = depts.splice(index,1);
           depts.push(arr[0]); 
         } 
+        //console.log(depts);
+        
         return depts;
       })
     },
-    async initialize(){
+    /** 初始化 */
+    initialize(){
       this.show = true;
-      try {
-        this.depts = await this.fetchDept();
-        this.chooseDept(this.depts[0]); //默认选中第一个
-      } catch (error) {
-        console.error(error)
-      }
+      this.initializeDept();
+      if(this.showUserState) this.initializeStateColor();
     },
+    /** 初始化部门数据 */
+    initializeDept(){
+      this.fetchDept()
+        //默认选中第一个
+        .then(depts => {
+          this.depts = depts;
+          this.initDeptUser(this.depts[0]); //默认选中第一个
+        })
+        .catch(err => console.error(err))
+    },
+    /** 初始化工作状态的颜色 */
+    initializeStateColor(){
+      http.get('/setting/getStateColorMap')
+        .then(res => this.stateColor = _.assign({}, this.stateColor,res || {}))
+        .catch(err => console.error(err))
+    },
+    /** 获取用户头像 */
     head(user){
       return user.head || DefaultHead;
     }
@@ -360,6 +452,7 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   height: 450px;
+  user-select: none;
 }
 
 .bc-dept{
@@ -423,6 +516,12 @@ export default {
   border-left: 1px solid #e9ecef;
   padding: 0 5px;
   overflow-y: auto;
+
+  h4{
+    margin: 0;
+    padding: 0 3px;
+    line-height: 24px;
+  }
 }
 
 .bc-chosen-user{
@@ -460,7 +559,7 @@ export default {
   }
 
   &:hover{
-    background-color: #f5f5f5;
+    background-color: #fafafa;
 
     i{
       visibility: visible;

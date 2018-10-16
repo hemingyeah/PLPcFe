@@ -1,8 +1,10 @@
 <template>
   <div class="base-tree">
-    <base-tree-node v-for="node in data" :key="node.id" 
-                    :node="node" :selected="selected"
-                    @node-click="transmit"/>
+    <base-tree-node 
+      v-for="node in data" :key="node.id" 
+      :node="node" :selected="selected" :show-checkbox="showCheckbox"
+      @node-click="$emit('node-selected', $event)" 
+      @node-check="$emit('node-check', $event)"/>
   </div>  
 </template>
 
@@ -19,11 +21,10 @@ export default {
     selected: {
       type: Object,
       default: () => ({})
-    }
-  },
-  methods: {
-    transmit(node){
-      this.$emit('node-selected',node)
+    },
+    showCheckbox: {
+      type: Boolean,
+      default: false
     }
   },
   components: {

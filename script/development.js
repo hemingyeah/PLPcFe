@@ -5,7 +5,7 @@ const colors = require('colors')
 const server = require('../server')
 const koaWebpack = require('koa-webpack')
 
-const webpackDevConfig = require('../config/webpack.dev.conf')
+const webpackDevConfig = require('../config/webpack.deve.conf')
 const koaWebpackConfig = {
   config: webpackDevConfig,
   devMiddleware: {

@@ -15,16 +15,17 @@
     <textarea id="textarea" style="width: 320px; height: 180px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis, arcu vitae adipiscing placerat, nisl lectus accumsan nisi, vitae iaculis sem neque vel lectus. Praesent tristique commodo lorem quis fringilla. Sed ac tellus eros. Sed consectetur eleifend felis vitae luctus. Praesent sagittis, est eget bibendum tincidunt, ligula diam tincidunt augue, a fermentum odio velit eget mi. Phasellus mattis, elit id fringilla semper, orci magna cursus ligula, non venenatis lacus augue sit amet dui. Pellentesque lacinia odio id nisi pulvinar commodo tempus at odio. Ut consectetur eros porttitor nunc mollis ultrices. Aenean porttitor, purus sollicitudin viverra auctor, neque erat blandit sapien, sit amet tincidunt massa mi ac nibh. Proin nibh sem, bibendum ut placerat nec, cursus et lacus. Phasellus vel augue turpis. Nunc eu mauris eu leo blandit mollis interdum eget lorem. </textarea>
   -->
     
-    <div style="height: 720px; min-width:1000px">
+    <!-- <div style="height: 720px; min-width:1000px">
       <form-design v-model="fields"></form-design>
       <button type="button" @click="saveToLocal">本地存储</button>
-    </div>
+    </div> -->
     <!-- <textarea :value="JSON.stringify(buildFields)" style="width: 100%; height: 150px;"></textarea> -->
     <!-- <div>
       <textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
       <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a>
     </div>  -->
-    <!-- <button @click="contact">contatc</button>
+    <button @click="contact">contatc</button>
+    <!-- 
 
     <div style="display:flex;">
       <form-builder :fields="buildFields" :value="form" @update="update" style="flex: 1;"></form-builder>
@@ -603,10 +604,42 @@ export default {
       localStorage.setItem(FORM_DESIGN_FIELDS, JSON.stringify(fields))
     },
     contact() {
-      this.$fast.contact.choose("dept", {
-        title: "请选择负责人",
-        max: 10
-      });
+      var options = {};
+      var users = [
+        {
+          "head":"http://static.dingtalk.com/media/lADPACOG82jnjMnNASDNASA_288_288.jpg",
+          "displayName":"董","userId":"cf12d356-4130-11e7-a318-00163e304a25",
+          "staffId":"035206101333891"
+        },
+        {
+          "head":"",
+          "displayName":"黄",
+          "userId":"bf25402f-93d9-11e7-9789-00163e304a25",
+          "staffId":"086328395240644"
+        },
+        {
+          "head":"http://static.dingtalk.com/media/lADOuEIYhc0C7s0C7A_748_750.jpg",
+          "displayName":"李","userId":"bf659348-93d9-11e7-9789-00163e304a25",
+          "staffId":"0633526626446"
+        },
+        {
+          "head":"","displayName":"赵","userId":"bfa699c3-93d9-11e7-9789-00163e304a25","staffId":"071729261636213"
+        }
+      ]
+      
+      options.selected = users;
+      options.max = -1;
+      options.title = '请选择负责人';
+      options.showDeptCheckbox = true;
+      // options.showTaskCount = true;
+      // options.showUserState = true;
+      // options.allotMap = true;
+      // options.lat = '27.127668'
+      // options.lng = '113.961467'
+
+      this.$fast.contact.choose("dept", options).then(res => {
+        console.log(res)
+      })
     },
     update({ field, newValue, oldValue }) {
       let { fieldName, displayName } = field;

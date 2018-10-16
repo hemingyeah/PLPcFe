@@ -35,3 +35,23 @@ if (!Element.prototype.closest) {
   CustomEvent.prototype = window.Event.prototype;
   window.CustomEvent = CustomEvent;
 })();
+
+//click handler
+(function(){
+  //非顶层window
+  let rootWindow = getRootWindow(window);
+  if(window != rootWindow){
+    //传递点击事件，用于关闭popper
+    document.addEventListener('click', function(e){
+      rootWindow.document.body.click();
+    })
+  }
+
+  function getRootWindow(win) {
+    //非frame 环境
+    if(win === window.top) return win;
+  
+    if(win.parent.__root_window_ == 'root') return win.parent;
+    return getRootWindow(win.parent);
+  }
+})()
