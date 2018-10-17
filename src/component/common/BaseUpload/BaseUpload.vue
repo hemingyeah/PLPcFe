@@ -44,7 +44,7 @@
       },
       value: {
         type: Array,
-        default: () => []
+        default: () => ([])
       }
     },
     methods: {

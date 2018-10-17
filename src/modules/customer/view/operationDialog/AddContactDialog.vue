@@ -164,7 +164,6 @@
       }
     },
     mounted() {
-      console.log('add-contact-dialog mounted');
     },
     methods: {
       async submit() {

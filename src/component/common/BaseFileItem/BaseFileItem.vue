@@ -4,7 +4,7 @@
       <img :data-origin="file.url">
     </div>  
     <div class="base-file-info">
-      <a :href="file.url" @click.prevent.stop="download">{{file.fileName}}</a>
+      <a :href="file.url" @click.prevent.stop="download">{{file.fileName || file.filename}}</a>
       <p>{{file.fileSize}}</p>
     </div>
     <button type="button" class="base-file-del" @click="deleteFile" v-if="del">
@@ -31,32 +31,33 @@ export default {
   computed:{
     icon(){
       let file = this.file;
+      const name = file.fileName || file.filename;
 
-      if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(file.fileName)) {
+      if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(name)) {
         return "img";
       }
-      if (/\.(ppt|pptx)$/i.test(file.fileName)) {
+      if (/\.(ppt|pptx)$/i.test(name)) {
         return 'ppt-file-icon';
       }
-      if (/\.(mp3)$/i.test(file.fileName)) {
+      if (/\.(mp3)$/i.test(name)) {
         return 'voice-file-icon';
       }
-      if (/\.(mp4)$/i.test(file.fileName)) {
+      if (/\.(mp4)$/i.test(name)) {
         return 'video-file-icon';
       }
-      if (/\.(zip)$/i.test(file.fileName)) {
+      if (/\.(zip)$/i.test(name)) {
         return 'zip-file-icon';
       }
-      if (/\.(pdf)$/i.test(file.fileName)) {
+      if (/\.(pdf)$/i.test(name)) {
         return 'pdf-file-icon';
       }
-      if (/\.(xls|xlsx)$/i.test(file.fileName)) {
+      if (/\.(xls|xlsx)$/i.test(name)) {
         return 'xls-file-icon';
       }
-      if (/\.(doc|docx)$/i.test(file.fileName)) {
+      if (/\.(doc|docx)$/i.test(name)) {
         return 'doc-file-icon';
       }
-      if (/\.(txt)$/i.test(file.fileName)) {
+      if (/\.(txt)$/i.test(name)) {
         return 'txt-file-icon';
       }
 
@@ -99,7 +100,8 @@ export default {
       });
     },
     async deleteFile(){
-      if(await platform.confirm('确定要删除该附件？\n' + this.file.fileName)){
+      const name = this.file.fileName || this.file.filename;
+      if(await platform.confirm('确定要删除该附件？\n' + name)){
         this.$emit('delete', this.file);
       }
     }

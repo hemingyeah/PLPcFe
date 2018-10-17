@@ -4,7 +4,7 @@
       <div>
         <el-button type="primary" icon="el-icon-search">返回</el-button>
         <el-button type="primary" icon="el-icon-search" @click="jump">编辑</el-button>
-        <el-button type="danger" icon="el-icon-search">删除</el-button>
+        <el-button type="danger" icon="el-icon-search" @click="deleteCustomer">删除</el-button>
       </div>
 
       <div>
@@ -41,66 +41,92 @@
     </div>
     <div class="main-content">
       <div class="customer-detail">
+
         <h3>
           {{customer.name}}
-          <span class="remind-btn">添加提醒</span>
+          <span class="remind-btn" @click="openDialog('remind')">添加提醒</span>
         </h3>
-        <ul class="customer-info-list">
-          <li>
-            <label for="">客户编号：</label>
-            {{customer.serialNumber}}
-          </li>
-          <li>
-            <label for="">联系人：</label>
-            {{customer.lmName}}
-          </li>
-          <li>
-            <label for="">电话：</label>
-            {{customer.lmPhone}}
-          </li>
-          <li>
-            <label for="">区域：</label>
-            {{customer.address.area}}
-          </li>
-          <li>
-            <label for="">详细地址：</label>
-            {{customer.address.detail}}
-          </li>
-          <li>
-            <label for="">服务团队：</label>
-            {{customer.tag}}
-          </li>
-          <li>
-            <label for="">客户负责人：</label>
-            {{customer.customerManagerName}}
-          </li>
-          <li>
-            <label for="">创建人：</label>
-            {{customer.createUser.name}}
-          </li>
-          <li>
-            <label for="">创建时间：</label>
-            {{customer.createTime}}
-          </li>
-          <li v-if="customer.isDelete && customer.deleteRecord.id">
-            <label for="">删除人：</label>
-            {{customer.deleteRecord.operator.displayName}}
-          </li>
-          <li v-if="customer.isDelete && customer.deleteRecord.id">
-            <label for="">删除时间：</label>
-            {{customer.deleteRecord.operateTime}}
-          </li>
-          <li v-for="field in customer.attribute" :key="field.fieldName">
-            <template v-if="field.formType === 'attachment'">
-              <label for="">{{field.displayName}}：</label>
-              <base-file-item v-for="file in field.value" :file="file" :key="file.url" :del="false"></base-file-item>
-            </template>
-            <template v-else>
-              <label for="">{{field.displayName}}：</label>
-              {{field.value}}
-            </template>
-          </li>
-        </ul>
+        <form-view :fields="allField" :value="originalCustomer">
+
+          <template slot="address" slot-scope="{area, address}">
+            <div class="app-row">
+              <div class="app-row-left">区域：</div>
+              <div class="app-row-right">
+                {{area}}
+              </div>
+            </div>
+            <div class="app-row">
+              <div class="app-row-left">详细地址：</div>
+              <div class="app-row-right">
+                {{address}}
+                <i v-if="customer.address.adLatitude && customer.address.adLongitude" @click="openMap" class="iconfont icon-guide"></i>
+              </div>
+            </div>
+          </template>
+
+
+        </form-view>
+
+        <div>
+          <!--<ul class="customer-info-list">-->
+          <!--<li>-->
+          <!--<label for="">客户编号：</label>-->
+          <!--{{customer.serialNumber}}-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">联系人：</label>-->
+          <!--{{customer.lmName}}-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">电话：</label>-->
+          <!--{{customer.lmPhone}}-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">区域：</label>-->
+          <!--{{customer.address.area}}-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">详细地址：</label>-->
+          <!--<a href="javascript:;" @click="openMap">-->
+          <!--{{customer.address.detail}}-->
+          <!--</a>-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">服务团队：</label>-->
+          <!--{{customer.tag}}-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">客户负责人：</label>-->
+          <!--{{customer.customerManagerName}}-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">创建人：</label>-->
+          <!--{{customer.createUser.name}}-->
+          <!--</li>-->
+          <!--<li>-->
+          <!--<label for="">创建时间：</label>-->
+          <!--{{customer.createTime}}-->
+          <!--</li>-->
+          <!--<li v-if="customer.isDelete && customer.deleteRecord.id">-->
+          <!--<label for="">删除人：</label>-->
+          <!--{{customer.deleteRecord.operator.displayName}}-->
+          <!--</li>-->
+          <!--<li v-if="customer.isDelete && customer.deleteRecord.id">-->
+          <!--<label for="">删除时间：</label>-->
+          <!--{{customer.deleteRecord.operateTime}}-->
+          <!--</li>-->
+          <!--<li v-for="field in customer.attribute" :key="field.fieldName">-->
+          <!--<template v-if="field.formType === 'attachment'">-->
+          <!--<label for="">{{field.displayName}}：</label>-->
+          <!--<base-file-item v-for="file in field.value" :file="file" :key="file.url" :del="false"></base-file-item>-->
+          <!--</template>-->
+          <!--<template v-else>-->
+          <!--<label for="">{{field.displayName}}：</label>-->
+          <!--{{field.value}}-->
+          <!--</template>-->
+          <!--</li>-->
+          <!--</ul>-->
+        </div>
       </div>
       <div class="customer-data">
         <div>
@@ -119,9 +145,21 @@
       </div>
     </div>
 
-    <add-address-dialog ref="addAddressDialog" :customer-id="customer.id" :default-address="initData.customerAddress"></add-address-dialog>
+    <ul>
+      <li v-for="r in remindList" :key="r.id">
+        <p style="display: flex;justify-content: space-between">提醒名称：{{r.remind.name}} <a @click="editRemind(r)"
+                                                                                          href="javascript:;">编辑</a></p>
+        <p style="display: flex;justify-content: space-between">预计发生时间：{{r.remindTime || '无'}} <a
+          @click="deleteRemind(r.id, r.remind.name)" href="javascript:;">删除</a></p>
+      </li>
+    </ul>
+
+    <add-address-dialog ref="addAddressDialog" :customer-id="customer.id"
+                        :default-address="initData.customerAddress"></add-address-dialog>
     <add-contact-dialog ref="addContactDialog" :customer="originalCustomer"></add-contact-dialog>
     <add-remark-dialog ref="addRemarkDialog" :customer="customer" @reload-remark="reloadRemark"></add-remark-dialog>
+    <remind-customer-dialog ref="addRemindDialog" :customer="originalCustomer" :edited-remind="selectedRemind"
+                            @success-callback="selectedRemind = {}"></remind-customer-dialog>
   </div>
 </template>
 
@@ -135,7 +173,9 @@
   import AddAddressDialog from './operationDialog/AddAddressDialog.vue';
   import AddContactDialog from './operationDialog/AddContactDialog.vue';
   import AddRemarkDialog from './operationDialog/AddRemarkDialog.vue';
-  import BasFileItem from '@src/component/common/BaseFileItem';
+  import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
+
+  import FormView from '@src/component/form/FormView.js';
 
   export default {
     name: "customer-detail-view",
@@ -149,6 +189,9 @@
       return {
         tab: 'customer-info-record',
         originalCustomer: {},
+        customerOption: {},
+        remindList: [],
+        selectedRemind: {},
         customer: {
           address: {},
           attribute: {},
@@ -156,12 +199,73 @@
         },
       }
     },
-    mounted() {
-      console.log('%c customer-detail-view mounted', 'color:red', this.initData);
+    computed: {
+      allField() {
+        const cf = [{
+          id: null,
+          formType: 'serialNumber',
+          displayName: '客户编号',
+          fieldName: 'serialNumber',
+          isSystem: 1,
+        }, {
+          id: null,
+          formType: 'lmName',
+          displayName: '联系人',
+          fieldName: 'lmName',
+          isSystem: 1,
+        }, {
+          id: null,
+          formType: 'lmPhone',
+          displayName: '电话',
+          fieldName: 'lmPhone',
+          isSystem: 1,
+        }, {
+          id: null,
+          formType: 'address',
+          displayName: '区域',
+          fieldName: 'customerAddress',
+          isSystem: 1,
+        }, {
+          id: null,
+          formType: 'tags',
+          displayName: '服务团队',
+          fieldName: 'tags',
+          isSystem: 1,
+        }, {
+          id: null,
+          formType: 'customerManagerName',
+          displayName: '客户负责人',
+          fieldName: 'customerManagerName',
+          isSystem: 1,
+        }];
 
+        return [...cf, ...this.initData.fieldInfo];
+      }
+    },
+    mounted() {
       this.fetchCustomer(this.initData.id);
+      this.fetchRemind();
     },
     methods: {
+      async deleteCustomer() {
+        try {
+          const action = await this.$platform.confirm('确定要删除该客户？');
+          if (!action) return;
+
+          const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+          console.log('result', result);
+          if (!result.status) {
+            window.location.href = '/customer';
+          }
+        } catch (e) {
+          console.error('customer-detail-view deleteCustomer error', e);
+        }
+      },
+      openMap() {
+        this.$fast.map.display(this.originalCustomer.customerAddress, {title: this.customer.name,})
+        .catch(err => console.error('openMap catch an err: ', err));
+
+      },
       fetchCustomer(id) {
         this.$http.get(`/v2/customer/get`, {id})
         .then(res => {
@@ -169,7 +273,6 @@
           this.originalCustomer = res.data;
           let tv = convertCustomerForDisplay(res.data, this.initData.fieldInfo);
           this.customer = Object.freeze(tv);
-          console.log('%c customer-detail-view fetchCustomer ', 'color:blue', this.customer);
         })
         .catch(err => console.error('customer-detail-view fetchCustomer catch error /n', err));
       },
@@ -180,16 +283,36 @@
           this.$refs.addContactDialog.openDialog();
         } else if (action === 'remark') {
           this.$refs.addRemarkDialog.openDialog();
+        } else if (action === 'remind') {
+          this.$refs.addRemindDialog.openDialog();
         }
-
       },
-
+      // remind func
+      editRemind(remind) {
+        this.selectedRemind = remind;
+        this.$nextTick(this.$refs.addRemindDialog.openDialog);
+      },
       fetchRemind() {
         const params = {
-          // modalId: 'cd4e8514-9285-11e8-8abd-7cd30abca02e',
-          // modal: 'customer'
+          modalId: this.customer.id,
+          modal: 'customer'
         };
-        // /remind/list
+        this.$http.get('/customer/remind/list', params)
+        .then(res => {
+          this.remindList = res;
+        })
+      },
+      async deleteRemind(id, name) {
+        try {
+          const action = await this.$platform.confirm(`确定删除 ${name}`);
+
+          if (!action) return
+        } catch (e) {
+          console.error('deleteRemind catch err', e);
+        }
+
+        this.$http.get(`/scheduler/delete/${id}`)
+        .catch(err => console.error('deleteRemind err', err));
 
       },
       jump() {
@@ -207,7 +330,8 @@
       AddAddressDialog,
       AddContactDialog,
       AddRemarkDialog,
-      [BasFileItem.name]: BasFileItem,
+      FormView,
+      [RemindCustomerDialog.name]: RemindCustomerDialog,
     }
   }
 </script>
@@ -227,7 +351,17 @@
       .el-button {
         margin-left: 0;
       }
+    }
 
+    .app-row {
+      display: flex;
+      justify-content: flex-start;
+      .app-row-left {
+        width: 100px;
+      }
+      .app-row-right {
+        width: 300px;
+      }
     }
   }
 

@@ -118,7 +118,6 @@
             this.pending = false;
 
             this.$emit('success-callback', this.selectedIds);
-            // console.log('post to /scheduler/buildBatch err', res);
           })
           .catch(err => {
             this.$platform.alert('批量添加提醒失败');

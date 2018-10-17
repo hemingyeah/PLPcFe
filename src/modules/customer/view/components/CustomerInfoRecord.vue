@@ -169,7 +169,7 @@
             r.formatInfo.recordTitle = `${r.content.type}了消息提醒  ${r.content.remindName}给  ${r.content.remindTo}`;
           } else if (r.action === '消息提醒' && r.content.type !== '已发送') {
             r.formatInfo.recordTitle =
-              `${r.userName}  ${r.content.type}了消息提醒  ${r.content.remindName} </br> ${!!r.content.rule && r.content.rule}`;
+              `${r.userName}  ${r.content.type}了消息提醒  ${r.content.remindName} </br> ${r.content.rule || ''}`;
           } else if (r.action === '发送短信' && r.content.type === '添加') {
             r.formatInfo.recordTitle =
               `${r.userName}  使用短信模板   ${r.content.templateName} 向客户发送了短信</br>预计发送时间：${r.content.sendTime}`

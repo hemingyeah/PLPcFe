@@ -378,6 +378,10 @@
       .form-item {
         width: 640px;
         margin: 0 auto;
+
+        .form-item-control {
+          width: 300px;
+        }
       }
 
       .base-dist-picker {

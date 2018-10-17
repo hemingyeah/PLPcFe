@@ -1,47 +1,51 @@
 import Vue from 'vue';
-import BaseMapPicker from './BaseMapPicker.vue';
+import BaseMapDisplay from './BaseMapDisplay.vue';
 import * as dom from '@src/util/dom'
 
-const BaseMapPickerComp = Vue.extend(BaseMapPicker);
+const BaseMapDisplayComp = Vue.extend(BaseMapDisplay);
 
 /**
- * 
- * @param {*} address 
- * @param {*} options 
+ *
+ * @param {*} address
+ * @param {*} options
  */
-function picker(address, options = {}){
-  let defaultArea = options.defaultArea;
+function display(address, options = {}){
+  // let defaultArea = options.defaultArea;
   
-  let instance = new BaseMapPickerComp({
+  let instance = new BaseMapDisplayComp({
     propsData: {
       address: address,
-      defaultArea: defaultArea
+      options,
     }
   });
-
+  
   return new Promise((resolve, reject) => {
     let ele = document.createElement("div");
     let body = document.body;
     let pending = false;
-
+    
     instance.$on('destroy', () => {
       setTimeout(() => dom.destroyComponent(instance), 1500);
     })
-
+    
     instance.$on('input', event => {
       if(pending) return;
-
+      
       this.pending = true;
       resolve({status: 0, data: event});
     })
-
+    
     instance.$on('cancel', () => {
       if(pending) return;
-
+  
+      console.log('instance', instance);
+      console.log('this', this);
+  
+  
       this.pending = true;
       resolve({status: 1, message: 'cancel'});
     })
-
+    
     body.appendChild(ele);
     instance.$mount(ele);
   })
@@ -52,11 +56,11 @@ function picker(address, options = {}){
   })
 }
 
-const MapPicker = {
+const MapDisplay = {
   namespace: 'map',
   props: {
-    picker
+    display
   }
 }
 
-export default MapPicker;
+export default MapDisplay;

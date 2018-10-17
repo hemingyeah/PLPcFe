@@ -63,9 +63,6 @@ function formatCustomer(originalCustomer, allTags, fields) {
     addressType: customerAddress.addressType || 0,
     adAddress: customerAddress.detail,
   };
-  
-  // console.log('formatCustomer', customer);
-  
 
   return customer;
 }

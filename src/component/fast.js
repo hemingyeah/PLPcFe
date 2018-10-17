@@ -1,10 +1,12 @@
 /** 可快速调用的组件 */
 import BaseContact from './common/BaseContact';
 import BaseMapPicker from './common/BaseMapPicker';
+import BaseMapDisplay from "./common/BaseMapDisplay";
 
 const components = [
   BaseContact,
-  BaseMapPicker
+  BaseMapPicker,
+  BaseMapDisplay
 ];
 
 const fast = {

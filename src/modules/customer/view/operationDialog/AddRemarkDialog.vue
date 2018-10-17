@@ -60,7 +60,6 @@
       }
     },
     mounted() {
-      console.log('add-remark-dialog mounted');
     },
     methods: {
       update({field, newValue, oldValue}) {
