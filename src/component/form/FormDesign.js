@@ -153,7 +153,7 @@ const FormDesign = {
     }
   },
   methods: {
-    // -------------- 组件列表 --------------
+    /** 开始插入字段 */
     beginInsert(field, event){
       let dragEvent = this.$data.$dragEvent;
       let target = event.target.closest('.form-design-field');
@@ -175,8 +175,6 @@ const FormDesign = {
       document.addEventListener('mousemove', this.handleDragging)
       document.addEventListener('mouseup', this.handleDragEnd)
     },
-    
-    // -------------- 拖拽排序 --------------
     /** 开始拖拽 */
     beginSort(field, event){
       let dragEvent = this.$data.$dragEvent;

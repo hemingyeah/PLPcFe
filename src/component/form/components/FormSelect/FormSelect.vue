@@ -89,10 +89,6 @@ export default {
 <style lang="scss">
 .form-select{
   width: 100%;
-  .el-input__inner:hover {
-    border-color: #00ac97;
-  }
-
   .el-select{
     width: 100%;
   }

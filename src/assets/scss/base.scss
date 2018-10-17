@@ -40,11 +40,11 @@ input,textarea{
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   
   &:focus{
-    border-color: $color-primary;
+    border-color: $input-border-hover-color;
   }
 
   &:hover{
-    border-color: $color-primary;
+    border-color: $input-border-hover-color;
   }
 }
 

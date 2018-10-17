@@ -2,7 +2,7 @@
   <div class="form-date">
     <el-date-picker
       :id="`form_${field.fieldName}`"
-      type="date"
+      type="date" readonly
       value-format="yyyy-MM-dd"
       :placeholder="placeholder"
       :value="value" @input="choose"/>
@@ -55,8 +55,12 @@ export default {
 .form-date{
   width: 100%;
 
-  .el-input__inner:hover {
-    border-color: #00ac97;
+  .el-input__inner{
+    cursor: pointer;
+    
+    &:hover{
+      border-color: #00ac97;
+    }
   }
 
   .el-date-editor{

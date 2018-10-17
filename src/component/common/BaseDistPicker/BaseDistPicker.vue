@@ -47,3 +47,9 @@
     }
   }
 </script>
+
+<style lang="scss">
+.base-dist-picker:hover .el-input__inner{
+  border-color: $input-border-hover-color;
+}
+</style>

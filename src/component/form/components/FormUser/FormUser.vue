@@ -75,7 +75,7 @@ export default {
     padding-right: 32px;
     width: 100%;
     cursor: pointer;
-    background-color: #eff1f3;
+    background-color: #f6f9f7;
   }
 }
 
