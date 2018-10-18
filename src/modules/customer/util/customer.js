@@ -40,7 +40,7 @@ function formatCustomer(originalCustomer, allTags, fields) {
   // tags
   if (tags && Array.isArray(tags) && tags.length) {
     customer.tags = tags.map(tag => {
-      const t =  allTags.filter(at => at.id === tag)[0];
+      const t = allTags.filter(at => at.id === tag)[0];
       return {
         id: t.id,
         tagName: t.tagName,
@@ -63,7 +63,7 @@ function formatCustomer(originalCustomer, allTags, fields) {
     addressType: customerAddress.addressType || 0,
     adAddress: customerAddress.detail,
   };
-
+  
   return customer;
 }
 
@@ -94,10 +94,9 @@ function convertCustomerToForm(originalCustomer) {
       form[key] = attribute[key];
     });
   }
-  
   // address
   form.customerAddress = {
-    adAddress: [customerAddress.adProvince, customerAddress.adCity, customerAddress.adDist, ],
+    adAddress: [customerAddress.adProvince, customerAddress.adCity, customerAddress.adDist,],
     detail: customerAddress.adAddress,
     adLongitude: customerAddress.adLongitude || '',
     adLatitude: customerAddress.adLatitude || '',
@@ -119,80 +118,7 @@ function convertCustomerToForm(originalCustomer) {
     form.customerManager = null;
   }
   
-  
-  
   return form;
 }
 
-
-function convertCustomerForDisplay(originalCustomer, fields) {
-  const {
-    id,
-    name,
-    lmName,
-    lmPhone,
-    serialNumber,
-    attribute,
-    customerAddress,
-    tags,
-    customerManagerName,
-    customerManager,
-    createTime,
-    createUser,
-    createLoginUser,
-  } = originalCustomer;
-  let customer = {
-    id,
-    name,
-    lmName,
-    lmPhone,
-    serialNumber,
-    customerManagerName,
-    createTime,
-    address: '',
-    tag: '',
-    createUser: {
-      id: createUser,
-      name: createLoginUser ? createLoginUser.displayName : '',
-    },
-    attribute: {},
-  };
-  let tv = null;
-  
-  if (customerAddress) {
-    customer.address = {
-      area: `${customerAddress.adProvince}-${customerAddress.adCity}-${customerAddress.adDist}`,
-      detail: customerAddress.adAddress,
-    }
-  }
-  
-  if (tags && tags.length) {
-    customer.tag = tags.map(t => t.tagName).join(' ');
-  }
-  // 被删除的相关属性
-
-  // 自定义属性
-  if (attribute) {
-    Object.keys(attribute)
-    .forEach(key => {
-      tv = fields.filter(field => field.fieldName === key)[0] || {};
-      customer.attribute[key] = {
-        fieldName: tv.fieldName,
-        displayName: tv.displayName,
-        value: attribute[key],
-        formType: tv.formType,
-      };
-      
-      if (Array.isArray(attribute[key]) && tv.formType !== 'attachment') {
-        customer.attribute[key].value = attribute[key].join(' ');
-      }
-    })
-  
-  }
-  
-  return customer;
-}
-
-
-
-export { formatCustomer, convertCustomerToForm, convertCustomerForDisplay, };
+export {formatCustomer, convertCustomerToForm,};

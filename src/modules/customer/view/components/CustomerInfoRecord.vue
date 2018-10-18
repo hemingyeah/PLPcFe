@@ -85,7 +85,6 @@
       }
     },
     mounted() {
-
       this.fetchRecord();
     },
     methods: {
@@ -115,7 +114,7 @@
           const res = await this.$platform.confirm('确认删除该备注吗？');
           if (!res) return;
 
-          const delRes = await this.$http.post('/customer/deleteCustomerRecord', { id: record.id, }, false);
+          const delRes = await this.$http.post('/customer/deleteCustomerRecord', {id: record.id,}, false);
           if (delRes.succ) {
             // reload record
             this.records = this.records.map(r => {
@@ -149,22 +148,16 @@
             r.content.isDelete = false;
           }
 
-          // 附件字段名称调整
-          if (r.attachments && r.attachments.length) {
-            r.attachments.forEach(a => {
-              a.fileName = a.filename;
-            })
-          }
           // 记录信息格式化
           if (r.action === '备注') {
             r.formatInfo.displayMark = !r.content.isDelete && Object.keys(r.content).length > 0;
-            r.formatInfo.recordTitle = `${r.userName}   添加了备注   ${r.primaryName}   ${r.showInOwn && '(仅自己可见)'}`;
+            r.formatInfo.recordTitle = `${r.userName}   添加了备注   ${r.primaryName}   ${r.showInOwn ? '(仅自己可见)' : ''}`;
           } else if (r.action === '联系人') {
             r.formatInfo.recordTitle = `${r.userName}
             ${r.content.type !== '设为默认' ?
               r.content.type + '了联系人  ' + r.content.name :
               '将  ' + r.content.name + '   设为默认联系人'
-            }`;
+              }`;
           } else if (r.action === '消息提醒' && r.content.type === '已发送') {
             r.formatInfo.recordTitle = `${r.content.type}了消息提醒  ${r.content.remindName}给  ${r.content.remindTo}`;
           } else if (r.action === '消息提醒' && r.content.type !== '已发送') {
@@ -181,7 +174,13 @@
             if (r.action === '批量更新') {
               r.formatInfo.recordTitle += `通过导入更新了客户   ${r.primaryName}`;
             } else {
-              r.formatInfo.recordTitle += `${r.action} 了客户   ${r.primaryName}`;
+              r.formatInfo.recordTitle += ` ${r.action}了客户   ${r.primaryName}`;
+            }
+
+            if (Object.keys(r.content).length > 0) {
+              if (r.content.updateFields !== undefined) {
+                r.formatInfo.recordTitle += `</br>修改字段：${r.content.updateFields}`;
+              }
             }
           }
 

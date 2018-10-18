@@ -3,8 +3,8 @@
     <div class="top-tool-bar">
       <div>
         <el-button type="primary" icon="el-icon-search">返回</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="jump">编辑</el-button>
-        <el-button type="danger" icon="el-icon-search" @click="deleteCustomer">删除</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="jump" v-if="allowEditCustomer">编辑</el-button>
+        <el-button type="danger" icon="el-icon-search" @click="deleteCustomer" v-if="allowDeleteCustomer">删除</el-button>
       </div>
 
       <div>
@@ -35,7 +35,8 @@
             <el-dropdown-item>蚵仔煎</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-button type="primary" icon="el-icon-search" @click="openDialog('remark')">添加备注</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="openDialog('remark')" v-if="allowEditCustomer">添加备注
+        </el-button>
       </div>
 
     </div>
@@ -46,7 +47,7 @@
           {{customer.name}}
           <span class="remind-btn" @click="openDialog('remind')">添加提醒</span>
         </h3>
-        <form-view :fields="allField" :value="originalCustomer">
+        <form-view :fields="allField" :value="customer">
 
           <template slot="address" slot-scope="{area, address}">
             <div class="app-row">
@@ -59,74 +60,12 @@
               <div class="app-row-left">详细地址：</div>
               <div class="app-row-right">
                 {{address}}
-                <i v-if="customer.address.adLatitude && customer.address.adLongitude" @click="openMap" class="iconfont icon-guide"></i>
+                <i v-if="customer.address && customer.address.adLatitude && customer.address.adLongitude"
+                   @click="openMap" class="iconfont icon-guide"></i>
               </div>
             </div>
           </template>
-
-
         </form-view>
-
-        <div>
-          <!--<ul class="customer-info-list">-->
-          <!--<li>-->
-          <!--<label for="">客户编号：</label>-->
-          <!--{{customer.serialNumber}}-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">联系人：</label>-->
-          <!--{{customer.lmName}}-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">电话：</label>-->
-          <!--{{customer.lmPhone}}-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">区域：</label>-->
-          <!--{{customer.address.area}}-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">详细地址：</label>-->
-          <!--<a href="javascript:;" @click="openMap">-->
-          <!--{{customer.address.detail}}-->
-          <!--</a>-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">服务团队：</label>-->
-          <!--{{customer.tag}}-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">客户负责人：</label>-->
-          <!--{{customer.customerManagerName}}-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">创建人：</label>-->
-          <!--{{customer.createUser.name}}-->
-          <!--</li>-->
-          <!--<li>-->
-          <!--<label for="">创建时间：</label>-->
-          <!--{{customer.createTime}}-->
-          <!--</li>-->
-          <!--<li v-if="customer.isDelete && customer.deleteRecord.id">-->
-          <!--<label for="">删除人：</label>-->
-          <!--{{customer.deleteRecord.operator.displayName}}-->
-          <!--</li>-->
-          <!--<li v-if="customer.isDelete && customer.deleteRecord.id">-->
-          <!--<label for="">删除时间：</label>-->
-          <!--{{customer.deleteRecord.operateTime}}-->
-          <!--</li>-->
-          <!--<li v-for="field in customer.attribute" :key="field.fieldName">-->
-          <!--<template v-if="field.formType === 'attachment'">-->
-          <!--<label for="">{{field.displayName}}：</label>-->
-          <!--<base-file-item v-for="file in field.value" :file="file" :key="file.url" :del="false"></base-file-item>-->
-          <!--</template>-->
-          <!--<template v-else>-->
-          <!--<label for="">{{field.displayName}}：</label>-->
-          <!--{{field.value}}-->
-          <!--</template>-->
-          <!--</li>-->
-          <!--</ul>-->
-        </div>
       </div>
       <div class="customer-data">
         <div>
@@ -154,11 +93,11 @@
       </li>
     </ul>
 
+    <add-contact-dialog ref="addContactDialog" :customer="customer"></add-contact-dialog>
+    <add-remark-dialog ref="addRemarkDialog" :customer="customer" @reload-remark="reloadRemark"></add-remark-dialog>
     <add-address-dialog ref="addAddressDialog" :customer-id="customer.id"
                         :default-address="initData.customerAddress"></add-address-dialog>
-    <add-contact-dialog ref="addContactDialog" :customer="originalCustomer"></add-contact-dialog>
-    <add-remark-dialog ref="addRemarkDialog" :customer="customer" @reload-remark="reloadRemark"></add-remark-dialog>
-    <remind-customer-dialog ref="addRemindDialog" :customer="originalCustomer" :edited-remind="selectedRemind"
+    <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind"
                             @success-callback="selectedRemind = {}"></remind-customer-dialog>
   </div>
 </template>
@@ -188,7 +127,6 @@
     data() {
       return {
         tab: 'customer-info-record',
-        originalCustomer: {},
         customerOption: {},
         remindList: [],
         selectedRemind: {},
@@ -240,11 +178,56 @@
         }];
 
         return [...cf, ...this.initData.fieldInfo];
-      }
+      },
+      //permission
+      permission() {
+        return this.initData.loginUser.authorities;
+      },
+      allowDeleteCustomer() {
+        return this.allowEditCustomer && this.permission.CUSTOMER_DELETE;
+      },
+      allowEditCustomer() {
+        const c = this.customer;
+        const loginUser = this.initData.loginUser;
+        const CUSTOMER_EDIT = this.permission.CUSTOMER_EDIT;
+        if (!CUSTOMER_EDIT) return false;
+        let auth = false;
+        if (CUSTOMER_EDIT === 1) {
+          auth = c.createUser === loginUser.userId;
+        } else if (CUSTOMER_EDIT === 2) {
+          auth = c.createUser === loginUser.userId || this.permissionAccordingToTag();
+        } else {
+          auth = true;
+        }
+
+        return c.isDelete === 0 && (auth || this.isCustomerManager);
+      },
+      permissionAccordingToTag() {
+        const c = this.customer;
+        let tags = Array.isArray(c.tags) ? c.tags : [];
+        let loginUserTagIds = this.initData.loginUser.tagIds || [];
+        //无团队则任何人都可编辑
+        if (tags.length == 0) return true;
+
+        //团队权限验证 return Boolean
+        let result = tags.filter(tag => loginUserTagIds.some(tId => tId === tag.id));
+
+        return result.length > 0;
+      },
+      /**
+       * 当前用户是否是该客户负责人
+       * 客户负责人用于和客户创建人相同权限
+       */
+      isCustomerManager() {
+        const {loginUser, customerManager,} = this.customer;
+        return loginUser.userId === customerManager;
+      },
+
     },
     mounted() {
       this.fetchCustomer(this.initData.id);
       this.fetchRemind();
+      console.log('this.initData', this.initData);
     },
     methods: {
       async deleteCustomer() {
@@ -262,7 +245,7 @@
         }
       },
       openMap() {
-        this.$fast.map.display(this.originalCustomer.customerAddress, {title: this.customer.name,})
+        this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name,})
         .catch(err => console.error('openMap catch an err: ', err));
 
       },
@@ -270,9 +253,7 @@
         this.$http.get(`/v2/customer/get`, {id})
         .then(res => {
           if (res.status) return;
-          this.originalCustomer = res.data;
-          let tv = convertCustomerForDisplay(res.data, this.initData.fieldInfo);
-          this.customer = Object.freeze(tv);
+          this.customer = Object.freeze(res.data);
         })
         .catch(err => console.error('customer-detail-view fetchCustomer catch error /n', err));
       },
