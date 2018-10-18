@@ -85,3 +85,19 @@ export function destroyComponent(instance){
   instance = null;
   parent.removeChild(el); 
 }
+
+/**
+ * 用于获取顶层window
+ * 顶层window中添加了一个特殊属性[__root_window_],因此判断该属性即可
+ * 
+ * 注：不适合使用惰性函数改写
+ * 
+ * @param win - 当前窗口window对象
+ */
+export function getRootWindow(win) {
+  //非frame 环境
+  if(win === window.top) return win;
+
+  if(win.parent.__root_window_ == 'root') return win.parent;
+  return getRootWindow(win.parent);
+}

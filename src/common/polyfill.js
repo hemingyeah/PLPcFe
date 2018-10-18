@@ -1,5 +1,6 @@
 /** 全局polyfill @author dongls */
 import "babel-polyfill";
+import {getRootWindow} from '../util/dom';
 
 if (!Element.prototype.matches) {
   Element.prototype.matches =
@@ -46,12 +47,4 @@ if (!Element.prototype.closest) {
       rootWindow.document.body.click();
     })
   }
-
-  function getRootWindow(win) {
-    //非frame 环境
-    if(win === window.top) return win;
-  
-    if(win.parent.__root_window_ == 'root') return win.parent;
-    return getRootWindow(win.parent);
-  }
-})()
+})();

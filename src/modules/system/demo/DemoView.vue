@@ -628,7 +628,7 @@ export default {
       ]
       
       options.selected = users;
-      options.max = -1;
+      options.max = 10;
       options.title = '请选择负责人';
       options.showDeptCheckbox = true;
       // options.showTaskCount = true;
