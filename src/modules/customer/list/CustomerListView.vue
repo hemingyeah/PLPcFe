@@ -11,7 +11,9 @@
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
           <a href="/customer">返回旧版</a>
         </div>
-        <el-button type="primary" @click="advancedSearchPanelShow = !advancedSearchPanelShow" class="advanced-search-visible-btn">高级搜索</el-button>
+        <el-button type="primary" @click="advancedSearchPanelShow = !advancedSearchPanelShow"
+                   class="advanced-search-visible-btn">高级搜索
+        </el-button>
       </form>
       <!--高级搜索-->
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
@@ -132,12 +134,15 @@
           </el-form-item>
 
           <!-- 动态搜索框 -->
-          <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields" :key="field.fieldName">
+          <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
+                        :key="field.fieldName">
             <template v-if="field.formType === 'text' || field.formType === 'code'">
-              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="text"></el-input>
+              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
+                        :placeholder="field.placeHolder" type="text"></el-input>
             </template>
             <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-              <el-select v-model="params.customizedSearchModel[field.fieldName]['value']" clearable :placeholder="field.placeHolder">
+              <el-select v-model="params.customizedSearchModel[field.fieldName]['value']" clearable
+                         :placeholder="field.placeHolder">
                 <el-option
                   v-for="item in field.setting.dataSource"
                   :key="item"
@@ -148,7 +153,8 @@
               </el-select>
             </template>
             <template v-else-if="field.formType === 'number'">
-              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder" type="number"></el-input>
+              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
+                        :placeholder="field.placeHolder" type="number"></el-input>
             </template>
             <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
               <el-date-picker
@@ -181,12 +187,15 @@
               </el-select>
             </template>
             <template v-else>
-              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']" :placeholder="field.placeHolder"></el-input>
+              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
+                        :placeholder="field.placeHolder"></el-input>
             </template>
           </el-form-item>
           <div class="advanced-search-btn-group">
             <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
-            <el-button type="primary" class="search-btn" native-type="submit" @click.prevent="search({ pageNum: 1, }, true)">搜索</el-button>
+            <el-button type="primary" class="search-btn" native-type="submit"
+                       @click.prevent="search({ pageNum: 1, }, true)">搜索
+            </el-button>
           </div>
         </el-form>
       </base-panel>
@@ -198,7 +207,8 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <el-button v-if="editedPermission" type="primary" icon="el-icon-plus" @click="jumpPage">新建</el-button>
-          <el-button v-if="highLevelPermission" type="primary" icon="el-icon-delete" @click="deleteCustomer" class="delete-customer-btn">删除
+          <el-button v-if="highLevelPermission" type="primary" icon="el-icon-delete" @click="deleteCustomer"
+                     class="delete-customer-btn">删除
           </el-button>
         </div>
 
@@ -235,7 +245,8 @@
               </el-dropdown-item>
               <el-dropdown-item>
                 <div @click="exportCustomer(true)">导出全部</div>
-              </el-dropdown-item>  <el-dropdown-item>
+              </el-dropdown-item>
+              <el-dropdown-item>
                 <div @click="openDialog('update')">批量更新</div>
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -345,7 +356,8 @@
     <!--list end-->
 
     <!-- dialog of operation -->
-    <batch-reminding-customer-dialog ref="batchRemindingCustomerDialog" :selected-ids="selectedIds" @success-callback="remindSuccess"></batch-reminding-customer-dialog>
+    <batch-reminding-customer-dialog ref="batchRemindingCustomerDialog" :selected-ids="selectedIds"
+                                     @success-callback="remindSuccess"></batch-reminding-customer-dialog>
     <send-message-dialog ref="messageDialog" :selected-ids="selectedIds"></send-message-dialog>
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
@@ -603,7 +615,7 @@
       };
       this.auth = initData.auth || {};
 
-      const { adProvince, adCity, adDist, } = this.customerConfig.customerAddressConfig;
+      const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
       this.defaultAddress = [adProvince, adCity, adDist,];
 
       this.buildConfig();
@@ -622,9 +634,9 @@
     },
     methods: {
       formatAddress(ad) {
-        const { adProvince, adCity, adDist, } = ad;
-        return [ adProvince, adCity, adDist, ]
-          .filter(d => !!d).join('-');
+        const {adProvince, adCity, adDist,} = ad;
+        return [adProvince, adCity, adDist,]
+        .filter(d => !!d).join('-');
       },
       remindSuccess(ids) {
         let tv = false;
@@ -642,20 +654,20 @@
       },
       buildConfig() {
         this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
-          .map(f => {
-            if (f.isSearch) {
-              // 需要搜索的字段
-              this.$set(this.params.customizedSearchModel, f.fieldName, {
-                fieldName: f.fieldName,
-                value: null,
-                operator: this.matchOperator(f.formType),
-                formType: f.formType,
-              });
-              this.searchFields.push(f);
-            }
+        .map(f => {
+          if (f.isSearch) {
+            // 需要搜索的字段
+            this.$set(this.params.customizedSearchModel, f.fieldName, {
+              fieldName: f.fieldName,
+              value: null,
+              operator: this.matchOperator(f.formType),
+              formType: f.formType,
+            });
+            this.searchFields.push(f);
+          }
 
-            return f;
-          });
+          return f;
+        });
         this.columns = this.buildTableColumn();
       },
       jumpPage() {
@@ -709,37 +721,37 @@
         };
 
         this.$http.post('/v2/customer/list', params)
-          .then(res => {
-            if (!res || !res.list) {
-              this.customers = [];
-              this.paginationInfo.totalItems = 0;
-              this.paginationInfo.totalPages = 0;
-              this.paginationInfo.pageNum = 1;
-            } else {
-              const {pages, total, pageNum, list, } = res;
+        .then(res => {
+          if (!res || !res.list) {
+            this.customers = [];
+            this.paginationInfo.totalItems = 0;
+            this.paginationInfo.totalPages = 0;
+            this.paginationInfo.pageNum = 1;
+          } else {
+            const {pages, total, pageNum, list,} = res;
 
-              this.customers = list
-                .map(c => {
-                  c.pending = false;
-                  return c;
-                });
+            this.customers = list
+            .map(c => {
+              c.pending = false;
+              return c;
+            });
 
-              this.paginationInfo.totalItems = total;
-              this.paginationInfo.totalPages = pages;
-              this.paginationInfo.pageNum = pageNum;
-              this.matchSelected();  // 把选中的匹配出来
-            }
+            this.paginationInfo.totalItems = total;
+            this.paginationInfo.totalPages = pages;
+            this.paginationInfo.pageNum = pageNum;
+            this.matchSelected();  // 把选中的匹配出来
+          }
 
-            return res;
-          })
-          .then(() => {
-            this.$refs.customerListPage.scrollTop = 0;
-            this.loadingListData = false;
-          })
-          .catch(err => {
-            this.loadingListData = false;
-            console.error('err', err);
-          })
+          return res;
+        })
+        .then(() => {
+          this.$refs.customerListPage.scrollTop = 0;
+          this.loadingListData = false;
+        })
+        .catch(err => {
+          this.loadingListData = false;
+          console.error('err', err);
+        })
       },
       buildParams() {
         let tv = null; // tv means temporary variable that used inside the loop.
@@ -767,33 +779,33 @@
 
         // build customized search fields
         Object.keys(this.paramsBackup.customizedSearchModel)
-          .forEach(key => {
-            tv = this.paramsBackup.customizedSearchModel[key];
-            if (tv.value && tv.formType === 'date') {
-              return conditions.push({
-                property: tv.fieldName,
-                operator: tv.operator,
-                betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
-                betweenValue2: formatDate(tv.value[1], 'YYYY-MM-DD'),
-              });
-            }
-            if (tv.value && tv.formType === 'datetime') {
-              return conditions.push({
-                property: tv.fieldName,
-                operator: tv.operator,
-                betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
-                betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
-              });
-            }
+        .forEach(key => {
+          tv = this.paramsBackup.customizedSearchModel[key];
+          if (tv.value && tv.formType === 'date') {
+            return conditions.push({
+              property: tv.fieldName,
+              operator: tv.operator,
+              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
+              betweenValue2: formatDate(tv.value[1], 'YYYY-MM-DD'),
+            });
+          }
+          if (tv.value && tv.formType === 'datetime') {
+            return conditions.push({
+              property: tv.fieldName,
+              operator: tv.operator,
+              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
+              betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
+            });
+          }
 
-            if (tv.value) {
-              conditions.push({
-                property: tv.fieldName,
-                operator: tv.operator,
-                value: tv.value,
-              });
-            }
-          });
+          if (tv.value) {
+            conditions.push({
+              property: tv.fieldName,
+              operator: tv.operator,
+              value: tv.value,
+            });
+          }
+        });
 
         if (conditions.length) {
           params.conditions = conditions;
@@ -812,24 +824,24 @@
         let obj = _.cloneDeep(sourceObj);
         if (except.length) {
           Object.keys(obj)
-            .forEach(key => {
-              if (typeof obj[key] === 'object' && obj[key]) {
-                obj[key] = this.deleteValueFromObject(obj[key], except);
-              }
-              if (!obj[key] && except.every(ex => ex !== obj[key])) {
-                delete obj[key];
-              }
-            });
+          .forEach(key => {
+            if (typeof obj[key] === 'object' && obj[key]) {
+              obj[key] = this.deleteValueFromObject(obj[key], except);
+            }
+            if (!obj[key] && except.every(ex => ex !== obj[key])) {
+              delete obj[key];
+            }
+          });
         } else {
           Object.keys(obj)
-            .forEach(key => {
-              if (typeof obj[key] === 'object' && obj[key]) {
-                obj[key] = this.deleteValueFromObject(obj[key]);
-              }
-              if (!obj[key]) {
-                delete obj[key];
-              }
-            });
+          .forEach(key => {
+            if (typeof obj[key] === 'object' && obj[key]) {
+              obj[key] = this.deleteValueFromObject(obj[key]);
+            }
+            if (!obj[key]) {
+              delete obj[key];
+            }
+          });
         }
         if (Object.keys(obj).length) {
           return obj;
@@ -853,19 +865,19 @@
           status: ns,
         };
 
-        this.$http.post('/customer/changeState', params, false)
-          .then(res => {
-            row.pending = false;
-            this.customers.forEach(c => {
-              if (c.id === row.id) {
-                c.status = ns;
-              }
-            })
+        this.$http.post('/customer/changeState', params, false, {cancelable: false})
+        .then(res => {
+          row.pending = false;
+          this.customers.forEach(c => {
+            if (c.id === row.id) {
+              c.status = ns;
+            }
           })
-          .catch(err => {
-            row.pending = false;
-            console.error('toggleStatus catch err', err);
-          })
+        })
+        .catch(err => {
+          row.pending = false;
+          console.error('toggleStatus catch err', err);
+        })
       },
       sortChange(option) {
         const {prop, order} = option;
@@ -903,9 +915,9 @@
       handleSelection(selection) {
         let tv = this.computeSelection(selection);
         let original = this.multipleSelection
-          .filter(ms => this.customers.some(cs => cs.id === ms.id));
+        .filter(ms => this.customers.some(cs => cs.id === ms.id));
         let unSelected = this.customers
-          .filter(c => original.every(oc => oc.id !== c.id));
+        .filter(c => original.every(oc => oc.id !== c.id));
 
         if (tv.length > this.selectedLimit) {
           unSelected.forEach(row => {
@@ -918,7 +930,7 @@
       computeSelection(selection) {
         let tv = [];
         tv = this.multipleSelection
-          .filter(ms => this.customers.every(c => c.id !== ms.id));
+        .filter(ms => this.customers.every(c => c.id !== ms.id));
         tv = _.uniqWith([...tv, ...selection], _.isEqual);
         return tv;
       },
@@ -964,11 +976,11 @@
           if (!result) return;
 
           this.$http.get(`/customer/delete/${this.selectedIds.join(',')}`)
-            .then(res => {
-              this.multipleSelection = [];
-              this.search();
-            })
-            .catch(err => console.error('deleteCustomer err', err));
+          .then(res => {
+            this.multipleSelection = [];
+            this.search();
+          })
+          .catch(err => console.error('deleteCustomer err', err));
         } catch (e) {
           console.error('deleteCustomer catch error', e);
         }
@@ -976,12 +988,12 @@
       // columns
       modifyColumnStatus(val, column) {
         this.columns = this.columns
-          .map(c => {
-            if (c.field === column.field) {
-              c.show = val;
-            }
-            return c;
-          });
+        .map(c => {
+          if (c.field === column.field) {
+            c.show = val;
+          }
+          return c;
+        });
         const showColumns = this.columns.filter(c => c.show).map(c => c.field);
         this.saveDataToStorage('columnStatus', showColumns);
       },
@@ -1006,36 +1018,36 @@
         let sortable = false;
 
         dynamicColumns = this.customerConfig.fieldInfo
-          .filter(f => !f.isSystem && f.formType !== 'attachment')
-          .map(field => {
-            sortable = false;
+        .filter(f => !f.isSystem && f.formType !== 'attachment')
+        .map(field => {
+          sortable = false;
+          minWidth = 100;
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+            sortable = 'custom';
             minWidth = 100;
-            if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
-              sortable = 'custom';
-              minWidth = 100;
-            }
+          }
 
-            if (field.displayName.length > 4) {
-              minWidth = field.displayName.length * 20;
-            }
+          if (field.displayName.length > 4) {
+            minWidth = field.displayName.length * 20;
+          }
 
-            if (sortable && field.displayName.length >= 4) {
-              minWidth += 25;
-            }
+          if (sortable && field.displayName.length >= 4) {
+            minWidth += 25;
+          }
 
-            if (field.formType === 'datetime') {
-              minWidth = 150;
-            }
+          if (field.formType === 'datetime') {
+            minWidth = 150;
+          }
 
-            return {
-              label: field.displayName,
-              field: field.fieldName,
-              formType: field.formType,
-              width: `${minWidth}px`,
-              sortable,
-              isSystem: 0,
-            };
-          });
+          return {
+            label: field.displayName,
+            field: field.fieldName,
+            formType: field.formType,
+            width: `${minWidth}px`,
+            sortable,
+            isSystem: 0,
+          };
+        });
 
         columns = [...baseColumns, ...dynamicColumns];
 
@@ -1108,42 +1120,42 @@
       searchCustomerManager(keyword) {
         this.inputRemoteSearch.customerManager.loading = true;
         return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
-          .then(res => {
-            this.inputRemoteSearch.customerManager.options = res.list;
-            this.inputRemoteSearch.customerManager.loading = false;
-            return res;
-          })
-          .catch(err => console.error('searchCustomerManager function catch err', err));
+        .then(res => {
+          this.inputRemoteSearch.customerManager.options = res.list;
+          this.inputRemoteSearch.customerManager.loading = false;
+          return res;
+        })
+        .catch(err => console.error('searchCustomerManager function catch err', err));
       },
       searchCreator(keyword) {
         this.inputRemoteSearch.creator.loading = true;
         return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
-          .then(res => {
-            this.inputRemoteSearch.creator.options = res.list;
-            this.inputRemoteSearch.creator.loading = false;
-            return res;
-          })
-          .catch(err => console.error('searchCreator function catch err', err));
+        .then(res => {
+          this.inputRemoteSearch.creator.options = res.list;
+          this.inputRemoteSearch.creator.loading = false;
+          return res;
+        })
+        .catch(err => console.error('searchCreator function catch err', err));
       },
       searchLinkman(keyword) {
         this.inputRemoteSearch.linkman.loading = true;
         return this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
-          .then(res => {
-            this.inputRemoteSearch.linkman.options = res.list;
-            this.inputRemoteSearch.linkman.loading = false;
-            return res;
-          })
-          .catch(err => console.error('searchLinkman function catch err', err));
+        .then(res => {
+          this.inputRemoteSearch.linkman.options = res.list;
+          this.inputRemoteSearch.linkman.loading = false;
+          return res;
+        })
+        .catch(err => console.error('searchLinkman function catch err', err));
       },
       searchTag(keyword) {
         this.inputRemoteSearch.tag.loading = true;
         return this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
-          .then(res => {
-            this.inputRemoteSearch.tag.options = res.list;
-            this.inputRemoteSearch.tag.loading = false;
-            return res;
-          })
-          .catch(err => console.error('searchTag function catch err', err));
+        .then(res => {
+          this.inputRemoteSearch.tag.options = res.list;
+          this.inputRemoteSearch.tag.loading = false;
+          return res;
+        })
+        .catch(err => console.error('searchTag function catch err', err));
       },
       // match data
       matchOperator(formType) {
@@ -1191,13 +1203,13 @@
       matchSelected() {
         if (!this.multipleSelection.length) return;
         const selected = this.customers
-          .filter(c => {
-            if (this.multipleSelection.some(sc => sc.id === c.id)) {
-              this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
-              this.multipleSelection.push(c);
-              return c;
-            }
-          }) || [];
+        .filter(c => {
+          if (this.multipleSelection.some(sc => sc.id === c.id)) {
+            this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
+            this.multipleSelection.push(c);
+            return c;
+          }
+        }) || [];
 
         this.$nextTick(() => {
           this.toggleSelection(selected);

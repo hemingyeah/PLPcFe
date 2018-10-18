@@ -19,7 +19,7 @@
         </form-item>
         <form-item label="联系人" :field="baseField.lmNameField">
           <div class="input-and-btn">
-            <form-text :field="baseField.lmNameField" :value="form.lmName" @input="update"
+            <form-text :field="baseField.lmNameField" :value="form.lmName" @input="update" ref="lmNameInput"
                        :placeholder="baseField.lmNameField.placeholder"></form-text>
             <el-button @click="copyName">同名客户</el-button>
           </div>
@@ -219,10 +219,8 @@
         if (this.$appConfig.debug) {
           console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
         }
-
         this.$set(this.form, fieldName, newValue)
       },
-
       submit() {
         this.$refs.form.validate()
         .then(valid => {
@@ -243,32 +241,30 @@
         });
       },
       createMethod(params) {
-  
         this.$http.post('/customer/create', params)
         .then(res => {
-    
           if (res.status) return this.$platform.alert('创建客户失败');
           window.location.href = `/customer/view/${res.data.customerId}`;
-          // window.location.href = `/customer/edit/${res.data.customerId}`;
         })
         .catch(err => console.error('err', err));
-        
       },
       updateMethod(params) {
-
         this.$http.post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
-
           if (res.status) return this.$platform.alert('更新客户失败');
           window.location.href = `/customer/view/${res.data}`;
         })
         .catch(err => console.error('err', err));
-        
       },
       copyName() {
         const {name,} = this.form;
         if (!name) return;
-        this.form.lmName = name;
+
+        this.$refs.lmNameInput.input({
+          target: {
+            value: name,
+          },
+        })
       },
       autoAssign(){
         let adr = this.form.customerAddress;
@@ -321,7 +317,7 @@
         this.$http.get(`/v2/customer/getForEdit`, {id})
         .then(res => {
           if (res.status) return;
-          this.form = convertCustomerToForm(res.data);
+          this.form = convertCustomerToForm(res.data, this.fields);
           this.addressBackup = this.form.customerAddress;
         })
       },

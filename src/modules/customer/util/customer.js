@@ -67,7 +67,7 @@ function formatCustomer(originalCustomer, allTags, fields) {
   return customer;
 }
 
-function convertCustomerToForm(originalCustomer) {
+function convertCustomerToForm(originalCustomer, fields) {
   const {
     id,
     name,
@@ -88,12 +88,22 @@ function convertCustomerToForm(originalCustomer) {
     lmPhone,
     serialNumber,
   };
+  
   // attribute
-  if (attribute && Object.keys(attribute).length) {
-    Object.keys(attribute).forEach(key => {
-      form[key] = attribute[key];
-    });
+  let tv = null;
+  const attrKeys = Object.keys(attribute);
+  for (let i = 0;i < attrKeys.length;i++) {
+    if (attrKeys[i] === 'remindCount') continue;
+  
+    tv = fields.filter(f => f.fieldName === attrKeys[i])[0];
+    if (!tv) continue;
+    if (tv && tv.setting && tv.setting.isMulti) {
+      form[attrKeys[i]] = [];
+    } else {
+      form[attrKeys[i]] = attribute[attrKeys[i]];
+    }
   }
+  
   // address
   form.customerAddress = {
     adAddress: [customerAddress.adProvince, customerAddress.adCity, customerAddress.adDist,],

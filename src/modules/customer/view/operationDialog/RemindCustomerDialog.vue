@@ -169,7 +169,7 @@
             tv = this.remindTemplate[0];
             if (tv) {
               this.form.remindId = tv.id;
-              this.form.users = tv.users.map(c => c.id);
+              this.form.users = (tv.users || []).map(c => c.id);
               this.remoteSearchCM.options = tv.users;
             }
           }

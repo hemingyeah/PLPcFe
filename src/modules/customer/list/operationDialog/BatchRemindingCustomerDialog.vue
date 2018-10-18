@@ -156,7 +156,7 @@
               if (tv) {
                 this.form.remindId = tv.id;
                 this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0 : 1;
-                this.form.users = tv.users.map(c => c.id);
+                this.form.users = (tv.users || []).map(c => c.id);
                 this.remoteSearchCM.options = tv.users;
               }
             }

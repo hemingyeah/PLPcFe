@@ -103,7 +103,6 @@
 </template>
 
 <script>
-  import {convertCustomerForDisplay,} from '../util/customer';
   import CustomerInfoRecord from './components/CustomerInfoRecord.vue';
   import CustomerEventTable from './components/CustomerEventTable.vue';
   import CustomerContactTable from './components/CustomerContactTable.vue';
@@ -227,7 +226,6 @@
     mounted() {
       this.fetchCustomer(this.initData.id);
       this.fetchRemind();
-      console.log('this.initData', this.initData);
     },
     methods: {
       async deleteCustomer() {
@@ -236,7 +234,6 @@
           if (!action) return;
 
           const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-          console.log('result', result);
           if (!result.status) {
             window.location.href = '/customer';
           }

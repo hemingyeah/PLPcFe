@@ -37,11 +37,6 @@ function display(address, options = {}){
     
     instance.$on('cancel', () => {
       if(pending) return;
-  
-      console.log('instance', instance);
-      console.log('this', this);
-  
-  
       this.pending = true;
       resolve({status: 1, message: 'cancel'});
     })

@@ -28,16 +28,7 @@ export default {
       type: String,
       default: ''
     },
-    value: {
-      type: [String, Array],
-      // 多选的时候一定要设置默认的空数组
-      // 否则 el-select 内部 handleOptionSelect 对数组操作时却得到一个undefined 会报错
-      default() {
-        let setting = this.field.setting || {};
-        if (setting.isMulti) return [];
-        return ''
-      },
-    },
+    value: [String, Array],
     source: {
       type: Array,
     }

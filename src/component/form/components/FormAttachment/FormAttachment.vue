@@ -17,15 +17,6 @@ export default {
       default: () => []
     }
   },
-  watch: {
-    value: {
-      handler: function(newValue) {
-        console.log('handler value newVal', newValue);
-      },
-      deep: true
-    }
-
-  },
   methods: {
     input(newValue) {
       let oldValue = null;
