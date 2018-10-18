@@ -4,7 +4,7 @@
       "modules": false,
       "useBuiltIns": "usage",
       "targets": {
-        "browsers": ["> 5% in CN", "ie >= 10", "chrome >= 49"]
+        "browsers": ["> 1% in CN", "ie >= 11", "chrome >= 49"]
       }
     }]
   ],

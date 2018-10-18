@@ -1,7 +1,7 @@
 {
   "name": "shb-pc-fe",
   "version": "1.0.0",
-  "description": "兼容IE 10+, Edge, Firefox, Chrome, Safari",
+  "description": "兼容IE 11, Edge, Firefox, Chrome, Safari",
   "private": true,
   "repository": {
     "type": "git",
@@ -74,8 +74,8 @@
     "vue": "^2.5.17"
   },
   "browserslist": [
-    "> 5% in CN",
-    "ie >= 10",
+    "> 1% in CN",
+    "ie >= 11",
     "chrome >= 49"
   ]
 }
