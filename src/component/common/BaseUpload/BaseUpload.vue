@@ -3,10 +3,11 @@
     <input type="file" ref="input" @change="handleChange" :multiple="multiple">
 
     <div class="base-file-list" >
-      <base-file-item v-for="file in uploadedFiles" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
+      <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
     
     <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
+      <i class="iconfont icon-loading" v-if="pending"></i>
       <span>{{pending ? '正在上传' : '点击上传'}}</span>
     </button>
   </div>
@@ -19,10 +20,11 @@
 
   export default {
     name: "base-upload",
-    data: () => ({
-      pending: false,
-      uploadedFiles: []
-    }),
+    data(){
+      return {
+        pending: false
+      }
+    },
     props: {
       displayName: {
         type: String,
@@ -39,6 +41,10 @@
       forId: {
         type: String,
         default: ''
+      },
+      value: {
+        type: Array,
+        default: () => []
       }
     },
     methods: {
@@ -46,9 +52,9 @@
         const files = event.target.files;
         if(!files || !files.length) return;
 
-        if(this.uploadedFiles.length + files.length > 9) {
+        if(this.value.length + files.length > 9) {
           let message = '上传文件数量不能超过9个';
-          let max = 9 - this.uploadedFiles.length;
+          let max = 9 - this.value.length;
 
           if(max > 0 && files.length < 9){
             message += `, 您还能上传${max}个文件`;
@@ -80,10 +86,10 @@
           const failedMessage = result.filter(file => !file.id).map(file => `[${file.fileName}]上传失败`);
           if(failedMessage.length > 0) platform.alert(failedMessage.join('\n'));
 
-          this.uploadedFiles = this.uploadedFiles.concat(newFiles);
-          this.$emit('input', this.uploadedFiles);
+          let value = this.value.concat(newFiles);
+          this.$emit('input', value);
         } catch (error) {
-          console.log(error)
+          console.error(error)
         }
       
         this.pending = false;
@@ -112,15 +118,15 @@
         })
       },
       async deleteFile(file) {
-        let index = this.uploadedFiles.indexOf(file);
+        let index = this.value.indexOf(file);
         if(index >= 0) {
-          this.uploadedFiles.splice(index, 1);
-          this.$emit('input', this.uploadedFiles);
+          this.value.splice(index, 1);
+          this.$emit('input', this.value);
         }
       },
       chooseFile(){
         if(this.pending) return platform.alert('请等待文件上传完成');
-        if(this.uploadedFiles.length >= 9) return platform.alert('上传文件数量不能超过9个');
+        if(this.value.length >= 9) return platform.alert('上传文件数量不能超过9个');
 
         this.$refs.input.value = null;
         this.$refs.input.click();
@@ -135,8 +141,6 @@
         let lastDotIndex = fileName.lastIndexOf(".");
         if(lastDotIndex < 0) return `[${fileName}]的文件类型未知，系统暂不支持上传`;
 
-        //let ext = fileName.substring(lastDotIndex + 1).toLowerCase();
-        //if(FileConfig.ALLOW_TYPE.indexOf(ext) < 0) return '不支持的文件类型';
         return null;
       }
     },
@@ -148,18 +152,31 @@
 
 <style lang="scss" >
 .base-upload-container {
+  overflow: hidden;
   input[type='file']{
     display: none;
   }
 }
 
 .base-upload-btn{
-  span, i{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  
+  span{
     color: #fff;
+    margin-left: 5px;
   }
 
-  i{
-    margin-right: 4px;
+  .icon-loading{
+    color: #fff;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    line-height: 18px;
+    display: block;
+    animation: rotating 2s linear infinite;
   }
 }
 </style>

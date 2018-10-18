@@ -73,7 +73,7 @@ function gen(directory, fileName){
   
       //2.生成jsp内容
       //#{} => ${}
-      template = template.replace(/#\{(.*)\}/g, "${$1}");
+      template = template.replace(/#\{(.*?)\}/g, "${$1}");
       //注入jsp头部信息
       template = '<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>\n' + template;
       //注入构建信息

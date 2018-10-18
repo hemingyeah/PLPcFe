@@ -1,10 +1,10 @@
 <template>
-  <div class="form-item" @validate.native="validate" :class="{err: errMessage || remoteValidation.msg}">
+  <div class="form-item" :class="{err: errMessage || remoteValidation.msg}">
     <label :for="`form_${field.fieldName}`"><span class="form-item-required" v-if="isRequired">*</span>{{label}}</label>
     <div class="form-item-control">
       <slot></slot>
       <div class="err-msg-wrap">
-        <div v-if="remoteValidation.status === 1" class="form-item-error">正在验证</div>
+        <div v-if="remoteValidation.status === 1" class="form-item-error">正在验证...</div>
         <div v-else-if="remoteValidation.status === 2" class="form-item-error">{{remoteValidation.msg}}</div>
         <div v-else-if="errMessage" class="form-item-error">{{errMessage}}</div>
       </div>
@@ -116,7 +116,6 @@
     }
   }
 
-
   .form-item {
     display: flex;
     flex-flow: row nowrap;
@@ -148,7 +147,6 @@
       /* Internet Explorer 10+ */
       color: #B3B7C1;
     }
-
   }
 
   .form-item-required {
@@ -157,6 +155,7 @@
 
   .form-item-control {
     flex: 1;
+    max-width: calc(100% - 120px);
 
     .err-msg-wrap {
       min-height: 10px;
@@ -166,7 +165,7 @@
 
   .form-item-error {
     font-size: 12px;
-    line-height: 20px;
+    line-height: 22px;
   }
 </style>
 

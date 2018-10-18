@@ -2,9 +2,11 @@
   <div class="form-date">
     <el-date-picker
       :id="`form_${field.fieldName}`"
-      type="date" readonly
-      value-format="yyyy-MM-dd"
+      type="date" 
+      :editable="false"
+      clearable
       :placeholder="placeholder"
+      value-format="yyyy-MM-dd"
       :value="value" @input="choose"/>
   </div>
 </template>
@@ -54,7 +56,6 @@ export default {
 <style lang="scss">
 .form-date{
   width: 100%;
-
   .el-input__inner{
     cursor: pointer;
     

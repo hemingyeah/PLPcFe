@@ -387,7 +387,7 @@ html, body, .frame{
   cursor: pointer;
   
   i{
-    font-size: 16px;
+    font-size: 14px; 
   }
 
   &:hover{
@@ -398,7 +398,7 @@ html, body, .frame{
 .export-btn{
   height: 100%;
   line-height: 50px;
-  text-align: center;
+  text-align: center; 
 }
 
 .export-panel-popper{

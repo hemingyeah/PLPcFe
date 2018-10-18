@@ -1,6 +1,11 @@
 <template>
   <div class="form-user">
-    <input :id="`form_${field.fieldName}`" readonly @click="choose" :value="displayName">
+    <input 
+      :id="`form_${field.fieldName}`" 
+      :value="displayName"
+      readonly 
+      @click="choose" >
+    <!-- @keydown.enter.prevent="choose" -->
     <button type="button" class="btn-text form-user-clear" @click="clear" v-if="!isEmpty">
       <i class="iconfont icon-guanbi-fill"></i>
     </button>
@@ -75,7 +80,11 @@ export default {
     padding-right: 32px;
     width: 100%;
     cursor: pointer;
-    background-color: #f6f9f7;
+    //background-color: #f6f9f7;
+  }
+
+  &:hover .form-user-clear{
+    display: block;
   }
 }
 
@@ -87,8 +96,14 @@ export default {
   height: 32px;
   padding: 0;
   margin: 0;
-  color: #9a9a9a;
-
+  color: #c0c4cc;
+  
+  display: none;
+  
+  i{
+    font-size: 14px;
+  }
+  
   &:hover{
     color: #ed3f14;
   }

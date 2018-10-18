@@ -37,6 +37,7 @@ input,textarea{
   border-radius: 2px;
   margin: 0;
   outline: none;
+  color: #333 !important; 
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   
   &:focus{
@@ -52,4 +53,5 @@ textarea{
   min-height: 32px;
   max-height: 320px;
   display: block;
+  word-break: break-all;
 }

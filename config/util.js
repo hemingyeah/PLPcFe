@@ -28,7 +28,7 @@ module.exports = {
     }
     return entry;
   },
-  /** 根据各个模块的配置生成HtmlPlugin */
+  /** 根据各个模块的配置生成HtmlPlugin, 构建生产环境资源时用 */
   genHtmlPlugins(){
     return Object.keys(modules).map(modName => {
       let mod = modules[modName];
@@ -41,7 +41,11 @@ module.exports = {
         template: mod.template ? mod.template : 'src/index.html',
         inject: true,
         chunks: chunks,
-        chunksSortMode: "manual"
+        chunksSortMode: "manual",
+        minify: { //压缩html
+          collapseWhitespace: true,
+          useShortDoctype: true
+        }
       }); 
     })
   }

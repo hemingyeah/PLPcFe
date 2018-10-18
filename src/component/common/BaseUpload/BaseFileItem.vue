@@ -109,16 +109,20 @@ export default {
   flex-flow: row nowrap;
   height: 44px;
   align-items: center;
-}
+  margin-bottom: 8px;
 
-.base-file-item{
-  margin-bottom: 5px;
+  &:hover {
+    .base-file-del{
+      visibility: visible;
+    }
+  }
 }
 
 .base-file-info {
   flex: 1;
   overflow: hidden;
-  margin: 0 5px;
+  margin-left: 10px;
+  @include text-ellipsis;
 
   & > p {
     margin: 0;
@@ -130,11 +134,9 @@ export default {
   }
 
   & > a{
-    display: block;
     height: 24px;
     line-height: 24px;
     font-size: 14px;
-    @include text-ellipsis;
   }
 }
 
@@ -146,6 +148,7 @@ export default {
   background-position: center;
   border-radius: 4px;
   overflow: hidden;
+  box-shadow: 0 0 4px rgba(0,0,0,.095)
 }
 
 .base-file-icon{
@@ -188,6 +191,7 @@ export default {
   border: none;
   outline: none;
   padding: 0;
+  visibility: hidden;
 
   .iconfont{
     color: #ef9f9f;

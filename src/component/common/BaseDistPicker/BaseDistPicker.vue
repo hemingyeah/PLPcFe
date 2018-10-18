@@ -49,7 +49,15 @@
 </script>
 
 <style lang="scss">
-.base-dist-picker:hover .el-input__inner{
-  border-color: $input-border-hover-color;
+.base-dist-picker{
+  .el-cascader__label{
+    padding-left: 10px;
+  }
+
+  &:hover .el-input__inner{
+    border-color: $input-border-hover-color;
+  }
 }
+
+
 </style>

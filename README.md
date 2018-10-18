@@ -47,9 +47,15 @@
  * git规范
  * 重写table组件
  * 热更新
- * frameTab支持响应mousewheel事件‘’
+ * frameTab支持响应mousewheel事件
  * 浏览器ua工具 
  * 输入组件支持清空
+ * babel升级至7.0
+ * ie11以下版本升级提示
+ * 动态计算多行文本框高度
+ * 表单支持键盘操作
+ * modal组件弹出时阻止body滚动
+ * 无法反向验证
  
  ## 优化项
 
