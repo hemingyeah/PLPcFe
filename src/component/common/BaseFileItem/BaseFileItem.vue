@@ -93,10 +93,19 @@ export default {
     preview(event){
       let element = event.target.querySelector('img');
       if(this.icon != 'img' || !element) return;
-    
+
+      let list = event.target.closest('.base-file-list');
+      let images = Array.prototype.slice.call(list.querySelectorAll('img'));
+      let currIndex = 0;
+      let urls = images.map((item, index) => {
+        if(item == element) currIndex = index;
+        return window.location.origin + item.dataset.origin;
+      })
+
       platform.imagePreview({
-        imageDom: element,
-        imgUrl: window.location.origin + element.dataset.origin
+        imageDom: list,
+        currIndex: currIndex,
+        urls
       });
     },
     async deleteFile(){

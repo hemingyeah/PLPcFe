@@ -2,16 +2,25 @@
 import Viewer from 'viewerjs'
 import 'viewerjs/dist/viewer.css';
 
-function preview(element){
+function preview(element, currIndex, multiple){
   let viewer = null;
   var options = {
-    navbar: false,
+    navbar: multiple,
+    initialViewIndex: currIndex,
     fullscreen: false,
     toolbar: {
       zoomIn: true,
       zoomOut: true,
-      oneToOne:true,
       reset: true,
+      oneToOne:true,
+      prev: {
+        show: multiple,
+        size: "large"
+      },
+      next: {
+        show: multiple,
+        size: "large"
+      },
       rotateLeft: true,
       rotateRight: true,
       flipHorizontal: true,
