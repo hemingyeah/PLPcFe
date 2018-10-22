@@ -129,11 +129,7 @@
         customerOption: {},
         remindList: [],
         selectedRemind: {},
-        customer: {
-          address: {},
-          attribute: {},
-          createUser: {},
-        },
+        customer: {},
       }
     },
     computed: {

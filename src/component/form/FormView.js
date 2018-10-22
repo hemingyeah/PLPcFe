@@ -13,9 +13,7 @@ const FormView = {
       default: ''
     }
   },
-  data() {
-    return {};
-  },
+  // data() { return {}; },
   methods: {
     buildCommonDom({displayName, value}) {
       return <div class="form-row"><label>{displayName}</label>{value}</div>
@@ -25,11 +23,11 @@ const FormView = {
       let {adProvince, adCity, adDist, adAddress} = value;
       val = `${adProvince} ${adCity} ${adDist} ${adAddress}`;
       
-      console.log('this.ctx.$scopedSlots[formType]', this.ctx.$scopedSlots[formType]);
-      if (!this.ctx.$scopedSlots[formType]) {
+      if (!this.$scopedSlots[formType]) {
         return this.buildCommonDom({displayName, value: val,});
       }
-      return this.ctx.$scopedSlots[formType]({
+      
+      return this.$scopedSlots[formType]({
         area: `${adProvince} ${adCity} ${adDist}`,
         address: adAddress,
       })
@@ -38,7 +36,7 @@ const FormView = {
       let val = '';
       if (formType === 'attachment') {
         val = value.map(a => {
-          return <base-file-item file={a} del={false} key={a.id} />
+          return <base-file-item file={a} del={false} key={a.id}/>
         });
       } else if (formType === 'tags') {
         val = value.map(t => t.tagName).join(' ');
@@ -48,11 +46,10 @@ const FormView = {
       
       return this.buildCommonDom({displayName, value: val,});
     },
-    buildObjectDom({displayName, value, formType}) {
+    buildObjectDom({displayName, value, formType, h}) {
       let val = '';
       if (formType === 'address') {
-        this.buildAddressDom({displayName, value, formType});
-       
+        return this.buildAddressDom({displayName, value, formType, h});
       }
       
       if (formType === 'user') {
@@ -60,13 +57,14 @@ const FormView = {
       }
       return this.buildCommonDom({displayName, value: val,});
     },
-    mapFieldToDom() {
+    mapFieldToDom(h) {
       const originalObj = this.value;
       let params = {};
       let value = '';
+      
       return this.fields.map(({formType, fieldName, displayName, isSystem}) => {
         value = isSystem ? originalObj[fieldName] : originalObj.attribute[fieldName];
-        params = {displayName, value, formType};
+        params = {displayName, value, formType, h};
         
         // value is array.
         if (Array.isArray(value)) {
@@ -81,15 +79,14 @@ const FormView = {
     },
   },
   render(h) {
+    if (!this.fields.length || !Object.keys(this.value).length) return null;
     return (
       <div class="form-view">
-        {this.mapFieldToDom()}
+        {this.mapFieldToDom(h)}
       </div>
     )
   },
-  mounted() {
-  
-  }
+  // mounted() {}
 };
 
 export default FormView;
