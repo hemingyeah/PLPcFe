@@ -8,6 +8,7 @@ import BaseMapPicker from './common/BaseMapPicker';
 import BaseDistPicker from './common/BaseDistPicker';
 import BaseImport from './common/BaseImport';
 import BaseExport from './common/BaseExport';
+import BaseFileItem from './common/BaseFileItem';
 
 import Form from './form';
 import Fast from './fast'
@@ -25,6 +26,7 @@ const components = [
   Fast,
   BaseImport,
   BaseExport,
+  BaseFileItem,
 ];
 
 export default {

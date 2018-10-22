@@ -47,15 +47,6 @@
     },
     methods: {
       /** 默认返回true, 确保不影响表单提交 */
-      // async validate(){
-      //   if(typeof this.valueFn != 'function') return true;
-      //
-      //   let value = this.valueFn();
-      //   let message = await Validator.validate(value, this.field);
-      //   this.errMessage = message;
-      //
-      //   return message;
-      // },
       validate() {
         if (typeof this.valueFn != 'function') return true;
         let value = this.valueFn();

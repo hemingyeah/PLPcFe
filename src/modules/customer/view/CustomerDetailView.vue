@@ -48,7 +48,7 @@
           <span class="remind-btn" @click="openDialog('remind')">添加提醒</span>
         </h3>
         <form-view :fields="allField" :value="customer">
-
+          <h1>Test</h1>
           <template slot="address" slot-scope="{area, address}">
             <div class="app-row">
               <div class="app-row-left">区域：</div>
@@ -113,7 +113,7 @@
   import AddRemarkDialog from './operationDialog/AddRemarkDialog.vue';
   import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
-  import FormView from '@src/component/form/FormView.js';
+  import FormView from '@src/component/form/FormView';
 
   export default {
     name: "customer-detail-view",
@@ -140,19 +140,19 @@
       allField() {
         const cf = [{
           id: null,
-          formType: 'serialNumber',
+          formType: 'text',
           displayName: '客户编号',
           fieldName: 'serialNumber',
           isSystem: 1,
         }, {
           id: null,
-          formType: 'lmName',
+          formType: 'text',
           displayName: '联系人',
           fieldName: 'lmName',
           isSystem: 1,
         }, {
           id: null,
-          formType: 'lmPhone',
+          formType: 'phone',
           displayName: '电话',
           fieldName: 'lmPhone',
           isSystem: 1,
@@ -170,7 +170,7 @@
           isSystem: 1,
         }, {
           id: null,
-          formType: 'customerManagerName',
+          formType: 'text',
           displayName: '客户负责人',
           fieldName: 'customerManagerName',
           isSystem: 1,
@@ -315,9 +315,17 @@
 </script>
 
 <style lang="scss">
+
   .customer-detail-container {
     padding: 10px 15px;
     background: #f4f7f5;
+
+    .form-row {
+      display: flex;
+      label {
+        width: 100px;
+      }
+    }
 
     .top-tool-bar {
       display: flex;

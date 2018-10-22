@@ -79,9 +79,10 @@ function phone(value, field = {}) {
   return new Promise(resolve => {
     if(field.isNull) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`必填`);
-    if (!PHONE_REG.test(value)) return resolve({
+    if (!PHONE_REG.test(value) && field.remoteValidation) return resolve({
       error: '请输入正确的电话或者手机号',
     });
+    if (!PHONE_REG.test(value) && !field.remoteValidation) return resolve('请输入正确的电话或者手机号');
     if (field.remoteValidation) {
       const { action, buildParams, } = field.remoteValidation;
       let params = buildParams();
