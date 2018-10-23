@@ -92,7 +92,7 @@
             displayName: "电话",
             placeholder: '建议使用手机号,可发送短信通知',
             isNull: 0,
-            remoteValidation: {
+            remote: {
               action: '/linkman/checkUnique4Phone',
               buildParams() {
                 const params = {
@@ -100,7 +100,7 @@
                 };
                 return params;
               }
-            },
+            }
           },
           genderField: {
             formType: 'selectMulti',

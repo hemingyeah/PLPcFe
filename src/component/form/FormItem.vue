@@ -1,11 +1,10 @@
 <template>
-  <div class="form-item" :class="{err: errMessage || remoteValidation.msg}">
+  <div class="form-item" :class="{err: errMessage}">
     <label :for="`form_${field.fieldName}`"><span class="form-item-required" v-if="isRequired">*</span>{{label}}</label>
     <div class="form-item-control">
       <slot></slot>
       <div class="err-msg-wrap">
-        <div v-if="remoteValidation.status === 1" class="form-item-error">正在验证...</div>
-        <div v-else-if="remoteValidation.status === 2" class="form-item-error">{{remoteValidation.msg}}</div>
+        <div v-if="remoting" class="form-item-error">正在验证...</div>
         <div v-else-if="errMessage" class="form-item-error">{{errMessage}}</div>
       </div>
     </div>
@@ -27,12 +26,8 @@
     data() {
       return {
         errMessage: '',
-        valueFn: null, //function 用于获取注册字段的值和
-        remoteValidation: {
-          need: false,
-          status: 0,
-          msg: '',
-        }
+        valueFn: null, //function 用于获取注册字段的值
+        remoting: false
       }
     },
     computed: {
@@ -42,30 +37,19 @@
       },
       /** 字段是否需要远程验证 **/
       needRemoteValidation() {
-        return !!this.field.remoteValidation;
-      },
+        return !!this.field.remote;
+      }
     },
     methods: {
       /** 默认返回true, 确保不影响表单提交 */
       validate() {
         if (typeof this.valueFn != 'function') return true;
         let value = this.valueFn();
-        if (this.needRemoteValidation && value) {
-          this.remoteValidation.status = 1;
-          this.remoteValidation.msg = '';
-          this.errMessage = '';
-        }
-        return Validator.validate(value, this.field)
+      
+        this.errMessage = '';
+        return Validator.validate(value, this.field, {changeRemoteStatus: this.changeRemoteStatus})
           .then(res => {
-            if (this.needRemoteValidation && value) {
-              this.remoteValidation.status = 2;
-              this.remoteValidation.msg = res.error ? res.error : '';
-              return;
-            }
-
             this.errMessage = res;
-            this.remoteValidation.msg = '';
-            this.remoteValidation.status = 0;
             return res;
           })
           .catch(err => console.error('validate err', err));
@@ -81,6 +65,9 @@
       },
       removeFieldHandler(event) {
         this.valueFn = null;
+      },
+      changeRemoteStatus(value){
+        this.remoting = value;
       }
     },
     mounted() {

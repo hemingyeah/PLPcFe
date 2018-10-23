@@ -76,7 +76,7 @@
             displayName: "客户编号",
             placeholder: '[最多50字]',
             isNull: 0,
-            remoteValidation: {
+            remote: {
               action: '/customer/unique',
               buildParams() {
                 const params = {
@@ -84,7 +84,8 @@
                   fieldName: 'serialNumber',
                 };
                 return params;
-              }
+              },
+              method: 'post'
             },
           },
           nameField: {
@@ -93,7 +94,7 @@
             displayName: "客户",
             placeholder: '[最多50字]',
             isNull: 0,
-            remoteValidation: {
+            remote: {
               action: '/customer/unique',
               buildParams() {
                 const params = {
@@ -117,7 +118,7 @@
             displayName: "电话",
             placeholder: '建议使用手机号,可发送短信通知',
             isNull: 0,
-            remoteValidation: {
+            remote: {
               action: '/linkman/checkUnique4Phone',
               buildParams() {
                 const params = {
@@ -172,11 +173,11 @@
       };
 
       if (this.initData.isCustomerNameDuplicate) {
-        delete data.baseField.nameField.remoteValidation;
+        delete data.baseField.nameField.remote;
       }
 
       if (!this.initData.isPhoneUnique) {
-        delete data.baseField.lmPhoneField.remoteValidation;
+        delete data.baseField.lmPhoneField.remote;
       }
 
       return data;

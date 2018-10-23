@@ -13,7 +13,6 @@ export const DATETIME_REG = /^\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}$/;
 //邮箱格式
 export const EMAIL_REG = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
 
-
 const RuleMap = {
   text,
   select,
@@ -40,17 +39,8 @@ const RuleMap = {
     if(field.isNull) return resolve(null);
     //不允许为空
     if(!value || !value.toString().length) return resolve(`必填`);
-    if (field.remoteValidation) return resolve(remoteValidation(value, field));
     resolve(null);
   })
-}
-
-/** 远程验证 */
-function remoteValidation(value, field = {}) {
-  const { action, buildParams, } = field.remoteValidation;
-  let params = buildParams();
-  params.value = value;
-  return http.post(action, params, false);
 }
 
 /** 单选必选验证 */
@@ -79,17 +69,7 @@ function phone(value, field = {}) {
   return new Promise(resolve => {
     if(field.isNull) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`必填`);
-    if (!PHONE_REG.test(value) && field.remoteValidation) return resolve({
-      error: '请输入正确的电话或者手机号',
-    });
-    if (!PHONE_REG.test(value) && !field.remoteValidation) return resolve('请输入正确的电话或者手机号');
-    if (field.remoteValidation) {
-      const { action, buildParams, } = field.remoteValidation;
-      let params = buildParams();
-      params.phone = value;
-  
-      return resolve(http.post(action, params, false));
-    }
+    if(!PHONE_REG.test(value)) return resolve('请输入正确的电话或者手机号');
     resolve(null);
   });
 }
@@ -101,7 +81,6 @@ function email(value, field = {}) {
     if (!EMAIL_REG.test(value)) return resolve('请输入正确的邮箱');
     resolve(null);
   });
-  
 }
 
 function date(value, field = {}) {
@@ -160,12 +139,22 @@ function address(value, field = {}) {
   });
 }
 
-function validateRequired(value, field = {}) {
-  return new Promise(resolve => {
-    if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve('必填');
-    resolve(null);
-  });
+/** 远程验证 */
+function remoteValidation(value, field = {}) {
+  const { 
+    action, 
+    buildParams, 
+    method = 'get', 
+    emulateJSON = false
+  } = field.remote;
+  let params = buildParams();
+  params.value = value;
+
+  let fn = http[method];
+  let args = [action, params];
+  if(method == 'post') args.push(emulateJSON);
+
+  return fn.apply(http, args);
 }
 
 /**
@@ -174,9 +163,21 @@ function validateRequired(value, field = {}) {
  * @param {*} formType 字段类型 
  * @param {*} options 可选项
  */
-function validate(value, field){
+async function validate(value, field, options){
   let fn = RuleMap[field.formType];
-  return typeof fn == 'function' ? fn(value, field) : Promise.resolve(null);
+  let message = null;
+  if(typeof fn == 'function') message = await fn(value, field);
+  //如果有远程验证
+  if(message == null && field.remote) {
+    let changeRemoteStatus = options.changeRemoteStatus;
+    changeRemoteStatus(true);
+
+    let result = await remoteValidation(value, field);
+    message = result.error ? result.error : '';
+
+    changeRemoteStatus(false);
+  }
+  return message;
 }
 
 const Validator = {validate};
