@@ -1,4 +1,5 @@
 const FormView = {
+  name: 'form-view',
   props: {
     fields: {
       type: Array,
@@ -8,81 +9,76 @@ const FormView = {
       type: Object,
       default: () => ({})
     },
-    mode: {
-      type: String,
-      default: ''
-    }
   },
-  // data() { return {}; },
   methods: {
     buildCommonDom({displayName, value}) {
-      return <div class="form-row"><label>{displayName}</label>{value}</div>
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+          <div>{value}</div>
+        </div>
+      )
     },
-    buildAddressDom({displayName, value, formType}) {
-      let val = '';
-      let {adProvince, adCity, adDist, adAddress} = value;
-      val = `${adProvince} ${adCity} ${adDist} ${adAddress}`;
-      
-      if (!this.$scopedSlots[formType]) {
-        return this.buildCommonDom({displayName, value: val,});
-      }
-      
-      return this.$scopedSlots[formType]({
-        area: `${adProvince} ${adCity} ${adDist}`,
-        address: adAddress,
-      })
-    },
-    buildArrayDom({displayName, value, formType}) {
-      let val = '';
-      if (formType === 'attachment') {
-        val = value.map(a => {
-          return <base-file-item file={a} del={false} key={a.id}/>
-        });
-      } else if (formType === 'tags') {
-        val = value.map(t => t.tagName).join(' ');
-      } else {
-        val = value.join(' ');
-      }
-      
-      return this.buildCommonDom({displayName, value: val,});
-    },
-    buildObjectDom({displayName, value, formType, h}) {
-      let val = '';
-      if (formType === 'address') {
-        return this.buildAddressDom({displayName, value, formType, h});
-      }
-      
-      if (formType === 'user') {
-        val = value.displayName;
-      }
-      return this.buildCommonDom({displayName, value: val,});
-    },
-    mapFieldToDom(h) {
+    mapFieldToDom() {
       const originalObj = this.value;
       let params = {};
       let value = '';
       
-      return this.fields.map(({formType, fieldName, displayName, isSystem}) => {
-        value = isSystem ? originalObj[fieldName] : originalObj.attribute[fieldName];
-        params = {displayName, value, formType, h};
+      return this.fields.map(({formType, fieldName, displayName, isSystem,}) => {
         
-        // value is array.
-        if (Array.isArray(value)) {
-          return this.buildArrayDom(params);
+        value = isSystem ? originalObj[fieldName] : originalObj.attribute[fieldName];
+        params = {displayName, value, formType};
+        
+        // return slot
+        if (this.$scopedSlots[formType]) {
+          return this.$scopedSlots[formType](params);
         }
-        // value is object.
-        if (typeof value === 'object') {
-          return this.buildObjectDom(params);
+        
+        if (formType === 'attachment') {
+          params = {
+            ...params,
+            value: value.map(a => <base-file-item file={a} del={false} key={a.id}/>),
+          };
         }
+        
+        if (formType === 'selectMulti') {
+          params = {
+            ...params,
+            value: value.join(' '),
+          };
+        }
+  
+        if (formType === 'tags') {
+          params = {
+            ...params,
+            value: value.map(t => t.tagName).join(' '),
+          };
+        }
+  
+        if (formType === 'user') {
+          params = {
+            ...params,
+            value: value.displayName,
+          };
+        }
+  
+        if (formType === 'address') {
+          let {adProvince, adCity, adDist, adAddress} = value;
+          params = {
+            ...params,
+            value: `${adProvince} ${adCity} ${adDist} ${adAddress}`,
+          };
+        }
+        // other types: text textarea date number datetime phone
         return this.buildCommonDom(params);
       });
     },
   },
-  render(h) {
+  render() {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     return (
       <div class="form-view">
-        {this.mapFieldToDom(h)}
+        {this.mapFieldToDom()}
       </div>
     )
   },

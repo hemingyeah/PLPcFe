@@ -42,26 +42,23 @@
     </div>
     <div class="main-content">
       <div class="customer-detail">
-
         <h3>
           {{customer.name}}
           <span class="remind-btn" @click="openDialog('remind')">添加提醒</span>
         </h3>
         <form-view :fields="allField" :value="customer">
-          <h1>Test</h1>
-          <template slot="address" slot-scope="{area, address}">
-            <div class="app-row">
+          <template slot="address" slot-scope="{value}">
+            <div class="app-row" v-if="value">
               <div class="app-row-left">区域：</div>
               <div class="app-row-right">
-                {{area}}
+                {{`${value.adProvince} ${value.adCity} ${value.adDist}`}}
               </div>
             </div>
-            <div class="app-row">
+            <div class="app-row" v-if="value">
               <div class="app-row-left">详细地址：</div>
               <div class="app-row-right">
-                {{address}}
-                <i v-if="customer.address && customer.address.adLatitude && customer.address.adLongitude"
-                   @click="openMap" class="iconfont icon-guide"></i>
+                {{value.adAddress}}
+                <i v-if="value.adLatitude && value.adLongitude" @click="openMap" class="iconfont icon-guide"></i>
               </div>
             </div>
           </template>
@@ -84,12 +81,18 @@
       </div>
     </div>
 
+
+
     <ul>
       <li v-for="r in remindList" :key="r.id">
-        <p style="display: flex;justify-content: space-between">提醒名称：{{r.remind.name}} <a @click="editRemind(r)"
-                                                                                          href="javascript:;">编辑</a></p>
-        <p style="display: flex;justify-content: space-between">预计发生时间：{{r.remindTime || '无'}} <a
-          @click="deleteRemind(r.id, r.remind.name)" href="javascript:;">删除</a></p>
+        <p style="display: flex;justify-content: space-between">
+          提醒名称：{{r.remind.name}}
+          <a @click="editRemind(r)" href="javascript:;">编辑</a>
+        </p>
+        <p style="display: flex;justify-content: space-between">
+          预计发生时间：{{r.remindTime || '无'}}
+          <a @click="deleteRemind(r.id, r.remind.name)" href="javascript:;">删除</a>
+        </p>
       </li>
     </ul>
 
@@ -315,13 +318,6 @@
   .customer-detail-container {
     padding: 10px 15px;
     background: #f4f7f5;
-
-    .form-row {
-      display: flex;
-      label {
-        width: 100px;
-      }
-    }
 
     .top-tool-bar {
       display: flex;
