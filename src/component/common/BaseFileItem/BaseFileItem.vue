@@ -1,10 +1,10 @@
 <template>
   <div class="base-file-item">
     <div :class="clazz" :style="styl" @click.prevent.stop="preview">
-      <img :data-origin="file.url">
+      <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
     </div>  
     <div class="base-file-info">
-      <a :href="file.url" @click.prevent.stop="download">{{file.fileName || file.filename}}</a>
+      <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
       <p>{{file.fileSize}}</p>
     </div>
     <button type="button" class="base-file-del" @click="deleteFile" v-if="del">
@@ -14,6 +14,7 @@
 </template>
 
 <script>
+//TODO: 识别更多类型的文件
 import platform from '@src/platform/index';
 
 export default {
@@ -31,7 +32,7 @@ export default {
   computed:{
     icon(){
       let file = this.file;
-      const name = file.fileName || file.filename;
+      const name = file.filename;
 
       if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(name)) {
         return "img";
@@ -82,6 +83,10 @@ export default {
       }
 
       return styl;
+    },
+    //是否为图片
+    isImage(){
+      return this.icon == 'img';
     }
   },
   methods: {
@@ -95,7 +100,8 @@ export default {
       if(this.icon != 'img' || !element) return;
 
       let list = event.target.closest('.base-file-list');
-      let images = Array.prototype.slice.call(list.querySelectorAll('img'));
+      let images = Array.prototype.slice.call(list.querySelectorAll("img"));
+
       let currIndex = 0;
       let urls = images.map((item, index) => {
         if(item == element) currIndex = index;
@@ -109,7 +115,7 @@ export default {
       });
     },
     async deleteFile(){
-      const name = this.file.fileName || this.file.filename;
+      const name = this.file.filename;
       if(await platform.confirm('确定要删除该附件？\n' + name)){
         this.$emit('delete', this.file);
       }
@@ -163,7 +169,11 @@ export default {
   background-position: center;
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 0 4px rgba(0,0,0,.095)
+  box-shadow: 0 0 4px rgba(0,0,0,.095);
+
+  img{
+    display: none;
+  }
 }
 
 .base-file-icon{

@@ -100,7 +100,7 @@
             let file = result.data;
             return {
               id: file.id,
-              fileName: file.fileName,
+              filename: file.fileName,
               url: `/files/get?fileId=${file.id}`,
               fileSize: file.fileSizeStr,
             };
