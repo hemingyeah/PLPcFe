@@ -3,33 +3,7 @@ import {getRootWindow} from '../util/dom';
 import dingtalk from '@src/util/dingtalk';
 import BaseGallery from '@src/component/common/BaseGallery';
 
-/**
- * 抹平钉钉和浏览器alert之间的差异
- * 
- * @param {*} message    提示信息
- * @param {*} title      标题
- * @param {*} buttonName 按钮名称
- */
-function alert(message = '', title = '提示', buttonName = '确定'){
-  if(!dingtalk.inDingTalk) {
-    window.alert(message);
-    return Promise.resolve(true);
-  }
-
-  return dingtalk.device.alert(message, title, buttonName)
-}
-
-/**
- * 抹平钉钉和浏览器confirm的差异
- * 
- * @param {*} message   提示信息
- * @param {*} title     标题
- */
-function confirm(message = '', title = '提示'){
-  if(!dingtalk.inDingTalk) return Promise.resolve(window.confirm(message));
-
-  return dingtalk.device.confirm(message, title)
-}
+export {alert, confirm} from './notification'
 
 // /**
 //  * @see http://element.eleme.io/#/zh-CN/component/message
@@ -51,14 +25,14 @@ function confirm(message = '', title = '提示'){
 
 
 /** 在新的窗口打开链接，链接必须是全路径 */
-function openLink(url){
+export function openLink(url){
   if(!dingtalk.inDingTalk) return window.open(url)
 
   return dingtalk.biz.openLink(url);
 }
 
 /** 打开一个的tab，如果已经存在则跳转至对应的tab */
-function openTab(data){
+export function openTab(data){
   let win = getRootWindow(window);
   let origin = window.location.origin;
   
@@ -76,7 +50,7 @@ function openTab(data){
  * @param {*} imageDom - img dom
  * @param {*} imgUrl - 图片链接
  */
-function imagePreview({ imageDom, urls, currIndex = 0}) {
+export function imagePreview({ imageDom, urls, currIndex = 0}) {
   if(!dingtalk.inDingTalk) return BaseGallery.preview(imageDom, currIndex, urls.length > 1);
   
   return dingtalk.biz.previewImage(urls, urls[currIndex])

@@ -64,7 +64,7 @@
 import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
-import Platform from '@src/platform';
+import {alert} from '@src/platform/notification';
 
 import ContactUserItem from './ContactUserItem.vue';
 import DefaultHead from '@src/assets/img/avatar.png';
@@ -236,7 +236,7 @@ export default {
     },
     /** 添加人员 */
     addUser(user){
-      if(!this.allowAddUser) return Platform.alert(`最多选择${this.max}人`);
+      if(!this.allowAddUser) return alert(`最多选择${this.max}人`);
     
       user.selected = true;
 
@@ -521,6 +521,7 @@ export default {
     margin: 0;
     padding: 0 3px;
     line-height: 24px;
+    font-size: 14px;
   }
 }
 
