@@ -92,15 +92,15 @@ function convertCustomerToForm(originalCustomer, fields) {
   // attribute
   let tv = null;
   const attrKeys = Object.keys(attribute);
-  for (let i = 0;i < attrKeys.length;i++) {
+  for (let i = 0; i < attrKeys.length; i++) {
     if (attrKeys[i] === 'remindCount') continue;
-  
+    
     tv = fields.filter(f => f.fieldName === attrKeys[i])[0];
     if (!tv) continue;
     if (tv && tv.setting && tv.setting.isMulti) {
-      form[attrKeys[i]] = [];
+      form[attrKeys[i]] = attribute[attrKeys[i]] || [];
     } else {
-      form[attrKeys[i]] = attribute[attrKeys[i]];
+      form[attrKeys[i]] = attribute[attrKeys[i]] || '';
     }
   }
   

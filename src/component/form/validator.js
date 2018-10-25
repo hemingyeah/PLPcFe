@@ -173,7 +173,7 @@ async function validate(value, field, options){
     changeRemoteStatus(true);
 
     let result = await remoteValidation(value, field);
-    message = result.error ? result.error : '';
+    message = result.error ? result.error : null;
 
     changeRemoteStatus(false);
   }

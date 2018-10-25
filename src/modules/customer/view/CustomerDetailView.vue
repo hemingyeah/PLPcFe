@@ -1,20 +1,13 @@
 <template>
   <div class="customer-detail-container">
     <div class="top-tool-bar">
-      <div>
-        <el-button type="primary" icon="el-icon-search">返回</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="jump" v-if="allowEditCustomer">编辑</el-button>
-        <el-button type="danger" icon="el-icon-search" @click="deleteCustomer" v-if="allowDeleteCustomer">删除</el-button>
-      </div>
+      <el-button icon="el-icon-search">返回</el-button>
 
-      <div>
-        <el-button type="primary" icon="el-icon-search" @click="openDialog('contact')">添加联系人</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="openDialog('address')">添加地址</el-button>
-        <el-button type="primary" icon="el-icon-search">添加产品</el-button>
-        <el-dropdown>
-          <el-button type="primary">
+      <div class="action-btn">
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link el-dropdown-btn">
             新建事件<i class="el-icon-arrow-down el-icon--right"></i>
-          </el-button>
+          </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>黄金糕</el-dropdown-item>
             <el-dropdown-item>狮子头</el-dropdown-item>
@@ -23,10 +16,10 @@
             <el-dropdown-item>蚵仔煎</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-dropdown>
-          <el-button type="primary">
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link el-dropdown-btn">
             新建工单<i class="el-icon-arrow-down el-icon--right"></i>
-          </el-button>
+          </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>黄金糕</el-dropdown-item>
             <el-dropdown-item>狮子头</el-dropdown-item>
@@ -35,8 +28,23 @@
             <el-dropdown-item>蚵仔煎</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-button type="primary" icon="el-icon-search" @click="openDialog('remark')" v-if="allowEditCustomer">添加备注
-        </el-button>
+        <span @click="openDialog('contact')" class="el-dropdown-btn add-contact">添加联系人</span>
+        <span @click="openDialog('address')" class="el-dropdown-btn">添加地址</span>
+        <span class="el-dropdown-btn add-production">添加产品</span>
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link el-dropdown-btn">
+            更多<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-if="allowEditCustomer">
+              <div @click="openDialog('remark')">添加备注</div>
+            </el-dropdown-item>
+            <el-dropdown-item @click="jump" v-if="allowEditCustomer">编辑</el-dropdown-item>
+            <el-dropdown-item v-if="allowDeleteCustomer">
+              <div @click="deleteCustomer">删除</div>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
 
     </div>
@@ -65,24 +73,15 @@
         </form-view>
       </div>
       <div class="customer-data">
-        <div>
-          关联数据
-          <el-radio-group v-model="tab">
-            <el-radio label="customer-info-record">信息动态</el-radio>
-            <el-radio label="customer-event-table">事件</el-radio>
-            <el-radio label="customer-address-table">客户地址</el-radio>
-            <el-radio label="customer-contact-table">客户联系人</el-radio>
-          </el-radio-group>
-        </div>
-
-        <keep-alive v-if="customer.id">
-          <component :is="tab" :customer-id="customer.id"></component>
-        </keep-alive>
+        关联数据
+        <base-tab-pane :tabs="tabs">
+          <div class="record-tab-label" slot="record-tab">
+            信息动态
+            <div class="point"></div>
+          </div>
+        </base-tab-pane>
       </div>
     </div>
-
-
-
     <ul>
       <li v-for="r in remindList" :key="r.id">
         <p style="display: flex;justify-content: space-between">
@@ -115,6 +114,7 @@
   import AddContactDialog from './operationDialog/AddContactDialog.vue';
   import AddRemarkDialog from './operationDialog/AddRemarkDialog.vue';
   import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
+  import BaseTabPane from '../../../component/common/BaseTabPane'
 
   import FormView from '@src/component/form/FormView';
 
@@ -128,6 +128,36 @@
     },
     data() {
       return {
+        tabs: [{
+          displayName: '信息动态',
+          component: CustomerInfoRecord,
+          componentName: 'customer-info-record',
+          props: {
+            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          },
+          slotName: 'record-tab',
+        }, {
+          displayName: '事件',
+          component: CustomerEventTable,
+          componentName: 'customer-event-table',
+          props: {
+            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          }
+        }, {
+          displayName: '客户地址',
+          component: CustomerAddressTable,
+          componentName: 'customer-address-table',
+          props: {
+            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          }
+        }, {
+          displayName: '客户联系人',
+          component: CustomerContactTable,
+          componentName: 'customer-contact-table',
+          props: {
+            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          }
+        }],
         tab: 'customer-info-record',
         customerOption: {},
         remindList: [],
@@ -308,6 +338,7 @@
       AddContactDialog,
       AddRemarkDialog,
       FormView,
+      BaseTabPane,
       [RemindCustomerDialog.name]: RemindCustomerDialog,
     }
   }
@@ -325,10 +356,36 @@
       background: #fff;
       padding: 10px;
       margin-bottom: 10px;
+      font-size: 14px;
+      color: #666;
 
       .el-button {
         margin-left: 0;
+        height: 32px;
+        align-self: center;
       }
+    }
+
+    .action-btn {
+      .el-dropdown {
+        line-height: 39px;
+      }
+      .el-dropdown-btn {
+        padding: 0 10px;
+        line-height: 16px;
+        &:hover {
+          cursor: pointer;
+          color: #00ac97;
+        }
+      }
+
+      .add-contact {
+        border-left: 1px solid #ccc;
+      }
+      .add-production {
+        border-right: 1px solid #ccc;
+      }
+
     }
 
     .app-row {
@@ -391,6 +448,20 @@
     padding: 0 10px 10px;
     min-width: 500px;
     margin-left: 15px;
+
+    .record-tab-label {
+      position: relative;
+
+      .point {
+        width: 8px;
+        height: 8px;
+        background: #FF6C60;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+    }
 
   }
 
