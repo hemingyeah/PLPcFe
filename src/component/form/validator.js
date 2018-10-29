@@ -147,9 +147,7 @@ function remoteValidation(value, field = {}) {
     method = 'get', 
     emulateJSON = false
   } = field.remote;
-  let params = buildParams();
-  params.value = value;
-
+  let params = buildParams(value);
   let fn = http[method];
   let args = [action, params];
   if(method == 'post') args.push(emulateJSON);

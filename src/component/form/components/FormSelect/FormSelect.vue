@@ -30,7 +30,7 @@ export default {
     },
     value: [String, Array],
     source: {
-      type: Array,
+      type: Array
     }
   },
   computed: {

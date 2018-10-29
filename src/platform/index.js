@@ -3,7 +3,7 @@ import {getRootWindow} from '../util/dom';
 import dingtalk from '@src/util/dingtalk';
 import BaseGallery from '@src/component/common/BaseGallery';
 
-export {alert, confirm} from './notification'
+import {alert, confirm} from './notification';
 
 // /**
 //  * @see http://element.eleme.io/#/zh-CN/component/message
@@ -25,14 +25,14 @@ export {alert, confirm} from './notification'
 
 
 /** 在新的窗口打开链接，链接必须是全路径 */
-export function openLink(url){
+function openLink(url){
   if(!dingtalk.inDingTalk) return window.open(url)
 
   return dingtalk.biz.openLink(url);
 }
 
 /** 打开一个的tab，如果已经存在则跳转至对应的tab */
-export function openTab(data){
+function openTab(data){
   let win = getRootWindow(window);
   let origin = window.location.origin;
   
@@ -50,18 +50,18 @@ export function openTab(data){
  * @param {*} imageDom - img dom
  * @param {*} imgUrl - 图片链接
  */
-export function imagePreview({ imageDom, urls, currIndex = 0}) {
+function imagePreview({ imageDom, urls, currIndex = 0}) {
   if(!dingtalk.inDingTalk) return BaseGallery.preview(imageDom, currIndex, urls.length > 1);
   
   return dingtalk.biz.previewImage(urls, urls[currIndex])
 }
 
-const platform = {
+export const platform = {
   alert,
   confirm,
   openTab,
   openLink,
   imagePreview
-}
+};
 
 export default platform;

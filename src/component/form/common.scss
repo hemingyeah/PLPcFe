@@ -279,16 +279,27 @@
 }
 
 // ------------ form-view ------------
-.form-view {
+.form-view-row {
+  display: flex;
+  justify-content: flex-start;
 
-  .form-view-row {
-    display: flex;
-    justify-content: flex-start;
-
-    label {
-      width: 100px;
-      flex-shrink: 0;
-      // 
-    }
+  label {
+    padding: 3px 0;
+    line-height: 24px;
+    width: 96px;
+    flex-shrink: 0;
+    margin: 0;
+    font-weight: 500;
   }
+
+  .form-view-row-content{
+    padding: 3px 0;
+    line-height: 24px;
+    flex: 1;
+    overflow-x: hidden;
+  }
+}
+
+.form-view-textarea-preview{
+  white-space: pre-line;
 }

@@ -2,7 +2,7 @@
   <div class="base-upload-container">
     <input type="file" ref="input" @change="handleChange" :multiple="multiple">
 
-    <div class="base-file-list" >
+    <div class="base-file-list base-file__preview" >
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
     

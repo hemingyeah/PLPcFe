@@ -5,11 +5,11 @@
     </div>  
     <div class="base-file-info">
       <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
-      <p>{{file.fileSize}}</p>
+      <p> 
+        <span>{{file.fileSize}}</span> 
+        <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">删除</button>
+      </p>
     </div>
-    <button type="button" class="base-file-del" @click="deleteFile" v-if="del">
-      <i class="iconfont icon-guanbi-fill"></i>
-    </button>
   </div>
 </template>
 
@@ -24,10 +24,11 @@ export default {
       type: Object,
       default: () => ({})
     },
-    del: {
+    /** 是否只读，如果为true，不允许删除操作 */
+    readonly: {
       type: Boolean,
-      default: true,
-    },
+      default: false
+    }
   },
   computed:{
     icon(){
@@ -99,7 +100,7 @@ export default {
       let element = event.target.querySelector('img');
       if(this.icon != 'img' || !element) return;
 
-      let list = event.target.closest('.base-file-list');
+      let list = event.target.closest('.base-file__preview');
       let images = Array.prototype.slice.call(list.querySelectorAll("img"));
 
       let currIndex = 0;
@@ -130,7 +131,7 @@ export default {
   flex-flow: row nowrap;
   height: 44px;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 
   &:hover {
     .base-file-del{
@@ -148,22 +149,21 @@ export default {
   & > p {
     margin: 0;
     padding: 0;
-    height: 20px;
-    line-height: 20px;
-    color: #9a9a9a;
+    line-height: 18px;
+    color: $text-color-second;
     font-size: 12px;
   }
 
   & > a{
-    height: 24px;
-    line-height: 24px;
+    color: $color-primary;
+    line-height: 20px;
     font-size: 14px;
   }
 }
 
 .base-file-preview{
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -178,49 +178,45 @@ export default {
 
 .base-file-icon{
   background-image: url("../../../assets/img/file-icon.png");
-  background-size: 44px;
+  background-size: 38px;
 }
 
 .ppt-file-icon {
   background-position: left 0 top 0;
 }
 .voice-file-icon {
-  background-position: left 0 top -44px;
+  background-position: left 0 top -38px;
 }
 .other-file-icon {
-  background-position: left 0 top -88px;
+  background-position: left 0 top -76px;
 }
 .video-file-icon {
-  background-position: left 0 top -132px;
+  background-position: left 0 top -114px;
 }
 .zip-file-icon {
-  background-position: left 0 top -176px;
+  background-position: left 0 top -152px;
 }
 .pdf-file-icon {
-  background-position: left 0 top -220px;
+  background-position: left 0 top -190px;
 }
 .xls-file-icon {
-  background-position: left 0 top -264px;
+  background-position: left 0 top -228px;
 }
 .doc-file-icon {
-  background-position: left 0 bottom -44px;
+  background-position: left 0 bottom -38px;
 }
 .txt-file-icon {
   background-position: left 0 bottom 0px;
 }
 
 .base-file-del{
-  width: 34px;
-  text-align: center;
-  background-color: transparent;
-  border: none;
-  outline: none;
+  margin-left: 5px;
   padding: 0;
   visibility: hidden;
+  color: #9a9a9a;
 
-  .iconfont{
-    color: #ef9f9f;
-    font-size: 18px;
+  &:hover{
+    color: #ed3f14;
   }
 }
 </style>

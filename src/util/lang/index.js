@@ -19,3 +19,8 @@ export function formatDate(date, tmp){
 export function parseDate(str, tmp){
   return DateUtil.parse(str, tmp);
 }
+
+/** 将一个值转换成数组，如果原值不是数组则返回[] */
+export function toArray(value){
+  return Array.isArray(value) ? value : [];
+}

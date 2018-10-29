@@ -1,3 +1,6 @@
+import {toArray} from '@src/util/lang';
+import {fmt_address} from '@src/filter'
+
 const FormView = {
   name: 'form-view',
   props: {
@@ -11,11 +14,17 @@ const FormView = {
     },
   },
   methods: {
-    buildCommonDom({displayName, value}) {
+    buildCommonDom({displayName, value, formType}) {
+      let clazz = {
+        'form-view-row-content': true,
+        'form-view-textarea-preview': formType == 'textarea',
+        'base-file__preview': formType == 'attachment',
+      }
+
       return (
         <div class="form-view-row">
           <label>{displayName}</label>
-          <div>{value}</div>
+          <div class={clazz}>{value}</div>
         </div>
       )
     },
@@ -37,36 +46,35 @@ const FormView = {
         if (formType === 'attachment') {
           params = {
             ...params,
-            value: value.map(a => <base-file-item file={a} del={false} key={a.id}/>),
+            value: toArray(value).map(a => <base-file-item file={a} readonly key={a.id}/>),
           };
         }
         
         if (formType === 'selectMulti') {
           params = {
             ...params,
-            value: value.join(' '),
+            value: toArray(value).join(' '),
           };
         }
   
         if (formType === 'tags') {
           params = {
             ...params,
-            value: value.map(t => t.tagName).join(' '),
+            value: toArray(value).map(t => t.tagName).join(' '),
           };
         }
   
         if (formType === 'user') {
           params = {
             ...params,
-            value: value.displayName,
+            value: value && value.displayName,
           };
         }
   
         if (formType === 'address') {
-          let {adProvince, adCity, adDist, adAddress} = value;
           params = {
             ...params,
-            value: `${adProvince} ${adCity} ${adDist} ${adAddress}`,
+            value: fmt_address(value),
           };
         }
         // other types: text textarea date number datetime phone

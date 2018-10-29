@@ -80,8 +80,8 @@ export function isDatetime(field){
  * @param {*} origin 原始值
  * @param {*} target 待合并的值
  */
-export function initialize(fields = [], origin = {}){
-  let result = {};
+export function initialize(fields = [], origin = {}, callback){
+  let result = typeof callback == 'function' ? callback(fields, origin) : {};
 
   fields.forEach(field => {
     let formType = field.formType;

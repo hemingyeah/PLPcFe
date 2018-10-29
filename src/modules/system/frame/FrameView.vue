@@ -329,6 +329,7 @@ export default {
 
 <style lang="scss">
 html, body, .frame{
+  background-color: #fff;
   height: 100%;
   overflow: hidden;
 }
