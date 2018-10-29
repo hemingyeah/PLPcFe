@@ -51,7 +51,8 @@
 
 <script>
   import * as FormUtil from '@src/component/form/util';
-  import { formatCustomer, convertCustomerToForm, } from '../util/customer';
+  import {toArray} from '@src/util/lang';
+  import { formatCustomer } from '../util/customer';
   import FormAddress from './FormAddress.vue';
 
   export default {
@@ -86,7 +87,7 @@
                 return params;
               },
               method: 'post'
-            },
+            }
           },
           nameField: {
             formType: 'text',
@@ -103,7 +104,7 @@
                 };
                 return params;
               }
-            },
+            }
           },
           lmNameField: {
             formType: 'text',
@@ -120,24 +121,24 @@
             isNull: 0,
             remote: {
               action: '/linkman/checkUnique4Phone',
-              buildParams() {
+              buildParams(value) {
                 const params = {
                   customerId: customerId,
-                  phone: '',
+                  phone: value,
                 };
                 return params;
               }
-            },
+            }
           },
           addressField: {
             formType: 'address',
             fieldName: 'customerAddress',
             displayName: "地址",
             placeholder: '请输入详细地址[最多50字]',
-            isNull: 0,
+            isNull: 0
           },
           tagField: {
-            formType: 'selectMulti',
+            formType: 'select',
             fieldName: 'tags',
             displayName: "服务团队",
             placeholder: '请先选择团队',
@@ -148,12 +149,12 @@
             }
           },
           customerManagerField: {
-            formType: 'select',
+            formType: 'user',
             fieldName: 'customerManager',
             displayName: "客户负责人",
             placeholder: '请选择',
-            isNull: 1,
-          },
+            isNull: 1
+          }
         },
         form: {
           serialNumber: null,
@@ -315,27 +316,54 @@
         this.addressBackup = this.form.customerAddress;
       },
       fetchCustomer(id) {
-        this.$http.get(`/v2/customer/getForEdit`, {id})
-        .then(res => {
-          if (res.status) return;
-          this.form = convertCustomerToForm(res.data, this.fields);
-          this.addressBackup = this.form.customerAddress;
-        })
+        return this.$http.get(`/v2/customer/getForEdit`, {id})
+        // .then(res => {
+        //   return res.status == 0 ? res.data : {};
+        //   // if (res.status) return;
+        //   // this.form = convertCustomerToForm(res.data, this.fields);
+        //   // this.addressBackup = this.form.customerAddress;
+        // })
       },
       updateAddressBackup(ad) {
         this.addressBackup = ad;
+      },
+      initCustomerData(fields, data){
+        return {
+          id: data.id,
+          name: data.name,
+          lmName: data.lmName,
+          lmPhone: data.lmPhone,
+          serialNumber: data.serialNumber,
+          customerAddress: {
+            adAddress: [data.customerAddress.adProvince, data.customerAddress.adCity, data.customerAddress.adDist],
+            detail: data.customerAddress.adAddress,
+            adLongitude: data.adLongitude || '',
+            adLatitude: data.adLatitude || '',
+            addressType: data.addressType || 0
+          },
+          tags: toArray(data.tags).map(item => item.id),
+          customerManager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
+        };
       }
     },
-    mounted() {
-      // this.initData = JSON.parse(window._init) || {};
+    async mounted() {
+      //初始化默认区域
       if (this.initData.customerAddress) {
         this.setDefaultAddress(this.initData.customerAddress);
       }
 
+      //初始化默认值
+      let form = {}; 
+      
       if (this.initData.action === 'edit' && this.initData.id) {
-        this.fetchCustomer(this.initData.id);
+        //处理编辑时数据
+        let cusRes = await this.fetchCustomer(this.initData.id);
+        if(cusRes.status == 0) form = cusRes.data;
       }
-    },
+
+      this.form = FormUtil.initialize(this.fields, form, this.initCustomerData);
+      this.addressBackup = this.form.customerAddress;
+    }
   }
 </script>
 

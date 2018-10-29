@@ -54,6 +54,8 @@
       <a href="javascript:;" @click="loadMore">{{btnText}}</a>
     </p>
 
+    {{customerId}}
+
   </div>
 </template>
 

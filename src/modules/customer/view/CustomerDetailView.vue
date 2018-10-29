@@ -1,7 +1,8 @@
 <template>
   <div class="customer-detail-container">
-    <div class="top-tool-bar">
+    <div class="customer-tool-bar">
       <el-button icon="el-icon-search">返回</el-button>
+      <el-button type="primary" icon="el-icon-search" @click="jump">编辑</el-button>
 
       <div class="action-btn">
         <el-dropdown trigger="click">
@@ -56,33 +57,29 @@
         </h3>
         <form-view :fields="allField" :value="customer">
           <template slot="address" slot-scope="{value}">
-            <div class="app-row" v-if="value">
-              <div class="app-row-left">区域：</div>
-              <div class="app-row-right">
-                {{`${value.adProvince} ${value.adCity} ${value.adDist}`}}
-              </div>
-            </div>
-            <div class="app-row" v-if="value">
-              <div class="app-row-left">详细地址：</div>
-              <div class="app-row-right">
-                {{value.adAddress}}
-                <i v-if="value.adLatitude && value.adLongitude" @click="openMap" class="iconfont icon-guide"></i>
+            <div class="form-view-row" v-if="value">
+              <label>地址</label>
+              <div class="form-view-row-content"> 
+                <span>{{value | fmt_address}}</span> 
+                <i v-if="value.adLatitude && value.adLongitude" @click="openMap" class="iconfont icon-address customer-address-icon"></i>
               </div>
             </div>
           </template>
         </form-view>
       </div>
       <div class="customer-data">
-        关联数据
-        <base-tab-pane :tabs="tabs">
+        <base-tab-pane :tabs="tabs" v-model="currTab">
           <div class="record-tab-label" slot="record-tab">
             信息动态
             <div class="point"></div>
           </div>
         </base-tab-pane>
+        <keep-alive>
+          <component :is="currTab"></component>
+        </keep-alive>
       </div>
     </div>
-    <ul>
+    <!-- <ul>
       <li v-for="r in remindList" :key="r.id">
         <p style="display: flex;justify-content: space-between">
           提醒名称：{{r.remind.name}}
@@ -93,7 +90,7 @@
           <a @click="deleteRemind(r.id, r.remind.name)" href="javascript:;">删除</a>
         </p>
       </li>
-    </ul>
+    </ul> -->
 
     <add-contact-dialog ref="addContactDialog" :customer="customer"></add-contact-dialog>
     <add-remark-dialog ref="addRemarkDialog" :customer="customer" @reload-remark="reloadRemark"></add-remark-dialog>
@@ -130,34 +127,31 @@
       return {
         tabs: [{
           displayName: '信息动态',
-          component: CustomerInfoRecord,
-          componentName: 'customer-info-record',
+          component: CustomerInfoRecord.name,
           props: {
             'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
           },
           slotName: 'record-tab',
         }, {
           displayName: '事件',
-          component: CustomerEventTable,
-          componentName: 'customer-event-table',
+          component: CustomerEventTable.name,
           props: {
             'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
           }
         }, {
           displayName: '客户地址',
-          component: CustomerAddressTable,
-          componentName: 'customer-address-table',
+          component: CustomerAddressTable.name,
           props: {
             'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
           }
         }, {
           displayName: '客户联系人',
-          component: CustomerContactTable,
-          componentName: 'customer-contact-table',
+          component: CustomerContactTable.name,
           props: {
             'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
           }
         }],
+        currTab: 'customer-info-record',
         tab: 'customer-info-record',
         customerOption: {},
         remindList: [],
@@ -330,10 +324,10 @@
       },
     },
     components: {
-      CustomerInfoRecord,
-      CustomerEventTable,
-      CustomerContactTable,
-      CustomerAddressTable,
+      [CustomerInfoRecord.name]: CustomerInfoRecord,
+      [CustomerEventTable.name]: CustomerEventTable,
+      [CustomerContactTable.name]: CustomerContactTable,
+      [CustomerAddressTable.name]: CustomerAddressTable,
       AddAddressDialog,
       AddContactDialog,
       AddRemarkDialog,
@@ -345,27 +339,61 @@
 </script>
 
 <style lang="scss">
+.customer-detail-container{
+  padding: 10px;
+}
+
+.customer-address-icon{
+  color: $color-primary;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.customer-tool-bar {
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #666;
+
+  .el-button {
+    margin-left: 0;
+    height: 32px;
+    align-self: center;
+  }
+}
+
+.main-content{
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.customer-data {
+  flex: 1;
+  background: #fff;
+  padding: 0 10px 10px;
+  min-width: 500px;
+  margin-left: 15px;
+
+  .record-tab-label {
+    position: relative;
+
+    .point {
+      width: 8px;
+      height: 8px;
+      background: #FF6C60;
+      border-radius: 50%;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  }
+}
+
 
   .customer-detail-container {
-    padding: 10px 15px;
-    background: #f4f7f5;
-
-    .top-tool-bar {
-      display: flex;
-      justify-content: space-between;
-      background: #fff;
-      padding: 10px;
-      margin-bottom: 10px;
-      font-size: 14px;
-      color: #666;
-
-      .el-button {
-        margin-left: 0;
-        height: 32px;
-        align-self: center;
-      }
-    }
-
     .action-btn {
       .el-dropdown {
         line-height: 39px;
@@ -387,17 +415,6 @@
       }
 
     }
-
-    .app-row {
-      display: flex;
-      justify-content: flex-start;
-      .app-row-left {
-        width: 100px;
-      }
-      .app-row-right {
-        width: 300px;
-      }
-    }
   }
 
   .customer-detail-container .main-content {
@@ -406,7 +423,7 @@
     .customer-detail {
       background: #fff;
       padding: 0 10px 10px;
-      min-width: 500px;
+      width: 520px;
 
       h3 {
         display: flex;
@@ -420,49 +437,26 @@
         }
       }
 
-      .customer-info-list {
-        list-style: none;
-        padding: 0;
+      // .customer-info-list {
+      //   list-style: none;
+      //   padding: 0;
 
-        li {
-          color: #333;
-          line-height: 26px;
-          font-size: 12px;
-          display: flex;
+      //   li {
+      //     color: #333;
+      //     line-height: 26px;
+      //     font-size: 12px;
+      //     display: flex;
 
-          label {
-            font-size: 12px;
-            width: 120px;
-            padding-right: 10px;
-            text-align: right;
-            font-weight: 500;
-            margin: 0;
-          }
-        }
-      }
+      //     label {
+      //       font-size: 12px;
+      //       width: 120px;
+      //       padding-right: 10px;
+      //       text-align: right;
+      //       font-weight: 500;
+      //       margin: 0;
+      //     }
+      //   }
+      // }
     }
   }
-
-  .customer-detail-container .main-content .customer-data {
-    background: #fff;
-    padding: 0 10px 10px;
-    min-width: 500px;
-    margin-left: 15px;
-
-    .record-tab-label {
-      position: relative;
-
-      .point {
-        width: 8px;
-        height: 8px;
-        background: #FF6C60;
-        border-radius: 50%;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-      }
-    }
-
-  }
-
 </style>
