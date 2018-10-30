@@ -9,7 +9,9 @@ import BaseDistPicker from './common/BaseDistPicker';
 import BaseImport from './common/BaseImport';
 import BaseExport from './common/BaseExport';
 import BaseFileItem from './common/BaseFileItem';
-import BaseTabPane from './common/BaseTabPane';
+import BaseTabBar from './common/BaseTabBar';
+import BaseTimeline from './common/BaseTimeline';
+import BaseComment from './common/BaseComment';
 
 import Form from './form';
 import Fast from './fast'
@@ -28,7 +30,9 @@ const components = [
   BaseImport,
   BaseExport,
   BaseFileItem,
-  BaseTabPane
+  BaseTabBar,
+  BaseTimeline,
+  BaseComment
 ];
 
 export default {

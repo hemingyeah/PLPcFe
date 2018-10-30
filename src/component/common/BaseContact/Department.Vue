@@ -589,7 +589,7 @@ export default {
 
 .bc-contact-chosen-count{
   float: left;
-  color: $text-color-second;
+  color: $text-color-secondary;
   font-size: 14px;
   line-height: 32px;
 }
@@ -616,7 +616,7 @@ export default {
 }
 
 .bc-contact-cancel{
-  color: $text-color-second;
+  color: $text-color-secondary;
   background-color: #fff;
   height: 32px;
   line-height: 32px;

@@ -4,9 +4,10 @@ $color-danger: #ed3f14 !default;
 $color-primary-hover: rgba($color-primary,.1) !default;
 
 $text-color-primary: #314659 !default;
-$text-color-second: #797e89 !default;
+$text-color-regular: #515a6e !default;
+$text-color-secondary: #797e89 !default;
 
 $border-color-base: #e0e1e2 !default;
 $border-radius-base: 2px !default; //边框圆角
 
-$input-border-hover-color: mix(#fff, $color-primary, 25%) !default;
+$input-border-hover-color: mix(#fff, $color-primary, 45%) !default;

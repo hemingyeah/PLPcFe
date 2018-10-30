@@ -362,7 +362,7 @@ html, body, .frame{
   line-height: 20px;
   text-align: center;
   margin: 0;
-  color: $text-color-second;
+  color: $text-color-secondary;
 }
 
 .frame-header-right{
@@ -378,7 +378,7 @@ html, body, .frame{
 .export-wrap,
 .user-profile-wrap{
   position: relative;
-  color: $text-color-second;
+  color: $text-color-secondary;
   width: 100px;
   margin: 0;
   padding: 0;
@@ -647,7 +647,7 @@ html, body, .frame{
   height: 14px;
   border-radius: 50%;
   margin-right: 8px;
-  background-color: $text-color-second;
+  background-color: $text-color-secondary;
 }
 
 .user-color-icon-mini{

@@ -139,7 +139,7 @@ export default {
     line-height: 20px;
     font-size: 13px;
     margin: 0;
-    color: $text-color-second;
+    color: $text-color-secondary;
   }
 }
  
@@ -164,7 +164,7 @@ export default {
   flex-flow: row nowrap;
   align-items: center;
   font-size: 12px;
-  color: $text-color-second;
+  color: $text-color-secondary;
 }
 
 .contact-user-state-icon{

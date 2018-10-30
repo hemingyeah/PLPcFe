@@ -14,147 +14,97 @@
 </template>
 
 <script>
-  import Uploader from '@src/util/uploader';
-  import BaseFileItem from '../BaseFileItem';
-  import platform from '@src/platform';
+import Uploader from '@src/util/uploader';
+import platform from '@src/platform';
 
-  export default {
-    name: "base-upload",
-    data(){
-      return {
-        pending: false
-      }
+export default {
+  name: "base-upload",
+  data(){
+    return {
+      pending: false
+    }
+  },
+  props: {
+    displayName: {
+      type: String,
+      default: () => '附件',
     },
-    props: {
-      displayName: {
-        type: String,
-        default: () => '附件',
-      },
-      action: {
-        type: String,
-        default: '/files/upload',
-      },
-      multiple: {
-        type: Boolean,
-        default: true
-      },
-      forId: {
-        type: String,
-        default: ''
-      },
-      value: {
-        type: Array,
-        default: () => ([])
-      }
+    action: {
+      type: String,
+      default: '/files/upload',
     },
-    methods: {
-      handleChange(event){
-        const files = event.target.files;
-        if(!files || !files.length) return;
+    multiple: {
+      type: Boolean,
+      default: true
+    },
+    forId: {
+      type: String,
+      default: ''
+    },
+    value: {
+      type: Array,
+      default: () => ([])
+    }
+  },
+  methods: {
+    chooseFile(){
+      if(this.pending) return platform.alert('请等待文件上传完成');
+      if(this.value.length >= Uploader.FILE_MAX_NUM) {
+        return platform.alert(`上传文件数量不能超过个${Uploader.FILE_MAX_NUM}`);
+      }
+        
+      this.$refs.input.value = null;
+      this.$refs.input.click();
+    },
+    handleChange(event){
+      const files = event.target.files;
+      if(!files || !files.length) return;
 
-        if(this.value.length + files.length > 9) {
-          let message = '上传文件数量不能超过9个';
-          let max = 9 - this.value.length;
+      if(this.value.length + files.length > Uploader.FILE_MAX_NUM) {
+        let message = `上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`;
+        let max = 9 - this.value.length;
 
-          if(max > 0 && files.length < 9){
-            message += `, 您还能上传${max}个文件`;
-          }
-
-          return platform.alert(message)
+        if(max > 0 && files.length < 9){
+          message += `, 您还能上传${max}个文件`;
         }
 
-        let message = [];
-        for(let i = 0; i < files.length; i++){
-          let res = this.validateFile(files[i]);
-          if(res) message.push(res)
+        return platform.alert(message)
+      }
+
+      this.pending = true;
+      Uploader.batchUploadWithParse(files, this.action).then(result => {
+        let {success, error} = result;
+
+        if(error.length > 0){
+          let message = error.map(item => item.message).join('\n');
+          //此处不能return
+          platform.alert(message)
         }
 
-        if(message.length > 0) return platform.alert(message.join('\n'));
-
-        this.pending = true;
-        this.handleUploadFileQueue(files);
-      },
-      async handleUploadFileQueue(files) {
-        try {
-          let promises = Array.prototype.slice.call(files).map(file => this.upload(file));
-
-          let result = await Promise.all(promises) || [];
-          // filter failed file.
-          const newFiles = result.filter(file => file.id);
-
-          // handle failed file
-          const failedMessage = result.filter(file => !file.id).map(file => `[${file.fileName}]上传失败`);
-          if(failedMessage.length > 0) platform.alert(failedMessage.join('\n'));
-
-          let value = this.value.concat(newFiles);
+        if(success.length > 0){
+          let value = this.value.concat(success);
           this.$emit('input', value);
-        } catch (error) {
-          console.error(error)
         }
-      
-        this.pending = false;
-      },
-      upload(file){
-        return Uploader.upload(file, this.action).then(result => {
-          if(result.status == 0){
-            let file = result.data;
-            return {
-              id: file.id,
-              filename: file.fileName,
-              url: `/files/get?fileId=${file.id}`,
-              fileSize: file.fileSizeStr,
-            };
-          }
-          return {
-            fileName: file.name,
-          };
-        })
-        .catch((error) => {
-          console.error(error);
-          // 处理失败的上传，不至于影响所有的上传。
-          return {
-            fileName: file.name,
-          };
-        })
-      },
-      async deleteFile(file) {
-        let index = this.value.indexOf(file);
-        if(index >= 0) {
-          this.value.splice(index, 1);
-          this.$emit('input', this.value);
-        }
-      },
-      chooseFile(){
-        if(this.pending) return platform.alert('请等待文件上传完成');
-        if(this.value.length >= 9) return platform.alert('上传文件数量不能超过9个');
-
-        this.$refs.input.value = null;
-        this.$refs.input.click();
-      },
-      validateFile(file){
-        const MAX_SIZE = 10 * 1024 * 1024;
-        //验证文件大小
-        if(file.size > MAX_SIZE) return '只支持小于10MB的文件';
-
-        //验证文件类型
-        let fileName = file.name;
-        let lastDotIndex = fileName.lastIndexOf(".");
-        if(lastDotIndex < 0) return `[${fileName}]的文件类型未知，系统暂不支持上传`;
-
-        return null;
-      }
+      })
+      .catch(err => console.error(err))
+      .then(() => this.pending = false)
     },
-    components: {
-      [BaseFileItem.name]: BaseFileItem
+    async deleteFile(file) {
+      let index = this.value.indexOf(file);
+      if(index >= 0) {
+        this.value.splice(index, 1);
+        this.$emit('input', this.value);
+      }
     }
   }
+}
 </script>
 
 <style lang="scss" >
 .base-upload-container {
   overflow: hidden;
   input[type='file']{
-    display: none;
+    display: none !important;
   }
 }
 

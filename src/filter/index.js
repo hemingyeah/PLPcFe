@@ -9,4 +9,4 @@ const filter = {
   }
 }
 
-export default filter
+export default filter;

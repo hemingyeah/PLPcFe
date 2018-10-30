@@ -37,7 +37,7 @@ export default class Page{
    * list为两个对象的和
    */
   merge(otherPage){
-    if(!(otherPage instanceof Page)) throw new Error('otherPage必须为Page的实例！');
+    if(!(otherPage instanceof Page)) otherPage = _.assign(new Page(), otherPage);
 
     for(let name in this){
       if(otherPage[name] == undefined) continue;

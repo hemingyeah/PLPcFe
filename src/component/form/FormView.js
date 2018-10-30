@@ -1,5 +1,5 @@
 import {toArray} from '@src/util/lang';
-import {fmt_address} from '@src/filter'
+import {fmt_address} from '@src/filter/fmt'
 
 const FormView = {
   name: 'form-view',

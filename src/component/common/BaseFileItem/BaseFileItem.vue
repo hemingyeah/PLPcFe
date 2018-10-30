@@ -129,9 +129,8 @@ export default {
 .base-file-item{
   display: flex;
   flex-flow: row nowrap;
-  height: 44px;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 
   &:hover {
     .base-file-del{
@@ -145,19 +144,25 @@ export default {
   overflow: hidden;
   margin-left: 10px;
   @include text-ellipsis;
+  line-height: 1;
 
   & > p {
     margin: 0;
     padding: 0;
-    line-height: 18px;
-    color: $text-color-second;
+    line-height: 18px !important;
+    color: $text-color-secondary;
     font-size: 12px;
   }
 
   & > a{
-    color: $color-primary;
-    line-height: 20px;
+    color: $text-color-regular;
+    line-height: 20px !important;;
     font-size: 14px;
+    display: inline-block;
+
+    &:hover{
+      color: $color-primary;
+    }
   }
 }
 

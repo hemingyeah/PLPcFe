@@ -56,7 +56,7 @@ function imagePreview({ imageDom, urls, currIndex = 0}) {
   return dingtalk.biz.previewImage(urls, urls[currIndex])
 }
 
-export const platform = {
+const platform = {
   alert,
   confirm,
   openTab,
@@ -64,4 +64,5 @@ export const platform = {
   imagePreview
 };
 
+export * from './notification';
 export default platform;

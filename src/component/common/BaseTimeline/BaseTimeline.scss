@@ -1,0 +1,118 @@
+.base-timeline {
+  position: relative;
+  padding-left: 20px;
+}
+
+.base-timeline-item{
+  position: relative;
+  padding: 0 0 15px 32px;
+  border-left: 2px solid #e5e8e6;
+
+  &:first-child .base-timeline-head{
+    background-color: #E23B41;
+    border-color:  mix(#fff, #E23B41, 75%)
+  }
+
+  &:last-child{
+    border-left-color: transparent !important; 
+  }
+
+  &:hover .base-timeline-head{
+    background-color: $color-primary;
+    border-color:  mix(#fff, $color-primary, 75%)
+  }
+
+  &:hover .base-timeline-delete{
+    display: inline-block;
+  }
+}
+
+.base-timeline-head{
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  background-color: #e5e8e6;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  transition: all ease .3s;
+}
+
+.base-timeline-head.base-timeline-loading{
+  background-color: #fff !important; ;
+  border-top-color: $color-primary !important;
+  border-left-color: #fff !important;
+  border-right-color: #fff !important;
+  border-bottom-color: #fff !important;
+
+  animation: rotating 1.5s linear infinite;
+}
+
+.base-timeline-content{
+  color: $text-color-primary;
+  font-size: 14px;
+
+  h5,p{
+    font-size: 14px;
+  }
+
+  h5{
+    line-height: 16px;
+    font-weight: 400;
+    margin-bottom: 5px;
+  }
+
+  strong{
+    font-weight: 600;
+  }
+
+  p{
+    margin: 0 0 2px 0;
+    line-height: 20px;
+    color: $text-color-regular;
+  }
+  
+  .icon-address{
+    color: $color-primary;
+    cursor: pointer;
+    font-size: 14px;
+  }
+}
+
+.base-timeline-time{
+  font-size: 12px;
+  margin: 0;
+  line-height: 20px;
+  color: #9a9a9a;
+}
+
+.base-timeline-delete{
+  font-size: 13px;
+  display: none;
+  padding: 0;
+  cursor: pointer;
+  color: $color-danger;
+  line-height: 14px;
+  padding: 0;
+  margin: 0;
+
+  i.iconfont{
+    font-size: 13px;
+  }
+}
+
+.base-timeline-item-dotted{
+  border-left-style: dotted;
+}
+
+.base-timeline-loadmore{
+  line-height: 16px;
+  padding: 0;
+  color: $color-primary;
+  vertical-align: top;
+}
+
+.base-timeline-attachment{
+  padding-top: 10px;
+}

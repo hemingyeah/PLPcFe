@@ -41,7 +41,9 @@
     methods: {
       initialize() {
         this.show = true;
-        const position = new AMap.LngLat(this.address.adLongitude, this.address.adLatitude);
+        let lng = this.address.adLongitude || this.address.longitude || this.address.lng
+        let lat = this.address.adLatitude || this.address.latitude || this.address.lat
+        const position = new AMap.LngLat(lng, lat);
         const content = `<div class = 'mark-title'><i class="iconfont icon-triangle-down"></i></br>${this.options.title || '客户地址'}</div>`;
         const option = {zoom: 13, center: position,};
 

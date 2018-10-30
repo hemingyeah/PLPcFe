@@ -38,7 +38,7 @@ const RuleMap = {
     //允许为空则不继续验证
     if(field.isNull) return resolve(null);
     //不允许为空
-    if(!value || !value.toString().length) return resolve(`必填`);
+    if(!value || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
   })
 }
@@ -47,7 +47,7 @@ const RuleMap = {
 function select(value, field = {}) {
   return new Promise((resolve, reject) => {
     if (field.isNull) return resolve(null);
-    if (value == null || !value.toString().length) return resolve('必选');
+    if (value == null || !value.toString().length) return resolve(`请选择${field.displayName}`);
     resolve(null);
   })
 }
@@ -59,7 +59,7 @@ function textarea(value, field = {}) {
       return resolve(`长度不能超过${MULTI_LINE_MAX_LEN}个字符`);
     }
     if (field.isNull === 1) return resolve(null);
-    if (value == null || !value.toString().length) return resolve('必填');
+    if (value == null || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
   });
 }
@@ -68,7 +68,7 @@ function textarea(value, field = {}) {
 function phone(value, field = {}) {
   return new Promise(resolve => {
     if(field.isNull) return resolve(null);
-    if(value == null || !value.toString().length) return resolve(`必填`);
+    if(value == null || !value.toString().length) return resolve(`请输入${field.displayName}`);
     if(!PHONE_REG.test(value)) return resolve('请输入正确的电话或者手机号');
     resolve(null);
   });
@@ -77,7 +77,7 @@ function phone(value, field = {}) {
 function email(value, field = {}) {
   return new Promise(resolve => {
     if(field.isNull && !value) return resolve(null);
-    if(value == null || !value.toString().length) return resolve(`必填`);
+    if(value == null || !value.toString().length) return resolve(`请输入${field.displayName}`);
     if (!EMAIL_REG.test(value)) return resolve('请输入正确的邮箱');
     resolve(null);
   });
@@ -86,7 +86,7 @@ function email(value, field = {}) {
 function date(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve('必填');
+    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
     if (!DATE_REG.test(value)) return resolve('请输入正确格式的日期');
     resolve(null);
   });
@@ -95,7 +95,7 @@ function date(value, field = {}) {
 function datetime(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve('必填');
+    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
     if (!DATETIME_REG.test(value)) return resolve('请输入正确格式的日期');
     resolve(null);
   });
@@ -104,7 +104,7 @@ function datetime(value, field = {}) {
 function number(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve('必填');
+    if (!value || !value.toString().length) return resolve(`请输入${field.displayName}`);
     if (typeof Number(value) !== 'number') return resolve('请输入数字');
     resolve(null);
   });
@@ -113,7 +113,7 @@ function number(value, field = {}) {
 function attachment(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve('必须上传附件');
+    if (!value || !value.toString().length) return resolve(`请上传${field.displayName}`);
     resolve(null);
   });
 }
@@ -121,7 +121,7 @@ function attachment(value, field = {}) {
 function user(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve('必选');
+    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
     resolve(null);
   });
 }
@@ -129,7 +129,7 @@ function user(value, field = {}) {
 function address(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull) return resolve(null);
-    if (!value || !value.toString().length) return resolve('必选');
+    if (!value || !value.toString().length) return resolve(`请补全${field.displayName}`);
     
     const {adAddress, detail, } = value;
     if (!adAddress || !adAddress.length || !detail) {

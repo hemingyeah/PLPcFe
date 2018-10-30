@@ -8,7 +8,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(144, 146, 152, .35);
+  background-color: rgba(211, 214, 217, 0.39);
   border-radius: 4px;
 }
 
@@ -44,12 +44,12 @@ input,textarea{
   color: #333 !important; 
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   
-  &:focus{
+  &:hover{
     border-color: $input-border-hover-color;
   }
 
-  &:hover{
-    border-color: $input-border-hover-color;
+  &:focus{
+    border-color: $color-primary;
   }
 }
 

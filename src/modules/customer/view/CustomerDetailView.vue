@@ -1,8 +1,8 @@
 <template>
-  <div class="customer-detail-container">
+  <div class="page-container">
     <div class="customer-tool-bar">
-      <el-button icon="el-icon-search">返回</el-button>
-      <el-button type="primary" icon="el-icon-search" @click="jump">编辑</el-button>
+      <!-- <span><el-button icon="el-icon-search">返回</el-button>
+      <el-button type="primary" icon="el-icon-search" @click="jump">编辑</el-button></span> -->
 
       <div class="action-btn">
         <el-dropdown trigger="click">
@@ -37,9 +37,6 @@
             更多<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-if="allowEditCustomer">
-              <div @click="openDialog('remark')">添加备注</div>
-            </el-dropdown-item>
             <el-dropdown-item @click="jump" v-if="allowEditCustomer">编辑</el-dropdown-item>
             <el-dropdown-item v-if="allowDeleteCustomer">
               <div @click="deleteCustomer">删除</div>
@@ -67,16 +64,15 @@
           </template>
         </form-view>
       </div>
-      <div class="customer-data">
-        <base-tab-pane :tabs="tabs" v-model="currTab">
-          <div class="record-tab-label" slot="record-tab">
-            信息动态
-            <div class="point"></div>
-          </div>
-        </base-tab-pane>
-        <keep-alive>
-          <component :is="currTab"></component>
-        </keep-alive>
+      <div class="customer-relation">
+        <base-tabbar :tabs="tabs" v-model="currTab">
+          <div class="record-tab-label" slot="customer-info-record__tab"><i class="iconfont icon-timeline"></i>信息动态</div>
+        </base-tabbar>
+        <div class="customer-relation-content">
+          <keep-alive>
+            <component :is="currTab" :share-data="propsForSubComponents"></component>
+          </keep-alive>
+        </div>
       </div>
     </div>
     <!-- <ul>
@@ -93,7 +89,6 @@
     </ul> -->
 
     <add-contact-dialog ref="addContactDialog" :customer="customer"></add-contact-dialog>
-    <add-remark-dialog ref="addRemarkDialog" :customer="customer" @reload-remark="reloadRemark"></add-remark-dialog>
     <add-address-dialog ref="addAddressDialog" :customer-id="customer.id"
                         :default-address="initData.customerAddress"></add-address-dialog>
     <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind"
@@ -109,11 +104,7 @@
 
   import AddAddressDialog from './operationDialog/AddAddressDialog.vue';
   import AddContactDialog from './operationDialog/AddContactDialog.vue';
-  import AddRemarkDialog from './operationDialog/AddRemarkDialog.vue';
   import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
-  import BaseTabPane from '../../../component/common/BaseTabPane'
-
-  import FormView from '@src/component/form/FormView';
 
   export default {
     name: "customer-detail-view",
@@ -125,34 +116,10 @@
     },
     data() {
       return {
-        tabs: [{
-          displayName: '信息动态',
-          component: CustomerInfoRecord.name,
-          props: {
-            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          },
-          slotName: 'record-tab',
-        }, {
-          displayName: '事件',
-          component: CustomerEventTable.name,
-          props: {
-            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          }
-        }, {
-          displayName: '客户地址',
-          component: CustomerAddressTable.name,
-          props: {
-            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          }
-        }, {
-          displayName: '客户联系人',
-          component: CustomerContactTable.name,
-          props: {
-            'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          }
-        }],
+        id: this.initData.id, //当前客户的id
+        tabs: this.buildTabs(),
+        //当前选中的tab
         currTab: 'customer-info-record',
-        tab: 'customer-info-record',
         customerOption: {},
         remindList: [],
         selectedRemind: {},
@@ -244,13 +211,60 @@
         const {loginUser, customerManager,} = this.customer;
         return loginUser.userId === customerManager;
       },
-
-    },
-    mounted() {
-      this.fetchCustomer(this.initData.id);
-      this.fetchRemind();
+      /** 子组件所需的数据 */
+      propsForSubComponents(){
+        return {
+          customerId: this.id,
+          customerName: this.customer.name,
+          loginUser: this.initData.loginUser,
+        };
+      }
     },
     methods: {
+      buildTabs(){
+        return [
+          {
+            displayName: '信息动态',
+            component: CustomerInfoRecord.name
+          }, 
+          {
+            displayName: '事件',
+            component: CustomerEventTable.name
+          }, 
+          {
+            displayName: '工单',
+            component: CustomerAddressTable.name
+          }, 
+          // {
+          //   displayName: '计划任务',
+          //   component: CustomerContactTable.name,
+          //   props: {
+          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          //   }
+          // },
+          // {
+          //   displayName: '产品',
+          //   component: CustomerContactTable.name,
+          //   props: {
+          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          //   }
+          // },
+          // {
+          //   displayName: '地址',
+          //   component: CustomerContactTable.name,
+          //   props: {
+          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          //   }
+          // },
+          // {
+          //   displayName: '联系人',
+          //   component: CustomerContactTable.name,
+          //   props: {
+          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
+          //   }
+          // }
+        ]
+      },
       async deleteCustomer() {
         try {
           const action = await this.$platform.confirm('确定要删除该客户？');
@@ -318,10 +332,11 @@
       },
       jump() {
         window.location.href = `/customer/edit/${this.initData.id}`
-      },
-      reloadRemark() {
-
-      },
+      }
+    },
+    mounted() {
+      this.fetchCustomer(this.initData.id);
+      this.fetchRemind();
     },
     components: {
       [CustomerInfoRecord.name]: CustomerInfoRecord,
@@ -330,17 +345,19 @@
       [CustomerAddressTable.name]: CustomerAddressTable,
       AddAddressDialog,
       AddContactDialog,
-      AddRemarkDialog,
-      FormView,
-      BaseTabPane,
       [RemindCustomerDialog.name]: RemindCustomerDialog,
     }
   }
 </script>
 
 <style lang="scss">
-.customer-detail-container{
-  padding: 10px;
+html,body,.page-container{
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-container{
+  padding: 0 10px 10px 10px;
 }
 
 .customer-address-icon{
@@ -351,10 +368,7 @@
 
 .customer-tool-bar {
   display: flex;
-  justify-content: space-between;
-  background: #fff;
-  padding: 10px;
-  margin-bottom: 10px;
+  justify-content: flex-end;
   font-size: 14px;
   color: #666;
 
@@ -368,95 +382,61 @@
 .main-content{
   display: flex;
   flex-flow: row nowrap;
+  height: calc(100% - 39px);
 }
 
-.customer-data {
-  flex: 1;
+.customer-detail{
+  height: 100%;
+  overflow: auto;
   background: #fff;
   padding: 0 10px 10px;
-  min-width: 500px;
-  margin-left: 15px;
+  width: 520px;
+  border-radius: 2px;
 
-  .record-tab-label {
-    position: relative;
+  h3 {
+    display: flex;
+    justify-content: space-between;
+    line-height: 40px;
+    border-bottom: 1px dashed #ccc;
 
-    .point {
-      width: 8px;
-      height: 8px;
-      background: #FF6C60;
-      border-radius: 50%;
-      position: absolute;
-      top: 10px;
-      right: 10px;
+    .remind-btn {
+      font-weight: normal;
+      font-size: 14px;
     }
   }
 }
 
+.customer-relation {
+  height: 100%;
+  flex: 1;
+  background: #fff;
+  min-width: 500px;
+  margin-left: 10px;
+  border-radius: 2px;
+}
 
-  .customer-detail-container {
-    .action-btn {
-      .el-dropdown {
-        line-height: 39px;
-      }
-      .el-dropdown-btn {
-        padding: 0 10px;
-        line-height: 16px;
-        &:hover {
-          cursor: pointer;
-          color: #00ac97;
-        }
-      }
+.customer-relation-content{
+  height: calc(100% - 46px);
+}
 
-      .add-contact {
-        border-left: 1px solid #ccc;
-      }
-      .add-production {
-        border-right: 1px solid #ccc;
-      }
-
+.action-btn {
+  .el-dropdown {
+    line-height: 39px;
+  }
+  .el-dropdown-btn {
+    padding: 0 10px;
+    line-height: 16px;
+    &:hover {
+      cursor: pointer;
+      color: #00ac97;
     }
   }
 
-  .customer-detail-container .main-content {
-    display: flex;
-
-    .customer-detail {
-      background: #fff;
-      padding: 0 10px 10px;
-      width: 520px;
-
-      h3 {
-        display: flex;
-        justify-content: space-between;
-        line-height: 40px;
-        border-bottom: 1px dashed #ccc;
-
-        .remind-btn {
-          font-weight: normal;
-          font-size: 14px;
-        }
-      }
-
-      // .customer-info-list {
-      //   list-style: none;
-      //   padding: 0;
-
-      //   li {
-      //     color: #333;
-      //     line-height: 26px;
-      //     font-size: 12px;
-      //     display: flex;
-
-      //     label {
-      //       font-size: 12px;
-      //       width: 120px;
-      //       padding-right: 10px;
-      //       text-align: right;
-      //       font-weight: 500;
-      //       margin: 0;
-      //     }
-      //   }
-      // }
-    }
+  .add-contact {
+    border-left: 1px solid #ccc;
   }
+  .add-production {
+    border-right: 1px solid #ccc;
+  }
+}
 </style>

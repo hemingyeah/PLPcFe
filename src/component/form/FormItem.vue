@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import Validator from './validator';
+  import Validator from '@src/util/validator';
 
   export default {
     name: 'form-item',
