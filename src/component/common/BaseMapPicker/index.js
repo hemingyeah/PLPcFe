@@ -25,7 +25,7 @@ function picker(address, options = {}){
     let pending = false;
 
     instance.$on('destroy', () => {
-      setTimeout(() => dom.destroyComponent(instance), 1500);
+      setTimeout(() => dom.destroyComponent(instance), 100);
     })
 
     instance.$on('input', event => {
