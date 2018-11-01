@@ -92,7 +92,7 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@src': path.join(__dirname,'../src'),
-      '@model':  path.join(__dirname,'../model')
+      '@model': path.join(__dirname,'../model')
     }
   },
   externals: {

@@ -5,14 +5,15 @@
     @click="$emit('jump', tab)">
 
     <div class="frame-tab-inner">
-      <i class="frame-loading-spinner" v-if="tab.loading">
-        <svg class="frame-loading-circular " viewBox="0 0 50 50">
-          <circle class="frame-loading-path" cx="25" cy="25" r="20" fill="none"/>
-        </svg>
-      </i>
-      <i class="iconfont icon-updete frame-loading" @click="$emit('reload', tab)" v-else></i>
-      <span>{{tab.title}}</span>
-      <button class="btn-text frame-close-btn" @click.stop="$emit('close', tab)" v-if="tab.closeable">
+      <span class="frame-tab-icon-wrap">
+        <base-spin size="small" v-if="tab.loading"></base-spin>
+        <template v-else>
+          <i :class="['iconfont', tab.isHome ? 'icon-home' : 'icon-yemian', 'frame-tab-icon']"></i>
+          <i class="iconfont icon-updete frame-tab-reload" @click="$emit('reload', tab)"></i>
+        </template>
+      </span>
+      <span class="frame-tab-name">{{tab.title}}</span>
+      <button class="btn-text frame-tab-close" @click.stop="$emit('close', tab)" v-if="tab.closeable">
         <i class="iconfont icon-close"></i>
       </button>
     </div>
@@ -36,17 +37,19 @@ export default {
   position: relative;
   display: block;
 }
-.frame-tab + .frame-tab{
-  margin-left: 1px;
-}
-.frame-tab + .frame-tab:after{
-  content: "";
-  position: absolute;
-  left: -1px;
-  top: 12px;
-  width: 1px;
-  height: 16px;
-  background-color: #f4f7f5;
+
+.frame-tab:not(:first-child){
+  margin-left: 3px;
+
+  &:before{
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 12px;
+    width: 1px;
+    height: 16px;
+    background-color: #e4e7e5;
+  }
 }
 
 .frame-tab-inner{
@@ -54,117 +57,90 @@ export default {
   flex-flow: row nowrap;
   align-items: center;
 
-  transition: all ease .15s;
-  line-height: 24px;
-  padding: 8px 15px;
-
-  span{
-    display: inline-block;
-    vertical-align: middle;
-    cursor: default;
-    user-select: none;
-    padding: 0 5px;
-    min-width: 80px;
-  }
+  transition: all ease .3s;
+  padding: 12px 8px;
+  border-radius: 4px 4px 0 0;
 }
 
-.frame-loading-spinner,
-.frame-loading{
-  display: block;
-  height: 18px;
-  width: 18px;
-  margin: 0;
-}
-
-.icon-updete.frame-loading{
-  line-height: 18px;
+.frame-tab-icon-wrap{
+  display: inline-block;
+  height: 16px;
+  width: 16px;
   text-align: center;
+  line-height: 16px;
+}
+
+.frame-tab-name{
+  display: inline-block;
+  cursor: default;
+  user-select: none;
+  height: 16px;
+  line-height: 16px;
+  font-size: 14px;
+  margin-left: 5px;
+  min-width: 80px;
+  white-space: nowrap;
+}
+
+.frame-tab-reload{
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
+  display: none;
 }
 
-.frame-loading-spinner .frame-loading-circular{
-  display: block;
-  width: 100%;
-  height: 100%;
+.frame-tab-icon{
+  color: #757575;
+  font-size: 16px;
+}
+
+.frame-tab-close{
   margin: 0;
-  will-change: transform;
-  animation: frame-loading-rotate 2s linear infinite;
-}
-
-.frame-loading-spinner .frame-loading-path{
-  animation: frame-loading-dash 1.5s ease-in-out infinite;
-  stroke-dasharray: 90,150;
-  stroke-dashoffset: 0;
-  stroke-width: 4;
-  stroke: $color-primary;
-  stroke-linecap: round;
-}
-
-@keyframes frame-loading-rotate{
-  100% {
-    transform: rotateZ(1turn);
-  }
-}
-
-@keyframes frame-loading-dash{
-  0% {
-    stroke-dasharray: 1,200;
-    stroke-dashoffset: 0;
-  }
-
-  50% {
-    stroke-dasharray: 90,150;
-    stroke-dashoffset: -40px;
-  }
-
-  100% {
-    stroke-dasharray: 90,150;
-    stroke-dashoffset: -120px;
-  }
-}
-
-.frame-tab-inner .icon-shuaxin{
-  width: 20px;
-  height: 20px;
-  font-size: 20px;
-  vertical-align: middle;
-  cursor: pointer;
-}
-
-.frame-close-btn{
-  vertical-align: middle;
-  margin: 0;
+  margin-left: 5px;
   padding: 0;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
-  color: #9a9a9a;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  color: #6a6a6a;
+  font-weight: 500;
 
   i.icon-close{
     font-size: 12px;
   }
  
   &:hover{
-    font-weight: 700;
-    color: #fff !important;
+    color: $color-danger;
   }
 }
 
 .frame-tab-active,
 .frame-tab:hover{
+  &:before{
+    background-color: transparent !important;
+  }
 
-  .frame-tab-inner{
-    background-color: $color-primary;
-    color: #fff;
-      
-    .frame-close-btn{
-      color: #fff;
+  & + .frame-tab{
+    &:before{
+      background-color: transparent !important;
     }
   }
 
-  .frame-loading-path{
-    stroke: #fff !important;
+  i.frame-tab-icon{
+    color: $color-primary;
+  }
+
+  .frame-tab-inner{
+    background-color: $color-primary-hover;
+    color: $color-primary;    
+  }
+}
+
+.frame-tab:hover{
+  .frame-tab-reload{
+    display: inline-block;
+  }
+
+  .frame-tab-icon{
+    display: none;
   }
 }
 </style>

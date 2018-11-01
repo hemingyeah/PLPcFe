@@ -258,9 +258,4 @@ export default {
     border-color: transparent;
   }
 }
-
-.customer-timeline,
-.customer-quick-comment{
-  
-}
 </style>

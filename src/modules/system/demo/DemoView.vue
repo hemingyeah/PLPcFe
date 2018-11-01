@@ -39,14 +39,12 @@
 import platform from "@src/platform";
 import * as dom from "@src/util/dom";
 
-import frameReload from "@src/mixin/frameReload";
 import * as FormUtil from "@src/component/form/util";
 
 const FORM_DESIGN_FIELDS = 'demo_form_design_fields'
 
 export default {
   name: "demo-view",
-  mixins: [frameReload],
   data() {
     return {
       fields: [],

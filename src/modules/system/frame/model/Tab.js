@@ -30,4 +30,8 @@ export default class Tab{
   get isUrlChange(){
     return this.url != this.currentUrl;
   }
+
+  get isHome(){
+    return this.url == '/home'
+  }
 }

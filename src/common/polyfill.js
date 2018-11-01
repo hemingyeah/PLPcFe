@@ -1,6 +1,5 @@
 /** 全局polyfill @author dongls */
 import "babel-polyfill";
-import {getRootWindow} from '../util/dom';
 
 if (!Element.prototype.matches) {
   Element.prototype.matches =
@@ -35,16 +34,4 @@ if (!Element.prototype.closest) {
 
   CustomEvent.prototype = window.Event.prototype;
   window.CustomEvent = CustomEvent;
-})();
-
-//click handler
-(function(){
-  //非顶层window
-  let rootWindow = getRootWindow(window);
-  if(window != rootWindow){
-    //传递点击事件，用于关闭popper
-    document.addEventListener('click', function(e){
-      rootWindow.document.body.click();
-    })
-  }
 })();

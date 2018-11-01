@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <transition name="collapse">
+    <transition name="collapse" @afterEnter="$emit('transitionEnd')" @afterLeave="$emit('transitionEnd')">
       <div class="frame-second-menu-wrap" v-if="!collapse && currMenu">
         <h3 class="frame-second-menu-title">{{currMenu.name}}</h3>
         <ul class="frame-second-menu">

@@ -25,11 +25,8 @@
 import platform from '@src/platform';
 import * as dom from '@src/util/dom';
 
-import frameReload from '@src/mixin/frameReload';
-
 export default {
   name: 'home-view',
-  mixins: [frameReload],
   data(){
     return {
       fields: [],

@@ -1,3 +1,44 @@
+// ------------------ modal fade ------------------
+.modal-fade-enter-active,
+.modal-fade-leave-active{
+  transition: opacity ease .3s;
+}
+
+.modal-fade-enter,
+.modal-fade-leave-active{
+  opacity: 0;
+}
+
+.modal-fade-enter-active .transition__container{
+  animation: modal-fade-in ease .3s;
+}
+
+.modal-fade-leave-active .transition__container{
+  animation: modal-fade-out ease .3s;
+}
+
+@keyframes modal-fade-in {
+  0% {
+    transform: translate3d(0, -20px, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, -20px, 0);
+    opacity: 0;
+  }
+}
+
 // ------------------ slide down ------------------
 .slide-down-enter-active,
 .slide-down-leave-active{

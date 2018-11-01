@@ -1,5 +1,5 @@
 <template>
-  <transition name="slide-down">
+  <transition name="modal-fade">
     <div class="saleManager-mask" @click.self="close" v-if="show">
       <div class="saleManager transition__container">
         <div class="saleManager-header">

@@ -1,6 +1,6 @@
 <template>
   <transition 
-    name="slide-down"
+    name="modal-fade"
     @after-leave="closed">
     <div v-show="show" class="base-modal-mask" @click.self="maskClose">
       <div class="base-modal transition__container" :style="{width: width}">

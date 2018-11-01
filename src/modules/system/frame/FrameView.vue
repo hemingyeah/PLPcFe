@@ -1,30 +1,60 @@
 <template>
   <div class="frame">
-    <frame-nav :collapse.sync="collapse" @open="openForNav" :source="initData.menus" :curr-url="currUrl"/>
+    <frame-nav 
+      :collapse.sync="collapse" 
+      :source="initData.menus" 
+      :curr-url="currUrl"
+      @open="openForNav"
+      @transitionEnd="navTransitionEnd"/>
     <div class="frame-content">
       <header class="frame-header">
-        <div class="frame-header-left">
-          <button class="btn-text frame-collapse-btn" @click="collapse = !collapse">
+        <div class="frame-header-left" :class="{'frame-tab-highlight': prevBtnEnable}">
+          <button type="button" class="btn-text frame-collapse" @click="collapse = !collapse">
             <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
           </button>
+          <button type="button" class="btn-text frame-tabs-prev" @click="prev" v-if="showOperateBtn">
+            <i class="iconfont icon-left"></i>
+          </button>
         </div>
-        <div class="frame-header-right">
-          <div><a href="/" style="line-height: 40px;">返回旧版</a></div>
+        
+        <!-- tabs -->
+        <div class="frame-tabs-scroll" ref="scroll">
+          <div class="frame-tabs-list" ref="list" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
+            <frame-tab 
+              v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
+              @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
+          </div>
+        </div>
+
+        <!-- profile -->
+        <div class="frame-header-right" :class="{'frame-tab-highlight': nextBtnEnable}">
+          <button type="button" class="btn-text frame-tabs-next" @click="next" v-if="showOperateBtn">
+            <i class="iconfont icon-right"></i>
+          </button>
+
+          <el-popover popper-class="frame-tabs-popper" placement="bottom-end" v-if="showOperateBtn">
+            <button type="button" class="btn-text frame-tabs-more" slot="reference">
+              <i class="iconfont icon-pile"></i>
+            </button>
+            <div class="frame-tabs-panel">
+              <frame-tab 
+                v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
+                @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
+            </div>
+          </el-popover>
+         
+          <!-- <div><a href="/" style="line-height: 40px;">返回旧版</a></div>
           <div class="dev-tool" v-if="showDevTool">
             <span>测试工具</span>
             <div class="dev-tool-menu">
               <a href="javascript:;" @click="openDemo">demo</a>
               <a href="javascript:;" @click="clearStorage">清空缓存</a>
             </div>
-          </div>
-          <!-- <button type="button" class="btn-text frame-header-btn" title="用户向导" v-tooltip><i class="iconfont icon-guide"></i></button> -->
-          <button type="button" class="btn-text frame-header-btn" @click="openHelpDoc"><i class="iconfont icon-help"></i> 帮助文档</button>
-          <button type="button" class="btn-text frame-header-btn" @click="saleManagerShow = !saleManagerShow"><i class="iconfont icon-customerservice"></i> 专属客服</button>
-          
-          <el-popover class="export-wrap" popper-class="export-panel-popper" placement="bottom-end">
-            <div class="export-btn" slot="reference"><i class="iconfont icon-download"></i> 导出下载</div>
+          </div> -->
+          <el-popover popper-class="export-panel-popper" placement="bottom-end">
+            <button type="button" class="btn-text frame-export" slot="reference"><i class="iconfont icon-download"></i> 导出下载</button>
 
-            <div class="export-panel">
+            <div class="frame-export-panel">
               <template v-if="exportList.length > 0">
                 <div v-for="item in exportList" :key="item.id" class="export-row">
                   <img src="../../../assets/img/excel.png">
@@ -43,19 +73,22 @@
           <!--导出下载-->
     
           <!-- 个人信息 -->
-          <el-popover class="user-profile-wrap" popper-class="user-profile-menu" v-model="profilePopperVisible">
-            <div class="user-profile" slot="reference">
+          <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
+            <div class="frame-user-profile" slot="reference">
               <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
                 <img :src="userAvatar"/>
               </a>
               <div class="user-info">
                 <h4>{{loginUser.displayName}}</h4>
-                <p><span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> {{loginUser.state}}</p>
+                <p>
+                  <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> 
+                  <span>{{loginUser.state}}</span>
+                </p>
               </div>
               <i class="iconfont icon-triangle-down user-profile-down"></i>
             </div>
             
-            <el-popover placement="left-start" popper-class="user-state-popper" v-model="userStatePopperVisible">
+            <el-popover placement="left-start" popper-class="user-state-popper" trigger="hover" v-model="userStatePopperVisible">
               <div class="user-profile-item" slot="reference"><i class="iconfont icon-user-status"></i>工作状态</div>
 
               <div class="user-state-panel">
@@ -72,15 +105,27 @@
             <div class="user-profile-item">
               <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
             </div>
-            <div class="user-profile-item logout">
-              <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-Signout"></i>注销</a>
+            <div class="user-profile-item">
+              <a href="https://help.shb.ltd" @click.prevent.self="openHelpDoc"><i class="iconfont icon-help"></i>帮助文档</a>
             </div>
-            
+            <div class="user-profile-item">
+              <a href="javascript:;" @click.prevent.self="openSaleManager"><i class="iconfont icon-customerservice"></i>专属客服</a>
+            </div>
+            <div class="user-profile-item logout">
+              <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-logout"></i>注销</a>
+            </div>
+
           </el-popover>
         </div>
       </header>
 
-      <frame-main ref="frameMain" v-model="currUrl"></frame-main>
+      <div class="frame-main">
+        <div class="frame-tab-content">
+          <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
+            <iframe :id="`frame_${tab.id}`" :data-id="tab.id" :src="tab.url" @load="updateFrameTab($event,tab)" allowfullscreen/>
+          </div>
+        </div>
+      </div>
     </div>
 
     <version :version="newVersion" :show.sync="versionShow"/>
@@ -91,10 +136,10 @@
 <script>
 import platform from '@src/platform'
 import http from '@src/util/http';
-import eventBus from '@src/util/eventBus';
+import FrameManager from './FrameManager';
 
+import FrameTab from './component/FrameTab.vue';
 import FrameNav from './component/FrameNav.vue';
-import FrameMain from './component/FrameMain.vue';
 import Version from './component/Version.vue';
 import SaleManager from './component/SaleManager.vue';
 
@@ -103,6 +148,7 @@ import DefaultHead from '@src/assets/img/user-avatar.png';
 const VERSION_NUM_KEY = 'shb_version_num';
 
 export default {
+  mixins: [FrameManager],
   name: 'frame-view',
   props: {
     initData: {
@@ -152,15 +198,16 @@ export default {
     }
   },
   methods: {
+    navTransitionEnd(){
+      let tab = this.frameTabs.find(item => item.show);
+      this.adjustFrameTabs(tab)
+    },
     openDemo(){
-      this.openFrameTab({
+      this.openForFrame({
         id: "demo",
         url: '/demo',
         title: 'demo'
       })
-    },
-    toggleCollapse(){
-      eventBus.$emit('es.frame.toggleCollapse');
     },
     /** @deprecated */
     async updateUser(){
@@ -199,24 +246,24 @@ export default {
     },
     openHelpDoc(event){
       platform.openLink("https://help.shb.ltd");
+      this.profilePopperVisible = false;
     },
     openUserView(event){
-      this.openFrameTab({
+      this.openForFrame({
         id: "userCenter",
         url: `/mine/` + this.loginUser.userId,
         title: '个人中心'
       })
+      this.profilePopperVisible = false;
     },
-    openFrameTab(option){
-      this.$refs.frameMain.openForFrame(option)
-    },
-    openForNav(menu){
-      this.$refs.frameMain.openForNav(menu)
+    openSaleManager(){
+      this.saleManagerShow = true;
+      this.profilePopperVisible = false;
     },
     //兼容旧页面，迁移完成后删除
     addTabs(option){
       console.warn('不推荐调用该方法，使用platform.openFrameTab替代');
-      this.openFrameTab(option)
+      this.openForFrame(option)
     },
     /** 检测是否有版本更新提示 */
     async checkVersion(){
@@ -320,341 +367,11 @@ export default {
   },
   components: {
     [FrameNav.name]: FrameNav,
-    [FrameMain.name]: FrameMain,
+    [FrameTab.name]: FrameTab,
     [Version.name]: Version,
     [SaleManager.name]: SaleManager
   }
 }
 </script>
 
-<style lang="scss">
-html, body, .frame{
-  background-color: #fff;
-  height: 100%;
-  overflow: hidden;
-}
-
-.frame{
-  display: flex;
-  flex-flow: row nowrap;
-}
-
-.frame-content{
-  flex: 1;
-  height: 100%;
-}
-
-.frame-header{
-  height: 52px;
-  display: flex;
-  align-items: center;
-
-  border-bottom: 1px solid #f4f7f5;
-}
-
-.frame-header-left{
-  padding-left: 10px;
-  flex: 1;
-}
-
-.frame-collapse-btn{
-  padding: 4px;
-  line-height: 20px;
-  text-align: center;
-  margin: 0;
-  color: $text-color-secondary;
-}
-
-.frame-header-right{
-  display: flex;
-  flex-flow: row nowrap;
-  height: 51px;
-  align-items: center;
-  padding-right: 8px;
-  user-select: none;
-}
-
-.frame-header-btn,
-.export-wrap,
-.user-profile-wrap{
-  position: relative;
-  color: $text-color-secondary;
-  width: 100px;
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  transition: background-color ease .3s;
-  z-index: 98;
-  cursor: pointer;
-  
-  i{
-    font-size: 14px; 
-  }
-
-  &:hover{
-    background-color: $color-primary-hover;
-  }
-}
-
-.export-btn{
-  height: 100%;
-  line-height: 50px;
-  text-align: center; 
-}
-
-.export-panel-popper{
-  width: 380px;
-  background-color: #fff;
-  box-shadow: 1px 1px 5px rgba(0,21,41, .15);
-  border: none;
-  padding: 0;
-  border-radius: 2px;
-}
-
-.export-panel{
-  padding: 5px 0;
-  max-height: 520px;
-  overflow: auto;
-}
-
-.export-row{
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding: 8px;
-  transition: background-color ease .3s;
-
-  img{
-    display: block;
-    width: 32px;
-    height: 32px;
-    border-radius: 2px;
-  }
-
-  a{
-    text-decoration: none;
-    margin-left: 5px;
-  }
-
-  &:hover{
-    background-color: $color-primary-hover;
-  }
-}
-
-.export-empty{
-  margin: 0;
-  text-align: center;
-  padding: 10px 0;
-}
-
-.export-row-info{
-  flex: 1;
-  overflow: hidden;
-  padding: 0 5px;
-
-  h4,p{
-    margin: 0;
-  }
-
-  h4{
-    font-size: 14px;
-    line-height: 18px;
-    color: $text-color-primary;
-    font-weight: 400;
-    @include text-ellipsis;
-  }
-
-  p{
-    line-height: 14px;
-    font-size: 12px;
-    color: #797e89;
-  }
-}
-
-.export-row-badge{
-  border-radius: 4px;
-  background-color: #409EFF;
-  font-size: 12px;
-  color: #fff;
-  text-align: center;
-  padding: 4px 6px;
-  line-height: 1;
-  margin: 0 5px;
-}
-
-.export-row-badge-finished{
-  background-color: #6cc87f;
-}
-
-.user-profile-wrap{
-  width: 160px;
-}
-
-.user-profile{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.user-avatar{
-  padding: 0 8px;
-
-  img{
-    display: block;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-  }
-}
-
-.user-info{
-  flex: 1;
-  overflow: hidden;
-
-  h4,p{
-    margin-bottom: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    cursor: default;
-  }
-
-  h4{
-    font-size: 14px;
-    line-height: 24px;
-    color: $text-color-primary;
-  }
-
-  p{
-    font-size: 12px;
-    line-height: 16px;
-    color: #797e89;
-  }
-}
-
-.user-profile-down{
-  font-size: 12px;
-  padding: 0 5px;
-  color: #797e89;
-}
-
-.user-profile-menu{
-  width: 160px;
-  background-color: #fff;
-  padding: 5px 0;
-  border-radius: 2px;
-  border: none;
-  box-shadow: 1px 1px 5px rgba(0,21,41, .15);
-  transition: background-color ease .3s;
-}
-
-.user-profile-item{
-  height: 40px;
-  line-height: 40px;
-  padding: 0 10px;
-  cursor: pointer;
-  color: #797e89;
-  transition: background-color ease .3s;
-  
-  i{
-    font-size: 14px;
-    margin-right: 8px;
-  }
-
-  &:hover{
-    background-color: $color-primary-hover;
-  }
-
-  a{
-    display: block;
-    width: 100%;
-    color: inherit;
-    text-decoration: none;
-  }
-}
-
-.logout:hover a{
-  color: #ed3f14;
-}
-
-.export-row{
-  display: flex;
-  flex-flow: row nowrap;
-}
-
-.dev-tool{
-  position: relative;
-  color: red;
-  cursor: default;
-  margin: 0 5px;
-  height: 20px;
-  line-height: 20px;
-  z-index: 90;
-
-  &:hover{
-    .dev-tool-menu{
-      display: block;
-    }
-  }
-}
-
-.dev-tool-menu{
-  display: none;
-  position: absolute;
-  top: 20px;
-  left: -5px;
-  min-width: 100px;
-  background-color: #ddd;
-
-  max-height: 360px;
-  overflow: auto;
-
-  a{
-    display: block;
-    width: 100%;
-    padding: 5px 8px;
-    color: red;
-  }
-}
-
-.user-state-popper{
-  margin-top: -5px;
-  background-color: #fff;
-  padding: 0;
-  
-  border-radius: 2px;
-  border: none;
-  box-shadow: 1px 1px 5px rgba(0,21,41, .15);
-  transition: background-color ease .3s;
-}
-
-.user-state-panel{
-  padding: 5px 0;
-  max-height: 620px;
-  overflow-y: auto;
-}
-
-.user-state-item{
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
-.user-color-icon{
-  display: block;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  margin-right: 8px;
-  background-color: $text-color-secondary;
-}
-
-.user-color-icon-mini{
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 2px;
-  vertical-align: middle;
-}
-</style>
+<style lang="scss" src="./frame.scss"></style>

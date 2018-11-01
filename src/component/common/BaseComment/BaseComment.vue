@@ -301,10 +301,9 @@ export default {
 .base-comment-loading{
   width: 30px;
   height: 30px;
-  border: 2px solid $color-primary;
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-  border-bottom-color: transparent !important;  
+  border: 2px solid #fff;
+  background-color: transparent;
+  border-top-color: $color-primary !important;
   border-radius: 50%;
 
   animation: rotating 1.5s linear infinite;
