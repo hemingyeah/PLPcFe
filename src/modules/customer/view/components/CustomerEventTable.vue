@@ -20,7 +20,7 @@
             {{scope.row[column.field]}}
           </template>
           <template v-else-if="column.field === 'eventNo'">
-            <a :href="`/event/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail">{{scope.row[column.field]}}</a>
+            <a :href="`/event/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail" class="event-link">{{scope.row[column.field]}}</a>
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -137,8 +137,14 @@
 <style lang="scss">
 
   .customer-event-table-container {
+    
+    .event-link {
+      color: #2F93C0;
+    }
+    
     .customer-event-table-pagination {
       text-align: right;
+      margin-top: 7px;
     }
   }
 </style>

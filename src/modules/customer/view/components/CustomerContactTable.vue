@@ -54,8 +54,7 @@
   import {formatDate,} from '@src/util/lang';
   import platform from '@src/platform';
   import EditContactDialog from '../operationDialog/EditContactDialog.vue';
-  // import _ from 'lodash';
-  
+
   export default {
     name: "customer-contact-table",
     props: {

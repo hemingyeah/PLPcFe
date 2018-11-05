@@ -12,25 +12,26 @@
         :label="column.label"
         :prop="column.field"
         :width="column.width"
+        :min-width="column.minWidth"
         :sortable="column.sortable"
         show-overflow-tooltip
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'area'">
-            <a href="javasript:;" @click="openDialog(scope.row)">{{scope.row[column.field]}}</a>
+            <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
           <div class="address-action" v-else-if="column.field === 'action'">
-
-            <span v-if="scope.row.isMain">默认地址</span>
-            <span v-else @click="setDefaultAddress(scope.row)" class="set-default-address-btn">
-              <i class="iconfont icon-part"></i>
-              设为默认地址
-            </span>
-
             <el-button type="danger" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]"
-                       icon="iconfont icon-shanchu">删除
+                       size="mini" icon="iconfont icon-shanchu">删除
             </el-button>
           </div>
+          <template v-else-if="column.field === 'type'">
+            <span v-if="scope.row.isMain">默认地址</span>
+            <span v-else @click="setDefaultAddress(scope.row)" class="set-default-address-btn">
+              <i class="iconfont icon-part"></i>设为默认
+            </span>
+          </template>
+
           <template v-else-if="column.field === 'address'">
             {{scope.row[column.field]}}
             <i class="iconfont icon-address customer-address-icon" @click="openMap(scope.row)"
@@ -52,8 +53,9 @@
       :total="paginationInfo.totalItems">
     </el-pagination>
 
-    <edit-address-dialog ref="addAddressDialog" :customer-id="shareData.customerId" :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="updateSuccess"
-                        :default-address="formatSelectedAddress"></edit-address-dialog>
+    <edit-address-dialog ref="addAddressDialog" :customer-id="shareData.customerId"
+                         :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="updateSuccess"
+                         :default-address="formatSelectedAddress"></edit-address-dialog>
   </div>
 </template>
 
@@ -63,7 +65,6 @@
   import EditAddressDialog from '../operationDialog/EditAddressDialog.vue';
   import _ from 'lodash';
 
-  
   export default {
     name: "customer-address-table",
     props: {
@@ -187,16 +188,22 @@
           label: '地址',
           field: 'area',
           show: true,
+          minWidth: '200px'
           // sortable: 'custom',
         }, {
           label: '详细地址',
           field: 'address',
           show: true,
+          minWidth: '200px'
+        }, {
+          label: '',
+          field: 'type',
+          show: true,
+          width: '110px'
         }, {
           label: '操作',
           field: 'action',
           show: true,
-          width: '200px',
         }]
       }
     },
@@ -211,23 +218,24 @@
 
   .customer-address-table-container {
 
-    .address-action {
-      display: flex;
-      justify-content: space-between;
+    .edit-btn {
+      color: #2F93C0
+    }
 
-      .set-default-address-btn {
-        line-height: 34px;
+    .set-default-address-btn {
+      line-height: 34px;
+      display: block;
+      text-align: center;
 
-        &:hover {
-          cursor: pointer;
-          background-color: #e7e7e7;
-          text-align: center;
-        }
+      &:hover {
+        cursor: pointer;
+        background-color: #e7e7e7;
       }
     }
 
     .customer-address-table-pagination {
       text-align: right;
+      margin-top: 7px;
     }
   }
 </style>

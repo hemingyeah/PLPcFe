@@ -103,6 +103,7 @@
   import CustomerProductTable from './components/CustomerProductTable.vue';
   import CustomerContactTable from './components/CustomerContactTable.vue';
   import CustomerAddressTable from './components/CustomerAddressTable.vue';
+  import CustomerPlanTable from './components/CustomerPlanTable';
 
   import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
   import EditContactDialog from './operationDialog/EditContactDialog.vue';
@@ -229,22 +230,33 @@
             displayName: '信息动态',
             component: CustomerInfoRecord.name,
             slotName: 'record-tab',
+            show: true,
           }, {
             displayName: '事件',
             component: CustomerEventTable.name,
+            show: true,
           }, {
             displayName: '工单',
             component: CustomerTaskTable.name,
+            show: true,
+          }, {
+            displayName: '计划任务',
+            component: CustomerPlanTable.name,
+            show: this.initData.planTaskEnabled
           }, {
             displayName: '客户产品',
             component: CustomerProductTable.name,
+            show: true,
           }, {
             displayName: '客户地址',
             component: CustomerAddressTable.name,
+            show: true,
           }, {
             displayName: '联系人',
             component: CustomerContactTable.name,
+            show: true,
           }]
+        .filter(tab => tab.show);
       },
       async deleteCustomer() {
         try {
@@ -325,6 +337,7 @@
       [CustomerProductTable.name]: CustomerProductTable,
       [CustomerContactTable.name]: CustomerContactTable,
       [CustomerAddressTable.name]: CustomerAddressTable,
+      [CustomerPlanTable.name]: CustomerPlanTable,
       EditAddressDialog,
       EditContactDialog,
       [RemindCustomerDialog.name]: RemindCustomerDialog,

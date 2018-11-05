@@ -20,7 +20,10 @@
             {{scope.row[column.field]}}
           </template>
           <template v-else-if="column.field === 'taskNo'">
-            <a :href="`/task/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail">{{scope.row[column.field]}}</a>
+            <a :href="`/task/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail" class="task-link">{{scope.row[column.field]}}</a>
+          </template>
+          <template v-else-if="column.field === 'executor' && scope.row[column.field]">
+            {{scope.row[column.field].displayName}}
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -152,10 +155,14 @@
 </script>
 
 <style lang="scss">
-
   .customer-task-table-container {
+
+    .task-link {
+      color: #2F93C0;
+    }
     .customer-task-table-pagination {
       text-align: right;
+      margin-top: 7px;
     }
   }
 </style>

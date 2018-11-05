@@ -20,7 +20,7 @@
             {{scope.row[column.field]}}
           </template>
           <template v-else-if="column.field === 'name'">
-            <a :href="`/customer/product/view/${scope.row.id}`" :data-id="scope.row.id">{{scope.row[column.field]}}</a>
+            <a :href="`/customer/product/view/${scope.row.id}`" :data-id="scope.row.id" class="product-link">{{scope.row[column.field]}}</a>
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -116,8 +116,14 @@
 <style lang="scss">
 
   .customer-product-table-container {
+
+    .product-link {
+      color: #2F93C0;
+    }
+
     .customer-product-table-pagination {
       text-align: right;
+      margin-top: 7px;
     }
   }
 </style>
