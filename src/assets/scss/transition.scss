@@ -1,7 +1,7 @@
 // ------------------ modal fade ------------------
 .modal-fade-enter-active,
 .modal-fade-leave-active{
-  transition: opacity ease .3s;
+  transition: opacity ease .2s;
 }
 
 .modal-fade-enter,
@@ -10,11 +10,11 @@
 }
 
 .modal-fade-enter-active .transition__container{
-  animation: modal-fade-in ease .3s;
+  animation: modal-fade-in ease .2s;
 }
 
 .modal-fade-leave-active .transition__container{
-  animation: modal-fade-out ease .3s;
+  animation: modal-fade-out ease .2s;
 }
 
 @keyframes modal-fade-in {

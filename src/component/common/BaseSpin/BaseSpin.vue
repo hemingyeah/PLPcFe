@@ -3,6 +3,7 @@
     <svg class="base-spin-circular " viewBox="25 25 50 50">
       <circle class="base-spin-path" cx="50" cy="50" r="20" fill="none"/>
     </svg>
+    <span class="base-spin-text" v-if="text">{{text}}</span>
   </i>
 </template>
 
@@ -13,6 +14,10 @@ export default {
     size: {
       type: String, //large medium small
       default: 'medium'
+    },
+    text: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -26,8 +31,6 @@ export default {
 <style lang="scss">
 .base-spin{
   display: inline-block;
-  height: 42px;
-  width: 42px;
   position: relative;
 }
 
@@ -35,6 +38,7 @@ export default {
   display: block;
   width: 100%;
   height: 100%;
+  margin: 0 auto;
   will-change: transform;
   animation: base-spin-rotate 2s linear infinite;
 }
@@ -71,9 +75,19 @@ export default {
   }
 }
 
+.base-spin-text{
+  display: block;
+  font-style: normal;
+  font-size: 13px;
+  color: $text-color-secondary;
+  padding-top: 8px;
+}
+
 .base-spin-large{
-  height: 42px;
-  width: 42px;
+  .base-spin-circular{
+    height: 42px;
+    width: 42px;
+  }
 
   .base-spin-path{
     stroke-width: 2;
@@ -81,8 +95,10 @@ export default {
 }
 
 .base-spin-medium{
-  height: 30px;
-  width: 30px;
+  .base-spin-circular{
+    height: 30px;
+    width: 30px;
+  }
 
   .base-spin-path{
     stroke-width: 4;
@@ -90,8 +106,10 @@ export default {
 }
 
 .base-spin-small{
-  height: 16px;
-  width: 16px;
+  .base-spin-circular{
+    height: 16px;
+    width: 16px;
+  }
   
   .base-spin-path{
     stroke-width: 6;

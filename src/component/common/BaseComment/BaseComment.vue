@@ -30,7 +30,7 @@
     </div>
     <input type="file" ref="input" @change="handleChange" multiple>
     <div class="base-comment-cover" v-if="!allowOperate">
-      <div class="base-comment-loading"></div>
+      <base-spin text="请稍等..."></base-spin>
     </div>
   </div>
 </template>
@@ -74,21 +74,6 @@ export default {
     }
   },
   methods: {
-    resizeTextarea() {
-      if (this.$isServer) return;
-      const { autosize, type } = this;
-      if (type !== 'textarea') return;
-      if (!autosize) {
-        this.textareaCalcStyle = {
-          minHeight: calcTextareaHeight(this.$refs.textarea).minHeight
-        };
-        return;
-      }
-      const minRows = autosize.minRows;
-      const maxRows = autosize.maxRows;
-
-      this.textareaCalcStyle = calcTextareaHeight(this.$refs.textarea, minRows, maxRows);
-    },
     validateContent(content){
       let field = {isNull: 0, formType: 'textarea', displayName: '内容'};
       return Validator.validate(this.form.content, field).then(validateRes => {
@@ -296,17 +281,6 @@ export default {
   .base-file-item:last-child{
     margin-bottom: 0;
   }
-}
-
-.base-comment-loading{
-  width: 30px;
-  height: 30px;
-  border: 2px solid #fff;
-  background-color: transparent;
-  border-top-color: $color-primary !important;
-  border-radius: 50%;
-
-  animation: rotating 1.5s linear infinite;
 }
 
 .base-comment-err{
