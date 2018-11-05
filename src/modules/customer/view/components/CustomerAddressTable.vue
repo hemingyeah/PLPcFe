@@ -1,23 +1,209 @@
 <template>
   <div class="customer-address-table-container">
+    <el-table
+      stripe
+      :data="addressList"
+      :highlight-current-row="false"
+      class="customer-address-table">
+      <el-table-column
+        v-for="column in columns"
+        v-if="column.show"
+        :key="column.field"
+        :label="column.label"
+        :prop="column.field"
+        :width="column.width"
+        :sortable="column.sortable"
+        show-overflow-tooltip
+        :align="column.align">
+        <template slot-scope="scope">
+          <template v-if="column.field === 'area'">
+            <a href="javasript:;" @click="openDialog(scope.row)">{{scope.row[column.field]}}</a>
+          </template>
+          <div class="address-action" v-else-if="column.field === 'action'">
 
-    <h1>address</h1>
+            <span v-if="scope.row.isMain">默认地址</span>
+            <span v-else @click="setDefaultAddress(scope.row)" class="set-default-address-btn">
+              <i class="iconfont icon-part"></i>
+              设为默认地址
+            </span>
+
+            <el-button type="danger" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]"
+                       icon="iconfont icon-shanchu">删除
+            </el-button>
+          </div>
+          <template v-else-if="column.field === 'address'">
+            {{scope.row[column.field]}}
+            <i class="iconfont icon-address customer-address-icon" @click="openMap(scope.row)"
+               v-if="scope.row.longitude && scope.row.latitude"></i>
+          </template>
+          <template v-else>
+            {{scope.row[column.field]}}
+          </template>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      class="customer-address-table-pagination"
+      background
+      @current-change="jump"
+      :page-size="paginationInfo.pageSize"
+      :current-page="paginationInfo.pageNum"
+      layout="prev, pager, next"
+      :total="paginationInfo.totalItems">
+    </el-pagination>
+
+    <edit-address-dialog ref="addAddressDialog" :customer-id="shareData.customerId" :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="updateSuccess"
+                        :default-address="formatSelectedAddress"></edit-address-dialog>
   </div>
 </template>
 
 <script>
+  import {formatDate,} from '@src/util/lang';
+  import platform from '@src/platform'
+  import EditAddressDialog from '../operationDialog/EditAddressDialog.vue';
+  import _ from 'lodash';
 
-
+  
   export default {
     name: "customer-address-table",
+    props: {
+      shareData: {
+        type: Object,
+        default: () => ({})
+      }
+    },
     data() {
-      return {}
+      return {
+        addressList: [],
+        selectedAddress: {},
+        pending: {},
+        columns: this.buildColumns(),
+        paginationInfo: {
+          pageSize: 10,
+          pageNum: 1,
+          totalItems: 0,
+        }
+      }
+    },
+    computed: {
+      formatSelectedAddress() {
+        const {province, city, dist, address, longitude, latitude, addressType, id} = this.selectedAddress;
+        if (!province || !city) return {};
+        return {
+          adAddress: [province, city, dist],
+          detail: address,
+          adLongitude: longitude || '',
+          adLatitude: latitude || '',
+          addressType: addressType || 0,
+          id
+        }
+      }
     },
     mounted() {
-
+      this.fetchData();
     },
-    methods: {},
-    components: {}
+    methods: {
+      updateSuccess() {
+        this.fetchData();
+      },
+      openDialog(address) {
+        this.selectedAddress = address;
+        this.$nextTick(() => {
+          this.$refs.addAddressDialog.openDialog();
+        });
+
+      },
+      async deleteAddress(address) {
+        if (address.isMain) return platform.alert('默认地址不能删除');
+        try {
+          const res = await platform.confirm('确定要删除该地址？');
+          if (!res) return;
+          this.pending[address.id] = true;
+          const reqRes = await this.$http.post('/customer/address/delete', {ids: address.id,}, false);
+          delete this.pending[address.id];
+          if (reqRes.status === 0) {
+            this.fetchData();
+          } else {
+            platform.alert(res.message);
+          }
+        } catch (e) {
+          console.error('err',);
+        }
+      },
+      setDefaultAddress(address) {
+        if (this.pending[address.id]) return;
+        this.pending[address.id] = true;
+        this.$http.post('/customer/address/setMain', {id: address.id}, false)
+        .then(res => {
+          if (res.status === 0) {
+            this.fetchData();
+          } else {
+            platform.alert(res.message);
+          }
+          this.pending[address.id] = false;
+        });
+      },
+      openMap(address) {
+
+        const ad = {
+          adLongitude: address.longitude,
+          adLatitude: address.latitude,
+        };
+
+        this.$fast.map.display(ad, {title: '客户地址',})
+        .catch(err => console.error('openMap catch an err: ', err));
+      },
+
+      jump(pN) {
+        this.paginationInfo.pageNum = pN;
+        this.fetchData();
+      },
+      fetchData() {
+        const params = {
+          customerId: this.shareData.customerId,
+          pageNum: this.paginationInfo.pageNum,
+          pageSize: this.paginationInfo.pageSize,
+        };
+        let adArr = [];
+        
+        this.$http.get('/v2/customer/address/list', params)
+        .then(res => {
+          this.addressList = res.list
+          .map(address => {
+            this.$set(this.pending, address.id, false);
+
+            adArr = [address.province, address.city, address.dist]
+            .filter(ad => ad);
+            address.area = _.uniq(adArr).join('-');
+            address.createTime = formatDate(new Date(address.createTime), 'YYYY-MM-DD HH:mm:ss');
+            return Object.freeze(address);
+          });
+
+          this.paginationInfo.totalItems = res.total;
+        })
+      },
+      buildColumns() {
+        return [{
+          label: '地址',
+          field: 'area',
+          show: true,
+          // sortable: 'custom',
+        }, {
+          label: '详细地址',
+          field: 'address',
+          show: true,
+        }, {
+          label: '操作',
+          field: 'action',
+          show: true,
+          width: '200px',
+        }]
+      }
+    },
+    components: {
+      EditAddressDialog,
+      [EditAddressDialog.name]: EditAddressDialog,
+    }
   }
 </script>
 
@@ -25,5 +211,23 @@
 
   .customer-address-table-container {
 
+    .address-action {
+      display: flex;
+      justify-content: space-between;
+
+      .set-default-address-btn {
+        line-height: 34px;
+
+        &:hover {
+          cursor: pointer;
+          background-color: #e7e7e7;
+          text-align: center;
+        }
+      }
+    }
+
+    .customer-address-table-pagination {
+      text-align: right;
+    }
   }
 </style>

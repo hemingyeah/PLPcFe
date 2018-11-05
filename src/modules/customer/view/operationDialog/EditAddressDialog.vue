@@ -1,7 +1,7 @@
 <template>
-  <base-modal title="添加地址" :show.sync="addAddressDialog" width="500px" class="add-address-dialog">
+  <base-modal :title="title" :show.sync="addAddressDialog" width="500px" class="edit-address-dialog">
     <form @submit.prevent="submit">
-      <form-builder :fields="[]" class="add-address-form" ref="form" :value="form" @input="update">
+      <form-builder :fields="[]" class="edit-address-form" ref="form" :value="form" @input="update">
         <form-item label="" :field="addressField">
           <form-address ref="addressForm" :field="addressField" :value="form.customerAddress" @input="update"
                         @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
@@ -21,9 +21,17 @@
   import FormAddress from '../../edit/FormAddress.vue';
 
   export default {
-    name: "add-address-dialog",
+    name: "edit-address-dialog",
     props: {
       customerId: {
+        type: String,
+        default: '',
+      },
+      action: {
+        type: String,
+        default: 'create',
+      },
+      loginUserId: {
         type: String,
         default: '',
       },
@@ -57,6 +65,11 @@
         }
       }
     },
+    computed: {
+      title() {
+        return this.action === 'create' ? '添加地址' : '编辑地址';
+      }
+    },
     mounted() {
 
     },
@@ -67,18 +80,24 @@
           if (!validateRes) return;
 
           const params = this.buildParams();
-          await this.$http.post('/customer/address/create', params, false);
+          const url = `/customer/address/${this.action === 'create' ? 'create' : 'update'}`;
+
+          await this.$http.post(url, params, false);
+
+          this.$emit('submit-success');
+
           // todo reload customer address
           this.addAddressDialog = false;
         } catch (e) {
-          console.error('add-address-dialog catch err', e);
+          console.error('edit-address-dialog catch err', e);
         }
       },
       buildParams() {
         const { adAddress, detail,} = this.form.customerAddress;
         const { adAddress: adAddressBp, detail: detailBp, adLongitude, adLatitude, } = this.addressBackup;
         let params = {
-          id: '',
+          // id: this.loginUserId,
+          id: this.defaultAddress.id || '',
           customerId: this.customerId,
           province: adAddress[0] || '',
           city: adAddress[1] || '',
@@ -93,7 +112,6 @@
           params.latitude = adLatitude;
           params.addressType = 1;
         }
-
         return params;
       },
       update({field, newValue, oldValue}) {
@@ -113,6 +131,9 @@
       },
       openDialog() {
         this.addAddressDialog = true;
+        if (this.action === 'edit') {
+          this.update({field: this.addressField, newValue: this.defaultAddress});
+        }
         this.setDefaultAddress(this.defaultAddress)
       },
     },
@@ -124,7 +145,7 @@
 
 <style lang="scss">
 
-  .add-address-form {
+  .edit-address-form {
     padding: 10px 30px;
 
     .form-item label {

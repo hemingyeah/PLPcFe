@@ -1,9 +1,9 @@
 <template>
-  <base-modal title="添加联系人" :show.sync="addContactDialog" width="500px"
-              class="add-contact-dialog">
+  <base-modal title="添加联系人" :show.sync="addContactDialog" width="500px" @cancel="$emit('submit-success')"
+              class="edit-contact-dialog">
 
-    <form @submit.prevent="submit" class="add-contact-form-container">
-      <form-builder :fields="[]" class="add-contact-form" ref="form" :value="form" @input="update">
+    <form @submit.prevent="submit" class="edit-contact-form-container">
+      <form-builder :fields="[]" class="edit-contact-form" ref="form" :value="form" @input="update">
         <div>
           <form-item label="姓名" :field="formFields.nameField">
             <form-text :field="formFields.nameField" :value="form.name" @input="update"
@@ -16,7 +16,7 @@
         </div>
         <div>
           <form-item label="性别" :field="formFields.genderField">
-            <form-select :field="formFields.genderField" :value="form.gender" @input="update"
+            <form-select :field="formFields.genderField" :value="form.sex" @input="update"
                          :placeholder="formFields.genderField.placeholder"></form-select>
           </form-item>
           <form-item label="邮箱" :field="formFields.emailField">
@@ -35,13 +35,13 @@
           </form-item>
         </div>
         <div>
-          <form-item label="关联地址" :field="formFields.genderField">
-            <form-select :field="formFields.genderField" :value="form.gender" @input="update"
-                         :placeholder="formFields.genderField.placeholder"></form-select>
+          <form-item label="关联地址" :field="formFields.addressField">
+            <form-select :field="formFields.addressField" :value="form.address" @input="update"
+                         :placeholder="formFields.addressField.placeholder"></form-select>
           </form-item>
-          <form-item label="关联产品" :field="formFields.genderField">
-            <form-select :field="formFields.genderField" :value="form.gender" @input="update"
-                         :placeholder="formFields.genderField.placeholder"></form-select>
+          <form-item label="关联产品" :field="formFields.productField">
+            <form-select :field="formFields.productField" :value="form.productId" @input="update"
+                         :placeholder="formFields.productField.placeholder"></form-select>
           </form-item>
         </div>
         <div>
@@ -50,8 +50,6 @@
                            :placeholder="formFields.remarkField.placeholder"></form-textarea>
           </form-item>
         </div>
-
-
       </form-builder>
 
       <div class="dialog-footer">
@@ -66,15 +64,20 @@
   import FormTextarea from "../../../../component/form/components/FormTextarea/FormTextarea";
 
   export default {
-    name: "add-contact-dialog",
+    name: "edit-contact-dialog",
     components: {FormTextarea},
     props: {
       customer: {
         type: Object,
         default: () => ({}),
       },
+      originalValue: {
+        type: Object,
+        default: () => ({}),
+      },
     },
     data() {
+      const ctx = this;
       return {
         addContactDialog: false,
         pending: false,
@@ -94,9 +97,10 @@
             isNull: 0,
             remote: {
               action: '/linkman/checkUnique4Phone',
-              buildParams() {
+              buildParams(val) {
                 const params = {
-                  phone: '',
+                  phone: val,
+                  id: ctx.originalValue.id || '',
                 };
                 return params;
               }
@@ -104,7 +108,7 @@
           },
           genderField: {
             formType: 'selectMulti',
-            fieldName: 'gender',
+            fieldName: 'sex',
             displayName: "性别",
             placeholder: '请选择',
             isNull: 1,
@@ -140,7 +144,27 @@
             placeholder: '[最多500字]',
             isNull: 1,
           },
-
+          productField: {
+            formType: 'selectMulti',
+            fieldName: 'productId',
+            displayName: "关联产品",
+            placeholder: '请选择',
+            isNull: 1,
+            setting: {
+              isMulti: true,
+              dataSource: [],
+            }
+          },
+          addressField: {
+            formType: 'selectMulti',
+            fieldName: 'address',
+            displayName: "关联地址",
+            placeholder: '请选择',
+            isNull: 1,
+            setting: {
+              dataSource: [],
+            }
+          },
         },
         form: {
           name: null,
@@ -148,24 +172,45 @@
           sex: '男',
           position: '',
           department: '',
-          address: '',
+          address: '', // address的ID
           customId: '',
           customer: {},
           id: '',
           phone: null,
           email: null,
-          productId: [],
+          productId: [], //数组，包含产品对象
         },
+        loadData: false,
       }
     },
     computed: {
+      action() {
+        return this.originalValue.name ? 'edit' : 'create';
+      },
       customerId() {
         return this.customer && this.customer.id || '';
       }
     },
     mounted() {
+      this.fetchData();
+
     },
     methods: {
+      fetchData() {
+        let n = 0;
+        let timer = setInterval(() => {
+          n++;
+          if (this.customer.id) {
+            this.fetchProducts();
+            this.fetchAddress();
+
+            return clearInterval(timer);
+          }
+          if (n > 10) {
+            return clearInterval(timer);
+          }
+        }, 1000);
+      },
       async submit() {
         try {
           const validateRes = await this.$refs.form.validate();
@@ -175,9 +220,19 @@
           const params = {
             ...this.form,
             customer: this.customer,
+            productId: this.formFields.productField.setting.dataSource
+            .filter(p => this.form.productId.some((pId => pId === p.value)))
+            .map(p => ({
+              id: p.value,
+              name: p.text,
+            })),
           };
 
-          await this.$http.post('/linkman/createByJson', params);
+          if (this.action === 'create') {
+            await this.$http.post('/linkman/createByJson', params);
+          } else {
+            await this.$http.post('/linkman/updateByJson', params);
+          }
 
           this.pending = false;
           this.addContactDialog = false;
@@ -191,17 +246,17 @@
       reset() {
         this.form = {
           name: null,
-            remark: '',
-            sex: '男',
-            position: '',
-            department: '',
-            address: '',
-            customId: '',
-            customer: {},
+          remark: '',
+          sex: '男',
+          position: '',
+          department: '',
+          address: '',
+          customId: '',
+          customer: {},
           id: '',
-            phone: null,
-            email: null,
-            productId: [],
+          phone: null,
+          email: null,
+          productId: [],
         };
       },
       update({field, newValue, oldValue}) {
@@ -213,20 +268,74 @@
       },
       openDialog() {
         this.addContactDialog = true;
+        if (this.action === 'edit') {
+          this.matchValueToForm(this.originalValue)
+        }
       },
+      matchValueToForm(val) {
+        const {name, remark, sex, position, department, customerId, customer, id, phone, email, address} = val;
+
+        this.form = {
+          name,
+          remark,
+          sex,
+          position,
+          department,
+          address,
+          customId: customerId || customer.id,
+          customer: customer || {},
+          id,
+          phone,
+          email,
+          productId: [],
+        };
+        if (val.productId && val.productId.length) {
+          this.form.productId = val.productId.map(p => p.id);
+        }
+      },
+      fetchAddress() {
+        this.$http.get('/v2/customer/address/list', {
+          customerId: this.customer.id,
+          pageSize: 100000,
+          pageNum: 1,
+        })
+        .then(res => {
+          this.formFields.addressField.setting.dataSource = res.list
+          .map(p => ({
+            text: p.province + p.city + p.dist + p.address,
+            value: p.id,
+          }));
+        })
+        .catch(err => console.error('fetchAddress catch err', err));
+      },
+      fetchProducts() {
+        this.$http.get('/v2/customer/product/list', {
+          customerId: this.customer.id,
+          pageSize: 100000,
+          pageNum: 1,
+        })
+        .then(res => {
+          this.formFields.productField.setting.dataSource = res.list
+          .map(p => ({
+            text: p.name,
+            value: p.id,
+          }));
+        })
+        .catch(err => console.error('fetchProducts catch err', err));
+      }
     },
   }
 </script>
 
 <style lang="scss">
 
-  .add-contact-dialog {
+  .edit-contact-dialog {
 
-    .add-contact-form-container {
+    .edit-contact-form-container {
       width: 85%;
     }
 
-    .add-contact-form {
+    .edit-contact-form {
 
     }
 

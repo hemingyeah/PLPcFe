@@ -1,10 +1,10 @@
 <template>
-  <div class="customer-event-table-container">
+  <div class="customer-product-table-container">
     <el-table
       stripe
-      :data="eventList"
+      :data="productList"
       :highlight-current-row="false"
-      class="customer-event-table">
+      class="customer-product-table">
       <el-table-column
         v-for="column in columns"
         v-if="column.show"
@@ -19,8 +19,8 @@
           <template v-if="column.field === 'state'">
             {{scope.row[column.field]}}
           </template>
-          <template v-else-if="column.field === 'eventNo'">
-            <a :href="`/event/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail">{{scope.row[column.field]}}</a>
+          <template v-else-if="column.field === 'name'">
+            <a :href="`/customer/product/view/${scope.row.id}`" :data-id="scope.row.id">{{scope.row[column.field]}}</a>
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -29,7 +29,7 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      class="customer-event-table-pagination"
+      class="customer-product-table-pagination"
       background
       @current-change="jump"
       :page-size="paginationInfo.pageSize"
@@ -46,7 +46,7 @@
 
 
   export default {
-    name: "customer-event-table",
+    name: "customer-product-table",
     props: {
       shareData: {
         type: Object,
@@ -55,7 +55,7 @@
     },
     data() {
       return {
-        eventList: [],
+        productList: [],
         columns: this.buildColumns(),
         paginationInfo: {
           pageSize: 10,
@@ -68,61 +68,40 @@
       this.fetchData();
     },
     methods: {
-      openDetail(event){
-        event.preventDefault();
-
-        if (!window.frameElement) return;
-
-        let el = event.target;
-        var fromId = window.frameElement.getAttribute('id');
-
-        parent.window.addTabs({
-          id: "taskView_" + el.dataset.id,
-          title: "正在加载",
-          close: true,
-          url: el.getAttribute('href'),
-          fromId:fromId
-        });
-        parent.window.resizeFrame();
-      },
       jump(pN) {
         this.paginationInfo.pageNum = pN;
         this.fetchData();
       },
       fetchData() {
         const params = {
-          cusId: this.shareData.customerId,
+          customerId: this.shareData.customerId,
           pageNum: this.paginationInfo.pageNum,
           pageSize: this.paginationInfo.pageSize,
         };
 
-        this.$http.get('/v2/customer/event/list', params)
+        this.$http.get('/v2/customer/product/list', params)
         .then(res => {
-          this.eventList = res.list
-          .map(event => {
-            event.createTime = formatDate(new Date(event.createTime), 'YYYY-MM-DD HH:mm:ss');
-            return Object.freeze(event);
+          this.productList = res.list
+          .map(product => {
+            product.createTime = formatDate(new Date(product.createTime), 'YYYY-MM-DD HH:mm:ss');
+            return Object.freeze(product);
           });
           this.paginationInfo.totalItems = res.total;
         })
       },
       buildColumns() {
         return [{
-          label: '事件编号',
-          field: 'eventNo',
+          label: '名称',
+          field: 'name',
           show: true,
           // sortable: 'custom',
         }, {
-          label: '事件类型',
-          field: 'templateName',
+          label: '产品编号',
+          field: 'serialNumber',
           show: true,
         }, {
-          label: '负责人',
-          field: 'executorName',
-          show: true,
-        }, {
-          label: '状态',
-          field: 'state',
+          label: '类型',
+          field: 'type',
           show: true,
         }, {
           label: '创建时间',
@@ -136,8 +115,8 @@
 
 <style lang="scss">
 
-  .customer-event-table-container {
-    .customer-event-table-pagination {
+  .customer-product-table-container {
+    .customer-product-table-pagination {
       text-align: right;
     }
   }

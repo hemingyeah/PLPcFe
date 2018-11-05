@@ -1,10 +1,10 @@
 <template>
-  <div class="customer-event-table-container">
+  <div class="customer-task-table-container">
     <el-table
       stripe
-      :data="eventList"
+      :data="taskList"
       :highlight-current-row="false"
-      class="customer-event-table">
+      class="customer-task-table">
       <el-table-column
         v-for="column in columns"
         v-if="column.show"
@@ -19,8 +19,8 @@
           <template v-if="column.field === 'state'">
             {{scope.row[column.field]}}
           </template>
-          <template v-else-if="column.field === 'eventNo'">
-            <a :href="`/event/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail">{{scope.row[column.field]}}</a>
+          <template v-else-if="column.field === 'taskNo'">
+            <a :href="`/task/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail">{{scope.row[column.field]}}</a>
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -29,7 +29,7 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      class="customer-event-table-pagination"
+      class="customer-task-table-pagination"
       background
       @current-change="jump"
       :page-size="paginationInfo.pageSize"
@@ -46,7 +46,7 @@
 
 
   export default {
-    name: "customer-event-table",
+    name: "customer-task-table",
     props: {
       shareData: {
         type: Object,
@@ -55,7 +55,7 @@
     },
     data() {
       return {
-        eventList: [],
+        taskList: [],
         columns: this.buildColumns(),
         paginationInfo: {
           pageSize: 10,
@@ -91,42 +91,59 @@
       },
       fetchData() {
         const params = {
-          cusId: this.shareData.customerId,
+          customerId: this.shareData.customerId,
           pageNum: this.paginationInfo.pageNum,
-          pageSize: this.paginationInfo.pageSize,
+          pageSize: this.paginationInfo.pageSize
         };
 
-        this.$http.get('/v2/customer/event/list', params)
+        this.$http.get('/v2/customer/task/list', params)
         .then(res => {
-          this.eventList = res.list
-          .map(event => {
-            event.createTime = formatDate(new Date(event.createTime), 'YYYY-MM-DD HH:mm:ss');
-            return Object.freeze(event);
+          this.taskList = res.list
+          .map(task => {
+            task.createTime = formatDate(new Date(task.createTime), 'YYYY-MM-DD HH:mm:ss');
+            if (!task.products || !task.products.length) {
+              task.productName = task.product ? task.product.name : '';
+            } else {
+              task.productName = task.products.map(p => p.name).join('、');
+            }
+            return Object.freeze(task);
           });
           this.paginationInfo.totalItems = res.total;
         })
       },
       buildColumns() {
         return [{
-          label: '事件编号',
-          field: 'eventNo',
+          label: '工单编号',
+          field: 'taskNo',
           show: true,
           // sortable: 'custom',
         }, {
-          label: '事件类型',
+          label: '工单类型',
           field: 'templateName',
           show: true,
         }, {
-          label: '负责人',
-          field: 'executorName',
+          label: '产品名称',
+          field: 'productName',
           show: true,
         }, {
-          label: '状态',
+          label: '工单状态',
           field: 'state',
+          show: true,
+        }, {
+          label: '负责人',
+          field: 'executor',
           show: true,
         }, {
           label: '创建时间',
           field: 'createTime',
+          show: true,
+        }, {
+          label: '完成时间',
+          field: 'completeTime',
+          show: true,
+        }, {
+          label: '客户评价',
+          field: 'suggestion',
           show: true,
         }]
       }
@@ -136,8 +153,8 @@
 
 <style lang="scss">
 
-  .customer-event-table-container {
-    .customer-event-table-pagination {
+  .customer-task-table-container {
+    .customer-task-table-pagination {
       text-align: right;
     }
   }

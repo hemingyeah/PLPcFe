@@ -42,10 +42,15 @@ export default {
       let setting = this.field.setting || {};
       let dataSource = setting.dataSource || [];
 
-      dataSource = dataSource.map(d => ({
-        text: d,
-        value: d,
-      }));
+      dataSource = dataSource.map(d => {
+        if (typeof d === 'string') {
+          return {
+            text: d,
+            value: d,
+          }
+        }
+        return d;
+      });
 
       return this.source || dataSource || [];
     }

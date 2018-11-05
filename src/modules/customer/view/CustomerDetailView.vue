@@ -87,10 +87,9 @@
         </p>
       </li>
     </ul> -->
-
-    <add-contact-dialog ref="addContactDialog" :customer="customer"></add-contact-dialog>
-    <add-address-dialog ref="addAddressDialog" :customer-id="customer.id"
-                        :default-address="initData.customerAddress"></add-address-dialog>
+    <edit-contact-dialog ref="EditContactDialog" :customer="customer"></edit-contact-dialog>
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id"
+                        :default-address="initData.customerAddress"></edit-address-dialog>
     <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind"
                             @success-callback="selectedRemind = {}"></remind-customer-dialog>
   </div>
@@ -99,11 +98,13 @@
 <script>
   import CustomerInfoRecord from './components/CustomerInfoRecord.vue';
   import CustomerEventTable from './components/CustomerEventTable.vue';
+  import CustomerTaskTable from './components/CustomerTaskTable.vue';
+  import CustomerProductTable from './components/CustomerProductTable.vue';
   import CustomerContactTable from './components/CustomerContactTable.vue';
   import CustomerAddressTable from './components/CustomerAddressTable.vue';
 
-  import AddAddressDialog from './operationDialog/AddAddressDialog.vue';
-  import AddContactDialog from './operationDialog/AddContactDialog.vue';
+  import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
+  import EditContactDialog from './operationDialog/EditContactDialog.vue';
   import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
   export default {
@@ -216,54 +217,33 @@
         return {
           customerId: this.id,
           customerName: this.customer.name,
+          customer: this.customer,
           loginUser: this.initData.loginUser,
         };
       }
     },
     methods: {
       buildTabs(){
-        return [
-          {
+        return [{
             displayName: '信息动态',
-            component: CustomerInfoRecord.name
-          }, 
-          {
+            component: CustomerInfoRecord.name,
+            slotName: 'record-tab',
+          }, {
             displayName: '事件',
-            component: CustomerEventTable.name
-          }, 
-          {
+            component: CustomerEventTable.name,
+          }, {
             displayName: '工单',
-            component: CustomerAddressTable.name
-          }, 
-          // {
-          //   displayName: '计划任务',
-          //   component: CustomerContactTable.name,
-          //   props: {
-          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          //   }
-          // },
-          // {
-          //   displayName: '产品',
-          //   component: CustomerContactTable.name,
-          //   props: {
-          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          //   }
-          // },
-          // {
-          //   displayName: '地址',
-          //   component: CustomerContactTable.name,
-          //   props: {
-          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          //   }
-          // },
-          // {
-          //   displayName: '联系人',
-          //   component: CustomerContactTable.name,
-          //   props: {
-          //     'customer-id': '26654253-d2a6-11e8-b3c6-00163e304a25'
-          //   }
-          // }
-        ]
+            component: CustomerTaskTable.name,
+          }, {
+            displayName: '客户产品',
+            component: CustomerProductTable.name,
+          }, {
+            displayName: '客户地址',
+            component: CustomerAddressTable.name,
+          }, {
+            displayName: '联系人',
+            component: CustomerContactTable.name,
+          }]
       },
       async deleteCustomer() {
         try {
@@ -281,7 +261,6 @@
       openMap() {
         this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name,})
         .catch(err => console.error('openMap catch an err: ', err));
-
       },
       fetchCustomer(id) {
         this.$http.get(`/v2/customer/get`, {id})
@@ -293,9 +272,9 @@
       },
       openDialog(action) {
         if (action === 'address') {
-          this.$refs.addAddressDialog.openDialog();
+          this.$refs.EditAddressDialog.openDialog();
         } else if (action === 'contact') {
-          this.$refs.addContactDialog.openDialog();
+          this.$refs.EditContactDialog.openDialog();
         } else if (action === 'remark') {
           this.$refs.addRemarkDialog.openDialog();
         } else if (action === 'remind') {
@@ -341,10 +320,12 @@
     components: {
       [CustomerInfoRecord.name]: CustomerInfoRecord,
       [CustomerEventTable.name]: CustomerEventTable,
+      [CustomerTaskTable.name]: CustomerTaskTable,
+      [CustomerProductTable.name]: CustomerProductTable,
       [CustomerContactTable.name]: CustomerContactTable,
       [CustomerAddressTable.name]: CustomerAddressTable,
-      AddAddressDialog,
-      AddContactDialog,
+      EditAddressDialog,
+      EditContactDialog,
       [RemindCustomerDialog.name]: RemindCustomerDialog,
     }
   }
