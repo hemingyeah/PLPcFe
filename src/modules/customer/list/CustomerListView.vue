@@ -285,6 +285,7 @@
           :prop="column.field"
           :fixed="column.fixed"
           :width="column.width"
+          :min-width="column.minWidth || '120px'"
           :sortable="column.sortable"
           show-overflow-tooltip
           :align="column.align">
@@ -334,8 +335,7 @@
       <div class="table-footer">
         <div class="list-info">
           <i class="iconfont icon-abnormal"></i>
-          已选中 <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>
-          条
+          已选中 <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条
           <span class="selectedCount" @click="toggleSelection()">清空</span>
           <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录</span>
           <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalPages}}</span>页</span>
@@ -544,7 +544,7 @@
           },
         },
         selectedLimit: 200,
-        auth: {},
+        auth: {}
       };
     },
     computed: {
@@ -741,7 +741,7 @@
             this.paginationInfo.totalItems = total;
             this.paginationInfo.totalPages = pages;
             this.paginationInfo.pageNum = pageNum;
-            this.matchSelected();  // 把选中的匹配出来
+            this.matchSelected(); // 把选中的匹配出来
           }
 
           return res;
@@ -1223,7 +1223,7 @@
           field: 'name',
           show: true,
           fixed: true,
-          // width: '150px',
+          minWidth: '150px',
         }, {
           label: '客户编号',
           field: 'serialNumber',

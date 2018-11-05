@@ -288,7 +288,7 @@ const FrameManager = {
     window.addEventListener("message", this.receiveMessage);
     window.addEventListener("resize", this.resizeHanler);
 
-    let homeTab = new Tab({url: '/home', title: '首页', show: true})
+    let homeTab = new Tab({id:'HOME',url: '/home', title: '首页', show: true})
     this.openForFrame(homeTab);
 
     //处理消息跳转url

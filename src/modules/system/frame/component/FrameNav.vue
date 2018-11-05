@@ -1,7 +1,7 @@
 <template>
   <nav class="frame-nav" :class="{'frame-nav-collapse': collapse}">
     <div class="frame-bar">
-      <a class="logo" href="/">
+      <a class="logo" href="javascript:;" @click="openHome">
         <img src="../../../../assets/svg/logo.svg">
       </a>
       
@@ -109,6 +109,9 @@ export default {
       if(!menu.url) return;
 
       this.$emit('open', menu)
+    },
+    openHome(){
+      this.$emit('open', {menuKey: 'HOME', url: '/home', title: '首页'})
     }
   }
 }
