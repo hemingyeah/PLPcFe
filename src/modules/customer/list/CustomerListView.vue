@@ -297,7 +297,7 @@
               {{formatAddress(scope.row[column.field])}}
             </template>
             <template v-else-if="column.field === 'detailAddress'">
-              {{scope.row.customerAddress.adAddress}}
+              {{scope.row.customerAddress && scope.row.customerAddress.adAddress}}
             </template>
             <template v-else-if="column.field === 'tags' && scope.row.tags">
               {{scope.row.tags | tagName}}
@@ -634,6 +634,8 @@
     },
     methods: {
       formatAddress(ad) {
+        if(null == ad) return '';
+        
         const {adProvince, adCity, adDist,} = ad;
         return [adProvince, adCity, adDist,]
         .filter(d => !!d).join('-');

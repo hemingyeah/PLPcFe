@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import {parse} from '@src/util/querystring'
 import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
 
@@ -288,7 +289,14 @@ const FrameManager = {
     window.addEventListener("resize", this.resizeHanler);
 
     let homeTab = new Tab({url: '/home', title: '首页', show: true})
-    this.openFrameTab(homeTab);
+    this.openForFrame(homeTab);
+
+    //处理消息跳转url
+    let query = parse(window.location.search);
+    let pcUrl = this.initData.pcUrl || query.pcUrl;
+    if(null != pcUrl){
+      this.openForFrame({id: "PcUrl", title: "正在加载", url: pcUrl});
+    }
   }
 };
 

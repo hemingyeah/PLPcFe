@@ -355,11 +355,6 @@ export default {
     }
 
     this.clearCachedIds();
-
-    //处理消息跳转url
-    if(this.initData.pcUrl){
-      this.openFrameTab({id: "PcUrl", title: "正在加载", close: true, url: this.initData.pcUrl});
-    }
   },
   mounted(){
     this.checkVersion();

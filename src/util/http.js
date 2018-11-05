@@ -1,6 +1,5 @@
 import _ from 'lodash';
-//https://github.com/ljharb/qs
-import qs from 'qs';
+import querystring from './querystring'
 //https://github.com/axios/axios
 import axios from 'axios';
 
@@ -8,7 +7,7 @@ const axiosIns = axios.create({
   // put, post, patch 请求参数转换
   transformRequest: [function (data, headers) {
     if(headers['Content-Type'] == 'application/x-www-form-urlencoded' && _.isPlainObject(data)){
-      data = qs.stringify(data)
+      data = querystring.stringify(data)
     }
 
     if(headers['Content-Type'] == 'application/json'){
@@ -19,7 +18,7 @@ const axiosIns = axios.create({
   }],
   //get 请求参数序列化
   paramsSerializer: function(params) {
-    return qs.stringify(params, {arrayFormat: 'brackets'})
+    return querystring.stringify(params)
   }
 })
 
