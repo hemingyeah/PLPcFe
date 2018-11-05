@@ -4,7 +4,7 @@
     <div class="form-preview-mock">
       <p class="form-preview-control form-preview-withIcon">
         {{field.placeHolder}}
-        <i class="iconfont icon-riqi"></i>
+        <i class="iconfont icon-date"></i>
       </p>
     </div>
   </div>

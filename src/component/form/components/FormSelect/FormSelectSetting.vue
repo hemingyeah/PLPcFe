@@ -19,36 +19,34 @@
         <input type="checkbox" :checked="field.isMulti" @input="update" data-prop="isMulti"> 多选
       </label>
     </h3>
-    <div>
-      <div class="form-select-setting-list">
-        <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
-          <input type="text" v-model="option.value" maxlength="30">
-          <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
-          <template v-if="!field.isMulti">
-            <button 
-              type="button" class="btn-text form-select-setting-default" 
-              @click="setDefaultOption(option)" v-if="!option.isDefault">
-              <i class="iconfont icon-check-fill"></i>
-            </button>
-            <span class="form-select-setting-defaultValue" v-else>默认</span>
-          </template>
-        </div>
+    <div class="form-select-setting-list">
+      <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
+        <input type="text" v-model="option.value" maxlength="30">
+        <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
+        <template v-if="!field.isMulti">
+          <button 
+            type="button" class="btn-text form-select-setting-default" 
+            @click="setDefaultOption(option)" v-if="!option.isDefault">
+            <i class="iconfont icon-check-fill"></i>
+          </button>
+          <span class="form-select-setting-defaultValue" v-else>默认</span>
+        </template>
       </div>
-      <div class="form-select-setting-operation">
-        <button type="button" class="btn-text" @click="addOption">增加选项</button>
-        <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
-      </div>
+    </div>
+    <div class="form-select-setting-operation">
+      <button type="button" class="btn-text" @click="addOption">增加选项</button>
+      <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
     </div>
 
     <base-modal 
-      title="批量编辑选项" width="480px" class="form-select-setting-modal"
+      title="批量编辑选项" width="520px" class="form-select-setting-modal"
       :show.sync="batchModalShow" :mask-closeable="false">
       <div class="form-select-setting-batch">
-        <textarea :value="optionText" @input="updateOptionText" rows="8"></textarea>
+        <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
         <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
       </div>
       <template slot="footer">
-        <span class="pull-left">每行对应一个选项</span>
+        <span class="form-select-tips">每行对应一个选项</span>
         <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
       </template>
     </base-modal>
@@ -222,7 +220,7 @@ export default {
 }
 
 .form-select-setting-list{
-  max-height: 420px;
+  max-height: calc(100% - 255px);
   overflow: auto;
 }
 
@@ -253,6 +251,9 @@ export default {
   color: #fff;
   padding: 2px 4px;
   border-radius: 2px;
+  font-size: 12px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .form-select-setting-operation .btn-text{
@@ -265,6 +266,7 @@ export default {
   padding: 0;
   width: 20px;
   height: 20px; 
+  vertical-align: middle;
 }
 
 .form-select-setting-delete{
@@ -272,6 +274,12 @@ export default {
 }
 .form-select-setting-default{
   color: $color-primary
+}
+
+.form-select-tips{
+  float: left;
+  color: $text-color-secondary;
+  line-height: 32px;
 }
 </style>
 

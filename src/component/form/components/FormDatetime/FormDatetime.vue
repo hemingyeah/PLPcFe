@@ -3,6 +3,7 @@
     <el-date-picker
       :id="`form_${field.fieldName}`"
       type="datetime"
+      prefix-icon="iconfont icon-fd-datetime"
       value-format="yyyy-MM-dd HH:mm:ss"
       :placeholder="placeholder"
       :value="value" @input="choose"/>

@@ -87,6 +87,7 @@
         </p>
       </li>
     </ul> -->
+
     <edit-contact-dialog ref="EditContactDialog" :customer="customer"></edit-contact-dialog>
     <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id"
                         :default-address="initData.customerAddress"></edit-address-dialog>

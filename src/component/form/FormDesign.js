@@ -382,7 +382,7 @@ const FormDesign = {
         <div class="form-design-field-wrap" 
           onMousedown={e => this.beginInsert(field, e)}>
           <div class="form-design-field form-design__ghost">
-            {field.name}<i class="iconfont icon-people"></i>
+            {field.name} <i class={["iconfont", `icon-fd-${field.formType}`]}></i>
           </div>
         </div>
       )
@@ -410,7 +410,7 @@ const FormDesign = {
           
         </div>
         <div class="form-design-main">
-          <div class={["form-design-list", this.silence ? 'form-design-silence' : null]}>
+          <div class={["form-design-phone", this.silence ? 'form-design-silence' : null]}>
             {!this.isEmpty ? previewList : (
               <div class="form-design-tip">
                 <p>选择左侧控件拖动到此处</p>
@@ -428,7 +428,7 @@ const FormDesign = {
   },
   mounted(){
     this.$data.$dragEvent.ghostEl = this.$el.querySelector('.form-design-ghost');
-    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-list');
+    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-phone');
   },
   components: {...PreivewComponents, ...SettingComponents}
 };

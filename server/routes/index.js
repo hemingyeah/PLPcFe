@@ -7,6 +7,7 @@ const router = new KoaRouter();
 
 const customerRouter = require('./customer')
 const openRouter = require('./open')
+const settingRouter = require('./setting')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -59,6 +60,7 @@ router.get('/demo', async ctx => {
 
 router.use("", customerRouter.routes(), customerRouter.allowedMethods())
 router.use("", openRouter.routes(), openRouter.allowedMethods())
+router.use("", settingRouter.routes(), settingRouter.allowedMethods())
 router.all('/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;

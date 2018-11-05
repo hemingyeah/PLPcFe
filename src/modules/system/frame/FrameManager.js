@@ -62,6 +62,18 @@ const FrameManager = {
       this.currUrl = tab.url;
 
       this.adjustFrameTabs(tab);
+
+      //为该frame添加事件
+      this.$nextTick(() => {
+        let rootWindow = getRootWindow(window);
+        let frame = document.getElementById(`frame_${tab.id}`);
+        let frameWindow = frame.contentWindow;
+
+        //传递点击事件，用于关闭顶层window popper
+        frameWindow.addEventListener('click', () => rootWindow.document.body.click())
+        //frame页面卸载时，重置刷新icon
+        frameWindow.addEventListener('unload', () => tab.loading = true)
+      })
     },
     //关闭frameTab
     closeFrameTab(frameTab){
@@ -97,25 +109,12 @@ const FrameManager = {
     updateFrameTab(event, tab){
       let frame = event.target;
       let frameWindow = frame.contentWindow;
-      let rootWindow = getRootWindow(window);
 
       tab.title = frameWindow.document.title || tab.originTitle;
       tab.currentUrl = frameWindow.location.pathname;
       tab.loading = false;
       tab.reload = false;
-
-      //click handler
-      //传递点击事件，用于关闭顶层window popper
-      frameWindow.document.addEventListener('click', () => rootWindow.document.body.click())
-      frameWindow.addEventListener('unload', function(){
-        let frame = frameWindow.frameElement;
-        let data = {
-          action: 'shb.system.realodFrameById',
-          id: frame.dataset.id
-        }
-        rootWindow.postMessage(data, window.location.origin)
-      })
-
+    
       this.adjustFrameTabs(tab)
     },
     reloadFrameTab(tab, redirect = false){
