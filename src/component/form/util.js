@@ -131,6 +131,7 @@ export function initialize(fields = [], origin = {}, callback){
     if(this.isMultiSelect(field) && !Array.isArray(formData)) {
       formData = formData ? [formData] : [];
     }
+
     result[fieldName] = formData == null ? defaultValue : formData;
   });
 

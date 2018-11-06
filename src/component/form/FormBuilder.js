@@ -42,6 +42,23 @@ function createFormField(h, field, comp){
   return h(comp.build, data);
 }
 
+function createGroup(fields){
+  let groups = [];
+
+  let group = {title: '',fields: []};
+  fields.forEach(field => {
+    if(field.formType == 'separator'){
+      if(group.fields.length > 0) groups.push(group);
+      group = {title: field.displayName,fields: []};
+      return;
+    }
+
+    group.fields.push(field);
+  });
+
+  return groups;
+}
+
 const FormBuilder = {
   name: 'form-builder',
   props: {
@@ -81,22 +98,54 @@ const FormBuilder = {
     }
   },
   render(h){
-    let formGroups = this.fields.map(field => {
-      let comp = FormFieldMap.get(field.formType);
-      if(comp == null) return;
+    let groups = createGroup(this.fields);
+    let formGroups = groups.map(group => {
+      let fields = group.fields || [];
+
+      let formItems = fields
+        .map(field => {
+          let comp = FormFieldMap.get(field.formType);
+          if(comp == null) return;
+
+          let formField = createFormField.call(this, h, field, comp);
+          if(comp.formType == 'separator') return formField;
+        
+          return (
+            <form-item label={field.displayName} field={field}>
+              {formField}
+            </form-item>
+          );
+        })
+        .filter(item => item != null);
       
-      let formField = createFormField.call(this, h, field, comp);
-    
       return (
-        <form-item label={field.displayName} field={field}>
-          {formField}
-        </form-item>
-      );
-    }).filter(item => item != null);
+        [
+          group.title ? <h4>{group.title}</h4> : '',
+          <div class="form-builder-group">
+            
+            {formItems}
+          </div>
+        ]
+      )
+    })
+
+    // let formGroups = this.fields.map(field => {
+    //   let comp = FormFieldMap.get(field.formType);
+    //   if(comp == null) return;
+
+    //   let formField = createFormField.call(this, h, field, comp);
+    //   if(comp.formType == 'separator') return formField;
+    
+    //   return (
+    //     <form-item label={field.displayName} field={field}>
+    //       {formField}
+    //     </form-item>
+    //   );
+    // }).filter(item => item != null);
 
     return (
       <div class="form-builder">
-        {this.$slots.default}
+        <div class="form-builder-group">{this.$slots.default}</div>
         {formGroups}
       </div>
     )

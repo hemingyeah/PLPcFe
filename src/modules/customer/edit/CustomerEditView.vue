@@ -1,14 +1,13 @@
 <template>
   <div class="customer-container" v-loading.fullscreen.lock="loadingPage">
-    <form @submit.prevent="submit" style="width: 640px;">
+    <form @submit.prevent="submit" >
       <h1 class="page-title">
-        <strong>基本信息</strong>
         <div class="btn-group-container">
           <el-button><i class="iconfont icon-return"></i>返回</el-button>
           <el-button :disabled="submitting" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i>提交</el-button>
         </div>
       </h1>
-      <form-builder ref="form" :fields="fields" :value="form" @input="update">
+      <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
         <form-item v-if="!config.isAutoSerialNumber" label="客户编号" :field="baseField.serialNumberField">
           <form-text :field="baseField.serialNumberField" :value="form.serialNumber" @input="update"
                      :placeholder="baseField.serialNumberField.placeholder"></form-text>
@@ -170,7 +169,8 @@
           tags: [],
           customerManager: null,
         },
-        address: {}
+        address: {},
+        init: false
       };
 
       if (this.initData.isCustomerNameDuplicate) {
@@ -333,7 +333,6 @@
           adAddress = [data.customerAddress.adProvince, data.customerAddress.adCity, data.customerAddress.adDist]
           .filter(ad => ad);
         }
-
         return {
           id: data.id,
           name: data.name,
@@ -369,29 +368,23 @@
 
       this.form = FormUtil.initialize(this.fields, form, this.initCustomerData);
       this.addressBackup = this.form.customerAddress;
+      this.init = true;
     }
   }
 </script>
 
 <style lang="scss">
-
   .customer-container {
     height: 100%;
+    width: 100%;
     overflow: auto;
-    background: #f4f7f5;
     padding: 10px;
 
     .page-title {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       border-bottom: 1px solid #f4f7f5;
       padding-left: 10px;
-
-      strong {
-        line-height: 62px;
-        font-weight: normal;
-        font-size: 16px;
-      }
 
       .btn-group-container {
         padding: 10px;
@@ -400,39 +393,27 @@
         }
       }
     }
-
-
-    form {
-      background: #fff;
-      width: 100% !important;
-      min-width: 640px;
-      .form-item {
-        width: 640px;
-        margin: 0 auto;
-
-        .form-item-control {
-          width: 300px;
-        }
-      }
-
-      .base-dist-picker {
-        margin-bottom: 10px;
-        width: 430px;
-
-        .el-cascader {
-          width: 100%;
-        }
-      }
-
-      .input-and-btn {
-        display: flex !important;
-        justify-content: space-between;
-        .form-item, .form-text, .form-select {
-          width: 430px;
-        }
-      }
-    }
-
   }
 
+.form-builder{
+  width: 640px;
+  margin: 0 auto;
+
+  .input-and-btn{
+    display: flex !important;
+    flex-flow: row nowrap;
+
+    .form-item, .form-text, .form-select {
+      flex: 1;
+    }
+
+    .base-dist-picker{
+      padding-right: 0;
+    }
+
+    button{
+      margin-left: 10px;
+    }
+  }
+}
 </style>
