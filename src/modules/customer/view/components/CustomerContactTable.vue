@@ -20,14 +20,17 @@
             {{scope.row[column.field]}}
           </template>
           <template v-else-if="column.field === 'name'">
-            <a href="javasript:;" @click="openDialog(scope.row)">{{scope.row[column.field]}}</a>
+            <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
-          <div class="lm-action" v-else-if="column.field === 'action'">
-            <span v-if="scope.row.isMain">默认联系人</span>
+          <template v-else-if="column.field === 'type'">
+            <span v-if="scope.row.isMain" style="text-align: center;display: block;">默认联系人</span>
             <span v-else @click="setDefaultLinkman(scope.row)" class="set-default-lm-btn">
               <i class="iconfont icon-part"></i>设为默认
             </span>
-            <el-button type="danger" @click="deleteLinkman(scope.row)" :disabled="pending[scope.row.id]" icon="iconfont icon-shanchu">删除
+          </template>
+          <div class="lm-action" v-else-if="column.field === 'action'">
+            <el-button type="danger" @click="deleteLinkman(scope.row)" :disabled="pending[scope.row.id]"
+                       icon="iconfont icon-shanchu" size="mini">删除
             </el-button>
           </div>
 
@@ -46,7 +49,8 @@
       layout="prev, pager, next"
       :total="paginationInfo.totalItems">
     </el-pagination>
-    <edit-contact-dialog ref="EditContactDialog" :customer="shareData.customer" :original-value="selectedContact" @submit-success="updateSuccess"></edit-contact-dialog>
+    <edit-contact-dialog ref="EditContactDialog" :customer="shareData.customer" :original-value="selectedContact"
+                         @submit-success="updateSuccess"></edit-contact-dialog>
   </div>
 </template>
 
@@ -75,6 +79,11 @@
           totalItems: 0,
         }
       }
+    },
+    computed: {
+      customerId() {
+        return this.shareData.customer ? this.shareData.customer.id : '';
+      },
     },
     mounted() {
       this.fetchData();
@@ -127,7 +136,7 @@
       },
       fetchData() {
         const params = {
-          customerId: this.shareData.customerId,
+          customerId: this.customerId,
           pageNum: this.paginationInfo.pageNum,
           pageSize: this.paginationInfo.pageSize,
         };
@@ -159,10 +168,15 @@
           field: 'phone',
           show: true,
         }, {
+          label: '',
+          field: 'type',
+          show: true,
+          width: '100px',
+        }, {
           label: '操作',
           field: 'action',
           show: true,
-          width: '200px'
+          width: '100px',
         }]
       }
     },
@@ -176,22 +190,25 @@
 
   .customer-contact-table-container {
 
-    .lm-action {
-      display: flex;
-      justify-content: space-between;
-      .set-default-lm-btn {
-        line-height: 34px;
+    .edit-btn {
+      color: #2F93C0
+    }
 
-        &:hover {
-          cursor: pointer;
-          background-color: #e7e7e7;
-          text-align: center;
-        }
+    .set-default-lm-btn {
+      line-height: 34px;
+      display: block;
+      text-align: center;
+      border-radius: 3px;
+
+      &:hover {
+        cursor: pointer;
+        background-color: #e7e7e7;
       }
     }
 
     .customer-contact-table-pagination {
       text-align: right;
+      margin-top: 7px;
     }
   }
 </style>

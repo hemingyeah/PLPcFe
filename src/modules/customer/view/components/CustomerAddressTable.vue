@@ -20,23 +20,23 @@
           <template v-if="column.field === 'area'">
             <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
-          <div class="address-action" v-else-if="column.field === 'action'">
-            <el-button type="danger" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]"
+          <div v-else-if="column.field === 'action'">
+            <el-button type="danger" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]" class="delete-address-btn"
                        size="mini" icon="iconfont icon-shanchu">删除
             </el-button>
           </div>
           <template v-else-if="column.field === 'type'">
-            <span v-if="scope.row.isMain">默认地址</span>
+            <span v-if="scope.row.isMain" style="text-align: center;display: block;">默认地址</span>
             <span v-else @click="setDefaultAddress(scope.row)" class="set-default-address-btn">
               <i class="iconfont icon-part"></i>设为默认
             </span>
           </template>
 
-          <template v-else-if="column.field === 'address'">
+          <div v-else-if="column.field === 'address'" :class="{'can-open-map': scope.row.longitude && scope.row.latitude, }" @click.stop="openMap(scope.row)">
             {{scope.row[column.field]}}
-            <i class="iconfont icon-address customer-address-icon" @click="openMap(scope.row)"
+            <i class="iconfont icon-address customer-address-icon" @click.stop="openMap(scope.row)"
                v-if="scope.row.longitude && scope.row.latitude"></i>
-          </template>
+          </div>
           <template v-else>
             {{scope.row[column.field]}}
           </template>
@@ -53,7 +53,7 @@
       :total="paginationInfo.totalItems">
     </el-pagination>
 
-    <edit-address-dialog ref="addAddressDialog" :customer-id="shareData.customerId"
+    <edit-address-dialog ref="addAddressDialog" :customer-id="customerId"
                          :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="updateSuccess"
                          :default-address="formatSelectedAddress"></edit-address-dialog>
   </div>
@@ -87,6 +87,9 @@
       }
     },
     computed: {
+      customerId() {
+        return this.shareData.customer ? this.shareData.customer.id : '';
+      },
       formatSelectedAddress() {
         const {province, city, dist, address, longitude, latitude, addressType, id} = this.selectedAddress;
         if (!province || !city) return {};
@@ -145,6 +148,7 @@
         });
       },
       openMap(address) {
+        if (!address.longitude && !address.latitude) return;
 
         const ad = {
           adLongitude: address.longitude,
@@ -161,7 +165,7 @@
       },
       fetchData() {
         const params = {
-          customerId: this.shareData.customerId,
+          customerId: this.customerId,
           pageNum: this.paginationInfo.pageNum,
           pageSize: this.paginationInfo.pageSize,
         };
@@ -218,14 +222,26 @@
 
   .customer-address-table-container {
 
+    .can-open-map:hover {
+      cursor: pointer;
+    }
+
     .edit-btn {
       color: #2F93C0
+    }
+
+    .delete-address-btn {
+      .iconfont {
+        position: relative;
+        top: 1px;
+      }
     }
 
     .set-default-address-btn {
       line-height: 34px;
       display: block;
       text-align: center;
+      border-radius: 3px;
 
       &:hover {
         cursor: pointer;

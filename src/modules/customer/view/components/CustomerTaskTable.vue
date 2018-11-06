@@ -46,7 +46,7 @@
 
 <script>
   import {formatDate,} from '@src/util/lang';
-
+  import TaskStateEnum from '@model/enum/TaskStateEnum';
 
   export default {
     name: "customer-task-table",
@@ -66,6 +66,11 @@
           totalItems: 0,
         }
       }
+    },
+    computed: {
+      customerId() {
+        return this.shareData.customer ? this.shareData.customer.id : '';
+      },
     },
     mounted() {
       this.fetchData();
@@ -94,7 +99,7 @@
       },
       fetchData() {
         const params = {
-          customerId: this.shareData.customerId,
+          customerId: this.customerId,
           pageNum: this.paginationInfo.pageNum,
           pageSize: this.paginationInfo.pageSize
         };
@@ -109,6 +114,7 @@
             } else {
               task.productName = task.products.map(p => p.name).join('、');
             }
+            task.state = TaskStateEnum.getName(task.state);
             return Object.freeze(task);
           });
           this.paginationInfo.totalItems = res.total;

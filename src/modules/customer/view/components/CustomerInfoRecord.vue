@@ -39,7 +39,7 @@ export default {
   data() {
     return {
       params: {
-        primaryId: this.shareData.customerId,
+        primaryId: this.shareData.customer.id,
         pageNum: 1,
         pageSize: 15,
       },
@@ -50,12 +50,12 @@ export default {
   },
   computed: {
     //客户ID
-    customerId(){
-      return this.shareData.customerId;
+    customerId() {
+      return this.shareData.customer ? this.shareData.customer.id : '';
     },
     //客户姓名
     customerName(){
-      return this.shareData.customerName;
+      return this.shareData.customer ? this.shareData.customer.name : '';
     },
     //当前用户id
     loginUser(){
@@ -82,8 +82,9 @@ export default {
             updateType: 'ptRecord'
           }
         }
+
         let result = await this.$http.post('/customer/cRecord/create', params, false);
-        
+
         if(result.status == 0){
           this.$refs.comment.reset();
           await this.initializeRecord();

@@ -43,7 +43,7 @@
 
 <script>
   import {formatDate,} from '@src/util/lang';
-
+  import EventStateEnum from '@model/enum/EventStateEnum';
 
   export default {
     name: "customer-event-table",
@@ -63,6 +63,11 @@
           totalItems: 0,
         }
       }
+    },
+    computed: {
+      customerId() {
+        return this.shareData.customer ? this.shareData.customer.id : '';
+      },
     },
     mounted() {
       this.fetchData();
@@ -91,7 +96,7 @@
       },
       fetchData() {
         const params = {
-          cusId: this.shareData.customerId,
+          cusId: this.customerId,
           pageNum: this.paginationInfo.pageNum,
           pageSize: this.paginationInfo.pageSize,
         };
@@ -101,6 +106,7 @@
           this.eventList = res.list
           .map(event => {
             event.createTime = formatDate(new Date(event.createTime), 'YYYY-MM-DD HH:mm:ss');
+            event.state = EventStateEnum.getName(event.state);
             return Object.freeze(event);
           });
           this.paginationInfo.totalItems = res.total;

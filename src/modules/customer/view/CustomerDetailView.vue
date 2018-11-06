@@ -64,7 +64,7 @@
           </template>
         </form-view>
       </div>
-      <div class="customer-relation">
+      <div class="customer-relation" v-if="this.customer.id">
         <base-tabbar :tabs="tabs" v-model="currTab">
           <div class="record-tab-label" slot="customer-info-record__tab"><i class="iconfont icon-timeline"></i>信息动态</div>
         </base-tabbar>
@@ -217,8 +217,8 @@
       /** 子组件所需的数据 */
       propsForSubComponents(){
         return {
-          customerId: this.id,
-          customerName: this.customer.name,
+          // customerId: this.id,
+          // customerName: this.customer.name,
           customer: this.customer,
           loginUser: this.initData.loginUser,
         };

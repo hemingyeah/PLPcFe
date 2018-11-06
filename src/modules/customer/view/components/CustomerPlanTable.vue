@@ -13,11 +13,11 @@
         :prop="column.field"
         :width="column.width"
         :sortable="column.sortable"
-        show-overflow-tooltip="column.tooltip"
+        :show-overflow-tooltip="column.tooltip"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'name'">
-            <a :href="`/task/planTask/edit?id=${scope.row.id}`" :data-id="scope.row.id">{{scope.row[column.field]}}</a>
+            <a :href="`/task/planTask/edit?id=${scope.row.id}`" :data-id="scope.row.id" class="plan-link">{{scope.row[column.field]}}</a>
           </template>
           <template v-else-if="column.field === 'templateName'">
             {{scope.row.task.templateName}}
@@ -37,7 +37,7 @@
                 placement="left"
                 width="360"
                 trigger="hover">
-                <span slot="reference">{{scope.row[column.field].length}}</span>
+                <div slot="reference">{{scope.row[column.field].length}}</div>
                 <ul class="plan-created-task-list">
                   <li v-for="task in scope.row[column.field]" :key="task.taskId">
                     工单编号：{{task.taskNo}} 创建时间：{{task.createTime}}
@@ -54,8 +54,8 @@
             每{{scope.row[column.field].period + scope.row[column.field].periodUnit}}
           </template>
           <template class="lm-action" v-else-if="column.field === 'action'">
-            <el-button type="danger" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]"
-                       icon="iconfont icon-shanchu">删除
+            <el-button type="danger" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]" class="delete-plan-btn"
+                       icon="iconfont icon-shanchu" size="mini">删除
             </el-button>
           </template>
 
@@ -108,6 +108,11 @@
         }
       }
     },
+    computed: {
+      customerId() {
+        return this.shareData.customer ? this.shareData.customer.id : '';
+      },
+    },
     mounted() {
       this.fetchData();
     },
@@ -136,7 +141,7 @@
       },
       fetchData() {
         const params = {
-          customerId: this.shareData.customerId,
+          customerId: this.customerId,
           pageNum: this.paginationInfo.pageNum,
           pageSize: this.paginationInfo.pageSize
         };
@@ -195,6 +200,7 @@
           field: 'nextTaskCreateTime',
           show: true,
           tooltip: true,
+          width: '100px'
         }, {
           label: '操作',
           field: 'action',
@@ -221,6 +227,17 @@
 
   .customer-plan-table-container {
 
+    .plan-link {
+      color: #2F93C0;
+    }
+
+    .delete-plan-btn {
+      .iconfont {
+        position: relative;
+        top: 1px;
+      }
+    }
+
     .empty-table-text {
       width: 400px;
       text-align: left;
@@ -232,6 +249,7 @@
 
     .customer-plan-table-pagination {
       text-align: right;
+      margin-top: 7px;
     }
   }
 </style>

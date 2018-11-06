@@ -64,6 +64,11 @@
         }
       }
     },
+    computed: {
+      customerId() {
+        return this.shareData.customer ? this.shareData.customer.id : '';
+      },
+    },
     mounted() {
       this.fetchData();
     },
@@ -74,7 +79,7 @@
       },
       fetchData() {
         const params = {
-          customerId: this.shareData.customerId,
+          customerId: this.customerId,
           pageNum: this.paginationInfo.pageNum,
           pageSize: this.paginationInfo.pageSize,
         };
