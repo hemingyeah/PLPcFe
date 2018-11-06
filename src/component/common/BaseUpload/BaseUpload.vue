@@ -6,10 +6,13 @@
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
     
-    <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
-      <i class="iconfont icon-loading" v-if="pending"></i>
-      <span>{{pending ? '正在上传' : '点击上传'}}</span>
-    </button>
+    <div class="base-upload-operation">
+      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
+        <i class="iconfont icon-loading" v-if="pending"></i>
+        <span>{{pending ? '正在上传' : '点击上传'}}</span>
+      </button>
+      <p class="base-upload-placeholder" v-if="placeholder">{{placeholder}}</p>
+    </div>
   </div>
 </template>
 
@@ -44,6 +47,10 @@ export default {
     value: {
       type: Array,
       default: () => ([])
+    },
+    placeholder: {
+      type: String,
+      default: ''
     }
   },
   methods: {
@@ -115,7 +122,6 @@ export default {
   
   span{
     color: #fff;
-    margin-left: 5px;
   }
 
   .icon-loading{
@@ -126,7 +132,22 @@ export default {
     text-align: center;
     line-height: 18px;
     display: block;
+    margin-right: 5px;
     animation: rotating 2s linear infinite;
   }
+}
+
+.base-upload-operation{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.base-upload-placeholder{
+  width: 100%;
+  color: #9a9a9a;
+  margin: 0 0 0 8px;
+  font-size: 14px;
+  @include text-ellipsis(); 
 }
 </style>

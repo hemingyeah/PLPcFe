@@ -1,23 +1,26 @@
 <template>
   <div class="form-setting-panel form-select-setting">
-    <h3>基础设置 -- {{setting.name}}</h3>
+    <h3>{{setting.name}}设置</h3>
     <div class="form-setting-group">
-      <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="update" maxlength="6">
+      <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" maxlength="6">
     </div>
     <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="update"></textarea>
+      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom"></textarea>
     </div>
     <div class="form-setting-group">
-      <label><input type="checkbox" :checked="field.isNull == 0" @input="update" data-prop="isNull"> 必填</label>
+      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
+      <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
+      <!-- <label><input type="checkbox" :checked="field.isNull == 0" @input="update" data-prop="isNull"> 必填</label>
       <label title="勾选后该字段可在高级搜索中查询" v-tooltip>
         <input type="checkbox" :checked="field.isSearch == 1" @input="update" data-prop="isSearch"> 搜索
-      </label>
+      </label> -->
     </div>
     <h3>
       选项设置
-      <label class="form-select-setting-isMulti">
+      <el-checkbox class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
+      <!-- <label class="form-select-setting-isMulti">
         <input type="checkbox" :checked="field.isMulti" @input="update" data-prop="isMulti"> 多选
-      </label>
+      </label> -->
     </h3>
     <div class="form-select-setting-list">
       <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
@@ -58,7 +61,7 @@
 import _ from 'lodash';
 import Platform from '@src/platform';
 
-const MAX_OPTION_NUM = 100;
+const MAX_OPTION_NUM = 120;
 
 export default {
   name: 'form-select-setting',
@@ -86,15 +89,15 @@ export default {
     }
   },
   methods: {
-    update(event){
+    updateForDom(event){
       let el = event.target;
       let prop = el.dataset.prop;
       let value = el.value;
       
-      if(prop == 'isNull') value = el.checked ? 0 : 1;
-      if(prop == 'isSearch') value = el.checked ? 1 : 0;
+      this.update(value, prop)
+    },
+    update(value, prop){
       if(prop == 'isMulti') {
-        value = el.checked;
         //如果是多选，清空默认值
         this.options.forEach(item => item.isDefault = false);
         this.$emit('input', {value: this.options, prop: 'options'})
@@ -266,7 +269,11 @@ export default {
   padding: 0;
   width: 20px;
   height: 20px; 
+  line-height: 20px;
   vertical-align: middle;
+  i.iconfont{
+    font-size: 18px;
+  }
 }
 
 .form-select-setting-delete{

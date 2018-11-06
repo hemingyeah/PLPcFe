@@ -1,16 +1,14 @@
 <template>
   <div class="form-setting-panel">
-    <h3>基础设置 -- {{setting.name}}</h3>
+    <h3>{{setting.name}}设置</h3>
     <div class="form-setting-group">
-      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="update" maxlength="6">
+      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" maxlength="6">
     </div>
     <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="4" data-prop="placeHolder" :value="field.placeHolder" @input="update" maxlength="128"></textarea>
+      <textarea placeholder="请在此添加描述信息" rows="4" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" maxlength="128"></textarea>
     </div>
     <div class="form-setting-group">
-      <label>
-        <input type="checkbox" :checked="field.isNull == 0" @input="update" data-prop="isNull"> 必填
-      </label>
+      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
     </div>
   </div>
 </template>
@@ -29,13 +27,14 @@ export default {
     }
   },
   methods: {
-    update(event){
+    updateForDom(event){
       let el = event.target;
       let prop = el.dataset.prop;
       let value = el.value;
       
-      if(prop == 'isNull') value = el.checked ? 0 : 1;
-
+      this.update(value, prop)
+    },
+    update(value, prop){
       this.$emit('input', {value, prop})
     }
   }

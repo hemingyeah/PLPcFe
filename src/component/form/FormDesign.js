@@ -8,6 +8,8 @@ import {
   SettingComponents
 } from './components';
 
+const MAX_FIELD_NUM = 120;
+
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
   let currFieldId = field._id;
@@ -155,6 +157,10 @@ const FormDesign = {
   methods: {
     /** 开始插入字段 */
     beginInsert(field, event){
+      if(this.value.length >= MAX_FIELD_NUM) {
+        return Platform.alert(`单个表单最大支持${MAX_FIELD_NUM}个字段`)
+      }
+
       let dragEvent = this.$data.$dragEvent;
       let target = event.target.closest('.form-design-field');
       let dragRect = target.getBoundingClientRect();
@@ -261,7 +267,7 @@ const FormDesign = {
       }
     },
     /** 结束拖拽 */
-    handleDragEnd(event){
+    handleDragEnd(){
       //清空鼠标事件
       document.removeEventListener('mousemove', this.handleDragging)
       document.removeEventListener('mouseup', this.handleDragEnd)
@@ -418,8 +424,8 @@ const FormDesign = {
             )}
           </div>
         </div>
-        <div class="form-design-setting">{fieldSetting}</div>
-        <div class="form-design-ghost">
+        {fieldSetting ? <div class="form-design-setting" key="form-design-setting">{fieldSetting}</div> : null}
+        <div class="form-design-ghost" key="form-design-ghost">
           <div class="form-design__template"></div>
           <div class="form-design-cover"></div>
         </div>

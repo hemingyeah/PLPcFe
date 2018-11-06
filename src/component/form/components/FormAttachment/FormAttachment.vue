@@ -1,6 +1,6 @@
 <template>
   <div class="form-attachment">
-    <base-upload @input="input" :value="value" :for-id="`form_${field.fieldName}`"></base-upload>
+    <base-upload @input="input" :value="value" :for-id="`form_${field.fieldName}`" placeholder="请上传附件"></base-upload>
   </div>
 </template>
 

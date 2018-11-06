@@ -9,8 +9,9 @@ import FormDate from './FormDate';
 import FormDatetime from './FormDatetime';
 import FormPhone from './FormPhone';
 import FormEmail from './FormEmail';
+import FormSeparator from './FormSeparator';
 
-const FormFields = [
+const BaseFormField = [
   FormText,
   FormTextarea,
   FormNumber,
@@ -22,24 +23,18 @@ const FormFields = [
   FormDatetime,
   FormPhone,
   FormEmail,
+  FormSeparator
 ];
+
+const BaseModeField = BaseFormField.map(item => item.formType)
 
 const Modes = {
   base: {
-    fields: [
-      FormText.formType, 
-      FormTextarea.formType,
-      FormNumber.formType,
-      FormSelect.formType,
-      FormCode.formType,
-      FormAttachment.formType,
-      FormUser.formType,
-      FormDate.formType,
-      FormDatetime.formType,
-      FormPhone.formType,
-      FormEmail.formType,
-    ]
+    fields: BaseModeField
   },
+  customer: {
+    fields: [...BaseModeField]
+  }
   // task: {
   //   fields: [FormText.formType]
   // }
@@ -49,6 +44,8 @@ const FormFieldMap = {};
 const PreivewComponents = {};
 const SettingComponents = {};
 const BuildComponents = {};
+
+const FormFields = [...BaseFormField]
 
 for(let i = 0; i < FormFields.length; i++){
   let formField = FormFields[i];

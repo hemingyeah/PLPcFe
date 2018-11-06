@@ -1,9 +1,9 @@
 <template>
   <div class="setting-customer">
     <div class="setting-customer-header">
-      <a href="javascript: history.back();">返回</a>
+      <a href="javascript: history.back();"><i class="iconfont icon-return"></i>返回</a>
       <h3>客户字段设置</h3>
-      <button type="button" class="btn btn-primary">发布</button>
+      <button type="button" class="btn btn-primary" @click="submit">保存</button>
     </div>
     <div class="setting-customer-design">
       <form-design v-model="fields" ></form-design>
@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import * as FormUtil from '@src/component/form/util';
+
 export default {
   name: 'setting-customer-view',
   props: {
@@ -22,12 +24,13 @@ export default {
   },
   data(){
     return {
-      fields: []
+      fields: FormUtil.toFormField(this.initData.fields || [])
     }
   },
   methods: {
-    setFields(){
-
+    submit(){
+      let fields = FormUtil.toField(this.fields);
+      console.log(fields)
     }
   }
 }

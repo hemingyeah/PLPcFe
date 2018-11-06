@@ -64,9 +64,9 @@
 }
 
 .form-design-main {
-  width: calc(100% - 640px);
+  width: calc(100% - 630px);
   height: 100%;
-  padding: 20px 10px;
+  padding: 40px 10px 20px 10px;
   border-top: none;
   border-bottom: none;
   user-select: none;
@@ -83,7 +83,7 @@
 .form-setting-panel {
   height: 100%;
   overflow: auto;
-  padding: 0 8px 10px 8px;
+  padding: 8px 10px;
 
   & > h3 {
     line-height: 24px;
