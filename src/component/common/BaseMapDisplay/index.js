@@ -25,7 +25,7 @@ function display(address, options = {}){
     let pending = false;
     
     instance.$on('destroy', () => {
-      setTimeout(() => dom.destroyComponent(instance), 1500);
+      setTimeout(() => dom.destroyComponent(instance), 150);
     })
     
     instance.$on('input', event => {
