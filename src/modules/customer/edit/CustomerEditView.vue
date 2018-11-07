@@ -328,6 +328,12 @@
         this.addressBackup = ad;
       },
       initCustomerData(fields, data){
+        let adAddress = [];
+        if (data.customerAddress) {
+          adAddress = [data.customerAddress.adProvince, data.customerAddress.adCity, data.customerAddress.adDist]
+          .filter(ad => ad);
+        }
+
         return {
           id: data.id,
           name: data.name,
@@ -335,8 +341,8 @@
           lmPhone: data.lmPhone,
           serialNumber: data.serialNumber,
           customerAddress: {
-            adAddress: [data.customerAddress.adProvince, data.customerAddress.adCity, data.customerAddress.adDist],
-            detail: data.customerAddress.adAddress,
+            adAddress,
+            detail: data.customerAddress ? data.customerAddress.adAddress : '',
             adLongitude: data.adLongitude || '',
             adLatitude: data.adLatitude || '',
             addressType: data.addressType || 0

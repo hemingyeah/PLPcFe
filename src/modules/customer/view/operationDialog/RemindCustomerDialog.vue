@@ -1,5 +1,5 @@
 <template>
-  <base-modal @closed="callBack" title="添加提醒" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog">
+  <base-modal @closed="$emit('success-callback')" title="添加提醒" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog">
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
@@ -107,14 +107,13 @@
         let reqUrl = '';
         let actionName = '';
         if (this.action === 'edit') {
-          reqUrl = '/scheduler/edit';
+          reqUrl = '/scheduler/editByJson';
           actionName = '编辑提醒';
         } else {
-          reqUrl = '/scheduler/build';
+          reqUrl = '/scheduler/buildByJson';
           actionName = '添加提醒';
         }
-
-        this.$http.post(reqUrl, params, false)
+        this.$http.post(reqUrl, params)
         .then(res => {
           if (res.status === 0) {
             this.$platform.alert(`${actionName}成功`);
@@ -128,7 +127,8 @@
           this.remindCustomerDialog = false;
           this.pending = false;
 
-          this.callBack();
+          this.$emit('success-callback');
+          this.$eventBus.$emit('customer_remind_table.update_remind_list');
         })
         .catch(err => {
           this.$platform.alert('批量添加提醒失败');
@@ -136,34 +136,34 @@
           console.error('post to /scheduler/buildBatch err', err)
         });
       },
-      callBack() {
-        this.$emit('success-callback');
-      },
       buildParams() {
-        let params = {
+        return {
           id: this.action === 'edit' ? this.editedRemind.id : '',
           modalId: this.customer.id,
           modalName: this.customer.name,
           modal: 'customer',
-          ['remind.id']: this.form.remindId,
+          remind: {
+            id: this.form.remindId,
+          },
           users: this.cmAllOptions.filter(rc => this.form.users.includes(rc.id))
         };
-        return params;
       },
       openDialog() {
         this.remindCustomerDialog = true;
 
         if (this.action === 'edit') {
           this.form.remindId = this.editedRemind.remind.id;
-          this.form.users = this.editedRemind.users.map(user => user.id);
+          this.form.users = (this.editedRemind.users || []).map(user => user.id);
           this.remoteSearchCM.options = this.editedRemind.users;
           this.cmAllOptions = this.editedRemind.users;
         }
+        this.searchCustomerManager();
       },
       fetchData() {
-        this.$http.get('/v2/customer/getReminds', {pageSize: 0,})
+        this.$http.get('/v2/customer/getReminds', {pageSize: 0, })
         .then(res => {
           let tv = null;
+
           if (res) {
             this.remindTemplate = res.list || [];
             tv = this.remindTemplate[0];
@@ -171,6 +171,8 @@
               this.form.remindId = tv.id;
               this.form.users = (tv.users || []).map(c => c.id);
               this.remoteSearchCM.options = tv.users;
+              this.cmAllOptions = tv.users;
+
             }
           }
         })

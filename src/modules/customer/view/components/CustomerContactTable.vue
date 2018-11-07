@@ -50,7 +50,7 @@
       :total="paginationInfo.totalItems">
     </el-pagination>
     <edit-contact-dialog ref="EditContactDialog" :customer="shareData.customer" :original-value="selectedContact"
-                         @submit-success="updateSuccess"></edit-contact-dialog>
+                         @submit-success="selectedContact = {}"></edit-contact-dialog>
   </div>
 </template>
 
@@ -87,18 +87,15 @@
     },
     mounted() {
       this.fetchData();
+      this.$eventBus.$on('customer_contact_table.update_linkman_list', this.fetchData);
+    },
+    beforeDestroy() {
+      this.$eventBus.$off('customer_contact_table.update_linkman_list', this.fetchData);
     },
     methods: {
-      updateSuccess() {
-        this.selectedContact = {};
-      },
       openDialog(contact) {
         this.selectedContact = contact;
-        // this.selectedAddress = address;
-        this.$nextTick(() => {
-          this.$refs.EditContactDialog.openDialog();
-        });
-
+        this.$nextTick(this.$refs.EditContactDialog.openDialog);
       },
       setDefaultLinkman(lm) {
         if (this.pending[lm.id]) return;

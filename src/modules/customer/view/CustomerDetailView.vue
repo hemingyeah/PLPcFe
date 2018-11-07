@@ -30,6 +30,7 @@
           </el-dropdown-menu>
         </el-dropdown>
         <span @click="openDialog('contact')" class="el-dropdown-btn add-contact">添加联系人</span>
+        <span @click="openDialog('remind')" class="el-dropdown-btn">添加提醒</span>
         <span @click="openDialog('address')" class="el-dropdown-btn">添加地址</span>
         <span class="el-dropdown-btn add-production">添加产品</span>
         <el-dropdown trigger="click">
@@ -48,10 +49,7 @@
     </div>
     <div class="main-content">
       <div class="customer-detail">
-        <h3>
-          {{customer.name}}
-          <span class="remind-btn" @click="openDialog('remind')">添加提醒</span>
-        </h3>
+        <h3>{{customer.name}}</h3>
         <form-view :fields="allField" :value="customer">
           <template slot="address" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
@@ -75,22 +73,9 @@
         </div>
       </div>
     </div>
-    <!-- <ul>
-      <li v-for="r in remindList" :key="r.id">
-        <p style="display: flex;justify-content: space-between">
-          提醒名称：{{r.remind.name}}
-          <a @click="editRemind(r)" href="javascript:;">编辑</a>
-        </p>
-        <p style="display: flex;justify-content: space-between">
-          预计发生时间：{{r.remindTime || '无'}}
-          <a @click="deleteRemind(r.id, r.remind.name)" href="javascript:;">删除</a>
-        </p>
-      </li>
-    </ul> -->
 
     <edit-contact-dialog ref="EditContactDialog" :customer="customer"></edit-contact-dialog>
-    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id"
-                        :default-address="initData.customerAddress"></edit-address-dialog>
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id" :default-address="initData.customerAddress"></edit-address-dialog>
     <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind"
                             @success-callback="selectedRemind = {}"></remind-customer-dialog>
   </div>
@@ -104,6 +89,7 @@
   import CustomerContactTable from './components/CustomerContactTable.vue';
   import CustomerAddressTable from './components/CustomerAddressTable.vue';
   import CustomerPlanTable from './components/CustomerPlanTable';
+  import CustomerRemindTable from './components/CustomerRemindTable';
 
   import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
   import EditContactDialog from './operationDialog/EditContactDialog.vue';
@@ -217,8 +203,6 @@
       /** 子组件所需的数据 */
       propsForSubComponents(){
         return {
-          // customerId: this.id,
-          // customerName: this.customer.name,
           customer: this.customer,
           loginUser: this.initData.loginUser,
         };
@@ -230,6 +214,10 @@
             displayName: '信息动态',
             component: CustomerInfoRecord.name,
             slotName: 'record-tab',
+              show: true,
+          }, {
+            displayName: '客户提醒',
+            component: CustomerRemindTable.name,
             show: true,
           }, {
             displayName: '事件',
@@ -260,9 +248,7 @@
       },
       async deleteCustomer() {
         try {
-          const action = await this.$platform.confirm('确定要删除该客户？');
-          if (!action) return;
-
+          if (!await this.$platform.confirm('确定要删除该客户？')) return;
           const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
           if (!result.status) {
             window.location.href = '/customer';
@@ -294,41 +280,20 @@
           this.$refs.addRemindDialog.openDialog();
         }
       },
-      // remind func
-      editRemind(remind) {
-        this.selectedRemind = remind;
-        this.$nextTick(this.$refs.addRemindDialog.openDialog);
-      },
-      fetchRemind() {
-        const params = {
-          modalId: this.customer.id,
-          modal: 'customer'
-        };
-        this.$http.get('/customer/remind/list', params)
-        .then(res => {
-          this.remindList = res;
-        })
-      },
-      async deleteRemind(id, name) {
-        try {
-          const action = await this.$platform.confirm(`确定删除 ${name}`);
-
-          if (!action) return
-        } catch (e) {
-          console.error('deleteRemind catch err', e);
-        }
-
-        this.$http.get(`/scheduler/delete/${id}`)
-        .catch(err => console.error('deleteRemind err', err));
-
-      },
       jump() {
         window.location.href = `/customer/edit/${this.initData.id}`
+      },
+      updateRemind(remind) {
+        this.selectedRemind = remind || {};
+        this.$nextTick(this.$refs.addRemindDialog.openDialog);
       }
     },
     mounted() {
       this.fetchCustomer(this.initData.id);
-      this.fetchRemind();
+      this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
+    },
+    beforeDestroy() {
+      this.$eventBus.$off('customer_detail_view.update_remind', this.updateRemind);
     },
     components: {
       [CustomerInfoRecord.name]: CustomerInfoRecord,
@@ -338,8 +303,9 @@
       [CustomerContactTable.name]: CustomerContactTable,
       [CustomerAddressTable.name]: CustomerAddressTable,
       [CustomerPlanTable.name]: CustomerPlanTable,
-      EditAddressDialog,
-      EditContactDialog,
+      [CustomerRemindTable.name]: CustomerRemindTable,
+      [EditAddressDialog.name]: EditAddressDialog,
+      [EditContactDialog.name]: EditContactDialog,
       [RemindCustomerDialog.name]: RemindCustomerDialog,
     }
   }

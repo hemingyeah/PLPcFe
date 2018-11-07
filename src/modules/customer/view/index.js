@@ -27,6 +27,7 @@ Vue.config.devtools = false;
 Vue.prototype.$appConfig = appConfig;
 Vue.prototype.$platform = platform;
 Vue.prototype.$http = http;
+Vue.prototype.$eventBus = new Vue();
 
 //处理注入的参数
 let initData = {};

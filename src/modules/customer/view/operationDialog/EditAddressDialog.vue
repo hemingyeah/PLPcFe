@@ -70,9 +70,6 @@
         return this.action === 'create' ? '添加地址' : '编辑地址';
       }
     },
-    mounted() {
-
-    },
     methods: {
       async submit() {
         try {
@@ -87,6 +84,7 @@
           this.$emit('submit-success');
 
           // todo reload customer address
+          this.$eventBus.$emit('customer_address_table.update_address_list');
           this.addAddressDialog = false;
         } catch (e) {
           console.error('edit-address-dialog catch err', e);

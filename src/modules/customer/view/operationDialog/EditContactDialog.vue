@@ -237,6 +237,8 @@
           this.pending = false;
           this.addContactDialog = false;
           this.reset();
+          this.$eventBus.$emit('customer_contact_table.update_linkman_list');
+
 
         } catch (e) {
           this.pending = false;
@@ -333,10 +335,6 @@
 
     .edit-contact-form-container {
       width: 85%;
-    }
-
-    .edit-contact-form {
-
     }
 
     .dialog-footer {

@@ -54,7 +54,7 @@
     </el-pagination>
 
     <edit-address-dialog ref="addAddressDialog" :customer-id="customerId"
-                         :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="updateSuccess"
+                         :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="fetchData"
                          :default-address="formatSelectedAddress"></edit-address-dialog>
   </div>
 </template>
@@ -105,11 +105,12 @@
     },
     mounted() {
       this.fetchData();
+      this.$eventBus.$on('customer_address_table.update_address_list', this.fetchData);
+    },
+    beforeDestroy() {
+      this.$eventBus.$off('customer_address_table.update_address_list', this.fetchData);
     },
     methods: {
-      updateSuccess() {
-        this.fetchData();
-      },
       openDialog(address) {
         this.selectedAddress = address;
         this.$nextTick(() => {
@@ -120,15 +121,14 @@
       async deleteAddress(address) {
         if (address.isMain) return platform.alert('默认地址不能删除');
         try {
-          const res = await platform.confirm('确定要删除该地址？');
-          if (!res) return;
+          if (!await platform.confirm('确定要删除该地址？')) return;
           this.pending[address.id] = true;
           const reqRes = await this.$http.post('/customer/address/delete', {ids: address.id,}, false);
           delete this.pending[address.id];
           if (reqRes.status === 0) {
             this.fetchData();
           } else {
-            platform.alert(res.message);
+            platform.alert(reqRes.message);
           }
         } catch (e) {
           console.error('err',);
