@@ -102,10 +102,9 @@
 
     label {
       display: block;
-      width: 120px;
+      width: 110px;
       padding: 4px 10px 0 0;
       line-height: 24px;
-      text-align: right;
       margin: 0;
     }
 
@@ -133,7 +132,7 @@
 
   .form-item-control {
     flex: 1;
-    max-width: calc(100% - 120px);
+    max-width: calc(100% - 110px);
 
     .err-msg-wrap {
       min-height: 10px;

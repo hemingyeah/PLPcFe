@@ -20,11 +20,9 @@ export default {
 <style lang="scss">
 .form-sparator{
   height: 16px;
-  margin-top: 16px;
-  border-top: 1px solid #333;
-  width: calc(100% - 120px);
+  margin: 36px 0 20px 0;
+  border-top: 1px dotted #666;
   text-align: center;
-  margin-left: 120px;
 
   span{
     height: 20px;

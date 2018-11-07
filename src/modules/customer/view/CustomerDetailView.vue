@@ -347,20 +347,14 @@ html,body,.page-container{
   height: 100%;
   overflow: auto;
   background: #fff;
-  padding: 0 10px 10px;
+  //padding: 0 10px 10px;
   width: 520px;
-  border-radius: 2px;
 
-  h3 {
-    display: flex;
-    justify-content: space-between;
+  h3{
+    margin: 0;
+    padding: 0 10px;
     line-height: 40px;
     border-bottom: 1px dashed #ccc;
-
-    .remind-btn {
-      font-weight: normal;
-      font-size: 14px;
-    }
   }
 }
 

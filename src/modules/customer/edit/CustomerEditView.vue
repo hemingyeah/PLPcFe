@@ -1,12 +1,10 @@
 <template>
   <div class="customer-container" v-loading.fullscreen.lock="loadingPage">
     <form @submit.prevent="submit" >
-      <h1 class="page-title">
-        <div class="btn-group-container">
-          <el-button><i class="iconfont icon-return"></i>返回</el-button>
-          <el-button :disabled="submitting" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i>提交</el-button>
-        </div>
-      </h1>
+      <div class="page-title">
+        <el-button><i class="iconfont icon-return"></i> 返回</el-button>
+        <el-button :disabled="submitting" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
+      </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
         <form-item v-if="!config.isAutoSerialNumber" label="客户编号" :field="baseField.serialNumberField">
           <form-text :field="baseField.serialNumberField" :value="form.serialNumber" @input="update"
@@ -379,19 +377,11 @@
     width: 100%;
     overflow: auto;
     padding: 10px;
+    background-color: #fff;
 
-    .page-title {
-      display: flex;
-      justify-content: flex-end;
+    .page-title { 
       border-bottom: 1px solid #f4f7f5;
-      padding-left: 10px;
-
-      .btn-group-container {
-        padding: 10px;
-        .iconfont {
-          font-size: 12px;
-        }
-      }
+      padding: 10px 0;
     }
   }
 

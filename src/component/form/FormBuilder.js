@@ -98,54 +98,60 @@ const FormBuilder = {
     }
   },
   render(h){
-    let groups = createGroup(this.fields);
-    let formGroups = groups.map(group => {
-      let fields = group.fields || [];
+    // let groups = createGroup(this.fields);
+    // let formGroups = groups.map(group => {
+    //   let fields = group.fields || [];
 
-      let formItems = fields
-        .map(field => {
-          let comp = FormFieldMap.get(field.formType);
-          if(comp == null) return;
+    //   let formItems = fields
+    //     .map(field => {
+    //       let comp = FormFieldMap.get(field.formType);
+    //       if(comp == null) return;
 
-          let formField = createFormField.call(this, h, field, comp);
-          if(comp.formType == 'separator') return formField;
+    //       let formField = createFormField.call(this, h, field, comp);
+    //       if(comp.formType == 'separator') return formField;
         
-          return (
-            <form-item label={field.displayName} field={field}>
-              {formField}
-            </form-item>
-          );
-        })
-        .filter(item => item != null);
+    //       return (
+    //         <form-item label={field.displayName} field={field}>
+    //           {formField}
+    //         </form-item>
+    //       );
+    //     })
+    //     .filter(item => item != null);
       
-      return (
-        [
-          group.title ? <h4>{group.title}</h4> : '',
-          <div class="form-builder-group">
-            
-            {formItems}
-          </div>
-        ]
-      )
-    })
-
-    // let formGroups = this.fields.map(field => {
-    //   let comp = FormFieldMap.get(field.formType);
-    //   if(comp == null) return;
-
-    //   let formField = createFormField.call(this, h, field, comp);
-    //   if(comp.formType == 'separator') return formField;
-    
     //   return (
-    //     <form-item label={field.displayName} field={field}>
-    //       {formField}
-    //     </form-item>
-    //   );
-    // }).filter(item => item != null);
+    //     [
+    //       group.title ? <h4>{group.title}</h4> : '',
+    //       <div class="form-builder-group">
+    //         {formItems}
+    //       </div>
+    //     ]
+    //   )
+
+      // return (
+      //   <fieldset>
+      //     <legend>{group.title}</legend>
+      //     {formItems}
+      //   </fieldset>
+      // );
+    //})
+
+    let formGroups = this.fields.map(field => {
+      let comp = FormFieldMap.get(field.formType);
+      if(comp == null) return;
+
+      let formField = createFormField.call(this, h, field, comp);
+      if(comp.formType == 'separator') return formField;
+    
+      return (
+        <form-item label={field.displayName} field={field}>
+          {formField}
+        </form-item>
+      );
+    }).filter(item => item != null);
 
     return (
       <div class="form-builder">
-        <div class="form-builder-group">{this.$slots.default}</div>
+        {this.$slots.default}
         {formGroups}
       </div>
     )

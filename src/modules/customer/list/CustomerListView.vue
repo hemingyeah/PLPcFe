@@ -276,14 +276,13 @@
         ref="multipleTable" class="customer-table">
         <!--row-key="serialNumber"-->
 
-        <el-table-column fixed type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+        <el-table-column  type="selection" width="48" align="center" class-name="select-column"></el-table-column>
         <el-table-column
           v-for="column in columns"
           v-if="column.show"
           :key="column.field"
           :label="column.label"
           :prop="column.field"
-          :fixed="column.fixed"
           :width="column.width"
           :min-width="column.minWidth || '120px'"
           :sortable="column.sortable"

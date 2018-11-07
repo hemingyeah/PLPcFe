@@ -10,7 +10,7 @@
     </div>
     
     <div class="customer-quick-comment">
-      <base-comment ref="comment" @submit="createRemark" :disabled="commentPending" autofocus/>
+      <base-comment ref="comment" placeholder="请输入备注内容" @submit="createRemark" :disabled="commentPending" autofocus/>
     </div>
   </div>
 </template>
@@ -83,8 +83,8 @@ export default {
           }
         }
 
-        let result = await this.$http.post('/customer/cRecord/create', params, false);
-
+        let result = await this.$http.post('/v2/customer/createRemark', params);
+        
         if(result.status == 0){
           this.$refs.comment.reset();
           await this.initializeRecord();

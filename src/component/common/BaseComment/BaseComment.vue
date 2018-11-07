@@ -6,7 +6,7 @@
       <textarea 
         ref="editor" 
         class="base-comment-editor" :style="editorCalcStyle"
-        placeholder="请输入内容 (Alt + Enter 快速提交)" 
+        :placeholder="`${placeholder} (Alt + Enter 快速提交)`" 
         maxlength="500"
         :value="form.content" @input="inputContent"
         @focus="editorFocus = true" @blur="editorFocus = false"/>
@@ -53,6 +53,10 @@ export default {
     autofocus: {
       type: Boolean,
       default: false
+    },
+    placeholder: {
+      type: String,
+      default: '请输入内容'
     }
   },
   data(){
