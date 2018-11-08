@@ -26,6 +26,7 @@ html, body, .frame{
 }
 
 .frame-header-left{
+  padding-left: 4px;
   height: 44px;
   display: flex;
   flex-flow: row nowrap;
@@ -83,7 +84,8 @@ html, body, .frame{
 }
 
 .frame-header-left.frame-tab-highlight{
-  box-shadow: 2px 0 12px rgba(0, 0, 0, .15)
+  box-shadow: 2px 0 12px rgba(0, 0, 0, .15);
+  padding-left: 0px !important;
 }
 
 .frame-header-right.frame-tab-highlight{

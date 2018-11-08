@@ -9,9 +9,9 @@
     <div class="frame-content">
       <header class="frame-header">
         <div class="frame-header-left" :class="{'frame-tab-highlight': prevBtnEnable}">
-          <button type="button" class="btn-text frame-collapse" @click="collapse = !collapse">
+          <!-- <button type="button" class="btn-text frame-collapse" @click="collapse = !collapse">
             <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
-          </button>
+          </button> -->
           <button type="button" class="btn-text frame-tabs-prev" @click="prev" v-if="showOperateBtn">
             <i class="iconfont icon-left"></i>
           </button>
@@ -234,6 +234,7 @@ export default {
     },
     updateUserState(state){
       this.loginUser.state = state;
+      //TODO: 判断是否打开个人中心，如果打开了，就刷新tab
     },
     async logout(){
       if(await platform.confirm('您确定要退出系统吗？')){
