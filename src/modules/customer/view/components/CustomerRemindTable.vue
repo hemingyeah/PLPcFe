@@ -13,7 +13,7 @@
         :prop="column.field"
         :width="column.width"
         :sortable="column.sortable"
-        show-overflow-tooltip
+        :show-overflow-tooltip="column.tooltip"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'remindName'">
@@ -89,7 +89,8 @@
           const action = await this.$platform.confirm(`确定删除 ${rm.remind.name}`);
           if (!action) return;
 
-          this.$http.get(`/scheduler/delete/${rm.id}`);
+          await this.$http.get(`/scheduler/delete/${rm.id}`);
+          this.fetchData();
         } catch (e) {
           console.error('deleteRemind catch err', e);
         }
@@ -117,19 +118,23 @@
           label: '提醒名称',
           field: 'remindName',
           show: true,
+          tooltip: true,
           // sortable: 'custom',
         }, {
           label: '预计发生时间',
           field: 'remindTime',
           show: true,
+          tooltip: true
         }, {
           label: '提醒内容',
           field: 'remindContent',
           show: true,
+          tooltip: true
         }, {
           label: '操作',
           field: 'action',
           show: true,
+          tooltip: false
         }]
       }
     },

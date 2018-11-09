@@ -1,9 +1,6 @@
 <template>
   <div class="page-container">
     <div class="customer-tool-bar">
-      <!-- <span><el-button icon="el-icon-search">返回</el-button>
-      <el-button type="primary" icon="el-icon-search" @click="jump">编辑</el-button></span> -->
-
       <div class="action-btn">
         <el-dropdown trigger="click">
           <span class="el-dropdown-link el-dropdown-btn">

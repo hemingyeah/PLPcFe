@@ -205,7 +205,7 @@
           label: '操作',
           field: 'action',
           show: true,
-          tooltip: true,
+          tooltip: false,
         }]
       }
     },

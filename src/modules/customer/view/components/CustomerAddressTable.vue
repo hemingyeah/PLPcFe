@@ -14,7 +14,7 @@
         :width="column.width"
         :min-width="column.minWidth"
         :sortable="column.sortable"
-        show-overflow-tooltip
+        :show-overflow-tooltip="column.tooltip"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'area'">
@@ -192,22 +192,26 @@
           label: '地址',
           field: 'area',
           show: true,
-          minWidth: '200px'
+          minWidth: '200px',
+          tooltip: true,
           // sortable: 'custom',
         }, {
           label: '详细地址',
           field: 'address',
           show: true,
-          minWidth: '200px'
+          minWidth: '200px',
+          tooltip: true
         }, {
           label: '',
           field: 'type',
           show: true,
-          width: '110px'
+          width: '110px',
+          tooltip: true
         }, {
           label: '操作',
           field: 'action',
           show: true,
+          tooltip: false
         }]
       }
     },
