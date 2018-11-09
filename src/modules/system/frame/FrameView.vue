@@ -6,13 +6,14 @@
       :curr-url="currUrl"
       @open="openForNav"
       @transitionEnd="navTransitionEnd"/>
+
     <div class="frame-content">
       <header class="frame-header">
         <div class="frame-header-left" :class="{'frame-tab-highlight': prevBtnEnable}">
-          <!-- <button type="button" class="btn-text frame-collapse" @click="collapse = !collapse">
+          <button type="button" class="btn-text frame-nav-btn frame-collapse" @click="collapse = !collapse">
             <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
-          </button> -->
-          <button type="button" class="btn-text frame-tabs-prev" @click="prev" v-if="showOperateBtn">
+          </button>
+          <button type="button" class="btn-text frame-nav-btn frame-tabs-prev" @click="prev" v-if="showOperateBtn">
             <i class="iconfont icon-left"></i>
           </button>
         </div>
@@ -28,33 +29,55 @@
 
         <!-- profile -->
         <div class="frame-header-right" :class="{'frame-tab-highlight': nextBtnEnable}">
-          <button type="button" class="btn-text frame-tabs-next" @click="next" v-if="showOperateBtn">
-            <i class="iconfont icon-right"></i>
-          </button>
-
-          <el-popover popper-class="frame-tabs-popper" placement="bottom-end" v-if="showOperateBtn">
-            <button type="button" class="btn-text frame-tabs-more" slot="reference">
-              <i class="iconfont icon-pile"></i>
+          <template v-if="showOperateBtn">
+            <button type="button" class="btn-text frame-nav-btn frame-tabs-next" @click="next">
+              <i class="iconfont icon-right"></i>
             </button>
-            <div class="frame-tabs-panel">
-              <frame-tab 
-                v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
-                @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
-            </div>
-          </el-popover>
-         
-          <!-- <div><a href="/" style="line-height: 40px;">返回旧版</a></div>
-          <div class="dev-tool" v-if="showDevTool">
-            <span>测试工具</span>
+
+            <el-popover trigger="hover" popper-class="frame-tabs-popper" placement="bottom-end">
+              <button type="button" class="btn-text frame-nav-btn frame-tabs-more" slot="reference">
+                <i class="iconfont icon-pile"></i>
+              </button>
+              <div class="frame-tabs-panel">
+                <frame-tab 
+                  v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
+                  @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
+              </div>
+            </el-popover>
+          </template>
+          
+          <el-popover v-if="showDevTool">
+            <button type="button" class="btn-text frame-nav-btn dev-tool" slot="reference">
+              <i class="iconfont icon-gongju"></i>
+            </button> 
+
             <div class="dev-tool-menu">
               <a href="javascript:;" @click="openDemo">demo</a>
               <a href="javascript:;" @click="clearStorage">清空缓存</a>
             </div>
-          </div> -->
-          <el-popover popper-class="export-panel-popper" placement="bottom-end">
-            <button type="button" class="btn-text frame-export" slot="reference"><i class="iconfont icon-download"></i> 导出下载</button>
+          </el-popover>
+          
+          <button 
+            type="button" class="btn-text frame-nav-btn frame-helpDoc"
+            @click.prevent="openHelpDoc"
+            title="帮助文档" v-tooltip>
+            <i class="iconfont icon-help"></i>
+          </button>
+
+          <button 
+            type="button" class="btn-text frame-nav-btn frame-saleManager" 
+            @click.prevent="openSaleManager"
+            title="专属客服" v-tooltip>
+            <i class="iconfont icon-customerservice"></i>
+          </button>
+
+          <el-popover trigger="hover" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
+            <button type="button" class="btn-text frame-nav-btn frame-export" slot="reference">
+              <i class="iconfont icon-export"></i>
+            </button>
 
             <div class="frame-export-panel">
+              <h3>导出下载（{{exportList.length || 0}}）</h3>
               <template v-if="exportList.length > 0">
                 <div v-for="item in exportList" :key="item.id" class="export-row">
                   <img src="../../../assets/img/excel.png">
@@ -67,7 +90,7 @@
                 </div>
               </template>
 
-              <p class="export-empty" v-else>暂无待下载的文件</p>
+              <p class="export-empty" v-else>您没有待下载的文件</p>
             </div>
           </el-popover>
           <!--导出下载-->
@@ -105,12 +128,7 @@
             <div class="user-profile-item">
               <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
             </div>
-            <div class="user-profile-item">
-              <a href="https://help.shb.ltd" @click.prevent.self="openHelpDoc"><i class="iconfont icon-help"></i>帮助文档</a>
-            </div>
-            <div class="user-profile-item">
-              <a href="javascript:;" @click.prevent.self="openSaleManager"><i class="iconfont icon-customerservice"></i>专属客服</a>
-            </div>
+            
             <div class="user-profile-item logout">
               <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-logout"></i>注销</a>
             </div>
@@ -345,6 +363,13 @@ export default {
       if(cachedKey) cachedkeyArray = cachedKey.split(",")
       cachedkeyArray.forEach(key => localStorage.setItem(key,[]))
       localStorage.removeItem('cachedKey');
+    },
+    // popover manage
+    exportPopoverToggle(visable){
+      if(visable){
+        this.profilePopperVisible = false
+        this.userStatePopperVisible = false;
+      }
     }
   },
   created(){

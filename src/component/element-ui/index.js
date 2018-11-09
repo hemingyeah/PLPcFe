@@ -5,7 +5,7 @@
  * 
  * @see http://element-cn.eleme.io/#/zh-CN/component/quickstart 
  */
-
+import './element-variables.scss';
 import {
   Pagination,
   Table,
@@ -29,9 +29,9 @@ import {
   TimePicker,
   Loading,
   CheckboxGroup,
-  Switch
+  Switch,
 } from 'element-ui';
-import './element-variables.scss';
+import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
 const ElementUI = {
   install(Vue){
@@ -64,6 +64,8 @@ const ElementUI = {
     Vue.use(Loading);
     Vue.use(CheckboxGroup);
     Vue.use(Switch);
+    
+    Vue.component(CollapseTransition.name, CollapseTransition);
   }
 };
 

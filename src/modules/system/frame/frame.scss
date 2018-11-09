@@ -15,7 +15,7 @@ html, body, .frame{
 }
 
 .frame-header{
-  height: 45px;
+  height: 49px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -26,8 +26,7 @@ html, body, .frame{
 }
 
 .frame-header-left{
-  padding-left: 4px;
-  height: 44px;
+  height: 48px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -36,18 +35,15 @@ html, body, .frame{
 .frame-header-right{
   display: flex;
   flex-flow: row nowrap;
-  height: 44px;
+  height: 48px;
   align-items: center;
   padding-right: 4px;
 }
 
-.frame-collapse,
-.frame-tabs-prev,
-.frame-tabs-next,
-.frame-tabs-more{
+.frame-nav-btn{
   padding: 4px 0 0 0;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   text-align: center;
   line-height: 40px;
   z-index: 12;
@@ -67,7 +63,11 @@ html, body, .frame{
 }
 
 .frame-collapse,
-.frame-tabs-more{
+.frame-tabs-more,
+.frame-heleDoc,
+.frame-saleManager,
+.frame-helpDoc,
+.frame-export{
   &:hover{
     color: $color-primary;
   }
@@ -85,35 +85,15 @@ html, body, .frame{
 
 .frame-header-left.frame-tab-highlight{
   box-shadow: 2px 0 12px rgba(0, 0, 0, .15);
-  padding-left: 0px !important;
 }
 
 .frame-header-right.frame-tab-highlight{
   box-shadow: -2px 0 12px rgba(0, 0, 0, .15)
 }
 
-.frame-export{
-  width: 90px;
-  height: 44px;
-  padding: 4px 0 0 0;
-  text-align: center;
-  line-height: 40px;
-  z-index: 12;
-  color: $text-color-secondary;
-  transition: color ease .3s;
-
-  i{
-    font-size: 16px;
-  }
-
-  &:hover{
-    color: $color-primary;
-  }
-}
-
 .export-btn{
   height: 100%;
-  line-height: 44px;
+  line-height: 48px;
   text-align: center; 
   cursor: pointer;
 
@@ -135,6 +115,16 @@ html, body, .frame{
   padding: 5px 0;
   max-height: 520px;
   overflow: auto;
+
+  h3{
+    line-height: 24px;
+    font-weight: 500;
+    margin: 0 5px;
+    border-bottom: 1px solid #f4f7f5;
+    font-size: 16px;
+    padding-bottom: 5px;
+    color: $text-color-primary;
+  }
 }
 
 .export-row{
@@ -164,7 +154,7 @@ html, body, .frame{
 .export-empty{
   margin: 0;
   text-align: center;
-  padding: 10px 0;
+  padding: 20px 0;
 }
 
 .export-row-info{
@@ -212,7 +202,7 @@ html, body, .frame{
   flex-flow: row nowrap;
   align-items: center;
   padding: 4px 0;
-  height: 44px;
+  height: 48px;
   color: $text-color-secondary;
   width: 160px;
   transition: background-color ease .3s;
@@ -235,10 +225,10 @@ html, body, .frame{
 
   img{
     display: block;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    box-shadow: 0 0 12px rgba(0,0,0,.095);
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0,0,0,.095);
   }
 }
 
@@ -256,13 +246,13 @@ html, body, .frame{
 
   h4{
     font-size: 14px;
-    line-height: 20px;
+    line-height: 18px;
     color: $text-color-primary;
   }
 
   p{
     font-size: 13px;
-    line-height: 16px;
+    line-height: 14px;
     color: #797e89;
     display: flex;
     flex-flow: row nowrap;
@@ -322,35 +312,16 @@ html, body, .frame{
 }
 
 .dev-tool{
-  position: relative;
   color: red;
-  cursor: default;
-  margin: 0 5px;
-  height: 20px;
-  line-height: 20px;
-  z-index: 90;
-
-  &:hover{
-    .dev-tool-menu{
-      display: block;
-    }
-  }
 }
 
 .dev-tool-menu{
-  display: none;
-  position: absolute;
-  top: 20px;
-  left: -5px;
   min-width: 100px;
-  background-color: #ddd;
-
   max-height: 360px;
   overflow: auto;
 
   a{
     display: block;
-    width: 100%;
     padding: 5px 8px;
     color: red;
   }
@@ -392,12 +363,12 @@ html, body, .frame{
   display: inline-block;
   width: 12px;
   height: 12px;
-  margin-right: 2px;
+  margin-right: 4px;
   vertical-align: middle;
 }
 
 .frame-tabs-scroll{
-  height: 44px;
+  height: 48px;
   position: relative;
   flex: 1;
   overflow: hidden;
@@ -406,7 +377,7 @@ html, body, .frame{
 .frame-tabs-list{
   position: absolute;
   bottom: 0;
-  height: 40px;
+  height: 42px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -415,7 +386,7 @@ html, body, .frame{
 
 .frame-main{
   position: relative;
-  height: calc(100% - 44px);
+  height: calc(100% - 49px);
 }
 
 .frame-tab-content{
@@ -434,7 +405,7 @@ html, body, .frame{
 }
 
 .frame-tabs-popper{
-  padding: 8px 0;
+  padding: 5px 0;
   border-radius: 2px;
   box-shadow: 1px 1px 8px rgba(0, 21, 41, .175);
 }

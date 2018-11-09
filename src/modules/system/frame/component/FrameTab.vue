@@ -58,7 +58,7 @@ export default {
   align-items: center;
 
   transition: all ease .3s;
-  padding: 12px 8px;
+  padding: 13px 8px;
   border-radius: 4px 4px 0 0;
 }
 
@@ -78,7 +78,7 @@ export default {
   line-height: 16px;
   font-size: 14px;
   margin-left: 5px;
-  min-width: 80px;
+  min-width: 70px;
   white-space: nowrap;
 }
 
