@@ -6,6 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">  
   <title>#{title}</title>
   <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_769637_juii1m5lm4.css">
+  <style type="text/css">.ie-tip-box{display:none;position:absolute;top:120px;left:50%;margin-left:-290px;width:580px;padding:20px;box-sizing:border-box;background-color:#fff;border-radius:5px;-ms-border-radius:5px;box-shadow:rgba(0,0,0,0.2) 0 0 6px 0}.isIE .ie-tip-box{display:block}.ie-tip-close{user-select:none;display:block;width:40px;height:20px;line-height:20px;text-align:center;float:right;color:#9c9c9c;cursor:pointer}.ie-tip-title{color:#454545;line-height:20px;margin-bottom:20px}.clearfix::after{clear:both;content:"";display:block}.browser-lists{margin:0;padding:0}.browser-lists li{width:180px;float:left;list-style:none}.browser-lists li a{text-decoration:none;color:#0072c6}.browser-lists li a img{width:34px;height:34px;border:0;float:left;margin-right:10px}.browser-lists li a span{display:block;font-size:12px;line-height:12px}</style>
+  <script type="text/javascript">function ieTipClose(){document.body.removeChild(document.querySelector('.ie-tip-box'))}(navigator.userAgent.toLowerCase().indexOf('msie') > -1) && (document.documentElement.className = 'isIE')</script>
   <script>window.__root_window_ = 'root';</script>
   <script data-init="js">window._init = '#{initJson}';</script>
   <script>/DingTalk/.test(window.navigator.userAgent) && document.write('<script src="//g.alicdn.com/dingding/dingtalk-pc-api/2.8.0/index.js"><\/script>')</script>
@@ -14,5 +16,42 @@
 </head>
 <body>
   <div id="app"></div>
+  <div class="ie-tip-box">
+    <p class="ie-tip-title clearfix">
+      您当前使用的浏览器版本过低，请升级后使用, 建议升级浏览器：
+      <span class="ie-tip-close" onclick="ieTipClose()">
+        关闭
+      </span>
+    </p>
+    <ul class="browser-lists clearfix">
+      <li>
+        <a href="https://www.google.com/intl/zh-CN/chrome/?system=true&standalone=1" target="_blank" class="clearfix">
+          <img src="/resource/pc-img/chrome-logo.png" alt="chrome浏览器">
+          谷歌浏览器
+          <span>
+            Google Chrome
+          </span>
+        </a>
+      </li>
+      <li>
+        <a href="http://www.firefox.com.cn/download/" class="clearfix" target="_blank">
+          <img src="/resource/pc-img/firefox-logo.png" alt="firefox浏览器">
+          火狐浏览器
+          <span>
+            Mozilla Firefox
+          </span>
+        </a>
+      </li>
+      <li>
+          <a href="http://windows.microsoft.com/zh-cn/internet-explorer/download-ie" target="_blank" class="clearfix">
+            <img src="/resource/pc-img/ie-logo.jpg" alt="IE浏览器">
+            IE浏览器
+            <span>
+              Internet Explorer
+            </span>
+          </a>
+      </li>
+    </ul>
+  </div>
 </body>
 </html>
