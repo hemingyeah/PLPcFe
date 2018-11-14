@@ -10,6 +10,11 @@ import FormDatetime from './FormDatetime';
 import FormPhone from './FormPhone';
 import FormEmail from './FormEmail';
 import FormSeparator from './FormSeparator';
+import FormAddress from './FormAddress';
+
+//arr all
+
+//base
 
 const BaseFormField = [
   FormText,
@@ -23,7 +28,13 @@ const BaseFormField = [
   FormDatetime,
   FormPhone,
   FormEmail,
-  FormSeparator
+  FormSeparator,
+  
+];
+
+const allFields = [
+  ...BaseFormField,
+  FormAddress
 ];
 
 const BaseModeField = BaseFormField.map(item => item.formType)
@@ -45,7 +56,7 @@ const PreivewComponents = {};
 const SettingComponents = {};
 const BuildComponents = {};
 
-const FormFields = [...BaseFormField]
+const FormFields = [...allFields]
 
 for(let i = 0; i < FormFields.length; i++){
   let formField = FormFields[i];

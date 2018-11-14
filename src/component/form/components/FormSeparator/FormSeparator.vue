@@ -12,7 +12,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    value: Object
+    // value: Object
   }
 }
 </script>

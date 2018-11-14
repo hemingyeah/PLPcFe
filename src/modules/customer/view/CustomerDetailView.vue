@@ -35,7 +35,9 @@
             更多<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click="jump" v-if="allowEditCustomer">编辑</el-dropdown-item>
+            <el-dropdown-item v-if="allowEditCustomer">
+              <div @click="jump">编辑</div>
+            </el-dropdown-item>
             <el-dropdown-item v-if="allowDeleteCustomer">
               <div @click="deleteCustomer">删除</div>
             </el-dropdown-item>

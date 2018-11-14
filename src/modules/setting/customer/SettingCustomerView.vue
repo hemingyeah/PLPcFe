@@ -30,7 +30,71 @@ export default {
       pending: false
     }
   },
+  mounted() {
+    this.fields = [...this.mockSystemData(), ...this.fields];
+
+    console.log('this.fields', this.fields);
+  },
   methods: {
+    mockSystemData() {
+      return [{
+        formType: 'text',
+        fieldName: 'name',
+        displayName: "客户",
+        placeholder: '[最多50字]',
+        isNull: 0,
+        isMulti: false,
+        isSearch: 1,
+        isSystem: 1,
+        defaultValue: null,
+        _id: 'name'
+      }, {
+        formType: 'text',
+        fieldName: 'linkman',
+        displayName: "联系人",
+        placeholder: '请输入详细地址[最多50字]',
+        isNull: 0,
+        isMulti: false,
+        isSearch: 1,
+        isSystem: 1,
+        defaultValue: null,
+        _id: 'linkman'
+      }, {
+        formType: 'phone',
+        fieldName: 'lmPhone',
+        displayName: "电话",
+        placeholder: '请输入详细地址[最多50字]',
+        isNull: 0,
+        isMulti: false,
+        isSearch: 1,
+        isSystem: 1,
+        defaultValue: null,
+        _id: 'lmPhone'
+      }, {
+        formType: 'address',
+        fieldName: 'customerAddress',
+        displayName: "地址",
+        placeholder: '请输入详细地址[最多50字]',
+        isNull: 0,
+        isMulti: false,
+        isSearch: 1,
+        isSystem: 1,
+        defaultValue: null,
+        _id: 'address'
+      }, {
+        formType: 'select',
+        fieldName: 'tags',
+        displayName: "服务团队",
+        placeholder: '请先选择团队',
+        isNull: 0,
+        isMulti: false,
+        isSearch: 1,
+        isSystem: 1,
+        defaultValue: null,
+        options: [],
+        _id: 'tags'
+      }];
+    },
     async submit(){
       this.pending = true;
 

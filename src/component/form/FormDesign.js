@@ -32,10 +32,10 @@ function createPreviewComp(h, field){
     <div class={previewClass} key={currFieldId} 
       onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
-      <button type="button" class="form-design-preview-delete" 
-        onClick={e => this.deleteField(field)}>
-          <i class="iconfont icon-close"></i>
-      </button> 
+      {!field.isSystem && <button type="button" class="form-design-preview-delete"
+               onClick={e => this.deleteField(field)}>
+        <i class="iconfont icon-close"></i>
+      </button>}
       <div class="form-design-cover"></div>
     </div>
   )
@@ -47,6 +47,13 @@ function createSettingComp(h, field){
 
   let formType = field.formType;
   let comp = FormFieldMap.get(formType);
+  
+  if (field.isSystem) return (
+    <div class="form-setting-panel">
+      <h3>系统字段</h3>
+      <p>不能删除或修改</p>
+    </div>
+  );
 
   return h(comp.setting, {
     key: field._id,

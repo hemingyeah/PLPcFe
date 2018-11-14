@@ -253,6 +253,10 @@
       }
     }
 
+    .address-action .iconfont {
+      font-size: 12px;
+    }
+
     .customer-address-table-pagination {
       text-align: right;
       margin-top: 7px;

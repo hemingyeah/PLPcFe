@@ -76,11 +76,13 @@
           const validateRes = await this.$refs.form.validate();
           if (!validateRes) return;
 
+          this.pending = true;
           const params = this.buildParams();
           const url = `/customer/address/${this.action === 'create' ? 'create' : 'update'}`;
 
           await this.$http.post(url, params, false);
 
+          this.pending = false;
           this.$emit('submit-success');
 
           // todo reload customer address
@@ -148,6 +150,10 @@
 
     .form-item label {
       display: none;
+    }
+
+    .form-item-control {
+      max-width: 100%;
     }
   }
 

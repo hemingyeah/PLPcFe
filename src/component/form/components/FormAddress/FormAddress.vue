@@ -99,10 +99,9 @@
         this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
       },
       chooseMap() {
-        // let defaultArea = this.addressBackup.adAddress.filter(a => a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
-        let defaultArea = this.value.adAddress.filter(a => a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
-        this.$fast.map.picker(this.addressBackup, {defaultArea: defaultArea[defaultArea.length - 1],}).then(result => {
+        let defaultArea = this.value.adAddress.filter(a => a && a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
 
+        this.$fast.map.picker(this.addressBackup, {defaultArea: defaultArea[defaultArea.length - 1],}).then(result => {
           if (result.status === 1) return;
 
           const { province, city, dist, address, latitude, longitude} = result.data;
@@ -115,12 +114,11 @@
             addressType: 1,
           };
 
-
           this.$emit('update-address-backup', newVal);
 
           this.updateValue(newVal);
         })
-          .catch(err => console.error(err));
+        .catch(err => console.error(err));
       },
 
       getValue(){

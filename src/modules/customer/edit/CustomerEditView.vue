@@ -2,8 +2,8 @@
   <div class="customer-container" v-loading.fullscreen.lock="loadingPage">
     <form @submit.prevent="submit" >
       <div class="page-title">
-        <el-button><i class="iconfont icon-return"></i> 返回</el-button>
-        <el-button :disabled="submitting" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
+        <el-button size="small"><i class="iconfont icon-return"></i> 返回</el-button>
+        <el-button size="small" :disabled="submitting" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
         <form-item v-if="!config.isAutoSerialNumber" label="客户编号" :field="baseField.serialNumberField">
@@ -50,11 +50,11 @@
   import * as FormUtil from '@src/component/form/util';
   import {toArray} from '@src/util/lang';
   import { formatCustomer } from '../util/customer';
-  import FormAddress from './FormAddress.vue';
+  // import FormAddress from './FormAddress.vue';
 
   export default {
     name: 'customer-edit-view',
-    components: {FormAddress,},
+    // components: {FormAddress,},
     props: {
       initData: {
         type: Object,
@@ -382,6 +382,10 @@
     .page-title { 
       border-bottom: 1px solid #f4f7f5;
       padding: 10px 0;
+
+      .iconfont {
+        font-size: 12px;
+      }
     }
   }
 

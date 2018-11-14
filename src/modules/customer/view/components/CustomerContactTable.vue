@@ -190,6 +190,14 @@
     .edit-btn {
       color: #2F93C0
     }
+    .lm-action {
+      display: flex;
+      justify-content: space-between;
+
+      .iconfont {
+        font-size: 12px;
+      }
+    }
 
     .set-default-lm-btn {
       line-height: 34px;

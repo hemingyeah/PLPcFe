@@ -53,9 +53,9 @@
           <template v-else-if="column.field === 'periodSetting'">
             每{{scope.row[column.field].period + scope.row[column.field].periodUnit}}
           </template>
-          <template class="lm-action" v-else-if="column.field === 'action'">
-            <el-button type="danger" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]" class="delete-plan-btn"
-                       icon="iconfont icon-shanchu" size="mini">删除
+          <template v-else-if="column.field === 'action'">
+            <el-button class="delete-plan-btn" type="danger" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]"
+                       icon="iconfont icon-shanchu">删除
             </el-button>
           </template>
 
@@ -233,8 +233,7 @@
 
     .delete-plan-btn {
       .iconfont {
-        position: relative;
-        top: 1px;
+        font-size: 12px;
       }
     }
 
