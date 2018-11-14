@@ -58,7 +58,7 @@ export default {
   align-items: center;
 
   transition: all ease .3s;
-  padding: 13px 8px;
+  padding: 14px 10px;
   border-radius: 4px 4px 0 0;
 }
 

@@ -5,7 +5,7 @@
       :source="initData.menus" 
       :curr-url="currUrl"
       @open="openForNav"
-      @transitionEnd="navTransitionEnd"/>
+      @collapse-changed="adjustOpenTab"/>
 
     <div class="frame-content">
       <header class="frame-header">
@@ -216,7 +216,7 @@ export default {
     }
   },
   methods: {
-    navTransitionEnd(){
+    adjustOpenTab(){
       let tab = this.frameTabs.find(item => item.show);
       this.adjustFrameTabs(tab)
     },

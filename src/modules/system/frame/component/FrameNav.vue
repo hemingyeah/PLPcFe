@@ -1,5 +1,5 @@
 <template>
-  <nav class="frame-nav" :class="{'frame-nav-expand': !collapse}">
+  <nav class="frame-nav" :class="{'frame-nav-expand': !collapse}" @transitionend="navTransitionEnd">
     <div class="frame-logo">
       <a href="javascript:;" @click="openHome">
         <img src="../../../../assets/svg/logo.svg">
@@ -21,7 +21,7 @@
               <ul 
                 :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
                 v-show="!collapse && menu == currMenu">
-                <li v-if="collapse"><h3 class="frame-float-menu-title">{{menu.name}}</h3></li>
+                <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
                 <template v-for="menu in menu.children">
                   <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}" :key="menu.menuKey">
                     <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
@@ -68,6 +68,11 @@ export default {
     };
   },
   methods: {
+    navTransitionEnd(event){
+      //只监听nav宽段变化
+      if(event.target != this.$el || event.propertyName != 'width') return;
+      this.$emit('collapse-changed')
+    },
     /** 将后端返回的菜单，重整为多根树形结构 */
     buildMenus(source, parent){
       let menus = [];
@@ -155,6 +160,9 @@ export default {
 
   .frame-subMenu-item > a{
     padding: 8px 15px 8px 39px;
+  }
+  .frame-float-menu-title{
+    display: none;
   }
 }
 
@@ -274,7 +282,7 @@ export default {
   box-shadow: 1px 1px 4px 0 rgba(0,0,0,.1);
 }
 
-.frame-float-menu-title{
+.frame-float-menu-title h3{
   margin: 0;
   font-size: 16px;
   padding: 12px 25px;
