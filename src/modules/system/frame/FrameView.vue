@@ -56,17 +56,23 @@
               <a href="javascript:;" @click="clearStorage">清空缓存</a>
             </div>
           </el-popover>
+
+          <a 
+            href="/" class="btn-text frame-nav-btn frame-helpDoc"
+            title="返回旧版" v-tooltip>
+            <i class="iconfont icon-jiuban"></i>
+          </a>
           
           <button 
             type="button" class="btn-text frame-nav-btn frame-helpDoc"
-            @click.prevent="openHelpDoc"
+            @click="openHelpDoc"
             title="帮助文档" v-tooltip>
             <i class="iconfont icon-help"></i>
           </button>
 
           <button 
             type="button" class="btn-text frame-nav-btn frame-saleManager" 
-            @click.prevent="openSaleManager"
+            @click="openSaleManager"
             title="专属客服" v-tooltip>
             <i class="iconfont icon-customerservice"></i>
           </button>

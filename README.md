@@ -39,19 +39,15 @@
 ```
 
 ## todolist
-
- * 图片预览 兼容钉钉 兼容文件上传组件 ▲
  * toast 兼容钉钉
  * 层管理 popmanager
  * 合并sm4_pc_components项目
- * git规范 ▲
  * 重写table组件
  * 热更新
  * frameTab支持响应mousewheel事件
  * 浏览器ua工具 ▲
  * 输入组件支持清空 ▲
  * babel升级至7.0
- * ie11以下版本升级提示
  * 动态计算多行文本框高度 ▲
  * 表单支持键盘操作
  * modal组件弹出时阻止body滚动 ▲
@@ -59,5 +55,4 @@
  * split分割面板 https://www.iviewui.com/components/split
  
  ## 优化项
-
  * BaseContact组件选人时，只在需要工单统计信息时才返回统计数据

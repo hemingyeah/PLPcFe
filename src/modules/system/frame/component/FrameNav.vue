@@ -119,7 +119,7 @@ export default {
 
 <style lang="scss">
 .frame-nav{
-  width: 48px;
+  width: 44px;
   background-color: $color-primary;
   box-shadow: 1px 0 4px rgba(0,0,0,.125);
   transition: width ease .2s;
@@ -145,7 +145,7 @@ export default {
 
   .frame-menu-scroll{
     overflow: auto;
-    height: calc(100% - 48px);
+    height: calc(100% - 44px);
     margin-right: -40px;
   }
 
@@ -167,8 +167,8 @@ export default {
 }
 
 .frame-logo{
-  height: 48px;
-  padding: 10px;
+  height: 44px;
+  padding: 8px;
   
   a{
     display: flex;
@@ -203,7 +203,7 @@ export default {
   position: relative;
   margin: 0;
   padding: 0;
-  min-height: 48px;
+  min-height: 44px;
   transition: background-color ease .3s;
 
   &:hover{
@@ -218,7 +218,7 @@ export default {
     display: flex;
     flex-flow: row nowrap;
     line-height: 24px;
-    padding: 12px;
+    padding: 10px;
     color: #fff;
     font-size: 14px;
 
@@ -274,7 +274,7 @@ export default {
 .frame-float-menu{
   display: none;
   position: absolute;
-  left: 49px;
+  left: 45px;
   top: 0;
   overflow: hidden;
   width: 176px;
@@ -285,7 +285,7 @@ export default {
 .frame-float-menu-title h3{
   margin: 0;
   font-size: 16px;
-  padding: 12px 25px;
+  padding: 10px 25px;
   line-height: 24px;
   color: #303133;
   border-bottom: 1px solid #ebeef5;

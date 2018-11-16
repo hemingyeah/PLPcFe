@@ -15,7 +15,7 @@ html, body, .frame{
 }
 
 .frame-header{
-  height: 49px;
+  height: 45px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -26,7 +26,7 @@ html, body, .frame{
 }
 
 .frame-header-left{
-  height: 48px;
+  height: 44px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -35,15 +35,15 @@ html, body, .frame{
 .frame-header-right{
   display: flex;
   flex-flow: row nowrap;
-  height: 48px;
+  height: 44px;
   align-items: center;
   padding-right: 4px;
 }
 
 .frame-nav-btn{
-  padding: 4px 0 0 0;
+  padding: 5px 0 0 0;
   width: 44px;
-  height: 48px;
+  height: 44px;
   text-align: center;
   line-height: 40px;
   z-index: 12;
@@ -93,7 +93,7 @@ html, body, .frame{
 
 .export-btn{
   height: 100%;
-  line-height: 48px;
+  line-height: 44px;
   text-align: center; 
   cursor: pointer;
 
@@ -202,7 +202,7 @@ html, body, .frame{
   flex-flow: row nowrap;
   align-items: center;
   padding: 4px 0;
-  height: 48px;
+  height: 44px;
   color: $text-color-secondary;
   width: 160px;
   transition: background-color ease .3s;
@@ -368,7 +368,7 @@ html, body, .frame{
 }
 
 .frame-tabs-scroll{
-  height: 48px;
+  height: 44px;
   position: relative;
   flex: 1;
   overflow: hidden;
