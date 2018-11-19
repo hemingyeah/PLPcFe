@@ -58,7 +58,7 @@
           </el-popover>
 
           <a 
-            href="/" class="btn-text frame-nav-btn frame-helpDoc"
+            href="/v3" class="btn-text frame-nav-btn frame-helpDoc"
             title="返回旧版" v-tooltip>
             <i class="iconfont icon-jiuban"></i>
           </a>

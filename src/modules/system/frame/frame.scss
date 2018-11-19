@@ -49,6 +49,7 @@ html, body, .frame{
   z-index: 12;
   color: $text-color-secondary;
   transition: color ease .3s;
+  text-decoration: none !important;
 
   i.iconfont{
     font-size: 16px;
@@ -385,7 +386,7 @@ html, body, .frame{
 
 .frame-main{
   position: relative;
-  height: calc(100% - 49px);
+  height: calc(100% - 45px);
 }
 
 .frame-tab-content{

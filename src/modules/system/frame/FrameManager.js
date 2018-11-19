@@ -293,9 +293,7 @@ const FrameManager = {
     //处理消息跳转url
     let query = parse(window.location.search);
     let pcUrl = this.initData.pcUrl || query.pcUrl;
-    if(null != pcUrl){
-      this.openForFrame({id: "PcUrl", title: "正在加载", url: pcUrl});
-    }
+    if(pcUrl) this.openForFrame({id: "PcUrl", title: "正在加载", url: pcUrl});
   }
 };
 
