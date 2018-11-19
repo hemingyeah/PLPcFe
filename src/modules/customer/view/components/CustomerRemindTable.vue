@@ -150,8 +150,7 @@
 
     .delete-remind-btn {
       .iconfont {
-        position: relative;
-        top: 1px;
+        font-size: 12px;
       }
     }
 

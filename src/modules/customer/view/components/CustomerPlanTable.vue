@@ -31,7 +31,6 @@
             </template>
           </template>
           <template v-else-if="column.field === 'createdTasks'">
-
             <template v-if="scope.row[column.field].length">
               <el-popover
                 placement="left"
@@ -44,7 +43,6 @@
                   </li>
                 </ul>
               </el-popover>
-
             </template>
             <template v-else>
               {{scope.row[column.field].length}}
@@ -55,10 +53,9 @@
           </template>
           <template v-else-if="column.field === 'action'">
             <el-button class="delete-plan-btn" type="danger" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]"
-                       icon="iconfont icon-shanchu">删除
+                       size="small" icon="iconfont icon-shanchu">删除
             </el-button>
           </template>
-
           <template v-else>
             {{scope.row[column.field]}}
           </template>
@@ -129,7 +126,7 @@
           if (reqRes.status === 0) {
             this.fetchData();
           } else {
-            platform.alert(res.message);
+            platform.alert(reqRes.message);
           }
         } catch (e) {
           console.error('deletePlan catch an err', e);

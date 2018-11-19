@@ -610,7 +610,7 @@
       this.customerConfig = {
         customerAddressConfig: initData.customerAddressConfig,
         customerConfig: initData.customerConfig,
-        fieldInfo: initData.fieldInfo,
+        fieldInfo: (initData.fieldInfo || []).filter(f => f.formType !== 'separator'),
       };
       this.auth = initData.auth || {};
 

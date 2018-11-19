@@ -20,11 +20,11 @@
           <template v-if="column.field === 'area'">
             <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
-          <div v-else-if="column.field === 'action'">
+          <template v-else-if="column.field === 'action'">
             <el-button type="danger" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]" class="delete-address-btn"
                        size="mini" icon="iconfont icon-shanchu">删除
             </el-button>
-          </div>
+          </template>
           <template v-else-if="column.field === 'type'">
             <span v-if="scope.row.isMain" style="text-align: center;display: block;">默认地址</span>
             <span v-else @click="setDefaultAddress(scope.row)" class="set-default-address-btn">
@@ -236,8 +236,7 @@
 
     .delete-address-btn {
       .iconfont {
-        position: relative;
-        top: 1px;
+        font-size: 12px;
       }
     }
 
@@ -251,10 +250,6 @@
         cursor: pointer;
         background-color: #e7e7e7;
       }
-    }
-
-    .address-action .iconfont {
-      font-size: 12px;
     }
 
     .customer-address-table-pagination {

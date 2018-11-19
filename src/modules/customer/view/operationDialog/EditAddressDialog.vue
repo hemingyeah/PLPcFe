@@ -3,8 +3,10 @@
     <form @submit.prevent="submit">
       <form-builder :fields="[]" class="edit-address-form" ref="form" :value="form" @input="update">
         <form-item label="" :field="addressField">
-          <form-address ref="addressForm" :field="addressField" :value="form.customerAddress" @input="update"
-                        @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
+          <form-address ref="addressForm" :field="addressField"
+                        :value="form.customerAddress" @input="update"
+                        :address-backup="addressBackup"
+                        @update-address-backup="updateAddressBackup"
                         :placeholder="addressField.placeholder"></form-address>
         </form-item>
       </form-builder>
@@ -18,8 +20,6 @@
 </template>
 
 <script>
-  import FormAddress from '../../edit/FormAddress.vue';
-
   export default {
     name: "edit-address-dialog",
     props: {
@@ -134,11 +134,12 @@
         if (this.action === 'edit') {
           this.update({field: this.addressField, newValue: this.defaultAddress});
         }
+
+        if (this.defaultAddress.addressType) {
+          this.updateAddressBackup(this.defaultAddress);
+        }
         this.setDefaultAddress(this.defaultAddress)
       },
-    },
-    components: {
-      FormAddress,
     },
   }
 </script>

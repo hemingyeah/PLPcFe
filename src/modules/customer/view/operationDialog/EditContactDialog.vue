@@ -335,6 +335,7 @@
 
     .edit-contact-form-container {
       width: 85%;
+      margin: 0 auto;
     }
 
     .dialog-footer {

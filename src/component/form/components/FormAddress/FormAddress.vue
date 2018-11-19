@@ -99,9 +99,15 @@
         this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
       },
       chooseMap() {
+        const point = {
+          latitude: this.addressBackup.adLatitude || this.value.adLatitude || '',
+          longitude: this.addressBackup.adLongitude || this.value.adLongitude || '',
+        };
+
         let defaultArea = this.value.adAddress.filter(a => a && a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
 
-        this.$fast.map.picker(this.addressBackup, {defaultArea: defaultArea[defaultArea.length - 1],}).then(result => {
+        // 有经纬度用经纬度，没有使用较小的行政单位
+        this.$fast.map.picker(point, {defaultArea: defaultArea[defaultArea.length - 1],}).then(result => {
           if (result.status === 1) return;
 
           const { province, city, dist, address, latitude, longitude} = result.data;

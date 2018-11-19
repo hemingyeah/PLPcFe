@@ -44,7 +44,6 @@
 <script>
   import {formatDate,} from '@src/util/lang';
 
-
   export default {
     name: "customer-product-table",
     props: {
@@ -99,7 +98,6 @@
           label: '名称',
           field: 'name',
           show: true,
-          // sortable: 'custom',
         }, {
           label: '产品编号',
           field: 'serialNumber',
