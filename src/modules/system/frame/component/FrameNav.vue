@@ -274,7 +274,7 @@ export default {
 .frame-float-menu{
   display: none;
   position: absolute;
-  left: 45px;
+  left: 44px;
   top: 0;
   overflow: hidden;
   width: 176px;

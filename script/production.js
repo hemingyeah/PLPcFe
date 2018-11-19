@@ -16,6 +16,8 @@ const shell = require('shelljs');
 const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.prod.conf');
 
+const ROOT_PATH = config.targetRootPath;
+
 //编译
 webpack(webpackConfig, function (err, stats) {
   if (err) throw err;
@@ -30,7 +32,19 @@ webpack(webpackConfig, function (err, stats) {
 
   //读取html生成jsp
   genJSP(path.resolve(__dirname, '../dist'));
+  //复制静态资源
+  copyResource()
 });
+
+function copyResource(){
+  let targetPath = `${ROOT_PATH}/shb-web/src/main/webapp/resource/pc-fe-static`;
+  let originPath = path.resolve(__dirname, '../public/resource/pc-fe-static');
+
+  shell.rm('-rf', targetPath);
+  shell.mkdir('-p', targetPath);
+  shell.cp('-r', `${originPath}/*`, targetPath);
+  console.log(`copy resource => ${targetPath}`)
+}
 
 async function genJSP(directory){
   let files = fs.readdirSync(directory);
@@ -44,8 +58,8 @@ async function genJSP(directory){
 
   //复制文件
   let distOriginPath = path.resolve(__dirname, '../dist');
-  let distTargetPath = config.targetRootPath + '/shb-web/src/main/webapp/resource/pc-fe';
-  let jspTatgetPath = config.targetRootPath + '/shb-web/src/main/webapp/WEB-INF/views/dist';
+  let distTargetPath = ROOT_PATH + '/shb-web/src/main/webapp/resource/pc-fe';
+  let jspTatgetPath = ROOT_PATH + '/shb-web/src/main/webapp/WEB-INF/views/dist';
 
   //复制jsp
   shell.rm('-rf', jspTatgetPath);
