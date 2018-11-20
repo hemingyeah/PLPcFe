@@ -120,6 +120,7 @@ export default {
 <style lang="scss">
 .frame-nav{
   width: 44px;
+  height: 100%;
   background-color: $color-primary;
   box-shadow: 1px 0 4px rgba(0,0,0,.125);
   transition: width ease .2s;
