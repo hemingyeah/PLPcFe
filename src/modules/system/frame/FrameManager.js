@@ -136,7 +136,10 @@ const FrameManager = {
         this.reloadFrameTab(this.frameTabs[index])
       }
     },
-    scroll(event){ 
+    tabScroll(event){ 
+      //1. 兼容不同浏览器的事件
+      //2. 根据方向设置offset
+      console.log(event)
       return; 
       // let scrollEl = this.$refs.scroll;
       // let listEl = this.$refs.list;

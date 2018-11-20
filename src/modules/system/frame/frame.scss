@@ -377,11 +377,10 @@ html, body, .frame{
 
 .frame-tabs-list{
   position: absolute;
+  height: 40px;
   bottom: 0;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  transition: transform ease .3s;
+  white-space: nowrap;
+  transition: transform linear .25s;
 }
 
 .frame-main{
@@ -419,14 +418,14 @@ html, body, .frame{
   
   .frame-tab{
     margin: 2px 0 0 0;
-    
+    width: 100%;
+
     .frame-tab-inner{
       border-radius: 2px;
       padding: 8px 5px;
 
       .frame-tab-name{
         flex: 1;
-
         @include text-ellipsis();
       }
     }

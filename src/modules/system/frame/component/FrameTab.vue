@@ -21,6 +21,7 @@
 </template>
 
 <script>
+//ie 显示bug
 export default {
   name: 'frame-tab',
   props: {
@@ -35,7 +36,8 @@ export default {
 <style lang="scss">
 .frame-tab{
   position: relative;
-  display: block;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .frame-tab:not(:first-child){
@@ -56,14 +58,20 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+  min-width: 120px;
+  position: relative;
 
   transition: all ease .3s;
-  padding: 12px 10px;
+  padding: 12px;
   border-radius: 4px 4px 0 0;
+
+  .base-spin{
+    display: block;
+  }
 }
 
 .frame-tab-icon-wrap{
-  display: inline-block;
+  display: block;
   height: 16px;
   width: 16px;
   text-align: center;
@@ -71,14 +79,13 @@ export default {
 }
 
 .frame-tab-name{
-  display: inline-block;
+  display: block;
   cursor: default;
   user-select: none;
   height: 16px;
   line-height: 16px;
-  font-size: 14px;
+  font-size: 15px;
   margin-left: 5px;
-  min-width: 70px;
   white-space: nowrap;
 }
 
@@ -89,13 +96,14 @@ export default {
 }
 
 .frame-tab-icon{
+  display: block;
   color: #757575;
   font-size: 16px;
 }
 
 .frame-tab-close{
-  margin: 0;
-  margin-left: 5px;
+  display: block;
+  margin: 0 0 0 5px;
   padding: 0;
   width: 16px;
   height: 16px;
@@ -113,7 +121,7 @@ export default {
 }
 
 .frame-tab-active,
-.frame-tab:hover{
+.frame-tab:hover{  
   &:before{
     background-color: transparent !important;
   }
@@ -136,7 +144,7 @@ export default {
 
 .frame-tab:hover{
   .frame-tab-reload{
-    display: inline-block;
+    display: block;
   }
 
   .frame-tab-icon{
