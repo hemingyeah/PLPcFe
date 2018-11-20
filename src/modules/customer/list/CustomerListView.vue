@@ -291,7 +291,7 @@
 
           <template slot-scope="scope">
             <template v-if="column.field === 'name'">
-              <a :href="`/customer/view/${scope.row.id}`" class="view-detail-btn">{{scope.row[column.field]}}</a>
+              <a :href="`/v2/customer/view/${scope.row.id}`" class="view-detail-btn">{{scope.row[column.field]}}</a>
             </template>
             <template v-else-if="column.field === 'customerAddress'">
               {{formatAddress(scope.row[column.field])}}

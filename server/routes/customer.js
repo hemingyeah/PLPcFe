@@ -33,7 +33,17 @@ router.get('/customer/edit/:id', async ctx => {
   ctx.body = Template.renderWithHtml('编辑客户', body, script, modConfig.template)
 });
 
-router.get('/customer/view/:id', async ctx => {
+// router.get('/customer/view/:id', async ctx => {
+//   let modConfig = modules['customer.view'];
+//   let reqHeaders = ctx.request.headers;
+//   let script = ['/customer.view.js'];
+//   let result = await HttpClient.request(`/v2/customer/view/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  
+//   let body = result.body;
+//   ctx.body = Template.renderWithHtml('客户信息', body, script, modConfig.template)
+// });
+
+router.get('/v2/customer/view/:id', async ctx => {
   let modConfig = modules['customer.view'];
   let reqHeaders = ctx.request.headers;
   let script = ['/customer.view.js'];
@@ -42,5 +52,6 @@ router.get('/customer/view/:id', async ctx => {
   let body = result.body;
   ctx.body = Template.renderWithHtml('客户信息', body, script, modConfig.template)
 });
+
 
 module.exports = router;
