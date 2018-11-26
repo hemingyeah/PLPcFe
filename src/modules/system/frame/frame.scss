@@ -385,7 +385,10 @@ button.export-operate-btn{
   height: 40px;
   bottom: 0;
   white-space: nowrap;
-  transition: transform linear .25s;
+}
+
+.frame-tab-transition{
+  transition: transform linear .3s;
 }
 
 .frame-main{

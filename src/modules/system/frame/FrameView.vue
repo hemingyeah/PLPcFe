@@ -20,7 +20,7 @@
         
         <!-- tabs -->
         <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
-          <div class="frame-tabs-list" ref="list" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
+          <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
             <frame-tab 
               v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
               @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
