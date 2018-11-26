@@ -86,7 +86,9 @@ export default {
   line-height: 16px;
   font-size: 15px;
   margin-left: 5px;
-  white-space: nowrap;
+  
+  max-width: 180px;
+  @include text-ellipsis();
 }
 
 .frame-tab-reload{

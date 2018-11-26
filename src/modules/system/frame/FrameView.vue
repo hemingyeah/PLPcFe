@@ -34,7 +34,7 @@
               <i class="iconfont icon-right"></i>
             </button>
 
-            <el-popover trigger="hover" popper-class="frame-tabs-popper" placement="bottom-end">
+            <el-popover trigger="click" popper-class="frame-tabs-popper" placement="bottom-end">
               <button type="button" class="btn-text frame-nav-btn frame-tabs-more" slot="reference">
                 <i class="iconfont icon-pile"></i>
               </button>
@@ -92,10 +92,10 @@
                     <p>{{item.createTime | fmt_datetime}}</p>
                   </div>  
                   <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
-                  <a href="javascript:void(0);" @click="execExportFile(item)">{{item.isFinished == 0 ? '取消' : '下载'}}</a>
+                  <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template>
+                  <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>{{item.isFinished == 0 ? '取消' : '下载'}}</button>
                 </div>
               </template>
-
               <p class="export-empty" v-else>您没有待下载的文件</p>
             </div>
           </el-popover>
@@ -198,8 +198,7 @@ export default {
       exportPanelShow: false,
       exportTimer: null,
       exportList: [],
-      autoFetchExportList: true,
-      downloadList: []
+      operationList: []
     }
   },
   computed: {
@@ -262,11 +261,7 @@ export default {
     },
     async logout(){
       if(await platform.confirm('您确定要退出系统吗？')){
-        if(platform.inDingTalk()){
-            window.location.href = '/smlogin/pc/logout'
-        }else{
-            window.location.href = '/logout'
-        }
+        window.location.href = platform.inDingTalk ? '/smlogin/pc/logout' : '/logout'
       }
     },
     openHelpDoc(event){
@@ -309,34 +304,33 @@ export default {
     async checkExports(){
       try {
         this.exportList = await http.get('/export/getList');
+        //更新操作列表
+        this.operationList = this.operationList.filter(item => {
+          return (
+            item.operate == 'cancel' || 
+            item.operate == 'download' && this.exportList.some(exp => exp.id == item)
+          );
+        })
 
-        let autoFetchExportList = this.exportList.length > 0 && this.exportList.some(item => item.isFinished == 0);
-        //如果文件仍被抓取到，说明文件还没下载完成，仍需刷新导出列表
-        if(this.downloadList.length > 0){
-          this.downloadList = this.downloadList.filter(item => this.exportList.some(exp => exp.id == item))
-          this.autoFetchExportList = true;
-        }
-
-        this.autoFetchExportList = autoFetchExportList;
-        
+        //以下情况需要刷新列表
+        // 1. 有为导出完成的文件
+        // 2. 操作列表中仍有下载的文件
+        let autoFetchExportList = this.exportList.some(item => item.isFinished == 0) || this.operationList.some(item => item.operate == 'download')
+                
         //如果不需要更新，清空定时器
-        if(!this.autoFetchExportList){
-          if(this.exportTimer){
-            clearInterval(this.exportTimer);
-            this.exportTimer = null;
-          }
+        if(!autoFetchExportList){
+          clearInterval(this.exportTimer);
+          this.exportTimer = null;
           return;
         }
 
         //如果需要更新,设置定时抓取数据
-        if(!this.exportTimer) this.exportTimer = setInterval(() => this.checkExports(), 15000);
+        if(!this.exportTimer) this.exportTimer = setInterval(() => this.checkExports(), 5000);
       } catch (error) {
         console.error(error);
 
-        if(this.exportTimer){
-          clearInterval(this.exportTimer);
-          this.exportTimer = null;
-        }
+        clearInterval(this.exportTimer);
+        this.exportTimer = null;
       }
     },
     async execExportFile(item){
@@ -347,13 +341,14 @@ export default {
         frame.src = `/export/download?id=${item.id}`;
         document.body.appendChild(frame);
 
-        this.downloadList.push(item.id)
+        this.operationList.push({id: item.id, operate: 'download'})
         this.checkExports();
         return
       }
 
       //取消下载
       if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
+        this.operationList.push({id: item.id, operate: 'cancel'})
         let result = await http.post('export/cancel', {id: item.id}, false);
         if(result.status == 0) this.checkExports();
       }

@@ -17,6 +17,9 @@
     opacity: 0.85;
   }
 
+  &:disabled{
+    cursor: not-allowed;
+  }
 }
 
 .btn-text{
@@ -38,6 +41,5 @@
     //background: #33bdac;
     background-color: lighten($color-primary, 3%) !important;
     opacity: 0.65 !important;
-    cursor: not-allowed;
   }
 }

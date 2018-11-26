@@ -142,11 +142,6 @@ html, body, .frame{
     border-radius: 2px;
   }
 
-  a{
-    text-decoration: none;
-    margin-left: 5px;
-  }
-
   &:hover{
     background-color: $color-primary-hover;
   }
@@ -195,6 +190,16 @@ html, body, .frame{
 
 .export-row-badge-finished{
   background-color: #6cc87f;
+}
+
+.export-operate-btn{
+  padding: 0;
+  width: 50px;
+  text-align: right;
+}
+
+button.export-operate-btn{
+  color: #007bff;
 }
 
 .frame-user-profile{
