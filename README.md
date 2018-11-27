@@ -44,7 +44,6 @@
  * 合并sm4_pc_components项目
  * 重写table组件
  * 热更新
- * frameTab支持响应mousewheel事件
  * 浏览器ua工具 ▲
  * 输入组件支持清空 ▲
  * babel升级至7.0

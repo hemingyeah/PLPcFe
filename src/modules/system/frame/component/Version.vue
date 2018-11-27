@@ -5,10 +5,11 @@
         <div class="version-banner">
           <img src="../../../../assets/img/version-banner.png">
         </div>
-        <h3 class="version-title">售后宝 | {{version.versionNum}} 更新说明</h3>
-        <div class="version-description" v-html="version.description"></div>
+        <h3 class="version-title">售后宝 | {{versionNum}} 更新说明</h3>
+        <div class="version-description" v-html="description"></div>
         <div class="version-bottom">
-          <button type="button" class="btn btn-text version-btn" @click="close">开始使用</button>
+          <button type="button" class="btn btn-text" @click="show = false">开始使用</button>
+          <button type="button" class="btn btn-text version-btn" @click="seeHelp">了解更多</button>
         </div>
       </div>
     </div>
@@ -16,22 +17,48 @@
 </template>
 
 <script>
+import http from '@src/util/http';
+import platform from '@src/platform'
+
+const VERSION_NUM_KEY = 'shb_version_num';
+
 export default {
   name: "version",
   props: {
-    show: { //是否显示组件
-      type: Boolean,
-      default: false
-    },
-    version: {
-      type: Object,
-      default: () =>({})
+    version: String
+  },
+  data(){
+    return {
+      show: false,
+      versionNum: '',
+      description: ''
     }
   },
   methods: {
-    close(){
-      this.$emit('update:show', false)
+    /** 检测是否有版本更新提示 */
+    async checkVersion(){
+      let currVersion = localStorage.getItem(VERSION_NUM_KEY);
+      let version = this.version;
+      if(version && (!currVersion || currVersion != version)){
+        try {
+          let result = await http.get('/getLastVersion');
+          let lastVersion = result.data || {};
+          this.versionNum = lastVersion.versionNum;
+          this.description = lastVersion.description;
+          this.show = true;
+          localStorage.setItem(VERSION_NUM_KEY, version);
+        } catch (error) {
+          console.error(error);
+        }               
+      }
+    },
+    seeHelp(){
+      platform.openLink('https://help.shb.ltd/doc?id=10102');
+      this.show = false;
     }
+  },
+  mounted(){
+    this.checkVersion();
   }
 }
 </script>
@@ -95,17 +122,27 @@ export default {
 .version-bottom{
   text-align: center;
   padding: 10px 15px;
+  overflow: hidden;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+
+  button.btn{
+    width: 100px;
+    height: 32px;
+    padding: 0;
+    color: $color-primary;
+    line-height: 32px;
+  }
 }
 
 .version-btn{
-  background-color: $color-primary;
-  color: #fff;
-  width: 100%;
-  margin: 0 auto;
-  font-size: 18px;
-  padding: 0;
-  height: 42px;
-  line-height: 42px;
-  border-radius: 1px;
+  font-size: 14px;
+  color: #fff !important;
+  border: none;
+  outline: none;
+  background-color: #00ac97;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px 0px rgba(0,172,151,0.5);
 }
 </style>

@@ -152,7 +152,7 @@
       </div>
     </div>
 
-    <version :version="newVersion" :show.sync="versionShow"/>
+    <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
   </div>
 </template>
@@ -169,8 +169,6 @@ import SaleManager from './component/SaleManager.vue';
 
 import DefaultHead from '@src/assets/img/user-avatar.png';
 
-const VERSION_NUM_KEY = 'shb_version_num';
-
 export default {
   mixins: [FrameManager],
   name: 'frame-view',
@@ -186,13 +184,10 @@ export default {
 
       profilePopperVisible: false, 
       userStatePopperVisible: false,
+      saleManagerShow: false, // 是否显示专属客服
 
       collapse: true,
       currUrl: '/home',
-
-      versionShow: false, //是否显示版本信息
-      saleManagerShow: false, // 是否显示专属客服
-      newVersion:{}, //跟新了的版本信息
 
       //导出相关变量
       exportPanelShow: false,
@@ -218,6 +213,9 @@ export default {
     /** 用户头像 */
     userAvatar(){
       return this.loginUser.head || DefaultHead;
+    },
+    releaseVersion(){
+      return this.initData.releaseVersion || '';
     }
   },
   methods: {
@@ -285,21 +283,7 @@ export default {
       console.warn('不推荐调用该方法，使用platform.openFrameTab替代');
       this.openForFrame(option)
     },
-    /** 检测是否有版本更新提示 */
-    async checkVersion(){
-      let currVersion = localStorage.getItem(VERSION_NUM_KEY);
-      let versionNum = this.initData.releaseVersion || '';
-      if(versionNum && (!currVersion || currVersion != versionNum)){
-        try {
-          let version = await http.get('/getLastVersion');
-          this.newVersion = version.data;
-          this.versionShow = true;
-          localStorage.setItem(VERSION_NUM_KEY, versionNum);
-        } catch (error) {
-          console.error(error);
-        }               
-      }
-    },
+    
     /** 检测是否有导出 */
     async checkExports(){
       try {
@@ -384,7 +368,7 @@ export default {
     this.clearCachedIds();
   },
   mounted(){
-    this.checkVersion();
+    
     this.checkExports();
   },
   components: {
