@@ -50,11 +50,9 @@
   import * as FormUtil from '@src/component/form/util';
   import {toArray} from '@src/util/lang';
   import { formatCustomer } from '../util/customer';
-  // import FormAddress from './FormAddress.vue';
 
   export default {
     name: 'customer-edit-view',
-    // components: {FormAddress,},
     props: {
       initData: {
         type: Object,
@@ -76,14 +74,15 @@
             isNull: 0,
             remote: {
               action: '/customer/unique',
-              buildParams() {
+              method: 'post',
+              buildParams(value) {
                 const params = {
                   id: customerId,
                   fieldName: 'serialNumber',
+                  value,
                 };
                 return params;
               },
-              method: 'post'
             }
           },
           nameField: {
@@ -94,10 +93,12 @@
             isNull: 0,
             remote: {
               action: '/customer/unique',
-              buildParams() {
+              method: 'post',
+              buildParams(value) {
                 const params = {
                   id: customerId,
                   fieldName: 'name',
+                  value,
                 };
                 return params;
               }
@@ -118,6 +119,7 @@
             isNull: 0,
             remote: {
               action: '/linkman/checkUnique4Phone',
+              method: 'post',
               buildParams(value) {
                 const params = {
                   customerId: customerId,
