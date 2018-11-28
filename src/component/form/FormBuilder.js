@@ -1,37 +1,29 @@
+/**
+ * 验证机制
+ * 
+ * 结构: Form组件 -> FormItem -> FormBuilder
+ *  Form组件提供每种字段的具体实现
+ *  FormItem主要用于验证
+ *  FormBuilder作为容器，并提供整个表单的验证 
+ * 
+ * 注册流程：
+ * 1. Form组件在挂载时触发form.add.field事件，将其注册到FormItem和FormBuilder中. 参数： {value: Function, fieldName: String}
+ * 2. FormItem在收到form.add.field事件后，保存value用于取值（闭包），并在原参数上附加validate方法
+ * 3. FormBuilder在收到form.add.field事件后，保存validate方法，在提交表单时验证整个表单
+ * 
+ * 验证流程：
+ * 1. Form组件中的值发生变化时，触发form.validate事件
+ * 2. FormItem接受到事件后，阻止事件冒泡并调用validate方法进行验证
+ * 3. 表单提交时，FormBuilder根据自身维护的validateMap验证整个表单
+ */
+
 import {
   FormFieldMap,
 } from './components';
 import * as util from './util';
 
-const DefaultPlaceholer = {
-  text: '最多50字',
-  number: '请输入数字',
-  address: '请填写详细地址',
-  relationCustomer: '由客户信息查询',
-  relationProduct: '由产品信息查询',
-  user: '请选择人员',
-  date: '日期',
-  datetime: '日期 + 时间',
-  select: '请选择'
-}
-
-function buildPlaceholder(field, defaultText = ''){
-  let text = '';
-  if(field.isNull == 0) {
-    text += (util.isSelect(field) || util.isMultiSelect(field)) ? "[必选] " : "[必填] "
-  }
-
-  if(field.placeHolder) return text + field.placeHolder;
-
-  let key = field.formType;
-  if(util.isDate(field)) key = 'date';
-  if(util.isDatetime(field)) key = 'datetime';
-  if(util.isSelect(field) || util.isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
-  return text + (DefaultPlaceholer[key] || '');
-}
-
 function createFormField(h, field, comp){
-  const placeholder = buildPlaceholder(field);
+  const placeholder = util.genPlaceholder(field);
   let data = {
     props: {
       field,
@@ -161,7 +153,7 @@ const FormBuilder = {
       if(comp.formType == 'separator') return formField;
     
       return (
-        <form-item label={field.displayName} field={field}>
+        <form-item label={field.displayName} validation>
           {formField}
         </form-item>
       );
@@ -176,6 +168,11 @@ const FormBuilder = {
   },
   mounted(){
     this.$el.addEventListener('form.add.field', this.addFieldHandler)
+    this.$el.addEventListener('form.remove.field', this.removeFieldHandler)
+  },
+  destroyed(){
+    this.$el.removeEventListener('form.add.field', this.addFieldHandler);
+    this.$el.removeEventListener('form.remove.field', this.removeFieldHandler)
   }
 };
 

@@ -7,49 +7,67 @@
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
         <template slot="serialNumber" slot-scope="{field}">
-          <div class="form-item" v-if="config.isAutoSerialNumber">
-            <label for="form_customerManager">{{field.displayName}}</label> 
-            <div class="form-item-control">
-              <div class="form-item__text">客户编号将在创建后由系统生成</div>
+          <form-item :label="field.displayName" :remote="remote.serialNumber" :validation="!config.isAutoSerialNumber">
+            <form-text 
+              v-if="!config.isAutoSerialNumber"
+              :field="field" 
+              :value="form.serialNumber" @input="update" 
+              :placeholder="genPlaceholder(field)"/>
+            <div v-else class="form-item__text">客户编号将在创建后由系统生成</div>
+          </form-item>
+        </template>
+        
+        <template slot="name" slot-scope="{field}">
+          <form-item :label="field.displayName" :remote="remote.name" validation>
+            <form-text 
+              :field="field" 
+              :value="form.name" @input="update"
+              :placeholder="genPlaceholder(field)"/>
+          </form-item>
+        </template>
+        
+        <template slot="lmName" slot-scope="{field}">
+          <form-item :label="field.displayName" validation>
+            <div class="input-and-btn">
+              <form-text 
+                :field="field" 
+                :value="form.lmName" @input="update" 
+                :placeholder="genPlaceholder(field)"/>
+              <el-button @click="copyName">同名客户</el-button>
             </div>
-          </div>
-          <!-- TODO: 修正字段来源 -->
-          <form-item v-else :label="field.displayName" :field="baseField.serialNumberField">
-            <form-text :field="baseField.serialNumberField" :value="form.serialNumber" @input="update" :placeholder="baseField.serialNumberField.placeholder"></form-text>
           </form-item>
         </template>
 
-        <form-item label="客户1" :field="baseField.nameField" slot="name">
-          <form-text :field="baseField.nameField" :value="form.name" @input="update"
-                     :placeholder="baseField.nameField.placeholder"></form-text>
-        </form-item>
-        <form-item label="联系人" :field="baseField.lmNameField">
-          <div class="input-and-btn">
-            <form-text :field="baseField.lmNameField" :value="form.lmName" @input="update" ref="lmNameInput"
-                       :placeholder="baseField.lmNameField.placeholder"></form-text>
-            <el-button @click="copyName">同名客户</el-button>
-          </div>
-        </form-item>
-        <form-item label="电话" :field="baseField.lmPhoneField">
-          <form-text :field="baseField.lmPhoneField" :value="form.lmPhone" @input="update"
-                     :placeholder="baseField.lmPhoneField.placeholder"></form-text>
-        </form-item>
-        <form-item label="地址" :field="baseField.addressField">
-          <form-address ref="addressForm" :field="baseField.addressField" :value="form.customerAddress" @input="update"
-                        @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
-                        :placeholder="baseField.addressField.placeholder"></form-address>
-        </form-item>
-        <form-item v-if="config.isDivideByTag" label="服务团队" :field="baseField.tagField">
-          <div class="input-and-btn">
-            <form-select :field="baseField.tagField" :value="form.tags" @input="update" :source="selectTagOptions || []"
-                         :placeholder="baseField.tagField.placeholder"></form-select>
-            <el-button type="button" @click="autoAssign">自动分配</el-button>
-          </div>
-        </form-item>
-        <form-item label="客户负责人" :field="baseField.customerManagerField">
-          <form-user :field="baseField.customerManagerField" :value="form.customerManager" @input="update"
-                     :placeholder="baseField.customerManagerField.placeholder"></form-user>
-        </form-item>
+        <template slot="lmPhone" slot-scope="{field}">
+          <form-item :label="field.displayName" :remote="remote.lmPhone" validation>
+            <form-text 
+              :field="field" 
+              :value="form.lmPhone" @input="update"
+              :placeholder="genPlaceholder(field)"/>
+          </form-item>
+        </template>
+
+        <template slot="customerAddress" slot-scope="{field}">
+          <form-item :label="field.displayName" validation>
+            <form-address
+              :field="field" 
+              :value="form.customerAddress" @input="update"
+              @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
+              :placeholder="genPlaceholder(field)"></form-address>
+          </form-item>
+        </template>
+
+        <template slot="tags" slot-scope="{field}">
+          <form-item :label="field.displayName" validation>
+            <div class="input-and-btn">
+              <form-select 
+                :field="field" :source="selectTagOptions || []"
+                :value="form.tags" @input="update" 
+                :placeholder="genPlaceholder(field)"/>
+              <el-button type="button" @click="autoAssign">自动分配</el-button>
+            </div>
+          </form-item>
+        </template>
       </form-builder>
     </form>
   </div>
@@ -58,7 +76,6 @@
 <script>
   import * as FormUtil from '@src/component/form/util';
   import {toArray} from '@src/util/lang';
-  import { formatCustomer } from '../util/customer';
 
   export default {
     name: 'customer-edit-view',
@@ -69,137 +86,15 @@
       }
     },
     data() {
-      const customerId = this.initData.id || '';
-      const ctx = this;
-      const data = {
+      return {
         submitting: false,
         pending: false,
         loadingPage: false,
         addressBackup: {},
-        baseField: {
-          serialNumberField: {
-            formType: 'text',
-            fieldName: 'serialNumber',
-            displayName: "客户编号",
-            placeholder: '[最多50字]',
-            isNull: 0,
-            remote: {
-              action: '/customer/unique',
-              method: 'post',
-              // 提交表单的时候，验证请求不可取消
-              isCancelable() {
-                return !ctx.submitting;
-              },
-              buildParams(value) {
-                const params = {
-                  id: customerId,
-                  fieldName: 'serialNumber',
-                  value,
-                };
-                return params;
-              },
-            }
-          },
-          nameField: {
-            formType: 'text',
-            fieldName: 'name',
-            displayName: "客户",
-            placeholder: '[最多50字]',
-            isNull: 0,
-            remote: {
-              action: '/customer/unique',
-              method: 'post',
-              isCancelable() {
-                return !ctx.submitting;
-              },
-              buildParams(value) {
-                const params = {
-                  id: customerId,
-                  fieldName: 'name',
-                  value,
-                };
-                return params;
-              }
-            }
-          },
-          lmNameField: {
-            formType: 'text',
-            fieldName: 'lmName',
-            displayName: "联系人",
-            placeholder: '[最多50字]',
-            isNull: 0,
-          },
-          lmPhoneField: {
-            formType: 'phone',
-            fieldName: 'lmPhone',
-            displayName: "电话",
-            placeholder: '建议使用手机号,可发送短信通知',
-            isNull: 0,
-            remote: {
-              action: '/linkman/checkUnique4Phone',
-              method: 'post',
-              buildParams(value) {
-                const params = {
-                  customerId: customerId,
-                  phone: value,
-                };
-                return params;
-              }
-            }
-          },
-          addressField: {
-            formType: 'address',
-            fieldName: 'customerAddress',
-            displayName: "地址",
-            placeholder: '请输入详细地址[最多50字]',
-            isNull: 0
-          },
-          tagField: {
-            formType: 'select',
-            fieldName: 'tags',
-            displayName: "服务团队",
-            placeholder: '请先选择团队',
-            isNull: 1,
-            setting: {
-              isMulti: true,
-              dataSource: [],
-            }
-          },
-          customerManagerField: {
-            formType: 'user',
-            fieldName: 'customerManager',
-            displayName: "客户负责人",
-            placeholder: '请选择',
-            isNull: 1
-          }
-        },
-        form: {
-          serialNumber: null,
-          name: null,
-          lmName: null,
-          customerAddress: {
-            adAddress: [],
-            detail: '',
-            adLongitude: '',
-            adLatitude: '',
-            addressType: 0,
-          },
-          tags: [],
-          customerManager: null,
-        },
-        address: {},
+        form: {},
+        remote: this.buildRemote(),
         init: false
       };
-
-      if (this.initData.isCustomerNameDuplicate) {
-        delete data.baseField.nameField.remote;
-      }
-
-      if (!this.initData.isPhoneUnique) {
-        delete data.baseField.lmPhoneField.remote;
-      }
-
-      return data;
     },
     computed: {
       action() {
@@ -230,10 +125,54 @@
       },
       fields() {
         let originFields = this.initData.fieldInfo || [];
-        return FormUtil.migration(originFields);
+        let sortedFields = originFields.sort((a,b) => a.orderId - b.orderId)
+     
+        return FormUtil.migration(sortedFields);
       }
     },
     methods: {
+      genPlaceholder(field){
+        return FormUtil.genPlaceholder(field)
+      },
+      buildRemote(){
+        let customerId = this.initData.id;
+        let {isAutoSerialNumber, isCustomerNameDuplicate, isPhoneUnique} = this.initData;
+        return {
+          serialNumber: isAutoSerialNumber ? null : {
+            action: '/customer/unique',
+            method: 'post',
+            // 提交表单的时候，验证请求不可取消
+            buildParams(value) {
+              return {
+                id: customerId,
+                fieldName: 'serialNumber',
+                value
+              };
+            }
+          },
+          name: !isCustomerNameDuplicate ? null : {
+            action: '/customer/unique',
+            method: 'post',
+            buildParams(value) {
+              return {
+                id: customerId,
+                fieldName: 'name',
+                value,
+              };
+            }
+          },
+          lmPhone: !isPhoneUnique ? null : {
+            action: '/linkman/checkUnique4Phone',
+            method: 'post',
+            buildParams(value) {
+              return {
+                customerId: customerId,
+                phone: value,
+              };
+            }
+          }
+        }
+      },
       update({field, newValue, oldValue}) {
         let {fieldName, displayName} = field;
         if (this.$appConfig.debug) {
@@ -247,8 +186,7 @@
         .then(valid => {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
-          const params = formatCustomer(this.form, this.initData.tags, this.fields);
-
+          const params = this.formToCustomer(this.fields, this.form);
           this.pending = true;
           this.loadingPage = true;
           if (this.action === 'edit') {
@@ -279,25 +217,14 @@
         .catch(err => console.error('err', err));
       },
       copyName() {
-        const {name,} = this.form;
-        if (!name) return;
+        const {name} = this.form;
+        if(!name) return;
         this.form.lmName = name;
       },
       autoAssign(){
         let adr = this.form.customerAddress;
-        let adProvince, adCity, adDist;
-
-        if (adr.adAddress && Array.isArray(adr.adAddress) && adr.adAddress.length) {
-          adProvince = adr.adAddress[0];
-          adCity = adr.adAddress[1];
-          adDist = adr.adAddress[2];
-        }
-
-        if(!adProvince || !adCity) return this.$platform.alert('请先补全客户地址');
-
-        let province = adProvince;
-        let city = adCity;
-        let dist = adDist;
+        let {province, city, dist} = adr;
+        if(!province || !city) return this.$platform.alert('请先补全客户地址');
 
         let tags = [];
         this.tags.forEach(team => {
@@ -332,22 +259,14 @@
       },
       fetchCustomer(id) {
         return this.$http.get(`/v2/customer/getForEdit`, {id})
-        // .then(res => {
-        //   return res.status == 0 ? res.data : {};
-        //   // if (res.status) return;
-        //   // this.form = convertCustomerToForm(res.data, this.fields);
-        //   // this.addressBackup = this.form.customerAddress;
-        // })
       },
       updateAddressBackup(ad) {
         this.addressBackup = ad;
       },
-      initCustomerData(fields, data){
-        let adAddress = [];
-        if (data.customerAddress) {
-          adAddress = [data.customerAddress.adProvince, data.customerAddress.adCity, data.customerAddress.adDist]
-          .filter(ad => ad);
-        }
+      //将后端传来的客户对象转换成form
+      customerToForm(fields, data){
+        let cusAdr = data.customerAddress || {};
+
         return {
           id: data.id,
           name: data.name,
@@ -355,15 +274,67 @@
           lmPhone: data.lmPhone,
           serialNumber: data.serialNumber,
           customerAddress: {
-            adAddress,
-            detail: data.customerAddress ? data.customerAddress.adAddress : '',
-            adLongitude: data.adLongitude || '',
-            adLatitude: data.adLatitude || '',
+            province: cusAdr.adProvince,
+            city: cusAdr.adCity,
+            dist: cusAdr.adDist,
+            address: cusAdr.adAddress,
+            longitude: data.adLongitude || '',
+            latitude: data.adLatitude || '',
             addressType: data.addressType || 0
           },
           tags: toArray(data.tags).map(item => item.id),
-          customerManager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
+          manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
         };
+      },
+      //将form对象转换成后端可接收的对象
+      formToCustomer(fields, form){
+        let customer = {
+          id: form.id,
+          attribute: {}
+        };
+
+        fields.forEach(field => {
+          let {fieldName, isSystem} = field;
+          let value = form[fieldName];
+
+          if(fieldName == 'customerAddress'){
+            let customerAddress = form.customerAddress || {};
+             // address
+            return customer.customerAddress = {
+              adCountry: '',
+              adProvince: customerAddress.province,
+              adCity: customerAddress.city,
+              adDist: customerAddress.dist,
+              adLatitude: customerAddress.latitude || '',
+              adLongitude: customerAddress.longitude || '',
+              addressType: customerAddress.addressType || 0,
+              adAddress: customerAddress.address,
+            };
+          }
+
+          if(fieldName == 'tags'){
+            let allTags = this.tags || [];
+            return customer.tags = value.map(tag => {
+              const t = allTags.find(at => at.id === tag);
+              return {
+                id: t.id,
+                tagName: t.tagName,
+              }
+            });
+          }
+
+          if(fieldName == 'manager' && value && value.userId){
+            customer.customerManager = value.userId;
+            customer.customerManagerName = value.displayName || ''
+            return;
+          }
+
+          isSystem == 0 
+            ? customer.attribute[fieldName] = value
+            : customer[fieldName] = value;
+        })
+
+        return customer;
       }
     },
     async mounted() {
@@ -381,7 +352,7 @@
         if(cusRes.status == 0) form = cusRes.data;
       }
 
-      this.form = FormUtil.initialize(this.fields, form, this.initCustomerData);
+      this.form = FormUtil.initialize(this.fields, form, this.customerToForm);
       this.addressBackup = this.form.customerAddress;
       this.init = true;
     }
@@ -389,22 +360,22 @@
 </script>
 
 <style lang="scss">
-  .customer-container {
-    height: 100%;
-    width: 100%;
-    overflow: auto;
-    padding: 10px;
-    background-color: #fff;
+.customer-container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  padding: 10px;
+  background-color: #fff;
 
-    .page-title { 
-      border-bottom: 1px solid #f4f7f5;
-      padding: 10px 0;
+  .page-title { 
+    border-bottom: 1px solid #f4f7f5;
+    padding: 10px 0;
 
-      .iconfont {
-        font-size: 12px;
-      }
+    .iconfont {
+      font-size: 12px;
     }
   }
+}
 
 .form-builder{
   width: 640px;

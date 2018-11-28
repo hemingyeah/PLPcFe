@@ -1,27 +1,25 @@
 <template>
   <div class="form-address">
-    <div class="input-and-btn">
-      <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker" :value="value.adAddress"></base-dist-picker>
+    <div class="form-address-picker">
+      <base-dist-picker @input="handleCitySelectorChange" :value="distValue"/>
       <el-button type="button" @click="chooseMap" style="margin-bottom: 10px">地图选址</el-button>
     </div>
     <input
       type="text"
-      :value="value.detail"
+      :value="detail"
       @input="input"
       :placeholder="placeholder"
-      :id="`form_${field.fieldName}`"/>
+      :id="`form_${field.fieldName}`"
+      autocomplete="off"/>
   </div>
 </template>
 
 <script>
-  import BaseDistPicker from '@src/component/common/BaseDistPicker';
   import FormMixin from '../FormMixin';
 
   export default {
     name: "form-address",
-    components: {BaseDistPicker,},
     mixins: [FormMixin],
-
     props: {
       addressBackup: {
         type: Object,
@@ -37,131 +35,150 @@
       },
       value: {
         type: Object,
-        default: () => ({})
+        default(){
+          let value = {
+            /**
+             * value值必须包含以下值:
+             * province: String,
+             * city: String,
+             * dist: String,
+             * address: String
+             * 
+             * 以下值可选：
+             * latitude： [String,Number],
+             * longitude: [String,Number],
+             * addressType: Number
+             */
+          };
+          
+          return value
+        }
+      }
+    },
+    computed: {
+      /** 将省市区转换成数组 */
+      distValue(){
+        let {province, city, dist} = this.value;
+        if(!province) return [];
+
+        let arr = [province];
+        if(!city) return arr;
+        
+        arr.push(city);
+        if(dist) arr.push(dist)
+
+        return arr;
+      },
+      /** 详细地址 */
+      detail(){
+        return this.value.address;
       }
     },
     methods: {
       input(event) {
         let newAddress = {
           ...this.value,
-          detail: event.target.value,
+          address: event.target.value
         };
 
-        if (!this.diffAddress(newAddress, this.addressBackup)) {
-          newAddress.addressType = 0;
-          newAddress.adLatitude = '';
-          newAddress.adLongitude = '';
-        } else {
-
-          newAddress.addressType = 1;
-          newAddress.adLatitude = this.addressBackup.adLatitude;
-          newAddress.adLongitude = this.addressBackup.adLongitude;
-        }
+        let adrBackup = this.addressBackup;
+        newAddress.addressType = this.diffAddress(newAddress, adrBackup);
+        newAddress.latitude = newAddress.addressType == 0 ? '' : (adrBackup.adLatitude || adrBackup.latitude);
+        newAddress.longitude = newAddress.addressType == 0 ? '' : (adrBackup.adLongitude || adrBackup.longitude);
 
         this.updateValue(newAddress)
       },
       diffAddress(newVal, oldVal) {
-        if (newVal.detail === oldVal.detail &&
-          newVal.adAddress.toString() === oldVal.adAddress.toString()) {
-          return true;
-        }
-        return false;
+        let newAdr = (newVal.adProvince || newVal.province) + (newVal.adCity || newVal.city) + (newVal.adDist || newVal.dist) + (newVal.adAddress || newVal.address);
+        let oldAdr = (oldVal.adProvince || oldVal.province) + (oldVal.adCity || oldVal.city) + (oldVal.adDist || oldVal.dist) + (oldVal.adAddress || oldVal.address);
+
+        return newAdr == oldAdr ? 1 : 0;
       },
       handleCitySelectorChange(val) {
-        let newAddress = {};
+        let newAddress = {
+          province: '',
+          city: '',
+          dist: '',
+          address: ''
+        };
 
-        if (!val || !val.length) {
-          newAddress = {
-            adAddress: [],
-            detail: '',
-            adLongitude: '',
-            adLatitude: '',
-            addressType: 0,
-          };
-
-        } else {
-          newAddress = {
-            ...this.value,
-            adAddress: val,
-            adProvince: val[0] || '',
-            adCity: val[1] || '',
-            adDist: val[2] || '',
-            adLongitude: '',
-            adLatitude: '',
-            addressType: 0,
-          };
+        if(!Array.isArray(val) || val.length == 0) {
+          return this.updateValue(newAddress);
         }
 
-        this.updateValue(newAddress);
+        newAddress = {
+          ...this.value,
+          province: val[0] || '',
+          city: val[1] || '',
+          dist: val[2] || '',
+        };
 
+        let adrBackup = this.addressBackup;
+        newAddress.addressType = this.diffAddress(newAddress, adrBackup);
+        newAddress.latitude = newAddress.addressType == 0 ? '' : (adrBackup.adLatitude || adrBackup.latitude);
+        newAddress.longitude = newAddress.addressType == 0 ? '' : (adrBackup.adLongitude || adrBackup.longitude);
+        
+        this.updateValue(newAddress);
       },
       updateValue(newValue) {
         let oldValue = null;
         this.$emit('input', {newValue, oldValue, field: this.field});
-        this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+        //this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
       },
       chooseMap() {
         const point = {
-          latitude: this.addressBackup.adLatitude || this.value.adLatitude || '',
-          longitude: this.addressBackup.adLongitude || this.value.adLongitude || '',
+          latitude: this.value.latitude || '',
+          longitude: this.value.longitude || '',
         };
 
-        let defaultArea = this.value.adAddress.filter(a => a && a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
+        let defaultArea = this.value.province;
+        if(this.value.city && ['郊县', '市辖区', '其他'].indexOf(this.value.city) < 0) defaultArea = this.value.city;
+        if(this.value.dist) defaultArea = this.value.dist; 
 
         // 有经纬度用经纬度，没有使用较小的行政单位
-        this.$fast.map.picker(point, {defaultArea: defaultArea[defaultArea.length - 1],}).then(result => {
+        this.$fast.map.picker(point, {defaultArea}).then(result => {
           if (result.status === 1) return;
 
-          const { province, city, dist, address, latitude, longitude} = result.data;
+          let adr = result.data;
+          adr.addressType = 1;
 
-          const newVal = {
-            adAddress: [ province, city, dist,],
-            detail: address,
-            adLatitude: latitude,
-            adLongitude: longitude,
-            addressType: 1,
-          };
-
-          this.$emit('update-address-backup', newVal);
-
-          this.updateValue(newVal);
+          this.$emit('update-address-backup', adr);
+          this.updateValue(adr);
         })
         .catch(err => console.error(err));
       },
-
       getValue(){
         return this.value;
-      },
-    },
+      }
+    }
   }
 </script>
 
 <style lang="scss">
+.form-address {
+  input {
+    width: 100%;
+  }
 
-  .form-address {
-    input {
+  .el-input__inner:hover {
+    border-color: #00ac97;
+  }
+
+  .base-dist-picker {
+    flex-grow: 1;
+    padding-right: 10px;
+    .el-cascader {
       width: 100%;
     }
-
-    .el-input__inner:hover {
-      border-color: #00ac97;
-    }
-
-    .base-dist-picker {
-      flex-grow: 1;
-      padding-right: 10px;
-      .el-cascader {
-        width: 100%;
-      }
-    }
   }
+}
 
-  .input-and-btn {
-    display: flex !important;
-    justify-content: space-between;
-    .form-item, .form-text {
-      width: 400px;
-    }
+.form-address-picker{
+  display: flex;
+  justify-content: space-between;
+  
+  .form-item, .form-text {
+    width: 400px;
   }
-
+}
 </style>

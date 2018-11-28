@@ -5,12 +5,13 @@
       :value="value"
       @input="input"
       :placeholder="placeholder"
-      :id="`form_${field.fieldName}`"/>
+      :id="`form_${field.fieldName}`" 
+      autocomplete="off"/>
   </div>
 </template>
 
 <script>
-  import FormMixin from '../FormMixin';
+import FormMixin from '../FormMixin';
 
 export default {
   name: 'form-text',

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import FormMixin from '../FormMixin';
+import FormMixin from '../FormMixin';
 
 export default {
   name: 'form-attachment',

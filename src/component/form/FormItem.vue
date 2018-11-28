@@ -13,19 +13,18 @@
 
 <script>
   import Validator from '@src/util/validator';
-  //1. remote从field中分离
-  //2. 作为参数传入validate
+  import _ from 'lodash'
+
   export default {
     name: 'form-item',
     props: {
       label: String,
-      field: {
-        type: Object,
-        default: () => ({})
-      }
+      validation: Boolean, //是否开启验证
+      remote: Object //远程验证配置对象
     },
     data() {
       return {
+        field: {},
         errMessage: '',
         valueFn: null, //function 用于获取注册字段的值
         remoting: false
@@ -38,33 +37,47 @@
       },
       /** 字段是否需要远程验证 **/
       needRemoteValidation() {
-        return !!this.field.remote;
+        return !!this.remote;
       }
     },
     methods: {
       /** 默认返回true, 确保不影响表单提交 */
       validate() {
         if (typeof this.valueFn != 'function') return true;
-        let value = this.valueFn();
-      
+
         this.errMessage = '';
-        return Validator.validate(value, this.field, {changeRemoteStatus: this.changeRemoteStatus})
+        let value = this.valueFn();
+        let options = {changeRemoteStatus: this.changeRemoteStatus, remote: this.remote};
+
+        return Validator.validate(value, this.field, options)
           .then(res => {
             this.errMessage = res;
             return res;
           })
           .catch(err => console.error('validate err', err));
       },
+      /** 远程验证时需要做延时 */
+      delayValidate: _.debounce(function(){
+        this.validate()
+      }, 500),
       validateHandler(event) {
         event.stopPropagation(); //阻止事件继续冒泡
-        this.$nextTick(() => this.validate())
+        if(this.validation) {
+          this.needRemoteValidation 
+            ? this.delayValidate()
+            : this.$nextTick(this.validate)
+        }
       },
       /** 注册字段取值函数 */
       addFieldHandler(event) {
+        if(!this.validation) return event.stopPropagation();
         this.valueFn = event.detail.value;
+        this.field = event.detail.field;
         event.detail.validate = this.validate;
       },
       removeFieldHandler(event) {
+        if(!this.validation) return event.stopPropagation();
+
         this.valueFn = null;
       },
       changeRemoteStatus(value){
@@ -77,7 +90,7 @@
       this.$el.addEventListener('form.remove.field', this.removeFieldHandler);
     },
     destroyed() {
-      this.$el.removeEventListener('form.validate', this.handler)
+      this.$el.removeEventListener('form.validate', this.validateHandler)
       this.$el.removeEventListener('form.add.field', this.addFieldHandler);
       this.$el.removeEventListener('form.remove.field', this.removeFieldHandler)
     }

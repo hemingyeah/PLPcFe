@@ -1,4 +1,3 @@
-//
 function formatCustomer(originalCustomer, allTags, fields) {
   const {
     id,

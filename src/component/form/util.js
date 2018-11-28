@@ -2,6 +2,18 @@ import _ from 'lodash';
 import Field from '@model/Field';
 import FormField from './FormField';
 
+const DefaultPlaceholer = {
+  text: '最多50字',
+  number: '请输入数字',
+  address: '请填写详细地址',
+  relationCustomer: '由客户信息查询',
+  relationProduct: '由产品信息查询',
+  user: '请选择人员',
+  date: '日期',
+  datetime: '日期 + 时间',
+  select: '请选择'
+}
+
 /** 
  * 将设计器输出的字段格式转换成后端可接受的类型 
  * 注意： 需要在提交时补全以下字段，如果有的话：
@@ -74,8 +86,21 @@ export function isDatetime(field){
     || (field.formType == 'planTime' && (setting == null || setting.dateType != 'date'));
 }
 
+/** 构建placeholder */
+export function genPlaceholder(field, defaultText = ''){
+  let text = '';
+  if(field.isNull == 0) {
+    text += (isSelect(field) || isMultiSelect(field)) ? "[必选] " : "[必填] "
+  }
 
+  if(field.placeHolder) return text + field.placeHolder;
 
+  let key = field.formType;
+  if(isDate(field)) key = 'date';
+  if(isDatetime(field)) key = 'datetime';
+  if(isSelect(field) || isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
+  return text + (DefaultPlaceholer[key] || '');
+}
 /**
  * 初始化所有字段的初始值
  * @param {*} fields 字段
@@ -87,13 +112,15 @@ export function initialize(fields = [], origin = {}, callback){
 
   fields.forEach(field => {
     let formType = field.formType;
-    //客户和编号类型不出初始化值
-    if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
-
     let setting = field.setting || {};
     let fieldName = field.fieldName;
     let dataSource = setting.dataSource || [];
     let defaultValue = field.defaultValue || '';
+
+    //客户和编号类型不出初始化值
+    if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
+    //如果已经存在值 则无需初始化
+    if(result[fieldName]) return;
 
     //屏蔽工单上单选里不存在默认值
     if(this.isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = '';

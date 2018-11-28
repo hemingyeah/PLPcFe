@@ -1,11 +1,11 @@
 <template>
   <div class="form-number">
-    <input :id="`form_${field.fieldName}`" type="number" @input="input" :value="value" :placeholder="placeholder">
+    <input :id="`form_${field.fieldName}`" type="number" @input="input" :value="value" :placeholder="placeholder" autocomplete="off">
   </div>
 </template>
 
 <script>
-  import FormMixin from '../FormMixin';
+import FormMixin from '../FormMixin';
 
 export default {
   name: 'form-number',

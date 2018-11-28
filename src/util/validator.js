@@ -131,8 +131,8 @@ function address(value, field = {}) {
     if (field.isNull) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请补全${field.displayName}`);
     
-    const {adAddress, detail, } = value;
-    if (!adAddress || !adAddress.length || !detail) {
+    const {province, city, address} = value;
+    if (!province || !city || !address) {
       return resolve('必填');
     }
     resolve(null);
@@ -140,14 +140,14 @@ function address(value, field = {}) {
 }
 
 /** 远程验证 */
-function remoteValidation(value, field = {}) {
+function remoteValidation(value, remote) {
   const { 
     action, 
     buildParams, 
     method = 'get', 
     emulateJSON = false,
     isCancelable,
-  } = field.remote;
+  } = remote;
   let params = buildParams(value);
   const options = {
     cancelable: isCancelable ? isCancelable() : false,
@@ -170,11 +170,11 @@ async function validate(value, field, options){
   let message = null;
   if(typeof fn == 'function') message = await fn(value, field);
   //如果有远程验证
-  if(message == null && field.remote) {
+  if(message == null && options.remote) {
     let changeRemoteStatus = options.changeRemoteStatus;
     changeRemoteStatus(true);
 
-    let result = await remoteValidation(value, field);
+    let result = await remoteValidation(value, options.remote);
     message = result.error ? result.error : null;
 
     changeRemoteStatus(false);

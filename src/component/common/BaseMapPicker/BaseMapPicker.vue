@@ -20,8 +20,7 @@
         <h3>当前选择位置</h3>
         <div class="bm-address-item">
           <div class="bm-address-recommend" :class="{'bm-address-checked': addressInfo.recommend.checked}">
-            <a href="javascript:;" @click="moveMarker(addressInfo.recommend)">{{addressInfo.recommend |
-              fmt_address}}</a>
+            <a href="javascript:;" @click="moveMarker(addressInfo.recommend)">{{addressInfo.recommend | fmt_address}}</a>
           </div>
         </div>
       </div>

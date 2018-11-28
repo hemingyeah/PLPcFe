@@ -1,9 +1,11 @@
 const FormMixin = {
-
   watch: {
-    value() {
-      console.info('∆ FormMixin watch a change and trigger form validation.');
-      this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+    value:{
+      deep: true,
+      handler() {
+        console.info('∆ FormMixin watch a change and trigger form validation.');
+        this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+      }
     }
   },
   methods: {
@@ -19,7 +21,7 @@ const FormMixin = {
   },
   mounted(){
     //触发注册事件，用于注册字段到外层formitem组件，和formbuilder组件
-    let params = {value: this.getValue, fieldName: this.field.fieldName};
+    let params = {value: this.getValue, fieldName: this.field.fieldName, field: this.field};
     let event = new CustomEvent('form.add.field', {detail: params, bubbles: true})
     this.$nextTick(() => this.$el.dispatchEvent(event));
   },

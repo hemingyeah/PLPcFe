@@ -1,6 +1,6 @@
 <template>
   <div class="form-textarea">
-    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeholder" maxlength="500"></textarea>
+    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeholder" maxlength="500" autocomplete="off"></textarea>
     <span class="form-textarea-summary" :style="{right: `${offsetRight}px`}">{{summary}}</span>
   </div>
 </template>
