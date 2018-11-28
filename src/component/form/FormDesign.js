@@ -48,10 +48,11 @@ function createSettingComp(h, field){
   let formType = field.formType;
   let comp = FormFieldMap.get(formType);
   
+  //TODO: 支持更新系统字段提示信息
   if (field.isSystem) return (
     <div class="form-setting-panel">
-      <h3>系统字段</h3>
-      <p>不能删除或修改</p>
+      <h3>系统字段 -- {field.displayName}</h3>
+      <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
     </div>
   );
 
@@ -165,7 +166,7 @@ const FormDesign = {
     /** 开始插入字段 */
     beginInsert(field, event){
       if(this.value.length >= MAX_FIELD_NUM) {
-        return Platform.alert(`单个表单最大支持${MAX_FIELD_NUM}个字段`)
+        return Platform.alert(`单个表单最多支持${MAX_FIELD_NUM}个字段`)
       }
 
       let dragEvent = this.$data.$dragEvent;

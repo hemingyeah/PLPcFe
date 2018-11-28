@@ -6,11 +6,20 @@
         <el-button size="small" :disabled="pending" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
-        <form-item v-if="!config.isAutoSerialNumber" label="客户编号" :field="baseField.serialNumberField">
-          <form-text :field="baseField.serialNumberField" :value="form.serialNumber" @input="update"
-                     :placeholder="baseField.serialNumberField.placeholder"></form-text>
-        </form-item>
-        <form-item label="客户" :field="baseField.nameField">
+        <template slot="serialNumber" slot-scope="{field}">
+          <div class="form-item" v-if="config.isAutoSerialNumber">
+            <label for="form_customerManager">{{field.displayName}}</label> 
+            <div class="form-item-control">
+              <div class="form-item__text">客户编号将在创建后由系统生成</div>
+            </div>
+          </div>
+          <!-- TODO: 修正字段来源 -->
+          <form-item v-else :label="field.displayName" :field="baseField.serialNumberField">
+            <form-text :field="baseField.serialNumberField" :value="form.serialNumber" @input="update" :placeholder="baseField.serialNumberField.placeholder"></form-text>
+          </form-item>
+        </template>
+
+        <form-item label="客户1" :field="baseField.nameField" slot="name">
           <form-text :field="baseField.nameField" :value="form.name" @input="update"
                      :placeholder="baseField.nameField.placeholder"></form-text>
         </form-item>

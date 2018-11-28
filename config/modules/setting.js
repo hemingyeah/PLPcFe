@@ -1,5 +1,5 @@
 module.exports = {
-  'setting.customer': {
-    entry: './src/modules/setting/customer/setting.customer.js'
+  'setting.customer.fields': {
+    entry: './src/modules/setting/customer/setting.customer.fields.js'
   }
 }

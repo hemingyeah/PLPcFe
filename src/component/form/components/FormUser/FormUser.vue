@@ -3,6 +3,7 @@
     <input 
       :id="`form_${field.fieldName}`" 
       :value="displayName"
+      :placeholder="placeholder"
       readonly 
       @click="choose" >
     <!-- @keydown.enter.prevent="choose" -->
@@ -22,6 +23,10 @@ export default {
     field: {
       type: Object,
       default: () => ({})
+    },
+    placeholder: {
+      type: String,
+      default: ''
     },
     value: Object
   },

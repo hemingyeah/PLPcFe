@@ -3,27 +3,31 @@ import {
 } from './components';
 import * as util from './util';
 
+const DefaultPlaceholer = {
+  text: '最多50字',
+  number: '请输入数字',
+  address: '请填写详细地址',
+  relationCustomer: '由客户信息查询',
+  relationProduct: '由产品信息查询',
+  user: '请选择人员',
+  date: '日期',
+  datetime: '日期 + 时间',
+  select: '请选择'
+}
+
 function buildPlaceholder(field, defaultText = ''){
   let text = '';
   if(field.isNull == 0) {
-    text += (util.isSelect(field) || util.isMultiSelect(field)) ? "[必选]" : "[必填]"
+    text += (util.isSelect(field) || util.isMultiSelect(field)) ? "[必选] " : "[必填] "
   }
 
   if(field.placeHolder) return text + field.placeHolder;
 
-  if(field.formType == 'number') text += '请输入数字';
-  if(field.formType == 'address') text += '请填写详细地址';
-
-  if(field.formType == 'relationCustomer') text += '由客户信息查询'
-  if(field.formType == 'relationProduct') text += '由产品信息查询'
-
-  if(field.formType == 'user') text += '请选择人员'
-
-  if(util.isDate(field)) text += '日期';
-  if(util.isDatetime(field)) text += '日期+时间';
-  if((util.isSelect(field) || util.isMultiSelect(field) || field.formType == 'cascader') && !text) text += '请选择';
-
-  return text;
+  let key = field.formType;
+  if(util.isDate(field)) key = 'date';
+  if(util.isDatetime(field)) key = 'datetime';
+  if(util.isSelect(field) || util.isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
+  return text + (DefaultPlaceholer[key] || '');
 }
 
 function createFormField(h, field, comp){
@@ -31,7 +35,7 @@ function createFormField(h, field, comp){
   let data = {
     props: {
       field,
-      value: this.value[field.fieldName],
+      value: getValue(field, this),
       placeholder,
     },
     on: {
@@ -40,6 +44,10 @@ function createFormField(h, field, comp){
   };
 
   return h(comp.build, data);
+}
+
+function getValue(field, ctx){
+  return ctx.value[field.fieldName]
 }
 
 function createGroup(fields){
@@ -136,6 +144,16 @@ const FormBuilder = {
     //})
 
     let formGroups = this.fields.map(field => {
+      let fieldName = field.fieldName;
+
+      if(this.$slots[fieldName]) {
+        return this.$slots[fieldName];
+      }
+      
+      if(this.$scopedSlots[fieldName]) {
+        return this.$scopedSlots[fieldName]({field, value: getValue(field, this)});
+      }
+
       let comp = FormFieldMap.get(field.formType);
       if(comp == null) return;
 

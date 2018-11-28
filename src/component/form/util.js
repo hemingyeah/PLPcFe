@@ -74,6 +74,8 @@ export function isDatetime(field){
     || (field.formType == 'planTime' && (setting == null || setting.dateType != 'date'));
 }
 
+
+
 /**
  * 初始化所有字段的初始值
  * @param {*} fields 字段

@@ -1,6 +1,6 @@
 <template>
   <div class="form-sparator">
-    <span>{{field.displayName}}</span>
+    <span v-if="field.displayName">{{field.displayName}}</span>
   </div>
 </template>
 

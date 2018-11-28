@@ -1,6 +1,6 @@
 <template>
   <div class="form-preview-group" @click="choose">
-    <div class="form-design-sparator"><span>{{field.displayName}}</span></div>
+    <div class="form-design-sparator"><span v-if="field.displayName">{{field.displayName}}</span></div>
   </div>
 </template>
 

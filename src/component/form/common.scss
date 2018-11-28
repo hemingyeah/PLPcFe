@@ -66,7 +66,7 @@
 .form-design-main {
   width: calc(100% - 630px);
   height: 100%;
-  padding: 40px 10px 20px 10px;
+  padding: 25px;
   border-top: none;
   border-bottom: none;
   user-select: none;
@@ -176,12 +176,14 @@
 .form-design-phone {
   position: relative;
   box-shadow: 0 0 8px rgba(0, 0, 0, .15);
+  width: 100%;
+  max-width: 414px;
+  min-width: 240px;
+  height: 100%;
   min-height: 50%;
-  height: 667px;
   margin: 0 auto;
-  width: 375px;
   overflow: auto;
-  border-radius: 2px;
+  border-radius: 1px;
   background-color: #fff;
 }
 
@@ -287,6 +289,7 @@
   background-color: #fff;
   padding: 10px;
 }
+
 .form-view-row {
   display: flex;
   justify-content: flex-start;
@@ -344,4 +347,17 @@
 .form-builder-group{
   border-radius: 2px;
   margin-bottom: 10px;
+}
+
+.form-design-warning{
+  padding: 10px;
+  border-radius: 2px;
+  background-color: #fdf6ec;
+  color: #e6a23c;
+}
+
+.form-item__text{
+  padding: 3px 0 13px 0;
+  line-height: 24px;
+  color: #666;
 }

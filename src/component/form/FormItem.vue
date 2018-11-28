@@ -13,7 +13,8 @@
 
 <script>
   import Validator from '@src/util/validator';
-
+  //1. remote从field中分离
+  //2. 作为参数传入validate
   export default {
     name: 'form-item',
     props: {

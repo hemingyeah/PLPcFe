@@ -11,7 +11,7 @@ import platform from '@src/platform';
 
 import appConfig from 'app.config';
 
-import SettingCustomerView from './SettingCustomerView.vue';
+import SettingCustomerFieldsView from './SettingCustomerFieldsView.vue';
 
 Vue.use(directive);
 Vue.use(filter);
@@ -30,7 +30,7 @@ try {
   console.error('no init data')
 }
 
-const PageComponent = Vue.extend(SettingCustomerView);
+const PageComponent = Vue.extend(SettingCustomerFieldsView);
 const app = new PageComponent({
   propsData: {
     initData
