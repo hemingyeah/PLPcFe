@@ -145,12 +145,16 @@ function remoteValidation(value, field = {}) {
     action, 
     buildParams, 
     method = 'get', 
-    emulateJSON = false
+    emulateJSON = false,
+    isCancelable,
   } = field.remote;
   let params = buildParams(value);
+  const options = {
+    cancelable: isCancelable ? isCancelable() : false,
+  };
   let fn = http[method];
-  let args = [action, params];
-  if(method == 'post') args.push(emulateJSON);
+  let args = [action, params, emulateJSON, options];
+  if(method == 'get') args.splice(2, 1,);
 
   return fn.apply(http, args);
 }

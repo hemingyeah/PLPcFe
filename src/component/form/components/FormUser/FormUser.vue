@@ -13,8 +13,11 @@
 </template>
 
 <script>
+  import FormMixin from '../FormMixin';
+
 export default {
   name: 'form-user',
+  mixins: [FormMixin],
   props: {
     field: {
       type: Object,
@@ -49,25 +52,10 @@ export default {
       })
       .catch(err => console.error(err))
     },
-    getValue(){
-      return this.value;
-    },
     clear(){
       this.$emit('input', {newValue: {}, field: this.field});
     }
   },
-  mounted(){
-    //触发注册事件，用于注册字段到外层formitem组件，和formbuilder组件
-    let params = {value: this.getValue, fieldName: this.field.fieldName};
-    let event = new CustomEvent('form.add.field', {detail: params, bubbles: true});
-    this.$nextTick(() => this.$el.dispatchEvent(event));
-  },
-  destroyed(){
-    //注册解绑事件，用于解绑组件
-    let params = {fieldName: this.field.fieldName}
-    let event = new CustomEvent('form.remove.field', {detail: params, bubbles: true});
-    this.$el.dispatchEvent(event)
-  }
 }
 </script>
 

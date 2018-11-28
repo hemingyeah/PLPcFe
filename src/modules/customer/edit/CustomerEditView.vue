@@ -3,7 +3,7 @@
     <form @submit.prevent="submit" >
       <div class="page-title">
         <el-button size="small"><i class="iconfont icon-return"></i> 返回</el-button>
-        <el-button size="small" :disabled="submitting" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
+        <el-button size="small" :disabled="pending" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
         <form-item v-if="!config.isAutoSerialNumber" label="客户编号" :field="baseField.serialNumberField">
@@ -61,8 +61,10 @@
     },
     data() {
       const customerId = this.initData.id || '';
+      const ctx = this;
       const data = {
         submitting: false,
+        pending: false,
         loadingPage: false,
         addressBackup: {},
         baseField: {
@@ -75,6 +77,10 @@
             remote: {
               action: '/customer/unique',
               method: 'post',
+              // 提交表单的时候，验证请求不可取消
+              isCancelable() {
+                return !ctx.submitting;
+              },
               buildParams(value) {
                 const params = {
                   id: customerId,
@@ -94,6 +100,9 @@
             remote: {
               action: '/customer/unique',
               method: 'post',
+              isCancelable() {
+                return !ctx.submitting;
+              },
               buildParams(value) {
                 const params = {
                   id: customerId,
@@ -224,12 +233,14 @@
         this.$set(this.form, fieldName, newValue)
       },
       submit() {
+        this.submitting = true;
         this.$refs.form.validate()
         .then(valid => {
+          this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
           const params = formatCustomer(this.form, this.initData.tags, this.fields);
 
-          this.submitting = true;
+          this.pending = true;
           this.loadingPage = true;
           if (this.action === 'edit') {
             return this.updateMethod(params);
@@ -238,7 +249,7 @@
         })
         .catch(err => {
           console.error(err);
-          this.submitting = false;
+          this.pending = false;
           this.loadingPage = false;
         });
       },
@@ -261,12 +272,7 @@
       copyName() {
         const {name,} = this.form;
         if (!name) return;
-
-        this.$refs.lmNameInput.input({
-          target: {
-            value: name,
-          },
-        })
+        this.form.lmName = name;
       },
       autoAssign(){
         let adr = this.form.customerAddress;
