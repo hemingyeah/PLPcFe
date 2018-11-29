@@ -4,7 +4,9 @@
       v-for="node in data" :key="node.id" 
       :node="node" :selected="selected" :show-checkbox="showCheckbox"
       @node-click="$emit('node-selected', $event)" 
-      @node-check="$emit('node-check', $event)"/>
+      @node-check="$emit('node-check', $event)"
+      :node-render="nodeRender">
+    </base-tree-node>
   </div>  
 </template>
 
@@ -25,7 +27,8 @@ export default {
     showCheckbox: {
       type: Boolean,
       default: false
-    }
+    },
+    nodeRender: Function
   },
   components: {
     [BaseTreeNode.name]: BaseTreeNode

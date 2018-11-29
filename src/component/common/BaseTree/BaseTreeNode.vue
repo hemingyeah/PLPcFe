@@ -3,14 +3,17 @@
     <div class="base-tree-node-content" :class="{'base-tree-selected': isSelected}" :style="{paddingLeft: `${16 * deep}px`}">
       <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle"><i class="iconfont icon-arrow-right" v-if="node.subDepartments.length > 0"></i></span>
       <el-checkbox v-if="showCheckbox" :value="node.isChecked" @input="input"/>
-      <span class="base-tree-node-name" @click.stop="transmit(node)">{{node.name}}</span>
+      <span class="base-tree-node-name" @click.stop="transmit(node)">
+        <tree-node-content/>
+      </span>
     </div>
     
     <template v-if="isExpand">
       <base-tree-node 
         v-for="n in node.subDepartments" :key="n.id"
         :node="n" :selected="selected" :deep="deep + 1" :show-checkbox="showCheckbox"
-        @node-click="transmit" @node-check="$emit('node-check', $event)"/>  
+        @node-click="transmit" @node-check="$emit('node-check', $event)"
+        :node-render="nodeRender"/>  
     </template>
   </div>
 </template>
@@ -38,7 +41,8 @@ export default {
     showCheckbox: {
       type: Boolean,
       default: false
-    }
+    },
+    nodeRender: Function
   },
   data(){
     return {
@@ -60,6 +64,18 @@ export default {
     },
     input(value){
       this.$emit('node-check', {node: this.node, value})
+    }
+  },
+  components: {
+    TreeNodeContent: {
+      name: 'tree-node-content',
+      render(h){
+        const parent = this.$parent;
+        const node = parent.node;
+        return parent.nodeRender 
+          ? parent.nodeRender(h, parent.node) 
+          : <span>{node.name}</span>;
+      }
     }
   }
 }

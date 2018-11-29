@@ -1,12 +1,13 @@
 <template>
   <base-modal 
-    :title="title" width="800px"
+    :title="title" width="840px"
     :show.sync="show" @closed="$emit('destory')" @cancel="$emit('canel')">
     <div class="bc-dept-wrap">
       <div class="bc-dept">
         <base-tree 
           :data="depts" :selected="selectedDept" :show-checkbox="allowCheckDept"
-          @node-selected="initDeptUser" @node-check="chooseDept"/>
+          @node-selected="initDeptUser" @node-check="chooseDept" 
+          :node-render="nodeRender"/>
       </div>
       <div class="bc-user">
         <div class="bc-search">
@@ -136,6 +137,7 @@ export default {
       },
 
       depts: [], //部门
+      deptUserCount: {},
       selectedDept: {}, //选中的部门
       chosenDept: [], //选择的部门
       chosen: [], //已选择的人
@@ -166,7 +168,9 @@ export default {
     //当前已选概览
     summary(){
       let text = `当前已选${this.chosen.length}人`;
-      if(this.allowCheckDept) text += `, 部门${this.chosenDept.length}个`;
+      if(this.allowCheckDept) {
+        text += `, 部门${this.chosenDept.length}个`;
+      }
       return text;
     },
     //是否允许选中部门
@@ -411,6 +415,9 @@ export default {
         return depts;
       })
     },
+    fetchDeptCount(){
+      return http.get('/security/department/depUserCount')
+    },
     /** 初始化 */
     initialize(){
       this.show = true;
@@ -419,13 +426,32 @@ export default {
     },
     /** 初始化部门数据 */
     initializeDept(){
-      this.fetchDept()
-        //默认选中第一个
-        .then(depts => {
-          this.depts = depts;
-          this.initDeptUser(this.depts[0]); //默认选中第一个
-        })
-        .catch(err => console.error(err))
+      let subtask = [
+        this.fetchDept()
+      ];
+
+      if(this.allowCheckDept) subtask.push(this.fetchDeptCount())
+
+      Promise.all(subtask).then(result => {
+        let depts = result[0] || [];
+        
+        if(this.allowCheckDept){
+          let deptUserCount = result[1] || {};
+          this.deptUserCount = deptUserCount.data || {};
+        }
+    
+        this.depts = depts;
+        this.initDeptUser(this.depts[0]); //默认选中第一个
+      })
+      .catch(err => console.error(err))
+
+      // this.fetchDept()
+      //   //默认选中第一个
+      //   .then(depts => {
+      //     this.depts = depts;
+      //     this.initDeptUser(this.depts[0]); //默认选中第一个
+      //   })
+      //   .catch(err => console.error(err))
     },
     /** 初始化工作状态的颜色 */
     initializeStateColor(){
@@ -436,6 +462,20 @@ export default {
     /** 获取用户头像 */
     head(user){
       return user.head || DefaultHead;
+    },
+    nodeRender(h, node){
+      let content = <span>{node.name}</span>;
+      if(!this.allowCheckDept) return content
+      
+      let count = this.deptUserCount[node.id] || 0
+      if(count <= 0) return content;
+
+      return (
+        <div class="bc-dept-node-wrap">
+          <span class="bc-dept-node-name">{node.name}</span>
+          <span class="bc-dept-node-count">{count}</span>
+        </div>
+      )
     }
   },
   mounted(){
@@ -456,7 +496,7 @@ export default {
 }
 
 .bc-dept{
-  width: 240px;
+  width: 260px;
   overflow: auto;
   height: 100%;
   padding: 2px 5px;
@@ -512,7 +552,7 @@ export default {
 }
 
 .bc-chosen{
-  width: 180px;
+  width: 200px;
   border-left: 1px solid #e9ecef;
   padding: 0 5px;
   overflow-y: auto;
@@ -654,5 +694,21 @@ export default {
   line-height: 20px;
   font-weight: 400;
   padding: 6px 0 4px 10px;
+}
+
+.bc-dept-node-wrap{
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.bc-dept-node-name{
+  flex: 1;
+  @include text-ellipsis();
+}
+
+.bc-dept-node-count{
+  margin-left: 5;
+  color: #9a9a9a;
 }
 </style>

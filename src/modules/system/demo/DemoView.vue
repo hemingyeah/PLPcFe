@@ -17,13 +17,14 @@
     
     <div style="height: 720px; min-width:1000px">
       <form-design v-model="fields"></form-design>
-      <button type="button" @click="saveToLocal">本地存储</button>
+     
     </div>
     <!-- <textarea :value="JSON.stringify(buildFields)" style="width: 100%; height: 150px;"></textarea> -->
     <!-- <div>
       <textarea :value="JSON.stringify(fields)" style="width: 100%; height: 50px;"></textarea>
       <button @click="save">保存</button> <a href="javascript:;" @click="toCreateCustomer">新建</a>
     </div>  -->
+    <button type="button" @click="saveToLocal">本地存储</button>
     <button @click="contact">contatc</button>
     <!-- 
 
