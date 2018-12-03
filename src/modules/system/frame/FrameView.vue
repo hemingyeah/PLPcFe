@@ -361,7 +361,7 @@ export default {
     window.addTabs = this.addTabs;
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
-    window.removeHistoryUrl = window.resizeFrame = function(){
+    window.resizeFrame = function(){
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     }
 
