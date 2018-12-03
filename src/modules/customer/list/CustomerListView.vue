@@ -207,8 +207,8 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <el-button v-if="editedPermission" type="primary" icon="el-icon-plus" @click="jumpPage">新建</el-button>
-          <el-button v-if="highLevelPermission" type="primary" icon="el-icon-delete" @click="deleteCustomer"
-                     class="delete-customer-btn">删除
+          <el-button plain v-if="highLevelPermission" type="primary" icon="el-icon-delete" @click="deleteCustomer"
+                     >删除
           </el-button>
         </div>
 

@@ -1,11 +1,21 @@
 <template>
   <div class="page-container">
     <div class="customer-tool-bar">
+      <div>
+        <base-button type="only-text" button-text="返回" icon="icon-commit1"></base-button>
+        <base-button type="only-text" button-text="编辑" icon="icon-commit1"></base-button>
+        <base-button type="only-text" button-text="删除" icon="icon-commit1"></base-button>
+        <base-button type="only-text" button-text="添加提醒" icon="icon-commit1"></base-button>
+
+
+        <!--<base-button type="plain" icon="icon-fd-separator" button-text="返回11111" :disabled="true"></base-button>-->
+      </div>
       <div class="action-btn">
         <el-dropdown trigger="click">
           <span class="el-dropdown-link el-dropdown-btn">
-            新建事件<i class="el-icon-arrow-down el-icon--right"></i>
+            <i class="el-icon-arrow-down"></i>工单
           </span>
+
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>黄金糕</el-dropdown-item>
             <el-dropdown-item>狮子头</el-dropdown-item>
@@ -16,7 +26,7 @@
         </el-dropdown>
         <el-dropdown trigger="click">
           <span class="el-dropdown-link el-dropdown-btn">
-            新建工单<i class="el-icon-arrow-down el-icon--right"></i>
+            <i class="el-icon-arrow-down"></i>事件
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>黄金糕</el-dropdown-item>
@@ -26,23 +36,11 @@
             <el-dropdown-item>蚵仔煎</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <span @click="openDialog('contact')" class="el-dropdown-btn add-contact">添加联系人</span>
-        <span @click="openDialog('remind')" class="el-dropdown-btn">添加提醒</span>
-        <span @click="openDialog('address')" class="el-dropdown-btn">添加地址</span>
-        <span class="el-dropdown-btn add-production">添加产品</span>
-        <el-dropdown trigger="click">
-          <span class="el-dropdown-link el-dropdown-btn">
-            更多<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-if="allowEditCustomer">
-              <div @click="jump">编辑</div>
-            </el-dropdown-item>
-            <el-dropdown-item v-if="allowDeleteCustomer">
-              <div @click="deleteCustomer">删除</div>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+        <base-button icon="icon-left" button-text="联系人" @event="openDialog('contact')"></base-button>
+        <base-button type="plain" icon="icon-left" button-text="联系人" @event="openDialog('contact')"></base-button>
+        <base-button type="plain" icon="icon-left" button-text="提醒" @event="openDialog('remind')"></base-button>
+        <base-button type="plain" icon="icon-left" button-text="地址" @event="openDialog('address')"></base-button>
+        <base-button type="plain" icon="icon-left" button-text="产品" @event="openDialog('address')"></base-button>
       </div>
 
     </div>
@@ -53,9 +51,10 @@
           <template slot="address" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>地址</label>
-              <div class="form-view-row-content"> 
-                <span>{{value | fmt_address}}</span> 
-                <i v-if="value.adLatitude && value.adLongitude" @click="openMap" class="iconfont icon-address customer-address-icon"></i>
+              <div class="form-view-row-content">
+                <span>{{value | fmt_address}}</span>
+                <i v-if="value.adLatitude && value.adLongitude" @click="openMap"
+                   class="iconfont icon-address customer-address-icon"></i>
               </div>
             </div>
           </template>
@@ -63,7 +62,8 @@
       </div>
       <div class="customer-relation" v-if="this.customer.id">
         <base-tabbar :tabs="tabs" v-model="currTab">
-          <div class="record-tab-label" slot="customer-info-record__tab"><i class="iconfont icon-timeline"></i>信息动态</div>
+          <div class="record-tab-label" slot="customer-info-record__tab"><i class="iconfont icon-timeline"></i>信息动态
+          </div>
         </base-tabbar>
         <div class="customer-relation-content">
           <keep-alive>
@@ -74,7 +74,8 @@
     </div>
 
     <edit-contact-dialog ref="EditContactDialog" :customer="customer"></edit-contact-dialog>
-    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id" :default-address="initData.customerAddress"></edit-address-dialog>
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id"
+                         :default-address="initData.customerAddress"></edit-address-dialog>
     <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind"
                             @success-callback="selectedRemind = {}"></remind-customer-dialog>
   </div>
@@ -200,7 +201,7 @@
         return loginUser.userId === customerManager;
       },
       /** 子组件所需的数据 */
-      propsForSubComponents(){
+      propsForSubComponents() {
         return {
           customer: this.customer,
           loginUser: this.initData.loginUser,
@@ -208,41 +209,41 @@
       }
     },
     methods: {
-      buildTabs(){
+      buildTabs() {
         return [{
-            displayName: '信息动态',
-            component: CustomerInfoRecord.name,
-            slotName: 'record-tab',
-              show: true,
-          }, {
-            displayName: '客户提醒',
-            component: CustomerRemindTable.name,
-            show: true,
-          }, {
-            displayName: '事件',
-            component: CustomerEventTable.name,
-            show: true,
-          }, {
-            displayName: '工单',
-            component: CustomerTaskTable.name,
-            show: true,
-          }, {
-            displayName: '计划任务',
-            component: CustomerPlanTable.name,
-            show: this.initData.planTaskEnabled
-          }, {
-            displayName: '客户产品',
-            component: CustomerProductTable.name,
-            show: true,
-          }, {
-            displayName: '客户地址',
-            component: CustomerAddressTable.name,
-            show: true,
-          }, {
-            displayName: '联系人',
-            component: CustomerContactTable.name,
-            show: true,
-          }]
+          displayName: '信息动态',
+          component: CustomerInfoRecord.name,
+          slotName: 'record-tab',
+          show: true,
+        }, {
+          displayName: '客户提醒',
+          component: CustomerRemindTable.name,
+          show: true,
+        }, {
+          displayName: '事件',
+          component: CustomerEventTable.name,
+          show: true,
+        }, {
+          displayName: '工单',
+          component: CustomerTaskTable.name,
+          show: true,
+        }, {
+          displayName: '计划任务',
+          component: CustomerPlanTable.name,
+          show: this.initData.planTaskEnabled
+        }, {
+          displayName: '客户产品',
+          component: CustomerProductTable.name,
+          show: true,
+        }, {
+          displayName: '客户地址',
+          component: CustomerAddressTable.name,
+          show: true,
+        }, {
+          displayName: '联系人',
+          component: CustomerContactTable.name,
+          show: true,
+        }]
         .filter(tab => tab.show);
       },
       async deleteCustomer() {
@@ -311,86 +312,91 @@
 </script>
 
 <style lang="scss">
-html,body,.page-container{
-  height: 100%;
-  overflow: hidden;
-}
 
-.page-container{
-  padding: 0 10px 10px 10px;
-}
 
-.customer-address-icon{
-  color: $color-primary;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.customer-tool-bar {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 14px;
-  color: #666;
-
-  .el-button {
-    margin-left: 0;
-    height: 32px;
-    align-self: center;
+  $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+  html, body, .page-container {
+    height: 100%;
+    overflow: hidden;
   }
-}
 
-.main-content{
-  display: flex;
-  flex-flow: row nowrap;
-  height: calc(100% - 39px);
-}
-
-.customer-detail{
-  height: 100%;
-  overflow: auto;
-  background: #fff;
-  //padding: 0 10px 10px;
-  width: 520px;
-
-  h3{
-    margin: 0;
-    padding: 0 10px;
-    line-height: 40px;
-    border-bottom: 1px dashed #ccc;
+  body {
+    padding: 10px;
   }
-}
 
-.customer-relation {
-  height: 100%;
-  flex: 1;
-  background: #fff;
-  min-width: 500px;
-  margin-left: 10px;
-  border-radius: 2px;
-}
-
-.customer-relation-content{
-  height: calc(100% - 46px);
-}
-
-.action-btn {
-  .el-dropdown {
-    line-height: 39px;
+  .page-container {
+    background: #fff;
+    border-radius: 3px;
   }
-  .el-dropdown-btn {
-    padding: 0 10px;
-    line-height: 16px;
-    &:hover {
-      cursor: pointer;
-      color: #00ac97;
+
+  .customer-address-icon {
+    color: $color-primary;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .customer-tool-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: $text-color-regular;
+    padding: 12px 20px;
+    border-bottom: 1px solid #f2f2f2;
+
+  }
+
+  .main-content {
+    display: flex;
+    flex-flow: row nowrap;
+    height: calc(100% - 39px);
+  }
+
+  .customer-detail {
+    height: 100%;
+    overflow: auto;
+    background: #fff;
+    //padding: 0 10px 10px;
+    width: 520px;
+
+    h3 {
+      margin: 0;
+      padding: 0 10px;
+      line-height: 40px;
+      border-bottom: 1px dashed #ccc;
     }
   }
 
-  .add-contact {
-    border-left: 1px solid #ccc;
+  .customer-relation {
+    height: 100%;
+    flex: 1;
+    background: #fff;
+    min-width: 500px;
+    margin-left: 10px;
+    border-radius: 2px;
   }
-  .add-production {
-    border-right: 1px solid #ccc;
+
+  .customer-relation-content {
+    height: calc(100% - 46px);
   }
-}
+
+  .action-btn {
+    .el-dropdown {
+      line-height: 39px;
+    }
+    .el-dropdown-btn {
+      padding: 0 15px;
+      line-height: 34px;
+      display: inline-block;
+      background: $color-primary-light-9;
+      .iconfont {
+        margin-right: 3px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: #fff;
+        background: $color-primary;
+      }
+    }
+  }
 </style>

@@ -13,6 +13,7 @@ import BaseTabBar from './common/BaseTabBar';
 import BaseTimeline from './common/BaseTimeline';
 import BaseComment from './common/BaseComment';
 import BaseSpin from './common/BaseSpin';
+import BaseButton from './common/BaseButton';
 
 import Form from './form';
 import Fast from './fast'
@@ -34,7 +35,8 @@ const components = [
   BaseTabBar,
   BaseTimeline,
   BaseComment,
-  BaseSpin
+  BaseSpin,
+  BaseButton
 ];
 
 export default {
