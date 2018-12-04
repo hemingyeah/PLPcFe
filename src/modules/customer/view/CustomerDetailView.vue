@@ -36,7 +36,6 @@
             <el-dropdown-item>蚵仔煎</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <base-button icon="icon-left" button-text="联系人" @event="openDialog('contact')"></base-button>
         <base-button type="plain" icon="icon-left" button-text="联系人" @event="openDialog('contact')"></base-button>
         <base-button type="plain" icon="icon-left" button-text="提醒" @event="openDialog('remind')"></base-button>
         <base-button type="plain" icon="icon-left" button-text="地址" @event="openDialog('address')"></base-button>
@@ -50,7 +49,7 @@
         <form-view :fields="allField" :value="customer">
           <template slot="address" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
-              <label>地址</label>
+              <label>地址：</label>
               <div class="form-view-row-content">
                 <span>{{value | fmt_address}}</span>
                 <i v-if="value.adLatitude && value.adLongitude" @click="openMap"
@@ -352,17 +351,20 @@
   }
 
   .customer-detail {
-    height: 100%;
+    height: 95%;
     overflow: auto;
     background: #fff;
-    //padding: 0 10px 10px;
     width: 520px;
 
     h3 {
       margin: 0;
-      padding: 0 10px;
-      line-height: 40px;
-      border-bottom: 1px dashed #ccc;
+      margin-bottom: 5px;
+      padding: 0 20px;
+      line-height: 50px;
+      font-size: 22px;
+      color: $text-color-primary;
+      background: $color-primary-light-9;
+      font-weight: normal;
     }
   }
 
