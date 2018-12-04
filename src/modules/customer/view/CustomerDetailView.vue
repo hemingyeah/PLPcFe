@@ -2,13 +2,10 @@
   <div class="page-container">
     <div class="customer-tool-bar">
       <div>
-        <base-button type="only-text" button-text="返回" icon="icon-commit1"></base-button>
-        <base-button type="only-text" button-text="编辑" icon="icon-commit1"></base-button>
-        <base-button type="only-text" button-text="删除" icon="icon-commit1"></base-button>
-        <base-button type="only-text" button-text="添加提醒" icon="icon-commit1"></base-button>
-
-
-        <!--<base-button type="plain" icon="icon-fd-separator" button-text="返回11111" :disabled="true"></base-button>-->
+        <base-button type="only-text" button-text="返回" icon="icon-commit1" @event="goBack"></base-button>
+        <base-button type="only-text" button-text="编辑" icon="icon-commit1" @event="jump" v-if="allowEditCustomer"></base-button>
+        <base-button type="only-text" button-text="删除" icon="icon-commit1" @event="deleteCustomer" v-if="allowDeleteCustomer"></base-button>
+        <base-button type="only-text" button-text="添加提醒" icon="icon-commit1" @event="openDialog('remind')"></base-button>
       </div>
       <div class="action-btn">
         <el-dropdown trigger="click">
@@ -46,7 +43,7 @@
     <div class="main-content">
       <div class="customer-detail">
         <h3>{{customer.name}}</h3>
-        <form-view :fields="allField" :value="customer">
+        <form-view :fields="fields" :value="customer">
           <template slot="address" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>地址：</label>
@@ -115,46 +112,8 @@
       }
     },
     computed: {
-      allField() {
-        const cf = [{
-          id: null,
-          formType: 'text',
-          displayName: '客户编号',
-          fieldName: 'serialNumber',
-          isSystem: 1,
-        }, {
-          id: null,
-          formType: 'text',
-          displayName: '联系人',
-          fieldName: 'lmName',
-          isSystem: 1,
-        }, {
-          id: null,
-          formType: 'phone',
-          displayName: '电话',
-          fieldName: 'lmPhone',
-          isSystem: 1,
-        }, {
-          id: null,
-          formType: 'address',
-          displayName: '区域',
-          fieldName: 'customerAddress',
-          isSystem: 1,
-        }, {
-          id: null,
-          formType: 'tags',
-          displayName: '服务团队',
-          fieldName: 'tags',
-          isSystem: 1,
-        }, {
-          id: null,
-          formType: 'text',
-          displayName: '客户负责人',
-          fieldName: 'customerManagerName',
-          isSystem: 1,
-        }];
-
-        return [...cf, ...this.initData.fieldInfo];
+      fields() {
+        return (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
       },
       //permission
       permission() {
@@ -281,6 +240,9 @@
       },
       jump() {
         window.location.href = `/customer/edit/${this.initData.id}`
+      },
+      goBack() {
+        window.history.go(-1);
       },
       updateRemind(remind) {
         this.selectedRemind = remind || {};

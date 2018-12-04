@@ -276,7 +276,7 @@
         ref="multipleTable" class="customer-table">
         <!--row-key="serialNumber"-->
 
-        <el-table-column  type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+        <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
         <el-table-column
           v-for="column in columns"
           v-if="column.show"
@@ -315,8 +315,8 @@
             <template v-else-if="column.field === 'remindCount'">
               {{scope.row.attribute.remindCount || 0}}
             </template>
-            <template v-else-if="column.formType === 'selectMulti' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field] | displaySelectMulti}}
+            <template v-else-if="column.formType === 'select' && scope.row.attribute[column.field]">
+              {{scope.row.attribute[column.field] | displaySelect}}
             </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
               {{scope.row.attribute[column.field].displayName}}
@@ -596,10 +596,15 @@
         .map(tag => tag.tagName)
         .join('，');
       },
-      displaySelectMulti(value) {
-        if (!value || !Array.isArray(value) || !value.length) return '';
-
-        return value.join('，');
+      displaySelect(value) {
+        if (!value) return null;
+        if (value && typeof value === 'string') {
+          return value;
+        }
+        if (Array.isArray(value) && value.length) {
+          return value.join('，');
+        }
+        return null;
       },
     },
     mounted() {
@@ -612,8 +617,9 @@
       this.customerConfig = {
         customerAddressConfig: initData.customerAddressConfig,
         customerConfig: initData.customerConfig,
-        fieldInfo: (initData.fieldInfo || []).filter(f => f.formType !== 'separator'),
+        fieldInfo: (initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId)
       };
+
       this.auth = initData.auth || {};
 
       const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
@@ -1021,7 +1027,7 @@
         let sortable = false;
 
         dynamicColumns = this.customerConfig.fieldInfo
-        .filter(f => !f.isSystem && f.formType !== 'attachment')
+        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
           sortable = false;
           minWidth = 100;
@@ -1048,7 +1054,7 @@
             formType: field.formType,
             width: `${minWidth}px`,
             sortable,
-            isSystem: 0,
+            isSystem: field.isSystem,
           };
         });
 

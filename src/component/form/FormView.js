@@ -39,11 +39,11 @@ const FormView = {
     mapFieldToDom(field) {
       let {formType, fieldName, displayName, isSystem} = field;
       if (formType == 'separator') {
-        const cn = `iconfont icon-triangle-down ${!this.sectionState[field.fieldId] && 'reversal'}`;
+        const cn = `iconfont icon-triangle-down ${!this.sectionState[field.id] && 'reversal'}`;
         return (
           <h4 class="section-title">
             {displayName || ' '}
-            <i class={cn} onClick={() => this.toggleDisplay(field.fieldId)}></i>
+            <i class={cn} onClick={() => this.toggleDisplay(field.id)}></i>
           </h4>
         );
       }
@@ -114,7 +114,7 @@ const FormView = {
       newArr[0].unshift({
         displayName: '基本信息',
         formType: 'separator',
-        fieldId: 'form-view-base-separator',
+        id: 'form-view-base-separator',
       });
       
       return newArr;
@@ -128,7 +128,7 @@ const FormView = {
       let currentGroupId = 0;
       
       let title = group.filter(f => f.formType === 'separator').map(item => {
-        currentGroupId = item.fieldId;
+        currentGroupId = item.id;
         if (this.sectionState[currentGroupId] === undefined) {
           this.$set(this.sectionState, currentGroupId, currentGroupId === 'form-view-base-separator');
         }
