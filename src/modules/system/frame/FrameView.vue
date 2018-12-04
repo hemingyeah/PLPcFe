@@ -9,140 +9,132 @@
 
     <div class="frame-content">
       <header class="frame-header">
-        <div class="frame-header-left" :class="{'frame-tab-highlight': prevBtnEnable}">
-          <button type="button" class="btn-text frame-nav-btn frame-collapse" @click="collapse = !collapse">
-            <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
-          </button>
-          <button type="button" class="btn-text frame-nav-btn frame-tabs-prev" @click="prev" v-if="showOperateBtn">
-            <i class="iconfont icon-left"></i>
-          </button>
-        </div>
-        
-        <!-- tabs -->
-        <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
-          <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
-            <frame-tab 
-              v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
-              @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
+        <div class="frame-quick">
+          <div class="frame-quick-left">
+            <button type="button" class="btn-text frame-header-btn frame-collapse" @click="collapse = !collapse">
+              <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
+            </button>     
+          </div>
+          
+          <!-- profile -->
+          <div class="frame-quick-right">
+            <el-popover v-if="showDevTool">
+              <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference">
+                <i class="iconfont icon-gongju"></i>
+              </button> 
+
+              <div class="dev-tool-menu">
+                <a href="javascript:;" @click="openDemo">demo</a>
+                <a href="javascript:;" @click="clearStorage">清空缓存</a>
+              </div>
+            </el-popover>
+
+            <a 
+              href="/v3" class="btn-text frame-header-btn frame-helpDoc"
+              title="返回旧版" v-tooltip>
+              <i class="iconfont icon-jiuban"></i>
+            </a>
+            
+            <button 
+              type="button" class="btn-text frame-header-btn frame-helpDoc"
+              @click="openHelpDoc"
+              title="帮助文档" v-tooltip>
+              <i class="iconfont icon-help"></i>
+            </button>
+
+            <button 
+              type="button" class="btn-text frame-header-btn frame-saleManager" 
+              @click="openSaleManager"
+              title="专属客服" v-tooltip>
+              <i class="iconfont icon-customerservice"></i>
+            </button>
+
+            <el-popover trigger="hover" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
+              <button type="button" class="btn-text frame-header-btn frame-export" slot="reference">
+                <i class="iconfont icon-export"></i>
+              </button>
+
+              <div class="frame-export-panel">
+                <h3>导出下载（{{exportList.length || 0}}）</h3>
+                <template v-if="exportList.length > 0">
+                  <div v-for="item in exportList" :key="item.id" class="export-row">
+                    <img src="../../../assets/img/excel.png">
+                    <div class="export-row-info">
+                      <h4>{{item.name}}</h4>
+                      <p>{{item.createTime | fmt_datetime}}</p>
+                    </div>  
+                    <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
+                    <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template>
+                    <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>{{item.isFinished == 0 ? '取消' : '下载'}}</button>
+                  </div>
+                </template>
+                <p class="export-empty" v-else>您没有待下载的文件</p>
+              </div>
+            </el-popover>
+            <!--导出下载-->
+      
+            <!-- 个人信息 -->
+            <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
+              <div class="frame-user-profile" slot="reference">
+                <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
+                  <img :src="userAvatar"/>
+                </a>
+                <div class="user-info">
+                  <h4>{{loginUser.displayName}}</h4>
+                  <p>
+                    <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> 
+                    <span>{{loginUser.state}}</span>
+                  </p>
+                </div>
+                <i class="iconfont icon-triangle-down user-profile-down"></i>
+              </div>
+              
+              <el-popover placement="left-start" popper-class="user-state-popper" trigger="hover" v-model="userStatePopperVisible">
+                <div class="user-profile-item" slot="reference"><i class="iconfont icon-user-status"></i>工作状态</div>
+
+                <div class="user-state-panel">
+                  <div 
+                    class="user-profile-item user-state-item" 
+                    v-for="(color, state) in userStateMap" :key="state"
+                    @click="chooseUserState(state)">
+                    <span class="user-color-icon" :style="{backgroundColor: color}"></span>
+                    <span>{{state}}</span>
+                  </div>
+                </div>
+              </el-popover>
+              
+              <div class="user-profile-item">
+                <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
+              </div>
+              
+              <div class="user-profile-item logout">
+                <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-logout"></i>注销</a>
+              </div>
+
+            </el-popover>
           </div>
         </div>
 
-        <!-- profile -->
-        <div class="frame-header-right" :class="{'frame-tab-highlight': nextBtnEnable}">
-          <template v-if="showOperateBtn">
-            <button type="button" class="btn-text frame-nav-btn frame-tabs-next" @click="next">
-              <i class="iconfont icon-right"></i>
-            </button>
-
-            <el-popover trigger="click" popper-class="frame-tabs-popper" placement="bottom-end">
-              <button type="button" class="btn-text frame-nav-btn frame-tabs-more" slot="reference">
-                <i class="iconfont icon-pile"></i>
-              </button>
-              <div class="frame-tabs-panel">
-                <frame-tab 
-                  v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
-                  @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
-              </div>
-            </el-popover>
-          </template>
-          
-          <el-popover v-if="showDevTool">
-            <button type="button" class="btn-text frame-nav-btn dev-tool" slot="reference">
-              <i class="iconfont icon-gongju"></i>
-            </button> 
-
-            <div class="dev-tool-menu">
-              <a href="javascript:;" @click="openDemo">demo</a>
-              <a href="javascript:;" @click="clearStorage">清空缓存</a>
-            </div>
-          </el-popover>
-
-          <a 
-            href="/v3" class="btn-text frame-nav-btn frame-helpDoc"
-            title="返回旧版" v-tooltip>
-            <i class="iconfont icon-jiuban"></i>
-          </a>
-          
-          <button 
-            type="button" class="btn-text frame-nav-btn frame-helpDoc"
-            @click="openHelpDoc"
-            title="帮助文档" v-tooltip>
-            <i class="iconfont icon-help"></i>
+        <div class="frame-tabs">
+          <button type="button" class="btn-text frame-tabs-prev" :class="{'frame-tab-highlight': prevBtnEnable}" @click="prev">
+            <i class="iconfont icon-left"></i>
           </button>
 
-          <button 
-            type="button" class="btn-text frame-nav-btn frame-saleManager" 
-            @click="openSaleManager"
-            title="专属客服" v-tooltip>
-            <i class="iconfont icon-customerservice"></i>
+          <!-- tabs -->
+          <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
+            <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
+              <frame-tab 
+                v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
+                @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
+            </div>
+          </div>
+
+          <button type="button" class="btn-text frame-tabs-next" :class="{'frame-tab-highlight': nextBtnEnable}" @click="next">
+            <i class="iconfont icon-right"></i>
           </button>
-
-          <el-popover trigger="hover" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
-            <button type="button" class="btn-text frame-nav-btn frame-export" slot="reference">
-              <i class="iconfont icon-export"></i>
-            </button>
-
-            <div class="frame-export-panel">
-              <h3>导出下载（{{exportList.length || 0}}）</h3>
-              <template v-if="exportList.length > 0">
-                <div v-for="item in exportList" :key="item.id" class="export-row">
-                  <img src="../../../assets/img/excel.png">
-                  <div class="export-row-info">
-                    <h4>{{item.name}}</h4>
-                    <p>{{item.createTime | fmt_datetime}}</p>
-                  </div>  
-                  <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
-                  <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template>
-                  <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>{{item.isFinished == 0 ? '取消' : '下载'}}</button>
-                </div>
-              </template>
-              <p class="export-empty" v-else>您没有待下载的文件</p>
-            </div>
-          </el-popover>
-          <!--导出下载-->
-    
-          <!-- 个人信息 -->
-          <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
-            <div class="frame-user-profile" slot="reference">
-              <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
-                <img :src="userAvatar"/>
-              </a>
-              <div class="user-info">
-                <h4>{{loginUser.displayName}}</h4>
-                <p>
-                  <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> 
-                  <span>{{loginUser.state}}</span>
-                </p>
-              </div>
-              <i class="iconfont icon-triangle-down user-profile-down"></i>
-            </div>
-            
-            <el-popover placement="left-start" popper-class="user-state-popper" trigger="hover" v-model="userStatePopperVisible">
-              <div class="user-profile-item" slot="reference"><i class="iconfont icon-user-status"></i>工作状态</div>
-
-              <div class="user-state-panel">
-                <div 
-                  class="user-profile-item user-state-item" 
-                  v-for="(color, state) in userStateMap" :key="state"
-                  @click="chooseUserState(state)">
-                  <span class="user-color-icon" :style="{backgroundColor: color}"></span>
-                  <span>{{state}}</span>
-                </div>
-              </div>
-            </el-popover>
-            
-            <div class="user-profile-item">
-              <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
-            </div>
-            
-            <div class="user-profile-item logout">
-              <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-logout"></i>注销</a>
-            </div>
-
-          </el-popover>
         </div>
       </header>
-
+      
       <div class="frame-main">
         <div class="frame-tab-content">
           <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
@@ -368,7 +360,6 @@ export default {
     this.clearCachedIds();
   },
   mounted(){
-    
     this.checkExports();
   },
   components: {

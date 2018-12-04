@@ -38,19 +38,10 @@ export default {
   position: relative;
   display: inline-block;
   vertical-align: middle;
-}
+  border-left: 1px solid #f2f2f2;
 
-.frame-tab:not(:first-child){
-  margin-left: 3px;
-
-  &:before{
-    content: "";
-    position: absolute;
-    left: -2px;
-    top: 12px;
-    width: 1px;
-    height: 16px;
-    background-color: #e4e7e5;
+  &:last-child{
+    border-right-color: #f2f2f2;
   }
 }
 

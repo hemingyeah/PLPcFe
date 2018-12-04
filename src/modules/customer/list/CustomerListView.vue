@@ -1307,7 +1307,6 @@
   .customer-list-container {
     height: 100%;
     overflow: auto;
-    background: #f4f7f5;
     padding: 10px;
 
     .panel-title {
