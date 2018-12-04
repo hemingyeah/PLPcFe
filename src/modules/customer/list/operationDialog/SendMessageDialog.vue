@@ -92,7 +92,6 @@
       }
     },
     mounted() {
-      this.fetchTemplate();
       this.buildParams();
     },
     methods: {
@@ -122,6 +121,7 @@
         }
         this.sendMessageDialog = true;
         this.fetchCount();
+        this.fetchTemplate();
       },
       fetchCount() {
         if (!this.needFetchCount) return;
@@ -149,8 +149,10 @@
       fetchTemplate() {
         this.$http.get('/vipsms/getTemplates', {pageSize: '100', pageNum: '1',})
           .then(res => {
-            if (res.status !== 0) return;
-            this.messageTemplate = res.data.list
+            if (res.status) {
+              this.$platform.alert('获取短信模板失败');
+            }
+            this.messageTemplate = (res.data.list || [])
             .filter(t => t.notice === '自定义通知' && t.status === 'pass_approval');
             if (this.messageTemplate.length) {
               this.form.smsTemplateId = this.messageTemplate[0].id;
@@ -159,6 +161,7 @@
           })
           .catch(err => {
             console.error('fetchTemplate', err);
+            this.$platform.alert('获取短信模板发生错误');
           })
       },
       buildParams() {

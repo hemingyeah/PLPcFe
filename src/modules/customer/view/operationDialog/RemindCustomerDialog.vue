@@ -78,20 +78,19 @@
       },
       remindRule() {
         const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
-        let unit = '';
-        if (periodUnit === 'day') {
-          unit = '天';
-        }
-        if (isRepeat) {
-          if (period) {
-            return `重复通知：${fieldDisplayName + (isAhead + hours)}小时，每${period + unit}发出提醒`;
-          } else {
-            return '无';
+        let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
+        let isahead = isAhead ? "前" : "后";
+
+        if (!isRepeat){
+          if(fieldDisplayName){
+            return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
+          }else{
+            return '无'
           }
-        } else {
-          if (fieldDisplayName) {
-            return `单次通知：根据${fieldDisplayName + (isAhead + hours)}小时提醒`;
-          } else {
+        }else{
+          if(period){
+            return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
+          }else{
             return '无'
           }
         }
@@ -165,7 +164,16 @@
           let tv = null;
 
           if (res) {
-            this.remindTemplate = res.list || [];
+            this.remindTemplate = (res.list || [])
+            .map(r => {
+              if (r.isDdResponse) {
+                r.name = r.name + '（内部提醒）';
+              } else {
+                r.name = r.name + '（外部提醒）';
+              }
+              return r;
+            });
+
             tv = this.remindTemplate[0];
             if (tv) {
               this.form.remindId = tv.id;

@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="导入客户" :show.sync="visible" width="600px" class="base-import-modal">
+  <base-modal :title="title" :show.sync="visible" width="600px" class="base-import-modal">
     <span class="base-import-title" slot="title">{{title}}</span>
     <slot name="tip">    
       <div class="base-import-warn">请先下载<a :href="templateUrl">导入模版</a>，填写完成后再上传导入。</div>

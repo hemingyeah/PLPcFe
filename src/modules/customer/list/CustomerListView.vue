@@ -374,6 +374,7 @@
 
 
     <base-import
+      title="导入客户"
       ref="importCustomerModal"
       @success="importSucc"
       action="/customer/import">
@@ -385,6 +386,7 @@
     </base-import>
 
     <base-import
+      title="导入联系人"
       ref="importLinkmanModal"
       @success="importSucc"
       action="/contacts/import">

@@ -27,7 +27,7 @@
     </div>
 
     <div slot="footer" class="import-footer">
-      <button type="button" class="btn btn-text" @click="visible = false">关闭</button>
+      <button type="button" class="btn btn-text" @click="batchUpdateCustomerDialog = false">关闭</button>
       <el-button type="primary" :disabled="pending" @click="upload" :loading="pending">{{pending ? '正在导入' : '导入'}}</el-button>
     </div>
   </base-modal>
