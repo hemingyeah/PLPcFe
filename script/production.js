@@ -17,6 +17,7 @@ const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.prod.conf');
 
 const ROOT_PATH = config.targetRootPath;
+const monitorScript = '<script>!(function(c,i,e,b){var h=i.createElement("script");var f=i.getElementsByTagName("script")[0];h.type="text/javascript";h.crossorigin=true;h.onload=function(){c[b]||(c[b]=new c.wpkReporter({bid:"${env == "production" ? "dta_2_3144" : "dta_2_3397"}"}));c[b].installAll()};f.parentNode.insertBefore(h,f);h.src=e})(window,document,"https://g.alicdn.com/woodpeckerx/jssdk??wpkReporter.js","__wpk");</script>'
 
 //编译
 webpack(webpackConfig, function (err, stats) {
@@ -92,6 +93,8 @@ function gen(directory, fileName){
       template = '<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>\n' + template;
       //注入构建信息
       template += `\n<!-- build on ${new Date().toLocaleString()}. -->`;
+      //注入监控脚本
+      template = template.replace('</head>', monitorScript + '</head>');
       
       let dirPath = path.resolve(directory, 'jsp');
       if(!existsSync(dirPath)) {
