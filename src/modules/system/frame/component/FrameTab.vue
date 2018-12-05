@@ -1,14 +1,14 @@
 <template>
   <div 
     :id="`tab_` + tab.id"
-    class="frame-tab" :class="{'frame-tab-active': tab.show}"
+    class="frame-tab" :class="{'frame-tab-active': tab.show, 'frame-tab-home': tab.isHome}"
     @click="$emit('jump', tab)">
 
     <div class="frame-tab-inner">
       <span class="frame-tab-icon-wrap">
         <base-spin size="small" v-if="tab.loading"></base-spin>
         <template v-else>
-          <i :class="['iconfont', tab.isHome ? 'icon-home' : 'icon-yemian', 'frame-tab-icon']"></i>
+          <i :class="['iconfont', tab.isHome ? 'icon-shouye' : 'icon-juxing', 'frame-tab-icon']"></i>
           <i class="iconfont icon-updete frame-tab-reload" @click="$emit('reload', tab)"></i>
         </template>
       </span>
@@ -39,10 +39,15 @@ export default {
   display: inline-block;
   vertical-align: middle;
   border-left: 1px solid #f2f2f2;
+  border-bottom: 1px solid #f2f2f2;
 
   &:last-child{
-    border-right-color: #f2f2f2;
+    border-right: 1px solid #f2f2f2;
   }
+}
+
+.frame-tab-home .frame-tab-inner{
+  min-width: 0;
 }
 
 .frame-tab-inner{
@@ -53,7 +58,7 @@ export default {
   position: relative;
 
   transition: all ease .3s;
-  padding: 12px;
+  padding: 12px 10px;
   border-radius: 4px 4px 0 0;
 
   .base-spin{
@@ -96,12 +101,12 @@ export default {
 
 .frame-tab-close{
   display: block;
-  margin: 0 0 0 5px;
+  margin: 0 0 0 10px;
   padding: 0;
   width: 16px;
   height: 16px;
   line-height: 16px;
-  color: #6a6a6a;
+  color: #d8d8d8;
   font-weight: 500;
 
   i.icon-close{
@@ -115,6 +120,7 @@ export default {
 
 .frame-tab-active,
 .frame-tab:hover{  
+  border-bottom-color: $color-primary;
   &:before{
     background-color: transparent !important;
   }
@@ -130,7 +136,7 @@ export default {
   }
 
   .frame-tab-inner{
-    background-color: $color-primary-hover;
+    //background-color: $color-primary-hover;
     color: $color-primary;    
   }
 }

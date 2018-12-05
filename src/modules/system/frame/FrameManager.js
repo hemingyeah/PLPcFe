@@ -3,13 +3,6 @@ import {parse} from '@src/util/querystring'
 import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
 
-// function isTabHidden(scrollRect, tabRect){
-//   let isLeftHidden = tabRect.right < scrollRect.left || (tabRect.left < scrollRect.left && tabRect.right > scrollRect.left);
-//   let isRightHidden = tabRect.left > scrollRect.right || (tabRect.left < scrollRect.right && tabRect.right > scrollRect.right)
-
-//   return isLeftHidden || isRightHidden;
-// }
-
 const FrameManager = {
   data(){
     return {
@@ -18,7 +11,6 @@ const FrameManager = {
       offset: 0,
       nextBtnEnable: false,
       prevBtnEnable: false,
-      showOperateBtn: false,
       offsetTransition: false
     }
   },
@@ -152,7 +144,7 @@ const FrameManager = {
       //2. 根据方向设置offset
       let direction = event.deltaX != 0 
         ? event.deltaX > 0 ? 1 : -1//存在横向滚动,
-        : event.deltaY > 0 ? 2 : -2;
+        : event.deltaY > 0 ? 4 : -4;
 
       let offset = this.offset + direction * 12;
       if(offset < 0) offset = 0;
@@ -208,12 +200,9 @@ const FrameManager = {
       
       let scrollOffsetWidth = scrollEl.offsetWidth; //外层容器的宽度
       let listOffsetWidth = listEl.offsetWidth; //tab list的宽度
-
-      //判断是否显示操作按钮
-      this.showOperateBtn = listOffsetWidth > scrollOffsetWidth;
       
       //如果无法滚动，offset置为0
-      if(!this.showOperateBtn){
+      if(listOffsetWidth <= scrollOffsetWidth){
         this.offset = 0;
         this.adjustScrollStyle();
         return;
@@ -279,21 +268,7 @@ const FrameManager = {
       //只处理tab list的tranform效果
       if(event.propertyName != 'transform' || !event.target.classList.contains('frame-tabs-list')) return;
       this.offsetTransition = false;
-      //this.calcHiddenTabs();
     },
-    // calcHiddenTabs(){
-    //   this.$nextTick(() => {
-    //     let scrollRect = this.$refs.scroll.getBoundingClientRect();
-
-    //     this.hiddenTabs = this.frameTabs.filter(tab => {
-    //       let tabEl = document.getElementById(`tab_${tab.id}`)
-    //       if(tabEl == null) return false;
-
-    //       let tabRect = tabEl.getBoundingClientRect();
-    //       return isTabHidden(scrollRect, tabRect);
-    //     });
-    //   })
-    // },
     resizeHanler(){
       let currTab = this.frameTabs.find(item => item.show);
       this.adjustFrameTabs(currTab);

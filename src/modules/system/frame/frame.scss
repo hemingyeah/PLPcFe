@@ -1,7 +1,7 @@
 html, body, .frame{
-  background-color: #fff;
   height: 100%;
   overflow: hidden;
+  background-color: #fff;
 }
 
 .frame{
@@ -14,34 +14,249 @@ html, body, .frame{
   height: 100%;
 }
 
-.frame-tabs-prev,
-.frame-tabs-next{
-  color: #d5d5d5;
-  cursor: not-allowed;
+.frame-user-profile{
+  position: relative;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 4px 0;
+  color: $text-color-secondary;
+  width: 160px;
+  transition: background-color ease .3s;
+  z-index: 9;
+
+  &:hover{
+    background-color: $color-primary-hover;
+  }
 }
 
-.frame-collapse,
-.frame-tabs-more,
-.frame-heleDoc,
-.frame-saleManager,
-.frame-helpDoc,
-.frame-export{
+.logout:hover a{
+  color: #ed3f14;
+}
+
+.export-row{
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.dev-tool{
+  color: red;
+}
+
+.dev-tool-menu{
+  min-width: 100px;
+  max-height: 360px;
+  overflow: auto;
+
+  a{
+    display: block;
+    padding: 5px 8px;
+    color: red;
+  }
+}
+
+.user-state-popper{
+  margin-top: -5px;
+  background-color: #fff;
+  padding: 0;
+  
+  border-radius: 2px;
+  border: none;
+  box-shadow: 1px 1px 8px rgba(0, 21, 41, .175);
+  transition: background-color ease .3s;
+}
+
+.user-state-panel{
+  padding: 5px 0;
+  max-height: 620px;
+  overflow-y: auto;
+}
+
+.user-state-item{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.frame-tab-transition{
+  transition: transform linear .3s;
+}
+
+.frame-main{
+  height: calc(100% - 90px);
+}
+
+.frame-tab-content{
+  height: 100%;
+}
+
+.frame-tab-window{
+  height: 100%;
+
+  iframe{
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+}
+
+.frame-tabs-popper{
+  padding: 5px 0;
+  border-radius: 2px;
+  box-shadow: 1px 1px 8px rgba(0, 21, 41, .175);
+}
+
+.frame-tabs-panel{
+  padding: 0 5px;
+  width: 180px;
+  max-height: 520px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  
+  .frame-tab{
+    margin: 2px 0 0 0;
+    width: 100%;
+
+    .frame-tab-inner{
+      border-radius: 2px;
+      padding: 8px 5px;
+
+      .frame-tab-name{
+        flex: 1;
+        @include text-ellipsis();
+      }
+    }
+
+    &:before{
+      content: none;
+    }
+
+    &:first-child{
+      margin-top: 0;
+    }
+  }
+}
+
+/**************** frame header ****************/
+.frame-header{
+  position: relative;
+  z-index: 8;
+  box-shadow: 0 1px 3px #d8d8d8;
+}
+
+.frame-quick{
+  height: 50px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  user-select: none;
+  //background: mix(#fff, $color-primary, 89.88%);
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.frame-quick-left{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.frame-quick-right{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.frame-header-btn{
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+  margin: 0;
+  padding: 0;
+  color: $text-color-regular;
+  transition: color ease .3s;
+  text-decoration: none !important;
+
   &:hover{
     color: $color-primary;
+    background-color: #CFEAE9;
+  }
+
+  i.iconfont{
+    font-size: 16px;
   }
 }
 
-.export-btn{
-  height: 100%;
-  line-height: 44px;
-  text-align: center; 
-  cursor: pointer;
+/**************** frame tabs ****************/
+.frame-tabs{
+  display: flex;
+  flex-flow: row nowrap;
+  overflow: hidden;
+}
 
-  i{
-    font-size: 14px; 
+.frame-tabs-scroll{
+  height: 41px;
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.frame-tabs-border{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.frame-tabs-list{
+  position: absolute;
+  bottom: 0;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.frame-tabs-prev,
+.frame-tabs-next{
+  width: 40px;
+  height: 41px;
+  text-align: center;
+  line-height: 40px;
+  color: #999;
+  cursor: not-allowed;
+  border-bottom: 1px solid #f2f2f2;
+
+  &.frame-tab-highlight{
+    color: $text-color-secondary;
+    cursor: pointer;
+
+    &:hover{
+      color: $color-primary;
+    }
   }
 }
 
+.frame-tabs-prev.frame-tab-highlight{
+  box-shadow: 4px 0 12px rgba(0, 0, 0, .125);
+}
+
+.frame-tabs-next.frame-tab-highlight{
+  box-shadow: -4px 0 12px rgba(0, 0, 0, .125)
+}
+
+.frame-tabs-line{
+  position: absolute;
+  bottom: -1px;
+  height: 0px;
+  width: 100px;
+  border-bottom: 1px solid $color-primary;
+}
+
+/**************** export ****************/
 .export-panel-popper{
   width: 380px;
   background-color: #fff;
@@ -141,23 +356,7 @@ button.export-operate-btn{
   color: #007bff;
 }
 
-.frame-user-profile{
-  position: relative;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding: 4px 0;
-  height: 44px;
-  color: $text-color-secondary;
-  width: 160px;
-  transition: background-color ease .3s;
-  z-index: 9;
-
-  &:hover{
-    background-color: $color-primary-hover;
-  }
-}
-
+/**************** export ****************/
 .user-profile{
   width: 100%;
   height: 100%;
@@ -166,14 +365,17 @@ button.export-operate-btn{
 }
 
 .user-avatar{
-  padding: 0 8px;
+  position: relative;
+  width: 42px;
+  height: 42px;
+  padding: 5px;
+  margin-right: 10px;
 
   img{
     display: block;
-    width: 34px;
-    height: 34px;
+    width: 100%;
+    height: 100%;
     border-radius: 4px;
-    box-shadow: 0 0 4px rgba(0,0,0,.095);
   }
 }
 
@@ -192,6 +394,7 @@ button.export-operate-btn{
   h4{
     font-size: 14px;
     line-height: 18px;
+    font-weight: 400;
     color: $text-color-primary;
   }
 
@@ -209,7 +412,7 @@ button.export-operate-btn{
   font-size: 12px;
   width: 20px;
   text-align: center;
-  color: #797e89;
+  color: #666;
 }
 
 .user-profile-menu{
@@ -247,221 +450,21 @@ button.export-operate-btn{
   }
 }
 
-.logout:hover a{
-  color: #ed3f14;
-}
-
-.export-row{
-  display: flex;
-  flex-flow: row nowrap;
-}
-
-.dev-tool{
-  color: red;
-}
-
-.dev-tool-menu{
-  min-width: 100px;
-  max-height: 360px;
-  overflow: auto;
-
-  a{
-    display: block;
-    padding: 5px 8px;
-    color: red;
-  }
-}
-
-.user-state-popper{
-  margin-top: -5px;
-  background-color: #fff;
-  padding: 0;
-  
-  border-radius: 2px;
-  border: none;
-  box-shadow: 1px 1px 8px rgba(0, 21, 41, .175);
-  transition: background-color ease .3s;
-}
-
-.user-state-panel{
-  padding: 5px 0;
-  max-height: 620px;
-  overflow-y: auto;
-}
-
-.user-state-item{
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
 .user-color-icon{
   display: block;
   width: 14px;
   height: 14px;
   border-radius: 50%;
   margin-right: 8px;
-  background-color: $text-color-secondary;
+  background-color: #999;
 }
 
 .user-color-icon-mini{
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 4px;
-  vertical-align: middle;
-}
-
-.frame-tabs-list{
   position: absolute;
-  height: 40px;
-  bottom: 0;
-  white-space: nowrap;
-}
-
-.frame-tab-transition{
-  transition: transform linear .3s;
-}
-
-.frame-main{
-  height: calc(100% - 90px);
-}
-
-.frame-tab-content{
-  height: 100%;
-}
-
-.frame-tab-window{
-  height: 100%;
-
-  iframe{
-    display: block;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-  }
-}
-
-.frame-tabs-popper{
-  padding: 5px 0;
-  border-radius: 2px;
-  box-shadow: 1px 1px 8px rgba(0, 21, 41, .175);
-}
-
-.frame-tabs-panel{
-  padding: 0 5px;
-  width: 180px;
-  max-height: 520px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  
-  .frame-tab{
-    margin: 2px 0 0 0;
-    width: 100%;
-
-    .frame-tab-inner{
-      border-radius: 2px;
-      padding: 8px 5px;
-
-      .frame-tab-name{
-        flex: 1;
-        @include text-ellipsis();
-      }
-    }
-
-    &:before{
-      content: none;
-    }
-
-    &:first-child{
-      margin-top: 0;
-    }
-  }
-}
-
-/**************** frame header ****************/
-.frame-header{
-  position: relative;
-  z-index: 9;
-  box-shadow: 0 1px 3px #d8d8d8;
-}
-
-.frame-quick{
-  height: 50px;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: space-between;
-  overflow: hidden;
-  user-select: none;
-
-  border-bottom: 1px solid #f4f7f5;
-}
-
-.frame-quick-left{
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
-.frame-quick-right{
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding-right: 4px;
-}
-
-.frame-header-btn{
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  line-height: 50px;
-  color: $text-color-secondary;
-  transition: color ease .3s;
-  text-decoration: none !important;
-
-  i.iconfont{
-    font-size: 16px;
-    font-weight: 700;
-  }
-}
-
-/**************** frame tabs ****************/
-.frame-tabs{
-  display: flex;
-  flex-flow: row nowrap;
-  border-bottom: 1px solid #f2f2f2;
-  overflow: hidden;
-}
-
-.frame-tabs-scroll{
-  height: 40px;
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-}
-
-.frame-tabs-prev,
-.frame-tabs-next{
-  width: 40px;
-  height: 40px;
-  text-align: center;
-  line-height: 40px;
-
-  &.frame-tab-highlight{
-    color: $text-color-secondary;
-    cursor: pointer;
-
-    &:hover{
-      color: $color-primary;
-    }
-  }
-}
-
-.frame-tabs-prev.frame-tab-highlight{
-  box-shadow: 4px 0 12px rgba(0, 0, 0, .125);
-}
-
-.frame-tabs-next.frame-tab-highlight{
-  box-shadow: -4px 0 12px rgba(0, 0, 0, .125)
+  right: 4px;
+  bottom: 4px;
+  margin: 0;
+  width: 9px;
+  height: 9px;
+  border: 1px solid #fff;
 }

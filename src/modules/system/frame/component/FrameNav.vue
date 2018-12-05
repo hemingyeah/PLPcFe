@@ -1,7 +1,7 @@
 <template>
   <nav class="frame-nav" :class="{'frame-nav-expand': !collapse}" @transitionend="navTransitionEnd">
     <div class="frame-logo">
-      <a href="javascript:;" @click="openHome"><img src="../../../../assets/svg/logo.svg"></a>
+      <a href="javascript:;" @click="openHome"><img :src="logoImg"></a>
     </div>
     <div class="frame-menu-scroll">
       <ul class="frame-menu">
@@ -10,7 +10,7 @@
             :class="{
               'frame-menu-item': true, 
               'frame-menu-active': menu == currMenu,
-              'frame-menu-expand': !collapse
+              'frame-menu-expand': menu == currMenu
             }" 
             :key="menu.url">
             <a 
@@ -20,7 +20,7 @@
               <span class="frame-menu-icon"><i :class="['iconfont', menuIcon[menu.menuKey]]"></i></span>
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
-                <i class="iconfont icon-nav-right" v-if="menu.children && menu.children.length > 0"></i>
+                <i class="iconfont icon-nav-down" v-if="menu.children && menu.children.length > 0"></i>
               </template>
             </a>
 
@@ -46,6 +46,9 @@
 <script>
 import _ from 'lodash';
 import MenuIcon from '../model/MenuIcon';
+
+import Logo from '@src/assets/img/logo.png';
+import MiniLogo from '@src/assets/svg/logo.svg';
 
 export default {
   name: 'frame-nav',
@@ -73,6 +76,11 @@ export default {
       menuIcon: MenuIcon,
       currMenu: null
     };
+  },
+  computed: {
+    logoImg(){
+      return this.collapse ? MiniLogo : Logo;
+    }
   },
   methods: {
     navTransitionEnd(event){
@@ -110,6 +118,7 @@ export default {
       //如果有子菜单，展开子菜单
       if(menu.children && menu.children.length > 0) {
         this.currMenu = this.currMenu == menu ? null : menu;
+        this.$emit('update:collapse', false);
         return
       }
 
@@ -134,6 +143,8 @@ export default {
 </script>
 
 <style lang="scss">
+$-nav-hover-color: lighten($color-primary, 3%);
+
 .frame-nav{
   width: 60px;
   height: 100%;
@@ -167,8 +178,23 @@ export default {
     overflow: hidden;
   }
 
-  .frame-subMenu-item > a{
-    padding: 8px 15px 8px 39px;
+  .frame-subMenu-item {
+    color: #fff;
+
+    & > a{
+      padding: 13px 15px 13px 46px;
+    }
+
+    &.frame-subMenu-active:before{
+      content: "";
+      position: absolute;
+      left: 25px;
+      top: 20px;
+      width: 6px;
+      height: 6px;
+      background-color: $color-primary;
+      border-radius: 50%;
+    }
   }
 
   .frame-float-menu-title{
@@ -188,12 +214,13 @@ export default {
     flex-flow: row nowrap;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
   }
 
   img{
     display: block;
     margin: 0;
-    width: 34px;
+    height: 34px;
   }
 }
 
@@ -211,7 +238,7 @@ export default {
   transition: background-color ease .3s;
 
   &:hover{
-    background-color: lighten($color-primary, 3%);
+    background-color: $-nav-hover-color;
 
     .frame-float-menu{
       display: block !important;
@@ -228,11 +255,11 @@ export default {
 
     i.iconfont{
       font-size: 16px;
-      transition: transform ease .15s;
     }
 
-    i.icon-nav-right{
+    i.icon-nav-down{
       margin-right: 15px;
+      font-size: 12px;
     }
   }
 }
@@ -247,8 +274,8 @@ export default {
   background-color: #fff;
 }
 
-.frame-menu-expand .icon-nav-right{
-  transform: rotateZ(90deg);
+.frame-menu-expand .icon-nav-down{
+  transform: rotateZ(180deg);
 }
 
 .frame-menu-icon{
@@ -266,28 +293,29 @@ export default {
 }
 
 .frame-subMenu{
-  background-color: #fff;
+  background-color: #4AA09E;
   margin: 0;
   padding: 0;
 }
 
 .frame-subMenu-item{
   display: block;
+  position: relative;
   width: 100%;
   transition: background-color ease .3s,
               color ease .3s;
   
   &:hover,
   &.frame-subMenu-active{
-    background-color: $color-primary-hover;
-    color: $color-primary;
+    background: mix(#fff, $color-primary, 89.88%);
+    color: $color-primary !important;
   }
   
   & > a{
     width: 100%;
     display: block;
-    padding: 8px 25px;
-    line-height: 24px;
+    padding: 10px 25px;
+    line-height: 20px;
     color: inherit;
   }
 }
@@ -306,7 +334,7 @@ export default {
 .frame-float-menu-title h3{
   margin: 0;
   font-size: 16px;
-  padding: 10px 25px;
+  padding: 13px 25px;
   line-height: 24px;
   color: #303133;
   border-bottom: 1px solid #ebeef5;

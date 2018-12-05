@@ -30,28 +30,28 @@
             </el-popover>
 
             <a 
-              href="/v3" class="btn-text frame-header-btn frame-helpDoc"
+              href="/v3" class="btn-text frame-header-btn"
               title="返回旧版" v-tooltip>
               <i class="iconfont icon-jiuban"></i>
             </a>
             
             <button 
-              type="button" class="btn-text frame-header-btn frame-helpDoc"
+              type="button" class="btn-text frame-header-btn"
               @click="openHelpDoc"
               title="帮助文档" v-tooltip>
-              <i class="iconfont icon-help"></i>
+              <i class="iconfont icon-bangzhu"></i>
             </button>
 
             <button 
-              type="button" class="btn-text frame-header-btn frame-saleManager" 
+              type="button" class="btn-text frame-header-btn" 
               @click="openSaleManager"
               title="专属客服" v-tooltip>
-              <i class="iconfont icon-customerservice"></i>
+              <i class="iconfont icon-kefu"></i>
             </button>
 
             <el-popover trigger="hover" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
-              <button type="button" class="btn-text frame-header-btn frame-export" slot="reference">
-                <i class="iconfont icon-export"></i>
+              <button type="button" class="btn-text frame-header-btn" slot="reference">
+                <i class="iconfont icon-xiazai"></i>
               </button>
 
               <div class="frame-export-panel">
@@ -78,15 +78,13 @@
               <div class="frame-user-profile" slot="reference">
                 <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
                   <img :src="userAvatar"/>
+                  <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> 
                 </a>
                 <div class="user-info">
                   <h4>{{loginUser.displayName}}</h4>
-                  <p>
-                    <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> 
-                    <span>{{loginUser.state}}</span>
-                  </p>
+                  <p>{{loginUser.state}}</p>
                 </div>
-                <i class="iconfont icon-triangle-down user-profile-down"></i>
+                <i class="iconfont icon-nav-down user-profile-down"></i>
               </div>
               
               <el-popover placement="left-start" popper-class="user-state-popper" trigger="hover" v-model="userStatePopperVisible">
@@ -117,7 +115,7 @@
 
         <div class="frame-tabs">
           <button type="button" class="btn-text frame-tabs-prev" :class="{'frame-tab-highlight': prevBtnEnable}" @click="prev">
-            <i class="iconfont icon-left"></i>
+            <i class="iconfont icon-zuoyidong"></i>
           </button>
 
           <!-- tabs -->
@@ -125,12 +123,13 @@
             <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
               <frame-tab 
                 v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
-                @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>
+                @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>   
             </div>
+            <div class="frame-tabs-border"></div>
           </div>
 
           <button type="button" class="btn-text frame-tabs-next" :class="{'frame-tab-highlight': nextBtnEnable}" @click="next">
-            <i class="iconfont icon-right"></i>
+            <i class="iconfont icon-youyidong"></i>
           </button>
         </div>
       </header>
