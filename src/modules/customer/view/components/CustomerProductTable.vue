@@ -4,6 +4,8 @@
       stripe
       :data="productList"
       :highlight-current-row="false"
+      header-row-class-name="customer-product-table-header"
+      row-class-name="customer-product-table-row"
       class="customer-product-table">
       <el-table-column
         v-for="column in columns"
@@ -119,9 +121,23 @@
 <style lang="scss">
 
   .customer-product-table-container {
+    padding: 15px 15px 15px 5px;
 
     .product-link {
-      color: #2F93C0;
+      color: $color-primary;
+    }
+
+    .customer-product-table-header th{
+      background: #F5F5F5;
+      line-height: 37px;
+      font-size: 14px;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+
+    .customer-product-table-row .cell {
+      line-height: 37px;
+      font-size: 14px;
     }
 
     .customer-product-table-pagination {

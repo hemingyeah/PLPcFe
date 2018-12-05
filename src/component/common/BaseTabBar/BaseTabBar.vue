@@ -5,7 +5,7 @@
       v-for="t in tabs" :key="t.component"
       class="base-tabbar-item" :class="{'base-tabbar-selected': t.component === value}"
       @click="selectTab(t)">
-      <slot :name="`${t.component}__tab`">{{t.displayName}}</slot>       
+      <slot :name="`${t.component}__tab`">{{t.displayName}}</slot>
     </div>
     <div class="base-tabbar-line" :style="borderStyle"></div>
   </div>
@@ -69,21 +69,23 @@ export default {
     position: absolute;
     width: 100%;
     height: 2px;
-    background-color: #e4e7ed;
+    background-color: $color-regular;
     bottom: 0;
     z-index: 1;
   }
 
   .base-tabbar-item {
     min-width: 80px;
-    line-height: 20px;
+    line-height: 24px;
     padding: 12px 10px;
     font-size: 14px;
     color: #444;
     text-align: center;
     cursor: pointer;
     transition: color ease .15s;
-    font-weight: 500;
+    background: $color-regular;
+    flex-grow: 1;
+    font-weight: normal;
 
     i.iconfont{
       font-size: 14px;
@@ -92,12 +94,14 @@ export default {
   }
 
   .base-tabbar-item + .base-tabbar-item{
-    margin-left: 25px;
+    /*margin-left: 25px;*/
   }
 
   .base-tabbar-item:hover,
   .base-tabbar-item.base-tabbar-selected {
-    color:$color-primary;
+    //color:$color-primary;
+    background: #CFEAE9;
+    color: #55B7B4;
   }
 
   .base-tabbar-line {

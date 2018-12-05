@@ -1,55 +1,19 @@
 <template>
-  <base-modal title="添加联系人" :show.sync="addContactDialog" width="500px" @cancel="$emit('submit-success')"
+  <base-modal title="添加联系人" :show.sync="addContactDialog" width="470px" @cancel="$emit('submit-success')"
               class="edit-contact-dialog">
 
     <form @submit.prevent="submit" class="edit-contact-form-container">
-      <form-builder :fields="[]" class="edit-contact-form" ref="form" :value="form" @input="update">
-        <div>
-          <form-item label="姓名" :field="formFields.nameField">
-            <form-text :field="formFields.nameField" :value="form.name" @input="update"
-                       :placeholder="formFields.nameField.placeholder"></form-text>
+      <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @input="update">
+
+        <template slot="phone" slot-scope="{field}">
+          <form-item :label="field.displayName" :remote="remote.phone" validation>
+            <form-text
+              :field="field"
+              :value="form.phone" @input="update"
+              :placeholder="genPlaceholder(field)"/>
           </form-item>
-          <form-item label="电话" :field="formFields.lmPhoneField">
-            <form-text :field="formFields.lmPhoneField" :value="form.phone" @input="update"
-                       :placeholder="formFields.lmPhoneField.placeholder"></form-text>
-          </form-item>
-        </div>
-        <div>
-          <form-item label="性别" :field="formFields.genderField">
-            <form-select :field="formFields.genderField" :value="form.sex" @input="update"
-                         :placeholder="formFields.genderField.placeholder"></form-select>
-          </form-item>
-          <form-item label="邮箱" :field="formFields.emailField">
-            <form-text :field="formFields.emailField" :value="form.email" @input="update"
-                       :placeholder="formFields.emailField.placeholder"></form-text>
-          </form-item>
-        </div>
-        <div>
-          <form-item label="职位" :field="formFields.positionField">
-            <form-text :field="formFields.positionField" :value="form.position" @input="update"
-                       :placeholder="formFields.positionField.placeholder"></form-text>
-          </form-item>
-          <form-item label="部门" :field="formFields.departmentField">
-            <form-text :field="formFields.departmentField" :value="form.department" @input="update"
-                       :placeholder="formFields.departmentField.placeholder"></form-text>
-          </form-item>
-        </div>
-        <div>
-          <form-item label="关联地址" :field="formFields.addressField">
-            <form-select :field="formFields.addressField" :value="form.address" @input="update"
-                         :placeholder="formFields.addressField.placeholder"></form-select>
-          </form-item>
-          <form-item label="关联产品" :field="formFields.productField">
-            <form-select :field="formFields.productField" :value="form.productId" @input="update"
-                         :placeholder="formFields.productField.placeholder"></form-select>
-          </form-item>
-        </div>
-        <div>
-          <form-item label="备注" :field="formFields.remarkField">
-            <form-textarea :field="formFields.remarkField" :value="form.remark" @input="update"
-                           :placeholder="formFields.remarkField.placeholder"></form-textarea>
-          </form-item>
-        </div>
+        </template>
+
       </form-builder>
 
       <div class="dialog-footer">
@@ -61,11 +25,10 @@
 </template>
 
 <script>
-  import FormTextarea from "../../../../component/form/components/FormTextarea/FormTextarea";
+  import * as FormUtil from '@src/component/form/util';
 
   export default {
     name: "edit-contact-dialog",
-    components: {FormTextarea},
     props: {
       customer: {
         type: Object,
@@ -77,95 +40,12 @@
       },
     },
     data() {
-      const ctx = this;
       return {
         addContactDialog: false,
         pending: false,
-        formFields: {
-          nameField: {
-            formType: 'text',
-            fieldName: 'name',
-            displayName: "客户",
-            placeholder: '[最多50字]',
-            isNull: 0,
-          },
-          lmPhoneField: {
-            formType: 'phone',
-            fieldName: 'phone',
-            displayName: "电话",
-            placeholder: '建议使用手机号,可发送短信通知',
-            isNull: 0,
-            remote: {
-              action: '/linkman/checkUnique4Phone',
-              buildParams(val) {
-                const params = {
-                  phone: val,
-                  id: ctx.originalValue.id || '',
-                };
-                return params;
-              }
-            }
-          },
-          genderField: {
-            formType: 'selectMulti',
-            fieldName: 'sex',
-            displayName: "性别",
-            placeholder: '请选择',
-            isNull: 1,
-            setting: {
-              dataSource: ['男', '女'],
-            }
-          },
-          emailField: {
-            formType: 'email',
-            fieldName: 'email',
-            displayName: "邮箱",
-            placeholder: '',
-            isNull: 1,
-          },
-          positionField: {
-            formType: 'text',
-            fieldName: 'position',
-            displayName: "职位",
-            placeholder: '',
-            isNull: 1,
-          },
-          departmentField: {
-            formType: 'text',
-            fieldName: 'department',
-            displayName: "部门",
-            placeholder: '',
-            isNull: 1,
-          },
-          remarkField: {
-            formType: 'textarea',
-            fieldName: 'remark',
-            displayName: "备注",
-            placeholder: '[最多500字]',
-            isNull: 1,
-          },
-          productField: {
-            formType: 'selectMulti',
-            fieldName: 'productId',
-            displayName: "关联产品",
-            placeholder: '请选择',
-            isNull: 1,
-            setting: {
-              isMulti: true,
-              dataSource: [],
-            }
-          },
-          addressField: {
-            formType: 'selectMulti',
-            fieldName: 'address',
-            displayName: "关联地址",
-            placeholder: '请选择',
-            isNull: 1,
-            setting: {
-              dataSource: [],
-            }
-          },
-        },
+        products: [],
+        addresses: [],
+        remote: this.buildRemote(),
         form: {
           name: null,
           remark: '',
@@ -189,6 +69,73 @@
       },
       customerId() {
         return this.customer && this.customer.id || '';
+      },
+      fields() {
+        return [{
+          formType: 'text',
+          fieldName: 'name',
+          displayName: "客户",
+          placeholder: '[最多50字]',
+          isNull: 0,
+        }, {
+          formType: 'phone',
+          fieldName: 'phone',
+          displayName: "电话",
+          placeholder: '建议使用手机号,可发送短信通知',
+          isNull: 0,
+        }, {
+          formType: 'select',
+          fieldName: 'sex',
+          displayName: "性别",
+          placeholder: '请选择',
+          isNull: 1,
+          setting: {
+            dataSource: ['男', '女'],
+          }
+        }, {
+          formType: 'email',
+          fieldName: 'email',
+          displayName: "邮箱",
+          placeholder: '',
+          isNull: 1,
+        }, {
+          formType: 'text',
+          fieldName: 'position',
+          displayName: "职位",
+          placeholder: '',
+          isNull: 1,
+        }, {
+          formType: 'text',
+          fieldName: 'department',
+          displayName: "部门",
+          placeholder: '',
+          isNull: 1,
+        }, {
+          formType: 'textarea',
+          fieldName: 'remark',
+          displayName: "备注",
+          placeholder: '[最多500字]',
+          isNull: 1,
+        }, {
+          formType: 'select',
+          fieldName: 'productId',
+          displayName: "关联产品",
+          placeholder: '请选择',
+          isNull: 1,
+          setting: {
+            isMulti: true,
+            dataSource: this.products || [],
+          }
+        }, {
+          formType: 'select',
+          fieldName: 'address',
+          displayName: "关联地址",
+          placeholder: '请选择',
+          isNull: 1,
+          setting: {
+            dataSource: this.addresses || [],
+          }
+        }]
       }
     },
     mounted() {
@@ -196,6 +143,25 @@
 
     },
     methods: {
+      buildRemote() {
+        const originalValue = this.originalValue;
+        return {
+          phone: {
+            action: '/linkman/checkUnique4Phone',
+            buildParams(val) {
+              const params = {
+                phone: val,
+                id: originalValue.id || '',
+              };
+              return params;
+            }
+          }
+        }
+      },
+      genPlaceholder(field){
+        return FormUtil.genPlaceholder(field)
+      },
+
       fetchData() {
         let n = 0;
         let timer = setInterval(() => {
@@ -215,12 +181,13 @@
         try {
           const validateRes = await this.$refs.form.validate();
           if (!validateRes) return;
+
           this.pending = true;
 
           const params = {
             ...this.form,
             customer: this.customer,
-            productId: this.formFields.productField.setting.dataSource
+            productId: this.products
             .filter(p => this.form.productId.some((pId => pId === p.value)))
             .map(p => ({
               id: p.value,
@@ -238,7 +205,6 @@
           this.addContactDialog = false;
           this.reset();
           this.$eventBus.$emit('customer_contact_table.update_linkman_list');
-
 
         } catch (e) {
           this.pending = false;
@@ -271,6 +237,7 @@
       openDialog() {
         this.addContactDialog = true;
         if (this.action === 'edit') {
+          this.remote = this.buildRemote();
           this.matchValueToForm(this.originalValue)
         }
       },
@@ -302,7 +269,7 @@
           pageNum: 1,
         })
         .then(res => {
-          this.formFields.addressField.setting.dataSource = res.list
+          this.addresses = res.list
           .map(p => ({
             text: p.province + p.city + p.dist + p.address,
             value: p.id,
@@ -317,7 +284,7 @@
           pageNum: 1,
         })
         .then(res => {
-          this.formFields.productField.setting.dataSource = res.list
+          this.products = res.list
           .map(p => ({
             text: p.name,
             value: p.id,
@@ -334,13 +301,26 @@
   .edit-contact-dialog {
 
     .edit-contact-form-container {
-      width: 85%;
+      width: 100%;
       margin: 0 auto;
+
+      .edit-contact-form {
+        padding: 10px 0 5px;
+      }
+
+      .form-item label {
+        text-align: right;
+        width: 80px;
+      }
+
+      .form-item-control {
+        max-width: calc(100% - 80px);
+      }
     }
 
     .dialog-footer {
       text-align: right;
-      padding: 10px 30px 20px;
+      padding: 0px 0px 15px;
     }
   }
 

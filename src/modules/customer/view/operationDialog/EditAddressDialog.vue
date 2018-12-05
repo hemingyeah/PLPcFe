@@ -1,21 +1,13 @@
 <template>
   <base-modal :title="title" :show.sync="addAddressDialog" width="500px" class="edit-address-dialog">
     <form @submit.prevent="submit">
-      <form-builder :fields="[]" class="edit-address-form" ref="form" :value="form" @input="update">
-        <form-item label="" :field="addressField">
-          <form-address ref="addressForm" :field="addressField"
-                        :value="form.customerAddress" @input="update"
-                        :address-backup="addressBackup"
-                        @update-address-backup="updateAddressBackup"
-                        :placeholder="addressField.placeholder"></form-address>
-        </form-item>
+      <form-builder :fields="fields" class="edit-address-form" ref="form" :value="form" @input="update">
       </form-builder>
-      <div class="dialog-footer">
-        <el-button @click="addAddressDialog = false">关闭</el-button>
-        <el-button native-type="submit" type="primary" :disabled="pending">保存</el-button>
-      </div>
     </form>
-
+    <div class="dialog-footer" slot="footer">
+      <el-button @click="addAddressDialog = false">关闭</el-button>
+      <el-button @click="submit" type="primary" :disabled="pending">保存</el-button>
+    </div>
   </base-modal>
 </template>
 
@@ -62,7 +54,14 @@
           displayName: "地址",
           placeholder: '请输入详细地址[最多50字]',
           isNull: 0,
-        }
+        },
+        fields: [{
+          formType: 'address',
+          fieldName: 'customerAddress',
+          displayName: "地址",
+          placeholder: '请输入详细地址[最多50字]',
+          isNull: 0,
+        }]
       }
     },
     computed: {
@@ -93,23 +92,28 @@
         }
       },
       buildParams() {
-        const { adAddress, detail,} = this.form.customerAddress;
-        const { adAddress: adAddressBp, detail: detailBp, adLongitude, adLatitude, } = this.addressBackup;
+        const address = this.form.customerAddress;
+        const addressBackup = this.addressBackup;
+
         let params = {
           // id: this.loginUserId,
           id: this.defaultAddress.id || '',
           customerId: this.customerId,
-          province: adAddress[0] || '',
-          city: adAddress[1] || '',
-          dist: adAddress[2] || '',
+          province: address.province || '',
+          city: address.city || '',
+          dist: address.dist || '',
           addressType: 0,
           longitude: '',
           latitude: '',
-          address: detail,
+          address: address.address,
         };
-        if (adAddress.join('') === adAddressBp.join('') && detail === detailBp) {
-          params.longitude = adLongitude;
-          params.latitude = adLatitude;
+        if (address.province === addressBackup.province &&
+            address.city === addressBackup.city &&
+            address.dist === addressBackup.dist &&
+            address.address === addressBackup.address
+        ) {
+          params.longitude = address.longitude;
+          params.latitude = address.latitude;
           params.addressType = 1;
         }
         return params;
@@ -147,7 +151,7 @@
 <style lang="scss">
 
   .edit-address-form {
-    padding: 10px 30px;
+    padding: 15px 0 0;
 
     .form-item label {
       display: none;
@@ -160,7 +164,6 @@
 
   .dialog-footer {
     text-align: right;
-    padding: 10px 30px 20px;
   }
 
 </style>

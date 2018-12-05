@@ -4,6 +4,8 @@
       stripe
       :data="eventList"
       :highlight-current-row="false"
+      header-row-class-name="customer-event-table-header"
+      row-class-name="customer-event-table-row"
       class="customer-event-table">
       <el-table-column
         v-for="column in columns"
@@ -143,11 +145,25 @@
 <style lang="scss">
 
   .customer-event-table-container {
+    padding: 15px 15px 15px 5px;
     
     .event-link {
-      color: #2F93C0;
+      color: $color-primary;
     }
-    
+
+    .customer-event-table-header th{
+      background: #F5F5F5;
+      line-height: 37px;
+      font-size: 14px;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+
+    .customer-event-table-row .cell {
+      line-height: 37px;
+      font-size: 14px;
+    }
+
     .customer-event-table-pagination {
       text-align: right;
       margin-top: 7px;

@@ -4,6 +4,8 @@
       stripe
       :data="taskList"
       :highlight-current-row="false"
+      header-row-class-name="customer-task-table-header"
+      row-class-name="customer-task-table-row"
       class="customer-task-table">
       <el-table-column
         v-for="column in columns"
@@ -162,10 +164,25 @@
 
 <style lang="scss">
   .customer-task-table-container {
+    padding: 15px 15px 15px 5px;
 
     .task-link {
-      color: #2F93C0;
+      color: $color-primary;
     }
+
+    .customer-task-table-header th{
+      background: #F5F5F5;
+      line-height: 37px;
+      font-size: 14px;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+
+    .customer-task-table-row .cell {
+      line-height: 37px;
+      font-size: 14px;
+    }
+
     .customer-task-table-pagination {
       text-align: right;
       margin-top: 7px;

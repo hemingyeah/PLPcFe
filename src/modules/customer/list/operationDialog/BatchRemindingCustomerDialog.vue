@@ -113,11 +113,10 @@
             }
             if (res.status === 1 && res.data) {
               this.$platform.alert(`批量添加提醒失败，以下客户已存在该提醒：${res.data.join(',')}`);
+              ids = [];
             }
             this.batchRemindingCustomerDialog = false;
             this.pending = false;
-
-            console.log('res', res);
 
             this.$emit('success-callback', ids);
           })

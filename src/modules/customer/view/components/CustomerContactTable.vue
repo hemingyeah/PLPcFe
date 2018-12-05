@@ -4,6 +4,8 @@
       stripe
       :data="contactList"
       :highlight-current-row="false"
+      header-row-class-name="customer-contact-table-header"
+      row-class-name="customer-contact-table-row"
       class="customer-contact-table">
       <el-table-column
         v-for="column in columns"
@@ -186,10 +188,25 @@
 <style lang="scss">
 
   .customer-contact-table-container {
+    padding: 15px 15px 15px 5px;
 
     .edit-btn {
-      color: #2F93C0
+      color: $color-primary;
     }
+
+    .customer-contact-table-header th{
+      background: #F5F5F5;
+      line-height: 37px;
+      font-size: 14px;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+
+    .customer-contact-table-row .cell {
+      line-height: 37px;
+      font-size: 14px;
+    }
+
     .lm-action {
       display: flex;
       justify-content: space-between;

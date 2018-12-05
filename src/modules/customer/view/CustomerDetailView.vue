@@ -14,11 +14,11 @@
           </span>
 
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>黄金糕</el-dropdown-item>
-            <el-dropdown-item>狮子头</el-dropdown-item>
-            <el-dropdown-item>螺蛳粉</el-dropdown-item>
-            <el-dropdown-item>双皮奶</el-dropdown-item>
-            <el-dropdown-item>蚵仔煎</el-dropdown-item>
+            <el-dropdown-item v-for="task in taskTypes" :key="task.id">
+              <a class="link-of-dropdown" :href="`/task/createFromCustomer/${id}?defaultTypeId=${task.id}`">
+                {{task.name}}
+              </a>
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <el-dropdown trigger="click">
@@ -26,19 +26,30 @@
             <i class="el-icon-arrow-down"></i>事件
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>黄金糕</el-dropdown-item>
-            <el-dropdown-item>狮子头</el-dropdown-item>
-            <el-dropdown-item>螺蛳粉</el-dropdown-item>
-            <el-dropdown-item>双皮奶</el-dropdown-item>
-            <el-dropdown-item>蚵仔煎</el-dropdown-item>
+            <el-dropdown-item v-for="event in eventTypes" :key="event.id">
+              <a class="link-of-dropdown" :href="`/event/createFromCustomer/${id}?defaultTypeId=${event.id}`">
+                {{event.name}}
+              </a>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link el-dropdown-btn">
+            <i class="el-icon-arrow-down"></i>计划任务
+          </span>
+
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-for="task in taskTypes" :key="task.id">
+              <a class="link-of-dropdown" :href="`/task/planTask/create?defaultTypeId=${task.id}&customerId=${id}`">
+                {{task.name}}
+              </a>
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <base-button type="plain" icon="icon-left" button-text="联系人" @event="openDialog('contact')"></base-button>
-        <base-button type="plain" icon="icon-left" button-text="提醒" @event="openDialog('remind')"></base-button>
         <base-button type="plain" icon="icon-left" button-text="地址" @event="openDialog('address')"></base-button>
-        <base-button type="plain" icon="icon-left" button-text="产品" @event="openDialog('address')"></base-button>
+        <base-button type="plain" icon="icon-left" button-text="产品" @event="createProduct('address')"></base-button>
       </div>
-
     </div>
     <div class="main-content">
       <div class="customer-detail">
@@ -58,8 +69,8 @@
       </div>
       <div class="customer-relation" v-if="this.customer.id">
         <base-tabbar :tabs="tabs" v-model="currTab">
-          <div class="record-tab-label" slot="customer-info-record__tab"><i class="iconfont icon-timeline"></i>信息动态
-          </div>
+          <!--<div class="record-tab-label" slot="customer-info-record__tab"><i class="iconfont icon-timeline"></i>信息动态-->
+          <!--</div>-->
         </base-tabbar>
         <div class="customer-relation-content">
           <keep-alive>
@@ -114,6 +125,14 @@
     computed: {
       fields() {
         return (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
+      },
+      eventTypes() {
+        if (!this.initData || (this.initData && !this.initData.eventTypeList)) return [];
+        return this.initData.eventTypeList.map(t => Object.freeze(t));
+      },
+      taskTypes() {
+        if (!this.initData || (this.initData && !this.initData.taskTypeList)) return [];
+        return this.initData.taskTypeList.map(t => Object.freeze(t));
       },
       //permission
       permission() {
@@ -239,7 +258,12 @@
         }
       },
       jump() {
-        window.location.href = `/customer/edit/${this.initData.id}`
+        const id = this.id || this.initData.id;
+        window.location.href = `/customer/edit/${id}`
+      },
+      createProduct() {
+        const id = this.id || this.initData.id;
+        window.location.href = `/customer/product/createNew?cid=${id}`
       },
       goBack() {
         window.history.go(-1);
@@ -274,12 +298,7 @@
 
 <style lang="scss">
 
-
   $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
-  html, body, .page-container {
-    height: 100%;
-    overflow: hidden;
-  }
 
   body {
     padding: 10px;
@@ -314,9 +333,9 @@
 
   .customer-detail {
     height: 95%;
-    overflow: auto;
     background: #fff;
     width: 520px;
+    border-right: 1px solid #f2f2f2;
 
     h3 {
       margin: 0;
@@ -327,6 +346,17 @@
       color: $text-color-primary;
       background: $color-primary-light-9;
       font-weight: normal;
+      position: relative;
+      &:after{
+        content: '';
+        display: block;
+        position: absolute;
+        width: 10px;
+        right: -11px;
+        top: 0;
+        height: 100%;
+        background: $color-primary-light-9;
+      }
     }
   }
 
@@ -363,4 +393,12 @@
       }
     }
   }
+
+  .link-of-dropdown {
+    color: $text-color-primary;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
 </style>

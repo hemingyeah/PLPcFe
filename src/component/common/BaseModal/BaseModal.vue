@@ -149,8 +149,12 @@
 
   .base-modal-header {
     position: relative;
-    padding: 8px 40px 8px 8px;
+    padding: 10px 40px 10px 20px;
     border-bottom: 1px solid #e9ecef;
+    background: #f8f8f8;
+    font-size: 16px;
+    color: $text-color-primary;
+    font-weight: normal;
 
     align-items: center;
 
@@ -190,7 +194,11 @@
     }
   }
 
+  .base-modal-body {
+    padding: 0 30px;
+  }
+
   .base-modal-footer {
-    border-top: 1px solid #e9ecef;
+    padding: 15px 30px;
   }
 </style>

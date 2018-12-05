@@ -4,6 +4,8 @@
       stripe
       :data="remindList"
       :highlight-current-row="false"
+      header-row-class-name="customer-remind-table-header"
+      row-class-name="customer-remind-table-row"
       class="customer-remind-table">
       <el-table-column
         v-for="column in columns"
@@ -144,8 +146,22 @@
 <style lang="scss">
   .customer-remind-table-container {
 
+    padding: 15px 15px 15px 5px;
     .edit-btn {
-      color: #2F93C0;
+      color: $color-primary;
+    }
+
+    .customer-remind-table-header th{
+      background: #F5F5F5;
+      line-height: 37px;
+      font-size: 14px;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+
+    .customer-remind-table-row .cell {
+      line-height: 37px;
+      font-size: 14px;
     }
 
     .delete-remind-btn {

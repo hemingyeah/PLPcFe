@@ -4,6 +4,8 @@
       stripe
       :data="addressList"
       :highlight-current-row="false"
+      header-row-class-name="customer-address-table-header"
+      row-class-name="customer-address-table-row"
       class="customer-address-table">
       <el-table-column
         v-for="column in columns"
@@ -225,13 +227,27 @@
 <style lang="scss">
 
   .customer-address-table-container {
+    padding: 15px 15px 15px 5px;
+
+    .customer-address-table-header th{
+      background: #F5F5F5;
+      line-height: 37px;
+      font-size: 14px;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+
+    .customer-address-table-row .cell {
+      line-height: 37px;
+      font-size: 14px;
+    }
 
     .can-open-map:hover {
       cursor: pointer;
     }
 
     .edit-btn {
-      color: #2F93C0
+      color: $color-primary;
     }
 
     .delete-address-btn {
