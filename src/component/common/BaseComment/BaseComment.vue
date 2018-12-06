@@ -11,7 +11,7 @@
         :value="form.content" @input="inputContent"
         @focus="editorFocus = true" @blur="editorFocus = false"/>
       <div class="base-comment-attachment base-file__preview" v-if="form.attachments.length > 0">
-        <base-file-item v-for="file in form.attachments" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>
+        <base-file-item v-for="file in form.attachments" :key="file.id" :file="file" @delete="deleteFile" size="small"></base-file-item>
       </div>
       <div class="base-comment-footer">
         <div class="base-comment-toolbar">
@@ -202,6 +202,7 @@ export default {
 }
 
 .base-comment-editor{
+  background: #f9f9f9;
   border: none;
   resize: none;
   display: block;
@@ -213,6 +214,7 @@ export default {
 }
 
 .base-comment-footer{
+  background: #f9f9f9;
   padding: 0 8px 5px 8px;
   display: flex;
   flex-flow: row nowrap;
@@ -281,6 +283,7 @@ export default {
 
 .base-comment-attachment{
   padding: 8px;
+  background: #f9f9f9;
 
   .base-file-item:last-child{
     margin-bottom: 0;

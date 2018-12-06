@@ -1,15 +1,28 @@
 <template>
   <div class="base-file-item">
-    <div :class="clazz" :style="styl" @click.prevent.stop="preview">
-      <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
-    </div>  
-    <div class="base-file-info">
-      <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
-      <p> 
-        <span>{{file.fileSize}}</span> 
-        <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">删除</button>
-      </p>
-    </div>
+    <template v-if="size === 'normal'">
+      <div :class="clazz" :style="styl" @click.prevent.stop="preview">
+        <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
+      </div>
+      <div class="base-file-info">
+        <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
+        <p>
+          <span>{{file.fileSize}}</span>
+          <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">删除</button>
+        </p>
+      </div>
+    </template>
+    <template v-else>
+      <div :class="clazz" :style="styl" @click.prevent.stop="preview">
+        <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
+      </div>
+      <div class="base-file-info">
+        <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
+        <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">
+          <i class="iconfont icon-circle-delete" style="position: relative;top: 1px"></i>
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -28,48 +41,55 @@ export default {
     readonly: {
       type: Boolean,
       default: false
+    },
+    size: {
+      type: String,
+      default: 'normal',
     }
   },
   computed:{
     icon(){
       let file = this.file;
+      let icon = ''
       const name = file.filename;
 
       if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(name)) {
-        return "img";
-      }
-      if (/\.(ppt|pptx)$/i.test(name)) {
-        return 'ppt-file-icon';
-      }
-      if (/\.(mp3)$/i.test(name)) {
-        return 'voice-file-icon';
-      }
-      if (/\.(mp4)$/i.test(name)) {
-        return 'video-file-icon';
-      }
-      if (/\.(zip)$/i.test(name)) {
-        return 'zip-file-icon';
-      }
-      if (/\.(pdf)$/i.test(name)) {
-        return 'pdf-file-icon';
-      }
-      if (/\.(xls|xlsx)$/i.test(name)) {
-        return 'xls-file-icon';
-      }
-      if (/\.(doc|docx)$/i.test(name)) {
-        return 'doc-file-icon';
-      }
-      if (/\.(txt)$/i.test(name)) {
-        return 'txt-file-icon';
+        icon = "img";
+      } else if (/\.(ppt|pptx)$/i.test(name)) {
+        icon = 'ppt-file-icon';
+      } else if (/\.(mp3)$/i.test(name)) {
+        icon = 'voice-file-icon';
+      } else if (/\.(mp4)$/i.test(name)) {
+        icon = 'video-file-icon';
+      } else if (/\.(zip)$/i.test(name)) {
+        icon = 'zip-file-icon';
+      } else if (/\.(pdf)$/i.test(name)) {
+        icon = 'pdf-file-icon';
+      } else if (/\.(xls|xlsx)$/i.test(name)) {
+        icon = 'xls-file-icon';
+      } else if (/\.(doc|docx)$/i.test(name)) {
+        icon = 'doc-file-icon';
+      } else if (/\.(txt)$/i.test(name)) {
+        icon = 'txt-file-icon';
+      } else {
+        icon = 'other-file-icon';
       }
 
-      return 'other-file-icon';
+      if (this.size === 'small') {
+        icon = 'small-' + icon;
+      }
+
+      return icon;
     },
     clazz(){
       let clazz = ['base-file-preview'];
 
       if(this.icon != 'img'){
         clazz = clazz.concat(['base-file-icon', this.icon])
+      }
+
+      if (this.size === 'small') {
+        clazz = clazz.concat(['small-base-file-preview', 'small-base-file-icon'])
       }
 
       return clazz;
@@ -155,7 +175,8 @@ export default {
   }
 
   & > a{
-    color: $text-color-regular;
+    //color: $text-color-regular;
+    color: $text-color-primary;
     line-height: 20px !important;;
     font-size: 14px;
     display: inline-block;
@@ -181,9 +202,19 @@ export default {
   }
 }
 
+.small-base-file-preview {
+  width: 20px;
+  height: 20px;
+
+}
+
 .base-file-icon{
   background-image: url("../../../assets/img/file-icon.png");
   background-size: 38px;
+}
+
+.small-base-file-icon{
+  background-size: 20px;
 }
 
 .ppt-file-icon {
@@ -214,6 +245,35 @@ export default {
   background-position: left 0 bottom 0px;
 }
 
+// small
+.small-ppt-file-icon {
+  background-position: left 0 top 0;
+}
+.small-voice-file-icon {
+  background-position: left 0 top -20px;
+}
+.small-other-file-icon {
+  background-position: left 0 top -40px;
+}
+.small-video-file-icon {
+  background-position: left 0 top -60px;
+}
+.small-zip-file-icon {
+  background-position: left 0 top -80px;
+}
+.small-pdf-file-icon {
+  background-position: left 0 top -100px;
+}
+.small-xls-file-icon {
+  background-position: left 0 top -120px;
+}
+.small-doc-file-icon {
+  background-position: left 0 bottom -20px;
+}
+.small-txt-file-icon {
+  background-position: left 0 bottom 0px;
+}
+
 .base-file-del{
   margin-left: 5px;
   padding: 0;
@@ -222,6 +282,9 @@ export default {
 
   &:hover{
     color: #ed3f14;
+    .iconfont {
+      color: #ed3f14;
+    }
   }
 }
 </style>

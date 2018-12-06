@@ -111,6 +111,7 @@
           this.taskList = res.list
           .map(task => {
             task.createTime = formatDate(new Date(task.createTime), 'YYYY-MM-DD HH:mm:ss');
+            task.completeTime = formatDate(new Date(task.completeTime), 'YYYY-MM-DD HH:mm:ss');
             if (!task.products || !task.products.length) {
               task.productName = task.product ? task.product.name : '';
             } else {

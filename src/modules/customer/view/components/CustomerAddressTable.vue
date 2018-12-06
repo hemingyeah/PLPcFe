@@ -57,7 +57,7 @@
 
     <edit-address-dialog ref="addAddressDialog" :customer-id="customerId"
                          :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="fetchData"
-                         :default-address="formatSelectedAddress"></edit-address-dialog>
+                         :default-address="selectedAddress"></edit-address-dialog>
   </div>
 </template>
 
@@ -92,18 +92,6 @@
       customerId() {
         return this.shareData.customer ? this.shareData.customer.id : '';
       },
-      formatSelectedAddress() {
-        const {province, city, dist, address, longitude, latitude, addressType, id} = this.selectedAddress;
-        if (!province || !city) return {};
-        return {
-          adAddress: [province, city, dist],
-          detail: address,
-          adLongitude: longitude || '',
-          adLatitude: latitude || '',
-          addressType: addressType || 0,
-          id
-        }
-      }
     },
     mounted() {
       this.fetchData();

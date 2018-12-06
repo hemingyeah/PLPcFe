@@ -216,7 +216,7 @@
 
   .batch-remind-customer-dialog {
     .base-modal-body {
-      padding: 10px;
+      padding: 15px 30px 0;
     }
 
     .el-form-item {
@@ -227,7 +227,7 @@
     }
 
     .el-select {
-      width: 90%;
+      width: 100%;
     }
 
     .content-item {
@@ -240,7 +240,6 @@
     }
 
     .dialog-footer {
-      padding: 10px 50px;
       display: flex;
       justify-content: flex-end;
     }

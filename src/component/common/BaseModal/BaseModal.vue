@@ -195,7 +195,7 @@
   }
 
   .base-modal-body {
-    padding: 0 30px;
+    padding: 0px 30px;
   }
 
   .base-modal-footer {

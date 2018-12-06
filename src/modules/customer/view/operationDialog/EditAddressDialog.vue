@@ -136,7 +136,7 @@
       openDialog() {
         this.addAddressDialog = true;
         if (this.action === 'edit') {
-          this.update({field: this.addressField, newValue: this.defaultAddress});
+          this.update({field: this.fields[0], newValue: this.defaultAddress});
         }
 
         if (this.defaultAddress.addressType) {
@@ -162,8 +162,11 @@
     }
   }
 
-  .dialog-footer {
-    text-align: right;
-  }
+  .edit-address-dialog {
 
+    .base-modal-footer {
+      padding-top: 5px;
+      text-align: right;
+    }
+  }
 </style>
