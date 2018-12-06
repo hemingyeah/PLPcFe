@@ -2,7 +2,8 @@ $color-primary: #55B7B4 !default;
 $color-danger: #ed3f14 !default;
 $color-regular: #eef8f8 !default;
 
-$color-primary-hover: rgba($color-primary,.1) !default;
+//$color-primary-hover: rgba($color-primary,.1) !default;
+$color-primary-hover: mix(#fff, $color-primary, 89.88%) !default;
 
 $text-color-primary: #333 !default;
 $text-color-regular: #666 !default;

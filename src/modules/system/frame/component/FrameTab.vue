@@ -59,7 +59,6 @@ export default {
 
   transition: all ease .3s;
   padding: 12px 10px;
-  border-radius: 4px 4px 0 0;
 
   .base-spin{
     display: block;

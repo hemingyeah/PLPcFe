@@ -30,27 +30,27 @@
             </el-popover>
 
             <a 
-              href="/v3" class="btn-text frame-header-btn"
+              href="/v3" class="btn-text frame-header-btn frame-header-btn-bg"
               title="返回旧版" v-tooltip>
               <i class="iconfont icon-jiuban"></i>
             </a>
             
             <button 
-              type="button" class="btn-text frame-header-btn"
+              type="button" class="btn-text frame-header-btn frame-header-btn-bg"
               @click="openHelpDoc"
               title="帮助文档" v-tooltip>
               <i class="iconfont icon-bangzhu"></i>
             </button>
 
             <button 
-              type="button" class="btn-text frame-header-btn" 
+              type="button" class="btn-text frame-header-btn frame-header-btn-bg" 
               @click="openSaleManager"
               title="专属客服" v-tooltip>
               <i class="iconfont icon-kefu"></i>
             </button>
 
             <el-popover trigger="hover" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
-              <button type="button" class="btn-text frame-header-btn" slot="reference">
+              <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
                 <i class="iconfont icon-xiazai"></i>
               </button>
 

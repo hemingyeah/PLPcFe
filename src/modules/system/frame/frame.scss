@@ -1,3 +1,5 @@
+//$-header-hover-color:  #CFEAE9;
+
 html, body, .frame{
   height: 100%;
   overflow: hidden;
@@ -12,22 +14,6 @@ html, body, .frame{
 .frame-content{
   flex: 1;
   height: 100%;
-}
-
-.frame-user-profile{
-  position: relative;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  padding: 4px 0;
-  color: $text-color-secondary;
-  width: 160px;
-  transition: background-color ease .3s;
-  z-index: 9;
-
-  &:hover{
-    background-color: $color-primary-hover;
-  }
 }
 
 .logout:hover a{
@@ -53,29 +39,6 @@ html, body, .frame{
     padding: 5px 8px;
     color: red;
   }
-}
-
-.user-state-popper{
-  margin-top: -5px;
-  background-color: #fff;
-  padding: 0;
-  
-  border-radius: 2px;
-  border: none;
-  box-shadow: 1px 1px 8px rgba(0, 21, 41, .175);
-  transition: background-color ease .3s;
-}
-
-.user-state-panel{
-  padding: 5px 0;
-  max-height: 620px;
-  overflow-y: auto;
-}
-
-.user-state-item{
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
 }
 
 .frame-tab-transition{
@@ -183,12 +146,15 @@ html, body, .frame{
 
   &:hover{
     color: $color-primary;
-    background-color: #CFEAE9;
   }
 
   i.iconfont{
     font-size: 16px;
   }
+}
+
+.frame-header-btn-bg:hover{
+  background: $color-primary-hover;
 }
 
 /**************** frame tabs ****************/
@@ -227,6 +193,7 @@ html, body, .frame{
   text-align: center;
   line-height: 40px;
   color: #999;
+  padding: 0;
   cursor: not-allowed;
   border-bottom: 1px solid #f2f2f2;
 
@@ -356,7 +323,23 @@ button.export-operate-btn{
   color: #007bff;
 }
 
-/**************** export ****************/
+/**************** user ****************/
+.frame-user-profile{
+  position: relative;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 4px 0;
+  color: $text-color-secondary;
+  width: 160px;
+  transition: background-color ease .3s;
+  z-index: 9;
+
+  &:hover{
+    background-color: $color-primary-hover;
+  }
+}
+
 .user-profile{
   width: 100%;
   height: 100%;
@@ -467,4 +450,27 @@ button.export-operate-btn{
   width: 9px;
   height: 9px;
   border: 1px solid #fff;
+}
+
+.user-state-popper{
+  margin-top: -5px;
+  background-color: #fff;
+  padding: 0;
+  
+  border-radius: 2px;
+  border: none;
+  box-shadow: 1px 1px 8px rgba(0, 21, 41, .175);
+  transition: background-color ease .3s;
+}
+
+.user-state-panel{
+  padding: 5px 0;
+  max-height: 620px;
+  overflow-y: auto;
+}
+
+.user-state-item{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
 }

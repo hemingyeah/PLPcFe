@@ -143,8 +143,6 @@ export default {
 </script>
 
 <style lang="scss">
-$-nav-hover-color: lighten($color-primary, 3%);
-
 .frame-nav{
   width: 60px;
   height: 100%;
@@ -238,7 +236,7 @@ $-nav-hover-color: lighten($color-primary, 3%);
   transition: background-color ease .3s;
 
   &:hover{
-    background-color: $-nav-hover-color;
+    background-color: lighten($color-primary, 3%);
 
     .frame-float-menu{
       display: block !important;
