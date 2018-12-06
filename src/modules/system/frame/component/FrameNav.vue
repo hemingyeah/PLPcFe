@@ -144,7 +144,7 @@ export default {
 
 <style lang="scss">
 .frame-nav{
-  width: 60px;
+  width: 50px;
   height: 100%;
   background-color: $color-primary;
   box-shadow: 1px 0 8px rgba(0,0,0,.125);
@@ -277,7 +277,7 @@ export default {
 }
 
 .frame-menu-icon{
-  width: 60px;
+  width: 50px;
   height: 50px;
 
   display: flex;
@@ -321,7 +321,7 @@ export default {
 .frame-float-menu{
   display: none;
   position: absolute;
-  left: 60px;
+  left: 50px;
   top: 0;
   overflow: hidden;
   width: 176px;
