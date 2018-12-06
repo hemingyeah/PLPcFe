@@ -34,7 +34,7 @@ module.exports = {
     "no-use-before-define": ["error", {functions: false}], //禁止定义前使用
 
     //Stylistic Issues
-    //"indent": ["warn", 2],
+    "indent": ["warn", 2],
     "brace-style": "warn", //一致的大括号风格
     "no-multi-spaces": "warn", //禁止使用多个空格
     "no-multiple-empty-lines": ["warn",{max: 3}], //禁止出现多行空行,

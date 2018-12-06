@@ -12,23 +12,23 @@
 </template>
 
 <script>
-  export default {
-    name: 'form-address-preview',
-    props: {
-      field: {
-        type: Object,
-        default: () => ({})
-      },
-      setting: {
-        type: Object,
-        default: () => ({})
-      }
+export default {
+  name: 'form-address-preview',
+  props: {
+    field: {
+      type: Object,
+      default: () => ({})
     },
-    methods: {
-      choose(){
-        this.$emit('chooseField', this.field)
-      }
+    setting: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  methods: {
+    choose(){
+      this.$emit('chooseField', this.field)
     }
   }
+}
 </script>
 

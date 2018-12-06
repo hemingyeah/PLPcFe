@@ -411,240 +411,240 @@
 </template>
 
 <script>
-  import _ from 'lodash';
-  import {formatDate,} from '../../../util/lang';
-  import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
-  import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
-  import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
-  import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
+import _ from 'lodash';
+import {formatDate,} from '../../../util/lang';
+import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
+import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
+import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
+import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
 
-  export default {
-    name: 'customer-list-view',
-    data() {
-      return {
-        // self state
-        pending: false,
-        loadingListData: false,
-        advancedSearchPanelShow: false,
-        multipleSelectionPanelShow: false,
-        paramsBackup: {
-          specialSearchModel: {
-            addressSelector: [],
-            adAddress: '',
-          },
-          customizedSearchModel: {},
-          createUserName: '',
-          customerManagerName: '',
-          serialNumber: '',
-          linkmanId: '',
-          tagId: '',
-          hasRemind: '',
-          status: '',
-          createUser: '',
-          customerManager: '',
-          createTime: '',
-          customerAddress: {},
-          orderDetail: {},
-          keyword: '',
-          pageNum: 1,
-          pageSize: 10,
+export default {
+  name: 'customer-list-view',
+  data() {
+    return {
+      // self state
+      pending: false,
+      loadingListData: false,
+      advancedSearchPanelShow: false,
+      multipleSelectionPanelShow: false,
+      paramsBackup: {
+        specialSearchModel: {
+          addressSelector: [],
+          adAddress: '',
         },
-        params: {
-          specialSearchModel: {
-            addressSelector: [],
-            adAddress: '',
-          },
-          customizedSearchModel: {},
-          createUserName: '',
-          customerManagerName: '',
-          serialNumber: '',
-          linkmanId: '',
-          tagId: '',
-          hasRemind: '',
-          status: '',
-          createUser: '',
-          customerManager: '',
-          createTime: '',
-          customerAddress: {},
-          orderDetail: {},
+        customizedSearchModel: {},
+        createUserName: '',
+        customerManagerName: '',
+        serialNumber: '',
+        linkmanId: '',
+        tagId: '',
+        hasRemind: '',
+        status: '',
+        createUser: '',
+        customerManager: '',
+        createTime: '',
+        customerAddress: {},
+        orderDetail: {},
+        keyword: '',
+        pageNum: 1,
+        pageSize: 10,
+      },
+      params: {
+        specialSearchModel: {
+          addressSelector: [],
+          adAddress: '',
         },
-        createTimePickerOptions: {
-          shortcuts: [{
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
+        customizedSearchModel: {},
+        createUserName: '',
+        customerManagerName: '',
+        serialNumber: '',
+        linkmanId: '',
+        tagId: '',
+        hasRemind: '',
+        status: '',
+        createUser: '',
+        customerManager: '',
+        createTime: '',
+        customerAddress: {},
+        orderDetail: {},
+      },
+      createTimePickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      },
+      paginationInfo: {
+        pageSize: 10,
+        pageNum: 1,
+        totalItems: 0,
+        totalPages: 0,
+      },
+      multipleSelection: [],
+      defaultAddress: [],
+      // data from remote
+      customers: [],
+      columns: this.fixedColumns(),
+      customerConfig: {},
+      searchFields: [],
+      inputRemoteSearch: {
+        linkman: {
+          options: [],
+          loading: false,
         },
-        paginationInfo: {
-          pageSize: 10,
-          pageNum: 1,
-          totalItems: 0,
-          totalPages: 0,
+        tag: {
+          options: [],
+          loading: false,
         },
-        multipleSelection: [],
-        defaultAddress: [],
-        // data from remote
-        customers: [],
-        columns: this.fixedColumns(),
-        customerConfig: {},
-        searchFields: [],
-        inputRemoteSearch: {
-          linkman: {
-            options: [],
-            loading: false,
-          },
-          tag: {
-            options: [],
-            loading: false,
-          },
-          creator: {
-            options: [],
-            loading: false,
-          },
-          customerManager: {
-            options: [],
-            loading: false,
-          },
+        creator: {
+          options: [],
+          loading: false,
         },
-        selectedLimit: 200,
-        auth: {}
-      };
+        customerManager: {
+          options: [],
+          loading: false,
+        },
+      },
+      selectedLimit: 200,
+      auth: {}
+    };
+  },
+  computed: {
+    editedPermission() {
+      return this.auth.CUSTOMER_EDIT;
     },
-    computed: {
-      editedPermission() {
-        return this.auth.CUSTOMER_EDIT;
-      },
-      highLevelPermission() {
-        return this.auth.CUSTOMER_EDIT === 3;
-      },
-      exportPermission() {
-        return this.auth.EXPORT_IN;
-      },
-      selectedIds() {
-        return this.multipleSelection.map(c => c.id) || [];
-      },
-      exportColumns() {
-        return this.columns.map(c => {
-          if (c.field !== 'customerAddress' && c.field !== 'remindCount') {
-            c.export = true;
-          }
-
-          if (c.field === 'detailAddress') {
-            c.exportAlias = 'customerAddress';
-          }
-
-          if (c.field === 'tags') {
-            c.exportAlias = 'customerTags';
-          }
-
-          if (c.field === 'customerManagerName') {
-            c.exportAlias = 'customerManager';
-          }
-
-          if (c.field === 'status') {
-            c.label = '状态';
-          }
-
-          return c;
-        });
-      }
+    highLevelPermission() {
+      return this.auth.CUSTOMER_EDIT === 3;
     },
-    filters: {
-      tagName: function (value) {
-        if (!value || !Array.isArray(value) || !value.length) return '';
+    exportPermission() {
+      return this.auth.EXPORT_IN;
+    },
+    selectedIds() {
+      return this.multipleSelection.map(c => c.id) || [];
+    },
+    exportColumns() {
+      return this.columns.map(c => {
+        if (c.field !== 'customerAddress' && c.field !== 'remindCount') {
+          c.export = true;
+        }
 
-        return value
+        if (c.field === 'detailAddress') {
+          c.exportAlias = 'customerAddress';
+        }
+
+        if (c.field === 'tags') {
+          c.exportAlias = 'customerTags';
+        }
+
+        if (c.field === 'customerManagerName') {
+          c.exportAlias = 'customerManager';
+        }
+
+        if (c.field === 'status') {
+          c.label = '状态';
+        }
+
+        return c;
+      });
+    }
+  },
+  filters: {
+    tagName: function (value) {
+      if (!value || !Array.isArray(value) || !value.length) return '';
+
+      return value
         .filter(tag => tag && tag.tagName)
         .map(tag => tag.tagName)
         .join('，');
-      },
-      displaySelect(value) {
-        if (!value) return null;
-        if (value && typeof value === 'string') {
-          return value;
-        }
-        if (Array.isArray(value) && value.length) {
-          return value.join('，');
-        }
-        return null;
-      },
     },
-    mounted() {
-      let initData = JSON.parse(window._init) || {};
-      const localStorageData = this.getLocalStorageData();
-      if (localStorageData.pageSize) {
-        this.paramsBackup.pageSize = Number(localStorageData.pageSize);
-        this.paginationInfo.pageSize = Number(localStorageData.pageSize);
+    displaySelect(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
       }
-      this.customerConfig = {
-        customerAddressConfig: initData.customerAddressConfig,
-        customerConfig: initData.customerConfig,
-        fieldInfo: (initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId)
-      };
+      if (Array.isArray(value) && value.length) {
+        return value.join('，');
+      }
+      return null;
+    },
+  },
+  mounted() {
+    let initData = JSON.parse(window._init) || {};
+    const localStorageData = this.getLocalStorageData();
+    if (localStorageData.pageSize) {
+      this.paramsBackup.pageSize = Number(localStorageData.pageSize);
+      this.paginationInfo.pageSize = Number(localStorageData.pageSize);
+    }
+    this.customerConfig = {
+      customerAddressConfig: initData.customerAddressConfig,
+      customerConfig: initData.customerConfig,
+      fieldInfo: (initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId)
+    };
 
-      this.auth = initData.auth || {};
+    this.auth = initData.auth || {};
 
-      const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
-      this.defaultAddress = [adProvince, adCity, adDist,];
+    const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
+    this.defaultAddress = [adProvince, adCity, adDist,];
 
-      this.buildConfig();
-      this.search();
+    this.buildConfig();
+    this.search();
 
-      // 团队、人员等搜索、默认加载部分数据
-      Promise.all([
-        this.searchCreator(),
-        this.searchLinkman(),
-        this.searchTag(),
-      ])
+    // 团队、人员等搜索、默认加载部分数据
+    Promise.all([
+      this.searchCreator(),
+      this.searchLinkman(),
+      this.searchTag(),
+    ])
       .then(res => {
         this.inputRemoteSearch.customerManager.options = res[0].list;
       })
       .catch(err => console.error('err', err));
-    },
-    methods: {
-      formatAddress(ad) {
-        if(null == ad) return '';
+  },
+  methods: {
+    formatAddress(ad) {
+      if(null == ad) return '';
         
-        const {adProvince, adCity, adDist,} = ad;
-        return [adProvince, adCity, adDist,]
+      const {adProvince, adCity, adDist,} = ad;
+      return [adProvince, adCity, adDist,]
         .filter(d => !!d).join('-');
-      },
-      remindSuccess(ids) {
-        let tv = false;
-        if (!ids || !ids.length) return;
+    },
+    remindSuccess(ids) {
+      let tv = false;
+      if (!ids || !ids.length) return;
 
-        this.customers.forEach(c => {
-          tv = ids.some(id => c.id === id);
-          if (!tv) return;
-          if (!c.attribute.remindCount) {
-            c.attribute.remindCount = 1;
-          } else {
-            c.attribute.remindCount += 1;
-          }
-        });
-      },
-      buildConfig() {
-        this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
+      this.customers.forEach(c => {
+        tv = ids.some(id => c.id === id);
+        if (!tv) return;
+        if (!c.attribute.remindCount) {
+          c.attribute.remindCount = 1;
+        } else {
+          c.attribute.remindCount += 1;
+        }
+      });
+    },
+    buildConfig() {
+      this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
         .map(f => {
           if (f.isSearch) {
             // 需要搜索的字段
@@ -659,59 +659,59 @@
 
           return f;
         });
-        this.columns = this.buildTableColumn();
-      },
-      jumpPage() {
-        window.location = '/customer/create';
-      },
-      buildExportParams(checkedArr, ids) {
-        let params = {};
+      this.columns = this.buildTableColumn();
+    },
+    jumpPage() {
+      window.location = '/customer/create';
+    },
+    buildExportParams(checkedArr, ids) {
+      let params = {};
 
-        if (ids && ids.length) {
-          params = {
-            customerChecked: checkedArr.join(','),
-            data: ids.join(','),
-            exportSearchModel: '',
-          };
-        } else {
-          params = {
-            customerChecked: checkedArr.join(','),
-            data: '',
-            exportSearchModel: JSON.stringify(this.buildParams() || {}),
-          }
-        }
-        return params;
-      },
-      exportCustomer(exportAll) {
-        let ids = [];
-        let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}客户数据.xlsx`;
-        if (!exportAll) {
-          if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
-          ids = this.selectedIds;
-        }
-        this.$refs.exportPanel.open(ids, fileName);
-      },
-      importSucc() {
-        // console.log('importSucc');
-      },
-      search(cp = {}, fullSearch) {
-        // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
-        let params = {};
-        this.loadingListData = true;
-
-        if (fullSearch) {
-          this.paramsBackup = {
-            ...this.paramsBackup,
-            ..._.cloneDeep(this.params),
-          };
-        }
-
+      if (ids && ids.length) {
         params = {
-          ...this.buildParams(),
-          ...cp,
+          customerChecked: checkedArr.join(','),
+          data: ids.join(','),
+          exportSearchModel: '',
         };
+      } else {
+        params = {
+          customerChecked: checkedArr.join(','),
+          data: '',
+          exportSearchModel: JSON.stringify(this.buildParams() || {}),
+        }
+      }
+      return params;
+    },
+    exportCustomer(exportAll) {
+      let ids = [];
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}客户数据.xlsx`;
+      if (!exportAll) {
+        if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+        ids = this.selectedIds;
+      }
+      this.$refs.exportPanel.open(ids, fileName);
+    },
+    importSucc() {
+      // console.log('importSucc');
+    },
+    search(cp = {}, fullSearch) {
+      // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
+      let params = {};
+      this.loadingListData = true;
 
-        this.$http.post('/v2/customer/list', params)
+      if (fullSearch) {
+        this.paramsBackup = {
+          ...this.paramsBackup,
+          ..._.cloneDeep(this.params),
+        };
+      }
+
+      params = {
+        ...this.buildParams(),
+        ...cp,
+      };
+
+      this.$http.post('/v2/customer/list', params)
         .then(res => {
           if (!res || !res.list) {
             this.customers = [];
@@ -722,10 +722,10 @@
             const {pages, total, pageNum, list,} = res;
 
             this.customers = list
-            .map(c => {
-              c.pending = false;
-              return c;
-            });
+              .map(c => {
+                c.pending = false;
+                return c;
+              });
 
             this.paginationInfo.totalItems = total;
             this.paginationInfo.totalPages = pages;
@@ -743,33 +743,33 @@
           this.loadingListData = false;
           console.error('err', err);
         })
-      },
-      buildParams() {
-        let tv = null; // tv means temporary variable that used inside the loop.
-        const conditions = [];
-        let params = _.cloneDeep(this.paramsBackup);
+    },
+    buildParams() {
+      let tv = null; // tv means temporary variable that used inside the loop.
+      const conditions = [];
+      let params = _.cloneDeep(this.paramsBackup);
 
-        // createTime
-        if (params.createTime && params.createTime.length) {
-          params.createTimeStart = formatDate(params.createTime[0]);
-          params.createTimeEnd = `${formatDate(params.createTime[1])} 23:59:59`;
-          delete params.createTime;
-        }
+      // createTime
+      if (params.createTime && params.createTime.length) {
+        params.createTimeStart = formatDate(params.createTime[0]);
+        params.createTimeEnd = `${formatDate(params.createTime[1])} 23:59:59`;
+        delete params.createTime;
+      }
 
-        // address
-        if (this.paramsBackup.specialSearchModel.addressSelector.length) {
-          params.customerAddress = {
-            adProvince: this.paramsBackup.specialSearchModel.addressSelector[0],
-            adCity: this.paramsBackup.specialSearchModel.addressSelector[1] || '',
-            adDist: this.paramsBackup.specialSearchModel.addressSelector[2] || '',
-          };
-        }
-        params.customerAddress.adAddress = this.paramsBackup.specialSearchModel.adAddress || '';
+      // address
+      if (this.paramsBackup.specialSearchModel.addressSelector.length) {
+        params.customerAddress = {
+          adProvince: this.paramsBackup.specialSearchModel.addressSelector[0],
+          adCity: this.paramsBackup.specialSearchModel.addressSelector[1] || '',
+          adDist: this.paramsBackup.specialSearchModel.addressSelector[2] || '',
+        };
+      }
+      params.customerAddress.adAddress = this.paramsBackup.specialSearchModel.adAddress || '';
 
-        params = this.deleteValueFromObject(params, [0, false]);
+      params = this.deleteValueFromObject(params, [0, false]);
 
-        // build customized search fields
-        Object.keys(this.paramsBackup.customizedSearchModel)
+      // build customized search fields
+      Object.keys(this.paramsBackup.customizedSearchModel)
         .forEach(key => {
           tv = this.paramsBackup.customizedSearchModel[key];
           if (tv.value && tv.formType === 'date') {
@@ -798,23 +798,23 @@
           }
         });
 
-        if (conditions.length) {
-          params.conditions = conditions;
-        }
+      if (conditions.length) {
+        params.conditions = conditions;
+      }
 
-        delete params.customizedSearchModel;
+      delete params.customizedSearchModel;
 
-        return params;
-      },
-      // 把对象中!!为false的值去除（eg. false, undefined, null...），except 可以把想保留的值留下(eg.[0])
-      // 主要用于向后端传参，把无用的空值过滤掉
-      // var a = { a: 0, b: 1, c: null, d: undefined, e: false}
-      //deleteValueFromObject(a) =>  {b: 1}
-      //deleteValueFromObject(a, [0]) =>  {a: 0, b: 1}
-      deleteValueFromObject(sourceObj, except = []) {
-        let obj = _.cloneDeep(sourceObj);
-        if (except.length) {
-          Object.keys(obj)
+      return params;
+    },
+    // 把对象中!!为false的值去除（eg. false, undefined, null...），except 可以把想保留的值留下(eg.[0])
+    // 主要用于向后端传参，把无用的空值过滤掉
+    // var a = { a: 0, b: 1, c: null, d: undefined, e: false}
+    //deleteValueFromObject(a) =>  {b: 1}
+    //deleteValueFromObject(a, [0]) =>  {a: 0, b: 1}
+    deleteValueFromObject(sourceObj, except = []) {
+      let obj = _.cloneDeep(sourceObj);
+      if (except.length) {
+        Object.keys(obj)
           .forEach(key => {
             if (typeof obj[key] === 'object' && obj[key]) {
               obj[key] = this.deleteValueFromObject(obj[key], except);
@@ -823,8 +823,8 @@
               delete obj[key];
             }
           });
-        } else {
-          Object.keys(obj)
+      } else {
+        Object.keys(obj)
           .forEach(key => {
             if (typeof obj[key] === 'object' && obj[key]) {
               obj[key] = this.deleteValueFromObject(obj[key]);
@@ -833,30 +833,30 @@
               delete obj[key];
             }
           });
-        }
-        if (Object.keys(obj).length) {
-          return obj;
-        } else {
-          return undefined;
-        }
-      },
-      handleCitySelectorChange(city) {
-        this.params.specialSearchModel.addressSelector = city;
-      },
-      cancelSelectCustomer(customer) {
-        if (!customer || !customer.id) return;
-        this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
-        this.toggleSelection([customer]);
-      },
-      toggleStatus(row) {
-        const ns = row.status ? 0 : 1;
-        row.pending = true;
-        const params = {
-          id: row.id,
-          status: ns,
-        };
+      }
+      if (Object.keys(obj).length) {
+        return obj;
+      } else {
+        return undefined;
+      }
+    },
+    handleCitySelectorChange(city) {
+      this.params.specialSearchModel.addressSelector = city;
+    },
+    cancelSelectCustomer(customer) {
+      if (!customer || !customer.id) return;
+      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== customer.id);
+      this.toggleSelection([customer]);
+    },
+    toggleStatus(row) {
+      const ns = row.status ? 0 : 1;
+      row.pending = true;
+      const params = {
+        id: row.id,
+        status: ns,
+      };
 
-        this.$http.post('/customer/changeState', params, false, {cancelable: false})
+      this.$http.post('/customer/changeState', params, false, {cancelable: false})
         .then(res => {
           row.pending = false;
           this.customers.forEach(c => {
@@ -869,146 +869,146 @@
           row.pending = false;
           console.error('toggleStatus catch err', err);
         })
-      },
-      sortChange(option) {
-        const {prop, order} = option;
-        if (!order) {
-          this.paramsBackup.orderDetail = {};
-          return this.search();
-        }
+    },
+    sortChange(option) {
+      const {prop, order} = option;
+      if (!order) {
+        this.paramsBackup.orderDetail = {};
+        return this.search();
+      }
 
-        let sortModel = {
-          isSystem: prop === 'createTime' ? 1 : 0,
-          sequence: order === 'ascending' ? 'ASC' : 'DESC',
-        };
+      let sortModel = {
+        isSystem: prop === 'createTime' ? 1 : 0,
+        sequence: order === 'ascending' ? 'ASC' : 'DESC',
+      };
 
-        sortModel.column = sortModel.isSystem ? `customer.${prop}` : prop;
-        sortModel.type = this.customerConfig.fieldInfo.filter(sf => sf.fieldName === prop)[0].formType;
+      sortModel.column = sortModel.isSystem ? `customer.${prop}` : prop;
+      sortModel.type = this.customerConfig.fieldInfo.filter(sf => sf.fieldName === prop)[0].formType;
 
-        if (sortModel.type === 'datetime') {
-          sortModel.type = 'date';
-        }
-        this.paramsBackup.orderDetail = sortModel;
+      if (sortModel.type === 'datetime') {
+        sortModel.type = 'date';
+      }
+      this.paramsBackup.orderDetail = sortModel;
 
-        this.search();
-      },
-      jump(pageNum) {
-        this.paramsBackup.pageNum = pageNum;
-        this.search();
-      },
-      handleSizeChange(pageSize) {
-        this.saveDataToStorage('pageSize', pageSize);
-        this.paramsBackup.pageNum = 1;
-        this.paramsBackup.pageSize = pageSize;
-        this.search();
-      },
-      // select customer
-      handleSelection(selection) {
-        let tv = this.computeSelection(selection);
-        let original = this.multipleSelection
+      this.search();
+    },
+    jump(pageNum) {
+      this.paramsBackup.pageNum = pageNum;
+      this.search();
+    },
+    handleSizeChange(pageSize) {
+      this.saveDataToStorage('pageSize', pageSize);
+      this.paramsBackup.pageNum = 1;
+      this.paramsBackup.pageSize = pageSize;
+      this.search();
+    },
+    // select customer
+    handleSelection(selection) {
+      let tv = this.computeSelection(selection);
+      let original = this.multipleSelection
         .filter(ms => this.customers.some(cs => cs.id === ms.id));
-        let unSelected = this.customers
+      let unSelected = this.customers
         .filter(c => original.every(oc => oc.id !== c.id));
 
-        if (tv.length > this.selectedLimit) {
-          unSelected.forEach(row => {
-            this.$refs.multipleTable.toggleRowSelection(row, false);
-          });
-          return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
-        }
-        this.multipleSelection = tv;
-      },
-      computeSelection(selection) {
-        let tv = [];
-        tv = this.multipleSelection
+      if (tv.length > this.selectedLimit) {
+        unSelected.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row, false);
+        });
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+      }
+      this.multipleSelection = tv;
+    },
+    computeSelection(selection) {
+      let tv = [];
+      tv = this.multipleSelection
         .filter(ms => this.customers.every(c => c.id !== ms.id));
-        tv = _.uniqWith([...tv, ...selection], _.isEqual);
-        return tv;
-      },
-      toggleSelection(rows) {
-        if (rows) {
-          rows.forEach(row => {
-            this.$refs.multipleTable.toggleRowSelection(row);
-          });
-        } else {
-          this.$refs.multipleTable.clearSelection();
-          this.multipleSelection = [];
-        }
-      },
-      // list method end
+      tv = _.uniqWith([...tv, ...selection], _.isEqual);
+      return tv;
+    },
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+        this.multipleSelection = [];
+      }
+    },
+    // list method end
 
-      // operation dialog
-      openDialog(category) {
-        if (category === 'sendMessage') {
-          this.$refs.messageDialog.openSendMessageDialog();
-        }
-        if (category === 'edit') {
-          this.$refs.batchEditingCustomerDialog.openBatchEditingCustomerDialog();
-        }
-        if (category === 'remind') {
-          this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
-        }
-        if (category === 'importCustomer') {
-          this.$refs.importCustomerModal.open();
-        }
-        if (category === 'importLinkman') {
-          this.$refs.importLinkmanModal.open();
-        }
-        if (category === 'update') {
-          this.$refs.batchUpdateCustomerDialog.openBatchUpdateCustomerDialog();
-        }
-      },
-      async deleteCustomer() {
-        if (!this.multipleSelection.length) {
-          return this.$platform.alert('请选择需要删除的客户');
-        }
-        try {
-          const result = await this.$platform.confirm('确定要删除选择的客户？');
-          if (!result) return;
+    // operation dialog
+    openDialog(category) {
+      if (category === 'sendMessage') {
+        this.$refs.messageDialog.openSendMessageDialog();
+      }
+      if (category === 'edit') {
+        this.$refs.batchEditingCustomerDialog.openBatchEditingCustomerDialog();
+      }
+      if (category === 'remind') {
+        this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
+      }
+      if (category === 'importCustomer') {
+        this.$refs.importCustomerModal.open();
+      }
+      if (category === 'importLinkman') {
+        this.$refs.importLinkmanModal.open();
+      }
+      if (category === 'update') {
+        this.$refs.batchUpdateCustomerDialog.openBatchUpdateCustomerDialog();
+      }
+    },
+    async deleteCustomer() {
+      if (!this.multipleSelection.length) {
+        return this.$platform.alert('请选择需要删除的客户');
+      }
+      try {
+        const result = await this.$platform.confirm('确定要删除选择的客户？');
+        if (!result) return;
 
-          this.$http.get(`/customer/delete/${this.selectedIds.join(',')}`)
+        this.$http.get(`/customer/delete/${this.selectedIds.join(',')}`)
           .then(res => {
             this.multipleSelection = [];
             this.search();
           })
           .catch(err => console.error('deleteCustomer err', err));
-        } catch (e) {
-          console.error('deleteCustomer catch error', e);
-        }
-      },
-      // columns
-      modifyColumnStatus(val, column) {
-        this.columns = this.columns
+      } catch (e) {
+        console.error('deleteCustomer catch error', e);
+      }
+    },
+    // columns
+    modifyColumnStatus(val, column) {
+      this.columns = this.columns
         .map(c => {
           if (c.field === column.field) {
             c.show = val;
           }
           return c;
         });
-        const showColumns = this.columns.filter(c => c.show).map(c => c.field);
-        this.saveDataToStorage('columnStatus', showColumns);
-      },
-      // common methods
-      getLocalStorageData() {
-        const dataStr = localStorage.getItem('customerListData') || '{}';
-        return JSON.parse(dataStr);
-      },
-      saveDataToStorage(key, value) {
-        const data = this.getLocalStorageData();
-        data[key] = value;
-        localStorage.setItem('customerListData', JSON.stringify(data));
-      },
-      buildTableColumn() {
-        const localStorageData = this.getLocalStorageData();
-        let columnStatus = localStorageData.columnStatus || [];
-        let minWidth = 100;
+      const showColumns = this.columns.filter(c => c.show).map(c => c.field);
+      this.saveDataToStorage('columnStatus', showColumns);
+    },
+    // common methods
+    getLocalStorageData() {
+      const dataStr = localStorage.getItem('customerListData') || '{}';
+      return JSON.parse(dataStr);
+    },
+    saveDataToStorage(key, value) {
+      const data = this.getLocalStorageData();
+      data[key] = value;
+      localStorage.setItem('customerListData', JSON.stringify(data));
+    },
+    buildTableColumn() {
+      const localStorageData = this.getLocalStorageData();
+      let columnStatus = localStorageData.columnStatus || [];
+      let minWidth = 100;
 
-        let baseColumns = this.fixedColumns();
-        let dynamicColumns = [];
-        let columns = [];
-        let sortable = false;
+      let baseColumns = this.fixedColumns();
+      let dynamicColumns = [];
+      let columns = [];
+      let sortable = false;
 
-        dynamicColumns = this.customerConfig.fieldInfo
+      dynamicColumns = this.customerConfig.fieldInfo
         .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
           sortable = false;
@@ -1040,160 +1040,160 @@
           };
         });
 
-        columns = [...baseColumns, ...dynamicColumns];
+      columns = [...baseColumns, ...dynamicColumns];
 
-        if (!columnStatus || !columnStatus.length) {
-          return columns;
-        }
-
-        columns = columns.map(bc => {
-          bc.show = columnStatus.some(sc => sc === bc.field);
-          return bc;
-        });
+      if (!columnStatus || !columnStatus.length) {
         return columns;
-      },
-      resetParams() {
+      }
 
-        this.paramsBackup = {
-          specialSearchModel: {
-            addressSelector: [],
-            adAddress: '',
-          },
-          customizedSearchModel: {},
-          createUserName: '',
-          customerManagerName: '',
-          serialNumber: '',
-          linkmanId: '',
-          tagId: '',
-          hasRemind: '',
-          status: '',
-          createUser: '',
-          customerManager: '',
-          createTime: '',
-          customerAddress: {},
-          orderDetail: {},
-          keyword: '',
-          pageNum: 1,
-          pageSize: this.paramsBackup.pageSize,
-        };
+      columns = columns.map(bc => {
+        bc.show = columnStatus.some(sc => sc === bc.field);
+        return bc;
+      });
+      return columns;
+    },
+    resetParams() {
 
-        this.params = {
-          createUserName: '',
-          customerManagerName: '',
-          serialNumber: '',
-          linkmanId: '',
-          tagId: '',
-          hasRemind: '',
-          status: '',
-          createUser: '',
-          customerManager: '',
-          createTime: '',
-          customerAddress: {},
-          orderDetail: {},
-          specialSearchModel: {
-            addressSelector: [],
-            adAddress: '',
-          },
-          customizedSearchModel: {
-            ...this.params.customizedSearchModel,
-          },
-        };
-        this.params.specialSearchModel.addressSelector = [];
-        this.params.specialSearchModel.adAddress = '';
+      this.paramsBackup = {
+        specialSearchModel: {
+          addressSelector: [],
+          adAddress: '',
+        },
+        customizedSearchModel: {},
+        createUserName: '',
+        customerManagerName: '',
+        serialNumber: '',
+        linkmanId: '',
+        tagId: '',
+        hasRemind: '',
+        status: '',
+        createUser: '',
+        customerManager: '',
+        createTime: '',
+        customerAddress: {},
+        orderDetail: {},
+        keyword: '',
+        pageNum: 1,
+        pageSize: this.paramsBackup.pageSize,
+      };
 
-        for (let key in this.params.customizedSearchModel) {
-          this.params.customizedSearchModel[key].value = null;
-        }
-        this.$refs.baseDistPicker.clearValue();
-        this.search();
-      },
-      // input search method
-      searchCustomerManager(keyword) {
-        this.inputRemoteSearch.customerManager.loading = true;
-        return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+      this.params = {
+        createUserName: '',
+        customerManagerName: '',
+        serialNumber: '',
+        linkmanId: '',
+        tagId: '',
+        hasRemind: '',
+        status: '',
+        createUser: '',
+        customerManager: '',
+        createTime: '',
+        customerAddress: {},
+        orderDetail: {},
+        specialSearchModel: {
+          addressSelector: [],
+          adAddress: '',
+        },
+        customizedSearchModel: {
+          ...this.params.customizedSearchModel,
+        },
+      };
+      this.params.specialSearchModel.addressSelector = [];
+      this.params.specialSearchModel.adAddress = '';
+
+      for (let key in this.params.customizedSearchModel) {
+        this.params.customizedSearchModel[key].value = null;
+      }
+      this.$refs.baseDistPicker.clearValue();
+      this.search();
+    },
+    // input search method
+    searchCustomerManager(keyword) {
+      this.inputRemoteSearch.customerManager.loading = true;
+      return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
           this.inputRemoteSearch.customerManager.options = res.list;
           this.inputRemoteSearch.customerManager.loading = false;
           return res;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
-      },
-      searchCreator(keyword) {
-        this.inputRemoteSearch.creator.loading = true;
-        return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+    },
+    searchCreator(keyword) {
+      this.inputRemoteSearch.creator.loading = true;
+      return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
           this.inputRemoteSearch.creator.options = res.list;
           this.inputRemoteSearch.creator.loading = false;
           return res;
         })
         .catch(err => console.error('searchCreator function catch err', err));
-      },
-      searchLinkman(keyword) {
-        this.inputRemoteSearch.linkman.loading = true;
-        return this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
+    },
+    searchLinkman(keyword) {
+      this.inputRemoteSearch.linkman.loading = true;
+      return this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
         .then(res => {
           this.inputRemoteSearch.linkman.options = res.list;
           this.inputRemoteSearch.linkman.loading = false;
           return res;
         })
         .catch(err => console.error('searchLinkman function catch err', err));
-      },
-      searchTag(keyword) {
-        this.inputRemoteSearch.tag.loading = true;
-        return this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
+    },
+    searchTag(keyword) {
+      this.inputRemoteSearch.tag.loading = true;
+      return this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
           this.inputRemoteSearch.tag.options = res.list;
           this.inputRemoteSearch.tag.loading = false;
           return res;
         })
         .catch(err => console.error('searchTag function catch err', err));
-      },
-      // match data
-      matchOperator(formType) {
-        let operator = '';
-        switch (formType) {
-          case 'date':
-            operator = 'between';
-            break;
-          case 'datetime':
-            operator = 'between';
-            break;
-          case 'select':
-            operator = 'eq';
-            break;
-          case 'selectMulti':
-            operator = 'contain';
-            break;
-          case 'user':
-            operator = 'user';
-            break;
-          default:
-            operator = 'like';
-            break;
-        }
-        return operator;
-      },
-      matchSortValue(order) {
-        let value = '';
-        switch (order) {
-          case null:
-            value = '';
-            break;
-          case 'descending':
-            value = false;
-            break;
-          case 'ascending':
-            value = true;
-            break;
-          default:
-            value = '';
-            break;
-        }
-        return value;
-      },
-      matchSelected() {
-        if (!this.multipleSelection.length) return;
-        const selected = this.customers
+    },
+    // match data
+    matchOperator(formType) {
+      let operator = '';
+      switch (formType) {
+      case 'date':
+        operator = 'between';
+        break;
+      case 'datetime':
+        operator = 'between';
+        break;
+      case 'select':
+        operator = 'eq';
+        break;
+      case 'selectMulti':
+        operator = 'contain';
+        break;
+      case 'user':
+        operator = 'user';
+        break;
+      default:
+        operator = 'like';
+        break;
+      }
+      return operator;
+    },
+    matchSortValue(order) {
+      let value = '';
+      switch (order) {
+      case null:
+        value = '';
+        break;
+      case 'descending':
+        value = false;
+        break;
+      case 'ascending':
+        value = true;
+        break;
+      default:
+        value = '';
+        break;
+      }
+      return value;
+    },
+    matchSelected() {
+      if (!this.multipleSelection.length) return;
+      const selected = this.customers
         .filter(c => {
           if (this.multipleSelection.some(sc => sc.id === c.id)) {
             this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
@@ -1202,85 +1202,85 @@
           }
         }) || [];
 
-        this.$nextTick(() => {
-          this.toggleSelection(selected);
-        });
-      },
-      fixedColumns() {
-        return [{
-          label: '客户',
-          field: 'name',
-          show: true,
-          fixed: true,
-          minWidth: '150px',
-        }, {
-          label: '客户编号',
-          field: 'serialNumber',
-          // width: '150px',
-          fixed: true,
-          show: true,
-        }, {
-          label: '联系人',
-          field: 'lmName',
-          // width: '100px',
-          show: true,
-        }, {
-          label: '电话',
-          field: 'lmPhone',
-          // width: '130px',
-          show: true,
-        }, {
-          label: '区域',
-          field: 'customerAddress',
-          // width: '180px',
-          show: true,
-        }, {
-          label: '详细地址',
-          field: 'detailAddress',
-          // width: '160px',
-          show: true,
-        }, {
-          label: '服务团队',
-          field: 'tags',
-          // width: '110px',
-          show: true,
-        }, {
-          label: '客户负责人',
-          field: 'customerManagerName',
-          show: true,
-          width: '110px',
-        }, {
-          label: '启用/禁用',
-          field: 'status',
-          show: true,
-          align: 'center',
-          width: '100px',
-        }, {
-          label: '创建时间',
-          field: 'createTime',
-          show: true,
-          sortable: 'custom',
-          width: '150px',
-        }, {
-          label: '创建人',
-          field: 'createUser',
-          // width: '80px',
-          show: true,
-        }, {
-          label: '提醒数量',
-          field: 'remindCount',
-          // width: '80px',
-          show: true,
-        }]
-      }
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
     },
-    components: {
-      [SendMessageDialog.name]: SendMessageDialog,
-      [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
-      [BatchRemindingCustomerDialog.name]: BatchRemindingCustomerDialog,
-      [BatchUpdateCustomerDialog.name]: BatchUpdateCustomerDialog,
+    fixedColumns() {
+      return [{
+        label: '客户',
+        field: 'name',
+        show: true,
+        fixed: true,
+        minWidth: '150px',
+      }, {
+        label: '客户编号',
+        field: 'serialNumber',
+        // width: '150px',
+        fixed: true,
+        show: true,
+      }, {
+        label: '联系人',
+        field: 'lmName',
+        // width: '100px',
+        show: true,
+      }, {
+        label: '电话',
+        field: 'lmPhone',
+        // width: '130px',
+        show: true,
+      }, {
+        label: '区域',
+        field: 'customerAddress',
+        // width: '180px',
+        show: true,
+      }, {
+        label: '详细地址',
+        field: 'detailAddress',
+        // width: '160px',
+        show: true,
+      }, {
+        label: '服务团队',
+        field: 'tags',
+        // width: '110px',
+        show: true,
+      }, {
+        label: '客户负责人',
+        field: 'customerManagerName',
+        show: true,
+        width: '110px',
+      }, {
+        label: '启用/禁用',
+        field: 'status',
+        show: true,
+        align: 'center',
+        width: '100px',
+      }, {
+        label: '创建时间',
+        field: 'createTime',
+        show: true,
+        sortable: 'custom',
+        width: '150px',
+      }, {
+        label: '创建人',
+        field: 'createUser',
+        // width: '80px',
+        show: true,
+      }, {
+        label: '提醒数量',
+        field: 'remindCount',
+        // width: '80px',
+        show: true,
+      }]
     }
+  },
+  components: {
+    [SendMessageDialog.name]: SendMessageDialog,
+    [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
+    [BatchRemindingCustomerDialog.name]: BatchRemindingCustomerDialog,
+    [BatchUpdateCustomerDialog.name]: BatchUpdateCustomerDialog,
   }
+}
 </script>
 
 <style lang="scss">

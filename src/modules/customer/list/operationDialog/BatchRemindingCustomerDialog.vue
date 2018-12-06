@@ -48,111 +48,111 @@
 </template>
 
 <script>
-  export default {
-    name: "batch-reminding-customer-dialog",
-    data: () => {
-      return {
-        remindTemplate: [],
-        remoteSearchCM: {
-          loading: false,
-          options: [],
-        },
-        form: {
-          ids: '',
-          isAllLm: 0,
-          remindId: null,
-          users: [],
-        },
-
-        batchRemindingCustomerDialog: false,
-        pending: false,
-      }
-    },
-    props: {
-      selectedIds: {
-        type: Array,
-        default: () => ([]),
+export default {
+  name: "batch-reminding-customer-dialog",
+  data: () => {
+    return {
+      remindTemplate: [],
+      remoteSearchCM: {
+        loading: false,
+        options: [],
       },
-    },
-    computed: {
-      selectedRemind() {
-        return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
+      form: {
+        ids: '',
+        isAllLm: 0,
+        remindId: null,
+        users: [],
       },
-      remindRule() {
-        const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
-        let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
-        let isahead = isAhead ? "前" : "后";
 
-        if (!isRepeat){
-          if(fieldDisplayName){
-            return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
-          }else{
-            return '无'
-          }
+      batchRemindingCustomerDialog: false,
+      pending: false,
+    }
+  },
+  props: {
+    selectedIds: {
+      type: Array,
+      default: () => ([]),
+    },
+  },
+  computed: {
+    selectedRemind() {
+      return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
+    },
+    remindRule() {
+      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
+      let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
+      let isahead = isAhead ? "前" : "后";
+
+      if (!isRepeat){
+        if(fieldDisplayName){
+          return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
         }else{
-          if(period){
-            return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
-          }else{
-            return '无'
-          }
+          return '无'
+        }
+      }else{
+        if(period){
+          return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
+        }else{
+          return '无'
         }
       }
-    },
-    mounted() {
-      this.fetchData();
-    },
-    methods: {
-      onSubmit() {
-        const params = this.buildParams();
-        this.pending = true;
-        this.$http.post('/scheduler/buildBatch', params)
-          .then(res => {
-            let ids = this.selectedIds;
-            if (res.status === 0) {
-              this.$platform.alert('批量添加提醒成功');
-            }
-            if (res.status === 1 && res.data) {
-              this.$platform.alert(`批量添加提醒失败，以下客户已存在该提醒：${res.data.join(',')}`);
-              ids = [];
-            }
-            this.batchRemindingCustomerDialog = false;
-            this.pending = false;
+    }
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    onSubmit() {
+      const params = this.buildParams();
+      this.pending = true;
+      this.$http.post('/scheduler/buildBatch', params)
+        .then(res => {
+          let ids = this.selectedIds;
+          if (res.status === 0) {
+            this.$platform.alert('批量添加提醒成功');
+          }
+          if (res.status === 1 && res.data) {
+            this.$platform.alert(`批量添加提醒失败，以下客户已存在该提醒：${res.data.join(',')}`);
+            ids = [];
+          }
+          this.batchRemindingCustomerDialog = false;
+          this.pending = false;
 
-            this.$emit('success-callback', ids);
-          })
-          .catch(err => {
-            this.$platform.alert('批量添加提醒失败');
-            this.pending = false;
-            console.error('post to /scheduler/buildBatch err', err)
-          });
-      },
-      buildParams() {
-        let params = {
-          ids: this.selectedIds.join(','),
-          remindId: this.form.remindId,
-        };
+          this.$emit('success-callback', ids);
+        })
+        .catch(err => {
+          this.$platform.alert('批量添加提醒失败');
+          this.pending = false;
+          console.error('post to /scheduler/buildBatch err', err)
+        });
+    },
+    buildParams() {
+      let params = {
+        ids: this.selectedIds.join(','),
+        remindId: this.form.remindId,
+      };
 
-        if (this.selectedRemind.isDdResponse) {
-          params.isAllLm = 0;
-          params.users = this.selectedRemind.users;
-        } else {
-          params.isAllLm = this.form.isAllLm;
-          params.users = [];
-        }
-        return params;
-      },
-      openBatchRemindingCustomerDialog() {
-        if (!this.selectedIds.length) {
-          return this.$platform.alert('请选择需要批量提醒的客户');
-        }
-        this.batchRemindingCustomerDialog = true;
-      },
-      fetchData() {
-        this.$http.get('/v2/customer/getReminds', {pageSize: 0,})
-          .then(res => {
-            let tv = null;
-            if (res) {
-              this.remindTemplate = (res.list || [])
+      if (this.selectedRemind.isDdResponse) {
+        params.isAllLm = 0;
+        params.users = this.selectedRemind.users;
+      } else {
+        params.isAllLm = this.form.isAllLm;
+        params.users = [];
+      }
+      return params;
+    },
+    openBatchRemindingCustomerDialog() {
+      if (!this.selectedIds.length) {
+        return this.$platform.alert('请选择需要批量提醒的客户');
+      }
+      this.batchRemindingCustomerDialog = true;
+    },
+    fetchData() {
+      this.$http.get('/v2/customer/getReminds', {pageSize: 0,})
+        .then(res => {
+          let tv = null;
+          if (res) {
+            this.remindTemplate = (res.list || [])
               .map(r => {
                 if (r.isDdResponse) {
                   r.name = r.name + '（内部提醒）';
@@ -161,32 +161,32 @@
                 }
                 return r;
               });
-              tv = this.remindTemplate[0];
-              if (tv) {
-                this.form.remindId = tv.id;
-                this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0 : 1;
-                this.form.users = (tv.users || []).map(c => c.id);
-                this.remoteSearchCM.options = tv.users;
-              }
+            tv = this.remindTemplate[0];
+            if (tv) {
+              this.form.remindId = tv.id;
+              this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0 : 1;
+              this.form.users = (tv.users || []).map(c => c.id);
+              this.remoteSearchCM.options = tv.users;
             }
-          })
-          .catch(err => console.error('err', err));
-      },
-      searchCustomerManager(keyword) {
-        this.remoteSearchCM.loading = true;
-        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
-          .then(res => {
-            this.remoteSearchCM.options = res.list
-              .map(c => ({
-                id: c.staffId,
-                name: c.displayName,
-              }));
-            this.remoteSearchCM.loading = false;
-          })
-          .catch(err => console.error('searchCustomerManager function catch err', err));
-      },
+          }
+        })
+        .catch(err => console.error('err', err));
     },
-  }
+    searchCustomerManager(keyword) {
+      this.remoteSearchCM.loading = true;
+      this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+        .then(res => {
+          this.remoteSearchCM.options = res.list
+            .map(c => ({
+              id: c.staffId,
+              name: c.displayName,
+            }));
+          this.remoteSearchCM.loading = false;
+        })
+        .catch(err => console.error('searchCustomerManager function catch err', err));
+    },
+  },
+}
 </script>
 
 <style lang="scss">

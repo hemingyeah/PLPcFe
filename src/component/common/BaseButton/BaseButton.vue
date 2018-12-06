@@ -1,58 +1,58 @@
 <script>
-  export default {
-    name: "base-button",
-    props: {
-      type: {
-        type: String,
-        default: 'primary', // primary、plain、only-text
-      },
-      icon: {
-        type: String,
-        default: ''
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
+export default {
+  name: "base-button",
+  props: {
+    type: {
+      type: String,
+      default: 'primary', // primary、plain、only-text
     },
-    data() {
-      return {}
+    icon: {
+      type: String,
+      default: ''
     },
-    methods: {
-      buildTextButton() {
-        const icon = this.icon;
-        return (
-          <span class="text-button" onClick={(e) => this.$emit('event', e)}>
-            {icon && <i class={'iconfont ' + icon}></i>}
-            {this.$slots.default}
-          </span>
-        )
-      },
-      buildBaseButton() {
-        const icon = this.icon;
-        const type = this.type;
-        const disabled = this.disabled ? 'disabled' : '';
-        return (
-          <button class={{
-            'base-button': true,
-            'plain-button': type === 'plain',
-            'base-button-disabled': disabled && type === 'primary',
-            'plain-button-disabled': disabled && type === 'plain',
-          }} type="button" onClick={(e) => this.$emit('event', e)}>
-            {icon && <i class={'iconfont ' + icon}></i>}
-            {this.$slots.default}
-          </button>
-
-        )
-      },
+    disabled: {
+      type: Boolean,
+      default: false
     },
-    render(r) {
+  },
+  data() {
+    return {}
+  },
+  methods: {
+    buildTextButton() {
+      const icon = this.icon;
+      return (
+        <span class="text-button" onClick={(e) => this.$emit('event', e)}>
+          {icon && <i class={'iconfont ' + icon}></i>}
+          {this.$slots.default}
+        </span>
+      )
+    },
+    buildBaseButton() {
+      const icon = this.icon;
+      const type = this.type;
+      const disabled = this.disabled ? 'disabled' : '';
+      return (
+        <button class={{
+          'base-button': true,
+          'plain-button': type === 'plain',
+          'base-button-disabled': disabled && type === 'primary',
+          'plain-button-disabled': disabled && type === 'plain',
+        }} type="button" onClick={(e) => this.$emit('event', e)}>
+          {icon && <i class={'iconfont ' + icon}></i>}
+          {this.$slots.default}
+        </button>
 
-      if (this.type === 'only-text') return this.buildTextButton();
+      )
+    },
+  },
+  render(r) {
 
-      return this.buildBaseButton();
-    }
+    if (this.type === 'only-text') return this.buildTextButton();
+
+    return this.buildBaseButton();
   }
+}
 </script>
 
 <style lang="scss">

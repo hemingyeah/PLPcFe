@@ -127,12 +127,12 @@ const FormBuilder = {
     //     ]
     //   )
 
-      // return (
-      //   <fieldset>
-      //     <legend>{group.title}</legend>
-      //     {formItems}
-      //   </fieldset>
-      // );
+    // return (
+    //   <fieldset>
+    //     <legend>{group.title}</legend>
+    //     {formItems}
+    //   </fieldset>
+    // );
     //})
 
     let formGroups = this.fields.map(field => {

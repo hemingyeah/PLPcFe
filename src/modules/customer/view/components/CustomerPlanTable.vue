@@ -83,132 +83,132 @@
 </template>
 
 <script>
-  import {formatDate,} from '@src/util/lang';
-  import platform from '@src/platform';
+import {formatDate,} from '@src/util/lang';
+import platform from '@src/platform';
 
 
-  export default {
-    name: "customer-plan-table",
-    props: {
-      shareData: {
-        type: Object,
-        default: () => ({})
+export default {
+  name: "customer-plan-table",
+  props: {
+    shareData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      planList: [],
+      pending: {},
+      columns: this.buildColumns(),
+      paginationInfo: {
+        pageSize: 10,
+        pageNum: 1,
+        totalItems: 0,
       }
+    }
+  },
+  computed: {
+    customerId() {
+      return this.shareData.customer ? this.shareData.customer.id : '';
     },
-    data() {
-      return {
-        planList: [],
-        pending: {},
-        columns: this.buildColumns(),
-        paginationInfo: {
-          pageSize: 10,
-          pageNum: 1,
-          totalItems: 0,
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    async deletePlan(plan) {
+      try {
+        const res = await platform.confirm('确认删除该计划任务？');
+        if (!res) return;
+        this.pending[plan.id] = true;
+
+        const reqRes = await this.$http.post('/task/deletePlanTask', {ids: [plan.id],}, false);
+        delete this.pending[plan.id];
+
+        if (reqRes.status === 0) {
+          this.fetchData();
+        } else {
+          platform.alert(reqRes.message);
         }
+      } catch (e) {
+        console.error('deletePlan catch an err', e);
       }
     },
-    computed: {
-      customerId() {
-        return this.shareData.customer ? this.shareData.customer.id : '';
-      },
-    },
-    mounted() {
+    jump(pN) {
+      this.paginationInfo.pageNum = pN;
       this.fetchData();
     },
-    methods: {
-      async deletePlan(plan) {
-        try {
-          const res = await platform.confirm('确认删除该计划任务？');
-          if (!res) return;
-          this.pending[plan.id] = true;
+    fetchData() {
+      const params = {
+        customerId: this.customerId,
+        pageNum: this.paginationInfo.pageNum,
+        pageSize: this.paginationInfo.pageSize
+      };
 
-          const reqRes = await this.$http.post('/task/deletePlanTask', {ids: [plan.id],}, false);
-          delete this.pending[plan.id];
-
-          if (reqRes.status === 0) {
-            this.fetchData();
-          } else {
-            platform.alert(reqRes.message);
-          }
-        } catch (e) {
-          console.error('deletePlan catch an err', e);
-        }
-      },
-      jump(pN) {
-        this.paginationInfo.pageNum = pN;
-        this.fetchData();
-      },
-      fetchData() {
-        const params = {
-          customerId: this.customerId,
-          pageNum: this.paginationInfo.pageNum,
-          pageSize: this.paginationInfo.pageSize
-        };
-
-        this.$http.get('/v2/customer/planTask/list', params)
+      this.$http.get('/v2/customer/planTask/list', params)
         .then(res => {
           this.planList = res.list
-          .map(plan => {
-            plan.createTime = formatDate(new Date(plan.createTime), 'YYYY-MM-DD HH:mm:ss');
-            plan.nextTaskCreateTime = plan.nextTaskCreateTime ? formatDate(new Date(plan.nextTaskCreateTime), 'YYYY-MM-DD HH:mm:ss') : '';
-            this.$set(this.pending, plan.id, false);
-            return Object.freeze(plan);
-          });
+            .map(plan => {
+              plan.createTime = formatDate(new Date(plan.createTime), 'YYYY-MM-DD HH:mm:ss');
+              plan.nextTaskCreateTime = plan.nextTaskCreateTime ? formatDate(new Date(plan.nextTaskCreateTime), 'YYYY-MM-DD HH:mm:ss') : '';
+              this.$set(this.pending, plan.id, false);
+              return Object.freeze(plan);
+            });
           this.paginationInfo.totalItems = res.total;
         })
-      },
-      buildColumns() {
-        return [{
-          label: '名称',
-          field: 'name',
-          show: true,
-          tooltip: true,
-          // sortable: 'custom',
-        }, {
-          label: '工单类型',
-          field: 'templateName',
-          show: true,
-          tooltip: true,
-        }, {
-          label: '创建人',
-          field: 'createUserName',
-          show: true,
-          tooltip: true,
-        }, {
-          label: '创建时间',
-          field: 'createTime',
-          show: true,
-          tooltip: true,
-        }, {
-          label: '截止时间',
-          field: 'endDate',
-          show: true,
-          tooltip: true,
-        }, {
-          label: '已创建',
-          field: 'createdTasks',
-          show: true,
-          tooltip: false,
-        }, {
-          label: '重复周期',
-          field: 'periodSetting',
-          show: true,
-          tooltip: true,
-        }, {
-          label: '下次创建时间',
-          field: 'nextTaskCreateTime',
-          show: true,
-          tooltip: true,
-          width: '100px'
-        }, {
-          label: '操作',
-          field: 'action',
-          show: true,
-          tooltip: false,
-        }]
-      }
     },
-  }
+    buildColumns() {
+      return [{
+        label: '名称',
+        field: 'name',
+        show: true,
+        tooltip: true,
+        // sortable: 'custom',
+      }, {
+        label: '工单类型',
+        field: 'templateName',
+        show: true,
+        tooltip: true,
+      }, {
+        label: '创建人',
+        field: 'createUserName',
+        show: true,
+        tooltip: true,
+      }, {
+        label: '创建时间',
+        field: 'createTime',
+        show: true,
+        tooltip: true,
+      }, {
+        label: '截止时间',
+        field: 'endDate',
+        show: true,
+        tooltip: true,
+      }, {
+        label: '已创建',
+        field: 'createdTasks',
+        show: true,
+        tooltip: false,
+      }, {
+        label: '重复周期',
+        field: 'periodSetting',
+        show: true,
+        tooltip: true,
+      }, {
+        label: '下次创建时间',
+        field: 'nextTaskCreateTime',
+        show: true,
+        tooltip: true,
+        width: '100px'
+      }, {
+        label: '操作',
+        field: 'action',
+        show: true,
+        tooltip: false,
+      }]
+    }
+  },
+}
 </script>
 
 <style lang="scss">

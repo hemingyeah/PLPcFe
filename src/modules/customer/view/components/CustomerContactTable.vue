@@ -57,52 +57,52 @@
 </template>
 
 <script>
-  import {formatDate,} from '@src/util/lang';
-  import platform from '@src/platform';
-  import EditContactDialog from '../operationDialog/EditContactDialog.vue';
+import {formatDate,} from '@src/util/lang';
+import platform from '@src/platform';
+import EditContactDialog from '../operationDialog/EditContactDialog.vue';
 
-  export default {
-    name: "customer-contact-table",
-    props: {
-      shareData: {
-        type: Object,
-        default: () => ({})
-      },
+export default {
+  name: "customer-contact-table",
+  props: {
+    shareData: {
+      type: Object,
+      default: () => ({})
     },
-    data() {
-      return {
-        pending: {},
-        selectedContact: {},
-        contactList: [],
-        columns: this.buildColumns(),
-        paginationInfo: {
-          pageSize: 10,
-          pageNum: 1,
-          totalItems: 0,
-        }
+  },
+  data() {
+    return {
+      pending: {},
+      selectedContact: {},
+      contactList: [],
+      columns: this.buildColumns(),
+      paginationInfo: {
+        pageSize: 10,
+        pageNum: 1,
+        totalItems: 0,
       }
+    }
+  },
+  computed: {
+    customerId() {
+      return this.shareData.customer ? this.shareData.customer.id : '';
     },
-    computed: {
-      customerId() {
-        return this.shareData.customer ? this.shareData.customer.id : '';
-      },
+  },
+  mounted() {
+    this.fetchData();
+    this.$eventBus.$on('customer_contact_table.update_linkman_list', this.fetchData);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('customer_contact_table.update_linkman_list', this.fetchData);
+  },
+  methods: {
+    openDialog(contact) {
+      this.selectedContact = contact;
+      this.$nextTick(this.$refs.EditContactDialog.openDialog);
     },
-    mounted() {
-      this.fetchData();
-      this.$eventBus.$on('customer_contact_table.update_linkman_list', this.fetchData);
-    },
-    beforeDestroy() {
-      this.$eventBus.$off('customer_contact_table.update_linkman_list', this.fetchData);
-    },
-    methods: {
-      openDialog(contact) {
-        this.selectedContact = contact;
-        this.$nextTick(this.$refs.EditContactDialog.openDialog);
-      },
-      setDefaultLinkman(lm) {
-        if (this.pending[lm.id]) return;
-        this.pending[lm.id] = true;
-        this.$http.post('/linkman/setMain', {id: lm.id}, false)
+    setDefaultLinkman(lm) {
+      if (this.pending[lm.id]) return;
+      this.pending[lm.id] = true;
+      this.$http.post('/linkman/setMain', {id: lm.id}, false)
         .then(res => {
           if (res.status === 0) {
             this.fetchData();
@@ -111,78 +111,78 @@
           }
           this.pending[lm.id] = false;
         });
-      },
-      async deleteLinkman(lm) {
-        if (lm.isMain) return platform.alert('默认联系人不能删除');
-        try {
-          const res = await platform.confirm('确定要删除该联系人？');
-          if (!res) return;
-          this.pending[lm.id] = true;
-          const reqRes = await this.$http.post('/linkman/delete', {ids: lm.id,}, false);
-          delete this.pending[lm.id];
-          if (reqRes.status === 0) {
-            this.fetchData();
-          } else {
-            platform.alert(res.message);
-          }
-        } catch (e) {
-          console.error('err',);
+    },
+    async deleteLinkman(lm) {
+      if (lm.isMain) return platform.alert('默认联系人不能删除');
+      try {
+        const res = await platform.confirm('确定要删除该联系人？');
+        if (!res) return;
+        this.pending[lm.id] = true;
+        const reqRes = await this.$http.post('/linkman/delete', {ids: lm.id,}, false);
+        delete this.pending[lm.id];
+        if (reqRes.status === 0) {
+          this.fetchData();
+        } else {
+          platform.alert(res.message);
         }
-      },
-      jump(pN) {
-        this.paginationInfo.pageNum = pN;
-        this.fetchData();
-      },
-      fetchData() {
-        const params = {
-          customerId: this.customerId,
-          pageNum: this.paginationInfo.pageNum,
-          pageSize: this.paginationInfo.pageSize,
-        };
-        
-        this.$http.get('/v2/customer/linkman/list', params)
-        .then(res => {
-          this.contactList = res.list
-          .map(contact => {
-
-            this.$set(this.pending, contact.id, false);
-            contact.createTime = formatDate(new Date(contact.createTime), 'YYYY-MM-DD HH:mm:ss');
-            return Object.freeze(contact);
-          });
-          this.paginationInfo.totalItems = res.total;
-        })
-      },
-      buildColumns() {
-        return [{
-          label: '姓名',
-          field: 'name',
-          show: true,
-          // sortable: 'custom',
-        }, {
-          label: '部门',
-          field: 'department',
-          show: true,
-        }, {
-          label: '电话',
-          field: 'phone',
-          show: true,
-        }, {
-          label: '',
-          field: 'type',
-          show: true,
-          width: '100px',
-        }, {
-          label: '操作',
-          field: 'action',
-          show: true,
-          width: '100px',
-        }]
+      } catch (e) {
+        console.error('err',);
       }
     },
-    components: {
-      [EditContactDialog.name]: EditContactDialog,
+    jump(pN) {
+      this.paginationInfo.pageNum = pN;
+      this.fetchData();
+    },
+    fetchData() {
+      const params = {
+        customerId: this.customerId,
+        pageNum: this.paginationInfo.pageNum,
+        pageSize: this.paginationInfo.pageSize,
+      };
+        
+      this.$http.get('/v2/customer/linkman/list', params)
+        .then(res => {
+          this.contactList = res.list
+            .map(contact => {
+
+              this.$set(this.pending, contact.id, false);
+              contact.createTime = formatDate(new Date(contact.createTime), 'YYYY-MM-DD HH:mm:ss');
+              return Object.freeze(contact);
+            });
+          this.paginationInfo.totalItems = res.total;
+        })
+    },
+    buildColumns() {
+      return [{
+        label: '姓名',
+        field: 'name',
+        show: true,
+        // sortable: 'custom',
+      }, {
+        label: '部门',
+        field: 'department',
+        show: true,
+      }, {
+        label: '电话',
+        field: 'phone',
+        show: true,
+      }, {
+        label: '',
+        field: 'type',
+        show: true,
+        width: '100px',
+      }, {
+        label: '操作',
+        field: 'action',
+        show: true,
+        width: '100px',
+      }]
     }
+  },
+  components: {
+    [EditContactDialog.name]: EditContactDialog,
   }
+}
 </script>
 
 <style lang="scss">

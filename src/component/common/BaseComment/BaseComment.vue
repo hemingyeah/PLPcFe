@@ -155,8 +155,8 @@ export default {
           form.attachments = form.attachments.concat(success);
         }
       })
-      .catch(err => console.error(err))
-      .then(() => this.pending = false)
+        .catch(err => console.error(err))
+        .then(() => this.pending = false)
     },
     async deleteFile(file) {
       let index = this.form.attachments.indexOf(file);

@@ -29,7 +29,7 @@ const RuleMap = {
 };
 
 /** 单行文本验证，50字以内 */
- function text(value, field = {}){
+function text(value, field = {}){
   return new Promise((resolve, reject) => {
     //先验证长度
     if(value != null && value.toString().length > SINGLE_LINE_MAX_LEN){

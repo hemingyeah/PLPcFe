@@ -83,7 +83,6 @@ export default {
 
 
 
-
       let ua = navigator.userAgent;
       if (ua.indexOf('Trident') >= 0){
         window.location.href = `${this.action}?${qs.stringify(params)}`;

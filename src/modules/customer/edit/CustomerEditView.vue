@@ -74,120 +74,120 @@
 </template>
 
 <script>
-  import * as FormUtil from '@src/component/form/util';
-  import {toArray} from '@src/util/lang';
+import * as FormUtil from '@src/component/form/util';
+import {toArray} from '@src/util/lang';
 
-  export default {
-    name: 'customer-edit-view',
-    props: {
-      initData: {
-        type: Object,
-        default: () => ({})
+export default {
+  name: 'customer-edit-view',
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      submitting: false,
+      pending: false,
+      loadingPage: false,
+      addressBackup: {},
+      form: {},
+      remote: this.buildRemote(),
+      init: false
+    };
+  },
+  computed: {
+    action() {
+      return this.initData.action;
+    },
+    editId() {
+      return this.initData.id || '';
+    },
+    config() {
+      const { customerAddress, isAutoSerialNumber, isDivideByTag, isCustomerNameDuplicate, isPhoneUnique, } = this.initData;
+      return {
+        isCustomerNameDuplicate,
+        isAutoSerialNumber,
+        customerAddress,
+        isDivideByTag,
+        isPhoneUnique,
       }
     },
-    data() {
-      return {
-        submitting: false,
-        pending: false,
-        loadingPage: false,
-        addressBackup: {},
-        form: {},
-        remote: this.buildRemote(),
-        init: false
-      };
+    tags() {
+      return this.initData.tags || [];
     },
-    computed: {
-      action() {
-        return this.initData.action;
-      },
-      editId() {
-        return this.initData.id || '';
-      },
-      config() {
-        const { customerAddress, isAutoSerialNumber, isDivideByTag, isCustomerNameDuplicate, isPhoneUnique, } = this.initData;
-        return {
-          isCustomerNameDuplicate,
-          isAutoSerialNumber,
-          customerAddress,
-          isDivideByTag,
-          isPhoneUnique,
-        }
-      },
-      tags() {
-        return this.initData.tags || [];
-      },
-      selectTagOptions() {
-        return this.initData.tags
+    selectTagOptions() {
+      return this.initData.tags
         .map(tag => ({
           text: tag.tagName,
           value: tag.id,
         })) || [];
-      },
-      fields() {
-        let originFields = this.initData.fieldInfo || [];
-        let sortedFields = originFields.sort((a,b) => a.orderId - b.orderId)
+    },
+    fields() {
+      let originFields = this.initData.fieldInfo || [];
+      let sortedFields = originFields.sort((a,b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
           }
           return f;
         });
-        return FormUtil.migration(sortedFields);
-      }
+      return FormUtil.migration(sortedFields);
+    }
+  },
+  methods: {
+    genPlaceholder(field){
+      return FormUtil.genPlaceholder(field)
     },
-    methods: {
-      genPlaceholder(field){
-        return FormUtil.genPlaceholder(field)
-      },
-      buildRemote(){
-        let customerId = this.initData.id;
-        let {isAutoSerialNumber, isCustomerNameDuplicate, isPhoneUnique} = this.initData;
-        return {
-          serialNumber: isAutoSerialNumber ? null : {
-            action: '/customer/unique',
-            method: 'post',
-            // 提交表单的时候，验证请求不可取消
-            buildParams(value) {
-              return {
-                id: customerId,
-                fieldName: 'serialNumber',
-                value
-              };
-            }
-          },
-          name: !isCustomerNameDuplicate ? null : {
-            action: '/customer/unique',
-            method: 'post',
-            buildParams(value) {
-              return {
-                id: customerId,
-                fieldName: 'name',
-                value,
-              };
-            }
-          },
-          lmPhone: !isPhoneUnique ? null : {
-            action: '/linkman/checkUnique4Phone',
-            method: 'post',
-            buildParams(value) {
-              return {
-                customerId: customerId,
-                phone: value,
-              };
-            }
+    buildRemote(){
+      let customerId = this.initData.id;
+      let {isAutoSerialNumber, isCustomerNameDuplicate, isPhoneUnique} = this.initData;
+      return {
+        serialNumber: isAutoSerialNumber ? null : {
+          action: '/customer/unique',
+          method: 'post',
+          // 提交表单的时候，验证请求不可取消
+          buildParams(value) {
+            return {
+              id: customerId,
+              fieldName: 'serialNumber',
+              value
+            };
+          }
+        },
+        name: !isCustomerNameDuplicate ? null : {
+          action: '/customer/unique',
+          method: 'post',
+          buildParams(value) {
+            return {
+              id: customerId,
+              fieldName: 'name',
+              value,
+            };
+          }
+        },
+        lmPhone: !isPhoneUnique ? null : {
+          action: '/linkman/checkUnique4Phone',
+          method: 'post',
+          buildParams(value) {
+            return {
+              customerId: customerId,
+              phone: value,
+            };
           }
         }
-      },
-      update({field, newValue, oldValue}) {
-        let {fieldName, displayName} = field;
-        if (this.$appConfig.debug) {
-          console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
-        }
-        this.$set(this.form, fieldName, newValue)
-      },
-      submit() {
-        this.submitting = true;
-        this.$refs.form.validate()
+      }
+    },
+    update({field, newValue, oldValue}) {
+      let {fieldName, displayName} = field;
+      if (this.$appConfig.debug) {
+        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+      this.$set(this.form, fieldName, newValue)
+    },
+    submit() {
+      this.submitting = true;
+      this.$refs.form.validate()
         .then(valid => {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
@@ -204,164 +204,164 @@
           this.pending = false;
           this.loadingPage = false;
         });
-      },
-      createMethod(params) {
-        this.$http.post('/customer/create', params)
+    },
+    createMethod(params) {
+      this.$http.post('/customer/create', params)
         .then(res => {
           if (res.status) return this.$platform.alert('创建客户失败');
           window.location.href = `/customer/view/${res.data.customerId}`;
         })
         .catch(err => console.error('err', err));
-      },
-      updateMethod(params) {
-        this.$http.post(`/customer/update?id=${this.editId}`, params)
+    },
+    updateMethod(params) {
+      this.$http.post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
           if (res.status) return this.$platform.alert('更新客户失败');
           window.location.href = `/customer/view/${res.data}`;
         })
         .catch(err => console.error('err', err));
-      },
-      copyName() {
-        const {name} = this.form;
-        if(!name) return;
-        this.form.lmName = name;
-      },
-      autoAssign(){
-        let adr = this.form.customerAddress;
-        let {province, city, dist} = adr;
-        if(!province || !city) return this.$platform.alert('请先补全客户地址');
-
-        let tags = [];
-        this.tags.forEach(team => {
-          let places = team.places || [];
-          for(let i = 0; i < places.length; i++){
-            let place = places[i];
-            let placeProvince = (place.province || "").replace("所有省", "");
-            let placeCity = (place.city || "").replace("所有市", "");
-            let placeDist = (place.dist || "").replace("所有区", "");
-
-            let placeStr = placeProvince + placeCity + placeDist;
-            let adrStr = province + city + dist;
-            if(placeStr && adrStr.indexOf(placeStr) == 0) tags.push(team.id);
-          }
-        });
-
-        if(tags.length == 0) return this.$platform.alert('未能按照规则分配成功，请到服务团队中设置负责区域');
-
-        this.form.tags = tags;
-      },
-      setDefaultAddress(ad) {
-        const { adProvince, adCity, adDist, } = ad;
-        if (!adProvince || !adCity) return;
-        const newVal = {
-          adAddress: [adProvince, adCity, adDist,].filter(ad => ad),
-          detail: '',
-          adLongitude: '',
-          adLatitude: '',
-        };
-        this.form.customerAddress = newVal;
-        this.addressBackup = this.form.customerAddress;
-      },
-      fetchCustomer(id) {
-        return this.$http.get(`/v2/customer/getForEdit`, {id})
-      },
-      updateAddressBackup(ad) {
-        this.addressBackup = ad;
-      },
-      //将后端传来的客户对象转换成form
-      customerToForm(fields, data){
-        let cusAdr = data.customerAddress || {};
-
-        return {
-          id: data.id,
-          name: data.name,
-          lmName: data.lmName,
-          lmPhone: data.lmPhone,
-          serialNumber: data.serialNumber,
-          customerAddress: {
-            province: cusAdr.adProvince,
-            city: cusAdr.adCity,
-            dist: cusAdr.adDist,
-            address: cusAdr.adAddress,
-            longitude: data.adLongitude || '',
-            latitude: data.adLatitude || '',
-            addressType: data.addressType || 0
-          },
-          tags: toArray(data.tags).map(item => item.id),
-          manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
-        };
-      },
-      //将form对象转换成后端可接收的对象
-      formToCustomer(fields, form){
-        let customer = {
-          id: form.id,
-          attribute: {}
-        };
-
-        fields.forEach(field => {
-          let {fieldName, isSystem} = field;
-          let value = form[fieldName];
-
-          if(fieldName == 'customerAddress'){
-            let customerAddress = form.customerAddress || {};
-             // address
-            return customer.customerAddress = {
-              adCountry: '',
-              adProvince: customerAddress.province,
-              adCity: customerAddress.city,
-              adDist: customerAddress.dist,
-              adLatitude: customerAddress.latitude || '',
-              adLongitude: customerAddress.longitude || '',
-              addressType: customerAddress.addressType || 0,
-              adAddress: customerAddress.address,
-            };
-          }
-
-          if(fieldName == 'tags'){
-            let allTags = this.tags || [];
-            return customer.tags = value.map(tag => {
-              const t = allTags.find(at => at.id === tag);
-              return {
-                id: t.id,
-                tagName: t.tagName,
-              }
-            });
-          }
-
-          if(fieldName == 'manager' && value && value.userId){
-            customer.customerManager = value.userId;
-            customer.customerManagerName = value.displayName || ''
-            return;
-          }
-
-          isSystem == 0 
-            ? customer.attribute[fieldName] = value
-            : customer[fieldName] = value;
-        })
-
-        return customer;
-      }
     },
-    async mounted() {
-      //初始化默认区域
-      if (this.initData.customerAddress) {
-        this.setDefaultAddress(this.initData.customerAddress);
-      }
+    copyName() {
+      const {name} = this.form;
+      if(!name) return;
+      this.form.lmName = name;
+    },
+    autoAssign(){
+      let adr = this.form.customerAddress;
+      let {province, city, dist} = adr;
+      if(!province || !city) return this.$platform.alert('请先补全客户地址');
 
-      //初始化默认值
-      let form = {}; 
-      
-      if (this.initData.action === 'edit' && this.initData.id) {
-        //处理编辑时数据
-        let cusRes = await this.fetchCustomer(this.initData.id);
-        if(cusRes.status == 0) form = cusRes.data;
-      }
+      let tags = [];
+      this.tags.forEach(team => {
+        let places = team.places || [];
+        for(let i = 0; i < places.length; i++){
+          let place = places[i];
+          let placeProvince = (place.province || "").replace("所有省", "");
+          let placeCity = (place.city || "").replace("所有市", "");
+          let placeDist = (place.dist || "").replace("所有区", "");
 
-      this.form = FormUtil.initialize(this.fields, form, this.customerToForm);
+          let placeStr = placeProvince + placeCity + placeDist;
+          let adrStr = province + city + dist;
+          if(placeStr && adrStr.indexOf(placeStr) == 0) tags.push(team.id);
+        }
+      });
+
+      if(tags.length == 0) return this.$platform.alert('未能按照规则分配成功，请到服务团队中设置负责区域');
+
+      this.form.tags = tags;
+    },
+    setDefaultAddress(ad) {
+      const { adProvince, adCity, adDist, } = ad;
+      if (!adProvince || !adCity) return;
+      const newVal = {
+        adAddress: [adProvince, adCity, adDist,].filter(ad => ad),
+        detail: '',
+        adLongitude: '',
+        adLatitude: '',
+      };
+      this.form.customerAddress = newVal;
       this.addressBackup = this.form.customerAddress;
-      this.init = true;
+    },
+    fetchCustomer(id) {
+      return this.$http.get(`/v2/customer/getForEdit`, {id})
+    },
+    updateAddressBackup(ad) {
+      this.addressBackup = ad;
+    },
+    //将后端传来的客户对象转换成form
+    customerToForm(fields, data){
+      let cusAdr = data.customerAddress || {};
+
+      return {
+        id: data.id,
+        name: data.name,
+        lmName: data.lmName,
+        lmPhone: data.lmPhone,
+        serialNumber: data.serialNumber,
+        customerAddress: {
+          province: cusAdr.adProvince,
+          city: cusAdr.adCity,
+          dist: cusAdr.adDist,
+          address: cusAdr.adAddress,
+          longitude: data.adLongitude || '',
+          latitude: data.adLatitude || '',
+          addressType: data.addressType || 0
+        },
+        tags: toArray(data.tags).map(item => item.id),
+        manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
+      };
+    },
+    //将form对象转换成后端可接收的对象
+    formToCustomer(fields, form){
+      let customer = {
+        id: form.id,
+        attribute: {}
+      };
+
+      fields.forEach(field => {
+        let {fieldName, isSystem} = field;
+        let value = form[fieldName];
+
+        if(fieldName == 'customerAddress'){
+          let customerAddress = form.customerAddress || {};
+          // address
+          return customer.customerAddress = {
+            adCountry: '',
+            adProvince: customerAddress.province,
+            adCity: customerAddress.city,
+            adDist: customerAddress.dist,
+            adLatitude: customerAddress.latitude || '',
+            adLongitude: customerAddress.longitude || '',
+            addressType: customerAddress.addressType || 0,
+            adAddress: customerAddress.address,
+          };
+        }
+
+        if(fieldName == 'tags'){
+          let allTags = this.tags || [];
+          return customer.tags = value.map(tag => {
+            const t = allTags.find(at => at.id === tag);
+            return {
+              id: t.id,
+              tagName: t.tagName,
+            }
+          });
+        }
+
+        if(fieldName == 'manager' && value && value.userId){
+          customer.customerManager = value.userId;
+          customer.customerManagerName = value.displayName || ''
+          return;
+        }
+
+        isSystem == 0 
+          ? customer.attribute[fieldName] = value
+          : customer[fieldName] = value;
+      })
+
+      return customer;
     }
+  },
+  async mounted() {
+    //初始化默认区域
+    if (this.initData.customerAddress) {
+      this.setDefaultAddress(this.initData.customerAddress);
+    }
+
+    //初始化默认值
+    let form = {}; 
+      
+    if (this.initData.action === 'edit' && this.initData.id) {
+      //处理编辑时数据
+      let cusRes = await this.fetchCustomer(this.initData.id);
+      if(cusRes.status == 0) form = cusRes.data;
+    }
+
+    this.form = FormUtil.initialize(this.fields, form, this.customerToForm);
+    this.addressBackup = this.form.customerAddress;
+    this.init = true;
   }
+}
 </script>
 
 <style lang="scss">

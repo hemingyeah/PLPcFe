@@ -23,8 +23,8 @@ import platform from '@src/platform';
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length > 0 
     ? <div class="base-timeline-attachment base-file__preview">
-        {attachments.map(item => <base-file-item file={item} key={item.id} readonly/>)}
-      </div> 
+      {attachments.map(item => <base-file-item file={item} key={item.id} readonly/>)}
+    </div> 
     : ''
 }
 
@@ -111,8 +111,8 @@ export default {
             {
               this.allowDeleteRecord(item) 
                 ? <button type='button' class="btn-text base-timeline-delete" onClick={e => this.deleteRemark(item)}>
-                    <i class="iconfont icon-shanchu"></i>删除
-                  </button> 
+                  <i class="iconfont icon-shanchu"></i>删除
+                </button> 
                 : ""
             }
           </h5>,

@@ -160,372 +160,372 @@
 </template>
 
 <script>
-  import {formatDate,} from '@src/util/lang';
+import {formatDate,} from '@src/util/lang';
 
-  export default {
-    name: "batch-editing-customer-dialog",
-    data: () => {
-      return {
-        inputRemoteSearch: {
-          tag: {
-            options: [],
-            loading: false,
-          },
-          customerManager: {
-            options: [],
-            loading: false,
-          },
+export default {
+  name: "batch-editing-customer-dialog",
+  data: () => {
+    return {
+      inputRemoteSearch: {
+        tag: {
+          options: [],
+          loading: false,
         },
-        addressBackup: {},
-        form: {
-          cusName: '',
-          lmName: '',
-          lmPhone: '',
-          address: {
-            adAddress: [],
-            detail: '',
-            addressType: 0,
-            latitude: '',
-            longitude: '',
-          },
-          tags: [],
-          manager: '',
+        customerManager: {
+          options: [],
+          loading: false,
         },
-        selectedFieldName: '',
-        batchEditingCustomerDialog: false,
-        pending: false,
-        editableFields: [],
-        fixedFieldsCount: 6,
-        selectedTags: [],
-        formBackup: {},
-      }
-    },
-    props: {
-      selectedIds: {
-        type: Array,
-        default: () => ([]),
       },
-      fields: {
-        type: Array,
-        default: () => ([]),
-      },
-      defaultAddress: {
-        type: Array,
-        default: () => ([]),
-      }
-    },
-    watch: {
-      defaultAddress: {
-        handler: function(newValue) {
-          this.form.address.adAddress = newValue;
+      addressBackup: {},
+      form: {
+        cusName: '',
+        lmName: '',
+        lmPhone: '',
+        address: {
+          adAddress: [],
+          detail: '',
+          addressType: 0,
+          latitude: '',
+          longitude: '',
         },
-        deep: true
-      }
+        tags: [],
+        manager: '',
+      },
+      selectedFieldName: '',
+      batchEditingCustomerDialog: false,
+      pending: false,
+      editableFields: [],
+      fixedFieldsCount: 6,
+      selectedTags: [],
+      formBackup: {},
+    }
+  },
+  props: {
+    selectedIds: {
+      type: Array,
+      default: () => ([]),
     },
-    computed: {
-      selectedField() {
-        return this.editableFields.filter(ef => ef.fieldName === this.selectedFieldName)[0] || {};
-      }
+    fields: {
+      type: Array,
+      default: () => ([]),
     },
-    mounted() {
-      this.buildFields();
-    },
-    methods: {
-      async onSubmit() {
-        try {
-          const valid = await this.$refs.editCustomerForm.validate();
-          if (!valid) return;
+    defaultAddress: {
+      type: Array,
+      default: () => ([]),
+    }
+  },
+  watch: {
+    defaultAddress: {
+      handler: function(newValue) {
+        this.form.address.adAddress = newValue;
+      },
+      deep: true
+    }
+  },
+  computed: {
+    selectedField() {
+      return this.editableFields.filter(ef => ef.fieldName === this.selectedFieldName)[0] || {};
+    }
+  },
+  mounted() {
+    this.buildFields();
+  },
+  methods: {
+    async onSubmit() {
+      try {
+        const valid = await this.$refs.editCustomerForm.validate();
+        if (!valid) return;
 
-          this.pending = true;
-          const params = this.buildParams();
+        this.pending = true;
+        const params = this.buildParams();
 
-          const res = await this.$http.post('/customer/editBatch', params, false);
+        const res = await this.$http.post('/customer/editBatch', params, false);
 
-          if (res.status === 0) {
-            this.$emit('submit-callback');
-          }
+        if (res.status === 0) {
+          this.$emit('submit-callback');
+        }
 
-          if (res.status === 1 && res.message) {
-            this.$platform.alert(res.message);
-          }
+        if (res.status === 1 && res.message) {
+          this.$platform.alert(res.message);
+        }
 
+        this.batchEditingCustomerDialog = false;
+        this.pending = false;
+      } catch (e) {
+        if (e !== false) {
           this.batchEditingCustomerDialog = false;
           this.pending = false;
-        } catch (e) {
-          if (e !== false) {
-            this.batchEditingCustomerDialog = false;
-            this.pending = false;
-          }
-          console.error('onSubmit editBatch catch e', e);
         }
-      },
-      reset() {
-        this.selectedFieldName = this.editableFields[0].fieldName;
+        console.error('onSubmit editBatch catch e', e);
+      }
+    },
+    reset() {
+      this.selectedFieldName = this.editableFields[0].fieldName;
+      this.form = JSON.parse(JSON.stringify(this.formBackup));
+      this.$refs.editCustomerForm.resetFields();
+    },
+    handleAddressChange(val) {
+      const newVal = {
+        adAddress: this.form.address.adAddress,
+        detail: val,
+        latitude: '',
+        longitude: '',
+        addressType: 0,
+      };
+
+      if (this.diffAddress(newVal, this.addressBackup)) {
+        this.form.address = this.addressBackup;
+      }
+      this.form.address = newVal;
+    },
+    handleCitySelectorChange(val) {
+      const newVal = {
+        detail: this.form.address.detail,
+        adAddress: val,
+        latitude: '',
+        longitude: '',
+        addressType: 0,
+      };
+
+      if (this.diffAddress(newVal, this.addressBackup)) {
+        this.form.address = this.addressBackup;
+      }
+      this.form.address = newVal;
+    },
+    diffAddress(newVal, oldVal) {
+      if (newVal.detail === oldVal.detail &&
+          newVal.adAddress.toString() === oldVal.adAddress.toString()) {
+        return true;
+      }
+      return false;
+    },
+    handleFieldIdChange() {
+      this.$nextTick(() => {
         this.form = JSON.parse(JSON.stringify(this.formBackup));
         this.$refs.editCustomerForm.resetFields();
-      },
-      handleAddressChange(val) {
-        const newVal = {
-          adAddress: this.form.address.adAddress,
-          detail: val,
-          latitude: '',
-          longitude: '',
-          addressType: 0,
-        };
-
-        if (this.diffAddress(newVal, this.addressBackup)) {
-          this.form.address = this.addressBackup;
-        }
-        this.form.address = newVal;
-      },
-      handleCitySelectorChange(val) {
-        const newVal = {
-          detail: this.form.address.detail,
-          adAddress: val,
-          latitude: '',
-          longitude: '',
-          addressType: 0,
-        };
-
-        if (this.diffAddress(newVal, this.addressBackup)) {
-          this.form.address = this.addressBackup;
-        }
-        this.form.address = newVal;
-      },
-      diffAddress(newVal, oldVal) {
-        if (newVal.detail === oldVal.detail &&
-          newVal.adAddress.toString() === oldVal.adAddress.toString()) {
-          return true;
-        }
-        return false;
-      },
-      handleFieldIdChange() {
-        this.$nextTick(() => {
-          this.form = JSON.parse(JSON.stringify(this.formBackup));
-          this.$refs.editCustomerForm.resetFields();
-        });
-      },
-      openBatchEditingCustomerDialog() {
-        if (!this.selectedIds.length) {
-          return this.$platform.alert('请选择需要批量编辑的客户');
-        }
-        this.batchEditingCustomerDialog = true;
-        this.buildDynamicField();
-      },
-      selectTag(val) {
-        const ts = this.inputRemoteSearch.tag.options;
-        this.selectedTags = ts
-          .filter(t => val.some(v => v === t.id))
-          .map(t => ({
-            id: t.id,
-            tagName: t.tagName,
-          }));
-      },
-      chooseMap() {
-        let defaultArea = this.form.address.adAddress.filter(a => a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
-
-        this.$fast.map.picker({}, { defaultArea: defaultArea[defaultArea.length - 1]}).then(result => {
-
-          if (result.status === 1) return;
-
-          const { province, city, dist, address, latitude, longitude} = result.data;
-
-          const newVal = {
-            adAddress: [ province, city, dist,],
-            detail: address,
-            latitude,
-            longitude,
-            addressType: 1,
-          };
-          this.form.address = newVal;
-          this.addressBackup = newVal;
-        })
-        .catch(err => console.error(err));
-      },
-      buildDynamicField() {
-        if (this.editableFields.length > this.fixedFieldsCount) return;
-        const customizedField = this.fields
-          .filter(f => f.isSystem === 0 && f.formType !== 'attachment')
-          .map(f => {
-            if (f.formType === 'selectMulti') {
-              this.$set(this.form, f.fieldName, []);
-            } else {
-              this.$set(this.form, f.fieldName, null);
-            }
-
-            if (!f.isNull) {
-              f.rules = [{
-                required: true, message: `请输入${f.displayName}`, trigger: ['blur', 'change']
-              },];
-            }
-
-            if (f.formType === 'select' && !f.isNull) {
-              f.rules = [{
-                required: true, message: '必须选择一个选项', trigger: ['blur', 'change']
-              },];
-            } else if (f.formType === 'selectMulti' && !f.isNull) {
-              f.rules = [{
-                required: true, message: '请至少选择一个选项', trigger: ['blur', 'change']
-              },];
-            } else if (f.formType === 'number') {
-              f.rules = [{
-                required: !f.isNull,
-                message: `请输入${f.displayName}`, trigger: ['blur', 'change']
-              }, {
-                type: 'number',
-                message: `请输入数字`, trigger: ['blur', 'change']
-              }];
-            }
-
-            return f;
-          });
-
-        this.formBackup = JSON.parse(JSON.stringify(this.form));
-        this.editableFields = [...this.editableFields, ...customizedField];
-      },
-      buildFields() {
-        let fixedFields = [{
-          fieldName: "cusName",
-          formType: "text",
-          displayName: '客户名称',
-          rules: [{
-            required: true, message: `请输入客户名称`, trigger: ['blur', 'change']
-          },]
-        }, {
-          fieldName: "lmName",
-          formType: "text",
-          displayName: '联系人',
-          rules: [{
-            required: true, message: `请输入联系人`, trigger: ['blur', 'change']
-          },]
-        }, {
-          fieldName: "lmPhone",
-          formType: "text",
-          displayName: '电话',
-          rules: [{
-            required: true, message: `请输入电话`, trigger: ['blur', 'change']
-          }, {
-            trigger: ['blur', 'change'],
-            validator(rule, value, callback) {
-              const reg = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
-              if (!reg.test(value)) {
-                callback(new Error('请输入正确的电话'));
-              }
-              callback();
-            }
-          }, {
-            trigger: ['blur', 'change']
-          }]
-        }, {
-          fieldName: "address",
-          formType: "address",
-          displayName: '客户地址',
-          rules: [{
-            trigger: ['blur', 'change'],
-            validator(rule, value, callback) {
-              if (value.adAddress.length < 2 || !value.detail) {
-                callback(new Error('请输入客户地址'));
-              }
-
-              callback();
-            }
-          }]
-        }, {
-          fieldName: "tags",
-          formType: "tags",
-          displayName: '服务团队',
-          rules: [{
-            trigger: ['blur', 'change'],
-            required: true, message: '请选择服务团队',
-          }]
-        }, {
-          fieldName: "manager",
-          formType: "manager",
-          displayName: '客户负责人',
-          rules: [{
-            trigger: ['change'],
-            required: true, message: '请选择客户负责人',
-          }]
-
-        }];
-
-        this.editableFields = [...fixedFields];
-        this.selectedFieldName = this.editableFields[0].fieldName;
-      },
-      buildParams() {
-        let tv = null;
-        let params = {
-          mapJson: JSON.stringify({
-            [this.selectedFieldName]: this.form[this.selectedFieldName],
-          }),
-          ids: this.selectedIds.join(','),
-        };
-
-        if (this.selectedFieldName === 'tags') {
-          params.mapJson = JSON.stringify({
-            [this.selectedFieldName]: this.selectedTags,
-          })
-        }
-        if (this.selectedFieldName === 'manager' || this.selectedField.formType === 'user') {
-          tv = this.inputRemoteSearch.customerManager.options
-            .filter(cm => cm.userId === this.form[this.selectedFieldName])[0] || {};
-
-          params.mapJson = JSON.stringify({
-            [this.selectedFieldName]: {
-              id: tv.userId,
-              name: tv.displayName,
-            },
-          })
-        }
-        if (this.selectedField.formType === 'datetime') {
-          tv = this.form[this.selectedFieldName];
-          params.mapJson = JSON.stringify({
-            [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD HH:mm:ss'),
-          })
-        }
-        if (this.selectedField.formType === 'date') {
-          tv = this.form[this.selectedFieldName];
-          params.mapJson = JSON.stringify({
-            [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD'),
-          })
-        }
-
-        if (this.selectedField.formType === 'address') {
-          tv = this.form[this.selectedFieldName];
-          params.mapJson = JSON.stringify({
-            [this.selectedFieldName]: {
-              province: tv.adAddress[0] || '',
-              city: tv.adAddress[1] || '',
-              dist: tv.adAddress[2] || '',
-              address: tv.detail,
-              addressType: tv.addressType,
-              latitude: tv.latitude,
-              longitude: tv.longitude,
-            },
-          })
-        }
-        return params;
-      },
-      searchTag(keyword) {
-        this.inputRemoteSearch.tag.loading = true;
-        this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
-          .then(res => {
-            this.inputRemoteSearch.tag.options = res.list;
-            this.inputRemoteSearch.tag.loading = false;
-          })
-          .catch(err => console.error('searchTag function catch err', err));
-      },
-      searchCustomerManager(keyword) {
-        this.inputRemoteSearch.customerManager.loading = true;
-        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
-          .then(res => {
-            this.inputRemoteSearch.customerManager.options = res.list;
-            this.inputRemoteSearch.customerManager.loading = false;
-          })
-          .catch(err => console.error('searchCustomerManager function catch err', err));
-      },
+      });
     },
-  }
+    openBatchEditingCustomerDialog() {
+      if (!this.selectedIds.length) {
+        return this.$platform.alert('请选择需要批量编辑的客户');
+      }
+      this.batchEditingCustomerDialog = true;
+      this.buildDynamicField();
+    },
+    selectTag(val) {
+      const ts = this.inputRemoteSearch.tag.options;
+      this.selectedTags = ts
+        .filter(t => val.some(v => v === t.id))
+        .map(t => ({
+          id: t.id,
+          tagName: t.tagName,
+        }));
+    },
+    chooseMap() {
+      let defaultArea = this.form.address.adAddress.filter(a => a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
+
+      this.$fast.map.picker({}, { defaultArea: defaultArea[defaultArea.length - 1]}).then(result => {
+
+        if (result.status === 1) return;
+
+        const { province, city, dist, address, latitude, longitude} = result.data;
+
+        const newVal = {
+          adAddress: [ province, city, dist,],
+          detail: address,
+          latitude,
+          longitude,
+          addressType: 1,
+        };
+        this.form.address = newVal;
+        this.addressBackup = newVal;
+      })
+        .catch(err => console.error(err));
+    },
+    buildDynamicField() {
+      if (this.editableFields.length > this.fixedFieldsCount) return;
+      const customizedField = this.fields
+        .filter(f => f.isSystem === 0 && f.formType !== 'attachment')
+        .map(f => {
+          if (f.formType === 'selectMulti') {
+            this.$set(this.form, f.fieldName, []);
+          } else {
+            this.$set(this.form, f.fieldName, null);
+          }
+
+          if (!f.isNull) {
+            f.rules = [{
+              required: true, message: `请输入${f.displayName}`, trigger: ['blur', 'change']
+            },];
+          }
+
+          if (f.formType === 'select' && !f.isNull) {
+            f.rules = [{
+              required: true, message: '必须选择一个选项', trigger: ['blur', 'change']
+            },];
+          } else if (f.formType === 'selectMulti' && !f.isNull) {
+            f.rules = [{
+              required: true, message: '请至少选择一个选项', trigger: ['blur', 'change']
+            },];
+          } else if (f.formType === 'number') {
+            f.rules = [{
+              required: !f.isNull,
+              message: `请输入${f.displayName}`, trigger: ['blur', 'change']
+            }, {
+              type: 'number',
+              message: `请输入数字`, trigger: ['blur', 'change']
+            }];
+          }
+
+          return f;
+        });
+
+      this.formBackup = JSON.parse(JSON.stringify(this.form));
+      this.editableFields = [...this.editableFields, ...customizedField];
+    },
+    buildFields() {
+      let fixedFields = [{
+        fieldName: "cusName",
+        formType: "text",
+        displayName: '客户名称',
+        rules: [{
+          required: true, message: `请输入客户名称`, trigger: ['blur', 'change']
+        },]
+      }, {
+        fieldName: "lmName",
+        formType: "text",
+        displayName: '联系人',
+        rules: [{
+          required: true, message: `请输入联系人`, trigger: ['blur', 'change']
+        },]
+      }, {
+        fieldName: "lmPhone",
+        formType: "text",
+        displayName: '电话',
+        rules: [{
+          required: true, message: `请输入电话`, trigger: ['blur', 'change']
+        }, {
+          trigger: ['blur', 'change'],
+          validator(rule, value, callback) {
+            const reg = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
+            if (!reg.test(value)) {
+              callback(new Error('请输入正确的电话'));
+            }
+            callback();
+          }
+        }, {
+          trigger: ['blur', 'change']
+        }]
+      }, {
+        fieldName: "address",
+        formType: "address",
+        displayName: '客户地址',
+        rules: [{
+          trigger: ['blur', 'change'],
+          validator(rule, value, callback) {
+            if (value.adAddress.length < 2 || !value.detail) {
+              callback(new Error('请输入客户地址'));
+            }
+
+            callback();
+          }
+        }]
+      }, {
+        fieldName: "tags",
+        formType: "tags",
+        displayName: '服务团队',
+        rules: [{
+          trigger: ['blur', 'change'],
+          required: true, message: '请选择服务团队',
+        }]
+      }, {
+        fieldName: "manager",
+        formType: "manager",
+        displayName: '客户负责人',
+        rules: [{
+          trigger: ['change'],
+          required: true, message: '请选择客户负责人',
+        }]
+
+      }];
+
+      this.editableFields = [...fixedFields];
+      this.selectedFieldName = this.editableFields[0].fieldName;
+    },
+    buildParams() {
+      let tv = null;
+      let params = {
+        mapJson: JSON.stringify({
+          [this.selectedFieldName]: this.form[this.selectedFieldName],
+        }),
+        ids: this.selectedIds.join(','),
+      };
+
+      if (this.selectedFieldName === 'tags') {
+        params.mapJson = JSON.stringify({
+          [this.selectedFieldName]: this.selectedTags,
+        })
+      }
+      if (this.selectedFieldName === 'manager' || this.selectedField.formType === 'user') {
+        tv = this.inputRemoteSearch.customerManager.options
+          .filter(cm => cm.userId === this.form[this.selectedFieldName])[0] || {};
+
+        params.mapJson = JSON.stringify({
+          [this.selectedFieldName]: {
+            id: tv.userId,
+            name: tv.displayName,
+          },
+        })
+      }
+      if (this.selectedField.formType === 'datetime') {
+        tv = this.form[this.selectedFieldName];
+        params.mapJson = JSON.stringify({
+          [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD HH:mm:ss'),
+        })
+      }
+      if (this.selectedField.formType === 'date') {
+        tv = this.form[this.selectedFieldName];
+        params.mapJson = JSON.stringify({
+          [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD'),
+        })
+      }
+
+      if (this.selectedField.formType === 'address') {
+        tv = this.form[this.selectedFieldName];
+        params.mapJson = JSON.stringify({
+          [this.selectedFieldName]: {
+            province: tv.adAddress[0] || '',
+            city: tv.adAddress[1] || '',
+            dist: tv.adAddress[2] || '',
+            address: tv.detail,
+            addressType: tv.addressType,
+            latitude: tv.latitude,
+            longitude: tv.longitude,
+          },
+        })
+      }
+      return params;
+    },
+    searchTag(keyword) {
+      this.inputRemoteSearch.tag.loading = true;
+      this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
+        .then(res => {
+          this.inputRemoteSearch.tag.options = res.list;
+          this.inputRemoteSearch.tag.loading = false;
+        })
+        .catch(err => console.error('searchTag function catch err', err));
+    },
+    searchCustomerManager(keyword) {
+      this.inputRemoteSearch.customerManager.loading = true;
+      this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+        .then(res => {
+          this.inputRemoteSearch.customerManager.options = res.list;
+          this.inputRemoteSearch.customerManager.loading = false;
+        })
+        .catch(err => console.error('searchCustomerManager function catch err', err));
+    },
+  },
+}
 </script>
 
 <style lang="scss">

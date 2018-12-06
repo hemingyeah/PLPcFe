@@ -22,7 +22,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-     setting: {
+    setting: {
       type: Object,
       default: () => ({})
     }

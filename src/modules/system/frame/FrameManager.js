@@ -154,7 +154,7 @@ const FrameManager = {
       this.nextBtnEnable = this.offset < maxOffset;
       this.offset = offset;
     },
-     /** 显示上一页tab */
+    /** 显示上一页tab */
     prev(){
       if(!this.prevBtnEnable) return;
 
@@ -209,7 +209,7 @@ const FrameManager = {
       }
 
       this.$nextTick(() => {
-          //超出最大滚动范围
+        //超出最大滚动范围
         if(this.offset + scrollOffsetWidth > listOffsetWidth){
           this.offset = listOffsetWidth - scrollOffsetWidth;
         }

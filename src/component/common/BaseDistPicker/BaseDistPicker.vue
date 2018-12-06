@@ -11,41 +11,41 @@
 </template>
 
 <script>
-  export default {
-    name: "base-dist-picker",
-    data() {
-      return {
-        options: [],
-        props: {
-          value: 'name',
-          label: 'name',
-          children: 'dist',
-        },
-      }
-    },
-    props: {
-      value: {
-        type: Array,
-        default: () => ([]),
-      }
-    },
-    methods: {
-      clearValue() {
-        this.$emit('input', []);
+export default {
+  name: "base-dist-picker",
+  data() {
+    return {
+      options: [],
+      props: {
+        value: 'name',
+        label: 'name',
+        children: 'dist',
       },
-      handleChange(value) {
-        this.$emit('input', value);
-
-      },
-      /** 异步加载区域数据 */
-      loadDistData(){
-        return import(/* webpackChunkName: "dist.data" */ './city').then(_module => _module.default);
-      }
-    },
-    async mounted(){
-      this.options = await this.loadDistData();
     }
+  },
+  props: {
+    value: {
+      type: Array,
+      default: () => ([]),
+    }
+  },
+  methods: {
+    clearValue() {
+      this.$emit('input', []);
+    },
+    handleChange(value) {
+      this.$emit('input', value);
+
+    },
+    /** 异步加载区域数据 */
+    loadDistData(){
+      return import(/* webpackChunkName: "dist.data" */ './city').then(_module => _module.default);
+    }
+  },
+  async mounted(){
+    this.options = await this.loadDistData();
   }
+}
 </script>
 
 <style lang="scss">

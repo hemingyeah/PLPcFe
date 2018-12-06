@@ -93,8 +93,8 @@ export default {
           this.$emit('input', value);
         }
       })
-      .catch(err => console.error(err))
-      .then(() => this.pending = false)
+        .catch(err => console.error(err))
+        .then(() => this.pending = false)
     },
     async deleteFile(file) {
       let index = this.value.indexOf(file);

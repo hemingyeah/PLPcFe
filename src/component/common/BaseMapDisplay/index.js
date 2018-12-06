@@ -44,11 +44,11 @@ function display(address, options = {}){
     body.appendChild(ele);
     instance.$mount(ele);
   })
-  .then(data => {
-    let callback = options.callback;
-    callback && typeof callback == 'function' && callback(data);
-    return data;
-  })
+    .then(data => {
+      let callback = options.callback;
+      callback && typeof callback == 'function' && callback(data);
+      return data;
+    })
 }
 
 const MapDisplay = {

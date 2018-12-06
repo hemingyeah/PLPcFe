@@ -55,7 +55,7 @@ export default {
           this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
         }
       })
-      .catch(err => console.error(err))
+        .catch(err => console.error(err))
     },
     clear(){
       this.$emit('input', {newValue: {}, field: this.field});

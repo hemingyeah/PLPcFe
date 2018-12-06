@@ -49,8 +49,6 @@
  * babel升级至7.0
  * 动态计算多行文本框高度 ▲
  * 表单支持键盘操作
- * modal组件弹出时阻止body滚动 ▲
- * 无法反向验证 ▲
  * split分割面板 https://www.iviewui.com/components/split
  
  ## 优化项

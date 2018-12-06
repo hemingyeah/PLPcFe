@@ -25,275 +25,275 @@
 </template>
 
 <script>
-  import * as FormUtil from '@src/component/form/util';
+import * as FormUtil from '@src/component/form/util';
 
-  export default {
-    name: "edit-contact-dialog",
-    props: {
-      customer: {
-        type: Object,
-        default: () => ({}),
-      },
-      originalValue: {
-        type: Object,
-        default: () => ({}),
-      },
+export default {
+  name: "edit-contact-dialog",
+  props: {
+    customer: {
+      type: Object,
+      default: () => ({}),
     },
-    data() {
+    originalValue: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  data() {
+    return {
+      addContactDialog: false,
+      pending: false,
+      products: [],
+      addresses: [],
+      remote: this.buildRemote(),
+      form: {
+        name: null,
+        remark: '',
+        sex: '男',
+        position: '',
+        department: '',
+        address: '', // address的ID
+        customId: '',
+        customer: {},
+        id: '',
+        phone: null,
+        email: null,
+        productId: [], //数组，包含产品对象
+      },
+      loadData: false,
+    }
+  },
+  computed: {
+    action() {
+      return this.originalValue.name ? 'edit' : 'create';
+    },
+    customerId() {
+      return this.customer && this.customer.id || '';
+    },
+    fields() {
+      return [{
+        formType: 'text',
+        fieldName: 'name',
+        displayName: "客户",
+        placeholder: '[最多50字]',
+        isNull: 0,
+      }, {
+        formType: 'phone',
+        fieldName: 'phone',
+        displayName: "电话",
+        placeholder: '建议使用手机号,可发送短信通知',
+        isNull: 0,
+      }, {
+        formType: 'select',
+        fieldName: 'sex',
+        displayName: "性别",
+        placeholder: '请选择',
+        isNull: 1,
+        setting: {
+          dataSource: ['男', '女'],
+        }
+      }, {
+        formType: 'email',
+        fieldName: 'email',
+        displayName: "邮箱",
+        placeholder: '',
+        isNull: 1,
+      }, {
+        formType: 'text',
+        fieldName: 'position',
+        displayName: "职位",
+        placeholder: '',
+        isNull: 1,
+      }, {
+        formType: 'text',
+        fieldName: 'department',
+        displayName: "部门",
+        placeholder: '',
+        isNull: 1,
+      }, {
+        formType: 'textarea',
+        fieldName: 'remark',
+        displayName: "备注",
+        placeholder: '[最多500字]',
+        isNull: 1,
+      }, {
+        formType: 'select',
+        fieldName: 'productId',
+        displayName: "关联产品",
+        placeholder: '请选择',
+        isNull: 1,
+        setting: {
+          isMulti: true,
+          dataSource: this.products || [],
+        }
+      }, {
+        formType: 'select',
+        fieldName: 'address',
+        displayName: "关联地址",
+        placeholder: '请选择',
+        isNull: 1,
+        setting: {
+          dataSource: this.addresses || [],
+        }
+      }]
+    }
+  },
+  mounted() {
+    this.fetchData();
+
+  },
+  methods: {
+    buildRemote() {
+      const originalValue = this.originalValue;
       return {
-        addContactDialog: false,
-        pending: false,
-        products: [],
-        addresses: [],
-        remote: this.buildRemote(),
-        form: {
-          name: null,
-          remark: '',
-          sex: '男',
-          position: '',
-          department: '',
-          address: '', // address的ID
-          customId: '',
-          customer: {},
-          id: '',
-          phone: null,
-          email: null,
-          productId: [], //数组，包含产品对象
-        },
-        loadData: false,
-      }
-    },
-    computed: {
-      action() {
-        return this.originalValue.name ? 'edit' : 'create';
-      },
-      customerId() {
-        return this.customer && this.customer.id || '';
-      },
-      fields() {
-        return [{
-          formType: 'text',
-          fieldName: 'name',
-          displayName: "客户",
-          placeholder: '[最多50字]',
-          isNull: 0,
-        }, {
-          formType: 'phone',
-          fieldName: 'phone',
-          displayName: "电话",
-          placeholder: '建议使用手机号,可发送短信通知',
-          isNull: 0,
-        }, {
-          formType: 'select',
-          fieldName: 'sex',
-          displayName: "性别",
-          placeholder: '请选择',
-          isNull: 1,
-          setting: {
-            dataSource: ['男', '女'],
-          }
-        }, {
-          formType: 'email',
-          fieldName: 'email',
-          displayName: "邮箱",
-          placeholder: '',
-          isNull: 1,
-        }, {
-          formType: 'text',
-          fieldName: 'position',
-          displayName: "职位",
-          placeholder: '',
-          isNull: 1,
-        }, {
-          formType: 'text',
-          fieldName: 'department',
-          displayName: "部门",
-          placeholder: '',
-          isNull: 1,
-        }, {
-          formType: 'textarea',
-          fieldName: 'remark',
-          displayName: "备注",
-          placeholder: '[最多500字]',
-          isNull: 1,
-        }, {
-          formType: 'select',
-          fieldName: 'productId',
-          displayName: "关联产品",
-          placeholder: '请选择',
-          isNull: 1,
-          setting: {
-            isMulti: true,
-            dataSource: this.products || [],
-          }
-        }, {
-          formType: 'select',
-          fieldName: 'address',
-          displayName: "关联地址",
-          placeholder: '请选择',
-          isNull: 1,
-          setting: {
-            dataSource: this.addresses || [],
-          }
-        }]
-      }
-    },
-    mounted() {
-      this.fetchData();
-
-    },
-    methods: {
-      buildRemote() {
-        const originalValue = this.originalValue;
-        return {
-          phone: {
-            action: '/linkman/checkUnique4Phone',
-            buildParams(val) {
-              const params = {
-                phone: val,
-                id: originalValue.id || '',
-              };
-              return params;
-            }
+        phone: {
+          action: '/linkman/checkUnique4Phone',
+          buildParams(val) {
+            const params = {
+              phone: val,
+              id: originalValue.id || '',
+            };
+            return params;
           }
         }
-      },
-      genPlaceholder(field){
-        return FormUtil.genPlaceholder(field)
-      },
+      }
+    },
+    genPlaceholder(field){
+      return FormUtil.genPlaceholder(field)
+    },
 
-      fetchData() {
-        let n = 0;
-        let timer = setInterval(() => {
-          n++;
-          if (this.customer.id) {
-            this.fetchProducts();
-            this.fetchAddress();
+    fetchData() {
+      let n = 0;
+      let timer = setInterval(() => {
+        n++;
+        if (this.customer.id) {
+          this.fetchProducts();
+          this.fetchAddress();
 
-            return clearInterval(timer);
-          }
-          if (n > 10) {
-            return clearInterval(timer);
-          }
-        }, 1000);
-      },
-      async submit() {
-        try {
-          const validateRes = await this.$refs.form.validate();
-          if (!validateRes) return;
+          return clearInterval(timer);
+        }
+        if (n > 10) {
+          return clearInterval(timer);
+        }
+      }, 1000);
+    },
+    async submit() {
+      try {
+        const validateRes = await this.$refs.form.validate();
+        if (!validateRes) return;
 
-          this.pending = true;
+        this.pending = true;
 
-          const params = {
-            ...this.form,
-            customer: this.customer,
-            productId: this.products
+        const params = {
+          ...this.form,
+          customer: this.customer,
+          productId: this.products
             .filter(p => this.form.productId.some((pId => pId === p.value)))
             .map(p => ({
               id: p.value,
               name: p.text,
             })),
-          };
-
-          if (this.action === 'create') {
-            await this.$http.post('/linkman/createByJson', params);
-          } else {
-            await this.$http.post('/linkman/updateByJson', params);
-          }
-
-          this.pending = false;
-          this.addContactDialog = false;
-          this.reset();
-          this.$eventBus.$emit('customer_contact_table.update_linkman_list');
-
-        } catch (e) {
-          this.pending = false;
-          console.error('addContactDialog submit catch e', e);
-        }
-      },
-      reset() {
-        this.form = {
-          name: null,
-          remark: '',
-          sex: '男',
-          position: '',
-          department: '',
-          address: '',
-          customId: '',
-          customer: {},
-          id: '',
-          phone: null,
-          email: null,
-          productId: [],
         };
-      },
-      update({field, newValue, oldValue}) {
-        let {fieldName, displayName} = field;
-        if (this.$appConfig.debug) {
-          console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
-        }
-        this.$set(this.form, fieldName, newValue)
-      },
-      openDialog() {
-        this.addContactDialog = true;
-        if (this.action === 'edit') {
-          this.remote = this.buildRemote();
-          this.matchValueToForm(this.originalValue)
-        }
-      },
-      matchValueToForm(val) {
-        const {name, remark, sex, position, department, customerId, customer, id, phone, email, address} = val;
 
-        this.form = {
-          name,
-          remark,
-          sex,
-          position,
-          department,
-          address,
-          customId: customerId || customer.id,
-          customer: customer || {},
-          id,
-          phone,
-          email,
-          productId: [],
-        };
-        if (val.productId && val.productId.length) {
-          this.form.productId = val.productId.map(p => p.id);
+        if (this.action === 'create') {
+          await this.$http.post('/linkman/createByJson', params);
+        } else {
+          await this.$http.post('/linkman/updateByJson', params);
         }
-      },
-      fetchAddress() {
-        this.$http.get('/v2/customer/address/list', {
-          customerId: this.customer.id,
-          pageSize: 100000,
-          pageNum: 1,
-        })
-        .then(res => {
-          this.addresses = res.list
-          .map(p => ({
-            text: p.province + p.city + p.dist + p.address,
-            value: p.id,
-          }));
-        })
-        .catch(err => console.error('fetchAddress catch err', err));
-      },
-      fetchProducts() {
-        this.$http.get('/v2/customer/product/list', {
-          customerId: this.customer.id,
-          pageSize: 100000,
-          pageNum: 1,
-        })
-        .then(res => {
-          this.products = res.list
-          .map(p => ({
-            text: p.name,
-            value: p.id,
-          }));
-        })
-        .catch(err => console.error('fetchProducts catch err', err));
+
+        this.pending = false;
+        this.addContactDialog = false;
+        this.reset();
+        this.$eventBus.$emit('customer_contact_table.update_linkman_list');
+
+      } catch (e) {
+        this.pending = false;
+        console.error('addContactDialog submit catch e', e);
       }
     },
-  }
+    reset() {
+      this.form = {
+        name: null,
+        remark: '',
+        sex: '男',
+        position: '',
+        department: '',
+        address: '',
+        customId: '',
+        customer: {},
+        id: '',
+        phone: null,
+        email: null,
+        productId: [],
+      };
+    },
+    update({field, newValue, oldValue}) {
+      let {fieldName, displayName} = field;
+      if (this.$appConfig.debug) {
+        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+      this.$set(this.form, fieldName, newValue)
+    },
+    openDialog() {
+      this.addContactDialog = true;
+      if (this.action === 'edit') {
+        this.remote = this.buildRemote();
+        this.matchValueToForm(this.originalValue)
+      }
+    },
+    matchValueToForm(val) {
+      const {name, remark, sex, position, department, customerId, customer, id, phone, email, address} = val;
+
+      this.form = {
+        name,
+        remark,
+        sex,
+        position,
+        department,
+        address,
+        customId: customerId || customer.id,
+        customer: customer || {},
+        id,
+        phone,
+        email,
+        productId: [],
+      };
+      if (val.productId && val.productId.length) {
+        this.form.productId = val.productId.map(p => p.id);
+      }
+    },
+    fetchAddress() {
+      this.$http.get('/v2/customer/address/list', {
+        customerId: this.customer.id,
+        pageSize: 100000,
+        pageNum: 1,
+      })
+        .then(res => {
+          this.addresses = res.list
+            .map(p => ({
+              text: p.province + p.city + p.dist + p.address,
+              value: p.id,
+            }));
+        })
+        .catch(err => console.error('fetchAddress catch err', err));
+    },
+    fetchProducts() {
+      this.$http.get('/v2/customer/product/list', {
+        customerId: this.customer.id,
+        pageSize: 100000,
+        pageNum: 1,
+      })
+        .then(res => {
+          this.products = res.list
+            .map(p => ({
+              text: p.name,
+              value: p.id,
+            }));
+        })
+        .catch(err => console.error('fetchProducts catch err', err));
+    }
+  },
+}
 </script>
 
 <style lang="scss">

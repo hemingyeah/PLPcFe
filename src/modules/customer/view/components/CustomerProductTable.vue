@@ -44,78 +44,78 @@
 </template>
 
 <script>
-  import {formatDate,} from '@src/util/lang';
+import {formatDate,} from '@src/util/lang';
 
-  export default {
-    name: "customer-product-table",
-    props: {
-      shareData: {
-        type: Object,
-        default: () => ({})
+export default {
+  name: "customer-product-table",
+  props: {
+    shareData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      productList: [],
+      columns: this.buildColumns(),
+      paginationInfo: {
+        pageSize: 10,
+        pageNum: 1,
+        totalItems: 0,
       }
+    }
+  },
+  computed: {
+    customerId() {
+      return this.shareData.customer ? this.shareData.customer.id : '';
     },
-    data() {
-      return {
-        productList: [],
-        columns: this.buildColumns(),
-        paginationInfo: {
-          pageSize: 10,
-          pageNum: 1,
-          totalItems: 0,
-        }
-      }
-    },
-    computed: {
-      customerId() {
-        return this.shareData.customer ? this.shareData.customer.id : '';
-      },
-    },
-    mounted() {
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    jump(pN) {
+      this.paginationInfo.pageNum = pN;
       this.fetchData();
     },
-    methods: {
-      jump(pN) {
-        this.paginationInfo.pageNum = pN;
-        this.fetchData();
-      },
-      fetchData() {
-        const params = {
-          customerId: this.customerId,
-          pageNum: this.paginationInfo.pageNum,
-          pageSize: this.paginationInfo.pageSize,
-        };
+    fetchData() {
+      const params = {
+        customerId: this.customerId,
+        pageNum: this.paginationInfo.pageNum,
+        pageSize: this.paginationInfo.pageSize,
+      };
 
-        this.$http.get('/v2/customer/product/list', params)
+      this.$http.get('/v2/customer/product/list', params)
         .then(res => {
           this.productList = res.list
-          .map(product => {
-            product.createTime = formatDate(new Date(product.createTime), 'YYYY-MM-DD HH:mm:ss');
-            return Object.freeze(product);
-          });
+            .map(product => {
+              product.createTime = formatDate(new Date(product.createTime), 'YYYY-MM-DD HH:mm:ss');
+              return Object.freeze(product);
+            });
           this.paginationInfo.totalItems = res.total;
         })
-      },
-      buildColumns() {
-        return [{
-          label: '名称',
-          field: 'name',
-          show: true,
-        }, {
-          label: '产品编号',
-          field: 'serialNumber',
-          show: true,
-        }, {
-          label: '类型',
-          field: 'type',
-          show: true,
-        }, {
-          label: '创建时间',
-          field: 'createTime',
-          show: true,
-        }]
-      }
     },
-  }
+    buildColumns() {
+      return [{
+        label: '名称',
+        field: 'name',
+        show: true,
+      }, {
+        label: '产品编号',
+        field: 'serialNumber',
+        show: true,
+      }, {
+        label: '类型',
+        field: 'type',
+        show: true,
+      }, {
+        label: '创建时间',
+        field: 'createTime',
+        show: true,
+      }]
+    }
+  },
+}
 </script>
 
 <style lang="scss">

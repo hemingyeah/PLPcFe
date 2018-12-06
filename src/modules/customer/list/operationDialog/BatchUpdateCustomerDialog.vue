@@ -34,121 +34,121 @@
 </template>
 
 <script>
-  import Uploader from '@src/util/uploader';
-  import Platform from '@src/platform';
+import Uploader from '@src/util/uploader';
+import Platform from '@src/platform';
 
-  export default {
-    name: "batch-update-customer-dialog",
-    data() {
-      return {
-        fileName: '',
-        visible: false,
-        pending: false,
-        file: null,
-        errors: [],
-        batchUpdateCustomerDialog: false,
+export default {
+  name: "batch-update-customer-dialog",
+  data() {
+    return {
+      fileName: '',
+      visible: false,
+      pending: false,
+      file: null,
+      errors: [],
+      batchUpdateCustomerDialog: false,
+    }
+  },
+  props: {
+    selectedIds: {
+      type: Array,
+      default: () => ([]),
+    },
+    totalItems: {
+      type: Number,
+      default: 0,
+    },
+    action: {
+      type: String,
+      default: '',
+    },
+    buildDownloadParams: {
+      type: Function,
+      default: () => {
+        return function () {}
+      },
+    }
+  },
+  computed: {
+    exportType() {
+      if (this.selectedIds.length) {
+        return 'exportSelect';
       }
+      return 'exportAll';
     },
-    props: {
-      selectedIds: {
-        type: Array,
-        default: () => ([]),
-      },
-      totalItems: {
-        type: Number,
-        default: 0,
-      },
-      action: {
-        type: String,
-        default: '',
-      },
-      buildDownloadParams: {
-        type: Function,
-        default: () => {
-          return function () {}
-        },
+    selectedCount() {
+      if (this.selectedIds.length) {
+        return this.selectedIds.length;
       }
+      return this.totalItems;
     },
-    computed: {
-      exportType() {
-        if (this.selectedIds.length) {
-          return 'exportSelect';
-        }
-        return 'exportAll';
-      },
-      selectedCount() {
-        if (this.selectedIds.length) {
-          return this.selectedIds.length;
-        }
-        return this.totalItems;
-      },
-      tip() {
-        if (this.selectedIds.length) {
-          return `1、您已经选择了<span>${this.selectedIds.length}</span>条数据`
-        }
-        return `1、您已经选择视图全部数据<span>${this.totalItems}</span>条`
-      },
-
+    tip() {
+      if (this.selectedIds.length) {
+        return `1、您已经选择了<span>${this.selectedIds.length}</span>条数据`
+      }
+      return `1、您已经选择视图全部数据<span>${this.totalItems}</span>条`
     },
-    methods: {
-      choose(){
-        this.$refs.file.value = null;
-        this.$refs.file.click();
-      },
-      openBatchUpdateCustomerDialog() {
-        this.batchUpdateCustomerDialog = true;
-      },
-      downloadData() {
-        let params = {
-          count: this.selectedCount,
-          exportType: this.exportType,
-          data: '',
-        };
 
-        if (this.exportType === 'exportSelect') {
-          params.data = this.selectedIds.join(',');
-        } else {
-          params.data = this.buildDownloadParams();
+  },
+  methods: {
+    choose(){
+      this.$refs.file.value = null;
+      this.$refs.file.click();
+    },
+    openBatchUpdateCustomerDialog() {
+      this.batchUpdateCustomerDialog = true;
+    },
+    downloadData() {
+      let params = {
+        count: this.selectedCount,
+        exportType: this.exportType,
+        data: '',
+      };
+
+      if (this.exportType === 'exportSelect') {
+        params.data = this.selectedIds.join(',');
+      } else {
+        params.data = this.buildDownloadParams();
+      }
+
+      window.location.href = `/customer/importCover/export?data=${encodeURI(JSON.stringify(params))}`;
+    },
+    upload(){
+      if(null == this.file || !(this.file instanceof File)) return Platform.alert(`请选择要导入的文件`);
+
+      this.pending = true;
+      Uploader.upload(this.file, this.action).then(result => {
+        if(result.status == 0){
+          let message = '导入成功！';
+          if(result.data && result.data.total) message += `共导入${result.data.total}条数据。`;
+
+          Platform.alert(message);
+          this.visible = false;
+          this.$emit('success');
+        }else{
+          let data = result.data || [];
+          this.errors = data;
+          Platform.alert(`导入失败！\n${data.join('\n')}`);
         }
-
-        window.location.href = `/customer/importCover/export?data=${encodeURI(JSON.stringify(params))}`;
-      },
-      upload(){
-        if(null == this.file || !(this.file instanceof File)) return Platform.alert(`请选择要导入的文件`);
-
-        this.pending = true;
-        Uploader.upload(this.file, this.action).then(result => {
-          if(result.status == 0){
-            let message = '导入成功！';
-            if(result.data && result.data.total) message += `共导入${result.data.total}条数据。`;
-
-            Platform.alert(message);
-            this.visible = false;
-            this.$emit('success');
-          }else{
-            let data = result.data || [];
-            this.errors = data;
-            Platform.alert(`导入失败！\n${data.join('\n')}`);
-          }
-        })
+      })
         .catch(err => {
           console.error(err)
         })
         .finally(() => {
           this.pending = false;
         })
-      },
-      change(event){
-        const files = event.target.files;
-        if (!files || files.length == 0) return;
-        let file = files[0];
-
-        this.errors = [];
-        this.fileName = file.name;
-        this.file = file
-      },
     },
-  }
+    change(event){
+      const files = event.target.files;
+      if (!files || files.length == 0) return;
+      let file = files[0];
+
+      this.errors = [];
+      this.fileName = file.name;
+      this.file = file
+    },
+  },
+}
 </script>
 
 <style lang="scss">

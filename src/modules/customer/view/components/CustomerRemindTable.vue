@@ -51,96 +51,96 @@
 </template>
 
 <script>
-  import {formatDate,} from '@src/util/lang';
+import {formatDate,} from '@src/util/lang';
 
-  export default {
-    name: "customer-remind-table",
-    props: {
-      shareData: {
-        type: Object,
-        default: () => ({})
+export default {
+  name: "customer-remind-table",
+  props: {
+    shareData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      pending: {},
+      remindList: [],
+      columns: this.buildColumns(),
+      paginationInfo: {
+        pageSize: 10,
+        pageNum: 1,
+        totalItems: 0,
       }
+    }
+  },
+  computed: {
+    customerId() {
+      return this.shareData.customer ? this.shareData.customer.id : '';
     },
-    data() {
-      return {
-        pending: {},
-        remindList: [],
-        columns: this.buildColumns(),
-        paginationInfo: {
-          pageSize: 10,
-          pageNum: 1,
-          totalItems: 0,
-        }
-      }
-    },
-    computed: {
-      customerId() {
-        return this.shareData.customer ? this.shareData.customer.id : '';
-      },
-    },
-    mounted() {
-      this.fetchData();
-      this.$eventBus.$on('customer_remind_table.update_remind_list', this.fetchData);
-    },
-    beforeDestroy() {
-      this.$eventBus.$off('customer_remind_table.update_remind_list', this.fetchData);
-    },
-    methods: {
-      async deleteRemind(rm) {
-        try {
-          const action = await this.$platform.confirm(`确定删除 ${rm.remind.name}`);
-          if (!action) return;
+  },
+  mounted() {
+    this.fetchData();
+    this.$eventBus.$on('customer_remind_table.update_remind_list', this.fetchData);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('customer_remind_table.update_remind_list', this.fetchData);
+  },
+  methods: {
+    async deleteRemind(rm) {
+      try {
+        const action = await this.$platform.confirm(`确定删除 ${rm.remind.name}`);
+        if (!action) return;
 
-          await this.$http.get(`/scheduler/delete/${rm.id}`);
-          this.fetchData();
-        } catch (e) {
-          console.error('deleteRemind catch err', e);
-        }
-      },
-      jump(pN) {
-        this.paginationInfo.pageNum = pN;
+        await this.$http.get(`/scheduler/delete/${rm.id}`);
         this.fetchData();
-      },
-      fetchData() {
-        const params = {
-          modalId: this.customerId,
-          modal: 'customer'
-        };
-        this.$http.get('/customer/remind/list', params)
+      } catch (e) {
+        console.error('deleteRemind catch err', e);
+      }
+    },
+    jump(pN) {
+      this.paginationInfo.pageNum = pN;
+      this.fetchData();
+    },
+    fetchData() {
+      const params = {
+        modalId: this.customerId,
+        modal: 'customer'
+      };
+      this.$http.get('/customer/remind/list', params)
         .then(res => {
           this.remindList = res
-          .map(rm => {
-            this.$set(this.pending, rm.id, false);
-            return Object.freeze(rm);
-          });
+            .map(rm => {
+              this.$set(this.pending, rm.id, false);
+              return Object.freeze(rm);
+            });
         })
-      },
-      buildColumns() {
-        return [{
-          label: '提醒名称',
-          field: 'remindName',
-          show: true,
-          tooltip: true,
-          // sortable: 'custom',
-        }, {
-          label: '预计发生时间',
-          field: 'remindTime',
-          show: true,
-          tooltip: true
-        }, {
-          label: '提醒内容',
-          field: 'remindContent',
-          show: true,
-          tooltip: true
-        }, {
-          label: '操作',
-          field: 'action',
-          show: true,
-          tooltip: false
-        }]
-      }
     },
-  }
+    buildColumns() {
+      return [{
+        label: '提醒名称',
+        field: 'remindName',
+        show: true,
+        tooltip: true,
+        // sortable: 'custom',
+      }, {
+        label: '预计发生时间',
+        field: 'remindTime',
+        show: true,
+        tooltip: true
+      }, {
+        label: '提醒内容',
+        field: 'remindContent',
+        show: true,
+        tooltip: true
+      }, {
+        label: '操作',
+        field: 'action',
+        show: true,
+        tooltip: false
+      }]
+    }
+  },
+}
 </script>
 
 <style lang="scss">

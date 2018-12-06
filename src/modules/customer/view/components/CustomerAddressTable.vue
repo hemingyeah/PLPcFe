@@ -62,72 +62,72 @@
 </template>
 
 <script>
-  import {formatDate,} from '@src/util/lang';
-  import platform from '@src/platform'
-  import EditAddressDialog from '../operationDialog/EditAddressDialog.vue';
-  import _ from 'lodash';
+import {formatDate,} from '@src/util/lang';
+import platform from '@src/platform'
+import EditAddressDialog from '../operationDialog/EditAddressDialog.vue';
+import _ from 'lodash';
 
-  export default {
-    name: "customer-address-table",
-    props: {
-      shareData: {
-        type: Object,
-        default: () => ({})
+export default {
+  name: "customer-address-table",
+  props: {
+    shareData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      addressList: [],
+      selectedAddress: {},
+      pending: {},
+      columns: this.buildColumns(),
+      paginationInfo: {
+        pageSize: 10,
+        pageNum: 1,
+        totalItems: 0,
       }
+    }
+  },
+  computed: {
+    customerId() {
+      return this.shareData.customer ? this.shareData.customer.id : '';
     },
-    data() {
-      return {
-        addressList: [],
-        selectedAddress: {},
-        pending: {},
-        columns: this.buildColumns(),
-        paginationInfo: {
-          pageSize: 10,
-          pageNum: 1,
-          totalItems: 0,
-        }
-      }
-    },
-    computed: {
-      customerId() {
-        return this.shareData.customer ? this.shareData.customer.id : '';
-      },
-    },
-    mounted() {
-      this.fetchData();
-      this.$eventBus.$on('customer_address_table.update_address_list', this.fetchData);
-    },
-    beforeDestroy() {
-      this.$eventBus.$off('customer_address_table.update_address_list', this.fetchData);
-    },
-    methods: {
-      openDialog(address) {
-        this.selectedAddress = address;
-        this.$nextTick(() => {
-          this.$refs.addAddressDialog.openDialog();
-        });
+  },
+  mounted() {
+    this.fetchData();
+    this.$eventBus.$on('customer_address_table.update_address_list', this.fetchData);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('customer_address_table.update_address_list', this.fetchData);
+  },
+  methods: {
+    openDialog(address) {
+      this.selectedAddress = address;
+      this.$nextTick(() => {
+        this.$refs.addAddressDialog.openDialog();
+      });
 
-      },
-      async deleteAddress(address) {
-        if (address.isMain) return platform.alert('默认地址不能删除');
-        try {
-          if (!await platform.confirm('确定要删除该地址？')) return;
-          this.pending[address.id] = true;
-          const reqRes = await this.$http.post('/customer/address/delete', {ids: address.id,}, false);
-          delete this.pending[address.id];
-          if (reqRes.status === 0) {
-            this.fetchData();
-          } else {
-            platform.alert(reqRes.message);
-          }
-        } catch (e) {
-          console.error('err',);
-        }
-      },
-      setDefaultAddress(address) {
-        if (this.pending[address.id]) return;
+    },
+    async deleteAddress(address) {
+      if (address.isMain) return platform.alert('默认地址不能删除');
+      try {
+        if (!await platform.confirm('确定要删除该地址？')) return;
         this.pending[address.id] = true;
-        this.$http.post('/customer/address/setMain', {id: address.id}, false)
+        const reqRes = await this.$http.post('/customer/address/delete', {ids: address.id,}, false);
+        delete this.pending[address.id];
+        if (reqRes.status === 0) {
+          this.fetchData();
+        } else {
+          platform.alert(reqRes.message);
+        }
+      } catch (e) {
+        console.error('err',);
+      }
+    },
+    setDefaultAddress(address) {
+      if (this.pending[address.id]) return;
+      this.pending[address.id] = true;
+      this.$http.post('/customer/address/setMain', {id: address.id}, false)
         .then(res => {
           if (res.status === 0) {
             this.fetchData();
@@ -136,80 +136,80 @@
           }
           this.pending[address.id] = false;
         });
-      },
-      openMap(address) {
-        if (!address.longitude && !address.latitude) return;
+    },
+    openMap(address) {
+      if (!address.longitude && !address.latitude) return;
 
-        const ad = {
-          adLongitude: address.longitude,
-          adLatitude: address.latitude,
-        };
+      const ad = {
+        adLongitude: address.longitude,
+        adLatitude: address.latitude,
+      };
 
-        this.$fast.map.display(ad, {title: '客户地址',})
+      this.$fast.map.display(ad, {title: '客户地址',})
         .catch(err => console.error('openMap catch an err: ', err));
-      },
+    },
 
-      jump(pN) {
-        this.paginationInfo.pageNum = pN;
-        this.fetchData();
-      },
-      fetchData() {
-        const params = {
-          customerId: this.customerId,
-          pageNum: this.paginationInfo.pageNum,
-          pageSize: this.paginationInfo.pageSize,
-        };
-        let adArr = [];
+    jump(pN) {
+      this.paginationInfo.pageNum = pN;
+      this.fetchData();
+    },
+    fetchData() {
+      const params = {
+        customerId: this.customerId,
+        pageNum: this.paginationInfo.pageNum,
+        pageSize: this.paginationInfo.pageSize,
+      };
+      let adArr = [];
         
-        this.$http.get('/v2/customer/address/list', params)
+      this.$http.get('/v2/customer/address/list', params)
         .then(res => {
           this.addressList = res.list
-          .map(address => {
-            this.$set(this.pending, address.id, false);
+            .map(address => {
+              this.$set(this.pending, address.id, false);
 
-            adArr = [address.province, address.city, address.dist]
-            .filter(ad => ad);
-            address.area = _.uniq(adArr).join('-');
-            address.createTime = formatDate(new Date(address.createTime), 'YYYY-MM-DD HH:mm:ss');
-            return Object.freeze(address);
-          });
+              adArr = [address.province, address.city, address.dist]
+                .filter(ad => ad);
+              address.area = _.uniq(adArr).join('-');
+              address.createTime = formatDate(new Date(address.createTime), 'YYYY-MM-DD HH:mm:ss');
+              return Object.freeze(address);
+            });
 
           this.paginationInfo.totalItems = res.total;
         })
-      },
-      buildColumns() {
-        return [{
-          label: '地址',
-          field: 'area',
-          show: true,
-          minWidth: '200px',
-          tooltip: true,
-          // sortable: 'custom',
-        }, {
-          label: '详细地址',
-          field: 'address',
-          show: true,
-          minWidth: '200px',
-          tooltip: true
-        }, {
-          label: '',
-          field: 'type',
-          show: true,
-          width: '110px',
-          tooltip: true
-        }, {
-          label: '操作',
-          field: 'action',
-          show: true,
-          tooltip: false
-        }]
-      }
     },
-    components: {
-      EditAddressDialog,
-      [EditAddressDialog.name]: EditAddressDialog,
+    buildColumns() {
+      return [{
+        label: '地址',
+        field: 'area',
+        show: true,
+        minWidth: '200px',
+        tooltip: true,
+        // sortable: 'custom',
+      }, {
+        label: '详细地址',
+        field: 'address',
+        show: true,
+        minWidth: '200px',
+        tooltip: true
+      }, {
+        label: '',
+        field: 'type',
+        show: true,
+        width: '110px',
+        tooltip: true
+      }, {
+        label: '操作',
+        field: 'action',
+        show: true,
+        tooltip: false
+      }]
     }
+  },
+  components: {
+    EditAddressDialog,
+    [EditAddressDialog.name]: EditAddressDialog,
   }
+}
 </script>
 
 <style lang="scss">

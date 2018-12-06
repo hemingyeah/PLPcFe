@@ -89,211 +89,211 @@
 </template>
 
 <script>
-  import CustomerInfoRecord from './components/CustomerInfoRecord.vue';
-  import CustomerEventTable from './components/CustomerEventTable.vue';
-  import CustomerTaskTable from './components/CustomerTaskTable.vue';
-  import CustomerProductTable from './components/CustomerProductTable.vue';
-  import CustomerContactTable from './components/CustomerContactTable.vue';
-  import CustomerAddressTable from './components/CustomerAddressTable.vue';
-  import CustomerPlanTable from './components/CustomerPlanTable';
-  import CustomerRemindTable from './components/CustomerRemindTable';
+import CustomerInfoRecord from './components/CustomerInfoRecord.vue';
+import CustomerEventTable from './components/CustomerEventTable.vue';
+import CustomerTaskTable from './components/CustomerTaskTable.vue';
+import CustomerProductTable from './components/CustomerProductTable.vue';
+import CustomerContactTable from './components/CustomerContactTable.vue';
+import CustomerAddressTable from './components/CustomerAddressTable.vue';
+import CustomerPlanTable from './components/CustomerPlanTable';
+import CustomerRemindTable from './components/CustomerRemindTable';
 
-  import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
-  import EditContactDialog from './operationDialog/EditContactDialog.vue';
-  import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
+import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
+import EditContactDialog from './operationDialog/EditContactDialog.vue';
+import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
-  export default {
-    name: "customer-detail-view",
-    props: {
-      initData: {
-        type: Object,
-        default: () => ({}),
-      }
+export default {
+  name: "customer-detail-view",
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({}),
+    }
+  },
+  data() {
+    return {
+      id: this.initData.id, //当前客户的id
+      tabs: this.buildTabs(),
+      //当前选中的tab
+      currTab: 'customer-info-record',
+      customerOption: {},
+      remindList: [],
+      selectedRemind: {},
+      customer: {},
+    }
+  },
+  computed: {
+    fields() {
+      return (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
     },
-    data() {
-      return {
-        id: this.initData.id, //当前客户的id
-        tabs: this.buildTabs(),
-        //当前选中的tab
-        currTab: 'customer-info-record',
-        customerOption: {},
-        remindList: [],
-        selectedRemind: {},
-        customer: {},
-      }
+    eventTypes() {
+      if (!this.initData || (this.initData && !this.initData.eventTypeList)) return [];
+      return this.initData.eventTypeList.map(t => Object.freeze(t));
     },
-    computed: {
-      fields() {
-        return (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
-      },
-      eventTypes() {
-        if (!this.initData || (this.initData && !this.initData.eventTypeList)) return [];
-        return this.initData.eventTypeList.map(t => Object.freeze(t));
-      },
-      taskTypes() {
-        if (!this.initData || (this.initData && !this.initData.taskTypeList)) return [];
-        return this.initData.taskTypeList.map(t => Object.freeze(t));
-      },
-      //permission
-      permission() {
-        return this.initData.loginUser.authorities;
-      },
-      allowDeleteCustomer() {
-        return this.allowEditCustomer && this.permission.CUSTOMER_DELETE;
-      },
-      allowEditCustomer() {
-        const c = this.customer;
-        const loginUser = this.initData.loginUser;
-        const CUSTOMER_EDIT = this.permission.CUSTOMER_EDIT;
-        if (!CUSTOMER_EDIT) return false;
-        let auth = false;
-        if (CUSTOMER_EDIT === 1) {
-          auth = c.createUser === loginUser.userId;
-        } else if (CUSTOMER_EDIT === 2) {
-          auth = c.createUser === loginUser.userId || this.permissionAccordingToTag();
-        } else {
-          auth = true;
-        }
+    taskTypes() {
+      if (!this.initData || (this.initData && !this.initData.taskTypeList)) return [];
+      return this.initData.taskTypeList.map(t => Object.freeze(t));
+    },
+    //permission
+    permission() {
+      return this.initData.loginUser.authorities;
+    },
+    allowDeleteCustomer() {
+      return this.allowEditCustomer && this.permission.CUSTOMER_DELETE;
+    },
+    allowEditCustomer() {
+      const c = this.customer;
+      const loginUser = this.initData.loginUser;
+      const CUSTOMER_EDIT = this.permission.CUSTOMER_EDIT;
+      if (!CUSTOMER_EDIT) return false;
+      let auth = false;
+      if (CUSTOMER_EDIT === 1) {
+        auth = c.createUser === loginUser.userId;
+      } else if (CUSTOMER_EDIT === 2) {
+        auth = c.createUser === loginUser.userId || this.permissionAccordingToTag();
+      } else {
+        auth = true;
+      }
 
-        return c.isDelete === 0 && (auth || this.isCustomerManager);
-      },
-      permissionAccordingToTag() {
-        const c = this.customer;
-        let tags = Array.isArray(c.tags) ? c.tags : [];
-        let loginUserTagIds = this.initData.loginUser.tagIds || [];
-        //无团队则任何人都可编辑
-        if (tags.length == 0) return true;
+      return c.isDelete === 0 && (auth || this.isCustomerManager);
+    },
+    permissionAccordingToTag() {
+      const c = this.customer;
+      let tags = Array.isArray(c.tags) ? c.tags : [];
+      let loginUserTagIds = this.initData.loginUser.tagIds || [];
+      //无团队则任何人都可编辑
+      if (tags.length == 0) return true;
 
-        //团队权限验证 return Boolean
-        let result = tags.filter(tag => loginUserTagIds.some(tId => tId === tag.id));
+      //团队权限验证 return Boolean
+      let result = tags.filter(tag => loginUserTagIds.some(tId => tId === tag.id));
 
-        return result.length > 0;
-      },
-      /**
+      return result.length > 0;
+    },
+    /**
        * 当前用户是否是该客户负责人
        * 客户负责人用于和客户创建人相同权限
        */
-      isCustomerManager() {
-        const {loginUser, customerManager,} = this.customer;
-        return loginUser.userId === customerManager;
-      },
-      /** 子组件所需的数据 */
-      propsForSubComponents() {
-        return {
-          customer: this.customer,
-          loginUser: this.initData.loginUser,
-        };
+    isCustomerManager() {
+      const {loginUser, customerManager,} = this.customer;
+      return loginUser.userId === customerManager;
+    },
+    /** 子组件所需的数据 */
+    propsForSubComponents() {
+      return {
+        customer: this.customer,
+        loginUser: this.initData.loginUser,
+      };
+    }
+  },
+  methods: {
+    buildTabs() {
+      return [{
+        displayName: '信息动态',
+        component: CustomerInfoRecord.name,
+        slotName: 'record-tab',
+        show: true,
+      }, {
+        displayName: '客户提醒',
+        component: CustomerRemindTable.name,
+        show: true,
+      }, {
+        displayName: '事件',
+        component: CustomerEventTable.name,
+        show: true,
+      }, {
+        displayName: '工单',
+        component: CustomerTaskTable.name,
+        show: true,
+      }, {
+        displayName: '计划任务',
+        component: CustomerPlanTable.name,
+        show: this.initData.planTaskEnabled
+      }, {
+        displayName: '客户产品',
+        component: CustomerProductTable.name,
+        show: true,
+      }, {
+        displayName: '客户地址',
+        component: CustomerAddressTable.name,
+        show: true,
+      }, {
+        displayName: '联系人',
+        component: CustomerContactTable.name,
+        show: true,
+      }]
+        .filter(tab => tab.show);
+    },
+    async deleteCustomer() {
+      try {
+        if (!await this.$platform.confirm('确定要删除该客户？')) return;
+        const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+        if (!result.status) {
+          window.location.href = '/customer';
+        }
+      } catch (e) {
+        console.error('customer-detail-view deleteCustomer error', e);
       }
     },
-    methods: {
-      buildTabs() {
-        return [{
-          displayName: '信息动态',
-          component: CustomerInfoRecord.name,
-          slotName: 'record-tab',
-          show: true,
-        }, {
-          displayName: '客户提醒',
-          component: CustomerRemindTable.name,
-          show: true,
-        }, {
-          displayName: '事件',
-          component: CustomerEventTable.name,
-          show: true,
-        }, {
-          displayName: '工单',
-          component: CustomerTaskTable.name,
-          show: true,
-        }, {
-          displayName: '计划任务',
-          component: CustomerPlanTable.name,
-          show: this.initData.planTaskEnabled
-        }, {
-          displayName: '客户产品',
-          component: CustomerProductTable.name,
-          show: true,
-        }, {
-          displayName: '客户地址',
-          component: CustomerAddressTable.name,
-          show: true,
-        }, {
-          displayName: '联系人',
-          component: CustomerContactTable.name,
-          show: true,
-        }]
-        .filter(tab => tab.show);
-      },
-      async deleteCustomer() {
-        try {
-          if (!await this.$platform.confirm('确定要删除该客户？')) return;
-          const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-          if (!result.status) {
-            window.location.href = '/customer';
-          }
-        } catch (e) {
-          console.error('customer-detail-view deleteCustomer error', e);
-        }
-      },
-      openMap() {
-        this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name,})
+    openMap() {
+      this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name,})
         .catch(err => console.error('openMap catch an err: ', err));
-      },
-      fetchCustomer(id) {
-        this.$http.get(`/v2/customer/get`, {id})
+    },
+    fetchCustomer(id) {
+      this.$http.get(`/v2/customer/get`, {id})
         .then(res => {
           if (res.status) return;
           this.customer = Object.freeze(res.data);
         })
         .catch(err => console.error('customer-detail-view fetchCustomer catch error /n', err));
-      },
-      openDialog(action) {
-        if (action === 'address') {
-          this.$refs.EditAddressDialog.openDialog();
-        } else if (action === 'contact') {
-          this.$refs.EditContactDialog.openDialog();
-        } else if (action === 'remark') {
-          this.$refs.addRemarkDialog.openDialog();
-        } else if (action === 'remind') {
-          this.$refs.addRemindDialog.openDialog();
-        }
-      },
-      jump() {
-        const id = this.id || this.initData.id;
-        window.location.href = `/customer/edit/${id}`
-      },
-      createProduct() {
-        const id = this.id || this.initData.id;
-        window.location.href = `/customer/product/createNew?cid=${id}`
-      },
-      goBack() {
-        window.history.go(-1);
-      },
-      updateRemind(remind) {
-        this.selectedRemind = remind || {};
-        this.$nextTick(this.$refs.addRemindDialog.openDialog);
+    },
+    openDialog(action) {
+      if (action === 'address') {
+        this.$refs.EditAddressDialog.openDialog();
+      } else if (action === 'contact') {
+        this.$refs.EditContactDialog.openDialog();
+      } else if (action === 'remark') {
+        this.$refs.addRemarkDialog.openDialog();
+      } else if (action === 'remind') {
+        this.$refs.addRemindDialog.openDialog();
       }
     },
-    mounted() {
-      this.fetchCustomer(this.initData.id);
-      this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
+    jump() {
+      const id = this.id || this.initData.id;
+      window.location.href = `/customer/edit/${id}`
     },
-    beforeDestroy() {
-      this.$eventBus.$off('customer_detail_view.update_remind', this.updateRemind);
+    createProduct() {
+      const id = this.id || this.initData.id;
+      window.location.href = `/customer/product/createNew?cid=${id}`
     },
-    components: {
-      [CustomerInfoRecord.name]: CustomerInfoRecord,
-      [CustomerEventTable.name]: CustomerEventTable,
-      [CustomerTaskTable.name]: CustomerTaskTable,
-      [CustomerProductTable.name]: CustomerProductTable,
-      [CustomerContactTable.name]: CustomerContactTable,
-      [CustomerAddressTable.name]: CustomerAddressTable,
-      [CustomerPlanTable.name]: CustomerPlanTable,
-      [CustomerRemindTable.name]: CustomerRemindTable,
-      [EditAddressDialog.name]: EditAddressDialog,
-      [EditContactDialog.name]: EditContactDialog,
-      [RemindCustomerDialog.name]: RemindCustomerDialog,
+    goBack() {
+      window.history.go(-1);
+    },
+    updateRemind(remind) {
+      this.selectedRemind = remind || {};
+      this.$nextTick(this.$refs.addRemindDialog.openDialog);
     }
+  },
+  mounted() {
+    this.fetchCustomer(this.initData.id);
+    this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('customer_detail_view.update_remind', this.updateRemind);
+  },
+  components: {
+    [CustomerInfoRecord.name]: CustomerInfoRecord,
+    [CustomerEventTable.name]: CustomerEventTable,
+    [CustomerTaskTable.name]: CustomerTaskTable,
+    [CustomerProductTable.name]: CustomerProductTable,
+    [CustomerContactTable.name]: CustomerContactTable,
+    [CustomerAddressTable.name]: CustomerAddressTable,
+    [CustomerPlanTable.name]: CustomerPlanTable,
+    [CustomerRemindTable.name]: CustomerRemindTable,
+    [EditAddressDialog.name]: EditAddressDialog,
+    [EditContactDialog.name]: EditContactDialog,
+    [RemindCustomerDialog.name]: RemindCustomerDialog,
   }
+}
 </script>
 
 <style lang="scss">

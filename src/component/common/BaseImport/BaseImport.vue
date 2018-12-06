@@ -8,7 +8,7 @@
       <p>{{fileName}}</p>
       <el-button type="primary" @click="choose" :disabled="pending">选择文件</el-button>
       <input type="file" ref="file" @change="change"
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+             accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
     </div>
 
     <div class="base-import-error" v-if="errors.length > 0">

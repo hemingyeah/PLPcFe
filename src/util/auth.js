@@ -4,7 +4,7 @@
  * @param {*} auth 权限对象 
  * @param {*} key 权限值,支持字符串和数组
  */
-function hasAuth(auth = {}, keys){
+export function hasAuth(auth = {}, keys){
   if(!Array.isArray(keys)) keys = [keys];
 
   let authKeys = Object.keys(auth);
@@ -18,7 +18,7 @@ function hasAuth(auth = {}, keys){
  * @param {*} auth - 权限对象 
  * @param {*} key - 权限值,支持字符串和数组
  */
-function hasEveryAuth(auth = {}, keys){
+export function hasEveryAuth(auth = {}, keys){
   if(!Array.isArray(keys)) keys = [keys];
 
   let authKeys = Object.keys(auth);
@@ -27,7 +27,7 @@ function hasEveryAuth(auth = {}, keys){
   return keys.every(item => authKeys.indexOf(item) >= 0);
 }
 
-export const util = {
+const util = {
   hasAuth,
   hasEveryAuth
 }

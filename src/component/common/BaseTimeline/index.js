@@ -34,8 +34,8 @@ const BaseTimeline = {
             <div class="base-timeline-content">
               {
                 this.loading 
-                ? <span class="base-timeline-loadmore">正在加载...</span>
-                : <button type="button" class="btn-text base-timeline-loadmore" onClick={e => this.$emit('load')}>加载更多</button>
+                  ? <span class="base-timeline-loadmore">正在加载...</span>
+                  : <button type="button" class="btn-text base-timeline-loadmore" onClick={e => this.$emit('load')}>加载更多</button>
               }
             </div>
           </div>

@@ -40,154 +40,154 @@
 </template>
 
 <script>
-  import { formatDate, } from '@src/util/lang';
+import { formatDate, } from '@src/util/lang';
 
-  export default {
-    name: "send-message-dialog",
-    data: () => {
-      return {
-        form: {
-          smsTemplateId: '',
-          isAllLm: '0',
-          sendTime: new Date(),
+export default {
+  name: "send-message-dialog",
+  data: () => {
+    return {
+      form: {
+        smsTemplateId: '',
+        isAllLm: '0',
+        sendTime: new Date(),
+      },
+      count: {
+        default: {
+          value: 0,
+          loaded: false,
         },
-        count: {
-          default: {
-            value: 0,
-            loaded: false,
-          },
-          all: {
-            value: 0,
-            loaded: false,
-          },
+        all: {
+          value: 0,
+          loaded: false,
         },
-        sendMessageDialog: false,
-        pending: false,
-        messageTemplate: []
+      },
+      sendMessageDialog: false,
+      pending: false,
+      messageTemplate: []
+    }
+  },
+  props: {
+    selectedIds: {
+      type: Array,
+      default: () => ([]),
+    },
+  },
+  computed: {
+    template() {
+      return this.messageTemplate.filter(t => t.id === this.form.smsTemplateId)
+        .map(t => t.allowContent).join('');
+    },
+    needFetchCount() {
+      if (this.form.isAllLm === '0' && this.count.default.loaded) {
+        return false;
       }
+      return !(this.form.isAllLm === '1' && this.count.all.loaded)
     },
-    props: {
-      selectedIds: {
-        type: Array,
-        default: () => ([]),
-      },
-    },
-    computed: {
-      template() {
-        return this.messageTemplate.filter(t => t.id === this.form.smsTemplateId)
-          .map(t => t.allowContent).join('');
-      },
-      needFetchCount() {
-        if (this.form.isAllLm === '0' && this.count.default.loaded) {
-          return false;
-        }
-        return !(this.form.isAllLm === '1' && this.count.all.loaded)
-      },
-      displayCount() {
-        if (this.form.isAllLm === '0') {
-          return this.count.default.value;
-        } else {
-          return this.count.all.value;
-        }
+    displayCount() {
+      if (this.form.isAllLm === '0') {
+        return this.count.default.value;
+      } else {
+        return this.count.all.value;
       }
-    },
-    mounted() {
-      this.buildParams();
-    },
-    methods: {
-      onSubmit() {
-        const params = this.buildParams();
-        this.pending = true;
+    }
+  },
+  mounted() {
+    this.buildParams();
+  },
+  methods: {
+    onSubmit() {
+      const params = this.buildParams();
+      this.pending = true;
 
-        this.$http.post('/customer/sendSmsBatch', params, false)
-          .then(res => {
-            if (res.status === 0) {
-              this.pending = false;
-              this.sendMessageDialog = false;
-              this.$platform.alert('批量发送短信成功');
-            } else {
-              return Promise.reject('status !== 0');
-            }
-          })
-          .catch(err => {
+      this.$http.post('/customer/sendSmsBatch', params, false)
+        .then(res => {
+          if (res.status === 0) {
             this.pending = false;
-            this.$platform.alert('批量发送短信失败');
-            console.error('sendSmsBatch err', err);
-          })
-      },
-      openSendMessageDialog() {
-        if (!this.selectedIds.length) {
-          return this.$platform.alert('请选择需要批量发送短信的客户');
-        }
-        this.sendMessageDialog = true;
-        this.fetchCount();
-        this.fetchTemplate();
-      },
-      fetchCount() {
-        if (!this.needFetchCount) return;
-        this.pending = true;
-        const params = {
-          ids: this.selectedIds.join(','),
-          isAllLm: this.form.isAllLm,
-        };
-        this.$http.get('/customer/computeSendNum', params)
-          .then(res => {
-            if (this.form.isAllLm === '0') {
-              this.count.default.value = res.data;
-              this.count.default.loaded = true;
-            } else {
-              this.count.all.value = res.data;
-              this.count.all.loaded = true;
-            }
-            this.pending = false;
-          })
-          .catch(err => {
-            this.pending = false;
-            console.error('fetchCount err', err);
-          })
-      },
-      fetchTemplate() {
-        this.$http.get('/vipsms/getTemplates', {pageSize: '100', pageNum: '1',})
-          .then(res => {
-            if (res.status) {
-              this.$platform.alert('获取短信模板失败');
-            }
-            this.messageTemplate = (res.data.list || [])
+            this.sendMessageDialog = false;
+            this.$platform.alert('批量发送短信成功');
+          } else {
+            return Promise.reject('status !== 0');
+          }
+        })
+        .catch(err => {
+          this.pending = false;
+          this.$platform.alert('批量发送短信失败');
+          console.error('sendSmsBatch err', err);
+        })
+    },
+    openSendMessageDialog() {
+      if (!this.selectedIds.length) {
+        return this.$platform.alert('请选择需要批量发送短信的客户');
+      }
+      this.sendMessageDialog = true;
+      this.fetchCount();
+      this.fetchTemplate();
+    },
+    fetchCount() {
+      if (!this.needFetchCount) return;
+      this.pending = true;
+      const params = {
+        ids: this.selectedIds.join(','),
+        isAllLm: this.form.isAllLm,
+      };
+      this.$http.get('/customer/computeSendNum', params)
+        .then(res => {
+          if (this.form.isAllLm === '0') {
+            this.count.default.value = res.data;
+            this.count.default.loaded = true;
+          } else {
+            this.count.all.value = res.data;
+            this.count.all.loaded = true;
+          }
+          this.pending = false;
+        })
+        .catch(err => {
+          this.pending = false;
+          console.error('fetchCount err', err);
+        })
+    },
+    fetchTemplate() {
+      this.$http.get('/vipsms/getTemplates', {pageSize: '100', pageNum: '1',})
+        .then(res => {
+          if (res.status) {
+            this.$platform.alert('获取短信模板失败');
+          }
+          this.messageTemplate = (res.data.list || [])
             .filter(t => t.notice === '自定义通知' && t.status === 'pass_approval');
-            if (this.messageTemplate.length) {
-              this.form.smsTemplateId = this.messageTemplate[0].id;
-            }
+          if (this.messageTemplate.length) {
+            this.form.smsTemplateId = this.messageTemplate[0].id;
+          }
 
-          })
-          .catch(err => {
-            console.error('fetchTemplate', err);
-            this.$platform.alert('获取短信模板发生错误');
-          })
-      },
-      buildParams() {
-        const {smsTemplateId, isAllLm, sendTime,} = this.form;
+        })
+        .catch(err => {
+          console.error('fetchTemplate', err);
+          this.$platform.alert('获取短信模板发生错误');
+        })
+    },
+    buildParams() {
+      const {smsTemplateId, isAllLm, sendTime,} = this.form;
 
-        return {
-          smsTemplateId,
-          isAllLm,
-          sendTime: formatDate(sendTime, 'YYYY-MM-DD HH:mm:ss'),
-          ids: this.selectedIds.join(','),
-        }
-      },
-      reset() {
-        this.count = {
-          default: {
-            value: 0,
-            loaded: false,
-          },
-          all: {
-            value: 0,
-            loaded: false,
-          },
-        };
+      return {
+        smsTemplateId,
+        isAllLm,
+        sendTime: formatDate(sendTime, 'YYYY-MM-DD HH:mm:ss'),
+        ids: this.selectedIds.join(','),
       }
     },
-  }
+    reset() {
+      this.count = {
+        default: {
+          value: 0,
+          loaded: false,
+        },
+        all: {
+          value: 0,
+          loaded: false,
+        },
+      };
+    }
+  },
+}
 </script>
 
 <style lang="scss">

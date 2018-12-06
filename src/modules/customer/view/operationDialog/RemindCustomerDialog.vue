@@ -40,79 +40,79 @@
 </template>
 
 <script>
-  export default {
-    name: "remind-customer-dialog",
-    data: () => {
-      return {
-        cmAllOptions: [],
-        remindTemplate: [],
-        remoteSearchCM: {
-          loading: false,
-          options: [],
-        },
-        form: {
-          remindId: null,
-          users: [],
-        },
-        remindCustomerDialog: false,
-        pending: false,
-      }
+export default {
+  name: "remind-customer-dialog",
+  data: () => {
+    return {
+      cmAllOptions: [],
+      remindTemplate: [],
+      remoteSearchCM: {
+        loading: false,
+        options: [],
+      },
+      form: {
+        remindId: null,
+        users: [],
+      },
+      remindCustomerDialog: false,
+      pending: false,
+    }
+  },
+  props: {
+    customer: {
+      type: Object,
+      default: () => ({}),
     },
-    props: {
-      customer: {
-        type: Object,
-        default: () => ({}),
-      },
-      // editedRemind
-      editedRemind: {
-        type: Object,
-        default: () => ({}),
-      }
+    // editedRemind
+    editedRemind: {
+      type: Object,
+      default: () => ({}),
+    }
+  },
+  computed: {
+    action() {
+      return this.editedRemind.id ? 'edit' : 'create';
     },
-    computed: {
-      action() {
-        return this.editedRemind.id ? 'edit' : 'create';
-      },
-      selectedRemind() {
-        return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
-      },
-      remindRule() {
-        const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
-        let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
-        let isahead = isAhead ? "前" : "后";
+    selectedRemind() {
+      return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
+    },
+    remindRule() {
+      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
+      let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
+      let isahead = isAhead ? "前" : "后";
 
-        if (!isRepeat){
-          if(fieldDisplayName){
-            return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
-          }else{
-            return '无'
-          }
+      if (!isRepeat){
+        if(fieldDisplayName){
+          return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
         }else{
-          if(period){
-            return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
-          }else{
-            return '无'
-          }
+          return '无'
+        }
+      }else{
+        if(period){
+          return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
+        }else{
+          return '无'
         }
       }
-    },
-    mounted() {
-      this.fetchData();
-    },
-    methods: {
-      onSubmit() {
-        const params = this.buildParams();
-        this.pending = true;
-        let reqUrl = '';
-        let actionName = '';
-        if (this.action === 'edit') {
-          reqUrl = '/scheduler/editByJson';
-          actionName = '编辑提醒';
-        } else {
-          reqUrl = '/scheduler/buildByJson';
-          actionName = '添加提醒';
-        }
-        this.$http.post(reqUrl, params)
+    }
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    onSubmit() {
+      const params = this.buildParams();
+      this.pending = true;
+      let reqUrl = '';
+      let actionName = '';
+      if (this.action === 'edit') {
+        reqUrl = '/scheduler/editByJson';
+        actionName = '编辑提醒';
+      } else {
+        reqUrl = '/scheduler/buildByJson';
+        actionName = '添加提醒';
+      }
+      this.$http.post(reqUrl, params)
         .then(res => {
           if (res.status === 0) {
             this.$platform.alert(`${actionName}成功`);
@@ -134,45 +134,45 @@
           this.pending = false;
           console.error('post to /scheduler/buildBatch err', err)
         });
-      },
-      buildParams() {
-        return {
-          id: this.action === 'edit' ? this.editedRemind.id : '',
-          modalId: this.customer.id,
-          modalName: this.customer.name,
-          modal: 'customer',
-          remind: {
-            id: this.form.remindId,
-          },
-          users: this.cmAllOptions.filter(rc => this.form.users.includes(rc.id))
-        };
-      },
-      openDialog() {
-        this.remindCustomerDialog = true;
+    },
+    buildParams() {
+      return {
+        id: this.action === 'edit' ? this.editedRemind.id : '',
+        modalId: this.customer.id,
+        modalName: this.customer.name,
+        modal: 'customer',
+        remind: {
+          id: this.form.remindId,
+        },
+        users: this.cmAllOptions.filter(rc => this.form.users.includes(rc.id))
+      };
+    },
+    openDialog() {
+      this.remindCustomerDialog = true;
 
-        if (this.action === 'edit') {
-          this.form.remindId = this.editedRemind.remind.id;
-          this.form.users = (this.editedRemind.users || []).map(user => user.id);
-          this.remoteSearchCM.options = this.editedRemind.users;
-          this.cmAllOptions = this.editedRemind.users;
-        }
-        this.searchCustomerManager();
-      },
-      fetchData() {
-        this.$http.get('/v2/customer/getReminds', {pageSize: 0, })
+      if (this.action === 'edit') {
+        this.form.remindId = this.editedRemind.remind.id;
+        this.form.users = (this.editedRemind.users || []).map(user => user.id);
+        this.remoteSearchCM.options = this.editedRemind.users;
+        this.cmAllOptions = this.editedRemind.users;
+      }
+      this.searchCustomerManager();
+    },
+    fetchData() {
+      this.$http.get('/v2/customer/getReminds', {pageSize: 0, })
         .then(res => {
           let tv = null;
 
           if (res) {
             this.remindTemplate = (res.list || [])
-            .map(r => {
-              if (r.isDdResponse) {
-                r.name = r.name + '（内部提醒）';
-              } else {
-                r.name = r.name + '（外部提醒）';
-              }
-              return r;
-            });
+              .map(r => {
+                if (r.isDdResponse) {
+                  r.name = r.name + '（内部提醒）';
+                } else {
+                  r.name = r.name + '（外部提醒）';
+                }
+                return r;
+              });
 
             tv = this.remindTemplate[0];
             if (tv) {
@@ -185,17 +185,17 @@
           }
         })
         .catch(err => console.error('err', err));
-      },
-      searchCustomerManager(keyword) {
-        this.remoteSearchCM.loading = true;
-        this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+    },
+    searchCustomerManager(keyword) {
+      this.remoteSearchCM.loading = true;
+      this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
           let obj = {};
           const newList = res.list
-          .map(c => Object.freeze({
-            id: c.staffId,
-            name: c.displayName,
-          }));
+            .map(c => Object.freeze({
+              id: c.staffId,
+              name: c.displayName,
+            }));
           this.remoteSearchCM.options = newList;
 
           // 数组中的对象根据id去重
@@ -207,9 +207,9 @@
           this.remoteSearchCM.loading = false;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
-      },
     },
-  }
+  },
+}
 </script>
 
 <style lang="scss">

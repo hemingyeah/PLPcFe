@@ -134,7 +134,6 @@ const FormView = {
       return newArr;
     }
   },
-  },
   render() {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     let groups = this.groupField(this.fields);

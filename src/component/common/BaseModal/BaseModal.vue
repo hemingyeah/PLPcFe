@@ -27,104 +27,104 @@
 </template>
 
 <script>
-  import { scrollBarWidth as getScrollBarWidth, hasClass, removeClass, addClass, getStyle } from '@src/util/dom';
+import { scrollBarWidth as getScrollBarWidth, hasClass, removeClass, addClass, getStyle } from '@src/util/dom';
 
-  export default {
-    name: "base-modal",
-    props: {
-      show: { //是否显示组件
-        type: Boolean,
-        default: false
-      },
-      title: {
-        type: String,
-        default: ''
-      },
-      width: {
-        type: String,
-        default: '640px'
-      },
-      closeable: { //是否能手动关闭
-        type: Boolean,
-        default: true
-      },
-      maskCloseable: {//是否允许点击遮罩关闭
-        type: Boolean,
-        default: false
-      },
-      bodyClass: String,
-      appendToBody: { //是否将弹窗插入body中
-        type: Boolean,
-        default: false
+export default {
+  name: "base-modal",
+  props: {
+    show: { //是否显示组件
+      type: Boolean,
+      default: false
+    },
+    title: {
+      type: String,
+      default: ''
+    },
+    width: {
+      type: String,
+      default: '640px'
+    },
+    closeable: { //是否能手动关闭
+      type: Boolean,
+      default: true
+    },
+    maskCloseable: {//是否允许点击遮罩关闭
+      type: Boolean,
+      default: false
+    },
+    bodyClass: String,
+    appendToBody: { //是否将弹窗插入body中
+      type: Boolean,
+      default: false
+    }
+  },
+  watch: {
+    show(val) {
+      if (val) return this.computeStyle();
+      this.restoreBodyStyle();
+    }
+  },
+  methods: {
+    closed() {
+      this.$emit('closed'); //关闭动画结束时触发
+    },
+    close() {
+      this.$emit('close'); //关闭时触发
+      //兼容sync
+      this.$emit('update:show', false);
+    },
+    cancel() {
+      this.$emit('cancel'); //点击关闭按钮，或遮罩层关闭时触发
+      this.close();
+    },
+    maskClose() {
+      if (this.closeable && this.maskCloseable) {
+        this.cancel();
       }
     },
-    watch: {
-      show(val) {
-        if (val) return this.computeStyle();
-        this.restoreBodyStyle();
+    escClose(event) {
+      if (this.show && this.closeable && event.keyCode == 27) {
+        this.cancel();
       }
     },
-    methods: {
-      closed() {
-        this.$emit('closed'); //关闭动画结束时触发
-      },
-      close() {
-        this.$emit('close'); //关闭时触发
-        //兼容sync
-        this.$emit('update:show', false);
-      },
-      cancel() {
-        this.$emit('cancel'); //点击关闭按钮，或遮罩层关闭时触发
-        this.close();
-      },
-      maskClose() {
-        if (this.closeable && this.maskCloseable) {
-          this.cancel();
-        }
-      },
-      escClose(event) {
-        if (this.show && this.closeable && event.keyCode == 27) {
-          this.cancel();
-        }
-      },
-      computeStyle() {
-        this.withoutHiddenClass = !hasClass(document.body, 'overflow-body-for-modal');
-        this.bodyPaddingRight = document.body.style.paddingRight;
-        let computedBodyPaddingRight = parseInt(getStyle(document.body, 'paddingRight'), 10);
-        let bodyHasOverflow = document.documentElement.clientHeight < document.body.scrollHeight;
-        let bodyOverflowY = getStyle(document.body, 'overflowY');
-        let scrollBarWidth = getScrollBarWidth();
+    computeStyle() {
+      this.withoutHiddenClass = !hasClass(document.body, 'overflow-body-for-modal');
+      this.bodyPaddingRight = document.body.style.paddingRight;
+      let computedBodyPaddingRight = parseInt(getStyle(document.body, 'paddingRight'), 10);
+      let bodyHasOverflow = document.documentElement.clientHeight < document.body.scrollHeight;
+      let bodyOverflowY = getStyle(document.body, 'overflowY');
+      let scrollBarWidth = getScrollBarWidth();
 
-        if (scrollBarWidth > 0 && (bodyHasOverflow || bodyOverflowY === 'scroll') && this.withoutHiddenClass) {
-          document.body.style.paddingRight = computedBodyPaddingRight + scrollBarWidth + 'px';
-        }
-        addClass(document.body, 'overflow-body-for-modal');
-      },
-      restoreBodyStyle() {
-        if (!this.show && this.withoutHiddenClass) {
-          document.body.style.paddingRight = this.bodyPaddingRight;
-          removeClass(document.body, 'overflow-body-for-modal');
-        }
-        this.withoutHiddenClass = true;
+      if (scrollBarWidth > 0 && (bodyHasOverflow || bodyOverflowY === 'scroll') && this.withoutHiddenClass) {
+        document.body.style.paddingRight = computedBodyPaddingRight + scrollBarWidth + 'px';
       }
+      addClass(document.body, 'overflow-body-for-modal');
     },
-    mounted() {
-      //document.addEventL.body-heightistener('keydown', this.escClose)
-
-      if (this.appendToBody) {
-        document.body.appendChild(this.$el);
+    restoreBodyStyle() {
+      if (!this.show && this.withoutHiddenClass) {
+        document.body.style.paddingRight = this.bodyPaddingRight;
+        removeClass(document.body, 'overflow-body-for-modal');
       }
+      this.withoutHiddenClass = true;
+    }
+  },
+  mounted() {
+    //document.addEventL.body-heightistener('keydown', this.escClose)
 
-    },
-    destroyed() {
-      //document.removeEventListener('keydown', this.escClose)
+    if (this.appendToBody) {
+      document.body.appendChild(this.$el);
+    }
 
-      // if appendToBody is true, remove DOM node after destroy
-      if (this.appendToBody && this.$el && this.$el.parentNode) {
-        this.$el.parentNode.removeChild(this.$el);
-      }
+  },
+  destroyed() {
+    //document.removeEventListener('keydown', this.escClose)
+
+    // if appendToBody is true, remove DOM node after destroy
+    if (this.appendToBody && this.$el && this.$el.parentNode) {
+      this.$el.parentNode.removeChild(this.$el);
     }
   }
+}
 </script>
 
 <style lang="scss">

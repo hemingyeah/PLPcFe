@@ -33,7 +33,7 @@ function createPreviewComp(h, field){
       onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
       {!field.isSystem && <button type="button" class="form-design-preview-delete"
-               onClick={e => this.deleteField(field)}>
+        onClick={e => this.deleteField(field)}>
         <i class="iconfont icon-close"></i>
       </button>}
       <div class="form-design-cover"></div>
