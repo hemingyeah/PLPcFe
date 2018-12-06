@@ -92,7 +92,7 @@ function gen(directory, fileName){
       //注入jsp头部信息
       template = '<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>\n' + template;
       //注入构建信息
-      template += `\n<!-- build on ${new Date().toLocaleString()}. -->`;
+      //template += `\n<!-- build on ${new Date().toLocaleString()}. -->`;
       //注入监控脚本
       template = template.replace('</head>', monitorScript + '</head>');
       
