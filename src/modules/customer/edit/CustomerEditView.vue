@@ -8,30 +8,30 @@
       <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
         <template slot="serialNumber" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.serialNumber" :validation="!config.isAutoSerialNumber">
-            <form-text 
+            <form-text
               v-if="!config.isAutoSerialNumber"
-              :field="field" 
-              :value="form.serialNumber" @input="update" 
+              :field="field"
+              :value="form.serialNumber" @input="update"
               :placeholder="genPlaceholder(field)"/>
             <div v-else class="form-item__text">客户编号将在创建后由系统生成</div>
           </form-item>
         </template>
-        
+
         <template slot="name" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.name" validation>
-            <form-text 
-              :field="field" 
+            <form-text
+              :field="field"
               :value="form.name" @input="update"
               :placeholder="genPlaceholder(field)"/>
           </form-item>
         </template>
-        
+
         <template slot="lmName" slot-scope="{field}">
           <form-item :label="field.displayName" validation>
             <div class="input-and-btn">
-              <form-text 
-                :field="field" 
-                :value="form.lmName" @input="update" 
+              <form-text
+                :field="field"
+                :value="form.lmName" @input="update"
                 :placeholder="genPlaceholder(field)"/>
               <el-button @click="copyName">同名客户</el-button>
             </div>
@@ -40,8 +40,8 @@
 
         <template slot="lmPhone" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.lmPhone" validation>
-            <form-text 
-              :field="field" 
+            <form-text
+              :field="field"
               :value="form.lmPhone" @input="update"
               :placeholder="genPlaceholder(field)"/>
           </form-item>
@@ -50,7 +50,7 @@
         <template slot="customerAddress" slot-scope="{field}">
           <form-item :label="field.displayName" validation>
             <form-address
-              :field="field" 
+              :field="field"
               :value="form.customerAddress" @input="update"
               @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
               :placeholder="genPlaceholder(field)"></form-address>
@@ -60,9 +60,9 @@
         <template slot="tags" slot-scope="{field}">
           <form-item :label="field.displayName" validation>
             <div class="input-and-btn">
-              <form-select 
+              <form-select
                 :field="field" :source="selectTagOptions || []"
-                :value="form.tags" @input="update" 
+                :value="form.tags" @input="update"
                 :placeholder="genPlaceholder(field)"/>
               <el-button type="button" @click="autoAssign">自动分配</el-button>
             </div>
@@ -102,6 +102,9 @@ export default {
     },
     editId() {
       return this.initData.id || '';
+    },
+    eventId() {
+      return this.initData.eventId || '';
     },
     config() {
       const { customerAddress, isAutoSerialNumber, isDivideByTag, isCustomerNameDuplicate, isPhoneUnique, } = this.initData;
@@ -197,6 +200,10 @@ export default {
           if (this.action === 'edit') {
             return this.updateMethod(params);
           }
+          if (this.action === 'createFromEvent') {
+            return this.createCustomerForEvent(params);
+          }
+
           this.createMethod(params);
         })
         .catch(err => {
@@ -204,6 +211,31 @@ export default {
           this.pending = false;
           this.loadingPage = false;
         });
+    },
+    createCustomerForEvent(params) {
+      this.$http.post('/event/customer/create', params)
+        .then(res => {
+          if (res.status) return this.$platform.alert('创建客户失败');
+          const params = {
+            ...res.data,
+            eventId: this.eventId,
+          };
+
+          delete params.latitude;
+          delete params.longitude;
+
+          this.$http.post('/event/update4CusInfo', params, false)
+            .then(res => {
+
+              if (this.action === 'createFromEvent' && this.initData.goto === 'eventView') {
+                return window.location.href = `/event/view/${this.initData.eventId}`;
+              }
+              if (this.action === 'createFromEvent' && this.initData.goto === 'createTask') {
+                return window.location.href = `/event/convent2Task/jump?eventId=${this.initData.eventId}`;
+              }
+            })
+        })
+        .catch(err => console.error('createCustomerForEvent catch an error', err));
     },
     createMethod(params) {
       this.$http.post('/customer/create', params)
@@ -334,7 +366,7 @@ export default {
           return;
         }
 
-        isSystem == 0 
+        isSystem == 0
           ? customer.attribute[fieldName] = value
           : customer[fieldName] = value;
       })
@@ -343,18 +375,22 @@ export default {
     }
   },
   async mounted() {
-    //初始化默认区域
+    // //初始化默认区域
     if (this.initData.customerAddress) {
       this.setDefaultAddress(this.initData.customerAddress);
     }
 
     //初始化默认值
-    let form = {}; 
-      
+    let form = {};
+
     if (this.initData.action === 'edit' && this.initData.id) {
       //处理编辑时数据
       let cusRes = await this.fetchCustomer(this.initData.id);
       if(cusRes.status == 0) form = cusRes.data;
+    }
+
+    if (this.initData.action === 'createFromEvent') {
+      form = this.initData.eventCustomer;
     }
 
     this.form = FormUtil.initialize(this.fields, form, this.customerToForm);
@@ -372,7 +408,7 @@ export default {
   padding: 10px;
   background-color: #fff;
 
-  .page-title { 
+  .page-title {
     border-bottom: 1px solid #f4f7f5;
     padding: 10px 0;
 
