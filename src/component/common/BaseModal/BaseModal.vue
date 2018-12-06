@@ -137,6 +137,7 @@
     @include mask();
     z-index: 999;
     overflow: auto;
+    background-color: rgba(0, 0, 0, 0.15);
   }
 
   .base-modal {

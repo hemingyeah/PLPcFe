@@ -25,8 +25,8 @@ const FormView = {
     buildCommonDom({displayName, value, formType}) {
       let clazz = {
         'form-view-row-content': true,
-        'form-view-textarea-preview': formType == 'textarea',
-        'base-file__preview': formType == 'attachment',
+        'form-view-textarea-preview': formType === 'textarea',
+        'base-file__preview': formType === 'attachment',
       };
       
       return (
@@ -38,7 +38,7 @@ const FormView = {
     },
     mapFieldToDom(field) {
       let {formType, fieldName, displayName, isSystem} = field;
-      if (formType == 'separator') {
+      if (formType === 'separator') {
         const cn = `iconfont icon-triangle-down ${!this.sectionState[field.id] && 'reversal'}`;
         return (
           <h4 class="section-title">
@@ -82,10 +82,24 @@ const FormView = {
         };
       }
       
+      if (formType === 'select' && fieldName === 'tags') {
+        params = {
+          ...params,
+          value: value.map(tag => tag.tagName).join('，')
+        };
+      }
+      
       if (formType === 'user') {
         params = {
           ...params,
           value: value && value.displayName
+        };
+      }
+      
+      if (formType === 'user' && fieldName === 'manager') {
+        params = {
+          ...params,
+          value: this.value.customerManagerName
         };
       }
       
@@ -120,6 +134,7 @@ const FormView = {
       return newArr;
     }
   },
+  },
   render() {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     let groups = this.groupField(this.fields);
@@ -130,7 +145,7 @@ const FormView = {
       let title = group.filter(f => f.formType === 'separator').map(item => {
         currentGroupId = item.id;
         if (this.sectionState[currentGroupId] === undefined) {
-          this.$set(this.sectionState, currentGroupId, currentGroupId === 'form-view-base-separator');
+          this.$set(this.sectionState, currentGroupId, true);
         }
         return this.mapFieldToDom(item);
       });

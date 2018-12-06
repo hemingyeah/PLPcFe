@@ -11,9 +11,7 @@
           <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
           <a href="/customer">返回旧版</a>
         </div>
-        <el-button type="primary" @click="advancedSearchPanelShow = !advancedSearchPanelShow"
-                   class="advanced-search-visible-btn">高级搜索
-        </el-button>
+        <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
       </form>
       <!--高级搜索-->
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
@@ -35,7 +33,6 @@
               placeholder="请输入关键词搜索"
               :loading="inputRemoteSearch.linkman.loading"
               :remote-method="searchLinkman">
-
 
               <el-option
                 v-for="item in inputRemoteSearch.linkman.options"
@@ -206,33 +203,18 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <el-button v-if="editedPermission" type="primary" icon="el-icon-plus" @click="jumpPage">新建</el-button>
-          <el-button plain v-if="highLevelPermission" type="primary" icon="el-icon-delete" @click="deleteCustomer"
-                     >删除
-          </el-button>
+          <base-button type="plain" icon="icon-add" @event="jumpPage">新建</base-button>
+          <base-button type="plain" icon="icon-yemianshanchu" v-if="highLevelPermission" @event="deleteCustomer">删除</base-button>
         </div>
 
         <div>
-          <el-dropdown trigger="click" v-if="highLevelPermission">
-            <el-button type="primary">
-              批量操作<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
-                <div @click="openDialog('sendMessage')">发送短信</div>
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <div @click="openDialog('edit')">批量编辑</div>
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <div @click="openDialog('remind')">批量提醒</div>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+          <base-button type="plain" @event="openDialog('sendMessage')">发送短信</base-button>
+          <base-button type="plain" @event="openDialog('edit')">批量编辑</base-button>
+          <base-button type="plain" @event="openDialog('remind')">批量提醒</base-button>
           <el-dropdown trigger="click" v-if="exportPermission">
-            <el-button type="primary" class="delete-customer-btn">
-              更多操作<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
+            <span class="el-dropdown-link el-dropdown-btn">
+              <i class="el-icon-arrow-down"></i>更多操作
+            </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
                 <div @click="openDialog('importCustomer')">导入客户</div>
@@ -252,9 +234,9 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
-            <el-button type="primary" class="delete-customer-btn">
-              选择列<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
+            <span class="el-dropdown-link el-dropdown-btn">
+              <i class="el-icon-arrow-down"></i>选择列
+            </span>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.field">
                 <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label">
@@ -273,8 +255,8 @@
         @select-all="handleSelection"
         @sort-change="sortChange"
         :highlight-current-row="false"
+        header-row-class-name="customer-table-header"
         ref="multipleTable" class="customer-table">
-        <!--row-key="serialNumber"-->
 
         <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
         <el-table-column
@@ -336,8 +318,8 @@
           <i class="iconfont icon-abnormal"></i>
           已选中 <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条
           <span class="selectedCount" @click="toggleSelection()">清空</span>
-          <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录</span>
-          <span class="level-padding">共<span class="level-padding">{{paginationInfo.totalPages}}</span>页</span>
+          <!--<span class="level-padding">共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录</span>-->
+          <!--<span class="level-padding">共<span class="level-padding">{{paginationInfo.totalPages}}</span>页</span>-->
         </div>
         <el-pagination
           class="customer-table-pagination"
@@ -1302,6 +1284,8 @@
 </script>
 
 <style lang="scss">
+  $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+
   html, body {
     height: 100%;
   }
@@ -1366,11 +1350,14 @@
       .advanced-search-visible-btn {
         font-size: 14px;
         font-weight: lighter;
-        height: 32px;
-        line-height: 12px;
+        line-height: 32px;
         color: $color-primary;
         border-color: $color-primary;
         background: #fff;
+        padding: 0 13px;
+        &:hover {
+          cursor: pointer;
+        }
       }
     }
 
@@ -1390,14 +1377,13 @@
 
         .advanced-search-btn-group {
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-end;
           width: 365px;
           height: 40px;
           margin: 0 auto 25px;
 
           .el-button {
-            width: 160px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: lighter;
           }
           .reset-btn {
@@ -1438,6 +1424,17 @@
 
     .customer-table {
       border-radius: 3px;
+      padding: 10px 15px;
+      &:before {
+        height: 0;
+      }
+
+      .customer-table-header th {
+        background: #F5F5F5;
+        color: $text-color-primary;
+        font-weight: normal;
+      }
+
       th {
         color: #606266;
         font-size: 14px;
@@ -1460,7 +1457,7 @@
     .table-footer {
       display: flex;
       justify-content: space-between;
-      padding: 10px;
+      padding: 0px 15px 10px;
       background: #fff;
 
       .list-info {
@@ -1556,17 +1553,30 @@
     display: flex;
     justify-content: space-between;
     padding: 10px;
+    border-bottom: 1px solid #f2f2f2;
 
     .top-btn-group .el-button, .el-button {
-      font-weight: lighter;
+      /*font-weight: lighter;*/
       font-size: 14px;
+      color: $text-color-primary;
     }
 
-    .delete-customer-btn {
-      background: #fff;
-      color: #81848F;
-      border-color: rgb(218, 218, 220);
-      margin-left: 5px;
+    .el-dropdown-btn {
+      padding: 0 15px;
+      line-height: 33px;
+      display: inline-block;
+      background: $color-primary-light-9;
+      color: $text-color-primary;
+      .iconfont {
+        margin-right: 3px;
+        font-size: 12px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: #fff;
+        background: $color-primary;
+      }
     }
   }
 </style>

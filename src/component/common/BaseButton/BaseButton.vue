@@ -6,10 +6,6 @@
         type: String,
         default: 'primary', // primary、plain、only-text
       },
-      buttonText: {
-        type: String,
-        default: '确定'
-      },
       icon: {
         type: String,
         default: ''
@@ -24,17 +20,15 @@
     },
     methods: {
       buildTextButton() {
-        const buttonText = this.buttonText;
         const icon = this.icon;
         return (
           <span class="text-button" onClick={(e) => this.$emit('event', e)}>
             {icon && <i class={'iconfont ' + icon}></i>}
-            {buttonText}
+            {this.$slots.default}
           </span>
         )
       },
       buildBaseButton() {
-        const buttonText = this.buttonText;
         const icon = this.icon;
         const type = this.type;
         const disabled = this.disabled ? 'disabled' : '';
@@ -46,7 +40,7 @@
             'plain-button-disabled': disabled && type === 'plain',
           }} type="button" onClick={(e) => this.$emit('event', e)}>
             {icon && <i class={'iconfont ' + icon}></i>}
-            {buttonText}
+            {this.$slots.default}
           </button>
 
         )
@@ -78,7 +72,7 @@
     border-radius: 2px;
     outline: none;
     .iconfont {
-      font-size: 14px;
+      font-size: 12px;
       margin-right: 3px;
     }
     &:hover {
@@ -121,7 +115,7 @@
     padding: 7px 15px;
     color: $text-color-primary;
     .iconfont {
-      font-size: 14px;
+      font-size: 12px;
       margin-right: 3px;
     }
     &:hover {

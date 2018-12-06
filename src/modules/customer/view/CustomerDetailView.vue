@@ -2,10 +2,10 @@
   <div class="page-container">
     <div class="customer-tool-bar">
       <div>
-        <base-button type="only-text" button-text="返回" icon="icon-arrow-left" @event="goBack"></base-button>
-        <base-button type="only-text" button-text="编辑" icon="icon-edit" @event="jump" v-if="allowEditCustomer"></base-button>
-        <base-button type="only-text" button-text="删除" icon="icon-yemianshanchu" @event="deleteCustomer" v-if="allowDeleteCustomer"></base-button>
-        <base-button type="only-text" button-text="添加提醒" icon="icon-notification" @event="openDialog('remind')"></base-button>
+        <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button>
+        <base-button type="only-text" icon="icon-edit" @event="jump" v-if="allowEditCustomer">编辑</base-button>
+        <base-button type="only-text" icon="icon-yemianshanchu" @event="deleteCustomer" v-if="allowDeleteCustomer">删除</base-button>
+        <base-button type="only-text" icon="icon-notification" @event="openDialog('remind')">添加提醒</base-button>
       </div>
       <div class="action-btn">
         <el-dropdown trigger="click">
@@ -46,9 +46,9 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <base-button type="plain" icon="icon-add" button-text="联系人" @event="openDialog('contact')"></base-button>
-        <base-button type="plain" icon="icon-add" button-text="地址" @event="openDialog('address')"></base-button>
-        <base-button type="plain" icon="icon-add" button-text="产品" @event="createProduct('address')"></base-button>
+        <base-button type="plain" icon="icon-add" @event="openDialog('contact')">联系人</base-button>
+        <base-button type="plain" icon="icon-add" @event="openDialog('address')">地址</base-button>
+        <base-button type="plain" icon="icon-add" @event="createProduct('address')">产品</base-button>
       </div>
     </div>
     <div class="main-content">
@@ -297,6 +297,10 @@
 </script>
 
 <style lang="scss">
+  html, body, .page-container {
+    height: 100%;
+    overflow: hidden;
+  }
 
   $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
@@ -336,6 +340,7 @@
     background: #fff;
     width: 520px;
     border-right: 1px solid #f2f2f2;
+    overflow-y: scroll;
 
     h3 {
       margin: 0;
@@ -347,16 +352,6 @@
       background: $color-primary-light-9;
       font-weight: normal;
       position: relative;
-      &:after{
-        content: '';
-        display: block;
-        position: absolute;
-        width: 10px;
-        right: -11px;
-        top: 0;
-        height: 100%;
-        background: $color-primary-light-9;
-      }
     }
   }
 
@@ -379,12 +374,13 @@
     }
     .el-dropdown-btn {
       padding: 0 15px;
-      line-height: 34px;
+      line-height: 33px;
       display: inline-block;
       background: $color-primary-light-9;
       color: $text-color-primary;
       .iconfont {
         margin-right: 3px;
+        font-size: 12px;
       }
 
       &:hover {
