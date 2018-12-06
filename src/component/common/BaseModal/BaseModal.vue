@@ -128,7 +128,6 @@ export default {
 </script>
 
 <style lang="scss">
-
   .overflow-body-for-modal {
     overflow: hidden;
   }
@@ -137,7 +136,6 @@ export default {
     @include mask();
     z-index: 999;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.15);
   }
 
   .base-modal {

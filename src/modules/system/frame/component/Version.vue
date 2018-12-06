@@ -99,7 +99,7 @@ export default {
 }
 
 .version-description{
-  padding: 0 15px;
+  padding: 5px 30px 20px 30px;
   max-height: 240px;
   overflow: auto;
 
@@ -126,6 +126,7 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-around;
+  border-top: 1px solid #f0f0f0;
 
   button.btn{
     width: 100px;
@@ -141,8 +142,8 @@ export default {
   color: #fff !important;
   border: none;
   outline: none;
-  background-color: #00ac97;
+  background-color: $color-primary;
   border-radius: 4px;
-  box-shadow: 0 1px 4px 0px rgba(0,172,151,0.5);
+  box-shadow: 0 1px 4px 0px rgba($color-primary,0.5);
 }
 </style>
