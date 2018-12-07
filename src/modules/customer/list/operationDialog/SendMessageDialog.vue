@@ -194,13 +194,13 @@ export default {
   .send-message-to-customer-dialog {
 
     .base-modal-body {
-      padding: 0 15px 20px;
+      padding: 0 0 20px;
     }
 
     .el-form {
+      padding: 0 30px;
       .el-form-item {
         margin: 10px 0;
-        width: 94%;
       }
 
       label {
@@ -222,7 +222,7 @@ export default {
     .dialog-footer {
       display: flex;
       justify-content: flex-end;
-      padding-right: 50px;
+      padding: 10px 30px 0;
     }
   }
 

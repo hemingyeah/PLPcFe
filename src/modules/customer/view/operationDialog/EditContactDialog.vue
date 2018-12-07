@@ -299,6 +299,10 @@ export default {
 <style lang="scss">
 
   .edit-contact-dialog {
+    .base-modal-body {
+      padding: 15px 30px 0;
+    }
+
 
     .edit-contact-form-container {
       width: 100%;

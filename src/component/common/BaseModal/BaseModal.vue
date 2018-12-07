@@ -193,10 +193,6 @@ export default {
     }
   }
 
-  .base-modal-body {
-    padding: 0px 30px;
-  }
-
   .base-modal-footer {
     padding: 15px 30px;
   }

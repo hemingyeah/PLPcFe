@@ -533,8 +533,7 @@ export default {
   .batch-editing-customer-dialog {
 
     .base-modal-body {
-      padding: 10px;
-      padding-right: 50px;
+      padding: 10px 30px 0;
     }
 
     .el-form-item.is-required .el-form-item__label:before {
@@ -567,7 +566,6 @@ export default {
     }
 
     .dialog-footer {
-      padding: 10px 50px;
       display: flex;
       justify-content: flex-end;
     }

@@ -193,7 +193,7 @@ export default {
 
   .batch-remind-customer-dialog {
     .base-modal-body {
-      padding: 10px;
+      padding: 10px 30px 0;
     }
 
     .el-form-item {
@@ -204,11 +204,10 @@ export default {
     }
 
     .el-select {
-      width: 90%;
+      width: 100%;
     }
 
     .content-item {
-      width: 93%;
       .el-form-item__content {
         max-height: 200px;
         overflow-y: auto;
@@ -216,7 +215,6 @@ export default {
     }
 
     .dialog-footer {
-      padding: 10px 50px;
       display: flex;
       justify-content: flex-end;
     }

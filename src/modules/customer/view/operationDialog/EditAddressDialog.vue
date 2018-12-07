@@ -163,6 +163,9 @@ export default {
   }
 
   .edit-address-dialog {
+    .base-modal-body {
+      padding: 15px 30px 0;
+    }
 
     .base-modal-footer {
       padding-top: 5px;
