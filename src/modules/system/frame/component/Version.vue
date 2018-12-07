@@ -40,17 +40,25 @@ export default {
       let currVersion = localStorage.getItem(VERSION_NUM_KEY);
       let version = this.version;
       if(version && (!currVersion || currVersion != version)){
-        try {
-          let result = await http.get('/getLastVersion');
-          let lastVersion = result.data || {};
-          this.versionNum = lastVersion.versionNum;
-          this.description = lastVersion.description;
-          this.show = true;
-          localStorage.setItem(VERSION_NUM_KEY, version);
-        } catch (error) {
-          console.error(error);
-        }               
+        //只有在显示提示信息后，才更新本地缓存
+        if(await this.showVersion()) localStorage.setItem(VERSION_NUM_KEY, this.version);       
       }
+    },
+    async showVersion(){
+      try {
+        let result = await http.get('/getLastVersion');
+        let lastVersion = result.data || {};
+        
+        this.versionNum = lastVersion.versionNum;
+        this.description = lastVersion.description;
+        this.show = true;
+        
+        return true;
+      } catch (error) {
+        console.error(error);
+      }  
+
+      return false;
     },
     seeHelp(){
       platform.openLink('https://help.shb.ltd/doc?id=10102');
@@ -59,6 +67,9 @@ export default {
   },
   mounted(){
     this.checkVersion();
+
+    //导出显示版本信息接口，方面子页面调用
+    window.shb_global_showVersion = this.showVersion;
   }
 }
 </script>
@@ -83,7 +94,7 @@ export default {
   position: relative;
   padding-top: 1px;
   user-select: none;
-  
+
   img{
     width: 100%;
     display: block;
