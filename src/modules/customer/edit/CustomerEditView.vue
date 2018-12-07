@@ -135,7 +135,10 @@ export default {
           }
           return f;
         });
-      return FormUtil.migration(sortedFields);
+      return [{
+        formType: 'separator',
+        displayName: '基本信息'
+      }, ...FormUtil.migration(sortedFields)]
     }
   },
   methods: {
@@ -227,10 +230,10 @@ export default {
           this.$http.post('/event/update4CusInfo', params, false)
             .then(res => {
 
-              if (this.action === 'createFromEvent' && this.initData.goto === 'eventView') {
+              if (this.initData.goto === 'eventView') {
                 return window.location.href = `/event/view/${this.initData.eventId}`;
               }
-              if (this.action === 'createFromEvent' && this.initData.goto === 'createTask') {
+              if (this.initData.goto === 'createTask') {
                 return window.location.href = `/event/convent2Task/jump?eventId=${this.initData.eventId}`;
               }
             })
@@ -241,7 +244,7 @@ export default {
       this.$http.post('/customer/create', params)
         .then(res => {
           if (res.status) return this.$platform.alert('创建客户失败');
-          window.location.href = `/customer/view/${res.data.customerId}`;
+          window.location.href = `/v2/customer/view/${res.data.customerId}`;
         })
         .catch(err => console.error('err', err));
     },
@@ -249,7 +252,7 @@ export default {
       this.$http.post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
           if (res.status) return this.$platform.alert('更新客户失败');
-          window.location.href = `/customer/view/${res.data}`;
+          window.location.href = `/v2/customer/view/${res.data || this.editId}`;
         })
         .catch(err => console.error('err', err));
     },

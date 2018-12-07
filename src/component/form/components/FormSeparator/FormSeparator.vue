@@ -1,6 +1,6 @@
 <template>
   <div class="form-sparator">
-    <span v-if="field.displayName">{{field.displayName}}</span>
+    {{field.displayName || ''}}
   </div>
 </template>
 
@@ -19,18 +19,12 @@ export default {
 
 <style lang="scss">
 .form-sparator{
-  height: 16px;
-  margin: 36px 0 20px 0;
-  border-top: 1px dotted #666;
-  text-align: center;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 20px;
+  margin: 20px 0;
+  text-align: left;
+  background: #eef8f8;
 
-  span{
-    height: 20px;
-    line-height: 20px;   
-    position: relative;
-    top: -10px;
-    background-color: #fff;
-    padding: 0 5px;
-  }
 }
 </style>
