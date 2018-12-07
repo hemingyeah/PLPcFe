@@ -8,7 +8,7 @@
         <h3 class="version-title">售后宝 | {{versionNum}} 更新说明</h3>
         <div class="version-description" v-html="description"></div>
         <div class="version-bottom">
-          <button type="button" class="btn btn-text" @click="show = false">开始使用</button>
+          <button type="button" class="btn btn-text" @click="show = false">知道了</button>
           <button type="button" class="btn btn-text version-btn" @click="seeHelp">了解更多</button>
         </div>
       </div>
