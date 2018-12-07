@@ -3,7 +3,7 @@
     <div class="version-mask" v-if="show">
       <div class="version transition-container">
         <div class="version-banner">
-          <img src="../../../../assets/img/version-banner.png">
+          <img src="../../../../assets/img/version-banner-v2.png">
         </div>
         <h3 class="version-title">售后宝 | {{versionNum}} 更新说明</h3>
         <div class="version-description" v-html="description"></div>
@@ -82,7 +82,8 @@ export default {
 .version-banner{
   position: relative;
   padding-top: 1px;
-
+  user-select: none;
+  
   img{
     width: 100%;
     display: block;
