@@ -20,7 +20,7 @@
           <div class="frame-quick-right">
             <el-popover v-if="showDevTool">
               <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference">
-                <i class="iconfont icon-gongju"></i>
+                <i class="iconfont icon-experiment"></i>
               </button> 
 
               <div class="dev-tool-menu">
@@ -32,7 +32,7 @@
             <a 
               href="/v3" class="btn-text frame-header-btn frame-header-btn-bg"
               title="返回旧版" v-tooltip>
-              <i class="iconfont icon-jiuban"></i>
+              <i class="iconfont icon-qiehuan"></i>
             </a>
             
             <button 
@@ -137,7 +137,10 @@
       <div class="frame-main">
         <div class="frame-tab-content">
           <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
-            <iframe :id="`frame_${tab.id}`" :data-id="tab.id" :src="tab.url" @load="updateFrameTab($event,tab)" allowfullscreen/>
+            <iframe 
+              :id="`frame_tab_${tab.id}`" :fromid="tab.fromId" :data-id="tab.id" 
+              :src="tab.url" 
+              @load="updateFrameTab($event,tab)" allowfullscreen/>
           </div>
         </div>
       </div>
@@ -269,12 +272,6 @@ export default {
       this.saleManagerShow = true;
       this.profilePopperVisible = false;
     },
-    //兼容旧页面，迁移完成后删除
-    addTabs(option){
-      console.warn('不推荐调用该方法，使用platform.openFrameTab替代');
-      this.openForFrame(option)
-    },
-    
     /** 检测是否有导出 */
     async checkExports(){
       try {
@@ -283,7 +280,7 @@ export default {
         this.operationList = this.operationList.filter(item => {
           return (
             item.operate == 'cancel' || 
-            item.operate == 'download' && this.exportList.some(exp => exp.id == item)
+            (item.operate == 'download' && this.exportList.some(exp => exp.id == item))
           );
         })
 
@@ -349,7 +346,6 @@ export default {
     }
   },
   created(){
-    window.addTabs = this.addTabs;
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
     window.resizeFrame = function(){

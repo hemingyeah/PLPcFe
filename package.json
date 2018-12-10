@@ -8,7 +8,7 @@
     "url": "git@code.aliyun.com:publink/shb-pc-fe.git"
   },
   "scripts": {
-    "dev": "node --max-old-space-size=4096 script/development.js",
+    "dev": "node script/development.js",
     "build": "node script/production.js",
     "lint": "eslint --fix --ext .js,.vue src",
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",

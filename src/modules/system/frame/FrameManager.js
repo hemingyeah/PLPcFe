@@ -3,6 +3,12 @@ import {parse} from '@src/util/querystring'
 import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
 
+const CACHED_FRAMES = [
+  'M_TASK_ALL',
+  'M_TASK_AUDIT',
+  'M_TASK_REVIEW'
+];
+
 const FrameManager = {
   data(){
     return {
@@ -28,6 +34,11 @@ const FrameManager = {
       if(action == 'shb.system.openFrameTab') this.openForFrame(eventData.data);
       if(action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.id);
     },
+    /** @deprecated 兼容旧页面，迁移完成后删除 */
+    addTabs(option){
+      console.warn('不推荐调用该方法，使用 platform.openForFrame 替代');
+      this.openForFrame(option)
+    },
     /** 用于从导航菜单打开tab */
     openForNav(menu){
       let tab = new Tab({id: menu.menuKey, url: menu.url, title: menu.name});
@@ -49,17 +60,18 @@ const FrameManager = {
         target.merge(tab);
         return this.jumpFrameTab(target);
       }
-
+      
       this.frameTabs.forEach(item => item.show = false);
       this.frameTabs.push(tab)
       this.currUrl = tab.url;
 
       this.adjustFrameTabs(tab);
+      this.removeFrameCache(tab.id)
 
       //为该frame添加事件
       this.$nextTick(() => {
         let rootWindow = getRootWindow(window);
-        let frame = document.getElementById(`frame_${tab.id}`);
+        let frame = document.getElementById(`frame_tab_${tab.id}`);
         let frameWindow = frame.contentWindow;
 
         //传递点击事件，用于关闭顶层window popper
@@ -71,7 +83,7 @@ const FrameManager = {
     //关闭frameTab
     closeFrameTab(frameTab){
       //TODO:迁移完成后删除
-      localStorage.removeItem("frame_" + frameTab.id + "_idArray");
+      localStorage.removeItem("frame_tab_" + frameTab.id + "_idArray");
 
       let index = this.frameTabs.indexOf(frameTab);
       if(index >= 0) {
@@ -87,7 +99,6 @@ const FrameManager = {
         }
 
         this.adjustFrameTabs(adjustTab);
-        //this.calcHiddenTabs();
       }
     },
     jumpFrameTab(frameTab){
@@ -111,7 +122,9 @@ const FrameManager = {
       this.adjustFrameTabs(tab)
     },
     reloadFrameTab(tab, redirect = false){
-      let iframe = document.getElementById(`frame_${tab.id}`);
+      this.removeFrameCache(tab.id)
+
+      let iframe = document.getElementById(`frame_tab_${tab.id}`);
       if(null != iframe){
         tab.loading = true;
         tab.title = '正在加载...';
@@ -272,11 +285,20 @@ const FrameManager = {
     resizeHanler(){
       let currTab = this.frameTabs.find(item => item.show);
       this.adjustFrameTabs(currTab);
+    },
+    //打开frame前清空缓存
+    removeFrameCache(menuKey){
+      if(CACHED_FRAMES.indexOf(menuKey) >= 0){
+        let key = `frame_tab_${menuKey}_cache`;
+        localStorage.removeItem(key);
+        console.info(`debug: clear localStorage for key [${key}]`);
+      }
     }
   },
   mounted(){
     window.addEventListener("message", this.receiveMessage);
     window.addEventListener("resize", this.resizeHanler);
+    window.addTabs = this.addTabs;
 
     let homeTab = new Tab({id:'HOME',url: '/home', title: '首页', show: true})
     this.openForFrame(homeTab);
