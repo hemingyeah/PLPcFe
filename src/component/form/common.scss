@@ -293,11 +293,11 @@
 .form-view-row {
   display: flex;
   justify-content: flex-start;
-  padding: 0 20px;
+  padding: 6px 20px;
   color: $text-color-primary;
 
   label {
-    line-height: 36px;
+    line-height: 20px;
     width: 98px;
     flex-shrink: 0;
     margin: 0;
@@ -306,7 +306,7 @@
   }
 
   .form-view-row-content{
-    line-height: 36px;
+    line-height: 20px;
     flex: 1;
     overflow-x: hidden;
     color: $text-color-primary;

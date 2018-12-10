@@ -25,14 +25,14 @@
             <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
           <template v-else-if="column.field === 'type'">
-            <span v-if="scope.row.isMain" style="text-align: center;display: block;">默认联系人</span>
-            <span v-else @click="setDefaultLinkman(scope.row)" class="set-default-lm-btn">
-              <i class="iconfont icon-part"></i>设为默认
-            </span>
+            <span v-if="scope.row.isMain" style="text-align: left;display: block;">默认联系人</span>
+            <el-button v-else @click="setDefaultLinkman(scope.row)" type="text" :disabled="pending[scope.row.id]">
+              设为默认
+            </el-button>
           </template>
           <div class="lm-action" v-else-if="column.field === 'action'">
-            <el-button type="danger" @click="deleteLinkman(scope.row)" :disabled="pending[scope.row.id]"
-                       icon="iconfont icon-shanchu" size="mini">删除
+            <el-button type="text" @click="deleteLinkman(scope.row)" :disabled="pending[scope.row.id]" class="delete-contact-btn"
+                       size="mini">删除
             </el-button>
           </div>
 
@@ -125,6 +125,7 @@ export default {
         } else {
           platform.alert(res.message);
         }
+        this.$eventBus.$emit('customer_info_record.update_record_list');
       } catch (e) {
         console.error('err',);
       }
@@ -145,7 +146,7 @@ export default {
           this.contactList = res.list
             .map(contact => {
 
-              this.$set(this.pending, contact.id, false);
+              this.$set(this.pending, contact.id, !!contact.isMain);
               contact.createTime = formatDate(new Date(contact.createTime), 'YYYY-MM-DD HH:mm:ss');
               return Object.freeze(contact);
             });
@@ -188,7 +189,7 @@ export default {
 <style lang="scss">
 
   .customer-contact-table-container {
-    padding: 15px 15px 15px 5px;
+    padding: 10px 10px 10px 5px;
 
     .edit-btn {
       color: $color-primary;
@@ -196,24 +197,27 @@ export default {
 
     .customer-contact-table-header th{
       background: #F5F5F5;
-      line-height: 37px;
-      font-size: 14px;
       color: $text-color-primary;
       font-weight: normal;
-    }
-
-    .customer-contact-table-row .cell {
-      line-height: 37px;
-      font-size: 14px;
     }
 
     .lm-action {
       display: flex;
       justify-content: space-between;
 
-      .iconfont {
-        font-size: 12px;
+
+      .delete-contact-btn {
+        color: $color-danger;
       }
+
+      .delete-contact-btn.is-disabled,
+      .delete-contact-btn.is-disabled:hover,
+      .el-button.delete-contact-btn:focus {
+        color: #c0c4cc;
+        cursor: not-allowed;
+        background-image: none;
+      }
+
     }
 
     .set-default-lm-btn {

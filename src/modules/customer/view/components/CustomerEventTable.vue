@@ -145,7 +145,7 @@ export default {
 <style lang="scss">
 
   .customer-event-table-container {
-    padding: 15px 15px 15px 5px;
+    padding: 10px 10px 10px 5px;
     
     .event-link {
       color: $color-primary;
@@ -153,15 +153,8 @@ export default {
 
     .customer-event-table-header th{
       background: #F5F5F5;
-      line-height: 37px;
-      font-size: 14px;
       color: $text-color-primary;
       font-weight: normal;
-    }
-
-    .customer-event-table-row .cell {
-      line-height: 37px;
-      font-size: 14px;
     }
 
     .customer-event-table-pagination {

@@ -205,6 +205,7 @@ export default {
         this.addContactDialog = false;
         this.reset();
         this.$eventBus.$emit('customer_contact_table.update_linkman_list');
+        this.$eventBus.$emit('customer_info_record.update_record_list');
 
       } catch (e) {
         this.pending = false;

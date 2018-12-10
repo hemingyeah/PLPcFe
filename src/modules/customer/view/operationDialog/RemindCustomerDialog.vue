@@ -3,7 +3,7 @@
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
-        <el-select v-model="form.remindId" placeholder="请选择短信模板">
+        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateUser">
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -100,6 +100,24 @@ export default {
     this.fetchData();
   },
   methods: {
+    updateUser() {
+      if (this.selectedRemind.isDdResponse) {
+        // 内部提醒
+        this.form.users = (this.selectedRemind.users || []).map(user => user.id);
+        this.remoteSearchCM.options = this.concatArrayAndItemUnique(this.remoteSearchCM.options, this.selectedRemind.users);
+        this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, this.selectedRemind.users);
+        return;
+      }
+      const users = [{
+        id: this.customer.id,
+        name: this.customer.name,
+        phone: this.customer.phone,
+      }];
+      this.form.users = users;
+      this.remoteSearchCM.options = users;
+      this.cmAllOptions = users;
+
+    },
     onSubmit() {
       const params = this.buildParams();
       this.pending = true;
@@ -128,6 +146,7 @@ export default {
 
           this.$emit('success-callback');
           this.$eventBus.$emit('customer_remind_table.update_remind_list');
+          this.$eventBus.$emit('customer_info_record.update_record_list');
         })
         .catch(err => {
           this.$platform.alert('批量添加提醒失败');
@@ -152,9 +171,9 @@ export default {
 
       if (this.action === 'edit') {
         this.form.remindId = this.editedRemind.remind.id;
-        this.form.users = (this.editedRemind.users || []).map(user => user.id);
-        this.remoteSearchCM.options = this.editedRemind.users;
-        this.cmAllOptions = this.editedRemind.users;
+        this.$nextTick(() => {
+          this.updateUser();
+        })
       }
       this.searchCustomerManager();
     },
@@ -190,7 +209,6 @@ export default {
       this.remoteSearchCM.loading = true;
       this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
-          let obj = {};
           const newList = res.list
             .map(c => Object.freeze({
               id: c.staffId,
@@ -199,14 +217,22 @@ export default {
           this.remoteSearchCM.options = newList;
 
           // 数组中的对象根据id去重
-          this.cmAllOptions = [...this.cmAllOptions, ...newList].reduce((cur,next) => {
-            obj[next.id] ? "" : obj[next.id] = true && cur.push(next);
-            return cur;
-          },[]);
+          this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, newList);
 
           this.remoteSearchCM.loading = false;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
+    },
+    concatArrayAndItemUnique(arr1, arr2) {
+      // 数组中的对象根据id去重
+      let obj = {};
+      if (!arr1 || !arr1.length) return arr2 || [];
+      if (!arr2 || !arr2.length) return arr1 || [];
+
+      return [...arr1, ...arr2].reduce((cur,next) => {
+        obj[next.id] ? "" : obj[next.id] = true && cur.push(next);
+        return cur;
+      },[]);
     },
   },
 }

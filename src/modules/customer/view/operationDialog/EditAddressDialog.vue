@@ -86,6 +86,7 @@ export default {
 
         // todo reload customer address
         this.$eventBus.$emit('customer_address_table.update_address_list');
+        this.$eventBus.$emit('customer_info_record.update_record_list');
         this.addAddressDialog = false;
       } catch (e) {
         console.error('edit-address-dialog catch err', e);

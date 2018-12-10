@@ -10,7 +10,7 @@
       <div class="action-btn">
         <el-dropdown trigger="click">
           <span class="el-dropdown-link el-dropdown-btn">
-            <i class="el-icon-arrow-down"></i>工单
+            <i class="iconfont icon-add"></i>工单
           </span>
 
           <el-dropdown-menu slot="dropdown">
@@ -23,7 +23,7 @@
         </el-dropdown>
         <el-dropdown trigger="click">
           <span class="el-dropdown-link el-dropdown-btn">
-            <i class="el-icon-arrow-down"></i>事件
+            <i class="iconfont icon-add"></i>事件
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="event in eventTypes" :key="event.id">
@@ -35,7 +35,7 @@
         </el-dropdown>
         <el-dropdown trigger="click">
           <span class="el-dropdown-link el-dropdown-btn">
-            <i class="el-icon-arrow-down"></i>计划任务
+            <i class="iconfont icon-add"></i>计划任务
           </span>
 
           <el-dropdown-menu slot="dropdown">
@@ -51,7 +51,7 @@
         <base-button type="plain" icon="icon-add" @event="createProduct('address')">产品</base-button>
       </div>
     </div>
-    <div class="main-content">
+    <div class="main-content" v-loading="loading">
       <div class="customer-detail">
         <h3>{{customer.name}}</h3>
         <form-view :fields="fields" :value="customer">
@@ -120,6 +120,7 @@ export default {
       remindList: [],
       selectedRemind: {},
       customer: {},
+      loading: false,
     }
   },
   computed: {
@@ -243,6 +244,7 @@ export default {
         .then(res => {
           if (res.status) return;
           this.customer = Object.freeze(res.data);
+          this.loading = false;
         })
         .catch(err => console.error('customer-detail-view fetchCustomer catch error /n', err));
     },
@@ -274,6 +276,7 @@ export default {
     }
   },
   mounted() {
+    this.loading = true;
     this.fetchCustomer(this.initData.id);
     this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
   },
@@ -297,15 +300,16 @@ export default {
 </script>
 
 <style lang="scss">
+  $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+
   html, body, .page-container {
     height: 100%;
-    overflow: hidden;
   }
-
-  $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
   body {
     padding: 10px;
+    min-width: 1100px;
+    overflow-x: auto;
   }
 
   .page-container {
@@ -332,26 +336,32 @@ export default {
   .main-content {
     display: flex;
     flex-flow: row nowrap;
-    height: calc(100% - 39px);
+    height: calc(100% - 64px);
+    position: relative;
   }
 
   .customer-detail {
-    height: 95%;
     background: #fff;
-    width: 520px;
+    width: 390px;
     border-right: 1px solid #f2f2f2;
-    overflow-y: scroll;
+    flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
+    padding-top: 55px;
 
     h3 {
       margin: 0;
       margin-bottom: 5px;
       padding: 0 20px;
       line-height: 50px;
-      font-size: 22px;
+      font-size: 16px;
       color: $text-color-primary;
       background: $color-primary-light-9;
       font-weight: normal;
-      position: relative;
+      top: 0;
+      left: 0;
+      width: 100%;
+      position: absolute;
     }
   }
 
@@ -365,7 +375,8 @@ export default {
   }
 
   .customer-relation-content {
-    height: calc(100% - 46px);
+    height: calc(100% - 50px);
+    overflow: auto;
   }
 
   .action-btn {
@@ -378,6 +389,7 @@ export default {
       display: inline-block;
       background: $color-primary-light-9;
       color: $text-color-primary;
+      margin-left: 10px;
       .iconfont {
         margin-right: 3px;
         font-size: 12px;
@@ -389,10 +401,15 @@ export default {
         background: $color-primary;
       }
     }
+
+    .base-button {
+      margin-left: 10px;
+    }
   }
 
   .link-of-dropdown {
     color: $text-color-primary;
+    display: block;
     &:hover {
       text-decoration: none;
     }

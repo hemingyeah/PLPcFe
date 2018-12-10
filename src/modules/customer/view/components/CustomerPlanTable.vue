@@ -54,8 +54,8 @@
             每{{scope.row[column.field].period + scope.row[column.field].periodUnit}}
           </template>
           <template v-else-if="column.field === 'action'">
-            <el-button class="delete-plan-btn" type="danger" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]"
-                       size="small" icon="iconfont icon-shanchu">删除
+            <el-button class="delete-plan-btn" type="text" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]"
+                       size="small">删除
             </el-button>
           </template>
           <template v-else>
@@ -130,6 +130,7 @@ export default {
         } else {
           platform.alert(reqRes.message);
         }
+        this.$eventBus.$emit('customer_info_record.update_record_list');
       } catch (e) {
         console.error('deletePlan catch an err', e);
       }
@@ -225,19 +226,12 @@ export default {
   }
 
   .customer-plan-table-container {
-    padding: 15px 15px 15px 5px;
+    padding: 10px 10px 10px 5px;
 
     .customer-plan-table-header th{
       background: #F5F5F5;
-      line-height: 37px;
-      font-size: 14px;
       color: $text-color-primary;
       font-weight: normal;
-    }
-
-    .customer-plan-table-row .cell {
-      line-height: 37px;
-      font-size: 14px;
     }
 
     .plan-link {
@@ -245,9 +239,15 @@ export default {
     }
 
     .delete-plan-btn {
-      .iconfont {
-        font-size: 12px;
-      }
+      color: $color-danger;
+    }
+
+    .delete-plan-btn.is-disabled,
+    .delete-plan-btn.is-disabled:hover,
+    .el-button.delete-plan-btn:focus {
+      color: #c0c4cc;
+      cursor: not-allowed;
+      background-image: none;
     }
 
     .empty-table-text {

@@ -188,16 +188,8 @@ export default {
     },
     /** 初始化信息动态 */
     async initializeRecord() {
-      try {
-        this.params.pageNum = 1;
-        this.recordLoading = true;
-        let result = await this.fetchRecord(this.params);
-        this.recordLoading = false;
-        this.recordPage.list = [];
-        this.recordPage.merge(result)
-      } catch (error) {
-        console.error(error)
-      }
+      this.params.pageNum = 1;
+      this.searchRecord();
     },
     /** 加载下一页 */
     async loadmore() {
@@ -224,10 +216,25 @@ export default {
       } catch (e) {
         console.error('deleteMark catch err', e);
       }
+    },
+    async searchRecord() {
+      try {
+        this.recordLoading = true;
+        let result = await this.fetchRecord(this.params);
+        this.recordLoading = false;
+        this.recordPage.list = [];
+        this.recordPage.merge(result)
+      } catch (error) {
+        console.error(error)
+      }
     }
   },
   mounted() {
     this.initializeRecord();
+    this.$eventBus.$on('customer_info_record.update_record_list', this.searchRecord);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('customer_info_record.update_record_list', this.searchRecord);
   }
 }
 </script>

@@ -3,12 +3,12 @@
     <!--搜索-->
     <div class="customer-list-search-group-container">
       <form class="base-search">
-        <div>
+        <div class="customer-list-base-search-group">
           <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <el-button type="primary" native-type="submit" @click.prevent="search({ pageNum: 1, }, true)">搜索</el-button>
-          <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
+          <base-button type="primary" @event="search({ pageNum: 1, }, true)">搜索</base-button>
+          <base-button type="ghost" @event="resetParams">重置</base-button>
           <a href="/customer">返回旧版</a>
         </div>
         <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
@@ -203,17 +203,18 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <base-button type="plain" icon="icon-add" @event="jumpPage">新建</base-button>
-          <base-button type="plain" icon="icon-yemianshanchu" v-if="highLevelPermission" @event="deleteCustomer">删除</base-button>
+          <base-button type="primary" icon="icon-add" @event="jumpPage">新建</base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu" v-if="highLevelPermission" @event="deleteCustomer">删除</base-button>
         </div>
 
-        <div>
+        <div class="action-button-group">
           <base-button type="plain" @event="openDialog('sendMessage')">发送短信</base-button>
           <base-button type="plain" @event="openDialog('edit')">批量编辑</base-button>
           <base-button type="plain" @event="openDialog('remind')">批量提醒</base-button>
           <el-dropdown trigger="click" v-if="exportPermission">
             <span class="el-dropdown-link el-dropdown-btn">
-              <i class="el-icon-arrow-down"></i>更多操作
+              更多操作
+              <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
@@ -235,7 +236,8 @@
           </el-dropdown>
           <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
             <span class="el-dropdown-link el-dropdown-btn">
-              <i class="el-icon-arrow-down"></i>选择列
+              选择列
+              <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.field">
@@ -398,10 +400,12 @@
           <span class="name-column">客户</span>
           <i></i>
         </dt>
-        <dd v-for="c in multipleSelection" :key="c.id" @click="cancelSelectCustomer(c)">
+        <dd v-for="c in multipleSelection" :key="c.id" >
           <span class="sn">{{c.serialNumber}}</span>
           <span class="name-column">{{c.name}}</span>
-          <i class="iconfont icon-close"></i>
+          <span class="delete-btn">
+          <i class="iconfont icon-close" @click.self="cancelSelectCustomer(c)"></i>
+          </span>
         </dd>
       </dl>
       <el-button type="info" class="cancel-select-customer-btn" @click="toggleSelection()">清除</el-button>
@@ -1328,23 +1332,24 @@ export default {
       justify-content: space-between;
       padding: 12px 10px;
 
-      div {
+      .customer-list-base-search-group {
+        display: flex;
+        width: 500px;
+        justify-content: space-between;
+
         .el-input {
-          width: 260px;
-          margin-right: 5px;
+          width: 300px;
+          input {
+          height: 33px;
+          line-height: 33px;
+          width: 300px;
+          }
         }
-        .el-button {
-          font-size: 14px;
-          font-weight: lighter;
-          height: 32px;
-          line-height: 12px;
+
+        a {
+          line-height: 33px;
         }
-        .reset-btn {
-          color: #9398a0;
-          border-color: #e0e1e2;
-          background: #fff;
-          margin-left: 6px;
-        }
+
       }
 
       .advanced-search-visible-btn {
@@ -1490,7 +1495,7 @@ export default {
   .selected-customer-panel {
 
     .selected-customer-list {
-      overflow-y: scroll;
+      overflow-y: auto;
       padding: 0 20px;
       line-height: 45px;
       font-size: 14px;
@@ -1503,17 +1508,16 @@ export default {
 
       dd {
         margin: 0;
+        padding: 0 15px;
         &:hover {
           cursor: pointer;
           .iconfont {
-            display: block;
+            visibility: visible;
           }
         }
         .iconfont {
           color: $color-primary;
-        }
-        .iconfont {
-          display: none;
+          visibility: hidden;
         }
       }
 
@@ -1555,20 +1559,26 @@ export default {
     padding: 10px;
     border-bottom: 1px solid #f2f2f2;
 
-    .top-btn-group .el-button, .el-button {
-      /*font-weight: lighter;*/
-      font-size: 14px;
-      color: $text-color-primary;
+    .top-btn-group .base-button {
+      margin-right: 5px;
+    }
+
+    .action-button-group {
+      .base-button {
+        margin-left: 5px;
+      }
     }
 
     .el-dropdown-btn {
       padding: 0 15px;
-      line-height: 33px;
+      line-height: 32px;
       display: inline-block;
       background: $color-primary-light-9;
       color: $text-color-primary;
+      outline: none;
+      margin-left: 5px;
       .iconfont {
-        margin-right: 3px;
+        margin-left: 5px;
         font-size: 12px;
       }
 

@@ -111,7 +111,7 @@ export default {
           this.taskList = res.list
             .map(task => {
               task.createTime = formatDate(new Date(task.createTime), 'YYYY-MM-DD HH:mm:ss');
-              task.completeTime = formatDate(new Date(task.completeTime), 'YYYY-MM-DD HH:mm:ss');
+              task.completeTime = task.completeTime && formatDate(new Date(task.completeTime), 'YYYY-MM-DD HH:mm:ss');
               if (!task.products || !task.products.length) {
                 task.productName = task.product ? task.product.name : '';
               } else {
@@ -165,7 +165,7 @@ export default {
 
 <style lang="scss">
   .customer-task-table-container {
-    padding: 15px 15px 15px 5px;
+    padding: 10px 10px 10px 5px;
 
     .task-link {
       color: $color-primary;
@@ -173,15 +173,8 @@ export default {
 
     .customer-task-table-header th{
       background: #F5F5F5;
-      line-height: 37px;
-      font-size: 14px;
       color: $text-color-primary;
       font-weight: normal;
-    }
-
-    .customer-task-table-row .cell {
-      line-height: 37px;
-      font-size: 14px;
     }
 
     .customer-task-table-pagination {

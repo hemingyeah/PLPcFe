@@ -25,9 +25,8 @@
             {{scope.row.remind.remindTime || '无'}}
           </template>
           <template class="rm-action" v-else-if="column.field === 'action'">
-            <el-button type="danger" @click="deleteRemind(scope.row)" :disabled="pending[scope.row.id]"
-                       class="delete-remind-btn"
-                       icon="iconfont icon-shanchu" size="mini">删除
+            <el-button type="text" @click="deleteRemind(scope.row)" :disabled="pending[scope.row.id]"
+                       class="delete-remind-btn" size="mini">删除
             </el-button>
           </template>
 
@@ -90,9 +89,11 @@ export default {
       try {
         const action = await this.$platform.confirm(`确定删除 ${rm.remind.name}`);
         if (!action) return;
+        this.pending[rm.id] = true;
 
         await this.$http.get(`/scheduler/delete/${rm.id}`);
         this.fetchData();
+        this.$eventBus.$emit('customer_info_record.update_record_list');
       } catch (e) {
         console.error('deleteRemind catch err', e);
       }
@@ -146,28 +147,27 @@ export default {
 <style lang="scss">
   .customer-remind-table-container {
 
-    padding: 15px 15px 15px 5px;
+    padding: 10px 10px 10px 5px;
     .edit-btn {
       color: $color-primary;
     }
 
     .customer-remind-table-header th{
       background: #F5F5F5;
-      line-height: 37px;
-      font-size: 14px;
       color: $text-color-primary;
       font-weight: normal;
     }
 
-    .customer-remind-table-row .cell {
-      line-height: 37px;
-      font-size: 14px;
+    .delete-remind-btn {
+      color: $color-danger;
     }
 
-    .delete-remind-btn {
-      .iconfont {
-        font-size: 12px;
-      }
+    .delete-remind-btn.is-disabled,
+    .delete-remind-btn.is-disabled:hover,
+    .el-button.delete-remind-btn:focus {
+      color: #c0c4cc;
+      cursor: not-allowed;
+      background-image: none;
     }
 
     .customer-remind-table-pagination {

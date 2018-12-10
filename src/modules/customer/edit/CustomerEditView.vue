@@ -2,7 +2,12 @@
   <div class="customer-container" v-loading.fullscreen.lock="loadingPage">
     <form @submit.prevent="submit" >
       <div class="page-title">
-        <el-button size="small"><i class="iconfont icon-return"></i> 返回</el-button>
+        <div class="title">
+          <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button>
+          <span class="text">|</span>
+          <span class="text">客户信息</span>
+        </div>
+        <!--<base-button type="primary" icon="icon-add" @event="jumpPage">新建</base-button>-->
         <el-button size="small" :disabled="pending" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
@@ -142,6 +147,9 @@ export default {
     }
   },
   methods: {
+    goBack() {
+      window.history.go(-1);
+    },
     genPlaceholder(field){
       return FormUtil.genPlaceholder(field)
     },
@@ -378,27 +386,33 @@ export default {
     }
   },
   async mounted() {
-    // //初始化默认区域
-    if (this.initData.customerAddress) {
-      this.setDefaultAddress(this.initData.customerAddress);
+    try {
+      // //初始化默认区域
+      if (this.initData.customerAddress) {
+        this.setDefaultAddress(this.initData.customerAddress);
+      }
+
+      //初始化默认值
+      let form = {};
+
+      if (this.initData.action === 'edit' && this.initData.id) {
+        //处理编辑时数据
+        this.loadingPage = true;
+        let cusRes = await this.fetchCustomer(this.initData.id);
+        this.loadingPage = false;
+        if(cusRes.status == 0) form = cusRes.data;
+      }
+
+      if (this.initData.action === 'createFromEvent') {
+        form = this.initData.eventCustomer;
+      }
+
+      this.form = FormUtil.initialize(this.fields, form, this.customerToForm);
+      this.addressBackup = this.form.customerAddress;
+      this.init = true;
+    } catch (e) {
+      console.error('CustomerEditView caught an error ', e);
     }
-
-    //初始化默认值
-    let form = {};
-
-    if (this.initData.action === 'edit' && this.initData.id) {
-      //处理编辑时数据
-      let cusRes = await this.fetchCustomer(this.initData.id);
-      if(cusRes.status == 0) form = cusRes.data;
-    }
-
-    if (this.initData.action === 'createFromEvent') {
-      form = this.initData.eventCustomer;
-    }
-
-    this.form = FormUtil.initialize(this.fields, form, this.customerToForm);
-    this.addressBackup = this.form.customerAddress;
-    this.init = true;
   }
 }
 </script>
@@ -414,9 +428,20 @@ export default {
   .page-title {
     border-bottom: 1px solid #f4f7f5;
     padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
 
     .iconfont {
       font-size: 12px;
+    }
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      span.text {
+        line-height: 33px;
+        margin-right: 12px;
+      }
     }
   }
 }

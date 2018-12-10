@@ -4,7 +4,7 @@ export default {
   props: {
     type: {
       type: String,
-      default: 'primary', // primary、plain、only-text
+      default: 'primary', // primary、plain、only-text、ghost
     },
     icon: {
       type: String,
@@ -36,6 +36,7 @@ export default {
         <button class={{
           'base-button': true,
           'plain-button': type === 'plain',
+          'ghost-button': type === 'ghost',
           'base-button-disabled': disabled && type === 'primary',
           'plain-button-disabled': disabled && type === 'plain',
         }} type="button" onClick={(e) => this.$emit('event', e)}>
@@ -107,6 +108,19 @@ export default {
       cursor: not-allowed;
       color: $text-color-primary-disabled;
     }
+  }
+
+  // 背景白色按钮
+  .ghost-button {
+    background: #fff;
+    color: $text-color-primary;
+    border: 1px solid #E2E2E2;
+    border-radius: 2px;
+    padding: 6px 15px;
+    &:hover {
+      border-color: $color-primary;
+    }
+
   }
 
   // 文字按钮

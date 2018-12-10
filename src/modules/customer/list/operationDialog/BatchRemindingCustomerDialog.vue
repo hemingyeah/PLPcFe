@@ -3,7 +3,7 @@
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
-        <el-select v-model="form.remindId" placeholder="请选择短信模板">
+        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateUser">
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -185,7 +185,23 @@ export default {
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },
+    updateUser() {
+      this.form.users = (this.selectedRemind.users || []).map(user => user.id);
+      this.remoteSearchCM.options = this.concatArrayAndItemUnique(this.remoteSearchCM.options, this.selectedRemind.users);
+    },
+    concatArrayAndItemUnique(arr1, arr2) {
+      // 数组中的对象根据id去重
+      let obj = {};
+      if (!arr1 || !arr1.length) return arr2 || [];
+      if (!arr2 || !arr2.length) return arr1 || [];
+
+      return [...arr1, ...arr2].reduce((cur,next) => {
+        obj[next.id] ? "" : obj[next.id] = true && cur.push(next);
+        return cur;
+      },[]);
+    },
   },
+
 }
 </script>
 

@@ -23,15 +23,15 @@
             <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
           <template v-else-if="column.field === 'action'">
-            <el-button type="danger" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]" class="delete-address-btn"
-                       size="mini" icon="iconfont icon-shanchu">删除
+            <el-button type="text" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]" class="delete-address-btn"
+                       size="mini">删除
             </el-button>
           </template>
           <template v-else-if="column.field === 'type'">
-            <span v-if="scope.row.isMain" style="text-align: center;display: block;">默认地址</span>
-            <span v-else @click="setDefaultAddress(scope.row)" class="set-default-address-btn">
-              <i class="iconfont icon-part"></i>设为默认
-            </span>
+            <span v-if="scope.row.isMain" style="text-align: left;display: block;">默认地址</span>
+            <el-button v-else @click="setDefaultAddress(scope.row)" type="text" :disabled="pending[scope.row.id]">
+              设为默认
+            </el-button>
           </template>
 
           <div v-else-if="column.field === 'address'" :class="{'can-open-map': scope.row.longitude && scope.row.latitude, }" @click.stop="openMap(scope.row)">
@@ -120,6 +120,7 @@ export default {
         } else {
           platform.alert(reqRes.message);
         }
+        this.$eventBus.$emit('customer_info_record.update_record_list');
       } catch (e) {
         console.error('err',);
       }
@@ -165,7 +166,7 @@ export default {
         .then(res => {
           this.addressList = res.list
             .map(address => {
-              this.$set(this.pending, address.id, false);
+              this.$set(this.pending, address.id, !!address.isMain);
 
               adArr = [address.province, address.city, address.dist]
                 .filter(ad => ad);
@@ -215,19 +216,12 @@ export default {
 <style lang="scss">
 
   .customer-address-table-container {
-    padding: 15px 15px 15px 5px;
+    padding: 10px 10px 10px 5px;
 
     .customer-address-table-header th{
       background: #F5F5F5;
-      line-height: 37px;
-      font-size: 14px;
       color: $text-color-primary;
       font-weight: normal;
-    }
-
-    .customer-address-table-row .cell {
-      line-height: 37px;
-      font-size: 14px;
     }
 
     .can-open-map:hover {
@@ -239,10 +233,17 @@ export default {
     }
 
     .delete-address-btn {
-      .iconfont {
-        font-size: 12px;
-      }
+      color: $color-danger;
     }
+
+    .delete-address-btn.is-disabled,
+    .delete-address-btn.is-disabled:hover,
+    .el-button.delete-address-btn:focus {
+      color: #c0c4cc;
+      cursor: not-allowed;
+      background-image: none;
+    }
+
 
     .set-default-address-btn {
       line-height: 34px;

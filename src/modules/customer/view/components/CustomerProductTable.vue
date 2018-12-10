@@ -121,7 +121,7 @@ export default {
 <style lang="scss">
 
   .customer-product-table-container {
-    padding: 15px 15px 15px 5px;
+    padding: 10px 10px 10px 5px;
 
     .product-link {
       color: $color-primary;
@@ -129,15 +129,8 @@ export default {
 
     .customer-product-table-header th{
       background: #F5F5F5;
-      line-height: 37px;
-      font-size: 14px;
       color: $text-color-primary;
       font-weight: normal;
-    }
-
-    .customer-product-table-row .cell {
-      line-height: 37px;
-      font-size: 14px;
     }
 
     .customer-product-table-pagination {
