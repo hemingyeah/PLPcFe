@@ -40,7 +40,7 @@
       <div class="bm-window-header">
         <h3>当前位置</h3>
         <button type="button" class="bm-window-header-close" @click="closeInfoWindow">
-          <i class="iconfont icon-guanbi"></i>
+          <i class="iconfont icon-close"></i>
         </button>
       </div>
       <div class="bm-window-body">

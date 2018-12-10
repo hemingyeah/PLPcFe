@@ -8,7 +8,7 @@
       @click="choose" >
     <!-- @keydown.enter.prevent="choose" -->
     <button type="button" class="btn-text form-user-clear" @click="clear" v-if="!isEmpty">
-      <i class="iconfont icon-guanbi-fill"></i>
+      <i class="iconfont icon-close"></i>
     </button>
   </div>
 </template>

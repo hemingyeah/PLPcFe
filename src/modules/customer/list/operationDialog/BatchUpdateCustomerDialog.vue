@@ -1,6 +1,6 @@
 <template>
   <base-modal :show.sync="batchUpdateCustomerDialog" width="600px" class="batch-update-customer-dialog">
-    <div slot="cHeader">
+    <div slot="title">
       <el-popover placement="bottom-start" popper-class="batch-update-customer-modal-header" trigger="hover">
         <h3 class="customized-batch-update-customer-modal-header" slot="reference">客户批量更新<i class="iconfont icon-help"></i></h3>
 

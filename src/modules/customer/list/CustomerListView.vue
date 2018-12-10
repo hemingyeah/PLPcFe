@@ -17,7 +17,7 @@
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
         <h4 class="panel-title">
           高级搜索
-          <i class="iconfont icon-guanbi" @click="advancedSearchPanelShow = false"></i>
+          <i class="iconfont icon-close" @click="advancedSearchPanelShow = false"></i>
         </h4>
         <el-form class="advanced-search-form">
           <el-form-item label-width="100px" label="客户编号">
@@ -317,11 +317,9 @@
 
       <div class="table-footer">
         <div class="list-info">
-          <i class="iconfont icon-abnormal"></i>
-          已选中 <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span> 条
+          共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录，
+          已选中<span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>条
           <span class="selectedCount" @click="toggleSelection()">清空</span>
-          <!--<span class="level-padding">共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录</span>-->
-          <!--<span class="level-padding">共<span class="level-padding">{{paginationInfo.totalPages}}</span>页</span>-->
         </div>
         <el-pagination
           class="customer-table-pagination"
@@ -392,7 +390,7 @@
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
       <h4 class="panel-title">
         已选择({{multipleSelection.length}})
-        <i class="iconfont icon-guanbi" @click="multipleSelectionPanelShow = false"></i>
+        <i class="iconfont icon-close" @click="multipleSelectionPanelShow = false"></i>
       </h4>
       <dl class="selected-customer-list">
         <dt>
@@ -1428,8 +1426,8 @@ export default {
     /*min-height: calc(100% - 100px);*/
 
     .customer-table {
-      border-radius: 3px;
-      padding: 10px 15px;
+      padding: 10px;
+
       &:before {
         height: 0;
       }
@@ -1462,12 +1460,13 @@ export default {
     .table-footer {
       display: flex;
       justify-content: space-between;
-      padding: 0px 15px 10px;
+      padding: 0px 10px 10px 10px ;
       background: #fff;
+      border-radius: 0 0 3px 3px;
 
       .list-info {
-        font-size: 12px;
-        line-height: 28px;
+        font-size: 13px;
+        line-height: 32px;
         margin: 0;
         color: #767e89;
         .iconfont {
@@ -1553,7 +1552,7 @@ export default {
 
   .operation-bar-container {
     background: #fff;
-    border-radius: 3px;
+    border-radius: 3px 3px 0 0;
     display: flex;
     justify-content: space-between;
     padding: 10px;

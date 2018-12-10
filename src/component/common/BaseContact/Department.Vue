@@ -1,6 +1,6 @@
 <template>
   <base-modal 
-    :title="title" width="840px"
+    :title="title" width="820px"
     :show.sync="show" @closed="$emit('destory')" @cancel="$emit('canel')">
     <div class="bc-dept-wrap">
       <div class="bc-dept">
@@ -40,7 +40,7 @@
             class="bc-chosen-user" 
             v-for="dept in chosenDept" :key="dept.id">
             <span>{{dept.name}}</span>
-            <i class="iconfont icon-guanbi" @click="chooseDept({node: dept, value: false})"></i>
+            <i class="iconfont icon-close" @click="chooseDept({node: dept, value: false})"></i>
           </div>
         </template>
         <template v-if="chosen.length > 0">
@@ -48,7 +48,7 @@
           <div class="bc-chosen-user" v-for="user in chosen" :key="user.userId">
             <div class="bc-chosen-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
             <span>{{user.displayName}}</span>
-            <i class="iconfont icon-guanbi" @click="removeUser(user)"></i>
+            <i class="iconfont icon-close" @click="removeUser(user)"></i>
           </div>
         </template>
       </div>
@@ -432,26 +432,19 @@ export default {
 
       if(this.allowCheckDept) subtask.push(this.fetchDeptCount())
 
-      Promise.all(subtask).then(result => {
-        let depts = result[0] || [];
-        
-        if(this.allowCheckDept){
-          let deptUserCount = result[1] || {};
-          this.deptUserCount = deptUserCount.data || {};
-        }
-    
-        this.depts = depts;
-        this.initDeptUser(this.depts[0]); //默认选中第一个
-      })
-      .catch(err => console.error(err))
-
-      // this.fetchDept()
-      //   //默认选中第一个
-      //   .then(depts => {
-      //     this.depts = depts;
-      //     this.initDeptUser(this.depts[0]); //默认选中第一个
-      //   })
-      //   .catch(err => console.error(err))
+      Promise.all(subtask)
+        .then(result => {
+          let depts = result[0] || [];
+          
+          if(this.allowCheckDept){
+            let deptUserCount = result[1] || {};
+            this.deptUserCount = deptUserCount.data || {};
+          }
+      
+          this.depts = depts;
+          this.initDeptUser(this.depts[0]); //默认选中第一个
+        })
+        .catch(err => console.error(err))
     },
     /** 初始化工作状态的颜色 */
     initializeStateColor(){
@@ -552,7 +545,7 @@ export default {
 }
 
 .bc-chosen{
-  width: 200px;
+  width: 180px;
   border-left: 1px solid #e9ecef;
   padding: 0 5px;
   overflow-y: auto;

@@ -91,9 +91,12 @@ export default {
   cursor: pointer;
   transition: background-color ease .15s;
 
-  &.contact-selected,
-  &:hover{
+  &.contact-selected{
     background-color: $color-primary-hover;
+  }
+
+  &:hover{
+    background-color: darken($color-primary-hover, 5%) !important;
   }
 
   &:last-child .contact-user-wrap{

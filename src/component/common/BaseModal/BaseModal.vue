@@ -6,12 +6,12 @@
       <div class="base-modal transition__container" :style="{width: width}">
         <div class="base-modal-header">
           <slot name="header">
-            <h3 v-if="title">{{ title }}</h3>
-            <template v-else>
-              <slot name="cHeader"></slot>
-            </template>
+            <slot name="title">
+              <h3 v-if="title">{{title}}</h3>
+            </slot>
+
             <button type="button" class="base-modal-header-close" @click="cancel" v-if="closeable">
-              <i class="iconfont icon-guanbi"></i>
+              <i class="iconfont icon-close"></i>
             </button>
           </slot>
         </div>
@@ -148,7 +148,7 @@ export default {
 
   .base-modal-header {
     position: relative;
-    padding: 10px 40px 10px 20px;
+    padding: 8px 40px 8px 10px;
     border-bottom: 1px solid #e9ecef;
     background: #f8f8f8;
     font-size: 16px;
