@@ -5,9 +5,10 @@
       v-for="t in tabs" :key="t.component"
       class="base-tabbar-item" :class="{'base-tabbar-selected': t.component === value}"
       @click="selectTab(t)">
-      <slot :name="`${t.component}__tab`">{{t.displayName}}</slot>
+      <slot :name="`${t.component}__tab`">
+        {{t.displayName}}
+      </slot>
     </div>
-    <div class="base-tabbar-line" :style="borderStyle"></div>
   </div>
 </template>
 
@@ -29,31 +30,11 @@ export default {
       }
     }
   },
-  mounted() {
-    this.resetTabOffset();
-    window.addEventListener('resize', this.computeOffset)
-  },
   methods: {
     selectTab(tab) {
-      this.$emit('input', tab.component)
-      this.resetTabOffset()
+      this.$emit('input', tab.component);
     },
-    //设置底部线的偏移量
-    resetTabOffset(){
-      this.$nextTick(() => {
-        let target = this.$el.querySelector('.base-tabbar-selected');
-        this.borderStyle = {
-          left: `${target.offsetLeft}px`,
-          width: `${target.offsetWidth}px`,
-        }
-      })
-    }
   },
-  watch: {
-    value(newVal){
-      this.resetTabOffset();
-    }
-  }
 }
 </script>
 
@@ -86,6 +67,7 @@ export default {
     background: $color-regular;
     flex-grow: 1;
     font-weight: normal;
+    position: relative;
 
     i.iconfont{
       font-size: 14px;
@@ -93,25 +75,22 @@ export default {
     }
   }
 
-  .base-tabbar-item + .base-tabbar-item{
-    /*margin-left: 25px;*/
-  }
-
   .base-tabbar-item:hover,
   .base-tabbar-item.base-tabbar-selected {
-    //color:$color-primary;
     background: #CFEAE9;
     color: #55B7B4;
-  }
+    &:after {
+      content: '';
+      position: absolute;
+      height: 2px;
+      background: $color-primary;
+      left: 0;
+      bottom: -2px;
+      transition: left ease .15s;
+      z-index: 9;
+      width: 100%;
 
-  .base-tabbar-line {
-    position: absolute;
-    height: 2px;
-    background: $color-primary;
-    left: 0;
-    bottom: 0;
-    transition: left ease .15s;
-    z-index: 9;
+    }
   }
 }
 </style>
