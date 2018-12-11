@@ -1,5 +1,5 @@
 <template>
-  <base-modal @closed="$emit('success-callback')" title="添加提醒" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog">
+  <base-modal @closed="$emit('success-callback')" :title="modalTitle" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog">
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
@@ -73,6 +73,9 @@ export default {
     action() {
       return this.editedRemind.id ? 'edit' : 'create';
     },
+    modalTitle() {
+      return this.editedRemind.id ? '编辑提醒' : '添加提醒';
+    },
     selectedRemind() {
       return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
     },
@@ -100,12 +103,15 @@ export default {
     this.fetchData();
   },
   methods: {
-    updateUser() {
+    updateUser(newUsersArr) {
+      const newArr = newUsersArr || this.selectedRemind.users || [];
       if (this.selectedRemind.isDdResponse) {
         // 内部提醒
-        this.form.users = (this.selectedRemind.users || []).map(user => user.id);
-        this.remoteSearchCM.options = this.concatArrayAndItemUnique(this.remoteSearchCM.options, this.selectedRemind.users);
-        this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, this.selectedRemind.users);
+        this.form.users = newArr.map(user => user.id);
+        this.remoteSearchCM.options = this.concatArrayAndItemUnique(this.remoteSearchCM.options, newArr)
+          .filter(c => c.id !== this.customer.id);
+        this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, newArr)
+          .filter(c => c.id !== this.customer.id);
         return;
       }
       const users = [{
@@ -172,7 +178,7 @@ export default {
       if (this.action === 'edit') {
         this.form.remindId = this.editedRemind.remind.id;
         this.$nextTick(() => {
-          this.updateUser();
+          this.updateUser(this.editedRemind.users);
         })
       }
       this.searchCustomerManager();
@@ -206,6 +212,9 @@ export default {
         .catch(err => console.error('err', err));
     },
     searchCustomerManager(keyword) {
+      if (!this.selectedRemind.isDdResponse) {
+        return this.remoteSearchCM.options = [];
+      }
       this.remoteSearchCM.loading = true;
       this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {

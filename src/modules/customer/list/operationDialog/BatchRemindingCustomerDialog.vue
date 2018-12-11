@@ -53,6 +53,7 @@ export default {
   data: () => {
     return {
       remindTemplate: [],
+      cmAllOptions: [],
       remoteSearchCM: {
         loading: false,
         options: [],
@@ -134,7 +135,7 @@ export default {
 
       if (this.selectedRemind.isDdResponse) {
         params.isAllLm = 0;
-        params.users = this.selectedRemind.users;
+        params.users = this.cmAllOptions.filter(rc => this.form.users.includes(rc.id));
       } else {
         params.isAllLm = this.form.isAllLm;
         params.users = [];
@@ -167,6 +168,7 @@ export default {
               this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0 : 1;
               this.form.users = (tv.users || []).map(c => c.id);
               this.remoteSearchCM.options = tv.users;
+              this.cmAllOptions = tv.users;
             }
           }
         })
@@ -182,12 +184,15 @@ export default {
               name: c.displayName,
             }));
           this.remoteSearchCM.loading = false;
+          // 数组中的对象根据id去重
+          this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, this.remoteSearchCM.options);
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },
     updateUser() {
       this.form.users = (this.selectedRemind.users || []).map(user => user.id);
       this.remoteSearchCM.options = this.concatArrayAndItemUnique(this.remoteSearchCM.options, this.selectedRemind.users);
+      this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, this.selectedRemind.users);
     },
     concatArrayAndItemUnique(arr1, arr2) {
       // 数组中的对象根据id去重
