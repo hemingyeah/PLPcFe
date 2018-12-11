@@ -165,7 +165,7 @@ function remoteValidation(value, remote) {
  * @param {*} formType 字段类型 
  * @param {*} options 可选项
  */
-async function validate(value, field, options){
+async function validate(value, field, options = {}){
   let fn = RuleMap[field.formType];
   let message = null;
   if(typeof fn == 'function') message = await fn(value, field);

@@ -315,6 +315,7 @@ export default {
   .page-container {
     background: #fff;
     border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(216,216,216, .65);
   }
 
   .customer-address-icon {

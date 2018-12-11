@@ -128,72 +128,91 @@ export default {
 </script>
 
 <style lang="scss">
-  .overflow-body-for-modal {
-    overflow: hidden;
-  }
+.overflow-body-for-modal {
+  overflow: hidden;
+}
 
-  .base-modal-mask {
-    @include mask();
-    z-index: 999;
-    overflow: auto;
-  }
+.base-modal-mask {
+  @include mask();
+  z-index: 999;
+  overflow: auto;
+}
 
-  .base-modal {
-    position: relative;
-    margin: 50px auto;
-    background-color: #fff;
-    border-radius: 1px;
-    box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
-  }
+.base-modal {
+  position: relative;
+  margin: 50px auto;
+  background-color: #fff;
+  border-radius: 1px;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
+}
 
-  .base-modal-header {
-    position: relative;
-    padding: 8px 40px 8px 10px;
-    border-bottom: 1px solid #e9ecef;
-    background: #f8f8f8;
+.base-modal-header {
+  position: relative;
+  padding: 8px 40px 8px 10px;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f8f8;
+  font-size: 16px;
+  color: $text-color-primary;
+  font-weight: normal;
+
+  align-items: center;
+
+  h3 {
+    flex: 1;
+    margin: 0;
+    height: 24px;
+    line-height: 24px;
     font-size: 16px;
-    color: $text-color-primary;
-    font-weight: normal;
+    font-weight: 400;
 
-    align-items: center;
-
-    h3 {
-      flex: 1;
-      margin: 0;
-      height: 24px;
-      line-height: 24px;
-      font-size: 16px;
-      font-weight: 400;
-
-      @include text-ellipsis()
-    }
-
-    &-close {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 40px;
-      width: 40px;
-      padding: 8px;
-      margin: 0;
-      outline: none;
-      color: #666;
-      border: none;
-      background-color: transparent;
-
-      transition: color ease .15s;
-
-      i {
-        font-size: 14px;
-      }
-
-      &:hover {
-        color: #e84040;
-      }
-    }
+    @include text-ellipsis()
   }
 
-  .base-modal-footer {
-    padding: 15px 30px;
+  &-close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 40px;
+    width: 40px;
+    padding: 8px;
+    margin: 0;
+    outline: none;
+    color: #666;
+    border: none;
+    background-color: transparent;
+
+    transition: color ease .15s;
+
+    i {
+      font-size: 14px;
+    }
+
+    &:hover {
+      color: #e84040;
+    }
   }
+}
+
+.base-modal-footer {
+  padding: 15px 30px;
+}
+
+.base-modal-text-btn{
+  outline: none;
+  border:none;
+  background-color: transparent;
+  color: $text-color-secondary;
+
+  &:hover{
+    background-color: #f0f0f0;
+  }
+
+  &:disabled{
+    cursor: not-allowed;
+  }
+
+  & + button{
+    margin-left: 10px;
+  }
+}
 </style>

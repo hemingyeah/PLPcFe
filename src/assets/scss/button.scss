@@ -12,6 +12,8 @@
   outline: none;
   cursor: pointer;
   transition: background-color .3s ease;
+  color: $text-color-regular;
+  min-width: 65px;
 
   &:active{
     opacity: 0.85;

@@ -385,6 +385,8 @@
       ref="exportPanel"
       :columns="exportColumns"
       :build-params="buildExportParams"
+      :validate="checkExportCount"
+      method="post"
       action="/customer/export"/>
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
@@ -402,7 +404,7 @@
           <span class="sn">{{c.serialNumber}}</span>
           <span class="name-column">{{c.name}}</span>
           <span class="delete-btn">
-          <i class="iconfont icon-close" @click.self="cancelSelectCustomer(c)"></i>
+            <i class="iconfont icon-close" @click.self="cancelSelectCustomer(c)"></i>
           </span>
         </dd>
       </dl>
@@ -666,24 +668,16 @@ export default {
     jumpPage() {
       window.location = '/customer/create';
     },
+    /** 构建客户导出参数 */
     buildExportParams(checkedArr, ids) {
-      let params = {};
-
-      if (ids && ids.length) {
-        params = {
-          customerChecked: checkedArr.join(','),
-          data: ids.join(','),
-          exportSearchModel: '',
-        };
-      } else {
-        params = {
-          customerChecked: checkedArr.join(','),
-          data: '',
-          exportSearchModel: JSON.stringify(this.buildParams() || {}),
-        }
-      }
-      return params;
+      let exportAll = !ids || ids.length == 0;
+      return {
+        customerChecked: checkedArr.join(','),
+        data: exportAll ? '' : ids.join(','),
+        exportSearchModel: exportAll ? JSON.stringify(this.buildParams() || {}) : ''
+      };
     },
+    /** 导出客户 */
     exportCustomer(exportAll) {
       let ids = [];
       let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}客户数据.xlsx`;
@@ -692,6 +686,11 @@ export default {
         ids = this.selectedIds;
       }
       this.$refs.exportPanel.open(ids, fileName);
+    },
+    /** 检测导出条数 */
+    checkExportCount(ids, max){
+      let exportAll = !ids || ids.length == 0;
+      return exportAll && this.paginationInfo.totalItems > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
     },
     importSucc() {
       // console.log('importSucc');

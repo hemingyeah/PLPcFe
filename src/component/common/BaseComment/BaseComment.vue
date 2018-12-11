@@ -62,8 +62,8 @@ export default {
   data(){
     return {
       editorCalcStyle: {
-        height: '58px',
-        minHeight: '58px'
+        height: '82px',
+        minHeight: '82px'
       },
 
       errMessage: '',
@@ -89,7 +89,7 @@ export default {
       let value = event.target.value;
       this.form.content = value;
       //计算输入框大小
-      this.editorCalcStyle = calcTextareaHeight(this.$refs.editor, 2, 8);
+      this.editorCalcStyle = calcTextareaHeight(this.$refs.editor, 3, 8);
       //验证输入内容
       if(value) this.validateContent(this.form.content);
     },
@@ -183,7 +183,6 @@ export default {
 .base-comment{
   position: relative;
   border: 1px solid #ccc;
-  border-radius: 2px;
   z-index: 8;
   outline: none;
 
@@ -201,8 +200,12 @@ export default {
   }
 }
 
+.base-comment-inner{
+  background-color: #f9f9f9;
+}
+
 .base-comment-editor{
-  background: #f9f9f9;
+  background-color: #f9f9f9;
   border: none;
   resize: none;
   display: block;
@@ -213,8 +216,19 @@ export default {
   height: 84px;
 }
 
+textarea.base-comment-editor::-webkit-input-placeholder{
+  color: #999;
+}
+
+textarea.base-comment-editor:-ms-input-placeholder{
+  color: #999;
+}
+
+textarea.base-comment-editor::-moz-placeholder{
+  color: #999;
+}
+
 .base-comment-footer{
-  background: #f9f9f9;
   padding: 0 8px 5px 8px;
   display: flex;
   flex-flow: row nowrap;
@@ -230,9 +244,9 @@ export default {
   background-color: transparent;
   border: none;
   outline: none;
-  color: #9a9a9a;
   transition: color ease .3s;
   font-size: 14px;
+  color: #999;
 
   &:hover{
     color: $color-primary;

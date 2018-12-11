@@ -61,14 +61,14 @@ axios.interceptors.response.use(response => {
 });
 
 function get(url = '', params = {}, option = {}) {
-  return axios_http('get', url, params, true, option);
+  return axiosHttp('get', url, params, true, option);
 }
 
 function post(url = '', params = {}, emulateJSON = true, option = {}) {
-  return axios_http('post', url, params, emulateJSON, option);
+  return axiosHttp('post', url, params, emulateJSON, option);
 }
 
-function axios_http(method = 'get', url = '', params = {}, emulateJSON = true, config = {}) {
+function axiosHttp(method = 'get', url = '', params = {}, emulateJSON = true, config = {}) {
   if(method == 'get'){
     config.params = params;
   }
@@ -87,6 +87,6 @@ function axios_http(method = 'get', url = '', params = {}, emulateJSON = true, c
   return axiosIns.request(config).then(response => response.data);
 }
 
-const http = { get, post };
+const http = { get, post, axios: axiosHttp };
 
 export default http;

@@ -8,8 +8,8 @@
     </el-checkbox-group>
    
     <div slot="footer" class="export-footer">
-      <button type="button" class="btn btn-text" @click="visible = false">关闭</button>
-      <el-button type="primary" :disabled="pending" :loading="pending" @click="exportData">{{pending ? '正在导出' : '导出'}}</el-button>
+      <button type="button" class="btn base-modal-text-btn" @click="visible = false">关闭</button>
+      <button type="button" class="btn btn-primary" :disabled="pending" @click="exportData">{{pending ? '正在导出' : '导出'}}</button>
     </div>
 
     <div class="base-export-bridge" ref="bridge"></div>
@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import qs from 'qs';
-import BaseModal from '../BaseModal';
 import Platform from '@src/platform';
 import http from '@src/util/http';
+
+const MAX_COUNT = 5000;
 
 export default {
   name: 'base-export',
@@ -31,7 +31,16 @@ export default {
     title: {
       type: String,
       default: '导出列选择'
-    }
+    },
+    method: {
+      type: String,
+      default: 'get'
+    },
+    /**
+     * 函数必须返回Promise对象
+     * 如果验证失败，promise需要返回错误信息，否则返回null
+     */
+    validate: Function
   },
   data(){
     return {
@@ -67,30 +76,32 @@ export default {
     handleChange(){
       this.isCheckedAll = this.checkedArr.length == this.filterColumns.length;
     },
-    exportData(){
-      if(this.checkedArr.length == 0) return Platform.alert('请至少选择一列导出');
-
-      this.pending = true;
-      let params = {
-        checked: this.checkedArr.join(','),
-        ids: this.ids.join(','),
-      };
-      // doubt
-
-      if (this.buildParams) {
-        params = this.buildParams(this.checkedArr, this.ids);
+    //表单形式导出
+    formExport(params){
+      let form = document.createElement('form');
+      this.$refs.bridge.appendChild(form)
+      
+      for(let prop in params){
+        let input = document.createElement("input");  
+        input.name = prop;  
+        input.value = params[prop];  
+        form.appendChild(input);  
       }
+      
+      form.method = this.method;
+      form.action = this.action;
+      form.submit();
 
+      this.visible = false;
+      this.pending = false;
 
-
-      let ua = navigator.userAgent;
-      if (ua.indexOf('Trident') >= 0){
-        window.location.href = `${this.action}?${qs.stringify(params)}`;
-        this.visible = false;
-        return
-      }
-
-      http.get(`${this.action}?${qs.stringify(params)}`, {}, {responseType: 'blob'}).then(blob => {
+      setTimeout(() => {
+        this.$refs.bridge.removeChild(form)
+      }, 150);
+    },
+    //ajax形式导出
+    ajaxExport(params){
+      return http.axios(this.method, this.action, params, false, {responseType: 'blob'}).then(blob => {
         let link = document.createElement('a');
         let url = URL.createObjectURL(blob);
         link.download = this.fileName;
@@ -99,37 +110,59 @@ export default {
         link.click();
 
         this.visible = false;
+        this.pending = false;
         setTimeout(() => {
           URL.revokeObjectURL(url);
           this.$refs.bridge.removeChild(link)
         }, 150);
       }).catch(err => console.error(err))
+    },
+    async exportData(){
+      if(this.checkedArr.length == 0) return Platform.alert('请至少选择一列导出');
+
+      this.pending = true;
+
+      //如果提供验证函数，则进行验证
+      if(typeof this.validate == 'function'){
+        let validateRes = await this.validate(this.ids, MAX_COUNT)
+        if(validateRes) {
+          this.pending = false;
+          this.visible = false;
+          return Platform.alert(validateRes)
+        }
+      }
+
+      let params = typeof this.buildParams == 'function' 
+        ? this.buildParams(this.checkedArr, this.ids)
+        : {checked: this.checkedArr.join(','), ids: this.ids.join(',')};
+
+      return navigator.userAgent.indexOf('Trident') >= 0 ? this.formExport(params) : this.ajaxExport(params);
     }
-  },
-  components: {
-    [BaseModal.name]: BaseModal,
   }
 }
 </script>
 
 <style lang="scss">
-  .base-export-modal {
-    .base-modal-body {
-      padding: 15px;
-    }
-    .base-modal-footer {
-      padding: 15px;
-      .export-footer {
-        display: flex;
-        justify-content: flex-end;
-      }
-
-    }
+.base-export-modal {
+  .base-modal-body {
+    padding: 15px;
   }
 
+  .base-modal-footer {
+    padding: 15px;
+  }
+}
 
+.export-footer {
+  display: flex;
+  justify-content: flex-end;
+  
+  .btn-text{
+    margin-right: 10px;
+  }
+}
 
-  .base-export-title{
+.base-export-title{
   display: inline-block;
   min-width: 80px;
   margin-right: 10px;
