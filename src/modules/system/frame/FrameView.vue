@@ -280,7 +280,7 @@ export default {
         this.operationList = this.operationList.filter(item => {
           return (
             item.operate == 'cancel' || 
-            (item.operate == 'download' && this.exportList.some(exp => exp.id == item))
+            (item.operate == 'download' && this.exportList.some(exp => exp.id == item.id))
           );
         })
 
@@ -322,7 +322,10 @@ export default {
       if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
         this.operationList.push({id: item.id, operate: 'cancel'})
         let result = await http.post('export/cancel', {id: item.id}, false);
-        if(result.status == 0) this.checkExports();
+        if(result.status == 0) {
+          this.operationList = this.operationList.filter(i => i.id != item.id)
+          this.checkExports();
+        }
       }
     },
     clearStorage(){
