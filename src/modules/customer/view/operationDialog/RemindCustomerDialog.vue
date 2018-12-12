@@ -1,9 +1,9 @@
 <template>
   <base-modal @closed="$emit('success-callback')" :title="modalTitle" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog">
-    <el-form ref="form" :model="form" label-width="80px">
+    <el-form ref="form" :model="form" label-width="80px" :rules="rules">
 
       <el-form-item label="选择提醒">
-        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateUser">
+        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateFormUser">
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -13,7 +13,7 @@
       <el-form-item label="提醒规则">
         {{remindRule}}
       </el-form-item>
-      <el-form-item label="通知人">
+      <el-form-item label="通知人" prop="users">
         <el-select
           v-model="form.users"
           filterable
@@ -44,7 +44,6 @@ export default {
   name: "remind-customer-dialog",
   data: () => {
     return {
-      cmAllOptions: [],
       remindTemplate: [],
       remoteSearchCM: {
         loading: false,
@@ -56,6 +55,17 @@ export default {
       },
       remindCustomerDialog: false,
       pending: false,
+      rules: {
+        users: [{
+          validator(rule, value, callback) {
+            if (!value || !value.length) {
+              callback(new Error('  '));
+            }
+            callback();
+          },
+          trigger: 'blur'
+        }],
+      }
     }
   },
   props: {
@@ -97,34 +107,78 @@ export default {
           return '无'
         }
       }
-    }
+    },
+    allUsers() {
+      if (this.selectedRemind.isDdResponse) {
+        // 内部提醒
+        const arr = this.concatArrayAndItemUnique(this.editedRemind.users, this.selectedRemind.users);
+        return this.concatArrayAndItemUnique(this.remoteSearchCM.options, arr)
+      }
+      return [{
+        id: this.customer.id,
+        name: this.customer.name,
+        phone: this.customer.phone,
+      }];
+    },
   },
   mounted() {
     this.fetchData();
   },
   methods: {
-    updateUser(newUsersArr) {
-      const newArr = newUsersArr || this.selectedRemind.users || [];
+    updateFormUser() {
+      let users = [];
       if (this.selectedRemind.isDdResponse) {
-        // 内部提醒
-        this.form.users = newArr.map(user => user.id);
-        this.remoteSearchCM.options = this.concatArrayAndItemUnique(this.remoteSearchCM.options, newArr)
-          .filter(c => c.id !== this.customer.id);
-        this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, newArr)
-          .filter(c => c.id !== this.customer.id);
-        return;
+        users = this.selectedRemind.users;
+      } else {
+        users = [{
+          id: this.customer.id,
+          name: this.customer.name,
+          phone: this.customer.phone,
+        }]
       }
-      const users = [{
-        id: this.customer.id,
-        name: this.customer.name,
-        phone: this.customer.phone,
-      }];
-      this.form.users = users;
-      this.remoteSearchCM.options = users;
-      this.cmAllOptions = users;
 
+      this.remoteSearchCM.options = users;
+      this.form.users = users
+        // .filter(c => {
+        //   if (c.id && (c.id.indexOf('-') >= 0) && Number(c.name)) return false;
+        //   return true;
+        // })
+        .map(c => c.id);
     },
-    onSubmit() {
+    defaultUserOfDifferentSelectedRemind() {
+      let users = [];
+      if (this.action === 'edit') {
+        users = this.editedRemind.users || [];
+      } else {
+        if (this.selectedRemind.isDdResponse) {
+          users = this.selectedRemind.users || [];
+        } else {
+          users = [{
+            id: this.customer.id,
+            name: this.customer.name,
+            phone: this.customer.phone,
+          }];
+        }
+      }
+
+      this.remoteSearchCM.options = users;
+      this.form.users = users
+        // .filter(c => {
+        //   if (c.id && (c.id.indexOf('-') >= 0) && Number(c.name)) return false;
+        //   return true;
+        // })
+        .map(c => c.id);
+    },
+    async onSubmit() {
+      let validateForm = false;
+      try {
+        validateForm = await this.$refs.form.validate();
+      } catch (e) {
+        console.error('onSubmit validateForm e', e);
+      }
+
+      if (!validateForm) return;
+
       const params = this.buildParams();
       this.pending = true;
       let reqUrl = '';
@@ -169,7 +223,7 @@ export default {
         remind: {
           id: this.form.remindId,
         },
-        users: this.cmAllOptions.filter(rc => this.form.users.includes(rc.id))
+        users: this.allUsers.filter(rc => this.form.users.includes(rc.id))
       };
     },
     openDialog() {
@@ -177,37 +231,21 @@ export default {
 
       if (this.action === 'edit') {
         this.form.remindId = this.editedRemind.remind.id;
-        this.$nextTick(() => {
-          this.updateUser(this.editedRemind.users);
-        })
+      } else {
+        this.form.remindId = (this.remindTemplate[0] || {}).id;
       }
-      this.searchCustomerManager();
+
+      this.defaultUserOfDifferentSelectedRemind();
     },
     fetchData() {
       this.$http.get('/v2/customer/getReminds', {pageSize: 0, })
         .then(res => {
-          let tv = null;
-
-          if (res) {
-            this.remindTemplate = (res.list || [])
-              .map(r => {
-                if (r.isDdResponse) {
-                  r.name = r.name + '（内部提醒）';
-                } else {
-                  r.name = r.name + '（外部提醒）';
-                }
-                return r;
-              });
-
-            tv = this.remindTemplate[0];
-            if (tv) {
-              this.form.remindId = tv.id;
-              this.form.users = (tv.users || []).map(c => c.id);
-              this.remoteSearchCM.options = tv.users;
-              this.cmAllOptions = tv.users;
-
-            }
-          }
+          if (!res || res.status) return;
+          this.remindTemplate = (res.list || [])
+            .map(r => {
+              r.name += r.isDdResponse ? '（内部提醒）' : '（外部提醒）';
+              return Object.freeze(r);
+            });
         })
         .catch(err => console.error('err', err));
     },
@@ -218,16 +256,11 @@ export default {
       this.remoteSearchCM.loading = true;
       this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
-          const newList = res.list
+          this.remoteSearchCM.options = res.list
             .map(c => Object.freeze({
               id: c.staffId,
               name: c.displayName,
-            }));
-          this.remoteSearchCM.options = newList;
-
-          // 数组中的对象根据id去重
-          this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, newList);
-
+            })) || [];
           this.remoteSearchCM.loading = false;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));

@@ -3,7 +3,7 @@
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
-        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateUser">
+        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="defaultUserOfDifferentSelectedRemind">
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -13,10 +13,11 @@
       <el-form-item label="提醒规则">
         {{remindRule}}
       </el-form-item>
-      <el-form-item label="通知人">
+      <el-form-item label="通知人" prop="users" :error="error">
         <template v-if="selectedRemind.isDdResponse">
           <el-select
             v-model="form.users"
+            @change="validateUser"
             filterable
             remote
             multiple
@@ -53,7 +54,6 @@ export default {
   data: () => {
     return {
       remindTemplate: [],
-      cmAllOptions: [],
       remoteSearchCM: {
         loading: false,
         options: [],
@@ -64,9 +64,10 @@ export default {
         remindId: null,
         users: [],
       },
-
       batchRemindingCustomerDialog: false,
       pending: false,
+      error: '',
+      submitted: false,
     }
   },
   props: {
@@ -97,13 +98,33 @@ export default {
           return '无'
         }
       }
-    }
+    },
+    allUsers() {
+      if (this.selectedRemind.isDdResponse) {
+        // 内部提醒
+        return this.concatArrayAndItemUnique(this.remoteSearchCM.options, this.selectedRemind.users)
+      }
+      return [];
+    },
   },
   mounted() {
     this.fetchData();
   },
   methods: {
-    onSubmit() {
+    validateUser() {
+      if (!this.submitted) return;
+      if (this.selectedRemind.isDdResponse && !this.form.users.length) {
+        // 内部提醒
+        return this.error = '      ';
+      }
+      this.error = '';
+    },
+    async onSubmit() {
+      this.submitted = true;
+      this.validateUser();
+
+      if (!!this.error) return;
+
       const params = this.buildParams();
       this.pending = true;
       this.$http.post('/scheduler/buildBatch', params)
@@ -135,7 +156,7 @@ export default {
 
       if (this.selectedRemind.isDdResponse) {
         params.isAllLm = 0;
-        params.users = this.cmAllOptions.filter(rc => this.form.users.includes(rc.id));
+        params.users = this.allUsers.filter(rc => this.form.users.includes(rc.id));
       } else {
         params.isAllLm = this.form.isAllLm;
         params.users = [];
@@ -146,31 +167,29 @@ export default {
       if (!this.selectedIds.length) {
         return this.$platform.alert('请选择需要批量提醒的客户');
       }
+      this.form.remindId = (this.remindTemplate[0] || {}).id;
       this.batchRemindingCustomerDialog = true;
+      this.defaultUserOfDifferentSelectedRemind();
     },
+    defaultUserOfDifferentSelectedRemind() {
+      let users = [];
+      if (this.selectedRemind.isDdResponse) {
+        users = this.selectedRemind.users || [];
+      }
+
+      this.remoteSearchCM.options = users;
+      this.form.users = users.map(c => c.id);
+    },
+
     fetchData() {
       this.$http.get('/v2/customer/getReminds', {pageSize: 0,})
         .then(res => {
-          let tv = null;
-          if (res) {
-            this.remindTemplate = (res.list || [])
-              .map(r => {
-                if (r.isDdResponse) {
-                  r.name = r.name + '（内部提醒）';
-                } else {
-                  r.name = r.name + '（外部提醒）';
-                }
-                return r;
-              });
-            tv = this.remindTemplate[0];
-            if (tv) {
-              this.form.remindId = tv.id;
-              this.form.isAllLm = tv.isdefaultLinkman === 1 ? 0 : 1;
-              this.form.users = (tv.users || []).map(c => c.id);
-              this.remoteSearchCM.options = tv.users;
-              this.cmAllOptions = tv.users;
-            }
-          }
+          if (!res || res.status) return;
+          this.remindTemplate = (res.list || [])
+            .map(r => {
+              r.name += r.isDdResponse ? '（内部提醒）' : '（外部提醒）';
+              return Object.freeze(r);
+            });
         })
         .catch(err => console.error('err', err));
     },
@@ -178,21 +197,14 @@ export default {
       this.remoteSearchCM.loading = true;
       this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
-          this.remoteSearchCM.options = res.list
+          this.remoteSearchCM.options = (res.list || [])
             .map(c => ({
               id: c.staffId,
               name: c.displayName,
             }));
           this.remoteSearchCM.loading = false;
-          // 数组中的对象根据id去重
-          this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, this.remoteSearchCM.options);
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
-    updateUser() {
-      this.form.users = (this.selectedRemind.users || []).map(user => user.id);
-      this.remoteSearchCM.options = this.concatArrayAndItemUnique(this.remoteSearchCM.options, this.selectedRemind.users);
-      this.cmAllOptions = this.concatArrayAndItemUnique(this.cmAllOptions, this.selectedRemind.users);
     },
     concatArrayAndItemUnique(arr1, arr2) {
       // 数组中的对象根据id去重
