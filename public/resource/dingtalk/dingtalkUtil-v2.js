@@ -74,6 +74,9 @@
       contentType = "application/json";
       params = JSON.stringify(params);
     }
+    
+    var random = '_t=' + (Math.random() * 100000 >> 0)
+    url = url + (url.indexOf("?") >= 0 ? '&' : '?') + random;
 
     $.ajax({
       type: method,

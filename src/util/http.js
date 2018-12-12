@@ -69,18 +69,19 @@ function post(url = '', params = {}, emulateJSON = true, option = {}) {
 }
 
 function axiosHttp(method = 'get', url = '', params = {}, emulateJSON = true, config = {}) {
+  if(!config.headers) config.headers = {};
+
   if(method == 'get'){
     config.params = params;
   }
 
   if(method == 'post') {
-    if(!config.headers) config.headers = {};
-
     config.headers['Content-Type'] = emulateJSON ? 'application/json' : 'application/x-www-form-urlencoded';
     config.data = params;
   }
-
-  config.url = url;
+  
+  let random = '_t=' + (Math.random() * 100000 >> 0);
+  config.url = url + (url.indexOf("?") >= 0 ? '&' : '?') + random;
   config.method = method;
   config.cancelable = config.cancelable !== false; //请求是否可取消
 
