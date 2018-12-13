@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import {scrollBarWidth} from '@src/util/dom';
+import {getScrollBarWidth} from '@src/util/dom';
 import FormMixin from '../FormMixin';
 
 export default {
@@ -32,7 +32,7 @@ export default {
       return `${length}/500`
     },
     offsetRight(){
-      return scrollBarWidth() + 4;
+      return getScrollBarWidth() + 4;
     }
   },
 }

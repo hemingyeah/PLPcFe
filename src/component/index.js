@@ -15,6 +15,7 @@ import BaseComment from './common/BaseComment';
 import BaseSpin from './common/BaseSpin';
 import BaseButton from './common/BaseButton';
 import BaseSelect from './common/BaseSelect';
+import BaseDatatable from './common/BaseDatatable';
 
 import Form from './form';
 import Fast from './fast'
@@ -38,7 +39,8 @@ const components = [
   BaseComment,
   BaseSpin,
   BaseButton,
-  BaseSelect
+  BaseSelect,
+  BaseDatatable
 ];
 
 export default {

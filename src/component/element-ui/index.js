@@ -31,6 +31,7 @@ import {
   CheckboxGroup,
   Switch,
   Tag,
+  Tooltip,
 } from 'element-ui';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
@@ -66,6 +67,7 @@ const ElementUI = {
     Vue.use(CheckboxGroup);
     Vue.use(Switch);
     Vue.use(Tag);
+    Vue.use(Tooltip);
     
     Vue.component(CollapseTransition.name, CollapseTransition);
   }

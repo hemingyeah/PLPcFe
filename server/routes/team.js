@@ -16,4 +16,10 @@ router.get('/team/create', async ctx => {
   ctx.body = Template.renderWithData('新建团队', {}, script)
 })
 
+router.get('/team/detail', async ctx => {
+  let script = ['/team.detail.js'];
+
+  ctx.body = Template.renderWithData('团队详情', {}, script)
+})
+
 module.exports = router;

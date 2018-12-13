@@ -361,6 +361,7 @@ export default {
     }
   },
   created(){
+    //TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
     window.resizeFrame = function(){

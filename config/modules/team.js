@@ -7,4 +7,8 @@ module.exports = {
     entry: './src/modules/team/create/team.create.js',
     template: 'src/modules/team/create/index.html'
   },
+  'team.detail': {
+    entry: './src/modules/team/detail/team.detail.js',
+    template: 'src/modules/team/detail/index.html'
+  },
 }

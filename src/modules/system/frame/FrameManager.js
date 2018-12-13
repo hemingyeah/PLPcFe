@@ -317,6 +317,8 @@ const FrameManager = {
   mounted(){
     window.addEventListener("message", this.receiveMessage);
     window.addEventListener("resize", this.resizeHanler);
+
+    //TODO: 迁移完成后删除
     window.addTabs = this.addTabs;
     
     window.frameHistoryBack = function(originWindow){

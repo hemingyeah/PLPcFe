@@ -6,6 +6,8 @@ import Vue from 'vue';
 import directive from '@src/directive';
 import component from '@src/component';
 import filter from '@src/filter';
+import platform from '@src/platform';
+import http from '@src/util/http';
 
 import dingtalk from '@src/util/dingtalk';
 import appConfig from 'app.config';
@@ -17,6 +19,8 @@ Vue.use(filter);
 Vue.use(component);
 
 Vue.prototype.$appConfig = appConfig;
+Vue.prototype.$platform = platform;
+Vue.prototype.$http = http;
 
 //处理注入的参数
 let initData = {};

@@ -12,7 +12,7 @@ import http from '@src/util/http';
 import dingtalk from '@src/util/dingtalk';
 import appConfig from 'app.config';
 
-import TeamManageView from './TeamManageView.vue';
+import TeamDetailView from './TeamDetailView.vue';
 
 Vue.use(directive);
 Vue.use(filter);
@@ -31,7 +31,7 @@ try {
   console.error('no init data')
 }
 
-const FrameViewComp = Vue.extend(TeamManageView);
+const FrameViewComp = Vue.extend(TeamDetailView);
 const app = new FrameViewComp({
   propsData: {
     initData

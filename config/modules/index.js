@@ -1,6 +1,6 @@
 /** 定义各个模块的配置，路径相对于项目根路径 @author dongls */
 const setting = require('./setting')
-const role = require('./role')
+const team = require('./team')
 
 module.exports = {
   'system.frame': {
@@ -38,5 +38,5 @@ module.exports = {
     exclude: ['common']
   },
   ...setting,
-  ...role,
+  ...team,
 }

@@ -1,0 +1,122 @@
+.base-datatable{
+  width: 100%;
+}
+
+.base-datatable-scroll {
+  height: 100%;
+  overflow: auto;
+}
+
+.base-datatable-head{
+  width: 100%;
+  color: #909399;
+  font-weight: 500;
+  line-height: 43px;
+  border-bottom: 1px solid #f2f2f2;
+
+  .th-padding {
+    padding-left: 30px;
+  }
+
+}
+
+.base-datatable-hidden{
+  display: none;
+}
+.base-datatable-body {
+  width: 100%;
+  tr {
+    line-height: 34px;
+    border-bottom: 1px solid #f2f2f2;
+    transition: background-color .25s ease;
+    &:hover {
+      background-color: #f5f7fa
+    }
+    td {
+      height: 30px;
+      padding: 5px 0;
+      position: relative;
+    }
+    input {
+      margin-left: 12px;
+    }
+    button {
+      height: 24px;
+      line-height: 24px;
+      margin-top: 3px;
+    }
+    a {
+      color: $color-primary;
+    }
+    i.iconfont {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      width: 16px;
+      height: 16px;
+      color: #909399;
+      &:hover {
+        cursor: pointer;
+        color: #333;
+      }
+    }
+  }
+}
+
+.base-table-checkbox-view {
+  display: flex;
+  justify-content: center;
+}
+
+.base-table-dotted-td {
+  padding-left: 45px;
+}
+
+.base-table-icon-element {
+  display: inline-block;
+  width: 31px;
+  text-align: center;
+}
+
+.base-table-extend-view {
+  text-align: center;
+}
+
+.base-table-row-children-line {
+  display: inline-block;
+  width: 30px;
+  height: 100%;
+  border-bottom: 1px dotted;
+  border-left: 1px dotted;
+  position: absolute;
+  // top: -23px;
+  top: -50%;
+  left: 10px;
+  z-index: 1;
+  margin-left: 5px;
+}
+
+.base-table-stripe {
+
+  .base-datatable-head tr:nth-child(odd),
+  .base-datatable-body tr:nth-child(even){
+    background-color: #fafafa;
+  }
+}
+
+.base-table-empty-block {
+  min-height: 60px;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .base-table-empty-text {
+    line-height: 60px;
+    width: 50%;
+    color: #909399;
+  }
+
+}

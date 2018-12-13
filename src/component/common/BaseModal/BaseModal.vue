@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { scrollBarWidth as getScrollBarWidth, hasClass, removeClass, addClass, getStyle } from '@src/util/dom';
+import { getScrollBarWidth, hasClass, removeClass, addClass, getStyle } from '@src/util/dom';
 
 export default {
   name: "base-modal",

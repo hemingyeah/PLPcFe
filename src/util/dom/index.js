@@ -25,7 +25,7 @@ export function fromHtml(html = '') {
 }
 
 /** 获取滚动条的宽度 */
-export function scrollBarWidth() {
+export function getScrollBarWidth() {
   let el = document.createElement('div');
 
   let styles = {
@@ -43,7 +43,7 @@ export function scrollBarWidth() {
   el = null;
 
   //下次直接返回结果
-  scrollBarWidth = function () { //eslint-disable-line
+  getScrollBarWidth = function () { //eslint-disable-line
     return scrollbarWidth;
   }
 
