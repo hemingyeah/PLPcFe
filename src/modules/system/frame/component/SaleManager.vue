@@ -106,7 +106,7 @@ export default {
     color: #797e89;
     text-align: center;
     font-size: 12px;
-    margin: 2px 0 0 0;
+    margin: 10px 0 0 0;
   }
 }
 
