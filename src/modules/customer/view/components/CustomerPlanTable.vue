@@ -231,7 +231,6 @@ export default {
     .customer-plan-table-header th{
       background: #F5F5F5;
       color: $text-color-primary;
-      font-weight: normal;
     }
 
     .plan-link {

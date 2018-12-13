@@ -327,6 +327,7 @@
   background: $color-regular;
   display: flex;
   justify-content: space-between;
+  font-weight: normal;
   .iconfont {
     color: $text-color-regular;
     &:hover {

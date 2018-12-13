@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="添加联系人" :show.sync="addContactDialog" width="470px" @cancel="$emit('submit-success')"
+  <base-modal title="添加联系人" :show.sync="addContactDialog" width="600px" @cancel="$emit('submit-success')"
               class="edit-contact-dialog">
 
     <form @submit.prevent="submit" class="edit-contact-form-container">
@@ -10,7 +10,7 @@
             <form-text
               :field="field"
               :value="form.phone" @input="update"
-              :placeholder="genPlaceholder(field)"/>
+              placeholder="建议使用手机号，可发送短信通知"/>
           </form-item>
         </template>
 
@@ -206,6 +206,7 @@ export default {
         this.reset();
         this.$eventBus.$emit('customer_contact_table.update_linkman_list');
         this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
 
       } catch (e) {
         this.pending = false;

@@ -23,7 +23,7 @@ import platform from '@src/platform';
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length > 0 
     ? <div class="base-timeline-attachment base-file__preview">
-      {attachments.map(item => <base-file-item file={item} key={item.id} readonly/>)}
+      {attachments.map(item => <base-file-item file={item} key={item.id} readonly size="small"/>)}
     </div> 
     : ''
 }
@@ -106,19 +106,23 @@ export default {
       
       if(action == '备注'){
         return [
-          <h5>
-            <strong>{userName}</strong>添加了备注{showInOwn == 1 ? '（仅自己可见）' : ''}。
+          <h5 class="main-info">
+            <strong>{userName}</strong>添加了备注
+            {!!showInOwn && (
+              <span class="private">
+                <i class="iconfont icon-account1"></i>仅自己可见
+              </span>
+            )}。
             {
-              this.allowDeleteRecord(item) 
-                ? <button type='button' class="btn-text base-timeline-delete" onClick={e => this.deleteRemark(item)}>
-                  <i class="iconfont icon-shanchu"></i>删除
-                </button> 
-                : ""
+              this.allowDeleteRecord(item) &&
+              <button type='button' class="btn-text base-timeline-delete" onClick={e => this.deleteRemark(item)}>
+                <i class="iconfont icon-shanchu"></i>删除
+              </button>
             }
           </h5>,
           content.isDelete == 'true' 
             ? <p class="text-danger">{content.deleteUserName}于{content.deleteTime}删除了该备注。</p> 
-            : [<p class="pre-line">{content.updateContent}</p>, createAttachmentDom(h,attachments)] 
+            : [<p class="pre-line secondary-info">{content.updateContent}</p>, createAttachmentDom(h,attachments)]
         ]
       }
 
@@ -139,7 +143,7 @@ export default {
         if(content.type == '已发送') return <h5>已发送了消息提醒{content.remindName}给{content.remindTo}。</h5>
         return [
           <h5>{userName}{content.type}了消息提醒{content.remindName}。</h5>,
-          content.rule ? <p>{content.rule}</p> : ''
+          content.rule ? <p class="secondary-info">{content.rule}</p> : ''
         ]
       }
 
@@ -147,14 +151,14 @@ export default {
         if(content.type == '添加'){
           return [
             <h5>{userName}使用短信模板{content.templateName}向客户发送了短信。</h5>,
-            <p>预计发送时间：{content.sendTime}</p>
+            <p class="secondary-info">预计发送时间：{content.sendTime}</p>
           ]
         }
 
         if(content.type == '已发送'){
           return [
             <h5>已使用短信模板{content.templateName}向客户发送了短信。</h5>,
-            <p>接收人：{content.remindToName}</p>
+            <p className="secondary-info">接收人：{content.remindToName}</p>
           ]
         }
       }
@@ -163,7 +167,7 @@ export default {
   
       return [
         <h5><strong>{userName}</strong>{action}了客户。</h5>,
-        content.updateFields ? <p>修改字段：{content.updateFields}</p> : '',
+        content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
         createAttachmentDom(h,attachments)
       ];
     },
@@ -245,6 +249,22 @@ export default {
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+
+  h5 {
+    margin-bottom: 5px;
+  }
+
+  .private {
+    color: $color-primary;
+    .iconfont {
+      font-size: 14px;
+      margin: 0 6px;
+    }
+  }
+
+  .secondary-info {
+    margin-top: 8px;
+  }
 }
 
 .customer-timeline{

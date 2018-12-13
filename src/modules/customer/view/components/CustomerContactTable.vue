@@ -24,13 +24,13 @@
           <template v-else-if="column.field === 'name'">
             <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
-          <template v-else-if="column.field === 'type'">
-            <span v-if="scope.row.isMain" style="text-align: left;display: block;">默认联系人</span>
-            <el-button v-else @click="setDefaultLinkman(scope.row)" type="text" :disabled="pending[scope.row.id]">
-              设为默认
-            </el-button>
-          </template>
           <div class="lm-action" v-else-if="column.field === 'action'">
+            <template>
+              <span v-if="scope.row.isMain" style="line-height: 26px;padding: 1px">默认联系人</span>
+              <el-button v-else @click="setDefaultLinkman(scope.row)" type="text" :disabled="pending[scope.row.id]">
+                设为默认
+              </el-button>
+            </template>
             <el-button type="text" @click="deleteLinkman(scope.row)" :disabled="pending[scope.row.id]" class="delete-contact-btn"
                        size="mini">删除
             </el-button>
@@ -126,6 +126,7 @@ export default {
           platform.alert(res.message);
         }
         this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
       } catch (e) {
         console.error('err',);
       }
@@ -167,16 +168,12 @@ export default {
         label: '电话',
         field: 'phone',
         show: true,
-      }, {
-        label: '',
-        field: 'type',
-        show: true,
-        width: '100px',
+        width: '150px',
       }, {
         label: '操作',
         field: 'action',
         show: true,
-        width: '100px',
+        width: '150px',
       }]
     }
   },
@@ -198,13 +195,11 @@ export default {
     .customer-contact-table-header th{
       background: #F5F5F5;
       color: $text-color-primary;
-      font-weight: normal;
     }
 
     .lm-action {
       display: flex;
       justify-content: space-between;
-
 
       .delete-contact-btn {
         color: $color-danger;

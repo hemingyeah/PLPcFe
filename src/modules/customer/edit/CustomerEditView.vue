@@ -1,6 +1,6 @@
 <template>
   <div class="customer-container" v-loading.fullscreen.lock="loadingPage">
-    <form @submit.prevent="submit" >
+    <form @submit.prevent="submit" class="base-form">
       <div class="page-title">
         <div class="title">
           <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button>
@@ -10,7 +10,7 @@
         <!--<base-button type="primary" icon="icon-add" @event="jumpPage">新建</base-button>-->
         <el-button size="small" :disabled="pending" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
       </div>
-      <form-builder ref="form" :fields="fields" :value="form" @input="update" style="width: 640px;" v-if="init">
+      <form-builder ref="form" :fields="fields" :value="form" @input="update" v-if="init">
         <template slot="serialNumber" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.serialNumber" :validation="!config.isAutoSerialNumber">
             <form-text
@@ -418,16 +418,24 @@ export default {
 </script>
 
 <style lang="scss">
+
+  html, body, .customer-container, .base-form {
+    height: 100%;
+  }
+
+  body {
+    padding: 10px;
+  }
+
 .customer-container {
   height: 100%;
   width: 100%;
   overflow: auto;
-  padding: 10px;
   background-color: #fff;
 
   .page-title {
     border-bottom: 1px solid #f4f7f5;
-    padding: 10px 0;
+    padding: 10px 15px 10px 0;
     display: flex;
     justify-content: space-between;
 
@@ -447,9 +455,18 @@ export default {
 }
 
 .form-builder{
-  width: 640px;
-  margin: 0 auto;
+  width: 100%;
+  padding: 0;
+  height: calc(100% - 54px);
+  overflow: auto;
 
+  .form-item {
+    width: 640px;
+    label {
+      width: 150px;
+      text-align: right;
+    }
+  }
   .input-and-btn{
     display: flex !important;
     flex-flow: row nowrap;

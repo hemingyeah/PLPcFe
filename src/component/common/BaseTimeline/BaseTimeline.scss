@@ -5,7 +5,7 @@
 
 .base-timeline-item{
   position: relative;
-  padding: 0 0 15px 32px;
+  padding: 0 0 25px 32px;
   border-left: 2px solid #e5e8e6;
 
   &:first-child .base-timeline-head{
@@ -14,7 +14,11 @@
   }
 
   &:last-child{
-    border-left-color: transparent !important; 
+    border-left-color: transparent !important;
+    &:after {
+      height: 0!important;
+      content: none!important;
+    }
   }
 
   &:hover .base-timeline-head{
@@ -24,6 +28,16 @@
 
   &:hover .base-timeline-delete{
     display: inline-block;
+  }
+
+  &:after {
+    content: '';
+    height: 1px;
+    width: calc(100% - 32px);
+    border-bottom: 1px dashed #eee;
+    position: absolute;
+    left: 32px;
+    bottom: 15px;
   }
 }
 
@@ -81,10 +95,11 @@
 }
 
 .base-timeline-time{
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
   line-height: 20px;
   color: #9a9a9a;
+  margin-top: 6px;
 }
 
 .base-timeline-delete{

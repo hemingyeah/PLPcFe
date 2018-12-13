@@ -36,15 +36,15 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      class="customer-remind-table-pagination"
-      background
-      @current-change="jump"
-      :page-size="paginationInfo.pageSize"
-      :current-page="paginationInfo.pageNum"
-      layout="prev, pager, next"
-      :total="paginationInfo.totalItems">
-    </el-pagination>
+    <!--<el-pagination-->
+      <!--class="customer-remind-table-pagination"-->
+      <!--background-->
+      <!--@current-change="jump"-->
+      <!--:page-size="paginationInfo.pageSize"-->
+      <!--:current-page="paginationInfo.pageNum"-->
+      <!--layout="prev, pager, next"-->
+      <!--:total="paginationInfo.totalItems">-->
+    <!--</el-pagination>-->
 
   </div>
 </template>
@@ -94,6 +94,7 @@ export default {
         await this.$http.get(`/scheduler/delete/${rm.id}`);
         this.fetchData();
         this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
       } catch (e) {
         console.error('deleteRemind catch err', e);
       }
@@ -137,7 +138,8 @@ export default {
         label: '操作',
         field: 'action',
         show: true,
-        tooltip: false
+        tooltip: false,
+        width: '80px'
       }]
     }
   },
@@ -155,7 +157,6 @@ export default {
     .customer-remind-table-header th{
       background: #F5F5F5;
       color: $text-color-primary;
-      font-weight: normal;
     }
 
     .delete-remind-btn {

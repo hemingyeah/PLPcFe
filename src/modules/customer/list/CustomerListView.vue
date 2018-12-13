@@ -2,12 +2,12 @@
   <div class="customer-list-container" ref="customerListPage" v-loading.fullscreen.lock="loadingListData">
     <!--搜索-->
     <div class="customer-list-search-group-container">
-      <form class="base-search">
+      <form class="base-search" onsubmit="return false;">
         <div class="customer-list-base-search-group">
           <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="search({ pageNum: 1, }, true)">搜索</base-button>
+          <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <a href="/customer">返回旧版</a>
         </div>
@@ -19,7 +19,7 @@
           高级搜索
           <i class="iconfont icon-close" @click="advancedSearchPanelShow = false"></i>
         </h4>
-        <el-form class="advanced-search-form">
+        <el-form class="advanced-search-form" onsubmit="return false;">
           <el-form-item label-width="100px" label="客户编号">
             <el-input type="text" v-model="params.serialNumber"></el-input>
           </el-form-item>
@@ -189,10 +189,8 @@
             </template>
           </el-form-item>
           <div class="advanced-search-btn-group">
-            <el-button type="primary" class="reset-btn" @click="resetParams">重置</el-button>
-            <el-button type="primary" class="search-btn" native-type="submit"
-                       @click.prevent="search({ pageNum: 1, }, true)">搜索
-            </el-button>
+            <base-button type="ghost" @event="resetParams">重置</base-button>
+            <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
           </div>
         </el-form>
       </base-panel>
@@ -1366,6 +1364,9 @@ export default {
     .advanced-search-form-wrap {
 
       .advanced-search-form {
+        height: calc(100% - 73px);
+        overflow: auto;
+        padding-bottom: 63px;
 
         .el-form-item {
           .el-form-item__content,
@@ -1380,18 +1381,14 @@ export default {
         .advanced-search-btn-group {
           display: flex;
           justify-content: flex-end;
-          width: 365px;
-          height: 40px;
-          margin: 0 auto 25px;
+          width: 100%;
+          position: absolute;
+          bottom: 0px;
+          background: #fff;
+          padding: 15px 20px;
 
-          .el-button {
-            font-size: 16px;
-            font-weight: lighter;
-          }
-          .reset-btn {
-            background: #E5E8F0;
-            color: #656B77;
-            border: #656B77;
+          .base-button {
+            margin: 0 10px;
           }
         }
       }

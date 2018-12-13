@@ -22,18 +22,17 @@
           <template v-if="column.field === 'area'">
             <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
-          <template v-else-if="column.field === 'action'">
+          <div v-else-if="column.field === 'action'" class="action">
+            <template>
+              <span v-if="scope.row.isMain" style="line-height: 26px;padding: 1px">默认地址</span>
+              <el-button v-else @click="setDefaultAddress(scope.row)" type="text" :disabled="pending[scope.row.id]">
+                设为默认
+              </el-button>
+            </template>
             <el-button type="text" @click="deleteAddress(scope.row)" :disabled="pending[scope.row.id]" class="delete-address-btn"
                        size="mini">删除
             </el-button>
-          </template>
-          <template v-else-if="column.field === 'type'">
-            <span v-if="scope.row.isMain" style="text-align: left;display: block;">默认地址</span>
-            <el-button v-else @click="setDefaultAddress(scope.row)" type="text" :disabled="pending[scope.row.id]">
-              设为默认
-            </el-button>
-          </template>
-
+          </div>
           <div v-else-if="column.field === 'address'" :class="{'can-open-map': scope.row.longitude && scope.row.latitude, }" @click.stop="openMap(scope.row)">
             {{scope.row[column.field]}}
             <i class="iconfont icon-address customer-address-icon" @click.stop="openMap(scope.row)"
@@ -121,6 +120,7 @@ export default {
           platform.alert(reqRes.message);
         }
         this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
       } catch (e) {
         console.error('err',);
       }
@@ -193,16 +193,11 @@ export default {
         minWidth: '200px',
         tooltip: true
       }, {
-        label: '',
-        field: 'type',
-        show: true,
-        width: '110px',
-        tooltip: true
-      }, {
         label: '操作',
         field: 'action',
         show: true,
-        tooltip: false
+        tooltip: false,
+        width: '120px',
       }]
     }
   },
@@ -221,7 +216,6 @@ export default {
     .customer-address-table-header th{
       background: #F5F5F5;
       color: $text-color-primary;
-      font-weight: normal;
     }
 
     .can-open-map:hover {
@@ -230,6 +224,11 @@ export default {
 
     .edit-btn {
       color: $color-primary;
+    }
+
+    .action {
+      display: flex;
+      justify-content: space-between;
     }
 
     .delete-address-btn {
@@ -242,19 +241,6 @@ export default {
       color: #c0c4cc;
       cursor: not-allowed;
       background-image: none;
-    }
-
-
-    .set-default-address-btn {
-      line-height: 34px;
-      display: block;
-      text-align: center;
-      border-radius: 3px;
-
-      &:hover {
-        cursor: pointer;
-        background-color: #e7e7e7;
-      }
     }
 
     .customer-address-table-pagination {

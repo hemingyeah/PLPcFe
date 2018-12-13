@@ -1,5 +1,5 @@
 <template>
-  <base-modal :title="title" :show.sync="addAddressDialog" width="500px" class="edit-address-dialog">
+  <base-modal :title="title" :show.sync="addAddressDialog" width="600px" class="edit-address-dialog">
     <form @submit.prevent="submit">
       <form-builder :fields="fields" class="edit-address-form" ref="form" :value="form" @input="update">
       </form-builder>
@@ -83,10 +83,9 @@ export default {
 
         this.pending = false;
         this.$emit('submit-success');
-
-        // todo reload customer address
         this.$eventBus.$emit('customer_address_table.update_address_list');
         this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
         this.addAddressDialog = false;
       } catch (e) {
         console.error('edit-address-dialog catch err', e);

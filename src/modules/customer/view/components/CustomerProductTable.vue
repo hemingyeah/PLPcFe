@@ -112,6 +112,7 @@ export default {
         label: '创建时间',
         field: 'createTime',
         show: true,
+        width: '150px'
       }]
     }
   },
@@ -130,7 +131,6 @@ export default {
     .customer-product-table-header th{
       background: #F5F5F5;
       color: $text-color-primary;
-      font-weight: normal;
     }
 
     .customer-product-table-pagination {

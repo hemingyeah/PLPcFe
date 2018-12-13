@@ -14,6 +14,10 @@ export default {
       type: Boolean,
       default: false
     },
+    nativeType: {
+      type: String,
+      default: 'button'
+    },
   },
   data() {
     return {}
@@ -31,6 +35,7 @@ export default {
     buildBaseButton() {
       const icon = this.icon;
       const type = this.type;
+      const nativeType = this.nativeType;
       const disabled = this.disabled ? 'disabled' : '';
       return (
         <button class={{
@@ -39,7 +44,7 @@ export default {
           'ghost-button': type === 'ghost',
           'base-button-disabled': disabled && type === 'primary',
           'plain-button-disabled': disabled && type === 'plain',
-        }} type="button" onClick={(e) => this.$emit('event', e)}>
+        }} type={nativeType} onClick={(e) => this.$emit('event', e)}>
           {icon && <i class={'iconfont ' + icon}></i>}
           {this.$slots.default}
         </button>

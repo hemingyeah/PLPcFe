@@ -132,10 +132,12 @@ export default {
         label: '状态',
         field: 'state',
         show: true,
+        width: '70px'
       }, {
         label: '创建时间',
         field: 'createTime',
         show: true,
+        width: '150px'
       }]
     }
   },
@@ -154,7 +156,6 @@ export default {
     .customer-event-table-header th{
       background: #F5F5F5;
       color: $text-color-primary;
-      font-weight: normal;
     }
 
     .customer-event-table-pagination {

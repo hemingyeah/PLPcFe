@@ -52,8 +52,11 @@
       </div>
     </div>
     <div class="main-content" v-loading="loading">
-      <div class="customer-detail">
-        <h3>{{customer.name}}</h3>
+      <div class="customer-detail" :style="style">
+        <h3 :class="{'customer-name-so-long': customerNameLong && !showWholeName}" ref="customerName">
+          {{customer.name}}
+          <i v-if="customerNameLong" @click="toggleTitleStatus" :class="[{'rotate': showWholeName, }, 'iconfont', 'icon-gongsimingchengxiala']"></i>
+        </h3>
         <form-view :fields="fields" :value="customer">
           <template slot="address" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
@@ -68,10 +71,7 @@
         </form-view>
       </div>
       <div class="customer-relation" v-if="this.customer.id">
-        <base-tabbar :tabs="tabs" v-model="currTab">
-          <!--<div class="record-tab-label" slot="customer-info-record__tab"><i class="iconfont icon-timeline"></i>信息动态-->
-          <!--</div>-->
-        </base-tabbar>
+        <base-tabbar :tabs="tabs" v-model="currTab"></base-tabbar>
         <div class="customer-relation-content">
           <keep-alive>
             <component :is="currTab" :share-data="propsForSubComponents"></component>
@@ -102,6 +102,8 @@ import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
 import EditContactDialog from './operationDialog/EditContactDialog.vue';
 import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
+import { getStyle } from '@src/util/dom';
+
 export default {
   name: "customer-detail-view",
   props: {
@@ -113,6 +115,7 @@ export default {
   data() {
     return {
       id: this.initData.id, //当前客户的id
+      // tabs: [],
       tabs: this.buildTabs(),
       //当前选中的tab
       currTab: 'customer-info-record',
@@ -121,6 +124,11 @@ export default {
       selectedRemind: {},
       customer: {},
       loading: false,
+      showWholeName: false,
+      statisticalData: {},
+      style: {
+        'padding-top': '55px',
+      }
     }
   },
   computed: {
@@ -184,41 +192,57 @@ export default {
         customer: this.customer,
         loginUser: this.initData.loginUser,
       };
+    },
+    customerNameLong() {
+      return (this.customer.name || '').length > 21;
     }
   },
   methods: {
     buildTabs() {
+      const {
+        addressQuantity,
+        eventQuantity,
+        linkmanQuantity,
+        plantaskQuantity,
+        productQuantity,
+        remindQuantity,
+        taskQuantity,
+        unfinishedEventQuantity,
+        unfinishedTaskQuantity,
+        recordQuantity,
+      } = this.StatisticalData || {};
+
       return [{
-        displayName: '信息动态',
+        displayName: recordQuantity ? `信息动态(${recordQuantity})` : '信息动态',
         component: CustomerInfoRecord.name,
         slotName: 'record-tab',
         show: true,
       }, {
-        displayName: '客户提醒',
+        displayName: remindQuantity ? `客户提醒(${remindQuantity})` : '客户提醒',
         component: CustomerRemindTable.name,
         show: true,
       }, {
-        displayName: '事件',
+        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity})` : '事件',
         component: CustomerEventTable.name,
         show: true,
       }, {
-        displayName: '工单',
+        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity})` : '工单',
         component: CustomerTaskTable.name,
         show: true,
       }, {
-        displayName: '计划任务',
+        displayName: plantaskQuantity ? `计划任务(${plantaskQuantity})` : '计划任务',
         component: CustomerPlanTable.name,
         show: this.initData.planTaskEnabled
       }, {
-        displayName: '客户产品',
+        displayName: productQuantity ? `客户产品(${productQuantity})` : '客户产品',
         component: CustomerProductTable.name,
         show: true,
       }, {
-        displayName: '客户地址',
+        displayName: addressQuantity ? `客户地址(${addressQuantity})` : '客户地址',
         component: CustomerAddressTable.name,
         show: true,
       }, {
-        displayName: '联系人',
+        displayName: linkmanQuantity ? `联系人(${linkmanQuantity})` : '联系人',
         component: CustomerContactTable.name,
         show: true,
       }]
@@ -248,6 +272,20 @@ export default {
         })
         .catch(err => console.error('customer-detail-view fetchCustomer catch error /n', err));
     },
+    fetchStatisticalData() {
+      const params = {
+        customerId: this.initData.id || this.customer.id
+      };
+
+      this.$http.get('/v2/customer/statistics/init', params)
+        .then(res => {
+          if (Object.keys(res).every(key => key !== 'taskQuantity')) return;
+
+          this.StatisticalData = res;
+          this.tabs = this.buildTabs();
+        })
+        .catch(err => console.error('fetchStatisticalData', err))
+    },
     openDialog(action) {
       if (action === 'address') {
         this.$refs.EditAddressDialog.openDialog();
@@ -261,7 +299,7 @@ export default {
     },
     jump() {
       const id = this.id || this.initData.id;
-      window.location.href = `/customer/edit/${id}`
+      window.location.href = `/v2/customer/edit/${id}`
     },
     createProduct() {
       const id = this.id || this.initData.id;
@@ -273,15 +311,25 @@ export default {
     updateRemind(remind) {
       this.selectedRemind = remind || {};
       this.$nextTick(this.$refs.addRemindDialog.openDialog);
+    },
+    toggleTitleStatus() {
+      this.showWholeName = !this.showWholeName;
+      this.$nextTick(() => {
+        const titleHeight = getStyle(this.$refs.customerName, 'height');
+        this.style['padding-top'] = parseInt(titleHeight, 10) + 5 + 'px';
+      });
     }
   },
   mounted() {
     this.loading = true;
     this.fetchCustomer(this.initData.id);
+    this.fetchStatisticalData();
     this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
+    this.$eventBus.$on('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
   },
   beforeDestroy() {
     this.$eventBus.$off('customer_detail_view.update_remind', this.updateRemind);
+    this.$eventBus.$off('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
   },
   components: {
     [CustomerInfoRecord.name]: CustomerInfoRecord,
@@ -332,6 +380,9 @@ export default {
     padding: 12px 20px;
     border-bottom: 1px solid #f2f2f2;
 
+    .text-button {
+      padding: 10px 15px;
+    }
   }
 
   .main-content {
@@ -353,16 +404,36 @@ export default {
     h3 {
       margin: 0;
       margin-bottom: 5px;
-      padding: 0 20px;
-      line-height: 50px;
+      padding: 10px 20px;
+      line-height: 30px;
       font-size: 16px;
       color: $text-color-primary;
       background: $color-primary-light-9;
       font-weight: normal;
       top: 0;
       left: 0;
-      width: 100%;
+      width: 390px;
       position: absolute;
+      padding-right: 28px;
+
+      .iconfont {
+        position: absolute;
+        right: 0px;
+        top: 10px;
+        padding: 0 10px;
+        color: $color-primary;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      .rotate {
+        transform: rotateZ(-180deg);
+      }
+    }
+
+    .customer-name-so-long {
+      @include text-ellipsis()
     }
   }
 

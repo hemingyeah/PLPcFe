@@ -207,6 +207,7 @@ export default {
           this.$emit('success-callback');
           this.$eventBus.$emit('customer_remind_table.update_remind_list');
           this.$eventBus.$emit('customer_info_record.update_record_list');
+          this.$eventBus.$emit('customer_detail_view.update_statistical_data');
         })
         .catch(err => {
           this.$platform.alert('批量添加提醒失败');

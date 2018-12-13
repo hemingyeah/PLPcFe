@@ -141,6 +141,7 @@ export default {
         label: '工单状态',
         field: 'state',
         show: true,
+        width: '70px'
       }, {
         label: '负责人',
         field: 'executor',
@@ -174,7 +175,6 @@ export default {
     .customer-task-table-header th{
       background: #F5F5F5;
       color: $text-color-primary;
-      font-weight: normal;
     }
 
     .customer-task-table-pagination {
