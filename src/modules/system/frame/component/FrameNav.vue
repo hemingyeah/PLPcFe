@@ -60,10 +60,6 @@ export default {
     source: {
       type: Array,
       default: () => []
-    },
-    currUrl: {
-      type: String,
-      default: ""
     }
   },
   data(){

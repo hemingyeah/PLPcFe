@@ -3,7 +3,6 @@
     <frame-nav 
       :collapse.sync="collapse" 
       :source="initData.menus" 
-      :curr-url="currUrl"
       @open="openForNav"
       @collapse-changed="adjustOpenTab"/>
 
@@ -11,7 +10,7 @@
       <header class="frame-header">
         <div class="frame-quick">
           <div class="frame-quick-left">
-            <button type="button" class="btn-text frame-header-btn frame-collapse" @click="collapse = !collapse">
+            <button type="button" class="btn-text frame-header-btn frame-collapse frame-header-btn-bg" @click="collapse = !collapse">
               <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
             </button>     
           </div>
@@ -181,7 +180,6 @@ export default {
       saleManagerShow: false, // 是否显示专属客服
 
       collapse: true,
-      currUrl: '/home',
 
       //导出相关变量
       exportPanelShow: false,

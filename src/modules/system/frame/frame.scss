@@ -46,7 +46,7 @@ html, body, .frame{
 }
 
 .frame-main{
-  height: calc(100% - 90px);
+  height: calc(100% - 91px);
 }
 
 .frame-tab-content{
@@ -116,7 +116,7 @@ html, body, .frame{
   justify-content: space-between;
   overflow: hidden;
   user-select: none;
-  //background: mix(#fff, $color-primary, 89.88%);
+  background: mix(#fff, $color-primary, 89.88%);
   border-bottom: 1px solid #f2f2f2;
 }
 
@@ -154,7 +154,8 @@ html, body, .frame{
 }
 
 .frame-header-btn-bg:hover{
-  background: $color-primary-hover;
+  //background: $color-primary-hover;
+  background-color: #CFEAE9;
 }
 
 /**************** frame tabs ****************/
@@ -336,7 +337,8 @@ button.export-operate-btn{
   z-index: 9;
 
   &:hover{
-    background-color: $color-primary-hover;
+    //background-color: $color-primary-hover;
+    background-color: #CFEAE9;
   }
 }
 

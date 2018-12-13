@@ -24,7 +24,7 @@ export default class Field{
     //客户、产品的字段id
     this.fieldId = options.id;
     this.tableChsName = options.tableChsName;
-      //工单、事件的字段id
+    //工单、事件的字段id
     this.id = options.id;
     
     //客户、产品特殊字段
