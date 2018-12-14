@@ -48,7 +48,7 @@
               <i class="iconfont icon-kefu"></i>
             </button>
 
-            <el-popover trigger="hover" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
+            <el-popover trigger="click" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
               <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
                 <i class="iconfont icon-xiazai"></i>
               </button>
@@ -63,7 +63,8 @@
                       <p>{{item.createTime | fmt_datetime}}</p>
                     </div>  
                     <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
-                    <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template>
+                    <!-- <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template> -->
+                    <template v-if="Math.random() > 0.5"><span class="btn export-operate-btn">请稍等</span></template>
                     <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>{{item.isFinished == 0 ? '取消' : '下载'}}</button>
                   </div>
                 </template>
