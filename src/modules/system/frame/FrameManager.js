@@ -2,6 +2,7 @@ import _ from 'lodash';
 import {parse} from '@src/util/querystring'
 import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
+import FrameHistoryManager from './FrameHistoryManager'
 
 const CACHED_FRAMES = [
   'M_TASK_ALL',
@@ -89,6 +90,10 @@ const FrameManager = {
       if(index >= 0) {
         let adjustTab = this.frameTabs.find(item => item.show);
         let currTab = this.frameTabs.splice(index, 1)[0];
+
+        //清空历史
+        FrameHistoryManager.removeStack(`frame_tab_${frameTab.id}`)
+
         if(currTab.show){
           let prevTab = this.frameTabs[index - 1];
           if(null != prevTab){
@@ -119,7 +124,10 @@ const FrameManager = {
       tab.loading = false;
       tab.reload = false;
     
-      this.adjustFrameTabs(tab)
+      this.adjustFrameTabs(tab);
+      
+      //记录frame历史
+      FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
     },
     reloadFrameTab(tab, redirect = false){
       this.removeFrameCache(tab.id)
@@ -299,6 +307,15 @@ const FrameManager = {
     window.addEventListener("message", this.receiveMessage);
     window.addEventListener("resize", this.resizeHanler);
     window.addTabs = this.addTabs;
+
+    window.frameHistoryBack = function(originWindow){
+      if(originWindow.__shb_pc_frame_history__back_pending__) return;
+
+      originWindow.__shb_pc_frame_history__back_pending__ = true;
+      let id = originWindow.frameElement.id;
+      let referrer = FrameHistoryManager.getReferrer(id);
+      referrer ? originWindow.location.replace(referrer) : originWindow.location.reload(true)
+    }
 
     let homeTab = new Tab({id:'HOME',url: '/home', title: '首页', show: true})
     this.openForFrame(homeTab);
