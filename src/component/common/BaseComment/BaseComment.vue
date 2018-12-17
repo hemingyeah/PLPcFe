@@ -103,8 +103,14 @@ export default {
       if(this.$refs.editor) this.$refs.editor.blur();
 
       //去除前后空白
-      let form = _.cloneDeep(this.form);
-      // form.content = (form.content || '').trimEnd();
+      // let form = _.cloneDeep(this.form);
+      let form = {
+        ...this.form,
+      };
+
+      console.log('this.form', this.form);
+      console.log('form', form);
+
       form.content = form.content.trimEnd();
 
       if(!await this.validateContent(this.form.content)) this.$emit('submit', form)

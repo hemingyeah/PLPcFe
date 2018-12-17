@@ -123,7 +123,7 @@ export function initialize(fields = [], origin = {}, callback){
     if(result[fieldName]) return;
 
     //屏蔽工单上单选里不存在默认值
-    if(this.isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = '';
+    if(isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = '';
 
     //优先级、服务类型、服务内容在空值时选中第一个
     if(field.formType == 'level' || field.formType == 'serviceContent' || field.formType == 'serviceType') {
@@ -131,7 +131,7 @@ export function initialize(fields = [], origin = {}, callback){
     }
 
     //多选和附件的默认值初始化为空数组
-    if(this.isMultiSelect(field) || field.formType == 'attachment'){
+    if(isMultiSelect(field) || field.formType == 'attachment'){
       defaultValue = [];
     }
 
@@ -153,11 +153,11 @@ export function initialize(fields = [], origin = {}, callback){
     let formData = field.isSystem === 1 ? origin[fieldName] : attribute[fieldName];
 
     //多选改单选,若原来有值则保留第一个
-    if(this.isSelect(field) && Array.isArray(formData)) {
+    if(isSelect(field) && Array.isArray(formData)) {
       formData = (formData && formData.length >= 1) ? formData[0] : '';
     }
     //单选改多选，将原值加入数组
-    if(this.isMultiSelect(field) && !Array.isArray(formData)) {
+    if(isMultiSelect(field) && !Array.isArray(formData)) {
       formData = formData ? [formData] : [];
     }
 
