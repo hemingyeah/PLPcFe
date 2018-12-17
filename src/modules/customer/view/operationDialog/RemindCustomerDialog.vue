@@ -34,6 +34,19 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
+
+
+      <el-popover
+        placement="bottom"
+        popper-class="remind-popover"
+        width="410"
+        trigger="hover">
+        <div>
+          提示：提醒规则在系统设置-客户设置-自动提醒设置中<a href="/setting/customer/remind" class="link">添加</a>
+        </div>
+        <i class="iconfont icon-question" slot="reference"></i>
+      </el-popover>
+
       <el-button @click="remindCustomerDialog = false">取 消</el-button>
       <el-button type="primary" @click="onSubmit" :disabled="pending">确 定</el-button>
     </div>
@@ -310,6 +323,25 @@ export default {
     .dialog-footer {
       display: flex;
       justify-content: flex-end;
+
+      .iconfont {
+        line-height: 32px;
+        margin-right: 10px;
+        color: $color-primary;
+      }
+    }
+  }
+
+  .remind-popover {
+    background: rgba(0,0,0,0.60);
+    color: #fff;
+    a.link {
+      color: $color-primary;
+      padding: 0 5px;
+    }
+
+    .popper__arrow:after {
+     border-bottom-color: rgba(0,0,0,0.60)!important;
     }
   }
 
