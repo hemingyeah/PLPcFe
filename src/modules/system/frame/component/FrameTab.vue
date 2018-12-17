@@ -13,9 +13,7 @@
         </template>
       </span>
       <span class="frame-tab-name">{{tab.title}}</span>
-      <button class="btn-text frame-tab-close" @click.stop="$emit('close', tab)" v-if="tab.closeable">
-        <i class="iconfont icon-fe-close"></i>
-      </button>
+      <button class="btn-text frame-tab-close" @click.stop="$emit('close', tab)" v-if="tab.closeable">×</button>
     </div>
   </div>
 </template>
@@ -105,13 +103,9 @@ export default {
   width: 16px;
   height: 16px;
   line-height: 16px;
-  color: #d8d8d8;
-  font-weight: 500;
-
-  i.icon-fe-close{
-    font-size: 12px;
-  }
- 
+  color: #bbb;
+  font-size: 18px;
+  
   &:hover{
     color: $color-danger;
   }
