@@ -27,7 +27,12 @@
                 <a href="javascript:;" @click="clearStorage">清空缓存</a>
               </div>
             </el-popover>
-
+            <a 
+              class="btn-text frame-header-btn frame-header-btn-bg"
+              v-if="showDevTool"
+              title="团队管理" v-tooltip @click="goRoleTeam">
+              <i class="iconfont icon-bangzhu"></i>
+            </a>
             <a 
               v-if="showDevTool"
               href="/v3" class="btn-text frame-header-btn frame-header-btn-bg"
@@ -345,6 +350,14 @@ export default {
         this.profilePopperVisible = false
         this.userStatePopperVisible = false;
       }
+    },
+    goRoleTeam() {
+      platform.openTab({
+        id: "team",
+        title: "团队管理",
+        url: "/team/manage",
+        reload: true
+      });
     }
   },
   created(){

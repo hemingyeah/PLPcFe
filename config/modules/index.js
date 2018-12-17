@@ -1,5 +1,6 @@
 /** 定义各个模块的配置，路径相对于项目根路径 @author dongls */
 const setting = require('./setting')
+const role = require('./role')
 
 module.exports = {
   'system.frame': {
@@ -36,5 +37,6 @@ module.exports = {
     entry: './src/modules/open/DailyReport/index.js',
     exclude: ['common']
   },
-  ...setting
+  ...setting,
+  ...role,
 }

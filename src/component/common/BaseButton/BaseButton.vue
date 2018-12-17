@@ -4,7 +4,7 @@ export default {
   props: {
     type: {
       type: String,
-      default: 'primary', // primary、plain、only-text、ghost
+      default: 'primary', // primary、plain、only-text、ghost、danger
     },
     icon: {
       type: String,
@@ -42,7 +42,9 @@ export default {
           'base-button': true,
           'plain-button': type === 'plain',
           'ghost-button': type === 'ghost',
+          'danger-button': type === 'danger',
           'base-button-disabled': disabled && type === 'primary',
+          'danger-button-disabled': disabled && type === 'danger',
           'plain-button-disabled': disabled && type === 'plain',
         }} type={nativeType} onClick={(e) => this.$emit('event', e)}>
           {icon && <i class={'iconfont ' + icon}></i>}
@@ -68,6 +70,11 @@ export default {
   $color-primary-disabled: rgba($color-primary, .3) !default;
   $color-primary-light-9-disabled: rgba($color-primary, .2) !default;
   $text-color-primary-disabled: rgba($text-color-primary, .2) !default;
+
+  $color-danger-light-1: mix(#fff, #f56c6c, 10%) !default;
+  $color-danger-light-9: mix(#fff, #f56c6c, 90%) !default;
+  $color-danger-disabled: rgba(#f56c6c, .3) !default;
+  $color-danger-light-9-disabled: rgba(#f56c6c, .2) !default;
   // 主要按钮
   .base-button {
     padding: 5px 15px;
@@ -118,7 +125,29 @@ export default {
       color: $text-color-primary-disabled;
     }
   }
+  // 危险红色按钮
+  .danger-button {
+    background: #f56c6c;
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    padding: 6px 15px;
+    &:hover {
+      background: $color-danger-light-1;
+      color: #fff;
+    }
 
+  }
+  .danger-button-disabled {
+    background: $color-danger-light-9-disabled;
+    border-color: $color-danger-light-9-disabled;
+    color: #fff;
+    &:hover {
+      background: $color-danger-light-9-disabled;
+      cursor: not-allowed;
+      color: #fff;
+    }
+  }
   // 背景白色按钮
   .ghost-button {
     background: #fff;
