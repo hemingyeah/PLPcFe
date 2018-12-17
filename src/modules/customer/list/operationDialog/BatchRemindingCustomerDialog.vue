@@ -35,8 +35,8 @@
         </template>
         <template v-else>
           <el-radio-group v-model="form.isAllLm">
-            <el-radio :label="0" :style="{ width: '120px'}">默认联系人</el-radio>
-            <el-radio :label="1" :style="{ width: '120px'}">所有联系人</el-radio>
+            <el-radio :label="0" style="width: 120px">默认联系人</el-radio>
+            <el-radio :label="1" style="width: 120px">所有联系人</el-radio>
           </el-radio-group>
         </template>
       </el-form-item>
@@ -225,6 +225,11 @@ export default {
 <style lang="scss">
 
   .batch-remind-customer-dialog {
+
+    .el-select .el-select__tags>span {
+      display: contents;
+    }
+
     .base-modal-body {
       padding: 10px 30px 0;
     }

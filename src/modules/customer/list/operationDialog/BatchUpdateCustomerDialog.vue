@@ -117,20 +117,22 @@ export default {
       if(null == this.file || !(this.file instanceof File)) return Platform.alert(`请选择要导入的文件`);
 
       this.pending = true;
-      Uploader.upload(this.file, this.action).then(result => {
-        if(result.status == 0){
-          let message = '导入成功！';
-          if(result.data && result.data.total) message += `共导入${result.data.total}条数据。`;
+      Uploader.upload(this.file, this.action)
+        .then(result => {
+          if(result.status == 0){
+            let message = '导入成功！';
+            if(result.data && result.data.total) message += `共导入${result.data.total}条数据。`;
 
-          Platform.alert(message);
+            Platform.alert(message);
+            this.$emit('success');
+          }else{
+            let data = result.data || [];
+            this.errors = data;
+            Platform.alert(`导入失败！\n${data.join('\n')}`);
+          }
+          this.pending = false;
           this.visible = false;
-          this.$emit('success');
-        }else{
-          let data = result.data || [];
-          this.errors = data;
-          Platform.alert(`导入失败！\n${data.join('\n')}`);
-        }
-      })
+        })
         .catch(err => {
           console.error(err)
         })
@@ -220,8 +222,7 @@ export default {
         justify-content: flex-end;
 
         button {
-          width: 80px;
-          padding: 9px 0;
+          min-width: 80px;
         }
       }
 

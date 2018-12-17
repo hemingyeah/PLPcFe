@@ -190,11 +190,13 @@ export default {
         field: 'createdTasks',
         show: true,
         tooltip: false,
+        width: '60px'
       }, {
         label: '重复周期',
         field: 'periodSetting',
         show: true,
         tooltip: true,
+        width: '70px'
       }, {
         label: '下次创建时间',
         field: 'nextTaskCreateTime',
@@ -206,6 +208,7 @@ export default {
         field: 'action',
         show: true,
         tooltip: false,
+        width: '50px'
       }]
     }
   },

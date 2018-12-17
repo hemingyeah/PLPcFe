@@ -110,6 +110,7 @@ export default {
             platform.alert(res.message);
           }
           this.pending[lm.id] = false;
+          this.$eventBus.$emit('customer_detail_view.update_customer_detail');
         });
     },
     async deleteLinkman(lm) {

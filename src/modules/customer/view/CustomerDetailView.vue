@@ -253,7 +253,7 @@ export default {
         if (!await this.$platform.confirm('确定要删除该客户？')) return;
         const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
         if (!result.status) {
-          window.location.href = '/customer';
+          window.location.href = '/v2/customer';
         }
       } catch (e) {
         console.error('customer-detail-view deleteCustomer error', e);
@@ -263,7 +263,8 @@ export default {
       this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name,})
         .catch(err => console.error('openMap catch an err: ', err));
     },
-    fetchCustomer(id) {
+    fetchCustomer() {
+      const id = this.initData.id;
       this.$http.get(`/v2/customer/get`, {id})
         .then(res => {
           if (res.status) return;
@@ -306,7 +307,8 @@ export default {
       window.location.href = `/customer/product/createNew?cid=${id}`
     },
     goBack() {
-      window.history.go(-1);
+      window.location.href = '/customer';
+      // window.history.go(-1);
     },
     updateRemind(remind) {
       this.selectedRemind = remind || {};
@@ -322,14 +324,16 @@ export default {
   },
   mounted() {
     this.loading = true;
-    this.fetchCustomer(this.initData.id);
-    this.fetchStatisticalData();
+    this.fetchCustomer();
+    // this.fetchStatisticalData();
     this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
     this.$eventBus.$on('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
+    this.$eventBus.$on('customer_detail_view.update_customer_detail', this.fetchCustomer);
   },
   beforeDestroy() {
     this.$eventBus.$off('customer_detail_view.update_remind', this.updateRemind);
     this.$eventBus.$off('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
+    this.$eventBus.$off('customer_detail_view.update_customer_detail', this.fetchCustomer);
   },
   components: {
     [CustomerInfoRecord.name]: CustomerInfoRecord,
@@ -415,6 +419,7 @@ export default {
       width: 390px;
       position: absolute;
       padding-right: 28px;
+      word-break: break-word;
 
       .iconfont {
         position: absolute;
@@ -434,6 +439,16 @@ export default {
 
     .customer-name-so-long {
       @include text-ellipsis()
+    }
+
+    &:after {
+      content: '';
+      height: 50px;
+      position: absolute;
+      width: 10px;
+      top: 0;
+      left: 390px;
+      background: $color-primary-light-9;
     }
   }
 

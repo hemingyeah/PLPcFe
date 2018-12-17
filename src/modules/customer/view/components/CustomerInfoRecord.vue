@@ -135,14 +135,14 @@ export default {
       }
 
       if(action == '联系人'){
-        let message = content.type == '设为默认' ? `${userName}将${content.name}设为默认联系人` : `${userName}${content.type}了联系人${content.name}`;
-        return <h5>{message}。</h5>
+        let message = content.type == '设为默认' ? `将${content.name}设为默认联系人` : `${content.type}了联系人${content.name}`;
+        return <h5><strong>{userName}</strong>{message}。</h5>
       }
 
       if(action == '消息提醒'){
         if(content.type == '已发送') return <h5>已发送了消息提醒{content.remindName}给{content.remindTo}。</h5>
         return [
-          <h5>{userName}{content.type}了消息提醒{content.remindName}。</h5>,
+          <h5><strong>{userName}</strong>{content.type}了消息提醒{content.remindName}。</h5>,
           content.rule ? <p class="secondary-info">{content.rule}</p> : ''
         ]
       }
@@ -150,7 +150,7 @@ export default {
       if(action == '发送短信'){
         if(content.type == '添加'){
           return [
-            <h5>{userName}使用短信模板{content.templateName}向客户发送了短信。</h5>,
+            <h5><strong>{userName}</strong>使用短信模板{content.templateName}向客户发送了短信。</h5>,
             <p class="secondary-info">预计发送时间：{content.sendTime}</p>
           ]
         }
@@ -163,7 +163,7 @@ export default {
         }
       }
 
-      if(action == '批量更新') return <h5>{userName}通过导入更新了客户。</h5>
+      if(action == '批量更新') return <h5><strong>{userName}</strong>通过导入更新了客户。</h5>
   
       return [
         <h5><strong>{userName}</strong>{action}了客户。</h5>,

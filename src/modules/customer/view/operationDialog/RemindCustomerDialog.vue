@@ -1,6 +1,6 @@
 <template>
   <base-modal @closed="$emit('success-callback')" :title="modalTitle" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog">
-    <el-form ref="form" :model="form" label-width="80px" :rules="rules">
+    <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
         <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateFormUser">
@@ -13,9 +13,10 @@
       <el-form-item label="提醒规则">
         {{remindRule}}
       </el-form-item>
-      <el-form-item label="通知人" prop="users">
+      <el-form-item label="通知人" prop="users" :error="error">
         <el-select
           v-model="form.users"
+          @change="validateUser"
           filterable
           remote
           multiple
@@ -55,17 +56,8 @@ export default {
       },
       remindCustomerDialog: false,
       pending: false,
-      rules: {
-        users: [{
-          validator(rule, value, callback) {
-            if (!value || !value.length) {
-              callback(new Error('  '));
-            }
-            callback();
-          },
-          trigger: 'blur'
-        }],
-      }
+      error: '',
+      submitted: false,
     }
   },
   props: {
@@ -125,6 +117,14 @@ export default {
     this.fetchData();
   },
   methods: {
+    validateUser() {
+      if (!this.submitted) return;
+      if (!this.form.users || !this.form.users.length) {
+        // 内部提醒
+        return this.error = '      ';
+      }
+      this.error = '';
+    },
     updateFormUser() {
       let users = [];
       if (this.selectedRemind.isDdResponse) {
@@ -170,14 +170,10 @@ export default {
         .map(c => c.id);
     },
     async onSubmit() {
-      let validateForm = false;
-      try {
-        validateForm = await this.$refs.form.validate();
-      } catch (e) {
-        console.error('onSubmit validateForm e', e);
-      }
+      this.submitted = true;
+      this.validateUser();
 
-      if (!validateForm) return;
+      if (!!this.error) return;
 
       const params = this.buildParams();
       this.pending = true;
@@ -284,8 +280,13 @@ export default {
 <style lang="scss">
 
   .batch-remind-customer-dialog {
+
+    .el-select .el-select__tags>span {
+      display: contents;
+    }
+
     .base-modal-body {
-      padding: 15px 30px 0;
+      padding: 10px 30px 0;
     }
 
     .el-form-item {
@@ -300,11 +301,9 @@ export default {
     }
 
     .content-item {
-      width: 93%;
       .el-form-item__content {
         max-height: 200px;
         overflow-y: auto;
-        word-break: break-all;
       }
     }
 

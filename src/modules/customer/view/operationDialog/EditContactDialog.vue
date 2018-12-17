@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="添加联系人" :show.sync="addContactDialog" width="600px" @cancel="$emit('submit-success')"
+  <base-modal :title="modalTitle" :show.sync="addContactDialog" width="600px" @cancel="$emit('submit-success')"
               class="edit-contact-dialog">
 
     <form @submit.prevent="submit" class="edit-contact-form-container">
@@ -74,7 +74,7 @@ export default {
       return [{
         formType: 'text',
         fieldName: 'name',
-        displayName: "客户",
+        displayName: "联系人",
         placeholder: '[最多50字]',
         isNull: 0,
       }, {
@@ -136,6 +136,9 @@ export default {
           dataSource: this.addresses || [],
         }
       }]
+    },
+    modalTitle() {
+      return this.originalValue.name ? '编辑联系人' : '添加联系人';
     }
   },
   mounted() {

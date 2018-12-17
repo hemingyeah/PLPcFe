@@ -356,7 +356,7 @@
     <base-import
       title="导入客户"
       ref="importCustomerModal"
-      @success="importSucc"
+      @success="search"
       action="/customer/import">
       <div slot="tip">
         <div class="base-import-warn">
@@ -648,7 +648,8 @@ export default {
     buildConfig() {
       this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
         .map(f => {
-          if (f.isSearch) {
+
+          if (f.isSearch && !f.isSystem) {
             // 需要搜索的字段
             this.$set(this.params.customizedSearchModel, f.fieldName, {
               fieldName: f.fieldName,
@@ -692,6 +693,7 @@ export default {
     },
     importSucc() {
       // console.log('importSucc');
+      this.search();
     },
     search(cp = {}, fullSearch) {
       // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
@@ -751,7 +753,7 @@ export default {
       // createTime
       if (params.createTime && params.createTime.length) {
         params.createTimeStart = formatDate(params.createTime[0]);
-        params.createTimeEnd = `${formatDate(params.createTime[1])} 23:59:59`;
+        params.createTimeEnd = `${formatDate(params.createTime[1]).replace('00:00:00', '23:59:59')}`;
         delete params.createTime;
       }
 
@@ -870,26 +872,39 @@ export default {
         })
     },
     sortChange(option) {
-      const {prop, order} = option;
-      if (!order) {
-        this.paramsBackup.orderDetail = {};
-        return this.search();
+      /**
+       * 目前情况：
+       * 所有字段理应后台获取，但是获取的所有字段中没有 createTime
+       *
+       */
+      try {
+        const {prop, order} = option;
+        if (!order) {
+          this.paramsBackup.orderDetail = {};
+          return this.search();
+        }
+
+        let sortModel = {
+          isSystem: prop === 'createTime' ? 1 : 0,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+          column: prop === 'createTime' ? `customer.${prop}` : prop,
+        };
+
+        const sortedField = this.customerConfig.fieldInfo.filter(sf => sf.fieldName === prop)[0] || {};
+
+        if (prop === 'createTime' || sortedField.formType === 'date' || sortedField.formType === 'datetime') {
+          sortModel.type = 'date';
+        } else {
+          sortModel.type = sortedField.formType;
+        }
+
+        this.paramsBackup.orderDetail = sortModel;
+
+        this.search();
+
+      } catch (e) {
+        console.error('e', e);
       }
-
-      let sortModel = {
-        isSystem: prop === 'createTime' ? 1 : 0,
-        sequence: order === 'ascending' ? 'ASC' : 'DESC',
-      };
-
-      sortModel.column = sortModel.isSystem ? `customer.${prop}` : prop;
-      sortModel.type = this.customerConfig.fieldInfo.filter(sf => sf.fieldName === prop)[0].formType;
-
-      if (sortModel.type === 'datetime') {
-        sortModel.type = 'date';
-      }
-      this.paramsBackup.orderDetail = sortModel;
-
-      this.search();
     },
     jump(pageNum) {
       this.paramsBackup.pageNum = pageNum;

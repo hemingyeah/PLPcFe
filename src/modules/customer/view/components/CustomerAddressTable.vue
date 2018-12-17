@@ -136,6 +136,7 @@ export default {
             platform.alert(res.message);
           }
           this.pending[address.id] = false;
+          this.$eventBus.$emit('customer_detail_view.update_customer_detail');
         });
     },
     openMap(address) {

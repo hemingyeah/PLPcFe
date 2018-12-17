@@ -104,8 +104,9 @@ export default {
 
       //去除前后空白
       let form = _.cloneDeep(this.form);
+      // form.content = (form.content || '').trimEnd();
       form.content = form.content.trimEnd();
-      
+
       if(!await this.validateContent(this.form.content)) this.$emit('submit', form)
     },
     buildForm(){
