@@ -14,8 +14,7 @@ router.get('/customer', async ctx => {
   
   ctx.body = Template.renderWithHtml('客户管理', body, script, modConfig.template)
 });
-
-router.get('/customer/create', async ctx => {
+router.get('/v2/customer/create', async ctx => {
   let modConfig = modules['customer.edit'];
   let reqHeaders = ctx.request.headers;
   let script = ['/customer.edit.js'];

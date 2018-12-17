@@ -141,10 +141,8 @@ export default {
       return this.originalValue.name ? '编辑联系人' : '添加联系人';
     }
   },
-  mounted() {
-    this.fetchData();
-
-  },
+  // mounted() {
+  // },
   methods: {
     buildRemote() {
       const originalValue = this.originalValue;
@@ -163,22 +161,6 @@ export default {
     },
     genPlaceholder(field){
       return FormUtil.genPlaceholder(field)
-    },
-
-    fetchData() {
-      let n = 0;
-      let timer = setInterval(() => {
-        n++;
-        if (this.customer.id) {
-          this.fetchProducts();
-          this.fetchAddress();
-
-          return clearInterval(timer);
-        }
-        if (n > 10) {
-          return clearInterval(timer);
-        }
-      }, 1000);
     },
     async submit() {
       try {
@@ -242,12 +224,19 @@ export default {
     openDialog() {
       this.addContactDialog = true;
       if (this.action === 'edit') {
-        this.remote = this.buildRemote();
-        this.matchValueToForm(this.originalValue)
+        Promise.all([
+          this.fetchAddress(),
+          this.fetchProducts(),
+        ])
+          .then(res => {
+            this.remote = this.buildRemote();
+            this.matchValueToForm(this.originalValue)
+
+          })
       }
     },
     matchValueToForm(val) {
-      const {name, remark, sex, position, department, customerId, customer, id, phone, email, address} = val;
+      const {name, remark, sex, position, department, customerId, customer, id, phone, email, address, productId} = val;
 
       this.form = {
         name,
@@ -255,7 +244,7 @@ export default {
         sex,
         position,
         department,
-        address,
+        address: '',
         customId: customerId || customer.id,
         customer: customer || {},
         id,
@@ -263,12 +252,17 @@ export default {
         email,
         productId: [],
       };
-      if (val.productId && val.productId.length) {
-        this.form.productId = val.productId.map(p => p.id);
+      if (productId && productId.length) {
+        this.form.productId = productId.map(p => p.id)
+          .filter(pId => this.products.some(p => p.value === pId));
+      }
+
+      if (address && this.addresses.some(a => a.value === address)) {
+        this.form.address = address;
       }
     },
     fetchAddress() {
-      this.$http.get('/v2/customer/address/list', {
+      return this.$http.get('/v2/customer/address/list', {
         customerId: this.customer.id,
         pageSize: 100000,
         pageNum: 1,
@@ -279,11 +273,13 @@ export default {
               text: p.province + p.city + p.dist + p.address,
               value: p.id,
             }));
+
+          return this.addresses;
         })
         .catch(err => console.error('fetchAddress catch err', err));
     },
     fetchProducts() {
-      this.$http.get('/v2/customer/product/list', {
+      return this.$http.get('/v2/customer/product/list', {
         customerId: this.customer.id,
         pageSize: 100000,
         pageNum: 1,
@@ -294,6 +290,8 @@ export default {
               text: p.name,
               value: p.id,
             }));
+
+          return this.products;
         })
         .catch(err => console.error('fetchProducts catch err', err));
     }

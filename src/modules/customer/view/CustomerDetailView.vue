@@ -307,8 +307,7 @@ export default {
       window.location.href = `/customer/product/createNew?cid=${id}`
     },
     goBack() {
-      window.location.href = '/customer';
-      // window.history.go(-1);
+      this.parent.frameHistoryBack();
     },
     updateRemind(remind) {
       this.selectedRemind = remind || {};
@@ -381,7 +380,7 @@ export default {
     justify-content: space-between;
     font-size: 14px;
     color: $text-color-regular;
-    padding: 12px 20px;
+    padding: 12px 10px;
     border-bottom: 1px solid #f2f2f2;
 
     .text-button {

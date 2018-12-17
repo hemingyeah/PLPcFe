@@ -22,7 +22,7 @@
             <a href="javascript:;" class="edit-btn" @click="$eventBus.$emit('customer_detail_view.update_remind', scope.row)">{{scope.row.remind.name}}</a>
           </template>
           <template v-else-if="column.field === 'remindTime'">
-            {{scope.row.remind.remindTime || '无'}}
+            {{scope.row.remindTime || '无'}}
           </template>
           <template class="rm-action" v-else-if="column.field === 'action'">
             <el-button type="text" @click="deleteRemind(scope.row)" :disabled="pending[scope.row.id]"
@@ -36,16 +36,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!--<el-pagination-->
-      <!--class="customer-remind-table-pagination"-->
-      <!--background-->
-      <!--@current-change="jump"-->
-      <!--:page-size="paginationInfo.pageSize"-->
-      <!--:current-page="paginationInfo.pageNum"-->
-      <!--layout="prev, pager, next"-->
-      <!--:total="paginationInfo.totalItems">-->
-    <!--</el-pagination>-->
-
   </div>
 </template>
 

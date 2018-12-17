@@ -307,7 +307,7 @@ const FrameManager = {
     window.addEventListener("message", this.receiveMessage);
     window.addEventListener("resize", this.resizeHanler);
     window.addTabs = this.addTabs;
-
+    
     window.frameHistoryBack = function(originWindow){
       if(originWindow.__shb_pc_frame_history__back_pending__) return;
 

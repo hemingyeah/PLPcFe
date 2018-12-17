@@ -665,7 +665,7 @@ export default {
       this.columns = this.buildTableColumn();
     },
     jumpPage() {
-      window.location = '/customer/create';
+      window.location = '/v2/customer/create';
     },
     /** 构建客户导出参数 */
     buildExportParams(checkedArr, ids) {

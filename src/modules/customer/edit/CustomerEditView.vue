@@ -148,7 +148,7 @@ export default {
   },
   methods: {
     goBack() {
-      window.history.go(-1);
+      this.parent.frameHistoryBack();
     },
     genPlaceholder(field){
       return FormUtil.genPlaceholder(field)
@@ -435,7 +435,7 @@ export default {
 
   .page-title {
     border-bottom: 1px solid #f4f7f5;
-    padding: 10px 15px 10px 0;
+    padding: 12px 10px;
     display: flex;
     justify-content: space-between;
 
@@ -457,7 +457,7 @@ export default {
 .form-builder{
   width: 100%;
   padding: 0;
-  height: calc(100% - 54px);
+  height: calc(100% - 58px);
   overflow: auto;
 
   .form-item {
