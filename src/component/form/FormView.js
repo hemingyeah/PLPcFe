@@ -23,7 +23,7 @@ const FormView = {
       this.sectionState[id] = !this.sectionState[id];
     },
     buildCommonDom({displayName, value, formType}) {
-      let clazz = {
+      let className = {
         'form-view-row-content': true,
         'form-view-textarea-preview': formType === 'textarea',
         'base-file__preview': formType === 'attachment',
@@ -32,7 +32,7 @@ const FormView = {
       return (
         <div class="form-view-row">
           <label>{displayName}：</label>
-          <div class={clazz}>{value}</div>
+          <div class={className}>{value}</div>
         </div>
       )
     },

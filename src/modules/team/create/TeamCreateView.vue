@@ -39,11 +39,10 @@ export default {
       pending: false,
       products: [],
       addresses: [],
-      remote: this.buildRemote(),
       form: {
-        name: null,
-        remark: '',
-        sex: '男',
+        name: '',
+        description: '',
+        charge: '黄',
         position: '',
         department: '',
         address: '', // address的ID
@@ -69,16 +68,17 @@ export default {
         formType: 'text',
         fieldName: 'description',
         displayName: "团队描述",
-        placeholder: '',
+        placeholder: '团队描述[最多30字]',
         isNull: 1,
       }, {
         formType: 'select',
-        fieldName: 'sex',
-        displayName: "性别",
-        placeholder: '请选择',
-        isNull: 1,
+        fieldName: 'charge',
+        displayName: "团队主管",
+        placeholder: '请选择团队主管',
+        isNull: 0,
         setting: {
-          dataSource: ['男', '女'],
+          isMulti: true,
+          dataSource: ['黄', '宝'],
         }
       }, {
         formType: 'email',
