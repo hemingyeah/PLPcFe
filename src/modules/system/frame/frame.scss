@@ -316,12 +316,15 @@ html, body, .frame{
 
 .export-operate-btn{
   padding: 0;
-  width: 50px;
+  min-width: 65px;
   text-align: right;
+  background-color: transparent;
+  cursor: default;
 }
 
 button.export-operate-btn{
   color: #007bff;
+  cursor: pointer;
 }
 
 /**************** user ****************/

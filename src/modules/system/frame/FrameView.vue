@@ -63,8 +63,7 @@
                       <p>{{item.createTime | fmt_datetime}}</p>
                     </div>  
                     <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
-                    <!-- <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template> -->
-                    <template v-if="Math.random() > 0.5"><span class="btn export-operate-btn">请稍等</span></template>
+                    <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template>
                     <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>{{item.isFinished == 0 ? '取消' : '下载'}}</button>
                   </div>
                 </template>
