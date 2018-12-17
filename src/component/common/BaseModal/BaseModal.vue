@@ -11,7 +11,7 @@
             </slot>
 
             <button type="button" class="base-modal-header-close" @click="cancel" v-if="closeable">
-              <i class="iconfont icon-close"></i>
+              <i class="iconfont icon-fe-close"></i>
             </button>
           </slot>
         </div>

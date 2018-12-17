@@ -14,7 +14,7 @@
       </span>
       <span class="frame-tab-name">{{tab.title}}</span>
       <button class="btn-text frame-tab-close" @click.stop="$emit('close', tab)" v-if="tab.closeable">
-        <i class="iconfont icon-close"></i>
+        <i class="iconfont icon-fe-close"></i>
       </button>
     </div>
   </div>
@@ -108,7 +108,7 @@ export default {
   color: #d8d8d8;
   font-weight: 500;
 
-  i.icon-close{
+  i.icon-fe-close{
     font-size: 12px;
   }
  

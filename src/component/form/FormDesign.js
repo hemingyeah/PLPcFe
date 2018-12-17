@@ -34,7 +34,7 @@ function createPreviewComp(h, field){
       {fieldPreview}
       {!field.isSystem && <button type="button" class="form-design-preview-delete"
         onClick={e => this.deleteField(field)}>
-        <i class="iconfont icon-close"></i>
+        <i class="iconfont icon-fe-close"></i>
       </button>}
       <div class="form-design-cover"></div>
     </div>

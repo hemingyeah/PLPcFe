@@ -40,7 +40,7 @@
             class="bc-chosen-user" 
             v-for="dept in chosenDept" :key="dept.id">
             <span>{{dept.name}}</span>
-            <i class="iconfont icon-close" @click="chooseDept({node: dept, value: false})"></i>
+            <i class="iconfont icon-fe-close" @click="chooseDept({node: dept, value: false})"></i>
           </div>
         </template>
         <template v-if="chosen.length > 0">
@@ -48,7 +48,7 @@
           <div class="bc-chosen-user" v-for="user in chosen" :key="user.userId">
             <div class="bc-chosen-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
             <span>{{user.displayName}}</span>
-            <i class="iconfont icon-close" @click="removeUser(user)"></i>
+            <i class="iconfont icon-fe-close" @click="removeUser(user)"></i>
           </div>
         </template>
       </div>

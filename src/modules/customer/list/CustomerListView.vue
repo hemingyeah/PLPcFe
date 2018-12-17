@@ -17,7 +17,7 @@
       <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
         <h4 class="panel-title">
           高级搜索
-          <i class="iconfont icon-close" @click="advancedSearchPanelShow = false"></i>
+          <i class="iconfont icon-fe-close" @click="advancedSearchPanelShow = false"></i>
         </h4>
         <el-form class="advanced-search-form" onsubmit="return false;">
           <el-form-item label-width="100px" label="客户编号">
@@ -390,7 +390,7 @@
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
       <h4 class="panel-title">
         已选择({{multipleSelection.length}})
-        <i class="iconfont icon-close" @click="multipleSelectionPanelShow = false"></i>
+        <i class="iconfont icon-fe-close" @click="multipleSelectionPanelShow = false"></i>
       </h4>
       <dl class="selected-customer-list">
         <dt>
@@ -402,7 +402,7 @@
           <span class="sn">{{c.serialNumber}}</span>
           <span class="name-column">{{c.name}}</span>
           <span class="delete-btn">
-            <i class="iconfont icon-close" @click.self="cancelSelectCustomer(c)"></i>
+            <i class="iconfont icon-fe-close" @click.self="cancelSelectCustomer(c)"></i>
           </span>
         </dd>
       </dl>

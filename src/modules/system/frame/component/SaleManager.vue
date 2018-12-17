@@ -5,7 +5,7 @@
         <div class="saleManager-header">
           <h3>专属客服</h3>
           <button type="button" class="btn-text saleManager-close" @click="close">
-            <i class="iconfont icon-close"></i>
+            <i class="iconfont icon-fe-close"></i>
           </button>
         </div>
         <div class="saleManager-qrcode">
