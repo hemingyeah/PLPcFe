@@ -167,7 +167,7 @@ export default {
     },
     reset(){
       this.form = this.buildForm();
-      this.editorCalcStyle = {height: '58px',minHeight: '58px'};
+      this.editorCalcStyle = {height: '82px',minHeight: '82px'};
       this.focus()
     },
     focus(){
