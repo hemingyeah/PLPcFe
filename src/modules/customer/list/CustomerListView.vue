@@ -273,7 +273,7 @@
 
           <template slot-scope="scope">
             <template v-if="column.field === 'name'">
-              <a :href="`/v2/customer/view/${scope.row.id}`" class="view-detail-btn">{{scope.row[column.field]}}</a>
+              <a :href="`/customer/view/${scope.row.id}`" class="view-detail-btn">{{scope.row[column.field]}}</a>
             </template>
             <template v-else-if="column.field === 'customerAddress'">
               {{formatAddress(scope.row[column.field])}}
@@ -665,7 +665,7 @@ export default {
       this.columns = this.buildTableColumn();
     },
     jumpPage() {
-      window.location = '/v2/customer/create';
+      window.location = '/customer/create';
     },
     /** 构建客户导出参数 */
     buildExportParams(checkedArr, ids) {
@@ -712,7 +712,7 @@ export default {
         ...cp,
       };
 
-      this.$http.post('/v2/customer/list', params)
+      this.$http.post('/customer/list', params)
         .then(res => {
           if (!res || !res.list) {
             this.customers = [];

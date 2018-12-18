@@ -262,7 +262,7 @@ export default {
       }
     },
     fetchAddress() {
-      return this.$http.get('/v2/customer/address/list', {
+      return this.$http.get('/customer/address/list', {
         customerId: this.customer.id,
         pageSize: 100000,
         pageNum: 1,
@@ -279,7 +279,7 @@ export default {
         .catch(err => console.error('fetchAddress catch err', err));
     },
     fetchProducts() {
-      return this.$http.get('/v2/customer/product/list', {
+      return this.$http.get('/customer/product/list', {
         customerId: this.customer.id,
         pageSize: 100000,
         pageNum: 1,

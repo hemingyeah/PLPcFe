@@ -83,7 +83,7 @@ export default {
           }
         }
 
-        let result = await this.$http.post('/v2/customer/createRemark', params);
+        let result = await this.$http.post('/customer/createRemark', params);
         
         if(result.status == 0){
           this.$refs.comment.reset();
@@ -209,7 +209,7 @@ export default {
     },
     /** 抓取信息动态 */
     fetchRecord(params){
-      return this.$http.get('/v2/customer/cRecord', params);
+      return this.$http.get('/customer/cRecord', params);
     },
     /** 删除备注 */
     async deleteRemark(record) {

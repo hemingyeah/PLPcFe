@@ -103,7 +103,7 @@ export default {
         pageSize: this.paginationInfo.pageSize,
       };
 
-      this.$http.get('/v2/customer/event/list', params)
+      this.$http.get('/customer/event/list', params)
         .then(res => {
           this.eventList = res.list
             .map(event => {

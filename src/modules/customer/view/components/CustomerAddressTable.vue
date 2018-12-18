@@ -163,7 +163,7 @@ export default {
       };
       let adArr = [];
         
-      this.$http.get('/v2/customer/address/list', params)
+      this.$http.get('/customer/address/list', params)
         .then(res => {
           this.addressList = res.list
             .map(address => {

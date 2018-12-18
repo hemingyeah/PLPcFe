@@ -54,6 +54,7 @@
  * 可折叠的 datatable
  * base64 https://www.npmjs.com/package/Base64
  * 文件上传监听进度
+ * 调整远程验证方式，支持传入function
 
  ## 优化项
  * BaseContact组件选人时，只在需要工单统计信息时才返回统计数据

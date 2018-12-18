@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import * as CustomerApi from '@src/api/CustomerApi';
 import * as FormUtil from '@src/component/form/util';
 import {toArray} from '@src/util/lang';
 
@@ -148,7 +149,7 @@ export default {
   },
   methods: {
     goBack() {
-      this.parent.frameHistoryBack();
+      parent.frameHistoryBack(window);
     },
     genPlaceholder(field){
       return FormUtil.genPlaceholder(field)
@@ -252,7 +253,7 @@ export default {
       this.$http.post('/customer/create', params)
         .then(res => {
           if (res.status) return this.$platform.alert('创建客户失败');
-          window.location.href = `/v2/customer/view/${res.data.customerId}`;
+          window.location.href = `/customer/view/${res.data.customerId}`;
         })
         .catch(err => console.error('err', err));
     },
@@ -260,7 +261,7 @@ export default {
       this.$http.post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
           if (res.status) return this.$platform.alert('更新客户失败');
-          window.location.href = `/v2/customer/view/${res.data || this.editId}`;
+          window.location.href = `/customer/view/${res.data || this.editId}`;
         })
         .catch(err => console.error('err', err));
     },
@@ -304,9 +305,6 @@ export default {
       };
       this.form.customerAddress = newVal;
       this.addressBackup = this.form.customerAddress;
-    },
-    fetchCustomer(id) {
-      return this.$http.get(`/v2/customer/getForEdit`, {id})
     },
     updateAddressBackup(ad) {
       this.addressBackup = ad;
@@ -398,7 +396,7 @@ export default {
       if (this.initData.action === 'edit' && this.initData.id) {
         //处理编辑时数据
         this.loadingPage = true;
-        let cusRes = await this.fetchCustomer(this.initData.id);
+        let cusRes = await CustomerApi.getForEdit(this.initData.id);
         this.loadingPage = false;
         if(cusRes.status == 0) form = cusRes.data;
       }

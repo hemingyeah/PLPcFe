@@ -106,7 +106,7 @@ export default {
         pageSize: this.paginationInfo.pageSize
       };
 
-      this.$http.get('/v2/customer/task/list', params)
+      this.$http.get('/customer/task/list', params)
         .then(res => {
           this.taskList = res.list
             .map(task => {

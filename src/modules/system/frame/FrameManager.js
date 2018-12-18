@@ -140,7 +140,7 @@ const FrameManager = {
         if(redirect){
           iframe.src = tab.url;
         }else{
-          iframe.contentWindow.location.reload();
+          iframe.contentWindow.location.reload(true);
         }
       }
     },

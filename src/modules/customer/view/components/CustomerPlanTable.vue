@@ -146,7 +146,7 @@ export default {
         pageSize: this.paginationInfo.pageSize
       };
 
-      this.$http.get('/v2/customer/planTask/list', params)
+      this.$http.get('/customer/planTask/list', params)
         .then(res => {
           this.planList = res.list
             .map(plan => {

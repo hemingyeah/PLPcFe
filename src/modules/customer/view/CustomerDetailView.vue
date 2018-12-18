@@ -253,7 +253,7 @@ export default {
         if (!await this.$platform.confirm('确定要删除该客户？')) return;
         const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
         if (!result.status) {
-          window.location.href = '/v2/customer';
+          window.location.href = '/customer';
         }
       } catch (e) {
         console.error('customer-detail-view deleteCustomer error', e);
@@ -265,7 +265,7 @@ export default {
     },
     fetchCustomer() {
       const id = this.initData.id;
-      this.$http.get(`/v2/customer/get`, {id})
+      this.$http.get(`/customer/get`, {id})
         .then(res => {
           if (res.status) return;
           this.customer = Object.freeze(res.data);
@@ -278,7 +278,7 @@ export default {
         customerId: this.initData.id || this.customer.id
       };
 
-      this.$http.get('/v2/customer/statistics/init', params)
+      this.$http.get('/customer/statistics/init', params)
         .then(res => {
           if (Object.keys(res).every(key => key !== 'taskQuantity')) return;
 
@@ -300,14 +300,14 @@ export default {
     },
     jump() {
       const id = this.id || this.initData.id;
-      window.location.href = `/v2/customer/edit/${id}`
+      window.location.href = `/customer/edit/${id}`
     },
     createProduct() {
       const id = this.id || this.initData.id;
       window.location.href = `/customer/product/createNew?cid=${id}`
     },
     goBack() {
-      this.parent.frameHistoryBack();
+      parent.frameHistoryBack(window);
     },
     updateRemind(remind) {
       this.selectedRemind = remind || {};

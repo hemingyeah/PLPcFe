@@ -182,7 +182,7 @@ export default {
     },
 
     fetchData() {
-      this.$http.get('/v2/customer/getReminds', {pageSize: 0,})
+      this.$http.get('/customer/getReminds', {pageSize: 0,})
         .then(res => {
           if (!res || res.status) return;
           this.remindTemplate = (res.list || [])

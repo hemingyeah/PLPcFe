@@ -85,7 +85,7 @@ export default {
         pageSize: this.paginationInfo.pageSize,
       };
 
-      this.$http.get('/v2/customer/product/list', params)
+      this.$http.get('/customer/product/list', params)
         .then(res => {
           this.productList = res.list
             .map(product => {

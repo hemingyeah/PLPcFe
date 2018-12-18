@@ -143,7 +143,7 @@ export default {
         pageSize: this.paginationInfo.pageSize,
       };
         
-      this.$http.get('/v2/customer/linkman/list', params)
+      this.$http.get('/customer/linkman/list', params)
         .then(res => {
           this.contactList = res.list
             .map(contact => {
