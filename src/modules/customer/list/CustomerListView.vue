@@ -342,7 +342,7 @@
       ref="batchEditingCustomerDialog"
       :fields="customerConfig.fieldInfo"
       :default-address="defaultAddress"
-      @submit-callback="search"
+      @success="search"
       :selected-ids="selectedIds"></batch-editing-customer-dialog>
     <batch-update-customer-dialog
       ref="batchUpdateCustomerDialog"
