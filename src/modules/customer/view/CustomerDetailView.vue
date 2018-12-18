@@ -6,6 +6,7 @@
         <base-button type="only-text" icon="icon-edit" @event="jump" v-if="allowEditCustomer">编辑</base-button>
         <base-button type="only-text" icon="icon-yemianshanchu" @event="deleteCustomer" v-if="allowDeleteCustomer">删除</base-button>
         <base-button type="only-text" icon="icon-notification" @event="openDialog('remind')">添加提醒</base-button>
+        <a :href="`/customer/oldView/${id}`">返回旧版</a>
       </div>
       <div class="action-btn">
         <el-dropdown trigger="click">

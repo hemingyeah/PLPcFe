@@ -9,7 +9,7 @@
           </el-input>
           <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
-          <a href="/customer">返回旧版</a>
+          <a href="/customer/oldList">返回旧版</a>
         </div>
         <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
       </form>
