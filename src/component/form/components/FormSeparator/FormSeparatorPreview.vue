@@ -27,19 +27,14 @@ export default {
 
 <style lang="scss">
 .form-design-sparator{
-  height: 16px;
-  margin-top: 16px;
-  border-top: 1px solid #ddd;
-  width: 100%;
-  text-align: center;
+  background-color: #eef8f8;
+  color: #55B7B4;
+  height: 30px;
+  line-height: 30px;
+  width: calc(100% + 20px);
+  margin-left: -10px;
+  margin-right: -10px;
 
-  span{
-    height: 20px;
-    line-height: 20px;   
-    position: relative;
-    top: -10px;
-    background-color: #fff;
-    padding: 0 5px;
-  }
+  padding: 0 10px;
 }
 </style>

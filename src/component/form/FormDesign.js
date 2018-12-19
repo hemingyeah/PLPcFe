@@ -8,7 +8,7 @@ import {
   SettingComponents
 } from './components';
 
-const MAX_FIELD_NUM = 120;
+const MAX_FIELD_NUM = 100;
 
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){

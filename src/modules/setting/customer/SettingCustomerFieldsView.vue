@@ -1,8 +1,12 @@
 <template>
   <div class="setting-customer">
     <div class="setting-customer-header">
-      <a href="javascript: history.back();" class="setting-back-btn"><i class="iconfont icon-return"></i> 返回</a>
-      <h3>客户字段设置</h3>
+      <div>
+        <button type="button" class="btn btn-text setting-back-btn"><i class="iconfont icon-arrow-left"></i> 返回</button>
+        <span class="setting-header-text">|</span>
+        <span class="setting-header-text">客户字段设置</span>
+      </div>
+
       <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
     </div>
     <div class="setting-customer-design">
@@ -34,6 +38,7 @@ export default {
   },
   methods: {
     async submit(){
+      //TODO: 字段验证
       this.pending = true;
 
       try {
@@ -61,37 +66,38 @@ export default {
 html,body{
   height: 100%;
 }
+
+body{
+  padding: 10px;
+}
+
 .setting-customer{
   height: 100%;
+  background-color: #fff;
+}
+
+.setting-header-text{
+  margin-right: 12px;
 }
 
 .setting-customer-header{
-  padding: 0 10px;
-  height: 46px;
+  padding: 10px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
   justify-content: space-between;
   background-color: #fff;
   border-bottom: 1px solid #f4f7f5;
-
-  h3{
-    margin: 0;
-    font-size: 16px;
-    font-weight: 500;
-  }
 }
 
 .setting-customer-design{
-  height: calc(100% - 46px);
+  height: calc(100% - 53px);
 }
 
 .setting-back-btn{
-  color: $text-color-regular;
-  text-decoration: none !important;
-
   i.iconfont{
-    font-size: 14px;
+    line-height: 12px;
+    font-size: 12px;
   }
 }
 

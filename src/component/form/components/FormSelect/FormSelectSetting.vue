@@ -5,7 +5,7 @@
       <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" maxlength="6">
     </div>
     <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom"></textarea>
+      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" maxlength="128"></textarea>
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
@@ -24,7 +24,7 @@
     </h3>
     <div class="form-select-setting-list">
       <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
-        <input type="text" v-model="option.value" maxlength="30">
+        <input type="text" v-model="option.value" maxlength="20">
         <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
         <template v-if="!field.isMulti">
           <button 
@@ -61,7 +61,8 @@
 import _ from 'lodash';
 import Platform from '@src/platform';
 
-const MAX_OPTION_NUM = 120;
+const MAX_OPTION_NUM = 50;
+const MAX_OPTION_TEXT_NUM = 20;
 
 export default {
   name: 'form-select-setting',
@@ -167,9 +168,9 @@ export default {
       }
 
       //验证每一项长度
-      let errIndex = options.map((item, index) => item.length > 30 ? index + 1 : -1).filter(item => item != -1);
+      let errIndex = options.map((item, index) => item.length > MAX_OPTION_TEXT_NUM ? index + 1 : -1).filter(item => item != -1);
       if(errIndex.length > 0){
-        message.push(`第${errIndex.join('，')}行字数超过30字`);
+        message.push(`第${errIndex.join('，')}行字数超过${MAX_OPTION_TEXT_NUM}字`);
       }
 
       return message.length > 0 ? message.join('\n') : null;
@@ -243,6 +244,7 @@ export default {
 }
 
 .form-select-setting-warn{
+  padding-top: 10px;
   color: #ff8c00;
   font-size: 12px;
   white-space: pre-line;

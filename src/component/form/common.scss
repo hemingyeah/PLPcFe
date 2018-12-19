@@ -10,7 +10,7 @@
 .form-design-panel {
   width: 310px;
   height: 100%;
-  padding: 0 5px;
+  padding: 0 10px;
   user-select: none;
   background-color: #fff;
 }
@@ -29,16 +29,17 @@
 .form-design-tabs-content {
   display: flex;
   flex-flow: row wrap;
+  justify-content: space-between;
 }
 
 .form-design-field-wrap {
-  margin: 8px 0 0 10px;
+  margin: 10px 0 0 0;
   cursor: move;
 }
 
 .form-design-field {
   position: relative;
-  width: 135px;
+  width: 140px;
   height: 32px;
   line-height: 24px;
   padding: 3px 24px 3px 10px;

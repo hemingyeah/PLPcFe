@@ -37,7 +37,7 @@ export default {
 }
 
 .form-attachment-preview-placeholder{
-  width: 100%;
+  flex: 1;
   color: #9a9a9a;
   margin: 0 0 0 8px;
   font-size: 14px;
