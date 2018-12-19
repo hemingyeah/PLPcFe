@@ -208,7 +208,7 @@ export default {
             this.$platform.alert(`${actionName}失败，以下客户已存在该提醒：${res.data.join(',')}`);
           }
           if (res.status === 1 && !res.data) {
-            this.$platform.alert(`${actionName}失败${res.data ? '，' + res.data : res.message}`);
+            this.$platform.alert(`${actionName}失败${(res.data || res.message) && ('，' + (res.data || res.message))}`);
           }
           this.remindCustomerDialog = false;
           this.pending = false;

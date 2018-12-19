@@ -131,10 +131,14 @@ function address(value, field = {}) {
     if (field.isNull) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请补全${field.displayName}`);
     
+    
     const {province, city, address} = value;
+  
     if (!province || !city || !address) {
       return resolve('必填');
     }
+    if (address.length > SINGLE_LINE_MAX_LEN) return resolve(`详细地址长度不能超过${SINGLE_LINE_MAX_LEN}个字符`);
+  
     resolve(null);
   });
 }

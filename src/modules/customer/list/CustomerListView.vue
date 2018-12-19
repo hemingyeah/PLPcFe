@@ -25,6 +25,7 @@
           </el-form-item>
           <el-form-item label-width="100px" label="联系人">
             <el-select
+              popper-class="advanced-search-linkman"
               v-model="params.linkmanId"
               filterable
               clearable
@@ -39,6 +40,8 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id">
+                <p>{{item.name}}</p>
+                <p>电话：{{item.phone || ''}}</p>
               </el-option>
             </el-select>
           </el-form-item>
@@ -273,7 +276,7 @@
 
           <template slot-scope="scope">
             <template v-if="column.field === 'name'">
-              <a :href="`/customer/view/${scope.row.id}`" class="view-detail-btn">{{scope.row[column.field]}}</a>
+              <a :href="`/customer/view/${scope.row.id}`" class="view-detail-btn" @click="viewCustomer">{{scope.row[column.field]}}</a>
             </template>
             <template v-else-if="column.field === 'customerAddress'">
               {{formatAddress(scope.row[column.field])}}
@@ -351,7 +354,6 @@
       :build-download-params="buildParams"
       action="/customer/importCover"
     ></batch-update-customer-dialog>
-
 
     <base-import
       title="导入客户"
@@ -593,11 +595,6 @@ export default {
   },
   mounted() {
     let initData = JSON.parse(window._init) || {};
-    const localStorageData = this.getLocalStorageData();
-    if (localStorageData.pageSize) {
-      this.paramsBackup.pageSize = Number(localStorageData.pageSize);
-      this.paginationInfo.pageSize = Number(localStorageData.pageSize);
-    }
     this.customerConfig = {
       customerAddressConfig: initData.customerAddressConfig,
       customerConfig: initData.customerConfig,
@@ -608,6 +605,23 @@ export default {
 
     const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
     this.defaultAddress = [adProvince, adCity, adDist,];
+
+    let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
+    if (paramsFromStorage) {
+      paramsFromStorage = JSON.parse(paramsFromStorage);
+
+      this.paramsBackup = {
+        ...paramsFromStorage.params,
+        pageNum: paramsFromStorage.paginationInfo.pageNum,
+      };
+    }
+    const localStorageData = this.getLocalStorageData();
+
+    if (localStorageData.pageSize) {
+      this.paramsBackup.pageSize = Number(localStorageData.pageSize);
+      this.paginationInfo.pageSize = Number(localStorageData.pageSize);
+    }
+
 
     this.buildConfig();
     this.search();
@@ -624,6 +638,17 @@ export default {
       .catch(err => console.error('err', err));
   },
   methods: {
+    viewCustomer(e) {
+
+      const status = {
+        params: {
+          ...this.paramsBackup,
+        },
+        paginationInfo: this.paginationInfo
+      };
+
+      sessionStorage.setItem('customer_list_search_status', JSON.stringify(status));
+    },
     formatAddress(ad) {
       if(null == ad) return '';
         
@@ -1306,6 +1331,17 @@ export default {
 
   .level-padding {
     padding: 0 5px;
+  }
+
+  .advanced-search-linkman {
+    .el-select-dropdown__item {
+      height: 50px;
+      padding: 5px 20px;
+      p {
+        margin: 0;
+        line-height: 20px;
+      }
+    }
   }
 
   .customer-list-container {

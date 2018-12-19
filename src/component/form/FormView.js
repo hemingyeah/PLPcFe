@@ -72,10 +72,10 @@ const FormView = {
         };
       }
       
-      if (formType === 'selectMulti') {
+      if (formType === 'select' && field.setting.isMulti) {
         params = {
           ...params,
-          value: toArray(value).join(' ')
+          value: toArray(value).join('，')
         };
       }
       

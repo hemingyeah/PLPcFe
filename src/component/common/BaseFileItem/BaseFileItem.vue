@@ -5,7 +5,7 @@
         <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
       </div>
       <div class="base-file-info">
-        <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
+        <a :href="file.url" @click.prevent.stop="download" >{{file.filename}}</a>
         <p>
           <span>{{file.fileSize}}</span>
           <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">删除</button>

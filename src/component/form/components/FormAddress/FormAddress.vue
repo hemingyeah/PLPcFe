@@ -8,6 +8,7 @@
       type="text"
       :value="detail"
       @input="input"
+      maxlength="50"
       :placeholder="placeholder"
       :id="`form_${field.fieldName}`"
       autocomplete="off"/>

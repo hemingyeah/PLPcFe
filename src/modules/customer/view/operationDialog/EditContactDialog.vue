@@ -1,7 +1,6 @@
 <template>
   <base-modal :title="modalTitle" :show.sync="addContactDialog" width="600px" @cancel="$emit('submit-success')"
               class="edit-contact-dialog">
-
     <form @submit.prevent="submit" class="edit-contact-form-container">
       <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @input="update">
 
@@ -49,7 +48,7 @@ export default {
       form: {
         name: null,
         remark: '',
-        sex: '男',
+        sex: '',
         position: '',
         department: '',
         address: '', // address的ID
@@ -202,7 +201,7 @@ export default {
       this.form = {
         name: null,
         remark: '',
-        sex: '男',
+        sex: '',
         position: '',
         department: '',
         address: '',

@@ -1,6 +1,7 @@
 <template>
   <div class="base-dist-picker">
     <el-cascader
+      popper-class="location-cascader"
       clearable
       :props="props"
       :options="options"
@@ -49,6 +50,12 @@ export default {
 </script>
 
 <style lang="scss">
+  .location-cascader {
+    .el-cascader-menu__item--extensible:after {
+      right: 5px;
+    }
+  }
+
 .base-dist-picker{
   .el-cascader__label{
     padding-left: 10px;

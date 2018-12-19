@@ -38,7 +38,7 @@
                 :field="field"
                 :value="form.lmName" @input="update"
                 :placeholder="genPlaceholder(field)"/>
-              <el-button @click="copyName">同名客户</el-button>
+              <el-button @click="copyName">同客户名</el-button>
             </div>
           </form-item>
         </template>
@@ -170,7 +170,7 @@ export default {
             };
           }
         },
-        name: !isCustomerNameDuplicate ? null : {
+        name: isCustomerNameDuplicate ? null : {
           action: '/customer/unique',
           method: 'post',
           buildParams(value) {

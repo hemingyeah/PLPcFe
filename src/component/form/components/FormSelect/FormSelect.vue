@@ -5,6 +5,7 @@
       :placeholder="placeholder"
       clearable
       :multiple="isMulti"
+      ref="elSelect"
       :value="value" @change="input">
       <el-option
         v-for="item in options"
@@ -61,6 +62,7 @@ export default {
   methods: {
     input(newValue){
       let oldValue = null;
+      this.$refs.elSelect.blur();
       this.$emit('input', {newValue, oldValue, field: this.field});
     },
   },

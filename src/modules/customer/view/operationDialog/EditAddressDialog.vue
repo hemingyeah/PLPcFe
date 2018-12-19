@@ -1,5 +1,5 @@
 <template>
-  <base-modal :title="title" :show.sync="addAddressDialog" width="600px" class="edit-address-dialog">
+  <base-modal :title="title" :show.sync="addAddressDialog" width="600px" class="edit-address-dialog" @closed="reset">
     <form @submit.prevent="submit">
       <form-builder :fields="fields" class="edit-address-form" ref="form" :value="form" @input="update">
       </form-builder>
@@ -35,10 +35,9 @@ export default {
   data() {
     return {
       addAddressDialog: false,
+      submitted: false,
       pending: false,
-      addressBackup: {
-        adAddress: [],
-      },
+      addressBackup: {},
       form: {
         customerAddress: {
           adAddress: [],
@@ -70,6 +69,18 @@ export default {
     }
   },
   methods: {
+    reset() {
+      this.form = {
+        customerAddress: {
+          adAddress: [],
+          detail: '',
+          adLongitude: '',
+          adLatitude: '',
+          addressType: 0,
+        }
+      };
+      this.addressBackup = {};
+    },
     async submit() {
       try {
         const validateRes = await this.$refs.form.validate();
@@ -112,8 +123,8 @@ export default {
             address.dist === addressBackup.dist &&
             address.address === addressBackup.address
       ) {
-        params.longitude = address.longitude;
-        params.latitude = address.latitude;
+        params.longitude = addressBackup.longitude;
+        params.latitude = addressBackup.latitude;
         params.addressType = 1;
       }
       return params;
@@ -123,15 +134,25 @@ export default {
       if (this.$appConfig.debug) {
         console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
       }
+
+      this.updateAddressBackup(newValue);
       this.$set(this.form, fieldName, newValue)
     },
     updateAddressBackup(ad) {
-      this.addressBackup = ad;
+      if (ad.addressType) {
+        this.addressBackup = ad;
+      }
     },
     setDefaultAddress(ad) {
       const { adProvince, adCity, adDist, } = ad;
       if (!adProvince || !adCity) return;
-      this.form.customerAddress.adAddress = [adProvince, adCity, adDist,].filter(ad => ad);
+      this.form.customerAddress = {
+        ...this.form,
+        province: adProvince,
+        city: adCity,
+        dist: adDist,
+      }
+      // this.form.customerAddress.adAddress = [adProvince, adCity, adDist,].filter(ad => ad);
     },
     openDialog() {
       this.addAddressDialog = true;
@@ -139,10 +160,10 @@ export default {
         this.update({field: this.fields[0], newValue: this.defaultAddress});
       }
 
-      if (this.defaultAddress.addressType) {
-        this.updateAddressBackup(this.defaultAddress);
-      }
-      this.setDefaultAddress(this.defaultAddress)
+      this.updateAddressBackup(this.defaultAddress);
+      this.setDefaultAddress(this.defaultAddress);
+
+      console.log('this.defaultAddress', this.defaultAddress);
     },
   },
 }

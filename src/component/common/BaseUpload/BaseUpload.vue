@@ -57,7 +57,7 @@ export default {
     chooseFile(){
       if(this.pending) return platform.alert('请等待文件上传完成');
       if(this.value.length >= Uploader.FILE_MAX_NUM) {
-        return platform.alert(`上传文件数量不能超过个${Uploader.FILE_MAX_NUM}`);
+        return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
       }
         
       this.$refs.input.value = null;

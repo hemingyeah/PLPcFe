@@ -357,7 +357,7 @@ export default {
   mounted() {
     this.loading = true;
     this.fetchCustomer();
-    // this.fetchStatisticalData();
+    this.fetchStatisticalData();
     this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
     this.$eventBus.$on('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
     this.$eventBus.$on('customer_detail_view.update_customer_detail', this.fetchCustomer);

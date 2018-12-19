@@ -120,6 +120,7 @@ export default {
       padding: 4px 10px 0 0;
       line-height: 24px;
       margin: 0;
+      flex-shrink: 0;
     }
 
     input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
@@ -146,7 +147,8 @@ export default {
 
   .form-item-control {
     flex: 1;
-    max-width: calc(100% - 110px);
+    /*max-width: calc(100% - 110px);*/
+    width: calc(100% - 110px);
 
     .err-msg-wrap {
       min-height: 10px;
