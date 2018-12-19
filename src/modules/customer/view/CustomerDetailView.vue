@@ -1,11 +1,16 @@
 <template>
   <div class="page-container">
     <div class="customer-tool-bar">
-      <div>
-        <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button>
-        <base-button type="only-text" icon="icon-edit" @event="jump" v-if="allowEditCustomer">编辑</base-button>
+      <div class="">
+        <button type="button" class="btn btn-text" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
+        <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
+        <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
+        <button type="button" class="btn btn-text" @click="openDialog('remind')"><i class="iconfont icon-notification"></i> 添加提醒</button>
+
+        <!-- <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button> -->
+        <!-- <base-button type="only-text" icon="icon-edit" @event="jump" v-if="allowEditCustomer">编辑</base-button>
         <base-button type="only-text" icon="icon-yemianshanchu" @event="deleteCustomer" v-if="allowDeleteCustomer">删除</base-button>
-        <base-button type="only-text" icon="icon-notification" @event="openDialog('remind')">添加提醒</base-button>
+        <base-button type="only-text" icon="icon-notification" @event="openDialog('remind')">添加提醒</base-button> -->
         <a :href="`/customer/oldView/${id}`">返回旧版</a>
       </div>
       <div class="action-btn">
@@ -15,10 +20,8 @@
           </span>
 
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-for="task in taskTypes" :key="task.id">
-              <a class="link-of-dropdown" :href="`/task/createFromCustomer/${id}?defaultTypeId=${task.id}`">
-                {{task.name}}
-              </a>
+            <el-dropdown-item v-for="type in taskTypes" :key="type.id">
+              <a class="link-of-dropdown" href="javascript:;" @click.prevent="createTask(type.id)">{{type.name}}</a>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -28,9 +31,7 @@
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="event in eventTypes" :key="event.id">
-              <a class="link-of-dropdown" :href="`/event/createFromCustomer/${id}?defaultTypeId=${event.id}`">
-                {{event.name}}
-              </a>
+              <a class="link-of-dropdown" href="javascript:;" @click.prevent="createEvent(event.id)">{{event.name}}</a>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -53,12 +54,15 @@
       </div>
     </div>
     <div class="main-content" v-loading="loading">
-      <div class="customer-detail" :style="style">
-        <h3 :class="{'customer-name-so-long': customerNameLong && !showWholeName}" ref="customerName">
-          {{customer.name}}
-          <i v-if="customerNameLong" @click="toggleTitleStatus" :class="[{'rotate': showWholeName, }, 'iconfont', 'icon-gongsimingchengxiala']"></i>
+      <div class="customer-detail">
+        <h3 class="customer-name" :class="{'customer-name-expand': showWholeName == 1}">
+          <span ref="customerName">{{customer.name}}</span>
+          <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
         </h3>
+        
         <form-view :fields="fields" :value="customer">
+          <div slot="name"></div>
+
           <template slot="address" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>地址：</label>
@@ -70,6 +74,7 @@
             </div>
           </template>
         </form-view>
+
       </div>
       <div class="customer-relation" v-if="this.customer.id">
         <base-tabbar :tabs="tabs" v-model="currTab"></base-tabbar>
@@ -103,8 +108,6 @@ import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
 import EditContactDialog from './operationDialog/EditContactDialog.vue';
 import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
-import { getStyle } from '@src/util/dom';
-
 export default {
   name: "customer-detail-view",
   props: {
@@ -125,14 +128,15 @@ export default {
       selectedRemind: {},
       customer: {},
       loading: false,
-      showWholeName: false,
-      statisticalData: {},
-      style: {
-        'padding-top': '55px',
-      }
+      showWholeName: -1, //-1代表不显示展开icon 0代表收起 1代表展开
+      statisticalData: {}
     }
   },
   computed: {
+    /** 是否允许操作该客户，在客户删除时不允许做任何操作，只能查询 */
+    allowOperate(){
+      return this.customer.isDelete === 0;
+    },
     fields() {
       return (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
     },
@@ -199,6 +203,40 @@ export default {
     }
   },
   methods: {
+    //更新客户名称的样式
+    updateCustomerStyle(){
+      let cnEl = this.$refs.customerName;
+      let width = cnEl.offsetWidth;
+      let maxWidth = cnEl.closest('h3').offsetWidth;
+      
+      this.showWholeName = maxWidth - 20 < width ? 0 : -1;
+    },
+    /** 从客户创建工单 */
+    createTask(typeId){
+      let customer = this.customer || {};
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'createTask',
+        title: '新建工单',
+        close: true,
+        url: `/task/createFromCustomer/${customer.id}?defaultTypeId=${typeId}`,
+        fromId: fromId
+      })      
+    },
+    /** 从客户创建事件 */
+    createEvent(typeId){
+      let customer = this.customer || {};
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'createEvent',
+        title: '新建事件',
+        close: true,
+        url: `/event/createFromCustomer/${customer.id}?defaultTypeId=${typeId}`,
+        fromId: fromId
+      })      
+    },
     buildTabs() {
       const {
         addressQuantity,
@@ -271,6 +309,7 @@ export default {
           if (res.status) return;
           this.customer = Object.freeze(res.data);
           this.loading = false;
+          this.$nextTick(this.updateCustomerStyle)
         })
         .catch(err => console.error('customer-detail-view fetchCustomer catch error /n', err));
     },
@@ -313,13 +352,6 @@ export default {
     updateRemind(remind) {
       this.selectedRemind = remind || {};
       this.$nextTick(this.$refs.addRemindDialog.openDialog);
-    },
-    toggleTitleStatus() {
-      this.showWholeName = !this.showWholeName;
-      this.$nextTick(() => {
-        const titleHeight = getStyle(this.$refs.customerName, 'height');
-        this.style['padding-top'] = parseInt(titleHeight, 10) + 5 + 'px';
-      });
     }
   },
   mounted() {
@@ -381,83 +413,82 @@ export default {
     justify-content: space-between;
     font-size: 14px;
     color: $text-color-regular;
-    padding: 12px 10px;
+    padding: 10px;
     border-bottom: 1px solid #f2f2f2;
 
-    .text-button {
-      padding: 10px 15px;
+    .btn-text .iconfont{
+      font-size: 14px;
     }
   }
 
   .main-content {
     display: flex;
     flex-flow: row nowrap;
-    height: calc(100% - 64px);
+    height: calc(100% - 53px);
     position: relative;
   }
 
   .customer-detail {
-    background: #fff;
-    width: 390px;
-    border-right: 1px solid #f2f2f2;
-    flex-shrink: 0;
+    flex: 2;
+    min-width: 420px;
     height: 100%;
-    overflow-y: auto;
-    padding-top: 55px;
+    display: flex;
+    flex-flow: column nowrap;
+    border-right: 1px solid #f2f2f2;
 
-    h3 {
-      margin: 0;
-      margin-bottom: 5px;
-      padding: 10px 20px;
-      line-height: 30px;
-      font-size: 16px;
-      color: $text-color-primary;
-      background: $color-primary-light-9;
-      font-weight: normal;
-      top: 0;
-      left: 0;
-      width: 390px;
+    .form-view{
+      flex: 1;
+      padding-top: 5px;
+      overflow-y: auto;
+    }
+  }
+
+  .customer-name{
+    min-height: 50px;
+    position: relative;
+    padding: 13px 20px;
+    line-height: 24px;
+    font-size: 16px;
+    margin: 0;
+    color: $text-color-primary;
+    background: $color-primary-light-9;
+    font-weight: 500;
+
+    @include text-ellipsis();
+
+    span{
+      white-space: nowrap;
+    }
+
+    .iconfont {
       position: absolute;
-      padding-right: 28px;
-      word-break: break-word;
+      right: 5px;
+      bottom: 10px;
+      color: $color-primary;
+      font-size: 12px;
 
-      .iconfont {
-        position: absolute;
-        right: 0px;
-        top: 10px;
-        padding: 0 10px;
-        color: $color-primary;
-        &:hover {
-          cursor: pointer;
-        }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    &.customer-name-expand{
+      span{
+        white-space: normal;
       }
 
-      .rotate {
+      .iconfont{
         transform: rotateZ(-180deg);
       }
-    }
-
-    .customer-name-so-long {
-      @include text-ellipsis()
-    }
-
-    &:after {
-      content: '';
-      height: 50px;
-      position: absolute;
-      width: 10px;
-      top: 0;
-      left: 390px;
-      background: $color-primary-light-9;
     }
   }
 
   .customer-relation {
     height: 100%;
-    flex: 1;
+    flex: 7;
     background: #fff;
     min-width: 500px;
-    margin-left: 10px;
+    //margin-left: 10px;
     border-radius: 2px;
   }
 
@@ -467,17 +498,16 @@ export default {
   }
 
   .action-btn {
-    .el-dropdown {
-      line-height: 39px;
-    }
     .el-dropdown-btn {
       padding: 0 15px;
-      line-height: 33px;
+      line-height: 32px;
       display: inline-block;
       background: $color-primary-light-9;
       color: $text-color-primary;
       margin-left: 10px;
+      border-radius: 2px;
       .iconfont {
+        line-height: 12px;
         margin-right: 3px;
         font-size: 12px;
       }

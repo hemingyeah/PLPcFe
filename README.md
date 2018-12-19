@@ -42,7 +42,6 @@
  * toast 兼容钉钉
  * 层管理 popmanager
  * 合并sm4_pc_components项目
- * 重写table组件
  * 热更新
  * 浏览器ua工具 ▲
  * 输入组件支持清空 ▲
@@ -52,8 +51,10 @@
  * split分割面板 https://www.iviewui.com/components/split
  * 部门下拉选择框
  * 可折叠的 datatable
+* 重写table组件
  * base64 https://www.npmjs.com/package/Base64
  * 文件上传监听进度
+ * 本地引入icon
  * 调整远程验证方式，支持传入function
 
  ## 优化项

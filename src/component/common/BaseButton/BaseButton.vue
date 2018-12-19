@@ -70,14 +70,17 @@ export default {
   $text-color-primary-disabled: rgba($text-color-primary, .2) !default;
   // 主要按钮
   .base-button {
-    padding: 7px 15px;
+    padding: 4px 15px;
     background: $color-primary;
     color: #fff;
     font-size: 14px;
     border: none;
     border-radius: 2px;
     outline: none;
+    line-height: 24px;
+
     .iconfont {
+      line-height: 12px;
       font-size: 12px;
       margin-right: 3px;
     }

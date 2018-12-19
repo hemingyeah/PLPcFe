@@ -39,7 +39,7 @@ const FormView = {
     mapFieldToDom(field) {
       let {formType, fieldName, displayName, isSystem} = field;
       if (formType === 'separator') {
-        const cn = `iconfont icon-triangle-down ${!this.sectionState[field.id] && 'reversal'}`;
+        const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
         return (
           <h4 class="section-title">
             {displayName || ' '}
@@ -56,9 +56,13 @@ const FormView = {
       value = isSystem ? originalObj[fieldName] : originalObj.attribute[fieldName];
       params = {displayName, value, formType};
       
+      if(this.$slots[fieldName]) {
+        return this.$slots[fieldName];
+      }
+
       // return slot
-      if (this.$scopedSlots[formType]) {
-        return this.$scopedSlots[formType](params);
+      if (this.$scopedSlots[fieldName]) {
+        return this.$scopedSlots[fieldName](params);
       }
       
       if (formType === 'attachment') {

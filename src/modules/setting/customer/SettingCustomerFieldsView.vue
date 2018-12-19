@@ -2,7 +2,7 @@
   <div class="setting-customer">
     <div class="setting-customer-header">
       <div>
-        <button type="button" class="btn btn-text setting-back-btn"><i class="iconfont icon-arrow-left"></i> 返回</button>
+        <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
         <span class="setting-header-text">客户字段设置</span>
       </div>
@@ -37,6 +37,9 @@ export default {
     }
   },
   methods: {
+    back(){
+      window.parent.frameHistoryBack(window)
+    },
     async submit(){
       //TODO: 字段验证
       this.pending = true;

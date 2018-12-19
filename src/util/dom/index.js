@@ -185,3 +185,7 @@ export function getStyle(el, styleProp) {
     return value;
   }
 }
+
+export function getTextWidth(){
+
+}

@@ -23,7 +23,7 @@
         <div class="base-comment-action">
           <el-checkbox v-model="form.showInOwn" :true-label="1" :false-label="0">仅自己可见</el-checkbox>
           <button 
-            type="button" class="btn btn-text btn-primary base-comment-submit" 
+            type="button" class="btn btn-primary base-comment-submit" 
             @click="submit" :disabled="!allowOperate"><i class="iconfont icon-send"></i> 发送</button>
         </div>
       </div>
@@ -104,9 +104,6 @@ export default {
 
       //去除前后空白
       let form = _.cloneDeep(this.form);
-
-      console.log('this.form', this.form);
-      console.log('form', form);
 
       // form.content = form.content.trimEnd();
       form.content = form.content.replace(/\s+$/g, '');
