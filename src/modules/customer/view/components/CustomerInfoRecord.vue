@@ -9,7 +9,7 @@
         @load="loadmore"/>
     </div>
     
-    <div class="customer-quick-comment">
+    <div class="customer-quick-comment" v-if="allowOperate">
       <base-comment ref="comment" placeholder="请输入备注内容" @submit="createRemark" :disabled="commentPending" autofocus/>
     </div>
   </div>
@@ -49,6 +49,9 @@ export default {
     }
   },
   computed: {
+    customer(){
+      return this.shareData.customer || {};
+    },
     //客户ID
     customerId() {
       return this.shareData.customer ? this.shareData.customer.id : '';
@@ -65,6 +68,10 @@ export default {
     authorities(){
       let user = this.loginUser || {};
       return user.authorities || {};
+    },
+    /** 是否允许操作 */
+    allowOperate(){
+      return this.customer.isDelete === 0;
     }
   },
   methods: {
@@ -181,6 +188,7 @@ export default {
      * 同时满足以下条件允许删除该记录
      * 1. 该记录没有被删除
      * 2. 客户编辑权限（CUSTOMER_EDIT）值为3 或者 是创建人
+     * 3. 该客户没有被删除
      */
     allowDeleteRecord(item){
       let isDelete = item.content.isDelete == 'true';
@@ -188,7 +196,7 @@ export default {
       let user = this.loginUser;
       let isCreator = item.userId == user.userId;
 
-      return !isDelete && (authorities['CUSTOMER_EDIT'].dataValue == 3 || isCreator)
+      return !isDelete && (authorities['CUSTOMER_EDIT'].dataValue == 3 || isCreator) && this.allowOperate;
     },
     /** 初始化信息动态 */
     async initializeRecord() {

@@ -54,9 +54,13 @@
             每{{scope.row[column.field].period + scope.row[column.field].periodUnit}}
           </template>
           <template v-else-if="column.field === 'action'">
-            <el-button class="delete-plan-btn" type="text" @click="deletePlan(scope.row)" :disabled="pending[scope.row.id]"
-                       size="small">删除
-            </el-button>
+            <el-button 
+              v-if="hasEditCustomerAuth"
+              class="delete-plan-btn" 
+              type="text" 
+              @click="deletePlan(scope.row)" 
+              :disabled="pending[scope.row.id]"
+              size="small">删除</el-button>
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -108,9 +112,20 @@ export default {
     }
   },
   computed: {
+    customer(){
+      return this.shareData.customer || {};
+    },
     customerId() {
       return this.shareData.customer ? this.shareData.customer.id : '';
     },
+    /** 是否允许操作 */
+    allowOperate(){
+      return this.customer.isDelete === 0;
+    },
+    /** 是否有编辑客户的权限 */
+    hasEditCustomerAuth(){
+      return this.shareData.hasEditCustomerAuth
+    }
   },
   mounted() {
     this.fetchData();

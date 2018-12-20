@@ -1,15 +1,17 @@
 <template>
   <div class="page-container">
     <div class="customer-tool-bar">
-      <div class="">
+      <div>
         <button type="button" class="btn btn-text" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
-        <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
-        <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
-        <button type="button" class="btn btn-text" @click="openDialog('remind')"><i class="iconfont icon-notification"></i> 添加提醒</button>
+        <template v-if="!isDelete">
+          <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
+          <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
+          <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable"><i class="iconfont icon-notification"></i> 添加提醒</button>
+        </template>
         <a :href="`/customer/oldView/${id}`">返回旧版</a>
       </div>
-      <div class="action-btn">
-        <el-dropdown trigger="click">
+      <div class="action-btn" v-if="!isDelete">
+        <el-dropdown trigger="click" v-if="allowCreateTask">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>工单
           </span>
@@ -20,7 +22,8 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-dropdown trigger="click">
+
+        <el-dropdown trigger="click" v-if="allowCreateEvent">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>事件
           </span>
@@ -30,7 +33,8 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-dropdown trigger="click" v-if="initData.planTaskEnabled">
+
+        <el-dropdown trigger="click" v-if="allowCreatePlanTask">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>计划任务
           </span>
@@ -51,6 +55,8 @@
     <div class="main-content" v-loading="loading">
       <div class="customer-detail">
         <h3 class="customer-name" :class="{'customer-name-expand': showWholeName == 1}">
+          <span class="customer-name-delete" v-if="isDelete" title="该客户已被删除，只能查看数据。" v-tooltip>已删除</span>
+          <span class="customer-name-disable" v-if="isDisable" title="该客户已被禁用，无法添加提醒和新建工单、事件、计划任务。" v-tooltip>已禁用</span>
           <span ref="customerName">{{customer.name}}</span>
           <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
         </h3>
@@ -103,6 +109,8 @@ import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
 import EditContactDialog from './operationDialog/EditContactDialog.vue';
 import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
+import AuthUtil from '@src/util/auth';
+
 export default {
   name: "customer-detail-view",
   props: {
@@ -128,9 +136,21 @@ export default {
     }
   },
   computed: {
-    /** 是否允许操作该客户，在客户删除时不允许做任何操作，只能查询 */
-    allowOperate(){
-      return this.customer.isDelete === 0;
+    /** 当前登录的用户 */
+    loginUser(){
+      return this.initData.loginUser || {};
+    },
+    /** 
+     * 客户是否被删除
+     * 在客户删除时不允许做任何操作，只能查询 
+     * 所有操作的权限应该以此为基础
+     */
+    isDelete(){
+      return this.customer.isDelete === 1;
+    },
+    /** 客户是否被禁用 */
+    isDisable(){
+      return this.customer.status === 0;
     },
     fields() {
       const fields = (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
@@ -154,58 +174,108 @@ export default {
       if (!this.initData || (this.initData && !this.initData.taskTypeList)) return [];
       return this.initData.taskTypeList.map(t => Object.freeze(t));
     },
-    //permission
+    /** 当前用户的权限 */
     permission() {
       return this.initData.loginUser.authorities;
     },
     allowDeleteCustomer() {
       return this.allowEditCustomer && this.permission.CUSTOMER_DELETE;
     },
+    /** 
+     * 满足以下条件允许编辑客户
+     * 1. 客户没有被删除
+     * 2. 有客户编辑权限
+     */
     allowEditCustomer() {
-      const c = this.customer;
-      const loginUser = this.initData.loginUser;
-      const CUSTOMER_EDIT = this.permission.CUSTOMER_EDIT;
-      if (!CUSTOMER_EDIT) return false;
-      let auth = false;
-      if (CUSTOMER_EDIT === 1) {
-        auth = c.createUser === loginUser.userId;
-      } else if (CUSTOMER_EDIT === 2) {
-        auth = c.createUser === loginUser.userId || this.permissionAccordingToTag();
-      } else {
-        auth = true;
-      }
-
-      return c.isDelete === 0 && (auth || this.isCustomerManager);
+      return !this.isDelete && this.hasEditCustomerAuth;
     },
-    permissionAccordingToTag() {
-      const c = this.customer;
-      let tags = Array.isArray(c.tags) ? c.tags : [];
-      let loginUserTagIds = this.initData.loginUser.tagIds || [];
-      //无团队则任何人都可编辑
-      if (tags.length == 0) return true;
+    /** 
+     * 是否有编辑客户权限，需要满足以下条件之一：
+     * 
+     * 1. 编辑客户全部权限： 全部客户
+     * 2. 编辑客户团队权限： 没有团队的客户都可编辑，有团队的按团队匹配。 包含个人权限
+     * 3. 编辑客户个人权限： 自己创建的 或 客户负责人
+     */
+    hasEditCustomerAuth(){
+      let customer = this.customer;
+      let loginUserId = this.loginUser.userId;
+      return AuthUtil.hasAuthWithDataLevel(this.permission, "CUSTOMER_EDIT", 
+        //团队权限判断
+        () => {
+          let tags = Array.isArray(customer.tags) ? customer.tags : [];
+          //无团队则任何人都可编辑
+          if(tags.length == 0) return true;
 
-      //团队权限验证 return Boolean
-      let result = tags.filter(tag => loginUserTagIds.some(tId => tId === tag.id));
-
-      return result.length > 0;
+          let loginUserTagIds = this.initData.loginUser.tagIds || [];
+          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
+        }, 
+        //个人权限判断
+        () => {
+          return customer.createUser == loginUserId || this.isCustomerManager
+        }
+      );
     },
+    // permissionAccordingToTag() {
+    //   const c = this.customer;
+    //   let tags = Array.isArray(c.tags) ? c.tags : [];
+    //   let loginUserTagIds = this.initData.loginUser.tagIds || [];
+    //   //无团队则任何人都可编辑
+    //   if (tags.length == 0) return true;
+
+    //   //团队权限验证 return Boolean
+    //   let result = tags.filter(tag => loginUserTagIds.some(tId => tId === tag.id));
+
+    //   return result.length > 0;
+    // },
     /**
-       * 当前用户是否是该客户负责人
-       * 客户负责人用于和客户创建人相同权限
-       */
+     * 当前用户是否是该客户负责人
+     * 客户负责人用于和客户创建人相同权限
+     */
     isCustomerManager() {
-      const {loginUser, customerManager,} = this.customer;
-      return loginUser.userId === customerManager;
+      return this.loginUser.userId === this.customer.customerManager;
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
         customer: this.customer,
         loginUser: this.initData.loginUser,
+        hasEditCustomerAuth: this.hasEditCustomerAuth
       };
     },
-    customerNameLong() {
-      return (this.customer.name || '').length > 21;
+    /**
+     * 满足以下提交见允许创建工单
+     * 
+     * 1. 客户没被删除
+     * 2. 客户没被禁用
+     * 3. 客户编辑权限
+     * 4. 创建工单权限
+     */
+    allowCreateTask(){
+      return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, "TASK_ADD");
+    },
+    /**
+     * 满足以下提交可以创建事件
+     * 
+     * 1. 客户没有被删除
+     * 2. 客户没有被禁用
+     * 3. 客户编辑权限
+     * 4. 新建事件权限
+     */
+    allowCreateEvent(){
+      return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, "CASE_ADD");
+    },
+    /**
+     * 满足以下条件可以创建计划任务
+     * 
+     * 1. 客户没有被删除
+     * 2. 客户没有被禁用
+     * 3. 启用计划任务
+     * 4. 客户编辑权限
+     * 5. 工单新建权限和工单指派权限
+     */
+    allowCreatePlanTask(){
+      let planTaskEnabled = this.initData.planTaskEnabled;
+      return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
     }
   },
   methods: {
@@ -281,7 +351,7 @@ export default {
       }, {
         displayName: `客户提醒(${remindQuantity || 0})`,
         component: CustomerRemindTable.name,
-        show: true,
+        show: !this.isDelete && !this.isDisable
       }, {
         displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity})` : '事件(0)',
         component: CustomerEventTable.name,
@@ -297,15 +367,15 @@ export default {
       }, {
         displayName: `客户产品(${productQuantity || 0})`,
         component: CustomerProductTable.name,
-        show: true,
+        show: !this.isDelete
       }, {
         displayName: `客户地址(${addressQuantity || 0})`,
         component: CustomerAddressTable.name,
-        show: true,
+        show: !this.isDelete
       }, {
         displayName: `联系人(${linkmanQuantity || 0})`,
         component: CustomerContactTable.name,
-        show: true,
+        show: !this.isDelete
       }]
         .filter(tab => tab.show);
     },
@@ -454,7 +524,7 @@ export default {
   }
 
   .customer-detail {
-    flex: 2;
+    flex: 3;
     min-width: 420px;
     height: 100%;
     display: flex;
@@ -483,6 +553,7 @@ export default {
 
     span{
       white-space: nowrap;
+      vertical-align: middle;
     }
 
     .iconfont {
@@ -505,6 +576,27 @@ export default {
       .iconfont{
         transform: rotateZ(-180deg);
       }
+    }
+
+    .customer-name-delete,
+    .customer-name-disable{
+      color: #fff;
+      display: inline-block;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 18px;
+      height: 18px;
+      padding: 0 5px;
+      font-weight: 400;
+      vertical-align: middle;
+      cursor: default;
+    }
+
+    .customer-name-delete{
+      background-color: $color-danger;
+    }
+    .customer-name-disable{
+      background-color: #ffc107;
     }
   }
 

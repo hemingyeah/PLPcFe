@@ -27,9 +27,38 @@ export function hasEveryAuth(auth = {}, keys){
   return keys.every(item => authKeys.indexOf(item) >= 0);
 }
 
+/** 根据用户的数据权限判断是否有某一权限 */
+export function hasAuthWithDataLevel(authorities = {}, authKey, teamAuthFn, personAuthFn){
+  let dataLevel = authorities[authKey];
+  //如果没有对应的权限
+  if(!dataLevel) return false;
+  //全部权限
+  if(dataLevel >= 3) return true;
+
+  let teamAuth = ( 
+    typeof teamAuthFn == 'function' 
+      ? teamAuthFn() : 
+      typeof teamAuthFn == 'boolean' ? teamAuthFn : false
+  );
+
+  let personAuth = (
+    typeof personAuthFn == 'function' 
+      ? personAuthFn() : 
+      typeof personAuthFn == 'boolean' ? personAuthFn : false
+  );
+
+  //团队权限 dataLevel = 2
+  if(dataLevel > 1 && dataLevel < 3){
+    return teamAuth || personAuth;
+  }
+
+  return personAuth;
+}
+
 const util = {
   hasAuth,
-  hasEveryAuth
+  hasEveryAuth,
+  hasAuthWithDataLevel
 }
 
 export default util;
