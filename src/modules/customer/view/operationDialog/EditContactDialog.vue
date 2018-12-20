@@ -1,7 +1,7 @@
 <template>
   <base-modal :title="modalTitle" :show.sync="addContactDialog" width="600px" @cancel="$emit('submit-success')"
-              class="edit-contact-dialog">
-    <form @submit.prevent="submit" class="edit-contact-form-container">
+              class="edit-contact-dialog" @close="reset">
+    <form @submit.prevent="submit" class="edit-contact-form-container" v-if="init">
       <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @input="update">
 
         <template slot="phone" slot-scope="{field}">
@@ -40,6 +40,7 @@ export default {
   },
   data() {
     return {
+      init: false,
       addContactDialog: false,
       pending: false,
       products: [],
@@ -191,6 +192,9 @@ export default {
         this.$eventBus.$emit('customer_contact_table.update_linkman_list');
         this.$eventBus.$emit('customer_info_record.update_record_list');
         this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+        if (this.action === 'create') {
+          this.$eventBus.$emit('customer_detail_view.select_tab', 'customer-contact-table');
+        }
 
       } catch (e) {
         this.pending = false;
@@ -212,6 +216,7 @@ export default {
         email: null,
         productId: [],
       };
+      this.init = false;
     },
     update({field, newValue, oldValue}) {
       let {fieldName, displayName} = field;
@@ -231,8 +236,10 @@ export default {
             this.remote = this.buildRemote();
             this.matchValueToForm(this.originalValue)
 
+            this.init = true;
           })
       }
+      this.init = true;
     },
     matchValueToForm(val) {
       const {name, remark, sex, position, department, customerId, customer, id, phone, email, address, productId} = val;

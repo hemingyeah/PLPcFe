@@ -1,6 +1,6 @@
 <template>
   <base-modal :title="title" :show.sync="addAddressDialog" width="600px" class="edit-address-dialog" @closed="reset">
-    <form @submit.prevent="submit">
+    <form @submit.prevent="submit" v-if="init">
       <form-builder :fields="fields" class="edit-address-form" ref="form" :value="form" @input="update">
       </form-builder>
     </form>
@@ -38,6 +38,7 @@ export default {
       submitted: false,
       pending: false,
       addressBackup: {},
+      init: false,
       form: {
         customerAddress: {
           adAddress: [],
@@ -80,6 +81,7 @@ export default {
         }
       };
       this.addressBackup = {};
+      this.init = false;
     },
     async submit() {
       try {
@@ -162,8 +164,7 @@ export default {
 
       this.updateAddressBackup(this.defaultAddress);
       this.setDefaultAddress(this.defaultAddress);
-
-      console.log('this.defaultAddress', this.defaultAddress);
+      this.init = true;
     },
   },
 }

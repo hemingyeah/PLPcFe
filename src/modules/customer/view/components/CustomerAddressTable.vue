@@ -20,7 +20,7 @@
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'area'">
-            <a href="javasript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
+            <a href="javascript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
           </template>
           <div v-else-if="column.field === 'action'" class="action">
             <template>

@@ -50,7 +50,7 @@ export default {
   computed:{
     icon(){
       let file = this.file;
-      let icon = ''
+      let icon = '';
       const name = file.filename;
 
       if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(name)) {
@@ -84,7 +84,7 @@ export default {
     clazz(){
       let clazz = ['base-file-preview'];
 
-      if(this.icon != 'img'){
+      if(!this.isImage){
         clazz = clazz.concat(['base-file-icon', this.icon])
       }
 
@@ -97,7 +97,7 @@ export default {
     styl(){
       let styl = {};
   
-      if(this.icon == 'img') {
+      if(this.isImage) {
         let url = `${this.file.url}${this.file.url.indexOf('?') >= 0 ? '&' : '?'}isCmp=true`;
         styl.backgroundImage = `url(${url})`;
         styl.cursor = 'pointer';
@@ -107,7 +107,7 @@ export default {
     },
     //是否为图片
     isImage(){
-      return this.icon == 'img';
+      return this.icon === 'img' || this.icon === 'small-img';
     }
   },
   methods: {
@@ -118,7 +118,7 @@ export default {
     },
     preview(event){
       let element = event.target.querySelector('img');
-      if(this.icon != 'img' || !element) return;
+      if(!this.isImage || !element) return;
 
       let list = event.target.closest('.base-file__preview');
       let images = Array.prototype.slice.call(list.querySelectorAll("img"));
@@ -127,7 +127,7 @@ export default {
       let urls = images.map((item, index) => {
         if(item == element) currIndex = index;
         return window.location.origin + item.dataset.origin;
-      })
+      });
 
       platform.imagePreview({
         imageDom: list,

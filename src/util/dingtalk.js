@@ -117,7 +117,7 @@ function openLink(url){
 }
 
 /** 预览图片 */
-function previewImage(currUrl, urls = []){
+function previewImage(urls = [], currUrl){
   let DingTalkPC = getDingTalkPC();
 
   DingTalkPC.biz.util.previewImage({

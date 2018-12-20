@@ -6,11 +6,6 @@
         <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
         <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
         <button type="button" class="btn btn-text" @click="openDialog('remind')"><i class="iconfont icon-notification"></i> 添加提醒</button>
-
-        <!-- <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button> -->
-        <!-- <base-button type="only-text" icon="icon-edit" @event="jump" v-if="allowEditCustomer">编辑</base-button>
-        <base-button type="only-text" icon="icon-yemianshanchu" @event="deleteCustomer" v-if="allowDeleteCustomer">删除</base-button>
-        <base-button type="only-text" icon="icon-notification" @event="openDialog('remind')">添加提醒</base-button> -->
         <a :href="`/customer/oldView/${id}`">返回旧版</a>
       </div>
       <div class="action-btn">
@@ -35,14 +30,14 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-dropdown trigger="click">
+        <el-dropdown trigger="click" v-if="initData.planTaskEnabled">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>计划任务
           </span>
 
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="task in taskTypes" :key="task.id">
-              <a class="link-of-dropdown" :href="`/task/planTask/create?defaultTypeId=${task.id}&customerId=${id}`">
+              <a class="link-of-dropdown" href="javascript:;" @click.prevent="createPlanTask(task.id)">
                 {{task.name}}
               </a>
             </el-dropdown-item>
@@ -138,7 +133,18 @@ export default {
       return this.customer.isDelete === 0;
     },
     fields() {
-      return (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
+      const fields = (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
+      return [...fields, {
+        displayName: '创建人',
+        fieldName: 'createLoginUser',
+        formType: 'user',
+        isSystem: 1,
+      }, {
+        displayName: '创建时间',
+        fieldName: 'createTime',
+        formType: 'text',
+        isSystem: 1,
+      }];
     },
     eventTypes() {
       if (!this.initData || (this.initData && !this.initData.eventTypeList)) return [];
@@ -237,6 +243,22 @@ export default {
         fromId: fromId
       })      
     },
+    /** 从客户创建计划工单 */
+    createPlanTask(typeId){
+      let customer = this.customer || {};
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: 'createPlan',
+        title: '新建计划任务',
+        close: true,
+        url: `/task/planTask/create?defaultTypeId=${typeId}&customerId=${customer.id}`,
+        fromId: fromId
+      })
+    },
+    selectTab(tab) {
+      this.currTab = tab;
+    },
     buildTabs() {
       const {
         addressQuantity,
@@ -252,36 +274,36 @@ export default {
       } = this.StatisticalData || {};
 
       return [{
-        displayName: recordQuantity ? `信息动态(${recordQuantity})` : '信息动态',
+        displayName: `信息动态(${recordQuantity || 0})`,
         component: CustomerInfoRecord.name,
         slotName: 'record-tab',
         show: true,
       }, {
-        displayName: remindQuantity ? `客户提醒(${remindQuantity})` : '客户提醒',
+        displayName: `客户提醒(${remindQuantity || 0})`,
         component: CustomerRemindTable.name,
         show: true,
       }, {
-        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity})` : '事件',
+        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity})` : '事件(0)',
         component: CustomerEventTable.name,
         show: true,
       }, {
-        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity})` : '工单',
+        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity})` : '工单(0)',
         component: CustomerTaskTable.name,
         show: true,
       }, {
-        displayName: plantaskQuantity ? `计划任务(${plantaskQuantity})` : '计划任务',
+        displayName: `计划任务(${plantaskQuantity || 0})`,
         component: CustomerPlanTable.name,
         show: this.initData.planTaskEnabled
       }, {
-        displayName: productQuantity ? `客户产品(${productQuantity})` : '客户产品',
+        displayName: `客户产品(${productQuantity || 0})`,
         component: CustomerProductTable.name,
         show: true,
       }, {
-        displayName: addressQuantity ? `客户地址(${addressQuantity})` : '客户地址',
+        displayName: `客户地址(${addressQuantity || 0})`,
         component: CustomerAddressTable.name,
         show: true,
       }, {
-        displayName: linkmanQuantity ? `联系人(${linkmanQuantity})` : '联系人',
+        displayName: `联系人(${linkmanQuantity || 0})`,
         component: CustomerContactTable.name,
         show: true,
       }]
@@ -355,17 +377,20 @@ export default {
     }
   },
   mounted() {
+    console.log('this.initData', this.initData);
     this.loading = true;
     this.fetchCustomer();
     this.fetchStatisticalData();
     this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
     this.$eventBus.$on('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
     this.$eventBus.$on('customer_detail_view.update_customer_detail', this.fetchCustomer);
+    this.$eventBus.$on('customer_detail_view.select_tab', this.selectTab);
   },
   beforeDestroy() {
     this.$eventBus.$off('customer_detail_view.update_remind', this.updateRemind);
     this.$eventBus.$off('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
     this.$eventBus.$off('customer_detail_view.update_customer_detail', this.fetchCustomer);
+    this.$eventBus.$off('customer_detail_view.select_tab', this.selectTab);
   },
   components: {
     [CustomerInfoRecord.name]: CustomerInfoRecord,

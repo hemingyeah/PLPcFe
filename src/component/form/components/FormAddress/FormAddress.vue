@@ -84,8 +84,11 @@ export default {
 
       let adrBackup = this.addressBackup;
       newAddress.addressType = this.diffAddress(newAddress, adrBackup);
-      newAddress.latitude = newAddress.addressType == 0 ? '' : (adrBackup.adLatitude || adrBackup.latitude);
-      newAddress.longitude = newAddress.addressType == 0 ? '' : (adrBackup.adLongitude || adrBackup.longitude);
+
+      if (newAddress.addressType) {
+        newAddress.latitude = adrBackup.adLatitude || adrBackup.latitude;
+        newAddress.longitude = adrBackup.adLongitude || adrBackup.longitude;
+      }
 
       this.updateValue(newAddress)
     },
@@ -93,7 +96,7 @@ export default {
       let newAdr = (newVal.adProvince || newVal.province) + (newVal.adCity || newVal.city) + (newVal.adDist || newVal.dist) + (newVal.adAddress || newVal.address);
       let oldAdr = (oldVal.adProvince || oldVal.province) + (oldVal.adCity || oldVal.city) + (oldVal.adDist || oldVal.dist) + (oldVal.adAddress || oldVal.address);
 
-      return newAdr == oldAdr ? 1 : 0;
+      return Number(newAdr === oldAdr);
     },
     handleCitySelectorChange(val) {
       let newAddress = {
@@ -103,7 +106,7 @@ export default {
         address: ''
       };
 
-      if(!Array.isArray(val) || val.length == 0) {
+      if(!Array.isArray(val) || !val.length) {
         return this.updateValue(newAddress);
       }
 
@@ -116,9 +119,13 @@ export default {
 
       let adrBackup = this.addressBackup;
       newAddress.addressType = this.diffAddress(newAddress, adrBackup);
-      newAddress.latitude = newAddress.addressType == 0 ? '' : (adrBackup.adLatitude || adrBackup.latitude);
-      newAddress.longitude = newAddress.addressType == 0 ? '' : (adrBackup.adLongitude || adrBackup.longitude);
-        
+
+
+      if (newAddress.addressType) {
+        newAddress.latitude = adrBackup.adLatitude || adrBackup.latitude;
+        newAddress.longitude = adrBackup.adLongitude || adrBackup.longitude;
+      }
+
       this.updateValue(newAddress);
     },
     updateValue(newValue) {
