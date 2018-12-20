@@ -110,6 +110,7 @@ import EditContactDialog from './operationDialog/EditContactDialog.vue';
 import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
 import AuthUtil from '@src/util/auth';
+import {parse} from '@src/util/querystring';
 
 export default {
   name: "customer-detail-view",
@@ -447,10 +448,14 @@ export default {
     }
   },
   mounted() {
-    console.log('this.initData', this.initData);
+    let query = parse(window.location.search);
     this.loading = true;
     this.fetchCustomer();
     this.fetchStatisticalData();
+    if (query && query.active === 'product') {
+      this.currTab = 'customer-product-table';
+    }
+
     this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
     this.$eventBus.$on('customer_detail_view.update_statistical_data', this.fetchStatisticalData);
     this.$eventBus.$on('customer_detail_view.update_customer_detail', this.fetchCustomer);

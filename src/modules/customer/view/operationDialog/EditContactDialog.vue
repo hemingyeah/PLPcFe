@@ -1,6 +1,5 @@
 <template>
-  <base-modal :title="modalTitle" :show.sync="addContactDialog" width="600px" @cancel="$emit('submit-success')"
-              class="edit-contact-dialog" @close="reset">
+  <base-modal :title="modalTitle" :show.sync="addContactDialog" width="600px" class="edit-contact-dialog" @closed="reset">
     <form @submit.prevent="submit" class="edit-contact-form-container" v-if="init">
       <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @input="update">
 
@@ -12,10 +11,8 @@
               placeholder="建议使用手机号，可发送短信通知"/>
           </form-item>
         </template>
-
       </form-builder>
-
-      <div class="dialog-footer">
+      <div class="dialog-footer" slot="footer">
         <el-button @click="addContactDialog = false">关闭</el-button>
         <el-button native-type="submit" type="primary" :disabled="pending">保存</el-button>
       </div>
@@ -228,21 +225,15 @@ export default {
     openDialog() {
       this.addContactDialog = true;
       if (this.action === 'edit') {
-        Promise.all([
-          this.fetchAddress(),
-          this.fetchProducts(),
-        ])
-          .then(res => {
-            this.remote = this.buildRemote();
-            this.matchValueToForm(this.originalValue)
-
-            this.init = true;
-          })
+        this.matchValueToForm(this.originalValue);
       }
+      this.fetchAddress();
+      this.fetchProducts();
+      this.remote = this.buildRemote();
       this.init = true;
     },
     matchValueToForm(val) {
-      const {name, remark, sex, position, department, customerId, customer, id, phone, email, address, productId} = val;
+      const {name, remark, sex, position, department, customerId, customer, id, phone, email} = val;
 
       this.form = {
         name,
@@ -258,14 +249,8 @@ export default {
         email,
         productId: [],
       };
-      if (productId && productId.length) {
-        this.form.productId = productId.map(p => p.id)
-          .filter(pId => this.products.some(p => p.value === pId));
-      }
 
-      if (address && this.addresses.some(a => a.value === address)) {
-        this.form.address = address;
-      }
+      // 联系人的产品和地址在获取到产品和地址的列表之后过滤掉被删除的再给form使用
     },
     fetchAddress() {
       return this.$http.get('/customer/address/list', {
@@ -279,6 +264,12 @@ export default {
               text: p.province + p.city + p.dist + p.address,
               value: p.id,
             }));
+
+          // 把被删除的地址过滤掉
+          const address = this.originalValue.address;
+          if (address && this.addresses.some(a => a.value === address)) {
+            this.form.address = address;
+          }
 
           return this.addresses;
         })
@@ -296,6 +287,12 @@ export default {
               text: p.name,
               value: p.id,
             }));
+          // 把被删除的产品过滤掉
+          const productId = this.originalValue.productId;
+          if (productId && productId.length) {
+            this.form.productId = productId.map(p => p.id)
+              .filter(pId => this.products.some(p => p.value === pId));
+          }
 
           return this.products;
         })

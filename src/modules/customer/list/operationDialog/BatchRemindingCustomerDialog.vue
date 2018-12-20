@@ -177,6 +177,10 @@ export default {
         users = this.selectedRemind.users || [];
       }
 
+      if (!this.selectedRemind.isDdResponse) {
+        this.form.isAllLm = Number(!this.selectedRemind.isDefaultLinkman);
+      }
+
       this.remoteSearchCM.options = users;
       this.form.users = users.map(c => c.id);
     },

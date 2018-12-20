@@ -1,6 +1,6 @@
 <template>
-  <base-modal @closed="$emit('success-callback')" :title="modalTitle" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog">
-    <el-form ref="form" :model="form" label-width="80px">
+  <base-modal :title="modalTitle" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog" @closed="reset">
+    <el-form ref="form" :model="form" label-width="80px" v-if="init">
 
       <el-form-item label="选择提醒">
         <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateFormUser">
@@ -58,7 +58,9 @@ export default {
   name: "remind-customer-dialog",
   data: () => {
     return {
+      linkmanListOfCustomer: [],
       remindTemplate: [],
+      resultOfSearch: [],
       remoteSearchCM: {
         loading: false,
         options: [],
@@ -71,6 +73,7 @@ export default {
       pending: false,
       error: '',
       submitted: false,
+      init: false,
     }
   },
   props: {
@@ -116,20 +119,24 @@ export default {
     allUsers() {
       if (this.selectedRemind.isDdResponse) {
         // 内部提醒
-        const arr = this.concatArrayAndItemUnique(this.editedRemind.users, this.selectedRemind.users);
-        return this.concatArrayAndItemUnique(this.remoteSearchCM.options, arr)
+        const users = this.action === 'create' ? this.selectedRemind.users : this.editedRemind.users;
+        return this.concatArrayAndItemUnique(users, this.resultOfSearch)
       }
-      return [{
-        id: this.customer.id,
-        name: this.customer.name,
-        phone: this.customer.phone,
-      }];
+      return [...this.linkmanListOfCustomer];
     },
   },
   mounted() {
     this.fetchData();
   },
   methods: {
+    reset() {
+      this.init = false;
+      this.form = {
+        remindId: null,
+        users: [],
+      };
+      this.$emit('success-callback');
+    },
     validateUser() {
       if (!this.submitted) return;
       if (!this.form.users || !this.form.users.length) {
@@ -141,46 +148,19 @@ export default {
     updateFormUser() {
       let users = [];
       if (this.selectedRemind.isDdResponse) {
+        // 内部提醒
         users = this.selectedRemind.users;
       } else {
-        users = [{
-          id: this.customer.id,
-          name: this.customer.name,
-          phone: this.customer.phone,
-        }]
-      }
-
-      this.remoteSearchCM.options = users;
-      this.form.users = users
-        // .filter(c => {
-        //   if (c.id && (c.id.indexOf('-') >= 0) && Number(c.name)) return false;
-        //   return true;
-        // })
-        .map(c => c.id);
-    },
-    defaultUserOfDifferentSelectedRemind() {
-      let users = [];
-      if (this.action === 'edit') {
-        users = this.editedRemind.users || [];
-      } else {
-        if (this.selectedRemind.isDdResponse) {
-          users = this.selectedRemind.users || [];
+        // 外部提醒（默认联系人或者全部联系人）
+        if (this.selectedRemind.isDefaultLinkman) {
+          users = this.linkmanListOfCustomer.filter(user => user.isMain);
         } else {
-          users = [{
-            id: this.customer.id,
-            name: this.customer.name,
-            phone: this.customer.phone,
-          }];
+          users = this.linkmanListOfCustomer;
         }
       }
 
-      this.remoteSearchCM.options = users;
-      this.form.users = users
-        // .filter(c => {
-        //   if (c.id && (c.id.indexOf('-') >= 0) && Number(c.name)) return false;
-        //   return true;
-        // })
-        .map(c => c.id);
+      this.form.users = users.map(c => c.id);
+      this.remoteSearchCM.options = this.allUsers;
     },
     async onSubmit() {
       this.submitted = true;
@@ -217,6 +197,10 @@ export default {
           this.$eventBus.$emit('customer_remind_table.update_remind_list');
           this.$eventBus.$emit('customer_info_record.update_record_list');
           this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+          if (this.action === 'create') {
+            this.$eventBus.$emit('customer_detail_view.select_tab', 'customer-remind-table');
+          }
+
         })
         .catch(err => {
           this.$platform.alert('批量添加提醒失败');
@@ -245,7 +229,9 @@ export default {
         this.form.remindId = (this.remindTemplate[0] || {}).id;
       }
 
-      this.defaultUserOfDifferentSelectedRemind();
+      this.searchCustomerManager();
+      this.fetchLinkman();
+      this.init = true;
     },
     fetchData() {
       this.$http.get('/customer/getReminds', {pageSize: 0, })
@@ -261,16 +247,18 @@ export default {
     },
     searchCustomerManager(keyword) {
       if (!this.selectedRemind.isDdResponse) {
-        return this.remoteSearchCM.options = [];
+        return this.remoteSearchCM.options = this.allUsers;
       }
       this.remoteSearchCM.loading = true;
       this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
-          this.remoteSearchCM.options = res.list
+          this.resultOfSearch = res.list
             .map(c => Object.freeze({
               id: c.staffId,
               name: c.displayName,
             })) || [];
+          const oldList = this.allUsers.filter(rc => this.form.users.includes(rc.id));
+          this.remoteSearchCM.options = this.concatArrayAndItemUnique(oldList, this.resultOfSearch);
           this.remoteSearchCM.loading = false;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
@@ -286,11 +274,49 @@ export default {
         return cur;
       },[]);
     },
+    fetchLinkman() {
+      const params = {
+        customerId: this.customer.id,
+        pageNum: 1,
+        pageSize: 100000,
+      };
+
+      this.$http.get('/customer/linkman/list', params)
+        .then(res => {
+          this.linkmanListOfCustomer = res.list
+            .map(contact => {
+              return Object.freeze(contact);
+            });
+
+          const users = this.action === 'create' ? this.selectedRemind.users : this.editedRemind.users;
+          if (this.action === 'create') {
+            this.updateFormUser();
+          } else {
+            this.form.users = users.map(c => c.id);
+            this.remoteSearchCM.options = this.allUsers;
+          }
+        })
+    },
   },
 }
 </script>
 
 <style lang="scss">
+
+  .el-tag {
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    .el-select__tags-text {
+      width: 100%;
+      @include text-ellipsis();
+    }
+    .el-icon-close {
+      flex-shrink: 0;
+      right: -3px!important;
+      top: 2px!important;
+    }
+  }
 
   .batch-remind-customer-dialog {
 
