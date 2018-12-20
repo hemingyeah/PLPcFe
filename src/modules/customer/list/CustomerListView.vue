@@ -204,8 +204,8 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <base-button type="primary" icon="icon-add" @event="jumpPage">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" v-if="highLevelPermission" @event="deleteCustomer">删除</base-button>
+          <base-button type="primary" icon="icon-add" @event="jumpPage" v-if="editedPermission">新建</base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu" v-if="deletePermission" @event="deleteCustomer">删除</base-button>
         </div>
 
         <div class="action-button-group">
@@ -538,8 +538,8 @@ export default {
     editedPermission() {
       return this.auth.CUSTOMER_EDIT;
     },
-    highLevelPermission() {
-      return this.auth.CUSTOMER_EDIT === 3;
+    deletePermission() {
+      return this.auth.CUSTOMER_EDIT && this.auth.CUSTOMER_DELETE;
     },
     exportPermission() {
       return this.auth.EXPORT_IN;
@@ -885,6 +885,11 @@ export default {
       this.$http.post('/customer/changeState', params, false, {cancelable: false})
         .then(res => {
           row.pending = false;
+          
+          if (res.status) {
+            return this.$platform.alert(res.message);
+          }
+          
           this.customers.forEach(c => {
             if (c.id === row.id) {
               c.status = ns;

@@ -303,6 +303,12 @@ export default {
       this.$nextTick(() => {
         this.form = JSON.parse(JSON.stringify(this.formBackup));
         this.$refs.editCustomerForm.resetFields();
+        if (this.selectedFieldName === 'manager') {
+          this.searchCustomerManager();
+        }
+        if (this.selectedFieldName === 'tags') {
+          this.searchTag();
+        }
       });
     },
     openBatchEditingCustomerDialog() {

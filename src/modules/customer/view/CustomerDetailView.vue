@@ -47,9 +47,9 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <base-button type="plain" icon="icon-add" @event="openDialog('contact')">联系人</base-button>
-        <base-button type="plain" icon="icon-add" @event="openDialog('address')">地址</base-button>
-        <base-button type="plain" icon="icon-add" @event="createProduct('address')">产品</base-button>
+        <base-button type="plain" icon="icon-add" @event="openDialog('contact')" v-if="allowEditCustomer">联系人</base-button>
+        <base-button type="plain" icon="icon-add" @event="openDialog('address')" v-if="allowEditCustomer">地址</base-button>
+        <base-button type="plain" icon="icon-add" @event="createProduct('address')" v-if="allowEditCustomer">产品</base-button>
       </div>
     </div>
     <div class="main-content" v-loading="loading">
@@ -240,7 +240,8 @@ export default {
       return {
         customer: this.customer,
         loginUser: this.initData.loginUser,
-        hasEditCustomerAuth: this.hasEditCustomerAuth
+        allowEditCustomer: this.allowEditCustomer,
+        isAddressAllowNull: this.initData.isAddressAllowNull,
       };
     },
     /**
@@ -277,7 +278,7 @@ export default {
     allowCreatePlanTask(){
       let planTaskEnabled = this.initData.planTaskEnabled;
       return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
-    }
+    },
   },
   methods: {
     //更新客户名称的样式

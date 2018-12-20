@@ -102,7 +102,10 @@ export default {
     allUsers() {
       if (this.selectedRemind.isDdResponse) {
         // 内部提醒
-        return this.concatArrayAndItemUnique(this.remoteSearchCM.options, this.selectedRemind.users)
+        let oldArr = sessionStorage.getItem('customer_list_remind_manager_storage') || '{}';
+        oldArr = JSON.parse(oldArr).manager || [];
+        const allSearchResult = this.concatArrayAndItemUnique(oldArr, this.remoteSearchCM.options);
+        return this.concatArrayAndItemUnique(allSearchResult, this.selectedRemind.users)
       }
       return [];
     },
@@ -111,6 +114,21 @@ export default {
     this.fetchData();
   },
   methods: {
+    saveManager(manager) {
+      let oldArr = sessionStorage.getItem('customer_list_remind_manager_storage') || '{}';
+      oldArr = JSON.parse(oldArr).manager || [];
+
+      manager.forEach(m => {
+        if (oldArr.every(ou => ou.id !== m.id)) {
+          oldArr.push(m);
+        }
+      });
+
+      sessionStorage.setItem('customer_list_remind_manager_storage', JSON.stringify({
+        manager: oldArr,
+      }));
+      return oldArr;
+    },
     validateUser() {
       if (!this.submitted) return;
       if (this.selectedRemind.isDdResponse && !this.form.users.length) {
@@ -170,6 +188,7 @@ export default {
       this.form.remindId = (this.remindTemplate[0] || {}).id;
       this.batchRemindingCustomerDialog = true;
       this.defaultUserOfDifferentSelectedRemind();
+      this.searchCustomerManager();
     },
     defaultUserOfDifferentSelectedRemind() {
       let users = [];
@@ -181,7 +200,7 @@ export default {
         this.form.isAllLm = Number(!this.selectedRemind.isDefaultLinkman);
       }
 
-      this.remoteSearchCM.options = users;
+      this.remoteSearchCM.options = this.concatArrayAndItemUnique(users, this.remoteSearchCM.options);
       this.form.users = users.map(c => c.id);
     },
 
@@ -207,6 +226,11 @@ export default {
               name: c.displayName,
             }));
           this.remoteSearchCM.loading = false;
+
+          const oldList = this.allUsers.filter(rc => this.form.users.includes(rc.id));
+          this.remoteSearchCM.options = this.concatArrayAndItemUnique(oldList, this.remoteSearchCM.options);
+
+          this.saveManager(this.remoteSearchCM.options);
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },

@@ -34,8 +34,6 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-
-
       <el-popover
         placement="bottom"
         popper-class="remind-popover"
@@ -119,8 +117,13 @@ export default {
     allUsers() {
       if (this.selectedRemind.isDdResponse) {
         // 内部提醒
+        let oldArr = sessionStorage.getItem('customer_view_remind_manager_storage') || '{}';
+        oldArr = JSON.parse(oldArr).manager || [];
+
         const users = this.action === 'create' ? this.selectedRemind.users : this.editedRemind.users;
-        return this.concatArrayAndItemUnique(users, this.resultOfSearch)
+        let newArr = this.concatArrayAndItemUnique(users, this.resultOfSearch);
+
+        return this.concatArrayAndItemUnique(oldArr, newArr);
       }
       return [...this.linkmanListOfCustomer];
     },
@@ -260,8 +263,23 @@ export default {
           const oldList = this.allUsers.filter(rc => this.form.users.includes(rc.id));
           this.remoteSearchCM.options = this.concatArrayAndItemUnique(oldList, this.resultOfSearch);
           this.remoteSearchCM.loading = false;
+          this.saveManager(this.resultOfSearch);
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
+    },
+    saveManager(manager) {
+      let oldArr = sessionStorage.getItem('customer_view_remind_manager_storage') || '{}';
+      oldArr = JSON.parse(oldArr).manager || [];
+
+      manager.forEach(m => {
+        if (oldArr.every(ou => ou.id !== m.id)) {
+          oldArr.push(m);
+        }
+      });
+
+      sessionStorage.setItem('customer_view_remind_manager_storage', JSON.stringify({
+        manager: oldArr,
+      }));
     },
     concatArrayAndItemUnique(arr1, arr2) {
       // 数组中的对象根据id去重
@@ -304,17 +322,14 @@ export default {
 <style lang="scss">
 
   .el-tag {
-    max-width: 100%;
-    display: flex;
-    align-items: center;
-    .el-select__tags-text {
-      width: 100%;
-      @include text-ellipsis();
-    }
-    .el-icon-close {
-      flex-shrink: 0;
-      right: -3px!important;
-      top: 2px!important;
+    /*width: 100%;*/
+    overflow: hidden;
+    position: relative;
+    padding-right: 20px;
+    .el-tag__close {
+      position: absolute;
+      right: 3px!important;
+      top: 3px!important;
     }
   }
 

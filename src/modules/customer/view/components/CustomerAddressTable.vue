@@ -79,7 +79,7 @@ export default {
       addressList: [],
       selectedAddress: {},
       pending: {},
-      columns: this.buildColumns(),
+      columns: [],
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -91,9 +91,16 @@ export default {
     customerId() {
       return this.shareData.customer ? this.shareData.customer.id : '';
     },
+    allowEditCustomer() {
+      return this.shareData.allowEditCustomer;
+    },
+    isAddressAllowNull() {
+      return this.shareData.isAddressAllowNull;
+    },
   },
   mounted() {
     this.fetchData();
+    this.columns = this.buildColumns();
     this.$eventBus.$on('customer_address_table.update_address_list', this.fetchData);
   },
   beforeDestroy() {
@@ -108,7 +115,7 @@ export default {
 
     },
     async deleteAddress(address) {
-      if (address.isMain) return platform.alert('默认地址不能删除');
+      if (address.isMain && !this.isAddressAllowNull) return platform.alert('默认地址不能删除');
       try {
         if (!await platform.confirm('确定要删除该地址？')) return;
         this.pending[address.id] = true;
@@ -167,7 +174,7 @@ export default {
         .then(res => {
           this.addressList = res.list
             .map(address => {
-              this.$set(this.pending, address.id, !!address.isMain);
+              this.$set(this.pending, address.id, !!address.isMain && !this.isAddressAllowNull);
 
               adArr = [address.province, address.city, address.dist]
                 .filter(ad => ad);
@@ -196,7 +203,7 @@ export default {
       }, {
         label: '操作',
         field: 'action',
-        show: true,
+        show: this.allowEditCustomer,
         tooltip: false,
         width: '120px',
       }]

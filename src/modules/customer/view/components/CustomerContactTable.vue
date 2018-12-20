@@ -74,7 +74,7 @@ export default {
       pending: {},
       selectedContact: {},
       contactList: [],
-      columns: this.buildColumns(),
+      columns: [],
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -86,9 +86,13 @@ export default {
     customerId() {
       return this.shareData.customer ? this.shareData.customer.id : '';
     },
+    allowEditCustomer() {
+      return this.shareData.allowEditCustomer;
+    },
   },
   mounted() {
     this.fetchData();
+    this.columns = this.buildColumns();
     this.$eventBus.$on('customer_contact_table.update_linkman_list', this.fetchData);
   },
   beforeDestroy() {
@@ -173,7 +177,7 @@ export default {
       }, {
         label: '操作',
         field: 'action',
-        show: true,
+        show: this.allowEditCustomer,
         width: '150px',
       }]
     }
