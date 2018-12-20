@@ -7,8 +7,7 @@
           <span class="text">|</span>
           <span class="text">客户信息</span>
         </div>
-        <!--<base-button type="primary" icon="icon-add" @event="jumpPage">新建</base-button>-->
-        <el-button size="small" :disabled="pending" native-type="submit" type="primary"><i class="iconfont icon-commit1"></i> 提交</el-button>
+        <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" v-if="init">
         <template slot="serialNumber" slot-scope="{field}">
@@ -141,10 +140,7 @@ export default {
           }
           return f;
         });
-      return [{
-        formType: 'separator',
-        displayName: '基本信息'
-      }, ...FormUtil.migration(sortedFields)]
+      return FormUtil.migration(sortedFields)
     }
   },
   methods: {
@@ -416,14 +412,9 @@ export default {
 </script>
 
 <style lang="scss">
-
-  html, body, .customer-container, .base-form {
-    height: 100%;
-  }
-
-  body {
-    padding: 10px;
-  }
+body {
+  padding: 10px;
+}
 
 .customer-container {
   height: 100%;
@@ -453,18 +444,9 @@ export default {
 }
 
 .form-builder{
-  width: 100%;
-  padding: 0;
-  height: calc(100% - 58px);
-  overflow: auto;
+  width: 655px;
+  padding: 10px 0 0 10px;
 
-  .form-item {
-    width: 640px;
-    label {
-      width: 150px;
-      text-align: right;
-    }
-  }
   .input-and-btn{
     display: flex !important;
     flex-flow: row nowrap;

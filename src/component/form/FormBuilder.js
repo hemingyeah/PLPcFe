@@ -151,9 +151,12 @@ const FormBuilder = {
 
       let formField = createFormField.call(this, h, field, comp);
       if(comp.formType == 'separator') return formField;
+      
+      let formItemClass = [];
+      if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
     
       return (
-        <form-item label={field.displayName} validation>
+        <form-item label={field.displayName} class={formItemClass} validation>
           {formField}
         </form-item>
       );

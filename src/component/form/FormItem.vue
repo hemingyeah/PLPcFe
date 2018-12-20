@@ -116,11 +116,12 @@ export default {
 
     label {
       display: block;
-      width: 110px;
+      width: 140px;
       padding: 4px 10px 0 0;
       line-height: 24px;
       margin: 0;
       flex-shrink: 0;
+      text-align: right;
     }
 
     input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
@@ -159,6 +160,12 @@ export default {
   .form-item-error {
     font-size: 12px;
     line-height: 22px;
+  }
+
+  .form-item-attachment{
+    .form-item-control{
+      overflow: hidden;
+    }
   }
 </style>
 
