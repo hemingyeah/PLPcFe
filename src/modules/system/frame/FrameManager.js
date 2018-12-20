@@ -170,10 +170,10 @@ const FrameManager = {
       let offset = this.offset + direction * 12;
       if(offset < 0) offset = 0;
       if(offset > maxOffset) offset = maxOffset;
-
+      
+      this.offset = offset;
       this.prevBtnEnable = this.offset > 0;
       this.nextBtnEnable = this.offset < maxOffset;
-      this.offset = offset;
     },
     /** 显示上一页tab */
     prev(){

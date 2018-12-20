@@ -535,12 +535,12 @@ export default {
     height: 100%;
     display: flex;
     flex-flow: column nowrap;
-    border-right: 1px solid #f2f2f2;
 
     .form-view{
       flex: 1;
       padding-top: 5px;
       overflow-y: auto;
+      border-left: 1px solid #f2f2f2;
     }
   }
 
@@ -548,7 +548,6 @@ export default {
     min-height: 50px;
     position: relative;
     padding: 13px 20px;
-    line-height: 24px;
     font-size: 16px;
     margin: 0;
     color: $text-color-primary;
@@ -565,7 +564,7 @@ export default {
     .iconfont {
       position: absolute;
       right: 5px;
-      bottom: 10px;
+      bottom: 15px;
       color: $color-primary;
       font-size: 12px;
 
