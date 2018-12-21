@@ -40,7 +40,9 @@ export default {
     },
     /** 异步加载区域数据 */
     loadDistData(){
-      return import(/* webpackChunkName: "dist.data" */ './city').then(_module => _module.default);
+      return import(/* webpackChunkName: "dist.data" */ './city')
+        .then(_module => _module.default)
+        .catch(err => console.error('err', err));
     }
   },
   async mounted(){

@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item>
         <p>本次发送：合计共{{selectedIds.length}}个</p>
-        <p>当前短信余额：{{displayCount}}条</p>
+        <p>当前短信余额：{{smsRest}}条</p>
         <p>如需查看发送记录请到系统管理-短信设置-发送记录查询</p>
         <p>一次性发送100条以上时将会因审核略有延迟，100条以下则无需审核</p>
       </el-form-item>
@@ -70,6 +70,10 @@ export default {
     selectedIds: {
       type: Array,
       default: () => ([]),
+    },
+    smsRest: {
+      type: Number,
+      default: 0,
     },
   },
   computed: {

@@ -73,16 +73,19 @@
         <p>如需创建请到工单中心-计划任务中设置。</p>
       </div>
     </el-table>
-    <el-pagination
-      class="customer-plan-table-pagination"
-      background
-      @current-change="jump"
-      :page-size="paginationInfo.pageSize"
-      :current-page="paginationInfo.pageNum"
-      layout="prev, pager, next"
-      :total="paginationInfo.totalItems">
-    </el-pagination>
-
+    <div class="plan-task-table-footer">
+      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <el-pagination
+        v-if="paginationInfo.totalItems"
+        class="customer-plan-table-pagination"
+        background
+        @current-change="jump"
+        :page-size="paginationInfo.pageSize"
+        :current-page="paginationInfo.pageNum"
+        layout="prev, pager, next"
+        :total="paginationInfo.totalItems">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
@@ -172,6 +175,7 @@ export default {
             });
           this.paginationInfo.totalItems = res.total;
         })
+        .catch(e => console.error('fetchData caught e', e));
     },
     buildColumns() {
       return [{
@@ -279,6 +283,21 @@ export default {
     .customer-plan-table-pagination {
       text-align: right;
       margin-top: 7px;
+    }
+    .plan-task-table-footer {
+      display: flex;
+      justify-content: space-between;
+
+      .total-count {
+        padding: 0 10px;
+        font-size: 12px;
+        margin: 0;
+        line-height: 46px;
+        span {
+          padding: 0 5px;
+          color: $color-primary;
+        }
+      }
     }
   }
 </style>

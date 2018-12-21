@@ -85,7 +85,8 @@ function axiosHttp(method = 'get', url = '', params = {}, emulateJSON = true, co
   config.method = method;
   config.cancelable = config.cancelable !== false; //请求是否可取消
 
-  return axiosIns.request(config).then(response => response.data);
+  return axiosIns.request(config).then(response => response.data)
+    .catch(e => console.error('axiosHttp caught e', e))
 }
 
 const http = { get, post, axios: axiosHttp };

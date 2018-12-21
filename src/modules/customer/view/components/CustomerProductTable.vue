@@ -30,16 +30,19 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      class="customer-product-table-pagination"
-      background
-      @current-change="jump"
-      :page-size="paginationInfo.pageSize"
-      :current-page="paginationInfo.pageNum"
-      layout="prev, pager, next"
-      :total="paginationInfo.totalItems">
-    </el-pagination>
-
+    <div class="product-table-footer">
+      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <el-pagination
+        v-if="paginationInfo.totalItems"
+        class="customer-product-table-pagination"
+        background
+        @current-change="jump"
+        :page-size="paginationInfo.pageSize"
+        :current-page="paginationInfo.pageNum"
+        layout="prev, pager, next"
+        :total="paginationInfo.totalItems">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
@@ -94,6 +97,7 @@ export default {
             });
           this.paginationInfo.totalItems = res.total;
         })
+        .catch(e => console.error('fetchData product caught e', e));
     },
     buildColumns() {
       return [{
@@ -136,6 +140,22 @@ export default {
     .customer-product-table-pagination {
       text-align: right;
       margin-top: 7px;
+    }
+
+    .product-table-footer {
+      display: flex;
+      justify-content: space-between;
+
+      .total-count {
+        padding: 0 10px;
+        font-size: 12px;
+        margin: 0;
+        line-height: 46px;
+        span {
+          padding: 0 5px;
+          color: $color-primary;
+        }
+      }
     }
   }
 </style>

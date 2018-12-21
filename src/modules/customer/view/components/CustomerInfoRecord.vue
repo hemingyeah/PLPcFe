@@ -9,7 +9,7 @@
         @load="loadmore"/>
     </div>
     
-    <div class="customer-quick-comment" v-if="allowOperate">
+    <div class="customer-quick-comment" v-if="editComment">
       <base-comment ref="comment" placeholder="请输入备注内容" @submit="createRemark" :disabled="commentPending" autofocus/>
     </div>
   </div>
@@ -72,7 +72,15 @@ export default {
     /** 是否允许操作 */
     allowOperate(){
       return this.customer.isDelete === 0;
-    }
+    },
+    /** 编辑权限 */
+    allowEditCustomer() {
+      return this.shareData.allowEditCustomer;
+    },
+    /** 添加备注权限 */
+    editComment(){
+      return this.allowEditCustomer && this.allowOperate;
+    },
   },
   methods: {
     /** 添加备注 */
@@ -196,7 +204,7 @@ export default {
       let user = this.loginUser;
       let isCreator = item.userId == user.userId;
 
-      return !isDelete && (authorities['CUSTOMER_EDIT'].dataValue == 3 || isCreator) && this.allowOperate;
+      return !isDelete && (authorities['CUSTOMER_EDIT'] && authorities['CUSTOMER_EDIT'].dataValue == 3 || isCreator) && this.allowOperate;
     },
     /** 初始化信息动态 */
     async initializeRecord() {

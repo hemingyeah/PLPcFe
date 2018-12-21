@@ -99,6 +99,7 @@ export default {
         this.$eventBus.$emit('customer_address_table.update_address_list');
         this.$eventBus.$emit('customer_info_record.update_record_list');
         this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+        this.$eventBus.$emit('customer_detail_view.update_customer_detail');
         this.addAddressDialog = false;
         if (this.action === 'create') {
           this.$eventBus.$emit('customer_detail_view.select_tab', 'customer-address-table');

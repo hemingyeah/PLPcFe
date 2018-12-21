@@ -388,7 +388,8 @@ export default {
           }
         }
         return page;
-      });
+      })
+        .catch(err => console.error('err', err));
     },
     /** 抓取部门数据 */
     fetchDept(){
@@ -414,6 +415,7 @@ export default {
         
         return depts;
       })
+        .catch(err => console.error('err', err));
     },
     fetchDeptCount(){
       return http.get('/security/department/depUserCount')

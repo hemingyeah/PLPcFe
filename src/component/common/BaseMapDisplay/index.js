@@ -49,6 +49,7 @@ function display(address, options = {}){
       callback && typeof callback == 'function' && callback(data);
       return data;
     })
+    .catch(err => console.error('err', err));
 }
 
 const MapDisplay = {

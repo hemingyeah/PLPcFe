@@ -42,15 +42,20 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      class="customer-contact-table-pagination"
-      background
-      @current-change="jump"
-      :page-size="paginationInfo.pageSize"
-      :current-page="paginationInfo.pageNum"
-      layout="prev, pager, next"
-      :total="paginationInfo.totalItems">
-    </el-pagination>
+    <div class="contact-table-footer">
+      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <el-pagination
+        class="customer-contact-table-pagination"
+        v-if="paginationInfo.totalItems"
+        background
+        @current-change="jump"
+        :page-size="paginationInfo.pageSize"
+        :current-page="paginationInfo.pageNum"
+        layout="prev, pager, next"
+        :total="paginationInfo.totalItems">
+      </el-pagination>
+    </div>
+
     <edit-contact-dialog ref="EditContactDialog" :customer="shareData.customer" :original-value="selectedContact"
                          @submit-success="selectedContact = {}"></edit-contact-dialog>
   </div>
@@ -115,7 +120,8 @@ export default {
           }
           this.pending[lm.id] = false;
           this.$eventBus.$emit('customer_detail_view.update_customer_detail');
-        });
+        })
+        .catch(err => console.error('err', err));
     },
     async deleteLinkman(lm) {
       if (lm.isMain) return platform.alert('默认联系人不能删除');
@@ -158,6 +164,7 @@ export default {
             });
           this.paginationInfo.totalItems = res.total;
         })
+        .catch(err => console.error('err', err));
     },
     buildColumns() {
       return [{
@@ -235,6 +242,22 @@ export default {
     .customer-contact-table-pagination {
       text-align: right;
       margin-top: 7px;
+    }
+
+    .contact-table-footer {
+      display: flex;
+      justify-content: space-between;
+
+      .total-count {
+        padding: 0 10px;
+        font-size: 12px;
+        margin: 0;
+        line-height: 46px;
+        span {
+          padding: 0 5px;
+          color: $color-primary;
+        }
+      }
     }
   }
 </style>

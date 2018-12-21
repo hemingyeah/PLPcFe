@@ -118,7 +118,8 @@ export function batchUploadWithParse(files, action = '/files/upload'){
     let error = [];
     result.forEach(item => item instanceof Error ? error.push(item) : success.push(item))
     return {success, error}
-  });
+  })
+    .catch(error => console.error('batchUploadWithParse caught e', error))
 }
 
 const uploader = {

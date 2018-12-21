@@ -206,7 +206,7 @@ export default {
 
         })
         .catch(err => {
-          this.$platform.alert('批量添加提醒失败');
+          this.$platform.alert('添加提醒失败');
           this.pending = false;
           console.error('post to /scheduler/buildBatch err', err)
         });
@@ -221,6 +221,11 @@ export default {
           id: this.form.remindId,
         },
         users: this.allUsers.filter(rc => this.form.users.includes(rc.id))
+          .map(user => ({
+            id: user.id,
+            name: user.name,
+            phone: user.phone,
+          }))
       };
     },
     openDialog() {
@@ -314,6 +319,7 @@ export default {
             this.remoteSearchCM.options = this.allUsers;
           }
         })
+        .catch(err => console.error('err', err));
     },
   },
 }
@@ -358,6 +364,7 @@ export default {
       .el-form-item__content {
         max-height: 200px;
         overflow-y: auto;
+        word-break: break-all;
       }
     }
 

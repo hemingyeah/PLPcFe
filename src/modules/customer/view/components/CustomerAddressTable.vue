@@ -44,15 +44,19 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      class="customer-address-table-pagination"
-      background
-      @current-change="jump"
-      :page-size="paginationInfo.pageSize"
-      :current-page="paginationInfo.pageNum"
-      layout="prev, pager, next"
-      :total="paginationInfo.totalItems">
-    </el-pagination>
+    <div class="address-table-footer">
+      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <el-pagination
+        class="customer-address-table-pagination"
+        v-if="paginationInfo.totalItems"
+        background
+        @current-change="jump"
+        :page-size="paginationInfo.pageSize"
+        :current-page="paginationInfo.pageNum"
+        layout="prev, pager, next"
+        :total="paginationInfo.totalItems">
+      </el-pagination>
+    </div>
 
     <edit-address-dialog ref="addAddressDialog" :customer-id="customerId"
                          :login-user-id="shareData.loginUser.userId" action="edit" @submit-success="fetchData"
@@ -128,6 +132,9 @@ export default {
         }
         this.$eventBus.$emit('customer_info_record.update_record_list');
         this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+        if (address.isMain) {
+          this.$eventBus.$emit('customer_detail_view.update_customer_detail');
+        }
       } catch (e) {
         console.error('err',);
       }
@@ -144,7 +151,8 @@ export default {
           }
           this.pending[address.id] = false;
           this.$eventBus.$emit('customer_detail_view.update_customer_detail');
-        });
+        })
+        .catch(e => console.error('caught e', e));
     },
     openMap(address) {
       if (!address.longitude && !address.latitude) return;
@@ -185,6 +193,7 @@ export default {
 
           this.paginationInfo.totalItems = res.total;
         })
+        .catch(e => console.error('caught e', e))
     },
     buildColumns() {
       return [{
@@ -254,6 +263,22 @@ export default {
     .customer-address-table-pagination {
       text-align: right;
       margin-top: 7px;
+    }
+
+    .address-table-footer {
+      display: flex;
+      justify-content: space-between;
+
+      .total-count {
+        padding: 0 10px;
+        font-size: 12px;
+        margin: 0;
+        line-height: 46px;
+        span {
+          padding: 0 5px;
+          color: $color-primary;
+        }
+      }
     }
   }
 </style>

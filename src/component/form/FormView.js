@@ -129,11 +129,6 @@ const FormView = {
           newArr.push(fields.slice(preIndex));
         }
       });
-      newArr[0].unshift({
-        displayName: '基本信息',
-        formType: 'separator',
-        id: 'form-view-base-separator',
-      });
       
       return newArr;
     }
@@ -157,7 +152,10 @@ const FormView = {
       return (
         <div class="view-group">
           {title}
-          <div class="items-of-group">{this.sectionState[currentGroupId] && items}</div>
+          <div class="items-of-group">{
+            (this.sectionState[currentGroupId] === undefined || this.sectionState[currentGroupId]) &&
+            items
+          }</div>
         </div>
       );
     });

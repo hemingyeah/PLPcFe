@@ -36,6 +36,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <p class="total-count">共<span>{{remindList.length}}</span>条记录</p>
   </div>
 </template>
 
@@ -164,6 +165,16 @@ export default {
     .customer-remind-table-pagination {
       text-align: right;
       margin-top: 7px;
+    }
+
+    .total-count {
+      line-height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+      span {
+        padding: 0 5px;
+        color: $color-primary;
+      }
     }
   }
 </style>

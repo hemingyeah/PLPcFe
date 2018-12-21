@@ -340,7 +340,7 @@
     <!-- dialog of operation -->
     <batch-reminding-customer-dialog ref="batchRemindingCustomerDialog" :selected-ids="selectedIds"
                                      @success-callback="remindSuccess"></batch-reminding-customer-dialog>
-    <send-message-dialog ref="messageDialog" :selected-ids="selectedIds"></send-message-dialog>
+    <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
       :fields="customerConfig.fieldInfo"
@@ -531,7 +531,8 @@ export default {
         },
       },
       selectedLimit: 200,
-      auth: {}
+      auth: {},
+      smsRest: 0,
     };
   },
   computed: {
@@ -571,7 +572,7 @@ export default {
 
         return c;
       });
-    }
+    },
   },
   filters: {
     tagName: function (value) {
@@ -602,6 +603,7 @@ export default {
     };
 
     this.auth = initData.auth || {};
+    this.smsRest = initData.smsRest || 0;
 
     const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
     this.defaultAddress = [adProvince, adCity, adDist,];
