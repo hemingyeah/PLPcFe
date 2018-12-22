@@ -209,9 +209,9 @@
         </div>
 
         <div class="action-button-group">
-          <base-button type="plain" @event="openDialog('sendMessage')">发送短信</base-button>
-          <base-button type="plain" @event="openDialog('edit')">批量编辑</base-button>
-          <base-button type="plain" @event="openDialog('remind')">批量提醒</base-button>
+          <base-button type="plain" @event="openDialog('sendMessage')" v-if="editedPermission === 3">发送短信</base-button>
+          <base-button type="plain" @event="openDialog('edit')" v-if="editedPermission === 3">批量编辑</base-button>
+          <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3">批量提醒</base-button>
           <el-dropdown trigger="click" v-if="exportPermission">
             <span class="el-dropdown-link el-dropdown-btn">
               更多操作
@@ -638,6 +638,8 @@ export default {
         this.inputRemoteSearch.customerManager.options = res[0].list;
       })
       .catch(err => console.error('err', err));
+
+    console.log('initData', initData);
   },
   methods: {
     viewCustomer(e) {

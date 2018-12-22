@@ -146,7 +146,17 @@ export default {
         let message = content.type == '设为默认' ? `将${address}设为默认地址` : `${content.type}了地址${address}`;
         let icon = address ? <i class="iconfont icon-address" onClick={e => this.openMap(content.longitude, content.latitude)}></i> : '';
 
-        return <h5><strong>{userName}</strong>{message}{icon}。</h5>
+        return (
+          <h5>
+            <strong>{userName}</strong>
+            {
+              content.type == '设为默认' ?
+                <span>将{icon}{address}设为默认地址</span> :
+                <span>{content.type}了地址{icon}{address}</span>
+            }
+            {message}。
+          </h5>
+        )
       }
 
       if(action == '联系人'){
@@ -268,6 +278,9 @@ export default {
 
   h5 {
     margin-bottom: 5px;
+    .icon-address {
+      margin-left: 5px;
+    }
   }
 
   .private {
