@@ -242,6 +242,8 @@ export default {
         loginUser: this.initData.loginUser,
         allowEditCustomer: this.allowEditCustomer,
         isAddressAllowNull: this.initData.isAddressAllowNull,
+        isDisable: this.isDisable,
+        isDelete: this.isDelete,
       };
     },
     /**

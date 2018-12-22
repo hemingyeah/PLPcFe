@@ -103,6 +103,7 @@ export default {
   .plain-button {
     background: $color-primary-light-9;
     color: $text-color-primary;
+    padding: 5px 15px;
     &:hover {
       background: $color-primary;
     }
@@ -124,7 +125,7 @@ export default {
     color: $text-color-primary;
     border: 1px solid #E2E2E2;
     border-radius: 2px;
-    padding: 6px 15px;
+    /*padding: 6px 15px;*/
     &:hover {
       border-color: $color-primary;
     }

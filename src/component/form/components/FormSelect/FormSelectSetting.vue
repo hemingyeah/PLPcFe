@@ -176,7 +176,8 @@ export default {
       return message.length > 0 ? message.join('\n') : null;
     },
     batchEdit(){
-      let newValues = this.optionText.split('\n');
+      let newValues = this.optionText.split('\n').filter(option => option);
+
       this.errMessage = this.validateOptions(newValues);
       if(this.errMessage) return;
 

@@ -339,7 +339,7 @@ export default {
         let {fieldName, isSystem} = field;
         let value = form[fieldName];
 
-        if(fieldName == 'customerAddress'){
+        if(fieldName === 'customerAddress'){
           let customerAddress = form.customerAddress || {};
           // address
           return customer.customerAddress = {
@@ -354,7 +354,7 @@ export default {
           };
         }
 
-        if(fieldName == 'tags'){
+        if(fieldName === 'tags'){
           let allTags = this.tags || [];
           return customer.tags = value.map(tag => {
             const t = allTags.find(at => at.id === tag);
@@ -365,8 +365,8 @@ export default {
           });
         }
 
-        if(fieldName == 'manager' && value && value.userId){
-          customer.customerManager = value.userId;
+        if(fieldName === 'manager'){
+          customer.customerManager = value.userId || '';
           customer.customerManagerName = value.displayName || ''
           return;
         }
@@ -374,7 +374,7 @@ export default {
         isSystem == 0
           ? customer.attribute[fieldName] = value
           : customer[fieldName] = value;
-      })
+      });
 
       return customer;
     }

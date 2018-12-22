@@ -360,7 +360,7 @@ const FormDesign = {
     },
     /** 删除字段 */
     async deleteField(item){
-      if(!await Platform.confirm('确定要删除该字段？')) return;
+      if(!await Platform.confirm('删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除。')) return;
 
       let value = this.value; 
       let index = value.indexOf(item);

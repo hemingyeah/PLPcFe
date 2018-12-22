@@ -352,6 +352,7 @@
       :selected-ids="selectedIds"
       :total-items="paginationInfo.totalItems"
       :build-download-params="buildParams"
+      @success="search"
       action="/customer/importCover"
     ></batch-update-customer-dialog>
 
@@ -540,7 +541,7 @@ export default {
       return this.auth.CUSTOMER_EDIT;
     },
     deletePermission() {
-      return this.auth.CUSTOMER_EDIT && this.auth.CUSTOMER_DELETE;
+      return this.auth.CUSTOMER_EDIT === 3 && this.auth.CUSTOMER_DELETE;
     },
     exportPermission() {
       return this.auth.EXPORT_IN;
@@ -1395,8 +1396,8 @@ export default {
         .el-input {
           width: 300px;
           input {
-          height: 33px;
-          line-height: 33px;
+          height: 34px;
+          line-height: 34px;
           width: 300px;
           }
         }

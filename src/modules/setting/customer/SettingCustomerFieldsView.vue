@@ -19,6 +19,7 @@
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
 import platform from '@src/platform'
+import {alert} from "../../../platform/notification";
 
 export default {
   name: 'setting-customer-fields-view',
@@ -29,8 +30,8 @@ export default {
     }
   },
   data(){
-    let fields = this.initData.fields || []
-    let sortedFields = fields.sort((a,b) => a.orderId - b.orderId)
+    let fields = this.initData.fields || [];
+    let sortedFields = fields.sort((a,b) => a.orderId - b.orderId);
     return {
       fields: FormUtil.toFormField(sortedFields),
       pending: false
@@ -42,14 +43,18 @@ export default {
     },
     async submit(){
       //TODO: 字段验证
-      this.pending = true;
 
       try {
         let fields = FormUtil.toField(this.fields);
         fields.forEach(item => {
-          item.tableName = 'customer'
+          item.tableName = 'customer';
           item.isDelete = 0; //TODO: 待删除
-        })
+        });
+
+        if (fields.some(f => !f.displayName)) {
+          return platform.alert('请检查客户字段设置，有字段标题标题缺失请补全。');
+        }
+        this.pending = true;
 
         let result = await http.post('/setting/customer/saveFields', fields);
         if(result.status == 0){

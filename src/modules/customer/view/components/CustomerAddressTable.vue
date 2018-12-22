@@ -96,7 +96,7 @@ export default {
       return this.shareData.customer ? this.shareData.customer.id : '';
     },
     allowEditCustomer() {
-      return this.shareData.allowEditCustomer;
+      return !this.shareData.isDelete && !this.shareData.isDisable && this.shareData.allowEditCustomer;
     },
     isAddressAllowNull() {
       return this.shareData.isAddressAllowNull;
@@ -112,6 +112,7 @@ export default {
   },
   methods: {
     openDialog(address) {
+      if (!this.allowEditCustomer) return;
       this.selectedAddress = address;
       this.$nextTick(() => {
         this.$refs.addAddressDialog.openDialog();

@@ -92,7 +92,7 @@ export default {
       return this.shareData.customer ? this.shareData.customer.id : '';
     },
     allowEditCustomer() {
-      return this.shareData.allowEditCustomer;
+      return !this.shareData.isDelete && !this.shareData.isDisable && this.shareData.allowEditCustomer;
     },
   },
   mounted() {
@@ -105,6 +105,7 @@ export default {
   },
   methods: {
     openDialog(contact) {
+      if (!this.allowEditCustomer) return;
       this.selectedContact = contact;
       this.$nextTick(this.$refs.EditContactDialog.openDialog);
     },

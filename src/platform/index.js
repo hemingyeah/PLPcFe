@@ -51,8 +51,8 @@ function openTab(data){
  * @param {*} imgUrl - 图片链接
  */
 function imagePreview({ imageDom, urls, currIndex = 0}) {
-  if(!dingtalk.inDingTalk) return BaseGallery.preview(imageDom, currIndex, urls.length > 1);
-  return dingtalk.biz.previewImage(urls, urls[currIndex])
+  return BaseGallery.preview(imageDom, currIndex, urls.length > 1);
+  // return dingtalk.biz.previewImage(urls, urls[currIndex])
 }
 
 export const platform = {
