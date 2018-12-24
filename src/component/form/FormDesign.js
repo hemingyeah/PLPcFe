@@ -387,6 +387,14 @@ const FormDesign = {
       //选中新添加的字段
       this.chooseField(newField)
       return newField;
+    },
+    /** 立即插入字段 */
+    immediateInsert(field, event){
+      let dragEvent = this.$data.$dragEvent;
+      if(dragEvent) dragEvent.direction = 0;
+
+      let newField = this.insertField(field, this.value, this.value.length)
+      this.insertedField = newField;
     }
   },
   render(h){
@@ -394,7 +402,8 @@ const FormDesign = {
     let fieldList = this.filterFields.map(field => {
       return (
         <div class="form-design-field-wrap" 
-          onMousedown={e => this.beginInsert(field, e)}>
+          onMousedown={e => this.beginInsert(field, e)}
+          onClick={e => this.immediateInsert(field, e)}>
           <div class="form-design-field form-design__ghost">
             {field.name} <i class={["iconfont", `icon-fd-${field.formType}`]}></i>
           </div>
