@@ -32,6 +32,7 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <base-select></base-select>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-popover

@@ -1223,24 +1223,6 @@ export default {
       }
       return operator;
     },
-    matchSortValue(order) {
-      let value = '';
-      switch (order) {
-      case null:
-        value = '';
-        break;
-      case 'descending':
-        value = false;
-        break;
-      case 'ascending':
-        value = true;
-        break;
-      default:
-        value = '';
-        break;
-      }
-      return value;
-    },
     matchSelected() {
       if (!this.multipleSelection.length) return;
       const selected = this.customers
