@@ -1155,6 +1155,7 @@ export default {
       }
       this.$refs.baseDistPicker.clearValue();
       this.search();
+      sessionStorage.removeItem('customer_list_search_status');
     },
     // input search method
     searchCustomerManager(keyword) {
