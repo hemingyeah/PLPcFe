@@ -16,8 +16,8 @@
         </div>
       </div>
     </div>
-    <el-popover trigger="click" placement="top-end" popper-class="base-tabbar-popover" v-if="showAll">
-      <button type="button" slot="reference" :class="{'base-tabbar-all': true, 'base-tabbar-highlight': nextBtnEnable}">全部 <i class="iconfont icon-triangle-down"></i></button>
+    <el-popover trigger="click" placement="top-end" popper-class="base-tabbar-popover" v-model="isShowPopver" v-if="showAll">
+      <button type="button" slot="reference" :class="{'base-tabbar-all': true, 'base-tabbar-highlight': nextBtnEnable, 'base-tabbar-rotate': isShowPopver}"><i class="iconfont icon-more"></i></button>
       <div class="base-tabbar-panel">
         <div 
           v-for="t in tabs" :key="t.component"
@@ -49,7 +49,8 @@ export default {
       offsetTransition: false,
       nextBtnEnable: false,
       prevBtnEnable: false,
-      showAll: false
+      showAll: false,
+      isShowPopver: false
     }
   },
   methods: {
@@ -226,7 +227,7 @@ export default {
 
 .base-tabbar-all{
   outline: none;
-  width: 70px;
+  width: 50px;
   height: 50px;
   margin: 0;
   background: $color-regular;
@@ -238,6 +239,14 @@ export default {
   &:hover{
     background: #CFEAE9 !important;
     color: #55B7B4;
+  }
+
+  i{
+    display: block;
+  }
+
+  &.base-tabbar-rotate i{
+    transform: rotate(180deg);
   }
 }
 

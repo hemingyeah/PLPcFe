@@ -560,7 +560,7 @@ export default {
       flex: 1;
       padding-top: 5px;
       overflow-y: auto;
-      border-left: 1px solid #f2f2f2;
+      border-right: 1px solid #f2f2f2;
     }
   }
 
