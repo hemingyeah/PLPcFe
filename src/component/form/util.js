@@ -5,7 +5,7 @@ import FormField from './FormField';
 const DefaultPlaceholer = {
   text: '最多50字',
   number: '请输入数字',
-  address: '请填写详细地址',
+  customerAddress: '请填写详细地址',
   relationCustomer: '由客户信息查询',
   relationProduct: '由产品信息查询',
   user: '请选择人员',
@@ -144,7 +144,7 @@ export function initialize(fields = [], origin = {}, callback){
     }
 
     //地址的默认值初始化为对象
-    if(field.formType == 'address') defaultValue = {};
+    if(field.formType == 'customerAddress') defaultValue = {};
     //人员的默认值初始化为对象
     if(field.formType == 'user') defaultValue = {}
 

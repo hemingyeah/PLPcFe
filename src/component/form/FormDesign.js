@@ -164,15 +164,15 @@ const FormDesign = {
   },
   methods: {
     /** 开始插入字段 */
-    beginInsert(field, event){
-      if(this.value.length >= MAX_FIELD_NUM) {
+    beginInsert(field, event) {
+      if (this.value.length >= MAX_FIELD_NUM) {
         return Platform.alert(`单个表单最多支持${MAX_FIELD_NUM}个字段`)
       }
-
+    
       let dragEvent = this.$data.$dragEvent;
       let target = event.target.closest('.form-design-field');
       let dragRect = target.getBoundingClientRect();
-
+    
       dragEvent.target = target;
       dragEvent.offsetY = event.clientY - dragRect.top;
       dragEvent.offsetX = event.clientX - dragRect.left;
@@ -180,92 +180,92 @@ const FormDesign = {
       dragEvent.mode = 'insert';
       dragEvent.insertFieldOption = field;
       dragEvent.initGhost = false;
-
+    
       this.currField = null;
       this.insertedField = null;
       this.originValue = _.cloneDeep(this.value);
-      
+    
       //监听鼠标移动事件
       document.addEventListener('mousemove', this.handleDragging)
       document.addEventListener('mouseup', this.handleDragEnd)
     },
     /** 开始拖拽 */
-    beginSort(field, event){
+    beginSort(field, event) {
       let dragEvent = this.$data.$dragEvent;
       let target = event.target.closest('.form-design-preview');
       let dragRect = target.getBoundingClientRect();
-
+    
       dragEvent.target = target;
       dragEvent.offsetY = event.clientY - dragRect.top;
       dragEvent.offsetX = event.clientX - dragRect.left;
       dragEvent.prevClientY = event.clientY;
       dragEvent.mode = 'sort';
       dragEvent.initGhost = false;
-
+    
       this.currField = field;
-      
+    
       //监听鼠标移动事件
       document.addEventListener('mousemove', this.handleDragging)
       document.addEventListener('mouseup', this.handleDragEnd)
     },
-    
+  
     /** 处理拖拽 */
-    handleDragging(event){
+    handleDragging(event) {
       let dragEvent = this.$data.$dragEvent;
       let ghostEl = dragEvent.ghostEl;
       let containerEl = dragEvent.containerEl;
       let dragEl = dragEvent.target;
-      
+    
       //初始化ghostEL
-      if(!dragEvent.initGhost){
+      if (!dragEvent.initGhost) {
         ghostEl.style.display = 'block';
         ghostEl.querySelector('.form-design__template').innerHTML = getTemplate(dragEl)
         ghostEl.style.width = dragEl.offsetWidth + 'px';
-
-        if(this.currField) this.currField.dragging = true;
+      
+        if (this.currField) this.currField.dragging = true;
         dragEvent.initGhost = true;
         this.silence = true;
       }
-
+    
       //移动ghostEl
       let y = event.clientY - dragEvent.offsetY;
       let x = event.clientX - dragEvent.offsetX
       ghostEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       dragEvent.direction = event.clientY - dragEvent.prevClientY >= 0 ? 1 : -1;
       dragEvent.prevClientY = event.clientY;
-      
+    
       //判断ghostEl是否在容器内
       let containerRect = containerEl.getBoundingClientRect();
       let ghostRect = ghostEl.getBoundingClientRect();
       let inContainer = isInContainer(ghostRect, containerRect);
-
-      if(dragEvent.mode == 'sort'){
-        if(inContainer){
+    
+      if (dragEvent.mode == 'sort') {
+        if (inContainer) {
           let dragIndex = this.value.findIndex(item => item._id == this.currField._id);
           let enterIndex = this.calcIndex(y, dragIndex);
           this.sort(dragIndex, enterIndex);
         }
         return;
       }
-
-      if(dragEvent.mode == 'insert'){
+    
+      if (dragEvent.mode == 'insert') {
         //已经插入但是当前拖拽元素不在容器内，删除该字段
-        if(!inContainer && this.insertField){
+        if (!inContainer && this.insertField) {
           this.insertedField = null;
           this.currField = null;
           this.$emit('input', this.originValue)
           return;
         }
-
-        if(inContainer){
+      
+        if (inContainer) {
           //如果已经插入，对字段进行排序
-          if(this.insertedField){
+          if (this.insertedField) {
             let dragIndex = this.value.findIndex(item => item._id == this.insertedField._id);
             let enterIndex = this.calcIndex(y, dragIndex);
             this.sort(dragIndex, enterIndex);
             return;
           }
-
+        
           //插入字段
           dragEvent.direction = 0;
           let insertIndex = this.calcIndex(y);
@@ -275,127 +275,158 @@ const FormDesign = {
       }
     },
     /** 结束拖拽 */
-    handleDragEnd(){
+    handleDragEnd() {
       //清空鼠标事件
       document.removeEventListener('mousemove', this.handleDragging)
       document.removeEventListener('mouseup', this.handleDragEnd)
-
+    
       let dragEvent = this.$data.$dragEvent;
       dragEvent.ghostEl.style.display = 'none';
-      
-      if(this.currField) this.currField.dragging = false;
+    
+      if (this.currField) this.currField.dragging = false;
       this.silence = false;
     },
     /** 计算当前位置索引 */
-    calcIndex(distance, currIndex = -1){
+    calcIndex(distance, currIndex = -1) {
       let dragEvent = this.$data.$dragEvent;
       let containerEl = dragEvent.containerEl;
       let previewDoms = Array.prototype.slice.call(dragEvent.containerEl.children);
       let containerRect = containerEl.getBoundingClientRect();
-
+    
       let offsetTop = distance - containerRect.top + containerEl.scrollTop;
       let direction = dragEvent.direction;
-
+    
       //如果是向上移动 或 插入时
-      if(direction <= 0){
-        for(let i = 0; i < previewDoms.length; i++){
+      if (direction <= 0) {
+        for (let i = 0; i < previewDoms.length; i++) {
           let dom = previewDoms[i];
-          if(dom.offsetTop + dom.offsetHeight / 2 > offsetTop){
+          if (dom.offsetTop + dom.offsetHeight / 2 > offsetTop) {
             //如果前一位置是当前位置，直接返回前一位置
             return i - 1 == currIndex ? currIndex : i;
           }
         }
       }
-
+    
       //如果是向下移动
-      if(direction > 0){
+      if (direction > 0) {
         let index = -1;
         let ghostEl = dragEvent.ghostEl;
         offsetTop += ghostEl.offsetHeight;
-
-        for(let i = 0; i < previewDoms.length; i++){
+      
+        for (let i = 0; i < previewDoms.length; i++) {
           let dom = previewDoms[i];
-          if(dom.offsetTop + dom.offsetHeight / 2 < offsetTop){
+          if (dom.offsetTop + dom.offsetHeight / 2 < offsetTop) {
             index = i;
           }
         }
         //如果后一位置是当前位置，直接返回后一位置
         return index + 1 == currIndex ? currIndex : index;
       }
-      
+    
       return -1;
     },
     /** 字段排序 */
-    sort(dragIndex, enterIndex){
-      if(dragIndex < 0 || enterIndex < 0 || dragIndex == enterIndex) return;
-      
+    sort(dragIndex, enterIndex) {
+      if (dragIndex < 0 || enterIndex < 0 || dragIndex == enterIndex) return;
+    
       let arr = _.cloneDeep(this.value);
-
+    
       let distance = dragIndex < enterIndex ? 1 : 0
       let dragField = arr[dragIndex]; //拖拽的字段
       let enterField = arr[enterIndex]; //目标字段
-
+    
       arr.splice(dragIndex, 1);
-      let insertIndex = arr.indexOf(enterField) ;
+      let insertIndex = arr.indexOf(enterField);
       arr.splice(insertIndex + distance, 0, dragField);
-
+    
       this.$emit('input', arr);
       this.chooseField(dragField)
     },
     /** 选中字段 */
-    chooseField(field){
+    chooseField(field) {
       this.currField = field;
-
+    
       this.$nextTick(() => {
         let dragEvent = this.$data.$dragEvent;
         let containerEl = dragEvent.containerEl;
         let draggingEl = this.$el.querySelector('.form-design-selected');
         let visible = isVisibility.call(this, draggingEl, containerEl);
-
-        if(!visible) {
+      
+        if (!visible) {
           let scrollTop = draggingEl.offsetTop + draggingEl.offsetHeight - containerEl.offsetHeight;
           containerEl.scrollTop = scrollTop;
         }
       })
     },
     /** 删除字段 */
-    async deleteField(item){
-      if(!await Platform.confirm('删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除。')) return;
-
-      let value = this.value; 
+    async deleteField(item) {
+      if (!await Platform.confirm('删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除。')) return;
+    
+      let value = this.value;
       let index = value.indexOf(item);
-
-      if(index >= 0){
+    
+      if (index >= 0) {
         //如果是选中的字段，清除选中
-        if(this.currField == item) this.currField = null;
-
+        if (this.currField == item) this.currField = null;
+      
         value.splice(index, 1);
         this.$emit('input', value)
       }
     },
-    /** 添加新字段 */ 
-    insertField(option = {}, value, index){
+    /** 添加新字段 */
+    insertField(option = {}, value, index) {
       let newField = new FormField({
         formType: option.formType,
         displayName: '标题'
       });
-      
+    
       let arr = _.cloneDeep(value ? value : this.value);
       index == null ? arr.push(newField) : arr.splice(index, 0, newField);
-      this.$emit('input', arr); 
-
+      this.$emit('input', arr);
+    
       //选中新添加的字段
-      this.chooseField(newField)
+      this.chooseField(newField);
       return newField;
     },
     /** 立即插入字段 */
-    immediateInsert(field, event){
+    immediateInsert(field, event) {
       let dragEvent = this.$data.$dragEvent;
-      if(dragEvent) dragEvent.direction = 0;
-
+      if (dragEvent) dragEvent.direction = 0;
+    
       let newField = this.insertField(field, this.value, this.value.length)
       this.insertedField = newField;
-    }
+    },
+    scrollWrap(e) {
+      _.debounce(() => {
+        let containerEl = this.$data.$dragEvent.containerEl;
+        e = e || window.event;
+        const distance = e.detail || e.wheelDelta;
+        const position = this.judgePosition(containerEl);
+      
+        if (distance > 0 && position !== 'bottom') {
+          // console.log("鼠标向下滚动");
+          containerEl.scrollTop += 10;
+        }
+      
+        if (distance < 0 && position !== 'top') {
+          // console.warn("鼠标向上滚动");
+          containerEl.scrollTop -= 10;
+        }
+      }, 100)();
+    },
+    judgePosition(dom) {
+      var clients = dom.innerHeight || dom.clientHeight || dom.clientHeight;
+      var scrollTop = dom.scrollTop;
+      var wholeHeight = dom.scrollHeight;
+    
+      if (clients + scrollTop >= wholeHeight) {
+        return 'bottom';
+      }
+      if (scrollTop === 0) {
+        return 'top';
+      }
+      return false;
+    },
   },
   render(h){
     //可用字段列表
@@ -442,7 +473,7 @@ const FormDesign = {
           </div>
         </div>
         {fieldSetting ? <div class="form-design-setting" key="form-design-setting">{fieldSetting}</div> : null}
-        <div class="form-design-ghost" key="form-design-ghost">
+        <div class="form-design-ghost" key="form-design-ghost" onMousewheel={e => this.scrollWrap(e)}>
           <div class="form-design__template"></div>
           <div class="form-design-cover"></div>
         </div>

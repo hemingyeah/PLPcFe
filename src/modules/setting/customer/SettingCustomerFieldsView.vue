@@ -51,9 +51,12 @@ export default {
           item.isDelete = 0; //TODO: 待删除
         });
 
-        if (fields.some(f => !f.displayName)) {
-          return platform.alert('请检查客户字段设置，有字段标题标题缺失请补全。');
+        const validateRes = this.validate(fields);
+        if (validateRes && validateRes.length) {
+          return platform.alert(validateRes.join('\n'));
         }
+
+
         this.pending = true;
 
         let result = await http.post('/setting/customer/saveFields', fields);
@@ -65,6 +68,28 @@ export default {
         console.error(error)
       }
       this.pending = false;
+    },
+    validate(fields) {
+      const msg = [];
+
+      if (fields.some(f => !f.displayName)) {
+        msg.push('请检查客户字段设置，有字段标题标题缺失请补全。');
+        return msg;
+      }
+
+      let tv1, tv2;
+      fields.forEach(f => {
+        tv1 = f.displayName.match(/[\u4E00-\u9FA5]/g);
+        tv2 = f.displayName.match(/[A-Za-z]/g);
+        if (tv1 && tv1.length > 6) {
+          msg.push(`字段名称 ${f.displayName} 长度超过6个汉字`);
+        }
+        if (tv2 && tv2.length > 20) {
+          msg.push(`字段名称 ${f.displayName} 长度超过20个字母`);
+        }
+      });
+
+      return msg;
     }
   }
 }

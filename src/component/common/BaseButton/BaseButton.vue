@@ -70,7 +70,7 @@ export default {
   $text-color-primary-disabled: rgba($text-color-primary, .2) !default;
   // 主要按钮
   .base-button {
-    padding: 4px 15px;
+    padding: 5px 15px;
     background: $color-primary;
     color: #fff;
     font-size: 14px;
@@ -125,7 +125,7 @@ export default {
     color: $text-color-primary;
     border: 1px solid #E2E2E2;
     border-radius: 2px;
-    /*padding: 6px 15px;*/
+    padding: 4px 15px;
     &:hover {
       border-color: $color-primary;
     }

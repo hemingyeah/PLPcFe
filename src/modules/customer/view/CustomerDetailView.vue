@@ -64,13 +64,22 @@
         <form-view :fields="fields" :value="customer">
           <div slot="name"></div>
 
-          <template slot="address" slot-scope="{value}">
+          <template slot="customerAddress" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>地址：</label>
               <div class="form-view-row-content">
                 <span>{{value | fmt_address}}</span>
                 <i v-if="value.adLatitude && value.adLongitude" @click="openMap"
                    class="iconfont icon-address customer-address-icon"></i>
+              </div>
+            </div>
+          </template>
+
+          <template slot="tags" slot-scope="{value}">
+            <div class="form-view-row" v-if="value.length">
+              <label>服务团队：</label>
+              <div class="form-view-row-content">
+                <span>{{value | fmt_tag}}</span>
               </div>
             </div>
           </template>
@@ -281,6 +290,12 @@ export default {
       let planTaskEnabled = this.initData.planTaskEnabled;
       return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
     },
+  },
+  filters: {
+    fmt_tag(value) {
+      if (!Array.isArray(value) || !value || !value.length) return '';
+      return value.map(t => t.tagName).join(' ');
+    }
   },
   methods: {
     //更新客户名称的样式
@@ -519,8 +534,11 @@ export default {
     padding: 10px;
     border-bottom: 1px solid #f2f2f2;
 
-    .btn-text .iconfont{
-      font-size: 14px;
+    .btn-text {
+      padding: 5px 12px;
+      .iconfont{
+        font-size: 14px;
+      }
     }
   }
 
@@ -624,7 +642,7 @@ export default {
   .action-btn {
     .el-dropdown-btn {
       padding: 0 15px;
-      line-height: 32px;
+      line-height: 34px;
       display: inline-block;
       background: $color-primary-light-9;
       color: $text-color-primary;

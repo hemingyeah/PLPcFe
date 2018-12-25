@@ -125,6 +125,7 @@ export default {
       return this.initData.tags || [];
     },
     selectTagOptions() {
+      if (!this.initData.tags) return [];
       return this.initData.tags
         .map(tag => ({
           text: tag.tagName,
@@ -139,7 +140,8 @@ export default {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
           }
           return f;
-        });
+        })
+        .filter(f => f.fieldName !== 'tags' || (f.fieldName === 'tags' && this.initData.isDivideByTag));
       return FormUtil.migration(sortedFields)
     }
   },
@@ -307,7 +309,7 @@ export default {
     },
     //将后端传来的客户对象转换成form
     customerToForm(fields, data){
-      let cusAdr = data.customerAddress || {};
+      let cusAdr = data.customerAddress || this.initData.customerAddress || {};
 
       return {
         id: data.id,
@@ -320,9 +322,9 @@ export default {
           city: cusAdr.adCity,
           dist: cusAdr.adDist,
           address: cusAdr.adAddress,
-          longitude: data.adLongitude || '',
-          latitude: data.adLatitude || '',
-          addressType: data.addressType || 0
+          longitude: cusAdr.adLongitude || '',
+          latitude: cusAdr.adLatitude || '',
+          addressType: cusAdr.addressType || 0
         },
         tags: toArray(data.tags).map(item => item.id),
         manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
@@ -381,20 +383,14 @@ export default {
   },
   async mounted() {
     try {
-      // //初始化默认区域
-      if (this.initData.customerAddress) {
-        this.setDefaultAddress(this.initData.customerAddress);
-      }
-
       //初始化默认值
       let form = {};
-
       if (this.initData.action === 'edit' && this.initData.id) {
         //处理编辑时数据
         this.loadingPage = true;
         let cusRes = await CustomerApi.getForEdit(this.initData.id);
         this.loadingPage = false;
-        if(cusRes.status == 0) form = cusRes.data;
+        if(cusRes.status === 0) form = cusRes.data;
       }
 
       if (this.initData.action === 'createFromEvent') {
@@ -404,6 +400,7 @@ export default {
       this.form = FormUtil.initialize(this.fields, form, this.customerToForm);
       this.addressBackup = this.form.customerAddress;
       this.init = true;
+
     } catch (e) {
       console.error('CustomerEditView caught an error ', e);
     }
@@ -436,7 +433,7 @@ body {
       display: flex;
       justify-content: space-between;
       span.text {
-        line-height: 33px;
+        line-height: 34px;
         margin-right: 12px;
       }
     }

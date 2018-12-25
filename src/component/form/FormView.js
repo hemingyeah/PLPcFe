@@ -107,7 +107,7 @@ const FormView = {
         };
       }
       
-      if (formType === 'address') {
+      if (formType === 'customerAddress') {
         params = {
           ...params,
           value: fmt_address(value)
