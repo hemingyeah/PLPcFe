@@ -393,7 +393,7 @@ const FormDesign = {
       let dragEvent = this.$data.$dragEvent;
       if (dragEvent) dragEvent.direction = 0;
     
-      let newField = this.insertField(field, this.value, this.value.length)
+      let newField = this.insertField(field, this.value, this.value.length);
       this.insertedField = newField;
     },
     scrollWrap(e) {

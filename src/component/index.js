@@ -14,7 +14,7 @@ import BaseTimeline from './common/BaseTimeline';
 import BaseComment from './common/BaseComment';
 import BaseSpin from './common/BaseSpin';
 import BaseButton from './common/BaseButton';
-import BaseSelect from './common/BaseSelect/BaseSelect';
+import BaseSelect from './common/BaseSelect';
 
 import Form from './form';
 import Fast from './fast'

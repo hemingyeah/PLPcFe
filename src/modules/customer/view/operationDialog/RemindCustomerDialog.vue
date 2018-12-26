@@ -13,26 +13,14 @@
       <el-form-item label="提醒规则">
         {{remindRule}}
       </el-form-item>
-      <el-form-item label="通知人" prop="users" :error="error">
-        <el-select
+      <el-form-item label="通知人">
+        <base-select
           v-model="form.users"
-          @change="validateUser"
-          filterable
-          remote
-          multiple
-          reserve-keyword
-          placeholder="请输入关键词"
-          :loading="remoteSearchCM.loading"
-          :remote-method="searchCustomerManager">
-          <el-option
-            v-for="item in remoteSearchCM.options"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
+          :remote-method="searchManager"
+          @update="validateUser"
+          :error="error"
+        ></base-select>
       </el-form-item>
-      <base-select></base-select>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-popover
@@ -70,8 +58,7 @@ export default {
       },
       remindCustomerDialog: false,
       pending: false,
-      error: '',
-      submitted: false,
+      error: false,
       init: false,
     }
   },
@@ -115,19 +102,6 @@ export default {
         }
       }
     },
-    allUsers() {
-      if (this.selectedRemind.isDdResponse) {
-        // 内部提醒
-        let oldArr = sessionStorage.getItem('customer_view_remind_manager_storage') || '{}';
-        oldArr = JSON.parse(oldArr).manager || [];
-
-        const users = this.action === 'create' ? this.selectedRemind.users : this.editedRemind.users;
-        let newArr = this.concatArrayAndItemUnique(users, this.resultOfSearch);
-
-        return this.concatArrayAndItemUnique(oldArr, newArr);
-      }
-      return [...this.linkmanListOfCustomer];
-    },
   },
   mounted() {
     this.fetchData();
@@ -142,12 +116,11 @@ export default {
       this.$emit('success-callback');
     },
     validateUser() {
-      if (!this.submitted) return;
       if (!this.form.users || !this.form.users.length) {
         // 内部提醒
-        return this.error = '      ';
+        return this.error = true;
       }
-      this.error = '';
+      return this.error = false;
     },
     updateFormUser() {
       let users = [];
@@ -162,15 +135,12 @@ export default {
           users = this.linkmanListOfCustomer;
         }
       }
-
-      this.form.users = users.map(c => c.id);
-      this.remoteSearchCM.options = this.allUsers;
+      this.form.users = users;
     },
     async onSubmit() {
-      this.submitted = true;
-      this.validateUser();
+      // console.log('start submit');
 
-      if (!!this.error) return;
+      if (this.validateUser()) return;
 
       const params = this.buildParams();
       this.pending = true;
@@ -221,12 +191,7 @@ export default {
         remind: {
           id: this.form.remindId,
         },
-        users: this.allUsers.filter(rc => this.form.users.includes(rc.id))
-          .map(user => ({
-            id: user.id,
-            name: user.name,
-            phone: user.phone,
-          }))
+        users: this.form.users || []
       };
     },
     openDialog() {
@@ -238,7 +203,6 @@ export default {
         this.form.remindId = (this.remindTemplate[0] || {}).id;
       }
 
-      this.searchCustomerManager();
       this.fetchLinkman();
       this.init = true;
     },
@@ -254,49 +218,19 @@ export default {
         })
         .catch(err => console.error('err', err));
     },
-    searchCustomerManager(keyword) {
-      if (!this.selectedRemind.isDdResponse) {
-        return this.remoteSearchCM.options = this.allUsers;
-      }
-      this.remoteSearchCM.loading = true;
-      this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+    searchManager(params) {
+      return this.$http.get('/customer/userTag/list', params || {})
         .then(res => {
-          this.resultOfSearch = res.list
-            .map(c => Object.freeze({
-              id: c.staffId,
-              name: c.displayName,
-            })) || [];
-          const oldList = this.allUsers.filter(rc => this.form.users.includes(rc.id));
-          this.remoteSearchCM.options = this.concatArrayAndItemUnique(oldList, this.resultOfSearch);
-          this.remoteSearchCM.loading = false;
-          this.saveManager(this.resultOfSearch);
+          if (res.list) {
+            res.list = res.list.map(user => Object.freeze({
+              name: user.displayName,
+              id: user.userId,
+              phone: user.cellPhone,
+            }))
+          }
+
+          return res;
         })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
-    saveManager(manager) {
-      let oldArr = sessionStorage.getItem('customer_view_remind_manager_storage') || '{}';
-      oldArr = JSON.parse(oldArr).manager || [];
-
-      manager.forEach(m => {
-        if (oldArr.every(ou => ou.id !== m.id)) {
-          oldArr.push(m);
-        }
-      });
-
-      sessionStorage.setItem('customer_view_remind_manager_storage', JSON.stringify({
-        manager: oldArr,
-      }));
-    },
-    concatArrayAndItemUnique(arr1, arr2) {
-      // 数组中的对象根据id去重
-      let obj = {};
-      if (!arr1 || !arr1.length) return arr2 || [];
-      if (!arr2 || !arr2.length) return arr1 || [];
-
-      return [...arr1, ...arr2].reduce((cur,next) => {
-        obj[next.id] ? "" : obj[next.id] = true && cur.push(next);
-        return cur;
-      },[]);
     },
     fetchLinkman() {
       const params = {
@@ -316,8 +250,7 @@ export default {
           if (this.action === 'create') {
             this.updateFormUser();
           } else {
-            this.form.users = users.map(c => c.id);
-            this.remoteSearchCM.options = this.allUsers;
+            this.form.users = users;
           }
         })
         .catch(err => console.error('err', err));
