@@ -1,5 +1,5 @@
 <template>
-  <base-modal :show.sync="batchUpdateCustomerDialog" width="600px" class="batch-update-customer-dialog">
+  <base-modal :show.sync="batchUpdateCustomerDialog" width="600px" class="batch-update-customer-dialog" @closed="closeModal">
     <div slot="title">
       <el-popover placement="bottom-start" popper-class="batch-update-customer-modal-header" trigger="hover">
         <h3 class="customized-batch-update-customer-modal-header" slot="reference">客户批量更新<i class="iconfont icon-help"></i></h3>
@@ -90,6 +90,10 @@ export default {
 
   },
   methods: {
+    closeModal() {
+      this.file = null;
+      this.fileName = '';
+    },
     choose(){
       this.$refs.file.value = null;
       this.$refs.file.click();
@@ -110,7 +114,7 @@ export default {
         params.data = this.buildDownloadParams();
       }
 
-      window.location.href = `/customer/importCover/export?data=${encodeURI(JSON.stringify(params))}`;
+      window.location.href = `/customer/importCover/exportNew?data=${encodeURI(JSON.stringify(params))}`;
     },
     async upload(){
       try {

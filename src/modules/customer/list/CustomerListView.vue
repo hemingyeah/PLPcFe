@@ -353,17 +353,17 @@
       :total-items="paginationInfo.totalItems"
       :build-download-params="buildParams"
       @success="search"
-      action="/customer/importCover"
+      action="/customer/importCoverNew"
     ></batch-update-customer-dialog>
 
     <base-import
       title="导入客户"
       ref="importCustomerModal"
       @success="search"
-      action="/customer/import">
+      action="/customer/importNew">
       <div slot="tip">
         <div class="base-import-warn">
-          请先下载<a href="/customer/import/template">导入模版 </a>，填写完成后再上传导入。
+          请先下载<a href="/customer/import/templateNew">导入模版 </a>，填写完成后再上传导入。
         </div>
       </div>
     </base-import>
@@ -388,7 +388,7 @@
       :build-params="buildExportParams"
       :validate="checkExportCount"
       method="post"
-      action="/customer/export"/>
+      action="/customer/exportNew"/>
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
       <h4 class="panel-title">
@@ -1047,9 +1047,26 @@ export default {
       data[key] = value;
       localStorage.setItem('customerListData', JSON.stringify(data));
     },
+    backwardCompatibleColumn() {
+      let checkedColumnsOldVersion = localStorage.getItem('customerCheck');
+      if (!checkedColumnsOldVersion) return;
+      let columns = checkedColumnsOldVersion.split(',');
+      localStorage.removeItem('customerCheck');
+      return (columns || []).filter(c => c)
+        .map(c => {
+          if (c === 'address') return 'customerAddress';
+          if (c === 'addressDetail') return 'detailAddress';
+          if (c === 'manager') return 'customerManagerName';
+
+          return c;
+        })
+    },
     buildTableColumn() {
       const localStorageData = this.getLocalStorageData();
       let columnStatus = localStorageData.columnStatus || [];
+      if (!columnStatus.length) {
+        columnStatus = this.backwardCompatibleColumn();
+      }
       let minWidth = 100;
 
       let baseColumns = this.fixedColumns();

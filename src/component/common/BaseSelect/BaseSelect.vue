@@ -12,7 +12,7 @@
             :class="{'selected': value.some(user => user.id ===op.id)}">
           {{op.name}}
         </li>
-        <li>{{message}}</li>
+        <li class="list-message">{{message}}</li>
       </ul>
     </div>
   </div>
@@ -193,6 +193,7 @@ export default {
       display: flex;
       flex-wrap: wrap;
       border: 1px solid #e0e1e2;
+      border-radius: 2px;
 
       input {
         border: none;
@@ -232,6 +233,10 @@ export default {
 
       li.selected {
         color: $color-primary;
+      }
+
+      .list-message {
+        color: $text-color-regular;
       }
     }
   }

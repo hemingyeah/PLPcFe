@@ -77,9 +77,9 @@ export default {
       Uploader.upload(this.file, this.action).then(result => {
         if(result.status == 0){
           let message = '导入成功！';
-          // 导入联系人或者导入客户的时候，返回的total竟然统计了第一行表头
+          // 导入联系人的时候，返回的total竟然统计了第一行表头
           let total = result.data.total;
-          if (this.action === '/customer/import' || this.action === '/contacts/import') {
+          if (this.action === '/contacts/import') {
             total -= 1;
           }
 
