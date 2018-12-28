@@ -3,13 +3,19 @@
     name="modal-fade"
     @after-leave="closed">
     <div v-show="show" class="base-modal-mask" @click.self="maskClose">
-      <div class="base-modal transition__container" :style="{width: width}">
+      <div :class="{
+        'base-modal': true,
+        'transition__container': true,
+        'base-modal-fullscreen': isFullscreen
+      }" :style="{width: width}">
         <div class="base-modal-header">
           <slot name="header">
             <slot name="title">
               <h3 v-if="title">{{title}}</h3>
             </slot>
-
+            <button type="button" v-if="allowFullscreen" @click="isFullscreen = !isFullscreen">
+              <i class="iconfont icon-quanping"></i>
+            </button>
             <button type="button" class="base-modal-header-close" @click="cancel" v-if="closeable">
               <i class="iconfont icon-fe-close"></i>
             </button>
@@ -56,12 +62,23 @@ export default {
     appendToBody: { //是否将弹窗插入body中
       type: Boolean,
       default: false
+    },
+    /** 是否允许全屏 */
+    allowFullscreen: { 
+      type: Boolean,
+      default: false
+    }
+  },
+  data(){
+    return {
+      isFullscreen: false
     }
   },
   watch: {
     show(val) {
       if (val) return this.computeStyle();
       this.restoreBodyStyle();
+      this.isFullscreen = false;
     }
   },
   methods: {
@@ -114,7 +131,6 @@ export default {
     if (this.appendToBody) {
       document.body.appendChild(this.$el);
     }
-
   },
   destroyed() {
     //document.removeEventListener('keydown', this.escClose)
@@ -144,17 +160,28 @@ export default {
   background-color: #fff;
   border-radius: 1px;
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
+
+  &.base-modal-fullscreen{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    width: auto !important;
+  }
 }
 
 .base-modal-header {
   position: relative;
-  padding: 8px 40px 8px 10px;
+  padding: 8px 10px;
   border-bottom: 1px solid #e9ecef;
   background: #f8f8f8;
   font-size: 16px;
   color: $text-color-primary;
   font-weight: normal;
 
+  display: flex;
   align-items: center;
 
   h3 {
@@ -168,28 +195,34 @@ export default {
     @include text-ellipsis()
   }
 
-  &-close {
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 40px;
-    width: 40px;
-    padding: 8px;
+  button{
+    height: 24px;
+    line-height: 24px;
+    width: 24px;
+
+    padding: 0;
     margin: 0;
     outline: none;
     color: #666;
     border: none;
     background-color: transparent;
-
     transition: color ease .15s;
 
     i {
       font-size: 14px;
     }
 
-    &:hover {
+    &:hover{
+      color: $color-primary;
+    }
+
+    &.base-modal-header-close:hover {
       color: #e84040;
     }
+  }
+
+  button + button{
+    margin-left: 5px;
   }
 }
 
