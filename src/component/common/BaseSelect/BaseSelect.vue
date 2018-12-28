@@ -2,7 +2,7 @@
   <div class="base-select-container">
     <div class="content">
       <div class="base-select-main-content" @click.stop="focusInput" :class="{'error': error}">
-        <el-tag size="mini" closable v-for="tag in value" :key="tag.id" @close="removeTag(tag)">
+        <el-tag size="mini" closable v-for="tag in value" :key="tag.id" @close="removeTag(tag)" disable-transitions>
           {{tag.name}}
         </el-tag>
         <input type="text" @focus="initList" :value="keyword" @input="searchByKeyword" ref="input" :style="{width: inputWidth, }">
@@ -93,6 +93,7 @@ export default {
   mounted() {
     document.addEventListener('click', () => {
       this.showList = false;
+      this.keyword = '';
     }, false);
   },
   methods: {
@@ -126,14 +127,21 @@ export default {
     searchByKeyword(e) {
       this.keyword = e.target.value;
       this.pageNum = 1;
+      this.options = [];
+      this.total = 0;
+      this.pending = true;
       this.search()
         .then(res => {
+          this.pending = false;
+          if (!res || !res.list) return;
           this.$refs.list.scrollTop = 0;
           this.options = res.list;
           this.total = res.total;
           // console.log('searchByKeyword')
         })
-        .catch(e => console.error('e', e));
+        .catch(e => {
+          console.log('searchByKeyword catch e', e)
+        });
     },
     search() {
       if (!this.remoteMethod) return;
@@ -150,12 +158,17 @@ export default {
       this.pending = true;
       this.search()
         .then(res => {
+          if (!res || !res.list) return;
           this.options = res.list;
           this.pending = false;
           this.total = res.total;
           // console.log('initList')
         })
-        .catch(e => console.error('e', e));
+        .catch(e => {
+          this.pending = false;
+          console.log('initList catch e', e)
+        });
+
     },
     loadMore(e) {
 
@@ -169,11 +182,15 @@ export default {
       this.pageNum++;
       this.search()
         .then(res => {
+          if (!res || !res.list) return;
           // console.log('loadMore')
           this.options = [...this.options, ...res.list];
           this.total = res.total;
         })
-        .catch(e => console.error('e', e));
+        .catch(e => {
+          this.pending = false;
+          console.log('loadMore catch e', e)
+        });
     }
   },
 }
@@ -221,6 +238,7 @@ export default {
       overflow: auto;
       padding: 0;
       margin: 0;
+      box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
 
       li {
         list-style: none;
@@ -236,7 +254,7 @@ export default {
       }
 
       .list-message {
-        color: $text-color-regular;
+        color: $text-color-secondary;
       }
     }
   }

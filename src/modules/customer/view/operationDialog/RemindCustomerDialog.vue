@@ -219,8 +219,10 @@ export default {
         .catch(err => console.error('err', err));
     },
     searchManager(params) {
-      return this.$http.get('/customer/userTag/list', params || {})
+      const pms = params || {};
+      return this.$http.get('/customer/userTag/list', pms)
         .then(res => {
+          if (!res || !res.list) return;
           if (res.list) {
             res.list = res.list.map(user => Object.freeze({
               name: user.displayName,
@@ -231,6 +233,7 @@ export default {
 
           return res;
         })
+        .catch(e => console.log(e));
     },
     fetchLinkman() {
       const params = {
@@ -261,17 +264,17 @@ export default {
 
 <style lang="scss">
 
-  .el-tag {
-    /*width: 100%;*/
-    overflow: hidden;
-    position: relative;
-    padding-right: 20px;
-    .el-tag__close {
-      position: absolute;
-      right: 3px!important;
-      top: 3px!important;
-    }
-  }
+  /*.el-tag {*/
+    /*!*width: 100%;*!*/
+    /*overflow: hidden;*/
+    /*position: relative;*/
+    /*padding-right: 20px;*/
+    /*.el-tag__close {*/
+      /*position: absolute;*/
+      /*right: 3px!important;*/
+      /*top: 3px!important;*/
+    /*}*/
+  /*}*/
 
   .batch-remind-customer-dialog {
 

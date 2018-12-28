@@ -73,6 +73,7 @@ function axiosHttp(method = 'get', url = '', params = {}, emulateJSON = true, co
 
   if(method == 'get'){
     config.params = params;
+    config.params._t = Math.random() * 100000 >> 0;
   }
 
   if(method == 'post') {
@@ -80,13 +81,16 @@ function axiosHttp(method = 'get', url = '', params = {}, emulateJSON = true, co
     config.data = params;
   }
   
-  let random = '_t=' + (Math.random() * 100000 >> 0);
-  config.url = url + (url.indexOf("?") >= 0 ? '&' : '?') + random;
+  config.url = url;
   config.method = method;
   config.cancelable = config.cancelable !== false; //请求是否可取消
 
   return axiosIns.request(config).then(response => response.data)
-    .catch(e => console.error('axiosHttp caught e', e))
+    .catch(e => {
+      if (e && e.message !== 'Request cancelled.') {
+        console.error('axiosHttp caught e', e);
+      }
+    })
 }
 
 const http = { get, post, axios: axiosHttp };
