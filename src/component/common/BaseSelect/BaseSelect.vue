@@ -1,31 +1,36 @@
 <template>
   <div class="base-select-container">
-    <div class="content">
-      <div class="base-select-main-content" @click.stop="focusInput" :class="{'error': error}">
-        <el-tag size="mini" closable v-for="tag in value" :key="tag.id" @close="removeTag(tag)" disable-transitions>
+    <div class="content" @focusin="initList" @focusout="closeList">
+      <div class="base-select-main-content el-select" @click.stop="focusInput"
+           :class="{'error': error, 'wrapper-is-focus': isFocus, }">
+        <el-tag size="mini" closable v-for="tag in value" :key="tag.id" @close="removeTag(tag)" disable-transitions
+                type="info">
           {{tag.name}}
         </el-tag>
-        <input type="text" @focus="initList" :value="keyword" @input="searchByKeyword" ref="input" :style="{width: inputWidth, }">
+        <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :style="{width: inputWidth, }">
       </div>
-      <ul class="option-list" @scroll="loadMore" ref="list" v-show="showList" tabindex="-1" @blur="showList = false">
-        <li v-for="op in options" :key="op.id" @click.stop="selectTag(op)"
-            :class="{'selected': value.some(user => user.id ===op.id)}">
-          {{op.name}}
-        </li>
-        <li class="list-message">{{message}}</li>
-      </ul>
+      <div class="list-wrapper" v-show="showList">
+        <div class="arrow"></div>
+        <ul class="option-list" @scroll="loadMore" ref="list" tabindex="-1">
+          <li v-for="op in page.list" :key="op.id" @click.stop="selectTag(op)"
+              :class="{'selected': value.some(user => user.id ===op.id)}">
+            {{op.name}}
+          </li>
+          <li class="list-message">{{message}}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 /**
-   * Todo
-   * 1. 列表出现在上部还是下部。
-   * 2. 点击空白隐藏列表。✅
-   * 3. 配置 key value 的name，还是整理好列表传进来
-   * 4.
-   */
+ * Todo
+ * 1. 列表出现在上部还是下部。
+ * 2. 点击空白隐藏列表。✅
+ * 3. 配置 key value 的name，还是整理好列表传进来
+ * 4. 关闭弹窗没有重置联系人 ✅
+ */
 export default {
   name: "base-select",
   props: {
@@ -38,21 +43,39 @@ export default {
       type: Boolean,
       default: false,
     },
-    keyName: '',
-    valueName: '',
+    options: {
+      type: Array,
+      default: () => ([]),
+    }
   },
   data() {
     return {
-      options: [],
-      keyword: '',
-      pageNum: 1,
-      pageSize: 10,
       showList: false,
       pending: false,
-      total: null,
+      isFocus: false,
+      keyword: '',
+
+      page: {
+        list: [],
+        total: 0,
+        pageSize: 10,
+        pageNum: 1,
+      }
     }
   },
+  // watch: {
+  //   value: {
+  //     deep: true,
+  //     handler(newVal) {
+  //       console.log('newVal', newVal);
+  //     }
+  //   }
+  // },
   computed: {
+    alreadyLoadedAll() {
+      const {list, total} = this.page;
+      return list.length === total;
+    },
     message() {
       if (this.pending) {
         return '载入更多结果......';
@@ -60,7 +83,7 @@ export default {
       if (this.total === 0) {
         return '未找到结果';
       }
-      if (this.total === this.options.length) {
+      if (this.alreadyLoadedAll) {
         return '已加载全部结果';
       }
       return '载入更多结果......';
@@ -72,7 +95,7 @@ export default {
       let width = 4;
       arr.forEach(character => {
 
-        if(/[\u4E00-\u9FA5]/g.test(character)) {
+        if (/[\u4E00-\u9FA5]/g.test(character)) {
           width += 17;
         }
         if (/[A-Za-z0-9]/g.test(character)) {
@@ -82,29 +105,21 @@ export default {
       return `${width}px`;
     }
   },
-  // watch: {
-  //   value: {
-  //     deep: true,
-  //     handler(val) {
-  //       console.log('val111111111111s', val);
-  //     }
-  //   }
-  // },
   mounted() {
-    document.addEventListener('click', () => {
-      this.showList = false;
-      this.keyword = '';
-    }, false);
   },
   methods: {
     focusInput() {
-      // console.log('focusInput');
       this.$refs.input.focus();
+      this.isFocus = true;
+    },
+    closeList() {
+      this.showList = false;
+      this.isFocus = false;
+      this.keyword = '';
     },
     removeTag(tag) {
       const newVal = this.value.filter(t => t.id !== tag.id);
       this.$emit('input', newVal);
-      this.$emit('update', newVal);
     },
     selectTag(tag) {
       let newValue = this.value;
@@ -115,63 +130,47 @@ export default {
       }
 
       this.$emit('input', newValue);
-      this.$emit('update', newValue);
       this.showList = false;
-      if (this.keyword) {
-        this.pageNum = 1;
-        this.keyword = '';
-        this.options = [];
-        this.total = null;
-      }
+      if (this.keyword) this.resetStatus();
+    },
+    search() {
+      if (!this.remoteMethod) return;
+      const {pageNum, pageSize,} = this.page;
+      return this.remoteMethod({
+        keyword: this.keyword,
+        pageNum,
+        pageSize,
+      })
     },
     searchByKeyword(e) {
-      this.keyword = e.target.value;
-      this.pageNum = 1;
-      this.options = [];
-      this.total = 0;
+      this.resetStatus(e.target.value);
       this.pending = true;
       this.search()
         .then(res => {
           this.pending = false;
           if (!res || !res.list) return;
           this.$refs.list.scrollTop = 0;
-          this.options = res.list;
-          this.total = res.total;
-          // console.log('searchByKeyword')
+          this.updatePageData(res);
         })
         .catch(e => {
           console.log('searchByKeyword catch e', e)
         });
     },
-    search() {
-      if (!this.remoteMethod) return;
-      return this.remoteMethod({
-        keyword: this.keyword,
-        pageNum: this.pageNum,
-        pageSize: this.pageSize,
-      })
-    },
     initList() {
       this.showList = true;
-      // this.$refs.list.focus();
-      if (this.options.length) return;
+      if (this.page.list.length) return;
       this.pending = true;
       this.search()
         .then(res => {
-          if (!res || !res.list) return;
-          this.options = res.list;
           this.pending = false;
-          this.total = res.total;
-          // console.log('initList')
+          if (!res || !res.list) return;
+          this.updatePageData(res);
         })
         .catch(e => {
-          this.pending = false;
           console.log('initList catch e', e)
         });
-
     },
     loadMore(e) {
-
       const dom = e.target;
       const clientHeight = dom.clientHeight;
       const scrollTop = dom.scrollTop;
@@ -179,19 +178,38 @@ export default {
 
       if (this.pending) return;
       if (scrollTop + clientHeight < scrollHeight) return;
-      this.pageNum++;
+      if (this.alreadyLoadedAll) return;
+      this.page.pageNum++;
+      this.pending = true;
       this.search()
         .then(res => {
+          this.pending = false;
           if (!res || !res.list) return;
-          // console.log('loadMore')
-          this.options = [...this.options, ...res.list];
-          this.total = res.total;
+          res.list = [...this.page.list, ...res.list];
+          this.updatePageData(res);
         })
         .catch(e => {
-          this.pending = false;
           console.log('loadMore catch e', e)
         });
-    }
+    },
+    updatePageData(source) {
+      const {list, pageSize, pageNum, total,} = source;
+      this.page = {
+        list,
+        total,
+        pageSize,
+        pageNum,
+      }
+    },
+    resetStatus(keyword) {
+      this.keyword = keyword || '';
+      this.page = {
+        list: [],
+        total: 0,
+        pageSize: 10,
+        pageNum: 1,
+      }
+    },
   },
 }
 </script>
@@ -202,11 +220,8 @@ export default {
   .base-select-container {
     position: relative;
 
-    .error.base-select-main-content {
-      border-color: red;
-    }
-
     .base-select-main-content {
+
       display: flex;
       flex-wrap: wrap;
       border: 1px solid #e0e1e2;
@@ -219,8 +234,6 @@ export default {
         line-height: 30px;
         flex-shrink: 1;
         flex-grow: 1;
-        /*max-width: 100%;*/
-        /*min-width: 10px;*/
       }
 
       .el-tag {
@@ -228,11 +241,33 @@ export default {
       }
     }
 
-    .option-list {
+    .wrapper-is-focus {
+      border-color: $color-primary;
+    }
+
+    .error.base-select-main-content {
+      border-color: red;
+    }
+
+    .list-wrapper {
       position: absolute;
       left: 0;
-      top: 100%;
+      top: calc(100% + 13px);
       width: 100%;
+
+      .arrow {
+        position: absolute;
+        width: 0;
+        height: 0;
+        top: -7px;
+        left: 37px;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 7px solid white;
+      }
+    }
+
+    .option-list {
       background: #fff;
       max-height: 200px;
       overflow: auto;
@@ -240,11 +275,20 @@ export default {
       margin: 0;
       box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
 
+      &::-webkit-scrollbar-track {
+        background-color: white;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(144, 147, 153, 0.3);
+      }
+
       li {
         list-style: none;
-        padding: 0 5px;
+        padding: 0 20px;
+        line-height: 34px;
         &:hover {
-          /*cursor: pointer;*/
           background: $color-primary-light-9;
         }
       }
@@ -258,5 +302,4 @@ export default {
       }
     }
   }
-
 </style>

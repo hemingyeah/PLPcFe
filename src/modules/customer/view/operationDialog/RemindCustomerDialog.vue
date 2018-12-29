@@ -17,7 +17,7 @@
         <base-select
           v-model="form.users"
           :remote-method="searchManager"
-          @update="validateUser"
+          @input="validateUser"
           :error="error"
         ></base-select>
       </el-form-item>
@@ -41,17 +41,14 @@
 </template>
 
 <script>
+import _ from 'lodash';
+
 export default {
   name: "remind-customer-dialog",
   data: () => {
     return {
       linkmanListOfCustomer: [],
       remindTemplate: [],
-      resultOfSearch: [],
-      remoteSearchCM: {
-        loading: false,
-        options: [],
-      },
       form: {
         remindId: null,
         users: [],
@@ -135,11 +132,9 @@ export default {
           users = this.linkmanListOfCustomer;
         }
       }
-      this.form.users = users;
+      this.form.users = _.cloneDeep(users);
     },
     async onSubmit() {
-      // console.log('start submit');
-
       if (this.validateUser()) return;
 
       const params = this.buildParams();
@@ -219,7 +214,9 @@ export default {
         .catch(err => console.error('err', err));
     },
     searchManager(params) {
+      // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {};
+
       return this.$http.get('/customer/userTag/list', pms)
         .then(res => {
           if (!res || !res.list) return;
@@ -249,11 +246,10 @@ export default {
               return Object.freeze(contact);
             });
 
-          const users = this.action === 'create' ? this.selectedRemind.users : this.editedRemind.users;
           if (this.action === 'create') {
             this.updateFormUser();
           } else {
-            this.form.users = users;
+            this.form.users = _.cloneDeep(this.editedRemind.users);
           }
         })
         .catch(err => console.error('err', err));
@@ -263,18 +259,6 @@ export default {
 </script>
 
 <style lang="scss">
-
-  /*.el-tag {*/
-    /*!*width: 100%;*!*/
-    /*overflow: hidden;*/
-    /*position: relative;*/
-    /*padding-right: 20px;*/
-    /*.el-tag__close {*/
-      /*position: absolute;*/
-      /*right: 3px!important;*/
-      /*top: 3px!important;*/
-    /*}*/
-  /*}*/
 
   .batch-remind-customer-dialog {
 
@@ -331,6 +315,3 @@ export default {
   }
 
 </style>
-
-
-
