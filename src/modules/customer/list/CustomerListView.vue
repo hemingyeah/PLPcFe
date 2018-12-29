@@ -319,8 +319,8 @@
       <div class="table-footer">
         <div class="list-info">
           共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录，
-          已选中<span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>条
-          <span class="selectedCount" @click="toggleSelection()">清空</span>
+          已选中<span class="customer-selected-count" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>条
+          <span class="customer-selected-count" @click="toggleSelection()">清空</span>
         </div>
         <el-pagination
           class="customer-table-pagination"
@@ -390,12 +390,39 @@
       method="post"
       action="/customer/exportNew"/>
 
-    <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
-      <h4 class="panel-title">
-        已选择({{multipleSelection.length}})
-        <i class="iconfont icon-fe-close" @click="multipleSelectionPanelShow = false"></i>
-      </h4>
-      <dl class="selected-customer-list">
+    <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
+      <h3 slot="title">
+        <span>已选中数据({{multipleSelection.length}})</span>
+        <i 
+          class="iconfont icon-qingkongshanchu customer-selected-clear" 
+          @click="toggleSelection()" 
+          title="清空已选中数据" data-placement="right" v-tooltip></i>
+      </h3>
+
+      <div class="customer-selected-panel">
+        <div class="customer-selected-tip" v-if="multipleSelection.length <= 0">
+          <img src="../../../assets/img/no-data.png">
+          <p>暂无选中的数据，请从列表中选择。</p>
+        </div>
+        <template v-else>
+          <div class="customer-selected-list">
+            <div class="customer-selected-row customer-selected-head">
+              <span class="customer-selected-sn">编号</span>
+              <span class="customer-selected-name">客户</span>
+            </div>
+            <div class="customer-selected-row" v-for="c in multipleSelection" :key="c.id" >
+              <span class="customer-selected-sn">{{c.serialNumber}}</span>
+              <span class="customer-selected-name">{{c.name}}</span>
+              <button type="button" class="customer-selected-delete" @click="cancelSelectCustomer(c)">
+                <i class="iconfont icon-fe-close"></i>
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+
+      <!-- <dl class="selected-customer-list" v-else>
         <dt>
           <span class="sn">编号</span>
           <span class="name-column">客户</span>
@@ -408,8 +435,7 @@
             <i class="iconfont icon-fe-close" @click.self="cancelSelectCustomer(c)"></i>
           </span>
         </dd>
-      </dl>
-      <el-button type="info" class="cancel-select-customer-btn" @click="toggleSelection()">清除</el-button>
+      </dl> -->
     </base-panel>
 
   </div>
@@ -1333,316 +1359,365 @@ export default {
 </script>
 
 <style lang="scss">
-  $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+$color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
-  html, body {
-    height: 100%;
-  }
+html, body {
+  height: 100%;
+}
 
-  .level-padding {
-    padding: 0 5px;
-  }
+.level-padding {
+  padding: 0 5px;
+}
 
-  .advanced-search-linkman {
-    .el-select-dropdown__item {
-      height: 50px;
-      padding: 5px 20px;
-      p {
-        margin: 0;
-        line-height: 20px;
-      }
+.advanced-search-linkman {
+  .el-select-dropdown__item {
+    height: 50px;
+    padding: 5px 20px;
+    p {
+      margin: 0;
+      line-height: 20px;
     }
   }
+}
 
-  .customer-list-container {
-    height: 100%;
-    overflow: auto;
-    padding: 10px;
+.customer-list-container {
+  height: 100%;
+  overflow: auto;
+  padding: 10px;
 
-    .panel-title {
-      font-size: 16px;
-      line-height: 60px;
-      padding: 0 25px;
-      color: rgb(132, 138, 147);
-      border-bottom: 1px solid rgb(242, 248, 247);
-      font-weight: normal;
-      display: flex;
-      justify-content: space-between;
-      .iconfont:hover {
-        cursor: pointer;
-      }
-    }
-  }
-
-  // search
-  .customer-list-search-group-container {
-
-    .advanced-search-function, .base-search {
-      background: #fff;
-      border-radius: 3px;
-    }
-
-    .base-search {
-      font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 10px;
-
-      .customer-list-base-search-group {
-        display: flex;
-        width: 500px;
-        justify-content: space-between;
-
-        .el-input {
-          width: 300px;
-          input {
-          height: 34px;
-          line-height: 34px;
-          width: 300px;
-          }
-        }
-
-        a {
-          line-height: 33px;
-        }
-
-      }
-
-      .advanced-search-visible-btn {
-        font-size: 14px;
-        font-weight: lighter;
-        line-height: 32px;
-        color: $color-primary;
-        border-color: $color-primary;
-        background: #fff;
-        padding: 0 13px;
-        &:hover {
-          cursor: pointer;
-        }
-      }
-    }
-
-    .advanced-search-form-wrap {
-
-      .advanced-search-form {
-        height: calc(100% - 73px);
-        overflow: auto;
-        padding-bottom: 63px;
-
-        .el-form-item {
-          .el-form-item__content,
-          .el-select,
-          .base-dist-picker,
-          .el-cascader,
-          .el-date-editor {
-            width: 290px;
-          }
-        }
-
-        .advanced-search-btn-group {
-          display: flex;
-          justify-content: flex-end;
-          width: 100%;
-          position: absolute;
-          bottom: 0px;
-          background: #fff;
-          padding: 15px 20px;
-
-          .base-button {
-            margin: 0 10px;
-          }
-        }
-      }
-    }
-
-    .advanced-search-function {
-      margin-top: 10px;
-      padding-bottom: 10px;
-
-      h4 {
-        border-bottom: 1px solid #f4f4f4;
-        padding: 10px;
-      }
-
-      .el-row {
-        padding: 5px 0;
-      }
-      .input-label {
-        text-align: right;
-        line-height: 32px;
-        padding-right: 0;
-      }
-
-    }
-
-  }
-
-  // list
-  .customer-list-component {
-    padding-top: 10px;
-    /*min-height: calc(100% - 100px);*/
-
-    .customer-table {
-      padding: 10px;
-
-      &:before {
-        height: 0;
-      }
-
-      .customer-table-header th {
-        background: #F5F5F5;
-        color: $text-color-primary;
-        font-weight: normal;
-      }
-
-      th {
-        color: #606266;
-        font-size: 14px;
-      }
-      td {
-        color: #909399;
-        font-size: 13px;
-      }
-
-      .view-detail-btn {
-        color: $color-primary;
-      }
-
-      .select-column .el-checkbox {
-        position: relative;
-        top: 3px;
-      }
-    }
-
-    .table-footer {
-      display: flex;
-      justify-content: space-between;
-      padding: 0px 10px 10px 10px ;
-      background: #fff;
-      border-radius: 0 0 3px 3px;
-
-      .list-info {
-        font-size: 13px;
-        line-height: 32px;
-        margin: 0;
-        color: #767e89;
-        .iconfont {
-          position: relative;
-          top: 1px;
-        }
-        .selectedCount {
-          color: $color-primary;
-          padding: 0 3px;
-          width: 15px;
-          text-align: center;
-          &:hover {
-            cursor: pointer;
-          }
-        }
-      }
-
-      .el-pagination__jump {
-        margin-left: 0;
-      }
-    }
-  }
-
-  //
-  .selected-customer-panel {
-
-    .selected-customer-list {
-      overflow-y: auto;
-      padding: 0 20px;
-      line-height: 45px;
-      font-size: 14px;
-      height: calc(100% - 130px);
-      dt, dd {
-        display: flex;
-        border-bottom: 1px solid #F0F5F5;
-        font-weight: normal;
-      }
-
-      dd {
-        margin: 0;
-        padding: 0 15px;
-        &:hover {
-          cursor: pointer;
-          .iconfont {
-            visibility: visible;
-          }
-        }
-        .iconfont {
-          color: $color-primary;
-          visibility: hidden;
-        }
-      }
-
-      .name-column {
-        padding: 0 5px;
-        width: 220px;
-        @include text-ellipsis;
-      }
-      .sn {
-        padding: 0 5px;
-        @include text-ellipsis;
-        width: 120px;
-      }
-    }
-
-    .cancel-select-customer-btn {
-      margin-right: 20px;
-      float: right;
-      background: #E5E8F0;
-      border-color: #E5E8F0;
-      color: #646B78;
-    }
-  }
-
-  // operation
-  .customer-columns-dropdown-menu {
-    max-height: 300px;
-    overflow: auto;
-    .el-checkbox {
-      width: 100%;
-    }
-  }
-
-  .operation-bar-container {
-    background: #fff;
-    border-radius: 3px 3px 0 0;
+  .panel-title {
+    font-size: 16px;
+    line-height: 60px;
+    padding: 0 25px;
+    color: rgb(132, 138, 147);
+    border-bottom: 1px solid rgb(242, 248, 247);
+    font-weight: normal;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #f2f2f2;
-
-    .top-btn-group .base-button {
-      margin-right: 5px;
+    .iconfont:hover {
+      cursor: pointer;
     }
+  }
+}
 
-    .action-button-group {
-      .base-button {
-        margin-left: 5px;
+// search
+.customer-list-search-group-container {
+
+  .advanced-search-function, .base-search {
+    background: #fff;
+    border-radius: 3px;
+  }
+
+  .base-search {
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 10px;
+
+    .customer-list-base-search-group {
+      display: flex;
+      width: 500px;
+      justify-content: space-between;
+
+      .el-input {
+        width: 300px;
+        input {
+        height: 34px;
+        line-height: 34px;
+        width: 300px;
+        }
       }
+
+      a {
+        line-height: 33px;
+      }
+
     }
 
-    .el-dropdown-btn {
-      padding: 0 15px;
+    .advanced-search-visible-btn {
+      font-size: 14px;
+      font-weight: lighter;
       line-height: 32px;
-      display: inline-block;
-      background: $color-primary-light-9;
-      color: $text-color-primary;
-      outline: none;
-      margin-left: 5px;
-      .iconfont {
-        margin-left: 5px;
-        font-size: 12px;
-      }
-
+      color: $color-primary;
+      border-color: $color-primary;
+      background: #fff;
+      padding: 0 13px;
       &:hover {
         cursor: pointer;
-        color: #fff;
-        background: $color-primary;
       }
     }
   }
+
+  .advanced-search-form-wrap {
+
+    .advanced-search-form {
+      height: calc(100% - 73px);
+      overflow: auto;
+      padding-bottom: 63px;
+
+      .el-form-item {
+        .el-form-item__content,
+        .el-select,
+        .base-dist-picker,
+        .el-cascader,
+        .el-date-editor {
+          width: 290px;
+        }
+      }
+
+      .advanced-search-btn-group {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        position: absolute;
+        bottom: 0px;
+        background: #fff;
+        padding: 15px 20px;
+
+        .base-button {
+          margin: 0 10px;
+        }
+      }
+    }
+  }
+
+  .advanced-search-function {
+    margin-top: 10px;
+    padding-bottom: 10px;
+
+    h4 {
+      border-bottom: 1px solid #f4f4f4;
+      padding: 10px;
+    }
+
+    .el-row {
+      padding: 5px 0;
+    }
+    .input-label {
+      text-align: right;
+      line-height: 32px;
+      padding-right: 0;
+    }
+
+  }
+
+}
+
+// list
+.customer-list-component {
+  padding-top: 10px;
+  /*min-height: calc(100% - 100px);*/
+
+  .customer-table {
+    padding: 10px;
+
+    &:before {
+      height: 0;
+    }
+
+    .customer-table-header th {
+      background: #F5F5F5;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+
+    th {
+      color: #606266;
+      font-size: 14px;
+    }
+    td {
+      color: #909399;
+      font-size: 13px;
+    }
+
+    .view-detail-btn {
+      color: $color-primary;
+    }
+
+    .select-column .el-checkbox {
+      position: relative;
+      top: 3px;
+    }
+  }
+
+  .table-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 10px 10px 10px ;
+    background: #fff;
+    border-radius: 0 0 3px 3px;
+
+    .list-info {
+      font-size: 13px;
+      line-height: 32px;
+      margin: 0;
+      color: #767e89;
+
+      .iconfont {
+        position: relative;
+        top: 1px;
+      }
+    }
+
+    .el-pagination__jump {
+      margin-left: 0;
+    }
+  }
+}
+
+// -------- customer selected panel --------
+.customer-selected-count{
+  color: $color-primary;
+  padding: 0 3px;
+  width: 15px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.customer-selected-clear{
+  float: right;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 5px;
+
+  &:hover{
+    color: $color-primary;
+  }
+}
+
+.customer-selected-panel{
+  font-size: 14px;
+  height: calc(100% - 51px);
+}
+
+.customer-selected-tip{
+  padding-top: 80px;
+
+  img{
+    display: block;
+    width: 240px;
+    margin: 0 auto;
+  }
+
+  p{
+    text-align: center;
+    color: #9a9a9a;
+    margin: 30px 0 0 0;
+    line-height: 20px;
+  }
+}
+
+.customer-selected-list{
+  height: 100%;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.customer-selected-row{
+  display: flex;
+  flex-flow: row nowrap;
+  line-height: 36px;
+  border-bottom: 1px solid #ebeef5;
+  font-size: 13px;
+
+
+  &:hover{
+    background-color: #f5f7fa;
+
+    .customer-selected-delete{
+      visibility: visible;
+    }
+  }
+}
+
+.customer-selected-head{
+  background-color: #F0F5F5;
+  color: #333;
+  font-size: 14px;
+}
+
+.customer-selected-sn{
+  padding-left: 10px;
+  width: 150px;
+  @include text-ellipsis;
+}
+
+.customer-selected-name{
+  padding-left: 10px;
+  flex: 1;
+  @include text-ellipsis;
+}
+
+.customer-selected-delete{
+  width: 36px;
+}
+
+.customer-selected-row button.customer-selected-delete{
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  color: #646B78;
+  visibility: hidden;
+
+  i{
+    font-size: 14px;
+  }
+
+  &:hover{
+    color: #e84040;
+  }
+}
+
+
+// operation
+.customer-columns-dropdown-menu {
+  max-height: 300px;
+  overflow: auto;
+  .el-checkbox {
+    width: 100%;
+  }
+}
+
+.operation-bar-container {
+  background: #fff;
+  border-radius: 3px 3px 0 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #f2f2f2;
+
+  .top-btn-group .base-button {
+    margin-right: 5px;
+  }
+
+  .action-button-group {
+    .base-button {
+      margin-left: 5px;
+    }
+  }
+
+  .el-dropdown-btn {
+    padding: 0 15px;
+    line-height: 32px;
+    display: inline-block;
+    background: $color-primary-light-9;
+    color: $text-color-primary;
+    outline: none;
+    margin-left: 5px;
+    .iconfont {
+      margin-left: 5px;
+      font-size: 12px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: #fff;
+      background: $color-primary;
+    }
+  }
+}
 </style>
