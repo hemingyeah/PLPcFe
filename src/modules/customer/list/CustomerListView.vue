@@ -14,11 +14,18 @@
         <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
       </form>
       <!--高级搜索-->
-      <base-panel :show.sync="advancedSearchPanelShow" width="420px" class="advanced-search-form-wrap">
-        <h4 class="panel-title">
-          高级搜索
-          <i class="iconfont icon-fe-close" @click="advancedSearchPanelShow = false"></i>
-        </h4>
+      <base-panel :show.sync="advancedSearchPanelShow" width="420px">
+        <h3 slot="title">
+          <span>高级搜索</span>
+          <el-dropdown class="pull-right" trigger="click" @command="setAdvanceSearchColumn">
+            <i class="iconfont icon-xitongguanli customer-panel-btn" style="float: none;"></i>
+
+            <el-dropdown-menu slot="dropdown" class="customer-advance-setting">
+              <el-dropdown-item command="1">一栏</el-dropdown-item>
+              <el-dropdown-item command="2">两栏</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </h3>
         <el-form class="advanced-search-form" onsubmit="return false;">
           <el-form-item label-width="100px" label="客户编号">
             <el-input type="text" v-model="params.serialNumber"></el-input>
@@ -394,7 +401,7 @@
       <h3 slot="title">
         <span>已选中数据({{multipleSelection.length}})</span>
         <i 
-          class="iconfont icon-qingkongshanchu customer-selected-clear" 
+          class="iconfont icon-qingkongshanchu customer-panel-btn" 
           @click="toggleSelection()" 
           title="清空已选中数据" data-placement="right" v-tooltip></i>
       </h3>
@@ -420,22 +427,6 @@
           </div>
         </template>
       </div>
-
-
-      <!-- <dl class="selected-customer-list" v-else>
-        <dt>
-          <span class="sn">编号</span>
-          <span class="name-column">客户</span>
-          <i></i>
-        </dt>
-        <dd v-for="c in multipleSelection" :key="c.id" >
-          <span class="sn">{{c.serialNumber}}</span>
-          <span class="name-column">{{c.name}}</span>
-          <span class="delete-btn">
-            <i class="iconfont icon-fe-close" @click.self="cancelSelectCustomer(c)"></i>
-          </span>
-        </dd>
-      </dl> -->
     </base-panel>
 
   </div>
@@ -665,10 +656,11 @@ export default {
         this.inputRemoteSearch.customerManager.options = res[0].list;
       })
       .catch(err => console.error('err', err));
-
-    console.log('initData', initData);
   },
   methods: {
+    setAdvanceSearchColumn(command){
+      console.log('advance search set ' + command)
+    },
     viewCustomer(e) {
 
       const status = {
@@ -1380,6 +1372,11 @@ html, body {
   }
 }
 
+.customer-advance-setting .el-dropdown-menu__item{
+  width: 80px;
+  text-align: center;
+}
+
 .customer-list-container {
   height: 100%;
   overflow: auto;
@@ -1448,38 +1445,36 @@ html, body {
     }
   }
 
-  .advanced-search-form-wrap {
+  .advanced-search-form {
+    height: calc(100% - 51px);
+    overflow: auto;
+    padding: 10px 0 63px 0;
 
-    .advanced-search-form {
-      height: calc(100% - 73px);
-      overflow: auto;
-      padding-bottom: 63px;
-
-      .el-form-item {
-        .el-form-item__content,
-        .el-select,
-        .base-dist-picker,
-        .el-cascader,
-        .el-date-editor {
-          width: 290px;
-        }
+    .el-form-item {
+      .el-form-item__content,
+      .el-select,
+      .base-dist-picker,
+      .el-cascader,
+      .el-date-editor {
+        width: 290px;
       }
+    }
 
-      .advanced-search-btn-group {
-        display: flex;
-        justify-content: flex-end;
-        width: 100%;
-        position: absolute;
-        bottom: 0px;
-        background: #fff;
-        padding: 15px 20px;
+    .advanced-search-btn-group {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      position: absolute;
+      bottom: 0px;
+      background: #fff;
+      padding: 15px 20px;
 
-        .base-button {
-          margin: 0 10px;
-        }
+      .base-button {
+        margin: 0 10px;
       }
     }
   }
+    
 
   .advanced-search-function {
     margin-top: 10px;
@@ -1565,17 +1560,7 @@ html, body {
   }
 }
 
-// -------- customer selected panel --------
-.customer-selected-count{
-  color: $color-primary;
-  padding: 0 3px;
-  width: 15px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.customer-selected-clear{
+.customer-panel-btn{
   float: right;
   cursor: pointer;
   font-size: 14px;
@@ -1584,6 +1569,16 @@ html, body {
   &:hover{
     color: $color-primary;
   }
+}
+
+// -------- customer selected panel --------
+.customer-selected-count{
+  color: $color-primary;
+  padding: 0 3px;
+  width: 15px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 13px;
 }
 
 .customer-selected-panel{
@@ -1671,7 +1666,6 @@ html, body {
     color: #e84040;
   }
 }
-
 
 // operation
 .customer-columns-dropdown-menu {

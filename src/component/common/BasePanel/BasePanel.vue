@@ -3,7 +3,7 @@
     name="slide-left"
     @after-leave="$emit('closed')">
     <!-- <div v-show="show" class="base-panel-mask" @click.self="close"> -->
-    <aside v-show="show" class="base-panel" :style="{width: width}">
+    <aside v-show="show" class="base-panel" :style="{width: width}" @click.stop>
       <slot name="header">
         <header class="base-panel-title">
           <slot name="title"><h3>{{title}}</h3></slot>
@@ -43,11 +43,11 @@ export default {
     },
     /** 监听文档的点击事件，如果点击组件外的元素，关闭组件 */
     handleClickOutside(e){
-      if(this.show && !this.$el.contains(e.target)) this.close()
+      if(this.show && !this.$el.contains(e.target)) this.close();
     }
   },
   mounted(){
-    document.addEventListener('click', this.handleClickOutside, true)
+    document.addEventListener('click', this.handleClickOutside, false)
   },
   destroyed(){
     document.removeEventListener('click', this.handleClickOutside)
