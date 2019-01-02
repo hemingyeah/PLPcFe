@@ -2,10 +2,11 @@ import '@src/assets/scss/index.scss'
 import '@src/common/polyfill';
 
 import Vue from 'vue';
+
+import directive from '@src/directive';
 import component from '@src/component';
 import platform from '@src/platform';
 import filter from '@src/filter';
-import directive from '@src/directive';
 
 import http from '@src/util/http';
 
