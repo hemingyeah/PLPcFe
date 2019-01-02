@@ -1,23 +1,5 @@
-import '@src/assets/scss/index.scss'
-import '@src/common/polyfill';
-
-import Vue from 'vue';
-
-import directive from '@src/directive';
-import filter from '@src/filter';
-import component from '@src/component';
-
-import appConfig from 'app.config';
-
-import platform from '@src/platform';
+import Vue from '@src/common/entry';
 import DemoView from './DemoView.vue';
-
-Vue.use(directive)
-Vue.use(filter)
-Vue.use(component)
-
-Vue.prototype.$platform = platform;
-Vue.prototype.$appConfig = appConfig;
 
 const app = new Vue({
   render: h => h(DemoView)

@@ -1,22 +1,6 @@
-import '@src/assets/scss/index.scss';
-import '@src/common/polyfill'
-
-import Vue from 'vue';
-
-import directive from '@src/directive';
-import component from '@src/component';
-import filter from '@src/filter';
-
+import Vue from '@src/common/entry';
 import dingtalk from '@src/util/dingtalk';
-import appConfig from 'app.config';
-
 import FrameView from './FrameView.vue';
-
-Vue.use(directive);
-Vue.use(filter);
-Vue.use(component);
-
-Vue.prototype.$appConfig = appConfig;
 
 //处理注入的参数
 let initData = {};

@@ -1,24 +1,7 @@
-import '@src/assets/scss/index.scss';
-import '@src/common/polyfill'
-
-import Vue from 'vue';
-
-import directive from '@src/directive';
-import component from '@src/component';
-import filter from '@src/filter';
+import Vue from '@src/common/entry'
 import http from '@src/util/http';
-import platform from '@src/platform';
-
-import appConfig from 'app.config';
-
 import SettingCustomerFieldsView from './SettingCustomerFieldsView.vue';
 
-Vue.use(directive);
-Vue.use(filter);
-Vue.use(component);
-
-Vue.prototype.$appConfig = appConfig;
-Vue.prototype.$platform = platform;
 Vue.prototype.$http = http;
 
 //处理注入的参数
