@@ -143,7 +143,6 @@ export default {
 
       if(action == '地址'){
         let address = trimAll(content.address);
-        let message = content.type == '设为默认' ? `将${address}设为默认地址` : `${content.type}了地址${address}`;
         let icon = address ? <i class="iconfont icon-address" onClick={e => this.openMap(content.longitude, content.latitude)}></i> : '';
 
         return (
@@ -153,8 +152,7 @@ export default {
               content.type == '设为默认' ?
                 <span>将{icon}{address}设为默认地址</span> :
                 <span>{content.type}了地址{icon}{address}</span>
-            }
-            {message}。
+            }。
           </h5>
         )
       }

@@ -221,8 +221,8 @@ export default {
       if (!this.selectedRemind.isDdResponse) {
         return Promise.resolve({
           list: this.linkmanListOfCustomer,
-          pageSize: 1,
-          pageNum: 10000,
+          pageSize: 10000,
+          pageNum: 1,
           total: this.linkmanListOfCustomer.length,
         });
       }

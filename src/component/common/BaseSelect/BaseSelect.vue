@@ -1,6 +1,7 @@
 <template>
   <div class="base-select-container">
-    <div class="content" @focusin="initList" @focusout.prevent="closeList">
+    <!--<div class="content" @focusin="initList" @focusout.prevent="closeList" v-clickoutside="closeList">-->
+    <div class="content" v-clickoutside="closeList">
       <div class="base-select-main-content el-select" @click.stop="focusInput"
            :class="{'error': error, 'wrapper-is-focus': isFocus, }">
         <el-tag size="mini" closable v-for="tag in value" :key="tag.id" @close="removeTag(tag)" disable-transitions
@@ -24,6 +25,8 @@
 </template>
 
 <script>
+import Clickoutside from '@src/util/clickoutside';
+
 /**
  * Todo
  * 1. 列表出现在上部还是下部。
@@ -64,12 +67,6 @@ export default {
     }
   },
   watch: {
-    // value: {
-    //   deep: true,
-    //   handler(newVal) {
-    //     console.log('newVal', newVal);
-    //   }
-    // }
   },
   computed: {
     alreadyLoadedAll() {
@@ -111,12 +108,13 @@ export default {
     focusInput() {
       this.$refs.input.focus();
       this.isFocus = true;
+      this.initList();
     },
     closeList(e) {
       this.showList = false;
       this.isFocus = false;
-      this.keyword = '';
       this.pending = true;
+      this.resetStatus('');
     },
     removeTag(tag) {
       const newVal = this.value.filter(t => t.id !== tag.id);
@@ -133,7 +131,6 @@ export default {
       this.$emit('input', newValue);
       this.showList = false;
       this.resetStatus();
-      // if (this.keyword) this.resetStatus();
     },
     search() {
       if (!this.remoteMethod) return;
@@ -161,7 +158,6 @@ export default {
     initList() {
       this.pending = true;
       this.showList = true;
-      // if (this.page.list.length) return;
       this.search()
         .then(res => {
           this.pending = false;
@@ -213,6 +209,7 @@ export default {
       }
     },
   },
+  directives: { Clickoutside },
 }
 </script>
 
@@ -292,6 +289,12 @@ export default {
         line-height: 34px;
         &:hover {
           background: $color-primary-light-9;
+        }
+      }
+
+      li:last-child {
+        &:hover {
+          background: white;
         }
       }
 

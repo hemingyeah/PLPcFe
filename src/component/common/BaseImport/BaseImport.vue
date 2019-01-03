@@ -92,12 +92,11 @@ export default {
           let data = result.data || [];
           this.errors = data;
         }
+
+        this.pending = false;
       })
         .catch(err => {
           console.error(err)
-        })
-        .finally(() => {
-          this.pending = false;
         })
     }
   },

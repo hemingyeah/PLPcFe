@@ -14,7 +14,7 @@
         <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
       </form>
       <!--高级搜索-->
-      <base-panel :show.sync="advancedSearchPanelShow" width="420px">
+      <base-panel :show.sync="advancedSearchPanelShow" :width="panelWidth">
         <h3 slot="title">
           <span>高级搜索</span>
           <el-dropdown class="pull-right" trigger="click" @command="setAdvanceSearchColumn">
@@ -27,162 +27,79 @@
           </el-dropdown>
         </h3>
         <el-form class="advanced-search-form" onsubmit="return false;">
-          <el-form-item label-width="100px" label="客户编号">
-            <el-input type="text" v-model="params.serialNumber"></el-input>
-          </el-form-item>
-          <el-form-item label-width="100px" label="联系人">
-            <el-select
-              popper-class="advanced-search-linkman"
-              v-model="params.linkmanId"
-              filterable
-              clearable
-              remote
-              reserve-keyword
-              placeholder="请输入关键词搜索"
-              :loading="inputRemoteSearch.linkman.loading"
-              :remote-method="searchLinkman">
-
-              <el-option
-                v-for="item in inputRemoteSearch.linkman.options"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-                <p>{{item.name}}</p>
-                <p>电话：{{item.phone || ''}}</p>
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label-width="100px" label="选择团队">
-            <el-select
-              v-model="params.tagId"
-              filterable
-              clearable
-              remote
-              reserve-keyword
-              placeholder="请输入关键词搜索"
-              :loading="inputRemoteSearch.tag.loading"
-              :remote-method="searchTag">
-
-              <el-option
-                v-for="item in inputRemoteSearch.tag.options"
-                :key="item.id"
-                :label="item.tagName"
-                :value="item.id">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label-width="100px" label="区域">
-            <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
-          </el-form-item>
-          <el-form-item label-width="100px" label="详细地址">
-            <el-input type="text" v-model="params.specialSearchModel.adAddress"></el-input>
-          </el-form-item>
-          <el-form-item label-width="100px" label="有无提醒">
-            <el-select v-model="params.hasRemind" clearable placeholder="请选择">
-              <el-option :value="null" label="全部"></el-option>
-              <el-option :value="1" label="有"></el-option>
-              <el-option :value="0" label="无"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label-width="100px" label="状态">
-            <el-select v-model="params.status" clearable placeholder="请选择">
-              <el-option :value="null" label="全部"></el-option>
-              <el-option :value="1" label="启用"></el-option>
-              <el-option :value="0" label="禁用"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label-width="100px" label="创建人">
-            <el-select
-              v-model="params.createUser"
-              filterable
-              clearable
-              remote
-              reserve-keyword
-              placeholder="请输入关键词搜索"
-              :loading="inputRemoteSearch.creator.loading"
-              :remote-method="searchCreator">
-              <el-option
-                v-for="item in inputRemoteSearch.creator.options"
-                :key="item.userId"
-                :label="item.displayName"
-                :value="item.userId">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label-width="100px" label="客户负责人">
-            <el-select
-              v-model="params.customerManager"
-              filterable
-              clearable
-              remote
-              reserve-keyword
-              placeholder="请输入关键词搜索"
-              :loading="inputRemoteSearch.customerManager.loading"
-              :remote-method="searchCustomerManager">
-              <el-option
-                v-for="item in inputRemoteSearch.customerManager.options"
-                :key="item.userId"
-                :label="item.displayName"
-                :value="item.userId">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label-width="100px" label="创建时间">
-            <el-date-picker
-              v-model="params.createTime"
-              type="daterange"
-              align="right"
-              unlink-panels
-              range-separator="-"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :picker-options="createTimePickerOptions">
-            </el-date-picker>
-          </el-form-item>
-
-          <!-- 动态搜索框 -->
-          <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
-                        :key="field.fieldName">
-            <template v-if="field.formType === 'text' || field.formType === 'code'">
-              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                        :placeholder="field.placeHolder" type="text"></el-input>
-            </template>
-            <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-              <el-select v-model="params.customizedSearchModel[field.fieldName]['value']" clearable
-                         :placeholder="field.placeHolder">
-                <el-option
-                  v-for="item in field.setting.dataSource"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                  :disabled="item.disabled">
-                </el-option>
-              </el-select>
-            </template>
-            <template v-else-if="field.formType === 'number'">
-              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                        :placeholder="field.placeHolder" type="number"></el-input>
-            </template>
-            <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
-              <el-date-picker
-                v-model="params.customizedSearchModel[field.fieldName]['value']"
-                type="daterange"
-                align="right"
-                unlink-panels
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :picker-options="createTimePickerOptions">
-              </el-date-picker>
-            </template>
-            <template v-else-if="field.formType === 'user'">
+          <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
+            <el-form-item label-width="100px" label="客户编号">
+              <el-input type="text" v-model="params.serialNumber"></el-input>
+            </el-form-item>
+            <el-form-item label-width="100px" label="联系人">
               <el-select
-                v-model="params.customizedSearchModel[field.fieldName]['value']"
+                popper-class="advanced-search-linkman"
+                v-model="params.linkmanId"
                 filterable
                 clearable
                 remote
                 reserve-keyword
-                placeholder=""
+                placeholder="请输入关键词搜索"
+                :loading="inputRemoteSearch.linkman.loading"
+                :remote-method="searchLinkman">
+
+                <el-option
+                  v-for="item in inputRemoteSearch.linkman.options"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                  <p>{{item.name}}</p>
+                  <p>电话：{{item.phone || ''}}</p>
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label-width="100px" label="选择团队">
+              <el-select
+                v-model="params.tagId"
+                filterable
+                clearable
+                remote
+                reserve-keyword
+                placeholder="请输入关键词搜索"
+                :loading="inputRemoteSearch.tag.loading"
+                :remote-method="searchTag">
+
+                <el-option
+                  v-for="item in inputRemoteSearch.tag.options"
+                  :key="item.id"
+                  :label="item.tagName"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label-width="100px" label="区域">
+              <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
+            </el-form-item>
+            <el-form-item label-width="100px" label="详细地址">
+              <el-input type="text" v-model="params.specialSearchModel.adAddress"></el-input>
+            </el-form-item>
+            <el-form-item label-width="100px" label="有无提醒">
+              <el-select v-model="params.hasRemind" clearable placeholder="请选择">
+                <el-option :value="null" label="全部"></el-option>
+                <el-option :value="1" label="有"></el-option>
+                <el-option :value="0" label="无"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label-width="100px" label="状态">
+              <el-select v-model="params.status" clearable placeholder="请选择">
+                <el-option :value="null" label="全部"></el-option>
+                <el-option :value="1" label="启用"></el-option>
+                <el-option :value="0" label="禁用"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label-width="100px" label="创建人">
+              <el-select
+                v-model="params.createUser"
+                filterable
+                clearable
+                remote
+                reserve-keyword
+                placeholder="请输入关键词搜索"
                 :loading="inputRemoteSearch.creator.loading"
                 :remote-method="searchCreator">
                 <el-option
@@ -192,12 +109,97 @@
                   :value="item.userId">
                 </el-option>
               </el-select>
-            </template>
-            <template v-else>
-              <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                        :placeholder="field.placeHolder"></el-input>
-            </template>
-          </el-form-item>
+            </el-form-item>
+            <el-form-item label-width="100px" label="客户负责人">
+              <el-select
+                v-model="params.customerManager"
+                filterable
+                clearable
+                remote
+                reserve-keyword
+                placeholder="请输入关键词搜索"
+                :loading="inputRemoteSearch.customerManager.loading"
+                :remote-method="searchCustomerManager">
+                <el-option
+                  v-for="item in inputRemoteSearch.customerManager.options"
+                  :key="item.userId"
+                  :label="item.displayName"
+                  :value="item.userId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label-width="100px" label="创建时间">
+              <el-date-picker
+                v-model="params.createTime"
+                type="daterange"
+                align="right"
+                unlink-panels
+                range-separator="-"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                :picker-options="createTimePickerOptions">
+              </el-date-picker>
+            </el-form-item>
+
+            <!-- 动态搜索框 -->
+            <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
+                          :key="field.fieldName">
+              <template v-if="field.formType === 'text' || field.formType === 'code'">
+                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
+                          :placeholder="field.placeHolder" type="text"></el-input>
+              </template>
+              <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
+                <el-select v-model="params.customizedSearchModel[field.fieldName]['value']" clearable
+                           :placeholder="field.placeHolder">
+                  <el-option
+                    v-for="item in field.setting.dataSource"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                    :disabled="item.disabled">
+                  </el-option>
+                </el-select>
+              </template>
+              <template v-else-if="field.formType === 'number'">
+                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
+                          :placeholder="field.placeHolder" type="number"></el-input>
+              </template>
+              <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
+                <el-date-picker
+                  v-model="params.customizedSearchModel[field.fieldName]['value']"
+                  type="daterange"
+                  align="right"
+                  unlink-panels
+                  range-separator="-"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :picker-options="createTimePickerOptions">
+                </el-date-picker>
+              </template>
+              <template v-else-if="field.formType === 'user'">
+                <el-select
+                  v-model="params.customizedSearchModel[field.fieldName]['value']"
+                  filterable
+                  clearable
+                  remote
+                  reserve-keyword
+                  placeholder=""
+                  :loading="inputRemoteSearch.creator.loading"
+                  :remote-method="searchCreator">
+                  <el-option
+                    v-for="item in inputRemoteSearch.creator.options"
+                    :key="item.userId"
+                    :label="item.displayName"
+                    :value="item.userId">
+                  </el-option>
+                </el-select>
+              </template>
+              <template v-else>
+                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
+                          :placeholder="field.placeHolder"></el-input>
+              </template>
+            </el-form-item>
+          </div>
           <div class="advanced-search-btn-group">
             <base-button type="ghost" @event="resetParams">重置</base-button>
             <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
@@ -550,6 +552,7 @@ export default {
       selectedLimit: 200,
       auth: {},
       smsRest: 0,
+      columnNum: 1,
     };
   },
   computed: {
@@ -590,6 +593,9 @@ export default {
         return c;
       });
     },
+    panelWidth() {
+      return `${420 * this.columnNum}px`;
+    }
   },
   filters: {
     tagName: function (value) {
@@ -641,6 +647,8 @@ export default {
       this.paginationInfo.pageSize = Number(localStorageData.pageSize);
     }
 
+    const num = localStorage.getItem('customer_list_advance_search_column_number') || 1;
+    this.columnNum = Number(num);
 
     this.buildConfig();
     this.search();
@@ -658,7 +666,8 @@ export default {
   },
   methods: {
     setAdvanceSearchColumn(command){
-      console.log('advance search set ' + command)
+      this.columnNum = Number(command);
+      localStorage.setItem('customer_list_advance_search_column_number', command);
     },
     viewCustomer(e) {
 
@@ -1206,8 +1215,10 @@ export default {
       this.inputRemoteSearch.creator.loading = true;
       return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
-          this.inputRemoteSearch.creator.options = res.list;
-          this.inputRemoteSearch.creator.loading = false;
+          if (res && res.list) {
+            this.inputRemoteSearch.creator.options = res.list;
+            this.inputRemoteSearch.creator.loading = false;
+          }
           return res;
         })
         .catch(err => console.error('searchCreator function catch err', err));
@@ -1216,8 +1227,10 @@ export default {
       this.inputRemoteSearch.linkman.loading = true;
       return this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
         .then(res => {
-          this.inputRemoteSearch.linkman.options = res.list;
-          this.inputRemoteSearch.linkman.loading = false;
+          if (res && res.list) {
+            this.inputRemoteSearch.linkman.options = res.list;
+            this.inputRemoteSearch.linkman.loading = false;
+          }
           return res;
         })
         .catch(err => console.error('searchLinkman function catch err', err));
@@ -1226,8 +1239,10 @@ export default {
       this.inputRemoteSearch.tag.loading = true;
       return this.$http.get('/customer/tag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
-          this.inputRemoteSearch.tag.options = res.list;
-          this.inputRemoteSearch.tag.loading = false;
+          if (res && res.list) {
+            this.inputRemoteSearch.tag.options = res.list;
+            this.inputRemoteSearch.tag.loading = false;
+          }
           return res;
         })
         .catch(err => console.error('searchTag function catch err', err));
@@ -1445,35 +1460,47 @@ html, body {
   }
 
   .advanced-search-form {
-    height: calc(100% - 51px);
     overflow: auto;
     padding: 10px 0 63px 0;
+    height: calc(100% - 51px);
 
-    .el-form-item {
-      .el-form-item__content,
-      .el-select,
-      .base-dist-picker,
-      .el-cascader,
-      .el-date-editor {
-        width: 290px;
-      }
+    .form-item-container {
+
     }
 
-    .advanced-search-btn-group {
+    .two-columns {
       display: flex;
-      justify-content: flex-end;
-      width: 100%;
-      position: absolute;
-      bottom: 0px;
-      background: #fff;
-      padding: 15px 20px;
-
-      .base-button {
-        margin: 0 10px;
+      flex-wrap: wrap;
+      .el-form-item {
+        width: 50%;
       }
     }
-  }
-    
+
+      .el-form-item {
+        .el-form-item__content,
+        .el-select,
+        .base-dist-picker,
+        .el-cascader,
+        .el-date-editor {
+          width: 290px;
+        }
+      }
+
+      .advanced-search-btn-group {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        position: absolute;
+        bottom: 0px;
+        background: #fff;
+        padding: 15px 20px;
+
+        .base-button {
+          margin: 0 10px;
+        }
+      }
+    }
+
 
   .advanced-search-function {
     margin-top: 10px;
