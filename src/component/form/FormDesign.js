@@ -404,13 +404,14 @@ const FormDesign = {
         const position = this.judgePosition(containerEl);
       
         if (distance > 0 && position !== 'bottom') {
-          // console.log("鼠标向下滚动");
-          containerEl.scrollTop += 10;
+          // console.warn("鼠标向上滚动");
+          containerEl.scrollTop -= 10;
+  
         }
       
         if (distance < 0 && position !== 'top') {
-          // console.warn("鼠标向上滚动");
-          containerEl.scrollTop -= 10;
+          // console.log("鼠标向下滚动");
+          containerEl.scrollTop += 10;
         }
       }, 100)();
     },
