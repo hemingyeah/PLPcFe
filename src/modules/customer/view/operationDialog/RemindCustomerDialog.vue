@@ -186,7 +186,11 @@ export default {
         remind: {
           id: this.form.remindId,
         },
-        users: this.form.users || []
+        users: (this.form.users || []).map(user => ({
+          id: user.id,
+          name: user.name,
+          phone: user.phone,
+        }))
       };
     },
     openDialog() {
@@ -214,6 +218,15 @@ export default {
         .catch(err => console.error('err', err));
     },
     searchManager(params) {
+      if (!this.selectedRemind.isDdResponse) {
+        return Promise.resolve({
+          list: this.linkmanListOfCustomer,
+          pageSize: 1,
+          pageNum: 10000,
+          total: this.linkmanListOfCustomer.length,
+        });
+      }
+
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {};
 
@@ -292,6 +305,10 @@ export default {
     .dialog-footer {
       display: flex;
       justify-content: flex-end;
+
+      span:focus {
+        outline: none;
+      }
 
       .iconfont {
         line-height: 32px;

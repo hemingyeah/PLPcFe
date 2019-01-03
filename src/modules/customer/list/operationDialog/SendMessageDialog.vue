@@ -21,6 +21,7 @@
           v-model="form.sendTime"
           type="datetime"
           placeholder="选择日期时间"
+          :picker-options="datePickerOption"
           default-time="12:00:00">
         </el-date-picker>
       </el-form-item>
@@ -63,7 +64,12 @@ export default {
       },
       sendMessageDialog: false,
       pending: false,
-      messageTemplate: []
+      messageTemplate: [],
+      datePickerOption: {
+        disabledDate(time) {
+          return time.getTime() < Date.now();
+        },
+      }
     }
   },
   props: {

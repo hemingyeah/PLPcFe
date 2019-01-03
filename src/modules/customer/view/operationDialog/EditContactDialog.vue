@@ -34,6 +34,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    isPhoneUnique: {
+      type: Boolean,
+      default: true,
+    }
   },
   data() {
     return {
@@ -144,7 +148,7 @@ export default {
     buildRemote() {
       const originalValue = this.originalValue;
       return {
-        phone: {
+        phone: this.isPhoneUnique ? {
           action: '/linkman/checkUnique4Phone',
           buildParams(val) {
             const params = {
@@ -153,7 +157,7 @@ export default {
             };
             return params;
           }
-        }
+        } : null,
       }
     },
     genPlaceholder(field){

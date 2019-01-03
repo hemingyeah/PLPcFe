@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    <edit-contact-dialog ref="EditContactDialog" :customer="customer"></edit-contact-dialog>
+    <edit-contact-dialog ref="EditContactDialog" :customer="customer" :is-phone-unique="isPhoneUnique"></edit-contact-dialog>
     <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id"
                          :default-address="initData.customerAddress"></edit-address-dialog>
     <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind"
@@ -290,6 +290,9 @@ export default {
       let planTaskEnabled = this.initData.planTaskEnabled;
       return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
     },
+    isPhoneUnique() {
+      return this.initData.isPhoneUnique;
+    }
   },
   filters: {
     fmt_tag(value) {

@@ -6,6 +6,7 @@
       clearable
       :multiple="isMulti"
       ref="elSelect"
+      filterable
       :value="value" @change="input">
       <el-option
         v-for="item in options"

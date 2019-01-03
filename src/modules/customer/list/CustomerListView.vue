@@ -1225,7 +1225,7 @@ export default {
     },
     searchTag(keyword) {
       this.inputRemoteSearch.tag.loading = true;
-      return this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
+      return this.$http.get('/customer/tag/list', {keyword: keyword, pageNum: 1,})
         .then(res => {
           this.inputRemoteSearch.tag.options = res.list;
           this.inputRemoteSearch.tag.loading = false;

@@ -1,6 +1,6 @@
 <template>
   <div class="base-select-container">
-    <div class="content" @focusin="initList" @focusout="closeList">
+    <div class="content" @focusin="initList" @focusout.prevent="closeList">
       <div class="base-select-main-content el-select" @click.stop="focusInput"
            :class="{'error': error, 'wrapper-is-focus': isFocus, }">
         <el-tag size="mini" closable v-for="tag in value" :key="tag.id" @close="removeTag(tag)" disable-transitions
@@ -12,7 +12,7 @@
       <div class="list-wrapper" v-show="showList">
         <div class="arrow"></div>
         <ul class="option-list" @scroll="loadMore" ref="list" tabindex="-1">
-          <li v-for="op in page.list" :key="op.id" @click.stop="selectTag(op)"
+          <li v-for="op in page.list" :key="op.id" @click="selectTag(op)"
               :class="{'selected': value.some(user => user.id ===op.id)}">
             {{op.name}}
           </li>
@@ -63,14 +63,14 @@ export default {
       }
     }
   },
-  // watch: {
-  //   value: {
-  //     deep: true,
-  //     handler(newVal) {
-  //       console.log('newVal', newVal);
-  //     }
-  //   }
-  // },
+  watch: {
+    // value: {
+    //   deep: true,
+    //   handler(newVal) {
+    //     console.log('newVal', newVal);
+    //   }
+    // }
+  },
   computed: {
     alreadyLoadedAll() {
       const {list, total} = this.page;
@@ -80,7 +80,7 @@ export default {
       if (this.pending) {
         return '载入更多结果......';
       }
-      if (this.total === 0) {
+      if (this.page.total === 0) {
         return '未找到结果';
       }
       if (this.alreadyLoadedAll) {
@@ -112,10 +112,11 @@ export default {
       this.$refs.input.focus();
       this.isFocus = true;
     },
-    closeList() {
+    closeList(e) {
       this.showList = false;
       this.isFocus = false;
       this.keyword = '';
+      this.pending = true;
     },
     removeTag(tag) {
       const newVal = this.value.filter(t => t.id !== tag.id);
@@ -131,7 +132,8 @@ export default {
 
       this.$emit('input', newValue);
       this.showList = false;
-      if (this.keyword) this.resetStatus();
+      this.resetStatus();
+      // if (this.keyword) this.resetStatus();
     },
     search() {
       if (!this.remoteMethod) return;
@@ -157,9 +159,9 @@ export default {
         });
     },
     initList() {
-      this.showList = true;
-      if (this.page.list.length) return;
       this.pending = true;
+      this.showList = true;
+      // if (this.page.list.length) return;
       this.search()
         .then(res => {
           this.pending = false;
@@ -295,6 +297,7 @@ export default {
 
       li.selected {
         color: $color-primary;
+        font-weight: 700;
       }
 
       .list-message {
