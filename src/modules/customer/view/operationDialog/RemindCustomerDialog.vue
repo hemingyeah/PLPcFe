@@ -236,7 +236,7 @@ export default {
           if (res.list) {
             res.list = res.list.map(user => Object.freeze({
               name: user.displayName,
-              id: user.userId,
+              id: user.staffId,
               phone: user.cellPhone,
             }))
           }

@@ -244,7 +244,7 @@ export default {
       this.form = {
         name,
         remark,
-        sex,
+        sex: ['男', '女'].indexOf(sex) === -1 ? '' : sex,
         position,
         department,
         address: '',
