@@ -73,6 +73,8 @@ const directive = {
     tooltip.updateOption(option)
   },
   unbind(el){
+    hideToolTip({target: el});
+    
     el.removeEventListener('mouseenter', showToolTip)
     el.removeEventListener('mouseleave', hideToolTip)
   }

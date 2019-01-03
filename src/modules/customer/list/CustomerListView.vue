@@ -249,9 +249,7 @@
             </span>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.field">
-                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label">
-                  {{item.label}}
-                </el-checkbox>
+                  <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label" :disabled="item.field == 'name'"/>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -401,6 +399,7 @@
       <h3 slot="title">
         <span>已选中数据({{multipleSelection.length}})</span>
         <i 
+          v-if="multipleSelection.length > 0"
           class="iconfont icon-qingkongshanchu customer-panel-btn" 
           @click="toggleSelection()" 
           title="清空已选中数据" data-placement="right" v-tooltip></i>
@@ -1671,8 +1670,13 @@ html, body {
 .customer-columns-dropdown-menu {
   max-height: 300px;
   overflow: auto;
+  .el-dropdown-menu__item{
+    padding: 0;
+  }
   .el-checkbox {
     width: 100%;
+    padding: 5px 15px;
+    margin: 0;
   }
 }
 
