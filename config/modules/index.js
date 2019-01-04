@@ -26,6 +26,10 @@ module.exports = {
     entry: './src/modules/customer/view/index.js',
     template: 'src/modules/customer/view/index.html'
   },
+  "customer.edit.modal": {
+    entry: './src/modules/customer/editForModal/index.js',
+    template: 'src/modules/customer/editForModal/index.html'
+  },
 
   // ------------ 订阅通知日报 ------------
   "open.dailyReport": {

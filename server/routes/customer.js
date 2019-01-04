@@ -14,6 +14,7 @@ router.get('/customer', async ctx => {
   
   ctx.body = Template.renderWithHtml('客户管理', body, script, modConfig.template)
 });
+
 router.get('/customer/create', async ctx => {
   let modConfig = modules['customer.edit'];
   let reqHeaders = ctx.request.headers;
@@ -53,6 +54,17 @@ router.get('/customer/view/:id', async ctx => {
   let body = result.body;
   ctx.body = Template.renderWithHtml('客户信息', body, script, modConfig.template)
 });
-
+// /customer/create/task
+// /customer/create/event
+router.get('/customer/create/:type', async ctx => {
+  console.log('ctx.params', ctx.params);
+  let modConfig = modules['customer.edit.modal'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/customer.edit.modal.js'];
+  let result = await HttpClient.request('/customer/create', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('新建客户', body, script, modConfig.template)
+});
 
 module.exports = router;
