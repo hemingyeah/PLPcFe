@@ -2,7 +2,7 @@
   <div class="customer-list-container" ref="customerListPage" v-loading.fullscreen.lock="loadingListData">
     <!--搜索-->
     <div class="customer-list-search-group-container">
-      <form class="base-search" onsubmit="return false;">
+      <form class="base-search"r onsubmit="return false;">
         <div class="customer-list-base-search-group">
           <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -632,6 +632,7 @@ export default {
     this.defaultAddress = [adProvince, adCity, adDist,];
 
     let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
+    sessionStorage.removeItem('customer_list_search_status');
     if (paramsFromStorage) {
       paramsFromStorage = JSON.parse(paramsFromStorage);
 

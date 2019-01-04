@@ -434,12 +434,15 @@ export default {
 <style lang="scss">
 body {
   .base-modal {
-    width: calc(100vw - 10px)!important;
+    width: 100%!important;
+    height: 100%;
+    padding: 10px;
     margin: 0;
   }
 }
+
 .bm-picker {
-  height: 459px;
+  height: calc(100% - 41px)!important;
 }
 
 .customer-modal-container {

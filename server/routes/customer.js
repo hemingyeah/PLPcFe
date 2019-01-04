@@ -57,7 +57,6 @@ router.get('/customer/view/:id', async ctx => {
 // /customer/create/task
 // /customer/create/event
 router.get('/customer/create/:type', async ctx => {
-  console.log('ctx.params', ctx.params);
   let modConfig = modules['customer.edit.modal'];
   let reqHeaders = ctx.request.headers;
   let script = ['/customer.edit.modal.js'];

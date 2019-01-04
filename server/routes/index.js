@@ -54,7 +54,15 @@ router.get('/', async ctx => {
 router.get('/demo', async ctx => {
   let script = ['/system.demo.js'];
   ctx.body = Template.renderWithData('demo', {}, script)
-})
+});
+
+router.get('/customer/createOnTask', async ctx => {
+  ctx.redirect('/customer/create/task')
+});
+
+router.get('/customer/createOnEvent', async ctx => {
+  ctx.redirect('/customer/create/event');
+});
 
 router.use("", customerRouter.routes(), customerRouter.allowedMethods())
 router.use("", openRouter.routes(), openRouter.allowedMethods())
