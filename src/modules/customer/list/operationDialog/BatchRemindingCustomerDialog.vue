@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="添加提醒" :show.sync="batchRemindingCustomerDialog" width="500px" class="batch-remind-customer-dialog">
+  <base-modal title="添加提醒" :show.sync="batchRemindingCustomerDialog" width="500px" class="batch-remind-customer-dialog" @closed="reset">
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
@@ -13,25 +13,15 @@
       <el-form-item label="提醒规则">
         {{remindRule}}
       </el-form-item>
-      <el-form-item label="通知人" prop="users" :error="error">
+      <el-form-item label="通知人" prop="users">
         <template v-if="selectedRemind.isDdResponse">
-          <el-select
+          <base-select
             v-model="form.users"
-            @change="validateUser"
-            filterable
-            remote
-            multiple
-            reserve-keyword
-            placeholder="请输入关键词"
-            :loading="remoteSearchCM.loading"
-            :remote-method="searchCustomerManager">
-            <el-option
-              v-for="item in remoteSearchCM.options"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
+            :remote-method="searchManager"
+            @input="validateUser"
+            :error="error"
+          ></base-select>
+
         </template>
         <template v-else>
           <el-radio-group v-model="form.isAllLm">
@@ -49,6 +39,8 @@
 </template>
 
 <script>
+import _ from 'lodash';
+
 export default {
   name: "batch-reminding-customer-dialog",
   data: () => {
@@ -66,8 +58,7 @@ export default {
       },
       batchRemindingCustomerDialog: false,
       pending: false,
-      error: '',
-      submitted: false,
+      error: false,
     }
   },
   props: {
@@ -99,49 +90,29 @@ export default {
         }
       }
     },
-    allUsers() {
-      if (this.selectedRemind.isDdResponse) {
-        // 内部提醒
-        let oldArr = sessionStorage.getItem('customer_list_remind_manager_storage') || '{}';
-        oldArr = JSON.parse(oldArr).manager || [];
-        const allSearchResult = this.concatArrayAndItemUnique(oldArr, this.remoteSearchCM.options);
-        return this.concatArrayAndItemUnique(allSearchResult, this.selectedRemind.users)
-      }
-      return [];
-    },
   },
   mounted() {
     this.fetchData();
   },
   methods: {
-    saveManager(manager) {
-      let oldArr = sessionStorage.getItem('customer_list_remind_manager_storage') || '{}';
-      oldArr = JSON.parse(oldArr).manager || [];
-
-      manager.forEach(m => {
-        if (oldArr.every(ou => ou.id !== m.id)) {
-          oldArr.push(m);
-        }
-      });
-
-      sessionStorage.setItem('customer_list_remind_manager_storage', JSON.stringify({
-        manager: oldArr,
-      }));
-      return oldArr;
+    reset() {
+      this.form = {
+        ids: '',
+        isAllLm: 0,
+        remindId: null,
+        users: [],
+      };
     },
     validateUser() {
-      if (!this.submitted) return;
-      if (this.selectedRemind.isDdResponse && !this.form.users.length) {
+      if (!this.selectedRemind.isDdResponse) return this.error = false;
+      if (!this.form.users || !this.form.users.length) {
         // 内部提醒
-        return this.error = '      ';
+        return this.error = true;
       }
-      this.error = '';
+      return this.error = false;
     },
     async onSubmit() {
-      this.submitted = true;
-      this.validateUser();
-
-      if (!!this.error) return;
+      if (this.validateUser()) return;
 
       const params = this.buildParams();
       this.pending = true;
@@ -174,7 +145,7 @@ export default {
 
       if (this.selectedRemind.isDdResponse) {
         params.isAllLm = 0;
-        params.users = this.allUsers.filter(rc => this.form.users.includes(rc.id));
+        params.users = this.form.users;
       } else {
         params.isAllLm = this.form.isAllLm;
         params.users = [];
@@ -188,7 +159,6 @@ export default {
       this.form.remindId = (this.remindTemplate[0] || {}).id;
       this.batchRemindingCustomerDialog = true;
       this.defaultUserOfDifferentSelectedRemind();
-      this.searchCustomerManager();
     },
     defaultUserOfDifferentSelectedRemind() {
       let users = [];
@@ -199,11 +169,8 @@ export default {
       if (!this.selectedRemind.isDdResponse) {
         this.form.isAllLm = Number(!this.selectedRemind.isDefaultLinkman);
       }
-
-      this.remoteSearchCM.options = this.concatArrayAndItemUnique(users, this.remoteSearchCM.options);
-      this.form.users = users.map(c => c.id);
+      this.form.users = _.cloneDeep(users);
     },
-
     fetchData() {
       this.$http.get('/customer/getReminds', {pageSize: 0,})
         .then(res => {
@@ -216,37 +183,26 @@ export default {
         })
         .catch(err => console.error('err', err));
     },
-    searchCustomerManager(keyword) {
-      this.remoteSearchCM.loading = true;
-      this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+    searchManager(params) {
+      // params has three properties include keyword、pageSize、pageNum.
+      const pms = params || {};
+
+      return this.$http.get('/customer/userTag/list', pms)
         .then(res => {
-          this.remoteSearchCM.options = (res.list || [])
-            .map(c => ({
-              id: c.staffId,
-              name: c.displayName,
-            }));
-          this.remoteSearchCM.loading = false;
+          if (!res || !res.list) return;
+          if (res.list) {
+            res.list = res.list.map(user => Object.freeze({
+              name: user.displayName,
+              id: user.staffId,
+              phone: user.cellPhone,
+            }))
+          }
 
-          const oldList = this.allUsers.filter(rc => this.form.users.includes(rc.id));
-          this.remoteSearchCM.options = this.concatArrayAndItemUnique(oldList, this.remoteSearchCM.options);
-
-          this.saveManager(this.remoteSearchCM.options);
+          return res;
         })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
-    concatArrayAndItemUnique(arr1, arr2) {
-      // 数组中的对象根据id去重
-      let obj = {};
-      if (!arr1 || !arr1.length) return arr2 || [];
-      if (!arr2 || !arr2.length) return arr1 || [];
-
-      return [...arr1, ...arr2].reduce((cur,next) => {
-        obj[next.id] ? "" : obj[next.id] = true && cur.push(next);
-        return cur;
-      },[]);
+        .catch(e => console.log(e));
     },
   },
-
 }
 </script>
 
