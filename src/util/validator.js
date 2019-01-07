@@ -67,7 +67,7 @@ function textarea(value, field = {}) {
 // 验证电话手机格式
 function phone(value, field = {}) {
   return new Promise(resolve => {
-    if(field.isNull) return resolve(null);
+    if(field.isNull && !value) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`请输入${field.displayName}`);
     if(!PHONE_REG.test(value)) return resolve('请输入正确的电话或者手机号');
     resolve(null);

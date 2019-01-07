@@ -35,6 +35,7 @@
               <el-select
                 popper-class="advanced-search-linkman"
                 v-model="params.linkmanId"
+                @change="modifyUser('linkman')"
                 filterable
                 clearable
                 remote
@@ -42,7 +43,6 @@
                 placeholder="请输入关键词搜索"
                 :loading="inputRemoteSearch.linkman.loading"
                 :remote-method="searchLinkman">
-
                 <el-option
                   v-for="item in inputRemoteSearch.linkman.options"
                   :key="item.id"
@@ -56,6 +56,7 @@
             <el-form-item label-width="100px" label="选择团队">
               <el-select
                 v-model="params.tagId"
+                @change="modifyUser('tags')"
                 filterable
                 clearable
                 remote
@@ -73,7 +74,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label-width="100px" label="区域">
-              <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker"></base-dist-picker>
+              <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector" ref="baseDistPicker"></base-dist-picker>
             </el-form-item>
             <el-form-item label-width="100px" label="详细地址">
               <el-input type="text" v-model="params.specialSearchModel.adAddress"></el-input>
@@ -95,6 +96,7 @@
             <el-form-item label-width="100px" label="创建人">
               <el-select
                 v-model="params.createUser"
+                @change="modifyUser('createUser')"
                 filterable
                 clearable
                 remote
@@ -113,6 +115,7 @@
             <el-form-item label-width="100px" label="客户负责人">
               <el-select
                 v-model="params.customerManager"
+                @change="modifyUser('customerManager')"
                 filterable
                 clearable
                 remote
@@ -179,6 +182,7 @@
               <template v-else-if="field.formType === 'user'">
                 <el-select
                   v-model="params.customizedSearchModel[field.fieldName]['value']"
+                  @change="modifyUser('user', field.fieldName)"
                   filterable
                   clearable
                   remote
@@ -251,7 +255,7 @@
             </span>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.field">
-                  <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label" :disabled="item.field == 'name'"/>
+                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label" :disabled="item.field == 'name'"/>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -624,48 +628,112 @@ export default {
       customerConfig: initData.customerConfig,
       fieldInfo: (initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId)
     };
+    const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
+    this.defaultAddress = [adProvince, adCity, adDist,];
 
     this.auth = initData.auth || {};
     this.smsRest = initData.smsRest || 0;
 
-    const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
-    this.defaultAddress = [adProvince, adCity, adDist,];
-
-    let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
-    sessionStorage.removeItem('customer_list_search_status');
-    if (paramsFromStorage) {
-      paramsFromStorage = JSON.parse(paramsFromStorage);
-
-      this.paramsBackup = {
-        ...paramsFromStorage.params,
-        pageNum: paramsFromStorage.paginationInfo.pageNum,
-      };
-    }
-    const localStorageData = this.getLocalStorageData();
-
-    if (localStorageData.pageSize) {
-      this.paramsBackup.pageSize = Number(localStorageData.pageSize);
-      this.paginationInfo.pageSize = Number(localStorageData.pageSize);
-    }
-
-    const num = localStorage.getItem('customer_list_advance_search_column_number') || 1;
-    this.columnNum = Number(num);
-
-    this.buildConfig();
+    this.revertSearchParams();
+    this.buildConfig(this.paramsBackup.customizedSearchModel);
     this.search();
 
-    // 团队、人员等搜索、默认加载部分数据
-    Promise.all([
-      this.searchCreator(),
-      this.searchLinkman(),
-      this.searchTag(),
-    ])
-      .then(res => {
-        this.inputRemoteSearch.customerManager.options = res[0].list;
-      })
-      .catch(err => console.error('err', err));
+    // 团队默认加载全部数据
+    this.searchTag();
   },
   methods: {
+    revertSearchParams() {
+
+      let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
+      sessionStorage.removeItem('customer_list_search_status');
+      if (paramsFromStorage) {
+        paramsFromStorage = JSON.parse(paramsFromStorage);
+
+        this.paramsBackup = {
+          ...paramsFromStorage.params,
+          pageNum: paramsFromStorage.paginationInfo.pageNum,
+        };
+      }
+      const localStorageData = this.getLocalStorageData();
+
+      if (localStorageData.pageSize) {
+        this.paramsBackup.pageSize = Number(localStorageData.pageSize);
+        this.paginationInfo.pageSize = Number(localStorageData.pageSize);
+      }
+
+      if (Array.isArray(this.paramsBackup.createTime) && this.paramsBackup.createTime.length) {
+        this.paramsBackup.createTime = this.paramsBackup.createTime.map(ct => new Date(ct));
+      }
+
+      let storeUser = localStorage.getItem('store_user_for_search_customer') || '{}';
+      sessionStorage.removeItem('store_user_for_search_customer');
+      storeUser = JSON.parse(storeUser);
+
+      if (this.paramsBackup.linkmanId) {
+        this.inputRemoteSearch.linkman.options = storeUser.linkman || [];
+      }
+
+      if (this.paramsBackup.tagId) {
+        this.inputRemoteSearch.tag.options = storeUser.tags || [];
+      }
+
+      if (storeUser.creator) {
+        this.inputRemoteSearch.creator.options = storeUser.creator || [];
+      }
+
+      if (this.paramsBackup.customerManager) {
+        this.inputRemoteSearch.customerManager.options = storeUser.customerManager || [];
+      }
+
+      this.params = _.cloneDeep(this.paramsBackup);
+
+      const num = localStorage.getItem('customer_list_advance_search_column_number') || 1;
+      this.columnNum = Number(num);
+    },
+    /**
+     *  人员类型的字段
+     *  绑定在form中的value是一个id，在初始化的时候却要给一个对象
+     *  所以选择某个人的时候，储存这个对象
+     *  在还原搜索状态的时候，取这个对象初始化这个form，
+     * */
+    modifyUser(type, fieldName) {
+      const store = {};
+      if (type === 'linkman') {
+        store.linkman = this.inputRemoteSearch.linkman.options.filter(lm => lm.id === this.params.linkmanId);
+      }
+      if (type === 'tags') {
+        store.tags = this.inputRemoteSearch.tag.options.filter(tag => tag.id === this.params.tagId);
+      }
+      if (type === 'createUser') {
+        const selected = this.inputRemoteSearch.creator.options.filter(ct => ct.userId === this.params.createUser);
+        let storageData = localStorage.getItem('store_user_for_search_customer') || '{}';
+        storageData = JSON.parse(storageData);
+        if (storageData.creator) {
+          storageData.creator = this.concatArrayAndItemUnique(storageData.creator, selected, 'userId');
+        } else {
+          store.creator = selected;
+        }
+
+      }
+      if (type === 'customerManager') {
+        store.customerManager = this.inputRemoteSearch.customerManager.options.filter(ct => ct.userId === this.params.customerManager);
+      }
+
+      // 自定义字段
+      if (type === 'user') {
+        const selected = this.inputRemoteSearch.creator.options.filter(ct => ct.userId === this.params.customizedSearchModel[fieldName].value);
+
+        let storageData = localStorage.getItem('store_user_for_search_customer') || '{}';
+        storageData = JSON.parse(storageData);
+        if (storageData.creator) {
+          store.creator = this.concatArrayAndItemUnique(storageData.creator, selected, 'userId');
+        } else {
+          store.creator = selected;
+        }
+      }
+
+      localStorage.setItem('store_user_for_search_customer', JSON.stringify(store));
+    },
     setAdvanceSearchColumn(command){
       this.columnNum = Number(command);
       localStorage.setItem('customer_list_advance_search_column_number', command);
@@ -702,15 +770,26 @@ export default {
         }
       });
     },
-    buildConfig() {
+    buildConfig(storage) {
+      const storageData = storage || {};
+      /**
+       * storageData如果存在，那就还原storage中的值
+       * date、datetime类型的要注意 new Date一下
+       * 人员选择初始化值是一个id，还要初始化它的options
+       */
+
       this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
         .map(f => {
 
           if (f.isSearch && !f.isSystem) {
+            if (storageData[f.fieldName] && (storageData[f.fieldName].formType === 'date' || storageData[f.fieldName].formType === 'datetime') && storageData[f.fieldName].operator === 'between') {
+              storageData[f.fieldName].value = storageData[f.fieldName].value && storageData[f.fieldName].value.map(t => new Date(t));
+            }
+
             // 需要搜索的字段
             this.$set(this.params.customizedSearchModel, f.fieldName, {
               fieldName: f.fieldName,
-              value: null,
+              value: storageData[f.fieldName] ? storageData[f.fieldName].value : null,
               operator: this.matchOperator(f.formType),
               formType: f.formType,
             });
@@ -897,6 +976,16 @@ export default {
       } else {
         return undefined;
       }
+    },
+    concatArrayAndItemUnique(arr1, arr2, key) {
+      // 数组中的对象根据id去重
+      let obj = {};
+      if (!arr1 || !arr1.length) return arr2 || [];
+      if (!arr2 || !arr2.length) return arr1 || [];
+      return [...arr1, ...arr2].reduce((cur,next) => {
+        obj[next[key]] ? "" : obj[next[key]] = true && cur.push(next);
+        return cur;
+      },[]);
     },
     handleCitySelectorChange(city) {
       this.params.specialSearchModel.addressSelector = city;
@@ -1197,6 +1286,9 @@ export default {
       for (let key in this.params.customizedSearchModel) {
         this.params.customizedSearchModel[key].value = null;
       }
+
+      this.inputRemoteSearch.linkman.options = [];
+      this.inputRemoteSearch.creator.options = [];
       this.$refs.baseDistPicker.clearValue();
       this.search();
       sessionStorage.removeItem('customer_list_search_status');
@@ -1238,7 +1330,7 @@ export default {
     },
     searchTag(keyword) {
       this.inputRemoteSearch.tag.loading = true;
-      return this.$http.get('/customer/tag/list', {keyword: keyword, pageNum: 1,})
+      return this.$http.get('/customer/tag/list', {keyword: keyword, pageNum: 1, pageSize: 100 * 100, })
         .then(res => {
           if (res && res.list) {
             this.inputRemoteSearch.tag.options = res.list;

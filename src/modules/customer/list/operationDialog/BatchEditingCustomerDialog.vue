@@ -13,7 +13,7 @@
         :prop="selectedFieldName"
         :key="selectedFieldName"
         :rules="selectedField.rules"
-        v-if="selectedField.formType === 'text' || selectedField.formType === 'code'">
+        v-if="selectedField.formType === 'text' || selectedField.formType === 'code' || selectedField.formType === 'phone' || selectedField.formType === 'email'">
         <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50"
                   type="text"></el-input>
       </el-form-item>
@@ -303,9 +303,9 @@ export default {
       this.$nextTick(() => {
         this.form = JSON.parse(JSON.stringify(this.formBackup));
         this.$refs.editCustomerForm.resetFields();
-        if (this.selectedFieldName === 'manager') {
-          this.searchCustomerManager();
-        }
+        // if (this.selectedFieldName === 'manager') {
+        //   this.searchCustomerManager();
+        // }
         if (this.selectedFieldName === 'tags') {
           this.searchTag();
         }
@@ -381,6 +381,36 @@ export default {
               type: 'number',
               message: `请输入数字`, trigger: ['blur', 'change']
             }];
+          } else if (f.formType === 'phone') {
+            f.rules = [{
+              required: true, message: `请输入电话`, trigger: ['blur', 'change']
+            }, {
+              trigger: ['blur', 'change'],
+              validator(rule, value, callback) {
+                const reg = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
+                if (!reg.test(value)) {
+                  callback(new Error('请输入正确的电话'));
+                }
+                callback();
+              }
+            }, {
+              trigger: ['blur', 'change']
+            }]
+          } else if (f.formType === 'email') {
+            f.rules = [{
+              required: true, message: `请输入邮箱`, trigger: ['blur', 'change']
+            }, {
+              trigger: ['blur', 'change'],
+              validator(rule, value, callback) {
+                const reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+                if (!reg.test(value)) {
+                  callback(new Error('请输入正确的邮箱'));
+                }
+                callback();
+              }
+            }, {
+              trigger: ['blur', 'change']
+            }]
           }
 
           return f;
@@ -514,7 +544,7 @@ export default {
     },
     searchTag(keyword) {
       this.inputRemoteSearch.tag.loading = true;
-      this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1,})
+      this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1, pageSize: 100 * 100, })
         .then(res => {
           this.inputRemoteSearch.tag.options = res.list;
           this.inputRemoteSearch.tag.loading = false;
@@ -549,7 +579,7 @@ export default {
     .el-form-item {
       margin: 0;
 
-      .el-select {
+      .el-select, .el-date-editor.el-input {
         width: 100%;
       }
       .base-dist-picker {
