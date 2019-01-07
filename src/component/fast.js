@@ -2,11 +2,13 @@
 import BaseContact from './common/BaseContact';
 import BaseMapPicker from './common/BaseMapPicker';
 import BaseMapDisplay from "./common/BaseMapDisplay";
+import BaseSelectTeam from "./common/BaseSelectTeam";
 
 const components = [
   BaseContact,
   BaseMapPicker,
-  BaseMapDisplay
+  BaseMapDisplay,
+  BaseSelectTeam
 ];
 
 const fast = {

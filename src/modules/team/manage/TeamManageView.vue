@@ -16,6 +16,7 @@
         <base-button type="primary" @event="teamChildCreate">新建子团队</base-button>
         <base-button type="primary" @event="teamDetail">团队详情</base-button>
         <base-button type="ghost" icon="icon-fe-close" @event="teamDelete">删除团队</base-button>
+        <div ref="selectView"></div>
       </div>
       <!-- end 按钮 -->
       <!-- start 团队 表格 -->
@@ -67,7 +68,8 @@ export default {
     if (localStoragePageSize) {
       this.paginationInfo.pageSize = Number(localStoragePageSize);
     }
-    this.fentchData();
+    // this.fentchData();
+    this.select();
   },
   methods: {
     fentchData() {
@@ -138,6 +140,16 @@ export default {
     /** 选中的 select 切换 */
     selectionToggle() {
       // 
+    },
+    select() {
+      let options = {
+        placeholder: '请选择人员',
+        multiple: false,
+        el: this.$refs.selectView
+      }
+      this.$fast.selectTeam.choose('team', options).then(user => {
+        console.log(user)
+      }).catch(err => console.log(err))
     }
   },
   components: {
@@ -172,11 +184,15 @@ export default {
   .manage-operate-btns {
     background-color: #fff;
     border-bottom: 1px solid #f2f2f2;
+    display: flex;
     margin-top: 10px;
     padding: 10px;
     
     .danger-button {
       margin-left: 20px;
+    }
+    button {
+      margin-right: 10px;
     }
 
   }
