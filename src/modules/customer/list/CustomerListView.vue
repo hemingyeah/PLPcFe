@@ -2,7 +2,7 @@
   <div class="customer-list-container" ref="customerListPage" v-loading.fullscreen.lock="loadingListData">
     <!--搜索-->
     <div class="customer-list-search-group-container">
-      <form class="base-search"r onsubmit="return false;">
+      <form class="base-search" onsubmit="return false;">
         <div class="customer-list-base-search-group">
           <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -686,6 +686,7 @@ export default {
       }
 
       this.params = _.cloneDeep(this.paramsBackup);
+      delete this.params.keyword;
 
       const num = localStorage.getItem('customer_list_advance_search_column_number') || 1;
       this.columnNum = Number(num);
