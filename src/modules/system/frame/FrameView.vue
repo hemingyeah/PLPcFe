@@ -29,6 +29,7 @@
             </el-popover>
 
             <a 
+              v-if="showDevTool"
               href="/v3" class="btn-text frame-header-btn frame-header-btn-bg"
               title="返回旧版" v-tooltip>
               <i class="iconfont icon-qiehuan"></i>
