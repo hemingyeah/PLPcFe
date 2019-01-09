@@ -39,13 +39,10 @@
           v-model="form.tags"
           multiple
           filterable
-          remote
-          reserve-keyword
           clearable
           placeholder="请输入关键词搜索"
           @change="selectTag"
-          :loading="inputRemoteSearch.tag.loading"
-          :remote-method="searchTag">
+        >
           <el-option
             v-for="item in inputRemoteSearch.tag.options"
             :key="item.id"
@@ -83,7 +80,7 @@
         :prop="selectedFieldName"
         :key="selectedFieldName"
         :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'selectMulti'">
+        v-else-if="selectedField.formType === 'select' && selectedField.setting.isMulti">
         <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
           <el-option
             v-for="item in selectedField.setting.dataSource"
@@ -98,7 +95,7 @@
         :prop="selectedFieldName"
         :key="selectedFieldName"
         :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'select'">
+        v-else-if="selectedField.formType === 'select' && !selectedField.setting.isMulti">
         <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
           <el-option
             v-for="item in selectedField.setting.dataSource"
@@ -306,9 +303,9 @@ export default {
         // if (this.selectedFieldName === 'manager') {
         //   this.searchCustomerManager();
         // }
-        if (this.selectedFieldName === 'tags') {
-          this.searchTag();
-        }
+        // if (this.selectedFieldName === 'tags') {
+        //   this.searchTag();
+        // }
       });
     },
     openBatchEditingCustomerDialog() {
@@ -317,6 +314,7 @@ export default {
       }
       this.batchEditingCustomerDialog = true;
       this.buildDynamicField();
+      this.searchTag();
     },
     selectTag(val) {
       const ts = this.inputRemoteSearch.tag.options;
@@ -353,7 +351,7 @@ export default {
       const customizedField = this.fields
         .filter(f => f.isSystem === 0 && f.formType !== 'attachment' && f.formType !== 'separator')
         .map(f => {
-          if (f.formType === 'selectMulti') {
+          if (f.formType === 'select' && f.setting.isMulti) {
             this.$set(this.form, f.fieldName, []);
           } else {
             this.$set(this.form, f.fieldName, null);

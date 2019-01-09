@@ -405,13 +405,13 @@ const FormDesign = {
       
         if (distance > 0 && position !== 'bottom') {
           // console.warn("鼠标向上滚动");
-          containerEl.scrollTop -= 10;
+          containerEl.scrollTop += 10;
   
         }
       
         if (distance < 0 && position !== 'top') {
           // console.log("鼠标向下滚动");
-          containerEl.scrollTop += 10;
+          containerEl.scrollTop -= 10;
         }
       }, 100)();
     },

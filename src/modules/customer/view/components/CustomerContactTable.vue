@@ -22,7 +22,8 @@
             {{scope.row[column.field]}}
           </template>
           <template v-else-if="column.field === 'name'">
-            <a href="javascript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
+            <a v-if="allowEditCustomer" href="javascript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
+            <template v-else>{{scope.row[column.field]}}</template>
           </template>
           <div class="lm-action" v-else-if="column.field === 'action'">
             <template>

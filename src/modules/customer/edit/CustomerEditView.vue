@@ -137,7 +137,7 @@ export default {
       let sortedFields = originFields.sort((a,b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
-            f.isNull = this.initData.addressAllowNull ? 1 : 0;
+            f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
           }
           return f;
         })

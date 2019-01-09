@@ -83,6 +83,9 @@ const FrameManager = {
     },
     //关闭frameTab
     closeFrameTab(frameTab){
+      // console.log('frameTab', frameTab);
+      // sessionStorage.removeItem('customer_list_search_status');
+  
       //TODO:迁移完成后删除
       localStorage.removeItem("frame_tab_" + frameTab.id + "_idArray");
 

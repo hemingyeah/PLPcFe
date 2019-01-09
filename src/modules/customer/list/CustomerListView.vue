@@ -582,12 +582,12 @@ export default {
           c.exportAlias = 'customerAddress';
         }
 
-        if (c.field === 'tags') {
-          c.exportAlias = 'customerTags';
-        }
+        // if (c.field === 'tags') {
+        //   c.exportAlias = 'customerTags';
+        // }
 
         if (c.field === 'customerManagerName') {
-          c.exportAlias = 'customerManager';
+          c.exportAlias = 'manager';
         }
 
         if (c.field === 'status') {
@@ -1290,6 +1290,7 @@ export default {
 
       this.inputRemoteSearch.linkman.options = [];
       this.inputRemoteSearch.creator.options = [];
+
       this.$refs.baseDistPicker.clearValue();
       this.search();
       sessionStorage.removeItem('customer_list_search_status');
@@ -1333,10 +1334,8 @@ export default {
       this.inputRemoteSearch.tag.loading = true;
       return this.$http.get('/customer/tag/list', {keyword: keyword, pageNum: 1, pageSize: 100 * 100, })
         .then(res => {
-          if (res && res.list) {
-            this.inputRemoteSearch.tag.options = res.list;
-            this.inputRemoteSearch.tag.loading = false;
-          }
+          this.inputRemoteSearch.tag.loading = false;
+          this.inputRemoteSearch.tag.options = res && res.list ? res.list : [];
           return res;
         })
         .catch(err => console.error('searchTag function catch err', err));

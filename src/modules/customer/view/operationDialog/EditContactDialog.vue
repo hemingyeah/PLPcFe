@@ -34,10 +34,7 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    isPhoneUnique: {
-      type: Boolean,
-      default: true,
-    }
+    isPhoneUnique: Boolean,
   },
   data() {
     return {
@@ -161,7 +158,7 @@ export default {
       }
     },
     genPlaceholder(field){
-      return FormUtil.genPlaceholder(field)
+      return FormUtil.genPlaceholder(field);
     },
     async submit() {
       try {
