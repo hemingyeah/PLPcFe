@@ -52,7 +52,7 @@ function createSettingComp(h, field){
   if (field.isSystem) return (
     <div class="form-setting-panel">
       <h3>系统字段 -- {field.displayName}</h3>
-      <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
+      <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。{field.formType === 'address' && '如需将地址设置为非必填请在客户设置中启用该选项。'}</p>
     </div>
   );
 

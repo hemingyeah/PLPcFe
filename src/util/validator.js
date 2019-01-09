@@ -128,11 +128,14 @@ function user(value, field = {}) {
 
 function address(value, field = {}) {
   return new Promise(resolve => {
+    const {province, city, dist, address} = value;
+  
+    if (address && (!province || !city)) {
+      return resolve('请补全地址');
+    }
+    
     if (field.isNull) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请补全${field.displayName}`);
-    
-    
-    const {province, city, address} = value;
   
     if (!province || !city || !address) {
       return resolve('必填');

@@ -1290,6 +1290,7 @@ export default {
 
       this.inputRemoteSearch.linkman.options = [];
       this.inputRemoteSearch.creator.options = [];
+      this.searchTag();
 
       this.$refs.baseDistPicker.clearValue();
       this.search();

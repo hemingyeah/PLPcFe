@@ -58,7 +58,7 @@
     </div>
 
     <edit-contact-dialog ref="EditContactDialog" :customer="shareData.customer" :original-value="selectedContact"
-                         @submit-success="selectedContact = {}"></edit-contact-dialog>
+                         :is-phone-unique="shareData.isPhoneUnique" @submit-success="selectedContact = {}"></edit-contact-dialog>
   </div>
 </template>
 

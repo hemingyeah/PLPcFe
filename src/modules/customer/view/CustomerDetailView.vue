@@ -251,6 +251,7 @@ export default {
         loginUser: this.initData.loginUser,
         allowEditCustomer: this.allowEditCustomer,
         isAddressAllowNull: this.initData.isAddressAllowNull,
+        isPhoneUnique: this.initData.isPhoneUnique,
         isDisable: this.isDisable,
         isDelete: this.isDelete,
       };

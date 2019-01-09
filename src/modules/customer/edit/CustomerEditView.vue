@@ -5,9 +5,9 @@
         <div class="title">
           <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button>
           <span class="text">|</span>
-          <span class="text">客户信息</span>
+          <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
+          <!--<span class="text">客户信息</span>-->
         </div>
-        <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" v-if="init">
         <template slot="serialNumber" slot-scope="{field}">
