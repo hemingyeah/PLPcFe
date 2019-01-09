@@ -80,6 +80,10 @@ const FrameManager = {
         //frame页面卸载时，重置刷新icon
         frameWindow.addEventListener('unload', () => tab.loading = true)
       })
+      // 进入客户列表时，清除记录的列表搜索参数
+      if (tab.currentUrl === '/customer') {
+        sessionStorage.removeItem('customer_list_search_status');
+      }
     },
     //关闭frameTab
     closeFrameTab(frameTab){
@@ -145,6 +149,10 @@ const FrameManager = {
         }else{
           iframe.contentWindow.location.reload(true);
         }
+      }
+  
+      if (tab.currentUrl === '/customer') {
+        sessionStorage.removeItem('customer_list_search_status');
       }
     },
     reloadFrameTabById(id){

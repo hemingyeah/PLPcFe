@@ -24,8 +24,11 @@
         <input type="file" ref="file" @change="change"
                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
       </div>
+      <ul class="error-message" v-if="errors.length">
+        <li>导入失败！</li>
+        <li v-for="item in errors" :key="item">{{item}}</li>
+      </ul>
     </div>
-
     <div slot="footer" class="import-footer">
       <button type="button" class="btn btn-text" @click="batchUpdateCustomerDialog = false">关闭</button>
       <el-button type="primary" :disabled="pending" @click="upload" :loading="pending">{{pending ? '正在导入' : '导入'}}</el-button>
@@ -93,6 +96,7 @@ export default {
     closeModal() {
       this.file = null;
       this.fileName = '';
+      this.errors = [];
     },
     choose(){
       this.$refs.file.value = null;
@@ -135,7 +139,7 @@ export default {
             }else{
               let data = result.data || [];
               this.errors = data;
-              Platform.alert(`导入失败！\n${data.join('\n')}`);
+              // Platform.alert(`导入失败！\n${data.join('\n')}`);
             }
             this.pending = false;
           })
@@ -222,6 +226,15 @@ export default {
 
       input[type='file']{
         display: none;
+      }
+    }
+
+    .error-message {
+      max-height: 100px;
+      overflow-y: auto;
+      padding: 0;
+      li {
+        list-style: none;
       }
     }
 

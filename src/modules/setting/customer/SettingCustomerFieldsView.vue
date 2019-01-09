@@ -61,6 +61,7 @@ export default {
 
         let result = await http.post('/setting/customer/saveFields', fields);
         if(result.status == 0){
+          platform.alert('客户字段更新成功');
           return window.location.reload()
         }
         platform.alert(result.message)
