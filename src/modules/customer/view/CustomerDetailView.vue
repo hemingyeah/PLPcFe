@@ -8,7 +8,7 @@
           <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
           <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable"><i class="iconfont icon-notification"></i> 添加提醒</button>
         </template>
-        <a :href="`/customer/oldView/${id}`">返回旧版</a>
+        <!-- <a :href="`/customer/oldView/${id}`">返回旧版</a> -->
       </div>
       <div class="action-btn" v-if="!isDelete">
         <el-dropdown trigger="click" v-if="allowCreateTask">
