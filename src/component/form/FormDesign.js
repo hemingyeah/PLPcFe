@@ -402,14 +402,18 @@ const FormDesign = {
         e = e || window.event;
         const distance = e.detail || e.wheelDelta;
         const position = this.judgePosition(containerEl);
+        
+        // console.log('scrollWrap');
       
-        if (distance > 0 && position !== 'bottom') {
+        // if (distance > 0 && position !== 'bottom') {
+        if (distance > 0) {
           // console.log("鼠标向下滚动");
           containerEl.scrollTop -= 10;
   
         }
       
-        if (distance < 0 && position !== 'top') {
+        // if (distance < 0 && position !== 'top') {
+        if (distance < 0) {
           // console.warn("鼠标向上滚动");
           containerEl.scrollTop += 10;
         }

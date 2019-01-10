@@ -217,6 +217,14 @@ export default {
         this.form.address.adAddress = newValue;
       },
       deep: true
+    },
+    form: {
+      handler: function(newValue) {
+        if ((this.selectedField.formType === 'manager' || this.selectedField.formType === 'user') && !newValue[this.selectedField.fieldName]) {
+          this.inputRemoteSearch.customerManager.options = [];
+        }
+      },
+      deep: true
     }
   },
   computed: {

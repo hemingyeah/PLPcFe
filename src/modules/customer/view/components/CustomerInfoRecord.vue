@@ -187,7 +187,11 @@ export default {
         }
       }
 
-      if(action == '批量更新') return <h5><strong>{userName}</strong>通过导入更新了客户。</h5>
+      if(action == '批量更新') return [
+        <h5><strong>{userName}</strong>通过导入更新了客户。</h5>,
+        content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
+        // createAttachmentDom(h,attachments)
+      ]
   
       return [
         <h5><strong>{userName}</strong>{action}了客户。</h5>,
