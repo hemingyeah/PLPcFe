@@ -96,7 +96,7 @@ const FormView = {
       if (formType === 'user') {
         params = {
           ...params,
-          value: value && value.displayName
+          value: value && (value.displayName || value.name)
         };
       }
       

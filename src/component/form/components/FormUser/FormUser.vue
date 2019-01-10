@@ -33,7 +33,7 @@ export default {
   computed: {
     displayName(){
       let user = this.value || {};
-      return user.displayName
+      return user.displayName || user.name;
     },
     isEmpty(){//根据userId判断是否为空
       let value = this.value || {};

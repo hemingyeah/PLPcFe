@@ -17,7 +17,7 @@
     </div>
     <h3>
       选项设置
-      <el-checkbox class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
+      <el-checkbox v-if="!field.fieldName" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
       <!-- <label class="form-select-setting-isMulti">
         <input type="checkbox" :checked="field.isMulti" @input="update" data-prop="isMulti"> 多选
       </label> -->

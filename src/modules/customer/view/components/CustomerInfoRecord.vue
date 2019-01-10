@@ -166,7 +166,7 @@ export default {
         if(content.type == '已发送') return <h5>已发送了消息提醒{content.remindName}给{content.remindTo}。</h5>
         return [
           <h5><strong>{userName}</strong>{content.type}了消息提醒。</h5>,
-          <p className="secondary-info">提醒人：{content.remindName}</p>,
+          <p className="secondary-info">提醒名称：{content.remindName}</p>,
           content.rule ? <p class="secondary-info">{content.rule}</p> : ''
         ]
       }
