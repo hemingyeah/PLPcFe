@@ -1521,7 +1521,7 @@ html, body {
 
     .customer-list-base-search-group {
       display: flex;
-      width: 500px;
+      width: 440px;
       justify-content: space-between;
 
       .el-input {
