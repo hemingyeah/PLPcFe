@@ -187,6 +187,9 @@ export default {
   }
 
   .batch-update-customer-dialog {
+    .base-modal-header {
+      justify-content: space-between;
+    }
     .main-content {
       font-size: 12px;
       padding: 20px 20px 0 20px;

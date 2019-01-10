@@ -109,6 +109,10 @@ export default {
 
 <style lang="scss">
   .base-import-modal {
+
+    .base-modal-header {
+      justify-content: space-between;
+    }
     .base-modal-body {
       padding: 15px;
     }
