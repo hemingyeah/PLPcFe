@@ -56,7 +56,6 @@ export default {
           return platform.alert(validateRes.join('\n'));
         }
 
-
         this.pending = true;
 
         let result = await http.post('/setting/customer/saveFields', fields);
@@ -87,6 +86,19 @@ export default {
         }
         if (tv2 && tv2.length > 20) {
           msg.push(`字段名称 ${f.displayName} 长度超过20个字母`);
+        }
+
+        if (f.formType === 'select') {
+
+          if (f.setting.dataSource.some(v => !v)) {
+            msg.push(`字段名称 ${f.displayName} 包含有值为空的选项`);
+          }
+
+          for (let i = 0;i <= f.setting.dataSource.length;i++) {
+            if (f.setting.dataSource.filter(item => item === f.setting.dataSource[i]).length > 1) {
+              return msg.push(`字段名称 ${f.displayName} 包含有重复的选项`);
+            }
+          }
         }
       });
 

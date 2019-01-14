@@ -372,6 +372,10 @@ export default {
         slotName: 'record-tab',
         show: true,
       }, {
+        displayName: `联系人(${linkmanQuantity || 0})`,
+        component: CustomerContactTable.name,
+        show: !this.isDelete
+      }, {
         displayName: `客户提醒(${remindQuantity || 0})`,
         component: CustomerRemindTable.name,
         show: !this.isDelete && !this.isDisable
@@ -394,10 +398,6 @@ export default {
       }, {
         displayName: `客户地址(${addressQuantity || 0})`,
         component: CustomerAddressTable.name,
-        show: !this.isDelete
-      }, {
-        displayName: `联系人(${linkmanQuantity || 0})`,
-        component: CustomerContactTable.name,
         show: !this.isDelete
       }]
         .filter(tab => tab.show);

@@ -16,7 +16,7 @@
       <el-form-item label="模板内容">
         <el-input type="textarea" v-model="template" rows="5" resize="none"></el-input>
       </el-form-item>
-      <el-form-item label="发送时间">
+      <el-form-item label="发送时间" :error="error">
         <el-date-picker
           v-model="form.sendTime"
           type="datetime"
@@ -69,7 +69,8 @@ export default {
         disabledDate(time) {
           return time.getTime() < Date.now();
         },
-      }
+      },
+      error: '',
     }
   },
   props: {
@@ -106,6 +107,12 @@ export default {
   },
   methods: {
     onSubmit() {
+      if (!this.form.sendTime) {
+        return this.error = '请选择有效的发送时间';
+      } else {
+        this.error = '';
+      }
+
       const params = this.buildParams();
       this.pending = true;
 
