@@ -63,6 +63,7 @@
 /* global AMap */
 import _ from 'lodash';
 import platform from '@src/platform';
+import cityMap from '../BaseDistPicker/specialCityMap';
 
 let map = null;
 let geocoder = null;
@@ -116,7 +117,7 @@ export default {
     /** 选中地址 */
     choose(item) {
       platform.confirm('确定要使用该地址？').then(value => {
-        if (!value) return Promise.reject('cancel')
+        if (!value) return Promise.reject('cancel');
 
         //如果选择的是推荐地址，直接返回数据
         if (!item.isPOI) {
@@ -237,7 +238,6 @@ export default {
 
       let province = adr.province;
       let city = adr.city;
-      //let dist = adr.district;
 
       return province && city;
     },
@@ -255,12 +255,25 @@ export default {
       if (!province) return null;
 
       //港、澳、台三地归入 其他区域
-      if (['香港', '澳门', "澳門", '台湾'].some(item => province.indexOf(item) == 0)) {
+      if (['香港', '澳门', "澳門"].some(item => province.indexOf(item) == 0)) {
         return {
-          province: "其他区域",
-          city: "其他",
+          province: cityMap[province] || province,
+          city: cityMap[adr.district] || adr.district || '市轄區',
           dist: "",
-          address: regeocode.formattedAddress,
+          address,
+          latitude: location.lat,
+          longitude: location.lng
+        };
+      }
+      if (province.indexOf('台湾') == 0) {
+        const index = (address.match(/[市縣]/) || {}).index || 0;
+        const dist = index && address.slice(0, index + 1);
+        address = dist ? address.replace(dist, '') : address;
+        return {
+          province: '台湾省',
+          city: cityMap[dist] || '其他',
+          dist: "",
+          address,
           latitude: location.lat,
           longitude: location.lng
         };
@@ -339,7 +352,8 @@ export default {
 
       AMap.plugin(['AMap.Geocoder', 'AMap.Autocomplete'], function () {
         geocoder = new AMap.Geocoder({
-          extensions: 'all'
+          extensions: 'all',
+          lang: 'zh_cn',
         });
 
         map.on('click', function (event) {
