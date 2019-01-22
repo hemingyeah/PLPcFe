@@ -65,7 +65,7 @@ const BaseDatatableHead = {
         <th class={col.toggle ? "th-padding" : ""}>
           {typeof col.headRender == "function"
             ? col.headRender(h, col)
-            : col.label}
+            : <div class="base-datatable-cell">{col.label}</div>}
         </th>
       ));
     },
@@ -73,41 +73,25 @@ const BaseDatatableHead = {
   render(h) {
     let columns = this.columns;
     let tableWidth = this.multiple ? this.$parent.$el.clientWidth - 50 : this.$parent.$el.clientWidth;
-    let colWidth = util.computeColumnWidth(columns, tableWidth, this)
+    let colWidths = util.computeColumnWidth(columns, tableWidth, this)
+    let total = colWidths.reduce((sum, w) => sum += w) + (this.multiple ? 50 : 0);
 
-    let maxTotal = 0;
-
-    columns.forEach(col => {
-      if (typeof col.width == "number") {
-        maxTotal += col.width;
-      } else {
-        maxTotal += 120;
-      }
-    });
-
-    if(maxTotal < tableWidth) {
-      maxTotal = ''
-    }
-    this.$nextTick(() => {
-      this.num++
-      if(1 == this.num) this.headKey = Math.random() * 100 >> 0
-    })
+    // this.$nextTick(() => {
+    //   this.num++
+    //   if(1 == this.num) this.headKey = Math.random() * 100 >> 0
+    // })
 
     return (
-      <table class="base-datatable-main" width={maxTotal} key={this.headKey}>
+      <table class="base-datatable-main" width={total} key={this.headKey}>
         <colgroup>
-          {
-            this.multiple ? <col width="50" /> : ''
-          }
-          {colWidth.map((item, index) => (
-            <col width={item} />
-          ))}
+          { this.multiple ? <col width="50" /> : '' }
+          { colWidths.map(item => <col width={item}/>) }
         </colgroup>
         <thead class="base-datatable-head">
           <tr>
             {
               this.multiple ?
-                <th class="base-table-checkbox-view">
+                <th class="base-datatable-checkbox">
                   <el-checkbox
                     indeterminate={this.isSelect}
                     value={this.isSelectAll}

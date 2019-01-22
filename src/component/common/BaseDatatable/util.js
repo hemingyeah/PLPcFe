@@ -1,18 +1,18 @@
 import {getScrollBarWidth} from '@src/util/dom'
 
-/** 计算列宽 */
+/** 补全列宽 */
 export function computeColumnWidth(columns, total, ctx){
-  let maxTotal = 0;
-  columns.forEach(col => {
-    if(typeof col.width == 'number') {
-      maxTotal += col.width;
-    } else {
-      maxTotal += 120;
-    }
-  })
-  if(maxTotal > total) {
-    total = maxTotal;
-  }
+  // let maxTotal = 0;
+  // columns.forEach(col => {
+  //   if(typeof col.width == 'number') {
+  //     maxTotal += col.width;
+  //   } else {
+  //     maxTotal += 120;
+  //   }
+  // })
+  // if(maxTotal > total) {
+  //   total = maxTotal;
+  // }
   // console.log(ctx.$parent)
   // console.log(document);
   // console.log(ctx.$root)
@@ -46,7 +46,11 @@ export function computeColumnWidth(columns, total, ctx){
   }
   //平分剩余宽度
   let averageWidth = Math.floor(total / averageSum);
+  //除非知道列宽，否则最小宽度为120px
+  if(averageWidth < 120) averageWidth = 120;
+
   let surplusWidth = total - averageWidth * averageSum;
+  if(surplusWidth < 0) surplusWidth = 0;
 
   //为每个列赋值
   for(let i = 0; i < columns.length; i++){

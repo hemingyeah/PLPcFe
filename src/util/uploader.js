@@ -113,12 +113,13 @@ export function batchUploadWithParse(files, action = '/files/upload'){
   }
 
   let promises = fileArr.map(file => uploadWithParse(file, action));
-  return Promise.all(promises).then(result => {
-    let success = [];
-    let error = [];
-    result.forEach(item => item instanceof Error ? error.push(item) : success.push(item))
-    return {success, error}
-  })
+  return Promise.all(promises)
+    .then(result => {
+      let success = [];
+      let error = [];
+      result.forEach(item => item instanceof Error ? error.push(item) : success.push(item))
+      return {success, error}
+    })
     .catch(error => console.error('batchUploadWithParse caught e', error))
 }
 

@@ -49,11 +49,15 @@ const BaseDatatableBody = {
         let tr = (
           <tr {...attrs}>
             {
-              this.multiple ?
-                <td class="base-table-checkbox-view">
-                  <el-checkbox value={row.selected} onInput={value => this.toggleRowSelect(value, row)}></el-checkbox>
-                </td> :
-                ''
+              this.multiple 
+                ? (
+                  <td class="base-datatable-checkbox">
+                    <el-checkbox 
+                      value={row.selected} 
+                      onInput={value => this.toggleRowSelect(value, row)}/>
+                  </td>
+                ) 
+                : ''
             }
             {
               columns.map((col, index) => {
@@ -64,7 +68,7 @@ const BaseDatatableBody = {
                       this.renderRowChildrenToggle(h, col, rawData) // row 子级默认展开渲染
                     }
                   </td> :
-                  this.renderCell(h, rawData, col);
+                  this.renderTd(h, rawData, col);
               })
             }
           </tr>
@@ -100,7 +104,7 @@ const BaseDatatableBody = {
                 ''
             }
           </span>
-          { this.renderMethodsJudge(h, rawData, col) }
+          { this.renderCell(h, rawData, col) }
         </div>
       )
     },
@@ -111,72 +115,52 @@ const BaseDatatableBody = {
           col.toggleRender(h, col, rawData) : // 下面是默认渲染样式
           <div class="base-table-dotted-td"> 
             <div class="base-table-row-children-line"></div>
-            { this.renderMethodsJudge(h, rawData, col) }
+            { this.renderCell(h, rawData, col) }
           </div>
       )
     },
     /** 渲染表格内容 */
+    renderTd(h, row, col){
+      return <td>{this.renderCell(h, row, col)}</td>
+    },
     renderCell(h, row, col){
       return (
-        <td>
-          {
-            this.renderMethodsJudge(h, row, col)
-          }
-        </td>
-      )
-    },
-    /** render 方法判断 */
-    renderMethodsJudge(h, row, col) {
-      return (
-        col['toggle'] && typeof col.toggleRender == 'function' ? 
-          col.toggleRender(h, col, row) : 
-          typeof col.render == 'function' ? 
-            col.render(h, col, row) : 
-            this.getValue(col, row)
-      )
-    },
+        typeof col.render == 'function' 
+          ? col.render(h, col, row) 
+          : (
+            <div class="base-datatable-cell">
+              <span>{this.getValue(col, row)}</span>
+            </div>
+          )
+      );
+    }
   },
   render(h){
+    //无数据返回空提示
+    if(this.rows.length <= 0){
+      return <div class="base-table-empty-block"><span class="base-table-empty-text">暂无数据</span></div>
+    }
+
     let columns = this.columns;
     let tableWidth = this.multiple ? this.$parent.$el.clientWidth - 50 : this.$parent.$el.clientWidth;
-    let colWidth = util.computeColumnWidth(columns, tableWidth, this)
+    let colWidths = util.computeColumnWidth(columns, tableWidth, this);
+    let total = colWidths.reduce((sum, w) => sum += w) + (this.multiple ? 50 : 0);
 
-    let maxTotal = 0;
+    // this.$nextTick(() => {
+    //   this.num++
+    //   if(1 == this.num) this.bodyKey = Math.random() * 100 >> 0
+    // })
 
-    columns.forEach(col => {
-      if (typeof col.width == "number") {
-        maxTotal += col.width;
-      } else {
-        maxTotal += 120;
-      }
-    });
-
-    if(maxTotal < tableWidth) {
-      maxTotal = ''
-    }
-    this.$nextTick(() => {
-      this.num++
-      if(1 == this.num) this.bodyKey = Math.random() * 100 >> 0
-    })
     return (
-      this.rows.length > 0 ?
-        <table class="base-datatable-main" ref="baseTableBody" width={maxTotal} key={this.bodyKey}>
-          <colgroup>
-            {
-              this.multiple ?
-                <col width="50"></col> :
-                ''
-            }
-            {colWidth.map((item, index) => {
-              this.columns[index]['elWidth'] = item;
-              return <col width={item}></col>
-            })}
-          </colgroup>
-          <tbody class="base-datatable-body">
-            {this.renderRow(h, this.rows, this.columns)}
-          </tbody>
-        </table> :
-        <div class="base-table-empty-block"><span class="base-table-empty-text">暂无数据</span></div>
+      <table class="base-datatable__table" width={total} ref="baseTableBody" key={this.bodyKey}>
+        <colgroup>
+          { this.multiple ? <col width="50"></col> : '' }
+          { colWidths.map(item => <col width={item}></col>) }
+        </colgroup>
+        <tbody class="base-datatable-body">
+          {this.renderRow(h, this.rows, this.columns)}
+        </tbody>
+      </table> 
     )
   },
 }

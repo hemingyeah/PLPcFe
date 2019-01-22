@@ -188,4 +188,5 @@ async function validate(value, field, options = {}){
 
 const Validator = {validate};
 
+//TODO: 去除远程验证方式，改为validator（function）方式
 export default Validator;

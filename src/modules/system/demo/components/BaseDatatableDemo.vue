@@ -274,7 +274,7 @@ export default {
           headRender(h, col){
             return <span>{col.label} <i class="iconfont icon-address"></i></span>
           },
-          render(h, col, row) {
+          render1(h, col, row) {
             let str = ''
             if(row.area.length < 25) {
               str = row.area;

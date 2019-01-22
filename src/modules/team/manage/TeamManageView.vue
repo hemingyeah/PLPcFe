@@ -207,7 +207,6 @@ export default {
     }
     .base-table-nowrap-text {
       @include text-ellipsis;
-      white-space: normal;
       word-break: break-all;
       line-height: 23px;
     }
