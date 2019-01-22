@@ -1,6 +1,4 @@
 /** 全局polyfill @author dongls */
-import "babel-polyfill";
-
 if (!Element.prototype.matches) {
   Element.prototype.matches =
     Element.prototype.matchesSelector ||

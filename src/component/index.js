@@ -17,6 +17,8 @@ import BaseButton from './common/BaseButton';
 import BaseSelect from './common/BaseSelect';
 import BaseDatatable from './common/BaseDatatable';
 
+import TsxComp from './common/TsxComp/index.tsx'
+
 import Form from './form';
 import Fast from './fast'
 
@@ -40,7 +42,8 @@ const components = [
   BaseSpin,
   BaseButton,
   BaseSelect,
-  BaseDatatable
+  BaseDatatable,
+  TsxComp
 ];
 
 export default {

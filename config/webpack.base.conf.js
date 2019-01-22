@@ -20,13 +20,15 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader'
       },
+      { 
+        test: /\.tsx?$/, 
+        loader: ["babel-loader", "ts-loader"],
+        exclude: /node_modules/
+      },
       {
-        test: /\.js$/,
+        test: /\.m?js$/,
         loader: 'babel-loader',
-        exclude: file => (
-          /node_modules/.test(file) &&
-          !/\.vue\.js/.test(file)
-        )
+        exclude: /node_modules/
       },
       {
         test: /\.scss$/,

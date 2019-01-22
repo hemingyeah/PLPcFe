@@ -1,5 +1,6 @@
 <template>
   <div>
+    <tsx-comp/>
     <base-datatable-demo/>
     <!--   
     <a href="javascript:;" @click="open">open</a>
