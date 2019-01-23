@@ -116,44 +116,79 @@ export default {
     },
     /** 选中地址 */
     choose(item) {
-      platform.confirm('确定要使用该地址？').then(value => {
-        if (!value) return Promise.reject('cancel');
+      //如果选择的是推荐地址，直接返回数据
+      if (!item.isPOI) {
+        let data = {
+          province: item.province,
+          city: item.city,
+          dist: item.dist,
+          address: item.address,
+          latitude: item.latitude,
+          longitude: item.longitude
+        };
+        this.show = false;
+        this.$emit('input', data);
+        return
+      }
 
-        //如果选择的是推荐地址，直接返回数据
-        if (!item.isPOI) {
-          let data = {
-            province: item.province,
-            city: item.city,
-            dist: item.dist,
-            address: item.address,
-            latitude: item.latitude,
-            longitude: item.longitude
-          };
-          this.show = false;
-          this.$emit('input', data);
-          return
+      //如果是附近的点，需要先解析当前位置
+      let location = new AMap.LngLat(item.longitude, item.latitude)
+      this.getAddress(location).then(result => {
+        if (null == result) {
+          return platform.alert('当前地址不可用，请重新选择')
         }
 
-        //如果是附近的点，需要先解析当前位置
-        let location = new AMap.LngLat(item.longitude, item.latitude)
-        this.getAddress(location).then(result => {
-          if (null == result) {
-            return platform.alert('当前地址不可用，请重新选择')
-          }
+        let regeocode = result.regeocode || {};
+        let address = this.convertAddress(regeocode, location);//只有省和市都存在时，才是有效地址
 
-          let regeocode = result.regeocode || {};
-          let address = this.convertAddress(regeocode, location);//只有省和市都存在时，才是有效地址
+        if (!this.isSafeAddress(address)) {
+          return platform.alert('当前地址不可用，请重新选择')
+        }
 
-          if (!this.isSafeAddress(address)) {
-            return platform.alert('当前地址不可用，请重新选择')
-          }
-
-          this.show = false;
-          this.$emit('input', address);
-        })
+        this.show = false;
+        this.$emit('input', address);
       })
-        .catch(err => console.error(err))
     },
+    // /** 选中地址 */
+    // choose(item) {
+    //   platform.confirm('确定要使用该地址？').then(value => {
+    //     if (!value) return Promise.reject('cancel')
+    //
+    //     //如果选择的是推荐地址，直接返回数据
+    //     if (!item.isPOI) {
+    //       let data = {
+    //         province: item.province,
+    //         city: item.city,
+    //         dist: item.dist,
+    //         address: item.address,
+    //         latitude: item.latitude,
+    //         longitude: item.longitude
+    //       };
+    //       this.show = false;
+    //       this.$emit('input', data);
+    //       return
+    //     }
+    //
+    //     //如果是附近的点，需要先解析当前位置
+    //     let location = new AMap.LngLat(item.longitude, item.latitude)
+    //     this.getAddress(location).then(result => {
+    //       if (null == result) {
+    //         return platform.alert('当前地址不可用，请重新选择')
+    //       }
+    //
+    //       let regeocode = result.regeocode || {};
+    //       let address = this.convertAddress(regeocode, location);//只有省和市都存在时，才是有效地址
+    //
+    //       if (!this.isSafeAddress(address)) {
+    //         return platform.alert('当前地址不可用，请重新选择')
+    //       }
+    //
+    //       this.show = false;
+    //       this.$emit('input', address);
+    //     })
+    //   })
+    //     .catch(err => console.error(err))
+    // },
     /** 解析地址 */
     parseAddress(location) {
       if (!location) return;
