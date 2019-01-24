@@ -61,8 +61,13 @@
 
 <script>
 /* global AMap */
+
+/**
+ * TODO: 地址转换封装
+ */
+
 import _ from 'lodash';
-import platform from '@src/platform';
+import {alert} from '@src/platform/notification';
 import cityMap from '../BaseDistPicker/specialCityMap';
 
 let map = null;
@@ -135,14 +140,14 @@ export default {
       let location = new AMap.LngLat(item.longitude, item.latitude)
       this.getAddress(location).then(result => {
         if (null == result) {
-          return platform.alert('当前地址不可用，请重新选择')
+          return alert('当前地址不可用，请重新选择')
         }
 
         let regeocode = result.regeocode || {};
         let address = this.convertAddress(regeocode, location);//只有省和市都存在时，才是有效地址
 
         if (!this.isSafeAddress(address)) {
-          return platform.alert('当前地址不可用，请重新选择')
+          return alert('当前地址不可用，请重新选择')
         }
 
         this.show = false;

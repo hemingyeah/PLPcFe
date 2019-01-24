@@ -5,10 +5,14 @@ import '../assets/scss/base.scss';
 import './element.scss';
 import '../common/polyfill';
 
-import Vue from 'vue'
+import Vue from 'vue';
+import filter from '../filter';
+
 import BaseModal from '../component/common/BaseModal';
 import BaseTree from '../component/common/BaseTree';
-import contact from '../component/common/BaseContact';
+import BaseContact from '../component/common/BaseContact';
+import BaseMapPicker from '../component/common/BaseMapPicker';
+
 import {
   Checkbox
 } from 'element-ui';
@@ -17,11 +21,13 @@ import {
 Vue.use(BaseModal);
 Vue.use(BaseTree);
 Vue.use(Checkbox);
+Vue.use(filter)
 
 Vue.prototype.$ELEMENT = { size: 'small'};
 
 const components = {
-  contact: contact.props
+  [BaseContact.namespace]: BaseContact.props,
+  [BaseMapPicker.namespace]: BaseMapPicker.props
 }
 
 window._pc_componentsV2 = components;
