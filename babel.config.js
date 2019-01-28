@@ -8,6 +8,7 @@ const plugins = [
   "@babel/plugin-proposal-class-properties",
   "@babel/plugin-syntax-jsx",
   "transform-vue-jsx",
+  'lodash',
   ["@babel/plugin-proposal-decorators", { 
     "legacy": true 
   }],
