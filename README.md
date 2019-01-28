@@ -23,36 +23,46 @@
 │   ├── assets                    资源文件
 │   ├── common                    公共脚本
 │   ├── component                 组件
-│   ├── component                 项目配置
+│   ├── config                    项目配置
 │   ├── directive                 vue 指令
 │   ├── filter                    vue filter
 │   ├── modules                   模块，所有页面在此开发
 │   ├── platform                  跨浏览器和钉钉工具类
 │   ├── util                      工具类
-│       └── dingtalk              钉钉api
+│   │   └── dingtalk              钉钉api
 │   └── index.html                默认模板
-├── .babelrc                      babel配置
-├── .eslintrc.js                  eslint配置  
-├── jsconfig.json                 vscode相关配置
-├── package.json                  npm配置文件  
-└── postcss.config.js             postcss-loader配置文件
+└── package.json                  npm配置文件 
 ```
 
-## todolist
- * toast 兼容钉钉
- * 层管理 popmanager
- * 合并sm4_pc_components项目
- * 热更新
- * 浏览器ua工具 ▲
- * 输入组件支持清空 ▲
- * 动态计算多行文本框高度 ▲
- * 表单支持键盘操作
- * split分割面板 https://www.iviewui.com/components/split
- * 部门下拉选择框
- * 重写table组件，可折叠的 datatable
- * base64 https://www.npmjs.com/package/Base64
- * 文件上传监听进度
- * 调整远程验证方式，支持传入function
+## 框架更新
+  >  `▲` 表示优先级较高，`▼` 表示优先级低
 
- ## 优化项
- * BaseContact组件选人时，只在需要工单统计信息时才返回统计数据
+  **新增**
+  - [ ] toast组件，兼容钉钉 
+  - [ ] 浏览器ua工具 
+  - [ ] 层管理(PopupManager), 统一管理弹层 
+  - [ ] 合并sm4_pc_components项目(Cascader)
+  - [ ] 浏览器ua工具 
+  - [ ] 输入组件支持清空 
+  - [ ] 动态计算多行文本框高度 
+  - [ ] 表单支持键盘操作
+  - [ ] split分割面板 https://www.iviewui.com/components/split
+  - [ ] 部门下拉选择框 ▲
+  - [ ] 重写table组件，可折叠的 datatable ▲
+  - [ ] base64 https://www.npmjs.com/package/Base64
+  
+  **优化** 
+  - [ ] BaseContact组件选人时，只在需要工单统计信息时才返回统计数据
+  - [ ] 文件上传监听进度 ▲
+  - [ ] FomrBuilder调整远程验证方式，支持传入function ▲
+
+## 工作计划
+  - 产品
+    - [ ] 产品列表
+    - [ ] 产品详情
+    - [ ] 产品新建、编辑
+    - [ ] 产品字段、产品设计器
+    - [ ] 产品模板列表
+    - [ ] 产品模板详情
+    - [ ] 产品模板新建、编辑
+  - 工单

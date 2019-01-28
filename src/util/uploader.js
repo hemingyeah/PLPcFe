@@ -68,6 +68,13 @@ export function upload(file, action){
       }
       resolve(getBody(xhr));
     };
+
+    //TODO: 上传进度监听
+    // if (xhr.upload) {
+    //   xhr.upload.onprogress = function progress(e) {
+    //     console.log(e)
+    //   }
+    // }
     
     xhr.open("post", action, true);
     xhr.send(form);
