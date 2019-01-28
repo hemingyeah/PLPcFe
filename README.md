@@ -45,7 +45,6 @@
  * 热更新
  * 浏览器ua工具 ▲
  * 输入组件支持清空 ▲
- * babel升级至7.0
  * 动态计算多行文本框高度 ▲
  * 表单支持键盘操作
  * split分割面板 https://www.iviewui.com/components/split
