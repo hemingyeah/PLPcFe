@@ -21,8 +21,7 @@
       <!-- end 按钮 -->
       <!-- start 团队 表格 -->
       <div class="team-manage-table">
-        <demo-view>
-        </demo-view>
+        <base-datatable-demo/>
         <div class="table-footer">
           <div class="list-info">
             共<span class="level-padding">{{ paginationInfo.total }}</span>记录，
@@ -49,7 +48,7 @@
 </template>
 
 <script>
-import DemoView from "./../../system/demo/DemoView.vue";
+import BaseDatatableDemo from "./../../system/demo/components/BaseDatatableDemo.vue";
 export default {
   name: 'team-manage-view',
   data() {
@@ -153,7 +152,7 @@ export default {
     }
   },
   components: {
-    [DemoView.name]: DemoView
+    [BaseDatatableDemo.name]: BaseDatatableDemo
   }
 }
 </script>

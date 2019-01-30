@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <tsx-comp/> -->
-    <base-datatable-demo/>
+    <base-datatable-demo style="padding: 10px;"/>
     <!--   
     <a href="javascript:;" @click="open">open</a>
     <a href="javascript:;" @click="open2">open2</a>

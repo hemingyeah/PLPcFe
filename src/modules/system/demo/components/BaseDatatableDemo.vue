@@ -3,10 +3,12 @@
     <base-datatable
       ref="teamTable"
       :columns="columns" :rows="rows"
-      sub-prop="children" row-key="id" 
+      row-key="id" 
       :stripe="true"
       :multiple="true"
-      @select="select"/>
+      @select="select">
+    
+    </base-datatable>
 
     <button type="button" @click="insert">添加数据</button>
     <button type="button" @click="selectInit">清空</button>
@@ -143,6 +145,132 @@ export default {
           area: '山东省青岛市市北区万科中心',
           location: '山东省青岛市李沧区',
           children: [],
+        },
+        {
+          id: 122221,
+          name: '测试团队-1',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122222,
+          name: '测试团队-2',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122223,
+          name: '测试团队-3',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122224,
+          name: '测试团队-4',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122225,
+          name: '测试团队-5',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122226,
+          name: '测试团队-6',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122227,
+          name: '测试团队-7',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122228,
+          name: '测试团队-8',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122229,
+          name: '测试团队-9',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122210,
+          name: '测试团队-10',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122211,
+          name: '测试团队-11',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 122212,
+          name: '测试团队-12',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 1222213,
+          name: '测试团队-13',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
+        },
+        {
+          id: 1222214,
+          name: '测试团队-14',
+          manager: '张三',
+          phone: '13895546633',
+          area: '山东省青岛市市北区万科中心',
+          location: '山东省青岛市李沧区',
+          children: [],
         }
       ]
     },
@@ -244,8 +372,8 @@ export default {
         {
           field: 'name',
           label: '团队名称',
-          toggle: true,
           width: 150,
+          expandProp: 'children',
           render(h, col, row){
             return (
               <a href="javscript:;">{row.name}</a>
@@ -255,7 +383,6 @@ export default {
         {
           field: 'manager',
           label: '团队主管',
-          toggle: true,
           width: 150,
           render(h, col, row) {
             return (
@@ -272,7 +399,10 @@ export default {
           field: 'area',
           label: '负责区域',
           headRender(h, col){
-            return <span>{col.label} <i class="iconfont icon-address"></i></span>
+            return [
+              col.label,
+              <i class="iconfont icon-address" style="font-size:14px;"></i>
+            ]
           },
           render1(h, col, row) {
             let str = ''

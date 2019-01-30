@@ -44,7 +44,7 @@ export default class Page{
       else if(name == 'list') this[name] = this[name].concat(otherPage[name] || []);
       else this[name] = otherPage[name];
     }
-}
+  }
 
   /**
    * 根据给定对象创建一个Page实例，该T实例包含原对象的值。

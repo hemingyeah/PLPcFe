@@ -42,7 +42,7 @@ function getBody(response, body, error){
 }
 
 module.exports = {
-    /**
+  /**
    * 发起一个请求,不能处理附件类请求
    * 如果请求地址需要登录，请在options的headers中传入对应的cookie
    * 

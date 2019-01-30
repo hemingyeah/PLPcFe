@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'base-table-stripe': stripe}" class="base-datatable">
+  <div :class="{'base-table-stripe': false}" class="base-datatable">
     <!-- v-if 默认不会渲染 确保子组件在父组件之后渲染 -->
     <div v-if="isTableShow" class="base-datatable-scroll" :style="{'height': tableHeight}">
       <base-datatable-head
@@ -30,9 +30,6 @@
  * 5. 可自定义单元格渲染内容
  * 6. 可配置列宽
  */
-import _ from "lodash";
-
-import * as TableLayout from './TableLayout';
 import TableRow from './TableRow';
 
 import BaseTableHead from './BaseDatatableHead';
@@ -48,15 +45,6 @@ export default {
     columns: { //表格的列
       type: Array,
       default: () => []
-    },
-    /**
-     * 指定子表格对应的数据
-     * 
-     * 如果类型是String, 组件会自动根据属性取值，
-     * 如果类型是Function, 需要返回数组
-     */
-    subProp: {
-      type: [String, Function]
     },
     /**
      * 行数据的 Key，用来优化 Table 的渲染，必须指定
@@ -175,23 +163,21 @@ export default {
     getValue(col, row){
       return row[col.fieldName];
     },
-    getSubRows(row, prop){ 
-      let subRows = [];
-    
-      if(typeof prop == 'string') subRows = row[prop];
-      if(typeof prop == 'function') subRows = prop(row);
-    
-      return Array.isArray(subRows) ? subRows : [];
+    /** 获取可展开的属性 */
+    getExpandPorp(columns){
+      for(let i = 0; i < columns.length; i++){
+        if(columns[i].expandProp) return columns[i].expandProp;
+      }
     },
     buildTableRows(data){
       let rows = Array.isArray(data) ? data : this.rows;
       let options = {
-        subProp: this.subProp,
+        subProp: this.getExpandPorp(this.columns),
         rowKey: this.rowKey,
+        parent: null
       }
       return rows.map(item => new TableRow(item, options))
     },
-    //TODO:合并数据，用于保持行当前状态
     mergeTableRows(data){
       return this.buildTableRows(data)
     },

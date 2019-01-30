@@ -1,4 +1,7 @@
 import * as util from './util';
+import {
+  COL_SELECTION_WIDTH
+} from './Config'
 
 const BaseDatatableHead = {
   name: "base-datatable-head",
@@ -62,19 +65,23 @@ const BaseDatatableHead = {
     /** 渲染表格内容 */
     renderCell(h, columns) {
       return columns.map(col => (
-        <th class={col.toggle ? "th-padding" : ""}>
-          {typeof col.headRender == "function"
-            ? col.headRender(h, col)
-            : <div class="base-datatable-cell">{col.label}</div>}
+        <th>
+          <div class="base-datatable-cell">
+            {
+              typeof col.headRender == "function"
+                ? col.headRender(h, col)
+                : col.label
+            }
+          </div>
         </th>
       ));
     },
   },
   render(h) {
     let columns = this.columns;
-    let tableWidth = this.multiple ? this.$parent.$el.clientWidth - 50 : this.$parent.$el.clientWidth;
+    let tableWidth = this.multiple ? this.$parent.$el.clientWidth - COL_SELECTION_WIDTH : this.$parent.$el.clientWidth;
     let colWidths = util.computeColumnWidth(columns, tableWidth, this)
-    let total = colWidths.reduce((sum, w) => sum += w) + (this.multiple ? 50 : 0);
+    let total = colWidths.reduce((sum, w) => sum += w) + (this.multiple ? COL_SELECTION_WIDTH : 0);
 
     // this.$nextTick(() => {
     //   this.num++
@@ -82,12 +89,12 @@ const BaseDatatableHead = {
     // })
 
     return (
-      <table class="base-datatable-main" width={total} key={this.headKey}>
+      <table class="base-datatable__table base-datatable__head" width={total} key={this.headKey}>
         <colgroup>
-          { this.multiple ? <col width="50" /> : '' }
+          { this.multiple ? <col width={COL_SELECTION_WIDTH} /> : '' }
           { colWidths.map(item => <col width={item}/>) }
         </colgroup>
-        <thead class="base-datatable-head">
+        <thead>
           <tr>
             {
               this.multiple ?
