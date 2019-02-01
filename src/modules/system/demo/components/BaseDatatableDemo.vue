@@ -1,20 +1,26 @@
 <template>
   <div class="base-data-table-view team-table-view">
     <base-datatable
-      ref="teamTable"
+      ref="teamTable" class="team-list-table"
       :columns="columns" :rows="rows"
       row-key="id" 
       :stripe="true"
       :multiple="true"
-      @select="select">
+      @select="select"
+      max-height="100vh - 44px">
     
     </base-datatable>
 
-    <button type="button" @click="insert">添加数据</button>
-    <button type="button" @click="selectInit">清空</button>
-    <button type="button" @click="prevPage">上一页</button>
-    <button type="button" @click="nextPage">下一页</button>
-    <button type="button" @click="multipleSelectionPanelShow = true">已选择({{multipleSelection.length}})</button>
+   
+
+    <div style="height:24px;">
+      <button type="button" @click="insert">添加数据</button>
+      <button type="button" @click="selectInit">清空</button>
+      <button type="button" @click="prevPage">上一页</button>
+      <button type="button" @click="nextPage">下一页</button>
+      <button type="button" @click="multipleSelectionPanelShow = true">已选择({{multipleSelection.length}})</button>
+      <span>共计{{rows.length}}行</span>
+    </div>
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-customer-panel">
       <h4 class="panel-title">
         已选择({{multipleSelection.length}})
@@ -398,6 +404,7 @@ export default {
         {
           field: 'area',
           label: '负责区域',
+          overflow: 'tooltip',
           headRender(h, col){
             return [
               col.label,
@@ -424,6 +431,41 @@ export default {
           label: '所在位置',
           width: 150,
         },
+        {
+          field: 'location',
+          label: '所在位置',
+          width: 150,
+        },
+        {
+          field: 'location',
+          label: '所在位置',
+          width: 150,
+        },
+        {
+          field: 'location',
+          label: '所在位置',
+          width: 150,
+        },
+        {
+          field: 'location',
+          label: '所在位置',
+          width: 150,
+        },
+        {
+          field: 'location',
+          label: '所在位置',
+          width: 150,
+        },
+        {
+          field: 'location',
+          label: '所在位置',
+          width: 150,
+        },
+        {
+          field: 'location',
+          label: '所在位置',
+          width: 150,
+        }
       ]
     },
     /** 取消选择 团队 */
@@ -529,7 +571,14 @@ export default {
 </script>
 
 <style lang="scss">
+  body{
+    background-color: #fff;
+  }
   .base-data-table-view {
     width: 100%;
+  }
+
+  .team-list-table{
+    max-height: calc(100vh - 44px);
   }
 </style>

@@ -1,4 +1,5 @@
 import * as util from './util';
+import {getScrollBarWidth} from '@src/util/dom'
 import {
   COL_SELECTION_WIDTH
 } from './Config'
@@ -79,7 +80,11 @@ const BaseDatatableHead = {
   },
   render(h) {
     let columns = this.columns;
-    let tableWidth = this.multiple ? this.$parent.$el.clientWidth - COL_SELECTION_WIDTH : this.$parent.$el.clientWidth;
+    //滚动条宽度
+    let barWidth = getScrollBarWidth();
+    //选择列宽度
+    let selectionWidth = this.multiple ? COL_SELECTION_WIDTH : 0;
+    let tableWidth = this.$parent.$el.clientWidth - barWidth - selectionWidth;
     let colWidths = util.computeColumnWidth(columns, tableWidth, this)
     let total = colWidths.reduce((sum, w) => sum += w) + (this.multiple ? COL_SELECTION_WIDTH : 0);
 
@@ -89,30 +94,37 @@ const BaseDatatableHead = {
     // })
 
     return (
-      <table class="base-datatable__table base-datatable__head" width={total} key={this.headKey}>
-        <colgroup>
-          { this.multiple ? <col width={COL_SELECTION_WIDTH} /> : '' }
-          { colWidths.map(item => <col width={item}/>) }
-        </colgroup>
-        <thead>
-          <tr>
-            {
-              this.multiple ?
-                <th class="base-datatable-checkbox">
-                  <el-checkbox
-                    indeterminate={this.isSelect}
-                    value={this.isSelectAll}
-                    key="base-table-checkbox"
-                    onInput={value => this.toggleSelectAll(value)}
-                  />
-                </th> :
-                ''
-            }
-            {this.renderCell(h, this.columns)}
-          </tr>
-        </thead>
-      </table>
+      <div class="base-datatable__head">
+        <table class="base-datatable__table" width={total} key={this.headKey}>
+          <colgroup>
+            { this.multiple ? <col width={COL_SELECTION_WIDTH} /> : '' }
+            { colWidths.map(item => <col width={item}/>) }
+            <col width={barWidth}/>
+          </colgroup>
+          <thead>
+            <tr>
+              {
+                this.multiple ?
+                  <th class="base-datatable-checkbox">
+                    <el-checkbox
+                      indeterminate={this.isSelect}
+                      value={this.isSelectAll}
+                      key="base-table-checkbox"
+                      onInput={value => this.toggleSelectAll(value)}
+                    />
+                  </th> :
+                  ''
+              }
+              {this.renderCell(h, this.columns)}
+              <th></th>
+            </tr>
+          </thead>
+        </table>
+      </div>
     );
+  },
+  mounted(){
+    this.$emit('mounted')
   }
 };
 

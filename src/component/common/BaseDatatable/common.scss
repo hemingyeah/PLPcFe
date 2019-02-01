@@ -67,11 +67,6 @@
   background-color: #fff;
 }
 
-.base-datatable-scroll {
-  height: 100%;
-  overflow: auto;
-}
-
 .base-datatable-checkbox{
   text-align: center;
 
@@ -127,12 +122,17 @@
 }
 
 // ---------- base-datatable__head ----------
-.base-datatable__head > thead > tr{
+.base-datatable__head{
+  overflow: hidden;
+}
+.base-datatable__head > .base-datatable__table> thead > tr{
   background-color: #f7f7f8;
 }
 
 // ---------- base-datatable__body ----------
 .base-datatable__body{
+  overflow: auto;
+  
   tr:hover {
     background-color: #f5f7fa !important;
   }

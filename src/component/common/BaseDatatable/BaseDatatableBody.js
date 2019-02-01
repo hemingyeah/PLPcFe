@@ -48,6 +48,10 @@ const BaseDatatableBody = {
       let children = row.rawData[col.expandProp];
       return Array.isArray(children) ? children : [];
     },
+    showOverflowTooltip(e){
+      //TODO:根据内容长度是否超过cell判断是否显示tooltip
+      console.log('show tooltip')
+    },
     /** 渲染表格行 */
     renderRow(h, rows, columns){
       let tableRows = [];
@@ -76,11 +80,11 @@ const BaseDatatableBody = {
       let parent = row.parent;
       let isHidden = !parent.expand;
       let isEnd = parent.children.length - 1 == index;
+
       return {
-        class: {
-          'base-datatable-subRow': true,
+        'class': {
           'base-datatable-hidden': isHidden,
-          'base-datatable-subRow-end': isEnd
+          'base-datatable-subRow-end': !isHidden && isEnd
         }
       }
     },
@@ -131,8 +135,17 @@ const BaseDatatableBody = {
       )
     },
     renderCell(h, row, col){
+      let attrs = {};
+
+      if(col.overflow == 'tooltip'){
+        let on = {
+          mouseenter: e => this.showOverflowTooltip(e)
+        }
+        attrs.on = on
+      }
+
       return (
-        <div class="base-datatable-cell">
+        <div class="base-datatable-cell" {...attrs}>
           {
             typeof col.render == 'function' 
               ? col.render(h, col, row) 
@@ -160,7 +173,7 @@ const BaseDatatableBody = {
     let total = colWidths.reduce((sum, w) => sum += w) + (this.multiple ? COL_SELECTION_WIDTH : 0);
 
     return (
-      <table class="base-datatable__table base-datatable__body" width={total} ref="baseTableBody" key={this.bodyKey}>
+      <table class="base-datatable__table" width={total} ref="baseTableBody" key={this.bodyKey}>
         <colgroup>
           { this.multiple ? <col width={COL_SELECTION_WIDTH}></col> : '' }
           { colWidths.map(item => <col width={item}></col>) }

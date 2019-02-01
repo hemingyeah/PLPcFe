@@ -1,17 +1,17 @@
 <template>
   <div :class="{'base-table-stripe': false}" class="base-datatable">
-    <!-- v-if 默认不会渲染 确保子组件在父组件之后渲染 -->
-    <div v-if="isTableShow" class="base-datatable-scroll" :style="{'height': tableHeight}">
-      <base-datatable-head
-        v-if="!tableResize"
-        :columns="columns"
-        :rows="tableRows"
-        :multiple="multiple"
-        :is-select-all="isSelectAll"
-        :is-not-select-all="isNotSelectAll"
-        @toggleSelectAll="toggleSelectAll"/>
+    <base-datatable-head
+      v-if="isRenderHead"
+      :columns="columns"
+      :rows="tableRows"
+      :multiple="multiple"
+      :is-select-all="isSelectAll"
+      :is-not-select-all="isNotSelectAll"
+      @toggleSelectAll="toggleSelectAll"
+      @mounted="renderBody"/>
+
+    <div v-if="isRenderBody" class="base-datatable__body" :style="scrollY" @scroll="syncScroll">
       <base-datatable-body
-        v-if="!tableResize"
         :rows="tableRows" 
         :columns="columns"
         :multiple="multiple"
@@ -57,6 +57,14 @@ export default {
       type: [Number, String],
       default: '100%'
     },
+    /**
+     * 组件的最大高度, 设置此值后会启用流式布局
+     * 如果值String时，请确保传入正确的值，该值会用于calc()计算
+     * 示例： 100vh - 44px => max-height: calc(100vh - 44px)
+     */
+    maxHeight: {
+      type: [Number, String]
+    },
     /** 是否开启斑马纹 */
     stripe: {
       type: Boolean,
@@ -66,20 +74,40 @@ export default {
     multiple: {
       type: Boolean,
       default: false
+    },
+    /** 是否启用流式布局 */
+    fluid: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
-
+ 
   },
   data(){
     return {
+      //当前表格头是否渲染完成
+      isRenderHead: false, 
+      //当前表格内容是否渲染完成
+      isRenderBody: false,
+      //滚动区域样式
+      scrollY: {},
+
+
+
+
+
+
+
       tableRows: this.buildTableRows(),
       tableKey: Math.random() * 10,
       tableHeight: this.height,
       tableResize: false,
       isSelectAll: false,
       isNotSelectAll: false,
-      isTableShow: false, // 当前表格是否显示
+
+
+
     }
   },
   methods: {
@@ -217,6 +245,43 @@ export default {
         select = false;
       }
       this.isNotSelectAll = select;
+    },
+
+
+    renderHead(){
+      this.isRenderHead = true;
+    },
+    renderBody(){
+      this.isRenderBody = true;
+      this.updateScrollY();
+    },
+    updateScrollY(){
+      let scrollY = {};
+
+      //启用流式布局需要计算滚动区域最大高度
+      if(this.maxHeight){
+        let max = this.maxHeight;
+        let headOffsetHeight = this.$el.querySelector('.base-datatable__head').offsetHeight;
+
+        if(typeof max == 'number'){
+          scrollY.maxHeight = max - headOffsetHeight + 'px';
+        }
+
+        if(typeof max == 'string'){
+          scrollY.maxHeight = `calc(${max} - ${headOffsetHeight}px)`;
+        }
+      }
+
+      this.scrollY = scrollY;
+    },
+    syncScroll(event){
+      let headEl = this.$el.querySelector('.base-datatable__head');
+      let bodyEl = event.target;
+
+      //同步横向滚动
+      if(headEl.scrollLeft != bodyEl.scrollLeft) {
+        headEl.scrollLeft = bodyEl.scrollLeft;
+      }
     }
   },
   watch: {
@@ -259,14 +324,19 @@ export default {
     if(type == 'number') this.tableHeight += 'px'
   },
   mounted() {
-    this.isTableShow = true;
-    const _this = this;
-    window.onresize = function (e) {
-      _this.tableResize = true;
-      _this.$nextTick(() => {
-        _this.tableResize = false;
-      })
-    }
+    //这里异步渲染表格，
+    //目标是确保根元素先渲染，用于获取表格的宽度
+    this.$nextTick(this.renderHead);
+
+
+    // this.isTableShow = true;
+    // const _this = this;
+    // window.onresize = function (e) {
+    //   _this.tableResize = true;
+    //   _this.$nextTick(() => {
+    //     _this.tableResize = false;
+    //   })
+    // }
   }
 }
 </script>
