@@ -6,6 +6,8 @@
       :highlight-current-row="false"
       header-row-class-name="customer-remind-table-header"
       row-class-name="customer-remind-table-row"
+      @sort-change="sortChange"
+      v-loading="loading"
       class="customer-remind-table">
       <el-table-column
         v-for="column in columns"
@@ -56,6 +58,7 @@ export default {
       pending: {},
       remindList: [],
       columns: this.buildColumns(),
+      loading: false,
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -76,6 +79,18 @@ export default {
     this.$eventBus.$off('customer_remind_table.update_remind_list', this.fetchData);
   },
   methods: {
+    sortChange({ prop, order, }) {
+      const params = {
+        orderDetail: {
+          column: prop,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+          isSystem: 1,
+          // type: '',
+        },
+      };
+
+      this.fetchData(params);
+    },
     async deleteRemind(rm) {
       try {
         const action = await this.$platform.confirm(`确定删除 ${rm.remind.name}`);
@@ -94,18 +109,28 @@ export default {
       this.paginationInfo.pageNum = pN;
       this.fetchData();
     },
-    fetchData() {
+    fetchData(orderParams = {}) {
       const params = {
         modalId: this.customerId,
-        modal: 'customer'
+        modal: 'customer',
+        ...orderParams,
       };
+
+      this.loading = true;
       this.$http.get('/customer/remind/list', params)
         .then(res => {
+          if (!res) return;
+
           this.remindList = res
             .map(rm => {
               this.$set(this.pending, rm.id, false);
               return Object.freeze(rm);
             });
+          this.loading = false;
+        })
+        .catch(e => {
+          this.loading = false;
+          console.error('e', e);
         })
     },
     buildColumns() {
@@ -114,23 +139,25 @@ export default {
         field: 'remindName',
         show: true,
         tooltip: true,
-        // sortable: 'custom',
+        sortable: 'custom',
       }, {
         label: '预计发生时间',
         field: 'remindTime',
         show: true,
-        tooltip: true
+        tooltip: true,
+        sortable: 'custom',
       }, {
         label: '提醒内容',
         field: 'remindContent',
         show: true,
-        tooltip: true
+        tooltip: true,
+        sortable: 'custom',
       }, {
         label: '操作',
         field: 'action',
         show: true,
         tooltip: false,
-        width: '80px'
+        width: '80px',
       }]
     }
   },

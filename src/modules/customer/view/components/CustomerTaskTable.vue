@@ -6,6 +6,8 @@
       :highlight-current-row="false"
       header-row-class-name="customer-task-table-header"
       row-class-name="customer-task-table-row"
+      @sort-change="sortChange"
+      v-loading="loading"
       class="customer-task-table">
       <el-table-column
         v-for="column in columns"
@@ -18,8 +20,11 @@
         show-overflow-tooltip
         :align="column.align">
         <template slot-scope="scope">
-          <template v-if="column.field === 'state'">
-            {{scope.row[column.field]}}
+          <template v-if="column.field === 't.type'">
+            {{scope.row.templateName}}
+          </template>
+          <template v-else-if="column.field === 'degree'">
+            {{scope.row.suggestion}}
           </template>
           <template v-else-if="column.field === 'taskNo'">
             <a :href="`/task/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail" class="task-link">{{scope.row[column.field]}}</a>
@@ -65,6 +70,7 @@ export default {
     return {
       taskList: [],
       columns: this.buildColumns(),
+      loading: false,
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -81,6 +87,18 @@ export default {
     this.fetchData();
   },
   methods: {
+    sortChange({ prop, order, }) {
+      const params = {
+        orderDetail: {
+          column: prop,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+          isSystem: 1,
+          // type: '',
+        },
+      };
+
+      this.fetchData(params);
+    },
     openDetail(event){
       event.preventDefault();
 
@@ -102,15 +120,19 @@ export default {
       this.paginationInfo.pageNum = pN;
       this.fetchData();
     },
-    fetchData() {
+    fetchData(orderParams = {}) {
       const params = {
         customerId: this.customerId,
         pageNum: this.paginationInfo.pageNum,
-        pageSize: this.paginationInfo.pageSize
+        pageSize: this.paginationInfo.pageSize,
+        ...orderParams,
       };
+      this.loading = true;
 
       this.$http.get('/customer/task/list', params)
         .then(res => {
+          if (!res) return;
+
           this.taskList = res.list
             .map(task => {
               task.createTime = formatDate(new Date(task.createTime), 'YYYY-MM-DD HH:mm:ss');
@@ -124,6 +146,7 @@ export default {
               return Object.freeze(task);
             });
           this.paginationInfo.totalItems = res.total;
+          this.loading = false;
         })
         .catch(e => console.error('fetch task caught e', e))
     },
@@ -135,33 +158,39 @@ export default {
         // sortable: 'custom',
       }, {
         label: '工单类型',
-        field: 'templateName',
+        field: 't.type',
         show: true,
+        sortable: 'custom',
       }, {
         label: '产品名称',
         field: 'productName',
         show: true,
+        sortable: 'custom',
       }, {
         label: '工单状态',
         field: 'state',
         show: true,
-        width: '70px'
+        sortable: 'custom',
       }, {
         label: '负责人',
         field: 'executor',
         show: true,
+        sortable: 'custom',
       }, {
         label: '创建时间',
         field: 'createTime',
         show: true,
+        sortable: 'custom',
       }, {
         label: '完成时间',
         field: 'completeTime',
         show: true,
+        sortable: 'custom',
       }, {
         label: '客户评价',
-        field: 'suggestion',
+        field: 'degree',
         show: true,
+        sortable: 'custom',
       }]
     }
   },

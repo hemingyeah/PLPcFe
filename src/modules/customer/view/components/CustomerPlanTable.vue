@@ -6,6 +6,8 @@
       :highlight-current-row="false"
       header-row-class-name="customer-plan-table-header"
       row-class-name="customer-plan-table-row"
+      @sort-change="sortChange"
+      v-loading="loading"
       class="customer-plan-table">
       <el-table-column
         v-for="column in columns"
@@ -21,10 +23,13 @@
           <template v-if="column.field === 'name'">
             <a :href="`/task/planTask/edit?id=${scope.row.id}`" :data-id="scope.row.id" class="plan-link">{{scope.row[column.field]}}</a>
           </template>
-          <template v-else-if="column.field === 'templateName'">
+          <template v-else-if="column.field === 'templateId'">
             {{scope.row.task.templateName}}
           </template>
-          <template v-else-if="column.field === 'endDate'">
+          <template v-else-if="column.field === 'createUserId'">
+            {{scope.row.createUserName}}
+          </template>
+          <template v-else-if="column.field === 'endSetting'">
             <template v-if="scope.row.endSetting.endBy === 'date'">
               {{scope.row.endSetting.value}}
             </template>
@@ -107,6 +112,7 @@ export default {
       planList: [],
       pending: {},
       columns: this.buildColumns(),
+      loading: false,
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -134,6 +140,18 @@ export default {
     this.fetchData();
   },
   methods: {
+    sortChange({ prop, order }) {
+      const params = {
+        orderDetail: {
+          column: prop,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+          isSystem: 1,
+          // type: '',
+        },
+      };
+
+      this.fetchData(params);
+    },
     async deletePlan(plan) {
       try {
         const res = await platform.confirm('确认删除该计划任务？');
@@ -157,15 +175,18 @@ export default {
       this.paginationInfo.pageNum = pN;
       this.fetchData();
     },
-    fetchData() {
+    fetchData(orderParams = {}) {
       const params = {
         customerId: this.customerId,
         pageNum: this.paginationInfo.pageNum,
-        pageSize: this.paginationInfo.pageSize
+        pageSize: this.paginationInfo.pageSize,
+        ...orderParams,
       };
 
+      this.loading = true;
       this.$http.get('/customer/planTask/list', params)
         .then(res => {
+          if (!res) return;
           this.planList = res.list
             .map(plan => {
               plan.createTime = formatDate(new Date(plan.createTime), 'YYYY-MM-DD HH:mm:ss');
@@ -174,8 +195,12 @@ export default {
               return Object.freeze(plan);
             });
           this.paginationInfo.totalItems = res.total;
+          this.loading = false;
         })
-        .catch(e => console.error('fetchData caught e', e));
+        .catch(e => {
+          this.loading = false;
+          console.error('fetchData caught e', e)
+        });
     },
     buildColumns() {
       return [{
@@ -183,51 +208,58 @@ export default {
         field: 'name',
         show: true,
         tooltip: true,
-        // sortable: 'custom',
+        sortable: 'custom',
       }, {
         label: '工单类型',
-        field: 'templateName',
+        field: 'templateId',
         show: true,
         tooltip: true,
+        sortable: 'custom',
       }, {
         label: '创建人',
-        field: 'createUserName',
+        field: 'createUserId',
         show: true,
         tooltip: true,
+        sortable: 'custom',
       }, {
         label: '创建时间',
         field: 'createTime',
         show: true,
         tooltip: true,
+        sortable: 'custom',
       }, {
         label: '截止时间',
-        field: 'endDate',
+        field: 'endSetting',
         show: true,
         tooltip: true,
+        sortable: 'custom',
       }, {
         label: '已创建',
         field: 'createdTasks',
         show: true,
         tooltip: false,
-        width: '60px'
+        width: '80px',
+        sortable: 'custom',
       }, {
         label: '重复周期',
         field: 'periodSetting',
         show: true,
         tooltip: true,
-        width: '70px'
+        width: '100px',
+        sortable: 'custom',
       }, {
         label: '下次创建时间',
         field: 'nextTaskCreateTime',
         show: true,
         tooltip: true,
-        width: '100px'
+        width: '120px',
+        sortable: 'custom',
       }, {
         label: '操作',
         field: 'action',
         show: true,
         tooltip: false,
-        width: '50px'
+        width: '50px',
       }]
     }
   },

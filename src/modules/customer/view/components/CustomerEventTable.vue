@@ -6,6 +6,8 @@
       :highlight-current-row="false"
       header-row-class-name="customer-event-table-header"
       row-class-name="customer-event-table-row"
+      @sort-change="sortChange"
+      v-loading="loading"
       class="customer-event-table">
       <el-table-column
         v-for="column in columns"
@@ -18,8 +20,11 @@
         show-overflow-tooltip
         :align="column.align">
         <template slot-scope="scope">
-          <template v-if="column.field === 'state'">
-            {{scope.row[column.field]}}
+          <template v-if="column.field === 'templateId'">
+            {{scope.row.templateName}}
+          </template>
+          <template v-else-if="column.field === 'executor'">
+            {{scope.row.executorName}}
           </template>
           <template v-else-if="column.field === 'eventNo'">
             <a :href="`/event/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail" class="event-link">{{scope.row[column.field]}}</a>
@@ -63,6 +68,7 @@ export default {
     return {
       eventList: [],
       columns: this.buildColumns(),
+      loading: false,
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -79,6 +85,19 @@ export default {
     this.fetchData();
   },
   methods: {
+    sortChange({prop, order, }) {
+      const params = {
+
+        orderDetail: {
+          column: prop,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+          isSystem: 1,
+          // type: '',
+        },
+      };
+
+      this.fetchData(params);
+    },
     openDetail(event){
       event.preventDefault();
 
@@ -100,15 +119,18 @@ export default {
       this.paginationInfo.pageNum = pN;
       this.fetchData();
     },
-    fetchData() {
+    fetchData(orderParams = {}) {
       const params = {
         cusId: this.customerId,
         pageNum: this.paginationInfo.pageNum,
         pageSize: this.paginationInfo.pageSize,
+        ...orderParams,
       };
 
+      this.loading = true;
       this.$http.get('/customer/event/list', params)
         .then(res => {
+          if (!res) return;
           this.eventList = res.list
             .map(event => {
               event.createTime = formatDate(new Date(event.createTime), 'YYYY-MM-DD HH:mm:ss');
@@ -116,6 +138,7 @@ export default {
               return Object.freeze(event);
             });
           this.paginationInfo.totalItems = res.total;
+          this.loading = false;
         })
         .catch(e => console.error('fetch event caught e', e));
     },
@@ -124,25 +147,28 @@ export default {
         label: '事件编号',
         field: 'eventNo',
         show: true,
-        // sortable: 'custom',
       }, {
         label: '事件类型',
-        field: 'templateName',
+        field: 'templateId',
         show: true,
+        sortable: 'custom'
       }, {
         label: '负责人',
-        field: 'executorName',
+        field: 'executor',
         show: true,
+        sortable: 'custom'
       }, {
         label: '状态',
         field: 'state',
         show: true,
-        width: '70px'
+        width: '70px',
+        sortable: 'custom'
       }, {
         label: '创建时间',
         field: 'createTime',
         show: true,
-        width: '150px'
+        width: '150px',
+        sortable: 'custom'
       }]
     }
   },
