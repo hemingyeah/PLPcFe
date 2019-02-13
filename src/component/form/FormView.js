@@ -40,12 +40,12 @@ const FormView = {
       let {formType, fieldName, displayName, isSystem} = field;
       if (formType === 'separator') {
         const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
-        return (
+        return displayName ? (
           <h4 class="section-title">
-            {displayName || ' '}
+            {displayName}
             <i class={cn} onClick={() => this.toggleDisplay(field.id)}></i>
           </h4>
-        );
+        ) : null;
       }
       
       const originalObj = this.value;

@@ -165,6 +165,9 @@ export default {
     fields() {
       const fields = (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
       return [...fields, {
+        displayName: '',
+        formType: 'separator'
+      },{
         displayName: '创建人',
         fieldName: 'createLoginUser',
         formType: 'user',
