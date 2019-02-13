@@ -22,14 +22,6 @@
 
 
 <script>
-/**
- * 1. 可显示子团队
- * 2. 可折叠
- * 3. 可选择子团队
- * 4. 字段需要配置
- * 5. 可自定义单元格渲染内容
- * 6. 可配置列宽
- */
 import TableRow from './TableRow';
 
 import BaseTableHead from './BaseDatatableHead';

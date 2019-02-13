@@ -111,7 +111,7 @@ const BaseDatatableBody = {
     /** 渲染带展开按钮的单元格 */
     renderExpandCell(h, row, col) {
       if(!row.hasChildren) return this.renderCell(h, row.rawData, col)
-
+      
       return (
         <div class="base-datatable-collapse">
           <span onClick={e => row.expand = !row.expand} class="base-datatable-expand">

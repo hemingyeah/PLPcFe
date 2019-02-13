@@ -1,5 +1,8 @@
 <template>
   <div class="base-data-table-view team-table-view">
+    <div style="height:24px;">
+      <button>选择列</button>
+    </div>
     <base-datatable
       ref="teamTable" class="team-list-table"
       :columns="columns" :rows="rows"
@@ -7,11 +10,8 @@
       :stripe="true"
       :multiple="true"
       @select="select"
-      max-height="100vh - 44px">
-    
+      max-height="100vh - 68px">
     </base-datatable>
-
-   
 
     <div style="height:24px;">
       <button type="button" @click="insert">添加数据</button>
