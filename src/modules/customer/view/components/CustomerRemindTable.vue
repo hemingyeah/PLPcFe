@@ -59,10 +59,11 @@ export default {
       remindList: [],
       columns: this.buildColumns(),
       loading: false,
-      paginationInfo: {
+      searchModel: {
         pageSize: 10,
         pageNum: 1,
         totalItems: 0,
+        orderDetail: {}
       }
     }
   },
@@ -80,16 +81,12 @@ export default {
   },
   methods: {
     sortChange({ prop, order, }) {
-      const params = {
-        orderDetail: {
-          column: prop,
-          sequence: order === 'ascending' ? 'ASC' : 'DESC',
-          isSystem: 1,
-          // type: '',
-        },
+      this.searchModel.orderDetail = {
+        column: prop,
+        sequence: order === 'ascending' ? 'ASC' : 'DESC',
+        isSystem: 1,
       };
-
-      this.fetchData(params);
+      this.fetchData();
     },
     async deleteRemind(rm) {
       try {
@@ -106,15 +103,20 @@ export default {
       }
     },
     jump(pN) {
-      this.paginationInfo.pageNum = pN;
+      this.searchModel.pageNum = pN;
       this.fetchData();
     },
-    fetchData(orderParams = {}) {
+    fetchData() {
+      const {pageNum, pageSize, orderDetail,} = this.searchModel;
       const params = {
-        modalId: this.customerId,
-        modal: 'customer',
-        ...orderParams,
+        customerId: this.customerId,
+        pageNum,
+        pageSize,
       };
+
+      if (Object.keys(orderDetail).length) {
+        params.orderDetail = orderDetail;
+      }
 
       this.loading = true;
       this.$http.get('/customer/remind/list', params)

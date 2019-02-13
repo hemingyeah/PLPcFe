@@ -39,16 +39,16 @@
       </el-table-column>
     </el-table>
     <div class="task-table-footer">
-      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <p class="total-count">共<span>{{searchModel.totalItems}}</span>条记录</p>
       <el-pagination
-        v-if="paginationInfo.totalItems"
+        v-if="searchModel.totalItems"
         class="customer-task-table-pagination"
         background
         @current-change="jump"
-        :page-size="paginationInfo.pageSize"
-        :current-page="paginationInfo.pageNum"
+        :page-size="searchModel.pageSize"
+        :current-page="searchModel.pageNum"
         layout="prev, pager, next"
-        :total="paginationInfo.totalItems">
+        :total="searchModel.totalItems">
       </el-pagination>
     </div>
   </div>
@@ -71,10 +71,11 @@ export default {
       taskList: [],
       columns: this.buildColumns(),
       loading: false,
-      paginationInfo: {
+      searchModel: {
         pageSize: 10,
         pageNum: 1,
         totalItems: 0,
+        orderDetail: {}
       }
     }
   },
@@ -88,16 +89,12 @@ export default {
   },
   methods: {
     sortChange({ prop, order, }) {
-      const params = {
-        orderDetail: {
-          column: prop,
-          sequence: order === 'ascending' ? 'ASC' : 'DESC',
-          isSystem: 1,
-          // type: '',
-        },
+      this.searchModel.orderDetail = {
+        column: prop,
+        sequence: order === 'ascending' ? 'ASC' : 'DESC',
+        isSystem: 1,
       };
-
-      this.fetchData(params);
+      this.fetchData();
     },
     openDetail(event){
       event.preventDefault();
@@ -117,16 +114,21 @@ export default {
       parent.window.resizeFrame();
     },
     jump(pN) {
-      this.paginationInfo.pageNum = pN;
+      this.searchModel.pageNum = pN;
       this.fetchData();
     },
-    fetchData(orderParams = {}) {
+    fetchData() {
+      const {pageNum, pageSize, orderDetail,} = this.searchModel;
       const params = {
         customerId: this.customerId,
-        pageNum: this.paginationInfo.pageNum,
-        pageSize: this.paginationInfo.pageSize,
-        ...orderParams,
+        pageNum,
+        pageSize,
       };
+
+      if (Object.keys(orderDetail).length) {
+        params.orderDetail = orderDetail;
+      }
+
       this.loading = true;
 
       this.$http.get('/customer/task/list', params)
@@ -145,7 +147,7 @@ export default {
               task.state = TaskStateEnum.getName(task.state);
               return Object.freeze(task);
             });
-          this.paginationInfo.totalItems = res.total;
+          this.searchModel.totalItems = res.total;
           this.loading = false;
         })
         .catch(e => console.error('fetch task caught e', e))

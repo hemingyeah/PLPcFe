@@ -36,16 +36,16 @@
       </el-table-column>
     </el-table>
     <div class="event-table-footer">
-      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <p class="total-count">共<span>{{searchModel.totalItems}}</span>条记录</p>
       <el-pagination
-        v-if="paginationInfo.totalItems"
+        v-if="searchModel.totalItems"
         class="customer-event-table-pagination"
         background
         @current-change="jump"
-        :page-size="paginationInfo.pageSize"
-        :current-page="paginationInfo.pageNum"
+        :page-size="searchModel.pageSize"
+        :current-page="searchModel.pageNum"
         layout="prev, pager, next"
-        :total="paginationInfo.totalItems">
+        :total="searchModel.totalItems">
       </el-pagination>
     </div>
 
@@ -69,10 +69,11 @@ export default {
       eventList: [],
       columns: this.buildColumns(),
       loading: false,
-      paginationInfo: {
+      searchModel: {
         pageSize: 10,
         pageNum: 1,
         totalItems: 0,
+        orderDetail: {}
       }
     }
   },
@@ -85,18 +86,13 @@ export default {
     this.fetchData();
   },
   methods: {
-    sortChange({prop, order, }) {
-      const params = {
-
-        orderDetail: {
-          column: prop,
-          sequence: order === 'ascending' ? 'ASC' : 'DESC',
-          isSystem: 1,
-          // type: '',
-        },
+    sortChange({ prop, order, }) {
+      this.searchModel.orderDetail = {
+        column: prop,
+        sequence: order === 'ascending' ? 'ASC' : 'DESC',
+        isSystem: 1,
       };
-
-      this.fetchData(params);
+      this.fetchData();
     },
     openDetail(event){
       event.preventDefault();
@@ -116,16 +112,20 @@ export default {
       parent.window.resizeFrame();
     },
     jump(pN) {
-      this.paginationInfo.pageNum = pN;
+      this.searchModel.pageNum = pN;
       this.fetchData();
     },
-    fetchData(orderParams = {}) {
+    fetchData() {
+      const {pageNum, pageSize, orderDetail,} = this.searchModel;
       const params = {
-        cusId: this.customerId,
-        pageNum: this.paginationInfo.pageNum,
-        pageSize: this.paginationInfo.pageSize,
-        ...orderParams,
+        customerId: this.customerId,
+        pageNum,
+        pageSize,
       };
+
+      if (Object.keys(orderDetail).length) {
+        params.orderDetail = orderDetail;
+      }
 
       this.loading = true;
       this.$http.get('/customer/event/list', params)
@@ -137,7 +137,7 @@ export default {
               event.state = EventStateEnum.getName(event.state);
               return Object.freeze(event);
             });
-          this.paginationInfo.totalItems = res.total;
+          this.searchModel.totalItems = res.total;
           this.loading = false;
         })
         .catch(e => console.error('fetch event caught e', e));

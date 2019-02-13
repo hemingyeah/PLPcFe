@@ -79,16 +79,16 @@
       </div>
     </el-table>
     <div class="plan-task-table-footer">
-      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <p class="total-count">共<span>{{searchModel.totalItems}}</span>条记录</p>
       <el-pagination
-        v-if="paginationInfo.totalItems"
+        v-if="searchModel.totalItems"
         class="customer-plan-table-pagination"
         background
         @current-change="jump"
-        :page-size="paginationInfo.pageSize"
-        :current-page="paginationInfo.pageNum"
+        :page-size="searchModel.pageSize"
+        :current-page="searchModel.pageNum"
         layout="prev, pager, next"
-        :total="paginationInfo.totalItems">
+        :total="searchModel.totalItems">
       </el-pagination>
     </div>
   </div>
@@ -113,10 +113,11 @@ export default {
       pending: {},
       columns: this.buildColumns(),
       loading: false,
-      paginationInfo: {
+      searchModel: {
         pageSize: 10,
         pageNum: 1,
         totalItems: 0,
+        orderDetail: {}
       }
     }
   },
@@ -140,17 +141,13 @@ export default {
     this.fetchData();
   },
   methods: {
-    sortChange({ prop, order }) {
-      const params = {
-        orderDetail: {
-          column: prop,
-          sequence: order === 'ascending' ? 'ASC' : 'DESC',
-          isSystem: 1,
-          // type: '',
-        },
+    sortChange({ prop, order, }) {
+      this.searchModel.orderDetail = {
+        column: prop,
+        sequence: order === 'ascending' ? 'ASC' : 'DESC',
+        isSystem: 1,
       };
-
-      this.fetchData(params);
+      this.fetchData();
     },
     async deletePlan(plan) {
       try {
@@ -172,16 +169,20 @@ export default {
       }
     },
     jump(pN) {
-      this.paginationInfo.pageNum = pN;
+      this.searchModel.pageNum = pN;
       this.fetchData();
     },
-    fetchData(orderParams = {}) {
+    fetchData() {
+      const {pageNum, pageSize, orderDetail,} = this.searchModel;
       const params = {
         customerId: this.customerId,
-        pageNum: this.paginationInfo.pageNum,
-        pageSize: this.paginationInfo.pageSize,
-        ...orderParams,
+        pageNum,
+        pageSize,
       };
+
+      if (Object.keys(orderDetail).length) {
+        params.orderDetail = orderDetail;
+      }
 
       this.loading = true;
       this.$http.get('/customer/planTask/list', params)
@@ -194,7 +195,7 @@ export default {
               this.$set(this.pending, plan.id, false);
               return Object.freeze(plan);
             });
-          this.paginationInfo.totalItems = res.total;
+          this.searchModel.totalItems = res.total;
           this.loading = false;
         })
         .catch(e => {
