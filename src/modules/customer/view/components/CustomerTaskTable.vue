@@ -20,7 +20,7 @@
         show-overflow-tooltip
         :align="column.align">
         <template slot-scope="scope">
-          <template v-if="column.field === 't.type'">
+          <template v-if="column.field === 'templateId'">
             {{scope.row.templateName}}
           </template>
           <template v-else-if="column.field === 'degree'">
@@ -160,7 +160,7 @@ export default {
         // sortable: 'custom',
       }, {
         label: '工单类型',
-        field: 't.type',
+        field: 'templateId',
         show: true,
         sortable: 'custom',
       }, {
