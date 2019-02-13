@@ -20,7 +20,7 @@
         :show-overflow-tooltip="column.tooltip"
         :align="column.align">
         <template slot-scope="scope">
-          <template v-if="column.field === 'remindName'">
+          <template v-if="column.field === 'modalName'">
             <a href="javascript:;" class="edit-btn" @click="$eventBus.$emit('customer_detail_view.update_remind', scope.row)">{{scope.row.remind.name}}</a>
           </template>
           <template v-else-if="column.field === 'remindTime'">
@@ -136,7 +136,7 @@ export default {
     buildColumns() {
       return [{
         label: '提醒名称',
-        field: 'remindName',
+        field: 'modalName',
         show: true,
         tooltip: true,
         sortable: 'custom',

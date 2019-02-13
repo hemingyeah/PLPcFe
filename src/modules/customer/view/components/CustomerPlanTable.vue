@@ -133,7 +133,7 @@ export default {
     },
     /** 是否有编辑客户的权限 */
     hasEditCustomerAuth(){
-      return this.shareData.hasEditCustomerAuth
+      return this.shareData.allowEditCustomer
     }
   },
   mounted() {
