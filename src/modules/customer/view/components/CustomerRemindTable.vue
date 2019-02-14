@@ -107,11 +107,10 @@ export default {
       this.fetchData();
     },
     fetchData() {
-      const {pageNum, pageSize, orderDetail,} = this.searchModel;
+      const {orderDetail,} = this.searchModel;
       const params = {
-        customerId: this.customerId,
-        pageNum,
-        pageSize,
+        modalId: this.customerId,
+        modal: 'customer',
       };
 
       if (Object.keys(orderDetail).length) {

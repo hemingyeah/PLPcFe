@@ -118,7 +118,7 @@ export default {
     fetchData() {
       const {pageNum, pageSize, orderDetail,} = this.searchModel;
       const params = {
-        customerId: this.customerId,
+        cusId: this.customerId,
         pageNum,
         pageSize,
       };
