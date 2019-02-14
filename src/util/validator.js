@@ -143,7 +143,7 @@ function address(value, field = {}) {
   });
 }
 
-/** 远程验证 */
+/** @deprecated 远程验证, 使用validator替代 */
 function remoteValidation(value, remote) {
   const { 
     action, 
@@ -188,5 +188,4 @@ async function validate(value, field, options = {}){
 
 const Validator = {validate};
 
-//TODO: 去除远程验证方式，改为validator（function）方式
 export default Validator;

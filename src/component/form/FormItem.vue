@@ -4,7 +4,7 @@
     <div class="form-item-control">
       <slot></slot>
       <div class="err-msg-wrap">
-        <div v-if="remoting" class="form-item-error">正在验证...</div>
+        <div v-if="status" class="form-item-error">正在验证...</div>
         <div v-else-if="errMessage" class="form-item-error">{{errMessage}}</div>
       </div>
     </div>
@@ -20,14 +20,17 @@ export default {
   props: {
     label: String,
     validation: Boolean, //是否开启验证
-    remote: Object //远程验证配置对象
+    validator: Function, //自定义验证方法
+
+    /** @deprecated  远程验证配置对象，使用validator替代 */
+    remote: Object
   },
   data() {
     return {
       field: {},
       errMessage: '',
       valueFn: null, //function 用于获取注册字段的值
-      remoting: false
+      status: false // true 代表正在验证
     }
   },
   computed: {
@@ -46,14 +49,20 @@ export default {
       if (typeof this.valueFn != 'function') return true;
 
       this.errMessage = '';
+      this.status = false;
+
       let value = this.valueFn();
-      let options = {changeRemoteStatus: this.changeRemoteStatus, remote: this.remote};
+      let validator = this.validator || this.field.validator;
+      if(typeof validator == 'function'){
+        return validator(value, this.field, this.changeStatus)
+          .then(res => this.errMessage = res)
+          .catch(err => console.error('validate err', err));
+      }
+      
+      let options = {changeRemoteStatus: this.changeStatus, remote: this.remote};
 
       return Validator.validate(value, this.field, options)
-        .then(res => {
-          this.errMessage = res;
-          return res;
-        })
+        .then(res => this.errMessage = res)
         .catch(err => console.error('validate err', err));
     },
     /** 远程验证时需要做延时 */
@@ -80,8 +89,8 @@ export default {
 
       this.valueFn = null;
     },
-    changeRemoteStatus(value){
-      this.remoting = value;
+    changeStatus(value){
+      this.status = !!value;
     }
   },
   mounted() {
