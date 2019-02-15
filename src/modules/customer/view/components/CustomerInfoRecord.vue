@@ -115,9 +115,46 @@ export default {
         console.error(e)
       }
     },
+    renderAddressRecordDom({action, userName, showInOwn, content}) {
+      let address = trimAll(content.address);
+      let icon = address ? <i class="iconfont icon-address" onClick={e => this.openMap(content.longitude, content.latitude)}></i> : '';
+      let str = '';
+
+      if (content.type === '设为默认') {
+        str = <span>将{icon}{address}设为默认地址</span>;
+      } else if (content.type === 'API设为默认') {
+        str = <span>通过API应用${content.clientName}将{icon}{address}设为默认地址</span>;
+      } else if (content.type === 'API添加') {
+        str = <span>通过API应用${content.clientName}添加了地址{icon}{address}</span>;
+      } else {
+        str = <span>{content.type}了地址{icon}{address}</span>;
+      }
+
+      return (
+        <h5>
+          <strong>{userName}</strong>
+          {str}
+        </h5>
+      )
+    },
+    renderLinkmanRecordDom({action, userName, showInOwn, content}) {
+      let message = '';
+
+      if (content.type === '设为默认') {
+        message = ` 将 ${content.name} 设为默认联系人`;
+      } else  if (content.type === 'API设为默认') {
+        message = ` 通过API应用${content.clientName}将 ${content.name} 设为默认联系人`;
+      } else if (content.type === 'API添加') {
+        message = ` 通过API应用${content.clientName}添加了联系人 ${content.name}`
+      } else {
+        message = `${content.type}了联系人${content.name}`;
+      }
+
+      return <h5><strong>{userName}</strong>{message}。</h5>
+    },
     /** 根据记录的action渲染对应的内容，支持jsx和render函数 */
     renderRecord(h, item){
-      let {action, userName, showInOwn, content, attachments} = item;
+      let {action, userName, showInOwn, content, attachments, primaryName} = item;
       
       if(action == '备注'){
         return [
@@ -141,26 +178,9 @@ export default {
         ]
       }
 
-      if(action == '地址'){
-        let address = trimAll(content.address);
-        let icon = address ? <i class="iconfont icon-address" onClick={e => this.openMap(content.longitude, content.latitude)}></i> : '';
+      if(action == '地址') return this.renderAddressRecordDom(item);
 
-        return (
-          <h5>
-            <strong>{userName}</strong>
-            {
-              content.type == '设为默认' ?
-                <span>将{icon}{address}设为默认地址</span> :
-                <span>{content.type}了地址{icon}{address}</span>
-            }。
-          </h5>
-        )
-      }
-
-      if(action == '联系人'){
-        let message = content.type == '设为默认' ? `将${content.name}设为默认联系人` : `${content.type}了联系人${content.name}`;
-        return <h5><strong>{userName}</strong>{message}。</h5>
-      }
+      if(action == '联系人') return this.renderLinkmanRecordDom(item);
 
       if(action == '消息提醒'){
         if(content.type == '已发送') return <h5>已发送了消息提醒{content.remindName}给{content.remindTo}。</h5>
@@ -191,6 +211,10 @@ export default {
         <h5><strong>{userName}</strong>通过导入更新了客户。</h5>,
         content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
         // createAttachmentDom(h,attachments)
+      ]
+
+      if (action === 'API新建') return [
+        <h5><strong>{userName}</strong>{` 通过API应用${content.clientName} 新建了客户  ${primaryName}`}</h5>,
       ]
   
       return [
