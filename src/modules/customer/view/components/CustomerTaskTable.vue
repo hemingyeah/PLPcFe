@@ -23,7 +23,7 @@
           <template v-if="column.field === 'templateId'">
             {{scope.row.templateName}}
           </template>
-          <template v-else-if="column.field === 'degree'">
+          <template v-else-if="column.field === 'suggestion'">
             {{scope.row.suggestion}}
           </template>
           <template v-else-if="column.field === 'taskNo'">
@@ -167,7 +167,7 @@ export default {
         label: '产品名称',
         field: 'productName',
         show: true,
-        sortable: 'custom',
+        // sortable: 'custom',
       }, {
         label: '工单状态',
         field: 'state',
@@ -190,7 +190,7 @@ export default {
         sortable: 'custom',
       }, {
         label: '客户评价',
-        field: 'degree',
+        field: 'suggestion',
         show: true,
         sortable: 'custom',
       }]
