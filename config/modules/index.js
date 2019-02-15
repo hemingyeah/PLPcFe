@@ -31,6 +31,12 @@ module.exports = {
     entry: './src/modules/customer/editForModal/index.js',
     template: 'src/modules/customer/editForModal/index.html'
   },
+  
+  // ------------ 绩效 ------------
+  "performance.list": {
+    entry: './src/modules/performance/list/index.ts',
+    template: 'src/modules/performance/list/index.html'
+  },
 
   // ------------ 订阅通知日报 ------------
   "open.dailyReport": {

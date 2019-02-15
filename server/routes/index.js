@@ -14,6 +14,7 @@ const customerRouter = require('./customer')
 const openRouter = require('./open')
 const settingRouter = require('./setting')
 const teamRouter = require('./team')
+const performanceRouter = require('./performance');
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -72,9 +73,15 @@ router.get('/customer/createOnTask', async ctx => {
   ctx.redirect('/customer/create/task')
 });
 
+router.get('/performance/list', async ctx => {
+  ctx.redirect('/performance_v2')
+});
+
 router.get('/customer/createOnEvent', async ctx => {
   ctx.redirect('/customer/create/event');
 });
+
+router.use("", performanceRouter.routes())
 
 router.use("", customerRouter.routes(), customerRouter.allowedMethods())
 router.use("", openRouter.routes(), openRouter.allowedMethods())
