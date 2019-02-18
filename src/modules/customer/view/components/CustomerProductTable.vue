@@ -22,7 +22,7 @@
             {{scope.row[column.field]}}
           </template>
           <template v-else-if="column.field === 'name'">
-            <a :href="`/customer/product/view/${scope.row.id}`" :data-id="scope.row.id" class="product-link">{{scope.row[column.field]}}</a>
+            <a href="" :data-id="scope.row.id" @click.prevent="createProductTab(scope.row.id)" class="product-link">{{scope.row[column.field]}}</a>
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -77,6 +77,17 @@ export default {
     this.fetchData();
   },
   methods: {
+    createProductTab(productId){
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `productView${productId}`,
+        title: '客户信息',
+        close: true,
+        url: `/customer/product/view/${productId}`,
+        fromId: fromId
+      })
+    },
     jump(pN) {
       this.paginationInfo.pageNum = pN;
       this.fetchData();

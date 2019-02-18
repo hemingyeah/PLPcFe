@@ -287,7 +287,7 @@
 
           <template slot-scope="scope">
             <template v-if="column.field === 'name'">
-              <a :href="`/customer/view/${scope.row.id}`" class="view-detail-btn" @click="viewCustomer">{{scope.row[column.field]}}</a>
+              <a href="" class="view-detail-btn" @click.stop.prevent="createCustomerTab(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
             <template v-else-if="column.field === 'customerAddress'">
               {{formatAddress(scope.row[column.field])}}
@@ -642,6 +642,19 @@ export default {
     this.searchTag();
   },
   methods: {
+    createCustomerTab(customerId){
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `customerView${customerId}`,
+        title: '查看产品',
+        close: true,
+        url: `/customer/view/${customerId}`,
+        fromId: fromId
+      })
+
+      this.viewCustomer();
+    },
     revertSearchParams() {
 
       let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
