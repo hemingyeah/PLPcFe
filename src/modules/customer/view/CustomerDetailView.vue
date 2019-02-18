@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="customer-tool-bar">
       <div>
-        <button type="button" class="btn btn-text" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
+        <button type="button" class="btn btn-text" @click="goBack" v-if="!noHistory"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <template v-if="!isDelete">
           <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
           <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
@@ -142,7 +142,8 @@ export default {
       customer: {},
       loading: false,
       showWholeName: -1, //-1代表不显示展开icon 0代表收起 1代表展开
-      statisticalData: {}
+      statisticalData: {},
+      noHistory: false,
     }
   },
   computed: {
@@ -474,6 +475,8 @@ export default {
   },
   mounted() {
     let query = parse(window.location.search);
+    console.log('query', query);
+    this.noHistory = !!query.noHistory;
     this.loading = true;
     this.fetchCustomer();
     this.fetchStatisticalData();

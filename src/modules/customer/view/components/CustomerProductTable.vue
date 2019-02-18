@@ -82,9 +82,9 @@ export default {
 
       this.$platform.openTab({
         id: `productView${productId}`,
-        title: '客户信息',
+        title: '产品信息',
         close: true,
-        url: `/customer/product/view/${productId}`,
+        url: `/customer/product/view/${productId}?noHistory=1`,
         fromId: fromId
       })
     },

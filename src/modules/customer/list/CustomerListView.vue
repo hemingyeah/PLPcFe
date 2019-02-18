@@ -649,7 +649,7 @@ export default {
         id: `customerView${customerId}`,
         title: '查看产品',
         close: true,
-        url: `/customer/view/${customerId}`,
+        url: `/customer/view/${customerId}?noHistory=1`,
         fromId: fromId
       })
 
