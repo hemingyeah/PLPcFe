@@ -646,7 +646,7 @@ export default {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: `customerView${customerId}`,
+        id: `customerView_${customerId}`,
         title: '查看产品',
         close: true,
         url: `/customer/view/${customerId}?noHistory=1`,
