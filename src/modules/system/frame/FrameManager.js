@@ -33,7 +33,7 @@ const FrameManager = {
       let action = eventData.action;
 
       if(action == 'shb.system.openFrameTab') this.openForFrame(eventData.data);
-      if(action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.id);
+      if(action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.data.id);
     },
     /** @deprecated 兼容旧页面，迁移完成后删除 */
     addTabs(option){
@@ -156,6 +156,11 @@ const FrameManager = {
       }
     },
     reloadFrameTabById(id){
+      // 再客户详情更新客户列表存在id不一致。
+      if (/frame_tab_/g.test(id)) {
+        id = id.replace('frame_tab_', '');
+      }
+      
       let index = _.findIndex(this.frameTabs, item => item.id == id);
       if(index >= 0){
         this.reloadFrameTab(this.frameTabs[index])

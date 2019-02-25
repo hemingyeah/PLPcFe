@@ -44,6 +44,19 @@ function openTab(data){
   win.postMessage(message, origin)
 }
 
+/** 刷新一个的tab，如果已经存在则跳转至对应的tab */
+function refreshTab(data){
+  let win = getRootWindow(window);
+  let origin = window.location.origin;
+  
+  let message = {
+    action: 'shb.system.realodFrameById',
+    data: data
+  };
+
+  win.postMessage(message, origin)
+}
+
 /**
  * 图片预览
  *
@@ -61,7 +74,8 @@ export const platform = {
   confirm,
   openTab,
   openLink,
-  imagePreview
+  imagePreview,
+  refreshTab,
 };
 
 export default platform;

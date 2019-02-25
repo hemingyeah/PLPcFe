@@ -411,7 +411,11 @@ export default {
         if (!await this.$platform.confirm('确定要删除该客户？')) return;
         const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
         if (!result.status) {
-          window.location.href = '/customer';
+          window.location.reload()
+          this.$platform.refreshTab({
+            id: `frame_tab_M_CUSTOMER_LIST`,
+            url: window.location.origin,
+          });
         }
       } catch (e) {
         console.error('customer-detail-view deleteCustomer error', e);
