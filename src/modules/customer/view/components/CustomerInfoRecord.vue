@@ -142,7 +142,7 @@ export default {
 
       if (content.type === '设为默认') {
         message = ` 将 ${content.name} 设为默认联系人`;
-      } else  if (content.type === 'API设为默认') {
+      } else if (content.type === 'API设为默认') {
         message = ` 通过API应用${content.clientName}将 ${content.name} 设为默认联系人`;
       } else if (content.type === 'API添加') {
         message = ` 通过API应用${content.clientName}添加了联系人 ${content.name}`
@@ -172,7 +172,7 @@ export default {
               </button>
             }
           </h5>,
-          content.isDelete == 'true' 
+          content.isDelete == 'true'
             ? <p class="text-danger">{content.deleteUserName}于{content.deleteTime}删除了该备注。</p> 
             : [<p class="pre-line secondary-info">{content.updateContent}</p>, createAttachmentDom(h,attachments)]
         ]
@@ -216,7 +216,52 @@ export default {
       if (action === 'API新建') return [
         <h5><strong>{userName}</strong>{` 通过API应用${content.clientName} 新建了客户  ${primaryName}`}</h5>,
       ]
-  
+
+      if (/工单/.test(action)) {
+        const str = `${action === '新建工单' ? '新建' : '完成' }了一个该客户的工单（${content.taskNo}）  工单类型为（${content.taskType}）`;
+        return (
+          <h5>
+            <strong>{userName}</strong>
+            {str}
+          </h5>
+        )
+      }
+
+      if (/事件/.test(action)) {
+        const str = `${action === '新建事件' ? '新建' : '完成' }了一个该客户的事件（${content.taskNo}）  事件类型为（${content.taskType}）`;
+        return (
+          <h5>
+            <strong>{userName}</strong>
+            {str}
+          </h5>
+        )
+      }
+
+      if (action === '新建计划') {
+        let str1 = `新建了一个该客户的计划任务（${content.planName}）  工单类型为（${content.taskType}）  每${content.planTime}执行一次`;
+        let str2 = content.time === 'times'
+          ? `执行（${content.end}）次截止`
+          : `截止时间（${content.end}）`;
+
+        return (
+          <h5>
+            <strong>{userName}</strong>
+            {str1}{str2}
+          </h5>
+        )
+      }
+
+      if (action === '编辑计划') {
+        let str = `编辑了一个该客户的计划`;
+        return (
+          <h5>
+            <strong>{userName}</strong>
+            {str}
+            content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
+          </h5>
+        )
+      }
+
       return [
         <h5><strong>{userName}</strong>{action}了客户。</h5>,
         content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
