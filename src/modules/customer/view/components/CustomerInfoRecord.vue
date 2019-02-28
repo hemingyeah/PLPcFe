@@ -252,10 +252,16 @@ export default {
       }
 
       if (action === '编辑计划') {
+        let str = content.updateFields;
+
+        if (str && /计划任务名称/.test(str)) {
+          str = str.replace('计划任务名称', `计划任务名称修改为：${content.newPlanName}`);
+        }
+
         return (
           <h5>
-            <strong>{userName} 编辑了一个该客户的计划。</strong>
-            {content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}。</p> : ''}
+            <strong>{userName}</strong> 编辑了一个该客户的计划：{content.oldPlanName}。
+            {str ? <p class="secondary-info">修改字段：{str}。</p> : ''}
           </h5>
         )
       }
