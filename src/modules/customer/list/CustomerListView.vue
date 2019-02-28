@@ -11,7 +11,7 @@
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
-        <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
+        <span class="advanced-search-visible-btn" @click.self="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
       </form>
       <!--高级搜索-->
       <base-panel :show.sync="advancedSearchPanelShow" :width="panelWidth">

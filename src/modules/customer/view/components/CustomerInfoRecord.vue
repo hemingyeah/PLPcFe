@@ -218,7 +218,7 @@ export default {
       ]
 
       if (/工单/.test(action)) {
-        const str = `${action === '新建工单' ? '新建' : '完成' }了一个该客户的工单 #${content.taskNo}，工单类型为（${content.taskType}）。`;
+        const str = ` ${action === '新建工单' ? '新建' : '完成' }了一个该客户的工单 #${content.taskNo}，工单类型为【${content.taskType}】。`;
         return (
           <h5>
             <strong>{userName}</strong>
@@ -228,7 +228,7 @@ export default {
       }
 
       if (/事件/.test(action)) {
-        const str = `${action === '新建事件' ? '新建' : '完成' }了一个该客户的事件 #${content.eventNo}， 事件类型为（${content.taskType}）。`;
+        const str = ` ${action === '新建事件' ? '新建' : '完成' }了一个该客户的事件 #${content.eventNo}， 事件类型为【${content.taskType}】。`;
         return (
           <h5>
             <strong>{userName}</strong>
@@ -238,10 +238,10 @@ export default {
       }
 
       if (action === '新建计划') {
-        let str1 = `新建了一个该客户的计划任务（${content.planName}），工单类型为（${content.taskType}），每${content.planTime}执行一次，`;
+        let str1 = ` 新建了一个该客户的计划任务【${content.planName}】，工单类型为【${content.taskType}】，每${content.planTime}执行一次，`;
         let str2 = content.time === 'times'
-          ? `执行（${content.end}）次截止。`
-          : `截止时间（${content.end}）。`;
+          ? `执行 ${content.end} 次截止。`
+          : `截止时间：${content.end}。`;
 
         return (
           <h5>
@@ -252,11 +252,9 @@ export default {
       }
 
       if (action === '编辑计划') {
-        let str = `编辑了一个该客户的计划。`;
         return (
           <h5>
-            <strong>{userName}</strong>
-            {str}
+            <strong>{userName} 编辑了一个该客户的计划。</strong>
             {content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}。</p> : ''}
           </h5>
         )
