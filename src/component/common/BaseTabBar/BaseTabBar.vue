@@ -112,7 +112,7 @@ export default {
       if(event.propertyName != 'transform' || !event.target.classList.contains('base-tabbar-list')) return;
       this.offsetTransition = false;
     },
-    adjustTabs: _.debounce(function(tab){
+    adjustTabs(tab){
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
 
@@ -132,17 +132,27 @@ export default {
       this.showAll = true;
       this.prevBtnEnable = this.offset > 0;
       this.nextBtnEnable = this.offset < maxOffset;
+    },
+    handler: _.debounce(function(tab){
+      return this.adjustTabs(tab)
     }, 160)
   },
   mounted(){
-    window.addEventListener("resize", this.adjustTabs);
+    window.addEventListener("resize", this.handler);
+    
     this.$nextTick(this.adjustTabs)
+  },
+  destroyed(){
+    window.removeEventListener("resize", this.handler);
   },
   watch: {
     tabs: {
       deep: true,
       handler(){
-        this.$nextTick(this.showSelectTab)
+        this.$nextTick(() => {
+          this.adjustTabs();
+          this.showSelectTab();
+        })
       }
     }
   }

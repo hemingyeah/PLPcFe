@@ -55,6 +55,7 @@
 <script>
 import {formatDate,} from '@src/util/lang';
 import EventStateEnum from '@model/enum/EventStateEnum';
+import platform from '@src/platform';
 
 export default {
   name: "customer-event-table",
@@ -96,20 +97,18 @@ export default {
     },
     openDetail(event){
       event.preventDefault();
-
       if (!window.frameElement) return;
 
       let el = event.target;
       var fromId = window.frameElement.getAttribute('id');
-
-      parent.window.addTabs({
+      //TODO: 统一id命名
+      platform.openTab({
         id: "taskView_" + el.dataset.id,
         title: "正在加载",
         close: true,
         url: el.getAttribute('href'),
-        fromId:fromId
+        fromId: fromId
       });
-      parent.window.resizeFrame();
     },
     jump(pN) {
       this.searchModel.pageNum = pN;

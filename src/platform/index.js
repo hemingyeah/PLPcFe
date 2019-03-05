@@ -31,27 +31,39 @@ function openLink(url){
   return dingtalk.biz.openLink(url);
 }
 
-/** 打开一个的tab，如果已经存在则跳转至对应的tab */
-function openTab(data){
+/** 
+ * 打开一个的tab，如果已经存在则跳转至对应的tab 
+ * 
+ * tab的id属性按以下格式命名：`[module]_[page](_${key})*`  
+ * 示例：customer_view_0fe58f8b-b698-4fc0-9ddb-8ca155452e9
+ * 
+ * @param {Object} options - tab对应的options，一般包含以下属性{id,title,close,url,fromId}
+ * @param {string} options.id - id
+ * @param {string} options.title - title
+ * @param {string} options.close - 是否允许关闭tab
+ * @param {string} options.url - tab对应的url
+ * @param {string} options.fromId - 打开该tab的源tab的id
+ */
+function openTab(options){
   let win = getRootWindow(window);
   let origin = window.location.origin;
   
   let message = {
     action: 'shb.system.openFrameTab',
-    data: data
+    data: options
   };
 
   win.postMessage(message, origin)
 }
 
-/** 刷新一个的tab，如果已经存在则跳转至对应的tab */
-function refreshTab(data){
+/** 根据tab刷新tab */
+function refreshTab(id){
   let win = getRootWindow(window);
   let origin = window.location.origin;
   
   let message = {
     action: 'shb.system.realodFrameById',
-    data: data
+    data: id
   };
 
   win.postMessage(message, origin)

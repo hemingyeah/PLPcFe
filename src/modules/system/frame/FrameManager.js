@@ -33,7 +33,7 @@ const FrameManager = {
       let action = eventData.action;
 
       if(action == 'shb.system.openFrameTab') this.openForFrame(eventData.data);
-      if(action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.data.id);
+      if(action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.data);
     },
     /** @deprecated 兼容旧页面，迁移完成后删除 */
     addTabs(option){
@@ -80,10 +80,11 @@ const FrameManager = {
         //frame页面卸载时，重置刷新icon
         frameWindow.addEventListener('unload', () => tab.loading = true)
       })
+      
       // 进入客户列表时，清除记录的列表搜索参数
-      if (tab.currentUrl === '/customer') {
-        sessionStorage.removeItem('customer_list_search_status');
-      }
+      // if (tab.currentUrl === '/customer') {
+      //   sessionStorage.removeItem('customer_list_search_status');
+      // }
     },
     //关闭frameTab
     closeFrameTab(frameTab){
@@ -144,22 +145,21 @@ const FrameManager = {
         tab.loading = true;
         tab.title = '正在加载...';
 
-        if(redirect){
-          iframe.src = tab.url;
-        }else{
-          iframe.contentWindow.location.reload(true);
+        if(redirect) return iframe.src = tab.url;
+        //如果页面由导出刷新方法，调用该方法
+        if(typeof iframe.contentWindow.__exports__refresh == 'function'){
+          return iframe.contentWindow.__exports__refresh().then(() => {
+            tab.loading = false;
+            tab.title = iframe.contentWindow.document.title;
+          });
         }
-      }
-  
-      if (tab.currentUrl === '/customer') {
-        sessionStorage.removeItem('customer_list_search_status');
+          
+        iframe.contentWindow.location.reload(true);
       }
     },
     reloadFrameTabById(id){
-      // 再客户详情更新客户列表存在id不一致。
-      if (/frame_tab_/g.test(id)) {
-        id = id.replace('frame_tab_', '');
-      }
+      // 替换传入的id中的frame_tab_
+      id = id.replace(/^frame_tab_/, '');
       
       let index = _.findIndex(this.frameTabs, item => item.id == id);
       if(index >= 0){

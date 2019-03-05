@@ -640,33 +640,37 @@ export default {
 
     // 团队默认加载全部数据
     this.searchTag();
+
+    //对外开放刷新方法，用于其他tab刷新本tab数据
+    //TODO: [tab_spec]标准化刷新方式
+    window.__exports__refresh = this.search;
   },
   methods: {
     createCustomerTab(customerId){
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: `customerView_${customerId}`,
-        title: '查看产品',
+        id: `customer_view_${customerId}`,
+        title: '产品详情',
         close: true,
         url: `/customer/view/${customerId}?noHistory=1`,
         fromId: fromId
       })
 
-      this.viewCustomer();
+      //this.viewCustomer();
     },
     revertSearchParams() {
+      //let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
+      //sessionStorage.removeItem('customer_list_search_status');
+      // if (paramsFromStorage) {
+      //   paramsFromStorage = JSON.parse(paramsFromStorage);
 
-      let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
-      sessionStorage.removeItem('customer_list_search_status');
-      if (paramsFromStorage) {
-        paramsFromStorage = JSON.parse(paramsFromStorage);
+      //   this.paramsBackup = {
+      //     ...paramsFromStorage.params,
+      //     pageNum: paramsFromStorage.paginationInfo.pageNum,
+      //   };
+      // }
 
-        this.paramsBackup = {
-          ...paramsFromStorage.params,
-          pageNum: paramsFromStorage.paginationInfo.pageNum,
-        };
-      }
       const localStorageData = this.getLocalStorageData();
 
       if (localStorageData.pageSize) {
@@ -752,17 +756,17 @@ export default {
       this.columnNum = Number(command);
       localStorage.setItem('customer_list_advance_search_column_number', command);
     },
-    viewCustomer(e) {
+    // viewCustomer(e) {
 
-      const status = {
-        params: {
-          ...this.paramsBackup,
-        },
-        paginationInfo: this.paginationInfo
-      };
+    //   const status = {
+    //     params: {
+    //       ...this.paramsBackup,
+    //     },
+    //     paginationInfo: this.paginationInfo
+    //   };
 
-      sessionStorage.setItem('customer_list_search_status', JSON.stringify(status));
-    },
+    //   sessionStorage.setItem('customer_list_search_status', JSON.stringify(status));
+    // },
     formatAddress(ad) {
       if(null == ad) return '';
         
@@ -862,7 +866,7 @@ export default {
         ...cp,
       };
 
-      this.$http.post('/customer/list', params)
+      return this.$http.post('/customer/list', params)
         .then(res => {
           if (!res || !res.list) {
             this.customers = [];
@@ -1307,7 +1311,7 @@ export default {
 
       this.$refs.baseDistPicker.clearValue();
       this.search();
-      sessionStorage.removeItem('customer_list_search_status');
+      // sessionStorage.removeItem('customer_list_search_status');
     },
     // input search method
     searchCustomerManager(keyword) {

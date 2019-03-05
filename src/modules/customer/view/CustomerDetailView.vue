@@ -1,8 +1,8 @@
 <template>
   <div class="page-container">
     <div class="customer-tool-bar">
-      <div>
-        <button type="button" class="btn btn-text" @click="goBack" v-if="!noHistory"><i class="iconfont icon-arrow-left"></i> 返回</button>
+      <div class="customer-toolbar-left" v-if="allowBack || !isDelete">
+        <button type="button" class="btn btn-text" @click="goBack" v-if="allowBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <template v-if="!isDelete">
           <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
           <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
@@ -10,7 +10,7 @@
         </template>
         <!-- <a :href="`/customer/oldView/${id}`">返回旧版</a> -->
       </div>
-      <div class="action-btn" v-if="!isDelete">
+      <div class="customer-toolbar-right action-btn" v-if="!isDelete">
         <el-dropdown trigger="click" v-if="allowCreateTask">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>工单
@@ -53,7 +53,7 @@
       </div>
     </div>
     <div class="main-content" v-loading="loading">
-      <div class="customer-detail">
+      <div class="customer-detail" v-if="!loading">
         <h3 class="customer-name" :class="{'customer-name-expand': showWholeName == 1}">
           <span class="customer-name-delete" v-if="isDelete" title="该客户已被删除，只能查看数据。" v-tooltip>已删除</span>
           <span class="customer-name-disable" v-if="isDisable" title="该客户已被禁用，无法添加提醒和新建工单、事件、计划任务。" v-tooltip>已禁用</span>
@@ -119,7 +119,7 @@ import EditContactDialog from './operationDialog/EditContactDialog.vue';
 import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
 
 import AuthUtil from '@src/util/auth';
-import {parse} from '@src/util/querystring';
+import qs from '@src/util/querystring';
 
 export default {
   name: "customer-detail-view",
@@ -132,8 +132,7 @@ export default {
   data() {
     return {
       id: this.initData.id, //当前客户的id
-      // tabs: [],
-      tabs: this.buildTabs(),
+      tabs: [],
       //当前选中的tab
       currTab: 'customer-info-record',
       customerOption: {},
@@ -143,10 +142,24 @@ export default {
       loading: false,
       showWholeName: -1, //-1代表不显示展开icon 0代表收起 1代表展开
       statisticalData: {},
-      noHistory: false,
     }
   },
   computed: {
+    /** 是否显示返回按钮 */
+    allowBack(){
+      let allow = true;
+
+      //如果带入noHistory参数，则不显示
+      let query = qs.parse(window.location.search);
+      if(query.noHistory) return false;
+
+      //验证路径
+      let path = window.location.pathname;
+      let disablePathReg = [/^\/customer\/view\/\S+$/];
+      if(disablePathReg.some(reg => reg.test(path))) return false;
+
+      return allow;
+    },
     /** 当前登录的用户 */
     loginUser(){
       return this.initData.loginUser || {};
@@ -157,11 +170,11 @@ export default {
      * 所有操作的权限应该以此为基础
      */
     isDelete(){
-      return this.customer.isDelete === 1;
+      return this.customer.isDelete == null || this.customer.isDelete === 1;
     },
     /** 客户是否被禁用 */
     isDisable(){
-      return this.customer.status === 0;
+      return this.customer.status == null || this.customer.status === 0;
     },
     fields() {
       const fields = (this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId);
@@ -411,11 +424,10 @@ export default {
         if (!await this.$platform.confirm('确定要删除该客户？')) return;
         const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
         if (!result.status) {
-          window.location.reload()
-          this.$platform.refreshTab({
-            id: `frame_tab_M_CUSTOMER_LIST`,
-            url: window.location.origin,
-          });
+          let fromId = window.frameElement.getAttribute('fromid');
+          this.$platform.refreshTab(fromId);
+
+          window.location.reload();
         }
       } catch (e) {
         console.error('customer-detail-view deleteCustomer error', e);
@@ -478,12 +490,11 @@ export default {
     }
   },
   mounted() {
-    let query = parse(window.location.search);
-    console.log('query', query);
-    this.noHistory = !!query.noHistory;
     this.loading = true;
     this.fetchCustomer();
     this.fetchStatisticalData();
+
+    let query = qs.parse(window.location.search);
     if (query && query.active === 'product') {
       this.currTab = 'customer-product-table';
     }
@@ -532,6 +543,8 @@ export default {
     background: #fff;
     border-radius: 3px;
     box-shadow: 0 1px 4px rgba(216,216,216, .65);
+    display: flex;
+    flex-flow: column nowrap;
   }
 
   .customer-address-icon {
@@ -545,7 +558,6 @@ export default {
     justify-content: space-between;
     font-size: 14px;
     color: $text-color-regular;
-    padding: 10px;
     border-bottom: 1px solid #f2f2f2;
 
     .btn-text {
@@ -556,10 +568,18 @@ export default {
     }
   }
 
+  .customer-toolbar-left{
+    padding: 10px 5px 10px 10px;
+  }
+
+  .customer-toolbar-right{
+    padding: 10px 10px 10px 5px;
+  }
+
   .main-content {
     display: flex;
     flex-flow: row nowrap;
-    height: calc(100% - 53px);
+    flex: 1;
     position: relative;
   }
 

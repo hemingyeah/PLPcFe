@@ -251,6 +251,7 @@ export default {
       this.$http.post('/customer/create', params)
         .then(res => {
           if (res.status) return this.$platform.alert('创建客户失败');
+          //TODO: 创建完成后需要修改tab id
           window.location.href = `/customer/view/${res.data.customerId}`;
         })
         .catch(err => console.error('err', err));
@@ -259,6 +260,10 @@ export default {
       this.$http.post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
           if (res.status) return this.$platform.alert('更新客户失败');
+
+          let fromId = window.frameElement.getAttribute('fromid');
+          this.$platform.refreshTab(fromId);
+
           window.location.href = `/customer/view/${res.data || this.editId}`;
         })
         .catch(err => console.error('err', err));
