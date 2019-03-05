@@ -2,7 +2,8 @@
   <el-form-item class="specific-condition-container" :label="label">
 
     <el-select
-      v-model="value.types"
+      :value="value.types"
+      @input="(val) => updateVal({val, action: 'types', })"
       multiple
       collapse-tags
       style="margin-left: 20px;"
@@ -11,27 +12,25 @@
         v-for="item in options"
         :key="item.value"
         :label="item.label"
+        :disabled="otherConditionValue.some(val => val === item.value)"
         :value="item.value">
       </el-option>
     </el-select>
     <div class="detail">
       <p>
-        <span class="ordinary-text">负责人每单计</span>
-        <el-input v-model="value.executorScore" class="count-input" placeholder="请输入内容"></el-input>
-        <span class="ordinary-text">分</span>
+        <span class="ordinary-text">负责人{{config.label}}</span>
+        <el-input :value="value.executorScore" @input="(val) => updateVal({val, action: 'executorScore', })" class="count-input" placeholder="请输入内容"></el-input>
+        <span class="ordinary-text">{{config.unit}}</span>
       </p>
       <p>
-        <span class="ordinary-text">协调人每单计</span>
-        <el-input v-model="value.assistantScore" class="count-input" placeholder="请输入内容"></el-input>
-        <span class="ordinary-text">分</span>
+        <span class="ordinary-text">协同人{{config.label}}</span>
+        <el-input :value="value.assistantScore" @input="(val) => updateVal({val, action: 'assistantScore', })" class="count-input" placeholder="请输入内容"></el-input>
+        <span class="ordinary-text">{{config.unit}}</span>
       </p>
     </div>
 
-
-    <el-button class="delete-contact-btn" type="danger" style="height: 32px;">删除</el-button>
-
-
-
+    <el-button class="delete-contact-btn" type="danger" style="height: 32px;" v-if="index > 1" @click="dele">删除</el-button>
+    <!--<base-button type="danger" @event="deleteCondition">添加条件</base-button>-->
   </el-form-item>
 </template>
 
@@ -47,21 +46,59 @@ export default {
       type: Array,
       default: () => ([])
     },
+    rules: {
+      type: Array,
+      default: () => ([])
+    },
+    config: {
+      type: Object,
+      default: () => ({})
+    },
   },
   data() {
     return {
-      value: {
-        types: [],
-        executorScore: 0,
-        assistantScore: 0,
-
-      },
+    }
+  },
+  computed: {
+    index() {
+      // 这里的index是从1开始
+      return Number(this.label.match(/\d/g)[0]);
+    },
+    value() {
+      return this.rules[this.index - 1];
+    },
+    otherConditionValue() {
+      let arr = [];
+      this.rules
+        .filter((el, index) => index !== this.index - 1)
+        .map(({types}) => types)
+        .forEach(types => {
+          arr = [...arr, ...types]
+        });
+      return arr;
     }
   },
   mounted() {
     console.log('mounted');
   },
-  methods: {},
+  methods: {
+    updateVal({action, val}) {
+      let newVal = {
+        ...this.value,
+        [action]: val,
+      };
+      this.$emit('update', {
+        newVal,
+        index: this.index - 1,
+      });
+    },
+    dele() {
+      this.$emit('delete-condition', {
+        action: 'delete',
+        index: this.index - 1,
+      })
+    }
+  },
 }
 </script>
 
@@ -75,7 +112,6 @@ export default {
       margin-left: 0!important;
       flex-grow: 1;
       display: flex;
-      /*justify-content: space-between;*/
 
       .el-input, .el-select {
         height: 32px;
