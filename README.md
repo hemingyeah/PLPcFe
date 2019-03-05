@@ -33,24 +33,3 @@
 │   └── index.html                默认模板
 └── package.json                  npm配置文件 
 ```
-
-## 框架更新
-  >  `▲` 表示优先级较高，`▼` 表示优先级低
-
-  **新增**
-  - [ ] toast组件，兼容钉钉 
-  - [ ] 浏览器ua工具 
-  - [ ] 层管理(PopupManager), 统一管理弹层 
-  - [ ] 合并sm4_pc_components项目(Cascader)
-  - [ ] 浏览器ua工具 
-  - [ ] 输入组件支持清空 
-  - [ ] 表单支持键盘操作
-  - [ ] split分割面板 https://www.iviewui.com/components/split
-  - [ ] 部门下拉选择框 ▲
-  - [ ] 重写table组件，可折叠的 datatable ▲
-  - [ ] base64 https://www.npmjs.com/package/Base64
-  
-  **优化** 
-  - [ ] BaseContact组件选人时，只在需要工单统计信息时才返回统计数据
-  - [ ] 文件上传监听进度 ▲
-  - [x] FomrBuilder调整远程验证方式，支持传入function ▲

@@ -23,23 +23,12 @@
               </button> 
 
               <div class="dev-tool-menu">
-                <a href="javascript:;" @click="openDemo">demo</a>
                 <a href="javascript:;" @click="clearStorage">清空缓存</a>
+                <a href="javascript:;" @click="openDemo">demo</a>
+                <a href="javascript:;" @click="goRoleTeam">团队管理</a>
               </div>
             </el-popover>
-            <a 
-              class="btn-text frame-header-btn frame-header-btn-bg"
-              v-if="showDevTool"
-              title="团队管理" v-tooltip @click="goRoleTeam">
-              <i class="iconfont icon-bangzhu"></i>
-            </a>
-            <a 
-              v-if="showDevTool"
-              href="/v3" class="btn-text frame-header-btn frame-header-btn-bg"
-              title="返回旧版" v-tooltip>
-              <i class="iconfont icon-qiehuan"></i>
-            </a>
-            
+        
             <button 
               type="button" class="btn-text frame-header-btn frame-header-btn-bg"
               @click="openHelpDoc"
