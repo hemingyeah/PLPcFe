@@ -7,6 +7,7 @@
       multiple
       collapse-tags
       style="margin-left: 20px;"
+      :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'types')}"
       placeholder="请选择">
       <el-option
         v-for="item in options"
@@ -19,12 +20,12 @@
     <div class="detail">
       <p>
         <span class="ordinary-text">负责人{{config.label}}</span>
-        <el-input :value="value.executorScore" @input="(val) => updateVal({val, action: 'executorScore', })" class="count-input" placeholder="请输入内容"></el-input>
+        <el-input :value="value.executorScore" @input="(val) => updateVal({val, action: 'executorScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
         <span class="ordinary-text">{{config.unit}}</span>
       </p>
       <p>
         <span class="ordinary-text">协同人{{config.label}}</span>
-        <el-input :value="value.assistantScore" @input="(val) => updateVal({val, action: 'assistantScore', })" class="count-input" placeholder="请输入内容"></el-input>
+        <el-input :value="value.assistantScore" @input="(val) => updateVal({val, action: 'assistantScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'assistantScore')}" class="count-input" placeholder="请输入内容"></el-input>
         <span class="ordinary-text">{{config.unit}}</span>
       </p>
     </div>
@@ -50,6 +51,10 @@ export default {
       type: Array,
       default: () => ([])
     },
+    validation: {
+      type: Array,
+      default: () => ([])
+    },
     config: {
       type: Object,
       default: () => ({})
@@ -66,6 +71,9 @@ export default {
     },
     value() {
       return this.rules[this.index - 1];
+    },
+    currentItemValidation() {
+      return this.validation[this.index - 1];
     },
     otherConditionValue() {
       let arr = [];
@@ -103,6 +111,9 @@ export default {
 </script>
 
 <style lang="scss">
+  .input-is-error input {
+    border-color: #f56c6c;
+  }
 
   .specific-condition-container {
     display: flex;

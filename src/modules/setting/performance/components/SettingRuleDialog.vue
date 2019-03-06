@@ -2,14 +2,14 @@
   <base-modal :title="title" :show.sync="visible" width="800px" class="base-import-modal">
     <el-form ref="form" :model="form" label-width="80px">
 
-      <el-form-item label="规则名称">
-        <el-input v-model="form.ruleName"></el-input>
+      <el-form-item label="规则名称" :error="formValidationResult.ruleName">
+        <el-input v-model="form.ruleName" @change="validate"></el-input>
       </el-form-item>
-      <el-form-item label="规则说明">
-        <el-input v-model="form.ruleDesc" type="textarea"></el-input>
+      <el-form-item label="规则说明" :error="formValidationResult.ruleDesc">
+        <el-input v-model="form.ruleDesc" @change="validate" type="textarea" :maxlength="500"></el-input>
       </el-form-item>
       <el-form-item label="类别" style="margin-bottom: 0px!important;">
-        <el-radio-group v-model="form.ruleType" @change="resetOtherValueAfterChangeRuleType">
+        <el-radio-group v-model="form.ruleType" @change="changeRuleType">
           <el-radio :label="0">计分制</el-radio>
           <el-radio :label="1">奖金制</el-radio>
         </el-radio-group>
@@ -19,7 +19,7 @@
       </el-form-item>
 
       <el-form-item label="计算方式" v-if="form.ruleType">
-        <el-select v-model="form.rewardType" placeholder="请选择">
+        <el-select v-model="form.rewardType" @change="validate" placeholder="请选择">
           <el-option
             v-for="item in calculations"
             :key="item.value"
@@ -30,7 +30,7 @@
       </el-form-item>
 
       <el-form-item label="生效条件" class="base-condition-wrap">
-        <el-select v-model="form.effectCondition" @change="resetOtherValue" placeholder="请选择">
+        <el-select v-model="form.effectCondition" @change="changeEffectCondition" placeholder="请选择">
           <el-option
             v-for="item in includeTypes"
             :key="item.value"
@@ -40,7 +40,7 @@
         </el-select>
 
         <span class="ordinary-text" v-if="form.effectCondition">为</span>
-        <el-select v-model="form.category" v-if="form.effectCondition" @change="resetOtherValueAfterChangeCategory" placeholder="请选择">
+        <el-select v-model="form.category" v-if="form.effectCondition" :class="{'input-is-error': formValidationResult.category}" @change="changeCategory" placeholder="请选择">
           <el-option
             v-for="item in categories"
             :key="item.value"
@@ -51,10 +51,10 @@
 
         <div v-if="!form.effectCondition" class="special-condition-wrap">
           <span class="ordinary-text">负责人{{conditionConfig.label}}</span>
-          <el-input v-model="form.rules[0].executorScore" class="count-input" placeholder="请输入内容"></el-input>
+          <el-input v-model="form.rules[0].executorScore" @change="validate" :class="{'input-is-error': formValidationResult.rules[0].fields.some(v => v === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
           <span class="ordinary-text">{{conditionConfig.unit}}</span>
           <span class="ordinary-text">协同人{{conditionConfig.label}}</span>
-          <el-input v-model="form.rules[0].assistantScore" class="count-input" placeholder="请输入内容"></el-input>
+          <el-input v-model="form.rules[0].assistantScore" @change="validate" :class="{'input-is-error': formValidationResult.rules[0].fields.some(v => v === 'assistantScore')}" class="count-input" placeholder="请输入内容"></el-input>
           <span class="ordinary-text">{{conditionConfig.unit}}</span>
         </div>
       </el-form-item>
@@ -69,7 +69,7 @@
           </el-option>
         </el-select>
         <span class="ordinary-text" v-if="form.custFieldOfTask">的</span>
-        <el-select v-model="form.customizedField" v-if="form.custFieldOfTask" :disabled="!taskSelectFields.length" placeholder="请选择">
+        <el-select v-model="form.customizedField" v-if="form.custFieldOfTask" @change="validate" :disabled="!taskSelectFields.length" placeholder="请选择">
           <el-option
             v-for="item in taskSelectFields"
             :key="item.value"
@@ -87,6 +87,7 @@
           :label="`条件${index+1}`"
           :rules="form.rules"
           :config="conditionConfig"
+          :validation="formValidationResult.rules"
           @delete-condition="modifyCondition"
           @update="updateCondition"
           :options="options" />
@@ -119,6 +120,7 @@ export default {
       visible: true,
       title: '新增绩效规则',
       pending: false,
+      submitted: false,
       includeTypes: [
         {
           label: '全部',
@@ -171,12 +173,10 @@ export default {
         ruleName: '',
         ruleDesc: '',
         ruleType: 0,
-        ruleContent: '',
         effect: '', // 是否启用
-        //
-        rewardType: 'profit',
-        effectCondition: 0,
-        category: '',
+        rewardType: 'profit', // 计算方式
+        effectCondition: 0, // 生效条件
+        category: '', // 工单类型、服务类型、服务内容或者 自定义字段
         custFieldOfTask: '',
         customizedField: '',
         rules: [
@@ -187,6 +187,140 @@ export default {
           },
         ],
       },
+      formValidation: {
+        ruleName(form) {
+          let val = form.ruleName;
+          if (val) return { field: 'ruleName', value: val, status: 0};
+          return {
+            field: 'ruleName',
+            value: val,
+            status: 1,
+            msg: '必填',
+          }
+        },
+        ruleDesc(form) {
+          let val = form.ruleDesc;
+          if (val) return { field: 'ruleDesc', value: val, status: 0};
+          return {
+            field: 'ruleDesc',
+            value: val,
+            status: 1,
+            msg: '必填',
+          }
+        },
+        category(form) {
+          const {effectCondition, category, } = form;
+          if (!effectCondition) return { field: 'category', value: category, status: 0};
+          if (category) return { field: 'category', value: category, status: 0};
+          return {
+            field: 'category',
+            value: category,
+            status: 1,
+            msg: '必选',
+          }
+        },
+        custFieldOfTask(form) {
+          const {custFieldOfTask, category, } = form;
+          if (category !== 'customizedFields') return { field: 'custFieldOfTask', value: custFieldOfTask, status: 0};
+          if (custFieldOfTask) return { field: 'custFieldOfTask', value: custFieldOfTask, status: 0};
+          return {
+            field: 'custFieldOfTask',
+            value: custFieldOfTask,
+            status: 1,
+            msg: '必选',
+          }
+        },
+        customizedField(form) {
+          const {custFieldOfTask, category, customizedField} = form;
+          if (category !== 'customizedFields') return { field: 'customizedField', value: customizedField, status: 0};
+          if (!custFieldOfTask) return { field: 'customizedField', value: customizedField, status: 0};
+          if (customizedField) return { field: 'customizedField', value: customizedField, status: 0};
+          return {
+            field: 'customizedField',
+            value: customizedField,
+            status: 1,
+            msg: '必选',
+          }
+        },
+        rules(form) {
+          const rules = form.rules;
+
+          return rules.map(rule => {
+            const {ruleType, effectCondition, rewardType,} = form;
+            let errFields = [];
+            if (!ruleType) {
+              // 计分制
+              if (effectCondition && (!rule.types || !rule.types.length)) {
+                // 部分生效 验证 选择类型
+                errFields.push('types');
+              }
+              if (!Number(rule.executorScore)) {
+                errFields.push('executorScore');
+              }
+
+              if (!Number(rule.assistantScore)) {
+                errFields.push('assistantScore');
+              }
+              if (errFields.length) {
+                return {
+                  status: 1,
+                  msg: '请正确填写',
+                  fields: errFields,
+                }
+              }
+              return {status: 0,fields: []};
+            }
+
+            // 奖金 全部生效
+            if (effectCondition && (!rule.types || !rule.types.length)) {
+              // 部分生效 验证 选择类型
+              errFields.push('types');
+            }
+
+            if (rewardType !== 'amount') {
+              // 按百分比计算
+              if (!Number(rule.executorScore) || !Number(rule.executorScore) < 0 || !Number(rule.executorScore) > 1) {
+                errFields.push('executorScore');
+              }
+
+              if (!Number(rule.assistantScore) || !Number(rule.executorScore) < 0 || !Number(rule.executorScore) > 1) {
+                errFields.push('assistantScore');
+              }
+
+            } else {
+              // 按整数计算
+              if (!Number(rule.executorScore)) {
+                errFields.push('executorScore');
+              }
+
+              if (!Number(rule.assistantScore)) {
+                errFields.push('assistantScore');
+              }
+            }
+            if (errFields.length) {
+              return {
+                status: 1,
+                msg: '请正确填写',
+                fields: errFields,
+              }
+            }
+
+            return {status: 0,fields: []};
+          })
+        }
+      },
+      formValidationResult: {
+        ruleName: null,
+        ruleDesc: null,
+        ruleType: null,
+        rewardType: null,
+        effectCondition:  null,
+        category: null,
+        custFieldOfTask: null,
+        customizedField: null,
+        rules: [{status: 0,fields: []}],
+      },
+
     }
   },
   computed: {
@@ -243,23 +377,38 @@ export default {
     }
   },
   mounted() {
-
-    console.log('taskTypes', this.allTypes);
-
   },
   methods: {
+
     onSubmit() {
+      this.submitted = true;
+      if (!this.validateForm()) return;
       const params = this.buildParam();
 
+      this.pending = true;
       return createPerformanceRule(params)
         .then(res => {
-
-          console.log('res', res);
+          if (!res.status) {
+            this.pending = false;
+            this.visible = false;
+            // refresh list
+            this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
+          }
         })
         .catch(e => console.error('e', e));
     },
     validateForm() {
+      let keysOfValidation = Object.keys(this.formValidation);
 
+      let res = keysOfValidation.map(key => {
+        const res = this.formValidation[key](this.form);
+
+        this.formValidationResult[key] = res.msg || null;
+        if (key !== 'rules') return !res.status;
+        this.formValidationResult.rules = res;
+        return res.every(r => !r.status);
+      });
+      return res.every(r => r);
     },
     buildParam() {
       let {
@@ -348,40 +497,58 @@ export default {
         if (i === index) return newVal;
         return e;
       })]);
+
+      this.validate();
     },
 
     modifyCondition({action, index }) {
       let { rules, } = this.form;
+      let { rules: result, } = this.formValidationResult;
       if (action === 'add') {
-        return this.$set(this.form, 'rules', [...rules, {
+        this.$set(this.form, 'rules', [...rules, {
           types: [],
           executorScore: 0,
           assistantScore: 0,
         }]);
+        this.$set(this.formValidationResult, 'rules', [...result, {
+          status: 0,fields: [],
+        }]);
+      } else {
+        this.$set(this.form, 'rules', [...rules.filter((e, i) => i !== index)]);
+        this.$set(this.form, 'formValidationResult', [...rules.filter((e, i) => i !== index)]);
       }
 
-      this.$set(this.form, 'rules', [...rules.filter((e, i) => i !== index)]);
+      this.validate();
     },
     toggleDialog() {
       this.visible = !this.visible;
     },
-    resetOtherValueAfterChangeRuleType() {
-      let fields = ['ruleContent', 'category', 'custFieldOfTask', 'customizedField', 'rules', 'rewardType', 'effectCondition'];
-      this.clearSomeFieldsVal(fields)
+    // input change event
+    validate() {
+      if (this.submitted) {
+        this.validateForm();
+      }
     },
-    resetOtherValueAfterChangeCategory() {
-      let fields = ['rules', 'custFieldOfTask', 'customizedField'];
-      this.clearSomeFieldsVal(fields)
-    },
-    resetOtherValue() {
 
-      let fields = ['ruleContent', 'category', 'custFieldOfTask', 'customizedField', 'rules'];
-      this.clearSomeFieldsVal(fields)
+    changeRuleType() {
+      let fields = ['category', 'custFieldOfTask', 'customizedField', 'rules', 'rewardType', 'effectCondition'];
+      this.clearSomeFieldsVal(fields);
+
+      this.validate();
+    },
+    changeCategory() {
+      let fields = ['rules', 'custFieldOfTask', 'customizedField'];
+      this.clearSomeFieldsVal(fields);
+      this.validate();
+    },
+    changeEffectCondition() {
+      let fields = ['category', 'custFieldOfTask', 'customizedField', 'rules'];
+      this.clearSomeFieldsVal(fields);
+      this.clearSomeFieldsVal(fields);
     },
     // clear val
     clearSomeFieldsVal(fields) {
-
-      let defaultValIsEmptyString = ['ruleName', 'ruleDesc', 'ruleContent', 'category', 'custFieldOfTask', 'customizedField'];
+      let defaultValIsEmptyString = ['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField'];
       let defaultValIsZero = ['effectCondition', 'ruleType'];
       let key = null;
 
@@ -398,6 +565,9 @@ export default {
             executorScore: 0,
             assistantScore: 0,
           }]);
+          this.$set(this.formValidationResult, 'rules', [{
+            status: 0,fields: [],
+          }]);
           continue;
         }
 
@@ -411,21 +581,6 @@ export default {
           continue;
         }
       }
-
-      // let form = {
-      //   effect: '', // 是否启用
-      //   // rewardType: 'profit',
-      //   // effectCondition: 0,
-      //   // ruleType: 0,
-      //
-      //   // rules: [
-      //   //   {
-      //   //     types: [],
-      //   //     executorScore: 0,
-      //   //     assistantScore: 0,
-      //   //   },
-      //   // ],
-      // }
     },
   },
   components: {
@@ -436,8 +591,12 @@ export default {
 
 <style lang="scss">
 
-  .ordinary-text {
-    padding: 0 10px;
+
+  .el-textarea textarea{
+    padding: 5px 10px;
+  }
+  .el-form-item__error {
+    top: auto;
   }
 
   .el-form-item {
@@ -447,6 +606,14 @@ export default {
   .el-radio {
     height: 32px;
     line-height: 32px;
+  }
+
+  .input-is-error input {
+    border-color: #f56c6c;
+  }
+
+  .ordinary-text {
+    padding: 0 10px;
   }
 
   .dialog-footer {
