@@ -85,7 +85,7 @@
               <span class="notification-new" v-show="notification.count && notification.count > 0">{{ msgCount || notification.count }}</span>
               <i class="iconfont">&#xe624;</i>
             </button>
-      
+
             <!-- 个人信息 -->
             <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
               <div class="frame-user-profile" slot="reference">
@@ -319,9 +319,11 @@ export default {
       try {
         this.exportList = await http.get('/export/getList');
         // 更新操作列表
+        if(!Array.isArray(this.exportList)) this.exportList = [];
+        //更新操作列表
         this.operationList = this.operationList.filter(item => {
           return (
-            item.operate == 'cancel' 
+            item.operate == 'cancel'
             || (item.operate == 'download' && this.exportList.some(exp => exp.id == item.id))
           );
         })

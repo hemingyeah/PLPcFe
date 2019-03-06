@@ -11,14 +11,6 @@ export default {
   name: 'form-number',
   mixins: [FormMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
     value: String
   },
   methods: {
@@ -30,9 +22,10 @@ export default {
           event.target.value = '';
         });
       }
-      this.$emit('input', {newValue, oldValue, field: this.field});
-    },
-  },
+      this.$emit('update', {newValue, oldValue, field: this.field});
+      this.$emit('input', newValue);
+    }
+  }
 }
 </script>
 

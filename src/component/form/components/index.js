@@ -11,10 +11,11 @@ import FormPhone from './FormPhone';
 import FormEmail from './FormEmail';
 import FormSeparator from './FormSeparator';
 import FormAddress from './FormAddress';
+import FormRadio from './FormRadio';
 
-//arr all
+// arr all
 
-//base
+// base
 
 const BaseFormField = [
   FormText,
@@ -29,6 +30,7 @@ const BaseFormField = [
   FormPhone,
   FormEmail,
   FormSeparator,
+  FormRadio
   
 ];
 
@@ -61,10 +63,10 @@ const FormFields = [...allFields]
 for(let i = 0; i < FormFields.length; i++){
   let formField = FormFields[i];
   let field = {
-    formType: formField.formType, //组件类型
-    name: formField.name, //组件显示名称
-    alias: formField.alias, //组件别名
-    isSystem: formField.isSystem //是否为为系统组件
+    formType: formField.formType, // 组件类型
+    name: formField.name, // 组件显示名称
+    alias: formField.alias, // 组件别名
+    isSystem: formField.isSystem // 是否为为系统组件
   }
 
   if(!formField.alias){
@@ -76,9 +78,9 @@ for(let i = 0; i < FormFields.length; i++){
     SettingComponents[settingComp.name] = settingComp;
     BuildComponents[buildComp.name] = buildComp;
 
-    field.preview = previewComp.name, //预览组件名
-    field.setting = settingComp.name, //设置组件名
-    field.build = buildComp.name //表单组件名
+    field.preview = previewComp.name, // 预览组件名
+    field.setting = settingComp.name, // 设置组件名
+    field.build = buildComp.name // 表单组件名
     field.name = formField.name
   }
 

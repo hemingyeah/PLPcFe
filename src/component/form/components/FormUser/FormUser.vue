@@ -5,7 +5,8 @@
       :value="displayName"
       :placeholder="placeholder"
       readonly 
-      @click="choose" >
+      @click="choose"
+    >
     <!-- @keydown.enter.prevent="choose" -->
     <button type="button" class="btn-text form-user-clear" @click="clear" v-if="!isEmpty">
       <i class="iconfont icon-fe-close"></i>
@@ -33,38 +34,64 @@ export default {
       type: Boolean,
       default: false
     },
-    value: Object
+    value: [Object, Array],
+    /* 是否是 多选 */
+    multple: {
+      type: Boolean,
+      default: false
+    },
+    /* 选人 配置项 */
+    max: [String, Number]
   },
   computed: {
     displayName(){
-      let user = this.value || {};
-      return user.displayName || user.name;
+      if(!this.multple) {
+        let user = this.value || {};
+        return user.displayName || user.name;
+      }
+
+      return this.value.map(i => i.displayName || i.name).join(',')
     },
-    isEmpty(){//根据userId判断是否为空
-      let value = this.value || {};
-      return !value.userId;
+    // 根据userId判断是否为空
+    isEmpty(){
+      if(!this.multple) {
+        let value = this.value || {};
+        return !value.userId;
+      }
+
+      let value = this.value || [];
+      return value.length <= 0
     }
   },
   methods: {
     choose(){
+      let max = 1;
+      if(this.multple) max = null == this.max ? -1 : parseInt(this.max)
+      
       let options = {
         title: `请选择${this.field.displayName}`,
-        max: 1,
-        seeAllOrg: this.seeAllOrg
+        seeAllOrg: this.seeAllOrg,
+        max: this.multple ? this.options.max ? this.options.max : -1 : 1
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){
           let oldValue = null;
           let data = result.data || {};
           let users = data.users || [];
-          this.$emit('input', {newValue: users[0], oldValue, field: this.field});
+          let newValue = this.multple ? users : users[0];
+
+          this.$emit('update', {newValue, oldValue, field: this.field});
+          this.$emit('input', newValue);
+
           this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
         }
       })
         .catch(err => console.error(err))
     },
     clear(){
-      this.$emit('input', {newValue: {}, field: this.field});
+      let value = this.multple ? [] : {};
+      this.$emit('update', {newValue: value, field: this.field});
+      this.$emit('input', value);
     }
   },
 }

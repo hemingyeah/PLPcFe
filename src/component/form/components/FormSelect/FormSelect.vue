@@ -25,14 +25,6 @@ export default {
   name: 'form-select',
   mixins: [FormMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
     value: [String, Array],
     source: {
       type: Array
@@ -64,9 +56,10 @@ export default {
     input(newValue){
       let oldValue = null;
       this.$refs.elSelect.blur();
-      this.$emit('input', {newValue, oldValue, field: this.field});
-    },
-  },
+      this.$emit('update', {newValue, oldValue, field: this.field});
+      this.$emit('input', newValue);
+    }
+  }
 }
 </script>
 

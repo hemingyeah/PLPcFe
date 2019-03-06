@@ -11,10 +11,6 @@ export default {
   name: 'form-attachment',
   mixins: [FormMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
     value: {
       type: Array,
       default: () => []
@@ -28,9 +24,10 @@ export default {
   methods: {
     input(newValue) {
       let oldValue = null;
-      this.$emit('input', {newValue, oldValue, field: this.field});
-    },
-  },
+      this.$emit('update', {newValue, oldValue, field: this.field});
+      this.$emit('input', newValue);
+    }
+  }
 }
 </script>
 

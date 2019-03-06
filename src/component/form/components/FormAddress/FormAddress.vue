@@ -19,21 +19,13 @@
 import FormMixin from '../FormMixin';
 
 export default {
-  name: "form-address",
+  name: 'form-address',
   mixins: [FormMixin],
   props: {
     addressBackup: {
       type: Object,
       default: () => ({})
-    },
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
+    },  
     value: {
       type: Object,
       default(){
@@ -130,7 +122,9 @@ export default {
     },
     updateValue(newValue) {
       let oldValue = null;
-      this.$emit('input', {newValue, oldValue, field: this.field});
+      this.$emit('update', {newValue, oldValue, field: this.field});
+      this.$emit('input', newValue);
+
       //this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
     },
     chooseMap() {

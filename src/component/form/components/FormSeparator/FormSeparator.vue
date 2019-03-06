@@ -11,8 +11,7 @@ export default {
     field: {
       type: Object,
       default: () => ({})
-    },
-    // value: Object
+    }
   }
 }
 </script>

@@ -1,13 +1,13 @@
 <template>
   <div class="customer-modal-container" v-loading.fullscreen.lock="loadingPage">
     <form @submit.prevent="submit" class="base-form">
-      <form-builder ref="form" :fields="fields" :value="form" @input="update" v-if="init">
+      <form-builder ref="form" :fields="fields" :value="form" @update="update" v-if="init">
         <template slot="serialNumber" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.serialNumber" :validation="!config.isAutoSerialNumber">
             <form-text
               v-if="!config.isAutoSerialNumber"
               :field="field"
-              :value="form.serialNumber" @input="update"
+              :value="form.serialNumber" @update="update"
               :placeholder="genPlaceholder(field)"/>
             <div v-else class="form-item__text">客户编号将在创建后由系统生成</div>
           </form-item>
@@ -29,7 +29,7 @@
           <form-item :label="field.displayName" :remote="remote.name" validation>
             <form-text
               :field="field"
-              :value="form.name" @input="update"
+              :value="form.name" @update="update"
               :placeholder="genPlaceholder(field)"/>
           </form-item>
         </template>
@@ -39,7 +39,7 @@
             <div class="input-and-btn">
               <form-text
                 :field="field"
-                :value="form.lmName" @input="update"
+                :value="form.lmName" @update="update"
                 :placeholder="genPlaceholder(field)"/>
               <el-button @click="copyName">同客户名</el-button>
             </div>
@@ -50,7 +50,7 @@
           <form-item :label="field.displayName" :remote="remote.lmPhone" validation>
             <form-text
               :field="field"
-              :value="form.lmPhone" @input="update"
+              :value="form.lmPhone" @update="update"
               :placeholder="genPlaceholder(field)"/>
           </form-item>
         </template>
@@ -59,7 +59,7 @@
           <form-item :label="field.displayName" validation>
             <form-address
               :field="field"
-              :value="form.customerAddress" @input="update"
+              :value="form.customerAddress" @update="update"
               @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
               :placeholder="genPlaceholder(field)"></form-address>
           </form-item>
@@ -70,7 +70,7 @@
             <div class="input-and-btn">
               <form-select
                 :field="field" :source="selectTagOptions || []"
-                :value="form.tags" @input="update"
+                :value="form.tags" @update="update"
                 :placeholder="genPlaceholder(field)"/>
               <el-button type="button" @click="autoAssign">自动分配</el-button>
             </div>

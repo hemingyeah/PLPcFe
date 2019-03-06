@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "base-dist-picker",
+  name: 'base-dist-picker',
   data() {
     return {
       options: [],
@@ -36,7 +36,6 @@ export default {
     },
     handleChange(value) {
       this.$emit('input', value);
-
     },
     /** 异步加载区域数据 */
     loadDistData(){
@@ -67,6 +66,4 @@ export default {
     border-color: $input-border-hover-color;
   }
 }
-
-
 </style>

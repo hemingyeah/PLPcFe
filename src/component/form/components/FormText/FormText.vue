@@ -17,19 +17,11 @@ export default {
   name: 'form-text',
   mixins: [FormMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
     value: {
       type: String,
       default: ''
     }
-  },
+  }
 }
 </script>
 

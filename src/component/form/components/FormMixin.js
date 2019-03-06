@@ -1,4 +1,18 @@
+import { genPlaceholder} from '../util'
+
 const FormMixin = {
+  props: {
+    field: {
+      type: Object,
+      default: () => ({})
+    },
+    placeholder: {
+      type: String,
+      default(){
+        return genPlaceholder(this.field);
+      }
+    },
+  },
   watch: {
     value:{
       deep: true,
@@ -12,7 +26,9 @@ const FormMixin = {
     input(event){
       let oldValue = null;
       let newValue = event.target.value;
-      this.$emit('input', {newValue, oldValue, field: this.field});
+      
+      this.$emit('update', {newValue, oldValue, field: this.field});
+      this.$emit('input', newValue);
     },
     /** 获取当前组件的值，验证用 */
     getValue(){

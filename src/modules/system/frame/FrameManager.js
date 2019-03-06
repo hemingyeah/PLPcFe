@@ -72,6 +72,8 @@ const FrameManager = {
       //为该frame添加事件
       this.$nextTick(() => {
         let frame = document.getElementById(`frame_tab_${tab.id}`);
+        if(frame == null) return;
+
         let frameWindow = frame.contentWindow;
 
         //frame页面卸载时，重置刷新icon
@@ -141,7 +143,7 @@ const FrameManager = {
             detail: {
               isTrusted: e.isTrusted,
               isMock: true
-            }, 
+            },
             bubbles: true
           })
           rootWindow.document.body.dispatchEvent(clickEvent)

@@ -237,7 +237,7 @@ export default {
       }
 
       this.searchUser();
-    },500),
+    }, 500),
     /** 选择人员 */
     chooseUser(user){
       if(!user) return;

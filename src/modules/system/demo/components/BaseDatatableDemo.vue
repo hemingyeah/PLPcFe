@@ -1,17 +1,12 @@
 <template>
   <div class="base-data-table-view team-table-view">
-    <div style="height:24px;">
-      <button>选择列</button>
-    </div>
-    <base-datatable
+    <base-table
       ref="teamTable" class="team-list-table"
-      :columns="columns" :rows="rows"
-      row-key="id" 
-      :stripe="true"
-      :multiple="true"
-      @select="select"
-      max-height="100vh - 68px">
-    </base-datatable>
+      row-key="id" max-height="100vh - 44px"
+      stripe multiple advanced
+      :columns="columns" :rows="rows" @select="select" 
+      @update="updateTable">
+    </base-table>
 
     <div style="height:24px;">
       <button type="button" @click="insert">添加数据</button>
@@ -46,14 +41,15 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import _ from "lodash";
+import * as mock from './mock';
 
 export default {
   name: 'base-datatable-demo',
   data(){
     return {
-      rows: this.buildRows(),
-      columns: this.buildColumns(),
+      rows: mock.genRows(),
+      columns: mock.genColumns(),
       multipleSelectionPanelShow: false,
       selection: [],
       selectedLimit: 200,
@@ -61,411 +57,17 @@ export default {
     }
   },
   methods: {
-    buildRows(){
-      return [
-        {
-          id: 123152341324,
-          name: '山东团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心C座山东省青岛市市北区万科中心C座山东省青岛市市北区万科中心C座',
-          location: '山东省青岛市李沧区',
-          children: [
-            {
-              id: 123543563425342341,
-              name: '济南团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心A济南团队张三济南团队张三济南团队张三济南团队张三济南团队张三'
-            },
-            {
-              id: 16345423412432,
-              name: '青岛团队',
-              manager: '李四',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心B'
-            },
-            {
-              id: 1256134512343241,
-              name: '临沂团队',
-              manager: '王五',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心C济南团队张三济南团队张三济南团队张三济南团队张三济南团队张三'
-            }
-          ],
-        },
-        {
-          id: 153461342341234,
-          name: '山西团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 123643151344324,
-          name: '北京团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [
-            {
-              id: 123534161345,
-              name: '海淀团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心'
-            },
-            {
-              id: 132534161346,
-              name: '朝阳团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心'
-            },
-            {
-              id: 165346431515,
-              name: '中关村团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心'
-            }
-          ],
-        },
-        {
-          id: 13253463425464536,
-          name: '上海团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 15314623463425234525,
-          name: '河北团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122221,
-          name: '测试团队-1',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122222,
-          name: '测试团队-2',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122223,
-          name: '测试团队-3',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122224,
-          name: '测试团队-4',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122225,
-          name: '测试团队-5',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122226,
-          name: '测试团队-6',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122227,
-          name: '测试团队-7',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122228,
-          name: '测试团队-8',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122229,
-          name: '测试团队-9',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122210,
-          name: '测试团队-10',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122211,
-          name: '测试团队-11',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 122212,
-          name: '测试团队-12',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 1222213,
-          name: '测试团队-13',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 1222214,
-          name: '测试团队-14',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        }
-      ]
-    },
-    buildRowsCopy(){
-      return [
-        {
-          id: 6234523143241435,
-          name: '1111山东团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [
-            {
-              id: 1634534152345,
-              name: '111济南团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心A'
-            },
-            {
-              id: 456431325345342,
-              name: '1111青岛团队',
-              manager: '李四',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心B'
-            },
-            {
-              id: 1345615641353416134,
-              name: '111临沂团队',
-              manager: '王五',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心C'
-            }
-          ],
-        },
-        {
-          id: 16346756745634,
-          name: '111山西团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 26456756745523467,
-          name: '111北京团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [
-            {
-              id: 246546765756,
-              name: '111海淀团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心'
-            },
-            {
-              id: 523464575674132,
-              name: '111朝阳团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心'
-            },
-            {
-              id: 24674756723453425,
-              name: '1111中关村团队',
-              manager: '张三',
-              phone: '13895546633',
-              area: '山东省青岛市市北区万科中心'
-            }
-          ],
-        },
-        {
-          id: 23456476547568568,
-          name: '1111上海团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        },
-        {
-          id: 64563234523475674235,
-          name: '111河北团队',
-          manager: '张三',
-          phone: '13895546633',
-          area: '山东省青岛市市北区万科中心',
-          location: '山东省青岛市李沧区',
-          children: [],
-        }
-      ]
-    },
-    buildColumns(){
-      return [
-        {
-          field: 'name',
-          label: '团队名称',
-          width: 150,
-          expandProp: 'children',
-          render(h, col, row){
-            return (
-              <a href="javscript:;">{row.name}</a>
-            )
-          },
-        },
-        {
-          field: 'manager',
-          label: '团队主管',
-          width: 150,
-          render(h, col, row) {
-            return (
-              <span> {row.manager} </span>
-            )
-          },
-        },
-        {
-          field: 'phone',
-          label: '电话',
-          width: 200,
-        },
-        {
-          field: 'area',
-          label: '负责区域',
-          overflow: 'tooltip',
-          headRender(h, col){
-            return [
-              col.label,
-              <i class="iconfont icon-address" style="font-size:14px;"></i>
-            ]
-          },
-          render1(h, col, row) {
-            let str = ''
-            if(row.area.length < 25) {
-              str = row.area;
-              return (<div style={{'width': `${ col['elWidth'] }px`}} class="base-table-nowrap-text">{str}</div>)
-            }
-            str = `${ row.area.substring(0, 25) }...`
-            return (
-              <el-tooltip class="item" effect="dark" content={row.area} placement="top">
-                <div style={{'width': `${ col['elWidth'] }px`}} class="base-table-nowrap-text">{str}</div>
-              </el-tooltip>
-            )
-          }
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        },
-        {
-          field: 'location',
-          label: '所在位置',
-          width: 150,
-        }
-      ]
+    updateTable({type, data}){
+      if(type == 'column'){
+       
+        let columns = this.columns.map(col => {
+          let same = data.find(item => item.field == col.field) || {};
+          return {...col, ...same}
+        })
+console.log(this.columns)
+        this.columns = columns;
+        //TODO: 本地存储
+      }
     },
     /** 取消选择 团队 */
     cancelSelecTteam(row, index) {
@@ -570,14 +172,7 @@ export default {
 </script>
 
 <style lang="scss">
-  body{
-    background-color: #fff;
-  }
-  .base-data-table-view {
-    width: 100%;
-  }
-
-  .team-list-table{
-    max-height: calc(100vh - 44px);
-  }
+.base-data-table-view {
+  box-shadow: 0 0 4px rgba(0, 0, 0, .125)
+}
 </style>

@@ -43,7 +43,8 @@ export function fmt_number_int(value){
 
 /** 格式化地址 */
 export function fmt_address(value){
-  if(typeof value != 'object' || value.constructor != Object) return value;
+  // 这里null需要特判，因为 typeof null == 'object'
+  if(null == value || typeof value != 'object' || value.constructor != Object) return value;
 
   let province = value.adProvince || value.province || '';
   let city = value.adCity || value.city || '';

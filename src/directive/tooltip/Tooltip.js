@@ -1,5 +1,5 @@
 import * as dom from '@src/util/dom';
-import Popper from 'popper.js'
+import Popper from 'popper.js';
 
 export default class Tooltip{
   constructor(option = {}){
@@ -7,6 +7,10 @@ export default class Tooltip{
     this.popper = null;
     this.option = option;
     this.timer = null;
+    this.delay = option.delay || 150;
+    
+    this.mouseenterHandler = () => this.clearTimer();
+    this.mouseleaveHandler = () => this.destroy()
   }
 
   updateOption(option = {}){
@@ -17,8 +21,13 @@ export default class Tooltip{
     let option = this.option;
     if(!option.content) return;
 
+    if(this.timer) this.clearTimer()
+
     if(null == this.el){
       let container = dom.fromHtml(this.genTemplate(option));
+      container.addEventListener('mouseenter', this.mouseenterHandler)
+      container.addEventListener('mouseleave', this.mouseleaveHandler)
+
       this.el = document.body.appendChild(container);
     }
 
@@ -30,19 +39,31 @@ export default class Tooltip{
     }
   }
 
-  hide(){
-    this.destroy();
+  /** 清空定时器 */
+  clearTimer(){
+    clearTimeout(this.timer)
+    this.timer = null;
   }
 
+  /** 隐藏tooltip */
+  hide(){
+    this.timer = setTimeout(() => this.destroy(), this.delay)
+  } 
+
+  /** 销毁tooltip */
   destroy(){
     if(null != this.popper){
       this.popper.destroy();
       this.popper = null;
     }
 
-    this.el = null;
+    if(this.el){
+      this.el.removeEventListener('mouseenter', this.mouseenterHandler)
+      this.el.removeEventListener('mouseleave', this.mouseleaveHandler)
+      this.el = null;
+    }
   }
-
+    
   genTemplate(option){
     return `
       <div class="base-tooltip">

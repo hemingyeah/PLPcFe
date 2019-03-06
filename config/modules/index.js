@@ -15,19 +15,19 @@ module.exports = {
   },
 
   // ------------ 客户 ------------
-  "customer.list": {
+  'customer.list': {
     entry: './src/modules/customer/list/index.js',
     template: 'src/modules/customer/list/index.html'
   },
-  "customer.edit": {
+  'customer.edit': {
     entry: './src/modules/customer/edit/index.js',
     template: 'src/modules/customer/edit/index.html'
   },
-  "customer.view": {
+  'customer.view': {
     entry: './src/modules/customer/view/index.js',
     template: 'src/modules/customer/view/index.html'
   },
-  "customer.edit.modal": {
+  'customer.edit.modal': {
     entry: './src/modules/customer/editForModal/index.js',
     template: 'src/modules/customer/editForModal/index.html'
   },
@@ -43,7 +43,7 @@ module.exports = {
   },
 
   // ------------ 订阅通知日报 ------------
-  "open.dailyReport": {
+  'open.dailyReport': {
     entry: './src/modules/open/DailyReport/index.js',
     exclude: ['common']
   },

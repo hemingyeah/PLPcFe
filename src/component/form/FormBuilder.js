@@ -28,7 +28,7 @@ function createFormField(h, field, comp){
       placeholder,
     },
     on: {
-      input: event => this.$emit('input', event)
+      update: event => this.$emit('update', event)
     }
   };
 
@@ -61,7 +61,7 @@ const FormBuilder = {
     findRootEl(){
       return this.$el;
     },
-    /**    
+    /**
      * 检测所有字段的结果，都验证通过，返回true, 否则返回false
      */
     validate(){
@@ -105,8 +105,8 @@ const FormBuilder = {
         let formItemClass = [];
         if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
         return (
-          <form-item 
-            label={field.displayName} class={formItemClass} 
+          <form-item
+            label={field.displayName} class={formItemClass}
             key={field.fieldName} findRootEl={this.findRootEl} validation>
             {formField}
           </form-item>
@@ -131,7 +131,7 @@ const FormBuilder = {
         }
 
         // 默认返回false, 走到这里意味着后面的节点都是null
-        return false; 
+        return false;
       });
 
     return (

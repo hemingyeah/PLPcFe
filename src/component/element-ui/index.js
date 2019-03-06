@@ -39,10 +39,10 @@ const ElementUI = {
   install(Vue){
     Vue.prototype.$ELEMENT = { size: 'small'};
 
-    //分页组件
+    // 分页组件
     Vue.use(Pagination);
 
-    //表格组件
+    // 表格组件
     Vue.use(Table);
     Vue.use(TableColumn);
 

@@ -34,13 +34,13 @@ module.exports = {
     "no-use-before-define": ["error", {functions: false}], //禁止定义前使用
 
     //Stylistic Issues
-    "indent": ["warn", 2],
-    "brace-style": "warn", //一致的大括号风格
+    "indent": ["error", 2], // 两空格缩进
+    "brace-style": "error", // 一致的大括号风格, 将else 放在与if块的右括号相同的行上
     "no-multi-spaces": "warn", //禁止使用多个空格
     "no-multiple-empty-lines": ["warn",{max: 3}], //禁止出现多行空行,
     "newline-per-chained-call": ["warn",{"ignoreChainWithDepth": 3}], //方法链中每个调用都有一个换行符
-    "new-cap": "warn",
-    "space-infix-ops": "warn", //要求操作符周围有空格
+    "new-cap": "error",
+    "space-infix-ops": "error", //要求操作符周围有空格
     "no-whitespace-before-property": "error", //禁止属性前有空白
     "max-nested-callbacks": ["warn", 5],
     "no-array-constructor": "error", //禁用 Array 构造函数
@@ -55,7 +55,6 @@ module.exports = {
     "vue/require-default-prop": "off",
     "vue/singleline-html-element-content-newline": "off",
 
-    // spec
     //spec
     "no-var": "error", // 禁止使用 var 变量
     "object-shorthand": ["warn", "always"], // 在对象中 方法属性使用简写
@@ -86,22 +85,17 @@ module.exports = {
     "no-case-declarations": "error", // 将子句包装在块中
     "no-unneeded-ternary": "warn", // 避免不必要的三元表达式
     "no-mixed-operators": "error", // 混合运算时，请将表达式 包含在括号中
-    "brace-style": "error", // 将else 放在与if块的右括号相同的行上
     "no-else-return": "error", // if return 语句
     "spaced-comment": ["warn", "always"], // 注释之前 跟一个空格
-    "indent": ["error", 2], // 两空格缩进
-    "space-infix-ops": "error", // 运算符间距
     "comma-spacing": ["error", { "before": false, "after": true }], // 逗号间距
     "computed-property-spacing": ["error", "never"], // 禁止属性内的空格
-    "no-array-constructor": "error", // 禁止 array 构造函数·
-    "new-cap": "error", // 构造函数名称以大写字母开头
     "no-param-reassign": 1, // 不要改变参数
   },
   "overrides": [
     {
       "files": ["src/**/*"],
       "rules": {
-        "no-console": ["warn", { allow: ["info", "warn", "error"] }] //禁用 console.log
+        "no-console": ["error", { allow: ["info", "warn", "error"] }] //禁用 console.log
       }  
     }
   ]

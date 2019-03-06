@@ -1,6 +1,6 @@
 <template>
   <div class="form-item" :class="{err: errMessage}">
-    <label :for="`form_${field.fieldName}`">{{label}} <span class="form-item-required" v-if="isRequired">*</span></label>
+    <label :for="forId">{{label}} <span class="form-item-required" v-if="isRequired">*</span></label>
     <div class="form-item-control">
       <slot></slot>
       <div class="err-msg-wrap">
@@ -19,8 +19,7 @@ export default {
   name: 'form-item',
   props: {
     label: String,
-    validation: Boolean, // 是否开启验证
-    validator: Function, // 自定义验证方法
+    validation: [Boolean, Function], // 是否开启验证
     /** 获取根元素（FormBuilder）的dom对象 */
     findRootEl: {
       type: Function,
@@ -49,6 +48,15 @@ export default {
     /** 字段是否需要远程验证 **/
     needRemoteValidation() {
       return !!this.remote;
+    },
+    forId(){
+      if(!this.field.fieldName) return '';
+      return `form_${this.field.fieldName}`;
+    },
+    /** 是否需要验证 */
+    needValidation(){
+      let validation = this.validation;
+      return (typeof validation == 'boolean' && validation) || typeof validation == 'function'
     }
   },
   methods: {
@@ -60,7 +68,8 @@ export default {
       this.status = false;
 
       let value = this.valueFn();
-      let validator = this.validator || this.field.validator;
+      let validator = this.getValidator();
+
       if(typeof validator == 'function'){
         return validator(value, this.field, this.changeStatus)
           .then(res => this.errMessage = res)
@@ -79,7 +88,7 @@ export default {
     }, 500),
     validateHandler(event) {
       event.stopPropagation(); // 阻止事件继续冒泡
-      if(this.validation) {
+      if(this.needValidation) {
         this.needRemoteValidation 
           ? this.delayValidate()
           : this.$nextTick(this.validate)
@@ -87,24 +96,30 @@ export default {
     },
     /** 注册字段取值函数 */
     addFieldHandler(event) {
-      if(!this.validation) return event.stopPropagation();
+      if(!this.needValidation) return event.stopPropagation();
       this.valueFn = event.detail.value;
       this.field = event.detail.field;
       event.detail.validate = this.validate;
     },
     removeFieldHandler(event) {
-      if(!this.validation) return event.stopPropagation();
+      if(!this.needValidation) return event.stopPropagation();
+
       /** 此处因为dom 会被移出document, 所以事件不会冒泡至 FormBuilder组件中, 需要手动触发 */
       let rootEl = this.findRootEl()
       if(null != rootEl) {
         let params = event.detail;
         let e = new CustomEvent('form.remove.field', {detail: params, bubbles: true})
-        rootEl.dispatchEvent(e);  
+        rootEl.dispatchEvent(e);
       }
       this.valueFn = null;
     },
     changeStatus(value){
       this.status = !!value;
+    },
+    getValidator(){
+      if(typeof this.validation == 'function') return this.validation;
+
+      return this.field.validator;
     }
   },
   mounted() {
@@ -121,13 +136,13 @@ export default {
 </script>
 
 <style lang="scss">
-  .form-item.err {
+  .form-item.err :not(.is-success){
     input, textarea {
-      border-color: #f56c6c!important;
+      border-color: #f56c6c !important;
     }
 
     .err-msg-wrap {
-      color: #f56c6c!important;
+      color: #f56c6c !important;
     }
   }
 

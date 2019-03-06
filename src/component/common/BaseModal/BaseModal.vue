@@ -226,6 +226,7 @@ export default {
   }
 }
 
+//TODO: 统一边距
 .base-modal-footer {
   padding: 15px 30px;
 }

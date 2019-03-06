@@ -59,7 +59,7 @@ module.exports = {
         ]
       },
 
-      { //处理字体,gif
+      { // 处理字体,gif
         test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
         loader: 'file-loader',
         exclude: path.resolve(__dirname, '../src/assets/svg'),
@@ -76,7 +76,7 @@ module.exports = {
           name: 'img/[name].[hash:8].[ext]',
         } : undefined
       },
-      { //gif单独处理
+      { // gif单独处理
         test: /\.(gif)(\?.*)?$/,
         loader: 'file-loader',
         options: IS_PRODUCTION ? {
@@ -84,7 +84,7 @@ module.exports = {
           name: 'img/[name].[hash:8].[ext]',
         } : undefined
       },
-      { //svg图像，所有svg都需要放入该目录下，负责会被当做字体处理
+      { // svg图像，所有svg都需要放入该目录下，负责会被当做字体处理
         test: /\.(svg)(\?.*)?$/,
         include: path.resolve(__dirname, '../src/assets/svg'),
         loader: 'url-loader',
@@ -103,8 +103,8 @@ module.exports = {
     extensions: ['.js', '.json', '.vue', '.scss', '.css', '.ts'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
-      '@src': path.join(__dirname,'../src'),
-      '@model': path.join(__dirname,'../model')
+      '@src': path.join(__dirname, '../src'),
+      '@model': path.join(__dirname, '../model')
     }
   },
   externals: {

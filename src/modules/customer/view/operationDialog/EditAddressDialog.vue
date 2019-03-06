@@ -1,7 +1,7 @@
 <template>
   <base-modal :title="title" :show.sync="addAddressDialog" width="600px" class="edit-address-dialog" @closed="reset">
     <form @submit.prevent="submit" v-if="init">
-      <form-builder :fields="fields" class="edit-address-form" ref="form" :value="form" @input="update">
+      <form-builder :fields="fields" class="edit-address-form" ref="form" :value="form" @update="update">
       </form-builder>
     </form>
     <div class="dialog-footer" slot="footer">

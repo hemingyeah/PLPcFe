@@ -13,14 +13,6 @@ export default {
   name: 'form-textarea',
   mixins: [FormMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
     value: {
       type: String,
       default: ''
@@ -34,7 +26,7 @@ export default {
     offsetRight(){
       return getScrollBarWidth() + 4;
     }
-  },
+  }
 }
 </script>
 

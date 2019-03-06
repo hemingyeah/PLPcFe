@@ -1,3 +1,5 @@
+$--var-tooltip-background-color: #4a4a4a !default;
+
 .base-tooltip {
   position: absolute;
   z-index: 99999;
@@ -5,15 +7,19 @@
   max-width: 360px;
   padding: 6px 8px;
 
-  background-color: #3a3a3a;
+  background-color: $--var-tooltip-background-color;
   color: #ffffff;
 
   font-size: 14px;
   line-height: 20px;
-  word-break: break-all;
 
   border-radius: 3px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
+}
+
+.base-tooltip-content{
+  white-space: pre-line;
+  word-break: break-all;
 }
 
 .base-tooltip .base-tooltip__arrow {
@@ -25,7 +31,7 @@
 }
 
 .base-tooltip .base-tooltip__arrow{
-  border-color: #3a3a3a;
+  border-color: $--var-tooltip-background-color;
 }
 
 .base-tooltip[x-placement^="top"] {

@@ -1,35 +1,22 @@
 <template>
-  <div>
-    <button @click="Notification">show Notification</button>
+  <div style="padding: 10px;">
+    <!-- <button @click="Notification">show Notification</button> -->
+    <!-- <tsx-comp/> -->
+    <!-- <base-datatable-demo/> -->
+    <biz-team-select-demo/>
   </div>
 </template>
 
 <script>
 import platform from '@src/platform';
 import * as dom from '@src/util/dom';
-import * as FormUtil from '@src/component/form/util';
 
 import BaseDatatableDemo from './components/BaseDatatableDemo.vue';
-
-const FORM_DESIGN_FIELDS = 'demo_form_design_fields'
+import BizTeamSelectDemo from './components/BizTeamSelectDemo.vue'
 
 export default {
   name: 'demo-view',
-  data() {
-    return {
-      fields: [],
-      files: [],
-      form: {}
-    };
-  },
-  computed: {
-    
-  },
   methods: {
-    saveToLocal(){
-      let fields = FormUtil.toField(this.fields);
-      localStorage.setItem(FORM_DESIGN_FIELDS, JSON.stringify(fields))
-    },
     contact() {
       let options = {};
       let users = [
@@ -149,10 +136,9 @@ export default {
       this.fields.forEach(item => item.toField());
     },
     Notification(){
-      // console.log(this.$createElement)
       platform.notification({
         title: '成功',
-        // content: '<p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p>',
+        //content: '<p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p>',
         message: (function name(h) {
           return <div>hello world</div>
         })(this.$createElement),
@@ -161,21 +147,12 @@ export default {
       })
     }
   },
-  mounted() {
-    let fieldsJson = localStorage.getItem(FORM_DESIGN_FIELDS);
-    let fields = [];
-    
-    try {
-      fields = JSON.parse(fieldsJson);
-    } catch (error) {
-      console.error(error)
-    }
-    
-    this.fields = FormUtil.toFormField(fields || [])
-  },
   components: {
-    [BaseDatatableDemo.name]: BaseDatatableDemo
+    [BaseDatatableDemo.name]: BaseDatatableDemo,
+    [BizTeamSelectDemo.name]: BizTeamSelectDemo
   }
 };
 </script>
+
+
 

@@ -14,17 +14,9 @@
 import FormMixin from '../FormMixin';
 
 export default {
-  name: "form-datetime",
+  name: 'form-datetime',
   mixins: [FormMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
     value: {
       type: String,
       default: ''
@@ -33,9 +25,10 @@ export default {
   methods: {
     choose(newValue){
       let oldValue = null;
-      this.$emit('input', {newValue, oldValue, field: this.field});
-    },
-  },
+      this.$emit('update', {newValue, oldValue, field: this.field});
+      this.$emit('input', newValue);
+    }
+  }
 }
 </script>
 

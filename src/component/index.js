@@ -1,4 +1,5 @@
 import ElementUI from './element-ui';
+
 import BaseModal from './common/BaseModal';
 import BasePanel from './common/BasePanel';
 import BaseUpload from './common/BaseUpload';
@@ -15,8 +16,9 @@ import BaseComment from './common/BaseComment';
 import BaseSpin from './common/BaseSpin';
 import BaseButton from './common/BaseButton';
 import BaseSelect from './common/BaseSelect';
-import BaseDatatable from './common/BaseDatatable';
-import BaseContextMent from './common/BaseContextMenu'
+import BaseContextMenu from './common/BaseContextMenu'
+import BaseTable from './common/BaseTable';
+
 import TsxComp from './common/TsxComp/index.tsx'
 
 import Form from './form';
@@ -42,8 +44,9 @@ const components = [
   BaseSpin,
   BaseButton,
   BaseSelect,
-  BaseDatatable,
-  BaseContextMent,
+
+  BaseContextMenu,
+  BaseTable,
   TsxComp
 ];
 

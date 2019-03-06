@@ -3,19 +3,19 @@
     <form @submit.prevent="submit" class="base-form">
       <div class="page-title">
         <div class="title">
-          <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button>
+          <button type="button" class="btn-text btn-back" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
+          <!-- <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button> -->
           <span class="text">|</span>
           <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
-          <!--<span class="text">客户信息</span>--> 
         </div>
       </div>
-      <form-builder ref="form" :fields="fields" :value="form" @input="update" v-if="init">
+      <form-builder ref="form" :fields="fields" :value="form" @update="update" v-if="init">
         <template slot="serialNumber" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.serialNumber" :validation="!config.isAutoSerialNumber">
             <form-text
               v-if="!config.isAutoSerialNumber"
               :field="field"
-              :value="form.serialNumber" @input="update"
+              :value="form.serialNumber" @update="update"
               :placeholder="genPlaceholder(field)"/>
             <div v-else class="form-item__text">客户编号将在创建后由系统生成</div>
           </form-item>
@@ -37,7 +37,7 @@
           <form-item :label="field.displayName" :remote="remote.name" validation>
             <form-text
               :field="field"
-              :value="form.name" @input="update"
+              :value="form.name" @update="update"
               :placeholder="genPlaceholder(field)"/>
           </form-item>
         </template>
@@ -47,7 +47,7 @@
             <div class="input-and-btn">
               <form-text
                 :field="field"
-                :value="form.lmName" @input="update"
+                :value="form.lmName" @update="update"
                 :placeholder="genPlaceholder(field)"/>
               <el-button @click="copyName">同客户名</el-button>
             </div>
@@ -58,7 +58,7 @@
           <form-item :label="field.displayName" :remote="remote.lmPhone" validation>
             <form-text
               :field="field"
-              :value="form.lmPhone" @input="update"
+              :value="form.lmPhone" @update="update"
               :placeholder="genPlaceholder(field)"/>
           </form-item>
         </template>
@@ -67,7 +67,7 @@
           <form-item :label="field.displayName" validation>
             <form-address
               :field="field"
-              :value="form.customerAddress" @input="update"
+              :value="form.customerAddress" @update="update"
               @update-address-backup="updateAddressBackup" :address-backup="addressBackup"
               :placeholder="genPlaceholder(field)"></form-address>
           </form-item>
@@ -78,7 +78,7 @@
             <div class="input-and-btn">
               <form-select
                 :field="field" :source="selectTagOptions || []"
-                :value="form.tags" @input="update"
+                :value="form.tags" @update="update"
                 :placeholder="genPlaceholder(field)"/>
               <el-button type="button" @click="autoAssign">自动分配</el-button>
             </div>
@@ -147,7 +147,7 @@ export default {
     },
     fields() {
       let originFields = this.initData.fieldInfo || [];
-      let sortedFields = originFields.sort((a,b) => a.orderId - b.orderId)
+      let sortedFields = originFields.sort((a, b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
@@ -302,9 +302,9 @@ export default {
         let places = team.places || [];
         for(let i = 0; i < places.length; i++){
           let place = places[i];
-          let placeProvince = (place.province || "").replace("所有省", "");
-          let placeCity = (place.city || "").replace("所有市", "");
-          let placeDist = (place.dist || "").replace("所有区", "");
+          let placeProvince = (place.province || '').replace('所有省', '');
+          let placeCity = (place.city || '').replace('所有市', '');
+          let placeDist = (place.dist || '').replace('所有区', '');
 
           let placeStr = placeProvince + placeCity + placeDist;
           let adrStr = province + city + dist;
@@ -320,7 +320,7 @@ export default {
       const { adProvince, adCity, adDist, } = ad;
       if (!adProvince || !adCity) return;
       const newVal = {
-        adAddress: [adProvince, adCity, adDist,].filter(ad => ad),
+        adAddress: [adProvince, adCity, adDist].filter(ad => ad),
         detail: '',
         adLongitude: '',
         adLatitude: '',

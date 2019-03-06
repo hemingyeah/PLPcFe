@@ -1,5 +1,5 @@
 import Vue from '@src/common/entry';
-import TeamManageView from './TeamManageView.vue';
+import TeamListView from './views/TeamListView.vue';
 
 //处理注入的参数
 let initData = {};
@@ -11,11 +11,9 @@ try {
   console.error('no init data')
 }
 
-const FrameViewComp = Vue.extend(TeamManageView);
-const app = new FrameViewComp({
-  propsData: {
-    initData
-  }
+const TeamListViewComp = Vue.extend(TeamListView);
+const app = new TeamListViewComp({
+  propsData: { initData }
 });
 
 app.$mount('#app');

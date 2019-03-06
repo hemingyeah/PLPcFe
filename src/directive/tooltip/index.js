@@ -12,7 +12,12 @@ function showToolTip(event){
   let id = el.dataset.tooltip;
   let tooltip = manager.get(id);
 
-  if(tooltip) tooltip.show();
+  if(!tooltip) return;
+  if(!tooltip.option.silence) tooltip.show();
+
+  //启用静默模式，只有内容超出才显示
+  let child = event.target.firstChild;
+  if(child && event.target.offsetWidth < child.offsetWidth) tooltip.show();
 }
 
 function hideToolTip(event){
@@ -20,7 +25,7 @@ function hideToolTip(event){
   let id = el.dataset.tooltip;
   let tooltip = manager.get(id);
 
-  if(tooltip) tooltip.hide();
+  if(tooltip) tooltip.hide()
 }
 
 /**

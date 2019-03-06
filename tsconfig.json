@@ -27,10 +27,11 @@
       "scripthost"
     ]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ],
+  //此处和jsconfig冲突
+  // "include": [ 
+  //   "src/**/*.ts",
+  //   "src/**/*.tsx"
+  // ],
   "exclude": [
     "node_modules"
   ]

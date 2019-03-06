@@ -1,13 +1,13 @@
 <template>
   <base-modal :title="modalTitle" :show.sync="addContactDialog" width="600px" class="edit-contact-dialog" @closed="reset">
     <form @submit.prevent="submit" class="edit-contact-form-container" v-if="init">
-      <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @input="update">
+      <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @update="update">
 
         <template slot="phone" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.phone" validation>
             <form-text
               :field="field"
-              :value="form.phone" @input="update"
+              :value="form.phone" @update="update"
               placeholder="建议使用手机号，可发送短信通知"/>
           </form-item>
         </template>

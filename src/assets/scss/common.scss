@@ -1,0 +1,51 @@
+.full-page{
+  height: 100vh;
+  padding: 10px;
+}
+
+.full-page-main{
+  background-color: #fff;
+  padding: 0 10px;
+}
+
+.full-page-header{
+ 
+}
+
+.full-page-pagination{
+
+}
+
+
+.form-page{
+  background-color: #fff;
+
+  .form-builder{
+    width: 655px;
+    padding: 10px 0 0 10px;
+  }
+}
+
+.form-page-header{
+  border-bottom: 1px solid #f4f7f5;
+  padding: 12px 10px;
+
+  .iconfont {
+    font-size: 12px;
+  }
+  
+  .btn-back{
+    padding: 7px 15px;
+    color: #333;
+  }
+
+  .cut-off-line{
+    line-height: 34px;
+    margin-right: 12px;
+  }
+}
+
+.form-page-tool{
+  display: flex;
+  flex-flow: row nowrap;
+}
