@@ -248,17 +248,20 @@ export default {
           return rules.map(rule => {
             const {ruleType, effectCondition, rewardType,} = form;
             let errFields = [];
+            let executorScore = Number(rule.executorScore);
+            let assistantScore = Number(rule.assistantScore);
+
             if (!ruleType) {
               // 计分制
               if (effectCondition && (!rule.types || !rule.types.length)) {
                 // 部分生效 验证 选择类型
                 errFields.push('types');
               }
-              if (!Number(rule.executorScore)) {
+              if (isNaN(executorScore) || typeof executorScore !== "number" || executorScore < 0) {
                 errFields.push('executorScore');
               }
 
-              if (!Number(rule.assistantScore)) {
+              if (isNaN(assistantScore) || typeof assistantScore !== "number" || assistantScore < 0) {
                 errFields.push('assistantScore');
               }
               if (errFields.length) {
@@ -279,11 +282,12 @@ export default {
 
             if (rewardType !== 'amount') {
               // 按百分比计算
-              if (!Number(rule.executorScore) || !Number(rule.executorScore) < 0 || !Number(rule.executorScore) > 1) {
+              // || executorScore > 100  || assistantScore > 100
+              if (isNaN(executorScore) || typeof executorScore !== "number" || executorScore < 0) {
                 errFields.push('executorScore');
               }
 
-              if (!Number(rule.assistantScore) || !Number(rule.executorScore) < 0 || !Number(rule.executorScore) > 1) {
+              if (isNaN(assistantScore) || typeof assistantScore !== "number" || assistantScore < 0) {
                 errFields.push('assistantScore');
               }
 
