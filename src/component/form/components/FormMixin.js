@@ -3,7 +3,7 @@ const FormMixin = {
     value:{
       deep: true,
       handler() {
-        console.info('∆ FormMixin watch a change and trigger form validation.');
+        // console.info('∆ FormMixin watch a change and trigger form validation.');
         this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
       }
     }

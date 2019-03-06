@@ -1,6 +1,6 @@
 <template>
   <div class="form-sparator">
-    {{field.displayName || ''}}
+    <span>{{field.displayName || ''}}</span>
   </div>
 </template>
 
@@ -21,10 +21,15 @@ export default {
 .form-sparator{
   height: 30px;
   line-height: 30px;
-  padding: 0 20px;
   margin: 20px 0;
   text-align: left;
   background: #eef8f8;
 
+  & > span{
+    margin: 0;
+    font-size: 14px;
+    padding-left: 10px;
+    color: #55B7B4;
+  }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="form-item" :class="{err: errMessage}">
-    <label :for="`form_${field.fieldName}`"><span class="form-item-required" v-if="isRequired">*</span>{{label}}</label>
+    <label :for="`form_${field.fieldName}`">{{label}} <span class="form-item-required" v-if="isRequired">*</span></label>
     <div class="form-item-control">
       <slot></slot>
       <div class="err-msg-wrap">
@@ -125,12 +125,11 @@ export default {
 
     label {
       display: block;
-      width: 140px;
-      padding: 4px 10px 0 0;
+      width: 130px;
+      padding: 4px 0 0 10px;
       line-height: 24px;
       margin: 0;
       flex-shrink: 0;
-      text-align: right;
     }
 
     input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {

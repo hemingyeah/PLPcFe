@@ -294,7 +294,7 @@
 .form-view-row {
   display: flex;
   justify-content: flex-start;
-  padding: 6px 20px;
+  padding: 8px 20px;
   color: $text-color-primary;
 
   label {
@@ -302,7 +302,6 @@
     width: 98px;
     flex-shrink: 0;
     margin: 0;
-    text-align: right;
     color: $text-color-regular;
   }
 
@@ -325,7 +324,7 @@
   padding: 0 32px 0 20px;
   font-size: 14px;
   color: $color-primary;
-  margin: 0 0 5px 0;
+  margin: 8px 0;
   background: $color-regular;
   font-weight: normal;
   position: relative;

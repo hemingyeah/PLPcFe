@@ -28,10 +28,10 @@ const FormView = {
         'form-view-textarea-preview': formType === 'textarea',
         'base-file__preview': formType === 'attachment',
       };
-      
+      //TODO: 没有值时默认显示 '--'
       return (
         <div class="form-view-row">
-          <label>{displayName}：</label>
+          <label>{displayName}</label>
           <div class={className}>{value}</div>
         </div>
       )
@@ -51,9 +51,8 @@ const FormView = {
       const originalObj = this.value;
       
       let params = {};
-      let value = '';
+      let value = isSystem ? originalObj[fieldName] : originalObj.attribute[fieldName];
       
-      value = isSystem ? originalObj[fieldName] : originalObj.attribute[fieldName];
       params = {displayName, value, formType};
       
       if(this.$slots[fieldName]) {

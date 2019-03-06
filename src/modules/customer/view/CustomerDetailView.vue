@@ -66,7 +66,7 @@
 
           <template slot="customerAddress" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
-              <label>地址：</label>
+              <label>地址</label>
               <div class="form-view-row-content">
                 <span>{{value | fmt_address}}</span>
                 <i v-if="value.adLatitude && value.adLongitude" @click="openMap"
@@ -77,7 +77,7 @@
 
           <template slot="tags" slot-scope="{value}">
             <div class="form-view-row" v-if="value.length">
-              <label>服务团队：</label>
+              <label>服务团队</label>
               <div class="form-view-row-content">
                 <span>{{value | fmt_tag}}</span>
               </div>

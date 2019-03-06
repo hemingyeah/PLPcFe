@@ -145,6 +145,7 @@ function address(value, field = {}) {
 
 /** @deprecated 远程验证, 使用validator替代 */
 function remoteValidation(value, remote) {
+  console.warn(`[deprecated]: 使用 validator function 替代`);
   const { 
     action, 
     buildParams, 

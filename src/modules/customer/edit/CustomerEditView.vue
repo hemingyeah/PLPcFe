@@ -194,7 +194,7 @@ export default {
     update({field, newValue, oldValue}) {
       let {fieldName, displayName} = field;
       if (this.$appConfig.debug) {
-        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+        console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
       }
       this.$set(this.form, fieldName, newValue)
     },
