@@ -55,9 +55,8 @@
               </el-select>
             </el-form-item>
             <el-form-item label-width="100px" label="选择团队">
-              <!-- COMMENT: 暂时去除团队 -->
-              <!-- <biz-team-select v-model="params.tag"/> -->
-              <el-select
+              <biz-team-select v-model="params.tag" :fetch-func="getTeamList"/>
+              <!-- <el-select
                 v-model="params.tagId"
                 @change="modifyUser('tags')"
                 filterable
@@ -74,7 +73,7 @@
                   :label="item.tagName"
                   :value="item.id">
                 </el-option>
-              </el-select>
+              </el-select> -->
             </el-form-item>
             <el-form-item label-width="100px" label="区域">
               <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector"
@@ -478,10 +477,14 @@ import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
 import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
 import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
 import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
+
 import * as CustomerApi from '@src/api/CustomerApi';
+
+import TeamMixin from '@src/mixins/teamMixin';
 
 export default {
   name: 'customer-list-view',
+  mixins: [TeamMixin],
   data() {
     return {
       // self state
@@ -596,11 +599,16 @@ export default {
       auth: {},
       smsRest: 0,
       columnNum: 1,
+      initData: {},
+      filterTeams: [],
     };
   },
   computed: {
     editedPermission() {
       return this.auth.CUSTOMER_EDIT;
+    },
+    viewedPermission() {
+      return this.auth.CUSTOMER_VIEW === 3
     },
     deletePermission() {
       return this.auth.CUSTOMER_EDIT === 3 && this.auth.CUSTOMER_DELETE;
@@ -679,8 +687,9 @@ export default {
     this.buildConfig(this.paramsBackup.customizedSearchModel);
     this.search();
 
-    // 团队默认加载全部数据
-    this.searchTag();
+    if(!this.viewedPermission) {
+      this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
+    }
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
@@ -809,17 +818,6 @@ export default {
       this.columnNum = Number(command);
       localStorage.setItem('customer_list_advance_search_column_number', command);
     },
-    // viewCustomer(e) {
-
-    //   const status = {
-    //     params: {
-    //       ...this.paramsBackup,
-    //     },
-    //     paginationInfo: this.paginationInfo
-    //   };
-
-    //   sessionStorage.setItem('customer_list_search_status', JSON.stringify(status));
-    // },
     formatAddress(ad) {
       if (null == ad) return '';
         
@@ -872,7 +870,17 @@ export default {
       this.columns = this.buildTableColumn();
     },
     jumpPage() {
-      window.location = '/customer/create';
+      // window.location = '/customer/create';
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'customer_create',
+        title: '新建客户',
+        url: '/customer/create',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
     /** 构建客户导出参数 */
     buildExportParams(checkedArr, ids) {
@@ -1428,6 +1436,9 @@ export default {
           return res;
         })
         .catch(err => console.error('searchTag function catch err', err));
+    },
+    getTeamList(params) {
+      return this.getBizTeamList(params, this.filterTeams, this.viewedPermission);
     },
     // match data
     matchOperator(formType) {

@@ -1,3 +1,5 @@
+$btn-color-primary-light-1: mix(#fff, $color-primary, 10%) !default;
+
 .btn{
   display: inline-block;
   margin: 0;
@@ -5,15 +7,14 @@
   font-weight: 400;
   text-align: center;
   white-space: nowrap;
-  padding: 4px 12px;
+  padding: 5px 12px;
   line-height: 24px;
   border-radius: 2px;
   border: none;
   outline: none;
   cursor: pointer;
-  transition: background-color .3s ease;
   color: $text-color-primary;
-  min-width: 65px;
+  min-width: 60px;
 
   &:active{
     opacity: 0.85;
@@ -54,4 +55,19 @@
   display: inline-block;
   padding: 7px 15px;
   color: #333;
+}
+
+// 背景白色按钮
+.btn-ghost{
+  background-color: #fff;
+  color: $text-color-primary;
+  border: 1px solid #E2E2E2;
+  border-radius: 2px;
+  padding: 4px 15px;
+
+  &:hover {
+    background-color: $btn-color-primary-light-1;
+    border-color: $btn-color-primary-light-1;
+    color: #fff;
+  }
 }

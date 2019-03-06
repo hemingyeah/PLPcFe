@@ -13,7 +13,7 @@
 
         <div class="action-btns">
           <!-- TODO: 新建子团队 需要权限控制 -->
-          <div class="action-btn-view" v-if="!teamData.parent" @click="teamChildCreate">
+          <div class="action-btn-view" v-if="!teamData.parent && showNewTeam" @click="teamChildCreate">
             <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子团队</span>
           </div>
           <div class="action-btn-view" @click="personAddChoose">
@@ -63,15 +63,12 @@
             <div class="form-view-row">
               <label>位置</label>
               <div class="form-view-row-content" v-if="teamData.tagAddress">
-                {{ teamData.tagAddress.province }}-
-                {{ teamData.tagAddress.city }}-
-                {{ teamData.tagAddress.dist }}-
-                {{ teamData.tagAddress.address }}
-                <i @click="openMap" class="iconfont icon-address team-address-icon link-text"></i>
+                {{ teamData.tagAddress | fmt_address }}
+                <i v-if="teamData.tagAddress.longitude && teamData.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i>
               </div>
             </div>
 
-            <div class="form-view-row" v-if="teamData.parent">
+            <div class="form-view-row" v-if="teamData.parent && showNewTeam">
               <label>主团队</label>
               <div class="form-view-row-content">
                 <span @click="goTeamDetail(teamData.parent.id)" class="link-text">
@@ -80,12 +77,12 @@
               </div>
             </div>
 
-            <div class="form-view-row" v-else>
+            <div class="form-view-row" v-else-if="!teamData.parent && showNewTeam">
               <label>子团队</label>
               <div class="form-view-row-content">
                 <span @click="goTeamDetail(child.id)" v-for="(child, index) in teamData.children" :key="index + 'detail'" class="link-text">
                   {{ child.tagName }}
-                  <span v-if="index <= teamData.children.length - 2">
+                  <span v-if="index <= teamData.children.length - 2" class="no-link">
                     ,
                   </span>
                 </span>
@@ -201,7 +198,7 @@ export default {
       return url.parse(window.location.href, true);
     },
     teamId() {
-      return this.urlParams.query.id || '';
+      return (this.initData && this.initData.tag && this.initData.tag.id) || '';
     },
     displayGoBackBtn() {
       return !this.urlParams.query.noHistory;
@@ -209,6 +206,9 @@ export default {
     /* 编辑团队权限 */
     allowEditTeam() {
       return true
+    },
+    showNewTeam() {
+      return this.initData.showNewTeam === true;
     }
   },
   mounted() {
@@ -219,9 +219,10 @@ export default {
     this.loadingPage = true;
     this.page.pageNum = 1;
     this.page.list = [];
-
-    this.fetchTeamData();
-    // this.fetchTableData();
+    
+    this.teamData = (this.initData && this.initData.tag) || {};
+    // this.fetchTeamData();
+    this.fetchTableData();
   },
   methods: {
     async fetchTeamData() {
@@ -278,7 +279,7 @@ export default {
     },
     goTeamDetail(id) {
       // TODO: 详情页
-      window.location.href = `/security/tag/view?id=${id}`
+      window.location.href = `/security/tag/view/${id}`;
     },
     /* 跳转 用户详情页 */
     goUserDetail(event) {
@@ -303,7 +304,6 @@ export default {
       );
     },
     openMap() {
-      console.log(this.$fast.map)
       this.$fast.map.display(this.teamData.tagAddress, {title: '团队位置'})
         .catch(err => console.error('openMap catch an err: ', err));
     },
@@ -365,10 +365,11 @@ export default {
         ids.push(this.teamData.id);
 
         let result = await TeamApi.deleteTag(ids);
+        let isParent = this.teamData.parent && this.isParent(this.teamData);
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `删除团队${result.status == 0 ? '成功' : '失败'}`,
+          title: `删除${isParent ? '主' : '子' }团队${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
 
@@ -378,7 +379,7 @@ export default {
 
           this.$platform.refreshTab(fromId);
 
-          if(this.displayGoBackBtn && this.teamData.parent && !this.isParent(this.teamData)) {
+          if(this.displayGoBackBtn && isParent) {
             this.goBack();
           } else {
             this.$platform.closeTab(id);
@@ -541,20 +542,25 @@ export default {
 
     .team-detail-list {
       background: #fff;
-      width: 390px;
       border-right: 1px solid #f2f2f2;
-      flex-shrink: 0;
+
       height: 100%;
+      width: 400px;
       padding-top: 55px;
+
+      flex-shrink: 0;
+      overflow-y: auto;
     }
     .team-detail-table {
+
       height: 100%;
-      width: calc(100% - 390px);
+      width: calc(100% - 400px);
+
       flex: 1;
-      background: #fff;
-      margin-left: 10px;
-      border-radius: 2px;
       overflow-y: auto;
+
+      background: #fff;
+      border-radius: 2px;
       padding: 10px;
 
       .el-table {
@@ -604,6 +610,9 @@ export default {
         color: $color-primary;
         cursor: pointer;
         margin-right: 10px;
+      }
+      .no-link {
+        color: #333;
       }
 
     }

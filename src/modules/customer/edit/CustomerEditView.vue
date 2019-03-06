@@ -9,7 +9,7 @@
         </div>
       </div>
        
-      <customer-edit-form :fields="fields" v-model="form" ref="customerEditForm"/>
+      <customer-edit-form :fields="fields" v-model="form" ref="form"/>
     </form>
   </div>
 </template>
@@ -61,6 +61,10 @@ export default {
   },
   methods: {
     goBack() {
+      if(this.action == 'create') {
+        let id = window.frameElement.dataset.id;
+        return this.$platform.closeTab(id);
+      }
       parent.frameHistoryBack(window);
     },
     submit() {
@@ -123,6 +127,7 @@ export default {
             message: !isSucc && res.message
           })
           
+          this.reloadTab();
           window.location.href = `/customer/view/${res.data.customerId}`;
         })
         .catch(err => console.error('err', err));
@@ -138,7 +143,12 @@ export default {
           window.location.href = `/customer/view/${res.data || this.editId}`;
         })
         .catch(err => console.error('err', err));
-    }
+    },
+    reloadTab() {
+      let fromId = window.frameElement.getAttribute('fromid');
+
+      this.$platform.refreshTab(fromId);
+    },
   },
   async mounted() {
     try {

@@ -3,7 +3,7 @@
     <template slot="serialNumber" slot-scope="{field}">
       <form-item :label="field.displayName" :validation="validation.serialNumber">
         <form-text
-          v-if="validation.serialNumber"
+          v-if="validation.serialNumber && initData && !initData.isAutoSerialNumber"
           :field="field"
           :value="value.serialNumber" @update="update"/>
         <div v-else class="form-item__text">客户编号将在创建后由系统生成</div>
@@ -52,23 +52,29 @@
     <template slot="tags" slot-scope="{field}">
       <form-item :label="field.displayName" validation>
         <div class="input-and-btn">
-          <biz-team-select v-model="value.tags" multiple/>
+          <biz-team-select v-model="value.tags" multiple :fetch-func="getTeamList" />
           <el-button type="button" @click="autoAssign">自动分配</el-button>
         </div>
       </form-item>
-    </template>
+    </template> 
   </form-builder>
 </template>
 
 <script>
 import * as CustomerApi from '@src/api/CustomerApi';
+import * as TeamApi from '@src/api/TeamApi'
 import * as LinkmanApi from '@src/api/LinkmanApi';
+
+import TeamMixin from '@src/mixins/teamMixin';
 
 import _ from 'lodash'
 import platform from '@src/platform'
 
+import AuthUtil from '@src/util/auth';
+
 export default {
   name: 'customer-edit-form',
+  mixins: [TeamMixin],
   props: {
     fields: {
       type: Array,
@@ -84,18 +90,49 @@ export default {
     return {
       validation: this.buildValidation(),
       addressBackup: this.value.customerAddress,
+      filterTeams: []
     }
   },
   computed: {
     /** 是否只显示 自己所在团队 */
     seeAllOrg() {
-      return this.initData.seeAllOrg;
+      return true; 
+    },
+    /** 当前用户的权限 */
+    permission() {
+      return this.initData.loginUser.authorities;
+    },
+    // 是否含有客户编辑全部权限
+    hasEditCustomerAuth(){
+      return this.initData?.loginUser?.authorities?.['CUSTOMER_EDIT'] === 3;
+    },
+    // 是否过滤团队
+    isFilterTag() {
+      return this.initData && this.initData.isDivideByTag && !this.hasEditCustomerAuth;
+
+    },
+  },
+  mounted() {
+    if(this.isFilterTag) {
+      let value = this.value;
+      
+      if(Array.isArray(value.tags)) {
+        let tags = value.tags.filter(tag => {
+          return this.teamsWithChildTag.some(t => tag.id == t.id);
+        })
+
+
+        this.$set(value, 'tags', tags);
+        this.$emit('input', value)
+      }
+      
+      this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
     }
   },
   methods: {
     buildValidation(){
       let {isAutoSerialNumber, isCustomerNameDuplicate, isPhoneUnique} = this.initData;
-
+      
       let checkCustomerProp = _.debounce(function(params, resolve, changeStatus){
         changeStatus(true);
         return CustomerApi.unique(params).then(res => {
@@ -111,7 +148,7 @@ export default {
           return resolve(res.error ? res.error : null);
         })
       }, 250)
-
+      
       const that = this;
 
       return Object.freeze({
@@ -149,8 +186,8 @@ export default {
         console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
       }
       let value = this.value;
-      this.$set(value, fieldName, newValue);
-      this.$emit('input', value);
+      this.$set(value, fieldName, newValue)
+      this.$emit('input', value)
     },
     copyName() {
       let value = this.value;
@@ -188,7 +225,9 @@ export default {
         this.value.tags = tags.map(item => ({
           id: item.id,
           tagName: item.tagName
-        }));
+        }))
+        .filter(tag => this.teamsWithChildTag.some(t => tag.id == t.id))
+
         this.$emit('input', this.value)
       } catch (error) {
         console.error(error)
@@ -216,6 +255,10 @@ export default {
     },
     validate(){
       return this.$refs.form.validate();
+    },
+    // 获取团队列表哦
+    getTeamList(params) {
+      return this.getBizTeamList(params, this.filterTeams, !this.isFilterTag);
     }
   }
 }

@@ -35,9 +35,8 @@
         :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'tags'">
-        <!-- COMMENT: 暂时去除团队 -->
-        <!-- <biz-team-select v-model="form.tags" multiple/> -->
-        <el-select
+        <biz-team-select v-model="form.tags" multiple/>
+        <!-- <el-select
           v-model="form.tags"
           multiple
           filterable
@@ -51,7 +50,7 @@
             :label="item.tagName"
             :value="item.id">
           </el-option>
-        </el-select>
+        </el-select> -->
 
       </el-form-item>
       <el-form-item

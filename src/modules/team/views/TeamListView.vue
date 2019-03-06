@@ -1,42 +1,29 @@
 <template>
   <div class="full-page" v-loading.fullscreen.lock="loadingPage">
-    <!-- start header -->
     <header class="team-list-header">
-      <form class="base-search" onsubmit="return false;">
-        <!-- start 团队搜索 -->
-        <div class="team-list-headr-search">
-          <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select">
-            <i slot="prefix" class="el-input__icon el-icon-search"></i>
-          </el-input>
-          <base-button type="primary" @event="search" native-type="submit">
-            搜索
-          </base-button>
-          <base-button type="ghost" @event="resetParams">
-            重置
-          </base-button>
-        </div>
+      <form class="base-search team-list-header-search" @submit.prevent="search">
+        <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select">
+          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+        </el-input>
+        <button type="submit" class="btn btn-primary">搜索</button>
+        <button type="button" class="btn btn-ghost" @click="resetParams">重置</button>
       </form>
-      <!-- end 团队搜索 -->
 
       <!-- start 团队选项 -->
       <div class="team-list-checkbox-view">
         <!-- start 按服务团队派单 -->
-        <el-checkbox label="tag" v-model="isAllotByTag" @change="setUsedAllot">
-          启用按服务团队派单
-        </el-checkbox>
+        <el-checkbox v-model="isAllotByTag" @change="setUsedAllot">启用按服务团队派单</el-checkbox>
         <el-popover
-          placement="top-start"
+          placement="bottom-end"
           width="300"
           trigger="hover"
           content="开启后，指派工单将按照团队查询人员；禁用时，按通讯录方式查询人员">
           <i class="iconfont icon-help" slot="reference"></i>
         </el-popover>
         <!-- end 按服务团队派单 -->
-        <el-checkbox :label="true" v-model="isSeeAllOrg" @change="setSeeAllOrg" :disabled="!isAllotByTag" class="team-list-header-see">
-          选择人员时隐藏非团队内成员
-        </el-checkbox>
+        <el-checkbox v-model="isSeeAllOrg" @change="setSeeAllOrg" :disabled="!isAllotByTag" class="team-list-header-see">选择人员时隐藏非团队内成员</el-checkbox>
         <el-popover
-          placement="top-start"
+          placement="bottom-end"
           width="300"
           trigger="hover"
           content="开启本选项后，在选择协同人等调用钉钉通讯录时只可见自己所属服务团队的成员，管理员除外">
@@ -52,7 +39,7 @@
         <div class="manage-operate-btns">
           <!-- TODO: 是否有权限 新建 删除 -->
           <base-button type="primary" icon="icon-add" @event="teamCreate">新建</base-button>
-          <base-button type="primary" icon="icon-add" @event="teamChildCreate">新建子团队</base-button>
+          <base-button type="primary" icon="icon-add" @event="teamChildCreate" v-if="showNewTeam">新建子团队</base-button>
           <base-button type="ghost" icon="icon-fe-close" @event="teamDelete">删除团队</base-button>
         </div>
         <!-- end 按钮 -->
@@ -67,7 +54,7 @@
       <div class="team-table-list">
         <base-table 
           class="team-list" 
-          max-height="100vh - 220px"
+          max-height="100vh - 205px"
           row-key="id"
           ref="teamTable"
           :rows="page.list" 
@@ -75,19 +62,14 @@
           @select="selectTeamList"
           @update="updateTableColumns"
           multiple 
-          advanced
-        >
-        </base-table>
+          advanced/>
       </div>
       <!-- start 表格底部 -->
       <div class="full-page-footer">
         <div class="list-info">
-          共<span class="level-padding">{{ page.total || 0 }}</span>记录，
-          已选中
-          <span class="selectedCount" @click="multipleSelectionPanelShow = true">
-            {{multipleSelection.length}}
-          </span>条
-          <span class="selectedCount select-init-text" @click="selectionInit()">清空</span>
+          共<span class="level-padding">{{ page.total || 0 }}</span>记录，已选中
+          <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>条
+          <span class="selectedCount select-init-text" @click="selectionInit">清空</span>
         </div>
         <el-pagination
           class="customer-table-pagination"
@@ -98,14 +80,8 @@
           :page-size="page.pageSize"
           :current-page="page.pageNum"
           layout="prev, pager, next, sizes, jumper"
-          :total="page.total"
-        >
-        </el-pagination>
+          :total="page.total"/>
       </div>
-      <!-- end 表格底部 -->
-      <!-- <div class="full-page-pagination"> 
-        <div style="height: 42px;"></div>
-      </div> -->
     </div>
 
     <!-- start 导入服务电话 -->
@@ -130,7 +106,7 @@
     <!-- end 导入服务电话 -->
 
     <!-- start 右侧选择团队弹窗 -->
-    <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-team-panel">
+    <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title">
         <span>已选中数据({{multipleSelection.length}})</span>
         <i 
@@ -139,29 +115,27 @@
           @click="selectionInit" 
           title="清空已选中数据" 
           data-placement="right" 
-          v-tooltip
-        >
-        </i>
+          v-tooltip/>
       </h3>
-      <dl class="selected-team-list">
-        <dt>
-          <!-- <span class="id-team">编号</span> -->
-          <span class="name-team">团队</span>
-          <i></i>
-        </dt>
-        <dd v-for="(team, index) in multipleSelection" :key="team.id">
-          <!-- <span class="id-team">{{team.serialNumber}}</span> -->
-          <span class="name-team">{{team.tagName}}</span>
-          <span class="delete-btn">
-            <i class="iconfont icon-fe-close" @click.self="selectCancelTeam(team, index)"></i>
-          </span>
-        </dd>
 
+      <div class="team-selected-panel">
         <div class="team-selected-tip" v-if="multipleSelection.length <= 0">
           <img src="../../../assets/img/no-data.png">
           <p>暂无选中的数据，请从列表中选择。</p>
         </div>
-      </dl>
+
+        <div class="team-selected-list" v-else>
+          <div class="team-selected-row team-selected-head">
+            <span class="team-selected-name">团队名称</span>
+          </div>
+          <div class="team-selected-row" v-for="(team, index) in multipleSelection" :key="team.id" >
+            <span class="team-selected-name">{{team.tagName}}</span>
+            <button type="button" class="team-selected-delete" @click="selectCancelTeam(team, index)">
+              <i class="iconfont icon-fe-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </base-panel>
     <!-- end 右侧选择团队弹窗 -->
   </div>
@@ -174,7 +148,6 @@ import qs from 'qs';
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi';
 import {fmt_address} from '@src/filter/fmt';
-
 
 export default {
   name: 'team-list-view',
@@ -196,8 +169,12 @@ export default {
       model: this.buildModel(),
       page: new Page(),
       serviceTelItemId: '',
-      selectedLimit: 200,
-      
+      selectedLimit: 200
+    }
+  },
+  computed: {
+    showNewTeam() {
+      return this.initData.showNewTeam === true;
     }
   },
   methods: {
@@ -212,7 +189,7 @@ export default {
           render(h, col, row){
             return (
               <a class="team-view-detail-btn" 
-                href={`/security/tag/view?id=${row.id}`}
+                href={`/security/tag/view/${row.id}?noHistory=1`}
                 onClick={e => that.openTeamView(e, row.id)}>
                 {row.tagName}
               </a>
@@ -240,7 +217,7 @@ export default {
           overflow: 'tooltip',
           formatter(col, row){
             return row.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')
-          },
+          }
         },
         {
           field: 'tagAddress',
@@ -295,10 +272,7 @@ export default {
       this.page.pageNum = 1;
       this.page.list = [];
 
-      return new Promise(async(resolve, reject) => {
-        let result = await this.fetchPageList(this.page.pageNum);
-        resolve(result)
-      }).catch(err => console.log(err))
+      return this.fetchPageList(this.page.pageNum)
     },
     jump(pageNum) {
       this.page.list = [];
@@ -341,7 +315,7 @@ export default {
       this.$platform.openTab({
         id: `team_view_${id}`,
         title: '团队详情',
-        url: `/security/tag/view?id=${id}&noHistory=1`,
+        url: `/security/tag/view/${id}?noHistory=1`,
         reload: true,
         close: true,
         fromId
@@ -357,7 +331,7 @@ export default {
       this.serviceTelItemId = item.id;
       this.$refs.serviceTelModal.open();
     },
-    /* 复原搜索参数 */
+    /** 复原搜索参数 */
     revertSearchParams() {
       const localStorageData = this.localStorageGet();
 
@@ -365,22 +339,19 @@ export default {
         this.page.pageSize = localStorageData.pageSize;
       }
     },
-    /* 复原表格列 数据 */
+    /** 复原表格列 数据 */
     revertTableColumns() {
       try {
         let data = this.localStorageGet();
-        let colums = JSON.parse(data.colums)
+        let columns = data.columns ? JSON.parse(data.columns) : [];
 
-        if(Array.isArray(colums) && colums.length > 0) {
-
+        if(Array.isArray(columns) && columns.length > 0) {
           this.columns = this.columns.map((col, index) => {
-            return Object.assign(col, colums[index])
+            return Object.assign(col, columns[index])
           })
         }
-        
       } catch (error) {
         console.log('revertTableColumns error: ', error);
-        
       }
     },
     /* 复原搜索 参数 */
@@ -468,15 +439,16 @@ export default {
       let _setTag = 'dep';
       if(setTag) {
         _setTag = 'tag'
-      } else {
-        this.isSeeAllOrg = false;
-        this.setSeeAllOrg();
       }
       try {
         let params = {
           set: _setTag
         }
         let result = await TeamApi.usedAllot(params);
+
+        if(!setTag) {
+          this.setSeeAllOrg();
+        }
 
         if(result.status != 0) {
           this.$platform.alert(result.message);
@@ -494,6 +466,8 @@ export default {
         let result = await TeamApi.saveSeeAllOrg(params);
         if(result.status != 0) {
           this.$platform.alert(result.message);
+        } else {
+          this.isSeeAllOrg = state;
         }
       } catch (error) {
         console.log('setUsedAllot error: ', error);
@@ -501,7 +475,16 @@ export default {
     },
     /* 新建团队 */
     teamCreate() {
-      window.location.href = '/security/tag/createTag';
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: 'team_create',
+        title: '新建团队',
+        url: '/security/tag/createTag?noHistory=1',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
     /* 新建子团队 */
     teamChildCreate() {
@@ -520,8 +503,16 @@ export default {
         pid: item.id,
         pname: item.tagName,
       }
-
-      window.location.href = `/security/tag/createTag?${qs.stringify(parent)}`;
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'team_create',
+        title: '新建子团队',
+        url: `/security/tag/createTag?${qs.stringify(parent)}`,
+        reload: true,
+        close: true,
+        fromId
+      });
     },
     /* 删除团队 */
     async teamDelete() {
@@ -559,6 +550,7 @@ export default {
 
         if(result.status == 0) {
           this.initialize();
+          this.selectionInit();
         } else {
           this.this.loadingPage = false;
         }
@@ -573,301 +565,289 @@ export default {
         return Object.assign(col, columns.data[index]);
       })
 
-      this.localStorageSet('colums', JSON.stringify(columns.data));
+      this.localStorageSet('columns', JSON.stringify(columns.data));
     }
   },
   mounted(){
-    this.revertTableColumns();
     this.revertSearchParams();
+    this.revertTableColumns();
     this.initialize();
 
     this.isAllotByTag = (this.initData.taskConfig && this.initData.taskConfig.allotByTag !== false);
     this.isSeeAllOrg = this.initData.seeAllOrg !== false;
 
-
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
-    // window.__exports__refresh = this.initialize;
+    window.__exports__refresh = this.initialize;
   }
 }
 </script>
 
 <style lang="scss">
-  .team-list-header {
-    background-color: #fff;
-    border-radius: 3px;
-    box-sizing: border-box;
+.team-list-header {
+  background-color: #fff;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+  padding: 12px 10px;
+
+  .input-with-select {
+    width: 300px;
+  }
+
+  .team-list-checkbox-view {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: center;
 
-    margin-bottom: 10px;
-    padding: 12px 10px;
-
-    .input-with-select {
-      width: 300px;
+    .el-checkbox {
+      margin-right: 0;
+      margin-bottom: 0;
     }
-
-    .team-list-checkbox-view {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-
-      .el-checkbox {
-        margin-right: 0;
-        margin-bottom: 0;
-      }
-      .team-list-header-see {
-        margin-left: 30px;
-      }
-      .iconfont {
-        color: grey;
-        margin-left: 5px;
-      }
-
+    .team-list-header-see {
+      margin-left: 30px;
     }
-    .team-list-headr-search {
-      display: flex;
-      width: 440px;
-      justify-content: space-between;
+    .iconfont {
+      color: grey;
+      margin-left: 5px;
     }
-
-    .el-input {
-      input {
-        height: 34px;
-        line-height: 34px;
-      }
-    }
-      
   }
-
-  .full-page-main {
-    padding: 0;
-  }
-
-  .full-page-header {
-    border-bottom: 1px solid #f2f2f2;
-    display: flex;
-    margin-bottom: 10px;
-    padding: 0 10px;
-  }
-
-  .manage-operate-btns,
-  .team-service-btn{
-    background-color: #fff;
-    display: flex;
-    padding: 10px 0;
-    flex: 1;
-    
-    .danger-button {
-      margin-left: 20px;
-    }
-    button {
-      margin-right: 10px;
-    }
-
-  }
-
-  .team-service-btn {
-    justify-content: flex-end;
-  }
-
-  .full-page-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 0px 10px 10px 10px;
-    background: #fff;
-    border-radius: 0 0 3px 3px;
-
-    margin-top: 10px;
-
-    .list-info {
-      font-size: 13px;
-      line-height: 32px;
-      margin: 0;
-      color: #767e89;
-
-      .level-padding {
-        padding: 0 5px;
-      }
-      .selectedCount {
-        color: $color-primary;
-        padding: 0 3px;
-        width: 15px;
-        text-align: center;
-        &:hover {
-          cursor: pointer;
-        }
-
-      }
-
-    }
-
-  }
-
-  .selected-team-panel {
-    .panel-title {
-      font-size: 16px;
-      line-height: 60px;
-      padding: 0 25px;
-      color: #848a93;
-      border-bottom: 1px solid #f2f8f7;
-      font-weight: normal;
-      display: flex;
-      justify-content: space-between;
-    }
   
-    .cancel-select-team-btn {
-      margin-right: 20px;
-      float: right;
-      background: #E5E8F0;
-      border-color: #E5E8F0;
-      color: #646B78; 
-    }
+  .team-list-header-search .btn{
+    margin-left: 7px;
   }
 
-  .selected-team-list {
-    overflow-y: auto;
-    padding: 0 20px;
-    line-height: 45px;
-    font-size: 14px;
-    height: calc(100% - 130px);
-
-    dt {
-      display: flex;
-      border-bottom: 1px solid #F0F5F5;
-      font-weight: normal;
+  .el-input {
+    input {
+      height: 34px;
+      line-height: 34px;
     }
-    dd {
-      display: flex;
-      
-      .iconfont {
-        color: $color-primary;
-        visibility: hidden;
-      }
+  }
+    
+}
+
+.full-page-main {
+  padding: 0;
+}
+
+.full-page-header {
+  border-bottom: 1px solid #f2f2f2;
+  display: flex;
+  margin-bottom: 10px;
+  padding: 0 10px;
+}
+
+.manage-operate-btns,
+.team-service-btn{
+  background-color: #fff;
+  display: flex;
+  padding: 10px 0;
+  flex: 1;
+  
+  .danger-button {
+    margin-left: 20px;
+  }
+  button {
+    margin-right: 10px;
+  }
+
+}
+
+.team-service-btn {
+  justify-content: flex-end;
+}
+
+.full-page-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: #fff;
+  border-radius: 0 0 3px 3px;
+
+  .list-info {
+    font-size: 13px;
+    line-height: 32px;
+    margin: 0;
+    color: #767e89;
+
+    .level-padding {
+      padding: 0 5px;
+    }
+
+    .selectedCount {
+      color: $color-primary;
+      padding: 0 3px;
+      width: 15px;
+      text-align: center;
+
       &:hover {
         cursor: pointer;
-        .iconfont {
-          visibility: visible;
-        }
       }
+    }
+  }
+}
 
-    }
-    .id-team {
-      padding: 0 5px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      width: 120px;
-    }
-    .name-team {
-      padding: 0 5px;
-      width: 340px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+// -------- team selected panel --------
+.team-selected-panel{
+  font-size: 14px;
+  height: calc(100% - 51px);
+}
 
+.team-selected-list{
+  height: 100%;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.team-selected-row{
+  display: flex;
+  flex-flow: row nowrap;
+  line-height: 36px;
+  border-bottom: 1px solid #ebeef5;
+  font-size: 13px;
+
+  &:hover{
+    background-color: #f5f7fa;
+
+    .team-selected-delete{
+      visibility: visible;
+    }
+  }
+}
+
+.team-selected-head{
+  background-color: #F0F5F5;
+  color: #333;
+  font-size: 14px;
+}
+
+.team-selected-name{
+  padding-left: 10px;
+  flex: 1;
+  @include text-ellipsis;
+}
+
+.team-selected-delete{
+  width: 36px;
+}
+
+.team-selected-row button.team-selected-delete{
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  color: #646B78;
+  visibility: hidden;
+
+  i{
+    font-size: 14px;
   }
 
-  .team-table-list {
+  &:hover{
+    color: #e84040;
+  }
+}
+
+.team-selected-tip{
+  padding-top: 80px;
+
+  img{
+    display: block;
+    width: 240px;
+    margin: 0 auto;
+  }
+
+  p{
+    text-align: center;
+    color: #9a9a9a;
+    margin: 30px 0 0 0;
+    line-height: 20px;
+  }
+}
+
+.team-panel-btn{
+  float: right;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 5px;
+
+  &:hover{
+    color: $color-primary;
+  }
+}
+
+// -------- team table --------
+.team-table-list {
+  padding: 0 10px;
+}
+
+.team-list-view {
+  .base-table__head {
+    th {
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #ebeef5;
+      color: #333;
+      font-weight: normal;
+      line-height: 34px;
+      padding-bottom: 10px;
+      padding: 6px 0;
+    }
+    button {
+      border: none;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+  }
+
+  .base-table__body {
+    td {
+      color: #909399;
+      font-size: 13px;
+      height: 42px;
+      padding: 6px 0;
+    }
+    .base-table-hover-row{
+      background-color: #f5f7fa;
+    }
+  }
+
+  .team-view-detail-btn {
+    color: #55B7B4;
+  }
+}
+
+.team-list {
+  .base-table-cell {
     padding: 0 10px;
   }
 
-  .team-list-view {
-    margin-bottom: 10px;
-
-    .base-table__head {
-      th {
-        background-color: #f5f5f5;
-        border-bottom: 1px solid #ebeef5;
-        color: #333;
-        font-weight: normal;
-        line-height: 34px;
-        padding-bottom: 10px;
-        padding: 6px 0;
-      }
-      button {
-        border: none;
-        background-color: #f5f5f5;
-        color: #333;
-      }
-    }
-
-    .base-table__body {
-      td {
-        color: #909399;
-        font-size: 13px;
-        height: 42px;
-        padding: 6px 0;
-      }
-      .base-table-hover-row{
-        background-color: #f5f7fa;
-      }
-    }
-
-    .team-view-detail-btn {
-      color: #55B7B4;;
-    }
-
-
-  }
-
-  .team-list {
-    .base-table-cell {
-      padding: 0 10px;
-    }
-
-    .base-table-body,
-    .base-table__body {
-      tr {
-        background-color: #fff;
-      }
-      tr:nth-child(even) {
-        background-color: #fafafa;
-      }
-    }
-
-    .base-table__table {
-      .base-table-hover-col{
-        background-color: #f5f7fa;
-      }
-    }
-  }
-  
-  .base-table__fixed-left {
+  .base-table-body,
+  .base-table__body {
     tr {
-      th {
-        width: 48px;
-      }
+      background-color: #fff;
+    }
+    tr:nth-child(even) {
+      background-color: #fafafa;
     }
   }
 
-  .team-selected-tip{
-    padding-top: 80px;
-
-    img{
-      display: block;
-      width: 240px;
-      margin: 0 auto;
-    }
-
-    p{
-      text-align: center;
-      color: #9a9a9a;
-      margin: 30px 0 0 0;
-      line-height: 20px;
+  .base-table__table {
+    .base-table-hover-col{
+      background-color: #f5f7fa;
     }
   }
+}
 
-  .team-panel-btn{
-    float: right;
-    cursor: pointer;
-    font-size: 14px;
-    margin-right: 5px;
-
-    &:hover{
-      color: $color-primary;
+.base-table__fixed-left {
+  tr {
+    th {
+      width: 48px;
     }
   }
+}
 </style>
-

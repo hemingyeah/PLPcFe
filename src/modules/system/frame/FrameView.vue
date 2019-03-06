@@ -396,9 +396,9 @@ export default {
     },
     goRoleTeam() {
       platform.openTab({
-        id: "team",
-        title: "团队管理",
-        url: "/security/tag",
+        id: 'team',
+        title: '团队管理',
+        url: '/security/tag',
         reload: true
       });
     },

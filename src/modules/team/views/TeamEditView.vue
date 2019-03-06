@@ -139,21 +139,60 @@ export default {
       return new Promise((resolve, reject) => {
         let tagPlaceList = this.form.tagPlaceList || [];
         let message = null;
-        for(let i = 0; i < tagPlaceList.length; i++){
-          let place = tagPlaceList[i] || {};
-          if(!place.province || !place.city){
-            message = '请补全负责区域';
-            break;
+
+        let isRepeat = this.checkPlaceRepeat();
+
+        if(isRepeat) {
+          message = '负责区域有重复';
+        } else {
+          for(let i = 0; i < tagPlaceList.length; i++){
+            let place = tagPlaceList[i] || {};
+            if(!place.province){
+              message = '请补全负责区域';
+              break;
+            }
           }
         }
+
         resolve(message)
       })
+    },
+    // 验证负责区域是否重复
+    checkPlaceRepeat() {
+      let tagPlaceList = this.form.tagPlaceList || [];
+      let isRepeat = false;
+
+      for(let i = 0; i < tagPlaceList.length; i++) {
+        let item = tagPlaceList[i];
+        let place = `${item.province}${item.city}${item.dist}`;
+
+        if(place) {
+
+          for(let j = 0; j < tagPlaceList.length; j++) {
+            if(j == i) continue
+
+            let tItem = tagPlaceList[j];
+            let tPlace = `${tItem.province}${tItem.city}${tItem.dist}`;
+            
+            if(place == tPlace) {
+              isRepeat = true;
+              break
+            }
+          }
+
+        }
+      }
+      return isRepeat
     },
     async fetchTeamUser(params) {
       return TeamApi.userList({...params, ...{tagId: this.id}})
     },
     /* 返回 */
     goBack() {
+      if(this.action == 'create') {
+        let id = window.frameElement.dataset.id;
+        return this.$platform.closeTab(id);
+      }
       window.parent.frameHistoryBack(window);
     },
     /* 打包给服务端的数据 */
@@ -165,6 +204,10 @@ export default {
       params.teamLeaders = data.teamLeaders;
       params.phone = data.phone;
       params.tagAddress = data.tagAddress;
+
+      if(!params.tagAddress.hasOwnProperty('addressType')) {
+        params.tagAddress.addressType = 1;
+      }
 
       params.tagPlaceList = data.tagPlaceList || [];
       params.teamLeaders = data.teamLeaders;
@@ -183,6 +226,11 @@ export default {
       form.tagPlaceList = data.tagPlaceList || [];
 
       return form
+    },
+    reloadTab() {
+      let fromId = window.frameElement.getAttribute('fromid');
+
+      this.$platform.refreshTab(fromId);
     },
     submit() {
       return this.$refs.form.validate()
@@ -220,7 +268,8 @@ export default {
         })
 
         if(result.status == 0) {
-          this.goBack();
+          this.reloadTab();
+          window.location.href = `/security/tag/view/${result.data}?noHistory=1`;
         }
       } catch (error) {
         console.error('error: ', error);
@@ -246,7 +295,12 @@ export default {
           title: `${child}团队编辑${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
-        if(result.status == 0) this.goBack();
+        if(result.status == 0) {
+          let fromId = window.frameElement.getAttribute('fromid');
+
+          this.$platform.refreshTab(fromId);
+          this.goBack();
+        }
       } catch (error) {
         console.error('error: ', error);
       }

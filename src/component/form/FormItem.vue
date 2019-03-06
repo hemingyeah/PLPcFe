@@ -19,7 +19,10 @@ export default {
   name: 'form-item',
   props: {
     label: String,
-    validation: [Boolean, Function], // 是否开启验证
+    validation: {
+      type: [Boolean, Function],
+      default: true
+    }, // 是否开启验证
     /** 获取根元素（FormBuilder）的dom对象 */
     findRootEl: {
       type: Function,

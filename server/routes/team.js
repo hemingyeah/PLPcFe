@@ -45,11 +45,15 @@ router.get('/security/tag/editTag/:id', async ctx => {
 //   ctx.body = Template.renderWithData('编辑子团队', {}, script)
 // });
 
-router.get('/security/tag/view', async ctx => {
+router.get('/security/tag/view/:id', async ctx => {
   let script = ['/team.detail.js'];
   let modConfig = modules['team.detail'];
+  let reqHeaders = ctx.request.headers;
+
+  let result = await HttpClient.request(`/security/tag/editTag/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
   
-  ctx.body = Template.renderWithHtml('团队详情', {}, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('团队详情', body, script, modConfig.template)
 })
 
 module.exports = router;

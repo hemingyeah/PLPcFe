@@ -36,9 +36,11 @@ function copy(){
   // 复制文件
   let distOriginPath = path.resolve(__dirname, '../dist/component');
   let distTargetPath = `${ config.targetRootPath }/shb-web/src/main/webapp/resource/component`;
-  // let distTargetPath = '/Users/dongls/Desktop/work/sm4-pc/resource/component';
+  let pcTargetPath = '/Users/dongls/Desktop/work/sm4-pc/resource/component';
+  
   // 复制静态资源
   shell.cp('-r', `${ distOriginPath }/*`, distTargetPath);
+  shell.cp('-r', `${ distOriginPath }/*`, pcTargetPath);
 
   console.log(`build on ${new Date().toLocaleString()}`)
 }

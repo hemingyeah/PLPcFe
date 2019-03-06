@@ -98,6 +98,7 @@ const BaseTableHead = {
 
         (<base-modal 
           title="自定义列" class="base-table__modal"
+          appendToBody={true}
           show={this.setting.show} onClose={e => this.closeSetting(e)}>
          
           <form class="base-table__setting">
