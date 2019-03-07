@@ -1,5 +1,5 @@
 <template>
-  <base-modal :title="title" :show.sync="visible" width="800px" class="base-import-modal">
+  <base-modal :title="title" :show.sync="visible" width="800px" class="base-import-modal" @closed="reset">
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="规则名称" :error="formValidationResult.ruleName">
@@ -60,7 +60,7 @@
       </el-form-item>
 
       <el-form-item>
-        <el-select v-model="form.custFieldOfTask" @change="fetchFields" v-if="form.category === 'customizedFields'" placeholder="请选择">
+        <el-select v-model="form.custFieldOfTask" @change="changeCustFieldOfTask" v-if="form.category === 'customizedFields'" placeholder="请选择">
           <el-option
             v-for="item in taskTypes"
             :key="item.value"
@@ -69,7 +69,7 @@
           </el-option>
         </el-select>
         <span class="ordinary-text" v-if="form.custFieldOfTask">的</span>
-        <el-select v-model="form.customizedField" v-if="form.custFieldOfTask" @change="validate" :disabled="!taskSelectFields.length" placeholder="请选择">
+        <el-select v-model="form.customizedField" v-if="form.custFieldOfTask" @change="changeCustomizedField" :disabled="!taskSelectFields.length" placeholder="请选择">
           <el-option
             v-for="item in taskSelectFields"
             :key="item.value"
@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import {createPerformanceRule, getFieldsForPerformance} from '@src/api/PerformanceApi';
+import {createPerformanceRule, getFieldsForPerformance, updatePerformanceRule} from '@src/api/PerformanceApi';
 import SpecificCondition from './SpecificCondition.vue';
 
 export default {
@@ -113,14 +113,14 @@ export default {
     allTypes: {
       type: Object,
       default: () => ({})
-    }
+    },
   },
   data() {
     return {
-      visible: true,
-      title: '新增绩效规则',
+      visible: false,
       pending: false,
       submitted: false,
+      performanceRule: {},
       includeTypes: [
         {
           label: '全部',
@@ -173,7 +173,7 @@ export default {
         ruleName: '',
         ruleDesc: '',
         ruleType: 0,
-        effect: '', // 是否启用
+        effect: 1, // 是否启用
         rewardType: 'profit', // 计算方式
         effectCondition: 0, // 生效条件
         category: '', // 工单类型、服务类型、服务内容或者 自定义字段
@@ -378,28 +378,37 @@ export default {
         label: '每单得',
         unit: '元',
       };
+    },
+    title() {
+      return this.performanceRule.id ? '编辑绩效规则' : '新增绩效规则';
+    },
+    action() {
+      return this.performanceRule.id ? 'edit' : 'create';
     }
   },
   mounted() {
   },
   methods: {
-
     onSubmit() {
       this.submitted = true;
       if (!this.validateForm()) return;
       const params = this.buildParam();
 
       this.pending = true;
-      return createPerformanceRule(params)
+      let fn = this.action === 'create' ? createPerformanceRule : updatePerformanceRule;
+
+      fn(params)
         .then(res => {
           if (!res.status) {
             this.pending = false;
             this.visible = false;
             // refresh list
-            this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
+            this.$emit('refresh-rules');
+            this.reset();
           }
         })
         .catch(e => console.error('e', e));
+
     },
     validateForm() {
       let keysOfValidation = Object.keys(this.formValidation);
@@ -422,7 +431,10 @@ export default {
         effectCondition,
         rules,
         category,
-        customizedField
+        customizedField,
+        effect,
+        rewardType,
+        custFieldOfTask,
       } = this.form;
       let tv = {};
       let ruleArr = [];
@@ -439,10 +451,12 @@ export default {
       });
 
       return {
+        id: this.performanceRule.id || '',
         ruleName,
         ruleDesc,
         ruleType,
         effectCondition,
+        effect,
         ruleContents: ruleArr.map(r => {
           tv = {};
           if (category === 'taskTypes') {
@@ -451,10 +465,15 @@ export default {
             tv.settleType = 'serviceType';
           } else if (category === 'serviceContents') {
             tv.settleType = 'serviceContent';
-          } else if (category === 'customField') {
+          } else if (category === 'customizedFields') {
             tv.settleType = 'customField';
             // tv.customField = custFieldOfTask;
             tv.customFieldValue = customizedField;
+            tv.templateId = custFieldOfTask;
+          }
+
+          if (ruleType) {
+            tv.rewardType = rewardType;
           }
 
           tv.screenMsg = r.types[0];
@@ -469,17 +488,18 @@ export default {
       this.form.customizedField = '';
       let selectedTaskType = this.form.custFieldOfTask;
       if (this.allTaskSelectFields[selectedTaskType]) {
-        return this.taskSelectFields = this.allTaskSelectFields[selectedTaskType]
+        this.taskSelectFields = this.allTaskSelectFields[selectedTaskType]
+        return Promise.resolve();
       }
 
-      getFieldsForPerformance(id)
+      return getFieldsForPerformance(id)
         .then(({succ, data}) => {
           if (succ) {
             this.taskSelectFields = data
               .filter(({formType, setting}) => formType === 'select' && setting && !setting.isMulti)
-              .map(({displayName, id, setting}) => ({
+              .map(({displayName, fieldName, setting}) => ({
                 label: displayName,
-                value: id,
+                value: fieldName,
                 dataSource: setting.dataSource.map(op => ({
                   label: op,
                   value: op,
@@ -524,8 +544,91 @@ export default {
 
       this.validate();
     },
-    toggleDialog() {
+    toggleDialog(pr) {
       this.visible = !this.visible;
+      // edit
+      if (this.visible && this.action === 'edit') {
+
+        this.performanceRule = pr;
+
+        this.transferRuleToForm();
+      }
+    },
+    transferRuleToForm() {
+      const {ruleName, ruleDesc, ruleType, effect, effectCondition,ruleContent,} = this.performanceRule;
+      const {settleType, templateId, customFieldValue, rewardType} = ruleContent[0];
+      let newRules = [];
+      let isSame = false;
+
+      if (!effectCondition && ruleContent.length === 1) {
+        newRules.push({
+          ...ruleContent[0],
+          types: [],
+        })
+      } else {
+        ruleContent.forEach(r => {
+          isSame = newRules.some(nr => nr.assPerson === r.assPerson && nr.chargePerson === r.chargePerson);
+          if (isSame) {
+            newRules = newRules.map(nr => {
+              if (nr.assPerson === r.assPerson && nr.chargePerson === r.chargePerson) {
+                nr.types = [r.screenMsg, nr.screenMsg];
+              }
+
+              return nr;
+            })
+          } else {
+            newRules.push({
+              ...r,
+              types: [r.screenMsg]
+            });
+          }
+
+        });
+
+      }
+
+      this.form = {
+        ruleName,
+        ruleDesc,
+        ruleType,
+        effect, // 是否启用
+        rewardType: rewardType || 'profit',
+        effectCondition: effectCondition || 0,
+        category: '', // 工单类型、服务类型、服务内容或者 自定义字段
+        custFieldOfTask: '',
+        customizedField: '',
+        rules: newRules.map(({assPerson, chargePerson, types}, index) => ({
+          types,
+          assistantScore: assPerson,
+          executorScore: chargePerson,
+        })),
+      }
+
+
+      if (settleType === 'templateId') {
+        this.form.category = 'taskTypes'
+      }
+
+      if (settleType === 'serviceType') {
+        this.form.category = 'serviceTypes'
+      }
+
+      if (settleType === 'serviceContent') {
+        this.form.category = 'serviceContents'
+      }
+
+      if (settleType === 'customField') {
+        this.form.category = 'customizedFields';
+        this.form.custFieldOfTask = templateId;
+        this.fetchFields(templateId)
+          .then(() => {
+            this.form.customizedField = customFieldValue;
+          })
+      }
+      this.formValidationResult.rules = newRules.map(() => ({
+        status: 0,
+        fields: [],
+      }));
     },
     // input change event
     validate() {
@@ -533,7 +636,15 @@ export default {
         this.validateForm();
       }
     },
+    changeCustomizedField() {
+      this.clearSomeFieldsVal(['rules']);
+      this.validate();
+    },
+    changeCustFieldOfTask() {
+      this.fetchFields(this.form.custFieldOfTask);
 
+      this.clearSomeFieldsVal(['rules', 'customizedField']);
+    },
     changeRuleType() {
       let fields = ['category', 'custFieldOfTask', 'customizedField', 'rules', 'rewardType', 'effectCondition'];
       this.clearSomeFieldsVal(fields);
@@ -551,6 +662,11 @@ export default {
       this.clearSomeFieldsVal(fields);
     },
     // clear val
+    reset() {
+      console.log('reset');
+      this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
+      this.performanceRule = {};
+    },
     clearSomeFieldsVal(fields) {
       let defaultValIsEmptyString = ['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField'];
       let defaultValIsZero = ['effectCondition', 'ruleType'];
@@ -585,6 +701,8 @@ export default {
           continue;
         }
       }
+
+      console.log('this.form', this.form);
     },
   },
   components: {

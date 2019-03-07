@@ -34,8 +34,12 @@ module.exports = {
   
   // ------------ 绩效 ------------
   "performance.list": {
-    entry: './src/modules/performance/list/index.ts',
-    template: 'src/modules/performance/list/index.html'
+    entry: './src/modules/performance/ListIndex.ts'
+    // template: 'src/modules/performance/list/index.html'
+  },
+  "performance.report": {
+    entry: './src/modules/performance/PerformanceReportIndex.ts'
+    // template: 'src/modules/performance/list/index.html'
   },
 
   // ------------ 订阅通知日报 ------------

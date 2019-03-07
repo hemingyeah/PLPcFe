@@ -8,7 +8,6 @@ Vue.prototype.$http = http;
 const ListViewComp = Vue.extend(ListView);
 let initData = {};
 
-console.log('window', window);
 
 try {
     initData = JSON.parse((<any>window)._init || '{}');
@@ -17,11 +16,11 @@ try {
     console.error('no init data')
 }
 
-console.log('initData', initData);
-
-
-
-const app = new ListViewComp({});
+const app = new ListViewComp({
+    propsData: {
+        initData
+    }
+});
 
 app.$mount('#app');
 

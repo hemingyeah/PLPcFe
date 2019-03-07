@@ -5,15 +5,51 @@
       <base-button type="primary" native-type="submit" @event="openSettingDialog">添加</base-button>
     </h2>
 
+    <el-table
+      stripe
+      :data="rules"
+      v-loading="loading"
+      :highlight-current-row="false">
+      <el-table-column
+        v-for="column in columns"
+        :key="column.field"
+        :label="column.label"
+        :prop="column.field"
+        :width="column.width"
+        show-overflow-tooltip
+      >
 
+        <template slot-scope="scope">
+          <template v-if="column.field === 'ruleType'">
+            {{scope.row[column.field] | ruleType}}
+          </template>
+          <template v-else-if="column.field === 'effect'">
+            <el-switch
+              :disabled="scope.row.pending"
+              @change="toggleStatus(scope.row)"
+              :value="Boolean(scope.row.effect)">
+            </el-switch>
+          </template>
+          <template v-else-if="column.field === 'action'">
+            <el-button plain @click="editRule(scope.row)" size="small">编辑</el-button>
+            <el-button type="danger" @click="deleteRule(scope.row)" size="small">删除</el-button>
+          </template>
 
-    <setting-rule-dialog :all-types="allTypes" ref="settingRuleDialog"></setting-rule-dialog>
+          <template v-else>
+            {{scope.row[column.field]}}
+          </template>
+        </template>
+
+      </el-table-column>
+    </el-table>
+
+    <setting-rule-dialog @refresh-rules="fetchRules" :all-types="allTypes" :performance-rule="editedPerformanceRule" ref="settingRuleDialog" />
   </div>
 </template>
 
 <script>
 import SettingRuleDialog from './components/SettingRuleDialog.vue';
-
+import {getAllPerformanceRules, deleteAllPerformanceRules, togglePerformanceRuleEffect} from '@src/api/PerformanceApi';
 
 export default {
   name: "rule-setting",
@@ -25,6 +61,10 @@ export default {
   },
   data() {
     return {
+      rules: [],
+      columns: this.buildColumns(),
+      loading: false,
+      editedPerformanceRule: {},
     }
   },
   computed: {
@@ -46,13 +86,118 @@ export default {
       };
     }
   },
+  filters: {
+    ruleType(val) {
+      return val ? '奖金制' : '计分制';
+    }
+  },
   mounted() {
-    console.log('mounted');
+    this.fetchRules();
+
   },
   methods: {
+    editRule(row) {
+      this.$refs.settingRuleDialog.toggleDialog({
+        ...row,
+        ruleContent: JSON.parse(row.ruleContent)
+      })
+    },
     openSettingDialog() {
       this.$refs.settingRuleDialog.toggleDialog();
     },
+    fetchRules() {
+
+      this.loading = true;
+      getAllPerformanceRules()
+        .then(res => {
+          if (!res.status) {
+            this.rules = res.data
+              .map(rule => ({
+                ...rule,
+                pending: false,
+              }))
+
+          }
+          this.loading = false;
+        })
+        .catch(e => console.error('e', e));
+    },
+    toggleStatus(row) {
+      const ns = row.effect ? 0 : 1;
+      row.pending = true;
+      const params = {
+        id: row.id,
+        effect: ns,
+      };
+
+
+      togglePerformanceRuleEffect(params)
+        .then(res => {
+          console.log('res', res);
+          row.pending = false;
+          if (res.status) {
+            // 失败 提示
+            return;
+          }
+
+          this.rules.forEach(rule => {
+            if (rule.id === row.id) {
+              rule.effect = ns;
+            }
+          })
+        })
+        .catch(e => console.error('e', e));
+    },
+    async deleteRule(row) {
+      const result = await this.$platform.confirm('您确定要删除该条规则吗?');
+      if (!result) return;
+
+      deleteAllPerformanceRules(row.id)
+        .then(res => {
+
+          if (!res.status) {
+            // 提示成功。
+            this.fetchRules();
+          }
+
+          console.log('res', res);
+        })
+        .catch(e => console.error('e', e));
+    },
+    buildColumns() {
+      return [
+        {
+          label: '规则名称',
+          field: 'ruleName',
+          show: true,
+          // width: '150px'
+        },
+        {
+          label: '规则说明',
+          field: 'ruleDesc',
+          show: true,
+          // width: '300px'
+        },
+        {
+          label: '类别',
+          field: 'ruleType',
+          show: true,
+          // width: '100px'
+        },
+        {
+          label: '启用/禁用',
+          field: 'effect',
+          show: true,
+          // width: '100px'
+        },
+        {
+          label: '操作',
+          field: 'action',
+          show: true,
+          // width: '100px'
+        },
+      ]
+    }
   },
   components: {
     [SettingRuleDialog.name]: SettingRuleDialog,
@@ -71,8 +216,14 @@ export default {
       line-height: 32px;
       font-size: 16px;
       margin: 0;
-
     }
+
+    // table
+    .el-table__body {
+      width: 100% !important;
+    }
+
+
   }
 
 </style>
