@@ -57,7 +57,7 @@
               <i class="iconfont icon-kefu"></i>
             </button>
 
-            <el-popover trigger="click" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
+            <el-popover trigger="click" :value="exportPopperVisible" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
               <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
                 <i class="iconfont icon-xiazai"></i>
               </button>
@@ -70,13 +70,48 @@
                     <div class="export-row-info">
                       <h4>{{item.name}}</h4>
                       <p>{{item.createTime | fmt_datetime}}</p>
-                    </div>  
-                    <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">{{item.isFinished == 0 ? '导出中' : '已完成'}}</div>
-                    <template v-if="operationList.some(o => o.id == item.id)"><span class="export-operate-btn">请稍等</span></template>
-                    <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>{{item.isFinished == 0 ? '取消' : '下载'}}</button>
+                    </div>
+                    <!-- start 导出状态 -->
+                    <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">
+                      <template v-if="item.action == 'export' || !item.action">
+                        {{item.isFinished == 0 ? '导出中' : '已完成'}}
+                      </template>
+                      <template v-if="item.action == 'import' || item.action == 'update'">
+                        <span v-if="item.isFinished == 0">
+                          {{ item.action == 'import' ? '导入' : '更新'}}中
+                        </span>
+                        <span v-if="item.isFinished == 1">
+                          已完成
+                        </span>
+                        <span v-if="item.isFinished == 2">
+                          {{ item.action == 'import' ? '导入' : '更新'}}失败
+                        </span>
+                      </template>
+                    </div>
+                    <!-- end 导出状态 -->
+                    <template v-if="operationList.some(o => o.id == item.id)">
+                      <span class="export-operate-btn">请稍等</span>
+                    </template>
+                    <!-- start 导出导入按钮 -->
+                    <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>
+                      <template v-if="item.action == 'export' || !item.action">
+                        {{item.isFinished == 0 ? '取消' : '下载'}}
+                      </template>
+                      <template v-if="item.action == 'import' || item.action == 'update'">
+                        <span v-if="item.isFinished == 1">
+                          确定
+                        </span>
+                        <span v-if="item.isFinished == 2">
+                          {{ item.action == 'import' ? '确定' : '确定'}}
+                        </span>
+                      </template>
+                    </button>
+                    <!-- end 导出导入按钮 -->
                   </div>
                 </template>
-                <p class="export-empty" v-else>您没有待下载的文件</p>
+                <p class="export-empty" v-else>
+                  您没有待下载的文件
+                </p>
               </div>
             </el-popover>
             <!--导出下载-->
@@ -209,6 +244,7 @@ export default {
       profilePopperVisible: false, 
       userStatePopperVisible: false,
       saleManagerShow: false, // 是否显示专属客服
+      exportPopperVisible: false,
 
       collapse: true,
 
@@ -304,7 +340,7 @@ export default {
     openUserView(event){
       this.openForFrame({
         id: 'userCenter',
-        url: `/mine/${ this.loginUser.userId}`,
+        url: `/mine/${this.loginUser.userId}`,
         title: '个人中心'
       })
       this.profilePopperVisible = false;
@@ -320,7 +356,7 @@ export default {
     /** 检测是否有导出 */
     async checkExports(){
       try {
-        this.exportList = await http.get('/export/getList');
+        this.exportList = await http.get('/excels/getList');
         // 更新操作列表
         if(!Array.isArray(this.exportList)) this.exportList = [];
         //更新操作列表
@@ -353,26 +389,66 @@ export default {
       }
     },
     async execExportFile(item){
-      // 下载文件
-      if(item.isFinished == 1){
+      // 导出 取消下载文件
+      if((item.action == 'export' || !item.action) && item.isFinished == 0) {
+        if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
+      
+          this.operationList.push({id: item.id, operate: 'cancel'})
+
+          try {
+            let result = await http.post('excels/cancel', {id: item.id}, false);
+
+            if(result.status == 0) {
+              this.operationList = this.operationList.filter(i => i.id != item.id)
+              this.checkExports();
+            } else {
+              platform.alert(result.message);
+            }
+            return
+
+          } catch (error) {
+            console.log('error: ', error);
+          }
+
+        }
+      }
+      // 导出 下载文件
+      if((item.action == 'export' || !item.action) && item.isFinished == 1){
         let frame = document.createElement('iframe');
         frame.style.display = 'none';
-        frame.src = `/export/download?id=${item.id}`;
+        frame.src = `/excels/download?id=${item.id}`;
         document.body.appendChild(frame);
 
         this.operationList.push({id: item.id, operate: 'download'})
         this.checkExports();
         return
       }
+      // 导入或更新完成
+      if(
+        (
+          item.action == 'import'
+          || item.action == 'update'
+        )
+      ){
+        this.operationList.push({id: item.id, operate: 'cancel'});
+        try {
+          let result = await http.get('/excels/import/delete', { id: item.id});
+          let data = JSON.parse(result.data);
+          let action = item.action == 'import' ? '导入' : '更新';
 
-      // 取消下载
-      if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
-        this.operationList.push({id: item.id, operate: 'cancel'})
-        let result = await http.post('export/cancel', {id: item.id}, false);
-        if(result.status == 0) {
-          this.operationList = this.operationList.filter(i => i.id != item.id)
-          this.checkExports();
+          this.operationList = this.operationList.filter(i => i.id != item.id);
+
+          if(data.isImported) {
+            platform.alert(`共${action}了${data.total}条数据`);
+          } else {
+            platform.alert(`${action}失败原因:${data.reasons.join('\n')}`);
+          }
+          
+        } catch (error) {
+          console.log('error: ', error);
         }
+        this.checkExports();
+        return
       }
     },
     clearStorage(){
@@ -389,6 +465,8 @@ export default {
     },
     // popover manage
     exportPopoverToggle(visable){
+      this.exportPopperVisible = visable;
+
       if(visable){
         this.profilePopperVisible = false
         this.userStatePopperVisible = false;
@@ -492,6 +570,8 @@ export default {
     // TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
+    window.exportPopoverToggle = this.exportPopoverToggle;
+
     window.resizeFrame = function(){
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     }

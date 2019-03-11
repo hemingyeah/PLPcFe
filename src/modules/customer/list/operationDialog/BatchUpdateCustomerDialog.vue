@@ -122,26 +122,21 @@ export default {
     },
     async upload(){
       try {
-        if(null == this.file || !(this.file instanceof File)) return Platform.alert(`请选择要导入的文件`);
+        if(null == this.file || !(this.file instanceof File)) return Platform.alert('请选择要导入的文件');
 
         if (!await this.$platform.confirm('本操作将会批量更新数据，更新成功后将无法恢复，是否确认')) return;
 
         this.pending = true;
         Uploader.upload(this.file, this.action)
           .then(result => {
-            if(result.status == 0){
-              let message = '导入成功！';
-              if(result.data && result.data.total) message += `共导入${result.data.total}条数据。`;
 
-              Platform.alert(message);
-              this.$emit('success');
-              this.batchUpdateCustomerDialog = false;
-            }else{
-              let data = result.data || [];
-              this.errors = data;
-              // Platform.alert(`导入失败！\n${data.join('\n')}`);
-            }
+            Platform.alert(result.message);
+            
+            this.batchUpdateCustomerDialog = false;
             this.pending = false;
+
+            window.parent.showExportList();
+            window.parent.exportPopoverToggle(true);
           })
           .catch(err => {
             console.error(err)

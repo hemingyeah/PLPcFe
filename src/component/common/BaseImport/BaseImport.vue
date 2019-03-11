@@ -71,27 +71,16 @@ export default {
       this.file = file
     },
     upload(){
-      if(null == this.file || !(this.file instanceof File)) return Platform.alert(`请选择要导入的文件`);
+      if(null == this.file || !(this.file instanceof File)) return Platform.alert('请选择要导入的文件');
 
       this.pending = true;
       Uploader.upload(this.file, this.action).then(result => {
-        if(result.status == 0){
-          let message = '导入成功！';
-          // 导入联系人的时候，返回的total竟然统计了第一行表头
-          let total = result.data.total;
-          if (this.action === '/contacts/import') {
-            total -= 1;
-          }
 
-          if(result.data && result.data.total) message += `共导入${total}条数据。`;
+        Platform.alert(result.message);
+        this.visible = false;
 
-          Platform.alert(message);
-          this.visible = false;
-          this.$emit('success');
-        }else{
-          let data = result.data || [];
-          this.errors = data;
-        }
+        window.parent.showExportList();
+        window.parent.exportPopoverToggle(true);
 
         this.pending = false;
       })

@@ -7,8 +7,12 @@
           <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
-          <base-button type="ghost" @event="resetParams">重置</base-button>
+          <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">
+            搜索
+          </base-button>
+          <base-button type="ghost" @event="resetParams">
+            重置
+          </base-button>
           <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
         <span class="advanced-search-visible-btn"
@@ -65,13 +69,14 @@
                 reserve-keyword
                 placeholder="请输入关键词搜索"
                 :loading="inputRemoteSearch.tag.loading"
-                :remote-method="searchTag">
-
+                :remote-method="searchTag"
+              >
                 <el-option
                   v-for="item in inputRemoteSearch.tag.options"
                   :key="item.id"
                   :label="item.tagName"
-                  :value="item.id">
+                  :value="item.id"
+                >
                 </el-option>
               </el-select> -->
             </el-form-item>
@@ -288,12 +293,12 @@
         @sort-change="sortChange"
         :highlight-current-row="false"
         header-row-class-name="customer-table-header"
-        ref="multipleTable" class="customer-table">
-
-        <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+        ref="multipleTable" class="customer-table"
+      >
+        <el-table-column type="selection" width="48" align="center" class-name="select-column">
+        </el-table-column>
         <el-table-column
           v-for="column in columns"
-          v-if="column.show"
           :key="column.field"
           :label="column.label"
           :prop="column.field"
@@ -301,9 +306,9 @@
           :min-width="column.minWidth || '120px'"
           :sortable="column.sortable"
           show-overflow-tooltip
-          :align="column.align">
-
-          <template slot-scope="scope">
+          :align="column.align"
+        >
+          <template slot-scope="scope" v-if="column.show">
             <template v-if="column.field === 'name'">
               <a href="" class="view-detail-btn" @click.stop.prevent="createCustomerTab(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
@@ -390,33 +395,40 @@
       :fields="customerConfig.fieldInfo"
       :default-address="defaultAddress"
       @submit-callback="search"
-      :selected-ids="selectedIds"></batch-editing-customer-dialog>
+      :selected-ids="selectedIds"
+    >
+    </batch-editing-customer-dialog>
+
+    <!-- start 批量更新 -->
     <batch-update-customer-dialog
       ref="batchUpdateCustomerDialog"
       :selected-ids="selectedIds"
       :total-items="paginationInfo.totalItems"
       :build-download-params="buildParams"
-      @success="search"
-      action="/customer/importCoverNew"
+      action="/excels/customer/update"
     ></batch-update-customer-dialog>
+    <!-- end 批量更新 -->
 
+    <!-- start 导入客户 -->
     <base-import
       title="导入客户"
       ref="importCustomerModal"
-      @success="search"
-      action="/customer/importNew">
+      action="/excels/customer/import"
+    >
       <div slot="tip">
         <div class="base-import-warn">
           请先下载<a href="/customer/import/templateNew">导入模版 </a>，填写完成后再上传导入。
         </div>
       </div>
     </base-import>
+    <!-- end 导入客户 -->
 
+    <!-- start 导入联系人 -->
     <base-import
       title="导入联系人"
       ref="importLinkmanModal"
       @success="importSucc"
-      action="/contacts/import">
+      action="/excels/contact/import">
       <div slot="tip">
         <div class="base-import-warn">
           <p style="margin: 0">请先下载<a href="/contacts/import/template">导入模版 </a>，填写完成后再上传导入。</p>
@@ -425,14 +437,18 @@
         </div>
       </div>
     </base-import>
+    <!-- 导入联系人 -->
 
+    <!-- start 导出客户 -->
     <base-export
       ref="exportPanel"
       :columns="exportColumns"
       :build-params="buildExportParams"
       :validate="checkExportCount"
       method="post"
-      action="/customer/exportNew"/>
+      action="/excels/customer/export"
+    />
+    <!-- end 导出客户 -->
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title">
@@ -910,7 +926,7 @@ export default {
     },
     importSucc() {
       // console.log('importSucc');
-      this.search();
+      // this.search();
     },
     search(cp = {}, fullSearch) {
       // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况

@@ -1,15 +1,23 @@
 <template>
   <base-modal title="导出列选择" :show.sync="visible" width="600px" class="base-export-modal">
     <div>
-      <el-checkbox v-model="isCheckedAll" @change="toggle">全选</el-checkbox>
+      <el-checkbox v-model="isCheckedAll" @change="toggle">
+        全选
+      </el-checkbox>
     </div>
     <el-checkbox-group v-model="checkedArr" @change="handleChange" style="width:100%;" class="base-export-field-wrap">
-      <el-checkbox v-for="col in filterColumns" :key="col.field" :label="col.exportAlias ? col.exportAlias : col.field" >{{col.label}}</el-checkbox>
+      <el-checkbox v-for="col in filterColumns" :key="col.field" :label="col.exportAlias ? col.exportAlias : col.field" >
+        {{col.label}}
+      </el-checkbox>
     </el-checkbox-group>
-   
+  
     <div slot="footer" class="export-footer">
-      <button type="button" class="btn base-modal-text-btn" @click="visible = false">关闭</button>
-      <button type="button" class="btn btn-primary" :disabled="pending" @click="exportData">{{pending ? '正在导出' : '导出'}}</button>
+      <button type="button" class="btn base-modal-text-btn" @click="visible = false">
+        关闭
+      </button>
+      <button type="button" class="btn btn-primary" :disabled="pending" @click="exportData">
+        {{pending ? '正在导出' : '导出'}}
+      </button>
     </div>
 
     <div class="base-export-bridge" ref="bridge"></div>
@@ -76,13 +84,13 @@ export default {
     handleChange(){
       this.isCheckedAll = this.checkedArr.length == this.filterColumns.length;
     },
-    //表单形式导出
+    // 表单形式导出 TODO: 修改
     formExport(params){
       let form = document.createElement('form');
       this.$refs.bridge.appendChild(form)
       
       for(let prop in params){
-        let input = document.createElement("input");  
+        let input = document.createElement('input');  
         input.name = prop;  
         input.value = params[prop];  
         form.appendChild(input);  
@@ -99,22 +107,17 @@ export default {
         this.$refs.bridge.removeChild(form)
       }, 150);
     },
-    //ajax形式导出
+    // ajax形式导出
     ajaxExport(params){
-      return http.axios(this.method, this.action, params, false, {responseType: 'blob'}).then(blob => {
-        let link = document.createElement('a');
-        let url = URL.createObjectURL(blob);
-        link.download = this.fileName;
-        link.href = url;
-        this.$refs.bridge.appendChild(link)
-        link.click();
+      return http.axios(this.method, this.action, params, false).then(res => {
 
         this.visible = false;
         this.pending = false;
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-          this.$refs.bridge.removeChild(link)
-        }, 150);
+
+        Platform.alert(res.message);
+        window.parent.showExportList();
+        window.parent.exportPopoverToggle(true);
+
       }).catch(err => console.error(err))
     },
     async exportData(){
@@ -122,7 +125,7 @@ export default {
 
       this.pending = true;
 
-      //如果提供验证函数，则进行验证
+      // 如果提供验证函数，则进行验证
       if(typeof this.validate == 'function'){
         let validateRes = await this.validate(this.ids, MAX_COUNT)
         if(validateRes) {
