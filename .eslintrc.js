@@ -52,7 +52,49 @@ module.exports = {
     "vue/mustache-interpolation-spacing": "off",
     "vue/name-property-casing": ["error", "kebab-case"],
     "vue/comment-directives": "off",
-    "vue/require-default-prop": "off"
+    "vue/require-default-prop": "off",
+
+    // spec
+    //spec
+    "no-var": "error", // 禁止使用 var 变量
+    "object-shorthand": ["warn", "always"], // 在对象中 方法属性使用简写
+    // "no-return-assign": "warn", // 禁止在return中 使用赋值运算符
+    "no-const-assign": "error", // 禁止修改 const
+    "no-dupe-class-members": "error", // 禁止在类中使用重复的名称
+    // "prefer-destructuring": ["error", { "object": true, "array": false }], // 对象解构
+    "quotes": ["error", "single"], // 要求字符串尽可能使用单引号
+    "prefer-template": "error", // 字符串使用模板文字
+    "no-duplicate-imports": ["error", { "includeExports": true }], // 仅从 一个路径导入
+    // "first": "error", // 将所有导入语句放在非导入语句之上
+    "operator-linebreak": ["warn", "none", {
+      "overrides": {
+        "&&": "before",
+        "||": "before",
+        "++": "before",
+        "+": "before",
+        "-": "before",
+        "--": "before",
+        "*": "before",
+        "/": "before",
+        "?": "before",
+        ":": "before",
+        "`": "before",
+      }
+    }
+    ], // 在赋值中 避免在 = 之前之后换行
+    "no-case-declarations": "error", // 将子句包装在块中
+    "no-unneeded-ternary": "warn", // 避免不必要的三元表达式
+    "no-mixed-operators": "error", // 混合运算时，请将表达式 包含在括号中
+    "brace-style": "error", // 将else 放在与if块的右括号相同的行上
+    "no-else-return": "error", // if return 语句
+    "spaced-comment": ["warn", "always"], // 注释之前 跟一个空格
+    "indent": ["error", 2], // 两空格缩进
+    "space-infix-ops": "error", // 运算符间距
+    "comma-spacing": ["error", { "before": false, "after": true }], // 逗号间距
+    "computed-property-spacing": ["error", "never"], // 禁止属性内的空格
+    "no-array-constructor": "error", // 禁止 array 构造函数·
+    "new-cap": "error", // 构造函数名称以大写字母开头
+    "no-param-reassign": 1, // 不要改变参数
   },
   "overrides": [
     {

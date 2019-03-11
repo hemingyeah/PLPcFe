@@ -7,13 +7,13 @@ const baseConfig = require('./webpack.base.conf')
 const util = require('./util')
 
 
-//https://github.com/webpack-contrib/mini-css-extract-plugin
+// https://github.com/webpack-contrib/mini-css-extract-plugin
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-//https://www.npmjs.com/package/webpack-bundle-analyzer
-//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// https://www.npmjs.com/package/webpack-bundle-analyzer
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = merge(baseConfig, {
   mode: 'production',
@@ -24,17 +24,18 @@ module.exports = merge(baseConfig, {
   },
   resolve: {
     alias: {
-      'app.config': path.resolve(__dirname,'../src/config/production.js'),
+      'app.config': path.resolve(__dirname, '../src/config/production.js'),
     }
   },
+  devtool: '#source-map',
   optimization: {
-    //runtimeChunk: true,
+    // runtimeChunk: true,
     splitChunks: {
       cacheGroups: {
         vendors: {
           name: 'vendors',
           test: /[\\/]node_modules[\\/]/,
-          //https://github.com/webpack/webpack/blob/master/lib/optimize/SplitChunksPlugin.js#L283 
+          // https://github.com/webpack/webpack/blob/master/lib/optimize/SplitChunksPlugin.js#L283 
           // test(module, chunks){
           //   if(module.nameForCondition){
           //     let name = module.nameForCondition();
@@ -68,7 +69,7 @@ module.exports = merge(baseConfig, {
   },
   plugins: [
     new CleanWebpackPlugin(['dist'], {
-      root: path.join(__dirname,'..')
+      root: path.join(__dirname, '..')
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[chunkhash:8].css',
@@ -77,6 +78,6 @@ module.exports = merge(baseConfig, {
     new OptimizeCSSPlugin(),
     new LodashModuleReplacementPlugin(),
     ...util.genHtmlPlugins(),
-    //new BundleAnalyzerPlugin()
+    // new BundleAnalyzerPlugin()
   ]
 });
