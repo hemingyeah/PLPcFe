@@ -27,7 +27,7 @@ function updatePerformanceRule(params) {
 
 // performance report
 function createPerformanceReport(params) {
-  return http.post('/performance/v2/contain/work_order', params, false)
+  return http.post('/performance/v2/contain/work_order', params, false) // form data
 }
 
 function getPerformanceReports(params) {
@@ -35,7 +35,7 @@ function getPerformanceReports(params) {
 }
 
 function deletePerformanceReports(params) {
-  return http.get('/performance/v2/delete/report_desc/by_report_id', params);
+  return http.post('/performance/v2/delete/report_desc/by_report_id', params, false);
 }
 
 export {

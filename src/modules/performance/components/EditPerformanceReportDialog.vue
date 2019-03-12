@@ -1,77 +1,122 @@
 <template>
   <base-modal :title="title" :show.sync="visible" width="600px" class="base-import-modal" @closed="reset">
-    <el-form ref="form" :model="form" label-width="100px">
-      <el-form-item label="报告名称" :error="!formValidation.reportName ? '必填': ''">
-        <el-input v-model="form.reportName" @change="validate"> </el-input>
-      </el-form-item>
-      <el-form-item label="选择规则" :error="!formValidation.ruleId ? '必选': ''">
-        <el-select v-model="form.ruleId" @change="validate" placeholder="请选择" style="width: 100%;">
-          <el-option
-            v-for="item in openRules"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+    <div class="build-stage" v-if="stage === 'build'">
+      <el-form ref="form" :model="form" label-width="100px">
+        <el-form-item label="报告名称" :error="!formValidation.reportName ? '必填': ''">
+          <el-input v-model="form.reportName" @change="validate"> </el-input>
+        </el-form-item>
+        <el-form-item label="选择规则" :error="!formValidation.ruleId ? '必选': ''">
+          <el-select v-model="form.ruleId" @change="validate" placeholder="请选择" style="width: 100%;">
+            <el-option
+              v-for="item in openRules"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
 
-      </el-form-item>
-      <el-form-item label="规则说明">
-        <el-input :value="ruleDesc" type="textarea" readonly></el-input>
-      </el-form-item>
-      <h3>报告统计对象</h3>
-      <el-form-item label="统计以下对象">
-        <el-select v-model="form.range" placeholder="请选择" @change="form.target = []" style="width: 130px;">
-          <el-option
-            v-for="item in rangeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <el-select v-model="form.target" multiple collapse-tags @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 250px;" placeholder="请选择">
-          <el-option
-            v-for="item in targetOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <el-button plain @click="selectAll">选择全部</el-button>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-select v-model="form.state" placeholder="请选择" style="width: 130px;">
-          <el-option
-            v-for="item in statusOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+        </el-form-item>
+        <el-form-item label="规则说明">
+          <el-input :value="ruleDesc" type="textarea" readonly></el-input>
+        </el-form-item>
+        <h3>报告统计对象</h3>
+        <el-form-item label="统计以下对象">
+          <el-select v-model="form.range" placeholder="请选择" @change="form.target = []" style="width: 130px;">
+            <el-option
+              v-for="item in rangeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          <el-select v-model="form.target" multiple collapse-tags @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 250px;" placeholder="请选择">
+            <el-option
+              v-for="item in targetOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          <el-button plain @click="selectAll">选择全部</el-button>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="form.state" placeholder="请选择" style="width: 130px;">
+            <el-option
+              v-for="item in statusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
 
-      </el-form-item>
-      <el-form-item label="完成时间" :error="!formValidation.time ? '必选': ''">
-        <el-date-picker
-          v-model="form.time"
-          type="daterange"
-          align="right"
-          unlink-panels
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          @change="validate"
-          style="width: 290px;"
-          :picker-options="createTimePickerOptions">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="备注">
-        <el-input v-model="form.remarks" type="textarea"></el-input>
-      </el-form-item>
-    </el-form>
+        </el-form-item>
+        <el-form-item label="完成时间" :error="!formValidation.time ? '必选': ''">
+          <el-date-picker
+            v-model="form.time"
+            type="daterange"
+            align="right"
+            unlink-panels
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="validate"
+            style="width: 290px;"
+            :picker-options="createTimePickerOptions">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="form.remarks" type="textarea"></el-input>
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" @click="onSubmit" :disabled="pending">确 定</el-button>
+      </div>
+    </div>
+    <div class="confirm-stage" v-if="stage === 'confirm'">
+      <el-table :data="reports" stripe >
+
+        <el-table-column
+          v-for="column in columns"
+          :key="column.field"
+          :label="column.label"
+          :prop="column.field"
+          show-overflow-tooltip>
+          <template slot-scope="scope">
+            <template v-if="column.field === 'tagName'">
+              {{scope.row[column.field]}}
+            </template>
+            <template v-else-if="column.field === 'taskNo'">
+              <a href="" class="view-detail-btn" @click.stop.prevent="viewTask(scope.row)">{{scope.row[column.field]}}</a>
+            </template>
+            <template v-else-if="column.field === 'executor'">
+              {{scope.row[column.field].displayName}}
+            </template>
+            <template v-else>
+              {{scope.row[column.field]}}
+            </template>
+          </template>
+        </el-table-column>
+      </el-table>
 
 
-    <div class="dialog-footer">
-      <el-button @click="visible = false">取 消</el-button>
-      <el-button type="primary" @click="onSubmit" :disabled="pending">确 定</el-button>
+      <div class="dialog-footer" style="margin-top: 15px;">
+        <el-button @click="visible = false">取 消</el-button>
+        <!--sign:screen-->
+        <el-button type="primary" @click="confirmCreateReport('screen')" :disabled="pending">去除重复数据并继续</el-button>
+        <el-button type="primary" @click="confirmCreateReport('continuation')" :disabled="pending">包含重复数据并继续</el-button>
+      </div>
+
+    </div>
+
+    <div class="stage-success" v-if="stage === 'success'">
+      <p>报告名称：{{createReportResult.name || createReportResult.reportName}}</p>
+      <p>统计范围：{{createReportResult.totalNumber}}</p>
+      <p>规则命中：{{createReportResult.hitNumber}}</p>
+      <p>起止时间：{{createReportResult.time}}</p>
+      <div class="dialog-footer" style="margin-top: 15px;">
+        <el-button type="primary" @click="viewDetail">查看详情</el-button>
+      </div>
     </div>
   </base-modal>
 </template>
@@ -79,7 +124,6 @@
 <script>
 import { formatDate, } from '@src/util/lang';
 import {createPerformanceReport} from '@src/api/PerformanceApi';
-
 export default {
   name: "edit-performance-report-dialog",
   props: {
@@ -92,7 +136,6 @@ export default {
     return {
       visible: false,
       pending: false,
-      title: '新增绩效报告',
       createTimePickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -140,7 +183,9 @@ export default {
           value: 1,
         },
       ],
-
+      reports: [],
+      stage: 'build',
+      createReportResult: {},
       form: {
         reportName: '',
         ruleId: '',
@@ -149,6 +194,7 @@ export default {
         target: [],
         state: 0,
         remarks: '',
+        sign: 'first',
       },
       formValidation: {
         reportName: true,
@@ -160,6 +206,11 @@ export default {
     }
   },
   computed: {
+    title() {
+      if (this.stage === 'build') return '新增绩效报告';
+      if (this.stage === 'confirm') return '重复统计';
+      return '统计成功';
+    },
     openRules() {
       return this.initData.AllOpenRules
         .map(({id, ruleName, ruleDesc}) => ({
@@ -190,13 +241,55 @@ export default {
       let formRuleId = this.form.ruleId;
       if (formRuleId) return this.openRules.filter(({value}) => value === formRuleId)[0].ruleDesc;
       return '';
+    },
+    columns() {
+      const range = this.form.range;
+      return [
+        {
+          label: '所属团队',
+          field: 'tagName',
+          show: !!range
+        },
+        {
+          label: '工单编号',
+          field: 'taskNo',
+          show: true
+        },
+        {
+          label: '客户',
+          field: 'cusName',
+          show: true
+        },
+        {
+          label: '负责人',
+          field: 'executor',
+          show: true
+        },
+      ].filter(c => c.show)
     }
   },
-  mounted() {
-  },
   methods: {
-    selectAll() {
-      this.form.target = this.targetOptions.map(t => t.value);
+    confirmCreateReport(sign) {
+      let params = {
+        ...this.buildParams(),
+        sign,
+      };
+      this.pending = true;
+
+      createPerformanceReport(params)
+        .then(res => {
+          console.log('res', res);
+          this.pending = false;
+          if ([1, 7, 8, 11].some(v => v === res.status)) {
+            // todo failed message
+            // 1 失败 8 无可统计的工单 7 无可结算员工信息
+            return;
+          }
+
+          this.stage = 'success';
+          this.createReportResult = res.data;
+        })
+        .catch(e => console.error('e', e));
     },
     onSubmit() {
       let res = this.validateForm();
@@ -207,14 +300,35 @@ export default {
 
       createPerformanceReport(params)
         .then(res => {
-          console.log('res', res);
+          // 0 成功
+          // 1 失败
+          // 7 没有可结算的员工信息，只出现在团队
+          // 8 无可统计工单 || 无可结算的订单
+          // 9 结算重复的工单 || 结算重复
+          // 11 去重后无可结算的工单
+
+          this.pending = false;
+          if ([1, 7, 8, 11].some(v => v === res.status)) {
+            // todo failed message
+            // 1 失败 8 无可统计的工单 7 无可结算员工信息
+            return;
+          }
+
+          // 结算重复
+          if (res.status === 9) {
+            this.reports = res.data;
+            this.stage = 'confirm';
+            return;
+          }
+          // todo  结果为空的情况
+          // 最后才是有不重复的数据生成报告
+
           if (!res.status) {
             this.visible = false;
             // todo 成功失败的弹窗提示 刷新列表
             this.$emit('refresh-list');
             this.reset();
           }
-          this.pending = false;
         })
         .catch(e => {
           this.pending = false;
@@ -222,21 +336,45 @@ export default {
         });
     },
     buildParams() {
-      const {ruleId, reportName, time, target, range, state, remarks} = this.form;
-      let params = {
+      const {ruleId, reportName, time, target, range, state, remarks, sign} = this.form;
+      return {
         ruleId,
         reportName,
         timeType: state,
         remarks,
-        startTime: formatDate(time[0], 'YYYY-MM-DD'),
-        endTime: formatDate(time[1], 'YYYY-MM-DD'),
+        startTime: formatDate(time[0], 'YYYY-MM-DD HH:mm:ss'),
+        endTime: formatDate(time[1], 'YYYY-MM-DD') + ' 23:59:59',
         [range ? 'teams' : 'users']: target.join(','),
-      };
+        sign,
+      }
+    },
+    viewTask(row){
+      let fromId = window.frameElement.getAttribute('id');
 
-      console.log('this.form', this.form);
-      console.log('params', params);
+      this.$platform.openTab({
+        id: `taskView_${row.taskId}`,
+        title: `工单${row.taskNo}`,
+        close: true,
+        url: `/task/view/${row.taskId}?noHistory=1`,
+        fromId: fromId
+      })
+    },
+    viewDetail() {
+      const id = this.createReportResult.reportId;
+      let fromId = window.frameElement.getAttribute('id');
+      this.visible = false;
+      this.reset();
 
-      return params;
+      this.$platform.openTab({
+        id: `performanceReport${id}`,
+        title: '绩效报告详情',
+        close: true,
+        url: `/performance/v2/report/desc/${id}`,
+        fromId: fromId
+      })
+    },
+    selectAll() {
+      this.form.target = this.targetOptions.map(t => t.value);
     },
     validate() {
       if (!this.submitted) return;
@@ -261,6 +399,10 @@ export default {
     },
 
     reset() {
+      if (this.stage === 'success') {
+        this.$emit('refresh-list');
+      }
+
       this.form = {
         reportName: '',
         ruleId: '',
@@ -269,7 +411,10 @@ export default {
         target: [],
         state: 0,
         remarks: '',
+        sign: 'first',
       };
+      this.stage = 'build';
+      this.submitted = false;
       this.formValidation = {
         reportName: true,
         ruleId: true,
@@ -286,6 +431,14 @@ export default {
   .input-is-error input {
     border-color: #f56c6c;
   }
+
+  .confirm-stage {
+    .el-table {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  }
+
 
   .dialog-footer {
     display: flex;

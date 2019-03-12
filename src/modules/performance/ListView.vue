@@ -5,22 +5,31 @@
         <el-input v-model="params.keyword" placeholder="根据绩效名称搜索">
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
-        <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
-        <base-button type="ghost" @event="resetParams">重置</base-button>
+        <base-button type="primary" @event="search(true)" native-type="submit">搜索</base-button>
+        <base-button type="ghost" @event="reSearch">重置</base-button>
       </div>
       <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
     </form>
 
-    <div class="advanced-search">
-      <h4>高级搜索</h4>
-      <form class="advanced-search-form" onsubmit="return false;">
-        <form-item label="绩效类型">
-          <el-input v-model="params.keyword" placeholder="根据绩效名称搜索">
-          </el-input>
-        </form-item>
-        <form-item label="创建时间">
+    <!--高级搜索-->
+    <base-panel :show.sync="advancedSearchPanelShow" width="420px">
+      <h3 slot="title">
+        <span>高级搜索</span>
+      </h3>
+      <el-form class="advanced-search-form" onsubmit="return false;">
+        <el-form-item label-width="100px" label="绩效类型">
+          <el-select v-model="secondaryParams.type" placeholder="请选择">
+            <el-option
+              v-for="item in rangeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label-width="100px" label="创建时间">
           <el-date-picker
-            v-model="params.createTime"
+            v-model="secondaryParams.time"
             type="daterange"
             align="right"
             unlink-panels
@@ -29,19 +38,19 @@
             end-placeholder="结束日期"
             :picker-options="createTimePickerOptions">
           </el-date-picker>
-        </form-item>
-      </form>
-      <div class="btn-group">
-        <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
-        <base-button type="ghost" @event="resetParams">重置</base-button>
-      </div>
-    </div>
+        </el-form-item>
+        <div class="advanced-search-btn-group">
+          <base-button type="ghost" @event="resetParams">重置</base-button>
+          <base-button type="primary" @event="search(true)" native-type="submit">搜索</base-button>
+        </div>
+      </el-form>
+    </base-panel>
 
     <div class="performance-list">
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" @click="deleteReport">删除</base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteReport">删除</base-button>
           <a href="https://help.shb.ltd/doc?id=10501#Performance_report">如何通过绩效报告统计团队或个人数据？</a>
         </div>
 
@@ -116,14 +125,12 @@
         background
         @current-change="jump"
         @size-change="handleSizeChange"
-        :page-sizes="[10, 20, 50]"
-        :page-size="paginationInfo.pageSize"
-        :current-page="paginationInfo.pageNum"
+        :page-sizes="[1,10, 20, 50]"
+        :page-size="params.pageSize"
+        :current-page="params.pageNum"
         layout="sizes, prev, pager, next, jumper"
-        :total="paginationInfo.totalItems">
+        :total="params.totalItems">
       </el-pagination>
-
-
 
     </div>
     <edit-performance-report-dialog :init-data="initData" @refresh-list="search" ref="reportDialog" />
@@ -133,7 +140,6 @@
 <script>
 import { formatDate, } from '@src/util/lang';
 import {getPerformanceReports, deletePerformanceReports} from '@src/api/PerformanceApi';
-
 import EditPerformanceReportDialog from './components/EditPerformanceReportDialog.vue';
 
 export default {
@@ -146,6 +152,7 @@ export default {
   },
   data() {
     return {
+      advancedSearchPanelShow: false,
       createTimePickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -174,110 +181,72 @@ export default {
         }]
       },
       loading: false,
-      advancedSearchPanelShow: false,
       columns: this.buildColumns(),
       multipleSelection: [],
       reports: [],
+      rangeOptions: [
+        {
+          label: '全部',
+          value: 995,
+        },
+        {
+          label: '按人员',
+          value: 0,
+        },
+        {
+          label: '按团队',
+          value: 1,
+        },
+      ],
       params: {
         keyword: '',
-        createTime: '',
-      },
-      paginationInfo: {
-        pageSize: 10,
+        time: '',
+        type: 995,
         pageNum: 1,
+        pageSize: 10,
         totalItems: 0,
+      },
+      secondaryParams: {
+        time: '',
+        type: 995,
       },
     }
   },
   mounted() {
+    const localStorageData = this.getLocalStorageData();
 
-    console.log('mounted this.initData', this.initData);
+    if (localStorageData.pageSize) {
+      this.params.pageSize = Number(localStorageData.pageSize);
+    }
+
     this.search();
   },
   methods: {
-    async deleteReport() {
-      if (!this.multipleSelection.length) {
-        return this.$platform.alert('请选择需要删除的绩效报告');
-      }
-      try {
-        if (!await this.$platform.confirm('确定要删除选择的绩效报告？')) return;
-
-        deletePerformanceReports({
-          ids: this.multipleSelection,
-        })
-          .then(res => {
-            this.multipleSelection = [];
-            this.search();
-          })
-          .catch(err => console.error('deleteCustomer err', err));
-      } catch (e) {
-        console.error('catch error', e);
+    search(fullSearch) {
+      if (fullSearch) {
+        this.params = {
+          ...this.params,
+          ...this.secondaryParams,
+          pageNum: 1,
+        }
       }
 
-
-    },
-    viewDetail(row) {
-      // 新开tab 打开 /performance/report?id=623
-      let fromId = window.frameElement.getAttribute('id');
-
-      this.$platform.openTab({
-        id: `performanceReport${row.id}`,
-        title: '绩效报告详情',
-        close: true,
-        url: `/setting/performance/v2/report/detail/${row.id}`,
-        fromId: fromId
-      })
-
-    },
-    openDialog() {
-      console.log('openDialog')
-      this.$refs.reportDialog.toggleDialog();
-    },
-    handleSelection(selection) {
-
-      console.log('selection', selection);
-      this.multipleSelection = selection
-        .map(({id}) => id);
-    },
-    jump() {
-
-    },
-    handleSizeChange() {
-
-    },
-    modifyColumnStatus(val, column) {
-      this.columns = this.columns
-        .map(c => {
-          if (c.field === column.field) {
-            c.show = val;
-          }
-          return c;
-        });
-      let columnIsShow = this.columns.filter(c => c.show).map(c => c.field);
-
-      console.log('this.columns', this.columns);
-
-      this.saveDataToStorage('columnStatus', columnIsShow);
-    },
-    init() {
-      console.log('init');
-    },
-    search() {
-
-
-      // /performance/v2/list/report
-      let params = {
-        // ...this.params
-        pageSize: 10,
-        pageNum: 1
-      };
+      let params = this.buildParams();
       this.loading = true;
 
       getPerformanceReports(params)
         .then(res => {
-
           this.loading = false;
-          console.log('res', res);
+          if (res.status) return {
+            //TODO failed message
+          };
+
+          if (!res.data.reportList) {
+            this.reports = [];
+            this.params.totalItems = 0;
+            return;
+          }
+
           this.reports = res.data.reportList.list
             .map(({users, createUserName, createTime, startTime, endTime, type, reportName, ruleIds, id}) => Object.freeze({
               reportName,
@@ -289,13 +258,111 @@ export default {
               endTime: formatDate(new Date(endTime), 'YYYY-MM-DD'),
               type: type ? '按团队' : '按个人',
               id
-            }))
+            }));
+          this.params.totalItems = res.data.reportList.total;
         })
         .catch(e => console.error('e', e));
 
     },
-    resetParams() {
+    buildParams() {
+      const {keyword, pageNum, pageSize, time, type,} = this.params;
+      let params = {
+        pageNum,
+        pageSize,
+      };
 
+      if (keyword) {
+        params.reportName = keyword;
+      }
+
+      if (time) {
+        params.startTime = formatDate(new Date(time[0]), 'YYYY-MM-DD HH:mm:ss');
+        params.endTime = formatDate(new Date(time[1]), 'YYYY-MM-DD') + ' 23:59:59';
+      }
+
+      if (type !== 995) {
+        params.type = type;
+      }
+
+      return params;
+    },
+    reSearch() {
+      this.resetParams();
+      this.search();
+    },
+    viewDetail(row) {
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `performanceReport${row.id}`,
+        title: '绩效报告详情',
+        close: true,
+        url: `/performance/v2/report/desc/${row.id}`,
+        fromId: fromId
+      })
+
+    },
+    openDialog() {
+      this.$refs.reportDialog.toggleDialog();
+    },
+    handleSelection(selection) {
+      this.multipleSelection = selection.map(({id}) => id);
+    },
+    jump(pageNum) {
+      this.params.pageNum = pageNum;
+      this.search();
+    },
+    handleSizeChange(pageSize) {
+      this.saveDataToStorage('pageSize', pageSize);
+      this.params.pageNum = 1;
+      this.params.pageSize = pageSize;
+      this.search();
+    },
+    async deleteReport() {
+      if (!this.multipleSelection.length) {
+        return this.$platform.alert('请选择需要删除的绩效报告');
+      }
+      try {
+        if (!await this.$platform.confirm('确定要删除选择的绩效报告？')) return;
+
+        deletePerformanceReports({
+          ids: this.multipleSelection.join(',') + ',',
+        })
+          .then(res => {
+            // todo 成功失败提示
+            this.multipleSelection = [];
+            this.search();
+          })
+          .catch(err => console.error('deleteCustomer err', err));
+      } catch (e) {
+        console.error('catch error', e);
+      }
+    },
+    resetParams() {
+      this.params = {
+        ...this.params,
+        keyword: '',
+        time: '',
+        type: 995,
+        pageNum: 1,
+        totalItems: 0,
+      }
+
+      this.secondaryParams = {
+        time: '',
+        type: 995,
+      }
+    },
+    modifyColumnStatus(val, column) {
+      this.columns = this.columns
+        .map(c => {
+          if (c.field === column.field) {
+            c.show = val;
+          }
+          return c;
+        });
+      let columnIsShow = this.columns.filter(c => c.show).map(c => c.field);
+      this.saveDataToStorage('columnStatus', columnIsShow);
     },
     // todo 把之前的column状态迁移过来
     buildColumns() {
@@ -349,7 +416,7 @@ export default {
         }
       ].map(c => ({
         ...c,
-        show: columnIsShow.some(key => key === c.field)
+        show: !columnIsShow.length || columnIsShow.some(key => key === c.field)
       }));
     },
     saveDataToStorage(key, value) {
@@ -363,7 +430,7 @@ export default {
     },
   },
   components: {
-    [EditPerformanceReportDialog.name]: EditPerformanceReportDialog
+    [EditPerformanceReportDialog.name]: EditPerformanceReportDialog,
   }
 }
 </script>
@@ -375,10 +442,11 @@ export default {
     height: 100%;
   }
 
+
   .performance-list-container {
     padding: 10px;
 
-    .advanced-search, .base-search {
+    .base-search {
       background: #fff;
       border-radius: 3px;
       padding: 12px 10px;
@@ -417,27 +485,33 @@ export default {
       }
     }
 
-    .advanced-search {
-      padding-top: 0;
-      margin-bottom: 10px;
-      h4 {
-        border-bottom: 1px solid #f4f4f4;
-        line-height: 40px;
-        font-size: 14px;
-        margin: 0;
-      }
-      .el-input {
-        width: 350px;
-      }
+    .advanced-search-form {
 
-      .advanced-search-form {
-        .btn-group {
-          display: flex;
-          justify-content: flex-end;
+      .el-form-item {
+        .el-form-item__content,
+        .el-select,
+        .base-dist-picker,
+        .el-cascader,
+        .el-date-editor {
+          width: 290px;
         }
       }
 
+      .advanced-search-btn-group {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        position: absolute;
+        bottom: 0px;
+        background: #fff;
+        padding: 15px 20px;
+
+        .base-button {
+          margin: 0 10px;
+        }
+      }
     }
+
 
     .operation-bar-container {
       background: #fff;
@@ -486,8 +560,6 @@ export default {
       text-align: right;
       padding: 10px 5px;
     }
-
-
   }
 
 </style>

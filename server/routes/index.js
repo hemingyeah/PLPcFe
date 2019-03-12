@@ -74,7 +74,7 @@ router.get('/customer/createOnTask', async ctx => {
 });
 
 router.get('/performance/list', async ctx => {
-  ctx.redirect('/setting/performance/v2/report')
+  ctx.redirect('/performance/v2/report')
 });
 
 router.get('/customer/createOnEvent', async ctx => {
