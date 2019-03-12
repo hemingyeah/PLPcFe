@@ -309,10 +309,14 @@ html, body, .frame{
   padding: 4px 6px;
   line-height: 1;
   margin: 0 5px;
+  width: 60px;
 }
 
 .export-row-badge-finished{
   background-color: #6cc87f;
+}
+.export-row-badge-error {
+  background-color: $color-danger;
 }
 
 .export-operate-btn{

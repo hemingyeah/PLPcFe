@@ -158,10 +158,10 @@
 </template>
 
 <script>
-import {formatDate,} from '@src/util/lang';
+import {formatDate} from '@src/util/lang';
 
 export default {
-  name: "batch-editing-customer-dialog",
+  name: 'batch-editing-customer-dialog',
   data: () => {
     return {
       inputRemoteSearch: {

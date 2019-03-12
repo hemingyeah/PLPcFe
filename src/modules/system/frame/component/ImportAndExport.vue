@@ -9,7 +9,13 @@
           <p>{{item.createTime | fmt_datetime}}</p>
         </div>
         <!-- start 导出状态 -->
-        <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">
+        <div 
+          class="export-row-badge" 
+          :class="{
+            'export-row-badge-finished': item.isFinished == 1,
+            'export-row-badge-error': item.isFinished == 2
+          }"
+        >
           <template v-if="item.action == 'export' || !item.action">
             {{item.isFinished == 0 ? '导出中' : '已完成'}}
           </template>
@@ -35,11 +41,14 @@
             {{item.isFinished == 0 ? '取消' : '下载'}}
           </template>
           <template v-if="item.action == 'import' || item.action == 'update'">
+            <span v-if="item.isFinished == 0 && isImportDelete(item.createTime)">
+              取消
+            </span>
             <span v-if="item.isFinished == 1">
               确定
             </span>
             <span v-if="item.isFinished == 2">
-              {{ item.action == 'import' ? '确定' : '确定'}}
+              {{ item.action == 'import' ? '查看原因' : '查看原因'}}
             </span>
           </template>
         </button>
@@ -49,6 +58,29 @@
     <p class="export-empty" v-else>
       您没有待下载的文件
     </p>
+
+    <!-- start 导出更新失败 原因弹窗 -->
+    <base-modal 
+      :title="errorDialogTitle" 
+      :show.sync="errorDialog" 
+      width="500px"
+      class="import-update-error-dialog"
+    >
+      <div class="import-update-error-dialog-body">
+        <p v-for="(reason, index) in reasons" :key="`reson_import${index}`">
+          {{ reason }}
+        </p>
+      </div>
+      <div slot="footer" class="import-update-error-dialog-footer">
+        <el-button type="danger" @click="deleteRecord" :loading="pending" :disabled="pending">
+          {{ pending ? '删除中' : '删除记录' }}
+        </el-button>
+        <el-button type="primary" @click="errorDialog = false" :disabled="pending">
+          确 定
+        </el-button>
+      </div>
+    </base-modal>
+    <!-- end 导出更新失败 原因弹窗 -->
   </div>
 </template>
 
@@ -73,10 +105,19 @@ export default {
   data() {
     return {
       operationList: [],
+      errorDialog: false, // 错误原因弹窗
+      errorDialogTitle: '', // 错误原因 弹窗 标题
+      pending: false,
+      reasons: [], // 错误原因
+      item: {},
     }
+  },
+  computed: {
+
   },
   methods: {
     async execExportFile(item){
+      let action = item.action == 'import' ? '导入' : '更新';
       // 导出 取消下载文件
       if((item.action == 'export' || !item.action) && item.isFinished == 0) {
         if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
@@ -112,36 +153,78 @@ export default {
         this.$emit('change', this.operationList);
         return
       }
+      // 导入或批量更新 取消
+      if((item.action == 'import' || item.action == 'update') && item.isFinished == 0) {
+        if(await platform.confirm(`确定要取消文件[${item.name}]的${action}？`)){
+
+          this.operationList.push({id: item.id, operate: 'cancel'})
+          try {
+            let result = await http.get('/excels/delete/manual', {id: item.id});
+
+            this.operationList = this.operationList.filter(i => i.id != item.id)
+
+            if(result.status == 0) {
+              // 
+            } else {
+              platform.alert(result.message);
+            }
+            this.$emit('change', this.operationList);
+
+            return
+
+          } catch (error) {
+            console.log('error: ', error);
+          }
+        }
+      }
       // 导入或更新完成
-      if(
-        (
-          item.action == 'import'
-          || item.action == 'update'
-        )
-      ){
-        this.operationList.push({id: item.id, operate: 'cancel'});
+      if(item.action == 'import' || item.action == 'update'){
         try {
-          let result = await http.get('/excels/import/delete', { id: item.id});
-          let data = JSON.parse(result.data);
-          let action = item.action == 'import' ? '导入' : '更新';
+
+          if(item.isFinished == 1) {
+            platform.alert(`共${action}了${item.importInfo.total}条数据`);
+          } else if (item.isFinished == 2) {
+            this.errorDialog = true;
+            this.item = item;
+            this.errorDialogTitle = `${action}失败原因`;
+            this.reasons = item.importInfo.reasons;
+            return
+          }
+
+          this.operationList.push({id: item.id, operate: 'cancel'});
+
+          await http.get('/excels/cancel', { id: item.id});
 
           this.operationList = this.operationList.filter(i => i.id != item.id);
-
-          if(data.isImported) {
-            platform.alert(`共${action}了${data.total}条数据`);
-            this.openTab(item.module);
-          } else {
-            platform.alert(`${action}失败原因:${data.reasons.join('\n')}`);
-          }
           this.$emit('change', this.operationList);
+
           return
           
         } catch (error) {
           console.log('error: ', error);
         }
-        return
       }
     },
+    async deleteRecord() {
+      this.pending = true;
+
+      await http.get('/excels/cancel', { id: this.item.id});
+      
+      this.errorDialog = false;
+      this.pending = false;
+
+      this.$emit('change', this.operationList);
+    },
+    isImportDelete(createTime) {
+      let timeOut = 2 * 60 * 60 * 1000;
+      let now = new Date().getTime();
+
+      if((createTime + timeOut) < now) {
+        return true;
+      }
+      return false
+    },
+    /** @deprecated */
     openTab(module) {
       let menus = JSON.parse(window._init).menus || [];
       let tab = {};
@@ -163,3 +246,19 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+  .import-update-error-dialog-body {
+    padding: 20px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: scroll;
+    p {
+      margin-bottom: 5px;
+    }
+  }
+  .import-update-error-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>

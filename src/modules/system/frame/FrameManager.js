@@ -79,7 +79,9 @@ const FrameManager = {
 
         let frameWindow = frame.contentWindow;
 
-        //frame页面卸载时，重置刷新icon
+        // 传递点击事件，用于关闭顶层window popper
+        frameWindow.addEventListener('click', () => rootWindow.document.body.click())
+        // frame页面卸载时，重置刷新icon
         frameWindow.addEventListener('unload', () => tab.loading = true)
       })
       
@@ -182,7 +184,7 @@ const FrameManager = {
       }
     },
     reloadFrameTabById(id){
-      // 替换传入的id中的frame_tab_
+      // 替换传入的 id 中的 frame_tab_
       id = id.replace(/^frame_tab_/, '');
       
       let index = _.findIndex(this.frameTabs, item => item.id == id);
@@ -207,10 +209,10 @@ const FrameManager = {
       // 1. 兼容不同浏览器的事件
       // 2. 根据方向设置offset
       let direction = event.deltaX != 0 
-        ? event.deltaX > 0 ? 1 : -1// 存在横向滚动,
+        ? event.deltaX > 0 ? 1 : -1 // 存在横向滚动,
         : event.deltaY > 0 ? 4 : -4;
 
-      let offset = this.offset + direction * 12;
+      let offset = this.offset + (direction * 12);
       if(offset < 0) offset = 0;
       if(offset > maxOffset) offset = maxOffset;
       
