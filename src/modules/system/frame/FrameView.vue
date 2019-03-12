@@ -61,58 +61,13 @@
               <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
                 <i class="iconfont icon-xiazai"></i>
               </button>
-
-              <div class="frame-export-panel">
-                <h3>导出下载（{{exportList.length || 0}}）</h3>
-                <template v-if="exportList.length > 0">
-                  <div v-for="item in exportList" :key="item.id" class="export-row">
-                    <img src="../../../assets/img/excel.png">
-                    <div class="export-row-info">
-                      <h4>{{item.name}}</h4>
-                      <p>{{item.createTime | fmt_datetime}}</p>
-                    </div>
-                    <!-- start 导出状态 -->
-                    <div class="export-row-badge" :class="{'export-row-badge-finished': item.isFinished == 1}">
-                      <template v-if="item.action == 'export' || !item.action">
-                        {{item.isFinished == 0 ? '导出中' : '已完成'}}
-                      </template>
-                      <template v-if="item.action == 'import' || item.action == 'update'">
-                        <span v-if="item.isFinished == 0">
-                          {{ item.action == 'import' ? '导入' : '更新'}}中
-                        </span>
-                        <span v-if="item.isFinished == 1">
-                          已完成
-                        </span>
-                        <span v-if="item.isFinished == 2">
-                          {{ item.action == 'import' ? '导入' : '更新'}}失败
-                        </span>
-                      </template>
-                    </div>
-                    <!-- end 导出状态 -->
-                    <template v-if="operationList.some(o => o.id == item.id)">
-                      <span class="export-operate-btn">请稍等</span>
-                    </template>
-                    <!-- start 导出导入按钮 -->
-                    <button type="button" class="btn btn-text export-operate-btn" @click="execExportFile(item)" v-else>
-                      <template v-if="item.action == 'export' || !item.action">
-                        {{item.isFinished == 0 ? '取消' : '下载'}}
-                      </template>
-                      <template v-if="item.action == 'import' || item.action == 'update'">
-                        <span v-if="item.isFinished == 1">
-                          确定
-                        </span>
-                        <span v-if="item.isFinished == 2">
-                          {{ item.action == 'import' ? '确定' : '确定'}}
-                        </span>
-                      </template>
-                    </button>
-                    <!-- end 导出导入按钮 -->
-                  </div>
-                </template>
-                <p class="export-empty" v-else>
-                  您没有待下载的文件
-                </p>
-              </div>
+              <!-- start 导入导出下载 -->
+              <import-and-export-view 
+                :source-list="exportList" 
+                @change="operationListChange"
+              >
+              </import-and-export-view>
+              <!-- end 导入导出下载 -->
             </el-popover>
             <!--导出下载-->
 
@@ -213,6 +168,8 @@ import FrameTab from './component/FrameTab.vue';
 import FrameNav from './component/FrameNav.vue';
 import Version from './component/Version.vue';
 import SaleManager from './component/SaleManager.vue';
+
+import ImportAndExport from './component/ImportAndExport.vue'
 
 import DefaultHead from '@src/assets/img/user-avatar.png';
 import NotificationCenter from './component/NotificationCenter.vue'
@@ -388,68 +345,10 @@ export default {
         this.exportTimer = null;
       }
     },
-    async execExportFile(item){
-      // 导出 取消下载文件
-      if((item.action == 'export' || !item.action) && item.isFinished == 0) {
-        if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
-      
-          this.operationList.push({id: item.id, operate: 'cancel'})
-
-          try {
-            let result = await http.post('excels/cancel', {id: item.id}, false);
-
-            if(result.status == 0) {
-              this.operationList = this.operationList.filter(i => i.id != item.id)
-              this.checkExports();
-            } else {
-              platform.alert(result.message);
-            }
-            return
-
-          } catch (error) {
-            console.log('error: ', error);
-          }
-
-        }
-      }
-      // 导出 下载文件
-      if((item.action == 'export' || !item.action) && item.isFinished == 1){
-        let frame = document.createElement('iframe');
-        frame.style.display = 'none';
-        frame.src = `/excels/download?id=${item.id}`;
-        document.body.appendChild(frame);
-
-        this.operationList.push({id: item.id, operate: 'download'})
-        this.checkExports();
-        return
-      }
-      // 导入或更新完成
-      if(
-        (
-          item.action == 'import'
-          || item.action == 'update'
-        )
-      ){
-        this.operationList.push({id: item.id, operate: 'cancel'});
-        try {
-          let result = await http.get('/excels/import/delete', { id: item.id});
-          let data = JSON.parse(result.data);
-          let action = item.action == 'import' ? '导入' : '更新';
-
-          this.operationList = this.operationList.filter(i => i.id != item.id);
-
-          if(data.isImported) {
-            platform.alert(`共${action}了${data.total}条数据`);
-          } else {
-            platform.alert(`${action}失败原因:${data.reasons.join('\n')}`);
-          }
-          
-        } catch (error) {
-          console.log('error: ', error);
-        }
-        this.checkExports();
-        return
-      }
+    /* 导入导出操作列表变化 */
+    operationListChange(list) {
+      this.operationList = list;
+      this.checkExports();
     },
     clearStorage(){
       localStorage.clear();
@@ -590,7 +489,8 @@ export default {
     [FrameTab.name]: FrameTab,
     [Version.name]: Version,
     [SaleManager.name]: SaleManager,
-    [NotificationCenter.name]: NotificationCenter
+    [NotificationCenter.name]: NotificationCenter,
+    [ImportAndExport.name]: ImportAndExport
   }
 }
 </script>
