@@ -6,7 +6,7 @@
           <base-button type="only-text" icon="icon-arrow-left" @event="goBack">返回</base-button>
           <span class="text">|</span>
           <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
-          <!--<span class="text">客户信息</span>-->
+          <!--<span class="text">客户信息</span>--> 
         </div>
       </div>
       <form-builder ref="form" :fields="fields" :value="form" @input="update" v-if="init">
@@ -18,6 +18,18 @@
               :value="form.serialNumber" @input="update"
               :placeholder="genPlaceholder(field)"/>
             <div v-else class="form-item__text">客户编号将在创建后由系统生成</div>
+          </form-item>
+        </template>
+
+        <template slot="manager" slot-scope="{field}">
+          <form-item :label="field.displayName" :remote="remote.manager">
+            <form-user
+              :field="field"
+              :value="form.manager" 
+              :placeholder="genPlaceholder(field)"
+              :see-all-org="seeAllOrg"
+              @input="update"
+            />
           </form-item>
         </template>
 
@@ -98,7 +110,8 @@ export default {
       addressBackup: {},
       form: {},
       remote: this.buildRemote(),
-      init: false
+      init: false,
+      auth: {},
     };
   },
   computed: {
@@ -143,6 +156,12 @@ export default {
         })
         .filter(f => f.fieldName !== 'tags' || (f.fieldName === 'tags' && this.initData.isDivideByTag));
       return FormUtil.migration(sortedFields)
+    },
+    /** 
+    * 组织架构 是否只显示 自己所在团队
+    */
+    seeAllOrg() {
+      return true; 
     }
   },
   methods: {
@@ -388,6 +407,9 @@ export default {
   },
   async mounted() {
     try {
+      let initData = JSON.parse(window._init) || {};
+
+      this.auth = initData.auth || {};
       //初始化默认值
       let form = {};
       if (this.initData.action === 'edit' && this.initData.id) {

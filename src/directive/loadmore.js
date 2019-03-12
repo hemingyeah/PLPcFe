@@ -14,9 +14,9 @@ function handler(event){
   let callback = option.callback;
 
   let target = event.target;
-  //暂未处理滚动的方向性
+  // 暂未处理滚动的方向性
   let MaxScrollHeight = target.scrollHeight - target.offsetHeight;
-  //未达到触发距离
+  // 未达到触发距离
   if(MaxScrollHeight - target.scrollTop >= distance) return;
 
   typeof callback == 'function' && callback(event);
@@ -26,7 +26,7 @@ const directive = {
   bind(el, binding, vnode){
     let option = binding.value || {};
 
-    //处理触发loadmore的距离
+    // 处理触发loadmore的距离
     if(!Lang.isSafeNumber(option.distance)) option.distance = 300;
     
     el._loadmore_option = option;

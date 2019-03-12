@@ -13,6 +13,18 @@
           </form-item>
         </template>
 
+        <template slot="manager" slot-scope="{field}">
+          <form-item :label="field.displayName" :remote="remote.manager">
+            <form-user
+              :field="field"
+              :value="form.manager" 
+              :placeholder="genPlaceholder(field)"
+              :see-all-org="seeAllOrg"
+              @input="update"
+            />
+          </form-item>
+        </template>
+
         <template slot="name" slot-scope="{field}">
           <form-item :label="field.displayName" :remote="remote.name" validation>
             <form-text
@@ -142,6 +154,9 @@ export default {
         return '/task/customer/create';
       }
       return '/event/customer/create';
+    },
+    seeAllOrg() {
+      return true
     }
   },
   methods: {

@@ -28,6 +28,11 @@ export default {
       type: String,
       default: ''
     },
+    /* 是否只显示 自己所在团队 人员  */
+    seeAllOrg: {
+      type: Boolean,
+      default: false
+    },
     value: Object
   },
   computed: {
@@ -44,7 +49,8 @@ export default {
     choose(){
       let options = {
         title: `请选择${this.field.displayName}`,
-        max: 1
+        max: 1,
+        seeAllOrg: this.seeAllOrg
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){

@@ -3,11 +3,12 @@
     :title="title" width="820px"
     :show.sync="show" @closed="$emit('destory')" @cancel="$emit('canel')">
     <div class="bc-dept-wrap">
-      <div class="bc-dept">
-        <base-tree 
+      <div class="bc-dept" v-if="depts.length > 0">
+        <base-tree
           :data="depts" :selected="selectedDept" :show-checkbox="allowCheckDept"
           @node-selected="initDeptUser" @node-check="chooseDept" 
-          :node-render="nodeRender"/>
+          :node-render="nodeRender"
+        />
       </div>
       <div class="bc-user">
         <div class="bc-search">
@@ -62,6 +63,7 @@
 </template> 
 
 <script>
+/* eslint-disable */
 import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
@@ -124,10 +126,15 @@ export default {
     showDeptCheckbox: {
       type: Boolean,
       default: false
+    },
+    /* 是否查询 开始降低组织架构的选项 */
+    seeAllOrg: {
+      type: Boolean,
+      default: false
     }
   },
   data(){
-    return {
+    let data = {
       mode: 'choose',
       show: false,
       loading: true,
@@ -150,8 +157,21 @@ export default {
       }, // 参数
       userPage: new Page(),
 
-      stateColor: {} // 用户工作状态颜色
+      stateColor: {}, //用户工作状态颜色
+      isSeeAllOrg: false, /** 是否 只可见本团队成员 */
     }
+
+    let selectedUser = this.selectedUser;
+    data.chosen = selectedUser.map(user => {
+      return {
+        userId: user.userId,
+        displayName: user.displayName,
+        staffId: user.staffId,
+        head: user.head || ''
+      }
+    })
+
+    return data
   },
   computed: {
     btnText(){
@@ -176,7 +196,7 @@ export default {
     // 是否允许选中部门
     allowCheckDept(){
       return this.isMulti && this.showDeptCheckbox;
-    }
+    },
   },
   methods: {
     post(){
@@ -282,6 +302,7 @@ export default {
           this.params.lat = this.lat;
           this.params.lng = this.lng;
         }
+        this.params.seeAllOrg = this.isSeeAllOrg;
         
         let userPage = await this.fetchUser(this.params);
         this.userPage.merge(Page.as(userPage));
@@ -309,6 +330,7 @@ export default {
           this.params.lat = this.lat;
           this.params.lng = this.lng;
         }
+        this.params.seeAllOrg = this.isSeeAllOrg;
 
         let userPage = await this.fetchUser(this.params);
 
@@ -353,8 +375,9 @@ export default {
 
       try {
         this.params.pageNum += 1;
+        this.params.seeAllOrg = this.isSeeAllOrg;
       
-        let userPage = await this.fetchUser(this.params)
+        let userPage = await this.fetchUser(this.params);
         this.userPage.merge(Page.as(userPage));
       } catch (error) {
         console.error(error)
@@ -373,7 +396,7 @@ export default {
           let user = rows[i];
 
           let index = -1;
-          for(let j = 0;j < this.chosen.length;j++){
+          for(let j = 0; j < this.chosen.length; j++){
             if(user.userId == this.chosen[j].userId){
               index = j;
               break;
@@ -393,7 +416,9 @@ export default {
     },
     /** 抓取部门数据 */
     fetchDept(){
-      return http.get('/security/department/tree').then(result => {
+      let params = {};
+      params.seeAllOrg = this.isSeeAllOrg;
+      return http.get('/security/department/tree', params).then(result => {
         if(result.status == 1) return [];
 
         let depts = result.data || [];
@@ -427,7 +452,19 @@ export default {
       if(this.showUserState) this.initializeStateColor();
     },
     /** 初始化部门数据 */
-    initializeDept(){
+    async initializeDept(){
+      this.isSeeAllOrg = false;
+      try {
+        /* 如果开启 查询按组织架构选项 */
+        if(this.seeAllOrg) {
+          let result = await this.getSeeAllOrg();
+          this.isSeeAllOrg = result.data;
+        }
+        
+      } catch (error) {
+        console.log('error: ', error);
+        this.isSeeAllOrg = false;
+      }
       let subtask = [
         this.fetchDept()
       ];
@@ -471,6 +508,28 @@ export default {
           <span class="bc-dept-node-count">{count}</span>
         </div>
       )
+    },
+    changeDept(dept) {
+      return
+      this.depts.forEach(d => {
+        this.$set(d, 'selected', false);
+      });
+
+      this.$set(dept, 'selected', true);
+      this.initDeptUser(dept);
+    },
+    /* 查询是否开启 降低组织架构的开关 */
+    getSeeAllOrg() {
+      return new Promise((resolve, reject) => {
+        http.post('/setting/user/getSeeAllOrg').then(result => { 
+          if(result.status == 0) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
+        })
+      })
+      
     }
   },
   mounted(){

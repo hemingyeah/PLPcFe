@@ -7,6 +7,7 @@ import '../common/polyfill';
 
 import Vue from 'vue';
 import filter from '../filter';
+import directive from '../directive';
 
 import BaseModal from '../component/common/BaseModal';
 import BaseTree from '../component/common/BaseTree';
@@ -22,6 +23,7 @@ Vue.use(BaseModal);
 Vue.use(BaseTree);
 Vue.use(Checkbox);
 Vue.use(filter)
+Vue.use(directive);
 
 Vue.prototype.$ELEMENT = { size: 'small'};
 

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 import DefaultHead from '@src/assets/img/avatar.png';
 
 export default {
