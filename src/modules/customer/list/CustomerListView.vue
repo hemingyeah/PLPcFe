@@ -143,6 +143,21 @@
                 :picker-options="createTimePickerOptions">
               </el-date-picker>
             </el-form-item>
+            <el-form-item label-width="100px" label="更新时间">
+              <el-date-picker
+                v-model="params.updateTime"
+                type="daterange"
+                align="right"
+                unlink-panels
+                range-separator="-"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                :picker-options="createTimePickerOptions">
+              </el-date-picker>
+            </el-form-item>
+
+
+
 
             <!-- 动态搜索框 -->
             <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
@@ -305,6 +320,21 @@
                 :value="Boolean(scope.row.status)">
               </el-switch>
             </template>
+            <template v-else-if="column.field === 'updateTime'">
+
+              <template v-if="scope.row.latesetUpdateRecord">
+                <el-tooltip class="item" effect="dark" :content="scope.row.latesetUpdateRecord" placement="top">
+                  <div @mouseover="showLatestUpdateRecord(scope.row)">
+                    {{scope.row[column.field]}}
+                  </div>
+                </el-tooltip>
+              </template>
+              <template v-else>
+                <div @mouseover="showLatestUpdateRecord(scope.row)">
+                  {{scope.row[column.field]}}
+                </div>
+              </template>
+            </template>
             <template v-else-if="column.field === 'createUser'">
               {{scope.row.createUserName}}
             </template>
@@ -439,11 +469,12 @@
 
 <script>
 import _ from 'lodash';
-import {formatDate,} from '../../../util/lang';
+import {formatDate} from '../../../util/lang';
 import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
 import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
 import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
 import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
+import * as CustomerApi from '@src/api/CustomerApi';
 
 export default {
   name: 'customer-list-view',
@@ -470,6 +501,7 @@ export default {
         createUser: '',
         customerManager: '',
         createTime: '',
+        updateTime: '',
         customerAddress: {},
         orderDetail: {},
         keyword: '',
@@ -492,6 +524,7 @@ export default {
         createUser: '',
         customerManager: '',
         createTime: '',
+        updateTime: '',
         customerAddress: {},
         orderDetail: {},
       },
@@ -646,6 +679,26 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    showLatestUpdateRecord(row) {
+      if (row.latesetUpdateRecord) return;
+
+      CustomerApi.getUpdateRecord({
+        customerId: row.id
+      })
+        .then(res => {
+          if (!res || res.status) return;
+
+          this.customers = this.customers
+            .map(c => {
+              if (c.id === row.id) {
+                c.latesetUpdateRecord = res.data;
+              }
+              return c;
+            })
+          console.log('res', res);
+        })
+        .catch(e => console.error('e', e));
+    },
     createCustomerTab(customerId){
       let fromId = window.frameElement.getAttribute('id');
 
@@ -660,17 +713,6 @@ export default {
       //this.viewCustomer();
     },
     revertSearchParams() {
-      //let paramsFromStorage = sessionStorage.getItem('customer_list_search_status');
-      //sessionStorage.removeItem('customer_list_search_status');
-      // if (paramsFromStorage) {
-      //   paramsFromStorage = JSON.parse(paramsFromStorage);
-
-      //   this.paramsBackup = {
-      //     ...paramsFromStorage.params,
-      //     pageNum: paramsFromStorage.paginationInfo.pageNum,
-      //   };
-      // }
-
       const localStorageData = this.getLocalStorageData();
 
       if (localStorageData.pageSize) {
@@ -680,6 +722,10 @@ export default {
 
       if (Array.isArray(this.paramsBackup.createTime) && this.paramsBackup.createTime.length) {
         this.paramsBackup.createTime = this.paramsBackup.createTime.map(ct => new Date(ct));
+      }
+
+      if (Array.isArray(this.paramsBackup.updateTime) && this.paramsBackup.updateTime.length) {
+        this.paramsBackup.updateTime = this.paramsBackup.updateTime.map(ct => new Date(ct));
       }
 
       let storeUser = localStorage.getItem('store_user_for_search_customer') || '{}';
@@ -874,7 +920,7 @@ export default {
             this.paginationInfo.totalPages = 0;
             this.paginationInfo.pageNum = 1;
           } else {
-            const {pages, total, pageNum, list,} = res;
+            const {pages, total, pageNum, list } = res;
 
             this.customers = list
               .map(c => {
@@ -909,6 +955,13 @@ export default {
         params.createTimeStart = formatDate(params.createTime[0]);
         params.createTimeEnd = `${formatDate(params.createTime[1]).replace('00:00:00', '23:59:59')}`;
         delete params.createTime;
+      }
+
+      // updateTIme
+      if (params.updateTime && params.updateTime.length) {
+        params.updateTimeStart = formatDate(params.updateTime[0]);
+        params.updateTimeEnd = `${formatDate(params.updateTime[1]).replace('00:00:00', '23:59:59')}`;
+        delete params.updateTime;
       }
 
       // address
@@ -1054,14 +1107,14 @@ export default {
         }
 
         let sortModel = {
-          isSystem: prop === 'createTime' ? 1 : 0,
+          isSystem: prop === 'createTime' || prop === 'updateTime' ? 1 : 0,
           sequence: order === 'ascending' ? 'ASC' : 'DESC',
-          column: prop === 'createTime' ? `customer.${prop}` : prop,
+          column: prop === 'createTime' || prop === 'updateTime' ? `customer.${prop}` : prop,
         };
 
         const sortedField = this.customerConfig.fieldInfo.filter(sf => sf.fieldName === prop)[0] || {};
 
-        if (prop === 'createTime' || sortedField.formType === 'date' || sortedField.formType === 'datetime') {
+        if (prop === 'createTime' || prop === 'updateTime' || sortedField.formType === 'date' || sortedField.formType === 'datetime') {
           sortModel.type = 'date';
         } else {
           sortModel.type = sortedField.formType;
@@ -1250,6 +1303,7 @@ export default {
         bc.show = columnStatus.some(sc => sc === bc.field);
         return bc;
       });
+
       return columns;
     },
     resetParams() {
@@ -1270,6 +1324,7 @@ export default {
         createUser: '',
         customerManager: '',
         createTime: '',
+        updateTime: '',
         customerAddress: {},
         orderDetail: {},
         keyword: '',
@@ -1288,6 +1343,7 @@ export default {
         createUser: '',
         customerManager: '',
         createTime: '',
+        updateTime: '',
         customerAddress: {},
         orderDetail: {},
         specialSearchModel: {
@@ -1450,6 +1506,12 @@ export default {
       }, {
         label: '创建时间',
         field: 'createTime',
+        show: true,
+        sortable: 'custom',
+        width: '150px',
+      }, {
+        label: '最近更新',
+        field: 'updateTime',
         show: true,
         sortable: 'custom',
         width: '150px',
