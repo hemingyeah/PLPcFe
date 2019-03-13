@@ -607,7 +607,7 @@ export default {
     },
     exportColumns() {
       return this.columns.map(c => {
-        if (c.field !== 'customerAddress' && c.field !== 'remindCount') {
+        if (c.field !== 'customerAddress' && c.field !== 'remindCount' && c.field !== 'updateTime') {
           c.export = true;
         }
 
