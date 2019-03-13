@@ -4,29 +4,60 @@
     <dl class="main-info">
 
       <dt>{{reportDetail.reportName}}</dt>
-      <dd>规则名称：{{reportDetail.ruleName}}</dd>
-      <dd>创建时间：{{reportDetail.createTime}}</dd>
-      <dd>统计范围：{{reportDetail.allSize}}</dd>
-      <dd>规则命中：{{reportDetail.hitSize}}</dd>
-      <dd>统计方式：{{reportDetail.ruleType}}</dd>
-      <dd>统计状态：{{1}}</dd>
-      <dd>起止时间：{{1}}</dd>
-      <dd>备注：{{reportDetail.remark}}</dd>
+      <dd><label>规则名称：</label>{{reportDetail.ruleName}}</dd>
+      <dd><label>创建时间：</label>{{reportDetail.createTime | formatDatetime}}</dd>
+      <dd><label>统计范围：</label>{{reportDetail.allSize}}</dd>
+      <dd><label>规则命中：</label>{{reportDetail.hitSize}}</dd>
+      <dd><label>统计方式：</label>{{reportDetail.ruleType | ruleType}}</dd>
+      <dd><label>统计状态：</label>{{reportDetail.timeType ? '已完成并结算' : '已完成'}}</dd>
+      <dd><label>起止时间：</label>{{reportDetail.startTime | formatDatetime}} ~ {{reportDetail.endTime | formatDatetime}}</dd>
+      <dd><label>备注：</label>{{reportDetail.remark}}</dd>
     </dl>
 
     <div class="detail-list">
-      <p>导出</p>
-      <!--table-->
+      <div style="text-align: right;" class="export-btn">
+        <el-button type="primary" :disabled="pending" @click="exportDetail">导出</el-button>
+      </div>
 
+      <el-table
+        stripe
+        :data="reports">
+        <el-table-column
+          v-for="column in columns"
+          :key="column.field"
+          :label="column.label"
+          :prop="column.field"
+        >
 
+          <template slot-scope="scope">
+            <template v-if="column.field === 'ruleType'">
+              {{scope.row[column.field] | ruleType}}
+            </template>
+            <template v-else-if="column.field === 'action'">
+              <el-button plain @click="viewDetail(scope.row)" size="small" :disabled="!scope.row.hitNumber">查看</el-button>
+            </template>
 
+            <template v-else>
+              {{scope.row[column.field]}}
+            </template>
+          </template>
+
+        </el-table-column>
+      </el-table>
+
+      <hit-rule-detail ref="hitRuleDetailDialog"></hit-rule-detail>
+      <div ref="bridge" class="base-export-bridge"></div>
     </div>
   </div>
 </template>
 
 <script>
+import { formatDate, } from '@src/util/lang';
+import qs from '@src/util/querystring';
+import HitRuleDetailDialog from './components/HitRuleDetailDialog.vue';
+
 export default {
-  name: "performance-view",
+  name: 'performance-report-view',
   props: {
     initData: {
       type: Object,
@@ -35,7 +66,7 @@ export default {
   },
   data() {
     return {
-
+      pending: false,
 
       columns: [
         {
@@ -52,7 +83,7 @@ export default {
         },
         {
           label: '绩效结果',
-          field: 'result',
+          field: 'total',
         },
         {
           label: '明细',
@@ -62,13 +93,42 @@ export default {
     }
   },
   computed: {
+    reportId() {
+      const pathname = window.location.pathname;
+      const res = pathname.match(/.*\/desc\/(\d*)/) || [];
+
+      return Number(res[1] || 0);
+    },
     reports() {
-      if (!this.initData || !this.initData.reportDescList || !this.initData.reportDescList.reportMap) return [];
-      return this.initData.reportDescList.reportMap;
+
+      if (!this.initData || !this.initData.reportDescList) return [];
+      const backup = JSON.parse(JSON.stringify(this.initData.reportDescList));
+      return (backup.reportList || backup.reportMap)
+        .map(report => {
+
+          if (report.desc && report.desc.length) {
+            report.total = report.desc
+              .map(r => {
+                r.ruleType = report.ruleType ? '奖金制' : '计分制';
+                r.userRole = r.userRole === 'person' ? '负责人' : '协同人';
+                // r.users = report.users;
+                r.income = (r.score || r.money || 0) + (report.ruleType ? '元' : '分');
+                return Number(r.score) || Number(r.money);
+              })
+              .filter(score => score >= 0)
+              .reduce((a, b) => a + b) || 0;
+          } else {
+            report.total = 0;
+          }
+
+          report.total += report.ruleType ? '元' : '分';
+
+          return report;
+        })
     },
     reportDetail() {
       if (!this.initData || !this.initData.reportDescList || !this.initData.reportDescList.ruleMap) return {}
-      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, } = this.initData.reportDescList.ruleMap;
+      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, timeType } = this.initData.reportDescList.ruleMap;
 
       return {
         reportName,
@@ -78,15 +138,62 @@ export default {
         hitSize,
         ruleType,
         remark,
-
-
+        startTime,
+        endTime,
+        timeType
       }
     }
   },
-  mounted() {
-    console.log('this.initData', this.initData);
+  filters: {
+    ruleType(val) {
+      return val ? '奖金制' : '计分制';
+    },
+    formatDatetime(val) {
+      if (!val) return val;
+      return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
+    },
   },
-  methods: {},
+  mounted() {
+    console.log(this.initData);
+  },
+  methods: {
+    exportDetail() {
+      this.pending = true;
+      const model = {
+        ids: this.reportId,
+      };
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-dd')}绩效报告明细.xlsx`;
+      let ua = navigator.userAgent;
+      if (ua.indexOf('Trident') >= 0){
+        window.location.href = `/performance/v2/export/report/desc?${qs.stringify(model)}`;
+        this.visible = false;
+      }
+
+      this.$http.get(`/performance/v2/export/report/desc?${qs.stringify(model)}`, {}, {responseType: 'blob'}).then(blob => {
+        let link = document.createElement('a');
+        let url = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.href = url;
+        this.$refs.bridge.appendChild(link);
+        link.click();
+        this.visible = false;
+        this.pending = false;
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          this.$refs.bridge.removeChild(link)
+        }, 150);
+      }).catch(err => {
+        console.error(err);
+        this.pending = false;
+      })
+    },
+    viewDetail(row) {
+      this.$refs.hitRuleDetailDialog.toggleDialog(row);
+    }
+  },
+  components: {
+    [HitRuleDetailDialog.name]: HitRuleDetailDialog,
+  }
 }
 </script>
 
@@ -99,11 +206,35 @@ export default {
     .main-info {
       margin: 0;
       background: #fff;
+      width: 320px;
+
+      dt {
+        line-height: 32px;
+        font-size: 16px;
+        padding: 10px;
+        border-bottom: 1px solid #f4f4f4;
+      }
+
+      dd {
+        line-height: 30px;
+        padding-left: 10px;
+        margin: 0;
+        label {
+          font-size: 14px;
+          font-weight: 700;
+        }
+      }
     }
     .detail-list {
-      background: #fff;
       margin-left: 10px;
       flex-grow: 1;
+
+      .export-btn {
+        text-align: right;
+        padding: 10px;
+        background: #fff;
+        margin-bottom: 10px;
+      }
 
     }
   }

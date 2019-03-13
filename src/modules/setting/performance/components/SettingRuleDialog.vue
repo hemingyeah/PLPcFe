@@ -84,7 +84,7 @@
           v-for="(item, index) in form.rules"
           :item="item"
           :key="index"
-          :label="`条件${index+1}`"
+          :label="form.effectCondition !== 2 ?`条件${index+1}` : '排除条件'"
           :rules="form.rules"
           :config="conditionConfig"
           :validation="formValidationResult.rules"
@@ -92,7 +92,7 @@
           @update="updateCondition"
           :options="options" />
 
-        <base-button type="only-text" @event="modifyCondition({action: 'add', })">添加条件</base-button>
+        <base-button v-if="form.effectCondition !== 2" type="only-text" @event="modifyCondition({action: 'add', })">添加条件</base-button>
       </div>
 
     </el-form>
@@ -108,7 +108,7 @@ import {createPerformanceRule, getFieldsForPerformance, updatePerformanceRule} f
 import SpecificCondition from './SpecificCondition.vue';
 
 export default {
-  name: "setting-rule-dialog",
+  name: 'setting-rule-dialog',
   props: {
     allTypes: {
       type: Object,
@@ -246,7 +246,7 @@ export default {
           const rules = form.rules;
 
           return rules.map(rule => {
-            const {ruleType, effectCondition, rewardType,} = form;
+            const {ruleType, effectCondition, rewardType, } = form;
             let errFields = [];
             let executorScore = Number(rule.executorScore);
             let assistantScore = Number(rule.assistantScore);
@@ -257,11 +257,11 @@ export default {
                 // 部分生效 验证 选择类型
                 errFields.push('types');
               }
-              if (isNaN(executorScore) || typeof executorScore !== "number" || executorScore < 0) {
+              if (isNaN(executorScore) || typeof executorScore !== 'number' || executorScore < 0) {
                 errFields.push('executorScore');
               }
 
-              if (isNaN(assistantScore) || typeof assistantScore !== "number" || assistantScore < 0) {
+              if (isNaN(assistantScore) || typeof assistantScore !== 'number' || assistantScore < 0) {
                 errFields.push('assistantScore');
               }
               if (errFields.length) {
@@ -271,7 +271,7 @@ export default {
                   fields: errFields,
                 }
               }
-              return {status: 0,fields: []};
+              return {status: 0, fields: []};
             }
 
             // 奖金 全部生效
@@ -283,11 +283,11 @@ export default {
             if (rewardType !== 'amount') {
               // 按百分比计算
               // || executorScore > 100  || assistantScore > 100
-              if (isNaN(executorScore) || typeof executorScore !== "number" || executorScore < 0) {
+              if (isNaN(executorScore) || typeof executorScore !== 'number' || executorScore < 0) {
                 errFields.push('executorScore');
               }
 
-              if (isNaN(assistantScore) || typeof assistantScore !== "number" || assistantScore < 0) {
+              if (isNaN(assistantScore) || typeof assistantScore !== 'number' || assistantScore < 0) {
                 errFields.push('assistantScore');
               }
 
@@ -309,7 +309,7 @@ export default {
               }
             }
 
-            return {status: 0,fields: []};
+            return {status: 0, fields: []};
           })
         }
       },
@@ -322,7 +322,7 @@ export default {
         category: null,
         custFieldOfTask: null,
         customizedField: null,
-        rules: [{status: 0,fields: []}],
+        rules: [{status: 0, fields: []}],
       },
 
     }
@@ -359,11 +359,16 @@ export default {
     },
     conditionConfig() {
       const {ruleType, rewardType} = this.form;
+      let prefix = '';
+      if (this.form.effectCondition === 2) {
+        prefix = '排除后';
+      }
 
       if (!ruleType) {
         return {
           label: '每单计',
           unit: '分',
+          prefix,
         }
       }
 
@@ -371,12 +376,14 @@ export default {
         return {
           label: '每单得',
           unit: '%',
+          prefix,
         }
       }
 
       return {
         label: '每单得',
         unit: '元',
+        prefix,
       };
     },
     title() {
@@ -513,7 +520,7 @@ export default {
         })
         .catch(e => console.error('e', e));
     },
-    updateCondition({index, newVal,}) {
+    updateCondition({index, newVal, }) {
       this.form.rules[index] = newVal;
       let { rules, } = this.form;
 
@@ -535,7 +542,7 @@ export default {
           assistantScore: 0,
         }]);
         this.$set(this.formValidationResult, 'rules', [...result, {
-          status: 0,fields: [],
+          status: 0, fields: [],
         }]);
       } else {
         this.$set(this.form, 'rules', [...rules.filter((e, i) => i !== index)]);
@@ -547,7 +554,7 @@ export default {
     toggleDialog(pr) {
       this.visible = !this.visible;
       // edit
-      if (this.visible && this.action === 'edit') {
+      if (this.visible && pr) {
 
         this.performanceRule = pr;
 
@@ -555,7 +562,7 @@ export default {
       }
     },
     transferRuleToForm() {
-      const {ruleName, ruleDesc, ruleType, effect, effectCondition,ruleContent,} = this.performanceRule;
+      const {ruleName, ruleDesc, ruleType, effect, effectCondition, ruleContent, } = this.performanceRule;
       const {settleType, templateId, customFieldValue, rewardType} = ruleContent[0];
       let newRules = [];
       let isSame = false;
@@ -663,7 +670,6 @@ export default {
     },
     // clear val
     reset() {
-      console.log('reset');
       this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
       this.performanceRule = {};
     },
@@ -686,7 +692,7 @@ export default {
             assistantScore: 0,
           }]);
           this.$set(this.formValidationResult, 'rules', [{
-            status: 0,fields: [],
+            status: 0, fields: [],
           }]);
           continue;
         }
@@ -702,7 +708,6 @@ export default {
         }
       }
 
-      console.log('this.form', this.form);
     },
   },
   components: {

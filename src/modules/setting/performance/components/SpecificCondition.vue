@@ -19,12 +19,12 @@
     </el-select>
     <div class="detail">
       <p>
-        <span class="ordinary-text">负责人{{config.label}}</span>
+        <span class="ordinary-text">{{config.prefix}}负责人{{config.label}}</span>
         <el-input :value="value.executorScore" @input="(val) => updateVal({val, action: 'executorScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
         <span class="ordinary-text">{{config.unit}}</span>
       </p>
       <p>
-        <span class="ordinary-text">协同人{{config.label}}</span>
+        <span class="ordinary-text">{{config.prefix}}协同人{{config.label}}</span>
         <el-input :value="value.assistantScore" @input="(val) => updateVal({val, action: 'assistantScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'assistantScore')}" class="count-input" placeholder="请输入内容"></el-input>
         <span class="ordinary-text">{{config.unit}}</span>
       </p>
@@ -67,6 +67,7 @@ export default {
   computed: {
     index() {
       // 这里的index是从1开始
+      if (this.label === '排除条件') return 1;
       return Number(this.label.match(/\d/g)[0]);
     },
     value() {
@@ -81,6 +82,7 @@ export default {
         .filter((el, index) => index !== this.index - 1)
         .map(({types}) => types)
         .forEach(types => {
+          // types 是(每个条件选择了哪几个工单或者自定义字段的id)一个数组， 直接return map后的结果会是一个二维数组
           arr = [...arr, ...types]
         });
       return arr;

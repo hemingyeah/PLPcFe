@@ -1,7 +1,7 @@
 <template>
   <base-modal :title="title" :show.sync="visible" width="600px" class="base-import-modal" @closed="reset">
     <div class="build-stage" v-if="stage === 'build'">
-      <el-form ref="form" :model="form" label-width="100px">
+      <el-form ref="form" :model="form" label-width="110px">
         <el-form-item label="报告名称" :error="!formValidation.reportName ? '必填': ''">
           <el-input v-model="form.reportName" @change="validate"> </el-input>
         </el-form-item>
@@ -29,7 +29,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="form.target" multiple collapse-tags @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 250px;" placeholder="请选择">
+          <el-select v-model="form.target" multiple collapse-tags @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 240px;" placeholder="请选择">
             <el-option
               v-for="item in targetOptions"
               :key="item.value"
@@ -40,7 +40,7 @@
           <el-button plain @click="selectAll">选择全部</el-button>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="form.state" placeholder="请选择" style="width: 130px;">
+          <el-select v-model="form.state" placeholder="请选择" style="width: 130px;" @change="form.timeType = 0">
             <el-option
               v-for="item in statusOptions"
               :key="item.value"
@@ -50,7 +50,20 @@
           </el-select>
 
         </el-form-item>
-        <el-form-item label="完成时间" :error="!formValidation.time ? '必选': ''">
+        <div class="customized-label">
+
+          <span v-if="!form.state" class="el-form-item__label">完成时间</span>
+          <span v-else class="el-form-item__label">
+            <el-select v-model="form.timeType" placeholder="请选择">
+              <el-option
+                v-for="item in timeTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </span>
+
           <el-date-picker
             v-model="form.time"
             type="daterange"
@@ -61,9 +74,11 @@
             end-placeholder="结束日期"
             @change="validate"
             style="width: 290px;"
+            :class="{'input-is-error': !formValidation.time}"
             :picker-options="createTimePickerOptions">
           </el-date-picker>
-        </el-form-item>
+
+        </div>
         <el-form-item label="备注">
           <el-input v-model="form.remarks" type="textarea"></el-input>
         </el-form-item>
@@ -102,9 +117,8 @@
 
       <div class="dialog-footer" style="margin-top: 15px;">
         <el-button @click="visible = false">取 消</el-button>
-        <!--sign:screen-->
         <el-button type="primary" @click="confirmCreateReport('screen')" :disabled="pending">去除重复数据并继续</el-button>
-        <el-button type="primary" @click="confirmCreateReport('continuation')" :disabled="pending">包含重复数据并继续</el-button>
+        <el-button type="primary" @click="confirmCreateReport" :disabled="pending">包含重复数据并继续</el-button>
       </div>
 
     </div>
@@ -122,10 +136,10 @@
 </template>
 
 <script>
-import { formatDate, } from '@src/util/lang';
+import { formatDate } from '@src/util/lang';
 import {createPerformanceReport} from '@src/api/PerformanceApi';
 export default {
-  name: "edit-performance-report-dialog",
+  name: 'edit-performance-report-dialog',
   props: {
     initData: {
       type: Object,
@@ -183,6 +197,16 @@ export default {
           value: 1,
         },
       ],
+      timeTypeOptions: [
+        {
+          label: '完成时间',
+          value: 0,
+        },
+        {
+          label: '结算时间',
+          value: 1,
+        },
+      ],
       reports: [],
       stage: 'build',
       createReportResult: {},
@@ -193,6 +217,7 @@ export default {
         range: 0,
         target: [],
         state: 0,
+        timeType: 0,
         remarks: '',
         sign: 'first',
       },
@@ -274,14 +299,19 @@ export default {
         ...this.buildParams(),
         sign,
       };
-      this.pending = true;
 
+      if (!sign) {
+        delete params.sign;
+      }
+
+      this.pending = true;
       createPerformanceReport(params)
         .then(res => {
-          console.log('res', res);
+          // console.log('res', res);
           this.pending = false;
           if ([1, 7, 8, 11].some(v => v === res.status)) {
             // todo failed message
+            this.$platform.alert(res.message);
             // 1 失败 8 无可统计的工单 7 无可结算员工信息
             return;
           }
@@ -324,10 +354,8 @@ export default {
           // 最后才是有不重复的数据生成报告
 
           if (!res.status) {
-            this.visible = false;
-            // todo 成功失败的弹窗提示 刷新列表
-            this.$emit('refresh-list');
-            this.reset();
+            this.stage = 'success';
+            this.createReportResult = res.data;
           }
         })
         .catch(e => {
@@ -336,14 +364,15 @@ export default {
         });
     },
     buildParams() {
-      const {ruleId, reportName, time, target, range, state, remarks, sign} = this.form;
+      const {ruleId, reportName, time, target, range, state, remarks, sign, timeType} = this.form;
       return {
         ruleId,
         reportName,
-        timeType: state,
+        state,
+        timeType: !state ? 0 : timeType,
         remarks,
         startTime: formatDate(time[0], 'YYYY-MM-DD HH:mm:ss'),
-        endTime: formatDate(time[1], 'YYYY-MM-DD') + ' 23:59:59',
+        endTime: `${formatDate(time[1], 'YYYY-MM-DD') } 23:59:59`,
         [range ? 'teams' : 'users']: target.join(','),
         sign,
       }
@@ -356,11 +385,11 @@ export default {
         title: `工单${row.taskNo}`,
         close: true,
         url: `/task/view/${row.taskId}?noHistory=1`,
-        fromId: fromId
+        fromId
       })
     },
     viewDetail() {
-      const id = this.createReportResult.reportId;
+      const id = this.createReportResult.reportId || this.createReportResult.id;
       let fromId = window.frameElement.getAttribute('id');
       this.visible = false;
       this.reset();
@@ -370,7 +399,7 @@ export default {
         title: '绩效报告详情',
         close: true,
         url: `/performance/v2/report/desc/${id}`,
-        fromId: fromId
+        fromId
       })
     },
     selectAll() {
@@ -410,6 +439,7 @@ export default {
         range: 0,
         target: [],
         state: 0,
+        timeType: 0,
         remarks: '',
         sign: 'first',
       };
@@ -428,7 +458,7 @@ export default {
 
 <style lang="scss">
 
-  .input-is-error input {
+  .input-is-error, .input-is-error input {
     border-color: #f56c6c;
   }
 
@@ -437,6 +467,20 @@ export default {
       max-height: 300px;
       overflow-y: auto;
     }
+  }
+
+  .customized-label {
+    height: 40px;
+    margin-bottom: 18px;
+    .el-form-item__label {
+      width: 110px;
+      height: 32px;
+      line-height: 32px;
+    }
+    .el-select {
+      width: 100%;
+    }
+
   }
 
 

@@ -52,6 +52,7 @@
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
           <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteReport">删除</base-button>
           <a href="https://help.shb.ltd/doc?id=10501#Performance_report">如何通过绩效报告统计团队或个人数据？</a>
+          <a href="/performance/list">旧版链接</a>
         </div>
 
 
@@ -63,10 +64,10 @@
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
-                <div >导出</div>
+                <div @click="exportReport(false)">导出</div>
               </el-dropdown-item>
               <el-dropdown-item>
-                <div >导出全部</div>
+                <div @click="exportReport(true)">导出全部</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -134,6 +135,15 @@
 
     </div>
     <edit-performance-report-dialog :init-data="initData" @refresh-list="search" ref="reportDialog" />
+    <base-export
+      ref="exportPanel"
+      :columns="columns"
+      :build-params="buildExportParams"
+      method="post"
+      action="/performance/v2/export/report"/>
+      <!--:validate="checkExportCount"-->
+
+
   </div>
 </template>
 
@@ -143,7 +153,7 @@ import {getPerformanceReports, deletePerformanceReports} from '@src/api/Performa
 import EditPerformanceReportDialog from './components/EditPerformanceReportDialog.vue';
 
 export default {
-  name: "list-view",
+  name: 'list-view',
   props: {
     initData: {
       type: Object,
@@ -222,6 +232,32 @@ export default {
     this.search();
   },
   methods: {
+    exportReport(exportAll) {
+      let ids = [];
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}结算数据.xlsx`;
+      if (!exportAll) {
+        if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+        ids = this.multipleSelection;
+      }
+
+      this.$refs.exportPanel.open(ids, fileName);
+    },
+    buildExportParams(checkedArr, ids) {
+      let exportAll = !ids || ids.length == 0;
+
+      if (exportAll) {
+        return {
+          checked: `${checkedArr.join(',') },`,
+          // exportSearchModel: exportAll ? JSON.stringify(this.buildParams() || {}) : ''
+        };
+      }
+
+      return {
+        checked: `${checkedArr.join(',') },`,
+        ids: `${ids.join(',') },`,
+      };
+    },
+
     search(fullSearch) {
       if (fullSearch) {
         this.params = {
@@ -238,7 +274,7 @@ export default {
         .then(res => {
           this.loading = false;
           if (res.status) return {
-            //TODO failed message
+            // TODO failed message
           };
 
           if (!res.data.reportList) {
@@ -265,7 +301,7 @@ export default {
 
     },
     buildParams() {
-      const {keyword, pageNum, pageSize, time, type,} = this.params;
+      const {keyword, pageNum, pageSize, time, type, } = this.params;
       let params = {
         pageNum,
         pageSize,
@@ -277,7 +313,7 @@ export default {
 
       if (time) {
         params.startTime = formatDate(new Date(time[0]), 'YYYY-MM-DD HH:mm:ss');
-        params.endTime = formatDate(new Date(time[1]), 'YYYY-MM-DD') + ' 23:59:59';
+        params.endTime = `${formatDate(new Date(time[1]), 'YYYY-MM-DD') } 23:59:59`;
       }
 
       if (type !== 995) {
@@ -298,7 +334,7 @@ export default {
         title: '绩效报告详情',
         close: true,
         url: `/performance/v2/report/desc/${row.id}`,
-        fromId: fromId
+        fromId
       })
 
     },
@@ -326,7 +362,7 @@ export default {
         if (!await this.$platform.confirm('确定要删除选择的绩效报告？')) return;
 
         deletePerformanceReports({
-          ids: this.multipleSelection.join(',') + ',',
+          ids: `${this.multipleSelection.join(',') },`,
         })
           .then(res => {
             // todo 成功失败提示
@@ -374,39 +410,48 @@ export default {
           label: '类型',
           field: 'type',
           show: false,
-          width: '70px'
+          width: '70px',
+          exportAlias: '',
+          export: true
         },
         {
           label: '名称',
           field: 'reportName',
-          show: true
+          show: true,
+          export: true
         },
         {
           label: '创建时间',
           field: 'createTime',
           show: true,
           width: '100px',
+          export: true
         },
         {
           label: '对象',
           field: 'users',
-          show: true
+          show: true,
+          export: true
         },
         {
           label: '周期',
           field: 'cycle',
-          show: true
+          show: true,
+          export: true
         },
         {
           label: '操作人',
           field: 'createUser',
           show: true,
-          width: '100px'
+          width: '100px',
+          export: true
         },
         {
           label: '统计规则',
           field: 'ruleIds',
-          show: true
+          show: true,
+          exportAlias: 'ruleName',
+          export: true
         },
         {
           label: '报告',

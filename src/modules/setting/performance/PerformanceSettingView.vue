@@ -2,14 +2,12 @@
   <div class="performance-setting-container">
     <div class="nav-side-bar">
       <h1>绩效规则设置</h1>
-
       <h3>绩效规则</h3>
-
+      <a href="/setting/performance/rule" style="padding-left: 13px">旧版链接</a>
     </div>
+
     <div class="function-area">
       <rule-setting :init-data="initData"></rule-setting>
-
-
     </div>
   </div>
 </template>
@@ -18,7 +16,7 @@
 import RuleSetting from './RuleSetting.vue';
 
 export default {
-  name: "performance-setting-view",
+  name: 'performance-setting-view',
   props: {
     initData: {
       type: Object,
@@ -27,15 +25,6 @@ export default {
   },
   data() {
     return {}
-  },
-  mounted() {
-
-    console.log('performance-setting-view mounted', this.initData);
-  },
-  methods: {
-
-
-
   },
   components: {
     [RuleSetting.name]: RuleSetting,
@@ -50,7 +39,7 @@ export default {
     padding: 10px;
 
     .nav-side-bar {
-      min-width: 200px;
+      width: 280px;
       background: #fff;
       margin-right: 10px;
 
@@ -73,7 +62,8 @@ export default {
     }
 
     .function-area {
-      flex-grow: 2;
+      width: 660px;
+      flex-grow: 1;
       padding: 10px;
       background: #fff;
     }

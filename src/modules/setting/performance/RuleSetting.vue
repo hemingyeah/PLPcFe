@@ -52,7 +52,7 @@ import SettingRuleDialog from './components/SettingRuleDialog.vue';
 import {getAllPerformanceRules, deleteAllPerformanceRules, togglePerformanceRuleEffect} from '@src/api/PerformanceApi';
 
 export default {
-  name: "rule-setting",
+  name: 'rule-setting',
   props: {
     initData: {
       type: Object,
@@ -71,7 +71,7 @@ export default {
     allTypes() {
       const { serviceType, serviceContent, templateId} = this.initData;
       return {
-        taskTypes: (templateId || []).map(({templateName , templateId}) => ({
+        taskTypes: (templateId || []).map(({templateName, templateId}) => ({
           label: templateName,
           value: templateId,
         })),
@@ -106,7 +106,6 @@ export default {
       this.$refs.settingRuleDialog.toggleDialog();
     },
     fetchRules() {
-
       this.loading = true;
       getAllPerformanceRules()
         .then(res => {
@@ -129,7 +128,6 @@ export default {
         id: row.id,
         effect: ns,
       };
-
 
       togglePerformanceRuleEffect(params)
         .then(res => {
@@ -159,8 +157,6 @@ export default {
             // 提示成功。
             this.fetchRules();
           }
-
-          console.log('res', res);
         })
         .catch(e => console.error('e', e));
     },
@@ -182,19 +178,19 @@ export default {
           label: '类别',
           field: 'ruleType',
           show: true,
-          // width: '100px'
+          width: '80px'
         },
         {
           label: '启用/禁用',
           field: 'effect',
           show: true,
-          // width: '100px'
+          width: '80px'
         },
         {
           label: '操作',
           field: 'action',
           show: true,
-          // width: '100px'
+          width: '160px'
         },
       ]
     }
