@@ -322,7 +322,7 @@ export default {
       }
 
       .form-item label {
-        text-align: right;
+        /*text-align: right;*/
         width: 80px;
       }
 
