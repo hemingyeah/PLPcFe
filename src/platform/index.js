@@ -3,26 +3,7 @@ import {getRootWindow} from '../util/dom';
 import dingtalk from '@src/util/dingtalk';
 import BaseGallery from '@src/component/common/BaseGallery';
 
-import {alert, confirm} from './notification';
-
-// /**
-//  * @see http://element.eleme.io/#/zh-CN/component/message
-//  * 
-//  * @param {*} message - 提示信息 
-//  * @param {*} type 
-//  * @param {*} options 
-//  */
-// function toast(message, type = 'success', options = {}) {
-//   return new Promise((resolve, reject) => {
-//     Message({ //eslint-disable-line
-//       message: message,
-//       duration: options.duration || 1500,
-//       type: type,
-//       onClose: () => resolve()
-//     })
-//   })
-// }
-
+import {alert, confirm, notification} from './message';
 
 /** 在新的窗口打开链接，链接必须是全路径 */
 function openLink(url){
@@ -82,12 +63,16 @@ function imagePreview({ imageDom, urls, currIndex = 0}) {
 
 export const platform = {
   inDingTalk: dingtalk.inDingTalk,
+
   alert,
   confirm,
+  notification,
+
   openTab,
+  refreshTab,
+
   openLink,
   imagePreview,
-  refreshTab,
 };
 
 export default platform;

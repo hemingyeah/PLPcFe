@@ -67,7 +67,7 @@
  */
 
 import _ from 'lodash';
-import {alert} from '@src/platform/notification';
+import {alert} from '@src/platform/message';
 import cityMap from '../BaseDistPicker/specialCityMap';
 
 let map = null;
@@ -121,7 +121,7 @@ export default {
     },
     /** 选中地址 */
     choose(item) {
-      //如果选择的是推荐地址，直接返回数据
+      // 如果选择的是推荐地址，直接返回数据
       if (!item.isPOI) {
         let data = {
           province: item.province,
@@ -136,7 +136,7 @@ export default {
         return
       }
 
-      //如果是附近的点，需要先解析当前位置
+      // 如果是附近的点，需要先解析当前位置
       let location = new AMap.LngLat(item.longitude, item.latitude)
       this.getAddress(location).then(result => {
         if (null == result) {
@@ -144,7 +144,7 @@ export default {
         }
 
         let regeocode = result.regeocode || {};
-        let address = this.convertAddress(regeocode, location);//只有省和市都存在时，才是有效地址
+        let address = this.convertAddress(regeocode, location);// 只有省和市都存在时，才是有效地址
 
         if (!this.isSafeAddress(address)) {
           return alert('当前地址不可用，请重新选择')
@@ -212,7 +212,7 @@ export default {
         }
 
         let regeocode = result.regeocode || {};
-        //拆解选中的地址
+        // 拆解选中的地址
         let address = this.convertAddress(regeocode, location);
 
         if (!this.isSafeAddress(address)) {
@@ -221,10 +221,10 @@ export default {
           return;
         }
 
-        //拆解poi信息
+        // 拆解poi信息
         let pois = this.convertPOI(regeocode);
 
-        //补全信息
+        // 补全信息
         address.checked = true;
         address.isPOI = false;
         address.formattedAddress = regeocode.formattedAddress;
@@ -246,7 +246,7 @@ export default {
     getAddress(location) {
       return new Promise((resolve, reject) => {
         geocoder.getAddress(location, function (status, result) {
-          //无数据返回null
+          // 无数据返回null
           resolve(status == 'no_data' ? null : result)
         })
       })
@@ -289,17 +289,17 @@ export default {
       let province = adr.province;
       let city = adr.city;
       let dist = adr.district;
-      let address = formattedAddress.replace(province + city + dist, "")
+      let address = formattedAddress.replace(province + city + dist, '')
 
-      //无省份视为无效地址
+      // 无省份视为无效地址
       if (!province) return null;
 
-      //港、澳、台三地归入 其他区域
-      if (['香港', '澳门', "澳門"].some(item => province.indexOf(item) == 0)) {
+      // 港、澳、台三地归入 其他区域
+      if (['香港', '澳门', '澳門'].some(item => province.indexOf(item) == 0)) {
         return {
           province: cityMap[province] || province,
           city: cityMap[adr.district] || adr.district || '市轄區',
-          dist: "",
+          dist: '',
           address,
           latitude: location.lat,
           longitude: location.lng
@@ -312,7 +312,7 @@ export default {
         return {
           province: '台湾省',
           city: cityMap[dist] || '其他',
-          dist: "",
+          dist: '',
           address,
           latitude: location.lat,
           longitude: location.lng
@@ -321,21 +321,21 @@ export default {
 
       let result = {province, city, dist, address};
 
-      //直辖市补全city
+      // 直辖市补全city
       if (['北京市', '上海市', '重庆市', '天津市'].indexOf(province) >= 0) result.city = '市辖区';
 
-      //海南省对city特殊处理
+      // 海南省对city特殊处理
       if (province == '海南省' && !result.city) {
         result.city = result.dist;
         result.dist = '';
       }
 
-      //部分地区存在区划变更的情况
+      // 部分地区存在区划变更的情况
       let map = {
-        //2018年那曲地区变更为那曲市
-        "那曲地区": {
-          level: "city",
-          alias: ["那曲市"]
+        // 2018年那曲地区变更为那曲市
+        '那曲地区': {
+          level: 'city',
+          alias: ['那曲市']
         }
       };
 
@@ -347,7 +347,7 @@ export default {
         }
       }
 
-      //补全经纬度
+      // 补全经纬度
       result.latitude = location.lat,
       result.longitude = location.lng
 
@@ -380,11 +380,11 @@ export default {
         isCustom: true,
         offset: new AMap.Pixel(0, -34),
         autoMove: true,
-        content: this.$refs.infoWindow //使用默认信息窗体框样式，显示信息内容
+        content: this.$refs.infoWindow // 使用默认信息窗体框样式，显示信息内容
       });
 
       let location = null;
-      //设置初始值
+      // 设置初始值
       if (null != this.address && this.address.latitude && this.address.longitude) {
         let adr = this.address;
         location = new AMap.LngLat(adr.longitude, adr.latitude);
@@ -406,7 +406,7 @@ export default {
           input: 'locationKeyword',
         });
 
-        AMap.event.addListener(autocomplete, "select", function (e) {
+        AMap.event.addListener(autocomplete, 'select', function (e) {
           if (e.poi.location) {
             return ctx.parseAddress(e.poi.location);
           }

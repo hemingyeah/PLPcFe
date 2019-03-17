@@ -65,7 +65,7 @@
 import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
-import {alert} from '@src/platform/notification';
+import {alert} from '@src/platform/message';
 
 import ContactUserItem from './ContactUserItem.vue';
 import DefaultHead from '@src/assets/img/avatar.png';
@@ -91,17 +91,17 @@ export default {
       type: String,
       default: '请选择人员'
     },
-    //是否显示任务统计
+    // 是否显示任务统计
     showTaskCount: {
       type: Boolean,
       default: false
     },
-    //是否显示用户工作状态
+    // 是否显示用户工作状态
     showUserState: {
       type: Boolean,
       default: false
     },
-    action: { //用户数据请求地址
+    action: { // 用户数据请求地址
       type: String,
       default: '/security/department/user'
     },
@@ -115,12 +115,12 @@ export default {
       default: ''
       // default: '113.961467'
     },
-    //是否显示定位信息
+    // 是否显示定位信息
     showLocation: { 
       type: Boolean,
       default: false
     },
-    //是否允许选中部门
+    // 是否允许选中部门
     showDeptCheckbox: {
       type: Boolean,
       default: false
@@ -136,36 +136,36 @@ export default {
         callback: this.loadmore
       },
 
-      depts: [], //部门
+      depts: [], // 部门
       deptUserCount: {},
-      selectedDept: {}, //选中的部门
-      chosenDept: [], //选择的部门
-      chosen: [], //已选择的人
+      selectedDept: {}, // 选中的部门
+      chosenDept: [], // 选择的部门
+      chosen: [], // 已选择的人
 
       params: {
-        keyword: '', //搜索关键词
+        keyword: '', // 搜索关键词
         deptId: '',
         pageNum: 1,
         pageSize: 50
-      }, //参数
+      }, // 参数
       userPage: new Page(),
 
-      stateColor: {} //用户工作状态颜色
+      stateColor: {} // 用户工作状态颜色
     }
   },
   computed: {
     btnText(){
       return this.max > 0 ? `(${this.chosen.length}/${this.max})` : "";
     },
-    //是否多选
+    // 是否多选
     isMulti(){
       return this.max != 1;
     },
-    //是否允许添加用户
+    // 是否允许添加用户
     allowAddUser(){
       return this.chosen.length < this.max;
     },
-    //当前已选概览
+    // 当前已选概览
     summary(){
       let text = `当前已选${this.chosen.length}人`;
       if(this.allowCheckDept) {
@@ -173,7 +173,7 @@ export default {
       }
       return text;
     },
-    //是否允许选中部门
+    // 是否允许选中部门
     allowCheckDept(){
       return this.isMulti && this.showDeptCheckbox;
     }
@@ -210,7 +210,7 @@ export default {
     },
     /** 搜索人员 */
     search: _.debounce(function(){
-      if(!this.params.keyword){ //空值  显示团队
+      if(!this.params.keyword){ // 空值  显示团队
         this.mode = 'choose';
         this.initDeptUser(this.selectedDept);
         return;
@@ -222,7 +222,7 @@ export default {
     chooseUser(user){
       if(!user) return;
 
-      //单选则直接返回
+      // 单选则直接返回
       if(!this.isMulti) {
         this.show = false;
         this.$emit('input', {
@@ -300,7 +300,7 @@ export default {
         this.userPage.list = [];
         this.loading = true;
 
-        //查询用户
+        // 查询用户
         this.params.keyword = '';
         this.params.deptId = this.selectedDept.id;
         this.params.pageNum = 1;
@@ -335,7 +335,7 @@ export default {
         subDepts.forEach(item => this.toggleDeptCheckStatus(item, value))
       }
     },
-    //筛选所有被选中的部门
+    // 筛选所有被选中的部门
     filterChosenDept(depts){
       if(!Array.isArray(depts) || depts.length == 0) return [];
 
@@ -366,7 +366,7 @@ export default {
     /** 抓取用户数据 */
     fetchUser(params = {}){      
       return http.get(this.action, params).then(page => {
-        //合并数据
+        // 合并数据
         let rows = page.list || [];
 
         for(let i = 0;i < rows.length; i++){
@@ -380,7 +380,7 @@ export default {
             }
           }
 
-          if(index >= 0){//存在相同数据 则替换原数据
+          if(index >= 0){// 存在相同数据 则替换原数据
             user.selected = true;
             this.$set(this.chosen, index, user);
           }else{
@@ -406,12 +406,12 @@ export default {
           }
         }
 
-        //将单独授权人员放在最后
+        // 将单独授权人员放在最后
         if(index >= 0){
           let arr = depts.splice(index,1);
           depts.push(arr[0]); 
         } 
-        //console.log(depts);
+        // console.log(depts);
         
         return depts;
       })
@@ -444,7 +444,7 @@ export default {
           }
       
           this.depts = depts;
-          this.initDeptUser(this.depts[0]); //默认选中第一个
+          this.initDeptUser(this.depts[0]); // 默认选中第一个
         })
         .catch(err => console.error(err))
     },

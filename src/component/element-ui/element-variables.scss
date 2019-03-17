@@ -47,3 +47,20 @@ $--select-border-color-hover: $input-border-hover-color !default;
 .el-table--small th, .el-table--small td {
   padding: 6px 0;
 }
+
+.base-notification{
+  padding: 14px !important;
+
+  .el-notification__group{
+    flex: 1;
+  }
+
+  .el-notification__title{
+    padding-right: 24px;
+  }
+
+  .el-notification__content{
+    max-height: 360px;
+    overflow-y: auto;
+  }
+}

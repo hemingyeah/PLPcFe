@@ -1,8 +1,11 @@
 import Vue from '@src/common/entry';
 import dingtalk from '@src/util/dingtalk';
 import FrameView from './FrameView.vue';
+import { Notification } from 'element-ui';
 
-//处理注入的参数
+window.__exports__notification = Notification;
+
+// 处理注入的参数
 let initData = {};
 try {
   initData = JSON.parse(window._init);

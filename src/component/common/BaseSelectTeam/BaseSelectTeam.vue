@@ -19,9 +19,7 @@
 </template> 
 
 <script>
-import _ from 'lodash';
 import http from '@src/util/http';
-import {alert} from '@src/platform/notification';
 
 export default {
   name: 'base-select-team',
@@ -91,8 +89,7 @@ export default {
     /** 抓取用户数据 */
     fetchUser(params = {}){
       return http.get(this.action, params).then(page => {
-        console.log('page', page)
-        //合并数据
+        // 合并数据
         let rows = page.list || [];
 
         for(let i = 0;i < rows.length; i++){
@@ -106,7 +103,7 @@ export default {
             }
           }
 
-          if(index >= 0){//存在相同数据 则替换原数据
+          if(index >= 0){// 存在相同数据 则替换原数据
             user.selected = true;
             this.$set(this.chosen, index, user);
           }else{

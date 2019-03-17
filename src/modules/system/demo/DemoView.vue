@@ -1,7 +1,8 @@
 <template>
   <div>
+    <button @click="Notification">show Notification</button>
     <!-- <tsx-comp/> -->
-    <base-datatable-demo style="padding: 10px;"/>
+    <!-- <base-datatable-demo style="padding: 10px;"/> -->
     <!--   
     <a href="javascript:;" @click="open">open</a>
     <a href="javascript:;" @click="open2">open2</a>
@@ -180,6 +181,18 @@ export default {
     },
     save() {
       this.fields.forEach(item => item.toField());
+    },
+    Notification(){
+      console.log(this.$createElement)
+      platform.notification({
+        title: '成功',
+        //content: '<p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p><p>这是一条成功的提示消息</p>',
+        message: (function name(h) {
+          return <div>hello world</div>
+        })(this.$createElement),
+        type: 'success',
+        duration: 0
+      })
     }
   },
   mounted() {

@@ -19,7 +19,6 @@
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
 import platform from '@src/platform'
-import {alert} from "../../../platform/notification";
 
 export default {
   name: 'setting-customer-fields-view',
@@ -42,13 +41,13 @@ export default {
       window.parent.frameHistoryBack(window)
     },
     async submit(){
-      //TODO: 字段验证
+      // TODO: 字段验证
 
       try {
         let fields = FormUtil.toField(this.fields);
         fields.forEach(item => {
           item.tableName = 'customer';
-          item.isDelete = 0; //TODO: 待删除
+          item.isDelete = 0; // TODO: 待删除
         });
 
         const validateRes = this.validate(fields);
