@@ -313,7 +313,7 @@ export default {
     /** 检测是否有导出 */
     async checkExports(){
       try {
-        this.exportList = await http.get('/excels/getList');
+        this.exportList = (await http.get('/excels/getList') || []);
         // 更新操作列表
         if(!Array.isArray(this.exportList)) this.exportList = [];
         //更新操作列表
