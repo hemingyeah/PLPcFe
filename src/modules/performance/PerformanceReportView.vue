@@ -10,7 +10,7 @@
       <dd><label>规则命中：</label>{{reportDetail.hitSize}}</dd>
       <dd><label>统计方式：</label>{{reportDetail.ruleType | ruleType}}</dd>
       <dd><label>统计状态：</label>{{reportDetail.timeType ? '已完成并结算' : '已完成'}}</dd>
-      <dd><label>起止时间：</label>{{reportDetail.startTime | formatDatetime}} ~ {{reportDetail.endTime | formatDatetime}}</dd>
+      <dd><label>起止时间：</label>{{reportDetail.startTime | formatDate}} ~ {{reportDetail.endTime | formatDate}}</dd>
       <dd><label>备注：</label>{{reportDetail.remark}}</dd>
     </dl>
 
@@ -151,6 +151,10 @@ export default {
     formatDatetime(val) {
       if (!val) return val;
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
+    },
+    formatDate(val) {
+      if (!val) return val;
+      return formatDate(val, 'YYYY-MM-DD')
     },
   },
   methods: {

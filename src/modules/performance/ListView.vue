@@ -126,7 +126,7 @@
         background
         @current-change="jump"
         @size-change="handleSizeChange"
-        :page-sizes="[1,10, 20, 50]"
+        :page-sizes="[10, 20, 50]"
         :page-size="params.pageSize"
         :current-page="params.pageNum"
         layout="sizes, prev, pager, next, jumper"
@@ -411,7 +411,6 @@ export default {
       let columnIsShow = this.columns.filter(c => c.show).map(c => c.field);
       this.saveDataToStorage('columnStatus', columnIsShow);
     },
-    // todo 把之前的column状态迁移过来
     buildColumns() {
       let storage = this.getLocalStorageData();
       let columnIsShow = storage.columnStatus || [];

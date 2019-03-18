@@ -78,6 +78,9 @@
             :picker-options="createTimePickerOptions">
           </el-date-picker>
 
+          <div v-if="!formValidation.time && form.time && form.time.length" class="time-is-error">
+            时间跨度不能大于3个月
+          </div>
         </div>
         <el-form-item label="备注">
           <el-input v-model="form.remarks" type="textarea"></el-input>
@@ -89,38 +92,38 @@
       </div>
     </div>
     <div class="confirm-stage" v-if="stage === 'confirm'">
-      <el-table :data="reports" stripe >
-
-        <el-table-column
-          v-for="column in columns"
-          :key="column.field"
-          :label="column.label"
-          :prop="column.field"
-          show-overflow-tooltip>
-          <template slot-scope="scope">
-            <template v-if="column.field === 'tagName'">
-              {{scope.row[column.field]}}
+      <div class="table-wrap">
+        <el-table :data="reports" stripe >
+          <el-table-column
+            v-for="column in columns"
+            :key="column.field"
+            :label="column.label"
+            :prop="column.field"
+            :width="column.width"
+            show-overflow-tooltip>
+            <template slot-scope="scope">
+              <template v-if="column.field === 'tagName'">
+                {{scope.row[column.field]}}
+              </template>
+              <template v-else-if="column.field === 'taskNo'">
+                <a href="" class="view-detail-btn" @click.stop.prevent="viewTask(scope.row)">{{scope.row[column.field]}}</a>
+              </template>
+              <template v-else-if="column.field === 'executor'">
+                {{scope.row[column.field].displayName}}
+              </template>
+              <template v-else>
+                {{scope.row[column.field]}}
+              </template>
             </template>
-            <template v-else-if="column.field === 'taskNo'">
-              <a href="" class="view-detail-btn" @click.stop.prevent="viewTask(scope.row)">{{scope.row[column.field]}}</a>
-            </template>
-            <template v-else-if="column.field === 'executor'">
-              {{scope.row[column.field].displayName}}
-            </template>
-            <template v-else>
-              {{scope.row[column.field]}}
-            </template>
-          </template>
-        </el-table-column>
-      </el-table>
-
+          </el-table-column>
+        </el-table>
+      </div>
 
       <div class="dialog-footer" style="margin-top: 15px;">
         <el-button @click="visible = false">取 消</el-button>
         <el-button type="primary" @click="confirmCreateReport('screen')" :disabled="pending">去除重复数据并继续</el-button>
         <el-button type="primary" @click="confirmCreateReport" :disabled="pending">包含重复数据并继续</el-button>
       </div>
-
     </div>
 
     <div class="stage-success" v-if="stage === 'success'">
@@ -151,6 +154,9 @@ export default {
       visible: false,
       pending: false,
       createTimePickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        },
         shortcuts: [{
           text: '最近一周',
           onClick(picker) {
@@ -288,6 +294,7 @@ export default {
         {
           label: '负责人',
           field: 'executor',
+          width: '100px',
           show: true
         },
       ].filter(c => c.show)
@@ -307,13 +314,14 @@ export default {
       this.pending = true;
       createPerformanceReport(params)
         .then(res => {
-          // console.log('res', res);
           this.pending = false;
           if ([1, 7, 8, 11].some(v => v === res.status)) {
-            // todo failed message
-            this.$platform.alert(res.message);
             // 1 失败 8 无可统计的工单 7 无可结算员工信息
-            return;
+            return this.$platform.notification({
+              title: '失败',
+              message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
+              type: 'error',
+            });
           }
 
           this.stage = 'success';
@@ -346,7 +354,6 @@ export default {
               message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
               type: 'error',
             });
-
           }
 
           // 结算重复
@@ -360,7 +367,7 @@ export default {
 
           if (!res.status) {
             this.stage = 'success';
-            this.createReportResult = res.data;
+            this.visible = false;
           }
         })
         .catch(e => {
@@ -416,14 +423,18 @@ export default {
     },
     validateForm() {
       const keys = Object.keys(this.formValidation);
-      const valIsArr = ['target', 'time'];
+      // const valIsArr = ['target', 'time'];
       let val = null;
 
       return keys.map(key => {
         val = this.form[key];
-        if (valIsArr.some(k => k === key)) {
-          return this.formValidation[key] = Array.isArray(val) && !!val.length;
-        }
+        // if (valIsArr.some(k => k === key)) {
+        //   return this.formValidation[key] = Array.isArray(val) && !!val.length;
+        // }
+        // 8035200000 ms = 93 days
+        if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
+        if (key === 'time') return this.formValidation[key] = Array.isArray(val) && !!val.length && new Date(this.form.time[1]) - new Date(this.form.time[0]) <= 8035200000;
+
         return this.formValidation[key] = !!val
       })
         .every(bool => bool);
@@ -462,35 +473,39 @@ export default {
 </script>
 
 <style lang="scss">
+.input-is-error, .input-is-error input {
+  border-color: #f56c6c;
+}
 
-  .input-is-error, .input-is-error input {
-    border-color: #f56c6c;
+.confirm-stage {
+  .table-wrap {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+}
+
+.customized-label {
+  height: 40px;
+  margin-bottom: 18px;
+  .el-form-item__label {
+    width: 110px;
+    height: 32px;
+    line-height: 32px;
+  }
+  .el-select {
+    width: 100%;
   }
 
-  .confirm-stage {
-    .el-table {
-      max-height: 300px;
-      overflow-y: auto;
-    }
+  .time-is-error {
+    color: #f56c6c;
+    font-size: 12px;
+    padding: 3px 0 0 110px;
   }
-
-  .customized-label {
-    height: 40px;
-    margin-bottom: 18px;
-    .el-form-item__label {
-      width: 110px;
-      height: 32px;
-      line-height: 32px;
-    }
-    .el-select {
-      width: 100%;
-    }
-
-  }
+}
 
 
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-  }
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
 </style>

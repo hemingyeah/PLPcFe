@@ -132,13 +132,13 @@ export default {
       togglePerformanceRuleEffect(params)
         .then(res => {
           row.pending = false;
-          // if (res.status) {
+          if (res.status) {
             return this.notice({
               title: '失败',
               type: 'error',
               message: res.message || '发生未知错误',
             })
-          // }
+          }
 
           this.rules.forEach(rule => {
             if (rule.id === row.id) {

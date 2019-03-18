@@ -20,12 +20,16 @@
     <div class="detail">
       <p>
         <span class="ordinary-text">{{config.prefix}}负责人{{config.label}}</span>
-        <el-input :value="value.executorScore" @input="(val) => updateVal({val, action: 'executorScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
+        <el-tooltip :content="config.tip" placement="top" effect="light">
+          <el-input :value="value.executorScore" @input="(val) => updateVal({val, action: 'executorScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
+        </el-tooltip>
         <span class="ordinary-text">{{config.unit}}</span>
       </p>
       <p>
         <span class="ordinary-text">{{config.prefix}}协同人{{config.label}}</span>
-        <el-input :value="value.assistantScore" @input="(val) => updateVal({val, action: 'assistantScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'assistantScore')}" class="count-input" placeholder="请输入内容"></el-input>
+        <el-tooltip :content="config.tip" placement="top" effect="light">
+          <el-input :value="value.assistantScore" @input="(val) => updateVal({val, action: 'assistantScore', })" :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'assistantScore')}" class="count-input" placeholder="请输入内容"></el-input>
+        </el-tooltip>
         <span class="ordinary-text">{{config.unit}}</span>
       </p>
     </div>
@@ -37,7 +41,7 @@
 
 <script>
 export default {
-  name: "specific-condition",
+  name: 'specific-condition',
   props: {
     label: {
       type: String,
@@ -87,9 +91,6 @@ export default {
         });
       return arr;
     }
-  },
-  mounted() {
-    console.log('mounted');
   },
   methods: {
     updateVal({action, val}) {

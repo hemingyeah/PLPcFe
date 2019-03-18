@@ -1,23 +1,24 @@
 <template>
   <base-modal title="绩效明细" :show.sync="visible" width="600px" class="base-import-modal" @closed="reset">
 
-    <el-table
-      stripe
-      :data="detail">
-      <el-table-column prop="taskNo" label="工单编号" >
-        <template slot-scope="scope">
-          <a href @click="viewTask(scope.row)" class="view-detail-btn">{{scope.row.taskNo}}</a>
-          <!--{{scope.row.taskNo}}-->
-        </template>
-      </el-table-column>
-      <el-table-column prop="customer" label="客户" >
-        <template slot-scope="scope">{{scope.row.customer.name}}</template>
-      </el-table-column>
-      <el-table-column prop="userName" label="对象" ></el-table-column>
-      <el-table-column prop="userRole" label="角色" ></el-table-column>
-      <el-table-column prop="ruleType" label="绩效方式" ></el-table-column>
-      <el-table-column prop="income" label="绩效结果" ></el-table-column>
-    </el-table>
+    <div class="table-wrap">
+      <el-table
+        stripe
+        :data="detail">
+        <el-table-column prop="taskNo" label="工单编号" >
+          <template slot-scope="scope">
+            <a href="javascript:;" @click="viewTask(scope.row)" class="view-detail-btn">{{scope.row.taskNo}}</a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="customer" label="客户" >
+          <template slot-scope="scope">{{scope.row.customer.name}}</template>
+        </el-table-column>
+        <el-table-column prop="userName" width="70px" label="对象"></el-table-column>
+        <el-table-column prop="userRole" width="70px" label="角色"></el-table-column>
+        <el-table-column prop="ruleType" width="70px" label="绩效方式" ></el-table-column>
+        <el-table-column prop="income" width="70px" label="绩效结果" ></el-table-column>
+      </el-table>
+    </div>
 
     <div class="dialog-footer" style="margin-top: 15px;text-align: right;">
       <el-button type="primary" :disabled="pending" @click="exportDetail">导出</el-button>
@@ -106,7 +107,7 @@ export default {
   color: $color-primary;
 }
 
-.el-table {
+.table-wrap {
   max-height: 300px;
   overflow-y: auto;
 }

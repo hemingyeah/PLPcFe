@@ -51,10 +51,14 @@
 
         <div v-if="!form.effectCondition" class="special-condition-wrap">
           <span class="ordinary-text">负责人{{conditionConfig.label}}</span>
-          <el-input v-model="form.rules[0].executorScore" @change="validate" :class="{'input-is-error': formValidationResult.rules[0].fields.some(v => v === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
+          <el-tooltip :content="conditionConfig.tip" placement="top" effect="light">
+            <el-input v-model="form.rules[0].executorScore" @change="validate" :class="{'input-is-error': formValidationResult.rules[0].fields.some(v => v === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
+          </el-tooltip>
           <span class="ordinary-text">{{conditionConfig.unit}}</span>
           <span class="ordinary-text">协同人{{conditionConfig.label}}</span>
-          <el-input v-model="form.rules[0].assistantScore" @change="validate" :class="{'input-is-error': formValidationResult.rules[0].fields.some(v => v === 'assistantScore')}" class="count-input" placeholder="请输入内容"></el-input>
+          <el-tooltip :content="conditionConfig.tip" placement="top" effect="light">
+            <el-input v-model="form.rules[0].assistantScore" @change="validate" :class="{'input-is-error': formValidationResult.rules[0].fields.some(v => v === 'assistantScore')}" class="count-input" placeholder="请输入内容"></el-input>
+          </el-tooltip>
           <span class="ordinary-text">{{conditionConfig.unit}}</span>
         </div>
       </el-form-item>
@@ -257,11 +261,11 @@ export default {
                 // 部分生效 验证 选择类型
                 errFields.push('types');
               }
-              if (isNaN(executorScore) || typeof executorScore !== 'number' || executorScore < 0) {
+              if (isNaN(executorScore) || typeof executorScore !== 'number' || executorScore < 0 || executorScore > 9999 || (/\./g.test(executorScore) && executorScore.toString().split('.')[1].length > 1)) {
                 errFields.push('executorScore');
               }
 
-              if (isNaN(assistantScore) || typeof assistantScore !== 'number' || assistantScore < 0) {
+              if (isNaN(assistantScore) || typeof assistantScore !== 'number' || assistantScore < 0 || assistantScore > 9999 || (/\./g.test(assistantScore) && assistantScore.toString().split('.')[1].length > 1)) {
                 errFields.push('assistantScore');
               }
               if (errFields.length) {
@@ -283,11 +287,11 @@ export default {
             if (rewardType !== 'amount') {
               // 按百分比计算
               // || executorScore > 100  || assistantScore > 100
-              if (isNaN(executorScore) || typeof executorScore !== 'number' || executorScore < 0) {
+              if (isNaN(executorScore) || typeof executorScore !== 'number' || executorScore < 0 || executorScore > 100 || (/\./g.test(executorScore) && executorScore.toString().split('.')[1].length > 1)) {
                 errFields.push('executorScore');
               }
 
-              if (isNaN(assistantScore) || typeof assistantScore !== 'number' || assistantScore < 0) {
+              if (isNaN(assistantScore) || typeof assistantScore !== 'number' || assistantScore < 0 || assistantScore > 100 || (/\./g.test(assistantScore) && assistantScore.toString().split('.')[1].length > 1)) {
                 errFields.push('assistantScore');
               }
 
@@ -364,11 +368,15 @@ export default {
         prefix = '排除后';
       }
 
+      // ruleType 0 计分制 1奖金制
+      // rewardType
+
       if (!ruleType) {
         return {
           label: '每单计',
           unit: '分',
           prefix,
+          tip: '请输入数字，可以有一位小数，最大9999'
         }
       }
 
@@ -377,6 +385,7 @@ export default {
           label: '每单得',
           unit: '%',
           prefix,
+          tip: '请输入数字，可以有一位小数，最大100'
         }
       }
 
@@ -384,6 +393,7 @@ export default {
         label: '每单得',
         unit: '元',
         prefix,
+        tip: '请输入数字，可以有一位小数，最大9999'
       };
     },
     title() {
@@ -392,8 +402,6 @@ export default {
     action() {
       return this.performanceRule.id ? 'edit' : 'create';
     }
-  },
-  mounted() {
   },
   methods: {
     onSubmit() {
@@ -679,6 +687,7 @@ export default {
     reset() {
       this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
       this.performanceRule = {};
+      this.submitted = false;
     },
     clearSomeFieldsVal(fields) {
       let defaultValIsEmptyString = ['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField'];
