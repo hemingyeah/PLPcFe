@@ -153,9 +153,6 @@ export default {
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
     },
   },
-  mounted() {
-    console.log(this.initData);
-  },
   methods: {
     exportDetail() {
       this.pending = true;

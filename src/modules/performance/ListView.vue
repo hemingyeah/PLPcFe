@@ -243,7 +243,7 @@ export default {
       this.$refs.exportPanel.open(ids, fileName);
     },
     buildExportParams(checkedArr, ids) {
-      let exportAll = !ids || ids.length == 0;
+      let exportAll = !ids || !ids.length;
 
       if (exportAll) {
         return {
@@ -273,9 +273,13 @@ export default {
       getPerformanceReports(params)
         .then(res => {
           this.loading = false;
-          if (res.status) return {
-            // TODO failed message
-          };
+          if (res.status) {
+            return this.$platform.notification({
+              title: '失败',
+              message: (h => (<div>{res.message || '获取绩效报告发生未知错误'}</div>))(this.$createElement),
+              type: 'error',
+            });
+          }
 
           if (!res.data.reportList) {
             this.reports = [];
@@ -365,7 +369,14 @@ export default {
           ids: `${this.multipleSelection.join(',') },`,
         })
           .then(res => {
-            // todo 成功失败提示
+            if (res.status) {
+              return this.$platform.notification({
+                title: '失败',
+                message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
+                type: 'error',
+              });
+            }
+
             this.multipleSelection = [];
             this.search();
           })

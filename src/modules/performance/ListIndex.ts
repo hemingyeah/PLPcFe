@@ -2,6 +2,9 @@
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
 import ListView from './ListView.vue';
+import { Notification } from 'element-ui';
+
+(<any>window).__exports__notification = Notification;
 
 Vue.prototype.$http = http;
 

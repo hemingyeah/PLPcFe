@@ -341,7 +341,12 @@ export default {
           if ([1, 7, 8, 11].some(v => v === res.status)) {
             // todo failed message
             // 1 失败 8 无可统计的工单 7 无可结算员工信息
-            return;
+            return this.$platform.notification({
+              title: '失败',
+              message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
+              type: 'error',
+            });
+
           }
 
           // 结算重复

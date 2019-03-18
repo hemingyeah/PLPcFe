@@ -406,13 +406,20 @@ export default {
 
       fn(params)
         .then(res => {
-          if (!res.status) {
-            this.pending = false;
-            this.visible = false;
-            // refresh list
-            this.$emit('refresh-rules');
-            this.reset();
+          this.pending = false;
+
+          if (res.status) {
+            return this.$platform.notification({
+              title: '失败',
+              message: (h => (<div>{res.message}</div>))(this.$createElement),
+              type: 'error',
+            });
           }
+
+          this.visible = false;
+          // refresh list
+          this.$emit('refresh-rules');
+          this.reset();
         })
         .catch(e => console.error('e', e));
 

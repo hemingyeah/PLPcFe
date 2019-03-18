@@ -1,6 +1,9 @@
 import Vue from '@src/common/entry'
 import http from '@src/util/http';
 import PerformanceSettingView from './PerformanceSettingView.vue';
+// import { Notification } from 'element-ui';
+//
+// window.__exports__notification = Notification;
 
 Vue.prototype.$http = http;
 

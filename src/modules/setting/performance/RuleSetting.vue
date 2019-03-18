@@ -131,12 +131,14 @@ export default {
 
       togglePerformanceRuleEffect(params)
         .then(res => {
-          console.log('res', res);
           row.pending = false;
-          if (res.status) {
-            // 失败 提示
-            return;
-          }
+          // if (res.status) {
+            return this.notice({
+              title: '失败',
+              type: 'error',
+              message: res.message || '发生未知错误',
+            })
+          // }
 
           this.rules.forEach(rule => {
             if (rule.id === row.id) {
@@ -152,13 +154,25 @@ export default {
 
       deleteAllPerformanceRules(row.id)
         .then(res => {
-
-          if (!res.status) {
-            // 提示成功。
-            this.fetchRules();
+          if (res.status) {
+            return this.notice({
+              title: '失败',
+              type: 'error',
+              message: res.message || '发生未知错误',
+            })
           }
+
+          // 删除成功
+          this.fetchRules();
         })
         .catch(e => console.error('e', e));
+    },
+    notice({type, message, title}) {
+      return this.$platform.notification({
+        title,
+        message: (h => (<div>{message}</div>))(this.$createElement),
+        type,
+      });
     },
     buildColumns() {
       return [

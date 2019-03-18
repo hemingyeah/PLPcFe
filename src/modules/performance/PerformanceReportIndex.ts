@@ -1,11 +1,11 @@
 
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
-import PeroformanceView from './PerformanceReportView.vue';
+import PerformanceView from './PerformanceReportView.vue';
 
 Vue.prototype.$http = http;
 
-const PerformanceViewComp = Vue.extend(PeroformanceView);
+const PerformanceViewComp = Vue.extend(PerformanceView);
 let initData = {};
 
 
