@@ -4,7 +4,12 @@
     <el-table
       stripe
       :data="detail">
-      <el-table-column prop="taskNo" label="工单编号" />
+      <el-table-column prop="taskNo" label="工单编号" >
+        <template slot-scope="scope">
+          <a href @click="viewTask(scope.row)" class="view-detail-btn">{{scope.row.taskNo}}</a>
+          <!--{{scope.row.taskNo}}-->
+        </template>
+      </el-table-column>
       <el-table-column prop="customer" label="客户" >
         <template slot-scope="scope">{{scope.row.customer.name}}</template>
       </el-table-column>
@@ -36,6 +41,17 @@ export default {
     }
   },
   methods: {
+    viewTask(row){
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `taskView_${row.taskId}`,
+        title: `工单${row.taskNo}`,
+        close: true,
+        url: `/task/view/${row.taskId}?noHistory=1`,
+        fromId
+      })
+    },
     exportDetail() {
       this.pending = true;
 
@@ -84,6 +100,11 @@ export default {
 </script>
 
 <style lang="scss">
+
+
+.view-detail-btn {
+  color: $color-primary;
+}
 
 .el-table {
   max-height: 300px;
