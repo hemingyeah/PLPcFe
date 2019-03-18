@@ -299,6 +299,7 @@
         </el-table-column>
         <el-table-column
           v-for="column in columns"
+          v-if="column.show"
           :key="column.field"
           :label="column.label"
           :prop="column.field"
@@ -308,7 +309,7 @@
           show-overflow-tooltip
           :align="column.align"
         >
-          <template slot-scope="scope" v-if="column.show">
+          <template slot-scope="scope">
             <template v-if="column.field === 'name'">
               <a href="" class="view-detail-btn" @click.stop.prevent="createCustomerTab(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
