@@ -93,7 +93,7 @@
         stripe
         @select="handleSelection"
         @select-all="handleSelection"
-        ref="multipleTable" class="">
+        ref="multipleTable" class="report-table">
 
         <el-table-column type="selection" width="48" align="center"></el-table-column>
         <el-table-column
@@ -428,6 +428,7 @@ export default {
           label: '名称',
           field: 'reportName',
           show: true,
+          width: '120px',
           export: true
         },
         {
@@ -447,7 +448,8 @@ export default {
           label: '周期',
           field: 'cycle',
           show: true,
-          export: true
+          export: true,
+          width: '200px'
         },
         {
           label: '操作人',
@@ -541,6 +543,7 @@ export default {
     }
 
     .advanced-search-form {
+      padding-top: 10px;
 
       .el-form-item {
         .el-form-item__content,
@@ -604,6 +607,21 @@ export default {
           color: #fff;
           background: $color-primary;
         }
+      }
+    }
+
+    .report-table {
+      padding: 10px;
+      th {
+        background: #F5F5F5;
+        color: $text-color-primary;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 34px;
+        color: #333;
+      }
+      td {
+        font-size: 13px;
       }
     }
 

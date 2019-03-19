@@ -1,7 +1,16 @@
 <template>
   <div class="rule-setting-container">
     <h2 class="rule-section-title">
-      绩效规则
+      <el-popover
+        placement="bottom-start"
+        width="500"
+        trigger="hover"
+        content="绩效管理模块可以帮助企业管理针对服务团队和服务人员的定期绩效数据统一，根据您在这里配置的规则到绩效管理创建绩效统计报告。">
+        <span style="vertical-align: middle" slot="reference">
+          绩效规则<i class="icon-help iconfont" style="margin-left: 3px;"></i>
+        </span>
+      </el-popover>
+
       <base-button type="primary" native-type="submit" @event="openSettingDialog">添加</base-button>
     </h2>
 
@@ -9,6 +18,7 @@
       stripe
       :data="rules"
       v-loading="loading"
+      class="rule-table"
       :highlight-current-row="false">
       <el-table-column
         v-for="column in columns"
@@ -180,7 +190,7 @@ export default {
           label: '规则名称',
           field: 'ruleName',
           show: true,
-          // width: '150px'
+          width: '200px'
         },
         {
           label: '规则说明',
@@ -198,7 +208,7 @@ export default {
           label: '启用/禁用',
           field: 'effect',
           show: true,
-          width: '80px'
+          width: '90px'
         },
         {
           label: '操作',
@@ -229,11 +239,24 @@ export default {
     }
 
     // table
-    .el-table__body {
-      width: 100% !important;
+    .rule-table {
+      margin-top: 10px;
+      th {
+        background: #F5F5F5;
+        color: $text-color-primary;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 34px;
+        color: #333;
+      }
+      td {
+        font-size: 13px;
+      }
+
+      .el-table__body {
+        width: 100% !important;
+      }
     }
-
-
   }
 
 </style>

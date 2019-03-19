@@ -6,8 +6,8 @@
       <dt>{{reportDetail.reportName}}</dt>
       <dd><label>规则名称：</label>{{reportDetail.ruleName}}</dd>
       <dd><label>创建时间：</label>{{reportDetail.createTime | formatDatetime}}</dd>
-      <dd><label>统计范围：</label>{{reportDetail.allSize}}</dd>
-      <dd><label>规则命中：</label>{{reportDetail.hitSize}}</dd>
+      <dd><label>统计范围：</label>{{reportDetail.allSize}} 条</dd>
+      <dd><label>规则命中：</label>{{reportDetail.hitSize}} 条</dd>
       <dd><label>统计方式：</label>{{reportDetail.ruleType | ruleType}}</dd>
       <dd><label>统计状态：</label>{{reportDetail.timeType ? '已完成并结算' : '已完成'}}</dd>
       <dd><label>起止时间：</label>{{reportDetail.startTime | formatDate}} ~ {{reportDetail.endTime | formatDate}}</dd>
@@ -21,6 +21,7 @@
 
       <el-table
         stripe
+        class="detail-table"
         :data="reports">
         <el-table-column
           v-for="column in columns"
@@ -200,44 +201,62 @@ export default {
 
 <style lang="scss">
 
-  .performance-view-container {
-    display: flex;
-    padding: 10px;
+.performance-view-container {
+  display: flex;
+  padding: 10px;
+  min-width: 1020px;
 
-    .main-info {
-      margin: 0;
-      background: #fff;
-      width: 320px;
+  .main-info {
+    margin: 0;
+    background: #fff;
+    max-width: 420px;
+    width: 30%;
 
-      dt {
-        line-height: 32px;
-        font-size: 16px;
-        padding: 10px;
-        border-bottom: 1px solid #f4f4f4;
-      }
-
-      dd {
-        line-height: 30px;
-        padding-left: 10px;
-        margin: 0;
-        label {
-          font-size: 14px;
-          font-weight: 700;
-        }
-      }
+    dt {
+      line-height: 32px;
+      font-size: 16px;
+      padding: 10px;
+      border-bottom: 1px solid #f4f4f4;
     }
-    .detail-list {
-      margin-left: 10px;
-      flex-grow: 1;
 
-      .export-btn {
-        text-align: right;
-        padding: 10px;
-        background: #fff;
-        margin-bottom: 10px;
+    dd {
+      line-height: 30px;
+      padding-left: 10px;
+      margin: 0;
+      label {
+        font-size: 14px;
+        font-weight: 700;
       }
-
     }
   }
+
+  .detail-list {
+    margin-left: 10px;
+    flex-grow: 1;
+    width: 70%;
+
+    .detail-table {
+      padding: 10px;
+      th {
+        background: #F5F5F5;
+        color: $text-color-primary;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 34px;
+        color: #333;
+      }
+      td {
+        font-size: 13px;
+      }
+    }
+
+    .export-btn {
+      text-align: right;
+      padding: 10px;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+  }
+}
 
 </style>

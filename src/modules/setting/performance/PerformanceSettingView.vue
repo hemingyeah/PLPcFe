@@ -37,11 +37,14 @@ export default {
   .performance-setting-container {
     display: flex;
     padding: 10px;
+    min-width: 1020px;
 
     .nav-side-bar {
       width: 280px;
       background: #fff;
       margin-right: 10px;
+      width: 30%;
+      max-width: 420px;
 
       h1, h3 {
         margin: 0;
@@ -62,7 +65,7 @@ export default {
     }
 
     .function-area {
-      width: 660px;
+      width: 70%;
       flex-grow: 1;
       padding: 10px;
       background: #fff;
