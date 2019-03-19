@@ -51,8 +51,7 @@
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
           <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteReport">删除</base-button>
-          <a href="https://help.shb.ltd/doc?id=10501#Performance_report">如何通过绩效报告统计团队或个人数据？</a>
-          <a href="/performance/list">旧版链接</a>
+          <a href="https://help.shb.ltd/doc?id=10501#Performance_report" target="_blank">如何通过绩效报告统计团队或个人数据？</a>
         </div>
 
 
