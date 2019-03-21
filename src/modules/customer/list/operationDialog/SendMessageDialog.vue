@@ -118,17 +118,14 @@ export default {
 
       this.$http.post('/customer/sendSmsBatch', params, false)
         .then(res => {
-          if (res.status === 0) {
-            this.pending = false;
-            this.sendMessageDialog = false;
-            this.$platform.alert('批量发送短信成功');
-          } else {
-            return Promise.reject('status !== 0');
-          }
+          this.pending = false;
+          if (res.status) return this.$platform.alert(res.message);
+
+          this.sendMessageDialog = false;
+          this.$platform.alert('批量发送短信成功');
         })
         .catch(err => {
           this.pending = false;
-          this.$platform.alert('批量发送短信失败');
           console.error('sendSmsBatch err', err);
         })
     },
