@@ -13,11 +13,29 @@
 </template>
 
 <script>
+
+import * as TeamApi from '@src/api/TeamApi'
+
+
 export default {
   name: 'biz-team-select-demo',
   data(){
     return {
-      team: ''
+      team: '',
+      initVal: [
+        {
+          createTime: 1496241171000,
+          description: null,
+          id: '065976e8-460e-11e7-a318-00163e304a25',
+          parent: null,
+          phone: null,
+          tagAddress: null,
+          tagColor: null,
+          tagName: '测试团队',
+          tagPlaceList: [],
+          tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
+        }
+      ]
     }
   },
   methods: {
@@ -25,24 +43,12 @@ export default {
       let instance = this.$fast.biz.initTeamSelect({
         reference: '#team',
         multiple: true,
-        value: [
-          {
-            createTime: 1496241171000,
-            description: null,
-            id: '065976e8-460e-11e7-a318-00163e304a25',
-            parent: null,
-            phone: null,
-            tagAddress: null,
-            tagColor: null,
-            tagName: '测试团队',
-            tagPlaceList: [],
-            tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
-          }
-        ]
-      })
+        value: this.initVal,
+        fetchFunc: params => TeamApi.tagList(params),
+      });
 
       instance.$on('input', value => {
-        console.info(value)
+        console.info(value);
         this.team = value
       })
     }

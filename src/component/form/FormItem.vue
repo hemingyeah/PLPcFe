@@ -73,7 +73,10 @@ export default {
       if(typeof validator == 'function'){
         return validator(value, this.field, this.changeStatus)
           .then(res => this.errMessage = res)
-          .catch(err => console.error('validate err', err));
+          .catch(err => {
+            console.error('validate err', err)
+            this.changeStatus(false)
+          });
       }
       
       let options = {changeRemoteStatus: this.changeStatus, remote: this.remote};

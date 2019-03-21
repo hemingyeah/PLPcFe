@@ -50,7 +50,6 @@ export default class Page{
    * @param o - 另一页数据
    * @returns Page
    */
-  
   cover(o) {
     let otherPage = o;
     if(!(otherPage instanceof Page)) otherPage = new Page(otherPage);

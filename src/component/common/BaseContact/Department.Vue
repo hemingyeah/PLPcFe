@@ -147,7 +147,16 @@ export default {
       deptUserCount: {},
       selectedDept: {}, // 选中的部门
       chosenDept: [], // 选择的部门
-      chosen: [], // 已选择的人
+      // 已选择的人
+      chosen: this.selectedUser.map(item => {
+        return {
+          userId: item.userId,
+          displayName: item.displayName,
+          staffId: item.staffId,
+          head: item.head || '',
+          selected: true
+        }
+      }), 
 
       params: {
         keyword: '', // 搜索关键词
@@ -222,7 +231,7 @@ export default {
       }
 
       this.show = false;
-      this.$emit('input',data);
+      this.$emit('input', data);
     },
     inputKeyword(event){
       this.params.keyword = event.target.value;

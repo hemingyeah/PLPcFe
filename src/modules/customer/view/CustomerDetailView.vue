@@ -240,14 +240,14 @@ export default {
     hasEditCustomerAuth(){
       let customer = this.customer;
       let loginUserId = this.loginUser.userId;
-      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT', 
+      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT',
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
           if(tags.length == 0) return true;
 
-          let loginUserTagIds = this.initData.loginUser.tagIds || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
         }, 
         // 个人权限判断
@@ -360,6 +360,7 @@ export default {
     }
   },
   filters: {
+    /** @deprecated */
     fmt_tag(value) {
       if (!Array.isArray(value) || !value || !value.length) return '';
       return value.map(t => t.tagName).join(' ');
@@ -837,4 +838,10 @@ export default {
     }
   }
 
+  .customer-team-row .form-view-row-content p{
+    margin: 0;
+    & + p{
+      margin-top: 10px;
+    }
+  }
 </style>

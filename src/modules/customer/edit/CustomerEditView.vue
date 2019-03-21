@@ -28,7 +28,7 @@
               :value="form.manager" 
               :placeholder="genPlaceholder(field)"
               :see-all-org="seeAllOrg"
-              @input="update"
+              @update="update"
             />
           </form-item>
         </template>
@@ -75,11 +75,13 @@
 
         <template slot="tags" slot-scope="{field}">
           <form-item :label="field.displayName" validation>
+            
             <div class="input-and-btn">
-              <form-select
+              <!-- <form-select
                 :field="field" :source="selectTagOptions || []"
                 :value="form.tags" @update="update"
-                :placeholder="genPlaceholder(field)"/>
+                :placeholder="genPlaceholder(field)"/> -->
+              <biz-team-select v-model="form.tags" multiple/>
               <el-button type="button" @click="autoAssign">自动分配</el-button>
             </div>
           </form-item>
@@ -92,6 +94,8 @@
 <script>
 import * as CustomerApi from '@src/api/CustomerApi';
 import * as FormUtil from '@src/component/form/util';
+
+import platform from '@src/platform'
 import {toArray} from '@src/util/lang';
 
 export default {
@@ -224,6 +228,7 @@ export default {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
           const params = this.formToCustomer(this.fields, this.form);
+          // return console.log(params)
           this.pending = true;
           this.loadingPage = true;
           if (this.action === 'edit') {
@@ -292,29 +297,55 @@ export default {
       if(!name) return;
       this.form.lmName = name;
     },
-    autoAssign(){
-      let adr = this.form.customerAddress;
-      let {province, city, dist} = adr;
-      if(!province || !city) return this.$platform.alert('请先补全客户地址');
+    async autoAssign(){
+      try {
+        let adr = this.form.customerAddress;
+        let {province, city, dist} = adr;
+        if(!province || !city) return this.$platform.alert('请先补全客户地址');
 
-      let tags = [];
-      this.tags.forEach(team => {
-        let places = team.places || [];
-        for(let i = 0; i < places.length; i++){
-          let place = places[i];
-          let placeProvince = (place.province || '').replace('所有省', '');
-          let placeCity = (place.city || '').replace('所有市', '');
-          let placeDist = (place.dist || '').replace('所有区', '');
+        let result = await CustomerApi.matchTag({province, city, dist});
 
-          let placeStr = placeProvince + placeCity + placeDist;
-          let adrStr = province + city + dist;
-          if(placeStr && adrStr.indexOf(placeStr) == 0) tags.push(team.id);
+        if(result.status == 1){
+          return platform.notification({
+            type: 'error',
+            title: '服务团队匹配失败',
+            message: result.message
+          })
         }
-      });
 
-      if(tags.length == 0) return this.$platform.alert('未能按照规则分配成功，请到服务团队中设置负责区域');
+        let tags = result.data || [];
+        if(tags.length == 0){
+          return platform.notification({
+            type: 'error',
+            title: '服务团队匹配失败',
+            message: '未能按照规则分配成功，请到服务团队中设置负责区域'
+          })
+        }
 
-      this.form.tags = tags;
+        this.form.tags = tags.map(item => ({
+          id: item.id,
+          tagName: item.tagName
+        }));
+      } catch (error) {
+        console.error(error)
+      }
+
+      // let tags = [];
+      // this.tags.forEach(team => {
+      //   let places = team.places || [];
+      //   for(let i = 0; i < places.length; i++){
+      //     let place = places[i];
+      //     let placeProvince = (place.province || '').replace('所有省', '');
+      //     let placeCity = (place.city || '').replace('所有市', '');
+      //     let placeDist = (place.dist || '').replace('所有区', '');
+
+      //     let placeStr = placeProvince + placeCity + placeDist;
+      //     let adrStr = province + city + dist;
+      //     if(placeStr && adrStr.indexOf(placeStr) == 0) tags.push(team.id);
+      //   }
+      // });
+
+      // if(tags.length == 0) return this.$platform.alert('未能按照规则分配成功，请到服务团队中设置负责区域');
     },
     setDefaultAddress(ad) {
       const { adProvince, adCity, adDist, } = ad;
@@ -350,7 +381,8 @@ export default {
           latitude: cusAdr.adLatitude || '',
           addressType: cusAdr.addressType || 0
         },
-        tags: toArray(data.tags).map(item => item.id),
+        //tags: toArray(data.tags).map(item => item.id),
+        tags: toArray(data.tags),
         manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
       };
     },
@@ -380,15 +412,24 @@ export default {
           };
         }
 
-        if(fieldName === 'tags'){
-          let allTags = this.tags || [];
-          return customer.tags = value.map(tag => {
-            const t = allTags.find(at => at.id === tag);
-            return {
-              id: t.id,
-              tagName: t.tagName,
-            }
-          });
+        // if(fieldName === 'tags'){
+        //   let allTags = this.tags || [];
+        //   return customer.tags = value.map(tag => {
+        //     const t = allTags.find(at => at.id === tag);
+        //     return {
+        //       id: t.id,
+        //       tagName: t.tagName,
+        //     }
+        //   });
+        // }
+
+        if(fieldName == 'tags'){
+          let tags = Array.isArray(value) ? value : [];
+          customer.tags = tags.map(item => ({
+            id: item.id,
+            tagName: item.tagName
+          }))
+          return
         }
 
         if(fieldName === 'manager'){
@@ -475,7 +516,7 @@ body {
     display: flex !important;
     flex-flow: row nowrap;
 
-    .form-item, .form-text, .form-select {
+    .form-item, .form-text, .form-select, .biz-team-select {
       flex: 1;
     }
 

@@ -2,11 +2,46 @@
   <div class="full-page" v-loading.fullscreen.lock="loadingPage">
     <!-- start header -->
     <header class="team-list-header">
-      <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select">
-      </el-input>
-      <base-button type="primary" @event="search">
-        搜索
-      </base-button>
+      <!-- start 团队搜索 -->
+      <div class="team-list-headr-search">
+        <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select">
+          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+        </el-input>
+        <base-button type="primary" @event="search">
+          搜索
+        </base-button>
+        <base-button type="ghost" @event="resetParams">
+          重置
+        </base-button>
+      </div>
+      <!-- end 团队搜索 -->
+
+      <!-- start 团队选项 -->
+      <div class="team-list-checkbox-view">
+        <!-- start 按服务团队派单 -->
+        <el-checkbox label="tag" v-model="isAllotByTag" @change="setUsedAllot">
+          启用按服务团队派单
+        </el-checkbox>
+        <el-popover
+          placement="top-start"
+          width="300"
+          trigger="hover"
+          content="开启后，指派工单将按照团队查询人员；禁用时，按通讯录方式查询人员">
+          <i class="iconfont icon-help" slot="reference"></i>
+        </el-popover>
+        <!-- end 按服务团队派单 -->
+        <el-checkbox :label="true" v-model="isSeeAllOrg" @change="setSeeAllOrg" :disabled="!isAllotByTag" class="team-list-header-see">
+          选择人员时隐藏非团队内成员
+        </el-checkbox>
+        <el-popover
+          placement="top-start"
+          width="300"
+          trigger="hover"
+          content="开启本选项后，在选择协同人等调用钉钉通讯录时只可见自己所属服务团队的成员，管理员除外">
+          <i class="iconfont icon-help" slot="reference"></i>
+        </el-popover>
+      </div>
+      <!-- end 团队选项 -->
     </header>
     <!-- end header -->
     <div class="full-page-main team-list-view">
@@ -14,30 +49,34 @@
         <!-- start 按钮 -->
         <div class="manage-operate-btns">
           <!-- TODO: 是否有权限 新建 删除 -->
-          <base-button type="primary" icon="icon-add" @event="teamCreate">
-            新建
-          </base-button>
-          <base-button type="primary" icon="icon-add" @event="teamChildCreate">
-            新建子团队
-          </base-button>
-          <base-button type="ghost" icon="icon-fe-close" @event="teamDelete">
-            删除团队
-          </base-button>
+          <base-button type="primary" icon="icon-add" @event="teamCreate">新建</base-button>
+          <base-button type="primary" icon="icon-add" @event="teamChildCreate">新建子团队</base-button>
+          <base-button type="ghost" icon="icon-fe-close" @event="teamDelete">删除团队</base-button>
         </div>
         <!-- end 按钮 -->
+        <!-- start 服务电话 -->
+        <div class="team-service-btn">
+          <base-button type="primary" @event="openTelDialog">
+            维护服务电话
+          </base-button>
+        </div>
+        <!-- end 服务电话 -->
       </div>
-      <base-table 
-        class="team-list" 
-        max-height="100vh - 100px"
-        row-key="id"
-        ref="teamTable"
-        :rows="page.list" 
-        :columns="columns"
-        @select="selectTeamList"
-        multiple 
-        advanced
-      >
-      </base-table>
+      <div class="team-table-list">
+        <base-table 
+          class="team-list" 
+          max-height="100vh - 220px"
+          row-key="id"
+          ref="teamTable"
+          :rows="page.list" 
+          :columns="columns"
+          @select="selectTeamList"
+          @update="updateTableColumns"
+          multiple 
+          advanced
+        >
+        </base-table>
+      </div>
       <!-- start 表格底部 -->
       <div class="full-page-footer">
         <div class="list-info">
@@ -66,6 +105,27 @@
         <div style="height: 42px;"></div>
       </div> -->
     </div>
+
+    <!-- start 导入服务电话 -->
+    <base-import
+      title="维护服务电话"
+      ref="serviceTelModal"
+      @success="importServiceSuccess"
+      action="/security/user/import/cellPhone">
+      <div slot="tip">
+        <div class="base-import-warn">
+          请先下载<a :href="`/security/user/import/template?tagId=${serviceTelItemId}`">导入模版 </a>，填写完成后再上传导入。<br>
+          这里维护服务电话仅用于给客户发送预约短信时显示服务人员电话；<br>
+          如果没有维护服务人员电话将会发送短信设置中统一服务电话；<br>
+          此数据为非必填项。  <br>
+          <br>
+          短信示例<br>
+          <br>
+          【售后宝】尊敬的客户您好，{公司名称}{计划时间}安排{服务人员姓名}{服务电话}为您提供服务，请安排好您的时间，{客服电话}，谢谢
+        </div>
+      </div>
+    </base-import>
+    <!-- end 导入服务电话 -->
 
     <!-- start 右侧选择团队弹窗 -->
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px" class="selected-team-panel">
@@ -116,26 +176,30 @@ import {fmt_address} from '@src/filter/fmt';
 
 export default {
   name: 'team-list-view',
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data(){
     return {
       columns: this.buildColumns(),
       loadingPage: false,
+      isAllotByTag: false, // 是否开始 按服务团队派单选项
+      isSeeAllOrg: false, // 是否开启降低组织架构可见性选项
       multipleSelectionPanelShow: false,
       multipleSelection: [], // 已选择的团队
       // TODO: 单独的model对象维护所有搜索条件
-      model: {
-        keyword: '',
-        pageSize: 10,
-        pageNum: 1,
-        total: 1,
-      },
+      model: this.buildModel(),
       page: new Page(),
+      serviceTelItemId: '',
       selectedLimit: 200,
+      
     }
   },
   methods: {
     buildColumns(){
-      // TODO: localStorage
       let that = this;
       return [
         {
@@ -159,7 +223,7 @@ export default {
           width: 180,
           overflow: 'tooltip',
           formatter(col, row){
-            return row.teamLeaders.map(i => i.displayName).join(',')
+            return row.teamLeaders.map(i => i.displayName).join('，')
           },
         },
         {
@@ -173,7 +237,7 @@ export default {
           width: 250,
           overflow: 'tooltip',
           formatter(col, row){
-            return row.tagPlaceList.map(p => `${p.province}-${p.city}-${p.dist}`).join('\n')
+            return row.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')
           },
         },
         {
@@ -185,6 +249,13 @@ export default {
           }
         }
       ]
+    },
+    buildModel() {
+      let model = {
+        keyword: '',
+      };
+
+      return model
     },
     /* 获取列表 */
     async fetchPageList(pageNum = 1){
@@ -236,6 +307,10 @@ export default {
 
       return bool
     },
+    /* 导入维护服务电话成功 */
+    importServiceSuccess() {
+      // 
+    },
     /* 获取本地数据 */
     localStorageGet() {
       try {
@@ -264,6 +339,17 @@ export default {
         close: true,
       });
     },
+    /* 打开服务电话弹出框 */
+    openTelDialog() {
+      if(this.multipleSelection.length != 1) {
+        return this.$platform.alert('请您先选择一个团队');
+      }
+      let item = this.multipleSelection[0];
+
+      this.serviceTelItemId = item.id;
+      this.$refs.serviceTelModal.open();
+    },
+    /* 复原搜索参数 */
     revertSearchParams() {
       const localStorageData = this.localStorageGet();
 
@@ -271,6 +357,31 @@ export default {
         this.page.pageSize = localStorageData.pageSize;
       }
     },
+    /* 复原表格列 数据 */
+    revertTableColumns() {
+      try {
+        let data = this.localStorageGet();
+        let colums = JSON.parse(data.colums)
+
+        if(Array.isArray(colums) && colums.length > 0) {
+
+          this.columns = this.columns.map((col, index) => {
+            return Object.assign(col, colums[index])
+          })
+        }
+        
+      } catch (error) {
+        console.log('revertTableColumns error: ', error);
+        
+      }
+    },
+    /* 复原搜索 参数 */
+    resetParams() {
+      this.model = this.buildModel();
+      this.page.list = [];
+
+      this.fetchPageList()
+    },  
     /* 搜索 */
     search() {
       this.page.pageNum = 1;
@@ -322,6 +433,42 @@ export default {
         }
       })
     },
+    /* 设置是否按 服务团队派单 */
+    async setUsedAllot(setTag) {
+      let _setTag = 'dep';
+      if(setTag) {
+        _setTag = 'tag'
+      } else {
+        this.isSeeAllOrg = false;
+        this.setSeeAllOrg();
+      }
+      try {
+        let params = {
+          set: _setTag
+        }
+        let result = await TeamApi.usedAllot(params);
+
+        if(result.status != 0) {
+          this.$platform.alert(result.message);
+        }
+      } catch (error) {
+        console.log('setUsedAllot error: ', error);
+      }
+    },
+    /* 是否开启 降低组织架构 */
+    async setSeeAllOrg(state = false) {
+      try {
+        let params = {
+          state,
+        }
+        let result = await TeamApi.saveSeeAllOrg(params);
+        if(result.status != 0) {
+          this.$platform.alert(result.message);
+        }
+      } catch (error) {
+        console.log('setUsedAllot error: ', error);
+      }
+    },
     /* 新建团队 */
     teamCreate() {
       window.location.href = '/security/tag/createTag';
@@ -340,11 +487,11 @@ export default {
 
       let parent = {
         action: 'create',
-        id: item.id,
-        tagName: item.tagName,
+        pid: item.id,
+        pname: item.tagName,
       }
 
-      window.location.href = `/security/tag/createChildrenTag?${qs.stringify(parent)}`;
+      window.location.href = `/security/tag/createTag?${qs.stringify(parent)}`;
     },
     /* 删除团队 */
     async teamDelete() {
@@ -384,10 +531,22 @@ export default {
         console.error('teamDelete catch error', e);
       }
     },
+    /* 更新表格列宽 */
+    updateTableColumns(columns) {
+      this.columns = this.columns.map((col, index) => {
+        return Object.assign(col, columns.data[index]);
+      })
+
+      this.localStorageSet('colums', JSON.stringify(columns.data));
+    }
   },
   mounted(){
+    this.revertTableColumns();
     this.revertSearchParams();
     this.initialize();
+
+    this.isAllotByTag = this.initData.allotByTag || true;
+    this.isSeeAllOrg = this.initData.seeAllOrg || true;
   }
 }
 </script>
@@ -398,26 +557,65 @@ export default {
     border-radius: 3px;
     box-sizing: border-box;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
 
+    margin-bottom: 10px;
     padding: 12px 10px;
 
     .input-with-select {
       width: 300px;
-      margin-right: 10px;
     }
+
+    .team-list-checkbox-view {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+
+      .el-checkbox {
+        margin-right: 0;
+        margin-bottom: 0;
+      }
+      .team-list-header-see {
+        margin-left: 30px;
+      }
+      .iconfont {
+        color: grey;
+        margin-left: 5px;
+      }
+
+    }
+    .team-list-headr-search {
+      display: flex;
+      width: 440px;
+      justify-content: space-between;
+    }
+
+    .el-input {
+      input {
+        height: 34px;
+        line-height: 34px;
+      }
+    }
+      
+  }
+
+  .full-page-main {
+    padding: 0;
   }
 
   .full-page-header {
-    margin-bottom: 30px;
-  }
-
-  .manage-operate-btns {
-    background-color: #fff;
     border-bottom: 1px solid #f2f2f2;
     display: flex;
-    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+  }
+
+  .manage-operate-btns,
+  .team-service-btn{
+    background-color: #fff;
+    display: flex;
     padding: 10px 0;
+    flex: 1;
     
     .danger-button {
       margin-left: 20px;
@@ -428,6 +626,10 @@ export default {
 
   }
 
+  .team-service-btn {
+    justify-content: flex-end;
+  }
+
   .full-page-footer {
     display: flex;
     justify-content: space-between;
@@ -435,7 +637,7 @@ export default {
     background: #fff;
     border-radius: 0 0 3px 3px;
 
-    margin-top: 20px;
+    margin-top: 10px;
 
     .list-info {
       font-size: 13px;
@@ -526,6 +728,10 @@ export default {
 
   }
 
+  .team-table-list {
+    padding: 0 10px;
+  }
+
   .team-list-view {
     margin-bottom: 10px;
 
@@ -535,8 +741,9 @@ export default {
         border-bottom: 1px solid #ebeef5;
         color: #333;
         font-weight: normal;
-        padding-top: 10px;
+        line-height: 34px;
         padding-bottom: 10px;
+        padding: 6px 0;
       }
       button {
         border: none;
@@ -549,7 +756,8 @@ export default {
       td {
         color: #909399;
         font-size: 13px;
-        padding: 10px 0;
+        height: 42px;
+        padding: 6px 0;
       }
       .base-table-hover-row{
         background-color: #f5f7fa;
@@ -561,6 +769,36 @@ export default {
     }
 
 
+  }
+
+  .team-list {
+    .base-table-cell {
+      padding: 0 10px;
+    }
+
+    .base-table-body,
+    .base-table__body {
+      tr {
+        background-color: #fff;
+      }
+      tr:nth-child(even) {
+        background-color: #fafafa;
+      }
+    }
+
+    .base-table__table {
+      .base-table-hover-col{
+        background-color: #f5f7fa;
+      }
+    }
+  }
+  
+  .base-table__fixed-left {
+    tr {
+      th {
+        width: 48px;
+      }
+    }
   }
 
   .team-selected-tip{

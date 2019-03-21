@@ -14,7 +14,6 @@ export function getForEdit(id) {
  * @param {string} customerId - 客户id
  * @returns Promise<Customer>
  */
- 
 export function getUpdateRecord(customerId){
   return http.get('/customer/record/latestOne', customerId)
 }
@@ -49,3 +48,16 @@ export function attentionList(params){
 export function cancelAttention(params){
   return http.post('/customer/record/attention/delete/customer_ids', params, false);
 }
+/**
+ * 自动匹配团队
+ * @param {Object} params - 参数
+ * @param {string} params.province - 省
+ * @param {string} params.city - 市
+ * @param {string} params.dist - 区
+ * 
+ * @returns MsgModal<List<Team>> 匹配后的数据
+ */
+export function matchTag(params){
+  return http.get('/customer/tagMatch', params)
+}
+

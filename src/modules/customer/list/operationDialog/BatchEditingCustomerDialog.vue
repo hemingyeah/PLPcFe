@@ -35,7 +35,8 @@
         :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'tags'">
-        <el-select
+        <biz-team-select v-model="form.tags" multiple/>
+        <!-- <el-select
           v-model="form.tags"
           multiple
           filterable
@@ -49,7 +50,7 @@
             :label="item.tagName"
             :value="item.id">
           </el-option>
-        </el-select>
+        </el-select> -->
 
       </el-form-item>
       <el-form-item
@@ -193,6 +194,7 @@ export default {
       pending: false,
       editableFields: [],
       fixedFieldsCount: 6,
+      /** @deprecated */
       selectedTags: [],
       formBackup: {},
     }
@@ -324,6 +326,7 @@ export default {
       this.buildDynamicField();
       this.searchTag();
     },
+    /** @deprecated */
     selectTag(val) {
       const ts = this.inputRemoteSearch.tag.options;
       this.selectedTags = ts
@@ -505,7 +508,7 @@ export default {
 
       if (this.selectedFieldName === 'tags') {
         params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: this.selectedTags,
+          [this.selectedFieldName]: this.form.tags,
         })
       }
       if (this.selectedFieldName === 'manager' || this.selectedField.formType === 'user') {

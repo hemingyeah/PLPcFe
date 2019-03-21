@@ -182,3 +182,38 @@ export function addUser(params) {
 export function deleteUser(params) {
   return http.post('/security/tag/deleteUser', params, false);
 }
+
+/**
+ * 验证团队参数唯一性
+ * 
+ * @param {Object} params -- 参数
+ * @param {String} [params.id] -- 团队id，编辑时需要传
+ * @param {String} params.field -- 验证的地段
+ * @param {String} params.value -- 值
+ * @returns Boolean true为验证通过
+ */
+export function checkUnique(params){
+  return http.get('/security/tag/checkUnique', params)
+}
+
+/**
+ * 是否开启按服务团队派单
+ * 
+ * @param {Object} params -- 参数
+ * @param {String} params.set -- 派单方式的值
+ * @returns Promise<Team>
+ */
+export function usedAllot(params) {
+  return http.post('/security/tag/usedAllot', params, false)
+}
+
+/**
+ * 是否开启按降低组织架构可见性
+ * 
+ * @param {Object} params -- 参数
+ * @param {Boolean} params.state -- 是否开启降低组织架构
+ * @returns Promise<Team>
+ */
+export function saveSeeAllOrg(params) {
+  return http.post('/setting/user/saveSeeAllOrg', params, false)
+}

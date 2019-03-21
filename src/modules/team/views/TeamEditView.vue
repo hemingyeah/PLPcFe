@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="submit" class="form-page">
+  <form @submit.prevent="submit" class="form-page" v-loading.fullscreen.lock="loadingPage">
     <div class="form-page-header">
       <div class="form-page-tool">
         <button type="button" class="btn-text btn-back" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
@@ -7,15 +7,16 @@
         <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
       </div>
     </div>
-    <form-builder ref="teamCreateForm" :value="form">
-      <form-item label="团队名称" validation>
+    <form-builder ref="form" :value="form">
+      <form-item label="团队名称" :validation="checkName">
         <form-text :field="filedMap.tagName" v-model="form.tagName"/>
       </form-item>
       <form-item label="团队描述" validation>
         <form-textarea :field="filedMap.description" v-model="form.description"/>
       </form-item>
       <form-item label="团队主管" validation>
-        <form-user :field="filedMap.teamLeaders" v-model="form.teamLeaders" max="10" multple/>
+        <form-user v-if="action == 'create'" :field="filedMap.teamLeaders" v-model="form.teamLeaders" max="10" multiple/>
+        <team-user-select v-if="action == 'edit'" :field="filedMap.teamLeaders" :fetch="fetchTeamUser" v-model="form.teamLeaders"/>
       </form-item>
       <form-item label="主管权限">
         <div class="team-form-role-tip"><input type="checkbox" checked disabled> 团队管理员（团队主管将自动获得团队管理员角色权限）</div>
@@ -26,21 +27,22 @@
       <form-item label="团队位置" validation>
         <form-address :field="filedMap.tagAddress" v-model="form.tagAddress"/>
       </form-item>
-      <form-item label="负责区域" :validation="placeValidator">
-        <team-places v-model="form.tagPlaceList"/>
+      <form-item label="负责区域" :validation="checkPlace">
+        <team-places :field="filedMap.tagPlaceList" v-model="form.tagPlaceList"/>
       </form-item>
     </form-builder>
   </form>
 </template>
 
 <script>
-import * as FormUtil from '@src/component/form/util';
 import * as TeamApi from '@src/api/TeamApi'
 
+import _ from 'lodash'
+import qs from 'qs';
 import FormMixin from '@src/component/form/components/FormMixin'
 
 export default {
-  name: 'team-create-view',
+  name: 'team-edit-view',
   props: {
     initData: {
       type: Object,
@@ -49,7 +51,7 @@ export default {
   },
   data() {
     return {
-      action: 'create',
+      action: '',
       pending: false,
 
       filedMap: {
@@ -90,7 +92,6 @@ export default {
           isNull: 1
         }
       },
-     
       form: {
         tagName: '',
         description: '',
@@ -98,9 +99,8 @@ export default {
         teamLeaderRole: false,
         tagPlaceList: []
       },
-
-
-      
+      id: '',
+      loadingPage: false,
       parent: {}, // 主团队信息
       teamData: {},
       users: [], // 用户
@@ -113,66 +113,37 @@ export default {
     },
   },
   methods: {
-    placeValidator(){
+    /** 自定义验证团队名称 */
+    checkName(value, field, changeStatus){
+      return new Promise((resolve, reject) => {
+        if(!value) return resolve('请输入团队名称');
+
+        this.remoteCheckName({id: this.id, field: 'name', value}, resolve, changeStatus)
+      })
+    },
+    remoteCheckName: _.debounce(function (params, resolve, changeStatus){
+      return TeamApi.checkUnique(params).then(validate => {
+        changeStatus(false);
+        return resolve(validate ? null : '团队名称不能重复');
+      })
+    }, 250),
+
+    checkPlace(){
       return new Promise((resolve, reject) => {
         let tagPlaceList = this.form.tagPlaceList || [];
         let message = null;
         for(let i = 0; i < tagPlaceList.length; i++){
           let place = tagPlaceList[i] || {};
           if(!place.province || !place.city){
-            //this.$set(place, 'success', false)
             message = '请补全负责区域';
-          }else{
-            //this.$set(place, 'success', true)
+            break;
           }
         }
         resolve(message)
       })
     },
-    /** @deprecated */
-    async fetchUsers() {
-      let params = {
-        pageSize: 0,
-        pageNum: 1,
-        tagId: this.id,
-      }
-      try {
-        let result = await TeamApi.userList(params);
-
-        this.users = result.list.map(l => {
-          return {
-            text: l.displayName,
-            value: l.userId
-          }
-        });
-        this.form.teamLeaders = this.teamData.teamLeaders.map(leader => {
-          return leader.userId
-        })
-      } catch (e) {
-        console.error('fetchUsers catch error', e);
-        this.users = [];
-      }
-    },
-    /**  @deprecated 查询单个团队的信息 */
-    async getTag() {
-      try {
-        let params = {
-          id: this.id
-        }
-        let result = await TeamApi.getTag(params);
-
-        if(result.status == 0) {
-          this.teamData = result.data;
-          this.form = this.unPackData(result.data);
-          // 加载数据
-          this.fetchUsers();
-        } else {
-          this.$platform.alert(result.meesage);
-        }
-
-      } catch (error) {
-        console.log('error: ', error);
-      }
+    async fetchTeamUser(params) {
+      return TeamApi.userList({...params, ...{tagId: this.id}})
     },
     /* 返回 */
     goBack() {
@@ -189,136 +160,93 @@ export default {
       params.tagAddress = data.tagAddress;
 
       params.tagPlaceList = data.tagPlaceList || [];
-
-      // 编辑团队
-      if('edit' == this.action) {
-        params.teamLeaders = this.users.filter(user => {
-          return data.teamLeaders.some(leader => leader == user.value)
-        }).map(user => {
-          return {
-            displayName: user.text,
-            userId: user.value
-          }
-        })
-      }
+      params.teamLeaders = data.teamLeaders;
 
       return params
-
     },
     unPackData(data) {
       let form = {};
 
       form.tagName = data.tagName;
       form.description = data.description;
-      form.teamLeaders = data.teamLeaders;
+      form.teamLeaders = data.teamLeaders || [];
       form.teamLeaderRole = true;
       form.phone = data.phone;
-      form.tagAddress = data.tagAddress;
-      form.tagPlaceList = data.tagPlaceList;
+      form.tagAddress = data.tagAddress || {};
+      form.tagPlaceList = data.tagPlaceList || [];
 
       return form
     },
-    /* TODO: 提交 */
     submit() {
-      this.$refs.teamCreateForm.validate()
+      return this.$refs.form.validate()
         .then(valid => {
-          //if (!valid) return Promise.reject('validate fail.');
+          if(!valid) return Promise.reject('validate fail.');
 
           const params = this.packData(this.form);
-
-          return console.log(params)
-
-          if (this.action === 'edit') {
-            return this.teamUpdate(params);
-          }
-
-          this.teamCreate(params);
+          return this.action === 'edit' ? this.teamUpdate(params) : this.teamCreate(params);
         })
         .catch(err => {
           console.error(err);
         })
-        .finally(() => {
-          this.pending = false;
-          this.loadingPage = false;
-        });
     },
     /* 新建 团队 */
     async teamCreate(params) {
+      this.pending = true;
+
       try {
+        // 判断是否是新建子团队
+        if(this.parent.id) {
+          params.parent = {
+            id: this.parent.id,
+            tagName: this.parent.tagName
+          }
+        }
+
         let result = await TeamApi.createTag(params);
 
-        if(result.status == 0) {
-          this.goBack();
-        } else {
-          this.$platform.alert(result.message);
-        }
+        this.$platform.notification({
+          type: result.status == 0 ? 'success' : 'error',
+          title: `团队创建${result.status == 0 ? '成功' : '失败'}`,
+          message: result.status == 0 ? null : result.message
+        })
+
+        if(result.status == 0) this.goBack();
       } catch (error) {
-        console.log('error: ', error);
+        console.error('error: ', error);
       }
+
+      this.pending = false;
     },
     /* 更新 团队 */
     async teamUpdate(params) {
-      let _params = params;
-      _params.id = this.teamData.id;
-
+      this.pending = true;
+    
       try {
-        let result = await TeamApi.updateTag(_params);
+        params.id = this.id;
+        let result = await TeamApi.updateTag(params);
 
-        if(result.status == 0) {
-          this.goBack();
-        } else {
-          this.$platform.alert(result.message);
-        }
+        this.$platform.notification({
+          type: result.status == 0 ? 'success' : 'error',
+          title: `团队编辑${result.status == 0 ? '成功' : '失败'}`,
+          message: result.status == 0 ? null : result.message
+        })
+        if(result.status == 0) this.goBack();
       } catch (error) {
-        console.log('error: ', error);
+        console.error('error: ', error);
       }
-    },
-    /* 验证 团队主管 */
-    validatorTeamLeader(value, field, changeStatus) {
-      return new Promise((resolve, reject) => {
-        if(!value || value.length <= 0) {
-          resolve('请选择团队主管')
-        } else {
-          changeStatus(false)
-        }
-      })
-    },
-    /* 验证 团队主管权限 */
-    validatorTeamLeaderRole(value, field, changeStatus) {
-      
-      return new Promise((resolve, reject) => {
-        if(!value) {
-          resolve('请选择团队主管，自动带入团队主管权限')
-        } else {
-          changeStatus(false)
-        }
-      })
+
+      this.pending = false;
     }
   },
-  /* TODO: 编辑修改 */
-  async mounted () {
-    try {
-      // 初始化默认值
-      let form = {};
-      // if (this.initData.action === 'edit' && this.initData.id) {
-      //   // 处理编辑时数据
-      //   this.loadingPage = true;
+  created () {
+    let query = qs.parse(window.location.search.substr(1));
+    let tag = this.initData.tag || {};
 
-      //   let result = await CustomerApi.getForEdit(this.initData.id);
-
-    // if('create' == this.action) {
-    //   this.parent = {
-    //     tagName: query.tagName || '',
-    //     id: query.id || ''
-    //   }
-    // } else {
-    //   this.id = query.id || '';
-      
-    //   this.getTag();
-    // }
-    } catch (e) {
-      console.error('TeamEdit error ', e);
-    }
+    this.action = tag.id ? 'edit' : 'create';
+    this.id = tag.id || '';
+    this.form = this.unPackData(tag)
+    this.parent.id = query.pid;
+    this.parent.tagName = query.pname;
   },
   components: {
     'team-places': {
@@ -359,17 +287,41 @@ export default {
           <div class="team-form-places">
             <div class="team-form-places-header">
               <p>设置团队的服务区域用于新建客户时自动分配客户所属服务团队</p>
-              <button type="button" class="btn-text" onClick={e => this.addPlace()}><i class="iconfont icon-add"></i>添加</button>
+              <button id={`form_${this.field.fieldName}`} type="button" class="btn-text" onClick={e => this.addPlace()}><i class="iconfont icon-add"></i>添加</button>
             </div>
             {
               this.value.map((item, index) => (
                 <div class={['team-form-place', item.success ? 'is-success' : null]} key={index}>
                   <base-dist-picker value={this.convertToArray(item)} onInput={e => this.update(item, e)}/>
-                  <button type="button" onClick={e => this.removePlace(item)}>删除</button>
+                  <button type="button" class="btn-text" onClick={e => this.removePlace(item)}>删除</button>
                 </div>
               ))
             }
           </div>
+        )
+      }
+    },
+    'team-user-select': {
+      name: 'team-user-select',
+      mixins: [FormMixin],
+      props: {
+        value: {
+          type: Array,
+          default: () => []
+        },
+        fetch: Function
+      },
+      methods: {
+        input(value){
+          this.$emit('input', value)
+        },
+      },
+      render(h){
+        return (
+          <biz-user-select 
+            value={this.value}
+            onInput={e => this.input(e)}
+            fetch={this.fetch} multiple/>
         )
       }
     }
@@ -439,6 +391,11 @@ body{
 
   & + .team-form-place{
     margin-top: 5px;
+  }
+
+  .btn-text{
+    font-size: 13px;
+    color: $color-danger;
   }
 }
 </style>

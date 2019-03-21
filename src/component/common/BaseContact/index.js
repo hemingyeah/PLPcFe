@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Department from './Department.vue';
-import * as dom from '@src/util/dom';
+import { destroyComponent } from '@src/util/dom';
+import { fastCall } from '@src/component/util'
 
 const DeptComponent = Vue.extend(Department);
 const MAX_NUM = 150; // 单次选人上限
@@ -47,7 +48,7 @@ function dept(options){
 
   return new Promise((resolve, reject) => {
     instance.$on('destroy', event => {
-      setTimeout(() => dom.destroyComponent(instance), 1500);
+      setTimeout(() => destroyComponent(instance), 1500);
     })
 
     instance.$on('input', user => {
@@ -70,6 +71,9 @@ function dept(options){
 }
 
 const BaseContact = {
+  install(Vue){
+    fastCall(Vue, 'contact', { choose })
+  },
   namespace: 'contact',
   props: {
     choose

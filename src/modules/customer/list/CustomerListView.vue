@@ -54,7 +54,8 @@
               </el-select>
             </el-form-item>
             <el-form-item label-width="100px" label="选择团队">
-              <el-select
+              <biz-team-select v-model="params.tag"/>
+              <!-- <el-select
                 v-model="params.tagId"
                 @change="modifyUser('tags')"
                 filterable
@@ -71,7 +72,7 @@
                   :label="item.tagName"
                   :value="item.id">
                 </el-option>
-              </el-select>
+              </el-select> -->
             </el-form-item>
             <el-form-item label-width="100px" label="区域">
               <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector" ref="baseDistPicker"></base-dist-picker>
@@ -507,6 +508,7 @@ export default {
         keyword: '',
         pageNum: 1,
         pageSize: 10,
+        tag: []
       },
       params: {
         specialSearchModel: {
@@ -527,6 +529,7 @@ export default {
         updateTime: '',
         customerAddress: {},
         orderDetail: {},
+        tag: []
       },
       createTimePickerOptions: {
         shortcuts: [{
@@ -972,8 +975,15 @@ export default {
           adDist: this.paramsBackup.specialSearchModel.addressSelector[2] || '',
         };
       }
-      params.customerAddress.adAddress = this.paramsBackup.specialSearchModel.adAddress || '';
 
+      // tags
+      if (null != params.tag || Array.isArray(params.tag)){
+        let tag = Array.isArray(params.tag) ? params.tag[0] || {} : params.tag
+        params.tagId = tag.id;
+        delete params.tag
+      }
+
+      params.customerAddress.adAddress = this.paramsBackup.specialSearchModel.adAddress || '';
       params = this.deleteValueFromObject(params, [0, false]);
 
       // build customized search fields
@@ -1404,6 +1414,7 @@ export default {
         })
         .catch(err => console.error('searchLinkman function catch err', err));
     },
+    /** @deprecated */
     searchTag(keyword) {
       this.inputRemoteSearch.tag.loading = true;
       return this.$http.get('/customer/tag/list', {keyword: keyword, pageNum: 1, pageSize: 100 * 100, })

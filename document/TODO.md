@@ -5,7 +5,6 @@
   **新增**
   - [ ] 层管理(PopupManager), 统一管理弹层 
   - [ ] 合并sm4_pc_components项目(Cascader)
-  - [ ] 浏览器ua工具 
   - [ ] 输入组件支持清空 
   - [ ] 表单支持键盘操作
   - [ ] split分割面板 https://www.iviewui.com/components/split
@@ -34,7 +33,13 @@
   **ContextMenu**
   - [ ] 弹出时边界判定
 
+  - [ ] 改进性能
 
 ## 模块
   **客户**
   - [ ] 客户详情列表排版调整
+  - [ ] 字段名称统一改为左对齐
+  - [ ] 分割线名称与其他字段对其
+
+  **Contextmenu**
+  - [ ] FrameTab 提供关闭其他tab，关闭所有tab 功能

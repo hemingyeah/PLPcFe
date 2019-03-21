@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import BaseMapDisplay from './BaseMapDisplay.vue';
-import * as dom from '@src/util/dom'
+
+import { destroyComponent } from '@src/util/dom';
+import { fastCall } from '@src/component/util';
 
 const BaseMapDisplayComp = Vue.extend(BaseMapDisplay);
 
@@ -14,18 +16,18 @@ function display(address, options = {}){
   
   let instance = new BaseMapDisplayComp({
     propsData: {
-      address: address,
+      address,
       options,
     }
   });
   
   return new Promise((resolve, reject) => {
-    let ele = document.createElement("div");
+    let ele = document.createElement('div');
     let body = document.body;
     let pending = false;
     
     instance.$on('destroy', () => {
-      setTimeout(() => dom.destroyComponent(instance), 150);
+      setTimeout(() => destroyComponent(instance), 150);
     })
     
     instance.$on('input', event => {
@@ -53,9 +55,8 @@ function display(address, options = {}){
 }
 
 const MapDisplay = {
-  namespace: 'map',
-  props: {
-    display
+  install(Vue){
+    fastCall(Vue, 'map', { display })
   }
 }
 

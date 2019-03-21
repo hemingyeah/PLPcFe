@@ -13,6 +13,7 @@ import BaseModal from '../component/common/BaseModal';
 import BaseTree from '../component/common/BaseTree';
 import BaseContact from '../component/common/BaseContact';
 import BaseMapPicker from '../component/common/BaseMapPicker';
+import BizTeamSelect from '../component/business/BizTeamSelect'
 
 import {
   Checkbox
@@ -29,7 +30,8 @@ Vue.prototype.$ELEMENT = { size: 'small'};
 
 const components = {
   [BaseContact.namespace]: BaseContact.props,
-  [BaseMapPicker.namespace]: BaseMapPicker.props
+  [BaseMapPicker.namespace]: BaseMapPicker.props,
+  [BizTeamSelect.namespace]: BizTeamSelect.props
 }
 
 window._pc_componentsV2 = components;

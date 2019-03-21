@@ -1,5 +1,5 @@
 import Vue from '@src/common/entry';
-import TeamCreateView from './views/TeamCreateView.vue';
+import TeamEditView from './views/TeamEditView.vue';
 
 // 处理注入的参数
 let initData = {};
@@ -11,8 +11,8 @@ try {
   console.error('no init data')
 }
 
-const TeamCreateViewComp = Vue.extend(TeamCreateView);
-const app = new TeamCreateViewComp({
+const TeamEditViewComp = Vue.extend(TeamEditView);
+const app = new TeamEditViewComp({
   propsData: { initData }
 });
 

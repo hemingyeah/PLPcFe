@@ -37,10 +37,11 @@
 
 .base-table-expand{
   cursor: pointer;
+  line-height: 24px;
 }
 
 .base-table-line {
-  width: 2px;
+  width: 26px;
   height: 100%;
   border-left: 1px dotted #333;
   position: absolute;

@@ -21,10 +21,6 @@ export default {
   name: 'form-user',
   mixins: [FormMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
     placeholder: {
       type: String,
       default: ''
@@ -36,7 +32,7 @@ export default {
     },
     value: [Object, Array],
     /* 是否是 多选 */
-    multple: {
+    multiple: {
       type: Boolean,
       default: false
     },
@@ -45,16 +41,17 @@ export default {
   },
   computed: {
     displayName(){
-      if(!this.multple) {
+      if(!this.multiple) {
         let user = this.value || {};
         return user.displayName || user.name;
       }
 
-      return this.value.map(i => i.displayName || i.name).join(',')
+      let value = Array.isArray(this.value) ? this.value : [];
+      return value.map(i => i.displayName || i.name).join(',')
     },
     // 根据userId判断是否为空
     isEmpty(){
-      if(!this.multple) {
+      if(!this.multiple) {
         let value = this.value || {};
         return !value.userId;
       }
@@ -66,19 +63,20 @@ export default {
   methods: {
     choose(){
       let max = 1;
-      if(this.multple) max = null == this.max ? -1 : parseInt(this.max)
+      if(this.multiple) max = null == this.max ? -1 : parseInt(this.max)
       
       let options = {
         title: `请选择${this.field.displayName}`,
         seeAllOrg: this.seeAllOrg,
-        max: this.multple ? this.options.max ? this.options.max : -1 : 1
+        selected: this.multiple ? this.value : null,
+        max
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){
           let oldValue = null;
           let data = result.data || {};
           let users = data.users || [];
-          let newValue = this.multple ? users : users[0];
+          let newValue = this.multiple ? users : users[0];
 
           this.$emit('update', {newValue, oldValue, field: this.field});
           this.$emit('input', newValue);
@@ -89,7 +87,7 @@ export default {
         .catch(err => console.error(err))
     },
     clear(){
-      let value = this.multple ? [] : {};
+      let value = this.multiple ? [] : {};
       this.$emit('update', {newValue: value, field: this.field});
       this.$emit('input', value);
     }

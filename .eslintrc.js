@@ -95,7 +95,7 @@ module.exports = {
     {
       "files": ["src/**/*"],
       "rules": {
-        "no-console": ["error", { allow: ["info", "warn", "error"] }] //禁用 console.log
+        "no-console": ["warn", { allow: ["info", "warn", "error"] }] //禁用 console.log
       }  
     }
   ]

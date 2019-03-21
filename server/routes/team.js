@@ -1,5 +1,6 @@
 const KoaRouter = require('koa-router');
 const Template = require('../util/Template');
+const HttpClient = require('../util/HttpClient')
 
 const modules = require('../../config/modules');
 const router = new KoaRouter();
@@ -12,29 +13,33 @@ router.get('/security/tag', async ctx => {
 
 
 router.get('/security/tag/createTag', async ctx => {
-  let script = ['/team.create.js'];
-  let modConfig = modules['team.create'];
+  let script = ['/team.edit.js'];
+  let modConfig = modules['team.edit'];
 
   ctx.body = Template.renderWithData('新建团队', {}, script, modConfig.template)
 })
 
-router.get('/security/tag/createChildrenTag', async ctx => {
-  let script = ['/team.create.js'];
+// router.get('/security/tag/createChildrenTag', async ctx => {
+//   let script = ['/team.create.js'];
 
-  ctx.body = Template.renderWithData('新建子团队', {}, script)
-});
+//   ctx.body = Template.renderWithData('新建子团队', {}, script)
+// });
 
-router.get('/security/tag/editTag', async ctx => {
-  let script = ['/team.create.js'];
+router.get('/security/tag/editTag/:id', async ctx => {
+  let modConfig = modules['team.edit'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/team.edit.js'];
+  let result = await HttpClient.request(`/security/tag/editTag/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
 
-  ctx.body = Template.renderWithData('编辑团队', {}, script)
+  ctx.body = Template.renderWithHtml('编辑团队', body, script, modConfig.template)
 })
 
-router.get('/security/tag/editChildrenTag', async ctx => {
-  let script = ['/team.create.js'];
+// router.get('/security/tag/editChildrenTag', async ctx => {
+//   let script = ['/team.create.js'];
 
-  ctx.body = Template.renderWithData('编辑子团队', {}, script)
-});
+//   ctx.body = Template.renderWithData('编辑子团队', {}, script)
+// });
 
 router.get('/security/tag/view', async ctx => {
   let script = ['/team.detail.js'];

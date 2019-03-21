@@ -9,31 +9,18 @@
           <!-- TODO: 编辑 需要权限 控制 -->
           <base-button type="only-text" icon="icon-edit" @event="teamEdit" v-if="allowEditTeam">编辑</base-button>
           <base-button type="only-text" icon="icon-fe-close" @event="teamDelete" v-if="allowEditTeam">删除</base-button>
-
-
         </div>
+
         <div class="action-btns">
           <!-- TODO: 新建子团队 需要权限控制 -->
-          <div class="action-btn-view" v-show="team.status === 'parent'" @click="teamChildCreate">
-            <span class="action-btn">
-              <i class="iconfont icon-add">
-              </i>
-              新建子团队
-            </span> 
+          <div class="action-btn-view" v-if="!teamData.parent" @click="teamChildCreate">
+            <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子团队</span>
           </div>
           <div class="action-btn-view" @click="personAddChoose">
-            <span class="action-btn">
-              <i class="iconfont icon-add">
-              </i>
-              添加成员
-            </span> 
+            <span class="action-btn"><i class="iconfont icon-add"></i>添加成员</span>
           </div>
           <div class="action-btn-view" @click="personDelete">
-            <span class="action-btn">
-              <i class="iconfont icon-fe-close">
-              </i>
-              删除成员
-            </span> 
+            <span class="action-btn"><i class="iconfont icon-fe-close"></i>删除成员</span>
           </div>
         </div>
       </div>
@@ -42,42 +29,39 @@
       <div class="team-detail-main">
         <!-- start  主体左侧 信息 -->
         <div class="team-detail-list">
-          <h3>
-            {{ teamData.tagName }}
-          </h3>
+          <h3>{{ teamData.tagName }}</h3>
+
           <div class="team-detail-form-group">
             <div class="form-view-row">
-              <label>团队描述：</label>
+              <label>团队描述</label>
+              <div class="form-view-row-content">{{ teamData.description }}</div>
+            </div>
+
+            <div class="form-view-row">
+              <label>主管</label>
               <div class="form-view-row-content">
-                {{ teamData.description }}
+                <span>{{ teamLeadersName }}</span>
               </div>
             </div>
+
             <div class="form-view-row">
-              <label>主管：</label>
-              <div class="form-view-row-content">
-                <span>
-                  {{ teamLeadersName }}
-                </span>
-              </div>
+              <label>电话</label>
+              <div class="form-view-row-content">{{ teamData.phone }}</div>
             </div>
+
             <div class="form-view-row">
-              <label>电话：</label>
-              <div class="form-view-row-content">
-                {{ teamData.phone }}
-              </div>
-            </div>
-            <div class="form-view-row">
-              <label>负责区域：</label>
+              <label>负责区域</label>
               <div class="form-view-row-content">
                 <p v-for="place in teamData.tagPlaceList" :key="`${place.id}_index`">
                   {{ place.province || '' }}
-                  {{ place.city ? `-${place.city}` : '' }}
-                  {{ place.dist ? `-${place.dist}` : '' }}
+                  {{ place.city ? `- ${place.city}` : '' }}
+                  {{ place.dist ? `- ${place.dist}` : '' }}
                 </p>
               </div>
             </div>
+
             <div class="form-view-row">
-              <label>位置：</label>
+              <label>位置</label>
               <div class="form-view-row-content" v-if="teamData.tagAddress">
                 {{ teamData.tagAddress.province }}-
                 {{ teamData.tagAddress.city }}-
@@ -85,19 +69,20 @@
                 {{ teamData.tagAddress.address }}
                 <i @click="openMap" class="iconfont icon-address team-address-icon link-text"></i>
               </div>
-              <!-- <i v-if="value.adLatitude && value.adLongitude" @click="openMap"
-                class="iconfont icon-address customer-address-icon"></i> -->
             </div>
-            <div class="form-view-row">
-              <label>{{team.status == 'parent' ? '子团队：' : '主团队'}}</label>
-              <!-- TODO: 主团队  显示子团队, 子团队 显示主团队-->
-              <div class="form-view-row-content" v-show="team.status == 'child'">
-                <span @click="goTeamDetail(teamData.parent)" class="link-text">
-                  {{ teamData.tagName }}
+
+            <div class="form-view-row" v-if="teamData.parent">
+              <label>主团队</label>
+              <div class="form-view-row-content">
+                <span @click="goTeamDetail(teamData.parent.id)" class="link-text">
+                  {{ teamData.parent.tagName }}
                 </span>
               </div>
-              <div class="form-view-row-content" v-show="team.status == 'parent'">
-                <!-- FIXME: map join -->
+            </div>
+
+            <div class="form-view-row" v-else>
+              <label>子团队</label>
+              <div class="form-view-row-content">
                 <span @click="goTeamDetail(child.id)" v-for="(child, index) in teamData.children" :key="index + 'detail'" class="link-text">
                   {{ child.tagName }}
                   <span v-if="index <= teamData.children.length - 2">
@@ -106,6 +91,7 @@
                 </span>
               </div>
             </div>
+
             <!-- TODO: 暂时隐藏 团队技能 -->
             <!-- <div class="form-view-row">
               <label>团队技能：</label>
@@ -126,28 +112,19 @@
             ref="multipleTable" class="team-table"
           >
             <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
-            <el-table-column
-              v-for="column in columns"
-              v-if="column.show"
-              :key="column.field + 'detail'"
-              :label="column.label"
-              :prop="column.field"
-              :width="column.width"
-              :min-width="column.minWidth || '120px'"
-              show-overflow-tooltip
-            >
+            <el-table-column prop="displayName" label="姓名">
+              <div style="display: flex" slot-scope="scope">
+                <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">{{scope.row.displayName}}</a>
+                <template v-if="scope.row.isTeamLeader">
+                  <i class="iconfont icon-people"></i>主管
+                </template>
+              </div>
+            </el-table-column>
+            <el-table-column prop="loginName" label="账号" />
+            <el-table-column prop="cellPhone" label="服务电话" />
+            <el-table-column prop="enabled" label="状态">
               <template slot-scope="scope">
-                <template v-if="column.field === 'displayName'">
-                  <!-- TODO: 跳转至个人信息页面 -->
-                  <a :href="`/security/user/view/${scope.row.userId}`" class="view-detail-btn">{{scope.row[column.field]}}</a>
-                  <span class="table-charge-view" v-if="scope.row.isTeamLeader == '1'">
-                    <i class="iconfont icon-director"></i>
-                    主管
-                  </span>
-                </template>
-                <template v-else>
-                  {{scope.row[column.field]}}
-                </template>
+                {{scope.row.enabled == 1 ? '启用' : '禁用'}}
               </template>
             </el-table-column>
           </el-table>
@@ -199,41 +176,8 @@ export default {
   data() {
     return {
       allowEditTeam: true,
-      columns: this.buildColumns(),
       loadingPage: false,
-      displayGoBackBtn: true,
-      lists: [
-        {
-          name: '孙启豪',
-          isCharge: true,
-          account: '孙启豪',
-          phone: '1757=61729980'
-        },
-        {
-          name: '王臣',
-          isCharge: false,
-          account: '王臣',
-          phone: '1757=61729980'
-        },
-        {
-          name: '王臣',
-          isCharge: false,
-          account: '王臣',
-          phone: '1757=61729980'
-        },
-        {
-          name: '孙启豪',
-          isCharge: true,
-          account: '孙启豪',
-          phone: '1757=61729980'
-        },
-        {
-          name: '孙启豪',
-          isCharge: true,
-          account: '孙启豪',
-          phone: '1757=61729980'
-        },
-      ],
+      // lists: [],
       multipleSelection: [],
       page: new Page(),
       paginationInfo: {
@@ -253,16 +197,17 @@ export default {
   computed: {
     /* 主管名字 */
     teamLeadersName() {
-      return this.teamData.teamLeaders.map(t => t.displayName).join(',')
+      return this.teamData.teamLeaders.map(t => t.displayName).join('，')
+    },
+    urlParams() {
+      return url.parse(window.location.href, true);
+    },
+    teamId() {
+      return this.urlParams.query.id || '';
+    },
+    displayGoBackBtn() {
+      return !this.urlParams.query.noHistory;
     }
-  },
-  created() {
-    this.lists = [];
-    let urlParams = url.parse(window.location.href, true);
-
-    this.team.id = urlParams.query.id || '';
-    this.displayGoBackBtn = !urlParams.query.noHistory;
-
   },
   mounted() {
     const localStoragePageSize = this.storageGetData();
@@ -277,75 +222,41 @@ export default {
     // this.fetchTableData();
   },
   methods: {
-    buildColumns() {
-      return [{
-        label: '名称',
-        field: 'displayName',
-        show: true,
-        width: 160,
-      }, {
-        label: '账号',
-        field: 'loginName',
-        show: true,
-        width: 120,
-      }, {
-        label: '服务电话',
-        field: 'cellPhone',
-        show: true,
-      }]
-    },
     async fetchTeamData() {
       let params = {
-        id: this.team.id
+        id: this.teamId
       };
 
       try {
         let result = await TeamApi.getTag(params);
 
-        if(result.status == 0) {
-          this.teamData = result.data;
+        if (result.status) return this.$platform.notification({
+          title: '失败',
+          message: (h => <div>{result.message}</div>)(this.$createElement),
+          type: 'error',
+          duration: 0
+        });
 
-          let status = '';
-          if(this.isParent(this.teamData)) {
-            status = 'parent';
-          } else {
-            status = 'child'
-          }
-          this.team.status = status;
+        this.teamData = result.data;
+        this.fetchTableData();
 
-          this.fetchTableData();
-
-        } else {
-          this.$platform.alert(result.status);
-        }
       } catch (error) {
         console.log('error: ', error);
       } finally {
         this.loadingPage = false;
       }
     },
-    fetchData() {
-      const params = {
-        pageNum: this.page.pageNum,
-        pageSize: this.page.pageSize,
-      };
-
-      this.$http.get('', params)
-        .then(res => {
-          this.paginationInfo.totalItems = res.total;
-        })
-    },
     async fetchTableData() {
       let params = {
         pageSize: 0,
         pageNum: this.page.pageNum,
-        tagId: this.team.id, // TODO: 团队id
+        tagId: this.teamId,
       }
       this.loadingPage = true;
       try {
         let result = await TeamApi.userList(params);
 
-        this.page.merge(result);
+        this.page.cover(result);
 
       } catch (e) {
         console.error('personAdd catch error', e);
@@ -365,6 +276,21 @@ export default {
     goTeamDetail(id) {
       // TODO: 详情页
       window.location.href = `/security/tag/view?id=${id}`
+    },
+    /* 跳转 用户详情页 */
+    goUserDetail(event) {
+      event.preventDefault();
+      if (!window.frameElement) return;
+
+      let el = event.target;
+
+      this.$platform.openTab({
+        id: `tab_team_view_${el.dataset.id}`,
+        title: '成员详情',
+        close: true,
+        reload: true,
+        url: `/security/user/view/${el.dataset.id}`,
+      });
     },
     /* 判断是否是主团队 */
     isParent(item) {
@@ -388,26 +314,6 @@ export default {
     /** select person */ 
     selectionHandle(selection) {
       this.multipleSelection = selection.slice(0)
-      // let tv = this.selectionCompute(selection);
-      // let original = this.multipleSelection
-      //   .filter(ms => this.customers.some(cs => cs.id === ms.id));
-      // let unSelected = this.customers
-      //   .filter(c => original.every(oc => oc.id !== c.id));
-
-      // if (tv.length > this.selectedLimit) {
-      //   unSelected.forEach(row => {
-      //     this.$refs.multipleTable.toggleRowSelection(row, false);
-      //   });
-      //   return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
-      // }
-      // this.multipleSelection = tv;
-    },
-    selectionCompute(selection) {
-      // let tv = [];
-      // tv = this.multipleSelection
-      //   .filter(ms => this.customers.every(c => c.id !== ms.id));
-      // tv = _.uniqWith([...tv, ...selection], _.isEqual);
-      // return tv;
     },
     selectionToggle(rows) {
       if (rows) {
@@ -430,9 +336,8 @@ export default {
     /** 新建子团队 */
     teamChildCreate() {
       let parent = {
-        action: 'create',
-        id: this.teamData.id,
-        tagName: this.teamData.tagName,
+        pid: this.teamData.id,
+        pname: this.teamData.tagName,
       }
 
       window.location.href = `/security/tag/createTag?${qs.stringify(parent)}`;
@@ -453,13 +358,10 @@ export default {
 
         let result = await TeamApi.deleteTag(ids);
 
-        if(result.status == 0) {
-          this.goBack();
-        } else {
-          this.$platform.alert(result.message);
-          this.loadingPage = false;
-        }
 
+        if (!result.status) return this.goBack();
+        this.$platform.alert(result.message);
+        this.loadingPage = false;
       } catch (e) {
         console.error('teamDelete catch error', e);
       }
@@ -467,24 +369,11 @@ export default {
     /** 编辑团队 */
     teamEdit() {
       // TODO: 编辑团队 
-      let query = {
-        action: 'edit',
-        id: this.teamData.id,
-      };
-      let href = ''
-
-      if(this.isParent(this.teamData)) {
-        href = 'editTag';
-      } else {
-        href = 'editChildrenTag'
-      }
-      window.location.href = `/security/tag/${href}?${qs.stringify(query)}`;
-      
+      window.location.href = `/security/tag/editTag/${this.teamData.id}`
     },
     personAddChoose() {
       let options = {};
       
-      // TODO: select
       options.selectedUser = this.page.list;
       options.max = 0;
       options.title = '请选择成员';
@@ -540,9 +429,7 @@ export default {
 
         // this.$platform.alert('删除成功');
         // 判断删除的是否含有 主管
-        let isHasLeader = this.multipleSelection.every(m => {
-          return m.isTeamLeader != 1
-        })
+        let isHasLeader = this.multipleSelection.every(m => !m.isTeamLeader);
         this.multipleSelection = [];
 
         if(isHasLeader) {
@@ -552,7 +439,7 @@ export default {
         }
 
       } catch (e) {
-        console.error('personDelete catch error', e);
+        console.error('deleteUser catch error', e);
       }
     },
   }
@@ -702,7 +589,9 @@ export default {
     .view-detail-btn {
       color: #55B7B4;
       display: inline-block;
-      width: 50px;
+      min-width: 50px;
+      max-width: 100px;
+      @include text-ellipsis();
     }
     .table-footer {
       display: flex;
@@ -739,6 +628,7 @@ export default {
   .team-table {
     /*padding: 0 10px;*/
     /*padding: 10px;*/
+    overflow: auto;
 
     &:before {
       height: 0;

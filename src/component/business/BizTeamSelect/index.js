@@ -1,6 +1,7 @@
 import './index.scss'
 
-import * as util from './util';
+import { getReferenceEl } from './util';
+import { fastCall } from '@src/component/util'
 
 import Vue from 'vue';
 import BizTeamSelect from './BizTeamSelect';
@@ -15,12 +16,12 @@ const BizTeamSelectComp = Vue.extend(BizTeamSelect);
  */
 function initTeamSelect(options = {}){
   // 获取定位元素
-  let refEl = util.getReferenceEl(options.reference);
+  let refEl = getReferenceEl(options.reference);
   if(null == refEl) return console.error(`[${BizTeamSelect.name}]: need a reference element.`);
   if(!document.body.contains(refEl)) return console.error(`[${BizTeamSelect.name}]: reference element must be in document`);
 
   let className = refEl.className ? refEl.className.split(' ') : [];
-  if(Array.isArray(options.className)) className = options.className
+  if(Array.isArray(options.className)) className = options.className;
 
   // 创建实例
   let instance = new BizTeamSelectComp({
@@ -29,47 +30,26 @@ function initTeamSelect(options = {}){
       placeholder: options.placeholder || refEl.placeholder,
       parent: options.parent,
       id: options.id || refEl.id,
+      name: options.name || refEl.name,
       multiple: options.multiple,
-      initValue: options.value,
+      value: options.value,
+      fetchFunc: options.fetchFunc,
+      serializer: options.serializer
     }
   });
   
   instance.$mount(refEl);
 
   return instance;
-
-  // return new Promise((resolve, reject) => {
-  //   instance.$on('destroy', () => {
-  //     // 先销毁popper
-  //     if(instance.$data.$popper) {
-  //       // 销毁popper时会删除dom，所以不再手动删除
-  //       instance.$data.$popper.destroy()
-  //     }
-
-  //     // 再销毁组件
-  //     instance.$destroy(true);
-  //     instance = null;
-
-  //     // 清除biz-id
-  //     delete refEl.dataset.bizId;
-
-  //     //reject({status: 1, message: 'cancel'})
-  //   });
-
-  //   instance.$on('input', value => {
-  //     resolve({status: 0, data: value});
-  //   })
-
-  //   instance.init();
-  // })
 }
 
 
 const component = {
   install(Vue){
     Vue.component(BizTeamSelect.name, BizTeamSelect);
+    // 注册快速调用方法
+    fastCall(Vue, 'biz', {initTeamSelect})
   },
-  component: BizTeamSelect,
   namespace: 'biz',
   props: { initTeamSelect }
 }

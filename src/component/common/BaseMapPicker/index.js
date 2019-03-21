@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import BaseMapPicker from './BaseMapPicker.vue';
-import * as dom from '@src/util/dom'
+
+import { destroyComponent } from '@src/util/dom';
+import { fastCall } from '@src/component/util';
 
 const BaseMapPickerComp = Vue.extend(BaseMapPicker);
 
@@ -14,18 +16,18 @@ function picker(address, options = {}){
   
   let instance = new BaseMapPickerComp({
     propsData: {
-      address: address,
-      defaultArea: defaultArea
+      address,
+      defaultArea
     }
   });
 
   return new Promise((resolve, reject) => {
-    let ele = document.createElement("div");
+    let ele = document.createElement('div');
     let body = document.body;
     let pending = false;
 
     instance.$on('destroy', () => {
-      setTimeout(() => dom.destroyComponent(instance), 100);
+      setTimeout(() => destroyComponent(instance), 100);
     })
 
     instance.$on('input', event => {
@@ -54,6 +56,9 @@ function picker(address, options = {}){
 }
 
 const MapPicker = {
+  install(Vue){
+    fastCall(Vue, 'map', { picker })
+  },
   namespace: 'map',
   props: {
     picker
