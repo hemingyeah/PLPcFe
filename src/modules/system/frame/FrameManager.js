@@ -87,7 +87,9 @@ const FrameManager = {
     closeFrameTab(frameTab){
       // console.log('frameTab', frameTab);
       // sessionStorage.removeItem('customer_list_search_status');
-  
+      
+      if(!frameTab.closeable) return;
+
       //TODO:迁移完成后删除
       localStorage.removeItem('frame_tab_' + frameTab.id + '_idArray');
 
@@ -327,6 +329,48 @@ const FrameManager = {
         let key = `frame_tab_${menuKey}_cache`;
         localStorage.removeItem(key);
         console.info(`debug: clear localStorage for key [${key}]`);
+      }
+    },
+    closeTabHandler(event){
+      let {target, command} = event;
+      let id = target.id;
+      let index = this.frameTabs.findIndex(tab => `tab_${tab.id}` == id);
+      if(index < 0) return;
+
+      let tab = this.frameTabs[index];
+
+      if(command == 'itself') return this.closeFrameTab(tab);
+
+      if(command == 'other'){
+        this.frameTabs = this.frameTabs.filter(item => {
+          if(item != tab && item.closeable){
+            // 清空历史
+            FrameHistoryManager.removeStack(`frame_tab_${item.id}`)
+            return false;
+          }
+          
+          return true;
+        })
+
+        let adjustTab = this.frameTabs.find(i => i == tab);
+        adjustTab.show = true;
+        return this.adjustFrameTabs(adjustTab);
+      }
+
+      if(command == 'all'){
+        this.frameTabs = this.frameTabs.filter(item => {
+          if(item.closeable){
+            // 清空历史
+            FrameHistoryManager.removeStack(`frame_tab_${item.id}`)
+            return false;
+          }
+          
+          return true;
+        })
+
+        let adjustTab = this.frameTabs[this.frameTabs.length - 1];
+        adjustTab.show = true;
+        return this.adjustFrameTabs(adjustTab);
       }
     }
   },

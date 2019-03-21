@@ -16,7 +16,7 @@ import BaseSpin from './common/BaseSpin';
 import BaseButton from './common/BaseButton';
 import BaseSelect from './common/BaseSelect';
 import BaseDatatable from './common/BaseDatatable';
-
+import BaseContextMent from './common/BaseContextMenu'
 import TsxComp from './common/TsxComp/index.tsx'
 
 import Form from './form';
@@ -43,6 +43,7 @@ const components = [
   BaseButton,
   BaseSelect,
   BaseDatatable,
+  BaseContextMent,
   TsxComp
 ];
 

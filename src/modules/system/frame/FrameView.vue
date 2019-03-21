@@ -161,7 +161,12 @@
 
     <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
-    <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum" @getNum="getNum"></notification-center>
+
+    <base-context-menu for=".frame-tab" @command="closeTabHandler">
+      <base-context-menu-item command="itself">关闭</base-context-menu-item>
+      <base-context-menu-item command="other">关闭其他</base-context-menu-item>
+      <base-context-menu-item command="all">关闭全部</base-context-menu-item>
+    </base-context-menu>
   </div>
 </template>
 
