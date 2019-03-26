@@ -1,5 +1,5 @@
 <template>
-  <div class="performance-list-container" v-loading="loading">
+  <div class="performance-list-container" v-loading.fullscreen="loading">
     <form class="base-search" onsubmit="return false;">
       <div class="search-group">
         <el-input v-model="params.keyword" placeholder="根据绩效名称搜索">
@@ -40,7 +40,7 @@
           </el-date-picker>
         </el-form-item>
         <div class="advanced-search-btn-group">
-          <base-button type="ghost" @event="resetParams">重置</base-button>
+          <base-button type="ghost" @event="reSearch">重置</base-button>
           <base-button type="primary" @event="search(true)" native-type="submit">搜索</base-button>
         </div>
       </el-form>
@@ -121,7 +121,7 @@
       </el-table>
 
       <el-pagination
-        class="customer-table-pagination"
+        class="performance-report-table-pagination"
         background
         @current-change="jump"
         @size-change="handleSizeChange"
@@ -168,7 +168,7 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            start.setTime(start.getTime() - (3600 * 1000 * 24 * 7));
             picker.$emit('pick', [start, end]);
           }
         }, {
@@ -176,7 +176,7 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            start.setTime(start.getTime() - (3600 * 1000 * 24 * 30));
             picker.$emit('pick', [start, end]);
           }
         }, {
@@ -184,7 +184,7 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            start.setTime(start.getTime() - (3600 * 1000 * 24 * 90));
             picker.$emit('pick', [start, end]);
           }
         }]
@@ -272,7 +272,7 @@ export default {
       getPerformanceReports(params)
         .then(res => {
           this.loading = false;
-          if (res.status) {
+          if (!res || res.status) {
             return this.$platform.notification({
               title: '失败',
               message: (h => (<div>{res.message || '获取绩效报告发生未知错误'}</div>))(this.$createElement),
@@ -611,6 +611,9 @@ export default {
 
     .report-table {
       padding: 10px;
+      &::before {
+        content: none;
+      }
       th {
         background: #F5F5F5;
         color: $text-color-primary;
@@ -626,6 +629,10 @@ export default {
 
     .performance-list {
       background: #fff;
+      .performance-report-table-pagination {
+        text-align: right;
+        padding: 10px;
+      }
     }
 
     .customer-table-pagination {

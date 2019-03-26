@@ -6,6 +6,7 @@
       @input="(val) => updateVal({val, action: 'types', })"
       multiple
       collapse-tags
+      filterable
       style="margin-left: 20px;"
       :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'types')}"
       placeholder="请选择">
@@ -72,7 +73,7 @@ export default {
     index() {
       // 这里的index是从1开始
       if (this.label === '排除条件') return 1;
-      return Number(this.label.match(/\d/g)[0]);
+      return Number(this.label.match(/\d{1,}/g)[0]);
     },
     value() {
       return this.rules[this.index - 1];

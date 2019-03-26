@@ -2,10 +2,10 @@
   <base-modal :title="title" :show.sync="visible" width="800px" class="base-import-modal" @closed="reset">
     <el-form ref="form" :model="form" label-width="80px">
 
-      <el-form-item label="规则名称" :error="formValidationResult.ruleName">
+      <el-form-item label="规则名称" :error="formValidationResult.ruleName" required>
         <el-input v-model="form.ruleName" @change="validate" placeholder="[最多6个字]" :maxlength="6"></el-input>
       </el-form-item>
-      <el-form-item label="规则说明" :error="formValidationResult.ruleDesc">
+      <el-form-item label="规则说明" :error="formValidationResult.ruleDesc" required>
         <el-input v-model="form.ruleDesc" @change="validate" type="textarea" placeholder="[最多500个字]" :maxlength="500"></el-input>
       </el-form-item>
       <el-form-item label="类别" style="margin-bottom: 0px!important;">
@@ -425,7 +425,11 @@ export default {
           }
 
           this.visible = false;
-          // refresh list
+          this.$platform.notification({
+            title: this.action === 'create' ? '添加成功' : '更新成功',
+            type: 'success',
+          });
+
           this.$emit('refresh-rules');
           this.reset();
         })

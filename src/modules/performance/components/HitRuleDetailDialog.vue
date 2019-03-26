@@ -1,22 +1,22 @@
 <template>
-  <base-modal title="绩效明细" :show.sync="visible" width="600px" class="base-import-modal" @closed="reset">
+  <base-modal title="绩效明细" :show.sync="visible" width="660px" class="base-import-modal" @closed="reset">
 
     <div class="table-wrap">
       <el-table
         stripe
         :data="detail">
-        <el-table-column prop="taskNo" label="工单编号" >
+        <el-table-column prop="taskNo" min-width="100px" label="工单编号" >
           <template slot-scope="scope">
             <a href="javascript:;" @click="viewTask(scope.row)" class="view-detail-btn">{{scope.row.taskNo}}</a>
           </template>
         </el-table-column>
-        <el-table-column prop="customer" label="客户" >
+        <el-table-column prop="customer" min-width="100px" label="客户">
           <template slot-scope="scope">{{scope.row.customer.name}}</template>
         </el-table-column>
         <el-table-column prop="userName" width="70px" label="对象"></el-table-column>
         <el-table-column prop="userRole" width="70px" label="角色"></el-table-column>
         <el-table-column prop="ruleType" width="70px" label="绩效方式" ></el-table-column>
-        <el-table-column prop="income" width="70px" label="绩效结果" ></el-table-column>
+        <el-table-column prop="income" label="绩效结果" ></el-table-column>
       </el-table>
     </div>
 
@@ -64,7 +64,7 @@ export default {
     },
     exportExcel(model) {
       this.pending = true;
-      let fileName = `${formatDate(new Date(), 'YYYY-MM-dd')}绩效报告明细.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}${this.detail[0].userName}绩效报告明细.xlsx`;
       let ua = navigator.userAgent;
       if (ua.indexOf('Trident') >= 0){
         window.location.href = `/performance/v2/export/report/desc/detail?${qs.stringify(model)}`;

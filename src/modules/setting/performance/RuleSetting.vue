@@ -119,15 +119,20 @@ export default {
       this.loading = true;
       getAllPerformanceRules()
         .then(res => {
-          if (!res.status) {
-            this.rules = res.data
-              .map(rule => ({
-                ...rule,
-                pending: false,
-              }))
-
-          }
           this.loading = false;
+
+          if (res.status) return this.notice({
+            title: '失败',
+            type: 'error',
+            message: res.message || '发生未知错误',
+          });
+
+          this.rules = (res.data || [])
+            .map(rule => ({
+              ...rule,
+              pending: false,
+            }))
+
         })
         .catch(e => console.error('e', e));
     },
@@ -171,6 +176,11 @@ export default {
               message: res.message || '发生未知错误',
             })
           }
+
+          this.$platform.notification({
+            title: '删除成功',
+            type: 'success',
+          });
 
           // 删除成功
           this.fetchRules();

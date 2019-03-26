@@ -10,7 +10,7 @@
       <dd><label>规则命中：</label>{{reportDetail.hitSize}} 条</dd>
       <dd><label>统计方式：</label>{{reportDetail.ruleType | ruleType}}</dd>
       <dd><label>统计状态：</label>{{reportDetail.timeType ? '已完成并结算' : '已完成'}}</dd>
-      <dd><label>起止时间：</label>{{reportDetail.startTime | formatDate}} ~ {{reportDetail.endTime | formatDate}}</dd>
+      <dd><label>起止时间：</label>{{reportDetail.startTime | formatDate}} ~ {{reportDetail.endTime | formatDate}}({{reportDetail.timeType ? '结算时间' : '完成时间'}})</dd>
       <dd><label>备注：</label>{{reportDetail.remark}}</dd>
     </dl>
 
@@ -113,16 +113,15 @@ export default {
                 r.ruleType = report.ruleType ? '奖金制' : '计分制';
                 r.userRole = r.userRole === 'person' ? '负责人' : '协同人';
                 // r.users = report.users;
-                r.income = (r.score || r.money || 0) + (report.ruleType ? '元' : '分');
-                return Number(r.score) || Number(r.money);
+                r.income = (r.score || r.money || 0.00) + (report.ruleType ? '元' : '分');
+                return Number(r.score) || Number(r.money) || 0.00;
               })
               .filter(score => score >= 0)
               .reduce((a, b) => a + b) || 0;
           } else {
             report.total = 0;
           }
-
-          report.total += report.ruleType ? '元' : '分';
+          report.total = `${report.total.toFixed(2)}${report.ruleType ? '元' : '分'}`;
 
           return report;
         })
@@ -164,7 +163,7 @@ export default {
       const model = {
         ids: this.reportId,
       };
-      let fileName = `${formatDate(new Date(), 'YYYY-MM-dd')}绩效报告明细.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}绩效报告明细.xlsx`;
       let ua = navigator.userAgent;
       if (ua.indexOf('Trident') >= 0){
         window.location.href = `/performance/v2/export/report/desc?${qs.stringify(model)}`;

@@ -1,11 +1,11 @@
 <template>
   <base-modal :title="title" :show.sync="visible" width="600px" class="base-import-modal" @closed="reset">
     <div class="build-stage" v-if="stage === 'build'">
-      <el-form ref="form" :model="form" label-width="110px">
-        <el-form-item label="报告名称" :error="!formValidation.reportName ? '必填': ''">
-          <el-input v-model="form.reportName" @change="validate"> </el-input>
+      <el-form ref="form" :model="form" label-width="110px" >
+        <el-form-item label="报告名称" :error="!formValidation.reportName ? '必填': ''" required>
+          <el-input v-model="form.reportName" @change="validate" :maxlength="50"> </el-input>
         </el-form-item>
-        <el-form-item label="选择规则" :error="!formValidation.ruleId ? '必选': ''">
+        <el-form-item label="选择规则" :error="!formValidation.ruleId ? '必选': ''" required>
           <el-select v-model="form.ruleId" @change="validate" placeholder="请选择" style="width: 100%;">
             <el-option
               v-for="item in openRules"
@@ -20,7 +20,7 @@
           <el-input :value="ruleDesc" type="textarea" readonly></el-input>
         </el-form-item>
         <h3>报告统计对象</h3>
-        <el-form-item label="统计以下对象">
+        <el-form-item label="统计以下对象" style="position: relative">
           <el-select v-model="form.range" placeholder="请选择" @change="form.target = []" style="width: 130px;">
             <el-option
               v-for="item in rangeOptions"
@@ -29,7 +29,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="form.target" multiple collapse-tags @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 240px;" placeholder="请选择">
+          <el-select v-model="form.target" multiple collapse-tags clearable filterable @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 240px;" placeholder="请选择">
             <el-option
               v-for="item in targetOptions"
               :key="item.value"
@@ -38,6 +38,11 @@
             </el-option>
           </el-select>
           <el-button plain @click="selectAll">选择全部</el-button>
+
+          <div v-if="!formValidation.target" class="target-is-error">
+            请选择统计对象
+          </div>
+
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="form.state" placeholder="请选择" style="width: 130px;" @change="form.timeType = 0">
@@ -78,12 +83,12 @@
             :picker-options="createTimePickerOptions">
           </el-date-picker>
 
-          <div v-if="!formValidation.time && form.time && form.time.length" class="time-is-error">
-            时间跨度不能大于3个月
+          <div v-if="!formValidation.time" class="time-is-error">
+            {{form.time && form.time.length ? '时间跨度不能大于3个月' : '请选择起始时间'}}
           </div>
         </div>
         <el-form-item label="备注">
-          <el-input v-model="form.remarks" type="textarea"></el-input>
+          <el-input v-model="form.remarks" type="textarea" :maxlength="500"></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer">
@@ -92,6 +97,7 @@
       </div>
     </div>
     <div class="confirm-stage" v-if="stage === 'confirm'">
+      <p class="tip">有{{reports.length}}条已经重复统计过，是否继续统计？</p>
       <div class="table-wrap">
         <el-table :data="reports" stripe >
           <el-table-column
@@ -243,7 +249,7 @@ export default {
       return '统计成功';
     },
     openRules() {
-      return this.initData.AllOpenRules
+      return (this.initData.AllOpenRules || [])
         .map(({id, ruleName, ruleDesc}) => ({
           label: ruleName,
           value: id,
@@ -251,17 +257,17 @@ export default {
         }));
     },
     users() {
-      return this.initData.AllUsers
-        .map(({displayName, userId}) => ({
-          label: displayName,
+      return (this.initData.AllUsers || [])
+        .map(({userName, userId}) => ({
+          label: userName,
           value: userId,
         }));
     },
     tags() {
-      return this.initData.AllTags
-        .map(({tagName, id}) => ({
+      return (this.initData.AllTags || [])
+        .map(({tagName, tagId}) => ({
           label: tagName,
-          value: id,
+          value: tagId,
         }));
     },
     targetOptions() {
@@ -416,6 +422,7 @@ export default {
     },
     selectAll() {
       this.form.target = this.targetOptions.map(t => t.value);
+      this.validate();
     },
     validate() {
       if (!this.submitted) return;
@@ -478,10 +485,27 @@ export default {
 }
 
 .confirm-stage {
+  .tip {
+    font-size: 12px;
+    color: $text-color-secondary;
+    margin-bottom: 0;
+    position: relative;
+    top: -5px;
+    padding-left: 9px;
+  }
+
   .table-wrap {
     max-height: 300px;
     overflow-y: auto;
   }
+}
+
+.target-is-error {
+  position: absolute;
+  color: #f56c6c;
+  font-size: 12px;
+  padding: 3px 0 0 0px;
+  line-height: 16px;
 }
 
 .customized-label {
