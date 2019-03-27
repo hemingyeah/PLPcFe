@@ -1,34 +1,26 @@
-<template>
-  <div class="base-context-menu" :style="style" @click.stop="close">
-    <slot></slot>
-    <!-- <div class="base-context-menu-line"></div>
-    <base-context-menu-item @click="close">关闭</base-context-menu-item> -->
-  </div>
-</template>
-
-<script>
-export default {
+const BaseContextMenu = {
   name: 'base-context-menu',
   props: {
+    menuRender: Function,
     for: {
       type: String,
-      required: true
+      required: true,
     }
   },
-  data(){
+  data () {
     return {
       top: 0,
       left: 0,
       opacity: 0,
       show: false,
-
       $target: null,
+
       menuHandler: e => this.showMenu(e),
       closeHandler: e => this.closeMenu(e)
     }
   },
   computed: {
-    style(){
+    style () {
       return {
         left: `${this.left}px`,
         top: `${this.top}px`,
@@ -36,6 +28,15 @@ export default {
         display: this.show ? 'block' : 'none'
       }
     }
+  },
+  mounted(){
+    document.addEventListener('contextmenu', this.menuHandler)
+    document.addEventListener('click', this.closeHandler)
+
+  },
+  destroyed(){
+    document.removeEventListener('contextmenu', this.menuHandler)
+    document.removeEventListener('click', this.closeHandler)
   },
   methods: {
     exec(command){
@@ -82,32 +83,24 @@ export default {
       }
     }
   },
-  mounted(){
-    document.addEventListener('contextmenu', this.menuHandler)
-    document.addEventListener('click', this.closeHandler)
+  render(h){   
+    let menus = [];
+    if (typeof this.menuRender == 'function') {
+      let menuArray = this.menuRender(h, this.$data.$target);
 
-  },
-  destroyed(){
-    document.removeEventListener('contextmenu', this.menuHandler)
-    document.removeEventListener('click', this.closeHandler)
+      if (Array.isArray(menuArray)) {
+        menus = menus.concat(menuArray)
+      }
+    }
+
+    return (
+      <div class="base-context-menu" style={this.style} onClick={e => e.stopPropagation()}>
+        {menus}
+        {this.$slots.default}
+      </div>
+    )
+    
   }
-}
-</script>
+};
 
-<style lang="scss">
-.base-context-menu{
-  position: fixed;
-  background-color: #fff;
-  box-shadow: 1px 1px 8px rgba(0, 21, 41, 0.175);
-  z-index: 9999;
-  padding: 5px 0;
-  border-radius: 2px;
-  user-select: none;
-}
-
-.base-context-menu-line{
-  margin: 5px 0;
-  border-bottom: 1px solid #e6e6e6;
-}
-</style>
-
+export default BaseContextMenu;

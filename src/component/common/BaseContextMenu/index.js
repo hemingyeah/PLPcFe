@@ -1,5 +1,6 @@
-import component from './BaseContextMenu.vue';
+import component from './BaseContextMenu.js';
 import item from './BaseContextMenuItem.vue'
+import './BaseContextMenu.scss'
 
 const BaseContextMenu = {
   install(Vue){
