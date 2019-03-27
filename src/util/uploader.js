@@ -97,7 +97,7 @@ function getResult(file, msg){
     id: data.id,
     filename: data.fileName,
     // 如果后端返回url,必须使用。如果后端不返回，需要拼接
-    url: data.url || `/files/get?fileId=${data.id}`,
+    url: data.ossUrl || data.url || `/files/get?fileId=${data.id}`,
     fileSize: data.fileSizeStr
   }
 }
