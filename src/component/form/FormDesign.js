@@ -396,27 +396,14 @@ const FormDesign = {
       this.insertedField = newField;
     },
     scrollWrap(e) {
-      _.debounce(() => {
-        let containerEl = this.$data.$dragEvent.containerEl;
-        e = e || window.event;
-        const distance = e.detail || e.wheelDelta;
-        const position = this.judgePosition(containerEl);
-        
-        // console.log('scrollWrap');
-      
-        // if (distance > 0 && position !== 'bottom') {
-        if (distance > 0) {
-          // console.log("鼠标向下滚动");
-          containerEl.scrollTop -= 10;
-  
-        }
-      
-        // if (distance < 0 && position !== 'top') {
-        if (distance < 0) {
-          // console.warn("鼠标向上滚动");
-          containerEl.scrollTop += 10;
-        }
-      }, 100)();
+      let containerEl = this.$data.$dragEvent.containerEl;
+      const distance = e.detail || e.wheelDelta;
+
+      if (distance) {//非火狐浏览器
+        containerEl.scrollTop += e.deltaY;
+      } else {//火狐浏览器
+        containerEl.scrollTop += e.deltaY * 5;
+      }
     },
     judgePosition(dom) {
       var clients = dom.innerHeight || dom.clientHeight || dom.clientHeight;
@@ -477,7 +464,7 @@ const FormDesign = {
           </div>
         </div>
         {fieldSetting ? <div class="form-design-setting" key="form-design-setting">{fieldSetting}</div> : null}
-        <div class="form-design-ghost" key="form-design-ghost" onMousewheel={e => this.scrollWrap(e)}>
+        <div class="form-design-ghost" key="form-design-ghost" onWheel={e => this.scrollWrap(e)}>
           <div class="form-design__template"></div>
           <div class="form-design-cover"></div>
         </div>
