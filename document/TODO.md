@@ -8,8 +8,9 @@
   - [ ] 输入组件支持清空 
   - [ ] 表单支持键盘操作
   - [ ] split分割面板 https://www.iviewui.com/components/split
-  - [ ] 部门下拉选择框 ▲
   - [ ] base64 https://www.npmjs.com/package/Base64
+  - [ ] 支持配置登录账号
+  - [ ] TypeScript枚举类型重写enum下的文件
   
   **优化** 
   - [ ] BaseContact组件选人时，只在需要工单统计信息时才返回统计数据

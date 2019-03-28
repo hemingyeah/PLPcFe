@@ -1,10 +1,11 @@
 import TableMixin from './TableMixin';
 import _ from 'lodash';
+import normalizeWheel from '@src/util/normalizeWheel'
 
 import { PaddingColumn } from './TableColumn'
 
 const BaseTableHead = {
-  name: "base-table-head",
+  name: 'base-table-head',
   mixins: [TableMixin],
   props: {
     /** 所有列 */
@@ -48,16 +49,17 @@ const BaseTableHead = {
       
       let paddingLeft = 0;
       let paddingRight = 0;
-      if(scrollEl.style.paddingLeft) paddingLeft = parseInt(scrollEl.style.paddingLeft.replace(/[px|%]/g, ""));
-      if(scrollEl.style.paddingRight) paddingRight = parseInt(scrollEl.style.paddingRight.replace(/[px|%]/g, ""));
+      if(scrollEl.style.paddingLeft) paddingLeft = parseInt(scrollEl.style.paddingLeft.replace(/[px|%]/g, ''));
+      if(scrollEl.style.paddingRight) paddingRight = parseInt(scrollEl.style.paddingRight.replace(/[px|%]/g, ''));
       
-      let scrollOffsetWidth = scrollEl.offsetWidth - paddingLeft - paddingRight; //外层容器的宽度
+      let scrollOffsetWidth = scrollEl.offsetWidth - paddingLeft - paddingRight; // 外层容器的宽度
       let headOffsetWidth = tableEl.offsetWidth; 
       let maxOffset = headOffsetWidth - scrollOffsetWidth;
-      //无法滚动
+      // 无法滚动
       if(headOffsetWidth <= scrollOffsetWidth) return;
 
-      let direction = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      let delta = normalizeWheel(event);
+      let direction = delta.pixelX ? delta.pixelX : delta.pixelY
 
       let offset = scrollEl.scrollLeft + direction;
       if(offset < 0) offset = 0;
@@ -65,7 +67,7 @@ const BaseTableHead = {
 
       scrollEl.scrollLeft = offset;
       
-      //同步滚动body
+      // 同步滚动body
       let bodyEl = this.rootEl.querySelector('.base-table__scroll > .base-table__body');
       if(bodyEl.scrollLeft != offset) bodyEl.scrollLeft = offset;
     },

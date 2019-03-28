@@ -25,7 +25,7 @@ router.get('/', async ctx => {
 
   let result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
   
-  //请求失败,模拟登陆
+  // 请求失败,模拟登陆
   if(!result.status){
     let mockUser = USER_CONFIG.loginUser;
     let userToken = 'dev_corpId';
@@ -40,7 +40,7 @@ router.get('/', async ctx => {
       headers['set-cookie'] = cookie;
       reqHeaders['cookie'] = cookie[0];
 
-      //再次请求
+      // 再次请求
       result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
     }else{
       console.log(loginRes)
@@ -50,12 +50,12 @@ router.get('/', async ctx => {
   headers = Object.assign(headers, result.headers);
   body = result.body;
 
-  //补全headers
+  // 补全headers
   for(let name in headers){
     ctx.response.set(name, headers[name])
   }
 
-  //返回html
+  // 返回html
   ctx.body = Template.renderWithHtml('售后宝', body, script, modConfig.template)
 })
 

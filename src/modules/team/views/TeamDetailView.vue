@@ -175,9 +175,7 @@ export default {
   },
   data() {
     return {
-      allowEditTeam: true,
       loadingPage: false,
-      // lists: [],
       multipleSelection: [],
       page: new Page(),
       paginationInfo: {
@@ -207,6 +205,10 @@ export default {
     },
     displayGoBackBtn() {
       return !this.urlParams.query.noHistory;
+    },
+    /* 编辑团队权限 */
+    allowEditTeam() {
+      return true
     }
   },
   mounted() {
@@ -226,6 +228,7 @@ export default {
       let params = {
         id: this.teamId
       };
+      this.loadingPage = true;
 
       try {
         let result = await TeamApi.getTag(params);
@@ -300,6 +303,7 @@ export default {
       );
     },
     openMap() {
+      console.log(this.$fast.map)
       this.$fast.map.display(this.teamData.tagAddress, {title: '团队位置'})
         .catch(err => console.error('openMap catch an err: ', err));
     },
@@ -344,11 +348,15 @@ export default {
     },
     /** 删除团队 */
     async teamDelete() {
-      if(this.teamData.parent && this.isParent(this.teamData)) {
-        return this.$platform.confirm('您选择了主团队，将会级联删除子团队。');
+      let confirm = false;
+
+      if(!this.teamData.parent && this.isParent(this.teamData)) {
+        confirm = await this.$platform.confirm('您选择了主团队，将会级联删除子团队。');
+      } else {
+        confirm = await this.$platform.confirm('您确定要删除该团队？');
       }
+
       try {
-        const confirm = await this.$platform.confirm('您确定要删除该团队？');
         if (!confirm) return;
 
         this.loadingPage = false;
@@ -358,9 +366,25 @@ export default {
 
         let result = await TeamApi.deleteTag(ids);
 
+        this.$platform.notification({
+          type: result.status == 0 ? 'success' : 'error',
+          title: `删除团队${result.status == 0 ? '成功' : '失败'}`,
+          message: result.status == 0 ? null : result.message
+        })
 
-        if (!result.status) return this.goBack();
-        this.$platform.alert(result.message);
+        if (!result.status) {
+          let id = window.frameElement.dataset.id;
+          let fromId = window.frameElement.getAttribute('fromid');
+
+          this.$platform.refreshTab(fromId);
+
+          if(this.displayGoBackBtn && this.teamData.parent && !this.isParent(this.teamData)) {
+            this.goBack();
+          } else {
+            this.$platform.closeTab(id);
+          }
+
+        }
         this.loadingPage = false;
       } catch (e) {
         console.error('teamDelete catch error', e);
@@ -368,15 +392,15 @@ export default {
     },
     /** 编辑团队 */
     teamEdit() {
-      // TODO: 编辑团队 
       window.location.href = `/security/tag/editTag/${this.teamData.id}`
     },
     personAddChoose() {
       let options = {};
       
       options.selectedUser = this.page.list;
-      options.max = 0;
+      options.max = -1;
       options.title = '请选择成员';
+      options.selected = this.page.list;
 
       this.$fast.contact.choose('dept', options).then(res => {
         this.personAdd(res.data.users)
@@ -389,18 +413,20 @@ export default {
         userIds: users.map(user => user.userId)
       }
       try {
+        this.loadingPage = true;
         let result = await TeamApi.addUser(params);
-        if (result.status) return this.$platform.notification({
-          title: '添加失败',
-          message: (h => <div>{result.message}</div>)(this.$createElement),
-          type: 'error',
-          duration: 0
-        });
+
+        this.$platform.notification({
+          type: result.status == 0 ? 'success' : 'error',
+          title: `添加成员${result.status == 0 ? '成功' : '失败'}`,
+          message: result.status == 0 ? null : result.message
+        })
 
         this.page.pageNum = 1;
         this.page.list = [];
         this.fetchTableData();
       } catch (error) {
+        this.loadingPage = false;
         console.log('error: ', error);
       }
     },
@@ -418,27 +444,27 @@ export default {
           userIds: this.multipleSelection.map(user => user.userId).join(',')
         };
 
+        this.loadingPage = true;
+
         let result = await TeamApi.deleteUser(params);
 
-        if (result.status) return this.$platform.notification({
-          title: '删除成员失败',
-          message: (h => <div>{result.message}</div>)(this.$createElement),
-          type: 'error',
-          duration: 0
-        });
-
-        // this.$platform.alert('删除成功');
+        this.$platform.notification({
+          type: result.status == 0 ? 'success' : 'error',
+          title: `删除成员${result.status == 0 ? '成功' : '失败'}`,
+          message: result.status == 0 ? null : result.message
+        })
         // 判断删除的是否含有 主管
         let isHasLeader = this.multipleSelection.every(m => !m.isTeamLeader);
         this.multipleSelection = [];
 
-        if(isHasLeader) {
+        if(!isHasLeader) {
           this.fetchTeamData()
         } else {
           this.fetchTableData();
         }
 
       } catch (e) {
+        this.loadingPage = false;
         console.error('deleteUser catch error', e);
       }
     },
@@ -590,7 +616,7 @@ export default {
       color: #55B7B4;
       display: inline-block;
       min-width: 50px;
-      max-width: 100px;
+      max-width: 140px;
       @include text-ellipsis();
     }
     .table-footer {

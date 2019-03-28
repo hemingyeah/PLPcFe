@@ -18,8 +18,9 @@ import BaseContextMenu from './common/BaseContextMenu'
 import BaseTable from './common/BaseTable';
 
 // 可快速调用的组件
-import BaseMapPicker from './common/BaseMapPicker';
 import BaseDistPicker from './common/BaseDistPicker';
+import BaseMapDisplay from './common/BaseMapDisplay';
+import BaseMapPicker from './common/BaseMapPicker';
 import BaseContact from './common/BaseContact';
 
 // 业务组件
@@ -37,6 +38,7 @@ const components = [
   BaseContact,
   BaseMapPicker,
   BaseDistPicker,
+  BaseMapDisplay,
   Form,
   BaseImport,
   BaseExport,

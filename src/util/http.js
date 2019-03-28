@@ -86,12 +86,8 @@ function axiosHttp(method = 'get', url = '', params = {}, emulateJSON = true, co
   config.method = method;
   config.cancelable = config.cancelable !== false; // 请求是否可取消
 
+  // 禁止在此处捕获异常
   return axiosIns.request(config).then(response => response.data)
-    .catch(e => {
-      if (e && e.message !== 'Request cancelled.') {
-        console.error('axiosHttp caught e', e);
-      }
-    })
 }
 
 const http = { get, post, axios: axiosHttp };

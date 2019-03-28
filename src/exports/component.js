@@ -36,6 +36,14 @@ const components = {
 
 window._pc_componentsV2 = components;
 
+function install(Vue){
+  Vue.use(directive)
+  Vue.component(BizTeamSelect.name, BizTeamSelect)
+}
+
+window._pc_components_exports = install;
+if(null != window.Vue) install(window.Vue)
+
 console.warn('该组件只用于兼容旧有页面，整体迁移后删除');
 
 export default components;

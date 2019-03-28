@@ -116,12 +116,11 @@ export default {
     /** 自定义验证团队名称 */
     checkName(value, field, changeStatus){
       return new Promise((resolve, reject) => {
-        if(!value) return resolve('请输入团队名称');
-
         this.remoteCheckName({id: this.id, field: 'name', value}, resolve, changeStatus)
       })
     },
     remoteCheckName: _.debounce(function (params, resolve, changeStatus){
+      changeStatus(true);
       return TeamApi.checkUnique(params).then(validate => {
         changeStatus(false);
         return resolve(validate ? null : '团队名称不能重复');
@@ -192,6 +191,7 @@ export default {
     /* 新建 团队 */
     async teamCreate(params) {
       this.pending = true;
+      let child = '';
 
       try {
         // 判断是否是新建子团队
@@ -199,18 +199,21 @@ export default {
           params.parent = {
             id: this.parent.id,
             tagName: this.parent.tagName
-          }
+          };
+          child = '子';
         }
 
         let result = await TeamApi.createTag(params);
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `团队创建${result.status == 0 ? '成功' : '失败'}`,
+          title: `${child}团队创建${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
 
-        if(result.status == 0) this.goBack();
+        if(result.status == 0) {
+          this.goBack();
+        }
       } catch (error) {
         console.error('error: ', error);
       }

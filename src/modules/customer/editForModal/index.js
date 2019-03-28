@@ -4,7 +4,7 @@ import CustomerEditView from './CustomerEditView.vue';
 
 Vue.prototype.$http = http;
 
-//处理注入的参数
+// 处理注入的参数
 let initData = {};
 try {
   initData = JSON.parse(window._init);
@@ -13,13 +13,12 @@ try {
   console.error('no init data')
 }
 
-const CustomerEditViewComp = Vue.extend(CustomerEditView);
-const app = new CustomerEditViewComp({
-  propsData: {
-    initData
-  }
+const app = new Vue({
+  provide: {
+    initData: Object.freeze(initData)
+  },
+  render: h => h(CustomerEditView),
+  el: '#app'
 });
-
-app.$mount('#app');
 
 export default app;

@@ -143,15 +143,15 @@
       </h3>
       <dl class="selected-team-list">
         <dt>
-          <span class="id-team">编号</span>
+          <!-- <span class="id-team">编号</span> -->
           <span class="name-team">团队</span>
           <i></i>
         </dt>
         <dd v-for="(team, index) in multipleSelection" :key="team.id">
-          <span class="id-team">{{team.serialNumber}}</span>
+          <!-- <span class="id-team">{{team.serialNumber}}</span> -->
           <span class="name-team">{{team.tagName}}</span>
           <span class="delete-btn">
-            <i class="iconfont icon-fe-close" @click.self="cancelSelecTteam(team, index)"></i>
+            <i class="iconfont icon-fe-close" @click.self="selectCancelTeam(team, index)"></i>
           </span>
         </dd>
 
@@ -264,7 +264,8 @@ export default {
         let params = {
           pageSize: this.page.pageSize,
           pageNum,
-          keyword: this.model.keyword
+          keyword: this.model.keyword,
+          onlyParent: true
         }
         let page = await TeamApi.tagList(params);
         this.page.merge(page);
@@ -290,9 +291,12 @@ export default {
     /* 初始化 */
     initialize(){
       this.page.pageNum = 1;
-      this.multipleSelection = [];
+      this.page.list = [];
 
-      this.fetchPageList();
+      return new Promise(async(resolve, reject) => {
+        let result = await this.fetchPageList(this.page.pageNum);
+        resolve(result)
+      })
     },
     jump(pageNum) {
       this.page.list = [];
@@ -330,6 +334,7 @@ export default {
     },
     openTeamView(e, id){
       e.preventDefault();
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: `team_view_${id}`,
@@ -337,6 +342,7 @@ export default {
         url: `/security/tag/view?id=${id}&noHistory=1`,
         reload: true,
         close: true,
+        fromId
       });
     },
     /* 打开服务电话弹出框 */
@@ -397,6 +403,7 @@ export default {
     /* 选择的团队 */
     selectTeamList(selection) {
       let tv = this.computeSelection(selection);
+
       let original = this.multipleSelection
         .filter(ms => this.page.list.some(l => l.id === ms.id));
 
@@ -411,10 +418,24 @@ export default {
       }
       this.multipleSelection = tv;
     },
+    /* 删除某项已选择的团队 */
+    selectCancelTeam(row, index) {
+      this.multipleSelection.splice(index, 1);
+      this.$refs.teamTable.toggleRowSelection(row, false);
+    },
     computeSelection(selection) {
+      let allTeam = [];
       let tv = [];
+
+      this.page.list.forEach(l => {
+        allTeam.push(l);
+        l.children.forEach(child => {
+          allTeam.push(child)
+        })
+      })
+      
       tv = this.multipleSelection
-        .filter(ms => this.page.list.every(l => l.id !== ms.id));
+        .filter(ms => allTeam.every(l => l.id !== ms.id));
       tv = _.uniqWith([...tv, ...selection], _.isEqual);
       return tv;
     },
@@ -423,9 +444,16 @@ export default {
      * @param {Array} list -表格列表
     */
     selectionToggle(list) {
+      let allTeam = [];
+      list.forEach(l => {
+        allTeam.push(l);
+        l.children.forEach(child => {
+          allTeam.push(child)
+        })
+      })
       this.multipleSelection.forEach(selection => {
-        for(let i = 0; i < list.length; i++){
-          let item = list[i];
+        for(let i = 0; i < allTeam.length; i++){
+          let item = allTeam[i];
 
           if(selection.id == item.id) {
             this.$refs.teamTable.toggleRowSelection(item, true);
@@ -501,29 +529,35 @@ export default {
       // 判断是否 删除含有主团队
       let hasParent = false;
       let select = this.multipleSelection;
+      let confirm = false;
 
       hasParent = select.some(s => {
         return this.isParent(s)
       })
-
+      
       if(hasParent) {
-        let confirm = await this.$platform.confirm('您选择了主团队，将会级联删除子团队。');
+        confirm = await this.$platform.confirm('您选择了主团队，将会级联删除子团队。');
         if(!confirm) return;
+      } else {
+        confirm = await this.$platform.confirm('您确定要删除选择的团队？');
+        if (!confirm) return;
       }
 
       try {
-        const confirm = await this.$platform.confirm('您确定要删除选择的团队？');
-        if (!confirm) return;
-
         let ids = [];
         this.multipleSelection.forEach(m => ids.push(m.id));
 
         let result = await TeamApi.deleteTag(ids);
 
+        this.$platform.notification({
+          type: result.status == 0 ? 'success' : 'error',
+          title: `团队删除${result.status == 0 ? '成功' : '失败'}`,
+          message: result.status == 0 ? null : result.message
+        })
+
         if(result.status == 0) {
           this.initialize();
         } else {
-          this.$platform.alert(result.message);
           this.this.loadingPage = false;
         }
 
@@ -547,6 +581,11 @@ export default {
 
     this.isAllotByTag = this.initData.allotByTag || true;
     this.isSeeAllOrg = this.initData.seeAllOrg || true;
+
+
+    // 对外开放刷新方法，用于其他tab刷新本tab数据
+    // TODO: [tab_spec]标准化刷新方式
+    window.__exports__refresh = this.initialize;
   }
 }
 </script>
@@ -720,7 +759,7 @@ export default {
     }
     .name-team {
       padding: 0 5px;
-      width: 220px;
+      width: 340px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

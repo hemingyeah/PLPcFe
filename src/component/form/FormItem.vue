@@ -68,22 +68,23 @@ export default {
       this.status = false;
 
       let value = this.valueFn();
-      let validator = this.getValidator();
 
-      if(typeof validator == 'function'){
-        return validator(value, this.field, this.changeStatus)
-          .then(res => this.errMessage = res)
-          .catch(err => {
-            console.error('validate err', err)
-            this.changeStatus(false)
-          });
-      }
-      
+      // 以下方式弃用，去除远程验证后删除
       let options = {changeRemoteStatus: this.changeStatus, remote: this.remote};
 
       return Validator.validate(value, this.field, options)
+        .then(res => {
+          let validator = this.getValidator();
+          return res == null && typeof validator == 'function' 
+            ? validator(value, this.field, this.changeStatus)
+            : res;
+        })
         .then(res => this.errMessage = res)
-        .catch(err => console.error('validate err', err));
+        .catch(err => {
+          if(err.message != 'Request cancelled.'){
+            console.error('validate err', err)
+          }
+        });
     },
     /** 远程验证时需要做延时 */
     delayValidate: _.debounce(function(){

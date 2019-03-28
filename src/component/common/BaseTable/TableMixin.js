@@ -20,13 +20,13 @@ const TableMixin = {
       type: Boolean,
       default: false
     },
-    //TODO: 验证命名
+    // TODO: 验证命名
     /** 是否选中全部 */
     isNotSelectAll: {
       type: Boolean,
       default: false
     },
-    //滚动条宽度
+    // 滚动条宽度
     gutter: {
       type: Number,
       default: 0
@@ -45,7 +45,7 @@ const TableMixin = {
     },
     /** 切换选中全部 */
     toggleSelectAll(value) {
-      this.$emit("toggleSelectAll", value);
+      this.$emit('toggleSelectAll', value);
     },
     /** 切换当前行选中 */
     toggleRowSelect(value, row){
@@ -79,7 +79,7 @@ const TableMixin = {
         <th {...attrs}>
           <div class="base-table-cell">
             {
-              typeof column.headRender == "function"
+              typeof column.headRender == 'function'
                 ? column.headRender(h, column)
                 : column.label
             }
@@ -111,7 +111,7 @@ const TableMixin = {
           </tr>
         );
 
-        //渲染子行
+        // 渲染子行
         if(row.hasChildren){
           tableRows = tableRows.concat(this.renderRow(h, row.children, columns, position))
         }
@@ -125,7 +125,7 @@ const TableMixin = {
         'base-table-hover-row': row.hover || row.selected
       }
 
-      //如果是子行
+      // 如果是子行
       if(row.parent){
         let parent = row.parent;
         let isHidden = !parent.expand;
@@ -166,7 +166,7 @@ const TableMixin = {
       let {hasParent, rawData} = row;
       let clazz = {'base-table-hover-col': col.hover};
 
-      //没有展开只渲染td
+      // 没有展开只渲染td
       if(!col.expandProp) return <td class={clazz}>{this.renderCell(h, rawData, col)}</td>;
       
       let render = hasParent ? this.renderLineCell : this.renderExpandCell;

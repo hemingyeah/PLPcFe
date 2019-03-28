@@ -7,6 +7,12 @@
         <input type="text" id="team" class="custom-class" placeholder="请选择服务团队"/>
       </div>
     </div>
+    <button type="button" @click="show = !show">显示</button>
+    <base-modal :show.sync="show">
+      <div style="height: 50px;"></div>
+      <biz-team-select fixed/>
+      <div style="height: 50px;"></div>
+    </base-modal>
     
     <div style="height: 1000px"></div>
   </div>
@@ -35,7 +41,8 @@ export default {
           tagPlaceList: [],
           tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
         }
-      ]
+      ],
+      show: false
     }
   },
   methods: {
@@ -43,8 +50,11 @@ export default {
       let instance = this.$fast.biz.initTeamSelect({
         reference: '#team',
         multiple: true,
+        // disabled: true,
         value: this.initVal,
+        // popperClassName: 'test',
         fetchFunc: params => TeamApi.tagList(params),
+        collapse: true
       });
 
       instance.$on('input', value => {

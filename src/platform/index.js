@@ -50,6 +50,19 @@ function refreshTab(id){
   win.postMessage(message, origin)
 }
 
+/** 根据id, 关闭tab */
+function closeTab(id) {
+  let win = getRootWindow(window);
+  let origin = window.location.origin;
+
+  let message = {
+    action: 'shb.system.closeFrameById',
+    data: id
+  };
+
+  win.postMessage(message, origin)
+}
+
 /**
  * 图片预览
  *
@@ -70,6 +83,7 @@ export const platform = {
 
   openTab,
   refreshTab,
+  closeTab,
 
   openLink,
   imagePreview,

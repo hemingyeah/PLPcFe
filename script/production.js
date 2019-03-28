@@ -6,7 +6,9 @@
  */
 process.env.NODE_ENV = 'production';
 
-const user = process.argv.splice(2)[0] || 'dongls'
+const argv = require('./argv')(process.argv.slice(2))
+const user = argv.user || 'dongls';
+
 const config = require('./config/' + user);
 
 const fs = require('fs');
@@ -19,7 +21,7 @@ const webpackConfig = require('../config/webpack.prod.conf');
 const ROOT_PATH = config.targetRootPath;
 const monitorScript = '<script>!(function(c,i,e,b){var h=i.createElement("script");var f=i.getElementsByTagName("script")[0];h.type="text/javascript";h.crossorigin=true;h.onload=function(){c[b]||(c[b]=new c.wpkReporter({bid:"${env == "production" ? "dta_2_3144" : "dta_2_3397"}"}));c[b].installAll()};f.parentNode.insertBefore(h,f);h.src=e})(window,document,"https://g.alicdn.com/woodpeckerx/jssdk??wpkReporter.js","__wpk");</script>'
 
-//编译
+// 编译
 webpack(webpackConfig, function (err, stats) {
   if (err) throw err;
 
@@ -31,9 +33,9 @@ webpack(webpackConfig, function (err, stats) {
     chunkModules: false
   }) + '\n');
 
-  //读取html生成jsp
+  // 读取html生成 jsp
   genJSP(path.resolve(__dirname, '../dist'));
-  //复制静态资源
+  // 复制静态资源
   copyResource()
 });
 
@@ -49,27 +51,27 @@ function copyResource(){
 
 async function genJSP(directory){
   let files = fs.readdirSync(directory);
-  //过滤html
+  // 过滤html
   let htmls = files.filter(file => file.endsWith('.html'));
 
-  //生成jsp
+  // 生成jsp
   let microTask = htmls.map(html => gen(directory, html));
 
   await Promise.all(microTask);
 
-  //复制文件
+  // 复制文件
   let distOriginPath = path.resolve(__dirname, '../dist');
   let distTargetPath = ROOT_PATH + '/shb-web/src/main/webapp/resource/pc-fe';
   let jspTatgetPath = ROOT_PATH + '/shb-web/src/main/webapp/WEB-INF/views/dist';
 
-  //复制jsp
+  // 复制jsp
   shell.rm('-rf', jspTatgetPath);
   shell.mkdir('-p', jspTatgetPath);
   shell.cp('-r', distOriginPath + '/jsp/*', jspTatgetPath);
-  //清空jsp
+  // 清空jsp
   shell.rm('-rf', distOriginPath + '/jsp');
   
-  //复制静态资源
+  // 复制静态资源
   shell.rm('-rf', distTargetPath);
   shell.mkdir('-p', distTargetPath);
   shell.cp('-r', distOriginPath + '/*', distTargetPath);
@@ -81,19 +83,19 @@ function gen(directory, fileName){
   return new Promise((resolve, reject) => {
     let jspName = fileName.substring(0, fileName.lastIndexOf('.')) + ".jsp";
 
-    //1.读取html
+    // 1.读取html
     fs.readFile(path.resolve(directory, fileName), (err, data) => {
       if(err) reject(err)
       let template = data.toString();
   
-      //2.生成jsp内容
-      //#{} => ${}
+      // 2.生成jsp内容
+      // #{} => ${}
       template = template.replace(/#\{(.*?)\}/g, "${$1}");
-      //注入jsp头部信息
+      // 注入jsp头部信息
       template = '<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>\n' + template;
-      //注入构建信息
-      //template += `\n<!-- build on ${new Date().toLocaleString()}. -->`;
-      //注入监控脚本
+      // 注入构建信息
+      // template += `\n<!-- build on ${new Date().toLocaleString()}. -->`;
+      // 注入监控脚本
       template = template.replace('</head>', monitorScript + '</head>');
       
       let dirPath = path.resolve(directory, 'jsp');
@@ -101,7 +103,7 @@ function gen(directory, fileName){
         fs.mkdirSync(dirPath)
       }
     
-      //3.写入文件
+      // 3.写入文件
       fs.writeFile(path.resolve(dirPath, jspName), template, () => {
         if(err) reject(err);
         resolve();
@@ -112,7 +114,7 @@ function gen(directory, fileName){
 
 function existsSync(path) {
   try{
-    fs.accessSync(path,fs.F_OK);
+    fs.accessSync(path, fs.F_OK);
   }catch(e){
     return false;
   }

@@ -17,8 +17,10 @@ let config = merge(baseConfig, {
   mode: 'production',
   output: {
     publicPath: '/resource/component/',
-    path: path.resolve(__dirname,'../dist/component'),
+    path: path.resolve(__dirname, '../dist/component'),
     filename: '[name].js',
+    library: 'pc_components',
+    libraryTarget: 'umd'
   },
   resolve: {
     alias: {
@@ -41,7 +43,8 @@ let config = merge(baseConfig, {
 });
 
 config.entry = {
-  'component_v2': './src/exports/component.js'
+  'component_v2': './src/exports/component.js',
+  'component_v2_pc': './src/exports/component_pc.js'
 }
 
 module.exports = config;

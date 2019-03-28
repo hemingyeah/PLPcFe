@@ -15,9 +15,9 @@ function showToolTip(event){
   if(!tooltip) return;
   if(!tooltip.option.silence) tooltip.show();
 
-  //启用静默模式，只有内容超出才显示
+  // 启用静默模式，只有内容超出才显示
   let child = event.target.firstChild;
-  if(child && event.target.offsetWidth < child.offsetWidth) tooltip.show();
+  if (child && event.target.offsetWidth < event.target.scrollWidth) tooltip.show();
 }
 
 function hideToolTip(event){

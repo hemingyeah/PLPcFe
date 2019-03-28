@@ -4,6 +4,8 @@ import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
 import FrameHistoryManager from './FrameHistoryManager'
 
+import normalizeWheel from '@src/util/normalizeWheel'
+
 const CACHED_FRAMES = [
   'M_TASK_ALL',
   'M_TASK_AUDIT',
@@ -14,7 +16,7 @@ const FrameManager = {
   data(){
     return {
       frameTabs: [],
-      //hiddenTabs: [],
+      // hiddenTabs: [],
       offset: 0,
       nextBtnEnable: false,
       prevBtnEnable: false,
@@ -23,10 +25,10 @@ const FrameManager = {
   },
   methods: {
     receiveMessage(event){
-      //不接收其他域名发送的信息
+      // 不接收其他域名发送的信息
       if(event.origin !== window.location.origin) return;
       
-      //验证数据格式
+      // 验证数据格式
       let eventData = event.data;
       if(!eventData || !eventData.action) return;
 
@@ -34,6 +36,7 @@ const FrameManager = {
 
       if(action == 'shb.system.openFrameTab') this.openForFrame(eventData.data);
       if(action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.data);
+      if(action == 'shb.system.closeFrameById') this.closeFrameTabById(eventData.data);
     },
     /** @deprecated 兼容旧页面，迁移完成后删除 */
     addTabs(option){
@@ -69,7 +72,7 @@ const FrameManager = {
       this.adjustFrameTabs(tab);
       this.removeFrameCache(tab.id)
 
-      //为该frame添加事件
+      // 为该frame添加事件
       this.$nextTick(() => {
         let frame = document.getElementById(`frame_tab_${tab.id}`);
         if(frame == null) return;
@@ -85,22 +88,19 @@ const FrameManager = {
       //   sessionStorage.removeItem('customer_list_search_status');
       // }
     },
-    //关闭frameTab
+    // 关闭frameTab
     closeFrameTab(frameTab){
-      // console.log('frameTab', frameTab);
       // sessionStorage.removeItem('customer_list_search_status');
-      
-      if(!frameTab.closeable) return;
-
-      //TODO:迁移完成后删除
-      localStorage.removeItem('frame_tab_' + frameTab.id + '_idArray');
+  
+      // TODO:迁移完成后删除
+      localStorage.removeItem(`frame_tab_${ frameTab.id }_idArray`);
 
       let index = this.frameTabs.indexOf(frameTab);
       if(index >= 0) {
         let adjustTab = this.frameTabs.find(item => item.show);
         let currTab = this.frameTabs.splice(index, 1)[0];
 
-        //清空历史
+        // 清空历史
         FrameHistoryManager.removeStack(`frame_tab_${frameTab.id}`)
 
         if(currTab.show){
@@ -114,6 +114,15 @@ const FrameManager = {
 
         this.adjustFrameTabs(adjustTab);
       }
+    },
+    closeFrameTabById(id) {
+      let frameTab = {};
+      let tab = this.frameTabs.filter(f => f.id == id);
+
+      if(Array.isArray(tab) && tab.length > 0) {
+        frameTab = tab[0];
+      }
+      this.closeFrameTab(frameTab);
     },
     jumpFrameTab(frameTab){
       this.frameTabs.forEach(item => item.show = false);
@@ -150,7 +159,7 @@ const FrameManager = {
         })
       })
       
-      //记录frame历史
+      // 记录frame历史
       FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
     },
     reloadFrameTab(tab, redirect = false){
@@ -162,7 +171,7 @@ const FrameManager = {
         tab.title = '正在加载...';
 
         if(redirect) return iframe.src = tab.url;
-        //如果页面由导出刷新方法，调用该方法
+        // 如果页面由导出刷新方法，调用该方法
         if(typeof iframe.contentWindow.__exports__refresh == 'function'){
           return iframe.contentWindow.__exports__refresh().then(() => {
             tab.loading = false;
@@ -183,19 +192,22 @@ const FrameManager = {
     },
     tabScroll(event){ 
       event.preventDefault();
+
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
 
-      let scrollOffsetWidth = scrollEl.offsetWidth; //外层容器的宽度
-      let listOffsetWidth = listEl.offsetWidth; //tab list的宽度
+      let scrollOffsetWidth = scrollEl.offsetWidth; // 外层容器的宽度
+      let listOffsetWidth = listEl.offsetWidth; // tab list的宽度
       let maxOffset = listOffsetWidth - scrollOffsetWidth;
-      //无法滚动
+      // 无法滚动
       if(listOffsetWidth <= scrollOffsetWidth) return;
+      
+      let delta = normalizeWheel(event);
 
-      //1. 兼容不同浏览器的事件
-      //2. 根据方向设置offset
+      // 1. 兼容不同浏览器的事件
+      // 2. 根据方向设置offset
       let direction = event.deltaX != 0 
-        ? event.deltaX > 0 ? 1 : -1//存在横向滚动,
+        ? event.deltaX > 0 ? 1 : -1// 存在横向滚动,
         : event.deltaY > 0 ? 4 : -4;
 
       let offset = this.offset + direction * 12;
@@ -216,7 +228,7 @@ const FrameManager = {
       let scrollOffset = scrollEl.offsetWidth;
       let offset = 0;
 
-      //如果能滚动，计算上一页offset
+      // 如果能滚动，计算上一页offset
       if(listEl.offsetWidth > scrollEl.offsetWidth && this.offset - scrollOffset > 0) {
         offset = this.offset - scrollOffset
       }
@@ -234,7 +246,7 @@ const FrameManager = {
 
       let scrollOffset = scrollEl.offsetWidth;
       let listWidth = listEl.offsetWidth;
-      let maxOffset = listWidth - scrollOffset; //最大偏移量
+      let maxOffset = listWidth - scrollOffset; // 最大偏移量
 
       let offset = 0;
       if(listEl.offsetWidth > scrollEl.offsetWidth){
@@ -250,10 +262,10 @@ const FrameManager = {
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
       
-      let scrollOffsetWidth = scrollEl.offsetWidth; //外层容器的宽度
-      let listOffsetWidth = listEl.offsetWidth; //tab list的宽度
+      let scrollOffsetWidth = scrollEl.offsetWidth; // 外层容器的宽度
+      let listOffsetWidth = listEl.offsetWidth; // tab list的宽度
       
-      //如果无法滚动，offset置为0
+      // 如果无法滚动，offset置为0
       if(listOffsetWidth <= scrollOffsetWidth){
         this.offset = 0;
         this.adjustScrollStyle();
@@ -261,14 +273,14 @@ const FrameManager = {
       }
 
       this.$nextTick(() => {
-        //超出最大滚动范围
+        // 超出最大滚动范围
         if(this.offset + scrollOffsetWidth > listOffsetWidth){
           this.offset = listOffsetWidth - scrollOffsetWidth;
         }
         
-        //显示激活的tab
+        // 显示激活的tab
         if(null != tab && tab.show) this.showActiveTab(tab)
-        //如果显示操作按钮，判断翻页按钮的样式
+        // 如果显示操作按钮，判断翻页按钮的样式
         this.adjustScrollStyle();
       });
     }, 160),
@@ -280,16 +292,16 @@ const FrameManager = {
 
       let scrollOffsetWidth = scrollEl.offsetWidth;
       let listOffsetWidth = listEl.offsetWidth;
-      let maxOffset = listEl.offsetWidth - scrollOffsetWidth; //最大偏移量
+      let maxOffset = listEl.offsetWidth - scrollOffsetWidth; // 最大偏移量
 
-      //左侧不可见
+      // 左侧不可见
       if(tabEl.offsetLeft < this.offset + 5){
         let offset = tabEl.offsetLeft - 5;
         if(offset < 0) offset = 0;
         this.offset = offset;
       }
 
-      //右侧不可见
+      // 右侧不可见
       let rightOffset = tabEl.offsetLeft + tabEl.offsetWidth
       if(this.offset + scrollOffsetWidth < rightOffset + 5){
         let offset = rightOffset + 5 - scrollOffsetWidth;
@@ -298,7 +310,7 @@ const FrameManager = {
         this.offset = offset;
       }
 
-      //如果激活的tab是最后一个tab(多个tab情况下),且是可滚动的，重置offset为最大偏移量
+      // 如果激活的tab是最后一个tab(多个tab情况下),且是可滚动的，重置offset为最大偏移量
       if(listOffsetWidth > scrollOffsetWidth && this.frameTabs.length > 1 && frameTab == this.frameTabs[this.frameTabs.length - 1]){
         this.offset = maxOffset;
       }
@@ -317,7 +329,7 @@ const FrameManager = {
       this.nextBtnEnable = this.offset < listEl.offsetWidth - scrollEl.offsetWidth;
     },
     tabTransitionEnd(event){
-      //只处理tab list的tranform效果
+      // 只处理tab list的tranform效果
       if(event.propertyName != 'transform' || !event.target.classList.contains('frame-tabs-list')) return;
       this.offsetTransition = false;
     },
@@ -325,7 +337,7 @@ const FrameManager = {
       let currTab = this.frameTabs.find(item => item.show);
       this.adjustFrameTabs(currTab);
     },
-    //打开frame前清空缓存
+    // 打开frame前清空缓存
     removeFrameCache(menuKey){
       if(CACHED_FRAMES.indexOf(menuKey) >= 0){
         let key = `frame_tab_${menuKey}_cache`;
@@ -380,7 +392,7 @@ const FrameManager = {
     window.addEventListener('message', this.receiveMessage);
     window.addEventListener('resize', this.resizeHandler);
 
-    //TODO: 迁移完成后删除
+    // TODO: 迁移完成后删除
     window.addTabs = this.addTabs;
     
     window.frameHistoryBack = function(originWindow){
@@ -392,10 +404,10 @@ const FrameManager = {
       referrer ? originWindow.location.replace(referrer) : originWindow.location.reload(true)
     }
 
-    let homeTab = new Tab({id:'HOME',url: '/home', title: '首页', show: true})
+    let homeTab = new Tab({id:'HOME', url: '/home', title: '首页', show: true})
     this.openForFrame(homeTab);
 
-    //处理消息跳转url
+    // 处理消息跳转url
     let query = parse(window.location.search);
     let pcUrl = this.initData.pcUrl || query.pcUrl;
     if(pcUrl) this.openForFrame({id: 'PcUrl', title: '正在加载', url: pcUrl});

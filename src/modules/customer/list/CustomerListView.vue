@@ -670,6 +670,8 @@ export default {
     this.auth = initData.auth || {};
     this.smsRest = initData.smsRest || 0;
 
+    console.log(this.multipleSelection)
+
     this.revertSearchParams();
     this.buildConfig(this.paramsBackup.customizedSearchModel);
     this.search();
@@ -710,7 +712,7 @@ export default {
         title: '产品详情',
         close: true,
         url: `/customer/view/${customerId}?noHistory=1`,
-        fromId: fromId
+        fromId
       })
 
       //this.viewCustomer();

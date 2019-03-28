@@ -251,12 +251,13 @@ export default {
       for(let i = 0; i < this.tableRows.length; i++) {
         let tableRow = this.tableRows[i];
         if(tableRow.key == row.id) {
-          this.$set(tableRow, 'selected', typeof selected == 'undefined' ? !tableRow['selected'] : new Boolean(selected));
+          this.$set(tableRow, 'selected', typeof selected == 'undefined' ? !tableRow['selected'] : Boolean(selected));
+          break;
         }
         for(let j = 0; j < tableRow.children.length; j++) {
           let child = tableRow.children[j];
           if(child.key == row.id) {
-            this.$set(child, 'selected', typeof selected == 'undefined' ? !child['selected'] : new Boolean(selected));
+            this.$set(child, 'selected', typeof selected == 'undefined' ? !child['selected'] : Boolean(selected));
             break
           }
         }

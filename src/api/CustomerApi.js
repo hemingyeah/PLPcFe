@@ -61,3 +61,15 @@ export function matchTag(params){
   return http.get('/customer/tagMatch', params)
 }
 
+/**
+ * 客户唯一性验证
+ * @param {Object} params - 参数
+ * @param {string} params.id - 客户id
+ * @param {string} params.fieldName - 字段名
+ * @param {string} params.value - 值
+ * @returns 成功 - {error: message}， 失败 - {ok: ''}
+ */
+export function unique(params){
+  return http.post('/customer/unique', params, false)
+}
+

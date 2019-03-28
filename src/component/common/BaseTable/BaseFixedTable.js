@@ -1,4 +1,5 @@
 import TableMixin from './TableMixin';
+import normalizeWheel from '@src/util/normalizeWheel'
 
 const BaseFixedTable = {
   name: 'base-fixed-table',
@@ -15,11 +16,10 @@ const BaseFixedTable = {
       //无法滚动
       if(tableOffsetHeight <= bodyOffsetHeight) return;
 
-      //1. 兼容不同浏览器的事件
-      //2. 根据方向设置offset
-      let direction = event.deltaY > 0 ? 4 : -4;
+      let delta = normalizeWheel(event);
+      let direction = delta.pixelX ? delta.pixelX : delta.pixelY
 
-      let offset = bodyEl.scrollTop + direction * 18;
+      let offset = bodyEl.scrollTop + direction;
       if(offset < 0) offset = 0;
       if(offset > tableOffsetHeight - bodyOffsetHeight) offset = tableOffsetHeight - bodyOffsetHeight;
       

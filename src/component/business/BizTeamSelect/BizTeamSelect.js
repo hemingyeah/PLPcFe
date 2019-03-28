@@ -5,6 +5,9 @@ import Popper from 'popper.js';
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi'
 
+/**
+ * TODO: item option render(jsx、template)
+*/
 const BizTeamSelect = {
   name: 'biz-team-select',
   props: {
@@ -21,10 +24,20 @@ const BizTeamSelect = {
       type: Boolean,
       default: false
     },
+    /** 是否禁用 */
+    disabled: {
+      type: Boolean,
+      default: false
+    },
     /** 样式名，添加输入框上 */
     className: {
       type: Array,
       default: () => []
+    },
+    /** 样式名，添加希腊区域上 */
+    popperClassName: {
+      type: String,
+      default: ''
     },
     placeholder: {
       type: String,
@@ -33,6 +46,11 @@ const BizTeamSelect = {
     value: {
       type: Array,
       default: () => []
+    },
+    /** 是否折叠tag */
+    collapse: {
+      type: Boolean,
+      default: false
     },
     fetchFunc: {
       type: Function,
@@ -45,6 +63,14 @@ const BizTeamSelect = {
       default(params){
         return Array.isArray(params) ? params.map(i => i.id).join(',') : params.id;
       }
+    },
+    /** 
+     * popper options
+     * @see https://github.com/FezVrasta/popper.js/blob/master/docs/_includes/popper-documentation.md
+     */
+    popperOptions: {
+      type: Object,
+      default: () => ({})
     }
   },
   data(){
@@ -61,8 +87,8 @@ const BizTeamSelect = {
         pageSize: 50,
         pageNum: 1,
         keyword: '',
-        onlyParent: true,
-        //是否只查主团队，true时只查出主团队来，子团队附带在主团队的children里，同时搜索条件支持子团队查询；不传或false时主团队和子团队会在同一级返回
+        // 是否只查主团队，true时只查出主团队来，子团队附带在主团队的children里，同时搜索条件支持子团队查询；不传或false时主团队和子团队会在同一级返回
+        onlyParent: true
       },
   
       loadmoreOptions: {
@@ -75,7 +101,7 @@ const BizTeamSelect = {
         let target = event.target;
         let data = this.$data;
 
-        if(target == data.$referenceEl) return;
+        if(target == data.$referenceEl || this.$el.contains(target)) return;
         
         this.close()
       }
@@ -97,9 +123,6 @@ const BizTeamSelect = {
         ? this.value 
         : null != this.value ? [this.value] : [];
     },
-    setValue(value){
-      // 设置valuee
-    },
     async loadmore(){
       this.loadmoreOptions.disabled = true;
       this.loading = true;
@@ -107,14 +130,15 @@ const BizTeamSelect = {
       
       this.fetchTeam('merge');
     },
-    handleInput(event) {
+    handleInput: _.debounce(function (event) {
       this.params.keyword = event.target.value;
       this.params.pageNum = 1;
+      this.fetchTeam('cover');
       
-      _.debounce(() => {
-        this.fetchTeam('cover');
-      }, 300)();
-    },
+      if (this.$refs.selectPanel) {
+        this.$refs.selectPanel.scrollTop = 0;
+      }
+    }, 300),
     close(){
       if(!this.popperVisible) return;
       this.popperVisible = false;
@@ -167,25 +191,28 @@ const BizTeamSelect = {
 
     /** 显示popper */
     showPopper(event){
-      event.stopPropagation();
-
-      if(this.popperVisible) return;
+      if(this.popperVisible || this.disabled) return;
 
       // 如果没创建popper，先创建
       if(this.$data.$popper == null){
-        this.$data.$parentEl.appendChild(this.$refs.popper)
-        this.$data.$popper = new Popper(this.$el, this.$refs.popper, {
+        let options = {
           placement: 'bottom-start',
           removeOnDestroy: true,
           onUpdate: this.updatePopperWidth
-        });
+        }
+
+        this.$data.$parentEl.appendChild(this.$refs.popper)
+        this.$data.$popper = new Popper(this.$el, this.$refs.popper, {...options, ...this.popperOptions});
       }
 
       // 更新宽度
       this.popperWidth = this.$el.offsetWidth;
       this.popperVisible = true;
-      this.$data.$popper.update();
-      this.$nextTick(() => this.$refs.search.focus())
+      this.$data.$popper.scheduleUpdate();
+      this.$nextTick(() => {
+        this.$refs.search.focus();
+        if(this.$refs.selectPanel) this.$refs.selectPanel.scrollTop = 0;
+      })
 
       if(this.page.hasNextPage && !this.page.list.length ) {
         this.fetchTeam('merge');
@@ -197,7 +224,7 @@ const BizTeamSelect = {
         let oldHeight = this.$el.offsetHeight;
         this.$nextTick(() => {
           let currHeight = this.$el.offsetHeight;
-          if(currHeight != oldHeight) this.$data.$popper.update()
+          if(currHeight != oldHeight) this.$data.$popper.scheduleUpdate()
         })
       }
     },
@@ -247,6 +274,10 @@ const BizTeamSelect = {
     },
     /** 渲染团队树 */
     renderTree(h, items = []){
+      if(!this.loading && items.length == 0){
+        return <div class="biz-team-select-empty">暂无可用团队</div>
+      }
+
       let teamItems = [];
 
       for(let i = 0; i < items.length; i++){
@@ -262,6 +293,8 @@ const BizTeamSelect = {
     },
     /** 渲染popper */
     renderPopper(h){
+      let clazz = ['biz-team-select-popper', this.popperClassName].filter(cn => cn);
+      
       let style = {
         display: this.popperVisible ? 'block' : 'none',
         width: `${this.popperWidth}px`
@@ -283,7 +316,7 @@ const BizTeamSelect = {
       }
   
       return (
-        <div class="biz-team-select-popper" 
+        <div class={clazz}
           style={style} ref="popper"
           onClick={e => e.stopPropagation()}
         >
@@ -291,7 +324,7 @@ const BizTeamSelect = {
             type="text" class="search-team-keyword" 
             placeholder="请输入关键字搜索..." ref="search"
             onInput={this.handleInput}/>
-          <div class="biz-team-select-panel" {...panelAttrs}>
+          <div class="biz-team-select-panel" {...panelAttrs} ref="selectPanel">
             { content }
             { this.renderTree(h, this.page.list) }
           </div>
@@ -311,7 +344,7 @@ const BizTeamSelect = {
     /** 渲染团队tag */
     renderTag(item){
       return (
-        <span class="biz-team-select-tag">
+        <span class="biz-team-select-tag" key={item.id}>
           <span class="biz-team-select-tag-text">{item.tagName || item.name}</span>
           <i class="iconfont icon-yemianshanchu" onClick={e => this.remove(e, item)}></i>
         </span>
@@ -322,12 +355,21 @@ const BizTeamSelect = {
       let inner = (
         this.isEmpty 
           ? <p class="biz-team-select-placeholder">{ this.placeholder }</p>
-          : this.value.map(item => this.renderTag(item))
-      )
-
+          : this.collapse 
+            ? this.renderTag(this.value[0])
+            : this.value.map(item => this.renderTag(item))
+      );
+      
+      let collapseTags = (
+        this.value.length > 1 && this.collapse
+          ? <div class="biz-team-select-tag">+{this.value.length - 1}</div>
+          : null
+      );
+      
       return (
-        <div class="biz-team-select-tags" onClick={e => this.showPopper(e)}>
+        <div class="biz-team-select-tags">
           {inner}
+          {collapseTags}
         </div>
       );
     },
@@ -343,6 +385,11 @@ const BizTeamSelect = {
   },
   render(h){
     let clazz = ['biz-team-select'];
+    
+    if (this.disabled) {
+      clazz.push('biz-team-select-disabled');
+    }
+    
     if(Array.isArray(this.className) && this.className.length > 0){
       clazz = clazz.concat(this.className)
     }

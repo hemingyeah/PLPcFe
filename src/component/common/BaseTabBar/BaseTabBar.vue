@@ -33,6 +33,7 @@
 
 <script>
 import _ from 'lodash';
+import normalizeWheel from '@src/util/normalizeWheel'
 
 export default {
   name: "base-tabbar",
@@ -72,13 +73,10 @@ export default {
       //无法滚动
       if(listOffsetWidth <= scrollOffsetWidth) return;
 
-      //1. 兼容不同浏览器的事件
-      //2. 根据方向设置offset
-      let direction = event.deltaX != 0 
-        ? event.deltaX > 0 ? 1 : -1//存在横向滚动,
-        : event.deltaY > 0 ? 4 : -4;
+      let delta = normalizeWheel(event);
+      let direction = delta.pixelX ? delta.pixelX : delta.pixelY;
 
-      let offset = this.offset + direction * 12;
+      let offset = this.offset + direction;
       if(offset < 0) offset = 0;
       if(offset > maxOffset) offset = maxOffset;
 

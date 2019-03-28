@@ -174,7 +174,8 @@ async function validate(value, field, options = {}){
   let fn = RuleMap[field.formType];
   let message = null;
   if(typeof fn == 'function') message = await fn(value, field);
-  // 如果有远程验证
+  
+  // TODO: 已弃用，待迁移后删除
   if(message == null && options.remote) {
     let changeRemoteStatus = options.changeRemoteStatus;
     changeRemoteStatus(true);
@@ -184,6 +185,7 @@ async function validate(value, field, options = {}){
 
     changeRemoteStatus(false);
   }
+
   return message;
 }
 

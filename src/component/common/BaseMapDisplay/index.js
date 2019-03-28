@@ -57,6 +57,10 @@ function display(address, options = {}){
 const MapDisplay = {
   install(Vue){
     fastCall(Vue, 'map', { display })
+  },
+  namespace: 'map',
+  props: {
+    display
   }
 }
 

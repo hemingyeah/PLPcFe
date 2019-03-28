@@ -97,7 +97,7 @@ export function genPlaceholder(field, defaultText = ''){
  * @param {*} target 待合并的值
  */
 export function initialize(fields = [], origin = {}, callback){
-  let result = typeof callback == 'function' ? callback(fields, origin) : {};
+  let result = typeof callback == 'function' ? callback(fields, origin) : origin;
 
   fields.forEach(field => {
     let formType = field.formType;

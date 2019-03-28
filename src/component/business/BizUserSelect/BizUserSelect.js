@@ -274,7 +274,7 @@ const BizUserSelect = {
     renderMultiple(){
       let inner = (
         this.isEmpty 
-          ? <p class="biz-user-select-placeholer">{ this.placeholder }</p> 
+          ? <p class="biz-user-select-placeholder">{ this.placeholder }</p> 
           : this.value.map(item => this.renderTag(item))
       )
 
@@ -288,7 +288,7 @@ const BizUserSelect = {
     renderSingle(h){
       let value = this.value || {};
       let inner = this.isEmpty 
-        ? <p class="biz-user-select-placeholer">{ this.placeholder }</p>
+        ? <p class="biz-user-select-placeholder">{ this.placeholder }</p>
         : <p>{ value.displayName }</p>
 
       return <div class="biz-user-select-input-inner">{ inner }</div>
