@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import FormField from './FormField';
 import Platform from '../../platform';
+import browser from '@src/util/browser'
+
 import {
   Modes, 
   FormFieldMap,
@@ -397,13 +399,8 @@ const FormDesign = {
     },
     scrollWrap(e) {
       let containerEl = this.$data.$dragEvent.containerEl;
-      const distance = e.detail || e.wheelDelta;
 
-      if (distance) {//非火狐浏览器
-        containerEl.scrollTop += e.deltaY;
-      } else {//火狐浏览器
-        containerEl.scrollTop += e.deltaY * 5;
-      }
+      containerEl.scrollTop += (browser.isFirefox ? e.deltaY * 5 : e.deltaY);
     },
     judgePosition(dom) {
       var clients = dom.innerHeight || dom.clientHeight || dom.clientHeight;
