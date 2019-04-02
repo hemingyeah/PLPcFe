@@ -584,34 +584,25 @@ export default {
       const {ruleName, ruleDesc, ruleType, effect, effectCondition, ruleContent, } = this.performanceRule;
       const {settleType, templateId, customFieldValue, rewardType} = ruleContent[0];
       let newRules = [];
-      let isSame = false;
 
-      if (!effectCondition && ruleContent.length === 1) {
-        newRules.push({
-          ...ruleContent[0],
-          types: [],
-        })
-      } else {
-        ruleContent.forEach(r => {
-          isSame = newRules.some(nr => nr.assPerson === r.assPerson && nr.chargePerson === r.chargePerson);
-          if (isSame) {
-            newRules = newRules.map(nr => {
-              if (nr.assPerson === r.assPerson && nr.chargePerson === r.chargePerson) {
-                nr.types = [r.screenMsg, nr.screenMsg];
+      // 把负责人、协调人分值相同的条件合并
+      ruleContent.forEach(singleRule => {
+        if (newRules.every(nr => nr.assPerson !== singleRule.assPerson && nr.chargePerson !== singleRule.chargePerson)) {
+          newRules.push(singleRule);
+        } else {
+          newRules = newRules.map(nr => {
+            if (nr.assPerson === singleRule.assPerson && nr.chargePerson === singleRule.chargePerson) {
+              return {
+                assPerson: nr.assPerson,
+                chargePerson: nr.chargePerson,
+                settleType: nr.settleType,
+                screenMsg: `${nr.screenMsg},${singleRule.screenMsg}`
               }
-
-              return nr;
-            })
-          } else {
-            newRules.push({
-              ...r,
-              types: [r.screenMsg]
-            });
-          }
-
-        });
-
-      }
+            }
+            return nr
+          })
+        }
+      });
 
       this.form = {
         ruleName,
@@ -623,12 +614,12 @@ export default {
         category: '', // 工单类型、服务类型、服务内容或者 自定义字段
         custFieldOfTask: '',
         customizedField: '',
-        rules: newRules.map(({assPerson, chargePerson, types}, index) => ({
-          types,
+        rules: newRules.map(({assPerson, chargePerson, screenMsg}, index) => ({
+          types: screenMsg ? screenMsg.split(',') : [],
           assistantScore: assPerson,
           executorScore: chargePerson,
         })),
-      }
+      };
 
 
       if (settleType === 'templateId') {
