@@ -4,7 +4,11 @@
     <dl class="main-info">
 
       <dt>{{reportDetail.reportName}}</dt>
-      <dd><label>规则名称：</label>{{reportDetail.ruleName}}</dd>
+      <dd>
+        <label>规则名称：</label>
+        {{reportDetail.ruleName}}
+        <span class="rule-delete" v-if="reportDetail.isDelete" title="该绩效规则已被删除。" v-tooltip>已删除</span>
+      </dd>
       <dd><label>创建时间：</label>{{reportDetail.createTime | formatDatetime}}</dd>
       <dd><label>统计范围：</label>{{reportDetail.allSize}} 条</dd>
       <dd><label>规则命中：</label>{{reportDetail.hitSize}} 条</dd>
@@ -128,7 +132,7 @@ export default {
     },
     reportDetail() {
       if (!this.initData || !this.initData.reportDescList || !this.initData.reportDescList.ruleMap) return {}
-      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, timeType } = this.initData.reportDescList.ruleMap;
+      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, timeType, isDelete } = this.initData.reportDescList.ruleMap;
 
       return {
         reportName,
@@ -140,7 +144,8 @@ export default {
         remark,
         startTime,
         endTime,
-        timeType
+        timeType,
+        isDelete
       }
     }
   },
@@ -226,6 +231,24 @@ export default {
         font-size: 14px;
         font-weight: 700;
       }
+    }
+
+
+    .rule-delete {
+      color: #fff;
+      display: inline-block;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 18px;
+      height: 18px;
+      padding: 0 5px;
+      font-weight: 400;
+      vertical-align: middle;
+      cursor: default;
+    }
+
+    .rule-delete{
+      background-color: $color-danger;
     }
   }
 
