@@ -64,7 +64,7 @@
       </el-form-item>
 
       <el-form-item class="base-condition-wrap">
-        <el-select v-model="form.custFieldOfTask" @change="changeCustFieldOfTask" v-if="form.category === 'customizedFields'" placeholder="请选择">
+        <el-select v-model="form.custFieldOfTask" :class="{'input-is-error': formValidationResult.custFieldOfTask}" @change="changeCustFieldOfTask" v-if="form.category === 'customizedFields'" placeholder="请选择">
           <el-option
             v-for="item in taskTypes"
             :key="item.value"
@@ -73,7 +73,7 @@
           </el-option>
         </el-select>
         <span class="ordinary-text" v-if="form.custFieldOfTask">的</span>
-        <el-select v-model="form.customizedField" v-if="form.custFieldOfTask" @change="changeCustomizedField" :disabled="!taskSelectFields.length" placeholder="请选择">
+        <el-select v-model="form.customizedField" :class="{'input-is-error': formValidationResult.customizedField}" v-if="form.custFieldOfTask" @change="changeCustomizedField" :disabled="!taskSelectFields.length" placeholder="请选择">
           <el-option
             v-for="item in taskSelectFields"
             :key="item.value"
@@ -515,7 +515,7 @@ export default {
       let selectedTaskType = this.form.custFieldOfTask;
       if (this.allTaskSelectFields[selectedTaskType]) {
         this.taskSelectFields = this.allTaskSelectFields[selectedTaskType]
-        return Promise.resolve();
+        return Promise.resolve(this.taskSelectFields);
       }
 
       return getFieldsForPerformance(id)
@@ -621,25 +621,59 @@ export default {
         })),
       };
 
-
       if (settleType === 'templateId') {
-        this.form.category = 'taskTypes'
+        this.form.category = 'taskTypes';
+        // 把选中的工单类型中被删除的过滤掉
+        this.form.rules = this.form.rules.map(condition => {
+          condition.types = condition.types.filter(t => this.taskTypes.some(template => template.value === t));
+          condition.placeHolder = !condition.types.length ? '工单类型已被删除请重选' : '';
+          return condition
+        })
+        // .filter(condition => condition.types.length)
       }
 
       if (settleType === 'serviceType') {
-        this.form.category = 'serviceTypes'
+        this.form.category = 'serviceTypes';
+        // this.form.rules = this.form.rules.map(condition => {
+        //   condition.types = condition.types.filter(t => this.serviceTypes.some(template => template.value === t))
+        //   return condition
+        // })
       }
 
       if (settleType === 'serviceContent') {
-        this.form.category = 'serviceContents'
+        this.form.category = 'serviceContents';
+        // this.form.rules = this.form.rules.map(condition => {
+        //   condition.types = condition.types.filter(t => this.serviceContents.some(template => template.value === t))
+        //   return condition
+        // })
       }
 
       if (settleType === 'customField') {
         this.form.category = 'customizedFields';
         this.form.custFieldOfTask = templateId;
+        // 工单被删除， 把工单往下的值清空
+        if (this.taskTypes.every(t => t.value !== templateId)) {
+          return this.changeCategory();
+        }
+
+
+        // 选项被删除
+        if (!templateId) return;
         this.fetchFields(templateId)
-          .then(() => {
-            this.form.customizedField = customFieldValue;
+          .then((res) => {
+            if (res.length) {
+              // 处理选项被删除的情况
+              this.form.rules = this.form.rules.map(rule => {
+                // 把被删除的选项过滤掉
+                rule.types = rule.types.filter(type => res.filter(field => field.value === customFieldValue)[0].dataSource.some(option => option === type));
+                rule.placeHolder = '选项已被删除请重选';
+                return rule;
+              });
+
+              return this.form.customizedField = customFieldValue;
+            }
+            // res 是条件被选中的字段，如果长度为0就是选中的字段被删除了， reset
+            this.clearSomeFieldsVal(['rules', 'customizedField']);
           })
       }
       this.formValidationResult.rules = newRules.map(() => ({
@@ -661,6 +695,7 @@ export default {
       this.fetchFields(this.form.custFieldOfTask);
 
       this.clearSomeFieldsVal(['rules', 'customizedField']);
+      this.validate();
     },
     changeRuleType() {
       let fields = ['category', 'custFieldOfTask', 'customizedField', 'rules', 'rewardType', 'effectCondition'];
@@ -683,6 +718,17 @@ export default {
       this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
       this.performanceRule = {};
       this.submitted = false;
+      this.formValidationResult = {
+        ruleName: null,
+        ruleDesc: null,
+        ruleType: null,
+        rewardType: null,
+        effectCondition:  null,
+        category: null,
+        custFieldOfTask: null,
+        customizedField: null,
+        rules: [{status: 0, fields: []}],
+      };
     },
     clearSomeFieldsVal(fields) {
       let defaultValIsEmptyString = ['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField'];

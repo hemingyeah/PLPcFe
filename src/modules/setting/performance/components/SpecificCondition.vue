@@ -9,7 +9,7 @@
       filterable
       style="margin-left: 20px;"
       :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'types')}"
-      placeholder="请选择">
+      :placeholder="value.placeHolder || '请选择'">
       <el-option
         v-for="item in options"
         :key="item.value"

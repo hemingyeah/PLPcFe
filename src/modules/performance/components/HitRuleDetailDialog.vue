@@ -39,6 +39,7 @@ export default {
       visible: false,
       pending: false,
       detail: [],
+      tag: '',
     }
   },
   methods: {
@@ -64,7 +65,7 @@ export default {
     },
     exportExcel(model) {
       this.pending = true;
-      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}${this.detail[0].userName}绩效报告明细.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}${this.tag}绩效报告明细.xlsx`;
       let ua = navigator.userAgent;
       if (ua.indexOf('Trident') >= 0){
         window.location.href = `/performance/v2/export/report/desc/detail?${qs.stringify(model)}`;
@@ -91,7 +92,11 @@ export default {
     },
     toggleDialog(detail) {
       this.visible = !this.visible;
-      if (detail) this.detail = detail.desc;
+
+      if (detail) {
+        this.detail = detail.desc;
+        this.tag = detail.users;
+      }
     },
     reset() {
       this.detail = [];

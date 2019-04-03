@@ -430,14 +430,10 @@ export default {
     },
     validateForm() {
       const keys = Object.keys(this.formValidation);
-      // const valIsArr = ['target', 'time'];
       let val = null;
 
       return keys.map(key => {
         val = this.form[key];
-        // if (valIsArr.some(k => k === key)) {
-        //   return this.formValidation[key] = Array.isArray(val) && !!val.length;
-        // }
         // 8035200000 ms = 93 days
         if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
         if (key === 'time') return this.formValidation[key] = Array.isArray(val) && !!val.length && new Date(this.form.time[1]) - new Date(this.form.time[0]) <= 8035200000;
