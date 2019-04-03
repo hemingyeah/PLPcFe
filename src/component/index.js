@@ -16,9 +16,9 @@ import BaseButton from './common/BaseButton';
 import BaseSelect from './common/BaseSelect';
 import BaseContextMenu from './common/BaseContextMenu'
 import BaseTable from './common/BaseTable';
+import BaseDistPicker from './common/BaseDistPicker';
 
 // 可快速调用的组件
-import BaseDistPicker from './common/BaseDistPicker';
 import BaseMapDisplay from './common/BaseMapDisplay';
 import BaseMapPicker from './common/BaseMapPicker';
 import BaseContact from './common/BaseContact';

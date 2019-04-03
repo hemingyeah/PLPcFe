@@ -670,7 +670,6 @@ export default {
     this.auth = initData.auth || {};
     this.smsRest = initData.smsRest || 0;
 
-    console.log(this.multipleSelection)
 
     this.revertSearchParams();
     this.buildConfig(this.paramsBackup.customizedSearchModel);

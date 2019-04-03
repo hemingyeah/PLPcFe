@@ -39,7 +39,10 @@ import * as TeamApi from '@src/api/TeamApi'
 
 import _ from 'lodash'
 import qs from 'qs';
+
 import FormMixin from '@src/component/form/components/FormMixin'
+
+import { stringLen } from './../../../util/lang/index.js'
 
 export default {
   name: 'team-edit-view',
@@ -58,7 +61,8 @@ export default {
         tagName: {
           displayName: '团队名称', 
           fieldName: 'tagName',
-          formType: 'text', 
+          formType: 'text',
+          placeHolder: '最多10字',
           isNull: 0
         },
         description: {
@@ -116,6 +120,10 @@ export default {
     /** 自定义验证团队名称 */
     checkName(value, field, changeStatus){
       return new Promise((resolve, reject) => {
+        if(stringLen(value) > 20) {
+          changeStatus(false)
+          return resolve('团队名称不能超过10字');
+        }
         this.remoteCheckName({id: this.id, field: 'name', value}, resolve, changeStatus)
       })
     },
@@ -227,10 +235,15 @@ export default {
       try {
         params.id = this.id;
         let result = await TeamApi.updateTag(params);
+        let child = '';
+
+        if(this.initData.tag.parent) {
+          child = '子';
+        }
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `团队编辑${result.status == 0 ? '成功' : '失败'}`,
+          title: `${child}团队编辑${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
         if(result.status == 0) this.goBack();
@@ -290,7 +303,7 @@ export default {
           <div class="team-form-places">
             <div class="team-form-places-header">
               <p>设置团队的服务区域用于新建客户时自动分配客户所属服务团队</p>
-              <button id={`form_${this.field.fieldName}`} type="button" class="btn-text" onClick={e => this.addPlace()}><i class="iconfont icon-add"></i>添加</button>
+              <button type="button" class="btn-text" onClick={e => this.addPlace()}><i class="iconfont icon-add"></i>添加</button>
             </div>
             {
               this.value.map((item, index) => (

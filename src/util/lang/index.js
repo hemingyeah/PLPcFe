@@ -43,3 +43,25 @@ export function toArray(value){
 export function trimAll(str){
   return str.replace(/\s+/g, '');
 }
+
+/** 
+ * 检测字符串长度
+ * 单字节加1, 其他加2
+ * @param {String} str - 要检测的字符串
+ * @returns {Number} len - 长度
+*/
+export function stringLen(str) {
+  if(typeof str != 'string') return 0;
+
+  let len = 0;
+  for (let i = 0; i < str.length; i++) {
+    let c = str.charCodeAt(i);
+    // 单字节加1 
+    if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+      len++;
+    } else {
+      len += 2;
+    }
+  }
+  return len;
+}

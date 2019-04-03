@@ -1,5 +1,6 @@
 module.exports = {
   'team.list': {
+    template: 'src/modules/team/index.html',
     entry: './src/modules/team/list.js',
   },
   'team.edit': {

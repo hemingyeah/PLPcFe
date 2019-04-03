@@ -2,18 +2,20 @@
   <div class="full-page" v-loading.fullscreen.lock="loadingPage">
     <!-- start header -->
     <header class="team-list-header">
-      <!-- start 团队搜索 -->
-      <div class="team-list-headr-search">
-        <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select">
-          <i slot="prefix" class="el-input__icon el-icon-search"></i>
-        </el-input>
-        <base-button type="primary" @event="search">
-          搜索
-        </base-button>
-        <base-button type="ghost" @event="resetParams">
-          重置
-        </base-button>
-      </div>
+      <form class="base-search" onsubmit="return false;">
+        <!-- start 团队搜索 -->
+        <div class="team-list-headr-search">
+          <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select">
+            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+          </el-input>
+          <base-button type="primary" @event="search" native-type="submit">
+            搜索
+          </base-button>
+          <base-button type="ghost" @event="resetParams">
+            重置
+          </base-button>
+        </div>
+      </form>
       <!-- end 团队搜索 -->
 
       <!-- start 团队选项 -->
@@ -296,7 +298,7 @@ export default {
       return new Promise(async(resolve, reject) => {
         let result = await this.fetchPageList(this.page.pageNum);
         resolve(result)
-      })
+      }).catch(err => console.log(err))
     },
     jump(pageNum) {
       this.page.list = [];
@@ -318,7 +320,7 @@ export default {
     /* 获取本地数据 */
     localStorageGet() {
       try {
-        const dataStr = localStorage.getItem('teamListData') || '{}';
+        const dataStr = localStorage.getItem('teamListData') || '{}'
         return JSON.parse(dataStr); 
       } catch (error) {
         console.log('error: ', error);
@@ -579,13 +581,13 @@ export default {
     this.revertSearchParams();
     this.initialize();
 
-    this.isAllotByTag = this.initData.allotByTag || true;
-    this.isSeeAllOrg = this.initData.seeAllOrg || true;
+    this.isAllotByTag = (this.initData.taskConfig && this.initData.taskConfig.allotByTag !== false);
+    this.isSeeAllOrg = this.initData.seeAllOrg !== false;
 
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
-    window.__exports__refresh = this.initialize;
+    // window.__exports__refresh = this.initialize;
   }
 }
 </script>

@@ -86,7 +86,7 @@ export function deleteUser(params) {
  * 
  * @param {Object} params -- 参数
  * @param {String} [params.id] -- 团队id，编辑时需要传
- * @param {String} params.field -- 验证的地段
+ * @param {String} params.field -- 验证的字段
  * @param {String} params.value -- 值
  * @returns Boolean true为验证通过
  */

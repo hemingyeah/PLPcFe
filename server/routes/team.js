@@ -6,9 +6,13 @@ const modules = require('../../config/modules');
 const router = new KoaRouter();
 
 router.get('/security/tag', async ctx => {
+  let modConfig = modules['team.edit'];
+  let reqHeaders = ctx.request.headers;
   let script = ['/team.list.js'];
+  let result = await HttpClient.request('/security/tag', 'get', null, { headers: reqHeaders });
+  let body = result.body;
 
-  ctx.body = Template.renderWithData('团队列表', {}, script)
+  ctx.body = Template.renderWithHtml('团队列表', body, script, modConfig.template)
 })
 
 
