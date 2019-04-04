@@ -12,7 +12,8 @@
     "build": "node script/production.js",
     "lint": "eslint --fix --ext .js,.vue src",
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
-    "comp": "node script/component.js"
+    "comp": "node script/component.js",
+    "build:hbc": "node script/production.js --user=huangbc"
   },
   "author": "dongls",
   "license": "ISC",
