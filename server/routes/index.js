@@ -1,3 +1,8 @@
+/** development server @author dongls */
+
+// 当前用户的配置
+const USER_CONFIG = require(`../../script/config/${process.argv.splice(2)[0] || 'dongls'}`);
+
 const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
@@ -21,7 +26,13 @@ router.get('/', async ctx => {
   
   //请求失败,模拟登陆
   if(!result.status){
-    let loginRes = await HttpClient.request('/dd/mockLogin?code=dev_code&corpId=dev_corpId', 'get', null);
+    let mockUser = USER_CONFIG.loginUser;
+    let userToken = 'dev_corpId';
+    if(null != mockUser){
+      userToken = `${mockUser.userId}_${mockUser.tenantId}`;
+    }
+
+    let loginRes = await HttpClient.request(`/dd/mockLogin?code=dev_code&corpId=${userToken}`, 'get', null);
     
     if(loginRes.status){
       let cookie = loginRes.headers['set-cookie'] || {};
