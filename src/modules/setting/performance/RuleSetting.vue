@@ -59,7 +59,7 @@
 
 <script>
 import SettingRuleDialog from './components/SettingRuleDialog.vue';
-import {getAllPerformanceRules, deleteAllPerformanceRules, togglePerformanceRuleEffect} from '@src/api/PerformanceApi';
+import {getAllPerformanceRules, deletePerformanceRule, togglePerformanceRuleEffect} from '@src/api/PerformanceApi';
 
 export default {
   name: 'rule-setting',
@@ -167,7 +167,7 @@ export default {
       const result = await this.$platform.confirm('您确定要删除该条规则吗?');
       if (!result) return;
 
-      deleteAllPerformanceRules(row.id)
+      deletePerformanceRule(row.id)
         .then(res => {
           if (res.status) {
             return this.notice({

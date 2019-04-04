@@ -419,7 +419,7 @@ export default {
           if (res.status) {
             return this.$platform.notification({
               title: '失败',
-              message: (h => (<div>{res.message}</div>))(this.$createElement),
+              message: res.message || '',
               type: 'error',
             });
           }
