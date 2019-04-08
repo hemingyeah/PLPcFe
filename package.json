@@ -13,7 +13,8 @@
     "lint": "eslint --fix --ext .js,.vue src",
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
     "comp": "node script/component.js",
-    "build:hbc": "node script/production.js --user=huangbc"
+    "build:hbc": "node script/production.js --user=huangbc",
+    "tag": "./scripts/tag.sh ${1} ${2}"
   },
   "author": "dongls",
   "license": "ISC",
