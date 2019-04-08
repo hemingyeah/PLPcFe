@@ -82,7 +82,9 @@
           </el-option>
         </el-select>
       </el-form-item>
-
+      <el-form-item v-if="warning">
+        <span class="warning">{{warning}}</span>
+      </el-form-item>
       <div v-if="conditionVisible" class="condition-wrap">
         <specific-condition
           v-for="(item, index) in form.rules"
@@ -125,6 +127,7 @@ export default {
       pending: false,
       submitted: false,
       performanceRule: {},
+      warning: '',
       includeTypes: [
         {
           label: '全部',
@@ -626,7 +629,12 @@ export default {
         // 把选中的工单类型中被删除的过滤掉
         this.form.rules = this.form.rules.map(condition => {
           condition.types = condition.types.filter(t => this.taskTypes.some(template => template.value === t));
-          condition.placeHolder = !condition.types.length ? '工单类型已被删除请重选' : '';
+
+          if (!condition.types.length) {
+            condition.placeHolder = '工单类型已被删除请重选';
+            this.warning = '工单类型已被删除，请重新编辑该绩效规则';
+          }
+
           return condition
         })
         // .filter(condition => condition.types.length)
@@ -653,25 +661,31 @@ export default {
         this.form.custFieldOfTask = templateId;
         // 工单被删除， 把工单往下的值清空
         if (this.taskTypes.every(t => t.value !== templateId)) {
+          this.warning = '工单类型已被删除，请重新编辑该绩效规则';
           return this.changeCategory();
         }
-
 
         // 选项被删除
         if (!templateId) return;
         this.fetchFields(templateId)
           .then((res) => {
-            if (res.length) {
+            let selectedField = res.filter(field => field.value === customFieldValue) || [];
+
+            if (res.length && selectedField.length) {
               // 处理选项被删除的情况
               this.form.rules = this.form.rules.map(rule => {
                 // 把被删除的选项过滤掉
-                rule.types = rule.types.filter(type => res.filter(field => field.value === customFieldValue)[0].dataSource.some(option => option === type));
-                rule.placeHolder = '选项已被删除请重选';
+                rule.types = rule.types.filter(type => selectedField[0].dataSource.some(option => option.value === type));
+                if (!rule.types.length) {
+                  this.warning = '自定义字段的选项已被删除，请重新编辑该绩效规则';
+                }
+                // rule.placeHolder = '选项已被删除请重选';
                 return rule;
               });
 
               return this.form.customizedField = customFieldValue;
             }
+            this.warning = '自定义字段已被删除，请重新编辑该绩效规则';
             // res 是条件被选中的字段，如果长度为0就是选中的字段被删除了， reset
             this.clearSomeFieldsVal(['rules', 'customizedField']);
           })
@@ -718,6 +732,7 @@ export default {
       this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
       this.performanceRule = {};
       this.submitted = false;
+      this.warning = '';
       this.formValidationResult = {
         ruleName: null,
         ruleDesc: null,
@@ -794,6 +809,11 @@ export default {
 
   .input-is-error input {
     border-color: #f56c6c;
+  }
+
+  .warning {
+    color: #f56c6c;
+    font-size: 12px;
   }
 
   .ordinary-text {

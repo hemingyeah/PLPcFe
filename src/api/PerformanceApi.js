@@ -53,7 +53,7 @@ function deletePerformanceRule(id) {
 
 /**
  * 启用/禁用绩效规则
- * @param {Object} - 参数
+ * @params {Object} - 参数
  * @params.id {Number} - 规则id
  * @params.effect {Number} - 规则状态(0: 禁用, 1: 启用)
  * @returns Promise {data, message, status}
@@ -64,7 +64,7 @@ function togglePerformanceRuleEffect(params) {
 
 /**
  * 更新绩效规则
- * @param {Object}
+ * @params {Object}
  * @param.id {Number} - 绩效规则id
  * @param... 参考创建绩效规则参数
  * @returns Promise
@@ -75,7 +75,7 @@ function updatePerformanceRule(params) {
 
 /**
  *
- * @param {Object}
+ * @params {Object}
  * @param.ruleId {Number} - 绩效规则id
  * @param.reportName {String} - 绩效报告名称
  * @param.state {Number} - 工单状态 (0:已完成,1:已完成并结算,)
@@ -94,7 +94,7 @@ function createPerformanceReport(params) {
 
 /**
  * 获取绩效报告的列表
- * @param {Object} - 参数
+ * @params {Object} - 参数
  * @param.pageSize {Number} - 分页
  * @param.pageNum {Number} - 页码
  * @param[startTime] {Date} - 开始时间
@@ -108,7 +108,7 @@ function getPerformanceReports(params) {
 
 /**
  * 删除绩效报告
- * @param {Object} - 参数
+ * @params {Object} - 参数
  * @param.ids {String} - id的字符串，以 , 分隔， 并以 , 结尾
  * @returns Promise {data, message, status}
  */
