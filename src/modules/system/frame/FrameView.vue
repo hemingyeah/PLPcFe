@@ -15,6 +15,12 @@
             </button>     
           </div>
           
+          <div class="frame-quick-notification">
+            <p v-tooltip :title="notification">{{notification}}</p>
+            <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
+              <i class="iconfont icon-fe-close"></i>
+            </button>
+          </div>
           <!-- profile -->
           <div class="frame-quick-right">
             <el-popover v-if="showDevTool">
@@ -66,6 +72,16 @@
               </div>
             </el-popover>
             <!--导出下载-->
+
+            <button
+              type="button" class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
+              @click="openNotificationCenter"
+              title="通知中心" v-tooltip>
+              <span class="notification-new">
+                <span class="notification-number">3</span>
+              </span>
+              <i class="iconfont">&#xe624;</i>
+            </button>
       
             <!-- 个人信息 -->
             <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
@@ -142,6 +158,7 @@
 
     <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
+    <notification-center ref="notification"></notification-center>
   </div>
 </template>
 
@@ -156,6 +173,7 @@ import Version from './component/Version.vue';
 import SaleManager from './component/SaleManager.vue';
 
 import DefaultHead from '@src/assets/img/user-avatar.png';
+import NotificationCenter from './component/NotificationCenter.vue'
 
 export default {
   mixins: [FrameManager],
@@ -180,7 +198,8 @@ export default {
       exportPanelShow: false,
       exportTimer: null,
       exportList: [],
-      operationList: []
+      operationList: [],
+      notification: '售后宝将在2月12日22：30至23：50进行系统更新，对因停机维护给用户带来的不便我们深表歉意。'
     }
   },
   computed: {
@@ -265,6 +284,11 @@ export default {
       this.saleManagerShow = true;
       this.profilePopperVisible = false;
     },
+    openNotificationCenter () {
+      this.$refs.notification.showCompont();
+      // this.notificationCenterShow = true;
+      this.profilePopperVisible = false;
+    },
     /** 检测是否有导出 */
     async checkExports(){
       try {
@@ -347,6 +371,9 @@ export default {
         url: "/team/manage",
         reload: true
       });
+    },
+    closeNotification () {
+
     }
   },
   created(){
@@ -366,7 +393,8 @@ export default {
     [FrameNav.name]: FrameNav,
     [FrameTab.name]: FrameTab,
     [Version.name]: Version,
-    [SaleManager.name]: SaleManager
+    [SaleManager.name]: SaleManager,
+    [NotificationCenter.name]: NotificationCenter
   }
 }
 </script>
