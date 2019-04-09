@@ -53,6 +53,7 @@ module.exports = {
     "vue/name-property-casing": ["error", "kebab-case"],
     "vue/comment-directives": "off",
     "vue/require-default-prop": "off",
+    "vue/singleline-html-element-content-newline": "off",
 
     // spec
     //spec
