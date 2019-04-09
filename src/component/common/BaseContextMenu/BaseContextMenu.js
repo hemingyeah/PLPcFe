@@ -1,3 +1,6 @@
+const ITEM_WIDTH = 150;
+const ITEM_HEIGHT = 32;
+
 const BaseContextMenu = {
   name: 'base-context-menu',
   props: {
@@ -11,9 +14,10 @@ const BaseContextMenu = {
     return {
       top: 0,
       left: 0,
-      opacity: 0,
+      opacity: 1,
       show: false,
       $target: null,
+      $event: null,
 
       menuHandler: e => this.showMenu(e),
       closeHandler: e => this.closeMenu(e)
@@ -53,38 +57,26 @@ const BaseContextMenu = {
       if(null == target) return this.show = false;
 
       event.preventDefault();
-      this.top = event.clientY;
-      this.left = event.clientX;
-      this.opacity = 0;
-      this.show = true;
+      this.$data.$event = event;
       this.$data.$target = target;
-      
-      this.$nextTick(this.updatePosition)
-    },
-    updatePosition(){
-      // TODO: 更新位置
-      let viewportHeight = window.innerHeight;
-      let viewportWidth = window.innerWidth;
-      let height = this.$el.offsetHeight;
-      let width = this.$el.offsetWidth;
 
-      if(viewportWidth - this.left < width) {
-        this.left = viewportWidth - width - 5;
-      }
-      if(viewportHeight - this.top < height) {
-        this.top = viewportHeight - height - 5;
-      }
-
-      this.opacity = 1;
+      this.$nextTick(() => {
+        this.show = true;
+      })
     },
     closeMenu(event){
       if (event.button === 0) {//兼容firefox
         this.show = false;
+        this.$data.$event = null;
       }
     }
   },
   render(h){   
+    if(!this.show) return null;
+
     let menus = [];
+    let length = 0;
+
     if (typeof this.menuRender == 'function') {
       let menuArray = this.menuRender(h, this.$data.$target);
 
@@ -93,13 +85,27 @@ const BaseContextMenu = {
       }
     }
 
+    if(this.$slots.default) {
+      length += this.$slots.default.length;
+    }
+    if(menus) {
+      length += menus.length;
+    }
+
+    let viewportHeight = window.innerHeight;
+    let viewportWidth = window.innerWidth;
+    let height = (length * ITEM_HEIGHT) + 10;
+    let width = ITEM_WIDTH;
+
+    this.top = (viewportHeight - this.$data.$event.clientY < height) ? (viewportHeight - height - 5) : this.$data.$event.clientY;
+    this.left = (viewportWidth - this.$data.$event.clientX < width) ? (viewportWidth - width - 5) : this.$data.$event.clientX;
+
     return (
       <div class="base-context-menu" style={this.style} onClick={e => e.stopPropagation()}>
         {menus}
         {this.$slots.default}
       </div>
-    )
-    
+    )  
   }
 };
 

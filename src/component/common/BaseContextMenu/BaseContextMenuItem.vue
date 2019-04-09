@@ -3,7 +3,7 @@
     <slot name="icon">
       <span class="base-context-menu-indent"></span>
     </slot>
-    <span><slot></slot></span>
+    <span class="base-context-menu-text"><slot></slot></span>
   </div>
 </template>
 
@@ -27,11 +27,12 @@ export default {
 <style lang="scss">
 .base-context-menu-item{
   line-height: 24px;
-  padding: 4px 10px 4px 0;
+  padding: 4px 10px;
   cursor: pointer;
   color: $text-color-regular;
   font-size: 14px;
-  min-width: 120px;
+  width: 150px;
+  height: 32px;
 
   display: flex;
   flex-flow: row nowrap;
@@ -49,6 +50,11 @@ export default {
     display: block;
     width: 24px;
     height: 24px;
+  }
+  .base-context-menu-text{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 }
 </style>

@@ -163,12 +163,6 @@
     <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
 
-    <!-- <base-context-menu for=".frame-tab" @command="closeTabHandler">
-      <base-context-menu-item command="itself">关闭</base-context-menu-item>
-      <base-context-menu-item command="other">关闭其他</base-context-menu-item>
-      <base-context-menu-item command="all">关闭全部</base-context-menu-item>
-    </base-context-menu> -->
-
     <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu>
   </div>
 </template>
@@ -248,7 +242,7 @@ export default {
   methods: {
     menuRender (h, target) {
       let menus = [
-        <base-context-menu-item command="other">关闭其他</base-context-menu-item>,
+        <base-context-menu-item command="other">关闭其他关闭其他关闭关闭其他</base-context-menu-item>,
         <base-context-menu-item command="all">关闭全部</base-context-menu-item>
       ];
 
