@@ -16,8 +16,8 @@ const BaseContextMenu = {
       left: 0,
       opacity: 1,
       show: false,
-      $target: null,
       $event: null,
+      $target: null,
 
       menuHandler: e => this.showMenu(e),
       closeHandler: e => this.closeMenu(e)
@@ -29,7 +29,8 @@ const BaseContextMenu = {
         left: `${this.left}px`,
         top: `${this.top}px`,
         opacity: this.opacity,
-        display: this.show ? 'block' : 'none'
+        display: this.show ? 'block' : 'none',
+        fontSize: 0
       }
     }
   },
@@ -47,7 +48,8 @@ const BaseContextMenu = {
       let event = {target: this.$data.$target, command}
       this.$emit('command', event)
     },
-    close(){
+    close(e){
+      e.stopPropagation();
       this.show = false;
     },
     showMenu(event){
@@ -72,7 +74,11 @@ const BaseContextMenu = {
     }
   },
   render(h){   
-    if(!this.show) return null;
+    if(!this.show) {
+      this.$data.$event = null;
+      this.$data.$target = null;
+      return null;
+    }
 
     let menus = [];
     let length = 0;
@@ -88,9 +94,7 @@ const BaseContextMenu = {
     if(this.$slots.default) {
       length += this.$slots.default.length;
     }
-    if(menus) {
-      length += menus.length;
-    }
+    length += menus.length;
 
     let viewportHeight = window.innerHeight;
     let viewportWidth = window.innerWidth;
@@ -101,9 +105,9 @@ const BaseContextMenu = {
     this.left = (viewportWidth - this.$data.$event.clientX < width) ? (viewportWidth - width - 5) : this.$data.$event.clientX;
 
     return (
-      <div class="base-context-menu" style={this.style} onClick={e => e.stopPropagation()}>
-        {menus}
+      <div class="base-context-menu" style={this.style} onClick={this.close}>
         {this.$slots.default}
+        {menus}
       </div>
     )  
   }

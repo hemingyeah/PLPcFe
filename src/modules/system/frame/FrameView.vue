@@ -242,7 +242,7 @@ export default {
   methods: {
     menuRender (h, target) {
       let menus = [
-        <base-context-menu-item command="other">关闭其他关闭其他关闭关闭其他</base-context-menu-item>,
+        <base-context-menu-item command="other">关闭其他</base-context-menu-item>,
         <base-context-menu-item command="all">关闭全部</base-context-menu-item>
       ];
 
