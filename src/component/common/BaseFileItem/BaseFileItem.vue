@@ -5,13 +5,15 @@
         <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
       </div>
       <div class="base-file-info">
-        <a :href="file.url" @click.prevent.stop="download" >{{file.filename}}</a>
+        <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
         <p>
           <span>{{file.fileSize}}</span>
           <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">删除</button>
         </p>
       </div>
     </template>
+
+    <!-- 用于添加备注 -->
     <template v-else>
       <div :class="clazz" :style="styl" @click.prevent.stop="preview">
         <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
@@ -27,11 +29,11 @@
 </template>
 
 <script>
-//TODO: 识别更多类型的文件
+// TODO: 识别更多类型的文件
 import platform from '@src/platform/index';
 
 export default {
-  name: "base-file-item",
+  name: 'base-file-item',
   props: {
     file: {
       type: Object,
@@ -54,7 +56,7 @@ export default {
       const name = file.filename;
 
       if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(name)) {
-        icon = "img";
+        icon = 'img';
       } else if (/\.(ppt|pptx)$/i.test(name)) {
         icon = 'ppt-file-icon';
       } else if (/\.(mp3)$/i.test(name)) {
@@ -76,7 +78,7 @@ export default {
       }
 
       if (this.size === 'small') {
-        icon = 'small-' + icon;
+        icon = `small-${ icon }`;
       }
 
       return icon;
@@ -94,9 +96,10 @@ export default {
 
       return clazz;
     },
+    /** TODO: 支持缩略图 */
     styl(){
       let styl = {};
-  
+
       if(this.isImage) {
         let url = `${this.file.url}${this.file.url.indexOf('?') >= 0 ? '&' : '?'}isCmp=true`;
         styl.backgroundImage = `url(${url})`;
@@ -105,7 +108,7 @@ export default {
 
       return styl;
     },
-    //是否为图片
+    // 是否为图片
     isImage(){
       return this.icon === 'img' || this.icon === 'small-img';
     }
@@ -121,7 +124,7 @@ export default {
       if(!this.isImage || !element) return;
 
       let list = event.target.closest('.base-file__preview');
-      let images = Array.prototype.slice.call(list.querySelectorAll("img"));
+      let images = Array.prototype.slice.call(list.querySelectorAll('img'));
 
       let currIndex = 0;
       let urls = images.map((item, index) => {
@@ -131,13 +134,13 @@ export default {
 
       platform.imagePreview({
         imageDom: list,
-        currIndex: currIndex,
+        currIndex,
         urls
       });
     },
     async deleteFile(){
       const name = this.file.filename;
-      if(await platform.confirm('确定要删除该附件？\n' + name)){
+      if(await platform.confirm(`确定要删除该附件？\n${ name }`)){
         this.$emit('delete', this.file);
       }
     }
