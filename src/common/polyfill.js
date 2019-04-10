@@ -1,13 +1,14 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-var */
-/** 全局polyfill @author dongls */
+/* eslint-disable */
+/** 全局polyfill   @author dongls */
+
 if (!Element.prototype.matches) {
-  Element.prototype.matches =
+  Element.prototype.matches = (
     Element.prototype.matchesSelector ||
     Element.prototype.mozMatchesSelector ||
     Element.prototype.msMatchesSelector ||
     Element.prototype.oMatchesSelector ||
     Element.prototype.webkitMatchesSelector
+  )
 }
 
 if (!Element.prototype.closest) {
