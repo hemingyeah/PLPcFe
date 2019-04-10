@@ -29,7 +29,6 @@
 </template>
 
 <script>
-// TODO: 识别更多类型的文件
 import platform from '@src/platform/index';
 
 export default {
@@ -96,11 +95,11 @@ export default {
 
       return clazz;
     },
-    /** TODO: 支持缩略图 */
     styl(){
       let styl = {};
 
       if(this.isImage) {
+        // TODO: 支持缩略图 
         let url = `${this.file.url}${this.file.url.indexOf('?') >= 0 ? '&' : '?'}isCmp=true`;
         styl.backgroundImage = `url(${url})`;
         styl.cursor = 'pointer';
@@ -116,8 +115,7 @@ export default {
   methods: {
     download(event){
       if(!this.file.url) return;
-
-      window.location.href = window.location.origin + this.file.url;
+      window.location.href = this.file.url;
     },
     preview(event){
       let element = event.target.querySelector('img');
@@ -129,7 +127,7 @@ export default {
       let currIndex = 0;
       let urls = images.map((item, index) => {
         if(item == element) currIndex = index;
-        return window.location.origin + item.dataset.origin;
+        return item.dataset.origin;
       });
 
       platform.imagePreview({
