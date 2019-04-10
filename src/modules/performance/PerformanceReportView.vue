@@ -116,7 +116,6 @@ export default {
               .map(r => {
                 r.ruleType = report.ruleType ? '奖金制' : '计分制';
                 r.userRole = r.userRole === 'person' ? '负责人' : '协同人';
-                // r.users = report.users;
                 r.income = (r.score || r.money || 0.00) + (report.ruleType ? '元' : '分');
                 return Number(r.score) || Number(r.money) || 0.00;
               })

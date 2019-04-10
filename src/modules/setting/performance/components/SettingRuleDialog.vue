@@ -63,6 +63,11 @@
         </div>
       </el-form-item>
 
+      <el-form-item>
+
+        <el-checkbox v-model="form.mark">当同一个工单负责人与协同人重复时只计算负责人</el-checkbox>
+      </el-form-item>
+
       <el-form-item class="base-condition-wrap">
         <el-select v-model="form.custFieldOfTask" :class="{'input-is-error': formValidationResult.custFieldOfTask}" @change="changeCustFieldOfTask" v-if="form.category === 'customizedFields'" placeholder="请选择">
           <el-option
@@ -186,6 +191,7 @@ export default {
         category: '', // 工单类型、服务类型、服务内容或者 自定义字段
         custFieldOfTask: '',
         customizedField: '',
+        mark: true,
         rules: [
           {
             types: [],
@@ -464,6 +470,7 @@ export default {
         effect,
         rewardType,
         custFieldOfTask,
+        mark,
       } = this.form;
       let tv = {};
       let ruleArr = [];
@@ -486,6 +493,7 @@ export default {
         ruleType,
         effectCondition,
         effect,
+        mark: Number(!mark),
         ruleContents: ruleArr.map(r => {
           tv = {};
           if (category === 'taskTypes') {
@@ -584,7 +592,7 @@ export default {
       }
     },
     transferRuleToForm() {
-      const {ruleName, ruleDesc, ruleType, effect, effectCondition, ruleContent, } = this.performanceRule;
+      const {ruleName, ruleDesc, ruleType, effect, effectCondition, ruleContent, mark, } = this.performanceRule;
       const {settleType, templateId, customFieldValue, rewardType} = ruleContent[0];
       let newRules = [];
 
@@ -617,6 +625,7 @@ export default {
         category: '', // 工单类型、服务类型、服务内容或者 自定义字段
         custFieldOfTask: '',
         customizedField: '',
+        mark: !mark,
         rules: newRules.map(({assPerson, chargePerson, screenMsg}, index) => ({
           types: screenMsg ? screenMsg.split(',') : [],
           assistantScore: assPerson,
@@ -729,7 +738,7 @@ export default {
     },
     // clear val
     reset() {
-      this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules']);
+      this.clearSomeFieldsVal(['ruleName', 'ruleDesc', 'category', 'custFieldOfTask', 'customizedField', 'effectCondition', 'ruleType', 'rewardType', 'rules', 'mark']);
       this.performanceRule = {};
       this.submitted = false;
       this.warning = '';
@@ -755,6 +764,10 @@ export default {
         if (key === 'rewardType') {
           this.form[key] = 'profit';
           continue;
+        }
+
+        if (key === 'mark') {
+          this.form.mark = true;
         }
 
         if (key === 'rules') {

@@ -11,6 +11,8 @@
   exit;
 fi
 
+# 检查tag 是不是最新的
+
  if [ -z $2 ]; then
   echo "warn: no message";
   exit;
