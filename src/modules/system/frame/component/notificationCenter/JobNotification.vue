@@ -1,14 +1,14 @@
 <template>
   <div class="job-notification">
     <div class="job-notification-header">
-      <el-select class="job-notification-select" v-model="jobOption" placeholder="消息来源">
+      <el-select class="job-notification-select-left" v-model="jobOption" placeholder="消息来源">
         <el-option
           v-for="(item, index) in jobOptions"
           :key="index"
           :label="item.label"
           :value="item.value"></el-option>
       </el-select>
-      <el-select class="job-notification-select" v-model="dataOption" placeholder="日期">
+      <el-select class="job-notification-select-right" v-model="dataOption" placeholder="日期">
         <el-option
           v-for="(item, index) in dataOptions"
           :key="index"
@@ -108,9 +108,27 @@ export default {
   margin: 0 10px;
   text-align: center;
 }
-.job-notification-select {
+.job-notification-select-left {
   display: inline-block;
   width: 125px;
   margin: 0 10px;
+  input {
+    background: #EAEAEA;
+    border: 0;
+    border-radius: 4px 0 0 4px;
+  }
 }
+.job-notification-select-right {
+  display: inline-block;
+  width: 125px;
+  margin: 0 10px;
+  input {
+    background: #EAEAEA;
+    border: 0;
+    border-radius: 0 4px 4px 0;
+  }
+}
+// .el-input__inner {
+//   background: #ccc;
+// }
 </style>
