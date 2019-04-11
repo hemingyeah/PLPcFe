@@ -1,17 +1,19 @@
 <template>
   <div class="job-notification-item">
-    <span class="job-notification-item-new"></span>
-    <div class="job-notification-item-header">{{title}}</div>
+    <span class="job-notification-item-new" v-if="info.readed == 0"></span>
+    <div class="job-notification-item-header">{{info.body.title}}</div>
     <button type="button" @click="close" class="job-notification-item-btn">
       <i class="iconfont icon-fe-close"></i>
     </button>
-    <slot class="job-notification-item-info" name="header"></slot>
-    <div class="job-notification-item-content">
-      <slot></slot>
+    <div class="job-notification-item-info" name="header">{{info.body.content}}</div>
+    <div class="job-notification-item-content" v-if="info.body.forms">
+      <p 
+        v-for="(item, index) in info.body.forms"
+        :key="index">{{Object.keys(item)[0]}}：{{Object.values(item)[0]}}</p>
     </div>
     <div class="job-notification-item-footer">
       <a href="#" class="job-notification-item-detail">查看详情</a>
-      <p class="job-notification-item-time">{{time}}</p>
+      <p class="job-notification-item-time">{{info.createTime}}</p>
     </div>
   </div>
 </template>
@@ -20,13 +22,15 @@
 export default {
   name: 'job-notification-item',
   props: {
-    title: String,
-    time: String
+    info: Object,
   },
   data () {
     return {
 
     }
+  },
+  created () {
+
   },
   methods: {
     close () {
@@ -39,15 +43,13 @@ export default {
 <style lang="scss">
 .job-notification-item {
   position: relative;
-  margin-top: 20px;
-  padding: 10px 20px 10px 30px;
+  margin: 10px;
+  padding: 25px;
   background: #fff;
-  font-size: 12px;
-  box-shadow: 6px 7px 7px #999;
 }
 .job-notification-item-new {
   position: absolute;
-  top: 17px;
+  top: 32px;
   left: 15px;
   width: 9px;
   height: 9px;
@@ -59,8 +61,7 @@ export default {
   display: inline-block;
   height: 24px;
   line-height: 24px;
-  margin-bottom: 10px;
-  font-size: 14px;
+  font-size: 16px;
 }
 .job-notification-item-btn {
   float: right;
@@ -83,15 +84,33 @@ export default {
   }
 }
 .job-notification-item-info {
-  font-size: 13px;
+  color: #8C8989;
+  padding-top: 5px;
+}
+.job-notification-item-content {
+  padding: 20px 0 10px 0;
+  color: #3E3E3E;
+  border-bottom: 1px solid #c4c4c4;
+  p {
+    margin-bottom: 5px;
+  }
+}
+.job-notification-item-footer {
+  padding-top: 15px;
 }
 .job-notification-item-detail {
-  display: block;
-  margin-bottom: 5px;
+  display: inline-block;
+  width: 82px;
+  height: 28px;
+  line-height: 28px;
+  border: 1px solid;
+  border-radius: 4px;
+  text-align: center;
   color: #55B7B4;
 }
 .job-notification-item-time {
-  margin: 0;
-  color: #999;
+  float: right;
+  line-height: 28px;
+  color: #3E3E3E;
 }
 </style>

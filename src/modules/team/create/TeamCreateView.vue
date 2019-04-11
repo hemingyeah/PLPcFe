@@ -205,6 +205,7 @@ export default {
         this.$http.post('/security/tag/userList', params, false)
           .then(res => {
             this.users = res.list;
+            console.log(this.users);
           })
           .catch(err => console.error('fetchUsers err', err));
       } catch (e) {
@@ -263,6 +264,7 @@ export default {
         .catch(err => console.error(err));
     },
     teamChargeSelectChange(value) {
+      console.log(value);
       this.form.charge = value;
       this.form.chargeRole = 'admin';
       this.form.chargeRoleDisabled = true;

@@ -5,7 +5,7 @@
     class="notification-center">
     <div class="notification-center-header" slot="header">
       <button type="button" class="btn-text notification-center-btn" @click="show = false">
-        <i class="iconfont icon-Takeup"></i>
+        <i class="iconfont icon-Takeup notification-close"></i>
       </button>
       <p class="notification-center-title">
         <i class="iconfont icon-notification"></i>通知中心
@@ -18,15 +18,13 @@
     <div class="notification-center-type">
       <input class="notification-center-tab" type="radio" id="job-notification" :checked="component == 'job-notification'" @change="notificationChange" />
       <label class="notification-center-tab-text" for="job-notification">工作通知
-        <div class="notification-center-tab-new">
-          <span class="notification-center-tab-number">31</span>
-        </div>
+        <div class="notification-center-tab-new">31</div>
+        <div class="notification-center-checked-border"></div>
       </label>
       <input class="notification-center-tab" type="radio" id="system-notification" :checked="component == 'system-notification'" @change="notificationChange" />
       <label class="notification-center-tab-text" for="system-notification">系统通知
-        <div class="notification-center-tab-new">
-          <span class="notification-center-tab-number">3</span>
-        </div>
+        <div class="notification-center-tab-new">2</div>
+        <div class="notification-center-checked-border"></div>
       </label>
     </div>
 
@@ -70,19 +68,26 @@ export default {
 
 <style lang="scss">
 .notification-center {
-  position: absolute;
-  top: 50px;
+  // position: absolute;
+  // top: 50px;
   background: #eee;
 }
 .notification-center-header {
-  height: 72px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  z-index: 999;
+  height: 50px;
+  line-height: 50px;
   background: #55B7B4;
   text-align: center;
-  padding: 22px 32px 22px 16px;
-  font-size: 20px;
+  font-size: 16px;
+  padding: 0 10px;
 }
 .notification-center-btn {
   float: left;
+  height: 50px;
 }
 .notification-center-title {
   display: inline-block;
@@ -90,11 +95,16 @@ export default {
   color: #fff;
 }
 .notification-center-type {
+  position: fixed;
+  top: 50px;
+  right: 0;
+  width: 420px;
+  z-index: 999;
   display: flex;
   text-align: center;
   list-style: none;
-  height: 70px;
-  padding: 0 10px;
+  height: 65px;
+  padding: 0 12px;
   font-size: 16px;
   color: #969696;
   background: #fff;
@@ -103,7 +113,24 @@ export default {
   display: none;
   &:checked + label{
     color: #000;
-    border-bottom: 2px solid #55B7b4;
+    div:nth-child(1) {
+      position: absolute;
+      top: 20px;
+      right: 45px;
+      font-size: 13px;
+      padding: 0 5px;
+      color: #fff;
+      background: #CB0C0C;
+      border-radius: 12px;
+      opacity: 1;
+    }
+    div:nth-child(2) {
+      height: 5px;
+      width: 28px;
+      margin:10px 85px;
+      border-radius: 5px;
+      background: #55B7b4;
+    }
   }
 }
 .notification-center-tab-text {
@@ -115,15 +142,36 @@ export default {
   border-bottom: 1px solid #cbcbcb;
   &:hover {
     color: #000;
-    border-bottom: 2px solid #55B7b4;
+    div:nth-child(1) {
+      position: absolute;
+      top: 20px;
+      right: 45px;
+      font-size: 13px;
+      padding: 0 5px;
+      color: #fff;
+      background: #CB0C0C;
+      border-radius: 12px;
+      opacity: 1;
+    }
+    div:nth-child(2) {
+      height: 5px;
+      width: 28px;
+      margin:10px 85px;
+      border-radius: 5px;
+      background: #55B7b4;
+    }
   }
 }
 .notification-center-tab-new {
-  display: inline-block;
-  width: 20px;
-  height: 15px;
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 13px;
+  padding: 0 5px;
+  color: #fff;
   background: #CB0C0C;
   border-radius: 12px;
+  opacity: 0.64;
 }
 .notification-center-tab-number {
   position: relative;
@@ -131,19 +179,20 @@ export default {
   font-size: 8px;
   color: #fff;
 }
-.icon-Takeup {
+.notification-close {
   color: #fff;
-  font-size: 20px;
+  font-size: 16px;
 }
 .icon-notification {
   margin-right: 5px;
-  font-size: 20px;
+  font-size: 16px;
 }
 .icon-fenzu {
   color: #fff;
-  font-size: 20px;
+  font-size: 16px;
 }
 .notification-center-close {
   float: right;
+  height: 50px;
 }
 </style>
