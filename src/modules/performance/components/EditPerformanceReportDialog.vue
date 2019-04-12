@@ -389,7 +389,7 @@ export default {
         state,
         timeType: !state ? 0 : timeType,
         remarks,
-        startTime: formatDate(time[0], 'YYYY-MM-DD HH:mm:ss'),
+        startTime: `${formatDate(time[0], 'YYYY-MM-DD')} 00:00:00`,
         endTime: `${formatDate(time[1], 'YYYY-MM-DD') } 23:59:59`,
         [range ? 'teams' : 'users']: target.join(','),
         sign,
