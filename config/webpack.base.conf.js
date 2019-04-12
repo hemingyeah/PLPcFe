@@ -102,5 +102,6 @@ module.exports = {
   },
   performance: {
     maxEntrypointSize: 1048576
-  }
+  },
+  devtool: IS_PRODUCTION ? 'nosources-source-map' : 'eval',
 }

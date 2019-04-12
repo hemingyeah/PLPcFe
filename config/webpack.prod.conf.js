@@ -27,7 +27,6 @@ module.exports = merge(baseConfig, {
       'app.config': path.resolve(__dirname, '../src/config/production.js'),
     }
   },
-  devtool: '#source-map',
   optimization: {
     // runtimeChunk: true,
     splitChunks: {
