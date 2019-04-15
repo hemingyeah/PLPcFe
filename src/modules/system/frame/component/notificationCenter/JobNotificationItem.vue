@@ -1,7 +1,9 @@
 <template>
   <div class="job-notification-item">
-    <span class="job-notification-item-new" v-if="info.readed == 0"></span>
-    <div class="job-notification-item-header">{{info.body.title}}</div>
+    <div class="job-notification-item-header">
+      <span class="job-notification-item-new" v-if="info.readed == 0"></span>
+      <span>{{info.body.title}}</span>
+    </div>
     <button type="button" @click="deleteItem(info)" class="job-notification-item-btn">
       <i class="iconfont icon-fe-close"></i>
     </button>
@@ -9,11 +11,11 @@
     <div class="job-notification-item-content" v-if="info.body.forms">
       <p 
         v-for="(item, index) in info.body.forms"
-        :key="index">{{Object.keys(item)[0]}}：{{Object.values(item)[0]}}</p>
+        :key="index">{{item.key}} {{item.value}}</p>
     </div>
     <div class="job-notification-item-footer">
       <button class="job-notification-item-detail" @click="toJobNotificationDetails(info)">查看详情</button>
-      <p class="job-notification-item-time">{{info.createTime}}</p>
+      <p class="job-notification-item-time">{{ info.createTime | fmt_datetime }}</p>
     </div>
   </div>
 </template>
@@ -54,6 +56,10 @@ export default {
           primaryId: info.primaryId
         }
         // TODO: 工作通知查看详情跳转
+        this.$platform.openTab({
+          url: info.body.forms.pcUrl,
+        });
+        
         await NotificationApi.haveRead(params);
         this.$emit('getInfo');
       } catch (error) {
@@ -66,15 +72,14 @@ export default {
 
 <style lang="scss">
 .job-notification-item {
-  position: relative;
   margin: 10px;
   padding: 25px;
   background: #fff;
 }
 .job-notification-item-new {
   position: absolute;
-  top: 32px;
-  left: 15px;
+  top: 8px;
+  left: -12px;
   width: 9px;
   height: 9px;
   background: #f44552;
@@ -82,6 +87,7 @@ export default {
   border-radius: 50%;
 }
 .job-notification-item-header {
+  position: relative;
   display: inline-block;
   height: 24px;
   line-height: 24px;

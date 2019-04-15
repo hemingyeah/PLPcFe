@@ -29,7 +29,7 @@
     </div>
     <div class="job-notification-content">
       <job-notification-item
-        v-for="(item, index) in notificationPage"
+        v-for="(item, index) in notificationPage.list"
         :key="index"
         :info="item"
         @getInfo="getInfo">
@@ -63,7 +63,7 @@ export default {
       },
       notificationCount: 0,
       params: {
-        pageSize: 20,
+        pageSize: 1,
         pageNum: 1,
       },
       notificationPage: new Page(),
@@ -134,163 +134,8 @@ export default {
   },
   async created () {
     // TODO:给已读未读字段赋值,获取通知总数量，第一次判断加载更多按钮是否出现
-    let notificationPage = this.getInfo();
-    // this.info = info.data.list;
-    
-    this.notificationPage = [{
-      pcUrl: 'https://www.baidu.com',
-      readed: 0,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 1,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 0,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        // forms: [{
-        //   '客户': '众联成业'
-        // }, {
-        //   '负责人': '王越'
-        // }, {
-        //   '地址': '山东省青岛市市北区黑龙江南路1号'
-        // }, {
-        //   '计划时间': '2018-12-16 12:12:12'
-        // }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 1,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 1,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 1,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 1,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 1,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }, {
-      pcUrl: 'https://www.baidu.com',
-      readed: 1,
-      createTime: '2018-12-24 10:03:56',
-      body: {
-        title: '工单更新通知',
-        content: '工单池有一个新工单，请您关注',
-        forms: [{
-          '客户': '众联成业'
-        }, {
-          '负责人': '王越'
-        }, {
-          '地址': '山东省青岛市市北区黑龙江南路1号'
-        }, {
-          '计划时间': '2018-12-16 12:12:12'
-        }, ]
-      }
-    }]
+    let notificationPage = await this.getInfo();
+    this.notificationPage.merge(Page.as(notificationPage.data));
   },
   methods: {
     getTime (value) {
@@ -356,20 +201,19 @@ export default {
         console.error(error);
       }
     },
-    async getInfo () {
-      try {
-        return await NotificationApi.getJobList(this.params);
-      } catch (error) {
-        console.error(error);
-      }
+    getInfo () {
+      return NotificationApi.getJobList(this.params);
     },
-    getMore () {
-      if (this.params.pageSize * this.params.pageNum >= this.info.count) {
+    async getMore () {
+      if (this.params.pageSize >= this.notificationPage.total) {
         this.moreShow = false;
-      } else {
-        this.params.pageNum += 1;
-        let notificationPage = this.getInfo();
-        this.notificationPage.merge(Page.as(notificationPage));
+      }
+
+      this.params.pageNum += 1;
+      let notificationPage = await this.getInfo();
+      this.notificationPage.merge(Page.as(notificationPage.data));
+      if (this.params.pageSize * this.params.pageNum >= this.notificationPage.total) {
+        this.moreShow = false;
       }
     }
   }

@@ -26,11 +26,13 @@
         <div class="system-notification-item" 
              v-for="(item, index) in info"
              :key="index">
-          <span class="system-notification-item-new" v-if="item.readed == 0"></span>
-          <div class="system-notification-item-header">{{ item.title }}</div>
-          <button type="button" @click="deleteItem(item)" class="system-notification-item-btn">
-            <i class="iconfont icon-fe-close"></i>
-          </button>
+          <div class="system-notification-item-header">
+            <span class="system-notification-item-new" v-if="info.readed == 0"></span>
+            <span>{{ item.title }}</span>
+            <button type="button" @click="deleteItem(item)" class="system-notification-item-btn">
+              <i class="iconfont icon-fe-close"></i>
+            </button>
+          </div>
           <img class="system-notification-item-img" :src="item.img">
           <p class="system-notification-item-info">{{ item.content }}</p> 
           <div class="system-notification-item-footer">
@@ -365,7 +367,8 @@ export default {
   margin-bottom: 10px;
 }
 .system-notification-item-btn {
-  float: right;
+  position: absolute;
+  right: 25px;
   width: 24px;
   height: 24px;
   line-height: 24px;
