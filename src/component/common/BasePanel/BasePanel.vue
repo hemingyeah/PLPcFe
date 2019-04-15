@@ -3,7 +3,7 @@
     name="slide-left"
     @after-leave="$emit('closed')">
     <!-- <div v-show="show" class="base-panel-mask" @click.self="close"> -->
-    <aside v-show="show" class="base-panel" :style="{width: width}" @click.stop>
+    <aside v-if="show" class="base-panel" :style="{width: width}" @click.stop>
       <slot name="header">
         <header class="base-panel-title">
           <slot name="title"><h3>{{title}}</h3></slot>

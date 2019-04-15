@@ -3,8 +3,15 @@
     <div class="job-notification-header">
       <div class="job-notification-readed">
         <button class="job-notification-readed-btn" :style="btnStyle" @click="setReaded"></button>
-        <span class="job-notification-readed-text">将所有信息标记为已读</span>
+        <span class="job-notification-readed-text">全部标记为已读</span>
       </div>
+      <el-select class="job-notification-select-readed" :value="readedOption" @input="getReaded">
+        <el-option
+          v-for="(item, index) in readedOptions"
+          :key="index"
+          :label="item.label"
+          :value="item.value"></el-option>
+      </el-select>
       <el-select class="job-notification-select-left" :value="jobOption" placeholder="消息来源" @input="getSource">
         <el-option
           v-for="(item, index) in jobOptions"
@@ -22,10 +29,15 @@
     </div>
     <div class="job-notification-content">
       <job-notification-item
-        v-for="(item, index) in info"
+        v-for="(item, index) in notificationPage"
         :key="index"
-        :info="item">
+        :info="item"
+        @getInfo="getInfo">
       </job-notification-item>
+      <div class="job-notification-footer">
+        <button class="job-notification-footer-more" @click="getMore" v-if="moreShow">加载更多</button>
+        <div v-else>没有更多信息了</div>
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +45,8 @@
 <script>
 import JobNotificationItem from './JobNotificationItem.vue'
 import * as NotificationApi from '@src/api/NotificationApi';
-import * as Lang from '../../../../../util/lang/index.js'
+import * as Lang from '@src/util/lang/index.js'
+import Page from '@model/Page';
 
 export default {
   name: 'job-notification',
@@ -42,15 +55,29 @@ export default {
   },
   data () {
     return {
-      info: {},
+      // info: {},
       btnShow: false,
+      moreShow: true,
       btnStyle: {
         'border': '5px solid #eaeaea'
       },
+      notificationCount: 0,
       params: {
         pageSize: 20,
         pageNum: 1,
       },
+      notificationPage: new Page(),
+      readedOption: ' ',
+      readedOptions: [{
+        value: ' ',
+        label: '全部'
+      }, {
+        value: false,
+        label: '未读'
+      }, {
+        value: true,
+        label: '已读'
+      }],
       jobOption: '',
       jobOptions: [{
         value: null,
@@ -106,10 +133,11 @@ export default {
     }
   },
   async created () {
-    let info = await NotificationApi.getJobList(this.params);
+    // TODO:给已读未读字段赋值,获取通知总数量，第一次判断加载更多按钮是否出现
+    let notificationPage = this.getInfo();
     // this.info = info.data.list;
     
-    this.info = [{
+    this.notificationPage = [{
       pcUrl: 'https://www.baidu.com',
       readed: 0,
       createTime: '2018-12-24 10:03:56',
@@ -293,25 +321,55 @@ export default {
 
       this.params.startTime = startTime;
       this.params.endTime = endTime;
+
+      this.getInfo();    
+    },
+    getReaded (value) {
+      this.readedOption = value;
+      // TODO:给已读未读字段赋值
+      this.getInfo();
     },
     getSource (val) {
       this.jobOption = val;
       this.params.source = val;
+      this.getInfo();
     },
-    setReaded () {
-      let param = {};
-      param.type = 'work';
+    async setReaded () {
+      try {
+        let param = {};
+        param.type = 'work';
 
-      this.show = !this.show;
-      if(this.show) {
-        NotificationApi.haveRead(param);
-        this.btnStyle = {
-          'border': '5px solid #55B7B4'
+        this.btnShow = !this.btnShow;
+        if(this.btnShow) {
+          await NotificationApi.haveRead(param);
+          this.getInfo();
+          this.btnStyle = {
+            'border': '5px solid #55B7B4'
+          }
+        } else {
+          this.getInfo();
+          this.btnStyle = {
+            'border': '5px solid #eaeaea'
+          }
         }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getInfo () {
+      try {
+        return await NotificationApi.getJobList(this.params);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    getMore () {
+      if (this.params.pageSize * this.params.pageNum >= this.info.count) {
+        this.moreShow = false;
       } else {
-        this.btnStyle = {
-          'border': '5px solid #eaeaea'
-        }
+        this.params.pageNum += 1;
+        let notificationPage = this.getInfo();
+        this.notificationPage.merge(Page.as(notificationPage));
       }
     }
   }
@@ -319,21 +377,48 @@ export default {
 </script>
 
 <style lang="scss">
+.job-notification {
+  flex: 1;
+  display: flex;
+  flex-flow: column;
+}
 .job-notification-header {
-  position: fixed;
-  top: 115px;
-  right: 0;
-  width: 420px;
-  z-index: 999;
   text-align: right;
   padding: 20px;
   background: #fff;
   height: 70px;
   font-size: 0;
 }
+.job-notification-select-readed {
+  display: inline-block;
+  width: 80px;
+  margin-right: 5px;
+  input {
+    color: #525252 !important;
+    background: #EAEAEA;
+    border: 0;
+    border-radius: 4px;
+  }
+  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+      /* WebKit browsers */
+    color: #525252;
+  }
+  input:-moz-placeholder, textarea:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #525252;
+  }
+  input::-moz-placeholder, textarea::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #525252;
+  }
+  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+    /* Internet Explorer 10+ */
+    color: #525252;
+  }
+}
 .job-notification-select-left {
   display: inline-block;
-  width: 70px;
+  width: 100px;
   border-right: 1px solid #fff;
   input {
     color: #525252 !important;
@@ -360,7 +445,7 @@ export default {
 }
 .job-notification-select-right {
   display: inline-block;
-  width: 70px;
+  width: 100px;
   input {
     color: #525252 !important;
     background: #EAEAEA;
@@ -386,7 +471,9 @@ export default {
   }
 }
 .job-notification-content {
-  padding-top: 185px;
+  // padding-top: 185px;
+  flex: 1;
+  overflow: auto;
 }
 .job-notification-readed {
   display: inline-block;
@@ -403,8 +490,25 @@ export default {
   border-radius: 50%
 }
 .job-notification-readed-text {
-  font-size: 14px;
-  padding: 0 20px 0 10px;
+  font-size: 13px;
+  padding: 0 5px;
   color: #525252;
+}
+.job-notification-footer {
+  text-align: center;
+  height: 40px;
+  line-height: 30px;
+  color: #8C8989;
+}
+.job-notification-footer-more {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+  background: none;
+  color: #8C8989;
+  &:hover {
+    color: #55B7B4;
+  }
 }
 </style>

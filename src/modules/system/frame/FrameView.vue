@@ -15,8 +15,15 @@
             </button>     
           </div>
           
-          <div class="frame-quick-notification">
-            <p v-tooltip :title="notification">{{notification}}</p>
+          <!-- v-show="notificationShow" -->
+          <div class="frame-quick-notification" :style="notificationStyle" v-show="notificationShow">
+            <div class="frame-quick-notification-info" ref="notificationInfo">
+              <div class="frame-quick-notification-text" ref="notificationCont">
+                <p ref="notificationText">{{ notification.content }}</p>
+              </div>
+            </div>
+            
+            <!-- <marquee behavior="behavior" width="500">{{ notification.content }}</marquee> -->
             <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
               <i class="iconfont icon-fe-close"></i>
             </button>
@@ -77,9 +84,7 @@
               type="button" class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
               @click="openNotificationCenter"
               title="通知中心" v-tooltip>
-              <span class="notification-new">
-                <span class="notification-number">3</span>
-              </span>
+              <span class="notification-new" v-show="notification.count">{{ notification.count }}</span>
               <i class="iconfont">&#xe624;</i>
             </button>
       
@@ -174,6 +179,7 @@ import SaleManager from './component/SaleManager.vue';
 
 import DefaultHead from '@src/assets/img/user-avatar.png';
 import NotificationCenter from './component/NotificationCenter.vue'
+import * as NotificationApi from '@src/api/NotificationApi';
 
 export default {
   mixins: [FrameManager],
@@ -186,7 +192,11 @@ export default {
   },
   data(){
     return {
-      loginUser: this.initData.user || {}, //当前登录的用户
+      notificationShow: false,
+      notificationStyle: {
+        'width': '500px'
+      },
+      loginUser: this.initData.user || {}, // 当前登录的用户
 
       profilePopperVisible: false, 
       userStatePopperVisible: false,
@@ -194,12 +204,16 @@ export default {
 
       collapse: true,
 
-      //导出相关变量
+      // 导出相关变量
       exportPanelShow: false,
       exportTimer: null,
       exportList: [],
       operationList: [],
-      notification: '售后宝将在2月12日22：30至23：50进行系统更新，对因停机维护给用户带来的不便我们深表歉意。'
+      notification: {
+        count: '',
+        // content: '用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置',
+        content: '用户工作状态颜色配置',
+      }
     }
   },
   computed: {
@@ -231,7 +245,7 @@ export default {
     },
     openDemo(){
       this.openForFrame({
-        id: "demo",
+        id: 'demo',
         url: '/demo',
         title: 'demo'
       })
@@ -240,7 +254,7 @@ export default {
     async updateUser(){
       let result = await http.get(`/security/user/get/${this.loginUser.userId}`);
       if(result.status == 0){
-        //暂时只更新状态
+        // 暂时只更新状态
         this.loginUser.state = result.data.state;
       }
     },
@@ -261,7 +275,7 @@ export default {
     },
     updateUserState(state){
       this.loginUser.state = state;
-      //TODO: 判断是否打开个人中心，如果打开了，就刷新tab
+      // TODO: 判断是否打开个人中心，如果打开了，就刷新tab
     },
     async logout(){
       if(await platform.confirm('您确定要退出系统吗？')){
@@ -269,13 +283,13 @@ export default {
       }
     },
     openHelpDoc(event){
-      platform.openLink("https://help.shb.ltd");
+      platform.openLink('https://help.shb.ltd');
       this.profilePopperVisible = false;
     },
     openUserView(event){
       this.openForFrame({
-        id: "userCenter",
-        url: `/mine/` + this.loginUser.userId,
+        id: 'userCenter',
+        url: `/mine/${ this.loginUser.userId}`,
         title: '个人中心'
       })
       this.profilePopperVisible = false;
@@ -293,27 +307,27 @@ export default {
     async checkExports(){
       try {
         this.exportList = await http.get('/export/getList');
-        //更新操作列表
+        // 更新操作列表
         this.operationList = this.operationList.filter(item => {
           return (
-            item.operate == 'cancel' || 
-            (item.operate == 'download' && this.exportList.some(exp => exp.id == item.id))
+            item.operate == 'cancel' 
+            || (item.operate == 'download' && this.exportList.some(exp => exp.id == item.id))
           );
         })
 
-        //以下情况需要刷新列表
+        // 以下情况需要刷新列表
         // 1. 有为导出完成的文件
         // 2. 操作列表中仍有下载的文件
         let autoFetchExportList = this.exportList.some(item => item.isFinished == 0) || this.operationList.some(item => item.operate == 'download')
                 
-        //如果不需要更新，清空定时器
+        // 如果不需要更新，清空定时器
         if(!autoFetchExportList){
           clearInterval(this.exportTimer);
           this.exportTimer = null;
           return;
         }
 
-        //如果需要更新,设置定时抓取数据
+        // 如果需要更新,设置定时抓取数据
         if(!this.exportTimer) this.exportTimer = setInterval(() => this.checkExports(), 5000);
       } catch (error) {
         console.error(error);
@@ -323,9 +337,9 @@ export default {
       }
     },
     async execExportFile(item){
-      //下载文件
+      // 下载文件
       if(item.isFinished == 1){
-        let frame = document.createElement("iframe");
+        let frame = document.createElement('iframe');
         frame.style.display = 'none';
         frame.src = `/export/download?id=${item.id}`;
         document.body.appendChild(frame);
@@ -335,7 +349,7 @@ export default {
         return
       }
 
-      //取消下载
+      // 取消下载
       if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
         this.operationList.push({id: item.id, operate: 'cancel'})
         let result = await http.post('export/cancel', {id: item.id}, false);
@@ -353,8 +367,8 @@ export default {
       let cachedKey = localStorage.getItem('cachedKey');
       let cachedkeyArray = [];
 
-      if(cachedKey) cachedkeyArray = cachedKey.split(",")
-      cachedkeyArray.forEach(key => localStorage.setItem(key,[]))
+      if(cachedKey) cachedkeyArray = cachedKey.split(',')
+      cachedkeyArray.forEach(key => localStorage.setItem(key, []))
       localStorage.removeItem('cachedKey');
     },
     // popover manage
@@ -366,25 +380,64 @@ export default {
     },
     goRoleTeam() {
       platform.openTab({
-        id: "team",
-        title: "团队管理",
-        url: "/team/manage",
+        id: 'team',
+        title: '团队管理',
+        url: '/team/manage',
         reload: true
       });
     },
     closeNotification () {
+      this.notificationShow = false;
+    },
+    async getSystemMsg () {
+      try {
+        let info = await NotificationApi.getSystemMessage();
+        this.notification.count = info.data.count;
+        // this.notification.content = info.data.msgSystem.content;
+        if(!this.notification.content) {
+          this.notificationShow = false;
+        } else {
+          this.notificationShow = true;
+        }
 
+        this.$nextTick(() => {
+          let textWidth = this.$refs.notificationText.offsetWidth;
+          let infoWidth = this.$refs.notificationInfo.offsetWidth;
+
+          if(textWidth > infoWidth) {
+            let interval = setInterval(() => {
+              let left = parseInt(this.$refs.notificationCont.style.left) - 1;
+              if(!left) {
+                left = -1;
+              }
+              if(Math.abs(left) > textWidth) {
+                left = infoWidth;
+              }
+              this.$refs.notificationCont.style.left = `${left.toString()}px`;
+            }, 20);
+
+            if(!this.notificationShow) {
+              clearInterval(interval);
+            }
+          }
+        })
+      } catch (error) {
+        console.error(error);
+      }
     }
   },
   created(){
-    //TODO: 迁移完成后删除
+    // TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
     window.resizeFrame = function(){
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     }
-
     this.clearCachedIds();
+    this.getSystemMsg();
+    setInterval(() => {
+      this.getSystemMsg();
+    }, 1000 * 60 * 10);
   },
   mounted(){
     this.checkExports();

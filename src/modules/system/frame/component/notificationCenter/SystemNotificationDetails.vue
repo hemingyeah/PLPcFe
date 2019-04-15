@@ -1,23 +1,41 @@
 <template>
-  <div>
+  <div class="system-notifications">
     <div class="system-notification-details">
-      <button type="button" class="system-notification-details-return" @click="returnUrl">
+      <button type="button" class="system-notification-details-return" @click="close">
         <i class="iconfont">&#xe61e;</i>
       </button>
       <button type="button" @click="close" class="system-notification-details-btn">
         <i class="iconfont icon-fe-close"></i>
       </button>
-      <div class="system-notification-details-header">{{title}}</div>
-      <img class="system-notification-details-img" src="http://pic29.nipic.com/20130601/12122227_123051482000_2.jpg">
-      <p class="system-notification-details-info">Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p> 
-      <p class="system-notification-details-time">2018-10-18 13:59:04</p>
+      <div class="system-notification-details-header">{{ info.title }}</div>
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <img class="system-notification-details-img" :src="info.img">
+      <p class="system-notification-details-info">{{info.content}}</p> 
+      <p class="system-notification-details-time">{{info.createTime}}</p>
     </div>
   </div>
+  
 </template>
 
 <script>
 export default {
   name: 'system-notification-details',
+  props: {
+    info: Object,
+  },
   data () {
     return {
       title: '售后宝双十一活动大促开始'
@@ -25,19 +43,19 @@ export default {
   },
   methods: {
     close () {
-
+      this.$emit('returnUrl');
     },
-    returnUrl () {
-
-    }
   }
 }
 </script>
 
 <style lang="scss">
+.system-notifications {
+  flex: 1;
+  overflow: auto;
+}
 .system-notification-details {
-  position: relative;
-  margin-top: 20px;
+  margin: 10px;
   padding: 10px 20px;
   background: #fff;
   font-size: 12px;
@@ -51,9 +69,9 @@ export default {
   outline: none;
   background-color: transparent;
   transition: color ease .15s;
-
+  color: #979797;
   i {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   &:hover{
@@ -61,11 +79,14 @@ export default {
   }
 }
 .system-notification-details-header {
-  height: 24px;
-  line-height: 24px;
+  height: 35px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 40px;
   margin-bottom: 10px;
-  font-size: 14px;
-  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
 }
 .system-notification-details-img {
   width: 100%;
@@ -81,7 +102,7 @@ export default {
   outline: none;
   background-color: transparent;
   transition: color ease .15s;
-
+  color: #979797;
   i {
     font-size: 14px;
   }
@@ -91,6 +112,7 @@ export default {
   }
 }
 .system-notification-details-info {
+  word-break: break-all;
   line-height: 24px;
 }
 .system-notification-details-time {

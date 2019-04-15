@@ -12,10 +12,10 @@ import http from '@src/util/http';
  * @returns Promise<JobList>
  */
 export function getJobList(params) {
-  // return http.get('/message/work/getWorkMessage', params);
-  return Promise.resolve({
+  return http.get('/message/work/getWorkMessage', params);
+  // return Promise.resolve({
     
-  })
+  // })
 }
 
 /**

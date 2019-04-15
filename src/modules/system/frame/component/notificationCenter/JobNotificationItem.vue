@@ -2,7 +2,7 @@
   <div class="job-notification-item">
     <span class="job-notification-item-new" v-if="info.readed == 0"></span>
     <div class="job-notification-item-header">{{info.body.title}}</div>
-    <button type="button" @click="close" class="job-notification-item-btn">
+    <button type="button" @click="deleteItem(info)" class="job-notification-item-btn">
       <i class="iconfont icon-fe-close"></i>
     </button>
     <div class="job-notification-item-info" name="header">{{info.body.content}}</div>
@@ -12,13 +12,15 @@
         :key="index">{{Object.keys(item)[0]}}：{{Object.values(item)[0]}}</p>
     </div>
     <div class="job-notification-item-footer">
-      <a href="#" class="job-notification-item-detail">查看详情</a>
+      <button class="job-notification-item-detail" @click="toJobNotificationDetails(info)">查看详情</button>
       <p class="job-notification-item-time">{{info.createTime}}</p>
     </div>
   </div>
 </template>
 
 <script>
+import * as NotificationApi from '@src/api/NotificationApi';
+
 export default {
   name: 'job-notification-item',
   props: {
@@ -33,8 +35,30 @@ export default {
 
   },
   methods: {
-    close () {
-
+    async deleteItem (info) {
+      try {
+        let params = {
+          type: 'work',
+          primaryId: info.primaryId
+        }
+        await NotificationApi.deleteNotification(params);
+        this.$emit('getInfo');
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    async toJobNotificationDetails (info) {
+      try {
+        let params = {
+          type: 'work',
+          primaryId: info.primaryId
+        }
+        // TODO: 工作通知查看详情跳转
+        await NotificationApi.haveRead(params);
+        this.$emit('getInfo');
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 }
@@ -62,6 +86,7 @@ export default {
   height: 24px;
   line-height: 24px;
   font-size: 16px;
+  font-weight: bold;
 }
 .job-notification-item-btn {
   float: right;
@@ -100,6 +125,9 @@ export default {
 }
 .job-notification-item-detail {
   display: inline-block;
+  margin: 0;
+  padding: 0;
+  outline: none;
   width: 82px;
   height: 28px;
   line-height: 28px;
