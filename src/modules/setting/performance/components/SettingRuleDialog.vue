@@ -598,7 +598,8 @@ export default {
 
       // 把负责人、协调人分值相同的条件合并
       ruleContent.forEach(singleRule => {
-        if (newRules.every(nr => nr.assPerson !== singleRule.assPerson && nr.chargePerson !== singleRule.chargePerson)) {
+
+        if (newRules.every(nr => (nr.assPerson !== singleRule.assPerson) || (nr.chargePerson !== singleRule.chargePerson))) {
           newRules.push(singleRule);
         } else {
           newRules = newRules.map(nr => {
