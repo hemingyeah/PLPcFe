@@ -6,14 +6,12 @@
  echo "$branchName"
 
 # check variable
- if [ -z $1 ]; then
+if [ -z $1 ]; then
   echo "warn: no version";
   exit;
 fi
 
-# 检查tag 是不是最新的
-
- if [ -z $2 ]; then
+if [ -z $2 ]; then
   echo "warn: no message";
   exit;
 fi

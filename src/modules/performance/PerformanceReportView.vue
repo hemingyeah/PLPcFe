@@ -13,7 +13,7 @@
       <dd><label>统计范围：</label>{{reportDetail.allSize}} 条</dd>
       <dd><label>规则命中：</label>{{reportDetail.hitSize}} 条</dd>
       <dd><label>统计方式：</label>{{reportDetail.ruleType | ruleType}}</dd>
-      <dd><label>统计状态：</label>{{reportDetail.timeType ? '已完成并结算' : '已完成'}}</dd>
+      <dd><label>统计状态：</label>{{reportDetail.taskType ? '已完成并结算' : '已完成'}}</dd>
       <dd><label>起止时间：</label>{{reportDetail.startTime | formatDate}} ~ {{reportDetail.endTime | formatDate}}({{reportDetail.timeType ? '结算时间' : '完成时间'}})</dd>
       <dd><label>备注：</label>{{reportDetail.remark}}</dd>
     </dl>
@@ -131,7 +131,7 @@ export default {
     },
     reportDetail() {
       if (!this.initData || !this.initData.reportDescList || !this.initData.reportDescList.ruleMap) return {}
-      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, timeType, isDelete } = this.initData.reportDescList.ruleMap;
+      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, timeType, isDelete, taskType } = this.initData.reportDescList.ruleMap;
 
       return {
         reportName,
@@ -144,6 +144,7 @@ export default {
         startTime,
         endTime,
         timeType,
+        taskType,
         isDelete
       }
     }
