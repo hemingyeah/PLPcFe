@@ -22,12 +22,12 @@
             :value="item.value"></el-option>
         </el-select>  
       </div>
-      <div class="system-notification-content">
+      <div class="system-notification-content" v-if="systemPage.list.length != 0">
         <div class="system-notification-item" 
-             v-for="(item, index) in info"
+             v-for="(item, index) in systemPage.list"
              :key="index">
           <div class="system-notification-item-header">
-            <span class="system-notification-item-new" v-if="info.readed == 0"></span>
+            <span class="system-notification-item-new" v-if="item.readed == 0"></span>
             <span>{{ item.title }}</span>
             <button type="button" @click="deleteItem(item)" class="system-notification-item-btn">
               <i class="iconfont icon-fe-close"></i>
@@ -37,7 +37,7 @@
           <p class="system-notification-item-info">{{ item.content }}</p> 
           <div class="system-notification-item-footer">
             <button class="system-notification-item-detail" @click="toSystemNotificationDetail(item)">查看详情</button>
-            <p class="system-notification-item-time">{{item.createTime}}</p>
+            <p class="system-notification-item-time">{{ item.createTime | fmt_datetime }}</p>
           </div>
         </div>
         <div class="system-notification-footer">
@@ -45,50 +45,44 @@
           <div v-else>没有更多信息了</div>
         </div>
       </div>
+      <div class="system-notification-footer" v-else>暂时没有信息</div>
     </div>
     <system-notification-details
       v-else
-      @returnUrl="detailShow = true"
+      @returnUrl="retrunUrl"
       :info="detailInfo">123</system-notification-details>
   </div>
 </template>
 
 <script>
-import * as Lang from '../../../../../util/lang/index.js';
+import * as Lang from '@src/util/lang/index.js';
 import * as NotificationApi from '@src/api/NotificationApi';
 import SystemNotificationDetails from '../notificationCenter/SystemNotificationDetails'
+import Page from '@model/Page';
+import platform from '@src/platform';
 
 export default {
   name: 'system-notification',
   components: {
     [SystemNotificationDetails.name]: SystemNotificationDetails
   },
+  props: {
+    info: Object
+  },
   data () {
     return {
       detailShow: true,
       moreShow: '',
       detailInfo: {},
-      info: {},
+      systemPage: new Page(),
       btnShow: false,
       btnStyle: {
         'border': '5px solid #eaeaea'
       },
       params: {
-        pageSize: 20,
+        pageSize: 2,
         pageNum: 1
       },
-      title: '售后宝双十一活动大促销',
-      readedOption: false,
-      readedOptions: [{
-        value: null,
-        label: '全部'
-      }, {
-        value: false,
-        label: '未读'
-      }, {
-        value: true,
-        label: '已读'
-      }],
       systemOption: '',
       systemOptions: [{
         value: null,
@@ -108,10 +102,10 @@ export default {
         value: null,
         label: '全部'
       }, {
-        value: 1,
+        value: 0,
         label: '今日'
       }, {
-        value: 2,
+        value: 1,
         label: '昨日'
       }, {
         value: 7,
@@ -126,18 +120,21 @@ export default {
     }
   },
   async created () {
-    // TODO:给已读未读字段赋值
-    this.info = await NotificationApi.getSystemList(this.params);
-    this.info = [{
-      title: this.title,
-      content: '一直知道html5 input有个新类型range，可以有个滑动条的效果，但是感觉丑不拉几的，又不知道如何美化，所以一直没用过。最近在网上瞅了瞅，发现滑动条还是可以美化的，所以掏出来给大家摆摆~~',
-      img: 'http://pic29.nipic.com/20130601/12122227_123051482000_2.jpg'
-    }]
+    this.getInfo();
   },
   methods: {
     async getInfo () {
       try {
-        await NotificationApi.getSystemList(this.params);
+        this.systemPage = new Page();
+        this.params.pageNum = 1;
+        let systemPage = await NotificationApi.getSystemList(this.params);
+        this.systemPage.merge(Page.as(systemPage.data));
+
+        if(this.params.pageSize >= this.systemPage.total) {
+          this.moreShow = false;
+        } else {
+          this.moreShow = true;
+        }
       } catch (error) {
         console.error(error);
       }
@@ -146,31 +143,33 @@ export default {
       try {
         let params = {
           type: 'system',
-          primaryId: info.primaryId
+          id: info.id
         }
-        await NotificationApi.deleteNotification(params);
-        this.getInfo();
+        if(await platform.confirm('确定要删除该信息吗？')) {
+          await NotificationApi.deleteNotification(params);
+          this.getInfo();
+        }
       } catch (error) {
         console.error(error);
       }
     },
     async toSystemNotificationDetail (info) {
       try {
-        let params = {
-          type: 'system',
-          primaryId: info.primaryId
-        }
         this.detailInfo = info;
-        await NotificationApi.haveRead(params);
         this.detailShow = false;
-        this.getInfo();
+        if(info.readed == 0) {
+          let params = {
+            type: 'system',
+            id: info.id
+          }
+          await NotificationApi.haveRead(params);
+        }
       } catch (error) {
         console.error(error);
       }
     },
-    getReaded (value) {
-      this.readedOption = value;
-      // TODO:给已读未读字段赋值
+    retrunUrl () {
+      this.detailShow = true;
       this.getInfo();
     },
     getSource (value) {
@@ -188,8 +187,10 @@ export default {
         endTime = `${Lang.formatDate(new Date()).split(' ')[0] } 23:59:59`;
       } else if (value == 1) {
         endTime = `${Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
-      } else {
+      } else if (value == 100) {
         endTime = `${Lang.formatDate(new Date() - (30 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
+      } else {
+        endTime = null;
       }
 
       if(value == 0) {
@@ -200,8 +201,8 @@ export default {
         startTime = `${Lang.formatDate(new Date() - (6 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
       } else if (value == 30) {
         startTime = `${Lang.formatDate(new Date() - (29 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
-      } else if (value == 100) {
-        startTime = '1900-01-01 00:00:00';
+      } else {
+        startTime = null;
       }
 
       this.params.startTime = startTime;
@@ -210,15 +211,24 @@ export default {
     },
     async setReaded () {
       try {
-        let param = {};
-        param.type = 'system';
-
+        if(this.info.systemMsg == 0) {
+          this.btnShow = false;
+          this.btnStyle = {
+            'border': '5px solid #eaeaea'
+          }
+          return;
+        }
+        let params = {
+          type: 'system'
+        };
         this.btnShow = !this.btnShow;
         if(this.btnShow) {
-          await NotificationApi.haveRead(param);
-          this.getInfo();
-          this.btnStyle = {
-            'border': '5px solid #55B7B4'
+          if(await platform.confirm('确定要将所有信息标记为已读？')) {
+            await NotificationApi.haveRead(params);
+            this.getInfo();
+            this.btnStyle = {
+              'border': '5px solid #55B7B4'
+            }
           }
         } else {
           this.btnStyle = {
@@ -229,8 +239,19 @@ export default {
         console.error(error);
       }
     },
-    getMore () {
-
+    async getMore () {
+      try {
+        this.params.pageNum++;
+        let systemPage = await NotificationApi.getSystemList(this.params);
+        this.systemPage.merge(Page.as(systemPage.data));
+        if(this.params.pageSize * this.params.pageNum >= this.systemPage.total) {
+          this.moreShow = false;
+        } else {
+          this.moreShow = true;
+        }
+      } catch(error) {
+        console.error(error);
+      }
     }
   }
 }

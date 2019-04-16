@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 <template>
   <div class="job-notification">
     <div class="job-notification-header">
@@ -27,7 +28,7 @@
           :value="item.value"></el-option>
       </el-select>
     </div>
-    <div class="job-notification-content">
+    <div class="job-notification-content" v-if="notificationPage.list.length != 0">
       <job-notification-item
         v-for="(item, index) in notificationPage.list"
         :key="index"
@@ -39,6 +40,7 @@
         <div v-else>没有更多信息了</div>
       </div>
     </div>
+    <div class="job-notification-footer" v-else>暂时没有信息</div>
   </div>
 </template>
 
@@ -47,15 +49,18 @@ import JobNotificationItem from './JobNotificationItem.vue'
 import * as NotificationApi from '@src/api/NotificationApi';
 import * as Lang from '@src/util/lang/index.js'
 import Page from '@model/Page';
+import platform from '@src/platform';
 
 export default {
   name: 'job-notification',
   components: {
     [JobNotificationItem.name]: JobNotificationItem
   },
+  props: {
+    info: Object
+  },
   data () {
     return {
-      // info: {},
       btnShow: false,
       moreShow: true,
       btnStyle: {
@@ -72,10 +77,10 @@ export default {
         value: ' ',
         label: '全部'
       }, {
-        value: false,
+        value: 0,
         label: '未读'
       }, {
-        value: true,
+        value: 1,
         label: '已读'
       }],
       jobOption: '',
@@ -106,7 +111,7 @@ export default {
       }, {
         value: 'notice',
         label: '通知公告'
-      },  {
+      }, {
         value: 10,
         label: '关注'
       }],
@@ -132,10 +137,8 @@ export default {
       }, ]
     }
   },
-  async created () {
-    // TODO:给已读未读字段赋值,获取通知总数量，第一次判断加载更多按钮是否出现
-    let notificationPage = await this.getInfo();
-    this.notificationPage.merge(Page.as(notificationPage.data));
+  created () {
+    this.getInfo();
   },
   methods: {
     getTime (value) {
@@ -148,8 +151,10 @@ export default {
         endTime = `${Lang.formatDate(new Date()).split(' ')[0] } 23:59:59`;
       } else if (value == 1) {
         endTime = `${Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
-      } else {
+      } else if (value == 100) {
         endTime = `${Lang.formatDate(new Date() - (30 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
+      } else {
+        endTime = null;
       }
 
       if(value == 0) {
@@ -160,18 +165,17 @@ export default {
         startTime = `${Lang.formatDate(new Date() - (6 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
       } else if (value == 30) {
         startTime = `${Lang.formatDate(new Date() - (29 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
-      } else if (value == 100) {
-        startTime = '1900-01-01 00:00:00';
+      } else {
+        startTime = null;
       }
 
       this.params.startTime = startTime;
       this.params.endTime = endTime;
-
-      this.getInfo();    
+      this.getInfo();
     },
     getReaded (value) {
       this.readedOption = value;
-      // TODO:给已读未读字段赋值
+      this.params.readed = value;
       this.getInfo();
     },
     getSource (val) {
@@ -181,18 +185,26 @@ export default {
     },
     async setReaded () {
       try {
-        let param = {};
-        param.type = 'work';
-
+        if(this.info.workMsg == 0) {
+          this.btnShow = false;
+          this.btnStyle = {
+            'border': '5px solid #eaeaea'
+          }
+          return;
+        }
+        let params = {
+          type: 'work'
+        };
         this.btnShow = !this.btnShow;
         if(this.btnShow) {
-          await NotificationApi.haveRead(param);
-          this.getInfo();
-          this.btnStyle = {
-            'border': '5px solid #55B7B4'
+          if(await platform.confirm('确定要将所有信息标记为已读？')) {
+            await NotificationApi.haveRead(params);
+            this.getInfo();
+            this.btnStyle = {
+              'border': '5px solid #55B7B4'
+            }
           }
         } else {
-          this.getInfo();
           this.btnStyle = {
             'border': '5px solid #eaeaea'
           }
@@ -201,19 +213,34 @@ export default {
         console.error(error);
       }
     },
-    getInfo () {
-      return NotificationApi.getJobList(this.params);
+    async getInfo () {
+      try {
+        this.notificationPage = new Page();
+        this.params.pageNum = 1;
+        let notificationPage = await NotificationApi.getJobList(this.params);
+        this.notificationPage.merge(Page.as(notificationPage.data));
+
+        if (this.params.pageSize >= this.notificationPage.total) {
+          this.moreShow = false;
+        }else{
+          this.moreShow = true;
+        }
+      } catch(error) {
+        console.error(error);
+      }
     },
     async getMore () {
-      if (this.params.pageSize >= this.notificationPage.total) {
-        this.moreShow = false;
-      }
-
-      this.params.pageNum += 1;
-      let notificationPage = await this.getInfo();
-      this.notificationPage.merge(Page.as(notificationPage.data));
-      if (this.params.pageSize * this.params.pageNum >= this.notificationPage.total) {
-        this.moreShow = false;
+      try {
+        this.params.pageNum++;
+        let notificationPage = await NotificationApi.getJobList(this.params);
+        this.notificationPage.merge(Page.as(notificationPage.data));
+        if (this.params.pageSize * this.params.pageNum >= this.notificationPage.total) {
+          this.moreShow = false;
+        }else{
+          this.moreShow = true;
+        }
+      } catch(error) {
+        console.error(error);
       }
     }
   }

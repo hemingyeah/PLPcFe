@@ -8,23 +8,9 @@
         <i class="iconfont icon-fe-close"></i>
       </button>
       <div class="system-notification-details-header">{{ info.title }}</div>
+      <p class="system-notification-details-content">{{ info.createTime | fmt_datetime }}</p>
       <img class="system-notification-details-img" :src="info.img">
       <p class="system-notification-details-info">{{info.content}}</p> 
-      <img class="system-notification-details-img" :src="info.img">
-      <p class="system-notification-details-info">{{info.content}}</p> 
-      <img class="system-notification-details-img" :src="info.img">
-      <p class="system-notification-details-info">{{info.content}}</p> 
-      <img class="system-notification-details-img" :src="info.img">
-      <p class="system-notification-details-info">{{info.content}}</p> 
-      <img class="system-notification-details-img" :src="info.img">
-      <p class="system-notification-details-info">{{info.content}}</p> 
-      <img class="system-notification-details-img" :src="info.img">
-      <p class="system-notification-details-info">{{info.content}}</p> 
-      <img class="system-notification-details-img" :src="info.img">
-      <p class="system-notification-details-info">{{info.content}}</p> 
-      <img class="system-notification-details-img" :src="info.img">
-      <p class="system-notification-details-info">{{info.content}}</p> 
-      <p class="system-notification-details-time">{{info.createTime}}</p>
     </div>
   </div>
   
@@ -37,9 +23,7 @@ export default {
     info: Object,
   },
   data () {
-    return {
-      title: '售后宝双十一活动大促开始'
-    }
+    return {}
   },
   methods: {
     close () {
@@ -87,6 +71,10 @@ export default {
   margin-bottom: 10px;
   font-size: 16px;
   font-weight: bold;
+}
+.system-notification-details-content {
+  color: #8C8989;
+  font-size: 12px;
 }
 .system-notification-details-img {
   width: 100%;

@@ -42,7 +42,7 @@ export function getSystemList(params) {
  * @returns Promise<res>
  */
 export function haveRead (params) {
-  return http.post('/message/updateMsgState', params);
+  return http.post('/message/updateMsgState', params, false);
 }
 
 /**
@@ -54,7 +54,7 @@ export function haveRead (params) {
  * @returns Promise<res> 
  */
 export function deleteNotification (params) {
-  return http.post('/message/deleteMessage', params);
+  return http.post('/message/deleteMessage', params, false);
 }
 
 /**

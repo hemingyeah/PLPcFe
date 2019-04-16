@@ -15,19 +15,17 @@
             </button>     
           </div>
           
-          <!-- v-show="notificationShow" -->
-          <div class="frame-quick-notification" :style="notificationStyle" v-show="notificationShow">
+          <div class="frame-quick-notification" :style="notificationStyle" v-show="systemMsg && systemMsg.notificationShow">
             <div class="frame-quick-notification-info" ref="notificationInfo">
               <div class="frame-quick-notification-text" ref="notificationCont">
-                <p ref="notificationText">{{ notification.content }}</p>
+                <p ref="notificationText">{{ notification.title }}</p>
               </div>
             </div>
-            
-            <!-- <marquee behavior="behavior" width="500">{{ notification.content }}</marquee> -->
             <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
               <i class="iconfont icon-fe-close"></i>
             </button>
           </div>
+
           <!-- profile -->
           <div class="frame-quick-right">
             <el-popover v-if="showDevTool">
@@ -163,7 +161,7 @@
 
     <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
-    <notification-center ref="notification"></notification-center>
+    <notification-center ref="notification" :info="notificationInfo"></notification-center>
   </div>
 </template>
 
@@ -192,7 +190,8 @@ export default {
   },
   data(){
     return {
-      notificationShow: false,
+      notificationInfo: {},
+      systemMsg: JSON.parse(localStorage.getItem('systemMsg')),
       notificationStyle: {
         'width': '500px'
       },
@@ -209,11 +208,7 @@ export default {
       exportTimer: null,
       exportList: [],
       operationList: [],
-      notification: {
-        count: '',
-        // content: '用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置用户工作状态颜色配置',
-        content: '用户工作状态颜色配置',
-      }
+      notification: {}
     }
   },
   computed: {
@@ -300,7 +295,6 @@ export default {
     },
     openNotificationCenter () {
       this.$refs.notification.showCompont();
-      // this.notificationCenterShow = true;
       this.profilePopperVisible = false;
     },
     /** 检测是否有导出 */
@@ -387,17 +381,35 @@ export default {
       });
     },
     closeNotification () {
-      this.notificationShow = false;
+      let systemMsg = JSON.parse(localStorage.getItem('systemMsg'));
+      systemMsg.notificationShow = false;
+      this.systemMsg.notificationShow = false;
+      localStorage.setItem('systemMsg', JSON.stringify(systemMsg));
     },
+
+    // 获取系统消息，本地存储，超出滚动
     async getSystemMsg () {
       try {
         let info = await NotificationApi.getSystemMessage();
-        this.notification.count = info.data.count;
-        // this.notification.content = info.data.msgSystem.content;
-        if(!this.notification.content) {
-          this.notificationShow = false;
+        this.notificationInfo = info.data;
+        this.notification.count = info.data.systemMsg + info.data.workMsg;
+        this.notification.title = info.data.msgSystem.title;
+
+        if(!this.systemMsg) {
+          this.systemMsg = {};
+          if(!this.notification.title) {
+            this.systemMsg.notificationShow = false;
+          } else {
+            this.systemMsg.notificationShow = true;
+          }
+          this.systemMsg.notificationId = this.notificationInfo.msgSystem.id;
+          localStorage.setItem('systemMsg', JSON.stringify(this.systemMsg));
         } else {
-          this.notificationShow = true;
+          if(this.notificationInfo.msgSystem.id != this.systemMsg.notificationId) {
+            this.systemMsg.notificationId = this.notificationInfo.msgSystem.id;
+            this.systemMsg.notificationShow = true;
+            localStorage.setItem('systemMsg', JSON.stringify(this.systemMsg));
+          }
         }
 
         this.$nextTick(() => {
@@ -416,7 +428,7 @@ export default {
               this.$refs.notificationCont.style.left = `${left.toString()}px`;
             }, 20);
 
-            if(!this.notificationShow) {
+            if(!this.notification.notificationShow) {
               clearInterval(interval);
             }
           }

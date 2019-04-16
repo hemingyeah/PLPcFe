@@ -19,19 +19,19 @@
       <input class="notification-center-tab" type="radio" id="job-notification" :checked="component == 'job-notification'" @change="notificationChange" />
       <label class="notification-center-tab-text" for="job-notification">
         <span>工作通知</span>
-        <div class="notification-center-tab-new">31</div>
+        <div class="notification-center-tab-new" v-show="info.workMsg != 0">{{info.workMsg}}</div>
         <div class="notification-center-checked-border"></div>
       </label>
       <input class="notification-center-tab" type="radio" id="system-notification" :checked="component == 'system-notification'" @change="notificationChange" />
       <label class="notification-center-tab-text" for="system-notification">
         <span>系统通知</span>
-        <div class="notification-center-tab-new">2</div>
+        <div class="notification-center-tab-new" v-show="info.systemMsg != 0">{{info.systemMsg}}</div>
         <div class="notification-center-checked-border"></div>
       </label>
     </div>
 
     <keep-alive>
-      <component :is="component"></component>
+      <component :is="component" :info="info"></component>
     </keep-alive>
   </base-panel>
 </template>
@@ -46,6 +46,9 @@ export default {
     [JobNotification.name]: JobNotification,
     [SystemNotification.name]: SystemNotification,
   },
+  props: {
+    info: Object
+  },
   data(){
     return {
       component: 'job-notification',
@@ -58,10 +61,7 @@ export default {
     },
     showCompont () {
       this.show = true;
-    },
-    // getdetails (val) {
-    //   this.component = val;
-    // }
+    }
   }
 }
 </script>
@@ -107,7 +107,7 @@ export default {
     div:nth-child(2) {
       position: absolute;
       top: 20px;
-      right: 45px;
+      right: 50px;
       font-size: 13px;
       padding: 0 5px;
       color: #fff;
@@ -137,7 +137,7 @@ export default {
     div:nth-child(2) {
       position: absolute;
       top: 20px;
-      right: 45px;
+      right: 50px;
       font-size: 13px;
       padding: 0 5px;
       color: #fff;
@@ -157,7 +157,7 @@ export default {
 .notification-center-tab-new {
   position: absolute;
   top: 20px;
-  right: 45px;
+  right: 50px;
   font-size: 13px;
   padding: 0 5px;
   color: #fff;

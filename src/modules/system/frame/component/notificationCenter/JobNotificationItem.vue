@@ -22,6 +22,7 @@
 
 <script>
 import * as NotificationApi from '@src/api/NotificationApi';
+import platform from '@src/platform';
 
 export default {
   name: 'job-notification-item',
@@ -33,35 +34,34 @@ export default {
 
     }
   },
-  created () {
-
-  },
   methods: {
     async deleteItem (info) {
       try {
         let params = {
           type: 'work',
-          primaryId: info.primaryId
+          id: info.id
         }
-        await NotificationApi.deleteNotification(params);
-        this.$emit('getInfo');
+        if(await platform.confirm('确定要删除该信息吗？')) {
+          await NotificationApi.deleteNotification(params);
+          this.$emit('getInfo');
+        }
       } catch (error) {
         console.error(error)
       }
     },
     async toJobNotificationDetails (info) {
       try {
-        let params = {
-          type: 'work',
-          primaryId: info.primaryId
-        }
-        // TODO: 工作通知查看详情跳转
         this.$platform.openTab({
           url: info.body.forms.pcUrl,
         });
-        
-        await NotificationApi.haveRead(params);
-        this.$emit('getInfo');
+        if(info.readed == 0) {
+          let params = {
+            type: 'work',
+            id: info.id
+          }
+          await NotificationApi.haveRead(params);
+          this.$emit('getInfo');
+        }
       } catch (error) {
         console.error(error);
       }
