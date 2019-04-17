@@ -4,7 +4,7 @@
       <button type="button" class="system-notification-details-return" @click="close">
         <i class="iconfont">&#xe61e;</i>
       </button>
-      <button type="button" @click="close" class="system-notification-details-btn">
+      <button type="button" @click="deleteItem" class="system-notification-details-btn">
         <i class="iconfont icon-fe-close"></i>
       </button>
       <div class="system-notification-details-header">{{ info.title }}</div>
@@ -21,14 +21,19 @@ export default {
   name: 'system-notification-details',
   props: {
     info: Object,
+    index: Number,
   },
   data () {
     return {}
   },
   methods: {
     close () {
-      this.$emit('returnUrl');
+      this.$emit('back');
     },
+    async deleteItem () {
+      this.$emit('deleteItem', this.info, this.index);
+      this.$emit('back');
+    }
   }
 }
 </script>

@@ -1,4 +1,3 @@
-/* eslint-disable vue/html-indent */
 <template>
   <div class="system-notification-main">
     <div class="system-notification" v-if="detailShow">
@@ -7,14 +6,14 @@
           <button class="system-notification-readed-btn" :style="btnStyle" @click="setReaded"></button>
           <span class="system-notification-readed-text">全部标记为已读</span>
         </div>
-        <el-select class="system-notification-select-left" :value="systemOption" placeholder="消息来源" @input="getSource">
+        <el-select class="system-notification-select system-notification-select-left" :value="systemOption" placeholder="消息来源" @input="getSource">
           <el-option
             v-for="(item, index) in systemOptions"
             :key="index"
             :label="item.label"
             :value="item.value"></el-option>
         </el-select>
-        <el-select class="system-notification-select-right" :value="dataOption" placeholder="日期" @input="getTime">
+        <el-select class="system-notification-select system-notification-select-right" :value="dataOption" placeholder="日期" @input="getTime">
           <el-option
             v-for="(item, index) in dataOptions"
             :key="index"
@@ -29,28 +28,31 @@
           <div class="system-notification-item-header">
             <span class="system-notification-item-new" v-if="item.readed == 0"></span>
             <span>{{ item.title }}</span>
-            <button type="button" @click="deleteItem(item)" class="system-notification-item-btn">
+            <button type="button" @click="deleteItem(item, index)" class="system-notification-item-btn">
               <i class="iconfont icon-fe-close"></i>
             </button>
           </div>
           <img class="system-notification-item-img" :src="item.img">
           <p class="system-notification-item-info">{{ item.content }}</p> 
           <div class="system-notification-item-footer">
-            <button class="system-notification-item-detail" @click="toSystemNotificationDetail(item)">查看详情</button>
+            <button class="system-notification-item-detail" @click="toSystemNotificationDetail(item, index)">查看详情</button>
             <p class="system-notification-item-time">{{ item.createTime | fmt_datetime }}</p>
           </div>
         </div>
         <div class="system-notification-footer">
-          <button class="system-notification-footer-more" @click="getMore" v-if="moreShow">加载更多</button>
-          <div v-else>没有更多信息了</div>
+          <button class="system-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
+          <div v-if="loading">正在加载...</div>
+          <div v-if="!moreShow && !loading">没有更多信息了</div>
         </div>
       </div>
       <div class="system-notification-footer" v-else>暂时没有信息</div>
     </div>
     <system-notification-details
       v-else
-      @returnUrl="retrunUrl"
-      :info="detailInfo">123</system-notification-details>
+      @back="back"
+      @deleteItem="deleteItem"
+      :info="detailInfo"
+      :index="detailIndex">123</system-notification-details>
   </div>
 </template>
 
@@ -72,8 +74,10 @@ export default {
   data () {
     return {
       detailShow: true,
-      moreShow: '',
+      loading: false,
+      systemReaded: 0,
       detailInfo: {},
+      detailIndex: null,
       systemPage: new Page(),
       btnShow: false,
       btnStyle: {
@@ -129,17 +133,11 @@ export default {
         this.params.pageNum = 1;
         let systemPage = await NotificationApi.getSystemList(this.params);
         this.systemPage.merge(Page.as(systemPage.data));
-
-        if(this.params.pageSize >= this.systemPage.total) {
-          this.moreShow = false;
-        } else {
-          this.moreShow = true;
-        }
       } catch (error) {
         console.error(error);
       }
     },
-    async deleteItem (info) {
+    async deleteItem (info, index) {
       try {
         let params = {
           type: 'system',
@@ -147,15 +145,16 @@ export default {
         }
         if(await platform.confirm('确定要删除该信息吗？')) {
           await NotificationApi.deleteNotification(params);
-          this.getInfo();
+          this.systemPage.list.splice(index, 1);
         }
       } catch (error) {
         console.error(error);
       }
     },
-    async toSystemNotificationDetail (info) {
+    async toSystemNotificationDetail (info, index) {
       try {
         this.detailInfo = info;
+        this.detailIndex = index;
         this.detailShow = false;
         if(info.readed == 0) {
           let params = {
@@ -163,14 +162,16 @@ export default {
             id: info.id
           }
           await NotificationApi.haveRead(params);
+          info.readed = 1;
+          this.getInfo();
+          this.$emit('clearNum', 'system', 1)
         }
       } catch (error) {
         console.error(error);
       }
     },
-    retrunUrl () {
+    back () {
       this.detailShow = true;
-      this.getInfo();
     },
     getSource (value) {
       this.systemOption = value;
@@ -184,23 +185,23 @@ export default {
       let endTime = '';
 
       if(value != 100 && value != null && value != 1) {
-        endTime = `${Lang.formatDate(new Date()).split(' ')[0] } 23:59:59`;
+        endTime = Lang.formatDate(new Date(), 'YYYY-MM-DD 23:59:59');
       } else if (value == 1) {
-        endTime = `${Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
+        endTime = Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 23:59:59');
       } else if (value == 100) {
-        endTime = `${Lang.formatDate(new Date() - (30 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
+        endTime = Lang.formatDate(new Date() - (30 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 23:59:59');
       } else {
         endTime = null;
       }
 
       if(value == 0) {
-        startTime = `${Lang.formatDate(new Date()).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date(), 'YYYY-MM-DD 00:00:00');
       } else if (value == 1) {
-        startTime = `${Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
       } else if (value == 7) {
-        startTime = `${Lang.formatDate(new Date() - (6 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date() - (6 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
       } else if (value == 30) {
-        startTime = `${Lang.formatDate(new Date() - (29 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date() - (29 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
       } else {
         startTime = null;
       }
@@ -224,11 +225,15 @@ export default {
         this.btnShow = !this.btnShow;
         if(this.btnShow) {
           if(await platform.confirm('确定要将所有信息标记为已读？')) {
-            await NotificationApi.haveRead(params);
-            this.getInfo();
-            this.btnStyle = {
-              'border': '5px solid #55B7B4'
+            let res = await NotificationApi.haveRead(params);
+            if(res.status == 0) {
+              this.getInfo();
+              this.btnStyle = {
+                'border': '5px solid #55B7B4'
+              };
+              this.$emit('clearNum', 'system');
             }
+            
           }
         } else {
           this.btnStyle = {
@@ -242,16 +247,18 @@ export default {
     async getMore () {
       try {
         this.params.pageNum++;
+        this.loading = true;
         let systemPage = await NotificationApi.getSystemList(this.params);
+        this.loading = false;
         this.systemPage.merge(Page.as(systemPage.data));
-        if(this.params.pageSize * this.params.pageNum >= this.systemPage.total) {
-          this.moreShow = false;
-        } else {
-          this.moreShow = true;
-        }
       } catch(error) {
         console.error(error);
       }
+    }
+  },
+  computed: {
+    moreShow () {
+      return !(this.params.pageSize * this.params.pageNum >= this.systemPage.total);
     }
   }
 }
@@ -269,20 +276,20 @@ export default {
 }
 .system-notification-header {
   text-align: right;
-  padding: 20px;
+  padding: 20px 12px;
   background: #fff;
   height: 70px;
   font-size: 0;
+  box-shadow: 0 3px 5px #E5E5E5;
+  z-index: 99;
 }
-.system-notification-select-readed {
+.system-notification-select {
   display: inline-block;
-  width: 80px;
-  margin-right: 5px;
+  width: 100px;
   input {
     color: #525252 !important;
     background: #EAEAEA;
     border: 0;
-    border-radius: 4px;
   }
   input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
       /* WebKit browsers */
@@ -302,57 +309,14 @@ export default {
   }
 }
 .system-notification-select-left {
-  display: inline-block;
-  width: 100px;
   border-right: 1px solid #fff;
   input {
-    color: #525252 !important;
-    background: #EAEAEA;
-    border: 0;
     border-radius: 4px 0 0 4px;
-  }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-      /* WebKit browsers */
-    color: #525252;
-  }
-  input:-moz-placeholder, textarea:-moz-placeholder {
-    /* Mozilla Firefox 4 to 18 */
-    color: #525252;
-  }
-  input::-moz-placeholder, textarea::-moz-placeholder {
-    /* Mozilla Firefox 19+ */
-    color: #525252;
-  }
-  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
-    /* Internet Explorer 10+ */
-    color: #525252;
   }
 }
 .system-notification-select-right {
-  display: inline-block;
-  width: 100px;
   input {
-    color: #525252 !important;
-    background: #EAEAEA;
-    border: 0;
-    color: #ccc;
     border-radius: 0 4px 4px 0;
-  }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-      /* WebKit browsers */
-    color: #525252;
-  }
-  input:-moz-placeholder, textarea:-moz-placeholder {
-    /* Mozilla Firefox 4 to 18 */
-    color: #525252;
-  }
-  input::-moz-placeholder, textarea::-moz-placeholder {
-    /* Mozilla Firefox 19+ */
-    color: #525252;
-  }
-  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
-    /* Internet Explorer 10+ */
-    color: #525252;
   }
 }
 .system-notification-item {
@@ -430,6 +394,7 @@ export default {
   float: right;
   line-height: 28px;
   color: #3E3E3E;
+  margin: 0;
 }
 .system-notification-readed {
   display: inline-block;

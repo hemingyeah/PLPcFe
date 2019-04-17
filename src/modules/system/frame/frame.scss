@@ -531,19 +531,64 @@ button.export-operate-btn{
     color: #e84040;
   }
 }
-.frame-quick-notification-text {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0 20px;
-  .p {
-    display: inline-block;
-  }
-}
 .frame-quick-notification-info {
   position: relative;
   width: 450px;
   height: 100%;
+  margin-right: 30px;
   white-space: nowrap;
   overflow: hidden;
+}
+.frame-quick-notification-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0 20px;
+  &:hover {
+    animation-play-state: paused !important;
+  }
+}
+.frame-quick-notification-text {
+  margin: 0;
+}
+@-webkit-keyframes text-scroll {
+  0% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+  }
+  100% {
+    -webkit-transform: translateX(-100%);
+            transform: translateX(-100%);
+  }
+}
+@keyframes text-scroll {
+  0% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+  }
+  100% {
+    -webkit-transform: translateX(-100%);
+            transform: translateX(-100%);
+  }
+}
+@-webkit-keyframes text-scroll-reverse {
+  0% {
+    -webkit-transform: translateX(100%);
+            transform: translateX(100%);
+  }
+  100% {
+    -webkit-transform: translateX(-100%);
+            transform: translateX(-100%);
+    
+  }
+}
+@keyframes text-scroll-reverse {
+  0% {
+    -webkit-transform: translateX(100%);
+            transform: translateX(100%);
+    }
+  100% {
+    -webkit-transform: translateX(-100%);
+            transform: translateX(-100%);
+  }
 }

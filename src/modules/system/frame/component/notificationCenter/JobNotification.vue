@@ -6,21 +6,21 @@
         <button class="job-notification-readed-btn" :style="btnStyle" @click="setReaded"></button>
         <span class="job-notification-readed-text">全部标记为已读</span>
       </div>
-      <el-select class="job-notification-select-readed" :value="readedOption" @input="getReaded">
+      <el-select class="job-notification-select job-notification-select-readed" :value="readedOption" @input="getReaded">
         <el-option
           v-for="(item, index) in readedOptions"
           :key="index"
           :label="item.label"
           :value="item.value"></el-option>
       </el-select>
-      <el-select class="job-notification-select-left" :value="jobOption" placeholder="消息来源" @input="getSource">
+      <el-select class="job-notification-select job-notification-select-left" :value="jobOption" placeholder="消息来源" @input="getSource">
         <el-option
           v-for="(item, index) in jobOptions"
           :key="index"
           :label="item.label"
           :value="item.value"></el-option>
       </el-select>
-      <el-select class="job-notification-select-right" :value="dataOption" @input="getTime" placeholder="日期">
+      <el-select class="job-notification-select job-notification-select-right" :value="dataOption" @input="getTime" placeholder="日期">
         <el-option
           v-for="(item, index) in dataOptions"
           :key="index"
@@ -33,11 +33,13 @@
         v-for="(item, index) in notificationPage.list"
         :key="index"
         :info="item"
-        @getInfo="getInfo">
+        @getInfo="getInfo"
+        @clearNum="clearNum">
       </job-notification-item>
       <div class="job-notification-footer">
-        <button class="job-notification-footer-more" @click="getMore" v-if="moreShow">加载更多</button>
-        <div v-else>没有更多信息了</div>
+        <button class="job-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
+        <div v-if="loading">正在加载...</div>
+        <div v-if="!moreShow && !loading">没有更多信息了</div>
       </div>
     </div>
     <div class="job-notification-footer" v-else>暂时没有信息</div>
@@ -61,8 +63,8 @@ export default {
   },
   data () {
     return {
+      loading: false,
       btnShow: false,
-      moreShow: true,
       btnStyle: {
         'border': '5px solid #eaeaea'
       },
@@ -148,23 +150,23 @@ export default {
       let endTime = '';
 
       if(value != 100 && value != null && value != 1) {
-        endTime = `${Lang.formatDate(new Date()).split(' ')[0] } 23:59:59`;
+        endTime = Lang.formatDate(new Date(), 'YYYY-MM-DD 23:59:59');
       } else if (value == 1) {
-        endTime = `${Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
+        endTime = Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 23:59:59');
       } else if (value == 100) {
-        endTime = `${Lang.formatDate(new Date() - (30 * 24 * 60 * 60 * 1000)).split(' ')[0] } 23:59:59`;
+        endTime = Lang.formatDate(new Date() - (30 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 23:59:59');
       } else {
         endTime = null;
       }
 
       if(value == 0) {
-        startTime = `${Lang.formatDate(new Date()).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date(), 'YYYY-MM-DD 00:00:00');
       } else if (value == 1) {
-        startTime = `${Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
       } else if (value == 7) {
-        startTime = `${Lang.formatDate(new Date() - (6 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date() - (6 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
       } else if (value == 30) {
-        startTime = `${Lang.formatDate(new Date() - (29 * 24 * 60 * 60 * 1000)).split(' ')[0] } 00:00:00`;
+        startTime = Lang.formatDate(new Date() - (29 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
       } else {
         startTime = null;
       }
@@ -203,6 +205,7 @@ export default {
             this.btnStyle = {
               'border': '5px solid #55B7B4'
             }
+            this.$emit('clearNum', 'work');
           }
         } else {
           this.btnStyle = {
@@ -219,12 +222,6 @@ export default {
         this.params.pageNum = 1;
         let notificationPage = await NotificationApi.getJobList(this.params);
         this.notificationPage.merge(Page.as(notificationPage.data));
-
-        if (this.params.pageSize >= this.notificationPage.total) {
-          this.moreShow = false;
-        }else{
-          this.moreShow = true;
-        }
       } catch(error) {
         console.error(error);
       }
@@ -232,16 +229,21 @@ export default {
     async getMore () {
       try {
         this.params.pageNum++;
+        this.loading = true;
         let notificationPage = await NotificationApi.getJobList(this.params);
+        this.loading = false;
         this.notificationPage.merge(Page.as(notificationPage.data));
-        if (this.params.pageSize * this.params.pageNum >= this.notificationPage.total) {
-          this.moreShow = false;
-        }else{
-          this.moreShow = true;
-        }
       } catch(error) {
         console.error(error);
       }
+    },
+    clearNum () {
+      this.$emit('clearNum', 'work', 1);
+    }
+  },
+  computed: {
+    moreShow () {
+      return !(this.params.pageSize * this.params.pageNum >= this.notificationPage.total);
     }
   }
 }
@@ -255,94 +257,58 @@ export default {
 }
 .job-notification-header {
   text-align: right;
-  padding: 20px;
+  padding: 20px 12px;
   background: #fff;
   height: 70px;
   font-size: 0;
+  box-shadow: 0 3px 5px #E5E5E5;
+  z-index: 99;
+}
+.job-notification-select {
+  display: inline-block;
+  input {
+    color: #525252 !important;
+    background: #EAEAEA;
+    border: 0;
+  }
+  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+      /* WebKit browsers */
+    color: #525252;
+  }
+  input:-moz-placeholder, textarea:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #525252;
+  }
+  input::-moz-placeholder, textarea::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #525252;
+  }
+  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+    /* Internet Explorer 10+ */
+    color: #525252;
+  }
 }
 .job-notification-select-readed {
-  display: inline-block;
   width: 80px;
   margin-right: 5px;
   input {
-    color: #525252 !important;
-    background: #EAEAEA;
-    border: 0;
     border-radius: 4px;
-  }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-      /* WebKit browsers */
-    color: #525252;
-  }
-  input:-moz-placeholder, textarea:-moz-placeholder {
-    /* Mozilla Firefox 4 to 18 */
-    color: #525252;
-  }
-  input::-moz-placeholder, textarea::-moz-placeholder {
-    /* Mozilla Firefox 19+ */
-    color: #525252;
-  }
-  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
-    /* Internet Explorer 10+ */
-    color: #525252;
   }
 }
 .job-notification-select-left {
-  display: inline-block;
   width: 100px;
   border-right: 1px solid #fff;
   input {
-    color: #525252 !important;
-    background: #EAEAEA;
-    border: 0;
     border-radius: 4px 0 0 4px;
-  }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-      /* WebKit browsers */
-    color: #525252;
-  }
-  input:-moz-placeholder, textarea:-moz-placeholder {
-    /* Mozilla Firefox 4 to 18 */
-    color: #525252;
-  }
-  input::-moz-placeholder, textarea::-moz-placeholder {
-    /* Mozilla Firefox 19+ */
-    color: #525252;
-  }
-  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
-    /* Internet Explorer 10+ */
-    color: #525252;
   }
 }
 .job-notification-select-right {
-  display: inline-block;
   width: 100px;
   input {
-    color: #525252 !important;
-    background: #EAEAEA;
-    border: 0;
-    color: #ccc;
     border-radius: 0 4px 4px 0;
-  }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-      /* WebKit browsers */
-    color: #525252;
-  }
-  input:-moz-placeholder, textarea:-moz-placeholder {
-    /* Mozilla Firefox 4 to 18 */
-    color: #525252;
-  }
-  input::-moz-placeholder, textarea::-moz-placeholder {
-    /* Mozilla Firefox 19+ */
-    color: #525252;
-  }
-  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
-    /* Internet Explorer 10+ */
-    color: #525252;
   }
 }
 .job-notification-content {
-  // padding-top: 185px;
   flex: 1;
   overflow: auto;
 }

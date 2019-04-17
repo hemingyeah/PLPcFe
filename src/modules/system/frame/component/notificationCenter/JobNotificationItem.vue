@@ -15,6 +15,7 @@
     </div>
     <div class="job-notification-item-footer">
       <button class="job-notification-item-detail" @click="toJobNotificationDetails(info)">查看详情</button>
+      <!-- <a :href="info.body.forms.pcUrl">查看详情</a> -->
       <p class="job-notification-item-time">{{ info.createTime | fmt_datetime }}</p>
     </div>
   </div>
@@ -52,7 +53,10 @@ export default {
     async toJobNotificationDetails (info) {
       try {
         this.$platform.openTab({
-          url: info.body.forms.pcUrl,
+          id: `taskView_${info.primaryId}`,
+          title: '正在查询',
+          close: true,
+          url: info.pcUrl,
         });
         if(info.readed == 0) {
           let params = {
@@ -60,7 +64,8 @@ export default {
             id: info.id
           }
           await NotificationApi.haveRead(params);
-          this.$emit('getInfo');
+          this.info.readed = 1;
+          this.$emit('clearNum');
         }
       } catch (error) {
         console.error(error);
@@ -146,5 +151,6 @@ export default {
   float: right;
   line-height: 28px;
   color: #3E3E3E;
+  margin: 0;
 }
 </style>

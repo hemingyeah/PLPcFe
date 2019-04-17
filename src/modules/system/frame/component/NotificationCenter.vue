@@ -31,7 +31,7 @@
     </div>
 
     <keep-alive>
-      <component :is="component" :info="info"></component>
+      <component :is="component" :info="info" @clearNum="clearNum"></component>
     </keep-alive>
   </base-panel>
 </template>
@@ -61,6 +61,24 @@ export default {
     },
     showCompont () {
       this.show = true;
+    },
+    clearNum (val, n) {
+      if(val == 'system') {
+        if(n == 1) {
+          this.info.systemMsg--;
+        } else {
+          this.info.systemMsg = 0;
+        }
+      } else if (val == 'work') {
+        if(n == 1) {
+          this.info.workMsg--;
+        } else {
+          this.info.workMsg = 0;
+        }
+      }
+
+      let num = this.info.systemMsg + this.info.workMsg;
+      this.$emit('clearNum', num);
     }
   }
 }
@@ -99,6 +117,7 @@ export default {
   font-size: 16px;
   color: #969696;
   background: #fff;
+  z-index: 100;
 }
 .notification-center-tab {
   display: none;
@@ -131,6 +150,7 @@ export default {
   flex: 1;
   background: #fff;
   border-bottom: 1px solid #cbcbcb;
+  user-select: none;
   &:hover {
     color: #000;
     cursor: pointer;

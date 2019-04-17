@@ -15,10 +15,10 @@
             </button>     
           </div>
           
-          <div class="frame-quick-notification" :style="notificationStyle" v-show="systemMsg && systemMsg.notificationShow">
+          <div class="frame-quick-notification" v-show="notificationShow">
             <div class="frame-quick-notification-info" ref="notificationInfo">
-              <div class="frame-quick-notification-text" ref="notificationCont">
-                <p ref="notificationText">{{ notification.title }}</p>
+              <div class="frame-quick-notification-content" ref="notificationContent">
+                <p ref="notificationText" class="frame-quick-notification-text">{{ notification.title }}</p>
               </div>
             </div>
             <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
@@ -82,7 +82,7 @@
               type="button" class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
               @click="openNotificationCenter"
               title="通知中心" v-tooltip>
-              <span class="notification-new" v-show="notification.count">{{ notification.count }}</span>
+              <span class="notification-new" v-show="notification.count && notification.count != 0">{{ notification.count }}</span>
               <i class="iconfont">&#xe624;</i>
             </button>
       
@@ -161,7 +161,7 @@
 
     <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
-    <notification-center ref="notification" :info="notificationInfo"></notification-center>
+    <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum"></notification-center>
   </div>
 </template>
 
@@ -179,6 +179,8 @@ import DefaultHead from '@src/assets/img/user-avatar.png';
 import NotificationCenter from './component/NotificationCenter.vue'
 import * as NotificationApi from '@src/api/NotificationApi';
 
+const NOTIFICATION_TIME = 1000 * 60 * 10
+
 export default {
   mixins: [FrameManager],
   name: 'frame-view',
@@ -191,10 +193,12 @@ export default {
   data(){
     return {
       notificationInfo: {},
-      systemMsg: JSON.parse(localStorage.getItem('systemMsg')),
-      notificationStyle: {
-        'width': '500px'
+      notification: {
+        count: 0
       },
+      systemMsg: '',
+      notificationShow: false,
+      notificationStyle: {},
       loginUser: this.initData.user || {}, // 当前登录的用户
 
       profilePopperVisible: false, 
@@ -208,7 +212,6 @@ export default {
       exportTimer: null,
       exportList: [],
       operationList: [],
-      notification: {}
     }
   },
   computed: {
@@ -381,10 +384,9 @@ export default {
       });
     },
     closeNotification () {
-      let systemMsg = JSON.parse(localStorage.getItem('systemMsg'));
-      systemMsg.notificationShow = false;
-      this.systemMsg.notificationShow = false;
-      localStorage.setItem('systemMsg', JSON.stringify(systemMsg));
+      this.notificationShow = false;
+      localStorage.setItem('shb_systemMsg', this.notificationInfo.msgSystem.id);
+      this.clearAnimation();
     },
 
     // 获取系统消息，本地存储，超出滚动
@@ -394,48 +396,38 @@ export default {
         this.notificationInfo = info.data;
         this.notification.count = info.data.systemMsg + info.data.workMsg;
         this.notification.title = info.data.msgSystem.title;
-
-        if(!this.systemMsg) {
-          this.systemMsg = {};
-          if(!this.notification.title) {
-            this.systemMsg.notificationShow = false;
+        
+        this.systemMsg = localStorage.getItem('shb_systemMsg');
+        if(this.systemMsg) {
+          if(this.systemMsg != this.notificationInfo.msgSystem.id){
+            this.notificationShow = true;
+            this.setAnimation();
           } else {
-            this.systemMsg.notificationShow = true;
+            this.notificationShow = false;
           }
-          this.systemMsg.notificationId = this.notificationInfo.msgSystem.id;
-          localStorage.setItem('systemMsg', JSON.stringify(this.systemMsg));
         } else {
-          if(this.notificationInfo.msgSystem.id != this.systemMsg.notificationId) {
-            this.systemMsg.notificationId = this.notificationInfo.msgSystem.id;
-            this.systemMsg.notificationShow = true;
-            localStorage.setItem('systemMsg', JSON.stringify(this.systemMsg));
-          }
+          this.notificationShow = true;
+          this.setAnimation();
         }
-
-        this.$nextTick(() => {
-          let textWidth = this.$refs.notificationText.offsetWidth;
-          let infoWidth = this.$refs.notificationInfo.offsetWidth;
-
-          if(textWidth > infoWidth) {
-            let interval = setInterval(() => {
-              let left = parseInt(this.$refs.notificationCont.style.left) - 1;
-              if(!left) {
-                left = -1;
-              }
-              if(Math.abs(left) > textWidth) {
-                left = infoWidth;
-              }
-              this.$refs.notificationCont.style.left = `${left.toString()}px`;
-            }, 20);
-
-            if(!this.notification.notificationShow) {
-              clearInterval(interval);
-            }
-          }
-        })
       } catch (error) {
         console.error(error);
       }
+    },
+    setAnimation () {
+      this.$nextTick(() => {
+        let textWidth = this.$refs.notificationText.offsetWidth;
+        let infoWidth = this.$refs.notificationInfo.offsetWidth;
+        if(textWidth > infoWidth) {
+          let time = this.notification.title.length / 2;
+          this.$refs.notificationContent.style.animation = `text-scroll ${time / 2}s linear infinite, text-scroll-reverse ${time}s linear ${time / 2}s infinite`;
+        }
+      })
+    },
+    clearAnimation () {
+      this.$refs.notificationContent.style.animation = '';
+    },
+    clearNum (num) {
+      this.notification.count = num;
     }
   },
   created(){
@@ -449,7 +441,7 @@ export default {
     this.getSystemMsg();
     setInterval(() => {
       this.getSystemMsg();
-    }, 1000 * 60 * 10);
+    }, NOTIFICATION_TIME);
   },
   mounted(){
     this.checkExports();
