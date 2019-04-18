@@ -3,8 +3,7 @@
     <div class="nav-side-bar">
       <h1>绩效规则设置</h1>
       <h3>绩效规则</h3>
-      <a href="/setting/performance/rule" style="padding-left: 13px">旧版链接</a>
-    </div>
+`    </div>
 
     <div class="function-area">
       <rule-setting :init-data="initData"></rule-setting>

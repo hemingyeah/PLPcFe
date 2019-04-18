@@ -89,6 +89,7 @@
         </div>
         <el-form-item label="备注">
           <el-input v-model="form.remarks" type="textarea" :maxlength="500"></el-input>
+          <p style="color: #999;">* 生成绩效报告的时间取决于选择的数据量，如遇长时间等待请稍后刷新</p>
         </el-form-item>
       </el-form>
       <div class="dialog-footer">
@@ -116,6 +117,9 @@
               </template>
               <template v-else-if="column.field === 'executor'">
                 {{scope.row[column.field].displayName}}
+              </template>
+              <template v-else-if="column.field === 'reportNames'">
+                {{(scope.row[column.field] || []).join(',')}}
               </template>
               <template v-else>
                 {{scope.row[column.field]}}
@@ -298,6 +302,11 @@ export default {
           show: true
         },
         {
+          label: '报告名称',
+          field: 'reportNames',
+          show: true
+        },
+        {
           label: '负责人',
           field: 'executor',
           width: '100px',
@@ -373,7 +382,8 @@ export default {
 
           if (!res.status) {
             this.stage = 'success';
-            this.visible = false;
+            this.createReportResult = res.data;
+            // this.visible = false;
           }
         })
         .catch(e => {

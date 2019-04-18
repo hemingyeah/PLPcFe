@@ -1,5 +1,5 @@
 <template>
-  <base-modal :title="title" :show.sync="visible" width="800px" class="base-import-modal" @closed="reset">
+  <base-modal :title="title" :show.sync="visible" width="820px" class="base-import-modal" @closed="reset">
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="规则名称" :error="formValidationResult.ruleName" required>
@@ -64,7 +64,6 @@
       </el-form-item>
 
       <el-form-item>
-
         <el-checkbox v-model="form.mark">当同一个工单负责人与协同人重复时只计算负责人</el-checkbox>
       </el-form-item>
 
@@ -86,6 +85,8 @@
             :value="item.value">
           </el-option>
         </el-select>
+        <span class="warning" style="padding-left: 10px" v-if="form.category === 'customizedFields'">仅支持单选项类型的字段</span>
+
       </el-form-item>
       <el-form-item v-if="warning">
         <span class="warning">{{warning}}</span>
@@ -306,11 +307,8 @@ export default {
 
             } else {
               // 按整数计算
-              if (!Number(rule.executorScore)) {
+              if (!Number(rule.executorScore) && !Number(rule.assistantScore)) {
                 errFields.push('executorScore');
-              }
-
-              if (!Number(rule.assistantScore)) {
                 errFields.push('assistantScore');
               }
             }
@@ -391,7 +389,7 @@ export default {
 
       if (ruleType && rewardType !== 'amount') {
         return {
-          label: '每单得',
+          label: `每单得${rewardType === 'profit' ? '毛利的' : '营收的'}`,
           unit: '%',
           prefix,
           tip: '请输入数字，可以有一位小数，最大100'

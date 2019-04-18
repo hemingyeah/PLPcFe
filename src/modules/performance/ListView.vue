@@ -27,6 +27,16 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label-width="100px" label="规则名称">
+          <el-select v-model="secondaryParams.ruleIds" placeholder="请选择">
+            <el-option
+              v-for="item in openRules"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label-width="100px" label="创建时间">
           <el-date-picker
             v-model="secondaryParams.time"
@@ -214,12 +224,24 @@ export default {
         pageNum: 1,
         pageSize: 10,
         totalItems: 0,
+        ruleIds: '',
       },
       secondaryParams: {
         time: '',
         type: 995,
+        ruleIds: '',
       },
     }
+  },
+  computed: {
+    openRules() {
+      return (this.initData.AllOpenRules || [])
+        .map(({id, ruleName, ruleDesc}) => ({
+          label: ruleName,
+          value: id,
+          ruleDesc,
+        }));
+    },
   },
   mounted() {
     const localStorageData = this.getLocalStorageData();
@@ -304,11 +326,15 @@ export default {
 
     },
     buildParams() {
-      const {keyword, pageNum, pageSize, time, type, } = this.params;
+      const {keyword, pageNum, pageSize, time, type, ruleIds} = this.params;
       let params = {
         pageNum,
         pageSize,
       };
+
+      if (ruleIds) {
+        params.ruleIds = ruleIds;
+      }
 
       if (keyword) {
         params.reportName = keyword;
@@ -392,11 +418,13 @@ export default {
         type: 995,
         pageNum: 1,
         totalItems: 0,
+        ruleIds: '',
       }
 
       this.secondaryParams = {
         time: '',
         type: 995,
+        ruleIds: '',
       }
     },
     modifyColumnStatus(val, column) {
