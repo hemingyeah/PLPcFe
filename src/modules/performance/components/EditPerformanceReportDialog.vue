@@ -118,9 +118,9 @@
               <template v-else-if="column.field === 'executor'">
                 {{scope.row[column.field].displayName}}
               </template>
-              <template v-else-if="column.field === 'settlement'">
-                {{scope.row[column.field]}}
-              </template>
+              <!--<template v-else-if="column.field === 'settlement'">-->
+                <!--{{scope.row[column.field]}}-->
+              <!--</template>-->
               <template v-else>
                 {{scope.row[column.field]}}
               </template>
@@ -301,12 +301,12 @@ export default {
           field: 'cusName',
           show: true
         },
-        {
-          label: '重复次数',
-          field: 'settlement',
-          width: '100px',
-          show: true
-        },
+        // {
+        //   label: '重复次数',
+        //   field: 'settlement',
+        //   width: '100px',
+        //   show: true
+        // },
         {
           label: '负责人',
           field: 'executor',
