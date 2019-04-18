@@ -118,8 +118,8 @@
               <template v-else-if="column.field === 'executor'">
                 {{scope.row[column.field].displayName}}
               </template>
-              <template v-else-if="column.field === 'reportNames'">
-                {{(scope.row[column.field] || []).join(',')}}
+              <template v-else-if="column.field === 'settlement'">
+                {{scope.row[column.field]}}
               </template>
               <template v-else>
                 {{scope.row[column.field]}}
@@ -302,8 +302,9 @@ export default {
           show: true
         },
         {
-          label: '报告名称',
-          field: 'reportNames',
+          label: '重复次数',
+          field: 'settlement',
+          width: '100px',
           show: true
         },
         {
