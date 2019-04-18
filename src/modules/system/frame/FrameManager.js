@@ -76,7 +76,16 @@ const FrameManager = {
         let frameWindow = frame.contentWindow;
 
         //传递点击事件，用于关闭顶层window popper
-        frameWindow.addEventListener('click', () => rootWindow.document.body.click())
+        frameWindow.addEventListener('click', (e) => {
+          const clickEvent = new CustomEvent('click', {
+            detail: {
+              isTrusted: e.isTrusted,
+              isMock: true
+            }, 
+            bubbles: true
+          })
+          rootWindow.document.body.dispatchEvent(clickEvent)
+        })
         //frame页面卸载时，重置刷新icon
         frameWindow.addEventListener('unload', () => tab.loading = true)
       })

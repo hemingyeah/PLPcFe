@@ -43,6 +43,9 @@ export default {
     },
     /** 监听文档的点击事件，如果点击组件外的元素，关闭组件 */
     handleClickOutside(e){
+      let {isTrusted, detail} = e;
+      if(!isTrusted && (detail == null || !detail.isTrusted)) return;
+      
       if(this.show && !this.$el.contains(e.target)) this.close();
     }
   },
