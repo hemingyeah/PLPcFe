@@ -436,7 +436,7 @@ export default {
         val = this.form[key];
         // 8035200000 ms = 93 days
         if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
-        if (key === 'time') return this.formValidation[key] = Array.isArray(val) && !!val.length && new Date(this.form.time[1]) - new Date(this.form.time[0]) <= 8035200000;
+        // if (key === 'time') return this.formValidation[key] = Array.isArray(val) && !!val.length && new Date(this.form.time[1]) - new Date(this.form.time[0]) <= 8035200000;
 
         return this.formValidation[key] = !!val
       })
