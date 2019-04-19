@@ -5,7 +5,7 @@
         <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
       </div>
       <div class="base-file-info">
-        <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
+        <a :href="genDownloadUrl(file.url)" @click.prevent.stop="download">{{file.filename}}</a>
         <p>
           <span>{{file.fileSize}}</span>
           <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">删除</button>
@@ -19,7 +19,7 @@
         <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
       </div>
       <div class="base-file-info">
-        <a :href="file.url" @click.prevent.stop="download">{{file.filename}}</a>
+        <a :href="genDownloadUrl(file.url)" @click.prevent.stop="download">{{file.filename}}</a>
         <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">
           <i class="iconfont icon-circle-delete" style="position: relative;top: 1px"></i>
         </button>
@@ -113,6 +113,9 @@ export default {
     }
   },
   methods: {
+    genDownloadUrl(url){
+      return `/files/download?ossurl=${encodeURIComponent(url)}`
+    },
     download(event){
       if(!this.file.url) return;
       window.location.href = this.file.url;
