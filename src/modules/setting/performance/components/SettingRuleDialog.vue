@@ -63,10 +63,6 @@
         </div>
       </el-form-item>
 
-      <el-form-item>
-        <el-checkbox v-model="form.mark">当同一个工单负责人与协同人重复时只计算负责人</el-checkbox>
-      </el-form-item>
-
       <el-form-item class="base-condition-wrap">
         <el-select v-model="form.custFieldOfTask" :class="{'input-is-error': formValidationResult.custFieldOfTask}" @change="changeCustFieldOfTask" v-if="form.category === 'customizedFields'" placeholder="请选择">
           <el-option
@@ -88,6 +84,11 @@
         <span class="warning" style="padding-left: 10px" v-if="form.category === 'customizedFields'">仅支持单选项类型的字段</span>
 
       </el-form-item>
+
+      <el-form-item>
+        <el-checkbox v-model="form.mark">当同一个工单负责人与协同人重复时只计算负责人</el-checkbox>
+      </el-form-item>
+
       <el-form-item v-if="warning">
         <span class="warning">{{warning}}</span>
       </el-form-item>
