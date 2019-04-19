@@ -76,7 +76,7 @@
           </template>
 
           <template slot="tags" slot-scope="{value}">
-            <div class="form-view-row" v-if="value.length">
+            <div class="form-view-row" v-if="isDivideByTag">
               <label>服务团队</label>
               <div class="form-view-row-content">
                 <span>{{value | fmt_tag}}</span>
@@ -122,7 +122,7 @@ import AuthUtil from '@src/util/auth';
 import qs from '@src/util/querystring';
 
 export default {
-  name: "customer-detail-view",
+  name: 'customer-detail-view',
   props: {
     initData: {
       type: Object,
@@ -131,16 +131,16 @@ export default {
   },
   data() {
     return {
-      id: this.initData.id, //当前客户的id
+      id: this.initData.id, // 当前客户的id
       tabs: [],
-      //当前选中的tab
+      // 当前选中的tab
       currTab: 'customer-info-record',
       customerOption: {},
       remindList: [],
       selectedRemind: {},
       customer: {},
       loading: false,
-      showWholeName: -1, //-1代表不显示展开icon 0代表收起 1代表展开
+      showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       statisticalData: {},
     }
   },
@@ -149,11 +149,11 @@ export default {
     allowBack(){
       let allow = true;
 
-      //如果带入noHistory参数，则不显示
+      // 如果带入noHistory参数，则不显示
       let query = qs.parse(window.location.search);
       if(query.noHistory) return false;
 
-      //验证路径
+      // 验证路径
       let path = window.location.pathname;
       let disablePathReg = [/^\/customer\/view\/\S+$/];
       if(disablePathReg.some(reg => reg.test(path))) return false;
@@ -181,7 +181,7 @@ export default {
       return [...fields, {
         displayName: '',
         formType: 'separator'
-      },{
+      }, {
         displayName: '创建人',
         fieldName: 'createLoginUser',
         formType: 'user',
@@ -226,17 +226,17 @@ export default {
     hasEditCustomerAuth(){
       let customer = this.customer;
       let loginUserId = this.loginUser.userId;
-      return AuthUtil.hasAuthWithDataLevel(this.permission, "CUSTOMER_EDIT", 
-        //团队权限判断
+      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT', 
+        // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
-          //无团队则任何人都可编辑
+          // 无团队则任何人都可编辑
           if(tags.length == 0) return true;
 
           let loginUserTagIds = this.initData.loginUser.tagIds || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
         }, 
-        //个人权限判断
+        // 个人权限判断
         () => {
           return customer.createUser == loginUserId || this.isCustomerManager
         }
@@ -282,7 +282,7 @@ export default {
      * 4. 创建工单权限
      */
     allowCreateTask(){
-      return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, "TASK_ADD");
+      return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, 'TASK_ADD');
     },
     /**
      * 满足以下提交可以创建事件
@@ -293,7 +293,7 @@ export default {
      * 4. 新建事件权限
      */
     allowCreateEvent(){
-      return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, "CASE_ADD");
+      return !this.isDelete && !this.isDisable && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, 'CASE_ADD');
     },
     /**
      * 满足以下条件可以创建计划任务
@@ -310,6 +310,9 @@ export default {
     },
     isPhoneUnique() {
       return this.initData.isPhoneUnique;
+    },
+    isDivideByTag() {
+      return this.initData.isDivideByTag;
     }
   },
   filters: {
@@ -319,7 +322,7 @@ export default {
     }
   },
   methods: {
-    //更新客户名称的样式
+    // 更新客户名称的样式
     updateCustomerStyle(){
       let cnEl = this.$refs.customerName;
       let width = cnEl.offsetWidth;
@@ -337,7 +340,7 @@ export default {
         title: '新建工单',
         close: true,
         url: `/task/createFromCustomer/${customer.id}?defaultTypeId=${typeId}`,
-        fromId: fromId
+        fromId
       })      
     },
     /** 从客户创建事件 */
@@ -350,7 +353,7 @@ export default {
         title: '新建事件',
         close: true,
         url: `/event/createFromCustomer/${customer.id}?defaultTypeId=${typeId}`,
-        fromId: fromId
+        fromId
       })      
     },
     /** 从客户创建计划工单 */
@@ -363,7 +366,7 @@ export default {
         title: '新建计划任务',
         close: true,
         url: `/task/planTask/create?defaultTypeId=${typeId}&customerId=${customer.id}`,
-        fromId: fromId
+        fromId
       })
     },
     selectTab(tab) {
@@ -434,12 +437,12 @@ export default {
       }
     },
     openMap() {
-      this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name,})
+      this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name, })
         .catch(err => console.error('openMap catch an err: ', err));
     },
     fetchCustomer() {
       const id = this.initData.id;
-      this.$http.get(`/customer/get`, {id})
+      this.$http.get('/customer/get', {id})
         .then(res => {
           if (res.status) return;
           this.customer = Object.freeze(res.data);
@@ -490,6 +493,8 @@ export default {
     }
   },
   mounted() {
+
+    console.log('this.initData', this.initData);
     this.loading = true;
     this.fetchCustomer();
     this.fetchStatisticalData();
