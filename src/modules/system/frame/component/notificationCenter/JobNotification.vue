@@ -33,8 +33,10 @@
         v-for="(item, index) in notificationPage.list"
         :key="index"
         :info="item"
+        :index="index"
         @getInfo="getInfo"
-        @clearNum="clearNum">
+        @clearNum="clearNum"
+        @deleteItem="deleteItem">
       </job-notification-item>
       <div class="job-notification-footer">
         <button class="job-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
@@ -42,7 +44,8 @@
         <div v-if="!moreShow && !loading">没有更多信息了</div>
       </div>
     </div>
-    <div class="job-notification-footer" v-else>暂时没有信息</div>
+    <div class="job-notification-footer" v-else-if="notificationPage.list.length == 0 && !loading">暂时没有信息</div>
+    <div class="job-notification-footer" v-else>正在加载...</div>
   </div>
 </template>
 
@@ -70,7 +73,7 @@ export default {
       },
       notificationCount: 0,
       params: {
-        pageSize: 1,
+        pageSize: 20,
         pageNum: 1,
       },
       notificationPage: new Page(),
@@ -113,10 +116,11 @@ export default {
       }, {
         value: 'notice',
         label: '通知公告'
-      }, {
-        value: 10,
-        label: '关注'
       }],
+      // , {
+      //   value: 10,
+      //   label: '关注'
+      // }],
       dataOption: '',
       dataOptions: [{
         value: null,
@@ -220,7 +224,9 @@ export default {
       try {
         this.notificationPage = new Page();
         this.params.pageNum = 1;
+        this.loading = true;
         let notificationPage = await NotificationApi.getJobList(this.params);
+        this.loading = false;
         this.notificationPage.merge(Page.as(notificationPage.data));
       } catch(error) {
         console.error(error);
@@ -239,6 +245,9 @@ export default {
     },
     clearNum () {
       this.$emit('clearNum', 'work', 1);
+    },
+    deleteItem (info, index) {
+      this.notificationPage.list.splice(index, 1);
     }
   },
   computed: {
@@ -333,8 +342,8 @@ export default {
 }
 .job-notification-footer {
   text-align: center;
-  height: 40px;
-  line-height: 30px;
+  margin-top: 10px;
+  height: 30px;
   color: #8C8989;
 }
 .job-notification-footer-more {

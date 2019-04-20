@@ -297,7 +297,7 @@ export default {
       this.profilePopperVisible = false;
     },
     openNotificationCenter () {
-      this.$refs.notification.showCompont();
+      this.$refs.notification.showComponent();
       this.profilePopperVisible = false;
     },
     /** 检测是否有导出 */
@@ -396,19 +396,22 @@ export default {
         this.notificationInfo = info.data;
         this.notification.count = info.data.systemMsg + info.data.workMsg;
         this.notification.title = info.data.msgSystem.title;
-        
         this.systemMsg = localStorage.getItem('shb_systemMsg');
-        if(this.systemMsg) {
-          if(this.systemMsg != this.notificationInfo.msgSystem.id){
+        
+        if(this.notification.title) {
+          if(this.systemMsg) {
+            if(this.systemMsg != this.notificationInfo.msgSystem.id){
+              this.notificationShow = true;
+              this.setAnimation();
+            } else {
+              this.notificationShow = false;
+            }
+          } else {
             this.notificationShow = true;
             this.setAnimation();
-          } else {
-            this.notificationShow = false;
           }
-        } else {
-          this.notificationShow = true;
-          this.setAnimation();
         }
+        
       } catch (error) {
         console.error(error);
       }
@@ -419,7 +422,7 @@ export default {
         let infoWidth = this.$refs.notificationInfo.offsetWidth;
         if(textWidth > infoWidth) {
           let time = this.notification.title.length / 2;
-          this.$refs.notificationContent.style.animation = `text-scroll ${time / 2}s linear infinite, text-scroll-reverse ${time}s linear ${time / 2}s infinite`;
+          this.$refs.notificationContent.style.animation = `text-scroll ${time / 2}s linear infinite`;
         }
       })
     },

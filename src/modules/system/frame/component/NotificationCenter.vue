@@ -59,7 +59,7 @@ export default {
     notificationChange (event) {
       event.target.checked ? this.component = event.target.id : '';
     },
-    showCompont () {
+    showComponent () {
       this.show = true;
     },
     clearNum (val, n) {

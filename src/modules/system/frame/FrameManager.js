@@ -71,21 +71,9 @@ const FrameManager = {
 
       //为该frame添加事件
       this.$nextTick(() => {
-        let rootWindow = getRootWindow(window);
         let frame = document.getElementById(`frame_tab_${tab.id}`);
         let frameWindow = frame.contentWindow;
 
-        //传递点击事件，用于关闭顶层window popper
-        frameWindow.addEventListener('click', (e) => {
-          const clickEvent = new CustomEvent('click', {
-            detail: {
-              isTrusted: e.isTrusted,
-              isMock: true
-            }, 
-            bubbles: true
-          })
-          rootWindow.document.body.dispatchEvent(clickEvent)
-        })
         //frame页面卸载时，重置刷新icon
         frameWindow.addEventListener('unload', () => tab.loading = true)
       })
@@ -101,7 +89,7 @@ const FrameManager = {
       // sessionStorage.removeItem('customer_list_search_status');
   
       //TODO:迁移完成后删除
-      localStorage.removeItem("frame_tab_" + frameTab.id + "_idArray");
+      localStorage.removeItem('frame_tab_' + frameTab.id + '_idArray');
 
       let index = this.frameTabs.indexOf(frameTab);
       if(index >= 0) {
@@ -142,6 +130,21 @@ const FrameManager = {
       tab.reload = false;
     
       this.adjustFrameTabs(tab);
+      this.$nextTick(() => {
+        let rootWindow = getRootWindow(window);
+
+        //传递点击事件，用于关闭顶层window popper
+        frameWindow.addEventListener('click', (e) => {
+          const clickEvent = new CustomEvent('click', {
+            detail: {
+              isTrusted: e.isTrusted,
+              isMock: true
+            }, 
+            bubbles: true
+          })
+          rootWindow.document.body.dispatchEvent(clickEvent)
+        })
+      })
       
       //记录frame历史
       FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
@@ -162,7 +165,6 @@ const FrameManager = {
             tab.title = iframe.contentWindow.document.title;
           });
         }
-          
         iframe.contentWindow.location.reload(true);
       }
     },
@@ -329,8 +331,8 @@ const FrameManager = {
     }
   },
   mounted(){
-    window.addEventListener("message", this.receiveMessage);
-    window.addEventListener("resize", this.resizeHanler);
+    window.addEventListener('message', this.receiveMessage);
+    window.addEventListener('resize', this.resizeHanler);
 
     //TODO: 迁移完成后删除
     window.addTabs = this.addTabs;
@@ -350,7 +352,7 @@ const FrameManager = {
     //处理消息跳转url
     let query = parse(window.location.search);
     let pcUrl = this.initData.pcUrl || query.pcUrl;
-    if(pcUrl) this.openForFrame({id: "PcUrl", title: "正在加载", url: pcUrl});
+    if(pcUrl) this.openForFrame({id: 'PcUrl', title: '正在加载', url: pcUrl});
   }
 };
 

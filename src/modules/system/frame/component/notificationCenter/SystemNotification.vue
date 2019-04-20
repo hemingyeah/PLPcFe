@@ -45,7 +45,8 @@
           <div v-if="!moreShow && !loading">没有更多信息了</div>
         </div>
       </div>
-      <div class="system-notification-footer" v-else>暂时没有信息</div>
+      <div class="job-notification-footer" v-else-if="systemPage.list.length == 0 && !loading">暂时没有信息</div>
+      <div class="job-notification-footer" v-else>正在加载...</div>
     </div>
     <system-notification-details
       v-else
@@ -131,7 +132,9 @@ export default {
       try {
         this.systemPage = new Page();
         this.params.pageNum = 1;
+        this.loading = true;
         let systemPage = await NotificationApi.getSystemList(this.params);
+        this.loading = false;
         this.systemPage.merge(Page.as(systemPage.data));
       } catch (error) {
         console.error(error);
@@ -421,8 +424,8 @@ export default {
 }
 .system-notification-footer {
   text-align: center;
-  height: 40px;
-  line-height: 30px;
+  margin-top: 10px;
+  height: 30px;
   color: #8C8989;
 }
 .system-notification-footer-more {

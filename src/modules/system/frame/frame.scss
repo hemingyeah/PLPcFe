@@ -553,8 +553,8 @@ button.export-operate-btn{
 }
 @-webkit-keyframes text-scroll {
   0% {
-    -webkit-transform: translateX(0);
-            transform: translateX(0);
+    -webkit-transform: translateX(450px);
+            transform: translateX(450px);
   }
   100% {
     -webkit-transform: translateX(-100%);
@@ -563,8 +563,8 @@ button.export-operate-btn{
 }
 @keyframes text-scroll {
   0% {
-    -webkit-transform: translateX(0);
-            transform: translateX(0);
+    -webkit-transform: translateX(450px);
+            transform: translateX(450px);
   }
   100% {
     -webkit-transform: translateX(-100%);
