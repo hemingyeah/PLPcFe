@@ -54,8 +54,9 @@
               </el-select>
             </el-form-item>
             <el-form-item label-width="100px" label="选择团队">
-              <biz-team-select v-model="params.tag"/>
-              <!-- <el-select
+              <!-- COMMENT: 暂时去除团队 -->
+              <!-- <biz-team-select v-model="params.tag"/> -->
+              <el-select
                 v-model="params.tagId"
                 @change="modifyUser('tags')"
                 filterable
@@ -72,7 +73,7 @@
                   :label="item.tagName"
                   :value="item.id">
                 </el-option>
-              </el-select> -->
+              </el-select>
             </el-form-item>
             <el-form-item label-width="100px" label="区域">
               <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector" ref="baseDistPicker"></base-dist-picker>

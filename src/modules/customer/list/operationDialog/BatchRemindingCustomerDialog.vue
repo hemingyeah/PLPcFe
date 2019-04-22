@@ -19,6 +19,7 @@
             v-model="form.users"
             :remote-method="searchManager"
             @input="validateUser"
+            multiple
             :error="error"
           ></base-select>
 
@@ -42,7 +43,7 @@
 import _ from 'lodash';
 
 export default {
-  name: "batch-reminding-customer-dialog",
+  name: 'batch-reminding-customer-dialog',
   data: () => {
     return {
       remindTemplate: [],
@@ -72,23 +73,23 @@ export default {
       return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
     },
     remindRule() {
-      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
-      let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
-      let isahead = isAhead ? "前" : "后";
+      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit, } = this.selectedRemind;
+      let unit = periodUnit === 'day' ? '天' : (periodUnit === 'week' ? '周' : '月');
+      let isahead = isAhead ? '前' : '后';
 
       if (!isRepeat){
         if(fieldDisplayName){
           return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
-        }else{
-          return '无'
         }
-      }else{
-        if(period){
-          return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
-        }else{
-          return '无'
-        }
+        return '无'
+        
       }
+      if(period){
+        return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
+      }
+      return '无'
+        
+      
     },
   },
   mounted() {
@@ -145,7 +146,7 @@ export default {
 
       if (this.selectedRemind.isDdResponse) {
         params.isAllLm = 0;
-        params.users = this.form.users;
+        params.users = this.form.users.map(({label, value, phone}) => ({name: label, id: value, phone}))
       } else {
         params.isAllLm = this.form.isAllLm;
         params.users = [];
@@ -169,10 +170,10 @@ export default {
       if (!this.selectedRemind.isDdResponse) {
         this.form.isAllLm = Number(!this.selectedRemind.isDefaultLinkman);
       }
-      this.form.users = _.cloneDeep(users);
+      this.form.users = _.cloneDeep(users).map(({id, name}) => ({label: name, value: id}))
     },
     fetchData() {
-      this.$http.get('/customer/getReminds', {pageSize: 0,})
+      this.$http.get('/customer/getReminds', {pageSize: 0, })
         .then(res => {
           if (!res || res.status) return;
           this.remindTemplate = (res.list || [])
@@ -192,8 +193,8 @@ export default {
           if (!res || !res.list) return;
           if (res.list) {
             res.list = res.list.map(user => Object.freeze({
-              name: user.displayName,
-              id: user.staffId,
+              label: user.displayName,
+              value: user.staffId,
               phone: user.cellPhone,
             }))
           }

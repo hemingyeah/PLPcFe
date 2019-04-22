@@ -1,6 +1,13 @@
 # product
 
-## list
+### list
+
+##### init data
+    - 产品全部字段信息
+    - auth
+    - 短信模板？
+    - 提醒模板？
+    
 
 - [ ] 搜索、高级搜索（高级搜索的字段是固定还是获取）
 - [ ] 发送短信
@@ -15,7 +22,7 @@
 - [ ] 列表-分页，切换数目
 - [ ] 列表-选中清空？
 
-# view
+### view
 
 - [ ] 编辑、删除
 - [ ] 新建工单、新建计划任务、新建事件
@@ -28,7 +35,10 @@
 
 # edit
 
-# fields Setting
+### fields Setting
+
+##### init data
+    - /setting/product/fields 全部字段
 
 
 

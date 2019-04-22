@@ -14,6 +14,55 @@
       </form>
     </div>
 
+    <div class="product-list-section">
+      <!--operation bar start-->
+      <div class="operation-bar-container">
+        <div class="top-btn-group">
+          <base-button type="primary" icon="icon-add" @click="goToCreate">新建</base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu">删除</base-button>
+        </div>
+
+        <div class="action-button-group">
+          <base-button type="plain" @event="openDialog('sendMessage')">发送短信</base-button>
+          <base-button type="plain" @event="openDialog('edit')" >批量编辑</base-button>
+          <base-button type="plain" @event="openDialog('remind')">批量提醒</base-button>
+          <el-dropdown trigger="click">
+            <span class="el-dropdown-link el-dropdown-btn">
+              更多操作
+              <i class="iconfont icon-nav-down"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>
+                <div @click="openDialog('importCustomer')">导入产品</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="exportCustomer(false)">导出</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="exportCustomer(true)">导出全部</div>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="openDialog('update')">批量更新</div>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+          <!--<el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">-->
+            <!--<span class="el-dropdown-link el-dropdown-btn">-->
+              <!--选择列-->
+              <!--<i class="iconfont icon-nav-down"></i>-->
+            <!--</span>-->
+            <!--<el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">-->
+              <!--<el-dropdown-item v-for="item in columns" :key="item.field">-->
+                <!--<el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label" :disabled="item.field == 'name'"/>-->
+              <!--</el-dropdown-item>-->
+            <!--</el-dropdown-menu>-->
+          <!--</el-dropdown>-->
+        </div>
+      </div>
+
+
+    </div>
+
 
 
 
@@ -28,8 +77,17 @@
 </template>
 
 <script>
+
+import { getProduct } from '@src/api/ProductApi'
+
 export default {
   name: 'product-list',
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({}),
+    }
+  },
   data() {
     return {
       advancedSearchPanelShow: false,
@@ -39,7 +97,7 @@ export default {
     }
   },
   mounted() {
-    console.log('product-list mounted')
+
   },
   methods: {
     search() {
@@ -48,16 +106,24 @@ export default {
     resetParams() {
 
     },
+    openDialog() {
+
+    },
+    goToCreate() {
+      window.location = '/product/create';
+    },
   },
 }
 </script>
 
 <style lang="scss">
+  $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
   .product-list-container {
     padding: 10px;
 
   }
 
+  // search
   .product-list-container .product-list-search-group-container {
 
     .advanced-search-function, .base-search {
@@ -168,6 +234,51 @@ export default {
 
     }
 
+  }
+
+
+  .product-list-container .product-list-section {
+    padding-top: 10px;
+  }
+
+  // operation
+  .product-list-container .product-list-section .operation-bar-container {
+    background: #fff;
+    border-radius: 3px 3px 0 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #f2f2f2;
+
+    .top-btn-group .base-button {
+      margin-right: 5px;
+    }
+
+    .action-button-group {
+      .base-button {
+        margin-left: 5px;
+      }
+    }
+
+    .el-dropdown-btn {
+      padding: 0 15px;
+      line-height: 32px;
+      display: inline-block;
+      background: $color-primary-light-9;
+      color: $text-color-primary;
+      outline: none;
+      margin-left: 5px;
+      .iconfont {
+        margin-left: 5px;
+        font-size: 12px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: #fff;
+        background: $color-primary;
+      }
+    }
   }
 
 

@@ -18,8 +18,11 @@
           v-model="form.users"
           :remote-method="searchManager"
           @input="validateUser"
+          multiple
+          clearable
           :error="error"
-        ></base-select>
+        >
+        </base-select>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -42,6 +45,7 @@
 
 <script>
 import _ from 'lodash';
+import Page from '@model/Page';
 
 export default {
   name: 'remind-customer-dialog',
@@ -137,6 +141,7 @@ export default {
           users = this.linkmanListOfCustomer;
         }
       }
+
       this.form.users = _.cloneDeep(users);
     },
     async onSubmit() {
@@ -166,7 +171,7 @@ export default {
             this.$platform.alert(`${actionName}失败，以下客户已存在该提醒：${res.data.join(',')}`);
           }
           if (res.status === 1 && !res.data) {
-            this.$platform.alert(`${actionName}失败${(res.data || res.message) && ('，' + (res.data || res.message))}`);
+            this.$platform.alert(`${actionName}失败${(res.data || res.message) && (`，${ res.data || res.message}`)}`);
           }
           this.remindCustomerDialog = false;
           this.pending = false;
@@ -196,8 +201,8 @@ export default {
           id: this.form.remindId,
         },
         users: (this.form.users || []).map(user => ({
-          id: user.id,
-          name: user.name,
+          id: user.value,
+          name: user.label,
           phone: user.phone,
         }))
       };
@@ -229,10 +234,12 @@ export default {
     searchManager(params) {
       if (!this.selectedRemind.isDdResponse) {
         return Promise.resolve({
+          ...new Page(),
           list: this.linkmanListOfCustomer,
-          pageSize: 10000,
+          pageSize: this.linkmanListOfCustomer.length,
           pageNum: 1,
           total: this.linkmanListOfCustomer.length,
+          hasNextPage: false,
         });
       }
 
@@ -244,8 +251,8 @@ export default {
           if (!res || !res.list) return;
           if (res.list) {
             res.list = res.list.map(user => Object.freeze({
-              name: user.displayName,
-              id: user.staffId,
+              label: user.displayName,
+              value: user.staffId,
               phone: user.cellPhone,
             }))
           }
@@ -265,12 +272,17 @@ export default {
         .then(res => {
           this.linkmanListOfCustomer = res.list
             .map(contact => {
-              return Object.freeze(contact);
+
+              return Object.freeze({
+                ...contact,
+                label: contact.name,
+                value: contact.id,
+              });
             });
           if (this.action === 'create') {
             this.updateFormUser();
           } else {
-            this.form.users = _.cloneDeep(this.editedRemind.users);
+            this.form.users = _.cloneDeep(this.editedRemind.users).map(({id, name}) => ({label: name, value: id}))
           }
         })
         .catch(err => console.error('err', err));

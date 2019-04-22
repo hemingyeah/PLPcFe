@@ -247,7 +247,7 @@ export default {
           // 无团队则任何人都可编辑
           if(tags.length == 0) return true;
 
-          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIds || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
         }, 
         // 个人权限判断

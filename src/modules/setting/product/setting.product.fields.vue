@@ -1,6 +1,6 @@
 <template>
-  <div class="setting-customer">
-    <div class="setting-customer-header">
+  <div class="setting-product">
+    <div class="setting-product-header">
       <div>
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
@@ -9,7 +9,7 @@
       </div>
 
     </div>
-    <div class="setting-customer-design">
+    <div class="setting-product-design">
       <form-design v-model="fields"></form-design>
     </div>
   </div>
@@ -21,7 +21,7 @@ import http from '@src/util/http';
 import platform from '@src/platform'
 
 export default {
-  name: 'setting-customer-fields-view',
+  name: 'setting-product-fields-view',
   props: {
     initData: {
       type: Object,
@@ -46,7 +46,7 @@ export default {
       try {
         let fields = FormUtil.toField(this.fields);
         fields.forEach(item => {
-          item.tableName = 'customer';
+          item.tableName = 'product';
           item.isDelete = 0; // TODO: 待删除
         });
 
@@ -57,7 +57,7 @@ export default {
 
         this.pending = true;
 
-        let result = await http.post('/setting/customer/saveFields', fields);
+        let result = await http.post('/setting/product/saveFields', fields);
         if(result.status == 0){
           platform.alert('客户字段更新成功');
           return window.location.reload()
@@ -116,7 +116,7 @@ body{
   padding: 10px;
 }
 
-.setting-customer{
+.setting-product{
   height: 100%;
   background-color: #fff;
 }
@@ -125,7 +125,7 @@ body{
   margin-right: 12px;
 }
 
-.setting-customer-header{
+.setting-product-header{
   padding: 10px;
   display: flex;
   flex-flow: row nowrap;
@@ -135,7 +135,7 @@ body{
   border-bottom: 1px solid #f4f7f5;
 }
 
-.setting-customer-design{
+.setting-product-design{
   height: calc(100% - 53px);
 }
 

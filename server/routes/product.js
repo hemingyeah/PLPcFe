@@ -9,7 +9,7 @@ router.get('/customer/product_v2', async ctx => {
   let script = ['/product.list.js'];
   let modConfig = modules['product.list'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/customer', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/product/list', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('产品管理', body, script, modConfig.template)
@@ -40,10 +40,20 @@ router.get('/product/template', async ctx => {
   let script = ['/product.template.list.js'];
   let modConfig = modules['product.template.list'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/customer', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/product/template/list', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('产品模板管理', body, script, modConfig.template)
+});
+
+router.get('/product/template/create', async ctx => {
+  let modConfig = modules['product.template.edit'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/product.template.edit.js'];
+  let result = await HttpClient.request('/product/template/create', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('新建产品模板', body, script, modConfig.template)
 });
 
 

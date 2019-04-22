@@ -12,7 +12,16 @@ router.get('/setting/customer/fields', async ctx => {
   let result = await HttpClient.request('/setting/customer/fields', 'get', null, {headers: reqHeaders});
   let body = result.body;
   ctx.body = Template.renderWithHtml('客户设置', body, script, modConfig.template)
-})
+});
+
+router.get('/setting/product/fields', async ctx => {
+  let script = ['/setting.product.fields.js'];
+  let modConfig = modules['setting.product.fields'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request('/setting/product/fields', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  ctx.body = Template.renderWithHtml('产品设置', body, script, modConfig.template)
+});
 
 router.get('/setting/performance/v2/rule', async ctx => {
   let script = ['/setting.performance.rule.js'];

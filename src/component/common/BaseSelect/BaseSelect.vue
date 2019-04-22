@@ -1,23 +1,36 @@
 <template>
   <div class="base-select-container">
-    <!--<div class="content" @focusin="initList" @focusout.prevent="closeList" v-clickoutside="closeList">-->
     <div class="content" v-clickoutside="closeList">
-      <div class="base-select-main-content el-select" @click.stop="focusInput"
-           :class="{'error': error, 'wrapper-is-focus': isFocus, }">
-        <el-tag size="mini" closable v-for="tag in value" :key="tag.id" @close="removeTag(tag)" disable-transitions
-                type="info">
-          {{tag.name}}
+      <div class="base-select-main-content multiple-layout el-select" @click.stop="focusInput" v-if="multiple"
+           :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
+
+        <el-tag size="mini" closable v-for="tag in value" :key="tag.value" @close="removeTag(tag)" disable-transitions type="info">
+          {{tag.label}}
         </el-tag>
-        <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :style="{width: inputWidth, }">
       </div>
+
+      <div class="base-select-main-content" @click.stop="focusInput" v-else
+           :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable,}">
+        {{value.map(tag => tag.label).join('')}}
+      </div>
+
+      <i v-if="clearable && value.length" class="iconfont icon-minus-fill clear-btn" @click="clearValue"></i>
+
       <div class="list-wrapper" v-show="showList">
         <div class="arrow"></div>
-        <ul class="option-list" @scroll="loadMore" ref="list" tabindex="-1">
-          <li v-for="op in page.list" :key="op.id" @click="selectTag(op)"
-              :class="{'selected': value.some(user => user.id ===op.id)}">
-            {{op.name}}
+        <div class="input-container" v-if="!options.length">
+          <input type="text" v-model="keyword" @input="searchByKeyword" ref="input">
+        </div>
+
+        <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
+
+          <li v-for="op in optionList" :key="op.value" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
+            <slot name="option" :option="op" v-if="optionSlot"> </slot>
+            <template v-else>{{op.label}}</template>
+            <div class="checked"></div>
           </li>
-          <li class="list-message">{{message}}</li>
+
+          <li class="list-message" v-if="message">{{message}}</li>
         </ul>
       </div>
     </div>
@@ -26,6 +39,7 @@
 
 <script>
 import Clickoutside from '@src/util/clickoutside';
+import Page from '@model/Page';
 
 /**
  * Todo
@@ -33,9 +47,15 @@ import Clickoutside from '@src/util/clickoutside';
  * 2. 点击空白隐藏列表。✅
  * 3. 配置 key value 的name，还是整理好列表传进来
  * 4. 关闭弹窗没有重置联系人 ✅
+ * 5. 配置多选单选
+ * 6. 配置可一键清空
+ * 7. 配置是否远程搜索
+ * 8. option的自定义
+ * 9. 布局调整，搜索框和列表在一起
+ * 10.
  */
 export default {
-  name: "base-select",
+  name: 'base-select',
   props: {
     remoteMethod: Function,
     value: {
@@ -45,6 +65,13 @@ export default {
     error: {
       type: Boolean,
       default: false,
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
+    clearable: {
+      type: Boolean,
     },
     options: {
       type: Array,
@@ -57,56 +84,38 @@ export default {
       pending: false,
       isFocus: false,
       keyword: '',
-
-      page: {
-        list: [],
-        total: 0,
-        pageSize: 10,
-        pageNum: 1,
-      }
+      loadmoreOptions: {
+        disabled: false,
+        callback: this.loadmore,
+        distance: 10,
+      },
+      page: new Page()
     }
   },
-  watch: {
-  },
   computed: {
-    alreadyLoadedAll() {
-      const {list, total} = this.page;
-      return list.length === total;
+    optionList() {
+      if (this.options.length) return this.options;
+      return this.page.list;
+    },
+    optionSlot() {
+      return !!this.$scopedSlots.option;
     },
     message() {
+      const {total, hasNextPage, } = this.page;
       if (this.pending) {
         return '载入更多结果......';
       }
-      if (this.page.total === 0) {
+      if (!total) {
         return '未找到结果';
       }
-      if (this.alreadyLoadedAll) {
+      if (!hasNextPage) {
         return '已加载全部结果';
       }
       return '载入更多结果......';
     },
-    inputWidth() {
-      if (!this.showList) return '0px';
-      if (!this.keyword) return '10px';
-      const arr = this.keyword.split('');
-      let width = 4;
-      arr.forEach(character => {
-
-        if (/[\u4E00-\u9FA5]/g.test(character)) {
-          width += 17;
-        }
-        if (/[A-Za-z0-9]/g.test(character)) {
-          width += 10;
-        }
-      });
-      return `${width}px`;
-    }
-  },
-  mounted() {
   },
   methods: {
     focusInput() {
-      this.$refs.input.focus();
       this.isFocus = true;
       this.initList();
     },
@@ -116,40 +125,65 @@ export default {
       this.pending = true;
       this.resetStatus('');
     },
+    clearValue() {
+      this.$emit('input', []);
+    },
     removeTag(tag) {
-      const newVal = this.value.filter(t => t.id !== tag.id);
+      const newVal = this.value.filter(t => t.value !== tag.value);
       this.$emit('input', newVal);
     },
     selectTag(tag) {
       let newValue = this.value;
-      if (this.value.every(t => t.id !== tag.id)) {
-        newValue.push(tag);
+
+      if (!this.multiple) {
+        newValue = [tag];
+        this.showList = false;
+        this.resetStatus();
+
       } else {
-        newValue = newValue.filter(t => t.id !== tag.id);
+        if (this.value.every(t => t.value !== tag.value)) {
+          newValue.push(tag);
+        } else {
+          newValue = newValue.filter(t => t.value !== tag.value);
+        }
       }
 
       this.$emit('input', newValue);
-      this.showList = false;
-      this.resetStatus();
+    },
+    async loadmore(){
+      this.loadmoreOptions.disabled = true;
+      this.loading = true;
+
+      try {
+        this.page.pageNum += 1;
+        const res = await this.search();
+        this.page.merge(res);
+      } catch (e) {
+        console.error('e', e);
+      }
     },
     search() {
       if (!this.remoteMethod) return;
-      const {pageNum, pageSize,} = this.page;
+      const {pageNum, pageSize, } = this.page;
       return this.remoteMethod({
         keyword: this.keyword,
         pageNum,
         pageSize,
       })
+        .then(res => {
+          this.pending = false;
+          this.loadmoreOptions.disabled = res ? !res.hasNextPage : false;
+          return res;
+        })
     },
     searchByKeyword(e) {
       this.resetStatus(e.target.value);
       this.pending = true;
       this.search()
         .then(res => {
-          this.pending = false;
           if (!res || !res.list) return;
           this.$refs.list.scrollTop = 0;
-          this.updatePageData(res);
+          this.page = Page.as(res);
         })
         .catch(e => {
           console.log('searchByKeyword catch e', e)
@@ -158,55 +192,21 @@ export default {
     initList() {
       this.pending = true;
       this.showList = true;
+
       this.search()
         .then(res => {
-          this.pending = false;
           if (!res || !res.list) return;
-          this.updatePageData(res);
+          this.$refs.input.focus();
+
+          this.page = Page.as(res);
         })
         .catch(e => {
           console.log('initList catch e', e)
         });
     },
-    loadMore(e) {
-      const dom = e.target;
-      const clientHeight = dom.clientHeight;
-      const scrollTop = dom.scrollTop;
-      const scrollHeight = dom.scrollHeight;
-
-      if (this.pending) return;
-      if (scrollTop + clientHeight < scrollHeight) return;
-      if (this.alreadyLoadedAll) return;
-      this.page.pageNum++;
-      this.pending = true;
-      this.search()
-        .then(res => {
-          this.pending = false;
-          if (!res || !res.list) return;
-          res.list = [...this.page.list, ...res.list];
-          this.updatePageData(res);
-        })
-        .catch(e => {
-          console.log('loadMore catch e', e)
-        });
-    },
-    updatePageData(source) {
-      const {list, pageSize, pageNum, total,} = source;
-      this.page = {
-        list,
-        total,
-        pageSize,
-        pageNum,
-      }
-    },
     resetStatus(keyword) {
       this.keyword = keyword || '';
-      this.page = {
-        list: [],
-        total: 0,
-        pageSize: 10,
-        pageNum: 1,
-      }
+      this.page = new Page();
     },
   },
   directives: { Clickoutside },
@@ -219,21 +219,39 @@ export default {
   .base-select-container {
     position: relative;
 
+    .content {
+      position: relative;
+      &:hover {
+        .clear-btn {
+          display: block;
+        }
+      }
+
+      .clear-btn {
+        position: absolute;
+        display: none;
+        top: 50%;
+        right: 4px;
+        transform: translateY(-50%);
+        font-size: 12px;
+        color: #c0c4cc;
+
+        &:hover {
+          cursor: pointer;
+          color: #909399;
+        }
+      }
+    }
+
     .base-select-main-content {
 
       display: flex;
       flex-wrap: wrap;
       border: 1px solid #e0e1e2;
       border-radius: 2px;
-
-      input {
-        border: none;
-        padding: 0 2px;
-        margin: 0;
-        line-height: 30px;
-        flex-shrink: 1;
-        flex-grow: 1;
-      }
+      padding: 0 10px;
+      min-height: 32px;
+      line-height: 30px;
 
       .el-tag {
         margin: 5px 2px 0px;
@@ -242,6 +260,14 @@ export default {
 
     .wrapper-is-focus {
       border-color: $color-primary;
+    }
+
+    .multiple-layout {
+      padding-bottom: 5px;
+    }
+
+    .clearable-layout {
+      padding-right: 20px;
     }
 
     .error.base-select-main-content {
@@ -253,6 +279,9 @@ export default {
       left: 0;
       top: calc(100% + 13px);
       width: 100%;
+      padding-top: 34px;
+      box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
+      background: #fff;
 
       .arrow {
         position: absolute;
@@ -264,15 +293,32 @@ export default {
         border-right: 5px solid transparent;
         border-bottom: 7px solid white;
       }
+
+      .input-container {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+        padding: 0 10px;
+        line-height: 34px;
+
+
+        input {
+          width: 100%;
+          margin: 2px 0;
+          padding: 0 5px;
+          height: 26px;
+          line-height: 26px;
+        }
+      }
+
     }
 
     .option-list {
-      background: #fff;
       max-height: 200px;
       overflow: auto;
       padding: 0;
       margin: 0;
-      box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
 
       &::-webkit-scrollbar-track {
         background-color: white;
@@ -283,12 +329,26 @@ export default {
         background-color: rgba(144, 147, 153, 0.3);
       }
 
+
       li {
         list-style: none;
-        padding: 0 20px;
+        padding: 0 10px;
         line-height: 34px;
+        position: relative;
         &:hover {
           background: $color-primary-light-9;
+        }
+
+        .checked {
+          display: none;
+          position: absolute;
+          right: 5px;
+          top: calc(50% - 4px);
+          width: 10px;
+          height: 5px;
+          border-left: 1px solid $color-primary;
+          border-bottom: 1px solid $color-primary;
+          transform: rotateZ(-45deg);
         }
       }
 
@@ -300,7 +360,11 @@ export default {
 
       li.selected {
         color: $color-primary;
-        font-weight: 700;
+        /*font-weight: 700;*/
+
+        .checked {
+          display: block;
+        }
       }
 
       .list-message {
