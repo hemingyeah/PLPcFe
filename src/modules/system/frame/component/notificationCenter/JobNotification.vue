@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 <template>
   <div class="job-notification">
     <div class="job-notification-header">
@@ -31,7 +30,7 @@
     <div class="job-notification-content" v-if="notificationPage.list.length != 0">
       <job-notification-item
         v-for="(item, index) in notificationPage.list"
-        :key="index"
+        :key="item.id - 0"
         :info="item"
         :index="index"
         @getInfo="getInfo"
@@ -117,10 +116,6 @@ export default {
         value: 'notice',
         label: '通知公告'
       }],
-      // , {
-      //   value: 10,
-      //   label: '关注'
-      // }],
       dataOption: '',
       dataOptions: [{
         value: null,
@@ -147,6 +142,7 @@ export default {
     this.getInfo();
   },
   methods: {
+    /** 将选择的时间格式化 */
     getTime (value) {
       this.dataOption = value;
 
@@ -189,6 +185,8 @@ export default {
       this.params.source = val;
       this.getInfo();
     },
+
+    /** 设置为全部已读 */
     async setReaded () {
       try {
         if(this.info.workMsg == 0) {
@@ -198,18 +196,20 @@ export default {
           }
           return;
         }
-        let params = {
-          type: 'work'
-        };
         this.btnShow = !this.btnShow;
         if(this.btnShow) {
           if(await platform.confirm('确定要将所有信息标记为已读？')) {
-            await NotificationApi.haveRead(params);
-            this.getInfo();
-            this.btnStyle = {
-              'border': '5px solid #55B7B4'
+            let params = {
+              type: 'work'
+            };
+            let result = await NotificationApi.haveRead(params);
+            if(result.status == 0) {
+              this.getInfo();
+              this.btnStyle = {
+                'border': '5px solid #55B7B4'
+              }
+              this.$emit('clearNum', 'work');
             }
-            this.$emit('clearNum', 'work');
           }
         } else {
           this.btnStyle = {
@@ -220,25 +220,34 @@ export default {
         console.error(error);
       }
     },
+
+    /** 获取信息，刷新列表 */
     async getInfo () {
       try {
-        this.notificationPage = new Page();
+        this.notificationPage.list = [];
         this.params.pageNum = 1;
         this.loading = true;
         let notificationPage = await NotificationApi.getJobList(this.params);
+        if(notificationPage.status == 0) {
+          this.notificationPage.merge(Page.as(notificationPage.data));
+          this.getNum();
+        }
         this.loading = false;
-        this.notificationPage.merge(Page.as(notificationPage.data));
       } catch(error) {
         console.error(error);
       }
     },
+
+    /** 分页处理 */
     async getMore () {
       try {
         this.params.pageNum++;
         this.loading = true;
         let notificationPage = await NotificationApi.getJobList(this.params);
+        if(notificationPage.status == 0) {
+          this.notificationPage.merge(Page.as(notificationPage.data));
+        }
         this.loading = false;
-        this.notificationPage.merge(Page.as(notificationPage.data));
       } catch(error) {
         console.error(error);
       }
@@ -248,11 +257,28 @@ export default {
     },
     deleteItem (info, index) {
       this.notificationPage.list.splice(index, 1);
+      if(info.readed == 0) {
+        this.$emit('clearNum', 'work', 1);
+      }
+    },
+    getNum () {
+      let count = 0;
+      if(this.notificationPage.list[0].readed == 0) {
+        this.notificationPage.list.forEach(item => {
+          if(item.readed == 0) {
+            count++;
+          }
+        })
+        this.$emit('getNum', count);
+      }
     }
   },
   computed: {
+    /** ture：显示加载更多按钮
+     *  false：不显示
+     */
     moreShow () {
-      return !(this.params.pageSize * this.params.pageNum >= this.notificationPage.total);
+      return this.notificationPage.hasNextPage;
     }
   }
 }

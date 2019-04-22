@@ -31,6 +31,7 @@ export default {
     index: Number
   },
   methods: {
+    /** 删除通知 */
     async deleteItem (info) {
       try {
         let params = {
@@ -38,44 +39,20 @@ export default {
           id: info.id
         }
         if(await platform.confirm('确定要删除该信息吗？')) {
-          await NotificationApi.deleteNotification(params);
-          this.$emit('deleteItem', info, this.index)
+          let result = await NotificationApi.deleteNotification(params);
+          if(result.status == 0) {
+            this.$emit('deleteItem', info, this.index)
+          }
         }
       } catch (error) {
         console.error(error)
       }
     },
+
+    /** 打开工作通知详情页 */
     async toJobNotificationDetails (info) {
       try {
-        let itemId = '';
-        switch (info.source) {
-        case 'task':
-          itemId = `taskView_${info.primaryId}`;
-          break;
-        case 'event':
-          itemId = 'M_SERVICE_PROJECT';
-          break;
-        case 'spare':
-          itemId = 'M_VIP_SPAREPART_RECORD';
-          break;
-        case 'approve':
-          itemId = '';
-          break;
-        case 'daily':
-          itemId = '';
-          break;
-        case 'timing':
-          itemId = '';
-          break;
-        case 'authority':
-          itemId = '';
-          break;
-        case 'notice':
-          itemId = '';
-          break;
-        default:
-          itemId = '';
-        }
+        let itemId = this.getId(info);
         this.$platform.openTab({
           id: itemId,
           title: '正在查询',
@@ -87,13 +64,21 @@ export default {
             type: 'work',
             id: info.id
           }
-          await NotificationApi.haveRead(params);
-          this.info.readed = 1;
-          this.$emit('clearNum');
+          let result = await NotificationApi.haveRead(params);
+          if(result.status == 0) {
+            info.readed = 1;
+            this.$emit('clearNum', 'work', 1);
+          }
         }
       } catch (error) {
         console.error(error);
       }
+    },
+    getId (info) {
+      if(info.pcUrl.indexOf('/task/view/') != -1) return `taskView_${info.primaryId}`;
+      if(info.pcUrl.indexOf('/partV2/repertory/record') != -1) return 'M_VIP_SPAREPART_RECORD';
+      if(info.pcUrl.indexOf('/event/view/') != -1) return 'M_SERVICE_PROJECT';
+      return 'PcUrl';
     }
   }
 }

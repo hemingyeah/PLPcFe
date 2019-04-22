@@ -161,7 +161,7 @@
 
     <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
-    <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum"></notification-center>
+    <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum" @getNum="getNum"></notification-center>
   </div>
 </template>
 
@@ -194,7 +194,7 @@ export default {
     return {
       notificationInfo: {},
       notification: {
-        count: 0
+        count: 0,
       },
       systemMsg: '',
       notificationShow: false,
@@ -393,44 +393,53 @@ export default {
     async getSystemMsg () {
       try {
         let info = await NotificationApi.getSystemMessage();
-        this.notificationInfo = info.data;
-        this.notification.count = info.data.systemMsg + info.data.workMsg;
-        this.notification.title = info.data.msgSystem.title;
-        this.systemMsg = localStorage.getItem('shb_systemMsg');
-        
-        if(this.notification.title) {
-          if(this.systemMsg) {
-            if(this.systemMsg != this.notificationInfo.msgSystem.id){
-              this.notificationShow = true;
-              this.setAnimation();
-            } else {
-              this.notificationShow = false;
-            }
+        if(info.status == 0) {
+          this.notificationInfo = info.data;
+          this.notification.count = info.data.systemMsg + info.data.workMsg;
+          let systemMsg = localStorage.getItem('shb_systemMsg');
+
+          if(info.data.msgSystem) {
+            this.notification.title = info.data.msgSystem.title;
           } else {
-            this.notificationShow = true;
-            this.setAnimation();
+            this.notification.title = null;
+          }
+
+          if(this.notification.id) {
+            this.notificationShow = (systemMsg == null || systemMsg != this.notificationInfo.msgSystem.id);
+            if(this.notificationShow) this.setAnimation();
           }
         }
-        
       } catch (error) {
         console.error(error);
       }
     },
+
+    /** 设置滚动动画 */
     setAnimation () {
       this.$nextTick(() => {
         let textWidth = this.$refs.notificationText.offsetWidth;
         let infoWidth = this.$refs.notificationInfo.offsetWidth;
         if(textWidth > infoWidth) {
-          let time = this.notification.title.length / 2;
-          this.$refs.notificationContent.style.animation = `text-scroll ${time / 2}s linear infinite`;
+          let time = this.notification.title.length / 4;
+          this.$refs.notificationContent.style.animation = `text-scroll ${time}s linear infinite`;
         }
       })
     },
     clearAnimation () {
       this.$refs.notificationContent.style.animation = '';
     },
-    clearNum (num) {
-      this.notification.count = num;
+
+    /** 删除未读消息或消息已读后更新新通知数量 */
+    clearNum (val, n) {
+      if(val == 'system') {
+        this.notificationInfo.systemMsg = (n == 1 ? --this.notificationInfo.systemMsg : 0);
+      } else if (val == 'work') {
+        this.notificationInfo.workMsg = (n == 1 ? --this.notificationInfo.workMsg : 0);
+      }
+      this.notification.count = this.notificationInfo.systemMsg + this.notificationInfo.workMsg;
+    },
+    getNum () {
+      this.getSystemMsg();
     }
   },
   created(){

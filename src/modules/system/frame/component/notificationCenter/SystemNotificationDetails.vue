@@ -30,7 +30,7 @@ export default {
     close () {
       this.$emit('back');
     },
-    async deleteItem () {
+    deleteItem () {
       this.$emit('deleteItem', this.info, this.index);
       this.$emit('back');
     }

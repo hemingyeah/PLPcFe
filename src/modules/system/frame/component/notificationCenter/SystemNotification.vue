@@ -24,7 +24,7 @@
       <div class="system-notification-content" v-if="systemPage.list.length != 0">
         <div class="system-notification-item" 
              v-for="(item, index) in systemPage.list"
-             :key="index">
+             :key="item.id - 0">
           <div class="system-notification-item-header">
             <span class="system-notification-item-new" v-if="item.readed == 0"></span>
             <span>{{ item.title }}</span>
@@ -85,7 +85,7 @@ export default {
         'border': '5px solid #eaeaea'
       },
       params: {
-        pageSize: 2,
+        pageSize: 20,
         pageNum: 1
       },
       systemOption: '',
@@ -128,18 +128,23 @@ export default {
     this.getInfo();
   },
   methods: {
+    /** 获取信息，刷新列表 */
     async getInfo () {
       try {
-        this.systemPage = new Page();
+        this.systemPage.list = [];
         this.params.pageNum = 1;
         this.loading = true;
         let systemPage = await NotificationApi.getSystemList(this.params);
+        if(systemPage.status == 0) {
+          this.systemPage.merge(Page.as(systemPage.data));
+        }
         this.loading = false;
-        this.systemPage.merge(Page.as(systemPage.data));
       } catch (error) {
         console.error(error);
       }
     },
+
+    /** 删除单个通知 */
     async deleteItem (info, index) {
       try {
         let params = {
@@ -147,13 +152,20 @@ export default {
           id: info.id
         }
         if(await platform.confirm('确定要删除该信息吗？')) {
-          await NotificationApi.deleteNotification(params);
-          this.systemPage.list.splice(index, 1);
+          let result = await NotificationApi.deleteNotification(params);
+          if(result.status == 0) {
+            this.systemPage.list.splice(index, 1);
+          }
+        }
+        if(info.readed == 0) {
+          this.$emit('clearNum', 'system', 1);
         }
       } catch (error) {
         console.error(error);
       }
     },
+
+    /** 打开系统通知详情页 */
     async toSystemNotificationDetail (info, index) {
       try {
         this.detailInfo = info;
@@ -164,10 +176,11 @@ export default {
             type: 'system',
             id: info.id
           }
-          await NotificationApi.haveRead(params);
-          info.readed = 1;
-          this.getInfo();
-          this.$emit('clearNum', 'system', 1)
+          let result = await NotificationApi.haveRead(params);
+          if(result.status == 0) {
+            info.readed = 1;
+            this.$emit('clearNum', 'system', 1)
+          }
         }
       } catch (error) {
         console.error(error);
@@ -181,6 +194,8 @@ export default {
       this.params.source = value;
       this.getInfo();
     },
+
+    /** 格式化选择的时间 */
     getTime (value) {
       this.dataOption = value;
 
@@ -211,8 +226,9 @@ export default {
 
       this.params.startTime = startTime;
       this.params.endTime = endTime;
-      this.getInfo();
     },
+
+    /** 将系统通知全部设为已读 */
     async setReaded () {
       try {
         if(this.info.systemMsg == 0) {
@@ -247,21 +263,28 @@ export default {
         console.error(error);
       }
     },
+
+    /** 分页操作 */
     async getMore () {
       try {
         this.params.pageNum++;
         this.loading = true;
         let systemPage = await NotificationApi.getSystemList(this.params);
+        if(systemPage.status == 0) {
+          this.systemPage.merge(Page.as(systemPage.data));
+        }
         this.loading = false;
-        this.systemPage.merge(Page.as(systemPage.data));
       } catch(error) {
         console.error(error);
       }
     }
   },
   computed: {
+    /** ture：显示加载更多按钮
+     *  false：不显示
+     */
     moreShow () {
-      return !(this.params.pageSize * this.params.pageNum >= this.systemPage.total);
+      return this.systemPage.hasNextPage;
     }
   }
 }

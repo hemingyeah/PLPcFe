@@ -31,7 +31,7 @@
     </div>
 
     <keep-alive>
-      <component :is="component" :info="info" @clearNum="clearNum"></component>
+      <component :is="component" :info="info" @clearNum="clearNum" @getNum="getNum"></component>
     </keep-alive>
   </base-panel>
 </template>
@@ -63,22 +63,12 @@ export default {
       this.show = true;
     },
     clearNum (val, n) {
-      if(val == 'system') {
-        if(n == 1) {
-          this.info.systemMsg--;
-        } else {
-          this.info.systemMsg = 0;
-        }
-      } else if (val == 'work') {
-        if(n == 1) {
-          this.info.workMsg--;
-        } else {
-          this.info.workMsg = 0;
-        }
+      this.$emit('clearNum', val, n);
+    },
+    getNum (count) {
+      if(this.info.workMsg < count) {
+        this.$emit('getNum');
       }
-
-      let num = this.info.systemMsg + this.info.workMsg;
-      this.$emit('clearNum', num);
     }
   }
 }
