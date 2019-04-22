@@ -15,6 +15,7 @@ const openRouter = require('./open')
 const settingRouter = require('./setting')
 const teamRouter = require('./team')
 const performanceRouter = require('./performance');
+const productRouter = require('./product');
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -81,12 +82,13 @@ router.get('/customer/createOnEvent', async ctx => {
   ctx.redirect('/customer/create/event');
 });
 
-router.use("", performanceRouter.routes())
+router.use('', performanceRouter.routes())
 
-router.use("", customerRouter.routes(), customerRouter.allowedMethods())
-router.use("", openRouter.routes(), openRouter.allowedMethods())
-router.use("", settingRouter.routes(), settingRouter.allowedMethods())
-router.use("", teamRouter.routes(), teamRouter.allowedMethods())
+router.use('', customerRouter.routes(), customerRouter.allowedMethods())
+router.use('', openRouter.routes(), openRouter.allowedMethods())
+router.use('', settingRouter.routes(), settingRouter.allowedMethods())
+router.use('', teamRouter.routes(), teamRouter.allowedMethods())
+router.use('', productRouter.routes(), productRouter.allowedMethods());
 router.all('/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;

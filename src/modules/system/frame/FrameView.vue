@@ -37,6 +37,7 @@
                 <a href="javascript:;" @click="clearStorage">清空缓存</a>
                 <a href="javascript:;" @click="openDemo">demo</a>
                 <a href="javascript:;" @click="goRoleTeam">团队管理</a>
+                <a href="javascript:;" @click="goProductTemplate">产品模板</a>
               </div>
             </el-popover>
         
@@ -393,9 +394,9 @@ export default {
     },
     goRoleTeam() {
       platform.openTab({
-        id: 'team',
-        title: '团队管理',
-        url: '/team/manage',
+        id: "team",
+        title: "团队管理",
+        url: "/security/tag",
         reload: true
       });
     },
@@ -459,6 +460,14 @@ export default {
     },
     getNum () {
       this.getSystemMsg();
+    },
+    goProductTemplate() {
+      platform.openTab({
+        id: "product_template",
+        title: "产品模板列表",
+        url: "/product/template",
+        reload: true,
+      });
     }
   },
   created(){
