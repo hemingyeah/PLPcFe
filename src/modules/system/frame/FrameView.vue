@@ -38,6 +38,7 @@
                 <a href="javascript:;" @click="openDemo">demo</a>
                 <a href="javascript:;" @click="goRoleTeam">团队管理</a>
                 <a href="javascript:;" @click="goProductTemplate">产品模板</a>
+                <a href="javascript:;" @click="goProduct">产品管理</a>
               </div>
             </el-popover>
         
@@ -463,9 +464,17 @@ export default {
     },
     goProductTemplate() {
       platform.openTab({
-        id: "product_template",
-        title: "产品模板列表",
-        url: "/product/template",
+        id: 'product_template',
+        title: '产品模板列表',
+        url: '/product/template',
+        reload: true,
+      });
+    },
+    goProduct() {
+      platform.openTab({
+        id: 'product_template',
+        title: '产品管理',
+        url: '/customer/product_v2',
         reload: true,
       });
     }

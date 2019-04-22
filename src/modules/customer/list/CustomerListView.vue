@@ -717,7 +717,6 @@ export default {
         fromId
       })
 
-      //this.viewCustomer();
     },
     revertSearchParams() {
       const localStorageData = this.getLocalStorageData();

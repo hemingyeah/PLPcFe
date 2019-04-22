@@ -5,7 +5,7 @@ const Template = require('../util/Template')
 const router = new KoaRouter();
 const modules = require('../../config/modules');
 
-router.get('/product', async ctx => {
+router.get('/customer/product_v2', async ctx => {
   let script = ['/product.list.js'];
   let modConfig = modules['product.list'];
   let reqHeaders = ctx.request.headers;
