@@ -52,7 +52,7 @@ const Modes = {
 }
 
 const FormFieldMap = {};
-const PreivewComponents = {};
+const PreviewComponents = {};
 const SettingComponents = {};
 const BuildComponents = {};
 
@@ -72,7 +72,7 @@ for(let i = 0; i < FormFields.length; i++){
     let previewComp = formField.component.preview;
     let buildComp = formField.component.build;
 
-    PreivewComponents[previewComp.name] = previewComp; 
+    PreviewComponents[previewComp.name] = previewComp; 
     SettingComponents[settingComp.name] = settingComp;
     BuildComponents[buildComp.name] = buildComp;
 
@@ -103,7 +103,7 @@ export {
   FormFields,
   FormFieldMap,
   Modes,
-  PreivewComponents,
+  PreviewComponents,
   SettingComponents,
   BuildComponents
 }

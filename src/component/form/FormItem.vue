@@ -19,8 +19,16 @@ export default {
   name: 'form-item',
   props: {
     label: String,
-    validation: Boolean, //是否开启验证
-    validator: Function, //自定义验证方法
+    validation: Boolean, // 是否开启验证
+    validator: Function, // 自定义验证方法
+    /** 获取根元素（FormBuilder）的dom对象 */
+    findRootEl: {
+      type: Function,
+      default(){
+        let parent = this.$parent;
+        return parent && parent.$el;
+      }
+    },
 
     /** @deprecated  远程验证配置对象，使用validator替代 */
     remote: Object
@@ -29,7 +37,7 @@ export default {
     return {
       field: {},
       errMessage: '',
-      valueFn: null, //function 用于获取注册字段的值
+      valueFn: null, // function 用于获取注册字段的值
       status: false // true 代表正在验证
     }
   },
@@ -70,7 +78,7 @@ export default {
       this.validate()
     }, 500),
     validateHandler(event) {
-      event.stopPropagation(); //阻止事件继续冒泡
+      event.stopPropagation(); // 阻止事件继续冒泡
       if(this.validation) {
         this.needRemoteValidation 
           ? this.delayValidate()
@@ -86,7 +94,13 @@ export default {
     },
     removeFieldHandler(event) {
       if(!this.validation) return event.stopPropagation();
-
+      /** 此处因为dom 会被移出document, 所以事件不会冒泡至 FormBuilder组件中, 需要手动触发 */
+      let rootEl = this.findRootEl()
+      if(null != rootEl) {
+        let params = event.detail;
+        let e = new CustomEvent('form.remove.field', {detail: params, bubbles: true})
+        rootEl.dispatchEvent(e);  
+      }
       this.valueFn = null;
     },
     changeStatus(value){

@@ -1,5 +1,5 @@
 <template>
-  <div class="form-sparator">
+  <div class="form-separator">
     <span>{{field.displayName || ''}}</span>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
 </script>
 
 <style lang="scss">
-.form-sparator{
+.form-separator{
   height: 30px;
   line-height: 30px;
   margin: 20px 0;

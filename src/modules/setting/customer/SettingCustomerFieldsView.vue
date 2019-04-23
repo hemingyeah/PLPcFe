@@ -30,7 +30,8 @@ export default {
   },
   data(){
     let fields = this.initData.fields || [];
-    let sortedFields = fields.sort((a,b) => a.orderId - b.orderId);
+    let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+    
     return {
       fields: FormUtil.toFormField(sortedFields),
       pending: false
@@ -42,12 +43,11 @@ export default {
     },
     async submit(){
       // TODO: 字段验证
-
       try {
         let fields = FormUtil.toField(this.fields);
+
         fields.forEach(item => {
           item.tableName = 'customer';
-          item.isDelete = 0; // TODO: 待删除
         });
 
         const validateRes = this.validate(fields);
@@ -59,7 +59,11 @@ export default {
 
         let result = await http.post('/setting/customer/saveFields', fields);
         if(result.status == 0){
-          platform.alert('客户字段更新成功');
+          platform.notification({
+            type: 'success',
+            title: '成功',
+            message: '客户字段更新成功'
+          })  
           return window.location.reload()
         }
         platform.alert(result.message)

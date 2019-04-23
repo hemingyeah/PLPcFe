@@ -1,3 +1,5 @@
+export * from './string'
+
 import DateUtil from './date';
 
 const MAX_SAFE_INTEGER = 9007199254740991;

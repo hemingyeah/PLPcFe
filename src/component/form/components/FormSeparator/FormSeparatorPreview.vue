@@ -1,12 +1,12 @@
 <template>
   <div class="form-preview-group" @click="choose">
-    <div class="form-design-sparator"><span v-if="field.displayName">{{field.displayName}}</span></div>
+    <div class="form-design-separator"><span v-if="field.displayName">{{field.displayName}}</span></div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'form-sparator-preview',
+  name: 'form-separator-preview',
   props: {
     field: {
       type: Object,
@@ -26,7 +26,7 @@ export default {
 </script>
 
 <style lang="scss">
-.form-design-sparator{
+.form-design-separator{
   background-color: #eef8f8;
   color: #55B7B4;
   height: 30px;

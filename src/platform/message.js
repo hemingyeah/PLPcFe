@@ -31,9 +31,23 @@ export function confirm(message = '', title = '提示'){
 
 /** 
  * 全局通知消息
- * message选项可以传入vnode
+ * 
  * ```javascript
+ * //传入内容
  * notification({
+ *  title: 'title',
+ *  message: '提示信息'
+ * })
+ * 
+ * //传入html
+ * notification({
+ *  title: 'title',
+ *  content: '<div>提示信息</div>'
+ * })
+ * 
+ * //传入VNode
+ * notification({
+ *   title: 'title',
  *   message: (function(h){
  *     return <div>hello world</div>
  *   })(this.$createElement)
@@ -52,7 +66,7 @@ export function notification(params = {}){
 
   let opt = {};
 
-  // content会覆盖message选项 
+  // content 会覆盖message选项 
   if(params.content) {
     opt.message = params.content;
     opt.dangerouslyUseHTMLString = true;

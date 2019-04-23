@@ -10,17 +10,10 @@
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
       <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
-      <!-- <label><input type="checkbox" :checked="field.isNull == 0" @input="update" data-prop="isNull"> 必填</label>
-      <label title="勾选后该字段可在高级搜索中查询" v-tooltip>
-        <input type="checkbox" :checked="field.isSearch == 1" @input="update" data-prop="isSearch"> 搜索
-      </label> -->
     </div>
     <h3>
       选项设置
-      <el-checkbox :disabled="!!field.fieldName" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
-      <!-- <label class="form-select-setting-isMulti">
-        <input type="checkbox" :checked="field.isMulti" @input="update" data-prop="isMulti"> 多选
-      </label> -->
+      <el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
     </h3>
     <div class="form-select-setting-list">
       <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
@@ -39,6 +32,7 @@
     <div class="form-select-setting-operation">
       <button type="button" class="btn-text" @click="addOption">增加选项</button>
       <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
+      <button type="button" class="btn-text" @click="showLogicalModal" v-if="allowLogical">配置显示逻辑</button>
     </div>
 
     <base-modal 
@@ -54,15 +48,18 @@
       </template>
     </base-modal>
 
+    <logical-field-modal v-if="!field.isMulti" @submit="updateDependencies" ref="logical" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
 import Platform from '@src/platform';
+import LogicalFieldModal from './components/LogicalFieldModal'
 
 const MAX_OPTION_NUM = 50;
 const MAX_OPTION_TEXT_NUM = 20;
+const DISABLE_LOGICAL_FIELD = ['separator']
 
 export default {
   name: 'form-select-setting',
@@ -74,22 +71,53 @@ export default {
     setting: {
       type: Object,
       default: () => ({})
-    }
+    },
+    /** 用于获取FormDesign实例 */
+    getContext: Function
   },
   computed: {
     options(){
       return this.field.options || [];
+    },
+    /** 
+     * 满足以下条件允许配置显示逻辑：
+     * 1. 单选
+     * 2. 不是最后一个非分割线类型的非系统字段
+     */
+    allowLogical(){
+      if(this.field.isMulti) return false;
+
+      let context = this.getContext();
+      let fields = context.value;
+
+      let currIndex = fields.findIndex(f => f.fieldName == this.field.fieldName);
+
+      for(let i = fields.length - 1; i > currIndex; i--){
+        let field = fields[i];
+        if(field.isSystem == 0 && DISABLE_LOGICAL_FIELD.indexOf(field.formType) < 0){
+          return true;
+        }
+      }
+
+      return false;
     }
   },
   data(){
     return {
       index: this.field.options.length,
       batchModalShow: false, 
-      optionText: '', //批量编辑文本
+      optionText: '', // 批量编辑文本
       errMessage: null
     }
   },
   methods: {
+    updateDependencies(val){
+      this.$emit('input', {prop: 'dependencies', value: val, operate: 'update'})
+    },
+    showLogicalModal(){
+      let context = this.getContext();
+      this.$refs.logical.showModal(this.field, context.value);
+    },
     updateForDom(event){
       let el = event.target;
       let prop = el.dataset.prop;
@@ -99,7 +127,7 @@ export default {
     },
     update(value, prop){
       if(prop == 'isMulti') {
-        //如果是多选，清空默认值
+        // 如果是多选，清空默认值
         this.options.forEach(item => item.isDefault = false);
         this.$emit('input', {value: this.options, prop: 'options'})
         this.$emit('input', {value: null, prop: 'defaultValue'});
@@ -114,7 +142,7 @@ export default {
       this.index++;
 
       options.push({
-        value: '选项' + this.index,
+        value: `选项${ this.index }`,
         isDefault: false
       })
 
@@ -123,15 +151,16 @@ export default {
     delOption(option, index){
       if(this.options.length <= 1) return alert('至少保留一个选项')
 
-      //如果是删除默认值，清空默认值
+      // 如果是删除默认值，清空默认值
       if(option.isDefault) this.$emit('input', {value: null, prop: 'defaultValue'});
 
       let options = _.cloneDeep(this.options);
       options.splice(index, 1);
 
       this.$emit('input', {value: options, prop: 'options'})
+      this.$emit('input', {value: this.field, prop: 'dependencies', operate: 'delete'})
     },
-    //设置默认值
+    // 设置默认值
     setDefaultOption(option){
       if(this.field.isMulti) return Platform.alert('多选暂不支持设置默认值');
       if(!option.value) return Platform.alert('请先补全选项');
@@ -157,17 +186,17 @@ export default {
       if(!options[options.length - 1]) options = options.slice(0, -1);
 
       let message = [];
-      //验证数量
+      // 验证数量
       if(options.length > MAX_OPTION_NUM){
         message.push(`选项数量不能超过${MAX_OPTION_NUM}`);
       }
 
-      //是否有空白项
+      // 是否有空白项
       if(options.some(item => !item)){
-        message.push(`不能存在空白项`);
+        message.push('不能存在空白项');
       }
 
-      //验证每一项长度
+      // 验证每一项长度
       let errIndex = options.map((item, index) => item.length > MAX_OPTION_TEXT_NUM ? index + 1 : -1).filter(item => item != -1);
       if(errIndex.length > 0){
         message.push(`第${errIndex.join('，')}行字数超过${MAX_OPTION_TEXT_NUM}字`);
@@ -182,7 +211,7 @@ export default {
       if(this.errMessage) return;
 
       let newOptions = newValues.map(item => ({value: item, isDefault: false}));
-      //补全默认值
+      // 补全默认值
       if(!this.field.isMulti){
         let defaultValue = this.field.defaultValue;
         for(let i = 0; i < newOptions.length; i++){
@@ -197,8 +226,10 @@ export default {
       this.$emit('input', {value: newOptions, prop: 'options'})
       this.batchModalShow = false;
     }
+  },
+  components: {
+    [LogicalFieldModal.name]: LogicalFieldModal
   }
- 
 }
 </script>
 

@@ -1,5 +1,6 @@
-import {toArray} from '@src/util/lang';
-import {fmt_address} from '@src/filter/fmt';
+import { toArray } from '@src/util/lang';
+import { fmt_address } from '@src/filter/fmt';
+import { isHiddenField } from './util'
 
 const FormView = {
   name: 'form-view',
@@ -28,7 +29,7 @@ const FormView = {
         'form-view-textarea-preview': formType === 'textarea',
         'base-file__preview': formType === 'attachment',
       };
-      //TODO: 没有值时默认显示 '--'
+      
       return (
         <div class="form-view-row">
           <label>{displayName}</label>
@@ -119,16 +120,28 @@ const FormView = {
       let newArr = [];
       let preIndex = 0;
       
-      fields.forEach((f, index) => {
-        if (f.formType === 'separator') {
-          newArr.push(fields.slice(preIndex, index));
-          preIndex = index;
-        }
-        if (index === fields.length - 1) {
-          newArr.push(fields.slice(preIndex));
-        }
-      });
-      
+      fields
+        // 隐藏不显示逻辑项
+        .filter(item => !isHiddenField(item, this.value, fields, false))
+        // 隐藏无内容的分割线
+        .filter((field, index, arr) => {
+          if(field.formType != 'separator') return true;
+
+          let next = arr[index + 1];
+          return null != next && next.formType != 'separator';
+        })
+        // 根据分割线分组
+        .forEach((f, index, filterArr) => {
+          if (f.formType === 'separator') {
+            newArr.push(filterArr.slice(preIndex, index));
+            preIndex = index;
+          }
+
+          if (index === filterArr.length - 1) {
+            newArr.push(filterArr.slice(preIndex));
+          }
+        });
+
       return newArr;
     }
   },
@@ -146,14 +159,14 @@ const FormView = {
         }
         return this.mapFieldToDom(item);
       });
+
       let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item));
       
       return (
         <div class="view-group">
           {title}
           <div class="items-of-group">{
-            (this.sectionState[currentGroupId] === undefined || this.sectionState[currentGroupId]) &&
-            items
+            (this.sectionState[currentGroupId] !== false) && items
           }</div>
         </div>
       );

@@ -30,9 +30,9 @@ export function hasEveryAuth(auth = {}, keys){
 /** 根据用户的数据权限判断是否有某一权限 */
 export function hasAuthWithDataLevel(authorities = {}, authKey, teamAuthFn, personAuthFn){
   let dataLevel = authorities[authKey];
-  //如果没有对应的权限
+  // 如果没有对应的权限
   if(!dataLevel) return false;
-  //全部权限
+  // 全部权限
   if(dataLevel >= 3) return true;
 
   let teamAuth = ( 
@@ -47,7 +47,7 @@ export function hasAuthWithDataLevel(authorities = {}, authKey, teamAuthFn, pers
       typeof personAuthFn == 'boolean' ? personAuthFn : false
   );
 
-  //团队权限 dataLevel = 2
+  // 团队权限 dataLevel = 2
   if(dataLevel > 1 && dataLevel < 3){
     return teamAuth || personAuth;
   }

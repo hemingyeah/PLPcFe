@@ -1,4 +1,36 @@
-import {genRandomKey} from './util';
+import {randomString} from '@src/util/lang';
+import Field from '@model/Field'
+
+/** 补全formType 为select时的所需字段 */
+function fillPropForSelect(params){
+  let setting = params.setting || {};
+
+  let options = [];
+  let isMulti = false;
+  let dependencies = setting.dependencies || {};
+
+  if(params.formType == 'select'){
+    let dataSource = setting.dataSource || [];
+    let initDefault = false;
+
+    isMulti = setting.isMulti === true;
+    options = dataSource.map(value => {
+      let isDefault = false;
+      // 只有第一个默认值生效
+      if(!initDefault && value == params.defaultValue){
+        isDefault = true;
+        initDefault = true;
+      }
+
+      return {value, isDefault};
+    })
+
+    // 没有选项，添加默认项
+    if(options.length == 0) options.push({value: '选项1', isDefault: false})
+  }
+
+  return {options, isMulti, dependencies};
+}
 
 /**
  * 用于表单设计的字段类
@@ -7,69 +39,50 @@ import {genRandomKey} from './util';
  * @author dongls 
  */
 export default class FormField{
-  /** 默认构造函数 */
+  /** 
+   * 默认构造函数
+   * @param {object} params - 构造函数参数
+   * @param {string} params.formType - 字段类型
+   * @param {string} params.displayName - 字段名称
+   */
   constructor(params = {}){
-    let options = [];
+    // 旧字段没有id字段，而是使用fieldId替代
+    this.id = params.id || params.fieldId;
+    // 前端生成fieldName
+    this.fieldName = params.fieldName || `field_${randomString(16)}`;
+    // 字段类型
+    this.formType = params.formType; 
+    this.displayName = params.displayName || '标题'; 
+    // 是否必填   0 - 必填，1 - 非必填
+    this.isNull = typeof params.isNull == 'number' ? params.isNull : 1; 
+    // 是否允许搜索 0 - 不允许，1 - 允许
+    this.isSearch = typeof params.isSearch == 'number' ? params.isSearch : 0; 
+    this.placeHolder = params.placeHolder; // 提示信息
+    this.defaultValue = params.defaultValue; // 默认值
+    // 是否为系统字段 0 - 非系统字段，1 - 系统字段
+    this.isSystem = typeof params.isSystem == 'number' ? params.isSystem : 0;
 
-    if(params.formType == 'select'){
-      options.push({value: '选项1', isDefault: false})
-    }
+    // formType 为select时需要补全一下字段
+    let {options, isMulti, dependencies} = fillPropForSelect(params)
+    this.options = options; // 下拉菜单类型选项
+    this.isMulti = isMulti; // 是否为多选
+    this.dependencies = dependencies; // 逻辑显示项用
 
-    this.id = null;
-    this.fieldName = null;
-    this.formType = params.formType; //字段类型
-    this.displayName = params.displayName || '标题'; //标题
-    this.isNull = 1; //是否必填
-    this.isSearch = 0; //是否允许搜索
-    this.placeHolder = null; //提示信息
-    this.defaultValue = null; //默认值
-    this.isSystem = params.isSystem || 0; //是否为系统字段
-
-    this.options = options; //下拉菜单类型选项
-    this.isMulti = false; //是否为多选
-    this._id = this.fieldName || `field_${genRandomKey()}`;
-
-    //辅助字段
-    this.dragging = false; //当前字段时候正在被拖拽
+    // 辅助字段
+    this.dragging = false; // 当前字段时候正在被拖拽
   }
 
-  /** 从Filed构建 */
-  static fromField(field){
-    let newField = new FormField();
-    let setting = field.setting || {};
-
-    newField.id = field.id || field.fieldId;
-    newField.fieldName = field.fieldName;
-    newField.formType = field.formType;
-    newField.displayName = field.displayName;
-    newField.isNull = field.isNull;
-    newField.isSearch = field.isSearch;
-    newField.placeHolder = field.placeHolder;
-    newField.defaultValue = field.defaultValue;
-    newField.isSystem = field.isSystem;
-
-    newField._id = newField.fieldName || `field_${genRandomKey()}`;
-
-    if(field.formType == 'select'){
-      let dataSource = setting.dataSource || [];
-      let initDefault = false;
-      newField.options = dataSource.map(value => {
-        let isDefault = false;
-        //只有第一个默认值生效
-        if(!initDefault && value == field.defaultValue){
-          isDefault = true;
-          initDefault = true;
-        }
-
-        return {value,isDefault};
-      })
-      newField.isMulti = setting.isMulti === true
-    }
-
-    return newField;
+  /** @deprecated 兼容旧有写法*/
+  get _id(){
+    return this.fieldName;
   }
 
-  /** 将字段转换成后端可接受的字段 */
+  /** 从Filed构建为组件可接受的字段 */
+  static fromField(field){ 
+    return new FormField(field);
+  }
+
+  /** 将字段转换成后端可接收的字段 */
   static toField(field){
     let option = {};
 
@@ -85,14 +98,14 @@ export default class FormField{
     let setting = {};
     let defaultValue = null;
 
-    //处理下拉选项
+    // 处理下拉选项
     if(field.formType == 'select'){
       let dataSource = [];
       let opts = field.options || [];
       for(let i = 0; i < opts.length; i++){
         let opt = opts[i];
         dataSource.push(opt.value);
-        //只有第一个默认值生效
+        // 只有第一个默认值生效
         if(opt.isDefault && !defaultValue) {
           defaultValue = opt.value;
         }
@@ -101,9 +114,22 @@ export default class FormField{
       setting.dataSource = dataSource;
     }
 
+    // 过滤空白依赖
+    let dependencies = field.dependencies || {};
+    Object.keys(dependencies).forEach(prop => {
+      let dep = dependencies[prop];
+      if(!Array.isArray(dep) || dep.length == 0) {
+        delete dependencies[prop]
+      }
+    })
+    
+    if(Object.keys(dependencies).length > 0) {
+      setting.dependencies = dependencies;
+    }
+    
     option.setting = setting;
     option.defaultValue = defaultValue;
 
-    return option;
+    return new Field(option);
   }
 }

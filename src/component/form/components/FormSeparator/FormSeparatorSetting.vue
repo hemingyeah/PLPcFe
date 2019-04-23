@@ -4,14 +4,14 @@
     <div class="form-setting-group">
       <input type="text" placeholder="请输入标题" data-prop="displayName" :value="field.displayName" @input="update" maxlength="6">
     </div>
-    <p class="form-sparator-setting-tips">您可以在表单中放置一个分割线方便分段显示信息，让页面更加直观。</p>
+    <p class="form-separator-setting-tips">您可以在表单中放置一个分割线方便分段显示信息，让页面更加直观。</p>
     <!--如果分割线在表单的最后，那么在生成表单和展示表单数据时该字段将会被忽略。-->
   </div>
 </template>
 
 <script>
 export default {
-  name: 'form-sparator-setting',
+  name: 'form-separator-setting',
   props: {
     field: {
       type: Object,
@@ -35,7 +35,7 @@ export default {
 </script>
 
 <style lang="scss">
-.form-sparator-setting-tips{
+.form-separator-setting-tips{
   margin-top: 10px;
   padding: 10px;
   border-radius: 2px;

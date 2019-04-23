@@ -16,10 +16,7 @@
  * 2. FormItem接受到事件后，阻止事件冒泡并调用validate方法进行验证
  * 3. 表单提交时，FormBuilder根据自身维护的validateMap验证整个表单
  */
-
-import {
-  FormFieldMap,
-} from './components';
+import { FormFieldMap } from './components';
 import * as util from './util';
 
 function createFormField(h, field, comp){
@@ -42,23 +39,6 @@ function getValue(field, ctx){
   return ctx.value[field.fieldName]
 }
 
-function createGroup(fields){
-  let groups = [];
-
-  let group = {title: '',fields: []};
-  fields.forEach(field => {
-    if(field.formType == 'separator'){
-      if(group.fields.length > 0) groups.push(group);
-      group = {title: field.displayName,fields: []};
-      return;
-    }
-
-    group.fields.push(field);
-  });
-
-  return groups;
-}
-
 const FormBuilder = {
   name: 'form-builder',
   props: {
@@ -73,16 +53,19 @@ const FormBuilder = {
   },
   data(){
     return {
-      validateMap: {} //所有注册的验证方法
+      validateMap: {} // 所有注册的验证方法
     }
   },
   methods: {
+    /** 获取该dom元素 */
+    findRootEl(){
+      return this.$el;
+    },
     /**    
      * 检测所有字段的结果，都验证通过，返回true, 否则返回false
      */
     validate(){
       let promises = Object.keys(this.validateMap).map(key => this.validateMap[key]());
-      
       return Promise.all(promises)
         .then(results => results.every(msg => !msg))
         .catch(err => console.error('validate error', err))
@@ -98,69 +81,58 @@ const FormBuilder = {
     }
   },
   render(h){
-    // let groups = createGroup(this.fields);
-    // let formGroups = groups.map(group => {
-    //   let fields = group.fields || [];
+    let formGroups = this.fields
+      .map(field => {
+        let fieldName = field.fieldName;
 
-    //   let formItems = fields
-    //     .map(field => {
-    //       let comp = FormFieldMap.get(field.formType);
-    //       if(comp == null) return;
-
-    //       let formField = createFormField.call(this, h, field, comp);
-    //       if(comp.formType == 'separator') return formField;
+        if(this.$slots[fieldName]) {
+          return this.$slots[fieldName];
+        }
         
-    //       return (
-    //         <form-item label={field.displayName} field={field}>
-    //           {formField}
-    //         </form-item>
-    //       );
-    //     })
-    //     .filter(item => item != null);
-      
-    //   return (
-    //     [
-    //       group.title ? <h4>{group.title}</h4> : '',
-    //       <div class="form-builder-group">
-    //         {formItems}
-    //       </div>
-    //     ]
-    //   )
+        if(this.$scopedSlots[fieldName]) {
+          return this.$scopedSlots[fieldName]({field, value: getValue(field, this)});
+        }
+        
+        // 判读是否隐藏该字段
+        if(util.isHiddenField(field, this.value, this.fields)) return null;
 
-    // return (
-    //   <fieldset>
-    //     <legend>{group.title}</legend>
-    //     {formItems}
-    //   </fieldset>
-    // );
-    //})
+        let comp = FormFieldMap.get(field.formType);
+        if(comp == null) return;
 
-    let formGroups = this.fields.map(field => {
-      let fieldName = field.fieldName;
+        let formField = createFormField.call(this, h, field, comp);
+        if(comp.formType == 'separator') return formField;
+        
+        let formItemClass = [];
+        if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
+        return (
+          <form-item 
+            label={field.displayName} class={formItemClass} 
+            key={field.fieldName} findRootEl={this.findRootEl} validation>
+            {formField}
+          </form-item>
+        );
+      })
+      .filter((vnode, index, arr) => {
+        // 过滤不渲染节点
+        if(null == vnode) return false;
 
-      if(this.$slots[fieldName]) {
-        return this.$slots[fieldName];
-      }
-      
-      if(this.$scopedSlots[fieldName]) {
-        return this.$scopedSlots[fieldName]({field, value: getValue(field, this)});
-      }
+        let options = vnode.componentOptions || {};
+        // 非分割线字段直接显示
+        if(options.tag != 'form-separator') return true;
 
-      let comp = FormFieldMap.get(field.formType);
-      if(comp == null) return;
+        // 只有在下一个元素存在且不是分割线时，才显示该分割线
+        // 如果该节点后面没有非分割线字段，则不显示
+        for(let i = index + 1; i < arr.length; i++){
+          let next = arr[i];
+          if(next == null) continue;
+          
+          let nextOptions = next.componentOptions || {};
+          return nextOptions.tag != 'form-separator';
+        }
 
-      let formField = createFormField.call(this, h, field, comp);
-      if(comp.formType == 'separator') return formField;
-      
-      let formItemClass = [];
-      if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
-    
-      return (
-        <form-item label={field.displayName} class={formItemClass} validation>
-          {formField}
-        </form-item>
-      );
-    }).filter(item => item != null);
+        // 默认返回false, 走到这里意味着后面的节点都是null
+        return false; 
+      });
 
     return (
       <div class="form-builder">

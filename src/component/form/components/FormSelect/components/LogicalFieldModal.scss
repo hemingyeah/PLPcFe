@@ -1,0 +1,94 @@
+.logical-field-modal{
+  .icon-question{
+    color: $text-color-secondary;
+  }
+
+  .base-modal-body{
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 10px 0;
+  }
+  
+  .base-modal-footer{
+    border-top: 1px solid #e9ecef;
+    text-align: right;
+    padding: 8px 10px;
+  }
+}
+
+.logical-field-panel{
+  flex: 1;
+  height: 320px;
+  padding: 0 10px;
+  display: flex;
+  flex-flow: column nowrap;
+
+  .logical-field-panel-header{
+    margin: 0;
+    line-height: 24px;
+    padding: 4px 10px;
+  }
+
+  .logical-field-panel-body{
+    padding-top: 5px;
+    flex: 1;
+    overflow: auto;
+  }
+
+  & + .logical-field-panel{
+    border-left: 1px solid #ddd;
+  }
+}
+
+.logical-field-value, .logical-field-target{
+  height: 32px;
+  line-height: 32px;
+  cursor: pointer;
+  padding: 0 10px;
+  border-bottom: 1px solid transparent;
+
+  &:hover{
+    background-color: #f0f0f0;
+  }
+}
+
+.logical-field-value{
+  &.logical-field-selected{
+    background-color: #f0f0f0;
+  }
+
+  & + .logical-field-value{
+    margin-top: 5px;
+  }
+}
+
+.logical-field-target{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+
+  .el-checkbox{
+    margin: 0;
+    padding-right: 10px;
+  }
+
+  p{
+    margin: 0;
+    flex: 1;
+
+    @include text-ellipsis();
+  }
+
+  & + .logical-field-target{
+    margin-top: 5px;
+  }
+}
+
+.logical-field-separator{
+  cursor: default;
+  flex: 1;
+  background-color: #eef8f8;
+  color: #55B7B4;
+  padding: 0 10px;
+  margin: 0 -10px;
+}
