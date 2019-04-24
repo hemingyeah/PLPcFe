@@ -39,15 +39,15 @@ function sign(config = {}){
       ]
     });
     
-    //签名成功
+    // 签名成功
     DingTalkPC.ready(function(){
       resolve();
-      console.info("========== DingTalkPC ready ==========");
+      console.info('========== DingTalkPC ready ==========');
     });
     
-    //签名失败
+    // 签名失败
     DingTalkPC.error(function(error){  
-      console.info("========== DingTalkPC error ==========");
+      console.info('========== DingTalkPC error ==========');
       reject(error)
     });
   });
@@ -66,9 +66,9 @@ function alert(message = '', title = '提示', buttonName = '确定'){
 
   return new Promise((resolve, reject) => {
     DingTalkPC.device.notification.alert({
-      message: message,
-      title: title, //可传空
-      buttonName: buttonName,
+      message,
+      title, // 可传空
+      buttonName,
       onSuccess: () => resolve(true),
       onFail: err => {
         console.error(err);
@@ -90,9 +90,9 @@ function confirm(message = '', title = '提示'){
     
   return new Promise((resolve, reject) => {  
     DingTalkPC.device.notification.confirm({
-      message: message,
-      title: title,
-      buttonLabels: ['是','否'],
+      message,
+      title,
+      buttonLabels: ['是', '否'],
       onSuccess: result => resolve(result.buttonIndex == 0),
       onFail: err => {
         console.error(err);
@@ -121,7 +121,7 @@ function previewImage(urls = [], currUrl){
   let DingTalkPC = getDingTalkPC();
 
   DingTalkPC.biz.util.previewImage({
-    urls: urls,
+    urls,
     current: currUrl,
     onFail: err => console.error(err)
   })

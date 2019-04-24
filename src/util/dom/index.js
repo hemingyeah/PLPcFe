@@ -1,11 +1,11 @@
-//公用dom, 使用前请确保清空内容
-//禁止插入文档中，禁止添加或修改属性，如有需要自行创建dom
+// 公用dom, 使用前请确保清空内容
+// 禁止插入文档中，禁止添加或修改属性，如有需要自行创建dom
 let tempEl = null;
 
 /** 动态加载一个js, 返回一个Promise */
 export function importScript(url) {
   return new Promise(function (resolve, reject) {
-    var script = document.createElement('script');
+    let script = document.createElement('script');
     script.src = url;
     document.body.appendChild(script);
 
@@ -42,7 +42,7 @@ export function getScrollBarWidth() {
   document.body.removeChild(el);
   el = null;
 
-  //下次直接返回结果
+  // 下次直接返回结果
   getScrollBarWidth = function () { //eslint-disable-line
     return scrollbarWidth;
   }
@@ -80,9 +80,10 @@ export function fullScreen(dom) {
 export function destroyComponent(instance){
   let el = instance.$el;
   let parent = el.parentNode;
+  let copyInstance = instance;
 
-  instance.$destroy(true);
-  instance = null;
+  copyInstance.$destroy(true);
+  copyInstance = null;
   parent.removeChild(el); 
 }
 
@@ -95,7 +96,7 @@ export function destroyComponent(instance){
  * @param win - 当前窗口window对象
  */
 export function getRootWindow(win) {
-  //非frame 环境
+  // 非frame 环境
   if(win === window.top) return win;
 
   if(win.parent.__root_window_ == 'root') return win.parent;
@@ -105,11 +106,9 @@ export function getRootWindow(win) {
 export function hasClass(el, cls) {
   if (!el || !cls) return false;
   if (cls.indexOf(' ') !== -1) throw new Error('className should not contain space.');
-  if (el.classList) {
-    return el.classList.contains(cls);
-  } else {
-    return (' ' + el.className + ' ').indexOf(' ' + cls + ' ') > -1;
-  }
+  if (el.classList) return el.classList.contains(cls);
+    
+  return (` ${ el.className } `).indexOf(` ${ cls } `) > -1;
 }
 
 export function trim(string) {
@@ -118,17 +117,17 @@ export function trim(string) {
 
 export function removeClass(el, cls) {
   if (!el || !cls) return;
-  var classes = cls.split(' ');
-  var curClass = ' ' + el.className + ' ';
+  let classes = cls.split(' ');
+  let curClass = ` ${ el.className } `;
   
-  for (var i = 0, j = classes.length; i < j; i++) {
-    var clsName = classes[i];
+  for (let i = 0, j = classes.length; i < j; i++) {
+    let clsName = classes[i];
     if (!clsName) continue;
     
     if (el.classList) {
       el.classList.remove(clsName);
     } else if (hasClass(el, clsName)) {
-      curClass = curClass.replace(' ' + clsName + ' ', ' ');
+      curClass = curClass.replace(` ${ clsName } `, ' ');
     }
   }
   if (!el.classList) {
@@ -138,17 +137,17 @@ export function removeClass(el, cls) {
 
 export function addClass(el, cls) {
   if (!el) return;
-  var curClass = el.className;
-  var classes = (cls || '').split(' ');
+  let curClass = el.className;
+  let classes = (cls || '').split(' ');
   
-  for (var i = 0, j = classes.length; i < j; i++) {
-    var clsName = classes[i];
+  for (let i = 0, j = classes.length; i < j; i++) {
+    let clsName = classes[i];
     if (!clsName) continue;
     
     if (el.classList) {
       el.classList.add(clsName);
     } else if (!hasClass(el, clsName)) {
-      curClass += ' ' + clsName;
+      curClass += ` ${ clsName }`;
     }
   }
   if (!el.classList) {
@@ -157,35 +156,37 @@ export function addClass(el, cls) {
 }
 
 export function getStyle(el, styleProp) {
-  var value, defaultView = (el.ownerDocument || document).defaultView;
+  let value, defaultView = (el.ownerDocument || document).defaultView;
+  let copyStyleProp = styleProp;
   // W3C standard way:
   if (defaultView && defaultView.getComputedStyle) {
     // sanitize property name to css notation
     // (hyphen separated words eg. font-Size)
-    styleProp = styleProp.replace(/([A-Z])/g, "-$1").toLowerCase();
+    copyStyleProp = copyStyleProp.replace(/([A-Z])/g, '-$1').toLowerCase();
     return defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
   } else if (el.currentStyle) { // IE
     // sanitize property name to camelCase
-    styleProp = styleProp.replace(/\-(\w)/g, function (str, letter) {
+    copyStyleProp = copyStyleProp.replace(/\-(\w)/g, function (str, letter) {
       return letter.toUpperCase();
     });
-    value = el.currentStyle[styleProp];
+    value = el.currentStyle[copyStyleProp];
     // convert other units to pixels on IE
     if (/^\d+(em|pt|%|ex)?$/i.test(value)) {
       return (function (value) {
-        var oldLeft = el.style.left, oldRsLeft = el.runtimeStyle.left;
+        let oldLeft = el.style.left, oldRsLeft = el.runtimeStyle.left;
+        let copyValue = value;
         el.runtimeStyle.left = el.currentStyle.left;
         el.style.left = value || 0;
-        value = el.style.pixelLeft + "px";
+        copyValue = `${ el.style.pixelLeft }px`;
         el.style.left = oldLeft;
         el.runtimeStyle.left = oldRsLeft;
-        return value;
+        return copyValue;
       })(value);
     }
     return value;
   }
 }
 
-export function getTextWidth(){
+export function getTextWidth() {
 
 }

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import DailyReportView from './DailyReportView.vue';
 
-//处理注入的参数
+// 处理注入的参数
 let initData = {};
 try {
   initData = JSON.parse(window._init);

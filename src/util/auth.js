@@ -5,12 +5,13 @@
  * @param {*} key 权限值,支持字符串和数组
  */
 export function hasAuth(auth = {}, keys){
-  if(!Array.isArray(keys)) keys = [keys];
+  let copyKeys = keys;
+  if(!Array.isArray(copyKeys)) copyKeys = [copyKeys];
 
   let authKeys = Object.keys(auth);
-  if(keys.length == 0) return false;
+  if(copyKeys.length == 0) return false;
 
-  return keys.some(item => authKeys.indexOf(item) >= 0);
+  return copyKeys.some(item => authKeys.indexOf(item) >= 0);
 }
 
 /**
@@ -19,12 +20,13 @@ export function hasAuth(auth = {}, keys){
  * @param {*} key - 权限值,支持字符串和数组
  */
 export function hasEveryAuth(auth = {}, keys){
-  if(!Array.isArray(keys)) keys = [keys];
+  let copyKeys = keys;
+  if(!Array.isArray(copyKeys)) copyKeys = [copyKeys];
 
   let authKeys = Object.keys(auth);
-  if(keys.length == 0) return false;
+  if(copyKeys.length == 0) return false;
 
-  return keys.every(item => authKeys.indexOf(item) >= 0);
+  return copyKeys.every(item => authKeys.indexOf(item) >= 0);
 }
 
 /** 根据用户的数据权限判断是否有某一权限 */

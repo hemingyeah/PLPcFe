@@ -1,16 +1,16 @@
 import http from '@src/util/http';
 
-//单行最大长度
+// 单行最大长度
 export const SINGLE_LINE_MAX_LEN = 50;
-//多行最大长度
+// 多行最大长度
 export const MULTI_LINE_MAX_LEN = 500;
-//电话或者手机号
+// 电话或者手机号
 export const PHONE_REG = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
-//日期格式
+// 日期格式
 export const DATE_REG = /^\d{4}-\d{1,2}-\d{1,2}$/;
-//日期时间格式
+// 日期时间格式
 export const DATETIME_REG = /^\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}$/;
-//邮箱格式
+// 邮箱格式
 export const EMAIL_REG = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
 
 const RuleMap = {
@@ -31,13 +31,13 @@ const RuleMap = {
 /** 单行文本验证，50字以内 */
 function text(value, field = {}){
   return new Promise((resolve, reject) => {
-    //先验证长度
+    // 先验证长度
     if(value != null && value.toString().length > SINGLE_LINE_MAX_LEN){
       return resolve(`长度不能超过${SINGLE_LINE_MAX_LEN}个字符`);
     }
-    //允许为空则不继续验证
+    // 允许为空则不继续验证
     if(field.isNull) return resolve(null);
-    //不允许为空
+    // 不允许为空
     if(!value || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
   })
@@ -145,7 +145,7 @@ function address(value, field = {}) {
 
 /** @deprecated 远程验证, 使用validator替代 */
 function remoteValidation(value, remote) {
-  console.warn(`[deprecated]: 使用 validator function 替代`);
+  console.warn('[deprecated]: 使用 validator function 替代');
   const { 
     action, 
     buildParams, 
@@ -159,7 +159,7 @@ function remoteValidation(value, remote) {
   };
   let fn = http[method];
   let args = [action, params, emulateJSON, options];
-  if(method == 'get') args.splice(2, 1,);
+  if(method == 'get') args.splice(2, 1, );
 
   return fn.apply(http, args);
 }
@@ -174,7 +174,7 @@ async function validate(value, field, options = {}){
   let fn = RuleMap[field.formType];
   let message = null;
   if(typeof fn == 'function') message = await fn(value, field);
-  //如果有远程验证
+  // 如果有远程验证
   if(message == null && options.remote) {
     let changeRemoteStatus = options.changeRemoteStatus;
     changeRemoteStatus(true);

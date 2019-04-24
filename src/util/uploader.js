@@ -1,6 +1,6 @@
 import {toArray} from '@src/util/lang';
 
-export const FILE_MAX_SIZE = 10 * 1024 * 1024; //单位字节(Byte)
+export const FILE_MAX_SIZE = 10 * 1024 * 1024; // 单位字节(Byte)
 export const FILE_MAX_NUM = 9;
 
 /** 
@@ -11,11 +11,11 @@ export const FILE_MAX_NUM = 9;
 export function validate(file){
   let fileName = file.name;
 
-  //验证文件大小
+  // 验证文件大小
   if(file.size > FILE_MAX_SIZE) return new Error(`[${fileName}]的大小超过10MB，系统暂不支持上传`);
 
-  //验证文件类型
-  let lastDotIndex = fileName.lastIndexOf(".");
+  // 验证文件类型
+  let lastDotIndex = fileName.lastIndexOf('.');
   if(lastDotIndex < 0) return new Error(`[${fileName}]的文件类型未知，系统暂不支持上传`);
 
   return null;
@@ -57,7 +57,7 @@ function getBody(xhr) {
 export function upload(file, action){
   let xhr = new XMLHttpRequest();
   let form = new FormData();
-  form.append('upload',file);
+  form.append('upload', file);
 
   return new Promise((resolve, reject) => {
     xhr.onerror = error => reject(error)
@@ -69,14 +69,14 @@ export function upload(file, action){
       resolve(getBody(xhr));
     };
 
-    //TODO: 上传进度监听
+    // TODO: 上传进度监听
     // if (xhr.upload) {
     //   xhr.upload.onprogress = function progress(e) {
     //     console.log(e)
     //   }
     // }
     
-    xhr.open("post", action, true);
+    xhr.open('post', action, true);
     xhr.send(form);
   });
 }
@@ -90,13 +90,13 @@ function getErrorResult(file, error){
 function getResult(file, msg){
   let data = msg.data || {};
 
-  //如果上传失败或没有文件id，按失败处理
+  // 如果上传失败或没有文件id，按失败处理
   if(msg.status != 0 || !data.id) return getErrorResult(file)
 
   return {
     id: data.id,
     filename: data.fileName,
-    //如果后端返回url,必须使用。如果后端不返回，需要拼接
+    // 如果后端返回url,必须使用。如果后端不返回，需要拼接
     url: data.url || `/files/get?fileId=${data.id}`,
     fileSize: data.fileSizeStr
   }
@@ -116,7 +116,7 @@ export function uploadWithParse(file, action = '/files/upload'){
 export function batchUploadWithParse(files, action = '/files/upload'){
   let fileArr = toArray(files);
   let validateRes = fileArr.map(item => validate(item)).filter(item => item instanceof Error);
-  if(validateRes.length > 0){ //文件验证失败
+  if(validateRes.length > 0){ // 文件验证失败
     return Promise.resolve({success: [], error: validateRes});
   }
 

@@ -11,9 +11,9 @@
 </template>
 
 <script>
-var width = document.body.offsetWidth;
+let width = document.body.offsetWidth;
 export default {
-  name: "daily-report-view",
+  name: 'daily-report-view',
   props: {
     initData: {
       type: Object,
@@ -22,8 +22,8 @@ export default {
   },
   data: function data() {
     return {
-      items:{},
-      width:width
+      items: {},
+      width
     }
   },
   computed:{
@@ -33,12 +33,12 @@ export default {
     getNum(value){
       let val = value.toString();
       if(val.indexOf('%') > 0 && val.substring(val.length - 1) == '%') {
-        val = val.substring(0, val.length - 1) + '<small>%</small>'
+        val = `${ val.substring(0, val.length - 1) }<small>%</small>`
       }
       return val;
     },
     fontSize(len){
-      if(len > 5 && len <= 9) return 30 * (1 - (len - 5) / 5 + (len - 5) / 12) + 'px';
+      if(len > 5 && len <= 9) return `${ 30 * (1 - ((len - 5) / 5) + ((len - 5) / 12)) }px`;
       if(len > 9) return '12px';
       return '30px';      
     },

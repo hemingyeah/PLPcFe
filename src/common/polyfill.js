@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-var */
 /** 全局polyfill @author dongls */
 if (!Element.prototype.matches) {
   Element.prototype.matches =
@@ -22,7 +24,7 @@ if (!Element.prototype.closest) {
 
 // CustomEvent polyfill
 (function () {
-  if (typeof window.CustomEvent === "function") return false;
+  if (typeof window.CustomEvent === 'function') return false;
   function CustomEvent(event, params) {
     params = params || { bubbles: false, cancelable: false, detail: undefined };
     var evt = document.createEvent('CustomEvent');

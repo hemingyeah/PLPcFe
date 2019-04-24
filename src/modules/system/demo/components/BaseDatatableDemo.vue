@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import _ from "lodash";
+import _ from 'lodash';
 
 export default {
   name: 'base-datatable-demo',
@@ -415,15 +415,14 @@ export default {
             let str = ''
             if(row.area.length < 25) {
               str = row.area;
-              return (<div style={{'width': col['elWidth'] + 'px'}} class="base-table-nowrap-text">{str}</div>)
-            } else {
-              str = row.area.substring(0, 25) + '...'
-              return (
-                <el-tooltip class="item" effect="dark" content={row.area} placement="top">
-                  <div style={{'width': col['elWidth'] + 'px'}} class="base-table-nowrap-text">{str}</div>
-                </el-tooltip>
-              )
+              return (<div style={{'width': `${ col['elWidth'] }px`}} class="base-table-nowrap-text">{str}</div>)
             }
+            str = `${ row.area.substring(0, 25) }...`
+            return (
+              <el-tooltip class="item" effect="dark" content={row.area} placement="top">
+                <div style={{'width': `${ col['elWidth'] }px`}} class="base-table-nowrap-text">{str}</div>
+              </el-tooltip>
+            )
           }
         },
         {
