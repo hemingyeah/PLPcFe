@@ -11,7 +11,7 @@ router.get('/customer/product_v2', async ctx => {
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request('/product/list', 'get', null, {headers: reqHeaders});
   let body = result.body;
-  
+
   ctx.body = Template.renderWithHtml('产品管理', body, script, modConfig.template)
 });
 

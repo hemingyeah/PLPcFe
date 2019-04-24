@@ -1,7 +1,7 @@
 import http from '@src/util/http';
 
 function getProduct(params) {
-  return http.post('/product/list/data', params)
+  return http.post('/product/list/data', params, false)
 }
 
 /**

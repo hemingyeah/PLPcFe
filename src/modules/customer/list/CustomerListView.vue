@@ -11,7 +11,8 @@
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
-        <span class="advanced-search-visible-btn" @click.self="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
+        <span class="advanced-search-visible-btn"
+              @click.self="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
       </form>
       <!--高级搜索-->
       <base-panel :show.sync="advancedSearchPanelShow" :width="panelWidth">
@@ -76,7 +77,8 @@
               </el-select>
             </el-form-item>
             <el-form-item label-width="100px" label="区域">
-              <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector" ref="baseDistPicker"></base-dist-picker>
+              <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector"
+                                ref="baseDistPicker"></base-dist-picker>
             </el-form-item>
             <el-form-item label-width="100px" label="详细地址">
               <el-input type="text" v-model="params.specialSearchModel.adAddress"></el-input>
@@ -159,8 +161,6 @@
             </el-form-item>
 
 
-
-
             <!-- 动态搜索框 -->
             <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
                           :key="field.fieldName">
@@ -235,7 +235,8 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="jumpPage" v-if="editedPermission">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" v-if="deletePermission" @event="deleteCustomer">删除</base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu" v-if="deletePermission" @event="deleteCustomer">删除
+          </base-button>
         </div>
 
         <div class="action-button-group">
@@ -272,7 +273,8 @@
             </span>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.field">
-                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label" :disabled="item.field == 'name'"/>
+                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label"
+                             :disabled="item.field == 'name'"/>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -436,10 +438,10 @@
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title">
         <span>已选中数据({{multipleSelection.length}})</span>
-        <i 
+        <i
           v-if="multipleSelection.length > 0"
-          class="iconfont icon-qingkongshanchu customer-panel-btn" 
-          @click="toggleSelection()" 
+          class="iconfont icon-qingkongshanchu customer-panel-btn"
+          @click="toggleSelection()"
           title="清空已选中数据" data-placement="right" v-tooltip></i>
       </h3>
 
@@ -454,7 +456,7 @@
               <span class="customer-selected-sn">编号</span>
               <span class="customer-selected-name">客户</span>
             </div>
-            <div class="customer-selected-row" v-for="c in multipleSelection" :key="c.id" >
+            <div class="customer-selected-row" v-for="c in multipleSelection" :key="c.id">
               <span class="customer-selected-sn">{{c.serialNumber}}</span>
               <span class="customer-selected-name">{{c.name}}</span>
               <button type="button" class="customer-selected-delete" @click="cancelSelectCustomer(c)">
@@ -639,7 +641,7 @@ export default {
     }
   },
   filters: {
-    tagName: function (value) {
+    tagName (value) {
       if (!value || !Array.isArray(value) || !value.length) return '';
 
       return value
@@ -668,8 +670,8 @@ export default {
       customerConfig: initData.customerConfig,
       fieldInfo: (initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId)
     };
-    const {adProvince, adCity, adDist,} = this.customerConfig.customerAddressConfig;
-    this.defaultAddress = [adProvince, adCity, adDist,];
+    const {adProvince, adCity, adDist, } = this.customerConfig.customerAddressConfig;
+    this.defaultAddress = [adProvince, adCity, adDist, ];
 
     this.auth = initData.auth || {};
     this.smsRest = initData.smsRest || 0;
@@ -682,8 +684,8 @@ export default {
     // 团队默认加载全部数据
     this.searchTag();
 
-    //对外开放刷新方法，用于其他tab刷新本tab数据
-    //TODO: [tab_spec]标准化刷新方式
+    // 对外开放刷新方法，用于其他tab刷新本tab数据
+    // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
   methods: {
@@ -707,7 +709,7 @@ export default {
         })
         .catch(e => console.error('e', e));
     },
-    createCustomerTab(customerId){
+    createCustomerTab(customerId) {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
@@ -762,11 +764,11 @@ export default {
       this.columnNum = Number(num);
     },
     /**
-     *  人员类型的字段
-     *  绑定在form中的value是一个id，在初始化的时候却要给一个对象
-     *  所以选择某个人的时候，储存这个对象
-     *  在还原搜索状态的时候，取这个对象初始化这个form，
-     * */
+       *  人员类型的字段
+       *  绑定在form中的value是一个id，在初始化的时候却要给一个对象
+       *  所以选择某个人的时候，储存这个对象
+       *  在还原搜索状态的时候，取这个对象初始化这个form，
+       * */
     modifyUser(type, fieldName) {
       const store = {};
       if (type === 'linkman') {
@@ -805,7 +807,7 @@ export default {
 
       localStorage.setItem('store_user_for_search_customer', JSON.stringify(store));
     },
-    setAdvanceSearchColumn(command){
+    setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
       localStorage.setItem('customer_list_advance_search_column_number', command);
     },
@@ -821,10 +823,10 @@ export default {
     //   sessionStorage.setItem('customer_list_search_status', JSON.stringify(status));
     // },
     formatAddress(ad) {
-      if(null == ad) return '';
+      if (null == ad) return '';
         
-      const {adProvince, adCity, adDist,} = ad;
-      return [adProvince, adCity, adDist,]
+      const {adProvince, adCity, adDist, } = ad;
+      return [adProvince, adCity, adDist, ]
         .filter(d => !!d).join('-');
     },
     remindSuccess(ids) {
@@ -844,10 +846,10 @@ export default {
     buildConfig(storage) {
       const storageData = storage || {};
       /**
-       * storageData如果存在，那就还原storage中的值
-       * date、datetime类型的要注意 new Date一下
-       * 人员选择初始化值是一个id，还要初始化它的options
-       */
+         * storageData如果存在，那就还原storage中的值
+         * date、datetime类型的要注意 new Date一下
+         * 人员选择初始化值是一个id，还要初始化它的options
+         */
 
       this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
         .map(f => {
@@ -894,7 +896,7 @@ export default {
       this.$refs.exportPanel.open(ids, fileName);
     },
     /** 检测导出条数 */
-    checkExportCount(ids, max){
+    checkExportCount(ids, max) {
       let exportAll = !ids || ids.length == 0;
       return exportAll && this.paginationInfo.totalItems > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
     },
@@ -927,7 +929,7 @@ export default {
             this.paginationInfo.totalPages = 0;
             this.paginationInfo.pageNum = 1;
           } else {
-            const {pages, total, pageNum, list } = res;
+            const {pages, total, pageNum, list} = res;
 
             this.customers = list
               .map(c => {
@@ -981,7 +983,7 @@ export default {
       }
 
       // tags
-      if (null != params.tag || Array.isArray(params.tag)){
+      if (null != params.tag || Array.isArray(params.tag)) {
         let tag = Array.isArray(params.tag) ? params.tag[0] || {} : params.tag
         params.tagId = tag.id;
         delete params.tag
@@ -1031,8 +1033,8 @@ export default {
     // 把对象中!!为false的值去除（eg. false, undefined, null...），except 可以把想保留的值留下(eg.[0])
     // 主要用于向后端传参，把无用的空值过滤掉
     // var a = { a: 0, b: 1, c: null, d: undefined, e: false}
-    //deleteValueFromObject(a) =>  {b: 1}
-    //deleteValueFromObject(a, [0]) =>  {a: 0, b: 1}
+    // deleteValueFromObject(a) =>  {b: 1}
+    // deleteValueFromObject(a, [0]) =>  {a: 0, b: 1}
     deleteValueFromObject(sourceObj, except = []) {
       let obj = _.cloneDeep(sourceObj);
       if (except.length) {
@@ -1058,19 +1060,19 @@ export default {
       }
       if (Object.keys(obj).length) {
         return obj;
-      } else {
-        return undefined;
-      }
+      } 
+      return undefined;
+        
     },
     concatArrayAndItemUnique(arr1, arr2, key) {
       // 数组中的对象根据id去重
       let obj = {};
       if (!arr1 || !arr1.length) return arr2 || [];
       if (!arr2 || !arr2.length) return arr1 || [];
-      return [...arr1, ...arr2].reduce((cur,next) => {
-        obj[next[key]] ? "" : obj[next[key]] = true && cur.push(next);
+      return [...arr1, ...arr2].reduce((cur, next) => {
+        obj[next[key]] ? '' : obj[next[key]] = true && cur.push(next);
         return cur;
-      },[]);
+      }, []);
     },
     handleCitySelectorChange(city) {
       this.params.specialSearchModel.addressSelector = city;
@@ -1091,11 +1093,11 @@ export default {
       this.$http.post('/customer/changeState', params, false, {cancelable: false})
         .then(res => {
           row.pending = false;
-          
+
           if (res.status) {
             return this.$platform.alert(res.message);
           }
-          
+
           this.customers.forEach(c => {
             if (c.id === row.id) {
               c.status = ns;
@@ -1109,10 +1111,10 @@ export default {
     },
     sortChange(option) {
       /**
-       * 目前情况：
-       * 所有字段理应后台获取，但是获取的所有字段中没有 createTime
-       *
-       */
+         * 目前情况：
+         * 所有字段理应后台获取，但是获取的所有字段中没有 createTime
+         *
+         */
       try {
         const {prop, order} = option;
         if (!order) {
@@ -1386,7 +1388,7 @@ export default {
     // input search method
     searchCustomerManager(keyword) {
       this.inputRemoteSearch.customerManager.loading = true;
-      return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+      return this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
         .then(res => {
           this.inputRemoteSearch.customerManager.options = res.list;
           this.inputRemoteSearch.customerManager.loading = false;
@@ -1396,7 +1398,7 @@ export default {
     },
     searchCreator(keyword) {
       this.inputRemoteSearch.creator.loading = true;
-      return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+      return this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
         .then(res => {
           if (res && res.list) {
             this.inputRemoteSearch.creator.options = res.list;
@@ -1408,7 +1410,7 @@ export default {
     },
     searchLinkman(keyword) {
       this.inputRemoteSearch.linkman.loading = true;
-      return this.$http.get('/linkman/getListAsyn', {keyword: keyword, pageNum: 1,})
+      return this.$http.get('/linkman/getListAsyn', {keyword, pageNum: 1, })
         .then(res => {
           if (res && res.list) {
             this.inputRemoteSearch.linkman.options = res.list;
@@ -1421,7 +1423,7 @@ export default {
     /** @deprecated */
     searchTag(keyword) {
       this.inputRemoteSearch.tag.loading = true;
-      return this.$http.get('/customer/tag/list', {keyword: keyword, pageNum: 1, pageSize: 100 * 100, })
+      return this.$http.get('/customer/tag/list', {keyword, pageNum: 1, pageSize: 100 * 100, })
         .then(res => {
           this.inputRemoteSearch.tag.loading = false;
           this.inputRemoteSearch.tag.options = res && res.list ? res.list : [];
@@ -1553,116 +1555,116 @@ export default {
 </script>
 
 <style lang="scss">
-$color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+  $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
-html, body {
-  height: 100%;
-}
+  html, body {
+    height: 100%;
+  }
 
-.level-padding {
-  padding: 0 5px;
-}
+  .level-padding {
+    padding: 0 5px;
+  }
 
-.advanced-search-linkman {
-  .el-select-dropdown__item {
-    height: 50px;
-    padding: 5px 20px;
-    p {
-      margin: 0;
-      line-height: 20px;
+  .advanced-search-linkman {
+    .el-select-dropdown__item {
+      height: 50px;
+      padding: 5px 20px;
+      p {
+        margin: 0;
+        line-height: 20px;
+      }
     }
   }
-}
 
-.customer-advance-setting .el-dropdown-menu__item{
-  width: 80px;
-  text-align: center;
-}
-
-.customer-list-container {
-  height: 100%;
-  overflow: auto;
-  padding: 10px;
-
-  .panel-title {
-    font-size: 16px;
-    line-height: 60px;
-    padding: 0 25px;
-    color: rgb(132, 138, 147);
-    border-bottom: 1px solid rgb(242, 248, 247);
-    font-weight: normal;
-    display: flex;
-    justify-content: space-between;
-    .iconfont:hover {
-      cursor: pointer;
-    }
-  }
-}
-
-// search
-.customer-list-search-group-container {
-
-  .advanced-search-function, .base-search {
-    background: #fff;
-    border-radius: 3px;
+  .customer-advance-setting .el-dropdown-menu__item {
+    width: 80px;
+    text-align: center;
   }
 
-  .base-search {
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 10px;
+  .customer-list-container {
+    height: 100%;
+    overflow: auto;
+    padding: 10px;
 
-    .customer-list-base-search-group {
+    .panel-title {
+      font-size: 16px;
+      line-height: 60px;
+      padding: 0 25px;
+      color: rgb(132, 138, 147);
+      border-bottom: 1px solid rgb(242, 248, 247);
+      font-weight: normal;
       display: flex;
-      width: 440px;
       justify-content: space-between;
-
-      .el-input {
-        width: 300px;
-        input {
-        height: 34px;
-        line-height: 34px;
-        width: 300px;
-        }
-      }
-
-      a {
-        line-height: 33px;
-      }
-
-    }
-
-    .advanced-search-visible-btn {
-      font-size: 14px;
-      font-weight: lighter;
-      line-height: 32px;
-      color: $color-primary;
-      border-color: $color-primary;
-      background: #fff;
-      padding: 0 13px;
-      &:hover {
+      .iconfont:hover {
         cursor: pointer;
       }
     }
   }
 
-  .advanced-search-form {
-    overflow: auto;
-    padding: 10px 0 63px 0;
-    height: calc(100% - 51px);
+  // search
+  .customer-list-search-group-container {
 
-    .form-item-container {
-
+    .advanced-search-function, .base-search {
+      background: #fff;
+      border-radius: 3px;
     }
 
-    .two-columns {
+    .base-search {
+      font-size: 14px;
       display: flex;
-      flex-wrap: wrap;
-      .el-form-item {
-        width: 50%;
+      justify-content: space-between;
+      padding: 12px 10px;
+
+      .customer-list-base-search-group {
+        display: flex;
+        width: 440px;
+        justify-content: space-between;
+
+        .el-input {
+          width: 300px;
+          input {
+            height: 34px;
+            line-height: 34px;
+            width: 300px;
+          }
+        }
+
+        a {
+          line-height: 33px;
+        }
+
+      }
+
+      .advanced-search-visible-btn {
+        font-size: 14px;
+        font-weight: lighter;
+        line-height: 32px;
+        color: $color-primary;
+        border-color: $color-primary;
+        background: #fff;
+        padding: 0 13px;
+        &:hover {
+          cursor: pointer;
+        }
       }
     }
+
+    .advanced-search-form {
+      overflow: auto;
+      padding: 10px 0 63px 0;
+      height: calc(100% - 51px);
+
+      .form-item-container {
+
+      }
+
+      .two-columns {
+        display: flex;
+        flex-wrap: wrap;
+        .el-form-item {
+          width: 50%;
+        }
+      }
 
       .el-form-item {
         .el-form-item__content,
@@ -1689,248 +1691,249 @@ html, body {
       }
     }
 
+    .advanced-search-function {
+      margin-top: 10px;
+      padding-bottom: 10px;
 
-  .advanced-search-function {
-    margin-top: 10px;
-    padding-bottom: 10px;
+      h4 {
+        border-bottom: 1px solid #f4f4f4;
+        padding: 10px;
+      }
 
-    h4 {
-      border-bottom: 1px solid #f4f4f4;
+      .el-row {
+        padding: 5px 0;
+      }
+      .input-label {
+        text-align: right;
+        line-height: 32px;
+        padding-right: 0;
+      }
+
+    }
+
+  }
+
+  // list
+  .customer-list-component {
+    padding-top: 10px;
+    /*min-height: calc(100% - 100px);*/
+
+    .customer-table {
       padding: 10px;
-    }
 
-    .el-row {
-      padding: 5px 0;
-    }
-    .input-label {
-      text-align: right;
-      line-height: 32px;
-      padding-right: 0;
-    }
+      &:before {
+        height: 0;
+      }
 
-  }
+      .customer-table-header th {
+        background: #F5F5F5;
+        color: $text-color-primary;
+        font-weight: normal;
+      }
 
-}
+      th {
+        color: #606266;
+        font-size: 14px;
+      }
+      td {
+        color: #909399;
+        font-size: 13px;
+      }
 
-// list
-.customer-list-component {
-  padding-top: 10px;
-  /*min-height: calc(100% - 100px);*/
+      .view-detail-btn {
+        color: $color-primary;
+      }
 
-  .customer-table {
-    padding: 10px;
-
-    &:before {
-      height: 0;
-    }
-
-    .customer-table-header th {
-      background: #F5F5F5;
-      color: $text-color-primary;
-      font-weight: normal;
-    }
-
-    th {
-      color: #606266;
-      font-size: 14px;
-    }
-    td {
-      color: #909399;
-      font-size: 13px;
-    }
-
-    .view-detail-btn {
-      color: $color-primary;
-    }
-
-    .select-column .el-checkbox {
-      position: relative;
-      top: 3px;
-    }
-  }
-
-  .table-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 0px 10px 10px 10px ;
-    background: #fff;
-    border-radius: 0 0 3px 3px;
-
-    .list-info {
-      font-size: 13px;
-      line-height: 32px;
-      margin: 0;
-      color: #767e89;
-
-      .iconfont {
+      .select-column .el-checkbox {
         position: relative;
-        top: 1px;
+        top: 3px;
       }
     }
 
-    .el-pagination__jump {
-      margin-left: 0;
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 0px 10px 10px 10px;
+      background: #fff;
+      border-radius: 0 0 3px 3px;
+
+      .list-info {
+        font-size: 13px;
+        line-height: 32px;
+        margin: 0;
+        color: #767e89;
+
+        .iconfont {
+          position: relative;
+          top: 1px;
+        }
+      }
+
+      .el-pagination__jump {
+        margin-left: 0;
+      }
     }
   }
-}
 
-.customer-panel-btn{
-  float: right;
-  cursor: pointer;
-  font-size: 14px;
-  margin-right: 5px;
-
-  &:hover{
-    color: $color-primary;
-  }
-}
-
-// -------- customer selected panel --------
-.customer-selected-count{
-  color: $color-primary;
-  padding: 0 3px;
-  width: 15px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.customer-selected-panel{
-  font-size: 14px;
-  height: calc(100% - 51px);
-}
-
-.customer-selected-tip{
-  padding-top: 80px;
-
-  img{
-    display: block;
-    width: 240px;
-    margin: 0 auto;
-  }
-
-  p{
-    text-align: center;
-    color: #9a9a9a;
-    margin: 30px 0 0 0;
-    line-height: 20px;
-  }
-}
-
-.customer-selected-list{
-  height: 100%;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-.customer-selected-row{
-  display: flex;
-  flex-flow: row nowrap;
-  line-height: 36px;
-  border-bottom: 1px solid #ebeef5;
-  font-size: 13px;
-
-
-  &:hover{
-    background-color: #f5f7fa;
-
-    .customer-selected-delete{
-      visibility: visible;
-    }
-  }
-}
-
-.customer-selected-head{
-  background-color: #F0F5F5;
-  color: #333;
-  font-size: 14px;
-}
-
-.customer-selected-sn{
-  padding-left: 10px;
-  width: 150px;
-  @include text-ellipsis;
-}
-
-.customer-selected-name{
-  padding-left: 10px;
-  flex: 1;
-  @include text-ellipsis;
-}
-
-.customer-selected-delete{
-  width: 36px;
-}
-
-.customer-selected-row button.customer-selected-delete{
-  padding: 0;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background-color: transparent;
-  outline: none;
-  color: #646B78;
-  visibility: hidden;
-
-  i{
+  .customer-panel-btn {
+    float: right;
+    cursor: pointer;
     font-size: 14px;
-  }
-
-  &:hover{
-    color: #e84040;
-  }
-}
-
-// operation
-.customer-columns-dropdown-menu {
-  max-height: 300px;
-  overflow: auto;
-  .el-dropdown-menu__item{
-    padding: 0;
-  }
-  .el-checkbox {
-    width: 100%;
-    padding: 5px 15px;
-    margin: 0;
-  }
-}
-
-.operation-bar-container {
-  background: #fff;
-  border-radius: 3px 3px 0 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #f2f2f2;
-
-  .top-btn-group .base-button {
     margin-right: 5px;
-  }
-
-  .action-button-group {
-    .base-button {
-      margin-left: 5px;
-    }
-  }
-
-  .el-dropdown-btn {
-    padding: 0 15px;
-    line-height: 32px;
-    display: inline-block;
-    background: $color-primary-light-9;
-    color: $text-color-primary;
-    outline: none;
-    margin-left: 5px;
-    .iconfont {
-      margin-left: 5px;
-      font-size: 12px;
-    }
 
     &:hover {
-      cursor: pointer;
-      color: #fff;
-      background: $color-primary;
+      color: $color-primary;
     }
   }
-}
+
+  // -------- customer selected panel --------
+  .customer-selected-count {
+    color: $color-primary;
+    padding: 0 3px;
+    width: 15px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .customer-selected-panel {
+    font-size: 14px;
+    height: calc(100% - 51px);
+
+    .customer-selected-tip {
+      padding-top: 80px;
+
+      img {
+        display: block;
+        width: 240px;
+        margin: 0 auto;
+      }
+
+      p {
+        text-align: center;
+        color: #9a9a9a;
+        margin: 30px 0 0 0;
+        line-height: 20px;
+      }
+    }
+
+    .customer-selected-list {
+      height: 100%;
+      padding: 10px;
+      overflow-y: auto;
+
+      .customer-selected-row {
+        display: flex;
+        flex-flow: row nowrap;
+        line-height: 36px;
+        border-bottom: 1px solid #ebeef5;
+        font-size: 13px;
+
+        &:hover {
+          background-color: #f5f7fa;
+
+          .customer-selected-delete {
+            visibility: visible;
+          }
+        }
+      }
+
+      .customer-selected-head {
+        background-color: #F0F5F5;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .customer-selected-sn {
+        padding-left: 10px;
+        width: 150px;
+        @include text-ellipsis;
+      }
+
+      .customer-selected-name {
+        padding-left: 10px;
+        flex: 1;
+        @include text-ellipsis;
+      }
+
+      .customer-selected-delete {
+        width: 36px;
+      }
+
+      .customer-selected-row button.customer-selected-delete {
+        padding: 0;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background-color: transparent;
+        outline: none;
+        color: #646B78;
+        visibility: hidden;
+
+        i {
+          font-size: 14px;
+        }
+
+        &:hover {
+          color: #e84040;
+        }
+      }
+    }
+  }
+
+
+
+
+  // operation
+  .customer-columns-dropdown-menu {
+    max-height: 300px;
+    overflow: auto;
+    .el-dropdown-menu__item {
+      padding: 0;
+    }
+    .el-checkbox {
+      width: 100%;
+      padding: 5px 15px;
+      margin: 0;
+    }
+  }
+
+  .operation-bar-container {
+    background: #fff;
+    border-radius: 3px 3px 0 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #f2f2f2;
+
+    .top-btn-group .base-button {
+      margin-right: 5px;
+    }
+
+    .action-button-group {
+      .base-button {
+        margin-left: 5px;
+      }
+    }
+
+    .el-dropdown-btn {
+      padding: 0 15px;
+      line-height: 32px;
+      display: inline-block;
+      background: $color-primary-light-9;
+      color: $text-color-primary;
+      outline: none;
+      margin-left: 5px;
+      .iconfont {
+        margin-left: 5px;
+        font-size: 12px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: #fff;
+        background: $color-primary;
+      }
+    }
+  }
 </style>
