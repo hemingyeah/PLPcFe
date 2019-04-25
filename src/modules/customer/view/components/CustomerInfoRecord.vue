@@ -306,7 +306,7 @@ export default {
       let user = this.loginUser;
       let isCreator = item.userId == user.userId;
 
-      return !isDelete && (authorities['CUSTOMER_EDIT'] && authorities['CUSTOMER_EDIT'] == 3 || isCreator) && this.allowOperate;
+      return !isDelete && ((authorities['CUSTOMER_EDIT'] && authorities['CUSTOMER_EDIT'] == 3) || isCreator) && this.allowOperate;
     },
     /** 初始化信息动态 */
     async initializeRecord() {

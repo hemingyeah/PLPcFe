@@ -64,12 +64,31 @@ function getProductTemplateList(params) {
 }
 
 /**
+ * 删除产品模板
+ * @param {String} ids - id字符串，以,分隔
+ * @returns Promise<>
+ */
+function productTemplateDelete(ids) {
+  return http.get(`/product/template/delete/${ids}`);
+}
+
+/**
+ * 产品模板批量编辑
+ * @param {Object} params.mapJson - 编辑的数据
+ * @param {String} params.ids - id字符串，以,分隔
+ * @returns Promise<>
+ */
+function productTemplateEditBatch(params) {
+  return http.post('/product/editBatch', params, false);
+}
+
+/**
  * 新建产品模板
  * @param {Object} params - 参数
  * @returns Promise<>
  */
 function productTemplateCreate(params) {
-  return http.get('/product/template/create', params);
+  return http.post('/product/template/create/action', params);
 }
 
 /**
@@ -78,7 +97,7 @@ function productTemplateCreate(params) {
  * @returns Promise<>
  */
 function productTemplateUpdate(params) {
-  return http.get('/product/template/update', params);
+  return http.post('/product/template/update', params);
 }
 
 /**
@@ -86,8 +105,8 @@ function productTemplateUpdate(params) {
  * @param {String} params.id -- 产品模板id
  * @returns Promise<>
  */
-function getProductTemplate(params) {
-  return http.get('/product/template/detail/data', params);
+function getProductTemplate(id) {
+  return http.get(`/product/template/detail/data/${id}`);
 }
 
 /**
@@ -113,7 +132,7 @@ function getProductTemplateRecord(params) {
  * @returns Promise<>
  */
 function productTemplateCreateRecord(params) {
-  return http.post('/product/template/createRemark', params);
+  return http.post('/product/ptRecord/create', params);
 }
 
 /**
@@ -122,12 +141,23 @@ function productTemplateCreateRecord(params) {
  * @returns Promise<>
  */
 function productTemplateDeleteRecord(params) {
-  return http.post('/product/template/deleteRemark', params);
+  return http.post('/customer/deleteCustomerRecord', params, false);
+}
+
+/**
+ * 获取产品模板关联的产品
+ * @param {String} params.templateId -- 产品模板id
+ * @returns Promise<>
+ */
+function productTemplateRelatedProducts(params) {
+  return http.get('/product/template/relatedProducts', params);
 }
 
 export {
   getProduct,
   getProductTemplateList,
+  productTemplateDelete,
+  productTemplateEditBatch,
   productTemplateCreate,
   productTemplateUpdate,
   getProductTemplate,
@@ -135,6 +165,7 @@ export {
   getProductTemplateRecord,
   productTemplateCreateRecord,
   productTemplateDeleteRecord,
+  productTemplateRelatedProducts,
   sendSmsBatch,
   computeSendNumForProduct,
   deleteProductByIds,

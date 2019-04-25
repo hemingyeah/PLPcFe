@@ -9,7 +9,7 @@
         </div>
       </div>
        
-      <customer-edit-form :fields="fields" v-model="form" ref="form"/>
+      <customer-edit-form :fields="fields" v-model="form" ref="customerEditForm"/>
     </form>
   </div>
 </template>
@@ -65,7 +65,7 @@ export default {
     },
     submit() {
       this.submitting = true;
-      this.$refs.form.validate()
+      this.$refs.customerEditForm.validate()
         .then(valid => {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
@@ -157,7 +157,6 @@ export default {
         form = this.initData.eventCustomer;
       }
 
-      form = util.packToForm(this.fields, form, this.initData.customerAddress);
       this.form = FormUtil.initialize(this.fields, form);
       this.init = true;
     } catch (e) {

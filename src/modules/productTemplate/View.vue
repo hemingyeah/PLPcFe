@@ -27,6 +27,16 @@
         
         <!-- start form表单展示 -->
         <form-view :fields="fields" :value="productTemplate">
+
+          <!-- start  -->
+          <template slot="createTime" slot-scope="{value}">
+            <div class="form-view-row" v-if="value">
+              <label>创建时间</label>
+              <div class="form-view-row-content">
+                <span>{{ value | fmt_datetime }}</span>
+              </div>
+            </div>
+          </template>
         </form-view>
         <!-- end form 表单展示 -->
 
@@ -57,7 +67,7 @@ import platform from '@src/platform';
 import { getProductTemplate, getProductTemplateStatisticsInit } from '@src/api/ProductApi.js';
 
 import ProductTemplateInfoRecord from './component/ProductTemplateInfoRecord.vue';
-import ProductTemplateRelatedProduct from './component/ProductTemplateRelatedProduct.vue';
+import ProductTemplateRelatedProductTable from './component/ProductTemplateRelatedProductTable.vue';
 
 export default {
   name: 'product-template-view',
@@ -85,19 +95,19 @@ export default {
       let allow = true;
 
       // 如果带入noHistory参数，则不显示
-      let query = qs.parse(window.location.search);
-      if(query.noHistory) return false;
+      let viewUrl = url.parse(window.location.href, true);
+      if(viewUrl.query.noHistory) return false;
 
       // 验证路径
       let path = window.location.pathname;
-      let disablePathReg = [/^\/product\/template\/view\/\S+$/];
+      let disablePathReg = [/^\/product\/template\/detail\/\S+$/];
       if(disablePathReg.some(reg => reg.test(path))) return false;
 
       return allow;
     },
     // 是否允许删除产品模板
     allowDeleteProductTemplate() {
-      return (this.allowEditCustomer && this.permission.CUSTOMER_DELETE) || true;
+      return (this.allowEditCustomer && this.permission.CUSTOMER_DELETE);
     },
     /** 
      * 满足以下条件允许编辑产品模板
@@ -105,12 +115,13 @@ export default {
      * 2. 有客户编辑权限
      */
     allowEditCustomer() {
-      return (!this.isDelete && this.hasEditCustomerAuth) || true;
+      return (!this.isDelete && this.hasEditCustomerAuth);
     },
     // 字段列表
     fields() {
-      let fields = (this.initData && this.initData.fieldInfo || []).sort((a, b) => a.orderId - b.order.id);
-
+      let fields = (this.initData.productFields || []).sort((a, b) => a.orderId - b.orderId).filter(field => {
+        return field.fieldName !== 'customerId'
+      });
       return [
         ...fields,
         {
@@ -139,24 +150,23 @@ export default {
      * 3. 编辑客户个人权限： 自己创建的 或 客户负责人
      */
     hasEditCustomerAuth(){
-      // let customer = this.customer;
+      let productTemplate = this.productTemplate;
       let loginUserId = (this.loginUser && this.loginUser.userId) || '';
-      // return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT', 
-      //   //团队权限判断
-      //   () => {
-      //     let tags = Array.isArray(customer.tags) ? customer.tags : [];
-      //     //无团队则任何人都可编辑
-      //     if(tags.length == 0) return true;
+      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT', 
+        // 团队权限判断
+        () => {
+          let tags = Array.isArray(productTemplate.tags) ? productTemplate.tags : [];
+          // 无团队则任何人都可编辑
+          if(tags.length == 0) return true;
 
-      //     let loginUserTagIds = this.initData.loginUser.tagIds || [];
-      //     return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
-      //   }, 
-      //   //个人权限判断
-      //   () => {
-      //     return customer.createUser == loginUserId || this.isCustomerManager
-      //   }
-      // );
-      return true;
+          let loginUserTagIds = this.initData.loginUser.tagIds || [];
+          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
+        }, 
+        // 个人权限判断
+        () => {
+          return productTemplate.createUser == loginUserId
+        }
+      );
     },
     /** 
      * 产品模板是否被删除
@@ -164,12 +174,11 @@ export default {
      * 所有操作的权限应该以此为基础
      */
     isDelete(){
-      return false
-      // return (this.productTemplate.isDelete == null || this.productTemplate.isDelete === 1);
+      return (this.productTemplate.isDelete == null || this.productTemplate.isDelete === 1);
     },
     // 当前用户的权限
     permission() {
-      return this.initData && this.initData.loginUser && this.initData.loginUser.authorities || {};
+      return (this.initData && this.initData.loginUser && this.initData.loginUser.authorities) || {};
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
@@ -193,13 +202,9 @@ export default {
     },
   },
   mounted() {
-    // this.loading = true;
+    this.loading = true;
 
-    // TODO: 有数据之后删除
-    this.tabs = this.buildTabs();
-    this.productTemplate.id = this.productTemplateId;
-
-    // this.fetchProductTemplate();
+    this.fetchProductTemplate();
     // this.fetchStatisticalData();
   },
   methods: {
@@ -219,7 +224,7 @@ export default {
         },
         {
           displayName: `相关产品(${productQuantity || 0})`,
-          component: ProductTemplateRelatedProduct.name,
+          component: ProductTemplateRelatedProductTable.name,
           show: !this.isDelete
         }
       ].filter(tab => tab.show);
@@ -231,15 +236,14 @@ export default {
     // 获取产品模板数据
     fetchProductTemplate() {
       const id = this.productTemplateId;
-      getProductTemplate({id}).then(result => {
+      getProductTemplate(id).then(result => {
 
-        if(result.status == 0) {
-          this.productTemplate = Object.freeze(result.data);
-          this.productTemplate.id = this.productTemplateId;
-          this.loading = false;
-        } else { 
-          platform.alert(result.message)
-        }
+        this.productTemplate = Object.freeze(result);
+        this.loading = false;
+
+        // TODO: 有数据之后删除
+        this.tabs = this.buildTabs();
+
       })
     },
     // 获取统计数据
@@ -259,7 +263,7 @@ export default {
     },
     // 跳转编辑
     goEdit() {
-      // 
+      window.location = `/product/template/edit/${this.productTemplateId}`;
     },
     selectTab(tab) {
       this.currentTab = tab;
@@ -267,7 +271,7 @@ export default {
   },
   components: {
     [ProductTemplateInfoRecord.name]: ProductTemplateInfoRecord,
-    [ProductTemplateRelatedProduct.name]: ProductTemplateRelatedProduct
+    [ProductTemplateRelatedProductTable.name]: ProductTemplateRelatedProductTable
   }
 }
 </script>

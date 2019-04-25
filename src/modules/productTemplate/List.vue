@@ -301,10 +301,10 @@
       title="导入产品"
       ref="importProductTemplateModal"
       @success="search"
-      action="/customer/importNew">
+      action="/product/importTemplate">
       <div slot="tip">
         <div class="base-import-warn">
-          请先下载<a href="/customer/import/templateNew">导入模版 </a>，填写完成后再上传导入。
+          请先下载<a href="/product/importTemplate/template">导入模版 </a>，填写完成后再上传导入。
         </div>
       </div>
     </base-import>
@@ -317,7 +317,7 @@
       :build-params="exportParamsBuild"
       :validate="exportCountCheck"
       method="post"
-      action="/customer/exportNew"/>
+      action="/product/exportProductTemplate"/>
     <!-- end 导出 -->
 
     <!-- start 已选择列表 -->
@@ -359,6 +359,7 @@
     <batch-edit-product-template-dialog
       ref="batchEditProductTemplateDialog"
       :fields="productTemplateConfig.productFields"
+      :init-data="initData"
       @submit-callback="search"
       :selected-ids="selectedIds">
 
@@ -372,10 +373,10 @@
 <script>
 import _ from 'lodash';
 import Page from '@model/Page';
-
+import platform from '@src/platform'
 import { formatDate } from '@src/util/lang';
 
-import { getProductTemplateList } from '@src/api/ProductApi.js'
+import { getProductTemplateList, productTemplateDelete } from '@src/api/ProductApi.js'
 
 import DialogBatchEditProductTemplate from './component/DialogBatchEditProductTemplate.vue';
 
@@ -492,8 +493,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.initData);
-
     this.auth = (this.initData && this.initData.authorities) || {};
 
 
@@ -507,7 +506,7 @@ export default {
     this.buildConfig(this.paramsBackup.customizedSearchModel);
     this.search();
 
-    //TODO: [tab_spec]标准化刷新方式
+    // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
   methods: {
@@ -1150,8 +1149,32 @@ export default {
       window.location = '/product/template/create';
     },
     // 产品 删除
-    productDelete() {
-      // 
+    async productDelete() {
+      if(this.multipleSelection.length <= 0) platform.alert('请您至少选择一个需要删除的产品！');
+      
+      const confirm = await platform.confirm('您确定要删除所选产品吗？');
+      if(!confirm) return
+
+      try {
+        this.loadingListData = true;
+        let result = await productTemplateDelete(this.selectedIds.join(','));
+
+        this.$platform.notification({
+          title: '产品模板',
+          message: result.status == 0 ? '删除产品模板成功' : result.message,
+          type: result.status == 0 ? 'success' : 'error',
+        });
+
+        if(result.status == 0) {
+          this.selectionToggle();
+          this.search();
+        } else {
+          this.loadingListData = false;
+        }
+
+      } catch(err) {
+        console.log(`productDelete err ${err}`)
+      }
     },
   },
   components: {

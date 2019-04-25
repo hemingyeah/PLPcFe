@@ -369,6 +369,12 @@ export default {
     updateAddressBackup(ad) {
       this.addressBackup = ad;
     },
+    validate() {
+      return this.$refs.form.validate()
+        .then(valid => { 
+          return valid
+        })
+    }
   }
 }
 </script>

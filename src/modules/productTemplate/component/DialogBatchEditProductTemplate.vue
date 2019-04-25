@@ -18,7 +18,7 @@
               v-for="item in editableFields" 
               :label="item.displayName" 
               :value="item.fieldName"
-              :key="item.fieldName">
+              :key="`${item.fieldName}${Math.random()}`">
             </el-option>
           </el-select>
         </el-form-item>
@@ -98,8 +98,8 @@
           :prop="selectedFieldName"
           :key="selectedFieldName"
           :rules="selectedField.rules"
-          v-else-if="selectedField.formType === 'select' && selectedField.setting.isMulti">
-          <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
+          v-else-if="selectedField.formType === 'select'">
+          <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
             <el-option
               v-for="item in selectedField.setting.dataSource"
               :key="item"
@@ -113,8 +113,8 @@
           :prop="selectedFieldName"
           :key="selectedFieldName"
           :rules="selectedField.rules"
-          v-else-if="selectedField.formType === 'select' && !selectedField.setting.isMulti">
-          <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
+          v-else-if="selectedField.formType === 'selectMulti'">
+          <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
             <el-option
               v-for="item in selectedField.setting.dataSource"
               :key="item"
@@ -183,7 +183,10 @@
 </template>
 
 <script>
-import platform from '@src/platform'
+
+import { productTemplateEditBatch } from '@src/api/ProductApi.js';
+
+import platform from '@src/platform';
 
 export default {
   name: 'batch-edit-product-template-dialog',
@@ -198,6 +201,11 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    // 初始化数据
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
   },
   data() {
     return {
@@ -225,12 +233,13 @@ export default {
   },
   computed: {
     selectedField() {
-      return this.editableFields.filter(ef => ef.fieldName === this.selectedFieldName)[0] || {};
+      let field = this.editableFields.filter(ef => ef.fieldName === this.selectedFieldName)[0] || {};
+      return field;
     }
   },
   watch: {
     form: {
-      handle(newValue) {
+      handler(newValue) {
         if ((this.selectedField.formType === 'manager' || this.selectedField.formType === 'user') && !newValue[this.selectedField.fieldName]) {
           this.inputRemoteSearch.customerManager.options = [];
         }
@@ -258,16 +267,19 @@ export default {
           formType: 'text',
           displayName: '产品编号',
           rules: [{
-            required: true, message: '请输入产品编号', trigger: ['blur', 'change']
+            required: false, message: '请输入产品编号', trigger: ['blur', 'change']
           }]
         },  
         {
           fieldName: 'type',
           formType: 'select',
           displayName: '产品类型',
+          setting: {
+            dataSource: this.initData.productConfig.productType
+          },
           rules: [{
             trigger: ['blur', 'change'],
-            required: true, message: '请选择产品类型',
+            required: false, message: '请选择产品类型',
           }]
         }
       ];
@@ -280,9 +292,9 @@ export default {
 
       const customizedField = this.fields
         .filter(f => f.isSystem === 0 && f.formType !== 'attachment' && f.formType !== 'separator')
-        .map(field  => {
+        .map(field => {
           // select
-          if (field.formType === 'select' && field.setting.isMulti) {
+          if (field.formType === 'selectMulti') {
             this.$set(this.form, field.fieldName, []);
           } else {
             this.$set(this.form, field.fieldName, null);
@@ -304,6 +316,7 @@ export default {
             field.rules = [{
               required: true, message: '请至少选择一个选项', trigger: ['blur', 'change']
             }];
+            field.setting.isMulti = 1;
           }
           // number
           else if (field.formType === 'number') {
@@ -319,7 +332,7 @@ export default {
           else if (field.formType === 'phone') {
             field.rules = [
               {
-                required: true, message: '请输入电话', trigger: ['blur', 'change']
+                required: !field.isNull, message: '请输入电话', trigger: ['blur', 'change']
               },
               {
                 trigger: ['blur', 'change'],
@@ -339,7 +352,7 @@ export default {
           else if (field.formType === 'email') {
             field.rules = [
               {
-                required: true, message: '请输入邮箱', trigger: ['blur', 'change']
+                required: !field.isNull, message: '请输入邮箱', trigger: ['blur', 'change']
               }, {
                 trigger: ['blur', 'change'],
                 validator(rule, value, callback) {
@@ -422,18 +435,19 @@ export default {
         this.pending = true;
         const params = this.buildParams();
 
-        const res = await this.$http.post('/customer/editBatch', params, false);
+        const result = await productTemplateEditBatch(params);
 
-        if (res.status === 0) {
+        if (result.status === 0) {
           this.$emit('submit-callback');
+          this.batchEditProductTemplateDialog = false;
+          this.pending = false;
         }
+        this.$platform.notification({
+          title: '产品模板',
+          message: result.status == 0 ? '批量编辑产品模板成功' : result.message,
+          type: result.status == 0 ? 'success' : 'error',
+        });
 
-        if (res.status === 1 && res.message) {
-          this.$platform.alert(res.message);
-        }
-
-        this.batchEditProductTemplateDialog = false;
-        this.pending = false;
 
       } catch (e) {
         if (e !== false) {
