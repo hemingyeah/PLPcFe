@@ -121,7 +121,7 @@ export default {
         .then(res => {
           this.loading = false;
 
-          if (res.status) return this.notice({
+          if (res.status) return this.$platform.notification({
             title: '失败',
             type: 'error',
             message: res.message || '发生未知错误',
@@ -148,7 +148,7 @@ export default {
         .then(res => {
           row.pending = false;
           if (res.status) {
-            return this.notice({
+            return this.$platform.notification({
               title: '失败',
               type: 'error',
               message: res.message || '发生未知错误',
@@ -169,13 +169,11 @@ export default {
 
       deletePerformanceRule(row.id)
         .then(res => {
-          if (res.status) {
-            return this.notice({
-              title: '失败',
-              type: 'error',
-              message: res.message || '发生未知错误',
-            })
-          }
+          if (res.status) return this.$platform.notification({
+            title: '失败',
+            type: 'error',
+            message: res.message || '发生未知错误',
+          });
 
           this.$platform.notification({
             title: '删除成功',

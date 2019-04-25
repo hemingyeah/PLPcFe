@@ -15,25 +15,36 @@ router.get('/customer/product_v2', async ctx => {
   ctx.body = Template.renderWithHtml('产品管理', body, script, modConfig.template)
 });
 
-// router.get('/product/create', async ctx => {
-//   let modConfig = modules['customer.edit'];
-//   let reqHeaders = ctx.request.headers;
-//   let script = ['/customer.edit.js'];
-//   let result = await HttpClient.request('//customer/create', 'get', null, {headers: reqHeaders});
-//   let body = result.body;
-//
-//   ctx.body = Template.renderWithHtml('新建客户', body, script, modConfig.template)
-// });
-//
-// router.get('/product/edit/:id', async ctx => {
-//   let modConfig = modules['customer.edit'];
-//   let reqHeaders = ctx.request.headers;
-//   let script = ['/customer.edit.js'];
-//   let result = await HttpClient.request(`/customer/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
-//   let body = result.body;
-//
-//   ctx.body = Template.renderWithHtml('编辑客户', body, script, modConfig.template)
-// });
+router.get('/customer/product/detail/:id', async ctx => {
+  let script = ['/product.view.js'];
+  let modConfig = modules['product.view'];
+  let reqHeaders = ctx.request.headers;
+  
+  let result = await HttpClient.request(`/product/detail/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('产品详情', body, script, modConfig.template)
+});
+
+router.get('/customer/product/create', async ctx => {
+  let modConfig = modules['product.edit'];
+  let script = ['/product.edit.js'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request('/product/create', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('新建产品', body, script, modConfig.template)
+});
+
+router.get('/customer/product/edit/:id', async ctx => {
+  let modConfig = modules['product.edit'];
+  let script = ['/product.edit.js'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request(`/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)
+});
 
 
 router.get('/product/template', async ctx => {

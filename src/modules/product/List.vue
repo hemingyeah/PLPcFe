@@ -19,7 +19,7 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @click="goToCreate">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu">删除</base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteProducts">删除</base-button>
         </div>
 
         <div class="action-button-group">
@@ -33,13 +33,13 @@
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
-                <div @click="openDialog('importCustomer')">导入产品</div>
+                <div @click="openDialog('importProduct')">导入产品</div>
               </el-dropdown-item>
               <el-dropdown-item>
-                <div @click="exportCustomer(false)">导出</div>
+                <div @click="exportProduct(false)">导出</div>
               </el-dropdown-item>
               <el-dropdown-item>
-                <div @click="exportCustomer(true)">导出全部</div>
+                <div @click="exportProduct(true)">导出全部</div>
               </el-dropdown-item>
               <el-dropdown-item>
                 <div @click="openDialog('update')">批量更新</div>
@@ -84,7 +84,15 @@
           :sortable="column.sortable"
           show-overflow-tooltip
           :align="column.align">
+          <template slot-scope="scope">
+            <template v-if="column.field === 'name'">
+              <a href="" class="view-detail-btn" @click.stop.prevent="openProductTab(scope.row.id)">{{scope.row[column.field]}}</a>
+            </template>
 
+            <template v-else>
+              {{scope.row[column.field]}}
+            </template>
+          </template>
         </el-table-column>
       </el-table>
 
@@ -127,7 +135,7 @@
           <div class="product-selected-list">
             <div class="product-selected-row product-selected-head">
               <span class="product-selected-sn">编号</span>
-              <span class="product-selected-name">客户</span>
+              <span class="product-selected-name">产品</span>
             </div>
             <div class="product-selected-row" v-for="c in multipleSelection" :key="c.id" >
               <span class="product-selected-sn">{{c.serialNumber}}</span>
@@ -201,15 +209,65 @@
         </div>
       </el-form>
     </base-panel>
+
+
+    <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
+    <batch-editing-dialog
+      ref="batchEditingDialog"
+      :fields="productFields"
+      @submit-callback="search"
+      :selected-ids="selectedIds"></batch-editing-dialog>
+
+    <batch-reminding-dialog ref="batchRemindingDialog" :selected-ids="selectedIds"
+                            @success-callback="remindSuccess"></batch-reminding-dialog>
+
+    <base-import
+      title="导入产品"
+      ref="importProductModal"
+      @success="search"
+      action="/product/import">
+      <div slot="tip">
+        <div class="base-import-warn">
+          <p>请先下载<a href="/product/import/template">导入模版 </a>，填写完成后再上传导入。</p>
+          <p>导入产品前，请确保产品所属客户已存在。您可以 <a href="/customer/import/getAllCustomerId">点这里</a>导出包含所有已存在客户的模板</p>
+        </div>
+      </div>
+    </base-import>
+
+    <base-export
+      ref="exportPanel"
+      :columns="exportColumns"
+      :build-params="buildExportParams"
+      :validate="checkExportCount"
+      method="post"
+      action="/customer/product/export"/>
+
+
+    <batch-update-dialog
+      ref="batchUpdateDialog"
+      :selected-ids="selectedIds"
+      :total-items="page.total"
+      :build-download-params="buildParams"
+      @success="search"
+      action="/product/importCover"
+    ></batch-update-dialog>
+
   </div>
 </template>
 
 <script>
 
 import Page from '@model/Page';
-import { getProduct } from '@src/api/ProductApi';
 import {formatDate} from '@src/util/lang';
+import SendMessageDialog from './components/SendMessageDialog.vue';
+import BatchEditingDialog from './components/BatchEditingDialog.vue'
+import BatchRemindingDialog from './components/BatchRemindingDialog.vue';
+import BatchUpdateDialog from './components/BatchUpdateDialog.vue';
 
+import {
+  getProduct,
+  deleteProductByIds,
+} from '@src/api/ProductApi';
 
 /**
  * todo
@@ -282,17 +340,45 @@ export default {
     },
     panelWidth() {
       return `${420 * this.columnNum}px`;
+    },
+    selectedIds() {
+      return this.multipleSelection.map(p => p.id);
+    },
+    exportColumns() {
+      return this.columns
+        .map(c => {
+          c.export = true;
+          return c;
+        })
+    },
+    smsRest() {
+      return this.initData.smsRest || 0;
     }
   },
   mounted() {
 
     console.log('initData', this.initData);
+    this.revertStorage();
     this.buildColumns();
     this.addCustomizedFieldToSearchModel();
     this.search();
-
   },
   methods: {
+    openProductTab(productId) {
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `customer_view_${productId}`,
+        title: '产品详情',
+        close: true,
+        url: `/customer/product/detail/${productId}?noHistory=1`,
+        fromId
+      })
+
+    },
+    remindSuccess() {
+
+    },
     search({ resetPageNum = false, moreConditions = false } = {}) {
       if (resetPageNum) {
         this.searchModel.pageNum = 1;
@@ -370,8 +456,57 @@ export default {
       this.addCustomizedFieldToSearchModel();
       this.search();
     },
-    openDialog() {
+    openDialog(action) {
 
+      if (action === 'sendMessage') {
+        this.$refs.messageDialog.openSendMessageDialog();
+      }
+
+      if (action === 'edit') {
+        this.$refs.batchEditingDialog.openBatchEditingDialog();
+      }
+
+      if (action === 'remind') {
+        this.$refs.batchRemindingDialog.openBatchRemindingDialog();
+      }
+
+      if (action === 'importProduct') {
+        this.$refs.importProductModal.open();
+      }
+
+      if (action === 'update') {
+        this.$refs.batchUpdateDialog.openBatchUpdateCustomerDialog();
+      }
+
+    },
+    // operation
+    async deleteProducts() {
+      if (!this.multipleSelection.length) {
+        return this.$platform.alert('请选择需要删除的产品');
+      }
+
+      try {
+        if (!await this.$platform.confirm('确定要删除选择的产品？')) return;
+
+        const ids = this.multipleSelection.map(p => p.id).join(',');
+
+        const res = await deleteProductByIds(ids);
+
+        if (!res || res.status) return this.$platform.notification({
+          title: '失败',
+          type: 'error',
+          message: res.message || '发生未知错误',
+        });
+        this.$platform.notification({
+          title: '删除成功',
+          type: 'success',
+        });
+        this.multipleSelection = [];
+        this.search();
+
+      } catch (e) {
+        console.error('e', e);
+      }
     },
     // table method
     handleSelection(selection) {
@@ -413,8 +548,15 @@ export default {
     },
     buildColumns() {
       let sortable = false;
+      let {columnStatus} = this.getLocalStorageData();
+      const customerProductCheck = localStorage.getItem('customerProductCheck');
 
-      return this.columns = this.productFields
+      if (customerProductCheck) {
+        columnStatus = customerProductCheck.split(',');
+        localStorage.removeItem('customerProductCheck');
+      }
+
+      this.columns = this.productFields
         .map(field => {
 
           if (field.formType === 'date' || field.formType === 'datetime') {
@@ -425,13 +567,42 @@ export default {
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
-            show: true,
+            show: columnStatus.some(c => c === field.fieldName),
             // width: `${minWidth}px`,
             sortable,
             isSystem: field.isSystem,
           }
         })
+
+      console.log('this.columns', this.columns.map(field => field.field));
+
+      return this.columns;
     },
+
+    buildExportParams(checkedArr, ids) {
+      let exportAll = !ids || !ids.length;
+      return {
+        productChecked: checkedArr.join(','),
+        data: exportAll ? '' : ids.join(','),
+        exportSearchModel: exportAll ? JSON.stringify(this.buildParams() || {}) : ''
+      };
+    },
+    /** 检测导出条数 */
+    checkExportCount(ids, max) {
+      let exportAll = !ids || !ids.length;
+      return exportAll && this.page.total > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
+    },
+
+    exportProduct(exportAll) {
+      let ids = [];
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品数据.xlsx`;
+      if (!exportAll) {
+        if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+        ids = this.selectedIds;
+      }
+      this.$refs.exportPanel.open(ids, fileName);
+    },
+
     addCustomizedFieldToSearchModel() {
 
       this.searchFields.forEach(field => {
@@ -444,7 +615,7 @@ export default {
     },
 
     goToCreate() {
-      window.location = '/product/create';
+      window.location = '/customer/product/create';
     },
     getLocalStorageData() {
       const dataStr = localStorage.getItem('product_list_localStorage_19_4_24') || '{}';
@@ -455,7 +626,19 @@ export default {
       data[key] = value;
       localStorage.setItem('product_list_localStorage_19_4_24', JSON.stringify(data));
     },
+    revertStorage() {
+      const {pageSize} = this.getLocalStorageData();
+      if (pageSize) {
+        this.searchModel.pageSize = pageSize;
+      }
+    },
   },
+  components: {
+    [SendMessageDialog.name]: SendMessageDialog,
+    [BatchEditingDialog.name]: BatchEditingDialog,
+    [BatchRemindingDialog.name]: BatchRemindingDialog,
+    [BatchUpdateDialog.name]: BatchUpdateDialog,
+  }
 }
 </script>
 
@@ -713,11 +896,7 @@ export default {
   .product-list-container .advanced-search-form {
     overflow: auto;
     padding: 10px 0 63px 0;
-    height: calc(100% - 51px);
-
-    .form-item-container {
-
-    }
+    height: calc(100% - 52px);
 
     .two-columns {
       display: flex;
@@ -749,6 +928,14 @@ export default {
       .base-button {
         margin: 0 10px;
       }
+    }
+  }
+
+
+
+  .base-import-warn {
+    p {
+      margin: 0;
     }
   }
 

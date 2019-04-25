@@ -663,8 +663,6 @@ export default {
   mounted() {
     let initData = JSON.parse(window._init) || {};
 
-    console.log('initData', initData);
-
     this.customerConfig = {
       customerAddressConfig: initData.customerAddressConfig,
       customerConfig: initData.customerConfig,

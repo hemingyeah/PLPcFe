@@ -5,6 +5,54 @@ function getProduct(params) {
 }
 
 /**
+ * 删除产品
+ * @param ids String ids = [id].join(',')
+ * @returns {*}
+ */
+function deleteProductByIds(ids) {
+  return http.get(`/customer/product/deleteByIds/${ids}`)
+}
+
+/**
+ * 选择产品批量发送短信
+ * @param {Object} params - 参数
+ * @param {String} params.smsTemplateId - 短信模板id
+ * @param {String} params.ids - 产品ids
+ * @param {Number} params.isAllLm - 是否是全部联系人
+ * @param {Date} params.sendTime - 发送时间
+ */
+function sendSmsBatch(params) {
+  return http.post('/customer/product/sendSmsBatch', params, false)
+}
+
+/**
+ * 统计给选中的产品发送短信的数量
+ * @param {Object} params - 参数
+ * @param {String} params.ids - 产品ids
+ * @param {Number} params.isAllLm - 是否是全部联系人
+ */
+function computeSendNumForProduct(params) {
+  return http.get('/customer/product/computeSendNum', params)
+}
+
+/**
+ * 统计给选中的产品发送短信的数量
+ * @param {Object} params - 参数
+ * @param {String} params.ids - 产品ids
+ * @param {Number} params.isAllLm - 是否是全部联系人
+ */
+function editBatchProduct(params) {
+  return http.post('/customer/product/editBatch', params, false)
+}
+
+/**
+ * 获取产品提醒模板
+ */
+function getProductRemindTemplate() {
+  return http.get('/product/remind/list')
+}
+
+/**
  * 获取产品模板列表数据
  * @param {Object} params - 参数
  * @param {Number} params.pageNum - 页码
@@ -87,4 +135,9 @@ export {
   getProductTemplateRecord,
   productTemplateCreateRecord,
   productTemplateDeleteRecord,
+  sendSmsBatch,
+  computeSendNumForProduct,
+  deleteProductByIds,
+  editBatchProduct,
+  getProductRemindTemplate,
 };
