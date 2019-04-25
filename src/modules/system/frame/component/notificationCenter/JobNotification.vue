@@ -263,7 +263,7 @@ export default {
     },
     getNum () {
       let count = 0;
-      if(this.notificationPage.list[0].readed == 0) {
+      if(this.notificationPage.list.length != 0 && this.notificationPage.list[0].readed == 0) {
         this.notificationPage.list.forEach(item => {
           if(item.readed == 0) {
             count++;

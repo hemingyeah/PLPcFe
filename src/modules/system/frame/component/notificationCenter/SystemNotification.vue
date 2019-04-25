@@ -98,9 +98,6 @@ export default {
       }, {
         value: 'activity',
         label: '活动通知'
-      }, {
-        value: 'maintenance',
-        label: '维护通知'
       }],
       dataOption: '',
       dataOptions: [{

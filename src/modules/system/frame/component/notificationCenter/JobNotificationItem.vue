@@ -30,6 +30,9 @@ export default {
     info: Object,
     index: Number
   },
+  created () {
+    console.log(this.info);
+  },
   methods: {
     /** 删除通知 */
     async deleteItem (info) {
