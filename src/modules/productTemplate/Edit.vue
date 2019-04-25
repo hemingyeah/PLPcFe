@@ -66,6 +66,8 @@
 import * as FormUtil from '@src/component/form/util';
 import platform from '@src/platform'
 
+import { productTemplateCreate, productTemplateUpdate, getProductTemplate } from '@src/api/ProductApi.js'
+
 export default {
   name: 'product-template-edit',
   props: {
@@ -77,7 +79,7 @@ export default {
   data() {
     return {
       auth: {}, // 权限
-      fields: [
+      fieldsLocal: [
         {
           displayName: '产品名称', 
           fieldName: 'name',
@@ -109,14 +111,49 @@ export default {
       productTemplateType: [], // 产品类型列表
     }
   },
-  mounted() {
-    let fields = 
-      [{"id":476,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"name","displayName":"客户","formType":"text","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":0,"isDelete":0},{"id":717,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_t5eFptCUdOKIaujS","displayName":"逻辑项","formType":"select","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{"isMulti":false,"dataSource":["选项1","选项2","选项3","选项4","选项5","选项6","选项7","选项8"]},"orderId":1,"isDelete":0},{"id":475,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"serialNumber","displayName":"客户编号","formType":"text","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":2,"isDelete":0},{"id":481,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"manager","displayName":"客户负责人","formType":"user","defaultValue":null,"isNull":1,"isSearch":1,"placeHolder":null,"setting":{},"orderId":3,"isDelete":0},{"id":830,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_AzGv2yDylwvpJ6VB","displayName":"逻辑项测试","formType":"select","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{"isMulti":false,"dataSource":["测1","测2","测3","测4","测5"]},"orderId":4,"isDelete":0},{"id":477,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"lmName","displayName":"联系人","formType":"text","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":5,"isDelete":0},{"id":478,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"lmPhone","displayName":"电话","formType":"phone","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":6,"isDelete":0},{"id":718,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_99yjJuwQV8Yn8iam","displayName":"多选","formType":"select","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":"","setting":{"isMulti":true,"dataSource":["选项1","选项2"]},"orderId":8,"isDelete":0},{"id":480,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"tags","displayName":"服务团队","formType":"select","defaultValue":null,"isNull":1,"isSearch":1,"placeHolder":null,"setting":{"isMulti":true,"dataSource":["选项1"]},"orderId":9,"isDelete":0},{"id":752,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_FS370VybAi6R6CVw","displayName":"附件测试PL","formType":"attachment","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":"附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的please","setting":{},"orderId":10,"isDelete":0},{"id":716,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_NTASlf2KNXmUOSXl","displayName":"日期","formType":"date","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":11,"isDelete":0},{"id":719,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_iN6yC8a8x8iKmHfS","displayName":"人员","formType":"user","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":12,"isDelete":0},{"id":715,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_ambl1C222CNvS2Pc","displayName":"时间","formType":"datetime","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":13,"isDelete":0},{"id":826,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_0RXU221agLm79ptT","displayName":"日期","formType":"date","defaultValue":null,"isNull":1,"isSearch":1,"placeHolder":"下单日期","setting":{},"orderId":14,"isDelete":0},{"id":827,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_5q4XKSTVj0cNNIvA","displayName":"单行","formType":"text","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":15,"isDelete":0}]
-    
-    this.fields = [...this.fields, ...fields];
+  computed: {
+    action() {
+      return this.initData.action
+    },
+    editId() {
+      return this.initData.id
+    },
+    fields() {
+      let originFields = this.initData && this.initData.fieldInfo || [{"id":476,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"name","displayName":"客户","formType":"text","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":0,"isDelete":0},{"id":717,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_t5eFptCUdOKIaujS","displayName":"逻辑项","formType":"select","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{"isMulti":false,"dataSource":["选项1","选项2","选项3","选项4","选项5","选项6","选项7","选项8"]},"orderId":1,"isDelete":0},{"id":475,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"serialNumber","displayName":"客户编号","formType":"text","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":2,"isDelete":0},{"id":481,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"manager","displayName":"客户负责人","formType":"user","defaultValue":null,"isNull":1,"isSearch":1,"placeHolder":null,"setting":{},"orderId":3,"isDelete":0},{"id":830,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_AzGv2yDylwvpJ6VB","displayName":"逻辑项测试","formType":"select","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{"isMulti":false,"dataSource":["测1","测2","测3","测4","测5"]},"orderId":4,"isDelete":0},{"id":477,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"lmName","displayName":"联系人","formType":"text","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":5,"isDelete":0},{"id":478,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"lmPhone","displayName":"电话","formType":"phone","defaultValue":null,"isNull":0,"isSearch":1,"placeHolder":null,"setting":{},"orderId":6,"isDelete":0},{"id":718,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_99yjJuwQV8Yn8iam","displayName":"多选","formType":"select","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":"","setting":{"isMulti":true,"dataSource":["选项1","选项2"]},"orderId":8,"isDelete":0},{"id":480,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":1,"fieldName":"tags","displayName":"服务团队","formType":"select","defaultValue":null,"isNull":1,"isSearch":1,"placeHolder":null,"setting":{"isMulti":true,"dataSource":["选项1"]},"orderId":9,"isDelete":0},{"id":752,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_FS370VybAi6R6CVw","displayName":"附件测试PL","formType":"attachment","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":"附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的pleaseholder测试附件的please","setting":{},"orderId":10,"isDelete":0},{"id":716,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_NTASlf2KNXmUOSXl","displayName":"日期","formType":"date","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":11,"isDelete":0},{"id":719,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_iN6yC8a8x8iKmHfS","displayName":"人员","formType":"user","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":12,"isDelete":0},{"id":715,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_ambl1C222CNvS2Pc","displayName":"时间","formType":"datetime","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":13,"isDelete":0},{"id":826,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_0RXU221agLm79ptT","displayName":"日期","formType":"date","defaultValue":null,"isNull":1,"isSearch":1,"placeHolder":"下单日期","setting":{},"orderId":14,"isDelete":0},{"id":827,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","tableName":"customer","isSystem":0,"fieldName":"field_5q4XKSTVj0cNNIvA","displayName":"单行","formType":"text","defaultValue":null,"isNull":1,"isSearch":0,"placeHolder":null,"setting":{},"orderId":15,"isDelete":0}];
+      let localFields = this.fieldsLocal;
+      let fields = [...localFields, ...originFields];
+
+      let sortedFields = fields.sort((a, b) => a.orderId - b.orderId)
+        .map(f => {
+          if (f.formType === 'address' && f.isSystem) {
+            f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
+          }
+          return f;
+        })
+        .filter(f => f.fieldName !== 'tags' || (f.fieldName === 'tags' && this.initData.isDivideByTag));
+      return FormUtil.migration(sortedFields)
+    }
+  },
+  async mounted() {
     this.productTemplateType = this.initData && this.initData.productTemplateType || ["产品类型1", "产品类型2", "产品类型3", "产品类型4", "6278￥@6dxm"];
-    this.productTemplateType = this.productTemplateType.map(type => ({text: type, value: type}))
+    this.productTemplateType = this.productTemplateType.map(type => ({text: type, value: type}));
+    // 初始化默认值
     let form = {};
+    // 编辑
+    if(this.action == 'edit' && this.initData.id) {
+      this.loadingPage = true;
+
+      let result = await getProductTemplate(this.initData.id);
+
+      this.loadingPage = false;
+
+      if(result.status == 0) {
+        form = result.data;
+      } else {
+        platform.alert(result.message);
+      }
+      
+    }
 
     form = this.unPackForm(this.fields, form);
     this.form = FormUtil.initialize(this.fields, form);
@@ -125,13 +162,42 @@ export default {
     console.log('product-edit mounted')
   },
   methods: {
-    // 创建产品模板
+    // TODO: 创建产品模板
     createProductTemplate(params) {
-      
+      productTemplateCreate(params)
+        .then(res => {
+          let isSucc = res.status == 0;
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `创建产品模板${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+          
+          window.location.href = `/product/template/view/${res.data.data}`;
+        })
+        .catch(err => console.error('err', err));
     },
-    // 修改产品模板
+    // TODO: 修改产品模板
     editProductTemplate(params) {
-      // 
+      productTemplateUpdate(params)
+        .then(res => {
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `更新产品模板${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+
+          if(res.status == 0) {
+            let fromId = window.frameElement.getAttribute('fromid');
+
+            this.$platform.refreshTab(fromId);
+            this.goBack();
+          }
+          // window.location.href = `/product/template/view/${res.data || this.editId}`;
+        })
+        .catch(err => console.error('err', err));
     },
     // 返回
     goBack() {
@@ -141,7 +207,7 @@ export default {
     genPlaceholder(field){
       return FormUtil.genPlaceholder(field);
     },
-    // 将form对象转换为产品对象
+    // 将form对象转换为产品对象 提交表单使用
     packForm(fields, form) {
       let product = {
         id: form.id,
@@ -152,6 +218,7 @@ export default {
         let {fieldName, isSystem} = field;
         let value = form[fieldName];
 
+        // 不为系统字段,放在attribute里面
         isSystem == 0
           ? product.attribute[fieldName] = value
           : product[fieldName] = value;
@@ -182,7 +249,7 @@ export default {
           this.loadingPage = false;
         });
     },
-    // 将服务端数据 转换为 form 对象
+    // 将服务端数据 转换为form对象 初始化表单
     unPackForm(field, data) {
       return {
         id: data.id,

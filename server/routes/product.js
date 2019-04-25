@@ -56,5 +56,24 @@ router.get('/product/template/create', async ctx => {
   ctx.body = Template.renderWithHtml('新建产品模板', body, script, modConfig.template)
 });
 
+router.get('/product/template/edit/:id', async ctx => {
+  let modConfig = modules['product.template.edit'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/product.template.edit.js'];
+  let result = await HttpClient.request(`/product/template/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('编辑产品模板', body, script, modConfig.template)
+});
+
+router.get('/product/template/detail/:id', async ctx => {
+  let modConfig = modules['product.template.view'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/product.template.view.js'];
+  let result = await HttpClient.request(`/product/template/detail/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('产品模板信息', body, script, modConfig.template)
+});
 
 module.exports = router;

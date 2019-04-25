@@ -73,12 +73,12 @@ module.exports = {
           size += chunk.length;
         })
      
-        //请求完成
+        // 请求完成
         res.on('end', () => {
-          //拼接返回数据
+          // 拼接返回数据
           let body = Buffer.concat(chunks, size).toString();
           
-          //处理返回值
+          // 处理返回值
           let contentType = res.headers['content-type'];
           if(contentType && contentType.indexOf('application/json' >= 0)) {
             body = toJSON(body)
@@ -93,7 +93,7 @@ module.exports = {
         resolve(getBody(null, null, error));
       });
       
-      //发送数据
+      // 发送数据
       if(rawBody) req.write(rawBody);
       
       req.end();
@@ -127,18 +127,18 @@ module.exports = {
 
     return new Promise((resolve, reject) => {
       let req = http.request(proxyOptions, res => {
-        //设定response的header
+        // 设定response的header
         let headers = res.headers;
         for(let name in headers){
           response.set(name, headers[name])
         }
         
-        //设定请求状态
+        // 设定请求状态
         response.status = res.statusCode;
         res.pipe(response.res, {end: false})
         
         res.on('end', () => {
-          //此处需要手动调用
+          // 此处需要手动调用
           response.res.end()
           resolve()
         })
@@ -149,7 +149,7 @@ module.exports = {
         reject(error)
       });
       
-      //非附件类请求需要调用end
+      // 非附件类请求需要调用end
       if(!isMultipart){
         if(rawBody) req.write(rawBody)
         req.end();

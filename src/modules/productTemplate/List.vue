@@ -254,7 +254,7 @@
 
           <template slot-scope="scope">
             <template v-if="column.field === 'name'">
-              <a href="" class="view-detail-btn">{{scope.row[column.field]}}</a>
+              <a href="" class="view-detail-btn" @click.stop.prevent="goProductTemplateView(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
             <template v-else-if="column.formType === 'selectMulti'">
               <span v-if="scope.row[column.field] && scope.row[column.field].length > 0">
@@ -743,6 +743,18 @@ export default {
       let exportAll = !ids || ids.length == 0;
 
       return exportAll && this.page.total > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
+    },
+    // 跳转 产品模板信息
+    goProductTemplateView(id) {
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `product_template_view_${id}`,
+        title: '产品模板信息',
+        close: true,
+        url: `/product/template/detail/${id}?noHistory=1`,
+        fromId
+      })
     },
     // 页码数切换
     handleSizeChange(pageSize) {
