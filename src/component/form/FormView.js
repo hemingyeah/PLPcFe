@@ -52,7 +52,7 @@ const FormView = {
       const originalObj = this.value;
       
       let params = {};
-      let value = isSystem ? originalObj[fieldName] : originalObj.attribute[fieldName];
+      let value = isSystem ? originalObj[fieldName] : originalObj.attribute && originalObj.attribute[fieldName];
       
       params = {displayName, value, formType};
       

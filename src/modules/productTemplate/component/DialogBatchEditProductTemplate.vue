@@ -275,7 +275,7 @@ export default {
           formType: 'select',
           displayName: '产品类型',
           setting: {
-            dataSource: this.initData.productConfig.productType
+            dataSource: this.initData.productConfig && this.initData.productConfig.productType
           },
           rules: [{
             trigger: ['blur', 'change'],

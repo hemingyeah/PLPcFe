@@ -184,6 +184,26 @@
               </el-select>
             </template>
 
+            <template v-else-if="field.formType === 'user'">
+              <el-select
+                v-model="searchModel[field.fieldName]"
+                filterable
+                remote
+                reserve-keyword
+                placeholder="请输入关键词搜索"
+                clearable
+                :loading="inputRemoteSearch.customerManager.loading"
+                :remote-method="searchCustomerManager">
+                <el-option
+                  v-for="item in inputRemoteSearch.customerManager.options"
+                  :key="item.userId"
+                  :label="item.displayName"
+                  :value="item.userId">
+                </el-option>
+              </el-select>
+            </template>
+
+
             <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
               <el-date-picker
                 v-model="searchModel[field.fieldName]"
@@ -269,14 +289,6 @@ import {
   deleteProductByIds,
 } from '@src/api/ProductApi';
 
-/**
- * todo
- * 1. 部分数据还原（选择列，分页数目）
- * 2. 字段对接
- * 3. 列表排序
- * 4. 操作
- *
- */
 export default {
   name: 'product-list',
   props: {
@@ -300,7 +312,13 @@ export default {
         pageSize: 10,
         pageNum: 1,
       },
-  
+      inputRemoteSearch: {
+        customerManager: {
+          options: [],
+          loading: false,
+        },
+      },
+
       datePickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -612,6 +630,16 @@ export default {
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
       this.saveDataToStorage('column_number', command);
+    },
+    searchCustomerManager(keyword) {
+      this.inputRemoteSearch.customerManager.loading = true;
+      return this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
+        .then(res => {
+          this.inputRemoteSearch.customerManager.options = res.list;
+          this.inputRemoteSearch.customerManager.loading = false;
+          return res;
+        })
+        .catch(err => console.error('searchCustomerManager function catch err', err));
     },
 
     goToCreate() {

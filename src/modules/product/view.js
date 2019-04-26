@@ -3,6 +3,7 @@ import http from '@src/util/http';
 import ProductView from './view.vue';
 
 Vue.prototype.$http = http;
+Vue.prototype.$eventBus = new Vue();
 
 //处理注入的参数
 let initData = {};
@@ -13,7 +14,6 @@ try {
   console.error(error)
   console.error('no init data')
 }
-
 const PageComponent = Vue.extend(ProductView);
 const app = new PageComponent({
   propsData: {

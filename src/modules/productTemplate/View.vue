@@ -122,7 +122,8 @@ export default {
       let fields = (this.initData.productFields || []).sort((a, b) => a.orderId - b.orderId).filter(field => {
         return field.fieldName !== 'customerId'
       });
-      return [
+
+      let allFields = [
         ...fields,
         {
           displayName: '',
@@ -140,7 +141,15 @@ export default {
           formType: 'text',
           isSystem: 1,
         }
-      ]
+      ];
+
+      return allFields.map(field => {
+        if(field.formType == 'selectMulti') {
+          field.formType = 'select';
+          field.setting.isMulti = 1;
+        }
+        return field
+      })
     },
     /** 
      * 是否有编辑客户权限，需要满足以下条件之一：

@@ -73,3 +73,49 @@ export function unique(params){
   return http.post('/customer/unique', params, false)
 }
 
+/**
+ * 获取客户提醒
+ * @param {Object} params - 参数
+ * @param {String} params.modalId - customerId || productId
+ * @param {String} params.modal - customer || product
+ */
+export function getRemindOfCustomer(params) {
+  return http.get('/customer/remind/list', params)
+}
+
+/**
+ *
+ * @param {Object} params - 参数
+ * @param {String} params.id - 记录id
+ * @returns {*}
+ */
+export function deleteComment(params) {
+  return http.post('/customer/deleteCustomerRecord', params, false)
+}
+
+/**
+ *
+ * @param {Object} params - 参数
+ * @param {String} params.customerId - 客户id
+ * @param {Number} params.pageSize -
+ * @param {Number} params.pageNum -
+ * @returns {*}
+ */
+export function getLinkmanOfCustomer(params) {
+  return http.get('/customer/linkman/list', params)
+}
+
+/**
+ *
+ * @param {Object} params - 参数
+ * @param {String} params.customerId - 客户id
+ * @param {Number} params.pageSize -
+ * @param {Number} params.pageNum -
+ * @param {Number} params.keyword -
+ * @returns {*}
+ */
+export function getUserTag(params) {
+  return http.get('/customer/userTag/list', params)
+}
+
+

@@ -53,6 +53,79 @@ function getProductRemindTemplate() {
 }
 
 /**
+ * 获取产品详情
+ * @param {Object} params - 参数
+ * @param {String} params.id - 产品id
+ */
+function getProductDetail(params) {
+  return http.get('/product/detail/data', params)
+}
+
+/**
+ * 获取产品相关事件
+ * @param {Object} params - 参数
+ * @param {String} params.id - 产品id
+ */
+function getEventOfProduct(params) {
+  return http.get('/product/event/list', params)
+}
+
+/**
+ * 获取产品相关工单
+ * @param {Object} params - 参数
+ * @param {String} params.id - 产品id
+ */
+function getTaskOfProduct(params) {
+  return http.get('/product/task/list', params)
+}
+
+/**
+ * 获取产品相关计划任务
+ * @param {Object} params - 参数
+ * @param {String} params.id - 产品id
+ */
+function getPlanOfProduct(params) {
+  return http.get('/product/plantask/list', params)
+}
+
+/**
+ * 获取产品记录
+ * @param {Object} params - 参数
+ * @param {String} params.primaryId - 产品id
+ * @param {Number} params.pageNum - 页码
+ * @param {Number} params.pageSize - 页面大小
+ */
+function getRecordOfProduct(params) {
+  return http.get('/product/record/list', params)
+}
+
+/**
+ * 创建产品备注
+ * @param {Object} params - 参数
+ * @param {String} params.primaryId - 产品id
+ * @param {String} params.primaryName - 产品名称
+ * @param {Number} params.showInOwn - 是否自己可见
+ * @param {Array} params.attachments - 附件
+ * @param {Object} params.content - 内容
+ * @param {Object} params.content.updateContent - 内容
+ * @param {Object} params.content.updateType - 'pRecord'
+ */
+function commentProduct(params) {
+  return http.post('/customer/product/pRecord/create', params, false)
+}
+
+/**
+ * 删除产品
+ * @param {Object} params - 参数
+ * @param {String} params.ids - 产品id
+ */
+function deleteProduct(ids) {
+  return http.post(`/customer/product/deleteByIds/${ids}`)
+}
+
+
+
+/**
  * 获取产品模板列表数据
  * @param {Object} params - 参数
  * @param {Number} params.pageNum - 页码
@@ -69,7 +142,7 @@ function getProductTemplateList(params) {
  * @returns Promise<>
  */
 function productTemplateDelete(ids) {
-  return http.get(`/product/template/delete/${ids}`);
+  return http.post(`/product/template/delete/${ids}`);
 }
 
 /**
@@ -154,6 +227,13 @@ function productTemplateRelatedProducts(params) {
 }
 
 export {
+  getTaskOfProduct,
+  getPlanOfProduct,
+  getRecordOfProduct,
+  commentProduct,
+  deleteProduct,
+  getProductDetail,
+  getEventOfProduct,
   getProduct,
   getProductTemplateList,
   productTemplateDelete,

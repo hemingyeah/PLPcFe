@@ -497,7 +497,7 @@ export default {
 
 
     this.productTemplateConfig = {
-      productConfig: this.initData && this.initData.productConfig,
+      productConfig: (this.initData && this.initData.productConfig) || {productType: []},
       productFields: (this.initData.productFields || []).sort((a, b) => a.orderId - b.orderId)
     };
     this.inputRemoteSearch.type.options = [...this.productTemplateConfig.productConfig.productType];
@@ -1014,7 +1014,7 @@ export default {
         let sortModel = {
           isSystem: prop === 'createTime' || prop === 'updateTime' || prop === 'type' ? 1 : 0,
           sequence: order === 'ascending' ? 'ASC' : 'DESC',
-          column: prop === 'createTime' || prop === 'updateTime' || prop === 'type' ? `product.${prop}` : prop,
+          column: prop === 'createTime' || prop === 'updateTime' || prop === 'type' ? `productTemplate.${prop}` : prop,
         };
 
         const sortedField = this.productTemplateConfig.productFields.filter(sf => sf.fieldName === prop)[0] || {};
@@ -1150,7 +1150,7 @@ export default {
     },
     // 产品 删除
     async productDelete() {
-      if(this.multipleSelection.length <= 0) platform.alert('请您至少选择一个需要删除的产品！');
+      if(this.multipleSelection.length <= 0) return platform.alert('请您至少选择一个需要删除的产品！');
       
       const confirm = await platform.confirm('您确定要删除所选产品吗？');
       if(!confirm) return

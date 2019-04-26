@@ -21,7 +21,7 @@
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'remind.name'">
-            <a href="javascript:;" class="edit-btn" @click="$eventBus.$emit('customer_detail_view.update_remind', scope.row)">{{scope.row.remind.name}}</a>
+            <a href="javascript:;" class="edit-btn" @click="$eventBus.$emit('product_view.open_remind_dialog', scope.row)">{{scope.row.remind.name}}</a>
           </template>
           <template v-else-if="column.field === 'remindTime'">
             {{scope.row.remindTime || '无'}}
@@ -43,11 +43,12 @@
 </template>
 
 <script>
-import {formatDate,} from '@src/util/lang';
+import {formatDate, } from '@src/util/lang';
 import * as CustomerApi from '@src/api/CustomerApi';
+import {deleteScheduler} from '@src/api/CommonApi';
 
 export default {
-  name: "customer-remind-table",
+  name: 'remind-table',
   props: {
     shareData: {
       type: Object,
@@ -69,16 +70,16 @@ export default {
     }
   },
   computed: {
-    customerId() {
-      return this.shareData.customer ? this.shareData.customer.id : '';
+    productId() {
+      return this.shareData.product.id;
     },
   },
   mounted() {
     this.fetchData();
-    this.$eventBus.$on('customer_remind_table.update_remind_list', this.fetchData);
+    this.$eventBus.$on('product_remind_table.update_remind_list', this.fetchData);
   },
   beforeDestroy() {
-    this.$eventBus.$off('customer_remind_table.update_remind_list', this.fetchData);
+    this.$eventBus.$off('product_remind_table.update_remind_list', this.fetchData);
   },
   methods: {
     sortChange({ prop, order, }) {
@@ -95,10 +96,9 @@ export default {
         if (!action) return;
         this.pending[rm.id] = true;
 
-        await this.$http.get(`/scheduler/delete/${rm.id}`);
+        await deleteScheduler(rm.id);
         this.fetchData();
-        this.$eventBus.$emit('customer_info_record.update_record_list');
-        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+        this.$eventBus.$emit('product_info_record.update_record_list');
       } catch (e) {
         console.error('deleteRemind catch err', e);
       }
@@ -108,10 +108,10 @@ export default {
       this.fetchData();
     },
     fetchData() {
-      const {orderDetail,} = this.searchModel;
+      const {orderDetail, } = this.searchModel;
       const params = {
-        modalId: this.customerId,
-        modal: 'customer',
+        modalId: this.productId,
+        modal: 'product',
       };
 
       if (Object.keys(orderDetail).length) {
@@ -142,19 +142,19 @@ export default {
         field: 'remind.name',
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        // sortable: 'custom',
       }, {
         label: '预计发生时间',
         field: 'remindTime',
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        // sortable: 'custom',
       }, {
         label: '提醒内容',
         field: 'remindContent',
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        // sortable: 'custom',
       }, {
         label: '操作',
         field: 'action',

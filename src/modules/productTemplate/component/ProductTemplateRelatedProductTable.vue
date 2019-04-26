@@ -182,7 +182,7 @@ export default {
     // 排序变化
     sortChange({ prop, order}) {
       this.searchModel.orderDetail = {
-        column: prop,
+        column: prop === 'customerName' ? 'c.name' : `product.${prop}`,
         sequence: order === 'ascending' ? 'ASC' : 'DESC',
         isSystem: 1,
       };
