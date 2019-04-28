@@ -29,7 +29,7 @@
              @click="toSystemNotificationDetail(item)">
           <div class="system-notification-item-header">
             <span class="system-notification-item-new" v-if="item.readed == 0"></span>
-            <img class="system-notification-item-img" :src="item.img">
+            <img class="system-notification-item-img" v-if="item.img" :src="item.img">
           </div>
           <span class="system-notification-item-title">{{ item.title }}</span>
           <p class="system-notification-item-info">{{ item.content }}</p> 
