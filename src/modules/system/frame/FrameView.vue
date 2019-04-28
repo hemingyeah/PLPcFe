@@ -82,7 +82,7 @@
               type="button" class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
               @click="openNotificationCenter"
               title="通知中心" v-tooltip>
-              <span class="notification-new" v-show="notification.count && notification.count != 0">{{ notification.count }}</span>
+              <span class="notification-new" v-show="notification.count && notification.count > 0">{{ msgCount || notification.count }}</span>
               <i class="iconfont">&#xe624;</i>
             </button>
       
@@ -199,6 +199,7 @@ export default {
       systemMsg: '',
       notificationShow: false,
       notificationStyle: {},
+      msgCount: '',
       loginUser: this.initData.user || {}, // 当前登录的用户
 
       profilePopperVisible: false, 
@@ -398,6 +399,11 @@ export default {
           this.notification.count = info.data.systemMsg + info.data.workMsg;
           let systemMsg = localStorage.getItem('shb_systemMsg');
 
+          if(this.notification.count > 99) {
+            this.msgCount = '99+';
+          } else {
+            this.msgCount = '';
+          }
           if(info.data.msgSystem) {
             this.notification.title = info.data.msgSystem.title;
           } else {

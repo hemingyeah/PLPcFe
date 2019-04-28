@@ -1,20 +1,16 @@
 <template>
-  <div class="job-notification-item">
+  <div class="job-notification-item" @click="toJobNotificationDetails(info)">
     <div class="job-notification-item-header">
       <span class="job-notification-item-new" v-if="info.readed == 0"></span>
       <span>{{info.body.title}}</span>
     </div>
-    <button type="button" @click="deleteItem(info)" class="job-notification-item-btn">
-      <i class="iconfont icon-fe-close"></i>
-    </button>
-    <div class="job-notification-item-info" name="header">{{info.body.content}}</div>
+    <div class="job-notification-item-info" name="header" v-if="info.body.content">{{info.body.content}}</div>
     <div class="job-notification-item-content" v-if="info.body.forms">
       <p 
         v-for="(item, index) in info.body.forms"
         :key="index">{{item.key}} {{item.value}}</p>
     </div>
     <div class="job-notification-item-footer">
-      <button class="job-notification-item-detail" @click="toJobNotificationDetails(info)" v-show="info.pcUrl">查看详情</button>
       <p class="job-notification-item-time">{{ info.createTime | fmt_datetime }}</p>
     </div>
   </div>
@@ -29,9 +25,6 @@ export default {
   props: {
     info: Object,
     index: Number
-  },
-  created () {
-    console.log(this.info);
   },
   methods: {
     /** 删除通知 */
@@ -55,13 +48,15 @@ export default {
     /** 打开工作通知详情页 */
     async toJobNotificationDetails (info) {
       try {
-        let itemId = this.getId(info);
-        this.$platform.openTab({
-          id: itemId,
-          title: '正在查询',
-          close: true,
-          url: info.pcUrl,
-        });
+        if(info.pcUrl) {
+          let itemId = this.getId(info);
+          this.$platform.openTab({
+            id: itemId,
+            title: '正在查询',
+            close: true,
+            url: info.pcUrl,
+          });
+        }
         if(info.readed == 0) {
           let params = {
             type: 'work',
@@ -90,13 +85,13 @@ export default {
 <style lang="scss">
 .job-notification-item {
   margin: 10px;
-  padding: 25px;
+  padding: 14px 24px;
   background: #fff;
 }
 .job-notification-item-new {
   position: absolute;
-  top: 8px;
-  left: -12px;
+  top: 11px;
+  left: -10px;
   width: 9px;
   height: 9px;
   background: #f44552;
@@ -106,10 +101,13 @@ export default {
 .job-notification-item-header {
   position: relative;
   display: inline-block;
-  height: 24px;
-  line-height: 24px;
+  // height: 24px;
+  // line-height: 24px;
   font-size: 16px;
+  padding-top: 5px;
   font-weight: bold;
+  color: #525252;
+  padding-left: 4px;
 }
 .job-notification-item-btn {
   float: right;
@@ -133,19 +131,18 @@ export default {
 }
 .job-notification-item-info {
   color: #8C8989;
-  padding-top: 5px;
+  padding: 4px;
 }
 .job-notification-item-content {
-  padding: 20px 0 10px 0;
+  padding: 10px 0 14px 4px;
   color: #3E3E3E;
-  border-bottom: 1px solid #c4c4c4;
+  border-bottom: 1px solid #EAE8E8;
   p {
     margin-bottom: 5px;
   }
 }
 .job-notification-item-footer {
-  padding-top: 15px;
-  height: 43px;
+  padding: 14px 0 0 4px;
 }
 .job-notification-item-detail {
   display: inline-block;
@@ -161,8 +158,6 @@ export default {
   color: #55B7B4;
 }
 .job-notification-item-time {
-  float: right;
-  line-height: 28px;
   color: #3E3E3E;
   margin: 0;
 }

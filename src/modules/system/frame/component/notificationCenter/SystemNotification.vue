@@ -1,10 +1,10 @@
 <template>
   <div class="system-notification-main">
-    <div class="system-notification" v-if="detailShow">
+    <div class="system-notification">
       <div class="system-notification-header">
         <div class="system-notification-readed">
           <button class="system-notification-readed-btn" :style="btnStyle" @click="setReaded"></button>
-          <span class="system-notification-readed-text">全部标记为已读</span>
+          <span class="system-notification-readed-text">将所有信息标记为已读</span>
         </div>
         <el-select class="system-notification-select system-notification-select-left" :value="systemOption" placeholder="消息来源" @input="getSource">
           <el-option
@@ -13,7 +13,8 @@
             :label="item.label"
             :value="item.value"></el-option>
         </el-select>
-        <el-select class="system-notification-select system-notification-select-right" :value="dataOption" placeholder="日期" @input="getTime">
+        <span class="system-notification-dividing-line"></span>
+        <el-select class="system-notification-select system-notification-select-right" :value="dataOption" placeholder="选择日期" @input="getTime">
           <el-option
             v-for="(item, index) in dataOptions"
             :key="index"
@@ -23,37 +24,32 @@
       </div>
       <div class="system-notification-content" v-if="systemPage.list.length != 0">
         <div class="system-notification-item" 
-             v-for="(item, index) in systemPage.list"
-             :key="item.id - 0">
+             v-for="(item) in systemPage.list"
+             :key="item.id - 0"
+             @click="toSystemNotificationDetail(item)">
           <div class="system-notification-item-header">
             <span class="system-notification-item-new" v-if="item.readed == 0"></span>
-            <span>{{ item.title }}</span>
-            <button type="button" @click="deleteItem(item, index)" class="system-notification-item-btn">
-              <i class="iconfont icon-fe-close"></i>
-            </button>
+            <img class="system-notification-item-img" :src="item.img">
           </div>
-          <img class="system-notification-item-img" :src="item.img">
+          <span class="system-notification-item-title">{{ item.title }}</span>
           <p class="system-notification-item-info">{{ item.content }}</p> 
           <div class="system-notification-item-footer">
-            <button class="system-notification-item-detail" @click="toSystemNotificationDetail(item, index)">查看详情</button>
             <p class="system-notification-item-time">{{ item.createTime | fmt_datetime }}</p>
           </div>
         </div>
         <div class="system-notification-footer">
           <button class="system-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
           <div v-if="loading">正在加载...</div>
-          <div v-if="!moreShow && !loading">没有更多信息了</div>
+          <div v-if="!moreShow && !loading">
+            <span class="system-notification-footer-line"></span>
+            <span class="system-notification-footer-text">没有更多数据</span>
+            <span class="system-notification-footer-line"></span>
+          </div>
         </div>
       </div>
       <div class="job-notification-footer" v-else-if="systemPage.list.length == 0 && !loading">暂时没有信息</div>
       <div class="job-notification-footer" v-else>正在加载...</div>
     </div>
-    <system-notification-details
-      v-else
-      @back="back"
-      @deleteItem="deleteItem"
-      :info="detailInfo"
-      :index="detailIndex">123</system-notification-details>
   </div>
 </template>
 
@@ -163,11 +159,8 @@ export default {
     },
 
     /** 打开系统通知详情页 */
-    async toSystemNotificationDetail (info, index) {
+    async toSystemNotificationDetail (info) {
       try {
-        this.detailInfo = info;
-        this.detailIndex = index;
-        this.detailShow = false;
         if(info.readed == 0) {
           let params = {
             type: 'system',
@@ -178,6 +171,10 @@ export default {
             info.readed = 1;
             this.$emit('clearNum', 'system', 1)
           }
+        }
+
+        if(info.url) {
+          platform.openLink(info.url);
         }
       } catch (error) {
         console.error(error);
@@ -282,6 +279,16 @@ export default {
      */
     moreShow () {
       return this.systemPage.hasNextPage;
+    },
+    change () {
+      return this.info.systemMsg;
+    }
+  },
+  watch: {
+    change(newValue, oldValue) {
+      if(newValue > oldValue) {
+        this.getInfo();
+      }
     }
   }
 }
@@ -298,8 +305,9 @@ export default {
   flex-flow: column;
 }
 .system-notification-header {
+  position: relative;
   text-align: right;
-  padding: 20px 12px;
+  padding: 20px;
   background: #fff;
   height: 70px;
   font-size: 0;
@@ -308,7 +316,7 @@ export default {
 }
 .system-notification-select {
   display: inline-block;
-  width: 100px;
+  width: 92px;
   input {
     color: #525252 !important;
     background: #EAEAEA;
@@ -332,7 +340,6 @@ export default {
   }
 }
 .system-notification-select-left {
-  border-right: 1px solid #fff;
   input {
     border-radius: 4px 0 0 4px;
   }
@@ -345,13 +352,13 @@ export default {
 .system-notification-item {
   position: relative;
   margin: 10px;
-  padding: 20px 28px;
+  padding: 0 21px;
   background: #fff;
 }
 .system-notification-item-new {
   position: absolute;
-  top: 28px;
-  left: 15px;
+  top: 25px;
+  left: 7px;
   width: 9px;
   height: 9px;
   background: #f44552;
@@ -360,19 +367,23 @@ export default {
 }
 .system-notification-item-header {
   display: inline-block;
+}
+.system-notification-item-title {
+  display: inline-block;
   width: 320px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   height: 24px;
   line-height: 24px;
-  margin-bottom: 10px;
   font-size: 16px;
   font-weight: bold;
+  color: #525252;
 }
 .system-notification-item-img {
   width: 100%;
-  margin-bottom: 10px;
+  height: 188px;
+  padding: 24px 0 14px 0;
 }
 .system-notification-item-btn {
   position: absolute;
@@ -396,9 +407,10 @@ export default {
   }
 }
 .system-notification-item-info {
-  color: #3E3E3E;
+  color: #8C8989;
   word-break: break-all;
   line-height: 24px;
+  margin: 0;
 }
 .system-notification-item-detail {
   display: inline-block;
@@ -414,13 +426,13 @@ export default {
   color: #55B7B4;
 }
 .system-notification-item-time {
-  float: right;
-  line-height: 28px;
-  color: #3E3E3E;
+  color: #8C8989;
   margin: 0;
+  padding: 4px 0 8px 0;
 }
 .system-notification-readed {
   display: inline-block;
+  padding-right: 10px;
 }
 .system-notification-readed-btn {
   position: relative;
@@ -462,5 +474,28 @@ export default {
 .system-notification-detail {
   flex: 1;
   overflow: auto;
+}
+.system-notification-dividing-line {
+  width: 2px;
+  height: 15px;
+  background: #fff;
+  position: absolute;
+  right: 112px;
+  top: 28px;
+  z-index: 100;
+}
+.system-notification-item-footer {
+  text-align: right;
+}
+.system-notification-footer-line {
+  position: relative;
+  bottom: 4px;
+  display: inline-block;
+  background: #D0D0D0;
+  height: 1px;
+  width: 169px;
+}
+.system-notification-footer-text {
+  padding: 0 16px;
 }
 </style>

@@ -3,7 +3,7 @@
     <div class="job-notification-header">
       <div class="job-notification-readed">
         <button class="job-notification-readed-btn" :style="btnStyle" @click="setReaded"></button>
-        <span class="job-notification-readed-text">全部标记为已读</span>
+        <span class="job-notification-readed-text">将所有信息标记为已读</span>
       </div>
       <el-select class="job-notification-select job-notification-select-readed" :value="readedOption" @input="getReaded">
         <el-option
@@ -19,7 +19,8 @@
           :label="item.label"
           :value="item.value"></el-option>
       </el-select>
-      <el-select class="job-notification-select job-notification-select-right" :value="dataOption" @input="getTime" placeholder="日期">
+      <span class="job-notification-dividing-line"></span>
+      <el-select class="job-notification-select job-notification-select-right" :value="dataOption" @input="getTime" placeholder="选择日期">
         <el-option
           v-for="(item, index) in dataOptions"
           :key="index"
@@ -40,7 +41,11 @@
       <div class="job-notification-footer">
         <button class="job-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
         <div v-if="loading">正在加载...</div>
-        <div v-if="!moreShow && !loading">没有更多信息了</div>
+        <div v-if="!moreShow && !loading">
+          <span class="job-notification-footer-line"></span>
+          <span class="job-notification-footer-text">没有更多数据</span>
+          <span class="job-notification-footer-line"></span>
+        </div>
       </div>
     </div>
     <div class="job-notification-footer" v-else-if="notificationPage.list.length == 0 && !loading">暂时没有信息</div>
@@ -279,6 +284,16 @@ export default {
      */
     moreShow () {
       return this.notificationPage.hasNextPage;
+    },
+    change () {
+      return this.info.workMsg;
+    }
+  },
+  watch: {
+    change(newValue, oldValue) {
+      if(newValue > oldValue) {
+        this.getInfo();
+      }
     }
   }
 }
@@ -291,8 +306,9 @@ export default {
   flex-flow: column;
 }
 .job-notification-header {
+  position: relative;
   text-align: right;
-  padding: 20px 12px;
+  padding: 20px;
   background: #fff;
   height: 70px;
   font-size: 0;
@@ -325,20 +341,19 @@ export default {
 }
 .job-notification-select-readed {
   width: 80px;
-  margin-right: 5px;
+  margin-right: 10px;
   input {
     border-radius: 4px;
   }
 }
 .job-notification-select-left {
-  width: 100px;
-  border-right: 1px solid #fff;
+  width: 92px;
   input {
     border-radius: 4px 0 0 4px;
   }
 }
 .job-notification-select-right {
-  width: 100px;
+  width: 92px;
   input {
     border-radius: 0 4px 4px 0;
   }
@@ -349,6 +364,7 @@ export default {
 }
 .job-notification-readed {
   display: inline-block;
+  padding-right: 10px;
 }
 .job-notification-readed-btn {
   position: relative;
@@ -362,7 +378,7 @@ export default {
   border-radius: 50%
 }
 .job-notification-readed-text {
-  font-size: 13px;
+  font-size: 14px;
   padding: 0 5px;
   color: #525252;
 }
@@ -370,6 +386,7 @@ export default {
   text-align: center;
   margin-top: 10px;
   height: 30px;
+  line-height: 30px;
   color: #8C8989;
 }
 .job-notification-footer-more {
@@ -382,5 +399,25 @@ export default {
   &:hover {
     color: #55B7B4;
   }
+}
+.job-notification-dividing-line {
+  width: 2px;
+  height: 15px;
+  background: #fff;
+  position: absolute;
+  right: 113px;
+  top: 28px;
+  z-index: 100;
+}
+.job-notification-footer-line {
+  position: relative;
+  bottom: 4px;
+  display: inline-block;
+  background: #D0D0D0;
+  height: 1px;
+  width: 169px;
+}
+.job-notification-footer-text {
+  padding: 0 16px;
 }
 </style>
