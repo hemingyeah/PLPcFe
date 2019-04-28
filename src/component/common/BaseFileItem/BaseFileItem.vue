@@ -100,10 +100,10 @@ export default {
     },
     styl(){
       let styl = {};
-
+      
       if(this.isImage) {
-        // TODO: 支持缩略图 
-        let url = `${this.file.url}${this.file.url.indexOf('?') >= 0 ? '&' : '?'}isCmp=true`;
+        let suffix = this.file.url.indexOf('http') == 0 ? 'x-oss-process=image/resize,m_lfit,h_88,w_88' : 'isCmp=true';
+        let url = `${this.file.url}${this.file.url.indexOf('?') >= 0 ? '&' : '?'}${suffix}`;
         styl.backgroundImage = `url(${url})`;
         styl.cursor = 'pointer';
       }
