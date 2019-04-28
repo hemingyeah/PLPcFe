@@ -42,7 +42,6 @@ export default {
       window.parent.frameHistoryBack(window)
     },
     async submit(){
-      // TODO: 字段验证
       try {
         let fields = FormUtil.toField(this.fields);
 

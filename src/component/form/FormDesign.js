@@ -50,7 +50,6 @@ function createSettingComp(h, field){
   let formType = field.formType;
   let comp = FormFieldMap.get(formType);
 
-  // TODO: 支持更新系统字段提示信息
   if (field.isSystem && field.fieldName !== 'customerAddress') return (
     <div class="form-setting-panel">
       <h3>系统字段 -- {field.displayName}</h3>

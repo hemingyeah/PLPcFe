@@ -12,12 +12,12 @@
       <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
     </div>
     <h3>
-      选项设置
+      选项
       <el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
     </h3>
     <div class="form-select-setting-list">
       <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
-        <input type="text" v-model="option.value" maxlength="20">
+        <input type="text" :value="option.value" @input="updateOption($event, option)" maxlength="20">
         <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
         <template v-if="!field.isMulti">
           <button 
@@ -29,11 +29,16 @@
         </template>
       </div>
     </div>
-    <div class="form-select-setting-operation">
+    <div class="form-setting-group form-select-setting-operation">
       <button type="button" class="btn-text" @click="addOption">增加选项</button>
       <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
-      <button type="button" class="btn-text" @click="showLogicalModal" v-if="allowLogical">配置显示逻辑</button>
     </div>
+    
+    <template v-if="allowLogical">
+      <h3>显示逻辑 <button type="button" class="btn-text form-select-logical-btn" @click="showLogicalModal">配置</button></h3>
+      <form-select-logical :logical="logical"/>
+      <logical-field-modal @submit="updateDependencies" ref="logical" />
+    </template>
 
     <base-modal 
       title="批量编辑选项" width="520px" class="form-select-setting-modal"
@@ -47,8 +52,6 @@
         <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
       </template>
     </base-modal>
-
-    <logical-field-modal v-if="!field.isMulti" @submit="updateDependencies" ref="logical" />
   </div>
 </template>
 
@@ -100,6 +103,37 @@ export default {
       }
 
       return false;
+    },
+    /** 该字段配置的逻辑显示项 */
+    logical(){
+      let logical = {};
+
+      let context = this.getContext();
+      let fields = context.value;
+
+      let fieldName = this.field.fieldName;
+      let options = this.options;
+
+      for(let i = 0; i < fields.length; i++){
+        let field = fields[i];
+
+        let dependencies = field.dependencies;
+        if(_.isEmpty(dependencies)) continue;
+
+        let depValues = dependencies[fieldName];
+        if(!Array.isArray(depValues) || depValues.length == 0) continue;
+
+        for(let j = 0; j < depValues.length; j++){
+          let val = depValues[j];
+          if(null == logical[val]){
+            logical[val] = {index: options.findIndex(i => i.value == val), controls: []};
+          }
+
+          logical[val].controls.push(field.displayName)
+        }
+      }
+
+      return logical;
     }
   },
   data(){
@@ -148,6 +182,11 @@ export default {
 
       this.$emit('input', {value: options, prop: 'options'})
     },
+    updateOption(event, option){
+      option.value = event.target.value;
+      
+      this.$emit('input', {value: this.field, prop: 'dependencies', operate: 'delete'})
+    },
     delOption(option, index){
       if(this.options.length <= 1) return alert('至少保留一个选项')
 
@@ -182,10 +221,10 @@ export default {
       let newOption = this.optionText.split('\n');
       this.errMessage = this.validateOptions(newOption);
     },
-    validateOptions(options){
-      if(!options[options.length - 1]) options = options.slice(0, -1);
-
+    validateOptions(opts){
+      let options = opts[opts.length - 1] == null ? opts.slice(0, -1) : opts;
       let message = [];
+
       // 验证数量
       if(options.length > MAX_OPTION_NUM){
         message.push(`选项数量不能超过${MAX_OPTION_NUM}`);
@@ -224,11 +263,46 @@ export default {
       }
       
       this.$emit('input', {value: newOptions, prop: 'options'})
+      this.$emit('input', {value: this.field, prop: 'dependencies', operate: 'delete'})
+
       this.batchModalShow = false;
     }
   },
   components: {
-    [LogicalFieldModal.name]: LogicalFieldModal
+    [LogicalFieldModal.name]: LogicalFieldModal,
+    'form-select-logical': {
+      name: 'form-select-logical',
+      functional: true,
+      props: {
+        logical: {
+          type: Object,
+          default: () => ({})
+        }
+      },
+      render(h, context){
+        let logical = context.props.logical;
+        let keys = Object.keys(logical);
+
+        if(keys.length == 0) return (
+          <p class="form-select-logical-tip">该字段尚未配置显示逻辑</p>
+        );
+
+        let controls = keys
+          .sort((p, n) => logical[p].index - logical[n].index)
+          .map(key => {
+            let c = logical[key].controls;
+
+            return (
+              <div class="form-select-logical-item"> 
+                <h4>{ key }</h4>
+                { c.map(i => <p>{ i }</p>) }
+              </div>
+            )
+          })
+
+        return <div>{ controls }</div>
+      }
+    }
   }
 }
 </script>
@@ -253,11 +327,6 @@ export default {
   input[type="text"]{
     width: 220px;
   }
-}
-
-.form-select-setting-list{
-  max-height: calc(100% - 255px);
-  overflow: auto;
 }
 
 .form-select-setting-modal{
@@ -293,8 +362,13 @@ export default {
   vertical-align: middle;
 }
 
-.form-select-setting-operation .btn-text{
-  color: $color-primary;
+.form-select-setting-operation {
+  .btn-text{
+    color: $color-primary;
+    padding: 0;
+
+    margin-right: 5px;
+  }
 }
 
 .form-select-setting-delete,
@@ -321,6 +395,52 @@ export default {
   float: left;
   color: $text-color-secondary;
   line-height: 32px;
+}
+
+.form-select-logical-btn{
+  float: right;
+  font-size: 14px;
+  color: $color-primary;
+  padding: 0;
+}
+
+.form-select-logical-item{
+  & + .form-select-logical-item{
+    margin-top: 10px;
+  }
+
+  h4{
+    font-size: 14px;
+    line-height: 20px;
+    padding-bottom: 5px;
+    background-color: #fff;
+    margin: 0;
+    position: relative;
+    z-index: 9;
+  }
+
+  p{
+    margin: 0;
+    padding-left: 35px;
+    position: relative;
+    line-height: 24px;
+    z-index: 1;
+    
+    &:before{
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      border-left: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      height: 24px;
+      width: 20px;
+    }
+  }
+}
+.form-select-logical-tip{
+  margin-top: 10px 0 0 0;
+  color: #666;
 }
 </style>
 
