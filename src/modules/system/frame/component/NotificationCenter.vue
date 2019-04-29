@@ -13,13 +13,13 @@
     </div>
 
     <div class="notification-center-type">
-      <input class="notification-center-tab" type="radio" id="job-notification" :checked="component == 'job-notification'" @change="notificationChange" />
+      <input class="notification-center-tab notification-center-tab-left" type="radio" id="job-notification" :checked="component == 'job-notification'" @change="notificationChange" />
       <label class="notification-center-tab-text" for="job-notification">
         <span>工作通知</span>
         <div class="notification-center-tab-new" v-show="info.workMsg && info.workMsg >= 0">{{workMore || info.workMsg}}</div>
         <div class="notification-center-checked-border"></div>
       </label>
-      <input class="notification-center-tab" type="radio" id="system-notification" :checked="component == 'system-notification'" @change="notificationChange" />
+      <input class="notification-center-tab notification-center-tab-right" type="radio" id="system-notification" :checked="component == 'system-notification'" @change="notificationChange" />
       <label class="notification-center-tab-text" for="system-notification">
         <span>系统通知</span>
         <div class="notification-center-tab-new" v-show="info.systemMsg && info.systemMsg >= 0">{{systemMore || info.systemMsg}}</div>
@@ -147,12 +147,37 @@ export default {
       border-radius: 12px;
       opacity: 1;
     }
+  }
+}
+.notification-center-tab-left {
+  &:checked + label{
     div:nth-child(3) {
+      position: absolute;
+      top: 62px;
+      left: 333px;
       height: 5px;
       width: 28px;
-      margin:10px 102px;
+      z-index: 99;
       border-radius: 5px;
       background: #55B7b4;
+      transition: all .3s cubic-bezier(.645,.045,.355,1);
+      transform: translateX(-233px);
+    }
+  }
+}
+.notification-center-tab-right {
+  &:checked + label{
+    div:nth-child(3) {
+      position: absolute;
+      top: 62px;
+      left: -133px;
+      height: 5px;
+      width: 28px;
+      z-index: 99;
+      border-radius: 5px;
+      background: #55B7b4;
+      transition: all .3s cubic-bezier(.645,.045,.355,1);
+      transform: translateX(233px);
     }
   }
 }
@@ -166,30 +191,6 @@ export default {
   user-select: none;
   &:hover {
     cursor: pointer;
-    span {
-      color: #474747;
-      opacity: 1;
-    }
-    div:nth-child(2) {
-      min-width: 18px;
-      height: 18px;
-      position: absolute;
-      top: 20px;
-      left: 145px;
-      font-size: 13px;
-      padding: 0 5px;
-      color: #fff;
-      background: #CB0C0C;
-      border-radius: 12px;
-      opacity: 1;
-    }
-    div:nth-child(3) {
-      height: 5px;
-      width: 28px;
-      margin:10px 102px;
-      border-radius: 5px;
-      background: #55B7b4;
-    }
   }
 }
 .notification-center-tab-new {
