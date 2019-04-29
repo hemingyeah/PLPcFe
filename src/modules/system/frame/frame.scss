@@ -506,6 +506,7 @@ button.export-operate-btn{
   border-radius: 12px;
 }
 .frame-quick-notification {
+  flex: 1;
   position: relative;
   height: 20px;
   color: #F30014;
@@ -513,9 +514,9 @@ button.export-operate-btn{
 .frame-quick-notification-btn {
   position: absolute;
   right: 0;
-  top: -5px;
-  width: 30px;
-  height: 30px;
+  top: -15px;
+  width: 50px;
+  height: 50px;
   padding: 0;
   margin: 0;
   border: none;
@@ -536,9 +537,10 @@ button.export-operate-btn{
   position: relative;
   width: 450px;
   height: 100%;
-  margin-right: 30px;
+  margin-right: 50px;
   white-space: nowrap;
   overflow: hidden;
+  float: right;
 }
 .frame-quick-notification-content {
   position: absolute;

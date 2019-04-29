@@ -1,7 +1,7 @@
 <template>
   <base-panel
     :show.sync="show"
-    width="490px"
+    width="468px"
     class="notification-center">
     <div class="notification-center-header" slot="header">
       <button type="button" class="btn-text notification-center-btn" @click="show = false">
@@ -91,10 +91,12 @@ export default {
 
 <style lang="scss">
 .notification-center {
+  top: 91px;
   display: flex;
   flex-flow: column;
   background: #eee;
   overflow: none;
+  box-shadow: -3px 0px 5px #ccc;
 }
 .notification-center-header {
   height: 50px;
@@ -154,7 +156,7 @@ export default {
     div:nth-child(3) {
       position: absolute;
       top: 62px;
-      left: 333px;
+      left: 330px;
       height: 5px;
       width: 28px;
       z-index: 99;
@@ -170,7 +172,7 @@ export default {
     div:nth-child(3) {
       position: absolute;
       top: 62px;
-      left: -133px;
+      left: -137px;
       height: 5px;
       width: 28px;
       z-index: 99;

@@ -1,32 +1,34 @@
 <template>
   <div class="job-notification">
     <div class="job-notification-header">
-      <div class="job-notification-readed">
-        <button class="job-notification-readed-btn" :style="btnStyle" @click="setReaded"></button>
-        <span class="job-notification-readed-text">将所有信息标记为已读</span>
+      <div class="job-notification-readed" @click="setReaded">
+        <button class="job-notification-readed-btn" :style="btnStyle"></button>
+        <span class="job-notification-readed-text">全部标记为已读</span>
       </div>
-      <el-select class="job-notification-select job-notification-select-readed" :value="readedOption" @input="getReaded">
-        <el-option
-          v-for="(item, index) in readedOptions"
-          :key="index"
-          :label="item.label"
-          :value="item.value"></el-option>
-      </el-select>
-      <el-select class="job-notification-select job-notification-select-left" :value="jobOption" placeholder="消息来源" @input="getSource">
-        <el-option
-          v-for="(item, index) in jobOptions"
-          :key="index"
-          :label="item.label"
-          :value="item.value"></el-option>
-      </el-select>
-      <span class="job-notification-dividing-line"></span>
-      <el-select class="job-notification-select job-notification-select-right" :value="dataOption" @input="getTime" placeholder="选择日期">
-        <el-option
-          v-for="(item, index) in dataOptions"
-          :key="index"
-          :label="item.label"
-          :value="item.value"></el-option>
-      </el-select>
+      <div class="notification-header-select-view">
+        <el-select class="job-notification-select job-notification-select-readed" :value="readedOption" @input="getReaded">
+          <el-option
+            v-for="(item, index) in readedOptions"
+            :key="index"
+            :label="item.label"
+            :value="item.value"></el-option>
+        </el-select>
+        <el-select class="job-notification-select job-notification-select-left" :value="jobOption" placeholder="消息来源" @input="getSource">
+          <el-option
+            v-for="(item, index) in jobOptions"
+            :key="index"
+            :label="item.label"
+            :value="item.value"></el-option>
+        </el-select>
+        <span class="job-notification-dividing-line"></span>
+        <el-select class="job-notification-select job-notification-select-right" :value="dataOption" @input="getTime" placeholder="选择日期">
+          <el-option
+            v-for="(item, index) in dataOptions"
+            :key="index"
+            :label="item.label"
+            :value="item.value"></el-option>
+        </el-select>
+      </div>
     </div>
     <div class="job-notification-content" v-if="notificationPage.list.length != 0">
       <job-notification-item
@@ -203,7 +205,7 @@ export default {
         }
         this.btnShow = !this.btnShow;
         if(this.btnShow) {
-          if(await platform.confirm('确定要将所有信息标记为已读？')) {
+          if(await platform.confirm('您确定将全部未读通知信息标记为已读?')) {
             let params = {
               type: 'work'
             };
@@ -301,19 +303,29 @@ export default {
 
 <style lang="scss">
 .job-notification {
-  flex: 1;
   display: flex;
   flex-flow: column;
+  height: calc(100% - 115px);
 }
 .job-notification-header {
   position: relative;
-  text-align: right;
-  padding: 20px;
-  background: #fff;
-  height: 70px;
-  font-size: 0;
-  box-shadow: 0 3px 5px #E5E5E5;
   z-index: 99;
+
+  background: #fff;
+  box-shadow: 0 3px 5px #E5E5E5;
+  font-size: 0;
+  text-align: right;
+
+  padding: 20px;
+  height: 70px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  
+  .notification-header-select-view {
+    flex: 1;
+  }
 }
 .job-notification-select {
   display: inline-block;
@@ -353,7 +365,7 @@ export default {
   }
 }
 .job-notification-select-right {
-  width: 92px;
+  width: 95px;
   input {
     border-radius: 0 4px 4px 0;
   }
@@ -378,7 +390,7 @@ export default {
   border-radius: 50%
 }
 .job-notification-readed-text {
-  font-size: 14px;
+  font-size: 13px;
   padding: 0 5px;
   color: #525252;
 }
@@ -415,7 +427,7 @@ export default {
   display: inline-block;
   background: #D0D0D0;
   height: 1px;
-  width: 169px;
+  width: 158px;
 }
 .job-notification-footer-text {
   padding: 0 16px;

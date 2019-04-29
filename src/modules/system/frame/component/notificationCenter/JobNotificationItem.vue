@@ -1,5 +1,6 @@
 <template>
-  <div class="job-notification-item" @click="toJobNotificationDetails(info)">
+  <div class="job-notification-item" 
+       @click="toJobNotificationDetails(info)">
     <div class="job-notification-item-header">
       <span class="job-notification-item-new" v-if="info.readed == 0"></span>
       <span>{{info.body.title}}</span>
@@ -87,6 +88,7 @@ export default {
   margin: 10px;
   padding: 14px 24px;
   background: #fff;
+  cursor: pointer;
 }
 .job-notification-item-new {
   position: absolute;
@@ -101,8 +103,6 @@ export default {
 .job-notification-item-header {
   position: relative;
   display: inline-block;
-  // height: 24px;
-  // line-height: 24px;
   font-size: 16px;
   padding-top: 5px;
   font-weight: bold;

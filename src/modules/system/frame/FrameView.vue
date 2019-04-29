@@ -386,7 +386,6 @@ export default {
     },
     closeNotification () {
       this.notificationShow = false;
-      localStorage.setItem('shb_systemMsg', this.notificationInfo.msgSystem.id);
       this.clearAnimation();
     },
 
@@ -397,7 +396,6 @@ export default {
         if(info.status == 0) {
           this.notificationInfo = info.data;
           this.notification.count = info.data.systemMsg + info.data.workMsg;
-          let systemMsg = localStorage.getItem('shb_systemMsg');
 
           if(this.notification.count > 99) {
             this.msgCount = '99+';
@@ -406,13 +404,10 @@ export default {
           }
           if(info.data.msgSystem) {
             this.notification.title = info.data.msgSystem.title;
+            this.notificationShow = true;
+            this.setAnimation();
           } else {
             this.notification.title = null;
-          }
-
-          if(this.notification.id) {
-            this.notificationShow = (systemMsg == null || systemMsg != this.notificationInfo.msgSystem.id);
-            if(this.notificationShow) this.setAnimation();
           }
         }
       } catch (error) {

@@ -1,11 +1,11 @@
 <template>
-  <div class="system-notification-main">
-    <div class="system-notification">
-      <div class="system-notification-header">
-        <div class="system-notification-readed">
-          <button class="system-notification-readed-btn" :style="btnStyle" @click="setReaded"></button>
-          <span class="system-notification-readed-text">将所有信息标记为已读</span>
-        </div>
+  <div class="system-notification">
+    <div class="system-notification-header">
+      <div class="system-notification-readed" @click="setReaded">
+        <button class="system-notification-readed-btn" :style="btnStyle"></button>
+        <span class="system-notification-readed-text">全部标记为已读</span>
+      </div>
+      <div class="system-header-select-view">
         <el-select class="system-notification-select system-notification-select-left" :value="systemOption" placeholder="消息来源" @input="getSource">
           <el-option
             v-for="(item, index) in systemOptions"
@@ -22,34 +22,34 @@
             :value="item.value"></el-option>
         </el-select>  
       </div>
-      <div class="system-notification-content" v-if="systemPage.list.length != 0">
-        <div class="system-notification-item" 
-             v-for="(item) in systemPage.list"
-             :key="item.id - 0"
-             @click="toSystemNotificationDetail(item)">
-          <div class="system-notification-item-header">
-            <span class="system-notification-item-new" v-if="item.readed == 0"></span>
-            <img class="system-notification-item-img" v-if="item.img" :src="item.img">
-          </div>
-          <span class="system-notification-item-title">{{ item.title }}</span>
-          <p class="system-notification-item-info">{{ item.content }}</p> 
-          <div class="system-notification-item-footer">
-            <p class="system-notification-item-time">{{ item.createTime | fmt_datetime }}</p>
-          </div>
+    </div>
+    <div class="system-notification-content" v-if="systemPage.list.length != 0">
+      <div class="system-notification-item" 
+           v-for="(item) in systemPage.list"
+           :key="item.id - 0"
+           @click="toSystemNotificationDetail(item)">
+        <div class="system-notification-item-header">
+          <span class="system-notification-item-new" v-if="item.readed == 0"></span>
+          <img class="system-notification-item-img" v-if="item.img" :src="item.img">
         </div>
-        <div class="system-notification-footer">
-          <button class="system-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
-          <div v-if="loading">正在加载...</div>
-          <div v-if="!moreShow && !loading">
-            <span class="system-notification-footer-line"></span>
-            <span class="system-notification-footer-text">没有更多数据</span>
-            <span class="system-notification-footer-line"></span>
-          </div>
+        <span class="system-notification-item-title">{{ item.title }}</span>
+        <p class="system-notification-item-info">{{ item.content }}</p> 
+        <div class="system-notification-item-footer">
+          <p class="system-notification-item-time">{{ item.createTime | fmt_datetime }}</p>
         </div>
       </div>
-      <div class="job-notification-footer" v-else-if="systemPage.list.length == 0 && !loading">暂时没有信息</div>
-      <div class="job-notification-footer" v-else>正在加载...</div>
+      <div class="system-notification-footer">
+        <button class="system-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
+        <div v-if="loading">正在加载...</div>
+        <div v-if="!moreShow && !loading">
+          <span class="system-notification-footer-line"></span>
+          <span class="system-notification-footer-text">没有更多数据</span>
+          <span class="system-notification-footer-line"></span>
+        </div>
+      </div>
     </div>
+    <div class="job-notification-footer" v-else-if="systemPage.list.length == 0 && !loading">暂时没有信息</div>
+    <div class="job-notification-footer" v-else>正在加载...</div>
   </div>
 </template>
 
@@ -237,7 +237,7 @@ export default {
         };
         this.btnShow = !this.btnShow;
         if(this.btnShow) {
-          if(await platform.confirm('确定要将所有信息标记为已读？')) {
+          if(await platform.confirm('您确定将全部未读通知信息标记为已读?')) {
             let res = await NotificationApi.haveRead(params);
             if(res.status == 0) {
               this.getInfo();
@@ -295,28 +295,33 @@ export default {
 </script>
 
 <style lang="scss">
-.system-notification-main {
-  flex: 1;
-  display: flex;
-  flex-flow: column;
-}
 .system-notification {
   display: flex;
   flex-flow: column;
+  height: calc(100% - 115px);
 }
 .system-notification-header {
   position: relative;
-  text-align: right;
-  padding: 20px;
-  background: #fff;
-  height: 70px;
-  font-size: 0;
-  box-shadow: 0 3px 5px #E5E5E5;
   z-index: 99;
+
+  background: #fff;
+  box-shadow: 0 3px 5px #E5E5E5;
+  font-size: 0;
+  text-align: right;
+
+  padding: 20px;
+  height: 70px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  .system-header-select-view {
+    flex: 1;
+  }
 }
 .system-notification-select {
   display: inline-block;
-  width: 92px;
   input {
     color: #525252 !important;
     background: #EAEAEA;
@@ -340,11 +345,13 @@ export default {
   }
 }
 .system-notification-select-left {
+  width: 92px;
   input {
     border-radius: 4px 0 0 4px;
   }
 }
 .system-notification-select-right {
+  width: 95px;
   input {
     border-radius: 0 4px 4px 0;
   }
@@ -354,6 +361,7 @@ export default {
   margin: 10px;
   padding: 0 21px;
   background: #fff;
+  cursor: pointer;
 }
 .system-notification-item-new {
   position: absolute;
@@ -382,7 +390,6 @@ export default {
 }
 .system-notification-item-img {
   width: 100%;
-  height: 188px;
   padding: 24px 0 14px 0;
 }
 .system-notification-item-btn {
@@ -480,7 +487,7 @@ export default {
   height: 15px;
   background: #fff;
   position: absolute;
-  right: 112px;
+  right: 113px;
   top: 28px;
   z-index: 100;
 }
@@ -493,7 +500,7 @@ export default {
   display: inline-block;
   background: #D0D0D0;
   height: 1px;
-  width: 169px;
+  width: 158px;
 }
 .system-notification-footer-text {
   padding: 0 16px;
