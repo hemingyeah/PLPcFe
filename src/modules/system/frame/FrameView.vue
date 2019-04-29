@@ -39,6 +39,7 @@
                 <a href="javascript:;" @click="goRoleTeam">团队管理</a>
                 <a href="javascript:;" @click="goProductTemplate">产品模板</a>
                 <a href="javascript:;" @click="goProduct">产品管理</a>
+                <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
               </div>
             </el-popover>
         
@@ -475,6 +476,14 @@ export default {
         id: 'product_template',
         title: '产品管理',
         url: '/customer/product_v2',
+        reload: true,
+      });
+    },
+    goProductSetting() {
+      platform.openTab({
+        id: 'product_template',
+        title: '产品设置',
+        url: '/setting/product/fields',
         reload: true,
       });
     }

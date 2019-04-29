@@ -1,7 +1,30 @@
 import http from '@src/util/http';
 
+/**
+ * 获取产品列表
+ * @param params
+ * @returns {*}
+ */
 function getProduct(params) {
   return http.post('/product/list/data', params, false)
+}
+
+/**
+ * 创建产品
+ * @param params
+ * @returns {*}
+ */
+function createProduct(params) {
+  return http.post('/customer/product/create', params);
+}
+
+/**
+ * 更新产品
+ * @param params
+ * @returns {*}
+ */
+function updateProduct(params) {
+  return http.post('/customer/product/updateProduct', params);
 }
 
 /**
@@ -11,6 +34,17 @@ function getProduct(params) {
  */
 function deleteProductByIds(ids) {
   return http.get(`/customer/product/deleteByIds/${ids}`)
+}
+
+/**
+ * 检查产品编号的唯一性
+ * @param params
+ * @param params.serialNumber
+ * @param params.id
+ * @returns {*}
+ */
+function checkSerialNumber(params) {
+  return http.post('/customer/product/checkUniqueForSerialNumber', params, false);
 }
 
 /**
@@ -123,6 +157,14 @@ function deleteProduct(ids) {
   return http.post(`/customer/product/deleteByIds/${ids}`)
 }
 
+/**
+ * 删除产品
+ * @param {Object} params - 参数
+ * @param {String} params.productId - 产品id
+ */
+function getUpdateRecord(params) {
+  return http.get('/customer/product/getLatestOne', params)
+}
 
 
 /**
@@ -197,7 +239,7 @@ function getProductTemplateStatisticsInit(params) {
  * @returns Promise<>
  */
 function getProductTemplateRecord(params) {
-  return http.get('/product/ptRecord', params);
+  return http.get('/product/template/record/list', params);
 }
 
 /**
@@ -205,7 +247,7 @@ function getProductTemplateRecord(params) {
  * @returns Promise<>
  */
 function productTemplateCreateRecord(params) {
-  return http.post('/product/ptRecord/create', params);
+  return http.post('/product/ptRecord/create', params, false);
 }
 
 /**
@@ -235,6 +277,10 @@ export {
   getProductDetail,
   getEventOfProduct,
   getProduct,
+  getUpdateRecord,
+  createProduct,
+  updateProduct,
+  checkSerialNumber,
   getProductTemplateList,
   productTemplateDelete,
   productTemplateEditBatch,

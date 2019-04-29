@@ -3,6 +3,7 @@ import http from '@src/util/http';
 import ProductList from './List.vue';
 
 Vue.prototype.$http = http;
+Vue.prototype.$eventBus = new Vue();
 
 //处理注入的参数
 let initData = {};

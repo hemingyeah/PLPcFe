@@ -254,44 +254,43 @@ export default {
     // 构建字段列表
     buildFields() {
       let fixedFields = [
-        {
-          fieldName: 'name',
-          formType: 'text',
-          displayName: '产品名称',
-          rules: [{
-            required: true, message: '请输入产品名称', trigger: ['blur', 'change']
-          }]
-        }, 
-        {
-          fieldName: 'serialNumber',
-          formType: 'text',
-          displayName: '产品编号',
-          rules: [{
-            required: false, message: '请输入产品编号', trigger: ['blur', 'change']
-          }]
-        },  
-        {
-          fieldName: 'type',
-          formType: 'select',
-          displayName: '产品类型',
-          setting: {
-            dataSource: this.initData.productConfig && this.initData.productConfig.productType
-          },
-          rules: [{
-            trigger: ['blur', 'change'],
-            required: false, message: '请选择产品类型',
-          }]
-        }
+        // {
+        //   fieldName: 'name',
+        //   formType: 'text',
+        //   displayName: '产品名称',
+        //   rules: [{
+        //     required: true, message: '请输入产品名称', trigger: ['blur', 'change']
+        //   }]
+        // }, 
+        // {
+        //   fieldName: 'serialNumber',
+        //   formType: 'text',
+        //   displayName: '产品编号',
+        //   rules: [{
+        //     required: false, message: '请输入产品编号', trigger: ['blur', 'change']
+        //   }]
+        // },  
+        // {
+        //   fieldName: 'type',
+        //   formType: 'select',
+        //   displayName: '产品类型',
+        //   setting: {
+        //     dataSource: this.initData.productConfig && this.initData.productConfig.productType
+        //   },
+        //   rules: [{
+        //     trigger: ['blur', 'change'],
+        //     required: false, message: '请选择产品类型',
+        //   }]
+        // }
       ];
       this.editableFields = [...fixedFields];
-      this.selectedFieldName = this.editableFields[0].fieldName;
     },
     // 构建自定义字段列表
     buildCustomizeField() {
       if (this.editableFields.length > this.fixedFieldsCount) return;
 
       const customizedField = this.fields
-        .filter(f => f.isSystem === 0 && f.formType !== 'attachment' && f.formType !== 'separator')
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
           // select
           if (field.formType === 'selectMulti') {
@@ -304,6 +303,10 @@ export default {
             field.rules = [{
               required: true, message: `请输入${field.displayName}`, trigger: ['blur', 'change']
             }];
+          }
+          // type 类型
+          if(field.fieldName == 'type') {
+            field.setting.dataSource = (this.initData.productConfig && this.initData.productConfig.productType) || [];
           }
           // select && 系统字段
           if (field.formType === 'select' && !field.isNull) {
@@ -373,6 +376,7 @@ export default {
 
       this.formBackup = JSON.parse(JSON.stringify(this.form));
       this.editableFields = [...this.editableFields, ...customizedField];
+      this.selectedFieldName = this.editableFields[0].fieldName;
     },
     //  构建参数
     buildParams() {
@@ -443,8 +447,8 @@ export default {
           this.pending = false;
         }
         this.$platform.notification({
-          title: '产品模板',
-          message: result.status == 0 ? '批量编辑产品模板成功' : result.message,
+          title: '批量编辑',
+          message: result.status == 0 ? `批量编辑${this.selectedField.displayName}成功` : result.message,
           type: result.status == 0 ? 'success' : 'error',
         });
 

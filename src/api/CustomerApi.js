@@ -118,4 +118,14 @@ export function getUserTag(params) {
   return http.get('/customer/userTag/list', params)
 }
 
+/**
+ * 统计给选中的客户发送短信的数量
+ * @param {Object} params - 参数
+ * @param {String} params.ids - 客户ids
+ * @param {Number} params.isAllLm - 是否是全部联系人
+ */
+export function computeSendNum(params) {
+  return http.get('/customer/computeSendNum', params)
+}
+
 

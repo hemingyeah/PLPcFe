@@ -50,44 +50,44 @@
             </el-form-item>
             <!-- end 创建时间 -->
 
-            <!-- start 产品名称 -->
-            <el-form-item label-width="100px" label="产品名称">
-              <el-input type="text" v-model="params.name"></el-input>
-            </el-form-item>
-            <!-- end 产品名称 -->
-
-            <!-- start 产品编号 -->
-            <el-form-item label-width="100px" label="产品编号">
-              <el-input type="text" v-model="params.serialNumber"></el-input>
-            </el-form-item>
-            <!-- end 产品编号 -->
-
-            <!-- start  TODO: 产品类型 -->
-            <el-form-item label-width="100px" label="产品类型">
-              <el-select
-                v-model="params.type"
-                @change="modifyUser('type')"
-                filterable
-                clearable
-                reserve-keyword
-                placeholder="请选择产品类型">
-
-                <el-option
-                  v-for="item in inputRemoteSearch.type.options"
-                  :key="`${item}_product_template_list_search_type`"
-                  :label="item"
-                  :value="item">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <!-- end 产品类型 -->
-
-            <!-- start TODO: 动态搜索框 -->
+            <!-- start 动态搜索框 -->
             <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchCustomizeFields"
                           :key="field.fieldName">
+              
+              <!-- start 产品名称 -->
+              <template v-if="field.fieldName === 'name'">
+                <el-input type="text" v-model="params[field.fieldName]" :placeholder="field.placeHolder"></el-input>
+              </template>
+              <!-- end 产品名称 -->
+
+              <!-- start 产品编号 -->
+              <template v-else-if="field.fieldName === 'serialNumber'">
+                <el-input type="text" v-model="params[field.fieldName]" :placeholder="field.placeHolder"></el-input>
+              </template>
+              <!-- end 产品编号 -->
+
+              <!-- start 产品类型 -->
+              <template v-else-if="field.fieldName === 'type'">
+                <el-select
+                  v-model="params[field.fieldName]"
+                  @change="modifyUser('type')"
+                  filterable
+                  clearable
+                  reserve-keyword
+                  :placeholder="field.placeHolder || '请选择'">
+
+                  <el-option
+                    v-for="item in inputRemoteSearch.type.options"
+                    :key="`${item}_product_template_list_search_type`"
+                    :label="item"
+                    :value="item">
+                  </el-option>
+                </el-select>
+              </template>
+              <!-- end 产品类型 -->
 
               <!-- start text || code -->
-              <template v-if="field.formType === 'text' || field.formType === 'code'">
+              <template v-else-if="field.formType === 'text' || field.formType === 'code'">
                 <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
                           :placeholder="field.placeHolder" type="text"></el-input>
               </template>
@@ -98,7 +98,7 @@
                 <el-select 
                   v-model="params.customizedSearchModel[field.fieldName]['value']"
                   clearable
-                  :placeholder="field.placeHolder">
+                  :placeholder="field.placeHolder || '请选择'">
                   <el-option
                     v-for="item in field.setting.dataSource"
                     :key="item"
@@ -141,7 +141,7 @@
                   clearable
                   remote
                   reserve-keyword
-                  placeholder=""
+                  :placeholder="field.placeHolder"
                   :loading="inputRemoteSearch.creator.loading"
                   :remote-method="searchCreator">
                   <el-option
@@ -296,7 +296,7 @@
     </div>
     <!-- end content -->
 
-    <!-- start TODO: 导入产品 -->
+    <!-- start 导入产品 -->
     <base-import
       title="导入产品"
       ref="importProductTemplateModal"
@@ -310,7 +310,7 @@
     </base-import>
     <!-- end 导入客户 -->
 
-    <!-- start TODO: 导出 -->
+    <!-- start 导出 -->
     <base-export
       ref="exportProductTemplatePanel"
       :columns="exportColumns()"
@@ -355,7 +355,7 @@
     </base-panel>
     <!-- end 已选择列表 -->
 
-    <!-- start TODO: 批量编辑 -->
+    <!-- start  批量编辑 -->
     <batch-edit-product-template-dialog
       ref="batchEditProductTemplateDialog"
       :fields="productTemplateConfig.productFields"
@@ -506,7 +506,7 @@ export default {
     this.buildConfig(this.paramsBackup.customizedSearchModel);
     this.search();
 
-    // TODO: [tab_spec]标准化刷新方式
+    // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
   methods: {
@@ -519,9 +519,10 @@ export default {
        * 人员选择初始化值是一个id，还要初始化它的options
        */
       this.productTemplateConfig.productFields = this.productTemplateConfig.productFields
+        .filter(f => f.fieldName !== 'customer')
         .map(f => {
 
-          if (f.isSearch && !f.isSystem) {
+          if (f.isSearch || f.isSystem) {
             if (
               storageData[f.fieldName] 
               && (storageData[f.fieldName].formType === 'date' || storageData[f.fieldName].formType === 'datetime') 
@@ -545,25 +546,26 @@ export default {
 
       this.columns = this.buildTableColumn();
     },
-    // 构建表格固定列 TODO: 产品类型排序
+    // 构建表格固定列
     buildTableFixedColumns() {
-      return [{
-        label: '产品名称',
-        field: 'name',
-        show: true,
-        fixed: true,
-        minWidth: '150px',
-      }, {
-        label: '产品编号',
-        field: 'serialNumber',
-        fixed: true,
-        show: true,
-      }, {
-        label: '产品类型',
-        sortable: 'custom',
-        field: 'type',
-        show: true,
-      }]
+      return []
+      // return [{
+      //   label: '产品名称',
+      //   field: 'name',
+      //   show: true,
+      //   fixed: true,
+      //   minWidth: '150px',
+      // }, {
+      //   label: '产品编号',
+      //   field: 'serialNumber',
+      //   fixed: true,
+      //   show: true,
+      // }, {
+      //   label: '产品类型',
+      //   sortable: 'custom',
+      //   field: 'type',
+      //   show: true,
+      // }]
     },
     // 构建表格列
     buildTableColumn() {
@@ -582,11 +584,11 @@ export default {
       let sortable = false;
 
       customizedColumns = this.productTemplateConfig.productFields
-        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.fieldName !== 'customerId')
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator' && f.fieldName !== 'customer')
         .map(field => {
           sortable = false;
           minWidth = 100;
-          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0 || field.fieldName == 'type') {
             sortable = 'custom';
             minWidth = 100;
           }
@@ -607,7 +609,7 @@ export default {
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
-            width: `${minWidth}px`,
+            minWidth: `${minWidth}px`,
             sortable,
             isSystem: field.isSystem,
           };
@@ -934,7 +936,7 @@ export default {
     },
     searchCreator(keyword) {
       this.inputRemoteSearch.creator.loading = true;
-      return this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
+      return this.$http.get('/customer/userTag/list', { keyword, pageNum: 1 })
         .then(res => {
           if (res && res.list) {
             this.inputRemoteSearch.creator.options = res.list;
@@ -997,7 +999,6 @@ export default {
 
       return tv;
     },
-    // TODO: 排序变化
     sortChange(option) {
       /**
        * 目前情况：

@@ -13,10 +13,35 @@
         :prop="selectedFieldName"
         :key="selectedFieldName"
         :rules="selectedField.rules"
-        v-if="selectedField.formType === 'text' || selectedField.formType === 'code'">
+        v-if="selectedField.formType === 'text' && selectedField.fieldName === 'customer'">
+        <el-select
+          v-model="form[selectedFieldName]"
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入关键词搜索"
+          clearable
+          :loading="inputRemoteSearch.customer.loading"
+          :remote-method="searchCustomer">
+          <el-option
+            v-for="item in inputRemoteSearch.customer.options"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item
+        label="修改为"
+        :prop="selectedFieldName"
+        :key="selectedFieldName"
+        :rules="selectedField.rules"
+        v-else-if="selectedField.formType === 'text' || selectedField.formType === 'code'">
         <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50"
                   type="text"></el-input>
       </el-form-item>
+
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
@@ -55,6 +80,22 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item
+        label="修改为"
+        :prop="selectedFieldName"
+        :key="selectedFieldName"
+        :rules="selectedField.rules"
+        v-else-if="selectedField.formType === 'select' && selectedField.fieldName === 'type'">
+        <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择类型">
+          <el-option
+            v-for="item in productTypes"
+            :key="item"
+            :label="item"
+            :value="item">
+          </el-option>
+        </el-select>
+      </el-form-item>
+
       <el-form-item
         label="修改为"
         :prop="selectedFieldName"
@@ -125,44 +166,8 @@
 import {formatDate } from '@src/util/lang';
 import { editBatchProduct } from '@src/api/ProductApi';
 
-
 export default {
   name: 'batch-editing-dialog',
-  data: () => {
-    return {
-      inputRemoteSearch: {
-        tag: {
-          options: [],
-          loading: false,
-        },
-        customerManager: {
-          options: [],
-          loading: false,
-        },
-      },
-      form: {
-        // cusName: '',
-        // lmName: '',
-        // lmPhone: '',
-        // address: {
-        //   adAddress: [],
-        //   detail: '',
-        //   addressType: 0,
-        //   latitude: '',
-        //   longitude: '',
-        // },
-        // tags: [],
-        // manager: '',
-      },
-      selectedFieldName: '',
-      batchEditingCustomerDialog: false,
-      pending: false,
-      editableFields: [],
-      fixedFieldsCount: 0,
-      /** @deprecated */
-      formBackup: {},
-    }
-  },
   props: {
     selectedIds: {
       type: Array,
@@ -172,11 +177,37 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    productTypes: {
+      type: Array,
+      default: () => ([]),
+    },
+  },
+  data: () => {
+    return {
+      inputRemoteSearch: {
+        customer: {
+          options: [],
+          loading: false,
+        },
+        customerManager: {
+          options: [],
+          loading: false,
+        },
+      },
+      form: {},
+      selectedFieldName: '',
+      batchEditingCustomerDialog: false,
+      pending: false,
+      editableFields: [],
+      fixedFieldsCount: 0,
+      /** @deprecated */
+      formBackup: {},
+    }
   },
   watch: {
     form: {
       handler(newValue) {
-        if ((this.selectedField.formType === 'manager' || this.selectedField.formType === 'user') && !newValue[this.selectedField.fieldName]) {
+        if (this.selectedField.formType === 'user' && !newValue[this.selectedField.fieldName]) {
           this.inputRemoteSearch.customerManager.options = [];
         }
       },
@@ -189,7 +220,6 @@ export default {
     }
   },
   mounted() {
-    // this.buildFields();
   },
   methods: {
     async onSubmit() {
@@ -202,12 +232,16 @@ export default {
 
         const res = await editBatchProduct(params);
 
-        if (res.status === 0) {
+        if (!res.status) {
           this.$emit('submit-callback');
         }
 
         if (res.status === 1 && res.message) {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: '失败',
+            type: 'error',
+            message: res.message
+          });
         }
 
         this.batchEditingCustomerDialog = false;
@@ -237,11 +271,12 @@ export default {
       }
       this.batchEditingCustomerDialog = true;
       this.buildDynamicField();
+      this.selectedFieldName = this.editableFields[0].fieldName;
     },
     buildDynamicField() {
       if (this.editableFields.length > this.fixedFieldsCount) return;
       const customizedField = this.fields
-        .filter(f => f.isSystem === 0 && f.formType !== 'attachment' && f.formType !== 'separator')
+        .filter(f => f.formType !== 'attachment' && !['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'].some(key => key === f.fieldName))
         .map(f => {
           if (f.formType === 'selectMulti') {
             this.$set(this.form, f.fieldName, []);
@@ -276,77 +311,10 @@ export default {
           return f;
         });
 
+      // 空的form对象方便 reset form
       this.formBackup = JSON.parse(JSON.stringify(this.form));
+
       this.editableFields = [...this.editableFields, ...customizedField];
-    },
-    buildFields() {
-      let fixedFields = [{
-        fieldName: 'cusName',
-        formType: 'text',
-        displayName: '产品名称',
-        rules: [{
-          required: true, message: '请输入产品名称', trigger: ['blur', 'change']
-        }, ]
-      }, {
-        fieldName: 'lmName',
-        formType: 'text',
-        displayName: '联系人',
-        rules: [{
-          required: true, message: '请输入联系人', trigger: ['blur', 'change']
-        }, ]
-      }, {
-        fieldName: 'lmPhone',
-        formType: 'text',
-        displayName: '电话',
-        rules: [{
-          required: true, message: '请输入电话', trigger: ['blur', 'change']
-        }, {
-          trigger: ['blur', 'change'],
-          validator(rule, value, callback) {
-            const reg = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
-            if (!reg.test(value)) {
-              callback(new Error('请输入正确的电话'));
-            }
-            callback();
-          }
-        }, {
-          trigger: ['blur', 'change']
-        }]
-      }, {
-        fieldName: 'address',
-        formType: 'address',
-        displayName: '产品地址',
-        rules: [{
-          trigger: ['blur', 'change'],
-          validator(rule, value, callback) {
-            if (value.adAddress.length < 2 || !value.detail) {
-              callback(new Error('请输入产品地址'));
-            }
-
-            callback();
-          }
-        }]
-      }, {
-        fieldName: 'tags',
-        formType: 'tags',
-        displayName: '服务团队',
-        rules: [{
-          trigger: ['blur', 'change'],
-          required: true, message: '请选择服务团队',
-        }]
-      }, {
-        fieldName: 'manager',
-        formType: 'manager',
-        displayName: '产品负责人',
-        rules: [{
-          trigger: ['change'],
-          required: true, message: '请选择产品负责人',
-        }]
-
-      }];
-
-      this.editableFields = [...fixedFields];
-      this.selectedFieldName = this.editableFields[0].fieldName;
     },
     buildParams() {
       let tv = null;
@@ -357,19 +325,16 @@ export default {
         ids: this.selectedIds.join(','),
       };
 
-      if (this.selectedFieldName === 'tags') {
-        params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: this.form.tags,
-        })
-      }
-      if (this.selectedFieldName === 'manager' || this.selectedField.formType === 'user') {
+      if (this.selectedField.formType === 'user') {
         tv = this.inputRemoteSearch.customerManager.options
           .filter(cm => cm.userId === this.form[this.selectedFieldName])[0] || {};
 
         params.mapJson = JSON.stringify({
           [this.selectedFieldName]: {
-            id: tv.userId,
-            name: tv.displayName,
+            userId: tv.userId,
+            displayName: tv.displayName,
+            staffId: tv.staffId,
+            head: tv.head,
           },
         })
       }
@@ -385,21 +350,6 @@ export default {
           [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD'),
         })
       }
-
-      if (this.selectedField.formType === 'address') {
-        tv = this.form[this.selectedFieldName];
-        params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: {
-            province: tv.adAddress[0] || '',
-            city: tv.adAddress[1] || '',
-            dist: tv.adAddress[2] || '',
-            address: tv.detail,
-            addressType: tv.addressType,
-            latitude: tv.latitude,
-            longitude: tv.longitude,
-          },
-        })
-      }
       return params;
     },
     searchCustomerManager(keyword) {
@@ -408,6 +358,16 @@ export default {
         .then(res => {
           this.inputRemoteSearch.customerManager.options = res.list;
           this.inputRemoteSearch.customerManager.loading = false;
+        })
+        .catch(err => console.error('searchCustomerManager function catch err', err));
+    },
+    searchCustomer(keyword) {
+      this.inputRemoteSearch.customer.loading = true;
+      this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+        .then(res => {
+          this.inputRemoteSearch.customer.options = res.list;
+          console.log('res.list', res.list);
+          this.inputRemoteSearch.customer.loading = false;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },

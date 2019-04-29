@@ -5,12 +5,12 @@
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
         <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
-        <!--<span class="setting-header-text">客户字段设置</span>-->
+        <!--<span class="setting-header-text">产品字段设置</span>-->
       </div>
 
     </div>
     <div class="setting-product-design">
-      <form-design v-model="fields"></form-design>
+      <form-design v-model="fields" :exclude-form-type="excludeFormType"></form-design>
     </div>
   </div>
 </template>
@@ -19,6 +19,15 @@
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
 import platform from '@src/platform'
+
+/**
+ * todo
+ * 1. 过滤掉产品用不到的类型
+ *
+ *
+ *
+ */
+
 
 export default {
   name: 'setting-product-fields-view',
@@ -29,12 +38,18 @@ export default {
     }
   },
   data(){
-    let fields = this.initData.fields || [];
-    let sortedFields = fields.sort((a,b) => a.orderId - b.orderId);
+    let fields = this.initData.productFields || [];
+    let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+
     return {
+      excludeFormType: ['separator', 'email', 'phone', 'radio'],
       fields: FormUtil.toFormField(sortedFields),
       pending: false
     }
+  },
+  mounted() {
+
+    console.log('this.initData', this.initData);
   },
   methods: {
     back(){
@@ -59,7 +74,7 @@ export default {
 
         let result = await http.post('/setting/product/saveFields', fields);
         if(result.status == 0){
-          platform.alert('客户字段更新成功');
+          platform.alert('产品字段更新成功');
           return window.location.reload()
         }
         platform.alert(result.message)
@@ -72,7 +87,7 @@ export default {
       const msg = [];
 
       if (fields.some(f => !f.displayName)) {
-        msg.push('请检查客户字段设置，有字段标题标题缺失请补全。');
+        msg.push('请检查产品字段设置，有字段标题标题缺失请补全。');
         return msg;
       }
 

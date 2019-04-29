@@ -39,9 +39,27 @@ function createScheduler(params) {
   return http.post('/scheduler/buildByJson', params)
 }
 
+// /scheduler/buildBatch
+
+/**
+ *
+ * @param {Object} params - 参数
+ * @param {String} params.ids - productId字符串
+ * @param {Number} params.isAllLm - 是否全部联系人
+ * @param {Object} params.remindId - {remindTemplateId}
+ * @param {Array} params.users - [user]
+ * @returns {*}
+ */
+function batchCreateScheduler(params) {
+  return http.post('/scheduler/buildBatch', params)
+}
+
+
+
 export {
   getSmsTemplate,
   deleteScheduler,
   editScheduler,
-  createScheduler
+  createScheduler,
+  batchCreateScheduler
 };

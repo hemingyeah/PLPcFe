@@ -18,15 +18,15 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <base-button type="primary" icon="icon-add" @click="goToCreate">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteProducts">删除</base-button>
+          <base-button type="primary" icon="icon-add" @event="goToCreate" v-if="editedPermission">新建</base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteProducts" v-if="deletePermission">删除</base-button>
         </div>
 
         <div class="action-button-group">
-          <base-button type="plain" @event="openDialog('sendMessage')">发送短信</base-button>
-          <base-button type="plain" @event="openDialog('edit')" >批量编辑</base-button>
-          <base-button type="plain" @event="openDialog('remind')">批量提醒</base-button>
-          <el-dropdown trigger="click">
+          <base-button type="plain" @event="openDialog('sendMessage')" v-if="editedPermission === 3">发送短信</base-button>
+          <base-button type="plain" @event="openDialog('edit')" v-if="editedPermission === 3">批量编辑</base-button>
+          <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3">批量提醒</base-button>
+          <el-dropdown trigger="click" v-if="exportPermission">
             <span class="el-dropdown-link el-dropdown-btn">
               更多操作
               <i class="iconfont icon-nav-down"></i>
@@ -53,7 +53,7 @@
             </span>
             <el-dropdown-menu slot="dropdown" class="product-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.field">
-                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label" :disabled="item.field == 'name'"/>
+                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label"/>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -87,6 +87,39 @@
           <template slot-scope="scope">
             <template v-if="column.field === 'name'">
               <a href="" class="view-detail-btn" @click.stop.prevent="openProductTab(scope.row.id)">{{scope.row[column.field]}}</a>
+            </template>
+            <template v-else-if="column.field === 'customer'">
+              <a href="" class="view-detail-btn" @click.stop.prevent="createCustomerTab(scope.row.customer.id)">
+                {{scope.row.customerName}}
+              </a>
+            </template>
+            <template v-else-if="column.field === 'productTemplate'">
+              <a href="" class="view-detail-btn" @click.stop.prevent="createTemplateTab(scope.row.templateId)">
+                {{scope.row.templateName}}
+              </a>
+            </template>
+            <template v-else-if="column.field === 'tags'">
+              {{scope.row | formatTags}}
+            </template>
+            <template v-else-if="column.field === 'updateTime'">
+              <template v-if="scope.row.latesetUpdateRecord">
+                <el-tooltip class="item" effect="dark" :content="scope.row.latesetUpdateRecord" placement="top">
+                  <div @mouseover="showLatestUpdateRecord(scope.row)">
+                    {{scope.row.updateTime | formatDate}}
+                  </div>
+                </el-tooltip>
+              </template>
+              <template v-else>
+                <div @mouseover="showLatestUpdateRecord(scope.row)">
+                  {{scope.row.updateTime | formatDate}}
+                </div>
+              </template>
+            </template>
+            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+              {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+            </template>
+            <template v-else-if="!column.isSystem">
+              {{scope.row.attribute[column.field]}}
             </template>
 
             <template v-else>
@@ -164,6 +197,104 @@
       <el-form class="advanced-search-form" onsubmit="return false;">
         <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
 
+          <el-form-item label-width="100px" label="客户">
+            <el-select
+              v-model="searchModel.customer"
+              filterable
+              remote
+              reserve-keyword
+              placeholder="请输入关键词搜索"
+              clearable
+              :loading="inputRemoteSearch.customer.loading"
+              :remote-method="searchCustomer">
+              <el-option
+                v-for="item in inputRemoteSearch.customer.options"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+
+          </el-form-item>
+
+
+          <el-form-item label-width="100px" label="选择团队">
+            <el-select
+              v-model="searchModel.tag"
+              filterable
+              clearable
+              remote
+              reserve-keyword
+              placeholder="请输入关键词搜索"
+              :loading="inputRemoteSearch.tag.loading"
+              :remote-method="searchTag">
+
+              <el-option
+                v-for="item in inputRemoteSearch.tag.options"
+                :key="item.id"
+                :label="item.tagName"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label-width="100px" label="创建时间">
+            <el-date-picker
+              v-model="searchModel.createTime"
+              type="daterange"
+              align="right"
+              unlink-panels
+              range-separator="-"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :picker-options="datePickerOptions">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label-width="100px" label="更新时间">
+            <el-date-picker
+              v-model="searchModel.updateTime"
+              type="daterange"
+              align="right"
+              unlink-panels
+              range-separator="-"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :picker-options="datePickerOptions">
+            </el-date-picker>
+          </el-form-item>
+
+          <el-form-item label-width="100px" label="产品名称">
+            <el-input v-model="searchModel.name" type="text"></el-input>
+          </el-form-item>
+
+          <el-form-item label-width="100px" label="产品编号">
+            <el-input v-model="searchModel.serialNumber" type="text"></el-input>
+          </el-form-item>
+
+          <el-form-item label-width="100px" label="产品类型">
+            <el-select v-model="searchModel.type" clearable >
+              <el-option
+                v-for="item in productTypes"
+                :key="item"
+                :label="item"
+                :value="item"
+                :disabled="item.disabled">
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label-width="100px" label="有无提醒">
+            <el-select v-model="searchModel.hasRemind" clearable >
+              <el-option
+                v-for="item in searchRemindOptions"
+                :key="item.label"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+
           <!-- 动态搜索框 -->
           <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
                         :key="field.fieldName">
@@ -235,11 +366,11 @@
     <batch-editing-dialog
       ref="batchEditingDialog"
       :fields="productFields"
+      :product-types="productTypes"
       @submit-callback="search"
       :selected-ids="selectedIds"></batch-editing-dialog>
 
-    <batch-reminding-dialog ref="batchRemindingDialog" :selected-ids="selectedIds"
-                            @success-callback="remindSuccess"></batch-reminding-dialog>
+    <batch-reminding-dialog ref="batchRemindingDialog" :selected-ids="selectedIds"></batch-reminding-dialog>
 
     <base-import
       title="导入产品"
@@ -287,8 +418,14 @@ import BatchUpdateDialog from './components/BatchUpdateDialog.vue';
 import {
   getProduct,
   deleteProductByIds,
+  getUpdateRecord,
 } from '@src/api/ProductApi';
 
+
+/**
+ *  todo
+ *  二维码编号显示
+ */
 export default {
   name: 'product-list',
   props: {
@@ -309,15 +446,47 @@ export default {
       searchIncludeMoreConditions: false,
       searchModel: {
         keyword: '',
+        customer: '',
+        tag: '',
+        createTime: '',
+        updateTime: '',
+        name: '',
+        serialNumber: '',
+        type: '',
+        hasRemind: '',
+
         pageSize: 10,
         pageNum: 1,
+        orderDetail: {},
       },
       inputRemoteSearch: {
+        customer: {
+          options: [],
+          loading: false,
+        },
+        tag: {
+          options: [],
+          loading: false,
+        },
         customerManager: {
           options: [],
           loading: false,
         },
       },
+      searchRemindOptions: [
+        {
+          label: '全部',
+          value: '',
+        },
+        {
+          label: '有',
+          value: 1,
+        },
+        {
+          label: '无',
+          value: 0,
+        },
+      ],
 
       datePickerOptions: {
         shortcuts: [{
@@ -349,8 +518,106 @@ export default {
     }
   },
   computed: {
+    auth() {
+      return this.initData.authorities;
+    },
+    editedPermission() {
+      return this.auth.CUSTOMER_EDIT;
+    },
+    deletePermission() {
+      return this.auth.CUSTOMER_EDIT === 3 && this.auth.CUSTOMER_DELETE;
+    },
+    exportPermission() {
+      return this.auth.EXPORT_IN;
+    },
     productFields() {
-      return this.initData.productFields || [];
+
+      let fixedFields = [
+        {
+          displayName: '最近更新',
+          fieldName: 'updateTime',
+          formType: 'date',
+          isExport: false,
+          isSystem: 1,
+        },
+        {
+          displayName: '产品模板',
+          fieldName: 'productTemplate',
+          formType: 'text',
+          isExport: false,
+          isSystem: 0,
+        },
+        {
+          displayName: '服务团队',
+          fieldName: 'tags',
+          isExport: true,
+          isSystem: 0,
+          exportAlias: 'customerTags'
+        },
+        {
+          displayName: '提醒数量',
+          fieldName: 'remindCount',
+          isExport: false,
+          isSystem: 0,
+        },
+      ];
+
+
+      if (this.initData.productConfig.qrcodeEnabled) {
+        fixedFields.push({
+          displayName: '二维码编号',
+          fieldName: 'qrcodeId',
+          formType: 'text',
+          isExport: false,
+          isSystem: 1,
+          orderId: -4
+        })
+      }
+
+      return (this.initData.productFields || [])
+        .concat(fixedFields)
+        .map(f => {
+
+          // 调整字段顺序
+          if (f.fieldName === 'name') {
+            f.orderId = -10;
+          }
+
+          if (f.fieldName === 'customer') {
+            f.orderId = -9;
+          }
+
+          if (f.fieldName === 'serialNumber') {
+            f.orderId = -6;
+          }
+
+          if (f.fieldName === 'type') {
+            f.orderId = -5;
+          }
+
+
+          if (f.fieldName === 'tags') {
+            f.orderId = -8;
+          }
+
+          if (f.fieldName === 'productTemplate') {
+            f.orderId = -7;
+          }
+
+          if (f.fieldName === 'remindCount') {
+            f.orderId = -3;
+          }
+
+          if (f.fieldName === 'updateTime') {
+            f.orderId = -2;
+          }
+
+          return f;
+        })
+        .sort((a, b) => a.orderId - b.orderId)
+    },
+    productTypes() {
+      return this.initData.productConfig.productType || [];
     },
     searchFields() {
       return this.productFields
@@ -363,14 +630,43 @@ export default {
       return this.multipleSelection.map(p => p.id);
     },
     exportColumns() {
-      return this.columns
-        .map(c => {
-          c.export = true;
-          return c;
+      return [{
+        label: '产品系统编号',
+        field: 'productId',
+        export: true,
+      }, {
+        label: '客户姓名',
+        field: 'customerName',
+        export: true,
+      }, {
+        label: '客户编号',
+        field: 'customerSN',
+        export: true,
+      }, ...this.columns]
+        .map(field => {
+
+          if (['customer', 'updateTime', 'productTemplate', 'remindCount', 'qrcodeId'].some(key => key === field.fieldName)) {
+            field.export = false;
+          } else {
+            field.export = true;
+          }
+
+          return field
         })
     },
     smsRest() {
       return this.initData.smsRest || 0;
+    }
+  },
+  filters: {
+    formatTags({customer}) {
+      if (!customer) return '';
+      if (!customer.tags || !customer.tags.length) return '';
+      return customer.tags.map(t => t.tagName).join(' ')
+    },
+    formatDate(val) {
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
     }
   },
   mounted() {
@@ -380,6 +676,11 @@ export default {
     this.buildColumns();
     this.addCustomizedFieldToSearchModel();
     this.search();
+    // updateProductRemindCount
+    this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount)
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
     openProductTab(productId) {
@@ -392,9 +693,6 @@ export default {
         url: `/customer/product/detail/${productId}?noHistory=1`,
         fromId
       })
-
-    },
-    remindSuccess() {
 
     },
     search({ resetPageNum = false, moreConditions = false } = {}) {
@@ -424,37 +722,69 @@ export default {
       };
       let conditions = [];
       let key = '';
+      
+      if (Object.keys(searchModel.orderDetail || {}).length) {
+        params.orderDetail = searchModel.orderDetail;
+      }
 
-      if (searchIncludeMoreConditions) {
-        searchFields
-          .forEach(field => {
-            key = field.fieldName;
-            if (searchModel[key] && field.formType === 'date') {
-              return conditions.push({
-                property: key,
-                operator: field.operator,
-                betweenValue1: formatDate(searchModel[key][0], 'YYYY-MM-DD'),
-                betweenValue2: formatDate(searchModel[key][1], 'YYYY-MM-DD'),
-              });
-            }
-            if (searchModel[key] && field.formType === 'datetime') {
-              return conditions.push({
-                property: key,
-                operator: field.operator,
-                betweenValue1: formatDate(searchModel[key][0], 'YYYY-MM-DD HH:mm:ss'),
-                betweenValue2: `${formatDate(searchModel[key][1], 'YYYY-MM-DD')} 23:59:59`,
-              });
-            }
+      if (!searchIncludeMoreConditions) return params;
 
-            if (searchModel[key]) {
-              conditions.push({
-                property: key,
-                operator: field.operator,
-                value: searchModel[key],
-              });
-            }
-          });
-        params.conditions = conditions;
+      searchFields
+        .forEach(field => {
+          key = field.fieldName;
+          if (searchModel[key] && field.formType === 'date') {
+            return conditions.push({
+              property: key,
+              operator: field.operator,
+              betweenValue1: formatDate(searchModel[key][0], 'YYYY-MM-DD'),
+              betweenValue2: formatDate(searchModel[key][1], 'YYYY-MM-DD'),
+            });
+          }
+          if (searchModel[key] && field.formType === 'datetime') {
+            return conditions.push({
+              property: key,
+              operator: field.operator,
+              betweenValue1: formatDate(searchModel[key][0], 'YYYY-MM-DD HH:mm:ss'),
+              betweenValue2: `${formatDate(searchModel[key][1], 'YYYY-MM-DD')} 23:59:59`,
+            });
+          }
+
+          if (searchModel[key]) {
+            conditions.push({
+              property: key,
+              operator: field.operator,
+              value: searchModel[key],
+            });
+          }
+        });
+      params.conditions = conditions;
+
+      let keys = ['customer', 'tag', 'name', 'serialNumber', 'type'];
+      let k = '';
+
+      keys.forEach(key => {
+        if (searchModel[key]) {
+          k = key;
+
+          if (key === 'customer') {
+            k = 'customerId';
+          }
+          if (key === 'tag') {
+            k = 'tagId';
+          }
+
+          params[k] = searchModel[key];
+        }
+      });
+
+      params.hasRemind = searchModel.hasRemind;
+
+      if (Array.isArray(searchModel.createTime) && searchModel.createTime.length === 2) {
+        params.createTime = searchModel.createTime.map(t => formatDate(t, 'YYYY/MM/DD')).join('-');
+      }
+
+      if (Array.isArray(searchModel.updateTime) && searchModel.updateTime.length === 2) {
+        params.updateTime = searchModel.updateTime.map(t => formatDate(t, 'YYYY/MM/DD')).join('-');
       }
 
       return params
@@ -468,7 +798,8 @@ export default {
       this.searchModel = {
         keyword: '',
         pageNum: 1,
-        pageSize: this.page.pageSize
+        pageSize: this.page.pageSize,
+        orderDetail: {},
       };
 
       this.addCustomizedFieldToSearchModel();
@@ -526,12 +857,61 @@ export default {
         console.error('e', e);
       }
     },
+    // 批量添加提醒成功后，更新产品的提醒数量
+    updateProductRemindCount() {
+      let count = 0;
+      this.page.list = this.page.list
+        .map(product => {
+          count = product.attribute.remindCount || 0;
+
+          if (this.selectedIds.some(id => id === product.id)) {
+            product.attribute.remindCount = count + 1;
+          }
+
+          return product;
+        })
+    },
     // table method
     handleSelection(selection) {
       this.multipleSelection = selection;
     },
-    sortChange() {
+    sortChange(option) {
+      try {
+        const {prop, order} = option;
+        if (!order) {
+          this.searchModel.orderDetail = {};
+          return this.search();
+        }
+        const sortedField = this.productFields.filter(sf => sf.fieldName === prop)[0] || {};
 
+        let isSystem = 0;
+
+        if (prop === 'createTime' || prop === 'updateTime') {
+          isSystem = 1;
+        } else {
+          isSystem = sortedField.isSystem;
+        }
+
+        let sortModel = {
+          isSystem,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+          column: isSystem ? `product.${prop}` : prop,
+        };
+
+
+        if (prop === 'createTime' || prop === 'updateTime' || sortedField.formType === 'date' || sortedField.formType === 'datetime') {
+          sortModel.type = 'date';
+        } else {
+          sortModel.type = sortedField.formType;
+        }
+
+        this.searchModel.orderDetail = sortModel;
+
+        this.search();
+
+      } catch (e) {
+        console.error('e', e);
+      }
     },
     handleSizeChange(pageSize) {
       this.saveDataToStorage('pageSize', pageSize);
@@ -565,34 +945,48 @@ export default {
       this.saveDataToStorage('columnStatus', showColumns);
     },
     buildColumns() {
+      // productUpdateTime,productTemplate,tags,remindCount
+
       let sortable = false;
+      let isExport = true;
       let {columnStatus} = this.getLocalStorageData();
       const customerProductCheck = localStorage.getItem('customerProductCheck');
 
       if (customerProductCheck) {
-        columnStatus = customerProductCheck.split(',');
+        columnStatus = (customerProductCheck.split(',') || [])
+          .map(c => {
+            if (c === 'customerName') return 'customer';
+            return c;
+          })
         localStorage.removeItem('customerProductCheck');
       }
 
       this.columns = this.productFields
+        .filter(f => f.formType !== 'attachment')
         .map(field => {
 
-          if (field.formType === 'date' || field.formType === 'datetime') {
-            sortable = true;
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+            sortable = 'custom';
+          } else {
+            sortable = false;
+          }
+
+
+          if (field.fieldName === 'type') {
+            sortable = 'custom';
           }
 
           return {
+            ...field,
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
             show: columnStatus.some(c => c === field.fieldName),
-            // width: `${minWidth}px`,
             sortable,
             isSystem: field.isSystem,
+            // exportAlias: field.exportAlias || ''
           }
-        })
-
-      console.log('this.columns', this.columns.map(field => field.field));
+        });
 
       return this.columns;
     },
@@ -642,6 +1036,67 @@ export default {
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },
 
+    searchTag(keyword) {
+      this.inputRemoteSearch.tag.loading = true;
+      return this.$http.get('/customer/tag/list', {keyword, pageNum: 1, pageSize: 100 * 100, })
+        .then(res => {
+          this.inputRemoteSearch.tag.loading = false;
+          this.inputRemoteSearch.tag.options = res && res.list ? res.list : [];
+          return res;
+        })
+        .catch(err => console.error('searchTag function catch err', err));
+    },
+    searchCustomer(keyword) {
+      this.inputRemoteSearch.customer.loading = true;
+      this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+        .then(res => {
+          this.inputRemoteSearch.customer.options = res.list;
+          this.inputRemoteSearch.customer.loading = false;
+        })
+        .catch(err => console.error('searchCustomerManager function catch err', err));
+    },
+    showLatestUpdateRecord(row) {
+      if (row.latesetUpdateRecord) return;
+      getUpdateRecord({
+        productId: row.id
+      })
+        .then(res => {
+          if (!res || res.status) return;
+
+          this.page.list = this.page.list
+            .map(c => {
+              if (c.id === row.id) {
+                c.latesetUpdateRecord = res.data;
+              }
+              return c;
+            });
+        })
+        .catch(e => console.error('e', e));
+    },
+
+    createCustomerTab(productId) {
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `customer_view_${productId}`,
+        title: '客户信息',
+        close: true,
+        url: `/customer/view/${productId}?noHistory=1`,
+        fromId
+      })
+    },
+
+    createTemplateTab(templateId) {
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `product_template_view_${templateId}`,
+        title: '产品模板',
+        close: true,
+        url: `/product/template/detail/${templateId}?noHistory=1`,
+        fromId
+      })
+    },
     goToCreate() {
       window.location = '/customer/product/create';
     },

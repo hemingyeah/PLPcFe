@@ -26,7 +26,7 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <p>本次发送：合计共{{selectedIds.length}}个</p>
+        <p>本次发送：合计共{{count}}个</p>
         <p>当前短信余额：{{smsRest}}条</p>
         <p>如需查看发送记录请到系统管理-短信设置-发送记录查询</p>
         <p>一次性发送100条以上时将会因审核略有延迟，100条以下则无需审核</p>
@@ -42,6 +42,7 @@
 
 <script>
 import { formatDate, } from '@src/util/lang';
+import * as CustomerApi from '@src/api/CustomerApi';
 
 export default {
   name: "send-message-dialog",
@@ -52,16 +53,7 @@ export default {
         isAllLm: '0',
         sendTime: new Date(),
       },
-      count: {
-        default: {
-          value: 0,
-          loaded: false,
-        },
-        all: {
-          value: 0,
-          loaded: false,
-        },
-      },
+      count: 0,
       sendMessageDialog: false,
       pending: false,
       messageTemplate: [],
@@ -88,19 +80,6 @@ export default {
       return this.messageTemplate.filter(t => t.id === this.form.smsTemplateId)
         .map(t => t.allowContent).join('');
     },
-    needFetchCount() {
-      if (this.form.isAllLm === '0' && this.count.default.loaded) {
-        return false;
-      }
-      return !(this.form.isAllLm === '1' && this.count.all.loaded)
-    },
-    displayCount() {
-      if (this.form.isAllLm === '0') {
-        return this.count.default.value;
-      } else {
-        return this.count.all.value;
-      }
-    }
   },
   mounted() {
     this.buildParams();
@@ -138,21 +117,13 @@ export default {
       this.fetchTemplate();
     },
     fetchCount() {
-      if (!this.needFetchCount) return;
       this.pending = true;
-      const params = {
+      CustomerApi.computeSendNum({
         ids: this.selectedIds.join(','),
         isAllLm: this.form.isAllLm,
-      };
-      this.$http.get('/customer/computeSendNum', params)
+      })
         .then(res => {
-          if (this.form.isAllLm === '0') {
-            this.count.default.value = res.data;
-            this.count.default.loaded = true;
-          } else {
-            this.count.all.value = res.data;
-            this.count.all.loaded = true;
-          }
+          this.count = res.data || 0;
           this.pending = false;
         })
         .catch(err => {

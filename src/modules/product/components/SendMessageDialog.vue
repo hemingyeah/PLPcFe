@@ -150,7 +150,10 @@ export default {
       getSmsTemplate()
         .then(res => {
           if (res.status) {
-            this.$platform.alert('获取短信模板失败');
+            return this.$platform.notification({
+              title: '获取短信模板失败',
+              type: 'error',
+            });
           }
           this.messageTemplate = (res.data.list || [])
             .filter(t => t.notice === '自定义通知' && t.status === 'pass_approval');
@@ -161,7 +164,10 @@ export default {
         })
         .catch(err => {
           console.error('fetchTemplate', err);
-          this.$platform.alert('获取短信模板发生错误');
+          this.$platform.notification({
+            title: '获取短信模板发生错误',
+            type: 'error',
+          });
         })
     },
     buildParams() {

@@ -19,7 +19,7 @@
 
         <!-- start 已删除 -->
         <h3 class="product-template-name" :class="{'product-template-name-expand': showWholeName == 1}">
-          <span class="product-template-name-delete" v-if="isDelete" title="该客户已被删除，只能查看数据。" v-tooltip>已删除</span>
+          <span class="product-template-name-delete" v-if="isDelete" title="该产品模板已被删除，只能查看数据。" v-tooltip>已删除</span>
           <span ref="productTemplateName">{{ productTemplate.name }}</span>
           <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
         </h3>
@@ -28,7 +28,18 @@
         <!-- start form表单展示 -->
         <form-view :fields="fields" :value="productTemplate">
 
-          <!-- start  -->
+          <!-- start 创建人 -->
+          <template slot="createUser" slot-scope="{value}">
+            <div class="form-view-row" v-if="value">
+              <label>创建人</label>
+              <div class="form-view-row-content">
+                <span>{{ value.displayName || '' }}</span>
+              </div>
+            </div>
+          </template>
+          <!-- end 创建人 -->
+
+          <!-- start 创建时间 -->
           <template slot="createTime" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>创建时间</label>
@@ -37,6 +48,8 @@
               </div>
             </div>
           </template>
+          <!-- end 创建时间 -->
+
         </form-view>
         <!-- end form 表单展示 -->
 
@@ -46,7 +59,11 @@
         <base-tabbar :tabs="tabs" v-model="currentTab"></base-tabbar>
         <div class="product-template-relation-content">
           <keep-alive>
-            <component :is="currentTab" :share-data="propsForSubComponents"></component>
+            <component 
+              :is="currentTab" 
+              :share-data="propsForSubComponents" 
+              @changeRecordCount="recordCountChange">
+            </component>
           </keep-alive>
         </div>
       </div>
@@ -64,7 +81,7 @@ import url from 'url';
 import AuthUtil from '@src/util/auth';
 import platform from '@src/platform';
 
-import { getProductTemplate, getProductTemplateStatisticsInit } from '@src/api/ProductApi.js';
+import { getProductTemplate, getProductTemplateStatisticsInit, productTemplateDelete } from '@src/api/ProductApi.js';
 
 import ProductTemplateInfoRecord from './component/ProductTemplateInfoRecord.vue';
 import ProductTemplateRelatedProductTable from './component/ProductTemplateRelatedProductTable.vue';
@@ -84,8 +101,9 @@ export default {
       productTemplate: {
         id: ''
       }, // 产品模板数据
+      productCount: 0,
+      recordCount: 0,
       showWholeName: -1, // -1 代表不显示展开icon 0 代表收起 1 代表展开
-      statisticalData: {},
       tabs: [],
     }
   },
@@ -112,15 +130,15 @@ export default {
     /** 
      * 满足以下条件允许编辑产品模板
      * 1. 产品模板没有被删除
-     * 2. 有客户编辑权限
+     * 2. 有客户编辑权限 或 客户负责人
      */
     allowEditCustomer() {
-      return (!this.isDelete && this.hasEditCustomerAuth);
+      return (!this.isDelete && (this.hasEditCustomerAuth || this.isCustomerManager));
     },
     // 字段列表
     fields() {
       let fields = (this.initData.productFields || []).sort((a, b) => a.orderId - b.orderId).filter(field => {
-        return field.fieldName !== 'customerId'
+        return field.fieldName !== 'customer'
       });
 
       let allFields = [
@@ -131,7 +149,7 @@ export default {
         },
         {
           displayName: '创建人',
-          fieldName: 'createLoginUser',
+          fieldName: 'createUser',
           formType: 'user',
           isSystem: 1,
         }, 
@@ -143,13 +161,7 @@ export default {
         }
       ];
 
-      return allFields.map(field => {
-        if(field.formType == 'selectMulti') {
-          field.formType = 'select';
-          field.setting.isMulti = 1;
-        }
-        return field
-      })
+      return allFields;
     },
     /** 
      * 是否有编辑客户权限，需要满足以下条件之一：
@@ -177,6 +189,13 @@ export default {
         }
       );
     },
+    /**
+     *  当前用户是否是该客户负责人
+     *  客户负责人用于和客户创建人相同权限
+     */
+    isCustomerManager() {
+      return this.loginUser.userId === this.productTemplate.customerManager;
+    },
     /** 
      * 产品模板是否被删除
      * 在产品模板删除时不允许做任何操作，只能查询 
@@ -196,6 +215,7 @@ export default {
         isDelete: this.isDelete,
         loginUser: this.initData.loginUser,
         productTemplate: this.productTemplate,
+        productCount: this.productCount || 0,
       };
     },
     productTemplateId() {
@@ -213,34 +233,54 @@ export default {
   mounted() {
     this.loading = true;
 
+    this.productCount = (this.initData && this.initData.productCount) || 0;
+    this.loginUser = (this.initData && this.initData.loginUser) || {};
+
     this.fetchProductTemplate();
-    // this.fetchStatisticalData();
   },
   methods: {
     // 构建tab
     buildTabs() {
-      const {
-        productQuantity,
-        recordQuantity,
-      } = this.statisticalData || {};
-
       return [
         {
-          displayName: `信息动态(${recordQuantity || 0})`,
+          displayName: `信息动态(${this.recordCount || 0})`,
           component: ProductTemplateInfoRecord.name,
           slotName: 'record-tab',
           show: true,
         },
         {
-          displayName: `相关产品(${productQuantity || 0})`,
+          displayName: `相关产品(${this.productCount || 0})`,
           component: ProductTemplateRelatedProductTable.name,
           show: !this.isDelete
         }
       ].filter(tab => tab.show);
     },
     // 删除产品模板
-    deleteProductTemplate() {
-      // 
+    async deleteProductTemplate() {
+      const confirm = await platform.confirm('您确定要删除所选产品吗？');
+      if(!confirm) return
+
+      try {
+        this.loading = true;
+        let result = await productTemplateDelete(this.productTemplateId);
+
+        this.$platform.notification({
+          title: '产品模板',
+          message: result.status == 0 ? '删除产品模板成功' : result.message,
+          type: result.status == 0 ? 'success' : 'error',
+        });
+
+        if(result.status == 0) {
+          let fromId = window.frameElement.getAttribute('fromId');
+
+          this.$platform.refreshTab(fromId);
+          this.fetchProductTemplate();
+        }
+        this.loading = false;
+
+      } catch(err) {
+        console.log(`productDelete err ${err}`)
+      }
     },
     // 获取产品模板数据
     fetchProductTemplate() {
@@ -250,21 +290,8 @@ export default {
         this.productTemplate = Object.freeze(result);
         this.loading = false;
 
-        // TODO: 有数据之后删除
-        this.tabs = this.buildTabs();
+        // this.tabs = this.buildTabs();
 
-      })
-    },
-    // 获取统计数据
-    fetchStatisticalData() {
-      const params = {
-        customerId: this.initData.id || this.productTemplateId
-      };
-      getProductTemplateStatisticsInit(params).then(result => {
-        if (Object.keys(result).every(key => key !== 'taskQuantity')) return;
-
-        this.statisticalData = result;
-        this.tabs = this.buildTabs();
       })
     },
     goBack() {
@@ -273,6 +300,11 @@ export default {
     // 跳转编辑
     goEdit() {
       window.location = `/product/template/edit/${this.productTemplateId}`;
+    },
+    // 信息动态数量变化
+    recordCountChange(count) {
+      this.recordCount = count;
+      this.tabs = this.buildTabs();
     },
     selectTab(tab) {
       this.currentTab = tab;

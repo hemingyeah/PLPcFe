@@ -4,7 +4,7 @@
       <div class="product-toolbar-left" v-if="allowBack || !isDelete">
         <button type="button" class="btn btn-text" @click="goBack" v-if="allowBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <template>
-          <button type="button" class="btn btn-text" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
+          <button type="button" class="btn btn-text" @click="editProduct" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
           <button type="button" class="btn btn-text" @click="deleteProduct" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
           <button type="button" class="btn btn-text" @click="openRemindDialog('remind')"><i class="iconfont icon-notification"></i> 添加提醒</button>
         </template>
@@ -52,6 +52,15 @@
     <div class="main-content" v-loading="loading">
       <div class="product-detail">
         <form-view :fields="fields" :value="product">
+          <template slot="customer" slot-scope="{value}">
+            <div class="form-view-row" v-if="value">
+              <label>客户</label>
+              <div class="form-view-row-content">
+                {{product.customerName}}
+              </div>
+            </div>
+          </template>
+
 
         </form-view>
       </div>
@@ -143,7 +152,68 @@ export default {
       return this.initData.taskTypeInfo.map(t => Object.freeze(t));
     },
     fields() {
-      return this.initData.productFields;
+
+
+      //产品二维码 创建人： 创建时间：系统编号：
+      let fixedFields = [
+        {
+          displayName: '创建人',
+          fieldName: 'createUser',
+          formType: 'user',
+          isSystem: 1,
+          orderId: 10001
+        },
+        {
+          displayName: '创建时间',
+          fieldName: 'createTime',
+          formType: 'datetime',
+          isSystem: 1,
+          orderId: 10002
+        },
+        {
+          displayName: '系统编号',
+          fieldName: 'id',
+          formType: 'text',
+          isSystem: 1,
+          orderId: 10003
+        },
+      ];
+
+      if (this.initData.productConfig.qrcodeEnabled) {
+        fixedFields.push({
+          displayName: '二维码编号',
+          fieldName: 'qrcodeId',
+          isSystem: 1,
+          formType: 'text',
+          orderId: 10000
+        })
+      }
+
+
+
+      return this.initData.productFields
+        .concat(fixedFields)
+        .map(f => {
+          console.log('f', f);
+          if (f.fieldName === 'name') {
+            f.orderId = -10;
+          }
+
+          if (f.fieldName === 'customer') {
+            f.orderId = -7;
+          }
+
+          if (f.fieldName === 'serialNumber') {
+            f.orderId = -9;
+          }
+
+          if (f.fieldName === 'type') {
+            f.orderId = -8;
+          }
+
+          return f;
+        })
+        .sort((a, b) => a.orderId - b.orderId)
     },
     productId() {
       return this.product.id;
@@ -260,14 +330,15 @@ export default {
   },
   mounted() {
     console.log('product-view mounted', this.initData);
-    // console.log('productId', this.productId);
     this.$eventBus.$on('product_view.open_remind_dialog', this.openRemindDialog);
   },
   beforeDestroy() {
     this.$eventBus.$off('product_view.open_remind_dialog', this.openRemindDialog);
   },
   methods: {
-
+    editProduct() {
+      window.location.href = `/customer/product/edit/${this.productId}`
+    },
     openRemindDialog(remind) {
       this.$refs.addRemindDialog.openDialog(remind);
     },
@@ -275,7 +346,7 @@ export default {
       try {
         if (!await this.$platform.confirm('确定要删除该产品？')) return;
 
-        const result = await deleteProduct(this.product.id);
+        const result = await deleteProduct(this.productId);
         if (!result.status) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
@@ -291,40 +362,37 @@ export default {
     },
     /** 从客户创建工单 */
     createTask(typeId){
-      let product = this.product || {};
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: 'createTask',
         title: '新建工单',
         close: true,
-        url: `/task/createFromProduct/${product.id}?defaultTypeId=${typeId}`,
+        url: `/task/createFromProduct/${this.productId}?defaultTypeId=${typeId}`,
         fromId
       })
     },
     /** 从客户创建事件 */
     createEvent(typeId){
-      let product = this.product || {};
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: 'createEvent',
         title: '新建事件',
         close: true,
-        url: `/event/createFromProduct/${product.id}?defaultTypeId=${typeId}`,
+        url: `/event/createFromProduct/${this.productId}?defaultTypeId=${typeId}`,
         fromId
       })
     },
     /** 从客户创建计划工单 */
     createPlanTask(typeId){
-      let product = this.product || {};
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: 'createPlan',
         title: '新建计划任务',
         close: true,
-        url: `/task/planTask/create?defaultTypeId=${typeId}&productId=${product.id}`,
+        url: `/task/planTask/create?defaultTypeId=${typeId}&productId=${this.productId}`,
         fromId
       })
     },

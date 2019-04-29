@@ -42,6 +42,8 @@
 <script>
 import _ from 'lodash';
 import { getProductRemindTemplate } from '@src/api/ProductApi';
+import * as CustomerApi from '@src/api/CustomerApi'
+import {batchCreateScheduler} from '@src/api/CommonApi';
 
 export default {
   name: 'batch-reminding-dialog',
@@ -118,23 +120,38 @@ export default {
 
       const params = this.buildParams();
       this.pending = true;
-      this.$http.post('/scheduler/buildBatch', params)
+      batchCreateScheduler(params)
         .then(res => {
-          let ids = this.selectedIds;
-          if (res.status === 0) {
-            this.$platform.alert('批量添加提醒成功');
+          if (!res.status) {
+            this.$platform.notification({
+              title: '成功',
+              type: 'success',
+              message: '批量添加提醒成功',
+            });
+            // 更新 产品列表的提醒数量
+            this.$eventBus.$emit('product_list.update_product_list_remind_count');
           }
           if (res.status === 1 && res.data) {
-            this.$platform.alert(`批量添加提醒失败，以下产品已存在该提醒：${res.data.join(',')}`);
-            ids = [];
+            this.$platform.notification({
+              title: '批量添加提醒失败',
+              type: 'error',
+              message: (() => (<dl>
+                <dt>以下产品已存在该提醒：</dt>
+                {res.data.map(c => (<dd style="margin: 0">{c}</dd>))}
+              </dl>))(),
+
+            });
           }
           this.batchRemindingCustomerDialog = false;
           this.pending = false;
-
-          this.$emit('success-callback', ids);
         })
         .catch(err => {
-          this.$platform.alert('批量添加提醒失败');
+          this.$platform.notification({
+            title: '失败',
+            type: 'error',
+            message: '批量添加提醒失败',
+          });
+
           this.pending = false;
           console.error('post to /scheduler/buildBatch err', err)
         });
@@ -189,7 +206,7 @@ export default {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {};
 
-      return this.$http.get('/customer/userTag/list', pms)
+      return CustomerApi.getUserTag(pms)
         .then(res => {
           if (!res || !res.list) return;
           if (res.list) {
@@ -202,7 +219,7 @@ export default {
 
           return res;
         })
-        .catch(e => console.log(e));
+        .catch(e => console.error(e));
     },
   },
 }

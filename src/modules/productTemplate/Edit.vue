@@ -16,36 +16,14 @@
 
       <!-- start form builder -->
       <form-builder ref="productTemplateEditForm" :fields="fields" :value="form" @update="update">
-
-        <!-- start 产品名称 -->
-        <template slot="name" slot-scope="{field}">
-          <form-item :label="field.displayName" validation>
-            <form-text
-              :field="field"
-              :value="form.name" @update="update"
-              :placeholder="genPlaceholder(field)"/>
-          </form-item>
-        </template>
-        <!-- end 产品名称 -->
-
-        <!-- start 产品编号 -->
-        <template slot="serialNumber" slot-scope="{field}">
-          <form-item :label="field.displayName" validation>
-            <form-text
-              :field="field"
-              :value="form.serialNumber" @update="update"
-              :placeholder="genPlaceholder(field)"/>
-          </form-item>
-        </template>
-        <!-- end 产品编号 -->
-
+        
         <!-- start 产品类型  -->
         <template slot="type" slot-scope="{field}">
           <form-item :label="field.displayName" validation>
             <div class="input-and-btn">
               <form-select
                 :field="field" 
-                :source="productTemplateType || []"
+                :source="productTypes || []"
                 :value="form.type" @update="update"
                 :placeholder="genPlaceholder(field)"/>
             </div>
@@ -64,7 +42,7 @@
 
 <script>
 import * as FormUtil from '@src/component/form/util';
-import platform from '@src/platform'
+import platform from '@src/platform';
 
 import { productTemplateCreate, productTemplateUpdate, getProductTemplate } from '@src/api/ProductApi.js'
 
@@ -79,27 +57,7 @@ export default {
   data() {
     return {
       auth: {}, // 权限
-      fieldsLocal: [
-        {
-          displayName: '产品名称', 
-          fieldName: 'name',
-          formType: 'text',
-          placeHolder: '',
-          isNull: 0
-        },
-        {
-          displayName: '产品编号', 
-          fieldName: 'serialNumber',
-          formType: 'text', 
-          isNull: 1
-        },
-        {
-          displayName: '产品类型', 
-          fieldName: 'type',
-          formType: 'select', 
-          isNull: 1,
-        },
-      ], // 字段列表
+      fieldsLocal: [], // 字段列表
       form: {
         name: '',
         serialNumber: '',
@@ -108,7 +66,7 @@ export default {
       init: false, // 初始化
       loadingPage: false, // 加载页面
       pending: false, // 等待状态
-      productTemplateType: [], // 产品类型列表
+      productTypes: [], // 产品类型列表
     }
   },
   computed: {
@@ -119,7 +77,7 @@ export default {
       return this.initData.id
     },
     fields() {
-      let originFields = this.initData && this.initData.productFields.filter(f => f.fieldName !== 'type' && f.fieldName !== 'serialNumber' && f.fieldName !== 'name');
+      let originFields = this.initData && this.initData.productFields.filter(f => f.fieldName !== 'customer' && f.fieldName !== 'tags');
       let localFields = this.fieldsLocal;
       let fields = [...localFields, ...originFields];
 
@@ -129,14 +87,14 @@ export default {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
           }
           return f;
-        })
-        .filter(f => f.fieldName !== 'tags' && f.fieldName !== 'customerId');
+        });
+      
       return FormUtil.migration(sortedFields)
     }
   },
   async mounted() {
-    this.productTemplateType = this.initData && this.initData.productTypes;
-    this.productTemplateType = this.productTemplateType.map(type => ({text: type, value: type}));
+    this.productTypes = (this.initData && this.initData.productTypes) || [];
+    this.productTypes = this.productTypes.map(type => ({text: type, value: type}));
     // 初始化默认值
     let form = {};
     // 编辑

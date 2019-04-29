@@ -137,15 +137,21 @@ const FormDesign = {
     let modeFormTypes = mode.fields || [];
 
     let hasSystemField = false;
-    let availableFields = [];
+    let availableFields = modeFormTypes
+      .map(item => {
+        let field = FormFieldMap.get(item);
+        if(field && field.isSystem === 1) hasSystemField = true;
+        return field
+      })
+      .filter(field => !!field && this.excludeFormType.every(formType => formType !== field.formType));
 
-    modeFormTypes.forEach(item => {
-      let field = FormFieldMap.get(item);
-      if(null == field) return;
-
-      if(field.isSystem == 1) hasSystemField = true;
-      availableFields.push(field)
-    })
+    // modeFormTypes.forEach(item => {
+    //   let field = FormFieldMap.get(item);
+    //   if(null == field) return;
+    //
+    //   if(field.isSystem == 1) hasSystemField = true;
+    //   availableFields.push(field)
+    // })
 
     return {
       // 当前模式下可用字段

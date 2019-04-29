@@ -274,7 +274,7 @@
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
               <el-dropdown-item v-for="item in columns" :key="item.field">
                 <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label"
-                             :disabled="item.field == 'name'"/>
+                             :disabled="item.field === 'name'"/>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>

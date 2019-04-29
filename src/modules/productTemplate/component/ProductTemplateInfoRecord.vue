@@ -66,7 +66,7 @@ export default {
     },
     /** 添加备注权限 */
     editComment(){
-      return (this.allowEditCustomer && this.allowOperate) || true;
+      return (this.allowEditCustomer && this.allowOperate);
     },
     // 当前用户id
     loginUser(){
@@ -118,9 +118,10 @@ export default {
           message: result.status == 0 ? '添加备注成功' : result.message,
           type: result.status == 0 ? 'success' : 'error',
         });
+
         if(result.status == 0){
           this.$refs.comment.reset();
-          await this.initRecord();
+          this.initRecord();
 
           this.$nextTick(() => {
             this.$refs.timeline.scrollTop = 0;
@@ -217,6 +218,8 @@ export default {
         this.recordLoading = false;
         this.recordPage.list = [];
         this.recordPage.merge(result);
+
+        this.$emit('changeRecordCount', result.total);
         
       } catch (error) {
         console.error(`searchRecord ${error}`)
