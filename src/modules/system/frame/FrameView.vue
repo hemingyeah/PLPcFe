@@ -22,7 +22,7 @@
               </div>
             </div>
             <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
-              <i class="iconfont icon-fe-close"></i>
+              <i class="iconfont icon-chahao"></i>
             </button>
           </div>
 
@@ -386,7 +386,7 @@ export default {
     },
     closeNotification () {
       this.notificationShow = false;
-      this.clearAnimation();
+      // this.clearAnimation();
     },
 
     // 获取系统消息，本地存储，超出滚动
@@ -405,7 +405,7 @@ export default {
           if(info.data.msgSystem) {
             this.notification.title = info.data.msgSystem.title;
             this.notificationShow = true;
-            this.setAnimation();
+            // this.setAnimation();
           } else {
             this.notification.title = null;
           }
