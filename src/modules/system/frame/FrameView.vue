@@ -402,12 +402,13 @@ export default {
           } else {
             this.msgCount = '';
           }
-          if(info.data.msgSystem) {
+          if(info.data.msgSystem && !this.notificationShow) {
             this.notification.title = info.data.msgSystem.title;
             this.notificationShow = true;
             // this.setAnimation();
           } else {
             this.notification.title = null;
+            this.notificationShow = false;
           }
         }
       } catch (error) {
