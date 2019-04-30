@@ -1365,7 +1365,7 @@ export default {
       this.inputRemoteSearch.creator.options = [];
       this.searchTag();
 
-      this.$refs.baseDistPicker.clearValue();
+      this.$refs.baseDistPicker && this.$refs.baseDistPicker.clearValue();
       this.search();
       // sessionStorage.removeItem('customer_list_search_status');
     },
