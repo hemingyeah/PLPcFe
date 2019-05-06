@@ -31,8 +31,19 @@ const BaseFormField = [
   FormEmail,
   FormSeparator,
   FormRadio
-  
 ];
+
+const ProductFormField = [
+  FormText,
+  FormTextarea,
+  FormNumber,
+  FormSelect,
+  FormCode,
+  FormAttachment,
+  FormUser,
+  FormDate,
+  FormDatetime,
+]
 
 const allFields = [
   ...BaseFormField,
@@ -41,12 +52,17 @@ const allFields = [
 
 const BaseModeField = BaseFormField.map(item => item.formType)
 
+const ProductModeField = ProductFormField.map(item => item.formType)
+
 const Modes = {
   base: {
     fields: BaseModeField
   },
   customer: {
     fields: [...BaseModeField]
+  },
+  product: {
+    fields: [...ProductModeField]
   }
   // task: {
   //   fields: [FormText.formType]

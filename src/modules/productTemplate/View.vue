@@ -75,13 +75,12 @@
 </template>
 
 <script>
-import qs from 'qs';
 import url from 'url';
 
 import AuthUtil from '@src/util/auth';
 import platform from '@src/platform';
 
-import { getProductTemplate, getProductTemplateStatisticsInit, productTemplateDelete } from '@src/api/ProductApi.js';
+import { getProductTemplate, productTemplateDelete } from '@src/api/ProductApi.js';
 
 import ProductTemplateInfoRecord from './component/ProductTemplateInfoRecord.vue';
 import ProductTemplateRelatedProductTable from './component/ProductTemplateRelatedProductTable.vue';

@@ -1,5 +1,5 @@
 <template>
-  <div class="batch-edit-product-template-dialog">
+  <!-- <div class="batch-edit-product-template-dialog"> -->
     <!-- start 批量编辑弹窗 -->
     <base-modal 
       title="批量编辑" 
@@ -179,13 +179,13 @@
 
     </base-modal>
     <!-- end 批量编辑弹窗 -->
-  </div>
+  <!-- </div> -->
 </template>
 
 <script>
 
 import { productTemplateEditBatch } from '@src/api/ProductApi.js';
-
+import { formatDate } from '@src/util/lang';
 import platform from '@src/platform';
 
 export default {
@@ -310,7 +310,7 @@ export default {
             field.setting.dataSource = (this.initData.productConfig && this.initData.productConfig.productType) || [];
           }
           // select && 系统字段
-          if (field.formType === 'select' && !field.isNull) {
+          if (field.formType === 'select' && !field.isNull && field.setting && !field.setting.isMulti) {
             field.rules = [{
               required: true, message: '必须选择一个选项', trigger: ['blur', 'change']
             }];
@@ -320,7 +320,6 @@ export default {
             field.rules = [{
               required: true, message: '请至少选择一个选项', trigger: ['blur', 'change']
             }];
-            field.setting.isMulti = 1;
           }
           // number
           else if (field.formType === 'number') {
@@ -424,7 +423,7 @@ export default {
     // 打开
     open() {
       if(this.selectedIds.length <= 0) {
-        return this.$platform.alert('请选择需要批量编辑的产品');
+        return platform.alert('请选择需要批量编辑的产品');
       }
 
       this.batchEditProductTemplateDialog = true;

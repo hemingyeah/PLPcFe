@@ -1,12 +1,13 @@
 import http from '@src/util/http';
 
+/** ------------ start 产品 ----------------------- */
 /**
  * 获取产品列表
  * @param params
  * @returns {*}
  */
 function getProduct(params) {
-  return http.post('/product/list/data', params, false)
+  return http.post('/customer/product/list/data', params, false)
 }
 
 /**
@@ -15,7 +16,7 @@ function getProduct(params) {
  * @returns {*}
  */
 function createProduct(params) {
-  return http.post('/customer/product/create', params);
+  return http.post('/customer/product/create/action', params);
 }
 
 /**
@@ -33,7 +34,7 @@ function updateProduct(params) {
  * @returns {*}
  */
 function deleteProductByIds(ids) {
-  return http.get(`/customer/product/deleteByIds/${ids}`)
+  return http.get(`/customer/product/deleteBatch/${ids}`)
 }
 
 /**
@@ -83,7 +84,7 @@ function editBatchProduct(params) {
  * 获取产品提醒模板
  */
 function getProductRemindTemplate() {
-  return http.get('/product/remind/list')
+  return http.get('/customer/product/remind/list')
 }
 
 /**
@@ -92,7 +93,7 @@ function getProductRemindTemplate() {
  * @param {String} params.id - 产品id
  */
 function getProductDetail(params) {
-  return http.get('/product/detail/data', params)
+  return http.get('/customer/product/detail/data', params)
 }
 
 /**
@@ -101,7 +102,7 @@ function getProductDetail(params) {
  * @param {String} params.id - 产品id
  */
 function getEventOfProduct(params) {
-  return http.get('/product/event/list', params)
+  return http.get('/customer/product/event/list', params)
 }
 
 /**
@@ -110,7 +111,7 @@ function getEventOfProduct(params) {
  * @param {String} params.id - 产品id
  */
 function getTaskOfProduct(params) {
-  return http.get('/product/task/list', params)
+  return http.get('/customer/product/task/list', params)
 }
 
 /**
@@ -119,7 +120,7 @@ function getTaskOfProduct(params) {
  * @param {String} params.id - 产品id
  */
 function getPlanOfProduct(params) {
-  return http.get('/product/plantask/list', params)
+  return http.get('/customer/product/plantask/list', params)
 }
 
 /**
@@ -130,7 +131,7 @@ function getPlanOfProduct(params) {
  * @param {Number} params.pageSize - 页面大小
  */
 function getRecordOfProduct(params) {
-  return http.get('/product/record/list', params)
+  return http.get('/customer/product/record/list', params)
 }
 
 /**
@@ -145,20 +146,11 @@ function getRecordOfProduct(params) {
  * @param {Object} params.content.updateType - 'pRecord'
  */
 function commentProduct(params) {
-  return http.post('/customer/product/pRecord/create', params, false)
+  return http.post('/customer/product/record/create', params, false)
 }
 
 /**
- * 删除产品
- * @param {Object} params - 参数
- * @param {String} params.ids - 产品id
- */
-function deleteProduct(ids) {
-  return http.post(`/customer/product/deleteByIds/${ids}`)
-}
-
-/**
- * 删除产品
+ * 获取产品最近的一条更新记录
  * @param {Object} params - 参数
  * @param {String} params.productId - 产品id
  */
@@ -166,7 +158,41 @@ function getUpdateRecord(params) {
   return http.get('/customer/product/getLatestOne', params)
 }
 
+/**
+ * 删除二维码
+ * @param {Object} params - 参数
+ * @param {String} params.productId - 产品id
+ */
+function unbindQrcode(params) {
+  return http.post('/product/unbindQrcode', params, false)
+}
 
+/**
+ * 绑定二维码
+ * @param {Object} params - 参数
+ * @param {Boolean} params.addQrcodeId - 是否附带qrocdeId
+ * @param {Boolean} params.addTenant - 是否附带公司简称
+ * @param {String} params.qrocdeId - 二维码id
+ */
+function bindQrcode(params) {
+  return http.get('/product/bindQrcode', params)
+}
+
+
+/**
+ * 下载二维码
+ * @param {Object} params - 参数
+ * @param {String} params.productId - 产品id
+ * @param {String} params.qrocdeId - 二维码id
+ */
+
+function downloadQrcode(params) {
+  return http.get('/product/downloadOneQrcode', params)
+}
+/** ------------ end 产品 ----------------------- */
+
+
+/** ------------ start 产品模板 ----------------------- */
 /**
  * 获取产品模板列表数据
  * @param {Object} params - 参数
@@ -175,7 +201,7 @@ function getUpdateRecord(params) {
  * @returns Promise<>
  */
 function getProductTemplateList(params) {
-  return http.post('/product/template/list/data', params, false);
+  return http.post('/product/list/data', params);
 }
 
 /**
@@ -184,7 +210,7 @@ function getProductTemplateList(params) {
  * @returns Promise<>
  */
 function productTemplateDelete(ids) {
-  return http.post(`/product/template/delete/${ids}`);
+  return http.post(`/product/delete/${ids}`);
 }
 
 /**
@@ -203,7 +229,7 @@ function productTemplateEditBatch(params) {
  * @returns Promise<>
  */
 function productTemplateCreate(params) {
-  return http.post('/product/template/create/action', params);
+  return http.post('/product/create/action', params);
 }
 
 /**
@@ -212,7 +238,7 @@ function productTemplateCreate(params) {
  * @returns Promise<>
  */
 function productTemplateUpdate(params) {
-  return http.post('/product/template/update', params);
+  return http.post('/product/update', params);
 }
 
 /**
@@ -221,25 +247,19 @@ function productTemplateUpdate(params) {
  * @returns Promise<>
  */
 function getProductTemplate(id) {
-  return http.get(`/product/template/detail/data/${id}`);
+  return http.get(`/product/detail/data/${id}`);
 }
 
-/**
- * 查询单个产品模板统计信息
- * @param {String} params.id -- 产品模板id
- * @returns Promise<>
- */
-function getProductTemplateStatisticsInit(params) {
-  return http.get('/product/template/statistics/init', params);
-}
 
 /**
  * 查询产品模板 信息动态
  * @param {String} params.id -- 产品模板id
+ * @param {Number} params.pageNum
+ * @param {Number} params.pageSize
  * @returns Promise<>
  */
 function getProductTemplateRecord(params) {
-  return http.get('/product/template/record/list', params);
+  return http.get('/product/record/list', params);
 }
 
 /**
@@ -247,7 +267,7 @@ function getProductTemplateRecord(params) {
  * @returns Promise<>
  */
 function productTemplateCreateRecord(params) {
-  return http.post('/product/ptRecord/create', params, false);
+  return http.post('/product/record/create', params, false);
 }
 
 /**
@@ -262,24 +282,30 @@ function productTemplateDeleteRecord(params) {
 /**
  * 获取产品模板关联的产品
  * @param {String} params.templateId -- 产品模板id
+ * @param {Number} params.pageNum
+ * @param {Number} params.pageSize
  * @returns Promise<>
  */
 function productTemplateRelatedProducts(params) {
-  return http.get('/product/template/relatedProducts', params);
+  return http.get('/product/relatedProducts', params);
 }
+
+/** ------------ end 产品模板 ----------------------- */
 
 export {
   getTaskOfProduct,
   getPlanOfProduct,
   getRecordOfProduct,
   commentProduct,
-  deleteProduct,
   getProductDetail,
   getEventOfProduct,
   getProduct,
   getUpdateRecord,
   createProduct,
   updateProduct,
+  unbindQrcode,
+  bindQrcode,
+  downloadQrcode,
   checkSerialNumber,
   getProductTemplateList,
   productTemplateDelete,
@@ -287,7 +313,6 @@ export {
   productTemplateCreate,
   productTemplateUpdate,
   getProductTemplate,
-  getProductTemplateStatisticsInit,
   getProductTemplateRecord,
   productTemplateCreateRecord,
   productTemplateDeleteRecord,

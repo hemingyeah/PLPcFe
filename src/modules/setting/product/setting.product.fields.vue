@@ -10,7 +10,7 @@
 
     </div>
     <div class="setting-product-design">
-      <form-design v-model="fields" :exclude-form-type="excludeFormType"></form-design>
+      <form-design v-model="fields" mode="product"></form-design>
     </div>
   </div>
 </template>
@@ -73,7 +73,7 @@ export default {
         this.pending = true;
 
         let result = await http.post('/setting/product/saveFields', fields);
-        if(result.status == 0){
+        if(!result.status){
           platform.alert('产品字段更新成功');
           return window.location.reload()
         }

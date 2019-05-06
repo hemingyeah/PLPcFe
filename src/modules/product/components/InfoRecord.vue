@@ -216,7 +216,7 @@ export default {
       ]
 
       if (action === '二维码') {
-        return <h5><strong>{userName}</strong> {content.type}了产品二维码，二维码编号：{content.qrcodeId}。</h5>
+        return <h5><strong>{userName}</strong> {content.type}了产品二维码{content.qrcodeId ? `，二维码编号：${content.qrcodeId}` : ''}。</h5>
       }
 
       if (action === 'API新建') return [

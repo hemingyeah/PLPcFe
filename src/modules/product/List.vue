@@ -611,6 +611,7 @@ export default {
           if (f.fieldName === 'updateTime') {
             f.orderId = -2;
           }
+          f.operator = this.matchOperator(f.formType);
 
           return f;
         })
@@ -683,6 +684,31 @@ export default {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
+    matchOperator(formType) {
+      let operator = '';
+      switch (formType) {
+        case 'date':
+          operator = 'between';
+          break;
+        case 'datetime':
+          operator = 'between';
+          break;
+        case 'select':
+          operator = 'eq';
+          break;
+        case 'selectMulti':
+          operator = 'contain';
+          break;
+        case 'user':
+          operator = 'user';
+          break;
+        default:
+          operator = 'like';
+          break;
+      }
+      return operator;
+    },
+
     openProductTab(productId) {
       let fromId = window.frameElement.getAttribute('id');
 

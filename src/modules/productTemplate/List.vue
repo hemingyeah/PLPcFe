@@ -50,6 +50,38 @@
             </el-form-item>
             <!-- end 创建时间 -->
 
+            <!-- start 产品名称 -->
+            <el-form-item label-width="100px" label="产品名称">
+              <el-input type="text" v-model="params.name"></el-input>
+            </el-form-item>
+            <!-- end 产品名称 -->
+
+            <!-- start 产品编号 -->
+            <el-form-item label-width="100px" label="产品编号">
+              <el-input type="text" v-model="params.serialNumber"></el-input>
+            </el-form-item>
+            <!-- end 产品编号 -->
+
+            <!-- start 产品类型 -->
+            <el-form-item label-width="100px" label="产品类型">
+              <el-select
+                v-model="params.type"
+                @change="modifyUser('type')"
+                filterable
+                clearable
+                reserve-keyword
+                placeholder="请选择产品类型">
+
+                <el-option
+                  v-for="item in inputRemoteSearch.type.options"
+                  :key="`${item}_product_template_list_search_type`"
+                  :label="item"
+                  :value="item">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <!-- end 产品类型 -->
+
             <!-- start 动态搜索框 -->
             <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchCustomizeFields"
                           :key="field.fieldName">
@@ -258,7 +290,7 @@
             </template>
             <template v-else-if="column.formType === 'select' && column.isMulti">
               <span v-if="scope.row[column.field] && scope.row[column.field].length > 0">
-                {{ scope.row[column.field] && scope.row[column.field].join(',') }}
+                {{ Array.isArray(scope.row[column.field]) ? scope.row[column.field].join(',') : scope.row[column.field] }}
               </span>
             </template>
             <template v-else-if="column.formType === 'user'">
@@ -522,7 +554,7 @@ export default {
         .filter(f => f.fieldName !== 'customer')
         .map(f => {
 
-          if (f.isSearch || f.isSystem) {
+          if (f.isSearch && !f.isSystem) {
             if (
               storageData[f.fieldName] 
               && (storageData[f.fieldName].formType === 'date' || storageData[f.fieldName].formType === 'datetime') 
@@ -535,7 +567,7 @@ export default {
             this.$set(this.params.customizedSearchModel, f.fieldName, {
               fieldName: f.fieldName,
               value: storageData[f.fieldName] ? storageData[f.fieldName].value : null,
-              operator: this.matchOperator(f.formType),
+              operator: this.matchOperator(f),
               formType: f.formType,
             });
             this.searchCustomizeFields.push(f);
@@ -548,24 +580,24 @@ export default {
     },
     // 构建表格固定列
     buildTableFixedColumns() {
-      return []
-      // return [{
-      //   label: '产品名称',
-      //   field: 'name',
-      //   show: true,
-      //   fixed: true,
-      //   minWidth: '150px',
-      // }, {
-      //   label: '产品编号',
-      //   field: 'serialNumber',
-      //   fixed: true,
-      //   show: true,
-      // }, {
-      //   label: '产品类型',
-      //   sortable: 'custom',
-      //   field: 'type',
-      //   show: true,
-      // }]
+      // return []
+      return [{
+        label: '产品名称',
+        field: 'name',
+        show: true,
+        fixed: true,
+        minWidth: '150px',
+      }, {
+        label: '产品编号',
+        field: 'serialNumber',
+        fixed: true,
+        show: true,
+      }, {
+        label: '产品类型',
+        sortable: 'custom',
+        field: 'type',
+        show: true,
+      }]
     },
     // 构建表格列
     buildTableColumn() {
@@ -584,7 +616,7 @@ export default {
       let sortable = false;
 
       customizedColumns = this.productTemplateConfig.productFields
-        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator' && f.fieldName !== 'customer')
+        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.fieldName !== 'customer')
         .map(field => {
           sortable = false;
           minWidth = 100;
@@ -702,9 +734,8 @@ export default {
       }
       if (Object.keys(obj).length) {
         return obj;
-      } else {
-        return undefined;
-      }
+      } 
+      return undefined;
     },
     // 构建产品导出参数
     exportParamsBuild(checkedArr, ids) {
@@ -731,7 +762,7 @@ export default {
     */
     exportProduct(exportAll = false) {
       let ids = [];
-      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品数据.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品模板数据.xlsx`;
 
       if (!exportAll) {
         if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
@@ -801,27 +832,35 @@ export default {
       } 
     },
     // 批量操作
-    matchOperator(formType) {
+    matchOperator(field) {
+      let formType = field.formType;
       let operator = '';
+
       switch (formType) {
-      case 'date':
+      case 'date': {
         operator = 'between';
         break;
-      case 'datetime':
+      }
+      case 'datetime': {
         operator = 'between';
         break;
-      case 'select':
-        operator = 'eq';
+      }
+      case 'select': {
+        if(field.setting && field.setting.isMulti) {
+          operator = 'contain';
+        } else {
+          operator = 'eq';
+        }
         break;
-      case 'selectMulti':
-        operator = 'contain';
-        break;
-      case 'user':
+      }
+      case 'user': {
         operator = 'user';
         break;
-      default:
+      }
+      default: {
         operator = 'like';
         break;
+      }
       }
       return operator;
     },

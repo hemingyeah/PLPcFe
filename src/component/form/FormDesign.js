@@ -4,9 +4,9 @@ import Platform from '../../platform';
 import browser from '@src/util/browser'
 
 import {
-  Modes, 
+  Modes,
   FormFieldMap,
-  PreviewComponents, 
+  PreviewComponents,
   SettingComponents
 } from './components';
 
@@ -21,19 +21,19 @@ function createPreviewComp(h, field){
     // TODO: 不再触发chooseField事件
     // on: { chooseField: this.chooseField }
   });
-
+  
   let previewClass = {
     'form-design-preview': true,
     'form-design-selected': this.currField && (currFieldId == this.currField._id), // 被选中
     'form-design-dragging': field.dragging
   }
-
+  
   return (
-    <div class={previewClass} key={currFieldId} 
-      onMousedown={e => this.beginSort(field, e)}>
+    <div class={previewClass} key={currFieldId}
+         onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
       {!field.isSystem && <button type="button" class="form-design-preview-delete"
-        onClick={e => this.deleteField(field)}>
+                                  onClick={e => this.deleteField(field)}>
         <i class="iconfont icon-fe-close"></i>
       </button>}
       <div class="form-design-cover"></div>
@@ -44,23 +44,23 @@ function createPreviewComp(h, field){
 /** 创建字段设置组件 */
 function createSettingComp(h, field){
   if(null == field) return null;
-
+  
   let formType = field.formType;
   let comp = FormFieldMap.get(formType);
-
+  
   if (field.isSystem && field.fieldName !== 'customerAddress') return (
     <div class="form-setting-panel">
       <h3>系统字段 -- {field.displayName}</h3>
       <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
     </div>
   );
-
+  
   let props = { field, setting: comp };
   
   if( formType == 'select' ){
     props.getContext = () => this;
   }
-
+  
   return h(comp.setting, {
     key: field._id,
     props,
@@ -68,16 +68,16 @@ function createSettingComp(h, field){
       input: event => {
         if(event.prop == 'dependencies'){
           let {operate, value} = event;
-
+          
           if(operate == 'update') this.updateDependencies(value);
           if(operate == 'delete') this.deleteDependencies(field, false);
           return;
         }
-
+        
         if(event.prop == 'isMulti' && event.value){
           this.deleteDependencies(field);
         }
-
+        
         field[event.prop] = event.value;
       }
     }
@@ -91,13 +91,13 @@ function createSettingComp(h, field){
 function isVisibility(el, container){
   let min = container.scrollTop;
   let max = min + container.offsetHeight;
-
+  
   return min <= el.offsetTop && (el.offsetTop + el.offsetHeight) <= max;
 }
 
 /** 检测元素是否在容器内 */
 function isInContainer(elRect, containerRect){
-  return !( 
+  return !(
     elRect.right < containerRect.left // 检测是否在容器左边
     || elRect.left > containerRect.right // 检测是否在容器右边
     || elRect.top > containerRect.bottom // 检测是否在容器下边
@@ -110,7 +110,7 @@ function getTemplate(el){
   if(el.classList.contains('form-design__ghost')){
     return el.outerHTML;
   }
-
+  
   let tmp = el.querySelector('.form-design__ghost');
   return tmp ? tmp.outerHTML : '';
 }
@@ -135,28 +135,22 @@ const FormDesign = {
   data(){
     let mode = Modes[this.mode];
     let modeFormTypes = mode.fields || [];
-
+    
     let hasSystemField = false;
-    let availableFields = modeFormTypes
-      .map(item => {
-        let field = FormFieldMap.get(item);
-        if(field && field.isSystem === 1) hasSystemField = true;
-        return field
-      })
-      .filter(field => !!field && this.excludeFormType.every(formType => formType !== field.formType));
-
-    // modeFormTypes.forEach(item => {
-    //   let field = FormFieldMap.get(item);
-    //   if(null == field) return;
-    //
-    //   if(field.isSystem == 1) hasSystemField = true;
-    //   availableFields.push(field)
-    // })
-
+    let availableFields = [];
+    
+    modeFormTypes.forEach(item => {
+      let field = FormFieldMap.get(item);
+      if(null == field) return;
+      
+      if(field.isSystem == 1) hasSystemField = true;
+      availableFields.push(field)
+    })
+    
     return {
       // 当前模式下可用字段
       availableFields,
-      // 是否显示系统字段tab 
+      // 是否显示系统字段tab
       hasSystemField,
       // 当前显示的字段 0 -- 基础组件  1 -- 系统组件
       fieldGroup: 0,
@@ -176,8 +170,8 @@ const FormDesign = {
       currField: null,
       // 容器是否静默，不响应hover
       silence: false,
-      // 插入的字段 
-      insertedField: null, 
+      // 插入的字段
+      insertedField: null,
       // 插入前的值
       originValue: null
     }
@@ -203,13 +197,13 @@ const FormDesign = {
       for(let i = 0; i < this.value.length; i++) {
         fieldMap[this.value[i].fieldName] = this.value[i];
       }
-
+      
       // 合并数据
       target
         .filter(i => i.dependencies && Object.keys(i.dependencies).length > 0)
-        .forEach(f => { 
+        .forEach(f => {
           let field = fieldMap[f.fieldName]
-
+          
           if(null != field){
             this.$set(field, 'dependencies', f.dependencies)
           }
@@ -220,16 +214,16 @@ const FormDesign = {
       let value = this.value;
       let removeArr = [];
       let fieldMap = value.reduce((o, field, index) => (o[field.fieldName] = {field, index}) && o, {});
-
+      
       for(let i = 0; i < value.length; i++){
         let field = value[i];
         let dependencies = field.dependencies || {};
         if(isEmpty(dependencies)) continue;
-
+        
         Object.keys(dependencies).forEach(fieldName => {
           let fm = fieldMap[fieldName];
           if(fm == null) return delete dependencies[fieldName];
-
+          
           // 在该字段下面需要去除逻辑项
           if(fm.index > i){
             let dep = dependencies[fieldName];
@@ -241,11 +235,11 @@ const FormDesign = {
           }
         })
       }
-
+      
       if(removeArr.length > 0) this.showLogicalNotification(removeArr);
       this.emitInput(value);
     },
-    /** 
+    /**
      * 删除与某字段关联的逻辑显示项
      * @param {Object} depField - 待删除依赖的字段
      * @param {boolean} clear - 是否是删除所有依赖。 true - 删除所有， false - 只删除option的依赖
@@ -260,7 +254,7 @@ const FormDesign = {
         allFields.forEach(field => {
           let dependencies = field.dependencies || {};
           if(isEmpty(dependencies) || null == dependencies[fieldName]) return;
-
+          
           let dep = dependencies[fieldName];
           if(!Array.isArray(dep)) dep = [];
           
@@ -269,17 +263,17 @@ const FormDesign = {
             if(dep.length > 0) removeArr.push([depField, field])
             return delete dependencies[fieldName]
           }
-
+          
           dependencies[fieldName] = dep
             .map(val => {
               let newVal = values.indexOf(val) >= 0 ? val : null;
               if(newVal == null) removeArr.push([depField, field, val])
-
+              
               return newVal;
             })
             .filter(i => i != null);
         })
-
+        
         if(removeArr.length > 0) this.showLogicalNotification(removeArr);
       })
     },
@@ -295,7 +289,7 @@ const FormDesign = {
             let suffix = v == null ? null : <strong>[{v}]</strong>
             return <p><strong>{p.displayName}</strong> {suffix} -- <strong>{r.displayName}</strong></p>
           });
-
+          
           return (
             <div class="form-design-notification">
               <p>因字段发生变动，以下字段之间的显示逻辑已被取消：</p>
@@ -314,11 +308,11 @@ const FormDesign = {
       if (this.value.length >= this.max) {
         return Platform.alert(`单个表单最多支持${ this.max }个字段`)
       }
-    
+      
       let dragEvent = this.$data.$dragEvent;
       let target = event.target.closest('.form-design-field');
       let dragRect = target.getBoundingClientRect();
-    
+      
       dragEvent.target = target;
       dragEvent.offsetY = event.clientY - dragRect.top;
       dragEvent.offsetX = event.clientX - dragRect.left;
@@ -326,11 +320,11 @@ const FormDesign = {
       dragEvent.mode = 'insert';
       dragEvent.insertFieldOption = field;
       dragEvent.initGhost = false;
-    
+      
       this.currField = null;
       this.insertedField = null;
       this.originValue = cloneDeep(this.value);
-    
+      
       // 监听鼠标移动事件
       document.addEventListener('mousemove', this.handleDragging)
       document.addEventListener('mouseup', this.handleDragEnd)
@@ -339,55 +333,55 @@ const FormDesign = {
     beginSort(field, event) {
       // 屏蔽非鼠标左键的点击事件
       if(event.button !== 0) return;
-  
+      
       let dragEvent = this.$data.$dragEvent;
       let target = event.target.closest('.form-design-preview');
       let dragRect = target.getBoundingClientRect();
-    
+      
       dragEvent.target = target;
       dragEvent.offsetY = event.clientY - dragRect.top;
       dragEvent.offsetX = event.clientX - dragRect.left;
       dragEvent.prevClientY = event.clientY;
       dragEvent.mode = 'sort';
       dragEvent.initGhost = false;
-    
+      
       this.currField = field;
-    
+      
       // 监听鼠标移动事件
       document.addEventListener('mousemove', this.handleDragging)
       document.addEventListener('mouseup', this.handleDragEnd)
     },
-  
+    
     /** 处理拖拽 */
     handleDragging(event) {
       let dragEvent = this.$data.$dragEvent;
       let ghostEl = dragEvent.ghostEl;
       let containerEl = dragEvent.containerEl;
       let dragEl = dragEvent.target;
-    
+      
       // 初始化ghostEL
       if (!dragEvent.initGhost) {
         ghostEl.style.display = 'block';
         ghostEl.querySelector('.form-design__template').innerHTML = getTemplate(dragEl)
         ghostEl.style.width = `${ dragEl.offsetWidth }px`;
-      
+        
         if (this.currField) this.currField.dragging = true;
         dragEvent.initGhost = true;
         this.silence = true;
       }
-    
+      
       // 移动ghostEl
       let y = event.clientY - dragEvent.offsetY;
       let x = event.clientX - dragEvent.offsetX
       ghostEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       dragEvent.direction = event.clientY - dragEvent.prevClientY >= 0 ? 1 : -1;
       dragEvent.prevClientY = event.clientY;
-    
+      
       // 判断ghostEl是否在容器内
       let containerRect = containerEl.getBoundingClientRect();
       let ghostRect = ghostEl.getBoundingClientRect();
       let inContainer = isInContainer(ghostRect, containerRect);
-    
+      
       if (dragEvent.mode == 'sort') {
         if (inContainer) {
           let dragIndex = this.value.findIndex(item => item._id == this.currField._id);
@@ -396,7 +390,7 @@ const FormDesign = {
         }
         return;
       }
-    
+      
       if (dragEvent.mode == 'insert') {
         // 已经插入但是当前拖拽元素不在容器内，删除该字段
         if (!inContainer && this.insertField) {
@@ -405,7 +399,7 @@ const FormDesign = {
           this.emitInput(this.originValue);
           return;
         }
-      
+        
         if (inContainer) {
           // 如果已经插入，对字段进行排序
           if (this.insertedField) {
@@ -414,7 +408,7 @@ const FormDesign = {
             this.sort(dragIndex, enterIndex);
             return;
           }
-        
+          
           // 插入字段
           dragEvent.direction = 0;
           let insertIndex = this.calcIndex(y);
@@ -428,15 +422,15 @@ const FormDesign = {
       // 清空鼠标事件
       document.removeEventListener('mousemove', this.handleDragging)
       document.removeEventListener('mouseup', this.handleDragEnd)
-    
+      
       let dragEvent = this.$data.$dragEvent;
       dragEvent.ghostEl.style.display = 'none';
-
+      
       // 检查逻辑字段
       if(dragEvent.mode == 'sort' && dragEvent.initGhost){
         this.checkLogicalField()
       }
-    
+      
       if (this.currField) this.currField.dragging = false;
       this.silence = false;
     },
@@ -446,10 +440,10 @@ const FormDesign = {
       let containerEl = dragEvent.containerEl;
       let previewDoms = Array.prototype.slice.call(dragEvent.containerEl.children);
       let containerRect = containerEl.getBoundingClientRect();
-    
+      
       let offsetTop = distance - containerRect.top + containerEl.scrollTop;
       let direction = dragEvent.direction;
-    
+      
       // 如果是向上移动 或 插入时
       if (direction <= 0) {
         for (let i = 0; i < previewDoms.length; i++) {
@@ -460,13 +454,13 @@ const FormDesign = {
           }
         }
       }
-    
+      
       // 如果是向下移动
       if (direction > 0) {
         let index = -1;
         let ghostEl = dragEvent.ghostEl;
         offsetTop += ghostEl.offsetHeight;
-      
+        
         for (let i = 0; i < previewDoms.length; i++) {
           let dom = previewDoms[i];
           if (dom.offsetTop + (dom.offsetHeight / 2) < offsetTop) {
@@ -476,36 +470,36 @@ const FormDesign = {
         // 如果后一位置是当前位置，直接返回后一位置
         return index + 1 == currIndex ? currIndex : index;
       }
-    
+      
       return -1;
     },
     /** 字段排序 */
     sort(dragIndex, enterIndex) {
       if (dragIndex < 0 || enterIndex < 0 || dragIndex == enterIndex) return;
-    
+      
       let arr = cloneDeep(this.value);
-    
+      
       let distance = dragIndex < enterIndex ? 1 : 0
       let dragField = arr[dragIndex]; // 拖拽的字段
       let enterField = arr[enterIndex]; // 目标字段
-    
+      
       arr.splice(dragIndex, 1);
       let insertIndex = arr.indexOf(enterField);
       arr.splice(insertIndex + distance, 0, dragField);
-    
+      
       this.emitInput(arr)
       this.chooseField(dragField)
     },
     /** 选中字段 */
     chooseField(field) {
       this.currField = field;
-    
+      
       this.$nextTick(() => {
         let dragEvent = this.$data.$dragEvent;
         let containerEl = dragEvent.containerEl;
         let draggingEl = this.$el.querySelector('.form-design-selected');
         let visible = isVisibility.call(this, draggingEl, containerEl);
-      
+        
         if (!visible) {
           let scrollTop = draggingEl.offsetTop + draggingEl.offsetHeight - containerEl.offsetHeight;
           containerEl.scrollTop = scrollTop;
@@ -515,14 +509,14 @@ const FormDesign = {
     /** 删除字段 */
     async deleteField(item) {
       if (!await Platform.confirm('删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除。')) return;
-    
+      
       let value = this.value;
       let index = value.indexOf(item);
-    
+      
       if (index >= 0) {
         // 如果是选中的字段，清除选中
         if (this.currField == item) this.currField = null;
-      
+        
         value.splice(index, 1);
         
         this.deleteDependencies(item);
@@ -535,11 +529,11 @@ const FormDesign = {
         formType: option.formType,
         displayName: '标题'
       });
-    
+      
       let arr = cloneDeep(value ? value : this.value);
       index == null ? arr.push(newField) : arr.splice(index, 0, newField);
       this.emitInput(arr)
-    
+      
       // 选中新添加的字段
       this.chooseField(newField);
       return newField;
@@ -566,9 +560,9 @@ const FormDesign = {
     // 可用字段列表
     let fieldList = this.filterFields.map(field => {
       return (
-        <div class="form-design-field-wrap" 
-          onMousedown={e => this.beginInsert(field, e)}
-          onClick={e => this.immediateInsert(field, e)}>
+        <div class="form-design-field-wrap"
+             onMousedown={e => this.beginInsert(field, e)}
+             onClick={e => this.immediateInsert(field, e)}>
           <div class="form-design-field form-design__ghost">
             {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
           </div>
@@ -580,7 +574,7 @@ const FormDesign = {
     let previewList = this.value.map(currField => createPreviewComp.call(this, h, currField));
     // 字段设置
     let fieldSetting = createSettingComp.call(this, h, this.currField);
-
+    
     return (
       <div class="form-design">
         <div class="form-design-panel">
@@ -588,7 +582,7 @@ const FormDesign = {
             <div class="form-design-tab" onClick={e => this.fieldGroup = 0}>基础组件</div>
             {this.hasSystemField && <div class="form-design-tab" onClick={e => this.fieldGroup = 1}>系统组件</div>}
           </div>
-          <div class="form-design-tabs-content">{fieldList}</div>     
+          <div class="form-design-tabs-content">{fieldList}</div>
         </div>
         <div class="form-design-main">
           <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>

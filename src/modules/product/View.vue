@@ -51,7 +51,16 @@
 
     <div class="main-content" v-loading="loading">
       <div class="product-detail">
+
+        <h3 class="product-name" :class="{'product-name-expand': showWholeName == 1}">
+          <span class="product-name-delete" v-if="isDelete" title="该产品已被删除，只能查看数据。" v-tooltip>已删除</span>
+          <span ref="customerName">{{product.name}}</span>
+          <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
+        </h3>
+
+
         <form-view :fields="fields" :value="product">
+          <div slot="name"></div>
           <template slot="customer" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>客户</label>
@@ -60,6 +69,22 @@
               </div>
             </div>
           </template>
+
+          <div slot="qrcodeId" slot-scope="{value}">
+            <div class="form-view-row">
+              <label>产品二维码</label>
+              <div class="form-view-row-content" v-show="value">
+                <span>{{value}}</span>
+                <div ref="qrcode" style="margin: 10px 0;"></div>
+                <a href="javascript:;" class="link" @click="openDownloadCodeDialog">下载</a>
+                <a href="javascript:;" class="link" @click="unbindQrcodeFromProduct">删除</a>
+              </div>
+              <div class="form-view-row-content" v-show="!value">
+                <a href="javascript:;" class="link" @click="openBindCodeDialog">关联二维码</a>
+
+              </div>
+            </div>
+          </div>
 
 
         </form-view>
@@ -74,6 +99,9 @@
 
     <remind-dialog ref="addRemindDialog" :product="product"></remind-dialog>
 
+    <bind-code :product-id="productId" ref="bindCodeDialog"></bind-code>
+    <download-code :code-data="downloadCodeData" ref="downloadCodeDialog"></download-code>
+
   </div>
 </template>
 
@@ -81,7 +109,8 @@
 
 import {
   getProductDetail,
-  deleteProduct,
+  deleteProductByIds,
+  unbindQrcode
 } from '@src/api/ProductApi';
 
 import EventTable from './components/EventTable.vue';
@@ -90,16 +119,19 @@ import PlanTable from './components/PlanTable.vue';
 import RemindTable from './components/RemindTable.vue';
 import InfoRecord from './components/InfoRecord.vue';
 import RemindDialog from './components/RemindDialog.vue';
+import BindCodeDialog from './components/BindCodeDialog.vue';
+import DownloadCodeDialog from './components/DownloadCodeDialog.vue';
+
 
 import qs from '@src/util/querystring';
 import AuthUtil from '@src/util/auth';
+
+import QRCode from 'qrcodejs2';
 /**
  * todo
- * 1. 只判断是否开启了产品二维码功能，如果开启则启用显示二维码、关联等功能，如果没有则不显示产品二维码相关信息，不再判断自助门户设置
+ * 1. 只判断是否开启了产品二维码功能，如果开启则启用显示二维码、关联等功能，如果没有则不显示产品二维码相关信息，不再判断自助门户设置✅
  * 2. 二维码字段处理
  * 3. 同步记录更新
- * 4. 新开窗口统一
- * 5. 弹窗提示统一
  */
 
 
@@ -115,6 +147,8 @@ export default {
     return {
       loading: false,
       currTab: 'info-record',
+      showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
+      newestProduct: null,
       tabs: [{
         displayName: '信息动态',
         component: InfoRecord.name,
@@ -141,7 +175,7 @@ export default {
   },
   computed: {
     product() {
-      return this.initData.product;
+      return this.newestProduct || this.initData.product || {};
     },
     eventTypes() {
       if (!this.initData || (this.initData && !this.initData.eventTypeInfo)) return [];
@@ -152,9 +186,6 @@ export default {
       return this.initData.taskTypeInfo.map(t => Object.freeze(t));
     },
     fields() {
-
-
-      //产品二维码 创建人： 创建时间：系统编号：
       let fixedFields = [
         {
           displayName: '创建人',
@@ -189,12 +220,9 @@ export default {
         })
       }
 
-
-
       return this.initData.productFields
         .concat(fixedFields)
         .map(f => {
-          console.log('f', f);
           if (f.fieldName === 'name') {
             f.orderId = -10;
           }
@@ -217,6 +245,11 @@ export default {
     },
     productId() {
       return this.product.id;
+    },
+    downloadCodeData() {
+      return {
+        qrcodeId: this.product.qrcodeId,
+      }
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
@@ -330,12 +363,92 @@ export default {
   },
   mounted() {
     console.log('product-view mounted', this.initData);
+
+    this.updateProductNameStyle();
+    this.createCode();
+    // this.refreshProduct();
+
     this.$eventBus.$on('product_view.open_remind_dialog', this.openRemindDialog);
+    this.$eventBus.$on('product_view.update_detail', this.refreshProduct);
   },
   beforeDestroy() {
     this.$eventBus.$off('product_view.open_remind_dialog', this.openRemindDialog);
+    this.$eventBus.$off('product_view.update_detail', this.refreshProduct);
   },
   methods: {
+    openBindCodeDialog() {
+      this.$refs.bindCodeDialog.open();
+    },
+    openDownloadCodeDialog() {
+      this.$refs.downloadCodeDialog.open();
+    },
+    async unbindQrcodeFromProduct() {
+      if (!await this.$platform.confirm('删除后，该二维码将会失效，确定删除该二维码？')) return;
+
+      unbindQrcode({
+        productId: this.product.id,
+      })
+        .then(res => {
+          if (res.status) return this.$platform.notification({
+            title: '失败',
+            message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
+            type: 'error',
+          });
+
+          this.refreshProduct();
+          this.$eventBus.$emit('product_info_record.update_record_list');
+
+          this.$platform.notification({
+            title: '删除成功',
+            type: 'success',
+          });
+
+        })
+        .catch(e => {
+
+          console.error('e', e)
+        })
+
+    },
+    createCode() {
+      if(!this.product.qrcodeId) return;
+      let url = `${window.location.origin}/qrcode/102308?qrcodeId=${this.product.qrcodeId}`;
+      this.$refs.qrcode.innerHTML = '';
+      this.$nextTick(() => {
+        let qrcode = new QRCode(this.$refs.qrcode, {
+          text: url,
+          width: 120,
+          height: 120,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      })
+    },
+
+    // 更新客户名称的样式
+    updateProductNameStyle(){
+      let cnEl = this.$refs.customerName;
+      let width = cnEl.offsetWidth;
+      let maxWidth = cnEl.closest('h3').offsetWidth;
+
+      this.showWholeName = maxWidth - 20 < width ? 0 : -1;
+    },
+    refreshProduct() {
+
+      getProductDetail({
+        id: this.productId,
+      })
+        .then(res => {
+          if (!res) return;
+          this.newestProduct = res;
+
+          if (this.newestProduct.qrcodeId) {
+            this.createCode();
+          }
+        })
+        .catch(e => console.error('e', e));
+    },
     editProduct() {
       window.location.href = `/customer/product/edit/${this.productId}`
     },
@@ -346,7 +459,7 @@ export default {
       try {
         if (!await this.$platform.confirm('确定要删除该产品？')) return;
 
-        const result = await deleteProduct(this.productId);
+        const result = await deleteProductByIds(this.productId);
         if (!result.status) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
@@ -404,6 +517,8 @@ export default {
     [RemindTable.name]: RemindTable,
     [InfoRecord.name]: InfoRecord,
     [RemindDialog.name]: RemindDialog,
+    [BindCodeDialog.name]: BindCodeDialog,
+    [DownloadCodeDialog.name]: DownloadCodeDialog,
   }
 }
 </script>
@@ -502,11 +617,79 @@ body {
   display: flex;
   flex-flow: column nowrap;
 
+
+  .product-name{
+    min-height: 50px;
+    position: relative;
+    padding: 13px 20px;
+    font-size: 16px;
+    margin: 0;
+    color: $text-color-primary;
+    background: $color-primary-light-9;
+    font-weight: 500;
+
+    @include text-ellipsis();
+
+    span{
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .iconfont {
+      position: absolute;
+      right: 5px;
+      bottom: 15px;
+      color: $color-primary;
+      font-size: 12px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    &.product-name-expand{
+      span{
+        white-space: normal;
+      }
+
+      .iconfont{
+        transform: rotateZ(-180deg);
+      }
+    }
+
+    .product-name-delete,
+    .product-name-disable{
+      color: #fff;
+      display: inline-block;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 18px;
+      height: 18px;
+      padding: 0 5px;
+      font-weight: 400;
+      vertical-align: middle;
+      cursor: default;
+    }
+
+    .product-name-delete{
+      background-color: $color-danger;
+    }
+    .product-name-disable{
+      background-color: #ffc107;
+    }
+  }
+
   .form-view{
     flex: 1;
     padding-top: 5px;
     overflow-y: auto;
     border-right: 1px solid #f2f2f2;
+
+
+    .link {
+      color: $color-primary;
+    }
+
   }
 }
 
