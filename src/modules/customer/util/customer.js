@@ -1,7 +1,7 @@
 import {toArray} from '@src/util/lang';
 
 /** 将form对象转成客户对象，用于提交表单 */
-export function packToCustomer(fields, form){
+export function packToCustomer(fields, form, initTags){
   let customer = {
     id: form.id,
     attribute: {}
@@ -28,10 +28,18 @@ export function packToCustomer(fields, form){
 
     if(fieldName == 'tags'){
       let tags = Array.isArray(value) ? value : [];
-      customer.tags = tags.map(item => ({
-        id: item.id,
-        tagName: item.tagName
-      }))
+      // COMMENT: 暂时去除团队
+      // customer.tags = tags.map(item => ({
+      //   id: item.id,
+      //   tagName: item.tagName
+      // }))
+      customer.tags = tags.map(tag => {
+        let t = initTags.find(initTag => initTag.id == tag);
+        return {
+          id: t.id,
+          tagName: t.tagName
+        }
+      })
       return
     }
 
@@ -68,7 +76,9 @@ export function packToForm(field, data, defaultAddress = {}){
       latitude: cusAdr.adLatitude || '',
       addressType: cusAdr.addressType || 0
     },
-    tags: toArray(data.tags),
+    // COMMENT: 暂时去除团队
+    // tags: toArray(data.tags),
+    tags: toArray(data.tags).map(item => item.id),
     manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
   };
 }

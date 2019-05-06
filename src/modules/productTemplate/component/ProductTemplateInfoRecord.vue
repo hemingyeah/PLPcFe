@@ -112,14 +112,15 @@ export default {
         }
 
         let result = await productTemplateCreateRecord(params);
+        const isSucc = (result.status == 0);
 
         this.$platform.notification({
-          title: '添加备注',
-          message: result.status == 0 ? '添加备注成功' : result.message,
-          type: result.status == 0 ? 'success' : 'error',
+          title: `添加备注${ isSucc ? '成功' : '失败' }`,
+          message: !isSucc && result.message,
+          type: isSucc ? 'success' : 'error',
         });
 
-        if(result.status == 0){
+        if(isSucc){
           this.$refs.comment.reset();
           this.initRecord();
 
@@ -140,14 +141,15 @@ export default {
         if (!await platform.confirm('您确认删除该备注吗？')) return;
 
         const result = await productTemplateDeleteRecord({id: record.id});
+        const isSucc = (result.status == 0)
 
         this.$platform.notification({
-          title: '删除备注备注',
-          message: result.status == 0 ? '删除备注成功' : result.message,
-          type: result.status == 0 ? 'success' : 'error',
+          title: `删除备注${ isSucc ? '成功' : '失败' }`,
+          message: !isSucc && result.message,
+          type: isSucc ? 'success' : 'error',
         });
 
-        if(result.status == 0) this.initRecord();
+        if(isSucc) this.initRecord();
 
       } catch (e) {
         console.error('product template deleteRemark  err', e);
@@ -183,7 +185,7 @@ export default {
       if(action == '备注'){
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>添加了备注
+            <strong>{userName}</strong> 添加了备注
             {!!showInOwn && (
               <span class="private">
                 <i class="iconfont icon-account1"></i>仅自己可见
@@ -197,13 +199,13 @@ export default {
             }
           </h5>,
           content.isDelete == 'true'
-            ? <p class="text-danger">{content.deleteUserName}于{content.deleteTime}删除了该备注。</p> 
+            ? <p class="text-danger">{content.deleteUserName}于{content.deleteTime} 删除了该备注。</p> 
             : [<p class="pre-line secondary-info">{content.updateContent}</p>, createAttachmentDom(h, attachments)]
         ]
       }
 
       return [
-        <h5><strong>{userName}</strong>{action}了产品模板。</h5>,
+        <h5><strong>{userName}</strong> {action}了 产品模板。</h5>,
         content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
         createAttachmentDom(h, attachments)
       ];

@@ -6,7 +6,7 @@
       @closed="reset" 
       :show.sync="batchEditProductTemplateDialog" 
       width="500px"
-      class="batch-editing-customer-dialog">
+      class="batch-edit-product-template-dialog">
 
       <!-- start form 表单 -->
       <el-form ref="editProductTemplateForm" :model="form" label-width="100px">
@@ -44,7 +44,7 @@
             <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker" :value="form.address.adAddress"></base-dist-picker>
             <el-button type="button" @click="chooseMap" style="margin-bottom: 10px">地图选址</el-button>
           </div>
-          <el-input placeholder="" @input="handleAddressChange" :value="form.address.detail" type="text"/>
+          <el-input :placeholder="selectedField.placeHolder" @input="handleAddressChange" :value="form.address.detail" type="text"/>
         </el-form-item>
         <el-form-item
           label="修改为"
@@ -58,7 +58,7 @@
             multiple
             filterable
             clearable
-            placeholder="请输入关键词搜索"
+            :placeholder="selectedField.placeHolder || '请输入关键字搜索'"
             @change="selectTag"
           >
             <el-option
@@ -81,7 +81,7 @@
             filterable
             remote
             reserve-keyword
-            placeholder="请输入关键词搜索"
+            :placeholder="selectedField.placeHolder || '请输入关键字搜索'"
             clearable
             :loading="inputRemoteSearch.customerManager.loading"
             :remote-method="searchCustomerManager">
@@ -98,8 +98,8 @@
           :prop="selectedFieldName"
           :key="selectedFieldName"
           :rules="selectedField.rules"
-          v-else-if="selectedField.formType === 'select'">
-          <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
+          v-else-if="selectedField.formType === 'select' && selectedField.setting && !selectedField.setting.isMulti">
+          <el-select v-model="form[selectedField.fieldName]" clearable :placeholder="selectedField.placeHolder || '请选择'">
             <el-option
               v-for="item in selectedField.setting.dataSource"
               :key="item"
@@ -113,8 +113,8 @@
           :prop="selectedFieldName"
           :key="selectedFieldName"
           :rules="selectedField.rules"
-          v-else-if="selectedField.formType === 'selectMulti'">
-          <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
+          v-else-if="selectedField.formType === 'select' && selectedField.setting && selectedField.setting.isMulti">
+          <el-select v-model="form[selectedField.fieldName]" multiple clearable :placeholder="selectedField.placeHolder || '请选择'">
             <el-option
               v-for="item in selectedField.setting.dataSource"
               :key="item"
@@ -149,7 +149,7 @@
           <el-date-picker
             v-model="form[selectedFieldName]"
             type="datetime"
-            placeholder="选择日期时间"
+            :placeholder="selectedField.placeHolder || '选择日期时间'"
             default-time="12:00:00">
           </el-date-picker>
         </el-form-item>
@@ -162,7 +162,7 @@
           <el-date-picker
             v-model="form[selectedFieldName]"
             type="date"
-            placeholder="选择日期">
+            :placeholder="selectedField.placeHolder || '选择日期'">
           </el-date-picker>
         </el-form-item>
         <!-- end 修改字段类型列表 -->
@@ -217,6 +217,7 @@ export default {
         type: '',
       },
       formBackup: {}, // form 备份数据
+      fixedFieldsCount: 0,
       inputRemoteSearch: {
         tag: {
           options: [],
@@ -293,7 +294,7 @@ export default {
         .filter(f => f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
           // select
-          if (field.formType === 'selectMulti') {
+          if (field.formType === 'select' && field.setting && field.setting.isMulti) {
             this.$set(this.form, field.fieldName, []);
           } else {
             this.$set(this.form, field.fieldName, null);
@@ -315,7 +316,7 @@ export default {
             }];
           }
           // 多选 && 系统字段
-          else if (field.formType === 'selectMulti' && !field.isNull) {
+          else if (field.formType === 'select' && !field.isNull && field.setting && field.setting.isMulti) {
             field.rules = [{
               required: true, message: '请至少选择一个选项', trigger: ['blur', 'change']
             }];
@@ -375,7 +376,7 @@ export default {
         });
 
       this.formBackup = JSON.parse(JSON.stringify(this.form));
-      this.editableFields = [...this.editableFields, ...customizedField];
+      this.editableFields = [...this.editableFields, ...customizedField].slice();
       this.selectedFieldName = this.editableFields[0].fieldName;
     },
     //  构建参数
@@ -446,10 +447,12 @@ export default {
           this.batchEditProductTemplateDialog = false;
           this.pending = false;
         }
+        const isSucc = (result.status == 0);
+
         this.$platform.notification({
-          title: '批量编辑',
-          message: result.status == 0 ? `批量编辑${this.selectedField.displayName}成功` : result.message,
-          type: result.status == 0 ? 'success' : 'error',
+          title: `批量编辑${this.selectedField.displayName}${ isSucc ? '成功' : '失败' }`,
+          message: !isSucc && result.message,
+          type: isSucc ? 'success' : 'error',
         });
 
 

@@ -127,7 +127,7 @@ export default {
     createProductTemplate(params) {
       productTemplateCreate(params)
         .then(res => {
-          let isSucc = res.status == 0;
+          const isSucc = (res.status == 0);
 
           platform.notification({
             type: isSucc ? 'success' : 'error',
@@ -135,7 +135,7 @@ export default {
             message: !isSucc && res.message
           })
           
-          window.location.href = `/product/template/detail/${res.data}`;
+          if(isSucc) window.location.href = `/product/template/detail/${res.data}`;
         })
         .catch(err => console.error('err', err));
     },
@@ -143,7 +143,7 @@ export default {
     editProductTemplate(params) {
       productTemplateUpdate(params)
         .then(res => {
-          let isSucc = res.status == 0;
+          const isSucc = (res.status == 0);
 
           platform.notification({
             type: isSucc ? 'success' : 'error',
@@ -151,7 +151,7 @@ export default {
             message: !isSucc && res.message
           })
 
-          if(res.status == 0) {
+          if(isSucc) {
             let fromId = window.frameElement.getAttribute('fromid');
 
             this.$platform.refreshTab(fromId);

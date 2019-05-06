@@ -293,8 +293,8 @@ export default {
         console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
       }
       let value = this.value;
-      this.$set(value, fieldName, newValue)
-      this.$emit('input', value)
+      this.$set(value, fieldName, newValue);
+      this.$emit('input', value);
     },
     copyName() {
       let value = this.value;

@@ -69,8 +69,8 @@ export default {
         .then(valid => {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
-          const params = util.packToCustomer(this.fields, this.form);
-         
+          const params = util.packToCustomer(this.fields, this.form, this.initData.tags);
+
           this.pending = true;
           this.loadingPage = true;
           if (this.action === 'edit') {
@@ -157,7 +157,7 @@ export default {
         form = this.initData.eventCustomer;
       }
 
-      this.form = FormUtil.initialize(this.fields, form);
+      this.form = FormUtil.initialize(this.fields, form, util.packToForm);
       this.init = true;
     } catch (e) {
       console.error('CustomerEditView caught an error ', e);

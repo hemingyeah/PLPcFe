@@ -263,14 +263,15 @@ export default {
       try {
         this.loading = true;
         let result = await productTemplateDelete(this.productTemplateId);
+        const isSucc = (result.status == 0);
 
         this.$platform.notification({
-          title: '产品模板',
-          message: result.status == 0 ? '删除产品模板成功' : result.message,
-          type: result.status == 0 ? 'success' : 'error',
+          title: `删除产品模板${ isSucc ? '成功' : '失败' }`,
+          message: !isSucc && result.message,
+          type: isSucc ? 'success' : 'error',
         });
 
-        if(result.status == 0) {
+        if(isSucc) {
           let fromId = window.frameElement.getAttribute('fromId');
 
           this.$platform.refreshTab(fromId);

@@ -256,9 +256,9 @@
             <template v-if="column.field === 'name'">
               <a href="" class="view-detail-btn" @click.stop.prevent="goProductTemplateView(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
-            <template v-else-if="column.formType === 'selectMulti'">
+            <template v-else-if="column.formType === 'select' && column.isMulti">
               <span v-if="scope.row[column.field] && scope.row[column.field].length > 0">
-                [{{ scope.row[column.field] && scope.row[column.field].join(',') }}]
+                {{ scope.row[column.field] && scope.row[column.field].join(',') }}
               </span>
             </template>
             <template v-else-if="column.formType === 'user'">
@@ -611,6 +611,7 @@ export default {
             formType: field.formType,
             minWidth: `${minWidth}px`,
             sortable,
+            isMulti: field.setting && field.setting.isMulti,
             isSystem: field.isSystem,
           };
         });
@@ -625,7 +626,6 @@ export default {
         bc.show = columnStatus.some(sc => sc === bc.field);
         return bc;
       });
-
       return columns;
     },
     // 兼容旧版本的 已选择列
@@ -1036,8 +1036,8 @@ export default {
     },
     // 参数构建
     paramsBuild() {
-      let tv = null; // tv means temporary variable that used inside the loop.
       const conditions = [];
+      let tv = null; // tv means temporary variable that used inside the loop.
       let params = _.cloneDeep(this.paramsBackup);
 
       // createTime
@@ -1159,14 +1159,15 @@ export default {
       try {
         this.loadingListData = true;
         let result = await productTemplateDelete(this.selectedIds.join(','));
+        const isSucc = (result.status == 0);
 
         this.$platform.notification({
-          title: '产品模板',
-          message: result.status == 0 ? '删除产品模板成功' : result.message,
-          type: result.status == 0 ? 'success' : 'error',
+          title: `删除产品模板${ isSucc ? '成功' : '失败' }`,
+          message: !isSucc && result.message,
+          type: isSucc ? 'success' : 'error',
         });
 
-        if(result.status == 0) {
+        if(isSucc) {
           this.selectionToggle();
           this.search();
         } else {

@@ -57,7 +57,7 @@ export default {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
 
-          const params = util.packToCustomer(this.fields, this.form);
+          const params = util.packToCustomer(this.fields, this.form, this.initData.tags);
           this.pending = true;
           this.loadingPage = true;
           this.createMethod(params, callBack);
