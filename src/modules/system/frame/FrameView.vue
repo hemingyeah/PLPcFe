@@ -399,6 +399,7 @@ export default {
     },
     closeNotification () {
       this.notificationShow = false;
+      sessionStorage.setItem('shb_systemMsg', this.notificationInfo.msgSystem.id);
       // this.clearAnimation();
     },
 
@@ -407,15 +408,16 @@ export default {
       try {
         let info = await NotificationApi.getSystemMessage();
         if(info.status == 0) {
-          this.notificationInfo = info.data;
+          this.notificationInfo = info.data;        
           this.notification.count = info.data.systemMsg + info.data.workMsg;
-
+          let msgSystem = sessionStorage.getItem('shb_systemMsg');
+        
           if(this.notification.count > 99) {
             this.msgCount = '99+';
           } else {
             this.msgCount = '';
           }
-          if(info.data.msgSystem && !this.notificationShow) {
+          if(this.notificationInfo.msgSystem && (!msgSystem || msgSystem != this.notificationInfo.msgSystem.id)) {
             this.notification.title = info.data.msgSystem.title;
             this.notificationShow = true;
             // this.setAnimation();
@@ -465,6 +467,7 @@ export default {
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     }
     this.clearCachedIds();
+    sessionStorage.removeItem('shb_systemMsg');
     this.getSystemMsg();
     setInterval(() => {
       this.getSystemMsg();

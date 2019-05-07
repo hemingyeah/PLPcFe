@@ -50,13 +50,18 @@ export default {
     async toJobNotificationDetails (info) {
       try {
         if(info.pcUrl) {
-          let itemId = this.getId(info);
-          this.$platform.openTab({
-            id: itemId,
-            title: '正在查询',
-            close: true,
-            url: info.pcUrl,
-          });
+          if(info.source != 'daily') {
+            let itemId = this.getId(info);
+            this.$platform.openTab({
+              id: itemId,
+              title: '正在查询',
+              close: true,
+              url: info.pcUrl,
+            });
+          } else {
+            info.pcUrl = `${ info.pcUrl }&DingTalkFlag=false`;
+            this.$emit('toDaily', info.pcUrl);
+          }
         }
         if(info.readed == 0) {
           let params = {

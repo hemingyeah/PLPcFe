@@ -30,28 +30,37 @@
         </el-select>
       </div>
     </div>
-    <div class="job-notification-content" v-if="notificationPage.list.length != 0">
-      <job-notification-item
-        v-for="(item, index) in notificationPage.list"
-        :key="item.id - 0"
-        :info="item"
-        :index="index"
-        @getInfo="getInfo"
-        @clearNum="clearNum"
-        @deleteItem="deleteItem">
-      </job-notification-item>
-      <div class="job-notification-footer">
-        <button class="job-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
-        <div v-if="loading">正在加载...</div>
-        <div v-if="!moreShow && !loading">
-          <span class="job-notification-footer-line"></span>
-          <span class="job-notification-footer-text">没有更多数据</span>
-          <span class="job-notification-footer-line"></span>
+    <div class="job-notification-content" v-show="!dailyShow">
+      <div v-if="notificationPage.list.length != 0">
+        <job-notification-item
+          v-for="(item, index) in notificationPage.list"
+          :key="item.id - 0"
+          :info="item"
+          :index="index"
+          @getInfo="getInfo"
+          @clearNum="clearNum"
+          @toDaily="toDaily"
+          @deleteItem="deleteItem">
+        </job-notification-item>
+        <div class="job-notification-footer">
+          <button class="job-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
+          <div v-if="loading">正在加载...</div>
+          <div v-if="!moreShow && !loading">
+            <span class="job-notification-footer-line"></span>
+            <span class="job-notification-footer-text">没有更多数据</span>
+            <span class="job-notification-footer-line"></span>
+          </div>
         </div>
       </div>
+      <div class="job-notification-footer" v-else-if="notificationPage.list.length == 0 && !loading">暂时没有信息</div>
+      <div class="job-notification-footer" v-else>正在加载...</div>
     </div>
-    <div class="job-notification-footer" v-else-if="notificationPage.list.length == 0 && !loading">暂时没有信息</div>
-    <div class="job-notification-footer" v-else>正在加载...</div>
+    <div class="job-notification-daily" v-show="dailyShow">
+      <iframe :src="dailyUrl" class="job-notification-daily-iframe" v-if="dailyShow" @load="onload"></iframe>
+      <button type="button" class="job-notification-details-return" @click="close" v-if="returnShow">
+        <i class="iconfont">&#xe61e;</i>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -72,6 +81,9 @@ export default {
   },
   data () {
     return {
+      dailyUrl: '',
+      returnShow: false,
+      dailyShow: false,
       loading: false,
       btnShow: false,
       btnStyle: {
@@ -278,6 +290,17 @@ export default {
         })
         this.$emit('getNum', count);
       }
+    },
+    toDaily (url) {
+      this.dailyUrl = url;
+      this.dailyShow = true;
+    },
+    close () {
+      this.dailyShow = false;
+      this.returnShow = false;
+    },
+    onload () {
+      this.returnShow = true;
     }
   },
   computed: {
@@ -431,5 +454,36 @@ export default {
 }
 .job-notification-footer-text {
   padding: 0 16px;
+}
+.job-notification-daily {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+.job-notification-details-return {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  transition: color ease .15s;
+  color: #979797;
+  i {
+    font-size: 18px;
+  }
+
+  &:hover{
+    color: #55B7B4;
+  }
+}
+.job-notification-daily-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 </style>

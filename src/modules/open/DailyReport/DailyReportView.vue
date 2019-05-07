@@ -5,8 +5,13 @@
       <div class="name"><div>{{item.name}}</div></div>
       <strong class="value" :style="{'font-size':fontSize(item.result.toString().length)}" v-html="getNum(item.result)"></strong>
     </div>
-    <div class="message"><p>如需自定义日报，请到</p><p><span>售后宝PC端[系统管理>订阅通知管理]</span>中进行配置</p></div>
-    <div @click="jump" class="to-index-btn">进入售后宝</div>
+    <div v-if="isDingTalk">
+      <div class="message"><p>如需自定义日报，请到</p><p><span>售后宝PC端[系统管理>订阅通知管理]</span>中进行配置</p></div>
+      <div @click="jump" v-if="isDingTalk" class="to-index-btn">进入售后宝</div>
+    </div>
+    <div v-else>
+      <div class="message"><p>如需自定义日报，请到</p><p><span>[系统管理>订阅通知管理]</span>中进行配置</p></div>
+    </div>
   </div>    
 </template>
 
@@ -22,8 +27,17 @@ export default {
   },
   data: function data() {
     return {
+      isDingTalk: true,
       items: {},
       width
+    }
+  },
+  created () {
+    let url = window.location.href;
+    if(url.indexOf('DingTalkFlag') != -1) {
+      this.isDingTalk = false;
+    } else {
+      this.isDingTalk = true;
     }
   },
   computed:{
