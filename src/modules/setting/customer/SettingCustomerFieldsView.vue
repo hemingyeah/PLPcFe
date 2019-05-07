@@ -10,7 +10,7 @@
 
     </div>
     <div class="setting-customer-design">
-      <form-design v-model="fields"></form-design>
+      <form-design v-model="fields" :max="maxField"></form-design>
     </div>
   </div>
 </template>
@@ -34,7 +34,8 @@ export default {
     
     return {
       fields: FormUtil.toFormField(sortedFields),
-      pending: false
+      pending: false,
+      maxField: this.initData.fieldNum
     }
   },
   methods: {

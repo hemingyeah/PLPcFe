@@ -10,8 +10,6 @@ import {
   SettingComponents
 } from './components';
 
-const MAX_FIELD_NUM = 100;
-
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
   let currFieldId = field._id;
@@ -127,6 +125,11 @@ const FormDesign = {
     value: {
       type: Array,
       default: () => []
+    },
+    /** 最大字段数量 */
+    max: {
+      type: Number,
+      default: 100
     }
   },
   data(){
@@ -300,9 +303,10 @@ const FormDesign = {
     beginInsert(field, event) {
       // 屏蔽非鼠标左键的点击事件
       if(event.button !== 0) return;
-      
-      if (this.value.length >= MAX_FIELD_NUM) {
-        return Platform.alert(`单个表单最多支持${MAX_FIELD_NUM}个字段`)
+ 
+      // 限制字段数量
+      if (this.value.length >= this.max) {
+        return Platform.alert(`单个表单最多支持${ this.max }个字段`)
       }
     
       let dragEvent = this.$data.$dragEvent;
@@ -538,6 +542,9 @@ const FormDesign = {
     immediateInsert(field, event) {
       let dragEvent = this.$data.$dragEvent;
       if (dragEvent) dragEvent.direction = 0;
+
+      // 限制字段数量
+      if (this.value.length >= this.max) return 
     
       let newField = this.insertField(field, this.value, this.value.length);
       this.insertedField = newField;
