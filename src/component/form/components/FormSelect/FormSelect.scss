@@ -1,0 +1,134 @@
+.form-select-setting-isMulti{
+  float: right;
+  margin: 0 5px 0 0;
+  vertical-align: middle;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+
+  input[type="checkbox"]{
+    margin-right: 3px;
+  }
+}
+
+.form-select-setting-option{
+  margin-bottom: 5px;
+
+  input[type="text"]{
+    width: 220px;
+  }
+}
+
+.form-select-setting-modal{
+  .form-select-setting-batch{
+    padding: 10px;
+    textarea{
+      width: 100%;
+      font-size: 12px;
+    }
+  }
+
+  .base-modal-footer{
+    padding: 10px;
+    text-align: right;
+  }
+}
+
+.form-select-setting-warn{
+  padding-top: 10px;
+  color: #ff8c00;
+  font-size: 12px;
+  white-space: pre-line;
+  line-height: 16px;
+}
+
+.form-select-setting-defaultValue{
+  background-color: #00ac97;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 12px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.form-select-setting-operation {
+  .btn-text{
+    color: $color-primary;
+    padding: 0;
+
+    margin-right: 5px;
+  }
+}
+
+.form-select-setting-delete,
+.form-select-setting-default{
+  margin: 0;
+  padding: 0;
+  width: 20px;
+  height: 20px; 
+  line-height: 20px;
+  vertical-align: middle;
+  i.iconfont{
+    font-size: 18px;
+  }
+}
+
+.form-select-setting-delete{
+  color: #F56C6C;
+}
+.form-select-setting-default{
+  color: $color-primary
+}
+
+.form-select-tips{
+  float: left;
+  color: $text-color-secondary;
+  line-height: 32px;
+}
+
+.form-select-logical-btn{
+  float: right;
+  font-size: 14px;
+  color: $color-primary;
+  padding: 0;
+}
+
+.form-select-logical-item{
+  & + .form-select-logical-item{
+    margin-top: 10px;
+  }
+
+  h4{
+    font-size: 14px;
+    line-height: 20px;
+    padding-bottom: 5px;
+    background-color: #fff;
+    margin: 0;
+    position: relative;
+    z-index: 9;
+  }
+
+  p{
+    margin: 0;
+    padding-left: 35px;
+    position: relative;
+    line-height: 24px;
+    z-index: 1;
+    
+    &:before{
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      border-left: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      height: 24px;
+      width: 20px;
+    }
+  }
+}
+.form-select-logical-tip{
+  margin-top: 10px 0 0 0;
+  color: #666;
+}

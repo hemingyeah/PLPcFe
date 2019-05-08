@@ -6,12 +6,12 @@
     <div class="product-template-list-search-group">
 
       <!-- start  搜索header -->
-      <form class="base-search" onsubmit="return false;">
+      <form class="base-search" @submit.prevent="search({ pageNum: 1, }, true)">
         <div class="product-template-list-base-search-group">
           <el-input v-model="paramsBackup.keyword" placeholder="请输入关键字">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
+          <base-button type="primary" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="paramsReset">重置</base-button>
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelTheSearchAdvancedShow = !panelTheSearchAdvancedShow">高级搜索</span>
@@ -33,7 +33,7 @@
         </h3>
         <!-- start 高级搜索 表单 -->
         <el-form class="advanced-search-form" onsubmit="return false;">
-          <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
+          <div class="form-item-container" :class="{'two-columns': columnNum == 2, }">
 
             <!-- start 创建时间 -->
             <el-form-item label-width="100px" label="创建时间">
@@ -233,7 +233,7 @@
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
-                <div @click="openDialog('importProduct')">导入产品</div>
+                <div @click="openDialog('importProduct')">导入产品模板</div>
               </el-dropdown-item>
               <el-dropdown-item>
                 <div @click="exportProduct(false)">导出</div>
@@ -294,7 +294,7 @@
               </span>
             </template>
             <template v-else-if="column.formType === 'user'">
-              {{ scope.row[column.field] && scope.row[column.field].displayName }}
+              {{ scope.row[column.field] && (scope.row[column.field].displayName || scope.row[column.field].name) }}
             </template>
             <template v-else>
               {{scope.row[column.field]}}
@@ -355,7 +355,7 @@
     <!-- start 已选择列表 -->
     <base-panel :show.sync="panelTheMultipleSelectionShow" width="420px">
       <h3 slot="title">
-        <span>已选中数据({{ multipleSelection.length }})</span>
+        <span>已选中产品模板({{ multipleSelection.length }})</span>
         <i 
           v-if="multipleSelection.length > 0"
           class="iconfont icon-qingkongshanchu product-template-panel-btn" 
@@ -506,7 +506,7 @@ export default {
     authEdit() {
       return this.auth.CUSTOMER_EDIT;
     },
-    // 删除权限 TODO: 疑惑
+    // 删除权限
     authDelete() {
       return (this.authEdit === 3);
     },
@@ -671,10 +671,6 @@ export default {
 
       return (columns || []).filter(c => c)
         .map(c => {
-          if (c === 'address') return 'customerAddress';
-          if (c === 'addressDetail') return 'detailAddress';
-          if (c === 'manager') return 'customerManagerName';
-
           return c;
         })
     },
@@ -774,7 +770,7 @@ export default {
     exportCountCheck(ids, max){
       let exportAll = !ids || ids.length == 0;
 
-      return exportAll && this.page.total > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
+      return exportAll && this.page.total > max ? `为了保障响应速度，暂不支持超过${max}条以上的数据导出，请您分段导出。` : null;
     },
     // 跳转 产品模板信息
     goProductTemplateView(id) {
@@ -784,7 +780,7 @@ export default {
         id: `product_template_view_${id}`,
         title: '产品模板信息',
         close: true,
-        url: `/product/template/detail/${id}?noHistory=1`,
+        url: `/product/detail/${id}?noHistory=1`,
         fromId
       })
     },
@@ -988,14 +984,18 @@ export default {
     // 设置高级搜索面板 列
     setAdvanceSearchColumn(command){
       this.columnNum = Number(command);
-      this.localStorageSet(PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER, command);
+      try {
+        localStorage.setItem(PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER, this.columnNum); 
+      } catch (error) {
+        console.log(error)
+      }
     },
     // 取消选择的产品
     selectProductTemplateCancel(productItem) {
       if (!productItem || !productItem.id) return;
 
       this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== productItem.id);
-      this.selectionToggle([productItem]);
+      this.multipleSelection.length < 1 ? this.selectionToggle() : this.selectionToggle([productItem]);
     },
     // 切换已选择
     selectionToggle(rows) {
@@ -1186,7 +1186,7 @@ export default {
     },
     // 产品新建
     productCreate() {
-      window.location = '/product/template/create';
+      window.location = '/product/create';
     },
     // 产品 删除
     async productDelete() {
@@ -1226,6 +1226,10 @@ export default {
 
 <style lang="scss">
 $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+
+html, body {
+  height: 100%;
+}
 
 .product-template-list-view {
   height: 100%;
@@ -1515,13 +1519,13 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
 .product-template-selected-sn{
   padding-left: 10px;
-  width: 150px;
+  flex: 1;
   @include text-ellipsis;
 }
 
 .product-template-selected-name{
   padding-left: 10px;
-  flex: 1;
+  width: 150px;
   @include text-ellipsis;
 }
 

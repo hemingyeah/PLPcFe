@@ -98,6 +98,7 @@ export default {
 
         await deleteScheduler(rm.id);
         this.fetchData();
+        this.$eventBus.$emit('product_view_remind_update');
         this.$eventBus.$emit('product_info_record.update_record_list');
       } catch (e) {
         console.error('deleteRemind catch err', e);

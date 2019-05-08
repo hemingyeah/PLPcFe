@@ -70,7 +70,7 @@
         :prop="selectedFieldName"
         :key="selectedFieldName"
         :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'selectMulti'">
+        v-else-if="selectedField.formType === 'select' && selectedField.setting.isMulti">
         <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
           <el-option
             v-for="item in selectedField.setting.dataSource"
@@ -278,9 +278,11 @@ export default {
       const customizedField = this.fields
         .filter(f => f.formType !== 'attachment' && !['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'].some(key => key === f.fieldName))
         .map(f => {
-          if (f.formType === 'selectMulti') {
+          if (f.formType === 'select' && f.setting.isMulti) {
             this.$set(this.form, f.fieldName, []);
-          } else {
+          }
+
+          if (f.formType === 'select' && !f.setting.isMulti) {
             this.$set(this.form, f.fieldName, null);
           }
 

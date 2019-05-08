@@ -2,7 +2,7 @@
   <div class="product-template-edit-container" v-loading.fullscreen.lock="loadingPage">
 
     <!-- start 新建编辑表单 -->
-    <form @submit.prevent="submit" class="base-form" v-if="init">
+    <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
 
       <!-- start 页面顶部按钮 -->
       <div class="page-title">
@@ -16,20 +16,6 @@
 
       <!-- start form builder -->
       <form-builder ref="productTemplateEditForm" :fields="fields" :value="form" @update="update">
-        
-        <!-- start 产品类型  -->
-        <template slot="type" slot-scope="{field}">
-          <form-item :label="field.displayName" validation>
-            <div class="input-and-btn">
-              <form-select
-                :field="field" 
-                :source="productTypes || []"
-                :value="form.type" @update="update"
-                :placeholder="genPlaceholder(field)"/>
-            </div>
-          </form-item>
-        </template>
-        <!-- end 产品类型 -->
         
       </form-builder>
       <!-- end form builder -->
@@ -66,7 +52,6 @@ export default {
       init: false, // 初始化
       loadingPage: false, // 加载页面
       pending: false, // 等待状态
-      productTypes: [], // 产品类型列表
     }
   },
   computed: {
@@ -93,8 +78,6 @@ export default {
     }
   },
   async mounted() {
-    this.productTypes = (this.initData && this.initData.productTypes) || [];
-    this.productTypes = this.productTypes.map(type => ({text: type, value: type}));
     // 初始化默认值
     let form = {};
     // 编辑
@@ -135,7 +118,7 @@ export default {
             message: !isSucc && res.message
           })
           
-          if(isSucc) window.location.href = `/product/template/detail/${res.data}`;
+          if(isSucc) window.location.href = `/product/detail/${res.data}`;
         })
         .catch(err => console.error('err', err));
     },

@@ -1,8 +1,8 @@
 <template>
   <base-modal :title="modalTitle" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog" @closed="reset">
-    <el-form ref="form" :model="form" label-width="80px" v-if="init">
+    <el-form ref="form" :model="form" label-width="80px" v-if="init" :rules="rules">
 
-      <el-form-item label="选择提醒">
+      <el-form-item label="选择提醒" prop="remindId">
         <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateFormUser">
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
@@ -65,6 +65,9 @@ export default {
       error: false,
       init: false,
       editedRemind: {},
+      rules: {
+        remindId: [{ required: true, message: '请选择短信模板', trigger: 'change' }]
+      }
     }
   },
   props: {
@@ -123,6 +126,8 @@ export default {
       return this.error = false;
     },
     updateFormUser() {
+      if(this.remindTemplate.length <= 0) return this.form.users = [];
+
       let users = [];
       if (this.selectedRemind.isDdResponse) {
         // 内部提醒
@@ -139,6 +144,9 @@ export default {
       this.form.users = _.cloneDeep(users);
     },
     async onSubmit() {
+      this.$refs.form.validate(valid => {
+        if(!valid) return false
+      })
       if (this.validateUser()) return;
 
       const params = this.buildParams();
@@ -179,6 +187,7 @@ export default {
           this.pending = false;
 
           this.editedRemind = {};
+          this.$eventBus.$emit('product_view_remind_update');
           this.$eventBus.$emit('product_remind_table.update_remind_list');
           this.$eventBus.$emit('product_info_record.update_record_list');
           // if (this.action === 'create') {
@@ -216,14 +225,17 @@ export default {
       this.remindCustomerDialog = true;
       this.editedRemind = remind || {};
 
+      this.changeRemindId();
+
+      this.fetchLinkman();
+      this.init = true;
+    },
+    changeRemindId() {
       if (this.action === 'edit') {
         this.form.remindId = this.editedRemind.remind.id;
       } else {
         this.form.remindId = (this.remindTemplate[0] || {}).id;
       }
-
-      this.fetchLinkman();
-      this.init = true;
     },
     fetchData() {
       getProductRemindTemplate()
@@ -233,6 +245,7 @@ export default {
               r.name += r.isDdResponse ? '（内部提醒）' : '（外部提醒）';
               return Object.freeze(r);
             });
+          this.changeRemindId();
         })
         .catch(err => console.error('err', err));
     },

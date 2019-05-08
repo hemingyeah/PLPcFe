@@ -24,7 +24,7 @@
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'name'">
-            <a :href="`/customer/product_v2/${scope.row.templateId}`" :data-id="scope.row.id" @click="openProductDetail" class="product-link">{{ scope.row[column.field] }}</a>
+            <a :href="`/customer/product/view/${scope.row.id}?noHistory=1`" :data-id="scope.row.id" @click="openProductDetail" class="product-link">{{ scope.row[column.field] }}</a>
           </template>
           <template v-else-if="column.field === 'customerName'">
             <a :href="`/customer/view/${scope.row.customerId}`" :data-id="scope.row.id" @click="openCustomerDetail" class="product-link">{{ scope.row[column.field] }}</a>

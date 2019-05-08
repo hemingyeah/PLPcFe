@@ -38,7 +38,7 @@ export default {
     }
   },
   data(){
-    let fields = this.initData.productFields || [];
+    let fields = this.initData.fields || [];
     let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
 
     return {
@@ -46,10 +46,6 @@ export default {
       fields: FormUtil.toFormField(sortedFields),
       pending: false
     }
-  },
-  mounted() {
-
-    console.log('this.initData', this.initData);
   },
   methods: {
     back(){

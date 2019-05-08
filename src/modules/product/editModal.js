@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry'
 import http from '@src/util/http';
-import ProductEdit from './Edit.vue';
+import ProductEdit from './EditModal.vue';
 
 Vue.prototype.$http = http;
 

@@ -37,8 +37,8 @@
                 <a href="javascript:;" @click="clearStorage">清空缓存</a>
                 <a href="javascript:;" @click="openDemo">demo</a>
                 <a href="javascript:;" @click="goRoleTeam">团队管理</a>
-                <a href="javascript:;" @click="goProductTemplate">产品模板</a>
-                <a href="javascript:;" @click="goProduct">产品管理</a>
+                <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
+                <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
                 <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
               </div>
             </el-popover>
@@ -467,21 +467,21 @@ export default {
       platform.openTab({
         id: 'product_template',
         title: '产品模板列表',
-        url: '/product/template',
+        url: '/product/old',
         reload: true,
       });
     },
-    goProduct() {
+    goProductOld() {
       platform.openTab({
-        id: 'product_template',
+        id: 'product',
         title: '产品管理',
-        url: '/customer/product_v2',
+        url: '/customer/product/old',
         reload: true,
       });
     },
     goProductSetting() {
       platform.openTab({
-        id: 'product_template',
+        id: 'product_setting',
         title: '产品设置',
         url: '/setting/product/fields',
         reload: true,

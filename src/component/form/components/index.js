@@ -30,7 +30,6 @@ const BaseFormField = [
   FormPhone,
   FormEmail,
   FormSeparator,
-  FormRadio
 ];
 
 const ProductFormField = [
@@ -43,12 +42,10 @@ const ProductFormField = [
   FormUser,
   FormDate,
   FormDatetime,
-]
-
-const allFields = [
-  ...BaseFormField,
-  FormAddress
+  FormSeparator
 ];
+
+const allFields = [...BaseFormField, FormAddress];
 
 const BaseModeField = BaseFormField.map(item => item.formType)
 
@@ -62,7 +59,7 @@ const Modes = {
     fields: [...BaseModeField]
   },
   product: {
-    fields: [...ProductModeField]
+    fields: [...BaseModeField]
   }
   // task: {
   //   fields: [FormText.formType]
@@ -89,6 +86,7 @@ for(let i = 0; i < FormFields.length; i++){
     let settingComp = formField.component.setting;
     let previewComp = formField.component.preview;
     let buildComp = formField.component.build;
+    let extendsComp = formField.component.extends || {};
 
     PreviewComponents[previewComp.name] = previewComp; 
     SettingComponents[settingComp.name] = settingComp;
@@ -97,7 +95,17 @@ for(let i = 0; i < FormFields.length; i++){
     field.preview = previewComp.name, // 预览组件名
     field.setting = settingComp.name, // 设置组件名
     field.build = buildComp.name // 表单组件名
-    field.name = formField.name
+    field.name = formField.name;
+    field.extends = extendsComp; // 扩展
+
+    // 判断有没有扩展组件 -> 注册组件
+    if(Object.keys(extendsComp).length > 0) {
+      let extendComponent = {};
+      for(let extend in extendsComp) {
+        extendComponent = extendsComp[extend];
+        SettingComponents[extendComponent.name] = extendComponent;
+      }
+    }
   }
 
   FormFieldMap[formField.formType] = field;
@@ -112,6 +120,7 @@ FormFieldMap.get = function(formType){
     field.preview = aliasField.preview;
     field.setting = aliasField.setting;
     field.build = aliasField.build;
+    field.extends = aliasField.extends || {};
   }
 
   return field;

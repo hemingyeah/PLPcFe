@@ -8,6 +8,9 @@ module.exports = {
   'product.edit': {
     entry: './src/modules/product/edit.js'
   },
+  'product.edit.modal': {
+    entry: './src/modules/product/editModal.js',
+  },
   'product.template.list': {
     entry: './src/modules/productTemplate/list.js'
   },

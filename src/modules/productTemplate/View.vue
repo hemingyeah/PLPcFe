@@ -117,7 +117,7 @@ export default {
 
       // 验证路径
       let path = window.location.pathname;
-      let disablePathReg = [/^\/product\/template\/detail\/\S+$/];
+      let disablePathReg = [/^\/product\/detail\/\S+$/];
       if(disablePathReg.some(reg => reg.test(path))) return false;
 
       return allow;
@@ -219,7 +219,7 @@ export default {
     },
     productTemplateId() {
       let href = window.location.pathname;
-      let path = '/product/template/detail/';
+      let path = '/product/detail/';
       let index = 0;
 
       if(href.indexOf(path) >= 0) {
@@ -250,7 +250,7 @@ export default {
         {
           displayName: `相关产品(${this.productCount || 0})`,
           component: ProductTemplateRelatedProductTable.name,
-          show: !this.isDelete
+          show: true
         }
       ].filter(tab => tab.show);
     },
@@ -299,7 +299,7 @@ export default {
     },
     // 跳转编辑
     goEdit() {
-      window.location = `/product/template/edit/${this.productTemplateId}`;
+      window.location = `/product/edit/${this.productTemplateId}`;
     },
     // 信息动态数量变化
     recordCountChange(count) {

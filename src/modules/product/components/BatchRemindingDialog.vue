@@ -3,7 +3,7 @@
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
-        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="defaultUserOfDifferentSelectedRemind">
+        <el-select v-model="form.remindId" placeholder="请选择提醒模板" @change="defaultUserOfDifferentSelectedRemind">
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -21,6 +21,7 @@
             @input="validateUser"
             multiple
             :error="error"
+            placeholder="请选择通知人"
           ></base-select>
 
         </template>

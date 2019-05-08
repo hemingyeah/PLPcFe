@@ -4,7 +4,7 @@
       <div class="code">
         <div ref="qrcode"></div>
         <p v-if="params.addQrcodeId">{{qrcodeId}}</p>
-        <p v-if="params.addTenant">{{qrcodeId}}</p>
+        <p v-if="params.addTenant">{{codeData.nickname}}</p>
 
       </div>
       <dl>
@@ -69,7 +69,7 @@ export default {
     },
     createCode() {
       if(!this.qrcodeId) return;
-      let url = `${window.location.origin}/qrcode/102308?qrcodeId=${this.qrcodeId}`;
+      let url = `${window.location.origin}/qrcode/${this.codeData.domain}?qrcodeId=${this.qrcodeId}`;
       this.$refs.qrcode.innerHTML = '';
       this.$nextTick(() => {
         let qrcode = new QRCode(this.$refs.qrcode, {

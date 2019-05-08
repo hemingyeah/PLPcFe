@@ -103,6 +103,7 @@ export default {
 
         if(!result.status){
           this.$refs.comment.reset();
+          this.$eventBus.$emit('product_view_record_update');
           await this.initializeRecord();
           this.$nextTick(() => {
             this.$refs.timeline.scrollTop = 0;
@@ -320,7 +321,10 @@ export default {
         if (!await this.$platform.confirm('确认删除该备注吗？')) return;
 
         const delRes = await CustomerApi.deleteComment({id: record.id});
-        if(!delRes.status) this.initializeRecord();
+        if(!delRes.status) {
+          this.initializeRecord();
+          this.$eventBus.$emit('product_view_record_update');
+        }
       } catch (e) {
         console.error('deleteMark catch err', e);
       }

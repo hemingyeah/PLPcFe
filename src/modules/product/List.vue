@@ -101,6 +101,10 @@
             <template v-else-if="column.field === 'tags'">
               {{scope.row | formatTags}}
             </template>
+            <!-- 自定义的选择类型字段显示， 与type 区别-->
+            <template v-else-if="column.formType === 'select' && !column.isSystem">
+              {{scope.row.attribute[column.field] | displaySelect}}
+            </template>
             <template v-else-if="column.field === 'updateTime'">
               <template v-if="scope.row.latesetUpdateRecord">
                 <el-tooltip class="item" effect="dark" :content="scope.row.latesetUpdateRecord" placement="top">
@@ -151,7 +155,7 @@
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title">
-        <span>已选中数据({{multipleSelection.length}})</span>
+        <span>已选中产品({{multipleSelection.length}})</span>
         <i
           v-if="multipleSelection.length"
           class="iconfont icon-qingkongshanchu product-panel-btn"
@@ -217,25 +221,8 @@
 
           </el-form-item>
 
-
           <el-form-item label-width="100px" label="选择团队">
-            <el-select
-              v-model="searchModel.tag"
-              filterable
-              clearable
-              remote
-              reserve-keyword
-              placeholder="请输入关键词搜索"
-              :loading="inputRemoteSearch.tag.loading"
-              :remote-method="searchTag">
-
-              <el-option
-                v-for="item in inputRemoteSearch.tag.options"
-                :key="item.id"
-                :label="item.tagName"
-                :value="item.id">
-              </el-option>
-            </el-select>
+            <biz-team-select v-model="searchModel.tag"/>
           </el-form-item>
 
           <el-form-item label-width="100px" label="创建时间">
@@ -407,6 +394,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 
 import Page from '@model/Page';
 import {formatDate} from '@src/util/lang';
@@ -443,11 +431,12 @@ export default {
       multipleSelection: [],
       columnNum: 1,
       loading: false,
+      selectedLimit: 200,
       searchIncludeMoreConditions: false,
       searchModel: {
         keyword: '',
         customer: '',
-        tag: '',
+        tag: [],
         createTime: '',
         updateTime: '',
         name: '',
@@ -461,10 +450,6 @@ export default {
       },
       inputRemoteSearch: {
         customer: {
-          options: [],
-          loading: false,
-        },
-        tag: {
           options: [],
           loading: false,
         },
@@ -576,6 +561,7 @@ export default {
 
       return (this.initData.productFields || [])
         .concat(fixedFields)
+        .filter(f => f.formType !== 'separator')
         .map(f => {
 
           // 调整字段顺序
@@ -611,7 +597,7 @@ export default {
           if (f.fieldName === 'updateTime') {
             f.orderId = -2;
           }
-          f.operator = this.matchOperator(f.formType);
+          f.operator = this.matchOperator(f);
 
           return f;
         })
@@ -668,43 +654,63 @@ export default {
     formatDate(val) {
       if (!val) return '';
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
-    }
+    },
+    displaySelect(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('，');
+      }
+      return null;
+    },
+
   },
   mounted() {
-
-    console.log('initData', this.initData);
     this.revertStorage();
     this.buildColumns();
     this.addCustomizedFieldToSearchModel();
     this.search();
     // updateProductRemindCount
+
+    console.log('04634ed8ffbc', this.initData)
+
     this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   beforeDestroy() {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
-    matchOperator(formType) {
+    matchOperator(field) {
+      let formType = field.formType;
       let operator = '';
+
       switch (formType) {
-        case 'date':
-          operator = 'between';
-          break;
-        case 'datetime':
-          operator = 'between';
-          break;
-        case 'select':
-          operator = 'eq';
-          break;
-        case 'selectMulti':
+      case 'date': {
+        operator = 'between';
+        break;
+      }
+      case 'datetime': {
+        operator = 'between';
+        break;
+      }
+      case 'select': {
+        if(field.setting && field.setting.isMulti) {
           operator = 'contain';
-          break;
-        case 'user':
-          operator = 'user';
-          break;
-        default:
-          operator = 'like';
-          break;
+        } else {
+          operator = 'eq';
+        }
+        break;
+      }
+      case 'user': {
+        operator = 'user';
+        break;
+      }
+      default: {
+        operator = 'like';
+        break;
+      }
       }
       return operator;
     },
@@ -716,7 +722,7 @@ export default {
         id: `customer_view_${productId}`,
         title: '产品详情',
         close: true,
-        url: `/customer/product/detail/${productId}?noHistory=1`,
+        url: `/customer/product/view/${productId}?noHistory=1`,
         fromId
       })
 
@@ -735,7 +741,8 @@ export default {
       return getProduct(params)
         .then(res => {
           this.loading = false;
-          return this.page = Page.as(Object.freeze(res));
+          this.page = Page.as(Object.freeze(res));
+          this.matchSelected();
         })
         .catch(e => console.error('fetch product catch an error', e));
     },
@@ -787,19 +794,21 @@ export default {
 
       let keys = ['customer', 'tag', 'name', 'serialNumber', 'type'];
       let k = '';
+      let v = '';
 
       keys.forEach(key => {
         if (searchModel[key]) {
           k = key;
-
+          v = searchModel[key];
           if (key === 'customer') {
             k = 'customerId';
           }
-          if (key === 'tag') {
+          if (key === 'tag' && v[0]) {
             k = 'tagId';
+            v = v[0].id;
           }
 
-          params[k] = searchModel[key];
+          params[k] = v;
         }
       });
 
@@ -899,7 +908,33 @@ export default {
     },
     // table method
     handleSelection(selection) {
-      this.multipleSelection = selection;
+      let tv = this.selectionCompute(selection);
+
+      let original = this.multipleSelection
+        .filter(ms => this.page.list.some(cs => cs.id === ms.id));
+
+      let unSelected = this.page.list
+        .filter(c => original.every(oc => oc.id !== c.id));
+
+      if (tv.length > this.selectedLimit) {
+
+        unSelected.forEach(row => {
+          this.$refs.productTemplateTable.toggleRowSelection(row, false);
+        });
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+      }
+
+      this.multipleSelection = tv;
+    },
+    // 计算已选择
+    selectionCompute(selection) {
+      let tv = [];
+      
+      tv = this.multipleSelection
+        .filter(ms => this.page.list.every(c => c.id !== ms.id));
+      tv = _.uniqWith([...tv, ...selection], _.isEqual);
+
+      return tv;
     },
     sortChange(option) {
       try {
@@ -956,8 +991,11 @@ export default {
     },
 
     removeFromSelection(c) {
+      if(!c || !c.id) return 
+
       this.multipleSelection = this.multipleSelection
         .filter(ms => ms.id !== c.id);
+      this.multipleSelection.length < 1 ? this.toggleSelection() : this.toggleSelection([c])
     },
     modifyColumnStatus(val, column) {
       this.columns = this.columns
@@ -974,9 +1012,12 @@ export default {
       // productUpdateTime,productTemplate,tags,remindCount
 
       let sortable = false;
-      let isExport = true;
       let {columnStatus} = this.getLocalStorageData();
       const customerProductCheck = localStorage.getItem('customerProductCheck');
+
+      if (!columnStatus || !columnStatus.length) {
+        columnStatus = ['name', 'customer', 'tags', 'productTemplate', 'serialNumber', 'type', 'remindCount', 'updateTime']
+      }
 
       if (customerProductCheck) {
         columnStatus = (customerProductCheck.split(',') || [])
@@ -986,9 +1027,10 @@ export default {
           })
         localStorage.removeItem('customerProductCheck');
       }
+      if(!columnStatus) columnStatus = [];
 
       this.columns = this.productFields
-        .filter(f => f.formType !== 'attachment')
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
 
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
@@ -1010,7 +1052,6 @@ export default {
             show: columnStatus.some(c => c === field.fieldName),
             sortable,
             isSystem: field.isSystem,
-            // exportAlias: field.exportAlias || ''
           }
         });
 
@@ -1061,17 +1102,6 @@ export default {
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },
-
-    searchTag(keyword) {
-      this.inputRemoteSearch.tag.loading = true;
-      return this.$http.get('/customer/tag/list', {keyword, pageNum: 1, pageSize: 100 * 100, })
-        .then(res => {
-          this.inputRemoteSearch.tag.loading = false;
-          this.inputRemoteSearch.tag.options = res && res.list ? res.list : [];
-          return res;
-        })
-        .catch(err => console.error('searchTag function catch err', err));
-    },
     searchCustomer(keyword) {
       this.inputRemoteSearch.customer.loading = true;
       this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
@@ -1096,6 +1126,8 @@ export default {
               }
               return c;
             });
+
+          this.matchSelected();
         })
         .catch(e => console.error('e', e));
     },
@@ -1119,7 +1151,7 @@ export default {
         id: `product_template_view_${templateId}`,
         title: '产品模板',
         close: true,
-        url: `/product/template/detail/${templateId}?noHistory=1`,
+        url: `/product/detail/${templateId}?noHistory=1`,
         fromId
       })
     },
@@ -1136,11 +1168,30 @@ export default {
       localStorage.setItem('product_list_localStorage_19_4_24', JSON.stringify(data));
     },
     revertStorage() {
-      const {pageSize} = this.getLocalStorageData();
+      const {pageSize, column_number} = this.getLocalStorageData();
       if (pageSize) {
         this.searchModel.pageSize = pageSize;
       }
+      if(column_number) this.columnNum = Number(column_number)
     },
+    // 匹配选中的列
+    matchSelected() {
+      if (!this.multipleSelection.length) return;
+
+      const selected = this.page.list
+        .filter(c => {
+          if (this.multipleSelection.some(sc => sc.id === c.id)) {
+
+            this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
+            this.multipleSelection.push(c);
+            return c;
+          }
+        }) || [];
+
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
+    }
   },
   components: {
     [SendMessageDialog.name]: SendMessageDialog,
@@ -1153,9 +1204,29 @@ export default {
 
 <style lang="scss">
   $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
-  .product-list-container {
-    padding: 10px;
+
+  html, body {
+    height: 100%;
   }
+  .product-list-container {
+    height: 100%;
+    padding: 10px;
+    overflow: auto;
+  }
+
+  .product-columns-dropdown-menu {
+    max-height: 300px;
+    overflow: auto;
+    .el-dropdown-menu__item {
+      padding: 0;
+    }
+    .el-checkbox {
+      width: 100%;
+      padding: 5px 15px;
+      margin: 0;
+    }
+  }
+
 
   // search
   .product-list-container .product-list-search-group-container {

@@ -7,7 +7,7 @@ import http from '@src/util/http';
  * @returns {*}
  */
 function getProduct(params) {
-  return http.post('/customer/product/list/data', params, false)
+  return http.post('/customer/product/list/data', params)
 }
 
 /**
@@ -146,7 +146,7 @@ function getRecordOfProduct(params) {
  * @param {Object} params.content.updateType - 'pRecord'
  */
 function commentProduct(params) {
-  return http.post('/customer/product/record/create', params, false)
+  return http.post('/customer/product/record/create', params)
 }
 
 /**
@@ -189,6 +189,18 @@ function bindQrcode(params) {
 function downloadQrcode(params) {
   return http.get('/product/downloadOneQrcode', params)
 }
+
+/**
+ * 获取产品详情统计数据
+ * @param {Object} params - 参数
+ * @param {String} params.productId - 产品id
+ * @return Promise<>
+ */
+
+function productStatisticsInit(params) {
+  return http.get('/customer/product/statistics/init', params)
+}
+
 /** ------------ end 产品 ----------------------- */
 
 
@@ -267,7 +279,7 @@ function getProductTemplateRecord(params) {
  * @returns Promise<>
  */
 function productTemplateCreateRecord(params) {
-  return http.post('/product/record/create', params, false);
+  return http.post('/product/record/create', params);
 }
 
 /**
@@ -307,6 +319,7 @@ export {
   bindQrcode,
   downloadQrcode,
   checkSerialNumber,
+  productStatisticsInit,
   getProductTemplateList,
   productTemplateDelete,
   productTemplateEditBatch,

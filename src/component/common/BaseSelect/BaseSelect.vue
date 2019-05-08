@@ -7,11 +7,17 @@
         <el-tag size="mini" closable v-for="tag in value" :key="tag.value" @close="removeTag(tag)" disable-transitions type="info">
           {{tag.label}}
         </el-tag>
+        <span v-if="value.length <= 0" class="placeholder-text">
+          {{ placeholder }}
+        </span>
       </div>
 
       <div class="base-select-main-content" @click.stop="focusInput" v-else
            :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable,}">
         {{value.map(tag => tag.label).join('')}}
+        <span v-if="value.length <= 0" class="placeholder-text">
+          {{ placeholder }}
+        </span>
       </div>
 
       <i v-if="clearable && value.length" class="iconfont icon-minus-fill clear-btn" @click="clearValue"></i>
@@ -76,6 +82,10 @@ export default {
     options: {
       type: Array,
       default: () => ([]),
+    },
+    placeholder: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -216,6 +226,10 @@ export default {
 <style lang="scss">
   $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
+  .form-item.err :not(.is-success) input, .form-item.err :not(.is-success) .base-select-main-content {
+    border-color: #f56c6c !important;
+  }
+
   .base-select-container {
     position: relative;
 
@@ -253,6 +267,13 @@ export default {
       min-height: 32px;
       line-height: 30px;
 
+      .placeholder-text {
+        color: #9e9e9e;
+        font-size: 14px;
+        line-height: 20px;
+        margin-top: 5px;
+      }
+
       .el-tag {
         margin: 5px 2px 0px;
       }
@@ -282,6 +303,7 @@ export default {
       padding-top: 34px;
       box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
       background: #fff;
+      z-index: 99999;
 
       .arrow {
         position: absolute;

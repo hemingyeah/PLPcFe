@@ -64,7 +64,7 @@
           <template slot="customer" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>客户</label>
-              <div class="form-view-row-content">
+              <div class="form-view-row-content link" @click="openCustomer">
                 {{product.customerName}}
               </div>
             </div>
@@ -85,6 +85,15 @@
               </div>
             </div>
           </div>
+
+          <template slot="createTime" slot-scope="{value}">
+            <div class="form-view-row" v-if="value">
+              <label>创建时间</label>
+              <div class="form-view-row-content">
+                <span>{{ value | fmt_datetime }}</span>
+              </div>
+            </div>
+          </template>
 
 
         </form-view>
@@ -110,7 +119,8 @@
 import {
   getProductDetail,
   deleteProductByIds,
-  unbindQrcode
+  unbindQrcode,
+  productStatisticsInit
 } from '@src/api/ProductApi';
 
 import EventTable from './components/EventTable.vue';
@@ -149,28 +159,8 @@ export default {
       currTab: 'info-record',
       showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       newestProduct: null,
-      tabs: [{
-        displayName: '信息动态',
-        component: InfoRecord.name,
-        slotName: 'record-tab',
-        show: true,
-      }, {
-        displayName: '相关工单',
-        component: TaskTable.name,
-        show: true,
-      }, {
-        displayName: '相关事件',
-        component: EventTable.name,
-        show: true,
-      }, {
-        displayName: '计划工单',
-        component: PlanTable.name,
-        show: true,
-      }, {
-        displayName: '产品提醒',
-        component: RemindTable.name,
-        show: true,
-      }]
+      tabs: [],
+      statisticalData: {}, // tab统计数据
     }
   },
   computed: {
@@ -187,6 +177,10 @@ export default {
     },
     fields() {
       let fixedFields = [
+        {
+          displayName: '',
+          formType: 'separator'
+        },
         {
           displayName: '创建人',
           fieldName: 'createUser',
@@ -249,6 +243,8 @@ export default {
     downloadCodeData() {
       return {
         qrcodeId: this.product.qrcodeId,
+        nickName: this.initData.nickName,
+        domain: this.initData.domain,
       }
     },
     /** 子组件所需的数据 */
@@ -362,18 +358,21 @@ export default {
     },
   },
   mounted() {
-    console.log('product-view mounted', this.initData);
-
     this.updateProductNameStyle();
     this.createCode();
+    this.fetchStatisticalData();
     // this.refreshProduct();
 
-    this.$eventBus.$on('product_view.open_remind_dialog', this.openRemindDialog);
-    this.$eventBus.$on('product_view.update_detail', this.refreshProduct);
+    this.$eventBus.$on('product_view.open_remind_dialog', this.openRemindDialog); // 打开提醒弹窗
+    this.$eventBus.$on('product_view.update_detail', this.refreshProduct); // 更新详情
+    this.$eventBus.$on('product_view_record_update', this.fetchStatisticalData); // 更新动态
+    this.$eventBus.$on('product_view_remind_update', this.fetchStatisticalData); // 更新提醒
   },
   beforeDestroy() {
     this.$eventBus.$off('product_view.open_remind_dialog', this.openRemindDialog);
     this.$eventBus.$off('product_view.update_detail', this.refreshProduct);
+    this.$eventBus.$off('product_view_record_update', this.fetchStatisticalData);
+    this.$eventBus.$off('product_view_remind_update', this.fetchStatisticalData);
   },
   methods: {
     openBindCodeDialog() {
@@ -412,7 +411,7 @@ export default {
     },
     createCode() {
       if(!this.product.qrcodeId) return;
-      let url = `${window.location.origin}/qrcode/102308?qrcodeId=${this.product.qrcodeId}`;
+      let url = `${window.location.origin}/qrcode/${this.initData.domain}?qrcodeId=${this.product.qrcodeId}`;
       this.$refs.qrcode.innerHTML = '';
       this.$nextTick(() => {
         let qrcode = new QRCode(this.$refs.qrcode, {
@@ -509,6 +508,57 @@ export default {
         fromId
       })
     },
+    // 打开客户新tab
+    openCustomer() {
+      if(this.product.customer && !this.product.customer.id) return 
+
+      const customerId = this.product.customer.id;
+
+      this.$platform.openTab({
+        id: `customer_view_${customerId}`,
+        title: '客户详情',
+        close: true,
+        url: `/customer/view/${customerId}?noHistory=1`,
+      })
+    },
+    // 获取统计数量
+    fetchStatisticalData() {
+      let params = {
+        productId: this.product.id
+      }
+      productStatisticsInit(params).then(result => {
+        if(!result) return 
+        this.statisticalData = result;
+        this.tabs = this.buildTabs();
+      })
+    },
+    // 构建tab
+    buildTabs() {
+      return [
+        {
+          displayName: `信息动态(${this.statisticalData.recordQuantity || 0})`,
+          component: InfoRecord.name,
+          slotName: 'record-tab',
+          show: true,
+        }, {
+          displayName: `相关工单(${this.statisticalData.taskQuantity || 0})`,
+          component: TaskTable.name,
+          show: true,
+        }, {
+          displayName: `相关事件(${this.statisticalData.eventQuantity || 0})`,
+          component: EventTable.name,
+          show: true,
+        }, {
+          displayName: `计划工单(${this.statisticalData.plantaskQuantity || 0})`,
+          component: PlanTable.name,
+          show: true,
+        }, {
+          displayName: `产品提醒(${this.statisticalData.remindQuantity || 0})`,
+          component: RemindTable.name,
+          show: true,
+        }
+      ].filter(tab => tab.show)
+    }
   },
   components: {
     [EventTable.name]: EventTable,
@@ -688,6 +738,7 @@ body {
 
     .link {
       color: $color-primary;
+      cursor: pointer;
     }
 
   }

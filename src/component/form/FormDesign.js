@@ -30,15 +30,31 @@ function createPreviewComp(h, field){
   
   return (
     <div class={previewClass} key={currFieldId}
-         onMousedown={e => this.beginSort(field, e)}>
+      onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
       {!field.isSystem && <button type="button" class="form-design-preview-delete"
-                                  onClick={e => this.deleteField(field)}>
+        onClick={e => this.deleteField(field)}>
         <i class="iconfont icon-fe-close"></i>
       </button>}
       <div class="form-design-cover"></div>
     </div>
   )
+}
+
+/** 获取设置组件组件名，如果返回null，渲染默认组件 */
+function getSettingComp(field, comp){
+  // 产品类型
+  if(this.mode == 'product' && field.fieldName == 'type'){
+    if(Object.keys(comp.extends).length <= 0) return null;
+    let productType = comp.extends.productType || {};
+    return productType.name;
+  }
+  // 客户地址
+  if(field.fieldName == 'customerAddress') return comp.setting;
+  // 系统字段默认设置
+  if(field.isSystem == 1) return null;
+
+  return comp.setting;
 }
 
 /** 创建字段设置组件 */
@@ -47,37 +63,39 @@ function createSettingComp(h, field){
   
   let formType = field.formType;
   let comp = FormFieldMap.get(formType);
+  if(null == comp) return null;
+
+  let compName = getSettingComp.call(this, field, comp)
   
-  if (field.isSystem && field.fieldName !== 'customerAddress') return (
+  if(null == compName) return (
     <div class="form-setting-panel">
-      <h3>系统字段 -- {field.displayName}</h3>
+      <h3>系统字段 -- {field.displayName}</h3>   
       <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
-    </div>
+    </div> 
   );
-  
+
   let props = { field, setting: comp };
-  
   if( formType == 'select' ){
     props.getContext = () => this;
   }
   
-  return h(comp.setting, {
+  return h(compName, {
     key: field._id,
     props,
     on: {
       input: event => {
-        if(event.prop == 'dependencies'){
-          let {operate, value} = event;
-          
-          if(operate == 'update') this.updateDependencies(value);
-          if(operate == 'delete') this.deleteDependencies(field, false);
+        if (event.prop == 'dependencies') {
+          let { operate, value } = event;
+
+          if (operate == 'update') this.updateDependencies(value);
+          if (operate == 'delete') this.deleteDependencies(field, false);
           return;
         }
-        
-        if(event.prop == 'isMulti' && event.value){
+
+        if (event.prop == 'isMulti' && event.value) {
           this.deleteDependencies(field);
         }
-        
+
         field[event.prop] = event.value;
       }
     }
@@ -561,8 +579,8 @@ const FormDesign = {
     let fieldList = this.filterFields.map(field => {
       return (
         <div class="form-design-field-wrap"
-             onMousedown={e => this.beginInsert(field, e)}
-             onClick={e => this.immediateInsert(field, e)}>
+          onMousedown={e => this.beginInsert(field, e)}
+          onClick={e => this.immediateInsert(field, e)}>
           <div class="form-design-field form-design__ghost">
             {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
           </div>

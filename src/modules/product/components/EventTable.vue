@@ -151,6 +151,7 @@ export default {
         label: '事件编号',
         field: 'eventNo',
         show: true,
+        sortable: 'custom'
       }, {
         label: '事件类型',
         field: 'templateId',

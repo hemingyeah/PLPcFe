@@ -607,7 +607,7 @@ export default {
     },
     createProduct() {
       const id = this.id || this.initData.id;
-      window.location.href = `/customer/product/createNew?cid=${id}`
+      window.location.href = `/customer/product/create?customerId=${id}`
     },
     goBack() {
       parent.frameHistoryBack(window);
