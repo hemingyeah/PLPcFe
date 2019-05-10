@@ -23,6 +23,13 @@
           :error="error"
         >
         </base-select>
+        <template v-if="selectedRemind.isDdResponse">
+          <span style="display: inline-block; margin-top: 10px;">按角色：</span>
+          <el-checkbox-group :value="sendRoleSetting" @input="change" style="display:inline">
+            <el-checkbox label="sendToCustomerExecutor">客户负责人</el-checkbox>
+            <el-checkbox label="sendToCustomerTag">客户所属服务团队</el-checkbox>
+          </el-checkbox-group>
+        </template>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -54,6 +61,7 @@ export default {
   name: 'remind-dialog',
   data: () => {
     return {
+      sendRoleSetting: [],
       linkmanListOfCustomer: [],
       remindTemplate: [],
       form: {
@@ -87,19 +95,20 @@ export default {
       return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
     },
     remindRule() {
-      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit, } = this.selectedRemind;
+      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit, timeUnit, } = this.selectedRemind;
       let unit = periodUnit === 'day' ? '天' : (periodUnit === 'week' ? '周' : '月');
       let isahead = isAhead ? '前' : '后';
+      let dorh = (timeUnit == 'hour' || !timeUnit) ? '小时' : '天';
 
       if (!isRepeat){
         if(fieldDisplayName){
-          return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
+          return `单次通知：根据${fieldDisplayName + (isahead + hours) + dorh}提醒`;
         }
         return '无'
         
       }
       if(period){
-        return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
+        return `重复通知：根据${fieldDisplayName + (isahead + hours) + dorh}，每${period + unit}发出提醒`;
       }
       return '无'
 
@@ -109,6 +118,17 @@ export default {
     this.fetchData();
   },
   methods: {
+    initSelect (info) {
+      this.sendRoleSetting = [];
+      if (info && info.sendToCustomerExecutor) this.sendRoleSetting.push('sendToCustomerExecutor');
+      if (info && info.sendToCustomerTag) {
+        this.sendRoleSetting.push('sendToCustomerTag')
+      }
+    },
+    change (val) {
+      this.sendRoleSetting = val;
+      this.validateUser();
+    },
     reset() {
       this.init = false;
       this.editedRemind = {};
@@ -119,7 +139,7 @@ export default {
       this.$emit('success-callback');
     },
     validateUser() {
-      if (!this.form.users || !this.form.users.length) {
+      if ((!this.form.users || !this.form.users.length) && this.sendRoleSetting.length == 0) {
         // 内部提醒
         return this.error = true;
       }
@@ -131,7 +151,7 @@ export default {
       let users = [];
       if (this.selectedRemind.isDdResponse) {
         // 内部提醒
-        users = this.selectedRemind.users.map(({id, name}) => ({label: name, value: id}))
+        if(this.selectedRemind.users) users = this.selectedRemind.users.map(({id, name}) => ({label: name, value: id}))
       } else {
         // 外部提醒（默认联系人或者全部联系人）
         if (this.selectedRemind.isDefaultLinkman) {
@@ -140,6 +160,8 @@ export default {
           users = this.linkmanListOfCustomer;
         }
       }
+
+      this.initSelect(this.selectedRemind.sendRoleSetting);
 
       this.form.users = _.cloneDeep(users);
     },
@@ -206,6 +228,9 @@ export default {
         });
     },
     buildParams() {
+      let sendRoleSetting = {};
+      sendRoleSetting.sendToCustomerExecutor = this.sendRoleSetting.indexOf('sendToCustomerExecutor') != -1;
+      sendRoleSetting.sendToCustomerTag = this.sendRoleSetting.indexOf('sendToCustomerTag') != -1;
       return {
         id: this.action === 'edit' ? this.editedRemind.id : '',
         modalId: this.product.id,
@@ -214,6 +239,7 @@ export default {
         remind: {
           id: this.form.remindId,
         },
+        sendRoleSetting,
         users: (this.form.users || []).map(user => ({
           id: user.value,
           name: user.label,

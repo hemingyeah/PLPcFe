@@ -186,7 +186,14 @@ export default {
       if(action === '联系人') return this.renderLinkmanRecordDom(item);
 
       if(action === '消息提醒'){
-        if(content.type === '已发送') return <h5>已发送了消息提醒{content.remindName}给{content.remindTo}。</h5>
+        if(content.type == '已发送') {
+          let info = [<h5>发送了消息提醒。</h5>, <p>提醒名称：{content.remindName}</p>, <p>通知范围：通知人：{content.remindTo}</p>]
+          if(content.customerManagerName) info.push(<p class="principal-info">客户负责人：{content.customerManagerName}</p>)
+          if(content.customerManagerName === null) info.push(<p class="principal-info">客户负责人：发送失败，客户负责人不存在</p>);
+          if(content.tagName) info.push(<p class="principal-info">所属服务团队：{content.tagName}</p>);
+          if(content.tagName === null) info.push(<p class="principal-info"> 所属服务团队：发送失败，客户所属服务团队不存在</p>);
+          return info;
+        }
         return [
           <h5><strong>{userName}</strong>{content.type}了消息提醒。</h5>,
           <p className="secondary-info">提醒名称：{content.remindName}</p>,
@@ -396,5 +403,8 @@ export default {
   .base-comment{
     border-color: transparent;
   }
+}
+p.principal-info {
+  margin-left: 70px;
 }
 </style>

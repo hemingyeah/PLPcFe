@@ -31,6 +31,10 @@
   content: "\e620";
 }
 
+.icon-chahao:before {
+  content: "\e626";
+}
+
 .icon-quanping:before {
   content: "\e660";
 }
