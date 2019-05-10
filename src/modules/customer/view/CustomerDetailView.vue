@@ -7,8 +7,16 @@
           <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
           <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
           <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable"><i class="iconfont icon-notification"></i> 添加提醒</button>
+          
+          <el-dropdown @command="execAttentionCommand">
+            <span style="cursor: default;"><i class="iconfont icon-focus"></i> {{ isAttention ? '已关注' : '关注客户'}}</span>
+            
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="toggle">{{ isAttention ? '取消关注' : '关注客户' }}</el-dropdown-item>
+              <el-dropdown-item command="view" :disabled="!hasEditCustomerAuth">查看已关注</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
-        <!-- <a :href="`/customer/oldView/${id}`">返回旧版</a> -->
       </div>
       <div class="customer-toolbar-right action-btn" v-if="!isDelete">
         <el-dropdown trigger="click" v-if="allowCreateTask">
@@ -96,15 +104,18 @@
       </div>
     </div>
 
-    <edit-contact-dialog ref="EditContactDialog" :customer="customer" :is-phone-unique="isPhoneUnique"></edit-contact-dialog>
-    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id"
-                         :default-address="initData.customerAddress"></edit-address-dialog>
-    <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind"
-                            @success-callback="selectedRemind = {}"></remind-customer-dialog>
+    <edit-contact-dialog ref="EditContactDialog" :customer="customer" :is-phone-unique="isPhoneUnique"/>
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id" :default-address="initData.customerAddress"/>
+    <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind" @success-callback="selectedRemind = {}"/>
+    <customer-attention ref="customerAttention" @submit="updateAttentionUser"/>
   </div>
 </template>
 
 <script>
+import Exception from '@model/Exception'
+import * as CustomerApi from '@src/api/CustomerApi';
+import Platform from '@src/platform';
+
 import CustomerInfoRecord from './components/CustomerInfoRecord.vue';
 import CustomerEventTable from './components/CustomerEventTable.vue';
 import CustomerTaskTable from './components/CustomerTaskTable.vue';
@@ -113,6 +124,7 @@ import CustomerContactTable from './components/CustomerContactTable.vue';
 import CustomerAddressTable from './components/CustomerAddressTable.vue';
 import CustomerPlanTable from './components/CustomerPlanTable';
 import CustomerRemindTable from './components/CustomerRemindTable';
+import CustomerAttention from './components/CustomerAttention.vue'
 
 import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
 import EditContactDialog from './operationDialog/EditContactDialog.vue';
@@ -142,6 +154,8 @@ export default {
       loading: false,
       showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       statisticalData: {},
+
+      attentionUsers: [] // 该客户的关注用户
     }
   },
   computed: {
@@ -313,6 +327,10 @@ export default {
     },
     isDivideByTag() {
       return this.initData.isDivideByTag;
+    },
+    /** 是否关注该客户 */
+    isAttention(){
+      return this.attentionUsers.some(u => u.userId == this.loginUser.userId);
     }
   },
   filters: {
@@ -322,6 +340,86 @@ export default {
     }
   },
   methods: {
+    /** 抓取该客户的关注列表 */
+    async fetchAttentionUsers(){
+      try {
+        let params = {customerId: this.id}
+        let result = await CustomerApi.attentionList(params);
+
+        if(result.status == 0){
+          this.attentionUsers = result.data || [];
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    execAttentionCommand(command){
+      if(command == 'toggle') return this.toggleAttention();
+      if(command == 'view') {
+        return this.hasEditCustomerAuth && this.$refs.customerAttention.view(this.attentionUsers)
+      }
+    },
+    /** 切换该客户的关注状态 */
+    async toggleAttention(event){
+      try{
+        let params = {
+          customerId: this.id,
+          module: 'customer',
+          action: this.isAttention ? '取消关注' : '关注'
+        }
+
+        let result = await CustomerApi.toggleAttention(params);
+        // 这里推荐至直接throw Exception
+        if(result.status == 1) throw new Exception(result.message);
+
+        Platform.notification({
+          type: 'success',
+          title: this.isAttention ? '取消关注成功' : '关注客户成功',
+          message: this.isAttention ? '您不会再接收该客户信息动态变更的通知' : '当该客户信息动态变更时，您会收到钉钉通知'
+        });
+        
+        this.fetchAttentionUsers();
+        this.$eventBus.$emit('customer_info_record.update_record_list');
+      } catch(e){
+        if(e instanceof Exception){
+          Platform.notification({
+            type: 'error',
+            title: '失败',
+            message: e.message
+          })
+        }
+      }
+    },
+    /** 取消某些用户对该客户的关注 */
+    async updateAttentionUser({removeUsers, userName}){
+      try{
+        let params = {
+          customerId: this.id,
+          userIds: removeUsers.map(u => u.userId).join(',')
+        }
+
+        let result = await CustomerApi.cancelAttention(params);
+        // 这里推荐至直接throw Exception
+        if(result.status == 1) throw new Exception(result.message);
+
+        Platform.notification({
+          type: 'success',
+          title: '取消关注成功',
+          message: `${userName}不会再接收该客户信息动态变更的通知`
+        });
+
+        this.fetchAttentionUsers();
+        this.$eventBus.$emit('customer_info_record.update_record_list');
+      } catch(e){
+        if(e instanceof Exception){
+          Platform.notification({
+            type: 'error',
+            title: '失败',
+            message: e.message
+          })
+        }
+      }
+    },
     // 更新客户名称的样式
     updateCustomerStyle(){
       let cnEl = this.$refs.customerName;
@@ -493,11 +591,10 @@ export default {
     }
   },
   mounted() {
-
-    console.log('this.initData', this.initData);
     this.loading = true;
     this.fetchCustomer();
     this.fetchStatisticalData();
+    this.fetchAttentionUsers();
 
     let query = qs.parse(window.location.search);
     if (query && query.active === 'product') {
@@ -527,6 +624,7 @@ export default {
     [EditAddressDialog.name]: EditAddressDialog,
     [EditContactDialog.name]: EditContactDialog,
     [RemindCustomerDialog.name]: RemindCustomerDialog,
+    [CustomerAttention.name]: CustomerAttention
   }
 }
 </script>

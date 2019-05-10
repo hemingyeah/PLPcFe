@@ -216,22 +216,12 @@ export default {
 
       if (/工单/.test(action)) {
         const str = `${action === '新建工单' ? '新建' : '完成' }了一个该客户的工单 #${content.taskNo}，工单类型为【${content.taskType}】。`;
-        return (
-          <h5>
-            <strong>{userName}</strong>
-            {str}
-          </h5>
-        )
+        return <h5><strong>{userName}</strong>{str}</h5>
       }
 
       if (/事件/.test(action)) {
         const str = `${action === '新建事件' ? '新建' : '完成' }了一个该客户的事件 #${content.eventNo}， 事件类型为【${content.taskType}】。`;
-        return (
-          <h5>
-            <strong>{userName}</strong>
-            {str}
-          </h5>
-        )
+        return <h5><strong>{userName}</strong>{str}</h5>
       }
 
       if (action === '新建计划') {
@@ -256,6 +246,40 @@ export default {
             {str ? <p class="secondary-info">修改字段：{str}。</p> : ''}
           </h5>
         )
+      }
+
+      if(action == '关注'){
+        return <h5><strong>{userName}</strong>关注了该客户。</h5>
+      }
+
+      if(action == '取消关注'){
+        return <h5><strong>{userName}</strong>取消了对该客户的关注。</h5>
+      }
+
+      if(action == '被取消关注'){
+        let userNameDetail = null
+        let fmtUserName = content.namesList;
+        let names = fmtUserName.split(',');
+
+        if(names.length > 3){
+          fmtUserName = names.reduce((acc, cur, index, arr) => {
+            if(index > 3) return acc;
+            if(index == 3) {
+              return `${acc.slice(0, -1)}等${arr.length}人`;
+            }
+
+            return `${acc}${cur},`;
+          }, '');
+
+          if(fmtUserName.endsWith(',')) fmtUserName = fmtUserName.slice(0, -1);
+
+          userNameDetail = <p>{content.namesList}</p>
+        }
+
+        return [
+          <h5><strong>{userName}</strong>取消了<strong>{fmtUserName}</strong>对该客户的关注。</h5>,
+          userNameDetail
+        ]
       }
 
       return [
