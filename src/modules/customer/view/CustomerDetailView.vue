@@ -8,7 +8,7 @@
           <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
           <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable"><i class="iconfont icon-notification"></i> 添加提醒</button>
           
-          <el-dropdown @command="execAttentionCommand">
+          <el-dropdown @command="execAttentionCommand" v-if="hasViewCustomerAuth">
             <span style="cursor: default;"><i class="iconfont icon-focus"></i> {{ isAttention ? '已关注' : '关注客户'}}</span>
             
             <el-dropdown-menu slot="dropdown">
@@ -241,6 +241,32 @@ export default {
       let customer = this.customer;
       let loginUserId = this.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT', 
+        // 团队权限判断
+        () => {
+          let tags = Array.isArray(customer.tags) ? customer.tags : [];
+          // 无团队则任何人都可编辑
+          if(tags.length == 0) return true;
+
+          let loginUserTagIds = this.initData.loginUser.tagIds || [];
+          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
+        }, 
+        // 个人权限判断
+        () => {
+          return customer.createUser == loginUserId || this.isCustomerManager
+        }
+      );
+    },
+    /** 
+     * 是否有查看客户权限，需要满足以下条件之一：
+     * 
+     * 1. 查看客户全部权限： 全部客户
+     * 2. 查看客户团队权限： 没有团队的客户都可查看，有团队的按团队匹配。 包含个人权限
+     * 3. 查看客户个人权限： 自己创建的 或 客户负责人
+     */
+    hasViewCustomerAuth(){
+      let customer = this.customer;
+      let loginUserId = this.loginUser.userId;
+      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_VIEW', 
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
