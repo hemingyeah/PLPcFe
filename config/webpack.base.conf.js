@@ -111,7 +111,7 @@ module.exports = {
     jQuery: 'jQuery'
   },
   performance: {
-    maxEntrypointSize: 1048576
+    maxEntrypointSize: 2097152
   },
   devtool: IS_PRODUCTION ? 'nosources-source-map' : 'eval',
 }
