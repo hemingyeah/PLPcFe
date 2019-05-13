@@ -319,7 +319,7 @@ const FrameManager = {
       if(event.propertyName != 'transform' || !event.target.classList.contains('frame-tabs-list')) return;
       this.offsetTransition = false;
     },
-    resizeHanler(){
+    resizeHandler(){
       let currTab = this.frameTabs.find(item => item.show);
       this.adjustFrameTabs(currTab);
     },
@@ -376,7 +376,7 @@ const FrameManager = {
   },
   mounted(){
     window.addEventListener('message', this.receiveMessage);
-    window.addEventListener('resize', this.resizeHanler);
+    window.addEventListener('resize', this.resizeHandler);
 
     //TODO: 迁移完成后删除
     window.addTabs = this.addTabs;

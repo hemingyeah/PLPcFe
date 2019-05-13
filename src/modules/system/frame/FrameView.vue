@@ -162,7 +162,7 @@
     <version :version="releaseVersion"/>
     <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
     <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum" @getNum="getNum"></notification-center>
-    <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu>
+    <!-- <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu> -->
   </div>
 </template>
 
