@@ -1,9 +1,9 @@
 <template>
   <base-modal :title="modalTitle" :show.sync="remindCustomerDialog" width="500px" class="batch-remind-customer-dialog" @closed="reset">
-    <el-form ref="form" :model="form" label-width="80px" v-if="init">
+    <el-form ref="form" :model="form" label-width="80px" v-if="init" :rules="rules">
 
-      <el-form-item label="选择提醒">
-        <el-select v-model="form.remindId" placeholder="请选择短信模板" @change="updateFormUser">
+      <el-form-item label="选择提醒" prop="remindId">
+        <el-select v-model="form.remindId" placeholder="请选择提醒" @change="updateFormUser">
           <el-option v-for="item in remindTemplate" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -44,7 +44,7 @@
 import _ from 'lodash';
 
 export default {
-  name: "remind-customer-dialog",
+  name: 'remind-customer-dialog',
   data: () => {
     return {
       linkmanListOfCustomer: [],
@@ -57,6 +57,10 @@ export default {
       pending: false,
       error: false,
       init: false,
+      rules: {
+        remindId: [{ required: true, message: '请选择提醒', trigger: 'change' }]
+      }
+
     }
   },
   props: {
@@ -82,22 +86,21 @@ export default {
     },
     remindRule() {
       const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
-      let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
-      let isahead = isAhead ? "前" : "后";
-
+      let unit = periodUnit === 'day' ? '天' : (periodUnit === 'week' ? '周' : '月');
+      let isahead = isAhead ? '前' : '后';
+      // 按顺序的
       if (!isRepeat){
         if(fieldDisplayName){
           return `单次通知：根据${fieldDisplayName + (isahead + hours)}小时提醒`;
-        }else{
-          return '无'
         }
-      }else{
-        if(period){
-          return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
-        }else{
-          return '无'
-        }
+
+        return '无'
+        
       }
+      if(period){
+        return `重复通知：根据${fieldDisplayName + (isahead + hours)}小时，每${period + unit}发出提醒`;
+      }
+      return '无'
     },
   },
   mounted() {
@@ -120,10 +123,12 @@ export default {
       return this.error = false;
     },
     updateFormUser() {
+      if(this.remindTemplate.length <= 0) return this.form.users = [];
+
       let users = [];
       if (this.selectedRemind.isDdResponse) {
         // 内部提醒
-        users = this.selectedRemind.users;
+        users = this.selectedRemind.users || [];
       } else {
         // 外部提醒（默认联系人或者全部联系人）
         if (this.selectedRemind.isDefaultLinkman) {
@@ -135,6 +140,10 @@ export default {
       this.form.users = _.cloneDeep(users);
     },
     async onSubmit() {
+      this.$refs.form.validate(valid => {
+        if(!valid) return false
+      })
+
       if (this.validateUser()) return;
 
       const params = this.buildParams();
@@ -258,7 +267,6 @@ export default {
             .map(contact => {
               return Object.freeze(contact);
             });
-
           if (this.action === 'create') {
             this.updateFormUser();
           } else {
