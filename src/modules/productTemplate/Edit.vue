@@ -106,7 +106,6 @@ export default {
     this.init = true;
   },
   methods: {
-    // TODO: 创建产品模板
     createProductTemplate(params) {
       productTemplateCreate(params)
         .then(res => {
@@ -118,11 +117,13 @@ export default {
             message: !isSucc && res.message
           })
           
-          if(isSucc) window.location.href = `/product/detail/${res.data}`;
+          if(isSucc) {
+            this.reloadTab();
+            window.location.href = `/product/detail/${res.data}`;
+          }
         })
         .catch(err => console.error('err', err));
     },
-    // TODO: 修改产品模板
     editProductTemplate(params) {
       productTemplateUpdate(params)
         .then(res => {
@@ -135,17 +136,18 @@ export default {
           })
 
           if(isSucc) {
-            let fromId = window.frameElement.getAttribute('fromid');
-
-            this.$platform.refreshTab(fromId);
+            this.reloadTab();
             this.goBack();
           }
-          // window.location.href = `/product/template/view/${res.data || this.editId}`;
         })
         .catch(err => console.error('err', err));
     },
     // 返回
     goBack() {
+      if(this.action == 'create') {
+        let id = window.frameElement.dataset.id;
+        return this.$platform.closeTab(id);
+      }
       parent.frameHistoryBack(window);
     },
     // 获取提示信息
@@ -170,6 +172,11 @@ export default {
       })
 
       return product
+    },
+    reloadTab() {
+      let fromId = window.frameElement.getAttribute('fromid');
+
+      this.$platform.refreshTab(fromId);
     },
     // 提交
     submit() {

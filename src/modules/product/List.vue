@@ -10,7 +10,7 @@
           <base-button type="primary" @event="search({resetPageNum: true})" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
         </div>
-        <span class="advanced-search-visible-btn" @click.self="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
+        <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">高级搜索</span>
       </form>
     </div>
 
@@ -222,7 +222,7 @@
           </el-form-item>
 
           <el-form-item label-width="100px" label="选择团队">
-            <biz-team-select v-model="searchModel.tag"/>
+            <biz-team-select v-model="searchModel.tag" :fetch-func="getTeamList"/>
           </el-form-item>
 
           <el-form-item label-width="100px" label="创建时间">
@@ -335,6 +335,13 @@
               </el-date-picker>
             </template>
 
+            <!-- start number  -->
+            <template v-else-if="field.formType === 'number'">
+              <el-input v-model="searchModel[field.fieldName]"
+                        :placeholder="field.placeHolder" type="number"></el-input>
+            </template>
+            <!-- end number  -->
+
             <template v-else>
               <el-input v-model="searchModel[field.fieldName]"
                         :placeholder="field.placeHolder"></el-input>
@@ -409,13 +416,11 @@ import {
   getUpdateRecord,
 } from '@src/api/ProductApi';
 
+import TeamMixin from '@src/mixins/teamMixin';
 
-/**
- *  todo
- *  二维码编号显示
- */
 export default {
   name: 'product-list',
+  mixins: [TeamMixin],
   props: {
     initData: {
       type: Object,
@@ -500,14 +505,18 @@ export default {
           }
         }]
       },
+      filterTeams: []
     }
   },
   computed: {
     auth() {
-      return this.initData.authorities;
+      return this.initData?.loginUser?.authorities || this.initData?.authorities;
     },
     editedPermission() {
       return this.auth.CUSTOMER_EDIT;
+    },
+    viewedPermission() {
+      return this.auth.CUSTOMER_VIEW === 3
     },
     deletePermission() {
       return this.auth.CUSTOMER_EDIT === 3 && this.auth.CUSTOMER_DELETE;
@@ -674,7 +683,9 @@ export default {
     this.search();
     // updateProductRemindCount
 
-    console.log('04634ed8ffbc', this.initData)
+    if(!this.viewedPermission) {
+      this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
+    }
 
     this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
@@ -1156,7 +1167,17 @@ export default {
       })
     },
     goToCreate() {
-      window.location = '/customer/product/create';
+      // window.location = '/customer/product/create';
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'customer_product_create',
+        title: '新建产品',
+        url: '/customer/product/create',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
     getLocalStorageData() {
       const dataStr = localStorage.getItem('product_list_localStorage_19_4_24') || '{}';
@@ -1191,6 +1212,20 @@ export default {
       this.$nextTick(() => {
         this.toggleSelection(selected);
       });
+    },
+    // 获取团队列表
+    getTeamList(params) {
+      return this.getBizTeamList(params, this.filterTeams, this.viewedPermission);
+    },
+    panelSearchAdvancedToggle() {
+      this.advancedSearchPanelShow = !this.advancedSearchPanelShow;
+      this.$nextTick(() => {
+        let forms = document.getElementsByClassName('advanced-search-form');
+        for(let i = 0; i < forms.length; i++) {
+          let form = forms[i];
+          form.setAttribute('novalidate', true)
+        }
+      })
     }
   },
   components: {

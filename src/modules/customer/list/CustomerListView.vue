@@ -421,7 +421,7 @@
       <div slot="tip">
         <div class="base-import-warn">
           <p style="margin: 0">请先下载<a href="/contacts/import/template">导入模版 </a>，填写完成后再上传导入。</p>
-          <p style="margin: 0">联系人导入可以先下载 <a href="/product/import/template">产品数据模版文档</a>，导入信息可以依照此模板填写。</p>
+          <p style="margin: 0">联系人导入可以先下载 <a href="/contacts/import/mesTemplate">产品数据模版文档</a>，导入信息可以依照此模板填写。</p>
           <p style="margin: 0">联系人导入可以先下载 <a href="/contacts/import/getAllCustomerId">客户数据模版文档</a>，导入信息可以依照此模板填写。</p>
         </div>
       </div>

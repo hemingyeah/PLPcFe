@@ -14,7 +14,7 @@
           <base-button type="primary" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="paramsReset">重置</base-button>
         </div>
-        <span class="advanced-search-visible-btn" @click.self="panelTheSearchAdvancedShow = !panelTheSearchAdvancedShow">高级搜索</span>
+        <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">高级搜索</span>
       </form>
       <!-- end 搜索 header -->
 
@@ -1186,7 +1186,17 @@ export default {
     },
     // 产品新建
     productCreate() {
-      window.location = '/product/create';
+      // window.location = '/product/create';
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'product_create',
+        title: '新建产品模板',
+        url: '/product/create',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
     // 产品 删除
     async productDelete() {
@@ -1217,6 +1227,16 @@ export default {
         console.log(`productDelete err ${err}`)
       }
     },
+    panelSearchAdvancedToggle() {
+      this.panelTheSearchAdvancedShow = !this.panelTheSearchAdvancedShow;
+      this.$nextTick(() => {
+        let forms = document.getElementsByClassName('advanced-search-form');
+        for(let i = 0; i < forms.length; i++) {
+          let form = forms[i];
+          form.setAttribute('novalidate', true)
+        }
+      })
+    }
   },
   components: {
     [DialogBatchEditProductTemplate.name]: DialogBatchEditProductTemplate 

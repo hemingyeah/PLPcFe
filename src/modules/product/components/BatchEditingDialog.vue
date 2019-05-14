@@ -37,7 +37,7 @@
         :prop="selectedFieldName"
         :key="selectedFieldName"
         :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'text' || selectedField.formType === 'code'">
+        v-else-if="selectedField.formType === 'text' || selectedField.formType === 'code' || selectedField.formType === 'phone'">
         <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50"
                   type="text"></el-input>
       </el-form-item>
@@ -218,8 +218,6 @@ export default {
     selectedField() {
       return this.editableFields.filter(ef => ef.fieldName === this.selectedFieldName)[0] || {};
     }
-  },
-  mounted() {
   },
   methods: {
     async onSubmit() {

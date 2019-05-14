@@ -411,7 +411,10 @@ export default {
     },
     createCode() {
       if(!this.product.qrcodeId) return;
+      if(!this.$refs.qrcode) return 
+      
       let url = `${window.location.origin}/qrcode/${this.initData.domain}?qrcodeId=${this.product.qrcodeId}`;
+
       this.$refs.qrcode.innerHTML = '';
       this.$nextTick(() => {
         let qrcode = new QRCode(this.$refs.qrcode, {
@@ -541,15 +544,15 @@ export default {
           slotName: 'record-tab',
           show: true,
         }, {
-          displayName: `相关工单(${this.statisticalData.taskQuantity || 0})`,
+          displayName: `工单(${this.statisticalData.unfinishedTaskQuantity || 0}/${this.statisticalData.taskQuantity || 0})`,
           component: TaskTable.name,
           show: true,
         }, {
-          displayName: `相关事件(${this.statisticalData.eventQuantity || 0})`,
+          displayName: `事件(${this.statisticalData.unfinishedEventQuantity || 0}/${this.statisticalData.eventQuantity || 0})`,
           component: EventTable.name,
           show: true,
         }, {
-          displayName: `计划工单(${this.statisticalData.plantaskQuantity || 0})`,
+          displayName: `计划任务(${this.statisticalData.plantaskQuantity || 0})`,
           component: PlanTable.name,
           show: true,
         }, {

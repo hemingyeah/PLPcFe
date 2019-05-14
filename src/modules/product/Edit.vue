@@ -136,6 +136,13 @@ export default {
                 type: 'success',
               });
 
+              if(this.action == 'create') {
+                this.reloadTab();
+              } else {
+                let fromId = window.frameElement.getAttribute('fromid');
+                this.$platform.refreshTab(fromId);
+              }
+
               if (this.customer) {
                 window.location.href = `/customer/view/${this.customer.id}`;
               } else {
@@ -150,8 +157,17 @@ export default {
         })
     },
     goBack() {
+      if(this.action == 'create') {
+        let id = window.frameElement.dataset.id;
+        return this.$platform.closeTab(id);
+      }
       parent.frameHistoryBack(window);
-    }
+    },
+    reloadTab() {
+      let fromId = window.frameElement.getAttribute('fromid');
+
+      this.$platform.refreshTab(fromId);
+    },
   },
   components: {
     [ProductEditForm.name]: ProductEditForm,
