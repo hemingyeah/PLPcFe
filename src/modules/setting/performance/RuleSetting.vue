@@ -237,6 +237,7 @@ export default {
 
   .rule-setting-container {
     background: #ffffff;
+    padding: 10px;
 
     .rule-section-title {
       display: flex;

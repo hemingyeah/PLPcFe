@@ -48,9 +48,10 @@
             :value="item.value">
           </el-option>
         </el-select>
-
-        <div v-if="!form.effectCondition" class="special-condition-wrap">
-          <span class="ordinary-text">负责人{{conditionConfig.label}}</span>
+      </el-form-item>
+      <el-form-item class="base-condition-wrap">
+        <div v-if="!form.effectCondition" class="special-condition-wrap" >
+          <span class="ordinary-text" style="padding-left: 0;padding-right: 20px;">负责人{{conditionConfig.label}}</span>
           <el-tooltip :content="conditionConfig.tip" placement="top" effect="light">
             <el-input v-model="form.rules[0].executorScore" @change="validate" :class="{'input-is-error': formValidationResult.rules[0].fields.some(v => v === 'executorScore')}" class="count-input" placeholder="请输入内容"></el-input>
           </el-tooltip>
@@ -151,17 +152,33 @@ export default {
       ],
       calculations: [
         {
-          label: '按毛利',
+          label: '按工单数量',
+          value: 'amount'
+        },
+        {
+          label: '按工单毛利',
           value: 'profit'
         },
         {
-          label: '按营收金额',
+          label: '按工单营收',
           value: 'sale'
         },
         {
-          label: '按工单数量',
-          value: 'amount'
-        }
+          label: '按工单备件营收',
+          value: 'sparePartSale'
+        },
+        {
+          label: '按工单备件毛利',
+          value: 'sparePartProfit'
+        },
+        {
+          label: '按工单服务项目营收',
+          value: 'serviceSale'
+        },
+        {
+          label: '按工单服务项目毛利',
+          value: 'serviceProfit'
+        },
       ],
       categories: [
         {
@@ -397,28 +414,57 @@ export default {
         }
       }
 
-      if (ruleType && rewardType !== 'amount') {
+      if (rewardType === 'amount') {
         return {
-          label: `每单得${rewardType === 'profit' ? '毛利的' : '营收的'}`,
-          unit: '%',
+          label: '每单得',
+          unit: '元',
           prefix,
-          tip: '请输入数字，可以有一位小数，最大100'
-        }
+          tip: '请输入数字，可以有一位小数，最大9999'
+        };
+      }
+
+      let label = '';
+
+
+      switch (rewardType) {
+      case 'profit':
+        label = '毛利的';
+        break;
+      case 'sale':
+        label = '营收的';
+        break;
+      case 'sparePartSale':
+        label = '工单备件营收的';
+        break;
+      case 'sparePartProfit':
+        label = '工单备件毛利的';
+        break;
+      case 'serviceSale':
+        label = '服务项目营收的';
+        break;
+      case 'serviceProfit':
+        label = '服务项目毛利的';
+        break;
+      default:
+        label = '';
+        break;
       }
 
       return {
-        label: '每单得',
+        label: `每单得${label}`,
         unit: '元',
         prefix,
-        tip: '请输入数字，可以有一位小数，最大9999'
-      };
+        tip: '请输入数字，可以有一位小数，最大100'
+      }
+
+
     },
     title() {
       return this.performanceRule.id ? '编辑绩效规则' : '新增绩效规则';
     },
     action() {
       return this.performanceRule.id ? 'edit' : 'create';
-    }
+    },
   },
   methods: {
     onSubmit() {
@@ -850,6 +896,7 @@ export default {
   .base-condition-wrap {
     .el-form-item__content {
       display: flex;
+      flex-wrap: wrap;
     }
     .special-condition-wrap {
       .el-input {

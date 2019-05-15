@@ -6,6 +6,7 @@
     </div>
 
     <div class="function-area">
+      <base-setting />
       <rule-setting :init-data="initData"></rule-setting>
     </div>
   </div>
@@ -13,6 +14,7 @@
 
 <script>
 import RuleSetting from './RuleSetting.vue';
+import BaseSetting from './BaseSetting.vue';
 
 export default {
   name: 'performance-setting-view',
@@ -27,6 +29,7 @@ export default {
   },
   components: {
     [RuleSetting.name]: RuleSetting,
+    [BaseSetting.name]: BaseSetting,
   }
 }
 </script>
@@ -66,8 +69,6 @@ export default {
     .function-area {
       width: 70%;
       flex-grow: 1;
-      padding: 10px;
-      background: #fff;
     }
   }
 
