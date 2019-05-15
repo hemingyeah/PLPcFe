@@ -75,7 +75,7 @@ export default {
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
 
-        if (nv) {
+        if (nv !== null && f.fieldName != 'customer' && f.fieldName != 'template') {
           this.update(({
             field: f,
             newValue: nv
