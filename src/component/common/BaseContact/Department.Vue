@@ -520,14 +520,8 @@ export default {
     },
     /* 查询是否开启 降低组织架构的开关 */
     getSeeAllOrg() {
-      return new Promise((resolve, reject) => {
-        http.post('/setting/user/getSeeAllOrg').then(result => { 
-          if(result.status == 0) {
-            resolve(result)
-          } else {
-            reject(result)
-          }
-        })
+      return http.post('/setting/user/getSeeAllOrg').then(result => { 
+          return result
       })
       
     }
