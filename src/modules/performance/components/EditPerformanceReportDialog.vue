@@ -20,8 +20,8 @@
           <el-input :value="ruleDesc" type="textarea" readonly></el-input>
         </el-form-item>
         <h3>报告统计对象</h3>
-        <el-form-item label="统计以下对象" class="target-group">
-          <el-select v-model="form.range" placeholder="请选择(默认选择全部人员)" @change="form.target = []" style="width: 130px;">
+        <el-form-item label="统计以下对象" style="position: relative">
+          <el-select v-model="form.range" placeholder="请选择" @change="form.target = []" style="width: 130px;">
             <el-option
               v-for="item in rangeOptions"
               :key="item.value"
@@ -29,7 +29,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-if="!form.range" v-model="form.target" multiple collapse-tags clearable filterable @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 315px;margin-left: 15px;" placeholder="请选择(默认选择全部人员)">
+          <el-select v-model="form.target" multiple collapse-tags clearable filterable @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 240px;" placeholder="请选择">
             <el-option
               v-for="item in targetOptions"
               :key="item.value"
@@ -37,11 +37,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-
-
-          <biz-team-select v-else multiple v-model="form.target" placeholder="请选择团队(默认选择全部团队)" :fetch-func="fetchTeam"></biz-team-select>
-
-          <!--<el-button plain @click="selectAll">选择全部</el-button>-->
+          <el-button plain @click="selectAll">选择全部</el-button>
 
           <div v-if="!formValidation.target" class="target-is-error">
             请选择统计对象
@@ -59,7 +55,6 @@
           </el-select>
 
         </el-form-item>
-
         <div class="customized-label">
 
           <span v-if="!form.state" class="el-form-item__label">完成时间</span>
@@ -96,6 +91,33 @@
           <el-input v-model="form.remarks" type="textarea" :maxlength="500"></el-input>
           <p style="color: #999;">* 生成绩效报告的时间取决于选择的数据量，如遇长时间等待请稍后刷新</p>
         </el-form-item>
+
+        <el-form-item label="抄送人" >
+          <el-select v-model="form.ccIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择">
+            <el-option
+              v-for="item in targetOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+
+        </el-form-item>
+
+        <el-form-item label="审核人">
+          <el-select v-model="form.ccIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择" disabled>
+            <el-option
+              v-for="item in targetOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="发布流程">
+          <approve-process stage="create"></approve-process>
+        </el-form-item>
       </el-form>
       <div class="dialog-footer">
         <el-button @click="visible = false">取 消</el-button>
@@ -123,6 +145,9 @@
               <template v-else-if="column.field === 'executor'">
                 {{scope.row[column.field].displayName}}
               </template>
+              <!--<template v-else-if="column.field === 'settlement'">-->
+                <!--{{scope.row[column.field]}}-->
+              <!--</template>-->
               <template v-else>
                 {{scope.row[column.field]}}
               </template>
@@ -153,7 +178,8 @@
 <script>
 import { formatDate } from '@src/util/lang';
 import {createPerformanceReport} from '@src/api/PerformanceApi';
-import * as TeamApi from '@src/api/TeamApi'
+import ApproveProcess from './ApproveProcess.vue'
+
 
 export default {
   name: 'edit-performance-report-dialog',
@@ -236,6 +262,7 @@ export default {
         time: [],
         range: 0,
         target: [],
+        ccIds: [],
         state: 0,
         timeType: 0,
         remarks: '',
@@ -321,9 +348,6 @@ export default {
     }
   },
   methods: {
-    fetchTeam(params) {
-      return TeamApi.tagList(params);
-    },
     confirmCreateReport(sign) {
       let params = {
         ...this.buildParams(),
@@ -400,19 +424,7 @@ export default {
         });
     },
     buildParams() {
-      const {ruleId, reportName, time, range, state, remarks, sign, timeType} = this.form;
-      let target = '';
-
-      if (this.form.target && this.form.target.length) {
-        if (!range) {
-          target = this.form.target.join(',')
-        } else {
-          target = this.form.target.map(({id}) => id).join(',')
-        }
-      } else {
-        target = 'isAll';
-      }
-
+      const {ruleId, reportName, time, target, range, state, remarks, sign, timeType, ccIds} = this.form;
       return {
         ruleId,
         reportName,
@@ -421,7 +433,8 @@ export default {
         remarks,
         startTime: `${formatDate(time[0], 'YYYY-MM-DD')} 00:00:00`,
         endTime: `${formatDate(time[1], 'YYYY-MM-DD') } 23:59:59`,
-        [range ? 'teams' : 'users']: target,
+        [range ? 'teams' : 'users']: target.join(','),
+        ccIds: ccIds.join(','),
         sign,
       }
     },
@@ -465,7 +478,7 @@ export default {
       return keys.map(key => {
         val = this.form[key];
         // 8035200000 ms = 93 days
-        // if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
+        if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
         if (key === 'time') return this.formValidation[key] = Array.isArray(val) && !!val.length && new Date(this.form.time[1]) - new Date(this.form.time[0]) <= 8035200000;
 
         return this.formValidation[key] = !!val
@@ -487,6 +500,7 @@ export default {
         time: [],
         range: 0,
         target: [],
+        ccIds: [],
         state: 0,
         timeType: 0,
         remarks: '',
@@ -502,6 +516,9 @@ export default {
       }
     }
   },
+  components: {
+    [ApproveProcess.name]: ApproveProcess,
+  }
 }
 </script>
 
@@ -532,15 +549,6 @@ export default {
   font-size: 12px;
   padding: 3px 0 0 0px;
   line-height: 16px;
-}
-
-.target-group .el-form-item__content{
-  display: flex;
-
-  .biz-team-select {
-    width: 315px;
-    margin-left: 15px;
-  }
 }
 
 .customized-label {
