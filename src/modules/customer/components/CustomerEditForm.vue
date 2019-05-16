@@ -226,7 +226,8 @@ export default {
           id: item.id,
           tagName: item.tagName
         }))
-        .filter(tag => this.teamsWithChildTag.some(t => tag.id == t.id))
+          .filter(tag => !this.isFilterTag || this.teamsWithChildTag.some(t => tag.id == t.id))
+
 
         this.$emit('input', this.value)
       } catch (error) {
