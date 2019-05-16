@@ -4,8 +4,7 @@
       <div class="code">
         <div ref="qrcode"></div>
         <p v-if="params.addQrcodeId">{{qrcodeId}}</p>
-        <p v-if="params.addTenant">{{codeData.nickname}}</p>
-
+        <p v-if="params.addTenant">{{codeData.nickName}}</p>
       </div>
       <dl>
         <dt>二维码附件信息</dt>

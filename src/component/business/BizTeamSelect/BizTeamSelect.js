@@ -405,7 +405,7 @@ const BizTeamSelect = {
     )
   },
   mounted(){
-    document.addEventListener('click', this.onClose);
+    document.addEventListener('click', this.onClose, true);
   },
   beforeDestroy(){
     // 销毁popper
@@ -417,7 +417,7 @@ const BizTeamSelect = {
     }
   },
   destroyed(){
-    document.removeEventListener('click', this.onClose);
+    document.removeEventListener('click', this.onClose, true);
   }
 }
 
