@@ -98,8 +98,21 @@ export default {
        * @param {*} origin 原始值
        * @param {*} target 待合并的值
        */
+      
+      this.form = FormUtil.initialize(this.productFields, form, function (fields, data) {
+        let index = fields.findIndex(f => f.fieldName == 'type');
+        let typeField = fields[index]
+      
+        if(typeField) {
+          let options = typeField.setting.dataSource || [];
 
-      this.form = FormUtil.initialize(this.productFields, form, this.form);
+          if(!typeField.defaultValue && !data.type) {
+            data.type = options[0]
+          }
+        }
+
+        return data
+      })
 
       this.init = true;
     } catch (e) {

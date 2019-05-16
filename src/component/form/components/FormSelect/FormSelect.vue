@@ -3,7 +3,7 @@
     <el-select
       :id="`form_${field.fieldName}`"
       :placeholder="placeholder"
-      clearable
+      :clearable="clearable"
       :multiple="isMulti"
       ref="elSelect"
       filterable
@@ -28,6 +28,10 @@ export default {
     value: [String, Array],
     source: {
       type: Array
+    },
+    clearable: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {

@@ -16,7 +16,27 @@
 
       <!-- start form builder -->
       <form-builder ref="productTemplateEditForm" :fields="fields" :value="form" @update="update">
-        
+
+        <!-- start 产品类型 -->
+        <template slot="type" slot-scope="{field}">
+          <form-item :label="field.displayName" validation>
+            <div class="input-and-btn">
+              <form-select
+                :field="field" 
+                :source="field.setting.dataSource.map(d => {
+                  return {
+                    text: d,
+                    value: d
+                  }
+                }) || []"
+                v-model="form.type"
+                :clearable="false"
+                :placeholder="genPlaceholder(field)"/>
+            </div>
+          </form-item>
+        </template>
+      <!-- end 产品类型 -->
+
       </form-builder>
       <!-- end form builder -->
 
@@ -102,7 +122,20 @@ export default {
       }
       
     }
-    this.form = FormUtil.initialize(this.fields, form);
+    this.form = FormUtil.initialize(this.fields, form, function (fields, data) {
+      let index = fields.findIndex(f => f.fieldName == 'type');
+      let typeField = fields[index]
+      
+      if(typeField) {
+        let options = typeField.setting.dataSource || [];
+
+        if(!typeField.defaultValue && !data.type) {
+          data.type = options[0]
+        }
+      }
+
+      return data
+    });
     this.init = true;
   },
   methods: {

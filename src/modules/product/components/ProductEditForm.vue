@@ -25,6 +25,26 @@
         </form-item>
       </template>
 
+      <!-- start 产品类型 -->
+      <template slot="type" slot-scope="{field}">
+        <form-item :label="field.displayName" validation>
+          <div class="input-and-btn">
+            <form-select
+              :field="field" 
+              :source="field.setting.dataSource.map(d => {
+                return {
+                  text: d,
+                  value: d
+                }
+              }) || []"
+              v-model="value.type"
+              :clearable="false"
+              :placeholder="genPlaceholder(field)"/>
+          </div>
+        </form-item>
+      </template>
+      <!-- end 产品类型 -->
+
     </form-builder>
   </div>
 </template>CustomerEditView
