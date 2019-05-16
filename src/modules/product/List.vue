@@ -681,7 +681,6 @@ export default {
     this.buildColumns();
     this.addCustomizedFieldToSearchModel();
     this.search();
-    // updateProductRemindCount
 
     if(!this.viewedPermission) {
       this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
@@ -730,7 +729,7 @@ export default {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: `customer_view_${productId}`,
+        id: `product_view_${productId}`,
         title: '产品详情',
         close: true,
         url: `/customer/product/view/${productId}?noHistory=1`,
@@ -916,6 +915,9 @@ export default {
 
           return product;
         })
+
+      this.matchSelected();
+
     },
     // table method
     handleSelection(selection) {

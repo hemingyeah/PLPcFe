@@ -406,6 +406,7 @@ export default {
         });
         
         this.fetchAttentionUsers();
+        this.fetchStatisticalData();
         this.$eventBus.$emit('customer_info_record.update_record_list');
       } catch(e){
         if(e instanceof Exception){

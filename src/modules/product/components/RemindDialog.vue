@@ -39,7 +39,7 @@
         width="410"
         trigger="hover">
         <div>
-          提示：提醒规则在系统设置-客户设置-自动提醒设置中添加
+          提示：提醒规则在系统设置-产品设置-自动提醒设置中添加
         </div>
         <i class="iconfont icon-question" slot="reference"></i>
       </el-popover>
