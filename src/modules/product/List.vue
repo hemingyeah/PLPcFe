@@ -932,7 +932,7 @@ export default {
       if (tv.length > this.selectedLimit) {
 
         unSelected.forEach(row => {
-          this.$refs.productTemplateTable.toggleRowSelection(row, false);
+          this.$refs.multipleTable.toggleRowSelection(row, false);
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
