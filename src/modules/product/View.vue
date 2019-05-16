@@ -2,7 +2,7 @@
   <div class="product-view-container">
     <div class="product-tool-bar">
       <div class="product-toolbar-left" v-if="allowBack || !isDelete">
-        <button type="button" class="btn btn-text" @click="goBack" v-if="allowBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
+        <!-- <button type="button" class="btn btn-text" @click="goBack" v-if="allowBack"><i class="iconfont icon-arrow-left"></i> 返回</button> -->
         <template>
           <button type="button" class="btn btn-text" @click="editProduct" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
           <button type="button" class="btn btn-text" @click="deleteProduct" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>

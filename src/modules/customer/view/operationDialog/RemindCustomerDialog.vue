@@ -95,9 +95,10 @@ export default {
       return this.remindTemplate.filter(rt => rt.id === this.form.remindId)[0] || {};
     },
     remindRule() {
-      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit,} = this.selectedRemind;
+      const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit, timeUnit} = this.selectedRemind;
       let unit = periodUnit === 'day' ? '天' : (periodUnit === 'week' ? '周' : '月');
       let isahead = isAhead ? '前' : '后';
+      let dorh = (timeUnit == 'hour' || !timeUnit) ? '小时' : '天';
       // 按顺序的
       if (!isRepeat){
         if(fieldDisplayName){

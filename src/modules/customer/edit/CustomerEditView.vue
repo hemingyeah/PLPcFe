@@ -69,7 +69,7 @@ export default {
     },
     submit() {
       this.submitting = true;
-      this.$refs.customerEditForm.validate()
+      this.$refs.form.validate()
         .then(valid => {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
