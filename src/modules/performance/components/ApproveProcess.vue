@@ -41,7 +41,7 @@ export default {
     stage: {
       type: String,
       default: '',
-    }
+    },
   },
   data() {
     return {}
@@ -99,6 +99,7 @@ export default {
       h5 {
         margin: 0;
         margin-top: 12px;
+        font-weight: normal;
       }
     }
 
