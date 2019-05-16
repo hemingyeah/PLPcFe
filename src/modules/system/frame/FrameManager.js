@@ -75,8 +75,8 @@ const FrameManager = {
       // 为该frame添加事件
       this.$nextTick(() => {
         let frame = document.getElementById(`frame_tab_${tab.id}`);
-        if (frame == null) return;
-
+        if(!frame) return 
+        
         let frameWindow = frame.contentWindow;
 
         // frame页面卸载时，重置刷新icon
@@ -91,7 +91,9 @@ const FrameManager = {
     // 关闭frameTab
     closeFrameTab(frameTab){
       // sessionStorage.removeItem('customer_list_search_status');
-  
+      
+      if(!frameTab.closeable) return;
+
       // TODO:迁移完成后删除
       localStorage.removeItem(`frame_tab_${ frameTab.id }_idArray`);
 
@@ -261,6 +263,8 @@ const FrameManager = {
     adjustFrameTabs: _.debounce(function(tab){    
       let scrollEl = this.$refs.scroll;
       let listEl = this.$refs.list;
+
+      if(!scrollEl) return 
       
       let scrollOffsetWidth = scrollEl.offsetWidth; // 外层容器的宽度
       let listOffsetWidth = listEl.offsetWidth; // tab list的宽度

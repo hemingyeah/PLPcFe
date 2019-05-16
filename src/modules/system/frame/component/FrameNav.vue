@@ -24,18 +24,16 @@
               </template>
             </a>
 
-            <el-collapse-transition>
-              <ul 
-                :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
-                v-show="!collapse && menu == currMenu">
-                <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
-                <template v-for="menu in menu.children">
-                  <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}" :key="menu.menuKey">
-                    <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
-                  </li>
-                </template>
-              </ul>
-            </el-collapse-transition>
+            <ul 
+              :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
+              v-show="!collapse && menu == currMenu">
+              <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
+              <template v-for="menu in menu.children">
+                <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}" :key="menu.menuKey">
+                  <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+                </li>
+              </template>
+            </ul>
           </li>
         </template>
       </ul>
@@ -67,8 +65,8 @@ export default {
     let {menus} = this.buildMenus(originMenus, null);
 
     return {
-      originMenus: originMenus,
-      menus: menus,
+      originMenus,
+      menus,
       menuIcon: MenuIcon,
       currMenu: null
     };
@@ -80,7 +78,7 @@ export default {
   },
   methods: {
     navTransitionEnd(event){
-      //只监听nav宽段变化
+      // 只监听nav宽段变化
       if(event.target != this.$el || event.propertyName != 'width') return;
       this.$emit('collapse-changed')
     },
@@ -111,7 +109,7 @@ export default {
       return {menus, otherMenus};
     },
     open(menu){
-      //如果有子菜单，展开子菜单
+      // 如果有子菜单，展开子菜单
       if(menu.children && menu.children.length > 0) {
         this.currMenu = this.currMenu == menu ? null : menu;
         this.$emit('update:collapse', false);

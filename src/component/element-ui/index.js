@@ -32,6 +32,8 @@ import {
   Switch,
   Tag,
   Tooltip,
+  Steps,
+  Step
 } from 'element-ui';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
@@ -68,6 +70,8 @@ const ElementUI = {
     Vue.use(Switch);
     Vue.use(Tag);
     Vue.use(Tooltip);
+    Vue.use(Steps);
+    Vue.use(Step);
     
     Vue.component(CollapseTransition.name, CollapseTransition);
   }

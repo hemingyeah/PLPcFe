@@ -1,6 +1,9 @@
 //$-header-hover-color:  #CFEAE9;
 
-html, body, .frame{
+html,
+body,
+.frame,
+.shb-main {
   height: 100%;
   overflow: hidden;
   background-color: #fff;
@@ -567,3 +570,44 @@ button.export-operate-btn{
     transform: translateX(-100%);
   }
 }
+
+
+/* --------  start 用户向导 ---------------- */
+.user-guide-view {
+  height: 100%;
+}
+.user-guide-modal-dialog {
+
+  .base-modal {
+    height: 620px;
+    width: 980px !important;
+    margin: auto auto;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    .base-modal-body {
+      height: 579px;
+    }
+  }
+  .base-modal-header-close {
+    display: none;
+  }
+}
+.base-modal-header-hidden {
+  .base-modal-header {
+    display: none;
+  }
+  .base-modal {
+    .base-modal-body {
+      height: 620px;
+    }
+  }
+  .guide-view-content {
+    padding-top: 0;
+  }
+}
+/* --------  end 用户向导 ---------------- */

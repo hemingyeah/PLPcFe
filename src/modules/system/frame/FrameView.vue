@@ -1,10 +1,11 @@
 <template>
-  <div class="frame">
-    <frame-nav 
-      :collapse.sync="collapse" 
-      :source="initData.menus" 
-      @open="openForNav"
-      @collapse-changed="adjustOpenTab"/>
+  <div class="shb-main">
+    <div class="frame">
+      <frame-nav 
+        :collapse.sync="collapse" 
+        :source="initData.menus" 
+        @open="openForNav"
+        @collapse-changed="adjustOpenTab"/>
 
     <div class="frame-content">
       <header class="frame-header">
@@ -152,10 +153,23 @@
       </div>
     </div>
 
-    <version :version="releaseVersion"/>
-    <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
-    <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum" @getNum="getNum"></notification-center>
+      <version :version="releaseVersion"/>
+      <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
+      <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum" @getNum="getNum"></notification-center>
     <!-- <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu> -->
+    </div>
+    <!-- star 用户向导 -->
+    <base-modal :show.sync="isShowUserGuide" width="600px" class="user-guide-modal-dialog" :class="isGuideLast ? 'base-modal-header-hidden' : ''">
+      <div slot="title">
+        <h3 class="user-guide-modal-header" slot="reference">立刻设置您的个性化系统</h3>
+      </div>
+      <div class="user-guide-view" @click.prevent>
+        <guide-view :init-data="initData" @isLast="guideLast" @guideUpdateModalShow="guideUpdateModalShow">
+        </guide-view>
+      </div>
+    </base-modal>
+    <!-- end 用户向导 -->
+
   </div>
 </template>
 
@@ -175,17 +189,15 @@ import DefaultHead from '@src/assets/img/user-avatar.png';
 import NotificationCenter from './component/NotificationCenter.vue'
 import * as NotificationApi from '@src/api/NotificationApi';
 
+// 用户向导
+import GuideView from './../guide/GuideView.vue'
+
 const NOTIFICATION_TIME = 1000 * 60 * 10
 
 export default {
   mixins: [FrameManager],
   name: 'frame-view',
-  props: {
-    initData: {
-      type: Object,
-      default: () => ({})
-    }
-  },
+  inject: ['initData'],
   data(){
     return {
       notificationInfo: {},
@@ -210,6 +222,10 @@ export default {
       exportTimer: null,
       exportList: [],
       operationList: [],
+
+      // 用户向导
+      isShowUserGuide: false,
+      isGuideLast: false,
     }
   },
   computed: {
@@ -283,7 +299,6 @@ export default {
     },
     updateUserState(state){
       this.loginUser.state = state;
-      // TODO: 判断是否打开个人中心，如果打开了，就刷新tab
     },
     async logout(){
       if(await platform.confirm('您确定要退出系统吗？')){
@@ -463,6 +478,12 @@ export default {
         url: '/setting/product/fields',
         reload: true,
       });
+    },
+    guideLast(data) {
+      this.isGuideLast = data;
+    },
+    guideUpdateModalShow() {
+      this.isShowUserGuide = false;
     }
   },
   created(){
@@ -480,6 +501,14 @@ export default {
     setInterval(() => {
       this.getSystemMsg();
     }, NOTIFICATION_TIME);
+
+    let userGuide = this?.initData?.userGuide === true || false;
+    // let userGuide = true;
+
+    if(userGuide) {
+      this.isShowUserGuide = true;
+    }
+
   },
   mounted(){
     this.checkExports();
@@ -490,7 +519,8 @@ export default {
     [Version.name]: Version,
     [SaleManager.name]: SaleManager,
     [NotificationCenter.name]: NotificationCenter,
-    [ImportAndExport.name]: ImportAndExport
+    [ImportAndExport.name]: ImportAndExport,
+    [GuideView.name]: GuideView
   }
 }
 </script>

@@ -18,6 +18,7 @@ import BaseContextMenu from './common/BaseContextMenu'
 import BaseTable from './common/BaseTable';
 import BaseDistPicker from './common/BaseDistPicker';
 import BaseWindow from './common/BaseWindow';
+import BaseSteps from './common/BaseSteps';
 
 // 可快速调用的组件
 import BaseMapDisplay from './common/BaseMapDisplay';
@@ -50,6 +51,7 @@ const components = [
   BaseSpin,
   BaseButton,
   BaseSelect,
+  BaseSteps,
 
   BaseContextMenu,
   BaseTable,

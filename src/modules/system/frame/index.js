@@ -10,19 +10,18 @@ let initData = {};
 try {
   initData = JSON.parse(window._init);
 } catch (error) {
-  console.error(error);
+  console.error(error)
   console.error('no init data')
 }
 
-const FrameViewComp = Vue.extend(FrameView);
-const app = new FrameViewComp({
-  propsData: {
-    initData
-  }
+const app = new Vue({
+  provide: {
+    initData: Object.freeze(initData)
+  },
+  render: h => h(FrameView),
+  el: '#app'
 });
 
 if(window.DingTalkPC) dingtalk.sign(initData.ddConfig);
-
-app.$mount('#app');
 
 export default app;
