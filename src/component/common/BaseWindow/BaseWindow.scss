@@ -1,0 +1,39 @@
+.base-window {
+  position: fixed;
+  z-index: 1000;
+
+  display: flex;
+  flex-flow: column nowrap;
+
+  background-color: #fff;
+  border-radius: 1px;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.35);
+}
+
+.base-window-header {
+  display: flex;
+  flex-flow: row nowrap; 
+  align-items: center;
+  background-color: #fff;
+  align-items: center;
+  user-select: none;
+
+  & h3 {
+    flex: 1;
+    margin: 0;
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+/* ------------------ zoom ------------------ */
+.zoom-enter-active, .zoom-leave-active {
+  transition: opacity ease .3s, transform ease .3s;
+}
+.zoom-enter, .zoom-leave-to {
+  opacity: 0;
+  transform: scale(.5);
+}

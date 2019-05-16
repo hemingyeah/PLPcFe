@@ -1,5 +1,5 @@
 const path = require('path');
-const modules = require('./modules')
+const modules = require('../modules')
 
 //https://github.com/jantimon/html-webpack-plugin
 const HtmlWebpackPlugin = require('html-webpack-plugin');

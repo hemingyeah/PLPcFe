@@ -17,6 +17,7 @@ import BaseSelect from './common/BaseSelect';
 import BaseContextMenu from './common/BaseContextMenu'
 import BaseTable from './common/BaseTable';
 import BaseDistPicker from './common/BaseDistPicker';
+import BaseWindow from './common/BaseWindow';
 
 // 可快速调用的组件
 import BaseMapDisplay from './common/BaseMapDisplay';
@@ -54,7 +55,8 @@ const components = [
   BaseTable,
   
   BizUserSelect,
-  BizTeamSelect
+  BizTeamSelect,
+  BaseWindow
 ];
 
 export default {
