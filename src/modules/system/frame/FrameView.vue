@@ -405,7 +405,7 @@ export default {
     closeNotification () {
       this.notificationShow = false;
       sessionStorage.setItem('shb_systemMsg', this.notificationInfo.msgSystem.id);
-      // this.clearAnimation();
+      this.clearAnimation();
     },
 
     // 获取系统消息，本地存储，超出滚动
@@ -425,7 +425,7 @@ export default {
           if(this.notificationInfo.msgSystem && (!msgSystem || msgSystem != this.notificationInfo.msgSystem.id)) {
             this.notification.title = info.data.msgSystem.title;
             this.notificationShow = true;
-            // this.setAnimation();
+            this.setAnimation();
           } else {
             this.notification.title = null;
             this.notificationShow = false;
@@ -440,7 +440,7 @@ export default {
     setAnimation () {
       this.$nextTick(() => {
         let textWidth = this.$refs.notificationText.offsetWidth;
-        let infoWidth = this.$refs.notificationInfo.offsetWidth;
+        let infoWidth = this.$refs.notificationInfo.offsetWidth - 30;
         if(textWidth > infoWidth) {
           let time = this.notification.title.length / 4;
           this.$refs.notificationContent.style.animation = `text-scroll ${time}s linear infinite`;
