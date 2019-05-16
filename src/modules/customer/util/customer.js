@@ -29,17 +29,17 @@ export function packToCustomer(fields, form, initTags){
     if(fieldName == 'tags'){
       let tags = Array.isArray(value) ? value : [];
       // COMMENT: 暂时去除团队
-      // customer.tags = tags.map(item => ({
-      //   id: item.id,
-      //   tagName: item.tagName
-      // }))
-      customer.tags = tags.map(tag => {
-        let t = initTags.find(initTag => initTag.id == tag);
-        return {
-          id: t.id,
-          tagName: t.tagName
-        }
-      })
+      customer.tags = tags.map(item => ({
+        id: item.id,
+        tagName: item.tagName
+      }))
+      // customer.tags = tags.map(tag => {
+      //   let t = initTags.find(initTag => initTag.id == tag);
+      //   return {
+      //     id: t.id,
+      //     tagName: t.tagName
+      //   }
+      // })
       return
     }
 
@@ -77,8 +77,8 @@ export function packToForm(field, data, defaultAddress = {}){
       addressType: cusAdr.addressType || 0
     },
     // COMMENT: 暂时去除团队
-    // tags: toArray(data.tags),
-    tags: toArray(data.tags).map(item => item.id),
+    tags: toArray(data.tags),
+    // tags: toArray(data.tags).map(item => item.id),
     manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
   };
 }
