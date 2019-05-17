@@ -19,8 +19,16 @@
 </template>
 
 <script>
+import {publishPerformance} from '@src/api/PerformanceApi';
+
 export default {
   name: 'publish-report',
+  props: {
+    publishData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       visible: false,
@@ -34,7 +42,35 @@ export default {
   mounted() {
   },
   methods: {
+    open() {
+
+      this.visible = true;
+    },
     send() {
+
+      publishPerformance({
+        reportId: this.publishData.reportId,
+        isAdvice: false,
+        isRanking: false,
+      })
+        .then(res => {
+          if (res.status) return this.$platform.notification({
+            title: '发布失败',
+            message: res.message || '',
+            type: 'error',
+          });
+
+          this.visible = false;
+
+          this.$platform.notification({
+            title: '发布成功',
+            type: 'success',
+          });
+
+          return window.location.reload()
+
+        })
+        .catch(e => console.error('e', e));
 
     },
     reset() {

@@ -116,6 +116,90 @@ function deletePerformanceReports(params) {
   return http.post('/performance/v2/delete/report_desc/by_report_id', params, false);
 }
 
+/**
+ * 绩效报告选项设置是否发送抄送人
+ * @param params
+ * @param.flag {Boolean} - 是否发送抄送人
+ * @returns {*}
+ */
+function setCcForReport(params) {
+  return http.post('/performance/v2/send_cc', params, false)
+}
+
+/**
+ * 获取绩效报告的审核人
+ * @param params {}
+ * @returns {*}
+ */
+function getApprovePerson(params) {
+  return http.get('/performance/v2/get/init_reviewers', params)
+}
+
+/**
+ *  绩效报告选项设置查看有运营分析的用户列表
+ * @param params
+ * @param.keyword
+ * @param.pageNum
+ * @param.pageSize
+ * @returns {*}
+ */
+function getApprovePersonList(params) {
+  return http.post('/performance/v2/reviewers/list', params)
+}
+
+/**
+ * 绩效报告选项设置保存审核人信息
+ * @param params
+ * @param.reviewIds 审核人人ids，拼接id，逗号分隔
+ * @returns {*}
+ */
+function setApprovePerson(params) {
+  return http.post('/performance/v2/save/reviewers', params, false);
+}
+
+/**
+ *
+ * @param params
+ * @param.reportId {String} 报告id
+ * @param.approveRemark {String}
+ * @returns {*}
+ */
+
+function submitApprove(params) {
+  return http.post('/performance/v2/report/submit/approve', params, false);
+}
+
+/**
+ *
+ * @param params
+ * @param.reportId {String} 报告id
+ * @returns {*}
+ */
+
+function cancelApprove(params) {
+  return http.post('/approve/offApprove/report', params, false);
+}
+
+/**
+ *
+ * @param params
+ * @param.reportId {String} 报告id
+ * @param.result {String}  success || fail
+ * @param.approveRemark {String}
+ * @returns {*}
+ */
+function approvePerformance(params) {
+  return http.post('/approve/saveResult/report', params, false);
+}
+
+function getPerformanceRecord(params) {
+  return http.get('/performance/v2/record/list/report_id', params)
+}
+
+function publishPerformance(params) {
+  return http.post('/performance/v2/report/publish', params, false);
+}
+
 export {
   createPerformanceRule,
   getFieldsForPerformance,
@@ -125,5 +209,14 @@ export {
   updatePerformanceRule,
   createPerformanceReport,
   getPerformanceReports,
-  deletePerformanceReports
+  deletePerformanceReports,
+  setCcForReport,
+  getApprovePerson,
+  getApprovePersonList,
+  setApprovePerson,
+  submitApprove,
+  cancelApprove,
+  approvePerformance,
+  getPerformanceRecord,
+  publishPerformance
 }

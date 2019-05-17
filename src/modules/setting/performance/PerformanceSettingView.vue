@@ -6,7 +6,7 @@
     </div>
 
     <div class="function-area">
-      <base-setting />
+      <base-setting :setting="setting"/>
       <rule-setting :init-data="initData"></rule-setting>
     </div>
   </div>
@@ -26,6 +26,18 @@ export default {
   },
   data() {
     return {}
+  },
+  computed: {
+    setting() {
+      const {sendToCc} = this.initData || {};
+      return {
+        sendToCc
+      }
+    }
+  },
+  mounted() {
+
+    console.log('this.initData', this.initData);
   },
   components: {
     [RuleSetting.name]: RuleSetting,

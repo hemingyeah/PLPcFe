@@ -20,8 +20,8 @@
           <el-input :value="ruleDesc" type="textarea" readonly></el-input>
         </el-form-item>
         <h3>报告统计对象</h3>
-        <el-form-item label="统计以下对象" style="position: relative">
-          <el-select v-model="form.range" placeholder="请选择" @change="form.target = []" style="width: 130px;">
+        <el-form-item label="统计以下对象" class="target-group">
+          <el-select v-model="form.range" placeholder="请选择(默认选择全部人员)" @change="form.target = []" style="width: 130px;">
             <el-option
               v-for="item in rangeOptions"
               :key="item.value"
@@ -29,7 +29,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="form.target" multiple collapse-tags clearable filterable @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 240px;" placeholder="请选择">
+          <el-select v-if="!form.range" v-model="form.target" multiple collapse-tags clearable filterable @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 315px;margin-left: 15px;" placeholder="请选择(默认选择全部人员)">
             <el-option
               v-for="item in targetOptions"
               :key="item.value"
@@ -37,7 +37,11 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-button plain @click="selectAll">选择全部</el-button>
+
+
+          <biz-team-select v-else multiple v-model="form.target" placeholder="请选择团队(默认选择全部团队)" :fetch-func="fetchTeam"></biz-team-select>
+
+          <!--<el-button plain @click="selectAll">选择全部</el-button>-->
 
           <div v-if="!formValidation.target" class="target-is-error">
             请选择统计对象
@@ -92,22 +96,31 @@
           <p style="color: #999;">* 生成绩效报告的时间取决于选择的数据量，如遇长时间等待请稍后刷新</p>
         </el-form-item>
 
-        <el-form-item label="抄送人" >
-          <el-select v-model="form.ccIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择">
+        <el-form-item label="抄送人" v-if="ccToOthers">
+          <el-select
+            style="width: 300px"
+            v-model="form.carbonCopy"
+            filterable
+            clearable
+            remote
+            multiple
+            reserve-keyword
+            placeholder="请输入关键词搜索"
+            :loading="remoteSearchLoading"
+            :remote-method="getApproveList">
             <el-option
-              v-for="item in targetOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              v-for="item in approveList"
+              :key="item.userId"
+              :label="item.displayName"
+              :value="item.userId">
             </el-option>
           </el-select>
-
         </el-form-item>
 
         <el-form-item label="审核人">
-          <el-select v-model="form.ccIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择" disabled>
+          <el-select v-model="approvePersonIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择" disabled>
             <el-option
-              v-for="item in targetOptions"
+              v-for="item in approvePerson"
               :key="item.value"
               :label="item.label"
               :value="item.value">
@@ -177,9 +190,9 @@
 
 <script>
 import { formatDate } from '@src/util/lang';
-import {createPerformanceReport} from '@src/api/PerformanceApi';
+import {createPerformanceReport, getApprovePerson, getApprovePersonList} from '@src/api/PerformanceApi';
 import ApproveProcess from './ApproveProcess.vue'
-
+import * as TeamApi from '@src/api/TeamApi'
 
 export default {
   name: 'edit-performance-report-dialog',
@@ -193,6 +206,12 @@ export default {
     return {
       visible: false,
       pending: false,
+      settingPending: false,
+      remoteSearchLoading: false,
+      approveList: [],
+
+      approvePerson: [],
+      approvePersonIds: [],
       createTimePickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
@@ -262,7 +281,7 @@ export default {
         time: [],
         range: 0,
         target: [],
-        ccIds: [],
+        carbonCopy: [],
         state: 0,
         timeType: 0,
         remarks: '',
@@ -278,6 +297,9 @@ export default {
     }
   },
   computed: {
+    ccToOthers() {
+      return this.initData.sendToCc;
+    },
     title() {
       if (this.stage === 'build') return '新增绩效报告';
       if (this.stage === 'confirm') return '重复统计';
@@ -347,7 +369,27 @@ export default {
       ].filter(c => c.show)
     }
   },
+  mounted() {
+    this.init();
+  },
   methods: {
+    fetchTeam(params) {
+      return TeamApi.tagList(params);
+    },
+    init() {
+      getApprovePerson()
+        .then(res => {
+          if (res.status) return;
+          this.approvePerson = res.data
+            .map(({userId, displayName}) => ({
+              label: displayName,
+              value: userId
+            }));
+          this.approvePersonIds = res.data
+            .map(({userId}) => userId);
+        })
+
+    },
     confirmCreateReport(sign) {
       let params = {
         ...this.buildParams(),
@@ -424,7 +466,19 @@ export default {
         });
     },
     buildParams() {
-      const {ruleId, reportName, time, target, range, state, remarks, sign, timeType, ccIds} = this.form;
+      const {ruleId, reportName, time, range, state, remarks, sign, timeType, carbonCopy} = this.form;
+      let target = '';
+
+      if (this.form.target && this.form.target.length) {
+        if (!range) {
+          target = this.form.target.join(',')
+        } else {
+          target = this.form.target.map(({id}) => id).join(',')
+        }
+      } else {
+        target = 'isAll';
+      }
+
       return {
         ruleId,
         reportName,
@@ -433,8 +487,8 @@ export default {
         remarks,
         startTime: `${formatDate(time[0], 'YYYY-MM-DD')} 00:00:00`,
         endTime: `${formatDate(time[1], 'YYYY-MM-DD') } 23:59:59`,
-        [range ? 'teams' : 'users']: target.join(','),
-        ccIds: ccIds.join(','),
+        [range ? 'teams' : 'users']: target,
+        carbonCopy: carbonCopy.join(','),
         sign,
       }
     },
@@ -478,7 +532,7 @@ export default {
       return keys.map(key => {
         val = this.form[key];
         // 8035200000 ms = 93 days
-        if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
+        // if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
         if (key === 'time') return this.formValidation[key] = Array.isArray(val) && !!val.length && new Date(this.form.time[1]) - new Date(this.form.time[0]) <= 8035200000;
 
         return this.formValidation[key] = !!val
@@ -488,7 +542,17 @@ export default {
     toggleDialog() {
       this.visible = !this.visible;
     },
-
+    getApproveList(keyword) {
+      return getApprovePersonList({
+        keyword: keyword || '',
+        pageNum: 1,
+        pageSize: 20,
+      })
+        .then(res => {
+          this.approveList = res.data.list;
+        })
+        .catch(e => console.error('e', e));
+    },
     reset() {
       if (this.stage === 'success') {
         this.$emit('refresh-list');
@@ -500,7 +564,7 @@ export default {
         time: [],
         range: 0,
         target: [],
-        ccIds: [],
+        carbonCopy: [],
         state: 0,
         timeType: 0,
         remarks: '',
@@ -549,6 +613,15 @@ export default {
   font-size: 12px;
   padding: 3px 0 0 0px;
   line-height: 16px;
+}
+
+.target-group .el-form-item__content{
+  display: flex;
+
+  .biz-team-select {
+    width: 315px;
+    margin-left: 15px;
+  }
 }
 
 .customized-label {

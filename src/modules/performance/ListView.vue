@@ -27,6 +27,16 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label-width="100px" label="绩效状态">
+          <el-select v-model="secondaryParams.status" placeholder="请选择">
+            <el-option
+              v-for="item in statusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label-width="100px" label="规则名称">
           <el-select v-model="secondaryParams.ruleIds" placeholder="请选择">
             <el-option
@@ -152,13 +162,12 @@
       action="/performance/v2/export/report"/>
       <!--:validate="checkExportCount"-->
 
-
   </div>
 </template>
 
 <script>
 import { formatDate, } from '@src/util/lang';
-import {getPerformanceReports, deletePerformanceReports} from '@src/api/PerformanceApi';
+import {getPerformanceReports, deletePerformanceReports, getApprovePersonList} from '@src/api/PerformanceApi';
 import EditPerformanceReportDialog from './components/EditPerformanceReportDialog.vue';
 
 export default {
@@ -217,6 +226,24 @@ export default {
           value: 1,
         },
       ],
+      statusOptions: [
+        {
+          label: '全部',
+          value: '',
+        },
+        {
+          label: '已创建',
+          value: 0,
+        },
+        {
+          label: '已审批',
+          value: 3,
+        },
+        {
+          label: '已发布',
+          value: 4,
+        },
+      ],
       params: {
         keyword: '',
         time: '',
@@ -249,6 +276,8 @@ export default {
     if (localStorageData.pageSize) {
       this.params.pageSize = Number(localStorageData.pageSize);
     }
+
+    console.log('initData', this.initData);
 
     this.search();
   },
@@ -310,7 +339,7 @@ export default {
           }
 
           this.reports = res.data.reportList.list
-            .map(({users, createUserName, createTime, startTime, endTime, type, reportName, ruleIds, id}) => Object.freeze({
+            .map(({users, createUserName, createTime, startTime, endTime, type, reportName, ruleIds, id, carbonCopy, status}) => Object.freeze({
               reportName,
               ruleIds: ruleIds.replace(/\[|\]/g, ''),
               users: users.replace(/\[|\]/g, ''),
@@ -319,7 +348,21 @@ export default {
               startTime: formatDate(new Date(startTime), 'YYYY-MM-DD'),
               endTime: formatDate(new Date(endTime), 'YYYY-MM-DD'),
               type: type ? '按团队' : '按个人',
-              id
+              id,
+              carbonCopy: carbonCopy ? carbonCopy.replace(/\[|\]|"/g, '') : '',
+              status: (() => {
+                if (status < 3) {
+                  return '已创建'
+                }
+
+                if (status === 3) {
+                  return '已审核'
+                }
+                if (status === 4) {
+                  return '已发布'
+                }
+
+              })()
             }));
           this.params.totalItems = res.data.reportList.total;
         })
@@ -349,6 +392,8 @@ export default {
       if (type !== 995) {
         params.type = type;
       }
+
+      params.status = '';
 
       return params;
     },
@@ -429,6 +474,7 @@ export default {
         time: '',
         type: 995,
         ruleIds: '',
+        status: '',
       }
     },
     modifyColumnStatus(val, column) {
@@ -470,6 +516,13 @@ export default {
           export: true
         },
         {
+          label: '状态',
+          field: 'status',
+          show: true,
+          width: '100px',
+          export: true
+        },
+        {
           label: '对象',
           field: 'users',
           show: true,
@@ -485,6 +538,13 @@ export default {
         {
           label: '操作人',
           field: 'createUser',
+          show: true,
+          width: '100px',
+          export: true
+        },
+        {
+          label: '抄送人',
+          field: 'carbonCopy',
           show: true,
           width: '100px',
           export: true

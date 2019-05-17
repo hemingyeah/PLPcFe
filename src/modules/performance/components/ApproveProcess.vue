@@ -2,7 +2,7 @@
   <ul class="approve-process-container">
     <li :class="{processing: order >= 0}">
       <i class="iconfont icon-chuanjianbaogao"></i>
-      <h5>创建报告</h5>
+      <h5>创建</h5>
     </li>
     <li class="line" :class="{processing: order > 0.5, 'half-processing': order === 0.5}">
       <div> </div>
@@ -10,7 +10,7 @@
     </li>
     <li :class="{processing: order >= 1}">
       <i class="iconfont icon-tijiaoshenhe"></i>
-      <h5>提交审核</h5>
+      <h5>审核</h5>
     </li>
     <li class="line" :class="{processing: order > 1.5, 'half-processing': order === 1.5}">
       <div> </div>
@@ -19,16 +19,16 @@
 
     <li :class="{processing: order >= 2}">
       <i class="iconfont icon-fabu"></i>
-      <h5>确认发布</h5>
+      <h5>发布</h5>
     </li>
-    <li class="line" :class="{processing: order > 2.5, 'half-processing': order === 2.5}">
-      <div></div>
-      <div></div>
-    </li>
-    <li :class="{processing: order >= 3}">
-      <i class="iconfont icon-tongzhi1"></i>
-      <h5>通知参与人</h5>
-    </li>
+    <!--<li class="line" :class="{processing: order > 2.5, 'half-processing': order === 2.5}">-->
+      <!--<div></div>-->
+      <!--<div></div>-->
+    <!--</li>-->
+    <!--<li :class="{processing: order >= 3}">-->
+      <!--<i class="iconfont icon-tongzhi1"></i>-->
+      <!--<h5>通知参与人</h5>-->
+    <!--</li>-->
   </ul>
 </template>
 

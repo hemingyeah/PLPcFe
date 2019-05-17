@@ -71,7 +71,7 @@ export default {
       return this.field.options || [];
     },
     isSystem() {
-      return this.field.isSystem == 1
+      return this.field.isSystem === 1
     }
   },
   data(){
