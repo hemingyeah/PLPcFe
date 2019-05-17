@@ -70,7 +70,7 @@ export function matchTag(params){
  * @returns 成功 - {error: message}， 失败 - {ok: ''}
  */
 export function unique(params){
-  return http.post('/customer/unique', params, false)
+  return http.post('/customer/unique', params, false, {cancelable: false})
 }
 
 /**

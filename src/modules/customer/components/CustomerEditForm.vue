@@ -133,7 +133,15 @@ export default {
     buildValidation(){
       let {isAutoSerialNumber, isCustomerNameDuplicate, isPhoneUnique} = this.initData;
       
-      let checkCustomerProp = _.debounce(function(params, resolve, changeStatus){
+      let checkCustomerName = _.debounce(function(params, resolve, changeStatus){
+        changeStatus(true);
+        return CustomerApi.unique(params).then(res => {
+          changeStatus(false);
+          return resolve(res.error ? res.error : null);
+        })
+      }, 250);
+
+      let checkCustomerSN = _.debounce(function(params, resolve, changeStatus){
         changeStatus(true);
         return CustomerApi.unique(params).then(res => {
           changeStatus(false);
@@ -159,7 +167,7 @@ export default {
             value
           }
 
-          return new Promise((resolve, reject) => checkCustomerProp(params, resolve, changeStatus))
+          return new Promise((resolve, reject) => checkCustomerName(params, resolve, changeStatus))
         },
         name: isCustomerNameDuplicate ? true : function(value, field, changeStatus){
           let params = {
@@ -168,11 +176,11 @@ export default {
             value
           }
 
-          return new Promise((resolve, reject) => checkCustomerProp(params, resolve, changeStatus))
+          return new Promise((resolve, reject) => checkCustomerSN(params, resolve, changeStatus))
         },
         lmPhone: !isPhoneUnique ? true : function(value, field, changeStatus){
           let params = {
-            customerId: (that.this.initData && that.initData.id) || '',
+            customerId: (that.initData && that.initData.id) || '',
             phone: value
           }
 

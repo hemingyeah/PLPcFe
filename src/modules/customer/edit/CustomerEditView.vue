@@ -5,7 +5,7 @@
         <div class="title">
           <button type="button" class="btn-text btn-back" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
           <span class="text">|</span>
-          <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
+          <button type="submit" :disabled="submitting || pending" class="btn btn-primary">提交</button>
         </div>
       </div>
        
@@ -126,7 +126,12 @@ export default {
             title: `创建客户${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-          
+          if(!isSucc){
+            this.pending = false;
+            this.loadingPage = false;
+            return;
+          }
+
           this.reloadTab();
           window.location.href = `/customer/view/${res.data.customerId}`;
         })
@@ -135,14 +140,26 @@ export default {
     updateMethod(params) {
       this.$http.post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
-          if (res.status) return this.$platform.alert('更新客户失败');
+          if (res.status == 1) {
+            this.loadingPage = false;
+            this.pending = false;
+            return platform.notification({
+              type: 'error',
+              title: '更新客户失败',
+              message: res.message
+            })
+          }
 
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
           window.location.href = `/customer/view/${res.data || this.editId}`;
         })
-        .catch(err => console.error('err', err));
+        .catch(err => {
+          this.pending = false;
+          console.error('err', err)
+          this.loadingPage = false;
+        });
     },
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid');
