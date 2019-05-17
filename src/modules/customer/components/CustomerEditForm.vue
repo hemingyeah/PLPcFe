@@ -52,7 +52,7 @@
     <template slot="tags" slot-scope="{field}">
       <form-item :label="field.displayName" validation>
         <div class="input-and-btn">
-          <biz-team-select v-model="value.tags" multiple :fetch-func="getTeamList" />
+          <biz-team-select v-model="value.tags" multiple />
           <el-button type="button" @click="autoAssign">自动分配</el-button>
         </div>
       </form-item>
@@ -109,25 +109,7 @@ export default {
     // 是否过滤团队
     isFilterTag() {
       return this.initData && this.initData.isDivideByTag && !this.hasEditCustomerAuth;
-
     },
-  },
-  mounted() {
-    if(this.isFilterTag) {
-      let value = this.value;
-      
-      if(Array.isArray(value.tags)) {
-        let tags = value.tags.filter(tag => {
-          return this.teamsWithChildTag.some(t => tag.id == t.id);
-        })
-
-
-        this.$set(value, 'tags', tags);
-        this.$emit('input', value)
-      }
-      
-      this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
-    }
   },
   methods: {
     buildValidation(){
@@ -223,41 +205,30 @@ export default {
 
         let tags = result.data || [];
         if(tags.length == 0){
-          return platform.notification({
-            type: 'error',
-            title: '服务团队匹配失败',
-            message: '未能按照规则分配成功，请到服务团队中设置负责区域'
-          })
+          return this.autoAssignFailNotification();
         }
 
         this.value.tags = tags.map(item => ({
           id: item.id,
           tagName: item.tagName
         }))
-          .filter(tag => !this.isFilterTag || this.teamsWithChildTag.some(t => tag.id == t.id))
+
+        if(this.value.tags.length <= 0) {
+          return this.autoAssignFailNotification();
+        }
 
 
         this.$emit('input', this.value)
       } catch (error) {
         console.error(error)
       }
-
-      // let tags = [];
-      // this.tags.forEach(team => {
-      //   let places = team.places || [];
-      //   for(let i = 0; i < places.length; i++){
-      //     let place = places[i];
-      //     let placeProvince = (place.province || '').replace('所有省', '');
-      //     let placeCity = (place.city || '').replace('所有市', '');
-      //     let placeDist = (place.dist || '').replace('所有区', '');
-
-      //     let placeStr = placeProvince + placeCity + placeDist;
-      //     let adrStr = province + city + dist;
-      //     if(placeStr && adrStr.indexOf(placeStr) == 0) tags.push(team.id);
-      //   }
-      // });
-
-      // if(tags.length == 0) return this.$platform.alert('未能按照规则分配成功，请到服务团队中设置负责区域');
+    },
+    autoAssignFailNotification() {
+      platform.notification({
+        type: 'error',
+        title: '服务团队匹配失败',
+        message: '未能按照规则分配成功，请到服务团队中设置负责区域'
+      })
     },
     updateAddressBackup(ad) {
       this.addressBackup = ad;
@@ -265,10 +236,6 @@ export default {
     validate(){
       return this.$refs.form.validate();
     },
-    // 获取团队列表哦
-    getTeamList(params) {
-      return this.getBizTeamList(params, this.filterTeams, !this.isFilterTag);
-    }
   }
 }
 </script>
