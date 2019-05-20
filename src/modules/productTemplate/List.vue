@@ -333,7 +333,7 @@
       title="导入产品"
       ref="importProductTemplateModal"
       @success="search"
-      action="/product/importTemplate">
+      action="/excels/productTemplateImport">
       <div slot="tip">
         <div class="base-import-warn">
           请先下载<a href="/product/importTemplate/template">导入模版 </a>，填写完成后再上传导入。
@@ -349,7 +349,7 @@
       :build-params="exportParamsBuild"
       :validate="exportCountCheck"
       method="post"
-      action="/product/exportProductTemplate"/>
+      action="/excels/productTemplate"/>
     <!-- end 导出 -->
 
     <!-- start 已选择列表 -->

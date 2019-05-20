@@ -370,7 +370,7 @@
       title="导入产品"
       ref="importProductModal"
       @success="search"
-      action="/product/import">
+      action="/excels/customer/customerProductImport">
       <div slot="tip">
         <div class="base-import-warn">
           <p>请先下载<a href="/product/import/template">导入模版 </a>，填写完成后再上传导入。</p>
@@ -385,7 +385,7 @@
       :build-params="buildExportParams"
       :validate="checkExportCount"
       method="post"
-      action="/customer/product/export"/>
+      action="/excels/customer/customerProduct"/>
 
 
     <batch-update-dialog
@@ -394,7 +394,7 @@
       :total-items="page.total"
       :build-download-params="buildParams"
       @success="search"
-      action="/product/importCover"
+      action="/excels/customer/customerProductUpdateBatch"
     ></batch-update-dialog>
 
   </div>
