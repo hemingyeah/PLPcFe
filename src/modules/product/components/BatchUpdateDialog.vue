@@ -2,7 +2,7 @@
   <base-modal :show.sync="batchUpdateCustomerDialog" width="600px" class="batch-update-customer-dialog" @closed="closeModal">
     <div slot="title">
       <el-popover placement="bottom-start" popper-class="batch-update-customer-modal-header" trigger="hover">
-        <h3 class="customized-batch-update-customer-modal-header" slot="reference">客户批量更新<i class="iconfont icon-help"></i></h3>
+        <h3 class="customized-batch-update-customer-modal-header" slot="reference">产品批量更新<i class="iconfont icon-help"></i></h3>
 
         <div class="tips">
           <p>批量更新注意事项：</p>
@@ -130,12 +130,13 @@ export default {
         Uploader.upload(this.file, this.action)
           .then(result => {
             if(!result.status){
-              let message = '导入成功！';
-              if(result.data && result.data.total) message += `共更新${result.data.total}条数据。`;
+              Platform.alert(result.message);
 
-              Platform.alert(message);
-              this.$emit('success');
               this.batchUpdateCustomerDialog = false;
+
+              window.parent.showExportList();
+              window.parent.exportPopoverToggle(true);
+              // this.$emit('success');
             }else{
               this.errors = result.data || [];
               // Platform.alert(`导入失败！\n${data.join('\n')}`);
