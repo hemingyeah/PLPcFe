@@ -1,4 +1,4 @@
-import http from '@src/util/http';
+import _ from 'lodash';
 
 // 单行最大长度
 export const SINGLE_LINE_MAX_LEN = 50;
@@ -143,52 +143,43 @@ function address(value, field = {}) {
   });
 }
 
-/** @deprecated 远程验证, 使用validator替代 */
-function remoteValidation(value, remote) {
-  console.warn('[deprecated]: 使用 validator function 替代');
-  const { 
-    action, 
-    buildParams, 
-    method = 'get', 
-    emulateJSON = false,
-    isCancelable,
-  } = remote;
-  let params = buildParams(value);
-  const options = {
-    cancelable: isCancelable ? isCancelable() : false,
-  };
-  let fn = http[method];
-  let args = [action, params, emulateJSON, options];
-  if(method == 'get') args.splice(2, 1, );
-
-  return fn.apply(http, args);
-}
-
 /**
  * 根据字段类型验证值
  * @param {*} value 值
  * @param {*} formType 字段类型 
- * @param {*} options 可选项
+ * @returns Promise<message> 
  */
-async function validate(value, field, options = {}){
+function validate(value, field){
   let fn = RuleMap[field.formType];
-  let message = null;
-  if(typeof fn == 'function') message = await fn(value, field);
-  
-  // TODO: 已弃用，待迁移后删除
-  if(message == null && options.remote) {
-    let changeRemoteStatus = options.changeRemoteStatus;
-    changeRemoteStatus(true);
+  if(typeof fn == 'function') return fn(value, field);
 
-    let result = await remoteValidation(value, options.remote);
-    message = result.error ? result.error : null;
-
-    changeRemoteStatus(false);
-  }
-
-  return message;
+  return Promise.resolve(null)
 }
 
-const Validator = {validate};
+/** 
+ * 创建远程验证方法
+ * @param {function} api - 调用的api方法
+ * @param {function} build - 参数构建方法
+ * @param {number} delay - 延时
+ */
+export function createRemoteValidate(api, build, delay = 250){
+  let invoke = _.debounce(function(params, resolve, changeStatus){
+    changeStatus(true);
+    return api(params).then(res => {
+      changeStatus(false);
+      return resolve(res.error ? res.error : null);
+    })
+  }, delay);
+
+  return function(value, field, changeStatus){
+    let params = typeof build == 'function' ? build(value, field) : {};
+    return new Promise(resolve => invoke(params, resolve, changeStatus))
+  }
+}
+
+const Validator = {
+  validate,
+  createRemoteValidate
+};
 
 export default Validator;

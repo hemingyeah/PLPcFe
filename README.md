@@ -12,9 +12,9 @@
 ## 项目结构
 ```
 ├── config                        Webpack配置
-│   └── modules                   页面入口
 ├── dist                          资源输出目录
 ├── model                         常用类和常量
+├── modules                       页面入口
 ├── public                        外部静态资源
 ├── script                        开发和打包脚本      
 ├── server                        koa server      

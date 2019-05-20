@@ -4,7 +4,7 @@
       <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @update="update">
 
         <template slot="phone" slot-scope="{field}">
-          <form-item :label="field.displayName" :remote="remote.phone" validation>
+          <form-item :label="field.displayName" :validation="validation">
             <form-text
               :field="field"
               :value="form.phone" @update="update"
@@ -22,9 +22,11 @@
 
 <script>
 import * as FormUtil from '@src/component/form/util';
+import * as LinkmanApi from '@src/api/LinkmanApi'
+import {createRemoteValidate} from '@src/util/validator'
 
 export default {
-  name: "edit-contact-dialog",
+  name: 'edit-contact-dialog',
   props: {
     customer: {
       type: Object,
@@ -34,7 +36,7 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    isPhoneUnique: Boolean,
+    isPhoneUnique: Boolean
   },
   data() {
     return {
@@ -43,7 +45,6 @@ export default {
       pending: false,
       products: [],
       addresses: [],
-      remote: this.buildRemote(),
       form: {
         name: null,
         remark: '',
@@ -56,9 +57,15 @@ export default {
         id: '',
         phone: null,
         email: null,
-        productId: [], //数组，包含产品对象
+        productId: [], // 数组，包含产品对象
       },
       loadData: false,
+      validation: createRemoteValidate(LinkmanApi.checkUnique4Phone, (value, field) => {
+        return {
+          id: this.originalValue.id || '',
+          phone: value
+        }
+      })
     }
   },
   computed: {
@@ -66,25 +73,25 @@ export default {
       return this.originalValue.name ? 'edit' : 'create';
     },
     customerId() {
-      return this.customer && this.customer.id || '';
+      return (this.customer && this.customer.id) || '';
     },
     fields() {
       return [{
         formType: 'text',
         fieldName: 'name',
-        displayName: "联系人",
+        displayName: '联系人',
         placeholder: '[最多50字]',
         isNull: 0,
       }, {
         formType: 'phone',
         fieldName: 'phone',
-        displayName: "电话",
+        displayName: '电话',
         placeholder: '建议使用手机号,可发送短信通知',
         isNull: 0,
       }, {
         formType: 'select',
         fieldName: 'sex',
-        displayName: "性别",
+        displayName: '性别',
         placeholder: '请选择',
         isNull: 1,
         setting: {
@@ -93,31 +100,31 @@ export default {
       }, {
         formType: 'email',
         fieldName: 'email',
-        displayName: "邮箱",
+        displayName: '邮箱',
         placeholder: '',
         isNull: 1,
       }, {
         formType: 'text',
         fieldName: 'position',
-        displayName: "职位",
+        displayName: '职位',
         placeholder: '',
         isNull: 1,
       }, {
         formType: 'text',
         fieldName: 'department',
-        displayName: "部门",
+        displayName: '部门',
         placeholder: '',
         isNull: 1,
       }, {
         formType: 'textarea',
         fieldName: 'remark',
-        displayName: "备注",
+        displayName: '备注',
         placeholder: '[最多500字]',
         isNull: 1,
       }, {
         formType: 'select',
         fieldName: 'productId',
-        displayName: "关联产品",
+        displayName: '关联产品',
         placeholder: '请选择',
         isNull: 1,
         setting: {
@@ -127,7 +134,7 @@ export default {
       }, {
         formType: 'select',
         fieldName: 'address',
-        displayName: "关联地址",
+        displayName: '关联地址',
         placeholder: '请选择',
         isNull: 1,
         setting: {
@@ -139,24 +146,7 @@ export default {
       return this.originalValue.name ? '编辑联系人' : '添加联系人';
     }
   },
-  // mounted() {
-  // },
   methods: {
-    buildRemote() {
-      const originalValue = this.originalValue;
-      return {
-        phone: this.isPhoneUnique ? {
-          action: '/linkman/checkUnique4Phone',
-          buildParams(val) {
-            const params = {
-              phone: val,
-              id: originalValue.id || '',
-            };
-            return params;
-          }
-        } : null,
-      }
-    },
     genPlaceholder(field){
       return FormUtil.genPlaceholder(field);
     },
@@ -232,7 +222,6 @@ export default {
       }
       this.fetchAddress();
       this.fetchProducts();
-      this.remote = this.buildRemote();
       this.init = true;
     },
     matchValueToForm(val) {

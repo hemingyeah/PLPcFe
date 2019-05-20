@@ -30,10 +30,7 @@ export default {
         let parent = this.$parent;
         return parent && parent.$el;
       }
-    },
-
-    /** @deprecated  远程验证配置对象，使用validator替代 */
-    remote: Object
+    }
   },
   data() {
     return {
@@ -47,10 +44,6 @@ export default {
     /** 字段是否必填 */
     isRequired() {
       return this.field.isNull == 0;
-    },
-    /** 字段是否需要远程验证 **/
-    needRemoteValidation() {
-      return !!this.remote;
     },
     forId(){
       if(!this.field.fieldName) return '';
@@ -71,11 +64,7 @@ export default {
       this.status = false;
 
       let value = this.valueFn();
-
-      // 以下方式弃用，去除远程验证后删除
-      let options = {changeRemoteStatus: this.changeStatus, remote: this.remote};
-
-      return Validator.validate(value, this.field, options)
+      return Validator.validate(value, this.field)
         .then(res => {
           let validator = this.getValidator();
           return res == null && typeof validator == 'function' 
@@ -96,9 +85,7 @@ export default {
     validateHandler(event) {
       event.stopPropagation(); // 阻止事件继续冒泡
       if(this.needValidation) {
-        this.needRemoteValidation 
-          ? this.delayValidate()
-          : this.$nextTick(this.validate)
+        this.$nextTick(this.validate)
       }
     },
     /** 注册字段取值函数 */

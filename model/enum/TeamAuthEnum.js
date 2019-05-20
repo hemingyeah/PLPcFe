@@ -40,8 +40,9 @@ class TeamAuthEnum extends BaseEnum{
       value: 'VIP_REPORT_VIEW'
     }
 
-    this.VIP_SPAREPART_PERSION = {
+    this.VIP_SPAREPART_PERSON = {
       name: '个人备件库',
+      // 数据库中就是拼写错误的值
       value: 'VIP_SPAREPART_PERSION'
     }
   }
