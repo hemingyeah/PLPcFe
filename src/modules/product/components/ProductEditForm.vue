@@ -7,7 +7,17 @@
             v-model="value.template"
             :remote-method="searchTemplate"
             @input="updateTemplate"
-          ></base-select>
+          >
+
+            <div class="product-template-option" slot="option" slot-scope="{option}">
+              <h3>{{option.name}}</h3>
+              <p>
+                <span><label>产品编号：</label><span>{{option.serialNumber}}</span></span>
+                <span><label>产品类型：</label><span>{{option.type}}</span></span>
+              </p>
+            </div>
+
+          </base-select>
 
         </form-item>
       </template>
@@ -229,5 +239,41 @@ export default {
 </script>
 
 <style lang="scss">
+
+  .product-template-option {
+    * {
+      margin: 0;
+    }
+    padding: 10px 0;
+    h3 {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 24px;
+    }
+
+
+    p {
+      display: flex;
+      justify-content: space-between;
+      line-height: 24px;
+
+      &>span {
+        width: 50%;
+        display: flex;
+        justify-content: flex-start;
+        font-size: 12px;
+        color: #666666;
+        padding-right: 10px;
+
+        &>label {
+          padding: 0;
+          width: 70px;
+        }
+        &>span {
+          @include text-ellipsis();
+        }
+      }
+    }
+  }
 
 </style>
