@@ -1,7 +1,7 @@
 import { cloneDeep, isEmpty } from 'lodash'
 import FormField from './FormField';
 import Platform from '../../platform';
-import browser from '@src/util/browser'
+import normalizeWheel from '@src/util/normalizeWheel';
 
 import {
   Modes,
@@ -570,8 +570,8 @@ const FormDesign = {
     scrollWrap(e) {
       let containerEl = this.$data.$dragEvent.containerEl;
       
-      // TODO: 改用normalizeWheel
-      containerEl.scrollTop += (browser.isFirefox ? e.deltaY * 5 : e.deltaY);
+      let {pixelY} = normalizeWheel(e);
+      containerEl.scrollTop += pixelY;
     }
   },
   render(h){
