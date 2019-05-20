@@ -7,8 +7,7 @@ process.env.NODE_ENV = 'production';
 
 const argv = require('./argv')(process.argv.slice(2))
 const user = argv.user || 'dongls';
-
-const config = require(`./config/${ user }`);
+const config = require(`./config/${user}`);
 
 const path = require('path');
 const shell = require('shelljs');

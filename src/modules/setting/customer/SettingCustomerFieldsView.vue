@@ -5,7 +5,6 @@
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
         <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
-        <!--<span class="setting-header-text">客户字段设置</span>-->
       </div>
 
     </div>

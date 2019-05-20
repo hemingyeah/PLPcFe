@@ -1,13 +1,15 @@
 /** development server @author dongls */
 
 // 当前用户的配置
-const USER_CONFIG = require(`../../script/config/${process.argv.splice(2)[0] || 'dongls'}`);
+const argv = require('../../script/argv')(process.argv.slice(2))
+const user = argv.user || 'dongls';
+const USER_CONFIG = require(`../../script/config/${user}`);
 
 const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
-const modules = require('../../config/modules');
+const modules = require('../../modules');
 const router = new KoaRouter();
 
 const customerRouter = require('./customer')

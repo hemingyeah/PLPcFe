@@ -3,7 +3,7 @@ const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
 const router = new KoaRouter();
-const modules = require('../../config/modules');
+const modules = require('../../modules');
 
 /** start 产品 */
 router.get('/customer/product', async ctx => {

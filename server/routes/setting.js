@@ -3,7 +3,7 @@ const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
 const router = new KoaRouter();
-const modules = require('../../config/modules');
+const modules = require('../../modules');
 
 router.get('/setting/customer/fields', async ctx => {
   let script = ['/setting.customer.fields.js'];

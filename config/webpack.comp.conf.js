@@ -5,13 +5,13 @@ const path = require('path');
 const merge = require('webpack-merge');
 const baseConfig = require('./webpack.base.conf')
 
-//https://github.com/webpack-contrib/mini-css-extract-plugin
+// https://github.com/webpack-contrib/mini-css-extract-plugin
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-//https://www.npmjs.com/package/webpack-bundle-analyzer
-//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// https://www.npmjs.com/package/webpack-bundle-analyzer
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 let config = merge(baseConfig, {
   mode: 'production',
@@ -24,12 +24,12 @@ let config = merge(baseConfig, {
   },
   resolve: {
     alias: {
-      'app.config': path.resolve(__dirname,'../src/config/production.js'),
+      'app.config': path.resolve(__dirname, '../src/config/production.js'),
     }
   },
   plugins: [
     new CleanWebpackPlugin(['dist/component'], {
-      root: path.join(__dirname,'..')
+      root: path.join(__dirname, '..')
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].css',

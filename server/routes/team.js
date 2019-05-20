@@ -2,7 +2,7 @@ const KoaRouter = require('koa-router');
 const Template = require('../util/Template');
 const HttpClient = require('../util/HttpClient')
 
-const modules = require('../../config/modules');
+const modules = require('../../modules');
 const router = new KoaRouter();
 
 router.get('/security/tag', async ctx => {

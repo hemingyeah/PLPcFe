@@ -8,11 +8,32 @@
  * 
  * @author dongls
  */
-const modules = require('../config/modules')
+const setting = require('./setting')
+const team = require('./team')
+const product = require('./product')
+const performance = require('./performance')
+const customer = require('./customer')
 
 module.exports = {
   'window': {
     entry: './src/component/common/BaseWindow/demo.js'
   },
-  ...modules
+  'system.frame': {
+    entry: './src/modules/system/frame/index.js',
+    template: 'src/modules/system/frame/index.html'
+  },
+  'system.demo': {
+    entry: './src/modules/system/demo/index.js'
+  },
+  
+  // ------------ 订阅通知日报 ------------
+  'open.dailyReport': {
+    entry: './src/modules/open/DailyReport/index.js',
+    exclude: ['common']
+  },
+  ...setting,
+  ...team,
+  ...product,
+  ...performance,
+  ...customer
 }

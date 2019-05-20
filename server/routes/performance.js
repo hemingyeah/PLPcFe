@@ -3,7 +3,7 @@ const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
 const router = new KoaRouter();
-const modules = require('../../config/modules');
+const modules = require('../../modules');
 
 router.get('/performance/v2/report', async ctx => {
   let script = ['/performance.list.js'];

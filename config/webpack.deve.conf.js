@@ -7,7 +7,7 @@ const baseConfig = require('./webpack.base.conf')
 module.exports = merge(baseConfig, {
   resolve: {
     alias: {
-      'app.config': path.resolve(__dirname,'../src/config/development.js'),
+      'app.config': path.resolve(__dirname, '../src/config/development.js'),
     }
   }
 })

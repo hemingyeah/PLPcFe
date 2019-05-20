@@ -5,7 +5,6 @@
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
         <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
-        <!--<span class="setting-header-text">产品字段设置</span>-->
       </div>
 
     </div>
@@ -18,16 +17,7 @@
 <script>
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
-import platform from '@src/platform'
-
-/**
- * todo
- * 1. 过滤掉产品用不到的类型
- *
- *
- *
- */
-
+import platform from '@src/platform';
 
 export default {
   name: 'setting-product-fields-view',
@@ -58,7 +48,6 @@ export default {
         let fields = FormUtil.toField(this.fields);
         fields.forEach(item => {
           item.tableName = 'product';
-          item.isDelete = 0; // TODO: 待删除
         });
 
         const validateRes = this.validate(fields);

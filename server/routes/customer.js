@@ -3,7 +3,7 @@ const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
 const router = new KoaRouter();
-const modules = require('../../config/modules');
+const modules = require('../../modules');
 
 router.get('/customer', async ctx => {
   let script = ['/customer.list.js'];
