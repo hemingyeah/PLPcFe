@@ -11,9 +11,7 @@
 <script>
 
 import {
-  getProductDetail,
-  createProduct,
-  updateProduct
+  createProduct
 } from '@src/api/ProductApi';
 import * as FormUtil from '@src/component/form/util';
 import ProductEditForm from './components/ProductEditForm.vue';
@@ -64,7 +62,7 @@ export default {
          * @param {*} target 待合并的值
          */
 
-      this.form = FormUtil.initialize(this.productFields, form, this.form);
+      this.form = FormUtil.initialize(this.productFields, form);
 
       this.init = true;
     } catch (e) {

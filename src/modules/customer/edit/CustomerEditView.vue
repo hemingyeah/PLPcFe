@@ -184,7 +184,9 @@ export default {
         form = this.initData.eventCustomer;
       }
 
-      this.form = FormUtil.initialize(this.fields, form, util.packToForm);
+      form = util.packToForm(this.fields, form, this.initData.customerAddress);
+      this.form = FormUtil.initialize(this.fields, form);
+      
       this.init = true;
     } catch (e) {
       console.error('CustomerEditView caught an error ', e);

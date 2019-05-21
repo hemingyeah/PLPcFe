@@ -62,15 +62,12 @@
 
 <script>
 import * as CustomerApi from '@src/api/CustomerApi';
-import * as TeamApi from '@src/api/TeamApi'
 import * as LinkmanApi from '@src/api/LinkmanApi';
 
 import TeamMixin from '@src/mixins/teamMixin';
 
 import _ from 'lodash'
 import platform from '@src/platform'
-
-import AuthUtil from '@src/util/auth';
 
 export default {
   name: 'customer-edit-form',
