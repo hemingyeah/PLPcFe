@@ -4,7 +4,7 @@ import FormSelectSetting from './FormSelectSetting.vue';
 import FormSelectPreview from './FormSelectPreview.vue';
 import FormSelect from './FormSelect.vue';
 
-import FormSelectSettingProductType from './FormSelectSettingProductType.vue';
+import ProductTypeExtendSetting from './extend/ProductTypeExtendSetting.vue'
 
 let FormSelectField = {
   formType: 'select', // 字段类型
@@ -12,11 +12,11 @@ let FormSelectField = {
   isSystem: 0,
   component: {
     setting: FormSelectSetting,
-    extends: {
-      productType: FormSelectSettingProductType
-    },
     preview: FormSelectPreview,
-    build: FormSelect
+    build: FormSelect,
+    extend: {
+      'product_type': ProductTypeExtendSetting
+    }
   }
 };
 

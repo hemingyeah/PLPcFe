@@ -1,7 +1,7 @@
 import { assign } from 'lodash'
 import FormField from './FormField';
 
-const DefaultPlaceholer = {
+const DEFAULT_PLACEHOLDER = {
   text: '最多50字',
   number: '请输入数字',
   customerAddress: '请填写详细地址',
@@ -88,7 +88,7 @@ export function genPlaceholder(field, defaultText = ''){
   if(isDate(field)) key = 'date';
   if(isDatetime(field)) key = 'datetime';
   if(isSelect(field) || isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
-  return text + (DefaultPlaceholer[key] || '');
+  return text + (DEFAULT_PLACEHOLDER[key] || '');
 }
 /**
  * 初始化所有字段的初始值

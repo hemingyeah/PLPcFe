@@ -1,5 +1,5 @@
 <template>
-  <div class="form-preview-group form-attachment-preview" @click="choose">
+  <div class="form-preview-group form-attachment-preview">
     <label>{{field.displayName}} <span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
     <div class="form-preview-mock">
       <button type="button" class="btn btn-primary">点击上传</button>
@@ -19,11 +19,6 @@ export default {
     setting: {
       type: Object,
       default: () => ({})
-    }
-  },
-  methods: {
-    choose(){
-      //this.$emit('chooseField', this.field)
     }
   }
 }

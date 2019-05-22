@@ -1,21 +1,3 @@
-/**
- * 验证机制
- * 
- * 结构: Form组件 -> FormItem -> FormBuilder
- *  Form组件提供每种字段的具体实现
- *  FormItem主要用于验证
- *  FormBuilder作为容器，并提供整个表单的验证 
- * 
- * 注册流程：
- * 1. Form组件在挂载时触发form.add.field事件，将其注册到FormItem和FormBuilder中. 参数： {value: Function, fieldName: String}
- * 2. FormItem在收到form.add.field事件后，保存value用于取值（闭包），并在原参数上附加validate方法
- * 3. FormBuilder在收到form.add.field事件后，保存validate方法，在提交表单时验证整个表单
- * 
- * 验证流程：
- * 1. Form组件中的值发生变化时，触发form.validate事件
- * 2. FormItem接受到事件后，阻止事件冒泡并调用validate方法进行验证
- * 3. 表单提交时，FormBuilder根据自身维护的validateMap验证整个表单
- */
 import { FormFieldMap } from './components';
 import * as util from './util';
 

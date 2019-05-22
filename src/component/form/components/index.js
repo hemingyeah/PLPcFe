@@ -11,12 +11,8 @@ import FormPhone from './FormPhone';
 import FormEmail from './FormEmail';
 import FormSeparator from './FormSeparator';
 import FormAddress from './FormAddress';
-import FormRadio from './FormRadio';
 
-// arr all
-
-// base
-
+// base fields
 const BaseFormField = [
   FormText,
   FormTextarea,
@@ -32,24 +28,8 @@ const BaseFormField = [
   FormSeparator,
 ];
 
-const ProductFormField = [
-  FormText,
-  FormTextarea,
-  FormNumber,
-  FormSelect,
-  FormCode,
-  FormAttachment,
-  FormUser,
-  FormDate,
-  FormDatetime,
-  FormSeparator
-];
-
 const allFields = [...BaseFormField, FormAddress];
-
 const BaseModeField = BaseFormField.map(item => item.formType)
-
-const ProductModeField = ProductFormField.map(item => item.formType)
 
 const Modes = {
   base: {
@@ -86,24 +66,24 @@ for(let i = 0; i < FormFields.length; i++){
     let settingComp = formField.component.setting;
     let previewComp = formField.component.preview;
     let buildComp = formField.component.build;
-    let extendsComp = formField.component.extends || {};
+    let extendComp = formField.component.extend;
 
     PreviewComponents[previewComp.name] = previewComp; 
     SettingComponents[settingComp.name] = settingComp;
     BuildComponents[buildComp.name] = buildComp;
 
-    field.preview = previewComp.name, // 预览组件名
-    field.setting = settingComp.name, // 设置组件名
-    field.build = buildComp.name // 表单组件名
+    field.preview = previewComp.name; // 预览组件名
+    field.setting = settingComp.name; // 设置组件名
+    field.build = buildComp.name; // 表单组件名
     field.name = formField.name;
-    field.extends = extendsComp; // 扩展
+    field.extend = {};
 
     // 判断有没有扩展组件 -> 注册组件
-    if(Object.keys(extendsComp).length > 0) {
-      let extendComponent = {};
-      for(let extend in extendsComp) {
-        extendComponent = extendsComp[extend];
-        SettingComponents[extendComponent.name] = extendComponent;
+    if(null != extendComp && Object.keys(extendComp).length > 0) {
+      for(let name in extendComp) {
+        let comp = extendComp[name];
+        SettingComponents[comp.name] = comp;
+        field.extend[name] = comp.name;
       }
     }
   }
@@ -120,11 +100,14 @@ FormFieldMap.get = function(formType){
     field.preview = aliasField.preview;
     field.setting = aliasField.setting;
     field.build = aliasField.build;
-    field.extends = aliasField.extends || {};
+    field.extend = aliasField.extend || {};
   }
 
   return field;
 }
+
+// 冻结字段
+Object.freeze(FormFieldMap);
 
 export {
   FormFields,

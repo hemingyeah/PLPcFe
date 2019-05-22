@@ -9,7 +9,7 @@
 
     </div>
     <div class="setting-customer-design">
-      <form-design v-model="fields" :max="maxField"></form-design>
+      <form-design v-model="fields" :max="maxField" mode="customer"></form-design>
     </div>
   </div>
 </template>

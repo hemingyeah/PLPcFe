@@ -23,9 +23,7 @@ function createPreviewComp(h, field){
   // 根据字段配置创建预览内容
   let fieldPreview = h(previewComp.preview, {
     'class': 'form-design__ghost',
-    props: { field, setting: previewComp},
-    // TODO: 不再触发chooseField事件
-    // on: { chooseField: this.chooseField }
+    props: { field, setting: previewComp}
   });
   
   let previewClass = {
@@ -49,14 +47,11 @@ function createPreviewComp(h, field){
 
 /** 获取设置组件组件名，如果返回null，渲染默认组件 */
 function getSettingComp(field, comp){
-  // 产品类型
-  if(this.mode == 'product' && field.fieldName == 'type'){
-    if(Object.keys(comp.extends).length <= 0) return null;
-    let productType = comp.extends.productType || {};
-    return productType.name;
-  }
-  // 客户地址
-  if(field.fieldName == 'customerAddress') return comp.setting;
+  // 先检测是否有扩展设置
+  let extend = comp.extend || {};
+  let key = `${this.mode}_${field.fieldName}`;
+  if(extend[key]) return extend[key];
+
   // 系统字段默认设置
   if(field.isSystem == 1) return null;
 
@@ -170,7 +165,7 @@ const FormDesign = {
       if(field.isSystem == 1) hasSystemField = true;
       availableFields.push(field)
     })
-    
+
     return {
       // 当前模式下可用字段
       availableFields,

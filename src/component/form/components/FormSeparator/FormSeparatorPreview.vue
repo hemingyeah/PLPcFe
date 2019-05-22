@@ -1,5 +1,5 @@
 <template>
-  <div class="form-preview-group" @click="choose">
+  <div class="form-preview-group">
     <div class="form-design-separator"><span v-if="field.displayName">{{field.displayName}}</span></div>
   </div>
 </template>
@@ -15,11 +15,6 @@ export default {
     setting: {
       type: Object,
       default: () => ({})
-    }
-  },
-  methods: {
-    choose(){
-      this.$emit('chooseField', this.field)
     }
   }
 }

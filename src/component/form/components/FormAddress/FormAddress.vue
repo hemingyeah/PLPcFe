@@ -2,7 +2,7 @@
   <div class="form-address">
     <div class="form-address-picker">
       <base-dist-picker @input="handleCitySelectorChange" :value="distValue"/>
-      <el-button type="button" @click="chooseMap" style="margin-bottom: 10px">地图选址</el-button>
+      <el-button type="button" @click="chooseMap" v-if="!disableMap">地图选址</el-button>
     </div>
     <input
       type="text"
@@ -31,22 +31,24 @@ export default {
       default(){
         let value = {
           /**
-             * value值必须包含以下值:
-             * province: String,
-             * city: String,
-             * dist: String,
-             * address: String
-             * 
-             * 以下值可选：
-             * latitude： [String,Number],
-             * longitude: [String,Number],
-             * addressType: Number
-             */
+           * value值必须包含以下值:
+           * province: String,
+           * city: String,
+           * dist: String,
+           * address: String
+           * 
+           * 以下值可选：
+           * latitude： [String,Number],
+           * longitude: [String,Number],
+           * addressType: Number
+           */
         };
           
         return value
       }
-    }
+    },
+    /** 是否启禁用图选址 */
+    disableMap: Boolean
   },
   computed: {
     /** 将省市区转换成数组 */
@@ -124,10 +126,10 @@ export default {
       let oldValue = null;
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);
-
-      //this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
     },
     chooseMap() {
+      if(this.disableMap) return;
+
       const point = {
         latitude: this.value.latitude || '',
         longitude: this.value.longitude || '',
@@ -178,9 +180,14 @@ export default {
 .form-address-picker{
   display: flex;
   justify-content: space-between;
-  
+  margin-bottom: 10px;
+
   .form-item, .form-text {
     width: 400px;
+  }
+
+  .el-button{
+    margin: 0;
   }
 }
 </style>
