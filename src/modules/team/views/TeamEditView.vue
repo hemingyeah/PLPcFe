@@ -62,7 +62,7 @@ export default {
           displayName: '团队名称', 
           fieldName: 'tagName',
           formType: 'text',
-          placeHolder: '最多10字',
+          placeHolder: '最多20字',
           isNull: 0
         },
         description: {
@@ -120,9 +120,9 @@ export default {
     /** 自定义验证团队名称 */
     checkName(value, field, changeStatus){
       return new Promise((resolve, reject) => {
-        if(stringLen(value) > 20) {
+        if(stringLen(value) > 40) {
           changeStatus(false)
-          return resolve('团队名称不能超过10字');
+          return resolve('团队名称不能超过20个文字/40字节');
         }
         this.remoteCheckName({id: this.id, field: 'name', value}, resolve, changeStatus)
       })
