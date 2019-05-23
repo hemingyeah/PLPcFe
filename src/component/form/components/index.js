@@ -61,35 +61,45 @@ const FormFields = [...allFields]
 for(let i = 0; i < FormFields.length; i++){
   let formField = FormFields[i];
   let field = {
-    formType: formField.formType, // 组件类型
     name: formField.name, // 组件显示名称
-    alias: formField.alias, // 组件别名
+    formType: formField.formType, // 组件类型
     isSystem: formField.isSystem // 是否为为系统组件
   }
 
+  if(formField.alias) field.alias = formField.alias;
+
   if(!formField.alias){
-    let settingComp = formField.component.setting;
+    // 预览组件
     let previewComp = formField.component.preview;
-    let buildComp = formField.component.build;
-    let extendComp = formField.component.extend;
-
     PreviewComponents[previewComp.name] = previewComp; 
-    SettingComponents[settingComp.name] = settingComp;
-    BuildComponents[buildComp.name] = buildComp;
-
     field.preview = previewComp.name; // 预览组件名
-    field.setting = settingComp.name; // 设置组件名
-    field.build = buildComp.name; // 表单组件名
-    field.name = formField.name;
-    field.extend = {};
 
-    // 判断有没有扩展组件 -> 注册组件
+    // 设置组件
+    let settingComp = formField.component.setting;
+    if(null != settingComp){
+      SettingComponents[settingComp.name] = settingComp;
+      field.setting = settingComp.name; // 设置组件名
+    }
+
+    // 表单组件
+    let buildComp = formField.component.build;
+    if(null != buildComp){
+      BuildComponents[buildComp.name] = buildComp;
+      field.build = buildComp.name; // 表单组件名
+    }
+
+    // 扩展组件
+    let extendComp = formField.component.extend;
     if(null != extendComp && Object.keys(extendComp).length > 0) {
+      let extend = {};
+
       for(let name in extendComp) {
         let comp = extendComp[name];
         SettingComponents[comp.name] = comp;
-        field.extend[name] = comp.name;
+        extend[name] = comp.name;
       }
+
+      field.extend = extend;
     }
   }
 

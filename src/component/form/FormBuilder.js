@@ -2,12 +2,13 @@ import { FormFieldMap } from './components';
 import * as util from './util';
 
 function createFormField(h, field, comp){
-  const placeholder = util.genPlaceholder(field);
+  if(null == comp.build) return comp.build;
+
   let data = {
     props: {
       field,
       value: getValue(field, this),
-      placeholder,
+      placeholder: util.genPlaceholder(field),
     },
     on: {
       update: event => this.$emit('update', event)
@@ -82,7 +83,7 @@ const FormBuilder = {
         if(comp == null) return;
 
         let formField = createFormField.call(this, h, field, comp);
-        if(comp.formType == 'separator') return formField;
+        if(comp.formType == 'separator' || null == formField) return formField;
         
         let formItemClass = [];
         if(field.formType == 'attachment') formItemClass.push('form-item-attachment')

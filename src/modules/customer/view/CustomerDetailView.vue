@@ -86,9 +86,7 @@
           <template slot="tags" slot-scope="{value}">
             <div class="form-view-row" v-if="isDivideByTag">
               <label>服务团队</label>
-              <div class="form-view-row-content">
-                <span>{{value | fmt_tag}}</span>
-              </div>
+              <div class="form-view-row-content">{{value | fmt_tag}}</div>
             </div>
           </template>
         </form-view>
@@ -363,7 +361,7 @@ export default {
     /** @deprecated */
     fmt_tag(value) {
       if (!Array.isArray(value) || !value || !value.length) return '';
-      return value.map(t => t.tagName).join(' ');
+      return value.map(t => t.tagName).join('， ');
     }
   },
   methods: {

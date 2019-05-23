@@ -185,7 +185,7 @@ function _isHiddenField(field, form, fieldMap, isSmooth){
     if(depField == null) return true;
     if(_isHiddenField(depField, form, fieldMap, isSmooth)) return true;
 
-    let val = getValue(prop, form, fieldMap, isSmooth)
+    let val = getHiddenFieldValue(prop, form, fieldMap, isSmooth)
     let dep = dependencies[prop];
     if(Array.isArray(dep) && dep.length > 0 && dep.indexOf(val) >= 0) return false;
   }
@@ -193,14 +193,33 @@ function _isHiddenField(field, form, fieldMap, isSmooth){
   return true;
 }
 
-function getValue(prop, form, fieldMap, isSmooth){
-  // 直接从form上取值，适用于FormBuilder
-  if(isSmooth) return form[prop];
-  
+function getHiddenFieldValue(prop, form, fieldMap, isSmooth){
   let field = fieldMap[prop];
-  if(null == field) return null;
-  if(field.isSystem == 1) return form[prop];
+  return getValue(field, form, isSmooth)
+}
 
+/**
+ * 根据字段取值
+ * @param {*} field - 字段
+ * @param {*} form - 表单对象
+ * @param {*} isSmooth - 是否平整。 值为true时，直接从form对象上取值；值为false时，根据字段isSystem取值
+ */
+export function getValue(field, form, isSmooth = false){
+  if(null == field) return null;
+  let fieldName = field.fieldName;
+
+  // 直接从form上取值，适用于FormBuilder
+  if(isSmooth) return form[fieldName];
+
+  // 客户负责人
+  if(field.tableName == 'customer' && fieldName == 'manager'){
+    return {userId:form.customerManager, displayName: form.customerManagerName}
+  }
+
+  // 系统字段
+  if(field.isSystem == 1) return form[fieldName];
+
+  // 自定义字段
   let attribute = form.attribute || {};
-  return attribute[prop];
+  return attribute[fieldName];
 }
