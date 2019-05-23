@@ -5,10 +5,10 @@
 
     <dl>
       <dt>请检查核对绩效报告内容，发送后将无法撤回。</dt>
-      <dd><el-checkbox v-model="form.notice">仅通知有绩效结果的对象</el-checkbox></dd>
-      <dd><el-checkbox v-model="form.sort">显示排名信息</el-checkbox></dd>
+      <dd><el-checkbox v-model="form.isAdvice">仅通知有绩效结果的对象</el-checkbox></dd>
+      <dd><el-checkbox v-model="form.isRanking">显示排名信息</el-checkbox></dd>
     </dl>
-    <div class="warning">提示：XXX、XXX、XXX团队主管为空，请检查后重新发送或忽略该信息继续发送，这可能导致某些人看不到绩效数据。</div>
+    <div class="warning" v-if="tagsName">提示：{{tagsName}}等团队主管为空，请检查后重新发送或忽略该信息继续发送，这可能导致某些人看不到绩效数据。</div>
 
     <div class="dialog-footer">
       <el-button type="primary" @click="send">发布</el-button>
@@ -33,25 +33,28 @@ export default {
     return {
       visible: false,
       form: {
-        notice: false,
-        sort: false,
+        isAdvice: false,
+        isRanking: false,
       }
-
     }
   },
-  mounted() {
+  computed: {
+    tagsName() {
+      const {tagsName} = this.publishData;
+      if (tagsName && Array.isArray(tagsName) && tagsName.length) {
+        return tagsName.join('，')
+      }
+      return ''
+    },
   },
   methods: {
     open() {
-
       this.visible = true;
     },
     send() {
-
       publishPerformance({
         reportId: this.publishData.reportId,
-        isAdvice: false,
-        isRanking: false,
+        ...this.form,
       })
         .then(res => {
           if (res.status) return this.$platform.notification({
@@ -74,7 +77,10 @@ export default {
 
     },
     reset() {
-
+      this.form = {
+        isAdvice: false,
+        isRanking: false,
+      }
     }
   },
 }

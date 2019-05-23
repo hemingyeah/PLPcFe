@@ -57,8 +57,7 @@
       <dd><label>绩效方式</label>{{reportDetail.ruleType | ruleType}}</dd>
       <dd class="group-line"><label>统计状态</label>{{reportDetail.taskType ? '已完成并结算' : '已完成'}}</dd>
 
-      <dd><label>起止时间</label>{{reportDetail.startTime | formatDate}} ~ {{reportDetail.endTime |
-      formatDate}}({{reportDetail.timeType ? '结算时间' : '完成时间'}})
+      <dd><label>起止时间</label>{{reportDetail.startTime | formatDate}} ~ {{reportDetail.endTime | formatDate}}({{reportDetail.timeType ? '结算时间' : '完成时间'}})
       </dd>
       <dd><label>创建备注</label>{{reportDetail.remark}}</dd>
       <dd><label>创建人</label>{{reportDetail.creator}}</dd>
@@ -68,14 +67,12 @@
       <dd><label>审核操作人</label>{{reportDetail.reviewOperater}}</dd>
       <dd><label>审核备注</label>{{reportDetail.approveRemark}}</dd>
       <dd><label>审核时间</label>{{reportDetail.completeTime}}</dd>
-      <dd><label>发布时间</label>{{reportDetail.reviewOperater}}</dd>
+      <dd><label>发布时间</label>{{reportDetail.publishTime}}</dd>
 
     </dl>
 
     <div class="detail-list">
       <div style="text-align: right;" class="export-btn">
-
-
         <el-checkbox v-model="filterResult">仅显示有绩效结果的数据</el-checkbox>
         <el-button type="primary" :disabled="pending" @click="exportDetail">导出</el-button>
       </div>
@@ -295,12 +292,20 @@ export default {
         reviewOperater: am.reviewOperater,
         approveRemark: am.approveRemark,
         // completeTime: am.completeTime,
-        completeTime: am.completeTime && formatDate(am.completeTime, 'YYYY-MM-DD HH:mm:ss'),
+        completeTime: am.completeTime && formatDate(am.completeTime, 'YYYY-MM-DD HH:mm:ss'), // 审核时间
+        publishTime: am.publishTime && formatDate(am.publishTime, 'YYYY-MM-DD HH:mm:ss'), // 审核时间
 
       }
     },
+    reportCreator() {
+      const {reportDescList} = this.initData;
+      return {
+        name: reportDescList.reportCreateUserName,
+        id: reportDescList.reportCreateUser,
+      }
+    },
     isCreator() {
-      return true;
+      return this.reportCreator.id === this.initData.loginUserId;
     },
     isApprovor() {
       return this.approveMap.reviewerNames.some(ap => ap.userId === this.initData.loginUserId)
@@ -328,8 +333,6 @@ export default {
     stage() {
       const reportStatus = this.reportStatus;
 
-      console.log('reportStatus', reportStatus);
-
       if (reportStatus <= 1) return 'created';
       // if (reportStatus === 1) return 'approve';
       if (reportStatus === 2 || reportStatus === 3) return 'approved';
@@ -346,6 +349,7 @@ export default {
     publishData() {
       return {
         reportId: this.reportId,
+        tagsName: this.approveMap.tagsName,
       }
     },
     approveData() {
@@ -380,7 +384,6 @@ export default {
   },
   methods: {
     setStatus(n) {
-
       this.reportApproveStatus = n;
     },
     getRecord() {
@@ -706,7 +709,6 @@ export default {
 
           }
         }
-
       }
 
       .detail-table {
