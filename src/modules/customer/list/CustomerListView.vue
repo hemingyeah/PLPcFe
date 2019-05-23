@@ -895,16 +895,13 @@ export default {
     },
     /** 导出客户 */
     exportCustomer(exportAll) {
-      // disabled import and export
-      return this.$platform.alert('系统正在对导入导出功能做升级，请稍后再试');
-
-      // let ids = [];
-      // let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}客户数据.xlsx`;
-      // if (!exportAll) {
-      //   if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
-      //   ids = this.selectedIds;
-      // }
-      // this.$refs.exportPanel.open(ids, fileName);
+      let ids = [];
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}客户数据.xlsx`;
+      if (!exportAll) {
+        if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+        ids = this.selectedIds;
+      }
+      this.$refs.exportPanel.open(ids, fileName);
     },
     /** 检测导出条数 */
     checkExportCount(ids, max) {
@@ -1212,20 +1209,13 @@ export default {
         this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
       }
       if (category === 'importCustomer') {
-        this.$platform.alert('系统正在对导入导出功能做升级，请稍后再试')
-        // disabled import and export
-        // this.$refs.importCustomerModal.open();
+        this.$refs.importCustomerModal.open();
       }
       if (category === 'importLinkman') {
-        this.$platform.alert('系统正在对导入导出功能做升级，请稍后再试')
-        // disabled import and export
-        // this.$refs.importLinkmanModal.open();
+        this.$refs.importLinkmanModal.open();
       }
       if (category === 'update') {
-        this.$platform.alert('系统正在对导入导出功能做升级，请稍后再试')
-
-        // disabled import and export
-        // this.$refs.batchUpdateCustomerDialog.openBatchUpdateCustomerDialog();
+        this.$refs.batchUpdateCustomerDialog.openBatchUpdateCustomerDialog();
       }
     },
     async deleteCustomer() {
