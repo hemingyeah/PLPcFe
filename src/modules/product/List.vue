@@ -865,11 +865,17 @@ export default {
       }
 
       if (action === 'importProduct') {
-        this.$refs.importProductModal.open();
+        this.$platform.alert('系统正在对导入导出功能做升级，请稍后再试')
+
+        // disabled import and export
+        // this.$refs.importProductModal.open();
       }
 
       if (action === 'update') {
-        this.$refs.batchUpdateDialog.openBatchUpdateCustomerDialog();
+        this.$platform.alert('系统正在对导入导出功能做升级，请稍后再试')
+
+        // disabled import and export
+        // this.$refs.batchUpdateDialog.openBatchUpdateCustomerDialog();
       }
 
     },
@@ -1086,13 +1092,16 @@ export default {
     },
 
     exportProduct(exportAll) {
-      let ids = [];
-      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品数据.xlsx`;
-      if (!exportAll) {
-        if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
-        ids = this.selectedIds;
-      }
-      this.$refs.exportPanel.open(ids, fileName);
+      return this.$platform.alert('系统正在对导入导出功能做升级，请稍后再试')
+      // disabled import and export
+
+      // let ids = [];
+      // let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品数据.xlsx`;
+      // if (!exportAll) {
+      //   if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+      //   ids = this.selectedIds;
+      // }
+      // this.$refs.exportPanel.open(ids, fileName);
     },
 
     addCustomizedFieldToSearchModel() {
