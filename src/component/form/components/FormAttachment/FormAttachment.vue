@@ -34,5 +34,9 @@ export default {
 <style lang="scss">
 .form-attachment{
   width: 100%;
+
+  .base-upload-btn{
+    padding: 4px 12px;
+  }
 }
 </style>

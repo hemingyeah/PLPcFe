@@ -546,7 +546,7 @@ const FormDesign = {
     insertField(option = {}, value, index) {
       let newField = new FormField({
         formType: option.formType,
-        displayName: '标题'
+        displayName: option.name
       });
       
       let arr = cloneDeep(value ? value : this.value);

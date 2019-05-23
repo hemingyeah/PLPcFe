@@ -10,7 +10,9 @@ import FormDatetime from './FormDatetime';
 import FormPhone from './FormPhone';
 import FormEmail from './FormEmail';
 import FormSeparator from './FormSeparator';
+
 import FormAddress from './FormAddress';
+import FormLocation from './FormLocation'
 
 // base fields
 const BaseFormField = [
@@ -26,9 +28,12 @@ const BaseFormField = [
   FormPhone,
   FormEmail,
   FormSeparator,
+  FormAddress,
+  FormLocation
 ];
 
-const allFields = [...BaseFormField, FormAddress];
+const allFields = [...BaseFormField];
+// const allFields = [...BaseFormField, FormAddress];
 const BaseModeField = BaseFormField.map(item => item.formType)
 
 const Modes = {
