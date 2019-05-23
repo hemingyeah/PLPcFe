@@ -847,6 +847,8 @@ export default {
          * 人员选择初始化值是一个id，还要初始化它的options
          */
 
+      console.log('this.customerConfig.fieldInfo', this.customerConfig.fieldInfo);
+
       this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
         .map(f => {
 
@@ -859,7 +861,7 @@ export default {
             this.$set(this.params.customizedSearchModel, f.fieldName, {
               fieldName: f.fieldName,
               value: storageData[f.fieldName] ? storageData[f.fieldName].value : null,
-              operator: this.matchOperator(f.formType),
+              operator: this.matchOperator(f),
               formType: f.formType,
             });
             this.searchFields.push(f);
@@ -1451,9 +1453,9 @@ export default {
       return this.getBizTeamList(params, this.filterTeams, this.viewedPermission);
     },
     // match data
-    matchOperator(formType) {
+    matchOperator(field) {
       let operator = '';
-      switch (formType) {
+      switch (field.formType) {
       case 'date':
         operator = 'between';
         break;
@@ -1461,7 +1463,7 @@ export default {
         operator = 'between';
         break;
       case 'select':
-        operator = 'eq';
+        operator = (field.setting && field.setting.isMulti) ? 'contain' : 'eq';
         break;
       case 'selectMulti':
         operator = 'contain';
