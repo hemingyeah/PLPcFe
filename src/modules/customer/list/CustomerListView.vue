@@ -738,7 +738,7 @@ export default {
 
       this.$platform.openTab({
         id: `customer_view_${customerId}`,
-        title: '产品详情',
+        title: '客户详情',
         close: true,
         url: `/customer/view/${customerId}?noHistory=1`,
         fromId
