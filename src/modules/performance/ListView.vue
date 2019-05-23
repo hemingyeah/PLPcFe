@@ -261,7 +261,8 @@ export default {
         ids = this.multipleSelection;
       }
 
-      this.$refs.exportPanel.open(ids, fileName);
+      let isExportDownloadNow = true;
+      this.$refs.exportPanel.open(ids, fileName, isExportDownloadNow);
     },
     buildExportParams(checkedArr, ids) {
       let exportAll = !ids || !ids.length;

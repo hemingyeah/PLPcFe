@@ -58,6 +58,7 @@ export default {
       pending: false,
       checkedArr: [],
       isCheckedAll: true,
+      isDownloadNow: false, // 导出是否是立刻下载模式
 
       checked: ''
     }
@@ -68,13 +69,14 @@ export default {
     }
   },
   methods: {
-    open(ids = [], fileName = '导出数据.xlsx'){
+    open(ids = [], fileName = '导出数据.xlsx', isDownloadNow = false){
       this.pending = false;
       this.ids = ids;
       this.fileName = fileName;
 
       this.checkedArr = this.filterColumns.map(item => item.exportAlias ? item.exportAlias : item.field);
       this.isCheckedAll = true;
+      this.isDownloadNow = isDownloadNow;
 
       this.visible = true;
     },
@@ -109,16 +111,42 @@ export default {
     },
     // ajax形式导出
     ajaxExport(params){
-      return http.axios(this.method, this.action, params, false).then(res => {
+      let ajax = null;
+      // 是否是立即下载
+      if(this.isDownloadNow) {
+        ajax = http.axios(this.method, this.action, params, false, {responseType: 'blob'}).then(blob => {
+          let link = document.createElement('a');
+          let url = URL.createObjectURL(blob);
+          link.download = this.fileName;
+          link.href = url;
+          this.$refs.bridge.appendChild(link)
+          link.click();
 
-        this.visible = false;
-        this.pending = false;
+          this.visible = false;
+          this.pending = false;
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+            this.$refs.bridge.removeChild(link)
+          }, 150);
+        }).catch(err => console.error(err));
 
-        Platform.alert(res.message);
-        window.parent.showExportList();
-        window.parent.exportPopoverToggle(true);
+      } else {
+        ajax = http.axios(this.method, this.action, params, false).then(res => {
 
-      }).catch(err => console.error(err))
+          this.visible = false;
+          this.pending = false;
+
+          Platform.alert(res.message);
+
+          if(res.status == 0) {
+            window.parent.showExportList();
+            window.parent.exportPopoverToggle(true);
+          }
+
+        }).catch(err => console.error(err))
+      }
+
+      return ajax
     },
     async exportData(){
       if(this.checkedArr.length == 0) return Platform.alert('请至少选择一列导出');

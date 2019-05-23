@@ -33,6 +33,11 @@ export default {
   name: 'base-import',
   props: {
     templateUrl: String,
+    // 是否立即 导入 或 异步导入显示在 导入导出列表
+    isImportNow: {
+      type: Boolean,
+      default: false,
+    }, 
     action: String,
     title: {
       type: String,
@@ -76,11 +81,37 @@ export default {
       this.pending = true;
       Uploader.upload(this.file, this.action).then(result => {
 
-        Platform.alert(result.message);
-        this.visible = false;
+        if(result.status == 0){
+          if(this.isImportNow) {
+            let message = '导入成功！';
+            // 导入联系人的时候，返回的total竟然统计了第一行表头
+            let total = result.data.total;
+            if (this.action === '/contacts/import' || this.action == '/security/user/import/cellPhone') {
+              total -= 1;
+            }
 
-        window.parent.showExportList();
-        window.parent.exportPopoverToggle(true);
+            if(result.data && result.data.total) message += `共导入${total}条数据。`;
+
+            Platform.alert(message);
+            this.visible = false;
+            this.$emit('success');
+
+          } else {
+            Platform.alert(result.message);
+            this.visible = false;
+
+            window.parent.showExportList();
+            window.parent.exportPopoverToggle(true);
+          }
+
+        }else{
+          if(this.isImportNow) {
+            let data = result.data || [];
+            this.errors = data;
+          } else {
+            Platform.alert(result.message);
+          }
+        }
 
         this.pending = false;
       })

@@ -88,6 +88,7 @@
     <base-import
       title="维护服务电话"
       ref="serviceTelModal"
+      :is-import-now="isImportNow"
       @success="importServiceSuccess"
       action="/security/user/import/cellPhone">
       <div slot="tip">
@@ -161,6 +162,7 @@ export default {
     return {
       columns: this.buildColumns(),
       loadingPage: false,
+      isImportNow: true, // 是否是导入立刻刷新
       isAllotByTag: false, // 是否开始 按服务团队派单选项
       isSeeAllOrg: false, // 是否开启降低组织架构可见性选项
       multipleSelectionPanelShow: false,
