@@ -129,14 +129,15 @@ export default {
         this.pending = true;
         Uploader.upload(this.file, this.action)
           .then(result => {
-
             Platform.alert(result.message);
             
-            this.batchUpdateCustomerDialog = false;
             this.pending = false;
 
-            window.parent.showExportList();
-            window.parent.exportPopoverToggle(true);
+            if(result.status == 0) {
+              this.batchUpdateCustomerDialog = false;
+              window.parent.showExportList();
+              window.parent.exportPopoverToggle(true);
+            }
           })
           .catch(err => {
             console.error(err)

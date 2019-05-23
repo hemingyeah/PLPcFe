@@ -138,6 +138,7 @@ export default {
               window.parent.exportPopoverToggle(true);
               // this.$emit('success');
             }else{
+              Platform.alert(result.message);
               this.errors = result.data || [];
               // Platform.alert(`导入失败！\n${data.join('\n')}`);
             }
