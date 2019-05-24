@@ -1,9 +1,9 @@
 export default class Tab{
   constructor(options = {}){
     let closeable = options.close;
-    //close closeable属性作用一样，但是closeable会覆盖close
+    // close closeable属性作用一样，但是closeable会覆盖close
     if(undefined !== options.closeable) closeable = options.closeable;
-    //首页不允许关闭
+    // 首页不允许关闭
     if(options.url == '/home') closeable = false;
   
     this.id = options.id || Math.random() * 10000000 >> 0;
@@ -19,7 +19,7 @@ export default class Tab{
     this.show = options.show !== false;
     this.loading = true;
 
-    this.reload = options.reload === true; //标记tab是否需要更新
+    this.reload = options.reload === true; // 标记tab是否需要更新
   }
 
   merge(other = {}){

@@ -6,15 +6,15 @@
  * 根据frame的id维护一个历史记录的数组
  */
 const FrameHistoryManager = {
-  stack: {}, //历史记录堆栈 key为frame的id
+  stack: {}, // 历史记录堆栈 key为frame的id
   /** 根据frameid记录该frame的历史记录 */
   push(id, url){
-    //初始化默认值
+    // 初始化默认值
     if(!Array.isArray(this.stack[id])) this.stack[id] = [];
-    //如果不是最后一条记录
+    // 如果不是最后一条记录
     let index = this.stack[id].lastIndexOf(url);
     let length = this.stack[id].length;
-    //数组中没有  或者  不是最后一个
+    // 数组中没有  或者  不是最后一个
     if(index < 0 || (index >= 0 && index < length - 1)){
       this.stack[id].push(url);
     }
@@ -31,7 +31,7 @@ const FrameHistoryManager = {
     let url = null;
     if(index >= 0){
       url = this.stack[id][index];
-      //删除历史记录
+      // 删除历史记录
       this.stack[id].length = index + 1;
     }
 

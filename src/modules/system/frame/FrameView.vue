@@ -316,7 +316,7 @@ export default {
         this.exportList = (await http.get('/excels/getList') || []);
         // 更新操作列表
         if(!Array.isArray(this.exportList)) this.exportList = [];
-        //更新操作列表
+        // 更新操作列表
         this.operationList = this.operationList.filter(item => {
           return (
             item.operate == 'cancel'
@@ -356,17 +356,17 @@ export default {
     /** @deprecated */
     clearCachedIds(){
       let cachedKey = localStorage.getItem('cachedKey');
-      let cachedkeyArray = [];
+      let cachedKeyArray = [];
 
-      if(cachedKey) cachedkeyArray = cachedKey.split(',')
-      cachedkeyArray.forEach(key => localStorage.setItem(key, []))
+      if(cachedKey) cachedKeyArray = cachedKey.split(',')
+      cachedKeyArray.forEach(key => localStorage.setItem(key, []))
       localStorage.removeItem('cachedKey');
     },
     // popover manage
-    exportPopoverToggle(visable){
-      this.exportPopperVisible = visable;
+    exportPopoverToggle(visible){
+      this.exportPopperVisible = visible;
 
-      if(visable){
+      if(visible){
         this.profilePopperVisible = false
         this.userStatePopperVisible = false;
       }
