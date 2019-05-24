@@ -21,7 +21,7 @@ import Uploader from '@src/util/uploader';
 import platform from '@src/platform';
 
 export default {
-  name: "base-upload",
+  name: 'base-upload',
   data(){
     return {
       pending: false

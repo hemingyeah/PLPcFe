@@ -55,6 +55,7 @@ const FormFieldMap = {};
 const PreviewComponents = {};
 const SettingComponents = {};
 const BuildComponents = {};
+const ViewComponents = {};
 
 const FormFields = [...allFields]
 
@@ -86,6 +87,13 @@ for(let i = 0; i < FormFields.length; i++){
     if(null != buildComp){
       BuildComponents[buildComp.name] = buildComp;
       field.build = buildComp.name; // 表单组件名
+    }
+
+    // 显示组件
+    let viewComp = formField.component.view;
+    if(null != viewComp){
+      ViewComponents[viewComp.name] = viewComp;
+      field.view = viewComp.name
     }
 
     // 扩展组件
@@ -130,5 +138,6 @@ export {
   Modes,
   PreviewComponents,
   SettingComponents,
-  BuildComponents
+  BuildComponents,
+  ViewComponents
 }

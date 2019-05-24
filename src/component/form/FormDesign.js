@@ -1,7 +1,8 @@
-import { cloneDeep, isEmpty } from 'lodash'
 import FormField from './FormField';
 import Platform from '../../platform';
 import normalizeWheel from '@src/util/normalizeWheel';
+
+import * as config from './config'
 
 import {
   Modes,
@@ -9,6 +10,11 @@ import {
   PreviewComponents,
   SettingComponents
 } from './components';
+
+import { 
+  cloneDeep, 
+  isEmpty 
+} from 'lodash';
 
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
@@ -148,7 +154,7 @@ const FormDesign = {
     /** 最大字段数量 */
     max: {
       type: Number,
-      default: 100
+      default: config.FORM_FIELD_MAX
     }
   },
   data(){
@@ -598,8 +604,8 @@ const FormDesign = {
       <div class="form-design">
         <div class="form-design-panel">
           <div class={['form-design-tabs', this.hasSystemField ? 'form-design-withSys' : '']}>
-            <div class="form-design-tab" onClick={e => this.fieldGroup = 0}>基础组件</div>
-            {this.hasSystemField && <div class="form-design-tab" onClick={e => this.fieldGroup = 1}>系统组件</div>}
+            <div class="form-design-tab" onClick={e => this.fieldGroup = 0}>基础字段</div>
+            {this.hasSystemField && <div class="form-design-tab" onClick={e => this.fieldGroup = 1}>系统字段</div>}
           </div>
           <div class="form-design-tabs-content">{fieldList}</div>
         </div>

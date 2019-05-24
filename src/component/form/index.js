@@ -1,6 +1,6 @@
 import './common.scss';
 
-import {BuildComponents} from './components';
+import {BuildComponents, ViewComponents} from './components';
 
 import FormDesign from './FormDesign';
 import FormBuilder from './FormBuilder';
@@ -9,8 +9,9 @@ import FormItem from './FormItem.vue';
 
 const Form = {
   install(Vue){
-    Object.keys(BuildComponents).forEach(name => Vue.component(name, BuildComponents[name]));
-    
+    let components = {...BuildComponents, ...ViewComponents};
+    Object.keys(components).forEach(name => Vue.component(name, components[name]));
+
     Vue.component(FormDesign.name, FormDesign);
     Vue.component(FormBuilder.name, FormBuilder);
     Vue.component(FormView.name, FormView);

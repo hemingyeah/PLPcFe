@@ -1,6 +1,13 @@
+## 表单组件结构
+- view 视图组件
+- build 表单组件
+- preview 预览组件
+- setting 设置组件
+- extend 扩展组件
+
 ## 表单验证机制
 
-**表单三层结构**: Form组件 -> FormItem -> FormBuilder
+**表单构建器三层结构**: Form组件 -> FormItem -> FormBuilder
 - Form组件提供每种字段的具体实现
 - FormItem主要用于验证
 - FormBuilder作为容器，并提供整个表单的验证 

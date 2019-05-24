@@ -4,6 +4,7 @@ import * as Lang from '@src/util/lang';
 /** 格式化日期，支持毫秒 */
 export function fmt_date(value){
   if(value instanceof Date || (typeof value == 'number' && !isNaN(value) && isFinite(value))){
+    // eslint-disable-next-line no-param-reassign
     if(typeof value == 'number') value = new Date(value);
 
     return Lang.formatDate(value, 'YYYY-MM-DD');
@@ -14,6 +15,7 @@ export function fmt_date(value){
 /** 格式化日期时间，支持毫秒 */
 export function fmt_datetime(value){
   if(value instanceof Date || (typeof value == 'number' && !isNaN(value) && isFinite(value))){
+    // eslint-disable-next-line no-param-reassign
     if(typeof value == 'number') value = new Date(value);
 
     return Lang.formatDate(value, 'YYYY-MM-DD HH:mm:ss');
@@ -44,7 +46,7 @@ export function fmt_number_int(value){
 /** 格式化地址 */
 export function fmt_address(value){
   // 这里null需要特判，因为 typeof null == 'object'
-  if(null == value || typeof value != 'object' || value.constructor != Object) return value;
+  if(null == value || typeof value != 'object') return value;
 
   let province = value.adProvince || value.province || '';
   let city = value.adCity || value.city || '';

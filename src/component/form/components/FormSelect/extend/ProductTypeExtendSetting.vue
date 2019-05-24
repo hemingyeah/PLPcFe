@@ -36,14 +36,18 @@
 </template>
 
 <script>
+import {
+  SELECT_OPTION_MAX,
+  SELECT_OPTION_LENGTH_MAX
+} from '@src/component/form/config'
+
 import _ from 'lodash';
 import Platform from '@src/platform';
-
-const MAX_OPTION_NUM = 50;
-const MAX_OPTION_TEXT_NUM = 20;
+import SettingMixin from '@src/component/form/mixin/setting';
 
 export default {
   name: 'form-select-setting-product-type',
+  mixins: [SettingMixin],
   props: {
     field: {
       type: Object,
@@ -91,7 +95,7 @@ export default {
       this.$emit('input', {value, prop})
     },
     addOption(){
-      if(this.options.length >= MAX_OPTION_NUM) return Platform.alert(`选项数量不能超过${MAX_OPTION_NUM}`);
+      if(this.options.length >= SELECT_OPTION_MAX) return Platform.alert(`选项数量不能超过${SELECT_OPTION_MAX}`);
 
       let options = _.cloneDeep(this.options);
       this.index++;
@@ -144,8 +148,8 @@ export default {
       let message = [];
 
       // 验证数量
-      if(options.length > MAX_OPTION_NUM){
-        message.push(`选项数量不能超过${MAX_OPTION_NUM}`);
+      if(options.length > SELECT_OPTION_MAX){
+        message.push(`选项数量不能超过${SELECT_OPTION_MAX}`);
       }
 
       // 是否有空白项
@@ -154,9 +158,9 @@ export default {
       }
 
       // 验证每一项长度
-      let errIndex = options.map((item, index) => item.length > MAX_OPTION_TEXT_NUM ? index + 1 : -1).filter(item => item != -1);
+      let errIndex = options.map((item, index) => item.length > SELECT_OPTION_LENGTH_MAX ? index + 1 : -1).filter(item => item != -1);
       if(errIndex.length > 0){
-        message.push(`第${errIndex.join('，')}行字数超过${MAX_OPTION_TEXT_NUM}字`);
+        message.push(`第${errIndex.join('，')}行字数超过${SELECT_OPTION_LENGTH_MAX}个`);
       }
 
       return message.length > 0 ? message.join('\n') : null;

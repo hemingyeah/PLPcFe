@@ -2,7 +2,7 @@
   <div class="form-setting-panel">
     <h3>系统字段 -- {{setting.name}}</h3>
     <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" maxlength="128"></textarea>
+      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
@@ -15,8 +15,11 @@
 </template>
 
 <script>
+import SettingMixin from '@src/component/form/mixin/setting';
+
 export default {
   name: 'customer-address-extend-setting',
+  mixins: [SettingMixin],
   props: {
     field: {
       type: Object,

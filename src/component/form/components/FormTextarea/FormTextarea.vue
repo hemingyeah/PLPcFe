@@ -7,7 +7,7 @@
 
 <script>
 import {getScrollBarWidth} from '@src/util/dom';
-import FormMixin from '../FormMixin';
+import FormMixin from '@src/component/form/mixin/form';
 
 export default {
   name: 'form-textarea',

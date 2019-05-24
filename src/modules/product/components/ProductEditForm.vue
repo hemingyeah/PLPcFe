@@ -61,7 +61,7 @@
 
 <script>
 import * as FormUtil from '@src/component/form/util';
-import FormMixin from '@src/component/form/components/FormMixin'
+import FormMixin from '@src/component/form/mixin/form'
 import {checkSerialNumber} from '@src/api/ProductApi';
 import _ from 'lodash'
 

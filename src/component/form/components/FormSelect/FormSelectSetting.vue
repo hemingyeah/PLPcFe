@@ -2,10 +2,10 @@
   <div class="form-setting-panel form-select-setting">
     <h3>基础字段 -- {{setting.name}}</h3>
     <div class="form-setting-group">
-      <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" maxlength="6">
+      <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
     </div>
     <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" maxlength="128"></textarea>
+      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
@@ -17,7 +17,7 @@
     </h3>
     <div class="form-select-setting-list">
       <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
-        <input type="text" :value="option.value" @input="updateOption($event, option)" maxlength="20">
+        <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
         <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
         <template v-if="!field.isMulti">
           <button 
@@ -56,16 +56,20 @@
 </template>
 
 <script>
+import {
+  SELECT_OPTION_MAX,
+  SELECT_OPTION_LENGTH_MAX,
+  FORM_FIELD_LOGICAL_DISABLE
+} from '../../config'
+
 import _ from 'lodash';
 import Platform from '@src/platform';
-import LogicalFieldModal from './components/LogicalFieldModal'
-
-const MAX_OPTION_NUM = 50;
-const MAX_OPTION_TEXT_NUM = 20;
-const DISABLE_LOGICAL_FIELD = ['separator']
+import LogicalFieldModal from './components/LogicalFieldModal';
+import SettingMixin from '@src/component/form/mixin/setting';
 
 export default {
   name: 'form-select-setting',
+  mixins: [SettingMixin],
   props: {
     field: {
       type: Object,
@@ -97,7 +101,7 @@ export default {
 
       for(let i = fields.length - 1; i > currIndex; i--){
         let field = fields[i];
-        if(field.isSystem == 0 && DISABLE_LOGICAL_FIELD.indexOf(field.formType) < 0){
+        if(field.isSystem == 0 && FORM_FIELD_LOGICAL_DISABLE.indexOf(field.formType) < 0){
           return true;
         }
       }
@@ -134,6 +138,9 @@ export default {
       }
 
       return logical;
+    },
+    optionMaxLength(){
+      return SELECT_OPTION_LENGTH_MAX
     }
   },
   data(){
@@ -170,7 +177,7 @@ export default {
       this.$emit('input', {value, prop})
     },
     addOption(){
-      if(this.options.length >= MAX_OPTION_NUM) return Platform.alert(`选项数量不能超过${MAX_OPTION_NUM}`);
+      if(this.options.length >= SELECT_OPTION_MAX) return Platform.alert(`选项数量不能超过${SELECT_OPTION_MAX}`);
 
       let options = _.cloneDeep(this.options);
       this.index++;
@@ -226,8 +233,8 @@ export default {
       let message = [];
 
       // 验证数量
-      if(options.length > MAX_OPTION_NUM){
-        message.push(`选项数量不能超过${MAX_OPTION_NUM}`);
+      if(options.length > SELECT_OPTION_MAX){
+        message.push(`选项数量不能超过${SELECT_OPTION_MAX}`);
       }
 
       // 是否有空白项
@@ -236,9 +243,9 @@ export default {
       }
 
       // 验证每一项长度
-      let errIndex = options.map((item, index) => item.length > MAX_OPTION_TEXT_NUM ? index + 1 : -1).filter(item => item != -1);
+      let errIndex = options.map((item, index) => item.length > SELECT_OPTION_LENGTH_MAX ? index + 1 : -1).filter(item => item != -1);
       if(errIndex.length > 0){
-        message.push(`第${errIndex.join('，')}行字数超过${MAX_OPTION_TEXT_NUM}字`);
+        message.push(`第${errIndex.join('，')}行字数超过${SELECT_OPTION_LENGTH_MAX}个`);
       }
 
       return message.length > 0 ? message.join('\n') : null;

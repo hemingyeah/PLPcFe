@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import FormMixin from '../FormMixin';
+import FormMixin from '@src/component/form/mixin/form';
 
 export default {
   name: 'form-number',

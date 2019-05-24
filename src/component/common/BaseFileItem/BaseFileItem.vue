@@ -29,6 +29,7 @@
 </template>
 
 <script>
+// TODO: 识别更多类型的文件
 import platform from '@src/platform/index';
 
 export default {
@@ -77,7 +78,7 @@ export default {
       }
 
       if (this.size === 'small') {
-        icon = `small-${ icon }`;
+        icon = `small-${icon}`;
       }
 
       return icon;
@@ -140,7 +141,7 @@ export default {
     },
     async deleteFile(){
       const name = this.file.filename;
-      if(await platform.confirm(`确定要删除该附件？\n${ name }`)){
+      if(await platform.confirm(`确定要删除该附件？\n${name}`)){
         this.$emit('delete', this.file);
       }
     }

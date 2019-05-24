@@ -1,6 +1,7 @@
 import FormAddressPreview from './FormAddressPreview.vue';
-import FormAddress from './FormAddress.vue'
 import FormAddressSetting from './FormAddressSetting.vue';
+import FormAddressView from './FormAddressView.vue';
+import FormAddress from './FormAddress.vue'
 
 import CustomerAddressExtendSetting from './extend/CustomerAddressExtendSetting.vue'
 
@@ -12,6 +13,7 @@ let FormAddressField = {
     setting: FormAddressSetting,
     preview: FormAddressPreview,
     build: FormAddress,
+    view: FormAddressView,
     extend: {
       'customer_customerAddress': CustomerAddressExtendSetting
     }

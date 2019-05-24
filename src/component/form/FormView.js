@@ -1,30 +1,8 @@
+import * as FormUtil from './util';
+
 import { toArray } from '@src/util/lang';
-import { fmt_address } from '@src/filter/fmt';
-import { isHiddenField, getValue } from './util';
-
-// TODO: 支持view component
-
-function formatValue(field, value, model, h){
-  let {formType, setting} = field;
-
-  if (formType === 'attachment') {
-    return toArray(value).map(a => <base-file-item file={a} readonly key={a.id}/>)
-  }
-  
-  if (formType === 'select' && setting.isMulti) {
-    return toArray(value).join('，')
-  }
-  
-  if (formType === 'user') {
-    return value && (value.displayName || value.name)
-  }
-  
-  if (formType === 'customerAddress') {
-    return fmt_address(value)
-  }
-
-  return value;
-}
+import { fmt_date, fmt_datetime } from '@src/filter/fmt'
+import { FormFieldMap } from './components';
 
 const FormView = {
   name: 'form-view',
@@ -47,11 +25,36 @@ const FormView = {
     toggleDisplay(id) {
       this.sectionState[id] = !this.sectionState[id];
     },
-    buildCommonDom({displayName, value, formType}) {
+    /** 格式化值 */
+    formatValue(field, value){
+      // 多选
+      if (FormUtil.isMultiSelect(field)) {
+        return toArray(value).join('，')
+      }
+
+      // 日期
+      if(FormUtil.isDate(field)){
+        return fmt_date(value)
+      }
+
+      // 日期时间
+      if(FormUtil.isDatetime(field)){
+        return fmt_datetime(value)
+      }
+      
+      // 人员
+      if (field.formType === 'user') {
+        return value && (value.displayName || value.name)
+      }
+      
+      return value;
+    },
+    buildCommonDom(field, value) {
+      let {displayName, formType} = field;
+      
       let className = {
         'form-view-row-content': true,
-        'form-view-textarea-preview': formType === 'textarea',
-        'base-file__preview': formType === 'attachment',
+        'form-view-textarea-preview': formType === 'textarea'
       };
       
       return (
@@ -69,18 +72,21 @@ const FormView = {
         return this.$slots[fieldName];
       }
       
-      let value = getValue(field, this.value)
-      let params = {displayName, value, formType};
-
+      let value = FormUtil.getValue(field, this.value)
       // scopedSlot
       if (this.$scopedSlots[fieldName]) {
-        return this.$scopedSlots[fieldName](params);
+        return this.$scopedSlots[fieldName]({displayName, value, formType, field});
       }
 
-      params.value = formatValue(field, value, this.value, h)
-      
-      // other types: text textarea date number datetime phone
-      return this.buildCommonDom(params);
+      // 组件默认视图
+      let FormField = FormFieldMap.get(field.formType);
+      if(FormField && FormField.view){
+        let attrs = {props: {field, value}}
+        return h(FormField.view, attrs);
+      }
+
+      // 通用视图
+      return this.buildCommonDom(field, this.formatValue(field, value));
     },
     groupField(fields) {
       let newArr = [];
@@ -88,7 +94,7 @@ const FormView = {
       
       fields
         // 隐藏不显示逻辑项
-        .filter(item => !isHiddenField(item, this.value, fields, false))
+        .filter(item => !FormUtil.isHiddenField(item, this.value, fields, false))
         // 隐藏无内容的分割线
         .filter((field, index, arr) => {
           if(field.formType != 'separator') return true;

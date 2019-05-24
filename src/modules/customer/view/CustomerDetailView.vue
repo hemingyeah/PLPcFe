@@ -72,17 +72,6 @@
         <form-view :fields="fields" :value="customer">
           <div slot="name"></div>
 
-          <template slot="customerAddress" slot-scope="{value}">
-            <div class="form-view-row" v-if="value">
-              <label>地址</label>
-              <div class="form-view-row-content">
-                <span>{{value | fmt_address}}</span>
-                <i v-if="value.adLatitude && value.adLongitude" @click="openMap"
-                   class="iconfont icon-address customer-address-icon"></i>
-              </div>
-            </div>
-          </template>
-
           <template slot="tags" slot-scope="{value}">
             <div class="form-view-row" v-if="isDivideByTag">
               <label>服务团队</label>
@@ -560,10 +549,6 @@ export default {
         console.error('customer-detail-view deleteCustomer error', e);
       }
     },
-    openMap() {
-      this.$fast.map.display(this.customer.customerAddress, {title: this.customer.name, })
-        .catch(err => console.error('openMap catch an err: ', err));
-    },
     fetchCustomer() {
       const id = this.initData.id;
       this.$http.get('/customer/get', {id})
@@ -674,12 +659,6 @@ export default {
     box-shadow: 0 1px 4px rgba(216,216,216, .65);
     display: flex;
     flex-flow: column nowrap;
-  }
-
-  .customer-address-icon {
-    color: $color-primary;
-    cursor: pointer;
-    font-size: 14px;
   }
 
   .customer-tool-bar {

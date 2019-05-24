@@ -223,3 +223,8 @@ export function getValue(field, form, isSmooth = false){
   let attribute = form.attribute || {};
   return attribute[fieldName];
 }
+
+/** 验证字段格式 */
+export function validate(){
+
+}

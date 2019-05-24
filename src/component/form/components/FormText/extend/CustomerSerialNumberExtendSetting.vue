@@ -3,7 +3,10 @@
 </template>
 
 <script>
+import SettingMixin from '@src/component/form/mixin/setting';
+
 export default {
-  name: 'customer-serial-number-extend-setting'
+  name: 'customer-serial-number-extend-setting',
+  mixins: [SettingMixin]
 }
 </script>

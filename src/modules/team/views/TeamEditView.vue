@@ -40,7 +40,7 @@ import * as TeamApi from '@src/api/TeamApi'
 import _ from 'lodash'
 import qs from 'qs';
 
-import FormMixin from '@src/component/form/components/FormMixin'
+import FormMixin from '@src/component/form/mixin/form'
 
 import { stringLen } from './../../../util/lang/index.js'
 
