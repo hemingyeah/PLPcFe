@@ -121,8 +121,6 @@ export default {
         this.$emit('guideUpdateModalShow', isShowUserGuide);
       }
 
-      console.table(this.guideValue)
-
     },
     updateLoading(isLoading) {
       this.loading = isLoading;

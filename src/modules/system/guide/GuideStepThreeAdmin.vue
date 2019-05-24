@@ -10,7 +10,7 @@
 
       <!-- start 副标题 -->
       <div class="guide-admin-subtitle">
-        当涉及数据恢复、日记查询等高级权限时需要使用该手机号进行验证 <br>
+        当涉及数据恢复、日记查询等高级权限时需要使用该手机号进行验证
         售后宝承诺保证您的数据安全
       </div>
       <!-- end 副标题 -->
@@ -172,12 +172,14 @@ export default {
 
       let params = {
         profession: this.data.profession || '',
-        // role: this.data.role.map(r => {
-        //   return {
-        //     roleId: r.roleId,
-        //     userId: r.userId,
-        //   }
-        // }),
+        role: this.data.role.filter(f => {
+          return Array.isArray(f.userId) && f.userId.length > 0;
+        }).map(r => {
+          return {
+            roleId: r.roleId,
+            userId: r.userId,
+          }
+        }),
         code: this.form.code || '',
         phone: this.form.phone || '',
       }
@@ -217,7 +219,7 @@ export default {
 
 <style lang="scss">
 .guide-admin-view {
-  width: 480px;
+  width: 420px;
   margin: 0 auto;
   padding-top: 60px;
 
@@ -229,7 +231,6 @@ export default {
   }
   .guide-admin-subtitle {
     color: #777;
-    font-size: 16px;
     line-height: 22px;
     margin-top: 5px;
   }
@@ -252,7 +253,7 @@ export default {
     .el-form-item__content {
       display: flex;
       width: 300px;
-      margin: 0 auto;
+      margin: 0 auto !important;
     }
   }
 

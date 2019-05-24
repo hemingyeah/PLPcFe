@@ -51,13 +51,23 @@
 
     <div class="main-content" v-loading="loading">
       <div class="product-detail">
-
-        <h3 class="product-name" :class="{'product-name-expand': showWholeName == 1}">
-          <span class="product-name-delete" v-if="isDelete" title="该产品已被删除，只能查看数据。" v-tooltip>已删除</span>
-          <span ref="customerName">{{product.name}}</span>
-          <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
-        </h3>
-
+        
+        <sample-tooltip :row="product">
+          <template slot="content" slot-scope="{isContentTooltip}">
+            <el-tooltip :content="product.name" placement="top" :disabled="!isContentTooltip">
+              <h3 
+                class="product-name" 
+                :class="{
+                  'product-name-expand': showWholeName == 1,
+                }"
+              >
+                <span class="product-name-delete" v-if="isDelete" title="该产品已被删除，只能查看数据。" v-tooltip>已删除</span>
+                <span ref="customerName">{{product.name}}</span>
+                <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
+              </h3>
+            </el-tooltip>
+          </template>
+        </sample-tooltip>
 
         <form-view :fields="fields" :value="product">
           <div slot="name"></div>
@@ -761,6 +771,9 @@ body {
   }
 }
 
+.sample-tooltip-container {
+  background-color: #eef8f8;
+}
 
 
 </style>

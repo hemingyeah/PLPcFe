@@ -16,8 +16,9 @@
         :label="column.label"
         :prop="column.field"
         :width="column.width"
+        :class-name="column.field == 'eventNo' ? 'customer-event-name-superscript-td' : ''"
         :sortable="column.sortable"
-        show-overflow-tooltip
+        :show-overflow-tooltip="column.field !== 'eventNo'"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'templateId'">
@@ -27,7 +28,21 @@
             {{scope.row.executorName}}
           </template>
           <template v-else-if="column.field === 'eventNo'">
-            <a :href="`/event/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail" class="event-link">{{scope.row[column.field]}}</a>
+
+              <sample-tooltip :row="scope.row">
+                <template slot="content" slot-scope="{isContentTooltip}">
+                  <el-tooltip :content="scope.row[column.field]" placement="top" :disabled="!isContentTooltip">
+                    <a 
+                      :href="`/event/view/${scope.row.id}`" 
+                      :data-id="scope.row.id" 
+                      @click="openDetail" 
+                      class="event-link">
+                      {{scope.row[column.field]}}
+                    </a>
+                  </el-tooltip>
+                </template>
+              </sample-tooltip>
+
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -209,5 +224,18 @@ export default {
       }
     }
 
+  }
+
+  .customer-event-name-superscript-td {
+    padding: 0 !important;
+    & > div {
+      height: 43px;
+      line-height: 43px !important;
+      a {
+        display: inline-block;
+        height: 43px;
+        line-height: 43px;
+      }
+    }
   }
 </style>

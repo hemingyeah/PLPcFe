@@ -87,6 +87,7 @@ export default {
     // 进入系统
     systemIn() {
       this.$emit('next', [3, { key: 'isShowUserGuide', value: true }]);
+      this.$platform.refreshTab('HOME');
     }
   },
 }

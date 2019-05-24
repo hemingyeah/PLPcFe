@@ -14,15 +14,31 @@
         :label="column.label"
         :prop="column.field"
         :width="column.width"
+        :class-name="column.field == 'name' ? 'customer-product-name-superscript-td' : ''"
         :sortable="column.sortable"
-        show-overflow-tooltip
+        :show-overflow-tooltip="column.field !== 'name'"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'state'">
             {{scope.row[column.field]}}
           </template>
           <template v-else-if="column.field === 'name'">
-            <a href="" :data-id="scope.row.id" @click.prevent="createProductTab(scope.row.id)" class="product-link">{{scope.row[column.field]}}</a>
+
+            <sample-tooltip :row="scope.row">
+                <template slot="content" slot-scope="{isContentTooltip}">
+                  <el-tooltip :content="scope.row[column.field]" placement="top" :disabled="!isContentTooltip">
+                    <a 
+                        href="" 
+                        :data-id="scope.row.id" 
+                        @click.prevent="createProductTab(scope.row.id)" 
+                        class="product-link"
+                      >
+                      {{scope.row[column.field]}}
+                    </a>
+                  </el-tooltip>
+                </template>
+              </sample-tooltip>
+            
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -166,6 +182,19 @@ export default {
           padding: 0 5px;
           color: $color-primary;
         }
+      }
+    }
+  }
+
+  .customer-product-name-superscript-td {
+    padding: 0 !important;
+    & > div {
+      height: 43px;
+      line-height: 43px !important;
+      a {
+        display: inline-block;
+        height: 43px;
+        line-height: 43px;
       }
     }
   }

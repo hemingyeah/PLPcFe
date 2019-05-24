@@ -17,7 +17,7 @@
         :prop="column.field"
         :width="column.width"
         :sortable="column.sortable"
-        show-overflow-tooltip
+        :show-overflow-tooltip="column.field === 'taskNo'"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'templateId'">
@@ -27,7 +27,13 @@
             {{scope.row.suggestion}}
           </template>
           <template v-else-if="column.field === 'taskNo'">
-            <a :href="`/task/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail" class="task-link">{{scope.row[column.field]}}</a>
+            <sample-tooltip :row="scope.row">
+              <template slot="content" slot-scope="{isContentTooltip}">
+                <el-tooltip :content="scope.row[column.field]" placement="top" :disabled="!isContentTooltip">
+                  <a :href="`/task/view/${scope.row.id}`" :data-id="scope.row.id" @click="openDetail" class="task-link">{{scope.row[column.field]}}</a>
+                </el-tooltip>
+              </template>
+            </sample-tooltip>
           </template>
           <template v-else-if="column.field === 'executor' && scope.row[column.field]">
             {{scope.row[column.field].displayName}}

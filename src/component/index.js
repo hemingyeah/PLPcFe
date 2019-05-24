@@ -28,6 +28,7 @@ import BaseContact from './common/BaseContact';
 // 业务组件
 import BizUserSelect from './business/BizUserSelect'
 import BizTeamSelect from './business/BizTeamSelect'
+import SampleTooltip from './common/SampleTooltip'
 
 import Form from './form';
 
@@ -58,7 +59,8 @@ const components = [
   
   BizUserSelect,
   BizTeamSelect,
-  BaseWindow
+  BaseWindow,
+  SampleTooltip
 ];
 
 export default {

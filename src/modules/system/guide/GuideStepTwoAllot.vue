@@ -102,6 +102,9 @@ export default {
     },
     // 跳过
     jump() {
+      this.roleList.forEach(l => {
+        l.users = [];
+      });
       this.emit(2, {
         key: 'role',
         value: []

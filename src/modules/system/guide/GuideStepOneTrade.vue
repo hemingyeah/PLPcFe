@@ -115,7 +115,7 @@ export default {
         {
           icon: 'icon-hulianwanglanx',
           text: '互联网/IT',
-          value: '互联网',
+          value: '互联网/IT',
           message: 'Keep、NEC、金桥信息等5000+企业在使用',
           detailHtml: 'Keep、NEC、金桥信息等5000+企业在使用，<br> 用互联网化服务管理新模式，精准管理服务过程，<br> 提升服务质量，为客户营造创新服务体验',
           list: ['智能工单管理', '在线客服中心', '库存管理', '客户档案管理', '自动派单、抢单等创新模式', '客户结算、绩效报告']

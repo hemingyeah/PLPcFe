@@ -3,7 +3,7 @@ import http from '@src/util/http';
 /**
  * 设置用户向导
  * @param {Object} params - 参数
- * @param {String} params.profession - 行业信息: 制造业、互联网、服务业、建筑家居、贸易零售、其他
+ * @param {String} params.profession - 行业信息: 制造业、互联网/IT、服务业、建筑家居、贸易零售、其他
  * @param {Array} params.role - 权限分配列表
  * role = [
  *  { id: '', userId: [ userId ] }

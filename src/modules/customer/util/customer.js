@@ -61,7 +61,10 @@ export function packToCustomer(fields, form, initTags){
 export function packToForm(field, data, defaultAddress = {}){
   let cusAdr = data.customerAddress || defaultAddress || {};
 
-  return {
+  let attribute = {
+    ...data.attribute
+  };
+  let form = {
     id: data.id,
     name: data.name,
     lmName: data.lmName,
@@ -76,12 +79,11 @@ export function packToForm(field, data, defaultAddress = {}){
       latitude: cusAdr.adLatitude || '',
       addressType: cusAdr.addressType || 0
     },
-    // COMMENT: 暂时去除团队
     tags: toArray(data.tags),
-    // tags: toArray(data.tags).map(item => item.id),
     manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null,
-    ...data.attribute
   };
+
+  return Object.assign(attribute, form)
 }
 
 
