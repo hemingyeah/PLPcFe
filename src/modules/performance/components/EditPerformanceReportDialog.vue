@@ -1,5 +1,5 @@
 <template>
-  <base-modal :title="title" :show.sync="visible" width="600px" class="base-import-modal" @closed="reset">
+  <base-modal :title="title" :show.sync="visible" width="600px" class="create-performance-report-modal" @closed="reset">
     <div class="build-stage" v-if="stage === 'build'">
       <el-form ref="form" :model="form" label-width="110px" >
         <el-form-item label="报告名称" :error="!formValidation.reportName ? '必填': ''" required>
@@ -93,10 +93,10 @@
         </div>
         <el-form-item label="备注">
           <el-input v-model="form.remarks" type="textarea" :maxlength="500"></el-input>
-          <p style="color: #999;">* 生成绩效报告的时间取决于选择的数据量，如遇长时间等待请稍后刷新</p>
+          <p style="color: #999;margin: 0">* 生成绩效报告的时间取决于选择的数据量，如遇长时间等待请稍后刷新</p>
         </el-form-item>
 
-        <el-form-item label="抄送人" v-if="ccToOthers">
+        <el-form-item label="抄送人">
           <el-select
             style="width: 300px"
             v-model="form.carbonCopy"
@@ -117,8 +117,8 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="审核人">
-          <el-select v-model="approvePersonIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择" disabled>
+        <el-form-item label="审核人" >
+          <el-select v-model="approvePersonIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择" disabled style="width: 300px">
             <el-option
               v-for="item in approvePerson"
               :key="item.value"
@@ -128,7 +128,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="发布流程">
+        <el-form-item label="发布流程" class="publish">
           <approve-process stage="create"></approve-process>
         </el-form-item>
       </el-form>
@@ -643,9 +643,23 @@ export default {
   }
 }
 
+.create-performance-report-modal {
 
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
+  .approve-process-container {
+    width: 300px;
+    margin: 0;
+  }
+
+  .base-modal-body {
+    padding: 15px;
+    padding-right: 25px;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
 }
+
 </style>

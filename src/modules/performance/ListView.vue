@@ -31,7 +31,7 @@
           <el-select v-model="secondaryParams.status" placeholder="请选择">
             <el-option
               v-for="item in statusOptions"
-              :key="item.value"
+              :key="item.label"
               :label="item.label"
               :value="item.value">
             </el-option>
@@ -131,6 +131,12 @@
             </template>
             <template v-else-if="column.field === 'action'">
               <el-button plain @click="viewDetail(scope.row)" size="small">查看</el-button>
+            </template>
+            <template v-else-if="column.field === 'status'">
+              <!--<el-button plain @click="viewDetail(scope.row)" size="small">查看</el-button>-->
+
+              {{scope.row[column.field]}}
+              <el-tag size="mini" v-if="scope.row.waitingForApprove">审核中</el-tag>
             </template>
             <template v-else>
               {{scope.row[column.field]}}
@@ -233,15 +239,15 @@ export default {
         },
         {
           label: '已创建',
-          value: 0,
+          value: [0],
         },
         {
-          label: '已审批',
-          value: 3,
+          label: '已审核',
+          value: [1, 3],
         },
         {
           label: '已发布',
-          value: 4,
+          value: [4],
         },
       ],
       params: {
@@ -350,8 +356,9 @@ export default {
               type: type ? '按团队' : '按个人',
               id,
               carbonCopy: carbonCopy ? carbonCopy.replace(/\[|\]|"/g, '') : '',
+              waitingForApprove: status === 1,
               status: (() => {
-                if (status < 3) {
+                if (status === 0 || status === 1) {
                   return '已创建'
                 }
 
@@ -370,7 +377,7 @@ export default {
 
     },
     buildParams() {
-      const {keyword, pageNum, pageSize, time, type, ruleIds} = this.params;
+      const {keyword, pageNum, pageSize, time, type, ruleIds, status} = this.params;
       let params = {
         pageNum,
         pageSize,
@@ -393,7 +400,7 @@ export default {
         params.type = type;
       }
 
-      params.status = '';
+      params.status = status ? status.join(',') : '';
 
       return params;
     },
@@ -412,7 +419,6 @@ export default {
         url: `/performance/v2/report/desc/${row.id}`,
         fromId
       })
-
     },
     openDialog() {
       window.TDAPP.onEvent('pc：绩效报告-新建事件');
@@ -468,6 +474,7 @@ export default {
         pageNum: 1,
         totalItems: 0,
         ruleIds: '',
+        status: '',
       }
 
       this.secondaryParams = {
@@ -519,7 +526,7 @@ export default {
           label: '状态',
           field: 'status',
           show: true,
-          width: '100px',
+          width: '150px',
           export: true
         },
         {

@@ -43,13 +43,12 @@
 
     <div class="setting-item">
       <p class="setting-title">绩效报告抄送选项</p>
-      <div class="content">
-        绩效报告完成审核后，向抄送人发送绩效报告
-        <el-switch v-model="form.sendToCc" @change="changeSetting" :disabled="pending"></el-switch>
+      <div class="setting-cc">
+        <span>请选择抄送绩效报告的发送节点</span>
+        <el-radio :label="0" @change="changeSetting" v-model="form.sendToCc" :disabled="pending">创建后抄送</el-radio>
+        <el-radio :label="3" @change="changeSetting" v-model="form.sendToCc" :disabled="pending">审核后抄送</el-radio>
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -191,6 +190,14 @@ export default {
         margin: 0;
       }
 
+      .setting-cc {
+        &>span {
+          margin-right: 25px;
+        }
+        label {
+          margin-bottom: 0;
+        }
+      }
 
       .content {
         display: flex;

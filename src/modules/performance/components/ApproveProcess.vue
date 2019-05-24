@@ -7,6 +7,7 @@
     <li class="line" :class="{processing: order > 0.5, 'half-processing': order === 0.5}">
       <div> </div>
       <div> </div>
+      <el-tag size="mini" v-if="stage === 'approve'">审核中</el-tag>
     </li>
     <li :class="{processing: order >= 1}">
       <i class="iconfont icon-tijiaoshenhe"></i>
@@ -57,7 +58,7 @@ export default {
       case 'created':
         return 0.5;
       case 'approve':
-        return 1;
+        return 0.5;
       case 'approved':
         return 1.5;
       case 'publish':
@@ -107,10 +108,18 @@ export default {
       flex-grow: 1;
       display: flex;
       padding-top: 15px;
+      margin: 0 10px;
+      position: relative;
       div {
         width: 50%;
         height: 0;
         border-top: 2px dashed #AFAFAF;
+      }
+      .el-tag {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
       }
     }
 

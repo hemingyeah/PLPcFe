@@ -322,19 +322,19 @@ export default {
        * 0 已创建  1 待审批 2 审批不通过 3 审批通过 4 已发布
        */
 
-      if (this.reportApproveStatus === 0 || this.reportApproveStatus > this.approveMap.reportStatus) {
+      if (this.reportApproveStatus === 0 || this.reportApproveStatus > this.initData.reportStatus) {
         return this.reportApproveStatus;
       }
 
-      return this.approveMap.reportStatus;
+      return this.initData.reportStatus;
     },
 
     // 1 显示审核中的小标志
     stage() {
       const reportStatus = this.reportStatus;
 
-      if (reportStatus <= 1) return 'created';
-      // if (reportStatus === 1) return 'approve';
+      if (reportStatus < 1) return 'created';
+      if (reportStatus === 1) return 'approve';
       if (reportStatus === 2 || reportStatus === 3) return 'approved';
       if (reportStatus === 4) return 'notice';
 
