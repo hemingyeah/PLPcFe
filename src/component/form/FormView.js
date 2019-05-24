@@ -1,7 +1,8 @@
 import { toArray } from '@src/util/lang';
-import { fmt_address } from '@src/filter/fmt';
-import { isHiddenField } from './util';
+import { fmt_address, fmt_datetime, fmt_date } from '@src/filter/fmt';
 import { FormFieldMap } from './components';
+import * as FormUtil from './util';
+
 import platform from '@src/platform'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
@@ -27,11 +28,36 @@ const FormView = {
     toggleDisplay(id) {
       this.sectionState[id] = !this.sectionState[id];
     },
-    buildCommonDom({displayName, value, formType}) {
+    /** 格式化值 */
+    formatValue(field, value){
+      // 多选
+      if (FormUtil.isMultiSelect(field)) {
+        return toArray(value).join('，')
+      }
+
+      // 日期
+      if(FormUtil.isDate(field)){
+        return fmt_date(value)
+      }
+
+      // 日期时间
+      if(FormUtil.isDatetime(field)){
+        return fmt_datetime(value)
+      }
+      
+      // 人员
+      if (field.formType === 'user') {
+        return value && (value.displayName || value.name)
+      }
+      
+      return value;
+    },
+    buildCommonDom(field, value) {
+      let {displayName, formType} = field;
+      
       let className = {
         'form-view-row-content': true,
-        'form-view-textarea-preview': formType === 'textarea',
-        'base-file__preview': formType === 'attachment',
+        'form-view-textarea-preview': formType === 'textarea'
       };
       
       return (
@@ -123,7 +149,7 @@ const FormView = {
 
       // return slot
       if (this.$scopedSlots[fieldName]) {
-        return this.$scopedSlots[fieldName](params);
+        return this.$scopedSlots[fieldName]({displayName, value, formType, field});
       }
 
       // 组件默认视图
@@ -224,7 +250,7 @@ const FormView = {
       
       fields
         // 隐藏不显示逻辑项
-        .filter(item => !isHiddenField(item, this.value, fields, false))
+        .filter(item => !FormUtil.isHiddenField(item, this.value, fields, false))
         // 隐藏无内容的分割线
         .filter((field, index, arr) => {
           if(field.formType != 'separator') return true;
