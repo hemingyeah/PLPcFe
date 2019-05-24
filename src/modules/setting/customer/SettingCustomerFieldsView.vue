@@ -48,10 +48,33 @@ export default {
         fields.forEach(item => {
           item.tableName = 'customer';
         });
+        
+        let message = FormUtil.validate(fields);
+        if(typeof message == 'string' && message.length > 0){
+          return platform.notification({
+            type: 'error',
+            title: '请检查字段标题',
+            message
+          }) 
+        }
 
-        const validateRes = this.validate(fields);
-        if (validateRes && validateRes.length) {
-          return platform.alert(validateRes.join('\n'));
+        if(Array.isArray(message) && message.length > 0){
+          return platform.notification({
+            type: 'error',
+            title: '请检查以下字段',
+            duration: 0,
+            message: (function(h) {
+              let content = message.map(i => {
+                let nodes = i.message.map(m => <p>{m}</p>);
+                nodes.unshift(<h3>{i.title}</h3>)
+                return nodes;
+              })
+
+              return (
+                <div class="form-design-notification">{content}</div>
+              )
+            })(this.$createElement)
+          }) 
         }
 
         this.pending = true;

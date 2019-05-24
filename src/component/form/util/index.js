@@ -1,5 +1,7 @@
 import { assign } from 'lodash'
-import FormField from './FormField';
+import FormField from '../FormField';
+
+export * from './validate';
 
 const DEFAULT_PLACEHOLDER = {
   text: '最多50字',
@@ -222,9 +224,4 @@ export function getValue(field, form, isSmooth = false){
   // 自定义字段
   let attribute = form.attribute || {};
   return attribute[fieldName];
-}
-
-/** 验证字段格式 */
-export function validate(){
-
 }

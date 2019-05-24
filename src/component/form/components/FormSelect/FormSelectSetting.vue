@@ -2,7 +2,7 @@
   <div class="form-setting-panel form-select-setting">
     <h3>基础字段 -- {{setting.name}}</h3>
     <div class="form-setting-group">
-      <input type="text" placeholder="请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
+      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
     </div>
     <div class="form-setting-group">
       <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
@@ -238,7 +238,7 @@ export default {
       }
 
       // 是否有空白项
-      if(options.some(item => !item)){
+      if(options.some(item => item == null || item.trim().length == 0)){
         message.push('不能存在空白项');
       }
 
