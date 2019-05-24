@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Department from './Department.vue';
 import { destroyComponent } from '@src/util/dom';
-import { fastCall } from '@src/component/util'
+import fastCall from '@src/component/util/fastCall'
 
 const DeptComponent = Vue.extend(Department);
 const MAX_NUM = 150; // 单次选人上限

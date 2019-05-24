@@ -1,5 +1,5 @@
 /** 组件快速调用注册方法 */
-export function fastCall(Vue, namespace, props){
+export default function fastCall(Vue, namespace, props){
   if(!Vue.prototype.$fast) Vue.prototype.$fast = {};
   
   if(!Vue.prototype.$fast[namespace]) {

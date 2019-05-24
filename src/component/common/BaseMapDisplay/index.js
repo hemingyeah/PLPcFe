@@ -2,7 +2,7 @@ import Vue from 'vue';
 import BaseMapDisplay from './BaseMapDisplay.vue';
 
 import { destroyComponent } from '@src/util/dom';
-import { fastCall } from '@src/component/util';
+import fastCall from '@src/component/util/fastCall';
 
 const BaseMapDisplayComp = Vue.extend(BaseMapDisplay);
 

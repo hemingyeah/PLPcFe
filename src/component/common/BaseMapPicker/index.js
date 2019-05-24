@@ -2,7 +2,7 @@ import Vue from 'vue';
 import BaseMapPicker from './BaseMapPicker.vue';
 
 import { destroyComponent } from '@src/util/dom';
-import { fastCall } from '@src/component/util';
+import fastCall from '@src/component/util/fastCall';
 
 const BaseMapPickerComp = Vue.extend(BaseMapPicker);
 
