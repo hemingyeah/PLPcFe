@@ -151,10 +151,7 @@ export default {
       }, {
         value: 30,
         label: '近30天'
-      }, {
-        value: 100,
-        label: '30天以前'
-      }, ]
+      } ]
     }
   },
   created () {
