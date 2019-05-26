@@ -36,28 +36,28 @@
             <el-form-item label-width="100px" label="客户编号">
               <el-input type="text" v-model="params.serialNumber"></el-input>
             </el-form-item>
-            <el-form-item label-width="100px" label="联系人">
-              <el-select
-                popper-class="advanced-search-linkman"
-                v-model="params.linkmanId"
-                @change="modifyUser('linkman')"
-                filterable
-                clearable
-                remote
-                reserve-keyword
-                placeholder="请输入关键词搜索"
-                :loading="inputRemoteSearch.linkman.loading"
-                :remote-method="searchLinkman">
-                <el-option
-                  v-for="item in inputRemoteSearch.linkman.options"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                  <p>{{item.name}}</p>
-                  <p>电话：{{item.phone || ''}}</p>
-                </el-option>
-              </el-select>
-            </el-form-item>
+            <!--<el-form-item label-width="100px" label="联系人">-->
+              <!--<el-select-->
+                <!--popper-class="advanced-search-linkman"-->
+                <!--v-model="params.linkmanId"-->
+                <!--@change="modifyUser('linkman')"-->
+                <!--filterable-->
+                <!--clearable-->
+                <!--remote-->
+                <!--reserve-keyword-->
+                <!--placeholder="请输入关键词搜索"-->
+                <!--:loading="inputRemoteSearch.linkman.loading"-->
+                <!--:remote-method="searchLinkman">-->
+                <!--<el-option-->
+                  <!--v-for="item in inputRemoteSearch.linkman.options"-->
+                  <!--:key="item.id"-->
+                  <!--:label="item.name"-->
+                  <!--:value="item.id">-->
+                  <!--<p>{{item.name}}</p>-->
+                  <!--<p>电话：{{item.phone || ''}}</p>-->
+                <!--</el-option>-->
+              <!--</el-select>-->
+            <!--</el-form-item>-->
             <el-form-item label-width="100px" label="选择团队">
               <biz-team-select v-model="params.tag" :fetch-func="getTeamList"/>
               <!-- <el-select
