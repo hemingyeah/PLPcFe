@@ -216,7 +216,7 @@ export default {
       this.$emit('change', this.operationList);
     },
     isImportDelete(createTime) {
-      let timeOut = 2 * 60 * 60 * 1000;
+      let timeOut = 30 * 60 * 1000;
       let now = new Date().getTime();
 
       if((createTime + timeOut) < now) {
