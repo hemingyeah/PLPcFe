@@ -17,7 +17,7 @@
 <script>
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
-import platform from '@src/platform'
+import platform from '@src/platform';
 
 export default {
   name: 'setting-customer-fields-view',
@@ -50,35 +50,9 @@ export default {
         });
         
         let message = FormUtil.validate(fields);
-        if(typeof message == 'string' && message.length > 0){
-          return platform.notification({
-            type: 'error',
-            title: '请检查字段标题',
-            message
-          }) 
-        }
-
-        if(Array.isArray(message) && message.length > 0){
-          return platform.notification({
-            type: 'error',
-            title: '请检查以下字段',
-            duration: 0,
-            message: (function(h) {
-              let content = message.map(i => {
-                let nodes = i.message.map(m => <p>{m}</p>);
-                nodes.unshift(<h3>{i.title}</h3>)
-                return nodes;
-              })
-
-              return (
-                <div class="form-design-notification">{content}</div>
-              )
-            })(this.$createElement)
-          }) 
-        }
+        if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
-
         let result = await http.post('/setting/customer/saveFields', fields);
         if(result.status == 0){
           platform.notification({
@@ -88,46 +62,17 @@ export default {
           })  
           return window.location.reload()
         }
-        platform.alert(result.message)
+
+        platform.notification({
+          type: 'error',
+          title: '客户字段更新失败',
+          message: result.message
+        })
       } catch (error) {
         console.error(error)
       }
+      
       this.pending = false;
-    },
-    validate(fields) {
-      const msg = [];
-
-      if (fields.some(f => !f.displayName)) {
-        msg.push('请检查客户字段设置，有字段标题标题缺失请补全。');
-        return msg;
-      }
-
-      let tv1, tv2;
-      fields.forEach(f => {
-        tv1 = f.displayName.match(/[\u4E00-\u9FA5]/g);
-        tv2 = f.displayName.match(/[A-Za-z]/g);
-        if (tv1 && tv1.length > 6) {
-          msg.push(`字段名称 ${f.displayName} 长度超过6个汉字`);
-        }
-        if (tv2 && tv2.length > 20) {
-          msg.push(`字段名称 ${f.displayName} 长度超过20个字母`);
-        }
-
-        if (f.formType === 'select') {
-
-          if (f.setting.dataSource.some(v => !v)) {
-            msg.push(`字段名称 ${f.displayName} 包含有值为空的选项`);
-          }
-
-          for (let i = 0;i <= f.setting.dataSource.length;i++) {
-            if (f.setting.dataSource.filter(item => item === f.setting.dataSource[i]).length > 1) {
-              return msg.push(`字段名称 ${f.displayName} 包含有重复的选项`);
-            }
-          }
-        }
-      });
-
-      return msg;
     }
   }
 }

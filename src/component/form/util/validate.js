@@ -1,5 +1,7 @@
 import * as config from '../config';
-import { isSelect, isMultiSelect } from './index'
+import { isSelect, isMultiSelect } from './index';
+import { isEmpty } from '@src/util/lang';
+import platform from '@src/platform'
 
 
 /** 通用验证 */
@@ -25,7 +27,7 @@ function select(field){
   
   // 验证是否存在空值
   for(let i = 0; i < dataSource.length; i++){
-    if(dataSource[i] == null || dataSource[i].trim().length == 0){
+    if(isEmpty(dataSource[i])){
       message.push('存在空白选项')
       break;
     }
@@ -38,7 +40,7 @@ function select(field){
     if(option.length > config.SELECT_OPTION_LENGTH_MAX){
       message.push(`第${i + 1}个选项字数超过${config.SELECT_OPTION_LENGTH_MAX}个`)
     }
-    if(dataSource.lastIndexOf(option) != i){
+    if(!isEmpty(option) && dataSource.lastIndexOf(option) != i){
       message.push(`选项[${option}]存在重复项`);
     }
   }
@@ -70,4 +72,44 @@ export function validate(fields){
 
     return message.length > 0 ? {message, title: field.displayName} : null;
   }).filter(i => i != null);
+}
+
+/**
+ * 默认提示，可自行根据内容提示
+ * @param {string | array} message - 提示内容
+ * @param {function} createElement - vue createElement function
+ * @returns true - 验证成功，无提示信息。 false - 验证失败，有提示信息
+ */
+export function notification(message, createElement){
+  if(typeof message == 'string' && message.length > 0){
+    platform.notification({
+      type: 'error',
+      title: '请检查字段标题',
+      message
+    });
+
+    return false;
+  }
+
+  if(Array.isArray(message) && message.length > 0){
+    platform.notification({
+      type: 'error',
+      title: '请检查以下字段',
+      duration: 0,
+      message: (function(h) {
+        let content = message.map(i => {
+          let nodes = i.message.map(m => <p>- {m}</p>);
+          nodes.unshift(<h3>{i.title}</h3>)
+          return nodes;
+        })
+
+        return (
+          <div class="form-design-notification">{content}</div>
+        )
+      })(createElement)
+    }) 
+    return false;
+  }
+
+  return true
 }

@@ -6,7 +6,12 @@ const MAX_SAFE_INTEGER = 9007199254740991;
 
 /** 判读给定的值是否是空串 */
 export function isEmptyStr(value){
-  return typeof value == 'string' && value.length == 0;
+  return typeof value == 'string' && value.trim().length == 0;
+}
+
+/** 判断是否为空值 */
+export function isEmpty(value){
+  return null == value || isEmptyStr(value);
 }
 
 /** 判断给定值是否为安全的数值 */

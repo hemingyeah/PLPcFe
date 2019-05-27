@@ -42,66 +42,37 @@ export default {
       window.parent.frameHistoryBack(window)
     },
     async submit(){
-      // TODO: 字段验证
-
       try {
         let fields = FormUtil.toField(this.fields);
+        
         fields.forEach(item => {
           item.tableName = 'product';
         });
 
-        const validateRes = this.validate(fields);
-        if (validateRes && validateRes.length) {
-          return platform.alert(validateRes.join('\n'));
-        }
+        let message = FormUtil.validate(fields);
+        if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
 
         let result = await http.post('/setting/product/saveFields', fields);
-        if(!result.status){
-          platform.alert('产品字段更新成功');
+        if(result.status == 0){
+          platform.notification({
+            type: 'success',
+            title: '成功',
+            message: '产品字段更新成功'
+          })  
           return window.location.reload()
         }
-        platform.alert(result.message)
+
+        platform.notification({
+          type: 'error',
+          title: '产品字段更新失败',
+          message: result.message
+        })
       } catch (error) {
         console.error(error)
       }
       this.pending = false;
-    },
-    validate(fields) {
-      const msg = [];
-
-      if (fields.some(f => !f.displayName)) {
-        msg.push('请检查产品字段设置，有字段标题标题缺失请补全。');
-        return msg;
-      }
-
-      let tv1, tv2;
-      fields.forEach(f => {
-        tv1 = f.displayName.match(/[\u4E00-\u9FA5]/g);
-        tv2 = f.displayName.match(/[A-Za-z]/g);
-        if (tv1 && tv1.length > 6) {
-          msg.push(`字段名称 ${f.displayName} 长度超过6个汉字`);
-        }
-        if (tv2 && tv2.length > 20) {
-          msg.push(`字段名称 ${f.displayName} 长度超过20个字母`);
-        }
-
-        if (f.formType === 'select') {
-
-          if (f.setting.dataSource.some(v => !v)) {
-            msg.push(`字段名称 ${f.displayName} 包含有值为空的选项`);
-          }
-
-          for (let i = 0;i <= f.setting.dataSource.length;i++) {
-            if (f.setting.dataSource.filter(item => item === f.setting.dataSource[i]).length > 1) {
-              return msg.push(`字段名称 ${f.displayName} 包含有重复的选项`);
-            }
-          }
-        }
-      });
-
-      return msg;
     }
   }
 }

@@ -28,12 +28,11 @@ const BaseFormField = [
   FormPhone,
   FormEmail,
   FormSeparator,
-  FormAddress,
-  FormLocation
+  // FormAddress,
+  // FormLocation
 ];
 
-const allFields = [...BaseFormField];
-// const allFields = [...BaseFormField, FormAddress];
+const allFields = [...BaseFormField, FormAddress];
 const BaseModeField = BaseFormField.map(item => item.formType)
 
 const Modes = {
@@ -120,12 +119,15 @@ FormFieldMap.get = function(formType){
 
   if(field && field.alias){
     let aliasField = FormFieldMap[field.alias];
+
     field.preview = aliasField.preview;
     field.setting = aliasField.setting;
     field.build = aliasField.build;
     field.extend = aliasField.extend || {};
-  }
 
+    return {...aliasField, ...field};
+  }
+ 
   return field;
 }
 

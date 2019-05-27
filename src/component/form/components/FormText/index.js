@@ -16,9 +16,9 @@ let FormTextField = {
     preview: FormTextPreview,
     build: FormText,
     extend: {
-      'customer_serialNumber': CustomerSerialNumberExtendSetting,
-      'customer_name': CustomerNameExtendSetting,
-      'product_serialNumber': ProductSerialNumberExtendSetting
+      // 'customer_serialNumber': CustomerSerialNumberExtendSetting,
+      // 'customer_name': CustomerNameExtendSetting,
+      // 'product_serialNumber': ProductSerialNumberExtendSetting
     }
   }
 };
