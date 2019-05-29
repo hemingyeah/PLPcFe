@@ -7,11 +7,11 @@
     <li class="line" :class="{processing: order > 0.5, 'half-processing': order === 0.5}">
       <div> </div>
       <div> </div>
-      <el-tag size="mini" v-if="stage === 'approve'">审核中</el-tag>
+      <el-tag size="mini" v-if="stage === 'approve'">审批中</el-tag>
     </li>
     <li :class="{processing: order >= 1}">
       <i class="iconfont icon-tijiaoshenhe"></i>
-      <h5>审核</h5>
+      <h5>审批</h5>
     </li>
     <li class="line" :class="{processing: order > 1.5, 'half-processing': order === 1.5}">
       <div> </div>

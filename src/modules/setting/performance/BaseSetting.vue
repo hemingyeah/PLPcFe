@@ -4,12 +4,12 @@
 
     <div class="setting-item">
       <p class="setting-title">
-        设置绩效报告审核人
+        设置绩效报告审批人
 
         <el-popover
           placement="top-start"
           trigger="hover"
-          content="具备运营分析权限的用户才可以被设置为审核人">
+          content="具备运营分析权限的用户才可以被设置为审批人">
           <span style="vertical-align: middle" slot="reference">
             <i class="icon-help iconfont" style="margin-left: 3px;"></i>
           </span>
@@ -24,7 +24,6 @@
           clearable
           remote
           multiple
-          reserve-keyword
           placeholder="请输入关键词搜索"
           :loading="remoteSearchLoading"
           :remote-method="getApproveList">
@@ -46,7 +45,7 @@
       <div class="setting-cc">
         <span>请选择抄送绩效报告的发送节点</span>
         <el-radio :label="0" @change="changeSetting" v-model="form.sendToCc" :disabled="pending">创建后抄送</el-radio>
-        <el-radio :label="3" @change="changeSetting" v-model="form.sendToCc" :disabled="pending">审核后抄送</el-radio>
+        <el-radio :label="3" @change="changeSetting" v-model="form.sendToCc" :disabled="pending">审批后抄送</el-radio>
       </div>
     </div>
   </div>
@@ -130,7 +129,7 @@ export default {
 
           return this.$platform.notification({
             title: '成功',
-            message: '设置绩效报告审核人',
+            message: '设置绩效报告审批人',
             type: 'success',
           });
 

@@ -181,7 +181,7 @@ function cancelApprove(params) {
 }
 
 /**
- *
+ * 审批绩效报告
  * @param params
  * @param.reportId {String} 报告id
  * @param.result {String}  success || fail
@@ -192,10 +192,24 @@ function approvePerformance(params) {
   return http.post('/approve/saveResult/report', params, false);
 }
 
+/**
+ * 获取绩效报告的记录
+ * @param params    {Object}
+ * @param.reportId  {String}  报告id
+ * @returns {*}
+ */
 function getPerformanceRecord(params) {
   return http.get('/performance/v2/record/list/report_id', params)
 }
 
+/**
+ * 发布绩效报告
+ * @param params    {Object}
+ * @param.reportId  {String}  报告id
+ * @param.isAdvice  {Boolean} 是否只通知有绩效结果的人
+ * @param.isRanking {String}  是否显示排名
+ * @returns {*}
+ */
 function publishPerformance(params) {
   return http.post('/performance/v2/report/publish', params, false);
 }

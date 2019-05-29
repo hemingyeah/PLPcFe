@@ -41,8 +41,6 @@
 
           <biz-team-select v-else multiple v-model="form.target" placeholder="请选择团队(默认选择全部团队)" :fetch-func="fetchTeam"></biz-team-select>
 
-          <!--<el-button plain @click="selectAll">选择全部</el-button>-->
-
           <div v-if="!formValidation.target" class="target-is-error">
             请选择统计对象
           </div>
@@ -104,8 +102,7 @@
             clearable
             remote
             multiple
-            reserve-keyword
-            placeholder="请输入关键词搜索"
+            placeholder="请选择绩效报告抄送人，须具备运营分析权限"
             :loading="remoteSearchLoading"
             :remote-method="getApproveList">
             <el-option
@@ -117,16 +114,16 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="审核人" >
-          <el-select v-model="approvePersonIds" multiple collapse-tags clearable filterable @change="validate" placeholder="请选择" disabled style="width: 300px">
-            <el-option
-              v-for="item in approvePerson"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
+        <!--<el-form-item label="审核人" >-->
+          <!--<el-select v-model="approvePersonIds" multiple clearable filterable @change="validate" placeholder="请选择" disabled style="width: 300px">-->
+            <!--<el-option-->
+              <!--v-for="item in approvePerson"-->
+              <!--:key="item.value"-->
+              <!--:label="item.label"-->
+              <!--:value="item.value">-->
+            <!--</el-option>-->
+          <!--</el-select>-->
+        <!--</el-form-item>-->
 
         <el-form-item label="发布流程" class="publish">
           <approve-process stage="create"></approve-process>
@@ -159,7 +156,7 @@
                 {{scope.row[column.field].displayName}}
               </template>
               <!--<template v-else-if="column.field === 'settlement'">-->
-                <!--{{scope.row[column.field]}}-->
+              <!--{{scope.row[column.field]}}-->
               <!--</template>-->
               <template v-else>
                 {{scope.row[column.field]}}
@@ -190,9 +187,9 @@
 
 <script>
 import { formatDate } from '@src/util/lang';
+import * as TeamApi from '@src/api/TeamApi';
 import {createPerformanceReport, getApprovePerson, getApprovePersonList} from '@src/api/PerformanceApi';
 import ApproveProcess from './ApproveProcess.vue'
-import * as TeamApi from '@src/api/TeamApi'
 
 export default {
   name: 'edit-performance-report-dialog',
@@ -297,9 +294,6 @@ export default {
     }
   },
   computed: {
-    ccToOthers() {
-      return this.initData.sendToCc;
-    },
     title() {
       if (this.stage === 'build') return '新增绩效报告';
       if (this.stage === 'confirm') return '重复统计';
@@ -354,12 +348,6 @@ export default {
           field: 'cusName',
           show: true
         },
-        // {
-        //   label: '重复次数',
-        //   field: 'settlement',
-        //   width: '100px',
-        //   show: true
-        // },
         {
           label: '负责人',
           field: 'executor',
@@ -370,7 +358,7 @@ export default {
     }
   },
   mounted() {
-    this.init();
+    // this.init();
   },
   methods: {
     fetchTeam(params) {
@@ -516,10 +504,6 @@ export default {
         url: `/performance/v2/report/desc/${id}`,
         fromId
       })
-    },
-    selectAll() {
-      this.form.target = this.targetOptions.map(t => t.value);
-      this.validate();
     },
     validate() {
       if (!this.submitted) return;

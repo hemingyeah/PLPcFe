@@ -126,6 +126,9 @@ export default {
         value: 'daily',
         label: '日报'
       }, {
+        value: 'performance',
+        label: '绩效'
+      }, {
         value: 'timing',
         label: '定时提醒'
       }, {

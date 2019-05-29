@@ -136,7 +136,7 @@
               <!--<el-button plain @click="viewDetail(scope.row)" size="small">查看</el-button>-->
 
               {{scope.row[column.field]}}
-              <el-tag size="mini" v-if="scope.row.waitingForApprove">审核中</el-tag>
+              <el-tag size="mini" v-if="scope.row.waitingForApprove">审批中</el-tag>
             </template>
             <template v-else>
               {{scope.row[column.field]}}
@@ -242,7 +242,7 @@ export default {
           value: [0],
         },
         {
-          label: '已审核',
+          label: '已审批',
           value: [1, 3],
         },
         {
@@ -275,6 +275,9 @@ export default {
           ruleDesc,
         }));
     },
+    userId () {
+      return this.initData.loginUserId;
+    }
   },
   mounted() {
     const localStorageData = this.getLocalStorageData();
@@ -345,11 +348,12 @@ export default {
           }
 
           this.reports = res.data.reportList.list
-            .map(({users, createUserName, createTime, startTime, endTime, type, reportName, ruleIds, id, carbonCopy, status}) => Object.freeze({
+            .map(({users, createUserName, createTime, startTime, endTime, type, reportName, ruleIds, id, carbonCopy, status, createUser}) => Object.freeze({
               reportName,
               ruleIds: ruleIds.replace(/\[|\]/g, ''),
               users: users.replace(/\[|\]/g, ''),
               createUser: createUserName,
+              createUserId: createUser,
               createTime: formatDate(new Date(createTime), 'YYYY-MM-DD'),
               startTime: formatDate(new Date(startTime), 'YYYY-MM-DD'),
               endTime: formatDate(new Date(endTime), 'YYYY-MM-DD'),
@@ -363,7 +367,7 @@ export default {
                 }
 
                 if (status === 3) {
-                  return '已审核'
+                  return '已审批'
                 }
                 if (status === 4) {
                   return '已发布'
@@ -442,6 +446,12 @@ export default {
       if (!this.multipleSelection.length) {
         return this.$platform.alert('请选择需要删除的绩效报告');
       }
+
+      const pass = this.reports.filter(r => this.multipleSelection.some(id => id === r.id))
+        .some(r => r.createUserId !== this.userId || r.waitingForApprove);
+
+      if (pass) return this.$platform.alert('选择的绩效报告包含抄送给您的，或者处于审批中的，这是不能被删除的，请重新选择。')
+
       try {
         if (!await this.$platform.confirm('确定要删除选择的绩效报告？')) return;
 
@@ -615,7 +625,6 @@ export default {
   html, body, .performance-list-container {
     height: 100%;
   }
-
 
   .performance-list-container {
     padding: 10px;

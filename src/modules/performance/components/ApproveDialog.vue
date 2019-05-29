@@ -117,11 +117,13 @@ export default {
       li {
         list-style: none;
         display: flex;
+        word-break: break-all;
 
         label {
           width: 100px;
           margin: 0;
           line-height: 26px;
+          flex-shrink: 0;
         }
       }
     }
