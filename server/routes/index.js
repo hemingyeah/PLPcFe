@@ -72,22 +72,14 @@ router.get('/demo', async ctx => {
   ctx.body = Template.renderWithData('demo', {}, script)
 });
 
-router.get('/customer/createOnTask', async ctx => {
-  ctx.redirect('/customer/create/task')
-});
-
 router.get('/performance/list', async ctx => {
   ctx.redirect('/performance/v2/report')
-});
-
-router.get('/customer/createOnEvent', async ctx => {
-  ctx.redirect('/customer/create/event');
 });
 
 router.get('/window', async ctx => {
   let script = ['/window.js'];
   ctx.body = Template.renderWithData('window', {}, script)
-});
+});0.
 
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());

@@ -1,6 +1,6 @@
 <template>
   <div class="customer-modal-container" v-loading.fullscreen.lock="loadingPage">
-    <form @submit.prevent="submit" class="base-form">
+    <form @submit.prevent="submit" class="base-form" v-if="init">
       <customer-edit-form :fields="fields" v-model="form" ref="form"/>
     </form>
   </div>
