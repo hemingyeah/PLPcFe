@@ -394,6 +394,7 @@ const FrameManager = {
 
     // TODO: 迁移完成后删除
     window.addTabs = this.addTabs;
+    window.closeFrameTabById = this.closeFrameTabById;
     
     window.frameHistoryBack = function(originWindow){
       if(originWindow.__shb_pc_frame_history__back_pending__) return;

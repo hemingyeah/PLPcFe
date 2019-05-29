@@ -21,7 +21,7 @@
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'name'">
-            <a :href="`/task/planTask/edit?id=${scope.row.id}`" :data-id="scope.row.id" class="plan-link">{{scope.row[column.field]}}</a>
+            <a :href="`/task/planTask/edit?id=${scope.row.id}`" @click="openDetail" :data-id="scope.row.id" class="plan-link">{{scope.row[column.field]}}</a>
           </template>
           <template v-else-if="column.field === 'templateId'">
             {{scope.row.task.templateName}}
@@ -264,6 +264,23 @@ export default {
         tooltip: false,
         width: '50px',
       }]
+    },
+    /* 新tab 打开计划任务 */
+    openDetail() {
+      event.preventDefault();
+      if (!window.frameElement) return;
+
+      let el = event.target;
+      let fromId = window.frameElement.getAttribute('id');
+
+      // 统一id命名
+      platform.openTab({
+        id: "editPlanTask_" + el.dataset.id,
+        title: "正在加载",
+        close: true,
+        url: el.getAttribute('href'),
+        fromId: fromId
+      });
     }
   },
 }
