@@ -554,7 +554,7 @@ export default {
         }, {
           displayName: `计划任务(${this.statisticalData.plantaskQuantity || 0})`,
           component: PlanTable.name,
-          show: true,
+          show: this.allowCreatePlanTask,
         }, {
           displayName: `产品提醒(${this.statisticalData.remindQuantity || 0})`,
           component: RemindTable.name,

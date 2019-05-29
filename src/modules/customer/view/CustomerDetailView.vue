@@ -536,7 +536,7 @@ export default {
       }, {
         displayName: `计划任务(${plantaskQuantity || 0})`,
         component: CustomerPlanTable.name,
-        show: this.initData.planTaskEnabled
+        show: this.allowCreatePlanTask
       }, {
         displayName: `客户产品(${productQuantity || 0})`,
         component: CustomerProductTable.name,
