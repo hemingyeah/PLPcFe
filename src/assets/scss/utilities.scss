@@ -22,3 +22,13 @@
 .text-danger{
   color: $color-danger !important;
 }
+
+::selection {
+  background: $color-primary;
+  color: #fff;
+}
+  
+::-moz-selection {
+  background: $color-primary;
+  color: #fff;
+}
