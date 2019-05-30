@@ -79,7 +79,8 @@ export function packToForm(field, data, defaultAddress = {}){
     // COMMENT: 暂时去除团队
     tags: toArray(data.tags),
     // tags: toArray(data.tags).map(item => item.id),
-    manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null
+    manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null,
+    ...data.attribute
   };
 }
 
