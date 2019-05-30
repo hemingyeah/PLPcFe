@@ -24,13 +24,13 @@ const axiosIns = axios.create({
 })
 
 let CancelToken = axios.CancelToken; // 取消令牌
-let requstPool = {}; // 请求池
+let requestPool = {}; // 请求池
 
 function removeFromPool(key){
-  let cancelFn = requstPool[key];
+  let cancelFn = requestPool[key];
   if(typeof cancelFn == 'function'){
     cancelFn('Request cancelled.');
-    delete requstPool[key];
+    delete requestPool[key];
   }
 }
 
@@ -42,7 +42,7 @@ axiosIns.interceptors.request.use(config => {
 
     // 生成取消token
     config.cancelToken = new CancelToken(function(c) {
-      requstPool[key] = c;
+      requestPool[key] = c;
     })
   }
 
