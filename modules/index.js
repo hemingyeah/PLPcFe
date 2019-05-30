@@ -7,6 +7,7 @@ const approve = require('./approve')
 const repository = require('./repository')
 const dataScreen = require('./dataScreen')
 const bill = require('./bill')
+const task = require('./task')
 const jobtransfer = require('./jobtransfer')
 
 const doMyself = require('./doMyself')
@@ -48,5 +49,6 @@ module.exports = {
   ...bill,
   ...jobtransfer,
   ...doMyself,
-  ...customerContact
+  ...customerContact,
+  ...task
 }

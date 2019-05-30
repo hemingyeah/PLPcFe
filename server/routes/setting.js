@@ -33,4 +33,10 @@ router.get('/setting/performance/v2/rule', async ctx => {
   ctx.body = Template.renderWithHtml('绩效规则', body, script, modConfig.template)
 });
 
+router.get('/setting/task/fields', async ctx => {
+  let script = ['/setting.task.fields.js'];
+  
+  ctx.body = Template.renderWithData('工单设置', {}, script)
+});
+
 module.exports = router;

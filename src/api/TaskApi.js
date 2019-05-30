@@ -5,10 +5,15 @@ import http from '@src/util/http';
  * @param {Object} params - 参数
  * @param {Array} params.ids - 计划id
  */
-function deletePlanTask(params) {
+export function deletePlanTask(params) {
   return http.post('/task/deletePlanTask', params, false)
 }
 
-export {
-  deletePlanTask
+/**
+ * 获取某一工单类型下的字段
+ * @param {*} templateId - 工单类型id
+ * @returns [fields]
+ */
+export function getTemplateFields(templateId){
+  return http.get('/task/getTaskTemplateFields', {tableName: 'task', templateId})
 }

@@ -3,9 +3,10 @@ import { fmt_address, fmt_datetime, fmt_date } from '@src/filter/fmt';
 import { FormFieldMap } from './components';
 import * as FormUtil from './util';
 
-import platform from '@src/platform'
+import platform from '@src/platform';
+import { FieldManager } from './components';
 
-const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
+const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 const FormView = {
   name: 'form-view',
@@ -124,7 +125,7 @@ const FormView = {
         .catch(err => console.error('openMap catch an err: ', err));
     },
   
-    mapFieldToDom(field, createElement) {
+    mapFieldToDom(field, h) {
       let {formType, fieldName, displayName, isSystem} = field;
       if (formType === 'separator') {
         const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
@@ -151,12 +152,11 @@ const FormView = {
       if (this.$scopedSlots[fieldName]) {
         return this.$scopedSlots[fieldName]({displayName, value, formType, field});
       }
-
       // 组件默认视图
-      let FormField = FormFieldMap.get(field.formType);
+      let FormField = FieldManager.get(field.formType);
       if(FormField && FormField.view){
         let attrs = {props: {field, value}}
-        return createElement(FormField.view, attrs);
+        return h(FormField.view, attrs);
       }
       
       if (formType === 'attachment') {

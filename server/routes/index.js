@@ -27,6 +27,7 @@ const BillRouter = require('./bill')
 const jobtransferRouter = require('./jobtransfer')
 const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact')
+const taskRouter = require('./task')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -173,9 +174,7 @@ router.all('/api/*', async ctx => {
   ctx.body = result.body;
 });
 
-
-router.all('/*', ctx => {
-  return HttpClient.proxy(ctx)
-});
+router.use('', taskRouter.routes(), taskRouter.allowedMethods());
+router.all('/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;

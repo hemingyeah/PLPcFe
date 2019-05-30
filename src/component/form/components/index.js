@@ -31,44 +31,25 @@ const BaseFormField = [
   FormSeparator,
   FormAddress,
   FormLocation,
-  FormInfo
+  FormInfo,
 ];
 
-const allFields = [...BaseFormField, FormAddress];
-const BaseModeField = BaseFormField.map(item => item.formType)
-
-const Modes = {
-  base: {
-    fields: BaseModeField
-  },
-  customer: {
-    fields: [...BaseModeField]
-  },
-  product: {
-    fields: [...BaseModeField]
-  }
-  // task: {
-  //   fields: [FormText.formType]
-  // }
-}
-
+const allFields = BaseFormField.reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 const FormFieldMap = {};
 const PreviewComponents = {};
 const SettingComponents = {};
 const BuildComponents = {};
 const ViewComponents = {};
 
-const FormFields = [...allFields]
-
-for(let i = 0; i < FormFields.length; i++){
-  let formField = FormFields[i];
+for(let i = 0; i < allFields.length; i++){
+  let formField = allFields[i];
   let field = {
     name: formField.name, // 组件显示名称
     formType: formField.formType, // 组件类型
-    isSystem: formField.isSystem // 是否为为系统组件
+    fieldName: formField.fieldName, // 字段名，部分系统字段会提供
+    isSystem: formField.isSystem, // 是否为为系统组件
+    alias: formField.alias
   }
-
-  if(formField.alias) field.alias = formField.alias;
 
   if(!formField.alias){
     // 预览组件
@@ -114,32 +95,49 @@ for(let i = 0; i < FormFields.length; i++){
 
   FormFieldMap[formField.formType] = field;
 }
-
-/** 获取字段 */
-FormFieldMap.get = function(formType){
-  let field = FormFieldMap[formType];
-
-  if(field && field.alias){
-    let aliasField = FormFieldMap[field.alias];
-
-    field.preview = aliasField.preview;
-    field.setting = aliasField.setting;
-    field.build = aliasField.build;
-    field.extend = aliasField.extend || {};
-
-    return {...aliasField, ...field};
+const MODES = {
+  customer: {
+    exclude: ['address']
+  },
+  product: {
+    exclude: ['address']
   }
- 
-  return field;
 }
 
-// 冻结字段
-Object.freeze(FormFieldMap);
+const FieldManager = {
+  /** 根据mode获取字段 */
+  findModeFields(mode = 'base'){
+    let fields = allFields;
+    let exclude = (MODES[mode] || {}).exclude || [];
+
+    // 排除字段
+    if(exclude.length > 0) {
+      fields = fields.filter(f => exclude.indexOf(f.formType) < 0)
+    }
+
+    return fields.map(f => f.formType);
+  },
+  /** 根据字段类型获取单个字段 */
+  findField(formType){
+    let field = FormFieldMap[formType];
+
+    if(field && field.alias){
+      let aliasField = FormFieldMap[field.alias];
+  
+      field.preview = aliasField.preview;
+      field.setting = aliasField.setting;
+      field.build = aliasField.build;
+      field.extend = aliasField.extend || {};
+  
+      return {...aliasField, ...field};
+    }
+  
+    return field;
+  }
+}
 
 export {
-  FormFields,
-  FormFieldMap,
-  Modes,
+  FieldManager,
   PreviewComponents,
   SettingComponents,
   BuildComponents,

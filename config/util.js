@@ -38,7 +38,7 @@ module.exports = {
     
       return new HtmlWebpackPlugin({
         filename: `${modName}.html`,
-        template: mod.template ? mod.template : 'src/index.html',
+        template: mod.template ? mod.template : 'src/templates/index.html',
         inject: true,
         chunks,
         chunksSortMode: 'manual',

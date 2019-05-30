@@ -5,8 +5,7 @@ import normalizeWheel from '@src/util/normalizeWheel';
 import * as config from './config'
 
 import {
-  Modes,
-  FormFieldMap,
+  FieldManager,
   PreviewComponents,
   SettingComponents
 } from './components';
@@ -16,11 +15,15 @@ import {
   isEmpty 
 } from 'lodash';
 
+import { 
+  isSelect 
+} from './util'
+
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
   let currFieldId = field._id;
-  let previewComp = FormFieldMap.get(field.formType);
-  
+  let previewComp = FieldManager.findField(field.formType);
+
   if(previewComp == null){
     console.warn(`[not implement]: ${field.displayName}(${field.fieldName}): ${field.formType}. `)
     return null;
@@ -46,7 +49,7 @@ function createPreviewComp(h, field){
     <div class={previewClass} key={currFieldId}
       onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
-      {!field.isSystem && <button type="button" class="form-design-preview-delete"
+      {field.isSystem == 0 && <button type="button" class="form-design-preview-delete"
         onClick={e => this.deleteField(field)}>
         <i class="iconfont icon-fe-close"></i>
       </button>}
@@ -73,7 +76,7 @@ function createSettingComp(h, field){
   if(null == field) return null;
   
   let formType = field.formType;
-  let comp = FormFieldMap.get(formType);
+  let comp = FieldManager.findField(formType);
   if(null == comp) return null;
 
   let compName = getSettingComp.call(this, field, comp)
@@ -86,9 +89,7 @@ function createSettingComp(h, field){
   );
 
   let props = { field, setting: comp };
-  if( formType == 'select' ){
-    props.getContext = () => this;
-  }
+  if(isSelect(field)) props.getContext = () => this;
   
   return h(compName, {
     key: field._id,
@@ -166,14 +167,12 @@ const FormDesign = {
     }
   },
   data(){
-    let mode = Modes[this.mode];
-    let modeFormTypes = mode.fields || [];
-    
+    let modeFields = FieldManager.findModeFields(this.mode);    
     let hasSystemField = false;
     let availableFields = [];
     
-    modeFormTypes.forEach(item => {
-      let field = FormFieldMap.get(item);
+    modeFields.forEach(item => {
+      let field = FieldManager.findField(item);
       if(null == field) return;
       
       if(field.isSystem == 1) hasSystemField = true;
@@ -560,7 +559,9 @@ const FormDesign = {
     insertField(option = {}, value, index) {
       let newField = new FormField({
         formType: option.formType,
-        displayName: option.name
+        displayName: option.name,
+        fieldName: option.fieldName,
+        isSystem: option.isSystem
       });
       
       let arr = cloneDeep(value ? value : this.value);

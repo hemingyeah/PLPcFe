@@ -24,6 +24,23 @@ let FormSelectField = {
   }
 };
 
-export default FormSelectField;
+let TaskLevelField = {
+  formType: 'level', // 字段类型
+  fieldName: 'level',
+  name: '优先级',
+  isSystem: 1,
+  component: {
+    preview: FormSelectPreview,
+    build: FormSelect,
+    extend: {
+      'task_level_setting': ProductTypeExtendSetting
+    }
+  }
+}
+
+export default [
+  FormSelectField, 
+  // TaskLevelField
+];
 
 
