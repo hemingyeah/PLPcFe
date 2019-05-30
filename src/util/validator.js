@@ -121,7 +121,7 @@ function attachment(value, field = {}) {
 function user(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
+    if (!value || Object.keys(value).length == 0) return resolve(`请选择${field.displayName}`);
     resolve(null);
   });
 }

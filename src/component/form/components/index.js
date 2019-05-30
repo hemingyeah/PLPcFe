@@ -12,7 +12,7 @@ import FormEmail from './FormEmail';
 import FormSeparator from './FormSeparator';
 
 import FormAddress from './FormAddress';
-import FormLocation from './FormLocation'
+import FormLocation from './FormLocation';
 
 // base fields
 const BaseFormField = [

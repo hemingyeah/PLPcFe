@@ -55,7 +55,7 @@ function createPreviewComp(h, field){
 function getSettingComp(field, comp){
   // 先检测是否有扩展设置
   let extend = comp.extend || {};
-  let key = `${this.mode}_${field.fieldName}`;
+  let key = `${this.mode}_${field.fieldName}_setting`;
   if(extend[key]) return extend[key];
 
   // 系统字段默认设置

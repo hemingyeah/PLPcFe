@@ -15,7 +15,7 @@ let FormSelectField = {
     preview: FormSelectPreview,
     build: FormSelect,
     extend: {
-      'product_type': ProductTypeExtendSetting
+      'product_type_setting': ProductTypeExtendSetting
     }
   }
 };
