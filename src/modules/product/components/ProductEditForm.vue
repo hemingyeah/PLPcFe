@@ -125,7 +125,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
-      }, 250)
+      }, 500)
 
       const that = this;
 

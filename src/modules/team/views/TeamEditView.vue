@@ -133,7 +133,7 @@ export default {
         changeStatus(false);
         return resolve(validate ? null : '团队名称不能重复');
       })
-    }, 250),
+    }, 500),
 
     checkPlace(){
       return new Promise((resolve, reject) => {

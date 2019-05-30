@@ -118,7 +118,7 @@ const BizUserSelect = {
     handleInput: debounce(function(event){
       this.params.keyword = event.target.value;
       this.search()
-    }, 250),
+    }, 500),
     async search(){
       this.params.pageNum = 1;
       this.page.list = [];

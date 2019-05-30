@@ -118,7 +118,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
-      }, 250);
+      }, 500);
 
       let checkCustomerSN = _.debounce(function(params, resolve, changeStatus){
         changeStatus(true);
@@ -126,7 +126,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
-      }, 250);
+      }, 500);
 
       let checkLmPhone = _.debounce(function(params, resolve, changeStatus){
         changeStatus(true);
@@ -134,7 +134,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
-      }, 250)
+      }, 500)
       
       const that = this;
 

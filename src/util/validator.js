@@ -160,9 +160,9 @@ function validate(value, field){
  * 创建远程验证方法
  * @param {function} api - 调用的api方法
  * @param {function} build - 参数构建方法
- * @param {number} delay - 延时
+ * @param {number} delay - 延时, 默认500ms延时
  */
-export function createRemoteValidate(api, build, delay = 250){
+export function createRemoteValidate(api, build, delay = 500){
   let invoke = _.debounce(function(params, resolve, changeStatus){
     changeStatus(true);
     return api(params).then(res => {
