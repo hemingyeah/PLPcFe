@@ -27,22 +27,22 @@ export default {
   data() {
     return {
       // 是否是输入中文
-      isInputZh: false,
+      $isInputZh: false,
     }
   },
   methods: {
     /* 输入文字之前 */
     compositionstart(event) {
-      this.isInputZh = true;
+      this.$data.$isInputZh = true;
     },
     /* 输入文字之后 */
     compositionend(event) {
-      this.isInputZh = false;
+      this.$data.$isInputZh = false;
       this.input(event);
     },
     inputEvent(event) {
       // 如果是在中文输入 return
-      if(this.isInputZh) return
+      if(this.$data.$isInputZh) return
 
       this.input(event);
     }
