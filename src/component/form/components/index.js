@@ -14,6 +14,7 @@ import FormSeparator from './FormSeparator';
 import FormAddress from './FormAddress';
 import FormLocation from './FormLocation';
 import FormInfo from './FormInfo';
+import FormCascader from './FormCascader';
 
 // base fields
 const BaseFormField = [
@@ -32,6 +33,7 @@ const BaseFormField = [
   FormAddress,
   FormLocation,
   FormInfo,
+  FormCascader
 ];
 
 const allFields = BaseFormField.reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
