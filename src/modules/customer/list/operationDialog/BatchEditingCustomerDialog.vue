@@ -508,7 +508,7 @@ export default {
 
       if (this.selectedFieldName === 'tags') {
         params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: this.form.tags,
+          [this.selectedFieldName]: this.form.tags.map(({id, tagName}) => ({id, tagName}))
         })
       }
       if (this.selectedFieldName === 'manager' || this.selectedField.formType === 'user') {
