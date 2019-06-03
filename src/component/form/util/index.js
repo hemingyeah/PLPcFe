@@ -145,11 +145,10 @@ export function initialize(fields = [], origin = {}, callback){
       defaultValue = cascaderDefaultValue;
     }
 
-    // 地址的默认值初始化为对象
-    if(field.formType == 'customerAddress' || field.formType == 'address') defaultValue = {};
-    // 人员的默认值初始化为对象
-    if(field.formType == 'user') defaultValue = {}
-
+    // 地址、人员的默认值初始化为对象
+    let objValueFields = ['customerAddress', 'address', 'user']
+    if(objValueFields.indexOf(field.formType) >= 0) defaultValue = {};
+   
     // 来自表单的值，用于编辑时初始化值
     let attribute = origin.attribute || {};
     let formData = field.isSystem === 1 ? origin[fieldName] : attribute[fieldName];

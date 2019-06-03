@@ -5,12 +5,6 @@
       <p class="form-preview-control form-preview-withIcon">
         <i class="iconfont icon-triangle-down"></i>
       </p>
-      <p class="form-preview-control form-preview-withIcon">
-        <i class="iconfont icon-triangle-down"></i>
-      </p>
-      <p class="form-preview-control form-preview-withIcon">
-        <i class="iconfont icon-triangle-down"></i>
-      </p>
     </div>
   </div>
 </template>
