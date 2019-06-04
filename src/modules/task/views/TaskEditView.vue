@@ -7,6 +7,7 @@
         ref="form" mode="task" 
         :fields="fields"
         :value="form" @update="update">
+
         <template slot="taskNo" slot-scope="{field, value}">
           <form-item :label="field.displayName" :validation="false">
             <div class="form-taskNo">{{value || '工单编号将在创建后由系统生成'}}</div>
@@ -16,6 +17,12 @@
               <el-option value="1">默认工单</el-option>
               <el-option value="other">其他工单</el-option>
             </el-select>
+          </form-item>
+        </template>
+
+        <template slot="customer" slot-scope="{field, value}">
+          <form-item :label="field.displayName" :validation="false">
+            <div> task customer implement</div>
           </form-item>
         </template>
       </form-builder>

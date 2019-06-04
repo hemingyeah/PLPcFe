@@ -18,6 +18,23 @@ let FormTextareaField = {
   }
 };
 
-export default FormTextareaField;
+let TaskDescriptionField = {
+  formType: 'description',
+  fieldName: 'level',
+  name: '描述',
+  isSystem: 1,
+  component: {
+    setting: {
+      name: 'task-description-setting',
+      render(){
+        return <div>task description setting</div>
+      }
+    },
+    preview: FormTextareaPreview,
+    build: FormTextarea
+  }
+}
+
+export default [FormTextareaField, TaskDescriptionField];
 
 

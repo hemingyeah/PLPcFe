@@ -32,15 +32,39 @@ let TaskLevelField = {
   component: {
     preview: FormSelectPreview,
     build: FormSelect,
-    extend: {
-      'task_level_setting': ProductTypeExtendSetting
-    }
+    setting: ProductTypeExtendSetting
+  }
+}
+
+const TaskServiceTypeField = {
+  formType: 'serviceType',
+  fieldName: 'serviceType',
+  name: '服务类型',
+  isSystem: 1,
+  component: {
+    preview: FormSelectPreview,
+    build: FormSelect,
+    setting: ProductTypeExtendSetting
+  }
+}
+
+const TaskServiceContentField = {
+  formType: 'serviceContent',
+  fieldName: 'serviceContent',
+  name: '服务内容',
+  isSystem: 1,
+  component: {
+    preview: FormSelectPreview,
+    build: FormSelect,
+    setting: ProductTypeExtendSetting
   }
 }
 
 export default [
   FormSelectField, 
-  // TaskLevelField
+  TaskLevelField,
+  TaskServiceTypeField,
+  TaskServiceContentField
 ];
 
 

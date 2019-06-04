@@ -66,7 +66,7 @@ function getSettingComp(field, comp){
   if(extend[key]) return extend[key];
 
   // 系统字段默认设置
-  if(field.isSystem == 1) return null;
+  if(field.isSystem == 1 && null == comp.setting) return null;
 
   return comp.setting;
 }

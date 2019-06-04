@@ -15,6 +15,8 @@ import FormAddress from './FormAddress';
 import FormLocation from './FormLocation';
 import FormInfo from './FormInfo';
 import FormCascader from './FormCascader';
+import FormCustomer from './FormCustomer';
+import FormRelation from './FormRelation'
 
 // base fields
 const BaseFormField = [
@@ -33,7 +35,9 @@ const BaseFormField = [
   FormAddress,
   FormLocation,
   FormInfo,
-  FormCascader
+  FormCascader,
+  FormCustomer,
+  FormRelation
 ];
 
 const allFields = BaseFormField.reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
@@ -49,7 +53,7 @@ for(let i = 0; i < allFields.length; i++){
     name: formField.name, // 组件显示名称
     formType: formField.formType, // 组件类型
     fieldName: formField.fieldName, // 字段名，部分系统字段会提供
-    isSystem: formField.isSystem, // 是否为为系统组件
+    isSystem: formField.isSystem || 0, // 是否为为系统组件
     alias: formField.alias
   }
 
@@ -99,10 +103,10 @@ for(let i = 0; i < allFields.length; i++){
 }
 const MODES = {
   customer: {
-    exclude: ['address']
+    exclude: ['address', 'customer']
   },
   product: {
-    exclude: ['address']
+    exclude: ['address', 'customer']
   }
 }
 
