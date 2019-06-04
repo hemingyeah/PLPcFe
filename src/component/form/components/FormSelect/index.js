@@ -29,10 +29,13 @@ let TaskLevelField = {
   fieldName: 'level',
   name: '优先级',
   isSystem: 1,
+  forceDelete: true,
   component: {
     preview: FormSelectPreview,
     build: FormSelect,
-    setting: ProductTypeExtendSetting
+    extend: {
+      'task_level_setting': ProductTypeExtendSetting
+    }
   }
 }
 
@@ -41,10 +44,13 @@ const TaskServiceTypeField = {
   fieldName: 'serviceType',
   name: '服务类型',
   isSystem: 1,
+  forceDelete: true,
   component: {
     preview: FormSelectPreview,
     build: FormSelect,
-    setting: ProductTypeExtendSetting
+    extend: {
+      'task_serviceType_setting': ProductTypeExtendSetting
+    }
   }
 }
 
@@ -53,10 +59,13 @@ const TaskServiceContentField = {
   fieldName: 'serviceContent',
   name: '服务内容',
   isSystem: 1,
+  forceDelete: true,
   component: {
     preview: FormSelectPreview,
     build: FormSelect,
-    setting: ProductTypeExtendSetting
+    extend: {
+      'task_serviceContent_setting': ProductTypeExtendSetting
+    }
   }
 }
 

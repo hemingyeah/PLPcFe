@@ -15,6 +15,27 @@ let FormAttachmentField = {
   }
 };
 
-export default FormAttachmentField;
+const TaskAttachmentField = {
+  formType: 'taskAttachment',
+  fieldName: 'attachment',
+  name: '附件',
+  isSystem: 1,
+  forceDelete: true,
+  component: {
+    preview: FormAttachmentPreview,
+    build: FormAttachment,
+    view: FormAttachmentView,
+    extend: {
+      'task_attachment_setting': {
+        name: 'task-attachment-setting',
+        render(){
+          return <div>task attachment setting</div>
+        }
+      }
+    }
+  }
+}
+
+export default [FormAttachmentField, TaskAttachmentField];
 
 

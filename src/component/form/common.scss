@@ -18,12 +18,21 @@
 .form-design-tabs {
   display: flex;
   flex-flow: row nowrap;
-  border-bottom: 1px solid #ddd;
+}
+
+.form-design-withSys .form-design-tab{
+  text-align: center;
 }
 
 .form-design-tab {
   padding: 10px;
   flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.form-design-tab-active{
+  color: $color-primary;
+  border-bottom-color: $color-primary;
 }
 
 .form-design-tabs-content {
@@ -125,6 +134,13 @@
   }
 }
 
+.form-design-field-empty{
+  flex: 1;
+  text-align: center;
+  color: #9a9a9a;
+  padding-top: 25px;
+}
+
 // ------------ setting ------------
 .form-setting-panel {
   height: 100%;
@@ -219,7 +235,7 @@
 }
 
 // ------------ design ------------
-.form-design-phone {
+.form-design-list {
   position: relative;
   box-shadow: 0 0 8px rgba(0, 0, 0, .15);
   width: 100%;

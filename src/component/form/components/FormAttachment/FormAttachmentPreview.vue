@@ -38,4 +38,8 @@ export default {
   font-size: 14px;
   @include text-ellipsis(); 
 }
+
+.form-attachment-preview .btn{
+  padding: 4px 12px;
+}
 </style>

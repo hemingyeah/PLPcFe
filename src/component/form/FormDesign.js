@@ -49,7 +49,7 @@ function createPreviewComp(h, field){
     <div class={previewClass} key={currFieldId}
       onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
-      {field.isSystem == 0 && <button type="button" class="form-design-preview-delete"
+      {(field.isSystem == 0 || previewComp.forceDelete) && <button type="button" class="form-design-preview-delete"
         onClick={e => this.deleteField(field)}>
         <i class="iconfont icon-fe-close"></i>
       </button>}
@@ -66,7 +66,7 @@ function getSettingComp(field, comp){
   if(extend[key]) return extend[key];
 
   // 系统字段默认设置
-  if(field.isSystem == 1 && null == comp.setting) return null;
+  if(field.isSystem == 1) return null;
 
   return comp.setting;
 }
@@ -211,7 +211,14 @@ const FormDesign = {
   computed: {
     // 根据fieldMode筛选后的字段
     filterFields(){
-      return this.availableFields.filter(item => item.isSystem == this.fieldGroup);
+      let groupFields = this.availableFields.filter(item => item.isSystem == this.fieldGroup);
+
+      // 系统字段由于需要保证唯一性，需要剔除已存在的字段
+      if(this.fieldGroup == 1){
+        groupFields = groupFields.filter(f => this.value.findIndex(v => v.formType == f.formType) == -1);
+      }
+     
+      return groupFields;
     },
     // 是否为空
     isEmpty(){
@@ -540,7 +547,8 @@ const FormDesign = {
     },
     /** 删除字段 */
     async deleteField(item) {
-      if (!await Platform.confirm('删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除。')) return;
+      let tip = item.isSystem == 0 ? '删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除？' : '该字段为系统内置字段，请确认是否删除？'
+      if (!await Platform.confirm(tip)) return;
       
       let value = this.value;
       let index = value.indexOf(item);
@@ -583,54 +591,79 @@ const FormDesign = {
       let newField = this.insertField(field, this.value, this.value.length);
       this.insertedField = newField;
     },
-    scrollWrap(e) {
+    scrollPreviewList(e) {
       let containerEl = this.$data.$dragEvent.containerEl;
       
       let {pixelY} = normalizeWheel(e);
       containerEl.scrollTop += pixelY;
+    },
+    renderTabHeader(){
+      if(!this.hasSystemField) return (
+        <div class="form-design-tabs">
+          <div class="form-design-tab">基础字段</div>
+        </div>
+      );
+
+      return (
+        <div class="form-design-tabs form-design-withSys">
+          <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
+          <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
+        </div>
+      )
+    },
+    renderFieldList(fields){
+      if(fields.length == 0){
+        return <div class="form-design-field-empty">暂无可添加的{this.fieldGroup == 0 ? '基础' : '系统'}字段</div>
+      }
+
+      return fields.map(field => {
+        return (
+          <div class="form-design-field-wrap"
+            onMousedown={e => this.beginInsert(field, e)}
+            onClick={e => this.immediateInsert(field, e)}>
+            <div class="form-design-field form-design__ghost">
+              {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
+            </div>
+          </div>
+        )
+      });
+    },
+    renderPreviewList(h){
+      if(this.isEmpty) return (
+        <div class="form-design-tip">
+          <p>选择左侧控件拖动到此处</p>
+        </div>
+      )
+
+      return this.value.map(f => createPreviewComp.call(this, h, f)) 
+    },
+    renderSettingPanel(h){
+      let fieldSetting = createSettingComp.call(this, h, this.currField);
+      if(null == fieldSetting) return null;
+
+      return (
+        <div class="form-design-setting" key="form-design-setting">
+          {fieldSetting}
+        </div> 
+      )
     }
   },
   render(h){
-    // 可用字段列表
-    let fieldList = this.filterFields.map(field => {
-      return (
-        <div class="form-design-field-wrap"
-          onMousedown={e => this.beginInsert(field, e)}
-          onClick={e => this.immediateInsert(field, e)}>
-          <div class="form-design-field form-design__ghost">
-            {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
-          </div>
-        </div>
-      )
-    });
-    
-    // 当前已选字段列表
-    let previewList = this.value.map(currField => createPreviewComp.call(this, h, currField));
-    // 字段设置
-    let fieldSetting = createSettingComp.call(this, h, this.currField);
-    
     return (
       <div class="form-design">
         <div class="form-design-panel">
-          <div class={['form-design-tabs', this.hasSystemField ? 'form-design-withSys' : '']}>
-            <div class="form-design-tab" onClick={e => this.fieldGroup = 0}>基础字段</div>
-            {this.hasSystemField && <div class="form-design-tab" onClick={e => this.fieldGroup = 1}>系统字段</div>}
+          { this.renderTabHeader() }
+          <div class="form-design-tabs-content">
+            { this.renderFieldList(this.filterFields) } 
           </div>
-          <div class="form-design-tabs-content">{fieldList}</div>
         </div>
         <div class="form-design-main">
-          <div class="form-design-center">
-            <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
-              {!this.isEmpty ? previewList : (
-                <div class="form-design-tip">
-                  <p>选择左侧控件拖动到此处</p>
-                </div>
-              )}
-            </div>
+          <div class={['form-design-list', this.silence ? 'form-design-silence' : null]}>
+            { this.renderPreviewList(h) }
           </div>
         </div>
-        {fieldSetting ? <div class="form-design-setting" key="form-design-setting">{fieldSetting}</div> : null}
-        <div class="form-design-ghost" key="form-design-ghost" onWheel={e => this.scrollWrap(e)}>
+        { this.renderSettingPanel(h) }
+        <div class="form-design-ghost" key="form-design-ghost" onWheel={this.scrollPreviewList}>
           <div class="form-design__template"></div>
           <div class="form-design-cover"></div>
         </div>
@@ -639,7 +672,7 @@ const FormDesign = {
   },
   mounted(){
     this.$data.$dragEvent.ghostEl = this.$el.querySelector('.form-design-ghost');
-    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-phone');
+    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-list');
   },
   components: {...PreviewComponents, ...SettingComponents}
 };

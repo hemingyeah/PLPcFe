@@ -18,8 +18,8 @@ import FormCascader from './FormCascader';
 import FormCustomer from './FormCustomer';
 import FormRelation from './FormRelation'
 
-// base fields
-const BaseFormField = [
+// 所有字段
+const ALL_FORM_FIELDS = [
   FormText,
   FormTextarea,
   FormNumber,
@@ -38,23 +38,23 @@ const BaseFormField = [
   FormCascader,
   FormCustomer,
   FormRelation
-];
+].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
-const allFields = BaseFormField.reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 const FormFieldMap = {};
 const PreviewComponents = {};
 const SettingComponents = {};
 const BuildComponents = {};
 const ViewComponents = {};
 
-for(let i = 0; i < allFields.length; i++){
-  let formField = allFields[i];
+for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
+  let formField = ALL_FORM_FIELDS[i];
   let field = {
     name: formField.name, // 组件显示名称
     formType: formField.formType, // 组件类型
     fieldName: formField.fieldName, // 字段名，部分系统字段会提供
     isSystem: formField.isSystem || 0, // 是否为为系统组件
-    alias: formField.alias
+    alias: formField.alias,
+    forceDelete: formField.forceDelete === true
   }
 
   if(!formField.alias){
@@ -101,24 +101,39 @@ for(let i = 0; i < allFields.length; i++){
 
   FormFieldMap[formField.formType] = field;
 }
-const MODES = {
+
+const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator']
+const MODE_MANAGER = {
+  base: {
+    include: [...COMMON_FIELDS]
+  },
   customer: {
-    exclude: ['address', 'customer']
+    include: [...COMMON_FIELDS]
   },
   product: {
-    exclude: ['address', 'customer']
+    include: [...COMMON_FIELDS]
+  },
+  task: {
+    include: [
+      ...COMMON_FIELDS,
+      ...['taskNo', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment']
+    ]
+  },
+  findMode(mode){
+    return MODE_MANAGER[mode] || MODE_MANAGER.base;
   }
 }
 
 const FieldManager = {
   /** 根据mode获取字段 */
   findModeFields(mode = 'base'){
-    let fields = allFields;
-    let exclude = (MODES[mode] || {}).exclude || [];
+    let fields = ALL_FORM_FIELDS;
+    let modeConfig = MODE_MANAGER.findMode(mode);
+    let include = modeConfig.include || []
 
     // 排除字段
-    if(exclude.length > 0) {
-      fields = fields.filter(f => exclude.indexOf(f.formType) < 0)
+    if(include.length > 0) {
+      fields = fields.filter(f => include.indexOf(f.formType) >= 0)
     }
 
     return fields.map(f => f.formType);

@@ -20,18 +20,21 @@ let FormTextareaField = {
 
 let TaskDescriptionField = {
   formType: 'description',
-  fieldName: 'level',
+  fieldName: 'description',
   name: '描述',
   isSystem: 1,
+  forceDelete: true,
   component: {
-    setting: {
-      name: 'task-description-setting',
-      render(){
-        return <div>task description setting</div>
-      }
-    },
     preview: FormTextareaPreview,
-    build: FormTextarea
+    build: FormTextarea,
+    extend: {
+      'task_description_setting': {
+        name: 'task-description-setting',
+        render(){
+          return <div>task description setting</div>
+        }
+      }
+    }
   }
 }
 
