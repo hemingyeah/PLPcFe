@@ -60,25 +60,6 @@
             <!--</el-form-item>-->
             <el-form-item label-width="100px" label="选择团队">
               <biz-team-select v-model="params.tag" :fetch-func="getTeamList"/>
-              <!-- <el-select
-                v-model="params.tagId"
-                @change="modifyUser('tags')"
-                filterable
-                clearable
-                remote
-                reserve-keyword
-                placeholder="请输入关键词搜索"
-                :loading="inputRemoteSearch.tag.loading"
-                :remote-method="searchTag"
-              >
-                <el-option
-                  v-for="item in inputRemoteSearch.tag.options"
-                  :key="item.id"
-                  :label="item.tagName"
-                  :value="item.id"
-                >
-                </el-option>
-              </el-select> -->
             </el-form-item>
             <el-form-item label-width="100px" label="区域">
               <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector"
@@ -239,8 +220,7 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="jumpPage" v-if="editedPermission">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" v-if="deletePermission" @event="deleteCustomer">删除
-          </base-button>
+          <base-button type="ghost" icon="icon-yemianshanchu" v-if="deletePermission" @event="deleteCustomer">删除</base-button>
         </div>
 
         <div class="action-button-group">
@@ -270,8 +250,9 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
-            <span class="el-dropdown-link el-dropdown-btn">
+          <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">选择列<i class="iconfont icon-nav-down"></i></span>
+          <!-- <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
+            <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">
               选择列
               <i class="iconfont icon-nav-down"></i>
             </span>
@@ -281,7 +262,7 @@
                              :disabled="item.field === 'name'"/>
               </el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown>
+          </el-dropdown> -->
         </div>
       </div>
       <!--operation bar end-->
@@ -484,6 +465,7 @@
       </div>
     </base-panel>
 
+    <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
   </div>
 </template>
 
@@ -713,6 +695,13 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    revert(){
+      let data = '{"columnStatus":["name","serialNumber","lmName","lmPhone","customerAddress","detailAddress","tags","customerManagerName","status","createTime","updateTime","createUser","remindCount","field_t3LO0cLitWOhR4y7","field_HbOtz3PWzl10BjET"]}'
+      localStorage.setItem('customerListData', data)
+    },
+    showAdvancedSetting(){
+      this.$refs.advanced.open(this.columns);
+    },
     showLatestUpdateRecord(row) {
       if (row.latesetUpdateRecord) return;
 
@@ -863,9 +852,6 @@ export default {
          * date、datetime类型的要注意 new Date一下
          * 人员选择初始化值是一个id，还要初始化它的options
          */
-
-      console.log('this.customerConfig.fieldInfo', this.customerConfig.fieldInfo);
-
       this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
         .map(f => {
 
@@ -1254,15 +1240,19 @@ export default {
       }
     },
     // columns
-    modifyColumnStatus(val, column) {
-      this.columns = this.columns
-        .map(c => {
-          if (c.field === column.field) {
-            c.show = val;
-          }
-          return c;
-        });
-      const showColumns = this.columns.filter(c => c.show).map(c => c.field);
+    modifyColumnStatus(event) {
+      let columns = event.data || [];
+      let colMap = columns.reduce((acc, col) => (acc[col.field] = col) && acc, {});
+
+      this.columns.forEach(col => {
+        let newCol = colMap[col.field];
+        if(null != newCol) {
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
+        }
+      })
+
+      const showColumns = this.columns.map(c => ({field: c.field, show: c.show, width: c.width}));
       this.saveDataToStorage('columnStatus', showColumns);
     },
     // common methods
@@ -1275,38 +1265,20 @@ export default {
       data[key] = value;
       localStorage.setItem('customerListData', JSON.stringify(data));
     },
-    backwardCompatibleColumn() {
-      let checkedColumnsOldVersion = localStorage.getItem('customerCheck');
-      if (!checkedColumnsOldVersion) return;
-      let columns = checkedColumnsOldVersion.split(',');
-      localStorage.removeItem('customerCheck');
-      return (columns || []).filter(c => c)
-        .map(c => {
-          if (c === 'address') return 'customerAddress';
-          if (c === 'addressDetail') return 'detailAddress';
-          if (c === 'manager') return 'customerManagerName';
-
-          return c;
-        })
-    },
     buildTableColumn() {
       const localStorageData = this.getLocalStorageData();
       let columnStatus = localStorageData.columnStatus || [];
-      if (!columnStatus.length) {
-        columnStatus = this.backwardCompatibleColumn();
-      }
-      let minWidth = 100;
+      let localColumns = columnStatus
+        .map(i => typeof i == 'string' ? {field: i, show: true} : i)
+        .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
       let baseColumns = this.fixedColumns();
-      let dynamicColumns = [];
-      let columns = [];
-      let sortable = false;
-
-      dynamicColumns = this.customerConfig.fieldInfo
+      let dynamicColumns = this.customerConfig.fieldInfo
         .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
-          sortable = false;
-          minWidth = 100;
+          let sortable = false;
+          let minWidth = 100;
+
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
             sortable = 'custom';
             minWidth = 100;
@@ -1332,17 +1304,22 @@ export default {
             sortable,
             isSystem: field.isSystem,
           };
-        });
+        })
 
-      columns = [...baseColumns, ...dynamicColumns];
+      let columns = [...baseColumns, ...dynamicColumns].map(col => {
+        let show = col.show === true;
+        let width = col.width;
+        let localField = localColumns[col.field];
 
-      if (!columnStatus || !columnStatus.length) {
-        return columns;
-      }
+        if(null != localField){
+          width = typeof localField.width == 'number' ? `${localField.width}px` : col.width;
+          show = localField.show !== false;
+        }
 
-      columns = columns.map(bc => {
-        bc.show = columnStatus.some(sc => sc === bc.field);
-        return bc;
+        col.show = show;
+        col.width = width;
+
+        return col;
       });
 
       return columns;

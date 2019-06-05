@@ -217,6 +217,8 @@
 
 .base-table__setting{
   border: 1px solid #ddd;
+  overflow: auto;
+  max-height: calc(100vh - 216px);
 }
 
 .base-table__setting-row{
@@ -225,8 +227,12 @@
   border-top: 1px solid #ddd;
 
   &.base-table__setting-head{
+    position: sticky;
+    top: 0;
+    z-index: 9;
     font-weight: 600;
     background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
   }
 
   input{
@@ -248,7 +254,7 @@
   }
 
   &:first-child{
-    border: none;
+    border-top: none;
   }
 
   &.base-table__setting-row-disable{

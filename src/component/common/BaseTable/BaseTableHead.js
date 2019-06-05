@@ -1,8 +1,7 @@
 import TableMixin from './TableMixin';
-import _ from 'lodash';
 import normalizeWheel from '@src/util/normalizeWheel'
 
-import { PaddingColumn } from './TableColumn'
+import { PaddingColumn } from './TableColumn';
 
 const BaseTableHead = {
   name: 'base-table-head',
@@ -19,16 +18,11 @@ const BaseTableHead = {
       default: false
     }
   },
-  data(){
-    return {
-      setting: {
-        show: false,
-        rows: []
-      }
-    }
-  },
   methods: {
-    /** 检测是否全部选中 */
+    /** 
+     * TODO: 确定该方式是否被调用，如无调用出，删除即可
+     * 检测是否全部选中 
+     */
     checkIsSelectAll(rows) {
       for (let i = 0; i < rows.length; i++) {
         let row = rows[i];
@@ -73,83 +67,23 @@ const BaseTableHead = {
     },
     /** 显示设置窗 */
     showSetting(){
-      let copy = _.cloneDeep(this.originColumns.filter(item => item.type == 'column'));
-      copy.forEach(item => item.width = item.isAuto ? '' : item.width);
-      
-      this.setting.rows = copy
-      this.setting.show = true;
-    },
-    /** 关闭设置窗 */
-    closeSetting(){
-      this.setting.show = false;
-    },
-    parseWidth(event, row){
-      let value = event.target.value;
-      row.width = parseInt(value);
+      let advanced = this.$refs.advanced;
+      advanced.open(this.originColumns)
     },
     /** 渲染设置窗 */
     renderSetting(h){
       if(!this.advanced) return null;
 
       return [
-        (<button type="button" class="base-table__setting-btn" onClick={e => this.showSetting()}>
+        (<button type="button" class="base-table__setting-btn" onClick={this.showSetting}>
           <i class="iconfont icon-xitongguanli"></i>
         </button>),
-
-        (<base-modal 
-          title="自定义列" class="base-table__modal"
-          appendToBody={true}
-          show={this.setting.show} onClose={e => this.closeSetting(e)}>
-         
-          <form class="base-table__setting">
-            <div class="base-table__setting-row base-table__setting-head">
-              <div class="base-table__setting-row-selection"></div>
-              <div class="base-table__setting-row-name"><span>列名</span></div>
-              <div class="base-table__setting-row-width">列宽</div>
-            </div>
-            {
-              this.setting.rows.map(row => {
-                return (
-                  <div class={['base-table__setting-row', row.show ? null : 'base-table__setting-row-disable']} >
-                    <div class="base-table__setting-row-selection">
-                      {
-                        row.show == 'important' 
-                          ? <el-checkbox value={true} disabled/>
-                          : <el-checkbox value={row.show} onInput={value => row.show = value}/>
-                      }
-                    </div>
-                    <div class="base-table__setting-row-name">
-                      <span onClick={e => row.show = !row.show} style={{width: `${row.width}px`}}>{row.label}</span>
-                    </div>
-                    <div class="base-table__setting-row-width">
-                      <input type="number" placeholder="自适应" value={row.width} onInput={e => this.parseWidth(e, row) }/>
-                    </div>
-                  </div>
-                )
-              })
-            }
-          </form>
-          
-          <template slot="footer">
-            <button type="button" class="btn btn-text" onClick={e => this.closeSetting()}>关闭</button>
-            <button type="button" class="btn btn-primary" onClick={e => this.saveSetting(e)}>保存</button>
-          </template>
-        </base-modal>)
+        <base-table-advanced-setting ref="advanced" onSave={this.saveSetting}/>
       ];
     },
     /** 保存设置 */
-    saveSetting(event){
-      event.preventDefault();
-      let data = this.setting.rows.map(item => {
-        return {
-          field: item.field,
-          show: item.show,
-          width: item.width
-        }
-      })
-      
-      this.closeSetting();
-      this.$emit('update', {type: 'column', data})
+    saveSetting(data){
+      this.$emit('update', data)
     }
   },
   render(h) {    
