@@ -3,7 +3,9 @@
     <input
       type="text"
       :value="value"
-      @input="input"
+      @compositionstart="compositionstart"
+      @compositionend="compositionend"
+      @input="inputEvent"
       :placeholder="placeholder"
       :id="`form_${field.fieldName}`"
       autocomplete="off"
@@ -23,17 +25,25 @@ export default {
       default: ''
     }
   },
+  data() {
+    return {
+      $isInputZh: false
+    }
+  },
   methods: {
-    input(event) {
-      let oldValue = null;
-      let newValue = event.target.value;
-      if (newValue === '') {
-        this.$nextTick(() => {
-          event.target.value = '';
-        });
-      }
-      this.$emit('update', { newValue, oldValue, field: this.field });
-      this.$emit('input', newValue);
+    /* 输入文字之前 */
+    compositionstart(event) {
+      this.$data.$isInputZh = true;
+    },
+    /* 输入文字之后 */
+    compositionend(event) {
+      this.$data.$isInputZh = false;
+      this.input(event);
+    },
+    inputEvent(event) {
+      if (this.$data.$isInputZh) return
+
+      this.input(event);
     }
   }
 }
