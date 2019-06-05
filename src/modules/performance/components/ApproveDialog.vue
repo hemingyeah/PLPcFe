@@ -33,7 +33,7 @@
       </li>
       <li>
         <label>审批备注：</label>
-        <el-input type="textarea" v-model="form.approveRemark" resize="none" rows="3"></el-input>
+        <el-input type="textarea" v-model="form.approveRemark" resize="none" rows="3" :maxlength="500"></el-input>
       </li>
     </ul>
 

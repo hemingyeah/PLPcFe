@@ -29,7 +29,7 @@
       </dt>
       <dd>
         <el-popover
-          placement="right"
+          placement="bottom"
           width="418"
           popper-class="process-popover"
           trigger="hover">
@@ -61,7 +61,6 @@
       </dd>
       <dd><label>创建备注</label>{{reportDetail.remark}}</dd>
       <dd><label>创建人</label>{{reportDetail.creator}}</dd>
-      <dd><label>审批人</label>{{reportDetail.reviewers}}</dd>
       <dd class="group-line" v-if="sendToCc"><label>抄送人</label>{{reportDetail.cns}}</dd>
 
       <dd><label>审批操作人</label>{{reportDetail.reviewOperater}}</dd>
@@ -473,7 +472,7 @@ export default {
       return (
         <h5>
           <strong>{userName}{str}。</strong>
-          {remark && <p class="secondary-info" >备注：{remark}</p>}
+          {remark && <p class="secondary-info">备注：{remark}</p>}
         </h5>
       )
     },
@@ -568,6 +567,10 @@ export default {
       max-height: 500px;
       overflow: auto;
       padding-top: 10px;
+
+      .secondary-info {
+        word-break: break-all;
+      }
     }
   }
 
