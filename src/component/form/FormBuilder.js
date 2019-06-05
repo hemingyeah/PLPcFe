@@ -82,7 +82,7 @@ const FormBuilder = {
         
         // 判读是否隐藏该字段
         if(util.isHiddenField(field, this.value, this.fields)) return null;
-
+        
         let comp = FormFieldMap.get(field.formType);
         if(comp == null) return;
 

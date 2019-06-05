@@ -3,9 +3,7 @@
     <input
       type="text"
       :value="value"
-      @compositionstart="compositionstart"
-      @compositionend="compositionend"
-      @input="inputEvent"
+      @input="input"
       :placeholder="placeholder"
       :id="`form_${field.fieldName}`"
       autocomplete="off"
