@@ -1,6 +1,6 @@
 <template>
   <div class="customer-container" v-loading.fullscreen.lock="loadingPage">
-    <form @submit.prevent="submit" class="base-form" v-if="init">
+    <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
       <div class="page-title">
         <div class="title">
           <button type="button" class="btn-text btn-back" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>

@@ -16,7 +16,7 @@
           <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
         <span class="advanced-search-visible-btn"
-              @click.self="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
+              @click.self="panelSearchAdvancedToggle">高级搜索</span>
       </form>
       <!--高级搜索-->
       <base-panel :show.sync="advancedSearchPanelShow" :width="panelWidth">
@@ -1571,6 +1571,16 @@ export default {
         // width: '80px',
         show: true,
       }]
+    },
+    panelSearchAdvancedToggle() {
+      this.advancedSearchPanelShow = !this.advancedSearchPanelShow;
+      this.$nextTick(() => {
+        let forms = document.getElementsByClassName('advanced-search-form');
+        for(let i = 0; i < forms.length; i++) {
+          let form = forms[i];
+          form.setAttribute('novalidate', true)
+        }
+      })
     }
   },
   components: {
