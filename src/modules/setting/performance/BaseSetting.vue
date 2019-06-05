@@ -24,7 +24,7 @@
           clearable
           remote
           multiple
-          placeholder="请输入关键词搜索"
+          placeholder="请设置绩效报告审批人"
           :loading="remoteSearchLoading"
           :remote-method="getApproveList">
           <el-option

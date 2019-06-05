@@ -450,7 +450,7 @@ export default {
       const pass = this.reports.filter(r => this.multipleSelection.some(id => id === r.id))
         .some(r => r.createUserId !== this.userId || r.waitingForApprove);
 
-      if (pass) return this.$platform.alert('选择的绩效报告包含抄送给您的，或者处于审批中的，这是不能被删除的，请重新选择。')
+      if (pass) return this.$platform.alert('无法删除，请确认该绩效报告是由您创建且未在审批中');
 
       try {
         if (!await this.$platform.confirm('确定要删除选择的绩效报告？')) return;

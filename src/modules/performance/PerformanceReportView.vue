@@ -268,7 +268,7 @@ export default {
     reportDetail() {
       if (!this.initData || !this.initData.reportDescList || !this.initData.reportDescList.ruleMap) return {}
       const am = this.approveMap;
-      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, timeType, isDelete, taskType, createUserName} = this.initData.reportDescList.ruleMap;
+      const {reportName, ruleName, allSize, hitSize, ruleType, createTime, startTime, endTime, remark, timeType, isDelete, taskType} = this.initData.reportDescList.ruleMap;
       return {
         reportName,
         ruleName,
@@ -285,7 +285,7 @@ export default {
         noTeamLeaders: this.initData.reportDescList.noTeamLeaders || [],
         totalUsers: this.initData.reportDescList.totalUsers,
         dataUsers: this.initData.reportDescList.dataUsers,
-        creator: createUserName,
+        creator: this.initData.reportDescList.reportCreateUserName,
         reviewers: (this.approveMap.reviewerNames || [])
           .map(({displayName}) => displayName).join(','),
         cns:  am.carbonCopyNames ? am.carbonCopyNames.replace(/\[|\]|"/g, '') : '',
