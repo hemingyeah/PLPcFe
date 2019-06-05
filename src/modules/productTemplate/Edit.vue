@@ -82,7 +82,16 @@ export default {
       return this.initData.id
     },
     fields() {
-      let originFields = this.initData && this.initData.productFields.filter(f => f.fieldName !== 'customer' && f.fieldName !== 'tags');
+      let originFields = (
+        this.initData 
+        && this.initData.productFields.filter(f => {
+          return (
+            f.fieldName !== 'customer' 
+            && f.fieldName !== 'tags'
+            && f.formType !== 'location'
+          )
+        })
+      );
       let localFields = this.fieldsLocal;
       let fields = [...localFields, ...originFields];
 

@@ -50,7 +50,7 @@ export default {
           formType: 'select',
           isSystem: 1
         },
-        ...this.initData.productFields
+        ...this.initData.productFields.filter(f => f.formType !== 'location')
       ]
     },
     auth() {
@@ -70,7 +70,6 @@ export default {
   },
   async mounted() {
     try {
-
       // 初始化默认值
       let form = {};
       if (this.action === 'edit') {

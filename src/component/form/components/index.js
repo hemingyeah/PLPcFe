@@ -30,6 +30,7 @@ const BaseFormField = [
   FormEmail,
   FormSeparator,
   // FormAddress,
+  FormLocation,
   // FormLocation,
   FormInfo
 ];

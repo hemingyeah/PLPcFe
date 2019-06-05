@@ -255,8 +255,16 @@ export default {
     buildCustomizeField() {
       if (this.editableFields.length > this.fixedFieldsCount) return;
 
+      let formTypes = ['attachment', 'separator', 'location'];
+
       const customizedField = this.fields
-        .filter(f => f.fieldName.indexOf('customer') < 0 && f.formType !== 'attachment' && f.formType !== 'separator')
+        .filter(f => {
+          return (
+            !f.isSystem
+            && f.fieldName.indexOf('customer') < 0 
+            && formTypes.indexOf(f.formType) < 0
+          )
+        })
         .map(field => {
           // select
           if (field.formType === 'select' && field.setting && field.setting.isMulti) {

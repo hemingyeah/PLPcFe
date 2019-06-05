@@ -39,7 +39,15 @@ export default {
           }
           return f;
         })
-        .filter(f => f.fieldName !== 'tags' || (f.fieldName === 'tags' && this.initData.isDivideByTag));
+        .filter(f => {
+          return (
+            (
+              f.fieldName !== 'tags' 
+              || (f.fieldName === 'tags' && this.initData.isDivideByTag)
+            )
+            && f.formType !== 'location'
+          )
+        });
       return FormUtil.migration(sortedFields)
     },
     postUrl() {

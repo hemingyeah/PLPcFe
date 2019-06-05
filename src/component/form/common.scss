@@ -370,6 +370,16 @@
   background-color: #fff;
 }
 
+.form-view-location-not {
+  color: #9a9a9a !important;
+}
+
+.link-text {
+  color: $color-primary;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
 // ------------ form-builder ------------
 .form-builder{
   padding: 10px;

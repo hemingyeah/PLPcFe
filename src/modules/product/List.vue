@@ -125,6 +125,9 @@
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
               {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
             </template>
+            <template v-else-if="column.formType === 'location'">
+              {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
+            </template>
             <template v-else-if="!column.isSystem">
               {{scope.row.attribute[column.field]}}
             </template>
