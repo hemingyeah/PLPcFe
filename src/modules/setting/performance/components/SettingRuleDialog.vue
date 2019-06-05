@@ -163,22 +163,22 @@ export default {
           label: '按工单营收',
           value: 'sale'
         },
-        {
-          label: '按工单备件营收',
-          value: 'sparePartSale'
-        },
-        {
-          label: '按工单备件毛利',
-          value: 'sparePartProfit'
-        },
-        {
-          label: '按工单服务项目营收',
-          value: 'serviceSale'
-        },
-        {
-          label: '按工单服务项目毛利',
-          value: 'serviceProfit'
-        },
+        // {
+        //   label: '按工单备件营收',
+        //   value: 'sparePartSale'
+        // },
+        // {
+        //   label: '按工单备件毛利',
+        //   value: 'sparePartProfit'
+        // },
+        // {
+        //   label: '按工单服务项目营收',
+        //   value: 'serviceSale'
+        // },
+        // {
+        //   label: '按工单服务项目毛利',
+        //   value: 'serviceProfit'
+        // },
       ],
       categories: [
         {
