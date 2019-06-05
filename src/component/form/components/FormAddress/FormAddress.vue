@@ -170,10 +170,13 @@ export default {
 
   .base-dist-picker {
     flex-grow: 1;
-    padding-right: 10px;
+    /*padding-right: 10px;*/
     .el-cascader {
       width: 100%;
     }
+  }
+  .base-dist-picker+.el-button {
+    margin-left: 10px;
   }
 }
 

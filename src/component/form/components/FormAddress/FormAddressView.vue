@@ -21,6 +21,8 @@ export default {
   computed: {
     displayMap(){
       let value = this.value;
+
+      if (!value) return;
       return (value.adLatitude && value.adLongitude) || (value.latitude && value.longitude)
     }
   },

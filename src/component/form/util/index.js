@@ -135,7 +135,7 @@ export function initialize(fields = [], origin = {}, callback){
     }
 
     // 地址的默认值初始化为对象
-    if(field.formType == 'customerAddress') defaultValue = {};
+    if(field.formType == 'customerAddress' || field.formType == 'address') defaultValue = {};
     // 人员的默认值初始化为对象
     if(field.formType == 'user') defaultValue = {}
 

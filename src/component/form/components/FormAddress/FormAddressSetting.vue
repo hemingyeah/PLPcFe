@@ -9,6 +9,7 @@
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
+      <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
     </div>
   </div>
 </template>

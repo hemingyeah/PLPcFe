@@ -14,6 +14,10 @@ function createFormField(h, field, comp){
       update: event => this.$emit('update', event)
     }
   };
+  
+  if (field.formType === 'address' && !field.isSystem) {
+    data.props.disableMap = true;
+  }
 
   return h(comp.build, data);
 }

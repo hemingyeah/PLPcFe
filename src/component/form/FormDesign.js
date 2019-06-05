@@ -27,6 +27,16 @@ function createPreviewComp(h, field){
   }
 
   // 根据字段配置创建预览内容
+  
+  // todo 临时解决
+  if (!previewComp) return;
+  
+  // console.group()
+  // console.log('field', field);
+  // console.log('previewComp', previewComp);
+  // console.groupEnd()
+  
+  
   let fieldPreview = h(previewComp.preview, {
     'class': 'form-design__ghost',
     props: { field, setting: previewComp}

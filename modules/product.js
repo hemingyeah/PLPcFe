@@ -3,10 +3,12 @@ module.exports = {
     entry: './src/modules/product/list.js'
   },
   'product.view': {
-    entry: './src/modules/product/view.js'
+    entry: './src/modules/product/view.js',
+    template: 'src/modules/product/index.html'
   },
   'product.edit': {
-    entry: './src/modules/product/edit.js'
+    entry: './src/modules/product/edit.js',
+    template: 'src/modules/product/index.html'
   },
   'product.edit.modal': {
     entry: './src/modules/product/editModal.js',
