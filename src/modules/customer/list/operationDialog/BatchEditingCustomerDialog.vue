@@ -360,7 +360,7 @@ export default {
     buildDynamicField() {
       if (this.editableFields.length > this.fixedFieldsCount) return;
       const customizedField = this.fields
-        .filter(f => f.isSystem === 0 && f.formType !== 'attachment' && f.formType !== 'separator')
+        .filter(f => f.isSystem === 0 && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info')
         .map(f => {
           if (f.formType === 'select' && f.setting.isMulti) {
             this.$set(this.form, f.fieldName, []);
