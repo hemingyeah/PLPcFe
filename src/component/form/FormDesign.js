@@ -31,12 +31,6 @@ function createPreviewComp(h, field){
   // todo 临时解决
   if (!previewComp) return;
   
-  // console.group()
-  // console.log('field', field);
-  // console.log('previewComp', previewComp);
-  // console.groupEnd()
-  
-  
   let fieldPreview = h(previewComp.preview, {
     'class': 'form-design__ghost',
     props: { field, setting: previewComp}
@@ -64,8 +58,11 @@ function createPreviewComp(h, field){
 /** 获取设置组件组件名，如果返回null，渲染默认组件 */
 function getSettingComp(field, comp){
   // 先检测是否有扩展设置
+  
   let extend = comp.extend || {};
   let key = `${this.mode}_${field.fieldName}_setting`;
+  
+  
   if(extend[key]) return extend[key];
 
   // 系统字段默认设置
@@ -112,8 +109,14 @@ function createSettingComp(h, field){
         if (event.prop == 'isMulti' && event.value) {
           this.deleteDependencies(field);
         }
-
-        field[event.prop] = event.value;
+        
+        console.log('event', event);
+        
+        if (event.isSetting) {
+          field.setting[event.prop] = event.value;
+        } else {
+          field[event.prop] = event.value;
+        }
       }
     }
   });

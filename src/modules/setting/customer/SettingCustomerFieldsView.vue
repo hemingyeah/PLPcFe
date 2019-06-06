@@ -48,9 +48,12 @@ export default {
         fields.forEach(item => {
           item.tableName = 'customer';
         });
-        
+
+        console.log('fields', fields);
+        return;
         let message = FormUtil.validate(fields);
         if(!FormUtil.notification(message, this.$createElement)) return;
+
 
         this.pending = true;
         let result = await http.post('/setting/customer/saveFields', fields);

@@ -1,5 +1,14 @@
 <template>
-  <div>customer serial number setting</div>
+  <div class="form-setting-panel">
+    <h3>系统字段 -- {{field.displayName}}</h3>
+    <!--<div class="form-setting-group">-->
+      <!--<textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>-->
+    <!--</div>-->
+    <div class="form-setting-group">
+      <el-checkbox :value="field.setting.autoSerialNumber" @input="update($event, 'autoSerialNumber', true)">启用客户自动编号</el-checkbox>
+    </div>
+    <p class="form-select-logical-tip">启用后由系统为客户进行自动编号且确保客户编号的唯一性</p>
+  </div>
 </template>
 
 <script>
@@ -7,6 +16,29 @@ import SettingMixin from '@src/component/form/mixin/setting';
 
 export default {
   name: 'customer-serial-number-extend-setting',
-  mixins: [SettingMixin]
+  mixins: [SettingMixin],
+  props: {
+    field: {
+      type: Object,
+      default: () => ({})
+    },
+    setting: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  methods: {
+    updateForDom(event){
+      let el = event.target;
+      let prop = el.dataset.prop;
+      let value = el.value;
+
+      this.update(value, prop)
+    },
+    update(value, prop, isSetting){
+      this.$emit('input', {value, prop, isSetting})
+    }
+  }
+
 }
 </script>

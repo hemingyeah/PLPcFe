@@ -85,6 +85,34 @@ export default class FormField{
     let { serialNumberUnique } = fillPropForSerialNumber(params);
     this.serialNumberUnique = serialNumberUnique;
 
+    
+    let setting = params.setting || {};
+    
+    // 处理客户地址
+    if (this.fieldName === 'customerAddress' && this.isSystem) {
+      this.setting = {};
+      this.setting.customerAddressConfig = setting.customerAddressConfig || {
+        adProvince: '河北省',
+        adCity: '唐山市',
+        adDist: '古冶区'
+      };
+    }
+    // 处理客户名称
+    if (this.displayName === '客户' && this.fieldName === 'name' && this.isSystem) {
+      this.setting = {};
+      this.setting.customerNameDuplicate = setting.customerNameDuplicate || false;
+    }
+    // 处理客户地址
+    if (this.displayName === '客户编号' && this.fieldName === 'serialNumber' && this.isSystem) {
+      this.setting = {};
+      this.setting.autoSerialNumber = setting.autoSerialNumber || false;
+    }
+    // 处理客户电话
+    if (this.displayName === '电话' && this.fieldName === 'lmPhone' && this.isSystem) {
+      this.setting = {};
+      this.setting.phoneUnique = setting.phoneUnique || false;
+    }
+  
     // 辅助字段
     this.dragging = false; // 当前字段时候正在被拖拽
   }
@@ -135,6 +163,14 @@ export default class FormField{
       setting.serialNumberUnique = (field.serialNumberUnique || false);
     }
 
+    
+    if (field.setting) {
+      setting = {
+        ...setting,
+        ...field.setting
+      }
+    }
+    
     // 过滤空白依赖
     let dependencies = field.dependencies || {};
     Object.keys(dependencies).forEach(prop => {
