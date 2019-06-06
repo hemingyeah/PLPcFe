@@ -22,5 +22,8 @@ export default {
 <style lang="scss">
 .form-info {
   width: 100%;
+  .form-item__text {
+    word-break: break-all;
+  }
 }
 </style>

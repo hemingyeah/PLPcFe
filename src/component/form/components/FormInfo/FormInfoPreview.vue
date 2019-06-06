@@ -1,8 +1,9 @@
 <template>
-  <div class="form-preview-group">
+  <div class="form-preview-group info-form-preview-group">
     <label>{{ field.displayName }}<span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
-    <div class="form-preview-mock">
-      <p class="form-preview-control">{{ field.placeHolder }}</p>
+    <div class="form-item__text">
+      {{ field.placeHolder }}
+      <!-- <p class="form-preview-control">{{ field.placeHolder }}</p> -->
     </div>
   </div>
 </template>
@@ -23,3 +24,13 @@ export default {
 }
 </script>
 
+<style lang="scss">
+.info-form-preview-group {
+  label {
+    flex-shrink: 0;
+  }
+  .form-item__text {
+    word-break: break-all;
+  }
+}
+</style>
