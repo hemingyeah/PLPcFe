@@ -101,13 +101,13 @@ export function genPlaceholder(field, defaultText = ''){
 export function initialize(fields = [], origin = {}, callback){
   let result = typeof callback == 'function' ? callback(fields, origin) : origin;
 
-  fields.forEach(field => {
+  fields.filter(field => field.formType !== 'info' && field.formType !== 'separator').forEach(field => {
     let formType = field.formType;
     let setting = field.setting || {};
     let fieldName = field.fieldName;
     let dataSource = setting.dataSource || [];
     let defaultValue = field.defaultValue || '';
-
+    
     // 客户和编号类型不出初始化值
     if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
     // 如果已经存在值 则无需初始化
@@ -155,7 +155,9 @@ export function initialize(fields = [], origin = {}, callback){
     result[fieldName] = formData == null ? defaultValue : formData;
   });
 
+
   return assign({}, origin.attribute, result);
+
 }
 
 /**
