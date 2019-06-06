@@ -19,7 +19,7 @@
         <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
       </div>
       <div class="base-file-info">
-        <a :href="genDownloadUrl(file.url)">{{file.filename}}</a>
+        <a :href="genDownloadUrl(file)">{{file.filename}}</a>
         <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">
           <i class="iconfont icon-circle-delete" style="position: relative;top: 1px"></i>
         </button>
@@ -116,8 +116,8 @@ export default {
     }
   },
   methods: {
-    genDownloadUrl(url){
-      return `/files/download?ossurl=${encodeURIComponent(url)}`
+    genDownloadUrl(file){
+      return `/files/download?fileId=${file.id}`;
     },
     preview(event){
       let element = event.target.querySelector('img');
