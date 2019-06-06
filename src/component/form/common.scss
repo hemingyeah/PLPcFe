@@ -320,6 +320,13 @@
     overflow-x: hidden;
     color: $text-color-primary;
     word-break: break-word;
+
+    .iconfont {
+      color: $color-primary;
+      &:hover {
+        cursor: pointer;
+      }
+    }
   }
 }
 
