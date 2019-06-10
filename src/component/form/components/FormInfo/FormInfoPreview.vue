@@ -1,5 +1,5 @@
 <template>
-  <div class="form-preview-group info-form-preview-group">
+  <div class="form-preview-group form-info-preview">
     <label>{{ field.displayName }}<span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
     <div class="form-item__text">
       {{ field.placeHolder }}
@@ -25,7 +25,7 @@ export default {
 </script>
 
 <style lang="scss">
-.info-form-preview-group {
+.form-info-preview {
   label {
     flex-shrink: 0;
   }

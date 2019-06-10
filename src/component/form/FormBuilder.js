@@ -79,9 +79,7 @@ const FormBuilder = {
         if(this.$scopedSlots[fieldName]) {
           return this.$scopedSlots[fieldName]({field, value: getValue(field, this)});
         }
-        // 如果是info或separator 不需要defaultValue字段
-        if(field.formType === 'info' || field.formType === 'separator') 
-          delete field.defaultValue
+        
         // 判读是否隐藏该字段
         if(util.isHiddenField(field, this.value, this.fields)) return null;
         
