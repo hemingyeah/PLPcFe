@@ -86,7 +86,7 @@
         :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'select' && selectedField.fieldName === 'type'">
-        <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择类型">
+        <el-select v-model="form[selectedField.fieldName]" clearable :placeholder="selectedField.placeHolder">
           <el-option
             v-for="item in productTypes"
             :key="item"
@@ -102,7 +102,7 @@
         :key="selectedFieldName"
         :rules="selectedField.rules"
         v-else-if="selectedField.formType === 'select'">
-        <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
+        <el-select v-model="form[selectedField.fieldName]" clearable :placeholder="selectedField.placeHolder || '请选择'">
           <el-option
             v-for="item in selectedField.setting.dataSource"
             :key="item"

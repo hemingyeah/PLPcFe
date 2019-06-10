@@ -2,10 +2,8 @@ import FormTextSetting from './FormTextSetting.vue';
 import FormTextPreview from './FormTextPreview.vue';
 import FormText from './FormText.vue';
 
-import CustomerSerialNumberExtendSetting from './extend/CustomerSerialNumberExtendSetting.vue';
-import CustomerNameExtendSetting from './extend/CustomerNameExtendSetting.vue';
-
 import ProductSerialNumberExtendSetting from './extend/ProductSerialNumberExtendSetting.vue';
+import ProductNameExtendSetting from './extend/ProductNameExtendSetting.vue';
 
 let FormTextField = {
   formType: 'text', // 字段类型
@@ -18,7 +16,8 @@ let FormTextField = {
     extend: {
       // 'customer_serialNumber_setting': CustomerSerialNumberExtendSetting,
       // 'customer_name_setting': CustomerNameExtendSetting,
-      // 'product_serialNumber_setting': ProductSerialNumberExtendSetting
+      'product_serialNumber_setting': ProductSerialNumberExtendSetting,
+      'product_name_setting': ProductNameExtendSetting,
     }
   }
 };

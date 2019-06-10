@@ -249,52 +249,14 @@ export default {
     }
   },
   mounted() {
-    this.buildFields();
   },
   methods: {
-    // 构建字段列表
-    buildFields() {
-      let fixedFields = [
-        {
-          fieldName: 'name',
-          formType: 'text',
-          displayName: '产品名称',
-          placeHolder: '请输入产品名称',
-          rules: [{
-            required: true, message: '请输入产品名称', trigger: ['blur', 'change']
-          }]
-        }, 
-        {
-          fieldName: 'serialNumber',
-          formType: 'text',
-          displayName: '产品编号',
-          placeHolder: '请输入产品编号',
-          rules: [{
-            required: false, message: '请输入产品编号', trigger: ['blur', 'change']
-          }]
-        },  
-        {
-          fieldName: 'type',
-          formType: 'select',
-          displayName: '产品类型',
-          placeHolder: '请选择产品类型',
-          setting: {
-            dataSource: this.initData.productConfig && this.initData.productConfig.productType
-          },
-          rules: [{
-            trigger: ['blur', 'change'],
-            required: false, message: '请选择产品类型',
-          }]
-        }
-      ];
-      this.editableFields = [...fixedFields];
-    },
     // 构建自定义字段列表
     buildCustomizeField() {
       if (this.editableFields.length > this.fixedFieldsCount) return;
 
       const customizedField = this.fields
-        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator')
+        .filter(f => f.fieldName.indexOf('customer') < 0 && f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
           // select
           if (field.formType === 'select' && field.setting && field.setting.isMulti) {

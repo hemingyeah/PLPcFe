@@ -4,11 +4,6 @@
     <div class="form-setting-group">
       <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
     </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-      <!-- <el-checkbox :value="field.serialNumberUnique" @input="update($event, 'serialNumberUnique')" :true-label="1" :false-label="0">唯一性验证</el-checkbox> -->
-      <el-checkbox :value="field.setting.serialNumberUnique" @input="updateForSetting($event, 'serialNumberUnique')">唯一性验证</el-checkbox>
-    </div>
   </div>
 </template>
 
@@ -16,7 +11,7 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 
 export default {
-  name: 'product-serial-number-extend-setting',
+  name: 'product-name-extend-setting',
   mixins: [SettingMixin],
   props: {
     field: {
@@ -40,13 +35,6 @@ export default {
       let value = el.value;
       
       this.update(value, prop)
-    },
-    updateForSetting(event, prop) {
-      let setting = JSON.parse(JSON.stringify(this.field.setting)) || {};
-      setting.serialNumberUnique = event;
-
-      this.update(setting, 'setting');
-
     },
     update(value, prop){
       this.$emit('input', {value, prop})

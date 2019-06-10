@@ -122,20 +122,7 @@ export default {
       }
       
     }
-    this.form = FormUtil.initialize(this.fields, form, function (fields, data) {
-      let index = fields.findIndex(f => f.fieldName == 'type');
-      let typeField = fields[index]
-      
-      if(typeField) {
-        let options = typeField.setting.dataSource || [];
-
-        if(!typeField.defaultValue && !data.type) {
-          data.type = options[0]
-        }
-      }
-
-      return data
-    });
+    this.form = FormUtil.initialize(this.fields, form);
     this.init = true;
   },
   methods: {

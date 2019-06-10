@@ -126,6 +126,8 @@ export default class FormField{
     if(Object.keys(dependencies).length > 0) {
       setting.dependencies = dependencies;
     }
+
+    setting.serialNumberUnique = field?.setting?.serialNumberUnique || false;
     
     option.setting = setting;
     option.defaultValue = defaultValue;

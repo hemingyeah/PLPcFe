@@ -52,13 +52,13 @@
 
             <!-- start 产品名称 -->
             <el-form-item label-width="100px" label="产品名称">
-              <el-input type="text" v-model="params.name"></el-input>
+              <el-input :placeholder="advancedSearchPlaceholder.name" type="text" v-model="params.name"></el-input>
             </el-form-item>
             <!-- end 产品名称 -->
 
             <!-- start 产品编号 -->
             <el-form-item label-width="100px" label="产品编号">
-              <el-input type="text" v-model="params.serialNumber"></el-input>
+              <el-input :placeholder="advancedSearchPlaceholder.serialNumber" type="text" v-model="params.serialNumber"></el-input>
             </el-form-item>
             <!-- end 产品编号 -->
 
@@ -70,7 +70,7 @@
                 filterable
                 clearable
                 reserve-keyword
-                placeholder="请选择产品类型">
+                :placeholder="advancedSearchPlaceholder.type">
 
                 <el-option
                   v-for="item in inputRemoteSearch.type.options"
@@ -380,7 +380,7 @@
     <!-- start  批量编辑 -->
     <batch-edit-product-template-dialog
       ref="batchEditProductTemplateDialog"
-      :fields="productTemplateConfig.productFields"
+      :fields="productFields"
       :init-data="initData"
       @submit-callback="search"
       :selected-ids="selectedIds">
@@ -493,6 +493,15 @@ export default {
     }
   },
   computed: {
+    // 高级搜索 占位符
+    advancedSearchPlaceholder() {
+      let fields = this.initData.productFields || [];
+      return {
+        name: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
+        serialNumber: fields.filter(f => f.fieldName == 'serialNumber')[0].placeHolder || '',
+        type: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
+      }
+    },
     // 编辑权限
     authEdit() {
       return this.auth.CUSTOMER_EDIT;
@@ -513,7 +522,31 @@ export default {
     // 高级搜索面板宽度
     panelWidth() {
       return `${420 * this.columnNum}px`;
-    }
+    },
+    productFields() {
+      return (this.initData.productFields || [])
+        .filter(f => f.formType !== 'separator')
+        .map(f => {
+
+          // 调整字段顺序
+          if (f.fieldName === 'name') {
+            f.orderId = -10;
+          }
+
+          if (f.fieldName === 'serialNumber') {
+            f.orderId = -9;
+          }
+
+          if (f.fieldName === 'type') {
+            f.orderId = -8;
+          }
+
+          f.operator = this.matchOperator(f);
+
+          return f;
+        })
+        .sort((a, b) => a.orderId - b.orderId)
+    },
   },
   mounted() {
     this.auth = (this.initData && this.initData.authorities) || {};

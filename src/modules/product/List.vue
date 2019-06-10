@@ -254,15 +254,15 @@
           </el-form-item>
 
           <el-form-item label-width="100px" label="产品名称">
-            <el-input v-model="searchModel.name" type="text"></el-input>
+            <el-input :placeholder="advancedSearchPlaceholder.name" v-model="searchModel.name" type="text"></el-input>
           </el-form-item>
 
           <el-form-item label-width="100px" label="产品编号">
-            <el-input v-model="searchModel.serialNumber" type="text"></el-input>
+            <el-input :placeholder="advancedSearchPlaceholder.serialNumber" v-model="searchModel.serialNumber" type="text"></el-input>
           </el-form-item>
 
           <el-form-item label-width="100px" label="产品类型">
-            <el-select v-model="searchModel.type" clearable >
+            <el-select :placeholder="advancedSearchPlaceholder.type" v-model="searchModel.type" clearable >
               <el-option
                 v-for="item in productTypes"
                 :key="item"
@@ -659,7 +659,16 @@ export default {
     },
     smsRest() {
       return this.initData.smsRest || 0;
-    }
+    },
+     // 高级搜索 占位符
+    advancedSearchPlaceholder() {
+      let fields = this.initData.productFields || [];
+      return {
+        name: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
+        serialNumber: fields.filter(f => f.fieldName == 'serialNumber')[0].placeHolder || '',
+        type: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
+      }
+    },
   },
   filters: {
     formatTags({customer}) {
