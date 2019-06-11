@@ -243,17 +243,7 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
-            <span class="el-dropdown-link el-dropdown-btn">
-              选择列
-              <i class="iconfont icon-nav-down"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown" class="product-template-columns-dropdown-menu">
-              <el-dropdown-item v-for="item in columns" :key="item.field">
-                <el-checkbox :value="item.show" @input="columnStatusModify($event, item)" :label="item.label" :disabled="item.field == 'name'"/>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+          <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">选择列 <i class="iconfont icon-nav-down"></i></span>
         </div>
         <!-- end 操作按钮组 -->
 
@@ -397,7 +387,8 @@
 
     </batch-edit-product-template-dialog>
     <!-- end 批量编辑 -->
-
+    
+    <base-table-advanced-setting ref="advanced" @save="columnStatusModify"/>
   </div>
   <!-- end 产品模板列表 -->
 </template>
@@ -542,6 +533,9 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    showAdvancedSetting(){
+      this.$refs.advanced.open(this.columns);
+    },
     // 构建配置项
     buildConfig(storage) {
       const storageData = storage || {};
@@ -603,23 +597,16 @@ export default {
     buildTableColumn() {
       const localStorageData = this.localStorageGet(PRODUCT_TEMPLATE_LIST_DATA);
       let columnStatus = localStorageData.columnStatus || [];
+      let localColumns = columnStatus
+        .map(i => typeof i == 'string' ? {field: i, show: true} : i)
+        .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
-      // 兼容旧版本 选择列
-      if (!columnStatus.length) {
-        columnStatus = this.backwardCompatibleColumn();
-      }
-
-      let minWidth = 100;
       let baseColumns = this.buildTableFixedColumns();
-      let customizedColumns = [];
-      let columns = [];
-      let sortable = false;
-
-      customizedColumns = this.productTemplateConfig.productFields
+      let customizedColumns = this.productTemplateConfig.productFields
         .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.fieldName !== 'customer')
         .map(field => {
-          sortable = false;
-          minWidth = 100;
+          let sortable = false;
+          let minWidth = 100;
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0 || field.fieldName == 'type') {
             sortable = 'custom';
             minWidth = 100;
@@ -648,16 +635,22 @@ export default {
           };
         });
 
-      columns = [...baseColumns, ...customizedColumns];
+      let columns = [...baseColumns, ...customizedColumns].map(col => {
+        let show = col.show === true;
+        let width = col.width;
+        let localField = localColumns[col.field];
+        
+        if(null != localField){
+          width = typeof localField.width == 'number' ? `${localField.width}px` : ''
+          show = localField.show !== false;
+        }
 
-      if (!columnStatus || !columnStatus.length) {
-        return columns;
-      }
+        col.show = show;
+        col.width = width;
 
-      columns = columns.map(bc => {
-        bc.show = columnStatus.some(sc => sc === bc.field);
-        return bc;
+        return col;
       });
+
       return columns;
     },
     // 兼容旧版本的 已选择列
@@ -673,20 +666,22 @@ export default {
         .map(c => {
           return c;
         })
-    },
+    },  
     // 修改列状态
-    columnStatusModify(val, column) {
-      this.columns = this.columns
-        .map(c => {
-          if (c.field === column.field) {
-            c.show = val;
-          }
-          return c;
-        });
+    columnStatusModify(event) {
+      let columns = event.data || [];
+      let colMap = columns.reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
-      const showColumns = this.columns.filter(c => c.show).map(c => c.field);
+      this.columns.forEach(col => {
+        let newCol = colMap[col.field];
+        if(null != newCol) {
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
+        }
+      })
 
-      this.localStorageSet('columnStatus', showColumns, PRODUCT_TEMPLATE_LIST_DATA);
+      const columnsStatus = this.columns.map(c => ({field: c.field, show: c.show, width: c.width}));
+      this.localStorageSet('columnStatus', columnsStatus, PRODUCT_TEMPLATE_LIST_DATA);
     },
     // 连接数组和 key去重
     concatArrayAndItemUnique(arr1, arr2, key) {

@@ -46,20 +46,9 @@
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
-            <span class="el-dropdown-link el-dropdown-btn">
-              选择列
-              <i class="iconfont icon-nav-down"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown" class="product-columns-dropdown-menu">
-              <el-dropdown-item v-for="item in columns" :key="item.field">
-                <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label"/>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+          <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">选择列 <i class="iconfont icon-nav-down"></i></span>
         </div>
       </div>
-
 
       <el-table
         :data="page.list"
@@ -397,6 +386,7 @@
       action="/excels/customer/customerProductUpdateBatch"
     ></batch-update-dialog>
 
+    <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
   </div>
 </template>
 
@@ -692,6 +682,9 @@ export default {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
+    showAdvancedSetting(){
+      this.$refs.advanced.open(this.columns);
+    },
     matchOperator(field) {
       let formType = field.formType;
       let operator = '';
@@ -1010,51 +1003,53 @@ export default {
         .filter(ms => ms.id !== c.id);
       this.multipleSelection.length < 1 ? this.toggleSelection() : this.toggleSelection([c])
     },
-    modifyColumnStatus(val, column) {
-      this.columns = this.columns
-        .map(c => {
-          if (c.field === column.field) {
-            c.show = val;
-          }
-          return c;
-        });
-      const showColumns = this.columns.filter(c => c.show).map(c => c.field);
-      this.saveDataToStorage('columnStatus', showColumns);
+    modifyColumnStatus(event) {
+      let columns = event.data || [];
+      let colMap = columns.reduce((acc, col) => (acc[col.field] = col) && acc, {});
+
+      this.columns.forEach(col => {
+        let newCol = colMap[col.field];
+        if(null != newCol) {
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
+        }
+      })
+
+      const columnsStatus = this.columns.map(c => ({field: c.field, show: c.show, width: c.width}));
+      this.saveDataToStorage('columnStatus', columnsStatus);
     },
     buildColumns() {
-      // productUpdateTime,productTemplate,tags,remindCount
-
-      let sortable = false;
-      let {columnStatus} = this.getLocalStorageData();
-      const customerProductCheck = localStorage.getItem('customerProductCheck');
-
-      if (!columnStatus || !columnStatus.length) {
-        columnStatus = ['name', 'customer', 'tags', 'productTemplate', 'serialNumber', 'type', 'remindCount', 'updateTime']
-      }
-
-      if (customerProductCheck) {
-        columnStatus = (customerProductCheck.split(',') || [])
-          .map(c => {
-            if (c === 'customerName') return 'customer';
-            return c;
-          })
-        localStorage.removeItem('customerProductCheck');
-      }
-      if(!columnStatus) columnStatus = [];
+      const localStorageData = this.getLocalStorageData();
+     
+      let columnStatus = localStorageData.columnStatus || [];
+      let localColumns = columnStatus
+        .map(i => typeof i == 'string' ? {field: i, show: true} : i)
+        .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
       this.columns = this.productFields
         .filter(f => f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
+          let sortable = false;
+          let minWidth = 100;
 
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
             sortable = 'custom';
-          } else {
-            sortable = false;
-          }
-
+          } 
 
           if (field.fieldName === 'type') {
             sortable = 'custom';
+          }
+
+          if (field.displayName.length > 4) {
+            minWidth = field.displayName.length * 20;
+          }
+
+          if (sortable && field.displayName.length >= 4) {
+            minWidth += 25;
+          }
+
+          if (field.formType === 'datetime') {
+            minWidth = 150;
           }
 
           return {
@@ -1062,13 +1057,26 @@ export default {
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
-            show: columnStatus.some(c => c === field.fieldName),
+            width: `${minWidth}px`,
             sortable,
             isSystem: field.isSystem,
           }
-        });
+        })
+        .map(col => {
+          let show = col.show === true;
+          let width = col.width;
+          let localField = localColumns[col.field];
+          
+          if(null != localField){
+            width = typeof localField.width == 'number' ? `${localField.width}px` : ''
+            show = localField.show !== false;
+          }
+          
+          col.show = show;
+          col.width = width;
 
-      return this.columns;
+          return col;
+        });
     },
 
     buildExportParams(checkedArr, ids) {

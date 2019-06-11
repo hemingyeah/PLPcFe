@@ -1310,9 +1310,9 @@ export default {
         let show = col.show === true;
         let width = col.width;
         let localField = localColumns[col.field];
-
+        
         if(null != localField){
-          width = typeof localField.width == 'number' ? `${localField.width}px` : col.width;
+          width = typeof localField.width == 'number' ? `${localField.width}px` : ''
           show = localField.show !== false;
         }
 
