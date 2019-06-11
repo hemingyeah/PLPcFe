@@ -14,6 +14,12 @@ import {
 function createPreviewComp(h, field){
   let currFieldId = field._id;
   let previewComp = FormFieldMap.get(field.formType);
+  
+  if(previewComp == null){
+    console.warn(`[not implement]: ${field.displayName}(${field.fieldName}): ${field.formType}. `)
+    return null;
+  }
+
   // 根据字段配置创建预览内容
   let fieldPreview = h(previewComp.preview, {
     'class': 'form-design__ghost',
