@@ -109,6 +109,11 @@ export default {
               this.loadingPage = false;
             });
         })
+        .catch(err => {
+          console.error(err);
+          this.pending = false;
+          this.loadingPage = false;
+        })
     },
     goBack() {
       parent.frameHistoryBack(window);
