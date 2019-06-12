@@ -593,6 +593,14 @@ export default {
         show: true,
       }]
     },
+    buildDefaultColumns(){
+      return [
+        'name',
+        'customer',
+        'serialNumber',
+        'type'
+      ]
+    },
     // 构建表格列
     buildTableColumn() {
       const localStorageData = this.localStorageGet(PRODUCT_TEMPLATE_LIST_DATA);
@@ -606,7 +614,8 @@ export default {
         .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.fieldName !== 'customer')
         .map(field => {
           let sortable = false;
-          let minWidth = 100;
+          let minWidth = null;
+
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0 || field.fieldName == 'type') {
             sortable = 'custom';
             minWidth = 100;
@@ -617,7 +626,7 @@ export default {
           }
 
           if (sortable && field.displayName.length >= 4) {
-            minWidth += 25;
+            minWidth = 125;
           }
 
           if (field.formType === 'datetime') {
@@ -628,7 +637,7 @@ export default {
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
-            minWidth: `${minWidth}px`,
+            minWidth: typeof minWidth == 'number' ? minWidth : `${minWidth}px`,
             sortable,
             isMulti: field.setting && field.setting.isMulti,
             isSystem: field.isSystem,

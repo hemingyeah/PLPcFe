@@ -566,20 +566,23 @@ export default {
           // 调整字段顺序
           if (f.fieldName === 'name') {
             f.orderId = -10;
+            f.show = true
           }
 
           if (f.fieldName === 'customer') {
             f.orderId = -9;
+            f.show = true
           }
 
           if (f.fieldName === 'serialNumber') {
             f.orderId = -6;
+            f.show = true
           }
 
           if (f.fieldName === 'type') {
             f.orderId = -5;
+            f.show = true
           }
-
 
           if (f.fieldName === 'tags') {
             f.orderId = -8;
@@ -1030,10 +1033,11 @@ export default {
         .filter(f => f.formType !== 'attachment' && f.formType !== 'separator')
         .map(field => {
           let sortable = false;
-          let minWidth = 100;
+          let minWidth = null;
 
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
             sortable = 'custom';
+            minWidth = 100;
           } 
 
           if (field.fieldName === 'type') {
@@ -1045,7 +1049,7 @@ export default {
           }
 
           if (sortable && field.displayName.length >= 4) {
-            minWidth += 25;
+            minWidth = 125;
           }
 
           if (field.formType === 'datetime') {
@@ -1057,7 +1061,7 @@ export default {
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
-            width: `${minWidth}px`,
+            minWidth: typeof minWidth == 'number' ? minWidth : `${minWidth}px`,
             sortable,
             isSystem: field.isSystem,
           }
