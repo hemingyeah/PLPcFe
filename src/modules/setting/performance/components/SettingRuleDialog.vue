@@ -308,10 +308,19 @@ export default {
 
             } else {
               // 按整数计算
-              if (!Number(rule.executorScore) && !Number(rule.assistantScore)) {
+
+              if (isNaN(executorScore) || typeof executorScore !== 'number' || executorScore < 0 || executorScore > 9999 || (/\./g.test(executorScore) && executorScore.toString().split('.')[1].length > 1)) {
                 errFields.push('executorScore');
+              }
+
+              if (isNaN(assistantScore) || typeof assistantScore !== 'number' || assistantScore < 0 || assistantScore > 9999 || (/\./g.test(assistantScore) && assistantScore.toString().split('.')[1].length > 1)) {
                 errFields.push('assistantScore');
               }
+
+              // if (!Number(rule.executorScore) && !Number(rule.assistantScore)) {
+              //   errFields.push('executorScore');
+              //   errFields.push('assistantScore');
+              // }
             }
             if (errFields.length) {
               return {
