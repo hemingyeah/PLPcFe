@@ -2,8 +2,8 @@
   <div class="sample-tooltip-container" ref="sampleTooltipContainer">
 
     <!-- start 示例数据 角标 -->
-    <el-tooltip :content="tip" placement="top" :disabled="!isGuideData">
-      <div class="superscript" v-if="isGuideData"></div>
+    <el-tooltip :content="tip" placement="top" v-if="isGuideData" :disabled="!isGuideData">
+      <div class="superscript"></div>
     </el-tooltip>
     <!-- <el-tooltip content="删除示例数据" placement="top">
       <div class="superscript"></div>
