@@ -15,7 +15,7 @@ let FormAddressField = {
     build: FormAddress,
     view: FormAddressView,
     extend: {
-      // 'customer_customerAddress_setting': CustomerAddressExtendSetting
+      'customer_customerAddress_setting': CustomerAddressExtendSetting
     }
   }
 };
