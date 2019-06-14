@@ -51,6 +51,8 @@ class PopupManager {
   }
 
   closeTopPopup(event){
+    if (!event || !event.key) return;
+    
     if(event.key.toLowerCase() != 'escape') return;
 
     let last = this.instances.length - 1;
