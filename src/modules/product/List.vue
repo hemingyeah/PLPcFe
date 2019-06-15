@@ -377,7 +377,7 @@
       <div slot="tip">
         <div class="base-import-warn">
           <p>请先下载<a href="/product/import/template">导入模版 </a>，填写完成后再上传导入。</p>
-          <p>导入产品前，请确保产品所属客户已存在。您可以 <a href="/customer/import/getAllCustomerId">点这里</a>导出包含所有已存在客户的模板</p>
+          <!--<p>导入产品前，请确保产品所属客户已存在。您可以 <a href="/customer/import/getAllCustomerId">点这里</a>导出包含所有已存在客户的模板</p>-->
         </div>
       </div>
     </base-import>
@@ -879,6 +879,9 @@ export default {
       }
 
       if (action === 'update') {
+        if (!this.multipleSelection || !this.multipleSelection.length) {
+          return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
+        }
         this.$refs.batchUpdateDialog.openBatchUpdateCustomerDialog();
       }
 
