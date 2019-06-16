@@ -9,7 +9,7 @@
         <base-spin size="small" v-if="tab.loading"></base-spin>
         <template v-else>
           <i :class="['iconfont', tab.isHome ? 'icon-shouye' : 'icon-juxing', 'frame-tab-icon']"></i>
-          <i class="iconfont icon-updete frame-tab-reload" @click="$emit('reload', tab)"></i>
+          <i class="iconfont icon-updete frame-tab-reload" ></i>
         </template>
       </span>
       <span class="frame-tab-name">{{tab.title}}</span>
@@ -134,13 +134,13 @@ export default {
   }
 }
 
-.frame-tab:hover{
-  .frame-tab-reload{
-    display: block;
-  }
+/*.frame-tab:hover{*/
+  /*.frame-tab-reload{*/
+    /*display: block;*/
+  /*}*/
 
-  .frame-tab-icon{
-    display: none;
-  }
-}
+  /*.frame-tab-icon{*/
+    /*display: none;*/
+  /*}*/
+/*}*/
 </style>
