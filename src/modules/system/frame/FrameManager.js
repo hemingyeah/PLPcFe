@@ -45,6 +45,7 @@ const FrameManager = {
     },
     /** 用于从导航菜单打开tab */
     openForNav(menu){
+      window.TDAPP.onEvent(`pc：访问${menu.name}`)
       let tab = new Tab({id: menu.menuKey, url: menu.url, title: menu.name});
       this.openFrameTab(tab)
     },

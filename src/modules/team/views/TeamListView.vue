@@ -518,6 +518,7 @@ export default {
     },
     /* 删除团队 */
     async teamDelete() {
+      window.TDAPP.onEvent('pc：团队管理-删除团队事件');
       if(this.multipleSelection.length <= 0) {
         return this.$platform.alert('请您先选择至少一个团队');
       }

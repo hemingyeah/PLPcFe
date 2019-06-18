@@ -5,10 +5,10 @@
         <el-input v-model="params.keyword" placeholder="根据绩效名称搜索">
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
-        <base-button type="primary" @event="search(true)" native-type="submit">搜索</base-button>
+        <base-button type="primary" @event="search(true);trackEventHandler('search')" native-type="submit">搜索</base-button>
         <base-button type="ghost" @event="reSearch">重置</base-button>
       </div>
-      <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow">高级搜索</span>
+      <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow;trackEventHandler('advSearch')">高级搜索</span>
     </form>
 
     <!--高级搜索-->
@@ -67,7 +67,7 @@
 
         <div class="action-button-group">
           <el-dropdown trigger="click">
-            <span class="el-dropdown-link el-dropdown-btn">
+            <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('moreAction')">
               更多操作
               <i class="iconfont icon-nav-down"></i>
             </span>
@@ -81,7 +81,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown :hide-on-click="false" :show-timeout="150" trigger="click">
-            <span class="el-dropdown-link el-dropdown-btn">
+            <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('selectColumn')">
               选择列
               <i class="iconfont icon-nav-down"></i>
             </span>
@@ -353,6 +353,7 @@ export default {
       return params;
     },
     reSearch() {
+      window.TDAPP.onEvent('pc：绩效报告-重置事件');
       this.resetParams();
       this.search();
     },
@@ -369,6 +370,7 @@ export default {
 
     },
     openDialog() {
+      window.TDAPP.onEvent('pc：绩效报告-新建事件');
       this.$refs.reportDialog.toggleDialog();
     },
     handleSelection(selection) {
@@ -385,6 +387,7 @@ export default {
       this.search();
     },
     async deleteReport() {
+      window.TDAPP.onEvent('pc：绩效报告-删除事件');
       if (!this.multipleSelection.length) {
         return this.$platform.alert('请选择需要删除的绩效报告');
       }
@@ -513,6 +516,25 @@ export default {
       const dataStr = localStorage.getItem('performance_storage_data_2019_02_28') || '{}';
       return JSON.parse(dataStr);
     },
+    // TalkingData事件埋点
+    trackEventHandler(type) {
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：绩效报告-搜索事件');
+        return;
+      }
+      if (type === 'advSearch') {
+        window.TDAPP.onEvent('pc：绩效报告-高级搜索事件');
+        return;
+      }
+      if (type === 'moreAction') {
+        window.TDAPP.onEvent('pc：绩效报告-更多操作事件');
+        return;
+      }
+      if (type === 'selectColumn') {
+        window.TDAPP.onEvent('pc：绩效报告-选择列事件');
+        return;
+      }
+    }
   },
   components: {
     [EditPerformanceReportDialog.name]: EditPerformanceReportDialog,

@@ -7,7 +7,7 @@
           <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">
+          <base-button type="primary" @event="search({ pageNum: 1, }, true);trackEventHandler('search')" native-type="submit">
             搜索
           </base-button>
           <base-button type="ghost" @event="resetParams">
@@ -228,7 +228,7 @@
           <base-button type="plain" @event="openDialog('edit')" v-if="editedPermission === 3">批量编辑</base-button>
           <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3">批量提醒</base-button>
           <el-dropdown trigger="click" v-if="exportPermission">
-            <span class="el-dropdown-link el-dropdown-btn">
+            <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('moreAction')">
               更多操作
               <i class="iconfont icon-nav-down"></i>
             </span>
@@ -713,6 +713,8 @@ export default {
       localStorage.setItem('customerListData', data)
     },
     showAdvancedSetting(){
+      window.TDAPP.onEvent('pc：客户管理-选择列事件');
+
       this.$refs.advanced.open(this.columns);
     },
     showLatestUpdateRecord(row) {
@@ -888,6 +890,8 @@ export default {
       this.columns = this.buildTableColumn();
     },
     jumpPage() {
+      window.TDAPP.onEvent('pc：客户管理-新建事件');
+
       // window.location = '/customer/create';
       let fromId = window.frameElement.getAttribute('id');
       
@@ -1107,6 +1111,8 @@ export default {
       this.toggleSelection([customer]);
     },
     toggleStatus(row) {
+      window.TDAPP.onEvent('pc：客户管理-状态开启事件');
+
       const ns = row.status ? 0 : 1;
       row.pending = true;
       const params = {
@@ -1216,12 +1222,18 @@ export default {
     // operation dialog
     openDialog(category) {
       if (category === 'sendMessage') {
+        window.TDAPP.onEvent('pc：客户管理-发送短信事件');
+
         this.$refs.messageDialog.openSendMessageDialog();
       }
       if (category === 'edit') {
+        window.TDAPP.onEvent('pc：客户管理-批量编辑事件');
+
         this.$refs.batchEditingCustomerDialog.openBatchEditingCustomerDialog();
       }
       if (category === 'remind') {
+        window.TDAPP.onEvent('pc：客户管理-批量提醒事件');
+
         this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
       }
       if (category === 'importCustomer') {
@@ -1238,6 +1250,8 @@ export default {
       }
     },
     async deleteCustomer() {
+      window.TDAPP.onEvent('pc：客户管理-删除事件');
+
       if (!this.multipleSelection.length) {
         return this.$platform.alert('请选择需要删除的客户');
       }
@@ -1342,7 +1356,7 @@ export default {
       return columns;
     },
     resetParams() {
-
+      window.TDAPP.onEvent('pc：客户管理-重置事件');
       this.paramsBackup = {
         specialSearchModel: {
           addressSelector: [],
@@ -1567,6 +1581,8 @@ export default {
       }]
     },
     panelSearchAdvancedToggle() {
+      window.TDAPP.onEvent('pc：客户管理-高级搜索事件');
+
       this.advancedSearchPanelShow = !this.advancedSearchPanelShow;
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
@@ -1575,6 +1591,17 @@ export default {
           form.setAttribute('novalidate', true)
         }
       })
+    },
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：客户管理-搜索事件');
+        return;
+      }
+      if (type === 'moreAction') {
+        window.TDAPP.onEvent('pc：客户管理-更多操作事件');
+        return;
+      }
     }
   },
   components: {

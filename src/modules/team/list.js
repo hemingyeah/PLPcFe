@@ -1,7 +1,10 @@
 import Vue from '@src/common/entry';
 import TeamListView from './views/TeamListView.vue';
+import mtracker from '@src/util/mtracker';
 
-//处理注入的参数
+mtracker();
+
+// 处理注入的参数
 let initData = {};
 
 try {

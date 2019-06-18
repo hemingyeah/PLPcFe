@@ -1,6 +1,9 @@
 import Vue from '@src/common/entry'
 import http from '@src/util/http';
 import ProductList from './List.vue';
+import mtracker from '@src/util/mtracker';
+
+mtracker();
 
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();

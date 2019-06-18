@@ -7,7 +7,7 @@
           <el-input v-model="searchModel.keyword" placeholder="根据产品信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="search({resetPageNum: true})" native-type="submit">搜索</base-button>
+          <base-button type="primary" @event="search({resetPageNum: true});trackEventHandler('search')" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">高级搜索</span>
@@ -27,7 +27,7 @@
           <base-button type="plain" @event="openDialog('edit')" v-if="editedPermission === 3">批量编辑</base-button>
           <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3">批量提醒</base-button>
           <el-dropdown trigger="click" v-if="exportPermission">
-            <span class="el-dropdown-link el-dropdown-btn">
+            <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('moreAction')">
               更多操作
               <i class="iconfont icon-nav-down"></i>
             </span>
@@ -353,7 +353,7 @@
         </div>
         <div class="advanced-search-btn-group">
           <base-button type="ghost" @event="resetParams">重置</base-button>
-          <base-button type="primary" @event="search({resetPageNum: true, moreConditions: true})" native-type="submit">搜索</base-button>
+          <base-button type="primary" @event="search({resetPageNum: true, moreConditions: true});trackEventHandler('advsearch')" native-type="submit">搜索</base-button>
         </div>
       </el-form>
     </base-panel>
@@ -709,6 +709,7 @@ export default {
   },
   methods: {
     showAdvancedSetting(){
+      window.TDAPP.onEvent('pc：产品管理-选择列事件');
       this.$refs.advanced.open(this.columns);
     },
     matchOperator(field) {
@@ -858,6 +859,7 @@ export default {
       this.search();
     },
     resetParams() {
+      window.TDAPP.onEvent('pc：产品管理-重置事件');
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
         keyword: '',
@@ -872,14 +874,17 @@ export default {
     openDialog(action) {
 
       if (action === 'sendMessage') {
+        window.TDAPP.onEvent('pc：产品管理-发送短信事件');
         this.$refs.messageDialog.openSendMessageDialog();
       }
 
       if (action === 'edit') {
+        window.TDAPP.onEvent('批量编辑	pc：产品管理-批量编辑事件');
         this.$refs.batchEditingDialog.openBatchEditingDialog();
       }
 
       if (action === 'remind') {
+        window.TDAPP.onEvent('批量提醒	pc：产品管理-批量提醒事件');
         this.$refs.batchRemindingDialog.openBatchRemindingDialog();
       }
 
@@ -897,6 +902,7 @@ export default {
     },
     // operation
     async deleteProducts() {
+      window.TDAPP.onEvent('pc：产品管理-删除事件');
       if (!this.multipleSelection.length) {
         return this.$platform.alert('请选择需要删除的产品');
       }
@@ -1208,6 +1214,7 @@ export default {
       })
     },
     goToCreate() {
+      window.TDAPP.onEvent('pc：产品管理-新建事件');
       // window.location = '/customer/product/create';
       let fromId = window.frameElement.getAttribute('id');
       
@@ -1259,6 +1266,7 @@ export default {
       return this.getBizTeamList(params, this.filterTeams, this.viewedPermission);
     },
     panelSearchAdvancedToggle() {
+      window.TDAPP.onEvent('pc：产品管理-高级搜索事件');
       this.advancedSearchPanelShow = !this.advancedSearchPanelShow;
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
@@ -1267,6 +1275,17 @@ export default {
           form.setAttribute('novalidate', true)
         }
       })
+    },
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：产品管理-搜索事件');
+        return;
+      } 
+      if (type === 'moreAction') {
+        window.TDAPP.onEvent('pc：产品管理-更多操作事件');
+        return;
+      }
     }
   },
   components: {

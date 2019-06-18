@@ -2,6 +2,10 @@ import Vue from '@src/common/entry';
 import dingtalk from '@src/util/dingtalk';
 import FrameView from './FrameView.vue';
 import { Notification } from 'element-ui';
+import mtracker from '@src/util/mtracker';
+
+mtracker();
+
 
 window.__exports__notification = Notification;
 

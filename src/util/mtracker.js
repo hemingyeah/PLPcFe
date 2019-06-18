@@ -13,6 +13,12 @@ const defaultConfig = {
  * @param {String} options.vc - 应用版本id
  */
 export default function (options = {}) {
+  // 防止SDK引入失败阻塞其他流程
+  window.TDAPP = {
+    onEvent () {
+      return '';
+    }
+  }
   const script = document.createElement('script');
 
   const isHttps = document.location.protocol === 'https:';

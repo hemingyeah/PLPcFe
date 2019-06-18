@@ -6,7 +6,7 @@
     <div class="product-template-list-search-group">
 
       <!-- start  搜索header -->
-      <form class="base-search" @submit.prevent="search({ pageNum: 1, }, true)">
+      <form class="base-search" @submit.prevent="search({ pageNum: 1, }, true);trackEventHandler('search')">
         <div class="product-template-list-base-search-group">
           <el-input v-model="paramsBackup.keyword" placeholder="请输入关键字">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -227,7 +227,7 @@
         <div class="action-button-group">
           <base-button type="plain" @event="openDialog('edit')" v-if="authEdit === 3">批量编辑</base-button>
           <el-dropdown trigger="click" v-if="authExport">
-            <span class="el-dropdown-link el-dropdown-btn">
+            <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('moreAction')">
               更多操作
               <i class="iconfont icon-nav-down"></i>
             </span>
@@ -567,6 +567,8 @@ export default {
   },
   methods: {
     showAdvancedSetting(){
+      window.TDAPP.onEvent('pc：产品管理-选择列事件');
+
       this.$refs.advanced.open(this.columns);
     },
     // 构建配置项
@@ -953,6 +955,7 @@ export default {
       }
       // 编辑
       if (type === 'edit') {
+        window.TDAPP.onEvent('pc：产品模板-批量编辑事件');
         this.$refs.batchEditProductTemplateDialog.open();
       }
     },
@@ -1193,6 +1196,7 @@ export default {
     },
     // 参数重置
     paramsReset() {
+      window.TDAPP.onEvent('pc：产品模板-重置事件')
       this.paramsBackup = {
         createTime: '', // 创建时间
         customizedSearchModel: {}, // 自定义搜索模型
@@ -1224,6 +1228,8 @@ export default {
     },
     // 产品新建
     productCreate() {
+      window.TDAPP.onEvent('pc：产品模板-新建事件');
+
       // window.location = '/product/create';
       let fromId = window.frameElement.getAttribute('id');
       
@@ -1238,6 +1244,8 @@ export default {
     },
     // 产品 删除
     async productDelete() {
+      window.TDAPP.onEvent('pc：产品模板-删除事件');
+
       if(this.multipleSelection.length <= 0) return platform.alert('请您至少选择一个需要删除的产品！');
       
       const confirm = await platform.confirm('您确定要删除所选产品吗？');
@@ -1266,6 +1274,8 @@ export default {
       }
     },
     panelSearchAdvancedToggle() {
+      window.TDAPP.onEvent('pc：产品模板-高级搜索事件');
+
       this.panelTheSearchAdvancedShow = !this.panelTheSearchAdvancedShow;
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
@@ -1274,6 +1284,17 @@ export default {
           form.setAttribute('novalidate', true)
         }
       })
+    },
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：产品模板-搜索事件');
+        return;
+      }
+      if (type === 'moreAction') {
+        window.TDAPP.onEvent('pc：产品管理-更多操作事件');
+        return;
+      }
     }
   },
   components: {
