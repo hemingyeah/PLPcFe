@@ -114,14 +114,7 @@ export default {
       });
     },
     buildValidation(){
-      // TODO: 产品编号并入到产品表单后 是否从产品表单中取值
-      let serialNumberUnique = false;
-      try {
-        serialNumberUnique = this.fields.filter(f => f.fieldName == 'serialNumber')?.[0]?.setting?.serialNumberUnique || false;
-      } catch (error) {
-        console.log(error);
-      }
-      // const serialNumberUnique = this.initData.productConfig.serialNumberUnique;
+      const serialNumberUnique = this.initData.productConfig.serialNumberUnique;
 
       let checkSerialNumberFn = _.debounce(function(params, resolve, changeStatus){
 

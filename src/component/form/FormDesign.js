@@ -81,8 +81,6 @@ function createSettingComp(h, field){
     </div> 
   );
 
-  field.setting ? field.setting : field.setting = {};
-
   let props = { field, setting: comp };
   if( formType == 'select' ){
     props.getContext = () => this;
