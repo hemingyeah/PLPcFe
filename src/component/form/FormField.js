@@ -86,31 +86,11 @@ export default class FormField{
     this.serialNumberUnique = serialNumberUnique;
 
     
-    let setting = params.setting || {};
+    this.setting = params.setting || {};
     
-    // 处理客户地址
-    if (this.fieldName === 'customerAddress' && this.isSystem) {
-      this.setting = {};
-      this.setting.customerAddressConfig = setting.customerAddressConfig || {
-        adProvince: '河北省',
-        adCity: '唐山市',
-        adDist: '古冶区'
-      };
-    }
-    // 处理客户名称
-    if (this.displayName === '客户' && this.fieldName === 'name' && this.isSystem) {
-      this.setting = {};
-      this.setting.customerNameDuplicate = setting.customerNameDuplicate || false;
-    }
-    // 处理客户地址
-    if (this.displayName === '客户编号' && this.fieldName === 'serialNumber' && this.isSystem) {
-      this.setting = {};
-      this.setting.autoSerialNumber = setting.autoSerialNumber || false;
-    }
-    // 处理客户电话
-    if (this.displayName === '电话' && this.fieldName === 'lmPhone' && this.isSystem) {
-      this.setting = {};
-      this.setting.phoneUnique = setting.phoneUnique || false;
+    // // 处理客户地址
+    if (this.fieldName === 'customerAddress' && this.isSystem && !params.setting.customerAddressConfig) {
+      this.setting.customerAddressConfig = {};
     }
   
     // 辅助字段

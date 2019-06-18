@@ -30,7 +30,7 @@ export default {
   data(){
     let fields = this.initData.fields || [];
     let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
-    
+
     return {
       fields: FormUtil.toFormField(sortedFields),
       pending: false,
@@ -49,11 +49,8 @@ export default {
           item.tableName = 'customer';
         });
 
-        console.log('fields', fields);
-        return;
         let message = FormUtil.validate(fields);
         if(!FormUtil.notification(message, this.$createElement)) return;
-
 
         this.pending = true;
         let result = await http.post('/setting/customer/saveFields', fields);
