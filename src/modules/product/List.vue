@@ -648,7 +648,7 @@ export default {
       }, ...this.columns]
         .map(field => {
 
-          if (['customer', 'updateTime', 'productTemplate', 'remindCount', 'qrcodeId'].some(key => key === field.fieldName)) {
+          if (['customer', 'productTemplate', 'remindCount', 'qrcodeId'].some(key => key === field.fieldName)) {
             field.export = false;
           } else {
             field.export = true;
