@@ -62,7 +62,7 @@ export function confirm(message = '', title = '提示'){
  */
 export function notification(params = {}){
   let notification = getRootWindow(window).__exports__notification;
-  if(typeof notification != 'function') return Promise.reject('[platform]: no notification function.');
+  if(typeof notification != 'function') return console.warn('[platform]: no notification function.');
 
   let opt = {};
 
