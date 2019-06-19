@@ -567,6 +567,7 @@ export default {
       max-height: 500px;
       overflow: auto;
       padding-top: 10px;
+      padding-right: 10px;
 
       .secondary-info {
         word-break: break-all;
