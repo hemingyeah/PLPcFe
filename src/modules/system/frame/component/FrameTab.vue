@@ -1,7 +1,7 @@
 <template>
   <div 
     :id="`tab_` + tab.id"
-    class="frame-tab" :class="{'frame-tab-active': tab.show, 'frame-tab-home': tab.isHome}"
+    class="frame-tab" :class="{'frame-tab-active': tab.show, 'frame-tab-home': tab.isHome, 'frame-tab-hover': new Date() - tab.timeStamp >= 10000}"
     @click="$emit('jump', tab)">
 
     <div class="frame-tab-inner">
@@ -9,7 +9,7 @@
         <base-spin size="small" v-if="tab.loading"></base-spin>
         <template v-else>
           <i :class="['iconfont', tab.isHome ? 'icon-shouye' : 'icon-juxing', 'frame-tab-icon']"></i>
-          <i class="iconfont icon-updete frame-tab-reload" ></i>
+          <i class="iconfont icon-updete frame-tab-reload" @click="reload"></i>
         </template>
       </span>
       <span class="frame-tab-name">{{tab.title}}</span>
@@ -26,6 +26,11 @@ export default {
     tab: {
       type: Object,
       default: () => ({})
+    }
+  },
+  methods: {
+    reload() {
+      this.$emit('reload', this.tab);
     }
   }
 }
@@ -134,13 +139,13 @@ export default {
   }
 }
 
-/*.frame-tab:hover{*/
-  /*.frame-tab-reload{*/
-    /*display: block;*/
-  /*}*/
+.frame-tab-hover:hover{
+  .frame-tab-reload{
+    display: block;
+  }
 
-  /*.frame-tab-icon{*/
-    /*display: none;*/
-  /*}*/
-/*}*/
+  .frame-tab-icon{
+    display: none;
+  }
+}
 </style>

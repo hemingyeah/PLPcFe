@@ -58,6 +58,7 @@ const FrameManager = {
     },
     /** 打卡一个frame tab */
     openFrameTab(tab){
+      tab.timeStamp = new Date();
       let index = _.findIndex(this.frameTabs, item => item.id == tab.id);
       if(index >= 0){
         let target = this.frameTabs[index];
@@ -165,7 +166,13 @@ const FrameManager = {
       FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
     },
     reloadFrameTab(tab, redirect = false){
+      if (tab.timeStamp && (new Date() - tab.timeStamp <= 10000)) return;
+      
+      tab.timeStamp = new Date();
+      
       this.removeFrameCache(tab.id)
+      
+      console.log('reloadFrameTab');
 
       let iframe = document.getElementById(`frame_tab_${tab.id}`);
       if(null != iframe){
