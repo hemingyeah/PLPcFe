@@ -1,4 +1,6 @@
 import {toArray} from '@src/util/lang';
+import {notification} from '@src/platform/message';
+import Exception from '@model/Exception'
 
 export const FILE_MAX_SIZE = 10 * 1024 * 1024; // 单位字节(Byte)
 export const FILE_MAX_NUM = 9;
@@ -12,7 +14,7 @@ export function validate(file){
   let fileName = file.name;
 
   // 验证文件大小
-  if(file.size > FILE_MAX_SIZE) return new Error(`[${fileName}]的大小超过10MB，系统暂不支持上传`);
+  if(file.size > FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过10MB，系统暂不支持上传`);
 
   // 验证文件类型
   let lastDotIndex = fileName.lastIndexOf('.');
@@ -53,32 +55,50 @@ function getBody(xhr) {
   }
 }
 
-/** 异步上传附件 */
-export function upload(file, action){
-  let xhr = new XMLHttpRequest();
-  let form = new FormData();
-  form.append('upload', file);
+/** 
+ * 异步上传附件
+ * 
+ * @param {File} file - 待上传的文件
+ * @param {string} action - 上传地址
+ * @param {object} options - 参数
+ * @param {(boolean | function)} options.validateStorage - 是否验证容量限制 
+ * @param {boolean} options.silence - 是否不显示提示
+ */
+export function upload(file, action, options = {}){
+  return validateTenantStorage(options.validateStorage, file)
+    .then(() => {
+      let xhr = new XMLHttpRequest();
+      let form = new FormData();
 
-  return new Promise((resolve, reject) => {
-    xhr.onerror = error => reject(error)
+      return new Promise((resolve, reject) => {
+        form.append('upload', file);
 
-    xhr.onload = function onload() {
-      if (xhr.status < 200 || xhr.status >= 300) {
-        return reject(getError(xhr, action));
-      }
-      resolve(getBody(xhr));
-    };
-
-    // TODO: 上传进度监听
-    // if (xhr.upload) {
-    //   xhr.upload.onprogress = function progress(e) {
-    //     console.log(e)
-    //   }
-    // }
+        xhr.onerror = error => reject(error)
+        xhr.onload = function onload() {
+          if (xhr.status < 200 || xhr.status >= 300) {
+            return reject(getError(xhr, action));
+          }
+          resolve(getBody(xhr));
+        };
     
-    xhr.open('post', action, true);
-    xhr.send(form);
-  });
+        xhr.open('post', action, true);
+        xhr.send(form);
+      });
+    })
+    .catch(error => {
+      if(error.code == 10404){
+        if(options.silence !== false) notification({
+          type: 'error',
+          title: '文件上传失败',
+          message: error.message
+        })
+
+        // 这里要继续扔出错误，以便让调用者处理
+        throw error;
+      }
+      
+      console.error('upload caught:', error)
+    })
 }
 
 function getErrorResult(file, error){
@@ -112,23 +132,62 @@ export function uploadWithParse(file, action = '/files/upload'){
     .catch(error => getErrorResult(file, error))
 }
 
-/** 批量上传 */
-export function batchUploadWithParse(files, action = '/files/upload'){
-  let fileArr = toArray(files);
-  let validateRes = fileArr.map(item => validate(item)).filter(item => item instanceof Error);
-  if(validateRes.length > 0){ // 文件验证失败
-    return Promise.resolve({success: [], error: validateRes});
-  }
+/** 
+ * 批量上传
+ * @param {FileList} files - 待上传的文件
+ * @param {string} action - 上传地址
+ * @param {object} options - 参数
+ * @param {(boolean | function)} options.validateStorage - 是否验证容量限制 
+ * @param {boolean} options.silence - 是否不显示提示
+ */
+export function batchUploadWithParse(files, action = '/files/upload', options = {}){
+  return validateTenantStorage(options.validateStorage, files)
+    .then(() => {
+      let fileArr = toArray(files);
+      let validateRes = fileArr.map(item => validate(item)).filter(item => item instanceof Error);
+      if(validateRes.length > 0){ // 文件验证失败
+        return Promise.resolve({success: [], error: validateRes});
+      }
 
-  let promises = fileArr.map(file => uploadWithParse(file, action));
-  return Promise.all(promises)
-    .then(result => {
-      let success = [];
-      let error = [];
-      result.forEach(item => item instanceof Error ? error.push(item) : success.push(item))
-      return {success, error}
+      let promises = fileArr.map(file => uploadWithParse(file, action));
+      return Promise.all(promises)
     })
-    .catch(error => console.error('batchUploadWithParse caught e', error))
+    .then(result => {
+      return result.reduce(
+        (acc, item) => (item instanceof Error ? acc.error.push(item) : acc.success.push(item)) && acc,
+        {success: [], error: []}
+      )
+    })
+    .catch(error => {
+      if(error.code == 10404){
+        if(options.silence !== false) notification({
+          type: 'error',
+          title: '文件上传失败',
+          message: error.message
+        })
+
+        // 这里要继续扔出错误，以便让调用者处理
+        throw error;
+      }
+      
+      console.error('batchUploadWithParse caught:', error)
+    })
+}
+
+/** 验证租户存储容量 */
+export function validateTenantStorage(option, args){
+  if(typeof option == 'function') return option();
+  if(option === false) return Promise.resolve();
+
+  let files = args instanceof FileList ? Array.from(args) : [args];
+  let total = files.reduce((acc, file) => (acc += file.size) && acc, 0)
+  console.log('all file total size: ', total)
+
+  // TODO: 补全容量限制接口
+  // TODO: 根据接口返回容量计算是否允许上传
+  return Promise.resolve().then(result => {
+    if(Math.random() > 0.15) return Promise.reject(new Exception('您的附件存储空间已经用尽，请联系管理员进行空间扩容', 10404))
+  })
 }
 
 const uploader = {

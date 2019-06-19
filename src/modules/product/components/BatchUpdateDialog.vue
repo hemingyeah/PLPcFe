@@ -127,7 +127,7 @@ export default {
         if (!await this.$platform.confirm('本操作将会批量更新数据，更新成功后将无法恢复，是否确认')) return;
 
         this.pending = true;
-        Uploader.upload(this.file, this.action)
+        Uploader.upload(this.file, this.action, {validateStorage: false})
           .then(result => {
             if(!result.status){
               Platform.alert(result.message);

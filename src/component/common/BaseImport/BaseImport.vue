@@ -79,7 +79,7 @@ export default {
       if(null == this.file || !(this.file instanceof File)) return Platform.alert('请选择要导入的文件');
 
       this.pending = true;
-      Uploader.upload(this.file, this.action).then(result => {
+      Uploader.upload(this.file, this.action, {validateStorage: false}).then(result => {
 
         if(result.status == 0){
           if(this.isImportNow) {
