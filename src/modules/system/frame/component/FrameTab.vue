@@ -1,7 +1,7 @@
 <template>
   <div 
     :id="`tab_` + tab.id"
-    class="frame-tab" :class="{'frame-tab-active': tab.show, 'frame-tab-home': tab.isHome, 'frame-tab-hover': new Date() - tab.timeStamp >= 10000}"
+    class="frame-tab" :class="{'frame-tab-active': tab.show, 'frame-tab-home': tab.isHome, 'frame-tab-hover': hover}"
     @click="$emit('jump', tab)">
 
     <div class="frame-tab-inner">
@@ -28,8 +28,31 @@ export default {
       default: () => ({})
     }
   },
+  data() {
+    return {
+      hover: false,
+    }
+  },
+  mounted() {
+    this.check();
+  },
+  beforeDestroy() {
+    clearInterval(this.timer);
+    this.timer = null;
+  },
   methods: {
+    check() {
+      const tab = this.tab;
+      this.timer = setInterval(() => {
+        if (new Date() - tab.timeStamp >= 10000) {
+          this.hover = true;
+          clearInterval(this.timer);
+        }
+      }, 1000)
+    },
     reload() {
+      this.hover = false;
+      this.check();
       this.$emit('reload', this.tab);
     }
   }
