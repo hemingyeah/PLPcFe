@@ -61,7 +61,7 @@
       </dd>
       <dd><label>创建备注</label>{{reportDetail.remark}}</dd>
       <dd><label>创建人</label>{{reportDetail.creator}}</dd>
-      <dd class="group-line" v-if="sendToCc"><label>抄送人</label>{{reportDetail.cns}}</dd>
+      <dd class="group-line"><label>抄送人</label>{{reportDetail.cns}}</dd>
 
       <dd><label>审批操作人</label>{{reportDetail.reviewOperater}}</dd>
       <dd><label>审批备注</label>{{reportDetail.approveRemark}}</dd>
