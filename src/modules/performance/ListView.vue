@@ -553,7 +553,7 @@ export default {
           width: '200px'
         },
         {
-          label: '操作人',
+          label: '创建人',
           field: 'createUser',
           show: true,
           width: '100px',
