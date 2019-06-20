@@ -60,9 +60,9 @@ function getBody(xhr) {
  * 
  * @param {File} file - 待上传的文件
  * @param {string} action - 上传地址
- * @param {object} options - 参数
- * @param {(boolean | function)} options.validateStorage - 是否验证容量限制 
- * @param {boolean} options.silence - 是否不显示提示
+ * @param {object} [options] - 参数
+ * @param {(boolean | function)} [options.validateStorage] - 是否验证容量限制 
+ * @param {boolean} [options.silence ]- 是否不显示提示
  */
 export function upload(file, action, options = {}){
   return validateTenantStorage(options.validateStorage, file)
@@ -136,9 +136,9 @@ export function uploadWithParse(file, action = '/files/upload'){
  * 批量上传
  * @param {FileList} files - 待上传的文件
  * @param {string} action - 上传地址
- * @param {object} options - 参数
- * @param {(boolean | function)} options.validateStorage - 是否验证容量限制 
- * @param {boolean} options.silence - 是否不显示提示
+ * @param {object} [options] - 参数
+ * @param {(boolean | function)} [options.validateStorage] - 是否验证容量限制 
+ * @param {boolean} [options.silence] - 是否不显示提示
  */
 export function batchUploadWithParse(files, action = '/files/upload', options = {}){
   return validateTenantStorage(options.validateStorage, files)
