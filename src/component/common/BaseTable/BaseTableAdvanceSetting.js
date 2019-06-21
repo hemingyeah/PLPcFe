@@ -12,7 +12,7 @@ const BaseTableAdvancedSetting = {
   methods: {
     /** 显示设置窗 */
     open(columns){
-      this.rows = columns.filter(i => i.type != 'column').map(c => {
+      this.rows = columns.filter(i => i.type == 'column').map(c => {
         let column = _.cloneDeep(c);
 
         if(!(column instanceof TableColumn)) {
@@ -24,7 +24,7 @@ const BaseTableAdvancedSetting = {
  
         return column;
       })
-
+      
       this.show = true;
     },
     /** 关闭设置窗 */
