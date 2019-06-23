@@ -1,19 +1,12 @@
 /** 请求代理 @author dongls */
-const http = require('http');
 const https = require('https');
 
 const DEFAULT_OPIONS = {
-  host: 'dev.api.shb.ltd',
-  port: 8080,
-  protocol: 'http:',
+  host: 'pubapp.shb.ltd',
+  port: 443,
+  protocol: 'https:',
   headers: {}
 };
-
-const AGENT = new http.Agent({
-  keepAlive: true,
-  maxSockets: 1024,
-  maxFreeSockets: 256
-});
 
 const HTTPS_AGENT = new https.Agent({
   keepAlive: true,
@@ -66,13 +59,12 @@ module.exports = {
     proxyOptions.port = options.port || DEFAULT_OPIONS.port;
     proxyOptions.method = method;
     proxyOptions.path = path;
-    // proxyOptions.path = '/sm4-web/' + path;
 
     proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, options.headers)
-    proxyOptions.agent = AGENT;
+    proxyOptions.agent = HTTPS_AGENT;
 
     return new Promise((resolve, reject) => {
-      let req = http.request(proxyOptions, res => {
+      let req = https.request(proxyOptions, res => {
         let chunks = [];
         let size = 0;
 
@@ -107,73 +99,4 @@ module.exports = {
       req.end();
     });
   },
-  /**
-   * 转发请求，无需对返回数据处理时用，可处理附件类请求
-   * @param {*} ctx 
-   * @param {*} options
-   */
-  proxy(ctx, options = {}){
-    let request = ctx.request;
-    let response = ctx.response;
-
-    let path = request.originalUrl;
-    let method = request.method;
-    let rawBody = request.rawBody;
-    let isHttps = options.protocol === 'https:';
-
-    let proxyOptions = {};
-
-    proxyOptions.host = options.host || DEFAULT_OPIONS.host;
-    proxyOptions.port = options.port || DEFAULT_OPIONS.port;
-    proxyOptions.protocol = options.protocol || DEFAULT_OPIONS.protocol;
-    proxyOptions.method = method;
-    proxyOptions.path = path;
-    // proxyOptions.path = '/sm4-web/' + path;
-
-    proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, request.headers, options.headers)
-    proxyOptions.agent = isHttps ? HTTPS_AGENT : AGENT;
-    
-    if (isHttps) {
-      proxyOptions.rejectUnauthorized = false;
-    }
-
-    let isMultipart = request.is('multipart/form-data');
-    
-    
-    console.log('proxyOptions', proxyOptions);
-
-    return new Promise((resolve, reject) => {
-      let req = (isHttps ? https : http).request(proxyOptions, res => {
-        // 设定response的header
-        let headers = res.headers;
-        for(let name in headers){
-          response.set(name, headers[name])
-        }
-        
-        // 设定请求状态
-        response.status = res.statusCode;
-        res.pipe(response.res, {end: false})
-        
-        res.on('end', () => {
-          // 此处需要手动调用
-          response.res.end()
-          resolve()
-        })
-      })
-      
-      req.on('error', error => {
-        console.log(error)
-        reject(error)
-      });
-      
-      // 非附件类请求需要调用end
-      if(!isMultipart){
-        if(rawBody) req.write(rawBody)
-        req.end();
-        return
-      }
-
-      request.req.pipe(req)
-    })
-  }
 };

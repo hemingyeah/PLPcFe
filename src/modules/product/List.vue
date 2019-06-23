@@ -422,7 +422,7 @@ import {
   deleteProductByIds,
   getUpdateRecord,
 } from '@src/api/ProductApi';
-
+import {searchCustomer} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 
 export default {
@@ -1185,12 +1185,20 @@ export default {
     },
     searchCustomer(keyword) {
       this.inputRemoteSearch.customer.loading = true;
-      this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+
+      searchCustomer({keyword, page: 0, pageSize: 20,})
         .then(res => {
           this.inputRemoteSearch.customer.options = res.list;
           this.inputRemoteSearch.customer.loading = false;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
+
+      // this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+      //   .then(res => {
+      //     this.inputRemoteSearch.customer.options = res.list;
+      //     this.inputRemoteSearch.customer.loading = false;
+      //   })
+      //   .catch(err => console.error('searchCustomerManager function catch err', err));
     },
     showLatestUpdateRecord(row) {
       if (row.latesetUpdateRecord) return;

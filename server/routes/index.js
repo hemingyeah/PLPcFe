@@ -7,6 +7,7 @@ const USER_CONFIG = require(`../../script/config/${user}`);
 
 const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
+const HttpsClient = require('../util/HttpsClient')
 const Template = require('../util/Template')
 
 const modules = require('../../modules');
@@ -80,7 +81,7 @@ router.get('/performance/list', async ctx => {
 router.get('/window', async ctx => {
   let script = ['/window.js'];
   ctx.body = Template.renderWithData('window', {}, script)
-});0.
+});
 
 // 审批列表 联调时临时使用
 // /api/app/outside
@@ -97,6 +98,23 @@ router.use('', settingRouter.routes(), settingRouter.allowedMethods());
 router.use('', teamRouter.routes(), teamRouter.allowedMethods());
 router.use('', productRouter.routes(), productRouter.allowedMethods());
 router.use('', approveRouter.routes(), productRouter.allowedMethods());
+router.all('/api/*', async ctx => {
+  
+  let option = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cookie': 'shbversion=shbvip; VIPPUBLINKJSESSIONID=00d6572e-aca5-489e-848d-5d93b41b53c2'
+    }
+  };
+  
+  const request = ctx.request;
+  
+  let result = await HttpsClient.request(request.url, request.method, request.rawBody, option);
+  
+  ctx.status = result.statusCode;
+  ctx.body = result.body;
+})
+
 router.all('/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;
