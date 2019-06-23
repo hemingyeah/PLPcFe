@@ -44,7 +44,7 @@ export default {
     check() {
       const tab = this.tab;
       this.timer = setInterval(() => {
-        if (new Date() - tab.timeStamp >= 10000) {
+        if (new Date() - tab.timeStamp >= 5000) {
           this.hover = true;
           clearInterval(this.timer);
         }

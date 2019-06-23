@@ -166,7 +166,7 @@ const FrameManager = {
       FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
     },
     reloadFrameTab(tab, redirect = false){
-      if (tab.timeStamp && (new Date() - tab.timeStamp <= 10000)) return;
+      if (tab.timeStamp && (new Date() - tab.timeStamp <= 5000)) return;
       
       tab.timeStamp = new Date();
       
