@@ -518,7 +518,7 @@ export default {
     },
     /* 删除团队 */
     async teamDelete() {
-      if(this.multipleSelection.length < 0) {
+      if(this.multipleSelection.length <= 0) {
         return this.$platform.alert('请您先选择至少一个团队');
       }
       // 判断是否 删除含有主团队
