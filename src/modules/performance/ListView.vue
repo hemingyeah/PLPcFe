@@ -71,6 +71,7 @@
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
           <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteReport">删除</base-button>
+          <base-button type="ghost" @event="performanceTeam">团队</base-button>
           <a href="https://help.shb.ltd/doc?id=10501#Performance_report" target="_blank">如何通过绩效报告统计团队或个人数据？</a>
         </div>
 
@@ -611,6 +612,16 @@ export default {
         window.TDAPP.onEvent('pc：绩效报告-选择列事件');
         return;
       }
+    },
+    performanceTeam() {
+      let options = {
+        max: -1,
+        isRepeatUser: true
+      };
+
+      this.$fast.contact.choose('team', options).then(res => {
+        console.log(res)
+      })
     }
   },
   components: {
