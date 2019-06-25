@@ -25,7 +25,7 @@
       <div class="list-wrapper" v-show="showList">
         <div class="arrow"></div>
         <div class="input-container" v-if="!options.length">
-          <input type="text" v-model="keyword" @input="searchByKeyword" ref="input">
+          <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
         </div>
 
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">

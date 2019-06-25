@@ -23,7 +23,7 @@
       </template>
       <template slot="customer" slot-scope="{field}" v-if="!customerIsReadonly">
         <form-item :label="field.displayName" validation>
-          <customer-select v-model="value.customer" :field="customerField" :remote-method="searchCustomer" :update-customer="updateCustomer"></customer-select>
+          <customer-select v-model="value.customer" :field="customerField" :remote-method="searchCustomer" :update-customer="updateCustomer" placeholder="请输入关键字搜索客户"></customer-select>
         </form-item>
       </template>
       <template slot="serialNumber" slot-scope="{field}">
@@ -62,6 +62,8 @@
 <script>
 import * as FormUtil from '@src/component/form/util';
 import FormMixin from '@src/component/form/mixin/form'
+
+import {searchCustomer} from '@src/api/EcSearchApi.js';
 import {checkSerialNumber} from '@src/api/ProductApi';
 import _ from 'lodash'
 
@@ -170,9 +172,16 @@ export default {
     },
     searchCustomer(params) {
       // params has three properties include keyword、pageSize、pageNum.
-      const pms = params || {};
+      let pms = {
+        pageSize: params.pageSize,
+        page: params.pageNum,
+      };
 
-      return this.$http.post('/customer/list', pms)
+      if (params.keyword) {
+        pms.keyword = params.keyword;
+      }
+
+      return searchCustomer(pms)
         .then(res => {
           if (!res || !res.list) return;
           if (res.list) {
@@ -217,6 +226,7 @@ export default {
         },
         remoteMethod: Function,
         updateCustomer: Function,
+        placeholder: String,
       },
       methods: {
         input(value){
@@ -227,6 +237,7 @@ export default {
         return (
           <base-select
             value={this.value}
+            placeholder={this.placeholder}
             remoteMethod={this.remoteMethod}
             onInput={this.updateCustomer}
           />

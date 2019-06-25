@@ -1,11 +1,9 @@
 /** 请求代理 @author dongls */
 const http = require('http');
-const https = require('https');
 
 const DEFAULT_OPIONS = {
   host: 'dev.api.shb.ltd',
   port: 8080,
-  protocol: 'http:',
   headers: {}
 };
 
@@ -14,13 +12,6 @@ const AGENT = new http.Agent({
   maxSockets: 1024,
   maxFreeSockets: 256
 });
-
-const HTTPS_AGENT = new https.Agent({
-  keepAlive: true,
-  maxSockets: 1024,
-  maxFreeSockets: 256
-});
-
 
 /** 如果解析失败返回原值 */
 function toJSON(data) {
@@ -119,31 +110,22 @@ module.exports = {
     let path = request.originalUrl;
     let method = request.method;
     let rawBody = request.rawBody;
-    let isHttps = options.protocol === 'https:';
 
     let proxyOptions = {};
 
     proxyOptions.host = options.host || DEFAULT_OPIONS.host;
     proxyOptions.port = options.port || DEFAULT_OPIONS.port;
-    proxyOptions.protocol = options.protocol || DEFAULT_OPIONS.protocol;
     proxyOptions.method = method;
     proxyOptions.path = path;
     // proxyOptions.path = '/sm4-web/' + path;
 
     proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, request.headers, options.headers)
-    proxyOptions.agent = isHttps ? HTTPS_AGENT : AGENT;
-    
-    if (isHttps) {
-      proxyOptions.rejectUnauthorized = false;
-    }
+    proxyOptions.agent = AGENT;
 
     let isMultipart = request.is('multipart/form-data');
-    
-    
-    console.log('proxyOptions', proxyOptions);
 
     return new Promise((resolve, reject) => {
-      let req = (isHttps ? https : http).request(proxyOptions, res => {
+      let req = http.request(proxyOptions, res => {
         // 设定response的header
         let headers = res.headers;
         for(let name in headers){
