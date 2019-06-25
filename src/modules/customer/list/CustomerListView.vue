@@ -633,7 +633,7 @@ export default {
     },
     exportColumns() {
       return this.columns.map(c => {
-        if (c.field !== 'customerAddress' && c.field !== 'remindCount') {
+        if (c.field !== 'customerAddress' && c.field !== 'remindCount' && c.field !== 'updateTime' && c.formType !== 'info') {
           c.export = true;
         }
 
@@ -1319,7 +1319,7 @@ export default {
 
       let baseColumns = this.fixedColumns();
       let dynamicColumns = this.customerConfig.fieldInfo
-        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator')
+        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info')
         .map(field => {
           let sortable = false;
           let minWidth = null;
