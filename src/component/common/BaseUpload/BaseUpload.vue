@@ -84,7 +84,7 @@ export default {
 
         if(error.length > 0){
           let message = error.map(item => item.message).join('\n');
-          //此处不能return
+          // 此处不能return
           platform.alert(message)
         }
 

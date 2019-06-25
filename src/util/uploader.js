@@ -1,6 +1,7 @@
 import {toArray} from '@src/util/lang';
 import {notification} from '@src/platform/message';
-import Exception from '@model/Exception'
+import Exception from '@model/Exception';
+import http from '@src/util/http';
 
 export const FILE_MAX_SIZE = 10 * 1024 * 1024; // 单位字节(Byte)
 export const FILE_MAX_NUM = 9;
@@ -126,8 +127,8 @@ function getResult(file, msg){
  * 上传文件, 会解析返回值
  * 上传失败会返回Error对象
  */
-export function uploadWithParse(file, action = '/files/upload'){
-  return upload(file, action)
+export function uploadWithParse(file, action = '/files/upload', options = {}){
+  return upload(file, action, options)
     .then(msg => getResult(file, msg))
     .catch(error => getErrorResult(file, error))
 }
@@ -149,7 +150,7 @@ export function batchUploadWithParse(files, action = '/files/upload', options = 
         return Promise.resolve({success: [], error: validateRes});
       }
 
-      let promises = fileArr.map(file => uploadWithParse(file, action));
+      let promises = fileArr.map(file => uploadWithParse(file, action, {validateStorage: false}));
       return Promise.all(promises)
     })
     .then(result => {
@@ -181,12 +182,10 @@ export function validateTenantStorage(option, args){
 
   let files = args instanceof FileList ? Array.from(args) : [args];
   let total = files.reduce((acc, file) => (acc += file.size) && acc, 0)
-  console.log('all file total size: ', total)
 
-  // TODO: 补全容量限制接口
-  // TODO: 根据接口返回容量计算是否允许上传
-  return Promise.resolve().then(result => {
-    if(Math.random() > 0.15) return Promise.reject(new Exception('您的附件存储空间已经用尽，请联系管理员进行空间扩容', 10404))
+  return http.get('/files/remainingStorage').then(result => {
+    let surplus = result.data;
+    if(surplus < (total / 1024 / 1024)) return Promise.reject(new Exception('您的附件存储空间已经用尽，请联系管理员进行空间扩容', 10404))
   })
 }
 
