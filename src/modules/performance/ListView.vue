@@ -616,7 +616,8 @@ export default {
     performanceTeam() {
       let options = {
         max: -1,
-        isRepeatUser: true
+        isRepeatUser: true,
+        isGroup: true,
       };
 
       this.$fast.contact.choose('team', options).then(res => {

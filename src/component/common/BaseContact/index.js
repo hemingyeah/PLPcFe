@@ -132,6 +132,7 @@ function team( options = {} ){
             lat={options.lat}
             lng={options.lng}
             isRepeatUser={options.isRepeatUser === true}
+            isGroup={options.isGroup === true}
             max={max}
             selectedUser={selectedUser}
             showTeamCheckbox={ options.showTeamCheckbox === true}

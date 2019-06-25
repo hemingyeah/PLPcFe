@@ -55,7 +55,7 @@
         <!-- end 已选择部门 -->
 
         <!-- start 已选择人员 -->
-        <template v-if="chosen.length > 0">
+        <template v-if="chosen.length > 0 && !isGroup">
           <h4 v-if="allowCheckDept">已选人员</h4>
           <div class="bc-chosen-team-user" v-for="(user, index) in chosen" :key="`${user.userId}_${index}`">
             <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
@@ -65,9 +65,25 @@
                 {{ user.tagName }}
               </span>
             </div>
-            <i class="iconfont icon-fe-close" @click="removeUser(user)"></i>
+            <i class="iconfont icon-fe-close" @click="removeRepeatUser(user)"></i>
           </div>
-
+        </template>
+        <template v-else>
+          <div class="chosen-tree-node-content" :class="{'chosen-tree-selected': isSelected}" >
+            <div>
+              <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle"><i class="iconfont icon-arrow-right" v-if="node.subDepartments.length > 0"></i></span>
+            </div>
+            <div class="bc-chosen-team-user" v-for="(user, index) in chosen" :key="`${user.userId}_${index}`">
+              <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
+              <div class="bc-chosen-team-user-content">
+                <span class="bc-chosen-team-user-name">{{user.displayName}}</span>
+                <span class="bc-chosen-tema-user-tagname">
+                  {{ user.tagName }}
+                </span>
+              </div>
+              <i class="iconfont icon-fe-close" @click="removeRepeatUser(user)"></i>
+            </div>
+          </div>
         </template>
         <!-- end 已选择人员 -->
 
@@ -101,6 +117,11 @@ export default {
     },
     /** 是否允许选择重复的人员 */
     isRepeatUser: {
+      type: Boolean,
+      default: false,
+    },
+    /** 是否分组 */
+    isGroup: {
       type: Boolean,
       default: false,
     },
@@ -158,6 +179,7 @@ export default {
           selected: true
         }
       }), 
+      chosenGroup: [],
 
       params: {
         keyword: '', // 搜索关键词
@@ -210,6 +232,36 @@ export default {
       return text;
     },
   },
+  watch: {
+    'chosen': {
+      handler(newValue, oldValue) {
+        if(!this.isGroup) return
+
+        let chosen = newValue.slice();
+        let team = {};
+
+        chosen.forEach(c => {
+          let tagName = c.tagName;
+          team.hasOwnProperty(tagName)
+          ? ''
+          : team[tagName] = []
+
+          team[tagName].push(c)
+        });
+
+        this.chosenGroup = [];
+
+        for(let key in team) {
+          this.chosenGroup.push({
+            tagId: team[key][0].tagId,
+            tagName: team[key][0].tagName,
+            children: team[key]
+          })
+        }
+      },
+      deep: true,
+    }
+  },
   mounted(){
     this.initialize();
   },
@@ -218,7 +270,7 @@ export default {
     addUser(user){
       if(!this.allowAddUser) return alert(`最多选择${this.max}人`);
     
-      user.selected = true;
+      this.$set(user, 'selected', true);
 
       var index = -1;
       var len = this.chosen.length;
@@ -235,7 +287,7 @@ export default {
     addRepeatUser(user) {
       if(!this.allowAddUser) return alert(`最多选择${this.max}人`);
 
-      user.selected = true;
+      this.$set(user, 'selected', true);
 
       this.chosen.push(user);
     },
@@ -316,7 +368,7 @@ export default {
     }, 500),
     /** 移除选择的人员 */
     removeUser(user){
-      user.selected = false;
+      this.$set(user, 'selected', false);
 
       var index = -1;
       var len = this.chosen.length;
@@ -335,6 +387,23 @@ export default {
         }
       }
       index >= 0 && this.chosen.splice(index,1);
+    },
+    removeRepeatUser(user) {
+      this.$set(user, 'selected', false);
+
+      if(user.tagId === this.selectedTeam.id) {
+        let list = this.userPage.list;
+        let item = null;
+        for(let i = 0; i < list.length; i++) {
+          item = list[i];
+          if(item.userId == user.userId) {
+            this.$set(item, 'selected', false);
+          }
+        }
+      }
+
+      let index = this.chosen.findIndex(u => u.userId == user.userId);
+      this.chosen.splice(index, 1);
     },
     /** 搜索用户 */
     async searchUser(){
@@ -436,7 +505,7 @@ export default {
 
           // 存在相同数据且不允许重复数据  则替换原数据
           if(index >= 0){
-            user.selected = true;
+            this.$set(user, 'selected', true);
 
             let hasTeamDataUser = {
               ...this.chosen[index],
@@ -444,7 +513,7 @@ export default {
             }
             this.$set(this.chosen, index, hasTeamDataUser);
           }else{
-            user.selected = false;
+            this.$set(user, 'selected', false);
           }
         }
         return page;
