@@ -742,6 +742,10 @@ export default {
         operator = 'user';
         break;
       }
+      case 'location': {
+        operator = 'location';
+        break;
+      }
       default: {
         operator = 'like';
         break;
