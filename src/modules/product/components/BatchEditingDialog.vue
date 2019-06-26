@@ -165,6 +165,7 @@
 <script>
 import {formatDate } from '@src/util/lang';
 import { editBatchProduct } from '@src/api/ProductApi';
+import {searchCustomer} from '@src/api/EcSearchApi.js';
 
 export default {
   name: 'batch-editing-dialog',
@@ -369,7 +370,7 @@ export default {
     },
     searchCustomer(keyword) {
       this.inputRemoteSearch.customer.loading = true;
-      this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+      searchCustomer({keyword, page: 1, })
         .then(res => {
           this.inputRemoteSearch.customer.options = res.list;
           console.log('res.list', res.list);
