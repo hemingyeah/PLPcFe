@@ -37,7 +37,7 @@ function hideToolTip(event){
  * @param {*} insOption 当前配置，更新选项时用
  */
 function parseOption(value, el, insOption = {}){
-  // 如果传入string类型值，该值会被当做conent
+  // 如果传入string类型值，该值会被当做content
   if(typeof value != 'object') {
     value = value == null ? {} : {content: value}
   }
@@ -61,7 +61,7 @@ function parseOption(value, el, insOption = {}){
 const directive = {
   bind(el, bind){
     let option = parseOption(bind.value, el);
-    // 设置tooltipid，根据该id标记该实例
+    // 设置tooltip id，根据该id标记该实例
     el.dataset.tooltip = option.id;
     
     let tooltip = new Tooltip(option);

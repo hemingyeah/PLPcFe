@@ -8,7 +8,7 @@
     "url": "git@code.aliyun.com:publink/shb-pc-fe.git"
   },
   "scripts": {
-    "dev": "node --max-old-space-size=4096 script/development.js",
+    "dev": "node script/development.js",
     "build": "node script/production.js",
     "lint": "eslint --fix --ext .js,.vue src",
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "element-ui": "^2.5.2",
     "fecha": "^2.3.3",
     "lodash": "^4.17.11",

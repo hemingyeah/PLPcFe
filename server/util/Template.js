@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT_PATH = path.resolve(__dirname,'../../')
+const ROOT_PATH = path.resolve(__dirname, '../../')
 
 module.exports = {
   renderWithHtml(title, html = '', script, templatePath = 'src/index.html'){
@@ -16,16 +16,16 @@ module.exports = {
   render(title = '售后宝', js, script, templatePath = 'src/index.html'){
     let template = fs.readFileSync(path.resolve(ROOT_PATH, templatePath), 'utf-8');
     
-    //注入标题
+    // 注入标题
     template = template.replace('#{title}', title)
-    //注入参数
-    template = template.replace(`<script data-init="js">window._init = '#{initJson}';</script>`, `<script data-init="js">${js}</script>`);
+    // 注入参数
+    template = template.replace('<script data-init="js">window._init = \'#{initJson}\';</script>', `<script data-init="js">${js}</script>`);
     
-    //注入脚本
+    // 注入脚本
     if(Array.isArray(script) && script.length > 0) {
       let scriptHtml = '';
       script.forEach(item => scriptHtml += `<script src="${item}"></script>`)
-      scriptHtml += `</body>`;
+      scriptHtml += '</body>';
 
       template = template.replace('</body>', scriptHtml)
     }

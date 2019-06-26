@@ -39,8 +39,8 @@ export function hasAuthWithDataLevel(authorities = {}, authKey, teamAuthFn, pers
 
   let teamAuth = ( 
     typeof teamAuthFn == 'function' 
-      ? teamAuthFn() : 
-      typeof teamAuthFn == 'boolean' ? teamAuthFn : false
+      ? teamAuthFn() 
+      : typeof teamAuthFn == 'boolean' ? teamAuthFn : false
   );
 
   let personAuth = (

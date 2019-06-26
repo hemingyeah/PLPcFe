@@ -12,41 +12,44 @@
 为满足以上需求，表单组件需要支持以下特性：
 - 表单设计器可拖拽
 - 表单设计器支持区分系统字段和自定义字段
-- 字段类型可扩展、复用（每一部分都可）
+- 字段类型可扩展、复用（每一部分）
 - 提供统一的验证机制
 - 提供统一的表单渲染机制
 - 提供统一的表单展示机制
 - 字段可在表单中或展示时支持自定义
 
-## 主要组件
-- FormDesign - 表单设计器，提供表单设计能力
-- FormBuilder - 表单构建器，提供统一的表单渲染机制
-- FormView - 表单查看器，提供统一的展示机制
-- FormItem - 表单项，提供统一的验证能力
+## 组件结构
+该组件主要由四个组件组成：`FormDesign`, `FormBuilder`, `FormView`, `FormItem`, 具体目录结构如下：
+```
+├── components            表单组件目录，所有类型的字段均维护在此目录下
+├── mixin                 
+├── util                  
+├── common.scss           组件通用样式
+├── config.js             常量
+├── FormBuilder.js        表单构建器，提供统一的表单渲染机制      
+├── FormDesign.js         表单设计器，提供表单设计能力  
+├── FormField.js          表单字段对象
+├── FormItem.vue          表单项，提供统一的验证能力
+├── FormView.js           表单查看器，提供统一的展示机制
+└── index.js              组件入口
+```
 
-## 字段类型结构
-为了`FormDesign`, `FormBuilder`, `FormView`三个组件协同运作，提供统一的字段配置：
+## 组件中的三种字段
 
-- formType            字段类型
-- name                字段名称
-- isSystem            是否系统字段
-- component.view    视图组件
-- component.build     表单组件
-- component.preview   预览组件
-- component.setting   设置组件
-- component.extend    扩展组件, 键值命名规则如下：
-  ```javascript
-  // 命名规则： 
-  `${mode}_${fieldName}_${component}`
-  // 例如产品类型设置需要自定义，命名如下：
-  'product_type_setting'
-  // 如果工单的客户字段需要自定义，命名如下：
-  'task_customer_build'
-  ```
+- `Field`： 该对象对应后端的字段对象，所有与后端交互的数据格式都应该符合该对象。
+- `FormField`: 该对象主要用于组件内部。因为`Field`对象并不满足组件需要，因而定义了该对象，该对象一般都由`Field`对象转化而成。
+- `FormTypeField`: 该对象没有定义具体的结构，主要用于导出各种类型的字段，该对象的具体说明见`components/README.md#字段类型结构`
+
+## Mode属性说明
+`mode`存在于`FormDesign`, `FormBuilder`两个组件中（作为`props`中的一个属性），目的是区分该组件用于哪个模块。设计`mode`属性主要基于以下几点考虑：
+
+- 各个模块对字段的需求不一致，某些字段只适用于某一模块
+- 可以根据该属性决定某个模块下显示某些类型的字段
+- 同一类型的字段可能在不同模块下表现出不同的行为
+- 用于对某一特定模块的系统字段自定义行为
 
 ## 表单验证机制
-
-**表单三层结构**: Form组件 -> FormItem -> FormBuilder
+表单的验证机制依赖于`自定义事件`和`事件冒泡`。**表单构建器三层结构**: Form组件 => FormItem => FormBuilder。
 - Form组件提供每种字段的具体实现
 - FormItem主要用于验证
 - FormBuilder作为容器，并提供整个表单的验证 
@@ -60,4 +63,3 @@
 > 1. Form组件中的值发生变化时，触发`form.validate`事件
 > 2. FormItem接受到事件后，阻止事件冒泡并调用`validate`方法进行验证
 > 3. 表单提交时，`FormBuilder`根据自身维护的`validateMap`触发整个表单的验证
- 
