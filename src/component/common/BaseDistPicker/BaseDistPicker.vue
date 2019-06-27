@@ -4,6 +4,7 @@
       popper-class="location-cascader"
       clearable
       :props="props"
+      :placeholder="placeholder"
       :options="options"
       change-on-select
       :value="value"
@@ -28,6 +29,10 @@ export default {
     value: {
       type: Array,
       default: () => ([]),
+    },
+    placeholder: {
+      type: String,
+      default: '请选择'
     }
   },
   methods: {

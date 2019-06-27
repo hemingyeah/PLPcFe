@@ -8,7 +8,8 @@
 
     <!-- TODO: 支持设置默认地址 -->
     <h3>默认地址</h3>
-    <base-dist-picker @input="changeDefaultVal" :value="distValue"/>
+    <base-dist-picker @input="changeDefaultVal" :value="distValue" placeholder="请选择区域"/>
+    <p class="address-tip">新建客户时默认选中的地址</p>
   </div>
 </template>
 
@@ -31,7 +32,6 @@ export default {
   computed: {
     distValue() {
       const {adProvince, adCity, adDist} = this.field.setting.customerAddressConfig;
-
 
       return [adProvince, adCity, adDist].filter(a => !!a);
     }
@@ -63,6 +63,12 @@ export default {
 <style lang="scss">
   .base-dist-picker  .el-cascader {
     width: 100%;
+  }
+
+  .address-tip {
+    margin: 0;
+    line-height: 30px;
+    color: #666;
   }
 
 </style>
