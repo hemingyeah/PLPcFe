@@ -656,6 +656,7 @@ export default {
 
         col.show = show;
         col.width = width;
+        col.type = 'column';
 
         return col;
       });
