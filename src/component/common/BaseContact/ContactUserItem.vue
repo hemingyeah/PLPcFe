@@ -1,7 +1,7 @@
 <template>
   <div class="contact-user-item" :class="{'contact-selected': user.selected}" @click="$emit('toggle', user)">
     <div class="contact-user-wrap">
-      <div class="contact-user-avatar" :style="{backgroundImage: `url(${head})`}"></div>
+      <div class="contact-user-avatar" :class="showTag ? 'contact-user-avatar-margin' : ''" :style="{backgroundImage: `url(${head})`}"></div>
       <div class="contact-user-info">
         <h3>
           <div class="contact-user-name">{{user.displayName}}</div>
@@ -11,6 +11,9 @@
           </div>
         </h3>
         <p>{{user.cellPhone}}</p>
+        <p v-if="showTag">
+          {{ user.tagName }}
+        </p>
       </div>
       <div class="contact-user-addition" v-if="showLocation">
         <p>{{initDis(user.cusDistance)}}{{diftime(user)}}</p>
@@ -52,6 +55,11 @@ export default {
     },
     //是否显示定位信息
     showLocation: { 
+      type: Boolean,
+      default: false
+    },
+    //是否显示团队信息
+    showTag: { 
       type: Boolean,
       default: false
     }
@@ -121,6 +129,10 @@ export default {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
+}
+
+.contact-user-avatar-margin {
+  margin-top: 10px;
 }
 
 .contact-user-info{

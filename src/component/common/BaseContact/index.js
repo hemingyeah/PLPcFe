@@ -81,16 +81,19 @@ function team( options = {} ){
   // 处理传入参数
   let selectedUser = [];
   let max = 0;
+  let action = '/security/tag/tagComponet/getUserList';
+  let selectTypes = ['universal', 'performance'];
+  let selectType = 'universal';
 
   if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
   if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
   if(max > 1 && Array.isArray(options.selected)) {
     selectedUser = options.selected.length > max ? options.selected.slice(0, max) : options.selected;
   }
-
-  let action = '/security/tag/userList';
-
   if(options.action) action = options.action;
+  if(selectTypes.indexOf(options.selectType) > 0) {
+    selectType = options.selectType;
+  }
 
   let ele = document.createElement('div');
   let body = document.body;
@@ -129,16 +132,18 @@ function team( options = {} ){
         return (
           <base-contact-team 
             action={action}
+            dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
             lat={options.lat}
             lng={options.lng}
             isRepeatUser={options.isRepeatUser === true}
             isGroup={options.isGroup === true}
+            isHideTeam={options.isHideTeam === true}
             max={max}
+            selectType={selectType}
             selectedUser={selectedUser}
             showTeamCheckbox={ options.showTeamCheckbox === true}
             showTaskCount={options.showTaskCount === true}
             showUserState={options.showUserState === true}
-            seeAllOrg={options.seeAllOrg || false}
             title={options.title}
             onDestroy={this.destroy.bind(this)}
             onCancel={this.cancel.bind(this)}

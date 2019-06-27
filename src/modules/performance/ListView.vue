@@ -265,6 +265,7 @@ export default {
         type: 995,
         ruleIds: '',
       },
+      userList: []
     }
   },
   computed: {
@@ -615,13 +616,32 @@ export default {
     },
     performanceTeam() {
       let options = {
-        max: -1,
         isRepeatUser: true,
-        isGroup: true,
+        isHideTeam: false,
+        max: -1,
+        selectType: '',
+        selected: this.userList
+        // dataFunc(data) {
+        //   let chosen = data.slice();
+        //   let team = {};
+        //   let group = [];
+
+        //   chosen.forEach(c => {
+        //     let tagId = c.tagId;
+
+        //     if(!team.hasOwnProperty(tagId)) {
+        //       team[tagId] = [];
+        //     }
+        //     team[tagId].push(c)
+        //   });
+
+        //   return team
+        // }
       };
 
       this.$fast.contact.choose('team', options).then(res => {
-        console.log(res)
+        this.userList = res.data;
+        console.log(this.userList)
       })
     }
   },
