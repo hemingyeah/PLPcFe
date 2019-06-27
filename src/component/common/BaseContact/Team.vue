@@ -2,15 +2,15 @@
   <base-modal 
     :title="title" width="820px"
     :show.sync="show" @closed="$emit('destory')" @cancel="$emit('canel')">
-    <div class="bc-dept-wrap">
-      <div class="bc-dept" v-if="teams.length > 0">
+    <div class="bc-team-wrap">
+      <div class="bc-team" v-if="teams.length > 0">
         <base-tree
           :data="teams" 
           :node-render="nodeRender"
           :selected="selectedTeam" 
-          :show-checkbox="allowCheckDept"
+          :show-checkbox="allowCheckTeam"
           @node-selected="initTeamUser" 
-          @node-check="chooseDept" 
+          @node-check="chooseTeam" 
         />
       </div>
       <div class="bc-user">
@@ -43,21 +43,21 @@
       </div>
       <div class="bc-chosen" v-if="isMulti">
 
-        <!-- start 已选择部门 -->
-        <template v-if="allowCheckDept && chosenDept.length > 0">
-          <h4>已选部门</h4>
+        <!-- start 已选择团队 -->
+        <template v-if="allowCheckTeam && chosenTeam.length > 0">
+          <h4>已选团队</h4>
           <div 
             class="bc-chosen-team-user" 
-            v-for="dept in chosenDept" :key="dept.id">
-            <span>{{dept.name}}</span>
-            <i class="iconfont icon-fe-close" @click="chooseDept({node: dept, value: false})"></i>
+            v-for="team in chosenTeam" :key="team.id">
+            <span>{{team.name}}</span>
+            <i class="iconfont icon-fe-close" @click="chooseTeam({node: team, value: false})"></i>
           </div>
         </template>
-        <!-- end 已选择部门 -->
+        <!-- end 已选择团队 -->
 
         <!-- start 已选择人员 -->
         <template v-if="chosen.length > 0">
-          <h4 v-if="allowCheckDept">已选人员</h4>
+          <h4 v-if="allowCheckTeam">已选人员</h4>
           <div class="bc-chosen-team-user" :class="isHideTeam ? 'bc-chosen-team-user-row': ''" v-for="(user, index) in chosen" :key="`${user.userId}_${index}`">
             <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
             <div class="bc-chosen-team-user-content">
@@ -100,6 +100,40 @@ export default {
       type: String,
       default: '/security/tag/tagComponet/getUserList',
     },
+    /** 返回数据函数  */
+    dataFunc: {
+      type: Function,
+      default(data) {
+        let callData = {};
+
+        // 返回用户
+        callData.users = data.users.map(item => {
+          let user = {
+            userId: item.userId,
+            displayName: item.displayName,
+            staffId: item.staffId,
+            head: item.head || ''
+          };
+          if(!this.isHideTeam) {
+            user.tagId = item.tagId || '';
+            user.tagName = item.tagName || '';
+          }
+          return user
+        });
+
+        // 如果允许选择团队
+        if(this.allowCheckTeam) {
+          callData.teams = data.teams.map(team => {
+            return {
+              id: team.id,
+              name: team.name
+            }
+          })
+        }
+
+        return callData;
+      }
+    },
     /** 
      * @desc 是否允许选择重复的人员, 建议同时不要隐藏团队信息
     */
@@ -126,25 +160,6 @@ export default {
     max: {
       type: Number,
       default: 0,
-    },
-    /** 返回数据函数  */
-    dataFunc: {
-      type: Function,
-      default(data) {
-        return data.map(item => {
-          let user = {
-            userId: item.userId,
-            displayName: item.displayName,
-            staffId: item.staffId,
-            head: item.head || ''
-          };
-          if(!this.isHideTeam) {
-            user.tagId = item.tagId || '';
-            user.tagName = item.tagName || '';
-          }
-          return user
-        });
-      }
     },
     /** 搜索用户的 参数 */
     selectType: {
@@ -182,9 +197,9 @@ export default {
         callback: this.loadmore
       },
 
-      teams: [], // 部门
-      selectedTeam: {}, // 选中的部门
-      chosenDept: [], // 选择的部门
+      teams: [], // 团队
+      selectedTeam: {}, // 选中的团队
+      chosenTeam: [], // 选择的团队
       // 已选择的人
       chosen: this.selectedUser.map(item => {
         return {
@@ -218,9 +233,9 @@ export default {
     allowAddUser(){
       return this.chosen.length < this.max;
     },
-    /** 是否允许选中部门 */
-    allowCheckDept(){
-      return this.isMulti && this.showDeptCheckbox;
+    /** 是否允许选中团队 */
+    allowCheckTeam(){
+      return this.isMulti && this.showTeamCheckbox;
     },
     /** 按钮文字  */
     btnText(){
@@ -238,42 +253,11 @@ export default {
     summary(){
       let text = `当前已选${this.chosen.length}人`;
 
-      if(this.allowCheckDept) {
-        text += `, 部门${this.chosenDept.length}个`;
+      if(this.allowCheckTeam) {
+        text += `, 团队${this.chosenTeam.length}个`;
       }
       return text;
     },
-  },
-  watch: {
-    // 'chosen': {
-    //   handler(newValue, oldValue) {
-    //     if(!this.isGroup) return
-
-    //     let chosen = newValue.slice();
-    //     let team = {};
-
-    //     chosen.forEach(c => {
-    //       let tagName = c.tagName;
-    //       team.hasOwnProperty(tagName)
-    //       ? ''
-    //       : team[tagName] = []
-    //     });
-    //     console.log(team)
-
-    //     for(let key in team) {
-    //       let isHave = this.chosenGroup.some(c => c.tagId == team[key][0].tagId);
-    //       !isHave
-    //       ? this.chosenGroup.push({
-    //           children: team[key],
-    //           tagId: team[key][0].tagId,
-    //           isSelected: true,
-    //           tagName: team[key][0].tagName,
-    //         })
-    //       : ''
-    //     }
-    //   },
-    //   deep: true,
-    // }
   },
   mounted(){
     this.initialize();
@@ -332,96 +316,16 @@ export default {
           ? this.addRepeatUser(user)
           : this.addUser(user);
     },
-    /** 选择部门 */
-    chooseDept(event){
+    /** 选择团队 */
+    chooseTeam(event){
 
       let {node, value} = event;
 
       this.toggleDeptCheckStatus(node, value);
 
-      this.chosenDept = this.filterChosenDept(this.teams);
+      this.chosenTeam = this.filterChosenTeam(this.teams);
     },
-    post(){
-      let data = this.dataFunc(this.chosen);
-
-      this.show = false;
-      this.$emit('input', data);
-    },
-    inputKeyword(event){
-      this.params.keyword = event.target.value;
-      this.search();
-    },
-    /** 搜索人员 */
-    search: _.debounce(function(){
-      if(!this.params.keyword){ // 空值  显示团队
-        this.mode = 'choose';
-
-        this.initTeamUser(this.selectedTeam);
-        return;
-      }
-
-      this.searchUser();
-    }, 500),
-    /** 搜索用户 */
-    async searchUser(){
-      try {
-        this.mode = 'search';
-        this.loading = true;
-        this.userPage.list = [];
-
-        this.params.tagId = '';
-        this.params.pageNum = 1;
-
-        let userPage = await this.fetchUser(this.params);
-
-        this.userPage.merge(Page.as(userPage));
-        
-      } catch (error) {
-        console.error(error)
-      }
-
-      this.loading = false
-      this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
-    },
-    /** 移除选择的人员 */
-    removeUser(user){
-      this.$set(user, 'selected', false);
-
-      var index = -1;
-      var len = this.chosen.length;
-
-      for(var i = 0; i < len; i++){
-
-        let isRepeatUser = (
-          this.isRepeatUser
-          ? this.chosen[i].tagId == user.tagId
-          : true
-        )
-
-        if(isRepeatUser && this.chosen[i].userId == user.userId){
-          index = i;
-          break;
-        }
-      }
-      index >= 0 && this.chosen.splice(index,1);
-    },
-    removeRepeatUser(user) {
-      let list = this.userPage.list;
-      let item = null;
-      let condition = u => u.userId == user.userId && u.tagId == user.tagId;
-      
-      for(let i = 0; i < list.length; i++) {
-        item = list[i];
-        if(condition(item)) {
-          this.$set(item, 'selected', false);
-          break;
-        }
-      }
-
-      let index = this.chosen.findIndex(u => condition(u));
-      index >= 0 && this.chosen.splice(index, 1);
-    },
-    /** 选中一个部门 */
+    /** 选中一个团队 */
     async initTeamUser(team){
       try {
         this.mode = 'choose';
@@ -446,24 +350,16 @@ export default {
       this.loading = false;
       this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
     },
-    /** 切换该部门及子部门选中状态 */
-    toggleDeptCheckStatus(dept, value){
-      this.$set(dept, 'isChecked', value);
-
-      let subDepts = dept.children || [];
-      if(subDepts.length > 0){
-        subDepts.forEach(item => this.toggleDeptCheckStatus(item, value))
-      }
-    },
-    // 筛选所有被选中的部门
-    filterChosenDept(depts){
-      if(!Array.isArray(depts) || depts.length == 0) return [];
+    // 筛选所有被选中的团队
+    filterChosenTeam(teams){
+      if(!Array.isArray(teams) || teams.length == 0) return [];
 
       let chosen = [];
-      for(let i = 0; i < depts.length; i++){
-        let dept = depts[i];
-        if(dept.isChecked) chosen.push(dept);
-        if(dept.children) chosen = chosen.concat(this.filterChosenDept(dept.children))
+
+      for(let i = 0; i < teams.length; i++){
+        let team = teams[i];
+        if(team.isChecked) chosen.push(team);
+        if(team.children) chosen = chosen.concat(this.filterChosenTeam(team.children))
       }
       return chosen;
     },
@@ -533,10 +429,10 @@ export default {
         if(result.status == 1) return [];
 
         let teams = result.data.list.map(l => {
-          return {
+          let list = {
             ...l,
             name: l.tagName ? l.tagName : l.name,
-            subDepartments: l.children.map(c => {
+            children: l.children.map(c => {
               return {
                 ...c,
                 name: c.tagName ? c.tagName : c.name,
@@ -544,6 +440,9 @@ export default {
               }
             }) || [],
           }
+          list.subDepartments = list.children.slice();
+
+          return list;
         }) || [];
 
         return teams;
@@ -552,6 +451,10 @@ export default {
     /** 获取用户头像 */
     head(user){
       return user.head || DefaultHead;
+    },
+    inputKeyword(event){
+      this.params.keyword = event.target.value;
+      this.search();
     },
     /** 初始化 */
     initialize(){
@@ -606,21 +509,110 @@ export default {
     },
     nodeRender(h, node){
       let content = <span>{node.name}</span>;
-      if(!this.allowCheckDept) return content
+      if(!this.allowCheckTeam) return content
       
       let count = 0
       if(count <= 0) return content;
 
       return (
-        <div class="bc-dept-node-wrap">
-          <span class="bc-dept-node-name">{node.name}</span>
-          <span class="bc-dept-node-count">{count}</span>
+        <div class="bc-team-node-wrap">
+          <span class="bc-team-node-name">{node.name}</span>
+          <span class="bc-team-node-count">{count}</span>
         </div>
       )
     },
+    post(){
+      let data = {
+        users: this.chosen,
+        teams: this.chosenTeam,
+      }
+      let inputData = this.dataFunc(data);
+
+      this.show = false;
+      this.$emit('input', inputData);
+    },
+    /** 移除选择的人员 */
+    removeUser(user){
+      this.$set(user, 'selected', false);
+
+      var index = -1;
+      var len = this.chosen.length;
+
+      for(var i = 0; i < len; i++){
+
+        let isRepeatUser = (
+          this.isRepeatUser
+          ? this.chosen[i].tagId == user.tagId
+          : true
+        )
+
+        if(isRepeatUser && this.chosen[i].userId == user.userId){
+          index = i;
+          break;
+        }
+      }
+      index >= 0 && this.chosen.splice(index,1);
+    },
+    removeRepeatUser(user) {
+      let list = this.userPage.list;
+      let item = null;
+      let condition = u => u.userId == user.userId && u.tagId == user.tagId;
+      
+      for(let i = 0; i < list.length; i++) {
+        item = list[i];
+        if(condition(item)) {
+          this.$set(item, 'selected', false);
+          break;
+        }
+      }
+
+      let index = this.chosen.findIndex(u => condition(u));
+      index >= 0 && this.chosen.splice(index, 1);
+    },
+    /** 搜索人员 */
+    search: _.debounce(function(){
+      if(!this.params.keyword){ // 空值  显示团队
+        this.mode = 'choose';
+
+        this.initTeamUser(this.selectedTeam);
+        return;
+      }
+
+      this.searchUser();
+    }, 500),
+    /** 搜索用户 */
+    async searchUser(){
+      try {
+        this.mode = 'search';
+        this.loading = true;
+        this.userPage.list = [];
+
+        this.params.tagId = '';
+        this.params.pageNum = 1;
+
+        let userPage = await this.fetchUser(this.params);
+
+        this.userPage.merge(Page.as(userPage));
+        
+      } catch (error) {
+        console.error(error)
+      }
+
+      this.loading = false
+      this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
+    },
     toggle(item) {
       this.$set(item, 'isSelected', !item.isSelected);
-    }
+    },
+    /** 切换该团队及子团队选中状态 */
+    toggleDeptCheckStatus(team, value){
+      this.$set(team, 'isChecked', value);
+
+      let subTeams = team.children || [];
+      if(subTeams.length > 0){
+        subTeams.forEach(item => this.toggleDeptCheckStatus(item, value))
+      }
+    },
   },
   components: {
     [ContactUserItem.name]: ContactUserItem
@@ -629,14 +621,14 @@ export default {
 </script>
 
 <style lang="scss">
-.bc-dept-wrap{
+.bc-team-wrap{
   display: flex;
   flex-flow: row nowrap;
   height: 450px;
   user-select: none;
 }
 
-.bc-dept{
+.bc-team{
   width: 260px;
   overflow: auto;
   height: 100%;
@@ -859,18 +851,18 @@ export default {
   padding: 6px 0 4px 10px;
 }
 
-.bc-dept-node-wrap{
+.bc-team-node-wrap{
   width: 100%;
   display: flex;
   flex-flow: row nowrap;
 }
 
-.bc-dept-node-name{
+.bc-team-node-name{
   flex: 1;
   @include text-ellipsis();
 }
 
-.bc-dept-node-count{
+.bc-team-node-count{
   margin-left: 5;
   color: #9a9a9a;
 }

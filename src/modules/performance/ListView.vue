@@ -620,7 +620,8 @@ export default {
         isHideTeam: false,
         max: -1,
         selectType: '',
-        selected: this.userList
+        selected: this.userList,
+        showTeamCheckbox: true,
         // dataFunc(data) {
         //   let chosen = data.slice();
         //   let team = {};
