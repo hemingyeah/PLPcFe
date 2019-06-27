@@ -41,7 +41,7 @@ export default {
       this.update(value, prop)
     },
     update(value, prop){
-      this.$emit('input', {value, prop})
+      this.$emit('input', {value, prop, isSetting: true})
     }
   }
 }
