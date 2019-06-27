@@ -1186,19 +1186,21 @@ export default {
     searchCustomer(keyword) {
       this.inputRemoteSearch.customer.loading = true;
 
-      searchCustomer({keyword, page: 0, pageSize: 20,})
+      searchCustomer({keyword, page: 1, pageSize: 20})
         .then(res => {
-          this.inputRemoteSearch.customer.options = res.list;
-          this.inputRemoteSearch.customer.loading = false;
-        })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
 
-      // this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
-      //   .then(res => {
-      //     this.inputRemoteSearch.customer.options = res.list;
-      //     this.inputRemoteSearch.customer.loading = false;
-      //   })
-      //   .catch(err => console.error('searchCustomerManager function catch err', err));
+          if (res.status) {
+            this.inputRemoteSearch.customer.options = [];
+            this.inputRemoteSearch.customer.loading = false;
+            return res;
+          }
+
+          this.inputRemoteSearch.customer.options = res.data.list;
+          this.inputRemoteSearch.customer.loading = false;
+
+          return res;
+        })
+        .catch(err => console.error('searchCustomer function catch err', err));
     },
     showLatestUpdateRecord(row) {
       if (row.latesetUpdateRecord) return;

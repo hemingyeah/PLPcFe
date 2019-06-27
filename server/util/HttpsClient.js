@@ -1,14 +1,14 @@
 /** 请求代理 @author dongls */
-const https = require('https');
+const http = require('http');
 
 const DEFAULT_OPIONS = {
-  host: 'pubapp.shb.ltd',
-  port: 443,
-  protocol: 'https:',
+  host: '172.18.1.10',
+  port: 10000,
+  // protocol: 'https:',
   headers: {}
 };
 
-const HTTPS_AGENT = new https.Agent({
+const HTTPS_AGENT = new http.Agent({
   keepAlive: true,
   maxSockets: 1024,
   maxFreeSockets: 256
@@ -64,7 +64,7 @@ module.exports = {
     proxyOptions.agent = HTTPS_AGENT;
 
     return new Promise((resolve, reject) => {
-      let req = https.request(proxyOptions, res => {
+      let req = http.request(proxyOptions, res => {
         let chunks = [];
         let size = 0;
 

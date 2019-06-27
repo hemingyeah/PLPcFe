@@ -1464,23 +1464,18 @@ export default {
 
       searchLinkman({keyword, page: 1, pageSize: 20,})
         .then(res => {
-          if (res && res.list) {
-            this.inputRemoteSearch.linkman.options = res.list;
+
+          if (res.status) {
+            this.inputRemoteSearch.linkman.options = [];
             this.inputRemoteSearch.linkman.loading = false;
+            return res;
           }
+
+          this.inputRemoteSearch.linkman.options = res.data.list;
+          this.inputRemoteSearch.linkman.loading = false;
           return res;
         })
         .catch(err => console.error('searchLinkman function catch err', err));
-
-      // return this.$http.get('/linkman/getListAsyn', {keyword, pageNum: 1, })
-      //   .then(res => {
-      //     if (res && res.list) {
-      //       this.inputRemoteSearch.linkman.options = res.list;
-      //       this.inputRemoteSearch.linkman.loading = false;
-      //     }
-      //     return res;
-      //   })
-      //   .catch(err => console.error('searchLinkman function catch err', err));
     },
     /** @deprecated */
     searchTag(keyword) {

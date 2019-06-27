@@ -372,9 +372,16 @@ export default {
       this.inputRemoteSearch.customer.loading = true;
       searchCustomer({keyword, page: 1, })
         .then(res => {
-          this.inputRemoteSearch.customer.options = res.list;
-          console.log('res.list', res.list);
+
+          if(!res || res.stauts) {
+            this.inputRemoteSearch.customer.options = [];
+            this.inputRemoteSearch.customer.loading = false;
+            return res;
+          }
+
+          this.inputRemoteSearch.customer.options = res.data.list;
           this.inputRemoteSearch.customer.loading = false;
+          return res;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },

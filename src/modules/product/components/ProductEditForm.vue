@@ -183,15 +183,15 @@ export default {
 
       return searchCustomer(pms)
         .then(res => {
-          if (!res || !res.list) return;
-          if (res.list) {
-            res.list = res.list.map(customer => Object.freeze({
+          if (!res || res.status) return;
+          if (res.data.list) {
+            res.data.list = res.data.list.map(customer => Object.freeze({
               label: customer.name,
               value: customer.id,
             }))
           }
 
-          return res;
+          return res.data;
         })
         .catch(e => console.error(e));
     },

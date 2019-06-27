@@ -101,10 +101,7 @@ router.use('', approveRouter.routes(), productRouter.allowedMethods());
 router.all('/api/*', async ctx => {
   
   let option = {
-    headers: {
-      'Content-Type': 'application/json',
-      'Cookie': 'shbversion=shbvip; VIPPUBLINKJSESSIONID=00d6572e-aca5-489e-848d-5d93b41b53c2'
-    }
+    headers: Object.assign({}, ctx.request.headers)
   };
   
   const request = ctx.request;
@@ -113,8 +110,8 @@ router.all('/api/*', async ctx => {
   
   ctx.status = result.statusCode;
   ctx.body = result.body;
-})
+});
 
-router.all('/*', ctx => HttpClient.proxy(ctx))
+router.all('/*', ctx => HttpClient.proxy(ctx));
 
 module.exports = router;
