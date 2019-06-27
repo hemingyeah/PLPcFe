@@ -80,6 +80,7 @@ function dept(options){
 function team( options = {} ){
   // 处理传入参数
   let selectedUser = [];
+  let selectedTeam = [];
   let max = 0;
   let action = '/security/tag/tagComponet/getUserList';
   let selectTypes = ['universal', 'performance'];
@@ -87,8 +88,14 @@ function team( options = {} ){
 
   if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
   if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
-  if(max > 1 && Array.isArray(options.selected)) {
-    selectedUser = options.selected.length > max ? options.selected.slice(0, max) : options.selected;
+  if(max > 1 && Object.keys(options.selected).length > 0) {
+    let users = options?.selected?.users;
+    let teams = options?.selected?.teams;
+    let isUserArray = Array.isArray(users);
+    let isTeamArray = Array.isArray(teams);
+
+    if(isUserArray) selectedUser = users.length > max ? options.selected.slice(0, max) : users;
+    if(isTeamArray) selectedTeam = teams;
   }
   if(options.action) action = options.action;
   if(selectTypes.indexOf(options.selectType) > 0) {
@@ -140,6 +147,7 @@ function team( options = {} ){
             isHideTeam={options.isHideTeam === true}
             max={max}
             selectType={selectType}
+            selectedTeam={selectedTeam}
             selectedUser={selectedUser}
             showTeamCheckbox={ options.showTeamCheckbox === true}
             showTaskCount={options.showTaskCount === true}

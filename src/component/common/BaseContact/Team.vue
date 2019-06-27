@@ -7,7 +7,7 @@
         <base-tree
           :data="teams" 
           :node-render="nodeRender"
-          :selected="selectedTeam" 
+          :selected="selectTeam" 
           :show-checkbox="allowCheckTeam"
           @node-selected="initTeamUser" 
           @node-check="chooseTeam" 
@@ -171,6 +171,11 @@ export default {
       type: Array,
       default: () => [],
     },
+    /** 已选中的团队  */
+    selectedTeam: {
+      type: Array,
+      default: () => [],
+    },
     /** 是否显示多选  */
     showTeamCheckbox: {
       type: Boolean,
@@ -191,6 +196,7 @@ export default {
     let data = {
       mode: 'choose',
       show: false,
+      isMatchTeam: false,
       loading: true,
       loadmoreOptions: {
         disabled: false,
@@ -198,8 +204,9 @@ export default {
       },
 
       teams: [], // 团队
-      selectedTeam: {}, // 选中的团队
-      chosenTeam: [], // 选择的团队
+      selectTeam: {}, // 选中的团队
+      // 已选择的团队
+      chosenTeam: [],
       // 已选择的人
       chosen: this.selectedUser.map(item => {
         return {
@@ -211,8 +218,7 @@ export default {
           tagId: item.tagId,
           tagName: item.tagName,
         }
-      }), 
-      chosenGroup: [],
+      }),
 
       params: {
         keyword: '', // 搜索关键词
@@ -258,6 +264,18 @@ export default {
       }
       return text;
     },
+  },
+  watch: {
+    'selectedTeam': {
+      handler(newValue, oldValue) {
+        this.chosenTeam = newValue.map(item => {
+          return { id: item.id, name: item.name }
+        })
+        this.isMatchTeam = true;
+      },
+      deep: true,
+      immediate: true,
+    }
   },
   mounted(){
     this.initialize();
@@ -329,13 +347,13 @@ export default {
     async initTeamUser(team){
       try {
         this.mode = 'choose';
-        this.selectedTeam = team;
+        this.selectTeam = team;
         this.userPage.list = [];
         this.loading = true;
 
         // 查询用户
         this.params.keyword = '';
-        this.params.tagId = this.selectedTeam.id;
+        this.params.tagId = this.selectTeam.id;
         this.params.pageNum = 1;
         this.params.selectType = this.selectType;
 
@@ -377,8 +395,8 @@ export default {
           // 判断当前用户是否含有团队信息
           if(!this.isUserHaveTagData) {
             // 判断是否是 搜索状态
-            user.tagId = isSearch ? user.tagInfoList.map(l => l.tagId).join(',') : this.selectedTeam.id;
-            user.tagName = isSearch ? user.tagInfoList.map(l => l.tagName).join(',') : this.selectedTeam.name;
+            user.tagId = isSearch ? user.tagInfoList.map(l => l.tagId).join(',') : this.selectTeam.id;
+            user.tagName = isSearch ? user.tagInfoList.map(l => l.tagName).join(',') : this.selectTeam.name;
           }
 
           for(let j = 0; j < this.chosen.length; j++){
@@ -479,6 +497,7 @@ export default {
           this.teams = teams;
 
           this.initTeamUser(this.teams[0]); // 默认选中第一个
+          this.matchTeam();
         })
         .catch(err => console.error(err))
     },
@@ -506,6 +525,29 @@ export default {
 
       this.loading = false;
       this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
+    },
+    /**  匹配团队 */
+    matchTeam() {
+      if(!this.isMatchTeam) return 
+
+      let teams = this.teams;
+
+      teams.forEach(team => {
+        this.matchTeamToggle(team)
+      });
+
+      this.isMatchTeam = false;
+    },
+    matchTeamToggle(team, checked = true) {
+      let children = team.children || [];
+      let selectTeams = this.selectedTeam;
+      let toggle = (t) => selectTeams.some(s => s.id === t.id);
+
+      this.$set(team, 'isChecked', toggle(team) ? checked : false);
+
+      if(children.length > 0){
+        children.forEach(item => this.matchTeamToggle(item));
+      }
     },
     nodeRender(h, node){
       let content = <span>{node.name}</span>;
@@ -574,7 +616,7 @@ export default {
       if(!this.params.keyword){ // 空值  显示团队
         this.mode = 'choose';
 
-        this.initTeamUser(this.selectedTeam);
+        this.initTeamUser(this.selectTeam);
         return;
       }
 

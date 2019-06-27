@@ -642,7 +642,6 @@ export default {
 
       this.$fast.contact.choose('team', options).then(res => {
         this.userList = res.data;
-        console.log(this.userList)
       })
     }
   },
