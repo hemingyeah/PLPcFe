@@ -146,8 +146,8 @@ export default class FormField{
     
     if (field.setting) {
       setting = {
+        ...field.setting,
         ...setting,
-        ...field.setting
       }
     }
     
