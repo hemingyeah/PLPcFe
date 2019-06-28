@@ -32,19 +32,6 @@ function fillPropForSelect(params){
   return {options, isMulti, dependencies};
 }
 
-/** 补全fileName 为serialNumber时的所需字段 */
-function fillPropForSerialNumber(params){
-  let setting = params.setting || {};
-
-  let serialNumberUnique = false;
-
-  if(params.fieldName == 'serialNumber'){
-    serialNumberUnique = (setting.serialNumberUnique === true);
-  }
-
-  return { serialNumberUnique };
-}
-
 /**
  * 用于表单设计的字段类
  * 后端给出的字段数据需要调用 util.toFormField 转换成该格式
@@ -81,11 +68,6 @@ export default class FormField{
     this.isMulti = isMulti; // 是否为多选
     this.dependencies = dependencies; // 逻辑显示项用
 
-    // 编号 需要补全字段
-    let { serialNumberUnique } = fillPropForSerialNumber(params);
-    this.serialNumberUnique = serialNumberUnique;
-
-    
     this.setting = params.setting || {};
     
     // // 处理客户地址
@@ -138,11 +120,6 @@ export default class FormField{
       setting.isMulti = field.isMulti;
       setting.dataSource = dataSource;
     }
-    // 编号
-    if(field.fieldName == 'serialNumber') {
-      setting.serialNumberUnique = (field.serialNumberUnique || false);
-    }
-
     
     if (field.setting) {
       setting = {

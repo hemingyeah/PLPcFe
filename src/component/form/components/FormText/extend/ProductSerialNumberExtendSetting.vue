@@ -6,7 +6,7 @@
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-      <el-checkbox :value="field.serialNumberUnique" @input="update($event, 'serialNumberUnique')">唯一性验证</el-checkbox>
+      <el-checkbox :value="field.setting.serialNumberUnique" @input="update($event, 'serialNumberUnique')">唯一性验证</el-checkbox>
     </div>
   </div>
 </template>

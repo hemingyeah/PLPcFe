@@ -109,7 +109,6 @@ function createSettingComp(h, field){
         
         if (event.isSetting) {
           field.setting[event.prop] = event.value;
-          field[event.prop] = event.value;
         } else {
           field[event.prop] = event.value;
         }
