@@ -69,7 +69,7 @@ export default class FormField{
     this.dependencies = dependencies; // 逻辑显示项用
 
     this.setting = params.setting || {};
-    
+
     // // 处理客户地址
     if (this.fieldName === 'customerAddress' && this.isSystem && !params.setting.customerAddressConfig) {
       this.setting.customerAddressConfig = {};
@@ -139,6 +139,8 @@ export default class FormField{
     
     if(Object.keys(dependencies).length > 0) {
       setting.dependencies = dependencies;
+    } else {
+      delete setting.dependencies
     }
     
     option.setting = setting;

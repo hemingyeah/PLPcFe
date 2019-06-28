@@ -47,6 +47,9 @@ export default {
         
         fields.forEach(item => {
           item.tableName = 'product';
+          if(item.fieldName == 'serialNumber' && item.isSystem) {
+            item.setting.serialNumberUnique = (item.setting.serialNumberUnique === true);
+          }
         });
 
         let message = FormUtil.validate(fields);
