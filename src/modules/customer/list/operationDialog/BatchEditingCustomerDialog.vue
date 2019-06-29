@@ -1,582 +1,313 @@
 <template>
-  <base-modal title="批量编辑" @closed="reset" :show.sync="batchEditingCustomerDialog" width="500px"
-              class="batch-editing-customer-dialog">
-    <el-form ref="editCustomerForm" :model="form" label-width="100px">
-      <el-form-item label="修改字段">
-        <el-select v-model="selectedFieldName" @change="handleFieldIdChange">
-          <el-option v-for="item in editableFields" :label="item.displayName" :value="item.fieldName"
-                     :key="item.fieldName"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-if="selectedField.formType === 'text' || selectedField.formType === 'code' || selectedField.formType === 'phone' || selectedField.formType === 'email'">
-        <el-input v-model="form[selectedField.fieldName]" :placeholder="selectedField.placeHolder" maxlength="50"
-                  type="text"></el-input>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'address'">
-        <div class="address-picker">
-          <base-dist-picker @input="handleCitySelectorChange" ref="baseDistPicker" :value="form.address.adAddress"></base-dist-picker>
-          <el-button type="button" @click="chooseMap" style="margin-bottom: 10px">地图选址</el-button>
-        </div>
-        <el-input placeholder="" @input="handleAddressChange" :value="form.address.detail" type="text"/>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'tags'">
-        <biz-team-select v-model="form.tags" multiple/>
-        <!-- <el-select
-          v-model="form.tags"
-          multiple
-          filterable
-          clearable
-          placeholder="请输入关键词搜索"
-          @change="selectTag"
-        >
-          <el-option
-            v-for="item in inputRemoteSearch.tag.options"
-            :key="item.id"
-            :label="item.tagName"
-            :value="item.id">
-          </el-option>
-        </el-select> -->
+  <base-modal title="批量编辑" @closed="reset" :show.sync="visible" width="500px" class="batch-editing-customer-dialog">
 
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'manager' || selectedField.formType === 'user'">
-        <el-select
-          v-model="form[selectedFieldName]"
-          filterable
-          remote
-          reserve-keyword
-          placeholder="请输入关键词搜索"
-          clearable
-          :loading="inputRemoteSearch.customerManager.loading"
-          :remote-method="searchCustomerManager">
-          <el-option
-            v-for="item in inputRemoteSearch.customerManager.options"
-            :key="item.userId"
-            :label="item.displayName"
-            :value="item.userId">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'select' && selectedField.setting.isMulti">
-        <el-select v-model="form[selectedField.fieldName]" multiple clearable placeholder="请选择">
-          <el-option
-            v-for="item in selectedField.setting.dataSource"
-            :key="item"
-            :label="item"
-            :value="item">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'select' && !selectedField.setting.isMulti">
-        <el-select v-model="form[selectedField.fieldName]" clearable placeholder="请选择">
-          <el-option
-            v-for="item in selectedField.setting.dataSource"
-            :key="item"
-            :label="item"
-            :value="item">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'textarea'">
-        <el-input v-model="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="textarea"
-                  maxlength="500" rows="10" resize="none"></el-input>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'number'">
-        <el-input v-model.number="form[selectedFieldName]" :placeholder="selectedField.placeHolder" type="number"
-                  maxlength="60"></el-input>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'datetime'">
-        <el-date-picker
-          v-model="form[selectedFieldName]"
-          type="datetime"
-          placeholder="选择日期时间"
-          default-time="12:00:00">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item
-        label="修改为"
-        :prop="selectedFieldName"
-        :key="selectedFieldName"
-        :rules="selectedField.rules"
-        v-else-if="selectedField.formType === 'date'">
-        <el-date-picker
-          v-model="form[selectedFieldName]"
-          type="date"
-          placeholder="选择日期">
-        </el-date-picker>
-      </el-form-item>
-    </el-form>
+    <batch-form :fields="fields" ref="batchForm" :default-address="config.defaultAddress"/>
 
     <div slot="footer" class="dialog-footer">
-      <el-button @click="batchEditingCustomerDialog = false">取 消</el-button>
+      <el-button @click="visible = false">取 消</el-button>
       <el-button type="primary" @click="onSubmit" :disabled="pending">确 定</el-button>
     </div>
   </base-modal>
 </template>
 
 <script>
+
 import {formatDate} from '@src/util/lang';
+import { FormFieldMap,  } from '@src/component/form/components';
+import * as Utils from '@src/component/form/util';
+import * as CustomerApi from '@src/api/CustomerApi';
+import FormItem from '@src/component/form/FormItem.vue';
 
 export default {
   name: 'batch-editing-customer-dialog',
-  data: () => {
-    return {
-      inputRemoteSearch: {
-        tag: {
-          options: [],
-          loading: false,
-        },
-        customerManager: {
-          options: [],
-          loading: false,
-        },
-      },
-      addressBackup: {},
-      form: {
-        cusName: '',
-        lmName: '',
-        lmPhone: '',
-        address: {
-          adAddress: [],
-          detail: '',
-          addressType: 0,
-          latitude: '',
-          longitude: '',
-        },
-        tags: [],
-        manager: '',
-      },
-      selectedFieldName: '',
-      batchEditingCustomerDialog: false,
-      pending: false,
-      editableFields: [],
-      fixedFieldsCount: 6,
-      /** @deprecated */
-      selectedTags: [],
-      formBackup: {},
-    }
-  },
   props: {
+    config: {
+      type: Object,
+      default: () => ({})
+    },
     selectedIds: {
       type: Array,
-      default: () => ([]),
+      default: () => ([])
     },
-    fields: {
-      type: Array,
-      default: () => ([]),
-    },
-    defaultAddress: {
-      type: Array,
-      default: () => ([]),
-    }
+    callback: Function,
   },
-  watch: {
-    defaultAddress: {
-      handler: function(newValue) {
-        this.form.address.adAddress = newValue;
-      },
-      deep: true
-    },
-    form: {
-      handler: function(newValue) {
-        if ((this.selectedField.formType === 'manager' || this.selectedField.formType === 'user') && !newValue[this.selectedField.fieldName]) {
-          this.inputRemoteSearch.customerManager.options = [];
-        }
-      },
-      deep: true
+  data: () => {
+    return {
+      visible: false,
+      pending: false,
     }
   },
   computed: {
-    selectedField() {
-      return this.editableFields.filter(ef => ef.fieldName === this.selectedFieldName)[0] || {};
-    }
-  },
-  mounted() {
-    this.buildFields();
-  },
-  methods: {
-    async onSubmit() {
-      try {
-        const valid = await this.$refs.editCustomerForm.validate();
-        if (!valid) return;
+    fields() {
+      let tv = null;
 
-        this.pending = true;
-        const params = this.buildParams();
-
-        const res = await this.$http.post('/customer/editBatch', params, false);
-
-        if (res.status === 0) {
-          this.$emit('submit-callback');
-        }
-
-        if (res.status === 1 && res.message) {
-          this.$platform.alert(res.message);
-        }
-
-        this.batchEditingCustomerDialog = false;
-        this.pending = false;
-      } catch (e) {
-        if (e !== false) {
-          this.batchEditingCustomerDialog = false;
-          this.pending = false;
-        }
-        console.error('onSubmit editBatch catch e', e);
-      }
-    },
-    reset() {
-      this.selectedFieldName = this.editableFields[0].fieldName;
-      this.form = JSON.parse(JSON.stringify(this.formBackup));
-      this.$refs.editCustomerForm.resetFields();
-    },
-    handleAddressChange(val) {
-      const newVal = {
-        adAddress: this.form.address.adAddress,
-        detail: val,
-        latitude: '',
-        longitude: '',
-        addressType: 0,
-      };
-
-      if (this.diffAddress(newVal, this.addressBackup)) {
-        this.form.address = this.addressBackup;
-      }
-      this.form.address = newVal;
-    },
-    handleCitySelectorChange(val) {
-      const newVal = {
-        detail: this.form.address.detail,
-        adAddress: val,
-        latitude: '',
-        longitude: '',
-        addressType: 0,
-      };
-
-      if (this.diffAddress(newVal, this.addressBackup)) {
-        this.form.address = this.addressBackup;
-      }
-      this.form.address = newVal;
-    },
-    diffAddress(newVal, oldVal) {
-      if (newVal.detail === oldVal.detail &&
-          newVal.adAddress.toString() === oldVal.adAddress.toString()) {
-        return true;
-      }
-      return false;
-    },
-    handleFieldIdChange() {
-      this.$nextTick(() => {
-        this.form = JSON.parse(JSON.stringify(this.formBackup));
-        this.$refs.editCustomerForm.resetFields();
-        // if (this.selectedFieldName === 'manager') {
-        //   this.searchCustomerManager();
-        // }
-        // if (this.selectedFieldName === 'tags') {
-        //   this.searchTag();
-        // }
-      });
-    },
-    openBatchEditingCustomerDialog() {
-      if (!this.selectedIds.length) {
-        return this.$platform.alert('请选择需要批量编辑的客户');
-      }
-      this.batchEditingCustomerDialog = true;
-      this.buildDynamicField();
-      this.searchTag();
-    },
-    /** @deprecated */
-    selectTag(val) {
-      const ts = this.inputRemoteSearch.tag.options;
-      this.selectedTags = ts
-        .filter(t => val.some(v => v === t.id))
-        .map(t => ({
-          id: t.id,
-          tagName: t.tagName,
-        }));
-    },
-    chooseMap() {
-      let defaultArea = this.form.address.adAddress.filter(a => a !== '郊县' && a !== '市辖区' && a.indexOf('其他') === -1);
-
-      this.$fast.map.picker({}, { defaultArea: defaultArea[defaultArea.length - 1]}).then(result => {
-
-        if (result.status === 1) return;
-
-        const { province, city, dist, address, latitude, longitude} = result.data;
-
-        const newVal = {
-          adAddress: [ province, city, dist,],
-          detail: address,
-          latitude,
-          longitude,
-          addressType: 1,
-        };
-        this.form.address = newVal;
-        this.addressBackup = newVal;
-      })
-        .catch(err => console.error(err));
-    },
-    buildDynamicField() {
-      if (this.editableFields.length > this.fixedFieldsCount) return;
       let formTypes = ['attachment', 'separator', 'location', 'info'];
 
-      const customizedField = this.fields
-        .filter(f => {
-          return (
-            f.isSystem === 0
-            && formTypes.indexOf(f.formType) < 0
-          )
-        })
+      let fields = (this.config.fields || [])
+        .filter(f => (
+          f.fieldName !== 'serialNumber' &&
+          formTypes.indexOf(f.formType) < 0
+        ))
         .map(f => {
-          if (f.formType === 'select' && f.setting.isMulti) {
-            this.$set(this.form, f.fieldName, []);
-          } else {
-            this.$set(this.form, f.fieldName, null);
+          tv = Object.assign({}, f);
+
+          if (tv.formType === 'address' && tv.isSystem) {
+            tv.displayName = '客户地址';
+            tv.fieldName = 'address';
           }
 
-          if (!f.isNull) {
-            f.rules = [{
-              required: true, message: `请输入${f.displayName}`, trigger: ['blur', 'change']
-            },];
+          if (tv.fieldName === 'name') {
+            tv.fieldName = 'cusName';
           }
 
-          if (f.formType === 'select' && !f.isNull) {
-            f.rules = [{
-              required: true, message: '必须选择一个选项', trigger: ['blur', 'change']
-            },];
-          } else if (f.formType === 'selectMulti' && !f.isNull) {
-            f.rules = [{
-              required: true, message: '请至少选择一个选项', trigger: ['blur', 'change']
-            },];
-          } else if (f.formType === 'number') {
-            f.rules = [{
-              required: !f.isNull,
-              message: `请输入${f.displayName}`, trigger: ['blur', 'change']
-            }, {
-              type: 'number',
-              message: `请输入数字`, trigger: ['blur', 'change']
-            }];
-          } else if (f.formType === 'phone') {
-            f.rules = [{
-              required: true, message: `请输入电话`, trigger: ['blur', 'change']
-            }, {
-              trigger: ['blur', 'change'],
-              validator(rule, value, callback) {
-                const reg = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
-                if (!reg.test(value)) {
-                  callback(new Error('请输入正确的电话'));
-                }
-                callback();
-              }
-            }, {
-              trigger: ['blur', 'change']
-            }]
-          } else if (f.formType === 'email') {
-            f.rules = [{
-              required: true, message: `请输入邮箱`, trigger: ['blur', 'change']
-            }, {
-              trigger: ['blur', 'change'],
-              validator(rule, value, callback) {
-                const reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
-                if (!reg.test(value)) {
-                  callback(new Error('请输入正确的邮箱'));
-                }
-                callback();
-              }
-            }, {
-              trigger: ['blur', 'change']
-            }]
+          if (tv.isSystem) {
+            tv.orderId -= 100;
           }
 
-          return f;
-        });
+          tv.isNull = 0;
+          return Object.freeze(tv);
+        })
 
-      this.formBackup = JSON.parse(JSON.stringify(this.form));
-      this.editableFields = [...this.editableFields, ...customizedField];
+      if (!fields || !fields.length) return [];
+
+      return fields.sort((a, b) => a.orderId - b.orderId);
     },
-    buildFields() {
-      let fixedFields = [{
-        fieldName: "cusName",
-        formType: "text",
-        displayName: '客户名称',
-        rules: [{
-          required: true, message: `请输入客户名称`, trigger: ['blur', 'change']
-        },]
-      }, {
-        fieldName: "lmName",
-        formType: "text",
-        displayName: '联系人',
-        rules: [{
-          required: true, message: `请输入联系人`, trigger: ['blur', 'change']
-        },]
-      }, {
-        fieldName: "lmPhone",
-        formType: "text",
-        displayName: '电话',
-        rules: [{
-          required: true, message: `请输入电话`, trigger: ['blur', 'change']
-        }, {
-          trigger: ['blur', 'change'],
-          validator(rule, value, callback) {
-            const reg = /^(((0\d{2,3}-{0,1})?\d{7,8})|(1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
-            if (!reg.test(value)) {
-              callback(new Error('请输入正确的电话'));
-            }
-            callback();
-          }
-        }, {
-          trigger: ['blur', 'change']
-        }]
-      }, {
-        fieldName: "address",
-        formType: "address",
-        displayName: '客户地址',
-        rules: [{
-          trigger: ['blur', 'change'],
-          validator(rule, value, callback) {
-            if (value.adAddress.length < 2 || !value.detail) {
-              callback(new Error('请输入客户地址'));
-            }
+  },
+  mounted() {
+    this.$el.addEventListener('form.add.field', this.addFieldHandler);
+  },
+  beforeDestroy() {
+    this.$el.removeEventListener('form.add.field', this.addFieldHandler);
+  },
+  methods: {
+    addFieldHandler(event) {
+      this.validate = event.detail.validate;
+    },
+    async onSubmit() {
+      if (await this.validate()) return;
 
-            callback();
-          }
-        }]
-      }, {
-        fieldName: "tags",
-        formType: "tags",
-        displayName: '服务团队',
-        rules: [{
-          trigger: ['blur', 'change'],
-          required: true, message: '请选择服务团队',
-        }]
-      }, {
-        fieldName: "manager",
-        formType: "manager",
-        displayName: '客户负责人',
-        rules: [{
-          trigger: ['change'],
-          required: true, message: '请选择客户负责人',
-        }]
+      const params = this.buildParams();
+      this.pending = true;
 
-      }];
+      CustomerApi.batchEditCustomer(params)
+        .then(res => {
+          const failure = res.status;
 
-      this.editableFields = [...fixedFields];
-      this.selectedFieldName = this.editableFields[0].fieldName;
+          this.pending = false;
+          this.$platform.notification({
+            type: !failure ? 'success' : 'error',
+            title: `批量编辑客户${!failure ? '成功' : '失败'}`,
+            message: !failure ? null : res.message
+          });
+
+          if (failure) return;
+          this.visible = false;
+          this.callback && this.callback();
+        })
+        .catch(e => console.error('e', e));
+    },
+    reset() {
+      // todo reset
+    },
+    open() {
+      this.visible = true;
     },
     buildParams() {
       let tv = null;
+      const {form, selectedField: sf} = this.$refs.batchForm.returnData()
+
       let params = {
         mapJson: JSON.stringify({
-          [this.selectedFieldName]: this.form[this.selectedFieldName],
+          [sf.fieldName]: form[sf.fieldName],
         }),
         ids: this.selectedIds.join(','),
       };
 
       if (this.selectedFieldName === 'tags') {
         params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: this.form.tags.map(({id, tagName}) => ({id, tagName}))
+          [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
       }
-      if (this.selectedFieldName === 'manager' || this.selectedField.formType === 'user') {
-        tv = this.inputRemoteSearch.customerManager.options
-          .filter(cm => cm.userId === this.form[this.selectedFieldName])[0] || {};
+      if (sf.fieldName === 'manager' || sf.formType === 'user') {
+        tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: {
+          [sf.fieldName]: {
             id: tv.userId,
             name: tv.displayName,
           },
         })
       }
-      if (this.selectedField.formType === 'datetime') {
-        tv = this.form[this.selectedFieldName];
+      if (sf.formType === 'datetime') {
+        tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD HH:mm:ss'),
+          [sf.fieldName]: formatDate(tv, 'YYYY-MM-DD HH:mm:ss'),
         })
       }
-      if (this.selectedField.formType === 'date') {
-        tv = this.form[this.selectedFieldName];
+      if (sf.formType === 'date') {
+        tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: formatDate(tv, 'YYYY-MM-DD'),
+          [sf.fieldName]: formatDate(tv, 'YYYY-MM-DD'),
         })
       }
 
-      if (this.selectedField.formType === 'address') {
-        tv = this.form[this.selectedFieldName];
-        params.mapJson = JSON.stringify({
-          [this.selectedFieldName]: {
-            province: tv.adAddress[0] || '',
-            city: tv.adAddress[1] || '',
-            dist: tv.adAddress[2] || '',
-            address: tv.detail,
-            addressType: tv.addressType,
-            latitude: tv.latitude,
-            longitude: tv.longitude,
-          },
-        })
-      }
       return params;
     },
-    searchTag(keyword) {
-      this.inputRemoteSearch.tag.loading = true;
-      this.$http.get('/task/tag/list', {keyword: keyword, pageNum: 1, pageSize: 100 * 100, })
-        .then(res => {
-          this.inputRemoteSearch.tag.options = res.list;
-          this.inputRemoteSearch.tag.loading = false;
-        })
-        .catch(err => console.error('searchTag function catch err', err));
-    },
-    searchCustomerManager(keyword) {
-      this.inputRemoteSearch.customerManager.loading = true;
-      this.$http.get('/customer/userTag/list', {keyword: keyword, pageNum: 1,})
-        .then(res => {
-          this.inputRemoteSearch.customerManager.options = res.list;
-          this.inputRemoteSearch.customerManager.loading = false;
-        })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
+
   },
+  components: {
+    BatchForm: {
+      name: 'batch-form',
+      props: {
+        fields: {
+          type: Array,
+          default: () => ([])
+        },
+        defaultAddress: {
+          type: Array,
+          default: () => ([])
+        }
+      },
+      data:() => {
+        return {
+          selectedField: {},
+          form: {},
+        }
+      },
+      methods: {
+        returnData() {
+          return {
+            selectedField: this.selectedField,
+            form: Object.assign({}, this.form)
+          }
+        },
+        dispatch({type, bubbles = false, params = {}}) {
+          const _dom = Array.prototype.slice.call(this.$el.children)
+            .filter(d => /form-item/g.test(d.className))[0];
+          _dom.dispatchEvent(new CustomEvent(type, {detail: params, bubbles}));
+        },
+        buildForm() {
+          if (Object.keys(this.form).length === this.fields.length) return;
+          this.selectField(this.fields[0].fieldName)
+          this.form = Utils.initialize(this.fields);
+        },
+        update(event) {
+          /**
+           * 选择团队使用的是单独的组件，不是统一的form组件，所以更新时的返回值不同，需要特殊处理
+           */
+          if (this.selectedField.fieldName === 'tags') {
+            this.form[this.selectedField.fieldName] = event;
+            return
+          }
+
+          const f = event.field;
+          this.form[f.fieldName] = event.newValue;
+        },
+        selectField(val) {
+          this.selectedField = this.fields.filter(f => f.fieldName === val)[0];
+
+          /**
+           * 1、切换的字段是系统地址时，根据默认值设置
+           * 2、切换字段的时候，重新注册一遍，是因为： 切换前后两个字段类型相同，不会触发字段的组件的重新注册，form-item 的 field 就不会更新，还是切换之前的 field
+           */
+
+          if (this.selectedField.formType === 'address' && this.selectedField.isSystem) {
+            let [province, city, dist] = this.defaultAddress;
+            this.form[this.selectedField.fieldName] = {
+              province: province || '',
+              city: city || '',
+              dist: dist || ''
+            }
+          }
+
+
+          this.dispatch({
+            type: 'form.add.field',
+            params: {
+              value: () => this.form[this.selectedField.fieldName],
+              field: this.selectedField,
+              fieldName: this.selectedField.fieldName
+            }
+          })
+
+          this.dispatch({
+            type: 'form.clear.validate',
+          })
+        },
+        renderSelector() {
+          if (!this.fields) return null;
+          return (
+            <el-select value={this.selectedField.fieldName} placeholder="请选择需要修改的字段" onChange={this.selectField}>
+              {this.fields.map(f => (
+                <el-option
+                  key={f.fieldName}
+                  label={f.displayName}
+                  value={f.fieldName}>
+                </el-option>
+              ))}
+            </el-select>
+          )
+        },
+
+        renderInput(h) {
+          const sf = this.selectedField;
+
+          if (!sf.formType) return null;
+
+          if (sf.fieldName === 'tags') {
+            return h(
+              'biz-team-select',
+              {
+                props: {
+                  multiple: true,
+                  value: this.form[sf.fieldName],
+                },
+                on: {
+                  input: event => this.update(event)
+                }
+              }
+            )
+          }
+
+          const comp = FormFieldMap.get(sf.formType);
+          const data = {
+            props: {
+              field: sf,
+              value: this.form[sf.fieldName],
+              placeholder: Utils.genPlaceholder(sf),
+            },
+            on: {
+              update: event => this.update(event)
+            }
+          };
+
+          if (sf.formType === 'address' && !sf.isSystem) {
+            data.props.disableMap = true;
+          }
+
+          return h(comp.build, data);
+        }
+      },
+      render(h) {
+        this.buildForm();
+        return (
+          <div>
+            <div class="item">
+              <label class="form-name">修改字段</label>
+              <div>{this.renderSelector()}</div>
+            </div>
+            <form-item label={'修改为'}>
+              {this.renderInput(h)}
+            </form-item>
+          </div>
+        )
+      }
+    },
+    components: {
+      [FormItem.name]: FormItem,
+    }
+  }
+
 }
 </script>
 
@@ -588,34 +319,47 @@ export default {
       padding: 10px 30px 0;
     }
 
-    .el-form-item.is-required .el-form-item__label:before {
-      content: '';
+    .form-name, .form-item label {
+      width: 70px;
+      padding: 0;
+      line-height: 32px;
     }
 
-    .el-form-item {
-      margin: 0;
-
-      .el-select, .el-date-editor.el-input {
-        width: 100%;
-      }
-      .base-dist-picker {
-        margin-bottom: 10px;
-      }
-
-      .el-form-item__error {
-        line-height: 24px;
-      }
-    }
-
-    .address-picker {
+    .item {
       display: flex;
       justify-content: space-between;
-
-      .el-cascader {
-        width: 250px;
+      line-height: 32px;
+      div {
+        flex-grow: 1;
+        .el-select {
+          width: 100%;
+        }
       }
-
     }
+
+
+    /*.address-picker {*/
+      /*display: flex;*/
+      /*justify-content: space-between;*/
+
+      /*.base-dist-picker {*/
+        /*flex-grow: 1;*/
+        /*!*padding-right: 10px;*!*/
+        /*.el-cascader {*/
+          /*width: 100%;*/
+        /*}*/
+      /*}*/
+    /*}*/
+
+    /*.address-picker {*/
+      /*display: flex;*/
+      /*justify-content: space-between;*/
+
+      /*.el-cascader {*/
+        /*width: 250px;*/
+      /*}*/
+
+    /*}*/
 
     .dialog-footer {
       display: flex;

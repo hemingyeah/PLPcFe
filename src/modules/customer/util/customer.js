@@ -48,6 +48,11 @@ export function packToCustomer(fields, form, initTags){
       customer.customerManagerName = value.displayName || ''
       return;
     }
+    
+    if (field.formType === 'address' && !field.isSystem) {
+      value.all = value.province + value.city + value.dist + value.address;
+    }
+    
 
     isSystem == 0
       ? customer.attribute[fieldName] = value

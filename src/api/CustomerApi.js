@@ -128,4 +128,15 @@ export function computeSendNum(params) {
   return http.get('/customer/computeSendNum', params)
 }
 
+/**
+ * 批量编辑客户的某个字段
+ * @param {Object} params - 参数
+ * @param {String} params params.ids - 客户ids
+ * @param {String} params params.mapJson - 修改值
+ * @returns {*}
+ */
+export  function batchEditCustomer(params) {
+  return http.post('/customer/editBatch', params, false);
+}
+
 

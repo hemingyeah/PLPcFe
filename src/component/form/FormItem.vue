@@ -110,19 +110,23 @@ export default {
     changeStatus(value){
       this.status = !!value;
     },
+    resetValidationStatus() {
+      this.errMessage = '';
+    },
     getValidator(){
       if(typeof this.validation == 'function') return this.validation;
-
       return this.field.validator;
     }
   },
   mounted() {
-    this.$el.addEventListener('form.validate', this.validateHandler);
     this.$el.addEventListener('form.add.field', this.addFieldHandler);
+    this.$el.addEventListener('form.validate', this.validateHandler);
+    this.$el.addEventListener('form.clear.validate', this.resetValidationStatus);
     this.$el.addEventListener('form.remove.field', this.removeFieldHandler);
   },
   destroyed() {
     this.$el.removeEventListener('form.validate', this.validateHandler)
+    this.$el.removeEventListener('form.clear.validate', this.resetValidationStatus)
     this.$el.removeEventListener('form.add.field', this.addFieldHandler);
     this.$el.removeEventListener('form.remove.field', this.removeFieldHandler)
   }

@@ -200,6 +200,10 @@
                   </el-option>
                 </el-select>
               </template>
+              <template v-else-if="field.formType === 'address'">
+                <base-dist-picker v-model="params.customizedSearchModel[field.fieldName]['value'].selector"></base-dist-picker>
+                <el-input v-model="params.customizedSearchModel[field.fieldName]['value'].address" :placeholder="field.placeHolder" style="margin-top: 8px;"></el-input>
+              </template>
               <template v-else>
                 <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
                           :placeholder="field.placeHolder"></el-input>
@@ -353,6 +357,11 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
+
+            <template v-else-if="column.formType === 'address'">
+              {{formatCustomizeAddress(scope.row.attribute[column.field])}}
+            </template>
+
             <template v-else-if="column.isSystem === 0">
               {{scope.row.attribute[column.field]}}
             </template>
@@ -390,9 +399,8 @@
     <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
-      :fields="customerConfig.fieldInfo"
-      :default-address="defaultAddress"
-      @submit-callback="search"
+      :config="{fields: customerConfig.fieldInfo, defaultAddress: defaultAddress}"
+      :callback="search"
       :selected-ids="selectedIds"
     >
     </batch-editing-customer-dialog>
@@ -849,6 +857,13 @@ export default {
       return [adProvince, adCity, adDist, ]
         .filter(d => !!d).join('-');
     },
+    formatCustomizeAddress(ad) {
+      if (null == ad) return '';
+
+      const {province, city, dist, address} = ad;
+      return [province, city, dist, address]
+        .filter(d => !!d).join('-');
+    },
     remindSuccess(ids) {
       let tv = false;
       if (!ids || !ids.length) return;
@@ -878,10 +893,19 @@ export default {
               storageData[f.fieldName].value = storageData[f.fieldName].value && storageData[f.fieldName].value.map(t => new Date(t));
             }
 
+            let value = storageData[f.fieldName] ? storageData[f.fieldName].value : null;
+
+            if (f.formType === 'address' && !f.isSystem) {
+              value = {
+                selector: [],
+                address: '',
+              }
+            }
+
             // 需要搜索的字段
             this.$set(this.params.customizedSearchModel, f.fieldName, {
               fieldName: f.fieldName,
-              value: storageData[f.fieldName] ? storageData[f.fieldName].value : null,
+              value,
               operator: this.matchOperator(f),
               formType: f.formType,
             });
@@ -890,7 +914,10 @@ export default {
 
           return f;
         });
+
       this.columns = this.buildTableColumn();
+
+      return this.params.customizedSearchModel;
     },
     jumpPage() {
       window.TDAPP.onEvent('pc：客户管理-新建事件');
@@ -1042,6 +1069,14 @@ export default {
               betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
               betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
             });
+          }
+
+          if (tv.formType === 'address' && (tv.value.selector.length || tv.address)) {
+            return conditions.push({
+              property: tv.fieldName,
+              operator: tv.operator,
+              value: tv.value.selector.filter(a => !!a).join('') + (tv.value.address || ''),
+            })
           }
 
           if (tv.value) {
@@ -1225,7 +1260,7 @@ export default {
           isNotOnCurrentPage = this.customers.every(item => {
             return item.id !== row.id;
           })
-          if(isNotOnCurrentPage) return 
+          if(isNotOnCurrentPage) return
         }
         rows.forEach(row => {
           this.$refs.multipleTable.toggleRowSelection(row);
@@ -1247,7 +1282,7 @@ export default {
       if (category === 'edit') {
         window.TDAPP.onEvent('pc：客户管理-批量编辑事件');
 
-        this.$refs.batchEditingCustomerDialog.openBatchEditingCustomerDialog();
+        this.$refs.batchEditingCustomerDialog.open();
       }
       if (category === 'remind') {
         window.TDAPP.onEvent('pc：客户管理-批量提醒事件');
@@ -1425,7 +1460,16 @@ export default {
       this.params.specialSearchModel.adAddress = '';
 
       for (let key in this.params.customizedSearchModel) {
-        this.params.customizedSearchModel[key].value = null;
+
+        if (this.params.customizedSearchModel[key].formType !== 'address') {
+          this.params.customizedSearchModel[key].value = null;
+        } else {
+          this.params.customizedSearchModel[key].value = {
+            selector: [],
+            address: '',
+
+          };
+        }
       }
 
       this.inputRemoteSearch.linkman.options = [];
@@ -1512,6 +1556,9 @@ export default {
         break;
       case 'location':
         operator = 'location';
+        break;
+      case 'address':
+        operator = 'address';
         break;
       default:
         operator = 'like';

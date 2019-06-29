@@ -29,9 +29,8 @@ const BaseFormField = [
   FormPhone,
   FormEmail,
   FormSeparator,
-  // FormAddress,
+  FormAddress,
   FormLocation,
-  // FormLocation,
   FormInfo
 ];
 
