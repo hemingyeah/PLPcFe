@@ -102,12 +102,13 @@ export default {
 
           if (failure) return;
           this.visible = false;
+          this.reset();
           this.callback && this.callback();
         })
         .catch(e => console.error('e', e));
     },
     reset() {
-      // todo reset
+      this.$refs.batchForm.reset();
     },
     open() {
 
@@ -180,7 +181,7 @@ export default {
         }
       },
       mounted() {
-        this.selectField(this.fields[0].fieldName)
+        this.reset()
       },
       methods: {
         returnData() {
@@ -188,6 +189,10 @@ export default {
             selectedField: this.selectedField,
             form: Object.assign({}, this.form)
           }
+        },
+        reset() {
+          this.form = {};
+          this.selectField(this.fields[0].fieldName)
         },
         dispatch({type, bubbles = false, params = {}}) {
           const _dom = Array.prototype.slice.call(this.$el.children)

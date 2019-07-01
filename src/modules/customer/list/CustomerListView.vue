@@ -399,7 +399,7 @@
     <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
-      :config="{fields: customerConfig.fieldInfo, defaultAddress: defaultAddress}"
+      :config="{fields: initData.fieldInfo, defaultAddress: defaultAddress}"
       :callback="search"
       :selected-ids="selectedIds"
     >
@@ -508,6 +508,12 @@ import TeamMixin from '@src/mixins/teamMixin';
 export default {
   name: 'customer-list-view',
   mixins: [TeamMixin],
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    },
+  },
   data() {
     return {
       // self state
@@ -598,7 +604,6 @@ export default {
       // data from remote
       customers: [],
       columns: this.fixedColumns(),
-      customerConfig: {},
       searchFields: [],
       inputRemoteSearch: {
         linkman: {
@@ -619,10 +624,7 @@ export default {
         },
       },
       selectedLimit: 200,
-      auth: {},
-      smsRest: 0,
       columnNum: 1,
-      initData: {},
       filterTeams: [],
     };
   },
@@ -669,6 +671,20 @@ export default {
     },
     panelWidth() {
       return `${420 * this.columnNum}px`;
+    },
+    customerConfig() {
+      let initData = this.initData
+      return {
+        customerAddressConfig: initData.customerAddressConfig,
+        customerConfig: initData.customerConfig,
+        fieldInfo: (initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId)
+      }
+    },
+    auth() {
+      return this.initData.auth || {}
+    },
+    smsRest() {
+      return this.initData.smsRest || 0;
     }
   },
   filters: {
@@ -692,19 +708,8 @@ export default {
     },
   },
   mounted() {
-    let initData = JSON.parse(window._init) || {};
-
-    this.customerConfig = {
-      customerAddressConfig: initData.customerAddressConfig,
-      customerConfig: initData.customerConfig,
-      fieldInfo: (initData.fieldInfo || []).sort((a, b) => a.orderId - b.orderId)
-    };
     const {adProvince, adCity, adDist, } = this.customerConfig.customerAddressConfig;
     this.defaultAddress = [adProvince, adCity, adDist, ];
-
-    this.auth = initData.auth || {};
-    this.smsRest = initData.smsRest || 0;
-
 
     this.revertSearchParams();
     this.buildConfig(this.paramsBackup.customizedSearchModel);
