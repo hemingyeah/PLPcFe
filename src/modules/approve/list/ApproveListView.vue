@@ -310,7 +310,8 @@ export default {
   data () {
     return {
       approveDataList: [],
-      columns: this.getFixedColumns(),
+      // columns: this.getFixedColumns(),
+      columns: [],
       pageInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -504,8 +505,10 @@ export default {
           }
           return c;
         });
-      let columnIsShow = this.columns.filter(c => c.show).map(c => c.field);
+      let columnIsShow = this.columns.filter(c => c.show);
+      let columnIsShowIds = columnIsShow.map(field => field.field)
       this.saveDataToStorage('columnStatus', columnIsShow);
+      // this.saveDataToStorage('columnStatusIds', columnIsShowIds);
     },
     /**
      * 获取审批页缓存数据
@@ -517,14 +520,15 @@ export default {
       const approveData = JSON.parse(approveDataStr);
       return approveData[key];
     },
-    getLocalStorageConfig () {
-      const data = localStorage.getItem(KEY_MAP.APPROVE_LIST_VIEW) || '{}';
-      return JSON.parse(data)
-    },
+    /**
+     * 存数据到当页储存中
+     */
     saveDataToStorage (key, value) {
-      const data = this.getLocalStorageData(key) || {};
-      data[key] = value;
-      localStorage.setItem(KEY_MAP.APPROVE_LIST_VIEW, JSON.stringify(data));
+      const configDataStr = localStorage.getItem(KEY_MAP.APPROVE_LIST_VIEW) || '{}';
+      const configData = JSON.parse(configDataStr);
+
+      configData[key] = value;
+      localStorage.setItem(KEY_MAP.APPROVE_LIST_VIEW, JSON.stringify(configData));
     },
     handleSelection (selection) {
       // this.multipleSelection = selection.map(({id}) => id)
@@ -751,6 +755,23 @@ export default {
         remark: '',
         id: row.id
       }
+    },
+    /**
+     * 尝试从本地存储中恢复数据
+     * - 列表列显隐藏配置
+     * - 分页大小
+     */
+    recoverConfigByStorage () {
+      try {
+        const columns = this.getLocalStorageData('columnStatus');
+        const pageSize = this.getLocalStorageData('pageSize');
+        
+        this.columns = (columns && columns.length) ? columns : this.getFixedColumns();
+        this.pageInfo.pageSize = pageSize || 10;
+      } catch (e) {
+        console.error('approveListRecoverStorageConfig error', e);
+        this.columns = this.getFixedColumns();
+      }
     }
   },
   computed: {
@@ -762,12 +783,10 @@ export default {
     }
   },
   mounted () {
+    this.recoverConfigByStorage();
     // let initData = JSON.parse(window._init || {});
     // this.auth = initData.auth || {};
-    const localStorage = this.getLocalStorageConfig()
-    console.log('localConfig', localStorage)
 
-    console.log(window.frameElement)
     this.doSearch();
   }
 }
