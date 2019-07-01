@@ -216,9 +216,9 @@
       <h3 slot="title">
         <span>已选中数据{{ multipleSelection.length }}</span>
         <i v-if="multipleSelection.length > 0"
-          class="iconfont icon-qingkongshanchu approve-panel-btn"
-          @click="toggleSelection()"
-          title="清空已选中数据" data-placement="right" v-tooltip
+           class="iconfont icon-qingkongshanchu approve-panel-btn"
+           @click="toggleSelection()"
+           title="清空已选中数据" data-placement="right" v-tooltip
         ></i>
       </h3>
       <div class="approve-selected-panel">
@@ -381,7 +381,7 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            start.setTime(start.getTime() - (3600 * 1000 * 24 * 7));
             picker.$emit('pick', [start, end]);
           }
         }, {
@@ -389,7 +389,7 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            start.setTime(start.getTime() - (3600 * 1000 * 24 * 30));
             picker.$emit('pick', [start, end]);
           }
         }, {
@@ -397,12 +397,11 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            start.setTime(start.getTime() - (3600 * 1000 * 24 * 90));
             picker.$emit('pick', [start, end]);
           }
         }]
       },
-      pageInfo: {},
       multipleSelection: [],
       auth: {},
       selectedLimit: 200,
@@ -422,7 +421,7 @@ export default {
       }
     },
     searchBtnHandler () {
-
+      return '';
     },
     doSearch (params = this.params) {
       this.ui.loadingListData = true;
@@ -435,7 +434,7 @@ export default {
           this.pageInfo.pageNum = 1;
           return res
         }
-        const {pages, total, pageNum, list} = res;
+        const {pages, total, pageNum} = res;
 
         this.approveDataList = res.list;
         this.pageInfo.totalItems = total;
@@ -445,7 +444,7 @@ export default {
         this.matchSelected();
       }).catch((e) => {
         this.ui.loadingListData = false;
-        console.log('get approve list error', e);
+        console.info('get approve list error', e);
       })
     },
     resetParams () {
@@ -506,7 +505,7 @@ export default {
           return c;
         });
       let columnIsShow = this.columns.filter(c => c.show);
-      let columnIsShowIds = columnIsShow.map(field => field.field)
+      // let columnIsShowIds = columnIsShow.map(field => field.field)
       this.saveDataToStorage('columnStatus', columnIsShow);
       // this.saveDataToStorage('columnStatusIds', columnIsShowIds);
     },
@@ -588,8 +587,8 @@ export default {
         this.toggleSelection(selected);
       });
     },
-    sortChange () {
-
+    sortChange (e) {
+      console.info('sortChange', e);
     },
     clearSelection () {
       this.toggleSelection();
@@ -606,41 +605,41 @@ export default {
     },
     changeStatus (status) {
       this.params.status = status;
-      console.log('status change', status)
+      console.info('status change', status)
     },
     inputSearchInitiator (e) {
       return ApproveApi.getInitiatorList({keyword: e.keyword, pageNum: e.pageNum, pageSize: e.pageSize})
-          .then(res => {
-            if (!res || !res.list) return;
-            res.list = res.list.map(item => Object.freeze({
-              label: item.displayName,
-              value: item.userId, // todo 联调时一定要注意字段是否不同, 如下
-              ...item
-            }))
-            return res;
-          })
-          .catch(err => console.log('searchInitiator function catch err', err))
+        .then(res => {
+          if (!res || !res.list) return;
+          res.list = res.list.map(item => Object.freeze({
+            label: item.displayName,
+            value: item.userId, // todo 联调时一定要注意字段是否不同, 如下
+            ...item
+          }))
+          return res;
+        })
+        .catch(err => console.info('searchInitiator function catch err', err))
     },
     searchEventType (e = {}) {
       return ApproveApi.getEventTypeList({keyword: e.keyword, pageNum: e.pageNum, pageSize: e.pageSize})
-          .then(res => {
-            if (!res || !res.list) return;
-            if (res.list) {
-              res.list = res.list.map(eventType => Object.freeze({
-                label: eventType.name,
-                value: eventType.id,
-                ...eventType
-              }))
-            }
-            return res;
-          })
-          .catch(err => console.log('searchEventType function catch err', err))
+        .then(res => {
+          if (!res || !res.list) return;
+          if (res.list) {
+            res.list = res.list.map(eventType => Object.freeze({
+              label: eventType.name,
+              value: eventType.id,
+              ...eventType
+            }))
+          }
+          return res;
+        })
+        .catch(err => console.info('searchEventType function catch err', err))
     },
     /**
      * 角色变更时处理方法 
      */
     roleChangeHandler (event) {
-      console.log('changeRole', event);
+      console.info('changeRole', event);
     },
     /**
      * 导出validate
@@ -649,15 +648,13 @@ export default {
       let exportAll = !ids || ids.length === 0;
       return exportAll && this.pageInfo.totalItems > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
     },
-    buildConfig () {
-      const storageData = storage || {};
-      
-    },
+
     buildTableColumn () {
-      const localStorageData = this.getLocalStorageData();
-      let columnStatus = localStorageData.columnStatus || [];
-      let localColumns = columnStatus
-        .map(i => typeof i === 'string')
+      return '';
+      // const localStorageData = this.getLocalStorageData();
+      // let columnStatus = localStorageData.columnStatus || [];
+      // let localColumns = columnStatus
+      //   .map(i => typeof i === 'string')
     },
     getFixedColumns () {
       return [
@@ -714,7 +711,6 @@ export default {
       this.$platform.openTab(tabOptions)
     },
     showApproverDetail (row) {
-      console.log('approver d', row)
       let fromId = window.frameElement.getAttribute('id');
       let testId = 'cf12d356-4130-11e7-a318-00163e304a25'
       this.$platform.openTab({
@@ -753,7 +749,6 @@ export default {
       this.tempApproveApply = {
         result: 'success',
         remark: '',
-        id: row.id
       }
     },
     /**
@@ -948,13 +943,6 @@ export default {
         .left-btn-group {
           display: flex;
           flex-wrap: nowrap;
-          .status-btn {
-          }
-          .status-active {
-          }
-        }
-
-        .right-btn-group {
         }
 
         .top-btn-group .base-button {
