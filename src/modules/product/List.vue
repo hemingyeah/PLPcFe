@@ -122,6 +122,9 @@
                 </div>
               </template>
             </template>
+            <template v-else-if="column.formType === 'address'">
+              {{formatCustomizeAddress(scope.row.attribute[column.field])}}
+            </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
               {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
             </template>
@@ -363,11 +366,11 @@
 
 
     <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
+
     <batch-editing-dialog
       ref="batchEditingDialog"
-      :fields="productFields"
-      :product-types="productTypes"
-      @submit-callback="search"
+      :config="{fields: productFields, productTypes: productTypes}"
+      :callback="search"
       :selected-ids="selectedIds"></batch-editing-dialog>
 
     <batch-reminding-dialog ref="batchRemindingDialog" :selected-ids="selectedIds"></batch-reminding-dialog>
@@ -713,6 +716,13 @@ export default {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
+    formatCustomizeAddress(ad) {
+      if (null == ad) return '';
+
+      const {province, city, dist, address} = ad;
+      return [province, city, dist, address]
+        .filter(d => !!d).join('-');
+    },
     showAdvancedSetting(){
       window.TDAPP.onEvent('pc：产品管理-选择列事件');
       this.$refs.advanced.open(this.columns);
@@ -889,7 +899,7 @@ export default {
 
       if (action === 'edit') {
         window.TDAPP.onEvent('批量编辑	pc：产品管理-批量编辑事件');
-        this.$refs.batchEditingDialog.openBatchEditingDialog();
+        this.$refs.batchEditingDialog.open();
       }
 
       if (action === 'remind') {

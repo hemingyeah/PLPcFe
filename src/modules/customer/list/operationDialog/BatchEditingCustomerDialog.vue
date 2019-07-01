@@ -110,6 +110,11 @@ export default {
       // todo reset
     },
     open() {
+
+      if (!this.selectedIds.length) {
+        return this.$platform.alert('请选择需要批量编辑的客户');
+      }
+
       this.visible = true;
     },
     buildParams() {
@@ -174,6 +179,9 @@ export default {
           form: {},
         }
       },
+      mounted() {
+        this.selectField(this.fields[0].fieldName)
+      },
       methods: {
         returnData() {
           return {
@@ -188,7 +196,6 @@ export default {
         },
         buildForm() {
           if (Object.keys(this.form).length === this.fields.length) return;
-          this.selectField(this.fields[0].fieldName)
           this.form = Utils.initialize(this.fields);
         },
         update(event) {
