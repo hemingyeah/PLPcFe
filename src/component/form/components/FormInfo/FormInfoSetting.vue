@@ -14,7 +14,7 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 
 export default {
-  name: 'form-text-setting',
+  name: 'form-info-setting',
   mixins: [SettingMixin],
   props: {
     field: {
