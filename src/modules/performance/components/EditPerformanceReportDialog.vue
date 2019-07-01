@@ -38,8 +38,19 @@
             </el-option>
           </el-select>
 
-
-          <biz-team-select v-else multiple v-model="form.target" placeholder="请选择团队(默认选择全部团队)" :fetch-func="fetchTeam"></biz-team-select>
+          <!-- start 按团队选择 -->
+          <el-input 
+            v-else 
+            readonly
+            :value="form.target.join(',')"
+            :class="{'input-is-error': !formValidation.target}" 
+            @click.native="selectTeamFocus" 
+            style="width: 315px; margin-left: 15px;"
+            placeholder="请选择团队/人员(默认选择全部)"
+          >
+          </el-input>
+          <!-- end 按团队选择 -->
+          <!-- <biz-team-select v-else multiple v-model="form.target" placeholder="请选择团队(默认选择全部团队)" :fetch-func="fetchTeam"></biz-team-select> -->
 
           <div v-if="!formValidation.target" class="target-is-error">
             请选择统计对象
@@ -291,6 +302,10 @@ export default {
         time: true,
       },
       submitted: false,
+      teamAndUser: {
+        data: [],
+        list: []
+      },
     }
   },
   computed: {
@@ -453,6 +468,31 @@ export default {
           console.error('e', e);
         });
     },
+    buildTarget() {
+      try {
+        let data = this.teamAndUser?.data || {};
+        let targetObject = {};
+
+        let users = data?.users || [];
+        let teams = data?.teams || [];
+
+        teams.forEach(team => { targetObject[team.id] =  'isAll'});
+
+        users.forEach(u => {
+          let tagId = u.tagId;
+          if(!targetObject.hasOwnProperty(tagId)) {
+            targetObject[tagId] = []
+          }
+          targetObject[tagId].push(u.userId)
+        });
+
+        return JSON.stringify(targetObject);
+      } catch (error) {
+        conosole.log(error);
+        return ''
+      }
+
+    },
     buildParams() {
       const {ruleId, reportName, time, range, state, remarks, sign, timeType, carbonCopy} = this.form;
       let target = '';
@@ -461,7 +501,7 @@ export default {
         if (!range) {
           target = this.form.target.join(',')
         } else {
-          target = this.form.target.map(({id}) => id).join(',')
+          target = this.buildTarget();
         }
       } else {
         target = 'isAll';
@@ -562,7 +602,34 @@ export default {
         target: true,
         time: true,
       }
-    }
+      this.teamAndUser = {
+        list: [],
+        data: [],
+      }
+    },
+    selectTeamFocus() {
+      let options = {
+        isRepeatUser: true,
+        isHideTeam: false,
+        max: -1,
+        selectType: '',
+        selected: this.teamAndUser.data || [],
+        showTeamCheckbox: true,
+      };
+
+      this.$fast.contact.choose('team', options).then(res => {
+        this.teamAndUser.data = res.data;
+
+        let users = this.teamAndUser?.data?.users || [];
+        let teams = this.teamAndUser?.data?.teams || [];
+
+        users = users.map(user => {
+          return { id: user.userId, name: user.displayName }
+        })
+        this.teamAndUser.list = teams.concat(users);
+        this.form.target = this.teamAndUser.list.map(({name}) => name);
+      })
+    },
   },
   components: {
     [ApproveProcess.name]: ApproveProcess,
