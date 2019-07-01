@@ -82,6 +82,12 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });0.
 
+// 审批列表 联调时临时使用
+router.post('/outside/*', ctx => HttpClient.proxy(ctx, {
+  host: '172.18.0.30',
+  port: 10002
+}))
+
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
 router.use('', openRouter.routes(), openRouter.allowedMethods());

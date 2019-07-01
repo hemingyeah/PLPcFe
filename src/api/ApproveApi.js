@@ -24,11 +24,23 @@ function getEventTypeList (params) {
 }
 
 /**
+ * 获取工单类型列表
+ * @param {Object} params 参数
+ * @param {String} params.keyword - 关键字
+ * @param {String} params.pageNum - 页码
+ * @param {String} params.pageSize - 页数据
+ */
+function getTaskTypeList (params) {
+  return http.get('/approve/taskType/allList', params);
+}
+
+/**
  * 获取审批数据列表
  * @param {Object} params 
  */
 function getApproveList (params) {
-  return http.get('http://localhost:3013/approve/list/data', params);
+  return http.post('/outside/approve/search', params);
+  // return http.post('http://inner.dev.sc:10002/outside/approve/search', params);
 }
 
 /**
@@ -41,9 +53,18 @@ function applyApprove (params) {
   return http.post('/approve/saveResult', params)
 }
 
+/**
+ * 获取审批详情（执行审批时）
+ */
+function getApplyApproveDetail (params) {
+  return http.get('/approve/get', params)
+}
+
 export {
   getInitiatorList,
   getEventTypeList,
+  getTaskTypeList,
   getApproveList,
-  applyApprove
+  applyApprove,
+  getApplyApproveDetail
 }

@@ -25,6 +25,7 @@ import {
   Form,
   FormItem,
   RadioGroup,
+  RadioButton,
   Radio,
   TimePicker,
   Loading,
@@ -63,6 +64,7 @@ const ElementUI = {
     Vue.use(Checkbox);
     Vue.use(FormItem);
     Vue.use(RadioGroup);
+    Vue.use(RadioButton);
     Vue.use(Radio);
     Vue.use(TimePicker);
     Vue.use(Loading);

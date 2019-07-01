@@ -5,10 +5,10 @@ import ApproveListView from './ApproveListView.vue';
 
 Vue.prototype.$http = http;
 
-const ApproveListViewComp = Vue.extend(ApproveListView);
-const app = new ApproveListViewComp({});
-
-app.$mount('#app');
+const app = new Vue({
+  el: '#app',
+  render: h => (<ApproveListView></ApproveListView>)
+})
 
 export default app;
 

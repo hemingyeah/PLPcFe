@@ -3,12 +3,12 @@
     <!-- 搜索 view -->
     <div class="approve-search-view">
       <!-- 基础搜索 -->
-      <form class="base-search" onsubmit="return false;">
+      <form class="base-search" @submit.prevent="searchBtnHandler()">
         <div class="search-group">
-          <el-input v-model="params.keyword" placeholder="根据客户信息搜索">
+          <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="searchBtnHandler({ pageNum: 1, }, true)" native-type="submit">
+          <base-button type="primary" native-type="submit">
             搜索
           </base-button>
           <base-button type="ghost" @event="resetParams">
@@ -30,13 +30,13 @@
           </el-dropdown>
         </h3>
 
-        <el-form class="advanced-search-form" onsubmit="return false;">
+        <el-form class="advanced-search-form" novalidate @submit.native.prevent="searchBtnHandler()">
           <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
             <el-form-item label-width="100px" label="发起人">
-              <base-select v-model="paramsForSelector.initiator" :remote-method="inputSearchInitiator">
+              <base-select v-model="paramsForSelector.proposer" :remote-method="inputSearchInitiator" clearable>
                 <template slot="option" slot-scope="{option}">
                   <div class="initiator-option-row">
-                    <img :src="option.head || '/resource/images/account_userhead.png'" class="initiator-avatar"/><span class="initiator-display-name">{{option.label}}</span>
+                    <img :src="getInitiatorAvatar(option.head)" class="initiator-avatar"/><span class="initiator-display-name">{{option.label}}</span>
                   </div>
                 </template>
               </base-select>
@@ -54,7 +54,7 @@
             </el-form-item>
             <el-form-item label-width="100px" label="审批时间">
               <el-date-picker
-                v-model="params.approveTime"
+                v-model="params.completeTime"
                 type="daterange"
                 align="right"
                 unlink-panels
@@ -64,55 +64,68 @@
               ></el-date-picker>
             </el-form-item>
             <el-form-item label-width="100px" label="来源">
-              <el-select v-model="params.source" clearable placeholder="请选择">
+              <el-select v-model="params.source" clearable placeholder="请选择" @input="sourceChangeHandler">
                 <el-option :value="item.value" :label="item.name" v-for="(item, idx) in sources" :key="idx"></el-option>
               </el-select>
             </el-form-item>
-            <!-- 事件类型 -->
-            <el-form-item v-show="params.source !== ''" label-width="100px" label="事件类型">
-              <base-select v-model="paramsForSelector.eventType" :remote-method="searchEventType"></base-select>
-            </el-form-item>
-            <!-- 流程节点 for Event -->
-            <el-form-item v-show="params.source === 'event'" label-width="100px" label="流程节点">
-              <el-select v-model="params.processNode" clearable placeholder="请选择">
-                <el-option :value="item.value" :label="item.name" v-for="(item, idx) in processNodeForEvent" :key="idx"></el-option>
-              </el-select>
-            </el-form-item>
-            <!-- 流程节点 for Task -->
-            <el-form-item v-show="params.source === 'task'" label-width="100px" label="流程节点">
-              <el-select v-model="params.processNode" clearable placeholder="请选择">
-                <el-option :value="item.value" :label="item.name" v-for="(item, idx) in processNodeForOrder" :key="idx"></el-option>
-              </el-select>
-            </el-form-item>
+            <!-- 来源为事件Event时 -->
+            <template v-if="params.source === 'event'">
+              <!-- 类型 for Event-->
+              <el-form-item label-width="100px" label="事件类型">
+                <base-select v-model="paramsForSelector.eventType" :remote-method="searchEventType" clearable></base-select>
+              </el-form-item>
+              <!-- 流程节点 for Event -->
+              <el-form-item label-width="100px" label="流程节点">
+                <el-select v-model="params.action" clearable placeholder="请选择">
+                  <el-option :value="item.value" :label="item.name" v-for="(item, idx) in processNodeForEvent" :key="idx"></el-option>
+                </el-select>
+              </el-form-item>
+            </template>
+            <!-- 来源为工单时 -->
+            <template v-if="params.source === 'task'">
+              <!-- 类型 for Task -->
+              <el-form-item label-width="100px" label="工单类型">
+                <base-select v-model="paramsForSelector.taskType" :remote-method="searchTaskType" clearable></base-select>
+              </el-form-item>
+              <!-- 流程节点 for Task -->
+              <el-form-item label-width="100px" label="流程节点">
+                <el-select v-model="params.action" clearable placeholder="请选择">
+                  <el-option :value="item.value" :label="item.name" v-for="(item, idx) in processNodeForOrder" :key="idx"></el-option>
+                </el-select>
+              </el-form-item>
+            </template>
+
+
           </div>
           <div class="advanced-search-btn-group">
             <base-button type="ghost" @event="resetParams">重置</base-button>
-            <base-button type="primary" @event="searchBtnHandler({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
+            <base-button type="primary" native-type="submit">搜索</base-button>
           </div>
         </el-form>
       </base-panel>
     </div>
     <!-- 列表 view -->
     <div class="list-group-view">
-      <el-form class="operation-bar-container" onsubmit="return false;">
+      <el-form class="operation-bar-container">
         <div class="left-btn-group">
-          <el-form-item label="按状态" class="status-btn-group">
-            <div class="status-btn-group">
-              <base-button @event="changeStatus('unapproved')" class="status-btn" :class="params.status !== 'unapproved' &&'ghost-button'">待审批</base-button>
-              <base-button @event="changeStatus('success')" class="status-btn" :class="params.status !== 'success' && 'ghost-button'">已审批</base-button>
-              <base-button @event="changeStatus('fail')" class="status-btn" :class="params.status !== 'fail' && 'ghost-button'">已拒绝</base-button>
-              <base-button @event="changeStatus('offed')" class="status-btn" :class="params.status !== 'offed' && 'ghost-button'">已撤回</base-button>
-            </div>
+
+          <el-form-item label="按状态" class="state-btn-group">
+            <el-radio-group :value="paramsForSelector.state" @input="stateChangeHandler" size="medium">
+              <el-radio-button label="待审批"></el-radio-button>
+              <el-radio-button label="已审批"></el-radio-button>
+              <el-radio-button label="已拒绝"></el-radio-button>
+              <el-radio-button label="已撤回"></el-radio-button>
+            </el-radio-group>
           </el-form-item>
+
           <el-form-item label-width="100px" label="按角色">
-            <el-select @change="roleChangeHandler" v-model="params.role" placeholder="请选择">
+            <el-select @change="roleChangeHandler" v-model="params.mySearch" placeholder="请选择">
               <el-option :value="item.value" :label="item.name" v-for="(item, idx) in role" :key="idx"></el-option>
             </el-select>
           </el-form-item>
         </div>
         <div class="right-btn-group">
-          <!-- <el-dropdown trigger="click" v-if="exportPermission"> -->
-          <el-dropdown trigger="click">            
+          <el-dropdown v-if="exportPermission" trigger="click">            
             <span class="el-dropdown-link el-dropdown-btn">
               更多操作
               <i class="iconfont icon-nav-down"></i>
@@ -165,18 +178,30 @@
           :align="column.align"
         >
           <template slot-scope="scope">
-            <template v-if="column.field === 'sn'">
+            <template v-if="column.field === 'objNo'">
               <a href="" class="view-detail-btn" @click.stop.prevent="showTaskOrEventDetail(scope.row, scope.row.source)">{{ scope.row[column.field] }}</a>
             </template>
-            <template v-else-if="column.field === 'ini'">
-              <a href="" class="view-detail-btn" @click.stop.prevent="showApproverDetail(scope.row)">{{ scope.row[column.field] }}</a>
+            <template v-else-if="column.field === 'source'">
+              {{ scope.row[column.field] | getEventName }}
             </template>
-            <template v-else-if="column.field === 'operation'">
-              <base-button type="primary" @event="approveHandler(scope.row)">审批</base-button>
+            <template v-else-if="column.field === 'proposerName'">
+              <a :href="`/security/user/view/${scope.row.proposer}`" class="view-detail-btn">{{ scope.row[column.field] }}</a>
+              <!-- <a href="" class="view-detail-btn" @click.stop.prevent="showProposerDetail(scope.row)">{{ scope.row[column.field] }}</a> -->
+            </template>
+            <template v-else-if="column.field === 'createTime'">
+              {{ scope.row[column.field] | getFormatDate }}
+            </template>
+            <template v-else-if="column.field === 'completeTime'">
+              {{ scope.row[column.field] | getFormatDate }}
             </template>
             <template v-else>
               {{ scope.row[column.field] }}
             </template>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="120px" min-width="120px" v-if="params.state === 'unapproved'">
+          <template slot-scope="scope" v-if="scope.row.state === 'unapproved'">
+            <base-button type="primary" @event="approveHandler(scope.row)">审批</base-button>
           </template>
         </el-table-column>
       </el-table>
@@ -203,13 +228,13 @@
     <!-- 列设置 -->
     <!-- <base-table-advanced-setting ref="columnSetting" @save="modifyColumnSetting" /> -->
     <!-- 导出数据 -->
-    <base-export
+    <approve-export
       ref="exportPanel"
       :columns="getExportColumns()"
       :build-params="buildExportParams"
       :validate="validateExport"
       method="post"
-      action="/todo/url"
+      action="/approve/export"
     />
     <!-- 已选中数据面板 -->
     <base-panel :show.sync="ui.multipleSelectionPanelShow" width="420px" class="base-hah">
@@ -230,12 +255,9 @@
           <div class="approve-selected-list">
             <div class="approve-selected-row approve-selected-head">
               <span class="approve-selected-sn">编号</span>
-              <span class="approve-selected-name">来源</span>
             </div>
-            <!-- todo 字段更新 -->
             <div class="approve-selected-row" v-for="c in multipleSelection" :key="c.id">
-              <span class="approve-selected-sn">{{c.sn}}</span>
-              <span class="approve-selected-name">{{c.source}}</span>
+              <span class="approve-selected-sn">{{c.objNo}}</span>
               <button type="button" class="approve-selected-delete" @click="cancelSelectApprove(c)">
                 <i class="iconfont icon-fe-close"></i>
               </button>
@@ -254,16 +276,19 @@
     >
       <div class="apply-approve-modal-content">
         <div class="apply-modal-row">
-          <span class="_key">来源：</span><span class="_value">{{ tempApprove.source }}</span>
+          <span class="approve-modal-key">来源：</span><span class="approve-modal-value">{{ tempApprove.source | getEventName }}</span>
         </div>
         <div class="apply-modal-row">
-          <span class="_key">节点：</span><span class="_value">{{ tempApprove.processNode }}</span>
+          <span class="approve-modal-key">节点：</span><span class="approve-modal-value">{{ tempApprove.action }}</span>
+        </div>
+        <div v-if="!tempApprove.html" class="apply-modal-row">
+          <span class="approve-modal-key">内容：</span><span class="approve-modal-value">{{ tempApprove.content }}</span>
+        </div>
+        <div v-else class="apply-modal-row">
+          <span class="approve-modal-key">内容：</span><span class="approve-modal-value" v-html="tempApprove.html"></span>
         </div>
         <div class="apply-modal-row">
-          <span class="_key">内容：</span><span class="_value">{{ tempApprove.content }}</span>
-        </div>
-        <div class="apply-modal-row">
-          <span class="_key">审批结果：</span><span class="_value">
+          <span class="approve-modal-key">审批结果：</span><span class="approve-modal-value">
             <el-radio-group v-model="tempApproveApply.result">
               <el-radio :label="'success'" style="width: 60px">同意</el-radio>
               <el-radio :label="'fail'" style="width: 60px">拒绝</el-radio>
@@ -271,7 +296,7 @@
           </span>
         </div>
         <div class="apply-modal-row">
-          <span class="_key">审批备注：</span><span class="_textarea"><form-textarea v-model="tempApproveApply.remark"/></span>
+          <span class="approve-modal-key">审批备注：</span><span class="_textarea"><form-textarea v-model="tempApproveApply.remark"/></span>
         </div>
       </div>
       <div slot="footer" class="apply-modal-footer">
@@ -285,23 +310,20 @@
 
 <script>
 
-/**
- * TodoFinish
- * - window._init注入 ?
- * - 权限管理 是否随window._init返回
- * - 接口提供后字段确认，搜索相关功能更新
- * - 导出 +接口+导出字段(测试版本不能导出)
- * - 审批 +实际列表接口提供后 更新实际字段
- * - 跳转 +需要绑定实际字段
- */
 import _ from 'lodash';
+import {formatDate} from '../../../util/lang';
 
 import * as ApproveApi from '@src/api/ApproveApi';
+
+import DEFAULT_INITIATOR_AVATAR from '../../../assets/img/avatar.png';
+import ApproveExport from '../components/approveExport'
+import platform from '../../../platform';
 
 
 const KEY_MAP = {
   APPROVE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER: 'approve_list_advance_search_column_number',
-  APPROVE_LIST_VIEW: 'approve_list_view',
+  APPROVE_LIST_VIEW: 'approve_list_view', // 本页vue中逻辑使用
+  APPROVE_LIST_DATA: 'approve_list_data', // 兼容jsp中逻辑
 }
 
 
@@ -310,7 +332,6 @@ export default {
   data () {
     return {
       approveDataList: [],
-      // columns: this.getFixedColumns(),
       columns: [],
       pageInfo: {
         pageSize: 10,
@@ -323,23 +344,30 @@ export default {
         advanceSearchPanel: false,
         multipleSelectionPanelShow: false,
         approveConfirmPanelShow: false,
+        loadingApproveDetail: false, // 点击列表条目审批按钮时 获取详情
       },
       params: {
         keyword: '',
-        faqiren: '', // 发起人
-        initiaTime: '', // faqishijian
-        appriveTime: '',
+        proposerId: '', // 发起人
+        createTime: '', // faqishijian
+        completeTime: '',
         source: '',
-        proposerId: '',
-        status: 'unapproved',
-        role: 'approve',
+        state: 'unapproved',
+        mySearch: 'approve',
+        // mySearch: '', // 联调时数据
+        typeId: '',
+        action: '',
+        pageNum: '',
+        pageSize: ''
       },
       paramsBackup: {
         keyword: '',
       },
       paramsForSelector: {
-        initiator: [],
-        eventType: []
+        proposer: [],
+        eventType: [],
+        taskType: [],
+        state: '待审批'
       },
       proposer: [],
       sources: [
@@ -363,18 +391,8 @@ export default {
         { value: '开始', name: '开始' },
         { value: '完成', name: '完成' }
       ],
-      column: [
-        { value: 'apprSource', name: '来源' },
-        { value: 'apprType', name: '类型' },
-        { value: 'apprAction', name: '流程节点' },
-        { value: 'apprProposer', name: '发起人' },
-        { value: 'apprCreateTime', name: '发起时间' },
-        { value: 'apprApplyRemark', name: '发起人备注' },
-        { value: 'apprApprover', name: '审批人' },
-        { value: 'apprCompleteTime', name: '审批时间' },
-        { value: 'apprApproveRemark', name: '审批备注' },
-      ],
       columnNum: 1,
+      userId: '',
       approveTimePickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -415,32 +433,82 @@ export default {
   methods: {
     getDefaultParams () {
       return {
-        source: '',
-        status: 'unapproved',
-        role: 'approve'
+        keyword: '',
+        proposerId: '',
+        createTime: '',
+        completeTime: '',
+        source: '', // 来源搜索
+        state: 'unapproved', // 审批状态搜索
+        mySearch: 'approve',
+        eventType: '',
+        action: '',
+        pageNum: 1,
       }
     },
+    buildParams () {
+      // 两个时间拆开
+      if (this.params.createTime && this.params.createTime.length) {
+        this.params.createTimeStart = formatDate(this.params.createTime[0])
+        this.params.createTimeEnd = `${formatDate(this.params.createTime[1]).replace('00:00:00', '23:59:59')}`;
+      } else {
+        this.params.createTimeStart = '';
+        this.params.createTimeEnd = '';
+      }
+
+      if (this.params.completeTime && this.params.completeTime.length) {
+        this.params.completeTimeStart = formatDate(this.params.completeTime[0]);
+        this.params.completeTimeEnd = `${formatDate(this.params.completeTime[1]).replace('00:00:00', '23:59:59')}`;
+      } else {
+        this.params.completeTimeStart = '';
+        this.params.completeTimeEnd = '';
+      }
+
+      this.params.keyword = this.paramsBackup.keyword || '';
+      this.params.pageNum = this.pageInfo.pageNum || 1;
+      this.params.pageSize = this.pageInfo.pageSize || 10;
+      
+      // 获取发起人参数Id
+      let proposers = this.paramsForSelector.proposer;
+      this.params.proposerId = (proposers && proposers.length > 0) ? proposers[0].userId : '';
+      // 获取事件类型参数id
+      if (this.params.source === 'task') {
+        let types = this.paramsForSelector.taskType;
+        this.params.typeId = (types && types.length > 0) ? types[0].id : '';
+      }
+      if (this.params.source === 'event') {
+        let types = this.paramsForSelector.eventType;
+        this.params.typeId = (types && types.length > 0) ? types[0].id : '';
+      }
+
+    },
     searchBtnHandler () {
-      return '';
+      this.pageInfo.pageNum = 1;
+      // 
+      this.buildParams();
+      this.doSearch();
     },
     doSearch (params = this.params) {
       this.ui.loadingListData = true;
+      // 字段转换
+      params.page = params.pageNum;
       ApproveApi.getApproveList(params).then((res) => {
         this.ui.loadingListData = false;
-        if (!res || !res.list) {
+        if (!res || !res.data || !res.data.list) {
           this.approveDataList = [];
           this.pageInfo.totalItems = 0;
           this.pageInfo.totalPages = 0;
           this.pageInfo.pageNum = 1;
+
+          res && res.message && platform.alert(res.message);
           return res
         }
-        const {pages, total, pageNum} = res;
+        const {data: {pages, total, pageNum}} = res;
 
-        this.approveDataList = res.list;
+        this.approveDataList = res.data.list;
         this.pageInfo.totalItems = total;
         this.pageInfo.totalPages = pages;
         this.pageInfo.pageNum = Number(pageNum);
-        // todo 筛选selected
+
         this.matchSelected();
       }).catch((e) => {
         this.ui.loadingListData = false;
@@ -448,34 +516,19 @@ export default {
       })
     },
     resetParams () {
-      // 直接绑定字段重置
-      let params = {
-        keyword: '',
-        faqiren: '',
-        initiaTime: '',
-        appriveTime: '',
-        source: '',
-        status: '',
-        role: '',
-        eventType: '',
-        processNode: '',
-      }
-      this.params = Object.assign(params, this.getDefaultParams())
+      this.params = Object.assign({pageSize: this.pageInfo.pageSize}, this.getDefaultParams())
       // 重置带有缓存字段
       this.paramsForSelector = {
         initiator: [],
-        eventType: []
+        eventType: [],
+        state: '待审批'
       }
+      this.pageInfo.pageNum = 1;
+      this.paramsBackup.keyword = '';
+      this.doSearch();
     },
     switchAdvanceSearch () {
       this.ui.advanceSearchPanel = !this.ui.advanceSearchPanel;
-      this.$nextTick(() => {
-        let forms = document.getElementsByClassName('advanced-search-form');
-        for(let i = 0; i < forms.length; i++) {
-          let form = forms[i];
-          form.setAttribute('novalidate', true)
-        }
-      })
     },
     setAdvanceSearchColumn (command) {
       this.columnNum = Number(command);
@@ -483,7 +536,7 @@ export default {
     },
     exportApprove (exportAll) {
       let ids = [];
-      let fileName = '测试导出.xlsx';
+      let fileName = `${formatDate(new Date(), 'yyyy-MM-dd')}审批中心数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
         ids = this.multipleSelection;
@@ -504,9 +557,9 @@ export default {
           }
           return c;
         });
-      let columnIsShow = this.columns.filter(c => c.show);
+      // let columnIsShow = this.columns.filter(c => c.show);
       // let columnIsShowIds = columnIsShow.map(field => field.field)
-      this.saveDataToStorage('columnStatus', columnIsShow);
+      this.saveDataToStorage('columnStatus', this.columns);
       // this.saveDataToStorage('columnStatusIds', columnIsShowIds);
     },
     /**
@@ -533,9 +586,9 @@ export default {
       // this.multipleSelection = selection.map(({id}) => id)
       let tv = this.getComputeSelection(selection);
       let original = this.multipleSelection
-        .filter(ms => this.approveDataList.some(cs => cs.id === ms.id));
+        .filter(ms => this.approveDataList.some(cs => cs.objId === ms.objId));
       let unSelected = this.approveDataList
-        .filter(c => original.every(oc => oc.id !== c.id));
+        .filter(c => original.every(oc => oc.objId !== c.objId));
 
       if (tv.length > this.selectedLimit) {
         unSelected.forEach(row => {
@@ -568,8 +621,8 @@ export default {
      * 已选中面板点击取消按钮 事件处理
      */
     cancelSelectApprove (approve) {
-      if (!approve || !approve.id) return;
-      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== approve.id);
+      if (!approve || !approve.objId) return;
+      this.multipleSelection = this.multipleSelection.filter(ms => ms.objId !== approve.objId);
       this.toggleSelection([approve]);
     },
     matchSelected() {
@@ -577,8 +630,8 @@ export default {
       // 如果后台没返回id 会出异常
       const selected = this.approveDataList
         .filter(c => {
-          if (this.multipleSelection.some(sc => sc.id === c.id)) {
-            this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
+          if (this.multipleSelection.some(sc => sc.objId === c.objId)) {
+            this.multipleSelection = this.multipleSelection.filter(sc => sc.objId !== c.objId);
             this.multipleSelection.push(c);
             return c;
           }
@@ -587,8 +640,12 @@ export default {
         this.toggleSelection(selected);
       });
     },
-    sortChange (e) {
-      console.info('sortChange', e);
+    sortChange (option) {
+      const {prop, order} = option;
+      if (order) {
+        this.params.sorts = [{ property: prop, direction: order === 'ascending' ? 'ASC' : 'DESC' }]
+        this.doSearch();
+      }
     },
     clearSelection () {
       this.toggleSelection();
@@ -603,9 +660,34 @@ export default {
       this.params.pageSize = pageSize;
       this.doSearch();
     },
-    changeStatus (status) {
-      this.params.status = status;
-      console.info('status change', status)
+    sourceChangeHandler (source) {
+      // 流程节点重置
+      this.params.action = '';
+      // 事件类型重置
+      this.paramsForSelector.taskType = [];
+      this.paramsForSelector.eventType = [];
+    },
+    stateChangeHandler (state) {
+      this.paramsForSelector.state = state;
+      switch (state) {
+      case '待审批':
+        this.params.state = 'unapproved';
+        break;
+      case '已审批':
+        this.params.state = 'success';
+        break;
+      case '已拒绝':
+        this.params.state = 'fail';
+        break;
+      case '已撤回':
+        this.params.state = 'offed';
+        break;
+      default:
+        break;
+      }
+
+      this.pageInfo.pageNum = 1;
+      this.doSearch();
     },
     inputSearchInitiator (e) {
       return ApproveApi.getInitiatorList({keyword: e.keyword, pageNum: e.pageNum, pageSize: e.pageSize})
@@ -613,7 +695,7 @@ export default {
           if (!res || !res.list) return;
           res.list = res.list.map(item => Object.freeze({
             label: item.displayName,
-            value: item.userId, // todo 联调时一定要注意字段是否不同, 如下
+            value: item.userId,
             ...item
           }))
           return res;
@@ -635,11 +717,28 @@ export default {
         })
         .catch(err => console.info('searchEventType function catch err', err))
     },
+    searchTaskType (e = {}) {
+      return ApproveApi.getTaskTypeList({keyword: e.keyword, pageNum: e.pageNum, pageSize: e.pageSize})
+        .then(res => {
+          if (!res || !res.list) return;
+          if (res.list) {
+            res.list = res.list.map(eventType => Object.freeze({
+              label: eventType.name,
+              value: eventType.id,
+              ...eventType
+            }))
+          }
+          return res;
+        })
+        .catch(err => console.info('searchEventType function catch err', err))
+    },
     /**
      * 角色变更时处理方法 
      */
     roleChangeHandler (event) {
-      console.info('changeRole', event);
+      this.pageInfo.pageNum = 1;
+      this.params.mySearch = event;
+      this.doSearch();
     },
     /**
      * 导出validate
@@ -649,48 +748,88 @@ export default {
       return exportAll && this.pageInfo.totalItems > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
     },
 
-    buildTableColumn () {
-      return '';
-      // const localStorageData = this.getLocalStorageData();
-      // let columnStatus = localStorageData.columnStatus || [];
-      // let localColumns = columnStatus
-      //   .map(i => typeof i === 'string')
-    },
     getFixedColumns () {
       return [
-        { label: '编号', field: 'sn', show: true, fixed: true, export: true },
-        { label: '来源', field: 'source', show: true, fixed: true, export: true },
-        { label: '类型', field: 'type', show: true, fixed: true, export: true },
-        { label: '流程节点', field: 'processNode', show: true, fixed: true, export: true },
-        { label: '发起人', field: 'ini', show: true, fixed: true, export: true },
-        { label: '发起时间', field: 'ini_time', show: true, fixed: true, export: true },
-        { label: '发起人备注', field: 'ini_mark', show: true, fixed: true, export: true },
-        { label: '审批人', field: 'approver', show: true, fixed: true, export: true },
-        { label: '审批时间', field: 'approve_time', show: true, fixed: true, export: true },
-        { label: '审批备注', field: 'approve_mark', show: true, fixed: true, export: true },
-        { label: '操作', field: 'operation', show: true, fixed: true, export: true },
+        { label: '编号', field: 'objNo', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '来源', field: 'source', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '类型', field: 'typeName', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '流程节点', field: 'action', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '发起人', field: 'proposerName', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '发起时间', field: 'createTime', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '发起人备注', field: 'applyRemark', show: true, fixed: true, export: true },
+        { label: '审批人', field: 'approverName', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '审批时间', field: 'completeTime', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '审批备注', field: 'approveRemark', show: true, fixed: true, export: true },
       ]
     },
-    approveHandler (row) {
-      this.tempApprove.source = row.source || '';
-      this.tempApprove.processNode = row.source || '';
-      this.tempApprove.content = row.content || '内容字段需要确认';
-
-      this.tempApproveApply = {
-        result: 'success',
-        remark: '',
-        id: row.id
-      };
-
-      this.ui.approveConfirmPanelShow = true;
-    },
     /**
-     * 点击列表中的编号子弹，判断进入任务还是事件详情页
+     * 保存approve(item)Id，用户点击列表中审批跳转后续操作
+     */
+    saveApproveId (id) {
+      let storageKey = KEY_MAP.APPROVE_LIST_DATA;
+      try {
+        let storageData = localStorage.getItem(storageKey);
+
+        if (!storageData) {
+          let approveListData = {};
+          localStorage.setItem(storageKey, approveListData);
+
+          storageData = localStorage.getItem(storageKey) || '{}';
+        }
+
+        storageData = JSON.parse(storageData);
+        storageData[id] = id;
+
+        localStorage.setItem(storageKey, storageData);
+      } catch (e) {
+        console.error('saveApproveId error', e);
+      }
+    },
+    addTabs (id, url) {
+      if (!window.frameElement) return;
+
+      let fromId = window.frameElement.getAttribute('id');
+      platform.openTab({
+        id,
+        title: '正在加载',
+        close: true,
+        url,
+        fromId
+      });
+    },
+    approveHandler (row) {
+      let type = row.source;
+      let id = row.objId;
+      let taskId = '';
+      let taskUrl = '';
+      let eventId = '';
+      let eventUrl = '';
+      switch (type) {
+      case 'task': 
+        taskId = `taskView_${id}`;
+        taskUrl = `/task/view/${id}`;
+        this.saveApproveId(id);
+        this.addTabs(taskId, taskUrl);
+        break;
+      case 'event':
+        eventId = `eventView_${id}`;
+        eventUrl = `/event/view/${id}`;
+        this.saveApproveId(id);
+        this.addTabs(eventId, eventUrl);
+        break;
+      default: 
+        break;
+      }
+    },
+
+
+    /**
+     * 点击列表中的编号字段，判断进入任务还是事件详情页
      */
     showTaskOrEventDetail (row, source) {
       let tabOptions = {};
       let fromId = window.frameElement.getAttribute('id');
-      let objId = 'appr.objId'
+      let objId = row.objId
       if (source === 'event') {
         tabOptions = {
           id: `eventView_${objId}`,
@@ -707,37 +846,100 @@ export default {
           url: `/task/view/${objId}`,
           fromId
         }
+      } else if (source === '绩效报告') {
+        tabOptions = {
+          id: `performanceReport${objId}`,
+          title: '正在加载',
+          close: true,
+          url: `/performance/v2/report/desc/${objId}`,
+          fromId
+        }
       }
-      this.$platform.openTab(tabOptions)
-    },
-    showApproverDetail (row) {
-      let fromId = window.frameElement.getAttribute('id');
-      let testId = 'cf12d356-4130-11e7-a318-00163e304a25'
-      this.$platform.openTab({
-        id: `security_userView_${testId}`,
-        close: false,
-        title: '成员详情',
-        url: `/security/user/view/${testId}`,
-        fromId
-      })
+      platform.openTab(tabOptions)
     },
 
-    /** 构建导出参数 */
-    buildExportParams(checkedArr, ids) {
-      // let exportAll = !ids || ids.length == 0;
-      return {};
+    /** 
+     * 构建导出参数 
+     * @params {Array} checkedArr
+     * @params ids itemList(table)
+     * */
+    buildExportParams (checkedArr, ids) {
+      let exportAll = !ids || ids.length === 0;
+      return {
+        approveChecked: checkedArr,
+        selectedIds: exportAll ? '' : ids.map((elm) => elm.uuId).join(','),
+        exportSearchModel: exportAll ? this.getExportParams() : ''
+      }
+    },
+    /**
+     * 字段名不同于列表字段名，独立出来 
+     */
+    getExportParams () {
+      let completeTimeStart = '';
+      let completeTimeEnd = '';
+      let createTimeStart = '';
+      let createTimeEnd = '';
+      let sortBy = {};
+
+      if (this.params.createTime && this.params.createTime.length) {
+        createTimeStart = formatDate(this.params.createTime[0])
+        createTimeEnd = `${formatDate(this.params.createTime[1]).replace('00:00:00', '23:59:59')}`;
+      }
+      if (this.params.completeTime && this.params.completeTime.length) {
+        completeTimeStart = formatDate(this.params.completeTime[0]);
+        completeTimeEnd = `${formatDate(this.params.completeTime[1]).replace('00:00:00', '23:59:59')}`;
+      }
+      
+      if (this.params.sorts && this.params.sorts.length) {
+        sortBy[this.params.sorts[0].property] = this.params.sorts[0].direction === 'ASC' ? true : false;
+      }
+
+      return {
+        completeTimeStart,
+        completeTimeEnd,
+        createTimeStart,
+        createTimeEnd,
+        sortBy,
+        pageSize: this.params.pageSize,
+        pageNum: this.params.pageNum,
+        keyword: this.params.keyword,
+        proposerId: this.params.proposerId,
+        source: this.params.source,
+        eventAction: this.params.eventAction,
+        myId: this.userId,
+        state: this.params.state,
+        mySearch: this.params.mySearch,
+        action: this.params.action,
+        // 下面三个字段目前不需要了
+        isAdvanced: 0,
+        ids: [],
+        orderDetail: {}
+      }
     },
     /**
      * 获取导出列数据
      */
-    getExportColumns() {
-      return this.columns;
+    getExportColumns () {
+      return this.getFixedColumns();
     },
     /**
      * 执行（确认）审批
      */
     applyApprove () {
-      // ApproveApi.applyApprove()
+      ApproveApi.applyApprove(this.tempApproveApply)
+        .then((res) => {
+          res = res || {};
+          if (res.succ) {
+            platform.alert('审批成功');
+            this.ui.approveConfirmPanelShow = false;
+            this.doSearch();
+          } else {
+            platform.alert(res.message || '审批失败');
+          }
+        }).catch((e) => {
+          platform.alert('审批失败');
+          console.error('approveList applyApprove error', e);
+        })
     },
     closeApproveModalHandler () {
       this.cancelApproveModalHandler();
@@ -751,6 +953,7 @@ export default {
         remark: '',
       }
     },
+
     /**
      * 尝试从本地存储中恢复数据
      * - 列表列显隐藏配置
@@ -760,13 +963,21 @@ export default {
       try {
         const columns = this.getLocalStorageData('columnStatus');
         const pageSize = this.getLocalStorageData('pageSize');
-        
+
         this.columns = (columns && columns.length) ? columns : this.getFixedColumns();
+        // this.columns = (columns && columns.length) ? columns : this.getFixedColumns();
         this.pageInfo.pageSize = pageSize || 10;
+        this.params.pageSize = pageSize || 10;
       } catch (e) {
         console.error('approveListRecoverStorageConfig error', e);
         this.columns = this.getFixedColumns();
       }
+    },
+    /**
+     * 获取发起人头像信息
+     */
+    getInitiatorAvatar (avatar) {
+      return avatar || DEFAULT_INITIATOR_AVATAR;
     }
   },
   computed: {
@@ -779,10 +990,34 @@ export default {
   },
   mounted () {
     this.recoverConfigByStorage();
-    // let initData = JSON.parse(window._init || {});
-    // this.auth = initData.auth || {};
+
+    try { // 联调时 _init字段被声明
+      let initData = JSON.parse(window._init || {});
+      this.auth = initData.auth || {};
+      this.userId = (initData.loginUser || {}).userId;
+    } catch (e) {
+      this.auth = {};
+      this.userId = '';
+    }
 
     this.doSearch();
+  },
+  filters: {
+    getEventName (value) {
+      if (!value) return '';
+      return value === 'event' ? '事件' : value === 'task' ? '工单' : value;
+    },
+    getFormatDate (value) {
+      if (!value) return '';
+      try {
+        return formatDate(new Date(value), 'YYYY-MM-dd HH:mm'); // 这里的format fullYear是YYYY
+      } catch (e) {
+        return '';
+      }
+    }
+  },
+  components: {
+    ApproveExport
   }
 }
 </script>
@@ -937,12 +1172,17 @@ export default {
         border-radius: 3px 3px 0 0;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         padding: 10px;
         border-bottom: 1px solid #f2f2f2;
 
         .left-btn-group {
           display: flex;
           flex-wrap: nowrap;
+          align-items: center;
+          .el-form-item, .el-form-item--small, .el-form-item__label, .el-radio-button, .el-radio-button--medium {
+            margin-bottom: 0;
+          }
         }
 
         .top-btn-group .base-button {
@@ -973,9 +1213,10 @@ export default {
           }
         }
       }
-      .status-btn-group {
+      .state-btn-group {
         display: flex;
         flex-wrap: nowrap;
+        align-items: center;
       }
 
       .approve-table {
@@ -1036,33 +1277,6 @@ export default {
 
         .el-pagination__jump {
           margin-left: 0;
-        }
-      }
-
-      // 审批确认弹框
-      .apply-approve-modal-content {
-        padding: 27px 30px;
-        .apply-modal-row {
-          display: flex;
-          flex-wrap: nowrap;
-          ._key {
-            width: 80px;
-            text-align: right;
-            margin: 0 20px 16px 0;
-          }
-          ._textarea {
-            flex: 1;
-          }
-        }
-      }
-      .apply-modal-footer {
-        position: relative;
-        display: flex;
-        justify-content: flex-end;
-        .apply-remark {
-          position: absolute;
-          left: 10px;
-          top: 3px;
         }
       }
     }
@@ -1172,6 +1386,33 @@ export default {
     margin-right: 5px;
     &:hover {
       color: $color-primary;
+    }
+  }
+
+  // 审批确认弹框
+  .apply-approve-modal-content {
+    padding: 27px 30px;
+    .apply-modal-row {
+      display: flex;
+      flex-wrap: nowrap;
+      .approve-modal-key {
+        width: 80px;
+        text-align: right;
+        margin: 0 20px 16px 0;
+      }
+      ._textarea {
+        flex: 1;
+      }
+    }
+  }
+  .apply-modal-footer {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    .apply-remark {
+      position: absolute;
+      left: 10px;
+      top: 3px;
     }
   }
   // 同page层级 结束
