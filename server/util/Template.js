@@ -14,8 +14,7 @@ module.exports = {
   },
   /** 渲染模板（开发用） */
   render(title = '售后宝', js, script, templatePath = 'src/index.html'){
-    let buffer = fs.readFileSync(path.resolve(ROOT_PATH, templatePath));
-    let template = buffer.toString();
+    let template = fs.readFileSync(path.resolve(ROOT_PATH, templatePath), 'utf-8');
     
     //注入标题
     template = template.replace('#{title}', title)
