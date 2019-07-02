@@ -11,8 +11,17 @@
           </div>
         </h3>
         <p>{{user.cellPhone}}</p>
-        <p v-if="showTag">
+        <p v-if="showTag" ref="tagName" class="contact-user-item-tagname" :class="isExpandTagName ? 'contact-user-item-tagname-show' : 'contact-user-item-tagname-hide'">
           {{ user.tagName }}
+          <span 
+            v-if="isToggleTagName"
+            class="base-tree-node-arrow"
+            :class="{'base-tree-node-arrow-down': isExpandTagName}" 
+            @click.stop="toggleTagName"
+          >
+          <i class="iconfont icon-arrow-right">
+          </i>
+        </span>
         </p>
       </div>
       <div class="contact-user-addition" v-if="showLocation">
@@ -29,6 +38,8 @@
 <script>
 /* eslint-disable */
 import DefaultHead from '@src/assets/img/avatar.png';
+
+const TEXT_HEIGHT = 20;
 
 export default {
   name: 'contact-user-item',
@@ -59,15 +70,29 @@ export default {
       default: false
     },
     //是否显示团队信息
-    showTag: { 
+    showTag: {
       type: Boolean,
       default: false
+    }
+  },
+  data() {
+    return {
+      isExpandTagName: false,
+      isToggleTagName: false
     }
   },
   computed: {
     head(){
       return this.user.head || DefaultHead;
     }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      if(!this.showTag) return 
+
+      let height = this.$refs.tagName.scrollHeight;
+      this.isToggleTagName = height > TEXT_HEIGHT;
+    })
   },
   methods: {
     //转换时间
@@ -89,6 +114,10 @@ export default {
     initDis(val){
       if(!val) return "";
       return val > 1000 ? (val / 1000).toFixed(2) + 'km' : val + 'm';
+    },
+    /** 收缩 团队名字 */
+    toggleTagName() {
+      this.isExpandTagName = !this.isExpandTagName;
     }
   }
 }
@@ -158,7 +187,7 @@ export default {
     color: $text-color-secondary;
   }
 }
- 
+
 .contact-user-addition{
   color: #9a9a9a;
   font-size: 12px;
@@ -190,6 +219,38 @@ export default {
   border-radius: 50%;
   background-color: #f0f0f0;
   margin: 0 2px 0 5px;
+}
+
+.contact-user-item-tagname {
+  position: relative;
+  padding-right: 20px;
+
+  .base-tree-node-arrow {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .base-tree-node-arrow {
+    height: 20px;
+    line-height: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform: rotateZ(180deg);
+  }
+
+  .base-tree-node-arrow-down {
+    transform: rotateZ(135deg);
+  }
+}
+.contact-user-item-tagname-hide {
+  max-height: 20px;
+}
+.contact-user-item-tagname-show {
+  max-height: 10000px;
 }
 </style>
 

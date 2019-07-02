@@ -49,3 +49,12 @@
   display: flex;
   flex-flow: row nowrap;
 }
+
+.is-required {
+  &:before {
+    content: '*';
+    color: #f56c6c;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+}

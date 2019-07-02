@@ -30,7 +30,7 @@
             :user="user" 
             :show-user-state="showUserState" 
             :state-color="stateColor"
-            :show-tag="mode == 'search' && !isHideTeam"
+            :show-tag="isShowTag"
             @toggle="chooseUser"
           />
           
@@ -49,8 +49,10 @@
           <div 
             class="bc-chosen-team-user" 
             v-for="team in chosenTeam" :key="team.id">
-            <span>{{team.name}}</span>
-            <i class="iconfont icon-fe-close" @click="chooseTeam({node: team, value: false})"></i>
+            <!-- <el-tooltip class="item" popper-class="bc-team-tooltip" effect="dark" :content="team.name" placement="top"> -->
+              <span>{{team.name}}</span>
+              <i class="iconfont icon-fe-close" @click="chooseTeam({node: team, value: false})"></i>
+            <!-- </el-tooltip> -->
           </div>
         </template>
         <!-- end 已选择团队 -->
@@ -58,16 +60,24 @@
         <!-- start 已选择人员 -->
         <template v-if="chosen.length > 0">
           <h4 v-if="allowCheckTeam">已选人员</h4>
-          <div class="bc-chosen-team-user" :class="isHideTeam ? 'bc-chosen-team-user-row': ''" v-for="(user, index) in chosen" :key="`${user.userId}_${index}`">
-            <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
-            <div class="bc-chosen-team-user-content">
-              <span class="bc-chosen-team-user-name">{{user.displayName}}</span>
-              <span class="bc-chosen-tema-user-tagname" v-if="!isHideTeam">
-                {{ user.tagName }}
-              </span>
+            <div class="bc-chosen-team-user" :class="isHideTeam ? 'bc-chosen-team-user-row': ''" v-for="(user, index) in chosen" :key="`${user.userId}_${index}`">
+                <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
+                <div class="bc-chosen-team-user-content" :ref="`bcChosenTeamUserContent${user.userId}_${user.tagId}`">
+                  <span class="bc-chosen-team-user-name">{{user.displayName}}</span>
+                  <!-- <el-tooltip 
+                    class="item" 
+                    popper-class="bc-user-tooltip" 
+                    effect="dark" 
+                    :content="user.tagName" 
+                    placement="top" 
+                    :disabled="!computedShowTooltip(user)"> -->
+                    <span v-if="!isHideTeam" class="bc-chosen-tema-user-tagname">
+                      {{ user.tagName }}
+                    </span>
+                  <!-- </el-tooltip> -->
+                </div>
+                <i class="iconfont icon-fe-close" @click="removeRepeatUser(user)"></i>
             </div>
-            <i class="iconfont icon-fe-close" @click="removeRepeatUser(user)"></i>
-          </div>
         </template>
         <!-- end 已选择人员 -->
 
@@ -254,6 +264,10 @@ export default {
     /** 用户是否含有团队信息 */
     isUserHaveTagData() {
       return this.selectType !== 'universal';
+    },
+    /** 是否显示团队信息 */
+    isShowTag() {
+      return this.mode == 'search' && !this.isHideTeam;
     },
     /** 当前已选概览 */
     summary(){
@@ -770,9 +784,10 @@ export default {
   span{
     flex: 1;
     display: block;
+
     font-size: 14px;
     padding-left: 5px;
-    line-height: 24px;
+    line-height: 20px;
     @include text-ellipsis();
   }
 
@@ -907,5 +922,10 @@ export default {
 .bc-team-node-count{
   margin-left: 5;
   color: #9a9a9a;
+}
+
+.bc-user-tooltip,
+.bc-team-tooltip {
+  max-width: 400px;
 }
 </style>

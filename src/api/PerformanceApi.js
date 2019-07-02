@@ -214,6 +214,19 @@ function publishPerformance(params) {
   return http.post('/performance/v2/report/publish', params, false);
 }
 
+/**
+ * 检查团队用户是否有重复
+ * @param params    {Object}
+ * @param {Object} params.tag - 团队列表
+ *  {
+ *    【tagId]: [userId, userId],(可选: 'isAll')
+ *  }
+ * @returns {*}
+ */
+function checkTagUserRepeat(params) {
+  return http.post('/security/tag/tagComponet/checkTagUserRepeat', params, false);
+}
+
 export {
   createPerformanceRule,
   getFieldsForPerformance,
@@ -232,5 +245,6 @@ export {
   cancelApprove,
   approvePerformance,
   getPerformanceRecord,
-  publishPerformance
+  publishPerformance,
+  checkTagUserRepeat
 }

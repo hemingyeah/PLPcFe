@@ -1,4 +1,5 @@
 <template>
+<section>
   <base-modal :title="title" :show.sync="visible" width="600px" class="create-performance-report-modal" @closed="reset">
     <div class="build-stage" v-if="stage === 'build'">
       <el-form ref="form" :model="form" label-width="110px" >
@@ -20,8 +21,8 @@
           <el-input :value="ruleDesc" type="textarea" readonly></el-input>
         </el-form-item>
         <h3>报告统计对象</h3>
-        <el-form-item label="统计以下对象" class="target-group">
-          <el-select v-model="form.range" placeholder="请选择(默认选择全部人员)" @change="form.target = []" style="width: 130px;">
+        <el-form-item label="统计以下对象" class="target-group" required>
+          <el-select v-model="form.range" placeholder="请选择人员" @change="form.target = []" style="width: 130px;">
             <el-option
               v-for="item in rangeOptions"
               :key="item.value"
@@ -29,14 +30,19 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-if="!form.range" v-model="form.target" multiple collapse-tags clearable filterable @change="validate" :class="{'input-is-error': !formValidation.target}" style="width: 315px;margin-left: 15px;" placeholder="请选择(默认选择全部人员)">
-            <el-option
-              v-for="item in targetOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+
+          <!-- start 按人员选择 -->
+          <el-input 
+            v-if="!form.range"
+            readonly
+            :value="form.target.map(({displayName}) => displayName).join(',')"
+            :class="{'input-is-error': !formValidation.target}"
+            @click.native="selectUser" 
+            style="width: 315px; margin-left: 15px;"
+            placeholder="请选择人员"
+          >
+          </el-input>
+          <!-- end 按人员选择 -->
 
           <!-- start 按团队选择 -->
           <el-input 
@@ -44,9 +50,9 @@
             readonly
             :value="form.target.join(',')"
             :class="{'input-is-error': !formValidation.target}" 
-            @click.native="selectTeamFocus" 
+            @click.native="selectTeam" 
             style="width: 315px; margin-left: 15px;"
-            placeholder="请选择团队/人员(默认选择全部)"
+            placeholder="请选择团队/人员"
           >
           </el-input>
           <!-- end 按团队选择 -->
@@ -70,7 +76,7 @@
         </el-form-item>
         <div class="customized-label">
 
-          <span v-if="!form.state" class="el-form-item__label">完成时间</span>
+          <span v-if="!form.state" class="el-form-item__label is-required">完成时间</span>
           <span v-else class="el-form-item__label">
             <el-select v-model="form.timeType" placeholder="请选择">
               <el-option
@@ -194,13 +200,25 @@
       </div>
     </div>
   </base-modal>
+  <choose-team-user-options-dialog 
+    ref="teamUserOptionsDialog"
+    v-model="form.isRepeat"
+    @update="updateFormIsrepeat"
+  >
+  </choose-team-user-options-dialog>
+  <!-- start 选择团队人员处理方式弹窗 -->
+  <!-- end 选择团队人员处理方式弹窗 -->
+</section>
 </template>
 
 <script>
 import { formatDate } from '@src/util/lang';
+
 import * as TeamApi from '@src/api/TeamApi';
-import {createPerformanceReport, getApprovePerson, getApprovePersonList} from '@src/api/PerformanceApi';
+import {createPerformanceReport, getApprovePerson, getApprovePersonList, checkTagUserRepeat} from '@src/api/PerformanceApi';
+
 import ApproveProcess from './ApproveProcess.vue'
+import ChooseTeamUserOptionsDialog from './ChooseTeamUserOptionsDialog.vue';
 
 export default {
   name: 'edit-performance-report-dialog',
@@ -294,6 +312,7 @@ export default {
         timeType: 0,
         remarks: '',
         sign: 'first',
+        isRepeat: ''
       },
       formValidation: {
         reportName: true,
@@ -304,7 +323,8 @@ export default {
       submitted: false,
       teamAndUser: {
         data: [],
-        list: []
+        list: [],
+        repeatNameList: [],
       },
     }
   },
@@ -370,10 +390,16 @@ export default {
           show: true
         },
       ].filter(c => c.show)
+    },
+    /** 是否开启服务团队派单 */
+    isAllotByTag() {
+      return this.initData?.isAllotByTag === true;
     }
   },
   mounted() {
-    // this.init();
+    if(!this.isAllotByTag) {
+      this.rangeOptions.splice(1, 1);
+    }
   },
   methods: {
     fetchTeam(params) {
@@ -476,8 +502,6 @@ export default {
         let users = data?.users || [];
         let teams = data?.teams || [];
 
-        teams.forEach(team => { targetObject[team.id] =  'isAll'});
-
         users.forEach(u => {
           let tagId = u.tagId;
           if(!targetObject.hasOwnProperty(tagId)) {
@@ -485,8 +509,10 @@ export default {
           }
           targetObject[tagId].push(u.userId)
         });
+        teams.forEach(team => { targetObject[team.id] =  'isAll'});
 
         return JSON.stringify(targetObject);
+
       } catch (error) {
         conosole.log(error);
         return ''
@@ -494,17 +520,20 @@ export default {
 
     },
     buildParams() {
-      const {ruleId, reportName, time, range, state, remarks, sign, timeType, carbonCopy} = this.form;
+      const {ruleId, reportName, time, range, state, remarks, sign, timeType, carbonCopy, isRepeat} = this.form;
       let target = '';
+      let userIsPepeat = '';
 
       if (this.form.target && this.form.target.length) {
         if (!range) {
-          target = this.form.target.join(',')
+          target = this.form.target.map(({userId}) => userId).join(',') || '';
         } else {
           target = this.buildTarget();
+          userIsPepeat = isRepeat ? isRepeat : 'onlyParent'
         }
       } else {
         target = 'isAll';
+        userIsPepeat = range ? 'onlyParent' : '';
       }
 
       return {
@@ -518,6 +547,7 @@ export default {
         [range ? 'teams' : 'users']: target,
         carbonCopy: carbonCopy.join(','),
         sign,
+        isRepeat: userIsPepeat,
       }
     },
     viewTask(row){
@@ -556,7 +586,7 @@ export default {
       return keys.map(key => {
         val = this.form[key];
         // 8035200000 ms = 93 days
-        // if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
+        if (key === 'target') return this.formValidation[key] = Array.isArray(val) && !!val.length;
         if (key === 'time') return this.formValidation[key] = Array.isArray(val) && !!val.length && new Date(this.form.time[1]) - new Date(this.form.time[0]) <= 8035200000;
 
         return this.formValidation[key] = !!val
@@ -593,6 +623,7 @@ export default {
         timeType: 0,
         remarks: '',
         sign: 'first',
+        isRepeat: '',
       };
       this.stage = 'build';
       this.submitted = false;
@@ -605,14 +636,38 @@ export default {
       this.teamAndUser = {
         list: [],
         data: [],
+        repeatNameList: []
       }
     },
-    selectTeamFocus() {
+    /** 选择人员  */
+    selectUser() {
+      let choose = this.isAllotByTag ? 'team' : 'dept';
+      let options = {
+        max: -1,
+        isHideTeam: true,
+        selected: (
+          this.isAllotByTag 
+          ? {
+              users: this.form.target
+            } 
+          : this.form.target
+        )
+      }
+
+      this.$fast.contact.choose(choose, options).then(res => {
+        if(res.status != 0) return
+
+        this.form.target = res?.data?.users || [];
+
+      })
+    },
+    /** 选择团队  */
+    selectTeam() {
       let options = {
         isRepeatUser: true,
         isHideTeam: false,
         max: -1,
-        selectType: '',
+        selectType: 'performance',
         selected: this.teamAndUser.data || [],
         showTeamCheckbox: true,
       };
@@ -628,11 +683,46 @@ export default {
         })
         this.teamAndUser.list = teams.concat(users);
         this.form.target = this.teamAndUser.list.map(({name}) => name);
+
+        if(!this.form.isRepeat || 'cancel' == this.form.isRepeat) {
+          this.checkTagAndUserRepeat();
+        }
+
       })
     },
+    /** 检查团队用户是否重复 */
+    checkTagAndUserRepeat() {
+      let params = {
+        paramJson: this.buildTarget()
+      };
+      checkTagUserRepeat(params).then(result => {
+        let data = result.data;
+        let isSucc = result.status == 0;
+        let isRepeat = false;
+
+        if(isSucc) {
+          isRepeat = (data.isRepeat === true);
+
+          if(isRepeat) {
+            this.teamAndUser.repeatNameList = data.repeatUserNameList;
+            this.$refs.teamUserOptionsDialog.show(this.teamAndUser.repeatNameList);
+          }
+
+        } else {
+          this.$platform.alert(result.message);
+        }
+
+      }).catch(err => console.error('checkTagUserRepeat', err))
+    },
+    updateFormIsrepeat(value) {
+      if(value == 'cancel') {
+        this.selectTeam();
+      }
+    }
   },
   components: {
     [ApproveProcess.name]: ApproveProcess,
+    [ChooseTeamUserOptionsDialog.name]: ChooseTeamUserOptionsDialog,
   }
 }
 </script>
@@ -660,6 +750,8 @@ export default {
 
 .target-is-error {
   position: absolute;
+  bottom: -20px;
+
   color: #f56c6c;
   font-size: 12px;
   padding: 3px 0 0 0px;
@@ -672,6 +764,12 @@ export default {
   .biz-team-select {
     width: 315px;
     margin-left: 15px;
+  }
+
+  .el-input__inner {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 

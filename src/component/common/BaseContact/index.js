@@ -88,7 +88,7 @@ function team( options = {} ){
 
   if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
   if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
-  if(max > 1 && Object.keys(options.selected).length > 0) {
+  if(max > 1 && options.selected && Object.keys(options.selected).length > 0) {
     let users = options?.selected?.users;
     let teams = options?.selected?.teams;
     let isUserArray = Array.isArray(users);
