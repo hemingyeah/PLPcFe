@@ -129,7 +129,7 @@ export default {
         ids: this.selectedIds.join(','),
       };
 
-      if (this.selectedFieldName === 'tags') {
+      if (sf.fieldName === 'tags') {
         params.mapJson = JSON.stringify({
           [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
