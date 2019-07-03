@@ -872,7 +872,8 @@ export default {
       }
     },
     /**
-     * 字段名不同于列表字段名，独立出来 
+     * 字段名不同于列表字段名，且某些字段转换特殊，独立出来 
+     * For 导出全部使用
      */
     getExportParams () {
       let completeTimeStart = '';
@@ -881,20 +882,34 @@ export default {
       let createTimeEnd = '';
       let sortBy = {};
 
+      let dynamicData = {};
+
       if (this.params.createTime && this.params.createTime.length) {
-        createTimeStart = formatDate(this.params.createTime[0])
+        createTimeStart = formatDate(this.params.createTime[0], 'YYYY/MM/DD  HH:mm:ss')
         createTimeEnd = `${formatDate(this.params.createTime[1]).replace('00:00:00', '23:59:59')}`;
       }
       if (this.params.completeTime && this.params.completeTime.length) {
-        completeTimeStart = formatDate(this.params.completeTime[0]);
+        completeTimeStart = formatDate(this.params.completeTime[0], 'YYYY/MM/DD  HH:mm:ss');
         completeTimeEnd = `${formatDate(this.params.completeTime[1]).replace('00:00:00', '23:59:59')}`;
       }
       
       if (this.params.sorts && this.params.sorts.length) {
         sortBy[this.params.sorts[0].property] = this.params.sorts[0].direction === 'ASC' ? true : false;
       }
+      // 动态字段设置
+      if (this.params.source === 'task') {
+        dynamicData.taskAction = this.params.action;
+        dynamicData.taskTypeId = this.params.typeId;
+        dynamicData.typeId = this.params.typeId;
+      }
+      if (this.params.source === 'event') {
+        dynamicData.eventAction = this.params.action;
+        dynamicData.eventTypeId = this.params.typeId;
+        dynamicData.typeId = this.params.typeId;
+      }
 
-      return {
+      // eventTypeId
+      let fixedData = {
         completeTimeStart,
         completeTimeEnd,
         createTimeStart,
@@ -905,7 +920,6 @@ export default {
         keyword: this.params.keyword,
         proposerId: this.params.proposerId,
         source: this.params.source,
-        eventAction: this.params.eventAction,
         myId: this.userId,
         state: this.params.state,
         mySearch: this.params.mySearch,
@@ -915,6 +929,8 @@ export default {
         ids: [],
         orderDetail: {}
       }
+
+      return Object.assign(fixedData, dynamicData);
     },
     /**
      * 获取导出列数据
