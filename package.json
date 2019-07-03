@@ -86,5 +86,10 @@
     "> 1% in CN",
     "ie >= 11",
     "chrome >= 49"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/git-cz"
+    }
+  }
 }
