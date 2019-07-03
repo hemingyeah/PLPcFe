@@ -695,6 +695,7 @@ export default {
       let params = {
         paramJson: this.buildTarget()
       };
+      this.pending = true;
       checkTagUserRepeat(params).then(result => {
         let data = result.data;
         let isSucc = result.status == 0;
@@ -713,6 +714,7 @@ export default {
         }
 
       }).catch(err => console.error('checkTagUserRepeat', err))
+        .finally(() => this.pending = false)
     },
     updateFormIsrepeat(value) {
       if(value == 'cancel') {

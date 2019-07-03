@@ -66,6 +66,10 @@ export default {
     padding: 15px 15px 0 15px;
   }
 
+  .base-modal-header-close {
+    display: none;
+  }
+
 }
 
 .choose-team-user-options-modal-list {
