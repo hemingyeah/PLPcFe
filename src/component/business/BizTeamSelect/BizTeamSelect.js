@@ -343,10 +343,10 @@ const BizTeamSelect = {
     /** 渲染团队tag */
     renderTag(item){
       return (
-        <span class="biz-team-select-tag" key={item.id}>
+        <div class="biz-team-select-tag" key={item.id}>
           <span class="biz-team-select-tag-text">{item.tagName || item.name}</span>
           <i class="iconfont icon-yemianshanchu" onClick={e => this.remove(e, item)}></i>
-        </span>
+        </div>
       );
     },
     /** 多选时需要渲染 */
