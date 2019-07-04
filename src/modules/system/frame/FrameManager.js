@@ -4,7 +4,7 @@ import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
 import FrameHistoryManager from './FrameHistoryManager'
 
-import normalizeWheel from '@src/util/normalizeWheel'
+// import normalizeWheel from '@src/util/normalizeWheel'
 
 const CACHED_FRAMES = [
   'M_TASK_ALL',
@@ -170,11 +170,8 @@ const FrameManager = {
       if (tab.timeStamp && (new Date() - tab.timeStamp <= 5000)) return;
       
       tab.timeStamp = new Date();
-      
       this.removeFrameCache(tab.id)
       
-      console.log('reloadFrameTab');
-
       let iframe = document.getElementById(`frame_tab_${tab.id}`);
       if(null != iframe){
         tab.loading = true;
@@ -192,6 +189,9 @@ const FrameManager = {
       }
     },
     reloadFrameTabById(id){
+      // 啄木鸟监控显示id可能为null
+      if(null == id) return;
+
       // 替换传入的 id 中的 frame_tab_
       id = id.replace(/^frame_tab_/, '');
       
@@ -212,7 +212,7 @@ const FrameManager = {
       // 无法滚动
       if(listOffsetWidth <= scrollOffsetWidth) return;
       
-      let delta = normalizeWheel(event);
+      // let delta = normalizeWheel(event);
 
       // 1. 兼容不同浏览器的事件
       // 2. 根据方向设置offset
@@ -341,7 +341,7 @@ const FrameManager = {
       this.nextBtnEnable = this.offset < listEl.offsetWidth - scrollEl.offsetWidth;
     },
     tabTransitionEnd(event){
-      // 只处理tab list的tranform效果
+      // 只处理tab list的transform效果
       if(event.propertyName != 'transform' || !event.target.classList.contains('frame-tabs-list')) return;
       this.offsetTransition = false;
     },
