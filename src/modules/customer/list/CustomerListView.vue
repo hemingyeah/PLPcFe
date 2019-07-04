@@ -362,6 +362,10 @@
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
 
+            <template v-else-if="column.formType === 'link' && scope.row.attribute[column.field] && scope.row.attribute[column.field].link">
+              <a href="javascript:;" @click="() => $platform.openLink(scope.row.attribute[column.field].link)">{{scope.row.attribute[column.field].link}}</a>
+            </template>
+
             <template v-else-if="column.isSystem === 0">
               {{scope.row.attribute[column.field]}}
             </template>
@@ -1059,6 +1063,9 @@ export default {
       Object.keys(this.paramsBackup.customizedSearchModel)
         .forEach(key => {
           tv = this.paramsBackup.customizedSearchModel[key];
+
+          console.log('tv', tv);
+
           if (tv.value && tv.formType === 'date') {
             return conditions.push({
               property: tv.fieldName,
@@ -1084,7 +1091,7 @@ export default {
             })
           }
 
-          if (tv.value) {
+          if (tv.value && tv.formType !== 'address') {
             conditions.push({
               property: tv.fieldName,
               operator: tv.operator,
@@ -1098,6 +1105,8 @@ export default {
       }
 
       delete params.customizedSearchModel;
+
+      console.log('params', params);
 
       return params;
     },

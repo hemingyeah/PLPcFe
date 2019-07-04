@@ -126,6 +126,11 @@ export function initialize(fields = [], origin = {}, callback){
     if(field.formType == 'level' || field.formType == 'serviceContent' || field.formType == 'serviceType') {
       if(defaultValue == '') defaultValue = dataSource[0];
     }
+    
+    // 超链接的默认值初始化为对象
+    if (field.formType === 'link') {
+      defaultValue = {}
+    }
 
     // 多选和附件的默认值初始化为空数组
     if(isMultiSelect(field) || field.formType == 'attachment'){

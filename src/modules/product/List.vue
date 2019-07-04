@@ -1053,7 +1053,7 @@ export default {
           isNotOnCurrentPage = this.page.list.every(item => {
             return item.id !== row.id;
           })
-          if(isNotOnCurrentPage) return 
+          if(isNotOnCurrentPage) return
         }
         rows.forEach(row => {
           this.$refs.multipleTable.toggleRowSelection(row);

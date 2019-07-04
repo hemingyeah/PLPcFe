@@ -14,6 +14,9 @@ export const DATE_REG = /^\d{4}-\d{1,2}-\d{1,2}$/;
 export const DATETIME_REG = /^\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}$/;
 // 邮箱格式
 export const EMAIL_REG = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+// 链接格式
+export const LINK_REG = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
+
 
 const RuleMap = {
   text,
@@ -28,6 +31,7 @@ const RuleMap = {
   user,
   attachment,
   address,
+  link,
 };
 
 /** 单行文本验证，50字以内 */
@@ -140,6 +144,17 @@ function address(value, field = {}) {
       return resolve('必填');
     }
     if (address.length > SINGLE_LINE_MAX_LEN) return resolve(`详细地址长度不能超过${SINGLE_LINE_MAX_LEN}个字符`);
+  
+    resolve(null);
+  });
+}
+
+function link(value, field = {}) {
+  return new Promise(resolve => {
+    if(field.isNull && !value.link) return resolve(null);
+    if(value == null || !value.toString().length) return resolve(`请输入${field.displayName}`);
+    if (!LINK_REG.test(value.link)) return resolve('请输入正确的链接');
+    // if (!/^https?/g.test(value)) return resolve('超链接请以http://或者https://开头');
   
     resolve(null);
   });

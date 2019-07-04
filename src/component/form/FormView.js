@@ -2,6 +2,7 @@ import { toArray } from '@src/util/lang';
 import { fmt_address } from '@src/filter/fmt';
 import { isHiddenField } from './util';
 import { FormFieldMap } from './components';
+import platform from '@src/platform'
 
 const FormView = {
   name: 'form-view',
@@ -107,7 +108,6 @@ const FormView = {
         return createElement(FormField.view, attrs);
       }
       
-      
       if (formType === 'attachment') {
         params = {
           ...params,
@@ -183,10 +183,6 @@ const FormView = {
       let preIndex = 0;
       
       fields
-        // // 隐藏说明(info)字段
-        // .filter(item => {
-        //   return item.formType !== 'info';
-        // })
         // 隐藏不显示逻辑项
         .filter(item => !isHiddenField(item, this.value, fields, false))
         // 隐藏无内容的分割线
