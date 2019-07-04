@@ -267,7 +267,7 @@
       </div>
     </base-panel>
     <!-- 审批确认框 -->
-    <base-modal 
+    <!-- <base-modal 
       :show.sync="ui.approveConfirmPanelShow"
       title="审批"
       width="650px"
@@ -304,7 +304,7 @@
         <button @click="closeApproveModalHandler()" class="btn btn-text">关闭</button>
         <button @click="applyApprove()" class="btn btn-primary">审批</button>
       </div>
-    </base-modal>
+    </base-modal> -->
   </div>
 </template>
 
@@ -343,13 +343,13 @@ export default {
         loadingListData: false,
         advanceSearchPanel: false,
         multipleSelectionPanelShow: false,
-        approveConfirmPanelShow: false,
+        // approveConfirmPanelShow: false, // 审批弹框
         loadingApproveDetail: false, // 点击列表条目审批按钮时 获取详情
       },
       params: {
         keyword: '',
-        proposerId: '', // 发起人
-        createTime: '', // faqishijian
+        proposerId: '', // 发起人Id
+        createTime: '', 
         completeTime: '',
         source: '',
         state: 'unapproved',
@@ -423,11 +423,12 @@ export default {
       multipleSelection: [],
       auth: {},
       selectedLimit: 200,
-      tempApprove: {}, // 当前执行操作的审批条目（如 点击审批时）
-      tempApproveApply: { // 执行审批操作确认模态框 绑定字段
-        result: 'success',
-        remark: ''
-      }
+      // 过期需求
+      // tempApprove: {}, // 当前执行操作的审批条目（如 点击审批时）
+      // tempApproveApply: { // 执行审批操作确认模态框 绑定字段
+      //   result: 'success',
+      //   remark: ''
+      // }
     }
   },
   methods: {
@@ -800,10 +801,12 @@ export default {
     approveHandler (row) {
       let type = row.source;
       let id = row.objId;
+
       let taskId = '';
       let taskUrl = '';
       let eventId = '';
       let eventUrl = '';
+      
       switch (type) {
       case 'task': 
         taskId = `taskView_${id}`;
@@ -941,34 +944,34 @@ export default {
     /**
      * 执行（确认）审批
      */
-    applyApprove () {
-      ApproveApi.applyApprove(this.tempApproveApply)
-        .then((res) => {
-          res = res || {};
-          if (res.succ) {
-            platform.alert('审批成功');
-            this.ui.approveConfirmPanelShow = false;
-            this.doSearch();
-          } else {
-            platform.alert(res.message || '审批失败');
-          }
-        }).catch((e) => {
-          platform.alert('审批失败');
-          console.error('approveList applyApprove error', e);
-        })
-    },
-    closeApproveModalHandler () {
-      this.cancelApproveModalHandler();
-    },
-    cancelApproveModalHandler () {
-      if (this.ui.approveConfirmPanelShow) {
-        this.ui.approveConfirmPanelShow = false;
-      }
-      this.tempApproveApply = {
-        result: 'success',
-        remark: '',
-      }
-    },
+    // applyApprove () {
+    //   ApproveApi.applyApprove(this.tempApproveApply)
+    //     .then((res) => {
+    //       res = res || {};
+    //       if (res.succ) {
+    //         platform.alert('审批成功');
+    //         this.ui.approveConfirmPanelShow = false;
+    //         this.doSearch();
+    //       } else {
+    //         platform.alert(res.message || '审批失败');
+    //       }
+    //     }).catch((e) => {
+    //       platform.alert('审批失败');
+    //       console.error('approveList applyApprove error', e);
+    //     })
+    // },
+    // closeApproveModalHandler () {
+    //   this.cancelApproveModalHandler();
+    // },
+    // cancelApproveModalHandler () {
+    //   if (this.ui.approveConfirmPanelShow) {
+    //     this.ui.approveConfirmPanelShow = false;
+    //   }
+    //   this.tempApproveApply = {
+    //     result: 'success',
+    //     remark: '',
+    //   }
+    // },
 
     /**
      * 尝试从本地存储中恢复数据
