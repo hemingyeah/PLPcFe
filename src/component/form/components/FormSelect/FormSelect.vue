@@ -25,7 +25,7 @@ export default {
   name: 'form-select',
   mixins: [FormMixin],
   props: {
-    value: [String, Array],
+    value: [String, Number, Array],
     source: {
       type: Array
     },

@@ -7,7 +7,7 @@
           <el-input v-model="searchModel.keyword" placeholder="根据产品信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="search({resetPageNum: true});trackEventHandler('search')" native-type="submit">搜索</base-button>
+          <base-button type="primary" @event="searchModel.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">高级搜索</span>
@@ -195,176 +195,6 @@
       </div>
     </base-panel>
 
-    <base-panel :show.sync="advancedSearchPanelShow" :width="panelWidth">
-      <h3 slot="title">
-        <span>高级搜索</span>
-        <el-dropdown class="pull-right" trigger="click" @command="setAdvanceSearchColumn">
-          <i class="iconfont icon-xitongguanli customer-panel-btn" style="float: none;"></i>
-
-          <el-dropdown-menu slot="dropdown" class="customer-advance-setting">
-            <el-dropdown-item command="1">一栏</el-dropdown-item>
-            <el-dropdown-item command="2">两栏</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </h3>
-      <el-form class="advanced-search-form" onsubmit="return false;">
-        <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
-
-          <el-form-item label-width="100px" label="客户">
-            <el-select
-              v-model="searchModel.customer"
-              filterable
-              remote
-              reserve-keyword
-              placeholder="请输入关键词搜索"
-              clearable
-              :loading="inputRemoteSearch.customer.loading"
-              :remote-method="searchCustomer">
-              <el-option
-                v-for="item in inputRemoteSearch.customer.options"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-              </el-option>
-            </el-select>
-
-          </el-form-item>
-
-          <el-form-item label-width="100px" label="选择团队">
-            <biz-team-select v-model="searchModel.tag" :fetch-func="getTeamList"/>
-          </el-form-item>
-
-          <el-form-item label-width="100px" label="创建时间">
-            <el-date-picker
-              v-model="searchModel.createTime"
-              type="daterange"
-              align="right"
-              unlink-panels
-              range-separator="-"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :picker-options="datePickerOptions">
-            </el-date-picker>
-          </el-form-item>
-          <el-form-item label-width="100px" label="更新时间">
-            <el-date-picker
-              v-model="searchModel.updateTime"
-              type="daterange"
-              align="right"
-              unlink-panels
-              range-separator="-"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :picker-options="datePickerOptions">
-            </el-date-picker>
-          </el-form-item>
-
-          <el-form-item label-width="100px" label="产品名称">
-            <el-input :placeholder="advancedSearchPlaceholder.name" v-model="searchModel.name" type="text"></el-input>
-          </el-form-item>
-
-          <el-form-item label-width="100px" label="产品编号">
-            <el-input :placeholder="advancedSearchPlaceholder.serialNumber" v-model="searchModel.serialNumber" type="text"></el-input>
-          </el-form-item>
-
-          <el-form-item label-width="100px" label="产品类型">
-            <el-select :placeholder="advancedSearchPlaceholder.type" v-model="searchModel.type" clearable >
-              <el-option
-                v-for="item in productTypes"
-                :key="item"
-                :label="item"
-                :value="item"
-                :disabled="item.disabled">
-              </el-option>
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label-width="100px" label="有无提醒">
-            <el-select v-model="searchModel.hasRemind" clearable >
-              <el-option
-                v-for="item in searchRemindOptions"
-                :key="item.label"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-
-
-          <!-- 动态搜索框 -->
-          <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
-                        :key="field.fieldName">
-            <template v-if="field.formType === 'text' || field.formType === 'code'">
-              <el-input v-model="searchModel[field.fieldName]"
-                        :placeholder="field.placeHolder" type="text"></el-input>
-            </template>
-            <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-              <el-select v-model="searchModel[field.fieldName]" clearable
-                         :placeholder="field.placeHolder">
-                <el-option
-                  v-for="item in field.setting.dataSource"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                  :disabled="item.disabled">
-                </el-option>
-              </el-select>
-            </template>
-
-            <template v-else-if="field.formType === 'user'">
-              <el-select
-                v-model="searchModel[field.fieldName]"
-                filterable
-                remote
-                reserve-keyword
-                placeholder="请输入关键词搜索"
-                clearable
-                :loading="inputRemoteSearch.customerManager.loading"
-                :remote-method="searchCustomerManager">
-                <el-option
-                  v-for="item in inputRemoteSearch.customerManager.options"
-                  :key="item.userId"
-                  :label="item.displayName"
-                  :value="item.userId">
-                </el-option>
-              </el-select>
-            </template>
-
-
-            <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
-              <el-date-picker
-                v-model="searchModel[field.fieldName]"
-                type="daterange"
-                align="right"
-                unlink-panels
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :picker-options="datePickerOptions">
-              </el-date-picker>
-            </template>
-
-            <!-- start number  -->
-            <template v-else-if="field.formType === 'number'">
-              <el-input v-model="searchModel[field.fieldName]"
-                        :placeholder="field.placeHolder" type="number"></el-input>
-            </template>
-            <!-- end number  -->
-
-            <template v-else>
-              <el-input v-model="searchModel[field.fieldName]"
-                        :placeholder="field.placeHolder"></el-input>
-            </template>
-          </el-form-item>
-        </div>
-        <div class="advanced-search-btn-group">
-          <base-button type="ghost" @event="resetParams">重置</base-button>
-          <base-button type="primary" @event="search({resetPageNum: true, moreConditions: true});trackEventHandler('advsearch')" native-type="submit">搜索</base-button>
-        </div>
-      </el-form>
-    </base-panel>
-
-
     <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
 
     <batch-editing-dialog
@@ -407,6 +237,18 @@
     ></batch-update-dialog>
 
     <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
+
+    <search-panel
+      :config="{
+        fields: this.productFields,
+      }"
+      ref="searchPanel"
+    >
+      <div class="advanced-search-btn-group" slot="footer">
+        <base-button type="ghost" @event="resetParams">重置</base-button>
+        <base-button type="primary" @event="powerfulSearch" native-type="submit">搜索</base-button>
+      </div>
+    </search-panel>
   </div>
 </template>
 
@@ -419,13 +261,13 @@ import SendMessageDialog from './components/SendMessageDialog.vue';
 import BatchEditingDialog from './components/BatchEditingDialog.vue'
 import BatchRemindingDialog from './components/BatchRemindingDialog.vue';
 import BatchUpdateDialog from './components/BatchUpdateDialog.vue';
+import SearchPanel from './components/SearchPanel.vue';
 
 import {
   getProduct,
   deleteProductByIds,
   getUpdateRecord,
 } from '@src/api/ProductApi';
-import {searchCustomer} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 
 export default {
@@ -439,7 +281,6 @@ export default {
   },
   data() {
     return {
-      advancedSearchPanelShow: false,
       multipleSelectionPanelShow: false,
       page: new Page(),
       columns: [],
@@ -450,71 +291,14 @@ export default {
       searchIncludeMoreConditions: false,
       searchModel: {
         keyword: '',
-        customer: '',
-        tag: [],
-        createTime: '',
-        updateTime: '',
-        name: '',
-        serialNumber: '',
-        type: '',
-        hasRemind: '',
-
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
-      },
-      inputRemoteSearch: {
-        customer: {
-          options: [],
-          loading: false,
-        },
-        customerManager: {
-          options: [],
-          loading: false,
+        moreConditions: {
+          conditions: [],
         },
       },
-      searchRemindOptions: [
-        {
-          label: '全部',
-          value: '',
-        },
-        {
-          label: '有',
-          value: 1,
-        },
-        {
-          label: '无',
-          value: 0,
-        },
-      ],
 
-      datePickerOptions: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-      },
       filterTeams: []
     }
   },
@@ -619,7 +403,6 @@ export default {
           if (f.fieldName === 'updateTime') {
             f.orderId = -2;
           }
-          f.operator = this.matchOperator(f);
 
           return f;
         })
@@ -627,10 +410,6 @@ export default {
     },
     productTypes() {
       return this.initData.productConfig.productType || [];
-    },
-    searchFields() {
-      return this.productFields
-        .filter(f => f.isSearch);
     },
     panelWidth() {
       return `${420 * this.columnNum}px`;
@@ -666,15 +445,6 @@ export default {
     smsRest() {
       return this.initData.smsRest || 0;
     },
-     // 高级搜索 占位符
-    advancedSearchPlaceholder() {
-      let fields = this.initData.productFields || [];
-      return {
-        name: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
-        serialNumber: fields.filter(f => f.fieldName == 'serialNumber')[0].placeHolder || '',
-        type: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
-      }
-    },
   },
   filters: {
     formatTags({customer}) {
@@ -701,7 +471,6 @@ export default {
   mounted() {
     this.revertStorage();
     this.buildColumns();
-    this.addCustomizedFieldToSearchModel();
     this.search();
 
     if(!this.viewedPermission) {
@@ -716,6 +485,13 @@ export default {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
+    powerfulSearch() {
+      this.searchModel.pageNum = 1;
+      this.searchModel.moreConditions = this.$refs.searchPanel.buildParams();
+
+      this.search();
+
+    },
     formatCustomizeAddress(ad) {
       if (null == ad) return '';
 
@@ -726,42 +502,6 @@ export default {
     showAdvancedSetting(){
       window.TDAPP.onEvent('pc：产品管理-选择列事件');
       this.$refs.advanced.open(this.columns);
-    },
-    matchOperator(field) {
-      let formType = field.formType;
-      let operator = '';
-
-      switch (formType) {
-      case 'date': {
-        operator = 'between';
-        break;
-      }
-      case 'datetime': {
-        operator = 'between';
-        break;
-      }
-      case 'select': {
-        if(field.setting && field.setting.isMulti) {
-          operator = 'contain';
-        } else {
-          operator = 'eq';
-        }
-        break;
-      }
-      case 'user': {
-        operator = 'user';
-        break;
-      }
-      case 'location': {
-        operator = 'location';
-        break;
-      }
-      default: {
-        operator = 'like';
-        break;
-      }
-      }
-      return operator;
     },
 
     openProductTab(productId) {
@@ -776,14 +516,7 @@ export default {
       })
 
     },
-    search({ resetPageNum = false, moreConditions = false } = {}) {
-      if (resetPageNum) {
-        this.searchModel.pageNum = 1;
-      }
-      if (moreConditions) {
-        this.searchIncludeMoreConditions = true;
-      }
-
+    search() {
       const params = this.buildParams();
       this.loading = true;
 
@@ -796,79 +529,22 @@ export default {
         .catch(e => console.error('fetch product catch an error', e));
     },
     buildParams() {
-      const { searchModel, searchIncludeMoreConditions, searchFields } = this;
+      const sm = Object.assign({}, this.searchModel);
       let params = {
-        keyword: searchModel.keyword,
-        pageSize: searchModel.pageSize,
-        pageNum: searchModel.pageNum,
+        keyword: sm.keyword,
+        pageSize: sm.pageSize,
+        pageNum: sm.pageNum,
       };
-      let conditions = [];
-      let key = '';
-      
-      if (Object.keys(searchModel.orderDetail || {}).length) {
-        params.orderDetail = searchModel.orderDetail;
+
+      if (Object.keys(sm.orderDetail || {}).length) {
+        params.orderDetail = sm.orderDetail;
       }
 
-      if (!searchIncludeMoreConditions) return params;
-
-      searchFields
-        .forEach(field => {
-          key = field.fieldName;
-          if (searchModel[key] && field.formType === 'date') {
-            return conditions.push({
-              property: key,
-              operator: field.operator,
-              betweenValue1: formatDate(searchModel[key][0], 'YYYY-MM-DD'),
-              betweenValue2: formatDate(searchModel[key][1], 'YYYY-MM-DD'),
-            });
-          }
-          if (searchModel[key] && field.formType === 'datetime') {
-            return conditions.push({
-              property: key,
-              operator: field.operator,
-              betweenValue1: formatDate(searchModel[key][0], 'YYYY-MM-DD HH:mm:ss'),
-              betweenValue2: `${formatDate(searchModel[key][1], 'YYYY-MM-DD')} 23:59:59`,
-            });
-          }
-
-          if (searchModel[key]) {
-            conditions.push({
-              property: key,
-              operator: field.operator,
-              value: searchModel[key],
-            });
-          }
-        });
-      params.conditions = conditions;
-
-      let keys = ['customer', 'tag', 'name', 'serialNumber', 'type'];
-      let k = '';
-      let v = '';
-
-      keys.forEach(key => {
-        if (searchModel[key]) {
-          k = key;
-          v = searchModel[key];
-          if (key === 'customer') {
-            k = 'customerId';
-          }
-          if (key === 'tag' && v[0]) {
-            k = 'tagId';
-            v = v[0].id;
-          }
-
-          params[k] = v;
+      if (Object.keys(sm.moreConditions).length > 1 || sm.moreConditions.conditions.length) {
+        params = {
+          ...params,
+          ...sm.moreConditions,
         }
-      });
-
-      params.hasRemind = searchModel.hasRemind;
-
-      if (Array.isArray(searchModel.createTime) && searchModel.createTime.length === 2) {
-        params.createTime = searchModel.createTime.map(t => formatDate(t, 'YYYY/MM/DD')).join('-');
-      }
-
-      if (Array.isArray(searchModel.updateTime) && searchModel.updateTime.length === 2) {
-        params.updateTime = searchModel.updateTime.map(t => formatDate(t, 'YYYY/MM/DD')).join('-');
       }
 
       return params
@@ -885,9 +561,12 @@ export default {
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
+        moreConditions: {
+          conditions: [],
+        }
       };
 
-      this.addCustomizedFieldToSearchModel();
+      this.$refs.searchPanel.resetParams();
       this.search();
     },
     openDialog(action) {
@@ -1040,7 +719,8 @@ export default {
     handleSizeChange(pageSize) {
       this.saveDataToStorage('pageSize', pageSize);
       this.searchModel.pageSize = pageSize;
-      this.search({resetPageNum: true});
+      this.searchModel.pageNum = 1;
+      this.search();
     },
     toggleSelection(rows) {
       let isNotOnCurrentPage = false;
@@ -1172,46 +852,6 @@ export default {
       }
       this.$refs.exportPanel.open(ids, fileName);
     },
-
-    addCustomizedFieldToSearchModel() {
-
-      this.searchFields.forEach(field => {
-        this.$set(this.searchModel, field.fieldName)
-      })
-    },
-    setAdvanceSearchColumn(command) {
-      this.columnNum = Number(command);
-      this.saveDataToStorage('column_number', command);
-    },
-    searchCustomerManager(keyword) {
-      this.inputRemoteSearch.customerManager.loading = true;
-      return this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
-        .then(res => {
-          this.inputRemoteSearch.customerManager.options = res.list;
-          this.inputRemoteSearch.customerManager.loading = false;
-          return res;
-        })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
-    searchCustomer(keyword) {
-      this.inputRemoteSearch.customer.loading = true;
-
-      searchCustomer({keyword, page: 1, pageSize: 20})
-        .then(res => {
-
-          if (res.status) {
-            this.inputRemoteSearch.customer.options = [];
-            this.inputRemoteSearch.customer.loading = false;
-            return res;
-          }
-
-          this.inputRemoteSearch.customer.options = res.data.list;
-          this.inputRemoteSearch.customer.loading = false;
-
-          return res;
-        })
-        .catch(err => console.error('searchCustomer function catch err', err));
-    },
     showLatestUpdateRecord(row) {
       if (row.latesetUpdateRecord) return;
       getUpdateRecord({
@@ -1310,7 +950,7 @@ export default {
     },
     panelSearchAdvancedToggle() {
       window.TDAPP.onEvent('pc：产品管理-高级搜索事件');
-      this.advancedSearchPanelShow = !this.advancedSearchPanelShow;
+      this.$refs.searchPanel.open();
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
         for(let i = 0; i < forms.length; i++) {
@@ -1332,10 +972,12 @@ export default {
     }
   },
   components: {
+    SearchPanel,
     [SendMessageDialog.name]: SendMessageDialog,
     [BatchEditingDialog.name]: BatchEditingDialog,
     [BatchRemindingDialog.name]: BatchRemindingDialog,
     [BatchUpdateDialog.name]: BatchUpdateDialog,
+    [SearchPanel.name]: SearchPanel,
   }
 }
 </script>
@@ -1611,45 +1253,6 @@ export default {
   }
 
   // advanced search form
-  .product-list-container .advanced-search-form {
-    overflow: auto;
-    padding: 10px 0 63px 0;
-    height: calc(100% - 52px);
-
-    .two-columns {
-      display: flex;
-      flex-wrap: wrap;
-      .el-form-item {
-        width: 50%;
-      }
-    }
-
-    .el-form-item {
-      .el-form-item__content,
-      .el-select,
-      .base-dist-picker,
-      .el-cascader,
-      .el-date-editor {
-        width: 290px;
-      }
-    }
-
-    .advanced-search-btn-group {
-      display: flex;
-      justify-content: flex-end;
-      width: 100%;
-      position: absolute;
-      bottom: 0px;
-      background: #fff;
-      padding: 15px 20px;
-
-      .base-button {
-        margin: 0 10px;
-      }
-    }
-  }
-
-
 
   .base-import-warn {
     p {

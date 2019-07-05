@@ -8,6 +8,7 @@ import CustomerNameExtendSetting from './extend/CustomerNameExtendSetting.vue';
 import ProductSerialNumberExtendSetting from './extend/ProductSerialNumberExtendSetting.vue';
 import CustomerPhoneExtendSetting from './extend/CustomerPhoneExtendSetting.vue';
 import ProductNameExtendSetting from './extend/ProductNameExtendSetting.vue';
+import CustomerNameExtendSearch from './extend/CustomerNameExtendSearch.vue';
 
 let FormTextField = {
   formType: 'text', // 字段类型
@@ -22,7 +23,8 @@ let FormTextField = {
       'customer_name_setting': CustomerNameExtendSetting,
       'product_serialNumber_setting': ProductSerialNumberExtendSetting,
       'product_name_setting': ProductNameExtendSetting,
-      'customer_lmPhone_setting': CustomerPhoneExtendSetting
+      'customer_lmPhone_setting': CustomerPhoneExtendSetting,
+      'customer_search': CustomerNameExtendSearch,
     }
   }
 };

@@ -30,6 +30,10 @@ export default {
         let parent = this.$parent;
         return parent && parent.$el;
       }
+    },
+    needValidate: {
+      type: Boolean,
+      default: true,
     }
   },
   data() {
@@ -58,7 +62,7 @@ export default {
   methods: {
     /** 默认返回true, 确保不影响表单提交 */
     validate() {
-      if (typeof this.valueFn != 'function') return true;
+      if (typeof this.valueFn != 'function' || !this.needValidate) return true;
 
       this.errMessage = '';
       this.status = false;

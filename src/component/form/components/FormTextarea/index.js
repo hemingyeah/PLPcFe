@@ -2,6 +2,8 @@ import FormTextareaSetting from './FormTextareaSetting.vue';
 import FormTextareaPreview from './FormTextareaPreview.vue';
 import FormTextarea from './FormTextarea.vue'
 
+import TextareaSearch from './extend/TextareaSearch';
+
 let FormTextareaField = {
   formType: 'textarea', // 字段类型
   name: '多行文本',
@@ -9,7 +11,10 @@ let FormTextareaField = {
   component: {
     setting: FormTextareaSetting,
     preview: FormTextareaPreview,
-    build: FormTextarea
+    build: FormTextarea,
+    extend: {
+      'textarea_search': TextareaSearch
+    }
   }
 };
 
