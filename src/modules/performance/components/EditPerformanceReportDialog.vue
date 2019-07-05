@@ -186,7 +186,7 @@
       <div class="dialog-footer" style="margin-top: 15px;">
         <el-button @click="visible = false">取 消</el-button>
         <el-button type="primary" @click="confirmCreateReport('screen')" :disabled="pending">去除重复数据并继续</el-button>
-        <el-button type="primary" @click="confirmCreateReport" :disabled="pending">包含重复数据并继续</el-button>
+        <el-button type="primary" @click="confirmCreateReport('')" :disabled="pending">包含重复数据并继续</el-button>
       </div>
     </div>
 
@@ -215,7 +215,7 @@
 import { formatDate } from '@src/util/lang';
 
 import * as TeamApi from '@src/api/TeamApi';
-import {createPerformanceReport, getApprovePerson, getApprovePersonList, checkTagUserRepeat} from '@src/api/PerformanceApi';
+import {createPerformanceReport, getApprovePerson, getApprovePersonList, checkTagUserRepeat, checkTaskRepeatCalculation} from '@src/api/PerformanceApi';
 
 import ApproveProcess from './ApproveProcess.vue'
 import ChooseTeamUserOptionsDialog from './ChooseTeamUserOptionsDialog.vue';
@@ -425,25 +425,23 @@ export default {
         sign,
       };
 
-      if (!sign) {
-        delete params.sign;
-      }
-
       this.pending = true;
       createPerformanceReport(params)
         .then(res => {
+          let isSucc = res.status == 0;
+
           this.pending = false;
-          if ([1, 7, 8, 11].some(v => v === res.status)) {
-            // 1 失败 8 无可统计的工单 7 无可结算员工信息
-            return this.$platform.notification({
-              title: '失败',
-              message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
-              type: 'error',
-            });
+          this.$platform.notification({
+            title: isSucc ? '成功' : '失败',
+            message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
+            type: isSucc ? 'success' : 'error',
+          });
+          
+          if(isSucc) {
+            this.visible = false;
+            this.showExportList();
           }
 
-          this.stage = 'success';
-          this.createReportResult = res.data;
         })
         .catch(e => console.error('e', e));
     },
@@ -454,19 +452,14 @@ export default {
       this.pending = true;
       const params = this.buildParams();
 
-      createPerformanceReport(params)
+      checkTaskRepeatCalculation(params)
         .then(res => {
-          // 0 成功
-          // 1 失败
-          // 7 没有可结算的员工信息，只出现在团队
-          // 8 无可统计工单 || 无可结算的订单
-          // 9 结算重复的工单 || 结算重复
-          // 11 去重后无可结算的工单
+          let data = res.data;
+          let isSucc = res.status == 0;
 
           this.pending = false;
-          if ([1, 7, 8, 11].some(v => v === res.status)) {
-            // todo failed message
-            // 1 失败 8 无可统计的工单 7 无可结算员工信息
+
+          if (!isSucc) {
             return this.$platform.notification({
               title: '失败',
               message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
@@ -474,19 +467,13 @@ export default {
             });
           }
 
-          // 结算重复
-          if (res.status === 9) {
+          // 结算是否重复
+          if (!data) {
+            this.visible = false;
+            this.showExportList();
+          } else {
             this.reports = res.data;
             this.stage = 'confirm';
-            return;
-          }
-          // todo  结果为空的情况
-          // 最后才是有不重复的数据生成报告
-
-          if (!res.status) {
-            this.stage = 'success';
-            this.createReportResult = res.data;
-            // this.visible = false;
           }
         })
         .catch(e => {
@@ -720,6 +707,10 @@ export default {
       if(value == 'cancel') {
         this.selectTeam();
       }
+    },
+    showExportList() {
+      window.parent.showExportList();
+      window.parent.exportPopoverToggle(true);
     }
   },
   components: {

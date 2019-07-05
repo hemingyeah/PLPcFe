@@ -59,11 +59,12 @@
                 </button>
 
                 <el-popover trigger="click" :value="exportPopperVisible" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
-                  <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
+                  <button type="button" :title="backgroundTaskTitle" v-tooltip class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
                     <i class="iconfont icon-xiazai"></i>
                   </button>
                   <!-- start 导入导出下载 -->
-                  <import-and-export-view 
+                  <import-and-export-view
+                    :title="backgroundTaskTitle" 
                     :source-list="exportList" 
                     @change="operationListChange"
                   >
@@ -211,6 +212,9 @@ export default {
       exportTimer: null,
       exportList: [],
       operationList: [],
+
+      // 后台任务
+      backgroundTaskTitle: '后台任务',
     }
   },
   computed: {

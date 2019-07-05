@@ -160,7 +160,15 @@
       </el-pagination>
 
     </div>
-    <edit-performance-report-dialog :init-data="initData" @refresh-list="search" ref="reportDialog" />
+
+    <!-- start 后台任务列表 -->
+    <edit-performance-report-dialog 
+      :init-data="initData" 
+      @refresh-list="search" 
+      ref="reportDialog" 
+    />
+    <!-- end 后台任务列表 -->
+
     <base-export
       ref="exportPanel"
       :columns="columns"

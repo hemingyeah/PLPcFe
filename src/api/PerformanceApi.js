@@ -89,7 +89,12 @@ function updatePerformanceRule(params) {
  * @returns Promise {data, message, status}
  */
 function createPerformanceReport(params) {
-  return http.post('/performance/v2/contain/work_order', params, false) // form data
+  return http.post('/excels/performance/calculation', params, false) // form data
+}
+
+/** 检查工单是否重复  */
+function checkTaskRepeatCalculation(params){
+  return http.post('/performance/v2/checkTaskRepeatCalculation', params, false)
 }
 
 /**
@@ -246,5 +251,6 @@ export {
   approvePerformance,
   getPerformanceRecord,
   publishPerformance,
-  checkTagUserRepeat
+  checkTagUserRepeat,
+  checkTaskRepeatCalculation
 }
