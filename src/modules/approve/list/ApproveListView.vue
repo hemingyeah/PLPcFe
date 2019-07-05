@@ -3,7 +3,7 @@
     <!-- 搜索 view -->
     <div class="approve-search-view">
       <!-- 基础搜索 -->
-      <form class="base-search" @submit.prevent="searchBtnHandler()">
+      <form class="base-search" @submit.prevent="btnSearchHandler()">
         <div class="search-group">
           <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -30,7 +30,7 @@
           </el-dropdown>
         </h3>
 
-        <el-form class="advanced-search-form" novalidate @submit.native.prevent="searchBtnHandler()">
+        <el-form class="advanced-search-form" novalidate @submit.native.prevent="btnSearchHandler()">
           <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
             <el-form-item label-width="100px" label="发起人">
               <base-select v-model="paramsForSelector.proposer" :remote-method="inputSearchInitiator" clearable>
@@ -475,14 +475,15 @@ export default {
       if (this.params.source === 'task') {
         let types = this.paramsForSelector.taskType;
         this.params.typeId = (types && types.length > 0) ? types[0].id : '';
-      }
-      if (this.params.source === 'event') {
+      } else if (this.params.source === 'event') {
         let types = this.paramsForSelector.eventType;
         this.params.typeId = (types && types.length > 0) ? types[0].id : '';
+      } else {
+        this.params.typeId = '';
       }
 
     },
-    searchBtnHandler () {
+    btnSearchHandler () {
       this.pageInfo.pageNum = 1;
       // 
       this.buildParams();
@@ -500,8 +501,7 @@ export default {
           this.pageInfo.totalPages = 0;
           this.pageInfo.pageNum = 1;
 
-          res && res.message && platform.alert(res.message);
-          return res
+          return res && res.message && platform.alert(res.message);
         }
         const {data: {pages, total, pageNum}} = res;
 
@@ -537,7 +537,7 @@ export default {
     },
     exportApprove (exportAll) {
       let ids = [];
-      let fileName = `${formatDate(new Date(), 'yyyy-MM-dd')}审批中心数据.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-dd')}审批中心数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
         ids = this.multipleSelection;
@@ -824,8 +824,6 @@ export default {
         break;
       }
     },
-
-
     /**
      * 点击列表中的编号字段，判断进入任务还是事件详情页
      */

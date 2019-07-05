@@ -84,7 +84,7 @@ router.get('/window', async ctx => {
 
 // 审批列表 联调时临时使用
 router.post('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.0.30',
+  host: '172.18.0.28',
   port: 10002
 }))
 
