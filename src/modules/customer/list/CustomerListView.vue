@@ -753,7 +753,6 @@ export default {
               }
               return c;
             })
-          console.log('res', res);
         })
         .catch(e => console.error('e', e));
     },
@@ -1064,8 +1063,6 @@ export default {
         .forEach(key => {
           tv = this.paramsBackup.customizedSearchModel[key];
 
-          console.log('tv', tv);
-
           if (tv.value && tv.formType === 'date') {
             return conditions.push({
               property: tv.fieldName,
@@ -1105,9 +1102,6 @@ export default {
       }
 
       delete params.customizedSearchModel;
-
-      console.log('params', params);
-
       return params;
     },
     // 把对象中!!为false的值去除（eg. false, undefined, null...），except 可以把想保留的值留下(eg.[0])

@@ -36,9 +36,6 @@ export default {
     },
     renderValue() {
       const {multiple, value} = this;
-      console.log('value', this.value);
-      console.log('multiple', multiple);
-      
       if (!multiple) return <div class="test">{value}</div>;
       return <div>value</div>
     },

@@ -12,15 +12,14 @@
       </el-dropdown>
     </h3>
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
-        <search-form :fields="fields" ref="searchForm" :form-backup="formBackup"></search-form>
-      </div>
+      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :columnNum="columnNum"></search-form>
       <slot name="footer"></slot>
     </el-form>
 </base-panel></template>
 
 <script>
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
+import * as Utils from '@src/component/form/util';
 import {formatDate} from '@src/util/lang';
 
 export default {
@@ -35,6 +34,7 @@ export default {
     return {
       visible: false,
       formBackup: {},
+      columnNum: 1,
       selfFields: [{
         displayName: '选择团队',
         fieldName: 'tags',
@@ -114,17 +114,24 @@ export default {
         })
         .sort((a, b) => a.orderId - b.orderId);
     },
-    columnNum() {
-      return 1;
-    },
     panelWidth() {
       return `${420 * this.columnNum}px`;
     },
   },
   mounted() {
-    console.log('mounted')
+    const {column_number} = this.getLocalStorageData();
+    if(column_number) this.columnNum = Number(column_number)
   },
   methods: {
+    saveDataToStorage(key, value) {
+      const data = this.getLocalStorageData();
+      data[key] = value;
+      localStorage.setItem('product_list_localStorage_19_4_24', JSON.stringify(data));
+    },
+    getLocalStorageData() {
+      const dataStr = localStorage.getItem('product_list_localStorage_19_4_24') || '{}';
+      return JSON.parse(dataStr);
+    },
     matchOperator(field) {
       let formType = field.formType;
       let operator = '';
@@ -205,13 +212,9 @@ export default {
         }
       }
 
-      console.log('notSystemFields', notSystemFields);
-
       for(let i = 0;i < notSystemFields.length;i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
-
-        console.log('form[fn]', form[fn]);
 
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
@@ -229,8 +232,6 @@ export default {
             betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
             betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD'),
           });
-
-          console.log('params.conditions', params.conditions);
           continue;
         }
 
@@ -260,9 +261,6 @@ export default {
         });
       }
 
-      console.log('form', form);
-      console.log('params', params);
-
       return params;
     },
     setAdvanceSearchColumn(command) {
@@ -285,6 +283,10 @@ export default {
           type: Object,
           default: () => ({})
         },
+        columnNum: {
+          type: Number,
+          default: 1
+        },
       },
       data() {
         return {
@@ -301,8 +303,6 @@ export default {
         },
         buildForm() {
           if (Object.keys(this.form).length === this.fields.length) return;
-          console.log('this.form', this.form);
-
           this.initFormVal();
         },
         initFormVal() {
@@ -324,17 +324,13 @@ export default {
 
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
-
             this.$set(this.form, field.fieldName, this.formBackup[field.fieldName] || tv)
           });
 
-          console.log('form', form);
-          console.log('this.formBackup', this.formBackup);
 
           return form;
         },
         update(event, isTags) {
-          console.log('event', event);
           if (isTags) {
             return this.form.tags = event;
           }
@@ -371,7 +367,6 @@ export default {
                   field: f,
                   value: this.form[f.fieldName],
                   disableMap: true,
-                  // placeholder: Utils.genPlaceholder(f),
                 },
                 on: {
                   update: event => this.update(event)
@@ -387,7 +382,7 @@ export default {
                   field: f,
                   value: this.form[f.fieldName],
                   disableMap: true,
-                  // placeholder: Utils.genPlaceholder(f),
+                  placeholder: Utils.genPlaceholder(f),
                 },
                 on: {
                   update: event => this.update(event)
@@ -409,7 +404,7 @@ export default {
       },
       render(h) {
         return (
-          <div>
+          <div class={`form-item-container ${this.columnNum == 2 ? 'two-columns' : ''}`}>
             {this.fields.map(f => this.renderInput(h, f))}
           </div>
         )
@@ -427,6 +422,7 @@ export default {
     padding: 10px 15px 63px 15px;
 
     height: calc(100% - 52px);
+    justify-content: space-between;
 
     .two-columns {
       display: flex;
@@ -436,14 +432,16 @@ export default {
       }
     }
 
-    .el-form-item {
-      .el-form-item__content,
-      .el-select,
-      .base-dist-picker,
-      .el-cascader,
-      .el-date-editor {
-        width: 290px;
+    .form-item-container {
+      justify-content: space-between;
+    }
+
+    .form-item {
+      label {
+        padding-left: 0;
       }
+
+      width: 390px;
     }
 
     .advanced-search-btn-group {

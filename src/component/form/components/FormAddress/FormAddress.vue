@@ -124,10 +124,6 @@ export default {
     updateValue(newValue) {
       let oldValue = null;
       this.$emit('update', {newValue, oldValue, field: this.field});
-
-
-      console.log('newValue', newValue);
-
       this.$emit('input', newValue);
     },
     chooseMap() {

@@ -41,16 +41,9 @@ export default {
   methods: {
     choose(newValue){
       let oldValue = null;
-
-      console.log('newValue', newValue);
-
-      // this.$emit('input', newValue);
       this.$emit('update', {newValue, oldValue, field: this.field});
     },
     searchCustomer(keyword) {
-
-      console.log('keyword', keyword);
-
       this.loading = true;
       this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
         .then(res => {
