@@ -441,6 +441,7 @@ export default {
         source: '', // 来源搜索
         state: 'unapproved', // 审批状态搜索
         mySearch: 'approve',
+        // mySearch: '', // todo  不要提交
         eventType: '',
         action: '',
         pageNum: 1,
@@ -452,16 +453,16 @@ export default {
         this.params.createTimeStart = formatDate(this.params.createTime[0])
         this.params.createTimeEnd = `${formatDate(this.params.createTime[1]).replace('00:00:00', '23:59:59')}`;
       } else {
-        this.params.createTimeStart = '';
-        this.params.createTimeEnd = '';
+        delete this.params.createTimeStart;
+        delete this.params.createTimeEnd;
       }
 
       if (this.params.completeTime && this.params.completeTime.length) {
         this.params.completeTimeStart = formatDate(this.params.completeTime[0]);
         this.params.completeTimeEnd = `${formatDate(this.params.completeTime[1]).replace('00:00:00', '23:59:59')}`;
       } else {
-        this.params.completeTimeStart = '';
-        this.params.completeTimeEnd = '';
+        delete this.params.completeTimeStart;
+        delete this.params.completeTimeEnd;
       }
 
       this.params.keyword = this.paramsBackup.keyword || '';
@@ -739,6 +740,7 @@ export default {
     roleChangeHandler (event) {
       this.pageInfo.pageNum = 1;
       this.params.mySearch = event;
+      // this.params.mySearch = ''; // todo  不要提交      
       this.doSearch();
     },
     /**
