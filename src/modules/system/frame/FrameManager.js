@@ -3,6 +3,7 @@ import {parse} from '@src/util/querystring'
 import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
 import FrameHistoryManager from './FrameHistoryManager'
+import { platform } from '@src/platform';
 
 // import normalizeWheel from '@src/util/normalizeWheel'
 
@@ -139,33 +140,41 @@ const FrameManager = {
     },
     updateFrameTab(event, tab){
       let frame = event.target;
-      let frameWindow = frame.contentWindow;
-      
-      // FIXME: 这里存在跨域问题，原因未知
-      tab.title = frameWindow.document.title || tab.originTitle;
-      tab.currentUrl = frameWindow.location.pathname;
-      tab.loading = false;
-      tab.reload = false;
-    
-      this.adjustFrameTabs(tab);
-      this.$nextTick(() => {
-        let rootWindow = getRootWindow(window);
+      try {
+        let frameWindow = frame.contentWindow;
 
-        // 传递点击事件，用于关闭顶层window popper
-        frameWindow.addEventListener('click', (e) => {
-          const clickEvent = new CustomEvent('click', {
-            detail: {
-              isTrusted: e.isTrusted,
-              isMock: true
-            },
-            bubbles: true
-          })
-          rootWindow.document.body.dispatchEvent(clickEvent)
-        })
-      })
+        tab.title = frameWindow.document.title || tab.originTitle;
+        tab.currentUrl = frameWindow.location.pathname;
+        tab.loading = false;
+        tab.reload = false;
       
-      // 记录frame历史
-      FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
+        this.adjustFrameTabs(tab);
+        this.$nextTick(() => {
+          let rootWindow = getRootWindow(window);
+
+          // 传递点击事件，用于关闭顶层window popper
+          frameWindow.addEventListener('click', (e) => {
+            const clickEvent = new CustomEvent('click', {
+              detail: {
+                isTrusted: e.isTrusted,
+                isMock: true
+              },
+              bubbles: true
+            })
+            rootWindow.document.body.dispatchEvent(clickEvent)
+          })
+        })
+        
+        // 记录frame历史
+        FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
+      } catch (error) {
+        platform.alert([
+          `[frame src]: ${frame.src}`,
+          `[tab url]: ${tab.url}`,
+          `[tab id]: ${tab.id}`,
+          `[tab fromid]: ${tab.fromId}`
+        ].join('\n'));
+      }
     },
     reloadFrameTab(tab, redirect = false){
       if (tab.timeStamp && (new Date() - tab.timeStamp <= 5000)) return;
