@@ -140,7 +140,8 @@ const FrameManager = {
     updateFrameTab(event, tab){
       let frame = event.target;
       let frameWindow = frame.contentWindow;
-
+      
+      // FIXME: 这里存在跨域问题，原因未知
       tab.title = frameWindow.document.title || tab.originTitle;
       tab.currentUrl = frameWindow.location.pathname;
       tab.loading = false;
