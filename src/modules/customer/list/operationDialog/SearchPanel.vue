@@ -36,14 +36,29 @@ export default {
       formBackup: {},
       columnNum: 1,
       selfFields: [{
-        displayName: '选择团队',
-        fieldName: 'tags',
-        formType: 'tags',
+        displayName: '区域',
+        fieldName: 'area',
+        formType: 'area',
         isExport: false,
         isNull: 1,
         isSystem: 1,
-        operator: 'between',
-        orderId: -2.5
+        orderId: 10
+      }, {
+        displayName: '详细地址',
+        fieldName: 'addressDetail',
+        formType: 'text',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        orderId: 11
+      }, {
+        displayName: '创建人',
+        fieldName: 'createUser',
+        formType: 'user',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        orderId: 12
       }, {
         displayName: '创建时间',
         fieldName: 'createTime',
@@ -52,7 +67,16 @@ export default {
         isNull: 1,
         isSystem: 1,
         operator: 'between',
-        orderId: -2
+        orderId: 98
+      }, {
+        displayName: '更新时间',
+        fieldName: 'updateTime',
+        formType: 'date',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        operator: 'between',
+        orderId: 99
       }, {
         displayName: '有无提醒',
         fieldName: 'hasRemind',
@@ -61,7 +85,7 @@ export default {
         isNull: 1,
         isSystem: 1,
         operator: 'between',
-        orderId: -3,
+        orderId: 96,
         setting: {
           isMulti: false,
           dataSource: [{
@@ -75,6 +99,28 @@ export default {
             value: 0
           }]
         }
+      }, {
+        displayName: '状态',
+        fieldName: 'status',
+        formType: 'select',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        operator: 'between',
+        orderId: 97,
+        setting: {
+          isMulti: false,
+          dataSource: [{
+            text: '全部',
+            value: ''
+          }, {
+            text: '启用',
+            value: 1
+          }, {
+            text: '禁用',
+            value: 0
+          }]
+        }
       }]
     }
   },
@@ -82,7 +128,13 @@ export default {
     fields() {
       let f = {};
       return [...this.config.fields, ...this.selfFields]
-        .filter(f => (f.isSearch || f.isSystem) && f.fieldName !== 'qrcodeId')
+        // .filter(f => (f.isSearch || f.isSystem) && f.fieldName !== 'qrcodeId' && f.displayName !== '服务团队')
+        .filter(f => (f.isSearch || f.isSystem) &&
+          f.formType !== 'separator' &&
+          f.fieldName !== 'name' &&
+          f.fieldName !== 'lmPhone' &&
+          f.fieldName !== 'customerAddress' &&
+          f.fieldName !== 'lmName')
         .map(field => {
 
           f = Object.assign({}, field);
@@ -101,14 +153,19 @@ export default {
             f.setting.isMulti = false;
           }
 
-          if (formType === 'updateTime') {
-            f.displayName = '更新时间';
+          if (f.fieldName === 'manager') {
+            f.fieldName = 'customerManager';
+          }
+
+          if (f.displayName === '服务团队') {
+            formType = 'tags';
           }
 
           return Object.freeze({
             ...f,
             isNull: 1,
             formType,
+            orderId: f.isSystem ? f.orderId - 100 : f.orderId ,
             operator: this.matchOperator(f)
           })
         })
@@ -187,8 +244,8 @@ export default {
         fn = tv.fieldName;
 
         // hasRemind
-        if (fn === 'hasRemind' && form[fn] !== '') {
-          params.hasRemind = form[fn];
+        if ((fn === 'hasRemind' || fn === 'status') && form[fn] !== '') {
+          params[fn] = form[fn];
           continue;
         }
 
@@ -196,8 +253,46 @@ export default {
           continue;
         }
 
+        if (fn === 'addressDetail') {
+          params.customerAddress = {
+            ...params.customerAddress || {},
+            adAddress: form[fn]
+          }
+          continue;
+        }
+
         if (typeof form[fn] === 'string') {
           params[fn === 'customer' ? 'customerId' : fn] = form[fn];
+          continue;
+        }
+
+        if (fn === 'area') {
+          params.customerAddress = {
+            ...params.customerAddress || {},
+            adProvince: form[fn][0],
+            adCity: form[fn][1],
+            adDist: form[fn][2],
+          }
+          continue;
+        }
+
+        if (fn === 'addressDetail') {
+          params.customerAddress = {
+            ...params.customerAddress || {},
+            adAddress: form[fn]
+          }
+          continue;
+        }
+
+        if (fn === 'createTime') {
+          params.createTimeStart = `${formatDate(form[fn][0], 'YYYY-MM-DD')} 00:00:00`;
+          params.createTimeEnd = `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`;
+          continue;
+        }
+
+        if (fn === 'updateTime') {
+          params.updateTimeStart = `${formatDate(form[fn][0], 'YYYY-MM-DD')} 00:00:00`;
+          params.updateTimeEnd = `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`;
           continue;
         }
 
@@ -320,18 +415,39 @@ export default {
             if (field.formType === 'tags') {
               tv = []
             }
+            if (field.formType === 'area') {
+              tv = []
+            }
+            if (field.formType === 'select' && field.displayName === '服务团队') {
+              tv = []
+            }
+
+            // console.group()
+            // console.log('field.formType', field.formType);
+            // console.log('field.fieldName', field.fieldName);
+            // console.log('field.displayName', field.displayName);
+            // console.log('field.orderId', field.orderId);
+            // console.groupEnd()
 
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
-            this.$set(this.form, field.fieldName, this.formBackup[field.fieldName] || tv)
-          });
 
+            if (field.fieldName === 'status' || field.fieldName === 'hasRemind') {
+              this.$set(this.form, field.fieldName, Number(this.formBackup[field.fieldName]) >= 0 ? this.formBackup[field.fieldName] : '')
+            } else {
+              this.$set(this.form, field.fieldName, this.formBackup[field.fieldName] || tv)
+            }
+          });
 
           return form;
         },
-        update(event, isTags) {
-          if (isTags) {
+        update(event, action) {
+          if (action === 'tags') {
             return this.form.tags = event;
+          }
+
+          if (action === 'dist') {
+            return this.form.area = event;
           }
 
           const f = event.field;
@@ -340,13 +456,14 @@ export default {
         renderInput(h, f) {
           let comp = FormFieldMap.get(f.formType);
 
-          if (!comp && f.formType !== 'tags' && f.formType !== 'customer') {
+          if (!comp && f.formType !== 'tags' && f.formType !== 'area') {
             return null;
           }
 
           let childComp = null;
 
           if (f.formType === 'tags') {
+
             childComp = h(
               'biz-team-select',
               {
@@ -354,21 +471,19 @@ export default {
                   value: this.form[f.fieldName],
                 },
                 on: {
-                  input: event => this.update(event, 'isTags')
+                  input: event => this.update(event, 'tags')
                 }
               }
             )
-          } else if (f.formType === 'customer') {
+          } else if (f.formType === 'area') {
             childComp = h(
-              'customer-search',
+              'base-dist-picker',
               {
                 props: {
-                  field: f,
                   value: this.form[f.fieldName],
-                  disableMap: true,
                 },
                 on: {
-                  update: event => this.update(event)
+                  input: event => this.update(event, 'dist')
                 }
               });
           } else {

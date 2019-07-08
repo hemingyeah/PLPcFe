@@ -37,6 +37,13 @@ export default {
       options: [],
     };
   },
+  created() {
+
+    let options = sessionStorage.getItem(`${this.field.fieldName}_options`);
+
+    this.options = JSON.parse(options || '[]');
+
+  },
   methods: {
     choose(newValue){
       let oldValue = null;
@@ -50,10 +57,12 @@ export default {
       this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
         .then(res => {
           this.options = res.list
-            .map(({displayName, userId}) => ({
+            .map(({displayName, userId}) => Object.freeze({
               name: displayName,
               id: userId
-            }))
+            }));
+
+          sessionStorage.setItem(`${this.field.fieldName}_options`, JSON.stringify(this.options));
           this.loading = false;
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));

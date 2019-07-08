@@ -4,10 +4,10 @@
     <div class="customer-list-search-group-container">
       <form class="base-search" onsubmit="return false;">
         <div class="customer-list-base-search-group">
-          <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
+          <el-input v-model="params.keyword" placeholder="根据客户信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="search({ pageNum: 1, }, true);trackEventHandler('search')" native-type="submit">
+          <base-button type="primary" @event="params.pageNum=1;search();trackEventHandler('search')" native-type="submit">
             搜索
           </base-button>
           <base-button type="ghost" @event="resetParams">
@@ -19,203 +19,7 @@
               @click.self="panelSearchAdvancedToggle">高级搜索</span>
       </form>
       <!--高级搜索-->
-      <base-panel :show.sync="advancedSearchPanelShow" :width="panelWidth">
-        <h3 slot="title">
-          <span>高级搜索</span>
-          <el-dropdown class="pull-right" trigger="click" @command="setAdvanceSearchColumn">
-            <i class="iconfont icon-xitongguanli customer-panel-btn" style="float: none;"></i>
 
-            <el-dropdown-menu slot="dropdown" class="customer-advance-setting">
-              <el-dropdown-item command="1">一栏</el-dropdown-item>
-              <el-dropdown-item command="2">两栏</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </h3>
-        <el-form class="advanced-search-form" onsubmit="return false;">
-          <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
-            <el-form-item label-width="100px" label="客户编号">
-              <el-input type="text" v-model="params.serialNumber"></el-input>
-            </el-form-item>
-            <el-form-item label-width="100px" label="联系人">
-              <el-select
-                popper-class="advanced-search-linkman"
-                v-model="params.linkmanId"
-                @change="modifyUser('linkman')"
-                filterable
-                clearable
-                remote
-                reserve-keyword
-                placeholder="请输入关键词搜索"
-                :loading="inputRemoteSearch.linkman.loading"
-                :remote-method="searchLinkman">
-                <el-option
-                  v-for="item in inputRemoteSearch.linkman.options"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id">
-                  <p>{{item.name}}</p>
-                  <p>电话：{{item.phone || ''}}</p>
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label-width="100px" label="选择团队">
-              <biz-team-select v-model="params.tag" :fetch-func="getTeamList"/>
-            </el-form-item>
-            <el-form-item label-width="100px" label="区域">
-              <base-dist-picker @input="handleCitySelectorChange" :value="params.specialSearchModel.addressSelector"
-                                ref="baseDistPicker"></base-dist-picker>
-            </el-form-item>
-            <el-form-item label-width="100px" label="详细地址">
-              <el-input type="text" v-model="params.specialSearchModel.adAddress"></el-input>
-            </el-form-item>
-            <el-form-item label-width="100px" label="有无提醒">
-              <el-select v-model="params.hasRemind" clearable placeholder="请选择">
-                <el-option :value="null" label="全部"></el-option>
-                <el-option :value="1" label="有"></el-option>
-                <el-option :value="0" label="无"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label-width="100px" label="状态">
-              <el-select v-model="params.status" clearable placeholder="请选择">
-                <el-option :value="null" label="全部"></el-option>
-                <el-option :value="1" label="启用"></el-option>
-                <el-option :value="0" label="禁用"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label-width="100px" label="创建人">
-              <el-select
-                v-model="params.createUser"
-                @change="modifyUser('createUser')"
-                filterable
-                clearable
-                remote
-                reserve-keyword
-                placeholder="请输入关键词搜索"
-                :loading="inputRemoteSearch.creator.loading"
-                :remote-method="searchCreator">
-                <el-option
-                  v-for="item in inputRemoteSearch.creator.options"
-                  :key="item.userId"
-                  :label="item.displayName"
-                  :value="item.userId">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label-width="100px" label="客户负责人">
-              <el-select
-                v-model="params.customerManager"
-                @change="modifyUser('customerManager')"
-                filterable
-                clearable
-                remote
-                reserve-keyword
-                placeholder="请输入关键词搜索"
-                :loading="inputRemoteSearch.customerManager.loading"
-                :remote-method="searchCustomerManager">
-                <el-option
-                  v-for="item in inputRemoteSearch.customerManager.options"
-                  :key="item.userId"
-                  :label="item.displayName"
-                  :value="item.userId">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label-width="100px" label="创建时间">
-              <el-date-picker
-                v-model="params.createTime"
-                type="daterange"
-                align="right"
-                unlink-panels
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :picker-options="createTimePickerOptions">
-              </el-date-picker>
-            </el-form-item>
-            <el-form-item label-width="100px" label="更新时间">
-              <el-date-picker
-                v-model="params.updateTime"
-                type="daterange"
-                align="right"
-                unlink-panels
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :picker-options="createTimePickerOptions">
-              </el-date-picker>
-            </el-form-item>
-
-
-            <!-- 动态搜索框 -->
-            <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchFields"
-                          :key="field.fieldName">
-              <template v-if="field.formType === 'text' || field.formType === 'code'">
-                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                          :placeholder="field.placeHolder" type="text"></el-input>
-              </template>
-              <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-                <el-select v-model="params.customizedSearchModel[field.fieldName]['value']" clearable
-                           :placeholder="field.placeHolder">
-                  <el-option
-                    v-for="item in field.setting.dataSource"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                    :disabled="item.disabled">
-                  </el-option>
-                </el-select>
-              </template>
-              <template v-else-if="field.formType === 'number'">
-                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                          :placeholder="field.placeHolder" type="number"></el-input>
-              </template>
-              <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
-                <el-date-picker
-                  v-model="params.customizedSearchModel[field.fieldName]['value']"
-                  type="daterange"
-                  align="right"
-                  unlink-panels
-                  range-separator="-"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  :picker-options="createTimePickerOptions">
-                </el-date-picker>
-              </template>
-              <template v-else-if="field.formType === 'user'">
-                <el-select
-                  v-model="params.customizedSearchModel[field.fieldName]['value']"
-                  @change="modifyUser('user', field.fieldName)"
-                  filterable
-                  clearable
-                  remote
-                  reserve-keyword
-                  placeholder=""
-                  :loading="inputRemoteSearch.creator.loading"
-                  :remote-method="searchCreator">
-                  <el-option
-                    v-for="item in inputRemoteSearch.creator.options"
-                    :key="item.userId"
-                    :label="item.displayName"
-                    :value="item.userId">
-                  </el-option>
-                </el-select>
-              </template>
-              <template v-else-if="field.formType === 'address'">
-                <base-dist-picker v-model="params.customizedSearchModel[field.fieldName]['value'].selector"></base-dist-picker>
-                <el-input v-model="params.customizedSearchModel[field.fieldName]['value'].address" :placeholder="field.placeHolder" style="margin-top: 8px;"></el-input>
-              </template>
-              <template v-else>
-                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                          :placeholder="field.placeHolder"></el-input>
-              </template>
-            </el-form-item>
-          </div>
-          <div class="advanced-search-btn-group">
-            <base-button type="ghost" @event="resetParams">重置</base-button>
-            <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
-          </div>
-        </el-form>
-      </base-panel>
     </div>
 
     <!--list start-->
@@ -378,7 +182,7 @@
 
       <div class="table-footer">
         <div class="list-info">
-          共<span class="level-padding">{{paginationInfo.totalItems}}</span>记录，
+          共<span class="level-padding">{{totalItems}}</span>记录，
           已选中<span class="customer-selected-count" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>条
           <span class="customer-selected-count" @click="toggleSelection()">清空</span>
         </div>
@@ -388,10 +192,10 @@
           @current-change="jump"
           @size-change="handleSizeChange"
           :page-sizes="[10, 20, 50]"
-          :page-size="paginationInfo.pageSize"
-          :current-page="paginationInfo.pageNum"
+          :page-size="params.pageSize"
+          :current-page="params.pageNum"
           layout="prev, pager, next, sizes, jumper"
-          :total="paginationInfo.totalItems">
+          :total="totalItems">
         </el-pagination>
       </div>
     </div>
@@ -413,7 +217,7 @@
     <batch-update-customer-dialog
       ref="batchUpdateCustomerDialog"
       :selected-ids="selectedIds"
-      :total-items="paginationInfo.totalItems"
+      :total-items="totalItems"
       :build-download-params="buildParams"
       action="/excels/customer/update"
     ></batch-update-customer-dialog>
@@ -494,6 +298,20 @@
     </base-panel>
 
     <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
+
+    <search-panel
+      :config="{
+        fields: this.initData.fieldInfo,
+      }"
+      ref="searchPanel"
+    >
+      <div class="advanced-search-btn-group" slot="footer">
+        <base-button type="ghost" @event="resetParams">重置</base-button>
+        <base-button type="primary" @event="powerfulSearch" native-type="submit">搜索</base-button>
+      </div>
+    </search-panel>
+
+
   </div>
 </template>
 
@@ -504,6 +322,7 @@ import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
 import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
 import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
 import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
+import SearchPanel from './operationDialog/SearchPanel.vue';
 
 import * as CustomerApi from '@src/api/CustomerApi';
 import {searchLinkman} from '@src/api/EcSearchApi.js';
@@ -523,113 +342,24 @@ export default {
       // self state
       pending: false,
       loadingListData: false,
-      advancedSearchPanelShow: false,
       multipleSelectionPanelShow: false,
-      paramsBackup: {
-        specialSearchModel: {
-          addressSelector: [],
-          adAddress: '',
-        },
-        customizedSearchModel: {},
-        createUserName: '',
-        customerManagerName: '',
-        serialNumber: '',
-        linkmanId: '',
-        tagId: '',
-        hasRemind: '',
-        status: '',
-        createUser: '',
-        customerManager: '',
-        createTime: '',
-        updateTime: '',
-        customerAddress: {},
+      params: {
         orderDetail: {},
+        moreConditions: {
+          conditions: [],
+        },
         keyword: '',
         pageNum: 1,
         pageSize: 10,
-        tag: []
       },
-      params: {
-        specialSearchModel: {
-          addressSelector: [],
-          adAddress: '',
-        },
-        customizedSearchModel: {},
-        createUserName: '',
-        customerManagerName: '',
-        serialNumber: '',
-        linkmanId: '',
-        tagId: '',
-        hasRemind: '',
-        status: '',
-        createUser: '',
-        customerManager: '',
-        createTime: '',
-        updateTime: '',
-        customerAddress: {},
-        orderDetail: {},
-        tag: []
-      },
-      createTimePickerOptions: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-      },
-      paginationInfo: {
-        pageSize: 10,
-        pageNum: 1,
-        totalItems: 0,
-        totalPages: 0,
-      },
+      totalItems: 0,
       multipleSelection: [],
       defaultAddress: [],
       // data from remote
       customers: [],
       columns: this.fixedColumns(),
-      searchFields: [],
-      inputRemoteSearch: {
-        linkman: {
-          options: [],
-          loading: false,
-        },
-        tag: {
-          options: [],
-          loading: false,
-        },
-        creator: {
-          options: [],
-          loading: false,
-        },
-        customerManager: {
-          options: [],
-          loading: false,
-        },
-      },
       selectedLimit: 200,
       columnNum: 1,
-      filterTeams: [],
     };
   },
   computed: {
@@ -714,23 +444,22 @@ export default {
   mounted() {
     const {adProvince, adCity, adDist, } = this.customerConfig.customerAddressConfig;
     this.defaultAddress = [adProvince, adCity, adDist, ];
-
-    this.revertSearchParams();
-    this.buildConfig(this.paramsBackup.customizedSearchModel);
+    this.revertStorage();
+    this.columns = this.buildTableColumn();
     this.search();
 
-    if(!this.viewedPermission) {
-      this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
-    }
+    console.log('this.initData', this.initData);
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
   methods: {
-    revert(){
-      let data = '{"columnStatus":["name","serialNumber","lmName","lmPhone","customerAddress","detailAddress","tags","customerManagerName","status","createTime","updateTime","createUser","remindCount","field_t3LO0cLitWOhR4y7","field_HbOtz3PWzl10BjET"]}'
-      localStorage.setItem('customerListData', data)
+    powerfulSearch() {
+      this.params.pageNum = 1;
+      this.params.moreConditions = this.$refs.searchPanel.buildParams();
+
+      this.search();
     },
     showAdvancedSetting(){
       window.TDAPP.onEvent('pc：客户管理-选择列事件');
@@ -768,92 +497,6 @@ export default {
       })
 
     },
-    revertSearchParams() {
-      const localStorageData = this.getLocalStorageData();
-
-      if (localStorageData.pageSize) {
-        this.paramsBackup.pageSize = Number(localStorageData.pageSize);
-        this.paginationInfo.pageSize = Number(localStorageData.pageSize);
-      }
-
-      if (Array.isArray(this.paramsBackup.createTime) && this.paramsBackup.createTime.length) {
-        this.paramsBackup.createTime = this.paramsBackup.createTime.map(ct => new Date(ct));
-      }
-
-      if (Array.isArray(this.paramsBackup.updateTime) && this.paramsBackup.updateTime.length) {
-        this.paramsBackup.updateTime = this.paramsBackup.updateTime.map(ct => new Date(ct));
-      }
-
-      let storeUser = localStorage.getItem('store_user_for_search_customer') || '{}';
-      sessionStorage.removeItem('store_user_for_search_customer');
-      storeUser = JSON.parse(storeUser);
-
-      if (this.paramsBackup.linkmanId) {
-        this.inputRemoteSearch.linkman.options = storeUser.linkman || [];
-      }
-
-      if (this.paramsBackup.tagId) {
-        this.inputRemoteSearch.tag.options = storeUser.tags || [];
-      }
-
-      if (storeUser.creator) {
-        this.inputRemoteSearch.creator.options = storeUser.creator || [];
-      }
-
-      if (this.paramsBackup.customerManager) {
-        this.inputRemoteSearch.customerManager.options = storeUser.customerManager || [];
-      }
-
-      this.params = _.cloneDeep(this.paramsBackup);
-      delete this.params.keyword;
-
-      const num = localStorage.getItem('customer_list_advance_search_column_number') || 1;
-      this.columnNum = Number(num);
-    },
-    /**
-       *  人员类型的字段
-       *  绑定在form中的value是一个id，在初始化的时候却要给一个对象
-       *  所以选择某个人的时候，储存这个对象
-       *  在还原搜索状态的时候，取这个对象初始化这个form，
-       * */
-    modifyUser(type, fieldName) {
-      const store = {};
-      if (type === 'linkman') {
-        store.linkman = this.inputRemoteSearch.linkman.options.filter(lm => lm.id === this.params.linkmanId);
-      }
-      if (type === 'tags') {
-        store.tags = this.inputRemoteSearch.tag.options.filter(tag => tag.id === this.params.tagId);
-      }
-      if (type === 'createUser') {
-        const selected = this.inputRemoteSearch.creator.options.filter(ct => ct.userId === this.params.createUser);
-        let storageData = localStorage.getItem('store_user_for_search_customer') || '{}';
-        storageData = JSON.parse(storageData);
-        if (storageData.creator) {
-          storageData.creator = this.concatArrayAndItemUnique(storageData.creator, selected, 'userId');
-        } else {
-          store.creator = selected;
-        }
-
-      }
-      if (type === 'customerManager') {
-        store.customerManager = this.inputRemoteSearch.customerManager.options.filter(ct => ct.userId === this.params.customerManager);
-      }
-
-      // 自定义字段
-      if (type === 'user') {
-        const selected = this.inputRemoteSearch.creator.options.filter(ct => ct.userId === this.params.customizedSearchModel[fieldName].value);
-
-        let storageData = localStorage.getItem('store_user_for_search_customer') || '{}';
-        storageData = JSON.parse(storageData);
-        if (storageData.creator) {
-          store.creator = this.concatArrayAndItemUnique(storageData.creator, selected, 'userId');
-        } else {
-          store.creator = selected;
-        }
-      }
-
-      localStorage.setItem('store_user_for_search_customer', JSON.stringify(store));
-    },
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
       localStorage.setItem('customer_list_advance_search_column_number', command);
@@ -885,47 +528,6 @@ export default {
           c.attribute.remindCount += 1;
         }
       });
-    },
-    buildConfig(storage) {
-      const storageData = storage || {};
-      /**
-         * storageData如果存在，那就还原storage中的值
-         * date、datetime类型的要注意 new Date一下
-         * 人员选择初始化值是一个id，还要初始化它的options
-         */
-      this.customerConfig.fieldInfo = this.customerConfig.fieldInfo
-        .map(f => {
-
-          if (f.isSearch && !f.isSystem) {
-            if (storageData[f.fieldName] && (storageData[f.fieldName].formType === 'date' || storageData[f.fieldName].formType === 'datetime') && storageData[f.fieldName].operator === 'between') {
-              storageData[f.fieldName].value = storageData[f.fieldName].value && storageData[f.fieldName].value.map(t => new Date(t));
-            }
-
-            let value = storageData[f.fieldName] ? storageData[f.fieldName].value : null;
-
-            if (f.formType === 'address' && !f.isSystem) {
-              value = {
-                selector: [],
-                address: '',
-              }
-            }
-
-            // 需要搜索的字段
-            this.$set(this.params.customizedSearchModel, f.fieldName, {
-              fieldName: f.fieldName,
-              value,
-              operator: this.matchOperator(f),
-              formType: f.formType,
-            });
-            this.searchFields.push(f);
-          }
-
-          return f;
-        });
-
-      this.columns = this.buildTableColumn();
-
-      return this.params.customizedSearchModel;
     },
     jumpPage() {
       window.TDAPP.onEvent('pc：客户管理-新建事件');
@@ -964,38 +566,33 @@ export default {
     /** 检测导出条数 */
     checkExportCount(ids, max) {
       let exportAll = !ids || ids.length == 0;
-      return exportAll && this.paginationInfo.totalItems > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
+      return exportAll && this.totalItems > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
     },
     importSucc() {
       // console.log('importSucc');
       // this.search();
     },
-    search(cp = {}, fullSearch) {
-      // cp({pageNum: 1, }) 用于 reset pageNum = 1，在需要的情况
-      let params = {};
-      this.loadingListData = true;
-
-      if (fullSearch) {
-        this.paramsBackup = {
-          ...this.paramsBackup,
-          ..._.cloneDeep(this.params),
-        };
+    revertStorage() {
+      const {pageSize, column_number} = this.getLocalStorageData();
+      if (pageSize) {
+        this.params.pageSize = pageSize;
       }
+      if(column_number) this.columnNum = Number(column_number)
+    },
+    search() {
+      const params = this.buildParams();
+      console.log('params params', params)
 
-      params = {
-        ...this.buildParams(),
-        ...cp,
-      };
+      this.loadingListData = true;
 
       return this.$http.post('/customer/list', params)
         .then(res => {
           if (!res || !res.list) {
             this.customers = [];
-            this.paginationInfo.totalItems = 0;
-            this.paginationInfo.totalPages = 0;
-            this.paginationInfo.pageNum = 1;
+            this.totalItems = 0;
+            this.params.pageNum = 1;
           } else {
-            const {pages, total, pageNum, list} = res;
+            const {total, pageNum, list} = res;
 
             this.customers = list
               .map(c => {
@@ -1003,9 +600,8 @@ export default {
                 return c;
               });
 
-            this.paginationInfo.totalItems = total;
-            this.paginationInfo.totalPages = pages;
-            this.paginationInfo.pageNum = pageNum;
+            this.totalItems = total;
+            this.params.pageNum = pageNum;
             this.matchSelected(); // 把选中的匹配出来
           }
 
@@ -1021,135 +617,25 @@ export default {
         })
     },
     buildParams() {
-      let tv = null; // tv means temporary variable that used inside the loop.
-      const conditions = [];
-      let params = _.cloneDeep(this.paramsBackup);
+      const sm = Object.assign({}, this.params);
+      let params = {
+        keyword: sm.keyword,
+        pageSize: sm.pageSize,
+        pageNum: sm.pageNum,
+      };
 
-      // createTime
-      if (params.createTime && params.createTime.length) {
-        params.createTimeStart = formatDate(params.createTime[0]);
-        params.createTimeEnd = `${formatDate(params.createTime[1]).replace('00:00:00', '23:59:59')}`;
-        delete params.createTime;
+      if (Object.keys(sm.orderDetail || {}).length) {
+        params.orderDetail = sm.orderDetail;
       }
 
-      // updateTIme
-      if (params.updateTime && params.updateTime.length) {
-        params.updateTimeStart = formatDate(params.updateTime[0]);
-        params.updateTimeEnd = `${formatDate(params.updateTime[1]).replace('00:00:00', '23:59:59')}`;
-        delete params.updateTime;
+      if (Object.keys(sm.moreConditions).length > 1 || sm.moreConditions.conditions.length) {
+        params = {
+          ...params,
+          ...sm.moreConditions,
+        }
       }
 
-      // address
-      if (this.paramsBackup.specialSearchModel.addressSelector.length) {
-        params.customerAddress = {
-          adProvince: this.paramsBackup.specialSearchModel.addressSelector[0],
-          adCity: this.paramsBackup.specialSearchModel.addressSelector[1] || '',
-          adDist: this.paramsBackup.specialSearchModel.addressSelector[2] || '',
-        };
-      }
-
-      // tags
-      if (null != params.tag || Array.isArray(params.tag)) {
-        let tag = Array.isArray(params.tag) ? params.tag[0] || {} : params.tag
-        params.tagId = tag.id;
-        delete params.tag
-      }
-
-      params.customerAddress.adAddress = this.paramsBackup.specialSearchModel.adAddress || '';
-      params = this.deleteValueFromObject(params, [0, false]);
-
-      // build customized search fields
-      Object.keys(this.paramsBackup.customizedSearchModel)
-        .forEach(key => {
-          tv = this.paramsBackup.customizedSearchModel[key];
-
-          if (tv.value && tv.formType === 'date') {
-            return conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
-              betweenValue2: formatDate(tv.value[1], 'YYYY-MM-DD'),
-            });
-          }
-          if (tv.value && tv.formType === 'datetime') {
-            return conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
-              betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
-            });
-          }
-
-          if (tv.formType === 'address' && (tv.value.selector.length || tv.address)) {
-            return conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              value: tv.value.selector.filter(a => !!a).join('') + (tv.value.address || ''),
-            })
-          }
-
-          if (tv.value && tv.formType !== 'address') {
-            conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              value: tv.value,
-            });
-          }
-        });
-
-      if (conditions.length) {
-        params.conditions = conditions;
-      }
-
-      delete params.customizedSearchModel;
-      return params;
-    },
-    // 把对象中!!为false的值去除（eg. false, undefined, null...），except 可以把想保留的值留下(eg.[0])
-    // 主要用于向后端传参，把无用的空值过滤掉
-    // var a = { a: 0, b: 1, c: null, d: undefined, e: false}
-    // deleteValueFromObject(a) =>  {b: 1}
-    // deleteValueFromObject(a, [0]) =>  {a: 0, b: 1}
-    deleteValueFromObject(sourceObj, except = []) {
-      let obj = _.cloneDeep(sourceObj);
-      if (except.length) {
-        Object.keys(obj)
-          .forEach(key => {
-            if (typeof obj[key] === 'object' && obj[key]) {
-              obj[key] = this.deleteValueFromObject(obj[key], except);
-            }
-            if (!obj[key] && except.every(ex => ex !== obj[key])) {
-              delete obj[key];
-            }
-          });
-      } else {
-        Object.keys(obj)
-          .forEach(key => {
-            if (typeof obj[key] === 'object' && obj[key]) {
-              obj[key] = this.deleteValueFromObject(obj[key]);
-            }
-            if (!obj[key]) {
-              delete obj[key];
-            }
-          });
-      }
-      if (Object.keys(obj).length) {
-        return obj;
-      } 
-      return undefined;
-        
-    },
-    concatArrayAndItemUnique(arr1, arr2, key) {
-      // 数组中的对象根据id去重
-      let obj = {};
-      if (!arr1 || !arr1.length) return arr2 || [];
-      if (!arr2 || !arr2.length) return arr1 || [];
-      return [...arr1, ...arr2].reduce((cur, next) => {
-        obj[next[key]] ? '' : obj[next[key]] = true && cur.push(next);
-        return cur;
-      }, []);
-    },
-    handleCitySelectorChange(city) {
-      this.params.specialSearchModel.addressSelector = city;
+      return params
     },
     cancelSelectCustomer(customer) {
       if (!customer || !customer.id) return;
@@ -1194,7 +680,7 @@ export default {
       try {
         const {prop, order} = option;
         if (!order) {
-          this.paramsBackup.orderDetail = {};
+          this.params.orderDetail = {};
           return this.search();
         }
 
@@ -1212,7 +698,7 @@ export default {
           sortModel.type = sortedField.formType;
         }
 
-        this.paramsBackup.orderDetail = sortModel;
+        this.params.orderDetail = sortModel;
 
         this.search();
 
@@ -1221,13 +707,13 @@ export default {
       }
     },
     jump(pageNum) {
-      this.paramsBackup.pageNum = pageNum;
+      this.params.pageNum = pageNum;
       this.search();
     },
     handleSizeChange(pageSize) {
       this.saveDataToStorage('pageSize', pageSize);
-      this.paramsBackup.pageNum = 1;
-      this.paramsBackup.pageSize = pageSize;
+      this.params.pageNum = 1;
+      this.params.pageSize = pageSize;
       this.search();
     },
     // select customer
@@ -1418,162 +904,21 @@ export default {
     },
     resetParams() {
       window.TDAPP.onEvent('pc：客户管理-重置事件');
-      this.paramsBackup = {
-        specialSearchModel: {
-          addressSelector: [],
-          adAddress: '',
-        },
-        customizedSearchModel: {},
-        createUserName: '',
-        customerManagerName: '',
-        serialNumber: '',
-        linkmanId: '',
-        tagId: '',
-        hasRemind: '',
-        status: '',
-        createUser: '',
-        customerManager: '',
-        createTime: '',
-        updateTime: '',
-        customerAddress: {},
-        orderDetail: {},
-        keyword: '',
-        pageNum: 1,
-        pageSize: this.paramsBackup.pageSize,
-      };
+      this.$refs.searchPanel.resetParams();
 
       this.params = {
-        createUserName: '',
-        customerManagerName: '',
-        serialNumber: '',
-        linkmanId: '',
-        tagId: '',
-        hasRemind: '',
-        status: '',
-        createUser: '',
-        customerManager: '',
-        createTime: '',
-        updateTime: '',
-        customerAddress: {},
+        keyword: '',
+        pageNum: 1,
+        pageSize: this.params.pageSize,
         orderDetail: {},
-        specialSearchModel: {
-          addressSelector: [],
-          adAddress: '',
-        },
-        customizedSearchModel: {
-          ...this.params.customizedSearchModel,
+        moreConditions: {
+          conditions: [],
         },
       };
-      this.params.specialSearchModel.addressSelector = [];
-      this.params.specialSearchModel.adAddress = '';
 
-      for (let key in this.params.customizedSearchModel) {
-
-        if (this.params.customizedSearchModel[key].formType !== 'address') {
-          this.params.customizedSearchModel[key].value = null;
-        } else {
-          this.params.customizedSearchModel[key].value = {
-            selector: [],
-            address: '',
-
-          };
-        }
-      }
-
-      this.inputRemoteSearch.linkman.options = [];
-      this.inputRemoteSearch.creator.options = [];
-      this.searchTag();
-
-      this.$refs.baseDistPicker && this.$refs.baseDistPicker.clearValue();
       this.search();
-      // sessionStorage.removeItem('customer_list_search_status');
-    },
-    // input search method
-    searchCustomerManager(keyword) {
-      this.inputRemoteSearch.customerManager.loading = true;
-      return this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
-        .then(res => {
-          this.inputRemoteSearch.customerManager.options = res.list;
-          this.inputRemoteSearch.customerManager.loading = false;
-          return res;
-        })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
-    searchCreator(keyword) {
-      this.inputRemoteSearch.creator.loading = true;
-      return this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
-        .then(res => {
-          if (res && res.list) {
-            this.inputRemoteSearch.creator.options = res.list;
-            this.inputRemoteSearch.creator.loading = false;
-          }
-          return res;
-        })
-        .catch(err => console.error('searchCreator function catch err', err));
-    },
-    searchLinkman(keyword) {
-      this.inputRemoteSearch.linkman.loading = true;
-
-      searchLinkman({keyword, page: 1, pageSize: 20,})
-        .then(res => {
-
-          if (res.status) {
-            this.inputRemoteSearch.linkman.options = [];
-            this.inputRemoteSearch.linkman.loading = false;
-            return res;
-          }
-
-          this.inputRemoteSearch.linkman.options = res.data.list;
-          this.inputRemoteSearch.linkman.loading = false;
-          return res;
-        })
-        .catch(err => console.error('searchLinkman function catch err', err));
-    },
-    /** @deprecated */
-    searchTag(keyword) {
-      this.inputRemoteSearch.tag.loading = true;
-      return this.$http.get('/customer/tag/list', {keyword, pageNum: 1, pageSize: 100 * 100, })
-        .then(res => {
-          this.inputRemoteSearch.tag.loading = false;
-          this.inputRemoteSearch.tag.options = res && res.list ? res.list : [];
-          return res;
-        })
-        .catch(err => console.error('searchTag function catch err', err));
-    },
-    getTeamList(params) {
-      return this.getBizTeamList(params, this.filterTeams, this.viewedPermission);
     },
     // match data
-    matchOperator(field) {
-      let operator = '';
-      switch (field.formType) {
-      case 'date':
-        operator = 'between';
-        break;
-      case 'datetime':
-        operator = 'between';
-        break;
-      case 'select':
-        operator = (field.setting && field.setting.isMulti) ? 'contain' : 'eq';
-        break;
-      case 'selectMulti':
-        operator = 'contain';
-        break;
-      case 'user':
-        operator = 'user';
-        break;
-      case 'location':
-        operator = 'location';
-        break;
-      case 'address':
-        operator = 'address';
-        break;
-      default:
-        operator = 'like';
-        break;
-      }
-      return operator;
-    },
     matchSelected() {
       if (!this.multipleSelection.length) return;
       const selected = this.customers
@@ -1664,8 +1009,7 @@ export default {
     },
     panelSearchAdvancedToggle() {
       window.TDAPP.onEvent('pc：客户管理-高级搜索事件');
-
-      this.advancedSearchPanelShow = !this.advancedSearchPanelShow;
+      this.$refs.searchPanel.open();
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
         for(let i = 0; i < forms.length; i++) {
@@ -1691,6 +1035,7 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [BatchRemindingCustomerDialog.name]: BatchRemindingCustomerDialog,
     [BatchUpdateCustomerDialog.name]: BatchUpdateCustomerDialog,
+    [SearchPanel.name]: SearchPanel,
   }
 }
 </script>
