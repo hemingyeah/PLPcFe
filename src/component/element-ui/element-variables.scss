@@ -51,6 +51,7 @@ $--select-border-color-hover: $input-border-hover-color !default;
 }
 
 .base-notification{
+  z-index: 9999 !important;
   padding: 14px !important;
 
   .el-notification__group{
