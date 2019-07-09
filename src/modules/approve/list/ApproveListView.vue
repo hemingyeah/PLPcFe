@@ -125,7 +125,8 @@
           </el-form-item>
         </div>
         <div class="right-btn-group">
-          <el-dropdown v-if="exportPermission" trigger="click">            
+          <el-dropdown v-if="exportPermission" trigger="click">
+            <!-- <el-dropdown trigger="click"> -->
             <span class="el-dropdown-link el-dropdown-btn">
               更多操作
               <i class="iconfont icon-nav-down"></i>
@@ -323,7 +324,7 @@ import platform from '../../../platform';
 const KEY_MAP = {
   APPROVE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER: 'approve_list_advance_search_column_number',
   APPROVE_LIST_VIEW: 'approve_list_view', // 本页vue中逻辑使用
-  APPROVE_LIST_DATA: 'approve_list_data', // 兼容jsp中逻辑
+  APPROVE_LIST_DATA: 'approve_list_data', // 兼容jsp中逻辑(用于点击审批按钮后跳转)
 }
 
 
@@ -492,8 +493,10 @@ export default {
     },
     doSearch (params = this.params) {
       this.ui.loadingListData = true;
-      // 字段转换
+      // 字段转换 // todo 抽出方法
       params.page = params.pageNum;
+      params.myId = this.userId || 'd33846ee-6fa9-11e9-bfc9-00163e304a25'; // todo 1 联调字段 需要删除 2 后台可处理
+
       ApproveApi.getApproveList(params).then((res) => {
         this.ui.loadingListData = false;
         if (!res || !res.data || !res.data.list) {
@@ -774,16 +777,14 @@ export default {
         let storageData = localStorage.getItem(storageKey);
 
         if (!storageData) {
-          let approveListData = {};
-          localStorage.setItem(storageKey, approveListData);
-
+          localStorage.setItem(storageKey, JSON.stringify({}));
           storageData = localStorage.getItem(storageKey) || '{}';
         }
 
         storageData = JSON.parse(storageData);
         storageData[id] = id;
 
-        localStorage.setItem(storageKey, storageData);
+        localStorage.setItem(storageKey, JSON.stringify(storageData));
       } catch (e) {
         console.error('saveApproveId error', e);
       }
@@ -923,7 +924,7 @@ export default {
         keyword: this.params.keyword,
         proposerId: this.params.proposerId,
         source: this.params.source,
-        myId: this.userId,
+        myId: this.userId || 'd33846ee-6fa9-11e9-bfc9-00163e304a25', // todo 联调信息需要删除 
         state: this.params.state,
         mySearch: this.params.mySearch,
         action: this.params.action,
