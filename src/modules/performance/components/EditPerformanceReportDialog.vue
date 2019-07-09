@@ -419,7 +419,7 @@ export default {
         })
 
     },
-    confirmCreateReport(sign) {
+    confirmCreateReport(sign = '') {
       let params = {
         ...this.buildParams(),
         sign,
@@ -470,9 +470,9 @@ export default {
           // 结算是否重复
           if (!data) {
             this.visible = false;
-            this.showExportList();
+            this.confirmCreateReport();
           } else {
-            this.reports = res.data;
+            this.reports = data;
             this.stage = 'confirm';
           }
         })
