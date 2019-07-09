@@ -516,11 +516,8 @@ export default {
           target = this.form.target.map(({userId}) => userId).join(',') || '';
         } else {
           target = this.buildTarget();
-          userIsPepeat = isRepeat ? isRepeat : 'onlyParent'
+          userIsPepeat = isRepeat ? isRepeat : 'repeat'
         }
-      } else {
-        target = 'isAll';
-        userIsPepeat = range ? 'onlyParent' : '';
       }
 
       return {
