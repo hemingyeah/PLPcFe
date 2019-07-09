@@ -73,7 +73,7 @@ export default {
         })
         .then(res => this.errMessage = res)
         .catch(err => {
-          if(err.message != 'Request cancelled.'){
+          if(!err.message.startsWith('Request cancelled:')){
             console.error('validate err', err)
           }
         });

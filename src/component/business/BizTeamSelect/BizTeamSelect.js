@@ -100,8 +100,7 @@ const BizTeamSelect = {
       onClose: event => {
         let target = event.target;
         let data = this.$data;
-
-        if(target == data.$referenceEl || this.$el.contains(target)) return;
+        if(target == data.$referenceEl || this.$refs.popper.contains(target)) return;
         
         this.close()
       }
@@ -123,7 +122,7 @@ const BizTeamSelect = {
         ? this.value 
         : null != this.value ? [this.value] : [];
     },
-    async loadmore(){
+    loadmore(){
       this.loadmoreOptions.disabled = true;
       this.loading = true;
       this.params.pageNum += 1;

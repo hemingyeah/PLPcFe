@@ -29,7 +29,7 @@ let requestPool = {}; // 请求池
 function removeFromPool(key){
   let cancelFn = requestPool[key];
   if(typeof cancelFn == 'function'){
-    cancelFn('Request cancelled.');
+    cancelFn( `Request cancelled: ${key}`);
     delete requestPool[key];
   }
 }
