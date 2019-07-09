@@ -195,6 +195,9 @@
             <template v-else-if="column.field === 'completeTime'">
               {{ scope.row[column.field] | getFormatDate }}
             </template>
+            <template v-else-if="column.field === 'approverName'">
+              {{ getApproversNameList(scope.row.approvers) }}
+            </template>
             <template v-else>
               {{ scope.row[column.field] }}
             </template>
@@ -692,6 +695,7 @@ export default {
       }
 
       this.pageInfo.pageNum = 1;
+      this.params.pageNum = 1;
       this.doSearch();
     },
     inputSearchInitiator (e) {
@@ -763,6 +767,7 @@ export default {
         { label: '发起人', field: 'proposerName', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '发起时间', field: 'createTime', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '发起人备注', field: 'applyRemark', show: true, fixed: true, export: true },
+        // 注意导出时使用的字段是 approveName, 显示的时候列表item显示approvers(Array)的名称集合
         { label: '审批人', field: 'approverName', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '审批时间', field: 'completeTime', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '审批备注', field: 'approveRemark', show: true, fixed: true, export: true },
@@ -998,6 +1003,27 @@ export default {
      */
     getInitiatorAvatar (avatar) {
       return avatar || DEFAULT_INITIATOR_AVATAR;
+    },
+    /**
+     * 获取审批人名字列表
+     * 原字段为直接显示approveName，现在显示approvers中的displayName 集合
+     * @param {Array} value - 审批人列表集合 approveList.item.approvers
+     * @return {String} - '张三,李四'
+     */
+    getApproversNameList (value) {
+      if (!value || !value.length) return '';
+
+      let arr = [];
+      try {
+        value.forEach(item => {
+          let displayName = item.displayName;
+          displayName && arr.push(displayName)
+        })
+      } catch (e) {
+        return '';
+      }
+
+      return arr.join(',');
     }
   },
   computed: {
