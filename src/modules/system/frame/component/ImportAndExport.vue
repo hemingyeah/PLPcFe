@@ -426,10 +426,12 @@ export default {
     },
     /** 打开  失败的弹窗   */
     openErrorDialog(item, action) {
+      let reasons = item?.importInfo?.reasons;
+
       this.errorDialog = true;
       this.item = item;
       this.errorDialogTitle = `${action}失败原因`;
-      this.reasons = item?.importInfo?.reasons;
+      this.reasons = Array.isArray(reasons) ? reasons : [reasons];
     },
     /** 导出 按钮操作  */
     operateExport(item) {

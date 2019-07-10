@@ -667,10 +667,7 @@ export default {
         })
         this.teamAndUser.list = teams.concat(users);
         this.form.target = this.teamAndUser.list.map(({name}) => name);
-
-        if(!this.form.isRepeat || 'cancel' == this.form.isRepeat) {
-          this.checkTagAndUserRepeat();
-        }
+        this.checkTagAndUserRepeat();
 
       })
     },
@@ -694,7 +691,11 @@ export default {
           }
 
         } else {
-          this.$platform.alert(result.message);
+          this.$platform.notification({
+            title: '失败',
+            message: result.message || '',
+            type: 'error',
+          });
         }
 
       }).catch(err => console.error('checkTagUserRepeat', err))
