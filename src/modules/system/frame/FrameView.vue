@@ -261,11 +261,16 @@ export default {
     },
     /** @deprecated */
     async updateUser(){
-      let result = await http.get(`/security/user/get/${this.loginUser.userId}`);
-      if(result.status == 0){
-        // 暂时只更新状态
-        this.loginUser.state = result.data.state;
+      try {
+        let result = await http.get(`/security/user/get/${this.loginUser.userId}`);
+        if(result.status == 0){
+          // 暂时只更新状态
+          this.loginUser.state = result.data.state;
+        }
+      } catch (error) {
+        console.error(error);
       }
+      
     },
     /** 选择用户状态 */
     async chooseUserState(state){
@@ -313,7 +318,7 @@ export default {
     /** 检测是否有导出 */
     async checkExports(){
       try {
-        this.exportList = (await http.get('/excels/getList') || []);
+        this.exportList = (await http.get('/excels/getList') || []); // 报错
         // 更新操作列表
         if(!Array.isArray(this.exportList)) this.exportList = [];
         // 更新操作列表

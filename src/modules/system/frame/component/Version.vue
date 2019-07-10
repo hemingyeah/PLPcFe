@@ -23,7 +23,7 @@ import platform from '@src/platform'
 const VERSION_NUM_KEY = 'shb_version_num';
 
 export default {
-  name: "version",
+  name: 'version',
   props: {
     version: String
   },

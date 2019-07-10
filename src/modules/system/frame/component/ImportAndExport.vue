@@ -137,7 +137,7 @@ export default {
             return
 
           } catch (error) {
-            console.log('error: ', error);
+            console.error(error);
           }
 
         }
@@ -173,7 +173,7 @@ export default {
             return
 
           } catch (error) {
-            console.log('error: ', error);
+            console.error(error);
           }
         }
       }
@@ -201,19 +201,22 @@ export default {
           return
           
         } catch (error) {
-          console.log('error: ', error);
+          console.error(error);
         }
       }
     },
     async deleteRecord() {
       this.pending = true;
-
-      await http.get('/excels/cancel', { id: this.item.id});
+      try {
+        await http.get('/excels/cancel', { id: this.item.id});
       
-      this.errorDialog = false;
-      this.pending = false;
+        this.errorDialog = false;
+        this.pending = false;
 
-      this.$emit('change', this.operationList);
+        this.$emit('change', this.operationList);
+      } catch (error) {
+        console.error(error);
+      }
     },
     isImportDelete(createTime) {
       let timeOut = 30 * 60 * 1000;

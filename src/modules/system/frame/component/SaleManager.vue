@@ -32,7 +32,7 @@ export default {
     },
     qrcode: {
       type: String,
-      default: ""
+      default: ''
     }
   },
   computed: {
