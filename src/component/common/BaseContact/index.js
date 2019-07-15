@@ -125,7 +125,7 @@ function team( options = {} ){
           // this.$destroy(true);
 
           // el.parentNode && el.parentNode.removeChild(el); 
-          setTimeout(() => destroyComponent(el), 1500);
+          setTimeout(() => destroyComponent(this), 1500);
         },
         /** 值的改变  */
         input(user) {
