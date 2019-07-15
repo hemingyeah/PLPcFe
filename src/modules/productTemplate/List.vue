@@ -1410,7 +1410,7 @@ html, body {
     .base-dist-picker,
     .el-cascader,
     .el-date-editor {
-      width: 290px;
+      width: 290px !important;
     }
   }
 

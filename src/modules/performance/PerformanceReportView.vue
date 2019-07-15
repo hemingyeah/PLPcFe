@@ -17,7 +17,7 @@
             <el-button type="primary" size="mini" @click="cancelApprove">撤回审批</el-button>
           </template>
 
-          <template v-if="needToApprove">
+          <template v-if="needToApprove && reportStatus">
             <el-button type="primary" size="mini" @click="approve">审批</el-button>
           </template>
 

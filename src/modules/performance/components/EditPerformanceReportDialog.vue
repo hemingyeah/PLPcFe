@@ -97,7 +97,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             @change="validate"
-            style="width: 290px;"
+            style="width: 290px !important;"
             :class="{'input-is-error': !formValidation.time}"
             :picker-options="createTimePickerOptions">
           </el-date-picker>
@@ -212,6 +212,7 @@
 </template>
 
 <script>
+import platform from '@src/platform';
 import { formatDate } from '@src/util/lang';
 
 import * as TeamApi from '@src/api/TeamApi';
@@ -431,11 +432,8 @@ export default {
           let isSucc = res.status == 0;
 
           this.pending = false;
-          this.$platform.notification({
-            title: isSucc ? '成功' : '失败',
-            message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
-            type: isSucc ? 'success' : 'error',
-          });
+          
+          platform.alert(res.message || '发生未知错误');
           
           if(isSucc) {
             this.visible = false;
