@@ -47,7 +47,10 @@ export default {
       }
     },
     /** 是否启禁用图选址 */
-    disableMap: Boolean
+    disableMap: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
     /** 将省市区转换成数组 */
@@ -81,6 +84,9 @@ export default {
       if (newAddress.addressType) {
         newAddress.latitude = adrBackup.adLatitude || adrBackup.latitude;
         newAddress.longitude = adrBackup.adLongitude || adrBackup.longitude;
+      } else {
+        newAddress.latitude = '';
+        newAddress.longitude = '';
       }
 
       this.updateValue(newAddress)
@@ -127,7 +133,6 @@ export default {
       this.$emit('input', newValue);
     },
     chooseMap() {
-      if(this.disableMap) return;
 
       const point = {
         latitude: this.value.latitude || '',

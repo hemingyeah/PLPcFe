@@ -15,9 +15,9 @@ function createFormField(h, field, comp){
     }
   };
   
-  if (field.formType === 'address' && !field.isSystem) {
-    data.props.disableMap = true;
-  }
+  // if (field.formType === 'address' && !field.isSystem) {
+  //   data.props.disableMap = true;
+  // }
 
   return h(comp.build, data);
 }
