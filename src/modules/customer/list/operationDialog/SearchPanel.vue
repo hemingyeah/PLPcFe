@@ -12,7 +12,7 @@
       </el-dropdown>
     </h3>
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :columnNum="columnNum"></search-form>
+      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :column-num="columnNum"></search-form>
       <slot name="footer"></slot>
     </el-form>
 </base-panel></template>
@@ -212,6 +212,14 @@ export default {
       }
       case 'user': {
         operator = 'user';
+        break;
+      }
+      case 'address': {
+        operator = 'address';
+        break;
+      }
+      case 'location': {
+        operator = 'location';
         break;
       }
       default: {

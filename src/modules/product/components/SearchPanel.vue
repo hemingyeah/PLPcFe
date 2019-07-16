@@ -157,6 +157,14 @@ export default {
         operator = 'user';
         break;
       }
+      case 'address': {
+        operator = 'address';
+        break;
+      }
+      case 'location': {
+        operator = 'location';
+        break;
+      }
       default: {
         operator = 'like';
         break;
