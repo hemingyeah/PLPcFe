@@ -9,7 +9,7 @@
         <el-popover
           placement="top-start"
           trigger="hover"
-          content="具备运营分析权限的用户才可以被设置为审批人">
+          content="请设置当生成绩效报告时由谁来审核">
           <span style="vertical-align: middle" slot="reference">
             <i class="icon-help iconfont" style="margin-left: 3px;"></i>
           </span>
@@ -35,13 +35,25 @@
           </el-option>
         </el-select>
 
-        <el-button type="primary" @click="setApprove" :disabled="settingPending">保存</el-button>
+        <el-button type="primary" @click="setApprove" :disabled="settingPending" style="margin: 0 15px;">保存</el-button>
       </div>
     </div>
 
 
     <div class="setting-item">
-      <p class="setting-title">绩效报告抄送选项</p>
+      <p class="setting-title">
+        绩效报告抄送选项
+
+        <el-popover
+          placement="top-start"
+          trigger="hover"
+          content="当绩效报告生成后，可以抄送给某些用户，但需要根据发布流程设置创建后即发送，还是审核后才发送。">
+          <span style="vertical-align: middle" slot="reference">
+            <i class="icon-help iconfont" style="margin-left: 3px;"></i>
+          </span>
+        </el-popover>
+
+      </p>
       <div class="setting-cc">
         <span>请选择抄送绩效报告的发送节点</span>
         <el-radio :label="0" @change="changeSetting" v-model="form.sendToCc" :disabled="pending">创建后抄送</el-radio>
@@ -200,7 +212,7 @@ export default {
 
       .content {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         padding: 10px 0;
       }

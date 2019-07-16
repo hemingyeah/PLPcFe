@@ -802,7 +802,7 @@ export default {
 
     .base-search {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       margin-bottom: 10px;
 
       .search-group {

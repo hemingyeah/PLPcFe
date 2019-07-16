@@ -7,7 +7,7 @@
           <el-input v-model="form.reportName" @change="validate" :maxlength="50"> </el-input>
         </el-form-item>
         <el-form-item label="选择规则" :error="!formValidation.ruleId ? '必选': ''" required>
-          <el-select v-model="form.ruleId" @change="validate" placeholder="请选择" style="width: 100%;">
+          <el-select v-model="form.ruleId" @change="validate" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
             <el-option
               v-for="item in openRules"
               :key="item.value"
@@ -97,7 +97,6 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             @change="validate"
-            style="width: 290px !important;"
             :class="{'input-is-error': !formValidation.time}"
             :picker-options="createTimePickerOptions">
           </el-date-picker>
@@ -113,7 +112,7 @@
 
         <el-form-item label="抄送人">
           <el-select
-            style="width: 300px"
+            style="width: 350px"
             v-model="form.carbonCopy"
             filterable
             clearable
@@ -784,7 +783,7 @@ export default {
 .create-performance-report-modal {
 
   .approve-process-container {
-    width: 300px;
+    width: 350px;
     margin: 0;
   }
 
