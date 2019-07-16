@@ -77,6 +77,11 @@ export function isDatetime(field){
     || (field.formType == 'planTime' && (setting == null || setting.dateType != 'date'));
 }
 
+/** 是否为说明信息类型 */
+export function isInfo(field) {
+  return field.formType === 'info';
+}
+
 /** 构建placeholder */
 export function genPlaceholder(field, defaultText = ''){
   let text = '';

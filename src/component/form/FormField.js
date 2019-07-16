@@ -1,5 +1,6 @@
 import {randomString} from '@src/util/lang';
 import Field from '@model/Field'
+import * as FormInfoConfig from './components/FormInfo/config';
 
 /** 补全formType 为select时的所需字段 */
 function fillPropForSelect(params){
@@ -119,6 +120,10 @@ export default class FormField{
       }
       setting.isMulti = field.isMulti;
       setting.dataSource = dataSource;
+    }
+
+    if(field.formType === 'info') {
+      option.placeHolder = option.placeHolder || FormInfoConfig.PLACE_HOLDER;
     }
     
     if (field.setting) {

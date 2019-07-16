@@ -1,14 +1,14 @@
 <template>
   <div class="form-preview-group form-info-preview">
-    <label>{{ field.displayName }}<span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
     <div class="form-item__text">
-      {{ field.placeHolder }}
-      <!-- <p class="form-preview-control">{{ field.placeHolder }}</p> -->
+      {{ field.placeHolder || placeholder }}
     </div>
   </div>
 </template>
 
 <script>
+import {PLACE_HOLDER} from './config';
+
 export default {
   name: 'form-info-preview',
   props: {
@@ -19,6 +19,10 @@ export default {
     setting: {
       type: Object,
       default: () => ({})
+    },
+    placeholder: {
+      type: String,
+      default: PLACE_HOLDER
     }
   }
 }

@@ -60,6 +60,9 @@ const FormBuilder = {
     /** 注册待验证的组件 */
     addFieldHandler(event){
       let {fieldName, validate} = event.detail;
+      if (event.detail && event.detail.field && event.detail.field.formType === 'info') {
+        return;
+      }
       this.validateMap[fieldName] = validate;
     },
     removeFieldHandler(event){
@@ -91,6 +94,11 @@ const FormBuilder = {
         
         let formItemClass = [];
         if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
+
+        if(field.formType === 'info') {
+          return formField;
+        }
+
         return (
           <form-item
             label={field.displayName} class={formItemClass}

@@ -1,5 +1,5 @@
 import * as config from '../config';
-import { isSelect, isMultiSelect } from './index';
+import { isSelect, isMultiSelect, isInfo } from './index';
 import { isEmpty } from '@src/util/lang';
 import platform from '@src/platform'
 
@@ -14,7 +14,7 @@ function common(field){
     }
   }
 
-  if(field.placeHolder && field.placeHolder.length > config.FIELD_PLACEHOLER_LENGTH_MAX){
+  if(field.placeHolder && field.formType !== 'info' && field.placeHolder.length > config.FIELD_PLACEHOLER_LENGTH_MAX){
     message.push(`描述信息长度超过${config.FIELD_PLACEHOLER_LENGTH_MAX}个字符`)
   }
   
@@ -53,6 +53,19 @@ function select(field){
   return message;
 }
 
+/**
+ * info字段的验证
+ * 默认为空显示 dom.placeholder（不在此处处理)
+ */
+function info (field) {
+  let message = [];
+  
+  if(field.placeHolder && field.placeHolder.length > config.INFO_FIELD_LENGTH_MAX){
+    message.push(`描述信息长度超过${config.INFO_FIELD_LENGTH_MAX}个字符`);
+  }
+
+  return message;
+}
 
 /**
  * 验证表单字段格式
@@ -68,6 +81,10 @@ export function validate(fields){
 
     if(isSelect(field) || isMultiSelect(field)){
       message = message.concat(select(field));
+    }
+
+    if(isInfo(field)) {
+      message = message.concat(info(field));
     }
 
     return message.length > 0 ? {message, title: field.displayName} : null;
