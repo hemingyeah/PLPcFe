@@ -50,7 +50,7 @@ export default {
           formType: 'select',
           isSystem: 1
         },
-        ...this.initData.productFields.filter(f => f.formType !== 'location')
+        ...this.initData.productFields
       ]
     },
     auth() {

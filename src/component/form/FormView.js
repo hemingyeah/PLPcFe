@@ -1,6 +1,7 @@
 import { toArray } from '@src/util/lang';
 import { fmt_address } from '@src/filter/fmt';
-import { isHiddenField } from './util'
+import { isHiddenField } from './util';
+import { FormFieldMap } from './components';
 
 const FormView = {
   name: 'form-view',
@@ -71,7 +72,7 @@ const FormView = {
         .catch(err => console.error('openMap catch an err: ', err));
     },
   
-    mapFieldToDom(field) {
+    mapFieldToDom(field, createElement) {
       let {formType, fieldName, displayName, isSystem} = field;
       if (formType === 'separator') {
         const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
@@ -98,6 +99,14 @@ const FormView = {
       if (this.$scopedSlots[fieldName]) {
         return this.$scopedSlots[fieldName](params);
       }
+
+      // 组件默认视图
+      let FormField = FormFieldMap.get(field.formType);
+      if(FormField && FormField.view){
+        let attrs = {props: {field, value}}
+        return createElement(FormField.view, attrs);
+      }
+      
       
       if (formType === 'attachment') {
         params = {
@@ -202,7 +211,7 @@ const FormView = {
       return newArr;
     }
   },
-  render() {
+  render(h) {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     let groups = this.groupField(this.fields);
     
@@ -214,10 +223,10 @@ const FormView = {
         if (this.sectionState[currentGroupId] === undefined) {
           this.$set(this.sectionState, currentGroupId, true);
         }
-        return this.mapFieldToDom(item);
+        return this.mapFieldToDom(item, h);
       });
 
-      let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item));
+      let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, h));
       
       return (
         <div class="view-group">

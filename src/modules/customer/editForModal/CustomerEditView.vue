@@ -45,7 +45,6 @@ export default {
               f.fieldName !== 'tags' 
               || (f.fieldName === 'tags' && this.initData.isDivideByTag)
             )
-            && f.formType !== 'location'
           )
         });
       return FormUtil.migration(sortedFields)

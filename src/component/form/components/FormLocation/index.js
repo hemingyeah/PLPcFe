@@ -8,6 +8,7 @@ let FormLocationField = {
   name: '位置',
   isSystem: 0,
   component: {
+    build: FormLocation,
     setting: FormLocationSetting,
     preview: FormLocationPreview,
     view: FormLocationView,

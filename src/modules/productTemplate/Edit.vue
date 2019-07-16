@@ -88,7 +88,6 @@ export default {
           return (
             f.fieldName !== 'customer' 
             && f.fieldName !== 'tags'
-            && f.formType !== 'location'
           )
         })
       );
