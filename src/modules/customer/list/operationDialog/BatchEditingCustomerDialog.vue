@@ -146,14 +146,16 @@ export default {
       }
       if (sf.formType === 'datetime') {
         tv = form[sf.fieldName];
+
         params.mapJson = JSON.stringify({
-          [sf.fieldName]: formatDate(tv, 'YYYY-MM-DD HH:mm:ss'),
+          [sf.fieldName]: tv,
         })
       }
       if (sf.formType === 'date') {
         tv = form[sf.fieldName];
+
         params.mapJson = JSON.stringify({
-          [sf.fieldName]: formatDate(tv, 'YYYY-MM-DD'),
+          [sf.fieldName]: tv,
         })
       }
 
@@ -202,6 +204,13 @@ export default {
         buildForm() {
           if (Object.keys(this.form).length === this.fields.length) return;
           this.form = Utils.initialize(this.fields);
+
+          this.fields.forEach(f => {
+            if (f.fieldName === 'tags' && f.formType === 'select') {
+              this.form[f.fieldName] = [];
+            }
+          });
+
         },
         update(event) {
           /**

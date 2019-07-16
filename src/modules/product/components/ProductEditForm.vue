@@ -99,6 +99,11 @@ export default {
       return this.fields.filter(f => f.fieldName === 'customer')[0]
     },
   },
+  mounted() {
+
+    console.log('value', this.value);
+
+  },
   methods: {
     updateTemplate(value) {
       let nv = null;
@@ -107,7 +112,11 @@ export default {
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
 
-        if (nv !== null && f.fieldName != 'customer' && f.fieldName != 'template') {
+        if (f.formType === 'address') {
+          console.log(nv)
+        }
+
+        if (!!nv && f.fieldName != 'customer' && f.fieldName != 'template') {
           this.update(({
             field: f,
             newValue: nv

@@ -141,13 +141,13 @@ export default {
       if (sf.formType === 'datetime') {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
-          [sf.fieldName]: formatDate(tv, 'YYYY-MM-DD HH:mm:ss'),
+          [sf.fieldName]: tv,
         })
       }
       if (sf.formType === 'date') {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
-          [sf.fieldName]: formatDate(tv, 'YYYY-MM-DD'),
+          [sf.fieldName]: tv,
         })
       }
 
