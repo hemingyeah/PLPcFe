@@ -799,4 +799,10 @@ export default {
 
 }
 
+.customized-label{
+  .el-date-editor{
+    width:  350px !important;
+  }
+}
+
 </style>
