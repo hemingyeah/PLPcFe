@@ -78,6 +78,36 @@ export default {
     .el-input__inner{
       padding-left: 10px;
     }
+
+    // 超出长度多行显示
+    .el-tag {
+      height: auto;
+      .el-select__tags-text {
+        white-space: pre-wrap;
+      }
+    }
+    // 超出单行显示'...'
+    // .el-tag {
+    //   position: relative;
+    //   max-width: 100%;
+    //   display: flex;
+    //   justify-content: center;
+    //   align-items: center;
+    //   .el-select__tags-text {
+    //     white-space: nowrap;
+    //     text-overflow: ellipsis;
+    //     overflow: hidden;
+    //     padding-right: 10px;
+    //     display: inline-block;
+    //     max-width: 100%;
+    //   }
+    //   .el-tag__close {
+    //     position: absolute;
+    //     right: 0;
+    //     top: 4px;
+    //   }
+    // }
+
   }
 }
 </style>
