@@ -71,7 +71,6 @@
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
           <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteReport">删除</base-button>
-          <base-button type="ghost" @event="performanceTeam">团队</base-button>
           <a href="https://help.shb.ltd/doc?id=10501#Performance_report" target="_blank">如何通过绩效报告统计团队或个人数据？</a>
         </div>
 
@@ -146,18 +145,26 @@
         </el-table-column>
 
       </el-table>
+      
+      <div class="performance-list-table-footer">
+        <div class="list-info">
+          共<span class="level-padding">{{ params.totalItems || 0 }}</span>记录，
+          已选中<span class="performance-selected-count" @click="panelTheMultipleSelectionShow = true">{{ multipleSelection.length }}</span>条
+          <span class="performance-selected-count" @click="selectionInit()">清空</span>
+        </div>
 
-      <el-pagination
-        class="performance-report-table-pagination"
-        background
-        @current-change="jump"
-        @size-change="handleSizeChange"
-        :page-sizes="[10, 20, 50]"
-        :page-size="params.pageSize"
-        :current-page="params.pageNum"
-        layout="sizes, prev, pager, next, jumper"
-        :total="params.totalItems">
-      </el-pagination>
+        <el-pagination
+          class="performance-report-table-pagination"
+          background
+          @current-change="jump"
+          @size-change="handleSizeChange"
+          :page-sizes="[10, 20, 50]"
+          :page-size="params.pageSize"
+          :current-page="params.pageNum"
+          layout="sizes, prev, pager, next, jumper"
+          :total="params.totalItems">
+        </el-pagination>
+      </div>
 
     </div>
 
@@ -168,6 +175,41 @@
       ref="reportDialog" 
     />
     <!-- end 后台任务列表 -->
+
+    <!-- start 已选择列表 -->
+    <base-panel class="performance-panel" :show.sync="panelTheMultipleSelectionShow" width="420px">
+      <h3 slot="title">
+        <span>已选中绩效报告({{ multipleSelection.length }})</span>
+        <i 
+          v-if="multipleSelection.length > 0"
+          class="iconfont icon-qingkongshanchu performance-panel-btn" 
+          @click="selectionInit()" 
+          title="清空已选中数据" data-placement="right" v-tooltip></i>
+      </h3>
+
+      <div class="performance-selected-panel">
+        <div class="performance-selected-tip" v-if="multipleSelection.length <= 0">
+          <img src="../../assets/img/no-data.png">
+          <p>暂无选中的数据，请从列表中选择。</p>
+        </div>
+        <template v-else>
+          <div class="performance-selected-list">
+            <div class="performance-selected-row performance-selected-head">
+              <span class="performance-selected-type">类型</span>
+              <span class="performance-selected-name">名称</span>
+            </div>
+            <div class="performance-selected-row" v-for="item in multipleSelection" :key="item.id" >
+              <span class="performance-selected-type">{{ item.type }}</span>
+              <span class="performance-selected-name">{{ item.reportName }}</span>
+              <button type="button" class="performance-selected-delete" @click="selectPerformanceCancel(item)">
+                <i class="iconfont icon-fe-close"></i>
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </base-panel>
+    <!-- end 已选择列表 -->
 
     <base-export
       ref="exportPanel"
@@ -181,6 +223,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import { formatDate, } from '@src/util/lang';
 import {getPerformanceReports, deletePerformanceReports, getApprovePersonList} from '@src/api/PerformanceApi';
 import EditPerformanceReportDialog from './components/EditPerformanceReportDialog.vue';
@@ -273,7 +316,9 @@ export default {
         type: 995,
         ruleIds: '',
       },
-      userList: []
+      selectedLimit: 200,
+      userList: [],
+      panelTheMultipleSelectionShow: false,
     }
   },
   computed: {
@@ -296,8 +341,6 @@ export default {
       this.params.pageSize = Number(localStorageData.pageSize);
     }
 
-    console.log('initData', this.initData);
-
     this.search();
   },
   methods: {
@@ -306,7 +349,7 @@ export default {
       let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}结算数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
-        ids = this.multipleSelection;
+        ids = this.multipleSelection.map(({id}) => id);
       }
 
       let isExportDownloadNow = true;
@@ -386,6 +429,8 @@ export default {
               })()
             }));
           this.params.totalItems = res.data.reportList.total;
+          // 把已选中的匹配出来
+          this.matchSelected();
         })
         .catch(e => console.error('e', e));
 
@@ -438,8 +483,42 @@ export default {
       window.TDAPP.onEvent('pc：绩效报告-新建事件');
       this.$refs.reportDialog.toggleDialog();
     },
+    /**  
+     * @description 操作选中
+    */
     handleSelection(selection) {
-      this.multipleSelection = selection.map(({id}) => id);
+      let selected = this.selectionComputed(selection);
+      let currentPageSelected = this.multipleSelection.filter(ms => {
+        return this.reports.some(report => report.id === ms.id)
+      });
+      let currentPageUnSelected = this.reports.filter(repost => {
+        return currentPageSelected.every(currentPageItem => repost.id !== currentPageItem.id);
+      })
+
+      if (selected.length > this.selectedLimit) {
+        this.$nextTick(() => {
+          currentPageSelected.length > 0
+          ? currentPageUnSelected.forEach(unSelected => {
+              this.$refs.multipleTable.toggleRowSelection(unSelected, false);
+            })
+          : this.$refs.multipleTable.clearSelection();
+        })
+
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+      }
+      this.multipleSelection = selected;
+    },
+    /**  
+     * @description 计算选中
+    */
+    selectionComputed(selection) {
+      let preSelected = this.multipleSelection.filter(ms => {
+        return this.reports.every(report => report.id !== ms.id);
+      })
+
+      preSelected = _.uniqWith([...preSelected, ...selection], _.isEqual);
+
+      return preSelected;
     },
     jump(pageNum) {
       this.params.pageNum = pageNum;
@@ -457,7 +536,7 @@ export default {
         return this.$platform.alert('请选择需要删除的绩效报告');
       }
 
-      const pass = this.reports.filter(r => this.multipleSelection.some(id => id === r.id))
+      const pass = this.reports.filter(r => this.multipleSelection.some(item => item.id === r.id))
         .some(r => r.createUserId !== this.userId || r.waitingForApprove);
 
       if (pass) return this.$platform.alert('无法删除，请确认该绩效报告是由您创建且未在审批中');
@@ -466,7 +545,7 @@ export default {
         if (!await this.$platform.confirm('确定要删除选择的绩效报告？')) return;
 
         deletePerformanceReports({
-          ids: `${this.multipleSelection.join(',') },`,
+          ids: `${this.multipleSelection.map(({id}) => id).join(',') },`,
         })
           .then(res => {
             if (res.status) {
@@ -651,7 +730,53 @@ export default {
       this.$fast.contact.choose('team', options).then(res => {
         this.userList = res.data;
       })
-    }
+    },
+    selectionInit(rows) {
+      let isNotOnCurrentPage = false;
+      let report = undefined;
+
+      if (rows) {
+        for(let i = 0; i < rows.length; i++) {
+          row = rows[i];
+          isNotOnCurrentPage = this.reports.every(report => {
+            return report.id !== row.id;
+          })
+          if(isNotOnCurrentPage) return 
+        }
+
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+        this.multipleSelection = [];
+
+      }
+    },
+    selectPerformanceCancel(item) {
+      if (!item || !item.id) return;
+
+      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== item.id);
+      this.multipleSelection.length < 1 ? this.selectionInit() : this.selectionInit([item]);
+    },
+    // 批量匹配选中
+    matchSelected() {
+      if (!this.multipleSelection.length) return;
+
+      const selected = this.reports
+        .filter(c => {
+          if (this.multipleSelection.some(sc => sc.id === c.id)) {
+
+            this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
+            this.multipleSelection.push(c);
+            return c;
+          }
+        }) || [];
+
+      this.$nextTick(() => {
+        this.selectionInit(selected);
+      });
+    },
   },
   components: {
     [EditPerformanceReportDialog.name]: EditPerformanceReportDialog,
@@ -805,6 +930,157 @@ export default {
     .customer-table-pagination {
       text-align: right;
       padding: 10px 5px;
+    }
+  }
+
+  .performance-list-table-footer {
+    background: #fff;
+    border-radius: 0 0 3px 3px;
+
+    display: flex;
+    justify-content: space-between;
+
+    padding: 0px 10px 10px 10px ;
+
+    .list-info {
+      color: #767e89;
+
+      font-size: 13px;
+      line-height: 48px;
+
+      margin: 0;
+
+      .iconfont {
+        position: relative;
+        top: 1px;
+      }
+    }
+
+    .el-pagination__jump {
+      margin-left: 0;
+    }
+  }
+
+  // performance selected panel
+  .performance-selected-count{
+    cursor: pointer;
+    color: $color-primary;
+
+    font-size: 13px;
+
+    padding: 0 3px;
+    width: 15px;
+
+    text-align: center;
+  }
+
+  .performance-panel {
+    .base-panel-title {
+      h3 {
+        display: flex;
+        justify-content: space-between;
+        i {
+          cursor: pointer;
+          display: inline-block;
+          text-align: center;
+          &:hover {
+            color: $color-primary;
+          }
+        }
+      }
+    }
+  }
+
+  .performance-selected-panel{
+    font-size: 14px;
+    height: calc(100% - 51px);
+  }
+
+  .performance-selected-tip{
+    padding-top: 80px;
+
+    img{
+      display: block;
+      width: 240px;
+      margin: 0 auto;
+    }
+
+    p{
+      color: #9a9a9a;
+
+      line-height: 20px;
+      text-align: center;
+
+      margin: 30px 0 0 0;
+    }
+  }
+
+  .performance-selected-list{
+    height: 100%;
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+  .performance-selected-row{
+    border-bottom: 1px solid #ebeef5;
+
+    display: flex;
+    flex-flow: row nowrap;
+
+    font-size: 13px;
+    line-height: 36px;
+
+
+    &:hover{
+      background-color: #f5f7fa;
+
+      .performance-selected-delete{
+        visibility: visible;
+      }
+    }
+  }
+
+  .performance-selected-head{
+    background-color: #F0F5F5;
+    color: #333;
+    font-size: 14px;
+  }
+
+  .performance-selected-name{
+    padding-left: 10px;
+    flex: 1;
+    @include text-ellipsis;
+  }
+
+  .performance-selected-type{
+    padding-left: 10px;
+    width: 150px;
+    @include text-ellipsis;
+  }
+
+  .performance-selected-delete{
+    width: 36px;
+  }
+
+  .performance-selected-row button.performance-selected-delete{
+    background-color: transparent;
+    color: #646B78;
+
+    border: none;
+    
+    padding: 0;
+    width: 36px;
+    height: 36px;
+
+    outline: none;
+    visibility: hidden;
+
+    i{
+      font-size: 14px;
+    }
+
+    &:hover{
+      color: #e84040;
     }
   }
 

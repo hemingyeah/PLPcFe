@@ -1193,9 +1193,13 @@ export default {
         .filter(c => original.every(oc => oc.id !== c.id));
 
       if (tv.length > this.selectedLimit) {
-        unSelected.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row, false);
-        });
+        this.$nextTick(() => {
+          original.length > 0
+          ? unSelected.forEach(row => {
+              this.$refs.multipleTable.toggleRowSelection(row, false);
+            })
+          : this.$refs.multipleTable.clearSelection();
+        })
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.multipleSelection = tv;
@@ -1208,7 +1212,18 @@ export default {
       return tv;
     },
     toggleSelection(rows) {
+      let isNotOnCurrentPage = false;
+      let item = undefined;
+      let row = undefined;
+
       if (rows) {
+        for(let i = 0; i < rows.length; i++) {
+          row = rows[i];
+          isNotOnCurrentPage = this.customers.every(item => {
+            return item.id !== row.id;
+          })
+          if(isNotOnCurrentPage) return 
+        }
         rows.forEach(row => {
           this.$refs.multipleTable.toggleRowSelection(row);
         });

@@ -156,7 +156,7 @@
       </div>
     </div>
 
-    <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
+    <base-panel class="product-panel" :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title">
         <span>已选中产品({{multipleSelection.length}})</span>
         <i
@@ -958,9 +958,12 @@ export default {
         .filter(c => original.every(oc => oc.id !== c.id));
 
       if (tv.length > this.selectedLimit) {
-
-        unSelected.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row, false);
+        this.$nextTick(() => {
+          original.length > 0
+          ? unSelected.forEach(row => {
+              this.$refs.multipleTable.toggleRowSelection(row, false);
+            })
+          : this.$refs.multipleTable.clearSelection();
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
@@ -1021,7 +1024,18 @@ export default {
       this.search({resetPageNum: true});
     },
     toggleSelection(rows) {
+      let isNotOnCurrentPage = false;
+      let item = undefined;
+      let row = undefined;
+
       if (rows) {
+        for(let i = 0; i < rows.length; i++) {
+          row = rows[i];
+          isNotOnCurrentPage = this.page.list.every(item => {
+            return item.id !== row.id;
+          })
+          if(isNotOnCurrentPage) return 
+        }
         rows.forEach(row => {
           this.$refs.multipleTable.toggleRowSelection(row);
         });
@@ -1624,6 +1638,21 @@ export default {
         display: inline-block;
         height: 43px;
         line-height: 43px;
+      }
+    }
+  }
+
+  .product-panel {
+    .base-panel-title {
+      h3 {
+        display: flex;
+        justify-content: space-between;
+      }
+      .product-panel-btn {
+        cursor: pointer;
+        &:hover {
+          color: $color-primary;
+        }
       }
     }
   }
