@@ -12,7 +12,8 @@ const DEFAULT_PLACEHOLDER = {
   user: '请选择人员',
   date: '日期',
   datetime: '日期 + 时间',
-  select: '请选择'
+  select: '请选择',
+  location: '请输入',
 }
 
 /** 
