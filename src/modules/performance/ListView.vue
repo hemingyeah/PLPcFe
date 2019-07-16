@@ -734,6 +734,7 @@ export default {
     selectionInit(rows) {
       let isNotOnCurrentPage = false;
       let report = undefined;
+      let row = undefined;
 
       if (rows) {
         for(let i = 0; i < rows.length; i++) {

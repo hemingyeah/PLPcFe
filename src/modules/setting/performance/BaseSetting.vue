@@ -9,7 +9,7 @@
         <el-popover
           placement="top-start"
           trigger="hover"
-          content="请设置当生成绩效报告时由谁来审核">
+          content="请设置当生成绩效报告时由谁来审批">
           <span style="vertical-align: middle" slot="reference">
             <i class="icon-help iconfont" style="margin-left: 3px;"></i>
           </span>
@@ -47,7 +47,7 @@
         <el-popover
           placement="top-start"
           trigger="hover"
-          content="当绩效报告生成后，可以抄送给某些用户，但需要根据发布流程设置创建后即发送，还是审核后才发送。">
+          content="当绩效报告生成后，可以抄送给某些用户，但需要根据发布流程设置创建后即发送，还是审批后才发送。">
           <span style="vertical-align: middle" slot="reference">
             <i class="icon-help iconfont" style="margin-left: 3px;"></i>
           </span>
