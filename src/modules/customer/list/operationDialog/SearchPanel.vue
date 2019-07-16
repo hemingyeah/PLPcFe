@@ -351,7 +351,7 @@ export default {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            value: (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
+            all: (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
           });
           continue;
         }
