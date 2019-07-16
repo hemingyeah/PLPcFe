@@ -17,7 +17,7 @@ import { FormFieldMap, } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import { editBatchProduct } from '@src/api/ProductApi';
 import FormItem from '@src/component/form/FormItem.vue';
-import {searchCustomer} from '@src/api/EcSearchApi.js';
+// import {searchCustomer} from '@src/api/EcSearchApi.js';
 
 export default {
   name: 'batch-editing-dialog',
@@ -217,18 +217,10 @@ export default {
         },
         searchCustomer(keyword) {
           this.inputRemoteSearch.customer.loading = true;
-          searchCustomer({keyword, page: 1, })
+          this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
             .then(res => {
-
-              if(!res || res.stauts) {
-                this.inputRemoteSearch.customer.options = [];
-                this.inputRemoteSearch.customer.loading = false;
-                return res;
-              }
-
-              this.inputRemoteSearch.customer.options = res.data.list;
+              this.inputRemoteSearch.customer.options = res.list;
               this.inputRemoteSearch.customer.loading = false;
-              return res;
             })
             .catch(err => console.error('searchCustomerManager function catch err', err));
         },

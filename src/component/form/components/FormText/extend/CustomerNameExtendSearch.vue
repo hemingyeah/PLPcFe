@@ -21,7 +21,7 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-import {searchCustomer} from '@src/api/EcSearchApi.js';
+// import {searchCustomer} from '@src/api/EcSearchApi.js';
 
 export default {
   name: 'customer-search',

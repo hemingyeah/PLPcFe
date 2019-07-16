@@ -325,7 +325,7 @@ import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDial
 import SearchPanel from './operationDialog/SearchPanel.vue';
 
 import * as CustomerApi from '@src/api/CustomerApi';
-import {searchLinkman} from '@src/api/EcSearchApi.js';
+// import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 
 export default {

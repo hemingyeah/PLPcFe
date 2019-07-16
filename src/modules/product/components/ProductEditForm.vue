@@ -63,7 +63,7 @@
 import * as FormUtil from '@src/component/form/util';
 import FormMixin from '@src/component/form/mixin/form'
 
-import {searchCustomer} from '@src/api/EcSearchApi.js';
+// import {searchCustomer} from '@src/api/EcSearchApi.js';
 import {checkSerialNumber} from '@src/api/ProductApi';
 import _ from 'lodash'
 
@@ -181,26 +181,19 @@ export default {
     },
     searchCustomer(params) {
       // params has three properties include keyword、pageSize、pageNum.
-      let pms = {
-        pageSize: params.pageSize,
-        page: params.pageNum,
-      };
+      const pms = params || {};
 
-      if (params.keyword) {
-        pms.keyword = params.keyword;
-      }
-
-      return searchCustomer(pms)
+      return this.$http.post('/customer/list', pms)
         .then(res => {
-          if (!res || res.status) return;
-          if (res.data.list) {
-            res.data.list = res.data.list.map(customer => Object.freeze({
+          if (!res || !res.list) return;
+          if (res.list) {
+            res.list = res.list.map(customer => Object.freeze({
               label: customer.name,
               value: customer.id,
             }))
           }
 
-          return res.data;
+          return res;
         })
         .catch(e => console.error(e));
     },
