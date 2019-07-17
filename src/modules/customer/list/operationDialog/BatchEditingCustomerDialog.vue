@@ -302,9 +302,9 @@ export default {
             }
           };
 
-          if (sf.formType === 'address' && !sf.isSystem) {
-            data.props.disableMap = true;
-          }
+          // if (sf.formType === 'address' && !sf.isSystem) {
+          //   data.props.disableMap = true;
+          // }
 
           return h(comp.build, data);
         }
