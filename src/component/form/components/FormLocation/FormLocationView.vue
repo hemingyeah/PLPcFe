@@ -34,8 +34,5 @@ export default {
         .catch(err => console.error('openMap catch an err: ', err));
     }
   },
-  mounted() {
-    console.log(this.value)
-  }
 }
 </script>

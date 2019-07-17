@@ -438,13 +438,6 @@ export default {
               tv = []
             }
 
-            // console.group()
-            // console.log('field.formType', field.formType);
-            // console.log('field.fieldName', field.fieldName);
-            // console.log('field.displayName', field.displayName);
-            // console.log('field.orderId', field.orderId);
-            // console.groupEnd()
-
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
 

@@ -448,8 +448,6 @@ export default {
     this.columns = this.buildTableColumn();
     this.search();
 
-    console.log('this.initData', this.initData);
-
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
@@ -581,7 +579,6 @@ export default {
     },
     search() {
       const params = this.buildParams();
-      console.log('params params', params)
 
       this.loadingListData = true;
 

@@ -380,8 +380,6 @@ export default {
     },
   },
   mounted() {
-    console.log('this.initData', this.initData);
-    // 审批列表中绩效报告数据的审批点击事件跳转到该页面触发 点击审批按钮事件 
     this.getRecord();
   },
   methods: {

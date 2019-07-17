@@ -99,11 +99,6 @@ export default {
       return this.fields.filter(f => f.fieldName === 'customer')[0]
     },
   },
-  mounted() {
-
-    console.log('value', this.value);
-
-  },
   methods: {
     updateTemplate(value) {
       let nv = null;

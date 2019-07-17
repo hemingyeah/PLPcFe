@@ -444,8 +444,7 @@ export default {
         if(index >= 0){
           let arr = depts.splice(index,1);
           depts.push(arr[0]); 
-        } 
-        // console.log(depts);
+        }
         
         return depts;
       })

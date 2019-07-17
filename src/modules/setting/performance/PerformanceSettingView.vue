@@ -35,10 +35,6 @@ export default {
       }
     }
   },
-  mounted() {
-
-    console.log('this.initData', this.initData);
-  },
   components: {
     [RuleSetting.name]: RuleSetting,
     [BaseSetting.name]: BaseSetting,
