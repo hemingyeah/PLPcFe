@@ -364,7 +364,7 @@ export default {
 
       return (this.initData.productFields || [])
         .concat(fixedFields)
-        .filter(f => f.formType !== 'separator')
+        .filter(f => f.formType !== 'separator' && f.formType !== 'info')
         .map(f => {
 
           // 调整字段顺序
@@ -433,7 +433,7 @@ export default {
       }, ...this.columns]
         .map(field => {
 
-          if (['customer', 'productTemplate', 'remindCount', 'qrcodeId'].some(key => key === field.fieldName)) {
+          if (['customer', 'productTemplate', 'remindCount', 'qrcodeId'].some(key => key === field.fieldName) || field.formType === 'info') {
             field.export = false;
           } else {
             field.export = true;
@@ -775,7 +775,7 @@ export default {
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
       this.columns = this.productFields
-        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator')
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info')
         .map(field => {
           let sortable = false;
           let minWidth = null;
