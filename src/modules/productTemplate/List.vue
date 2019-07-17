@@ -111,6 +111,9 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
+            <template v-else-if="column.formType === 'address'">
+              {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}
+            </template>
             <template v-else>
               {{scope.row[column.field]}}
             </template>
@@ -206,8 +209,8 @@
     <batch-edit-product-template-dialog
       ref="batchEditProductTemplateDialog"
       :fields="productFields"
-      :init-data="initData"
-      @submit-callback="search"
+      :config="{fields: initData.productFields, productTypes: initData.productConfig.productTypes}"
+      :callback="search"
       :selected-ids="selectedIds">
 
     </batch-edit-product-template-dialog>

@@ -1,5 +1,6 @@
 <template>
   <el-select
+    class="user-search"
     :value="value"
     @input="choose"
     filterable
@@ -57,7 +58,7 @@ export default {
 </script>
 
 <style lang="scss">
-  .el-select {
+  .user-search {
     width: 100%;
   }
 </style>
