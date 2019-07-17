@@ -77,6 +77,7 @@ export default {
       if (await this.validate()) return;
 
       const params = this.buildParams();
+
       this.pending = true;
 
       editBatchProduct(params)
@@ -144,6 +145,16 @@ export default {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
           [sf.fieldName]: tv,
+        })
+      }
+
+      if (sf.formType === 'address') {
+        tv = form[sf.fieldName];
+        params.mapJson = JSON.stringify({
+          [sf.fieldName]: {
+            ...tv,
+            all: [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('')
+          },
         })
       }
 

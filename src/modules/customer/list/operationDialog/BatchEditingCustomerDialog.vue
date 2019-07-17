@@ -159,6 +159,16 @@ export default {
         })
       }
 
+      if (sf.formType === 'address') {
+        tv = form[sf.fieldName];
+        params.mapJson = JSON.stringify({
+          [sf.fieldName]: {
+            ...tv,
+            all: [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('')
+          },
+        })
+      }
+
       return params;
     },
 

@@ -5,10 +5,19 @@ export function packToProduct(fields, form){
   let product = {};
   let attribute = {};
   const {customer, template, type, serialNumber, name, id} = form;
+  let tv = null;
   
   fields.forEach(f => {
     if (!f.isSystem) {
       attribute[f.fieldName] = form[f.fieldName];
+    }
+    
+    if (f.formType === 'address' && !f.isSystem) {
+      tv = form[f.fieldName];
+      attribute[f.fieldName] = {
+        ...tv,
+        all: [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('')
+      }
     }
   });
   
