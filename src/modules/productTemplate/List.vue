@@ -6,209 +6,31 @@
     <div class="product-template-list-search-group">
 
       <!-- start  搜索header -->
-      <form class="base-search" @submit.prevent="search({ pageNum: 1, }, true);trackEventHandler('search')">
+      <form class="base-search" @submit.prevent="searchModel.pageNum=1;search();trackEventHandler('search')">
         <div class="product-template-list-base-search-group">
-          <el-input v-model="paramsBackup.keyword" placeholder="请输入关键字">
+          <el-input v-model="searchModel.keyword" placeholder="请输入关键字">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">搜索</base-button>
-          <base-button type="ghost" @event="paramsReset">重置</base-button>
+          <base-button type="ghost" @event="resetParams">重置</base-button>
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">高级搜索</span>
       </form>
       <!-- end 搜索 header -->
 
-      <!--  start 高级搜索 -->
-      <base-panel :show.sync="panelTheSearchAdvancedShow" :width="panelWidth">
-        <h3 slot="title">
-          <span>高级搜索</span>
-          <el-dropdown class="pull-right" trigger="click" @command="setAdvanceSearchColumn">
-            <i class="iconfont icon-xitongguanli product-template-panel-btn" style="float: none;"></i>
-
-            <el-dropdown-menu slot="dropdown" class="product-template-advance-setting">
-              <el-dropdown-item command="1">一栏</el-dropdown-item>
-              <el-dropdown-item command="2">两栏</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </h3>
-        <!-- start 高级搜索 表单 -->
-        <el-form class="advanced-search-form" onsubmit="return false;">
-          <div class="form-item-container" :class="{'two-columns': columnNum == 2, }">
-
-            <!-- start 创建时间 -->
-            <el-form-item label-width="100px" label="创建时间">
-              <el-date-picker
-                v-model="params.createTime"
-                type="daterange"
-                align="right"
-                unlink-panels
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :picker-options="createTimePickerOptions">
-              </el-date-picker>
-            </el-form-item>
-            <!-- end 创建时间 -->
-
-            <!-- start 产品名称 -->
-            <el-form-item label-width="100px" label="产品名称">
-              <el-input :placeholder="advancedSearchPlaceholder.name" type="text" v-model="params.name"></el-input>
-            </el-form-item>
-            <!-- end 产品名称 -->
-
-            <!-- start 产品编号 -->
-            <el-form-item label-width="100px" label="产品编号">
-              <el-input :placeholder="advancedSearchPlaceholder.serialNumber" type="text" v-model="params.serialNumber"></el-input>
-            </el-form-item>
-            <!-- end 产品编号 -->
-
-            <!-- start 产品类型 -->
-            <el-form-item label-width="100px" label="产品类型">
-              <el-select
-                v-model="params.type"
-                @change="modifyUser('type')"
-                filterable
-                clearable
-                reserve-keyword
-                :placeholder="advancedSearchPlaceholder.type">
-
-                <el-option
-                  v-for="item in inputRemoteSearch.type.options"
-                  :key="`${item}_product_template_list_search_type`"
-                  :label="item"
-                  :value="item">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <!-- end 产品类型 -->
-
-            <!-- start 动态搜索框 -->
-            <el-form-item label-width="100px" :label="field.displayName" v-for="field in searchCustomizeFields"
-                          :key="field.fieldName">
-              
-              <!-- start 产品名称 -->
-              <template v-if="field.fieldName === 'name'">
-                <el-input type="text" v-model="params[field.fieldName]" :placeholder="field.placeHolder"></el-input>
-              </template>
-              <!-- end 产品名称 -->
-
-              <!-- start 产品编号 -->
-              <template v-else-if="field.fieldName === 'serialNumber'">
-                <el-input type="text" v-model="params[field.fieldName]" :placeholder="field.placeHolder"></el-input>
-              </template>
-              <!-- end 产品编号 -->
-
-              <!-- start 产品类型 -->
-              <template v-else-if="field.fieldName === 'type'">
-                <el-select
-                  v-model="params[field.fieldName]"
-                  @change="modifyUser('type')"
-                  filterable
-                  clearable
-                  reserve-keyword
-                  :placeholder="field.placeHolder || '请选择'">
-
-                  <el-option
-                    v-for="item in inputRemoteSearch.type.options"
-                    :key="`${item}_product_template_list_search_type`"
-                    :label="item"
-                    :value="item">
-                  </el-option>
-                </el-select>
-              </template>
-              <!-- end 产品类型 -->
-
-              <!-- start text || code -->
-              <template v-else-if="field.formType === 'text' || field.formType === 'code'">
-                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                          :placeholder="field.placeHolder" type="text"></el-input>
-              </template>
-              <!-- end text || code -->
-
-              <!-- start select || selectMulti  -->
-              <template v-else-if="field.formType === 'select' || field.formType === 'selectMulti'">
-                <el-select 
-                  v-model="params.customizedSearchModel[field.fieldName]['value']"
-                  clearable
-                  :placeholder="field.placeHolder || '请选择'">
-                  <el-option
-                    v-for="item in field.setting.dataSource"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                    :disabled="item.disabled">
-                  </el-option>
-                </el-select>
-              </template>
-              <!-- end select || selectMulti  -->
-
-              <!-- start number  -->
-              <template v-else-if="field.formType === 'number'">
-                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                          :placeholder="field.placeHolder" type="number"></el-input>
-              </template>
-              <!-- end number  -->
-
-              <!-- start date || datetime  -->
-              <template v-else-if="field.formType === 'date' || field.formType === 'datetime'">
-                <el-date-picker
-                  v-model="params.customizedSearchModel[field.fieldName]['value']"
-                  type="daterange"
-                  align="right"
-                  unlink-panels
-                  range-separator="-"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  :picker-options="createTimePickerOptions">
-                </el-date-picker>
-              </template>
-              <!-- end date || datetime  -->
-
-              <!-- start user -->
-              <template v-else-if="field.formType === 'user'">
-                <el-select
-                  v-model="params.customizedSearchModel[field.fieldName]['value']"
-                  @change="modifyUser('user', field.fieldName)"
-                  filterable
-                  clearable
-                  remote
-                  reserve-keyword
-                  :placeholder="field.placeHolder"
-                  :loading="inputRemoteSearch.creator.loading"
-                  :remote-method="searchCreator">
-                  <el-option
-                    v-for="item in inputRemoteSearch.creator.options"
-                    :key="item.userId"
-                    :label="item.displayName"
-                    :value="item.userId">
-                  </el-option>
-                </el-select>
-              </template>
-              <!-- end user -->
-
-              <!-- start other -->
-              <template v-else>
-                <el-input v-model="params.customizedSearchModel[field.fieldName]['value']"
-                          :placeholder="field.placeHolder"></el-input>
-              </template>
-              <!-- end other -->
-
-            </el-form-item>
-            <!-- end 动态搜索框 -->
-
-          </div>
-          <!-- start 高级搜索 footer -->
-          <div class="advanced-search-btn-group">
-            <base-button type="ghost" @event="paramsReset">重置</base-button>
-            <base-button type="primary" @event="search({ pageNum: 1, }, true)" native-type="submit">搜索</base-button>
-          </div>
-          <!-- end 高级搜索 footer -->
-          
-        </el-form>
-        <!-- end 高级搜索表单  -->
-
-      </base-panel>
-      <!-- end 高级搜索 -->
+      <!-- start 高级搜索表单 -->
+      <product-template-search-panel
+        :config="{
+          fields: this.productFields,
+        }"
+        ref="searchPanel"
+      >
+        <div class="advanced-search-btn-group" slot="footer">
+          <base-button type="ghost" @event="resetParams">重置</base-button>
+          <base-button type="primary" @event="powerfulSearch" native-type="submit">搜索</base-button>
+        </div>
+      </product-template-search-panel>
+      <!-- end 高级搜索表单 -->
 
     </div>
     <!-- end 搜索 -->
@@ -404,6 +226,7 @@ import { formatDate } from '@src/util/lang';
 
 import { getProductTemplateList, productTemplateDelete } from '@src/api/ProductApi.js'
 
+import SearchPanel from './component/SearchPanel.vue';
 import DialogBatchEditProductTemplate from './component/DialogBatchEditProductTemplate.vue';
 
 /* 高级搜索面板 列数 */
@@ -470,29 +293,20 @@ export default {
       searchCustomizeFields: [], // 搜索自定义字段
       selectedLimit: 200, // 最大选择数量
       page: new Page(), // page 对象
-      panelTheSearchAdvancedShow: false, // 高级搜索面板显示
       panelTheMultipleSelectionShow: false, // 已选择列表 面板显示
-      paramsBackup: {
-        createTime: '', // 创建时间
-        customizedSearchModel: {}, // 自定义搜索模型
-        name: '', // 产品名称
-        serialNumber: '', // 产品编号
-        type: '', // 产品类型
-        keyword: '',
-        pageNum: 1,
-        pageSize: 10,
-      },
-      params: {
-        createTime: '', // 创建时间
-        customizedSearchModel: {}, // 自定义搜索模型
-        name: '', // 产品名称
-        serialNumber: '', // 产品编号
-        type: '', // 产品类型
-      },
       productTemplateConfig: {
         productTemplateConfig: {},
         productFields: []
       }, // 产品配置项
+      searchModel: {
+        keyword: '',
+        pageSize: 10,
+        pageNum: 1,
+        orderDetail: {},
+        moreConditions: {
+          conditions: [],
+        },
+      },
     }
   },
   computed: {
@@ -521,11 +335,6 @@ export default {
     selectedIds() {
       return this.multipleSelection.map(item => item.id) || [];
     },
-
-    // 高级搜索面板宽度
-    panelWidth() {
-      return `${420 * this.columnNum}px`;
-    },
     productFields() {
       return (this.initData.productFields || [])
         .filter(f => f.formType !== 'separator')
@@ -544,8 +353,6 @@ export default {
             f.orderId = -8;
           }
 
-          f.operator = this.matchOperator(f);
-
           return f;
         })
         .sort((a, b) => a.orderId - b.orderId)
@@ -562,7 +369,7 @@ export default {
     this.inputRemoteSearch.type.options = [...this.productTemplateConfig.productConfig.productType];
 
     this.paramsSearchRevert();
-    this.buildConfig(this.paramsBackup.customizedSearchModel);
+    this.columns = this.buildTableColumn();
     this.search();
 
     // [tab_spec]标准化刷新方式
@@ -574,41 +381,34 @@ export default {
 
       this.$refs.advanced.open(this.columns);
     },
-    // 构建配置项
-    buildConfig(storage) {
-      const storageData = storage || {};
-      /**
-       * storageData如果存在，那就还原storage中的值
-       * date、datetime类型的要注意 new Date一下
-       * 人员选择初始化值是一个id，还要初始化它的options
-       */
-      this.productTemplateConfig.productFields = this.productTemplateConfig.productFields
-        .filter(f => f.fieldName !== 'customer')
-        .map(f => {
+    buildParams() {
+      const sm = Object.assign({}, this.searchModel);
+      let params = {
+        keyword: sm.keyword,
+        pageSize: sm.pageSize,
+        pageNum: sm.pageNum,
+      };
 
-          if (f.isSearch && !f.isSystem) {
-            if (
-              storageData[f.fieldName] 
-              && (storageData[f.fieldName].formType === 'date' || storageData[f.fieldName].formType === 'datetime') 
-              && storageData[f.fieldName].operator === 'between'
-            ) {
-              storageData[f.fieldName].value = storageData[f.fieldName].value && storageData[f.fieldName].value.map(t => new Date(t));
-            }
+      if (Object.keys(sm.orderDetail || {}).length) {
+        params.orderDetail = sm.orderDetail;
+      }
 
-            // 需要搜索的字段
-            this.$set(this.params.customizedSearchModel, f.fieldName, {
-              fieldName: f.fieldName,
-              value: storageData[f.fieldName] ? storageData[f.fieldName].value : null,
-              operator: this.matchOperator(f),
-              formType: f.formType,
-            });
-            this.searchCustomizeFields.push(f);
-          }
+      if (Object.keys(sm.moreConditions).length > 1 || sm.moreConditions.conditions.length) {
+        params = {
+          ...params,
+          ...sm.moreConditions,
+        }
+      }
 
-          return f;
-        });
+      if (params.createTime && params.createTime.length) {
+        let createTime = params.createTime.split('-');
 
-      this.columns = this.buildTableColumn();
+        params.createTimeStart = `${createTime[0]} 00:00:00`;
+        params.createTimeEnd = `${createTime[1]} 23:59:59`;
+        delete params.createTime;
+      }
+
+      return params
     },
     // 构建表格固定列
     buildTableFixedColumns() {
@@ -782,7 +582,7 @@ export default {
       return {
         productChecked: checkedArr.join(','),
         data: exportAll ? '' : ids.join(','),
-        exportSearchModel: exportAll ? JSON.stringify(this.paramsBuild() || {}) : ''
+        exportSearchModel: exportAll ? JSON.stringify(this.buildParams() || {}) : ''
       };
     },
     // 导出 列
@@ -829,20 +629,15 @@ export default {
     },
     // 页码数切换
     handleSizeChange(pageSize) {
-      this.page.pageSize = pageSize;
-      this.page.pageNum = 1;
-      this.paramsBackup.pageNum = 1;
-      this.paramsBackup.pageSize = pageSize;
-      this.page.list = [];
+      this.searchModel.pageSize = pageSize;
+      this.searchModel.pageNum = 1;
 
       this.localStorageSet('pageSize', pageSize, PRODUCT_TEMPLATE_LIST_DATA);
       this.search();
     },
     // 跳转
     jump(pageNum) {
-      this.page.pageNum = pageNum;
-      this.paramsBackup.pageNum = pageNum;
-
+      this.searchModel.pageNum = pageNum;
       this.search();
     },
     /* 获取本地数据 */
@@ -869,69 +664,6 @@ export default {
       } catch(err) {
         console.log('localStorageSet err', err)
       } 
-    },
-    // 批量操作
-    matchOperator(field) {
-      let formType = field.formType;
-      let operator = '';
-
-      switch (formType) {
-      case 'date': {
-        operator = 'between';
-        break;
-      }
-      case 'datetime': {
-        operator = 'between';
-        break;
-      }
-      case 'select': {
-        if(field.setting && field.setting.isMulti) {
-          operator = 'contain';
-        } else {
-          operator = 'eq';
-        }
-        break;
-      }
-      case 'user': {
-        operator = 'user';
-        break;
-      }
-      case 'location': {
-        operator = 'location';
-        break;
-      }
-      default: {
-        operator = 'like';
-        break;
-      }
-      }
-      return operator;
-    },
-    /**
-     *  -- 人员类型的字段
-     *  绑定在form中的value是一个id，在初始化的时候却要给一个对象
-     *  所以选择某个人的时候，储存这个对象
-     *  在还原搜索状态的时候，取这个对象初始化这个form，
-    */
-    modifyUser(type, fieldName) {
-      const store = {};
-      if (type === 'type') {
-        store.type = this.inputRemoteSearch.type.options.filter(t => t === this.params.type);
-      }
-      // 自定义字段
-      if (type === 'user') {
-        const selected = this.inputRemoteSearch.creator.options.filter(ct => ct.userId === this.params.customizedSearchModel[fieldName].value);
-
-        let storageData = localStorage.getItem(STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE) || '{}';
-        storageData = JSON.parse(storageData);
-        if (storageData.creator) {
-          store.creator = this.concatArrayAndItemUnique(storageData.creator, selected, 'userId');
-        } else {
-          store.creator = selected;
-        }
-      }
-
-      localStorage.setItem(STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE, JSON.stringify(store));
     },
     // 批量匹配选中
     matchSelected() {
@@ -967,22 +699,10 @@ export default {
       }
     },
     // 搜索
-    search(templateParams, fullSearch = false) {
-      let params = {};
+    search() {
+      const params = this.buildParams();
+
       this.loadingListData = true;
-
-      // 全量搜索
-      if (fullSearch) {
-        this.paramsBackup = {
-          ...this.paramsBackup,
-          ..._.cloneDeep(this.params),
-        };
-      }
-
-      params = {
-        ...this.paramsBuild(),
-        ...templateParams,
-      };
 
       return getProductTemplateList(params)
         .then(res => {
@@ -1109,7 +829,7 @@ export default {
       try {
         const {prop, order} = option;
         if (!order) {
-          this.paramsBackup.orderDetail = {};
+          this.searchModel.orderDetail = {};
           return this.search();
         }
 
@@ -1127,7 +847,7 @@ export default {
           sortModel.type = sortedField.formType;
         }
 
-        this.paramsBackup.orderDetail = sortModel;
+        this.searchModel.orderDetail = sortModel;
 
         this.search();
 
@@ -1137,115 +857,42 @@ export default {
     },
     // 参数构建
     paramsBuild() {
-      const conditions = [];
-      let tv = null; // tv means temporary variable that used inside the loop.
-      let params = _.cloneDeep(this.paramsBackup);
+      const sm = Object.assign({}, this.searchModel);
+      let params = {
+        keyword: sm.keyword,
+        pageSize: sm.pageSize,
+        pageNum: sm.pageNum,
+      };
 
-      // createTime
+      if (Object.keys(sm.orderDetail || {}).length) {
+        params.orderDetail = sm.orderDetail;
+      }
+
+      if (Object.keys(sm.moreConditions).length > 1 || sm.moreConditions.conditions.length) {
+        params = {
+          ...params,
+          ...sm.moreConditions,
+        }
+      }
+
       if (params.createTime && params.createTime.length) {
         params.createTimeStart = formatDate(params.createTime[0]);
         params.createTimeEnd = `${formatDate(params.createTime[1]).replace('00:00:00', '23:59:59')}`;
         delete params.createTime;
       }
 
-      params = this.deleteValueFromObject(params, [0, false]);
-
-      if(!params) params = {};
-      // build customized search fields
-      Object.keys(this.paramsBackup.customizedSearchModel)
-        .forEach(key => {
-          tv = this.paramsBackup.customizedSearchModel[key];
-          if (tv.value && tv.formType === 'date') {
-            return conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD'),
-              betweenValue2: formatDate(tv.value[1], 'YYYY-MM-DD'),
-            });
-          }
-          if (tv.value && tv.formType === 'datetime') {
-            return conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              betweenValue1: formatDate(tv.value[0], 'YYYY-MM-DD HH:mm:ss'),
-              betweenValue2: `${formatDate(tv.value[1], 'YYYY-MM-DD')} 23:59:59`,
-            });
-          }
-
-          if (tv.value) {
-            conditions.push({
-              property: tv.fieldName,
-              operator: tv.operator,
-              value: tv.value,
-            });
-          }
-        });
-
-      if (conditions.length) {
-        params.conditions = conditions;
-      }
-
-      delete params.customizedSearchModel;
-
-      return params;
+      return params
     },
     // 搜索参数恢复
     paramsSearchRevert() {
       const localStorageData = this.localStorageGet(PRODUCT_TEMPLATE_LIST_DATA);
 
       if (localStorageData && localStorageData.pageSize) {
-        this.paramsBackup.pageSize = Number(localStorageData.pageSize);
-        this.page.pageSize = Number(localStorageData.pageSize);
+        this.searchModel.pageSize = Number(localStorageData.pageSize);
       }
-
-      if (Array.isArray(this.paramsBackup.createTime) && this.paramsBackup.createTime.length) {
-        this.paramsBackup.createTime = this.paramsBackup.createTime.map(ct => new Date(ct));
-      }
-
-
-      let storeUser = this.localStorageGet(STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE);
-
-      if (storeUser.creator) {
-        this.inputRemoteSearch.creator.options = storeUser.creator || [];
-      }
-
-      this.params = _.cloneDeep(this.paramsBackup);
-      delete this.params.keyword;
 
       const num = localStorage.getItem(PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER) || 1;
       this.columnNum = Number(num);
-    },
-    // 参数重置
-    paramsReset() {
-      window.TDAPP.onEvent('pc：产品模板-重置事件')
-      this.paramsBackup = {
-        createTime: '', // 创建时间
-        customizedSearchModel: {}, // 自定义搜索模型
-        name: '', // 产品名称
-        serialNumber: '', // 产品编号
-        type: '', // 产品类型
-        keyword: '',
-        pageNum: 1,
-        pageSize: this.paramsBackup.pageSize,
-      };
-
-      this.params = {
-        createTime: '', // 创建时间
-        name: '', // 产品名称
-        serialNumber: '', // 产品编号
-        type: '', // 产品类型
-        customizedSearchModel: {
-          ...this.params.customizedSearchModel,
-        },
-      };
-
-      for (let key in this.params.customizedSearchModel) {
-        this.params.customizedSearchModel[key].value = null;
-      }
-
-      this.inputRemoteSearch.creator.options = [];
-
-      this.search();
     },
     // 产品新建
     productCreate() {
@@ -1296,8 +943,8 @@ export default {
     },
     panelSearchAdvancedToggle() {
       window.TDAPP.onEvent('pc：产品模板-高级搜索事件');
+      this.$refs.searchPanel.open();
 
-      this.panelTheSearchAdvancedShow = !this.panelTheSearchAdvancedShow;
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
         for(let i = 0; i < forms.length; i++) {
@@ -1305,6 +952,33 @@ export default {
           form.setAttribute('novalidate', true)
         }
       })
+    },
+    /**  
+     * @description 全量搜索
+    */
+    powerfulSearch() {
+      this.searchModel.pageNum = 1;
+      this.searchModel.moreConditions = this.$refs.searchPanel.buildParams();
+
+      this.trackEventHandler('search');
+      this.search();
+
+    },
+    resetParams() {
+      window.TDAPP.onEvent('pc：产品模板-重置事件');
+      this.searchIncludeMoreConditions = false;
+      this.searchModel = {
+        keyword: '',
+        pageNum: 1,
+        pageSize: this.page.pageSize,
+        orderDetail: {},
+        moreConditions: {
+          conditions: [],
+        }
+      };
+
+      this.$refs.searchPanel.resetParams();
+      this.search();
     },
     // TalkingData事件埋点
     trackEventHandler (type) {
@@ -1319,7 +993,8 @@ export default {
     }
   },
   components: {
-    [DialogBatchEditProductTemplate.name]: DialogBatchEditProductTemplate 
+    [DialogBatchEditProductTemplate.name]: DialogBatchEditProductTemplate,
+    [SearchPanel.name]: SearchPanel,
   }
 }
 </script>
@@ -1413,9 +1088,6 @@ html, body {
 }
 
 .advanced-search-form {
-  height: calc(100% - 51px);
-  overflow: auto;
-  padding: 10px 0 63px 0;
 
   .two-columns {
     display: flex;

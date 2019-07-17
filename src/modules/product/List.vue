@@ -477,6 +477,7 @@ export default {
       this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
     }
 
+    // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
 
     this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount)
