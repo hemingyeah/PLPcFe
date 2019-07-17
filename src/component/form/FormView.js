@@ -60,7 +60,7 @@ const FormView = {
       const value = info.value;
       return (
         <div class="form-view-row">
-          <div class="form-view-row-content">
+          <div class="form-view-row-content form-view-info-content">
             {value}
           </div>
         </div>

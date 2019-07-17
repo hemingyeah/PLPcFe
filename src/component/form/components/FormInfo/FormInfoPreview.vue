@@ -35,6 +35,8 @@ export default {
   }
   .form-item__text {
     word-break: break-all;
+    background-color: #FEF1E5;
+    padding: 3px 5px;
   }
 }
 </style>
