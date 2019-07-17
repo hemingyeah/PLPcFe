@@ -22,7 +22,6 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-// import {searchCustomer} from '@src/api/EcSearchApi.js';
 
 export default {
   name: 'customer-search',
@@ -39,6 +38,13 @@ export default {
       options: [],
     };
   },
+  created() {
+
+    let options = sessionStorage.getItem(`${this.field.fieldName}_options`);
+
+    this.options = JSON.parse(options || '[]');
+
+  },
   methods: {
     choose(newValue){
       let oldValue = null;
@@ -50,6 +56,7 @@ export default {
         .then(res => {
           this.options = res.list;
           this.loading = false;
+          sessionStorage.setItem(`${this.field.fieldName}_options`, JSON.stringify(this.options));
         })
         .catch(err => console.error('searchCustomerManager function catch err', err));
     },
