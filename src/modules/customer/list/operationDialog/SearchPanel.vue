@@ -21,6 +21,7 @@
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import {formatDate} from '@src/util/lang';
+import _ from 'lodash';
 
 export default {
   name: 'search-panel',
@@ -137,7 +138,7 @@ export default {
           f.fieldName !== 'lmName')
         .map(field => {
 
-          f = Object.assign({}, field);
+          f = _.cloneDeep(field);
 
           let formType = f.formType;
 
