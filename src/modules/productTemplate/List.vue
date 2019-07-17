@@ -452,7 +452,7 @@ export default {
 
       let baseColumns = this.buildTableFixedColumns();
       let customizedColumns = this.productTemplateConfig.productFields
-        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.fieldName !== 'customer')
+        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.fieldName !== 'customer')
         .map(field => {
           let sortable = false;
           let minWidth = null;
