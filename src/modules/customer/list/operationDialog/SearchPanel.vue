@@ -21,6 +21,7 @@
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import {formatDate} from '@src/util/lang';
+import { isEmptyStringObject } from '@src/util/function';
 import _ from 'lodash';
 
 export default {
@@ -348,12 +349,18 @@ export default {
           continue;
         }
 
-        if (tv.formType === 'address' && Object.keys(form[fn]).some(key => !!form[fn][key])) {
-          params.conditions.push({
+        if (tv.formType === 'address') {
+          let address = {
             property: fn,
             operator: tv.operator,
-            all: (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
-          });
+          };
+          let isEmpty = isEmptyStringObject(form[fn]);
+          console.log('hbc: buildParams -> isEmpty', isEmpty)
+          
+          if(!isEmpty) {
+            address.all = (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
+          }
+          params.conditions.push(address);
           continue;
         }
 

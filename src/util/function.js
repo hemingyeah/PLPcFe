@@ -19,3 +19,24 @@ export function frameThrottle(callback, max = 5){
     timer();
   };
 }
+
+/**  
+ * 判断当前
+*/
+export function isEmptyStringObject(object = {}){
+  if(!object || Object.keys(object).length <= 0 ) return true;
+  
+  let isEmpty = true;
+  let item = null;
+
+  for(let key in object) {
+    item = object[key];
+    if(String(item)) {
+      isEmpty = false;
+      break;
+    }
+  }
+
+  return isEmpty;
+
+}
