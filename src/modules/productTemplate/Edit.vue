@@ -193,6 +193,10 @@ export default {
         let {fieldName, isSystem} = field;
         let value = form[fieldName];
 
+        if (field.formType === 'location') {
+          value = {};
+        }
+
         // 不为系统字段,放在attribute里面
         isSystem == 0
           ? product.attribute[fieldName] = value

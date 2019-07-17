@@ -19,6 +19,11 @@ export function packToProduct(fields, form){
         all: [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('')
       }
     }
+  
+    if (f.formType === 'location') {
+      attribute[f.fieldName] = {};
+    }
+  
   });
   
   

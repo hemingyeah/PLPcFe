@@ -189,6 +189,7 @@ export default {
       },
       mounted() {
         this.reset();
+        this.buildForm();
       },
       methods: {
         returnData() {
@@ -301,7 +302,7 @@ export default {
         }
       },
       render(h) {
-        this.buildForm();
+
         return (
           <div>
             <div class="item">
