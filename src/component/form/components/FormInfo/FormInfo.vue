@@ -27,7 +27,7 @@ export default {
   padding: 0 0 13px 10px;
   .form-item__text {
     word-break: break-all;
-    background-color: #FEF1E5;
+    background-color: #FAFAFA;
     padding: 3px 5px;
   }
 }
