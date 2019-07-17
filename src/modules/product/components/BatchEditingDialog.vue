@@ -51,7 +51,7 @@ export default {
             tv.orderId -= 100;
           }
 
-          tv.isNull = 0;
+          // tv.isNull = 0;
           return Object.freeze(tv);
         });
 
