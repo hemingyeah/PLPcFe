@@ -43,7 +43,7 @@ export default {
       let tv = null;
 
       let fields = (this.config.fields || [])
-        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'location' && f.formType !== 'info' && !['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'].some(key => key === f.fieldName))
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'location' && f.formType !== 'info' && !['customer', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'].some(key => key === f.fieldName))
         .map(f => {
           tv = Object.assign({}, f);
 
@@ -280,40 +280,6 @@ export default {
           const sf = this.selectedField;
 
           if (!sf.formType) return null;
-
-          if (sf.fieldName === 'customer') {
-            return h(
-              'el-select',
-              {
-                props: {
-                  filterable: true,
-                  remote: true,
-                  clearable: true,
-                  'reserve-keyword': true,
-                  'remote-method': this.searchCustomer,
-                  value: this.form[sf.fieldName],
-                  loading: this.inputRemoteSearch.customer.loading,
-                  placeholder: '请输入关键词搜索',
-                },
-                on: {
-                  input: event => this.update(event)
-                }
-              },
-              this.inputRemoteSearch.customer.options
-                .map(op => (
-                  h(
-                    'el-option',
-                    {
-                      props: {
-                        key: op.id,
-                        label: op.name,
-                        value: op.id,
-                      }
-                    }
-                  )
-                )),
-            )
-          }
 
           const comp = FormFieldMap.get(sf.formType);
           const data = {
