@@ -39,7 +39,7 @@
   content: "\e626";
 }
 
-.icon-fa-info:before {
+.icon-fd-info:before {
   content: "\e649";
 }
 
@@ -417,6 +417,10 @@
 
 .icon-yemianshanchu:before {
   content: "\e612";
+}
+
+.icon-fd-link:before {
+  content: "\eb47";
 }
 
 .icon-fd-location:before {
