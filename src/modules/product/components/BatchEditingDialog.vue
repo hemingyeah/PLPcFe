@@ -43,11 +43,7 @@ export default {
       let tv = null;
 
       let fields = (this.config.fields || [])
-        .filter(f => (
-          f.formType !== 'attachment'
-          && f.formType !== 'location'
-          && !['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'].some(key => key === f.fieldName)
-        ))
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'location' && f.formType !== 'info' &&  !['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'].some(key => key === f.fieldName))
         .map(f => {
           tv = Object.assign({}, f);
 
