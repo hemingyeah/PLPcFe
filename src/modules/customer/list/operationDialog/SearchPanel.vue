@@ -329,16 +329,6 @@ export default {
           continue;
         }
 
-        if (tv.formType === 'date') {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
-            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD'),
-          });
-          continue;
-        }
-
         if (tv.formType === 'date' || tv.formType === 'datetime') {
           params.conditions.push({
             property: fn,
