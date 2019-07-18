@@ -109,6 +109,7 @@ export default {
     },
     reset() {
       this.$refs.batchForm.reset();
+      this.$refs.batchForm.buildForm();
     },
     open() {
 
