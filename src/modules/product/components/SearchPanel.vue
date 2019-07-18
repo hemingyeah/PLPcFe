@@ -111,6 +111,7 @@ export default {
             ...f,
             isNull: 1,
             formType,
+            originalFormType: f.formType,
             operator: this.matchOperator(f)
           })
         })
@@ -234,7 +235,17 @@ export default {
           continue;
         }
 
-        if (tv.formType === 'date' || tv.formType === 'datetime') {
+        if (tv.originalFormType === 'date') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
+            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD'),
+          });
+          continue;
+        }
+
+        if (tv.originalFormType === 'datetime') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
