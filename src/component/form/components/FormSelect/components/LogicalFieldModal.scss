@@ -53,6 +53,8 @@
 }
 
 .logical-field-value{
+  height: auto;
+  word-break: break-all;
   &.logical-field-selected{
     background-color: #f0f0f0;
   }
