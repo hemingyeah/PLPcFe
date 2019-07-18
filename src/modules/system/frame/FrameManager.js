@@ -168,7 +168,7 @@ const FrameManager = {
         // 记录frame历史
         FrameHistoryManager.push(frameWindow.frameElement.id, frameWindow.location.href)
       } catch (error) {
-        platform.alert([
+        console.log([
           `[frame src]: ${frame.src}`,
           `[tab url]: ${tab.url}`,
           `[tab id]: ${tab.id}`,
