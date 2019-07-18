@@ -21,9 +21,8 @@ export default {
   computed: {
     displayMap(){
       let value = this.value;
-
-      if (!value) return;
-      return (value.adLatitude && value.adLongitude) || (value.latitude && value.longitude)
+      if (!value) return false;
+      return ![value.adProvince, value.adCity, value.adDist, value.adAddress, value.province, value.city, value.dist, value.address].every(s => !s)
     }
   },
   methods: {
