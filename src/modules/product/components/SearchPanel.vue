@@ -252,7 +252,7 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
           
           if(!isEmpty) {
-            address.all = (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
+            address.value = (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
           }
           params.conditions.push(address);
           continue;

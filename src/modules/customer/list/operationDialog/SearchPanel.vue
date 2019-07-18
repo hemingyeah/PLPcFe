@@ -345,14 +345,14 @@ export default {
             operator: tv.operator,
           };
           let isEmpty = isEmptyStringObject(form[fn]);
-          console.log('hbc: buildParams -> isEmpty', isEmpty)
-          
+
           if(!isEmpty) {
-            address.all = (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
+            address.value = (form[fn].province || '') + (form[fn].city || '') + (form[fn].dist || '') + (form[fn].address || '')
+            params.conditions.push(address);
           }
-          params.conditions.push(address);
           continue;
         }
+
 
         params.conditions.push({
           property: fn,
