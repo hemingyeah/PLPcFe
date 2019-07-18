@@ -491,6 +491,7 @@ export default {
     },
     /* 新建子团队 */
     teamChildCreate() {
+      window.TDAPP.onEvent('pc：访问团队管理-新建子团队');
       let len = this.multipleSelection.length;
       if(len != 1) {
         return this.$platform.alert('请您选择一个团队');
