@@ -41,9 +41,11 @@ export default {
   computed: {
     fields() {
       let tv = null;
+      let formTypes = ['attachment', 'separator', 'location', 'info'];
+      let fieldNames = ['customer', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'];
 
       let fields = (this.config.fields || [])
-        .filter(f => f.formType !== 'attachment' && f.formType !== 'location' && f.formType !== 'info' && !['customer', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'].some(key => key === f.fieldName))
+        .filter(f => formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
         .map(f => {
           tv = Object.assign({}, f);
 

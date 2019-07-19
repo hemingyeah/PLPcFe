@@ -192,9 +192,16 @@ export default {
       fields.forEach(field => {
         let {fieldName, isSystem} = field;
         let value = form[fieldName];
+        let tv = null;
 
         if (field.formType === 'location') {
           value = {};
+        }
+        if (field.formType === 'address' && !field.isSystem) {
+          value = {
+            ...value,
+            all: [value.province, value.city, value.dist, value.address].filter(str => !!str).join('')
+          }
         }
 
         // 不为系统字段,放在attribute里面
