@@ -281,7 +281,7 @@ export default {
         createAttachmentDom(h, attachments)
       ];
     },
-    openMap(longitude, latitude){
+    openMap(content){
       let longitude = content.longitude;
       let latitude = content.latitude;
 
