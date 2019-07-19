@@ -160,6 +160,7 @@ export default {
       if (!address.longitude && !address.latitude) return;
 
       const ad = {
+        ...address,
         adLongitude: address.longitude,
         adLatitude: address.latitude,
       };

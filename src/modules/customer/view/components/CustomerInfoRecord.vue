@@ -117,7 +117,7 @@ export default {
     },
     renderAddressRecordDom({action, userName, showInOwn, content}) {
       let address = trimAll(content.address);
-      let icon = address ? <i class="iconfont icon-address" onClick={e => this.openMap(content.longitude, content.latitude)}></i> : '';
+      let icon = address ? <i class="iconfont icon-address" onClick={e => this.openMap(content)}></i> : '';
       let str = '';
 
       if (content.type === '设为默认') {
@@ -295,10 +295,13 @@ export default {
         createAttachmentDom(h, attachments)
       ];
     },
-    openMap(longitude, latitude){
+    openMap(content){
+      let longitude = content.longitude;
+      let latitude = content.latitude;
+
       if(!longitude || !latitude) return;
       
-      this.$fast.map.display({longitude, latitude})
+      this.$fast.map.display({ ...content })
         .catch(err => console.error('openMap catch an err: ', err));
     },
     /** 
