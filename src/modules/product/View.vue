@@ -227,21 +227,21 @@ export default {
       return this.initData.productFields
         .concat(fixedFields)
         .map(f => {
-          if (f.fieldName === 'name') {
-            f.orderId = -10;
-          }
+          // if (f.fieldName === 'name') {
+          //   f.orderId = -10;
+          // }
 
-          if (f.fieldName === 'customer') {
-            f.orderId = -7;
-          }
+          // if (f.fieldName === 'customer') {
+          //   f.orderId = -7;
+          // }
 
-          if (f.fieldName === 'serialNumber') {
-            f.orderId = -9;
-          }
+          // if (f.fieldName === 'serialNumber') {
+          //   f.orderId = -9;
+          // }
 
-          if (f.fieldName === 'type') {
-            f.orderId = -8;
-          }
+          // if (f.fieldName === 'type') {
+          //   f.orderId = -8;
+          // }
 
           return f;
         })
