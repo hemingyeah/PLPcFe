@@ -39,8 +39,7 @@ function getTaskTypeList (params) {
  * @param {Object} params 
  */
 function getApproveList (params) {
-  return http.post('/outside/approve/search', params);
-  // return http.post('http://inner.dev.sc:10002/outside/approve/search', params);
+  return http.post('/api/outside/approve/search', params);
 }
 
 /**

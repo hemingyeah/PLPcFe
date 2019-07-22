@@ -498,7 +498,7 @@ export default {
       this.ui.loadingListData = true;
       // 字段转换 // todo 抽出方法
       params.page = params.pageNum;
-      params.myId = this.userId || 'd33846ee-6fa9-11e9-bfc9-00163e304a25'; // todo 1 联调字段 需要删除 2 后台可处理
+      params.myId = this.userId; 
 
       ApproveApi.getApproveList(params).then((res) => {
         this.ui.loadingListData = false;
@@ -929,7 +929,7 @@ export default {
         keyword: this.params.keyword,
         proposerId: this.params.proposerId,
         source: this.params.source,
-        myId: this.userId || 'd33846ee-6fa9-11e9-bfc9-00163e304a25', // todo 联调信息需要删除 
+        myId: this.userId,
         state: this.params.state,
         mySearch: this.params.mySearch,
         action: this.params.action,
