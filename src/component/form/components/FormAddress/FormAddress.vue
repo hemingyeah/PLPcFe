@@ -1,7 +1,7 @@
 <template>
   <div class="form-address">
     <div class="form-address-picker">
-      <base-dist-picker @input="handleCitySelectorChange" :value="distValue"/>
+      <base-dist-picker @input="handleCitySelectorChange" :value="distValue" :placeholder="placeholder"/>
       <el-button type="button" @click="chooseMap" v-if="!disableMap">地图选址</el-button>
     </div>
     <input
@@ -9,7 +9,6 @@
       :value="detail"
       @input="input"
       maxlength="50"
-      :placeholder="placeholder"
       :id="`form_${field.fieldName}`"
       autocomplete="off"/>
   </div>
