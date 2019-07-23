@@ -148,6 +148,9 @@ export default {
           if(isSucc) {
             this.reloadTab();
             window.location.href = `/product/detail/${res.data}`;
+          } else {
+            this.pending = false;
+            this.loadingPage = false;
           }
         })
         .catch(err => console.error('err', err));
@@ -166,6 +169,9 @@ export default {
           if(isSucc) {
             this.reloadTab();
             this.goBack();
+          } else {
+            this.pending = false;
+            this.loadingPage = false;
           }
         })
         .catch(err => console.error('err', err));

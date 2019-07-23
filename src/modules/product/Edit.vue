@@ -124,11 +124,16 @@ export default {
             .then(res => {
               let action = this.action === 'create' ? '新建' : '更新';
 
-              if (res.status) return this.$platform.notification({
-                title: `${action}产品失败`,
-                message: res.message || '',
-                type: 'error',
-              });
+              if (res.status) {
+                this.pending = false;
+                this.loadingPage = false;
+
+                return this.$platform.notification({
+                  title: `${action}产品失败`,
+                  message: res.message || '',
+                  type: 'error',
+                })
+              }
 
               this.$platform.notification({
                 title: `${action}产品成功`,
