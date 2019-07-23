@@ -16,6 +16,7 @@
     "build:hbc": "node script/production.js --user=huangbc",
     "build:zaj": "node script/production.js --user=zhangaj",
     "build:mao": "node script/production.js --user=aaronmao",
+    "build:swj": "node script/production.js --user=sunwj",
     "tag": "./script/tag.sh ${1} ${2}"
   },
   "author": "dongls",
