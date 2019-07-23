@@ -9,7 +9,7 @@
     placeholder="请输入关键词搜索"
     clearable
     :loading="loading"
-    :remote-method="searchUser">
+    :remote-method="searchLinkman">
     <el-option
       v-for="item in options"
       :key="item.id"
@@ -21,10 +21,11 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import FormMixin from '@src/component/form/mixin/form';
 
 export default {
-  name: 'user-search',
+  name: 'linkman-search',
   mixins: [FormMixin],
   props: {
     value: {
@@ -50,21 +51,16 @@ export default {
       let oldValue = null;
       this.$emit('update', {newValue, oldValue, field: this.field});
     },
-    searchUser(keyword) {
+    searchLinkman: _.debounce(function (keyword) {
       this.loading = true;
-      this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
+      this.$http.get('/linkman/getListAsyn', {keyword, pageNum: 1, })
         .then(res => {
-          this.options = res.list
-            .map(({displayName, userId}) => Object.freeze({
-              name: displayName,
-              id: userId
-            }));
-
-          sessionStorage.setItem(`${this.field.fieldName}_options`, JSON.stringify(this.options));
+          this.options = res.list;
           this.loading = false;
+          sessionStorage.setItem(`${this.field.fieldName}_options`, JSON.stringify(this.options));
         })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
+        .catch(err => console.error('searchLinkmanManager function catch err', err));
+    }, 1000),
   },
 }
 </script>

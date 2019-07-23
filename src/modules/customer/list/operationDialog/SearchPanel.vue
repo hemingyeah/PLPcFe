@@ -54,6 +54,15 @@ export default {
         isSystem: 1,
         orderId: 11
       }, {
+        displayName: '联系人',
+        fieldName: 'linkmanId',
+        formType: 'linkman',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        orderId: 3,
+        placeholder: '请输入关键字搜索联系人'
+      }, {
         displayName: '创建人',
         fieldName: 'createUser',
         formType: 'user',
@@ -466,7 +475,7 @@ export default {
 
           let comp = FormFieldMap.get(f.formType);
 
-          if (!comp && f.formType !== 'tags' && f.formType !== 'area') {
+          if (!comp && f.formType !== 'tags' && f.formType !== 'area' && f.formType !== 'linkman') {
             return null;
           }
 
@@ -500,7 +509,21 @@ export default {
                   input: event => this.update(event, 'dist')
                 }
               });
+          } else if (f.formType === 'linkman') {
+            childComp = h(
+              'linkman-search',
+              {
+                props: {
+                  field: f,
+                  value: this.form[f.fieldName],
+                  disableMap: true,
+                },
+                on: {
+                  update: event => this.update(event)
+                }
+              });
           } else {
+
             childComp = h(
               comp.extend && comp.extend[`${f.formType}_search`]
                 ? comp.extend[`${f.formType}_search`]
