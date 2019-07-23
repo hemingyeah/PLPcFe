@@ -534,7 +534,7 @@ export default {
       })
       
       if(hasParent) {
-        confirm = await this.$platform.confirm('您选择了主团队，将会级联删除子团队。');
+        confirm = await this.$platform.confirm('您删除的团队，如果包含子团队将会一并删除，是否继续？');
         if(!confirm) return;
       } else {
         confirm = await this.$platform.confirm('您确定要删除选择的团队？');

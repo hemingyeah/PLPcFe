@@ -25,7 +25,7 @@
         <form-text :field="filedMap.phone" v-model="form.phone"/>
       </form-item>
       <form-item label="团队位置" validation>
-        <form-address :field="filedMap.tagAddress" v-model="form.tagAddress"/>
+        <form-address :field="filedMap.tagAddress" v-model="form.tagAddress" :placeholder="'您可以指定一下该团队所在的地理位置'"/>
       </form-item>
       <form-item label="负责区域" :validation="checkPlace">
         <team-places :field="filedMap.tagPlaceList" v-model="form.tagPlaceList"/>
@@ -356,7 +356,7 @@ export default {
         return (
           <div class="team-form-places">
             <div class="team-form-places-header">
-              <p>设置团队的服务区域用于新建客户时自动分配客户所属服务团队</p>
+              <p>设置本团队负责哪些区域的客户，可以用于客户按照区域自动分配</p>
               <button type="button" class="btn-text" onClick={e => this.addPlace()}><i class="iconfont icon-add"></i>添加</button>
             </div>
             {
@@ -390,6 +390,7 @@ export default {
         return (
           <biz-user-select 
             value={this.value}
+            placeholder='请选择团队内的成员'
             onInput={e => this.input(e)}
             fetch={this.fetch} multiple/>
         )
