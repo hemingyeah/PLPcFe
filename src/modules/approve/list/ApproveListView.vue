@@ -5,7 +5,7 @@
       <!-- 基础搜索 -->
       <form class="base-search" @submit.prevent="btnSearchHandler()">
         <div class="search-group">
-          <el-input v-model="paramsBackup.keyword" placeholder="根据客户信息搜索">
+          <el-input v-model="paramsBackup.keyword" placeholder="请输入编号、发起人等信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">
@@ -33,7 +33,7 @@
         <el-form class="advanced-search-form" novalidate @submit.native.prevent="btnSearchHandler()">
           <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
             <el-form-item label-width="100px" label="发起人">
-              <base-select v-model="paramsForSelector.proposer" :remote-method="inputSearchInitiator" clearable>
+              <base-select v-model="paramsForSelector.proposer" :remote-method="inputSearchInitiator" placeholder="请选择" clearable>
                 <template slot="option" slot-scope="{option}">
                   <div class="initiator-option-row">
                     <img :src="getInitiatorAvatar(option.head)" class="initiator-avatar"/><span class="initiator-display-name">{{option.label}}</span>
@@ -48,7 +48,8 @@
                 align="right"
                 unlink-panels
                 range-separator="-"
-                placeholder="请输入创建时间"
+                start-placeholder="请输入开始时间"
+                end-placeholder="请输入结束时间"
                 :picker-options="approveTimePickerOptions"
               ></el-date-picker>
             </el-form-item>
@@ -59,7 +60,8 @@
                 align="right"
                 unlink-panels
                 range-separator="-"
-                placeholder="请输入审批时间"
+                start-placeholder="请输入开始时间"
+                end-placeholder="请输入结束时间"
                 :picker-options="approveTimePickerOptions"
               ></el-date-picker>
             </el-form-item>
@@ -270,45 +272,7 @@
         </template>
       </div>
     </base-panel>
-    <!-- 审批确认框 -->
-    <!-- <base-modal 
-      :show.sync="ui.approveConfirmPanelShow"
-      title="审批"
-      width="650px"
-      @close="closeApproveModalHandler"
-      @cancel="cancelApproveModalHandler"
-    >
-      <div class="apply-approve-modal-content">
-        <div class="apply-modal-row">
-          <span class="approve-modal-key">来源：</span><span class="approve-modal-value">{{ tempApprove.source | getEventName }}</span>
-        </div>
-        <div class="apply-modal-row">
-          <span class="approve-modal-key">节点：</span><span class="approve-modal-value">{{ tempApprove.action }}</span>
-        </div>
-        <div v-if="!tempApprove.html" class="apply-modal-row">
-          <span class="approve-modal-key">内容：</span><span class="approve-modal-value">{{ tempApprove.content }}</span>
-        </div>
-        <div v-else class="apply-modal-row">
-          <span class="approve-modal-key">内容：</span><span class="approve-modal-value" v-html="tempApprove.html"></span>
-        </div>
-        <div class="apply-modal-row">
-          <span class="approve-modal-key">审批结果：</span><span class="approve-modal-value">
-            <el-radio-group v-model="tempApproveApply.result">
-              <el-radio :label="'success'" style="width: 60px">同意</el-radio>
-              <el-radio :label="'fail'" style="width: 60px">拒绝</el-radio>
-            </el-radio-group>
-          </span>
-        </div>
-        <div class="apply-modal-row">
-          <span class="approve-modal-key">审批备注：</span><span class="_textarea"><form-textarea v-model="tempApproveApply.remark"/></span>
-        </div>
-      </div>
-      <div slot="footer" class="apply-modal-footer">
-        <span class="apply-remark">备注：审批后不能修改审批结果</span>
-        <button @click="closeApproveModalHandler()" class="btn btn-text">关闭</button>
-        <button @click="applyApprove()" class="btn btn-primary">审批</button>
-      </div>
-    </base-modal> -->
+
   </div>
 </template>
 
@@ -361,7 +325,7 @@ export default {
         // mySearch: '', // 联调时数据
         typeId: '',
         action: '',
-        pageNum: '',
+        pageNum: 1,
         pageSize: ''
       },
       paramsBackup: {
@@ -591,13 +555,11 @@ export default {
       localStorage.setItem(KEY_MAP.APPROVE_LIST_VIEW, JSON.stringify(configData));
     },
     handleSelection (selection) {
-      // this.multipleSelection = selection.map(({id}) => id)
       let tv = this.getComputeSelection(selection);
       let original = this.multipleSelection
         .filter(ms => this.approveDataList.some(cs => cs.objId === ms.objId));
       let unSelected = this.approveDataList
         .filter(c => original.every(oc => oc.objId !== c.objId));
-
       if (tv.length > this.selectedLimit) {
         unSelected.forEach(row => {
           this.$refs.multipleTable.toggleRowSelection(row, false);
@@ -610,7 +572,7 @@ export default {
       let tv = [];
       
       tv = this.multipleSelection
-        .filter(ms => this.approveDataList.every(c => c.id !== ms.id));
+        .filter(ms => this.approveDataList.every(c => c.objId !== ms.objId));
       tv = _.uniqWith([...tv, ...selection], _.isEqual);
 
       return tv;
@@ -666,6 +628,7 @@ export default {
       this.saveDataToStorage('pageSize', pageSize);
       this.params.pageNum = 1;
       this.params.pageSize = pageSize;
+      this.pageInfo.pageSize = pageSize;
       this.doSearch();
     },
     sourceChangeHandler (source) {
@@ -864,6 +827,8 @@ export default {
           fromId
         }
       }
+
+      // /performance/v2/report/desc/3679
       platform.openTab(tabOptions)
     },
 
@@ -947,37 +912,6 @@ export default {
     getExportColumns () {
       return this.getFixedColumns();
     },
-    /**
-     * 执行（确认）审批
-     */
-    // applyApprove () {
-    //   ApproveApi.applyApprove(this.tempApproveApply)
-    //     .then((res) => {
-    //       res = res || {};
-    //       if (res.succ) {
-    //         platform.alert('审批成功');
-    //         this.ui.approveConfirmPanelShow = false;
-    //         this.doSearch();
-    //       } else {
-    //         platform.alert(res.message || '审批失败');
-    //       }
-    //     }).catch((e) => {
-    //       platform.alert('审批失败');
-    //       console.error('approveList applyApprove error', e);
-    //     })
-    // },
-    // closeApproveModalHandler () {
-    //   this.cancelApproveModalHandler();
-    // },
-    // cancelApproveModalHandler () {
-    //   if (this.ui.approveConfirmPanelShow) {
-    //     this.ui.approveConfirmPanelShow = false;
-    //   }
-    //   this.tempApproveApply = {
-    //     result: 'success',
-    //     remark: '',
-    //   }
-    // },
 
     /**
      * 尝试从本地存储中恢复数据
@@ -988,11 +922,12 @@ export default {
       try {
         const columns = this.getLocalStorageData('columnStatus');
         const pageSize = this.getLocalStorageData('pageSize');
+        const advanceColumnNum = localStorage.getItem(KEY_MAP.APPROVE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER);
 
         this.columns = (columns && columns.length) ? columns : this.getFixedColumns();
-        // this.columns = (columns && columns.length) ? columns : this.getFixedColumns();
         this.pageInfo.pageSize = pageSize || 10;
         this.params.pageSize = pageSize || 10;
+        this.columnNum = Number(advanceColumnNum || 1);
       } catch (e) {
         console.error('approveListRecoverStorageConfig error', e);
         this.columns = this.getFixedColumns();
