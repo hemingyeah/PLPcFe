@@ -390,7 +390,6 @@ export default {
         return (
           <biz-user-select 
             value={this.value}
-            placeholder='请选择团队内的成员'
             onInput={e => this.input(e)}
             fetch={this.fetch} multiple/>
         )
