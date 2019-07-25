@@ -1100,7 +1100,7 @@ export default {
             minWidth = 125;
           }
 
-          if (field.formType === 'datetime') {
+          if (field.formType === 'datetime' || field.fieldName === 'updateTime') {
             minWidth = 150;
           }
 
