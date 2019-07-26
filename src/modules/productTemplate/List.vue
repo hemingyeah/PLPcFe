@@ -100,10 +100,8 @@
             <template v-if="column.field === 'name'">
               <a href="" class="view-detail-btn" @click.stop.prevent="goProductTemplateView(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
-            <template v-else-if="column.formType === 'select' && column.isMulti">
-              <span v-if="scope.row[column.field] && scope.row[column.field].length > 0">
-                {{ Array.isArray(scope.row[column.field]) ? scope.row[column.field].join(',') : scope.row[column.field] }}
-              </span>
+            <template v-else-if="column.formType === 'select'">
+              {{ scope.row[column.field] | displaySelect }}
             </template>
             <template v-else-if="column.formType === 'user'">
               {{ scope.row[column.field] && (scope.row[column.field].displayName || scope.row[column.field].name) }}
@@ -359,6 +357,18 @@ export default {
           return f;
         })
         .sort((a, b) => a.orderId - b.orderId)
+    },
+  },
+  filters: {
+    displaySelect(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('，');
+      }
+      return null;
     },
   },
   mounted() {
