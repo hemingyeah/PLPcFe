@@ -74,10 +74,6 @@ export default {
             formType = 'customer'
           }
 
-          if (formType === 'select' && f.setting.isMulti) {
-            f.setting.isMulti = false;
-          }
-
           if (formType === 'updateTime') {
             f.displayName = '更新时间';
           }
@@ -344,11 +340,22 @@ export default {
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },
-        renderInput(h, f) {
+        renderInput(h, field) {
+          const f = {
+            ...Object.freeze(field),
+          }
+
           let comp = FormFieldMap.get(f.formType);
 
           if (!comp && f.formType !== 'tags' && f.formType !== 'customer') {
             return null;
+          }
+
+          if (f.formType === 'select') {
+            f.setting = {
+              ...f.setting,
+              isMulti: false
+            };
           }
 
           let childComp = null;

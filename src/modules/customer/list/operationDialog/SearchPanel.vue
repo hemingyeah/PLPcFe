@@ -151,10 +151,6 @@ export default {
             formType = 'customer'
           }
 
-          if (formType === 'select' && f.setting.isMulti) {
-            f.setting.isMulti = false;
-          }
-
           if (f.fieldName === 'manager') {
             f.fieldName = 'customerManager';
           }
@@ -168,7 +164,7 @@ export default {
             isNull: 1,
             formType,
             originalFormType: f.formType,
-            orderId: f.isSystem ? f.orderId - 100 : f.orderId ,
+            orderId: f.isSystem ? f.orderId - 100 : f.orderId,
             operator: this.matchOperator(f)
           })
         })
@@ -463,11 +459,19 @@ export default {
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },
-        renderInput(h, f) {
+        renderInput(h, field) {
+          const f = {
+            ...Object.freeze(field),
+          }
+
           let comp = FormFieldMap.get(f.formType);
 
           if (!comp && f.formType !== 'tags' && f.formType !== 'area') {
             return null;
+          }
+
+          if (f.formType === 'select') {
+            f.setting.isMulti = false;
           }
 
           let childComp = null;
