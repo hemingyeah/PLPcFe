@@ -769,6 +769,14 @@ export default {
         fromId
       });
     },
+    // todo clear
+    approveHandlerTest () {
+      let row = {
+        objId: '3681',
+        source: '绩效报告'
+      }
+      this.approveHandler(row);
+    },
     approveHandler (row) {
       let type = row.source;
       let id = row.objId;
@@ -777,7 +785,11 @@ export default {
       let taskUrl = '';
       let eventId = '';
       let eventUrl = '';
+      let performanceId = '';
+      let performanceUrl = '';
+      let performanceQueryStr = '';
       
+      // 两个工单事件jsp页面
       switch (type) {
       case 'task': 
         taskId = `taskView_${id}`;
@@ -790,6 +802,13 @@ export default {
         eventUrl = `/event/view/${id}`;
         this.saveApproveId(id);
         this.addTabs(eventId, eventUrl);
+        break;
+      case '绩效报告':
+        console.info('#绩效报告条目数据#', row); // todo clear
+        performanceQueryStr = 'from=approveList&action=approve';
+        performanceId = `frame_tab_performanceReport${id}`;
+        performanceUrl = `/performance/v2/report/desc/${id}?${performanceQueryStr}`;
+        this.addTabs(performanceId, performanceUrl);
         break;
       default: 
         break;

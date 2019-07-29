@@ -381,6 +381,7 @@ export default {
   },
   mounted() {
     console.log('this.initData', this.initData);
+    // 审批列表中绩效报告数据的审批点击事件跳转到该页面触发 点击审批按钮事件 
     this.getRecord();
   },
   methods: {
@@ -401,6 +402,8 @@ export default {
               return r;
             })
           console.log('this.records', this.records);
+          // 处理来自审理列表的事件
+          this.handleApproveListEvent();
         })
         .catch(e => console.error('e', e));
     },
@@ -508,6 +511,32 @@ export default {
     },
     viewDetail(row) {
       this.$refs.hitRuleDetailDialog.toggleDialog(row);
+    },
+    // 处理来自审批列表的事件
+    handleApproveListEvent () {
+      let params = this.getUrlParams();
+      if (!params) return;
+      if (params.from === 'approveList' && params.action === 'approve') {
+        console.info('绩效报告解析到审批列表参数', params, this.needToApprove, this.reportStatus); // todo clear
+        return this.needToApprove && this.reportStatus && this.approve();
+      }
+    },
+    // 获取地址参数
+    getUrlParams () {
+      let url = window.location.href;
+      let paramsStr = url.split('?')[1];
+
+      if (!paramsStr) return null;
+      let arr = paramsStr.split('&');
+      let params = {};
+      arr.forEach(elm => {
+        let param = elm.split('=');
+        let key = param[0];
+        let value = param[1];
+        params[key] = value;
+      })
+
+      return params;
     }
   },
   components: {
