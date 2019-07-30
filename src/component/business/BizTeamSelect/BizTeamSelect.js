@@ -130,6 +130,7 @@ const BizTeamSelect = {
       this.fetchTeam('merge');
     },
     handleInput: _.debounce(function (event) {
+      event.stopPropagation();
       this.params.keyword = event.target.value;
       this.params.pageNum = 1;
       this.fetchTeam('cover');
