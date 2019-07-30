@@ -511,7 +511,7 @@ export default {
     },
     exportApprove (exportAll) {
       let ids = [];
-      let fileName = `${formatDate(new Date(), 'YYYY-MM-dd')}审批中心数据.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}审批中心数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
         ids = this.multipleSelection;
@@ -1013,7 +1013,8 @@ export default {
     getFormatDate (value) {
       if (!value) return '';
       try {
-        return formatDate(new Date(value), 'YYYY-MM-dd HH:mm'); // 这里的format fullYear是YYYY
+        // YYYY-MM-DD HH:mm:ss 这里方法的格式不同于普通格式化
+        return formatDate(new Date(value), 'YYYY-MM-DD HH:mm'); // 这里的format fullYear是YYYY
       } catch (e) {
         return '';
       }
