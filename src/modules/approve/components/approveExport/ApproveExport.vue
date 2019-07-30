@@ -113,6 +113,7 @@ export default {
       
       form.method = this.method;
       form.action = this.action;
+      // form.action = 'http://172.18.0.33:8080/approve/export' || this.action;
       form.submit();
 
       this.visible = false;

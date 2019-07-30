@@ -462,7 +462,9 @@ export default {
       this.ui.loadingListData = true;
       // 字段转换 // todo 抽出方法
       params.page = params.pageNum;
-      params.myId = this.userId; 
+      params.myId = this.userId;
+      // params.myId = this.userId || 'd33846ee-6fa9-11e9-bfc9-00163e304a25';
+      // params.tenantId = '7416b42a-25cc-11e7-a500-00163e12f748'; // 本地联调
 
       ApproveApi.getApproveList(params).then((res) => {
         this.ui.loadingListData = false;
@@ -1098,7 +1100,8 @@ export default {
 
       .advanced-search-form {
         overflow: auto;
-        padding: 10px 0 63px 0;
+        // padding: 10px 0 63px 0;
+        padding: 10px 15px 63px;
         height: calc(100% - 51px);
         .two-columns {
           display: flex;
@@ -1129,6 +1132,10 @@ export default {
           .base-button {
             margin: 0 10px;
           }
+        }
+
+        .el-form-item__label {
+          text-align: left;
         }
       }
 

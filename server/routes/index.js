@@ -83,8 +83,10 @@ router.get('/window', async ctx => {
 });0.
 
 // 审批列表 联调时临时使用
-router.post('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.0.28',
+// /api/app/outside
+// router.post('/outside/*', ctx => HttpClient.proxy(ctx, {
+router.post('/approve/search', ctx => HttpClient.proxy(ctx, {
+  host: '172.18.0.33',
   port: 10002
 }))
 
