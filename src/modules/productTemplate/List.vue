@@ -14,7 +14,10 @@
           <base-button type="primary" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
         </div>
-        <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">高级搜索</span>
+        <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">
+          <i class="iconfont icon-add"></i>
+          高级搜索
+        </span>
       </form>
       <!-- end 搜索 header -->
 
@@ -41,7 +44,7 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="productCreate" v-if="authEdit == 3">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" v-if="authDelete" @event="productDelete">删除</base-button>
+          <base-button type="ghost" icon="icon-qingkongshanchu" v-if="authDelete" @event="productDelete">删除</base-button>
         </div>
         <!-- end operation bar-->
 
@@ -1085,17 +1088,18 @@ html, body {
       background: #fff;
       border-color: $color-primary;
       color: $color-primary;
-
       font-size: 14px;
-      font-weight: lighter;
       line-height: 32px;
-      
       padding: 0 13px;
 
       &:hover {
         cursor: pointer;
       }
 
+      .iconfont {
+        font-size: 12px;
+        font-weight: bolder;
+      }
     }
   }
 }

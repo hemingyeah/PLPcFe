@@ -8,7 +8,10 @@
         <base-button type="primary" @event="search(true);trackEventHandler('search')" native-type="submit">搜索</base-button>
         <base-button type="ghost" @event="reSearch">重置</base-button>
       </div>
-      <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow;trackEventHandler('advSearch')">高级搜索</span>
+      <span class="advanced-search-visible-btn" @click="advancedSearchPanelShow = !advancedSearchPanelShow;trackEventHandler('advSearch')">
+        <i class="iconfont icon-add"></i>
+        高级搜索
+      </span>
     </form>
 
     <!--高级搜索-->
@@ -70,7 +73,7 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteReport">删除</base-button>
+          <base-button type="ghost" icon="icon-qingkongshanchu" @event="deleteReport">删除</base-button>
           <a href="https://help.shb.ltd/doc?id=10501#Performance_report" target="_blank">如何通过绩效报告统计团队或个人数据？</a>
         </div>
 
@@ -822,7 +825,6 @@ export default {
 
       .advanced-search-visible-btn {
         font-size: 14px;
-        font-weight: lighter;
         line-height: 32px;
         color: $color-primary;
         border-color: $color-primary;
@@ -830,6 +832,11 @@ export default {
         padding: 0 13px;
         &:hover {
           cursor: pointer;
+        }
+
+        .iconfont {
+          font-size: 12px;
+          font-weight: bolder;
         }
       }
     }

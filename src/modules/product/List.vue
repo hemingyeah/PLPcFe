@@ -10,7 +10,10 @@
           <base-button type="primary" @event="searchModel.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
         </div>
-        <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">高级搜索</span>
+        <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">
+          <i class="iconfont icon-add"></i>
+          高级搜索
+        </span>
       </form>
     </div>
 
@@ -19,7 +22,7 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="goToCreate" v-if="editedPermission">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" @event="deleteProducts" v-if="deletePermission">删除</base-button>
+          <base-button type="ghost" icon="icon-qingkongshanchu" @event="deleteProducts" v-if="deletePermission">删除</base-button>
         </div>
 
         <div class="action-button-group">
@@ -1042,7 +1045,6 @@ export default {
 
       .advanced-search-visible-btn {
         font-size: 14px;
-        font-weight: lighter;
         line-height: 32px;
         color: $color-primary;
         border-color: $color-primary;
@@ -1050,6 +1052,11 @@ export default {
         padding: 0 13px;
         &:hover {
           cursor: pointer;
+        }
+
+        .iconfont {
+          font-size: 12px;
+          font-weight: bolder;
         }
       }
     }

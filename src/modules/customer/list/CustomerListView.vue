@@ -16,7 +16,10 @@
           <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
         <span class="advanced-search-visible-btn"
-              @click.self="panelSearchAdvancedToggle">高级搜索</span>
+              @click.self="panelSearchAdvancedToggle">
+          <i class="iconfont icon-add"></i>
+          高级搜索
+        </span>
       </form>
       <!--高级搜索-->
 
@@ -28,7 +31,7 @@
       <div class="operation-bar-container">
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="jumpPage" v-if="editedPermission">新建</base-button>
-          <base-button type="ghost" icon="icon-yemianshanchu" v-if="deletePermission" @event="deleteCustomer">删除</base-button>
+          <base-button type="ghost" icon="icon-qingkongshanchu" v-if="deletePermission" @event="deleteCustomer">删除</base-button>
         </div>
 
         <div class="action-button-group">
@@ -1120,14 +1123,19 @@ export default {
 
       .advanced-search-visible-btn {
         font-size: 14px;
-        font-weight: lighter;
         line-height: 32px;
         color: $color-primary;
         border-color: $color-primary;
         background: #fff;
         padding: 0 13px;
+
         &:hover {
           cursor: pointer;
+        }
+
+        .iconfont {
+          font-size: 12px;
+          font-weight: bolder;
         }
       }
     }

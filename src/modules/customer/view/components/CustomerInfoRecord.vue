@@ -149,6 +149,9 @@ export default {
 
       return <h5><strong>{userName}</strong>{message}。</h5>
     },
+    renderProductRecordDom({action, userName, showInOwn, content}) {
+      return <h5><strong>{userName}</strong>{ `${content.type}了产品${content.name}`}。</h5>
+    },
     /** 根据记录的action渲染对应的内容，支持jsx和render函数 */
     renderRecord(h, item){
       let {action, userName, showInOwn, content, attachments, primaryName} = item;
@@ -178,6 +181,7 @@ export default {
       if(action == '地址') return this.renderAddressRecordDom(item);
 
       if(action == '联系人') return this.renderLinkmanRecordDom(item);
+      if(action === '产品') return this.renderProductRecordDom(item);
 
       if(action == '消息提醒'){
         if(content.type == '已发送') {
