@@ -341,7 +341,8 @@ export default {
       sources: [
         { name: '全部', value: '' },
         { name: '事件', value: 'event' },
-        { name: '工单', value: 'task' }
+        { name: '工单', value: 'task' },
+        { name: '绩效报告', value: '绩效报告' }
       ],
       role: [
         { name: '由我审批', value: 'approve' },
