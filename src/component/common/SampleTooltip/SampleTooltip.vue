@@ -5,9 +5,6 @@
     <el-tooltip :content="tip" placement="top" v-if="isGuideData" :disabled="!isGuideData">
       <div class="superscript"></div>
     </el-tooltip>
-    <!-- <el-tooltip content="删除示例数据" placement="top">
-      <div class="superscript"></div>
-    </el-tooltip> -->
     <!-- end 示例数据 角标 -->
 
     <!-- start 内容 -->
@@ -97,6 +94,7 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    padding-left: 10px;
 
     & > * {
       white-space: nowrap;
@@ -104,6 +102,6 @@ export default {
   }
 
   .sample-tooltip-content-padding {
-    padding-left: 20px;
+    padding-left: 20px !important;
   }
 </style>

@@ -771,8 +771,13 @@ body {
   }
 }
 
-.sample-tooltip-container {
-  background-color: #eef8f8;
+.product-detail {
+  .sample-tooltip-container {
+    background-color: #eef8f8;
+  }
+  .sample-tooltip-content {
+    padding-left: 0;
+  }
 }
 
 

@@ -18,6 +18,7 @@
         :width="column.width"
         :sortable="column.sortable"
         :show-overflow-tooltip="column.field === 'taskNo'"
+        :class-name="column.field == 'taskNo' ? 'product-task-name-superscript-td' : ''"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'templateId'">
@@ -232,6 +233,23 @@ export default {
           padding: 0 5px;
           color: $color-primary;
         }
+      }
+    }
+  }
+
+  td.product-task-name-superscript-td {
+    padding: 0 !important;
+    & > .cell {
+      padding-left: 0 !important;
+    }
+
+    & > div {
+      height: 43px;
+      line-height: 43px !important;
+      a {
+        display: inline-block;
+        height: 43px;
+        line-height: 43px;
       }
     }
   }

@@ -716,6 +716,15 @@ export default {
       overflow-y: auto;
       border-right: 1px solid #f2f2f2;
     }
+
+    .sample-tooltip-container {
+      background-color: #eef8f8;;
+    }
+
+    .sample-tooltip-content {
+      padding-left: 0;
+    }
+
   }
 
   .customer-name{
@@ -833,9 +842,5 @@ export default {
     & + p{
       margin-top: 10px;
     }
-  }
-
-  .sample-tooltip-container {
-    background-color: #eef8f8;;
   }
 </style>

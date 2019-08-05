@@ -186,8 +186,13 @@ export default {
     }
   }
 
-  .customer-product-name-superscript-td {
+  td.customer-product-name-superscript-td {
     padding: 0 !important;
+
+    & > .cell {
+      padding-left: 0 !important;
+    }
+
     & > div {
       height: 43px;
       line-height: 43px !important;
@@ -197,5 +202,6 @@ export default {
         line-height: 43px;
       }
     }
+
   }
 </style>
