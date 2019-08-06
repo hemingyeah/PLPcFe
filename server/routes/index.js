@@ -21,7 +21,7 @@ const performanceRouter = require('./performance');
 const productRouter = require('./product');
 const approveRouter = require('./approve');
 
-const repositoryPouter = require('./repository')
+const repositoryRouter = require('./repository')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -101,7 +101,7 @@ router.use('', teamRouter.routes(), teamRouter.allowedMethods());
 router.use('', productRouter.routes(), productRouter.allowedMethods());
 router.use('', approveRouter.routes(), productRouter.allowedMethods());
 
-router.use('', repositoryPouter.routes(), repositoryPouter.allowedMethods());
+router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.all('/api/*', async ctx => {
   
   let option = {
