@@ -18,7 +18,7 @@
         :width="column.width"
         :class-name="column.field == 'taskNo' ? 'customer-task-name-superscript-td' : ''"
         :sortable="column.sortable"
-        :show-overflow-tooltip="column.field === 'taskNo'"
+        :show-overflow-tooltip="column.field !== 'taskNo'"
         :align="column.align">
         <template slot-scope="scope">
           <template v-if="column.field === 'templateId'">

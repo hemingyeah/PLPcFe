@@ -17,7 +17,7 @@
         :prop="column.field"
         :width="column.width"
         :sortable="column.sortable"
-        :show-overflow-tooltip="column.field === 'taskNo'"
+        :show-overflow-tooltip="column.field !== 'taskNo'"
         :class-name="column.field == 'taskNo' ? 'product-task-name-superscript-td' : ''"
         :align="column.align">
         <template slot-scope="scope">
