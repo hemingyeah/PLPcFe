@@ -78,11 +78,19 @@ export default {
     createMethod(params, callBack) {
       this.$http.post(this.postUrl, params)
         .then(result => {
-          if (result.status == 1) return platform.notification({
-            type: 'error',
-            title: '创建客户成功失败',
-            message: result.message
+
+          this.pending = false;
+          this.loadingPage = false;
+
+          let isSucc = result.succ;
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `创建客户${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && result.message
           });
+          
+          if (!isSucc) return;
 
           const addressId = result.data.addressId;
           const customerId = result.data.customerId;
