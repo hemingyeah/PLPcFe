@@ -87,6 +87,8 @@ export default {
 
           createProduct(params)
             .then(res => {
+              this.pending = false;
+              this.loadingPage = false;
 
               if (res.status) return this.$platform.notification({
                 title: '新建产品失败',
@@ -105,8 +107,6 @@ export default {
             })
             .catch(err => {
               console.error(err);
-              this.pending = false;
-              this.loadingPage = false;
             });
         })
         .catch(err => {
