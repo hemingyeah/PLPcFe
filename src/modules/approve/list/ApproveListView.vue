@@ -499,6 +499,7 @@ export default {
       this.paramsForSelector = {
         initiator: [],
         eventType: [],
+        taskType: [],
         state: '待审批'
       }
       this.pageInfo.pageNum = 1;
