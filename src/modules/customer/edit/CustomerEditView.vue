@@ -102,7 +102,18 @@ export default {
     createCustomerForEvent(params) {
       this.$http.post('/event/customer/create', params)
         .then(res => {
-          if (res.status) return this.$platform.alert('创建客户失败');
+          let isSucc = !res.status;
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `创建客户${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          });
+
+          this.pending = false;
+          this.loadingPage = false;
+
+          if(!isSucc) return;
+
           const params = {
             ...res.data,
             eventId: this.eventId,
@@ -127,17 +138,16 @@ export default {
     createMethod(params) {
       this.$http.post('/customer/create', params)
         .then(res => {
-          let isSucc = res.status == 0;
+          let isSucc = !res.status;
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建客户${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-          if(!isSucc){
-            this.pending = false;
-            this.loadingPage = false;
-            return;
-          }
+          this.pending = false;
+          this.loadingPage = false;
+
+          if(!isSucc) return;
 
           this.reloadTab();
           window.location.href = `/customer/view/${res.data.customerId}`;
