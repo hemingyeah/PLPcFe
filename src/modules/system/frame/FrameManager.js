@@ -38,6 +38,7 @@ const FrameManager = {
       if(action == 'shb.system.openFrameTab') this.openForFrame(eventData.data);
       if(action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.data);
       if(action == 'shb.system.closeFrameById') this.closeFrameTabById(eventData.data);
+      if(action == 'shb.system.setFrameLoadingStatus') this.setFrameLoadingStatus(eventData.data);
     },
     /** @deprecated 兼容旧页面，迁移完成后删除 */
     addTabs(option){
@@ -209,6 +210,14 @@ const FrameManager = {
       if(index >= 0){
         this.reloadFrameTab(this.frameTabs[index])
       }
+    },
+    // 设置tab loading动画
+    setFrameLoadingStatus (options) {
+      let id = options.id;
+      if (null == id) return;
+      let tab = this.frameTabs.filter(f => f.id == id)[0];
+      tab.loading = options.loading;
+      tab.title = options.title || tab.originTitle;
     },
     tabScroll(event){ 
       event.preventDefault();

@@ -63,6 +63,17 @@ function closeTab(id) {
   win.postMessage(message, origin)
 }
 
+function setTabLoadingStatus (options) {
+  let win = getRootWindow(window);
+  let origin = window.location.origin;
+  let message = {
+    action: 'shb.system.setFrameLoadingStatus',
+    data: options
+  }
+
+  win.postMessage(message, origin)
+}
+
 /**
  * 图片预览
  *
@@ -84,6 +95,7 @@ export const platform = {
   openTab,
   refreshTab,
   closeTab,
+  setTabLoadingStatus,
 
   openLink,
   imagePreview,

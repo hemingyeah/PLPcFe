@@ -39,35 +39,9 @@ function getTaskTypeList (params) {
  * @param {Object} params 
  */
 function getApproveList (params) {
-  // return http.post('/approve/search', params);
-  return http.post('/api/app/outside/approve/search', params);
-  // class Mock {
-  //   constructor(pageNum, pageSize) {
-  //     console.log(`no: ${pageNum}, size: ${pageSize}`)
-  //     return this.list(pageNum, pageSize)
-  //   }
-  //   list (pageNum, pageSize) {
-  //     let arr = [];
-  //     let start = (pageSize * (pageNum - 1)) + + 1;
-  //     let end = (pageSize) * (pageNum)
-  //     for (let i = start; i < end; i ++) {
-  //       arr.push({
-  //         objId: i,
-  //         objNo: `objNo${i}`
-  //       })
-  //     }
-  //     return arr;
-  //   }
-  // }
-
-  // return Promise.resolve({
-  //   data: {
-  //     list: new Mock(params.page, params.pageSize),
-  //     pageNum: params.page,
-  //     total: 9998,
-  //     pages: 12,
-  //   }
-  // })
+  // return http.post('http://47.98.255.79:10002/approve/search', params) // 内部接口
+  // return http.post('/approve/search', params); // 本地联调
+  return http.post('/api/app/outside/approve/search', params); // 正式，测试服
 }
 
 /**

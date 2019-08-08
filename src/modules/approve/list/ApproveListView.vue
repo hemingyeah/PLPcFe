@@ -464,10 +464,13 @@ export default {
       // 字段转换 // todo 抽出方法
       params.page = params.pageNum;
       params.myId = this.userId;
-      // params.myId = this.userId || 'd33846ee-6fa9-11e9-bfc9-00163e304a25';
+      // todo clera
+      // console.log('[approveList] doSearch ..')
+      // params.myId = 'd33846ee-6fa9-11e9-bfc9-00163e304a25';
       // params.tenantId = '7416b42a-25cc-11e7-a500-00163e12f748'; // 本地联调
 
-      ApproveApi.getApproveList(params).then((res) => {
+      // 返回Promise供 '其他' 调用暴露方法时使用
+      return ApproveApi.getApproveList(params).then((res) => {
         this.ui.loadingListData = false;
         if (!res || !res.data || !res.data.list) {
           this.approveDataList = [];
@@ -981,6 +984,15 @@ export default {
       }
 
       return arr.join(',');
+    },
+    exportsRefreshUI (loading) {
+      let title = loading ? ' 正在加载' : '审批中心'; 
+      platform.setTabLoadingStatus({
+        id: 'M_APPROVE_LIST',
+        title,
+        loading
+      });
+      // alert(`handleExport${loading}`)
     }
   },
   computed: {
@@ -1004,6 +1016,9 @@ export default {
     }
 
     this.doSearch();
+    // 注册暴露方法
+    window.__exports__refresh = this.doSearch;
+    window.__exports__refresh_ui = this.exportsRefreshUI;
   },
   filters: {
     getEventName (value) {

@@ -87,7 +87,7 @@ router.get('/window', async ctx => {
 // /api/app/outside
 // router.post('/outside/*', ctx => HttpClient.proxy(ctx, {
 router.post('/approve/search', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.0.33',
+  host: '47.98.255.79',
   port: 10002
 }))
 

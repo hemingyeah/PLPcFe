@@ -95,6 +95,9 @@ export default {
             type: 'success',
           });
 
+          let fromId = window.frameElement.getAttribute('fromid');
+          this.$platform.refreshTab(fromId);
+
           return window.location.reload()
         })
         .catch(e => console.error('e', e));
