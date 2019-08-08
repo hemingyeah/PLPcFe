@@ -15,9 +15,9 @@ Vue.use(directive);
 Vue.use(filter);
 Vue.use(component);
 
-// import 'quill/dist/quill.core.css'
-// import 'quill/dist/quill.snow.css'
-// import 'quill/dist/quill.bubble.css'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
 Vue.prototype.$appConfig = appConfig;
 Vue.prototype.$platform = platform;

@@ -70,8 +70,18 @@ const FrameManager = {
       }
       
       this.frameTabs.forEach(item => item.show = false);
-      this.frameTabs.push(tab)
-      this.currUrl = tab.url;
+      this.frameTabs.push(tab);
+      if(tab.id == 'M_INFO_DOC') {
+        tab.url = '/document/list';
+        // tab.currentUrl = '/infoManagement/documentLibrary';
+      } else if(tab.id == 'M_INFO_NOTICE') {
+        tab.url = '/infoManagement/infoNotice';
+        // tab.currentUrl = '/infoManagement/infoNotice';
+      } else {
+        this.currUrl = tab.url;
+      }
+      console.log(this.frameTabs);
+      // this.currUrl = tab.url;
 
       this.adjustFrameTabs(tab);
       this.removeFrameCache(tab.id)

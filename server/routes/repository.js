@@ -6,20 +6,20 @@ const router = new KoaRouter();
 const modules = require('../../modules');
 
 router.get('/document/list', async ctx => {
-  let script = ['/document.DocumentListView.js'];
+  let script = ['/document.list.js'];
   let modConfig = modules['document.list'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/approve', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/document/list', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('文档库', body, script, modConfig.template)
 })
 
-router.get('/documet/create', async ctx => {
-  let script = ['/document.DocumentCreateView.js'];
+router.get('/document/create', async ctx => {
+  let script = ['/document.create.js'];
   let modConfig = modules['document.create'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/documet/create', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/document/create', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('新建文档库', body, script, modConfig.template)
