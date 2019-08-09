@@ -2,6 +2,7 @@
   <div class="document-list-detail">
     <!-- 详情头部 -->
     <div class="detail-top">
+
       <div class="author">
         <img class="author-img" :src="info.author.img">
         <div class="author-info">
@@ -9,7 +10,9 @@
           <p class="time">发布于：{{info.author.time}}</p>
         </div>
       </div>
+
       <div class="operating">
+
         <div class="published" v-if="info.property == '我发布的'">
           <span class="permission">
             <i class="iconfont icon-account1 icon-permission" v-if="info.permission"></i>
@@ -18,45 +21,53 @@
           </span>
           <span class="readNum">阅读（{{info.readNum}}）</span>
         </div>
+
         <div class="draftBox" v-if="info.property == '草稿箱'">
           <el-tag :type="info.review == '待审核' ? '' : 'danger'">{{info.review}}</el-tag>
         </div>
+
         <span class="management">
           <i class="iconfont icon-chuanjianbaogao icon-operating"></i>
           <i class="iconfont icon-qingkongshanchu icon-operating"></i>
-          <!-- <span class="edit"></span>
-          <span class="delete"></span> -->
         </span>
+
         <span class="share" v-if="info.property == '我发布的'">
           <i class="iconfont icon-send icon-operating"></i>
         </span>
-        <span class="open" @click="openFrame">新页面打开</span>
+
+        <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
+
       </div>
     </div>
 
     <!-- 文章详情 -->
     <div class="detail-content">
+
       <div class="info">
         <p class="title">{{info.title}}</p>
         <div class="content">{{info.content}}</div>
       </div>
+      <!-- 详情页脚部分 -->
       <div class="footer">
+
         <div class="tags">
           <i class="iconfont icon-chuanjianbaogao icon-tags"></i>
           <el-tag class="detail-tag" @click="handleTags(tag)" v-for="(tag,index) in info.tags" :key="index">{{tag}}</el-tag>
         </div>
+
         <div class="dividing-line"></div>
+
         <div class="annex">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
             <div class="annex-item">menu.pdf</div>
             <div class="annex-item">menu.pdf</div>
             <!-- <div class="base-comment-attachment base-file__preview" v-if="form.attachments.length > 0">
-              <base-file-item v-for="file in form.attachments" :key="file.id" :file="file" @delete="deleteFile" size="small"></base-file-item>
+              <base-file-item v-for="file in form.attachments" :key="file.id" :file="file" size="small"></base-file-item>
             </div> -->
           </div>
-          
         </div>
+
       </div>
     </div>
   </div>
@@ -64,10 +75,12 @@
 
 <script>
 export default {
-  name: 'list-detail',
+  name: 'document-detail',
   data () {
     return {
-      form: this.buildForm(),
+      form: this.buildForm(), // 附件存储格式
+      articleId: 'UGDIVUHYI98', // 通知公告id
+      showOpenFrame: true, // 是否显示 新页面打开
       info: {
         author: {
           img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
@@ -81,8 +94,13 @@ export default {
         content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。正好新人导师让我看看能否把产品目前使用的FileUploader从老的组件库分离出来的，自己也查阅了相关的各种资料，对文件上传的这些事有了更进一步的了解。把这些知识点总结一下，供自己日后回顾，也供有需要的同学参考，同时也欢迎各位大牛拍砖指点共同学习。',
         property: '草稿箱',
         review: '待审核',
-      }
+      } // 文章详情
     }
+  },
+  mounted () {
+    // 根据formId来判断是否是在新页面打开
+    let formId = window.frameElement.getAttribute('id');
+    if(formId.indexOf('document_detail') != -1) this.showOpenFrame = false;
   },
   methods: {
     buildForm(){
@@ -92,14 +110,18 @@ export default {
         showInOwn: 0
       }
     },
-    async deleteFile(file) {
-      let index = this.form.attachments.indexOf(file);
-      if(index >= 0) {
-        this.form.attachments.splice(index, 1);
-      }
-    },
+    // 新页面打开通知公告详情
     openFrame () {
-
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: `document_detail_${ this.articleId }`,
+        title: '文档库详情',
+        url: `/document/detail?id=${ this.articleId }`,
+        reload: true,
+        close: true,
+        fromId
+      });
     }
   }
 }
@@ -108,6 +130,7 @@ export default {
 <style lang="scss">
 .document-list-detail {
   background: #fff;
+  height: 100vh;
 
   .detail-top {
     display: flex;
@@ -195,6 +218,8 @@ export default {
         text-align: center;
         font-size: 14px;
         color: #38A6A6;
+
+        cursor: pointer;
       }
 
       .open {
@@ -203,6 +228,8 @@ export default {
         line-height: 30px;
         margin-left: 10px;
         color: #55B7B4;
+        
+        cursor: pointer;
       }
     }
   }

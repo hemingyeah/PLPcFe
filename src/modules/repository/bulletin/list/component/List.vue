@@ -1,5 +1,5 @@
 <template>
-  <div class="document-list-container">
+  <div class="bulletin-list-container">
 
     <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
 
@@ -7,8 +7,6 @@
 
       <div class="item-top">
         <p class="item-title" ref="title">{{item.title}}</p>
-        <!-- 草稿箱显示审核状态 -->
-        <el-tag class="review-tag" v-if="item.property == '草稿箱'" :type="item.review == '待审核' ? '' : 'danger'">{{item.review}}</el-tag>
       </div>
 
       <div class="item-info">
@@ -20,25 +18,10 @@
       <p class="item-content" ref="content">{{item.content}}</p>
 
       <div class="item-footer">
-
-        <div class="type">
-          <i class="iconfont icon-chuanjianbaogao icon-tags"></i>
-          <el-tag class="search-tag" @click="handleTags(tag)" v-for="(tag,index) in item.tags" :key="index">{{tag}}</el-tag>
-        </div>
-
-        <!-- 我发布的显示权限、阅读量、分享 -->
-        <div class="footer-right" v-if="item.property == '我发布的'">
-          <span class="permission">
-            <i class="iconfont icon-account1 icon-permission" v-if="item.permission"></i>
-            <i class="iconfont icon-quanxianguanli icon-permission" v-else></i>
-            {{item.permission ? '内部' : '外部'}}
-          </span>
-          <span class="readNum">阅读（{{item.readNum}}）</span>
-          <span class="share" @click="shareArticle">
-            <i class="iconfont icon-send icon-share"></i>
-          </span>
-        </div>
+        <span class="item-num">已读（{{item.readNum}}）</span>
+        <span class="item-num">未读（{{item.noReadNum}}）</span>
       </div>
+
     </div>
   </div>
 </template>
@@ -54,29 +37,19 @@ export default {
   },
   data () {
     return {
-      total: 18,
       item: {
-        property: '草稿箱',
         title: '最前线|微信内测新功能，提升阅读效率没那么容易',
         name: '张某某',
         time: '2019年7月7日 19:03',
-        review: '已拒绝',
         type: '分类1/分类1.1',
         content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。',
-        tags: ['诚信', '友善', '进取'],
-        permission: true,
-        readNum: 10086
-      }
+        readNum: 10086,
+        noReadNum: 3344
+      },
+      total: 12
     }
   },
-  created () {
-    this.highlight()
-  },
   methods: {
-    // 点击标签成为搜索条件
-    handleTags (tag) {
-      this.$emit('tag', tag);
-    },
     // 根据关键词设置高亮字段
     highlight () {
       if(!this.keyword) return;
@@ -84,10 +57,6 @@ export default {
       let replaceString = `<span style="color: #FF7B00">${ this.keyword }</span>`;
       this.$refs.content.innerHTML = this.item.content.replace(replaceReg, replaceString);
       this.$refs.title.innerHTML = this.item.title.replace(replaceReg, replaceString);
-    },
-    // 文章分享
-    shareArticle () {
-
     }
   },
   watch: {
@@ -99,7 +68,7 @@ export default {
 </script>
 
 <style lang="scss">
-.document-list-container {
+.bulletin-list-container {
   background: #fff;
 
   .list-top {
@@ -117,17 +86,10 @@ export default {
       font-size: 0;
 
       .item-title {
-        display: inline-block;
-        width: 300px;
         margin: 0;
         font-size: 16px;
         font-weight: 500;
         vertical-align: middle;
-      }
-
-      .review-tag {
-        vertical-align: middle;
-        margin-left: 24px;
       }
     }
     
@@ -151,36 +113,11 @@ export default {
 
     .item-footer {
       padding-top: 10px;
-      display: flex;
-      justify-content: space-between;
+      display: inline-block;
 
-      .icon-tags {
-        font-size: 14px;
-        color: #B0BCC3;
-      }
-
-      .search-tag {
-        margin-left: 4px;
-        border: none;
-        background: #E8EFF0;
-        color: #606266;
-
-        cursor: pointer;
-      }
-
-      .icon-permission {
-        font-size: 14px;
-        color: #B0BCC3;
-        margin-right: 3px;
-      }
-
-      .readNum {
-        margin: 0 15px;
-      }
-
-      .icon-share {
-        font-size: 14px;
-        color: #38A6A6;
+      .item-num {
+        display: inline-block;
+        margin-right: 10px;
       }
     }
   }

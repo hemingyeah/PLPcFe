@@ -30,6 +30,8 @@ import BizUserSelect from './business/BizUserSelect'
 import BizTeamSelect from './business/BizTeamSelect'
 import SampleTooltip from './common/SampleTooltip'
 
+import BaseEditor from './lessUsed/BaseEditor'
+
 import Form from './form';
 
 const components = [
@@ -60,7 +62,9 @@ const components = [
   BizUserSelect,
   BizTeamSelect,
   BaseWindow,
-  SampleTooltip
+  SampleTooltip,
+
+  BaseEditor
 ];
 
 export default {

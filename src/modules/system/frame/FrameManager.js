@@ -73,10 +73,8 @@ const FrameManager = {
       this.frameTabs.push(tab);
       if(tab.id == 'M_INFO_DOC') {
         tab.url = '/document/list';
-        // tab.currentUrl = '/infoManagement/documentLibrary';
       } else if(tab.id == 'M_INFO_NOTICE') {
-        tab.url = '/infoManagement/infoNotice';
-        // tab.currentUrl = '/infoManagement/infoNotice';
+        tab.url = '/bulletin/list';
       } else {
         this.currUrl = tab.url;
       }

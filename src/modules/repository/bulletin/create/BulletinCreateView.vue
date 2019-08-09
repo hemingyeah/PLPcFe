@@ -1,6 +1,6 @@
 <template>
-  <div class="document-create-view">
-    <div class="view-left">
+  <div class="bulletin-create-view">
+    <div class="content">
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
@@ -12,27 +12,21 @@
         <button class="base-button red-butn" @click="deleteFile">删除</button>
       </div>
     </div>
-    <!-- 更新日志，编辑时显示 -->
-    <update-log class="view-right"></update-log>
   </div>
 </template>
 
 <script>
 import TextTitle from './component/TextTitle.vue'
-import UpdateLog from './component/UpdateLog.vue'
 
 export default {
   name: 'document-create-view',
   components: {
     [TextTitle.name]: TextTitle,
-    [UpdateLog.name]: UpdateLog
   },
   data () {
     return {
       params: {
         article: '', // 文章内容
-        permission: '内部', // 文章权限
-        tags: [], // 标签
         form: {}, // 附件
         type: '', // 文章分类
       },
@@ -61,16 +55,14 @@ export default {
 </script>
 
 <style lang="scss">
-.document-create-view {
+.bulletin-create-view {
   padding: 10px;
   height: 100vh;
 
-  display: flex;
 
-  .view-left {
-    flex: 1;
+  .content {
     height: 100%;
-    padding: 50px 40px 100px 150px;
+    padding: 50px 200px 100px 150px;
     background: #fff;
 
     .textTitle {
@@ -90,13 +82,6 @@ export default {
       }
     }
   }
-
-  .view-right {
-    width: 350px;
-    height: 100%;
-    background: #fff;
-
-    border-left: 1px solid #C5D9E8;
-  }
+  
 }
 </style>

@@ -7,24 +7,7 @@
       </el-form-item>
 
       <el-form-item label="分类：" class="create-item">
-        <el-cascader :options="options" clearable class="type" v-model="params.tyep"></el-cascader>
-      </el-form-item>
-
-      <el-form-item label="权限：" class="create-item">
-        <el-radio-group v-model="params.permission">
-          <el-radio :label="'内部'">
-            内部
-            <el-tooltip content="仅应用内部用户可查看" placement="top">
-              <i class="iconfont icon-fd-info icon-permission"></i>
-            </el-tooltip>
-          </el-radio>
-          <el-radio :label="'外部'">
-            外部
-            <el-tooltip content="可分享给所有人，支持应用外查看" placement="top">
-              <i class="iconfont icon-fd-info icon-permission"></i>
-            </el-tooltip>
-          </el-radio>
-        </el-radio-group>
+        <el-cascader :options="options" clearable class="type" v-model="params.type"></el-cascader>
       </el-form-item>
 
       <el-form-item label="标签：" class="create-item">
@@ -196,7 +179,6 @@ export default {
 
       font-size: 14px;
       margin-left: 4px;
-      color: #333;
     }
 
     .search-tag {
