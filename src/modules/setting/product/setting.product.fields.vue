@@ -9,7 +9,7 @@
 
     </div>
     <div class="setting-product-design">
-      <form-design v-model="fields" mode="product"></form-design>
+      <form-design v-model="fields" :max="maxField" mode="product"></form-design>
     </div>
   </div>
 </template>
@@ -34,7 +34,8 @@ export default {
     return {
       excludeFormType: ['separator', 'email', 'phone', 'radio'],
       fields: FormUtil.toFormField(sortedFields),
-      pending: false
+      pending: false,
+      maxField: this.initData.fieldNum
     }
   },
   methods: {
