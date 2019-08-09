@@ -2,23 +2,31 @@
   <div class="document-list-search">
     <div class="search-top">
       <button class="base-button search-new" @click="create">新建</button>
-      <div class="search-input-container">
-        <input class="search-input el-input__inner" placeholder="输入关键词搜索" type="text" v-model="params.keyword">
-        <button class="search-btn" @click="search">
+      <div class="search-input-container" ref="searchInput">
+        <el-input 
+          class="search-input"
+          placeholder="输入关键词搜索" 
+          v-model="params.keyword"
+          @keyup.enter.native="search"
+          v-if="isSearch"
+          clearable>
+          <i slot="suffix" class="el-input__icon el-icon-search"></i>
+        </el-input>
+        <button class="search-btn" @click="toSearch" v-else>
           <i class="iconfont icon-search1 serach-icon"></i>
         </button>
       </div>
     </div>
     <div class="search-middle">
-      <el-select v-model="params.type" class="search-type search-type-left">
+      <el-select v-model="params.type" class="search-type search-type-left" @change="search">
         <el-option value="" label="全部(1312)"></el-option>
         <el-option value="1" label="我发布的(1312)"></el-option>
         <el-option value="2" label="草稿箱(1312)"></el-option>
       </el-select>
-      <el-cascader :options="options" clearable class="search-type search-type-right"></el-cascader>
+      <el-cascader :options="options" clearable class="search-type search-type-right" @change="search"></el-cascader>
     </div>
     <div class="search-bottom">
-      <el-select v-model="params.sort" class="search-sort">
+      <el-select v-model="params.sort" class="search-sort" @change="search">
         <el-option value="1" label="按更新时间排序"></el-option>
         <el-option value="2" label="按访问量排序"></el-option>
       </el-select>
@@ -33,19 +41,23 @@ export default {
   props: {
     tag: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
   data () {
     return {
       options: [],
       typeOptions: [],
+      isSearch: false,
       params: {
         keyword: '',
         type: '',
         sort: '1',
       }
     }
+  },
+  mounted () {
+    // this.toggleInput();
   },
   methods: {
     create () {
@@ -60,8 +72,35 @@ export default {
         fromId
       });
     },
+    toSearch () {
+      this.isSearch = true;
+      this.toggleInput();
+    },
     search () {
       this.$emit('search', this.params);
+    },
+    toggleInput () {
+      if (this.isSearch) {
+        document.addEventListener('click', (e) => {
+          if(!this.$refs.searchInput) return;
+          if (this.params.keyword) return;
+          if(!this.$refs.searchInput.contains(e.target)) {
+            this.isSearch = false;
+          }
+        })
+      } else {
+        document.removeEventListener('click', (e) => {
+          console.log('取消')
+        })
+      }
+    }
+  },
+  watch: {
+    'tag': {
+      handler(newValue, oldValue) {
+        this.search();
+      },
+      deep: true,
     }
   }
 }
@@ -81,10 +120,14 @@ export default {
 
       .search-input {
         height: 36px;
-        width: 200px;
-        position: absolute;
-        right: 36px;
+        width: 250px;
+        // position: absolute;
+        // right: 36px;
         // vertical-align: middle;
+
+        .el-input__inner {
+          height: 100%;
+        }
       }
 
       .search-btn {

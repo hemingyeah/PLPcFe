@@ -127,7 +127,6 @@ export default {
       this.$refs.input.click();
     },
     handleChange(event){
-      console.log(event);
       const files = event.target.files;
       if(!files || !files.length) return;
 
@@ -145,7 +144,7 @@ export default {
       }
 
       this.pending = true;
-      console.log(files);
+
       Uploader.batchUploadWithParse(files).then(result => {
         let {success, error} = result;
 

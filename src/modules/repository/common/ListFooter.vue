@@ -1,5 +1,6 @@
 <template>
   <div class="document-list-footer">
+    <!-- current-page 当前页面 -->
     <el-pagination
       class="list-table-pagination"
       background
@@ -7,7 +8,7 @@
       @size-change="handleSizeChange"
       :page-sizes="[10, 20, 50]"
       :page-size="page.pageSize"
-      :current-page="page.pageNum"
+      :current-page="page.pageNum" 
       layout="prev, pager, next, sizes, jumper">
     </el-pagination>
   </div>
@@ -25,10 +26,12 @@ export default {
     }
   },
   methods: {
+    // 页面跳转
     jump (pageNum) {
       this.params.pageNum = pageNum;
       this.$emit('search', this.params);
     },
+    // 页面pageSize改变
     handleSizeChange (pageSize) {
       this.params.pageNum = 1;
       this.params.pageSize = pageSize;
