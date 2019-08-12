@@ -119,7 +119,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .bulletin-list-search {
   background: #fff;
   padding: 11px;

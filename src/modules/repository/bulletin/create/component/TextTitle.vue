@@ -7,13 +7,18 @@
       </el-form-item>
 
       <el-form-item label="分类：" class="create-item">
-        <el-cascader :options="options" clearable class="type" v-model="params.type"></el-cascader>
+        <el-select v-model="params.type" class="search-type" @change="search">
+          <el-option v-for="(item, index) in typeOptions" :key="index" :value="item.value" :label="item.label">
+          </el-option>
+        </el-select>
       </el-form-item>
 
-      <el-form-item label="标签：" class="create-item">
-        <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="(tag,index) in params.tags" :key="index">{{tag}}</el-tag>
-        <el-input v-if="inputVisible" class="input-new-tag" @keyup.enter.native="addTags" @blur="addTags" v-model="tagValue" ref="saveTagInput"></el-input>
-        <i v-if="!inputVisible && params.tags.length < 4" class="iconfont icon-icon02 icon-addTags" @click="showInput"></i>
+      <el-form-item label="通知范围：" class="create-item">
+        <div class="range">
+          <biz-team-select v-model="value.tags" multiple class="notification-range" ref="notificationRange" />
+          <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="(tag,index) in params.tags" :key="index">{{tag.tagName}}</el-tag>
+          <i class="iconfont icon-icon02 icon-addTags" @click="chooseTeam"></i>
+        </div>
       </el-form-item>
 
       <el-form-item label="附件列表：" class="create-item">
@@ -67,11 +72,8 @@ export default {
   },
   methods: {
     // 点击加号显示标签输入框
-    showInput () {
-      this.inputVisible = true;
-      this.$nextTick(() => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      })
+    chooseTeam () {
+      this.$refs.notificationRange.$el.click();
     },
     // 添加标签，最多5个
     addTags () {
@@ -150,11 +152,12 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .document-create-title {
   background: #fff;
 
   .create-item {
+    position: relative;
     width: 100%;
     padding-top: 10px;
     margin: 0;
@@ -231,6 +234,24 @@ export default {
         }
       }
     }
+
+    .range {
+      margin-left: 82px;
+
+      .notification-range {
+        position: absolute;
+        bottom: 0;
+        z-index: -20;
+        display: inline-block;
+        width: calc(100% - 82px);
+        border: none;
+
+        .biz-team-select-tags {
+          display: none;
+        }
+      }
+    }
+    
     
   }
 

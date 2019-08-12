@@ -120,6 +120,7 @@ export default {
   methods: {
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
     showCascader (flag) {
+      if(this.options.length <= 0) return;
       let parent = document.getElementsByClassName('el-cascader-panel')[0];
 
       if(flag) {
@@ -199,7 +200,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .document-list-search {
   background: #fff;
   padding: 11px;
@@ -214,9 +215,6 @@ export default {
       .search-input {
         height: 36px;
         width: 250px;
-        // position: absolute;
-        // right: 36px;
-        // vertical-align: middle;
 
         .el-input__inner {
           height: 100%;
