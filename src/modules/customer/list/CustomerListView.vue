@@ -169,9 +169,8 @@
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
 
-            <template v-else-if="column.formType === 'link' && scope.row.attribute[column.field] && scope.row.attribute[column.field].link">
-              <a href="javascript:;" @click="() => $platform.openLink(scope.row.attribute[column.field].link)">{{scope.row.attribute[column.field].link}}</a>
-            </template>
+            <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
+            </div>
 
             <template v-else-if="column.isSystem === 0">
               {{scope.row.attribute[column.field]}}
@@ -330,6 +329,7 @@ import SearchPanel from './operationDialog/SearchPanel.vue';
 import * as CustomerApi from '@src/api/CustomerApi';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
+const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
 export default {
   name: 'customer-list-view',
@@ -1028,7 +1028,20 @@ export default {
         window.TDAPP.onEvent('pc：客户管理-更多操作事件');
         return;
       }
-    }
+    },
+    openOutsideLink(e) {
+      let url = e.target.getAttribute('url');
+      if (!url) return;
+      if (!/http/gi.test(url)) return this.$platform.alert('请确保输入的链接以http或者https开始');
+      this.$platform.openLink(url)
+    },
+    buildTextarea(value) {
+      return value
+        ? value.replace(link_reg, (match) => {
+          return `<a href="javascript:;" target="_blank" url=${match}>${match}</a>`
+        })
+        : '';
+    },
   },
   components: {
     [SendMessageDialog.name]: SendMessageDialog,

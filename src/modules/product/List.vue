@@ -134,6 +134,10 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
+
+            <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
+            </div>
+
             <template v-else-if="!column.isSystem">
               {{scope.row.attribute[column.field]}}
             </template>
@@ -272,6 +276,8 @@ import {
   getUpdateRecord,
 } from '@src/api/ProductApi';
 import TeamMixin from '@src/mixins/teamMixin';
+
+const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
 export default {
   name: 'product-list',
@@ -489,6 +495,19 @@ export default {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
+    openOutsideLink(e) {
+      let url = e.target.getAttribute('url');
+      if (!url) return;
+      if (!/http/gi.test(url)) return this.$platform.alert('请确保输入的链接以http或者https开始');
+      this.$platform.openLink(url)
+    },
+    buildTextarea(value) {
+      return value
+        ? value.replace(link_reg, (match) => {
+          return `<a href="javascript:;" target="_blank" url=${match}>${match}</a>`
+        })
+        : '';
+    },
     powerfulSearch() {
       this.searchModel.pageNum = 1;
       this.searchModel.moreConditions = this.$refs.searchPanel.buildParams();

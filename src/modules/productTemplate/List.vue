@@ -115,6 +115,10 @@
             <template v-else-if="column.formType === 'address'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}
             </template>
+
+            <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
+            </div>
+
             <template v-else>
               {{scope.row[column.field]}}
             </template>
@@ -241,6 +245,8 @@ const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE = 'store_user_for_search_product_te
 const PRODUCT_TEMPLATE_LIST_DATA = 'product_template_list_data';
 // 产品模板列表选择
 const PRODUCT_CHECK = 'productCheck'
+
+const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
 export default {
   name: 'product-template-list-view',
@@ -1006,7 +1012,20 @@ export default {
         window.TDAPP.onEvent('pc：产品管理-更多操作事件');
         return;
       }
-    }
+    },
+    openOutsideLink(e) {
+      let url = e.target.getAttribute('url');
+      if (!url) return;
+      if (!/http/gi.test(url)) return this.$platform.alert('请确保输入的链接以http或者https开始');
+      this.$platform.openLink(url)
+    },
+    buildTextarea(value) {
+      return value
+        ? value.replace(link_reg, (match) => {
+          return `<a href="javascript:;" target="_blank" url=${match}>${match}</a>`
+        })
+        : '';
+    },
   },
   components: {
     [DialogBatchEditProductTemplate.name]: DialogBatchEditProductTemplate,

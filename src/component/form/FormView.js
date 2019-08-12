@@ -4,6 +4,8 @@ import { isHiddenField } from './util';
 import { FormFieldMap } from './components';
 import platform from '@src/platform'
 
+const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
+
 const FormView = {
   name: 'form-view',
   props: {
@@ -52,6 +54,29 @@ const FormView = {
           <div class="form-view-row-content">
             <span>{value}</span>
             {value && <i onClick={() => this.openMap(map)} class="iconfont icon-address customer-address-icon"></i>}
+          </div>
+        </div>
+      )
+    },
+    buildTextarea({displayName, value, formType}) {
+      const newVal = value ? value.replace(link_reg, (match) => {
+        // return `<a href=${match} traget="_blank" >${match}</a>`
+        return `<a href="javascript:;" target="_blank" url=${match}>${match}</a>`
+      }) : '';
+
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+          <div class="form-view-row-content">
+            <span domPropsInnerHTML={newVal} onClick={(e) => {
+              e.stopPropagation();
+              let url = e.target.getAttribute('url');
+
+              if (!url) return;
+              if (!/http/gi.test(url)) return platform.alert('请确保输入的链接以http或者https开始');
+
+              platform.openLink(url)
+            }}>{newVal}</span>
           </div>
         </div>
       )
@@ -174,8 +199,16 @@ const FormView = {
         };
         return this.buildInfoDom(params);
       }
+
+      if(formType === 'textarea') {
+        params = {
+          ...params,
+          value: value
+        };
+        return this.buildTextarea(params);
+      }
       
-      // other types: text textarea date number datetime phone
+      // other types: text date number datetime phone
       return this.buildCommonDom(params);
     },
     groupField(fields) {
