@@ -21,7 +21,14 @@
     <!-- 通知公告类型筛选 -->
     <div class="search-bottom">
       <el-select v-model="params.type" class="search-type" @change="search">
-        <el-option v-for="(item, index) in typeOptions" :key="index" :value="item.value" :label="item.label"></el-option>
+        <el-option v-for="(item, index) in typeOptions" :key="index" :value="item.value" :label="item.label">
+          <span style="float: left">{{ item.label }}</span>
+          <span style="float: right" class="type-operating">
+            <i class="iconfont icon-chuanjianbaogao" style="font-size: 14px" @click.stop="editType(item)"></i>
+            <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
+          </span>
+        </el-option>
+        <div class="add-type" @click="addType">新建分类</div>
       </el-select>
     </div>
   </div>
@@ -32,7 +39,25 @@ export default {
   name: 'list-search',
   data () {
     return {
-      typeOptions: [], // 类型
+      typeOptions: [{
+        value: 'Beijing',
+        label: '北京'
+      }, {
+        value: 'Shanghai',
+        label: '上海'
+      }, {
+        value: 'Nanjing',
+        label: '南京'
+      }, {
+        value: 'Chengdu',
+        label: '成都'
+      }, {
+        value: 'Shenzhen',
+        label: '深圳'
+      }, {
+        value: 'Guangzhou',
+        label: '广州'
+      }], // 类型
       isSearch: false, // 搜索框显示标识
       params: {
         keyword: '',
@@ -77,6 +102,18 @@ export default {
           console.log('取消')
         })
       }
+    },
+    // 添加分类
+    addType () {
+      console.log('add')
+    },
+    // 编辑分类
+    editType (info) {
+      console.log(info)
+    },
+    // 删除分类
+    deleteType (info) {
+      console.log(info)
     }
   }
 }
@@ -132,6 +169,43 @@ export default {
       vertical-align: middle;
       width: 100%;
     }
+  }
+}
+
+.el-select-dropdown__item {
+  & >.type-operating {
+    display: none;
+  }
+
+  &:hover > .type-operating {
+    display: inline-block;
+  }
+}
+.el-select-dropdown__list {
+
+  .add-type {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-top: 1px solid #D3DCE6;
+    color: #38A6A6;
+    cursor: pointer;
+
+    &:hover {
+      color: #38A6A6;
+    }
+  }
+}
+
+.icon-chuanjianbaogao {
+  &:hover {
+    color: #38A6A6;
+  }
+}
+
+.icon-qingkongshanchu {
+  &:hover {
+    color: #38A6A6;
   }
 }
 </style>

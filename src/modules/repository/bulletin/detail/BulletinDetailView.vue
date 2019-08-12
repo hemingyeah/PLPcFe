@@ -230,7 +230,6 @@ export default {
 <style lang="scss">
 .bulletin-list-detail {
   background: #fff;
-  height: 100vh;
 
   .detail-top {
     display: flex;

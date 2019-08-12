@@ -130,7 +130,6 @@ export default {
 <style lang="scss">
 .document-list-detail {
   background: #fff;
-  height: 100vh;
 
   .detail-top {
     display: flex;

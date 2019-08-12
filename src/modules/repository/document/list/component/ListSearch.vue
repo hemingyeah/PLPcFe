@@ -26,12 +26,20 @@
         <el-option value="2" label="草稿箱(1312)"></el-option>
       </el-select>
       <el-cascader 
-        @click.stop="haha" 
-        :options="options" 
+        :options="options"
+        class="search-type search-type-right"  
         clearable 
-        class="search-type search-type-right" 
         @change="search"
-        filterable></el-cascader>
+        @visible-change="showCascader"
+        filterable>
+        <template slot-scope="{ node, data }" class="type">
+          <span>{{data.label}}</span>
+          <span class="type-operating">
+            <i class="iconfont icon-chuanjianbaogao icon-operating" @click.stop="editType(data)"></i>
+            <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
+          </span>
+        </template>
+      </el-cascader>
     </div>
     <!-- 文档库排序、标签 -->
     <div class="search-bottom">
@@ -67,29 +75,9 @@ export default {
         children: [{
           value: 'shejiyuanze',
           label: '设计原则',
-          children: [{
-            value: 'yizhi',
-            label: '一致'
-          }, {
-            value: 'fankui',
-            label: '反馈'
-          }, {
-            value: 'xiaolv',
-            label: '效率'
-          }, {
-            value: 'kekong',
-            label: '可控'
-          }]
         }, {
           value: 'daohang',
           label: '导航',
-          children: [{
-            value: 'cexiangdaohang',
-            label: '侧向导航'
-          }, {
-            value: 'dingbudaohang',
-            label: '顶部导航'
-          }]
         }]
       }, {
         value: 'zujian',
@@ -97,150 +85,21 @@ export default {
         children: [{
           value: 'basic',
           label: 'Basic',
-          children: [{
-            value: 'layout',
-            label: 'Layout 布局'
-          }, {
-            value: 'color',
-            label: 'Color 色彩'
-          }, {
-            value: 'typography',
-            label: 'Typography 字体'
-          }, {
-            value: 'icon',
-            label: 'Icon 图标'
-          }, {
-            value: 'button',
-            label: 'Button 按钮'
-          }]
         }, {
           value: 'form',
           label: 'Form',
-          children: [{
-            value: 'radio',
-            label: 'Radio 单选框'
-          }, {
-            value: 'checkbox',
-            label: 'Checkbox 多选框'
-          }, {
-            value: 'input',
-            label: 'Input 输入框'
-          }, {
-            value: 'input-number',
-            label: 'InputNumber 计数器'
-          }, {
-            value: 'select',
-            label: 'Select 选择器'
-          }, {
-            value: 'cascader',
-            label: 'Cascader 级联选择器'
-          }, {
-            value: 'switch',
-            label: 'Switch 开关'
-          }, {
-            value: 'slider',
-            label: 'Slider 滑块'
-          }, {
-            value: 'time-picker',
-            label: 'TimePicker 时间选择器'
-          }, {
-            value: 'date-picker',
-            label: 'DatePicker 日期选择器'
-          }, {
-            value: 'datetime-picker',
-            label: 'DateTimePicker 日期时间选择器'
-          }, {
-            value: 'upload',
-            label: 'Upload 上传'
-          }, {
-            value: 'rate',
-            label: 'Rate 评分'
-          }, {
-            value: 'form',
-            label: 'Form 表单'
-          }]
         }, {
           value: 'data',
           label: 'Data',
-          children: [{
-            value: 'table',
-            label: 'Table 表格'
-          }, {
-            value: 'tag',
-            label: 'Tag 标签'
-          }, {
-            value: 'progress',
-            label: 'Progress 进度条'
-          }, {
-            value: 'tree',
-            label: 'Tree 树形控件'
-          }, {
-            value: 'pagination',
-            label: 'Pagination 分页'
-          }, {
-            value: 'badge',
-            label: 'Badge 标记'
-          }]
         }, {
           value: 'notice',
           label: 'Notice',
-          children: [{
-            value: 'alert',
-            label: 'Alert 警告'
-          }, {
-            value: 'loading',
-            label: 'Loading 加载'
-          }, {
-            value: 'message',
-            label: 'Message 消息提示'
-          }, {
-            value: 'message-box',
-            label: 'MessageBox 弹框'
-          }, {
-            value: 'notification',
-            label: 'Notification 通知'
-          }]
         }, {
           value: 'navigation',
           label: 'Navigation',
-          children: [{
-            value: 'menu',
-            label: 'NavMenu 导航菜单'
-          }, {
-            value: 'tabs',
-            label: 'Tabs 标签页'
-          }, {
-            value: 'breadcrumb',
-            label: 'Breadcrumb 面包屑'
-          }, {
-            value: 'dropdown',
-            label: 'Dropdown 下拉菜单'
-          }, {
-            value: 'steps',
-            label: 'Steps 步骤条'
-          }]
         }, {
           value: 'others',
           label: 'Others',
-          children: [{
-            value: 'dialog',
-            label: 'Dialog 对话框'
-          }, {
-            value: 'tooltip',
-            label: 'Tooltip 文字提示'
-          }, {
-            value: 'popover',
-            label: 'Popover 弹出框'
-          }, {
-            value: 'card',
-            label: 'Card 卡片'
-          }, {
-            value: 'carousel',
-            label: 'Carousel 走马灯'
-          }, {
-            value: 'collapse',
-            label: 'Collapse 折叠面板'
-          }]
         }]
       }, {
         value: 'ziyuan',
@@ -259,6 +118,29 @@ export default {
     }
   },
   methods: {
+    // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
+    showCascader (flag) {
+      let parent = document.getElementsByClassName('el-cascader-panel')[0];
+
+      if(flag) {
+        let child = document.createElement('div');
+        child.innerHTML = '新建分类';
+        child.className = 'type';
+        child.id = 'type-id';
+
+        parent.appendChild(child);
+
+        child.addEventListener('click', e => { // 新建分类
+          console.log('add');
+        });
+
+      } else { 
+        let child = document.getElementById('type-id')
+
+        parent.removeChild(child);
+      }
+      
+    },
     // 跳转到新建页面
     create () {
       let fromId = window.frameElement.getAttribute('id');
@@ -295,6 +177,14 @@ export default {
           console.log('取消')
         })
       }
+    },
+    // 编辑分类
+    editType (info) {
+      console.log(info)
+    },
+    // 删除分类
+    deleteType (info) {
+      console.log(info)
     }
   },
   watch: {
@@ -383,6 +273,7 @@ export default {
     .search-type-right {
       flex: 1;
 
+
       .el-input__inner {
         border-radius: 0 2px 2px 0;
       }
@@ -427,6 +318,48 @@ export default {
         }
       }
     }
+  }
+}
+
+.el-cascader-node__label {
+  display: flex;
+  justify-content: space-between;
+  
+  & >.type-operating {
+    display: none;
+  }
+
+  &:hover > .type-operating {
+    display: inline-block;
+  }
+
+  .type-operating {
+
+    .icon-operating {
+      font-size: 14px;
+
+      &:hover {
+        color: #38A6A6;
+      }
+    }
+    
+  }
+}
+
+.el-cascader-panel {
+  position: relative;
+  padding-bottom: 40px;
+
+  .type {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    line-height: 40px;
+    color: #38A6A6;
+
+    cursor: pointer;
   }
 }
 </style>
