@@ -12,6 +12,7 @@ import Quill from 'quill'
 import Uploader from '@src/util/uploader';
 import platform from '@src/platform';
 
+import './style.scss';
 import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
 
@@ -153,6 +154,7 @@ export default {
 
   .base-editor-container {
     background: #fff;
+    font-size: 14px !important;
 
     .ql-editor {
       min-height: 300px;
@@ -167,5 +169,8 @@ export default {
     .input-file {
       display: none;
     }
+  }
+  .ql-container {
+    font-size: 14px !important;
   }
 </style>
