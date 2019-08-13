@@ -27,10 +27,12 @@
       </el-select>
       <el-cascader 
         :options="options"
-        class="search-type search-type-right"  
+        class="search-type search-type-right"
+        popper-class="search-cascader-panel"  
         clearable 
         @change="search"
         @visible-change="showCascader"
+        @click="click"
         filterable>
         <template slot-scope="{ node, data }" class="type">
           <span>{{data.label}}</span>
@@ -49,10 +51,15 @@
       </el-select>
       <el-tag class="search-tag" closable @close="tag.show = false" v-if="tag.show">{{tag.name}}</el-tag>
     </div>
+    
+    <type-modal v-model="info" :title="title" @sumbitType="sumbitType" ref="typeModal"></type-modal>
+
   </div>
 </template>
 
 <script>
+import TypeModal from './TypeModal'
+
 export default {
   name: 'list-search',
   props: {
@@ -61,8 +68,13 @@ export default {
       default: () => ({})
     }
   },
+  components: {
+    [TypeModal.name]: TypeModal
+  },
   data () {
     return {
+      show: false,
+      isEdit: false,
       isSearch: false, // 搜索框显示标识
       params: {
         keyword: '',
@@ -114,14 +126,35 @@ export default {
           value: 'jiaohu',
           label: '组件交互文档'
         }]
-      }]
+      }],
+      info: {
+        newType: '',
+        parentType: '',
+        options: []
+      },
     }
   },
+  computed: {
+    title () {
+      return this.isEdit ? '编辑分类' : '新建分类';
+    }
+  },
+  mounted () {
+    this.info.options = this.options;
+    let tag = document.getElementsByClassName('el-cascader-panel');
+    tag[0].id = 'search-id';
+    tag[1].id = 'add-type-id';
+  },
   methods: {
+    click () {
+      console.log(5555)
+    },
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
     showCascader (flag) {
       if(this.options.length <= 0) return;
-      let parent = document.getElementsByClassName('el-cascader-panel')[0];
+      let parent = document.getElementById('search-id');
+      // console.log(document.getElementsByClassName('el-cascader-panel'))
+       
 
       if(flag) {
         let child = document.createElement('div');
@@ -129,13 +162,21 @@ export default {
         child.className = 'type';
         child.id = 'type-id';
 
+        parent.style.paddingBottom = '40px';
+
         parent.appendChild(child);
 
-        child.addEventListener('click', e => { // 新建分类
-          console.log('add');
+        child.addEventListener('click', e => { // 打开新建分类
+          let btn = document.getElementsByClassName('is-reverse')[0];
+
+          btn.click();
+          this.$refs.typeModal.open();
+          this.isEdit = false;
+          this.info.newType = '';
+          this.info.parentType = '';
         });
 
-      } else { 
+      } else {
         let child = document.getElementById('type-id')
 
         parent.removeChild(child);
@@ -179,13 +220,23 @@ export default {
         })
       }
     },
-    // 编辑分类
+    // 打开编辑分类
     editType (info) {
-      console.log(info)
+      let btn = document.getElementsByClassName('is-reverse')[0];
+
+      btn.click();
+      this.$refs.typeModal.open();
+      this.isEdit = true;
+      this.info.newType = info.label;
+      this.info.parentType = '哈哈哈';
     },
     // 删除分类
     deleteType (info) {
       console.log(info)
+    },
+    // 提交编辑或添加的分类
+    sumbitType () {
+      console.log(this.info);
     }
   },
   watch: {
@@ -200,7 +251,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .document-list-search {
   background: #fff;
   padding: 11px;
@@ -317,6 +368,10 @@ export default {
       }
     }
   }
+
+  .auxiliary {
+    // display: none;
+  }
 }
 
 .el-cascader-node__label {
@@ -346,7 +401,6 @@ export default {
 
 .el-cascader-panel {
   position: relative;
-  padding-bottom: 40px;
 
   .type {
     position: absolute;

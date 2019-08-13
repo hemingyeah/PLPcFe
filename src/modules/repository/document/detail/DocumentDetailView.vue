@@ -1,5 +1,5 @@
 <template>
-  <div class="document-list-detail">
+  <div class="document-list-detail" :style="{height: height}">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -15,8 +15,8 @@
 
         <div class="published" v-if="info.property == '我发布的'">
           <span class="permission">
-            <i class="iconfont icon-account1 icon-permission" v-if="info.permission"></i>
-            <i class="iconfont icon-quanxianguanli icon-permission" v-else></i>
+            <i class="iconfont icon-suo icon-permission" v-if="info.permission"></i>
+            <i class="iconfont icon-unie65b icon-permission" v-else></i>
             {{info.permission ? '内部' : '外部'}}
           </span>
           <span class="readNum">阅读（{{info.readNum}}）</span>
@@ -27,12 +27,12 @@
         </div>
 
         <span class="management">
-          <i class="iconfont icon-chuanjianbaogao icon-operating"></i>
+          <i class="iconfont icon-bianji icon-operating"></i>
           <i class="iconfont icon-qingkongshanchu icon-operating"></i>
         </span>
 
-        <span class="share" v-if="info.property == '我发布的'">
-          <i class="iconfont icon-send icon-operating"></i>
+        <span class="share" v-if="info.property == '我发布的'" @click="shareArticle">
+          <i class="iconfont icon-share icon-article-share"></i>
         </span>
 
         <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
@@ -51,7 +51,7 @@
       <div class="footer">
 
         <div class="tags">
-          <i class="iconfont icon-chuanjianbaogao icon-tags"></i>
+          <i class="iconfont icon-tag icon-tags"></i>
           <el-tag class="detail-tag" @click="handleTags(tag)" v-for="(tag,index) in info.tags" :key="index">{{tag}}</el-tag>
         </div>
 
@@ -92,13 +92,17 @@ export default {
         tags: ['诚信', '友善', '进取'],
         title: '最前线|微信内测新功能，提升阅读效率没那么容易',
         content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。正好新人导师让我看看能否把产品目前使用的FileUploader从老的组件库分离出来的，自己也查阅了相关的各种资料，对文件上传的这些事有了更进一步的了解。把这些知识点总结一下，供自己日后回顾，也供有需要的同学参考，同时也欢迎各位大牛拍砖指点共同学习。',
-        property: '草稿箱',
+        property: '我发布的',
         review: '待审核',
       } // 文章详情
     }
   },
   mounted () {
     // 根据formId来判断是否是在新页面打开
+    if(!window.frameElement) {
+      this.showOpenFrame = false;
+      return;
+    }
     let formId = window.frameElement.getAttribute('id');
     if(formId.indexOf('document_detail') != -1) this.showOpenFrame = false;
   },
@@ -122,6 +126,39 @@ export default {
         close: true,
         fromId
       });
+    },
+    // 文章分享
+    shareArticle () {
+      let body = document.getElementsByTagName('body')[0];
+      let hideTextarea = document.createElement('textarea');
+      body.appendChild(hideTextarea);
+
+      hideTextarea.style.position = 'absolute';
+      hideTextarea.style.left = '-9999px';
+      hideTextarea.style.top = '-9999px';
+      hideTextarea.innerHTML = 'http://127.0.0.1:9000/document/detail';
+
+      let selectObject = window.getSelection();
+      let range = document.createRange();
+      range.setStart(selectObject.anchorNode, selectObject.anchorOffset);
+      range.setEnd(selectObject.focusNode, selectObject.focusOffset);
+
+      hideTextarea.focus();
+      hideTextarea.setSelectionRange(0, hideTextarea.value.length);
+      let successful = document.execCommand('copy');
+
+      // 将此前选中的文本再进行选中
+      selectObject.removeAllRanges();
+      selectObject.addRange(range);
+
+      if(!successful) {
+        this.$platform.alert('分享失败，请重新操作')
+      }
+    }
+  },
+  computed: {
+    height () {
+      return this.showOpenFrame ? 'auto' : '100vh';
     }
   }
 }
@@ -209,16 +246,32 @@ export default {
         }
       }
 
+      
       .icon-operating {
         display: inline-block;
         width: 30px;
         height: 30px;
         line-height: 30px;
         text-align: center;
-        font-size: 14px;
+        font-size: 16px;
         color: #38A6A6;
 
         cursor: pointer;
+      }
+
+      .share {
+        display: inline-block;
+
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+
+        cursor: pointer;
+
+        .icon-article-share {
+          font-size: 16px;
+          color: #38A6A6;
+        }
       }
 
       .open {
@@ -263,7 +316,7 @@ export default {
         vertical-align: top;
 
         .icon-tags {
-          font-size: 14px;
+          font-size: 16px;
           color: #B0BCC3;
         }
 

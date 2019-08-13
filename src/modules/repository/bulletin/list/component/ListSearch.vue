@@ -31,6 +31,22 @@
         <div class="add-type" @click="addType">新建分类</div>
       </el-select>
     </div>
+    <!-- 添加编辑分类 -->
+    <base-modal
+      class="type-modal"
+      :title="title"
+      width="500px"
+      :show.sync="show">
+      <el-form>
+        <el-form-item label="分类名称">
+          <input class="title" v-model="newType" />
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="edit-footer">
+        <button type="button" class="btn btn-primary" @click="sumbitType">确定</button>
+      </div>
+    </base-modal>
   </div>
 </template>
 
@@ -62,7 +78,15 @@ export default {
       params: {
         keyword: '',
         type: '',
-      }
+      },
+      newType: '',
+      show: false,
+      isEdit: false,
+    }
+  },
+  computed: {
+    title () {
+      return this.isEdit ? '编辑分类' : '新建分类';
     }
   },
   methods: {
@@ -105,15 +129,29 @@ export default {
     },
     // 添加分类
     addType () {
-      console.log('add')
+      let btn = document.getElementsByClassName('is-reverse')[0];
+
+      btn.click();
+      this.isEdit = false;
+      this.show = true;
+      this.newType = '';
     },
     // 编辑分类
     editType (info) {
-      console.log(info)
+      let btn = document.getElementsByClassName('is-reverse')[0];
+
+      btn.click();
+      this.isEdit = true;
+      this.show = true;
+      this.newType = info.label;
     },
     // 删除分类
     deleteType (info) {
       console.log(info)
+    },
+    sumbitType () {
+      this.show = false;
+      console.log(this.newType);
     }
   }
 }
@@ -134,9 +172,6 @@ export default {
       .search-input {
         height: 36px;
         width: 250px;
-        // position: absolute;
-        // right: 36px;
-        // vertical-align: middle;
 
         .el-input__inner {
           height: 100%;
@@ -144,7 +179,6 @@ export default {
       }
 
       .search-btn {
-        // vertical-align: middle;
         margin: 0;
         border: 1px solid #E3E9EA;  //自定义边框
         outline: none;    //消除默认点击蓝色边框效果
@@ -206,6 +240,26 @@ export default {
 .icon-qingkongshanchu {
   &:hover {
     color: #38A6A6;
+  }
+}
+
+.type-modal {
+  .base-modal-body {
+
+    .el-form-item {
+      margin: 0;
+      padding: 10px 30px 0;
+    }
+
+    .title {
+      width: 370px;
+    }
+
+  }
+
+  .edit-footer {
+    display: flex;
+    justify-content: flex-end;
   }
 }
 </style>

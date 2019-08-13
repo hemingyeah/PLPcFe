@@ -22,20 +22,20 @@
       <div class="item-footer">
 
         <div class="type">
-          <i class="iconfont icon-chuanjianbaogao icon-tags"></i>
+          <i class="iconfont icon-tag icon-tags"></i>
           <el-tag class="search-tag" @click="handleTags(tag)" v-for="(tag,index) in item.tags" :key="index">{{tag}}</el-tag>
         </div>
 
         <!-- 我发布的显示权限、阅读量、分享 -->
         <div class="footer-right" v-if="item.property == '我发布的'">
           <span class="permission">
-            <i class="iconfont icon-account1 icon-permission" v-if="item.permission"></i>
-            <i class="iconfont icon-quanxianguanli icon-permission" v-else></i>
+            <i class="iconfont icon-suo icon-permission" v-if="item.permission"></i>
+            <i class="iconfont icon-unie65b icon-permission" v-else></i>
             {{item.permission ? '内部' : '外部'}}
           </span>
           <span class="readNum">阅读（{{item.readNum}}）</span>
           <span class="share" @click="shareArticle">
-            <i class="iconfont icon-send icon-share"></i>
+            <i class="iconfont icon-share icon-article-share"></i>
           </span>
         </div>
       </div>
@@ -56,7 +56,7 @@ export default {
     return {
       total: 18,
       item: {
-        property: '草稿箱',
+        property: '我发布的',
         title: '最前线|微信内测新功能，提升阅读效率没那么容易',
         name: '张某某',
         time: '2019年7月7日 19:03',
@@ -87,7 +87,31 @@ export default {
     },
     // 文章分享
     shareArticle () {
+      let body = document.getElementsByTagName('body')[0];
+      let hideTextarea = document.createElement('textarea');
+      body.appendChild(hideTextarea);
 
+      hideTextarea.style.position = 'absolute';
+      hideTextarea.style.left = '-9999px';
+      hideTextarea.style.top = '-9999px';
+      hideTextarea.innerHTML = 'http://127.0.0.1:9000/document/detail';
+
+      let selectObject = window.getSelection();
+      let range = document.createRange();
+      range.setStart(selectObject.anchorNode, selectObject.anchorOffset);
+      range.setEnd(selectObject.focusNode, selectObject.focusOffset);
+
+      hideTextarea.focus();
+      hideTextarea.setSelectionRange(0, hideTextarea.value.length);
+      let successful = document.execCommand('copy');
+
+      // 将此前选中的文本再进行选中
+      selectObject.removeAllRanges();
+      selectObject.addRange(range);
+
+      if(!successful) {
+        this.$platform.alert('分享失败，请重新操作')
+      }
     }
   },
   watch: {
@@ -115,10 +139,10 @@ export default {
 
     .item-top {
       font-size: 0;
+      display: flex;
 
       .item-title {
-        display: inline-block;
-        width: 300px;
+        flex: 1;
         margin: 0;
         font-size: 16px;
         font-weight: 500;
@@ -126,6 +150,7 @@ export default {
       }
 
       .review-tag {
+        width: 54px;
         vertical-align: middle;
         margin-left: 24px;
       }
@@ -155,7 +180,7 @@ export default {
       justify-content: space-between;
 
       .icon-tags {
-        font-size: 14px;
+        font-size: 16px;
         color: #B0BCC3;
       }
 
@@ -178,9 +203,19 @@ export default {
         margin: 0 15px;
       }
 
-      .icon-share {
-        font-size: 14px;
-        color: #38A6A6;
+      .share {
+        display: inline-block;
+
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+
+        cursor: pointer;
+
+        .icon-article-share {
+          font-size: 16px;
+          color: #38A6A6;
+        }
       }
     }
   }

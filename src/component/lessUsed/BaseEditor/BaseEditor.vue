@@ -117,22 +117,32 @@ export default {
         })
     },
     handlerPaste(event) {
-      let items = event.clipboardData && event.clipboardData.items;
-      let file = null;
-      if (items && items.length) {
-        // 检索剪切板items
-        for (let i = 0; i < items.length; i++) {
-          if (items[i].type.indexOf('image') !== -1) {
-            file = items[i].getAsFile();
-            this.handleChange({
-              target: {
-                files: [file]
-              }
-            });
-            break;
+      try {
+        let items = event.clipboardData && event.clipboardData.items;
+        let file = null;
+        if (items && items.length) {
+          let length = items.length;
+          if(items.length > 2 && items[length - 1].type.indexOf('image') !== -1) {
+            length = length - 1;
+          }
+
+          // 检索剪切板items
+          for (let i = 0; i < length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+              file = items[i].getAsFile();
+              this.handleChange({
+                target: {
+                  files: [file]
+                }
+              });
+              break;
+            }
           }
         }
+      } catch (err) {
+        console.error(err);
       }
+      
       // 此时file就是剪切板中的图片文件
     },
     insertImage(data) {
@@ -157,7 +167,8 @@ export default {
     font-size: 14px !important;
 
     .ql-editor {
-      min-height: 300px;
+      // min-height: 300px;
+      height: calc(100vh - 500px);
     }
 
     .ql-editor.ql-blank::before {

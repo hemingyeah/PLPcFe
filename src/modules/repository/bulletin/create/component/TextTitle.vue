@@ -8,7 +8,7 @@
 
       <el-form-item label="分类：" class="create-item">
         <el-select v-model="params.type" class="search-type" @change="search">
-          <el-option v-for="(item, index) in typeOptions" :key="index" :value="item.value" :label="item.label">
+          <el-option v-for="(item, index) in options" :key="index" :value="item.value" :label="item.label">
           </el-option>
         </el-select>
       </el-form-item>
@@ -17,7 +17,9 @@
         <div class="range">
           <biz-team-select v-model="value.tags" multiple class="notification-range" ref="notificationRange" />
           <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="(tag,index) in params.tags" :key="index">{{tag.tagName}}</el-tag>
-          <i class="iconfont icon-icon02 icon-addTags" @click="chooseTeam"></i>
+          <div class="icon-add-tags-btn" @click="chooseTeam">
+            <i class="iconfont icon-jia icon-addTags"></i>
+          </div>
         </div>
       </el-form-item>
 
@@ -71,6 +73,9 @@ export default {
     this.params.form = this.buildForm();
   },
   methods: {
+    search () {
+
+    },
     // 点击加号显示标签输入框
     chooseTeam () {
       this.$refs.notificationRange.$el.click();
@@ -197,13 +202,21 @@ export default {
       width: 80px;
     }
 
-    .icon-addTags {
+    .icon-add-tags-btn {
+      display: inline-block;
       position: relative;
       top: 2px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
 
-      font-size: 14px;
       margin-left: 5px;
-      color: #38A6A6;
+
+      cursor: pointer;
+      .icon-addTags {
+        font-size: 14px;
+        color: #38A6A6; 
+      }
     }
     
     input[type='file']{

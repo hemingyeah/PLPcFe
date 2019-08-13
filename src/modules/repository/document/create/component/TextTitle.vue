@@ -7,7 +7,7 @@
       </el-form-item>
 
       <el-form-item label="分类：" class="create-item">
-        <el-cascader :options="options" clearable class="type" v-model="params.tyep"></el-cascader>
+        <el-cascader :options="options" clearable class="type" v-model="params.type"></el-cascader>
       </el-form-item>
 
       <el-form-item label="权限：" class="create-item">
@@ -15,13 +15,13 @@
           <el-radio :label="'内部'">
             内部
             <el-tooltip content="仅应用内部用户可查看" placement="top">
-              <i class="iconfont icon-fd-info icon-permission"></i>
+              <i class="iconfont icon-info icon-permission"></i>
             </el-tooltip>
           </el-radio>
           <el-radio :label="'外部'">
             外部
             <el-tooltip content="可分享给所有人，支持应用外查看" placement="top">
-              <i class="iconfont icon-fd-info icon-permission"></i>
+              <i class="iconfont icon-info icon-permission"></i>
             </el-tooltip>
           </el-radio>
         </el-radio-group>
@@ -30,7 +30,9 @@
       <el-form-item label="标签：" class="create-item">
         <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="(tag,index) in params.tags" :key="index">{{tag}}</el-tag>
         <el-input v-if="inputVisible" class="input-new-tag" @keyup.enter.native="addTags" @blur="addTags" v-model="tagValue" ref="saveTagInput"></el-input>
-        <i v-if="!inputVisible && params.tags.length < 4" class="iconfont icon-icon02 icon-addTags" @click="showInput"></i>
+        <div class="icon-add-tags-btn" @click="showInput" v-if="!inputVisible && params.tags.length < 4">
+          <i class="iconfont icon-jia icon-addTags"></i>
+        </div>
       </el-form-item>
 
       <el-form-item label="附件列表：" class="create-item">
@@ -196,7 +198,7 @@ export default {
 
       font-size: 14px;
       margin-left: 4px;
-      color: #333;
+      color: #999;
     }
 
     .search-tag {
@@ -212,14 +214,23 @@ export default {
       width: 80px;
     }
 
-    .icon-addTags {
+    .icon-add-tags-btn {
+      display: inline-block;
       position: relative;
       top: 2px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
 
-      font-size: 14px;
       margin-left: 5px;
-      color: #38A6A6;
+
+      cursor: pointer;
+      .icon-addTags {
+        font-size: 14px;
+        color: #38A6A6; 
+      }
     }
+    
     
     input[type='file']{
       display: none !important;

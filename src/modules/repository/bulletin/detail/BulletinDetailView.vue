@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-list-detail" ref="bulletinDetail">
+  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -19,7 +19,7 @@
         </div>
 
         <span class="management">
-          <i class="iconfont icon-chuanjianbaogao icon-operating"></i>
+          <i class="iconfont icon-bianji icon-operating"></i>
           <i class="iconfont icon-qingkongshanchu icon-operating"></i>
         </span>
 
@@ -176,6 +176,10 @@ export default {
   },
   mounted () {
     // 根据formId来判断是否是在新页面打开
+    if(!window.frameElement) {
+      this.showOpenFrame = false;
+      return;
+    }
     let formId = window.frameElement.getAttribute('id');
     if(formId.indexOf('bulletin_detail') != -1) this.showOpenFrame = false;
   },
@@ -222,6 +226,11 @@ export default {
           console.log('取消')
         })
       }
+    }
+  },
+  computed: {
+    height () {
+      return this.showOpenFrame ? 'auto' : '100vh';
     }
   }
 }

@@ -1,10 +1,10 @@
 <template>
   <div class="document-create-view">
-    <div class="view-left">
+    <div class="view-left" :style="{paddingRight: padding}">
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
-      <base-editor v-model="params.article"></base-editor>
+      <base-editor v-model="params.article" @input="getInput"></base-editor>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
         <button class="base-button green-butn" @click="saveAndSumbit">保存并提交</button>
@@ -13,7 +13,7 @@
       </div>
     </div>
     <!-- 更新日志，编辑时显示 -->
-    <update-log class="view-right"></update-log>
+    <update-log class="view-right" v-if="isEdit"></update-log>
   </div>
 </template>
 
@@ -36,27 +36,58 @@ export default {
         form: {}, // 附件
         type: '', // 文章分类
       },
+      articleHtml: '',
+      isSave: false,
+      isEdit: false,
     }
+  },
+  created () {
+    this.getArticle();
+    this.saveArticle();
   },
   methods: {
     saveAndSumbit () {
+      localStorage.removeItem('document_article');
       // TODO: 保存提交操作
     },
     toDraftBox () {
+      localStorage.removeItem('document_article');
       // TODO: 存到草稿箱操作
     },
     deleteFile () {
+      localStorage.removeItem('document_article');
       // TODO: 删除文章操作
+    },
+    getInput (html) {
+      this.articleHtml = html
+    },
+    getArticle () {
+      if(this.isEdit) {
+        // TODO: 编辑时获取文章信息
+      } else {
+        let article = localStorage.getItem('document_article');
+        if (article) this.params.article = article;
+      }
+    },
+    saveArticle () {
+      setInterval(() => {
+        if(this.isSave) {
+          localStorage.setItem('document_article', this.articleHtml);
+        }
+        this.isSave = false
+      }, 1000 * 60 * 5)
     }
   },
-  // watch: {
-  //   params: {
-  //     handler (n, o) {
-  //       console.log(n);
-  //     },
-  //     deep: true
-  //   }
-  // }
+  computed: {
+    padding () {
+      return this.isEdit ? '40px' : '200px';
+    }
+  },
+  watch: {
+    articleHtml(n) {
+      this.isSave = true;
+    }
+  }
 }
 </script>
 
