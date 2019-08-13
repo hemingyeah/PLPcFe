@@ -21,10 +21,13 @@ function dept(options){
   let selectedUser = [];
   let max = 0;
 
-  if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
-  if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
-  if(max > 1 && Array.isArray(options.selected)) {
-    selectedUser = options.selected.length > max ? options.selected.slice(0, max) : options.selected;
+  // if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
+  // if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
+  
+  // 后端已经限制了人数，前端不应限制选人
+  if(Array.isArray(options.selected)) {
+    selectedUser = options.selected
+    // .length > max ? options.selected.slice(0, max) : options.selected;
   }
 
   let showLocation = !!options.allotMap;
@@ -87,8 +90,8 @@ function team( options = {} ){
   let selectType = 'universal';
 
   if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
-  if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
-  if(max > 1 && options.selected && Object.keys(options.selected).length > 0) {
+  // if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
+  if(options.selected && Object.keys(options.selected).length > 0) {
     let users = options?.selected?.users;
     let teams = options?.selected?.teams;
     let isUserArray = Array.isArray(users);

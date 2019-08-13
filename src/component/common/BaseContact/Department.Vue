@@ -192,6 +192,7 @@ export default {
     },
     // 是否允许添加用户
     allowAddUser(){
+      if (this.max <= 0) return true;
       return this.chosen.length < this.max;
     },
     // 当前已选概览
