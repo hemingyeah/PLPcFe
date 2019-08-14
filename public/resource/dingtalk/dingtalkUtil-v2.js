@@ -40,6 +40,15 @@
       }
     }
   };
+  
+  //====================================openLink 实现========================================
+  window.dd_openLink = function (url) {
+    if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
+      return dingtalk.biz.openLink(url);
+    } else {
+      return window.open(url)
+    }
+  };
 
   /**
    * @param url 请求地址
