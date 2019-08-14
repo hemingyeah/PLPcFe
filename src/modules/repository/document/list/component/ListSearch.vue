@@ -53,7 +53,7 @@
     </div>
     
     <type-modal v-model="info" :title="title" @sumbitType="sumbitType" ref="typeModal"></type-modal>
-
+    
   </div>
 </template>
 
@@ -231,7 +231,20 @@ export default {
       this.info.parentType = '哈哈哈';
     },
     // 删除分类
-    deleteType (info) {
+    async deleteType (info) {
+      this.$platform.alert('分类下存在文章，不能删除。请删除文章或将文章至其它分类再继续操作。')
+      try {
+        if (!await this.$platform.confirm('必须先将该分类下的文章删除或移动该分类下的文章后再删除分类！')) return;
+        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+        // if (!result.status) {
+        //   let fromId = window.frameElement.getAttribute('fromid');
+        //   this.$platform.refreshTab(fromId);
+
+        //   window.location.reload();
+        // }
+      } catch (e) {
+        console.error(e);
+      }
       console.log(info)
     },
     // 提交编辑或添加的分类
@@ -291,31 +304,37 @@ export default {
   }
 
   .search-middle {
-    padding: 11px 0;
+    margin: 11px 0;
     display: flex;
+    border: 1px solid #e0e1e2;
+    border-radius: 4px;
 
     .search-type {
-      height: 36px;
+      height: 32px;
 
-      .el-cascader .el-input.is-focus .el-input__inner {
-        border-color: #e0e1e2;
-      }
-
-      .el-input__inner:focus {
-        border-color: #e0e1e2;
-      }
-
-      .el-input__inner:hover {
-        border-color: #e0e1e2;
+      .el-input__inner {
+        border: none;
       }
     }
 
     .search-type-left {
-      width: 140px;
+      position: relative;
+      width: 150px;
 
       .el-input__inner {
         border-right: none;
         border-radius: 2px 0 0 2px;
+      }
+
+      &::after {
+        content: "";
+
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 1px;
+        height: 32px;
+        background: #e0e1e2;
       }
     }
 
@@ -350,6 +369,12 @@ export default {
 
     .search-tag {
       vertical-align: middle;
+
+      max-width: 200px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
       margin-left: 5px;
       height: 24px;
       line-height: 24px;

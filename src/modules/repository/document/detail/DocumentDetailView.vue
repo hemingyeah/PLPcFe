@@ -11,7 +11,7 @@
         </div>
       </div>
 
-      <div class="operating">
+      <div class="operating" v-if="!isReview">
 
         <div class="published" v-if="info.property == '我发布的'">
           <span class="permission">
@@ -27,8 +27,8 @@
         </div>
 
         <span class="management">
-          <i class="iconfont icon-bianji icon-operating"></i>
-          <i class="iconfont icon-qingkongshanchu icon-operating"></i>
+          <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
+          <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
         </span>
 
         <span class="share" v-if="info.property == '我发布的'" @click="shareArticle">
@@ -38,10 +38,15 @@
         <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
 
       </div>
+
+      <div class="operating" v-else>
+        <button class="base-button green-btn" @click="pass">通过</button>
+        <button class="base-button white-btn" @click="refuse">拒绝</button>
+      </div>
     </div>
 
     <!-- 文章详情 -->
-    <div class="detail-content">
+    <div class="detail-content" :style="{padding: padding}">
 
       <div class="info">
         <p class="title">{{info.title}}</p>
@@ -70,6 +75,49 @@
 
       </div>
     </div>
+
+
+    <base-modal
+      class="type-modal"
+      title="审核拒绝"
+      width="500px"
+      :show.sync="show">
+      <el-form :rules="rules" ref="rulesForm" :model="refuseInfo">
+        <el-form-item prop="text">
+          <el-input 
+            type="textarea" 
+            v-model="refuseInfo.text"
+            :autosize="{ minRows: 3, maxRows: 5}" 
+            placeholder="请在此添加拒绝信息"></el-input>
+        </el-form-item>
+      </el-form>
+      
+
+      <div slot="footer" class="edit-footer">
+        <el-button @click="show = false">取 消</el-button>
+        <el-button type="primary" class="green-btn" @click="sumbit">确 定</el-button>
+        <!-- <el-button @click="show = false">取 消</el-button>
+        <button type="button" class="btn btn-primary" @click="sumbit">确定</button> -->
+      </div>
+    </base-modal>
+
+    <base-modal
+      class="type-modal"
+      width="400px"
+      :show.sync="shareBoxShow"
+      title=" ">
+
+      <div>
+        <i class="iconfont icon-jinggao share-icon"></i>
+        <p>请选择分享方式</p>
+      </div>
+
+      <div slot="footer" class="edit-footer">
+        <el-button @click="inlineShare">对内分享</el-button>
+        <el-button type="primary" class="green-btn" @click="outlineShare">对外分享</el-button>
+      </div>
+    </base-modal>
+
   </div>
 </template>
 
@@ -81,6 +129,19 @@ export default {
       form: this.buildForm(), // 附件存储格式
       articleId: 'UGDIVUHYI98', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
+      isReview: false,
+      refuseInfo: {
+        text: '',
+      },
+      show: false,
+      shareBoxShow: false,
+      rules: {
+        text: [{
+          required: true,
+          message: '请输入拒绝原因',
+          trigger: 'blur'
+        }]
+      },
       info: {
         author: {
           img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
@@ -114,6 +175,7 @@ export default {
         showInOwn: 0
       }
     },
+
     // 新页面打开通知公告详情
     openFrame () {
       let fromId = window.frameElement.getAttribute('id');
@@ -127,8 +189,19 @@ export default {
         fromId
       });
     },
+
     // 文章分享
     shareArticle () {
+      // 外部文章分享
+      this.shareBoxShow = true;
+
+      // 内部文章分享
+      // this.inlineShare();
+    },
+
+    outlineShare () {
+      // 外部文章选择外部分享时
+      this.shareBoxShow = false;
       let body = document.getElementsByTagName('body')[0];
       let hideTextarea = document.createElement('textarea');
       body.appendChild(hideTextarea);
@@ -153,12 +226,76 @@ export default {
 
       if(!successful) {
         this.$platform.alert('分享失败，请重新操作')
+      } else {
+        this.$platform.alert('已将链接复制到剪贴板，快去粘贴吧！')
       }
+
+      this.share = '';
+    },
+
+    inlineShare () {
+      this.shareBoxShow = false;
+      console.log('选人')
+      this.share = '';
+    },
+
+    async pass () {
+      try {
+        if (!await this.$platform.confirm('确定通过该文章审核吗？')) return;
+        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+        // if (!result.status) {
+        //   let fromId = window.frameElement.getAttribute('fromid');
+        //   this.$platform.refreshTab(fromId);
+
+        //   window.location.reload();
+        // }
+      } catch (e) {
+        console.error(e);
+      }
+      console.log('pass');
+    },
+
+    refuse () {
+      this.show = true;
+      console.log('refuse')
+    },
+
+    editArticle () {
+      // TODO: 详情查询接口
+      this.$platform.alert('该文章正在被编辑，需要等待他编辑完成后才能继续编辑。')
+    },
+
+    async deleteArticle () {
+      try {
+        if (!await this.$platform.confirm('确定删除该文章吗？')) return;
+        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+        // if (!result.status) {
+        //   let fromId = window.frameElement.getAttribute('fromid');
+        //   this.$platform.refreshTab(fromId);
+
+        //   window.location.reload();
+        // }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+
+    sumbit () {
+      this.$refs.rulesForm.validate((valid) => {
+        if (valid) {
+          console.log(this.refuseInfo.text);
+          this.show = false;
+        }
+      })
     }
   },
   computed: {
     height () {
       return this.showOpenFrame ? 'auto' : '100vh';
+    },
+
+    padding () {
+      return this.showOpenFrame ? '0 50px' : '0 100px';
     }
   }
 }
@@ -283,11 +420,22 @@ export default {
         
         cursor: pointer;
       }
+
+      .white-btn {
+        background: #fff;
+        color: #333;
+        border: 1px solid #E2E2E2;
+
+        &:hover {
+          border-color: #55B7B4;
+          background: #66bebc;
+          color: #fff;
+        }
+      }
     }
   }
 
   .detail-content {
-    padding: 0 100px;
 
     .info {
 
@@ -321,6 +469,11 @@ export default {
         }
 
         .detail-tag {
+          max-width: 76px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+
           margin-left: 4px;
           border: none;
           background: #E8EFF0;
@@ -357,6 +510,26 @@ export default {
           }
         }
       }
+    }
+  }
+
+  .type-modal {
+
+    .el-button:hover, .el-button:focus {
+      color: #55B7B4;
+      border-color: #cce9e9;
+      background-color: #eef8f8;
+    }
+
+    .el-button--primary:hover, .el-button--primary:focus {
+      background: #77c5c3;
+      border-color: #77c5c3;
+      color: #FFFFFF;
+    }
+
+    .green-btn {
+      background: #55B7B4;
+      border: transparent;
     }
   }
 }

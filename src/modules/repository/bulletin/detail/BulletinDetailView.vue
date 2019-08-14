@@ -19,8 +19,8 @@
         </div>
 
         <span class="management">
-          <i class="iconfont icon-bianji icon-operating"></i>
-          <i class="iconfont icon-qingkongshanchu icon-operating"></i>
+          <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
+          <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
         </span>
 
         <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
@@ -29,7 +29,7 @@
     </div>
 
     <!-- 文章详情 -->
-    <div class="detail-content">
+    <div class="detail-content" :style="{padding: padding}">
 
       <div class="info">
         <p class="title">{{info.title}}</p>
@@ -226,11 +226,34 @@ export default {
           console.log('取消')
         })
       }
+    },
+
+    editArticle () {
+      
+    },
+
+    async deleteArticle () {
+      try {
+        if (!await this.$platform.confirm('确定删除该文章吗？')) return;
+        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+        // if (!result.status) {
+        //   let fromId = window.frameElement.getAttribute('fromid');
+        //   this.$platform.refreshTab(fromId);
+
+        //   window.location.reload();
+        // }
+      } catch (e) {
+        console.error(e);
+      }
     }
   },
   computed: {
     height () {
       return this.showOpenFrame ? 'auto' : '100vh';
+    },
+
+    padding () {
+      return this.showOpenFrame ? '0 50px' : '0 100px';
     }
   }
 }
@@ -332,7 +355,6 @@ export default {
   }
 
   .detail-content {
-    padding: 0 100px;
 
     .info {
 

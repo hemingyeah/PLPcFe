@@ -167,8 +167,7 @@ export default {
     font-size: 14px !important;
 
     .ql-editor {
-      // min-height: 300px;
-      height: calc(100vh - 500px);
+      height: 400px;
     }
 
     .ql-editor.ql-blank::before {

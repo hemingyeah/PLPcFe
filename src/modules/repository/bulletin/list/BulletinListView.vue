@@ -5,7 +5,7 @@
       <!-- 搜索部分 -->
       <list-search class="list-search" @search="search"></list-search>
       <!-- 列表部分 -->
-      <list class="list" :keyword="params.keyword"></list>
+      <list class="list" :keyword="params.keyword" @toDetail="toDetail"></list>
       <!-- 页脚部分 -->
       <list-footer class="list-footer" @search="search"></list-footer>
     </div>
@@ -42,6 +42,10 @@ export default {
     search (params) {
       Object.assign(this.params, params);
       // TODO: 查询数据操作
+    },
+
+    toDetail (item) {
+      // TODO: 将id传入详情
     }
   }
 }

@@ -146,7 +146,20 @@ export default {
       this.newType = info.label;
     },
     // 删除分类
-    deleteType (info) {
+    async deleteType (info) {
+      this.$platform.alert('分类下存在文章，不能删除。请删除文章或将文章至其它分类再继续操作。')
+      try {
+        if (!await this.$platform.confirm('确定删除该文章分类吗？')) return;
+        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+        // if (!result.status) {
+        //   let fromId = window.frameElement.getAttribute('fromid');
+        //   this.$platform.refreshTab(fromId);
+
+        //   window.location.reload();
+        // }
+      } catch (e) {
+        console.error(e);
+      }
       console.log(info)
     },
     sumbitType () {

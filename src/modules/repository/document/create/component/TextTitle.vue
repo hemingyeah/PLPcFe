@@ -95,7 +95,11 @@ export default {
     // 添加标签，最多5个
     addTags () {
       if(this.tagValue) {
-        this.params.tags.push(this.tagValue);
+        if (this.tagValue.length <= 10) {
+          this.params.tags.push(this.tagValue);
+        } else {
+          this.$platform.alert('标签最多只支持10个字符。');
+        }
       }
       this.inputVisible = false;
       this.tagValue = '';

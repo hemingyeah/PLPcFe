@@ -3,10 +3,10 @@
 
     <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
 
-    <div class="list-item">
+    <div class="list-item" :class="{'choosed-item': id}">
 
       <div class="item-top">
-        <p class="item-title" ref="title">{{item.title}}</p>
+        <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
       </div>
 
       <div class="item-info">
@@ -46,7 +46,8 @@ export default {
         readNum: 10086,
         noReadNum: 3344
       },
-      total: 12
+      total: 12,
+      id: true,
     }
   },
   methods: {
@@ -57,6 +58,10 @@ export default {
       let replaceString = `<span style="color: #FF7B00">${ this.keyword }</span>`;
       this.$refs.content.innerHTML = this.item.content.replace(replaceReg, replaceString);
       this.$refs.title.innerHTML = this.item.title.replace(replaceReg, replaceString);
+    },
+
+    toDetail (item) {
+      this.$emit('toDetail', item)
     }
   },
   watch: {
@@ -90,6 +95,8 @@ export default {
         font-size: 16px;
         font-weight: 500;
         vertical-align: middle;
+
+        cursor: pointer;
       }
     }
     
@@ -109,6 +116,11 @@ export default {
       padding: 4px 0;
       color: #909399;
       line-height: 22px;
+
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
     }
 
     .item-footer {
@@ -120,6 +132,10 @@ export default {
         margin-right: 10px;
       }
     }
+  }
+
+  .choosed-item {
+    background: #F5F7FA;
   }
 }
 </style>

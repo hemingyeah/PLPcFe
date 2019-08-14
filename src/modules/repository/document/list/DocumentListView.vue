@@ -5,7 +5,7 @@
       <!-- 搜索部分 -->
       <list-search class="list-search" :tag="params.tag" @search="search"></list-search>
       <!-- 列表部分 -->
-      <list class="list" @tag="setTag" :keyword="params.keyword"></list>
+      <list class="list" @tag="setTag" :keyword="params.keyword" @toDetail="toDetail"></list>
       <!-- 页脚部分 -->
       <list-footer class="list-footer" @search="search"></list-footer>
     </div>
@@ -50,6 +50,10 @@ export default {
         name: tag,
         show: true
       };
+    },
+
+    toDetail (item) {
+      // TODO: 将id传入详情
     }
   }
 }

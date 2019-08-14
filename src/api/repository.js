@@ -6,12 +6,12 @@ import http from '@src/util/http';
  * 获取文档库列表
  * @param {Object} params - 参数
  * @param {String} params.keyword - 关键词
- * @param {String} params.view - 文章分类（我发布的、草稿箱）
- * @param {Number} params.TypeIds - 文章类别id
- * @param {String} params.sort - 排序标准
+ * @param {String} params.view - 文章分类（my、draft）
+ * @param {Number} params.typeIds - 文章类别id
+ * @param {String} params.sort - 排序标准(createTime、readTimes)
  * @param {Number} params.pageNum - 页数
  * @param {Number} params.pageSize - 每页条数
- * @param {String} params.tag - 标签
+ * @param {String} params.label - 标签
  * 
  * @returns Promise<List>
  */
@@ -115,8 +115,10 @@ export function deleteDocument (wikiId) {
 /**
  * 获取文章日志
  * @param {String} params - 文档库id
+ * @param {Number} params.pageNum - 页数
+ * @param {Number} params.pageSize - 每页条数
  * 
- * @returns Promise<Object>
+ * @returns Promise<List>
  */
 export function getRecord (wikiId) {
   return http.get('/outside/wiki/record/get', wikiId);
@@ -125,7 +127,14 @@ export function getRecord (wikiId) {
 /**
  * 文档库保存草稿
  * @param {Object} params
- * // TODO: 
+ * @param {String} params.id - 草稿id
+ * @param {String} params.title - 标题
+ * @param {String} params.content - 内容
+ * @param {Number} params.typeId - 类别id
+ * @param {Number} params.allow_share - 是否允许分享 0-否 1-是
+ * @param {Array} params.label - 标签
+ * @param {Array} params.attachment - 附件
+ * @param {Number} params.originalId - 编辑文档时需要
  * 
  * @returns Promise<Boolean>
  */
@@ -146,7 +155,13 @@ export function deletedraft (draftId) {
 /**
  * 文档库保存并提交
  * @param {Object} params
- * // TODO: 
+ * @param {String} params.title - 标题
+ * @param {String} params.content - 内容
+ * @param {Number} params.typeId - 类别id
+ * @param {Number} params.allow_share - 是否允许分享 0-否 1-是
+ * @param {Array} params.label - 标签
+ * @param {Array} params.attachment - 附件
+ * @param {Number} params.originalId - 编辑文档时需要 
  * 
  * @returns Promise<Boolean>
  */
