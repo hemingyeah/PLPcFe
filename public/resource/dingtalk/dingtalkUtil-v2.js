@@ -44,7 +44,7 @@
   //====================================openLink 实现========================================
   window.dd_openLink = function (url) {
     if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
-      return dingtalk.biz.openLink(url);
+      return window.DingTalkPC.device.openLink(url);
     } else {
       return window.open(url)
     }
