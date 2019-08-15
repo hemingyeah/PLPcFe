@@ -164,6 +164,7 @@ export default {
       this.$emit('toDetail', item)
     },
   },
+  
   watch: {
     keyword (n, o) {
       this.highlight();

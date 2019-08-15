@@ -15,8 +15,9 @@
 
       <el-form-item label="通知范围：" class="create-item">
         <div class="range">
-          <biz-team-select v-model="value.tags" multiple class="notification-range" ref="notificationRange" />
-          <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="(tag,index) in params.tags" :key="index">{{tag.tagName}}</el-tag>
+          <!-- <base-contact-dept :selectedUser="selectedUser" title="选择分享人员" :showDeptCheckbox="true" @input="getData"></base-contact-dept> -->
+          <!-- <biz-team-select v-model="value.tags" multiple class="notification-range" ref="notificationRange" /> -->
+          <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="tag in params.tags" :key="tag.userId">{{tag.displayName}}</el-tag>
           <div class="icon-add-tags-btn" @click="chooseTeam">
             <i class="iconfont icon-jia icon-addTags"></i>
           </div>
@@ -45,6 +46,7 @@
 <script>
 import platform from '@src/platform';
 import Uploader from '@src/util/uploader';
+import BaseContactDept from '@src/component/common/BaseContact/'
 
 export default {
   name: 'text-title',
@@ -61,6 +63,8 @@ export default {
       tagValue: '', // 添加的标签
       options: [], // 文章分类
       pending: false,
+      selectedUser: [],
+      multiple: true,
     }
   },
   computed: {
@@ -78,7 +82,29 @@ export default {
     },
     // 点击加号显示标签输入框
     chooseTeam () {
-      this.$refs.notificationRange.$el.click();
+      // this.$refs.notificationRange.$el.click();
+      let max = 1;
+      if(this.multiple) max = null == this.max ? -1 : parseInt(this.max)
+      
+      let options = {
+        title: '请选择分享人员',
+        seeAllOrg: true,
+        selected: this.params.selected,
+        max
+      };
+      return this.$fast.contact.choose('dept', options).then(result => {
+        if(result.status == 0){
+          let data = result.data || {};
+          let users = data.users || [];
+          let newValue = this.multiple ? users : users[0];
+
+          this.params.tags = newValue;
+          this.params.selected = newValue;
+
+          this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+        }
+      })
+        .catch(err => console.error(err))
     },
     // 添加标签，最多5个
     addTags () {
@@ -153,6 +179,10 @@ export default {
         this.params.form.attachments.splice(index, 1);
       }
     },
+
+    getData (data) {
+      console.log(data);
+    }
   }
 }
 </script>

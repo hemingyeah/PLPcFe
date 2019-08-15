@@ -31,7 +31,8 @@ export default {
         article: '', // 文章内容
         form: {}, // 附件
         type: '', // 文章分类
-        tags: []
+        tags: [],
+        selected: []
       },
       articleHtml: '',
       isSave: false,

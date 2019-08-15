@@ -44,6 +44,7 @@ export default {
       Object.assign(this.params, params);
       // TODO: 查询数据操作
     },
+    
     // 给子组件传过来的tag加上show属性
     setTag (tag) {
       this.params.tag = {
