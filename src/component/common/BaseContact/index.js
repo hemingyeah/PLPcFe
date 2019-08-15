@@ -19,15 +19,21 @@ function choose(type = 'dept', options = {}){
 function dept(options){
   // 处理传入参数
   let selectedUser = [];
-  let max = 0;
+  let max = options.max;
 
-  // if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
-  // if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
+  if(
+    ( typeof max == 'number' || typeof max == 'string' )
+    && !isNaN(max) 
+    && isFinite(max)
+  ) {
+    max = parseInt(max);
+  } else {
+    max = 0;
+  }
   
   // 后端已经限制了人数，前端不应限制选人
   if(Array.isArray(options.selected)) {
-    selectedUser = options.selected
-    // .length > max ? options.selected.slice(0, max) : options.selected;
+    selectedUser = max === 1 ? [] : options.selected;
   }
 
   let showLocation = !!options.allotMap;
@@ -84,20 +90,28 @@ function team( options = {} ){
   // 处理传入参数
   let selectedUser = [];
   let selectedTeam = [];
-  let max = 0;
+  let max = options.max;
   let action = '/security/tag/tagComponet/getUserList';
   let selectTypes = ['universal', 'performance'];
   let selectType = 'universal';
 
-  if(typeof options.max == 'number' && !isNaN(max) && isFinite(max)) max = parseInt(options.max);
-  // if(max <= 0 || max > MAX_NUM) max = MAX_NUM; // 单次上限是150个
-  if(options.selected && Object.keys(options.selected).length > 0) {
+  if(
+    ( typeof max == 'number' || typeof max == 'string' )
+    && !isNaN(max) 
+    && isFinite(max)
+  ) {
+    max = parseInt(max);
+  } else {
+    max = 0;
+  }
+
+  if(options.selected && max !== 1 && Object.keys(options.selected).length > 0) {
     let users = options?.selected?.users;
     let teams = options?.selected?.teams;
     let isUserArray = Array.isArray(users);
     let isTeamArray = Array.isArray(teams);
 
-    if(isUserArray) selectedUser = users.length > max ? options.selected.slice(0, max) : users;
+    if(isUserArray) selectedUser = users;
     if(isTeamArray) selectedTeam = teams;
   }
   if(options.action) action = options.action;
