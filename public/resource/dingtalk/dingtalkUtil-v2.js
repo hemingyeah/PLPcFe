@@ -44,7 +44,11 @@
   //====================================openLink 实现========================================
   window.dd_openLink = function (url) {
     if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
-      return window.DingTalkPC.device.openLink(url);
+      console.log('window.DingTalkPC.device', window.DingTalkPC.device);
+      console.log('window.DingTalkPC.device', window.DingTalkPC.util);
+  
+      return window.DingTalkPC.util.openLink(url);
+  
     } else {
       return window.open(url)
     }
