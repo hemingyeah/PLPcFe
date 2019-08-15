@@ -504,7 +504,7 @@ export default {
     buildTextarea(value) {
       return value
         ? value.replace(link_reg, (match) => {
-          return `<a href="javascript:;" target="_blank" url=${match}>${match}</a>`
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
         })
         : '';
     },

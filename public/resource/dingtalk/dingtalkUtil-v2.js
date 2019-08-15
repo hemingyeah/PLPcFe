@@ -47,7 +47,7 @@
       console.log('window.DingTalkPC.device', window.DingTalkPC.device);
       console.log('window.DingTalkPC.device', window.DingTalkPC.util);
   
-      return window.DingTalkPC.util.openLink(url);
+      return window.DingTalkPC.biz.util.openLink(url);
   
     } else {
       return window.open(url)
