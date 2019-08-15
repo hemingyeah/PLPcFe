@@ -85,11 +85,9 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-// 审批列表 联调时临时使用
 // /api/app/outside
-// router.post('/outside/*', ctx => HttpClient.proxy(ctx, {
-router.post('/approve/search', ctx => HttpClient.proxy(ctx, {
-  host: '47.98.255.79',
+router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
+  host: '172.18.1.10',
   port: 10002
 }))
 
