@@ -112,6 +112,7 @@
 
       <el-table
         :data="reports"
+        :row-key="getRowKey"
         stripe
         @select="handleSelection"
         @select-all="handleSelection"
@@ -780,6 +781,9 @@ export default {
       this.$nextTick(() => {
         this.selectionInit(selected);
       });
+    },
+    getRowKey(row) {
+      return row.id
     },
   },
   components: {

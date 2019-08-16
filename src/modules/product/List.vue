@@ -56,6 +56,7 @@
       <el-table
         :data="page.list"
         :key="tableKey"
+        :row-key="getRowKey"
         stripe
         @select="handleSelection"
         @select-all="handleSelection"
@@ -994,7 +995,10 @@ export default {
         window.TDAPP.onEvent('pc：产品管理-更多操作事件');
         return;
       }
-    }
+    },
+    getRowKey(row) {
+      return row.id
+    },
   },
   components: {
     SearchPanel,

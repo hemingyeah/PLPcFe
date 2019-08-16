@@ -78,6 +78,7 @@
       <!-- start 表格 -->
       <el-table
         :data="page.list"
+        :row-key="getRowKey"
         stripe
         @select="selectionHandle"
         @select-all="selectionHandle"
@@ -1025,6 +1026,9 @@ export default {
           return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
         })
         : '';
+    },
+    getRowKey(row) {
+      return row.id
     },
   },
   components: {

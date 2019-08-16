@@ -83,7 +83,7 @@
         @select="handleSelection"
         @select-all="handleSelection"
         @sort-change="sortChange"
-        :key="tableKey"
+        :row-key="getRowKey"
         :highlight-current-row="false"
         header-row-class-name="customer-table-header"
         ref="multipleTable" class="customer-table"
@@ -1044,6 +1044,9 @@ export default {
           return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
         })
         : '';
+    },
+    getRowKey(row) {
+      return row.id
     },
   },
   components: {
