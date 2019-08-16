@@ -83,6 +83,7 @@
         @select="handleSelection"
         @select-all="handleSelection"
         @sort-change="sortChange"
+        :key="tableKey"
         :highlight-current-row="false"
         header-row-class-name="customer-table-header"
         ref="multipleTable" class="customer-table"
@@ -363,6 +364,7 @@ export default {
       columns: this.fixedColumns(),
       selectedLimit: 200,
       columnNum: 1,
+      tableKey: Math.random() * 1000 >> 2,
     };
   },
   computed: {
@@ -483,6 +485,7 @@ export default {
               }
               return c;
             })
+          this.matchSelected();
         })
         .catch(e => console.error('e', e));
     },

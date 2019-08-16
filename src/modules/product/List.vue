@@ -55,6 +55,7 @@
 
       <el-table
         :data="page.list"
+        :key="tableKey"
         stripe
         @select="handleSelection"
         @select-all="handleSelection"
@@ -308,7 +309,8 @@ export default {
         },
       },
 
-      filterTeams: []
+      filterTeams: [],
+      tableKey: Math.random() * 1000 >> 2,
     }
   },
   computed: {
