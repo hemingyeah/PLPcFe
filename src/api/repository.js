@@ -54,6 +54,7 @@ export function addDocumentType (params) {
  * 文档库分类修改
  * @param {Object} params 
  * @param {String} params.name - 分类名称
+ * @param {String} params.id - 分类id
  * @param {String} params.parentId - 父级分类id
  * 
  * @returns Promise<Boolean>
@@ -222,7 +223,7 @@ export function getBulletinList (params) {
  * @returns Promise<Object>
  */
 export function getBulletinTypes () {
-  return http.get('/outside/notice/types');
+  return http.get('/outside/noticeType/types');
 }
 
 /**
@@ -233,7 +234,7 @@ export function getBulletinTypes () {
  * @returns Promise<Boolean>
  */
 export function addBulletinType (params) {
-  return http.post('/outside/notice/type/create', params);
+  return http.post('/outside/noticeType/create', params);
 }
 
 /**
@@ -244,7 +245,7 @@ export function addBulletinType (params) {
  * @returns Promise<Boolean>
  */
 export function updateBulletinType (params) {
-  return http.post('/outside/notice/type/update', params);
+  return http.post('/outside/noticeType/update', params);
 }
 
 /**
@@ -254,7 +255,7 @@ export function updateBulletinType (params) {
  * @returns Promise<Boolean>
  */
 export function deleteBulletinType (typeId) {
-  return http.get('/outside/notice/type/delete', typeId);
+  return http.get('/outside/noticeType/delete', typeId);
 }
 
 /**

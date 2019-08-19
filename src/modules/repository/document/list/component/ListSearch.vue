@@ -20,24 +20,23 @@
     </div>
     <!-- 文档库类型筛选 -->
     <div class="search-middle">
-      <el-select v-model="params.type" class="search-type search-type-left" @change="search">
-        <el-option value="" label="全部(1312)"></el-option>
-        <el-option value="1" label="我发布的(1312)"></el-option>
-        <el-option value="2" label="草稿箱(1312)"></el-option>
+      <el-select v-model="params.view" class="search-type search-type-left" @change="search">
+        <el-option v-for="item in viewOptions" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
       </el-select>
       <el-cascader 
-        :options="options"
+        :options="typeOptions"
         class="search-type search-type-right"
         popper-class="search-cascader-panel"  
         clearable 
-        @change="search"
+        @change="handleChange"
         @visible-change="showCascader"
-        @click="click"
         filterable>
         <template slot-scope="{ node, data }" class="type">
-          <span>{{data.label}}</span>
-          <span class="type-operating">
-            <i class="iconfont icon-chuanjianbaogao icon-operating" @click.stop="editType(data)"></i>
+          <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
+          <span v-else>{{data.label}}</span>
+          <span class="type-operating" v-if="data.label != '全部'">
+            <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
             <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
           </span>
         </template>
@@ -45,9 +44,9 @@
     </div>
     <!-- 文档库排序、标签 -->
     <div class="search-bottom">
-      <el-select v-model="params.sort" class="search-sort" @change="search">
-        <el-option value="1" label="按更新时间排序"></el-option>
-        <el-option value="2" label="按访问量排序"></el-option>
+      <el-select v-model="params.orderDetail.column" class="search-sort" @change="search">
+        <el-option value="createTime" label="按更新时间排序"></el-option>
+        <el-option value="readTimes" label="按访问量排序"></el-option>
       </el-select>
       <el-tag class="search-tag" closable @close="tag.show = false" v-if="tag.show">{{tag.name}}</el-tag>
     </div>
@@ -59,6 +58,7 @@
 
 <script>
 import TypeModal from './TypeModal'
+import * as RepositoryApi from '@src/api/Repository'
 
 export default {
   name: 'list-search',
@@ -76,62 +76,24 @@ export default {
       show: false,
       isEdit: false,
       isSearch: false, // 搜索框显示标识
-      params: {
+      params: { // 参数对象
         keyword: '',
         type: '',
-        sort: '1',
+        orderDetail: {
+          isSystem: 1,
+          column: 'createTime',
+          type: '',
+          sequence: 'desc'
+        },
+        view: 'all',
       },
-      options: [{ // 类型
-        value: 'zhinan',
-        label: '指南',
-        children: [{
-          value: 'shejiyuanze',
-          label: '设计原则',
-        }, {
-          value: 'daohang',
-          label: '导航',
-        }]
-      }, {
-        value: 'zujian',
-        label: '组件',
-        children: [{
-          value: 'basic',
-          label: 'Basic',
-        }, {
-          value: 'form',
-          label: 'Form',
-        }, {
-          value: 'data',
-          label: 'Data',
-        }, {
-          value: 'notice',
-          label: 'Notice',
-        }, {
-          value: 'navigation',
-          label: 'Navigation',
-        }, {
-          value: 'others',
-          label: 'Others',
-        }]
-      }, {
-        value: 'ziyuan',
-        label: '资源',
-        children: [{
-          value: 'axure',
-          label: 'Axure Components'
-        }, {
-          value: 'sketch',
-          label: 'Sketch Templates'
-        }, {
-          value: 'jiaohu',
-          label: '组件交互文档'
-        }]
-      }],
-      info: {
-        newType: '',
-        parentType: '',
+      info: { // 新建、编辑type对象
+        name: '',
+        parentId: null,
         options: []
       },
+      viewOptions: this.initView(),
+      typeOptions: [],
     }
   },
   computed: {
@@ -139,21 +101,109 @@ export default {
       return this.isEdit ? '编辑分类' : '新建分类';
     }
   },
-  mounted () {
-    this.info.options = this.options;
-    let tag = document.getElementsByClassName('el-cascader-panel');
-    tag[0].id = 'search-id';
-    tag[1].id = 'add-type-id';
+  mounted () {   
+    this.initView();
+    this.getTypes();
   },
   methods: {
-    click () {
-      console.log(5555)
+    // 初始化viewOptions对象，包括数量，每次更新一次
+    async initView () {
+      try {
+        let options = [{
+          value: 'all',
+          label: ''
+        }, {
+          value: 'my',
+          label: ''
+        }, {
+          value: 'draft',
+          label: ''
+        }];
+        let res = await RepositoryApi.getDocumentViewCount();
+
+        if(res.success) {
+          options.forEach(item => {
+            if(item.value == 'all') item.label = `全部（${ res.result.all }）`;
+            if(item.value == 'my') item.label = `我发布的（${ res.result.my }）`;
+            if(item.value == 'draft') item.label = `草稿箱（${ res.result.draft }）`;
+          })
+        }
+        this.viewOptions = options;
+      } catch (err) {
+        console.error(err)
+      }
     },
+
+    // 获取分类二级树状结构，每次更新一次
+    async getTypes () {
+      try {
+        let res = await RepositoryApi.getDocumentTypes();
+        if(res.success) {
+          res.result.forEach(item => {
+            item.value = item.id;
+            item.label = item.name;
+            item.children = item.subTypes;
+            item.count = 0;
+
+            item.children.forEach(childItem => {
+              childItem.value = childItem.id;
+              childItem.label = childItem.name;
+              childItem.count = 0;
+            })
+            
+            item.children.unshift({
+              label: '全部',
+              value: item.id
+            })
+          })
+          this.typeOptions = res.result;
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
+    // 获取分类下各级分类的文章数量，每次点击下拉框时更新
+    async getTypesCount () {
+      try {
+        let params = {
+          view: this.params.view
+        }
+        let res = await RepositoryApi.getTypesCount(params);
+        this.typeOptions.forEach(parent => {
+          // let parentCount = 0;
+          res.result.forEach(info => {
+            if(parent.id == info.typeId) parent.count = info.count
+            // parentCount = info.count;
+            // parent.label = parent.name;
+            // parent.count = parentCount;
+            // parent.label = `${ parent.label }（${ parentCount }）`; // 为父级类别label添加数量
+          })
+
+          parent.children.forEach(child => {
+            // let childCount = 0;
+            res.result.forEach(info => {
+              if(child.id == info.typeId) child.count = info.count;
+              // childCount = info.count;
+              // if(child.label != '全部') {
+              //   child.label = child.name;
+              //   child.count = childCount;
+              // child.label = `${ child.label }（${ childCount }）`; // 为子级类别label添加数量
+              // }
+            })
+          })
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
     showCascader (flag) {
-      if(this.options.length <= 0) return;
-      let parent = document.getElementById('search-id');
-      // console.log(document.getElementsByClassName('el-cascader-panel'))
+      if(this.typeOptions.length <= 0) return;
+      let parent = document.getElementsByClassName('el-cascader-panel')[0];
        
 
       if(flag) {
@@ -172,9 +222,12 @@ export default {
           btn.click();
           this.$refs.typeModal.open();
           this.isEdit = false;
-          this.info.newType = '';
-          this.info.parentType = '';
+          this.info.name = '';
+          this.info.parentId = '';
         });
+
+        // 获取分类文章数量
+        this.getTypesCount();
 
       } else {
         let child = document.getElementById('type-id')
@@ -183,6 +236,7 @@ export default {
       }
       
     },
+
     // 跳转到新建页面
     create () {
       let fromId = window.frameElement.getAttribute('id');
@@ -196,15 +250,29 @@ export default {
         fromId
       });
     },
+
     // 显示搜索框
     toSearch () {
       this.isSearch = true;
       this.toggleInput();
     },
+
     // 输入关键词或选择条件时向父组件触发search事件
     search () {
       this.$emit('search', this.params);
     },
+
+    // 所选类型改变时为params.typeIds赋值
+    handleChange (value) {
+      if (value.length > 0) {
+        this.params.typeIds = [value[1]];
+      } else {
+        this.params.typeIds = [];
+      }
+      this.search();
+    },
+
+    // 搜索框的显示隐藏，点击放大镜显示，在没有内同时点击其他空白区域隐藏
     toggleInput () {
       if (this.isSearch) {
         document.addEventListener('click', (e) => {
@@ -220,6 +288,7 @@ export default {
         })
       }
     },
+
     // 打开编辑分类
     editType (info) {
       let btn = document.getElementsByClassName('is-reverse')[0];
@@ -227,35 +296,63 @@ export default {
       btn.click();
       this.$refs.typeModal.open();
       this.isEdit = true;
-      this.info.newType = info.label;
-      this.info.parentType = '哈哈哈';
+      this.info.name = info.name;
+      this.info.id = info.id;
+      this.info.parentId = info.parentId;
+      this.info.options = this.typeOptions;
     },
+
     // 删除分类
     async deleteType (info) {
-      this.$platform.alert('分类下存在文章，不能删除。请删除文章或将文章至其它分类再继续操作。')
+      let btn = document.getElementsByClassName('is-reverse')[0];
+      btn.click();
       try {
-        if (!await this.$platform.confirm('必须先将该分类下的文章删除或移动该分类下的文章后再删除分类！')) return;
-        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-        // if (!result.status) {
-        //   let fromId = window.frameElement.getAttribute('fromid');
-        //   this.$platform.refreshTab(fromId);
-
-        //   window.location.reload();
-        // }
+        let params = {
+          typeId: info.id
+        } 
+        let res = await RepositoryApi.deleteDocumentType(params);
+        
+        if (res.success) {
+          this.$platform.alert('删除分类成功');
+          this.getTypes();
+        } else {
+          this.$platform.alert(res.message);
+        }
       } catch (e) {
         console.error(e);
       }
-      console.log(info)
     },
+
     // 提交编辑或添加的分类
-    sumbitType () {
-      console.log(this.info);
+    async sumbitType () {
+      try {
+        let res;
+        if(this.isEdit) {
+          res = await RepositoryApi.updateDocumentType(this.info);
+
+        } else {
+          res = await RepositoryApi.addDocumentType(this.info);
+        }
+
+        if(res.success) {
+          let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
+          this.$platform.alert(msg);
+          this.getTypes();
+        } else {
+          this.$platform.alert(res.message);
+        }
+        this.isEdit = false;
+      } catch (err) {
+        console.error(err)
+      }
     }
   },
+
   watch: {
     // 标签改变时向父组件触发search事件
     'tag': {
       handler(newValue, oldValue) {
+        this.params.label = newValue.show ? newValue.name : '';
         this.search();
       },
       deep: true,

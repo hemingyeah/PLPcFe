@@ -6,16 +6,16 @@
       :show.sync="show">
       <el-form>
         <el-form-item label="分类名称">
-          <input class="title" v-model="info.newType" />
+          <input class="title" v-model="info.name" />
         </el-form-item>
         <el-form-item label="父级分类">
-          <el-cascader 
-            :options="info.options" 
-            clearable 
-            class="type" 
-            v-model="info.parentType"></el-cascader>
+          <el-select v-model="info.parentId" class="type" clearable>
+            <el-option v-for="item in info.options" :key="item.value" :label="item.name" :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
+      <p class="prompt">如果不选择父级分类，则该分类为一级分类</p>
 
       <div slot="footer" class="edit-footer">
         <button type="button" class="btn btn-primary" @click="sumbitType">确定</button>
@@ -42,9 +42,6 @@ export default {
       show: false,
       info: this.value
     }
-  },
-  created () {
-    console.log(this.info);
   },
   methods: {
     open () {
@@ -75,4 +72,10 @@ export default {
   display: flex;
   justify-content: flex-end;
 }
+
+.prompt {
+  margin: 0;
+  font-size: 12px;
+  color: red;
+} 
 </style>

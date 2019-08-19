@@ -22,7 +22,7 @@
     <div class="search-bottom">
       <el-select v-model="params.type" class="search-type" @change="search">
         <el-option v-for="(item, index) in typeOptions" :key="index" :value="item.value" :label="item.label">
-          <span style="float: left">{{ item.label }}</span>
+          <span style="float: left">{{ item.label }}（{{ item.count }}）</span>
           <span style="float: right" class="type-operating">
             <i class="iconfont icon-chuanjianbaogao" style="font-size: 14px" @click.stop="editType(item)"></i>
             <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
@@ -39,7 +39,7 @@
       :show.sync="show">
       <el-form>
         <el-form-item label="分类名称">
-          <input class="title" v-model="newType" />
+          <input class="title" v-model="info.name" />
         </el-form-item>
       </el-form>
 
@@ -51,6 +51,8 @@
 </template>
 
 <script>
+import * as RepositoryApi from '@src/api/Repository'
+
 export default {
   name: 'list-search',
   data () {
@@ -79,6 +81,10 @@ export default {
         keyword: '',
         type: '',
       },
+      info: {
+        name: '',
+        id: null
+      },
       newType: '',
       show: false,
       isEdit: false,
@@ -89,7 +95,39 @@ export default {
       return this.isEdit ? '编辑分类' : '新建分类';
     }
   },
+  mounted () {
+    this.getTypes();
+  },
+
   methods: {
+    // 获取分类一级树状结构，每次更新一次
+    async getTypes () {
+      try {
+        let res = await RepositoryApi.getBulletinTypes();
+        if(res.success) {
+          console.log(res.result);
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
+    // 获取分类下各级分类的文章数量，每次更新一次
+    async getTypeCount () {
+      try {
+        let res = await RepositoryApi.getBulletinTypesCount();
+        if(res.success) {
+          console.log(res.result);
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
     // 跳转到新建页面
     create () {
       let fromId = window.frameElement.getAttribute('id');
@@ -103,15 +141,18 @@ export default {
         fromId
       });
     },
+
     // 显示搜索框
     toSearch () {
       this.isSearch = true;
       this.toggleInput();
     },
+
     // 输入关键词或选择条件时向父组件触发search事件
     search () {
       this.$emit('search', this.params);
     },
+
     toggleInput () {
       if (this.isSearch) {
         document.addEventListener('click', (e) => {
@@ -127,6 +168,7 @@ export default {
         })
       }
     },
+
     // 添加分类
     addType () {
       let btn = document.getElementsByClassName('is-reverse')[0];
@@ -134,8 +176,9 @@ export default {
       btn.click();
       this.isEdit = false;
       this.show = true;
-      this.newType = '';
+      this.name = '';
     },
+
     // 编辑分类
     editType (info) {
       let btn = document.getElementsByClassName('is-reverse')[0];
@@ -143,28 +186,51 @@ export default {
       btn.click();
       this.isEdit = true;
       this.show = true;
-      this.newType = info.label;
+      this.name = info.name;
     },
+
     // 删除分类
     async deleteType (info) {
-      this.$platform.alert('分类下存在文章，不能删除。请删除文章或将文章至其它分类再继续操作。')
       try {
         if (!await this.$platform.confirm('确定删除该文章分类吗？')) return;
-        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-        // if (!result.status) {
-        //   let fromId = window.frameElement.getAttribute('fromid');
-        //   this.$platform.refreshTab(fromId);
-
-        //   window.location.reload();
-        // }
+        let params = {
+          typeId: info.id
+        } 
+        let res = await RepositoryApi.deleteBulletinType(params);
+        
+        if (res.success) {
+          this.$platform.alert('删除分类成功');
+          this.getTypes();
+        } else {
+          this.$platform.alert(res.message);
+        }
       } catch (e) {
         console.error(e);
       }
-      console.log(info)
     },
-    sumbitType () {
-      this.show = false;
-      console.log(this.newType);
+
+    // 提交编辑或添加的分类
+    async sumbitType () {
+      try {
+        let res;
+        if(this.isEdit) {
+          res = await RepositoryApi.updateBulletinType(this.info);
+
+        } else {
+          res = await RepositoryApi.addBulletinType(this.info);
+        }
+
+        if(res.success) {
+          let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
+          this.$platform.alert(msg);
+          this.getTypes();
+        } else {
+          this.$platform.alert(res.message);
+        }
+        this.isEdit = false;
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }

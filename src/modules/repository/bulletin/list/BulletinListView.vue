@@ -12,7 +12,7 @@
 
     <!-- 右侧详情 -->
     <div class="bulletin-list-right">
-      <bullet-detail></bullet-detail>
+      <bullet-detail :noticeId="noticeId"></bullet-detail>
     </div>
 
   </div>
@@ -24,12 +24,16 @@ import List from './component/List'
 import ListFooter from '../../common/ListFooter'
 import BulletinDetailView from '../detail/BulletinDetailView'
 
+import * as RepositoryApi from '@src/api/Repository'
+
 export default {
   data () {
     return {
       params: {
         keyword: '', // 搜索的关键词
-      }
+      },
+      listTotal: null,
+      listMsg: {}
     }
   },
   components: {
@@ -39,12 +43,25 @@ export default {
     [BulletinDetailView.name]: BulletinDetailView
   },
   methods: {
-    search (params) {
-      Object.assign(this.params, params);
+    async search (params) {
+      if(params) Object.assign(this.params, params);
+      try {
+        let res = await RepositoryApi.getBulletinList(this.params);
+        
+        if(res.success) {
+          this.listTotal = res.result.total;
+          this.listMsg = res.result;
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }    
       // TODO: 查询数据操作
     },
 
     toDetail (item) {
+      this.noticeId = item.id;
       // TODO: 将id传入详情
     }
   }
@@ -58,7 +75,7 @@ export default {
   display: flex;
 
   .bulletin-list-left {
-    width: 400px;
+    width: 450px;
     display: flex;
     height: 100%;
     flex-direction: column;

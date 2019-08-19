@@ -3,11 +3,11 @@
     <!-- 左侧列表 -->
     <div class="document-list-left">
       <!-- 搜索部分 -->
-      <list-search class="list-search" :tag="params.tag" @search="search"></list-search>
+      <list-search class="list-search" v-model="params" :tag="tag" @search="search"></list-search>
       <!-- 列表部分 -->
-      <list class="list" @tag="setTag" :keyword="params.keyword" @toDetail="toDetail"></list>
+      <list class="list" @tag="setTag" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg"></list>
       <!-- 页脚部分 -->
-      <list-footer class="list-footer" @search="search"></list-footer>
+      <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
     </div>
 
     <!-- 右侧详情 -->
@@ -24,13 +24,27 @@ import List from './component/List'
 import ListFooter from '../../common/ListFooter'
 import DocumentDetailView from '../detail/DocumentDetailView'
 
+import * as RepositoryApi from '@src/api/Repository'
+
 export default {
   data () {
     return {
       params: {
-        tag: {}, // 选中的标签
-        keyword: '' // 搜索的关键词
-      }
+        label: '',
+        keyword: '', // 搜索的关键词
+        pageNum: 1,
+        pageSize: 20,
+        orderDetail: {
+          isSystem: 1,
+          column: 'createTime',
+          type: '',
+          sequence: 'desc'
+        },
+        view: 'all',
+      },
+      tag: {}, // 选中的标签
+      listTotal: null,
+      listMsg: {}
     }
   },
   components: {
@@ -39,15 +53,30 @@ export default {
     [ListFooter.name]: ListFooter,
     [DocumentDetailView.name]: DocumentDetailView
   },
+  mounted () {
+    this.search()
+  },
   methods: {
-    search (params) {
-      Object.assign(this.params, params);
-      // TODO: 查询数据操作
+    // 获取文档库列表，将ListSearch、ListFooter组件传递的参数合并
+    async search (params) {
+      if(params) Object.assign(this.params, params);
+      try {
+        let res = await RepositoryApi.getDocumentList(this.params);
+        
+        if(res.success) {
+          this.listTotal = res.result.total;
+          this.listMsg = res.result;
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }    
     },
     
     // 给子组件传过来的tag加上show属性
     setTag (tag) {
-      this.params.tag = {
+      this.tag = {
         name: tag,
         show: true
       };
@@ -55,7 +84,7 @@ export default {
 
     toDetail (item) {
       // TODO: 将id传入详情
-    }
+    },
   }
 }
 </script>
@@ -67,7 +96,7 @@ export default {
   display: flex;
 
   .document-list-left {
-    width: 400px;
+    width: 450px;
     display: flex;
     height: 100%;
     flex-direction: column;

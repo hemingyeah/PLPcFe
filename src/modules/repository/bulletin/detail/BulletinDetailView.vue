@@ -87,13 +87,24 @@
 </template>
 
 <script>
+import * as RepositoryApi from '@src/api/Repository'
+
 export default {
   name: 'bullet-detail',
+  props: {
+    noticeId: {
+      type: Number,
+      default: null
+    }
+  },
   data () {
     return {
       form: this.buildForm(), // 附件存储格式
       articleId: 'NIHIF678', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
+      params: {
+        noticeId: this.noticeId
+      },
       info: {
         author: {
           img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
@@ -104,71 +115,8 @@ export default {
         noReadNum: 3344,
         title: '最前线|微信内测新功能，提升阅读效率没那么容易',
         content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。正好新人导师让我看看能否把产品目前使用的FileUploader从老的组件库分离出来的，自己也查阅了相关的各种资料，对文件上传的这些事有了更进一步的了解。把这些知识点总结一下，供自己日后回顾，也供有需要的同学参考，同时也欢迎各位大牛拍砖指点共同学习。',
-        readPerson: [{
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }],
-        noReadPerson: [{
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }, {
-          name: '张某某',
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        }]
+        readPerson: [],
+        noReadPerson: []
       }, // 文章详情
       showMoreRead: false, // 是否显示已读人员浮框
       showMoreNoRead: false // 是否显示未读人员浮框
@@ -182,8 +130,66 @@ export default {
     }
     let formId = window.frameElement.getAttribute('id');
     if(formId.indexOf('bulletin_detail') != -1) this.showOpenFrame = false;
+
+    this.getReadOrNotLatest();
   },
   methods: {
+    // 获取通知公告详情
+    async getBulletinDetail () {
+      try {
+        let res = await RepositoryApi.getBulletinDetail(this.params);
+        if(res.success) {
+          console.log(res.result);
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    // 获取最近5条已读未读用户
+    async getReadOrNotLatest () {
+      try {
+        let res = await RepositoryApi.getReadOrNotLatest(this.params);
+        if(res.success) {
+          console.log(res.result);
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    // 获取所有已读用户,点击加号时获取
+    async getReadPerson () {
+      try {
+        let res = await RepositoryApi.getReadPerson(this.params);
+        if(res.success) {
+          console.log(res.result);
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    // 获取所有未读用户，点击加号时获取
+    async getUnreadPerson () {
+      try {
+        let res = await RepositoryApi.getUnreadPerson(this.params);
+        if(res.success) {
+          console.log(res.result);
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
     buildForm(){
       return {
         content: '',
@@ -191,6 +197,7 @@ export default {
         showInOwn: 0,
       }
     },
+
     // 新页面打开通知公告详情
     openFrame () {
       let fromId = window.frameElement.getAttribute('id');
@@ -204,6 +211,7 @@ export default {
         fromId
       });
     },
+
     // 打开已读、未读人员浮框
     seeMore (value) {
       if (value == 'read') this.showMoreRead = true;
@@ -211,6 +219,7 @@ export default {
 
       this.toggleSeeMore();
     },
+
     // 监听click事件，根据条件关闭已读、未读人员浮框
     toggleSeeMore () {
       if(this.showMoreRead || this.showMoreNoRead) {
@@ -229,19 +238,28 @@ export default {
     },
 
     editArticle () {
+      let fromId = window.frameElement.getAttribute('id');
       
+      this.$platform.openTab({
+        id: 'bulletin_edit',
+        title: '编辑通知公告',
+        url: '/bulletin/create',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
 
+    // 删除通知公告
     async deleteArticle () {
       try {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
-        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-        // if (!result.status) {
-        //   let fromId = window.frameElement.getAttribute('fromid');
-        //   this.$platform.refreshTab(fromId);
-
-        //   window.location.reload();
-        // }
+        let res = await RepositoryApi.deleteBulletin(this.params);
+        if(res.success) {
+          console.log(res.result);
+        } else {
+          this.$platform.alert(res.message);
+        }
       } catch (e) {
         console.error(e);
       }

@@ -7,9 +7,12 @@
       @current-change="jump"
       @size-change="handleSizeChange"
       :page-sizes="[10, 20, 50]"
-      :page-size="page.pageSize"
-      :current-page="page.pageNum" 
-      layout="prev, pager, next, sizes, jumper">
+      :page-size="params.pageSize"
+      :current-page="params.pageNum" 
+      :pager-count="5"
+      small
+      layout="prev, pager, next, sizes, jumper"
+      :total="total">
     </el-pagination>
   </div>
 </template>
@@ -19,10 +22,20 @@ import Page from '@model/Page';
 
 export default {
   name: 'list-footer',
+  props: {
+    total: {
+      type: Number,
+      default: 0
+    },
+    value: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       page: new Page(),
-      params: {},
+      params: this.value,
     }
   },
   methods: {
@@ -50,6 +63,14 @@ export default {
 
   .list-table-pagination {
     padding: 0;
+  }
+
+  .el-pagination__jump {
+    margin: 0;
+  }
+
+  .el-pagination .el-select .el-input {
+    margin: 0;
   }
 }
 </style>

@@ -1,42 +1,47 @@
 <template>
   <div class="document-list-container">
 
-    <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
+    <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{value.total}}</span>条</div>
+    
+    <div class="list-content">
+      <div class="list-noData" v-if="value.list && value.list.length <= 0">暂无数据</div>
 
-    <div class="list-item" :class="{'choosed-item': id}">
+      <div class="list-item" :class="id == item.id ? 'choosed-item' : ''" v-else v-for="item in value.list" :key="item.id">
 
-      <div class="item-top">
-        <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
-        <!-- 草稿箱显示审核状态 -->
-        <el-tag class="review-tag" v-if="item.property == '草稿箱'" :type="item.review == '待审核' ? '' : 'danger'">{{item.review}}</el-tag>
-      </div>
-
-      <div class="item-info">
-        <span class="name">{{item.name}}</span>
-        <span class="time">发布于：{{item.time}}</span>
-        <span class="type">{{item.type}}</span>
-      </div>
-
-      <p class="item-content" ref="content">{{item.content}}</p>
-
-      <div class="item-footer">
-
-        <div class="type">
-          <i class="iconfont icon-tag icon-tags"></i>
-          <el-tag class="search-tag" @click="handleTags(tag)" v-for="(tag,index) in item.tags" :key="index">{{tag}}</el-tag>
+        <div class="item-top">
+          <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
+          <!-- 草稿箱显示审核状态 -->
+          <el-tag class="review-tag" v-if="item.examineState && item.examineState != 0" :type="item.examineState == 1 ? '' : 'danger'">{{item.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
 
-        <!-- 我发布的显示权限、阅读量、分享 -->
-        <div class="footer-right" v-if="item.property == '我发布的'">
-          <span class="permission">
-            <i class="iconfont icon-suo icon-permission" v-if="item.permission"></i>
-            <i class="iconfont icon-unie65b icon-permission" v-else></i>
-            {{item.permission ? '内部' : '外部'}}
-          </span>
-          <span class="readNum">阅读（{{item.readNum}}）</span>
-          <span class="share" @click="shareArticle">
-            <i class="iconfont icon-share icon-article-share"></i>
-          </span>
+        <div class="item-info">
+          <span class="name">{{item.createUserName}}</span>
+          <span class="time">发布于：{{item.createTime}}</span>
+          <span class="type">{{item.type}}</span>
+        </div>
+
+        <p class="item-content" ref="content">{{item.transferredContent}}</p>
+
+        <div class="item-footer">
+
+          <div class="type" v-if="item.label && item.label.length > 0">
+            <i class="iconfont icon-tag icon-tags"></i>
+            <el-tag class="search-tag" @click="handleTags(tag)" v-for="(tag,index) in item.label" :key="index">{{tag}}</el-tag>
+          </div>
+
+          <!-- 我发布的显示权限、阅读量、分享 -->
+          <div class="footer-right" v-if="!item.isDraft">
+            <span class="permission">
+              <i class="iconfont icon-suo icon-permission" v-if="item.allow_share"></i>
+              <i class="iconfont icon-unie65b icon-permission" v-else></i>
+              {{item.allow_share ? '内部' : '外部'}}
+            </span>
+            <span class="readNum">阅读（{{item.readTimes}}）</span>
+            <span class="share" @click="shareArticle">
+              <i class="iconfont icon-share icon-article-share"></i>
+            </span>
+          </div>
+
         </div>
 
       </div>
@@ -69,12 +74,16 @@ export default {
     keyword: {
       type: String,
       default: ''
+    },
+    value: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {
     return {
       total: 18,
-      id: true,
+      id: null,
       shareBoxShow: false,
       item: {
         property: '我发布的',
@@ -93,6 +102,11 @@ export default {
   created () {
     this.highlight()
   },
+  computed: {
+    // chooseClass (item) {
+    //   return id == 
+    // }
+  },
   methods: {
     // 点击标签成为搜索条件
     handleTags (tag) {
@@ -110,8 +124,8 @@ export default {
 
     // 文章分享
     shareArticle () {
-      // 外部文章分享
       this.shareBoxShow = true;
+      // 外部文章分享
 
       // 内部文章分享
       // this.inlineShare();
@@ -175,13 +189,29 @@ export default {
 
 <style lang="scss">
 .document-list-container {
+  display: flex;
+  flex-direction: column;
+
   background: #fff;
+  height: 100%;
+  overflow: hidden;
 
   .list-top {
     height: 40px;
     line-height: 40px;
     padding: 0 11px;
     color: #909399;
+  }
+
+  .list-content {
+    overflow: auto;
+    flex: 1;
+
+    .list-noData {
+      line-height: 40px;
+      text-align: center;
+      color: #909399;
+    }
   }
 
   .list-item {
@@ -237,7 +267,7 @@ export default {
       padding-top: 10px;
 
       .footer-right {
-        padding-top: 10px;
+        // padding-top: 10px;
 
         .icon-permission {
           font-size: 14px;
@@ -262,22 +292,12 @@ export default {
             font-size: 16px;
             color: #38A6A6;
           }
-
-          .share-box {
-
-            .share-box-item {
-
-            }
-
-            .bottom {
-
-            }
-          }
         }
       }
 
       .type {
         font-size: 0;
+        padding-bottom: 10px;
 
         .icon-tags {
           vertical-align: middle;

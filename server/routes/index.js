@@ -87,9 +87,13 @@ router.get('/window', async ctx => {
 
 // /api/app/outside
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.1.10',
-  port: 10002
+  host: '172.18.1.153',
+  port: 10002,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=8138dfaf-f574-4919-ab08-77c26bac50cc`
+  }
 }))
+
 
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
