@@ -1,6 +1,11 @@
 <template>
   <base-modal title="批量编辑" @closed="reset" :show.sync="visible" width="500px" class="batch-editing-customer-dialog">
 
+    <div slot="title" class="modal-title">
+      <h3>批量编辑</h3>
+      <div class="tip">（您已选择{{selectedIds.length}}条数据进行批量编辑）</div>
+    </div>
+
     <batch-form :fields="fields" ref="batchForm" :default-address="config.defaultAddress"/>
 
     <div slot="footer" class="dialog-footer">
@@ -363,6 +368,24 @@ export default {
 <style lang="scss">
 
   .batch-editing-customer-dialog {
+
+    .modal-title {
+      display: flex;
+      flex-grow: 1;
+      justify-content: flex-start;
+
+      h3 {
+        flex-grow: 0;
+        flex: unset;
+      }
+
+      .tip {
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 24px;
+        color: #666;
+      }
+    }
 
     .base-modal-body {
       padding: 10px 30px 0;
