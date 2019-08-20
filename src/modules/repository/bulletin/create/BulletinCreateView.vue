@@ -8,7 +8,7 @@
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
         <button class="base-button green-butn" @click="sumbit">发布</button>
-        <button class="base-button white-butn" @click="deleteFile">删除</button>
+        <button class="base-button white-butn" @click="deleteFile" v-if="isEdit">删除</button>
       </div>
     </div>
 
@@ -20,6 +20,8 @@ import TextTitle from './component/TextTitle.vue'
 
 import { Message } from 'element-ui';
 
+import * as RepositoryApi from '@src/api/Repository'
+
 export default {
   name: 'document-create-view',
   components: {
@@ -28,55 +30,115 @@ export default {
   data () {
     return {
       params: {
+        title: '', // 文章标题
         article: '', // 文章内容
         form: {}, // 附件
-        type: '', // 文章分类
-        tags: [],
-        selected: []
+        typeId: null, // 文章分类
+        options: [],
+        selectedUsers: [], // 选择的人员
+        selectedDepts: [], // 选择的部门
       },
       articleHtml: '',
       isSave: false,
       isEdit: false,
       interval: '',
       showAlert: true,
+      noticeId: null,
+      info: {}
     }
   },
-  created () {
+  mounted () {
     this.getArticle();
     this.saveArticle();
+    this.getTypes();
   },
   beforeDestroy() {
-    //清除定时器
+    // 清除定时器
     clearInterval(this.interval);
   },
   methods: {
-    sumbit () {
-      localStorage.removeItem('bulletin_article');
-      // TODO: 保存提交操作
-      this.$platform.alert('文章已发布成功。')
+    // 获取分类一级树状结构，每次更新一次
+    async getTypes () {
+      try {
+        let res = await RepositoryApi.getBulletinTypes();
+        if(res.success) {
+          res.result.forEach(item => {
+            item.count = 0;
+          })
+
+          this.params.options = res.result;
+          this.params.typeId = this.params.options[0].id;
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     },
 
+    // 获取编辑通知公告的内容
+    async getBulletinDetail () {
+      try {
+        let params = {
+          noticeId: this.noticeId
+        }
+        let res = await RepositoryApi.getBulletinDetail(params);
+        if(res.success) {
+          // TODO: 处理 将值付给
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
+    // 新建、编辑文章提交操作
+    async sumbit () {    
+      if(!this.paramsCheck()) return;
+
+      try {
+        let params = this.buildParams();
+        let res = await RepositoryApi.createBulletin(params);
+
+        if(res.success) {
+          localStorage.removeItem('bulletin_article');
+          this.$platform.alert('文章已发布成功。');
+          // TODO: 跳到详情页面
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    // 删除文章
     async deleteFile () {
       try {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
-        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-        // if (!result.status) {
-        //   let fromId = window.frameElement.getAttribute('fromid');
-        //   this.$platform.refreshTab(fromId);
-
-        //   window.location.reload();
-        // }
+        let params = {
+          noticeId: this.noticeId
+        }
+        let res = await RepositoryApi.deleteBulletin(params);
+        if(res.success) {
+          this.$platform.alert('文章删除成功');
+          localStorage.removeItem('bulletin_article');
+          // TODO: 跳到列表页面
+        } else {
+          this.$platform.alert(res.message);
+        }
       } catch (e) {
         console.error(e);
       }
-      localStorage.removeItem('bulletin_article');
-      // TODO: 删除文章操作
     },
 
+    // 获取带格式的文章内容
     getInput (html) {
       this.articleHtml = html
     },
 
+    // 编辑时获取文章信息
     getArticle () {
       if(this.isEdit) {
         // TODO: 编辑时获取文章信息
@@ -86,6 +148,7 @@ export default {
       }
     },
 
+    // 本地缓存文章内容，5分钟一次
     saveArticle () {
       this.interval = setInterval(() => {
         if(this.isSave) {
@@ -97,6 +160,61 @@ export default {
         }
         this.isSave = false
       }, 1000 * 60 * 5)
+    },
+
+    // 参数校验，标题、内容不允许为空
+    paramsCheck () {
+      if(!this.params.title) {
+        this.$platform.alert('请填写通知公告标题！');
+        return false;
+      }
+      if(!this.params.article) {
+        this.$platform.alert('请填写通知公告内容！');
+        return false;
+      }
+      return true;
+    },
+
+    // 构建参数
+    buildParams () {
+      let params = {
+        title: this.params.title,
+        content: this.params.article,
+        typeId: this.params.typeId,
+        attachment: [],
+      }
+
+      if(this.params.selectedUsers.length > 0) {
+        let arr = [];
+        this.params.selectedUsers.forEach(item => {
+          arr.push(item.userId)
+        })
+        params.openIds = arr.join();
+      }
+
+      if(this.params.selectedDepts.length > 0) {
+        let arr = [];
+        this.params.selectedDepts.forEach(item => {
+          let array = item.id.split('_');
+          let id = array[array.length - 1]
+          arr.push(id);
+        })
+        params.dingIds = arr.join();
+      }
+
+      if(this.params.form.attachments && this.params.form.attachments.length > 0) {
+        params.attachment = this.params.form.attachments;
+      }
+
+      if(this.params.typeId) {
+        this.params.options.forEach(item => {
+          if(item.id == this.params.typeId) {
+            params.type = item.name;
+          }
+        })
+      }
+
+      return params;
     }
   },
   watch: {

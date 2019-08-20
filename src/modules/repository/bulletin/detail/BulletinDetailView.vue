@@ -4,10 +4,18 @@
     <div class="detail-top">
 
       <div class="author">
-        <img class="author-img" :src="info.author.img">
+        <img class="author-img" :src="author.img">
         <div class="author-info">
-          <p class="name">{{info.author.name}}</p>
-          <p class="time">发布于：{{info.author.time}}</p>
+          <p class="name">{{info.createUser}}</p>
+          <p class="time">创建于：{{info.createTime | fmt_datetime}}</p>
+        </div>
+      </div>
+
+      <div class="author">
+        <img class="author-img" :src="author.img">
+        <div class="author-info">
+          <p class="name">{{info.updateUser}}</p>
+          <p class="time">最后编辑：{{info.updateTime | fmt_datetime}}</p>
         </div>
       </div>
 
@@ -33,12 +41,12 @@
 
       <div class="info">
         <p class="title">{{info.title}}</p>
-        <div class="content">{{info.content}}</div>
+        <div class="content" ref="content"></div>
       </div>
       <!-- 详情页脚部分 -->
       <div class="footer">
         <!-- 已读、未读人员显示 -->
-        <div class="person">
+        <!-- <div class="person">
 
           <div class="read-person">
             <span class="title">已读</span>
@@ -68,7 +76,7 @@
             </div>
           </div>
 
-        </div>
+        </div> -->
         <!-- 附件部分 -->
         <div class="annex">
           <span class="annex-left">附件：</span>
@@ -89,12 +97,14 @@
 <script>
 import * as RepositoryApi from '@src/api/Repository'
 
+import { fmt_GMT_time } from '@src/filter/fmt'
+
 export default {
   name: 'bullet-detail',
   props: {
     noticeId: {
-      type: Number,
-      default: null
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -103,21 +113,14 @@ export default {
       articleId: 'NIHIF678', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
       params: {
-        noticeId: this.noticeId
+        noticeId: ''
       },
-      info: {
-        author: {
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-          name: '张某某',
-          time: '2019年7月7日 19:03',
-        },
-        readNum: 10086,
-        noReadNum: 3344,
-        title: '最前线|微信内测新功能，提升阅读效率没那么容易',
-        content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。正好新人导师让我看看能否把产品目前使用的FileUploader从老的组件库分离出来的，自己也查阅了相关的各种资料，对文件上传的这些事有了更进一步的了解。把这些知识点总结一下，供自己日后回顾，也供有需要的同学参考，同时也欢迎各位大牛拍砖指点共同学习。',
-        readPerson: [],
-        noReadPerson: []
-      }, // 文章详情
+      info: {}, // 文章详情
+      author: {
+        img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
+        name: '张某某',
+        time: '2019年7月7日 19:03',
+      },
       showMoreRead: false, // 是否显示已读人员浮框
       showMoreNoRead: false // 是否显示未读人员浮框
     }
@@ -131,7 +134,7 @@ export default {
     let formId = window.frameElement.getAttribute('id');
     if(formId.indexOf('bulletin_detail') != -1) this.showOpenFrame = false;
 
-    this.getReadOrNotLatest();
+    // this.getReadOrNotLatest();
   },
   methods: {
     // 获取通知公告详情
@@ -139,7 +142,10 @@ export default {
       try {
         let res = await RepositoryApi.getBulletinDetail(this.params);
         if(res.success) {
-          console.log(res.result);
+          this.info = res.result;
+          this.info.createTime = fmt_GMT_time(this.info.createTime, 0);
+          this.info.updateTime = fmt_GMT_time(this.info.updateTime, 0);
+          this.editContent();
         } else {
           this.$platform.alert(res.message);
         }
@@ -263,6 +269,10 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+
+    editContent () {
+      this.$refs.content.innerHTML = this.info.content;
     }
   },
   computed: {
@@ -272,6 +282,15 @@ export default {
 
     padding () {
       return this.showOpenFrame ? '0 50px' : '0 100px';
+    }
+  },
+
+  watch: {
+    noticeId (n) {
+      this.params.noticeId = this.noticeId;
+      this.getBulletinDetail();
+      // this.getReadOrNotLatest();
+      // this.getReadPerson();
     }
   }
 }

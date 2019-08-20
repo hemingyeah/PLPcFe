@@ -21,8 +21,8 @@
     <!-- 通知公告类型筛选 -->
     <div class="search-bottom">
       <el-select v-model="params.type" class="search-type" @change="search">
-        <el-option v-for="(item, index) in typeOptions" :key="index" :value="item.value" :label="item.label">
-          <span style="float: left">{{ item.label }}（{{ item.count }}）</span>
+        <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
+          <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
           <span style="float: right" class="type-operating">
             <i class="iconfont icon-chuanjianbaogao" style="font-size: 14px" @click.stop="editType(item)"></i>
             <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
@@ -37,9 +37,9 @@
       :title="title"
       width="500px"
       :show.sync="show">
-      <el-form>
-        <el-form-item label="分类名称">
-          <input class="title" v-model="info.name" />
+      <el-form :model="info" :rules="rules" ref="ruleForm">
+        <el-form-item label="分类名称" prop="name">
+          <el-input class="title" v-model="info.name"></el-input>
         </el-form-item>
       </el-form>
 
@@ -57,25 +57,7 @@ export default {
   name: 'list-search',
   data () {
     return {
-      typeOptions: [{
-        value: 'Beijing',
-        label: '北京'
-      }, {
-        value: 'Shanghai',
-        label: '上海'
-      }, {
-        value: 'Nanjing',
-        label: '南京'
-      }, {
-        value: 'Chengdu',
-        label: '成都'
-      }, {
-        value: 'Shenzhen',
-        label: '深圳'
-      }, {
-        value: 'Guangzhou',
-        label: '广州'
-      }], // 类型
+      typeOptions: [], // 类型
       isSearch: false, // 搜索框显示标识
       params: {
         keyword: '',
@@ -84,6 +66,13 @@ export default {
       info: {
         name: '',
         id: null
+      },
+      rules: {
+        name: [{
+          required: true,
+          message: '请输入分类名称',
+          trigger: 'blur'
+        }]
       },
       newType: '',
       show: false,
@@ -105,7 +94,12 @@ export default {
       try {
         let res = await RepositoryApi.getBulletinTypes();
         if(res.success) {
-          console.log(res.result);
+          res.result.forEach(item => {
+            item.count = 0;
+          })
+
+          this.typeOptions = res.result;
+          this.getTypeCount();
         } else {
           this.$platform.alert(res.message);
         }
@@ -119,7 +113,11 @@ export default {
       try {
         let res = await RepositoryApi.getBulletinTypesCount();
         if(res.success) {
-          console.log(res.result);
+          this.typeOptions.forEach(item => {
+            res.result.forEach(info => {
+              if(item.id == info.typeId) item.count = info.count;
+            })
+          })
         } else {
           this.$platform.alert(res.message);
         }
@@ -176,21 +174,25 @@ export default {
       btn.click();
       this.isEdit = false;
       this.show = true;
-      this.name = '';
+      this.info.name = '';
+      this.info.id = null;
     },
 
     // 编辑分类
     editType (info) {
       let btn = document.getElementsByClassName('is-reverse')[0];
-
       btn.click();
+
       this.isEdit = true;
       this.show = true;
-      this.name = info.name;
+      this.info.name = info.name;
+      this.info.id = info.id;
     },
 
     // 删除分类
     async deleteType (info) {
+      // let btn = document.getElementsByClassName('is-reverse')[0];
+      // btn.click();
       try {
         if (!await this.$platform.confirm('确定删除该文章分类吗？')) return;
         let params = {
@@ -212,22 +214,29 @@ export default {
     // 提交编辑或添加的分类
     async sumbitType () {
       try {
-        let res;
-        if(this.isEdit) {
-          res = await RepositoryApi.updateBulletinType(this.info);
+        this.$refs.ruleForm.validate(async (valid) => {
+          if(valid) {
+            this.show = false;
+            let res;
 
-        } else {
-          res = await RepositoryApi.addBulletinType(this.info);
-        }
+            if(this.isEdit) {
+              res = await RepositoryApi.updateBulletinType(this.info);
 
-        if(res.success) {
-          let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
-          this.$platform.alert(msg);
-          this.getTypes();
-        } else {
-          this.$platform.alert(res.message);
-        }
-        this.isEdit = false;
+            } else {
+              res = await RepositoryApi.addBulletinType(this.info);
+            }
+
+            if(res.success) {
+              let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
+              this.$platform.alert(msg);
+              this.getTypes();
+            } else {
+              this.$platform.alert(res.message);
+            }
+            this.isEdit = false;
+          }
+        })
+        
       } catch (err) {
         console.error(err)
       }
@@ -331,7 +340,7 @@ export default {
     }
 
     .title {
-      width: 370px;
+      width: 360px;
     }
 
   }

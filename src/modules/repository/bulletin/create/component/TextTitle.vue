@@ -7,17 +7,20 @@
       </el-form-item>
 
       <el-form-item label="分类：" class="create-item">
-        <el-select v-model="params.type" class="search-type" @change="search">
-          <el-option v-for="(item, index) in options" :key="index" :value="item.value" :label="item.label">
+        <el-select v-model="params.typeId" class="search-type">
+          <el-option v-for="item in params.options" :key="item.id" :value="item.id" :label="item.name">
           </el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="通知范围：" class="create-item">
         <div class="range">
-          <!-- <base-contact-dept :selectedUser="selectedUser" title="选择分享人员" :showDeptCheckbox="true" @input="getData"></base-contact-dept> -->
-          <!-- <biz-team-select v-model="value.tags" multiple class="notification-range" ref="notificationRange" /> -->
-          <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="tag in params.tags" :key="tag.userId">{{tag.displayName}}</el-tag>
+          <span style="color: #999" v-if="params.selectedDepts.length > 0">部门：
+            <el-tag class="search-tag" closable @close="handleTags(tag, 'depts')" v-for="tag in params.selectedDepts" :key="tag.id">{{tag.name}}</el-tag>
+          </span>
+          <span style="color: #999; padding-left: 15px" v-if="params.selectedUsers.length > 0">人员：
+            <el-tag class="search-tag" closable @close="handleTags(tag, 'users')" v-for="tag in params.selectedUsers" :key="tag.userId">{{tag.displayName}}</el-tag>
+          </span>
           <div class="icon-add-tags-btn" @click="chooseTeam">
             <i class="iconfont icon-jia icon-addTags"></i>
           </div>
@@ -46,7 +49,6 @@
 <script>
 import platform from '@src/platform';
 import Uploader from '@src/util/uploader';
-import BaseContactDept from '@src/component/common/BaseContact/'
 
 export default {
   name: 'text-title',
@@ -77,9 +79,6 @@ export default {
     this.params.form = this.buildForm();
   },
   methods: {
-    search () {
-
-    },
     // 点击加号显示标签输入框
     chooseTeam () {
       // this.$refs.notificationRange.$el.click();
@@ -89,23 +88,27 @@ export default {
       let options = {
         title: '请选择分享人员',
         seeAllOrg: true,
-        selected: this.params.selected,
-        max
+        selectedUsers: this.params.selectedUsers,
+        selectedDepts: this.params.selectedDepts,
+        max,
+        showDeptCheckbox: true
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){
           let data = result.data || {};
           let users = data.users || [];
+          let depts = data.depts || [];
           let newValue = this.multiple ? users : users[0];
 
-          this.params.tags = newValue;
-          this.params.selected = newValue;
+          this.params.selectedUsers = newValue;
+          this.params.selectedDepts = depts;
 
           this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
         }
       })
         .catch(err => console.error(err))
     },
+
     // 添加标签，最多5个
     addTags () {
       if(this.tagValue) {
@@ -114,10 +117,16 @@ export default {
       this.inputVisible = false;
       this.tagValue = '';
     },
+
     // 删除标签
-    handleTags (tag) {
-      this.params.tags.splice(this.params.tags.indexOf(tag), 1);
+    handleTags (tag, text) {
+      if(text == 'users') {
+        this.params.selectedUsers.splice(this.params.selectedUsers.indexOf(tag), 1);
+      } else {
+        this.params.selectedDepts.splice(this.params.selectedDepts.indexOf(tag), 1);
+      }
     },
+
     // 文件存储form结构
     buildForm(){
       return {
@@ -126,6 +135,7 @@ export default {
         showInOwn: 0
       }
     },
+
     // 选择文件
     handleChange(event){
       const files = event.target.files;
@@ -162,6 +172,7 @@ export default {
         .catch(err => console.error(err))
         .then(() => this.pending = false)
     },
+
     // 触发inputclick事件选择文件
     chooseFile () {
       if(this.pending) return platform.alert('请等待文件上传完成');
@@ -172,6 +183,7 @@ export default {
       this.$refs.input.value = null;
       this.$refs.input.click();
     },
+
     // 删除文件
     deleteFile(file) {
       let index = this.params.form.attachments.indexOf(file);
@@ -179,10 +191,6 @@ export default {
         this.params.form.attachments.splice(index, 1);
       }
     },
-
-    getData (data) {
-      console.log(data);
-    }
   }
 }
 </script>

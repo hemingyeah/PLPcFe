@@ -4,11 +4,11 @@
       :title="title"
       width="500px"
       :show.sync="show">
-      <el-form>
-        <el-form-item label="分类名称">
-          <input class="title" v-model="info.name" />
+      <el-form :model="info" :rules="rules" ref="ruleForm">
+        <el-form-item label="分类名称" prop="name">
+          <el-input class="title" v-model="info.name"></el-input>
         </el-form-item>
-        <el-form-item label="父级分类">
+        <el-form-item label="父级分类" class="type-form">
           <el-select v-model="info.parentId" class="type" clearable>
             <el-option v-for="item in info.options" :key="item.value" :label="item.name" :value="item.value">
             </el-option>
@@ -40,7 +40,14 @@ export default {
   data () {
     return {
       show: false,
-      info: this.value
+      info: this.value,
+      rules: {
+        name: [{
+          required: true,
+          message: '请输入分类名称',
+          trigger: 'blur'
+        }]
+      },
     }
   },
   methods: {
@@ -48,8 +55,12 @@ export default {
       this.show = true;
     },
     sumbitType () {
-      this.show = false;
-      this.$emit('sumbitType');
+      this.$refs.ruleForm.validate((valid) => {
+        if(valid) {
+          this.show = false;
+          this.$emit('sumbitType');
+        }
+      })
     }
   }
 }
@@ -63,7 +74,15 @@ export default {
     margin: 0;
   }
 
-  .title, .type {
+  .title {
+    width: 360px;
+  }
+
+  .type-form {
+    margin-top: 20px;
+  }
+
+  .type {
     width: 370px;
   }
 
@@ -76,6 +95,6 @@ export default {
 .prompt {
   margin: 0;
   font-size: 12px;
-  color: red;
+  color: #F56C6C;
 } 
 </style>

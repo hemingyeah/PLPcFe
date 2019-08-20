@@ -25,6 +25,7 @@ import ListFooter from '../../common/ListFooter'
 import DocumentDetailView from '../detail/DocumentDetailView'
 
 import * as RepositoryApi from '@src/api/Repository'
+import { fmt_GMT_time } from '@src/filter/fmt'
 
 export default {
   data () {
@@ -65,6 +66,9 @@ export default {
         
         if(res.success) {
           this.listTotal = res.result.total;
+          res.result.list.forEach(item => {
+            item.createTime = fmt_GMT_time(item.createTime, 0);
+          })
           this.listMsg = res.result;
         } else {
           this.$platform.alert(res.message);

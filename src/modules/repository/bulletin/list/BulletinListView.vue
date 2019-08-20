@@ -33,7 +33,8 @@ export default {
         keyword: '', // 搜索的关键词
       },
       listTotal: null,
-      listMsg: {}
+      listMsg: {},
+      noticeId: null
     }
   },
   components: {
@@ -47,6 +48,7 @@ export default {
       if(params) Object.assign(this.params, params);
       try {
         let res = await RepositoryApi.getBulletinList(this.params);
+        console.log(res.result);
         
         if(res.success) {
           this.listTotal = res.result.total;

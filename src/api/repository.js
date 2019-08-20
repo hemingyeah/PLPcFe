@@ -290,7 +290,13 @@ export function deleteBulletin (noticeId) {
 /**
  * 新建通知公告
  * @param {Object} params
- * // TODO: 
+ * @param {String} params.title - 标题
+ * @param {String} params.type - 分类名称
+ * @param {String} params.typeId - 分类Id
+ * @param {String} params.openIds - 通知人员
+ * @param {String} params.dingIds - 通知部门
+ * @param {Array} params.attachment - 附件列表
+ * @param {String} params.content - 内容
  * 
  * @returns Promise<Boolean>
  */
@@ -301,7 +307,13 @@ export function createBulletin (params) {
 /**
  * 更新通知公告
  * @param {Object} params
- * // TODO: 
+ * @param {String} params.title - 标题
+ * @param {String} params.type - 分类名称
+ * @param {String} params.typeId - 分类Id
+ * @param {String} params.openIds - 通知人员
+ * @param {String} params.dingIds - 通知部门
+ * @param {Array} params.attachment - 附件列表
+ * @param {String} params.content - 内容
  * 
  * @returns Promise<Boolean>
  */
@@ -316,7 +328,7 @@ export function updateBulletin (params) {
  * @returns Promise<Object>
  */
 export function getReadOrNotLatest (noticeId) {
-  return http.get('/outside/notice/readOrNot/latest', noticeId);
+  return http.get('/outside/noticeRead/latest', noticeId);
 }
 
 /**
@@ -326,7 +338,7 @@ export function getReadOrNotLatest (noticeId) {
  * @returns Promise<Object>
  */
 export function getReadPerson (noticeId) {
-  return http.get('/outside/notice/read', noticeId);
+  return http.get('/outside/noticeRead/read', noticeId);
 }
 
 /**
@@ -336,5 +348,5 @@ export function getReadPerson (noticeId) {
  * @returns Promise<Object>
  */
 export function getUnreadPerson (noticeId) {
-  return http.get('/outside/notice/unread', noticeId);
+  return http.get('/outside/noticeRead/unread', noticeId);
 }

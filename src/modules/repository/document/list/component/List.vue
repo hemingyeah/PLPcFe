@@ -16,7 +16,7 @@
 
         <div class="item-info">
           <span class="name">{{item.createUserName}}</span>
-          <span class="time">发布于：{{item.createTime}}</span>
+          <span class="time">发布于：{{item.createTime | fmt_datetime}}</span>
           <span class="type">{{item.type}}</span>
         </div>
 
@@ -99,13 +99,9 @@ export default {
       }
     }
   },
-  created () {
-    this.highlight()
-  },
-  computed: {
-    // chooseClass (item) {
-    //   return id == 
-    // }
+  mounted () {
+    this.highlight();
+    console.log(this.value.list)
   },
   methods: {
     // 点击标签成为搜索条件

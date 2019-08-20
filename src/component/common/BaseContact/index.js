@@ -36,6 +36,11 @@ function dept(options){
     selectedUser = max === 1 ? [] : options.selected;
   }
 
+  let selectedDepts = [];
+  if(options.showDeptCheckbox && Array.isArray(options.selectedDepts)) {
+    selectedDepts = options.selectedDepts;
+  }
+
   let showLocation = !!options.allotMap;
   let action = '/security/department/user';
   if(showLocation || options.allot) action = '/task/department/user/dispatch/list';
@@ -45,6 +50,7 @@ function dept(options){
     propsData: {
       title: options.title,
       selectedUser,
+      selectedDepts,
       max,
       showTaskCount: options.showTaskCount === true,
       showUserState: options.showUserState === true,

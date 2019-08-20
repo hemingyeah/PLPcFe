@@ -29,6 +29,18 @@ export function fmt_date_16(value){
   return reg.test(value) ? value.slice(0, 16) : value;
 }
 
+/** 解析GMT时间，默认解析成北京时间，GMT时间加8小时 */
+export function fmt_GMT_time(time, jetLagHours = 8) {
+  if(!time) return new Date();
+
+  time = time.replace('T', ' ').replace('.000+0000', '');
+
+  let date = new Date(time).getTime();
+  let hours = jetLagHours * 3600 * 1000;
+
+  return new Date(date + hours);
+}
+
 /** 数字保留两位小数 */
 export function fmt_number_fixed2(value){
   // 不是数字 或 是NaN 或 是无穷，直接返回原值
@@ -60,6 +72,7 @@ const fmt = {
   fmt_date,
   fmt_datetime,
   fmt_date_16,
+  fmt_GMT_time,
   fmt_number_fixed2,
   fmt_number_int,
   fmt_address

@@ -304,8 +304,8 @@ export default {
 
     // 删除分类
     async deleteType (info) {
-      let btn = document.getElementsByClassName('is-reverse')[0];
-      btn.click();
+      // let btn = document.getElementsByClassName('is-reverse')[0];
+      // btn.click();
       try {
         let params = {
           typeId: info.id

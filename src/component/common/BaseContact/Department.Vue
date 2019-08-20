@@ -10,6 +10,7 @@
           :node-render="nodeRender"
         />
       </div>
+
       <div class="bc-user">
         <div class="bc-search">
           <label class="bc-search-inner">
@@ -34,6 +35,7 @@
           </div>
         </div>
       </div>
+
       <div class="bc-chosen" v-if="isMulti">
         <template v-if="allowCheckDept && chosenDept.length > 0">
           <h4>已选部门</h4>
@@ -127,6 +129,10 @@ export default {
       type: Boolean,
       default: false
     },
+    selectedDepts: {
+      type: Array,
+      default: () => ([])
+    },
     /* 是否查询 开始降低组织架构的选项 */
     seeAllOrg: {
       type: Boolean,
@@ -146,7 +152,13 @@ export default {
       depts: [], // 部门
       deptUserCount: {},
       selectedDept: {}, // 选中的部门
-      chosenDept: [], // 选择的部门
+      // chosenDept: [], // 选择的部门
+      chosenDept: this.selectedDepts.map(dept => {
+        return {
+          id: dept.id,
+          name: dept.name
+        }
+      }),
       // 已选择的人
       chosen: this.selectedUser.map(item => {
         return {
@@ -177,6 +189,14 @@ export default {
         displayName: user.displayName,
         staffId: user.staffId,
         head: user.head || ''
+      }
+    })
+
+    let selectedDepts = this.selectedDepts;
+    data.chosenDept = selectedDepts.map(dept => {
+      return {
+        id: dept.id,
+        name: dept.name
       }
     })
 
@@ -490,9 +510,22 @@ export default {
           }
       
           this.depts = depts;
+          this.initChosenDept(this.depts);
           this.initDeptUser(this.depts[0]); // 默认选中第一个
         })
         .catch(err => console.error(err))
+    },
+    /** 初始化选中的部门 */
+    initChosenDept (depts) {
+      this.chosenDept.forEach (chosen => {
+        depts.forEach (dept => {
+          let value = true;
+          if(chosen.id == dept.id) this.toggleDeptCheckStatus(dept, value)
+          if(dept.subDepartments.length > 0){
+            this.initChosenDept(dept.subDepartments)
+          }
+        })
+      })
     },
     /** 初始化工作状态的颜色 */
     initializeStateColor(){
