@@ -551,10 +551,15 @@ export default {
     /** 构建客户导出参数 */
     buildExportParams(checkedArr, ids) {
       let exportAll = !ids || ids.length == 0;
+      let exportSearchModel = exportAll ? {
+        ...this.buildParams(),
+        exportTotal: this.totalItems
+      } : {exportTotal: ids.length};
+
       return {
         customerChecked: checkedArr.join(','),
         data: exportAll ? '' : ids.join(','),
-        exportSearchModel: exportAll ? JSON.stringify(this.buildParams() || {}) : ''
+        exportSearchModel: JSON.stringify(exportSearchModel)
       };
     },
     /** 导出客户 */

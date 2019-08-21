@@ -857,10 +857,15 @@ export default {
 
     buildExportParams(checkedArr, ids) {
       let exportAll = !ids || !ids.length;
+      let exportSearchModel = exportAll ? {
+        ...this.buildParams(),
+        exportTotal: this.totalItems
+      } : {exportTotal: ids.length};
+
       return {
         productChecked: checkedArr.join(','),
         data: exportAll ? '' : ids.join(','),
-        exportSearchModel: exportAll ? JSON.stringify(this.buildParams() || {}) : ''
+        exportSearchModel: JSON.stringify(exportSearchModel)
       };
     },
     /** 检测导出条数 */
