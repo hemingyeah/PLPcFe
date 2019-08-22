@@ -4,26 +4,26 @@
     <div class="detail-top">
 
       <div class="author">
-        <img class="author-img" :src="info.author.img">
+        <img class="author-img" :src="author.img">
         <div class="author-info">
-          <p class="name">{{info.author.name}}</p>
-          <p class="time">发布于：{{info.author.time}}</p>
+          <p class="name">{{detail.createUserName}}</p>
+          <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
         </div>
       </div>
 
       <div class="operating" v-if="!isReview">
 
-        <div class="published" v-if="info.property == '我发布的'">
+        <div class="published" v-if="!detail.originalId">
           <span class="permission">
-            <i class="iconfont icon-suo icon-permission" v-if="info.permission"></i>
+            <i class="iconfont icon-suo icon-permission" v-if="!detail.allowShare"></i>
             <i class="iconfont icon-unie65b icon-permission" v-else></i>
-            {{info.permission ? '内部' : '外部'}}
+            {{!detail.allowShare ? '内部' : '外部'}}
           </span>
-          <span class="readNum">阅读（{{info.readNum}}）</span>
+          <span class="readNum">阅读（{{detail.readTimes}}）</span>
         </div>
 
-        <div class="draftBox" v-if="info.property == '草稿箱'">
-          <el-tag :type="info.review == '待审核' ? '' : 'danger'">{{info.review}}</el-tag>
+        <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
+          <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
 
         <span class="management">
@@ -31,7 +31,7 @@
           <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
         </span>
 
-        <span class="share" v-if="info.property == '我发布的'" @click="shareArticle">
+        <span class="share" v-if="!detail.isDraft" @click="shareBoxShow = true">
           <i class="iconfont icon-share icon-article-share"></i>
         </span>
 
@@ -41,7 +41,7 @@
 
       <div class="operating" v-else>
         <button class="base-button green-btn" @click="pass">通过</button>
-        <button class="base-button white-btn" @click="refuse">拒绝</button>
+        <button class="base-button white-btn" @click="show = true">拒绝</button>
       </div>
     </div>
 
@@ -49,27 +49,25 @@
     <div class="detail-content" :style="{padding: padding}">
 
       <div class="info">
-        <p class="title">{{info.title}}</p>
-        <div class="content">{{info.content}}</div>
+        <p class="title">{{detail.title}}</p>
+        <div class="content" ref="content">{{detail.content}}</div>
       </div>
       <!-- 详情页脚部分 -->
-      <div class="footer">
+      <div class="footer" v-if="(detail.label && detail.label.length > 0) || (detail.attachment && detail.attachment.length > 0)">
 
-        <div class="tags">
+        <div class="tags" v-if="detail.label && detail.label.length > 0">
           <i class="iconfont icon-tag icon-tags"></i>
-          <el-tag class="detail-tag" @click="handleTags(tag)" v-for="(tag,index) in info.tags" :key="index">{{tag}}</el-tag>
+          <el-tag class="detail-tag" v-for="(tag,index) in detail.label" :key="index">{{tag}}</el-tag>
         </div>
 
-        <div class="dividing-line"></div>
+        <div class="dividing-line" v-if="detail.label && detail.label.length > 0"></div>
 
-        <div class="annex">
+        <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
-            <div class="annex-item">menu.pdf</div>
-            <div class="annex-item">menu.pdf</div>
-            <!-- <div class="base-comment-attachment base-file__preview" v-if="form.attachments.length > 0">
-              <base-file-item v-for="file in form.attachments" :key="file.id" :file="file" size="small"></base-file-item>
-            </div> -->
+            <div class="base-comment-attachment base-file__preview">
+              <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
+            </div>
           </div>
         </div>
 
@@ -96,8 +94,6 @@
       <div slot="footer" class="edit-footer">
         <el-button @click="show = false">取 消</el-button>
         <el-button type="primary" class="green-btn" @click="sumbit">确 定</el-button>
-        <!-- <el-button @click="show = false">取 消</el-button>
-        <button type="button" class="btn btn-primary" @click="sumbit">确定</button> -->
       </div>
     </base-modal>
 
@@ -122,8 +118,17 @@
 </template>
 
 <script>
+import * as RepositoryApi from '@src/api/Repository'
+import * as Lang from '@src/util/lang/index.js';
+
 export default {
   name: 'document-detail',
+  props: {
+    info: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       form: this.buildForm(), // 附件存储格式
@@ -142,20 +147,10 @@ export default {
           trigger: 'blur'
         }]
       },
-      info: {
-        author: {
-          img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-          name: '张某某',
-          time: '2019年7月7日 19:03',
-        },
-        permission: true,
-        readNum: 10086,
-        tags: ['诚信', '友善', '进取'],
-        title: '最前线|微信内测新功能，提升阅读效率没那么容易',
-        content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。正好新人导师让我看看能否把产品目前使用的FileUploader从老的组件库分离出来的，自己也查阅了相关的各种资料，对文件上传的这些事有了更进一步的了解。把这些知识点总结一下，供自己日后回顾，也供有需要的同学参考，同时也欢迎各位大牛拍砖指点共同学习。',
-        property: '我发布的',
-        review: '待审核',
-      } // 文章详情
+      author: {
+        img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
+      },
+      detail: {} // 文章详情
     }
   },
   mounted () {
@@ -176,6 +171,32 @@ export default {
       }
     },
 
+    // 获取文档库详情
+    async getDocumnetDetail () {
+      try{
+        let params = {
+          wikiId: this.info.id
+        }
+        let fn = this.info.allowShare ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
+        let res = await fn(params);
+
+        if(res.success) {
+          this.detail = res.result;
+          this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
+          this.initContent();
+        } else {
+          this.$platform.alert(res.message)
+        }
+      } catch(err) {
+        console.error(err)
+      }
+    },
+    
+    // 将文章内容换为带格式的
+    initContent () {
+      this.$refs.content.innerHTML = this.detail.content;
+    },
+
     // 新页面打开通知公告详情
     openFrame () {
       let fromId = window.frameElement.getAttribute('id');
@@ -190,13 +211,52 @@ export default {
       });
     },
 
-    // 文章分享
-    shareArticle () {
-      // 外部文章分享
-      this.shareBoxShow = true;
+    // 点击加号显示标签输入框
+    choosePerson () {
+      // this.$refs.notificationRange.$el.click();
+      let max = -1;
+      
+      let options = {
+        title: '请选择分享人员',
+        seeAllOrg: true,
+        selectedUsers: this.shareInfo.selectedUsers,
+        max,
+      };
+      return this.$fast.contact.choose('dept', options).then(result => {
+        if(result.status == 0){
+          let data = result.data || {};
+          let users = data.users || [];
 
-      // 内部文章分享
-      // this.inlineShare();
+          this.shareInfo.selectedUsers = users;
+          this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+          this.submitShare();
+        }
+      })
+        .catch(err => console.error(err))
+    },
+
+    // 内部分享选择人员确定后
+    async submitShare () {
+      if(!this.shareInfo.selectedUsers) return;
+
+      try {
+        let userIds = this.shareInfo.selectedUsers.map(item => item.userId);
+        let res = await RepositoryApi.shareDocument({userIds});
+
+        if(res.success) {
+          this.$platform.alert('分享成功，该人员将会收到消息通知');
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch(err) {
+        console.error(err)
+      }
+    },
+
+    // 内部分享，选择人员或者组织
+    inlineShare () {
+      this.shareBoxShow = false;
+      this.choosePerson();
     },
 
     outlineShare () {
@@ -233,61 +293,108 @@ export default {
       this.share = '';
     },
 
-    inlineShare () {
-      this.shareBoxShow = false;
-      console.log('选人')
-      this.share = '';
-    },
+    // 编辑文章操作，查询详情接口，有人正在编辑提示不跳转
+    async editArticle () {
+      try{
+        let params = {
+          wikiId: this.info.id
+        }
+        let fn = this.info.allowShare ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
+        let res = await fn(params);
 
-    async pass () {
-      try {
-        if (!await this.$platform.confirm('确定通过该文章审核吗？')) return;
-        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-        // if (!result.status) {
-        //   let fromId = window.frameElement.getAttribute('fromid');
-        //   this.$platform.refreshTab(fromId);
+        if(res.success) {
+          let detail = res.result;
 
-        //   window.location.reload();
-        // }
-      } catch (e) {
-        console.error(e);
+          if(detail.isLock) {
+            this.$platform.alert('该文章正在被编辑，需要等待他编辑完成后才能继续编辑。')
+          } else {
+            //TODO: store存入id、权限,跳转编辑页面
+            let fromId = window.frameElement.getAttribute('id');
+      
+            this.$platform.openTab({
+              id: `wiki_create_${ this.info.id }`,
+              title: '编辑文档',
+              url: `/document/detail/${ this.info.id }`,
+              reload: true,
+              close: true,
+              fromId
+            });
+          }
+        } else {
+          this.$platform.alert(res.message)
+        }
+      } catch(err) {
+        console.error(err)
       }
-      console.log('pass');
     },
 
-    refuse () {
-      this.show = true;
-      console.log('refuse')
-    },
-
-    editArticle () {
-      // TODO: 详情查询接口
-      this.$platform.alert('该文章正在被编辑，需要等待他编辑完成后才能继续编辑。')
-    },
-
+    // 删除文章
     async deleteArticle () {
       try {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
-        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-        // if (!result.status) {
-        //   let fromId = window.frameElement.getAttribute('fromid');
-        //   this.$platform.refreshTab(fromId);
+        
+        let params = {
+          wikiId: this.detail.id
+        };
 
-        //   window.location.reload();
+        let res = RepositoryApi.deleteDocument(params);
+
+        if(res.success) {
+          this.$platform.alert('文章已删除成功。')
+        } else {
+          this.$platform.alert(res.message);
+        }
+
+      } catch (e) {
+        console.error(e);
+      }
+    },
+
+    // 拒绝审核
+    async sumbit () {
+      this.$refs.rulesForm.validate((valid) => {
+        if (valid) {
+          // try {
+          //   let params = {
+          //     wikiId: this.detail.id,
+          //     msg: this.refuseInfo.text
+          //   }
+          //   //TODO: 拒绝审核接口
+          //   let res = await RepositoryApi.
+
+          //   if(res.success) {
+          //     this.$platform.alert('已拒绝该文章审核')
+          //     this.show = false;
+          //   } else {
+          //     this.$platform.alert(res.message)
+          //   }
+          // } catch(err) {
+          //   console.error(err)
+          // }
+        }
+      })
+    },
+
+    // 通过审核
+    async pass () {
+      try {
+        if (!await this.$platform.confirm('确定通过该文章审核吗？')) return;
+        // let params = {
+        //   wikiId: this.detail.id,
+        // }
+        // //TODO: 审核通过接口
+        // let res = await RepositoryApi.
+
+        // if(res.success) {
+        //   this.$platform.alert('已通过该文章审核')
+        // } else {
+        //   this.$platform.alert(res.message)
         // }
       } catch (e) {
         console.error(e);
       }
     },
 
-    sumbit () {
-      this.$refs.rulesForm.validate((valid) => {
-        if (valid) {
-          console.log(this.refuseInfo.text);
-          this.show = false;
-        }
-      })
-    }
   },
   computed: {
     height () {
@@ -296,6 +403,15 @@ export default {
 
     padding () {
       return this.showOpenFrame ? '0 50px' : '0 100px';
+    }
+  },
+  watch: {
+    'info': {
+      handler (n) {
+        this.getDocumnetDetail();
+      },
+      deep: true,
+      immediate: true
     }
   }
 }
@@ -450,6 +566,12 @@ export default {
         font-size: 16px;
         line-height: 30px;
         padding-bottom: 30px;
+
+        word-break: break-all;
+
+        p > img {
+          width: 100%;
+        }
       }
     }
 
@@ -462,13 +584,16 @@ export default {
       .tags {
         display: inline-block;
         vertical-align: top;
+        font-size: 0;
 
         .icon-tags {
+          vertical-align: middle;
           font-size: 16px;
           color: #B0BCC3;
         }
 
         .detail-tag {
+          vertical-align: middle;
           max-width: 76px;
           overflow: hidden;
           white-space: nowrap;
@@ -499,6 +624,7 @@ export default {
           vertical-align: top;
           display: inline-block;
           font-size: 14px;
+          line-height: 35px;
         }
 
         .annex-right {
@@ -532,5 +658,9 @@ export default {
       border: transparent;
     }
   }
+}
+
+.base-file-del {
+  display: none;
 }
 </style>

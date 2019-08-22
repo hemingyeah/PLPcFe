@@ -44,7 +44,7 @@ export default {
       interval: '',
       showAlert: true,
       noticeId: null,
-      info: {}
+      info: {},
     }
   },
   mounted () {
@@ -182,6 +182,10 @@ export default {
         content: this.params.article,
         typeId: this.params.typeId,
         attachment: [],
+      }
+
+      if(this.isEdit) {
+        params.id = this.noticeId;
       }
 
       if(this.params.selectedUsers.length > 0) {

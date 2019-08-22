@@ -7,7 +7,8 @@
       </el-form-item>
 
       <el-form-item label="分类：" class="create-item">
-        <el-cascader :options="options" clearable class="type" v-model="params.type"></el-cascader>
+        <el-cascader :options="params.options" clearable class="type" v-model="params.typeId" filterable>
+        </el-cascader>
       </el-form-item>
 
       <el-form-item label="权限：" class="create-item">
@@ -28,16 +29,16 @@
       </el-form-item>
 
       <el-form-item label="标签：" class="create-item">
-        <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="(tag,index) in params.tags" :key="index">{{tag}}</el-tag>
+        <el-tag class="search-tag" closable @close="handleTags(tag)" v-for="(tag,index) in params.label" :key="index">{{tag}}</el-tag>
         <el-input v-if="inputVisible" class="input-new-tag" @keyup.enter.native="addTags" @blur="addTags" v-model="tagValue" ref="saveTagInput"></el-input>
-        <div class="icon-add-tags-btn" @click="showInput" v-if="!inputVisible && params.tags.length < 4">
+        <div class="icon-add-tags-btn" @click="showInput" v-if="!params.label || (!inputVisible && params.label.length < 4)">
           <i class="iconfont icon-jia icon-addTags"></i>
         </div>
       </el-form-item>
 
       <el-form-item label="附件列表：" class="create-item">
         <div class="file">
-          <div class="base-comment-attachment base-file__preview file-item" v-if="params.form.attachments.length > 0">
+          <div class="base-comment-attachment base-file__preview file-item" v-if="params.form.attachments && params.form.attachments.length > 0">
             <base-file-item v-for="file in params.form.attachments" :key="file.id" :file="file" @delete="deleteFile" size="small"></base-file-item>
           </div>
           <button type="button" class="base-comment-tool file-button" @click="chooseFile">
@@ -96,7 +97,7 @@ export default {
     addTags () {
       if(this.tagValue) {
         if (this.tagValue.length <= 10) {
-          this.params.tags.push(this.tagValue);
+          this.params.label.push(this.tagValue);
         } else {
           this.$platform.alert('标签最多只支持10个字符。');
         }

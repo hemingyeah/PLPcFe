@@ -65,8 +65,6 @@ export default {
       tagValue: '', // 添加的标签
       options: [], // 文章分类
       pending: false,
-      selectedUser: [],
-      multiple: true,
     }
   },
   computed: {
@@ -82,11 +80,10 @@ export default {
     // 点击加号显示标签输入框
     chooseTeam () {
       // this.$refs.notificationRange.$el.click();
-      let max = 1;
-      if(this.multiple) max = null == this.max ? -1 : parseInt(this.max)
+      let max = -1;
       
       let options = {
-        title: '请选择分享人员',
+        title: '请选择推送部门或人员',
         seeAllOrg: true,
         selectedUsers: this.params.selectedUsers,
         selectedDepts: this.params.selectedDepts,
@@ -98,7 +95,8 @@ export default {
           let data = result.data || {};
           let users = data.users || [];
           let depts = data.depts || [];
-          let newValue = this.multiple ? users : users[0];
+          let newValue = users;
+          console.log(data);
 
           this.params.selectedUsers = newValue;
           this.params.selectedDepts = depts;

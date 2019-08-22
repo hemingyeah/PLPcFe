@@ -22,10 +22,20 @@ router.get('/document/create', async ctx => {
   let result = await HttpClient.request('/document/create', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
-  ctx.body = Template.renderWithHtml('新建文档库', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('新建文档', body, script, modConfig.template)
 })
 
-router.get('/document/detail', async ctx => {
+router.get('/document/detail/:id', async ctx => {
+  let script = ['/document.create.js'];
+  let modConfig = modules['document.create'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request('/document/create', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('编辑文档', body, script, modConfig.template)
+})
+
+router.get('/document/detail/:id', async ctx => {
   let script = ['/document.detail.js'];
   let modConfig = modules['document.detail'];
   let reqHeaders = ctx.request.headers;
@@ -55,7 +65,17 @@ router.get('/bulletin/create', async ctx => {
   ctx.body = Template.renderWithHtml('新建通知公告', body, script, modConfig.template)
 })
 
-router.get('/bulletin/detail', async ctx => {
+router.get('/bulletin/detail/:id', async ctx => {
+  let script = ['/bulletin.create.js'];
+  let modConfig = modules['bulletin.create'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request('/bulletin/create', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('编辑通知公告', body, script, modConfig.template)
+})
+
+router.get('/bulletin/detail/:id', async ctx => {
   let script = ['/bulletin.detail.js'];
   let modConfig = modules['bulletin.detail'];
   let reqHeaders = ctx.request.headers;

@@ -70,3 +70,29 @@ export function stringLen(str) {
   }
   return len;
 }
+
+/**  
+ * @description 格式化日期时间
+ * @param {String} str -- 格式 2019-08-20 14:00:00
+ * @returns {Date} date 对象
+*/
+export function parseDateTime(str) {
+  let date = (
+    /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\s((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$)/.test(str)
+      ? new Date(str.replace(/-/g, '/'))
+      : new Date()
+  );
+
+  return date;
+}
+
+export function fmt_gmt_time(time, jetLagHours = 8) {
+  if(!time) return new Date();
+
+  time = time.replace('T', ' ').replace('.000+0000', '');
+
+  let date = this.parseDateTime(time).getTime();
+  let hours = jetLagHours * 3600 * 1000;
+
+  return new Date(date + hours);
+}

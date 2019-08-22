@@ -35,7 +35,7 @@ function dept(options){
   if(Array.isArray(options.selected)) {
     selectedUser = max === 1 ? [] : options.selected;
   }
-
+  
   let selectedDepts = [];
   if(options.showDeptCheckbox && Array.isArray(options.selectedDepts)) {
     selectedDepts = options.selectedDepts;

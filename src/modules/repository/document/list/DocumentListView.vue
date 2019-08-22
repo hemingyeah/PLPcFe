@@ -12,7 +12,7 @@
 
     <!-- 右侧详情 -->
     <div class="document-list-right">
-      <document-detail></document-detail>
+      <document-detail :info="info" ref="documentDetail"></document-detail>
     </div>
     
   </div>
@@ -25,27 +25,28 @@ import ListFooter from '../../common/ListFooter'
 import DocumentDetailView from '../detail/DocumentDetailView'
 
 import * as RepositoryApi from '@src/api/Repository'
-import { fmt_GMT_time } from '@src/filter/fmt'
+import * as Lang from '@src/util/lang/index.js';
 
 export default {
   data () {
     return {
       params: {
-        label: '',
-        keyword: '', // 搜索的关键词
+        // label: '',
+        // keyword: '', // 搜索的关键词
         pageNum: 1,
         pageSize: 20,
-        orderDetail: {
-          isSystem: 1,
-          column: 'createTime',
-          type: '',
-          sequence: 'desc'
-        },
-        view: 'all',
+        // orderDetail: {
+        //   isSystem: 1,
+        //   column: 'createTime',
+        //   type: '',
+        //   sequence: 'desc'
+        // },
+        // view: '',
       },
       tag: {}, // 选中的标签
       listTotal: null,
-      listMsg: {}
+      listMsg: {},
+      info: {}
     }
   },
   components: {
@@ -54,7 +55,7 @@ export default {
     [ListFooter.name]: ListFooter,
     [DocumentDetailView.name]: DocumentDetailView
   },
-  mounted () {
+  created () {
     this.search()
   },
   methods: {
@@ -67,9 +68,10 @@ export default {
         if(res.success) {
           this.listTotal = res.result.total;
           res.result.list.forEach(item => {
-            item.createTime = fmt_GMT_time(item.createTime, 0);
+            item.createTime = Lang.fmt_gmt_time(item.createTime, 0);
           })
           this.listMsg = res.result;
+          this.info = this.listMsg[0];
         } else {
           this.$platform.alert(res.message);
         }
@@ -87,8 +89,10 @@ export default {
     },
 
     toDetail (item) {
-      // TODO: 将id传入详情
+      // TODO: 将id、权限传入详情
+      this.info = item;
     },
+    
   }
 }
 </script>

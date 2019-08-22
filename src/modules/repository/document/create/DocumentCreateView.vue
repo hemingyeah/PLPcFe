@@ -4,12 +4,12 @@
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
-      <base-editor v-model="params.article" @input="getInput"></base-editor>
+      <base-editor v-model="params.article" @input="getInput" ref="editor" :isEdit="isEdit"></base-editor>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
         <button class="base-button green-butn" @click="saveAndSumbit">保存并提交</button>
         <button class="base-button green-butn" @click="toDraftBox">草稿箱</button>
-        <button class="base-button white-butn" @click="deleteFile">删除</button>
+        <button class="base-button white-butn" @click="deleteFile" v-if="isEdit">删除</button>
       </div>
     </div>
     <!-- 更新日志，编辑时显示 -->
@@ -20,6 +20,7 @@
 <script>
 import TextTitle from './component/TextTitle.vue'
 import UpdateLog from './component/UpdateLog.vue'
+import * as RepositoryApi from '@src/api/Repository'
 
 import { Message } from 'element-ui';
 
@@ -34,65 +35,184 @@ export default {
       params: {
         article: '', // 文章内容
         permission: '内部', // 文章权限
-        tags: [], // 标签
+        label: [], // 标签
         form: {}, // 附件
-        type: '', // 文章分类
+        typeId: [], // 文章分类
+        options: []
       },
       articleHtml: '',
       isSave: false,
       isEdit: false,
+      isToDraft: false,
+      wikiId: null,
+      allowShare: false,
+      info: {}
     }
   },
   created () {
-    this.getArticle();
-    this.saveArticle();
+    this.getTypes();
+    this.getId();
+    // 新建时开启暂存功能
+    if(!this.isEdit) this.saveArticle();
   },
   methods: {
-    saveAndSumbit () {
-      localStorage.removeItem('document_article');
-      // 开启审核功能时
-      this.$platform.alert('文章已提交成功，请等待审核。')
-      // 关闭审核功能时
-      this.$platform.alert('文章已发布成功。')
-      // TODO: 保存提交操作
+    getId () {
+      let array = window.location.href.split('/');
+      if(array[array.length - 2] == 'detail') {
+        this.wikiId = array[array.length - 1];
+        this.isEdit = true;
+      }
+      this.getArticle();
+    },
+    // 获取分类二级树状结构，每次更新一次
+    async getTypes () {
+      try {
+        let res = await RepositoryApi.getDocumentTypes();
+        if(res.success) {
+          res.result.forEach(item => {
+            item.value = item.id;
+            item.label = item.name;
+            item.children = item.subTypes;
+
+            item.children.forEach(childItem => {
+              childItem.value = childItem.id;
+              childItem.label = childItem.name;
+              childItem.count = 0;
+            })
+            item.children.unshift({
+              label: '全部',
+              value: item.id
+            })
+          })
+          this.params.options = res.result;
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     },
 
-    toDraftBox () {
-      localStorage.removeItem('document_article');
-      this.$platform.alert('文章已保存至草稿箱。')
-      // TODO: 存到草稿箱操作
+    // 保存并提交，新建、编辑调不同的接口
+    async saveAndSumbit () {
+      if(!this.paramsCheck()) return;
+      this.isToDraft = false;
+
+      try {
+        let params = this.buildParams();        
+        let res = RepositoryApi.saveAndSumbit(params);
+
+        if(res.success) {
+          localStorage.removeItem('document_article');
+          this.$platform.alert(res.message);
+          // // 开启审核功能时
+          // this.$platform.alert('文章已提交成功，请等待审核。')
+          // // 关闭审核功能时
+          // this.$platform.alert('文章已发布成功。')
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
     },
 
+    // 存到草稿箱操作
+    async toDraftBox () {
+      if(!this.paramsCheck()) return;
+      this.isToDraft = true;
+
+      try {
+        let params = this.buildParams();        
+        let res = RepositoryApi.saveDraft(params);
+
+        if(res.success) {
+          localStorage.removeItem('document_article');
+          this.$platform.alert('文章已保存至草稿箱。')
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    // 文档库或草稿删除操作，所调接口不同
     async deleteFile () {
       try {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
-        // const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
-        // if (!result.status) {
-        //   let fromId = window.frameElement.getAttribute('fromid');
-        //   this.$platform.refreshTab(fromId);
+        
+        let params = {};
 
-        //   window.location.reload();
-        // }
+        if(this.info.isDraft) {
+          params.draftId = this.wikiId;
+        } else {
+          params.wikiId = this.wikiId;
+        }
+
+        let fn = this.info.isDraft ? RepositoryApi.deletedraft : RepositoryApi.deleteDocument;
+        let res = fn(params);
+
+        if(res.success) {
+          localStorage.removeItem('document_article');
+          this.$platform.alert('文章已删除成功。')
+        } else {
+          this.$platform.alert(res.message);
+        }
+
       } catch (e) {
         console.error(e);
       }
-      localStorage.removeItem('document_article');
-      // TODO: 删除文章操作
     },
 
     getInput (html) {
       this.articleHtml = html
     },
 
-    getArticle () {
+    // 编辑时获取文章信息
+    async getArticle () {
       if(this.isEdit) {
-        // TODO: 编辑时获取文章信息
+        // this.params.article = '<p>dfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfaf</p>';
+        try{
+          let params = {
+            wikiId: this.wikiId
+          }
+          let fn = this.allowShare ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
+          let res = await fn(params);
+
+          if(res.success) {
+            let detail = res.result;
+            this.params.title = detail.title;
+            this.params.permission = detail.allowShare ? '外部' : '内部';
+            this.params.label = detail.label;
+            this.params.form.attachments = detail.attachment;
+            this.params.article = detail.content;
+            this.setType(detail.typeId);
+          } else {
+            this.$platform.alert(res.message)
+          }
+        } catch(err) {
+          console.error(err)
+        }
       } else {
         let article = localStorage.getItem('document_article');
         if (article) this.params.article = article;
+        console.log(this.params.article)
+        console.log(typeof this.params.article)
       }
     },
 
+    setType (id) {
+      this.params.options.forEach(parent => {
+        parent.children.forEach(child => {
+          if(child.value == id) {
+            this.params.typeId = [parent.value, child.value]
+          }
+        })
+      })
+    },
+
+    // 文章暂存操作，每五分钟一次，仅在新建时暂存
     saveArticle () {
       setInterval(() => {
         if(this.isSave) {
@@ -103,8 +223,51 @@ export default {
           })
         }
         this.isSave = false
-      }, 1000 * 60 * 5)
-    }
+      }, 1000 * 6)
+    },
+
+    // 构建参数
+    buildParams () {
+      let params = {
+        title: this.params.title,
+        content: this.params.article,
+        typeId: this.params.typeId[1],
+        label: this.params.label,
+        attachment: [],
+      }
+
+      // 文档保存或存草稿
+      if(!this.info.isDraft && this.isEdit) {
+        params.originalId = this.wikiId;
+      }
+      // 草稿编辑保存成草稿
+      if(this.info.isDraft && this.isEdit) {
+        params.id = this.wikiId;
+      }
+      // 草稿编辑后保存提交
+      if(this.info.isDraft && !this.isToDraft && this.isEdit) {
+        params.originalId = this.info.originalId;
+      }
+
+      if(this.params.form.attachments && this.params.form.attachments.length > 0) {
+        params.attachment = this.params.form.attachments;
+      }
+
+      return params;
+    },
+
+    // 参数校验，标题、内容不允许为空
+    paramsCheck () {
+      if(!this.params.title) {
+        this.$platform.alert('请填写通知公告标题！');
+        return false;
+      }
+      if(!this.params.article) {
+        this.$platform.alert('请填写通知公告内容！');
+        return false;
+      }
+      return true;
+    },
   },
   computed: {
     padding () {

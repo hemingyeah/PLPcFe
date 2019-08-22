@@ -49,6 +49,10 @@ export default {
     value: {
       type: String,
       default: '',
+    },
+    isEdit: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -56,31 +60,35 @@ export default {
       editor: null,
       pending: false,
       loading: false,
+      isInit: false,
     }
   },
   mounted() {
-    const _self = this;
-    this.editor = new Quill('#editor', {
-      modules: {
-        toolbar: {
-          container: _self.toolbarOptions,
-          handlers: {
-            image() {
-              _self.chooseFile(); // 1、选择文件；2、上传；3、appendChild
-            }
-          }
-        },
-      },
-      placeholder: _self.placeholder,
-      theme: 'snow'
-    });
-    // init value
-    this.editor.clipboard.dangerouslyPasteHTML(0, this.value);
-
-    this.editor.on('text-change', this.update);
-    document.addEventListener('paste', this.handlerPaste);
+    if(!this.isEdit) this.initEditor();
   },
   methods: {
+    initEditor () {
+      const _self = this;
+      this.editor = new Quill('#editor', {
+        modules: {
+          toolbar: {
+            container: _self.toolbarOptions,
+            handlers: {
+              image() {
+                _self.chooseFile(); // 1、选择文件；2、上传；3、appendChild
+              }
+            }
+          },
+        },
+        placeholder: _self.placeholder,
+        theme: 'snow'
+      });
+      // init value
+      this.editor.clipboard.dangerouslyPasteHTML(0, this.value);
+
+      this.editor.on('text-change', this.update); 
+      document.addEventListener('paste', this.handlerPaste);
+    },
     update(delta, oldDelta, source) {
       // delta 推荐的数据格式，为了兼容旧数据，文档的内容还是直接保存html
       let html = this.editor.container.firstChild.innerHTML;
@@ -157,6 +165,14 @@ export default {
     document.removeEventListener('paste', this.handlerPaste);
     this.editor.off('text-change', this.update);
   },
+  watch: {
+    value (n) {
+      if(this.isEdit && !this.isInit) {
+        this.isInit = true;
+        this.initEditor();
+      }
+    }
+  }
 }
 </script>
 

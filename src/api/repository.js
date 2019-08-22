@@ -16,7 +16,7 @@ import http from '@src/util/http';
  * @returns Promise<List>
  */
 export function getDocumentList (params) {
-  return http.post('/outside/wiki/list', params);
+  return http.post('/outside/es/wiki/list', params);
 }
 
 
@@ -89,7 +89,7 @@ export function getTypesCount (params) {
  * 
  * @returns Promise<Object>
  */
-export function getOutsideDetail (wikiId) {
+export function getInlineDetail (wikiId) {
   return http.get('/outside/wiki/get', wikiId);
 }
 

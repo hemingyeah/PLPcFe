@@ -1,7 +1,7 @@
 <template>
   <div class="document-list-container">
 
-    <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{value.total}}</span>条</div>
+    <div class="list-top" v-if="value.list && value.list.length > 0">符合搜索结果的共<span style="color: #FF7B00">{{value.total}}</span>条</div>
     
     <div class="list-content">
       <div class="list-noData" v-if="value.list && value.list.length <= 0">暂无数据</div>
@@ -32,12 +32,12 @@
           <!-- 我发布的显示权限、阅读量、分享 -->
           <div class="footer-right" v-if="!item.isDraft">
             <span class="permission">
-              <i class="iconfont icon-suo icon-permission" v-if="item.allow_share"></i>
+              <i class="iconfont icon-suo icon-permission" v-if="!item.allowShare"></i>
               <i class="iconfont icon-unie65b icon-permission" v-else></i>
-              {{item.allow_share ? '内部' : '外部'}}
+              {{!item.allowShare ? '内部' : '外部'}}
             </span>
             <span class="readNum">阅读（{{item.readTimes}}）</span>
-            <span class="share" @click="shareArticle">
+            <span class="share" @click="shareBoxShow = true">
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
           </div>
@@ -68,6 +68,8 @@
 </template>
 
 <script>
+import * as RepositoryApi from '@src/api/Repository'
+
 export default {
   name: 'list',
   props: {
@@ -85,23 +87,11 @@ export default {
       total: 18,
       id: null,
       shareBoxShow: false,
-      item: {
-        property: '我发布的',
-        title: '最前线|微信内测新功能，提升阅读效率没那么容易',
-        name: '张某某',
-        time: '2019年7月7日 19:03',
-        review: '已拒绝',
-        type: '分类1/分类1.1',
-        content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。',
-        tags: ['诚信诚信哈诚信诚信哈', '友善诚信哈', '进取诚信哈', '奋发诚信哈'],
-        permission: true,
-        readNum: 10086
-      }
+      shareInfo: {}
     }
   },
   mounted () {
     this.highlight();
-    console.log(this.value.list)
   },
   methods: {
     // 点击标签成为搜索条件
@@ -118,13 +108,52 @@ export default {
       this.$refs.title.innerHTML = this.item.title.replace(replaceReg, replaceString);
     },
 
-    // 文章分享
-    shareArticle () {
-      this.shareBoxShow = true;
-      // 外部文章分享
+    // 点击加号显示标签输入框
+    choosePerson () {
+      // this.$refs.notificationRange.$el.click();
+      let max = -1;
+      
+      let options = {
+        title: '请选择分享人员',
+        seeAllOrg: true,
+        selectedUsers: this.shareInfo.selectedUsers,
+        max,
+      };
+      return this.$fast.contact.choose('dept', options).then(result => {
+        if(result.status == 0){
+          let data = result.data || {};
+          let users = data.users || [];
 
-      // 内部文章分享
-      // this.inlineShare();
+          this.shareInfo.selectedUsers = users;
+          this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+          this.submitShare();
+        }
+      })
+        .catch(err => console.error(err))
+    },
+
+    // 内部分享选择人员确定后
+    async submitShare () {
+      if(!this.shareInfo.selectedUsers) return;
+
+      try {
+        let userIds = this.shareInfo.selectedUsers.map(item => item.userId);
+        let res = await RepositoryApi.shareDocument({userIds});
+
+        if(res.success) {
+          this.$platform.alert('分享成功，该人员将会收到消息通知');
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch(err) {
+        console.error(err)
+      }
+    },
+
+    // 内部分享，选择人员或者组织
+    inlineShare () {
+      this.shareBoxShow = false;
+      this.choosePerson();
     },
 
     // 外部分享，将连接添加至剪切板
@@ -158,19 +187,11 @@ export default {
       } else {
         this.$platform.alert('已将链接复制到剪贴板，快去粘贴吧！')
       }
-
-      this.share = '';
-    },
-
-    // 内部分享，选择人员或者组织
-    inlineShare () {
-      this.shareBoxShow = false;
-      console.log('选人')
-      this.share = '';
     },
 
     // 跳转到详情页面
     toDetail (item) {
+      this.id = item.id;
       this.$emit('toDetail', item)
     },
   },
@@ -178,6 +199,16 @@ export default {
   watch: {
     keyword (n, o) {
       this.highlight();
+    },
+    'value': {
+      handler (newValue) {
+        if(newValue.list && !this.id) {
+          this.id = newValue.list[0].id;
+          this.$emit('toDetail', newValue.list[0])
+        }
+      },
+      deep: true,
+      immediate: true
     }
   }
 }

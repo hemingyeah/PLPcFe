@@ -7,17 +7,17 @@
         <img class="author-img" :src="author.img">
         <div class="author-info">
           <p class="name">{{info.createUser}}</p>
-          <p class="time">创建于：{{info.createTime | fmt_datetime}}</p>
+          <p class="time">发布于：{{info.createTime | fmt_datetime}}</p>
         </div>
       </div>
 
-      <div class="author">
+      <!-- <div class="author">
         <img class="author-img" :src="author.img">
         <div class="author-info">
           <p class="name">{{info.updateUser}}</p>
           <p class="time">最后编辑：{{info.updateTime | fmt_datetime}}</p>
         </div>
-      </div>
+      </div> -->
 
       <div class="operating">
 
@@ -46,46 +46,46 @@
       <!-- 详情页脚部分 -->
       <div class="footer">
         <!-- 已读、未读人员显示 -->
-        <!-- <div class="person">
+        <div class="person">
 
-          <div class="read-person">
+          <div class="read-person" v-if="reads.reads.length > 0">
             <span class="title">已读</span>
-            <el-tooltip :content="item.name" placement="top" v-for="(item, index) in info.readPerson" :key="index">
-              <img class="person-img" :src="item.img" v-if="index < 5">
+            <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
+              <img class="person-img" :src="item.head" v-if="index < 5">
             </el-tooltip>
-            <div class="more-preson" v-if="info.readPerson.length > 5" @click="seeMore('read')">+{{info.readPerson.length - 5}}
+            <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">+{{reads.reads.length - 5}}
               <div class="see-more" v-if="showMoreRead" ref="seeMore">
-                <el-tooltip :content="item.name" placement="top" v-for="(item, index) in info.readPerson" :key="index">
-                  <img class="person-img" :src="item.img" v-if="index >= 5">
+                <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
+                  <img class="person-img" :src="item.head" v-if="index >= 5">
                 </el-tooltip>
               </div>
             </div>
           </div>
 
-          <div class="read-person">
+          <div class="read-person" v-if="reads.unreads.length > 0">
             <span class="title right">未读</span>
-            <el-tooltip :content="item.name" placement="top" v-for="(item, index) in info.noReadPerson" :key="index">
-              <img class="person-img" :src="item.img" v-if="index < 5">
+            <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
+              <img class="person-img" :src="item.head" v-if="index < 5">
             </el-tooltip>
-            <div class="more-preson" v-if="info.noReadPerson.length > 5" @click="seeMore('noRead')">+{{info.noReadPerson.length - 5}}
+            <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">+{{reads.unreads.length - 5}}
               <div class="see-more" v-if="showMoreNoRead" ref="seeMore">
-                <el-tooltip :content="item.name" placement="top" v-for="(item, index) in info.noReadPerson" :key="index">
-                  <img class="person-img" :src="item.img" v-if="index >= 5">
+                <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
+                  <img class="person-img" :src="item.head" v-if="index >= 5">
                 </el-tooltip>
               </div>
             </div>
           </div>
 
-        </div> -->
+        </div>
         <!-- 附件部分 -->
-        <div class="annex">
+        <div class="annex" v-if="info.attachment && info.attachment.length > 0">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
-            <div class="annex-item">menu.pdf</div>
-            <div class="annex-item">menu.pdf</div>
-            <!-- <div class="base-comment-attachment base-file__preview" v-if="form.attachments.length > 0">
-              <base-file-item v-for="file in form.attachments" :key="file.id" :file="file" size="small"></base-file-item>
-            </div> -->
+            <!-- <div class="annex-item">menu.pdf</div>
+            <div class="annex-item">menu.pdf</div> -->
+            <div class="base-comment-attachment base-file__preview">
+              <base-file-item v-for="file in info.attachment" :key="file.id" :file="file" size="small"></base-file-item>
+            </div>
           </div>
         </div>
         
@@ -97,7 +97,7 @@
 <script>
 import * as RepositoryApi from '@src/api/Repository'
 
-import { fmt_GMT_time } from '@src/filter/fmt'
+import * as Lang from '@src/util/lang/index.js';
 
 export default {
   name: 'bullet-detail',
@@ -116,6 +116,10 @@ export default {
         noticeId: ''
       },
       info: {}, // 文章详情
+      reads: {
+        reads: [],
+        unreads: []
+      },
       author: {
         img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
         name: '张某某',
@@ -132,9 +136,7 @@ export default {
       return;
     }
     let formId = window.frameElement.getAttribute('id');
-    if(formId.indexOf('bulletin_detail') != -1) this.showOpenFrame = false;
-
-    // this.getReadOrNotLatest();
+    if(formId.indexOf('bulletin_detail') != -1) this.showOpenFrame = false; 
   },
   methods: {
     // 获取通知公告详情
@@ -143,9 +145,9 @@ export default {
         let res = await RepositoryApi.getBulletinDetail(this.params);
         if(res.success) {
           this.info = res.result;
-          this.info.createTime = fmt_GMT_time(this.info.createTime, 0);
-          this.info.updateTime = fmt_GMT_time(this.info.updateTime, 0);
-          this.editContent();
+          this.info.createTime = Lang.fmt_gmt_time(this.info.createTime, 0);
+          this.info.updateTime = Lang.fmt_gmt_time(this.info.updateTime, 0);
+          this.initContent();
         } else {
           this.$platform.alert(res.message);
         }
@@ -159,7 +161,9 @@ export default {
       try {
         let res = await RepositoryApi.getReadOrNotLatest(this.params);
         if(res.success) {
-          console.log(res.result);
+          this.reads.reads = res.result.reads;
+          this.reads.unreads = res.result.unreads;
+          console.log(this.reads);
         } else {
           this.$platform.alert(res.message);
         }
@@ -271,7 +275,7 @@ export default {
       }
     },
 
-    editContent () {
+    initContent () {
       this.$refs.content.innerHTML = this.info.content;
     }
   },
@@ -289,7 +293,7 @@ export default {
     noticeId (n) {
       this.params.noticeId = this.noticeId;
       this.getBulletinDetail();
-      // this.getReadOrNotLatest();
+      this.getReadOrNotLatest();
       // this.getReadPerson();
     }
   }
@@ -498,6 +502,7 @@ export default {
           vertical-align: top;
           display: inline-block;
           font-size: 14px;
+          line-height: 35px;
         }
 
         .annex-right {
@@ -511,5 +516,9 @@ export default {
       }
     }
   }
+}
+
+.base-file-del {
+  display: none;
 }
 </style>

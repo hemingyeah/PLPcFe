@@ -61,7 +61,7 @@ export default {
     },
 
     toDetail (item) {
-      this.id = '0c389aa8-a121-11e9-bfc9-00163e304a25';
+      this.id = '02900f0c-c481-11e9-bfc9-00163e304a25';
       let info = {
         id: this.id
       }

@@ -85,7 +85,7 @@ export default {
           type: '',
           sequence: 'desc'
         },
-        view: 'all',
+        view: '',
       },
       info: { // 新建、编辑type对象
         name: '',
@@ -110,7 +110,7 @@ export default {
     async initView () {
       try {
         let options = [{
-          value: 'all',
+          value: '',
           label: ''
         }, {
           value: 'my',
@@ -123,7 +123,7 @@ export default {
 
         if(res.success) {
           options.forEach(item => {
-            if(item.value == 'all') item.label = `全部（${ res.result.all }）`;
+            if(item.value == '') item.label = `全部（${ res.result.all }）`;
             if(item.value == 'my') item.label = `我发布的（${ res.result.my }）`;
             if(item.value == 'draft') item.label = `草稿箱（${ res.result.draft }）`;
           })
