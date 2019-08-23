@@ -37,7 +37,7 @@
               {{!item.allowShare ? '内部' : '外部'}}
             </span>
             <span class="readNum">阅读（{{item.readTimes}}）</span>
-            <span class="share" @click="shareBoxShow = true">
+            <span class="share" @click="shareDocument(item)">
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
           </div>
@@ -80,12 +80,16 @@ export default {
     value: {
       type: Object,
       default: () => ({})
+    },
+    id: {
+      type: String,
+      default: ''
     }
   },
   data () {
     return {
       total: 18,
-      id: null,
+      // id: null,
       shareBoxShow: false,
       shareInfo: {}
     }
@@ -109,7 +113,7 @@ export default {
     },
 
     // 点击加号显示标签输入框
-    choosePerson () {
+    choosePerson (item) {
       // this.$refs.notificationRange.$el.click();
       let max = -1;
       
@@ -126,22 +130,22 @@ export default {
 
           this.shareInfo.selectedUsers = users;
           this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
-          this.submitShare();
+          this.submitShare(item);
         }
       })
         .catch(err => console.error(err))
     },
 
     // 内部分享选择人员确定后
-    async submitShare () {
+    async submitShare (item) {
       if(!this.shareInfo.selectedUsers) return;
 
       try {
         let userIds = this.shareInfo.selectedUsers.map(item => item.userId);
-        let res = await RepositoryApi.shareDocument({userIds});
+        let res = await RepositoryApi.shareDocument(item.id, userIds);
 
         if(res.success) {
-          this.$platform.alert('分享成功，该人员将会收到消息通知');
+          this.$platform.alert('分享成功，该分享人员将会收到消息通知');
         } else {
           this.$platform.alert(res.message);
         }
@@ -150,10 +154,18 @@ export default {
       }
     },
 
+    shareDocument (item) {
+      if(item.allowShare) {
+        this.shareBoxShow = true
+      } else {
+        this.inlineShare(item);
+      }
+    },
+
     // 内部分享，选择人员或者组织
-    inlineShare () {
+    inlineShare (item) {
       this.shareBoxShow = false;
-      this.choosePerson();
+      this.choosePerson(item);
     },
 
     // 外部分享，将连接添加至剪切板
@@ -191,26 +203,18 @@ export default {
 
     // 跳转到详情页面
     toDetail (item) {
-      this.id = item.id;
+      // this.id = item.id;
+      this.$emit('update:id', item.id);
       this.$emit('toDetail', item)
     },
   },
   
-  watch: {
-    keyword (n, o) {
-      this.highlight();
-    },
-    'value': {
-      handler (newValue) {
-        if(newValue.list && !this.id) {
-          this.id = newValue.list[0].id;
-          this.$emit('toDetail', newValue.list[0])
-        }
-      },
-      deep: true,
-      immediate: true
-    }
-  }
+  // watch: {
+  //   keyword (n, o) {
+  //     console.log(n)
+  //     // this.highlight();
+  //   }
+  // }
 }
 </script>
 

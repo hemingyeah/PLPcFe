@@ -4,10 +4,11 @@
     <div class="detail-top">
 
       <div class="author">
-        <img class="author-img" :src="author.img">
+        <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
+        <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
         <div class="author-info">
-          <p class="name">{{info.createUser}}</p>
-          <p class="time">发布于：{{info.createTime | fmt_datetime}}</p>
+          <p class="name">{{detail.createUserName}}</p>
+          <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
         </div>
       </div>
 
@@ -22,12 +23,12 @@
       <div class="operating">
 
         <div class="common">
-          <span class="item-num">已读（{{info.readNum}}）</span>
-          <span class="item-num">未读（{{info.noReadNum}}）</span>
+          <span class="item-num">已读（{{detail.readNum}}）</span>
+          <span class="item-num">未读（{{detail.unreadNum}}）</span>
         </div>
 
         <span class="management">
-          <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
+          <!-- <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i> -->
           <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
         </span>
 
@@ -40,11 +41,11 @@
     <div class="detail-content" :style="{padding: padding}">
 
       <div class="info">
-        <p class="title">{{info.title}}</p>
+        <p class="title">{{detail.title}}</p>
         <div class="content" ref="content"></div>
       </div>
       <!-- 详情页脚部分 -->
-      <div class="footer">
+      <div class="footer" v-if="reads.reads.length > 0 && reads.unreads.length > 0 && detail.attachment && detail.attachment.length > 0">
         <!-- 已读、未读人员显示 -->
         <div class="person">
 
@@ -52,25 +53,29 @@
             <span class="title">已读</span>
             <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
               <img class="person-img" :src="item.head" v-if="index < 5">
+              <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
             </el-tooltip>
             <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">+{{reads.reads.length - 5}}
               <div class="see-more" v-if="showMoreRead" ref="seeMore">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
                   <img class="person-img" :src="item.head" v-if="index >= 5">
+                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
                 </el-tooltip>
               </div>
             </div>
           </div>
 
           <div class="read-person" v-if="reads.unreads.length > 0">
-            <span class="title right">未读</span>
+            <span class="title right" :style="{marginLeft: marginLeft}">未读</span>
             <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
-              <img class="person-img" :src="item.head" v-if="index < 5">
+              <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
+              <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
             </el-tooltip>
             <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">+{{reads.unreads.length - 5}}
               <div class="see-more" v-if="showMoreNoRead" ref="seeMore">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
-                  <img class="person-img" :src="item.head" v-if="index >= 5">
+                  <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
+                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
                 </el-tooltip>
               </div>
             </div>
@@ -78,13 +83,13 @@
 
         </div>
         <!-- 附件部分 -->
-        <div class="annex" v-if="info.attachment && info.attachment.length > 0">
+        <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
             <!-- <div class="annex-item">menu.pdf</div>
             <div class="annex-item">menu.pdf</div> -->
             <div class="base-comment-attachment base-file__preview">
-              <base-file-item v-for="file in info.attachment" :key="file.id" :file="file" size="small"></base-file-item>
+              <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
             </div>
           </div>
         </div>
@@ -97,25 +102,24 @@
 <script>
 import * as RepositoryApi from '@src/api/Repository'
 
-import * as Lang from '@src/util/lang/index.js';
-
 export default {
   name: 'bullet-detail',
   props: {
-    noticeId: {
-      type: String,
-      default: ''
+    info: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {
     return {
+      noticeId: '',
       form: this.buildForm(), // 附件存储格式
       articleId: 'NIHIF678', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
       params: {
         noticeId: ''
       },
-      info: {}, // 文章详情
+      detail: {}, // 文章详情
       reads: {
         reads: [],
         unreads: []
@@ -130,6 +134,7 @@ export default {
     }
   },
   mounted () {
+    this.getId();
     // 根据formId来判断是否是在新页面打开
     if(!window.frameElement) {
       this.showOpenFrame = false;
@@ -139,14 +144,24 @@ export default {
     if(formId.indexOf('bulletin_detail') != -1) this.showOpenFrame = false; 
   },
   methods: {
+    getId () {
+      if(window.location.href.indexOf('?') != -1) {
+        let array = window.location.href.split('?');
+        let params = array[1].split('=');
+        if(params[0] == 'noticeId') {
+          this.noticeId = params[1]
+        }
+        this.getBulletinDetail();
+        this.getReadOrNotLatest();
+      }
+    },
     // 获取通知公告详情
     async getBulletinDetail () {
       try {
+        this.params.noticeId = this.info.id ? this.info.id : this.noticeId
         let res = await RepositoryApi.getBulletinDetail(this.params);
         if(res.success) {
-          this.info = res.result;
-          this.info.createTime = Lang.fmt_gmt_time(this.info.createTime, 0);
-          this.info.updateTime = Lang.fmt_gmt_time(this.info.updateTime, 0);
+          this.detail = res.result;
           this.initContent();
         } else {
           this.$platform.alert(res.message);
@@ -163,7 +178,6 @@ export default {
         if(res.success) {
           this.reads.reads = res.result.reads;
           this.reads.unreads = res.result.unreads;
-          console.log(this.reads);
         } else {
           this.$platform.alert(res.message);
         }
@@ -177,7 +191,7 @@ export default {
       try {
         let res = await RepositoryApi.getReadPerson(this.params);
         if(res.success) {
-          console.log(res.result);
+          this.reads.reads = res.result;
         } else {
           this.$platform.alert(res.message);
         }
@@ -191,7 +205,7 @@ export default {
       try {
         let res = await RepositoryApi.getUnreadPerson(this.params);
         if(res.success) {
-          console.log(res.result);
+          this.reads.unreads = res.result;
         } else {
           this.$platform.alert(res.message);
         }
@@ -213,9 +227,9 @@ export default {
       let fromId = window.frameElement.getAttribute('id');
       
       this.$platform.openTab({
-        id: `bulletin_detail_${ this.articleId }`,
+        id: `bulletin_detail_${ this.params.noticeId }`,
         title: '通知公告详情',
-        url: `/bulletin/detail?id=${ this.articleId }`,
+        url: `/bulletin/detail?noticeId=${ this.params.noticeId }`,
         reload: true,
         close: true,
         fromId
@@ -266,7 +280,8 @@ export default {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
         let res = await RepositoryApi.deleteBulletin(this.params);
         if(res.success) {
-          console.log(res.result);
+          this.$platform.alert('文章已删除成功。')
+          this.$emit('search')
         } else {
           this.$platform.alert(res.message);
         }
@@ -276,7 +291,7 @@ export default {
     },
 
     initContent () {
-      this.$refs.content.innerHTML = this.info.content;
+      this.$refs.content.innerHTML = this.detail.content;
     }
   },
   computed: {
@@ -286,22 +301,32 @@ export default {
 
     padding () {
       return this.showOpenFrame ? '0 50px' : '0 100px';
+    },
+
+    marginLeft () {
+      return this.reads.reads.length > 0 ? '20px' : '0'
     }
   },
 
-  watch: {
-    noticeId (n) {
-      this.params.noticeId = this.noticeId;
-      this.getBulletinDetail();
-      this.getReadOrNotLatest();
-      // this.getReadPerson();
-    }
-  }
+  // watch: {
+  //   'info': {
+  //     handler (n) {
+  //       this.getBulletinDetail();
+  //       this.getReadOrNotLatest();
+  //       // this.getReadPerson();
+  //     },
+  //     deep: true,
+  //   }
+  // }
 }
 </script>
 
 <style lang="scss">
 .bulletin-list-detail {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
   background: #fff;
 
   .detail-top {
@@ -396,6 +421,8 @@ export default {
   }
 
   .detail-content {
+    flex: 1;
+    overflow: auto;
 
     .info {
 

@@ -105,6 +105,7 @@ export default {
           localStorage.removeItem('bulletin_article');
           this.$platform.alert('文章已发布成功。');
           // TODO: 跳到详情页面
+          this.openFrame();
         } else {
           this.$platform.alert(res.message);
         }
@@ -125,12 +126,29 @@ export default {
           this.$platform.alert('文章删除成功');
           localStorage.removeItem('bulletin_article');
           // TODO: 跳到列表页面
+          this.openFrame();
         } else {
           this.$platform.alert(res.message);
         }
       } catch (e) {
         console.error(e);
       }
+    },
+
+    openFrame () {
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id);
+
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'M_INFO_NOTICE',
+        title: '通知公告',
+        url: '/bulletin/list',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
 
     // 获取带格式的文章内容

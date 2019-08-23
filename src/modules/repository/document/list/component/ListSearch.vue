@@ -48,7 +48,7 @@
         <el-option value="createTime" label="按更新时间排序"></el-option>
         <el-option value="readTimes" label="按访问量排序"></el-option>
       </el-select>
-      <el-tag class="search-tag" closable @close="tag.show = false" v-if="tag.show">{{tag.name}}</el-tag>
+      <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
     </div>
     
     <type-modal v-model="info" :title="title" @sumbitType="sumbitType" ref="typeModal"></type-modal>
@@ -345,17 +345,18 @@ export default {
       } catch (err) {
         console.error(err)
       }
-    }
-  },
+    },
 
-  watch: {
     // 标签改变时向父组件触发search事件
-    'tag': {
-      handler(newValue, oldValue) {
-        this.params.label = newValue.show ? newValue.name : '';
-        this.search();
-      },
-      deep: true,
+    setTag () {
+      this.params.label = this.tag.show ? this.tag.name : '';
+      this.search();
+    },
+
+    closeTag () {
+      this.tag.show = false;
+      this.params.label = this.tag.show ? this.tag.name : '';
+      this.search();
     }
   }
 }

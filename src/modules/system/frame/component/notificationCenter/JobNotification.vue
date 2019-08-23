@@ -137,6 +137,9 @@ export default {
       }, {
         value: 'notice',
         label: '通知公告'
+      }, {
+        value: 'wiki',
+        label: '文档库'
       }],
       dataOption: '',
       dataOptions: [{

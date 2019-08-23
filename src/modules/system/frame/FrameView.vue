@@ -7,152 +7,152 @@
         @open="openForNav"
         @collapse-changed="adjustOpenTab"/>
 
-        <div class="frame-content">
-          <header class="frame-header">
-            <div class="frame-quick">
-              <div class="frame-quick-left">
-                <button type="button" class="btn-text frame-header-btn frame-collapse frame-header-btn-bg" @click="collapse = !collapse">
-                  <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
-                </button>     
-              </div>
+      <div class="frame-content">
+        <header class="frame-header">
+          <div class="frame-quick">
+            <div class="frame-quick-left">
+              <button type="button" class="btn-text frame-header-btn frame-collapse frame-header-btn-bg" @click="collapse = !collapse">
+                <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
+              </button>     
+            </div>
 
-              <div class="frame-quick-notification" v-show="notificationShow">
-                <div class="frame-quick-notification-info" ref="notificationInfo">
-                  <div class="frame-quick-notification-content" ref="notificationContent">
-                    <p ref="notificationText" class="frame-quick-notification-text">{{ notification.title }}</p>
-                  </div>
+            <div class="frame-quick-notification" v-show="notificationShow">
+              <div class="frame-quick-notification-info" ref="notificationInfo">
+                <div class="frame-quick-notification-content" ref="notificationContent">
+                  <p ref="notificationText" class="frame-quick-notification-text">{{ notification.title }}</p>
                 </div>
-                <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
-                  <i class="iconfont icon-chahao"></i>
-                </button>
               </div>
+              <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
+                <i class="iconfont icon-chahao"></i>
+              </button>
+            </div>
 
-              <!-- profile -->
-              <div class="frame-quick-right">
-                <el-popover v-if="showDevTool">
-                  <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference">
-                    <i class="iconfont icon-experiment"></i>
-                  </button> 
+            <!-- profile -->
+            <div class="frame-quick-right">
+              <el-popover v-if="showDevTool">
+                <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference">
+                  <i class="iconfont icon-experiment"></i>
+                </button> 
 
-                  <div class="dev-tool-menu">
-                    <a href="javascript:;" @click="clearStorage">清空缓存</a>
-                    <a href="javascript:;" @click="openDemo">demo</a>
-                    <a href="javascript:;" @click="goRoleTeam">团队管理</a>
-                    <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
-                    <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
-                    <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
-                  </div>
-                </el-popover>
+                <div class="dev-tool-menu">
+                  <a href="javascript:;" @click="clearStorage">清空缓存</a>
+                  <a href="javascript:;" @click="openDemo">demo</a>
+                  <a href="javascript:;" @click="goRoleTeam">团队管理</a>
+                  <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
+                  <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
+                  <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
+                </div>
+              </el-popover>
         
-                <button 
-                  type="button" class="btn-text frame-header-btn frame-header-btn-bg"
-                  @click="openHelpDoc"
-                  title="帮助文档" v-tooltip>
-                  <i class="iconfont icon-bangzhu"></i>
-                </button>
+              <button 
+                type="button" class="btn-text frame-header-btn frame-header-btn-bg"
+                @click="openHelpDoc"
+                title="帮助文档" v-tooltip>
+                <i class="iconfont icon-bangzhu"></i>
+              </button>
 
-                <button 
-                  type="button" class="btn-text frame-header-btn frame-header-btn-bg" 
-                  @click="openSaleManager"
-                  title="专属客服" v-tooltip>
-                  <i class="iconfont icon-kefu"></i>
-                </button>
+              <button 
+                type="button" class="btn-text frame-header-btn frame-header-btn-bg" 
+                @click="openSaleManager"
+                title="专属客服" v-tooltip>
+                <i class="iconfont icon-kefu"></i>
+              </button>
 
-                <el-popover trigger="click" :value="exportPopperVisible" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
-                  <button type="button" :title="backgroundTaskTitle" v-tooltip class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
-                    <i class="iconfont icon-xiazai"></i>
-                  </button>
-                  <!-- start 导入导出下载 -->
-                  <import-and-export-view
-                    :title="backgroundTaskTitle" 
-                    :source-list="exportList" 
-                    @change="operationListChange"
-                  >
-                  </import-and-export-view>
+              <el-popover trigger="click" :value="exportPopperVisible" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
+                <button type="button" :title="backgroundTaskTitle" v-tooltip class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
+                  <i class="iconfont icon-xiazai"></i>
+                </button>
+                <!-- start 导入导出下载 -->
+                <import-and-export-view
+                  :title="backgroundTaskTitle" 
+                  :source-list="exportList" 
+                  @change="operationListChange"
+                >
+                </import-and-export-view>
                 <!-- end 导入导出下载 -->
-                </el-popover>
-                <!--导出下载-->
+              </el-popover>
+              <!--导出下载-->
 
-                <button
-                  type="button" class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
-                  @click="openNotificationCenter"
-                  title="通知中心" v-tooltip>
-                  <span class="notification-new" v-show="notification.count && notification.count > 0">{{ msgCount || notification.count }}</span>
-                  <i class="iconfont">&#xe624;</i>
-                </button>
-
-                <!-- 个人信息 -->
-                <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
-                  <div class="frame-user-profile" slot="reference">
-                    <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
-                      <img :src="userAvatar"/>
-                      <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> 
-                    </a>
-                    <div class="user-info">
-                      <h4>{{loginUser.displayName}}</h4>
-                      <p>{{loginUser.state}}</p>
-                    </div>
-                    <i class="iconfont icon-nav-down user-profile-down"></i>
-                  </div>
-              
-                  <el-popover placement="left-start" popper-class="user-state-popper" trigger="hover" v-model="userStatePopperVisible">
-                    <div class="user-profile-item" slot="reference"><i class="iconfont icon-user-status"></i>工作状态</div>
-
-                    <div class="user-state-panel">
-                      <div 
-                        class="user-profile-item user-state-item" 
-                        v-for="(color, state) in userStateMap" :key="state"
-                        @click="chooseUserState(state)">
-                        <span class="user-color-icon" :style="{backgroundColor: color}"></span>
-                        <span>{{state}}</span>
-                      </div>
-                    </div>
-                  </el-popover>
-              
-                  <div class="user-profile-item">
-                    <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
-                  </div>
-              
-                  <div class="user-profile-item logout">
-                    <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-logout"></i>注销</a>
-                  </div>
-
-                </el-popover>
-              </div>
-            </div>
-
-            <div class="frame-tabs">
-              <button type="button" class="btn-text frame-tabs-prev" :class="{'frame-tab-highlight': prevBtnEnable}" @click="prev">
-                <i class="iconfont icon-zuoyidong"></i>
+              <button
+                type="button" class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
+                @click="openNotificationCenter"
+                title="通知中心" v-tooltip>
+                <span class="notification-new" v-show="notification.count && notification.count > 0">{{ msgCount || notification.count }}</span>
+                <i class="iconfont">&#xe624;</i>
               </button>
 
-              <!-- tabs -->
-              <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
-                <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
-                  <frame-tab 
-                    v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
-                    @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>   
+              <!-- 个人信息 -->
+              <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
+                <div class="frame-user-profile" slot="reference">
+                  <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
+                    <img :src="userAvatar"/>
+                    <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span> 
+                  </a>
+                  <div class="user-info">
+                    <h4>{{loginUser.displayName}}</h4>
+                    <p>{{loginUser.state}}</p>
+                  </div>
+                  <i class="iconfont icon-nav-down user-profile-down"></i>
                 </div>
-                <div class="frame-tabs-border"></div>
-              </div>
+              
+                <el-popover placement="left-start" popper-class="user-state-popper" trigger="hover" v-model="userStatePopperVisible">
+                  <div class="user-profile-item" slot="reference"><i class="iconfont icon-user-status"></i>工作状态</div>
 
-              <button type="button" class="btn-text frame-tabs-next" :class="{'frame-tab-highlight': nextBtnEnable}" @click="next">
-                <i class="iconfont icon-youyidong"></i>
-              </button>
+                  <div class="user-state-panel">
+                    <div 
+                      class="user-profile-item user-state-item" 
+                      v-for="(color, state) in userStateMap" :key="state"
+                      @click="chooseUserState(state)">
+                      <span class="user-color-icon" :style="{backgroundColor: color}"></span>
+                      <span>{{state}}</span>
+                    </div>
+                  </div>
+                </el-popover>
+              
+                <div class="user-profile-item">
+                  <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView"><i class="iconfont icon-people"></i>个人中心</a>
+                </div>
+              
+                <div class="user-profile-item logout">
+                  <a href="javascript:;" @click.prevent="logout"><i class="iconfont icon-logout"></i>注销</a>
+                </div>
+
+              </el-popover>
             </div>
-          </header>
-      
-          <div class="frame-main">
-            <div class="frame-tab-content">
-              <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
-                <iframe 
-                  :id="`frame_tab_${tab.id}`" :fromid="tab.fromId" :data-id="tab.id" 
-                  :src="tab.url" 
-                  @load="updateFrameTab($event,tab)" allowfullscreen/>
+          </div>
+
+          <div class="frame-tabs">
+            <button type="button" class="btn-text frame-tabs-prev" :class="{'frame-tab-highlight': prevBtnEnable}" @click="prev">
+              <i class="iconfont icon-zuoyidong"></i>
+            </button>
+
+            <!-- tabs -->
+            <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
+              <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
+                <frame-tab 
+                  v-for="tab in frameTabs" :key="tab.url" :tab="tab" 
+                  @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab"/>   
               </div>
+              <div class="frame-tabs-border"></div>
+            </div>
+
+            <button type="button" class="btn-text frame-tabs-next" :class="{'frame-tab-highlight': nextBtnEnable}" @click="next">
+              <i class="iconfont icon-youyidong"></i>
+            </button>
+          </div>
+        </header>
+      
+        <div class="frame-main">
+          <div class="frame-tab-content">
+            <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
+              <iframe 
+                :id="`frame_tab_${tab.id}`" :fromid="tab.fromId" :data-id="tab.id" 
+                :src="tab.url" 
+                @load="updateFrameTab($event,tab)" allowfullscreen/>
             </div>
           </div>
         </div>
+      </div>
 
       <version :version="releaseVersion"/>
       <sale-manager :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>

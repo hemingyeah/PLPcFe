@@ -13,7 +13,7 @@
 
       <div class="operating" v-if="!isReview">
 
-        <div class="published" v-if="!detail.originalId">
+        <div class="published" v-if="!detail.isDraft">
           <span class="permission">
             <i class="iconfont icon-suo icon-permission" v-if="!detail.allowShare"></i>
             <i class="iconfont icon-unie65b icon-permission" v-else></i>
@@ -26,16 +26,19 @@
           <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
 
-        <span class="management">
-          <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
-          <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
-        </span>
+        <div style="display: inline-block" v-if="!this.id">
+          <span class="management">
+            <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
+            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
+          </span>
 
-        <span class="share" v-if="!detail.isDraft" @click="shareBoxShow = true">
-          <i class="iconfont icon-share icon-article-share"></i>
-        </span>
+          <span class="share" v-if="!detail.isDraft" @click="shareDocument">
+            <i class="iconfont icon-share icon-article-share"></i>
+          </span>
 
-        <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
+          <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
+        </div>
+        
 
       </div>
 
@@ -60,7 +63,7 @@
           <el-tag class="detail-tag" v-for="(tag,index) in detail.label" :key="index">{{tag}}</el-tag>
         </div>
 
-        <div class="dividing-line" v-if="detail.label && detail.label.length > 0"></div>
+        <!-- <div class="dividing-line" v-if="detail.label && detail.label.length > 0"></div> -->
 
         <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
           <span class="annex-left">附件：</span>
@@ -132,7 +135,8 @@ export default {
   data () {
     return {
       form: this.buildForm(), // 附件存储格式
-      articleId: 'UGDIVUHYI98', // 通知公告id
+      id: '', // 通知公告id
+      wikiId: '',
       showOpenFrame: true, // 是否显示 新页面打开
       isReview: false,
       refuseInfo: {
@@ -150,10 +154,14 @@ export default {
       author: {
         img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
       },
-      detail: {} // 文章详情
+      detail: {}, // 文章详情
+      shareInfo: {
+        selectedUsers: []
+      }
     }
   },
   mounted () {
+    this.getId();
     // 根据formId来判断是否是在新页面打开
     if(!window.frameElement) {
       this.showOpenFrame = false;
@@ -171,13 +179,28 @@ export default {
       }
     },
 
+    getId () {
+      if(window.location.href.indexOf('?') != -1) {
+        let array = window.location.href.split('?');
+        let params = array[1].split('=');
+        if(params[0] == 'id') {
+          this.id = params[1]
+        }
+        if(params[0] == 'wikiId') {
+          this.wikiId = params[1];
+        }
+        this.getDocumnetDetail();
+      }
+    },
+
     // 获取文档库详情
     async getDocumnetDetail () {
       try{
+
         let params = {
-          wikiId: this.info.id
+          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : this.id)
         }
-        let fn = this.info.allowShare ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
+        let fn = this.id ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
         let res = await fn(params);
 
         if(res.success) {
@@ -202,9 +225,9 @@ export default {
       let fromId = window.frameElement.getAttribute('id');
       
       this.$platform.openTab({
-        id: `document_detail_${ this.articleId }`,
+        id: `document_detail_${ this.detail.id }`,
         title: '文档库详情',
-        url: `/document/detail?id=${ this.articleId }`,
+        url: `/document/detail?wikiId=${ this.detail.id }`,
         reload: true,
         close: true,
         fromId
@@ -241,15 +264,23 @@ export default {
 
       try {
         let userIds = this.shareInfo.selectedUsers.map(item => item.userId);
-        let res = await RepositoryApi.shareDocument({userIds});
+        let res = await RepositoryApi.shareDocument(this.detail.id, userIds);
 
         if(res.success) {
-          this.$platform.alert('分享成功，该人员将会收到消息通知');
+          this.$platform.alert('分享成功，该分享人员将会收到消息通知');
         } else {
           this.$platform.alert(res.message);
         }
       } catch(err) {
         console.error(err)
+      }
+    },
+
+    shareDocument () {
+      if(this.detail.allowShare) {
+        this.shareBoxShow = true
+      } else {
+        this.inlineShare();
       }
     },
 
@@ -269,7 +300,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = 'http://127.0.0.1:9000/document/detail';
+      hideTextarea.innerHTML = `http://127.0.0.1:9000/document/detail?id=${this.detail.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -299,8 +330,7 @@ export default {
         let params = {
           wikiId: this.info.id
         }
-        let fn = this.info.allowShare ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
-        let res = await fn(params);
+        let res = await RepositoryApi.getInlineDetail(params);
 
         if(res.success) {
           let detail = res.result;
@@ -314,7 +344,7 @@ export default {
             this.$platform.openTab({
               id: `wiki_create_${ this.info.id }`,
               title: '编辑文档',
-              url: `/document/detail/${ this.info.id }`,
+              url: `/document/create/${ this.info.id }`,
               reload: true,
               close: true,
               fromId
@@ -337,10 +367,11 @@ export default {
           wikiId: this.detail.id
         };
 
-        let res = RepositoryApi.deleteDocument(params);
+        let res = await RepositoryApi.deleteDocument(params);
 
         if(res.success) {
           this.$platform.alert('文章已删除成功。')
+          this.$emit('search')
         } else {
           this.$platform.alert(res.message);
         }
@@ -398,27 +429,31 @@ export default {
   },
   computed: {
     height () {
-      return this.showOpenFrame ? 'auto' : '100vh';
+      return this.showOpenFrame ? '100%' : '100vh';
     },
 
     padding () {
-      return this.showOpenFrame ? '0 50px' : '0 100px';
+      return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
     }
   },
-  watch: {
-    'info': {
-      handler (n) {
-        this.getDocumnetDetail();
-      },
-      deep: true,
-      immediate: true
-    }
-  }
+  // watch: {
+  //   'info': {
+  //     handler (n) {
+  //       console.log(n);
+  //       // this.getDocumnetDetail();
+  //     },
+  //     deep: true,
+  //   }
+  // }
 }
 </script>
 
 <style lang="scss">
 .document-list-detail {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
   background: #fff;
 
   .detail-top {
@@ -552,6 +587,8 @@ export default {
   }
 
   .detail-content {
+    flex: 1;
+    overflow: auto;
 
     .info {
 
@@ -570,7 +607,7 @@ export default {
         word-break: break-all;
 
         p > img {
-          width: 100%;
+          max-width: 100%;
         }
       }
     }
@@ -582,7 +619,7 @@ export default {
       font-size: 0;
 
       .tags {
-        display: inline-block;
+        // display: inline-block;
         vertical-align: top;
         font-size: 0;
 
@@ -607,7 +644,7 @@ export default {
       }
 
       .dividing-line {
-        display: inline-block;
+        // display: inline-block;
         height: 22px;
         width: 1px;
         background: #848E92;
@@ -640,6 +677,14 @@ export default {
   }
 
   .type-modal {
+
+    .base-modal-body {
+      padding: 10px 30px 0;
+    }
+
+    .base-modal-footer {
+      text-align: right;
+    }
 
     .el-button:hover, .el-button:focus {
       color: #55B7B4;

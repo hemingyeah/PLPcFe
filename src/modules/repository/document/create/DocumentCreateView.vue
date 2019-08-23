@@ -58,11 +58,11 @@ export default {
   methods: {
     getId () {
       let array = window.location.href.split('/');
-      if(array[array.length - 2] == 'detail') {
+      if(array[array.length - 2] == 'create') {
         this.wikiId = array[array.length - 1];
         this.isEdit = true;
+        this.getArticle();
       }
-      this.getArticle();
     },
     // 获取分类二级树状结构，每次更新一次
     async getTypes () {
@@ -85,6 +85,7 @@ export default {
             })
           })
           this.params.options = res.result;
+          if(!this.isEdit) this.setType(this.params.options[0].children[0].value)
         } else {
           this.$platform.alert(res.message);
         }
@@ -100,11 +101,12 @@ export default {
 
       try {
         let params = this.buildParams();        
-        let res = RepositoryApi.saveAndSumbit(params);
+        let res = await RepositoryApi.saveAndSumbit(params);
 
         if(res.success) {
           localStorage.removeItem('document_article');
           this.$platform.alert(res.message);
+          this.openFrame();
           // // 开启审核功能时
           // this.$platform.alert('文章已提交成功，请等待审核。')
           // // 关闭审核功能时
@@ -124,11 +126,12 @@ export default {
 
       try {
         let params = this.buildParams();        
-        let res = RepositoryApi.saveDraft(params);
+        let res = await RepositoryApi.saveDraft(params);
 
         if(res.success) {
-          localStorage.removeItem('document_article');
           this.$platform.alert('文章已保存至草稿箱。')
+          localStorage.removeItem('document_article');
+          this.openFrame();
         } else {
           this.$platform.alert(res.message);
         }
@@ -142,20 +145,16 @@ export default {
       try {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
         
-        let params = {};
+        let params = {
+          wikiId: this.wikiId
+        };
 
-        if(this.info.isDraft) {
-          params.draftId = this.wikiId;
-        } else {
-          params.wikiId = this.wikiId;
-        }
-
-        let fn = this.info.isDraft ? RepositoryApi.deletedraft : RepositoryApi.deleteDocument;
-        let res = fn(params);
+        let res = await RepositoryApi.deleteDocument(params);
 
         if(res.success) {
           localStorage.removeItem('document_article');
           this.$platform.alert('文章已删除成功。')
+          this.openFrame();
         } else {
           this.$platform.alert(res.message);
         }
@@ -165,6 +164,22 @@ export default {
       }
     },
 
+    openFrame () {
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id);
+
+      let fromId = window.frameElement.getAttribute('id');
+      
+      this.$platform.openTab({
+        id: 'M_INFO_DOC',
+        title: '文档库',
+        url: '/document/list',
+        reload: true,
+        close: true,
+        fromId
+      });
+    },
+
     getInput (html) {
       this.articleHtml = html
     },
@@ -172,7 +187,6 @@ export default {
     // 编辑时获取文章信息
     async getArticle () {
       if(this.isEdit) {
-        // this.params.article = '<p>dfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfafdfsafdsfafsdfasafsfadfaf</p>';
         try{
           let params = {
             wikiId: this.wikiId
@@ -187,6 +201,7 @@ export default {
             this.params.label = detail.label;
             this.params.form.attachments = detail.attachment;
             this.params.article = detail.content;
+            this.info = detail;
             this.setType(detail.typeId);
           } else {
             this.$platform.alert(res.message)
@@ -197,8 +212,6 @@ export default {
       } else {
         let article = localStorage.getItem('document_article');
         if (article) this.params.article = article;
-        console.log(this.params.article)
-        console.log(typeof this.params.article)
       }
     },
 
@@ -241,12 +254,21 @@ export default {
         params.originalId = this.wikiId;
       }
       // 草稿编辑保存成草稿
-      if(this.info.isDraft && this.isEdit) {
+      if(this.info.isDraft && this.isEdit && this.isToDraft) {
         params.id = this.wikiId;
       }
       // 草稿编辑后保存提交
       if(this.info.isDraft && !this.isToDraft && this.isEdit) {
         params.originalId = this.info.originalId;
+        params.id = this.wikiId;
+      }
+
+      if(this.params.permission == '内部') {
+        params.allowShare = 0;
+      }
+
+      if(this.params.permission == '外部') {
+        params.allowShare = 1;
       }
 
       if(this.params.form.attachments && this.params.form.attachments.length > 0) {
@@ -272,7 +294,8 @@ export default {
   computed: {
     padding () {
       return this.isEdit ? '40px' : '200px';
-    }
+    },
+    
   },
   watch: {
     articleHtml(n) {

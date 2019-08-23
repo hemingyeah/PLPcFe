@@ -16,7 +16,7 @@ import http from '@src/util/http';
  * @returns Promise<List>
  */
 export function getDocumentList (params) {
-  return http.post('/outside/es/wiki/list', params);
+  return http.post('/outside/wiki/list', params);
 }
 
 
@@ -144,16 +144,6 @@ export function saveDraft (params) {
 }
 
 /**
- * 文档库删除草稿
- * @param {String} draftId - 草稿id
- * 
- * @returns Promise<Boolean>
- */
-export function deletedraft (draftId) {
-  return http.get('/outside/wiki/draft/delete', draftId);
-}
-
-/**
  * 文档库保存并提交
  * @param {Object} params
  * @param {String} params.title - 标题
@@ -192,10 +182,9 @@ export function shareSetting (state) {
 
 /**
  * 分享接口-推送钉钉工作通知使用协同人选人框，推送给人
- * TODO: 不理解
  */
-export function shareDocument () {
-  return http.get('/outside/wiki/share')
+export function shareDocument (wikiId, params) {
+  return http.post(`/outside/wiki/share?wikiId=${wikiId}`, params)
 }
 
 
@@ -213,7 +202,7 @@ export function shareDocument () {
  * @returns Promise<List>
  */
 export function getBulletinList (params) {
-  return http.post('/outside/notice/list', params);
+  return http.post('/outside/es/notice/search', params);
 }
 
 

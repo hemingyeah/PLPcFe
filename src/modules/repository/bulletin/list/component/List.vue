@@ -1,28 +1,33 @@
 <template>
   <div class="bulletin-list-container">
 
-    <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
+    <div class="list-top" v-if="value.list && value.list.length > 0">符合搜索结果的共<span style="color: #FF7B00">{{value.total}}</span>条</div>
 
-    <div class="list-item" :class="{'choosed-item': id}">
+    <div class="list-content">
+      <div class="list-noData" v-if="value.list && value.list.length <= 0">暂无数据</div>
 
-      <div class="item-top">
-        <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
+      <div class="list-item" :class="id == item.id ? 'choosed-item' : ''" v-else v-for="item in value.list" :key="item.id">
+
+        <div class="item-top">
+          <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
+        </div>
+
+        <div class="item-info">
+          <span class="name">{{item.name}}</span>
+          <span class="time">发布于：{{item.createTime | fmt_datetime}}</span>
+          <span class="type">{{item.type}}</span>
+        </div>
+
+        <p class="item-content" ref="content">{{item.content}}</p>
+
+        <div class="item-footer">
+          <span class="item-num">已读（{{item.readNum}}）</span>
+          <span class="item-num">未读（{{item.unreadNum}}）</span>
+        </div>
+
       </div>
-
-      <div class="item-info">
-        <span class="name">{{item.name}}</span>
-        <span class="time">发布于：{{item.time}}</span>
-        <span class="type">{{item.type}}</span>
-      </div>
-
-      <p class="item-content" ref="content">{{item.content}}</p>
-
-      <div class="item-footer">
-        <span class="item-num">已读（{{item.readNum}}）</span>
-        <span class="item-num">未读（{{item.noReadNum}}）</span>
-      </div>
-
     </div>
+    
   </div>
 </template>
 
@@ -31,6 +36,14 @@ export default {
   name: 'list',
   props: {
     keyword: {
+      type: String,
+      default: ''
+    },
+    value: {
+      type: Object,
+      default: () => ({})
+    },
+    id: {
       type: String,
       default: ''
     }
@@ -47,7 +60,6 @@ export default {
         noReadNum: 3344
       },
       total: 12,
-      id: true,
     }
   },
   methods: {
@@ -61,30 +73,53 @@ export default {
     },
 
     toDetail (item) {
-      this.id = '02900f0c-c481-11e9-bfc9-00163e304a25';
-      let info = {
-        id: this.id
-      }
-      this.$emit('toDetail', info)
+      this.$emit('update:id', item.id);
+      this.$emit('toDetail', item)
     }
   },
   watch: {
-    keyword (n, o) {
-      this.highlight();
-    }
+    // keyword (n, o) {
+    //   this.highlight();
+    // },
+    // 'value': {
+    //   handler (newValue) {
+    //     if(newValue.list) {
+    //       this.id = newValue.list[0].id;
+    //       this.$emit('toDetail', newValue.list[0])
+    //     }
+    //   },
+    //   deep: true,
+    //   immediate: true
+    // }
   }
 }
 </script>
 
 <style lang="scss">
 .bulletin-list-container {
+  display: flex;
+  flex-direction: column;
+
   background: #fff;
+  height: 100%;
+  overflow: hidden;
 
   .list-top {
     height: 40px;
     line-height: 40px;
     padding: 0 11px;
     color: #909399;
+  }
+
+  .list-content {
+    overflow: auto;
+    flex: 1;
+
+    .list-noData {
+      line-height: 40px;
+      text-align: center;
+      color: #909399;
+    }
   }
 
   .list-item {

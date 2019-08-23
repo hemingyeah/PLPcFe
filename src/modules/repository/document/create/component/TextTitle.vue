@@ -7,7 +7,7 @@
       </el-form-item>
 
       <el-form-item label="分类：" class="create-item">
-        <el-cascader :options="params.options" clearable class="type" v-model="params.typeId" filterable>
+        <el-cascader :options="params.options" class="type" v-model="params.typeId" filterable>
         </el-cascader>
       </el-form-item>
 

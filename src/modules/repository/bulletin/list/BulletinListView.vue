@@ -5,14 +5,14 @@
       <!-- 搜索部分 -->
       <list-search class="list-search" @search="search"></list-search>
       <!-- 列表部分 -->
-      <list class="list" :keyword="params.keyword" @toDetail="toDetail"></list>
+      <list class="list" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list"></list>
       <!-- 页脚部分 -->
-      <list-footer class="list-footer" @search="search"></list-footer>
+      <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
     </div>
 
     <!-- 右侧详情 -->
     <div class="bulletin-list-right">
-      <bullet-detail :noticeId="noticeId"></bullet-detail>
+      <bullet-detail :info="info" @search="search" ref="bulletinDetail"></bullet-detail>
     </div>
 
   </div>
@@ -31,10 +31,17 @@ export default {
     return {
       params: {
         keyword: '', // 搜索的关键词
+        typeId: null,
+        pageNum: 1,
+        pageSize: 20,
       },
       listTotal: null,
       listMsg: {},
-      noticeId: null
+      noticeId: null,
+      info: {
+        id: null
+      },
+      chosenId: null
     }
   },
   components: {
@@ -43,28 +50,39 @@ export default {
     [ListFooter.name]: ListFooter,
     [BulletinDetailView.name]: BulletinDetailView
   },
+  created () {
+    this.search()
+  },
   methods: {
     async search (params) {
       if(params) Object.assign(this.params, params);
       try {
         let res = await RepositoryApi.getBulletinList(this.params);
-        console.log(res.result);
         
         if(res.success) {
           this.listTotal = res.result.total;
+
           this.listMsg = res.result;
+          this.toDetail(this.listMsg.list[0]);
+
+          if(this.params.keyword) {
+            this.$refs.list.highlight();
+          }
         } else {
           this.$platform.alert(res.message);
         }
       } catch (err) {
         console.error(err);
       }    
-      // TODO: 查询数据操作
     },
 
     toDetail (item) {
-      this.noticeId = item.id;
-      // TODO: 将id传入详情
+      this.info.id = item.id;
+      this.chosenId = this.info.id;
+      // this.info.allowShare = item.allowShare;
+      this.$refs.bulletinDetail.getBulletinDetail();
+      this.$refs.bulletinDetail.getReadPerson();
+      this.$refs.bulletinDetail.getUnreadPerson();
     }
   }
 }

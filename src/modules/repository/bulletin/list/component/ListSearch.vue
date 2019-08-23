@@ -20,7 +20,7 @@
     </div>
     <!-- 通知公告类型筛选 -->
     <div class="search-bottom">
-      <el-select v-model="params.type" class="search-type" @change="search">
+      <el-select v-model="params.typeId" class="search-type" @change="search">
         <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
           <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
           <span style="float: right" class="type-operating">
