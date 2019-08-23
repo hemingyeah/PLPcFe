@@ -13,7 +13,7 @@
       </div>
     </div>
     <!-- 更新日志，编辑时显示 -->
-    <update-log class="view-right" v-if="isEdit"></update-log>
+    <update-log class="view-right" v-if="isEdit" :wikiId="wikiId"></update-log>
   </div>
 </template>
 
@@ -46,7 +46,7 @@ export default {
       isToDraft: false,
       wikiId: null,
       allowShare: false,
-      info: {}
+      info: {},
     }
   },
   created () {

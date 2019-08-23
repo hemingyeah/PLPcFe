@@ -121,8 +121,8 @@ export function deleteDocument (wikiId) {
  * 
  * @returns Promise<List>
  */
-export function getRecord (wikiId) {
-  return http.get('/outside/wiki/record/get', wikiId);
+export function getRecord (params) {
+  return http.get('/outside/wiki/record/list', params);
 }
 
 /**
