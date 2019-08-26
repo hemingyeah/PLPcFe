@@ -547,26 +547,28 @@ export default {
     },
     // 构建tab
     buildTabs() {
+      const {taskQuantity, eventQuantity, unfinishedTaskQuantity, unfinishedEventQuantity, recordQuantity, plantaskQuantity, remindQuantity} = this.statisticalData;
+
       return [
         {
-          displayName: `信息动态(${this.statisticalData.recordQuantity || 0})`,
+          displayName: `信息动态(${recordQuantity || 0})`,
           component: InfoRecord.name,
           slotName: 'record-tab',
           show: true,
         }, {
-          displayName: `工单(${this.statisticalData.unfinishedTaskQuantity || 0}/${this.statisticalData.taskQuantity || 0})`,
+          displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
           component: TaskTable.name,
           show: true,
         }, {
-          displayName: `事件(${this.statisticalData.unfinishedEventQuantity || 0}/${this.statisticalData.eventQuantity || 0})`,
+          displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? '999+' : eventQuantity})` : '事件(0)',
           component: EventTable.name,
           show: true,
         }, {
-          displayName: `计划任务(${this.statisticalData.plantaskQuantity || 0})`,
+          displayName: `计划任务(${plantaskQuantity || 0})`,
           component: PlanTable.name,
           show: this.allowCreatePlanTask,
         }, {
-          displayName: `产品提醒(${this.statisticalData.remindQuantity || 0})`,
+          displayName: `产品提醒(${remindQuantity || 0})`,
           component: RemindTable.name,
           show: true,
         }

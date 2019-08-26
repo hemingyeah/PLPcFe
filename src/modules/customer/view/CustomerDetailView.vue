@@ -525,11 +525,11 @@ export default {
         component: CustomerRemindTable.name,
         show: !this.isDelete && !this.isDisable
       }, {
-        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity})` : '事件(0)',
+        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? '999+' : eventQuantity})` : '事件(0)',
         component: CustomerEventTable.name,
         show: true,
       }, {
-        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity})` : '工单(0)',
+        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
         component: CustomerTaskTable.name,
         show: true,
       }, {
