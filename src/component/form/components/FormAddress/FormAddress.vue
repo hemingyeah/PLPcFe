@@ -2,21 +2,30 @@
   <div class="form-address">
     <div class="form-address-picker">
       <base-dist-picker @input="handleCitySelectorChange" :value="distValue" :placeholder="placeholder"/>
-      <el-button type="button" @click="chooseMap" v-if="!disableMap">地图选址</el-button>
+      <el-button type="button" @click="chooseMap" v-if="!disableMap" class="action-btn">地图选址</el-button>
     </div>
-    <input
-      type="text"
-      :value="detail"
-      @input="input"
-      maxlength="50"
-      :id="`form_${field.fieldName}`"
-      autocomplete="off"/>
+    <div class="form-address-picker">
+      <input
+        type="text"
+        :value="detail"
+        @input="input"
+        maxlength="50"
+        :id="`form_${field.fieldName}`"
+        autocomplete="off"/>
+      <el-button type="button" class="action-btn" @click="toggleModal">解析地址</el-button>
+    </div>
+
+    <base-modal :show.sync="visible" title="解析地址" class="form-address-modal">
+      <textarea v-model="copy" placeholder="请输入或粘贴地址到文本框进行解析"></textarea>
+      <el-button type="primary" @click="analyze" :disabled="!copy.length || pending">解析</el-button>
+    </base-modal>
   </div>
 </template>
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-
+import {parseAddress} from '@src/api/CommonApi';
+/* global AMap */
 export default {
   name: 'form-address',
   mixins: [FormMixin],
@@ -52,6 +61,13 @@ export default {
       default: false
     }
   },
+  data() {
+    return {
+      visible: false,
+      pending: false,
+      copy: ''
+    }
+  },
   computed: {
     /** 将省市区转换成数组 */
     distValue(){
@@ -71,7 +87,45 @@ export default {
       return this.value.address;
     }
   },
+  mounted() {
+  },
   methods: {
+    toggleModal() {
+      this.visible = !this.visible;
+      if (this.visible) {
+        this.copy = '';
+      }
+    },
+    analyze() {
+
+      this.pending = true;
+      parseAddress({detailAddress: this.copy})
+        .then(res => {
+
+          this.pending = false;
+          if (!res || res.status) return this.$platform.notification({
+            title: '解析地址失败，请手动选择省市区以及详细地址',
+            message: res.message || '',
+            type: 'error',
+          });
+
+          let {province, city, district, address, lat, lng} = res.data;
+
+          this.updateValue({
+            province: province || '',
+            city: city || '',
+            dist: district || '',
+            address: address || '',
+            latitude: lat || '',
+            longitude: lng || '',
+            addressType: (lat || lng) ? 1 : 0,
+          });
+
+          this.visible = false;
+          this.copy = '';
+        })
+        .catch(e => console.error('e', e))
+    },
     input(event) {
       let newAddress = {
         ...this.value,
@@ -174,13 +228,33 @@ export default {
 
   .base-dist-picker {
     flex-grow: 1;
-    /*padding-right: 10px;*/
     .el-cascader {
       width: 100%;
     }
   }
-  .base-dist-picker+.el-button {
-    margin-left: 10px;
+
+
+  .form-address-modal {
+
+    .base-modal-body {
+      padding: 20px;
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+
+      textarea {
+        flex-shrink: 0;
+        line-height: 24px;
+        height: 48px;
+        width: 100%;
+        resize: none;
+      }
+
+      .el-button {
+        margin-top: 10px;
+      }
+
+    }
   }
 }
 
@@ -193,8 +267,8 @@ export default {
     width: 400px;
   }
 
-  .el-button{
-    margin: 0;
+  .action-btn {
+    margin-left: 10px;
   }
 }
 </style>

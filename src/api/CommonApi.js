@@ -54,6 +54,16 @@ function batchCreateScheduler(params) {
   return http.post('/scheduler/buildBatch', params)
 }
 
+/**
+ * 将字符串地址解析成结构化数据
+ * @param {Object} params - 参数
+ * @param {String} detailAddress - 地址字符串
+ * @returns {*}
+ */
+function parseAddress(params) {
+  return http.get('/address/resolution', params)
+}
+
 
 
 export {
@@ -61,5 +71,6 @@ export {
   deleteScheduler,
   editScheduler,
   createScheduler,
-  batchCreateScheduler
+  batchCreateScheduler,
+  parseAddress
 };
