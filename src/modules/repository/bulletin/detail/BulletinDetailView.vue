@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}">
+  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -42,7 +42,7 @@
 
       <div class="info">
         <p class="title">{{detail.title}}</p>
-        <div class="content" ref="content"></div>
+        <div class="content" v-html="detail.handleContent"></div>
       </div>
       <!-- 详情页脚部分 -->
       <div class="footer" v-if="reads.reads.length > 0 && reads.unreads.length > 0 && detail.attachment && detail.attachment.length > 0">
@@ -101,6 +101,7 @@
 
 <script>
 import * as RepositoryApi from '@src/api/Repository'
+import * as Lang from '@src/util/lang/index.js';
 
 export default {
   name: 'bullet-detail',
@@ -158,11 +159,13 @@ export default {
     // 获取通知公告详情
     async getBulletinDetail () {
       try {
-        this.params.noticeId = this.info.id ? this.info.id : this.noticeId
+        this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
         let res = await RepositoryApi.getBulletinDetail(this.params);
         if(res.success) {
           this.detail = res.result;
-          this.initContent();
+          if(!this.detail) return;
+          this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
+          this.detail.handleContent = this.detail.content;
         } else {
           this.$platform.alert(res.message);
         }
@@ -288,10 +291,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-
-    initContent () {
-      this.$refs.content.innerHTML = this.detail.content;
     }
   },
   computed: {
@@ -306,18 +305,7 @@ export default {
     marginLeft () {
       return this.reads.reads.length > 0 ? '20px' : '0'
     }
-  },
-
-  // watch: {
-  //   'info': {
-  //     handler (n) {
-  //       this.getBulletinDetail();
-  //       this.getReadOrNotLatest();
-  //       // this.getReadPerson();
-  //     },
-  //     deep: true,
-  //   }
-  // }
+  }
 }
 </script>
 

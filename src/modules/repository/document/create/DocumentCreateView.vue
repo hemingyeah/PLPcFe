@@ -14,12 +14,15 @@
     </div>
     <!-- 更新日志，编辑时显示 -->
     <update-log class="view-right" v-if="isEdit" :wikiId="wikiId"></update-log>
+
+    <request-approve @createApprove="createApprove" ref="requestApproveDialog" />
   </div>
 </template>
 
 <script>
 import TextTitle from './component/TextTitle.vue'
 import UpdateLog from './component/UpdateLog.vue'
+import RequestApprove from './component/RequestApprove.vue'
 import * as RepositoryApi from '@src/api/Repository'
 
 import { Message } from 'element-ui';
@@ -28,7 +31,8 @@ export default {
   name: 'document-create-view',
   components: {
     [TextTitle.name]: TextTitle,
-    [UpdateLog.name]: UpdateLog
+    [UpdateLog.name]: UpdateLog,
+    [RequestApprove.name]: RequestApprove
   },
   data () {
     return {
@@ -47,6 +51,8 @@ export default {
       wikiId: null,
       allowShare: false,
       info: {},
+      reportApproveStatus: null,
+      needApprove: false,
     }
   },
   created () {
@@ -56,6 +62,10 @@ export default {
     if(!this.isEdit) this.saveArticle();
   },
   methods: {
+    setStatus(n) {
+      this.reportApproveStatus = n;
+    },
+
     getId () {
       let array = window.location.href.split('/');
       if(array[array.length - 2] == 'create') {
@@ -99,9 +109,46 @@ export default {
       if(!this.paramsCheck()) return;
       this.isToDraft = false;
 
+      if(this.needApprove) {
+        this.$refs.requestApproveDialog.open();
+        return;
+      }
+
       try {
         let params = this.buildParams();        
         let res = await RepositoryApi.saveAndSumbit(params);
+
+        if(res.success) {
+          localStorage.removeItem('document_article');
+          this.$platform.alert(res.message);
+          this.openFrame();
+          // // 开启审核功能时
+          // this.$platform.alert('文章已提交成功，请等待审核。')
+          // // 关闭审核功能时
+          // this.$platform.alert('文章已发布成功。')
+        } else {
+          this.$platform.alert(res.message);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+
+    // 需要审批时，提交
+    async createApprove (remark) {
+      if(!this.paramsCheck()) return;
+      this.isToDraft = false;
+      this.$refs.requestApproveDialog.close();
+
+      try {
+        let otherInfo = this.buildParams();
+        let params = {
+          objId: this.info.wikiId || null,
+          applyRemark: remark,
+          source: 'wiki',
+          otherInfo
+        }        
+        let res = await RepositoryApi.createApprove(params);
 
         if(res.success) {
           localStorage.removeItem('document_article');
@@ -249,18 +296,28 @@ export default {
         attachment: [],
       }
 
-      // 文档保存或存草稿
-      if(!this.info.isDraft && this.isEdit) {
-        params.originalId = this.wikiId;
-      }
-      // 草稿编辑保存成草稿
-      if(this.info.isDraft && this.isEdit && this.isToDraft) {
-        params.id = this.wikiId;
-      }
-      // 草稿编辑后保存提交
-      if(this.info.isDraft && !this.isToDraft && this.isEdit) {
+      // 文档、草稿编辑后存为草稿
+      if(this.isEdit && this.isToDraft) {
+        params.id = this.info.id;
         params.originalId = this.info.originalId;
-        params.id = this.wikiId;
+        params.isDraft = this.info.isDraft;
+      }
+
+      // 新建草稿
+      if(!this.isEdit && this.isToDraft) {
+        params.isDraft = 1;
+      }
+
+      // 文档、草稿编辑后提交
+      if(this.isEdit && !this.isToDraft) {
+        params.id = this.info.id;
+        params.originalId = this.info.originalId;
+        params.isDraft = this.info.isDraft;
+      }
+
+      // 新建文档
+      if(!this.isEdit && !this.isToDraft) {
+        params.isDraft = 0;
       }
 
       if(this.params.permission == '内部') {
@@ -294,8 +351,7 @@ export default {
   computed: {
     padding () {
       return this.isEdit ? '40px' : '200px';
-    },
-    
+    }
   },
   watch: {
     articleHtml(n) {

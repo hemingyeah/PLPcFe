@@ -60,14 +60,39 @@ export default {
         let res = await RepositoryApi.getBulletinList(this.params);
         
         if(res.success) {
+          if(!res.result) {
+            this.listTotal = 0;
+            this.listMsg = {
+              list: []
+            };
+            this.toDetail(this.listMsg.list[0]);
+            return;
+          }
+          
           this.listTotal = res.result.total;
 
+          res.result.list.forEach(item => {
+            if(item.title.indexOf('<em>') != -1) {
+              let replaceReg = new RegExp('<em>', 'g');
+              item.handleTitle = item.title.replace(replaceReg, '<span style="color: #FF7B00">');
+              let reg = new RegExp('</em>', 'g');
+              item.handleTitle = item.handleTitle.replace(reg, '</span>');
+            } else {
+              item.handleTitle = item.title;
+            }
+
+            if(item.content.indexOf('<em>') != -1) {
+              let replaceReg = new RegExp('<em>', 'g');
+              item.handleContent = item.content.replace(replaceReg, '<span style="color: #FF7B00">');
+              let reg = new RegExp('</em>', 'g');
+              item.handleContent = item.handleContent.replace(reg, '</span>');
+            } else {
+              item.handleContent = item.content;
+            }
+          })
           this.listMsg = res.result;
           this.toDetail(this.listMsg.list[0]);
 
-          if(this.params.keyword) {
-            this.$refs.list.highlight();
-          }
         } else {
           this.$platform.alert(res.message);
         }
@@ -77,9 +102,12 @@ export default {
     },
 
     toDetail (item) {
+      if(!item) {
+        this.info.id = null;
+        return;
+      }
       this.info.id = item.id;
       this.chosenId = this.info.id;
-      // this.info.allowShare = item.allowShare;
       this.$refs.bulletinDetail.getBulletinDetail();
       this.$refs.bulletinDetail.getReadPerson();
       this.$refs.bulletinDetail.getUnreadPerson();

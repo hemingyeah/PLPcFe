@@ -817,6 +817,12 @@ export default {
         performanceUrl = `/performance/v2/report/desc/${id}?${performanceQueryStr}`;
         this.addTabs(performanceId, performanceUrl);
         break;
+      case 'wiki': 
+        taskId = `document_detail_${id}`;
+        taskUrl = `/document/detail?wikiId=${id}&approve=true`;
+        this.saveApproveId(id);
+        this.addTabs(taskId, taskUrl);
+        break;
       default: 
         break;
       }
@@ -851,7 +857,15 @@ export default {
           close: true,
           url: `/performance/v2/report/desc/${objId}`,
           fromId
-        }
+        } 
+      } else if (source == 'wiki') {
+        tabOptions = {
+          id: `document_detail_${objId}`,
+          title: '正在加载',
+          close: true,
+          url: `/document/detail?wikiId=${objId}&approve=true`,
+          fromId
+        } 
       }
 
       // /performance/v2/report/desc/3679

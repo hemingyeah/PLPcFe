@@ -61,7 +61,7 @@ export default {
       isSearch: false, // 搜索框显示标识
       params: {
         keyword: '',
-        type: '',
+        typeId: null,
       },
       info: {
         name: '',

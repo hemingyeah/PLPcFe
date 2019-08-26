@@ -22,7 +22,7 @@
           <span class="readNum">阅读（{{detail.readTimes}}）</span>
         </div>
 
-        <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
+        <!-- <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
           <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
 
@@ -37,15 +37,15 @@
           </span>
 
           <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
-        </div>
+        </div> -->
         
 
       </div>
 
-      <div class="operating" v-else>
-        <button class="base-button green-btn" @click="approve">审批</button>
-        <!-- <button class="base-button white-btn" @click="show = true">拒绝</button> -->
-      </div>
+      <!-- <div class="operating" v-else>
+        <button class="base-button green-btn" @click="pass">通过</button>
+        <button class="base-button white-btn" @click="show = true">拒绝</button>
+      </div> -->
     </div>
 
     <!-- 文章详情 -->
@@ -100,7 +100,7 @@
       </div>
     </base-modal>
 
-    <base-modal
+    <!-- <base-modal
       class="type-modal"
       width="400px"
       :show.sync="shareBoxShow"
@@ -115,18 +115,14 @@
         <el-button @click="inlineShare">对内分享</el-button>
         <el-button type="primary" class="green-btn" @click="outlineShare">对外分享</el-button>
       </div>
-    </base-modal>
-
-    <approve-dialog :approve-data="approveData" ref="approveDialog"/>
+    </base-modal> -->
 
   </div>
 </template>
 
 <script>
 import * as RepositoryApi from '@src/api/Repository'
-import * as Lang from '@src/util/lang/index.js'
-
-import ApproveDialog from './component/ApproveDialog.vue'
+import * as Lang from '@src/util/lang/index.js';
 
 export default {
   name: 'document-detail',
@@ -135,9 +131,6 @@ export default {
       type: Object,
       default: () => ({})
     }
-  },
-  components: {
-    [ApproveDialog.name]: ApproveDialog
   },
   data () {
     return {
@@ -170,12 +163,12 @@ export default {
   mounted () {
     this.getId();
     // 根据formId来判断是否是在新页面打开
-    if(!window.frameElement) {
-      this.showOpenFrame = false;
-      return;
-    }
-    let formId = window.frameElement.getAttribute('id');
-    if(formId.indexOf('document_detail') != -1) this.showOpenFrame = false;
+    // if(!window.frameElement) {
+    //   this.showOpenFrame = false;
+    //   return;
+    // }
+    // let formId = window.frameElement.getAttribute('id');
+    // if(formId.indexOf('document_detail') != -1) this.showOpenFrame = false;
   },
   methods: {
     buildForm(){
@@ -188,22 +181,13 @@ export default {
 
     getId () {
       if(window.location.href.indexOf('?') != -1) {
-        let array = window.location.href.split('?')[1].split('&');
-        let params = [];
-        array.forEach(item => {
-          params.push({name: item.split('=')[0],
-            value: item.split('=')[1]})
-        })
-        
-        if(params[0].name == 'id') {
-          this.id = params[0].value;
+        let array = window.location.href.split('?');
+        let params = array[1].split('=');
+        if(params[0] == 'id') {
+          this.id = params[1]
         }
-        if(params[0].name == 'wikiId') {
-          this.wikiId = params[0].value;
-        }
-        if(params[1] && params[1].name == 'approve') {
-          this.$refs.approveDialog.open();
-          this.isReview = true;
+        if(params[0] == 'wikiId') {
+          this.wikiId = params[1];
         }
         this.getDocumnetDetail();
       }
@@ -221,7 +205,7 @@ export default {
 
         if(res.success) {
           this.detail = res.result;
-          this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
+          this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
           this.initContent();
         } else {
           this.$platform.alert(res.message)
@@ -316,7 +300,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://127.0.0.1:9000/open/wiki?id=${this.detail.id}`;
+      hideTextarea.innerHTML = `http://127.0.0.1:9000/document/detail?id=${this.detail.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -397,10 +381,6 @@ export default {
       }
     },
 
-    approve () {
-      this.$refs.approveDialog.open();
-    },
-
     // 拒绝审核
     async sumbit () {
       this.$refs.rulesForm.validate((valid) => {
@@ -454,22 +434,6 @@ export default {
 
     padding () {
       return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
-    },
-
-    approveData() {
-      if(!this.detail.createTime) return;
-
-      const {title, type, createUserName, id} = this.detail;
-      let createTime = this.detail.createTime;
-
-      return {
-        name: title,
-        type,
-        wikiId: id,
-        applyRemark: '哈哈哈哈',
-        proposerName: createUserName,
-        proposerTime: Lang.formatDate(createTime, 'YYYY-MM-DD HH:mm:ss'),
-      }
     }
   },
   // watch: {

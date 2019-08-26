@@ -1,0 +1,210 @@
+<template>
+  <base-modal title="审批" :show.sync="visible" width="600px" class="approve-performance-modal" @closed="reset">
+
+    <ul class="approve-info">
+      <li>
+        <label>编号：</label> {{approveData.name}}
+      </li>
+      <li>
+        <label>来源：</label> 文档库
+      </li>
+      <li>
+        <label>分类：</label> {{approveData.type}}
+      </li>
+      <li>
+        <label>流程节点：</label> 发布
+      </li>
+      <li>
+        <label>内容：</label> 发布 {{approveData.name}}
+      </li>
+      <li>
+        <label>发起人：</label> {{approveData.proposerName}}
+      </li>
+      <li>
+        <label>发起时间：</label> {{approveData.proposerTime}}
+      </li>
+      <li>
+        <label>发起备注：</label> {{approveData.applyRemark}}
+      </li>
+      <li>
+        <label>审批结果：</label>
+        <el-radio v-model="form.result" label="success">同意</el-radio>
+        <el-radio v-model="form.result" label="fail">不同意</el-radio>
+      </li>
+      <li>
+        <label>审批备注：</label>
+        <el-input type="textarea" v-model="form.approveRemark" resize="none" rows="3" :maxlength="500"></el-input>
+      </li>
+    </ul>
+
+    <!-- <el-form ref="form" :rules="rules" :model="form">
+      <el-form-item label="编号：">{{approveData.name}}</el-form-item>
+      <el-form-item label="来源：">文档库</el-form-item>
+      <el-form-item label="分类：">{{approveData.type}}</el-form-item>
+      <el-form-item label="流程节点：">发布</el-form-item>
+      <el-form-item label="内容：">发布 {{approveData.name}}</el-form-item>
+      <el-form-item label="发起人：">{{approveData.proposerName}}</el-form-item>
+      <el-form-item label="发起时间：">{{approveData.name}}</el-form-item>
+      <el-form-item label="发起备注：">{{approveData.applyRemark}}</el-form-item>
+      <el-form-item label="审批结果：">
+        <el-radio v-model="form.result" label="success">同意</el-radio>
+        <el-radio v-model="form.result" label="fail">不同意</el-radio>
+      </el-form-item>
+      <el-form-item label="审批备注：" :prop="form.result == 'fail' ? 'approveRemark' : ''">
+        <el-input type="textarea" v-model="form.approveRemark" resize="none" rows="3" :maxlength="500"></el-input>
+      </el-form-item>
+    </el-form> -->
+
+
+    <p class="tip">备注：审批后不能修改审批结果</p>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="visible = false">取 消</el-button>
+      <el-button type="primary" @click="onSubmit" :disabled="pending" >确 定</el-button>
+    </div>
+  </base-modal>
+</template>
+
+<script>
+import * as RepositoryApi from '@src/api/Repository'
+
+export default {
+  name: 'approve-dialog',
+  props: {
+    approveData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      visible: false,
+      pending: false,
+      init: false,
+      form: {
+        result: 'success',
+        approveRemark: '',
+      },
+      rules: {
+        approveRemark: [
+          { required: true, message: '请在审批备注中填写拒绝原因', trigger: 'blur' },
+          { max: 500, message: '最多 500 个字符', trigger: 'blur' }
+        ],
+      }
+    }
+  },
+  methods: {
+    open() {
+      this.init = true;
+      this.visible = true;
+    },
+    onSubmit() {
+      // this.$refs.form.validateField('approveRemark', res => {
+      //   console.log(res);
+      // })
+
+      if(this.form.result == 'fail' && !this.form.approveRemark) {
+        this.$platform.alert('请在审批备注中填写拒绝原因');
+        return;
+      }
+
+      this.visible = false;
+      this.pending = true;
+
+      RepositoryApi.operateApprove({
+        ...this.form,
+        wikiId: this.approveData.wikiId,
+      })
+        .then(res => {
+
+          this.pending = false;
+
+          if (res.status) return this.$platform.notification({
+            title: '审批失败',
+            message: res.message || '',
+            type: 'error',
+          });
+
+          this.$platform.notification({
+            title: '审批成功',
+            type: 'success',
+          });
+
+          return window.location.reload()
+        })
+        .catch(e => console.error('e', e));
+    },
+
+    reset() {
+      this.init = false;
+    },
+  },
+}
+</script>
+
+<style lang="scss">
+
+  .approve-performance-modal {
+
+    .approve-info {
+      margin: 0;
+      padding: 15px 0 0;
+
+      li {
+        list-style: none;
+        display: flex;
+        word-break: break-all;
+
+        label {
+          width: 100px;
+          margin: 0;
+          line-height: 26px;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    .tip {
+      margin: 10px 0 0;
+      line-height: 26px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .base-modal-body {
+      padding: 0 30px;
+    }
+
+    .dialog-footer {
+      text-align: right;
+      /*padding: 15px 0 ;*/
+    }
+  }
+
+  .el-form {
+    padding-top: 15px;
+
+    .el-form-item {
+      margin: 0 !important;
+
+      .el-form-item__label {
+        margin: 0;
+        width: 100px;
+        text-align: left;
+
+        line-height: 26px;
+      }
+
+      .el-form-item__content {
+        line-height: 26px;
+
+        .el-textarea {
+          width: calc(100% - 100px);
+        }
+
+        .el-form-item__error {
+          margin-left: 100px;
+        }
+      }
+    }
+  }
+</style>

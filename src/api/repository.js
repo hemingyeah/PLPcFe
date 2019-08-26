@@ -187,6 +187,30 @@ export function shareDocument (wikiId, params) {
   return http.post(`/outside/wiki/share?wikiId=${wikiId}`, params)
 }
 
+/**
+ * 文档库创建审批
+ * @param {String} params.wikiId - 文档库Id
+ * @param {String} params.applyRemark - 发起审批备注
+ * 
+ * @returns Promise<Boolean>
+ */
+export function createApprove (params) {
+  return http.post('/outside/approve/create', params)
+}
+
+/**
+ * 文档库处理审批
+ * @param {String} params.wikiId - 文档库Id
+ * @param {String} params.approveRemark - 审批备注
+ * @param {String} params.result - 审批结果（fail success）
+ * 
+ * @returns Promise<Boolean>
+ */
+export function operateApprove (params) {
+  return http.post('/outside/approve/operate', params)
+}
+
+
 
 // 通知公告
 

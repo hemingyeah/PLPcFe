@@ -9,16 +9,16 @@
       <div class="list-item" :class="id == item.id ? 'choosed-item' : ''" v-else v-for="item in value.list" :key="item.id">
 
         <div class="item-top">
-          <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
+          <p class="item-title" ref="title" @click="toDetail(item)" v-html="item.handleTitle"></p>
         </div>
 
         <div class="item-info">
-          <span class="name">{{item.name}}</span>
+          <span class="name">{{item.createUserName}}</span>
           <span class="time">发布于：{{item.createTime | fmt_datetime}}</span>
           <span class="type">{{item.type}}</span>
         </div>
 
-        <p class="item-content" ref="content">{{item.content}}</p>
+        <p class="item-content" ref="content" v-html="item.handleContent">{{item.content}}</p>
 
         <div class="item-footer">
           <span class="item-num">已读（{{item.readNum}}）</span>
@@ -62,6 +62,9 @@ export default {
       total: 12,
     }
   },
+  mounted () {
+    console.log(this.value)
+  },
   methods: {
     // 根据关键词设置高亮字段
     highlight () {
@@ -83,10 +86,12 @@ export default {
     // },
     // 'value': {
     //   handler (newValue) {
-    //     if(newValue.list) {
-    //       this.id = newValue.list[0].id;
-    //       this.$emit('toDetail', newValue.list[0])
-    //     }
+    //     let keyword = '微信';
+    //     let replaceReg = new RegExp(keyword, 'g');
+    //     let replaceString = `<span style="color: #FF7B00">${ keyword }</span>`;
+    //     this.$nextTick(() => {
+    //       this.$refs.title.innerHTML = this.item.title.replace(replaceReg, replaceString);
+    //     })
     //   },
     //   deep: true,
     //   immediate: true
