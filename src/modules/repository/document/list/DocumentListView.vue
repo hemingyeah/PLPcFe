@@ -75,15 +75,11 @@ export default {
         if(res.success) {
           this.listTotal = res.result.total;
           res.result.list.forEach(item => {
-            item.createTime = Lang.fmt_gmt_time(item.createTime, 0);
+            item.createTime = Lang.fmt_gmt_time(item.createTime);
           })
           this.listMsg = res.result;
-          // if(this.listMsg.list.length > 0) this.listMsg.list[0].label = ['hahha', 'llllll', 'hhhhh']
           this.toDetail(this.listMsg.list[0]);
 
-          if(this.params.keyword) {
-            this.$refs.list.highlight();
-          }
         } else {
           this.$platform.alert(res.message);
         }
@@ -101,6 +97,11 @@ export default {
     },
 
     toDetail (item) {
+      if(!item) {
+        this.info.id = null;
+        this.$refs.documentDetail.getDocumnetDetail();
+        return;
+      }
       this.info.id = item.id;
       this.info.allowShare = item.allowShare;
       this.chosenId = this.info.id;

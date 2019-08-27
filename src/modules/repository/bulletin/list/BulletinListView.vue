@@ -60,6 +60,7 @@ export default {
         let res = await RepositoryApi.getBulletinList(this.params);
         
         if(res.success) {
+          // 查询无数据时
           if(!res.result) {
             this.listTotal = 0;
             this.listMsg = {
@@ -104,6 +105,7 @@ export default {
     toDetail (item) {
       if(!item) {
         this.info.id = null;
+        this.$refs.bulletinDetail.getBulletinDetail();
         return;
       }
       this.info.id = item.id;

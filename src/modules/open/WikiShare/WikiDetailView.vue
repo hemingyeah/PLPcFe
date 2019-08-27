@@ -4,16 +4,16 @@
     <div class="detail-top">
 
       <div class="author">
-        <img class="author-img" :src="author.img">
+        <img class="author-img" :src="detail.createUserHead">
         <div class="author-info">
           <p class="name">{{detail.createUserName}}</p>
-          <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
+          <p class="time">发布于：{{detail.createTime}}</p>
         </div>
       </div>
 
-      <div class="operating" v-if="!isReview">
-
-        <div class="published" v-if="!detail.isDraft">
+      <div class="operating">
+        
+        <div class="published">
           <span class="permission">
             <i class="iconfont icon-suo icon-permission" v-if="!detail.allowShare"></i>
             <i class="iconfont icon-unie65b icon-permission" v-else></i>
@@ -21,31 +21,9 @@
           </span>
           <span class="readNum">阅读（{{detail.readTimes}}）</span>
         </div>
-
-        <!-- <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
-          <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
-        </div>
-
-        <div style="display: inline-block" v-if="!this.id">
-          <span class="management">
-            <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
-            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
-          </span>
-
-          <span class="share" v-if="!detail.isDraft" @click="shareDocument">
-            <i class="iconfont icon-share icon-article-share"></i>
-          </span>
-
-          <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
-        </div> -->
-        
-
+      
       </div>
 
-      <!-- <div class="operating" v-else>
-        <button class="base-button green-btn" @click="pass">通过</button>
-        <button class="base-button white-btn" @click="show = true">拒绝</button>
-      </div> -->
     </div>
 
     <!-- 文章详情 -->
@@ -53,7 +31,7 @@
 
       <div class="info">
         <p class="title">{{detail.title}}</p>
-        <div class="content" ref="content">{{detail.content}}</div>
+        <div class="content" ref="content" v-html="detail.content"></div>
       </div>
       <!-- 详情页脚部分 -->
       <div class="footer" v-if="(detail.label && detail.label.length > 0) || (detail.attachment && detail.attachment.length > 0)">
@@ -77,52 +55,13 @@
       </div>
     </div>
 
-
-    <base-modal
-      class="type-modal"
-      title="审核拒绝"
-      width="500px"
-      :show.sync="show">
-      <el-form :rules="rules" ref="rulesForm" :model="refuseInfo">
-        <el-form-item prop="text">
-          <el-input 
-            type="textarea" 
-            v-model="refuseInfo.text"
-            :autosize="{ minRows: 3, maxRows: 5}" 
-            placeholder="请在此添加拒绝信息"></el-input>
-        </el-form-item>
-      </el-form>
-      
-
-      <div slot="footer" class="edit-footer">
-        <el-button @click="show = false">取 消</el-button>
-        <el-button type="primary" class="green-btn" @click="sumbit">确 定</el-button>
-      </div>
-    </base-modal>
-
-    <!-- <base-modal
-      class="type-modal"
-      width="400px"
-      :show.sync="shareBoxShow"
-      title=" ">
-
-      <div>
-        <i class="iconfont icon-jinggao share-icon"></i>
-        <p>请选择分享方式</p>
-      </div>
-
-      <div slot="footer" class="edit-footer">
-        <el-button @click="inlineShare">对内分享</el-button>
-        <el-button type="primary" class="green-btn" @click="outlineShare">对外分享</el-button>
-      </div>
-    </base-modal> -->
-
   </div>
 </template>
 
 <script>
 import * as RepositoryApi from '@src/api/Repository'
 import * as Lang from '@src/util/lang/index.js';
+import BaseFileItem from '@src/component/common/BaseFileItem/BaseFileItem.vue'
 
 export default {
   name: 'document-detail',
@@ -132,43 +71,18 @@ export default {
       default: () => ({})
     }
   },
+  components: {
+    [BaseFileItem.name]: BaseFileItem
+  },
   data () {
     return {
       form: this.buildForm(), // 附件存储格式
       id: '', // 通知公告id
-      wikiId: '',
-      showOpenFrame: true, // 是否显示 新页面打开
-      isReview: false,
-      refuseInfo: {
-        text: '',
-      },
-      show: false,
-      shareBoxShow: false,
-      rules: {
-        text: [{
-          required: true,
-          message: '请输入拒绝原因',
-          trigger: 'blur'
-        }]
-      },
-      author: {
-        img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-      },
       detail: {}, // 文章详情
-      shareInfo: {
-        selectedUsers: []
-      }
     }
   },
   mounted () {
     this.getId();
-    // 根据formId来判断是否是在新页面打开
-    // if(!window.frameElement) {
-    //   this.showOpenFrame = false;
-    //   return;
-    // }
-    // let formId = window.frameElement.getAttribute('id');
-    // if(formId.indexOf('document_detail') != -1) this.showOpenFrame = false;
   },
   methods: {
     buildForm(){
@@ -186,9 +100,6 @@ export default {
         if(params[0] == 'id') {
           this.id = params[1]
         }
-        if(params[0] == 'wikiId') {
-          this.wikiId = params[1];
-        }
         this.getDocumnetDetail();
       }
     },
@@ -198,231 +109,19 @@ export default {
       try{
 
         let params = {
-          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : this.id)
+          wikiId: this.id
         }
-        let fn = this.id ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
-        let res = await fn(params);
+        let res = await RepositoryApi.getPublicDetail(params);
 
         if(res.success) {
           this.detail = res.result;
-          this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
-          this.initContent();
+          let time = Lang.fmt_gmt_time(this.detail.createTime, 0);
+          this.detail.createTime = Lang.formatDate(time, 'YYYY-MM-DD HH:mm:ss');
         } else {
           this.$platform.alert(res.message)
         }
       } catch(err) {
         console.error(err)
-      }
-    },
-    
-    // 将文章内容换为带格式的
-    initContent () {
-      this.$refs.content.innerHTML = this.detail.content;
-    },
-
-    // 新页面打开通知公告详情
-    openFrame () {
-      let fromId = window.frameElement.getAttribute('id');
-      
-      this.$platform.openTab({
-        id: `document_detail_${ this.detail.id }`,
-        title: '文档库详情',
-        url: `/document/detail?wikiId=${ this.detail.id }`,
-        reload: true,
-        close: true,
-        fromId
-      });
-    },
-
-    // 点击加号显示标签输入框
-    choosePerson () {
-      // this.$refs.notificationRange.$el.click();
-      let max = -1;
-      
-      let options = {
-        title: '请选择分享人员',
-        seeAllOrg: true,
-        selectedUsers: this.shareInfo.selectedUsers,
-        max,
-      };
-      return this.$fast.contact.choose('dept', options).then(result => {
-        if(result.status == 0){
-          let data = result.data || {};
-          let users = data.users || [];
-
-          this.shareInfo.selectedUsers = users;
-          this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
-          this.submitShare();
-        }
-      })
-        .catch(err => console.error(err))
-    },
-
-    // 内部分享选择人员确定后
-    async submitShare () {
-      if(!this.shareInfo.selectedUsers) return;
-
-      try {
-        let userIds = this.shareInfo.selectedUsers.map(item => item.userId);
-        let res = await RepositoryApi.shareDocument(this.detail.id, userIds);
-
-        if(res.success) {
-          this.$platform.alert('分享成功，该分享人员将会收到消息通知');
-        } else {
-          this.$platform.alert(res.message);
-        }
-      } catch(err) {
-        console.error(err)
-      }
-    },
-
-    shareDocument () {
-      if(this.detail.allowShare) {
-        this.shareBoxShow = true
-      } else {
-        this.inlineShare();
-      }
-    },
-
-    // 内部分享，选择人员或者组织
-    inlineShare () {
-      this.shareBoxShow = false;
-      this.choosePerson();
-    },
-
-    outlineShare () {
-      // 外部文章选择外部分享时
-      this.shareBoxShow = false;
-      let body = document.getElementsByTagName('body')[0];
-      let hideTextarea = document.createElement('textarea');
-      body.appendChild(hideTextarea);
-
-      hideTextarea.style.position = 'absolute';
-      hideTextarea.style.left = '-9999px';
-      hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://127.0.0.1:9000/document/detail?id=${this.detail.id}`;
-
-      let selectObject = window.getSelection();
-      let range = document.createRange();
-      range.setStart(selectObject.anchorNode, selectObject.anchorOffset);
-      range.setEnd(selectObject.focusNode, selectObject.focusOffset);
-
-      hideTextarea.focus();
-      hideTextarea.setSelectionRange(0, hideTextarea.value.length);
-      let successful = document.execCommand('copy');
-
-      // 将此前选中的文本再进行选中
-      selectObject.removeAllRanges();
-      selectObject.addRange(range);
-
-      if(!successful) {
-        this.$platform.alert('分享失败，请重新操作')
-      } else {
-        this.$platform.alert('已将链接复制到剪贴板，快去粘贴吧！')
-      }
-
-      this.share = '';
-    },
-
-    // 编辑文章操作，查询详情接口，有人正在编辑提示不跳转
-    async editArticle () {
-      try{
-        let params = {
-          wikiId: this.info.id
-        }
-        let res = await RepositoryApi.getInlineDetail(params);
-
-        if(res.success) {
-          let detail = res.result;
-
-          if(detail.isLock) {
-            this.$platform.alert('该文章正在被编辑，需要等待他编辑完成后才能继续编辑。')
-          } else {
-            //TODO: store存入id、权限,跳转编辑页面
-            let fromId = window.frameElement.getAttribute('id');
-      
-            this.$platform.openTab({
-              id: `wiki_create_${ this.info.id }`,
-              title: '编辑文档',
-              url: `/document/create/${ this.info.id }`,
-              reload: true,
-              close: true,
-              fromId
-            });
-          }
-        } else {
-          this.$platform.alert(res.message)
-        }
-      } catch(err) {
-        console.error(err)
-      }
-    },
-
-    // 删除文章
-    async deleteArticle () {
-      try {
-        if (!await this.$platform.confirm('确定删除该文章吗？')) return;
-        
-        let params = {
-          wikiId: this.detail.id
-        };
-
-        let res = await RepositoryApi.deleteDocument(params);
-
-        if(res.success) {
-          this.$platform.alert('文章已删除成功。')
-          this.$emit('search')
-        } else {
-          this.$platform.alert(res.message);
-        }
-
-      } catch (e) {
-        console.error(e);
-      }
-    },
-
-    // 拒绝审核
-    async sumbit () {
-      this.$refs.rulesForm.validate((valid) => {
-        if (valid) {
-          // try {
-          //   let params = {
-          //     wikiId: this.detail.id,
-          //     msg: this.refuseInfo.text
-          //   }
-          //   //TODO: 拒绝审核接口
-          //   let res = await RepositoryApi.
-
-          //   if(res.success) {
-          //     this.$platform.alert('已拒绝该文章审核')
-          //     this.show = false;
-          //   } else {
-          //     this.$platform.alert(res.message)
-          //   }
-          // } catch(err) {
-          //   console.error(err)
-          // }
-        }
-      })
-    },
-
-    // 通过审核
-    async pass () {
-      try {
-        if (!await this.$platform.confirm('确定通过该文章审核吗？')) return;
-        // let params = {
-        //   wikiId: this.detail.id,
-        // }
-        // //TODO: 审核通过接口
-        // let res = await RepositoryApi.
-
-        // if(res.success) {
-        //   this.$platform.alert('已通过该文章审核')
-        // } else {
-        //   this.$platform.alert(res.message)
-        // }
-      } catch (e) {
-        console.error(e);
       }
     },
 
@@ -436,32 +135,28 @@ export default {
       return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
     }
   },
-  // watch: {
-  //   'info': {
-  //     handler (n) {
-  //       console.log(n);
-  //       // this.getDocumnetDetail();
-  //     },
-  //     deep: true,
-  //   }
-  // }
 }
 </script>
 
 <style lang="scss">
+@import '../../../assets/icon/iconfont.css';
+
 .document-list-detail {
   display: flex;
   flex-direction: column;
   overflow: hidden;
   
   background: #fff;
+  font-size: 14px;
+  color: #333;
 
   .detail-top {
     display: flex;
     justify-content: space-between;
-    height: 74px;
+    height: 75px;
     padding: 16px 24px 16px 16px;
     border-bottom: 1px solid #E8EFF0;
+    box-sizing: border-box;
 
     .author {
       font-size: 0;
@@ -481,7 +176,7 @@ export default {
 
         .name {
           font-size: 16px;
-          margin-bottom: 4px;
+          margin: 0 0 4px 0;
         }
 
         .time {
@@ -667,40 +362,27 @@ export default {
         .annex-right {
           vertical-align: top;
           display: inline-block;
+          padding: 8px;
+
+          a {
+            color: #333;
+            line-height: 20px !important;
+            font-size: 14px;
+            display: inline-block;
+            text-decoration: none;
+            background-color: transparent;
+
+            &:hover {
+              color: #55B7B4;
+              text-decoration: underline;
+            }
+          }
 
           .annex-item {
             font-size: 14px;
           }
         }
       }
-    }
-  }
-
-  .type-modal {
-
-    .base-modal-body {
-      padding: 10px 30px 0;
-    }
-
-    .base-modal-footer {
-      text-align: right;
-    }
-
-    .el-button:hover, .el-button:focus {
-      color: #55B7B4;
-      border-color: #cce9e9;
-      background-color: #eef8f8;
-    }
-
-    .el-button--primary:hover, .el-button--primary:focus {
-      background: #77c5c3;
-      border-color: #77c5c3;
-      color: #FFFFFF;
-    }
-
-    .green-btn {
-      background: #55B7B4;
-      border: transparent;
     }
   }
 }

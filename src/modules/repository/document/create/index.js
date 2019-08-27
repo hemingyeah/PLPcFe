@@ -10,6 +10,10 @@ let initData = {};
 
 try {
   initData = JSON.parse(window._init || '{}');
+  initData.wikiConfig = {
+    needApprove: true,
+    permitShare: true
+  }
 } catch (error) {
   console.error(error)
   console.error('no init data')

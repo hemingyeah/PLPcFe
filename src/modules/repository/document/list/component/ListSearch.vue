@@ -46,7 +46,7 @@
     <div class="search-bottom">
       <el-select v-model="params.orderDetail.column" class="search-sort" @change="search">
         <el-option value="createTime" label="按更新时间排序"></el-option>
-        <el-option value="readTimes" label="按访问量排序"></el-option>
+        <el-option value="read_times" label="按访问量排序"></el-option>
       </el-select>
       <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
     </div>

@@ -12,14 +12,6 @@
         </div>
       </div>
 
-      <!-- <div class="author">
-        <img class="author-img" :src="author.img">
-        <div class="author-info">
-          <p class="name">{{info.updateUser}}</p>
-          <p class="time">最后编辑：{{info.updateTime | fmt_datetime}}</p>
-        </div>
-      </div> -->
-
       <div class="operating">
 
         <div class="common">
@@ -42,10 +34,10 @@
 
       <div class="info">
         <p class="title">{{detail.title}}</p>
-        <div class="content" v-html="detail.handleContent"></div>
+        <div class="content" v-html="detail.content"></div>
       </div>
       <!-- 详情页脚部分 -->
-      <div class="footer" v-if="reads.reads.length > 0 && reads.unreads.length > 0 && detail.attachment && detail.attachment.length > 0">
+      <div class="footer" v-if="(reads.reads.length > 0 && reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)">
         <!-- 已读、未读人员显示 -->
         <div class="person">
 
@@ -86,8 +78,6 @@
         <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
-            <!-- <div class="annex-item">menu.pdf</div>
-            <div class="annex-item">menu.pdf</div> -->
             <div class="base-comment-attachment base-file__preview">
               <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
             </div>
@@ -153,19 +143,22 @@ export default {
           this.noticeId = params[1]
         }
         this.getBulletinDetail();
-        this.getReadOrNotLatest();
+        this.getReadPerson();
+        this.getUnreadPerson();
       }
     },
     // 获取通知公告详情
     async getBulletinDetail () {
       try {
         this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
+        if(!this.params.noticeId) {
+          this.detail = null;
+          return;
+        }
         let res = await RepositoryApi.getBulletinDetail(this.params);
         if(res.success) {
           this.detail = res.result;
-          if(!this.detail) return;
           this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
-          this.detail.handleContent = this.detail.content;
         } else {
           this.$platform.alert(res.message);
         }

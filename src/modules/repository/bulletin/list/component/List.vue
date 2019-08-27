@@ -62,40 +62,11 @@ export default {
       total: 12,
     }
   },
-  mounted () {
-    console.log(this.value)
-  },
   methods: {
-    // 根据关键词设置高亮字段
-    highlight () {
-      if(!this.keyword) return;
-      let replaceReg = new RegExp(this.keyword, 'g');
-      let replaceString = `<span style="color: #FF7B00">${ this.keyword }</span>`;
-      this.$refs.content.innerHTML = this.item.content.replace(replaceReg, replaceString);
-      this.$refs.title.innerHTML = this.item.title.replace(replaceReg, replaceString);
-    },
-
     toDetail (item) {
       this.$emit('update:id', item.id);
       this.$emit('toDetail', item)
     }
-  },
-  watch: {
-    // keyword (n, o) {
-    //   this.highlight();
-    // },
-    // 'value': {
-    //   handler (newValue) {
-    //     let keyword = '微信';
-    //     let replaceReg = new RegExp(keyword, 'g');
-    //     let replaceString = `<span style="color: #FF7B00">${ keyword }</span>`;
-    //     this.$nextTick(() => {
-    //       this.$refs.title.innerHTML = this.item.title.replace(replaceReg, replaceString);
-    //     })
-    //   },
-    //   deep: true,
-    //   immediate: true
-    // }
   }
 }
 </script>

@@ -1,10 +1,11 @@
 <template>
-  <div class="document-list-detail" :style="{height: height}">
+  <div class="document-list-detail" :style="{height: height}" v-if="detail">
     <!-- 详情头部 -->
     <div class="detail-top">
 
       <div class="author">
-        <img class="author-img" :src="author.img">
+        <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
+        <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
         <div class="author-info">
           <p class="name">{{detail.createUserName}}</p>
           <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
@@ -26,8 +27,8 @@
           <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
 
-        <div style="display: inline-block" v-if="!this.id">
-          <span class="management">
+        <div style="display: inline-block">
+          <span class="management" v-if="detail.examineState != 1">
             <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
             <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
           </span>
@@ -53,7 +54,7 @@
 
       <div class="info">
         <p class="title">{{detail.title}}</p>
-        <div class="content" ref="content">{{detail.content}}</div>
+        <div class="content" ref="content" v-html="detail.content"></div>
       </div>
       <!-- 详情页脚部分 -->
       <div class="footer" v-if="(detail.label && detail.label.length > 0) || (detail.attachment && detail.attachment.length > 0)">
@@ -78,7 +79,7 @@
     </div>
 
 
-    <base-modal
+    <!-- <base-modal
       class="type-modal"
       title="审核拒绝"
       width="500px"
@@ -98,7 +99,7 @@
         <el-button @click="show = false">取 消</el-button>
         <el-button type="primary" class="green-btn" @click="sumbit">确 定</el-button>
       </div>
-    </base-modal>
+    </base-modal> -->
 
     <base-modal
       class="type-modal"
@@ -142,8 +143,7 @@ export default {
   data () {
     return {
       form: this.buildForm(), // 附件存储格式
-      id: '', // 通知公告id
-      wikiId: '',
+      wikiId: '', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
       isReview: false,
       refuseInfo: {
@@ -214,26 +214,23 @@ export default {
       try{
 
         let params = {
-          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : this.id)
+          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
         }
-        let fn = this.id ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
-        let res = await fn(params);
+        if(!params.wikiId) {
+          this.detail = null;
+          return;
+        }
+        let res = await RepositoryApi.getInlineDetail(params);
 
         if(res.success) {
           this.detail = res.result;
           this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
-          this.initContent();
         } else {
           this.$platform.alert(res.message)
         }
       } catch(err) {
         console.error(err)
       }
-    },
-    
-    // 将文章内容换为带格式的
-    initContent () {
-      this.$refs.content.innerHTML = this.detail.content;
     },
 
     // 新页面打开通知公告详情
@@ -316,7 +313,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://127.0.0.1:9000/open/wiki?id=${this.detail.id}`;
+      hideTextarea.innerHTML = `http://127.0.0.1:9000/v_open/wiki?id=${this.detail.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -351,10 +348,9 @@ export default {
         if(res.success) {
           let detail = res.result;
 
-          if(detail.isLock) {
+          if(detail.isLock && detail.examineState != 1) {
             this.$platform.alert('该文章正在被编辑，需要等待他编辑完成后才能继续编辑。')
           } else {
-            //TODO: store存入id、权限,跳转编辑页面
             let fromId = window.frameElement.getAttribute('id');
       
             this.$platform.openTab({
@@ -401,51 +397,6 @@ export default {
       this.$refs.approveDialog.open();
     },
 
-    // 拒绝审核
-    async sumbit () {
-      this.$refs.rulesForm.validate((valid) => {
-        if (valid) {
-          // try {
-          //   let params = {
-          //     wikiId: this.detail.id,
-          //     msg: this.refuseInfo.text
-          //   }
-          //   //TODO: 拒绝审核接口
-          //   let res = await RepositoryApi.
-
-          //   if(res.success) {
-          //     this.$platform.alert('已拒绝该文章审核')
-          //     this.show = false;
-          //   } else {
-          //     this.$platform.alert(res.message)
-          //   }
-          // } catch(err) {
-          //   console.error(err)
-          // }
-        }
-      })
-    },
-
-    // 通过审核
-    async pass () {
-      try {
-        if (!await this.$platform.confirm('确定通过该文章审核吗？')) return;
-        // let params = {
-        //   wikiId: this.detail.id,
-        // }
-        // //TODO: 审核通过接口
-        // let res = await RepositoryApi.
-
-        // if(res.success) {
-        //   this.$platform.alert('已通过该文章审核')
-        // } else {
-        //   this.$platform.alert(res.message)
-        // }
-      } catch (e) {
-        console.error(e);
-      }
-    },
-
   },
   computed: {
     height () {
@@ -471,16 +422,7 @@ export default {
         proposerTime: Lang.formatDate(createTime, 'YYYY-MM-DD HH:mm:ss'),
       }
     }
-  },
-  // watch: {
-  //   'info': {
-  //     handler (n) {
-  //       console.log(n);
-  //       // this.getDocumnetDetail();
-  //     },
-  //     deep: true,
-  //   }
-  // }
+  }
 }
 </script>
 
@@ -495,7 +437,7 @@ export default {
   .detail-top {
     display: flex;
     justify-content: space-between;
-    height: 74px;
+    height: 75px;
     padding: 16px 24px 16px 16px;
     border-bottom: 1px solid #E8EFF0;
 

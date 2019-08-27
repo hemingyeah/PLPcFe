@@ -34,11 +34,18 @@ export default {
     [UpdateLog.name]: UpdateLog,
     [RequestApprove.name]: RequestApprove
   },
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       params: {
         article: '', // 文章内容
         permission: '内部', // 文章权限
+        permitShare: this.initData.wikiConfig.permitShare,
         label: [], // 标签
         form: {}, // 附件
         typeId: [], // 文章分类
@@ -52,7 +59,6 @@ export default {
       allowShare: false,
       info: {},
       reportApproveStatus: null,
-      needApprove: false,
     }
   },
   created () {
@@ -109,7 +115,7 @@ export default {
       if(!this.paramsCheck()) return;
       this.isToDraft = false;
 
-      if(this.needApprove) {
+      if(this.initData.wikiConfig.needApprove) {
         this.$refs.requestApproveDialog.open();
         return;
       }
@@ -143,7 +149,7 @@ export default {
       try {
         let otherInfo = this.buildParams();
         let params = {
-          objId: this.info.wikiId || null,
+          objId: this.info.id || null,
           applyRemark: remark,
           source: 'wiki',
           otherInfo

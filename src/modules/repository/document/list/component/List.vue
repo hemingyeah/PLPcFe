@@ -91,7 +91,8 @@ export default {
       total: 18,
       // id: null,
       shareBoxShow: false,
-      shareInfo: {}
+      shareInfo: {},
+      chosenItem: {}
     }
   },
   mounted () {
@@ -155,17 +156,18 @@ export default {
     },
 
     shareDocument (item) {
+      this.chosenItem = item;
       if(item.allowShare) {
         this.shareBoxShow = true
       } else {
-        this.inlineShare(item);
+        this.inlineShare();
       }
     },
 
     // 内部分享，选择人员或者组织
-    inlineShare (item) {
+    inlineShare () {
       this.shareBoxShow = false;
-      this.choosePerson(item);
+      this.choosePerson(this.chosenItem);
     },
 
     // 外部分享，将连接添加至剪切板
@@ -179,7 +181,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = 'http://127.0.0.1:9000/document/detail';
+      hideTextarea.innerHTML = `http://127.0.0.1:9000/v_open/wiki?id=${this.chosenItem.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -207,14 +209,7 @@ export default {
       this.$emit('update:id', item.id);
       this.$emit('toDetail', item)
     },
-  },
-  
-  // watch: {
-  //   keyword (n, o) {
-  //     console.log(n)
-  //     // this.highlight();
-  //   }
-  // }
+  }
 }
 </script>
 

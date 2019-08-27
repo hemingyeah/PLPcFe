@@ -342,7 +342,8 @@ export default {
         { name: '全部', value: '' },
         { name: '事件', value: 'event' },
         { name: '工单', value: 'task' },
-        { name: '绩效报告', value: '绩效报告' }
+        { name: '绩效报告', value: '绩效报告' },
+        { name: '文档库', value: 'wiki' },
       ],
       role: [
         { name: '由我审批', value: 'approve' },
@@ -865,7 +866,7 @@ export default {
           close: true,
           url: `/document/detail?wikiId=${objId}&approve=true`,
           fromId
-        } 
+        }
       }
 
       // /performance/v2/report/desc/3679
@@ -1038,7 +1039,7 @@ export default {
   filters: {
     getEventName (value) {
       if (!value) return '';
-      return value === 'event' ? '事件' : value === 'task' ? '工单' : value;
+      return value === 'event' ? '事件' : value === 'task' ? '工单' : value === 'wiki' ? '文档库' : value;
     },
     getFormatDate (value) {
       if (!value) return '';
