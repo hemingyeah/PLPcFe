@@ -16,7 +16,7 @@
     </div>
 
     <base-modal :show.sync="visible" title="解析地址" class="form-address-modal">
-      <textarea v-model="copy" placeholder="请输入或粘贴地址到文本框进行解析"></textarea>
+      <textarea v-model="copy" placeholder="请输入或粘贴地址到文本框进行解析" maxlength="500"></textarea>
       <el-button type="primary" @click="analyze" :disabled="!copy.length || pending">解析</el-button>
     </base-modal>
   </div>
