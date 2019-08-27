@@ -12,7 +12,7 @@
         <label>分类：</label> {{approveData.type}}
       </li>
       <li>
-        <label>流程节点：</label> 发布
+        <label>操作：</label> 发布
       </li>
       <li>
         <label>内容：</label> 发布 {{approveData.name}}

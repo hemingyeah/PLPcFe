@@ -600,6 +600,7 @@ export default {
         // display: inline-block;
         vertical-align: top;
         font-size: 0;
+        padding-bottom: 10px;
 
         .icon-tags {
           vertical-align: middle;

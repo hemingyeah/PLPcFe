@@ -64,7 +64,7 @@
               <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
             </el-tooltip>
             <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">+{{reads.unreads.length - 5}}
-              <div class="see-more" v-if="showMoreNoRead" ref="seeMore">
+              <div class="see-more right" v-if="showMoreNoRead" ref="seeMore">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
                   <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
                   <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
@@ -494,6 +494,14 @@ export default {
               .person-img {
                 margin-right: 10px;
                 margin-bottom: 8px;
+              }
+            }
+
+            .right {
+              left: -155px;
+
+              &::after {
+                left: 138px;
               }
             }
           }
