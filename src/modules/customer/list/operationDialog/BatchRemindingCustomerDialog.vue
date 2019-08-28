@@ -3,7 +3,7 @@
 
     <div slot="title" class="modal-title">
       <h3>添加提醒</h3>
-      <div class="tip">（您已选择{{selectedIds.length}}条数据进行批量编辑）</div>
+      <div class="tip">（您已选择{{selectedIds.length}}条数据进行批量提醒）</div>
     </div>
 
     <el-form ref="form" :model="form" label-width="80px">
