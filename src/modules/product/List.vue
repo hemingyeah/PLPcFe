@@ -859,7 +859,7 @@ export default {
       let exportAll = !ids || !ids.length;
       let exportSearchModel = exportAll ? {
         ...this.buildParams(),
-        exportTotal: this.totalItems
+        exportTotal: this.page.total
       } : {exportTotal: ids.length};
 
       return {

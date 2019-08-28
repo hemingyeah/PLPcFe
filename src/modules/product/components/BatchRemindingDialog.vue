@@ -1,5 +1,11 @@
 <template>
   <base-modal title="添加提醒" :show.sync="batchRemindingCustomerDialog" width="500px" class="batch-remind-customer-dialog" @closed="reset">
+
+    <div slot="title" class="modal-title">
+      <h3>添加提醒</h3>
+      <div class="tip">（您已选择{{selectedIds.length}}条数据进行批量编辑）</div>
+    </div>
+
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="选择提醒">
@@ -255,6 +261,24 @@ export default {
 <style lang="scss">
 
   .batch-remind-customer-dialog {
+
+    .modal-title {
+      display: flex;
+      flex-grow: 1;
+      justify-content: flex-start;
+
+      h3 {
+        flex-grow: 0;
+        flex: unset;
+      }
+
+      .tip {
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 24px;
+        color: #666;
+      }
+    }
 
     .el-select .el-select__tags>span {
       display: contents;
