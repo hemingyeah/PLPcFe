@@ -1,12 +1,6 @@
 <template>
   <base-modal title="发送短信" :show.sync="sendMessageDialog" width="600px"
               class="send-message-to-customer-dialog">
-
-    <div slot="title" class="modal-title">
-      <h3>发送短信</h3>
-      <div class="tip">（您已选择{{selectedIds.length}}条数据发送短信）</div>
-    </div>
-
     <el-form ref="form" :model="form" label-width="100px">
       <el-form-item label="接收人">
         <el-radio-group v-model="form.isAllLm" @change="fetchCount" :disabled="pending">
@@ -192,24 +186,6 @@ export default {
 
 <style lang="scss">
   .send-message-to-customer-dialog {
-
-    .modal-title {
-      display: flex;
-      flex-grow: 1;
-      justify-content: flex-start;
-
-      h3 {
-        flex-grow: 0;
-        flex: unset;
-      }
-
-      .tip {
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 24px;
-        color: #666;
-      }
-    }
 
     .base-modal-body {
       padding: 0 0 20px;
