@@ -1,7 +1,5 @@
 <template>
   <div class="document-list-container">
-
-    <div class="list-top" v-if="value.list && value.list.length > 0">符合搜索结果的共<span style="color: #FF7B00">{{value.total}}</span>条</div>
     
     <div class="list-content">
       <div class="list-noData" v-if="value.list && value.list.length <= 0">暂无数据</div>
@@ -10,6 +8,10 @@
 
         <div class="item-top">
           <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
+          <!-- 我发布的显示分享 -->
+          <span class="share" @click="shareDocument(item)" v-if="!item.isDraft">
+            <i class="iconfont icon-share icon-article-share"></i>
+          </span>
           <!-- 草稿箱显示审核状态 -->
           <el-tag class="review-tag" v-if="item.examineState && item.examineState != 0" :type="item.examineState == 1 ? '' : 'danger'">{{item.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
@@ -37,9 +39,6 @@
               {{!item.allowShare ? '内部' : '外部'}}
             </span>
             <span class="readNum">阅读（{{item.readTimes}}）</span>
-            <span class="share" @click="shareDocument(item)">
-              <i class="iconfont icon-share icon-article-share"></i>
-            </span>
           </div>
 
         </div>
@@ -181,7 +180,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://127.0.0.1:9000/v_open/wiki?id=${this.chosenItem.id}`;
+      hideTextarea.innerHTML = `http://172.18.1.153:8080/share/wiki/view?wikiId=${this.chosenItem.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -222,13 +221,6 @@ export default {
   height: 100%;
   overflow: hidden;
 
-  .list-top {
-    height: 40px;
-    line-height: 40px;
-    padding: 0 11px;
-    color: #909399;
-  }
-
   .list-content {
     overflow: auto;
     flex: 1;
@@ -241,22 +233,37 @@ export default {
   }
 
   .list-item {
-    padding: 11px;
+    padding: 10px 11px;
     border-bottom: 1px solid #E8EFF0;
     
 
     .item-top {
       font-size: 0;
       display: flex;
+      height: 24px;
+      line-height: 24px;
 
       .item-title {
         flex: 1;
         margin: 0;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 500;
         vertical-align: middle;
 
         cursor: pointer;
+      }
+
+      .share {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+
+        cursor: pointer;
+
+        .icon-article-share {
+          font-size: 16px;
+          color: #38A6A6;
+        }
       }
 
       .review-tag {
@@ -268,7 +275,7 @@ export default {
     
 
     .item-info {
-      padding: 4px 0;
+      // padding: 4px 0;
       font-size: 12px;
       color: #909399;
 
@@ -281,19 +288,26 @@ export default {
       margin: 0;
       padding: 4px 0;
       color: #909399;
-      line-height: 22px;
+      line-height: 17px;
+      font-size: 12px;
 
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
+      word-break: break-all;
     }
 
     .item-footer {
-      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
 
       .footer-right {
-        // padding-top: 10px;
+        flex: 1;
+        text-align: right;
+        height: 24px;
+        line-height: 24px;
 
         .icon-permission {
           font-size: 14px;
@@ -302,28 +316,12 @@ export default {
         }
 
         .readNum {
-          margin: 0 15px;
-        }
-
-        .share {
-          display: inline-block;
-
-          width: 20px;
-          height: 20px;
-          line-height: 20px;
-
-          cursor: pointer;
-
-          .icon-article-share {
-            font-size: 16px;
-            color: #38A6A6;
-          }
+          margin: 0 5px;
         }
       }
 
       .type {
         font-size: 0;
-        padding-bottom: 10px;
 
         .icon-tags {
           vertical-align: middle;
@@ -332,12 +330,12 @@ export default {
         }
 
         .search-tag {
-          max-width: 76px;
+          max-width: 62px;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
 
-          margin-left: 4px;
+          margin-right: 4px;
           border: none;
           background: #E8EFF0;
           color: #606266;

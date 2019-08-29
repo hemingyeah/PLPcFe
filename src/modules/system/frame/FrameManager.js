@@ -72,13 +72,14 @@ const FrameManager = {
       this.frameTabs.forEach(item => item.show = false);
       this.frameTabs.push(tab);
       if(tab.id == 'M_INFO_DOC') {
-        tab.url = '/document/list';
+        tab.url = '/wiki/list/page';
       } else if(tab.id == 'M_INFO_NOTICE') {
-        tab.url = '/bulletin/list';
+        tab.url = '/info/notice/list/page';
+      } else if (tab.id == 'M_APPROVE_LIST') {
+        tab.url = '/approve/list'
       } else {
         this.currUrl = tab.url;
       }
-      console.log(this.frameTabs);
       // this.currUrl = tab.url;
 
       this.adjustFrameTabs(tab);

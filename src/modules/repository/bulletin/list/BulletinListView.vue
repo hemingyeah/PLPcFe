@@ -1,18 +1,21 @@
 <template>
   <div class="bulletin-list-view">
-    <!-- 左侧列表 -->
-    <div class="bulletin-list-left">
-      <!-- 搜索部分 -->
-      <list-search class="list-search" @search="search"></list-search>
-      <!-- 列表部分 -->
-      <list class="list" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list"></list>
-      <!-- 页脚部分 -->
-      <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
-    </div>
+    <!-- 搜索部分 -->
+    <list-search class="list-search" @search="search" :total="listTotal"></list-search>
 
-    <!-- 右侧详情 -->
-    <div class="bulletin-list-right">
-      <bullet-detail :info="info" @search="search" ref="bulletinDetail"></bullet-detail>
+    <div class="bulletin-list-bottom">
+      <!-- 左侧列表 -->
+      <div class="bulletin-list-left">
+        <!-- 列表部分 -->
+        <list class="list" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list"></list>
+        <!-- 页脚部分 -->
+        <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
+      </div>
+
+      <!-- 右侧详情 -->
+      <div class="bulletin-list-right">
+        <bullet-detail :info="info" @search="search" ref="bulletinDetail"></bullet-detail>
+      </div>
     </div>
 
   </div>
@@ -123,34 +126,43 @@ export default {
   padding: 10px;
   height: 100vh;
   display: flex;
+  flex-direction: column;
 
-  .bulletin-list-left {
-    width: 450px;
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-
-    .list-search {
-      position: relative;
-      z-index: 99;
-      box-shadow:0px 2px 4px 0px rgba(232,232,232,1);
-    }
-
-    .list {
-      background: #fff;
-      flex: 1
-    }
-
-    .list-footer {
-      margin-top: 3px;
-    }
+  .list-search {
+    position: relative;
+    z-index: 99;
+    border-bottom: 1px solid #E8EFF0;
+    height: 56px;
+    background: #F8F8F8;
+    // box-shadow:0px 2px 4px 0px rgba(232,232,232,1);
   }
 
-  .bulletin-list-right {
+  .bulletin-list-bottom {
     flex: 1;
-    height: 100%;
-    margin-left: 10px;
-    background: #fff;
+    display: flex;
+
+    .bulletin-list-left {
+      width: 450px;
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+
+      .list {
+        background: #fff;
+        flex: 1
+      }
+
+      .list-footer {
+        margin-top: 3px;
+      }
+    }
+
+    .bulletin-list-right {
+      flex: 1;
+      height: 100%;
+      background: #fff;
+      border-left: 2px solid #E8EFF0;
+    }
   }
 }
 </style>

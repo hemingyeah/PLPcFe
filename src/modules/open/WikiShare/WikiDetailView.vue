@@ -4,22 +4,17 @@
     <div class="detail-top">
 
       <div class="author">
-        <img class="author-img" :src="detail.createUserHead">
+        <img class="author-img" :src="initData.createUserHead">
         <div class="author-info">
-          <p class="name">{{detail.createUserName}}</p>
-          <p class="time">发布于：{{detail.createTime}}</p>
+          <p class="name">{{initData.createUserName}}</p>
+          <p class="time">发布于：{{initData.createTime | fmt_dateTime}}</p>
         </div>
       </div>
 
       <div class="operating">
         
         <div class="published">
-          <span class="permission">
-            <i class="iconfont icon-suo icon-permission" v-if="!detail.allowShare"></i>
-            <i class="iconfont icon-unie65b icon-permission" v-else></i>
-            {{!detail.allowShare ? '内部' : '外部'}}
-          </span>
-          <span class="readNum">阅读（{{detail.readTimes}}）</span>
+          <span class="readNum">阅读（{{initData.readTimes}}）</span>
         </div>
       
       </div>
@@ -30,24 +25,24 @@
     <div class="detail-content" :style="{padding: padding}">
 
       <div class="info">
-        <p class="title">{{detail.title}}</p>
-        <div class="content" ref="content" v-html="detail.content"></div>
+        <p class="title">{{initData.title}}</p>
+        <div class="content" ref="content" v-html="initData.content"></div>
       </div>
       <!-- 详情页脚部分 -->
-      <div class="footer" v-if="(detail.label && detail.label.length > 0) || (detail.attachment && detail.attachment.length > 0)">
+      <div class="footer" v-if="(initData.label && initData.label.length > 0) || (initData.attachment && initData.attachment.length > 0)">
 
-        <div class="tags" v-if="detail.label && detail.label.length > 0">
+        <div class="tags" v-if="initData.label && initData.label.length > 0">
           <i class="iconfont icon-tag icon-tags"></i>
-          <el-tag class="detail-tag" v-for="(tag,index) in detail.label" :key="index">{{tag}}</el-tag>
+          <el-tag class="detail-tag" v-for="(tag,index) in initData.label" :key="index">{{tag}}</el-tag>
         </div>
 
         <!-- <div class="dividing-line" v-if="detail.label && detail.label.length > 0"></div> -->
 
-        <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
+        <div class="annex" v-if="initData.attachment && initData.attachment.length > 0">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
             <div class="base-comment-attachment base-file__preview">
-              <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
+              <base-file-item v-for="file in initData.attachment" :key="file.id" :file="file" size="small"></base-file-item>
             </div>
           </div>
         </div>
@@ -66,65 +61,13 @@ import BaseFileItem from '@src/component/common/BaseFileItem/BaseFileItem.vue'
 export default {
   name: 'document-detail',
   props: {
-    info: {
+    initData: {
       type: Object,
       default: () => ({})
     }
   },
   components: {
     [BaseFileItem.name]: BaseFileItem
-  },
-  data () {
-    return {
-      form: this.buildForm(), // 附件存储格式
-      id: '', // 通知公告id
-      detail: {}, // 文章详情
-    }
-  },
-  mounted () {
-    this.getId();
-  },
-  methods: {
-    buildForm(){
-      return {
-        content: '',
-        attachments: [],
-        showInOwn: 0
-      }
-    },
-
-    getId () {
-      if(window.location.href.indexOf('?') != -1) {
-        let array = window.location.href.split('?');
-        let params = array[1].split('=');
-        if(params[0] == 'id') {
-          this.id = params[1]
-        }
-        this.getDocumnetDetail();
-      }
-    },
-
-    // 获取文档库详情
-    async getDocumnetDetail () {
-      try{
-
-        let params = {
-          wikiId: this.id
-        }
-        let res = await RepositoryApi.getPublicDetail(params);
-
-        if(res.success) {
-          this.detail = res.result;
-          let time = Lang.fmt_gmt_time(this.detail.createTime, 0);
-          this.detail.createTime = Lang.formatDate(time, 'YYYY-MM-DD HH:mm:ss');
-        } else {
-          this.$platform.alert(res.message)
-        }
-      } catch(err) {
-        console.error(err)
-      }
-    },
-
   },
   computed: {
     height () {

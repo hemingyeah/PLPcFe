@@ -1,19 +1,23 @@
 <template>
   <div class="document-list-view">
-    <!-- 左侧列表 -->
-    <div class="document-list-left">
-      <!-- 搜索部分 -->
-      <list-search class="list-search" v-model="params" :tag="tag" @search="search" ref="listSearch"></list-search>
-      <!-- 列表部分 -->
-      <list class="list" @tag="setTag" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list"></list>
-      <!-- 页脚部分 -->
-      <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
-    </div>
+    <!-- 搜索部分 -->
+    <list-search class="list-search" v-model="params" :tag="tag" :total="listTotal" @search="search" ref="listSearch"></list-search>
 
-    <!-- 右侧详情 -->
-    <div class="document-list-right">
-      <document-detail :info="info" ref="documentDetail" @search="search"></document-detail>
+    <div class="document-list-bottom">
+      <!-- 左侧列表 -->
+      <div class="document-list-left">
+        <!-- 列表部分 -->
+        <list class="list" @tag="setTag" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list"></list>
+        <!-- 页脚部分 -->
+        <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
+      </div>
+
+      <!-- 右侧详情 -->
+      <div class="document-list-right">
+        <document-detail :info="info" ref="documentDetail" @search="search"></document-detail>
+      </div>
     </div>
+    
     
   </div>
 </template>
@@ -117,34 +121,44 @@ export default {
   padding: 10px;
   height: 100vh;
   display: flex;
+  flex-direction: column;
 
-  .document-list-left {
-    width: 450px;
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-
-    .list-search {
-      position: relative;
-      z-index: 99;
-      box-shadow:0px 2px 4px 0px rgba(232,232,232,1);
-    }
-
-    .list {
-      background: #fff;
-      flex: 1
-    }
-
-    .list-footer {
-      margin-top: 3px;
-    }
+  .list-search {
+    position: relative;
+    z-index: 99;
+    height: 56px;
+    background: #F8F8F8;
+    border-bottom: 1px solid #E8EFF0;
+    // box-shadow:0px 2px 4px 0px rgba(232,232,232,1);
   }
 
-  .document-list-right {
+  .document-list-bottom {
     flex: 1;
-    height: 100%;
-    margin-left: 10px;
-    background: #fff;
+    display: flex;
+
+    .document-list-left {
+      width: 426px;
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+
+      .list {
+        background: #fff;
+        flex: 1
+      }
+
+      .list-footer {
+        margin-top: 3px;
+      }
+    }
+
+    .document-list-right {
+      flex: 1;
+      height: 100%;
+      // margin-left: 10px;
+      background: #fff;
+      border-left: 2px solid #E8EFF0;
+    }
   }
 }
 </style>

@@ -3,57 +3,39 @@
 
     <ul class="approve-info">
       <li>
-        <label>编号：</label> {{approveData.name}}
+        <label>编号：</label> {{approveData.objNo}}
       </li>
       <li>
         <label>来源：</label> 文档库
       </li>
       <li>
-        <label>分类：</label> {{approveData.type}}
+        <label>分类：</label> {{approveData.typeName}}
       </li>
       <li>
-        <label>操作：</label> 发布
+        <label>操作：</label> {{approveData.action}}
       </li>
       <li>
-        <label>内容：</label> 发布 {{approveData.name}}
+        <label>内容：</label> {{approveData.action}} {{approveData.objNo}}
       </li>
       <li>
         <label>发起人：</label> {{approveData.proposerName}}
       </li>
       <li>
-        <label>发起时间：</label> {{approveData.proposerTime}}
+        <label>发起时间：</label> {{approveData.createTime}}
       </li>
       <li>
         <label>发起备注：</label> {{approveData.applyRemark}}
       </li>
       <li>
         <label>审批结果：</label>
-        <el-radio v-model="form.result" label="success">同意</el-radio>
-        <el-radio v-model="form.result" label="fail">不同意</el-radio>
+        <el-radio v-model="form.state" label="success">同意</el-radio>
+        <el-radio v-model="form.state" label="fail">不同意</el-radio>
       </li>
       <li>
         <label>审批备注：</label>
         <el-input type="textarea" v-model="form.approveRemark" resize="none" rows="3" :maxlength="500"></el-input>
       </li>
     </ul>
-
-    <!-- <el-form ref="form" :rules="rules" :model="form">
-      <el-form-item label="编号：">{{approveData.name}}</el-form-item>
-      <el-form-item label="来源：">文档库</el-form-item>
-      <el-form-item label="分类：">{{approveData.type}}</el-form-item>
-      <el-form-item label="流程节点：">发布</el-form-item>
-      <el-form-item label="内容：">发布 {{approveData.name}}</el-form-item>
-      <el-form-item label="发起人：">{{approveData.proposerName}}</el-form-item>
-      <el-form-item label="发起时间：">{{approveData.name}}</el-form-item>
-      <el-form-item label="发起备注：">{{approveData.applyRemark}}</el-form-item>
-      <el-form-item label="审批结果：">
-        <el-radio v-model="form.result" label="success">同意</el-radio>
-        <el-radio v-model="form.result" label="fail">不同意</el-radio>
-      </el-form-item>
-      <el-form-item label="审批备注：" :prop="form.result == 'fail' ? 'approveRemark' : ''">
-        <el-input type="textarea" v-model="form.approveRemark" resize="none" rows="3" :maxlength="500"></el-input>
-      </el-form-item>
-    </el-form> -->
 
 
     <p class="tip">备注：审批后不能修改审批结果</p>
@@ -81,7 +63,7 @@ export default {
       pending: false,
       init: false,
       form: {
-        result: 'success',
+        state: 'success',
         approveRemark: '',
       },
       rules: {
@@ -98,11 +80,7 @@ export default {
       this.visible = true;
     },
     onSubmit() {
-      // this.$refs.form.validateField('approveRemark', res => {
-      //   console.log(res);
-      // })
-
-      if(this.form.result == 'fail' && !this.form.approveRemark) {
+      if(this.form.state == 'fail' && !this.form.approveRemark) {
         this.$platform.alert('请在审批备注中填写拒绝原因');
         return;
       }
@@ -112,24 +90,36 @@ export default {
 
       RepositoryApi.operateApprove({
         ...this.form,
-        wikiId: this.approveData.wikiId,
+        id: this.approveData.id,
+        source: 'wiki'
       })
         .then(res => {
+          if(res.success) {
+            this.pending = false;
 
-          this.pending = false;
+            if (res.status) return this.$platform.notification({
+              title: '审批失败',
+              message: res.message || '',
+              type: 'error',
+            });
 
-          if (res.status) return this.$platform.notification({
-            title: '审批失败',
-            message: res.message || '',
-            type: 'error',
-          });
+            this.$platform.notification({
+              title: '审批成功',
+              type: 'success',
+            });
 
-          this.$platform.notification({
-            title: '审批成功',
-            type: 'success',
-          });
-
-          return window.location.reload()
+            let fromId = window.frameElement.getAttribute('id');
+      
+            return this.$platform.openTab({
+              id: `document_detail_${ this.approveData.objId }`,
+              title: '文档库详情',
+              url: `/wiki/detail/page?wikiId=${ this.approveData.objId }`,
+              reload: true,
+              close: true,
+              fromId
+            });
+          }
+          this.$platform.alert(res.message);
         })
         .catch(e => console.error('e', e));
     },

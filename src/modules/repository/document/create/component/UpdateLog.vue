@@ -122,18 +122,18 @@ export default {
         ]
       }
 
-      if(action == '审核通过') {
+      if(action == '审批成功') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>执行审核通过操作
+            <strong>{userName}</strong>执行审批成功操作
           </h5>
         ]
       }
 
-      if(action == '审核拒绝') {
+      if(action == '审批拒绝') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>执行审核拒绝操作
+            <strong>{userName}</strong>执行审批拒绝操作
           </h5>,
           <p class="secondary-info">拒绝原因：
             {content.reason}

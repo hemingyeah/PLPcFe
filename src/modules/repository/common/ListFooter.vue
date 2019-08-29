@@ -66,11 +66,20 @@ export default {
   }
 
   .el-pagination__jump {
+    margin: 0 0 0 5px;
+  }
+
+  .el-pagination__sizes {
     margin: 0;
   }
 
   .el-pagination .el-select .el-input {
     margin: 0;
+    width: 80px;
+  }
+
+  .el-input__inner {
+    height: 22px;
   }
 }
 </style>

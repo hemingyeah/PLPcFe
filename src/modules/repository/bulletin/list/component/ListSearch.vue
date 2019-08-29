@@ -2,35 +2,39 @@
   <div class="bulletin-list-search" ref="search">
     <div class="search-top">
       <button class="base-button search-new" @click="create">新建</button>
-      <!-- 关键词搜索框 -->
-      <div class="search-input-container" ref="searchInput">
-        <el-input 
-          class="search-input"
-          placeholder="输入关键词搜索" 
-          v-model="params.keyword"
-          @keyup.enter.native="search"
-          v-if="isSearch"
-          clearable>
-          <i slot="suffix" class="el-input__icon el-icon-search"></i>
-        </el-input>
-        <button class="search-btn" @click="toSearch" v-else>
-          <i class="iconfont icon-search1 serach-icon"></i>
-        </button>
+      
+      <!-- 通知公告类型筛选 -->
+      <div class="search-bottom">
+        <el-select v-model="params.typeId" class="search-type" @change="search">
+          <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
+            <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
+            <span style="float: right" class="type-operating">
+              <i class="iconfont icon-chuanjianbaogao" style="font-size: 14px" @click.stop="editType(item)"></i>
+              <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
+            </span>
+          </el-option>
+          <div class="add-type" @click="addType">新建分类</div>
+        </el-select>
       </div>
     </div>
-    <!-- 通知公告类型筛选 -->
-    <div class="search-bottom">
-      <el-select v-model="params.typeId" class="search-type" @change="search">
-        <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
-          <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
-          <span style="float: right" class="type-operating">
-            <i class="iconfont icon-chuanjianbaogao" style="font-size: 14px" @click.stop="editType(item)"></i>
-            <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
-          </span>
-        </el-option>
-        <div class="add-type" @click="addType">新建分类</div>
-      </el-select>
+
+    <!-- 关键词搜索框 -->
+    <div class="search-input-container" ref="searchInput">
+      <div class="list-top" v-if="total && total > 0">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
+      <el-input 
+        class="search-input"
+        placeholder="输入关键词搜索" 
+        v-model="params.keyword"
+        @keyup.enter.native="search"
+        clearable>
+        <i slot="suffix" class="el-input__icon el-icon-search"></i>
+      </el-input>
+      <!-- v-if="isSearch" -->
+      <!-- <button class="search-btn" @click="toSearch" v-else>
+        <i class="iconfont icon-search1 serach-icon"></i>
+      </button> -->
     </div>
+    
     <!-- 添加编辑分类 -->
     <base-modal
       class="type-modal"
@@ -55,6 +59,12 @@ import * as RepositoryApi from '@src/api/Repository'
 
 export default {
   name: 'list-search',
+  props: {
+    total: {
+      type: Number,
+      default: null
+    }
+  },
   data () {
     return {
       typeOptions: [], // 类型
@@ -133,7 +143,7 @@ export default {
       this.$platform.openTab({
         id: 'bulletin_create',
         title: '新建文档',
-        url: '/bulletin/create',
+        url: '/info/notice/create/page',
         reload: true,
         close: true,
         fromId
@@ -245,51 +255,71 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .bulletin-list-search {
   background: #fff;
   padding: 11px;
+  display: flex;
+  justify-content: space-between;
   
   .search-top {
-    display: flex;
-    justify-content: space-between;
+    
 
-    .search-input-container {
-      position: relative;
+    .search-bottom {
+      display: inline-block;
+      font-size: 0;
+      height: 34px;
+      margin-left: 10px;
 
-      .search-input {
-        height: 36px;
-        width: 250px;
+      .search-type {
+        // vertical-align: middle;
+        width: 100%;
+        height: 34px;
 
         .el-input__inner {
-          height: 100%;
+          height: 34px;
+          line-height: 34px;
         }
       }
 
-      .search-btn {
-        margin: 0;
-        border: 1px solid #E3E9EA;  //自定义边框
-        outline: none;    //消除默认点击蓝色边框效果
-        height: 36px;
-        width: 36px;
-        line-height: 30px;
-        border-radius: 2px;
-
-        .serach-icon {
-          font-size: 18px;
-          color: #55B7B4;
-        }
-      }
+      
     }
+
   }
 
-  .search-bottom {
-    font-size: 0;
-    padding-top: 11px;
+  .search-input-container {
+    position: relative;
 
-    .search-type {
-      vertical-align: middle;
-      width: 100%;
+    .list-top {
+      display: inline-block;
+      height: 34px;
+      line-height: 34px;
+      padding: 0 11px;
+      color: #909399;
+    }
+
+    .search-input {
+      height: 34px;
+      width: 230px;
+
+      .el-input__inner {
+        height: 100%;
+      }
+    }
+
+    .search-btn {
+      margin: 0;
+      border: 1px solid #E3E9EA;  //自定义边框
+      outline: none;    //消除默认点击蓝色边框效果
+      height: 36px;
+      width: 36px;
+      line-height: 30px;
+      border-radius: 2px;
+
+      .serach-icon {
+        font-size: 18px;
+        color: #55B7B4;
+      }
     }
   }
 }

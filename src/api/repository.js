@@ -99,9 +99,9 @@ export function getInlineDetail (wikiId) {
  * 
  * @returns Promise<Object>
  */
-export function getPublicDetail (wikiId) {
-  return http.get('/public/wiki/get', wikiId);
-}
+// export function getPublicDetail (wikiId) {
+//   return http.get('/share/wiki/view', wikiId);
+// }
 
 /**
  * 删除文档库
@@ -200,14 +200,25 @@ export function createApprove (params) {
 
 /**
  * 文档库处理审批
- * @param {String} params.wikiId - 文档库Id
+ * @param {String} params.id - 审批Id
  * @param {String} params.approveRemark - 审批备注
- * @param {String} params.result - 审批结果（fail success）
+ * @param {String} params.state - 审批结果（fail success）
+ * @param {String} params.source - 审批来源
  * 
  * @returns Promise<Boolean>
  */
 export function operateApprove (params) {
   return http.post('/outside/approve/operate', params)
+}
+
+/**
+ * 获取审批详情
+ * 
+ * @param {Object} params
+ * @param {String} params.objId - 文档库Id
+ */
+export function getApprove (params) {
+  return http.get('/outside/approve/pending', params)
 }
 
 

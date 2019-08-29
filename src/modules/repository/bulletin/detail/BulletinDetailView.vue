@@ -225,7 +225,7 @@ export default {
       this.$platform.openTab({
         id: `bulletin_detail_${ this.params.noticeId }`,
         title: '通知公告详情',
-        url: `/bulletin/detail?noticeId=${ this.params.noticeId }`,
+        url: `/info/notice/detail/page?noticeId=${ this.params.noticeId }`,
         reload: true,
         close: true,
         fromId
@@ -313,8 +313,8 @@ export default {
   .detail-top {
     display: flex;
     justify-content: space-between;
-    height: 74px;
-    padding: 16px 24px 16px 16px;
+    height: 60px;
+    padding: 10px 24px 10px 16px;
     border-bottom: 1px solid #E8EFF0;
 
     .author {
@@ -323,8 +323,8 @@ export default {
       .author-img {
         vertical-align: middle;
         display: inline-block;
-        width: 40px;
-        height: 40px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
         margin-right: 15px;
       }
@@ -334,7 +334,7 @@ export default {
         display: inline-block;
 
         .name {
-          font-size: 16px;
+          font-size: 14px;
           margin-bottom: 4px;
         }
 
@@ -347,7 +347,7 @@ export default {
     }
 
     .operating {
-      line-height: 42px;
+      line-height: 40px;
 
       .common {
         display: inline-block;
@@ -409,15 +409,21 @@ export default {
 
       .title {
         margin: 0;
-        padding: 35px 0;
+        padding: 16px 0;
         text-align: center;
-        font-size: 32px;
+        font-size: 20  px;
       }
 
       .content {
         font-size: 16px;
         line-height: 30px;
         padding-bottom: 30px;
+
+        word-break: break-all;
+
+        p > img {
+          max-width: 100%;
+        }
       }
     }
 

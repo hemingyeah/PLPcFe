@@ -107,7 +107,7 @@ export default {
     },
     // 删除标签
     handleTags (tag) {
-      this.params.tags.splice(this.params.tags.indexOf(tag), 1);
+      this.params.label.splice(this.params.label.indexOf(tag), 1);
     },
     // 文件存储form结构
     buildForm(){
@@ -274,6 +274,7 @@ export default {
 
       input {
         border: none;
+        width: calc(100% - 60px);
       }
     }
   }

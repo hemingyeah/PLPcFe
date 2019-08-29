@@ -3,12 +3,23 @@
     <!-- 详情头部 -->
     <div class="detail-top">
 
-      <div class="author">
-        <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
-        <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
-        <div class="author-info">
-          <p class="name">{{detail.createUserName}}</p>
-          <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
+      <div class="author-container">
+        <div class="author">
+          <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
+          <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
+          <div class="author-info">
+            <p class="name">{{detail.createUserName}}</p>
+            <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
+          </div>
+        </div>
+
+        <div class="author right" v-if="detail.updateUserName">
+          <img class="author-img" :src="detail.updateUserHead" v-if="detail.createUserHead">
+          <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
+          <div class="author-info">
+            <p class="name">{{detail.updateUserName}}</p>
+            <p class="time">发布于：{{detail.updateTime | fmt_datetime}}</p>
+          </div>
         </div>
       </div>
 
@@ -38,6 +49,8 @@
           </span>
 
           <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
+
+          <button class="base-button green-btn" @click="approve" v-if="showDetailApprove">审批</button>
         </div>
         
 
@@ -77,29 +90,6 @@
 
       </div>
     </div>
-
-
-    <!-- <base-modal
-      class="type-modal"
-      title="审核拒绝"
-      width="500px"
-      :show.sync="show">
-      <el-form :rules="rules" ref="rulesForm" :model="refuseInfo">
-        <el-form-item prop="text">
-          <el-input 
-            type="textarea" 
-            v-model="refuseInfo.text"
-            :autosize="{ minRows: 3, maxRows: 5}" 
-            placeholder="请在此添加拒绝信息"></el-input>
-        </el-form-item>
-      </el-form>
-      
-
-      <div slot="footer" class="edit-footer">
-        <el-button @click="show = false">取 消</el-button>
-        <el-button type="primary" class="green-btn" @click="sumbit">确 定</el-button>
-      </div>
-    </base-modal> -->
 
     <base-modal
       class="type-modal"
@@ -145,6 +135,8 @@ export default {
       form: this.buildForm(), // 附件存储格式
       wikiId: '', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
+      showDetailApprove: false,
+      approveData: {},
       isReview: false,
       refuseInfo: {
         text: '',
@@ -194,18 +186,45 @@ export default {
           params.push({name: item.split('=')[0],
             value: item.split('=')[1]})
         })
-        
-        if(params[0].name == 'id') {
-          this.id = params[0].value;
-        }
-        if(params[0].name == 'wikiId') {
-          this.wikiId = params[0].value;
-        }
-        if(params[1] && params[1].name == 'approve') {
-          this.$refs.approveDialog.open();
-          this.isReview = true;
-        }
+
+        params.forEach(item => {
+          if(item.name == 'wikiId') {
+            this.wikiId = item.value;
+          }
+          if(item.name == 'objId') {
+            this.wikiId = item.value;
+          }
+          if(item.name == 'id') {
+            this.wikiId = item.value;
+          }
+          if(item.name == 'action' && item.value == 'approve') {
+            this.isReview = true;
+          }
+        })
         this.getDocumnetDetail();
+      }
+    },
+
+    async getApproveDetail () {
+      try {
+        let params = {
+          objId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
+        }
+        let res = await RepositoryApi.getApprove(params);
+
+        if(res.success) {
+          this.approveData = res.result;
+          let time = Lang.fmt_gmt_time(this.approveData.createTime);
+          this.approveData.createTime = Lang.formatDate(time, 'YYYY-MM-DD HH:mm:ss');
+          this.approveData.approvers.forEach(item => {
+            if(item.userId == this.detail.createUser) this.showDetailApprove = true;
+          })
+
+        } else {
+          this.$platform.alert(res.message)
+        }
+      } catch (err) {
+        console.error(err)
       }
     },
 
@@ -225,6 +244,17 @@ export default {
         if(res.success) {
           this.detail = res.result;
           this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
+          if(this.detail.updateTime) {
+            this.detail.updateTime = Lang.fmt_gmt_time(this.detail.updateTime);
+          }
+          if(this.isReview) {
+            this.getApproveDetail();
+            this.approve();
+            return;
+          }
+          if(this.detail.examineState && this.detail.examineState == 1) {
+            this.getApproveDetail();
+          }
         } else {
           this.$platform.alert(res.message)
         }
@@ -240,7 +270,7 @@ export default {
       this.$platform.openTab({
         id: `document_detail_${ this.detail.id }`,
         title: '文档库详情',
-        url: `/document/detail?wikiId=${ this.detail.id }`,
+        url: `/wiki/detail/page?wikiId=${ this.detail.id }`,
         reload: true,
         close: true,
         fromId
@@ -313,7 +343,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://127.0.0.1:9000/v_open/wiki?id=${this.detail.id}`;
+      hideTextarea.innerHTML = `http://172.18.1.153:8080/share/wiki/view?wikiId=${this.detail.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -341,7 +371,7 @@ export default {
     async editArticle () {
       try{
         let params = {
-          wikiId: this.info.id
+          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
         }
         let res = await RepositoryApi.getInlineDetail(params);
 
@@ -354,9 +384,9 @@ export default {
             let fromId = window.frameElement.getAttribute('id');
       
             this.$platform.openTab({
-              id: `wiki_create_${ this.info.id }`,
+              id: `wiki_create_${ params.wikiId }`,
               title: '编辑文档',
-              url: `/document/create/${ this.info.id }`,
+              url: `/wiki/edit/page?wikiId=${ params.wikiId }`,
               reload: true,
               close: true,
               fromId
@@ -406,22 +436,6 @@ export default {
     padding () {
       return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
     },
-
-    approveData() {
-      if(!this.detail.createTime) return;
-
-      const {title, type, createUserName, id} = this.detail;
-      let createTime = this.detail.createTime;
-
-      return {
-        name: title,
-        type,
-        wikiId: id,
-        applyRemark: '哈哈哈哈',
-        proposerName: createUserName,
-        proposerTime: Lang.formatDate(createTime, 'YYYY-MM-DD HH:mm:ss'),
-      }
-    }
   }
 }
 </script>
@@ -437,45 +451,52 @@ export default {
   .detail-top {
     display: flex;
     justify-content: space-between;
-    height: 75px;
-    padding: 16px 24px 16px 16px;
+    height: 60px;
+    padding: 10px 24px 10px 16px;
     border-bottom: 1px solid #E8EFF0;
 
-    .author {
-      font-size: 0;
+    .author-container {
 
-      .author-img {
-        vertical-align: middle;
-        display: inline-block;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin-right: 15px;
-      }
-      
-      .author-info {
-        vertical-align: middle;
+      .author {
+        font-size: 0;
         display: inline-block;
 
-        .name {
-          font-size: 16px;
-          margin-bottom: 4px;
+        .author-img {
+          vertical-align: middle;
+          display: inline-block;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          margin-right: 5px;
         }
+        
+        .author-info {
+          vertical-align: middle;
+          display: inline-block;
 
-        .time {
-          font-size: 12px;
-          color: #909399;
-          margin: 0;
+          .name {
+            font-size: 14px;
+            margin-bottom: 5px;
+          }
+
+          .time {
+            font-size: 12px;
+            color: #909399;
+            margin: 0;
+          }
         }
       }
+
+      .right {
+        margin-left: 15px;
+      }  
     }
 
     .operating {
-      line-height: 42px;
+      line-height: 40px;
 
       .published {
         display: inline-block;
-        margin-right: 10px;
       }
 
       .draftBox {
@@ -487,10 +508,6 @@ export default {
         font-size: 14px;
         color: #B0BCC3;
         margin-right: 3px;
-      }
-
-      .readNum {
-        margin: 0 20px;
       }
 
       .management {
@@ -550,6 +567,12 @@ export default {
         cursor: pointer;
       }
 
+      .green-btn {
+        background: #55B7B4;
+        border: transparent;
+        margin-left: 10px;
+      }
+
       .white-btn {
         background: #fff;
         color: #333;
@@ -572,9 +595,9 @@ export default {
 
       .title {
         margin: 0;
-        padding: 35px 0;
+        padding: 16px 0;
         text-align: center;
-        font-size: 32px;
+        font-size: 20px;
       }
 
       .content {
@@ -680,6 +703,7 @@ export default {
     .green-btn {
       background: #55B7B4;
       border: transparent;
+      margin-left: 10px;
     }
   }
 }

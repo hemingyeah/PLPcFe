@@ -820,7 +820,7 @@ export default {
         break;
       case 'wiki': 
         taskId = `document_detail_${id}`;
-        taskUrl = `/document/detail?wikiId=${id}&approve=true`;
+        taskUrl = `/wiki/detail/page?objId=${id}&action=approve`;
         this.saveApproveId(id);
         this.addTabs(taskId, taskUrl);
         break;
@@ -864,7 +864,7 @@ export default {
           id: `document_detail_${objId}`,
           title: '正在加载',
           close: true,
-          url: `/document/detail?wikiId=${objId}&approve=true`,
+          url: `/wiki/detail/page?objId=${objId}`,
           fromId
         }
       }

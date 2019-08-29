@@ -73,12 +73,22 @@ export default {
     },
 
     getId () {
-      let array = window.location.href.split('/');
-      if(array[array.length - 2] == 'create') {
-        this.wikiId = array[array.length - 1];
-        this.isEdit = true;
-        this.getArticle();
-      }
+      let array = window.location.href.split('?');
+      if(array.length <= 1) return;
+      let query = array[1].split('&');
+      let params = [];
+      query.forEach(item => {
+        params.push({name: item.split('=')[0],
+          value: item.split('=')[1]})
+      })
+
+      params.forEach(item => {
+        if(item.name == 'wikiId') {
+          this.wikiId = item.value;
+          this.isEdit = true;
+          this.getArticle();
+        }
+      })
     },
     // 获取分类二级树状结构，每次更新一次
     async getTypes () {
@@ -226,7 +236,7 @@ export default {
       this.$platform.openTab({
         id: 'M_INFO_DOC',
         title: '文档库',
-        url: '/document/list',
+        url: '/wiki/list/page',
         reload: true,
         close: true,
         fromId

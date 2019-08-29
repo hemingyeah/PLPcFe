@@ -1,56 +1,64 @@
 <template>
   <div class="document-list-search" ref="search">
-    <div class="search-top">
+    <div class="search-left">
       <button class="base-button search-new" @click="create">新建</button>
-      <!-- 关键词搜索框 -->
-      <div class="search-input-container" ref="searchInput">
-        <el-input 
-          class="search-input"
-          placeholder="输入关键词搜索" 
-          v-model="params.keyword"
-          @keyup.enter.native="search"
-          v-if="isSearch"
-          clearable>
-          <i slot="suffix" class="el-input__icon el-icon-search"></i>
-        </el-input>
-        <button class="search-btn" @click="toSearch" v-else>
-          <i class="iconfont icon-search1 serach-icon"></i>
-        </button>
+
+      <!-- 文档库类型筛选 -->
+      <div class="search-middle">
+        <el-select v-model="params.view" class="search-type search-type-left" @change="search">
+          <el-option v-for="item in viewOptions" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+        <el-cascader 
+          :options="typeOptions"
+          class="search-type search-type-right"
+          popper-class="search-cascader-panel"  
+          clearable 
+          @change="handleChange"
+          @visible-change="showCascader"
+          filterable>
+          <template slot-scope="{ node, data }" class="type">
+            <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
+            <span v-else>{{data.label}}</span>
+            <span class="type-operating" v-if="data.label != '全部'">
+              <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
+              <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
+            </span>
+          </template>
+        </el-cascader>
+      </div>
+      <!-- 文档库排序、标签 -->
+      <div class="search-bottom">
+        <el-select v-model="params.orderDetail.column" class="search-sort" @change="search">
+          <el-option value="createTime" label="按更新时间排序"></el-option>
+          <el-option value="read_times" label="按访问量排序"></el-option>
+        </el-select>
+        <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
+        <!-- <div style="display: inline-block; margin-left: 10px; color: #666" v-if="tag.show">标签：
+          <el-tag class="search-tag" closable @close="closeTag">{{tag.name}}</el-tag>
+        </div> -->
+        
       </div>
     </div>
-    <!-- 文档库类型筛选 -->
-    <div class="search-middle">
-      <el-select v-model="params.view" class="search-type search-type-left" @change="search">
-        <el-option v-for="item in viewOptions" :key="item.value" :label="item.label" :value="item.value">
-        </el-option>
-      </el-select>
-      <el-cascader 
-        :options="typeOptions"
-        class="search-type search-type-right"
-        popper-class="search-cascader-panel"  
-        clearable 
-        @change="handleChange"
-        @visible-change="showCascader"
-        filterable>
-        <template slot-scope="{ node, data }" class="type">
-          <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
-          <span v-else>{{data.label}}</span>
-          <span class="type-operating" v-if="data.label != '全部'">
-            <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
-            <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
-          </span>
-        </template>
-      </el-cascader>
-    </div>
-    <!-- 文档库排序、标签 -->
-    <div class="search-bottom">
-      <el-select v-model="params.orderDetail.column" class="search-sort" @change="search">
-        <el-option value="createTime" label="按更新时间排序"></el-option>
-        <el-option value="read_times" label="按访问量排序"></el-option>
-      </el-select>
-      <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
-    </div>
     
+    
+    <!-- 关键词搜索框 -->
+    <div class="search-input-container" ref="searchInput">
+      <div class="list-top" v-if="total && total > 0">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
+      <el-input 
+        class="search-input"
+        placeholder="输入关键词搜索" 
+        v-model="params.keyword"
+        @keyup.enter.native="search"
+        clearable>
+        <i slot="suffix" class="el-input__icon el-icon-search"></i>
+      </el-input>
+      <!-- v-if="isSearch" -->
+      <!-- <button class="search-btn" @click="toSearch" v-else>
+        <i class="iconfont icon-search1 serach-icon"></i>
+      </button> -->
+    </div>
+      
     <type-modal v-model="info" :title="title" @sumbitType="sumbitType" ref="typeModal"></type-modal>
     
   </div>
@@ -66,6 +74,10 @@ export default {
     tag: {
       type: Object,
       default: () => ({})
+    },
+    total: {
+      type: Number,
+      default: null
     }
   },
   components: {
@@ -244,7 +256,7 @@ export default {
       this.$platform.openTab({
         id: 'wiki_create',
         title: '新建文档',
-        url: '/document/create',
+        url: '/wiki/create/page',
         reload: true,
         close: true,
         fromId
@@ -366,135 +378,144 @@ export default {
 .document-list-search {
   background: #fff;
   padding: 11px;
+  display: flex;
+  justify-content: space-between;
   
-  .search-top {
-    display: flex;
-    justify-content: space-between;
+  .search-left {
 
-    .search-input-container {
-      position: relative;
+    .search-middle {
+      margin-left: 10px;
+      display: inline-block;
+      height: 34px;
+      border: 1px solid #e0e1e2;
+      border-radius: 2px;
+      box-sizing: border-box;
+      font-size: 0;
 
-      .search-input {
-        height: 36px;
-        width: 250px;
+      .search-type {
+        height: 32px;
 
         .el-input__inner {
-          height: 100%;
+          border: none;
         }
       }
 
-      .search-btn {
-        // vertical-align: middle;
-        margin: 0;
-        border: 1px solid #E3E9EA;  //自定义边框
-        outline: none;    //消除默认点击蓝色边框效果
-        height: 36px;
-        width: 36px;
-        line-height: 30px;
-        border-radius: 2px;
+      .search-type-left {
+        position: relative;
+        width: 150px;
 
-        .serach-icon {
-          font-size: 18px;
-          color: #55B7B4;
+        .el-input__inner {
+          border-right: none;
+          border-radius: 2px 0 0 2px;
+        }
+
+        &::after {
+          content: "";
+
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 1px;
+          height: 32px;
+          background: #e0e1e2;
+        }
+      }
+
+      .search-type-right {
+        width: 230px;
+
+        .el-input__inner {
+          border-radius: 0 2px 2px 0;
         }
       }
     }
-  }
 
-  .search-middle {
-    margin: 11px 0;
-    display: flex;
-    border: 1px solid #e0e1e2;
-    border-radius: 4px;
+    .search-bottom {
+      display: inline-block;
+      margin-left: 10px;
 
-    .search-type {
-      height: 32px;
+      .search-sort {
+        vertical-align: middle;
 
-      .el-input__inner {
-        border: none;
-      }
-    }
+        .el-input__inner {
+          height: 34px;
+          border: none;
+          background: #E8EFF0;
+          width: 140px;
+          color: #717C83 !important;
+        }
 
-    .search-type-left {
-      position: relative;
-      width: 150px;
-
-      .el-input__inner {
-        border-right: none;
-        border-radius: 2px 0 0 2px;
+        .el-input__icon {
+          line-height: 34px;
+        }
       }
 
-      &::after {
-        content: "";
+      .search-tag {
+        vertical-align: middle;
 
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 1px;
-        height: 32px;
-        background: #e0e1e2;
-      }
-    }
+        max-width: 200px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
 
-    .search-type-right {
-      flex: 1;
-
-
-      .el-input__inner {
-        border-radius: 0 2px 2px 0;
-      }
-    }
-  }
-
-  .search-bottom {
-    font-size: 0;
-
-    .search-sort {
-      vertical-align: middle;
-
-      .el-input__inner {
-        height: 24px;
+        margin-left: 5px;
+        height: 34px;
+        line-height: 34px;
         border: none;
         background: #E8EFF0;
-        width: 140px;
-        color: #717C83 !important;
-      }
+        border-radius: 2px;
+        color: #717C83;
 
-      .el-input__icon {
-        line-height: 24px;
-      }
-    }
+        .el-icon-close {
+          color: #333;
 
-    .search-tag {
-      vertical-align: middle;
-
-      max-width: 200px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-
-      margin-left: 5px;
-      height: 24px;
-      line-height: 24px;
-      border: none;
-      background: #E8EFF0;
-      border-radius: 2px;
-      color: #717C83;
-
-      .el-icon-close {
-        color: #333;
-
-        &:hover {
-          background: #999;
-          color: #fff;
+          &:hover {
+            background: #999;
+            color: #fff;
+          }
         }
       }
     }
   }
 
-  .auxiliary {
-    // display: none;
+  .search-input-container {
+    position: relative;
+    flex: 1;
+    text-align: right;
+    
+    .list-top {
+      display: inline-block;
+      height: 34px;
+      line-height: 34px;
+      padding: 0 11px;
+      color: #909399;
+    }
+
+    .search-input {
+      height: 34px;
+      width: 230px;
+
+      .el-input__inner {
+        height: 100%;
+      }
+    }
+
+    .search-btn {
+      margin: 0;
+      border: 1px solid #E3E9EA;  //自定义边框
+      outline: none;    //消除默认点击蓝色边框效果
+      height: 34px;
+      width: 34px;
+      line-height: 30px;
+      border-radius: 2px;
+
+      .serach-icon {
+        font-size: 18px;
+        color: #55B7B4;
+      }
+    }
   }
+
 }
 
 .el-cascader-node__label {

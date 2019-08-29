@@ -1,8 +1,6 @@
 <template>
   <div class="bulletin-list-container">
 
-    <div class="list-top" v-if="value.list && value.list.length > 0">符合搜索结果的共<span style="color: #FF7B00">{{value.total}}</span>条</div>
-
     <div class="list-content">
       <div class="list-noData" v-if="value.list && value.list.length <= 0">暂无数据</div>
 
@@ -80,13 +78,6 @@ export default {
   height: 100%;
   overflow: hidden;
 
-  .list-top {
-    height: 40px;
-    line-height: 40px;
-    padding: 0 11px;
-    color: #909399;
-  }
-
   .list-content {
     overflow: auto;
     flex: 1;
@@ -99,15 +90,17 @@ export default {
   }
 
   .list-item {
-    padding: 11px;
+    padding: 10px 11px;
     border-bottom: 1px solid #E8EFF0;
 
     .item-top {
       font-size: 0;
+      height: 24px;
+      line-height: 24px;
 
       .item-title {
         margin: 0;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 500;
         vertical-align: middle;
 
@@ -117,7 +110,6 @@ export default {
     
 
     .item-info {
-      padding: 4px 0;
       font-size: 12px;
       color: #909399;
 
@@ -130,17 +122,19 @@ export default {
       margin: 0;
       padding: 4px 0;
       color: #909399;
-      line-height: 22px;
+      line-height: 17px;
+      font-size: 12px;
 
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
+      word-break: break-all;
     }
 
     .item-footer {
-      padding-top: 10px;
       display: inline-block;
+      font-size: 12px;
 
       .item-num {
         display: inline-block;
