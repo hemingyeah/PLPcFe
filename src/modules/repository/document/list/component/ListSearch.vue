@@ -1,7 +1,7 @@
 <template>
   <div class="document-list-search" ref="search">
     <div class="search-left">
-      <button class="base-button search-new" @click="create">新建</button>
+      <button class="base-button search-new" @click="create" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">新建</button>
 
       <!-- 文档库类型筛选 -->
       <div class="search-middle">
@@ -34,9 +34,7 @@
           <el-option value="read_times" label="按访问量排序"></el-option>
         </el-select>
         <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
-        <!-- <div style="display: inline-block; margin-left: 10px; color: #666" v-if="tag.show">标签：
-          <el-tag class="search-tag" closable @close="closeTag">{{tag.name}}</el-tag>
-        </div> -->
+
         
       </div>
     </div>
@@ -78,6 +76,10 @@ export default {
     total: {
       type: Number,
       default: null
+    },
+    infoEdit: {
+      type: Object,
+      default: () => ({})
     }
   },
   components: {
@@ -169,6 +171,7 @@ export default {
             })
           })
           this.typeOptions = res.result;
+          this.info.options = this.typeOptions;
         } else {
           this.$platform.alert(res.message);
         }
@@ -178,6 +181,7 @@ export default {
     },
 
     // 获取分类下各级分类的文章数量，每次点击下拉框时更新
+    // TODO: 检查
     async getTypesCount () {
       try {
         let params = {
@@ -225,6 +229,7 @@ export default {
         child.id = 'type-id';
 
         parent.style.paddingBottom = '40px';
+        parent.style.maxHeight = '350px';
 
         parent.appendChild(child);
 
@@ -383,8 +388,11 @@ export default {
   
   .search-left {
 
+    .search-new {
+      margin-right: 10px;
+    }
+
     .search-middle {
-      margin-left: 10px;
       display: inline-block;
       height: 34px;
       border: 1px solid #e0e1e2;

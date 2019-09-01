@@ -18,7 +18,7 @@
 
         <div class="item-info">
           <span class="name">{{item.createUserName}}</span>
-          <span class="time">发布于：{{item.createTime | fmt_datetime}}</span>
+          <span class="time">发布于：{{item.createtime | fmt_datehour}}</span>
           <span class="type">{{item.type}}</span>
         </div>
 
@@ -180,7 +180,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://172.18.1.153:8080/share/wiki/view?wikiId=${this.chosenItem.id}`;
+      hideTextarea.innerHTML = `http://127.0.0.1:9000/share/wiki/view?wikiId=${this.chosenItem.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -314,10 +314,6 @@ export default {
           color: #B0BCC3;
           margin-right: 3px;
         }
-
-        .readNum {
-          margin: 0 5px;
-        }
       }
 
       .type {
@@ -352,6 +348,10 @@ export default {
   }
 
   .type-modal {
+
+    .base-modal-body {
+      padding: 10px 30px 0;
+    }
 
     .el-button:hover, .el-button:focus {
       color: #55B7B4;

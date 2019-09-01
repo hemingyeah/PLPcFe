@@ -9,7 +9,7 @@
           <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
           <div class="author-info">
             <p class="name">{{detail.createUserName}}</p>
-            <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
+            <p class="time">发布于：{{detail.createTime | fmt_datehour}}</p>
           </div>
         </div>
 
@@ -18,7 +18,7 @@
           <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
           <div class="author-info">
             <p class="name">{{detail.updateUserName}}</p>
-            <p class="time">发布于：{{detail.updateTime | fmt_datetime}}</p>
+            <p class="time">最后编辑：{{detail.updateTime | fmt_datehour}}</p>
           </div>
         </div>
       </div>
@@ -39,7 +39,7 @@
         </div>
 
         <div style="display: inline-block">
-          <span class="management" v-if="detail.examineState != 1">
+          <span class="management" v-if="detail.examineState != 1 && allowEdit">
             <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
             <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
           </span>
@@ -50,7 +50,7 @@
 
           <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
 
-          <button class="base-button green-btn" @click="approve" v-if="showDetailApprove">审批</button>
+          <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
         </div>
         
 
@@ -125,6 +125,14 @@ export default {
     info: {
       type: Object,
       default: () => ({})
+    },
+    initData: {
+      type: Object,
+      default: () => ({})
+    },
+    infoEdit: {
+      type: Object,
+      default: () => ({})
     }
   },
   components: {
@@ -132,6 +140,7 @@ export default {
   },
   data () {
     return {
+      allowEdit: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3 : this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
       form: this.buildForm(), // 附件存储格式
       wikiId: '', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
@@ -149,9 +158,6 @@ export default {
           message: '请输入拒绝原因',
           trigger: 'blur'
         }]
-      },
-      author: {
-        img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
       },
       detail: {}, // 文章详情
       shareInfo: {
@@ -231,7 +237,6 @@ export default {
     // 获取文档库详情
     async getDocumnetDetail () {
       try{
-
         let params = {
           wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
         }
@@ -343,7 +348,7 @@ export default {
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://172.18.1.153:8080/share/wiki/view?wikiId=${this.detail.id}`;
+      hideTextarea.innerHTML = `http://127.0.0.1:9000/share/wiki/view?wikiId=${this.detail.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();
@@ -413,7 +418,22 @@ export default {
 
         if(res.success) {
           this.$platform.alert('文章已删除成功。')
-          this.$emit('search')
+
+          if(!this.showOpenFrame) {
+            let id = window.frameElement.dataset.id;
+            this.$platform.closeTab(id);
+          }
+          
+          let fromId = window.frameElement.getAttribute('id');
+      
+          this.$platform.openTab({
+            id: 'M_INFO_DOC',
+            title: '文档库',
+            url: '/wiki/list/page',
+            reload: true,
+            close: true,
+            fromId
+          });
         } else {
           this.$platform.alert(res.message);
         }
@@ -452,7 +472,7 @@ export default {
     display: flex;
     justify-content: space-between;
     height: 60px;
-    padding: 10px 24px 10px 16px;
+    padding: 10px 15px;
     border-bottom: 1px solid #E8EFF0;
 
     .author-container {
@@ -488,7 +508,7 @@ export default {
       }
 
       .right {
-        margin-left: 15px;
+        margin-left: 10px;
       }  
     }
 

@@ -128,6 +128,7 @@ export default {
       try {
         let items = event.clipboardData && event.clipboardData.items;
         let file = null;
+        console.log(items);
         if (items && items.length) {
           let length = items.length;
           if(items.length > 2 && items[length - 1].type.indexOf('image') !== -1) {
@@ -137,6 +138,7 @@ export default {
           // 检索剪切板items
           for (let i = 0; i < length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
+              console.log(items[i])
               file = items[i].getAsFile();
               this.handleChange({
                 target: {

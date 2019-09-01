@@ -11,9 +11,8 @@ router.get('/wiki/list/page', async ctx => {
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request('/wiki/list/page', 'get', null, {headers: reqHeaders});
   let body = result.body;
-  console.log(body);
   
-  ctx.body = Template.renderWithHtml('文档库', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('知识库', body, script, modConfig.template)
 })
 
 router.get('/wiki/create/page', async ctx => {
@@ -47,7 +46,7 @@ router.get('/wiki/detail/page', async ctx => {
   let result = await HttpClient.request(`/wiki/detail/page?id=${wikiId}`, 'get', null, {headers: reqHeaders});
   let body = result.body;
   
-  ctx.body = Template.renderWithHtml('文档库详情', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('知识库', body, script, modConfig.template)
 })
 
 router.get('/info/notice/list/page', async ctx => {
@@ -70,16 +69,6 @@ router.get('/info/notice/create/page', async ctx => {
   ctx.body = Template.renderWithHtml('新建通知公告', body, script, modConfig.template)
 })
 
-// router.get('/bulletin/detail/:id', async ctx => {
-//   let script = ['/bulletin.create.js'];
-//   let modConfig = modules['bulletin.create'];
-//   let reqHeaders = ctx.request.headers;
-//   let result = await HttpClient.request('/bulletin/create', 'get', null, {headers: reqHeaders});
-//   let body = result.body;
-  
-//   ctx.body = Template.renderWithHtml('编辑通知公告', body, script, modConfig.template)
-// })
-
 router.get('/info/notice/detail/page', async ctx => {
   let script = ['/bulletin.detail.js'];
   let modConfig = modules['bulletin.detail'];
@@ -87,7 +76,7 @@ router.get('/info/notice/detail/page', async ctx => {
   let result = await HttpClient.request('/info/notice/detail/page', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
-  ctx.body = Template.renderWithHtml('通知公告详情', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('通知公告', body, script, modConfig.template)
 })
 
 module.exports = router;

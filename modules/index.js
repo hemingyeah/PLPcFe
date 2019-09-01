@@ -34,6 +34,7 @@ module.exports = {
 
   'open.wiki': {
     entry: './src/modules/open/WikiShare/index.js',
+    template: 'src/modules/open/WikiShare/index.html',
     exclude: ['common']
   },
   ...setting,

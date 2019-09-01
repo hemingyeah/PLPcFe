@@ -1,7 +1,7 @@
 <template>
   <div class="document-list-view">
     <!-- 搜索部分 -->
-    <list-search class="list-search" v-model="params" :tag="tag" :total="listTotal" @search="search" ref="listSearch"></list-search>
+    <list-search class="list-search" v-model="params" :tag="tag" :total="listTotal" :infoEdit="initData.userInfo.authorities" @search="search" ref="listSearch"></list-search>
 
     <div class="document-list-bottom">
       <!-- 左侧列表 -->
@@ -14,7 +14,7 @@
 
       <!-- 右侧详情 -->
       <div class="document-list-right">
-        <document-detail :info="info" ref="documentDetail" @search="search"></document-detail>
+        <document-detail :info="info" :infoEdit="initData.userInfo.authorities" ref="documentDetail" @search="search"></document-detail>
       </div>
     </div>
     
@@ -32,6 +32,12 @@ import * as RepositoryApi from '@src/api/Repository'
 import * as Lang from '@src/util/lang/index.js';
 
 export default {
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       params: {
@@ -79,7 +85,7 @@ export default {
         if(res.success) {
           this.listTotal = res.result.total;
           res.result.list.forEach(item => {
-            item.createTime = Lang.fmt_gmt_time(item.createTime);
+            item.createtime = Lang.fmt_gmt_time(item.createtime);
           })
           this.listMsg = res.result;
           this.toDetail(this.listMsg.list[0]);
@@ -137,7 +143,7 @@ export default {
     display: flex;
 
     .document-list-left {
-      width: 426px;
+      width: 440px;
       display: flex;
       height: 100%;
       flex-direction: column;
@@ -155,6 +161,7 @@ export default {
     .document-list-right {
       flex: 1;
       height: 100%;
+      width: 0;
       // margin-left: 10px;
       background: #fff;
       border-left: 2px solid #E8EFF0;

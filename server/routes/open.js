@@ -3,8 +3,10 @@ const HttpClient = require('../util/HttpClient')
 const Template = require('../util/Template')
 
 const router = new KoaRouter();
+const modules = require('../../modules');
 
 router.get('/v_open/dailyReport', async ctx => {
+  console.log('日报')
   let script = ['/open.dailyReport.js'];
   let reqHeaders = ctx.request.headers;
   let queryString = ctx.request.querystring;
@@ -19,14 +21,14 @@ router.get('/v_open/dailyReport', async ctx => {
 
 router.get('/share/wiki/view', async ctx => {
   let script = ['/open.wiki.js'];
+  let modConfig = modules['open.wiki'];
   let reqHeaders = ctx.request.headers;
-  // let queryString = ctx.request.querystring;
-  let path = '/share/wiki/view'
+  const wikiId = ctx.request.query.wikiId;
 
-  let result = await HttpClient.request(path, 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request( `/share/wiki/view?wikiId=${wikiId}`, 'get', null, {headers: reqHeaders});
   let body = result.body;
  
-  ctx.body = Template.renderWithHtml('文档库分享', body, script)
+  ctx.body = Template.renderWithHtml('知识库分享', body, script, modConfig.template)
 });
 
 module.exports = router;

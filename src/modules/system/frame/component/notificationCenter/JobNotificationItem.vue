@@ -82,6 +82,8 @@ export default {
       if(info.pcUrl.indexOf('/task/view/') != -1) return `taskView_${info.primaryId}`;
       if(info.pcUrl.indexOf('/partV2/repertory/record') != -1) return 'M_VIP_SPAREPART_RECORD';
       if(info.pcUrl.indexOf('/event/view/') != -1) return 'M_SERVICE_PROJECT';
+      if(info.pcUrl.indexOf('/info/notice/detail/page') != -1) return `bulletin_detail_${ info.primaryId }`;
+      if(info.pcUrl.indexOf('/wiki/detail/page') != -1) return `document_detail_${ info.primaryId }`;
       return 'PcUrl';
     }
   }

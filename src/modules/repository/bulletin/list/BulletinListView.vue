@@ -1,7 +1,7 @@
 <template>
   <div class="bulletin-list-view">
     <!-- 搜索部分 -->
-    <list-search class="list-search" @search="search" :total="listTotal"></list-search>
+    <list-search class="list-search" @search="search" :total="listTotal" :infoEdit="initData.userInfo.authorities"></list-search>
 
     <div class="bulletin-list-bottom">
       <!-- 左侧列表 -->
@@ -14,7 +14,7 @@
 
       <!-- 右侧详情 -->
       <div class="bulletin-list-right">
-        <bullet-detail :info="info" @search="search" ref="bulletinDetail"></bullet-detail>
+        <bullet-detail :info="info" :infoEdit="initData.userInfo.authorities" @search="search" ref="bulletinDetail"></bullet-detail>
       </div>
     </div>
 
@@ -30,6 +30,12 @@ import BulletinDetailView from '../detail/BulletinDetailView'
 import * as RepositoryApi from '@src/api/Repository'
 
 export default {
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       params: {
@@ -160,6 +166,7 @@ export default {
     .bulletin-list-right {
       flex: 1;
       height: 100%;
+      width: 0;
       background: #fff;
       border-left: 2px solid #E8EFF0;
     }

@@ -12,7 +12,7 @@
 
         <div class="item-info">
           <span class="name">{{item.createUserName}}</span>
-          <span class="time">发布于：{{item.createTime | fmt_datetime}}</span>
+          <span class="time">发布于：{{item.createTime | fmt_datehour}}</span>
           <span class="type">{{item.type}}</span>
         </div>
 
@@ -130,6 +130,10 @@ export default {
       -webkit-line-clamp: 2;
       overflow: hidden;
       word-break: break-all;
+
+      img {
+        width: 40px;
+      }
     }
 
     .item-footer {

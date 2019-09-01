@@ -16,7 +16,7 @@ import http from '@src/util/http';
  * @returns Promise<List>
  */
 export function getDocumentList (params) {
-  return http.post('/outside/wiki/list', params);
+  return http.post('/outside/es/wiki/list', params);
 }
 
 

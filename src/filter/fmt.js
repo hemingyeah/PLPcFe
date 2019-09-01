@@ -23,6 +23,16 @@ export function fmt_datetime(value){
   return value;
 }
 
+/** 格式化时间，返回到分钟 */
+export function fmt_datehour(value){
+  if(value instanceof Date || (typeof value == 'number' && !isNaN(value) && isFinite(value))){
+    if(typeof value == 'number') value = new Date(value);
+
+    return Lang.formatDate(value, 'YYYY-MM-DD HH:mm');
+  }
+  return value;
+}
+
 /** 取日期字符串的前16位 */
 export function fmt_date_16(value){
   let reg = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\s{1}(20|21|22|23|[0-1]\d):[0-5]\d:[0-5]\d$/;
@@ -62,7 +72,8 @@ const fmt = {
   fmt_date_16,
   fmt_number_fixed2,
   fmt_number_int,
-  fmt_address
+  fmt_address,
+  fmt_datehour
 }
 
 export default fmt;

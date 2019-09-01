@@ -76,23 +76,6 @@ export default {
       }
     },
 
-    // 获取编辑通知公告的内容
-    async getBulletinDetail () {
-      try {
-        let params = {
-          noticeId: this.noticeId
-        }
-        let res = await RepositoryApi.getBulletinDetail(params);
-        if(res.success) {
-          // TODO: 处理 将值付给
-        } else {
-          this.$platform.alert(res.message);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    },
-
     // 新建、编辑文章提交操作
     async sumbit () {    
       if(!this.paramsCheck()) return;
@@ -104,7 +87,6 @@ export default {
         if(res.success) {
           localStorage.removeItem('bulletin_article');
           this.$platform.alert('文章已发布成功。');
-          // TODO: 跳到详情页面
           this.openFrame();
         } else {
           this.$platform.alert(res.message);
@@ -125,7 +107,6 @@ export default {
         if(res.success) {
           this.$platform.alert('文章删除成功');
           localStorage.removeItem('bulletin_article');
-          // TODO: 跳到列表页面
           this.openFrame();
         } else {
           this.$platform.alert(res.message);
@@ -144,7 +125,7 @@ export default {
       this.$platform.openTab({
         id: 'M_INFO_NOTICE',
         title: '通知公告',
-        url: '/bulletin/list',
+        url: '/info/notice/list/page',
         reload: true,
         close: true,
         fromId
@@ -156,14 +137,10 @@ export default {
       this.articleHtml = html
     },
 
-    // 编辑时获取文章信息
+    // 获取缓存的文章信息
     getArticle () {
-      if(this.isEdit) {
-        // TODO: 编辑时获取文章信息
-      } else {
-        let article = localStorage.getItem('bulletin_article');
-        if (article) this.params.article = article;
-      }
+      let article = localStorage.getItem('bulletin_article');
+      if (article) this.params.article = article;
     },
 
     // 本地缓存文章内容，5分钟一次

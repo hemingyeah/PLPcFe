@@ -3,7 +3,8 @@
     <base-modal
       :title="title"
       width="500px"
-      :show.sync="show">
+      :show.sync="show"
+      class="type-modal-body">
       <el-form :model="info" :rules="rules" ref="ruleForm">
         <el-form-item label="分类名称" prop="name">
           <el-input class="title" v-model="info.name"></el-input>
@@ -67,34 +68,39 @@ export default {
 </script>
 
 <style lang="scss">
-.base-modal-body {
-  padding: 10px 30px 0;
+.type-modal-body {
 
-  .el-form-item {
+  .base-modal-body {
+    padding: 10px 30px 0;
+
+    .el-form-item {
+      margin: 0;
+      line-height: 32px;
+    }
+
+    .title {
+      width: 340px;
+    }
+
+    .type-form {
+      margin-top: 20px !important;
+    }
+
+    .type {
+      width: 340px;
+    }
+
+  }
+  .edit-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .prompt {
     margin: 0;
-  }
-
-  .title {
-    width: 360px;
-  }
-
-  .type-form {
-    margin-top: 20px;
-  }
-
-  .type {
-    width: 370px;
-  }
-
-}
-.edit-footer {
-  display: flex;
-  justify-content: flex-end;
+    font-size: 12px;
+    color: #F56C6C;
+  } 
 }
 
-.prompt {
-  margin: 0;
-  font-size: 12px;
-  color: #F56C6C;
-} 
 </style>

@@ -5,7 +5,7 @@
       
       <!-- 通知公告类型筛选 -->
       <div class="search-bottom">
-        <el-select v-model="params.typeId" class="search-type" @change="search">
+        <el-select v-model="params.typeId" class="search-type" @change="search" @visible-change="showCascader" clearable>
           <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
             <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
             <span style="float: right" class="type-operating">
@@ -13,7 +13,7 @@
               <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
             </span>
           </el-option>
-          <div class="add-type" @click="addType">新建分类</div>
+          <!-- <div class="add-type" @click="addType">新建分类</div> -->
         </el-select>
       </div>
     </div>
@@ -156,8 +156,44 @@ export default {
       this.toggleInput();
     },
 
+    showCascader (flag) {
+      if(this.typeOptions.length <= 0) return;
+      let parent = document.getElementsByClassName('el-scrollbar')[1];
+       
+
+      if(flag) {
+        let child = document.createElement('div');
+        child.innerHTML = '新建分类';
+        child.className = 'add-type';
+        child.id = 'type-id';
+
+        parent.style.paddingBottom = '46px';
+
+        parent.appendChild(child);
+
+        child.addEventListener('click', e => { // 打开新建分类
+          let btn = document.getElementsByClassName('is-reverse')[0];
+
+          btn.click();
+          this.isEdit = false;
+          this.show = true;
+          this.info.name = '';
+          this.info.id = null;
+        });
+
+        // 获取分类文章数量
+        // this.getTypesCount();
+
+      } else {
+        let child = document.getElementById('type-id')
+
+        parent.removeChild(child);
+      }
+    },
+
     // 输入关键词或选择条件时向父组件触发search事件
     search () {
+      if(!this.params.typeId) this.params.typeId = null;
       this.$emit('search', this.params);
     },
 
@@ -178,15 +214,15 @@ export default {
     },
 
     // 添加分类
-    addType () {
-      let btn = document.getElementsByClassName('is-reverse')[0];
+    // addType () {
+    //   let btn = document.getElementsByClassName('is-reverse')[0];
 
-      btn.click();
-      this.isEdit = false;
-      this.show = true;
-      this.info.name = '';
-      this.info.id = null;
-    },
+    //   btn.click();
+    //   this.isEdit = false;
+    //   this.show = true;
+    //   this.info.name = '';
+    //   this.info.id = null;
+    // },
 
     // 编辑分类
     editType (info) {
@@ -263,13 +299,16 @@ export default {
   justify-content: space-between;
   
   .search-top {
+
+    .search-new {
+      margin-right: 10px;
+    }
     
 
     .search-bottom {
       display: inline-block;
       font-size: 0;
       height: 34px;
-      margin-left: 10px;
 
       .search-type {
         // vertical-align: middle;
@@ -333,19 +372,34 @@ export default {
     display: inline-block;
   }
 }
-.el-select-dropdown__list {
+.el-scrollbar {
+  position: relative;
 
   .add-type {
-    height: 40px;
-    line-height: 40px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
     text-align: center;
-    border-top: 1px solid #D3DCE6;
+    line-height: 40px;
     color: #38A6A6;
+
     cursor: pointer;
 
     &:hover {
       color: #38A6A6;
     }
+
+    // height: 40px;
+    // line-height: 40px;
+    // text-align: center;
+    // border-top: 1px solid #D3DCE6;
+    // color: #38A6A6;
+    // cursor: pointer;
+
+    // &:hover {
+    //   color: #38A6A6;
+    // }
   }
 }
 

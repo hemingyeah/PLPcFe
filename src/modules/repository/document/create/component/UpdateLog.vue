@@ -87,22 +87,10 @@ export default {
       let {action, userName, content} = item;
 
       if(action == '编辑') {
-        let info = [];
-        for(let i = 0; i < content.updateFields.length; i++) {
-          if(i != content.updateFields.length - 1) {
-            info.push(<span>{content.updateFields[i]}、</span>)
-          } else {
-            info.push(<span>{content.updateFields[i]}</span>)
-          }
-        }
-
         return [
           <h5 class="main-info">
             <strong>{userName}</strong>编辑了文章
-          </h5>,
-          <p class="secondary-info">编辑字段：
-            {info}
-          </p>
+          </h5>
         ]
       }
 
@@ -114,18 +102,21 @@ export default {
         ]
       }
 
-      if(action == '审核发起') {
+      if(action == '审批发起') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>发起了审核
-          </h5>
+            <strong>{userName}</strong>发起了关于{content.action}的审批
+          </h5>,
+          <p class="secondary-info">审批备注：
+            {content.remark}
+          </p>
         ]
       }
 
       if(action == '审批成功') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>执行审批成功操作
+            <strong>{userName}</strong>通过了关于{content.action}的审批
           </h5>
         ]
       }
@@ -133,10 +124,10 @@ export default {
       if(action == '审批拒绝') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>执行审批拒绝操作
+            <strong>{userName}</strong>拒绝了关于{content.action}的审批
           </h5>,
           <p class="secondary-info">拒绝原因：
-            {content.reason}
+            {content.remark}
           </p>
         ]
       }

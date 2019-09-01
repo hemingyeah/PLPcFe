@@ -8,7 +8,7 @@
         <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
         <div class="author-info">
           <p class="name">{{detail.createUserName}}</p>
-          <p class="time">发布于：{{detail.createTime | fmt_datetime}}</p>
+          <p class="time">发布于：{{detail.createTime | fmt_datehour}}</p>
         </div>
       </div>
 
@@ -19,8 +19,7 @@
           <span class="item-num">未读（{{detail.unreadNum}}）</span>
         </div>
 
-        <span class="management">
-          <!-- <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i> -->
+        <span class="management" v-if="allowEdit">
           <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
         </span>
 
@@ -99,10 +98,19 @@ export default {
     info: {
       type: Object,
       default: () => ({})
+    },
+    initData: {
+      type: Object,
+      default: () => ({})
+    },
+    infoEdit: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {
     return {
+      allowEdit: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3 : this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
       noticeId: '',
       form: this.buildForm(), // 附件存储格式
       articleId: 'NIHIF678', // 通知公告id
@@ -140,7 +148,8 @@ export default {
         let array = window.location.href.split('?');
         let params = array[1].split('=');
         if(params[0] == 'noticeId') {
-          this.noticeId = params[1]
+          this.noticeId = params[1];
+          this.showOpenFrame = false;
         }
         this.getBulletinDetail();
         this.getReadPerson();
@@ -277,7 +286,23 @@ export default {
         let res = await RepositoryApi.deleteBulletin(this.params);
         if(res.success) {
           this.$platform.alert('文章已删除成功。')
-          this.$emit('search')
+
+          if(!this.showOpenFrame) {
+            let id = window.frameElement.dataset.id;
+            this.$platform.closeTab(id);
+          }
+          
+
+          let fromId = window.frameElement.getAttribute('id');
+      
+          this.$platform.openTab({
+            id: 'M_INFO_NOTICE',
+            title: '通知公告',
+            url: '/info/notice/list/page',
+            reload: true,
+            close: true,
+            fromId
+          });
         } else {
           this.$platform.alert(res.message);
         }
@@ -288,11 +313,11 @@ export default {
   },
   computed: {
     height () {
-      return this.showOpenFrame ? 'auto' : '100vh';
+      return this.showOpenFrame ? '100%' : '100vh';
     },
 
     padding () {
-      return this.showOpenFrame ? '0 50px' : '0 100px';
+      return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
     },
 
     marginLeft () {

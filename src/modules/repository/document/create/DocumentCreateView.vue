@@ -61,11 +61,14 @@ export default {
       reportApproveStatus: null,
     }
   },
-  created () {
-    this.getTypes();
+  async created () {
+    if(!this.isEdit) {
+      this.saveArticle();
+      this.getArticle();
+    }
     this.getId();
-    // 新建时开启暂存功能
-    if(!this.isEdit) this.saveArticle();
+    await this.getTypes();
+    if(this.isEdit) this.getArticle();
   },
   methods: {
     setStatus(n) {
@@ -86,7 +89,6 @@ export default {
         if(item.name == 'wikiId') {
           this.wikiId = item.value;
           this.isEdit = true;
-          this.getArticle();
         }
       })
     },
@@ -315,25 +317,11 @@ export default {
       // 文档、草稿编辑后存为草稿
       if(this.isEdit && this.isToDraft) {
         params.id = this.info.id;
-        params.originalId = this.info.originalId;
-        params.isDraft = this.info.isDraft;
-      }
-
-      // 新建草稿
-      if(!this.isEdit && this.isToDraft) {
-        params.isDraft = 1;
       }
 
       // 文档、草稿编辑后提交
       if(this.isEdit && !this.isToDraft) {
         params.id = this.info.id;
-        params.originalId = this.info.originalId;
-        params.isDraft = this.info.isDraft;
-      }
-
-      // 新建文档
-      if(!this.isEdit && !this.isToDraft) {
-        params.isDraft = 0;
       }
 
       if(this.params.permission == '内部') {

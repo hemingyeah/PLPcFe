@@ -7,7 +7,7 @@
         <img class="author-img" :src="initData.createUserHead">
         <div class="author-info">
           <p class="name">{{initData.createUserName}}</p>
-          <p class="time">发布于：{{initData.createTime | fmt_dateTime}}</p>
+          <p class="time">发布于：{{initData.createTime}}</p>
         </div>
       </div>
 
@@ -54,8 +54,6 @@
 </template>
 
 <script>
-import * as RepositoryApi from '@src/api/Repository'
-import * as Lang from '@src/util/lang/index.js';
 import BaseFileItem from '@src/component/common/BaseFileItem/BaseFileItem.vue'
 
 export default {
