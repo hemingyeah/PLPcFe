@@ -5,10 +5,13 @@
 
       <!-- 文档库类型筛选 -->
       <div class="search-middle">
+        <!-- 视图删选 -->
         <el-select v-model="params.view" class="search-type search-type-left" @change="search">
           <el-option v-for="item in viewOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
+
+        <!-- 类别删选 -->
         <el-cascader 
           :options="typeOptions"
           class="search-type search-type-right"
@@ -27,15 +30,15 @@
           </template>
         </el-cascader>
       </div>
+
       <!-- 文档库排序、标签 -->
       <div class="search-bottom">
         <el-select v-model="params.orderDetail.column" class="search-sort" @change="search">
           <el-option value="createTime" label="按更新时间排序"></el-option>
-          <el-option value="read_times" label="按访问量排序"></el-option>
+          <el-option value="readTimes" label="按访问量排序"></el-option>
         </el-select>
-        <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
 
-        
+        <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
       </div>
     </div>
     
@@ -43,6 +46,7 @@
     <!-- 关键词搜索框 -->
     <div class="search-input-container" ref="searchInput">
       <div class="list-top" v-if="total && total > 0">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
+
       <el-input 
         class="search-input"
         placeholder="输入关键词搜索" 
@@ -56,7 +60,8 @@
         <i class="iconfont icon-search1 serach-icon"></i>
       </button> -->
     </div>
-      
+    
+    <!-- 分类编辑、添加 -->
     <type-modal v-model="info" :title="title" @sumbitType="sumbitType" ref="typeModal"></type-modal>
     
   </div>
@@ -69,26 +74,28 @@ import * as RepositoryApi from '@src/api/Repository'
 export default {
   name: 'list-search',
   props: {
-    tag: {
+    tag: { // 标签
       type: Object,
       default: () => ({})
     },
-    total: {
+    total: { // 搜索数量
       type: Number,
       default: null
     },
-    infoEdit: {
+    infoEdit: { // 编辑权限
       type: Object,
       default: () => ({})
     }
   },
+
   components: {
     [TypeModal.name]: TypeModal
   },
+
   data () {
     return {
       show: false,
-      isEdit: false,
+      isEdit: false, // 是否编辑分类
       isSearch: false, // 搜索框显示标识
       params: { // 参数对象
         keyword: '',
@@ -106,19 +113,22 @@ export default {
         parentId: null,
         options: []
       },
-      viewOptions: this.initView(),
-      typeOptions: [],
+      viewOptions: this.initView(), // 视图
+      typeOptions: [], // 类别
     }
   },
+
   computed: {
     title () {
       return this.isEdit ? '编辑分类' : '新建分类';
     }
   },
+
   mounted () {   
     this.initView();
     this.getTypes();
   },
+  
   methods: {
     // 初始化viewOptions对象，包括数量，每次更新一次
     async initView () {

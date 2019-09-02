@@ -7,7 +7,7 @@
       <!-- 左侧列表 -->
       <div class="document-list-left">
         <!-- 列表部分 -->
-        <list class="list" @tag="setTag" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list"></list>
+        <list class="list" @tag="setTag" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="info.id" ref="list"></list>
         <!-- 页脚部分 -->
         <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
       </div>
@@ -33,7 +33,7 @@ import * as Lang from '@src/util/lang/index.js';
 
 export default {
   props: {
-    initData: {
+    initData: { // 配置信息
       type: Object,
       default: () => ({})
     }
@@ -41,11 +41,11 @@ export default {
   data () {
     return {
       params: {
-        label: '',
+        label: '', // 标签
         keyword: '', // 搜索的关键词
         pageNum: 1,
         pageSize: 20,
-        orderDetail: {
+        orderDetail: { // 排序
           isSystem: 1,
           column: 'createTime',
           type: '',
@@ -58,23 +58,26 @@ export default {
         show: false
       }, // 选中的标签
       listTotal: null,
-      listMsg: {},
-      info: {
+
+      listMsg: {}, // 列表全部数据
+      info: { // 传给右侧详情的文档id、allowShare
         id: null,
         allowShare: 0
-      },
-      chosenId: null
+      }
     }
   },
+
   components: {
     [ListSearch.name]: ListSearch,
     [List.name]: List,
     [ListFooter.name]: ListFooter,
     [DocumentDetailView.name]: DocumentDetailView
   },
+
   created () {
     this.search()
   },
+
   methods: {
     // 获取文档库列表，将ListSearch、ListFooter组件传递的参数合并
     async search (params) {
@@ -86,6 +89,24 @@ export default {
           this.listTotal = res.result.total;
           res.result.list.forEach(item => {
             item.createtime = Lang.fmt_gmt_time(item.createtime);
+
+            if(item.title.indexOf('<em>') != -1) {
+              let replaceReg = new RegExp('<em>', 'g');
+              item.handleTitle = item.title.replace(replaceReg, '<span style="color: #FF7B00">');
+              let reg = new RegExp('</em>', 'g');
+              item.handleTitle = item.handleTitle.replace(reg, '</span>');
+            } else {
+              item.handleTitle = item.title;
+            }
+
+            if(item.content.indexOf('<em>') != -1) {
+              let replaceReg = new RegExp('<em>', 'g');
+              item.handleContent = item.content.replace(replaceReg, '<span style="color: #FF7B00">');
+              let reg = new RegExp('</em>', 'g');
+              item.handleContent = item.handleContent.replace(reg, '</span>');
+            } else {
+              item.handleContent = item.content;
+            }
           })
           this.listMsg = res.result;
           this.toDetail(this.listMsg.list[0]);
@@ -114,7 +135,6 @@ export default {
       }
       this.info.id = item.id;
       this.info.allowShare = item.allowShare;
-      this.chosenId = this.info.id;
       this.$refs.documentDetail.getDocumnetDetail();
     },
     

@@ -256,8 +256,7 @@ export default {
           let params = {
             wikiId: this.wikiId
           }
-          let fn = this.allowShare ? RepositoryApi.getPublicDetail : RepositoryApi.getInlineDetail;
-          let res = await fn(params);
+          let res = await RepositoryApi.getInlineDetail(params);
 
           if(res.success) {
             let detail = res.result;

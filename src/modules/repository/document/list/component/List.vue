@@ -7,7 +7,7 @@
       <div class="list-item" :class="id == item.id ? 'choosed-item' : ''" v-else v-for="item in value.list" :key="item.id">
 
         <div class="item-top">
-          <p class="item-title" ref="title" @click="toDetail(item)">{{item.title}}</p>
+          <p class="item-title" ref="title" @click="toDetail(item)" v-html="item.handleTitle">{{item.title}}</p>
           <!-- 我发布的显示分享 -->
           <span class="share" @click="shareDocument(item)" v-if="!item.isDraft">
             <i class="iconfont icon-share icon-article-share"></i>
@@ -22,7 +22,7 @@
           <span class="type">{{item.type}}</span>
         </div>
 
-        <p class="item-content" ref="content">{{item.transferredContent}}</p>
+        <p class="item-content" ref="content" v-html="item.handleContent">{{item.content}}</p>
 
         <div class="item-footer">
 

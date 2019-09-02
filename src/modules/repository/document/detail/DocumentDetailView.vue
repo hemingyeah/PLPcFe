@@ -225,6 +225,7 @@ export default {
           this.approveData.approvers.forEach(item => {
             if(item.userId == this.detail.createUser) this.showDetailApprove = true;
           })
+          this.approveData.showOpenFrame = this.showOpenFrame;
 
         } else {
           this.$platform.alert(res.message)

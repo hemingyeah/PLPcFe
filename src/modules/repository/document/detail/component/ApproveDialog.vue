@@ -108,6 +108,11 @@ export default {
               type: 'success',
             });
 
+            if(this.approveData.showOpenFrame) {
+              window.location.reload();
+              return;
+            }
+
             let fromId = window.frameElement.getAttribute('id');
       
             return this.$platform.openTab({
