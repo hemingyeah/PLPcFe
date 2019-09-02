@@ -32,7 +32,7 @@ do
         git checkout dev
         git pull
         git checkout -b $releaseBranchName
-        # git push --set-upstream origin $releaseBranchName
+        git push --set-upstream origin $releaseBranchName
     fi
 
     if [[ -z $2 ]] || [[ $2 == "bugFix" ]]; then
@@ -41,7 +41,7 @@ do
         git pull
         buFixBranchName="bugFix/$(git describe --tags --abbrev=0)"
         git checkout -b $buFixBranchName
-        # git push --set-upstream origin $buFixBranchName
+        git push --set-upstream origin $buFixBranchName
     fi
 
     if [ "$2" == "pre_master" ]; then
@@ -50,7 +50,7 @@ do
         git pull
         preMasterBranchName="pre_master_$(date +'%m%d')"
         git checkout -b $preMasterBranchName
-        # git push --set-upstream origin $preMasterBranchName
+        git push --set-upstream origin $preMasterBranchName
     fi
 
     # echo "Successfully create branch $releaseBranchName for fe project"
