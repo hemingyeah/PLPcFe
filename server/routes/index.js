@@ -87,25 +87,20 @@ router.get('/window', async ctx => {
 
 // /api/app/outside
 router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.0.98',
+  host: '127.0.0.1',
   port: 10003,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=d5981c33-5767-4f0e-aa91-55c336d56e4c`
-  }
+  // headers: {
+  //   'cookie': `VIPPUBLINKJSESSIONID=d5981c33-5767-4f0e-aa91-55c336d56e4c`
+  // }
 }))
 
 // /api/app/outside
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.0.98',
+  host: '127.0.0.1',
   port: 10002,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=d5981c33-5767-4f0e-aa91-55c336d56e4c`
-  }
-}))
-
-router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
-  host: '47.98.255.79',
-  port: 10002,
+  // headers: {
+  //   'cookie': `VIPPUBLINKJSESSIONID=d5981c33-5767-4f0e-aa91-55c336d56e4c`
+  // }
 }))
 
 router.use('', performanceRouter.routes());
