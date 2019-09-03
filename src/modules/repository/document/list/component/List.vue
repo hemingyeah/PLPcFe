@@ -17,8 +17,8 @@
         </div>
 
         <div class="item-info">
-          <span class="name">{{item.updateUserName || item.createUserName}}</span>
-          <span class="time">{{item.updateTime == item.createTime ? '创建于：' : '更新于：'}}{{item.updateTime | fmt_datehour}}</span>
+          <span class="name">{{item.createUserName}}</span>
+          <span class="time">创建于：{{item.createtime | fmt_datehour}}</span>
           <span class="type">{{item.type}}</span>
         </div>
 
