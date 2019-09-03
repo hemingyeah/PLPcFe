@@ -117,7 +117,6 @@ export default {
       allowEdit: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3 : this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
       noticeId: '',
       form: this.buildForm(), // 附件存储格式
-      articleId: 'NIHIF678', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
       params: {
         noticeId: ''
@@ -126,11 +125,6 @@ export default {
       reads: {
         reads: [],
         unreads: []
-      },
-      author: {
-        img: 'https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg',
-        name: '张某某',
-        time: '2019年7月7日 19:03',
       },
       showMoreRead: false, // 是否显示已读人员浮框
       showMoreNoRead: false, // 是否显示未读人员浮框
@@ -177,6 +171,7 @@ export default {
           this.loading = false;
         } else {
           this.$platform.alert(res.message);
+          this.loading = false;
         }
       } catch (err) {
         console.error(err)

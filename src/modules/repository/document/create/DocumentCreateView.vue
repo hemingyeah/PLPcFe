@@ -121,6 +121,7 @@ export default {
           }
         } else {
           this.$platform.alert(res.message);
+          this.loading = false;
         }
       } catch (err) {
         console.error(err);
@@ -267,6 +268,7 @@ export default {
             this.loading = false;
           } else {
             this.$platform.alert(res.message)
+            this.loading = false;
           }
         } catch(err) {
           console.error(err)

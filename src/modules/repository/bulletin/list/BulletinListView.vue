@@ -78,6 +78,7 @@ export default {
               list: []
             };
             this.toDetail(this.listMsg.list[0]);
+            this.loading = false;
             return;
           }
           
@@ -108,6 +109,7 @@ export default {
 
         } else {
           this.$platform.alert(res.message);
+          this.loading = false;
         }
       } catch (err) {
         console.error(err);

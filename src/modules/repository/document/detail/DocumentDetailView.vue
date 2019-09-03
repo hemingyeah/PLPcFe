@@ -235,6 +235,7 @@ export default {
           this.loading = false;
         } else {
           this.$platform.alert(res.message)
+          this.loading = false;
         }
       } catch (err) {
         console.error(err)
@@ -352,12 +353,15 @@ export default {
       this.shareBoxShow = false;
       let body = document.getElementsByTagName('body')[0];
       let hideTextarea = document.createElement('textarea');
+      let protocol = window.location.protocol;
+      let host = window.location.host;
+
       body.appendChild(hideTextarea);
 
       hideTextarea.style.position = 'absolute';
       hideTextarea.style.left = '-9999px';
       hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `http://127.0.0.1:9000/share/wiki/view?wikiId=${this.detail.id}`;
+      hideTextarea.innerHTML = `${protocol}${host}/share/wiki/view?wikiId=${this.detail.id}`;
 
       let selectObject = window.getSelection();
       let range = document.createRange();

@@ -119,6 +119,7 @@ export default {
 
         } else {
           this.$platform.alert(res.message);
+          this.loading = false;
         }
       } catch (err) {
         console.error(err);

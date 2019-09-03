@@ -1,5 +1,5 @@
 import http from '@src/util/http';
-let head = '';
+let head = '/api/app';
 
 // 文档库
 
@@ -17,7 +17,8 @@ let head = '';
  * @returns Promise<List>
  */
 export function getDocumentList (params) {
-  return http.post(`${ head }/outside/es/wiki/list`, params);
+  // return http.post('/outside/es/wiki/list', params);
+  return http.post('/api/search/outside/es/wiki/list', params);
 }
 
 
@@ -238,7 +239,8 @@ export function getApprove (params) {
  * @returns Promise<List>
  */
 export function getBulletinList (params) {
-  return http.post(`${ head }/outside/es/notice/search`, params);
+  // return http.post('/outside/es/notice/search', params);
+  return http.post('/api/search/outside/es/notice/search', params);
 }
 
 
@@ -248,6 +250,7 @@ export function getBulletinList (params) {
  * @returns Promise<Object>
  */
 export function getBulletinTypes () {
+  // return http.get('/outside/noticeType/types');
   return http.get(`${ head }/outside/noticeType/types`);
 }
 
