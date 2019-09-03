@@ -139,7 +139,7 @@ export default {
         label: '通知公告'
       }, {
         value: 'wiki',
-        label: '文档库'
+        label: '知识库'
       }],
       dataOption: '',
       dataOptions: [{

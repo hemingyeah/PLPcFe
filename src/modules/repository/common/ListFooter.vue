@@ -78,6 +78,10 @@ export default {
     width: 80px;
   }
 
+  .el-select__caret {
+    line-height: 22px;
+  }
+
   .el-input__inner {
     height: 22px;
   }

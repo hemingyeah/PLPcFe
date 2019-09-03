@@ -1,5 +1,5 @@
 <template>
-  <div class="document-list-detail" :style="{height: height}" v-if="detail">
+  <div class="document-list-detail" :style="{height: height}" v-if="detail" v-loading.fullscreen.lock="loading">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -67,7 +67,11 @@
 
       <div class="info">
         <p class="title">{{detail.title}}</p>
-        <div class="content" ref="content" v-html="detail.content"></div>
+        <div class="ql-container ql-snow content" style="border:none">
+          <div class="ql-editor">
+            <div v-html="detail.content"></div>
+          </div>
+        </div>
       </div>
       <!-- 详情页脚部分 -->
       <div class="footer" v-if="(detail.label && detail.label.length > 0) || (detail.attachment && detail.attachment.length > 0)">
@@ -162,7 +166,8 @@ export default {
       detail: {}, // 文章详情
       shareInfo: {
         selectedUsers: []
-      }
+      },
+      loading: false
     }
   },
   mounted () {
@@ -216,6 +221,7 @@ export default {
         let params = {
           objId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
         }
+        this.loading = true;
         let res = await RepositoryApi.getApprove(params);
 
         if(res.success) {
@@ -226,7 +232,7 @@ export default {
             if(item.userId == this.detail.createUser) this.showDetailApprove = true;
           })
           this.approveData.showOpenFrame = this.showOpenFrame;
-
+          this.loading = false;
         } else {
           this.$platform.alert(res.message)
         }
@@ -275,7 +281,7 @@ export default {
       
       this.$platform.openTab({
         id: `document_detail_${ this.detail.id }`,
-        title: '文档库详情',
+        title: '知识库',
         url: `/wiki/detail/page?wikiId=${ this.detail.id }`,
         reload: true,
         close: true,
@@ -293,6 +299,8 @@ export default {
         seeAllOrg: true,
         selectedUsers: this.shareInfo.selectedUsers,
         max,
+        action: '/wiki/approver/list',
+        departShow: false,
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){
@@ -429,7 +437,7 @@ export default {
       
           this.$platform.openTab({
             id: 'M_INFO_DOC',
-            title: '文档库',
+            title: '知识库',
             url: '/wiki/list/page',
             reload: true,
             close: true,
@@ -455,7 +463,7 @@ export default {
     },
 
     padding () {
-      return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
+      return this.showOpenFrame ? '0 50px' : '0 100px';
     },
   }
 }
@@ -639,6 +647,7 @@ export default {
       box-shadow:0px 2px 8px 0px rgba(144,171,184,0.5);
       border-radius: 4px;
       font-size: 0;
+      margin-bottom: 50px;
 
       .tags {
         // display: inline-block;

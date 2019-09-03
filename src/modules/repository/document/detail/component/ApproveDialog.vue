@@ -6,7 +6,7 @@
         <label>编号：</label> {{approveData.objNo}}
       </li>
       <li>
-        <label>来源：</label> 文档库
+        <label>来源：</label> 知识库
       </li>
       <li>
         <label>分类：</label> {{approveData.typeName}}
@@ -114,10 +114,11 @@ export default {
             }
 
             let fromId = window.frameElement.getAttribute('id');
+            this.$platform.closeTab(fromId);
       
             return this.$platform.openTab({
               id: `document_detail_${ this.approveData.objId }`,
-              title: '文档库详情',
+              title: '知识库',
               url: `/wiki/detail/page?wikiId=${ this.approveData.objId }`,
               reload: true,
               close: true,

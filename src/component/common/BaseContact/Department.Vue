@@ -3,7 +3,7 @@
     :title="title" width="820px"
     :show.sync="show" @closed="$emit('destroy')" @cancel="$emit('cancel')">
     <div class="bc-dept-wrap">
-      <div class="bc-dept" v-if="depts.length > 0">
+      <div class="bc-dept" v-if="depts.length > 0 && departShow">
         <base-tree
           :data="depts" :selected="selectedDept" :show-checkbox="allowCheckDept"
           @node-selected="initDeptUser" @node-check="chooseDept" 
@@ -137,6 +137,10 @@ export default {
     seeAllOrg: {
       type: Boolean,
       default: false
+    },
+    departShow: {
+      type: Boolean,
+      default: true
     }
   },
   data(){

@@ -89,7 +89,7 @@ export default {
       if(action == '编辑') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>执行创建操作
+            <strong>{userName}</strong> 执行编辑操作
           </h5>
         ]
       }
@@ -97,7 +97,7 @@ export default {
       if(action == '新建') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>执行新建操作
+            <strong>{userName}</strong> 执行新建操作
           </h5>
         ]
       }
@@ -105,7 +105,7 @@ export default {
       if(action == '审批发起') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong>发起了{content.action}的审批
+            <strong>{userName}</strong> 发起了{content.action}的审批
           </h5>,
           // <p class="secondary-info">审批备注：
           //   {content.remark}
@@ -116,7 +116,7 @@ export default {
       if(action == '审批成功') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong> 审核<span style="color: green">通过</span>
+            <strong>{userName}</strong> 审核<span style="color: #00AC97">通过</span>
           </h5>
         ]
       }
@@ -124,9 +124,9 @@ export default {
       if(action == '审批拒绝') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong> 审核<span style="color: red">拒绝</span>
+            <strong>{userName}</strong> 审核<span style="color: #F13E47">拒绝</span>
           </h5>,
-          <p class="secondary-info" style="color: red">拒绝原因：
+          <p class="secondary-info" style="color: #F13E47">拒绝原因：
             {content.remark}
           </p>
         ]

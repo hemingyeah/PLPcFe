@@ -126,48 +126,23 @@ export default {
     },
     handlerPaste(event) {
       try {
-        // event.preventDefault();
         let items = event.clipboardData && event.clipboardData.items;
-        // items = Array.prototype.slice.call(items, 0);
-        console.log(items);
         let file = null;
         if (items && items.length) {
           let length = items.length;
 
-          event.preventDefault();
-
-          // if(items.length > 2 && items[length - 1].type.indexOf('image') !== -1) {
-          //   length = length - 1;
-          // }
+          if(items.length > 2 && items[length - 1].type.indexOf('image') !== -1) {
+            length = length - 1;
+          }
           
-          // let indexStart = 0;
-          // if(items.length == 2 && items[length - 1].type.indexOf('image') !== -1 && items[0].kind == 'string') {
-          //   indexStart = 1;
-          //   event.preventDefault();
-          // }
-
-          // if(items.length == 2 && items[length - 1].type.indexOf('html') !== -1 && items[0].kind == 'string') {
-          //   // event.preventDefault()
-          //   items[1].getAsString(str => {
-          //     let imgReg = /<img.*?(?:>|\/>)/gi;
-          //     let arr = str.match(imgReg);
-              
-          //     if ( arr && arr.length > 0) {
-          //       event.returnValue = false;
-          //       console.log(event.returnValue)
-          //       event.preventDefault();
-          //       // str = str.replace(imgReg, '<br>');
-          //       // this.editor.container.firstChild.innerHTML = str;
-          //     }
-          //     // str = str.replace(imgReg, '<br>');
-          //     // this.editor.container.firstChild.innerHTML = str;
-          //     // console.log(str);
-          //     // this.value = str;
-          //   })
-          // }
+          let indexStart = 0;
+          if(items.length == 2 && items[length - 1].type.indexOf('image') !== -1 && items[0].kind == 'string') {
+            indexStart = 1;
+            event.preventDefault();
+          }
 
           // 检索剪切板items
-          for (let i = 0; i < length; i++) {
+          for (let i = indexStart; i < length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
               file = items[i].getAsFile();
               this.handleChange({
@@ -176,24 +151,6 @@ export default {
                 }
               });
               break;
-            }
-            if (items[i].type.indexOf('html') !== -1) {
-              items[i].getAsString(str => {
-                let imgReg = /<img.*?(?:>|\/>)/gi;
-                // let arr = str.match(imgReg);
-                // console.log(arr.length)
-
-                str = str.replace(imgReg, '<br>');
-                this.editor.container.firstChild.innerHTML = str;
-
-                // if (arr.length > 0) {
-                //   console.log('hello')
-                //   // str = str.replace(imgReg, '<br>');
-                //   // this.editor.container.firstChild.innerHTML = str;
-                // }
-                
-                console.log(str);
-              })
             }
           }
         }

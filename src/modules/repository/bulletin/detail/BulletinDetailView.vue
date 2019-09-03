@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail">
+  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail" v-loading.fullscreen.lock="loading">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -33,7 +33,11 @@
 
       <div class="info">
         <p class="title">{{detail.title}}</p>
-        <div class="content" v-html="detail.content"></div>
+        <div class="ql-container ql-snow content" style="border:none">
+          <div class="ql-editor">
+            <div v-html="detail.content"></div>
+          </div>
+        </div>
       </div>
       <!-- 详情页脚部分 -->
       <div class="footer" v-if="(reads.reads.length > 0 && reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)">
@@ -129,7 +133,8 @@ export default {
         time: '2019年7月7日 19:03',
       },
       showMoreRead: false, // 是否显示已读人员浮框
-      showMoreNoRead: false // 是否显示未读人员浮框
+      showMoreNoRead: false, // 是否显示未读人员浮框
+      loading: false
     }
   },
   mounted () {
@@ -159,6 +164,7 @@ export default {
     // 获取通知公告详情
     async getBulletinDetail () {
       try {
+        this.loading = true;
         this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
         if(!this.params.noticeId) {
           this.detail = null;
@@ -168,6 +174,7 @@ export default {
         if(res.success) {
           this.detail = res.result;
           this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
+          this.loading = false;
         } else {
           this.$platform.alert(res.message);
         }
@@ -317,7 +324,7 @@ export default {
     },
 
     padding () {
-      return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
+      return this.showOpenFrame ? '0 50px' : '0 100px';
     },
 
     marginLeft () {
@@ -457,6 +464,7 @@ export default {
       box-shadow:0px 2px 8px 0px rgba(144,171,184,0.5);
       border-radius: 4px;
       font-size: 0;
+      margin-bottom: 50px;
 
       .person {
         display: flex;

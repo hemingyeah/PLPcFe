@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-create-view">
+  <div class="bulletin-create-view" v-loading.fullscreen.lock="loading">
     <div class="content">
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
@@ -45,6 +45,7 @@ export default {
       showAlert: true,
       noticeId: null,
       info: {},
+      loading: false
     }
   },
   mounted () {
@@ -60,6 +61,7 @@ export default {
     // 获取分类一级树状结构，每次更新一次
     async getTypes () {
       try {
+        this.loading = true;
         let res = await RepositoryApi.getBulletinTypes();
         if(res.success) {
           res.result.forEach(item => {
@@ -68,6 +70,7 @@ export default {
 
           this.params.options = res.result;
           this.params.typeId = this.params.options[0].id;
+          this.loading = false;
         } else {
           this.$platform.alert(res.message);
         }
@@ -233,7 +236,7 @@ export default {
   .content {
     height: 100%;
     overflow: auto;
-    padding: 50px 200px 100px 150px;
+    padding: 50px 40px 0 150px;
     background: #fff;
 
     .textTitle {
@@ -243,6 +246,7 @@ export default {
     .view-left-footer {
       display: flex;
       margin-top: 25px;
+      margin-bottom: 100px;
 
       .green-butn {
         margin-right: 15px;

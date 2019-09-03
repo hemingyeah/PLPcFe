@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-list-view">
+  <div class="bulletin-list-view" v-loading.fullscreen.lock="loading">
     <!-- 搜索部分 -->
     <list-search class="list-search" @search="search" :total="listTotal" :infoEdit="initData.userInfo.authorities"></list-search>
 
@@ -50,7 +50,8 @@ export default {
       info: {
         id: null
       },
-      chosenId: null
+      chosenId: null,
+      loading: false
     }
   },
   components: {
@@ -64,6 +65,7 @@ export default {
   },
   methods: {
     async search (params) {
+      this.loading = true;
       if(params) Object.assign(this.params, params);
       try {
         let res = await RepositoryApi.getBulletinList(this.params);
@@ -102,6 +104,7 @@ export default {
           })
           this.listMsg = res.result;
           this.toDetail(this.listMsg.list[0]);
+          this.loading = false;
 
         } else {
           this.$platform.alert(res.message);
@@ -131,8 +134,6 @@ export default {
 .bulletin-list-view {
   padding: 10px;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
 
   .list-search {
     position: relative;
@@ -140,12 +141,12 @@ export default {
     border-bottom: 1px solid #E8EFF0;
     height: 56px;
     background: #F8F8F8;
-    // box-shadow:0px 2px 4px 0px rgba(232,232,232,1);
   }
 
   .bulletin-list-bottom {
-    flex: 1;
     display: flex;
+    overflow: hidden;
+    height: calc(100vh - 76px);
 
     .bulletin-list-left {
       width: 450px;

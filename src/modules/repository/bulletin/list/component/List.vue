@@ -16,7 +16,7 @@
           <span class="type">{{item.type}}</span>
         </div>
 
-        <p class="item-content" ref="content" v-html="item.handleContent">{{item.content}}</p>
+        <p class="item-content" ref="content" v-html="item.handleContent" @click="toDetail(item)">{{item.content}}</p>
 
         <div class="item-footer">
           <span class="item-num">已读（{{item.readNum}}）</span>
@@ -44,20 +44,6 @@ export default {
     id: {
       type: String,
       default: ''
-    }
-  },
-  data () {
-    return {
-      item: {
-        title: '最前线|微信内测新功能，提升阅读效率没那么容易',
-        name: '张某某',
-        time: '2019年7月7日 19:03',
-        type: '分类1/分类1.1',
-        content: '作为一枚初入鹅厂的鲜鹅，对这里的一切都充满着求知欲。看到我们的KM平台如此生机勃勃，各种技术分享交流如火如荼，在努力的汲取着养分的同时也期待自己能为这个生态圈做出贡献。',
-        readNum: 10086,
-        noReadNum: 3344
-      },
-      total: 12,
     }
   },
   methods: {
@@ -119,8 +105,7 @@ export default {
     }
 
     .item-content {
-      margin: 0;
-      padding: 4px 0;
+      margin: 4px 0;
       color: #909399;
       line-height: 17px;
       font-size: 12px;
@@ -130,6 +115,8 @@ export default {
       -webkit-line-clamp: 2;
       overflow: hidden;
       word-break: break-all;
+
+      cursor: pointer;
 
       img {
         width: 40px;

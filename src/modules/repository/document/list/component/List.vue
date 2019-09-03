@@ -17,12 +17,12 @@
         </div>
 
         <div class="item-info">
-          <span class="name">{{item.createUserName}}</span>
-          <span class="time">发布于：{{item.createtime | fmt_datehour}}</span>
+          <span class="name">{{item.updateUserName || item.createUserName}}</span>
+          <span class="time">发布于：{{item.time | fmt_datehour}}</span>
           <span class="type">{{item.type}}</span>
         </div>
 
-        <p class="item-content" ref="content" v-html="item.handleContent">{{item.content}}</p>
+        <p class="item-content" ref="content" v-html="item.handleContent" @click="toDetail(item)">{{item.content}}</p>
 
         <div class="item-footer">
 
@@ -88,14 +88,10 @@ export default {
   data () {
     return {
       total: 18,
-      // id: null,
       shareBoxShow: false,
       shareInfo: {},
-      chosenItem: {}
+      chosenItem: {},
     }
-  },
-  mounted () {
-    this.highlight();
   },
   methods: {
     // 点击标签成为搜索条件
@@ -103,18 +99,8 @@ export default {
       this.$emit('tag', tag);
     },
 
-    // 根据关键词设置高亮字段
-    highlight () {
-      if(!this.keyword) return;
-      let replaceReg = new RegExp(this.keyword, 'g');
-      let replaceString = `<span style="color: #FF7B00">${ this.keyword }</span>`;
-      this.$refs.content.innerHTML = this.item.content.replace(replaceReg, replaceString);
-      this.$refs.title.innerHTML = this.item.title.replace(replaceReg, replaceString);
-    },
-
     // 点击加号显示标签输入框
     choosePerson (item) {
-      // this.$refs.notificationRange.$el.click();
       let max = -1;
       
       let options = {
@@ -122,6 +108,8 @@ export default {
         seeAllOrg: true,
         selectedUsers: this.shareInfo.selectedUsers,
         max,
+        action: '/wiki/approver/list',
+        departShow: false,
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){
@@ -285,8 +273,7 @@ export default {
     }
 
     .item-content {
-      margin: 0;
-      padding: 4px 0;
+      margin: 4px 0;
       color: #909399;
       line-height: 17px;
       font-size: 12px;
@@ -296,6 +283,8 @@ export default {
       -webkit-line-clamp: 2;
       overflow: hidden;
       word-break: break-all;
+
+      cursor: pointer;
     }
 
     .item-footer {

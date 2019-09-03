@@ -9,11 +9,10 @@
           <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
             <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
             <span style="float: right" class="type-operating">
-              <i class="iconfont icon-chuanjianbaogao" style="font-size: 14px" @click.stop="editType(item)"></i>
+              <i class="iconfont icon-bianji" style="font-size: 14px" @click.stop="editType(item)"></i>
               <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
             </span>
           </el-option>
-          <!-- <div class="add-type" @click="addType">新建分类</div> -->
         </el-select>
       </div>
     </div>
@@ -213,17 +212,6 @@ export default {
       }
     },
 
-    // 添加分类
-    // addType () {
-    //   let btn = document.getElementsByClassName('is-reverse')[0];
-
-    //   btn.click();
-    //   this.isEdit = false;
-    //   this.show = true;
-    //   this.info.name = '';
-    //   this.info.id = null;
-    // },
-
     // 编辑分类
     editType (info) {
       let btn = document.getElementsByClassName('is-reverse')[0];
@@ -248,7 +236,7 @@ export default {
         
         if (res.success) {
           this.$platform.alert('删除分类成功');
-          this.getTypes();
+          window.location.reload();
         } else {
           this.$platform.alert(res.message);
         }
@@ -275,7 +263,7 @@ export default {
             if(res.success) {
               let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
               this.$platform.alert(msg);
-              this.getTypes();
+              window.location.reload();
             } else {
               this.$platform.alert(res.message);
             }

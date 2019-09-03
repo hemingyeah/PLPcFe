@@ -6,7 +6,7 @@ const router = new KoaRouter();
 const modules = require('../../modules');
 
 // todo 改为实际地址
-router.get('/approve/list', async ctx => {
+router.get('/approve', async ctx => {
   let script = ['/approve.list.js'];
   let modConfig = modules['approve.list'];
   let reqHeaders = ctx.request.headers;

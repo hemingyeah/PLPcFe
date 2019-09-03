@@ -343,7 +343,7 @@ export default {
         { name: '事件', value: 'event' },
         { name: '工单', value: 'task' },
         { name: '绩效报告', value: '绩效报告' },
-        { name: '文档库', value: 'wiki' },
+        { name: '知识库', value: 'wiki' },
       ],
       role: [
         { name: '由我审批', value: 'approve' },
@@ -465,10 +465,6 @@ export default {
       // 字段转换 // todo 抽出方法
       params.page = params.pageNum;
       params.myId = this.userId;
-      // todo clera
-      // console.log('[approveList] doSearch ..')
-      // params.myId = 'd33846ee-6fa9-11e9-bfc9-00163e304a25';
-      // params.tenantId = '7416b42a-25cc-11e7-a500-00163e12f748'; // 本地联调
 
       // 返回Promise供 '其他' 调用暴露方法时使用
       return ApproveApi.getApproveList(params).then((res) => {
@@ -1039,7 +1035,7 @@ export default {
   filters: {
     getEventName (value) {
       if (!value) return '';
-      return value === 'event' ? '事件' : value === 'task' ? '工单' : value === 'wiki' ? '文档库' : value;
+      return value === 'event' ? '事件' : value === 'task' ? '工单' : value === 'wiki' ? '知识库' : value;
     },
     getFormatDate (value) {
       if (!value) return '';

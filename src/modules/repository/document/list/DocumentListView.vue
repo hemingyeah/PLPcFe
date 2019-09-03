@@ -1,5 +1,5 @@
 <template>
-  <div class="document-list-view">
+  <div class="document-list-view" v-loading.fullscreen.lock="loading">
     <!-- 搜索部分 -->
     <list-search class="list-search" v-model="params" :tag="tag" :total="listTotal" :infoEdit="initData.userInfo.authorities" @search="search" ref="listSearch"></list-search>
 
@@ -47,7 +47,7 @@ export default {
         pageSize: 20,
         orderDetail: { // 排序
           isSystem: 1,
-          column: 'createTime',
+          column: 'updatetime',
           type: '',
           sequence: 'desc'
         },
@@ -63,7 +63,9 @@ export default {
       info: { // 传给右侧详情的文档id、allowShare
         id: null,
         allowShare: 0
-      }
+      },
+
+      loading: false
     }
   },
 
@@ -81,6 +83,7 @@ export default {
   methods: {
     // 获取文档库列表，将ListSearch、ListFooter组件传递的参数合并
     async search (params) {
+      this.loading = true;
       if(params) Object.assign(this.params, params);
       try {
         let res = await RepositoryApi.getDocumentList(this.params);
@@ -88,7 +91,9 @@ export default {
         if(res.success) {
           this.listTotal = res.result.total;
           res.result.list.forEach(item => {
-            item.createtime = Lang.fmt_gmt_time(item.createtime);
+            if(item.createtime) item.createtime = Lang.fmt_gmt_time(item.createtime);
+            if(item.updateTime) item.updateTime = Lang.fmt_gmt_time(item.updateTime);
+            item.time = item.updateTime ? item.updateTime : item.createtime;
 
             if(item.title.indexOf('<em>') != -1) {
               let replaceReg = new RegExp('<em>', 'g');
@@ -110,6 +115,7 @@ export default {
           })
           this.listMsg = res.result;
           this.toDetail(this.listMsg.list[0]);
+          this.loading = false;
 
         } else {
           this.$platform.alert(res.message);
@@ -146,8 +152,6 @@ export default {
 .document-list-view {
   padding: 10px;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
 
   .list-search {
     position: relative;
@@ -155,14 +159,15 @@ export default {
     height: 56px;
     background: #F8F8F8;
     border-bottom: 1px solid #E8EFF0;
-    // box-shadow:0px 2px 4px 0px rgba(232,232,232,1);
   }
 
   .document-list-bottom {
-    flex: 1;
     display: flex;
+    overflow: hidden;
+    height: calc(100vh - 76px);
 
     .document-list-left {
+      display: inline-block;
       width: 440px;
       display: flex;
       height: 100%;
@@ -179,10 +184,10 @@ export default {
     }
 
     .document-list-right {
+      display: inline-block;
       flex: 1;
       height: 100%;
       width: 0;
-      // margin-left: 10px;
       background: #fff;
       border-left: 2px solid #E8EFF0;
     }

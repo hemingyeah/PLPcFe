@@ -1,5 +1,5 @@
 <template>
-  <div class="document-create-view">
+  <div class="document-create-view" v-loading.fullscreen.lock="loading">
     <div class="view-left" :style="{paddingRight: padding}">
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
@@ -49,7 +49,7 @@ export default {
         label: [], // 标签
         form: {}, // 附件
         typeId: [], // 文章分类
-        options: []
+        options: [],
       },
       articleHtml: '',
       isSave: false,
@@ -59,6 +59,7 @@ export default {
       allowShare: false,
       info: {},
       reportApproveStatus: null,
+      loading: false,
     }
   },
   async created () {
@@ -95,6 +96,7 @@ export default {
     // 获取分类二级树状结构，每次更新一次
     async getTypes () {
       try {
+        this.loading = true;
         let res = await RepositoryApi.getDocumentTypes();
         if(res.success) {
           res.result.forEach(item => {
@@ -113,7 +115,10 @@ export default {
             })
           })
           this.params.options = res.result;
-          if(!this.isEdit) this.setType(this.params.options[0].children[0].value)
+          if(!this.isEdit) {
+            this.setType(this.params.options[0].children[0].value);
+            this.loading = false;
+          }
         } else {
           this.$platform.alert(res.message);
         }
@@ -127,7 +132,7 @@ export default {
       if(!this.paramsCheck()) return;
       this.isToDraft = false;
 
-      if(this.initData.wikiConfig.needApprove) {
+      if(this.initData.wikiConfig.needApprove && this.initData.wikiConfig.approvers && this.initData.wikiConfig.approvers.length > 0) {
         this.$refs.requestApproveDialog.open();
         return;
       }
@@ -140,10 +145,6 @@ export default {
           localStorage.removeItem('document_article');
           this.$platform.alert(res.message);
           this.openFrame();
-          // // 开启审核功能时
-          // this.$platform.alert('文章已提交成功，请等待审核。')
-          // // 关闭审核功能时
-          // this.$platform.alert('文章已发布成功。')
         } else {
           this.$platform.alert(res.message);
         }
@@ -172,10 +173,6 @@ export default {
           localStorage.removeItem('document_article');
           this.$platform.alert(res.message);
           this.openFrame();
-          // // 开启审核功能时
-          // this.$platform.alert('文章已提交成功，请等待审核。')
-          // // 关闭审核功能时
-          // this.$platform.alert('文章已发布成功。')
         } else {
           this.$platform.alert(res.message);
         }
@@ -237,7 +234,7 @@ export default {
       
       this.$platform.openTab({
         id: 'M_INFO_DOC',
-        title: '文档库',
+        title: '知识库',
         url: '/wiki/list/page',
         reload: true,
         close: true,
@@ -267,6 +264,7 @@ export default {
             this.params.article = detail.content;
             this.info = detail;
             this.setType(detail.typeId);
+            this.loading = false;
           } else {
             this.$platform.alert(res.message)
           }
@@ -341,11 +339,11 @@ export default {
     // 参数校验，标题、内容不允许为空
     paramsCheck () {
       if(!this.params.title) {
-        this.$platform.alert('请填写通知公告标题！');
+        this.$platform.alert('请填写知识库标题！');
         return false;
       }
       if(!this.params.article) {
-        this.$platform.alert('请填写通知公告内容！');
+        this.$platform.alert('请填写知识库内容！');
         return false;
       }
       return true;
@@ -375,7 +373,7 @@ export default {
     flex: 1;
     height: 100%;
     overflow: auto;
-    padding: 50px 40px 100px 150px;
+    padding: 50px 40px 0 150px;
     background: #fff;
 
     .textTitle {
@@ -385,6 +383,7 @@ export default {
     .view-left-footer {
       display: flex;
       margin-top: 25px;
+      margin-bottom: 100px;
 
       .green-butn {
         margin-right: 15px;

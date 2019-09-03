@@ -6,7 +6,7 @@
       <!-- 文档库类型筛选 -->
       <div class="search-middle">
         <!-- 视图删选 -->
-        <el-select v-model="params.view" class="search-type search-type-left" @change="search">
+        <el-select v-model="params.view" class="search-type search-type-left" @change="search" v-if="viewOptions.length > 0">
           <el-option v-for="item in viewOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
@@ -34,7 +34,7 @@
       <!-- 文档库排序、标签 -->
       <div class="search-bottom">
         <el-select v-model="params.orderDetail.column" class="search-sort" @change="search">
-          <el-option value="createTime" label="按更新时间排序"></el-option>
+          <el-option value="updatetime" label="按更新时间排序"></el-option>
           <el-option value="readTimes" label="按访问量排序"></el-option>
         </el-select>
 
@@ -102,7 +102,7 @@ export default {
         type: '',
         orderDetail: {
           isSystem: 1,
-          column: 'createTime',
+          column: 'updatetime',
           type: '',
           sequence: 'desc'
         },
@@ -111,7 +111,8 @@ export default {
       info: { // 新建、编辑type对象
         name: '',
         parentId: null,
-        options: []
+        options: [],
+        title: null
       },
       viewOptions: this.initView(), // 视图
       typeOptions: [], // 类别
@@ -128,7 +129,7 @@ export default {
     this.initView();
     this.getTypes();
   },
-  
+
   methods: {
     // 初始化viewOptions对象，包括数量，每次更新一次
     async initView () {
@@ -153,6 +154,7 @@ export default {
           })
         }
         this.viewOptions = options;
+        return options;
       } catch (err) {
         console.error(err)
       }
@@ -199,25 +201,13 @@ export default {
         }
         let res = await RepositoryApi.getTypesCount(params);
         this.typeOptions.forEach(parent => {
-          // let parentCount = 0;
           res.result.forEach(info => {
             if(parent.id == info.typeId) parent.count = info.count
-            // parentCount = info.count;
-            // parent.label = parent.name;
-            // parent.count = parentCount;
-            // parent.label = `${ parent.label }（${ parentCount }）`; // 为父级类别label添加数量
           })
 
           parent.children.forEach(child => {
-            // let childCount = 0;
             res.result.forEach(info => {
               if(child.id == info.typeId) child.count = info.count;
-              // childCount = info.count;
-              // if(child.label != '全部') {
-              //   child.label = child.name;
-              //   child.count = childCount;
-              // child.label = `${ child.label }（${ childCount }）`; // 为子级类别label添加数量
-              // }
             })
           })
         })
@@ -251,6 +241,7 @@ export default {
           this.isEdit = false;
           this.info.name = '';
           this.info.parentId = '';
+          this.info.id = null;
         });
 
         // 获取分类文章数量
@@ -327,6 +318,7 @@ export default {
       this.info.id = info.id;
       this.info.parentId = info.parentId;
       this.info.options = this.typeOptions;
+      this.info.title = info.title;
     },
 
     // 删除分类
@@ -341,7 +333,7 @@ export default {
         
         if (res.success) {
           this.$platform.alert('删除分类成功');
-          this.getTypes();
+          window.location.reload();
         } else {
           this.$platform.alert(res.message);
         }
@@ -364,7 +356,7 @@ export default {
         if(res.success) {
           let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
           this.$platform.alert(msg);
-          this.getTypes();
+          window.location.reload();
         } else {
           this.$platform.alert(res.message);
         }
