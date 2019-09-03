@@ -1,5 +1,5 @@
 module.exports = {
-  targetRootPath: '/code/shb-pc-fe',
+  targetRootPath: '/code/web',
   loginUser: { // 登录用户
     // userId: 'f4cea5f7-49eb-11e9-bfc9-00163e304a25',
     userId: '1676d835-7f76-11e8-8546-00163e304a25',

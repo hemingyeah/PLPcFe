@@ -91,9 +91,9 @@ export default {
         if(res.success) {
           this.listTotal = res.result.total;
           res.result.list.forEach(item => {
-            if(item.createtime) item.createtime = Lang.fmt_gmt_time(item.createtime);
+            // if(item.createtime) item.createtime = Lang.fmt_gmt_time(item.createtime);
             if(item.updateTime) item.updateTime = Lang.fmt_gmt_time(item.updateTime);
-            item.time = item.updateTime ? item.updateTime : item.createtime;
+            // item.time = item.updateTime ? item.updateTime : item.createtime;
 
             if(item.title.indexOf('<em>') != -1) {
               let replaceReg = new RegExp('<em>', 'g');

@@ -9,16 +9,16 @@
           <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
           <div class="author-info">
             <p class="name">{{detail.createUserName}}</p>
-            <p class="time">发布于：{{detail.createTime | fmt_datehour}}</p>
+            <p class="time">创建于：{{detail.createTime | fmt_datehour}}</p>
           </div>
         </div>
 
-        <div class="author right" v-if="detail.updateUserName">
+        <div class="author right" v-if="detail.createTime != detail.updateTime">
           <img class="author-img" :src="detail.updateUserHead" v-if="detail.createUserHead">
           <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
           <div class="author-info">
             <p class="name">{{detail.updateUserName}}</p>
-            <p class="time">最后编辑：{{detail.updateTime | fmt_datehour}}</p>
+            <p class="time">更新于：{{detail.updateTime | fmt_datehour}}</p>
           </div>
         </div>
       </div>
