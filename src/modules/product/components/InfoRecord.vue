@@ -232,7 +232,7 @@ export default {
       ]
 
       if (/工单/.test(action)) {
-        const str = `${action === '新建工单' ? '新建' : '完成' }了一个该产品的工单 #${content.taskNo}，工单类型为【${content.taskType}】。`;
+        const str = ` ${item.action.indexOf('新建工单') > -1 ? item.action.indexOf('API') > -1 ? 'API新建' : '新建' : '完成' } 了一个该产品的工单 #${content.taskNo}，工单类型为【${content.taskType}】。`;
         return (
           <h5>
             <strong>{userName}</strong>
@@ -242,7 +242,7 @@ export default {
       }
 
       if (/事件/.test(action)) {
-        const str = `${action === '新建事件' ? '新建' : '完成' }了一个该产品的事件 #${content.eventNo}， 事件类型为【${content.taskType}】。`;
+        const str = ` ${item.action.indexOf('新建事件') > -1 ? item.action.indexOf('API') > -1 ? 'API新建' : '新建' : '完成' } 了一个该产品的事件 #${content.eventNo}， 事件类型为【${content.taskType}】。`;
         return (
           <h5>
             <strong>{userName}</strong>
