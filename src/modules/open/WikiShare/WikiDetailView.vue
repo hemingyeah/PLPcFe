@@ -67,6 +67,9 @@ export default {
   components: {
     [BaseFileItem.name]: BaseFileItem
   },
+  mounted () {
+    console.log(this.initData);
+  },
   computed: {
     height () {
       return this.showOpenFrame ? '100%' : '100vh';

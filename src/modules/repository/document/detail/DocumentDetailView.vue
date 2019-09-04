@@ -144,7 +144,7 @@ export default {
   },
   data () {
     return {
-      allowEdit: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3 : this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
+      allowEdit: this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
       form: this.buildForm(), // 附件存储格式
       wikiId: '', // 通知公告id
       showOpenFrame: true, // 是否显示 新页面打开
@@ -221,24 +221,24 @@ export default {
         let params = {
           objId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
         }
-        this.loading = true;
         let res = await RepositoryApi.getApprove(params);
-        this.loading = false;
 
         if(res.success) {
           this.approveData = res.result;
           let time = Lang.fmt_gmt_time(this.approveData.createTime);
           this.approveData.createTime = Lang.formatDate(time, 'YYYY-MM-DD HH:mm:ss');
           this.approveData.approvers.forEach(item => {
-            if(item.userId == this.detail.createUser) this.showDetailApprove = true;
+            if(item.userId == this.initData.userInfo.userId) this.showDetailApprove = true;
           })
           this.approveData.showOpenFrame = this.showOpenFrame;
+          if(this.detail.originalId) {
+            this.approveData.wikiId = this.detail.originalId;
+          }
         } else {
           this.$platform.alert(res.message)
         }
       } catch (err) {
         console.error(err)
-        this.loading = false;
       }
     },
 
@@ -252,7 +252,9 @@ export default {
           this.detail = null;
           return;
         }
+        this.loading = true;
         let res = await RepositoryApi.getInlineDetail(params);
+        this.loading = false;
 
         if(res.success) {
           this.detail = res.result;
@@ -273,6 +275,7 @@ export default {
         }
       } catch(err) {
         console.error(err)
+        this.loading = false;
       }
     },
 

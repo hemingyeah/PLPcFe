@@ -113,13 +113,19 @@ export default {
               return;
             }
 
+            if((this.approveData.wikiId && this.form.state == 'fail') || (!this.approveData.wikiId)) {
+              this.approveData.wikiId = this.approveData.objId;
+            }
+
+            let id = window.frameElement.dataset.id;
+            this.$platform.closeTab(id);
+
             let fromId = window.frameElement.getAttribute('id');
-            this.$platform.closeTab(fromId);
       
             return this.$platform.openTab({
-              id: `document_detail_${ this.approveData.objId }`,
+              id: `document_detail_${ this.approveData.wikiId }`,
               title: '知识库',
-              url: `/wiki/detail/page?wikiId=${ this.approveData.objId }`,
+              url: `/wiki/detail/page?wikiId=${ this.approveData.wikiId }`,
               reload: true,
               close: true,
               fromId

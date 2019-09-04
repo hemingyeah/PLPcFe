@@ -14,7 +14,7 @@
 
       <!-- 右侧详情 -->
       <div class="document-list-right">
-        <document-detail :info="info" :infoEdit="initData.userInfo.authorities" ref="documentDetail" @search="search"></document-detail>
+        <document-detail :info="info" :initData="initData" ref="documentDetail" @search="search"></document-detail>
       </div>
     </div>
     

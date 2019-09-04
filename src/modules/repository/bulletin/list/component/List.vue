@@ -10,13 +10,15 @@
           <p class="item-title" ref="title" @click="toDetail(item)" v-html="item.handleTitle"></p>
         </div>
 
-        <div class="item-info">
-          <span class="name">{{item.createUserName}}</span>
-          <span class="time">发布于：{{item.createTime | fmt_datehour}}</span>
-          <span class="type">{{item.type}}</span>
-        </div>
+        <div class="item-cursor" @click="toDetail(item)">
+          <div class="item-info">
+            <span class="name">{{item.createUserName}}</span>
+            <span class="time">发布于：{{item.createTime | fmt_datehour}}</span>
+            <span class="type">{{item.type}}</span>
+          </div>
 
-        <p class="item-content" ref="content" v-html="item.handleContent" @click="toDetail(item)">{{item.content}}</p>
+          <p class="item-content" ref="content" v-html="item.handleContent">{{item.content}}</p>
+        </div>
 
         <div class="item-footer">
           <span class="item-num">已读（{{item.readNum}}）</span>
@@ -95,33 +97,36 @@ export default {
     }
     
 
-    .item-info {
-      font-size: 12px;
-      color: #909399;
-
-      .type {
-        margin-left: 20px;
-      }
-    }
-
-    .item-content {
-      margin: 4px 0;
-      color: #909399;
-      line-height: 17px;
-      font-size: 12px;
-
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      word-break: break-all;
-
+    .item-cursor {
       cursor: pointer;
 
-      img {
-        width: 40px;
+      .item-info {
+        font-size: 12px;
+        color: #909399;
+
+        .type {
+          margin-left: 20px;
+        }
+      }
+
+      .item-content {
+        margin: 4px 0;
+        color: #909399;
+        line-height: 17px;
+        font-size: 12px;
+
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        word-break: break-all;
+
+        img {
+          width: 40px;
+        }
       }
     }
+    
 
     .item-footer {
       display: inline-block;

@@ -235,7 +235,8 @@ export default {
         let res = await RepositoryApi.deleteBulletinType(params);
         
         if (res.success) {
-          this.$platform.alert('删除分类成功');
+          const result = await this.$platform.alert('删除分类成功');
+          if (!result) return;
           window.location.reload();
         } else {
           this.$platform.alert(res.message);
@@ -262,7 +263,8 @@ export default {
 
             if(res.success) {
               let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
-              this.$platform.alert(msg);
+              const result = await this.$platform.alert(msg);
+              if (!result) return;
               window.location.reload();
             } else {
               this.$platform.alert(res.message);
@@ -391,7 +393,7 @@ export default {
   }
 }
 
-.icon-chuanjianbaogao {
+.icon-bianji {
   &:hover {
     color: #38A6A6;
   }

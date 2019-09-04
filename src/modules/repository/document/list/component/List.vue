@@ -16,13 +16,16 @@
           <el-tag class="review-tag" v-if="item.examineState && item.examineState != 0" :type="item.examineState == 1 ? '' : 'danger'">{{item.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
 
-        <div class="item-info">
-          <span class="name">{{item.createUserName}}</span>
-          <span class="time">创建于：{{item.createtime | fmt_datehour}}</span>
-          <span class="type">{{item.type}}</span>
-        </div>
+        <div class="item-cursor" @click="toDetail(item)">
+          <div class="item-info">
+            <span class="name">{{item.createUserName}}</span>
+            <span class="time">创建于：{{item.createtime | fmt_datehour}}</span>
+            <span class="type">{{item.type}}</span>
+          </div>
 
-        <p class="item-content" ref="content" v-html="item.handleContent" @click="toDetail(item)">{{item.content}}</p>
+          <p class="item-content" ref="content" v-html="item.handleContent">{{item.content}}</p>
+        </div>
+        
 
         <div class="item-footer">
 
@@ -264,31 +267,33 @@ export default {
       }
     }
     
+    .item-cursor {
+      cursor: pointer;
 
-    .item-info {
-      // padding: 4px 0;
-      font-size: 12px;
-      color: #909399;
+      .item-info {
+        // padding: 4px 0;
+        font-size: 12px;
+        color: #909399;
 
-      .type {
-        margin-left: 20px;
+        .type {
+          margin-left: 20px;
+        }
+      }
+
+      .item-content {
+        margin: 4px 0;
+        color: #909399;
+        line-height: 17px;
+        font-size: 12px;
+
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        word-break: break-all;
       }
     }
-
-    .item-content {
-      margin: 4px 0;
-      color: #909399;
-      line-height: 17px;
-      font-size: 12px;
-
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      word-break: break-all;
-
-      cursor: pointer;
-    }
+    
 
     .item-footer {
       display: flex;
