@@ -119,7 +119,7 @@ export default {
             })
           })
           this.params.options = res.result;
-          if(!this.isEdit) {
+          if(!this.isEdit && this.params.options.length > 0) {
             this.setType(this.params.options[0].children[0].value);
           }
         } else {
@@ -351,6 +351,10 @@ export default {
         this.$platform.alert('请填写知识库内容！');
         return false;
       }
+      if(this.params.title.length > 100) {
+        this.$platform.alert('标题不能超过100字！');
+        return false;
+      }
       return true;
     },
   },
@@ -415,5 +419,8 @@ export default {
 
     border-left: 1px solid #C5D9E8;
   }
+}
+.el-scrollbar {
+  min-height: 45px;
 }
 </style>

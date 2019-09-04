@@ -40,7 +40,7 @@
         </div>
       </div>
       <!-- 详情页脚部分 -->
-      <div class="footer" v-if="(reads.reads.length > 0 && reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)">
+      <div class="footer" v-if="(reads.reads.length > 0 || reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)">
         <!-- 已读、未读人员显示 -->
         <div class="person">
 
@@ -50,7 +50,7 @@
               <img class="person-img" :src="item.head" v-if="index < 5">
               <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
             </el-tooltip>
-            <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">+{{reads.reads.length - 5}}
+            <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">{{reads.reads.length < 105 ? reads.reads.length - 5 : '99+'}}
               <div class="see-more" v-if="showMoreRead" ref="seeMore">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
                   <img class="person-img" :src="item.head" v-if="index >= 5">
@@ -66,7 +66,7 @@
               <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
               <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
             </el-tooltip>
-            <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">+{{reads.unreads.length - 5}}
+            <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">{{reads.unreads.length < 105 ? reads.unreads.length - 5 : '99+'}}
               <div class="see-more right" v-if="showMoreNoRead" ref="seeMore">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
                   <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
@@ -510,7 +510,9 @@ export default {
               bottom: 45px;
               left: -117px;
               text-align: left;
-              width: 232px;
+              width: 240px;
+              max-height: 120px;
+              overflow: auto;
               padding: 15px 5px 5px 15px;
               border: 1px solid #ccc;
               border-radius: 10px;

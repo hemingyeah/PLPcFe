@@ -22,5 +22,9 @@ module.exports = {
   'bulletin.detail': {
     entry: './src/modules/repository/bulletin/detail/index.js',
     template: 'src/modules/repository/bulletin/detail/index.html'
-  }
+  },
+  'open.wiki': {
+    entry: './src/modules/repository/document/share/index.js',
+    template: 'src/modules/repository/document/share/index.html',
+  },
 }

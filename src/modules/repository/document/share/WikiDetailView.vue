@@ -26,7 +26,11 @@
 
       <div class="info">
         <p class="title">{{initData.title}}</p>
-        <div class="content" ref="content" v-html="initData.content"></div>
+        <div class="ql-container ql-snow content" style="border:none">
+          <div class="ql-editor">
+            <div v-html="initData.content"></div>
+          </div>
+        </div>
       </div>
       <!-- 详情页脚部分 -->
       <div class="footer" v-if="(initData.label && initData.label.length > 0) || (initData.attachment && initData.attachment.length > 0)">
@@ -54,7 +58,7 @@
 </template>
 
 <script>
-import BaseFileItem from '@src/component/common/BaseFileItem/BaseFileItem.vue'
+import * as Lang from '@src/util/lang/index.js'
 
 export default {
   name: 'document-detail',
@@ -64,11 +68,8 @@ export default {
       default: () => ({})
     }
   },
-  components: {
-    [BaseFileItem.name]: BaseFileItem
-  },
-  mounted () {
-    console.log(this.initData);
+  created () {
+    this.initData.createTime = Lang.formatDate(this.initData.createTime, 'YYYY-MM-DD HH:mm');
   },
   computed: {
     height () {
@@ -83,8 +84,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../../assets/icon/iconfont.css';
-
 .document-list-detail {
   display: flex;
   flex-direction: column;

@@ -76,6 +76,11 @@ export default {
     .el-form-item {
       margin: 0;
       line-height: 32px;
+
+      .el-form-item__label {
+        line-height: 32px;
+        text-align: right;
+      }
     }
 
     .title {
@@ -100,6 +105,7 @@ export default {
     margin: 0;
     font-size: 12px;
     color: #F56C6C;
+    margin-top: 10px;
   } 
 }
 

@@ -49,6 +49,7 @@
 <script>
 import platform from '@src/platform';
 import Uploader from '@src/util/uploader';
+import http from '@src/util/http';
 
 export default {
   name: 'text-title',
@@ -96,15 +97,33 @@ export default {
           let users = data.users || [];
           let depts = data.depts || [];
           let newValue = users;
-          console.log(data);
 
           this.params.selectedUsers = newValue;
           this.params.selectedDepts = depts;
+          this.deftCheck();
 
           this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
         }
       })
         .catch(err => console.error(err))
+    },
+
+    async deftCheck () {
+      if(this.params.selectedDepts.length > 0) {
+        let num = 0;
+        this.params.selectedDepts.forEach(async item => {
+          let params = {
+            deptId: item.id,
+            pageNum: 1,
+            pageSize: 50,
+            sellAllOrg: false,
+            keyword: '',
+          }
+          let res = await http.get('/security/department/user', params);
+          num = res.list.length + num;
+          this.params.deptPerson = num;
+        })
+      }
     },
 
     // 添加标签，最多5个
@@ -310,6 +329,7 @@ export default {
 
       input {
         border: none;
+        width: calc(100% - 60px);
       }
     }
   }

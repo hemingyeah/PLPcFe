@@ -19,16 +19,4 @@ router.get('/v_open/dailyReport', async ctx => {
   ctx.body = Template.renderWithHtml('订阅汇总信息每日通知日报', body, script)
 });
 
-router.get('/share/wiki/view', async ctx => {
-  let script = ['/open.wiki.js'];
-  let modConfig = modules['open.wiki'];
-  let reqHeaders = ctx.request.headers;
-  const wikiId = ctx.request.query.wikiId;
-
-  let result = await HttpClient.request( `/share/wiki/view?wikiId=${wikiId}`, 'get', null, {headers: reqHeaders});
-  let body = result.body;
- 
-  ctx.body = Template.renderWithHtml('知识库分享', body, script, modConfig.template)
-});
-
 module.exports = router;

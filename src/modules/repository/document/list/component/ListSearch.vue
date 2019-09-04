@@ -19,6 +19,7 @@
           clearable 
           @change="handleChange"
           @visible-change="showCascader"
+          v-model="params.type"
           filterable>
           <template slot-scope="{ node, data }" class="type">
             <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
@@ -51,10 +52,16 @@
         class="search-input"
         placeholder="输入关键词搜索" 
         v-model="params.keyword"
-        @keyup.enter.native="search"
-        clearable>
+        @keyup.enter.native="search">
         <i slot="suffix" class="el-input__icon el-icon-search"></i>
       </el-input>
+
+      <base-button type="primary" @event="search()" native-type="submit">
+        搜索
+      </base-button>
+      <base-button type="ghost" @event="resetParams">
+        重置
+      </base-button>
       <!-- v-if="isSearch" -->
       <!-- <button class="search-btn" @click="toSearch" v-else>
         <i class="iconfont icon-search1 serach-icon"></i>
@@ -99,7 +106,7 @@ export default {
       isSearch: false, // 搜索框显示标识
       params: { // 参数对象
         keyword: '',
-        type: '',
+        type: [],
         orderDetail: {
           isSystem: 1,
           column: 'updatetime',
@@ -108,6 +115,7 @@ export default {
         },
         view: '',
       },
+      // params: this.value,
       info: { // 新建、编辑type对象
         name: '',
         parentId: null,
@@ -218,7 +226,6 @@ export default {
 
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
     showCascader (flag) {
-      if(this.typeOptions.length <= 0) return;
       let parent = document.getElementsByClassName('el-cascader-panel')[0];
        
 
@@ -230,6 +237,7 @@ export default {
 
         parent.style.paddingBottom = '40px';
         parent.style.maxHeight = '350px';
+        parent.style.minHeight = '90px';
 
         parent.appendChild(child);
 
@@ -277,6 +285,20 @@ export default {
 
     // 输入关键词或选择条件时向父组件触发search事件
     search () {
+      this.$emit('search', this.params);
+    },
+
+    resetParams () {
+      this.params.keyword = '';
+      this.params.view = '';
+      this.params.typeIds = [];
+      this.params.type = [];
+      this.params.orderDetail = { // 排序
+        isSystem: 1,
+        column: 'updatetime',
+        type: '',
+        sequence: 'desc'
+      };
       this.$emit('search', this.params);
     },
 
@@ -346,6 +368,10 @@ export default {
     // 提交编辑或添加的分类
     async sumbitType () {
       try {
+        if(this.info.name.length > 20) {
+          this.$platform.alert('分类名称不能超过20字');
+          return;
+        }
         let res;
         if(this.isEdit) {
           res = await RepositoryApi.updateDocumentType(this.info);
@@ -414,7 +440,7 @@ export default {
 
       .search-type-left {
         position: relative;
-        width: 150px;
+        width: 140px;
 
         .el-input__inner {
           border-right: none;
@@ -434,7 +460,7 @@ export default {
       }
 
       .search-type-right {
-        width: 230px;
+        width: 190px;
 
         .el-input__inner {
           border-radius: 0 2px 2px 0;
@@ -465,7 +491,7 @@ export default {
       .search-tag {
         vertical-align: middle;
 
-        max-width: 200px;
+        max-width: 190px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -505,11 +531,15 @@ export default {
 
     .search-input {
       height: 34px;
-      width: 230px;
+      width: 200px;
 
       .el-input__inner {
         height: 100%;
       }
+    }
+
+    .base-button {
+      margin-left: 5px;
     }
 
     .search-btn {
@@ -535,11 +565,14 @@ export default {
   justify-content: space-between;
   
   & >.type-operating {
-    display: none;
+    // display: none;
+    display: inline-block;
+    opacity: 0;
   }
 
   &:hover > .type-operating {
     display: inline-block;
+    opacity: 1;
   }
 
   .type-operating {

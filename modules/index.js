@@ -31,12 +31,6 @@ module.exports = {
     entry: './src/modules/open/DailyReport/index.js',
     exclude: ['common']
   },
-
-  'open.wiki': {
-    entry: './src/modules/open/WikiShare/index.js',
-    template: 'src/modules/open/WikiShare/index.html',
-    exclude: ['common']
-  },
   ...setting,
   ...team,
   ...product,

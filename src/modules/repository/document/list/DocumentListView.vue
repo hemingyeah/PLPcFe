@@ -52,6 +52,7 @@ export default {
           sequence: 'desc'
         },
         view: '',
+        type: [],
       },
       tag: {
         name: '',

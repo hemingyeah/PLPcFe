@@ -1,7 +1,7 @@
 <template>
   <div class="bulletin-list-search" ref="search">
     <div class="search-top">
-      <button class="base-button search-new" @click="create">新建</button>
+      <button class="base-button search-new" @click="create" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">新建</button>
       
       <!-- 通知公告类型筛选 -->
       <div class="search-bottom">
@@ -24,14 +24,15 @@
         class="search-input"
         placeholder="输入关键词搜索" 
         v-model="params.keyword"
-        @keyup.enter.native="search"
-        clearable>
+        @keyup.enter.native="search">
         <i slot="suffix" class="el-input__icon el-icon-search"></i>
       </el-input>
-      <!-- v-if="isSearch" -->
-      <!-- <button class="search-btn" @click="toSearch" v-else>
-        <i class="iconfont icon-search1 serach-icon"></i>
-      </button> -->
+      <base-button type="primary" @event="search()" native-type="submit">
+        搜索
+      </base-button>
+      <base-button type="ghost" @event="resetParams">
+        重置
+      </base-button>
     </div>
     
     <!-- 添加编辑分类 -->
@@ -62,6 +63,10 @@ export default {
     total: {
       type: Number,
       default: null
+    },
+    infoEdit: { // 编辑权限
+      type: Object,
+      default: () => ({})
     }
   },
   data () {
@@ -156,43 +161,72 @@ export default {
     },
 
     showCascader (flag) {
-      if(this.typeOptions.length <= 0) return;
-      let parent = document.getElementsByClassName('el-scrollbar')[1];
-       
+      let parent;
+      if(this.typeOptions.length <= 0) {
+        parent = document.getElementsByClassName('el-select-dropdown__empty')[0];
+        if(flag) {
+          let child = document.createElement('div');
+          child.innerHTML = '新建分类';
+          child.className = 'add-type-empty';
+          child.id = 'type-id';
+          parent.after(child)
 
-      if(flag) {
-        let child = document.createElement('div');
-        child.innerHTML = '新建分类';
-        child.className = 'add-type';
-        child.id = 'type-id';
+          child.addEventListener('click', e => { // 打开新建分类
+            let btn = document.getElementsByClassName('is-reverse')[0];
 
-        parent.style.paddingBottom = '46px';
-
-        parent.appendChild(child);
-
-        child.addEventListener('click', e => { // 打开新建分类
-          let btn = document.getElementsByClassName('is-reverse')[0];
-
-          btn.click();
-          this.isEdit = false;
-          this.show = true;
-          this.info.name = '';
-          this.info.id = null;
-        });
-
-        // 获取分类文章数量
-        // this.getTypesCount();
-
+            btn.click();
+            this.isEdit = false;
+            this.show = true;
+            this.info.name = '';
+            this.info.id = null;
+          });
+        } else {
+          document.getElementById('type-id').remove();
+        }
+        
       } else {
-        let child = document.getElementById('type-id')
+        parent = document.getElementsByClassName('el-scrollbar')[1];
+       
+        if(flag) {
+          let child = document.createElement('div');
+          child.innerHTML = '新建分类';
+          child.className = 'add-type';
+          child.id = 'type-id';
 
-        parent.removeChild(child);
+          parent.style.paddingBottom = '46px';
+
+          parent.appendChild(child);
+
+          child.addEventListener('click', e => { // 打开新建分类
+            let btn = document.getElementsByClassName('is-reverse')[0];
+
+            btn.click();
+            this.isEdit = false;
+            this.show = true;
+            this.info.name = '';
+            this.info.id = null;
+          });
+
+          // 获取分类文章数量
+          // this.getTypesCount();
+
+        } else {
+          let child = document.getElementById('type-id')
+
+          parent.removeChild(child);
+        }
       }
     },
 
     // 输入关键词或选择条件时向父组件触发search事件
     search () {
       if(!this.params.typeId) this.params.typeId = null;
+      this.$emit('search', this.params);
+    },
+
+    resetParams () {
+      this.params.keyword = '';
+      this.params.typeId = null;
       this.$emit('search', this.params);
     },
 
@@ -253,6 +287,10 @@ export default {
           if(valid) {
             this.show = false;
             let res;
+            if(this.info.name.length > 20) {
+              this.$platform.alert('分类名称不能超过20字');
+              return;
+            }
 
             if(this.isEdit) {
               res = await RepositoryApi.updateBulletinType(this.info);
@@ -329,11 +367,15 @@ export default {
 
     .search-input {
       height: 34px;
-      width: 230px;
+      width: 190px;
 
       .el-input__inner {
         height: 100%;
       }
+    }
+
+    .base-button {
+      margin-left: 5px;
     }
 
     .search-btn {
@@ -355,11 +397,13 @@ export default {
 
 .el-select-dropdown__item {
   & >.type-operating {
-    display: none;
+    display: inline-block;
+    opacity: 0;
   }
 
   &:hover > .type-operating {
     display: inline-block;
+    opacity: 1;
   }
 }
 .el-scrollbar {
@@ -380,16 +424,6 @@ export default {
       color: #38A6A6;
     }
 
-    // height: 40px;
-    // line-height: 40px;
-    // text-align: center;
-    // border-top: 1px solid #D3DCE6;
-    // color: #38A6A6;
-    // cursor: pointer;
-
-    // &:hover {
-    //   color: #38A6A6;
-    // }
   }
 }
 
@@ -422,6 +456,18 @@ export default {
   .edit-footer {
     display: flex;
     justify-content: flex-end;
+  }
+}
+
+.el-select-dropdown {
+  .add-type-empty {
+    height: 40;
+    text-align: center;
+    line-height: 40px;
+    color: #38A6A6;
+    border-top: 6px solid rgba(144, 147, 153, 0.15);
+
+    cursor: pointer;
   }
 }
 </style>

@@ -21,6 +21,7 @@ import TextTitle from './component/TextTitle.vue'
 import { Message } from 'element-ui';
 
 import * as RepositoryApi from '@src/api/Repository'
+import http from '@src/util/http';
 
 export default {
   name: 'document-create-view',
@@ -37,6 +38,7 @@ export default {
         options: [],
         selectedUsers: [], // 选择的人员
         selectedDepts: [], // 选择的部门
+        deptPerson: 0
       },
       articleHtml: '',
       isSave: false,
@@ -71,7 +73,9 @@ export default {
           })
 
           this.params.options = res.result;
-          this.params.typeId = this.params.options[0].id;
+          if(this.params.options.length > 0) {
+            this.params.typeId = this.params.options[0].id;
+          }
         } else {
           this.$platform.alert(res.message);
         }
@@ -82,8 +86,13 @@ export default {
     },
 
     // 新建、编辑文章提交操作
-    async sumbit () {    
-      if(!this.paramsCheck()) return;
+    async sumbit () {
+      let result = await this.paramsCheck()
+      if(!result) return;
+      if(this.params.deptPerson <= 0 && this.params.selectedUsers.length <= 0) {
+        let result = await this.$platform.confirm('您选择的通知范围不包含任何人，将不会发出通知，是否继续！');
+        if(!result) return;
+      }
 
       try {
         let params = this.buildParams();
@@ -163,16 +172,42 @@ export default {
     },
 
     // 参数校验，标题、内容不允许为空
-    paramsCheck () {
+    async paramsCheck () {
       if(!this.params.title) {
         this.$platform.alert('请填写通知公告标题！');
+        return false;
+      }
+      if(this.params.title.length > 100) {
+        this.$platform.alert('标题不能超过100字！');
         return false;
       }
       if(!this.params.article) {
         this.$platform.alert('请填写通知公告内容！');
         return false;
       }
+      if(this.params.selectedUsers.length <= 0 && this.params.selectedDepts.length <= 0) {
+        this.$platform.alert('请选择通知范围！');
+        return false;
+      }
+      
       return true;
+    },
+
+    async deftCheck () {
+      if(this.params.selectedDepts.length > 0) {
+        let num = 0;
+        this.params.selectedDepts.forEach(async item => {
+          let params = {
+            deptId: item.id,
+            pageNum: 1,
+            pageSize: 50,
+            sellAllOrg: false,
+            keyword: '',
+          }
+          let res = await http.get('/security/department/user', params);
+          num = res.list.length + num;
+        })
+      }
     },
 
     // 构建参数
