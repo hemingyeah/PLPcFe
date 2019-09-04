@@ -112,14 +112,15 @@ export default {
         pageNum: 1,
         pageSize: 20,
       })
-        .then(res => {
-          return this.approveList = res.data.list
+        .then((res = {}) => {
+          return this.approveList = res?.data?.list || [];
         })
         .catch(e => console.error('e', e));
     },
     getApproveInfo() {
       return getApprovePerson()
-        .then(res => {
+        .then((res = {}) => {
+          res.data ? res.data : res.data = [];
           this.form.approve = res.data.map(({userId}) => userId);
           return res.data;
         })

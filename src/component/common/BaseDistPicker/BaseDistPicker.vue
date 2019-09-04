@@ -60,6 +60,9 @@ export default {
     .el-cascader-menu__item--extensible:after {
       right: 5px;
     }
+    .el-cascader-menu__list {
+      max-height: 300px;
+    }
   }
 
 .base-dist-picker{
