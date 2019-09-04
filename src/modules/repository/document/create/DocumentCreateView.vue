@@ -98,6 +98,10 @@ export default {
       try {
         this.loading = true;
         let res = await RepositoryApi.getDocumentTypes();
+        if(!this.isEdit) {
+          this.loading = false;
+        }
+
         if(res.success) {
           res.result.forEach(item => {
             item.value = item.id;
@@ -117,14 +121,13 @@ export default {
           this.params.options = res.result;
           if(!this.isEdit) {
             this.setType(this.params.options[0].children[0].value);
-            this.loading = false;
           }
         } else {
           this.$platform.alert(res.message);
-          this.loading = false;
         }
       } catch (err) {
         console.error(err);
+        this.loading = false;
       }
     },
 
@@ -255,6 +258,7 @@ export default {
             wikiId: this.wikiId
           }
           let res = await RepositoryApi.getInlineDetail(params);
+          this.loading = false;
 
           if(res.success) {
             let detail = res.result;
@@ -265,13 +269,12 @@ export default {
             this.params.article = detail.content;
             this.info = detail;
             this.setType(detail.typeId);
-            this.loading = false;
           } else {
             this.$platform.alert(res.message)
-            this.loading = false;
           }
         } catch(err) {
           console.error(err)
+          this.loading = false;
         }
       } else {
         let article = localStorage.getItem('document_article');

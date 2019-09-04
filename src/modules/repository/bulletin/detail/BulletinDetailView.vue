@@ -158,23 +158,23 @@ export default {
     // 获取通知公告详情
     async getBulletinDetail () {
       try {
-        this.loading = true;
         this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
         if(!this.params.noticeId) {
           this.detail = null;
           return;
         }
+        this.loading = true;
         let res = await RepositoryApi.getBulletinDetail(this.params);
+        this.loading = false;
         if(res.success) {
           this.detail = res.result;
           this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
-          this.loading = false;
         } else {
           this.$platform.alert(res.message);
-          this.loading = false;
         }
       } catch (err) {
         console.error(err)
+        this.loading = false;
       }
     },
 

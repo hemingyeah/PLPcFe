@@ -85,18 +85,26 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-// /api/app/outside
+// /api/app/outside/es
 router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  host: '127.0.0.1',
+  host: '172.18.0.98',
   port: 10003,
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=d5981c33-5767-4f0e-aa91-55c336d56e4c`
-  // }
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=f4bc6b27-8ad7-4914-8189-c9fb53a2827b`
+  }
 }))
 
 // /api/app/outside
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '127.0.0.1',
+  host: '172.18.0.98',
+  port: 10002,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=f4bc6b27-8ad7-4914-8189-c9fb53a2827b`
+  }
+}))
+
+router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
+  host: '47.98.255.79',
   port: 10002,
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=d5981c33-5767-4f0e-aa91-55c336d56e4c`

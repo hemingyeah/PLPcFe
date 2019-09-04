@@ -63,6 +63,8 @@ export default {
       try {
         this.loading = true;
         let res = await RepositoryApi.getBulletinTypes();
+        this.loading = false;
+
         if(res.success) {
           res.result.forEach(item => {
             item.count = 0;
@@ -70,13 +72,12 @@ export default {
 
           this.params.options = res.result;
           this.params.typeId = this.params.options[0].id;
-          this.loading = false;
         } else {
           this.$platform.alert(res.message);
-          this.loading = false;
         }
       } catch (err) {
         console.error(err);
+        this.loading = false;
       }
     },
 

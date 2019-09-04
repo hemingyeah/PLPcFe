@@ -91,7 +91,7 @@ export function fmt_gmt_time(time, jetLagHours = 8) {
 
   time = time.replace('T', ' ').replace('.000+0000', '');
 
-  let date = this.parseDateTime(time).getTime();
+  let date = parseDateTime(time).getTime();
   let hours = jetLagHours * 3600 * 1000;
 
   return new Date(date + hours);

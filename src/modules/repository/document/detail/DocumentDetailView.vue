@@ -223,6 +223,7 @@ export default {
         }
         this.loading = true;
         let res = await RepositoryApi.getApprove(params);
+        this.loading = false;
 
         if(res.success) {
           this.approveData = res.result;
@@ -232,13 +233,12 @@ export default {
             if(item.userId == this.detail.createUser) this.showDetailApprove = true;
           })
           this.approveData.showOpenFrame = this.showOpenFrame;
-          this.loading = false;
         } else {
           this.$platform.alert(res.message)
-          this.loading = false;
         }
       } catch (err) {
         console.error(err)
+        this.loading = false;
       }
     },
 

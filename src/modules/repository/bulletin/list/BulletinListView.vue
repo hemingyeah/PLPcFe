@@ -65,10 +65,11 @@ export default {
   },
   methods: {
     async search (params) {
-      this.loading = true;
       if(params) Object.assign(this.params, params);
       try {
+        this.loading = true;
         let res = await RepositoryApi.getBulletinList(this.params);
+        this.loading = false;
         
         if(res.success) {
           // 查询无数据时
@@ -78,7 +79,6 @@ export default {
               list: []
             };
             this.toDetail(this.listMsg.list[0]);
-            this.loading = false;
             return;
           }
           
@@ -105,14 +105,13 @@ export default {
           })
           this.listMsg = res.result;
           this.toDetail(this.listMsg.list[0]);
-          this.loading = false;
 
         } else {
           this.$platform.alert(res.message);
-          this.loading = false;
         }
       } catch (err) {
         console.error(err);
+        this.loading = false;
       }    
     },
 

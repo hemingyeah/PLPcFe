@@ -83,10 +83,11 @@ export default {
   methods: {
     // 获取文档库列表，将ListSearch、ListFooter组件传递的参数合并
     async search (params) {
-      this.loading = true;
       if(params) Object.assign(this.params, params);
       try {
+        this.loading = true;
         let res = await RepositoryApi.getDocumentList(this.params);
+        this.loading = false;
         
         if(res.success) {
           this.listTotal = res.result.total;
@@ -115,14 +116,13 @@ export default {
           })
           this.listMsg = res.result;
           this.toDetail(this.listMsg.list[0]);
-          this.loading = false;
 
         } else {
           this.$platform.alert(res.message);
-          this.loading = false;
         }
       } catch (err) {
         console.error(err);
+        this.loading = false;
       }    
     },
     
