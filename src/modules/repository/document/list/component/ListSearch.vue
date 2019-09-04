@@ -24,7 +24,7 @@
           <template slot-scope="{ node, data }" class="type">
             <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
             <span v-else>{{data.label}}</span>
-            <span class="type-operating" v-if="data.label != '全部'">
+            <span class="type-operating" v-if="data.label != '全部' && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
               <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
               <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
             </span>
@@ -227,6 +227,9 @@ export default {
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
     showCascader (flag) {
       let parent = document.getElementsByClassName('el-cascader-panel')[0];
+      parent.style.maxHeight = '350px';
+      parent.style.minHeight = '90px';
+      if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
        
 
       if(flag) {
@@ -236,8 +239,6 @@ export default {
         child.id = 'type-id';
 
         parent.style.paddingBottom = '40px';
-        parent.style.maxHeight = '350px';
-        parent.style.minHeight = '90px';
 
         parent.appendChild(child);
 

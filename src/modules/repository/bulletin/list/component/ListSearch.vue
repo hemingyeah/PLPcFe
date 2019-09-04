@@ -8,7 +8,7 @@
         <el-select v-model="params.typeId" class="search-type" @change="search" @visible-change="showCascader" clearable>
           <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
             <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
-            <span style="float: right" class="type-operating">
+            <span style="float: right" class="type-operating" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
               <i class="iconfont icon-bianji" style="font-size: 14px" @click.stop="editType(item)"></i>
               <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
             </span>
@@ -161,6 +161,7 @@ export default {
     },
 
     showCascader (flag) {
+      if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
       let parent;
       if(this.typeOptions.length <= 0) {
         parent = document.getElementsByClassName('el-select-dropdown__empty')[0];
