@@ -8,7 +8,8 @@
       :options="options"
       change-on-select
       :value="value"
-      @change="handleChange"/>
+      @change="handleChange"
+    />
   </div>
 </template>
 
@@ -22,6 +23,7 @@ export default {
         value: 'name',
         label: 'name',
         children: 'dist',
+        checkStrictly: false
       },
     }
   },
@@ -60,8 +62,8 @@ export default {
     .el-cascader-menu__item--extensible:after {
       right: 5px;
     }
-    .el-cascader-menu__list {
-      max-height: 300px;
+    .el-cascader-menu {
+      max-height: 204px;
     }
   }
 
