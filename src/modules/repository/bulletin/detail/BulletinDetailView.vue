@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail" v-loading.fullscreen.lock="loading">
+  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail.title" v-loading.fullscreen.lock="loading">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -90,6 +90,12 @@
       </div>
     </div>
   </div>
+  <div v-else class="bulletin-list-detail empty">
+    <div>
+      <img class="empty-img" src="../../../../assets/img/empty.png">
+    </div>
+    <span class="empty-msg">{{deleteMsg || '暂无数据'}}</span>
+  </div>
 </template>
 
 <script>
@@ -169,10 +175,11 @@ export default {
         if(res.success) {
           if(res.message == '已删除') {
             this.detail = null;
-            this.$platform.alert('该通知已被删除！');
+            // this.$platform.alert('该通知已被删除！');
+            this.deleteMsg = '已被删除'
           } else {
             this.detail = res.result;
-            this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
+            this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
           }
         } else {
           this.$platform.alert(res.message);
@@ -572,6 +579,23 @@ export default {
         }
       }
     }
+  }
+}
+
+.empty {
+  text-align: center;
+  padding-top: 100px;
+  height: 100vh;
+
+  .empty-img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .empty-msg {
+    display: block;
+    padding-top: 10px;
+    font-size: 14px;
   }
 }
 

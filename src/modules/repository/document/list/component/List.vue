@@ -243,6 +243,10 @@ export default {
         font-size: 14px;
         font-weight: 500;
         vertical-align: middle;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         cursor: pointer;
       }

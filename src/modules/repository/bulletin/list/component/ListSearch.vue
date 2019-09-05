@@ -40,6 +40,7 @@
       class="type-modal"
       :title="title"
       width="500px"
+      v-if="show"
       :show.sync="show">
       <el-form :model="info" :rules="rules" ref="ruleForm">
         <el-form-item label="分类名称" prop="name">

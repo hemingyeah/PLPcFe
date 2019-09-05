@@ -1,5 +1,5 @@
 <template>
-  <div class="document-list-detail" :style="{height: height}" v-if="detail" v-loading.fullscreen.lock="loading">
+  <div class="document-list-detail" :style="{height: height}" v-if="detail.title" v-loading.fullscreen.lock="loading">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -9,7 +9,7 @@
           <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
           <div class="author-info">
             <p class="name">{{detail.createUserName}}</p>
-            <p class="time">创建于：{{detail.createTime | fmt_datehour}}</p>
+            <p class="time">创建于：{{detail.createTimeShow | fmt_datehour}}</p>
           </div>
         </div>
 
@@ -18,7 +18,7 @@
           <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
           <div class="author-info">
             <p class="name">{{detail.updateUserName}}</p>
-            <p class="time">更新于：{{detail.updateTime | fmt_datehour}}</p>
+            <p class="time">更新于：{{detail.updateTimeShow | fmt_datehour}}</p>
           </div>
         </div>
       </div>
@@ -115,6 +115,12 @@
     <approve-dialog :approve-data="approveData" ref="approveDialog"/>
 
   </div>
+  <div v-else class="document-list-detail empty">
+    <div>
+      <img class="empty-img" src="../../../../assets/img/empty.png">
+    </div>
+    <span class="empty-msg">{{deleteMsg || '暂无数据'}}</span>
+  </div>
 </template>
 
 <script>
@@ -167,7 +173,8 @@ export default {
       shareInfo: {
         selectedUsers: []
       },
-      loading: false
+      loading: false,
+      deleteMsg: null
     }
   },
   mounted () {
@@ -259,12 +266,13 @@ export default {
         if(res.success) {
           if(res.message == '已删除') {
             this.detail = null;
-            this.$platform.alert('该文章已被删除！');
+            // this.$platform.alert('该文章已被删除！');
+            this.deleteMsg = '已被删除';
           } else {
             this.detail = res.result;
-            this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
+            this.detail.createTimeShow = Lang.fmt_gmt_time(this.detail.createTime);
             if(this.detail.updateTime) {
-              this.detail.updateTime = Lang.fmt_gmt_time(this.detail.updateTime);
+              this.detail.updateTimeShow = Lang.fmt_gmt_time(this.detail.updateTime);
             }
             if(this.isReview) {
               this.getApproveDetail();
@@ -747,6 +755,23 @@ export default {
       border: transparent;
       margin-left: 10px;
     }
+  }
+}
+
+.empty {
+  text-align: center;
+  padding-top: 100px;
+  height: 100vh;
+
+  .empty-img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .empty-msg {
+    display: block;
+    padding-top: 10px;
+    font-size: 14px;
   }
 }
 

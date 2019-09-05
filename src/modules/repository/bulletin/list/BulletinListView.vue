@@ -7,7 +7,11 @@
       <!-- 左侧列表 -->
       <div class="bulletin-list-left">
         <!-- 列表部分 -->
-        <list class="list" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list"></list>
+        <list class="list" :keyword="params.keyword" @toDetail="toDetail" :value="listMsg" :id.sync="chosenId" ref="list" v-if="listMsg.list && listMsg.list.length > 0"></list>
+        <div v-else class="list empty">
+          <img class="empty-img" src="../../../../assets/img/empty.png">
+          <span class="empty-msg">暂无数据</span>
+        </div>
         <!-- 页脚部分 -->
         <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
       </div>
@@ -150,7 +154,7 @@ export default {
     height: calc(100vh - 76px);
 
     .bulletin-list-left {
-      width: 450px;
+      width: 440px;
       display: flex;
       height: 100%;
       flex-direction: column;
@@ -158,6 +162,22 @@ export default {
       .list {
         background: #fff;
         flex: 1
+      }
+
+      .empty {
+        text-align: center;
+        padding-top: 100px;
+
+        .empty-img {
+          width: 100px;
+          height: 100px;
+        }
+
+        .empty-msg {
+          display: block;
+          padding-top: 10px;
+          font-size: 14px;
+        }
       }
 
       .list-footer {

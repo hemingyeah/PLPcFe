@@ -144,13 +144,13 @@ export default {
       try {
         let options = [{
           value: '',
-          label: ''
+          label: '全部'
         }, {
           value: 'my',
-          label: ''
+          label: '我发布的'
         }, {
           value: 'draft',
-          label: ''
+          label: '草稿箱'
         }];
         let res = await RepositoryApi.getDocumentViewCount();
 
