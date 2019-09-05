@@ -167,8 +167,13 @@ export default {
         let res = await RepositoryApi.getBulletinDetail(this.params);
         this.loading = false;
         if(res.success) {
-          this.detail = res.result;
-          this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
+          if(res.message == '已删除') {
+            this.detail = null;
+            this.$platform.alert('该通知已被删除！');
+          } else {
+            this.detail = res.result;
+            this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime, 0);
+          }
         } else {
           this.$platform.alert(res.message);
         }

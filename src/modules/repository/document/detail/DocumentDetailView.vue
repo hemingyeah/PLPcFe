@@ -257,18 +257,23 @@ export default {
         this.loading = false;
 
         if(res.success) {
-          this.detail = res.result;
-          this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
-          if(this.detail.updateTime) {
-            this.detail.updateTime = Lang.fmt_gmt_time(this.detail.updateTime);
-          }
-          if(this.isReview) {
-            this.getApproveDetail();
-            this.approve();
-            return;
-          }
-          if(this.detail.examineState && this.detail.examineState == 1) {
-            this.getApproveDetail();
+          if(res.message == '已删除') {
+            this.detail = null;
+            this.$platform.alert('该文章已被删除！');
+          } else {
+            this.detail = res.result;
+            this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
+            if(this.detail.updateTime) {
+              this.detail.updateTime = Lang.fmt_gmt_time(this.detail.updateTime);
+            }
+            if(this.isReview) {
+              this.getApproveDetail();
+              this.approve();
+              return;
+            }
+            if(this.detail.examineState && this.detail.examineState == 1) {
+              this.getApproveDetail();
+            }
           }
         } else {
           this.$platform.alert(res.message)

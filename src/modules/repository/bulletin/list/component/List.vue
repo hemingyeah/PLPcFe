@@ -103,6 +103,10 @@ export default {
       .item-info {
         font-size: 12px;
         color: #909399;
+        width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
 
         .type {
           margin-left: 20px;

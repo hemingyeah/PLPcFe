@@ -274,9 +274,13 @@ export default {
         // padding: 4px 0;
         font-size: 12px;
         color: #909399;
+        width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
 
         .type {
-          margin-left: 20px;
+          margin-left: 20px;          
         }
       }
 
