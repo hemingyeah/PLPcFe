@@ -511,40 +511,48 @@ export default {
         recordQuantity,
       } = this.StatisticalData || {};
 
-      return [{
-        displayName: `信息动态(${recordQuantity || 0})`,
-        component: CustomerInfoRecord.name,
-        slotName: 'record-tab',
-        show: true,
-      }, {
-        displayName: `联系人(${linkmanQuantity || 0})`,
-        component: CustomerContactTable.name,
-        show: !this.isDelete
-      }, {
-        displayName: `客户提醒(${remindQuantity || 0})`,
-        component: CustomerRemindTable.name,
-        show: !this.isDelete && !this.isDisable
-      }, {
-        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? '999+' : eventQuantity})` : '事件(0)',
-        component: CustomerEventTable.name,
-        show: true,
-      }, {
-        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
-        component: CustomerTaskTable.name,
-        show: true,
-      }, {
-        displayName: `计划任务(${plantaskQuantity || 0})`,
-        component: CustomerPlanTable.name,
-        show: this.allowCreatePlanTask
-      }, {
-        displayName: `客户产品(${productQuantity || 0})`,
-        component: CustomerProductTable.name,
-        show: !this.isDelete
-      }, {
-        displayName: `客户地址(${addressQuantity || 0})`,
-        component: CustomerAddressTable.name,
-        show: !this.isDelete
-      }]
+      return [
+        {
+          displayName: `信息动态(${recordQuantity || 0})`,
+          component: CustomerInfoRecord.name,
+          slotName: 'record-tab',
+          show: true,
+        }, 
+        {
+          displayName: `联系人(${linkmanQuantity || 0})`,
+          component: CustomerContactTable.name,
+          show: !this.isDelete
+        },
+        {
+          displayName: `客户地址(${addressQuantity || 0})`,
+          component: CustomerAddressTable.name,
+          show: !this.isDelete
+        },
+        {
+          displayName: `客户产品(${productQuantity || 0})`,
+          component: CustomerProductTable.name,
+          show: !this.isDelete
+        }, 
+        {
+          displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
+          component: CustomerTaskTable.name,
+          show: true,
+        }, 
+        {
+          displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? '999+' : eventQuantity})` : '事件(0)',
+          component: CustomerEventTable.name,
+          show: true,
+        }, 
+        {
+          displayName: `计划任务(${plantaskQuantity || 0})`,
+          component: CustomerPlanTable.name,
+          show: this.allowCreatePlanTask
+        }, 
+        {
+          displayName: `客户提醒(${remindQuantity || 0})`,
+          component: CustomerRemindTable.name,
+          show: !this.isDelete && !this.isDisable
+        }, ]
         .filter(tab => tab.show);
     },
     async deleteCustomer() {
