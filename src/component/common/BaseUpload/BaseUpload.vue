@@ -79,16 +79,16 @@ export default {
       }
 
       this.pending = true;
-      Uploader.batchUploadWithParse(files, this.action).then(result => {
+      Uploader.batchUploadWithParse(files, this.action).then((result = {}) => {
         let {success, error} = result;
 
-        if(error.length > 0){
+        if(error && Array.isArray(error) && error.length > 0){
           let message = error.map(item => item.message).join('\n');
           // 此处不能return
           platform.alert(message)
         }
 
-        if(success.length > 0){
+        if(success && Array.isArray(success) && success.length > 0){
           let value = this.value.concat(success);
           this.$emit('input', value);
         }

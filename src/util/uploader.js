@@ -147,10 +147,10 @@ export function batchUploadWithParse(files, action = '/files/upload', options = 
       let fileArr = toArray(files);
       let validateRes = fileArr.map(item => validate(item)).filter(item => item instanceof Error);
       if(validateRes.length > 0){ // 文件验证失败
-        return Promise.resolve({success: [], error: validateRes});
+        return Promise.resolve(validateRes);
       }
 
-      let promises = fileArr.map(file => uploadWithParse(file, action, {validateStorage: false}));
+      let promises = fileArr.map(file => uploadWithParse(file, action, {validateStorage: false}));      
       return Promise.all(promises)
     })
     .then(result => {
