@@ -116,7 +116,7 @@ export default {
       if(action == '审批成功') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong> 审核<span style="color: #00AC97">通过</span>
+            <strong>{userName}</strong> 审批<span style="color: #00AC97">通过</span>
           </h5>
         ]
       }
@@ -124,7 +124,7 @@ export default {
       if(action == '审批拒绝') {
         return [
           <h5 class="main-info">
-            <strong>{userName}</strong> 审核<span style="color: #F13E47">拒绝</span>
+            <strong>{userName}</strong> 审批<span style="color: #F13E47">拒绝</span>
           </h5>,
           <p class="secondary-info" style="color: #F13E47">拒绝原因：
             {content.remark}

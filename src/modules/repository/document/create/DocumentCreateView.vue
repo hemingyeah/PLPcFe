@@ -44,6 +44,7 @@ export default {
   data () {
     return {
       params: {
+        title: '',
         article: '', // 文章内容
         permission: '内部', // 文章权限
         permitShare: this.initData.wikiConfig.permitShare,
@@ -250,8 +251,7 @@ export default {
 
     getInput (html) {
       this.articleHtml = html;
-      this.articleEmpty = this.$refs.editor.hasValidText();
-      console.log(this.articleHtml);
+      this.articleEmpty = !this.$refs.editor.hasValidText();
     },
 
     // 编辑时获取文章信息
@@ -348,13 +348,12 @@ export default {
     // 参数校验，标题、内容不允许为空
     paramsCheck () {
       this.$refs.textTitle.submit();
-      if(!this.params.article) {
+      if(!this.$refs.editor.hasValidText()) {
         this.articleEmpty = true;
       }
 
       if(!this.$refs.textTitle.submit()) return false;
-      if(!this.params.article) {
-        this.articleEmpty = true;
+      if(!this.$refs.editor.hasValidText()) {
         return false;
       }
       return true;

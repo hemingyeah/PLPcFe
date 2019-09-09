@@ -10,6 +10,7 @@ let initData = {};
 
 try {
   initData = JSON.parse(window._init || '{}');
+  console.log(initData);
 } catch (error) {
   console.error(error)
   console.error('no init data')

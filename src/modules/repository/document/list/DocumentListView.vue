@@ -213,4 +213,43 @@ export default {
     }
   }
 }
+
+.search-cascader-panel {
+
+  .el-cascader-menu__item, .is-active {
+    line-height: 18px;
+    display: flex;
+    justify-content: space-between;
+
+    & > span > .icon-qingkongshanchu {
+      opacity: 0;
+    }
+
+    &:hover > span > .icon-qingkongshanchu {
+      opacity: 1;
+    }
+
+    & > span >.icon-bianji {
+      opacity: 0;
+    }
+
+    &:hover > span > .icon-bianji {
+      opacity: 1;
+    }
+
+    .icon-bianji {
+      margin-right: 5px;
+      &:hover {
+        color: #38A6A6;
+      }
+    }
+
+    .icon-qingkongshanchu {
+      margin-right: 15px;
+      &:hover {
+        color: #38A6A6;
+      }
+    }
+  }
+}
 </style>

@@ -47,13 +47,13 @@
           <div class="read-person" v-if="reads.reads.length > 0">
             <span class="title">已读</span>
             <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
-              <img class="person-img" :src="item.head" v-if="index < 5">
+              <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
               <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
             </el-tooltip>
             <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">{{reads.reads.length < 105 ? reads.reads.length - 5 : '99+'}}
               <div class="see-more" v-if="showMoreRead" ref="seeMore">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
-                  <img class="person-img" :src="item.head" v-if="index >= 5">
+                  <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
                   <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
                 </el-tooltip>
               </div>

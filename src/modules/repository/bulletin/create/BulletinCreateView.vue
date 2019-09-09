@@ -151,12 +151,7 @@ export default {
     // 获取带格式的文章内容
     getInput (html) {
       this.articleHtml = html;
-
-      let text = html || '';
-      let reg = /\s+/g;
-
-      let res = text.replace(reg, '');
-      this.articleEmpty = !(res && res.length > 0);
+      this.articleEmpty = !this.$refs.editor.hasValidText();
     },
 
     // 获取缓存的文章信息
@@ -183,7 +178,7 @@ export default {
     async paramsCheck () {
       this.$refs.textTitle.submit();
       this.$refs.textTitle.rangeCheck();
-      if(!this.params.article) {
+      if(!this.$refs.editor.hasValidText()) {
         this.articleEmpty = true;
       }
       if(!this.$refs.textTitle.submit()) {
@@ -192,7 +187,7 @@ export default {
       if(!this.$refs.textTitle.rangeCheck()) {
         return false;
       }
-      if(!this.params.article) {
+      if(!this.$refs.editor.hasValidText()) {
         return false;
       }
       // if(!this.params.title) {

@@ -44,11 +44,10 @@ export default {
       show: false,
       info: this.value,
       rules: {
-        name: [{
-          required: true,
-          message: '请输入分类名称',
-          trigger: 'blur'
-        }]
+        name: [
+          { required: true, message: '请输入分类名称！', trigger: 'blur' },
+          { max: 20, message: '标题不能超过20个字符！', trigger: 'blur' }
+        ]
       },
     }
   },

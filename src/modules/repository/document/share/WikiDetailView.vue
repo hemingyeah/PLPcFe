@@ -4,7 +4,8 @@
     <div class="detail-top">
 
       <div class="author">
-        <img class="author-img" :src="initData.createUserHead">
+        <img class="author-img" :src="initData.createUserHead" v-if="initData.createUserHead">
+        <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
         <div class="author-info">
           <p class="name">{{initData.createUserName}}</p>
           <p class="time">发布于：{{initData.createTime}}</p>

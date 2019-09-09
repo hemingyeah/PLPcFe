@@ -33,7 +33,6 @@
           </template> -->
         </el-cascader>
 
-        <!-- <button id="cascader-hidden" style="display: none"></button> -->
       </div>
 
       <!-- 文档库排序、标签 -->
@@ -59,6 +58,8 @@
         <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
       </div>
     </div>
+
+    <button id="cascader-hidden" class="cascader-hidden" @click="showMsg"></button>
     
     
     <!-- 关键词搜索框 -->
@@ -158,6 +159,12 @@ export default {
   mounted () {   
     this.initView();
     this.getTypes();
+    document.addEventListener('blur', e => {
+      console.log('blur');
+    })
+    document.addEventListener('focus', e => {
+      console.log(e.target);
+    })
   },
 
   methods: {
@@ -279,16 +286,18 @@ export default {
           let left = document.getElementsByClassName('el-cascader-menu__item');
 
           for(let i = 0; i < left.length; i++) {
+            let span = document.createElement('span');
             let edit = document.createElement('i');
             edit.className = 'iconfont icon-bianji';
             let del = document.createElement('i');
             del.className = 'iconfont icon-qingkongshanchu';
-            left[i].appendChild(edit);
-            left[i].appendChild(del);
+            span.appendChild(edit);
+            span.appendChild(del);
+            left[i].appendChild(span);
 
             edit.addEventListener('click', e => {
               window.event ? window.event.cancelBubble = true : e.stopPropagation();
-              let name = edit.parentNode.firstElementChild.innerHTML;
+              let name = edit.parentNode.parentNode.firstElementChild.innerHTML;
               let index = name.indexOf('（');
               name = name.slice(0, index);
               this.typeOptions.forEach(item => {
@@ -300,7 +309,7 @@ export default {
 
             del.addEventListener('click', e => {
               window.event ? window.event.cancelBubble = true : e.stopPropagation();
-              let name = del.parentNode.firstElementChild.innerHTML;
+              let name = del.parentNode.parentNode.firstElementChild.innerHTML;
               let index = name.indexOf('（');
               name = name.slice(0, index);
               this.typeOptions.forEach(item => {
@@ -357,14 +366,16 @@ export default {
             let right = document.getElementById(editId);
             if(right) continue;
 
+            let span = document.createElement('span');
             let edit = document.createElement('i');
             edit.className = 'iconfont icon-bianji';
             edit.id = editId;
             let del = document.createElement('i');
             del.className = 'iconfont icon-qingkongshanchu';
             del.id = delId;
-            parent[i].appendChild(edit);
-            parent[i].appendChild(del);
+            span.appendChild(edit);
+            span.appendChild(del);
+            parent[i].appendChild(span);
 
             edit.addEventListener('click', e => {
               window.event ? window.event.cancelBubble = true : e.stopPropagation();
@@ -373,7 +384,6 @@ export default {
               name = name.slice(0, index);
               this.typeOptions.forEach(item => {
                 if(item.name == name) {
-                  console.log(item);
                   this.editType(item);
                 }
               })
@@ -470,11 +480,28 @@ export default {
       }
     },
 
+    showMsg () {
+      console.log('隐藏的btn');
+    },
+
     // 打开编辑分类
     editType (info) {
-      let btn = document.getElementById('cascader-hidden');
+      // let btn = document.getElementById('cascader-hidden');
 
-      btn.click();
+      // btn.click();
+      let btn = document.activeElement;
+      console.log(btn);
+
+      let input = document.getElementsByClassName('el-input__inner')[1];
+      input.addEventListener('focus', e => {
+        console.log('focus');
+      })
+      input.onfocus = () => {
+        console.log('focus');
+      }
+      input.blur();
+      console.log(input.blur())
+      console.log(input);
       this.$refs.typeModal.open();
       this.isEdit = true;
       this.info.name = info.name;
@@ -509,10 +536,6 @@ export default {
     // 提交编辑或添加的分类
     async sumbitType () {
       try {
-        if(this.info.name.length > 20) {
-          this.$platform.alert('分类名称不能超过20字');
-          return;
-        }
         let res;
         if(this.isEdit) {
           res = await RepositoryApi.updateDocumentType(this.info);
@@ -564,6 +587,7 @@ export default {
     }
 
     .search-middle {
+      position: relative;
       display: inline-block;
       height: 34px;
       border: 1px solid #e0e1e2;
@@ -655,6 +679,15 @@ export default {
         }
       }
     }
+  }
+
+  .cascader-hidden {
+    position: absolute;
+    top: -10px;
+    left: 300px;
+    padding: 0px;
+    cursor: initial;
+    // opacity: 0;
   }
 
   .search-input-container {

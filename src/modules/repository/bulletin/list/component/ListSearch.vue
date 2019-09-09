@@ -83,11 +83,10 @@ export default {
         id: null
       },
       rules: {
-        name: [{
-          required: true,
-          message: '请输入分类名称',
-          trigger: 'blur'
-        }]
+        name: [
+          { required: true, message: '请输入分类名称！', trigger: 'blur' },
+          { max: 20, message: '标题不能超过20个字符！', trigger: 'blur' }
+        ]
       },
       newType: '',
       show: false,
@@ -291,10 +290,6 @@ export default {
           if(valid) {
             this.show = false;
             let res;
-            if(this.info.name.length > 20) {
-              this.$platform.alert('分类名称不能超过20字');
-              return;
-            }
 
             if(this.isEdit) {
               res = await RepositoryApi.updateBulletinType(this.info);
