@@ -167,6 +167,24 @@ export default {
       this.editor.insertEmbed(index, 'image', data.ossUrl);
       this.editor.setSelection(index + 1, 0);
     },
+
+    /**
+     * 获取编辑器 文本内容
+     */
+    getText () {
+      return this.editor.getText();
+    },
+    /**
+     * 判断否为含有效内容
+     */
+    hasValidText () {
+      let text = this.getText() || '';
+      let reg = /\s+/g;
+
+      let res = text.replace(reg, '');
+      return res && res.length > 0;
+    },
+
   },
   beforeDestroy() {
     document.removeEventListener('paste', this.handlerPaste);

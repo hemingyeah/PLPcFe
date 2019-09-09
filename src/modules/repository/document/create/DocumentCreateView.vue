@@ -250,13 +250,8 @@ export default {
 
     getInput (html) {
       this.articleHtml = html;
-
-      let text = html || '';
-      let reg = /\s+/g;
-
-      let res = text.replace(reg, '');
-      this.articleEmpty = !(res && res.length > 0);
-      console.log(this.articleEmpty);
+      this.articleEmpty = this.$refs.editor.hasValidText();
+      console.log(this.articleHtml);
     },
 
     // 编辑时获取文章信息
