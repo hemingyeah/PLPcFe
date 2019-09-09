@@ -3,7 +3,7 @@
     <div id="toolbar"></div>
     <div id="editor" v-loading="loading" ref="editor"></div>
 
-    <input type="file" ref="input" class="input-file" @change="handleChange" accept="image/png, image/gif, image/jpeg, image/bmp, image/x-icon">
+    <input type="file" ref="input" class="input-file" @change="handleChange" accept="image/*">
   </div>
 </template>
 
