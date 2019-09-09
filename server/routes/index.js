@@ -88,19 +88,27 @@ router.get('/window', async ctx => {
 // /api/app/outside/es
 router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
   host: '172.18.0.98',
+  // host: '172.18.0.36',
   port: 10003,
   headers: {
     'cookie': `VIPPUBLINKJSESSIONID=f4bc6b27-8ad7-4914-8189-c9fb53a2827b`
-  }
+  },
+  // headers: {
+  //   'cookie': `VIPPUBLINKJSESSIONID=99ff6b3f-8d6b-4c0a-bff3-e7c7498de5ed`
+  // }
 }))
 
 // /api/app/outside
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   host: '172.18.0.98',
+  // host: '172.18.0.36',
   port: 10002,
   headers: {
     'cookie': `VIPPUBLINKJSESSIONID=f4bc6b27-8ad7-4914-8189-c9fb53a2827b`
-  }
+  },
+  // headers: {
+  //   'cookie': `VIPPUBLINKJSESSIONID=99ff6b3f-8d6b-4c0a-bff3-e7c7498de5ed`
+  // }
 }))
 
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {

@@ -13,30 +13,47 @@
 
         <!-- 类别删选 -->
         <el-cascader 
-          :options="typeOptions"
+          :options="options"
           class="search-type search-type-right"
           popper-class="search-cascader-panel"  
-          clearable 
+          clearable
+          :props="props"
           @change="handleChange"
           @visible-change="showCascader"
+          @active-item-change="showCascaderChild"
           v-model="params.type"
           filterable>
-          <template slot-scope="{ node, data }" class="type">
+          <!-- <template slot-scope="{ node, data }" class="type">
             <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
             <span v-else>{{data.label}}</span>
             <span class="type-operating" v-if="data.label != '全部' && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
               <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
               <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
             </span>
-          </template>
+          </template> -->
         </el-cascader>
+
+        <!-- <button id="cascader-hidden" style="display: none"></button> -->
       </div>
 
       <!-- 文档库排序、标签 -->
       <div class="search-bottom">
         <el-select v-model="params.orderDetail.column" class="search-sort" @change="search">
-          <el-option value="updatetime" label="按更新时间排序"></el-option>
-          <el-option value="readTimes" label="按访问量排序"></el-option>
+          <el-option value="" label="默认"></el-option>
+          <el-option value="updatetime" label="按更新时间排序">
+            <span>按更新时间排序</span>
+            <span @click="updateShow=!updateShow; readTimesShow=true; search()" v-if="params.orderDetail.column == 'updatetime'">
+              <i class="iconfont icon-paixuxia2" :style="{color: updateShow ? '#38A6A6' : '#606266'}"></i>
+              <i class="iconfont icon-paixushang" :style="{color: !updateShow ? '#38A6A6' : '#606266'}"></i>
+            </span>
+          </el-option>
+          <el-option value="readTimes" label="按访问量排序">
+            <span>按访问量排序</span>
+            <span @click="updateShow=true; readTimesShow=!readTimesShow; search()" v-if="params.orderDetail.column == 'readTimes'">
+              <i class="iconfont icon-paixuxia2" :style="{color: readTimesShow ? '#38A6A6' : '#606266'}"></i>
+              <i class="iconfont icon-paixushang" :style="{color: !readTimesShow ? '#38A6A6' : '#606266'}"></i>
+            </span>
+          </el-option>
         </el-select>
 
         <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
@@ -46,7 +63,7 @@
     
     <!-- 关键词搜索框 -->
     <div class="search-input-container" ref="searchInput">
-      <div class="list-top" v-if="total && total > 0">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
+      <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
 
       <el-input 
         class="search-input"
@@ -62,10 +79,6 @@
       <base-button type="ghost" @event="resetParams">
         重置
       </base-button>
-      <!-- v-if="isSearch" -->
-      <!-- <button class="search-btn" @click="toSearch" v-else>
-        <i class="iconfont icon-search1 serach-icon"></i>
-      </button> -->
     </div>
     
     <!-- 分类编辑、添加 -->
@@ -109,11 +122,16 @@ export default {
         type: [],
         orderDetail: {
           isSystem: 1,
-          column: 'updatetime',
+          column: '',
           type: '',
           sequence: 'desc'
         },
         view: '',
+      },
+      props: {
+        value: 'id',
+        label: 'countName',
+        children: 'children'
       },
       // params: this.value,
       info: { // 新建、编辑type对象
@@ -123,7 +141,11 @@ export default {
         title: null
       },
       viewOptions: this.initView(), // 视图
+      options: [],
       typeOptions: [], // 类别
+      updateShow: true,
+      readTimesShow: true,
+      left: false
     }
   },
 
@@ -178,11 +200,13 @@ export default {
             item.label = item.name;
             item.children = item.subTypes;
             item.count = 0;
+            item.countName = `${ item.label }（${ item.count }）`;
 
             item.children.forEach(childItem => {
               childItem.value = childItem.id;
               childItem.label = childItem.name;
               childItem.count = 0;
+              childItem.countName = `${ childItem.label }（${ childItem.count })`;
             })
             
             item.children.unshift({
@@ -210,57 +234,165 @@ export default {
         let res = await RepositoryApi.getTypesCount(params);
         this.typeOptions.forEach(parent => {
           res.result.forEach(info => {
-            if(parent.id == info.typeId) parent.count = info.count
+            if(parent.id == info.typeId) {
+              parent.countName = `${ parent.label }（${ info.count }）`;
+              parent.count = info.count;
+            }
           })
 
           parent.children.forEach(child => {
             res.result.forEach(info => {
-              if(child.id == info.typeId) child.count = info.count;
+              if(child.id == info.typeId) {
+                child.countName = `${ child.label }（${ info.count })`;
+                child.count = info.count;
+              }
             })
           })
         })
+        this.options = this.typeOptions;
       } catch (err) {
         console.error(err)
       }
     },
 
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
-    showCascader (flag) {
-      let parent = document.getElementsByClassName('el-cascader-panel')[0];
-      parent.style.maxHeight = '350px';
-      parent.style.minHeight = '90px';
-      if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
+    async showCascader (flag) {
+      if(this.left || !flag) return;
+      // 获取分类文章数量
+      await this.getTypesCount();
+      setTimeout(() => {
+        let parent;
+        let selects = document.getElementsByClassName('el-popper');
+        for(let i = 0; i < selects.length; i++) {
+          if(selects[i].className.indexOf('el-cascader-menus') != -1) {
+            parent = selects[i];
+          }
+        }
+
+
+        parent.style.maxHeight = '350px';
+        parent.style.minHeight = '90px';
+        if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
        
 
-      if(flag) {
-        let child = document.createElement('div');
-        child.innerHTML = '新建分类';
-        child.className = 'type';
-        child.id = 'type-id';
+        if(flag) {
+          let left = document.getElementsByClassName('el-cascader-menu__item');
 
-        parent.style.paddingBottom = '40px';
+          for(let i = 0; i < left.length; i++) {
+            let edit = document.createElement('i');
+            edit.className = 'iconfont icon-bianji';
+            let del = document.createElement('i');
+            del.className = 'iconfont icon-qingkongshanchu';
+            left[i].appendChild(edit);
+            left[i].appendChild(del);
 
-        parent.appendChild(child);
+            edit.addEventListener('click', e => {
+              window.event ? window.event.cancelBubble = true : e.stopPropagation();
+              let name = edit.parentNode.firstElementChild.innerHTML;
+              let index = name.indexOf('（');
+              name = name.slice(0, index);
+              this.typeOptions.forEach(item => {
+                if(item.name == name) {
+                  this.editType(item);
+                }
+              })
+            })
 
-        child.addEventListener('click', e => { // 打开新建分类
-          let btn = document.getElementsByClassName('is-reverse')[0];
+            del.addEventListener('click', e => {
+              window.event ? window.event.cancelBubble = true : e.stopPropagation();
+              let name = del.parentNode.firstElementChild.innerHTML;
+              let index = name.indexOf('（');
+              name = name.slice(0, index);
+              this.typeOptions.forEach(item => {
+                if(item.name == name) {
+                  this.deleteType(item);
+                }
+              })
+            })
+          }
 
-          btn.click();
-          this.$refs.typeModal.open();
-          this.isEdit = false;
-          this.info.name = '';
-          this.info.parentId = '';
-          this.info.id = null;
-        });
+          this.left = true;
 
-        // 获取分类文章数量
-        this.getTypesCount();
+        
+          let child = document.createElement('div');
+          child.innerHTML = '新建分类';
+          child.className = 'type';
+          child.id = 'type-id';
 
-      } else {
-        let child = document.getElementById('type-id')
+          parent.style.paddingBottom = '40px';
 
-        parent.removeChild(child);
-      }
+          parent.appendChild(child);
+
+          child.addEventListener('click', e => { // 打开新建分类
+            let btn = document.getElementsByClassName('is-reverse')[0];
+
+            btn.click();
+            this.$refs.typeModal.open();
+            this.isEdit = false;
+            this.info.name = '';
+            this.info.parentId = '';
+            this.info.id = null;
+          });         
+
+        } else {
+          let child = document.getElementById('type-id')
+
+          parent.removeChild(child);
+        }
+      }, 0)
+    },
+
+    showCascaderChild (item) {
+      setTimeout(() => {
+        let parent = document.getElementsByClassName('el-cascader-menu__item');
+        let count = 0;
+
+        for(let i = 0; i < parent.length; i++) {
+          if(parent[i].id) {
+            if(parent[i].firstElementChild.innerHTML == '全部') continue;
+
+            count++;
+            let editId = `add-${ count }-0`;
+            let delId = `add-${ count }-1`;
+            let right = document.getElementById(editId);
+            if(right) continue;
+
+            let edit = document.createElement('i');
+            edit.className = 'iconfont icon-bianji';
+            edit.id = editId;
+            let del = document.createElement('i');
+            del.className = 'iconfont icon-qingkongshanchu';
+            del.id = delId;
+            parent[i].appendChild(edit);
+            parent[i].appendChild(del);
+
+            edit.addEventListener('click', e => {
+              window.event ? window.event.cancelBubble = true : e.stopPropagation();
+              let name = edit.parentNode.firstElementChild.innerHTML;
+              let index = name.indexOf('（');
+              name = name.slice(0, index);
+              this.typeOptions.forEach(item => {
+                if(item.name == name) {
+                  console.log(item);
+                  this.editType(item);
+                }
+              })
+            })
+
+            del.addEventListener('click', e => {
+              window.event ? window.event.cancelBubble = true : e.stopPropagation();
+              let name = del.parentNode.firstElementChild.innerHTML;
+              let index = name.indexOf('（');
+              name = name.slice(0, index);
+              this.typeOptions.forEach(item => {
+                if(item.name == name) {
+                  this.deleteType(item);
+                }
+              })
+            })
+          }
+        }
+      }, 0)
       
     },
 
@@ -270,7 +402,7 @@ export default {
       
       this.$platform.openTab({
         id: 'wiki_create',
-        title: '新建文档',
+        title: '新建知识库',
         url: '/wiki/create/page',
         reload: true,
         close: true,
@@ -286,6 +418,14 @@ export default {
 
     // 输入关键词或选择条件时向父组件触发search事件
     search () {
+      if(this.params.orderDetail.column == 'updatetime') {
+        this.params.orderDetail.sequence = this.updateShow ? 'desc' : 'asc';
+        this.readTimesShow = true;
+      }
+      if(this.params.orderDetail.column == 'readTimes') {
+        this.params.orderDetail.sequence = this.readTimesShow ? 'desc' : 'asc';
+        this.updateShow = true;
+      }
       this.$emit('search', this.params);
     },
 
@@ -332,7 +472,7 @@ export default {
 
     // 打开编辑分类
     editType (info) {
-      let btn = document.getElementsByClassName('is-reverse')[0];
+      let btn = document.getElementById('cascader-hidden');
 
       btn.click();
       this.$refs.typeModal.open();
@@ -478,10 +618,10 @@ export default {
 
         .el-input__inner {
           height: 34px;
-          border: none;
-          background: #E8EFF0;
+          // border: none;
+          // background: #E8EFF0;
           width: 140px;
-          color: #717C83 !important;
+          // color: #717C83 !important;
         }
 
         .el-input__icon {
@@ -589,7 +729,7 @@ export default {
   }
 }
 
-.el-cascader-panel {
+.el-cascader-menus {
   position: relative;
 
   .type {
@@ -600,6 +740,7 @@ export default {
     text-align: center;
     line-height: 40px;
     color: #38A6A6;
+    border-top: 6px solid #eee;
 
     cursor: pointer;
   }

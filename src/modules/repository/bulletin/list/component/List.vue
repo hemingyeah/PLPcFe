@@ -7,6 +7,7 @@
       <div class="list-item" :class="id == item.id ? 'choosed-item' : ''" v-else v-for="item in value.list" :key="item.id">
 
         <div class="item-top">
+          <i class="iconfont icon-fd-attachment" v-if="item.hasAttachment"></i>
           <p class="item-title" ref="title" @click="toDetail(item)" v-html="item.handleTitle"></p>
         </div>
 
@@ -86,12 +87,19 @@ export default {
       height: 24px;
       line-height: 24px;
 
+      .icon-fd-attachment {
+        vertical-align: middle;
+        font-size: 12px;
+        margin-right: 5px;
+      }
+
       .item-title {
+        display: inline-block;
         margin: 0;
         font-size: 14px;
         font-weight: 500;
         vertical-align: middle;
-        width: 100%;
+        width: 390px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

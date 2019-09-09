@@ -48,10 +48,10 @@ export default {
         label: '', // 标签
         keyword: '', // 搜索的关键词
         pageNum: 1,
-        pageSize: 20,
+        pageSize: 10,
         orderDetail: { // 排序
           isSystem: 1,
-          column: 'updatetime',
+          column: '',
           type: '',
           sequence: 'desc'
         },
@@ -98,8 +98,6 @@ export default {
           this.listTotal = res.result.total;
           res.result.list.forEach(item => {
             if(item.createtime) item.createtime = Lang.fmt_gmt_time(item.createtime);
-            // if(item.updateTime) item.updateTime = Lang.fmt_gmt_time(item.updateTime);
-            // item.time = item.updateTime ? item.updateTime : item.createtime;
 
             if(item.title.indexOf('<em>') != -1) {
               let replaceReg = new RegExp('<em>', 'g');

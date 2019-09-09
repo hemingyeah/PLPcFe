@@ -1,17 +1,22 @@
 <template>
   <div class="document-create-title">
-    <el-form>
+    <el-form :model="params" :rules="rules" ref="ruleForm">
 
-      <el-form-item label="标题：" class="create-item item-title">
-        <input class="title" v-model="params.title" />
+      <el-form-item label="标题：" class="create-item item-title" prop='title'>
+        <!-- <span style="color:red">*</span> -->
+        <el-input class="title" v-model="params.title" @blur="titleCheck"></el-input>
+        <!-- <input class="title" v-model="params.title" ref="input" /> -->
       </el-form-item>
+      <p class="title-error" v-if="msg"></p>
 
-      <el-form-item label="分类：" class="create-item">
+      <el-form-item label="分类：" class="create-item" prop="typeId">
+        <!-- <span style="color:red">*</span> -->
         <el-cascader :options="params.options" class="type" v-model="params.typeId" filterable>
         </el-cascader>
       </el-form-item>
 
-      <el-form-item label="权限：" class="create-item">
+      <el-form-item label="权限：" class="create-item" prop="permission">
+        <!-- <span style="color:red">*</span> -->
         <el-radio-group v-model="params.permission">
           <el-radio :label="'内部'" :disabled = "!params.permitShare">
             内部
@@ -74,6 +79,19 @@ export default {
       tagValue: '', // 添加的标签
       options: [], // 文章分类
       pending: false,
+      msg: '',
+      rules: {
+        title: [
+          { required: true, message: '请填写知识库标题！', trigger: 'blur' },
+          { max: 100, message: '标题不能超过100字！', trigger: 'blur' }
+        ],
+        typeId: [
+          { required: true, message: '请选择知识库分类', trigger: 'change' }
+        ],
+        permission: [
+          { required: true, message: '请选择知识库权限', trigger: 'change' }
+        ]
+      }
     }
   },
   computed: {
@@ -170,13 +188,45 @@ export default {
         this.params.form.attachments.splice(index, 1);
       }
     },
+
+    titleCheck() {
+      this.msg = '';
+      if(!this.params.title) {
+        this.msg = '请填写知识库标题！';
+        return false;
+      }
+      if(this.params.title.length > 100) {
+        this.msg = '标题不能超过100字！';
+        return false;
+      }
+    },
+
+    submit () {
+      let result;
+      this.$refs.ruleForm.validate((valid) => {
+        if (!valid) {
+          this.msg = true;
+        }
+        result = valid;
+      });
+      return result;
+    }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .document-create-title {
   background: #fff;
+
+  .title-error {
+    height: 17px;
+    color: #f56c6c;
+    font-size: 12px;
+    line-height: 12px;
+    margin: 0;
+    padding-top: 5px;
+  }
 
   .create-item {
     width: 100%;
@@ -265,6 +315,10 @@ export default {
         }
       }
     }
+
+    .el-input__inner {
+      border-color: #e0e1e2;
+    }
     
   }
 
@@ -274,7 +328,15 @@ export default {
 
       input {
         border: none;
-        width: calc(100% - 60px);
+        width: calc(100% - 65px);
+      }
+    }
+
+    .title {
+      width: calc(100% - 65px);
+
+      .el-input__inner {
+        border: none;
       }
     }
   }

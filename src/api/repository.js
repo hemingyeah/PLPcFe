@@ -1,6 +1,14 @@
 import http from '@src/util/http';
 // let head = '/api/app';
-let head = '';
+// let head = '';
+let prefixAppPath = '/api/app';
+let prefixSearchPath = '/api/search';
+
+
+if(process && process.env.NODE_ENV === 'development') {
+  prefixAppPath = '';
+  prefixSearchPath = '';
+}
 
 // 文档库
 
@@ -18,7 +26,7 @@ let head = '';
  * @returns Promise<List>
  */
 export function getDocumentList (params) {
-  return http.post('/outside/es/wiki/list', params);
+  return http.post(`${ prefixSearchPath }/outside/es/wiki/list`, params);
   // return http.post('/api/search/outside/es/wiki/list', params);
 }
 
@@ -29,7 +37,7 @@ export function getDocumentList (params) {
  * @returns Promise<Object>
  */
 export function getDocumentViewCount () {
-  return http.get(`${ head }/outside/wiki/viewCount`);
+  return http.get(`${ prefixAppPath }/outside/wiki/viewCount`);
 }
 
 /**
@@ -38,7 +46,7 @@ export function getDocumentViewCount () {
  * @returns Promise<Object>
  */
 export function getDocumentTypes () {
-  return http.get(`${ head }/outside/wiki/types`);
+  return http.get(`${ prefixAppPath }/outside/wiki/types`);
 }
 
 /**
@@ -50,7 +58,7 @@ export function getDocumentTypes () {
  * @returns Promise<Boolean>
  */
 export function addDocumentType (params) {
-  return http.post(`${ head }/outside/wiki/type/create`, params);
+  return http.post(`${ prefixAppPath }/outside/wiki/type/create`, params);
 }
 
 /**
@@ -63,7 +71,7 @@ export function addDocumentType (params) {
  * @returns Promise<Boolean>
  */
 export function updateDocumentType (params) {
-  return http.post(`${ head }/outside/wiki/type/update`, params);
+  return http.post(`${ prefixAppPath }/outside/wiki/type/update`, params);
 }
 
 /**
@@ -73,7 +81,7 @@ export function updateDocumentType (params) {
  * @returns Promise<Boolean>
  */
 export function deleteDocumentType (typeId) {
-  return http.get(`${ head }/outside/wiki/type/delete`, typeId);
+  return http.get(`${ prefixAppPath }/outside/wiki/type/delete`, typeId);
 }
 
 /**
@@ -83,7 +91,7 @@ export function deleteDocumentType (typeId) {
  * @returns Promise<List>
  */
 export function getTypesCount (params) {
-  return http.get(`${ head }/outside/wiki/typesCount`, params);
+  return http.get(`${ prefixAppPath }/outside/wiki/typesCount`, params);
 }
 
 /**
@@ -93,7 +101,7 @@ export function getTypesCount (params) {
  * @returns Promise<Object>
  */
 export function getInlineDetail (wikiId) {
-  return http.get(`${ head }/outside/wiki/get`, wikiId);
+  return http.get(`${ prefixAppPath }/outside/wiki/get`, wikiId);
 }
 
 /**
@@ -113,7 +121,7 @@ export function getInlineDetail (wikiId) {
  * @returns Promise<Object>
  */
 export function deleteDocument (wikiId) {
-  return http.get(`${ head }/outside/wiki/delete`, wikiId);
+  return http.get(`${ prefixAppPath }/outside/wiki/delete`, wikiId);
 }
 
 /**
@@ -125,7 +133,7 @@ export function deleteDocument (wikiId) {
  * @returns Promise<List>
  */
 export function getRecord (params) {
-  return http.get(`${ head }/outside/wiki/record/list`, params);
+  return http.get(`${ prefixAppPath }/outside/wiki/record/list`, params);
 }
 
 /**
@@ -143,7 +151,7 @@ export function getRecord (params) {
  * @returns Promise<Boolean>
  */
 export function saveDraft (params) {
-  return http.post(`${ head }/outside/wiki/draft/save`, params);
+  return http.post(`${ prefixAppPath }/outside/wiki/draft/save`, params);
 }
 
 /**
@@ -160,7 +168,7 @@ export function saveDraft (params) {
  * @returns Promise<Boolean>
  */
 export function saveAndSumbit (params) {
-  return http.post(`${ head }/outside/wiki/submit`, params);
+  return http.post(`${ prefixAppPath }/outside/wiki/submit`, params);
 }
 
 /**
@@ -170,7 +178,7 @@ export function saveAndSumbit (params) {
  * @returns Promise<Boolean>
  */
 export function approveSetting (state) {
-  return http.get(`${ head }/outside/wiki/setting/approve`, state)
+  return http.get(`${ prefixAppPath }/outside/wiki/setting/approve`, state)
 }
 
 /**
@@ -180,14 +188,14 @@ export function approveSetting (state) {
  * @returns Promise<Boolean>
  */
 export function shareSetting (state) {
-  return http.get(`${ head }/outside/wiki/setting/share`, state)
+  return http.get(`${ prefixAppPath }/outside/wiki/setting/share`, state)
 }
 
 /**
  * 分享接口-推送钉钉工作通知使用协同人选人框，推送给人
  */
 export function shareDocument (wikiId, params) {
-  return http.post(`${ head }/outside/wiki/share?wikiId=${ wikiId }`, params)
+  return http.post(`${ prefixAppPath }/outside/wiki/share?wikiId=${ wikiId }`, params)
 }
 
 /**
@@ -198,7 +206,7 @@ export function shareDocument (wikiId, params) {
  * @returns Promise<Boolean>
  */
 export function createApprove (params) {
-  return http.post(`${ head }/outside/approve/create`, params)
+  return http.post(`${ prefixAppPath }/outside/approve/create`, params)
 }
 
 /**
@@ -211,17 +219,27 @@ export function createApprove (params) {
  * @returns Promise<Boolean>
  */
 export function operateApprove (params) {
-  return http.post(`${ head }/outside/approve/operate`, params)
+  return http.post(`${ prefixAppPath }/outside/approve/operate`, params)
 }
 
 /**
  * 获取审批详情
- * 
  * @param {Object} params
  * @param {String} params.objId - 文档库Id
+ * 
+ * @returns Promise<Boolean>
  */
 export function getApprove (params) {
-  return http.get(`${ head }/outside/approve/pending`, params)
+  return http.get(`${ prefixAppPath }/outside/approve/pending`, params)
+}
+
+/**
+ * 撤回审批
+ * @param {Object} params 
+ * @param {String} params.id - 审批id
+ */
+export function revoke (params) {
+  return http.post(`${ prefixAppPath }/outside/approve/revoke`, params)
 }
 
 
@@ -240,7 +258,7 @@ export function getApprove (params) {
  * @returns Promise<List>
  */
 export function getBulletinList (params) {
-  return http.post('/outside/es/notice/search', params);
+  return http.post(`${ prefixSearchPath }/outside/es/notice/search`, params);
   // return http.post('/api/search/outside/es/notice/search', params);
 }
 
@@ -251,7 +269,7 @@ export function getBulletinList (params) {
  * @returns Promise<Object>
  */
 export function getBulletinTypes () {
-  return http.get(`${ head }/outside/noticeType/types`);
+  return http.get(`${ prefixAppPath }/outside/noticeType/types`);
 }
 
 /**
@@ -262,7 +280,7 @@ export function getBulletinTypes () {
  * @returns Promise<Boolean>
  */
 export function addBulletinType (params) {
-  return http.post(`${ head }/outside/noticeType/create`, params);
+  return http.post(`${ prefixAppPath }/outside/noticeType/create`, params);
 }
 
 /**
@@ -273,7 +291,7 @@ export function addBulletinType (params) {
  * @returns Promise<Boolean>
  */
 export function updateBulletinType (params) {
-  return http.post(`${ head }/outside/noticeType/update`, params);
+  return http.post(`${ prefixAppPath }/outside/noticeType/update`, params);
 }
 
 /**
@@ -283,7 +301,7 @@ export function updateBulletinType (params) {
  * @returns Promise<Boolean>
  */
 export function deleteBulletinType (typeId) {
-  return http.get(`${ head }/outside/noticeType/delete`, typeId);
+  return http.get(`${ prefixAppPath }/outside/noticeType/delete`, typeId);
 }
 
 /**
@@ -292,7 +310,7 @@ export function deleteBulletinType (typeId) {
  * @returns Promise<List>
  */
 export function getBulletinTypesCount () {
-  return http.get(`${ head }/outside/notice/typesCount`);
+  return http.get(`${ prefixAppPath }/outside/notice/typesCount`);
 }
 
 /**
@@ -302,7 +320,7 @@ export function getBulletinTypesCount () {
  * @returns Promise<Object>
  */
 export function getBulletinDetail (noticeId) {
-  return http.get(`${ head }/outside/notice/get`, noticeId);
+  return http.get(`${ prefixAppPath }/outside/notice/get`, noticeId);
 }
 
 /**
@@ -312,7 +330,7 @@ export function getBulletinDetail (noticeId) {
  * @returns Promise<Object>
  */
 export function deleteBulletin (noticeId) {
-  return http.get(`${ head }/outside/notice/delete`, noticeId);
+  return http.get(`${ prefixAppPath }/outside/notice/delete`, noticeId);
 }
 
 /**
@@ -329,7 +347,7 @@ export function deleteBulletin (noticeId) {
  * @returns Promise<Boolean>
  */
 export function createBulletin (params) {
-  return http.post(`${ head }/outside/notice/create`, params);
+  return http.post(`${ prefixAppPath }/outside/notice/create`, params);
 }
 
 /**
@@ -346,7 +364,7 @@ export function createBulletin (params) {
  * @returns Promise<Boolean>
  */
 export function updateBulletin (params) {
-  return http.post(`${ head }/outside/notice/update`, params);
+  return http.post(`${ prefixAppPath }/outside/notice/update`, params);
 }
 
 /**
@@ -356,7 +374,7 @@ export function updateBulletin (params) {
  * @returns Promise<Object>
  */
 export function getReadOrNotLatest (noticeId) {
-  return http.get(`${ head }/outside/noticeRead/latest`, noticeId);
+  return http.get(`${ prefixAppPath }/outside/noticeRead/latest`, noticeId);
 }
 
 /**
@@ -366,7 +384,7 @@ export function getReadOrNotLatest (noticeId) {
  * @returns Promise<Object>
  */
 export function getReadPerson (noticeId) {
-  return http.get(`${ head }/outside/noticeRead/read`, noticeId);
+  return http.get(`${ prefixAppPath }/outside/noticeRead/read`, noticeId);
 }
 
 /**
@@ -376,5 +394,5 @@ export function getReadPerson (noticeId) {
  * @returns Promise<Object>
  */
 export function getUnreadPerson (noticeId) {
-  return http.get(`${ head }/outside/noticeRead/unread`, noticeId);
+  return http.get(`${ prefixAppPath }/outside/noticeRead/unread`, noticeId);
 }

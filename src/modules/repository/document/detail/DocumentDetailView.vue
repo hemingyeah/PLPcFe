@@ -1,8 +1,8 @@
 <template>
-  <div class="document-list-detail" :style="{height: height}" v-if="detail.title" v-loading.fullscreen.lock="loading">
+  <div class="document-list-detail" :style="{height: height}" v-if="detail && detail.title" v-loading.fullscreen.lock="loading">
     <!-- 详情头部 -->
     <div class="detail-top">
-
+      
       <div class="author-container">
         <div class="author">
           <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
@@ -51,6 +51,7 @@
           <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
 
           <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
+          <button class="base-button green-btn" @click="revoke" v-if="revokeShow" style="margin-left:5px">撤回审批</button>
         </div>
         
 
@@ -58,6 +59,7 @@
 
       <div class="operating" v-else>
         <button class="base-button green-btn" @click="approve">审批</button>
+        <button class="base-button green-btn" @click="revoke" v-if="revokeShow" style="margin-left:5px">撤回审批</button>
         <!-- <button class="base-button white-btn" @click="show = true">拒绝</button> -->
       </div>
     </div>
@@ -67,9 +69,9 @@
 
       <div class="info">
         <p class="title">{{detail.title}}</p>
-        <div class="ql-container ql-snow content" style="border:none">
+        <div class="ql-container ql-snow content" :class="fontClass" style="border:none">
           <div class="ql-editor">
-            <div v-html="detail.content"></div>
+            <div v-html="detail.content" class="wiki-content"></div>
           </div>
         </div>
       </div>
@@ -128,6 +130,7 @@ import * as RepositoryApi from '@src/api/Repository'
 import * as Lang from '@src/util/lang/index.js'
 
 import ApproveDialog from './component/ApproveDialog.vue'
+import Clipboard from 'clipboard';
 
 export default {
   name: 'document-detail',
@@ -174,7 +177,9 @@ export default {
         selectedUsers: []
       },
       loading: false,
-      deleteMsg: null
+      deleteMsg: null,
+      revokeShow: false,
+      url: ''
     }
   },
   mounted () {
@@ -241,6 +246,9 @@ export default {
           if(this.detail.originalId) {
             this.approveData.wikiId = this.detail.originalId;
           }
+          if(this.approveData.proposer == this.initData.userInfo.userId) {
+            this.revokeShow = true;
+          }
         } else {
           this.$platform.alert(res.message)
         }
@@ -266,7 +274,6 @@ export default {
         if(res.success) {
           if(res.message == '已删除') {
             this.detail = null;
-            // this.$platform.alert('该文章已被删除！');
             this.deleteMsg = '已被删除';
           } else {
             this.detail = res.result;
@@ -367,38 +374,44 @@ export default {
     outlineShare () {
       // 外部文章选择外部分享时
       this.shareBoxShow = false;
-      let body = document.getElementsByTagName('body')[0];
-      let hideTextarea = document.createElement('textarea');
       let protocol = window.location.protocol;
       let host = window.location.host;
+      let url = `${protocol}//${host}/share/wiki/view?wikiId=${this.detail.id}`;
+      // 获取body
+      let body = document.getElementsByTagName('body')[0];
 
-      body.appendChild(hideTextarea);
+      let copyFrom = document.createElement('a');
+      copyFrom.setAttribute('id', 'target');
+      copyFrom.setAttribute('target', '_blank');
+      copyFrom.setAttribute('href', url);
+      copyFrom.innerHTML = url;
 
-      hideTextarea.style.position = 'absolute';
-      hideTextarea.style.left = '-9999px';
-      hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `${protocol}${host}/share/wiki/view?wikiId=${this.detail.id}`;
+      body.appendChild(copyFrom);
 
-      let selectObject = window.getSelection();
-      let range = document.createRange();
-      range.setStart(selectObject.anchorNode, selectObject.anchorOffset);
-      range.setEnd(selectObject.focusNode, selectObject.focusOffset);
+      // 创建按钮
+      let agent = document.createElement('button');
+      // body增加超链接
+      body.appendChild(copyFrom);
+      // body增加按钮
+      body.appendChild(agent); // 采用Clipboard.js方案 // trouble：没有可以传入的HTML元素，但我们可以动态创建一个DOM对象作为代理，复制超链接
+      let clipboard = new Clipboard(agent, {
+        target() {
+          return document.getElementById('target');
+        }
+      });
 
-      hideTextarea.focus();
-      hideTextarea.setSelectionRange(0, hideTextarea.value.length);
-      let successful = document.execCommand('copy');
+      clipboard.on('success', function(e) {
+        alert('已将链接复制到剪贴板，快去粘贴吧！');
+      });
 
-      // 将此前选中的文本再进行选中
-      selectObject.removeAllRanges();
-      selectObject.addRange(range);
-
-      if(!successful) {
-        this.$platform.alert('分享失败，请重新操作')
-      } else {
-        this.$platform.alert('已将链接复制到剪贴板，快去粘贴吧！')
-      }
-
-      this.share = '';
+      clipboard.on('error', function(e) {
+        alert('分享失败，请重新操作');
+      });
+      // 点击按钮
+      agent.click();
+      // 移除创建的元素 
+      body.removeChild(copyFrom);
+      body.removeChild(agent);
     },
 
     // 编辑文章操作，查询详情接口，有人正在编辑提示不跳转
@@ -451,18 +464,19 @@ export default {
           if(!this.showOpenFrame) {
             let id = window.frameElement.dataset.id;
             this.$platform.closeTab(id);
+
+            let fromId = window.frameElement.getAttribute('id');
+            this.$platform.openTab({
+              id: 'M_INFO_DOC',
+              title: '知识库',
+              url: '/wiki/list/page',
+              reload: true,
+              close: true,
+              fromId
+            });
+          } else {
+            this.$emit('search');
           }
-          
-          let fromId = window.frameElement.getAttribute('id');
-      
-          this.$platform.openTab({
-            id: 'M_INFO_DOC',
-            title: '知识库',
-            url: '/wiki/list/page',
-            reload: true,
-            close: true,
-            fromId
-          });
         } else {
           this.$platform.alert(res.message);
         }
@@ -476,6 +490,31 @@ export default {
       this.$refs.approveDialog.open();
     },
 
+    async revoke () {
+      try {
+        if (!await this.$platform.confirm('确定要撤回审批吗？')) return;
+        
+        let params = {
+          id: this.approveData.id
+        };
+
+        let res = await RepositoryApi.revoke(params);
+
+        if(res.success) {
+          if(!this.showOpenFrame) {
+            window.location.reload();
+          } else {
+            this.$emit('search');
+          }
+        } else {
+          this.$platform.alert(res.message);
+        }
+
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
   },
   computed: {
     height () {
@@ -485,6 +524,10 @@ export default {
     padding () {
       return this.showOpenFrame ? '0 50px' : '0 100px';
     },
+
+    fontClass () {
+      return document.body.clientWidth > 1800 ? 'font-class' : '';
+    }
   }
 }
 </script>
@@ -650,14 +693,23 @@ export default {
       }
 
       .content {
-        font-size: 16px;
-        line-height: 30px;
         padding-bottom: 30px;
-
         word-break: break-all;
 
         p > img {
           max-width: 100%;
+        }
+
+        p {
+          line-height: 28px;
+        }
+      }
+
+      .font-class {
+        font-size: 16px !important;
+
+        p {
+          line-height: 30px;
         }
       }
     }

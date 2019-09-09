@@ -5,6 +5,7 @@
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
       <base-editor v-model="params.article" @input="getInput" ref="editor" :isEdit="isEdit"></base-editor>
+      <p class="article-error" v-if="articleEmpty">请填写知识库内容！</p>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
         <button class="base-button green-butn" @click="saveAndSumbit">保存并提交</button>
@@ -60,6 +61,7 @@ export default {
       info: {},
       reportApproveStatus: null,
       loading: false,
+      articleEmpty: false
     }
   },
   async created () {
@@ -247,7 +249,14 @@ export default {
     },
 
     getInput (html) {
-      this.articleHtml = html
+      this.articleHtml = html;
+
+      let text = html || '';
+      let reg = /\s+/g;
+
+      let res = text.replace(reg, '');
+      this.articleEmpty = !(res && res.length > 0);
+      console.log(this.articleEmpty);
     },
 
     // 编辑时获取文章信息
@@ -303,7 +312,7 @@ export default {
           })
         }
         this.isSave = false
-      }, 1000 * 6)
+      }, 1000 * 6 * 5)
     },
 
     // 构建参数
@@ -343,16 +352,14 @@ export default {
 
     // 参数校验，标题、内容不允许为空
     paramsCheck () {
-      if(!this.params.title) {
-        this.$platform.alert('请填写知识库标题！');
-        return false;
-      }
+      this.$refs.textTitle.submit();
       if(!this.params.article) {
-        this.$platform.alert('请填写知识库内容！');
-        return false;
+        this.articleEmpty = true;
       }
-      if(this.params.title.length > 100) {
-        this.$platform.alert('标题不能超过100字！');
+
+      if(!this.$refs.textTitle.submit()) return false;
+      if(!this.params.article) {
+        this.articleEmpty = true;
         return false;
       }
       return true;
@@ -389,6 +396,14 @@ export default {
       padding-bottom: 10px;
     }
 
+    .article-error {
+      color: #f56c6c;
+      font-size: 12px;
+      line-height: 12px;
+      margin: 0;
+      padding-top: 5px;
+    }
+
     .view-left-footer {
       display: flex;
       margin-top: 25px;
@@ -410,6 +425,7 @@ export default {
         }
       }
     }
+
   }
 
   .view-right {

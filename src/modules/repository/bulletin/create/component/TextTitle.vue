@@ -1,19 +1,21 @@
 <template>
   <div class="document-create-title">
-    <el-form>
+    <el-form :model="params" :rules="rules" ref="ruleForm">
 
-      <el-form-item label="标题：" class="create-item item-title">
-        <input class="title" v-model="params.title" />
+      <el-form-item label="标题：" class="create-item item-title" prop="title">
+        <el-input class="title" v-model="params.title" @blur="titleCheck"></el-input>
+        <!-- <input class="title" v-model="params.title" /> -->
       </el-form-item>
+      <p class="title-error" v-if="msg"></p>
 
-      <el-form-item label="分类：" class="create-item">
+      <el-form-item label="分类：" class="create-item" prop="typeId">
         <el-select v-model="params.typeId" class="search-type">
           <el-option v-for="item in params.options" :key="item.id" :value="item.id" :label="item.name">
           </el-option>
         </el-select>
       </el-form-item>
 
-      <el-form-item label="通知范围：" class="create-item">
+      <el-form-item label="通知范围：" class="create-item" prop="typeId">
         <div class="range">
           <span style="color: #999" v-if="params.selectedDepts.length > 0">部门：
             <el-tag class="search-tag" closable @close="handleTags(tag, 'depts')" v-for="tag in params.selectedDepts" :key="tag.id">{{tag.name}}</el-tag>
@@ -26,6 +28,7 @@
           </div>
         </div>
       </el-form-item>
+      <p class="title-error" v-if="range">{{range}}</p>
 
       <el-form-item label="附件列表：" class="create-item">
         <div class="file">
@@ -66,6 +69,20 @@ export default {
       tagValue: '', // 添加的标签
       options: [], // 文章分类
       pending: false,
+      msg: '',
+      range: '',
+      rules: {
+        title: [
+          { required: true, message: '请填写知识库标题！', trigger: 'blur' },
+          { max: 100, message: '标题不能超过100字！', trigger: 'blur' }
+        ],
+        typeId: [
+          { required: true, message: '请选择知识库分类', trigger: 'change' }
+        ],
+        range: [
+          { required: true, message: '请选择知识库权限', trigger: 'change' }
+        ]
+      }
     }
   },
   computed: {
@@ -100,6 +117,9 @@ export default {
 
           this.params.selectedUsers = newValue;
           this.params.selectedDepts = depts;
+          if(newValue.length > 0 || depts.length > 0) {
+            this.range = false;
+          }
           this.deftCheck();
 
           this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
@@ -208,11 +228,42 @@ export default {
         this.params.form.attachments.splice(index, 1);
       }
     },
+
+    titleCheck() {
+      this.msg = '';
+      if(!this.params.title) {
+        this.msg = '请填通知公告标题！';
+        return false;
+      }
+      if(this.params.title.length > 100) {
+        this.msg = '标题不能超过100字！';
+        return false;
+      }
+    },
+
+    rangeCheck () {
+      if(this.params.selectedUsers.length <= 0 && this.params.selectedDepts.length <= 0) {
+        this.range = '请选择通知范围！';
+        return false;
+      }
+      return true;
+    },
+
+    submit () {
+      let result;
+      this.$refs.ruleForm.validate((valid) => {
+        if (!valid) {
+          this.msg = true;
+        }
+        result = valid;
+      });
+      return result;
+    }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .document-create-title {
   background: #fff;
 
@@ -319,8 +370,21 @@ export default {
         }
       }
     }
+
+    .el-input__inner {
+      border-color: #e0e1e2;
+    }
     
     
+  }
+
+  .title-error {
+    height: 17px;
+    color: #f56c6c;
+    font-size: 12px;
+    line-height: 12px;
+    margin: 0;
+    padding-top: 5px;
   }
 
   .item-title {
@@ -330,6 +394,14 @@ export default {
       input {
         border: none;
         width: calc(100% - 60px);
+      }
+    }
+
+    .title {
+      width: calc(100% - 65px);
+
+      .el-input__inner {
+        border: none;
       }
     }
   }

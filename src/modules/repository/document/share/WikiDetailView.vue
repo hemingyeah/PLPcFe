@@ -300,6 +300,7 @@ export default {
           display: inline-block;
           font-size: 14px;
           line-height: 35px;
+          padding: 8px 0;
         }
 
         .annex-right {

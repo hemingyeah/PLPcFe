@@ -19,7 +19,7 @@
 
     <!-- 关键词搜索框 -->
     <div class="search-input-container" ref="searchInput">
-      <div class="list-top" v-if="total && total > 0">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
+      <div class="list-top">符合搜索结果的共<span style="color: #FF7B00">{{total}}</span>条</div>
       <el-input 
         class="search-input"
         placeholder="输入关键词搜索" 
@@ -261,8 +261,8 @@ export default {
 
     // 删除分类
     async deleteType (info) {
-      // let btn = document.getElementsByClassName('is-reverse')[0];
-      // btn.click();
+      let btn = document.getElementsByClassName('is-reverse')[0];
+      btn.click();
       try {
         if (!await this.$platform.confirm('确定删除该文章分类吗？')) return;
         let params = {
@@ -273,7 +273,9 @@ export default {
         if (res.success) {
           const result = await this.$platform.alert('删除分类成功');
           if (!result) return;
-          window.location.reload();
+          await this.getTypes();
+          this.params.typeId = null;
+          this.search();
         } else {
           this.$platform.alert(res.message);
         }
@@ -305,7 +307,9 @@ export default {
               let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
               const result = await this.$platform.alert(msg);
               if (!result) return;
-              window.location.reload();
+              await this.getTypes();
+              this.params.typeId = this.info.id;
+              this.search();
             } else {
               this.$platform.alert(res.message);
             }
@@ -467,7 +471,7 @@ export default {
     text-align: center;
     line-height: 40px;
     color: #38A6A6;
-    border-top: 6px solid rgba(144, 147, 153, 0.15);
+    border-top: 6px solid #eee;
 
     cursor: pointer;
   }

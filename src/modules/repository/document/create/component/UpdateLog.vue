@@ -132,6 +132,14 @@ export default {
         ]
       }
 
+      if(action == '审批撤回') {
+        return [
+          <h5 class="main-info">
+            <strong>{userName}</strong> 撤回了审批
+          </h5>
+        ]
+      }
+
     }
   }
 }

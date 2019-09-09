@@ -46,7 +46,7 @@ export default {
         keyword: '', // 搜索的关键词
         typeId: null,
         pageNum: 1,
-        pageSize: 20,
+        pageSize: 10,
       },
       listTotal: null,
       listMsg: {},
@@ -119,7 +119,7 @@ export default {
       }    
     },
 
-    toDetail (item) {
+    async toDetail (item) {
       if(!item) {
         this.info.id = null;
         this.$refs.bulletinDetail.getBulletinDetail();
@@ -127,7 +127,7 @@ export default {
       }
       this.info.id = item.id;
       this.chosenId = this.info.id;
-      this.$refs.bulletinDetail.getBulletinDetail();
+      await this.$refs.bulletinDetail.getBulletinDetail();
       this.$refs.bulletinDetail.getReadPerson();
       this.$refs.bulletinDetail.getUnreadPerson();
     }

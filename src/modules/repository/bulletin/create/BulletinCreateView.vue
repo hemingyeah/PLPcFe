@@ -5,6 +5,7 @@
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
       <base-editor v-model="params.article" @input="getInput"></base-editor>
+      <p class="article-error" v-if="articleEmpty">请填写知识库内容！</p>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
         <button class="base-button green-butn" @click="sumbit">发布</button>
@@ -47,7 +48,8 @@ export default {
       showAlert: true,
       noticeId: null,
       info: {},
-      loading: false
+      loading: false,
+      articleEmpty: false
     }
   },
   mounted () {
@@ -148,7 +150,13 @@ export default {
 
     // 获取带格式的文章内容
     getInput (html) {
-      this.articleHtml = html
+      this.articleHtml = html;
+
+      let text = html || '';
+      let reg = /\s+/g;
+
+      let res = text.replace(reg, '');
+      this.articleEmpty = !(res && res.length > 0);
     },
 
     // 获取缓存的文章信息
@@ -173,22 +181,34 @@ export default {
 
     // 参数校验，标题、内容不允许为空
     async paramsCheck () {
-      if(!this.params.title) {
-        this.$platform.alert('请填写通知公告标题！');
+      this.$refs.textTitle.submit();
+      this.$refs.textTitle.rangeCheck();
+      if(!this.params.article) {
+        this.articleEmpty = true;
+      }
+      if(!this.$refs.textTitle.submit()) {
         return false;
       }
-      if(this.params.title.length > 100) {
-        this.$platform.alert('标题不能超过100字！');
+      if(!this.$refs.textTitle.rangeCheck()) {
         return false;
       }
       if(!this.params.article) {
-        this.$platform.alert('请填写通知公告内容！');
         return false;
       }
-      if(this.params.selectedUsers.length <= 0 && this.params.selectedDepts.length <= 0) {
-        this.$platform.alert('请选择通知范围！');
-        return false;
-      }
+      // if(!this.params.title) {
+      //   this.$platform.alert('请填写通知公告标题！');
+      //   return false;
+      // }
+      // if(this.params.title.length > 100) {
+      //   this.$platform.alert('标题不能超过100字！');
+      //   return false;
+      // }
+      // this.$refs.textTitle.titleCheck();
+      
+      // if(this.params.selectedUsers.length <= 0 && this.params.selectedDepts.length <= 0) {
+      //   this.$platform.alert('请选择通知范围！');
+      //   return false;
+      // }
       
       return true;
     },
@@ -273,11 +293,19 @@ export default {
   .content {
     height: 100%;
     overflow: auto;
-    padding: 50px 40px 0 150px;
+    padding: 50px 200px 0 150px;
     background: #fff;
 
     .textTitle {
       padding-bottom: 10px;
+    }
+
+    .article-error {
+      color: #f56c6c;
+      font-size: 12px;
+      line-height: 12px;
+      margin: 0;
+      padding-top: 5px;
     }
 
     .view-left-footer {

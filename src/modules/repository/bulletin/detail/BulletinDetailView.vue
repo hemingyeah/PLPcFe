@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail.title" v-loading.fullscreen.lock="loading">
+  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail && detail.title" v-loading.fullscreen.lock="loading">
     <!-- 详情头部 -->
     <div class="detail-top">
 
@@ -134,7 +134,8 @@ export default {
       },
       showMoreRead: false, // 是否显示已读人员浮框
       showMoreNoRead: false, // 是否显示未读人员浮框
-      loading: false
+      loading: false,
+      deleteMsg: null
     }
   },
   mounted () {
@@ -164,6 +165,8 @@ export default {
     // 获取通知公告详情
     async getBulletinDetail () {
       try {
+        this.showMoreNoRead = false;
+        this.showMoreRead = false;
         this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
         if(!this.params.noticeId) {
           this.detail = null;
@@ -304,19 +307,19 @@ export default {
           if(!this.showOpenFrame) {
             let id = window.frameElement.dataset.id;
             this.$platform.closeTab(id);
-          }
-          
 
-          let fromId = window.frameElement.getAttribute('id');
-      
-          this.$platform.openTab({
-            id: 'M_INFO_NOTICE',
-            title: '通知公告',
-            url: '/info/notice/list/page',
-            reload: true,
-            close: true,
-            fromId
-          });
+            let fromId = window.frameElement.getAttribute('id');
+            this.$platform.openTab({
+              id: 'M_INFO_NOTICE',
+              title: '通知公告',
+              url: '/info/notice/list/page',
+              reload: true,
+              close: true,
+              fromId
+            });
+          } else {
+            this.$emit('search');
+          }
         } else {
           this.$platform.alert(res.message);
         }

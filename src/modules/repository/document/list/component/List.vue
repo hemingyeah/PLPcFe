@@ -7,6 +7,7 @@
       <div class="list-item" :class="id == item.id ? 'choosed-item' : ''" v-else v-for="item in value.list" :key="item.id">
 
         <div class="item-top">
+          <i class="iconfont icon-fd-attachment" v-if="item.hasAttachment"></i>
           <p class="item-title" ref="title" @click="toDetail(item)" v-html="item.handleTitle">{{item.title}}</p>
           <!-- 我发布的显示分享 -->
           <span class="share" @click="shareDocument(item)" v-if="!item.isDraft">
@@ -70,7 +71,8 @@
 </template>
 
 <script>
-import * as RepositoryApi from '@src/api/Repository'
+import * as RepositoryApi from '@src/api/Repository';
+import Clipboard from 'clipboard';
 
 export default {
   name: 'list',
@@ -164,36 +166,46 @@ export default {
     outlineShare () {
       // 外部文章选择外部分享时
       this.shareBoxShow = false;
-      let body = document.getElementsByTagName('body')[0];
-      let hideTextarea = document.createElement('textarea');
       let protocol = window.location.protocol;
       let host = window.location.host;
+      let url = `${protocol}//${host}/share/wiki/view?wikiId=${this.chosenItem.id}`;
 
-      body.appendChild(hideTextarea);
+      // 获取body
+      let body = document.getElementsByTagName('body')[0];
 
-      hideTextarea.style.position = 'absolute';
-      hideTextarea.style.left = '-9999px';
-      hideTextarea.style.top = '-9999px';
-      hideTextarea.innerHTML = `${protocol}${host}/share/wiki/view?wikiId=${this.chosenItem.id}`;
+      let copyFrom = document.createElement('a');
+      copyFrom.setAttribute('id', 'target');
+      copyFrom.setAttribute('target', '_blank');
+      copyFrom.setAttribute('href', url);
+      let name = 'http://文档分享'
+      copyFrom.innerHTML = url;
 
-      let selectObject = window.getSelection();
-      let range = document.createRange();
-      range.setStart(selectObject.anchorNode, selectObject.anchorOffset);
-      range.setEnd(selectObject.focusNode, selectObject.focusOffset);
+      body.appendChild(copyFrom);
 
-      hideTextarea.focus();
-      hideTextarea.setSelectionRange(0, hideTextarea.value.length);
-      let successful = document.execCommand('copy');
+      // 创建按钮
+      let agent = document.createElement('button');
+      // body增加超链接
+      body.appendChild(copyFrom);
+      // body增加按钮
+      body.appendChild(agent); // 采用Clipboard.js方案 // trouble：没有可以传入的HTML元素，但我们可以动态创建一个DOM对象作为代理，复制超链接
+      let clipboard = new Clipboard(agent, {
+        target() {
+          return document.getElementById('target');
+        }
+      });
 
-      // 将此前选中的文本再进行选中
-      selectObject.removeAllRanges();
-      selectObject.addRange(range);
+      clipboard.on('success', function(e) {
+        alert('已将链接复制到剪贴板，快去粘贴吧！');
+      });
 
-      if(!successful) {
-        this.$platform.alert('分享失败，请重新操作！')
-      } else {
-        this.$platform.alert('已将链接复制到剪贴板，快去粘贴吧！')
-      }
+      clipboard.on('error', function(e) {
+        alert('分享失败，请重新操作');
+      });
+      // 点击按钮
+      agent.click();
+      // 移除创建的元素 
+      body.removeChild(copyFrom);
+      body.removeChild(agent);
     },
 
     // 跳转到详情页面
@@ -236,6 +248,12 @@ export default {
       display: flex;
       height: 24px;
       line-height: 24px;
+
+      .icon-fd-attachment {
+        vertical-align: middle;
+        font-size: 12px;
+        margin-right: 5px;
+      }
 
       .item-title {
         flex: 1;
