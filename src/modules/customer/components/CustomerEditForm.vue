@@ -50,11 +50,13 @@
     </template>
 
     <template slot="tags" slot-scope="{field}">
-      <form-item :label="field.displayName" validation>
-        <div class="input-and-btn">
-          <biz-team-select v-model="value.tags" multiple />
-          <el-button type="button" @click="autoAssign">自动分配</el-button>
-        </div>
+      <form-item :label="field.displayName">
+        <customer-tags 
+          :field="field"
+          :value="value.tags"
+          @autoAssign="autoAssign"
+          @input="update"
+        />
       </form-item>
     </template> 
   </form-builder>
@@ -64,6 +66,7 @@
 import * as CustomerApi from '@src/api/CustomerApi';
 import * as LinkmanApi from '@src/api/LinkmanApi';
 
+import FormMixin from '@src/component/form/mixin/form';
 import TeamMixin from '@src/mixins/teamMixin';
 
 import _ from 'lodash'
@@ -183,7 +186,7 @@ export default {
       this.$set(value, 'lmName', value.name)
       this.$emit('input', value)
     },
-    /** 自动匹配客户服务团第 */
+    /** 自动匹配客户服务团队 */
     async autoAssign(){
       try {
         let adr = this.value.customerAddress;
@@ -232,6 +235,42 @@ export default {
     },
     validate(){
       return this.$refs.form.validate();
+    }
+  },
+  components: {
+    'customer-tags': {
+      name: 'customer-tags',
+      mixins: [FormMixin],
+      props: {
+        field: {
+          type: Object,
+          default: () => ({})
+        },
+        value: {
+          type: Array,
+          default: () => ([])
+        }
+      },
+      render(h) {
+        return (
+          <div class="input-and-btn">
+            <biz-team-select value={this.value} onInput={this.input} multiple />
+            <el-button type="button" onClick={this.autoAssign}>自动分配</el-button>
+          </div>
+        )
+      },
+      methods: {
+        autoAssign() {
+          this.$emit('autoAssign');
+        },
+        input(value) {
+          this.$emit('input', {
+            field: this.field, 
+            newValue: value,
+            oldValue: [],
+          });
+        }
+      }
     }
   }
 }
