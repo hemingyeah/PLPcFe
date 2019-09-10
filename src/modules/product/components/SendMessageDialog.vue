@@ -56,6 +56,7 @@ export default {
     return {
       form: {
         smsTemplateId: '',
+        type: '',
         isAllLm: '0',
         sendTime: new Date(),
       },
@@ -98,6 +99,12 @@ export default {
       this.error = '';
 
       const params = this.buildParams();
+      const maxCount = 100;
+
+      if(params.type == '1' && this.count < maxCount) {
+        this.$platform.alert(`营销类型模板单次短信达${maxCount}条才可以发送`);
+      }
+
       this.pending = true;
 
       sendSmsBatch(params)
@@ -173,9 +180,16 @@ export default {
     buildParams() {
       const {smsTemplateId, isAllLm, sendTime, } = this.form;
 
+      const chooseTemplate = this.messageTemplate.filter(template => {
+        return template.id == smsTemplateId;
+      });
+
+      const type = chooseTemplate.length ? (chooseTemplate[0].type || '') : '';
+
       return {
         smsTemplateId,
         isAllLm,
+        type,
         sendTime: formatDate(sendTime, 'YYYY-MM-DD HH:mm:ss'),
         ids: this.selectedIds.join(','),
       }
