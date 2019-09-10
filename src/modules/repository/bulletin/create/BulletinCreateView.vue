@@ -4,12 +4,11 @@
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
-      <base-editor v-model="params.article" @input="getInput" ref="editor"></base-editor>
+      <base-editor v-model="params.article" @input="getInput" ref="editor" :isEdit="isSaveData"></base-editor>
       <p class="article-error" v-if="articleEmpty">请填写通知公告内容！</p>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
-        <button class="base-button green-butn btn-primary" @click="sumbit" :disabled="sumbtting || pending">发布</button>
-        <button class="base-button white-butn" @click="deleteFile" v-if="isEdit">删除</button>
+        <button class="base-button green-butn btn-primary" @click="sumbit();trackEventHandler('sumbit')" :disabled="sumbtting || pending">发布</button>
       </div>
     </div>
 
@@ -35,7 +34,11 @@ export default {
         title: '', // 文章标题
         rule: true,
         article: '', // 文章内容
-        form: {}, // 附件
+        form: {
+          content: '',
+          attachments: [],
+          showInOwn: 0
+        }, // 附件
         typeId: null, // 文章分类
         options: [],
         selectedUsers: [], // 选择的人员
@@ -52,11 +55,22 @@ export default {
       loading: false,
       articleEmpty: false,
       sumbtting: false,
-      pending: false
+      pending: false,
+      isSaveData: false
     }
   },
-  created () {
-    this.getArticle();
+  async created () {
+    let detail = localStorage.getItem('bulletin_article');
+    if (detail) {
+      this.isSaveData = true;
+      let res = await this.$platform.confirm('上次有尚未保存的内容，是否从上次保存内容开始填写?');
+      if(res) {
+        this.getArticle();
+      } else {
+        this.params.article = ' ';
+        localStorage.removeItem('bulletin_article');
+      }
+    }
     this.saveArticle();
     this.getTypes();
   },
@@ -78,8 +92,15 @@ export default {
           })
 
           this.params.options = res.result;
+          if(this.params.options.length <= 0) {
+            this.$platform.notification({
+              title: '暂时没有通知公告类别，请先到通知公告列表添加分类！',
+              type: 'error',
+            });
+            this.sumbtting = true;
+          }
           if(this.params.options.length > 0) {
-            this.params.typeId = this.params.options[0].id;
+            this.params.typeId = this.params.typeId || this.params.options[0].id;
           }
         } else {
           this.$platform.notification({
@@ -118,6 +139,7 @@ export default {
           this.sumbtting = false;
           this.openFrame();
         } else {
+          this.sumbtting = false;
           this.$platform.notification({
             title: res.message,
             type: 'error',
@@ -162,7 +184,7 @@ export default {
       
       this.$platform.openTab({
         id: 'M_INFO_NOTICE',
-        title: '通知公告',
+        title: '通知公告列表',
         url: '/info/notice/list/page',
         reload: true,
         close: true,
@@ -179,22 +201,30 @@ export default {
 
     // 获取缓存的文章信息
     getArticle () {
-      let article = localStorage.getItem('bulletin_article');
-      if (article) this.params.article = article;
+      let detail = localStorage.getItem('bulletin_article');
+      this.params = Object.assign(this.params, JSON.parse(detail));
     },
 
     // 本地缓存文章内容，5分钟一次
     saveArticle () {
       this.interval = setInterval(() => {
         if(this.isSave) {
-          localStorage.setItem('bulletin_article', this.articleHtml);
+          let detail = {
+            'article': this.params.article,
+            'form': this.params.form,
+            'selectedDepts': this.params.selectedDepts,
+            'selectedUsers': this.params.selectedUsers,
+            'title': this.params.title,
+            'typeId': this.params.typeId
+          }
+          localStorage.setItem('bulletin_article', JSON.stringify(detail));
           Message.success({
             message: '文章已暂存',
             type: 'success'
           })
         }
-        this.isSave = false
-      }, 1000 * 6)
+        this.isSave = false;
+      }, 1000 * 60 * 1)
     },
 
     // 参数校验，标题、内容不允许为空
@@ -278,11 +308,22 @@ export default {
       }
 
       return params;
+    },
+
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'sumbit') {
+        window.TDAPP.onEvent('pc：通知公告-发布事件');
+        return;
+      }
     }
   },
   watch: {
-    articleHtml(n) {
-      this.isSave = true;
+    params: {
+      handler(n) {
+        this.isSave = true;
+      },
+      deep: true,
     }
   }
 }

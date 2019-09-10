@@ -1,7 +1,7 @@
 <template>
   <div class="document-list-search" ref="search">
     <div class="search-left">
-      <button class="base-button search-new" @click="create" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">新建</button>
+      <button class="base-button search-new" @click="create();trackEventHandler('create')" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">新建</button>
 
       <!-- 文档库类型筛选 -->
       <div class="search-middle">
@@ -70,10 +70,10 @@
         <i slot="suffix" class="el-input__icon el-icon-search"></i>
       </el-input>
 
-      <base-button type="primary" @event="search()" native-type="submit">
+      <base-button type="primary" @event="search();trackEventHandler('search')" native-type="submit">
         搜索
       </base-button>
-      <base-button type="ghost" @event="resetParams">
+      <base-button type="ghost" @event="resetParams();trackEventHandler('reset')">
         重置
       </base-button>
     </div>
@@ -306,7 +306,7 @@ export default {
       
       this.$platform.openTab({
         id: 'wiki_create',
-        title: '新建知识库',
+        title: '知识库新建',
         url: '/wiki/create/page',
         reload: true,
         close: true,
@@ -424,7 +424,10 @@ export default {
           }
           this.search();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (e) {
         console.error(e);
@@ -474,6 +477,22 @@ export default {
       this.tag.show = false;
       this.params.label = this.tag.show ? this.tag.name : '';
       this.search();
+    },
+
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'create') {
+        window.TDAPP.onEvent('pc：知识库列表-新建事件');
+        return;
+      }
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：知识库列表-搜索事件');
+        return;
+      }
+      if (type === 'reset') {
+        window.TDAPP.onEvent('pc：知识库列表-重置事件');
+        return;
+      }
     }
   }
 }

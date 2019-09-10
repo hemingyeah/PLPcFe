@@ -25,30 +25,21 @@
 
       <div class="operating" v-if="!isReview">
 
-        <!-- <div class="published" v-if="!detail.isDraft">
-          <span class="permission">
-            <i class="iconfont icon-suo icon-permission" v-if="!detail.allowShare"></i>
-            <i class="iconfont icon-unie65b icon-permission" v-else></i>
-            {{!detail.allowShare ? '内部' : '外部'}}
-          </span>
-          <span class="readNum">阅读（{{detail.readTimes}}）</span>
-        </div> -->
-
         <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
           <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
         </div>
 
         <div style="display: inline-block">
           <span class="management" v-if="detail.examineState != 1 && allowEdit">
-            <i class="iconfont icon-bianji icon-operating" @click="editArticle"></i>
-            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
+            <i class="iconfont icon-bianji icon-operating" @click="editArticle()"></i>
+            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('detele')"></i>
           </span>
 
-          <span class="share" v-if="!detail.isDraft" @click="shareDocument">
+          <span class="share" v-if="!detail.isDraft" @click="shareDocument();trackEventHandler('share')">
             <i class="iconfont icon-share icon-article-share"></i>
           </span>
 
-          <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
+          <span class="open" @click="openFrame();trackEventHandler('open')" v-if="showOpenFrame">新页面打开</span>
 
           <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
           <button class="base-button green-btn" @click="revoke" v-if="detail.examineState == 1 && revokeShow" style="margin-left:5px">撤回审批</button>
@@ -308,7 +299,7 @@ export default {
       
       this.$platform.openTab({
         id: `document_detail_${ this.detail.id }`,
-        title: '知识库',
+        title: '知识库列表',
         url: `/wiki/detail/page?wikiId=${ this.detail.id }`,
         reload: true,
         close: true,
@@ -384,7 +375,7 @@ export default {
       this.shareBoxShow = false;
       let protocol = window.location.protocol;
       let host = window.location.host;
-      let url = `${protocol}//${host}/share/wiki/view?wikiId=${this.detail.id}`;
+      let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.detail.id}`;
       // 获取body
       let body = document.getElementsByTagName('body')[0];
 
@@ -450,7 +441,7 @@ export default {
       
             this.$platform.openTab({
               id: `wiki_create_${ params.wikiId }`,
-              title: '编辑文档',
+              title: '知识库编辑',
               url: `/wiki/edit/page?wikiId=${ params.wikiId }`,
               reload: true,
               close: true,
@@ -492,7 +483,7 @@ export default {
             let fromId = window.frameElement.getAttribute('id');
             this.$platform.openTab({
               id: 'M_INFO_DOC',
-              title: '知识库',
+              title: '知识库列表',
               url: '/wiki/list/page',
               reload: true,
               close: true,
@@ -511,6 +502,10 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+
+    search () {
+      this.$emit('search');
     },
 
     approve () {
@@ -542,6 +537,22 @@ export default {
 
       } catch (e) {
         console.error(e);
+      }
+    },
+
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'delete') {
+        window.TDAPP.onEvent('pc：知识库详情-删除事件');
+        return;
+      }
+      if (type === 'share') {
+        window.TDAPP.onEvent('pc：知识库详情-分享事件');
+        return;
+      }
+      if (type === 'open') {
+        window.TDAPP.onEvent('pc：知识库详情-新页面打开');
+        return;
       }
     }
 

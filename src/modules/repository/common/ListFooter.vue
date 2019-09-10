@@ -48,7 +48,7 @@ export default {
     handleSizeChange (pageSize) {
       this.params.pageNum = 1;
       this.params.pageSize = pageSize;
-      this.$emit('search', this.params);
+      this.$emit('search', this.params, 'pageSize');
     },
   }
 }

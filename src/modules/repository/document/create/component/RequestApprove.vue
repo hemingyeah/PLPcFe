@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="发起审批" :show.sync="visible" width="600px" class="request-approve-performance-modal" @closed="reset">
+  <base-modal title="发起审批" :show.sync="visible" width="600px" class="request-approve-performance-modal" @closed="reset" @cancel="cancel">
 
     <el-form ref="form" :rules="rules" :model="form" v-if="init">
       <el-form-item prop="remark">
@@ -8,7 +8,7 @@
     </el-form>
 
     <div slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取 消</el-button>
+      <el-button @click="visible = false;cancel()">取 消</el-button>
       <el-button type="primary" @click="onSubmit" :disabled="pending" >确 定</el-button>
     </div>
   </base-modal>
@@ -45,6 +45,7 @@ export default {
   },
   methods: {
     open() {
+      this.pending = false;
       this.init = true;
       this.visible = true;
     },
@@ -64,6 +65,10 @@ export default {
     reset() {
       this.form.remark = '';
       this.init = false;
+      
+    },
+    cancel () {
+      this.$emit('reset');
     }
   },
 }

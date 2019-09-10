@@ -4,7 +4,6 @@
 
       <el-form-item label="标题：" class="create-item item-title" prop="rule">
         <el-input class="title" v-model="params.title" @blur="titleCheck"></el-input>
-        <!-- <input class="title" v-model="params.title" /> -->
       </el-form-item>
       <p class="title-error" v-if="params.title && params.title.length > 100">标题不能超过100个字符！</p>
       <p class="title-error" v-if="msg && !params.title">请填写通知公告标题！</p>
@@ -95,9 +94,6 @@ export default {
       return !this.pending
     }
   },
-  created () {
-    this.params.form = this.buildForm();
-  },
   methods: {
     // 点击加号显示标签输入框
     chooseTeam () {
@@ -165,15 +161,6 @@ export default {
         this.params.selectedUsers.splice(this.params.selectedUsers.indexOf(tag), 1);
       } else {
         this.params.selectedDepts.splice(this.params.selectedDepts.indexOf(tag), 1);
-      }
-    },
-
-    // 文件存储form结构
-    buildForm(){
-      return {
-        content: '',
-        attachments: [],
-        showInOwn: 0
       }
     },
 

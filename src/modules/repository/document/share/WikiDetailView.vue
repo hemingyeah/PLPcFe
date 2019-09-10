@@ -15,7 +15,10 @@
       <div class="operating">
         
         <div class="published">
-          <span class="readNum">阅读（{{initData.readTimes}}）</span>
+          <span class="readNum">
+            <i class="iconfont icon-yanjing"></i>
+            <span>{{initData.readTimes}}</span>
+          </span>
         </div>
       
       </div>
@@ -97,7 +100,7 @@ export default {
     display: flex;
     justify-content: space-between;
     height: 75px;
-    padding: 16px 10px 16px 16px;
+    padding: 16px;
     border-bottom: 1px solid #E8EFF0;
     box-sizing: border-box;
 
@@ -151,6 +154,17 @@ export default {
 
       .readNum {
         margin: 0 10px;
+
+        .icon-yanjing {
+          font-size: 12px;
+          color: #B0BCC3;
+          margin-left: 8px;
+        }
+
+        span {
+          display: inline-block;
+          padding-left: 5px;
+        }
       }
 
       .management {

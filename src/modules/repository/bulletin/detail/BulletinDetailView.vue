@@ -20,7 +20,7 @@
         </div>
 
         <span class="management" v-if="allowEdit">
-          <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle"></i>
+          <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('delete')"></i>
         </span>
 
         <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
@@ -178,7 +178,6 @@ export default {
         if(res.success) {
           if(res.message == '已删除') {
             this.detail = null;
-            // this.$platform.alert('该通知已被删除！');
             this.deleteMsg = '已被删除'
           } else {
             this.detail = res.result;
@@ -295,19 +294,6 @@ export default {
       }
     },
 
-    editArticle () {
-      let fromId = window.frameElement.getAttribute('id');
-      
-      this.$platform.openTab({
-        id: 'bulletin_edit',
-        title: '编辑通知公告',
-        url: '/bulletin/create',
-        reload: true,
-        close: true,
-        fromId
-      });
-    },
-
     // 删除通知公告
     async deleteArticle () {
       try {
@@ -343,6 +329,14 @@ export default {
         }
       } catch (e) {
         console.error(e);
+      }
+    },
+
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'delete') {
+        window.TDAPP.onEvent('pc：通知公告详情-删除事件');
+        return;
       }
     }
   },

@@ -10,7 +10,7 @@
           <i class="iconfont icon-fd-attachment" v-if="item.hasAttachment"></i>
           <p class="item-title" ref="title" @click="toDetail(item)" v-html="item.handleTitle">{{item.title}}</p>
           <!-- 我发布的显示分享 -->
-          <span class="share" @click="shareDocument(item)" v-if="!item.isDraft">
+          <span class="share" @click="shareDocument(item);trackEventHandler('share')" v-if="!item.isDraft">
             <i class="iconfont icon-share icon-article-share"></i>
           </span>
           <!-- 草稿箱显示审核状态 -->
@@ -32,7 +32,7 @@
 
           <div class="type" v-if="item.label && item.label.length > 0">
             <i class="iconfont icon-tag icon-tags"></i>
-            <el-tag class="search-tag" @click="handleTags(tag)" v-for="(tag,index) in item.label" :key="index">{{tag}}</el-tag>
+            <el-tag class="search-tag" @click="handleTags(tag);trackEventHandler('tag')" v-for="(tag,index) in item.label" :key="index">{{tag}}</el-tag>
           </div>
 
           <!-- 我发布的显示权限、阅读量、分享 -->
@@ -43,7 +43,7 @@
             </span>
             <span class="readNum">
               <i class="iconfont icon-yanjing"></i>
-              <span>（{{item.readTimes}}）</span>
+              <span>{{item.readTimes}}</span>
             </span>
           </div>
 
@@ -142,7 +142,6 @@ export default {
             title: '分享成功，该分享人员将会收到消息通知',
             type: 'success',
           });
-          this.$platform.alert('分享成功，该分享人员将会收到消息通知');
         } else {
           this.$platform.notification({
             title: res.message,
@@ -176,7 +175,7 @@ export default {
       this.shareBoxShow = false;
       let protocol = window.location.protocol;
       let host = window.location.host;
-      let url = `${protocol}//${host}/share/wiki/view?wikiId=${this.chosenItem.id}`;
+      let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.chosenItem.id}`;
 
       // 获取body
       let body = document.getElementsByTagName('body')[0];
@@ -227,6 +226,18 @@ export default {
       this.$emit('update:id', item.id);
       this.$emit('toDetail', item)
     },
+
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'share') {
+        window.TDAPP.onEvent('pc：知识库列表-分享事件');
+        return;
+      }
+      if (type === 'reset') {
+        window.TDAPP.onEvent('pc：知识库列表-点击标签搜索');
+        return;
+      }
+    }
   }
 }
 </script>
@@ -357,6 +368,11 @@ export default {
             font-size: 12px;
             color: #B0BCC3;
             margin-left: 8px;
+          }
+
+          span {
+            display: inline-block;
+            padding-left: 5px;
           }
         }
       }

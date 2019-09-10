@@ -46,7 +46,7 @@ export default {
         keyword: '', // 搜索的关键词
         typeId: null,
         pageNum: 1,
-        pageSize: 10,
+        pageSize: this.getPageSize(),
       },
       listTotal: null,
       listMsg: {},
@@ -67,9 +67,15 @@ export default {
   created () {
     this.search()
   },
+  mounted () {
+    window.__exports__refresh = this.search;
+  },
   methods: {
-    async search (params) {
+    async search (params, flag) {
       if(params) Object.assign(this.params, params);
+      if(flag) {
+        localStorage.setItem('notice_pageSize', this.params.pageSize);
+      }
       try {
         this.loading = true;
         let res = await RepositoryApi.getBulletinList(this.params);
@@ -111,12 +117,19 @@ export default {
           this.toDetail(this.listMsg.list[0]);
 
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err);
         this.loading = false;
       }    
+    },
+
+    getPageSize () {
+      return parseInt(localStorage.getItem('notice_pageSize')) || 10
     },
 
     async toDetail (item) {

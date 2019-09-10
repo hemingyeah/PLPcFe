@@ -48,7 +48,7 @@ export default {
         label: '', // 标签
         keyword: '', // 搜索的关键词
         pageNum: 1,
-        pageSize: 10,
+        pageSize: this.getPageSize(),
         orderDetail: { // 排序
           isSystem: 1,
           column: '',
@@ -85,10 +85,17 @@ export default {
     this.search()
   },
 
+  mounted () {
+    window.__exports__refresh = this.search;
+  },
+
   methods: {
     // 获取文档库列表，将ListSearch、ListFooter组件传递的参数合并
-    async search (params) {
+    async search (params, flag) {
       if(params) Object.assign(this.params, params);
+      if(flag) {
+        localStorage.setItem('wiki_pageSize', this.params.pageSize);
+      }
       try {
         this.loading = true;
         let res = await RepositoryApi.getDocumentList(this.params);
@@ -130,6 +137,10 @@ export default {
         console.error(err);
         this.loading = false;
       }    
+    },
+
+    getPageSize () {
+      return parseInt(localStorage.getItem('wiki_pageSize')) || 10
     },
     
     // 给子组件传过来的tag加上show属性

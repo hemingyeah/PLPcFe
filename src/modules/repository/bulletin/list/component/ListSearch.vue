@@ -1,7 +1,7 @@
 <template>
   <div class="bulletin-list-search" ref="search">
     <div class="search-top">
-      <button class="base-button search-new" @click="create" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">新建</button>
+      <button class="base-button search-new" @click="create();trackEventHandler('create')" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">新建</button>
       
       <!-- 通知公告类型筛选 -->
       <div class="search-bottom">
@@ -27,10 +27,10 @@
         @keyup.enter.native="search">
         <i slot="suffix" class="el-input__icon el-icon-search"></i>
       </el-input>
-      <base-button type="primary" @event="search()" native-type="submit">
+      <base-button type="primary" @event="search();trackEventHandler('search')" native-type="submit">
         搜索
       </base-button>
-      <base-button type="ghost" @event="resetParams">
+      <base-button type="ghost" @event="resetParams();trackEventHandler('reset')">
         重置
       </base-button>
     </div>
@@ -160,7 +160,7 @@ export default {
       
       this.$platform.openTab({
         id: 'bulletin_create',
-        title: '新建文档',
+        title: '通知公告新建',
         url: '/info/notice/create/page',
         reload: true,
         close: true,
@@ -347,6 +347,22 @@ export default {
         
       } catch (err) {
         console.error(err)
+      }
+    },
+
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'create') {
+        window.TDAPP.onEvent('pc：通知公告列表-新建事件');
+        return;
+      }
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：通知公告列表-搜索事件');
+        return;
+      }
+      if (type === 'reset') {
+        window.TDAPP.onEvent('pc：通知公告列表-重置事件');
+        return;
       }
     }
   }

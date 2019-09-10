@@ -94,7 +94,7 @@ router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
     'cookie': `VIPPUBLINKJSESSIONID=f4bc6b27-8ad7-4914-8189-c9fb53a2827b`
   },
   // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=99ff6b3f-8d6b-4c0a-bff3-e7c7498de5ed`
+  //   'cookie': `VIPPUBLINKJSESSIONID=26f5d84d-cb6c-4dac-b938-700ff187477f`
   // }
 }))
 
@@ -107,7 +107,7 @@ router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
     'cookie': `VIPPUBLINKJSESSIONID=f4bc6b27-8ad7-4914-8189-c9fb53a2827b`
   },
   // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=99ff6b3f-8d6b-4c0a-bff3-e7c7498de5ed`
+  //   'cookie': `VIPPUBLINKJSESSIONID=26f5d84d-cb6c-4dac-b938-700ff187477f`
   // }
 }))
 

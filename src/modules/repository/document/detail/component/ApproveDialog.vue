@@ -112,7 +112,7 @@ export default {
             });
 
             if(this.approveData.showOpenFrame) {
-              window.location.reload();
+              this.$parent.search();
               return;
             }
 
@@ -127,7 +127,7 @@ export default {
       
             return this.$platform.openTab({
               id: `document_detail_${ this.approveData.wikiId }`,
-              title: '知识库',
+              title: '知识库详情',
               url: `/wiki/detail/page?wikiId=${ this.approveData.wikiId }`,
               reload: true,
               close: true,

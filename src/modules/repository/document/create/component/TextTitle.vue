@@ -112,8 +112,15 @@ export default {
     // 添加标签，最多5个
     addTags () {
       if(this.tagValue) {
-        if (this.tagValue.length <= 10) {
-          this.params.label.push(this.tagValue);
+        if(this.params.label.indexOf(this.tagValue) != -1) {
+          this.$platform.notification({
+            title: '标签不能重复',
+            type: 'error',
+          });
+        } else {
+          if (this.tagValue.length <= 10) {
+            this.params.label.push(this.tagValue);
+          }
         }
       }
       this.inputVisible = false;

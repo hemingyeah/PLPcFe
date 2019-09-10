@@ -17,9 +17,9 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <p class="prompt">如果不选择父级分类，则该分类为父级分类</p>
 
       <div slot="footer" class="edit-footer">
+        <p class="prompt">如果不选择父级分类，则该分类为父级分类</p>
         <button type="button" class="btn btn-primary" @click="sumbitType">确定</button>
       </div>
     </base-modal>
@@ -80,11 +80,12 @@ export default {
       .el-form-item__label {
         line-height: 32px;
         text-align: right;
+        width: 85px;
       }
     }
 
     .title {
-      width: 340px;
+      width: 355px;
     }
 
     .type-form {
@@ -92,21 +93,26 @@ export default {
     }
 
     .type {
-      width: 340px;
+      width: 355px;
     }
 
   }
+
+  .base-modal-footer {
+    padding: 15px 30px 15px 45px;
+  }
   .edit-footer {
     display: flex;
-    justify-content: flex-end;
-  }
+    justify-content: space-between;
 
-  .prompt {
-    margin: 0;
-    font-size: 12px;
-    color: #F56C6C;
-    margin-top: 10px;
-  } 
+    .prompt {
+      display: inline-block;
+      margin: 0;
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+  }
 }
 
 </style>

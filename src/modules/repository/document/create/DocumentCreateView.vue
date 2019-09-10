@@ -4,19 +4,19 @@
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
-      <base-editor v-model="params.article" @input="getInput" ref="editor" :isEdit="isEdit"></base-editor>
+      <base-editor v-model="params.article" @input="getInput" ref="editor" :isEdit="isEdit || isSaveData"></base-editor>
       <p class="article-error" v-if="articleEmpty">请填写知识库内容！</p>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
-        <button class="base-button green-butn btn-primary" @click="saveAndSumbit" :disabled="!saveCanClick || pending">保存并提交</button>
-        <button class="base-button green-butn btn-primary" @click="toDraftBox" :disabled="!draftCanClick || pending">草稿箱</button>
-        <button class="base-button white-butn" @click="deleteFile" v-if="isEdit" :disabled="!deleteCanClick || pending">删除</button>
+        <button class="base-button green-butn btn-primary" @click="saveAndSumbit();trackEventHandler('save')" :disabled="!saveCanClick || pending">保存并提交</button>
+        <button class="base-button green-butn btn-primary" @click="toDraftBox();trackEventHandler('draft')" :disabled="!draftCanClick || pending">草稿箱</button>
+        <button class="base-button white-butn" @click="deleteFile();trackEventHandler('delete')" v-if="isEdit" :disabled="!deleteCanClick || pending">删除</button>
       </div>
     </div>
     <!-- 更新日志，编辑时显示 -->
     <update-log class="view-right" v-if="isEdit" :wikiId="wikiId"></update-log>
 
-    <request-approve @createApprove="createApprove" ref="requestApproveDialog" />
+    <request-approve @createApprove="createApprove" @reset="reset" ref="requestApproveDialog" />
   </div>
 </template>
 
@@ -53,7 +53,7 @@ export default {
         typeId: [], // 文章分类
         options: [],
       },
-      articleHtml: '',
+      articleHtml: null,
       isSave: false,
       isEdit: false,
       isToDraft: false,
@@ -66,19 +66,34 @@ export default {
       deleteCanClick: true,
       saveCanClick: true,
       draftCanClick: true,
-      pending: false
+      pending: false,
+      isSaveData: false
     }
   },
   async created () {
-    if(!this.isEdit) {
-      this.saveArticle();
-      this.getArticle();
+    let detail = JSON.parse(localStorage.getItem('document_article'));
+    if (detail && !this.isEdit) {
+      this.isSaveData = true;
+      let res = await this.$platform.confirm('上次有尚未保存的内容，是否从上次保存内容开始填写?');
+      if(res) {
+        this.getArticle();
+      } else {
+        this.params.article = ' ';
+        localStorage.removeItem('document_article');
+      }
     }
+    if(!this.isEdit) this.saveArticle();
     this.getId();
     await this.getTypes();
     if(this.isEdit) this.getArticle();
   },
   methods: {
+    reset () {
+      this.deleteCanClick = true;
+      this.saveCanClick = true;
+      this.draftCanClick = true;
+      this.pending = false;
+    },
     setStatus(n) {
       this.reportApproveStatus = n;
     },
@@ -126,8 +141,17 @@ export default {
             })
           })
           this.params.options = res.result;
+          if(this.params.options.length <= 0) {
+            this.$platform.notification({
+              title: '暂时没有知识库类别，请先到知识库列表添加分类！',
+              type: 'error',
+            });
+            this.saveCanClick = false;
+            this.draftCanClick = false;
+            this.deleteCanClick = false;
+          }
           if(!this.isEdit && this.params.options.length > 0) {
-            this.setType(this.params.options[0].children[0].value);
+            if(this.params.typeId.length <= 0) this.setType(this.params.options[0].children[0].value);
           }
         } else {
           this.$platform.notification({
@@ -167,6 +191,7 @@ export default {
           this.saveCanClick = true;
           this.openFrame();
         } else {
+          this.saveCanClick = true;
           this.$platform.notification({
             title: res.message,
             type: 'error',
@@ -205,6 +230,7 @@ export default {
           this.saveCanClick = true;
           this.openFrame();
         } else {
+          this.saveCanClick = true;
           this.$platform.notification({
             title: res.message,
             type: 'error',
@@ -236,6 +262,7 @@ export default {
           this.draftCanClick = true;
           this.openFrame();
         } else {
+          this.draftCanClick = true;
           this.$platform.notification({
             title: res.message,
             type: 'error',
@@ -269,6 +296,7 @@ export default {
           this.deleteCanClick = true;
           this.openFrame();
         } else {
+          this.deleteCanClick = true;
           this.$platform.notification({
             title: res.message,
             type: 'error',
@@ -288,7 +316,7 @@ export default {
       
       this.$platform.openTab({
         id: 'M_INFO_DOC',
-        title: '知识库',
+        title: '知识库列表',
         url: '/wiki/list/page',
         reload: true,
         close: true,
@@ -333,8 +361,8 @@ export default {
           this.loading = false;
         }
       } else {
-        let article = localStorage.getItem('document_article');
-        if (article) this.params.article = article;
+        let detail = localStorage.getItem('document_article');
+        this.params = Object.assign(this.params, JSON.parse(detail));
       }
     },
 
@@ -352,14 +380,22 @@ export default {
     saveArticle () {
       setInterval(() => {
         if(this.isSave) {
-          localStorage.setItem('document_article', this.articleHtml);
+          let detail = {
+            'article': this.params.article,
+            'form': this.params.form,
+            'permission': this.params.permission,
+            'title': this.params.title,
+            'typeId': this.params.typeId,
+            'label': this.params.label
+          }
+          localStorage.setItem('document_article', JSON.stringify(detail));
           Message.success({
             message: '文章已暂存',
             type: 'success'
           })
         }
         this.isSave = false
-      }, 1000 * 6 * 5)
+      }, 1000 * 60 * 1)
     },
 
     // 构建参数
@@ -410,6 +446,22 @@ export default {
       }
       return true;
     },
+
+    // TalkingData事件埋点
+    trackEventHandler (type) {
+      if (type === 'delete') {
+        window.TDAPP.onEvent('pc：知识库编辑-删除事件');
+        return;
+      }
+      if (type === 'save') {
+        window.TDAPP.onEvent('pc：知识库-保存并提交事件');
+        return;
+      }
+      if (type === 'draft') {
+        window.TDAPP.onEvent('pc：知识库-保存草稿');
+        return;
+      }
+    }
   },
   computed: {
     padding () {
@@ -417,8 +469,11 @@ export default {
     }
   },
   watch: {
-    articleHtml(n) {
-      this.isSave = true;
+    params: {
+      handler(n) {
+        this.isSave = true;
+      },
+      deep: true,
     }
   }
 }
