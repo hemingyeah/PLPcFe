@@ -105,39 +105,53 @@ export default {
   methods: {
     // 获取分类一级树状结构，每次更新一次
     async getTypes () {
-      try {
-        let res = await RepositoryApi.getBulletinTypes();
-        if(res.success) {
-          res.result.forEach(item => {
-            item.count = 0;
-          })
+      return new Promise(async (resolve, reject) => {
+        try {
+          let res = await RepositoryApi.getBulletinTypes();
+          if(res.success) {
+            res.result.forEach(item => {
+              item.count = 0;
+            })
 
-          this.typeOptions = res.result;
-          this.getTypeCount();
-        } else {
-          this.$platform.alert(res.message);
+            this.typeOptions = res.result;
+            this.getTypeCount();
+            resolve();
+          } else {
+            this.$platform.notification({
+              title: res.message,
+              type: 'error',
+            });
+            reject();
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
+      })
     },
 
     // 获取分类下各级分类的文章数量，每次更新一次
     async getTypeCount () {
-      try {
-        let res = await RepositoryApi.getBulletinTypesCount();
-        if(res.success) {
-          this.typeOptions.forEach(item => {
-            res.result.forEach(info => {
-              if(item.id == info.typeId) item.count = info.count;
+      return new Promise(async (resolve, reject) => {
+        try {
+          let res = await RepositoryApi.getBulletinTypesCount();
+          if(res.success) {
+            this.typeOptions.forEach(item => {
+              res.result.forEach(info => {
+                if(item.id == info.typeId) item.count = info.count;
+              })
             })
-          })
-        } else {
-          this.$platform.alert(res.message);
+            resolve();
+          } else {
+            this.$platform.notification({
+              title: res.message,
+              type: 'error',
+            });
+            reject();
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
+      })
     },
 
     // 跳转到新建页面
@@ -270,13 +284,26 @@ export default {
         let res = await RepositoryApi.deleteBulletinType(params);
         
         if (res.success) {
-          const result = await this.$platform.alert('删除分类成功');
-          if (!result) return;
+          this.$platform.notification({
+            title: '删除分类成功。',
+            type: 'success',
+          });
+
           await this.getTypes();
-          this.params.typeId = null;
+          await this.getTypeCount();
+          let isEdit = false;
+          this.typeOptions.forEach(item => {
+            if(item.id == this.params.typeId) {
+              isEdit = true;
+            }
+          })
+          if(!isEdit) this.params.typeId = null;
           this.search();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (e) {
         console.error(e);
@@ -300,13 +327,19 @@ export default {
 
             if(res.success) {
               let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
-              const result = await this.$platform.alert(msg);
-              if (!result) return;
+              this.$platform.notification({
+                title: msg,
+                type: 'success',
+              });
               await this.getTypes();
+              await this.getTypeCount();
               this.params.typeId = this.info.id;
               this.search();
             } else {
-              this.$platform.alert(res.message);
+              this.$platform.notification({
+                title: res.message,
+                type: 'error',
+              });
             }
             this.isEdit = false;
           }

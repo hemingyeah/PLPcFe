@@ -177,6 +177,7 @@ export default {
       params: {
         keyword: '', // 搜索关键词
         deptId: '',
+        departmentId: '',
         pageNum: 1,
         pageSize: 50
       }, // 参数
@@ -330,6 +331,7 @@ export default {
         this.userPage.list = [];
 
         this.params.deptId = 'root';
+        this.params.departmentId = '';
         this.params.pageNum = 1;
 
         if(this.showLocation){
@@ -358,6 +360,7 @@ export default {
         // 查询用户
         this.params.keyword = '';
         this.params.deptId = this.selectedDept.id;
+        this.params.departmentId = this.selectedDept.id;
         this.params.pageNum = 1;
 
         if(this.showLocation){

@@ -11,7 +11,7 @@
           <el-input class="title" v-model="info.name"></el-input>
         </el-form-item>
         <el-form-item label="父级分类" class="type-form">
-          <el-select v-model="info.parentId" class="type" clearable :disabled="value.title == 1">
+          <el-select v-model="info.parentId" class="type" clearable :disabled="value.parentId == null">
             <el-option v-for="item in info.options" :key="item.value" :label="item.name" :value="item.value">
             </el-option>
           </el-select>

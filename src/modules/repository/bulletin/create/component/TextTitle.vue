@@ -2,11 +2,12 @@
   <div class="document-create-title">
     <el-form :model="params" :rules="rules" ref="ruleForm">
 
-      <el-form-item label="标题：" class="create-item item-title" prop="title">
+      <el-form-item label="标题：" class="create-item item-title" prop="rule">
         <el-input class="title" v-model="params.title" @blur="titleCheck"></el-input>
         <!-- <input class="title" v-model="params.title" /> -->
       </el-form-item>
-      <p class="title-error" v-if="msg"></p>
+      <p class="title-error" v-if="params.title && params.title.length > 100">标题不能超过100个字符！</p>
+      <p class="title-error" v-if="msg && !params.title">请填写通知公告标题！</p>
 
       <el-form-item label="分类：" class="create-item" prop="typeId">
         <el-select v-model="params.typeId" class="search-type">
@@ -75,6 +76,9 @@ export default {
         title: [
           { required: true, message: '请填写知识库标题！', trigger: 'blur' },
           { max: 100, message: '标题不能超过100字！', trigger: 'blur' }
+        ],
+        rule: [
+          { required: true, message: '请填写知识库标题！', trigger: 'blur' },
         ],
         typeId: [
           { required: true, message: '请选择知识库分类', trigger: 'change' }
@@ -236,9 +240,9 @@ export default {
         return false;
       }
       if(this.params.title.length > 100) {
-        this.msg = '标题不能超过100字！';
         return false;
       }
+      return true;
     },
 
     rangeCheck () {
@@ -248,17 +252,6 @@ export default {
       }
       return true;
     },
-
-    submit () {
-      let result;
-      this.$refs.ruleForm.validate((valid) => {
-        if (!valid) {
-          this.msg = true;
-        }
-        result = valid;
-      });
-      return result;
-    }
   }
 }
 </script>

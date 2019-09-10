@@ -81,7 +81,10 @@ export default {
     },
     onSubmit() {
       if(this.form.state == 'fail' && !this.form.approveRemark) {
-        this.$platform.alert('请在审批备注中填写拒绝原因');
+        this.$platform.notification({
+          title: '请在审批备注中填写拒绝原因',
+          type: 'error',
+        });
         return;
       }
 
@@ -131,7 +134,10 @@ export default {
               fromId
             });
           }
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         })
         .catch(e => console.error('e', e));
     },

@@ -13,24 +13,23 @@
 
         <!-- 类别删选 -->
         <el-cascader 
-          :options="options"
+          :options="typeOptions"
+          :key="typeOptions.length"
           class="search-type search-type-right"
           popper-class="search-cascader-panel"  
           clearable
-          :props="props"
           @change="handleChange"
           @visible-change="showCascader"
-          @active-item-change="showCascaderChild"
           v-model="params.type"
           filterable>
-          <!-- <template slot-scope="{ node, data }" class="type">
+          <template slot-scope="{ node, data }" class="type">
             <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
             <span v-else>{{data.label}}</span>
             <span class="type-operating" v-if="data.label != '全部' && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
               <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
               <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
             </span>
-          </template> -->
+          </template>
         </el-cascader>
 
       </div>
@@ -57,10 +56,7 @@
 
         <el-tag class="search-tag" closable @close="closeTag" v-if="tag.show">{{tag.name}}</el-tag>
       </div>
-    </div>
-
-    <button id="cascader-hidden" class="cascader-hidden" @click="showMsg"></button>
-    
+    </div>    
     
     <!-- 关键词搜索框 -->
     <div class="search-input-container" ref="searchInput">
@@ -121,6 +117,7 @@ export default {
       params: { // 参数对象
         keyword: '',
         type: [],
+        typeIds: [],
         orderDetail: {
           isSystem: 1,
           column: '',
@@ -142,7 +139,6 @@ export default {
         title: null
       },
       viewOptions: this.initView(), // 视图
-      options: [],
       typeOptions: [], // 类别
       updateShow: true,
       readTimesShow: true,
@@ -159,12 +155,6 @@ export default {
   mounted () {   
     this.initView();
     this.getTypes();
-    document.addEventListener('blur', e => {
-      console.log('blur');
-    })
-    document.addEventListener('focus', e => {
-      console.log(e.target);
-    })
   },
 
   methods: {
@@ -199,211 +189,115 @@ export default {
 
     // 获取分类二级树状结构，每次更新一次
     async getTypes () {
-      try {
-        let res = await RepositoryApi.getDocumentTypes();
-        if(res.success) {
-          res.result.forEach(item => {
-            item.value = item.id;
-            item.label = item.name;
-            item.children = item.subTypes;
-            item.count = 0;
-            item.countName = `${ item.label }（${ item.count }）`;
+      return new Promise(async (resolve, reject) => {
+        try {
+          let res = await RepositoryApi.getDocumentTypes();
+          if(res.success) {
+            res.result.forEach(item => {
+              item.value = item.id;
+              item.label = item.name;
+              item.children = item.subTypes;
+              item.count = 0;
 
-            item.children.forEach(childItem => {
-              childItem.value = childItem.id;
-              childItem.label = childItem.name;
-              childItem.count = 0;
-              childItem.countName = `${ childItem.label }（${ childItem.count })`;
+              item.children.forEach(childItem => {
+                childItem.value = childItem.id;
+                childItem.label = childItem.name;
+                childItem.count = 0;
+              })
+              
+              item.children.unshift({
+                label: '全部',
+                value: item.id
+              })
             })
-            
-            item.children.unshift({
-              label: '全部',
-              value: item.id
-            })
-          })
-          this.typeOptions = res.result;
-          this.info.options = this.typeOptions;
-        } else {
-          this.$platform.alert(res.message);
+            this.typeOptions = res.result;
+            this.info.options = this.typeOptions;
+            resolve();
+          } else {
+            this.$platform.notification({
+              title: res.message,
+              type: 'error',
+            });
+            reject();
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
+      })
     },
 
     // 获取分类下各级分类的文章数量，每次点击下拉框时更新
     // TODO: 检查
     async getTypesCount () {
-      try {
-        let params = {
-          view: this.params.view
-        }
-        let res = await RepositoryApi.getTypesCount(params);
-        this.typeOptions.forEach(parent => {
-          res.result.forEach(info => {
-            if(parent.id == info.typeId) {
-              parent.countName = `${ parent.label }（${ info.count }）`;
-              parent.count = info.count;
-            }
-          })
+      return new Promise(async (resolve, reject) => {
+        try {
+          let params = {
+            view: this.params.view
+          }
+          let res = await RepositoryApi.getTypesCount(params);
+           
+          if(res.success) {
+            this.typeOptions.forEach(parent => {
+              res.result.forEach(info => {
+                if(parent.id == info.typeId) parent.count = info.count
+              })
 
-          parent.children.forEach(child => {
-            res.result.forEach(info => {
-              if(child.id == info.typeId) {
-                child.countName = `${ child.label }（${ info.count })`;
-                child.count = info.count;
-              }
+              parent.children.forEach(child => {
+                res.result.forEach(info => {
+                  if(child.id == info.typeId) child.count = info.count;
+                })
+              })
             })
-          })
-        })
-        this.options = this.typeOptions;
-      } catch (err) {
-        console.error(err)
-      }
+            resolve();
+          } else {
+            this.$platform.notification({
+              title: res.message,
+              type: 'error',
+            });
+            reject();
+          }
+        } catch (err) {
+          console.error(err)
+        }
+      })
     },
 
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
     async showCascader (flag) {
-      if(this.left || !flag) return;
       // 获取分类文章数量
       await this.getTypesCount();
-      setTimeout(() => {
-        let parent;
-        let selects = document.getElementsByClassName('el-popper');
-        for(let i = 0; i < selects.length; i++) {
-          if(selects[i].className.indexOf('el-cascader-menus') != -1) {
-            parent = selects[i];
-          }
-        }
-
-
-        parent.style.maxHeight = '350px';
-        parent.style.minHeight = '90px';
-        if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
+      let parent = document.getElementsByClassName('el-cascader-panel')[0];
+      parent.style.maxHeight = '350px';
+      parent.style.minHeight = '90px';
+      if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
        
 
-        if(flag) {
-          let left = document.getElementsByClassName('el-cascader-menu__item');
+      if(flag) {
+        let child = document.createElement('div');
+        child.innerHTML = '新建分类';
+        child.className = 'type';
+        child.id = 'type-id';
 
-          for(let i = 0; i < left.length; i++) {
-            let span = document.createElement('span');
-            let edit = document.createElement('i');
-            edit.className = 'iconfont icon-bianji';
-            let del = document.createElement('i');
-            del.className = 'iconfont icon-qingkongshanchu';
-            span.appendChild(edit);
-            span.appendChild(del);
-            left[i].appendChild(span);
+        parent.style.paddingBottom = '40px';
 
-            edit.addEventListener('click', e => {
-              window.event ? window.event.cancelBubble = true : e.stopPropagation();
-              let name = edit.parentNode.parentNode.firstElementChild.innerHTML;
-              let index = name.indexOf('（');
-              name = name.slice(0, index);
-              this.typeOptions.forEach(item => {
-                if(item.name == name) {
-                  this.editType(item);
-                }
-              })
-            })
+        parent.appendChild(child);
 
-            del.addEventListener('click', e => {
-              window.event ? window.event.cancelBubble = true : e.stopPropagation();
-              let name = del.parentNode.parentNode.firstElementChild.innerHTML;
-              let index = name.indexOf('（');
-              name = name.slice(0, index);
-              this.typeOptions.forEach(item => {
-                if(item.name == name) {
-                  this.deleteType(item);
-                }
-              })
-            })
-          }
+        child.addEventListener('click', e => { // 打开新建分类
+          let btn = document.getElementsByClassName('is-reverse')[0];
 
-          this.left = true;
+          btn.click();
+          this.$refs.typeModal.open();
+          this.isEdit = false;
+          this.info.name = '';
+          this.info.parentId = '';
+          this.info.id = null;
+        });
 
-        
-          let child = document.createElement('div');
-          child.innerHTML = '新建分类';
-          child.className = 'type';
-          child.id = 'type-id';
+      } else {
+        let child = document.getElementById('type-id')
 
-          parent.style.paddingBottom = '40px';
-
-          parent.appendChild(child);
-
-          child.addEventListener('click', e => { // 打开新建分类
-            let btn = document.getElementsByClassName('is-reverse')[0];
-
-            btn.click();
-            this.$refs.typeModal.open();
-            this.isEdit = false;
-            this.info.name = '';
-            this.info.parentId = '';
-            this.info.id = null;
-          });         
-
-        } else {
-          let child = document.getElementById('type-id')
-
-          parent.removeChild(child);
-        }
-      }, 0)
-    },
-
-    showCascaderChild (item) {
-      setTimeout(() => {
-        let parent = document.getElementsByClassName('el-cascader-menu__item');
-        let count = 0;
-
-        for(let i = 0; i < parent.length; i++) {
-          if(parent[i].id) {
-            if(parent[i].firstElementChild.innerHTML == '全部') continue;
-
-            count++;
-            let editId = `add-${ count }-0`;
-            let delId = `add-${ count }-1`;
-            let right = document.getElementById(editId);
-            if(right) continue;
-
-            let span = document.createElement('span');
-            let edit = document.createElement('i');
-            edit.className = 'iconfont icon-bianji';
-            edit.id = editId;
-            let del = document.createElement('i');
-            del.className = 'iconfont icon-qingkongshanchu';
-            del.id = delId;
-            span.appendChild(edit);
-            span.appendChild(del);
-            parent[i].appendChild(span);
-
-            edit.addEventListener('click', e => {
-              window.event ? window.event.cancelBubble = true : e.stopPropagation();
-              let name = edit.parentNode.firstElementChild.innerHTML;
-              let index = name.indexOf('（');
-              name = name.slice(0, index);
-              this.typeOptions.forEach(item => {
-                if(item.name == name) {
-                  this.editType(item);
-                }
-              })
-            })
-
-            del.addEventListener('click', e => {
-              window.event ? window.event.cancelBubble = true : e.stopPropagation();
-              let name = del.parentNode.firstElementChild.innerHTML;
-              let index = name.indexOf('（');
-              name = name.slice(0, index);
-              this.typeOptions.forEach(item => {
-                if(item.name == name) {
-                  this.deleteType(item);
-                }
-              })
-            })
-          }
-        }
-      }, 0)
-      
+        parent.removeChild(child);
+      }
     },
 
     // 跳转到新建页面
@@ -480,28 +374,11 @@ export default {
       }
     },
 
-    showMsg () {
-      console.log('隐藏的btn');
-    },
-
     // 打开编辑分类
     editType (info) {
-      // let btn = document.getElementById('cascader-hidden');
+      let btn = document.getElementsByClassName('is-reverse')[0];
 
-      // btn.click();
-      let btn = document.activeElement;
-      console.log(btn);
-
-      let input = document.getElementsByClassName('el-input__inner')[1];
-      input.addEventListener('focus', e => {
-        console.log('focus');
-      })
-      input.onfocus = () => {
-        console.log('focus');
-      }
-      input.blur();
-      console.log(input.blur())
-      console.log(input);
+      btn.click();
       this.$refs.typeModal.open();
       this.isEdit = true;
       this.info.name = info.name;
@@ -513,18 +390,39 @@ export default {
 
     // 删除分类
     async deleteType (info) {
-      // let btn = document.getElementsByClassName('is-reverse')[0];
-      // btn.click();
+      let btn = document.getElementsByClassName('is-reverse')[0];
+      btn.click();
       try {
+        if (!await this.$platform.confirm('确定删除该文章分类吗？')) return;
         let params = {
           typeId: info.id
         } 
         let res = await RepositoryApi.deleteDocumentType(params);
         
         if (res.success) {
-          const result = await this.$platform.alert('删除分类成功');
-          if (!result) return;
-          window.location.reload();
+          this.$platform.notification({
+            title: '删除分类成功',
+            type: 'success',
+          });
+          await this.getTypes();
+          await this.getTypesCount();
+          let isEdit = false;
+          this.typeOptions.forEach(item => {  
+            if(item.value == this.params.typeIds[0]) {
+              isEdit = true;
+            }
+            item.children.forEach(child => {
+              if(child.value == this.params.typeIds[0]) {
+                isEdit = true;
+              }
+            })
+          })
+
+          if(!isEdit) {
+            this.params.type = [];
+            this.params.typeIds = [];
+          }
+          this.search();
         } else {
           this.$platform.alert(res.message);
         }
@@ -532,6 +430,7 @@ export default {
         console.error(e);
       }
     },
+
 
     // 提交编辑或添加的分类
     async sumbitType () {
@@ -546,11 +445,18 @@ export default {
 
         if(res.success) {
           let msg = this.isEdit ? '编辑分类成功' : '添加分类成功';
-          const result = await this.$platform.alert(msg);
-          if (!result) return;
-          window.location.reload();
+          this.$platform.notification({
+            title: msg,
+            type: 'success',
+          });
+          await this.getTypes();
+          await this.getTypesCount();
+          this.search();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
         this.isEdit = false;
       } catch (err) {
@@ -762,7 +668,7 @@ export default {
   }
 }
 
-.el-cascader-menus {
+.el-cascader-panel {
   position: relative;
 
   .type {
@@ -773,7 +679,6 @@ export default {
     text-align: center;
     line-height: 40px;
     color: #38A6A6;
-    border-top: 6px solid #eee;
 
     cursor: pointer;
   }

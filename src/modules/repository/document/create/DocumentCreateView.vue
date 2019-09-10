@@ -8,9 +8,9 @@
       <p class="article-error" v-if="articleEmpty">请填写知识库内容！</p>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
-        <button class="base-button green-butn" @click="saveAndSumbit">保存并提交</button>
-        <button class="base-button green-butn" @click="toDraftBox">草稿箱</button>
-        <button class="base-button white-butn" @click="deleteFile" v-if="isEdit">删除</button>
+        <button class="base-button green-butn btn-primary" @click="saveAndSumbit" :disabled="!saveCanClick || pending">保存并提交</button>
+        <button class="base-button green-butn btn-primary" @click="toDraftBox" :disabled="!draftCanClick || pending">草稿箱</button>
+        <button class="base-button white-butn" @click="deleteFile" v-if="isEdit" :disabled="!deleteCanClick || pending">删除</button>
       </div>
     </div>
     <!-- 更新日志，编辑时显示 -->
@@ -62,7 +62,11 @@ export default {
       info: {},
       reportApproveStatus: null,
       loading: false,
-      articleEmpty: false
+      articleEmpty: false,
+      deleteCanClick: true,
+      saveCanClick: true,
+      draftCanClick: true,
+      pending: false
     }
   },
   async created () {
@@ -126,7 +130,10 @@ export default {
             this.setType(this.params.options[0].children[0].value);
           }
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err);
@@ -134,10 +141,11 @@ export default {
       }
     },
 
-    // 保存并提交，新建、编辑调不同的接口
+    // 保存并提交，新建、编辑
     async saveAndSumbit () {
       if(!this.paramsCheck()) return;
       this.isToDraft = false;
+      this.saveCanClick = false;
 
       if(this.initData.wikiConfig.needApprove && this.initData.wikiConfig.approvers && this.initData.wikiConfig.approvers.length > 0) {
         this.$refs.requestApproveDialog.open();
@@ -145,15 +153,24 @@ export default {
       }
 
       try {
-        let params = this.buildParams();        
+        let params = this.buildParams();
+        this.pending = true;        
         let res = await RepositoryApi.saveAndSumbit(params);
+        this.pending = false;
 
         if(res.success) {
           localStorage.removeItem('document_article');
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'success',
+          });
+          this.saveCanClick = true;
           this.openFrame();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -165,6 +182,7 @@ export default {
       if(!this.paramsCheck()) return;
       this.isToDraft = false;
       this.$refs.requestApproveDialog.close();
+      this.saveCanClick = false;
 
       try {
         let otherInfo = this.buildParams();
@@ -173,15 +191,24 @@ export default {
           applyRemark: remark,
           source: 'wiki',
           otherInfo
-        }        
+        }
+        this.pending = true;          
         let res = await RepositoryApi.createApprove(params);
+        this.pending = false;  
 
         if(res.success) {
           localStorage.removeItem('document_article');
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'success',
+          });
+          this.saveCanClick = true;
           this.openFrame();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -192,17 +219,27 @@ export default {
     async toDraftBox () {
       if(!this.paramsCheck()) return;
       this.isToDraft = true;
+      this.draftCanClick = false;
 
       try {
-        let params = this.buildParams();        
+        let params = this.buildParams();
+        this.pending = true;        
         let res = await RepositoryApi.saveDraft(params);
+        this.pending = false;
 
         if(res.success) {
-          this.$platform.alert('文章已保存至草稿箱。')
+          this.$platform.notification({
+            title: '文章已保存至草稿箱。',
+            type: 'success',
+          });
           localStorage.removeItem('document_article');
+          this.draftCanClick = true;
           this.openFrame();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -213,19 +250,29 @@ export default {
     async deleteFile () {
       try {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
-        
+        this.deleteCanClick = false;
+
         let params = {
           wikiId: this.wikiId
         };
 
+        this.pending = true; 
         let res = await RepositoryApi.deleteDocument(params);
+        this.pending = false; 
 
         if(res.success) {
           localStorage.removeItem('document_article');
-          this.$platform.alert('文章已删除成功。')
+          this.$platform.notification({
+            title: '文章已删除成功。',
+            type: 'success',
+          });
+          this.deleteCanClick = true;
           this.openFrame();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
 
       } catch (e) {
@@ -251,7 +298,8 @@ export default {
 
     getInput (html) {
       this.articleHtml = html;
-      this.articleEmpty = !this.$refs.editor.hasValidText();
+      let img = this.articleHtml.indexOf('<img') != -1;
+      this.articleEmpty = !this.$refs.editor.hasValidText() && !img;
     },
 
     // 编辑时获取文章信息
@@ -259,7 +307,8 @@ export default {
       if(this.isEdit) {
         try{
           let params = {
-            wikiId: this.wikiId
+            wikiId: this.wikiId,
+            updateReadTimes: false
           }
           let res = await RepositoryApi.getInlineDetail(params);
           this.loading = false;
@@ -274,7 +323,10 @@ export default {
             this.info = detail;
             this.setType(detail.typeId);
           } else {
-            this.$platform.alert(res.message)
+            this.$platform.notification({
+              title: res.message,
+              type: 'error',
+            });
           }
         } catch(err) {
           console.error(err)
@@ -347,13 +399,13 @@ export default {
 
     // 参数校验，标题、内容不允许为空
     paramsCheck () {
-      this.$refs.textTitle.submit();
-      if(!this.$refs.editor.hasValidText()) {
+      this.$refs.textTitle.titleCheck();
+      if(!this.$refs.editor.hasValidText() && this.params.article.indexOf('<img') == -1) {
         this.articleEmpty = true;
       }
 
-      if(!this.$refs.textTitle.submit()) return false;
-      if(!this.$refs.editor.hasValidText()) {
+      if(!this.$refs.textTitle.titleCheck()) return false;
+      if(this.articleEmpty) {
         return false;
       }
       return true;
@@ -405,6 +457,10 @@ export default {
 
       .green-butn {
         margin-right: 15px;
+
+        &:disabled {
+          cursor: not-allowed;
+        }
       }
 
       .white-butn {
@@ -416,6 +472,11 @@ export default {
           border-color: #55B7B4;
           background: #66bebc;
           color: #fff;
+        }
+
+        &:disabled {
+          opacity: 0.65 !important;
+          cursor: not-allowed;
         }
       }
     }

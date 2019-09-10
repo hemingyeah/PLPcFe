@@ -14,7 +14,7 @@
         </div>
 
         <div class="author right" v-if="detail.createTime != detail.updateTime">
-          <img class="author-img" :src="detail.updateUserHead" v-if="detail.createUserHead">
+          <img class="author-img" :src="detail.updateUserHead" v-if="detail.updateUserHead">
           <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
           <div class="author-info">
             <p class="name">{{detail.updateUserName}}</p>
@@ -25,14 +25,14 @@
 
       <div class="operating" v-if="!isReview">
 
-        <div class="published" v-if="!detail.isDraft">
+        <!-- <div class="published" v-if="!detail.isDraft">
           <span class="permission">
             <i class="iconfont icon-suo icon-permission" v-if="!detail.allowShare"></i>
             <i class="iconfont icon-unie65b icon-permission" v-else></i>
             {{!detail.allowShare ? '内部' : '外部'}}
           </span>
           <span class="readNum">阅读（{{detail.readTimes}}）</span>
-        </div>
+        </div> -->
 
         <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
           <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
@@ -51,7 +51,7 @@
           <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
 
           <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
-          <button class="base-button green-btn" @click="revoke" v-if="revokeShow" style="margin-left:5px">撤回审批</button>
+          <button class="base-button green-btn" @click="revoke" v-if="detail.examineState == 1 && revokeShow" style="margin-left:5px">撤回审批</button>
         </div>
         
 
@@ -60,7 +60,6 @@
       <div class="operating" v-else>
         <button class="base-button green-btn" @click="approve">审批</button>
         <button class="base-button green-btn" @click="revoke" v-if="revokeShow" style="margin-left:5px">撤回审批</button>
-        <!-- <button class="base-button white-btn" @click="show = true">拒绝</button> -->
       </div>
     </div>
 
@@ -83,8 +82,6 @@
           <el-tag class="detail-tag" v-for="(tag,index) in detail.label" :key="index">{{tag}}</el-tag>
         </div>
 
-        <!-- <div class="dividing-line" v-if="detail.label && detail.label.length > 0"></div> -->
-
         <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
@@ -104,7 +101,6 @@
       title=" ">
 
       <div>
-        <i class="iconfont icon-jinggao share-icon"></i>
         <p>请选择分享方式</p>
       </div>
 
@@ -250,7 +246,10 @@ export default {
             this.revokeShow = true;
           }
         } else {
-          this.$platform.alert(res.message)
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -261,7 +260,8 @@ export default {
     async getDocumnetDetail () {
       try{
         let params = {
-          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
+          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null),
+          updateReadTimes: true
         }
         if(!params.wikiId) {
           this.detail = null;
@@ -291,7 +291,10 @@ export default {
             }
           }
         } else {
-          this.$platform.alert(res.message)
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch(err) {
         console.error(err)
@@ -315,7 +318,6 @@ export default {
 
     // 点击加号显示标签输入框
     choosePerson () {
-      // this.$refs.notificationRange.$el.click();
       let max = -1;
       
       let options = {
@@ -324,7 +326,6 @@ export default {
         selectedUsers: this.shareInfo.selectedUsers,
         max,
         action: '/wiki/approver/list',
-        departShow: false,
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){
@@ -348,9 +349,15 @@ export default {
         let res = await RepositoryApi.shareDocument(this.detail.id, userIds);
 
         if(res.success) {
-          this.$platform.alert('分享成功，该分享人员将会收到消息通知');
+          this.$platform.notification({
+            title: '分享成功，该分享人员将会收到消息通知',
+            type: 'success',
+          });
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch(err) {
         console.error(err)
@@ -373,6 +380,7 @@ export default {
 
     outlineShare () {
       // 外部文章选择外部分享时
+      let _this = this;
       this.shareBoxShow = false;
       let protocol = window.location.protocol;
       let host = window.location.host;
@@ -401,11 +409,17 @@ export default {
       });
 
       clipboard.on('success', function(e) {
-        alert('已将链接复制到剪贴板，快去粘贴吧！');
+        _this.$platform.notification({
+          title: '已将链接复制到剪贴板，快去粘贴吧！',
+          type: 'success',
+        });
       });
 
       clipboard.on('error', function(e) {
-        alert('分享失败，请重新操作');
+        _this.$platform.notification({
+          title: '分享失败，请重新操作',
+          type: 'error',
+        });
       });
       // 点击按钮
       agent.click();
@@ -418,7 +432,8 @@ export default {
     async editArticle () {
       try{
         let params = {
-          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null)
+          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null),
+          updateReadTimes: false
         }
         let res = await RepositoryApi.getInlineDetail(params);
 
@@ -426,7 +441,10 @@ export default {
           let detail = res.result;
 
           if(detail.isLock && detail.examineState != 1) {
-            this.$platform.alert('该文章正在被编辑，需要等待他编辑完成后才能继续编辑。')
+            this.$platform.notification({
+              title: '该文章正在被编辑，需要等待他编辑完成后才能继续编辑。',
+              type: 'error',
+            });
           } else {
             let fromId = window.frameElement.getAttribute('id');
       
@@ -440,7 +458,10 @@ export default {
             });
           }
         } else {
-          this.$platform.alert(res.message)
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch(err) {
         console.error(err)
@@ -459,7 +480,10 @@ export default {
         let res = await RepositoryApi.deleteDocument(params);
 
         if(res.success) {
-          this.$platform.alert('文章已删除成功。')
+          this.$platform.notification({
+            title: '文章已删除成功。',
+            type: 'success',
+          });
 
           if(!this.showOpenFrame) {
             let id = window.frameElement.dataset.id;
@@ -478,7 +502,10 @@ export default {
             this.$emit('search');
           }
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
 
       } catch (e) {
@@ -507,7 +534,10 @@ export default {
             this.$emit('search');
           }
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
 
       } catch (e) {

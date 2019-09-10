@@ -39,10 +39,12 @@
           <div class="footer-right" v-if="!item.isDraft">
             <span class="permission">
               <i class="iconfont icon-suo icon-permission" v-if="!item.allowShare"></i>
-              <i class="iconfont icon-unie65b icon-permission" v-else></i>
               {{!item.allowShare ? '内部' : '外部'}}
             </span>
-            <span class="readNum">阅读（{{item.readTimes}}）</span>
+            <span class="readNum">
+              <i class="iconfont icon-yanjing"></i>
+              <span>（{{item.readTimes}}）</span>
+            </span>
           </div>
 
         </div>
@@ -58,7 +60,6 @@
       title=" ">
 
       <div>
-        <i class="iconfont icon-jinggao share-icon"></i>
         <p>请选择分享方式</p>
       </div>
 
@@ -114,7 +115,6 @@ export default {
         selectedUsers: this.shareInfo.selectedUsers,
         max,
         action: '/wiki/approver/list',
-        departShow: false,
       };
       return this.$fast.contact.choose('dept', options).then(result => {
         if(result.status == 0){
@@ -138,9 +138,16 @@ export default {
         let res = await RepositoryApi.shareDocument(item.id, userIds);
 
         if(res.success) {
+          this.$platform.notification({
+            title: '分享成功，该分享人员将会收到消息通知',
+            type: 'success',
+          });
           this.$platform.alert('分享成功，该分享人员将会收到消息通知');
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch(err) {
         console.error(err)
@@ -165,6 +172,7 @@ export default {
     // 外部分享，将连接添加至剪切板
     outlineShare () {
       // 外部文章选择外部分享时
+      let _this = this;
       this.shareBoxShow = false;
       let protocol = window.location.protocol;
       let host = window.location.host;
@@ -177,7 +185,6 @@ export default {
       copyFrom.setAttribute('id', 'target');
       copyFrom.setAttribute('target', '_blank');
       copyFrom.setAttribute('href', url);
-      let name = 'http://文档分享'
       copyFrom.innerHTML = url;
 
       body.appendChild(copyFrom);
@@ -195,11 +202,17 @@ export default {
       });
 
       clipboard.on('success', function(e) {
-        alert('已将链接复制到剪贴板，快去粘贴吧！');
+        _this.$platform.notification({
+          title: '已将链接复制到剪贴板，快去粘贴吧！',
+          type: 'success',
+        });
       });
 
       clipboard.on('error', function(e) {
-        alert('分享失败，请重新操作');
+        _this.$platform.notification({
+          title: '分享失败，请重新操作',
+          type: 'success',
+        });
       });
       // 点击按钮
       agent.click();
@@ -336,6 +349,15 @@ export default {
           font-size: 14px;
           color: #B0BCC3;
           margin-right: 3px;
+        }
+
+        .readNum {
+
+          .icon-yanjing {
+            font-size: 12px;
+            color: #B0BCC3;
+            margin-left: 8px;
+          }
         }
       }
 

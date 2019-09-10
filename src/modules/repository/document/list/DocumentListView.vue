@@ -121,7 +121,10 @@ export default {
           this.toDetail(this.listMsg.list[0]);
 
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err);

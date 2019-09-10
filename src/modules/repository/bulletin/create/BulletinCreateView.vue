@@ -4,11 +4,11 @@
       <!-- 顶部文章属性 -->
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
-      <base-editor v-model="params.article" @input="getInput"></base-editor>
-      <p class="article-error" v-if="articleEmpty">请填写知识库内容！</p>
+      <base-editor v-model="params.article" @input="getInput" ref="editor"></base-editor>
+      <p class="article-error" v-if="articleEmpty">请填写通知公告内容！</p>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
-        <button class="base-button green-butn" @click="sumbit">发布</button>
+        <button class="base-button green-butn btn-primary" @click="sumbit" :disabled="sumbtting || pending">发布</button>
         <button class="base-button white-butn" @click="deleteFile" v-if="isEdit">删除</button>
       </div>
     </div>
@@ -33,6 +33,7 @@ export default {
     return {
       params: {
         title: '', // 文章标题
+        rule: true,
         article: '', // 文章内容
         form: {}, // 附件
         typeId: null, // 文章分类
@@ -49,10 +50,12 @@ export default {
       noticeId: null,
       info: {},
       loading: false,
-      articleEmpty: false
+      articleEmpty: false,
+      sumbtting: false,
+      pending: false
     }
   },
-  mounted () {
+  created () {
     this.getArticle();
     this.saveArticle();
     this.getTypes();
@@ -79,7 +82,10 @@ export default {
             this.params.typeId = this.params.options[0].id;
           }
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err);
@@ -87,7 +93,7 @@ export default {
       }
     },
 
-    // 新建、编辑文章提交操作
+    // 新建文章提交操作
     async sumbit () {
       let result = await this.paramsCheck()
       if(!result) return;
@@ -95,17 +101,27 @@ export default {
         let result = await this.$platform.confirm('您选择的通知范围不包含任何人，将不会发出通知，是否继续！');
         if(!result) return;
       }
+      this.sumbtting = true;
 
       try {
         let params = this.buildParams();
+        this.pending = true; 
         let res = await RepositoryApi.createBulletin(params);
+        this.pending = false; 
 
         if(res.success) {
           localStorage.removeItem('bulletin_article');
-          this.$platform.alert('文章已发布成功。');
+          this.$platform.notification({
+            title: '文章已发布成功。',
+            type: 'success',
+          });
+          this.sumbtting = false;
           this.openFrame();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -121,11 +137,17 @@ export default {
         }
         let res = await RepositoryApi.deleteBulletin(params);
         if(res.success) {
-          this.$platform.alert('文章删除成功');
+          this.$platform.notification({
+            title: '文章删除成功.',
+            type: 'success',
+          });
           localStorage.removeItem('bulletin_article');
           this.openFrame();
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (e) {
         console.error(e);
@@ -151,7 +173,8 @@ export default {
     // 获取带格式的文章内容
     getInput (html) {
       this.articleHtml = html;
-      this.articleEmpty = !this.$refs.editor.hasValidText();
+      let img = this.articleHtml.indexOf('<img') != -1;
+      this.articleEmpty = !this.$refs.editor.hasValidText() && !img;
     },
 
     // 获取缓存的文章信息
@@ -171,39 +194,25 @@ export default {
           })
         }
         this.isSave = false
-      }, 1000 * 60 * 5)
+      }, 1000 * 6)
     },
 
     // 参数校验，标题、内容不允许为空
     async paramsCheck () {
-      this.$refs.textTitle.submit();
+      this.$refs.textTitle.titleCheck();
       this.$refs.textTitle.rangeCheck();
-      if(!this.$refs.editor.hasValidText()) {
+      if(!this.$refs.editor.hasValidText() && this.params.article.indexOf('<img') == -1) {
         this.articleEmpty = true;
       }
-      if(!this.$refs.textTitle.submit()) {
+      if(!this.$refs.textTitle.titleCheck()) {
         return false;
       }
       if(!this.$refs.textTitle.rangeCheck()) {
         return false;
       }
-      if(!this.$refs.editor.hasValidText()) {
+      if(this.articleEmpty) {
         return false;
       }
-      // if(!this.params.title) {
-      //   this.$platform.alert('请填写通知公告标题！');
-      //   return false;
-      // }
-      // if(this.params.title.length > 100) {
-      //   this.$platform.alert('标题不能超过100字！');
-      //   return false;
-      // }
-      // this.$refs.textTitle.titleCheck();
-      
-      // if(this.params.selectedUsers.length <= 0 && this.params.selectedDepts.length <= 0) {
-      //   this.$platform.alert('请选择通知范围！');
-      //   return false;
-      // }
       
       return true;
     },
@@ -310,6 +319,10 @@ export default {
 
       .green-butn {
         margin-right: 15px;
+
+        &:disabled {
+          cursor: not-allowed;
+        }
       }
 
       .white-butn {

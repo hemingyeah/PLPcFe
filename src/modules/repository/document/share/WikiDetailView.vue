@@ -41,8 +41,6 @@
           <el-tag class="detail-tag" v-for="(tag,index) in initData.label" :key="index">{{tag}}</el-tag>
         </div>
 
-        <!-- <div class="dividing-line" v-if="detail.label && detail.label.length > 0"></div> -->
-
         <div class="annex" v-if="initData.attachment && initData.attachment.length > 0">
           <span class="annex-left">附件：</span>
           <div class="annex-right">
@@ -78,7 +76,8 @@ export default {
     },
 
     padding () {
-      return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
+      return document.body.clientWidth < 550 ? '0 20px 20px' : '0 100px 50px';
+      // return this.showOpenFrame ? '0 50px 50px' : '0 100px 50px';
     }
   },
 }
@@ -98,7 +97,7 @@ export default {
     display: flex;
     justify-content: space-between;
     height: 75px;
-    padding: 16px 24px 16px 16px;
+    padding: 16px 10px 16px 16px;
     border-bottom: 1px solid #E8EFF0;
     box-sizing: border-box;
 
@@ -136,7 +135,7 @@ export default {
 
       .published {
         display: inline-block;
-        margin-right: 10px;
+        // margin-right: 10px;
       }
 
       .draftBox {
@@ -151,7 +150,7 @@ export default {
       }
 
       .readNum {
-        margin: 0 20px;
+        margin: 0 10px;
       }
 
       .management {
@@ -308,6 +307,10 @@ export default {
           vertical-align: top;
           display: inline-block;
           padding: 8px;
+
+          .base-file__preview {
+            max-width: calc(100vw - 130px);
+          }
 
           a {
             color: #333;

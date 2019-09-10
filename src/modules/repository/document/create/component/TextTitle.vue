@@ -2,21 +2,18 @@
   <div class="document-create-title">
     <el-form :model="params" :rules="rules" ref="ruleForm">
 
-      <el-form-item label="标题：" class="create-item item-title" prop='title'>
-        <!-- <span style="color:red">*</span> -->
+      <el-form-item label="标题：" class="create-item item-title" prop='permission'>
         <el-input class="title" v-model="params.title" @blur="titleCheck"></el-input>
-        <!-- <input class="title" v-model="params.title" ref="input" /> -->
       </el-form-item>
-      <p class="title-error" v-if="msg"></p>
+      <p class="title-error" v-if="params.title && params.title.length > 100">标题不能超过100个字符！</p>
+      <p class="title-error" v-if="msg && !params.title">请填写知识库标题！</p>
 
       <el-form-item label="分类：" class="create-item" prop="typeId">
-        <!-- <span style="color:red">*</span> -->
         <el-cascader :options="params.options" class="type" v-model="params.typeId" filterable>
         </el-cascader>
       </el-form-item>
 
       <el-form-item label="权限：" class="create-item" prop="permission">
-        <!-- <span style="color:red">*</span> -->
         <el-radio-group v-model="params.permission">
           <el-radio :label="'内部'" :disabled = "!params.permitShare">
             内部
@@ -40,6 +37,7 @@
           <i class="iconfont icon-jia icon-addTags"></i>
         </div>
       </el-form-item>
+      <p class="title-error" v-if="tagValue && tagValue.length > 10">标签最多只支持10个字符。</p>
 
       <el-form-item label="附件列表：" class="create-item">
         <div class="file">
@@ -83,7 +81,7 @@ export default {
       rules: {
         title: [
           { required: true, message: '请填写知识库标题！', trigger: 'blur' },
-          { max: 100, message: '标题不能超过100字！', trigger: 'blur' }
+          { max: 100, message: '标题不能超过100个字符！', trigger: 'blur' }
         ],
         typeId: [
           { required: true, message: '请选择知识库分类', trigger: 'change' }
@@ -116,8 +114,6 @@ export default {
       if(this.tagValue) {
         if (this.tagValue.length <= 10) {
           this.params.label.push(this.tagValue);
-        } else {
-          this.$platform.alert('标签最多只支持10个字符。');
         }
       }
       this.inputVisible = false;
@@ -196,21 +192,10 @@ export default {
         return false;
       }
       if(this.params.title.length > 100) {
-        this.msg = '标题不能超过100字！';
         return false;
       }
+      return true;
     },
-
-    submit () {
-      let result;
-      this.$refs.ruleForm.validate((valid) => {
-        if (!valid) {
-          this.msg = true;
-        }
-        result = valid;
-      });
-      return result;
-    }
   }
 }
 </script>

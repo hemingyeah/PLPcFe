@@ -185,7 +185,10 @@ export default {
             this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
           }
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -201,7 +204,10 @@ export default {
           this.reads.reads = res.result.reads;
           this.reads.unreads = res.result.unreads;
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -215,7 +221,10 @@ export default {
         if(res.success) {
           this.reads.reads = res.result;
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -229,7 +238,10 @@ export default {
         if(res.success) {
           this.reads.unreads = res.result;
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (err) {
         console.error(err)
@@ -302,7 +314,10 @@ export default {
         if (!await this.$platform.confirm('确定删除该文章吗？')) return;
         let res = await RepositoryApi.deleteBulletin(this.params);
         if(res.success) {
-          this.$platform.alert('文章已删除成功。')
+          this.$platform.notification({
+            title: '文章已删除成功。',
+            type: 'success',
+          });
 
           if(!this.showOpenFrame) {
             let id = window.frameElement.dataset.id;
@@ -321,7 +336,10 @@ export default {
             this.$emit('search');
           }
         } else {
-          this.$platform.alert(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (e) {
         console.error(e);

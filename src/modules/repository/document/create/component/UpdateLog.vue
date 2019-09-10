@@ -54,7 +54,10 @@ export default {
             item.createTime = Lang.formatDate(time, 'YYYY-MM-DD HH:mm:ss');
           })
         } else {
-          this.$platform.alert(res.message)
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch(err) {
         console.error(err)
@@ -75,7 +78,10 @@ export default {
             item.createTime = Lang.formatDate(time, 'YYYY-MM-DD HH:mm:ss');
           })
         } else {
-          this.$platform.alert(res.message)
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
         }
       } catch (error) {
         console.error(error)
