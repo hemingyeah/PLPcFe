@@ -15,16 +15,16 @@
 
         <div class="operating">
 
-          <div class="common">
+          <!-- <div class="common">
             <span class="item-num">已读（{{detail.readNum}}）</span>
             <span class="item-num">未读（{{detail.unreadNum}}）</span>
-          </div>
+          </div> -->
 
           <span class="management" v-if="allowEdit">
             <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('delete')"></i>
           </span>
 
-          <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
+          <span class="open" @click="openFrame" v-if="isList">新页面打开</span>
 
         </div>
       </div>
@@ -124,6 +124,10 @@ export default {
     infoEdit: {
       type: Object,
       default: () => ({})
+    },
+    isList: {
+      type: Boolean,
+      default: false,
     }
   },
   data () {
@@ -131,7 +135,6 @@ export default {
       allowEdit: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3 : this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
       noticeId: '',
       form: this.buildForm(), // 附件存储格式
-      showOpenFrame: true, // 是否显示 新页面打开
       params: {
         noticeId: ''
       },
@@ -149,13 +152,6 @@ export default {
   },
   mounted () {
     this.getId();
-    // 根据formId来判断是否是在新页面打开
-    if(!window.frameElement) {
-      this.showOpenFrame = false;
-      return;
-    }
-    let formId = window.frameElement.getAttribute('id');
-    if(formId.indexOf('bulletin_detail') != -1) this.showOpenFrame = false; 
   },
   methods: {
     getId () {
@@ -164,7 +160,6 @@ export default {
         let params = array[1].split('=');
         if(params[0] == 'noticeId') {
           this.noticeId = params[1];
-          this.showOpenFrame = false;
         }
         this.getBulletinDetail();
         this.getReadPerson();
@@ -316,7 +311,7 @@ export default {
             type: 'success',
           });
 
-          if(!this.showOpenFrame) {
+          if(!this.isList) {
             let id = window.frameElement.dataset.id;
             this.$platform.closeTab(id);
 
@@ -353,11 +348,11 @@ export default {
   },
   computed: {
     height () {
-      return this.showOpenFrame ? '100%' : '100vh';
+      return this.isList ? '100%' : '100vh';
     },
 
     padding () {
-      return this.showOpenFrame ? '0 50px' : '0 100px';
+      return this.isList ? '0 50px' : '0 100px';
     },
 
     marginLeft () {

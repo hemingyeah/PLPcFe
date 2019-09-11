@@ -111,7 +111,7 @@ export default {
               type: 'success',
             });
 
-            if(this.approveData.showOpenFrame) {
+            if(this.approveData.isList) {
               this.$parent.search();
               return;
             }

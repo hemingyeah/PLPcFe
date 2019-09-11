@@ -18,7 +18,7 @@
 
       <!-- 右侧详情 -->
       <div class="bulletin-list-right">
-        <bullet-detail :info="info" :infoEdit="initData.userInfo.authorities" @search="search" ref="bulletinDetail"></bullet-detail>
+        <bullet-detail :info="info" :infoEdit="initData.userInfo.authorities" :isList="true" @search="search" ref="bulletinDetail"></bullet-detail>
       </div>
     </div>
 

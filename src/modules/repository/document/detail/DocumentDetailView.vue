@@ -40,7 +40,7 @@
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
 
-            <span class="open" @click="openFrame();trackEventHandler('open')" v-if="showOpenFrame">新页面打开</span>
+            <span class="open" @click="openFrame();trackEventHandler('open')" v-if="isList">新页面打开</span>
 
             <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
             <button class="base-button green-btn" @click="revoke" v-if="detail.examineState == 1 && revokeShow" style="margin-left:5px">撤回审批</button>
@@ -135,6 +135,10 @@ export default {
     infoEdit: {
       type: Object,
       default: () => ({})
+    },
+    isList: {
+      type: Boolean,
+      default: false,
     }
   },
   components: {
@@ -145,7 +149,6 @@ export default {
       allowEdit: this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
       form: this.buildForm(), // 附件存储格式
       wikiId: '', // 通知公告id
-      showOpenFrame: true, // 是否显示 新页面打开
       showDetailApprove: false,
       approveData: {},
       isReview: false,
@@ -174,13 +177,6 @@ export default {
   },
   mounted () {
     this.getId();
-    // 根据formId来判断是否是在新页面打开
-    if(!window.frameElement) {
-      this.showOpenFrame = false;
-      return;
-    }
-    let formId = window.frameElement.getAttribute('id');
-    if(formId.indexOf('document_detail') != -1) this.showOpenFrame = false;
   },
   methods: {
     buildForm(){
@@ -232,7 +228,7 @@ export default {
           this.approveData.approvers.forEach(item => {
             if(item.userId == this.initData.userInfo.userId) this.showDetailApprove = true;
           })
-          this.approveData.showOpenFrame = this.showOpenFrame;
+          this.approveData.isList = this.isList;
           if(this.detail.originalId) {
             this.approveData.wikiId = this.detail.originalId;
           }
@@ -260,7 +256,6 @@ export default {
         if(!params.wikiId) {
           this.detail = null;
           this.detailShow = false;
-          console.log(this.detailShow)
           return;
         }
         this.loading = true;
@@ -482,7 +477,7 @@ export default {
             type: 'success',
           });
 
-          if(!this.showOpenFrame) {
+          if(!this.isList) {
             let id = window.frameElement.dataset.id;
             this.$platform.closeTab(id);
 
@@ -529,7 +524,7 @@ export default {
         let res = await RepositoryApi.revoke(params);
 
         if(res.success) {
-          if(!this.showOpenFrame) {
+          if(!this.isList) {
             window.location.reload();
           } else {
             this.$emit('search');
@@ -565,11 +560,11 @@ export default {
   },
   computed: {
     height () {
-      return this.showOpenFrame ? '100%' : '100vh';
+      return this.isList ? '100%' : '100vh';
     },
 
     padding () {
-      return this.showOpenFrame ? '0 50px' : '0 100px';
+      return this.isList ? '0 50px' : '0 100px';
     },
 
     fontClass () {
