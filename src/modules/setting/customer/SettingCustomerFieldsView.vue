@@ -18,9 +18,12 @@
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
 import platform from '@src/platform';
+/* mixin */
+import fieldMixin from '@src/mixins/fieldMixin';
 
 export default {
   name: 'setting-customer-fields-view',
+  mixins: [fieldMixin],
   props: {
     initData: {
       type: Object,
@@ -36,6 +39,9 @@ export default {
       pending: false,
       maxField: this.initData.fieldNum
     }
+  },
+  mounted(){
+    this.setFieldDesignHeight();
   },
   methods: {
     back(){
@@ -116,40 +122,4 @@ body{
     font-size: 12px;
   }
 }
-
-.form-design-center {
-  background: url('./../../../assets/img/iphoneX.png') no-repeat center 0;
-  background-size: 100%;
-
-  position: relative;
-  height: 720px;
-  width: 370px;
-
-  margin: 0 auto;
-
-  .form-design-phone {
-    position: absolute;
-    top: 72px;
-    left: 20px;
-    right: 23px;
-    bottom: 22px;
-
-    height: calc(100% - 80px);
-    width: calc(100% - 50px);
-
-    border-radius: 0 0 35px 35px;
-    border: 1px solid #edf0f4;
-    border-top: none;
-    background-color: #edf0f4;
-    box-shadow: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-  }
-
-
-}
-
 </style>

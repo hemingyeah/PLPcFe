@@ -18,9 +18,12 @@
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
 import platform from '@src/platform';
+/* mixin */
+import fieldMixin from '@src/mixins/fieldMixin';
 
 export default {
   name: 'setting-product-fields-view',
+  mixins: [fieldMixin],
   props: {
     initData: {
       type: Object,
@@ -37,6 +40,9 @@ export default {
       pending: false,
       maxField: this.initData.fieldNum
     }
+  },
+  mounted(){
+    this.setFieldDesignHeight();
   },
   methods: {
     back(){
