@@ -1,7 +1,7 @@
 <template>
   <div class="bulletin-list-view" v-loading.fullscreen.lock="loading">
     <!-- 搜索部分 -->
-    <list-search class="list-search" @search="search" :total="listTotal" :infoEdit="initData.userInfo.authorities"></list-search>
+    <list-search class="list-search" @search="search" :total="listTotal" :infoEdit="initData.userInfo.authorities" ref="listSearch"></list-search>
 
     <div class="bulletin-list-bottom">
       <!-- 左侧列表 -->
@@ -64,10 +64,8 @@ export default {
     [ListFooter.name]: ListFooter,
     [BulletinDetailView.name]: BulletinDetailView
   },
-  created () {
-    this.search()
-  },
   mounted () {
+    this.search()
     window.__exports__refresh = this.search;
   },
   methods: {
@@ -76,6 +74,7 @@ export default {
       if(flag) {
         localStorage.setItem('notice_pageSize', this.params.pageSize);
       }
+      this.$refs.listSearch.getTypes();
       try {
         this.loading = true;
         let res = await RepositoryApi.getBulletinList(this.params);

@@ -81,11 +81,9 @@ export default {
     [DocumentDetailView.name]: DocumentDetailView
   },
 
-  created () {
-    this.search()
-  },
 
   mounted () {
+    this.search()
     window.__exports__refresh = this.search;
   },
 
@@ -96,6 +94,8 @@ export default {
       if(flag) {
         localStorage.setItem('wiki_pageSize', this.params.pageSize);
       }
+      this.$refs.listSearch.initView();
+      this.$refs.listSearch.getTypes();
       try {
         this.loading = true;
         let res = await RepositoryApi.getDocumentList(this.params);

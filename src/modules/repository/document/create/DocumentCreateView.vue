@@ -71,6 +71,7 @@ export default {
     }
   },
   async created () {
+    this.getId();
     let detail = JSON.parse(localStorage.getItem('document_article'));
     if (detail && !this.isEdit) {
       this.isSaveData = true;
@@ -83,7 +84,6 @@ export default {
       }
     }
     if(!this.isEdit) this.saveArticle();
-    this.getId();
     await this.getTypes();
     if(this.isEdit) this.getArticle();
   },
