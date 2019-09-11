@@ -146,7 +146,7 @@ export default {
   },
   data () {
     return {
-      allowEdit: this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
+      allowEdit: false,
       form: this.buildForm(), // 附件存储格式
       wikiId: '', // 通知公告id
       showDetailApprove: false,
@@ -272,6 +272,15 @@ export default {
             this.detail.createTimeShow = Lang.fmt_gmt_time(this.detail.createTime);
             if(this.detail.updateTime) {
               this.detail.updateTimeShow = Lang.fmt_gmt_time(this.detail.updateTime);
+            }
+            if(this.initData.userInfo.authorities.INFO_EDIT) {
+              this.allowEdit = true;
+            } else {
+              if(this.detail.createUser == this.initData.userInfo.userId && this.initData.userInfo.authorities.INFO_CREATE == 3) {
+                this.allowEdit = true;
+              } else {
+                this.allowEdit = false;
+              }
             }
             if(this.isReview) {
               this.getApproveDetail();
