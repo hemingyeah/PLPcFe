@@ -136,7 +136,7 @@ export default {
         label: '权限变更'
       }, {
         value: 'notice',
-        label: '通知公告'
+        label: '信息公告'
       }, {
         value: 'wiki',
         label: '知识库'

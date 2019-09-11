@@ -160,7 +160,7 @@ export default {
       
       this.$platform.openTab({
         id: 'bulletin_create',
-        title: '通知公告新建',
+        title: '信息公告新建',
         url: '/info/notice/create/page',
         reload: true,
         close: true,
@@ -353,15 +353,15 @@ export default {
     // TalkingData事件埋点
     trackEventHandler (type) {
       if (type === 'create') {
-        window.TDAPP.onEvent('pc：通知公告列表-新建事件');
+        window.TDAPP.onEvent('pc：信息公告列表-新建事件');
         return;
       }
       if (type === 'search') {
-        window.TDAPP.onEvent('pc：通知公告列表-搜索事件');
+        window.TDAPP.onEvent('pc：信息公告列表-搜索事件');
         return;
       }
       if (type === 'reset') {
-        window.TDAPP.onEvent('pc：通知公告列表-重置事件');
+        window.TDAPP.onEvent('pc：信息公告列表-重置事件');
         return;
       }
     }

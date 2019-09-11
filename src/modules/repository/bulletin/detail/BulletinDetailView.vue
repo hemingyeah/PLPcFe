@@ -1,94 +1,102 @@
 <template>
-  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detail && detail.title" v-loading.fullscreen.lock="loading">
-    <!-- 详情头部 -->
-    <div class="detail-top">
+  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detailShow" v-loading.fullscreen.lock="loading">
+    <template v-if="detail && detail.title">
+      <!-- 详情头部 -->
+      <div class="detail-top">
 
-      <div class="author">
-        <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
-        <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
-        <div class="author-info">
-          <p class="name">{{detail.createUserName}}</p>
-          <p class="time">发布于：{{detail.createTime | fmt_datehour}}</p>
-        </div>
-      </div>
-
-      <div class="operating">
-
-        <div class="common">
-          <span class="item-num">已读（{{detail.readNum}}）</span>
-          <span class="item-num">未读（{{detail.unreadNum}}）</span>
-        </div>
-
-        <span class="management" v-if="allowEdit">
-          <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('delete')"></i>
-        </span>
-
-        <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
-
-      </div>
-    </div>
-
-    <!-- 文章详情 -->
-    <div class="detail-content" :style="{padding: padding}">
-
-      <div class="info">
-        <p class="title">{{detail.title}}</p>
-        <div class="ql-container ql-snow content" style="border:none">
-          <div class="ql-editor">
-            <div v-html="detail.content"></div>
+        <div class="author">
+          <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
+          <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
+          <div class="author-info">
+            <p class="name">{{detail.createUserName}}</p>
+            <p class="time">发布于：{{detail.createTime | fmt_datehour}}</p>
           </div>
         </div>
-      </div>
-      <!-- 详情页脚部分 -->
-      <div class="footer" v-if="(reads.reads.length > 0 || reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)">
-        <!-- 已读、未读人员显示 -->
-        <div class="person">
 
-          <div class="read-person" v-if="reads.reads.length > 0">
-            <span class="title">已读</span>
-            <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
-              <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
-              <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
-            </el-tooltip>
-            <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">{{reads.reads.length < 105 ? reads.reads.length - 5 : '99+'}}
-              <div class="see-more" v-if="showMoreRead" ref="seeMore">
+        <div class="operating">
+
+          <div class="common">
+            <span class="item-num">已读（{{detail.readNum}}）</span>
+            <span class="item-num">未读（{{detail.unreadNum}}）</span>
+          </div>
+
+          <span class="management" v-if="allowEdit">
+            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('delete')"></i>
+          </span>
+
+          <span class="open" @click="openFrame" v-if="showOpenFrame">新页面打开</span>
+
+        </div>
+      </div>
+
+      <!-- 文章详情 -->
+      <div class="detail-content" :style="{padding: padding}">
+
+        <div class="info">
+          <p class="title">{{detail.title}}</p>
+          <div class="ql-container ql-snow content" style="border:none">
+            <div class="ql-editor">
+              <div v-html="detail.content"></div>
+            </div>
+          </div>
+        </div>
+        <!-- 详情页脚部分 -->
+        <div class="footer" v-if="(reads.reads.length > 0 || reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)">
+          <!-- 已读、未读人员显示 -->
+          <div class="person">
+
+            <div class="read-person" v-if="reads.reads.length > 0">
+              <span class="title">已读</span>
+              <div class="read-img">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
-                  <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
-                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
+                  <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
+                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
                 </el-tooltip>
+                <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">
+                  <span class="more-point">···</span>
+                  <div class="see-more" v-if="showMoreRead" ref="seeMore">
+                    <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
+                      <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
+                      <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
+                    </el-tooltip>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="read-person" v-if="reads.unreads.length > 0">
-            <span class="title right" :style="{marginLeft: marginLeft}">未读</span>
-            <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
-              <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
-              <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
-            </el-tooltip>
-            <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">{{reads.unreads.length < 105 ? reads.unreads.length - 5 : '99+'}}
-              <div class="see-more right" v-if="showMoreNoRead" ref="seeMore">
+            <div class="read-person" v-if="reads.unreads.length > 0">
+              <span class="title right" :style="{marginLeft: marginLeft}">未读</span>
+              <div class="read-img">
                 <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
-                  <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
-                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
+                  <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
+                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
                 </el-tooltip>
+                <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">
+                  <span class="more-point">···</span>
+                  <div class="see-more right" v-if="showMoreNoRead" ref="seeMore">
+                    <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
+                      <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
+                      <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
+                    </el-tooltip>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- 附件部分 -->
+          <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
+            <span class="annex-left">附件：</span>
+            <div class="annex-right">
+              <div class="base-comment-attachment base-file__preview">
+                <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
               </div>
             </div>
           </div>
-
-        </div>
-        <!-- 附件部分 -->
-        <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
-          <span class="annex-left">附件：</span>
-          <div class="annex-right">
-            <div class="base-comment-attachment base-file__preview">
-              <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
-            </div>
-          </div>
-        </div>
         
+        </div>
       </div>
-    </div>
+    </template>
   </div>
   <div v-else class="bulletin-list-detail empty">
     <div>
@@ -135,7 +143,8 @@ export default {
       showMoreRead: false, // 是否显示已读人员浮框
       showMoreNoRead: false, // 是否显示未读人员浮框
       loading: false,
-      deleteMsg: null
+      deleteMsg: null,
+      detailShow: true,
     }
   },
   mounted () {
@@ -170,6 +179,7 @@ export default {
         this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
         if(!this.params.noticeId) {
           this.detail = null;
+          this.detailShow = false;
           return;
         }
         this.loading = true;
@@ -178,7 +188,8 @@ export default {
         if(res.success) {
           if(res.message == '已删除') {
             this.detail = null;
-            this.deleteMsg = '已被删除'
+            this.deleteMsg = '已被删除';
+            this.detailShow = false;
           } else {
             this.detail = res.result;
             this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
@@ -261,7 +272,7 @@ export default {
       
       this.$platform.openTab({
         id: `bulletin_detail_${ this.params.noticeId }`,
-        title: '通知公告详情',
+        title: '信息公告详情',
         url: `/info/notice/detail/page?noticeId=${ this.params.noticeId }`,
         reload: true,
         close: true,
@@ -335,7 +346,7 @@ export default {
     // TalkingData事件埋点
     trackEventHandler (type) {
       if (type === 'delete') {
-        window.TDAPP.onEvent('pc：通知公告详情-删除事件');
+        window.TDAPP.onEvent('pc：信息公告详情-删除事件');
         return;
       }
     }
@@ -495,12 +506,18 @@ export default {
           flex: 1;
 
           .title {
-            vertical-align: middle;
+            vertical-align: top;
             display: inline-block;
 
             font-size: 15px;
+            line-height: 32px;
 
             margin-right: 20px;
+          }
+
+          .read-img {
+            display: inline-block;
+            width: calc(100% - 70px);
           }
 
           .right {
@@ -508,11 +525,12 @@ export default {
           }
 
           .person-img {
-            vertical-align: middle;
+            // vertical-align: middle;
             width: 32px;
             height: 32px;
             border-radius: 50%;
             margin-right: 8px;
+            margin-bottom: 5px;
           }
 
           .more-preson {
@@ -527,6 +545,7 @@ export default {
             text-align: center;
             color: #696974;
 
+            margin-bottom: 5px;
             border-radius: 50%;
             border: 1px solid #E2E2EA;
 

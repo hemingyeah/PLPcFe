@@ -5,7 +5,7 @@
       <text-title ref="textTitle" v-model="params" class="textTitle"></text-title>
       <!-- 富文本编辑器 -->
       <base-editor v-model="params.article" @input="getInput" ref="editor" :isEdit="isSaveData"></base-editor>
-      <p class="article-error" v-if="articleEmpty">请填写通知公告内容！</p>
+      <p class="article-error" v-if="articleEmpty">请填写信息公告内容！</p>
       <!-- 底部提交按钮 -->
       <div class="view-left-footer">
         <button class="base-button green-butn btn-primary" @click="sumbit();trackEventHandler('sumbit')" :disabled="sumbtting || pending">发布</button>
@@ -22,6 +22,7 @@ import { Message } from 'element-ui';
 
 import * as RepositoryApi from '@src/api/Repository'
 import http from '@src/util/http';
+import _ from 'lodash';
 
 export default {
   name: 'document-create-view',
@@ -74,10 +75,18 @@ export default {
     this.saveArticle();
     this.getTypes();
   },
+
   beforeDestroy() {
     // 清除定时器
     clearInterval(this.interval);
   },
+
+  updated: _.debounce(function () {
+    this.$nextTick(() => {
+      this.isUpdate = true;
+    }) 
+  }, 1000),
+
   methods: {
     // 获取分类一级树状结构，每次更新一次
     async getTypes () {
@@ -94,7 +103,7 @@ export default {
           this.params.options = res.result;
           if(this.params.options.length <= 0) {
             this.$platform.notification({
-              title: '暂时没有通知公告类别，请先到通知公告列表添加分类！',
+              title: '暂时没有信息公告类别，请先到信息公告列表添加分类！',
               type: 'error',
             });
             this.sumbtting = true;
@@ -184,7 +193,7 @@ export default {
       
       this.$platform.openTab({
         id: 'M_INFO_NOTICE',
-        title: '通知公告列表',
+        title: '信息公告列表',
         url: '/info/notice/list/page',
         reload: true,
         close: true,
@@ -203,6 +212,7 @@ export default {
     getArticle () {
       let detail = localStorage.getItem('bulletin_article');
       this.params = Object.assign(this.params, JSON.parse(detail));
+      if(!this.params.article) this.params.article = ' ';
     },
 
     // 本地缓存文章内容，5分钟一次
@@ -313,7 +323,7 @@ export default {
     // TalkingData事件埋点
     trackEventHandler (type) {
       if (type === 'sumbit') {
-        window.TDAPP.onEvent('pc：通知公告-发布事件');
+        window.TDAPP.onEvent('pc：信息公告-发布事件');
         return;
       }
     }
@@ -321,7 +331,9 @@ export default {
   watch: {
     params: {
       handler(n) {
-        this.isSave = true;
+        if(this.isUpdate) {
+          this.isSave = true;
+        }
       },
       deep: true,
     }

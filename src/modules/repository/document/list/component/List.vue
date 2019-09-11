@@ -414,6 +414,10 @@ export default {
       padding: 10px 30px 0;
     }
 
+    .base-modal-footer {
+      text-align: right;
+    }
+
     .el-button:hover, .el-button:focus {
       color: #55B7B4;
       border-color: #cce9e9;

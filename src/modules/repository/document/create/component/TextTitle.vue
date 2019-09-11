@@ -9,7 +9,7 @@
       <p class="title-error" v-if="msg && !params.title">请填写知识库标题！</p>
 
       <el-form-item label="分类：" class="create-item" prop="typeId">
-        <el-cascader :options="params.options" class="type" v-model="params.typeId" filterable>
+        <el-cascader :options="params.options" class="type" v-model="params.typeId" :props="{ checkStrictly: true }" :popper-class="'popper-class'" filterable>
         </el-cascader>
       </el-form-item>
 
@@ -23,7 +23,10 @@
           </el-radio>
           <el-radio :label="'外部'" :disabled = "!params.permitShare">
             外部
-            <el-tooltip content="可分享给所有人，支持应用外查看" placement="top">
+            <el-tooltip content="可分享给所有人，支持应用外查看" placement="top" v-if="params.permitShare">
+              <i class="iconfont icon-info icon-permission"></i>
+            </el-tooltip>
+            <el-tooltip content="当前未开启外部分享设置，请到PC端系统设置-知识库设置中启用" placement="top" v-else>
               <i class="iconfont icon-info icon-permission"></i>
             </el-tooltip>
           </el-radio>

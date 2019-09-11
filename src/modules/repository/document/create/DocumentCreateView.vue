@@ -25,6 +25,7 @@ import TextTitle from './component/TextTitle.vue'
 import UpdateLog from './component/UpdateLog.vue'
 import RequestApprove from './component/RequestApprove.vue'
 import * as RepositoryApi from '@src/api/Repository'
+import _ from 'lodash';
 
 import { Message } from 'element-ui';
 
@@ -53,6 +54,7 @@ export default {
         typeId: [], // 文章分类
         options: [],
       },
+      interval: '',
       articleHtml: null,
       isSave: false,
       isEdit: false,
@@ -67,7 +69,8 @@ export default {
       saveCanClick: true,
       draftCanClick: true,
       pending: false,
-      isSaveData: false
+      isSaveData: false,
+      isUpdate: false
     }
   },
   async created () {
@@ -87,6 +90,18 @@ export default {
     await this.getTypes();
     if(this.isEdit) this.getArticle();
   },
+
+  beforeDestroy() {
+    // 清除定时器
+    clearInterval(this.interval);
+  },
+
+  updated: _.debounce(function () {
+    this.$nextTick(() => {
+      this.isUpdate = true;
+    }) 
+  }, 1000),
+
   methods: {
     reset () {
       this.deleteCanClick = true;
@@ -135,10 +150,6 @@ export default {
               childItem.label = childItem.name;
               childItem.count = 0;
             })
-            item.children.unshift({
-              label: '全部',
-              value: item.id
-            })
           })
           this.params.options = res.result;
           if(this.params.options.length <= 0) {
@@ -151,7 +162,7 @@ export default {
             this.deleteCanClick = false;
           }
           if(!this.isEdit && this.params.options.length > 0) {
-            if(this.params.typeId.length <= 0) this.setType(this.params.options[0].children[0].value);
+            if(this.params.typeId.length <= 0) this.params.typeId = [this.params.options[0].value]
           }
         } else {
           this.$platform.notification({
@@ -363,11 +374,16 @@ export default {
       } else {
         let detail = localStorage.getItem('document_article');
         this.params = Object.assign(this.params, JSON.parse(detail));
+        if(!this.params.article) this.params.article = ' ';
       }
     },
 
     setType (id) {
       this.params.options.forEach(parent => {
+        if(parent.value == id) {
+          this.params.typeId = [parent.value]
+        }
+
         parent.children.forEach(child => {
           if(child.value == id) {
             this.params.typeId = [parent.value, child.value]
@@ -378,7 +394,7 @@ export default {
 
     // 文章暂存操作，每五分钟一次，仅在新建时暂存
     saveArticle () {
-      setInterval(() => {
+      this.interval = setInterval(() => {
         if(this.isSave) {
           let detail = {
             'article': this.params.article,
@@ -395,7 +411,7 @@ export default {
           })
         }
         this.isSave = false
-      }, 1000 * 60 * 1)
+      }, 1000 * 2)
     },
 
     // 构建参数
@@ -403,7 +419,7 @@ export default {
       let params = {
         title: this.params.title,
         content: this.params.article,
-        typeId: this.params.typeId[1],
+        typeId: this.params.typeId[1] || this.params.typeId[0],
         label: this.params.label,
         attachment: [],
       }
@@ -471,7 +487,9 @@ export default {
   watch: {
     params: {
       handler(n) {
-        this.isSave = true;
+        if(this.isUpdate) {
+          this.isSave = true;
+        }
       },
       deep: true,
     }
@@ -548,5 +566,11 @@ export default {
 }
 .el-scrollbar {
   min-height: 45px;
+}
+.popper-class {
+
+  .el-radio__inner {
+    margin-top: 10px;
+  }
 }
 </style>

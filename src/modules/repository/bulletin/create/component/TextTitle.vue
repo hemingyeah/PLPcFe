@@ -6,7 +6,7 @@
         <el-input class="title" v-model="params.title" @blur="titleCheck"></el-input>
       </el-form-item>
       <p class="title-error" v-if="params.title && params.title.length > 100">标题不能超过100个字符！</p>
-      <p class="title-error" v-if="msg && !params.title">请填写通知公告标题！</p>
+      <p class="title-error" v-if="msg && !params.title">请填写信息公告标题！</p>
 
       <el-form-item label="分类：" class="create-item" prop="typeId">
         <el-select v-model="params.typeId" class="search-type">
@@ -223,7 +223,7 @@ export default {
     titleCheck() {
       this.msg = '';
       if(!this.params.title) {
-        this.msg = '请填通知公告标题！';
+        this.msg = '请填信息公告标题！';
         return false;
       }
       if(this.params.title.length > 100) {

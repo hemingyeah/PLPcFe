@@ -1,108 +1,110 @@
 <template>
-  <div class="document-list-detail" :style="{height: height}" v-if="detail && detail.title" v-loading.fullscreen.lock="loading">
-    <!-- 详情头部 -->
-    <div class="detail-top">
+  <div class="document-list-detail" :style="{height: height}" v-if="detailShow" v-loading.fullscreen.lock="loading">
+    <template v-if="detail && detail.title">
+      <!-- 详情头部 -->
+      <div class="detail-top">
       
-      <div class="author-container">
-        <div class="author">
-          <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
-          <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
-          <div class="author-info">
-            <p class="name">{{detail.createUserName}}</p>
-            <p class="time">创建于：{{detail.createTimeShow | fmt_datehour}}</p>
+        <div class="author-container">
+          <div class="author">
+            <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
+            <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
+            <div class="author-info">
+              <p class="name">{{detail.createUserName}}</p>
+              <p class="time">创建于：{{detail.createTimeShow | fmt_datehour}}</p>
+            </div>
           </div>
-        </div>
 
-        <div class="author right" v-if="detail.createTime != detail.updateTime">
-          <img class="author-img" :src="detail.updateUserHead" v-if="detail.updateUserHead">
-          <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
-          <div class="author-info">
-            <p class="name">{{detail.updateUserName}}</p>
-            <p class="time">更新于：{{detail.updateTimeShow | fmt_datehour}}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="operating" v-if="!isReview">
-
-        <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
-          <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
-        </div>
-
-        <div style="display: inline-block">
-          <span class="management" v-if="detail.examineState != 1 && allowEdit">
-            <i class="iconfont icon-bianji icon-operating" @click="editArticle()"></i>
-            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('detele')"></i>
-          </span>
-
-          <span class="share" v-if="!detail.isDraft" @click="shareDocument();trackEventHandler('share')">
-            <i class="iconfont icon-share icon-article-share"></i>
-          </span>
-
-          <span class="open" @click="openFrame();trackEventHandler('open')" v-if="showOpenFrame">新页面打开</span>
-
-          <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
-          <button class="base-button green-btn" @click="revoke" v-if="detail.examineState == 1 && revokeShow" style="margin-left:5px">撤回审批</button>
-        </div>
-        
-
-      </div>
-
-      <div class="operating" v-else>
-        <button class="base-button green-btn" @click="approve">审批</button>
-        <button class="base-button green-btn" @click="revoke" v-if="revokeShow" style="margin-left:5px">撤回审批</button>
-      </div>
-    </div>
-
-    <!-- 文章详情 -->
-    <div class="detail-content" :style="{padding: padding}">
-
-      <div class="info">
-        <p class="title">{{detail.title}}</p>
-        <div class="ql-container ql-snow content" :class="fontClass" style="border:none">
-          <div class="ql-editor">
-            <div v-html="detail.content" class="wiki-content"></div>
-          </div>
-        </div>
-      </div>
-      <!-- 详情页脚部分 -->
-      <div class="footer" v-if="(detail.label && detail.label.length > 0) || (detail.attachment && detail.attachment.length > 0)">
-
-        <div class="tags" v-if="detail.label && detail.label.length > 0">
-          <i class="iconfont icon-tag icon-tags"></i>
-          <el-tag class="detail-tag" v-for="(tag,index) in detail.label" :key="index">{{tag}}</el-tag>
-        </div>
-
-        <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
-          <span class="annex-left">附件：</span>
-          <div class="annex-right">
-            <div class="base-comment-attachment base-file__preview">
-              <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
+          <div class="author right" v-if="detail.createTime != detail.updateTime">
+            <img class="author-img" :src="detail.updateUserHead" v-if="detail.updateUserHead">
+            <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
+            <div class="author-info">
+              <p class="name">{{detail.updateUserName}}</p>
+              <p class="time">更新于：{{detail.updateTimeShow | fmt_datehour}}</p>
             </div>
           </div>
         </div>
 
+        <div class="operating" v-if="!isReview">
+
+          <div class="draftBox" v-if="detail.examineState && detail.examineState != 0">
+            <el-tag :type="detail.examineState == 1 ? '' : 'danger'">{{detail.examineState == 1 ? '待审核' : '已拒绝'}}</el-tag>
+          </div>
+
+          <div style="display: inline-block">
+            <span class="management" v-if="detail.examineState != 1 && allowEdit">
+              <i class="iconfont icon-bianji icon-operating" @click="editArticle()"></i>
+              <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('detele')"></i>
+            </span>
+
+            <span class="share" v-if="!detail.isDraft" @click="shareDocument();trackEventHandler('share')">
+              <i class="iconfont icon-share icon-article-share"></i>
+            </span>
+
+            <span class="open" @click="openFrame();trackEventHandler('open')" v-if="showOpenFrame">新页面打开</span>
+
+            <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
+            <button class="base-button green-btn" @click="revoke" v-if="detail.examineState == 1 && revokeShow" style="margin-left:5px">撤回审批</button>
+          </div>
+        
+
+        </div>
+
+        <div class="operating" v-else>
+          <button class="base-button green-btn" @click="approve">审批</button>
+          <button class="base-button green-btn" @click="revoke" v-if="revokeShow" style="margin-left:5px">撤回审批</button>
+        </div>
       </div>
-    </div>
 
-    <base-modal
-      class="type-modal"
-      width="400px"
-      :show.sync="shareBoxShow"
-      title=" ">
+      <!-- 文章详情 -->
+      <div class="detail-content" :style="{padding: padding}">
 
-      <div>
-        <p>请选择分享方式</p>
+        <div class="info">
+          <p class="title">{{detail.title}}</p>
+          <div class="ql-container ql-snow content" :class="fontClass" style="border:none">
+            <div class="ql-editor">
+              <div v-html="detail.content" class="wiki-content"></div>
+            </div>
+          </div>
+        </div>
+        <!-- 详情页脚部分 -->
+        <div class="footer" v-if="(detail.label && detail.label.length > 0) || (detail.attachment && detail.attachment.length > 0)">
+
+          <div class="tags" v-if="detail.label && detail.label.length > 0">
+            <i class="iconfont icon-tag icon-tags"></i>
+            <el-tag class="detail-tag" v-for="(tag,index) in detail.label" :key="index">{{tag}}</el-tag>
+          </div>
+
+          <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
+            <span class="annex-left">附件：</span>
+            <div class="annex-right">
+              <div class="base-comment-attachment base-file__preview">
+                <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      <div slot="footer" class="edit-footer">
-        <el-button @click="inlineShare">对内分享</el-button>
-        <el-button type="primary" class="green-btn" @click="outlineShare">对外分享</el-button>
-      </div>
-    </base-modal>
+      <base-modal
+        class="type-modal"
+        width="400px"
+        :show.sync="shareBoxShow"
+        title=" ">
 
-    <approve-dialog :approve-data="approveData" ref="approveDialog"/>
+        <div>
+          <p>请选择分享方式</p>
+        </div>
 
+        <div slot="footer" class="edit-footer">
+          <el-button @click="inlineShare">对内分享</el-button>
+          <el-button type="primary" class="green-btn" @click="outlineShare">对外分享</el-button>
+        </div>
+      </base-modal>
+
+      <approve-dialog :approve-data="approveData" ref="approveDialog"/>
+
+    </template>
   </div>
   <div v-else class="document-list-detail empty">
     <div>
@@ -166,7 +168,8 @@ export default {
       loading: false,
       deleteMsg: null,
       revokeShow: false,
-      url: ''
+      url: '',
+      detailShow: true
     }
   },
   mounted () {
@@ -256,6 +259,8 @@ export default {
         }
         if(!params.wikiId) {
           this.detail = null;
+          this.detailShow = false;
+          console.log(this.detailShow)
           return;
         }
         this.loading = true;
@@ -266,6 +271,7 @@ export default {
           if(res.message == '已删除') {
             this.detail = null;
             this.deleteMsg = '已被删除';
+            this.detailShow = false;
           } else {
             this.detail = res.result;
             this.detail.createTimeShow = Lang.fmt_gmt_time(this.detail.createTime);
