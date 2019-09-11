@@ -411,7 +411,7 @@ export default {
           })
         }
         this.isSave = false
-      }, 1000 * 2)
+      }, 1000 * 60 * 2)
     },
 
     // 构建参数
