@@ -618,12 +618,14 @@ const FormDesign = {
           <div class="form-design-tabs-content">{fieldList}</div>
         </div>
         <div class="form-design-main">
-          <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
-            {!this.isEmpty ? previewList : (
-              <div class="form-design-tip">
-                <p>选择左侧控件拖动到此处</p>
-              </div>
-            )}
+          <div class="form-design-center">
+            <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
+              {!this.isEmpty ? previewList : (
+                <div class="form-design-tip">
+                  <p>选择左侧控件拖动到此处</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         {fieldSetting ? <div class="form-design-setting" key="form-design-setting">{fieldSetting}</div> : null}
