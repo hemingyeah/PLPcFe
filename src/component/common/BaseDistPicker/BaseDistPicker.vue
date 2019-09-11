@@ -2,11 +2,11 @@
   <div class="base-dist-picker">
     <el-cascader
       popper-class="location-cascader"
+      change-on-select
       clearable
       :props="props"
       :placeholder="placeholder"
       :options="options"
-      change-on-select
       :value="value"
       @change="handleChange"
     />
@@ -23,7 +23,6 @@ export default {
         value: 'name',
         label: 'name',
         children: 'dist',
-        checkStrictly: false
       },
     }
   },
@@ -75,5 +74,11 @@ export default {
   &:hover .el-input__inner{
     border-color: $input-border-hover-color;
   }
+}
+/** 
+* @url {@link https://github.com/ElemeFE/element/pull/15611}
+*/
+.location-cascader .el-cascader-node .el-radio {
+  display: none;
 }
 </style>
