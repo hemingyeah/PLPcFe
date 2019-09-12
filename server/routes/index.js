@@ -87,28 +87,28 @@ router.get('/window', async ctx => {
 
 // /api/app/outside/es
 router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.0.98',
-  // host: '172.18.0.36',
+  // host: '172.18.0.98',
+  host: '172.18.0.36',
   port: 10003,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=1357f42c-21c6-4aa9-ad38-2c4d7d258dcf`
-  },
   // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=26f5d84d-cb6c-4dac-b938-700ff187477f`
-  // }
+  //   'cookie': `VIPPUBLINKJSESSIONID=15b5005d-648a-407f-8898-8d8426aba048`
+  // },
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
+  }
 }))
 
 // /api/app/outside
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '172.18.0.98',
-  // host: '172.18.0.36',
+  // host: '172.18.0.98',
+  host: '172.18.0.36',
   port: 10002,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=1357f42c-21c6-4aa9-ad38-2c4d7d258dcf`
-  },
   // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=26f5d84d-cb6c-4dac-b938-700ff187477f`
-  // }
+  //   'cookie': `VIPPUBLINKJSESSIONID=15b5005d-648a-407f-8898-8d8426aba048`
+  // },
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
+  }
 }))
 
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {

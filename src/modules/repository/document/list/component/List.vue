@@ -365,15 +365,15 @@ export default {
         .readNum {
 
           .icon-yanjing {
-            font-size: 12px;
+            font-size: 8px;
             color: #B0BCC3;
             margin-left: 8px;
           }
 
-          span {
-            display: inline-block;
-            padding-left: 5px;
-          }
+          // span {
+          //   display: inline-block;
+          //   padding-left: 5px;
+          // }
         }
       }
 

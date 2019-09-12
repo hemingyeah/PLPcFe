@@ -253,6 +253,7 @@ export default {
           wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null),
           updateReadTimes: true
         }
+        this.detailShow = true;
         if(!params.wikiId) {
           this.detail = null;
           this.detailShow = false;
@@ -269,6 +270,7 @@ export default {
             this.detailShow = false;
           } else {
             this.detail = res.result;
+            // this.detailShow = true;
             this.detail.createTimeShow = Lang.fmt_gmt_time(this.detail.createTime);
             if(this.detail.updateTime) {
               this.detail.updateTimeShow = Lang.fmt_gmt_time(this.detail.updateTime);

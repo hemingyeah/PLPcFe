@@ -169,12 +169,12 @@ export default {
     // 获取通知公告详情
     async getBulletinDetail () {
       try {
+        this.detailShow = true;
         this.showMoreNoRead = false;
         this.showMoreRead = false;
         this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
         if(!this.params.noticeId) {
           this.detail = null;
-          this.detailShow = false;
           return;
         }
         this.loading = true;
@@ -188,6 +188,7 @@ export default {
           } else {
             this.detail = res.result;
             this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
+            this.detailShow = true;
           }
         } else {
           this.$platform.notification({
@@ -559,14 +560,14 @@ export default {
               border-radius: 10px;
               background: #fff;
 
-              &::after {
-                content: "";
-                position: absolute;
-                bottom: -20px;
-                left: 120px;
-                border: 10px solid;
-                border-color: #ccc transparent transparent;
-              }
+              // &::after {
+              //   content: "";
+              //   position: absolute;
+              //   bottom: -20px;
+              //   left: 120px;
+              //   border: 10px solid;
+              //   border-color: #ccc transparent transparent;
+              // }
 
               .person-img {
                 margin-right: 10px;
