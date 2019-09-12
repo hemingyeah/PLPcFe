@@ -276,7 +276,7 @@ export default {
             if(this.initData.userInfo.authorities.INFO_EDIT) {
               this.allowEdit = true;
             } else {
-              if(this.detail.createUser == this.initData.userInfo.userId && this.initData.userInfo.authorities.INFO_CREATE == 3) {
+              if(this.detail.createUser == this.initData.userInfo.userId && this.initData.userInfo.authorities.VIP_INFO_CREATE) {
                 this.allowEdit = true;
               } else {
                 this.allowEdit = false;

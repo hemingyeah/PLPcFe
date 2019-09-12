@@ -1,7 +1,7 @@
 <template>
   <div class="document-list-search" ref="search">
     <div class="search-left">
-      <button class="base-button search-new" @click="create();trackEventHandler('create')" v-if="infoEdit.INFO_EDIT || infoEdit.INFO_CREATE">新建</button>
+      <button class="base-button search-new" @click="create();trackEventHandler('create')" v-if="infoEdit.INFO_EDIT || infoEdit.VIP_INFO_CREATE">新建</button>
 
       <!-- 文档库类型筛选 -->
       <div class="search-middle">
@@ -252,6 +252,7 @@ export default {
                 })
               })
             })
+            this.typeOptions = [];
             resolve();
           } else {
             this.$platform.notification({
