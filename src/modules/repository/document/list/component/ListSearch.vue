@@ -152,10 +152,10 @@ export default {
     }
   },
 
-  mounted () {   
-    this.initView();
-    this.getTypes();
-  },
+  // mounted () {   
+  //   this.initView();
+  //   this.getTypes();
+  // },
 
   methods: {
     // 初始化viewOptions对象，包括数量，每次更新一次
@@ -252,7 +252,6 @@ export default {
                 })
               })
             })
-            this.typeOptions = [];
             resolve();
           } else {
             this.$platform.notification({

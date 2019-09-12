@@ -98,9 +98,6 @@ export default {
       return this.isEdit ? '编辑分类' : '新建分类';
     }
   },
-  mounted () {
-    this.getTypes();
-  },
 
   methods: {
     // 获取分类一级树状结构，每次更新一次
