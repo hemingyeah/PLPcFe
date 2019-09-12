@@ -97,7 +97,7 @@ export default {
       const maxCount = 100;
 
       if(params.type == '1' && this.count < maxCount) {
-        this.$platform.alert(`营销类型模板单次短信达${maxCount}条才可以发送`);
+        return this.$platform.alert(`营销类型模板单次短信达${maxCount}条才可以发送`);
       }
 
       this.pending = true;
@@ -145,7 +145,7 @@ export default {
             this.$platform.alert('获取短信模板失败');
           }
           this.messageTemplate = (res.data.list || [])
-            .filter(t => t.notice === '自定义通知' && t.status === 'pass_approval');
+            .filter(t => (t.notice === '自定义通知' || t.type == 1) && t.status === 'pass_approval');
           if (this.messageTemplate.length) {
             this.form.smsTemplateId = this.messageTemplate[0].id;
           }
