@@ -319,7 +319,7 @@ export default {
             this.$platform.openTab({
               id: 'M_INFO_NOTICE',
               title: '通知公告',
-              url: '/info/notice/list/page',
+              url: '/info/notice',
               reload: true,
               close: true,
               fromId

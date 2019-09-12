@@ -5,11 +5,11 @@ const Template = require('../util/Template')
 const router = new KoaRouter();
 const modules = require('../../modules');
 
-router.get('/wiki/list/page', async ctx => {
+router.get('/wiki', async ctx => {
   let script = ['/document.list.js'];
   let modConfig = modules['document.list'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/wiki/list/page', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/wiki', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('知识库', body, script, modConfig.template)
@@ -49,11 +49,11 @@ router.get('/wiki/detail/page', async ctx => {
   ctx.body = Template.renderWithHtml('知识库', body, script, modConfig.template)
 })
 
-router.get('/info/notice/list/page', async ctx => {
+router.get('/info/notice', async ctx => {
   let script = ['/bulletin.list.js'];
   let modConfig = modules['bulletin.list'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/info/notice/list/page', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/info/notice', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('通知公告', body, script, modConfig.template)

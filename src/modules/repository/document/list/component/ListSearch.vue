@@ -23,9 +23,9 @@
           v-model="params.type"
           filterable>
           <template slot-scope="{ node, data }" class="type">
-            <span v-if="data.label != '全部'">{{data.label}}（{{data.count}}）</span>
-            <span v-else>{{data.label}}</span>
-            <span class="type-operating" v-if="data.label != '全部' && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
+            <span>{{data.label}}（{{data.count}}）</span>
+            <!-- <span v-else>{{data.label}}</span> -->
+            <span class="type-operating" v-if="!data.noModify && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
               <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
               <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
             </span>
@@ -198,16 +198,20 @@ export default {
               item.label = item.name;
               item.children = item.subTypes;
               item.count = 0;
+              item.noModify = false;
 
               item.children.forEach(childItem => {
                 childItem.value = childItem.id;
                 childItem.label = childItem.name;
                 childItem.count = 0;
+                childItem.noModify = false;
               })
               
               item.children.unshift({
                 label: '全部',
-                value: item.id
+                value: item.id,
+                noModify: true,
+                count: 0,
               })
             })
             this.typeOptions = res.result;
@@ -239,12 +243,12 @@ export default {
           if(res.success) {
             this.typeOptions.forEach(parent => {
               res.result.forEach(info => {
-                if(parent.id == info.typeId) parent.count = info.count
+                if(parent.value == info.typeId) parent.count = info.count
               })
 
               parent.children.forEach(child => {
                 res.result.forEach(info => {
-                  if(child.id == info.typeId) child.count = info.count;
+                  if(child.value == info.typeId) child.count = info.count;
                 })
               })
             })
@@ -340,7 +344,7 @@ export default {
       this.params.type = [];
       this.params.orderDetail = { // 排序
         isSystem: 1,
-        column: 'updatetime',
+        column: '',
         type: '',
         sequence: 'desc'
       };

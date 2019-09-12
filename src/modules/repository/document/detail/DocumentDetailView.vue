@@ -36,7 +36,7 @@
               <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('detele')"></i>
             </span>
 
-            <span class="share" v-if="!detail.isDraft" @click="shareDocument();trackEventHandler('share')">
+            <span class="share" v-if="!detail.isDraft && initData.userInfo.authorities.INFO_VIEW" @click="shareDocument();trackEventHandler('share')">
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
 
@@ -494,7 +494,7 @@ export default {
             this.$platform.openTab({
               id: 'M_INFO_DOC',
               title: '知识库列表',
-              url: '/wiki/list/page',
+              url: '/wiki',
               reload: true,
               close: true,
               fromId

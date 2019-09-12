@@ -328,7 +328,7 @@ export default {
       this.$platform.openTab({
         id: 'M_INFO_DOC',
         title: '知识库列表',
-        url: '/wiki/list/page',
+        url: '/wiki',
         reload: true,
         close: true,
         fromId
