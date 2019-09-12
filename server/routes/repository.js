@@ -63,7 +63,7 @@ router.get('/info/notice/create/page', async ctx => {
   let script = ['/bulletin.create.js'];
   let modConfig = modules['bulletin.create'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/info/notice/create/page', 'post', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/info/notice/create/page', 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('新建通知公告', body, script, modConfig.template)

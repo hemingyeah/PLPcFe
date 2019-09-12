@@ -156,11 +156,18 @@ export default {
   methods: {
     getId () {
       if(window.location.href.indexOf('?') != -1) {
-        let array = window.location.href.split('?');
-        let params = array[1].split('=');
-        if(params[0] == 'noticeId') {
-          this.noticeId = params[1];
-        }
+        let array = window.location.href.split('?')[1].split('&');
+        let params = [];
+
+        array.forEach(item => {
+          params.push({name: item.split('=')[0],
+            value: item.split('=')[1]})
+        })
+        params.forEach(item => {
+          if(item.name == 'noticeId') {
+            this.noticeId = item.value;
+          }
+        })
         this.getBulletinDetail();
         this.getReadPerson();
         this.getUnreadPerson();
