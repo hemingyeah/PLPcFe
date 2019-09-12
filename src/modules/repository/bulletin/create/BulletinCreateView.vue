@@ -217,7 +217,7 @@ export default {
 
     // 本地缓存文章内容，5分钟一次
     saveArticle () {
-      this.interval = setInterval(() => {
+      this.interval = setTimeout(() => {
         if(this.isSave) {
           let detail = {
             'article': this.params.article,
@@ -333,6 +333,7 @@ export default {
       handler(n) {
         if(this.isUpdate) {
           this.isSave = true;
+          this.saveArticle();
         }
       },
       deep: true,

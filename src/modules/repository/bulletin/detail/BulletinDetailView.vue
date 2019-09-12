@@ -319,7 +319,7 @@ export default {
             let fromId = window.frameElement.getAttribute('id');
             this.$platform.openTab({
               id: 'M_INFO_NOTICE',
-              title: '通知公告',
+              title: '信息公告',
               url: '/info/notice',
               reload: true,
               close: true,
@@ -513,7 +513,7 @@ export default {
 
           .read-img {
             display: inline-block;
-            width: calc(100% - 70px);
+            width: calc(100% - 75px);
           }
 
           .right {

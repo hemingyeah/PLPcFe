@@ -270,7 +270,6 @@ export default {
             this.detailShow = false;
           } else {
             this.detail = res.result;
-            // this.detailShow = true;
             this.detail.createTimeShow = Lang.fmt_gmt_time(this.detail.createTime);
             if(this.detail.updateTime) {
               this.detail.updateTimeShow = Lang.fmt_gmt_time(this.detail.updateTime);

@@ -394,7 +394,7 @@ export default {
 
     // 文章暂存操作，每五分钟一次，仅在新建时暂存
     saveArticle () {
-      this.interval = setInterval(() => {
+      this.interval = setTimeout(() => {
         if(this.isSave) {
           let detail = {
             'article': this.params.article,
@@ -489,6 +489,7 @@ export default {
       handler(n) {
         if(this.isUpdate) {
           this.isSave = true;
+          this.saveArticle();
         }
       },
       deep: true,

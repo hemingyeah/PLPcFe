@@ -88,7 +88,7 @@ router.get('/window', async ctx => {
 // /api/app/outside/es
 router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
   // host: '172.18.0.98',
-  host: '172.18.0.36',
+  host: '172.18.0.37',
   port: 10003,
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=15b5005d-648a-407f-8898-8d8426aba048`
@@ -101,7 +101,7 @@ router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
 // /api/app/outside
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   // host: '172.18.0.98',
-  host: '172.18.0.36',
+  host: '172.18.0.37',
   port: 10002,
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=15b5005d-648a-407f-8898-8d8426aba048`
