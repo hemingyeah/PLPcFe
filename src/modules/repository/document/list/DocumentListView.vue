@@ -55,7 +55,7 @@ export default {
           type: '',
           sequence: 'desc'
         },
-        view: '',
+        view: 'all',
         type: [],
       },
       tag: {
