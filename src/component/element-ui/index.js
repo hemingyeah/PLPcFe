@@ -35,8 +35,8 @@ import {
   Tooltip,
   Steps,
   Step
-} from 'element-ui';
-import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
+} from 'shb-element-ui';
+import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
 
 const ElementUI = {
   install(Vue){

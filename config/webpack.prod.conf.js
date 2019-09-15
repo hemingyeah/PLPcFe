@@ -50,7 +50,7 @@ module.exports = merge(baseConfig, {
           test(module, chunks){
             let conditions = [
               /[\\/]src[\\/](assets|common|component|config|directive|filter|mixin|platform|util)/,
-              /[\\/]node_modules[\\/]element-ui[\\/]/,
+              /[\\/]node_modules[\\/]shb-element-ui[\\/]/,
               /[\\/]node_modules[\\/]viewerjs[\\/]/
             ];
             

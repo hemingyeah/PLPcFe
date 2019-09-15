@@ -8,7 +8,7 @@ mtracker();
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
 
-//处理注入的参数
+// 处理注入的参数
 let initData = {};
 
 try {

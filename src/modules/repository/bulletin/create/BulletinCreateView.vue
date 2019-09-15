@@ -18,7 +18,7 @@
 <script>
 import TextTitle from './component/TextTitle.vue'
 
-import { Message } from 'element-ui';
+import { Message } from 'shb-element-ui';
 
 import * as RepositoryApi from '@src/api/Repository'
 import http from '@src/util/http';

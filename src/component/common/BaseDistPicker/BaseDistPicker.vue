@@ -9,7 +9,17 @@
       :options="options"
       :value="value"
       @change="handleChange"
-    />
+    >
+    <template slot-scope="{ item, data }" class="type">
+      <span> 
+        {{ data.name }}
+        <!-- TODO: 临时解决图标不显示方法 -->
+        <template v-if="data.dist">
+          <i class="iconfont icon-arrowright"> </i>
+        </template>
+      </span>
+    </template>
+    </el-cascader>
   </div>
 </template>
 
@@ -58,12 +68,36 @@ export default {
 
 <style lang="scss">
   .location-cascader {
-    .el-cascader-menu__item--extensible:after {
-      right: 5px;
+
+    .el-cascader-menu__item {
+      line-height: 21px;
+      & > div {
+        height: 21px;
+        line-height: 21px;
+        position: relative;
+      }
     }
     .el-cascader-menu {
       max-height: 204px;
     }
+
+    .el-cascader-menu__item--extensible {
+      font-family: "iconfont" !important;
+
+      &::after {
+        content: "";
+        right: 5px;
+      }
+
+      .iconfont {
+        color: #bfcbd9;
+        position: absolute;
+        right: -10px;
+        top: -2px;
+      }
+
+    }
+
   }
 
 .base-dist-picker{

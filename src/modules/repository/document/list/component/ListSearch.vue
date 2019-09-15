@@ -13,6 +13,7 @@
 
         <!-- 类别删选 -->
         <el-cascader 
+          ref="listTypeCascader"
           :options="typeOptions"
           :key="typeOptions.length"
           class="search-type search-type-right"
@@ -22,9 +23,8 @@
           @visible-change="showCascader"
           v-model="params.type"
           filterable>
-          <template slot-scope="{ node, data }" class="type">
-            <span>{{data.label}}（{{data.count}}）</span>
-            <!-- <span v-else>{{data.label}}</span> -->
+          <template slot-scope="{ item, data }" class="type">
+            <span class="search-type-label">{{data.label}}（{{data.count}}）</span>
             <span class="type-operating" v-if="!data.noModify && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
               <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
               <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
@@ -270,7 +270,7 @@ export default {
     async showCascader (flag) {
       // 获取分类文章数量
       await this.getTypesCount();
-      let parent = document.getElementsByClassName('el-cascader-panel')[0];
+      let parent = document.getElementsByClassName('search-cascader-panel')[0];
       parent.style.maxHeight = '350px';
       parent.style.minHeight = '90px';
       if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
@@ -290,7 +290,9 @@ export default {
           let btn = document.getElementsByClassName('is-reverse')[0];
 
           btn.click();
+          this.handleHideCascaderMenu();
           this.$refs.typeModal.open();
+
           this.isEdit = false;
           this.info.name = '';
           this.info.parentId = '';
@@ -383,7 +385,10 @@ export default {
       let btn = document.getElementsByClassName('is-reverse')[0];
 
       btn.click();
+      
+      this.handleHideCascaderMenu();
       this.$refs.typeModal.open();
+
       this.isEdit = true;
       this.info.name = info.name;
       this.info.id = info.id;
@@ -497,6 +502,9 @@ export default {
         window.TDAPP.onEvent('pc：知识库列表-重置事件');
         return;
       }
+    },
+    handleHideCascaderMenu() {
+      this.$refs.listTypeCascader.handleClickoutside();
     }
   }
 }
@@ -663,17 +671,16 @@ export default {
 
 }
 
-.el-cascader-node__label {
+.el-cascader-menu__item {
   display: flex;
   justify-content: space-between;
   
-  & >.type-operating {
-    // display: none;
-    display: inline-block;
+  & .type-operating {
+    display: none;
     opacity: 0;
   }
 
-  &:hover > .type-operating {
+  &:hover .type-operating {
     display: inline-block;
     opacity: 1;
   }
@@ -705,5 +712,42 @@ export default {
 
     cursor: pointer;
   }
+}
+
+.search-cascader-panel {
+  padding-bottom: 50px !important;
+
+  .el-cascader-menu__item{
+    max-width: 350px;
+
+    & > div {
+      width: 100%;
+
+      display: flex;
+      justify-content: space-between;
+
+      .search-type-label {
+        flex: 1;
+        @include text-ellipsis;
+      }
+
+    }
+
+  }
+
+  #type-id {
+    position: absolute;
+
+    width: 100%;
+    height: 50px;
+
+    border-top: 10px solid rgb(240, 240, 240);
+    color: $color-primary;
+    cursor: pointer;
+
+    line-height: 40px;
+    text-align: center;
+  }
+
 }
 </style>

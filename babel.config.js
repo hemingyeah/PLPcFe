@@ -14,7 +14,7 @@ const plugins = [
     'legacy': true 
   }],
   ['component', {
-    'libraryName': 'element-ui',
+    'libraryName': 'shb-element-ui',
     'styleLibraryName': 'theme-chalk'
   }]
 ]

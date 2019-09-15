@@ -1,7 +1,7 @@
 import Vue from '@src/common/entry';
 import dingtalk from '@src/util/dingtalk';
 import FrameView from './FrameView.vue';
-import { Notification } from 'element-ui';
+import { Notification } from 'shb-element-ui';
 import mtracker from '@src/util/mtracker';
 
 mtracker();

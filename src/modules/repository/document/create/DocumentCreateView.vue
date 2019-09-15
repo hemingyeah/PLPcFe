@@ -27,7 +27,7 @@ import RequestApprove from './component/RequestApprove.vue'
 import * as RepositoryApi from '@src/api/Repository'
 import _ from 'lodash';
 
-import { Message } from 'element-ui';
+import { Message } from 'shb-element-ui';
 
 export default {
   name: 'document-create-view',

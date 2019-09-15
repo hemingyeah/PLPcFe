@@ -17,7 +17,7 @@ import BizTeamSelect from '../component/business/BizTeamSelect'
 
 import {
   Checkbox
-} from 'element-ui';
+} from 'shb-element-ui';
 
 
 Vue.use(BaseModal);
