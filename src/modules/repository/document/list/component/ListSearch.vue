@@ -22,7 +22,7 @@
           @change="handleChange"
           @visible-change="showCascader"
           v-model="params.type"
-          filterable>
+          >
           <template slot-scope="{ item, data }" class="type">
             <span class="search-type-label">{{data.label}}（{{data.count}}）</span>
             <span class="type-operating" v-if="!data.noModify && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
@@ -336,12 +336,13 @@ export default {
         this.params.orderDetail.sequence = this.readTimesShow ? 'desc' : 'asc';
         this.updateShow = true;
       }
+      this.params.pageNum = 1;
       this.$emit('search', this.params);
     },
 
     resetParams () {
       this.params.keyword = '';
-      this.params.view = '';
+      this.params.view = 'all';
       this.params.typeIds = [];
       this.params.type = [];
       this.params.orderDetail = { // 排序
@@ -676,7 +677,7 @@ export default {
   justify-content: space-between;
   
   & .type-operating {
-    display: none;
+    display: inline-block;
     opacity: 0;
   }
 

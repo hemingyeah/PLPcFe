@@ -9,7 +9,16 @@
       <p class="title-error" v-if="msg && !params.title">请填写知识库标题！</p>
 
       <el-form-item label="分类：" class="create-item" prop="typeId">
-        <el-cascader :options="params.options" class="type" v-model="params.typeId" :props="{ checkStrictly: true }" :popper-class="'document-type-cascader'" filterable>
+        <el-cascader :options="params.options" class="type" v-model="params.typeId" :props="{ checkStrictly: true }" :popper-class="'document-type-cascader'">
+          <template slot-scope="{ item, data }" class="type">
+            <span> 
+              {{ data.name }}
+              <!-- TODO: 临时解决图标不显示方法 -->
+              <template v-if="data.subTypes && data.subTypes.length > 0">
+                <i class="iconfont icon-arrowright"> </i>
+              </template>
+            </span>
+          </template>
         </el-cascader>
       </el-form-item>
 
@@ -339,12 +348,18 @@ export default {
 
 .document-type-cascader {
   .el-cascader-menu__item {
+    display: flex;
+    align-items: center;
+
     line-height: 21px;
+
     & > div {
       height: 21px;
+      width: 100%;
       line-height: 21px;
       position: relative;
     }
+
   }
   .el-cascader-menu {
     max-height: 204px;
@@ -362,7 +377,7 @@ export default {
       color: #bfcbd9;
       position: absolute;
       right: -10px;
-      top: -2px;
+      top: 0;
     }
 
   }

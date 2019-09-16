@@ -70,12 +70,17 @@ export default {
   .location-cascader {
 
     .el-cascader-menu__item {
+      display: flex;
+      align-items: center;
       line-height: 21px;
+      
       & > div {
         height: 21px;
+        width: 100%;
         line-height: 21px;
         position: relative;
       }
+
     }
     .el-cascader-menu {
       max-height: 204px;
@@ -93,7 +98,7 @@ export default {
         color: #bfcbd9;
         position: absolute;
         right: -10px;
-        top: -2px;
+        top: 0;
       }
 
     }

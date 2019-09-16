@@ -50,6 +50,11 @@ export default {
       this.params.pageSize = pageSize;
       this.$emit('search', this.params, 'pageSize');
     },
+
+    resetPageNum () {
+      this.params.pageNum = this.params.pageNum > 1 ? this.params.pageNum - 1 : 1;
+      this.$emit('search', this.params);
+    }
   }
 }
 </script>

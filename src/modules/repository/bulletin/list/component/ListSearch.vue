@@ -232,6 +232,7 @@ export default {
 
     // 输入关键词或选择条件时向父组件触发search事件
     search () {
+      this.params.pageNum = 1;
       if(!this.params.typeId) this.params.typeId = null;
       this.$emit('search', this.params);
     },

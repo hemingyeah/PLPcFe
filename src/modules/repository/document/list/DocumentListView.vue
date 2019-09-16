@@ -13,7 +13,7 @@
           <span class="empty-msg">暂无数据</span>
         </div>
         <!-- 页脚部分 -->
-        <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
+        <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params" ref="listFooter"></list-footer>
       </div>
 
       <!-- 右侧详情 -->
@@ -67,7 +67,8 @@ export default {
       listMsg: {}, // 列表全部数据
       info: { // 传给右侧详情的文档id、allowShare
         id: null,
-        allowShare: 0
+        allowShare: 0,
+        isLast: false
       },
 
       loading: false
@@ -103,6 +104,10 @@ export default {
         
         if(res.success) {
           this.listTotal = res.result.total;
+          if(res.result.list.length == 1 && res.result.nextPage == 0) {
+            res.result.list[0].isLast = true;
+          }
+
           res.result.list.forEach(item => {
             if(item.createtime) item.createtime = Lang.fmt_gmt_time(item.createtime);
 
@@ -159,8 +164,13 @@ export default {
       }
       this.info.id = item.id;
       this.info.allowShare = item.allowShare;
+      this.info.isLast = item.isLast ? item.isLast : false;
       this.$refs.documentDetail.getDocumnetDetail();
     },
+
+    resetPageNum () {
+      this.$refs.listFooter.resetPageNum();
+    }
     
   }
 }

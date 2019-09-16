@@ -150,6 +150,11 @@ export default {
               childItem.label = childItem.name;
               childItem.count = 0;
             })
+
+            item.children.unshift({
+              label: '全部',
+              value: item.id,
+            })
           })
           this.params.options = res.result;
           if(this.params.options.length <= 0) {
@@ -162,7 +167,8 @@ export default {
             this.deleteCanClick = false;
           }
           if(!this.isEdit && this.params.options.length > 0) {
-            if(this.params.typeId.length <= 0) this.params.typeId = [this.params.options[0].value]
+            if(this.params.typeId.length <= 0) this.setType(this.params.options[0].value)
+            // this.params.typeId = [this.params.options[0].value]
           }
         } else {
           this.$platform.notification({
@@ -380,9 +386,9 @@ export default {
 
     setType (id) {
       this.params.options.forEach(parent => {
-        if(parent.value == id) {
-          this.params.typeId = [parent.value]
-        }
+        // if(parent.value == id) {
+        //   this.params.typeId = [parent.value]
+        // }
 
         parent.children.forEach(child => {
           if(child.value == id) {

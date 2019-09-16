@@ -333,7 +333,11 @@ export default {
               fromId
             });
           } else {
-            this.$emit('search');
+            if(this.info.isLast) {
+              this.$parent.resetPageNum();
+            } else {
+              this.$emit('search');
+            }
           }
         } else {
           this.$platform.notification({

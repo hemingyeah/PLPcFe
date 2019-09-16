@@ -13,7 +13,7 @@
           <span class="empty-msg">暂无数据</span>
         </div>
         <!-- 页脚部分 -->
-        <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params"></list-footer>
+        <list-footer class="list-footer" @search="search" :total="listTotal" v-model="params" ref="listFooter"></list-footer>
       </div>
 
       <!-- 右侧详情 -->
@@ -52,10 +52,12 @@ export default {
       listMsg: {},
       noticeId: null,
       info: {
-        id: null
+        id: null,
+        isLast: false,
       },
       chosenId: null,
-      loading: false
+      loading: false,
+      initPageNum: false,
     }
   },
   components: {
@@ -92,6 +94,9 @@ export default {
           }
           
           this.listTotal = res.result.total;
+          if(res.result.list.length == 1 && res.result.nextPage == 0) {
+            res.result.list[0].isLast = true;
+          }
 
           res.result.list.forEach(item => {
             if(item.title.indexOf('<em>') != -1) {
@@ -139,9 +144,14 @@ export default {
       }
       this.info.id = item.id;
       this.chosenId = this.info.id;
+      this.info.isLast = item.isLast ? item.isLast : false;
       await this.$refs.bulletinDetail.getBulletinDetail();
       this.$refs.bulletinDetail.getReadPerson();
       this.$refs.bulletinDetail.getUnreadPerson();
+    },
+
+    resetPageNum () {
+      this.$refs.listFooter.resetPageNum();
     }
   }
 }
