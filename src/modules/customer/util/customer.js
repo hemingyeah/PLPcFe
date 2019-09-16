@@ -50,7 +50,10 @@ export function packToCustomer(fields, form, initTags){
     }
     
     if (field.formType === 'address' && !field.isSystem) {
-      value.all = value.province + value.city + value.dist + value.address;
+      let all = value.province + value.city + value.dist + value.address;
+      if(all) {
+        value.all = all;
+      }
     }
     
     if (field.formType === 'location') {
