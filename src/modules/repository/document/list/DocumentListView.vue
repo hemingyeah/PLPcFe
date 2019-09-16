@@ -100,7 +100,7 @@ export default {
       try {
         this.loading = true;
         let res = await RepositoryApi.getDocumentList(this.params);
-        this.loading = false;
+        // this.loading = false;
         
         if(res.success) {
           if(this.$refs.list) this.$refs.list.resetScrollTop();
@@ -157,16 +157,18 @@ export default {
       this.$refs.listSearch.setTag();
     },
 
-    toDetail (item) {
+    async toDetail (item) {
       if(!item) {
         this.info.id = null;
         this.$refs.documentDetail.getDocumnetDetail();
+        this.loading = false;
         return;
       }
       this.info.id = item.id;
       this.info.allowShare = item.allowShare;
       this.info.isLast = item.isLast ? item.isLast : false;
-      this.$refs.documentDetail.getDocumnetDetail();
+      await this.$refs.documentDetail.getDocumnetDetail();
+      this.loading = false;
     },
 
     resetPageNum () {

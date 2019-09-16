@@ -257,61 +257,64 @@ export default {
 
     // 获取文档库详情
     async getDocumnetDetail () {
-      try{
-        let params = {
-          wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null),
-          updateReadTimes: true
-        }
-        this.detailShow = true;
-        if(!params.wikiId) {
-          this.detail = null;
-          this.detailShow = false;
-          return;
-        }
-        this.loading = true;
-        let res = await RepositoryApi.getInlineDetail(params);
-        this.loading = false;
-
-        if(res.success) {
-          if(res.message == '已删除') {
+      return new Promise(async (resolve, reject) => {
+        try{
+          let params = {
+            wikiId: this.info.id ? this.info.id : (this.wikiId ? this.wikiId : null),
+            updateReadTimes: true
+          }
+          this.detailShow = true;
+          if(!params.wikiId) {
             this.detail = null;
-            this.deleteMsg = '已被删除';
             this.detailShow = false;
-          } else {
-            this.detail = res.result;
-            this.detail.createTimeShow = Lang.fmt_gmt_time(this.detail.createTime);
-            if(this.detail.updateTime) {
-              this.detail.updateTimeShow = Lang.fmt_gmt_time(this.detail.updateTime);
-            }
-            if(this.initData.userInfo.authorities.INFO_EDIT) {
-              this.allowEdit = true;
+            return;
+          }
+          this.loading = true;
+          let res = await RepositoryApi.getInlineDetail(params);
+          this.loading = false;
+
+          if(res.success) {
+            if(res.message == '已删除') {
+              this.detail = null;
+              this.deleteMsg = '已被删除';
+              this.detailShow = false;
             } else {
-              if(this.detail.createUser == this.initData.userInfo.userId && this.initData.userInfo.authorities.VIP_INFO_CREATE) {
+              this.detail = res.result;
+              this.detail.createTimeShow = Lang.fmt_gmt_time(this.detail.createTime);
+              if(this.detail.updateTime) {
+                this.detail.updateTimeShow = Lang.fmt_gmt_time(this.detail.updateTime);
+              }
+              if(this.initData.userInfo.authorities.INFO_EDIT) {
                 this.allowEdit = true;
-                console.log(this.allowEdit)
               } else {
-                this.allowEdit = false;
+                if(this.detail.createUser == this.initData.userInfo.userId && this.initData.userInfo.authorities.VIP_INFO_CREATE) {
+                  this.allowEdit = true;
+                } else {
+                  this.allowEdit = false;
+                }
+              }
+              if(this.isReview) {
+                this.getApproveDetail();
+                this.approve();
+                return;
+              }
+              if(this.detail.examineState && this.detail.examineState == 1) {
+                this.getApproveDetail();
               }
             }
-            if(this.isReview) {
-              this.getApproveDetail();
-              this.approve();
-              return;
-            }
-            if(this.detail.examineState && this.detail.examineState == 1) {
-              this.getApproveDetail();
-            }
+            resolve();
+          } else {
+            reject();
+            this.$platform.notification({
+              title: res.message,
+              type: 'error',
+            });
           }
-        } else {
-          this.$platform.notification({
-            title: res.message,
-            type: 'error',
-          });
+        } catch(err) {
+          console.error(err)
+          this.loading = false;
         }
-      } catch(err) {
-        console.error(err)
-        this.loading = false;
-      }
+      })
     },
 
     // 新页面打开通知公告详情

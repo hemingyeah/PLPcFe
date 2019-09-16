@@ -21,8 +21,7 @@
           clearable
           @change="handleChange"
           @visible-change="showCascader"
-          v-model="params.type"
-          >
+          v-model="params.type">
           <template slot-scope="{ item, data }" class="type">
             <span class="search-type-label">{{data.label}}（{{data.count}}）</span>
             <span class="type-operating" v-if="!data.noModify && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">

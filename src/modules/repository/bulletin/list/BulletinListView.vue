@@ -80,7 +80,7 @@ export default {
       try {
         this.loading = true;
         let res = await RepositoryApi.getBulletinList(this.params);
-        this.loading = false;
+        
         
         if(res.success) {
           // 查询无数据时
@@ -141,12 +141,14 @@ export default {
       if(!item) {
         this.info.id = null;
         this.$refs.bulletinDetail.getBulletinDetail();
+        this.loading = false;
         return;
       }
       this.info.id = item.id;
       this.chosenId = this.info.id;
       this.info.isLast = item.isLast ? item.isLast : false;
       await this.$refs.bulletinDetail.getBulletinDetail();
+      this.loading = false;
       this.$refs.bulletinDetail.getReadPerson();
       this.$refs.bulletinDetail.getUnreadPerson();
     },
