@@ -56,7 +56,6 @@ function getBody(xhr) {
   }
 }
 
-<<<<<<< HEAD
 /** 
  * 异步上传附件
  * 
@@ -101,33 +100,6 @@ export function upload(file, action, options = {}){
       
       console.error('upload caught:', error)
     })
-=======
-/** 异步上传附件 */
-export function upload(file, action){
-  let xhr = new XMLHttpRequest();
-  let form = new FormData();
-  form.append('upload', file);
-
-  return new Promise((resolve, reject) => {
-    xhr.onerror = error => reject(error)
-
-    xhr.onload = function onload() {
-      if (xhr.status < 200 || xhr.status >= 300) {
-        return reject(getError(xhr, action));
-      }
-      resolve(getBody(xhr));
-    };
-
-    // TODO: 上传进度监听
-    // if (xhr.upload) {
-    //   xhr.upload.onprogress = function progress(e) {
-    //     console.log(e)
-    //   }
-    // }
-    xhr.open('post', action, true);
-    xhr.send(form);
-  });
->>>>>>> fix: 文档库列表、详情样式
 }
 
 function getErrorResult(file, error){
