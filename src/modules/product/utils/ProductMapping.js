@@ -14,10 +14,13 @@ export function packToProduct(fields, form){
     
     if (f.formType === 'address' && !f.isSystem) {
       tv = form[f.fieldName];
+      let all = [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('');
+
       attribute[f.fieldName] = {
         ...tv,
-        all: [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('')
-      }
+      };
+
+      all ? attribute[f.fieldName]['all'] = all : '';
     }
   
     if (f.formType === 'location') {

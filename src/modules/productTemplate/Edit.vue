@@ -204,10 +204,14 @@ export default {
           value = {};
         }
         if (field.formType === 'address' && !field.isSystem) {
+          let all =  [value.province, value.city, value.dist, value.address].filter(str => !!str).join('');
+
           value = {
             ...value,
-            all: [value.province, value.city, value.dist, value.address].filter(str => !!str).join('')
-          }
+          };
+
+          all ? value.all = all : '';
+
         }
 
         // 不为系统字段,放在attribute里面
