@@ -132,7 +132,8 @@ export default {
   },
   data () {
     return {
-      allowEdit: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3 : this.initData.userInfo.authorities.INFO_EDIT && this.initData.userInfo.authorities.INFO_EDIT == 3,
+      allowEdit: this.infoEdit ? (this.infoEdit.INFO_EDIT ? this.infoEdit.INFO_EDIT : false) : (this.initData.userInfo.authorities.INFO_EDIT ? this.initData.userInfo.authorities.INFO_EDIT == 3 : false),
+      allowShow: this.infoEdit ? (this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_VIEW : false) : (this.initData.userInfo.authorities.INFO_VIEW ? this.initData.userInfo.authorities.INFO_VIEW : false),
       noticeId: '',
       form: this.buildForm(), // 附件存储格式
       params: {

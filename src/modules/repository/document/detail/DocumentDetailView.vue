@@ -36,7 +36,7 @@
               <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('detele')"></i>
             </span>
 
-            <span class="share" v-if="!detail.isDraft && initData.userInfo.authorities.INFO_VIEW" @click="shareDocument();trackEventHandler('share')">
+            <span class="share" v-if="!detail.isDraft && allowEdit" @click="shareDocument();trackEventHandler('share')">
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
 
@@ -279,6 +279,7 @@ export default {
             } else {
               if(this.detail.createUser == this.initData.userInfo.userId && this.initData.userInfo.authorities.VIP_INFO_CREATE) {
                 this.allowEdit = true;
+                console.log(this.allowEdit)
               } else {
                 this.allowEdit = false;
               }
