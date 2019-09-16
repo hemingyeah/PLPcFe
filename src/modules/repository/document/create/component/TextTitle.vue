@@ -12,7 +12,7 @@
         <el-cascader :options="params.options" class="type" v-model="params.typeId" :props="{ checkStrictly: true }" :popper-class="'document-type-cascader'">
           <template slot-scope="{ item, data }" class="type">
             <span> 
-              {{ data.name }}
+              {{ data.label }}
               <!-- TODO: 临时解决图标不显示方法 -->
               <template v-if="data.subTypes && data.subTypes.length > 0">
                 <i class="iconfont icon-arrowright"> </i>
