@@ -196,6 +196,7 @@ export default {
             value: item.split('=')[1]})
         })
 
+        let shenpi = false;
         params.forEach(item => {
           if(item.name == 'wikiId') {
             this.wikiId = item.value;
@@ -209,7 +210,15 @@ export default {
           if(item.name == 'action' && item.value == 'approve') {
             this.isReview = true;
           }
+          if(item.name == 'from' && item.value == 'approve') {
+            shenpi = true;
+          }
         })
+        if(!shenpi && !this.initData.userInfo.authorities.INFO_VIEW && !this.initData.userInfo.authorities.INFO_EDIT && !this.initData.userInfo.authorities.VIP_INFO_CREATE) {
+          this.deleteMsg = '您没有权限查看该页面';
+          this.detailShow = false;
+          return;
+        }
         this.getDocumnetDetail();
       }
     },
