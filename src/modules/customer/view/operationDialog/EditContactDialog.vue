@@ -168,10 +168,20 @@ export default {
             })),
         };
 
+        let result = {};
+
         if (this.action === 'create') {
-          await this.$http.post('/linkman/createByJson', params);
+          result = await this.$http.post('/linkman/createByJson', params);
         } else {
-          await this.$http.post('/linkman/updateByJson', params);
+          result = await this.$http.post('/linkman/updateByJson', params);
+        }
+
+        if(result.status != 0) {
+          return this.$platform.notification({
+            title: '失败',
+            message: result.message || `${this.action === 'create' ? '新建' : '更新'}失败`,
+            type: 'error',
+          });
         }
 
         this.pending = false;

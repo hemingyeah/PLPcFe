@@ -92,7 +92,15 @@ export default {
         const params = this.buildParams();
         const url = `/customer/address/${this.action === 'create' ? 'create' : 'update'}`;
 
-        await this.$http.post(url, params, false);
+        let result = await this.$http.post(url, params, false);
+
+        if(result.status != 0) {
+          return this.$platform.notification({
+              title: '失败',
+              message: result.message || `${this.action === 'create' ? '新建' : '更新'}失败`,
+              type: 'error',
+          });
+        }
 
         this.pending = false;
         this.$emit('submit-success');
