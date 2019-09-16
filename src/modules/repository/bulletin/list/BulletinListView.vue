@@ -1,5 +1,5 @@
 <template>
-  <div class="bulletin-list-view" v-loading.fullscreen.lock="loading">
+  <div class="bulletin-list-view">
     <!-- 搜索部分 -->
     <list-search class="list-search" @search="search" :total="listTotal" :infoEdit="initData.userInfo.authorities" ref="listSearch"></list-search>
 
@@ -56,7 +56,6 @@ export default {
         isLast: false,
       },
       chosenId: null,
-      loading: false,
       initPageNum: false,
     }
   },
@@ -78,9 +77,8 @@ export default {
       }
       this.$refs.listSearch.getTypes();
       try {
-        this.loading = true;
-        let res = await RepositoryApi.getBulletinList(this.params);
-        
+        this.$refs.bulletinDetail.loading = true;
+        let res = await RepositoryApi.getBulletinList(this.params); 
         
         if(res.success) {
           // 查询无数据时
@@ -129,7 +127,7 @@ export default {
         }
       } catch (err) {
         console.error(err);
-        this.loading = false;
+        this.$refs.bulletinDetail.loading = false;
       }    
     },
 
@@ -137,18 +135,17 @@ export default {
       return parseInt(localStorage.getItem('notice_pageSize')) || 10
     },
 
-    async toDetail (item) {
+    toDetail (item) {
       if(!item) {
         this.info.id = null;
         this.$refs.bulletinDetail.getBulletinDetail();
-        this.loading = false;
+        this.$refs.bulletinDetail.loading = false;
         return;
       }
       this.info.id = item.id;
       this.chosenId = this.info.id;
       this.info.isLast = item.isLast ? item.isLast : false;
-      await this.$refs.bulletinDetail.getBulletinDetail();
-      this.loading = false;
+      this.$refs.bulletinDetail.getBulletinDetail();
       this.$refs.bulletinDetail.getReadPerson();
       this.$refs.bulletinDetail.getUnreadPerson();
     },

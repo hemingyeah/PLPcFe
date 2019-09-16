@@ -181,43 +181,41 @@ export default {
     },
     // 获取通知公告详情
     async getBulletinDetail () {
-      return new Promise(async (resolve, reject) => {
-        try {
-          this.detailShow = true;
-          this.showMoreNoRead = false;
-          this.showMoreRead = false;
-          this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
-          if(!this.params.noticeId) {
-            this.detail = null;
-            this.detailShow = false;
-            return;
-          }
-          this.loading = true;
-          let res = await RepositoryApi.getBulletinDetail(this.params);
-          this.loading = false;
-          if(res.success) {
-            if(res.message == '已删除') {
-              this.detail = null;
-              this.deleteMsg = '已被删除';
-              this.detailShow = false;
-            } else {
-              this.detail = res.result;
-              this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
-              this.detailShow = true;
-            }
-            resolve();
-          } else {
-            this.$platform.notification({
-              title: res.message,
-              type: 'error',
-            });
-            reject();
-          }
-        } catch (err) {
-          console.error(err)
-          this.loading = false;
+      try {
+        this.detailShow = true;
+        this.showMoreNoRead = false;
+        this.showMoreRead = false;
+        this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
+        if(!this.params.noticeId) {
+          this.detail = null;
+          this.detailShow = false;
+          return;
         }
-      })
+
+        this.loading = true;
+        let res = await RepositoryApi.getBulletinDetail(this.params);
+        this.loading = false;
+
+        if(res.success) {
+          if(res.message == '已删除') {
+            this.detail = null;
+            this.deleteMsg = '已被删除';
+            this.detailShow = false;
+          } else {
+            this.detail = res.result;
+            this.detail.createTime = Lang.fmt_gmt_time(this.detail.createTime);
+            this.detailShow = true;
+          }
+        } else {
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
+        }
+      } catch (err) {
+        console.error(err)
+        this.loading = false;
+      }
     },
 
     // 获取最近5条已读未读用户

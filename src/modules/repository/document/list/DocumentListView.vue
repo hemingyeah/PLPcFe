@@ -1,5 +1,5 @@
 <template>
-  <div class="document-list-view" v-loading.fullscreen.lock="loading">
+  <div class="document-list-view">
     <!-- 搜索部分 -->
     <list-search class="list-search" v-model="params" :tag="tag" :total="listTotal" :infoEdit="initData.userInfo.authorities" @search="search" ref="listSearch"></list-search>
 
@@ -69,9 +69,7 @@ export default {
         id: null,
         allowShare: 0,
         isLast: false
-      },
-
-      loading: false,
+      }
     }
   },
 
@@ -98,9 +96,8 @@ export default {
       this.$refs.listSearch.initView();
       this.$refs.listSearch.getTypes();
       try {
-        this.loading = true;
+        this.$refs.documentDetail.loading = true;
         let res = await RepositoryApi.getDocumentList(this.params);
-        // this.loading = false;
         
         if(res.success) {
           if(this.$refs.list) this.$refs.list.resetScrollTop();
@@ -141,7 +138,7 @@ export default {
         }
       } catch (err) {
         console.error(err);
-        this.loading = false;
+        this.$refs.documentDetail.loading = false;
       }    
     },
 
@@ -157,18 +154,17 @@ export default {
       this.$refs.listSearch.setTag();
     },
 
-    async toDetail (item) {
+    toDetail (item) {
       if(!item) {
         this.info.id = null;
         this.$refs.documentDetail.getDocumnetDetail();
-        this.loading = false;
+        this.$refs.documentDetail.loading = false;
         return;
       }
       this.info.id = item.id;
       this.info.allowShare = item.allowShare;
       this.info.isLast = item.isLast ? item.isLast : false;
-      await this.$refs.documentDetail.getDocumnetDetail();
-      this.loading = false;
+      this.$refs.documentDetail.getDocumnetDetail();
     },
 
     resetPageNum () {
