@@ -93,6 +93,7 @@ export default {
             return;
           }
           
+          if(this.$refs.list) this.$refs.list.resetScrollTop();
           this.listTotal = res.result.total;
           if(res.result.list.length == 1 && res.result.nextPage == 0) {
             res.result.list[0].isLast = true;

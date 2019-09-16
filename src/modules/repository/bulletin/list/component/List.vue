@@ -1,7 +1,7 @@
 <template>
   <div class="bulletin-list-container">
 
-    <div class="list-content">
+    <div class="list-content" ref="lisrContent">
       <div class="list-noData" v-if="value.list && value.list.length <= 0">暂无数据</div>
 
       <div class="list-item" :class="id == item.id ? 'choosed-item' : ''" v-else v-for="item in value.list" :key="item.id">
@@ -50,6 +50,10 @@ export default {
     }
   },
   methods: {
+    resetScrollTop () {
+      this.$refs.lisrContent.scrollTop = 0;
+    },
+
     toDetail (item) {
       this.$emit('update:id', item.id);
       this.$emit('toDetail', item)
