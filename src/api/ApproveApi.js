@@ -40,8 +40,16 @@ function getTaskTypeList (params) {
  */
 function getApproveList (params) {
   // return http.post('http://47.98.255.79:10002/approve/search', params) // 内部接口
-  // return http.post('/approve/search', params); // 本地联调
-  return http.post('/api/app/outside/approve/search', params); // 正式，测试服
+
+  // --- 本地联调 start ---
+  // params.tenantId = '7416b42a-25cc-11e7-a500-00163e12f748';
+  // params.myId = 'd4384a18-8833-11e9-bfc9-00163e304a25';
+
+  // return http.post('/outside/approve/search', params); // 本地联调
+  // --- 本地联调 end ---
+
+  // prod环境
+  return http.post('/api/app/outside/approve/search', params); 
 }
 
 /**

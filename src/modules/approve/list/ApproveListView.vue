@@ -32,6 +32,7 @@
 
         <el-form class="advanced-search-form" novalidate @submit.native.prevent="btnSearchHandler()">
           <div class="form-item-container" :class="{'two-columns': columnNum === 2, }">
+            <!-- 发起人 -->
             <el-form-item label-width="100px" label="发起人">
               <base-select v-model="paramsForSelector.proposer" :remote-method="inputSearchInitiator" placeholder="请选择" clearable>
                 <template slot="option" slot-scope="{option}">
@@ -41,6 +42,7 @@
                 </template>
               </base-select>
             </el-form-item>
+            <!-- 发起时间 -->
             <el-form-item label-width="100px" label="发起时间">
               <el-date-picker
                 v-model="params.createTime"
@@ -53,6 +55,7 @@
                 :picker-options="approveTimePickerOptions"
               ></el-date-picker>
             </el-form-item>
+            <!-- 审批时间 -->
             <el-form-item label-width="100px" label="审批时间">
               <el-date-picker
                 v-model="params.completeTime"
@@ -65,6 +68,7 @@
                 :picker-options="approveTimePickerOptions"
               ></el-date-picker>
             </el-form-item>
+            <!-- 来源 -->
             <el-form-item label-width="100px" label="来源">
               <el-select v-model="params.source" clearable placeholder="请选择" @input="sourceChangeHandler">
                 <el-option :value="item.value" :label="item.name" v-for="(item, idx) in sources" :key="idx"></el-option>
@@ -96,7 +100,16 @@
                 </el-select>
               </el-form-item>
             </template>
-
+            <!-- 审批人 -->
+            <el-form-item label-width="100px" label="审批人">
+              <base-select v-model="paramsForSelector.approvers" :remote-method="inputSearchInitiator" placeholder="请选择" clearable>
+                <template slot="option" slot-scope="{option}">
+                  <div class="initiator-option-row">
+                    <img :src="getInitiatorAvatar(option.head)" class="initiator-avatar"/><span class="initiator-display-name">{{option.label}}</span>
+                  </div>
+                </template>
+              </base-select>
+            </el-form-item>
 
           </div>
           <div class="advanced-search-btn-group">
@@ -106,6 +119,7 @@
         </el-form>
       </base-panel>
     </div>
+
     <!-- 列表 view -->
     <div class="list-group-view">
       <el-form class="operation-bar-container">
@@ -126,6 +140,7 @@
             </el-select>
           </el-form-item>
         </div>
+
         <div class="right-btn-group">
           <el-dropdown v-if="exportPermission" trigger="click">
             <!-- <el-dropdown trigger="click"> -->
@@ -200,13 +215,16 @@
             <template v-else-if="column.field === 'approverName'">
               {{ getApproversNameList(scope.row.approvers) }}
             </template>
+            <template v-else-if="column.field === 'approvalTime'">
+              {{ scope.row[column.field] | getFormatApproveTime }}
+            </template>
             <template v-else>
               {{ scope.row[column.field] }}
             </template>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120px" min-width="120px" v-if="params.state === 'unapproved'">
-          <template slot-scope="scope" v-if="scope.row.state === 'unapproved'">
+          <template slot-scope="scope" v-if="canApproveThis(scope.row)">
             <base-button type="primary" @event="approveHandler(scope.row)">审批</base-button>
           </template>
         </el-table-column>
@@ -326,7 +344,8 @@ export default {
         typeId: '',
         action: '',
         pageNum: 1,
-        pageSize: ''
+        pageSize: '',
+        approversId: '',
       },
       paramsBackup: {
         keyword: '',
@@ -335,7 +354,8 @@ export default {
         proposer: [],
         eventType: [],
         taskType: [],
-        state: '待审批'
+        state: '待审批',
+        approvers: [],
       },
       proposer: [],
       sources: [
@@ -347,7 +367,8 @@ export default {
       ],
       role: [
         { name: '由我审批', value: 'approve' },
-        { name: '由我发起', value: 'propose' }
+        { name: '由我发起', value: 'propose' },
+        // { name: '全部审批', value: 'all' }
       ],
       processNodeForEvent: [
         { value: '', name: '全部' },
@@ -393,12 +414,6 @@ export default {
       multipleSelection: [],
       auth: {},
       selectedLimit: 200,
-      // 过期需求
-      // tempApprove: {}, // 当前执行操作的审批条目（如 点击审批时）
-      // tempApproveApply: { // 执行审批操作确认模态框 绑定字段
-      //   result: 'success',
-      //   remark: ''
-      // }
     }
   },
   methods: {
@@ -410,11 +425,11 @@ export default {
         completeTime: '',
         source: '', // 来源搜索
         state: 'unapproved', // 审批状态搜索
-        mySearch: 'approve',
-        // mySearch: '', // todo  不要提交
+        mySearch: 'approve', // 没有审批数据时可以传空字符串调试
         eventType: '',
         action: '',
         pageNum: 1,
+        approversId: '',
       }
     },
     buildParams () {
@@ -442,6 +457,7 @@ export default {
       // 获取发起人参数Id
       let proposers = this.paramsForSelector.proposer;
       this.params.proposerId = (proposers && proposers.length > 0) ? proposers[0].userId : '';
+
       // 获取事件类型参数id
       if (this.params.source === 'task') {
         let types = this.paramsForSelector.taskType;
@@ -452,6 +468,10 @@ export default {
       } else {
         this.params.typeId = '';
       }
+
+      // 审批人
+      let approvers = this.paramsForSelector.approvers;
+      this.params.approversId = (approvers && approvers.length) ? approvers[0].userId : '';
 
     },
     btnSearchHandler () {
@@ -738,6 +758,7 @@ export default {
         { label: '审批人', field: 'approverName', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '审批时间', field: 'completeTime', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '审批备注', field: 'approveRemark', show: true, fixed: true, export: true },
+        { label: '审批用时', field: 'approvalTime', show: true, fixed: true, export: true, sortable: 'custom' }
       ]
     },
     /**
@@ -1005,6 +1026,30 @@ export default {
         loading
       });
       // alert(`handleExport${loading}`)
+    },
+    
+    /**
+     * 设置权限
+     */
+    setPermission () {
+      if (this.hasVIPApprovePermission) {
+        this.role.push({ name: '全部审批', value: 'all' });
+      }
+    },
+
+    /**
+     * 是否可以审批此数据
+     * - 控制审批按钮的显示隐藏
+     * 必须是审批人才可以审批
+     */
+    canApproveThis (data) {
+      if (!data) return false;
+      if (data.state !== 'unapproved') return false;
+
+      let approvers = data.approvers || [];
+      let isApprover = approvers.some(approve => approve.userId === this.userId);
+
+      return isApprover;
     }
   },
   computed: {
@@ -1013,6 +1058,9 @@ export default {
     },
     exportPermission () {
       return this.auth.EXPORT_IN;
+    },
+    hasVIPApprovePermission () {
+      return this.auth.VIP_APPROVE === 3;
     }
   },
   mounted () {
@@ -1026,6 +1074,9 @@ export default {
       this.auth = {};
       this.userId = '';
     }
+
+    // 根据auth设置不同权限
+    this.setPermission();
 
     this.doSearch();
     // 注册暴露方法
@@ -1045,6 +1096,31 @@ export default {
       } catch (e) {
         return '';
       }
+    },
+    /**
+     * 格式化的审批用时
+     */
+    getFormatApproveTime (value) {
+      if (!value) return '';
+
+      let day = Math.floor(value / (24 * 3600 * 1000));
+  
+      let l1 = value % (24 * 3600 * 1000);
+      let hours = Math.floor(l1 / (3600 * 1000));
+      
+      let l2 = l1 % (3600 * 1000);
+      let minute = Math.floor(l2 / (60 * 1000));
+      
+      let l3 = l2 % (60 * 1000);
+      let second = Math.floor(l3 / 1000);
+      
+      
+      day = day ? (`${day}天`) : '';
+      hours = hours ? (`${hours}时`) : '';
+      minute = minute ? (`${minute}分`) : '';
+      second = second ? (`${second}秒`) : '';
+      
+      return day + hours + minute + second;
     }
   },
   components: {
