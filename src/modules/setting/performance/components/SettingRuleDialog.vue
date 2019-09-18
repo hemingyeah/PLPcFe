@@ -194,7 +194,7 @@ export default {
           value: 'serviceContents',
         },
         {
-          label: '自定义字段',
+          label: '工单自定义字段',
           value: 'customizedFields',
         },
       ],
@@ -741,7 +741,7 @@ export default {
                 // 把被删除的选项过滤掉
                 rule.types = rule.types.filter(type => selectedField[0].dataSource.some(option => option.value === type));
                 if (!rule.types.length) {
-                  this.warning = '自定义字段的选项已被删除，请重新编辑该绩效规则';
+                  this.warning = '工单自定义字段的选项已被删除，请重新编辑该绩效规则';
                 }
                 // rule.placeHolder = '选项已被删除请重选';
                 return rule;
@@ -749,7 +749,7 @@ export default {
 
               return this.form.customizedField = customFieldValue;
             }
-            this.warning = '自定义字段已被删除，请重新编辑该绩效规则';
+            this.warning = '工单自定义字段已被删除，请重新编辑该绩效规则';
             // res 是条件被选中的字段，如果长度为0就是选中的字段被删除了， reset
             this.clearSomeFieldsVal(['rules', 'customizedField']);
           })
