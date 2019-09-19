@@ -76,7 +76,7 @@
   // 手机边框
   .form-design-center {
     background: url('./../../assets/img/iphoneX.png') no-repeat center 0;
-    background-size: 100%;
+    background-size: 100% 100%;
   
     position: relative;
     height: 600px;
@@ -86,22 +86,22 @@
   
     .form-design-phone {
       position: absolute;
-      top: 72px;
-      left: 20px;
+      top: 49px;
+      left: 18px;
       right: 23px;
       bottom: 22px;
   
       height: calc(100% - 80px);
-      width: calc(100% - 50px);
+      width: calc(100% - 36px);
   
-      border-radius: 0 0 35px 35px;
+      // border-radius: 0 0 35px 35px;
       border: 1px solid #edf0f4;
       border-top: none;
-      background-color: #edf0f4;
+      background-color: #fff;
       box-shadow: none;
   
-      &::-webkit-scrollbar {
-        display: none;
+      &::-webkit-scrollbar-thumb {
+        border-radius: 3px;
       }
   
     }
