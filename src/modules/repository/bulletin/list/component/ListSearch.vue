@@ -1,14 +1,14 @@
 <template>
   <div class="bulletin-list-search" ref="search">
     <div class="search-top">
-      <button class="base-button search-new" @click="create();trackEventHandler('create')" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">新建</button>
+      <button class="base-button search-new" @click="create();trackEventHandler('create')" v-if="infoEdit.VIP_INFO_NOTICE_CREATE && infoEdit.VIP_INFO_NOTICE_CREATE == 3">新建</button>
       
       <!-- 通知公告类型筛选 -->
       <div class="search-bottom">
         <el-select v-model="params.typeId" class="search-type" @change="search" @visible-change="showCascader" clearable>
           <el-option v-for="item in typeOptions" :key="item.id" :value="item.id" :label="item.name">
             <span style="float: left">{{ item.name }}（{{ item.count }}）</span>
-            <span style="float: right" class="type-operating" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
+            <span style="float: right" class="type-operating" v-if="infoEdit.VIP_INFO_NOTICE_CREATE && infoEdit.VIP_INFO_NOTICE_CREATE == 3">
               <i class="iconfont icon-bianji" style="font-size: 14px" @click.stop="editType(item)"></i>
               <i class="iconfont icon-qingkongshanchu" style="font-size: 14px" @click.stop="deleteType(item)"></i>
             </span>
@@ -172,7 +172,7 @@ export default {
     },
 
     showCascader (flag) {
-      if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
+      if(!(this.infoEdit.VIP_INFO_NOTICE_CREATE && this.infoEdit.VIP_INFO_NOTICE_CREATE == 3)) return;
       let parent;
       if(this.typeOptions.length <= 0) {
         parent = document.getElementsByClassName('el-select-dropdown__empty')[0];

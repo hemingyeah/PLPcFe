@@ -132,8 +132,8 @@ export default {
   },
   data () {
     return {
-      allowEdit: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3 : (this.initData.userInfo.authorities.INFO_EDIT ? this.initData.userInfo.authorities.INFO_EDIT == 3 : false),
-      allowShow: this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_VIEW : (this.initData.userInfo.authorities.INFO_VIEW ? this.initData.userInfo.authorities.INFO_VIEW : false),
+      allowEdit: this.infoEdit ? (this.infoEdit.VIP_INFO_NOTICE_CREATE && this.infoEdit.VIP_INFO_NOTICE_CREATE == 3) : (this.initData.userInfo.authorities.VIP_INFO_NOTICE_CREATE && this.initData.userInfo.authorities.VIP_INFO_NOTICE_CREATE == 3),
+      // allowShow: this.infoEdit ? (this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_VIEW : false) : (this.initData.userInfo.authorities.INFO_VIEW ? this.initData.userInfo.authorities.INFO_VIEW : false),
       noticeId: '',
       form: this.buildForm(), // 附件存储格式
       params: {
@@ -169,11 +169,11 @@ export default {
             this.noticeId = item.value;
           }
         })
-        if(!this.allowEdit && !this.allowShow) {
-          this.detailShow = false;
-          this.deleteMsg = '您没有权限查看该页面';
-          return;
-        }
+        // if(!this.allowEdit && !this.allowShow) {
+        //   this.detailShow = false;
+        //   this.deleteMsg = '您没有权限查看该页面';
+        //   return;
+        // }
         this.getBulletinDetail();
         this.getReadPerson();
         this.getUnreadPerson();
