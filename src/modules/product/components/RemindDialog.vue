@@ -253,7 +253,7 @@ export default {
 
       this.changeRemindId();
 
-      this.fetchLinkman();
+      this.fetchLinkman(remind);
       this.init = true;
     },
     changeRemindId() {
@@ -304,7 +304,7 @@ export default {
         })
         .catch(e => console.log(e));
     },
-    fetchLinkman() {
+    fetchLinkman(remind) {
       const params = {
         customerId: this.product.customer.id,
         pageNum: 1,
@@ -326,6 +326,7 @@ export default {
           if (this.action === 'create') {
             this.updateFormUser();
           } else {
+            this.initSelect(remind.sendRoleSetting || {});
             this.form.users = _.cloneDeep(this.editedRemind.users).map(({id, name}) => ({label: name, value: id}))
           }
         })

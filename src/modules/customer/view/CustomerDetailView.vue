@@ -618,7 +618,9 @@ export default {
     },
     updateRemind(remind) {
       this.selectedRemind = remind || {};
-      this.$nextTick(this.$refs.addRemindDialog.openDialog);
+      this.$nextTick(() =>  {
+        this.$refs.addRemindDialog.openDialog(this.selectedRemind.sendRoleSetting || {});
+      });
     }
   },
   mounted() {

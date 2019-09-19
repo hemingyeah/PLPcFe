@@ -231,7 +231,7 @@ export default {
         }))
       };
     },
-    openDialog() {
+    openDialog(remind) {
       this.remindCustomerDialog = true;
 
       if (this.action === 'edit') {
@@ -240,7 +240,7 @@ export default {
         this.form.remindId = (this.remindTemplate[0] || {}).id;
       }
 
-      this.fetchLinkman();
+      this.fetchLinkman(remind);
       this.init = true;
     },
     fetchData() {
@@ -285,7 +285,7 @@ export default {
         })
         .catch(e => console.log(e));
     },
-    fetchLinkman() {
+    fetchLinkman(remind) {
       const params = {
         customerId: this.customer.id,
         pageNum: 1,
@@ -306,6 +306,7 @@ export default {
           if (this.action === 'create') {
             this.updateFormUser();
           } else {
+            this.initSelect(remind)
             this.form.users = _.cloneDeep(this.editedRemind.users).map(({id, name}) => ({label: name, value: id}))
           }
         })
