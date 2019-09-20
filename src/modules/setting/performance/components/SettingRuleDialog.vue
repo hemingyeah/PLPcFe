@@ -588,14 +588,20 @@ export default {
           if (succ) {
             this.taskSelectFields = data
               .filter(({formType, setting}) => formType === 'select' && setting && !setting.isMulti)
-              .map(({displayName, fieldName, setting}) => ({
-                label: displayName,
-                value: fieldName,
-                dataSource: setting.dataSource.map(op => ({
-                  label: op,
-                  value: op,
-                }))
-              }));
+              .map(({displayName, fieldName, setting, tableName}) => {
+                // 显示后缀
+                let suffix = tableName === 'task_receipt' ? '（回执）' : '';
+                let label = displayName + suffix;
+
+                return {
+                  label,
+                  value: fieldName,
+                  dataSource: setting.dataSource.map(op => ({
+                    label: op,
+                    value: op,
+                  }))
+                }
+              });
 
             return this.allTaskSelectFields[this.form.custFieldOfTask] = this.taskSelectFields;
           }
