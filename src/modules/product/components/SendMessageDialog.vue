@@ -134,7 +134,7 @@ export default {
       if (!this.selectedIds.length) {
         return this.$platform.alert('请选择需要批量发送短信的产品');
       }
-      this.sendMessageDialog = true;\
+      this.sendMessageDialog = true;
       this.form.sendTime = new Date(),
       this.fetchCount();
       this.fetchTemplate();
