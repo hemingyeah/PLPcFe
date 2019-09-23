@@ -68,7 +68,7 @@ const FormView = {
         <div class="form-view-row">
           <label>{displayName}</label>
           <div class="form-view-row-content">
-            <span domPropsInnerHTML={newVal} onClick={(e) => {
+            <span domPropsInnerHTML={newVal} class="form-view-textarea-content" onClick={(e) => {
               e.stopPropagation();
               let url = e.target.getAttribute('url');
 
