@@ -1,5 +1,5 @@
 <template>
-  <div class="performance-view-container">
+  <div v-if="!isDelete" class="performance-view-container">
 
     <dl class="main-info">
 
@@ -156,6 +156,8 @@
       <div ref="bridge" class="base-export-bridge"></div>
     </div>
   </div>
+  <!-- 被删除时 -->
+  <no-data-view v-else :notice-msg="'已被删除'"></no-data-view>
 </template>
 
 <script>
@@ -166,6 +168,7 @@ import ApproveProcess from './components/ApproveProcess.vue';
 import PublishReportDialog from './components/PublishReportDialog.vue';
 import RequestApprove from './components/RequestApprove.vue';
 import ApproveDialog from './components/ApproveDialog.vue';
+import NoDataView from '@src/component/common/NoDataView';
 import {cancelApprove, getPerformanceRecord} from '@src/api/PerformanceApi';
 
 /**
@@ -217,7 +220,8 @@ export default {
           label: '明细',
           field: 'action',
         },
-      ]
+      ],
+      isDelete: false, // 绩效报告是否被删除
     }
   },
   computed: {
@@ -381,8 +385,14 @@ export default {
   },
   mounted() {
     this.getRecord();
+    this.initView();
   },
   methods: {
+    initView () {
+      if (this.initData && this.initData.reportDescList === '') {
+        this.isDelete = true;
+      }
+    },
     setStatus(n) {
       this.reportApproveStatus = n;
     },
@@ -543,6 +553,7 @@ export default {
     [ApproveProcess.name]: ApproveProcess,
     [RequestApprove.name]: RequestApprove,
     [ApproveDialog.name]: ApproveDialog,
+    [NoDataView.name]: NoDataView
   }
 }
 </script>
