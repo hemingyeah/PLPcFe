@@ -46,21 +46,22 @@
         <div class="base-cascader__dropdown" v-if="optionList.length > 0 && optionList[0].length > 0">
           <ul
             class="base-cascader-panel"
-            v-for="(options, index) in optionList"
-            :key="index"
+            v-for="(options, indexList) in optionList"
+            :key="indexList"
             v-show="!filtering">
             <li
               class="base-cascader-menu"
               :class="{'is-active': typeValue.indexOf(item.value) != -1}"
               v-for="(item, index) in options"
               :key="index"
-              @click="handleMenu(item)">
-              <slot :data = 'item'></slot>
+              @click="chooseItem(item, indexList); openChild(item, indexList)">
+              <slot :data = 'item'>
+                <span>{{ item.label }}</span>
+              </slot>
               <i
                 key="clear"
                 v-if="item.children"
-                class="el-icon-arrow-right"
-                @click="openChild(item)"></i>
+                class="el-icon-arrow-right"></i>
             </li>
           </ul>
 
@@ -88,7 +89,6 @@
 </template>
 
 <script>
-import BaseCascaderPanel from './BaseCascaderPanel';
 import _ from 'lodash';
 
 /**
@@ -105,7 +105,7 @@ import _ from 'lodash';
  */
 // TODO: 多选
 export default {
-  name: 'BaseCascader',
+  name: 'base-cascader',
   props: {
     value: {
       type: Array,
@@ -141,10 +141,6 @@ export default {
   model: {
     prop: 'value', //绑定的值，通过父组件传递
     event: 'update' //自定义时间名
-  },
-
-  components: {
-    [BaseCascaderPanel.name]: BaseCascaderPanel
   },
 
   data () {
@@ -206,31 +202,22 @@ export default {
     },
 
     // 初始化input的绑定值
-    initInputValue () {
+    initInputValue (inputValueArray, optionList, itemIndex) {
       if(this.typeValue.length <= 0) return;
-      if(this.checkStrictly) {
-        if(this.typeValue.length == 1) {
-          this.options.forEach(option => {
-            if(option.value == this.typeValue[0]) {
-              this.inputValue = option.label;
-            }
-          })
-        }
-      }
-      
-      if(this.typeValue.length > 1) {
-        this.options.forEach(option => {
-          if(option.value == this.typeValue[0]) {
-            this.inputValue = option.label;
-          }
 
-          option.children.forEach(child => {
-            if(child.value == this.typeValue[1]) {
-              this.inputValue = `${ this.inputValue }/${ child.label }`;
-            }
-          })
-        })
-      }
+      optionList.forEach(option => {
+        if(option.value == this.typeValue[itemIndex]) {  
+          inputValueArray.push(option.label);
+          if(this.checkStrictly || (!this.checkStrictly && !option.children)) {
+            this.inputValue = inputValueArray.join('/');
+          }
+          if(!option.children || this.typeValue.length <= itemIndex) {
+            return;
+          }
+          itemIndex++;
+          this.initInputValue(inputValueArray, option.children, itemIndex)
+        }
+      })
     },
 
     // input获得焦点
@@ -255,7 +242,8 @@ export default {
     },
 
     // 初始化搜索时的分类数据结构，即对父级和子级的分类做了一个拼接
-    fileterTye () {
+    // TODO: 无限级拼接
+    filterType () {
       let arr = [];
       this.options.forEach(parent => {
         if(this.checkStrictly) {
@@ -274,7 +262,7 @@ export default {
 
     // 搜索符合条件的类别，即包含关键词
     filterHandler: _.debounce(function () {
-      let arr = this.fileterTye();
+      let arr = this.filterType();
       let typeArr = [];
       arr.forEach(item => {
         typeArr.push(item.label);
@@ -311,34 +299,36 @@ export default {
     },
 
     // 初始化展开板数据
-    initOptionList () {
-      if(!this.inputValue) {
+    initOptionList (optionList, itemIndex) {
+      if(!this.typeValue || this.typeValue.length == 0) {
         this.optionList = [this.options]; 
         return;
       }
-      if(this.typeValue.length == 1) {
-        this.optionList = [this.options];
-        return;
-      }
-      this.optionList = [this.options];
-      let arr = this.inputValue.split('/');
-      this.options.forEach(item => {
-        if(item.label == arr[0]) {
-          this.optionList.push(item.children)
+
+      if(!this.typeValue[itemIndex]) return;
+
+      optionList.forEach(option => {
+        if(option.value == this.typeValue[itemIndex]) {
+          if(this.optionList[itemIndex]) this.optionList.splice(itemIndex);
+          this.optionList.push(optionList);
+          if(!option.children || this.typeValue.length <= (itemIndex - 1)) {
+            return;
+          }
+          itemIndex++;
+          this.initOptionList(option.children, itemIndex)
         }
       })
     },
 
     // 展开第二级
-    openChild (info) {
+    openChild (info, index) {
       if(!info.children) return;
-      if(this.optionList.length > 1) {
-        this.optionList.splice(1);
+      if(this.optionList.length > index + 1) {
+        this.optionList.splice(index + 1);
       }
       this.$nextTick(() => {
         this.optionList.push(info.children);
       })
-      
     },
 
     // 点击分类时
@@ -348,21 +338,17 @@ export default {
     },
 
     // 平时选中
-    chooseItem (item) {
+    // TODO: 不可以每一级都选择时，选择到最后一级关闭
+    chooseItem (item, index) {
       let { inputValueArr } = this;
-      if(item.children) {
-        this.typeValue.splice(0);
-        inputValueArr.splice(0);
-      } else {
-        this.typeValue.splice(1);
-        inputValueArr.splice(1);
-      }
+      this.typeValue.splice(index);
+      inputValueArr.splice(index);
       this.typeValue.push(item.value);
       inputValueArr.push(item.label);
       if(!this.checkStrictly) {
         if(inputValueArr.length > 1) {
           this.inputValue = inputValueArr.join('/');
-          this.toggleDropDownVisible(false);
+          // this.toggleDropDownVisible(false);
         }
       } else {
         this.inputValue = inputValueArr.join('/');
@@ -388,7 +374,7 @@ export default {
   watch: {
     options: {
       handler() {
-        this.initOptionList();
+        this.initOptionList(this.options, 0);
       },
       deep: true,
       immediate: true,
@@ -396,8 +382,8 @@ export default {
 
     typeValue: {
       handler(n) {
-        this.initInputValue();
-        if(n.length <= 0) this.initOptionList();
+        this.initInputValue([], this.options, 0);
+        if(n.length > 0) this.initOptionList(this.options, 0);
       },
       deep: true,
       immediate: true,
@@ -495,7 +481,7 @@ export default {
     }
 
     .base-cascader-footer {
-      height: 40px;
+      // height: 40px;
       border-top: 10px solid #f0f0f0;
       color: #55b7b4;
       cursor: pointer;
