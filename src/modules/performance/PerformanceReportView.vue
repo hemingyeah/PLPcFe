@@ -389,7 +389,7 @@ export default {
   },
   methods: {
     initView () {
-      if (this.initData && this.initData.reportDescList === '') {
+      if (this.initData && this.initData.reportDescList === null) {
         this.isDelete = true;
       }
     },
