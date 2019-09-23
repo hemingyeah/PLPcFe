@@ -19,6 +19,7 @@ import BaseTable from './common/BaseTable';
 import BaseDistPicker from './common/BaseDistPicker';
 import BaseWindow from './common/BaseWindow';
 import BaseSteps from './common/BaseSteps';
+import BaseCascader from './common/BaseCascader';
 
 // 可快速调用的组件
 import BaseMapDisplay from './common/BaseMapDisplay';
@@ -63,7 +64,7 @@ const components = [
   BizTeamSelect,
   BaseWindow,
   SampleTooltip,
-
+  BaseCascader,
   BaseEditor
 ];
 

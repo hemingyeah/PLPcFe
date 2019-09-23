@@ -14,7 +14,6 @@
       <div style="height: 50px;"></div>
     </base-modal>
     
-    <div style="height: 1000px"></div>
   </div>
 </template>
 
