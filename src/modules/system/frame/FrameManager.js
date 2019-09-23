@@ -4,6 +4,7 @@ import Tab from './model/Tab';
 import {getRootWindow} from '@src/util/dom';
 import FrameHistoryManager from './FrameHistoryManager'
 import { platform } from '@src/platform';
+import { storageGet, storageSet, storageSetDepth } from '@src/util/storage';
 
 // import normalizeWheel from '@src/util/normalizeWheel'
 
@@ -12,6 +13,30 @@ const CACHED_FRAMES = [
   'M_TASK_AUDIT',
   'M_TASK_REVIEW'
 ];
+
+const urlMap = {
+  taskList: '/task',
+  taskAllot: '/task/allot',
+  settlement: '/balance/alreadySettlement',
+  taskReview : '/task/review',
+  taskClose: '/task/close',
+  taskPlanList: '/task/planTask/list',
+  taskPool: '/task/taskPool',
+  event: '/event',
+  eventOrder: '/event/order',
+}
+
+const storagePageMap = {
+  taskList: 'shb_task_list_page_data',
+  taskAllot: 'shb_task_allot_page_data',
+  settlement: 'shb_settlement_page_data',
+  taskReview : 'shb_task_review_page_data',
+  taskClose: 'shb_task_close_page_data',
+  taskPlanList: 'shb_task_planlist_page_data',
+  taskPool: 'shb_task_taskpool_page_data',
+  event: 'shb_event_list_page_data',
+  eventOrder: 'shb_event_order_page_data',
+};
 
 const FrameManager = {
   data(){
@@ -48,7 +73,11 @@ const FrameManager = {
     /** 用于从导航菜单打开tab */
     openForNav(menu){
       window.TDAPP.onEvent(`pc：访问${menu.name || (`未命名页面${menu.menuKey || ''}`)}`);
-      let tab = new Tab({id: menu.menuKey, url: menu.url, title: menu.name});
+      let url = this.joinParams(menu.url);
+
+      console.log('this is url', url);
+      
+      let tab = new Tab({ id: menu.menuKey, url, title: menu.name });
       this.openFrameTab(tab)
     },
     /** 
@@ -417,7 +446,74 @@ const FrameManager = {
         adjustTab.show = true;
         return this.adjustFrameTabs(adjustTab);
       }
-    }
+    },
+    conversionUrlWithStorageName(fullUrl) {
+      if(!fullUrl) return '';
+      
+      let symbol = '?';
+      let symbolIndex = fullUrl.indexOf(symbol);
+      let url = symbolIndex < 0 ? fullUrl : fullUrl.substr(0, symbolIndex);
+      let storageKey = '';
+
+      for(let key in urlMap) {
+        if(urlMap[key] == url) {
+          storageKey = key;
+          break;
+        }
+      }
+      
+      return storagePageMap[storageKey] || '';
+    },
+    getStoragePageData(fullUrl) {
+      let storageKey = this.conversionUrlWithStorageName(fullUrl);
+
+      if(!storageKey) return {};
+
+      let pageData = {};
+
+      try {
+        pageData = storageGet(storageKey, '{}');
+        pageData = JSON.parse(pageData);
+      } catch(err) {
+        console.log('hbc: getStoragePageData -> err', err)
+      }
+      
+      // 存入缓存
+      if(Object.keys(pageData).length <= 0) {
+        let setPageData = { pageSize: 10 };
+        storageSet(storageKey, JSON.stringify(setPageData));
+      }
+
+      return pageData;
+
+    },
+    joinParams(fullUrl) {
+      if(!fullUrl) return '';
+
+      let symbol = '?';
+      let symbolIndex = fullUrl.indexOf(symbol);
+      let storageData = this.getStoragePageData(fullUrl);
+      let url = fullUrl;
+      let startIndex = 0;
+      
+      // 拼接参数
+      if(symbolIndex < 0) {
+        for(let key in storageData) {
+          startIndex++;
+          startIndex > 1
+            ? url += `&${key}=${storageData[key]}`
+            : url += `?${key}=${storageData[key]}`
+        }
+      } else {
+        for(let key in storageData) {
+          url += `&${key}=${storageData[key]}`;
+        }
+      }
+
+      return url;
+
+    },
+
   },
   mounted(){
     window.addEventListener('message', this.receiveMessage);
