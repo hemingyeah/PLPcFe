@@ -20,10 +20,11 @@ import http from '@src/util/http';
 import platform from '@src/platform';
 /* mixin */
 import fieldMixin from '@src/mixins/fieldMixin';
+import FormDesignMixin from '@src/mixins/FormDesign';
 
 export default {
   name: 'setting-product-fields-view',
-  mixins: [fieldMixin],
+  mixins: [fieldMixin, FormDesignMixin],
   props: {
     initData: {
       type: Object,
@@ -43,10 +44,19 @@ export default {
   },
   mounted(){
     this.setFieldDesignHeight();
+
+    this.computedFormWidthAndHeight('setting-product');
+    window.addEventListener('resize', this.resizeHandler);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.resizeHandler);
   },
   methods: {
     back(){
       window.parent.frameHistoryBack(window)
+    },
+    resizeHandler(event) {
+      this.computedFormWidthAndHeight('setting-product');
     },
     async submit(){
       try {
