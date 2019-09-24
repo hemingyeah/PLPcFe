@@ -6,7 +6,12 @@
     <!-- <biz-team-select-demo/> -->
     <base-cascader :options="options" v-model="typeValue">
     </base-cascader>
-    <base-cascader :options="options" v-model="typeValue" clearable filterable checkStrictly>
+    {{typeValue}}
+
+
+
+
+    <base-cascader :options="options" v-model="typeValue" clearable filterable check-strictly>
       <template slot-scope="slotsProps">
         <span>{{ slotsProps.data.label }}</span>
         <span v-if="slotsProps.data.children">添加</span>
@@ -365,14 +370,6 @@ export default {
     // [BizTeamSelectDemo.name]: BizTeamSelectDemo,
     [BaseCascader.name]: BaseCascader
   },
-  watch: {
-    typeValue: {
-      handler (n) {
-        console.log('typeValue:', n)
-      },
-      deep: true
-    }
-  }
 };
 </script>
 
