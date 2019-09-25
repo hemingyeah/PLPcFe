@@ -293,6 +293,10 @@ export default {
         ]
       }
 
+      if(action == '电话日志'){
+        return <h5><strong>{userName}</strong>拨打了<strong>{content.targetName}</strong>的电话。</h5>
+      }
+
       return [
         <h5><strong>{userName}</strong>{action}了客户。</h5>,
         content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
