@@ -20,6 +20,7 @@ import BaseDistPicker from './common/BaseDistPicker';
 import BaseWindow from './common/BaseWindow';
 import BaseSteps from './common/BaseSteps';
 import BaseCascader from './common/BaseCascader';
+import BaseSelectionBar from './common/BaseSelectionBar'
 
 // 可快速调用的组件
 import BaseMapDisplay from './common/BaseMapDisplay';
@@ -65,6 +66,7 @@ const components = [
   BaseWindow,
   SampleTooltip,
   BaseCascader,
+  BaseSelectionBar,
   BaseEditor
 ];
 

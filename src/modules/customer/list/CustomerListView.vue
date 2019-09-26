@@ -77,6 +77,11 @@
         </div>
       </div>
       <!--operation bar end-->
+
+      <div style="background: #fff;padding: 0 10px">
+        <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection" @toggle-selection="toggleSelection" @show-panel="() => multipleSelectionPanelShow = true" />
+      </div>
+
       <el-table
         :data="customers"
         stripe
@@ -743,6 +748,8 @@ export default {
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.multipleSelection = tv;
+
+      this.$refs.baseSelectionBar.openTooltip();
     },
     computeSelection(selection) {
       let tv = [];
@@ -753,7 +760,6 @@ export default {
     },
     toggleSelection(rows) {
       let isNotOnCurrentPage = false;
-      let item = undefined;
       let row = undefined;
 
       if (rows) {
@@ -1419,7 +1425,6 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    border-bottom: 1px solid #f2f2f2;
 
     .top-btn-group .base-button {
       margin-right: 5px;

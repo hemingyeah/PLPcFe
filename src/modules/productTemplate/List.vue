@@ -75,6 +75,10 @@
       </div>
       <!-- end  -->
 
+      <div style="background: #fff;padding: 0 10px">
+        <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection" @toggle-selection="selectionToggle" @show-panel="() => panelTheMultipleSelectionShow = true" />
+      </div>
+
       <!-- start 表格 -->
       <el-table
         :data="page.list"
@@ -837,6 +841,8 @@ export default {
       }
 
       this.multipleSelection = tv;
+
+      this.$refs.baseSelectionBar.openTooltip();
     },
     // 计算已选择
     selectionCompute(selection) {
@@ -1388,7 +1394,6 @@ html, body {
 
 .operation-bar-container {
   background: #fff;
-  border-bottom: 1px solid #f2f2f2;
   border-radius: 3px 3px 0 0;
 
   display: flex;
