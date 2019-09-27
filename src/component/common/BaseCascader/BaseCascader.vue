@@ -3,7 +3,7 @@
     <div 
       :class="['base-cascader-input', clearable && inputValue && 'base-cascader-input-hover']"
       ref="input" 
-      @click="toggleDropDownVisible">
+      @click.stop="toggleDropDownVisible(!dropDownVisible)">
       <el-input
         v-model="inputValue"
         :size="size"
@@ -252,9 +252,7 @@ export default {
     // 下拉框的展开和关闭
     toggleDropDownVisible(visible) {
       if (this.disabled) return;
-      this.dropDownVisible = !!this.dropDownVisible;
-      if(typeof visible !== 'boolean') visible = null;
-      this.dropDownVisible = visible == null ? !this.dropDownVisible : visible;
+      this.dropDownVisible = visible;
       if(this.dropDownVisible) {
         this.$refs.input.focus();
       }
