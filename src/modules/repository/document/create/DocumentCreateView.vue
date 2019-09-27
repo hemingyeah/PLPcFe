@@ -356,7 +356,7 @@ export default {
     getInput (html) {
       this.articleHtml = html;
       let imgCount = this.imgCount(html);
-      this.articleEmpty = !this.$refs.editor.hasValidText() && !!imgCount;
+      this.articleEmpty = !this.$refs.editor.hasValidText() && !imgCount;
 
       if(imgCount > 20) {
         this.$platform.notification({
