@@ -125,7 +125,6 @@ export default {
     return {
       selfValue: this.value,
       dropDownVisible: false, // 下拉框是否显示
-      // inputValue: this.inputValueArr, // 单选或搜索时input框的绑定值
       filtering: false, // 是否正在搜索
       filterValue: null,
       inputText: '', // input框的输入值
@@ -244,8 +243,6 @@ export default {
 
     // 清除操作
     handleClear() {
-      // this.inputValue = '';
-      console.log(33333)
       this.selfValue = [];
       this.$emit('input', []);
       this.$emit('change', []);
@@ -254,12 +251,10 @@ export default {
     
     // 下拉框的展开和关闭
     toggleDropDownVisible(visible) {
-      console.log(visible)
-      this.dropDownVisible = !!this.dropDownVisible;
-      console.log(this.dropDownVisible)
       if (this.disabled) return;
+      this.dropDownVisible = !!this.dropDownVisible;
       if(typeof visible !== 'boolean') visible = null;
-      this.dropDownVisible = visible || !this.dropDownVisible;
+      this.dropDownVisible = visible == null ? !this.dropDownVisible : visible;
       if(this.dropDownVisible) {
         this.$refs.input.focus();
       }
@@ -297,7 +292,6 @@ export default {
 
       // 每次选择都会更新父组件的value
       if (this.checkStrictly) {
-        // this.inputValue = newInputVal.join('/');
         this.$emit('input', newVal);
         this.$emit('change', newVal);
         return;
@@ -308,7 +302,6 @@ export default {
         this.dropDownVisible = false;
         this.$emit('change', newVal);
         this.$emit('input', newVal);
-        // this.inputValue = newInputVal.join('/');
       }
     },
 
@@ -316,7 +309,6 @@ export default {
     chooseFilterItem (item) {
       this.dropDownVisible = false;
       this.filterChoose = true;
-      // this.inputValue.set(item.label);
       let newVal;
       if(item.value.length > 1) {
         newVal = item.value.split('/');
