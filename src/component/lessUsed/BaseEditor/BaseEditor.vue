@@ -40,7 +40,7 @@ export default {
     },
     action: {
       type: String,
-      default: '/files/upload',
+      default: '/files/upload?isCmp=true',
     },
     placeholder: {
       type: String,

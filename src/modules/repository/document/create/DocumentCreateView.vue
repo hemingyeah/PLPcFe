@@ -70,7 +70,8 @@ export default {
       draftCanClick: true,
       pending: false,
       isSaveData: false,
-      isUpdate: false
+      isUpdate: false,
+      typeId: null,
     }
   },
   async created () {
@@ -141,20 +142,27 @@ export default {
 
         if(res.success) {
           res.result.forEach(item => {
-            item.value = item.id;
+            item.value = item.id.toString();
             item.label = item.name;
-            item.children = item.subTypes;
+            if(item.subTypes.length > 0) {
+              item.children = item.subTypes;
+              item.children.forEach(childItem => {
+                childItem.value = childItem.id.toString();
+                childItem.label = childItem.name;
+              })
+            }
+            // item.children = item.subTypes;
 
-            item.children.forEach(childItem => {
-              childItem.value = childItem.id;
-              childItem.label = childItem.name;
-              childItem.count = 0;
-            })
+            // item.children.forEach(childItem => {
+            //   childItem.value = childItem.id;
+            //   childItem.label = childItem.name;
+            //   childItem.count = 0;
+            // })
 
-            item.children.unshift({
-              label: '全部',
-              value: item.id,
-            })
+            // item.children.unshift({
+            //   label: '全部',
+            //   value: item.id,
+            // })
           })
           this.params.options = res.result;
           if(this.params.options.length <= 0) {
@@ -167,8 +175,12 @@ export default {
             this.deleteCanClick = false;
           }
           if(!this.isEdit && this.params.options.length > 0) {
-            if(this.params.typeId.length <= 0) this.setType(this.params.options[0].value)
-            // this.params.typeId = [this.params.options[0].value]
+            if(this.params.typeId.length <= 0) {
+              this.setType(this.params.options[0].value)
+            }
+            if(this.typeId) {
+              this.setType(this.typeId);
+            }
           }
         } else {
           this.$platform.notification({
@@ -343,8 +355,23 @@ export default {
 
     getInput (html) {
       this.articleHtml = html;
-      let img = this.articleHtml.indexOf('<img') != -1;
-      this.articleEmpty = !this.$refs.editor.hasValidText() && !img;
+      let imgCount = this.imgCount(html);
+      this.articleEmpty = !this.$refs.editor.hasValidText() && !!imgCount;
+
+      if(imgCount > 20) {
+        this.$platform.notification({
+          title: '最多支持20张图片！',
+          type: 'error',
+        });
+        return false;
+      }
+      return true;
+    },
+
+    imgCount (html) {
+      let imgReg = /<img.*?(?:>|\/>)/gi // 匹配图片中的img标签
+      let arr = html.match(imgReg)  //筛选出所有的img
+      return (arr && arr.length) || null;
     },
 
     // 编辑时获取文章信息
@@ -379,22 +406,32 @@ export default {
         }
       } else {
         let detail = localStorage.getItem('document_article');
-        this.params = Object.assign(this.params, JSON.parse(detail));
-        if(!this.params.article) this.params.article = ' ';
+        let params = JSON.parse(detail);
+        this.params.title = params.title || '';
+        this.params.permission = params.permission || '内部';
+        this.params.label = params.label || [];
+        this.params.form = params.form || {};
+        this.params.article = params.article || ' ';
+        this.typeId = params.typeId;
       }
     },
 
     setType (id) {
       this.params.options.forEach(parent => {
-        // if(parent.value == id) {
-        //   this.params.typeId = [parent.value]
-        // }
+        if(parent.value == id) {
+          this.params.typeId.splice(0);
+          this.params.typeId.push(parent.value);
+        }
 
-        parent.children.forEach(child => {
-          if(child.value == id) {
-            this.params.typeId = [parent.value, child.value]
-          }
-        })
+        if(parent.children) {
+          parent.children.forEach(child => {
+            if(child.value == id) {
+              this.params.typeId.splice(0)
+              this.params.typeId.push(parent.value)
+              this.params.typeId.push(child.value)
+            }
+          })
+        }
       })
     },
 
@@ -407,7 +444,7 @@ export default {
             'form': this.params.form,
             'permission': this.params.permission,
             'title': this.params.title,
-            'typeId': this.params.typeId,
+            'typeId': this.params.typeId[1] || this.params.typeId[0],
             'label': this.params.label
           }
           localStorage.setItem('document_article', JSON.stringify(detail));
@@ -466,6 +503,7 @@ export default {
       if(this.articleEmpty) {
         return false;
       }
+      if(!this.getInput()) return false;
       return true;
     },
 

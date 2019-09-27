@@ -15,8 +15,8 @@
         @blur="handleBlur"
         @input="handleInput">
         <template slot="suffix">
-          <i key="clear" class="el-input__icon el-icon-circle-close" @click.stop="handleClear"></i>
-          <i key="arrow-down" :class="['el-input__icon', 'el-icon-arrow-down', dropDownVisible && 'is-reverse']" @click.stop="toggleDropDownVisible"></i>
+          <i key="clear" class="el-input__icon el-icon-circle-close" @click.stop.self="handleClear"></i>
+          <i key="arrow-down" :class="['el-input__icon', 'el-icon-arrow-down', dropDownVisible && 'is-reverse']"></i>
         </template>
       </el-input>
     </div>
@@ -27,7 +27,7 @@
         <div class="base-cascader__dropdown" v-if="!isEmpty">
           <ul
             class="base-cascader-panel"
-            v-for="(options, indexList) in opl"
+            v-for="(options, indexList) in optionList"
             :key="indexList"
             v-show="!filtering">
             <li
@@ -44,7 +44,7 @@
           </ul>
 
           <ul class="base-cascader-panel" v-show="filtering">
-            <li class="base-cascader-menu" v-for="(item, index) in opl" :key="index" @click="chooseFilterItem(item)">
+            <li class="base-cascader-menu" v-for="(item, index) in optionList" :key="index" @click="chooseFilterItem(item)">
               {{item.label}}
             </li>
           </ul>
@@ -54,9 +54,10 @@
           暂无数据
         </div>
 
-        <div class="base-cascader-footer">
+        <slot name="footer"></slot>
+        <!-- <div class="base-cascader-footer">
           <slot name="footer"></slot>
-        </div>
+        </div> -->
       </div>
     </transition>
 
@@ -122,15 +123,18 @@ export default {
 
   data () {
     return {
-      selfValue: [],
+      selfValue: this.value,
       dropDownVisible: false, // 下拉框是否显示
-      inputValue: null, // 单选或搜索时input框的绑定值
+      // inputValue: this.inputValueArr, // 单选或搜索时input框的绑定值
       filtering: false, // 是否正在搜索
+      filterValue: null,
+      inputText: '', // input框的输入值
+      inputfilter: false,
     }
   },
   
   mounted () {
-    document.addEventListener('click', this.handleClickOutside, false);
+    document.addEventListener('click', this.handleClickOutside, true);
   },
 
   computed: {
@@ -138,18 +142,19 @@ export default {
     readonly() {
       return !this.filterable;
     },
-    opl() {
+    optionList() {
       const {filtering, options, selfValue} = this;
       let op = [options];
 
       if (!filtering) {
         if(!selfValue || !selfValue.length) return op;
         for (let i = 1;i <= selfValue.length;i++) {
-          let tv = op[i - 1].filter(({value}) => value === this.selfValue[i - 1])[0];
-          if (tv.children) {
+          let tv = op[i - 1].filter(({value}) => value == this.selfValue[i - 1])[0];
+          if (tv.children && !!tv.children.length) {
             op.push(tv.children)
           }
         }
+
         return op;
       }
 
@@ -157,9 +162,43 @@ export default {
 
       return newOpl.filter(item => item.label.indexOf(this.inputValue) !== -1)
     },
+
+    // 单选或搜索时input框的绑定值
+    inputValue: {
+      get () {
+        const {options, selfValue, inputText, filtering} = this;
+        let arr = [];
+        let op = [options];
+
+        if(!selfValue && !selfValue.length) return '';
+        if(filtering) {
+          return inputText;
+        }
+        for (let i = 1; i <= selfValue.length; i++) {
+          let tv = op[i - 1].filter(({value}) => value == this.selfValue[i - 1])[0];
+          arr.push(tv.label);
+          if (tv.children && !!tv.children.length) {
+            op.push(tv.children)
+          }
+        }
+
+        if(this.checkStrictly || selfValue.length == op.length) {
+          return arr.join('/');
+        }
+        
+        return '';
+      },
+      
+      set(newValue) {
+        this.inputText = newValue;
+        this.filtering = true;
+        return this.inputText || '';
+      }
+    },
+
     isEmpty() {
-      const {opl} = this;
-      return !opl || !opl.length
+      const {optionList} = this;
+      return !optionList || !optionList.length
     }
   },
 
@@ -167,6 +206,7 @@ export default {
     /** 监听文档的点击事件，如果点击组件外的元素，关闭组件 */
     handleClickOutside(e){
       this.$nextTick(() => {
+        if(!this.$refs.input) return;
         if(!this.$refs.input.contains(e.target) && !this.$refs.popper.contains(e.target)) {
           if(this.dropDownVisible) this.toggleDropDownVisible(false);
         }
@@ -176,16 +216,18 @@ export default {
     // 搜索时val不为空时进行搜索操作
     handleInput(val, event) {
       this.dropDownVisible = true;
-      this.filtering = !!val;
     },
 
     // 无限级拼接：初始化搜索时的分类数据结构，即对父级和子级的分类做了一个拼接
     filterTypes(options, newOp) {
       for (let i = 0; i < options.length; i++) {
-        newOp.push({
-          label: options[i].parent ? `${options[i].parent.label}/${options[i].label}` : options[i].label,
-          value: options[i].parent ? `${options[i].parent.value}/${options[i].value}` : options[i].value,
-        });
+        if(this.checkStrictly || (!this.checkStrictly && !options[i].children)) {
+          newOp.push({
+            label: options[i].parent ? `${options[i].parent.label}/${options[i].label}` : options[i].label,
+            value: options[i].parent ? `${options[i].parent.value}/${options[i].value}` : options[i].value,
+          });
+        }
+        
 
         if (options[i].children) {
           for (let j = 0; j < options[i].children.length; j++) {
@@ -202,14 +244,21 @@ export default {
 
     // 清除操作
     handleClear() {
-      this.inputValue = '';
+      // this.inputValue = '';
+      console.log(33333)
       this.selfValue = [];
       this.$emit('input', []);
+      this.$emit('change', []);
+      this.toggleDropDownVisible(false);
     },
     
     // 下拉框的展开和关闭
     toggleDropDownVisible(visible) {
+      console.log(visible)
+      this.dropDownVisible = !!this.dropDownVisible;
+      console.log(this.dropDownVisible)
       if (this.disabled) return;
+      if(typeof visible !== 'boolean') visible = null;
       this.dropDownVisible = visible || !this.dropDownVisible;
       if(this.dropDownVisible) {
         this.$refs.input.focus();
@@ -248,7 +297,7 @@ export default {
 
       // 每次选择都会更新父组件的value
       if (this.checkStrictly) {
-        this.inputValue = newInputVal.join('/');
+        // this.inputValue = newInputVal.join('/');
         this.$emit('input', newVal);
         this.$emit('change', newVal);
         return;
@@ -256,18 +305,24 @@ export default {
 
       // 没有子选项，就是选到最后一级才更新父组件中真正的value
       if (!item.children) {
+        this.dropDownVisible = false;
         this.$emit('change', newVal);
         this.$emit('input', newVal);
-        this.inputValue = newInputVal.join('/');
+        // this.inputValue = newInputVal.join('/');
       }
     },
 
     // 搜索时选中
     chooseFilterItem (item) {
       this.dropDownVisible = false;
-      this.inputValue = item.label;
-
-      let newVal = item.value.split('/');
+      this.filterChoose = true;
+      // this.inputValue.set(item.label);
+      let newVal;
+      if(item.value.length > 1) {
+        newVal = item.value.split('/');
+      } else {
+        newVal = [item.value];
+      }
       this.selfValue = newVal;
       this.$emit('input', newVal);
       this.$emit('change', newVal);
@@ -282,17 +337,18 @@ export default {
     handleBlur(e) {
       this.$emit('blur', e);
     },
-  },
+  }
 }
 </script>
 
 <style lang="scss">
 .base-cascader {
-  margin-bottom: 20px;
   position: relative;
+  margin-bottom: 10px;
+  display: inline-block;
 
   .base-cascader-input {
-    width: 194px;
+    width: 100%;
     cursor: pointer;
 
     .is-reverse {
@@ -350,7 +406,6 @@ export default {
       padding: 6px 0;
       border-right: 1px solid #E4E7ED;
       overflow: auto;
-      min-width: 170px;
 
       .base-cascader-menu {
         position: relative;
@@ -358,6 +413,8 @@ export default {
         padding: 0 40px 0 20px;
         height: 34px;
         line-height: 34px;
+        min-width: 170px;
+        white-space: nowrap;
 
         font-size: 14px;
         cursor: pointer;
@@ -385,6 +442,7 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
+      font-size: 14px;
       color: #ccc;
     }
 

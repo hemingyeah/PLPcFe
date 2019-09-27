@@ -58,10 +58,12 @@ export default {
     sumbitType () {
       this.$refs.ruleForm.validate((valid) => {
         if(valid) {
-          this.show = false;
           this.$emit('sumbitType');
         }
       })
+    },
+    close () {
+      this.show = false;
     }
   }
 }

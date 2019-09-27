@@ -131,6 +131,7 @@ export default {
           this.toDetail(this.listMsg.list[0]);
 
         } else {
+          this.$refs.documentDetail.loading = false;
           this.$platform.notification({
             title: res.message,
             type: 'error',

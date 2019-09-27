@@ -12,7 +12,7 @@
         </el-select>
 
         <!-- 类别删选 -->
-        <el-cascader 
+        <!-- <el-cascader 
           ref="listTypeCascader"
           :options="typeOptions"
           :key="typeOptions.length"
@@ -29,7 +29,33 @@
               <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
             </span>
           </template>
-        </el-cascader>
+        </el-cascader> -->
+
+        <!-- 类别删选 -->
+        <!-- @visible-change="showCascader" -->
+        <!-- popper-class="search-cascader-panel"   -->
+        <!-- :key="typeOptions.length" -->
+        <!-- （{{slotsProps.data.count}}） -->
+        <base-cascader
+          ref="listTypeCascader"
+          :options="typeOptions"
+          class="search-type-right search-type"
+          clearable
+          filterable
+          @change="handleChange"
+          @visible-change="showCascader"
+          v-model="params.type">
+          <template slot-scope="slotsProps" class="type">
+            <span class="search-type-label">{{slotsProps.data.label}}（{{slotsProps.data.count}}）</span>
+            <span class="type-operating" v-if="!slotsProps.data.noModify && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
+              <i class="iconfont icon-bianji icon-operating" @click.stop="editType(slotsProps.data)"></i>
+              <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(slotsProps.data)"></i>
+            </span>
+          </template>
+          <div slot="footer" class="search-type-footer" v-if="infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3" @click="createType">
+            新建分类
+          </div>
+        </base-cascader>
 
       </div>
 
@@ -141,7 +167,7 @@ export default {
       typeOptions: [], // 类别
       updateShow: true,
       readTimesShow: true,
-      left: false
+      left: false,
     }
   },
 
@@ -150,11 +176,6 @@ export default {
       return this.isEdit ? '编辑分类' : '新建分类';
     }
   },
-
-  // mounted () {   
-  //   this.initView();
-  //   this.getTypes();
-  // },
 
   methods: {
     // 初始化viewOptions对象，包括数量，每次更新一次
@@ -193,28 +214,39 @@ export default {
           let res = await RepositoryApi.getDocumentTypes();
           if(res.success) {
             res.result.forEach(item => {
-              item.value = item.id;
+              item.value = `${ item.id }-parent`;
               item.label = item.name;
-              item.children = item.subTypes;
               item.count = 0;
               item.noModify = false;
+              item.children = item.subTypes;
+              // if(item.subTypes.length > 0) {
+              //   item.children = item.subTypes;
+              //   item.children.forEach(childItem => {
+              //     childItem.value = childItem.id;
+              //     childItem.label = childItem.name;
+              //     childItem.count = 0;
+              //     childItem.noModify = false;
+              //   })
+              // }
 
               item.children.forEach(childItem => {
-                childItem.value = childItem.id;
+                childItem.value = childItem.id.toString();
                 childItem.label = childItem.name;
                 childItem.count = 0;
                 childItem.noModify = false;
               })
               
               item.children.unshift({
-                label: '全部',
-                value: item.id,
+                label: '未分类',
+                value: item.id.toString(),
+                id: item.id,
                 noModify: true,
                 count: 0,
               })
             })
             this.typeOptions = res.result;
             this.info.options = this.typeOptions;
+            this.getTypesCount();
             resolve();
           } else {
             this.$platform.notification({
@@ -241,15 +273,22 @@ export default {
            
           if(res.success) {
             this.typeOptions.forEach(parent => {
-              res.result.forEach(info => {
-                if(parent.value == info.typeId) parent.count = info.count
-              })
-
-              parent.children.forEach(child => {
-                res.result.forEach(info => {
-                  if(child.value == info.typeId) child.count = info.count;
+              // res.result.forEach(info => {
+              //   if(parent.id == info.typeId) {
+              //     parent.count = info.count
+              //   }
+              // })
+              parent.count = 0;
+              if(parent.children) {
+                parent.children.forEach(child => {
+                  res.result.forEach(info => {
+                    if(child.id == info.typeId) {
+                      child.count = info.count;
+                      parent.count = parent.count + child.count;
+                    }
+                  })
                 })
-              })
+              }
             })
             resolve();
           } else {
@@ -269,40 +308,6 @@ export default {
     async showCascader (flag) {
       // 获取分类文章数量
       await this.getTypesCount();
-      let parent = document.getElementsByClassName('search-cascader-panel')[0];
-      parent.style.maxHeight = '350px';
-      parent.style.minHeight = '90px';
-      if(!(this.infoEdit.INFO_EDIT && this.infoEdit.INFO_EDIT == 3)) return;
-       
-
-      if(flag) {
-        let child = document.createElement('div');
-        child.innerHTML = '新建分类';
-        child.className = 'type';
-        child.id = 'type-id';
-
-        parent.style.paddingBottom = '40px';
-
-        parent.appendChild(child);
-
-        child.addEventListener('click', e => { // 打开新建分类
-          let btn = document.getElementsByClassName('is-reverse')[0];
-
-          btn.click();
-          this.handleHideCascaderMenu();
-          this.$refs.typeModal.open();
-
-          this.isEdit = false;
-          this.info.name = '';
-          this.info.parentId = '';
-          this.info.id = null;
-        });
-
-      } else {
-        let child = document.getElementById('type-id')
-
-        parent.removeChild(child);
-      }
     },
 
     // 跳转到新建页面
@@ -356,7 +361,7 @@ export default {
     // 所选类型改变时为params.typeIds赋值
     handleChange (value) {
       if (value.length > 0) {
-        this.params.typeIds = [value[1]];
+        this.params.typeIds = [value[1] || value[0]];
       } else {
         this.params.typeIds = [];
       }
@@ -380,12 +385,18 @@ export default {
       }
     },
 
+    createType () {
+      this.handleHideCascaderMenu();
+      this.$refs.typeModal.open();
+
+      this.isEdit = false;
+      this.info.name = '';
+      this.info.parentId = '';
+      this.info.id = null;
+    },
+
     // 打开编辑分类
     editType (info) {
-      let btn = document.getElementsByClassName('is-reverse')[0];
-
-      btn.click();
-      
       this.handleHideCascaderMenu();
       this.$refs.typeModal.open();
 
@@ -399,8 +410,6 @@ export default {
 
     // 删除分类
     async deleteType (info) {
-      let btn = document.getElementsByClassName('is-reverse')[0];
-      btn.click();
       try {
         if (!await this.$platform.confirm('确定删除该文章分类吗？')) return;
         let params = {
@@ -413,6 +422,7 @@ export default {
             title: '删除分类成功',
             type: 'success',
           });
+          this.$refs.typeModal.close();
           await this.getTypes();
           await this.getTypesCount();
           let isEdit = false;
@@ -461,6 +471,7 @@ export default {
             title: msg,
             type: 'success',
           });
+          this.$refs.typeModal.close();
           await this.getTypes();
           await this.getTypesCount();
           this.search();
@@ -504,7 +515,7 @@ export default {
       }
     },
     handleHideCascaderMenu() {
-      this.$refs.listTypeCascader.handleClickoutside();
+      this.$refs.listTypeCascader.toggleDropDownVisible(false);
     }
   }
 }
@@ -538,6 +549,44 @@ export default {
         .el-input__inner {
           border: none;
         }
+
+        .base-cascader-menu {
+          display: flex;
+
+          .search-type-label {
+            flex: 1;
+          }
+
+          & .type-operating {
+            display: inline-block;
+            opacity: 0;
+          }
+
+          &:hover .type-operating {
+            opacity: 1;
+          }
+
+          .type-operating {
+
+            .icon-operating {
+              font-size: 14px;
+
+              &:hover {
+                color: #38A6A6;
+              }
+            }
+            
+          }
+        }
+
+        .search-type-footer {
+          border-top: 10px solid #f0f0f0;
+          color: #55b7b4;
+          cursor: pointer;
+          line-height: 40px;
+          text-align: center;
+          font-size: 14px;
+        }
       }
 
       .search-type-left {
@@ -563,6 +612,7 @@ export default {
 
       .search-type-right {
         width: 190px;
+        display: inline-block;
 
         .el-input__inner {
           border-radius: 0 2px 2px 0;
@@ -701,7 +751,7 @@ export default {
 .el-cascader-panel {
   position: relative;
 
-  .type {
+  .create-type {
     position: absolute;
     left: 0;
     right: 0;
@@ -715,7 +765,6 @@ export default {
 }
 
 .search-cascader-panel {
-  padding-bottom: 50px !important;
 
   .el-cascader-menu__item{
     max-width: 350px;
@@ -734,20 +783,5 @@ export default {
     }
 
   }
-
-  #type-id {
-    position: absolute;
-
-    width: 100%;
-    height: 50px;
-
-    border-top: 10px solid rgb(240, 240, 240);
-    color: $color-primary;
-    cursor: pointer;
-
-    line-height: 40px;
-    text-align: center;
-  }
-
 }
 </style>

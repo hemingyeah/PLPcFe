@@ -8,10 +8,10 @@
     </base-cascader>
     {{typeValue}}
 
+    <base-editor v-model="article" ref="editor" :isEdit="false"></base-editor>
 
 
-
-    <base-cascader :options="options" v-model="typeValue" clearable filterable check-strictly>
+    <base-cascader :options="options" v-model="typeValue" @change="handleChange" clearable filterable check-strictly>
       <template slot-scope="slotsProps">
         <span>{{ slotsProps.data.label }}</span>
         <span v-if="slotsProps.data.children">添加</span>
@@ -30,13 +30,14 @@ import * as dom from '@src/util/dom';
 
 // import BaseDatatableDemo from './components/BaseDatatableDemo.vue';
 // import BizTeamSelectDemo from './components/BizTeamSelectDemo.vue'
-import BaseCascader from '@src/component/common/BaseCascader/BaseCascader.vue';
+// import BaseCascader from '@src/component/common/BaseCascader/BaseCascader.vue';
 
 export default {
   name: 'demo-view',
   data () {
     return {
-      typeValue: [],
+      article: '',
+      typeValue: ['zhinan', 'shejiyuanze'],
       options: [{
         value: 'zhinan',
         label: '指南',
@@ -363,12 +364,15 @@ export default {
         type: 'success',
         duration: 0
       })
+    },
+    handleChange (val) {
+      console.log(val)
     }
   },
   components: {
     // [BaseDatatableDemo.name]: BaseDatatableDemo,
     // [BizTeamSelectDemo.name]: BizTeamSelectDemo,
-    [BaseCascader.name]: BaseCascader
+    // [BaseCascader.name]: BaseCascader
   },
 };
 </script>

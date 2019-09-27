@@ -9,17 +9,24 @@
       <p class="title-error" v-if="msg && !params.title">请填写知识库标题！</p>
 
       <el-form-item label="分类：" class="create-item" prop="typeId">
-        <el-cascader :options="params.options" class="type" v-model="params.typeId" :props="{ checkStrictly: true }" :popper-class="'document-type-cascader'">
+        <!-- <el-cascader :options="params.options" class="type" v-model="params.typeId" :props="{ checkStrictly: true }" :popper-class="'document-type-cascader'">
           <template slot-scope="{ item, data }" class="type">
             <span> 
               {{ data.label }}
-              <!-- TODO: 临时解决图标不显示方法 -->
               <template v-if="data.subTypes && data.subTypes.length > 0">
                 <i class="iconfont icon-arrowright"> </i>
               </template>
             </span>
           </template>
-        </el-cascader>
+        </el-cascader> -->
+        <base-cascader
+          ref="listTypeCascader"
+          style="width: 188px"
+          :options="params.options"
+          check-strictly
+          filterable
+          v-model="params.typeId">
+        </base-cascader>
       </el-form-item>
 
       <el-form-item label="权限：" class="create-item" prop="permission">
@@ -110,7 +117,7 @@ export default {
       return !this.pending
     }
   },
-  created () {
+  mounted () {
     this.params.form = this.buildForm();
   },
   methods: {
