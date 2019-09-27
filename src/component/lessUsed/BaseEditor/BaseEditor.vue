@@ -160,11 +160,23 @@ export default {
       
       // 此时file就是剪切板中的图片文件
     },
+    genUrl({fileSize, ossUrl}) {
+      let size = Number(fileSize.replace(/[a-z A-Z]/gi, ''));
+
+      // 1M 以下不压缩
+      if (/kb/gi.test(fileSize) || !size) return ossUrl;
+
+      const existParams = ossUrl.indexOf('?') >= 0;
+
+      if (size > 1) return existParams ? '&x-oss-process=image/resize,p_70' : '?x-oss-process=image/resize,p_70';
+      if (size > 3) return existParams ? '&x-oss-process=image/resize,p_50' : '?x-oss-process=image/resize,p_50';
+      return ossUrl;
+    },
     insertImage(data) {
       let range = this.editor.getSelection();
       let index = range.index || 0;
 
-      this.editor.insertEmbed(index, 'image', data.ossUrl);
+      this.editor.insertEmbed(index, 'image', this.genUrl(data));
       this.editor.setSelection(index + 1, 0);
     },
 
