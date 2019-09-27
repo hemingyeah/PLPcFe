@@ -360,7 +360,7 @@ export default {
 
       if(imgCount > 20) {
         this.$platform.notification({
-          title: '最多支持20张图片！',
+          title: '单个知识库文章最大支持15000字和20张图片',
           type: 'error',
         });
         return false;
@@ -369,6 +369,7 @@ export default {
     },
 
     imgCount (html) {
+      if(!html) return null;
       let imgReg = /<img.*?(?:>|\/>)/gi // 匹配图片中的img标签
       let arr = html.match(imgReg)  //筛选出所有的img
       return (arr && arr.length) || null;
@@ -503,7 +504,7 @@ export default {
       if(this.articleEmpty) {
         return false;
       }
-      if(!this.getInput()) return false;
+      if(!this.getInput(this.articleHtml)) return false;
       return true;
     },
 

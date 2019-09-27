@@ -204,8 +204,23 @@ export default {
     // 获取带格式的文章内容
     getInput (html) {
       this.articleHtml = html;
-      let img = this.articleHtml.indexOf('<img') != -1;
-      this.articleEmpty = !this.$refs.editor.hasValidText() && !img;
+      let imgCount = this.imgCount(html);
+      this.articleEmpty = !this.$refs.editor.hasValidText() && !imgCount;
+      if(imgCount > 20) {
+        this.$platform.notification({
+          title: '单个信息公告文章最大支持15000字和20张图片',
+          type: 'error',
+        });
+        return false;
+      }
+      return true;
+    },
+
+    imgCount (html) {
+      if(!html) return null;
+      let imgReg = /<img.*?(?:>|\/>)/gi // 匹配图片中的img标签
+      let arr = html.match(imgReg)  //筛选出所有的img
+      return (arr && arr.length) || null;
     },
 
     // 获取缓存的文章信息
@@ -253,6 +268,7 @@ export default {
       if(this.articleEmpty) {
         return false;
       }
+      if(!this.getInput(this.articleHtml)) return false;
       
       return true;
     },
