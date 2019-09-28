@@ -268,7 +268,7 @@ export default {
       if(this.articleEmpty) {
         return false;
       }
-      if(!this.getInput(this.articleHtml)) return false;
+      if(!this.getInput(this.params.article)) return false;
       
       return true;
     },
