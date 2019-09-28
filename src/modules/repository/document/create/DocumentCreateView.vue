@@ -463,7 +463,7 @@ export default {
       let params = {
         title: this.params.title,
         content: this.params.article,
-        typeId: this.params.typeId[1] || this.params.typeId[0],
+        typeId: Number(this.params.typeId[1] || this.params.typeId[0]),
         label: this.params.label,
         attachment: [],
       }
