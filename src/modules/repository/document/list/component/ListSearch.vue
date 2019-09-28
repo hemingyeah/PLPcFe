@@ -406,6 +406,7 @@ export default {
       this.info.parentId = info.parentId;
       this.info.options = this.typeOptions;
       this.info.title = info.title;
+      console.log(this.info);
     },
 
     // 删除分类
