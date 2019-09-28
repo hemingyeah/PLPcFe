@@ -129,6 +129,7 @@ export default {
       filterValue: null,
       inputText: '', // input框的输入值
       inputfilter: false,
+      labelValue: ''
     }
   },
   
@@ -187,7 +188,7 @@ export default {
           return arr.join('/');
         }
         
-        return '';
+        return !this.value.length ? '' : this.labelValue;
       },
       
       set(newValue) {
@@ -246,6 +247,7 @@ export default {
     // 清除操作
     handleClear() {
       this.selfValue = [];
+      this.labelValue = '';
       this.$emit('input', []);
       this.$emit('change', []);
       this.toggleDropDownVisible(false);
@@ -278,6 +280,7 @@ export default {
       let op = this.options;
       let newInputVal = [];
       let newVal = this.selfValue.map(val => val);
+      this.labelValue = this.inputValue;
 
       newVal.splice(index);
       newVal.push(item.value);
@@ -299,6 +302,7 @@ export default {
 
       // 没有子选项，就是选到最后一级才更新父组件中真正的value
       if (!item.children) {
+        this.labelValue = '';
         this.dropDownVisible = false;
         this.$emit('change', newVal);
         this.$emit('input', newVal);
