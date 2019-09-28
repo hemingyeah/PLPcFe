@@ -43,10 +43,10 @@ export default {
     }
   },
   mounted(){
-    this.setFieldDesignHeight();
+    // this.setFieldDesignHeight();
 
-    this.computedFormWidthAndHeight('setting-product');
-    window.addEventListener('resize', this.resizeHandler);
+    // this.computedFormWidthAndHeight('setting-product');
+    // window.addEventListener('resize', this.resizeHandler);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeHandler);

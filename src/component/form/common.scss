@@ -66,6 +66,7 @@
 
 .form-design-main {
   width: calc(100% - 630px);
+  min-width: 500px;
   height: 100%;
   padding: 10px 15px;
   border-top: none;
@@ -79,20 +80,20 @@
     background-size: 100% 100%;
   
     position: relative;
-    height: 600px;
-    width: 370px;
+    height: 560px;
+    width: 328px;
   
     margin: 0 auto;
   
     .form-design-phone {
       position: absolute;
-      top: 49px;
-      left: 18px;
+      top: 39px;
+      left: 15px;
       right: 23px;
       bottom: 22px;
   
-      height: calc(100% - 100px);
-      width: calc(100% - 36px);
+      height: calc(100% - 80px);
+      width: calc(100% - 31px);
   
       border: 1px solid #edf0f4;
       border-top: none;
