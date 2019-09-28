@@ -4,6 +4,7 @@
     <!-- <tsx-comp/> -->
     <!-- <base-datatable-demo/> -->
     <!-- <biz-team-select-demo/> -->
+    <img :src="imgUrl" >
     <base-cascader :options="options" v-model="typeValue">
     </base-cascader>
     {{typeValue}}
@@ -11,7 +12,7 @@
     <base-editor v-model="article" ref="editor" :isEdit="false"></base-editor>
 
 
-    <base-cascader :options="options" v-model="typeValue" @change="handleChange" clearable filterable check-strictly>
+    <base-cascader :options="options" v-model="typeValue" clearable filterable check-strictly>
       <template slot-scope="slotsProps">
         <span>{{ slotsProps.data.label }}</span>
         <span v-if="slotsProps.data.children">添加</span>
@@ -36,6 +37,7 @@ export default {
   name: 'demo-view',
   data () {
     return {
+      imgUrl: '',
       article: '',
       typeValue: ['zhinan', 'shejiyuanze'],
       options: [{
@@ -235,6 +237,9 @@ export default {
       }]
     }
   },
+  mounted () {
+    this.getImg();
+  },
   methods: {
     contact() {
       let options = {};
@@ -365,9 +370,39 @@ export default {
         duration: 0
       })
     },
-    handleChange (val) {
-      console.log(val)
-    }
+    getImg () {
+      let res = {
+        compressedPath: null,
+        compressedSize: null,
+        contentType: 'image/png',
+        createTime: 1569641778031,
+        fileMd5: '7CE188F7E6F9FE3A01D2A48458A7D6E6',
+        fileName: 'image-张爱军-2019-09-28.png',
+        fileSizeStr: '8.60M',
+        id: '6d5bbf2f-38e4-46ff-a060-39c97b747cc7',
+        localPath: '/acs/newfiles/7416b42a-25cc-11e7-a500-00163e12f748/201909/f0c7136a-f5e3-4d4e-8483-f180a3a65459.png',
+        ossUrl: 'https://she-dev.oss-cn-hangzhou.aliyuncs.com/acs/newfiles/7416b42a-25cc-11e7-a500-00163e12f748/201909/3d4339c8-3ca8-4f63-b03c-d6f44da19f18.png',
+        size: 8810,
+        symLink: null,
+        tenantId: '7416b42a-25cc-11e7-a500-00163e12f748',
+        type: 0,
+        url: null,
+      }
+
+      this.imgUrl = this.genUrl(res);
+    },
+    genUrl({fileSizeStr, ossUrl}) {
+      let size = Number(fileSizeStr.replace(/[a-z A-Z]/gi, ''));
+
+      // 1M 以下不压缩
+      if (/kb/gi.test(fileSizeStr) || !size) return ossUrl;
+
+      const existParams = ossUrl.indexOf('?') >= 0;
+
+      if (size > 3) return existParams ? `${ ossUrl }&x-oss-process=image/resize,p_50` : `${ ossUrl }?x-oss-process=image/resize,p_50`;
+      if (size > 1) return existParams ? `${ ossUrl }&x-oss-process=image/resize,p_70` : `${ ossUrl }?x-oss-process=image/resize,p_70`;
+      return ossUrl;
+    },
   },
   components: {
     // [BaseDatatableDemo.name]: BaseDatatableDemo,

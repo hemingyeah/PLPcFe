@@ -148,8 +148,9 @@ export default {
       if (!filtering) {
         if(!selfValue || !selfValue.length) return op;
         for (let i = 1;i <= selfValue.length;i++) {
+          if(!op[i - 1]) return;
           let tv = op[i - 1].filter(({value}) => value == this.selfValue[i - 1])[0];
-          if (tv.children && !!tv.children.length) {
+          if (tv && tv.children && !!tv.children.length) {
             op.push(tv.children)
           }
         }
@@ -174,9 +175,10 @@ export default {
           return inputText;
         }
         for (let i = 1; i <= selfValue.length; i++) {
+          if(!op[i - 1]) return;
           let tv = op[i - 1].filter(({value}) => value == this.selfValue[i - 1])[0];
-          arr.push(tv.label);
-          if (tv.children && !!tv.children.length) {
+          if(tv && tv.label) arr.push(tv.label);
+          if (tv && tv.children && !!tv.children.length) {
             op.push(tv.children)
           }
         }

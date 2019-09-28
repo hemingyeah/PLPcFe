@@ -439,7 +439,7 @@ export default {
           })
 
           if(!isEdit) {
-            this.params.type = [];
+            this.params.type.splice(0);
             this.params.typeIds = [];
           }
           this.search();
