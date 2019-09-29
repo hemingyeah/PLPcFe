@@ -103,7 +103,7 @@ export default {
 
       this.pending = true;
 
-      this.$http.post('/customer/sendSmsBatch', params, false)
+      CustomerApi.sendSmsBatch(params)
         .then(res => {
           this.pending = false;
           if (res.status) return this.$platform.alert(res.message);
@@ -128,7 +128,7 @@ export default {
     fetchCount() {
       this.pending = true;
       CustomerApi.computeSendNum({
-        ids: this.selectedIds.join(','),
+        ids: this.selectedIds,
         isAllLm: this.form.isAllLm,
       })
         .then(res => {
@@ -172,7 +172,7 @@ export default {
         isAllLm,
         type,
         sendTime: formatDate(sendTime, 'YYYY-MM-DD HH:mm:ss'),
-        ids: this.selectedIds,
+        ids: this.selectedIds.join(','),
       }
     },
     reset() {

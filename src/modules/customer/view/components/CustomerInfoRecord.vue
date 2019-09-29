@@ -203,7 +203,7 @@ export default {
         if(content.type == '添加'){
           return [
             <h5><strong>{userName}</strong>使用短信模板【{content.templateName}】向客户发送了短信。</h5>,
-            <p class="secondary-info">预计发送时间：{content.sendTime}</p>
+            <p class="secondary-info">预计发送时间：{content.sendTime}</p>,
             <p className="secondary-info">接收人：{content.remindToName}</p>
           ]
         }

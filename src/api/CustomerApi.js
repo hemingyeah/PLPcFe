@@ -129,13 +129,25 @@ export function computeSendNum(params) {
 }
 
 /**
+ * 选择客户批量发送短信
+ * @param {Object} params - 参数
+ * @param {Number} params.smsTemplateId - 短信模板id
+ * @param {String} params.ids - 产品ids
+ * @param {Number} params.isAllLm - 是否是全部联系人
+ * @param {Date} params.sendTime - 发送时间
+ */
+export function sendSmsBatch(params) {
+  return http.post('/customer/sendSmsBatch', params, false);
+}
+
+/**
  * 批量编辑客户的某个字段
  * @param {Object} params - 参数
  * @param {String} params params.ids - 客户ids
  * @param {String} params params.mapJson - 修改值
  * @returns {*}
  */
-export  function batchEditCustomer(params) {
+export function batchEditCustomer(params) {
   return http.post('/customer/editBatch', params, false);
 }
 
