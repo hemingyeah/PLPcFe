@@ -67,7 +67,7 @@ function sendSmsBatch(params) {
  * @param {Number} params.isAllLm - 是否是全部联系人
  */
 function computeSendNumForProduct(params) {
-  return http.get('/customer/product/computeSendNum', params)
+  return http.post('/customer/product/computeSendNum', params)
 }
 
 /**

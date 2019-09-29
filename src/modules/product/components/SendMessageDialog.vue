@@ -142,7 +142,7 @@ export default {
     fetchCount() {
       this.pending = true;
       computeSendNumForProduct({
-        ids: this.selectedIds.join(','),
+        ids: this.selectedIds,
         isAllLm: this.form.isAllLm,
       })
         .then(res => {

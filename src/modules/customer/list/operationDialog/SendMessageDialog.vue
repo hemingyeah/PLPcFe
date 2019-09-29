@@ -172,7 +172,7 @@ export default {
         isAllLm,
         type,
         sendTime: formatDate(sendTime, 'YYYY-MM-DD HH:mm:ss'),
-        ids: this.selectedIds.join(','),
+        ids: this.selectedIds,
       }
     },
     reset() {

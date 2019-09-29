@@ -125,7 +125,7 @@ export function getUserTag(params) {
  * @param {Number} params.isAllLm - 是否是全部联系人
  */
 export function computeSendNum(params) {
-  return http.get('/customer/computeSendNum', params)
+  return http.post('/customer/computeSendNum', params)
 }
 
 /**
