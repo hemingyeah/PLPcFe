@@ -176,8 +176,7 @@ export default {
   },
   computed: {
     showNewTeam() {
-      // return this.initData.showNewTeam === true;
-      return true;
+      return this.initData.showNewTeam === true;
     }
   },
   methods: {
