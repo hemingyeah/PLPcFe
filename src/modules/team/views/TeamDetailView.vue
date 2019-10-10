@@ -365,7 +365,7 @@ export default {
         ids.push(this.teamData.id);
 
         let result = await TeamApi.deleteTag(ids);
-        let isParent = this.teamData.parent && this.isParent(this.teamData);
+        let isParent = this.isParent(this.teamData);
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
