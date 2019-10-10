@@ -369,7 +369,7 @@ export default {
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `删除${isParent ? '主' : '子' }团队${result.status == 0 ? '成功' : '失败'}`,
+          title: `团队删除${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
 
