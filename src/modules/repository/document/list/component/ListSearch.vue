@@ -12,30 +12,6 @@
         </el-select>
 
         <!-- 类别删选 -->
-        <!-- <el-cascader 
-          ref="listTypeCascader"
-          :options="typeOptions"
-          :key="typeOptions.length"
-          class="search-type search-type-right"
-          popper-class="search-cascader-panel"  
-          clearable
-          @change="handleChange"
-          @visible-change="showCascader"
-          v-model="params.type">
-          <template slot-scope="{ item, data }" class="type">
-            <span class="search-type-label">{{data.label}}（{{data.count}}）</span>
-            <span class="type-operating" v-if="!data.noModify && infoEdit.INFO_EDIT && infoEdit.INFO_EDIT == 3">
-              <i class="iconfont icon-bianji icon-operating" @click.stop="editType(data)"></i>
-              <i class="iconfont icon-qingkongshanchu icon-operating" @click.stop="deleteType(data)"></i>
-            </span>
-          </template>
-        </el-cascader> -->
-
-        <!-- 类别删选 -->
-        <!-- @visible-change="showCascader" -->
-        <!-- popper-class="search-cascader-panel"   -->
-        <!-- :key="typeOptions.length" -->
-        <!-- （{{slotsProps.data.count}}） -->
         <base-cascader
           ref="listTypeCascader"
           :options="typeOptions"
@@ -98,9 +74,9 @@
       <base-button type="primary" @event="search();trackEventHandler('search')" native-type="submit">
         搜索
       </base-button>
-      <base-button type="ghost" @event="resetParams();trackEventHandler('reset')">
+      <!-- <base-button type="ghost" @event="resetParams();trackEventHandler('reset')">
         重置
-      </base-button>
+      </base-button> -->
     </div>
     
     <!-- 分类编辑、添加 -->
@@ -531,7 +507,7 @@ export default {
   .search-left {
 
     .search-new {
-      margin-right: 10px;
+      margin-right: 5px;
     }
 
     .search-middle {
@@ -591,7 +567,7 @@ export default {
 
       .search-type-left {
         position: relative;
-        width: 140px;
+        width: 130px;
 
         .el-input__inner {
           border-right: none;
@@ -611,7 +587,7 @@ export default {
       }
 
       .search-type-right {
-        width: 190px;
+        width: 170px;
         display: inline-block;
 
         .el-input__inner {
@@ -622,7 +598,7 @@ export default {
 
     .search-bottom {
       display: inline-block;
-      margin-left: 10px;
+      margin-left: 5px;
 
       .search-sort {
         vertical-align: middle;
@@ -631,7 +607,7 @@ export default {
           height: 34px;
           // border: none;
           // background: #E8EFF0;
-          width: 140px;
+          width: 130px;
           // color: #717C83 !important;
         }
 
@@ -642,8 +618,7 @@ export default {
 
       .search-tag {
         vertical-align: middle;
-
-        max-width: 190px;
+        max-width: 115px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -686,13 +661,13 @@ export default {
       display: inline-block;
       height: 34px;
       line-height: 34px;
-      padding: 0 11px;
+      padding: 0 5px;
       color: #909399;
     }
 
     .search-input {
       height: 34px;
-      width: 200px;
+      width: 150px;
 
       .el-input__inner {
         height: 100%;

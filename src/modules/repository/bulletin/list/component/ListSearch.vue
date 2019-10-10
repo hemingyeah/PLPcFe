@@ -30,9 +30,9 @@
       <base-button type="primary" @event="search();trackEventHandler('search')" native-type="submit">
         搜索
       </base-button>
-      <base-button type="ghost" @event="resetParams();trackEventHandler('reset')">
+      <!-- <base-button type="ghost" @event="resetParams();trackEventHandler('reset')">
         重置
-      </base-button>
+      </base-button> -->
     </div>
     
     <!-- 添加编辑分类 -->
@@ -377,7 +377,7 @@ export default {
   .search-top {
 
     .search-new {
-      margin-right: 10px;
+      margin-right: 5px;
     }
     
 
@@ -409,13 +409,13 @@ export default {
       display: inline-block;
       height: 34px;
       line-height: 34px;
-      padding: 0 11px;
+      padding: 0 5px;
       color: #909399;
     }
 
     .search-input {
       height: 34px;
-      width: 190px;
+      width: 150px;
 
       .el-input__inner {
         height: 100%;
