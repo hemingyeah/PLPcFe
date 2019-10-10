@@ -115,7 +115,7 @@ export default {
       let options = {
         title: '请选择分享人员',
         seeAllOrg: true,
-        selectedUsers: this.shareInfo.selectedUsers,
+        // selected: this.shareInfo.selectedUsers,
         max,
         action: '/wiki/approver/list',
       };

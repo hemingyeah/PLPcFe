@@ -103,7 +103,7 @@ export default {
       let options = {
         title: '请选择推送部门或人员',
         seeAllOrg: true,
-        selectedUsers: this.params.selectedUsers,
+        selected: this.params.selectedUsers,
         selectedDepts: this.params.selectedDepts,
         max,
         showDeptCheckbox: true
@@ -113,11 +113,10 @@ export default {
           let data = result.data || {};
           let users = data.users || [];
           let depts = data.depts || [];
-          let newValue = users;
 
-          this.params.selectedUsers = newValue;
+          this.params.selectedUsers = users;
           this.params.selectedDepts = depts;
-          if(newValue.length > 0 || depts.length > 0) {
+          if(users.length > 0 || depts.length > 0) {
             this.range = false;
           }
           this.deftCheck();

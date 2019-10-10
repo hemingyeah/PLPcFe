@@ -4,7 +4,7 @@
     <!-- <tsx-comp/> -->
     <!-- <base-datatable-demo/> -->
     <!-- <biz-team-select-demo/> -->
-    <img :src="imgUrl" >
+    <img @click="contact" :src="imgUrl" >
     <base-cascader :options="options" v-model="typeValue">
     </base-cascader>
     {{typeValue}}
@@ -37,6 +37,7 @@ export default {
   name: 'demo-view',
   data () {
     return {
+      selectedUsers: [],
       imgUrl: '',
       article: '',
       typeValue: ['zhinan', 'shejiyuanze'],
@@ -264,8 +265,7 @@ export default {
           'head':'', 'displayName':'赵', 'userId':'bfa699c3-93d9-11e7-9789-00163e304a25', 'staffId':'071729261636213'
         }
       ]
-      
-      options.selected = users;
+      options.selected = this.selectedUsers;
       options.max = 0;
       options.title = '请选择负责人';
       options.showDeptCheckbox = true;
@@ -276,6 +276,8 @@ export default {
       // options.lng = '113.961467'
 
       this.$fast.contact.choose('dept', options).then(res => {
+        let users = res.data.users || [];
+        this.selectedUsers = users;
         // console.log(res)
       })
     },
