@@ -273,6 +273,7 @@ export default {
     initialize(){
       this.page.pageNum = 1;
       this.page.list = [];
+      this.multipleSelection = [];
 
       return this.fetchPageList(this.page.pageNum)
     },
