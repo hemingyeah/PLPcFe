@@ -532,11 +532,11 @@ export default {
         return this.isParent(s)
       })
       
-      if(hasParent) {
+      if(hasParent && this.showNewTeam) {
         confirm = await this.$platform.confirm('您删除的团队，如果包含子团队将会一并删除，是否继续？');
         if(!confirm) return;
       } else {
-        confirm = await this.$platform.confirm('您确定要删除选择的团队？');
+        confirm = await this.$platform.confirm('是否确定删除您所选中的团队？');
         if (!confirm) return;
       }
 

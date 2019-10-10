@@ -350,7 +350,7 @@ export default {
     async teamDelete() {
       let confirm = false;
 
-      if(!this.teamData.parent && this.isParent(this.teamData)) {
+      if(!this.teamData.parent && this.isParent(this.teamData) && this.showNewTeam) {
         confirm = await this.$platform.confirm('您删除的团队，如果包含子团队将会一并删除，是否继续？');
       } else {
         confirm = await this.$platform.confirm('您确定要删除该团队？');
