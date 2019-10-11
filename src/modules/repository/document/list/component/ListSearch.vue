@@ -617,6 +617,7 @@ export default {
       }
 
       .search-tag {
+        position: relative;
         vertical-align: middle;
         max-width: 115px;
         overflow: hidden;
@@ -624,6 +625,7 @@ export default {
         text-overflow: ellipsis;
 
         margin-left: 5px;
+        padding-right: 20px;
         height: 34px;
         line-height: 34px;
         border: none;
@@ -632,7 +634,11 @@ export default {
         color: #717C83;
 
         .el-icon-close {
+          position: absolute;
+          right: 0;
+          top: 9px;
           color: #333;
+          font-size: 14px;
 
           &:hover {
             background: #999;
