@@ -1,0 +1,20 @@
+
+$baseFrameWidth: 1920px;
+$baseFrameHeight: 1080px; // 这里会被js覆盖
+// $baseFrameHeight: 1200px;
+
+$frameHeaderHeight: 86px;
+// $frameContentHeight: calc()
+$leftPanelWidth: 1028px;
+
+$leftRatio: 55%;
+$rightRatio: 45%;
+
+
+$contentMarginTop: 8px;
+$rightPanelMarginLeft: 15px;
+
+
+$panelBorderColor: #06A8A1;
+$panelBorderWidth: 1px;
+$panelBorderStyle: $panelBorderWidth solid $panelBorderColor;

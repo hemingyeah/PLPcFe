@@ -20,6 +20,7 @@ const teamRouter = require('./team')
 const performanceRouter = require('./performance');
 const productRouter = require('./product');
 const approveRouter = require('./approve');
+const dataScreenRouter = require('./dataScreen');
 
 const repositoryRouter = require('./repository')
 
@@ -88,28 +89,54 @@ router.get('/window', async ctx => {
 // /api/app/outside/es
 router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
   // host: '192.168.31.148',
-  host: '192.168.31.70',
+  host: '192.168.31.148',
   port: 10003,
   headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=a6b007ff-d29e-4b1d-9888-4e648fb07b0f`
+    'cookie': 'VIPPUBLINKJSESSIONID=a6b007ff-d29e-4b1d-9888-4e648fb07b0f'
   },
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
   // }
 }))
 
-// /api/app/outside
+
+// 数据屏调试代码
+const dsCookie = '1db1eb33-32ae-4c6e-9e8e-dc6b0a09c3a6';
+
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  // host: '192.168.31.148',
-  host: '192.168.31.70',
+  host: '47.98.255.79',
   port: 10002,
   headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=a6b007ff-d29e-4b1d-9888-4e648fb07b0f`
+    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
   },
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
-  // }
 }))
+
+router.use('/setting/screen/save', ctx => HttpClient.proxy(ctx, {
+  host: '47.97.91.2',
+  port: 8080,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
+  },
+}))
+
+router.use('/getOpenWebCode', ctx => HttpClient.proxy(ctx, {
+  host: '47.97.91.2',
+  port: 8080,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
+  },
+}))
+
+router.use('/stats/screenData/*', ctx => HttpClient.proxy(ctx, {
+  // host: '192.168.31.148',
+  host: '47.97.91.2',
+  port: 8080,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
+  },
+}))
+
+// End of 数据屏调试 
 
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
@@ -126,6 +153,7 @@ router.use('', settingRouter.routes(), settingRouter.allowedMethods());
 router.use('', teamRouter.routes(), teamRouter.allowedMethods());
 router.use('', productRouter.routes(), productRouter.allowedMethods());
 router.use('', approveRouter.routes(), productRouter.allowedMethods());
+router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
 
 router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.all('/api/*', async ctx => {
