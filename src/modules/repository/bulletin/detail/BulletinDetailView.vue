@@ -626,6 +626,10 @@ export default {
           .annex-item {
             font-size: 14px;
           }
+
+          .base-file-info {
+            white-space: inherit;
+          }
         }
       }
     }
