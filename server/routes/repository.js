@@ -91,4 +91,30 @@ router.get('/share/wiki/view', async ctx => {
   ctx.body = Template.renderWithHtml('知识库分享', body, script, modConfig.template)
 });
 
+router.get('/share/wiki/delete', async ctx => {
+  let script = ['/share.delete.js'];
+  let modConfig = modules['share.delete'];
+  let reqHeaders = ctx.request.headers;
+  const wikiId = ctx.request.query.wikiId;
+
+  let result = await HttpClient.request( `/share/wiki/delete?wikiId=${wikiId}`, 'get', null, {headers: reqHeaders});
+  // let result = await HttpClient.request( `/share/wiki/view?wikiId=${wikiId}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+ 
+  ctx.body = Template.renderWithHtml('知识库分享', body, script, modConfig.template)
+});
+
+router.get('/share/wiki/invalid', async ctx => {
+  let script = ['/permission.invalid.js'];
+  let modConfig = modules['permission.invalid'];
+  let reqHeaders = ctx.request.headers;
+  const wikiId = ctx.request.query.wikiId;
+
+  let result = await HttpClient.request( `/share/wiki/invalid?wikiId=${wikiId}`, 'get', null, {headers: reqHeaders});
+  // let result = await HttpClient.request( `/share/wiki/view?wikiId=${wikiId}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+ 
+  ctx.body = Template.renderWithHtml('知识库分享', body, script, modConfig.template)
+});
+
 module.exports = router;

@@ -27,4 +27,12 @@ module.exports = {
     entry: './src/modules/repository/document/share/index.js',
     template: 'src/modules/repository/document/share/index.html',
   },
+  'share.delete': {
+    entry: './src/modules/repository/document/share/delete/index.js',
+    template: 'src/modules/repository/document/share/delete/index.html',
+  },
+  'permission.invalid': {
+    entry: './src/modules/repository/document/share/permissionInvalid/index.js',
+    template: 'src/modules/repository/document/share/permissionInvalid/index.html',
+  },
 }

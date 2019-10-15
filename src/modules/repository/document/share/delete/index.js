@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry'
 import http from '@src/util/http';
-import WikiDetailView from './WikiDetailView.vue';
+import ShareDelete from './ShareDelete.vue';
 
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
@@ -14,7 +14,7 @@ try {
   console.error(error)
   console.error('no init data')
 }
-const PageComponent = Vue.extend(WikiDetailView);
+const PageComponent = Vue.extend(ShareDelete);
 const app = new PageComponent({
   propsData: {
     initData
