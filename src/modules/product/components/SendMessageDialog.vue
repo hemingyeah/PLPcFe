@@ -5,7 +5,7 @@
       <el-form-item label="接收人">
         <el-radio-group v-model="form.isAllLm" @change="fetchCount" :disabled="pending">
           <el-radio label="0" :style="{ width: '120px'}">默认联系人</el-radio>
-          <el-radio label="1" :style="{ width: '120px'}">全部联系人</el-radio>
+          <!-- <el-radio label="1" :style="{ width: '120px'}">全部联系人</el-radio> -->
         </el-radio-group>
       </el-form-item>
       <el-form-item label="选择短信模板">
