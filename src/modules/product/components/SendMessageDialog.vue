@@ -135,7 +135,7 @@ export default {
         return this.$platform.alert('请选择需要批量发送短信的产品');
       }
       this.sendMessageDialog = true;
-      this.form.sendTime = new Date(),
+      this.form.sendTime = new Date();
       this.fetchCount();
       this.fetchTemplate();
     },
@@ -182,9 +182,7 @@ export default {
     buildParams() {
       const {smsTemplateId, isAllLm, sendTime, } = this.form;
 
-      const chooseTemplate = this.messageTemplate.filter(template => {
-        return template.id == smsTemplateId;
-      });
+      const chooseTemplate = this.messageTemplate.filter(template => template.id == smsTemplateId);
 
       const type = chooseTemplate.length ? (chooseTemplate[0].type || '') : '';
 
