@@ -123,7 +123,9 @@ export default {
             let id = window.frameElement.dataset.id;
             this.$platform.closeTab(id);
 
-            let fromId = window.frameElement.getAttribute('id');
+            let detailFromId = window.frameElement.getAttribute('id');
+            let fromId = window.frameElement.getAttribute('fromid');
+            this.$platform.refreshTab(fromId);
       
             return this.$platform.openTab({
               id: `document_detail_${ this.approveData.wikiId }`,
@@ -131,7 +133,7 @@ export default {
               url: `/wiki/detail/page?wikiId=${ this.approveData.wikiId }`,
               reload: true,
               close: true,
-              fromId
+              detailFromId
             });
           }
           this.$platform.notification({

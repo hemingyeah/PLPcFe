@@ -76,7 +76,7 @@ export default {
   },
   async created () {
     this.getId();
-    let detail = JSON.parse(localStorage.getItem('document_article'));
+    let detail = JSON.parse(localStorage.getItem(`document_article_${ this.initData.userInfo.userId }`));
     if (detail && !this.isEdit) {
       this.isSaveData = true;
       let res = await this.$platform.confirm('上次有尚未保存的内容，是否从上次保存内容开始填写?');
@@ -84,7 +84,7 @@ export default {
         this.getArticle();
       } else {
         this.params.article = ' ';
-        localStorage.removeItem('document_article');
+        localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
       }
     }
     if(!this.isEdit) this.saveArticle();
@@ -212,7 +212,7 @@ export default {
         this.pending = false;
 
         if(res.success) {
-          localStorage.removeItem('document_article');
+          localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
           this.$platform.notification({
             title: res.message,
             type: 'success',
@@ -251,7 +251,7 @@ export default {
         this.pending = false;  
 
         if(res.success) {
-          localStorage.removeItem('document_article');
+          localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
           this.$platform.notification({
             title: res.message,
             type: 'success',
@@ -287,7 +287,7 @@ export default {
             title: '文章已保存至草稿箱。',
             type: 'success',
           });
-          localStorage.removeItem('document_article');
+          localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
           this.draftCanClick = true;
           this.openFrame();
         } else {
@@ -317,7 +317,7 @@ export default {
         this.pending = false; 
 
         if(res.success) {
-          localStorage.removeItem('document_article');
+          localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
           this.$platform.notification({
             title: '文章已删除成功。',
             type: 'success',
@@ -406,7 +406,7 @@ export default {
           this.loading = false;
         }
       } else {
-        let detail = localStorage.getItem('document_article');
+        let detail = localStorage.getItem(`document_article_${ this.initData.userInfo.userId }`);
         let params = JSON.parse(detail);
         this.params.title = params.title || '';
         this.params.permission = params.permission || '内部';
@@ -448,7 +448,7 @@ export default {
             'typeId': this.params.typeId[1] || this.params.typeId[0],
             'label': this.params.label
           }
-          localStorage.setItem('document_article', JSON.stringify(detail));
+          localStorage.setItem(`document_article_${ this.initData.userInfo.userId }`, JSON.stringify(detail));
           Message.success({
             message: '文章已暂存',
             type: 'success'

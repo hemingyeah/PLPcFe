@@ -29,6 +29,12 @@ export default {
   components: {
     [TextTitle.name]: TextTitle,
   },
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       params: {
@@ -61,7 +67,7 @@ export default {
     }
   },
   async created () {
-    let detail = localStorage.getItem('bulletin_article');
+    let detail = JSON.parse(localStorage.getItem(`bulletin_article_${ this.initData.userInfo.userId }`));
     if (detail) {
       this.isSaveData = true;
       let res = await this.$platform.confirm('上次有尚未保存的内容，是否从上次保存内容开始填写?');
@@ -69,7 +75,7 @@ export default {
         this.getArticle();
       } else {
         this.params.article = ' ';
-        localStorage.removeItem('bulletin_article');
+        localStorage.removeItem(`bulletin_article_${ this.initData.userInfo.userId }`);
       }
     }
     this.saveArticle();
@@ -140,7 +146,7 @@ export default {
         this.pending = false; 
 
         if(res.success) {
-          localStorage.removeItem('bulletin_article');
+          localStorage.removeItem(`bulletin_article_${ this.initData.userInfo.userId }`);
           this.$platform.notification({
             title: '文章已发布成功。',
             type: 'success',
@@ -172,7 +178,7 @@ export default {
             title: '文章删除成功.',
             type: 'success',
           });
-          localStorage.removeItem('bulletin_article');
+          localStorage.removeItem(`bulletin_article_${ this.initData.userInfo.userId }`);
           this.openFrame();
         } else {
           this.$platform.notification({
@@ -225,7 +231,7 @@ export default {
 
     // 获取缓存的文章信息
     getArticle () {
-      let detail = localStorage.getItem('bulletin_article');
+      let detail = localStorage.getItem(`bulletin_article_${ this.initData.userInfo.userId }`);
       this.params = Object.assign(this.params, JSON.parse(detail));
       if(!this.params.article) this.params.article = ' ';
     },
@@ -242,7 +248,7 @@ export default {
             'title': this.params.title,
             'typeId': this.params.typeId
           }
-          localStorage.setItem('bulletin_article', JSON.stringify(detail));
+          localStorage.setItem(`bulletin_article_${ this.initData.userInfo.userId }`, JSON.stringify(detail));
           Message.success({
             message: '文章已暂存',
             type: 'success'
