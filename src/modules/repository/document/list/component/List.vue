@@ -97,6 +97,7 @@ export default {
       shareBoxShow: false,
       shareInfo: {},
       chosenItem: {},
+      shareUrl: '',
     }
   },
   methods: {
@@ -159,10 +160,18 @@ export default {
     shareDocument (item) {
       this.chosenItem = item;
       if(item.allowShare) {
+        this.getShareUrl(); // 获取外部分享链接
         this.shareBoxShow = true
       } else {
         this.inlineShare();
       }
+    },
+
+    async getShareUrl () {
+      let protocol = window.location.protocol;
+      let host = window.location.host;
+      let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.chosenItem.id}`;
+      this.shareUrl = await RepositoryApi.getShareLink(url);
     },
 
     // 内部分享，选择人员或者组织
@@ -172,15 +181,12 @@ export default {
     },
 
     // 外部分享，将连接添加至剪切板
-    outlineShare () {
+    async outlineShare () {
       // 外部文章选择外部分享时
       let _this = this;
       this.shareBoxShow = false;
-      let protocol = window.location.protocol;
-      let host = window.location.host;
-      let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.chosenItem.id}`;
+      let url = this.shareUrl;
 
-      // 获取body
       let body = document.getElementsByTagName('body')[0];
 
       let copyFrom = document.createElement('a');
@@ -213,7 +219,7 @@ export default {
       clipboard.on('error', function(e) {
         _this.$platform.notification({
           title: '分享失败，请重新操作',
-          type: 'success',
+          type: 'error',
         });
       });
       // 点击按钮

@@ -242,6 +242,14 @@ export function revoke (params) {
   return http.post(`${ prefixAppPath }/outside/approve/revoke`, params)
 }
 
+/**
+ * 获取外部分享链接
+ * @param {String} originalUrl - 原始拼接链接
+ */
+export function getShareLink (originalUrl) {
+  return http.get(`${ prefixAppPath }/outside/wiki/short/url?originalUrl=${ originalUrl }`)
+}
+
 
 
 // 通知公告

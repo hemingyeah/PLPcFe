@@ -172,7 +172,8 @@ export default {
       deleteMsg: null,
       revokeShow: false,
       url: '',
-      detailShow: true
+      detailShow: true,
+      shareUrl: '',
     }
   },
   mounted () {
@@ -377,6 +378,7 @@ export default {
 
     shareDocument () {
       if(this.detail.allowShare) {
+        this.getShareUrl();
         this.shareBoxShow = true
       } else {
         this.inlineShare();
@@ -389,13 +391,19 @@ export default {
       this.choosePerson();
     },
 
+    async getShareUrl () {
+      let protocol = window.location.protocol;
+      let host = window.location.host;
+      let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.detail.id}`;
+      this.shareUrl = await RepositoryApi.getShareLink(url);
+    },
+
     outlineShare () {
       // 外部文章选择外部分享时
       let _this = this;
       this.shareBoxShow = false;
-      let protocol = window.location.protocol;
-      let host = window.location.host;
-      let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.detail.id}`;
+      let url = this.shareUrl;
+
       // 获取body
       let body = document.getElementsByTagName('body')[0];
 
@@ -404,8 +412,6 @@ export default {
       copyFrom.setAttribute('target', '_blank');
       copyFrom.setAttribute('href', url);
       copyFrom.innerHTML = url;
-
-      body.appendChild(copyFrom);
 
       // 创建按钮
       let agent = document.createElement('button');
@@ -417,6 +423,7 @@ export default {
         target() {
           return document.getElementById('target');
         }
+        
       });
 
       clipboard.on('success', function(e) {
