@@ -12,7 +12,8 @@
               'frame-menu-active': menu == currMenu,
               'frame-menu-expand': menu == currMenu
             }" 
-            :key="menu.url">
+            :key="menu.url"
+            :id="menu.menuKey">
             <a 
               :href="menu.url ? menu.url : 'javascript:;'" 
               @click.prevent="open(menu)" 
@@ -28,11 +29,13 @@
               :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
               v-show="!collapse && menu == currMenu">
               <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
-              <template v-for="menu in menu.children">
-                <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}" :key="menu.menuKey">
-                  <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
-                </li>
-              </template>
+              <div class="frame-subMenu-item-wrap" :style="getMenuItemWrapStyle(menu)">
+                <template v-for="menu in menu.children">
+                  <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}" :key="menu.menuKey">
+                    <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+                  </li>
+                </template>
+              </div>
             </ul>
           </li>
         </template>
@@ -68,7 +71,8 @@ export default {
       originMenus,
       menus,
       menuIcon: MenuIcon,
-      currMenu: null
+      currMenu: null,
+      bodyHeight: 0
     };
   },
   computed: {
@@ -131,7 +135,68 @@ export default {
     },
     openHome(){
       this.$emit('open', {menuKey: 'HOME', url: '/home', title: '首页'})
+    },
+    /**
+     * 为menus的每个条目设置y轴占用高度数据 供计算
+     */
+    setMenuOffsetData() {
+      const baseTitleHeight = 51; // 菜单栏标题的高度
+      const baseItemHeight = 40; // 菜单栏每个条目的高度
+
+      // 获取menus的位置，记录menuItem 的offsetTop
+      this.menus = this.menus.map(menu => {
+        let key = (menu || {}).menuKey;
+        if (!key) return menu;
+
+        let dom = document.querySelector(`#${key}`);
+        if (!dom) return menu;
+        // 获取距离顶部的高度
+        let offsetTop = dom.offsetTop || 0;
+        // menu._offsetTop = offsetTop || 0;
+        // 记录每个条目 距离顶部高度+自身占用高度， 用于比较body.offsetHeight
+        let childrenLength = (menu.children && menu.children.length) || 0;
+        menu.__bottomToTop = offsetTop + baseTitleHeight;
+        menu.__totalHeight = offsetTop + baseTitleHeight + (baseItemHeight * childrenLength);
+
+        return menu;
+      })
+    },
+    /**
+     * 注册窗口大小变更监听器
+     */
+    registerResizeListener() {
+      try {
+        let _scope = this;
+        let dom = document.body;
+        this.bodyHeight = dom.offsetHeight;
+
+        window.addEventListener('resize', _.debounce(function() {
+          _scope.bodyHeight = dom.offsetHeight || 0;
+        }, 167));
+      } catch(e) {
+        console.error(e);
+      }
+    },
+    /**
+     * 获取菜单条目外围容器的样式，来确保显示不会被裁减
+     */
+    getMenuItemWrapStyle(menu) {
+      let totalHeight = menu.__totalHeight || 0;
+      let bottomToTop = menu.__bottomToTop || 0;
+      // 如果该菜单的子条目显示不会被当前屏幕裁剪
+      if (totalHeight <= this.bodyHeight) return '';
+
+      let remindHeight = this.bodyHeight - bottomToTop;
+      const minHeight = 40; // 菜单条目的高度
+      // 看不到一个半完整的条目停止计算
+      if (remindHeight < (minHeight / 2)) return ''; 
+
+      return `max-height: ${remindHeight}px; overflow-y: auto;`;
     }
+  },
+  mounted() {
+    this.setMenuOffsetData();
+    this.registerResizeListener();
   }
 }
 </script>
@@ -288,6 +353,10 @@ export default {
   background-color: #4AA09E;
   margin: 0;
   padding: 0;
+}
+
+.frame-subMenu-item-wrap {
+  position: relative;
 }
 
 .frame-subMenu-item{
