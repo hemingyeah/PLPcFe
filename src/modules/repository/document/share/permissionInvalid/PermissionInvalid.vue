@@ -3,7 +3,7 @@
     <div>
       <img class="permission-invalid-img" src="../../../../../assets/img/empty.png">
     </div>
-    <span class="permission-invalid-msg">非常抱歉，该文章对外查看权限已关闭，您无法查看</span>
+    <span class="permission-invalid-msg">该文章对外查看权限已关闭</span>
   </div>
 </template>
 

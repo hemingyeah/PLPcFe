@@ -3,7 +3,7 @@
     <div>
       <img class="delete-img" src="../../../../../assets/img/empty.png">
     </div>
-    <span class="delete-msg">非常抱歉，该文章已被删除</span>
+    <span class="delete-msg">该文章已被删除</span>
   </div>
 </template>
 
