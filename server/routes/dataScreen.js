@@ -5,7 +5,7 @@ const Template = require('../util/Template');
 const router = new KoaRouter();
 const modules = require('../../modules');
 
-const DS_COOKIE = 'ef3056fd-73f2-4dc3-a4aa-a0faa45d9e1c';
+const DS_COOKIE = 'a31f81bc-0ff3-4459-8ac3-3283c53b6fc2';
 const WEB_URI = '47.97.91.2';
 const MONGO_URI = '47.98.255.79';
 
@@ -17,7 +17,7 @@ router.get('/data-screen', async ctx => {
   let modConfig = modules['dataScreen.frame'];
   let reqHeaders = ctx.request.headers;
   
-  reqHeaders.cookie = 'VIPPUBLINKJSESSIONID=ef3056fd-73f2-4dc3-a4aa-a0faa45d9e1c';
+  reqHeaders.cookie = `VIPPUBLINKJSESSIONID=${DS_COOKIE}`;
 
   let result = await HttpClient.request('http://47.97.91.2:8080/stats/screenData/screenDataView', 'get', null, { headers: reqHeaders });
 

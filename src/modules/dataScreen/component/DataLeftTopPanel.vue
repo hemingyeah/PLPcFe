@@ -243,10 +243,19 @@ export default {
       if (!feature) return '';
       // let change = feature.change;
       let {change, current, last} = feature;
+
+      if (current === 0 && last) return '100% <i class="iconfont icon-long-arrow-down"></i>'; // 下降100%
+      if (current === 0 && last === 0) return '0%'; // 保持不变
+      if (current && last === 0) return '100% <i class="iconfont icon-long-arrow-up"></i>'; // 增长100%
+
       // 变化百分比
       let changeRatio = (current - last) / last;
-      changeRatio = changeRatio % 1 === 0 ? changeRatio : changeRatio.toFixed(4);
-      changeRatio = changeRatio * 100;
+
+      let isFloat = changeRatio % 1 !== 0;
+      if (isFloat) {
+        changeRatio = changeRatio.toFixed(4) * 100; // 可能出现精度丢失
+        changeRatio = Number(changeRatio.toFixed(2));
+      }
 
       if (change > 0) {
         return `${changeRatio}% <i class="iconfont icon-long-arrow-up"></i>`
