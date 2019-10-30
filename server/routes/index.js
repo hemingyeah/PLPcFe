@@ -92,7 +92,7 @@ router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
   // host: '192.168.31.70',
   port: 10003,
   headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=f280dc20-4315-4b28-b7cd-227287cf33e1`
+    'cookie': `VIPPUBLINKJSESSIONID=df935236-4ef9-4df6-bd2c-31afe81f85f3`
   },
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
@@ -105,7 +105,7 @@ router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   // host: '192.168.31.70',
   port: 10002,
   headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=f280dc20-4315-4b28-b7cd-227287cf33e1`
+    'cookie': `VIPPUBLINKJSESSIONID=df935236-4ef9-4df6-bd2c-31afe81f85f3`
   },
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`

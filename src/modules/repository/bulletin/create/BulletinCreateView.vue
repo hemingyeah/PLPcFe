@@ -236,8 +236,9 @@ export default {
       if(!this.params.article) this.params.article = ' ';
     },
 
-    // 本地缓存文章内容，5分钟一次
+    // 本地缓存文章内容，2分钟一次
     saveArticle () {
+      this.interval && clearInterval(this.interval);
       this.interval = setTimeout(() => {
         if(this.isSave) {
           let detail = {
