@@ -81,15 +81,6 @@ export default {
       return `width:${width}px;height:${height}px`
     }
   },
-  computed: {
-    headerBgFixStyleStr() {
-      if (!this.scope || !this.scope.y) return '?';
-
-      let scope = this.scope.y;
-
-      return `transform: scaleX(${scope / 1}); transform-origin: center center;`;
-    }
-  },
   methods: {
     getImage(type) {
       return HEADER_SIDE_GIF; // 目前版本是显示同一张图片 右侧显示翻转

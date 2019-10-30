@@ -99,45 +99,6 @@ router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
   // }
 }))
 
-
-// 数据屏调试代码
-const dsCookie = '1db1eb33-32ae-4c6e-9e8e-dc6b0a09c3a6';
-
-router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '47.98.255.79',
-  port: 10002,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
-  },
-}))
-
-router.use('/setting/screen/save', ctx => HttpClient.proxy(ctx, {
-  host: '47.97.91.2',
-  port: 8080,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
-  },
-}))
-
-router.use('/getOpenWebCode', ctx => HttpClient.proxy(ctx, {
-  host: '47.97.91.2',
-  port: 8080,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
-  },
-}))
-
-router.use('/stats/screenData/*', ctx => HttpClient.proxy(ctx, {
-  // host: '192.168.31.148',
-  host: '47.97.91.2',
-  port: 8080,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=${dsCookie}`
-  },
-}))
-
-// End of 数据屏调试 
-
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
   port: 10002,

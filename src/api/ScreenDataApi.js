@@ -72,8 +72,6 @@ function getTestMapData() {
 }
 
 
-
-
 export {
   saveSettingConfig,
   getSettingConfig,
