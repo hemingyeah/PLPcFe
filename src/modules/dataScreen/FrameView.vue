@@ -320,7 +320,7 @@ export default {
 
       console.info('获取转跳参数', serverHost, corpId, code);
 
-      let url = `${serverHost}/relogin?ua=webRelogin&corpId=${corpId}&code=${code}&withoutTab=true&pcUrl=${dataScreenPath}?fullScreen=true`;
+      let url = `${serverHost}/web/relogin?ua=webRelogin&corpId=${corpId}&code=${code}&withoutTab=true&pcUrl=${dataScreenPath}?fullScreen=true`;
       console.info('转跳地址', url);
       this.$platform.openLink(url);
 
