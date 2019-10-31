@@ -1,14 +1,13 @@
 .base-selection-bar-container {
   width: 100%;
-  height: 34px;
+  height: 28px;
   border-radius: 4px;
   background: #fff;
-  border: 1px solid rgba(254, 139, 37, 0.32);
   font-size: 12px;
   .content {
     padding: 0 7px;
     background: rgba(254, 139, 37, 0.08);
-    line-height: 32px;
+    line-height: 28px;
 
     span {
       color: #2CB9B0;
