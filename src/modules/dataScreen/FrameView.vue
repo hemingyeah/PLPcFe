@@ -258,7 +258,7 @@ export default {
      */
     registerLoop() {
       if (this.refreshInterval) clearInterval(this.refreshInterval);
-      this.refreshInterval = setInterval(this.refreshLoopFunc, 1 * 60 * 1000); // 60s
+      this.refreshInterval = setInterval(this.refreshLoopFunc, 10 * 1000); // 10s
 
       if (this.cacheInterval) clearInterval(this.cacheInterval);
       this.cacheInterval = setInterval(this.cacheLoopFunc, 120 * 1000); // 120s
