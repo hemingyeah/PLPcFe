@@ -22,6 +22,9 @@ function saveSettingConfig(params) {
 
 /**
  * 获取配置信息接口
+ * 目前后台逻辑是需要全部配置文件，
+ * 改动会造成A先改了配置，然后B在修改，B修改配置后会覆盖A的配置
+ * 所以在请求保存/更新配置前 从这个接口拿一下当前配置信息 去做merge后提交
  */
 function getSettingConfig() {
   return http.get('/stats/screenData/screenDataConfig')

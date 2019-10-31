@@ -638,7 +638,6 @@ export default {
      * @param {Object} prams 当前显示的参数，在非clearAll时生效
      */
     clearMarkers(clearAll = false, params = {}) {
-      console.info('%c 检查入参', 'color: blue; font-weight: 700; font-size: 15px;', params)
       let {
         notCompleteTask,
         staffInformation,

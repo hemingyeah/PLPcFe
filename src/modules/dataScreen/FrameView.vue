@@ -103,7 +103,7 @@ export default {
       hidden: false, // 用于控制钉钉中显示时隐藏主画面
       showSetting: false,
 
-      settingParams: null, // 设置信息, 通过getSettingConfig 获取
+      settingParams: null, // 设置信息用于绑定页面组件，先从initData中获取，更改settingDialog后会被settingDialog覆盖掉
       settingGroup: {}, // 分组字段
       screenData: {}, // 总数据
 
@@ -205,8 +205,6 @@ export default {
 
       await this.saveSetting(params);
       this.refreshFrameData();
-
-      // this.getSettingConfig();
     }, 100),
 
     rightTimeUpdateHandler: _.debounce(async function(time) {
@@ -218,15 +216,29 @@ export default {
 
     /**
      * 请求保存配置
+     * 先去请求获取最新配置，然后做merge
+     * @params {Object} params 要更新的配置
+     * 
      */
-    saveSetting(params) {
+    async saveSetting(params) {
+      let currentParams = {};
+      try {
+        let response = await DSApi.getSettingConfig();
+
+        currentParams = response.screenDataConfig;
+        params = _.assign(currentParams, params);
+      } catch(e) {
+        console.error('@DS GetSettingConfig Error', e);
+      }
+
       return DSApi.saveSettingConfig(params)
         .then(res => {
           if (!res.succ) {
             res.message && platform.alert(res.message);
           }
-          // res.succ 保存成功
-          console.info('saveSettingSuccess');
+          // res.succ 保存成功 
+          // donoting
+          // console.info('@SaveSettingSuccess');
         })
         .catch(err => {
           //
@@ -235,31 +247,9 @@ export default {
     },
 
     /**
-     * 主动获取设置信息 
-     * 暂时不用
-     */
-    getSettingConfig() {
-      DSApi.getSettingConfig()
-        .then(res => {
-          /**
-           * DTO
-           * httpResponse: {
-           *  screenDataConfig: {...具体配置}
-           * }
-           */
-          console.info('获取到配置信息', res);
-        })
-        .catch(err => {
-          console.info('获取配置信息失败', err);
-        })
-    },
-
-    /**
      * 组件要求更新保存配置文件
      */
     updateMapPanelSetting: _.debounce(function(setting) {
-      console.info('saveMapPanelConfig', setting);
-
       this.saveSetting(setting);
     }, 1000),
 
