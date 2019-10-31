@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
-import FrameView from './FrameView.vue';
+const FrameView = () => import('./FrameView.vue');
 
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
