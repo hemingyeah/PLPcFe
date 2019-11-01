@@ -135,7 +135,7 @@ export default {
   },
   methods: {
     updateFeaturesHandler(update) {
-      console.info('%c@rc-update dataLeftTop', 'color: red; font-weight: 400;', update);
+      // console.info('%c@rc-update dataLeftTop', 'color: red; font-weight: 400;', update);
       
       let data = update || this.data;
       let featureItems = this.config.items || [];

@@ -77,20 +77,30 @@ import platform from '../../platform';
  * 右上方数据展示 rightTop
  * 右侧柱形图 rightHistogram
  * 右侧饼状图 rightPieChart
+ * 
+ * 以宽度为1920为标准
+ * 高度支持最小 1280 (3:2)
+ * 第二档 1080 (16:9)
+ * 上述两档可以两侧不留白，
+ * 当宽高比大于 16/9 时 两侧逐渐留白
  */
 
-// const BASE_HEIGHT = 1080;
+/**
+ * 获取当前显示器的屏幕宽高
+ */
 const screenWidth = window.screen.width;
 const screenHeight = window.screen.height;
 
 const screenRatio = screenWidth / screenHeight;
 
-const fixedWidth1 = 1080;
-const fixedWidth2 = 1200;
+const fixedWidth = 1920;
+const fixedHeight1 = 1080;
+const fixedHeight2 = 1280; // 1200 (16:10) 1280 (4:3)
+const maxRatio = (fixedWidth / fixedHeight1) - 0.02; // 小于这个比例是不行的
 
-// const BASE_HEIGHT = 1200;
-const BASE_HEIGHT = screenRatio > 1.7 ? fixedWidth1 : fixedWidth2;
-const BASE_WIDTH = 1920;
+// 计算基准宽高
+const BASE_HEIGHT = screenRatio > maxRatio ? fixedHeight1 : fixedHeight2;
+const BASE_WIDTH = fixedWidth;
 
 export default {
   name: 'data-screen-frame-view',
@@ -110,13 +120,11 @@ export default {
       cacheInterval: null,
       refreshInterval: null,
 
-      scaleScope: { // 命名可改一下, 后期去除 y
-        x: 1, // 浏览器高度 与  标准高度比例
-        // y: 1, // 浏览器宽度 与 标准高度比例
-        bX: 1, // 浏览器宽度 与 标准宽度比例
+      scaleScope: {
+        widthRatio: 1, // 浏览器宽度 与 基准宽度比例
+        heightRatio: 1, // 浏览器高度 与 基准高度比例
         screenRatio,
-        fixedWidth1,
-        fixedWidth2
+        maxRatio
       },
 
       outsideParams: {},
@@ -126,18 +134,15 @@ export default {
   },
   methods: {
     domResizeHandler() {
-      // eslint-disable-next-line no-unused-vars
       let {innerHeight, innerWidth} = window;
-      // let {offsetWidth, offsetHeight} = document.body;
 
-      let baseRatio = innerHeight / BASE_HEIGHT; // 基准比例
-      let baseX = innerWidth / BASE_WIDTH;
+      let heightRatio = innerHeight / BASE_HEIGHT; // 基准比例
+      let widthRatio = innerWidth / BASE_WIDTH;
 
-      this.scaleScope.x = baseRatio;
-      this.scaleScope.bX = baseRatio; // 特殊计算
-      this.scaleScope.widthRatio = baseX;
+      this.scaleScope.heightRatio = heightRatio; 
+      this.scaleScope.widthRatio = widthRatio;
 
-      this.frameStyleStr = `width: ${BASE_WIDTH}px; height: ${BASE_HEIGHT}px; transform: scale(${baseRatio}) translateX(-50%);`;
+      this.frameStyleStr = `width: ${BASE_WIDTH}px; height: ${BASE_HEIGHT}px; transform: scale(${heightRatio}) translateX(-50%);`;
     },
 
     registerResizeListener() {

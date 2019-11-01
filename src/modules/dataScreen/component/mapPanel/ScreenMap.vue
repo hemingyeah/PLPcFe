@@ -55,17 +55,18 @@ export default {
      * 11.49
      */
     mapFixStylestr() {
-      if (!this.scope || !this.scope.x) return '';
+      if (!this.scope || !this.scope.widthRatio) return '';
 
       let screenRatio = this.scope.screenRatio;
-      let shrink = screenRatio <= 1.7;
-      let scope = this.scope.x;
+      let shrink = screenRatio <= this.scope.maxRatio;
+      let scope = this.scope.widthRatio;
 
       // let w = 720 * scope;
       // let h = 630 * scope; // 630
       // let dynamicHeight = this.scope.screenRatio >= 1.7 ? fixedMapHeight1 : fixedMapHeight2;
       let baseWidth = 1026;
-      let baseHeight = shrink ? 796.5 : 742;
+      // 841.5, 16/9: 742, 16/10: 796.5, 3/2: 841.5
+      let baseHeight = shrink ? 841.5 : 742; 
       let w = baseWidth * scope;
       let h = baseHeight * scope; // 684 531
       

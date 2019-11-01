@@ -179,7 +179,7 @@ export default {
 
       
     updateFeaturesHandler(update) {
-      console.info('%c@rc-update rightPie', 'color: red;font-weight: bold')
+      // console.info('%c@rc-update rightPie', 'color: red;font-weight: bold')
 
       let data = update;
       let featureItems = this.config.items || [];

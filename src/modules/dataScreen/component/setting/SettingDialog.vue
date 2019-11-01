@@ -67,9 +67,9 @@ export default {
   },
   computed: {
     headerBgFixStyleStr() {
-      if (!this.scope || !this.scope.bX) return '?';
+      if (!this.scope || !this.scope.heightRatio) return '?';
 
-      let scope = this.scope.bX;
+      let scope = this.scope.heightRatio;
       scope = scope > 1 ? scope : (1 / scope);
 
       return `transform: scaleX(${scope}); transform-origin: center center;`;

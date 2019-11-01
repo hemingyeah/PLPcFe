@@ -61,9 +61,9 @@ export default {
   },
   computed: {
     headerBgFixStyleStr() {
-      if (!this.scope || !this.scope.bX) return '';
+      if (!this.scope || !this.scope.heightRatio) return '';
 
-      let scope = this.scope.bX;
+      let scope = this.scope.heightRatio;
       // let scope = this.scope.offsetX;
       scope = scope > 1 ? scope : (1 / scope);
 
