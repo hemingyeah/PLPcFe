@@ -85,15 +85,11 @@ import platform from '../../platform';
  * 当宽高比大于 16/9 时 两侧逐渐留白
  */
 
-/**
- * 获取当前显示器的屏幕宽高
- */
-
 
 const fixedWidth = 1920;
 const fixedHeight1 = 1080;
 const fixedHeight2 = 1280; // 1200 (16:10) 1280 (4:3)
-const maxRatio = (fixedWidth / fixedHeight1) - 0.02; // 小于这个比例是不行的
+const maxRatio = (fixedWidth / fixedHeight1) - 0.02; 
 
 
 export default {

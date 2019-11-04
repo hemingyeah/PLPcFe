@@ -106,10 +106,6 @@ export default {
         this.$eventBus.$emit(EventMap.NEED_REFRESH_RIGHT_SEARCH_ET);
       })
     },
-
-    updateTimeHandler() {
-      // 
-    }
   },
   mounted() {
     this.$eventBus.$on(EventMap.NEED_UPDATE_RIGHT_HISTOGRAM, this.updateFeaturesHandler);
@@ -127,7 +123,7 @@ export default {
 </script>
 
 <style lang="scss">
-  $panelHeightRatio: 45%;
+  $panelHeightRatio: 42%;
 
   .right-histogram-panel {
     position: relative;
@@ -207,7 +203,7 @@ export default {
       }
       .histogram-container {
         height: calc(100% - 31px); 
-        // padding: 14px 19px;
+        padding: 12px 0 8px;
       }
     }
   }

@@ -100,7 +100,7 @@ export default {
 </script>
 
 <style lang="scss">
-  $panelHeightRatio: 16.8%;
+  $panelHeightRatio: 19.8%;
 
   .data-right-top-panel {
     height: $panelHeightRatio;
@@ -114,10 +114,10 @@ export default {
     position: relative;
     
     .feature-item {
-      height: 76px;
+      height: 95px;
       .feature-title {
         color: #00FFCC;
-        font-size: 14px;
+        font-size: 18px;
         font-weight: 400;
         line-height: 1;
 
@@ -125,7 +125,7 @@ export default {
       }
       .feature-content {
         color: #ffffff;
-        font-size: 24px;
+        font-size: 32px;
         line-height: 1;
         font-weight: normal;
       }

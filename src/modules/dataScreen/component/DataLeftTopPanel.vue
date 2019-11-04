@@ -377,15 +377,22 @@ export default {
     .feature-item {
       position: relative;
       border: $borderStyle;
-      padding: 0 19px;
+      padding: 18px 19px 5px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
 
       .title-row {
+        position: relative;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 16px 0 18px;
-        
+        // padding: 16px 0 30px;
+        width: 100%;
         line-height: 1;
+        margin-bottom: 20px;
         .main-title {
           color: $titleColor;
           font-size: 18px;
@@ -399,10 +406,12 @@ export default {
       }
 
       .content-row {
+        position: relative;
         display: flex;
         justify-content: space-between;
         align-items: center;
         line-height: 1;
+        width: 100%;
         .main-value {
           color: $valueColor;
           color: $valueColor;

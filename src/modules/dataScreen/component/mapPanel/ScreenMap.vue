@@ -61,8 +61,8 @@ export default {
       let scope = this.scope.heightRatio;
 
       let baseWidth = 1026;
-      // 841.5, 16/9: 742, 16/10: 796.5, 3/2: 841.5
-      let baseHeight = shrink ? 842 : 742; 
+      // 原比例: 841.5, 16/9: 742, 16/10: 796.5, 3/2: 841.5
+      let baseHeight = shrink ? 1026 : 742; 
       let w = baseWidth * scope;
       let h = baseHeight * scope; // 684 531
       
