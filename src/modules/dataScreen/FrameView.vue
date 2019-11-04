@@ -88,19 +88,13 @@ import platform from '../../platform';
 /**
  * 获取当前显示器的屏幕宽高
  */
-const screenWidth = window.screen.width;
-const screenHeight = window.screen.height;
 
-const screenRatio = screenWidth / screenHeight;
 
 const fixedWidth = 1920;
 const fixedHeight1 = 1080;
 const fixedHeight2 = 1280; // 1200 (16:10) 1280 (4:3)
 const maxRatio = (fixedWidth / fixedHeight1) - 0.02; // 小于这个比例是不行的
 
-// 计算基准宽高
-const BASE_HEIGHT = screenRatio > maxRatio ? fixedHeight1 : fixedHeight2;
-const BASE_WIDTH = fixedWidth;
 
 export default {
   name: 'data-screen-frame-view',
@@ -123,7 +117,7 @@ export default {
       scaleScope: {
         widthRatio: 1, // 浏览器宽度 与 基准宽度比例
         heightRatio: 1, // 浏览器高度 与 基准高度比例
-        screenRatio,
+        screenRatio: 1,
         maxRatio
       },
 
@@ -136,11 +130,20 @@ export default {
     domResizeHandler() {
       let {innerHeight, innerWidth} = window;
 
+      // 计算基准宽高
+      const screenWidth = window.screen.width;
+      const screenHeight = window.screen.height;
+
+      const screenRatio = screenWidth / screenHeight;
+      const BASE_HEIGHT = screenRatio > maxRatio ? fixedHeight1 : fixedHeight2;
+      const BASE_WIDTH = fixedWidth;
+
       let heightRatio = innerHeight / BASE_HEIGHT; // 基准比例
       let widthRatio = innerWidth / BASE_WIDTH;
 
       this.scaleScope.heightRatio = heightRatio; 
       this.scaleScope.widthRatio = widthRatio;
+      this.scaleScope.screenRatio = screenRatio;
 
       this.frameStyleStr = `width: ${BASE_WIDTH}px; height: ${BASE_HEIGHT}px; transform: scale(${heightRatio}) translateX(-50%);`;
     },

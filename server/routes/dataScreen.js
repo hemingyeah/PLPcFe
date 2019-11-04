@@ -5,9 +5,10 @@ const Template = require('../util/Template');
 const router = new KoaRouter();
 const modules = require('../../modules');
 
-const DS_COOKIE = 'ba206ce8-3b66-480d-9025-427111f34b37';
+const DS_COOKIE = '1f6e6477-8036-4bfe-a599-0617bceff766';
 const WEB_URI = '47.97.91.2';
 const MONGO_URI = '47.98.255.79';
+const PAGE_REDIRECT_URI = 'http://47.97.91.2:8080';
 
 /**
  * 转跳地址
@@ -19,7 +20,7 @@ router.get('/data-screen', async ctx => {
   
   reqHeaders.cookie = `VIPPUBLINKJSESSIONID=${DS_COOKIE}`;
 
-  let result = await HttpClient.request('http://47.97.91.2:8080/stats/screenData/screenDataView', 'get', null, { headers: reqHeaders });
+  let result = await HttpClient.request(`${PAGE_REDIRECT_URI}/stats/screenData/screenDataView`, 'get', null, { headers: reqHeaders });
 
   console.log('-----------------')
   console.log(result);
