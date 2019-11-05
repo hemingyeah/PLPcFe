@@ -268,7 +268,7 @@ export default {
           yAxis: index,
           xAxis: 0,
           label,
-          idx: index
+          idx: index + 1
         }
       })
     },
