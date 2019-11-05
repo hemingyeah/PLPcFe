@@ -29,6 +29,7 @@ import echarts from 'echarts';
 import ENGINEER_IMG from '@src/assets/img/screen-data-engineer.png';
 
 import EventMap from '../../../event';
+import HistogramMixins from './mixins';
 
 // let currCharts = null;
 let currChartsP1 = null;
@@ -41,6 +42,7 @@ const baseStyleConfig = {
 
 export default {
   name: 'cycle-ct-gs-histogram',
+  mixins: [HistogramMixins],
   props: {
     params: {
       type: Object,
@@ -82,24 +84,8 @@ export default {
 
       return `${label}${this.titleSuffix}`;
     },
-    /**
-     * 当前charts页码数
-     */
-    chartsPage() {
-      let length = (this.data || {}).data.length;
-      let ins = length > (this.max / 2);
-
-      return ins ? 2 : 1;
-    },
-    needPage() {
-      return this.chartsPage > 1;
-    }
   },
   methods: {
-    // initECharts() {
-    //   currCharts = echarts.init(document.querySelector('#sd-ctgs'));
-    // },
-
     initEChartsP1() {
       currChartsP1 = echarts.init(document.querySelector('#sd-ctgs-p1'));
     },
@@ -118,42 +104,13 @@ export default {
       return result;
     },
 
-    getFormatOriginData () {
-      let data = ((this.data || {}).data || []).map((item, idx) => {
-        item.idx = idx + 1;
-        return item;
-      })
-      let max = this.max / 2;
-
-      let dataP1 = data.slice(0, 5);
-      let dataP2 = data.slice(5, 10);
-
-      const getPaddingList = (list) => {
-        if (list.length >= max) return list;
-
-        let subNum = max - list.length;
-        let suppleData = [];
-        for (let i = 0; i < subNum; i++) {
-          // hidden 用于标记markPoint隐藏
-          suppleData.push({ hidden: true });
-        }
-        list = list.concat(suppleData);
-        return list;
-      }
-
-      return {
-        dataP1: getPaddingList(dataP1),
-        dataP2: getPaddingList(dataP2)
-      }
-    },
-
-    getEChartsOption(data) {
+    getEChartsOption(data, data2) {
 
       const config = this.getCustomConfig();
-      // 数据裁剪限制
-      // data = data.slice(0, this.max || 8);
+      const hasSupData = data2 && data2.length;
 
       const chartsData = this.getEChartsData(data);
+      const chartsDataSup = hasSupData && this.getEChartsData(data2);
       const markPointData = this.getMarkPointData(data);
 
       const option = {
@@ -309,6 +266,20 @@ export default {
           }
         ]
       }
+      // 如果有辅助数据填充辅助数据
+      if (hasSupData) {
+        option.series.push({
+          type: 'bar',
+          stack: 'one',
+          data: chartsDataSup,
+          itemStyle: {
+            normal: {
+              color: 'none'
+            }
+          }
+        })
+      }
+
       return option;
     }, 
 
@@ -352,7 +323,7 @@ export default {
       if (dataP2 && dataP2.length > 0 && this.needPage) {
         !currChartsP2 && this.initEChartsP2();
 
-        let optionP2 = this.getEChartsOption(dataP2);
+        let optionP2 = this.getEChartsOption(dataP2, dataP1);
         currChartsP2.setOption(optionP2);
       }
 
