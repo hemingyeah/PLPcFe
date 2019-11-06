@@ -11,7 +11,7 @@
     <!-- <div id="sd-et" class="histogram-container"></div> -->
     <div class="histogram-container">
       <div id="sd-et-p1" class="histogram-page" :class="{'hisgotram-page-animation-p1': chartsPage > 1}"></div>
-      <div v-if="chartsPage > 1" id="sd-et-p2" class="histogram-page" :class="{'hisgotram-page-animation-p1': chartsPage > 1}"></div>
+      <div v-if="chartsPage > 1" id="sd-et-p2" class="histogram-page" :class="{'hisgotram-page-animation-p2': chartsPage > 1}"></div>
     </div>
   </div>
 </template>

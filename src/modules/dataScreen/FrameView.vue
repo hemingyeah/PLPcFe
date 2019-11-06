@@ -91,6 +91,9 @@ const fixedHeight1 = 1080;
 const fixedHeight2 = 1280; // 1200 (16:10) 1280 (4:3)
 const maxRatio = (fixedWidth / fixedHeight1) - 0.02; 
 
+const refreshDataTimeInterval = 10 * 1000; // 定时刷新数据时间间隔
+const refreshCacheTimeInterval = 120 * 1000; // 定时发送心跳检测请求时间间隔
+
 
 export default {
   name: 'data-screen-frame-view',
@@ -151,6 +154,9 @@ export default {
       }, 100));
     },
 
+    /**
+     * 请求刷新页面数据
+     */
     refreshFrameData () {
       let config = this.settingParams;
 
@@ -167,14 +173,13 @@ export default {
           this.init = true;
 
           this.settingGroup = getSettingGroup(config);
-          this.screenData = res.result || res.data; // res.data 特殊联调用
+          this.screenData = res.result;
 
           // 发送更新广播
           this.broadcast(this.screenData);
 
         })
         .catch(err => {
-          //
           this.init = true;
         })
         .finally(() => {
@@ -262,10 +267,10 @@ export default {
      */
     registerLoop() {
       if (this.refreshInterval) clearInterval(this.refreshInterval);
-      this.refreshInterval = setInterval(this.refreshLoopFunc, 10 * 1000); // 10s
+      this.refreshInterval = setInterval(this.refreshLoopFunc, refreshDataTimeInterval);
 
       if (this.cacheInterval) clearInterval(this.cacheInterval);
-      this.cacheInterval = setInterval(this.cacheLoopFunc, 120 * 1000); // 120s
+      this.cacheInterval = setInterval(this.cacheLoopFunc, refreshCacheTimeInterval);
     },
 
     /**

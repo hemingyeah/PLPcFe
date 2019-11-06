@@ -230,7 +230,9 @@ export default {
     getMarkPointData(data) {
       return (data || []).map((item, index) => {
         let label = item.serviceContent;
-        label = label ? label : item.count ? '无' : '';
+        let hasCount = item.count || item.count === 0;
+
+        label = label ? label : hasCount ? '无' : '';
         return {
           yAxis: index,
           xAxis: 0,

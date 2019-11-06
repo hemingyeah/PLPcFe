@@ -85,6 +85,14 @@ export default {
         let key = feature.key;
 
         base.data = data[key] || [];
+
+        // if (key === 'cycleServerContent') {
+        //   base.data = [ ]
+        // }
+        // if (key === 'cycleServerTypeRankingCount') {
+        //   base.data = [ ]
+        // }
+
         return base;
       });
 
