@@ -4,6 +4,7 @@ import Exception from '@model/Exception';
 import http from '@src/util/http';
 
 export const FILE_MAX_SIZE = 10 * 1024 * 1024; // 单位字节(Byte)
+export const WIKI_FILE_MAX_SIZE = 50 * 1024 * 1024; // 50M
 export const FILE_MAX_NUM = 9;
 
 /** 
@@ -11,11 +12,18 @@ export const FILE_MAX_NUM = 9;
  * 1. 10m以内
  * 2. 有后缀名 
  */
-export function validate(file){
+export function validate(file, source){
   let fileName = file.name;
+  console.log('source', source)
+  if(source == 'wiki') {
+    // 验证文件大小
+    if(file.size > WIKI_FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过50MB，系统暂不支持上传`);
+  } else  {
+    // 验证文件大小
+    if(file.size > FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过10MB，系统暂不支持上传`);
+  }
 
-  // 验证文件大小
-  if(file.size > FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过10MB，系统暂不支持上传`);
+  
 
   // 验证文件类型
   let lastDotIndex = fileName.lastIndexOf('.');
@@ -141,11 +149,11 @@ export function uploadWithParse(file, action = '/files/upload', options = {}){
  * @param {(boolean | function)} [options.validateStorage] - 是否验证容量限制 
  * @param {boolean} [options.silence] - 是否不显示提示
  */
-export function batchUploadWithParse(files, action = '/files/upload', options = {}){
+export function batchUploadWithParse({files = {}, action = '/files/upload', options = {}, source = ''} = {}){
   return validateTenantStorage(options.validateStorage, files)
     .then(() => {
       let fileArr = toArray(files);
-      let validateRes = fileArr.map(item => validate(item)).filter(item => item instanceof Error);
+      let validateRes = fileArr.map(item => validate(item, source)).filter(item => item instanceof Error);
       if(validateRes.length > 0){ // 文件验证失败
         return Promise.resolve(validateRes);
       }

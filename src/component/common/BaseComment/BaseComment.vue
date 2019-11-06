@@ -145,7 +145,7 @@ export default {
 
       this.pending = true;
 
-      Uploader.batchUploadWithParse(files).then(result => {
+      Uploader.batchUploadWithParse({files}).then(result => {
         let {success, error} = result;
 
         if(error.length > 0){

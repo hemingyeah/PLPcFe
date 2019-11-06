@@ -79,7 +79,7 @@ export default {
       }
 
       this.pending = true;
-      Uploader.batchUploadWithParse(files, this.action).then((result = {}) => {
+      Uploader.batchUploadWithParse({files, action: this.action}).then((result = {}) => {
         let {success, error} = result;
 
         if(error && Array.isArray(error) && error.length > 0){

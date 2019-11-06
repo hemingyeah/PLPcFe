@@ -177,7 +177,7 @@ export default {
 
       this.pending = true;
 
-      Uploader.batchUploadWithParse(files).then(result => {
+      Uploader.batchUploadWithParse({files, action: '/files/upload/wiki', source: 'wiki'}).then(result => {
         let {success, error} = result;
 
         if(error.length > 0){
@@ -311,6 +311,11 @@ export default {
         flex-wrap: wrap;
 
         vertical-align: middle;
+        a {
+          max-width: 350px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
 
       .file-button {

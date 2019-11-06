@@ -2,7 +2,7 @@
 const http = require('http');
 
 const DEFAULT_OPIONS = {
-  host: '192.168.31.18',
+  host: '47.98.255.79',
   port: 10000,
   // protocol: 'https:',
   headers: {}
