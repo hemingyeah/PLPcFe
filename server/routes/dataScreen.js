@@ -5,7 +5,7 @@ const Template = require('../util/Template');
 const router = new KoaRouter();
 const modules = require('../../modules');
 
-const DS_COOKIE = 'a89d6e09-ee99-4498-8113-0c4ea7b12b5c';
+const DS_COOKIE = 'eeb926e7-615a-4e6f-9e46-3a817e8d9d2c';
 const WEB_URI = '47.97.91.2';
 const MONGO_URI = '47.98.255.79';
 const PAGE_REDIRECT_URI = 'http://47.97.91.2:8080';

@@ -321,8 +321,8 @@ export default {
   $borderStyle: 1px solid #06A8A1;
   $titleColor: #00FFCC;
   $valueColor: #ffffff;
-  $upColor: #00FF66;
-  $downColor: #FF414A; 
+  $upColor: #FF414A; 
+  $downColor: #00FF66;
 
   $baseHeight6: 105px;
 
