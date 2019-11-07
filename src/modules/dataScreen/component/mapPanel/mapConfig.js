@@ -95,7 +95,7 @@ export function getCustomerUiWidth(level, number) {
     if (number <= 800) return 6;
     if (number <= 3200) return 10;
     if (number <= 12800) return 12;
-    return;
+    return 14;
   }
 
   return 0;

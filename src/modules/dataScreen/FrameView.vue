@@ -362,11 +362,17 @@ export default {
       // URL参数中有fullScreen=true 说明当前URL是在钉钉中弹出的地址, 且需要在钉钉中
       if (this.inDingTalk) {
         this.hidden = true;
-        const confirmOutside = await this.$platform.confirm('数据大屏功能推荐使用浏览器全屏查看\n点击确定继续');
+        // const confirmOutside = await this.$platform.confirm('数据大屏功能推荐使用浏览器全屏查看\n点击确定继续');
 
-        if (!confirmOutside) return (this.hidden = false);
+        // if (!confirmOutside) return (this.hidden = false);
 
-        this.jumpToOutside();
+        // this.jumpToOutside();
+        this.$platform.confirm('数据大屏功能推荐使用浏览器全屏查看\n点击确定继续')
+          .then(res => {
+            if (!res) return (this.hidden = false);
+
+            this.jumpToOutside();
+          })
       }
     } catch(e) {
       this.settingParams = {};
