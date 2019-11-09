@@ -6550,6 +6550,12 @@ export default [
           },
           {
             name: '龙门县'
+          },
+          {
+            name: '仲恺区'
+          },
+          {
+            name: '大湾亚区'
           }
         ]
       },
@@ -7469,7 +7475,7 @@ export default [
             name: '金堂县'
           },
           {
-            name: '郫县'
+            name: '郫都区'
           },
           {
             name: '大邑县'
