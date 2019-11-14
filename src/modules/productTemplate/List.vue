@@ -43,7 +43,7 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <base-button type="primary" icon="icon-add" @event="productCreate" v-if="authEdit == 3">新建</base-button>
+          <base-button type="primary" icon="icon-add" @event="productCreate" v-if="authCreate">新建</base-button>
           <base-button type="ghost" icon="icon-qingkongshanchu" v-if="authDelete" @event="productDelete">删除</base-button>
         </div>
         <!-- end operation bar-->
@@ -336,11 +336,14 @@ export default {
     },
     // 编辑权限
     authEdit() {
-      return this.auth.CUSTOMER_EDIT;
+      return this.auth.PRODUCT_EDIT;
+    },
+    authCreate() {
+      return this.auth.PRODUCT_CREATE;
     },
     // 删除权限
     authDelete() {
-      return (this.authEdit === 3);
+      return (this.authEdit == 3 && this.auth.PRODUCT_DELETE);
     },
     // 导出权限
     authExport() {

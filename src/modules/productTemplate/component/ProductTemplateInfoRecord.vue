@@ -61,12 +61,12 @@ export default {
       return this.productTemplate.isDelete === 0;
     },
     /** 编辑权限 */
-    allowEditCustomer() {
-      return this.shareData.allowEditCustomer;
+    allowEditProduct() {
+      return this.shareData.allowEditProduct;
     },
     /** 添加备注权限 */
     editComment(){
-      return (this.allowEditCustomer && this.allowOperate);
+      return (this.allowEditProduct && this.allowOperate);
     },
     // 当前用户id
     loginUser(){
@@ -85,7 +85,7 @@ export default {
     /** 
      * 同时满足以下条件允许删除该记录
      * 1. 该记录没有被删除
-     * 2. 客户编辑权限（CUSTOMER_EDIT）值为3 或者 是创建人
+     * 2. 产品编辑权限（PRODUCT_EDIT）值为3 或者 是创建人
      * 3. 该客户没有被删除
      */
     allowDeleteRecord(item){
@@ -94,7 +94,7 @@ export default {
       let user = this.loginUser;
       let isCreator = item.userId == user.userId;
 
-      return !isDelete && ((authorities['CUSTOMER_EDIT'] && authorities['CUSTOMER_EDIT'] == 3) || isCreator) && this.allowOperate;
+      return !isDelete && ((authorities['PRODUCT_EDIT'] && authorities['PRODUCT_EDIT'] == 3) || isCreator) && this.allowOperate;
     },
     /** 添加备注 */
     async createRemark(form){

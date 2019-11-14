@@ -4,8 +4,8 @@
       <div class="product-toolbar-left" v-if="allowBack || !isDelete">
         <!-- <button type="button" class="btn btn-text" @click="goBack" v-if="allowBack"><i class="iconfont icon-arrow-left"></i> 返回</button> -->
         <template>
-          <button type="button" class="btn btn-text" @click="editProduct" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
-          <button type="button" class="btn btn-text" @click="deleteProduct" v-if="allowDeleteCustomer"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
+          <button type="button" class="btn btn-text" @click="editProduct" v-if="allowEditProduct"><i class="iconfont icon-edit"></i> 编辑</button>
+          <button type="button" class="btn btn-text" @click="deleteProduct" v-if="allowDeleteProduct"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
           <button type="button" class="btn btn-text" @click="openRemindDialog('remind')"><i class="iconfont icon-notification"></i> 添加提醒</button>
         </template>
       </div>
@@ -262,7 +262,7 @@ export default {
       return {
         product: this.product,
         loginUser: this.initData.loginUser,
-        allowEditCustomer: this.allowEditCustomer,
+        allowEditProduct: this.allowEditProduct,
         isDelete: this.isDelete,
       };
     },
@@ -287,16 +287,16 @@ export default {
       return this.product.isDelete == null || this.product.isDelete === 1;
     },
 
-    allowDeleteCustomer() {
-      return this.allowEditCustomer && this.permission.CUSTOMER_DELETE;
+    allowDeleteProduct() {
+      return this.allowEditProduct && this.permission.PRODUCT_DELETE;
     },
     /**
-     * 满足以下条件允许编辑客户
-     * 1. 客户没有被删除
-     * 2. 有客户编辑权限
+     * 满足以下条件允许编辑产品
+     * 1. 产品没有被删除
+     * 2. 有产品编辑权限
      */
-    allowEditCustomer() {
-      return !this.isDelete && this.hasEditCustomerAuth;
+    allowEditProduct() {
+      return !this.isDelete && this.hasEditProductAuth;
     },
     /**
      * 满足以下提交见允许创建工单
@@ -307,7 +307,7 @@ export default {
      * 4. 创建工单权限
      */
     allowCreateTask(){
-      return !this.isDelete && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, 'TASK_ADD');
+      return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, 'TASK_ADD');
     },
     /**
      * 满足以下提交可以创建事件
@@ -318,7 +318,7 @@ export default {
      * 4. 新建事件权限
      */
     allowCreateEvent(){
-      return !this.isDelete && this.hasEditCustomerAuth && AuthUtil.hasAuth(this.permission, 'CASE_ADD');
+      return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, 'CASE_ADD');
     },
     /**
      * 满足以下条件可以创建计划任务
@@ -331,7 +331,7 @@ export default {
      */
     allowCreatePlanTask(){
       let planTaskEnabled = this.initData.planTaskEnabled;
-      return !this.isDelete && this.hasEditCustomerAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
+      return !this.isDelete && this.hasEditProductAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
     },
     /**
      * 当前用户是否是该客户负责人
@@ -341,16 +341,16 @@ export default {
       return this.loginUser.userId === this.product.customer.customerManager;
     },
     /**
-     * 是否有编辑客户权限，需要满足以下条件之一：
+     * 是否有编辑产品权限，需要满足以下条件之一：
      *
-     * 1. 编辑客户全部权限： 全部客户
-     * 2. 编辑客户团队权限： 没有团队的客户都可编辑，有团队的按团队匹配。 包含个人权限
-     * 3. 编辑客户个人权限： 自己创建的 或 客户负责人
+     * 1. 编辑产品全部权限： 全部产品
+     * 2. 编辑产品团队权限： 创建人没有团队的产品都可编辑，有团队的按团队匹配。 包含个人权限
+     * 3. 编辑产品个人权限： 自己创建的产品 或 客户负责人的产品
      */
-    hasEditCustomerAuth(){
+    hasEditProductAuth(){
       let customer = this.product.customer;
       let loginUserId = this.loginUser.userId;
-      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT',
+      return AuthUtil.hasAuthWithDataLevel(this.permission, 'PRODUCT_EDIT',
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];

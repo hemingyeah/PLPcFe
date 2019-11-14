@@ -6,7 +6,7 @@
       <div class="product-template-toolbar-left" v-if="allowBack || !isDelete">
         <button type="button" class="btn btn-text" @click="goBack" v-if="allowBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <template v-if="!isDelete">
-          <button type="button" class="btn btn-text" @click="goEdit" v-if="allowEditCustomer"><i class="iconfont icon-edit"></i> 编辑</button>
+          <button type="button" class="btn btn-text" @click="goEdit" v-if="allowEditProduct"><i class="iconfont icon-edit"></i> 编辑</button>
           <button type="button" class="btn btn-text" @click="deleteProductTemplate" v-if="allowDeleteProductTemplate"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
         </template>
       </div>
@@ -124,15 +124,15 @@ export default {
     },
     // 是否允许删除产品模板
     allowDeleteProductTemplate() {
-      return (this.allowEditCustomer && this.permission.CUSTOMER_DELETE);
+      return (this.allowEditProduct && this.permission.PRODUCT_DELETE);
     },
     /** 
      * 满足以下条件允许编辑产品模板
      * 1. 产品模板没有被删除
-     * 2. 有客户编辑权限 或 客户负责人
+     * 2. 有产品编辑权限 或 客户负责人
      */
-    allowEditCustomer() {
-      return (!this.isDelete && (this.hasEditCustomerAuth || this.isCustomerManager));
+    allowEditProduct() {
+      return (!this.isDelete && (this.hasEditProductAuth || this.isCustomerManager));
     },
     // 字段列表
     fields() {
@@ -163,16 +163,16 @@ export default {
       return allFields;
     },
     /** 
-     * 是否有编辑客户权限，需要满足以下条件之一：
+     * 是否有编辑产品权限，需要满足以下条件之一：
      * 
-     * 1. 编辑客户全部权限： 全部客户
-     * 2. 编辑客户团队权限： 没有团队的客户都可编辑，有团队的按团队匹配。 包含个人权限
-     * 3. 编辑客户个人权限： 自己创建的 或 客户负责人
+     * 1. 编辑产品全部权限： 全部产品
+     * 2. 编辑产品团队权限： 创建人没有团队的产品都可编辑，有团队的按团队匹配。 包含个人权限
+     * 3. 编辑产品个人权限： 自己创建的产品 或 客户负责人的产品
      */
-    hasEditCustomerAuth(){
+    hasEditProductAuth(){
       let productTemplate = this.productTemplate;
       let loginUserId = (this.loginUser && this.loginUser.userId) || '';
-      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT', 
+      return AuthUtil.hasAuthWithDataLevel(this.permission, 'PRODUCT_EDIT', 
         // 团队权限判断
         () => {
           let tags = Array.isArray(productTemplate.tags) ? productTemplate.tags : [];
@@ -210,7 +210,7 @@ export default {
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
-        allowEditCustomer: this.allowEditCustomer,
+        allowEditProduct: this.allowEditProduct,
         isDelete: this.isDelete,
         loginUser: this.initData.loginUser,
         productTemplate: this.productTemplate,

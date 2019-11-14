@@ -30,7 +30,7 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <base-button type="primary" icon="icon-add" @event="jumpPage" v-if="editedPermission">新建</base-button>
+          <base-button type="primary" icon="icon-add" @event="jumpPage" v-if="createdPermission">新建</base-button>
           <base-button type="ghost" icon="icon-qingkongshanchu" v-if="deletePermission" @event="deleteCustomer">删除</base-button>
         </div>
 
@@ -375,6 +375,9 @@ export default {
   computed: {
     editedPermission() {
       return this.auth.CUSTOMER_EDIT;
+    },
+    createdPermission() {
+      return this.auth.CUSTOMER_CREATE;
     },
     viewedPermission() {
       return this.auth.CUSTOMER_VIEW === 3

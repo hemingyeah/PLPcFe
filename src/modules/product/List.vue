@@ -21,7 +21,7 @@
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <base-button type="primary" icon="icon-add" @event="goToCreate" v-if="editedPermission">新建</base-button>
+          <base-button type="primary" icon="icon-add" @event="goToCreate" v-if="createdPermission">新建</base-button>
           <base-button type="ghost" icon="icon-qingkongshanchu" @event="deleteProducts" v-if="deletePermission">删除</base-button>
         </div>
 
@@ -323,13 +323,16 @@ export default {
       return this.initData?.loginUser?.authorities || this.initData?.authorities;
     },
     editedPermission() {
-      return this.auth.CUSTOMER_EDIT;
+      return this.auth.PRODUCT_EDIT;
+    },
+    createdPermission() {
+      return this.auth.PRODUCT_CREATE;
     },
     viewedPermission() {
       return this.auth.CUSTOMER_VIEW === 3
     },
     deletePermission() {
-      return this.auth.CUSTOMER_EDIT === 3 && this.auth.CUSTOMER_DELETE;
+      return this.auth.PRODUCT_EDIT === 3 && this.auth.PRODUCT_DELETE;
     },
     exportPermission() {
       return this.auth.EXPORT_IN;
