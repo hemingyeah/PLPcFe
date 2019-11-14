@@ -258,7 +258,10 @@ export default {
       }
 
       if (change > 0) {
-        return `${changeRatio * 100}% <i class="iconfont icon-long-arrow-up"></i>`
+        if (!isFloat) {
+          changeRatio = changeRatio * 100;
+        }
+        return `${changeRatio}% <i class="iconfont icon-long-arrow-up"></i>`
       }
 
       if (Number(change) === 0) {
