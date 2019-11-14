@@ -258,7 +258,7 @@ export default {
       }
 
       if (change > 0) {
-        return `${changeRatio}% <i class="iconfont icon-long-arrow-up"></i>`
+        return `${changeRatio * 100}% <i class="iconfont icon-long-arrow-up"></i>`
       }
 
       if (Number(change) === 0) {
