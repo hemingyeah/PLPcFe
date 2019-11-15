@@ -74,8 +74,6 @@ const FrameManager = {
     openForNav(menu){
       window.TDAPP.onEvent(`pc：访问${menu.name || (`未命名页面${menu.menuKey || ''}`)}`);
       let url = this.joinParams(menu.url);
-
-      console.log('this is url', url);
       
       let tab = new Tab({ id: menu.menuKey, url, title: menu.name });
       this.openFrameTab(tab)
@@ -100,7 +98,13 @@ const FrameManager = {
       
       this.frameTabs.forEach(item => item.show = false);
       this.frameTabs.push(tab);
-      this.currUrl = tab.url;
+      console.log('tab', tab)
+      if(tab.id == 'M_VIP_SPAREPART_LIST') {
+        this.currUrl = '/bill';
+      } else {
+        this.currUrl = tab.url;
+      }
+      console.log('tab', this.currUrl)
 
       this.adjustFrameTabs(tab);
       this.removeFrameCache(tab.id)

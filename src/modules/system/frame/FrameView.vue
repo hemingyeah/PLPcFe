@@ -259,7 +259,7 @@ export default {
     openDemo(){
       this.openForFrame({
         id: 'demo',
-        url: '/demo',
+        url: '/bill',
         title: 'demo'
       })
     },

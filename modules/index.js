@@ -6,6 +6,7 @@ const customer = require('./customer')
 const approve = require('./approve')
 const repository = require('./repository')
 const dataScreen = require('./dataScreen')
+const bill = require('./bill')
 
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
@@ -39,5 +40,6 @@ module.exports = {
   ...customer,
   ...approve,
   ...repository,
-  ...dataScreen
+  ...dataScreen,
+  ...bill
 }
