@@ -128,12 +128,22 @@ export default {
           [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
       }
-      if (sf.fieldName === 'manager' || sf.formType === 'user') {
+      if (sf.fieldName === 'manager') {
         tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
           [sf.fieldName]: {
             id: tv.userId,
+            name: tv.displayName,
+          },
+        })
+      }
+      if (sf.formType === 'user') {
+        tv = form[sf.fieldName];
+
+        params.mapJson = JSON.stringify({
+          [sf.fieldName]: {
+            userId: tv.userId,
             name: tv.displayName,
           },
         })
