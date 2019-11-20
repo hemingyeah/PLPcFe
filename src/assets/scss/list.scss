@@ -1,0 +1,101 @@
+$color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+
+.page-list {
+  height: 100%;
+  padding: 10px;
+  overflow: auto;
+
+  .page-list-section {
+    padding-top: 10px
+  }
+}
+
+.page-list-section .operation-bar-container {
+  background: #fff;
+  border-radius: 3px 3px 0 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #f2f2f2;
+
+  .top-btn-group .base-button {
+    margin-right: 5px;
+  }
+
+  .action-button-group {
+    .base-button {
+      margin-left: 5px;
+    }
+  }
+
+  .el-dropdown-btn {
+    padding: 0 15px;
+    line-height: 32px;
+    display: inline-block;
+    background: $color-primary-light-9;
+    color: $text-color-primary;
+    outline: none;
+    margin-left: 5px;
+    .iconfont {
+      margin-left: 5px;
+      font-size: 12px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: #fff;
+      background: $color-primary;
+    }
+  }
+}
+
+// table
+.page-table {
+  padding: 10px;
+
+  &:before {
+    display: none;
+  }
+
+  .page-table-header th {
+    background: #F5F5F5;
+    color: $text-color-primary;
+    font-weight: normal;
+  }
+
+  th {
+    color: #606266;
+    font-size: 14px;
+  }
+  td {
+    color: #909399;
+    font-size: 13px;
+  }
+
+  .view-detail-btn {
+    color: $color-primary;
+  }
+
+  .select-column .el-checkbox {
+    position: relative;
+    top: 3px;
+  }
+
+  tr .el-table{
+    height: 44px;
+  }
+}
+
+// superscript
+.page-name-superscript-td {
+  padding: 0 !important;
+  & > div {
+    height: 43px;
+    line-height: 43px !important;
+    a {
+      display: inline-block;
+      height: 43px;
+      line-height: 43px;
+    }
+  }
+}
