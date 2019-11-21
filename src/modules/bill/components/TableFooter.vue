@@ -3,7 +3,7 @@
     <div class="table-footer">
       <div class="list-info">
         共<span class="level-padding">{{page.total}}</span>记录，
-        已选中<span class="product-selected-count" @click="multipleSelectionPanelShow = true">{{multipleSelection.list.length}}</span>条
+        已选中<span class="product-selected-count" @click="multipleSelection.multipleSelectionPanelShow = true">{{multipleSelection.list.length}}</span>条
         <span class="product-selected-count" @click="toggleSelection()">清空</span>
       </div>
       <el-pagination
@@ -19,7 +19,7 @@
       </el-pagination>
     </div>
 
-    <base-panel class="product-panel" :show.sync="multipleSelectionPanelShow" width="420px">
+    <base-panel class="product-panel" :show.sync="multipleSelection.multipleSelectionPanelShow" width="420px">
       <h3 slot="title">
         <span>已选中数据({{multipleSelection.list.length}})</span>
         <i
@@ -69,7 +69,6 @@ export default {
   },
   data () {
     return {
-      multipleSelectionPanelShow: false,
       searchModel: {
         pageSize: this.page.pageSize,
         pageNum: this.page.pageNum,

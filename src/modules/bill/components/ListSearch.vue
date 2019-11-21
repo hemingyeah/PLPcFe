@@ -6,7 +6,7 @@
       <form class="base-search" onsubmit="return false;">
         <div class="list-left">
           <div class="list-base-search-group">
-            <el-input v-model="searchModel.keyWord" :placeholder="placeholder">
+            <el-input v-model="searchModel.keyword" :placeholder="placeholder">
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
             <base-button type="primary" @event="search();trackEventHandler('search')" native-type="submit">搜索</base-button>
@@ -34,7 +34,14 @@
         </el-dropdown>
       </h3>
       <el-form class="advanced-search-form" onsubmit="return false;">
-        <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :columnNum="columnNum"></search-form>
+        <search-form 
+          :fields="fields" 
+          ref="searchForm" 
+          :form-backup="formBackup" 
+          :columnNum="columnNum" 
+          :options="options" 
+          @updateCreateTime="updateCreateTime"
+          @getForm="getForm"></search-form>
         <div class="advanced-search-btn-group">
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button type="primary" @event="search" native-type="submit">搜索</base-button>
@@ -49,8 +56,6 @@ import { FormFieldMap, SettingComponents } from '@src/component/form/components'
 import * as Utils from '@src/component/form/util';
 import _ from 'lodash';
 import BillAmountRange from './amountRange.vue'
-// import PartNameSelect from './PartNameSelect.vue'
-// import PartLibrarySelect from './PartLibrarySelect.vue'
 
 export default {
   name: 'list-search',
@@ -70,6 +75,14 @@ export default {
           type: Number,
           default: 1
         },
+        pickerOptions: {
+          type: Object,
+          default: () => ({})
+        },
+        options: {
+          type: Object,
+          default: () => ({})
+        }
       },
       data() {
         return {
@@ -91,10 +104,6 @@ export default {
           let fields = this.fields;
           let form = {};
           let tv = '';
-          let amount = {
-            amountStart: '',
-            amountEnd: ''
-          }
 
           fields.forEach(field => {
             tv = '';
@@ -117,7 +126,9 @@ export default {
             }
 
             if (field.formType === 'range') {
-              this.$set(this.form, field.fieldName, amount)
+              this.$set(this.form, field.fieldName, this.options.amount)
+            } else if (field.fieldName == 'createTime') {
+              this.$set(this.form, field.fieldName, this.options.createTime)
             } else {
               form[field.fieldName] = this.formBackup[field.fieldName] || tv;
               this.$set(this.form, field.fieldName, this.formBackup[field.fieldName] || tv)
@@ -133,7 +144,10 @@ export default {
           }
 
           const f = event.field;
-          this.form[f.fieldName] = event.newValue;
+          this.form[f.fieldName] = event.newValue;          
+          if(f.fieldName == 'createTime') {
+            this.$emit('updateCreateTime', event.newValue)
+          }
         },
         renderInput(h, f) {
           let comp = FormFieldMap.get(f.formType);
@@ -196,7 +210,21 @@ export default {
                   update: event => this.update(event)
                 }
               });
-          } else if (f.formType === 'customize') { // 其他
+          } else if (f.formType === 'date') {
+            childComp = h(
+              'date-search',
+              {
+                props: {
+                  field: f,
+                  value: this.form[f.fieldName],
+                  disableMap: true,
+                  pickerOptions: this.options.pickerOptions,
+                },
+                on: {
+                  update: event => this.update(event)
+                }
+              });
+          } else if (f.formType === 'customize') { // 其他非公共模板
             childComp = h(
               f.components,
               {
@@ -264,38 +292,50 @@ export default {
     config: {
       type: Object,
       default: () => ({})
+    },
+    pickerOptions: {
+      type: Object,
+      default: () => ({})
+    },
+    options: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {
     return {
       searchModel: {
-        keyWord: '',
+        keyword: '',
         moreConditions: {},
       },
       visible: false,
       formBackup: {},
       columnNum: 1,
+      form: {}
     }
   },
   methods: {
+    updateCreateTime(value) {
+      this.$emit('updateCreateTime', value)
+    },
     search () {
       this.searchModel.moreConditions = this.buildParams();
       this.$emit('search', this.searchModel);
     },
     // TalkingData事件埋点
     trackEventHandler (type) {
-      // if (type === 'search') {
-      //   window.TDAPP.onEvent('pc：产品管理-搜索事件');
-      //   return;
-      // } 
-      // if (type === 'moreAction') {
-      //   window.TDAPP.onEvent('pc：产品管理-更多操作事件');
-      //   return;
-      // }
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：支付管理-搜索事件');
+        return;
+      } 
+      if (type === 'moreAction') {
+        window.TDAPP.onEvent('pc：支付管理-更多操作事件');
+        return;
+      }
     },
     resetParams () {
       this.searchModel = {
-        keyWord: '',
+        keyword: '',
         moreConditions: {},
       };
       this.formBackup = {};
@@ -303,7 +343,7 @@ export default {
       this.$emit('reset');
     },
     panelSearchAdvancedToggle () {
-      // window.TDAPP.onEvent('pc：产品管理-高级搜索事件');
+      window.TDAPP.onEvent('pc：支付管理-高级搜索事件');
       this.visible = true;
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
@@ -356,11 +396,17 @@ export default {
       return operator;
     },
 
+    getForm (value) {
+      return value;
+    },
+
     buildParams() {
-      if(!this.$refs.searchForm) return;
-      const form = this.$refs.searchForm.returnData();
+      if(this.$refs.searchForm) {
+        this.form = this.$refs.searchForm.returnData();
+      }
+      const form = this.form;
+      
       this.formBackup = Object.assign({}, form);
-      console.log('formBackup', form)
 
       const isSystemFields = this.fields.filter(f => f.isSystem);
       const notSystemFields = this.fields.filter(f => !f.isSystem);

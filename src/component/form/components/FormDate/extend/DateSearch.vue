@@ -8,7 +8,7 @@
     range-separator="-"
     start-placeholder="开始日期"
     end-placeholder="结束日期"
-    :picker-options="datePickerOptions">
+    :picker-options="pickerOptions.shortcuts? pickerOptions : datePickerOptions">
   </el-date-picker>
 
 </template>
@@ -23,6 +23,10 @@ export default {
     value: {
       type: Array,
       default: () => ([])
+    },
+    pickerOptions: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -59,9 +63,6 @@ export default {
   methods: {
     choose(newValue){
       let oldValue = null;
-
-      console.log('newValue', newValue);
-
       // this.$emit('input', newValue);
       this.$emit('update', {newValue, oldValue, field: this.field});
     },

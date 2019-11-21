@@ -1,16 +1,15 @@
 <template>
   <div class="page-list" v-loading.fullscreen.lock="loadingListData">
 
-    <list-search :placeholder="placeholder" :config="{fields: this.partFields}" @search="search" @reset="reset">
+    <list-search :placeholder="placeholder" :config="{fields: this.partFields}" :options="options" @search="search" @reset="reset" @updateCreateTime="updateCreateTime">
       <div class="bill-date">
         <el-date-picker
-          v-model="originModel.createTime"
+          v-model="options.createTime"
           type="daterange"
           unlink-panels
           start-placeholder="开始日期"
           end-placeholder="结束日期"
-          value-format="yyyy-MM-dd"
-          :picker-options="pickerOptions">
+          :picker-options="options.pickerOptions">
         </el-date-picker>
       </div>
     </list-search>
@@ -36,6 +35,10 @@
           <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">选择列 <i class="iconfont icon-nav-down"></i></span>
         </div>
       </div>
+    </div>
+
+    <div style="background: #fff;padding: 0 10px">
+      <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection.list" @toggle-selection="clearSelection" @show-panel="() => multipleSelection.multipleSelectionPanelShow = true" />
     </div>
 
     <div class="page-panel">
@@ -80,6 +83,18 @@
               </sample-tooltip>
             </template>
 
+            <template v-else-if="column.field === 'createTime'">
+              {{scope.row.createTime | fmt_datetime}}
+            </template>
+
+            <template v-else-if="column.field === 'payTime'">
+              {{scope.row.payTime | fmt_datetime}}
+            </template>
+
+            <template v-else-if="column.field === 'receiptAmount'">
+              {{scope.row.receiptAmount.toFixed(2)}}
+            </template>
+
             <template v-else>
               {{scope.row[column.field]}}
             </template>
@@ -95,9 +110,10 @@
         @toggleRowSelection="toggleRowSelection"
         @clearSelection="clearSelection"></table-footer>
 
+      <!-- v-if="allowImportAndExport" -->
       <base-export ref="exportPanel"
-                   v-if="allowImportAndExport"
                    :columns="filterColumns"
+                   method="post"
                    action="/partV2/repertory/sparepartRepertory"></base-export>
 
       <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
@@ -109,8 +125,8 @@
 import _ from 'lodash';
 import Page from '../../../model/Page';
 import AuthUtil from '@src/util/auth';
-import * as DateUtil from '@src/util/lang';
 import StorageUtil from '@src/util/storageUtil';
+import {formatDate} from '@src/util/lang';
 
 import ListSearch from './components/ListSearch';
 import TableFooter from './components/TableFooter';
@@ -123,7 +139,7 @@ export default {
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
     let originModel = {
-      keyWord: '', // 关键字
+      keyword: '', // 关键字
       // amount: {}, // 金额范围
       // taskNo: '', // 工单编号
       // orderNo: '', // 商家订单编号
@@ -132,11 +148,9 @@ export default {
       // alipayAccount: '', // 买家账号
       // alipayNo: '', // 交易号
       // payChannel: [], // 支付渠道
-      createTime: [], // 交易创建时间
       pageNum: 1,
       pageSize,
-      sortBy: {},
-      isMissingPart: 0,
+      sortBy: {}
     };
 
     return {
@@ -144,7 +158,8 @@ export default {
       multipleSelection: {
         leftName: '客户名称',
         rightName: '收支金额',
-        list: []
+        list: [],
+        multipleSelectionPanelShow: false,
       },
 
       auths: {}, // 权限对象
@@ -153,7 +168,20 @@ export default {
       isExpand: false,
       pending: false,
       bill: {
-        options: [],
+        payType: [{
+          text: '支付宝',
+          value: ''
+        }, {
+          text: '微信',
+          value: 1
+        }, {
+          text: '银行卡',
+          value: 0
+        }, {
+          text: '其他',
+          value: 2
+        }],
+        billType: ['工单支付'],
         dateRange: ''
       },
 
@@ -162,6 +190,7 @@ export default {
       model: _.assign({}, originModel),
 
       page: new Page(),
+      selected: [],
 
       pickerOptions: {
         shortcuts: [{
@@ -169,7 +198,6 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
             picker.$emit('pick', [start, end]);
           }
         }, {
@@ -177,7 +205,8 @@ export default {
           onClick(picker) {
             const end = new Date();
             const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 2);
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
+            end.setTime(end.getTime() - 3600 * 1000 * 24 * 1);
             picker.$emit('pick', [start, end]);
           }
         }, {
@@ -199,6 +228,49 @@ export default {
         }]
       },
       loadingListData: false,
+      options: {
+        pickerOptions: {
+          shortcuts: [{
+            text: '今日',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '昨日',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
+              end.setTime(end.getTime() - 3600 * 1000 * 24 * 1);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近7天',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近30天',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
+        createTime: [],
+        amount: {
+          amountStart: '',
+          amountEnd: ''
+        }
+      },
+      selectedLimit: 200,
     }
   },
   computed: {
@@ -206,14 +278,14 @@ export default {
       let fixedFields = [
         {
           displayName: '客户',
-          fieldName: 'customer',
+          fieldName: 'customerId',
           formType: 'customer',
           isExport: false,
           isSystem: 1,
         },
         {
           displayName: '商家订单号',
-          fieldName: 'orderNo',
+          fieldName: 'shbTradeNo',
           formType: 'text',
           isExport: false,
           isSystem: 1,
@@ -225,20 +297,20 @@ export default {
           isExport: false,
           isSystem: 1,
         },
-        {
-          displayName: '支付渠道',
-          fieldName: 'payChannel',
-          formType: 'select',
-          isExport: false,
-          isSystem: 1,
-          setting: {
-            dataSource: this.bill.options,
-            isMulti: false
-          }
-        }, 
+        // {
+        //   displayName: '支付渠道',
+        //   fieldName: 'payType',
+        //   formType: 'select',
+        //   isExport: false,
+        //   isSystem: 1,
+        //   setting: {
+        //     dataSource: this.bill.payType,
+        //     isMulti: false
+        //   }
+        // }, 
         {
           displayName: '交易号',
-          fieldName: 'alipayNo',
+          fieldName: 'tradeNo',
           formType: 'text',
           isExport: false,
           isSystem: 1,
@@ -255,7 +327,7 @@ export default {
         },
         {
           displayName: '交易付款时间',
-          fieldName: 'paymentTime',
+          fieldName: 'payTime',
           formType: 'date',
           isExport: false,
           isNull: 1,
@@ -265,7 +337,7 @@ export default {
         },
         {
           displayName: '买家账号',
-          fieldName: 'alipayAccount',
+          fieldName: 'buyerLogonId',
           formType: 'text',
           isExport: false,
           isSystem: 1,
@@ -278,17 +350,17 @@ export default {
           isSystem: 1,
           components: 'bill-amount-range',
         },
-        {
-          displayName: '账单类型',
-          fieldName: 'billType',
-          formType: 'select',
-          isExport: false,
-          isSystem: 1,
-          setting: {
-            dataSource: this.bill.options,
-            isMulti: false
-          }
-        }
+        // {
+        //   displayName: '账单类型',
+        //   fieldName: 'billType',
+        //   formType: 'select',
+        //   isExport: false,
+        //   isSystem: 1,
+        //   setting: {
+        //     dataSource: this.bill.billType,
+        //     isMulti: false
+        //   }
+        // }
       ];
 
       return fixedFields
@@ -365,15 +437,14 @@ export default {
 
     // 导出支付记录
     exportData(exportAll){
-      if(!this.allowImportAndExport || !this.allowEdit || !this.allowInout) return;
+      // if(!this.allowImportAndExport || !this.allowEdit || !this.allowInout) return;
       let ids = [];
-
-      if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}在线支付记录.xlsx`;
+      if (!exportAll) {
+        if (!this.selected.length) return this.$platform.alert('请选择要导出的数据');
         ids = this.selected.map(item => item.id);
       }
-
-      this.$refs.exportPanel.open(ids, `${DateUtil.formatDate(new Date(), 'yyyy-MM-dd')}在线支付记录.xlsx`);
+      this.$refs.exportPanel.open(ids, fileName);
     },
 
     importSucc(){
@@ -391,21 +462,94 @@ export default {
     },
 
     openDetail(row){
-      this.$platform.openView({
-        id: `partV2_detail_${row.id}`,
-        url:`/partV2/detail?id=${row.id}`,
-        title: '备件品类详情'
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `frame_tab_taskView_${row.taskId}`,
+        url:`/task/view/${row.taskId}`,
+        title: `工单${row.taskId}`,
+        close: true,
+        fromId
       })
     },
 
+    // 计算已选择
+    selectionCompute(selection) {
+      let tv = [];
+      
+      tv = this.multipleSelection.list
+        .filter(ms => this.page.list.every(c => c.id !== ms.id));
+      tv = _.uniqWith([...tv, ...selection], _.isEqual);
+
+      return tv;
+    },
     select(data){
-      this.selected = data;
+      let tv = this.selectionCompute(data);
+      
+      let original = this.multipleSelection.list
+        .filter(ms => this.page.list.some(cs => cs.id === ms.id));
+
+      let unSelected = this.page.list
+        .filter(c => original.every(oc => oc.id !== c.id));
+
+      if (tv.length > this.selectedLimit) {
+        this.$nextTick(() => {
+          original.length > 0
+            ? unSelected.forEach(row => {
+              this.$refs.table.toggleRowSelection(row, false);
+            })
+            : this.$refs.table.clearSelection();
+        });
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+      }
+
       this.multipleSelection.list = [];
-      data.forEach((item) => {
-        item.serialNumber = item.sparepart.serialNumber;
-        item.name = item.sparepart.name;
+      this.selected = tv;
+      tv.forEach((item) => {
+        item.serialNumber = item.customerName;
+        item.name = item.receiptAmount;
         this.multipleSelection.list.push(item)
       })
+    },
+    // 匹配选中的列
+    matchSelected() {
+      if (!this.multipleSelection.list.length) return;
+
+      const selected = this.page.list
+        .filter(c => {
+          if (this.multipleSelection.list.some(sc => sc.id === c.id)) {
+            this.multipleSelection.list = this.multipleSelection.list.filter(sc => sc.id !== c.id);
+            this.multipleSelection.list.push(c);
+            return c;
+          }
+        }) || [];
+
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
+    },
+
+    toggleSelection(rows) {
+      let isNotOnCurrentPage = false;
+      let row = undefined;
+
+      if (rows.length <= 0) this.$refs.table.clearSelection();
+
+      if (rows) {
+        for(let i = 0; i < rows.length; i++) {
+          row = rows[i];
+          isNotOnCurrentPage = this.page.list.every(item => {
+            return item.id !== row.id;
+          })
+          if(isNotOnCurrentPage) return
+        }
+        rows.forEach(row => {
+          this.$refs.table.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.table.clearSelection();
+        this.multipleSelection.list = [];
+      }
     },
 
     jump(pageNum){
@@ -429,10 +573,11 @@ export default {
     },
 
     buildModel (data) {
+      console.log('data', data);
       this.model = _.assign({}, this.originModel);
       this.$refs.table.clearSort();
       
-      this.model.keyWord = data.keyWord;
+      this.model.keyword = data.keyword;
 
       if(data.pageNum) this.model.pageNum = data.pageNum;
       
@@ -442,6 +587,8 @@ export default {
         // 存入localStorage
         StorageUtil.save(STORAGE_PAGESIZE_KEY, data.pageSize);
       }
+
+      this.buildTime(this.options.createTime);
 
       if(!data.moreConditions || !data.moreConditions.fields) return;
 
@@ -459,18 +606,61 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === 'customerId') {
+          this.model.customerId = form[fn];
+          continue;
+        }
 
-        // if (tv.fieldName === 'partType') {
-        //   this.model.type = form[fn];
-        //   continue;
-        // }
+        if (tv.fieldName === 'shbTradeNo') {
+          this.model.shbTradeNo = form[fn];
+          continue;
+        }
 
+        if (tv.fieldName === 'taskNo') {
+          this.model.taskNo = form[fn];
+          continue;
+        }
+
+        if (tv.fieldName === 'payType') {
+          this.model.payType = form[fn];
+          continue;
+        }
+
+        if (tv.fieldName === 'tradeNo') {
+          this.model.tradeNo = form[fn];
+          continue;
+        }
+
+        if (tv.fieldName === 'payTime') {
+          this.model.payTimeStart = formatDate(form[fn][0], 'YYYY-MM-DD 00:00:00')
+          this.model.payTimeEnd = `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`
+          continue;
+        }
+
+        if (tv.fieldName === 'buyerLogonId') {
+          this.model.buyerLogonId = form[fn];
+          continue;
+        }
+
+        if (tv.fieldName === 'amountRange') {
+          this.model.receiptAmountMin = form[fn].amountStart;
+          this.model.receiptAmountMax = form[fn].amountEnd;
+          this.options.mounted = form[fn];
+          continue;
+        }
+
+        if (tv.fieldName === 'billType') {
+          this.model.billType = form[fn];
+          continue;
+        }
       }
     },
 
     reset(){
       this.model = _.assign({}, this.originModel);
-      this.originModel.createTime = [];
+      this.options.createTime = [];
+      this.options.amount.amountStart = '';
+      this.options.amount.amountEnd = '';
       this.$refs.table.clearSort();
       this.loadData();
     },
@@ -479,7 +669,7 @@ export default {
       let sortBy = {};
 
       if(prop){
-        let tableName = 'repertorySparepart';
+        let tableName = 'pbo';
         let key = `${tableName}.${prop}`
         sortBy[key] = order == 'ascending';
       }
@@ -491,9 +681,19 @@ export default {
     async loadData(){
       this.loadingListData = true;
       try{
-        // this.page = await this.fetchData();
+        let res = await this.fetchData();
+        if(res.success == false) {
+          this.loadingListData = false;
+          this.$platform.notification({
+            title: res.message,
+            type: 'error',
+          });
+          return;
+        }
+        this.page = res.result;
         this.model.pageNum = this.page.pageNum;
         this.model.pageSize = this.page.pageSize;
+        this.matchSelected();
       }catch(error){
         this.loadingListData = false;
         console.error(error);
@@ -503,7 +703,7 @@ export default {
 
     fetchData(){
       // 获取支付列表
-      // return this.$http.get('/partV2/repertory/list', this.model)
+      return this.$http.post('/outside/paymentBill/online/list', this.model)
     },
 
     buildParams(pageNum, pageSize){
@@ -522,53 +722,54 @@ export default {
           label: '客户',
           field: 'customerName',
           show: true,
-          width: '200px',
-          exportAlias: 'bill.serialNumber',
+          width: '160px',
+          exportAlias: 'bill.customerName',
           tooltip: true,
         },
         {
           label: '工单编号',
           field: 'taskNo',
           show: true,
-          width: '170px',
-          exportAlias: 'bill.name',
+          width: '150px',
+          exportAlias: 'bill.taskNo',
           tooltip: true,
         },
         {
           label: '商家订单号',
-          field: 'orderNo',
+          field: 'shbTradeNo',
           show: true,
-          width: '200px',
-          exportAlias: 'bill.name',
+          width: '150px',
+          exportAlias: 'bill.shbTradeNo',
           tooltip: true,
         },
         {
           label: '支付渠道',
-          field: 'payChannel',
+          field: 'payType',
           show: true,
           tooltip: true,
         },
         {
           label: '交易号',
-          field: 'alipayNo',
+          field: 'tradeNo',
           show: true,
-          width: '170px',
+          width: '150px',
           tooltip: true,
         },
         {
           label: '收支金额（元）',
-          field: 'amount',
+          field: 'receiptAmount',
           show: true,
-          width: '150px',
-          exportAlias: 'bill.standard',
+          sortable: 'pbo',
+          exportAlias: 'bill.receiptAmount',
           tooltip: true,
         },
         {
           label: '交易付款时间',
-          field: 'paymentTime',
+          field: 'payTime',
           show: true,
           width: '170px',
-          exportAlias: 'bill.name',
+          sortable: 'pbo',
+          exportAlias: 'bill.payTime',
           tooltip: true,
         },
         {
@@ -576,15 +777,16 @@ export default {
           field: 'createTime',
           show: true,
           width: '170px',
-          exportAlias: 'bill.type',
+          sortable: 'pbo',
+          exportAlias: 'bill.createTime',
           tooltip: true,
         },
         {
           label: '买家账号',
-          field: 'alipayAccount',
+          field: 'buyerLogonId',
           show: true,
-          width: '200px',
-          exportAlias: 'safetyStock',
+          width: '150px',
+          exportAlias: 'bill.buyerLogonId',
           tooltip: true,
         },
         {
@@ -608,9 +810,19 @@ export default {
 
       return columns;
     },
+
+    buildTime(value) {
+      if(!value || !value.length) return;
+      this.model.createTimeStart = formatDate(value[0], 'YYYY-MM-DD 00:00:00')
+      this.model.createTimeEnd = `${formatDate(value[1], 'YYYY-MM-DD')} 23:59:59`
+    },
+
+    updateCreateTime(value) {
+      this.options.createTime = value;
+    },
    
     trackEventHandler() {
-      // this.$tdOnEvent('pc：在线支付管理-更多操作事件');
+      window.TDAPP.onEvent('pc：在线支付管理-更多操作事件');
     }
   },
   mounted(){
@@ -620,6 +832,7 @@ export default {
     this.page.pageSize = this.model.pageSize;
 
     // this.loadData();
+    window.__exports__refresh = this.loadData();
   },
   components: {
     [ListSearch.name]: ListSearch,

@@ -102,11 +102,11 @@ router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
 
 // /api/app/outside
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '47.98.255.79',
+  host: '192.168.31.146',
   // host: '192.168.31.70',
-  port: 10002,
+  port: 10004,
   headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=36c9d799-16c5-4ab4-96ae-b9f92c11754c`
+    'cookie': `VIPPUBLINKJSESSIONID=dabd6af8-c4ef-4ad4-b224-f05892907da9`
   },
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
