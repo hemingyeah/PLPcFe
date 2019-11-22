@@ -78,12 +78,12 @@ export default {
   methods: {
     jump(pageNum) {
       this.searchModel.pageNum = pageNum;
-      this.$emit('search', this.searchModel);
+      this.$emit('search', this.searchModel, 'jump');
     },
     handleSizeChange(pageSize) {
       this.searchModel.pageSize = pageSize;
       this.searchModel.pageNum = 1;
-      this.$emit('search', this.searchModel)
+      this.$emit('search', this.searchModel, 'pageSizeChange')
     },
     toggleSelection (rows) {
       if (rows) {

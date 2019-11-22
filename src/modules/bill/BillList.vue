@@ -113,8 +113,10 @@
       <!-- v-if="allowImportAndExport" -->
       <base-export ref="exportPanel"
                    :columns="filterColumns"
+                   :build-params="buildExportParams"
+                   :validate="checkExportCount"
                    method="post"
-                   action="/partV2/repertory/sparepartRepertory"></base-export>
+                   action="/excels/paymentBillOnline/export"></base-export>
 
       <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
     </div>
@@ -409,6 +411,25 @@ export default {
       this.$refs.table.clearSelection();
     },
 
+    buildExportParams(checkedArr, ids) {
+      let exportAll = !ids || !ids.length;
+      let exportSearchModel = exportAll ? {
+        ...this.buildParams(),
+        exportTotal: this.page.total
+      } : {exportTotal: ids.length};
+
+      return {
+        checked: checkedArr.join(','),
+        data: exportAll ? '' : ids.join(','),
+        exportSearchModel: JSON.stringify(exportSearchModel)
+      };
+    },
+    /** 检测导出条数 */
+    checkExportCount(ids, max) {
+      let exportAll = !ids || !ids.length;
+      return exportAll && this.page.total > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
+    },
+
     // 选择列
     showAdvancedSetting(){
       // window.TDAPP.onEvent('pc：在线支付管理-选择列事件');
@@ -567,26 +588,24 @@ export default {
       StorageUtil.save(STORAGE_PAGESIZE_KEY, pageSize);
     },
 
-    search (data) {
+    search (data, type) {
+      if(type == 'jump') {
+        this.jump(data.pageNum);
+        return;
+      }
+      if(type == 'pageSizeChange') {
+        this.pageSizeChange(data.pageSize);
+        return;
+      }
       this.buildModel(data);
       this.loadData();
     },
 
     buildModel (data) {
-      console.log('data', data);
       this.model = _.assign({}, this.originModel);
       this.$refs.table.clearSort();
       
       this.model.keyword = data.keyword;
-
-      if(data.pageNum) this.model.pageNum = data.pageNum;
-      
-      if(data.pageSize) {
-        this.model.pageSize = data.pageSize;
-        this.originModel.pageSize = data.pageSize;
-        // 存入localStorage
-        StorageUtil.save(STORAGE_PAGESIZE_KEY, data.pageSize);
-      }
 
       this.buildTime(this.options.createTime);
 
@@ -723,7 +742,7 @@ export default {
           field: 'customerName',
           show: true,
           width: '160px',
-          exportAlias: 'bill.customerName',
+          exportAlias: 'export_customerName',
           tooltip: true,
         },
         {
@@ -731,7 +750,7 @@ export default {
           field: 'taskNo',
           show: true,
           width: '150px',
-          exportAlias: 'bill.taskNo',
+          exportAlias: 'export_taskNo',
           tooltip: true,
         },
         {
@@ -739,13 +758,14 @@ export default {
           field: 'shbTradeNo',
           show: true,
           width: '150px',
-          exportAlias: 'bill.shbTradeNo',
+          exportAlias: 'export_shbTradeNo',
           tooltip: true,
         },
         {
           label: '支付渠道',
           field: 'payType',
           show: true,
+          exportAlias: 'export_payType',
           tooltip: true,
         },
         {
@@ -753,14 +773,16 @@ export default {
           field: 'tradeNo',
           show: true,
           width: '150px',
+          exportAlias: 'export_tradeNo',
           tooltip: true,
         },
         {
           label: '收支金额（元）',
           field: 'receiptAmount',
           show: true,
+          width: '150px',
           sortable: 'pbo',
-          exportAlias: 'bill.receiptAmount',
+          exportAlias: 'export_receiptAmount',
           tooltip: true,
         },
         {
@@ -769,7 +791,7 @@ export default {
           show: true,
           width: '170px',
           sortable: 'pbo',
-          exportAlias: 'bill.payTime',
+          exportAlias: 'export_payTime',
           tooltip: true,
         },
         {
@@ -778,7 +800,7 @@ export default {
           show: true,
           width: '170px',
           sortable: 'pbo',
-          exportAlias: 'bill.createTime',
+          exportAlias: 'export_createTime',
           tooltip: true,
         },
         {
@@ -786,13 +808,14 @@ export default {
           field: 'buyerLogonId',
           show: true,
           width: '150px',
-          exportAlias: 'bill.buyerLogonId',
+          exportAlias: 'export_buyerLogonId',
           tooltip: true,
         },
         {
           label: '账单类型',
           field: 'billType',
           show: true,
+          exportAlias: 'export_billType',
           tooltip: true,
         }
       ];
@@ -826,13 +849,12 @@ export default {
     }
   },
   mounted(){
-    let initData = JSON.parse(JSON.stringify(window._init_data || {}));
-
     this.page.pageNum = this.model.pageNum;
     this.page.pageSize = this.model.pageSize;
 
     // this.loadData();
     window.__exports__refresh = this.loadData();
+    console.log(3333);
   },
   components: {
     [ListSearch.name]: ListSearch,
