@@ -48,7 +48,8 @@ export default {
      * 函数必须返回Promise对象
      * 如果验证失败，promise需要返回错误信息，否则返回null
      */
-    validate: Function
+    validate: Function,
+    downloadUrl: String
   },
   data(){
     return {
@@ -110,11 +111,16 @@ export default {
       }, 150);
     },
     // ajax形式导出
-    ajaxExport(params){
+    async ajaxExport(params){
       let ajax = null;
       // 是否是立即下载
       if(this.isDownloadNow) {
-        ajax = http.axios(this.method, this.action, params, false, {responseType: 'blob'}).then(blob => {
+        let data = ''
+        if(this.downloadUrl) {
+          data = await http.post(this.downloadUrl, params, false);
+          console.log(data);
+        }
+        ajax = http.axios(this.method, this.action, data || params, false, {responseType: 'blob'}).then(blob => {
           let link = document.createElement('a');
           let url = URL.createObjectURL(blob);
           link.download = this.fileName;

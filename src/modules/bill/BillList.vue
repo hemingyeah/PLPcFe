@@ -115,8 +115,9 @@
                    :columns="filterColumns"
                    :build-params="buildExportParams"
                    :validate="checkExportCount"
-                   method="post"
-                   action="/excels/paymentBillOnline/export"></base-export>
+                   method="get"
+                   download-url="/excels/paymentBillOnline/export"
+                   action="/excels/downloadByToken"></base-export>
 
       <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
     </div>
@@ -430,6 +431,13 @@ export default {
       return exportAll && this.page.total > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
     },
 
+    // downloadFn() {
+    //   let filterColumns = this.filterColumns.filter(item => item.export)
+    //   let checkedArr = filterColumns.map(item => item.exportAlias ? item.exportAlias : item.field);
+    //   let ids = this.selected.map(item => item.id);
+    //   let params = this.buildExportParams(checkedArr, ids);
+    // },
+
     // 选择列
     showAdvancedSetting(){
       // window.TDAPP.onEvent('pc：在线支付管理-选择列事件');
@@ -465,7 +473,7 @@ export default {
         if (!this.selected.length) return this.$platform.alert('请选择要导出的数据');
         ids = this.selected.map(item => item.id);
       }
-      this.$refs.exportPanel.open(ids, fileName);
+      this.$refs.exportPanel.open(ids, fileName, true);
     },
 
     importSucc(){

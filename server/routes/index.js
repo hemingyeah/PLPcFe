@@ -113,6 +113,18 @@ router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   // }
 }))
 
+// router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
+//   host: '192.168.31.249',
+//   // host: '192.168.31.70',
+//   port: 8080,
+//   headers: {
+//     'cookie': `VIPPUBLINKJSESSIONID=71a54c18-dcfd-4f2d-99a9-a5faf00835e1`
+//   },
+//   // headers: {
+//   //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
+//   // }
+// }))
+
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
   port: 10002,
