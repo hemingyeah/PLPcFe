@@ -97,6 +97,13 @@
       "unicode_decimal": 58976
     },
     {
+      "icon_id": "924332",
+      "name": "card",
+      "font_class": "card",
+      "unicode": "e8bd",
+      "unicode_decimal": 59581
+    },
+    {
       "icon_id": "967627",
       "name": "信息",
       "font_class": "info",
