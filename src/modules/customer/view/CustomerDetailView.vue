@@ -57,7 +57,7 @@
         </el-dropdown>
         <base-button type="plain" icon="icon-add" @event="openDialog('contact')" v-if="allowEditCustomer">联系人</base-button>
         <base-button type="plain" icon="icon-add" @event="openDialog('address')" v-if="allowEditCustomer">地址</base-button>
-        <base-button type="plain" icon="icon-add" @event="createProduct('address')" v-if="allowEditCustomer">产品</base-button>
+        <base-button type="plain" icon="icon-add" @event="createProduct('address')" v-if="allowCreateProduct">产品</base-button>
       </div>
     </div>
     <div class="main-content" v-loading="loading">
@@ -216,6 +216,7 @@ export default {
     },
     /** 当前用户的权限 */
     permission() {
+      console.log(this.initData.loginUser.authorities)
       return this.initData.loginUser.authorities;
     },
     allowDeleteCustomer() {
@@ -228,6 +229,14 @@ export default {
      */
     allowEditCustomer() {
       return !this.isDelete && this.hasEditCustomerAuth;
+    },
+    /**
+     * 满足以下条件允许为客户添加产品
+     * 1. 客户没有被删除
+     * 2. 产品创建权限
+     */
+    allowCreateProduct() {
+      return !this.isDelete && this.permission.PRODUCT_CREATE;
     },
     /** 
      * 是否有编辑客户权限，需要满足以下条件之一：
