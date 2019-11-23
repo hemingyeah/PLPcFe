@@ -723,7 +723,7 @@ export default {
 
     fetchData(){
       // 获取支付列表
-      return this.$http.post('/outside/paymentBill/online/list', this.model)
+      return this.$http.post('/api/payment/outside/paymentBill/online/list', this.model)
     },
 
     buildParams(pageNum, pageSize){
