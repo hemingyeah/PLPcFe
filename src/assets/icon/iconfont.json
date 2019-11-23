@@ -573,6 +573,13 @@
       "unicode_decimal": 60479
     },
     {
+      "icon_id": "5924731",
+      "name": "card",
+      "font_class": "card1",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
       "icon_id": "5992221",
       "name": "userstatus",
       "font_class": "user-status",

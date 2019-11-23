@@ -9,5 +9,5 @@ export default {
   'M_INFO': 'icon-xinxiguanli', //信息管理
   'M_USER': 'icon-quanxianguanli', // 账号权限
   'M_SYSTEM': 'icon-xitongguanli', //系统管理
-  'M_VIP_FINANCE': 'icon-card' //财务管理
+  'M_VIP_FINANCE': 'icon-card1' //财务管理
 }
