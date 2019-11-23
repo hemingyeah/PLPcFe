@@ -115,12 +115,11 @@ export default {
       let ajax = null;
       // 是否是立即下载
       if(this.isDownloadNow) {
-        let data = ''
         if(this.downloadUrl) {
-          data = await http.post(this.downloadUrl, params, false);
-          console.log(data);
+          this.billExport(params);
+          return;
         }
-        ajax = http.axios(this.method, this.action, data || params, false, {responseType: 'blob'}).then(blob => {
+        ajax = http.axios(this.method, this.action, params, false, {responseType: 'blob'}).then(blob => {
           let link = document.createElement('a');
           let url = URL.createObjectURL(blob);
           link.download = this.fileName;
@@ -154,6 +153,29 @@ export default {
 
       return ajax
     },
+    async billExport(params) {
+      let ajax = null;
+      let token = await http.post(this.downloadUrl, params, false);
+      let url = `${ this.action }?token=${ token.data }`;
+      ajax = http.axios(this.method, url, {}, false, {responseType: 'blob'}).then(blob => {
+        let link = document.createElement('a');
+        let url = URL.createObjectURL(blob);
+        link.download = this.fileName;
+        link.href = url;
+        this.$refs.bridge.appendChild(link)
+        link.click();
+
+        this.visible = false;
+        this.pending = false;
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          this.$refs.bridge.removeChild(link)
+        }, 150);
+      }).catch(err => console.error(err));
+
+      return ajax;
+    },
+
     async exportData(){
       if(this.checkedArr.length == 0) return Platform.alert('请至少选择一列导出');
 

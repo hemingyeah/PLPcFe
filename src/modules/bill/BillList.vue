@@ -431,13 +431,6 @@ export default {
       return exportAll && this.page.total > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
     },
 
-    // downloadFn() {
-    //   let filterColumns = this.filterColumns.filter(item => item.export)
-    //   let checkedArr = filterColumns.map(item => item.exportAlias ? item.exportAlias : item.field);
-    //   let ids = this.selected.map(item => item.id);
-    //   let params = this.buildExportParams(checkedArr, ids);
-    // },
-
     // 选择列
     showAdvancedSetting(){
       // window.TDAPP.onEvent('pc：在线支付管理-选择列事件');
