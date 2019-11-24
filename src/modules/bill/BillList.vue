@@ -529,7 +529,7 @@ export default {
       this.selected = tv;
       tv.forEach((item) => {
         item.serialNumber = item.customerName;
-        item.name = item.receiptAmount;
+        item.name = item.receiptAmount.toFixed(2);
         this.multipleSelection.list.push(item)
       })
     },
