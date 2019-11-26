@@ -120,6 +120,12 @@
             <template v-else-if="column.formType === 'address'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}
             </template>
+            <template v-else-if="column.field === 'createUser'">
+              {{ scope.row.createUser && scope.row.createUser.displayName }}
+            </template>
+            <template v-else-if="column.field === 'createTime'">
+              {{ scope.row.createTime | formatDate }}
+            </template>
 
             <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
             </div>
@@ -387,6 +393,10 @@ export default {
       }
       return null;
     },
+    formatDate(val) {
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
+    },
   },
   mounted() {
     this.auth = (this.initData && this.initData.authorities) || {};
@@ -459,6 +469,15 @@ export default {
         sortable: 'custom',
         field: 'type',
         show: true,
+      }, {
+        label: '创建人',
+        field: 'createUser',
+        show: true,
+      }, {
+        label: '创建时间',
+        field: 'createTime',
+        minWidth: '150px',
+        show: true
       }]
     },
     buildDefaultColumns(){

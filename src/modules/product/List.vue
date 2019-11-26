@@ -140,7 +140,12 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
-
+            <template v-else-if="column.field === 'createUser'">
+              {{ scope.row.createUser && scope.row.createUser.displayName }}
+            </template>
+            <template v-else-if="column.field === 'createTime'">
+              {{ scope.row.createTime | formatDate }}
+            </template>
             <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
             </div>
 
@@ -367,6 +372,18 @@ export default {
           isExport: false,
           isSystem: 0,
         },
+        {
+          displayName: '创建人',
+          fieldName: 'createUser',
+          isExport: true,
+          isSystem: 0
+        },
+        {
+          displayName: '创建时间',
+          fieldName: 'createTime',
+          isExport: true,
+          isSystem: 0
+        }
       ];
 
 
@@ -421,6 +438,16 @@ export default {
 
           if (f.fieldName === 'updateTime') {
             f.orderId = -2;
+          }
+
+          if (f.fieldName === 'createUser') {
+            f.orderId = -1;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'createTime') {
+            f.orderId = 0;
+            f.show = true;
           }
 
           return f;
@@ -832,7 +859,7 @@ export default {
             minWidth = 125;
           }
 
-          if (field.formType === 'datetime' || field.fieldName === 'updateTime') {
+          if (field.formType === 'datetime' || field.fieldName === 'updateTime' || field.fieldName === 'createTime') {
             minWidth = 150;
           }
 
