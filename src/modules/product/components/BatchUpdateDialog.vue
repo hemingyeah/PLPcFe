@@ -13,9 +13,17 @@
     </div>
     <div class="main-content">
       <p>
-        <strong v-html="tip" class="info-item"></strong>
-        <a href="javascript:;" @click="downloadData">下载</a>
+        <template v-if="hasSelectedData">
+          <strong v-html="tip" class="info-item"></strong>
+          <a href="javascript:;" @click="downloadData">下载</a>
+        </template>
+        <template v-else>
+          <strong class="info-item">您未选择数据,</strong>
+          <a href="javascript:;" @click="downloadData">下载</a>
+          <strong class="info-item">空白模板</strong>
+        </template>
       </p>
+      
       <p>2、上传修改后的文件批量更新</p>
 
       <div class="base-import-file">
@@ -88,8 +96,12 @@ export default {
       if (this.selectedIds.length) {
         return `1、您已经选择了<span>${this.selectedIds.length}</span>条数据`
       }
-      return `1、您已经选择视图全部数据<span>${this.totalItems}</span>条`
+      // return `1、您已经选择视图全部数据<span>${this.totalItems}</span>条`
+      return '您未选择数据,';
     },
+    hasSelectedData() {
+      return this.selectedIds.length > 0;
+    }
 
   },
   methods: {

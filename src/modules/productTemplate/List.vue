@@ -312,7 +312,7 @@ export default {
       loadingListData: false, // 加载列表数据
       multipleSelection: [], // 已选择列表
       searchCustomizeFields: [], // 搜索自定义字段
-      selectedLimit: 200, // 最大选择数量
+      selectedLimit: 500, // 最大选择数量
       page: new Page(), // page 对象
       panelTheMultipleSelectionShow: false, // 已选择列表 面板显示
       productTemplateConfig: {

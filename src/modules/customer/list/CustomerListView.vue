@@ -367,7 +367,7 @@ export default {
       // data from remote
       customers: [],
       columns: this.fixedColumns(),
-      selectedLimit: 200,
+      selectedLimit: 500,
       columnNum: 1,
       tableKey: Math.random() * 1000 >> 2,
     };
@@ -392,7 +392,15 @@ export default {
       return this.multipleSelection.map(c => c.id) || [];
     },
     exportColumns() {
-      return this.columns.map(c => {
+      const fixedFields = [
+        {
+          field: 'id',
+          export: true,
+          label: '客户系统编号'
+        }
+      ]
+
+      return this.columns.concat(fixedFields).map(c => {
         if (c.field !== 'customerAddress' && c.field !== 'remindCount' && c.field !== 'updateTime' && c.formType !== 'info') {
           c.export = true;
         }
@@ -808,9 +816,9 @@ export default {
         this.$refs.importLinkmanModal.open();
       }
       if (category === 'update') {
-        if (!this.multipleSelection || !this.multipleSelection.length) {
-          return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
-        }
+        // if (!this.multipleSelection || !this.multipleSelection.length) {
+        //   return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
+        // }
         this.$refs.batchUpdateCustomerDialog.openBatchUpdateCustomerDialog();
       }
     },

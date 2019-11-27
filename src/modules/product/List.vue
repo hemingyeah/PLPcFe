@@ -307,7 +307,7 @@ export default {
       multipleSelection: [],
       columnNum: 1,
       loading: false,
-      selectedLimit: 200,
+      selectedLimit: 500,
       searchIncludeMoreConditions: false,
       searchModel: {
         keyword: '',
@@ -651,9 +651,9 @@ export default {
       }
 
       if (action === 'update') {
-        if (!this.multipleSelection || !this.multipleSelection.length) {
-          return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
-        }
+        // if (!this.multipleSelection || !this.multipleSelection.length) {
+        //   return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
+        // }
         this.$refs.batchUpdateDialog.openBatchUpdateCustomerDialog();
       }
 
