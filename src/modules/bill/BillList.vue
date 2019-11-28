@@ -346,6 +346,13 @@ export default {
           isSystem: 1,
         },
         {
+          displayName: '卖家账号',
+          fieldName: 'sellerLogonId',
+          formType: 'text',
+          isExport: false,
+          isSystem: 1,
+        },
+        {
           displayName: '金额范围',
           fieldName: 'amountRange',
           formType: 'range',
@@ -662,6 +669,11 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === 'sellerLogonId') {
+          this.model.sellerLogonId = form[fn];
+          continue;
+        }
+
         if (tv.fieldName === 'amountRange') {
           this.model.receiptAmountMin = form[fn].amountStart;
           this.model.receiptAmountMax = form[fn].amountEnd;
@@ -810,6 +822,14 @@ export default {
           show: true,
           width: '150px',
           exportAlias: 'export_buyerLogonId',
+          tooltip: true,
+        },
+        {
+          label: '卖家账号',
+          field: 'sellerLogonId',
+          show: true,
+          width: '150px',
+          exportAlias: 'export_sellerLogonId',
           tooltip: true,
         },
         {
