@@ -6,7 +6,7 @@ const router = new KoaRouter();
 const modules = require('../../modules');
 
 router.get('/payment/paymentBillOnline', async ctx => {
-  let script = ['/bill.list.js'];
+  let script = ['/paymentBillOnline.list.js'];
   let modConfig = modules['paymentBillOnline.list'];
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request('/payment/paymentBillOnline', 'get', null, {headers: reqHeaders});
