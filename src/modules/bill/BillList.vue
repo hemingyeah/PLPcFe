@@ -38,7 +38,7 @@
     </div>
 
     <div style="background: #fff;padding: 0 10px">
-      <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection.list" @toggle-selection="clearSelection" @show-panel="() => multipleSelection.multipleSelectionPanelShow = true" />
+      <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection.list" @toggle-selection="toggleSelection" @show-panel="() => multipleSelection.multipleSelectionPanelShow = true" />
     </div>
 
     <div class="page-panel">
@@ -562,7 +562,7 @@ export default {
       let isNotOnCurrentPage = false;
       let row = undefined;
 
-      if (rows.length <= 0) this.$refs.table.clearSelection();
+      if (rows && rows.length <= 0) this.$refs.table.clearSelection();
 
       if (rows) {
         for(let i = 0; i < rows.length; i++) {
@@ -736,6 +736,7 @@ export default {
     fetchData(){
       // 获取支付列表
       return this.$http.post('/api/payment/outside/paymentBill/online/list', this.model)
+      // return this.$http.post('/outside/paymentBill/online/list', this.model)
     },
 
     buildParams(pageNum, pageSize){
