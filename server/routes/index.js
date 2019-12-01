@@ -106,7 +106,7 @@ router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   // host: '192.168.31.70',
   port: 10004,
   headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=2ed5e4ea-a0a8-4543-9d25-14abb67b5063`
+    'cookie': `VIPPUBLINKJSESSIONID=802755db-e26b-4d8a-96a8-17795613766e`
   },
   // headers: {
   //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`

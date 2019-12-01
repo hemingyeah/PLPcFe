@@ -339,14 +339,14 @@ export default {
           orderId: 99
         },
         {
-          displayName: '买家账号',
+          displayName: '付款账号',
           fieldName: 'buyerLogonId',
           formType: 'text',
           isExport: false,
           isSystem: 1,
         },
         {
-          displayName: '卖家账号',
+          displayName: '收款账号',
           fieldName: 'sellerLogonId',
           formType: 'text',
           isExport: false,
@@ -818,7 +818,7 @@ export default {
           tooltip: true,
         },
         {
-          label: '买家账号',
+          label: '付款账号',
           field: 'buyerLogonId',
           show: true,
           width: '150px',
@@ -826,7 +826,7 @@ export default {
           tooltip: true,
         },
         {
-          label: '卖家账号',
+          label: '收款账号',
           field: 'sellerLogonId',
           show: true,
           width: '150px',
