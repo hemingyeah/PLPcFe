@@ -832,7 +832,8 @@ export default {
         const result = await this.$platform.confirm('确定要删除选择的客户？');
         if (!result) return;
 
-        this.$http.get(`/customer/delete/${this.selectedIds.join(',')}`)
+        const params = { ids: this.selectedIds.join(',') }
+        this.$http.post('/customer/delete', params)
           .then(res => {
             this.multipleSelection = [];
             this.search();

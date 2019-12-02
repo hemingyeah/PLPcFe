@@ -567,7 +567,9 @@ export default {
     async deleteCustomer() {
       try {
         if (!await this.$platform.confirm('确定要删除该客户？')) return;
-        const result = await this.$http.get(`/customer/delete/${this.customer.id}`);
+
+        const params = { ids: this.customer.id };
+        const result = await this.$http.post('/customer/delete', params);
         if (!result.status) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);

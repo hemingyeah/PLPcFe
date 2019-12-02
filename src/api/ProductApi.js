@@ -34,7 +34,7 @@ function updateProduct(params) {
  * @returns {*}
  */
 function deleteProductByIds(ids) {
-  return http.get(`/customer/product/deleteBatch/${ids}`)
+  return http.post('/customer/product/deleteBatch', { ids})
 }
 
 /**
