@@ -18,8 +18,8 @@
           <a href="javascript:;" @click="downloadData">下载</a>
         </template>
         <template v-else>
-          <strong class="info-item">您未选择数据,</strong>
-          <a href="javascript:;" @click="downloadData">下载</a>
+          <strong class="info-item">1、您未选择数据,</strong>
+          <a href="javascript:;" @click="downloadBlank">下载</a>
           <strong class="info-item">空白模板</strong>
         </template>
       </p>
@@ -131,6 +131,9 @@ export default {
       }
 
       window.location.href = `/product/importCover/export?data=${encodeURI(JSON.stringify(params))}`;
+    },
+    downloadBlank() {
+      window.location.href = '/product/importBlankCoverExport/exportNew';
     },
     async upload(){
       try {
