@@ -41,12 +41,14 @@
       <button type="button" class="btn btn-text" @click="batchUpdateCustomerDialog = false">关闭</button>
       <el-button type="primary" :disabled="pending" @click="upload" :loading="pending">{{pending ? '正在导入' : '导入'}}</el-button>
     </div>
+    <div ref="bridge" style="display: none;"></div>
   </base-modal>
 </template>
 
 <script>
 import Uploader from '@src/util/uploader';
 import Platform from '@src/platform';
+import * as Lang from '@src/util/lang/index.js';
 
 export default {
   name: 'batch-update-dialog',
@@ -118,19 +120,39 @@ export default {
       this.batchUpdateCustomerDialog = true;
     },
     downloadData() {
-      let params = {
-        count: this.selectedCount,
-        exportType: this.exportType,
-        data: '',
-      };
+      // let params = {
+      //   count: this.selectedCount,
+      //   exportType: this.exportType,
+      //   data: '',
+      // };
 
-      if (this.exportType === 'exportSelect') {
-        params.data = this.selectedIds.join(',');
-      } else {
-        params.data = this.buildDownloadParams();
-      }
+      // if (this.exportType === 'exportSelect') {
+      //   params.data = this.selectedIds.join(',');
+      // } else {
+      //   params.data = this.buildDownloadParams();
+      // }
+      // window.location.href = `/product/importCover/export?data=${encodeURI(JSON.stringify(params))}`;
+      let params = this.selectedIds;
 
-      window.location.href = `/product/importCover/export?data=${encodeURI(JSON.stringify(params))}`;
+      let date = Lang.formatDate(new Date(), 'YYYY-MM-DD');
+      let fileName = `${date}批量更新产品数据.xlsx`;
+      let url = '/product/importCover/export';
+
+      this.$http.post(url, params, true, {responseType: 'blob'})
+        .then(blob => {
+          let link = document.createElement('a');
+          let url = URL.createObjectURL(blob);
+          link.download = fileName;
+          link.href = url;
+          this.$refs.bridge.appendChild(link);
+          link.click();
+
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+            this.$refs.bridge.removeChild(link);
+          }, 150);
+        })
+        .catch(err => console.error(err));
     },
     downloadBlank() {
       window.location.href = '/product/importBlankCoverExport/exportNew';
