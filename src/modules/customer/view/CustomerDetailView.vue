@@ -204,6 +204,11 @@ export default {
         fieldName: 'createTime',
         formType: 'text',
         isSystem: 1,
+      }, {
+        displayName: '系统编号',
+        fieldName: 'id',
+        formType: 'text',
+        isSystem: 1
       }];
     },
     eventTypes() {
