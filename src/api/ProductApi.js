@@ -222,7 +222,7 @@ function getProductTemplateList(params) {
  * @returns Promise<>
  */
 function productTemplateDelete(ids) {
-  return http.post(`/product/delete/${ids}`);
+  return http.post('/product/delete', [ids]);
 }
 
 /**
