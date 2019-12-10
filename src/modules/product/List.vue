@@ -669,8 +669,9 @@ export default {
         if (!await this.$platform.confirm('确定要删除选择的产品？')) return;
 
         const ids = this.multipleSelection.map(p => p.id).join(',');
-
+        this.loading = true;
         const res = await deleteProductByIds(ids);
+        this.loading = false;
 
         if (!res || res.status) return this.$platform.notification({
           title: '失败',
@@ -685,6 +686,7 @@ export default {
         this.search();
 
       } catch (e) {
+        this.loading = false;
         console.error('e', e);
       }
     },

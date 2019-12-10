@@ -829,18 +829,24 @@ export default {
         return this.$platform.alert('请选择需要删除的客户');
       }
       try {
+        // fuck 
         const result = await this.$platform.confirm('确定要删除选择的客户？');
         if (!result) return;
 
+        this.loadingListData = true;
         const params = { ids: this.selectedIds.join(',') }
         this.$http.post('/customer/delete', params)
           .then(res => {
             this.multipleSelection = [];
             this.search();
           })
-          .catch(err => console.error('deleteCustomer err', err));
+          .catch(err => console.error('deleteCustomer err', err))
+          .finally(() => {
+            this.loadingListData = false;
+          })
       } catch (e) {
         console.error('deleteCustomer catch error', e);
+        this.loadingListData = false;
       }
     },
     // columns
