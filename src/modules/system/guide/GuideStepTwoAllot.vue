@@ -26,7 +26,7 @@
         <!-- </span> -->
       </span>
       <base-button @event="next">
-        下一步
+        完成
       </base-button>
       <span @click="jump" class="guide-view-footer-right">
         {{ jumpBtnText }}
