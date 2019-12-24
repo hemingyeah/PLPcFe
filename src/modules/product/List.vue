@@ -479,10 +479,14 @@ export default {
       }, ...this.columns]
         .map(field => {
 
-          if (['customer', 'productTemplate', 'remindCount', 'qrcodeId'].some(key => key === field.fieldName) || field.formType === 'info') {
+          if (['customer', 'productTemplate', 'remindCount'].some(key => key === field.fieldName) || field.formType === 'info') {
             field.export = false;
           } else {
             field.export = true;
+          }
+          
+          if ('qrcodeId' == field.fieldName) {
+            field.export = Boolean(this.initData.productConfig.qrcodeEnabled);
           }
 
           return field

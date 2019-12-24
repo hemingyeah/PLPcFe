@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import { saveGuideSetting } from '@src/api/GuideApi.js';
 import RoleList from './component/RoleList.vue';
 
 export default {
@@ -105,10 +106,13 @@ export default {
       this.roleList.forEach(l => {
         l.users = [];
       });
-      this.emit(2, {
+
+      this.emit(3, {
         key: 'role',
         value: []
-      })
+      });
+
+      this.submit();
     },
     // 下一步
     next() {
@@ -159,7 +163,8 @@ export default {
         }
       })
 
-      this.emit(2, { key: 'role', value: roleList});
+      this.emit(1, { key: 'role', value: roleList});
+      this.submit();
     },
     // 上一步
     prev() {
@@ -167,6 +172,42 @@ export default {
         list.users = [];
       });
       this.emit(0, { key: 'role', value: []});
+    },
+    // 提交
+    submit() {
+      this.$emit('updateLoading', true);
+
+      let params = {
+        profession: this.data.profession || '',
+        role: this.data.role.filter(f => {
+          return Array.isArray(f.userId) && f.userId.length > 0;
+        }).map(r => {
+          return {
+            roleId: r.roleId,
+            userId: r.userId,
+          }
+        }),
+      }
+
+      saveGuideSetting(params).then(result => {
+        let isSucc = result.status == 0;
+
+        if(isSucc) {
+          this.emit(3, { key: 'qrcode', value: result.data || '' });
+        } else {
+          this.$platform.notification({
+            type: 'error',
+            title: isSucc ? '' : '失败',
+            message: isSucc ? '' : result.message
+          })
+        }
+        
+        this.$emit('updateLoading', false);
+
+      }).catch(err => {
+        this.$emit('updateLoading', false);
+        console.log(err)
+      })
     },
     updateRoleList(list) {
       this.roleList = list;

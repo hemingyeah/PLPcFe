@@ -73,9 +73,6 @@ export default {
         },
         {
           description: '分配试用资格'
-        },
-        {
-          description: '确认系统管理员'
         }
       ],
       stepsOptions: {
