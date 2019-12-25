@@ -490,6 +490,10 @@ export default {
             field.export = Boolean(this.initData.productConfig.qrcodeEnabled);
           }
 
+          if ('qrcodeId' == field.fieldName) {
+            field.export = Boolean(this.initData.productConfig.qrcodeEnabled);
+          }
+
           return field
         })
     },
