@@ -98,9 +98,25 @@ export default {
   .guide-qrcode-title {
     color: #333;
     font-size: 24px;
-    line-height: 33px;
 
-    padding: 35px 0;
+    padding: 35px 0 65px;
+  }
+
+
+  .guide-qrcode-content {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-flow: column;
+    
+    i {
+      color: rgb(80, 168, 151);
+      font-size: 90px;
+    }
+
+    span {
+      line-height: 33px;
+    }
+
   }
 
   img {

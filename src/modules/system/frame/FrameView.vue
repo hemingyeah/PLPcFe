@@ -494,7 +494,6 @@ export default {
   },
   mounted(){
     let userGuide = this?.initData?.userGuide === true || false;
-    // let userGuide = true;
 
     if(userGuide) {
       this.$refs.userGuideView.show();
