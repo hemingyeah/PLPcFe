@@ -3,14 +3,13 @@
     <div class="saleManager-mask" @click.self="close" v-if="show">
       <div class="saleManager transition__container">
         <div class="saleManager-header">
-          <h3>专属客服</h3>
+          <h3>售后宝服务群</h3>
           <button type="button" class="btn-text saleManager-close" @click="close">
             <i class="iconfont icon-fe-close"></i>
           </button>
         </div>
         <div class="saleManager-qrcode">
-          <img :src="saleManagerQRCode" alt="专属客服"/>
-          <p>钉钉扫码联系专属客服</p>
+          <div class="saleManager-qrcode-block" ref="qrcode"></div>
         </div>
         <div class="saleManager-line"></div>
         <div class="saleManager-contact">
@@ -23,27 +22,56 @@
 </template>
 
 <script>
+import QRCode from 'qrcodejs2';
+
 export default {
   name: 'sale-manager',
   props: {
-    show: { //是否显示组件
+    show: { // 是否显示组件
       type: Boolean,
       default: false
     },
     qrcode: {
       type: String,
       default: ''
+    },
+    serviceGroupUrl: {
+      type: String,
+      default: ''
     }
   },
   computed: {
     saleManagerQRCode(){
-      //return "https://help.shb.ltd/feedback/about_files/basic-q_cop.jpg"
       return `/files/getQrcode?fileName=${this.qrcode}`;
+    }
+  },
+  watch: {
+    show(newValue) {
+      if(newValue) {
+        this.createCode();
+      }
     }
   },
   methods: {
     close(){
       this.$emit('update:show', false)
+    },
+    createCode() {
+      let url = this.serviceGroupUrl || '';
+
+      if(!url) return;
+
+      this.$nextTick(() => {
+        this.$refs.qrcode.innerHTML = '';
+        new QRCode(this.$refs.qrcode, {
+          text: url,
+          width: 268,
+          height: 268,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      })
     }
   }
 }
@@ -94,7 +122,7 @@ export default {
 }
 
 .saleManager-qrcode{
-  padding: 0 0 8px 0;
+  padding: 8px 0 28px 0;
   img{
     display: block;
     margin: 0 auto;

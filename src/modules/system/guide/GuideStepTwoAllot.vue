@@ -107,7 +107,7 @@ export default {
         l.users = [];
       });
 
-      this.emit(3, {
+      this.emit(1, {
         key: 'role',
         value: []
       });
