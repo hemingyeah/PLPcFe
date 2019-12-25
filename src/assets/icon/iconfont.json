@@ -1138,6 +1138,20 @@
       "font_class": "qingkongshanchu-copy",
       "unicode": "ec40",
       "unicode_decimal": 60480
+    },
+    {
+      "icon_id": "12007107",
+      "name": "默认已选",
+      "font_class": "morenyixuan",
+      "unicode": "e691",
+      "unicode_decimal": 59025
+    },
+    {
+      "icon_id": "12494988",
+      "name": "日历",
+      "font_class": "rili1",
+      "unicode": "e6de",
+      "unicode_decimal": 59102
     }
   ]
 }

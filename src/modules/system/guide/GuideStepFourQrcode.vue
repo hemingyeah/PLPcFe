@@ -3,17 +3,14 @@
 
     <!-- start 标题 -->
     <div class="guide-qrcode-title">
-      系统设置已完成
+
+      <div class="guide-qrcode-content">
+        <i class="iconfont icon-morenyixuan"></i>
+        <span>系统配置完成</span>
+      </div>
+
     </div>
     <!-- end 标题 -->
-
-    <!-- start 客服图片 -->
-    <img :src="qrCode" alt="专属客服" />
-    <!-- end 客服图片 -->
-
-    <div class="guide-qrcode-tip">
-      扫码添加专属客服
-    </div>
 
     <div class="guide-qrcode-subtitle">
       我们为您提供以下服务
