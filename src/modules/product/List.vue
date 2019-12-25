@@ -257,6 +257,7 @@
     <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/>
 
     <search-panel
+      :init-data="initData"
       :config="{
         fields: this.productFields,
       }"

@@ -12,7 +12,7 @@
       </el-dropdown>
     </h3>
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :columnNum="columnNum"></search-form>
+      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :column-num="columnNum"></search-form>
       <slot name="footer"></slot>
     </el-form>
 </base-panel></template>
@@ -28,6 +28,10 @@ export default {
   name: 'search-panel',
   props: {
     config: {
+      type: Object,
+      default: () => ({})
+    },
+    initData: {
       type: Object,
       default: () => ({})
     }
@@ -119,9 +123,38 @@ export default {
   },
   mounted() {
     const {column_number} = this.getLocalStorageData();
-    if(column_number) this.columnNum = Number(column_number)
+    if(column_number) this.columnNum = Number(column_number);
+
+    this.computedWhetherAddQrcodeField();
   },
   methods: {
+    computedWhetherAddQrcodeField() {
+      if (this.initData?.productConfig?.qrcodeEnabled) {
+        this.selfFields.push({
+          displayName: '是否绑定二维码',
+          fieldName: 'qrcodeState',
+          formType: 'select',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          operator: 'between',
+          orderId: 1000,
+          setting: {
+            isMulti: false,
+            dataSource: [{
+              text: '全部',
+              value: ''
+            }, {
+              text: '是',
+              value: 1
+            }, {
+              text: '否',
+              value: 0
+            }]
+          }
+        })
+      }
+    },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
@@ -196,6 +229,11 @@ export default {
         // hasRemind
         if (fn === 'hasRemind' && form[fn] !== '') {
           params.hasRemind = form[fn];
+          continue;
+        }
+
+        if (fn === 'qrcodeState' && form[fn] !== '') {
+          params.qrcodeState = form[fn];
           continue;
         }
 
