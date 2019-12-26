@@ -78,7 +78,7 @@ export default {
             value: 1
           }, {
             text: '无',
-            value: 0
+            value: 2
           }]
         }
       }]
@@ -149,7 +149,7 @@ export default {
               value: 1
             }, {
               text: '否',
-              value: 0
+              value: 2
             }]
           }
         })
@@ -228,12 +228,12 @@ export default {
 
         // hasRemind
         if (fn === 'hasRemind' && form[fn] !== '') {
-          params.hasRemind = form[fn];
+          params.hasRemind = form[fn] == 2 ? 0 : form[fn];
           continue;
         }
 
         if (fn === 'qrcodeState' && form[fn] !== '') {
-          params.qrcodeState = form[fn];
+          params.qrcodeState = form[fn] == 2 ? 0 : form[fn];
           continue;
         }
 
