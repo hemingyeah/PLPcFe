@@ -55,7 +55,8 @@ export default {
       this.loading = true;
       this.$http.get('/outside/es/linkman/list', {keyword, pageNum: 1, })
         .then(res => {
-          this.options = res.result.list || [];
+          let result = res.result || {};
+          this.options = result.list || [];
           this.loading = false;
           sessionStorage.setItem(`${this.field.fieldName}_options`, JSON.stringify(this.options));
         })
