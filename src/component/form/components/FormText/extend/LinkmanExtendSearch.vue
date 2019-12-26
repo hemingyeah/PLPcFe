@@ -53,9 +53,9 @@ export default {
     },
     searchLinkman: _.debounce(function (keyword) {
       this.loading = true;
-      this.$http.get('/linkman/getListAsyn', {keyword, pageNum: 1, })
+      this.$http.get('/outside/es/linkman/list', {keyword, pageNum: 1, })
         .then(res => {
-          this.options = res.list;
+          this.options = res.result.list || [];
           this.loading = false;
           sessionStorage.setItem(`${this.field.fieldName}_options`, JSON.stringify(this.options));
         })
