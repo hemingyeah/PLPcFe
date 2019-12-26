@@ -53,7 +53,7 @@ export default {
     },
     searchLinkman: _.debounce(function (keyword) {
       this.loading = true;
-      this.$http.get('/outside/es/linkman/list', {keyword, pageNum: 1, })
+      this.$http.get('/api/elasticsearch/outside/es/linkman/list', {keyword, pageNum: 1, })
         .then(res => {
           let result = res.result || {};
           this.options = result.list || [];
