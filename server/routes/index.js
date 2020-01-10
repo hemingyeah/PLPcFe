@@ -27,6 +27,7 @@ const BillRouter = require('./bill')
 const jobtransferRouter = require('./jobtransfer')
 const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact')
+const departmentRouter = require('./department')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -159,6 +160,7 @@ router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 
+router.use('', departmentRouter.routes(), departmentRouter.allowedMethods());
 router.all('/api/*', async ctx => {
 
   let option = {

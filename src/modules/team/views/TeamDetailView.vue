@@ -6,13 +6,11 @@
       <div class="team-tool-bar">
         <div class="func-btn">
           <base-button type="only-text" icon="icon-arrow-left" @event="goBack" v-if="displayGoBackBtn">返回</base-button>
-          <!-- TODO: 编辑 需要权限 控制 -->
           <base-button type="only-text" icon="icon-edit" @event="teamEdit" v-if="allowEditTeam">编辑</base-button>
           <base-button type="only-text" icon="icon-fe-close" @event="teamDelete" v-if="allowEditTeam">删除</base-button>
         </div>
 
         <div class="action-btns">
-          <!-- TODO: 新建子团队 需要权限控制 -->
           <div class="action-btn-view" v-if="!teamData.parent && showNewTeam" @click="teamChildCreate">
             <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子团队</span>
           </div>

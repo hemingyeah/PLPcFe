@@ -51,6 +51,7 @@
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
+                  <a href="javascript:;" @click="goDepartment">组织架构管理</a>
                 </div>
               </el-popover>
 
@@ -560,28 +561,12 @@ export default {
     getNum() {
       this.getSystemMsg();
     },
-    goProductTemplate() {
+    goDepartment() {
       platform.openTab({
-        id: "product_template",
-        title: "产品模板列表",
-        url: "/product/old",
-        reload: true
-      });
-    },
-    goProductOld() {
-      platform.openTab({
-        id: "product",
-        title: "产品管理",
-        url: "/customer/product/old",
-        reload: true
-      });
-    },
-    goProductSetting() {
-      platform.openTab({
-        id: "product_setting",
-        title: "产品设置",
-        url: "/setting/product/fields",
-        reload: true
+        id: 'department_view',
+        title: '组织架构管理',
+        url: '/department/view',
+        reload: true,
       });
     },
     goCustomerContact() {

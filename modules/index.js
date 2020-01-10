@@ -11,6 +11,7 @@ const jobtransfer = require('./jobtransfer')
 
 const doMyself = require('./doMyself')
 const customerContact = require('./customerContact')
+const department = require('./department')
 
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
@@ -48,5 +49,6 @@ module.exports = {
   ...bill,
   ...jobtransfer,
   ...doMyself,
-  ...customerContact
+  ...customerContact,
+  ...department,
 }
