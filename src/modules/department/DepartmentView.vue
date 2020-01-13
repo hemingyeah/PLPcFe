@@ -32,7 +32,7 @@
 
           <div class="department-detail-header-title" v-if="Object.keys(selectedDept).length > 0">
             <span> {{ selectedDept.name }} </span>
-            <base-button type="ghost"> 编辑 </base-button>
+            <base-button type="ghost" @event="openDepartmentEditPanel"> 编辑 </base-button>
           </div>
 
           <!-- TODO: 面包屑列表 -->
@@ -51,13 +51,13 @@
             </div>
 
             <div class="department-child-block-header-btn">
-              <base-button type="ghost"> 添加子部门 </base-button>
+              <base-button type="ghost" @event="addDepartment"> 添加子部门 </base-button>
             </div>
 
           </div>
 
           <div class="no-data-block">
-            当前部门不包含下级部门 <span class="active-btn">添加子部门</span>
+            当前部门不包含下级部门 <span class="active-btn" @click="addDepartment">添加子部门</span>
           </div>
 
         </div>
@@ -143,6 +143,16 @@
     </div>
     <!-- end 主要内容 -->
 
+    <!-- start 新建/编辑 部门 面板 -->
+    <department-edit-panel 
+      ref="departmentEditPanel"
+      @create="departmentCreate"
+      @edit="departmentEdit"
+      @delete="departmentDelete"
+    >
+    </department-edit-panel>
+    <!-- end 新建/编辑 部门 面板 -->
+
   </div>
   <!-- end 选择组织架构页面 -->
 </template>
@@ -155,7 +165,12 @@ import {
   getDepartmentUser, 
   deleteDepartmentUser,
   addDepartmentUser,
+  addDepartment,
+  updateDepartment,
+  deleteDepartment
 } from '@src/api/DepartmentApi';
+/* components */
+import DepartmentEditPanel from './component/DepartmentEditPanel.vue';
 /* utils */
 import http from '@src/util/http';
 import Page from '@model/Page';
@@ -181,6 +196,9 @@ export default {
     this.initialize();
   },
   methods: {
+    addDepartment() {
+      this.$refs.departmentEditPanel.open('create', {});
+    },
     /** 选择部门 */
     chooseDept(event){
       let {node, value} = event;
@@ -201,6 +219,77 @@ export default {
         }
       })
         .catch(err => console.error(err))
+    },
+    /* 新建部门 */
+    departmentCreate(params) {
+      this.pending = true;
+      
+      addDepartment(params).then(result => {
+        let isSucc = result.status == 0;
+
+        if(isSucc) {
+          this.initialize();
+        }
+
+        this.$platform.notification({
+          title: isSucc ? '' : '失败',
+          message: isSucc ? '创建成功' : result.message,
+          type: isSucc ? 'success' : 'error',
+        });
+
+      })
+        .catch(err => console.error(err))
+        .finally(() => this.pending = false)
+    },
+    /* 编辑部门 */
+    departmentEdit(params) {
+      this.pending = true;
+
+      updateDepartment(params).then(result => {
+        let isSucc = result.status == 0;
+
+        if(isSucc) {
+          this.initialize();
+        }
+
+        this.$platform.notification({
+          title: isSucc ? '' : '失败',
+          message: isSucc ? '更新成功' : result.message,
+          type: isSucc ? 'success' : 'error',
+        });
+
+      })
+        .catch(err => console.error(err))
+        .finally(() => this.pending = false)
+
+    },
+    /* 删除部门 */
+    async departmentDelete() {
+      if (!await this.$platform.confirm('您确定要删除该部门吗？')) return;
+
+      let params = {
+        departmentId: this.selectedDept.id
+      }
+
+      this.pending = true;
+
+      deleteDepartment(params).then(result => {
+        let isSucc = result.status == 0;
+
+        if(isSucc) {
+          this.initialize();
+        }
+
+        this.$platform.notification({
+          title: isSucc ? '' : '失败',
+          message: isSucc ? '删除成功' : result.message,
+          type: isSucc ? 'success' : 'error',
+        });
+
+      })
+        .catch(err => console.log(err))
+        .finally(() => this.pending = false)
+
     },
     /** 抓取部门数据 */
     fetchDept(){
@@ -231,6 +320,7 @@ export default {
       })
         .catch(err => console.error('err', err));
     },
+    /* 抓取部门 人员数量 */
     fetchDeptCount(){
       return getDepartmentUserCount();
     },
@@ -349,6 +439,10 @@ export default {
         </div>
       )
     },
+    openDepartmentEditPanel() {
+      let data = this.selectedDept;
+      this.$refs.departmentEditPanel.open('edit', data);
+    },
     /** select person */ 
     selectionHandle(selection) {
       this.multipleSelection = selection.slice();
@@ -423,6 +517,9 @@ export default {
         .finally(() => this.pending = false)
     }
   },
+  components: {
+    [DepartmentEditPanel.name]: DepartmentEditPanel,
+  }
 }
 </script>
 

@@ -44,3 +44,32 @@ export function deleteDepartmentUser (params) {
 export function addDepartmentUser (params) {
   return http.post('/security/department/user', params)
 }
+
+/**
+ * @description 添加部门
+ * @param {String} name 部门名称
+ * @param {String} higherDepartmentId 上级部门id
+ * @returns {*}
+ */
+export function addDepartment (params) {
+  return http.post('/security/department/user', params)
+}
+
+/**
+ * @description 编辑部门
+ * @param {String} name 部门名称
+ * @param {String} higherDepartmentId 上级部门id
+ * @returns {*}
+ */
+export function updateDepartment (params) {
+  return http.post('/security/department/user', params)
+}
+
+/**
+ * @description 删除部门
+ * @param {String} departmentId 部门id
+ * @returns {*}
+ */
+export function deleteDepartment (params) {
+  return http.post('/security/department/user', params)
+}
