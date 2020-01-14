@@ -32,7 +32,7 @@
 
           <div class="department-detail-header-title" v-if="Object.keys(selectedDept).length > 0">
             <span> {{ selectedDept.name }} </span>
-            <base-button type="ghost" @event="openDepartmentEditPanel"> 编辑 </base-button>
+            <base-button type="ghost" @event="openDepartmentEditPanel" v-if="!isRootDepartment(selectedDept)"> 编辑 </base-button>
           </div>
 
           <!-- TODO: 面包屑列表 -->
@@ -56,7 +56,19 @@
 
           </div>
 
-          <div class="no-data-block">
+          <!-- start 下级部门列表 -->
+          <div v-if="subDepartments.length > 0" class="department-child-list">
+            <div class="department-child-item" v-for="department in subDepartments" :key="department.id" @click="chooseChildDepartment(department)">
+              <span>
+                {{ department.name }} &nbsp;&nbsp;
+                ({{ deptUserCount[department.id] || 0 }}人)
+              </span>
+              <i class="iconfont icon-arrowright"></i>
+            </div>
+          </div>
+          <!-- end 下级部门列表 -->
+
+          <div class="no-data-block" v-else>
             当前部门不包含下级部门 <span class="active-btn" @click="addDepartment">添加子部门</span>
           </div>
 
@@ -75,7 +87,7 @@
             
             <div class="department-user-block-header-btn">
               <base-button type="primary" @event="chooseUser"> 添加成员 </base-button>
-              <base-button type="primary"> 调整部门 </base-button>
+              <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
               <base-button type="danger" @event="userDeleteConfirm"> 批量删除 </base-button>
             </div>
           </div>
@@ -191,13 +203,23 @@ export default {
     }
   },
   computed: {
+    /* 子部门 */
+    subDepartments() {      
+      return this.selectedDept.subDepartments || [];
+    }
   },
   mounted() {
     this.initialize();
   },
   methods: {
     addDepartment() {
-      this.$refs.departmentEditPanel.open('create', {});
+      this.$refs.departmentEditPanel.open('create', {
+        higherDepartment: this.selectedDept
+      });
+    },
+    chooseChildDepartment(childDept) {
+      this.selectedDept = childDept;
+      this.initDeptUser(this.selectedDept);
     },
     /** 选择部门 */
     chooseDept(event){
@@ -208,6 +230,7 @@ export default {
         title: '请选择成员',
         seeAllOrg: true,
         max: -1,
+        selectedUser: this.userPage.list
       };
 
       this.$fast.contact.choose('dept', options).then(result => {
@@ -220,8 +243,36 @@ export default {
       })
         .catch(err => console.error(err))
     },
+    /* 选择多个部门 */
+    chooseDepartmentMulti() {      
+      if(this.multipleSelection.length <= 0) {
+        return this.$platform.alert('请先选择需要调整的成员');
+      }
+
+      let options = {
+        title: '请选择部门',
+        seeAllOrg: true,
+        max: -1,
+      };
+
+      this.$fast.contact.choose('dept_only', options).then(result => {
+        let data = result.data || {};
+        console.log('hbc: chooseDepartmentMulti -> data', data)
+        if(result.status == 0){
+          // 
+        }
+      })
+        .catch(err => console.error(err))
+    },
     /* 新建部门 */
-    departmentCreate(params) {
+    departmentCreate(form) {
+      let params = {
+        name: form.name,
+        description: '自主新建',
+        type: 'self',
+        parentId: form.department.id
+      }
+      
       this.pending = true;
       
       addDepartment(params).then(result => {
@@ -229,10 +280,11 @@ export default {
 
         if(isSucc) {
           this.initialize();
+          this.$refs.departmentEditPanel.close();
         }
 
         this.$platform.notification({
-          title: isSucc ? '' : '失败',
+          title: isSucc ? '成功' : '失败',
           message: isSucc ? '创建成功' : result.message,
           type: isSucc ? 'success' : 'error',
         });
@@ -242,18 +294,26 @@ export default {
         .finally(() => this.pending = false)
     },
     /* 编辑部门 */
-    departmentEdit(params) {
+    departmentEdit(form) {
+      let params = {
+        id: this.selectedDept.id,
+        name: form.name,
+        // description: '自主新建',
+        // type: 'self',
+        parentId: form.department.id
+      }
       this.pending = true;
 
       updateDepartment(params).then(result => {
         let isSucc = result.status == 0;
 
         if(isSucc) {
+          this.$refs.departmentEditPanel.close();
           this.initialize();
         }
 
         this.$platform.notification({
-          title: isSucc ? '' : '失败',
+          title: isSucc ? '成功' : '失败',
           message: isSucc ? '更新成功' : result.message,
           type: isSucc ? 'success' : 'error',
         });
@@ -281,7 +341,7 @@ export default {
         }
 
         this.$platform.notification({
-          title: isSucc ? '' : '失败',
+          title: isSucc ? '成功' : '失败',
           message: isSucc ? '删除成功' : result.message,
           type: isSucc ? 'success' : 'error',
         });
@@ -355,6 +415,31 @@ export default {
         url: `/security/user/view/${el.dataset.id}`,
       });
     },
+    getHigherDepartment(data, department) {
+      let depts = data.depts;
+
+      if(!Array.isArray(depts)) return {};
+
+      let higherDepartment = depts.filter(dept => dept.id == department.id);
+
+      if(higherDepartment.length > 0) return data;
+      
+      for(let i = 0; i < depts.length; i++) {
+        let dept = depts[i];
+        let subDepartments = dept.subDepartments || [];
+        dept.depts = subDepartments;
+
+        let higherDepartment = this.getHigherDepartment(dept, department);
+
+        if(Object.keys(higherDepartment).length > 0) {
+          return higherDepartment;
+        }
+
+      }
+
+      return {};
+
+    },
     handleSizeChange(pageSize) {
       this.params.pageSize = pageSize;
       this.params.pageNum = 1;
@@ -369,6 +454,7 @@ export default {
     },
     /** 初始化部门数据 */
     async initializeDept(){
+      this.pending = true;
       this.isSeeAllOrg = false;
 
       try {
@@ -396,6 +482,7 @@ export default {
           this.initDeptUser(this.depts[0]); // 默认选中第一个
         })
         .catch(err => console.error(err))
+        .finally(() => this.pending = false)
     },
     /** 选中一个部门 */
     async initDeptUser(dept){
@@ -419,6 +506,9 @@ export default {
 
       this.loading = false;
     },
+    isRootDepartment(department = {}) {
+      return this.depts.some(dept => dept.id == department.id);
+    },
     jump(pageNum) {
       this.params.pageNum = pageNum;
 
@@ -440,7 +530,10 @@ export default {
       )
     },
     openDepartmentEditPanel() {
-      let data = this.selectedDept;
+      let data = {
+        name: this.selectedDept.name,
+        higherDepartment: this.getHigherDepartment(this, this.selectedDept)
+      }
       this.$refs.departmentEditPanel.open('edit', data);
     },
     /** select person */ 
@@ -482,7 +575,7 @@ export default {
         }
 
         this.$platform.notification({
-          title: isSucc ? '' : '失败',
+          title: isSucc ? '成功' : '失败',
           message: isSucc ? '删除成功' : result.message,
           type: isSucc ? 'success' : 'error',
         });
@@ -507,7 +600,7 @@ export default {
         }
 
         this.$platform.notification({
-          title: isSucc ? '' : '失败',
+          title: isSucc ? '成功' : '失败',
           message: isSucc ? '添加成功' : result.message,
           type: isSucc ? 'success' : 'error',
         });
@@ -614,6 +707,11 @@ export default {
   .department-child-block {
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
+
+    &-header {
+      margin-bottom: 10px;
+    }
+
   }
 
   .department-child-block,
@@ -695,5 +793,20 @@ export default {
     line-height: 30px;
     margin-top: 10px;
     text-align: center;
+  }
+
+  .department-child-item {
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+
+    display: flex;
+    justify-content: space-between;
+
+    line-height: 44px;
+    padding: 0 20px;
+
+    &:hover {
+      background-color: #fafafa;
+    }
   }
 </style>

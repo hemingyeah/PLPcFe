@@ -48,21 +48,26 @@ export function addDepartmentUser (params) {
 /**
  * @description 添加部门
  * @param {String} name 部门名称
- * @param {String} higherDepartmentId 上级部门id
+ * @param {String} parentId 上级部门id
+ * @param {String} description 介绍
+ * @param {String} type 类型
  * @returns {*}
  */
 export function addDepartment (params) {
-  return http.post('/security/department/user', params)
+  return http.post('/security/department/update', params, false)
 }
 
 /**
- * @description 编辑部门
+ * @description 添加部门
+ * @param {String} id 部门id
  * @param {String} name 部门名称
- * @param {String} higherDepartmentId 上级部门id
+ * @param {String} parentId 上级部门id
+ * @param {String} description 介绍
+ * @param {String} type 类型
  * @returns {*}
  */
 export function updateDepartment (params) {
-  return http.post('/security/department/user', params)
+  return http.post('/security/department/update', params, false)
 }
 
 /**

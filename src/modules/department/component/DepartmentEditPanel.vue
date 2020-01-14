@@ -15,8 +15,8 @@
             <el-input v-model="form.name" autocomplete="off" :maxlength="10"></el-input>
           </el-form-item>
 
-          <el-form-item label="上级部门" prop="higherDepartmentId">
-            <el-input v-model="form.higherDepartmentId" autocomplete="off"></el-input>
+          <el-form-item label="上级部门" prop="departmentName">
+            <div @click="chooseDepartment" class="department-higher-name">{{ form.departmentName }}</div>
           </el-form-item>
 
         </el-form>
@@ -42,15 +42,17 @@ export default {
   data(){
     return {
       action: 'create',
+      higherDepartment: {},
       form: {
         name: '',
-        higherDepartmentId: ''
+        department: {},
+        departmentName: ''
       },
       rules: {
         name: [
           { required: true, message: '请填写部门名称', trigger: 'change' }
         ],
-        higherDepartmentId: [
+        departmentName: [
           { required: true, message: '请选择上级部门', trigger: 'change' }
         ],
       },
@@ -66,6 +68,25 @@ export default {
     }
   },
   methods: {
+    /* 选择单个部门 */
+    chooseDepartment() {      
+      let options = {
+        title: '请选择部门',
+        seeAllOrg: true,
+        max: 1,
+      };
+
+      this.$fast.contact.choose('dept_only', options).then(result => {
+        let data = result.data || {};
+
+        if(result.status == 0){
+          this.form.department = data.depts[0] || {};
+          this.form.departmentName = this.form.department.name || '';
+        }
+
+      })
+        .catch(err => console.error(err))
+    },
     close() {
       this.visible = false;
     },
@@ -86,6 +107,8 @@ export default {
     },
     packData(data) {
       this.form.name = data.name || '';
+      this.form.department = data.higherDepartment || {};
+      this.form.departmentName = this.form.department.name || '';
     },
     submit() {
       this.isEdit ? this.departmentEdit() : this.departmentCreate();
@@ -123,5 +146,17 @@ export default {
     }
 
   }
+}
+
+.department-higher-name {
+  border: 1px solid #e0e1e2;
+  border-radius: 2px;
+
+  height: 32px;
+  width: 100%;
+
+  padding: 0 10px;
+
+  line-height: 32px;
 }
 </style>
