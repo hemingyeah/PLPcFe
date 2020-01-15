@@ -86,7 +86,7 @@
             </div>
             
             <div class="department-user-block-header-btn">
-              <base-button type="primary" @event="chooseUser"> 添加成员 </base-button>
+              <base-button type="primary" @event="openCreateUserPanel"> 添加成员 </base-button>
               <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
               <base-button type="danger" @event="userDeleteConfirm"> 批量删除 </base-button>
             </div>
@@ -165,6 +165,13 @@
     </department-edit-panel>
     <!-- end 新建/编辑 部门 面板 -->
 
+    <!-- start 新建人员 -->
+    <create-user-panel
+      ref="createUserPanel"
+    >
+    </create-user-panel>
+    <!-- end 新建人员 -->
+
   </div>
   <!-- end 选择组织架构页面 -->
 </template>
@@ -182,6 +189,7 @@ import {
   deleteDepartment
 } from '@src/api/DepartmentApi';
 /* components */
+import CreateUserPanel from './component/CreateUserPanel.vue';
 import DepartmentEditPanel from './component/DepartmentEditPanel.vue';
 /* utils */
 import http from '@src/util/http';
@@ -273,7 +281,7 @@ export default {
         parentId: form.department.id
       }
       
-      this.pending = true;
+      this.loading = true;
       
       addDepartment(params).then(result => {
         let isSucc = result.status == 0;
@@ -291,7 +299,7 @@ export default {
 
       })
         .catch(err => console.error(err))
-        .finally(() => this.pending = false)
+        .finally(() => this.loading = false)
     },
     /* 编辑部门 */
     departmentEdit(form) {
@@ -302,7 +310,7 @@ export default {
         // type: 'self',
         parentId: form.department.id
       }
-      this.pending = true;
+      this.loading = true;
 
       updateDepartment(params).then(result => {
         let isSucc = result.status == 0;
@@ -320,7 +328,7 @@ export default {
 
       })
         .catch(err => console.error(err))
-        .finally(() => this.pending = false)
+        .finally(() => this.loading = false)
 
     },
     /* 删除部门 */
@@ -331,13 +339,13 @@ export default {
         departmentId: this.selectedDept.id
       }
 
-      this.pending = true;
+      this.loading = true;
 
       deleteDepartment(params).then(result => {
         let isSucc = result.status == 0;
 
         if(isSucc) {
-          this.initialize();
+          this.initialize(false);
         }
 
         this.$platform.notification({
@@ -348,7 +356,7 @@ export default {
 
       })
         .catch(err => console.log(err))
-        .finally(() => this.pending = false)
+        .finally(() => this.loading = false)
 
     },
     /** 抓取部门数据 */
@@ -388,10 +396,10 @@ export default {
     fetchUser(){      
       let params = this.params;
 
-      getDepartmentUser(params).then(userPage => {
+      return getDepartmentUser(params).then(userPage => {
         this.userPage.merge(Page.as(userPage));
       })
-        .catch(err => console.error('err', err));
+        .catch(err => console.error('err', err))
 
     },
     /* 查询是否开启 降低组织架构的开关 */
@@ -449,12 +457,12 @@ export default {
       this.fetchUser();
     },
     /** 初始化 */
-    initialize(){
-      this.initializeDept();
+    initialize(isInit = true){
+      this.initializeDept(isInit);
     },
     /** 初始化部门数据 */
-    async initializeDept(){
-      this.pending = true;
+    async initializeDept(isInit = true){
+      this.loading = true;
       this.isSeeAllOrg = false;
 
       try {
@@ -478,11 +486,11 @@ export default {
 
           this.deptUserCount = deptUserCount.data || {};
           this.depts = depts;
-
-          this.initDeptUser(this.depts[0]); // 默认选中第一个
+          
+          this.initDeptUser(isInit ? this.depts[0] : this.selectedDept)
         })
         .catch(err => console.error(err))
-        .finally(() => this.pending = false)
+        .finally(() => this.loading = false)
     },
     /** 选中一个部门 */
     async initDeptUser(dept){
@@ -498,7 +506,7 @@ export default {
         this.params.pageNum = 1;
         this.params.seeAllOrg = this.isSeeAllOrg;
 
-        this.fetchUser();
+        await this.fetchUser();
 
       } catch (error) {
         console.error(error)
@@ -528,6 +536,9 @@ export default {
           <span class="dept-node-count">&nbsp;({count})人</span>
         </div>
       )
+    },
+    openCreateUserPanel() {
+      this.$refs.createUserPanel.open({});
     },
     openDepartmentEditPanel() {
       let data = {
@@ -561,17 +572,17 @@ export default {
     },
     userDelete() {
       let params = {
-        userIdList: this.multipleSelection.map(item => item.userId),
+        userIdList: this.multipleSelection.map(item => item.userId).join(','),
         departmentId: this.selectedDept.id
       }
 
-      this.pending = true;
+      this.loading = true;
 
       deleteDepartmentUser(params).then(result => {
         let isSucc = result.status == 0;
 
         if(isSucc) {
-          this.fetchUser();
+          this.initialize(false);
         }
 
         this.$platform.notification({
@@ -582,7 +593,7 @@ export default {
 
       })
         .catch(err => console.log(err))
-        .finally(() => this.pending = false)
+        .finally(() => this.loading = false)
     },
     userAdd(users) {
       let params = {
@@ -590,13 +601,13 @@ export default {
         userIdList: users.map(user => user.userId)
       }
 
-      this.pending = true;
+      this.loading = true;
 
       addDepartmentUser(params).then(result => {
         let isSucc = result.status == 0;
 
         if(isSucc) {
-          this.fetchUser();
+          this.initialize(false);
         }
 
         this.$platform.notification({
@@ -607,10 +618,11 @@ export default {
 
       })
         .catch(err => console.log(err))
-        .finally(() => this.pending = false)
+        .finally(() => this.loading = false)
     }
   },
   components: {
+    [CreateUserPanel.name]: CreateUserPanel,
     [DepartmentEditPanel.name]: DepartmentEditPanel,
   }
 }

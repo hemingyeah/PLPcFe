@@ -32,7 +32,7 @@ export function getDepartmentUser (params) {
  * @returns {*}
  */
 export function deleteDepartmentUser (params) {
-  return http.post('/security/department/user', params)
+  return http.post('/security/department/deleteDepartmentUser', params, false)
 }
 
 /**

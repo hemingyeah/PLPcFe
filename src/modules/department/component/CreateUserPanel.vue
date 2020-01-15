@@ -1,22 +1,30 @@
 <template>
-  <div class="department-edit-panel">
+  <div class="create-user-panel">
     <!-- 新建编辑部门 -->
     <base-panel :show.sync="visible" :width="panelWidth">
       <h3 slot="title">
-        <span>{{ isEdit ? '编辑部门' : '新建部门' }}</span>
+        <span>{{ '添加成员' }}</span>
       </h3>
 
-      <!-- start 编辑表单 -->
-      <div class="department-edit-form">
+      <!-- start 添加成员 -->
+      <div class="create-user-form">
 
         <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-ruleForm">
 
-          <el-form-item label="部门名称" prop="name">
+          <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name" autocomplete="off" :maxlength="10"></el-input>
           </el-form-item>
 
-          <el-form-item label="上级部门" prop="departmentName">
-            <div @click="chooseDepartment" class="department-higher-name">{{ form.departmentName }}</div>
+          <el-form-item label="手机" prop="phone">
+            <el-input v-model="form.name" autocomplete="off" :maxlength="11"></el-input>
+          </el-form-item>
+
+          <el-form-item label="部门" prop="department">
+            <div @click="chooseDepartment" class="department-higher-name">{{ form.department }}</div>
+          </el-form-item>
+
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="form.email" autocomplete="off" :maxlength="20"></el-input>
           </el-form-item>
 
         </el-form>
@@ -25,9 +33,9 @@
       <!-- end 编辑表单 -->
 
       <!-- start 底部按钮 -->
-      <div class="department-edit-panel-bottom">
+      <div class="create-user-panel-bottom">
         <base-button type="primary" @event="validate">保存</base-button>
-        <base-button type="danger" @event="departmentDelete">删除</base-button>
+        <!-- <base-button type="danger" @event="departmentDelete">删除</base-button> -->
       </div>
       <!-- end 底部按钮 -->
 
@@ -36,24 +44,35 @@
 </template>
 
 <script>
-/* apis */
+/* util */
+import { PHONE_REG } from '@src/util/validator';
+
 export default {
-  name: 'department-edit-panel',
+  name: 'create-user-panel',
   data(){
     return {
       action: 'create',
       higherDepartment: {},
       form: {
         name: '',
-        department: {},
-        departmentName: ''
+        phone: '',
+        department: '',
+        email: '',
       },
       rules: {
         name: [
-          { required: true, message: '请填写部门名称', trigger: 'change' }
+          { required: true, message: '请填写姓名', trigger: 'change' }
         ],
-        departmentName: [
-          { required: true, message: '请选择上级部门', trigger: 'change' }
+        phone: [
+          { required: true, message: '请填写手机号', trigger: 'change' },
+          { regexp: PHONE_REG, message: '请输入正确的手机号', trigger: ['blur', 'change'] }
+        ],
+        department: [
+          { required: true, message: '请选择部门', trigger: 'change' }
+        ],
+        email: [
+          { required: false, message: '请填写邮箱', trigger: 'change' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ],
       },
       visible: false,
@@ -69,19 +88,19 @@ export default {
   },
   methods: {
     /* 选择单个部门 */
-    chooseDepartment() {      
+    chooseDepartment() { 
+      // TODO: 需要挂载的 el
       let options = {
         title: '请选择部门',
         seeAllOrg: true,
-        max: 1,
+        max: -1,
       };
 
       this.$fast.contact.choose('dept_only', options).then(result => {
         let data = result.data || {};
 
         if(result.status == 0){
-          this.form.department = data.depts[0] || {};
-          this.form.departmentName = this.form.department.name || '';
+          this.form.department = data.depts || [];
         }
 
       })
@@ -90,28 +109,17 @@ export default {
     close() {
       this.visible = false;
     },
-    departmentCreate() {
-      this.$emit('create', this.form); 
-    },
-    departmentEdit() {
-      this.$emit('edit', this.form); 
-    },
-    async departmentDelete() {
-      this.$emit('delete');
-    },
-    open(action, data) {
-      this.action = action;
+    open(data) {
       this.packData(data);
 
       this.visible = true;
     },
     packData(data) {
       this.form.name = data.name || '';
-      this.form.department = data.higherDepartment || {};
-      this.form.departmentName = this.form.department.name || '';
+      this.form.department = data.department || '';
     },
     submit() {
-      this.isEdit ? this.departmentEdit() : this.departmentCreate();
+      this.$emit('submit');
     },
     validate() {
       this.$refs.form.validate((valid) => {
@@ -127,13 +135,13 @@ export default {
 </script>
 
 <style lang='scss'>
-.department-edit-panel {
+.create-user-panel {
 
-  .department-edit-form {
+  .create-user-form {
     padding: 20px 20px 0 0;
   }
 
-  .department-edit-panel-bottom {
+  .create-user-panel-bottom {
     padding: 0 20px;
 
     position: absolute;
@@ -146,17 +154,5 @@ export default {
     }
 
   }
-}
-
-.department-higher-name {
-  border: 1px solid #e0e1e2;
-  border-radius: 2px;
-
-  height: 32px;
-  width: 100%;
-
-  padding: 0 10px;
-
-  line-height: 32px;
 }
 </style>
