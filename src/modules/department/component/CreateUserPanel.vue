@@ -11,20 +11,36 @@
 
         <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-ruleForm">
 
+          <el-form-item label="账户名" prop="accountName">
+            <el-input v-model="form.accountName" autocomplete="off" :maxlength="10"></el-input>
+          </el-form-item>
+
           <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name" autocomplete="off" :maxlength="10"></el-input>
           </el-form-item>
 
           <el-form-item label="手机" prop="phone">
-            <el-input v-model="form.name" autocomplete="off" :maxlength="11"></el-input>
-          </el-form-item>
-
-          <el-form-item label="部门" prop="department">
-            <div @click="chooseDepartment" class="department-higher-name">{{ form.department }}</div>
+            <el-input v-model="form.phone" autocomplete="off" :maxlength="11"></el-input>
           </el-form-item>
 
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="form.email" autocomplete="off" :maxlength="20"></el-input>
+          </el-form-item>
+
+          <el-form-item label="角色" prop="role">
+            <el-select v-model="form.role" placeholder="请选择">
+              <el-option
+                v-for="item in roleOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="部门" prop="department">
+            <div @click="chooseDepartment" class="department-higher-name">{{ form.department }}</div>
           </el-form-item>
 
         </el-form>
@@ -44,8 +60,11 @@
 </template>
 
 <script>
+/* apis */
+import { userLoginNameUnique } from '@src/api/DepartmentApi';
 /* util */
 import { PHONE_REG } from '@src/util/validator';
+import _ from 'lodash';
 
 export default {
   name: 'create-user-panel',
@@ -54,27 +73,36 @@ export default {
       action: 'create',
       higherDepartment: {},
       form: {
+        accountName: '',
         name: '',
         phone: '',
         department: '',
         email: '',
+        role: [],
       },
       rules: {
+        accountName: [
+          { required: true, validator: this.checkAccountName, message: '请填写账户名', trigger: 'change' }
+        ],
         name: [
           { required: true, message: '请填写姓名', trigger: 'change' }
         ],
         phone: [
-          { required: true, message: '请填写手机号', trigger: 'change' },
+          { required: false, message: '请填写手机号', trigger: 'change' },
           { regexp: PHONE_REG, message: '请输入正确的手机号', trigger: ['blur', 'change'] }
         ],
+        role: [
+          { required: false, message: '请选择角色', trigger: 'change' }
+        ],
         department: [
-          { required: true, message: '请选择部门', trigger: 'change' }
+          { required: false, message: '请选择部门', trigger: 'change' }
         ],
         email: [
           { required: false, message: '请填写邮箱', trigger: 'change' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ],
       },
+      roleOptions: [],
       visible: false,
     }
   },
@@ -87,13 +115,26 @@ export default {
     }
   },
   methods: {
+    checkAccountName: _.debounce(function (rule, value, callback) {
+      let params = {
+        loginName: this.form.accountName,
+        userId: ''
+      }
+      userLoginNameUnique(params).then(result => {
+        if(result.error) {
+          callback(result.error);
+        } else {
+          callback();
+        }
+      })
+    }, 1000),
     /* 选择单个部门 */
     chooseDepartment() { 
       // TODO: 需要挂载的 el
       let options = {
         title: '请选择部门',
         seeAllOrg: true,
-        max: -1,
+        max: 1,
       };
 
       this.$fast.contact.choose('dept_only', options).then(result => {
@@ -119,7 +160,7 @@ export default {
       this.form.department = data.department || '';
     },
     submit() {
-      this.$emit('submit');
+      this.$emit('submit', this.form);
     },
     validate() {
       this.$refs.form.validate((valid) => {
@@ -153,6 +194,10 @@ export default {
       margin-right: 20px;
     }
 
+  }
+
+  .el-select {
+    width: 100%;
   }
 }
 </style>

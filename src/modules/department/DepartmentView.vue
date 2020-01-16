@@ -168,6 +168,7 @@
     <!-- start 新建人员 -->
     <create-user-panel
       ref="createUserPanel"
+      @submit="userAdd"
     >
     </create-user-panel>
     <!-- end 新建人员 -->
@@ -251,7 +252,7 @@ export default {
       })
         .catch(err => console.error(err))
     },
-    /* 选择多个部门 */
+    /* 选择多个部门 / 调整部门 */
     chooseDepartmentMulti() {      
       if(this.multipleSelection.length <= 0) {
         return this.$platform.alert('请先选择需要调整的成员');
@@ -260,7 +261,7 @@ export default {
       let options = {
         title: '请选择部门',
         seeAllOrg: true,
-        max: -1,
+        max: 1,
       };
 
       this.$fast.contact.choose('dept_only', options).then(result => {
@@ -595,11 +596,17 @@ export default {
         .catch(err => console.log(err))
         .finally(() => this.loading = false)
     },
-    userAdd(users) {
+    userAdd(form = {}) {
       let params = {
         departmentId: this.selectedDept.id,
-        userIdList: users.map(user => user.userId)
+        loginUser: {
+          loginName: form.accountName,
+          displayName: form.name,
+          cellPhone: form.phone,
+          email: form.email
+        }
       }
+      console.log('hbc: userAdd -> params', params)
 
       this.loading = true;
 

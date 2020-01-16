@@ -42,7 +42,7 @@ export function deleteDepartmentUser (params) {
  * @returns {*}
  */
 export function addDepartmentUser (params) {
-  return http.post('/security/department/user', params)
+  return http.post('/security/department/createAndAddDepartmentUser' + '?departmentId=' + params.departmentId, params.loginUser)
 }
 
 /**
@@ -77,4 +77,15 @@ export function updateDepartment (params) {
  */
 export function deleteDepartment (params) {
   return http.post('/security/department/user', params)
+}
+
+
+/**
+ * @description 判断人员的账户名称是否重复
+ * @param {String} loginName 名称
+ * @param {String} userId 用户id
+ * @returns {*}
+ */
+export function userLoginNameUnique (params) {
+  return http.get('/security/user/unique', params)
 }
