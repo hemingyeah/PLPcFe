@@ -25,6 +25,7 @@ const app = new PageComponent({
   }
 });
 
+
 app.$mount('#app');
 
 export default app;

@@ -9,7 +9,7 @@ router.get('/department/view', async ctx => {
   let modConfig = modules['department.view'];
   let reqHeaders = ctx.request.headers;
   let script = ['/department.view.js'];
-  let result = await HttpClient.request('/department/view', 'get', null, { headers: reqHeaders });
+  let result = await HttpClient.request('/security/department/view', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
   ctx.body = Template.renderWithHtml('组织架构', body, script, modConfig.template)

@@ -215,12 +215,14 @@ function department( options = {} ){
     selectedDepts = options.selectedDepts;
   }
 
+  let body = document.body;
+  let mountEl = options.mountEl instanceof HTMLElement ? options.mountEl : body
+
 
   let ele = document.createElement('div');
-  let body = document.body;
   let pending = false;
 
-  body.appendChild(ele);
+  mountEl.appendChild(ele);
 
   return new Promise((resolve, reject) => {
     new Vue({

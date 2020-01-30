@@ -86,7 +86,7 @@
             </div>
             
             <div class="department-user-block-header-btn">
-              <base-button type="primary" @event="openCreateUserPanel"> 添加成员 </base-button>
+              <base-button type="primary" @event="openCreateUserPanel" v-if="allowAddUser"> 添加成员 </base-button>
               <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
               <base-button type="danger" @event="userDeleteConfirm"> 批量删除 </base-button>
             </div>
@@ -143,7 +143,7 @@
           </div>
 
           <div v-else class="no-data-block">
-            当前部门暂无人员 <span class="active-btn">添加成员</span>
+            当前部门暂无人员 <span class="active-btn" @click="openCreateUserPanel">添加成员</span>
           </div>
 
         </div>
@@ -183,21 +183,24 @@ import {
   getDepartmentTree, 
   getDepartmentUserCount, 
   getDepartmentUser, 
-  deleteDepartmentUser,
+  deleteBatchDepartmentUserByIdList,
   addDepartmentUser,
   addDepartment,
   updateDepartment,
-  deleteDepartment
+  deleteDepartment,
+  updateDepartmentUserBatch,
 } from '@src/api/DepartmentApi';
 /* components */
 import CreateUserPanel from './component/CreateUserPanel.vue';
 import DepartmentEditPanel from './component/DepartmentEditPanel.vue';
 /* utils */
+import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
 
 export default {
   name: 'department-view',
+  inject: ['initData'],
   data(){
     return {
       allowCheckDept: false,
@@ -212,10 +215,16 @@ export default {
     }
   },
   computed: {
+    authorities() {
+      return this.initData.authorities || {};
+    },
+    allowAddUser() {
+      return this.authorities.AUTH_STAFF == 3 && this.authorities.AUTH_ROLE == 3 && this.authorities.AUTH_TAG == 3;
+    },
     /* 子部门 */
     subDepartments() {      
       return this.selectedDept.subDepartments || [];
-    }
+    },
   },
   mounted() {
     this.initialize();
@@ -239,7 +248,8 @@ export default {
         title: '请选择成员',
         seeAllOrg: true,
         max: -1,
-        selectedUser: this.userPage.list
+        selectedUser: this.userPage.list,
+        mountEl: this.$el,
       };
 
       this.$fast.contact.choose('dept', options).then(result => {
@@ -258,28 +268,33 @@ export default {
         return this.$platform.alert('请先选择需要调整的成员');
       }
 
+      if(this.multipleSelection.length > 1) {
+        return this.$platform.alert('请先选择一个需要调整的成员');
+      }
+
       let options = {
         title: '请选择部门',
         seeAllOrg: true,
-        max: 1,
+        max: -1,
       };
 
       this.$fast.contact.choose('dept_only', options).then(result => {
         let data = result.data || {};
-        console.log('hbc: chooseDepartmentMulti -> data', data)
         if(result.status == 0){
-          // 
+          this.updateDepartmentUserBatch(data.depts || {});
         }
       })
         .catch(err => console.error(err))
     },
     /* 新建部门 */
     departmentCreate(form) {
+      let { department } = form;
+      let parent = this.getHigherDepartment(this, department);
       let params = {
         name: form.name,
         description: '自主新建',
-        type: 'self',
-        parentId: form.department.id
+        type: 'app',
+        parentId: parent.type == 'ding' ? department.dingId : department.id
       }
       
       this.loading = true;
@@ -288,7 +303,7 @@ export default {
         let isSucc = result.status == 0;
 
         if(isSucc) {
-          this.initialize();
+          this.initialize(false);
           this.$refs.departmentEditPanel.close();
         }
 
@@ -304,12 +319,14 @@ export default {
     },
     /* 编辑部门 */
     departmentEdit(form) {
+      let { department } = form;
+      let parent = this.getHigherDepartment(this, department);
+
       let params = {
         id: this.selectedDept.id,
         name: form.name,
-        // description: '自主新建',
-        // type: 'self',
-        parentId: form.department.id
+        type: 'app',
+        parentId: parent.type == 'ding' ? department.dingId : department.id
       }
       this.loading = true;
 
@@ -318,7 +335,7 @@ export default {
 
         if(isSucc) {
           this.$refs.departmentEditPanel.close();
-          this.initialize();
+          this.initialize(false);
         }
 
         this.$platform.notification({
@@ -337,7 +354,7 @@ export default {
       if (!await this.$platform.confirm('您确定要删除该部门吗？')) return;
 
       let params = {
-        departmentId: this.selectedDept.id
+        id: this.selectedDept.id
       }
 
       this.loading = true;
@@ -346,7 +363,8 @@ export default {
         let isSucc = result.status == 0;
 
         if(isSucc) {
-          this.initialize(false);
+          this.$refs.departmentEditPanel.close();
+          this.initialize();
         }
 
         this.$platform.notification({
@@ -455,7 +473,9 @@ export default {
 
       this.userPage.list = [];
 
-      this.fetchUser();
+      this.loading = true;
+
+      this.fetchUser().finally(() => this.loading = false);
     },
     /** 初始化 */
     initialize(isInit = true){
@@ -488,22 +508,22 @@ export default {
           this.deptUserCount = deptUserCount.data || {};
           this.depts = depts;
           
-          this.initDeptUser(isInit ? this.depts[0] : this.selectedDept)
+          this.initDeptUser(isInit ? this.depts[0] : _.cloneDeep(this.selectedDept))
         })
         .catch(err => console.error(err))
-        .finally(() => this.loading = false)
     },
     /** 选中一个部门 */
     async initDeptUser(dept){
       try {
         this.selectedDept = dept;
+
         this.userPage.list = [];
         this.loading = true;
 
         // 查询用户
         this.params.keyword = '';
-        this.params.deptId = this.selectedDept.id;
-        this.params.departmentId = this.selectedDept.id;
+        this.params.deptId = dept.id;
+        this.params.departmentId = dept.id;
         this.params.pageNum = 1;
         this.params.seeAllOrg = this.isSeeAllOrg;
 
@@ -523,7 +543,9 @@ export default {
 
       this.userPage.list = [];
 
-      this.fetchUser();
+      this.loading = true;
+
+      this.fetchUser().finally(() => this.loading = false);
     },
     nodeRender(h, node){
       let content = <span>{node.name}</span>;
@@ -579,7 +601,7 @@ export default {
 
       this.loading = true;
 
-      deleteDepartmentUser(params).then(result => {
+      deleteBatchDepartmentUserByIdList(params).then(result => {
         let isSucc = result.status == 0;
 
         if(isSucc) {
@@ -597,13 +619,18 @@ export default {
         .finally(() => this.loading = false)
     },
     userAdd(form = {}) {
+      console.log('hbc: userAdd -> form', form)
       let params = {
         departmentId: this.selectedDept.id,
         loginUser: {
           loginName: form.accountName,
           displayName: form.name,
           cellPhone: form.phone,
-          email: form.email
+          email: form.email,
+          loginPassword: form.pass,
+          roles: form.role.map(r => ({ id: r })) || [],
+          tagList: form.team.map(t => ({ id: t.id })) || [],
+          departments: form.department.map(d => ({ id: d.id })) || [],
         }
       }
       console.log('hbc: userAdd -> params', params)
@@ -614,12 +641,38 @@ export default {
         let isSucc = result.status == 0;
 
         if(isSucc) {
+          this.$refs.createUserPanel.close();
           this.initialize(false);
         }
 
         this.$platform.notification({
           title: isSucc ? '成功' : '失败',
           message: isSucc ? '添加成功' : result.message,
+          type: isSucc ? 'success' : 'error',
+        });
+
+      })
+        .catch(err => console.log(err))
+        .finally(() => this.loading = false)
+    },
+    updateDepartmentUserBatch(departments) {
+      let params = {
+        userId: this.multipleSelection[0].userId,
+        departmentIds: departments.map(d => d.id).join(',')
+      }
+
+      this.loading = true;
+
+      updateDepartmentUserBatch(params).then(result => {
+        let isSucc = result.status == 0;
+
+        if(isSucc) {
+          this.initialize(false);
+        }
+
+        this.$platform.notification({
+          title: isSucc ? '成功' : '失败',
+          message: isSucc ? '调整成功' : result.message,
           type: isSucc ? 'success' : 'error',
         });
 
@@ -668,7 +721,7 @@ export default {
     flex: 2;
     flex-flow: column nowrap;
 
-    min-width: 420px;
+    min-width: 320px;
     height: 100%;
 
     .bc-dept {
@@ -692,7 +745,7 @@ export default {
     flex: 8;
 
     height: 100%;
-    min-width: 500px;
+    min-width: 400px;
     padding: 20px;
 
     overflow-y: auto;
@@ -710,6 +763,8 @@ export default {
     padding: 10px 0;
 
     &-title {
+      display: flex;
+      justify-content: space-between;
       line-height: 34px;
 
       span {

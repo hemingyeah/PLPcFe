@@ -31,8 +31,8 @@ export function getDepartmentUser (params) {
  * @param {String} departmentId 部门id
  * @returns {*}
  */
-export function deleteDepartmentUser (params) {
-  return http.post('/security/department/deleteDepartmentUser', params, false)
+export function deleteBatchDepartmentUserByIdList (params) {
+  return http.post('/security/department/deleteBatchDepartmentUserByIdList', params, false)
 }
 
 /**
@@ -42,7 +42,7 @@ export function deleteDepartmentUser (params) {
  * @returns {*}
  */
 export function addDepartmentUser (params) {
-  return http.post('/security/department/createAndAddDepartmentUser' + '?departmentId=' + params.departmentId, params.loginUser)
+  return http.post(`/security/department/createAndAddDepartmentUser?departmentId=${params.departmentId}`, params.loginUser)
 }
 
 /**
@@ -58,7 +58,7 @@ export function addDepartment (params) {
 }
 
 /**
- * @description 添加部门
+ * @description 更新部门
  * @param {String} id 部门id
  * @param {String} name 部门名称
  * @param {String} parentId 上级部门id
@@ -76,7 +76,18 @@ export function updateDepartment (params) {
  * @returns {*}
  */
 export function deleteDepartment (params) {
-  return http.post('/security/department/user', params)
+  return http.post(`/security/department/delete/${params.id}`)
+}
+
+/**
+ * @description 调整部门
+ * @param {String} userId 用户ID
+ * @param {String} primaryDepartment 原部门
+ * @param {String} freshDepartment  新部门
+ * @returns {*}
+ */
+export function updateDepartmentUserBatch (params) {
+  return http.post('/security/department/updateDepartmentUserBatch', params, false)
 }
 
 

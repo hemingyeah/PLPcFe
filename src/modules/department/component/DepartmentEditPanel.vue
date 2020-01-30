@@ -1,7 +1,7 @@
 <template>
   <div class="department-edit-panel">
     <!-- 新建编辑部门 -->
-    <base-panel :show.sync="visible" :width="panelWidth">
+    <base-panel :show.sync="visible" :width="panelWidth" class="departmentEditPanel">
       <h3 slot="title">
         <span>{{ isEdit ? '编辑部门' : '新建部门' }}</span>
       </h3>
@@ -74,6 +74,7 @@ export default {
         title: '请选择部门',
         seeAllOrg: true,
         max: 1,
+        mountEl: document.querySelector('.departmentEditPanel')
       };
 
       this.$fast.contact.choose('dept_only', options).then(result => {

@@ -78,6 +78,7 @@ export default {
           name: dept.name
         }
       }),
+      chosen: [],
       depts: [],
       deptUserCount: {},
       loading: true,

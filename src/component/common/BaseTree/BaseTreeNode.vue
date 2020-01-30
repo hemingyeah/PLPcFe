@@ -1,5 +1,5 @@
 <template>
-  <div class="base-tree-node">
+  <div class="base-tree-node" :ref="`${node.id}_base_tree_node`">
     <div class="base-tree-node-content" :class="{'base-tree-selected': isSelected}" :style="{paddingLeft: `${16 * deep}px`}">
       <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle"><i class="iconfont icon-arrow-right" v-if="node.subDepartments.length > 0"></i></span>
       <el-checkbox v-if="showCheckbox" :value="node.isChecked" @input="input"/>
@@ -51,12 +51,25 @@ export default {
   },
   computed: {
     isSelected(){
-      return this.node == this.selected;
+      let isSelected = false;
+
+      try {
+        isSelected = JSON.stringify(this.node) == JSON.stringify(this.selected);
+      } catch (error) {
+        console.log('hbc: isSelected -> error', error);
+      }
+
+      return isSelected;
+    }
+  },
+  watch: {
+    selected(newValue) {
+      this.$emit('selected-change')
     }
   },
   methods: {
     transmit(node){
-      this.$emit('node-click',node);
+      this.$emit('node-click', node);
     },
     toggle(){
       if(this.node.subDepartments.length == 0) return;
