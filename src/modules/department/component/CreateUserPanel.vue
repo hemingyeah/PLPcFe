@@ -127,7 +127,7 @@ export default {
           { required: true, validator: validatePass2, trigger: ['blur', 'change'] }
         ],
         phone: [
-          { required: false, validator: validatePhone, message: '请填写手机号', trigger: ['blur', 'change'] },
+          { required: false, validator: validatePhone, trigger: ['blur', 'change'] },
         ],
         role: [
           { required: true, message: '请选择角色', trigger: ['blue'] }

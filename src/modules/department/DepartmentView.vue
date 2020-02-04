@@ -335,7 +335,7 @@ export default {
 
         if(isSucc) {
           this.$refs.departmentEditPanel.close();
-          this.initialize(false);
+          this.initialize();
         }
 
         this.$platform.notification({
@@ -439,7 +439,7 @@ export default {
         title: '成员详情',
         close: true,
         reload: true,
-        url: `/security/user/view/${el.dataset.id}`,
+        url: `/security/user/view/${el.dataset.id}?from=department`,
       });
     },
     getHigherDepartment(data, department) {
