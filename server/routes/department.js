@@ -5,7 +5,7 @@ const HttpClient = require('../util/HttpClient')
 const modules = require('../../modules');
 const router = new KoaRouter();
 
-router.get('/department/view', async ctx => {
+router.get('/security/department/view', async ctx => {
   let modConfig = modules['department.view'];
   let reqHeaders = ctx.request.headers;
   let script = ['/department.view.js'];

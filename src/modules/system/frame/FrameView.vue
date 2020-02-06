@@ -565,7 +565,7 @@ export default {
       platform.openTab({
         id: 'department_view',
         title: '组织架构管理',
-        url: '/department/view',
+        url: '/security/department/view',
         reload: true,
       });
     },
