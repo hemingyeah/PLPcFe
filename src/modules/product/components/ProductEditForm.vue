@@ -131,6 +131,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
+          .catch(err => console.error(err))
       }, 500)
 
       const that = this;
@@ -173,6 +174,7 @@ export default {
         .then(valid => {
           return valid
         })
+        .catch(err => console.error(err))
     },
     searchCustomer(params) {
       // params has three properties include keyword、pageSize、pageNum.

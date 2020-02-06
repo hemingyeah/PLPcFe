@@ -280,6 +280,7 @@ export default {
         this.selectedUsers = users;
         // console.log(res)
       })
+        .catch(err => console.error(err))
     },
     update({ field, newValue, oldValue }) {
       let { fieldName, displayName } = field;

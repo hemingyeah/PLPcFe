@@ -163,7 +163,7 @@
               <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
-              <el-dropdown-item v-for="item in columns" :key="item.field">
+              <el-dropdown-item v-for="(item, index) in columns" :key="`${item.field}_${index}`">
                 <el-checkbox :value="item.show" @input="modifyColumnsShow($event, item)" :label="item.label"></el-checkbox>
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -183,9 +183,9 @@
       >
         <el-table-column type="selection" align="center" class-name="select-column"></el-table-column>
         <el-table-column
-          v-for="column in columns"
+          v-for="(column, index) in columns"
           v-if="column.show"
-          :key="column.field"
+          :key="`${column.field}_${index}`"
           :label="column.label"
           :prop="column.field"
           :width="column.width"

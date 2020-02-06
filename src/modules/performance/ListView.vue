@@ -99,7 +99,7 @@
               <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown" class="customer-columns-dropdown-menu">
-              <el-dropdown-item v-for="item in columns" :key="item.field">
+              <el-dropdown-item v-for="(item, index) in columns" :key="`${item.field}_${index}`">
                 <el-checkbox :value="item.show" @input="modifyColumnStatus($event, item)" :label="item.label"/>
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -120,9 +120,9 @@
 
         <el-table-column type="selection" width="48" align="center"></el-table-column>
         <el-table-column
-          v-for="column in columns"
+          v-for="(column, index) in columns"
           v-if="column.show"
-          :key="column.field"
+          :key="`${column.field}_${index}`"
           :label="column.label"
           :prop="column.field"
           :width="column.width"
@@ -734,6 +734,7 @@ export default {
       this.$fast.contact.choose('team', options).then(res => {
         this.userList = res.data;
       })
+        .catch(err => console.error(err))
     },
     selectionInit(rows) {
       let isNotOnCurrentPage = false;

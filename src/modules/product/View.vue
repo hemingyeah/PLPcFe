@@ -542,6 +542,7 @@ export default {
         this.statisticalData = result;
         this.tabs = this.buildTabs();
       })
+        .catch(err => console.error(err))
     },
     // 构建tab
     buildTabs() {

@@ -155,8 +155,8 @@
       <div class="table-wrap">
         <el-table :data="reports" stripe >
           <el-table-column
-            v-for="column in columns"
-            :key="column.field"
+            v-for="(column, index) in columns"
+            :key="`${column.field}_${index}`"
             :label="column.label"
             :prop="column.field"
             :width="column.width"
@@ -417,7 +417,7 @@ export default {
           this.approvePersonIds = res.data
             .map(({userId}) => userId);
         })
-
+        .catch(err => console.error(err))
     },
     confirmCreateReport(sign = '') {
       let params = {
@@ -641,6 +641,7 @@ export default {
         this.form.target = res?.data?.users || [];
 
       })
+        .catch(err => console.error(err))
     },
     /** 选择团队  */
     selectTeam() {
@@ -667,6 +668,7 @@ export default {
         this.checkTagAndUserRepeat();
 
       })
+        .catch(err => console.error(err))
     },
     /** 检查团队用户是否重复 */
     checkTagAndUserRepeat() {

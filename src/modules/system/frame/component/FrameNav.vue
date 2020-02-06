@@ -5,14 +5,14 @@
     </div>
     <div class="frame-menu-scroll">
       <ul class="frame-menu">
-        <template v-for="menu in menus">
+        <template v-for="(menu, index) in menus">
           <li 
             :class="{
               'frame-menu-item': true, 
               'frame-menu-active': menu == currMenu,
               'frame-menu-expand': menu == currMenu
             }" 
-            :key="menu.url"
+            :key="`${menu.url}_${index}`"
             :id="menu.menuKey">
             <a 
               :href="menu.url ? menu.url : 'javascript:;'" 

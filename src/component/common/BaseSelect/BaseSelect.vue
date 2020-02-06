@@ -185,6 +185,7 @@ export default {
           this.loadmoreOptions.disabled = res ? !res.hasNextPage : false;
           return res;
         })
+        .catch(err => console.error(err))
     },
     searchByKeyword(e) {
       this.resetStatus(e.target.value);

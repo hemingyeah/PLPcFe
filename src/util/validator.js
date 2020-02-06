@@ -186,6 +186,7 @@ export function createRemoteValidate(api, build, delay = 500){
       changeStatus(false);
       return resolve(res.error ? res.error : null);
     })
+      .catch(err => console.error(err))
   }, delay);
 
   return function(value, field, changeStatus){

@@ -153,6 +153,7 @@ export default {
         this.show = false;
         this.$emit('input', address);
       })
+        .catch(err => console.error(err))
     },
     // /** 选中地址 */
     // choose(item) {

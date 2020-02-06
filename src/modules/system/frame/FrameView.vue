@@ -155,8 +155,20 @@
 
             <!-- tabs -->
             <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
-              <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
-                <frame-tab v-for="tab in frameTabs" :key="tab.url" :tab="tab" @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab" />
+              <div
+                ref="list"
+                :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}"
+                :style="{transform: `translateX(${-offset}px)`}"
+                @transitionend="tabTransitionEnd"
+              >
+                <frame-tab
+                  v-for="tab in frameTabs"
+                  :key="`${index}_${tab.url}`"
+                  :tab="tab"
+                  @jump="jumpFrameTab"
+                  @reload="reloadFrameTab"
+                  @close="closeFrameTab"
+                />
               </div>
               <div class="frame-tabs-border"></div>
             </div>
@@ -169,8 +181,15 @@
 
         <div class="frame-main">
           <div class="frame-tab-content">
-            <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
-              <iframe :id="`frame_tab_${tab.id}`" :fromid="tab.fromId" :data-id="tab.id" :src="tab.url" @load="updateFrameTab($event,tab)" allowfullscreen />
+            <div class="frame-tab-window" v-for="tab in frameTabs" :key="`${index}_${tab.url}`" v-show="tab.show">
+              <iframe
+                :id="`frame_tab_${tab.id}`"
+                :fromid="tab.fromId"
+                :data-id="tab.id"
+                :src="tab.url"
+                @load="updateFrameTab($event,tab)"
+                allowfullscreen
+              />
             </div>
           </div>
         </div>

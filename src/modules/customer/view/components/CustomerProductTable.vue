@@ -8,9 +8,9 @@
       row-class-name="customer-product-table-row"
       class="customer-product-table">
       <el-table-column
-        v-for="column in columns"
+        v-for="(column, index) in columns"
         v-if="column.show"
-        :key="column.field"
+        :key="`${column.field}_${index}`"
         :label="column.label"
         :prop="column.field"
         :width="column.width"
