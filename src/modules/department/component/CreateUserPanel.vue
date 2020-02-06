@@ -148,7 +148,9 @@ export default {
       return this.action == 'edit';
     },
     roleOptions() {
-      let roles = this.initData.rolesJson || [];
+      let rolesJson = this.initData.rolesJson;
+      let roles = JSON.parse(rolesJson) || [];
+      
       return roles.map(role => ({ label: role.text, value: role.id}))
     },
     panelWidth() {
