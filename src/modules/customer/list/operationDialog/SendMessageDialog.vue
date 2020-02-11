@@ -109,7 +109,11 @@ export default {
           if (res.status) return this.$platform.alert(res.message);
 
           this.sendMessageDialog = false;
-          this.$platform.alert('批量发送短信成功');
+
+          this.$platform.notification({
+            title: '批量发送短信成功',
+            type: 'successs',
+          });
         })
         .catch(err => {
           this.pending = false;

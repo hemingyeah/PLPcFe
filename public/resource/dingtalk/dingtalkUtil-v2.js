@@ -191,4 +191,31 @@
       window.open(url);
     }
   }
+
+  window.toastr.options = {
+    "closeButton": true,
+    "debug": false,
+    "newestOnTop": true,
+    "progressBar": false,
+    "positionClass": "toast-top-right",
+    "preventDuplicates": false,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "2000",
+    "extendedTimeOut": "0",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  };
+
+  // 提示
+  window.toast = function (message, type) {
+      let types = ['warning', 'error', 'success', 'info'];
+
+      if(types.indexOf(type) <= -1) type = 'info';
+
+      window.toastr[type](message);
+  }
+
 })();

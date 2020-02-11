@@ -263,7 +263,10 @@ export default {
         try {
 
           if(item.isFinished == 1) {
-            platform.alert(`共${action}了${item.importInfo.total}条数据`);
+            platform.notification({
+              title: `共${action}了${item.importInfo.total}条数据`,
+              type: 'successs',
+            });
           } else if (item.isFinished == 2) {
             this.errorDialog = true;
             this.item = item;
@@ -402,7 +405,10 @@ export default {
     },
     /** 导入或更新 完成  */
     importAndUpdateDone(item, action) {
-      platform.alert(`共${action}了${item.importInfo.total}条数据`);
+      platform.notification({
+        title: `共${action}了${item.importInfo.total}条数据`,
+        type: 'successs',
+      });
       this.deleteRecord(item);
     },
     /** @deprecated */
