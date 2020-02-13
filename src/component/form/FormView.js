@@ -1,10 +1,9 @@
 import { toArray } from '@src/util/lang';
 import { fmt_address, fmt_datetime, fmt_date } from '@src/filter/fmt';
-import { FormFieldMap } from './components';
+import { FormFieldMap, FieldManager } from './components';
 import * as FormUtil from './util';
 
 import platform from '@src/platform';
-import { FieldManager } from './components';
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
@@ -125,7 +124,7 @@ const FormView = {
         .catch(err => console.error('openMap catch an err: ', err));
     },
   
-    mapFieldToDom(field, h) {
+    mapFieldToDom(field, createElement) {
       let {formType, fieldName, displayName, isSystem} = field;
       if (formType === 'separator') {
         const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
@@ -156,7 +155,7 @@ const FormView = {
       let FormField = FieldManager.get(field.formType);
       if(FormField && FormField.view){
         let attrs = {props: {field, value}}
-        return h(FormField.view, attrs);
+        return createElement(FormField.view, attrs);
       }
       
       if (formType === 'attachment') {
@@ -273,7 +272,7 @@ const FormView = {
       return newArr;
     }
   },
-  render(h) {
+  render(createElement) {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     let groups = this.groupField(this.fields);
     console.log(groups, 'form-view')
@@ -285,10 +284,11 @@ const FormView = {
         if (this.sectionState[currentGroupId] === undefined) {
           this.$set(this.sectionState, currentGroupId, true);
         }
-        return this.mapFieldToDom(item, h);
+        return this.mapFieldToDom(item, createElement);
       });
 
-      let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, h));
+      let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, createElement));
+      
       return (
         <div class="view-group">
           {title}
