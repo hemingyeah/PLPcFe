@@ -26,12 +26,7 @@ const TaskAttachmentField = {
     build: FormAttachment,
     view: FormAttachmentView,
     extend: {
-      'task_attachment_setting': {
-        name: 'task-attachment-setting',
-        render(){
-          return <div>task attachment setting</div>
-        }
-      }
+      setting: FormAttachmentSetting
     }
   }
 }

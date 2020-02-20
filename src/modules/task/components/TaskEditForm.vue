@@ -6,10 +6,6 @@
           <div class="form-taskNo">{{ value || "工单编号将在创建后由系统生成" }}</div>
         </form-item>
         <form-item label="工单类型" :validation="false">
-          <!-- <el-select :value="field.templateId" @input="chooseTemplate">
-            <el-option value="1">默认工单</el-option>
-            <el-option value="other">其他工单</el-option>
-          </el-select> -->
           <form-select
             :field="field"
             :source="taskTypes"
@@ -47,7 +43,7 @@
           <form-text :field="field" :value="selectCustomer.lmName" @update="update" />
         </form-item>
         <form-item v-if="customerOption.address" label="地址">
-          <form-address :field="field" :value="customerAddress" @update="update"/>
+          <form-address :field="field" :value="customerAddress" @update="update" :taskDisableUpdate="true"/>
         </form-item>
         <form-item v-if="customerOption.product" label="产品">
           <base-select
@@ -70,14 +66,14 @@
           </base-select>
         </form-item>
       </template>
-      <template slot="serialNumber" slot-scope="{field}">
+      <!-- <template slot="serialNumber" slot-scope="{field}">
         <form-item :label="field.displayName" >
           <form-text
             :field="field"
             :value="value.serialNumber" @update="update"
           />
         </form-item>
-      </template>
+      </template> -->
     </form-builder>
   </div>
 </template>
@@ -152,7 +148,7 @@ export default {
         longitude:address.adLatitude,
         addressType:address.addressType
       };
-    }
+    },
   },
   methods: {
     async chooseTemplate(id) {
@@ -165,6 +161,7 @@ export default {
         this.task_fields = await TaskApi.getTemplateFields(id)
         this.task_value = FormUtil.initialize(this.fields, this.value)    
         this.taskType = this.taskTypes[this.taskTypes.findIndex(item=>item.value == id)].text;
+        this.$emit('updatetemplateId', this.taskTypes[this.taskTypes.findIndex(item=>item.value == id)]);
       } catch (error) {
         console.error(error)
       }
@@ -195,9 +192,10 @@ export default {
       // 查询客户关联字段
       let forRelation = {
         module: 'customer',
-        id: value[0].value,
-        from: 'event'
+        id: value[0].value
       }
+      console.log('forRelation: ', forRelation);
+      
       EventBus.$emit('es.Relation.Customer', forRelation)
     },
 
@@ -233,6 +231,11 @@ export default {
     searchProduct(params) {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {}
+      //这里判断是否有客户信息
+      console.log(this.selectCustomer);
+      if(this.selectCustomer && this.selectCustomer.value){
+        pms.customerId = this.selectCustomer.value;
+      }
       return this.$http
         .post('/product/list/data', pms)
         .then(res => {
@@ -255,9 +258,17 @@ export default {
       const template = value[0];
       console.log(template);
       
+      // 查询产品关联字段
+      let forRelation = {
+        module: 'product',
+        id: value[0].value
+      }
+      console.log('forRelation: ', forRelation);
+      EventBus.$emit('es.Relation.Product', forRelation)
+
       // 获取产品明细
-      let res = await getProductDetail({id: template.id});
-      console.log('product res:', res);
+      //let res = await getProductDetail({id: template.id});
+      //console.log('product res:', res);
       
       // 产品说明信息 field_8pBY7AYs6W4axVzK
       // 产品多行文本 field_hQ47BtvO7WFKDA7y
@@ -268,9 +279,9 @@ export default {
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
         if (f.formType === 'address') {
-          console.log(nv)
+          console.log('nv:', nv)
         }
-        if (!!nv && f.fieldName != 'customer' && f.fieldName != 'template') {
+        if (!!nv && f.fieldName != 'customer' && f.fieldName != 'template') { 
           this.update(({
             field: f,
             newValue: nv

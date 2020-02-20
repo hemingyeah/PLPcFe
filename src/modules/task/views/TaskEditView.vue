@@ -16,7 +16,7 @@
           </button>
         </div>
       </div>
-      <task-edit-form :fields="fields" :types="types" :value="form" ref="form">
+      <task-edit-form :fields="fields" :types="types" :value="form" ref="form" @updatetemplateId="updatetemplateId">
       </task-edit-form>
     </form>
   </div>
@@ -26,7 +26,9 @@
 import TaskEditForm from '../components/TaskEditForm.vue'
 import * as TaskApi from '@src/api/TaskApi'
 import * as FormUtil from '@src/component/form/util'
+import * as util from '../util/task'
 import platform from '@src/platform'
+let taskTemplate = {};
 export default {
   name: 'task-edit-view',
   inject: ['initData'],
@@ -62,6 +64,10 @@ export default {
     }
   },
   methods: {
+    updatetemplateId(e){
+      // console.log('e: ', e);
+      taskTemplate = e;
+    },
     goBack() {
       if (this.action == 'create') {
         let id = window.frameElement.dataset.id
@@ -70,41 +76,44 @@ export default {
       parent.frameHistoryBack(window)
     },
     submit() {
-      // this.submitting = true
-      // this.$refs.form
-      // .validate()
-      // .then(valid => {
-      //   this.submitting = false
-      //   if (!valid) return Promise.reject('validate fail.')
-      //   const params = util.packToCustomer(
-      //     this.fields,
-      //     this.form,
-      //     this.initData.tags
-      //   )
-      //   this.pending = true
-      //   this.loadingPage = true
-      //   if (this.action === 'edit') {
-      //     return this.updateMethod(params)
-      //   }
-      //   if (this.action === 'createFromEvent') {
-      //     return this.createCustomerForEvent(params)
-      //   }
-      //   this.createMethod(params)
-      // })
-      // .catch(err => {
-      //   console.error(err)
-      //   this.pending = false
-      //   this.loadingPage = false
-      // })
+      this.submitting = true
+      this.$refs.form
+        .validate()
+        .then(valid => {
+          this.submitting = false
+          if (!valid) return Promise.reject('validate fail.')
+          const params = util.packToTask(
+            this.fields,
+            this.form
+          )
+          params.templateId = taskTemplate.value;
+          params.templateName = taskTemplate.text;
+          this.pending = true
+          this.loadingPage = true
+          // if (this.action === 'edit') {
+          //   return this.updateMethod(params)
+          // }
+          // if (this.action === 'createFromEvent') {
+          //   return this.createCustomerForEvent(params)
+          // }
+          console.log(params);
+          
+          this.createMethod(params)
+        })
+        .catch(err => {
+          console.error(err)
+          this.pending = false
+          this.loadingPage = false
+        })
     },
     createMethod(params) {
       this.$http
-        .post('/customer/create', params)
+        .post('/task/create', params)
         .then(res => {
           let isSucc = !res.status
           platform.notification({
             type: isSucc ? 'success' : 'error',
-            title: `创建客户${isSucc ? '成功' : '失败'}`,
+            title: `创建工单${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
           this.pending = false
@@ -113,7 +122,7 @@ export default {
           if (!isSucc) return
 
           this.reloadTab()
-          window.location.href = `/customer/view/${res.data.customerId}`
+          //window.location.href = `/task/view/${res.data.customerId}`
         })
         .catch(err => console.error('err', err))
     },
@@ -158,7 +167,7 @@ export default {
       this.$emit('input', {})
       this.init = false
       
-      //let tasktypes = (await TaskApi.taskType()) || []
+      // let tasktypes = (await TaskApi.taskType()) || []
 
       this.fields = await TaskApi.getTemplateFields(this.types[0].id)
       this.form = FormUtil.initialize(this.fields, this.form)

@@ -28,12 +28,7 @@ let TaskDescriptionField = {
     preview: FormTextareaPreview,
     build: FormTextarea,
     extend: {
-      'task_description_setting': {
-        name: 'task-description-setting',
-        render(){
-          return <div>task description setting</div>
-        }
-      }
+      'task_description_setting': FormTextareaSetting
     }
   }
 }

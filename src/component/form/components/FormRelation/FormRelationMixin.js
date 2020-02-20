@@ -29,7 +29,7 @@ export default {
     }
   },
   mounted() {
-    console.log('formType:', this.field.formType)
+    // console.log('formType:', this.field.formType)
     if (this.field.formType == 'relationCustomer') {
       EventBus.$on('es.Relation.Customer', this.update)
     }
@@ -47,12 +47,12 @@ export default {
 
       if (forRelation.from == 'event') action = 'event/relatedFieldValue'
       
-      console.log(forRelation)
+      //console.log(forRelation)
 
       if (forRelation.id && forRelation.id !== '') { 
         try {
           const res = await this.$http.get('/dd/task/relatedFieldValue', forRelation)
-          console.log('relation:', res);
+          // console.log('relation:', res);
           if(res.status == 0){
             newValue = res.data
             //this.$emit('input', {newValue, oldValue});

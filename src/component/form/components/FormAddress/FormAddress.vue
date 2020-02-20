@@ -59,7 +59,12 @@ export default {
     disableMap: {
       type: Boolean,
       default: false
-    }
+    },
+    // 工单客户关联字段清除位置信息时候不调用update
+    taskDisableUpdate: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {
@@ -183,7 +188,10 @@ export default {
     },
     updateValue(newValue) {
       let oldValue = null;
-      this.$emit('update', {newValue, oldValue, field: this.field});
+      // 工单客户关联字段清除位置信息时候不调用update
+      if(!this.taskDisableUpdate){
+        this.$emit('update', {newValue, oldValue, field: this.field});
+      }
       this.$emit('input', newValue);
     },
     chooseMap() {
