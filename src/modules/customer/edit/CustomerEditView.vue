@@ -3,13 +3,21 @@
     <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
       <div class="page-title">
         <div class="title">
-          <button type="button" class="btn-text btn-back" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
+          <button type="button" class="btn-text btn-back" @click="goBack">
+            <i class="iconfont icon-arrow-left"></i> 返回
+          </button>
           <span class="text">|</span>
-          <button type="submit" :disabled="submitting || pending" class="btn btn-primary">提交</button>
+          <button
+            type="submit"
+            :disabled="submitting || pending"
+            class="btn btn-primary"
+          >
+            提交
+          </button>
         </div>
       </div>
-       
-      <customer-edit-form :fields="fields" v-model="form" ref="form"/>
+
+      <customer-edit-form :fields="fields" v-model="form" ref="form" />
     </form>
   </div>
 </template>
@@ -17,8 +25,8 @@
 <script>
 import CustomerEditForm from '../components/CustomerEditForm.vue'
 
-import * as CustomerApi from '@src/api/CustomerApi';
-import * as FormUtil from '@src/component/form/util';
+import * as CustomerApi from '@src/api/CustomerApi'
+import * as FormUtil from '@src/component/form/util'
 import * as util from '../util/customer'
 
 import platform from '@src/platform'
@@ -33,133 +41,140 @@ export default {
       loadingPage: false,
       form: {},
       init: false,
-      auth: {},
-    };
+      auth: {}
+    }
   },
   computed: {
     action() {
-      return this.initData.action;
+      return this.initData.action
     },
     editId() {
-      return this.initData.id || '';
+      return this.initData.id || ''
     },
     eventId() {
-      return this.initData.eventId || '';
+      return this.initData.eventId || ''
     },
     fields() {
-      let originFields = this.initData.fieldInfo || [];
-      let sortedFields = originFields.sort((a, b) => a.orderId - b.orderId)
+      let originFields = this.initData.fieldInfo || []
+      let sortedFields = originFields
+        .sort((a, b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
-            f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
+            f.isNull = this.initData.isAddressAllowNull ? 1 : 0
           }
-          return f;
+          return f
         })
         .filter(f => {
           return (
-            (
-              f.fieldName !== 'tags' 
-              || (f.fieldName === 'tags' && this.initData.isDivideByTag)
-            )
+            f.fieldName !== 'tags' ||
+            (f.fieldName === 'tags' && this.initData.isDivideByTag)
           )
-        });
+        })
       return FormUtil.migration(sortedFields)
     }
   },
   methods: {
     goBack() {
-      if(this.action == 'create') {
-        let id = window.frameElement.dataset.id;
-        return this.$platform.closeTab(id);
+      if (this.action == 'create') {
+        let id = window.frameElement.dataset.id
+        return this.$platform.closeTab(id)
       }
-      parent.frameHistoryBack(window);
+      parent.frameHistoryBack(window)
     },
     submit() {
-      this.submitting = true;
-      this.$refs.form.validate()
+      this.submitting = true
+      this.$refs.form
+        .validate()
         .then(valid => {
-          this.submitting = false;
-          if (!valid) return Promise.reject('validate fail.');
-          const params = util.packToCustomer(this.fields, this.form, this.initData.tags);
+          this.submitting = false
+          if (!valid) return Promise.reject('validate fail.')
+          const params = util.packToCustomer(
+            this.fields,
+            this.form,
+            this.initData.tags
+          )
 
-          this.pending = true;
-          this.loadingPage = true;
+          this.pending = true
+          this.loadingPage = true
           if (this.action === 'edit') {
-            return this.updateMethod(params);
+            return this.updateMethod(params)
           }
           if (this.action === 'createFromEvent') {
-            return this.createCustomerForEvent(params);
+            return this.createCustomerForEvent(params)
           }
 
-          this.createMethod(params);
+          this.createMethod(params)
         })
         .catch(err => {
-          console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
-        });
+          console.error(err)
+          this.pending = false
+          this.loadingPage = false
+        })
     },
     createCustomerForEvent(params) {
-      this.$http.post('/event/customer/create', params)
+      this.$http
+        .post('/event/customer/create', params)
         .then(res => {
-          let isSucc = !res.status;
-          platform.notification({
-            type: isSucc ? 'success' : 'error',
-            title: `创建客户${isSucc ? '成功' : '失败'}`,
-            message: !isSucc && res.message
-          });
-
-          this.pending = false;
-          this.loadingPage = false;
-
-          if(!isSucc) return;
-
-          const params = {
-            ...res.data,
-            eventId: this.eventId,
-          };
-
-          delete params.latitude;
-          delete params.longitude;
-
-          this.$http.post('/event/update4CusInfo', params, false)
-            .then(res => {
-
-              if (this.initData.goto === 'eventView') {
-                return window.location.href = `/event/view/${this.initData.eventId}`;
-              }
-              if (this.initData.goto === 'createTask') {
-                return window.location.href = `/event/convent2Task/jump?eventId=${this.initData.eventId}&flow=${this.initData.flow}`;
-              }
-            })
-        })
-        .catch(err => console.error('createCustomerForEvent catch an error', err));
-    },
-    createMethod(params) {
-      this.$http.post('/customer/create', params)
-        .then(res => {
-          let isSucc = !res.status;
+          let isSucc = !res.status
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建客户${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-          this.pending = false;
-          this.loadingPage = false;
 
-          if(!isSucc) return;
+          this.pending = false
+          this.loadingPage = false
 
-          this.reloadTab();
-          window.location.href = `/customer/view/${res.data.customerId}`;
+          if (!isSucc) return
+
+          const params = {
+            ...res.data,
+            eventId: this.eventId
+          }
+
+          delete params.latitude
+          delete params.longitude
+
+          this.$http.post('/event/update4CusInfo', params, false).then(res => {
+            if (this.initData.goto === 'eventView') {
+              return (window.location.href = `/event/view/${this.initData.eventId}`)
+            }
+            if (this.initData.goto === 'createTask') {
+              return (window.location.href = `/event/convent2Task/jump?eventId=${this.initData.eventId}`)
+            }
+          })
         })
-        .catch(err => console.error('err', err));
+        .catch(err =>
+          console.error('createCustomerForEvent catch an error', err)
+        )
+    },
+    createMethod(params) {
+      this.$http
+        .post('/customer/create', params)
+        .then(res => {
+          let isSucc = !res.status
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `创建客户${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+          this.pending = false
+          this.loadingPage = false
+
+          if (!isSucc) return
+
+          this.reloadTab()
+          window.location.href = `/customer/view/${res.data.customerId}`
+        })
+        .catch(err => console.error('err', err))
     },
     updateMethod(params) {
-      this.$http.post(`/customer/update?id=${this.editId}`, params)
+      this.$http
+        .post(`/customer/update?id=${this.editId}`, params)
         .then(res => {
           if (res.status == 1) {
-            this.loadingPage = false;
-            this.pending = false;
+            this.loadingPage = false
+            this.pending = false
             return platform.notification({
               type: 'error',
               title: '更新客户失败',
@@ -167,46 +182,46 @@ export default {
             })
           }
 
-          let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          let fromId = window.frameElement.getAttribute('fromid')
+          this.$platform.refreshTab(fromId)
 
-          window.location.href = `/customer/view/${res.data || this.editId}`;
+          window.location.href = `/customer/view/${res.data || this.editId}`
         })
         .catch(err => {
-          this.pending = false;
+          this.pending = false
           console.error('err', err)
-          this.loadingPage = false;
-        });
+          this.loadingPage = false
+        })
     },
     reloadTab() {
-      let fromId = window.frameElement.getAttribute('fromid');
+      let fromId = window.frameElement.getAttribute('fromid')
 
-      this.$platform.refreshTab(fromId);
-    },
+      this.$platform.refreshTab(fromId)
+    }
   },
   async mounted() {
     try {
-      this.auth = this.initData.auth || {};
+      this.auth = this.initData.auth || {}
       // 初始化默认值
-      let form = {};
+      let form = {}
       if (this.initData.action === 'edit' && this.initData.id) {
         // 处理编辑时数据
-        this.loadingPage = true;
-        let cusRes = await CustomerApi.getForEdit(this.initData.id);
-        this.loadingPage = false;
-        if(cusRes.status === 0) form = cusRes.data;
+        this.loadingPage = true
+        let cusRes = await CustomerApi.getForEdit(this.initData.id)
+        this.loadingPage = false
+        if (cusRes.status === 0) form = cusRes.data
       }
 
       if (this.initData.action === 'createFromEvent') {
-        form = this.initData.eventCustomer;
+        form = this.initData.eventCustomer
       }
 
-      form = util.packToForm(this.fields, form, this.initData.customerAddress);
-      this.form = FormUtil.initialize(this.fields, form);
-      
-      this.init = true;
+      form = util.packToForm(this.fields, form, this.initData.customerAddress)
+      this.form = FormUtil.initialize(this.fields, form)
+
+      this.init = true
     } catch (e) {
-      console.error('CustomerEditView caught an error ', e);
+      console.error('CustomerEditView caught an error ', e)
     }
   },
   components: {
@@ -247,23 +262,26 @@ body {
   }
 }
 
-.form-builder{
+.form-builder {
   width: 655px;
   padding: 10px 0 0 10px;
 
-  .input-and-btn{
+  .input-and-btn {
     display: flex !important;
     flex-flow: row nowrap;
 
-    .form-item, .form-text, .form-select, .biz-team-select {
+    .form-item,
+    .form-text,
+    .form-select,
+    .biz-team-select {
       flex: 1;
     }
 
-    .base-dist-picker{
+    .base-dist-picker {
       padding-right: 0;
     }
 
-    button{
+    button {
       margin-left: 10px;
     }
   }

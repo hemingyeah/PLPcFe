@@ -1,5 +1,5 @@
-import FormDatetimeSetting from './FormDatetimeSetting.vue';
-import FormDatetimePreview from './FormDatetimePreview.vue';
+import FormDatetimeSetting from './FormDatetimeSetting.vue'
+import FormDatetimePreview from './FormDatetimePreview.vue'
 import FormDatetime from './FormDatetime.vue'
 
 let FormDatetimeField = {
@@ -11,35 +11,20 @@ let FormDatetimeField = {
     preview: FormDatetimePreview,
     build: FormDatetime
   }
-};
+}
 
 const TaskPlanTimeField = {
   formType: 'planTime',
   name: '计划时间',
   isSystem: 1,
+  setting: {
+    dateType: 'dateTime'
+  },
   component: {
-    setting: {
-      name: 'task-planTime-setting',
-      render(){
-        return <div>task planTime setting</div>
-      }
-    },
-    preview: {
-      name: 'task-planTime-preview',
-      render(){
-        return <div>task planTime preview</div>
-      }
-    },
-    build: {
-      name: 'task-planTime',
-      render(){
-        return <div>task planTime</div>
-      }
-    }
+    setting: FormDatetimeSetting,
+    preview: FormDatetimePreview,
+    build: FormDatetime
   }
 }
 
-export default [
-  FormDatetimeField,
-  TaskPlanTimeField
-];
+export default [FormDatetimeField, TaskPlanTimeField]

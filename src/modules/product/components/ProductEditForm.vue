@@ -57,7 +57,7 @@
 
     </form-builder>
   </div>
-</template>CustomerEditView
+</template>
 
 <script>
 import * as FormUtil from '@src/component/form/util';
@@ -103,7 +103,7 @@ export default {
     updateTemplate(value) {
       let nv = null;
       const template = value[0];
-
+      
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
 

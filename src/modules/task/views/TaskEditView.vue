@@ -1,105 +1,186 @@
 <template>
-  <div>
-    <form @submit.prevent="submit">
-      <button type="submit">提交</button>
-      <form-builder 
-        v-if="init"
-        ref="form" mode="task" 
-        :fields="fields"
-        :value="form" @update="update">
-
-        <template slot="taskNo" slot-scope="{field, value}">
-          <form-item :label="field.displayName" :validation="false">
-            <div class="form-taskNo">{{value || '工单编号将在创建后由系统生成'}}</div>
-          </form-item>
-          <form-item label="工单类型" :validation="false">
-            <el-select :value="templateId" @input="chooseTemplate">
-              <el-option value="1">默认工单</el-option>
-              <el-option value="other">其他工单</el-option>
-            </el-select>
-          </form-item>
-        </template>
-
-        <template slot="customer" slot-scope="{field, value}">
-          <form-item :label="field.displayName" :validation="false">
-            <div> task customer implement</div>
-          </form-item>
-        </template>
-      </form-builder>
+  <div class="customer-container">
+    <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
+      <div class="page-title">
+        <div class="title">
+          <button type="button" class="btn-text btn-back" @click="goBack">
+            <i class="iconfont icon-arrow-left"></i> 返回
+          </button>
+          <span class="text">|</span>
+          <button
+            type="submit"
+            :disabled="submitting || pending"
+            class="btn btn-primary"
+          >
+            提交
+          </button>
+        </div>
+      </div>
+      <task-edit-form :fields="fields" :types="types" :value="form" ref="form">
+      </task-edit-form>
     </form>
   </div>
 </template>
 
 <script>
-import * as TaskApi from '@src/api/TaskApi';
-import * as FormUtil from '@src/component/form/util';
-
+import TaskEditForm from '../components/TaskEditForm.vue'
+import * as TaskApi from '@src/api/TaskApi'
+import * as FormUtil from '@src/component/form/util'
+import platform from '@src/platform'
 export default {
   name: 'task-edit-view',
   inject: ['initData'],
-  data(){
+  data() {
     return {
+      submitting: false,
+      pending: false,
+      loadingPage: false,
+      form: {},
       init: false,
-      fields: [],
-      templateId: '1',
-      form: {}
+      auth: {}
+    }
+  },
+  computed: {
+    action() {
+      return this.initData.action
+    },
+    editId() {
+      return this.initData.id || ''
+    },
+    eventId() {
+      return this.initData.eventId || ''
+    },
+    types(){   
+      return JSON.parse(`[{"name":"默认工单","id":"1","tags":[]},
+      {"name":"测工单排序4","id":"31cdc36c-918d-4525-9ee8-73c89614a891","tags":[]},
+      {"name":"测试导出12","id":"9ffbc9c2-c8cc-472a-98ff-873c3e50ea63","tags":[]},
+      {"name":"全字段测试","id":"13de8ca3-2d80-46ae-852f-6e692132f0e9","tags":[]},
+      {"name":"测试结算回访","id":"278a103a-5806-4e0c-b102-04e37484f675","tags":[]},
+      {"name":"测试组件","id":"b84170e4-358e-4b4d-8c79-b0aca7074147","tags":[]},
+      {"name":"移动之附加组","id":"1ddde36b-6305-44db-8f1b-958ed39e4ddc","tags":[]},
+      {"name":"工时记录测试","id":"9a4067e8-8d18-45d8-984d-52aa500da2fc","tags":[]}]`);
     }
   },
   methods: {
-    submit(){
-      console.log(this.form)
-    },
-    update({field, newValue, oldValue}){
-      let {fieldName, displayName} = field;
-      if (this.$appConfig.debug) {
-        console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+    goBack() {
+      if (this.action == 'create') {
+        let id = window.frameElement.dataset.id
+        return this.$platform.closeTab(id)
       }
-
-      let value = this.form;
-      this.$set(value, fieldName, newValue)
-      this.$emit('input', value)
+      parent.frameHistoryBack(window)
     },
-    async chooseTemplate(id){
-      let loading = this.$loading();
-      try {
-        
-        this.templateId = id;
-        // 清空表单
-        this.$emit('input', {});
-        this.init = false;
-
-        this.fields = await TaskApi.getTemplateFields(id);
-        this.initValue();
-        
-        this.$nextTick(() => this.init = true)
-      } catch (error) {
-        console.error(error);
-      }
-
-      loading.close();
+    submit() {
+      // this.submitting = true
+      // this.$refs.form
+      // .validate()
+      // .then(valid => {
+      //   this.submitting = false
+      //   if (!valid) return Promise.reject('validate fail.')
+      //   const params = util.packToCustomer(
+      //     this.fields,
+      //     this.form,
+      //     this.initData.tags
+      //   )
+      //   this.pending = true
+      //   this.loadingPage = true
+      //   if (this.action === 'edit') {
+      //     return this.updateMethod(params)
+      //   }
+      //   if (this.action === 'createFromEvent') {
+      //     return this.createCustomerForEvent(params)
+      //   }
+      //   this.createMethod(params)
+      // })
+      // .catch(err => {
+      //   console.error(err)
+      //   this.pending = false
+      //   this.loadingPage = false
+      // })
     },
-    initValue(){
-      this.form = FormUtil.initialize(this.fields, this.form);
+    createMethod(params) {
+      this.$http
+        .post('/customer/create', params)
+        .then(res => {
+          let isSucc = !res.status
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `创建客户${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+          this.pending = false
+          this.loadingPage = false
+
+          if (!isSucc) return
+
+          this.reloadTab()
+          window.location.href = `/customer/view/${res.data.customerId}`
+        })
+        .catch(err => console.error('err', err))
     },
-    initialize(){
-      this.chooseTemplate(this.templateId); 
+    updateMethod(params) {
+      this.$http
+        .post(`/customer/update?id=${this.editId}`, params)
+        .then(res => {
+          if (res.status == 1) {
+            this.loadingPage = false
+            this.pending = false
+            return platform.notification({
+              type: 'error',
+              title: '更新客户失败',
+              message: res.message
+            })
+          }
+
+          let fromId = window.frameElement.getAttribute('fromid')
+          this.$platform.refreshTab(fromId)
+
+          window.location.href = `/customer/view/${res.data || this.editId}`
+        })
+        .catch(err => {
+          this.pending = false
+          console.error('err', err)
+          this.loadingPage = false
+        })
+    },
+    reloadTab() {
+      let fromId = window.frameElement.getAttribute('fromid')
+
+      this.$platform.refreshTab(fromId)
     }
   },
-  mounted(){
-    this.initialize();
-    
+  async mounted() {
+    try {
+      console.log('initData:', this.initData)
+
+      this.auth = this.initData.auth || {}
+      // 初始化默认值
+      // 清空表单
+      this.$emit('input', {})
+      this.init = false
+      
+      //let tasktypes = (await TaskApi.taskType()) || []
+
+      this.fields = await TaskApi.getTemplateFields(this.types[0].id)
+      this.form = FormUtil.initialize(this.fields, this.form)
+      console.log(this.fields, this.form)
+
+      this.init = true
+    } catch (e) {
+      console.error('error ', e)
+    }
+  },
+  components: {
+    [TaskEditForm.name]: TaskEditForm
   }
 }
 </script>
 
 <style lang="scss">
-.form-taskNo{
+.form-taskNo {
   color: #8a8a8a;
-  font-style: italic;
   line-height: 32px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 </style>
-
