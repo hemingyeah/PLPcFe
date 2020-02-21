@@ -1,5 +1,5 @@
 <template>
-  <div class="customer-container">
+  <div class="task-container">
     <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
       <div class="page-title">
         <div class="title">
@@ -185,11 +185,59 @@ export default {
 </script>
 
 <style lang="scss">
-.form-taskNo {
-  color: #8a8a8a;
-  line-height: 32px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+body {
+  padding: 10px;
+}
+
+.task-container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background-color: #fff;
+
+  .page-title {
+    border-bottom: 1px solid #f4f7f5;
+    padding: 12px 10px;
+    display: flex;
+    justify-content: space-between;
+
+    .iconfont {
+      font-size: 12px;
+    }
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      span.text {
+        line-height: 34px;
+        margin-right: 12px;
+      }
+    }
+  }
+}
+
+.form-builder {
+  width: 655px;
+  padding: 10px 0 0 10px;
+
+  .input-and-btn {
+    display: flex !important;
+    flex-flow: row nowrap;
+
+    .form-item,
+    .form-text,
+    .form-select,
+    .biz-team-select {
+      flex: 1;
+    }
+
+    .base-dist-picker {
+      padding-right: 0;
+    }
+
+    button {
+      margin-left: 10px;
+    }
+  }
 }
 </style>

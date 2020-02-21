@@ -51,6 +51,7 @@
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
+                  <a href="javascript:;" @click="goCreateTask">新建工单</a>
                 </div>
               </el-popover>
 
@@ -599,7 +600,15 @@ export default {
         url: "/setting/doMyself/wxSet",
         reload: true
       });
-    }
+    },
+    goCreateTask() {
+      platform.openTab({
+        id: 'task_create',
+        title: '新建工单',
+        url: '/task/create',
+        reload: true,
+      });
+    },
   },
   created() {
     // TODO: 迁移完成后删除

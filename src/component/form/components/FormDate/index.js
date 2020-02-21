@@ -6,7 +6,7 @@ import DateSearch from './extend/DateSearch.vue'
 
 let FormDateField = {
   formType: 'date', // 字段类型
-  name: '日期',
+  name: 'date',
   isSystem: 0,
   component: {
     setting: FormDateSetting,
