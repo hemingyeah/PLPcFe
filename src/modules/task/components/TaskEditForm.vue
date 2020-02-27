@@ -43,7 +43,7 @@
           <form-text :field="field" :value="selectCustomer.lmName" @update="update" />
         </form-item>
         <form-item v-if="customerOption.address" label="地址">
-          <form-address :field="field" :value="customerAddress" @update="update" :taskDisableUpdate="true"/>
+          <form-address :field="field" :value="customerAddress" @update="update" :task-disable-update="true"/>
         </form-item>
         <form-item v-if="customerOption.product" label="产品">
           <base-select
@@ -221,7 +221,7 @@ export default {
             customerAddress:customer.customerAddress
           })
         )
-        //console.log('customers : ', res);
+        // console.log('customers : ', res);
         return res
       } catch (error) {
         console.error(error)
@@ -231,7 +231,7 @@ export default {
     searchProduct(params) {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {}
-      //这里判断是否有客户信息
+      // 这里判断是否有客户信息
       console.log(this.selectCustomer);
       if(this.selectCustomer && this.selectCustomer.value){
         pms.customerId = this.selectCustomer.value;
@@ -267,8 +267,8 @@ export default {
       EventBus.$emit('es.Relation.Product', forRelation)
 
       // 获取产品明细
-      //let res = await getProductDetail({id: template.id});
-      //console.log('product res:', res);
+      // let res = await getProductDetail({id: template.id});
+      // console.log('product res:', res);
       
       // 产品说明信息 field_8pBY7AYs6W4axVzK
       // 产品多行文本 field_hQ47BtvO7WFKDA7y

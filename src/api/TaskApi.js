@@ -90,9 +90,9 @@ export function taskType() {
  * @param {*} templateId - 工单类型id
  * @returns [fields]
  */
-export function getTemplateFields(templateId) {
+export function getTemplateFields(templateId, tableName = 'task') {
   return http.get('/task/getTaskTemplateFields', {
-    tableName: 'task',
+    tableName,
     templateId
   })
 }

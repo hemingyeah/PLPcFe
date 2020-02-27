@@ -133,7 +133,7 @@ export function initialize(fields = [], origin = {}, callback){
     }
 
     // 多选和附件的默认值初始化为空数组
-    if(isMultiSelect(field) || field.formType == 'attachment'){
+    if(isMultiSelect(field) || field.formType == 'attachment' || field.formType == 'taskAttachment' || field.formType == 'receiptAttachment'){
       defaultValue = [];
     }
 

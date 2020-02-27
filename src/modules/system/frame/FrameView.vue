@@ -52,6 +52,7 @@
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
                   <a href="javascript:;" @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;" @click="goTaskReceipt">工单回执</a>
                 </div>
               </el-popover>
 
@@ -606,6 +607,14 @@ export default {
         id: 'task_create',
         title: '新建工单',
         url: '/task/create',
+        reload: true,
+      });
+    },
+    goTaskReceipt() {
+      platform.openTab({
+        id: 'task_receipt',
+        title: '工单回执',
+        url: '/task/receipt',
         reload: true,
       });
     },

@@ -16,7 +16,13 @@ import FormLocation from './FormLocation';
 import FormInfo from './FormInfo';
 import FormCascader from './FormCascader';
 import FormCustomer from './FormCustomer';
-import FormRelation from './FormRelation'
+import FormRelation from './FormRelation';
+
+import FormAutograph from './FormAutograph'
+import FormSystemAutograph from './FormSystemAutograph'
+import FormSparepart from './FormSparepart'
+import FormServiceIterm from './FormServiceIterm'
+
 
 // 所有字段
 const ALL_FORM_FIELDS = [
@@ -37,7 +43,11 @@ const ALL_FORM_FIELDS = [
   FormInfo,
   FormCascader,
   FormCustomer,
-  FormRelation
+  FormRelation,
+  FormAutograph,
+  FormSystemAutograph,
+  FormSparepart,
+  FormServiceIterm
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
 const FormFieldMap = {};
@@ -116,7 +126,7 @@ const MODE_MANAGER = {
   task: {
     include: [
       ...COMMON_FIELDS,
-      ...['taskNo', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment']
+      ...['taskNo', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
     ]
   },
   findMode(mode){

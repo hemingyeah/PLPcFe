@@ -7,23 +7,23 @@
             <i class="iconfont icon-arrow-left"></i> 返回
           </button>
           <span class="text">|</span>
-          <button type="submit" :disabled="submitting || pending" class="btn btn-primary">提交</button>
+          <button type="submit" class="btn btn-primary">暂存</button>
         </div>
       </div>
-      <task-edit-form :fields="fields" :types="types" :value="form" ref="form" @updatetemplateId="updatetemplateId"></task-edit-form>
+      <task-receipt-form :fields="fields" :value="form" ref="form"></task-receipt-form>
     </form>
   </div>
 </template>
 
 <script>
-import TaskEditForm from '../components/TaskEditForm.vue'
+import TaskReceiptForm from '../components/TaskReceiptForm.vue'
 import * as TaskApi from '@src/api/TaskApi'
 import * as FormUtil from '@src/component/form/util'
 import * as util from '../util/task'
 import platform from '@src/platform'
-let taskTemplate = {}
+
 export default {
-  name: 'task-edit-view',
+  name: 'task-receipt-view',
   inject: ['initData'],
   data() {
     return {
@@ -35,32 +35,28 @@ export default {
       auth: {}
     }
   },
-  computed: {
-    action() {
-      return this.initData.action
-    },
-    editId() {
-      return this.initData.id || ''
-    },
-    eventId() {
-      return this.initData.eventId || ''
-    },
-    types() {
-      return JSON.parse(`[{"name":"默认工单","id":"1","tags":[]},
-      {"name":"测工单排序4","id":"31cdc36c-918d-4525-9ee8-73c89614a891","tags":[]},
-      {"name":"测试导出12","id":"9ffbc9c2-c8cc-472a-98ff-873c3e50ea63","tags":[]},
-      {"name":"全字段测试","id":"13de8ca3-2d80-46ae-852f-6e692132f0e9","tags":[]},
-      {"name":"测试结算回访","id":"278a103a-5806-4e0c-b102-04e37484f675","tags":[]},
-      {"name":"测试组件","id":"b84170e4-358e-4b4d-8c79-b0aca7074147","tags":[]},
-      {"name":"移动之附加组","id":"1ddde36b-6305-44db-8f1b-958ed39e4ddc","tags":[]},
-      {"name":"工时记录测试","id":"9a4067e8-8d18-45d8-984d-52aa500da2fc","tags":[]}]`)
+  async mounted() {
+    try {
+      console.log('initData:', this.initData)
+
+      this.auth = this.initData.auth || {}
+      // 初始化默认值
+      // 清空表单
+      this.$emit('input', {})
+      this.init = false
+
+      // let tasktypes = (await TaskApi.taskType()) || []
+
+      this.fields = await TaskApi.getTemplateFields('1', 'task_receipt')
+      this.form = FormUtil.initialize(this.fields, this.form)
+      // console.log(this.fields, this.form)
+
+      this.init = true
+    } catch (e) {
+      console.error('error ', e)
     }
   },
   methods: {
-    updatetemplateId(e) {
-      // console.log('e: ', e);
-      taskTemplate = e
-    },
     goBack() {
       if (this.action == 'create') {
         let id = window.frameElement.dataset.id
@@ -76,8 +72,8 @@ export default {
           this.submitting = false
           if (!valid) return Promise.reject('validate fail.')
           const params = util.packToTask(this.fields, this.form)
-          params.templateId = taskTemplate.value
-          params.templateName = taskTemplate.text
+          params.templateId = 1
+          // params.templateName = taskTemplate.text;
           this.pending = true
           this.loadingPage = true
           // if (this.action === 'edit') {
@@ -88,7 +84,7 @@ export default {
           // }
           console.log(params)
 
-          this.createMethod(params)
+          // this.createMethod(params)
         })
         .catch(err => {
           console.error(err)
@@ -98,7 +94,7 @@ export default {
     },
     createMethod(params) {
       this.$http
-        .post('/task/create', params)
+        .post('/task/saveReceiptDraft', params)
         .then(res => {
           let isSucc = !res.status
           platform.notification({
@@ -112,7 +108,7 @@ export default {
           if (!isSucc) return
 
           this.reloadTab()
-          //window.location.href = `/task/view/${res.data.customerId}`
+          // window.location.href = `/task/view/${res.data.customerId}`
         })
         .catch(err => console.error('err', err))
     },
@@ -147,29 +143,8 @@ export default {
       this.$platform.refreshTab(fromId)
     }
   },
-  async mounted() {
-    try {
-      console.log('initData:', this.initData)
-
-      this.auth = this.initData.auth || {}
-      // 初始化默认值
-      // 清空表单
-      this.$emit('input', {})
-      this.init = false
-
-      // let tasktypes = (await TaskApi.taskType()) || []
-
-      this.fields = await TaskApi.getTemplateFields(this.types[0].id)
-      this.form = FormUtil.initialize(this.fields, this.form)
-      console.log(this.fields, this.form)
-
-      this.init = true
-    } catch (e) {
-      console.error('error ', e)
-    }
-  },
   components: {
-    [TaskEditForm.name]: TaskEditForm
+    [TaskReceiptForm.name]: TaskReceiptForm
   }
 }
 </script>
@@ -177,14 +152,6 @@ export default {
 <style lang="scss">
 body {
   padding: 10px;
-}
-
-.form-taskNo {
-  color: #8a8a8a;
-  line-height: 32px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .task-container {

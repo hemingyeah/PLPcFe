@@ -31,6 +31,23 @@ const TaskAttachmentField = {
   }
 }
 
-export default [FormAttachmentField, TaskAttachmentField];
+
+const TaskReceiptAttachmentField = {
+  formType: 'receiptAttachment',
+  fieldName: 'receiptAttachment',
+  name: '回执附件',
+  isSystem: 1,
+  forceDelete: true,
+  component: {
+    preview: FormAttachmentPreview,
+    build: FormAttachment,
+    view: FormAttachmentView,
+    extend: {
+      setting: FormAttachmentSetting
+    }
+  }
+}
+
+export default [FormAttachmentField, TaskAttachmentField, TaskReceiptAttachmentField];
 
 
