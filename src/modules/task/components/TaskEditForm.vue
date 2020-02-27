@@ -29,7 +29,7 @@
         </template>
       </template>
       <!-- 客户 -->
-      <template slot="customer" slot-scope="{ field }" v-if="!customerIsReadonly">
+      <template slot="customer" slot-scope="{ field }">
         <form-item :label="field.displayName" validation>
           <customer-select
             v-model="value.customer"

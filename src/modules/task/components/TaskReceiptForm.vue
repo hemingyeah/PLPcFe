@@ -82,7 +82,7 @@
         </template> 
       </template>
        
-      <template slot="template" slot-scope="{ field }">    
+      <template v-if="hasExpense" slot="template" slot-scope="{ field }">    
         <form-item :label="field.displayName" class="task-receipt-expense">
           <div class="item">
             <label>备件费用</label>
@@ -110,11 +110,6 @@
 </template>
 
 <script>
-import * as TaskApi from '@src/api/TaskApi'
-import * as FormUtil from '@src/component/form/util'
-import FormMixin from '@src/component/form/mixin/form'
-import EventBus from '@src/util/eventBus'
-import _ from 'lodash'
 export default {
   name: 'task-receipt-form',
   props: {
@@ -127,7 +122,6 @@ export default {
       required: true
     },
   },
-  inject: ['initData'],
   data() {
     return {
       validation: false, // this.buildValidation(),
@@ -235,8 +229,6 @@ export default {
         )
       }
       let value = this.value
-      console.log('value', value); 
-      console.log('newValue', newValue);
       this.$set(value, fieldName, newValue)  
       this.$emit('input', newValue)
       this.$nextTick(()=>{
