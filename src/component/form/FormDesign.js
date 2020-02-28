@@ -63,7 +63,10 @@ function getSettingComp(field, comp){
   // 先检测是否有扩展设置
   let extend = comp.extend || {};
   let key = `${this.mode}_${field.fieldName}_setting`;
-  if(extend[key]) return extend[key];
+
+  // TODO: 当fieldName不固定且是系统字段
+  let systemKey = `${this.mode}_${field.formType}_setting`;
+  if(extend[key] || extend[systemKey]) return extend[key] || extend[systemKey];
 
   // 系统字段默认设置
   if(field.isSystem == 1) return null;

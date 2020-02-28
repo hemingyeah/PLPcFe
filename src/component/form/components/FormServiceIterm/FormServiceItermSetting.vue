@@ -2,8 +2,13 @@
   <div class="form-setting-panel">
     <h3>基础字段 -- {{setting.name}}</h3>
     <div class="form-setting-group">
-      <p class="form-separator-setting-tips">备件组件可以在工单完成时选择备件库中的备件直接管理核销出库，并生成价格。</p>
-      <input type="text" placeholder="请输入标题" data-prop="displayName" :value="field.displayName" @input="update" :maxlength="nameMaxLength">
+      <p class="form-separator-setting-tips">服务项目组件可以在工单完成时选择已维护的标准服务项目，并生成价格。</p>
+      <div class="form-setting-group">
+        <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+      </div>
+      <div class="form-setting-group">
+        <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
+      </div>
     </div>
     
   </div>
@@ -26,12 +31,15 @@ export default {
     }
   },
   methods: {
-    update(event){
+    updateForDom(event){
       let el = event.target;
       let prop = el.dataset.prop;
       let value = el.value;
-
-      this.$emit('input', {value, prop})
+      
+      this.update(value, prop)
+    },
+    update(value, prop){
+      this.$emit('input', {value, prop});
     }
   }
 }

@@ -3,6 +3,9 @@
   <!-- start autograph setting -->
   <div class="form-setting-panel">
     <h3>{{setting.isSystem == 1 ? '系统' : '基础'}}字段 -- {{setting.name}}</h3>
+    <div class="form-setting-group" v-if="setting.isSystem == 0">
+      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
+    </div>
     <div class="form-setting-group">
       <textarea rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
     </div>

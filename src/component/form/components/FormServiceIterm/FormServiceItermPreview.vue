@@ -1,6 +1,9 @@
 <template>
   <div class="form-preview-group">
-    <div class="form-design-separator"><span v-if="field.displayName">{{field.displayName}}</span></div>
+    <label>{{field.displayName}} <span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
+    <div class="form-preview-mock">
+      <p class="form-preview-control">{{field.placeHolder}}</p>
+    </div>
   </div>
 </template>
 

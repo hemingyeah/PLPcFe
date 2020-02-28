@@ -7,9 +7,11 @@ let FormServiceItermField = {
   name: '服务项目',
   isSystem: 1,
   component: {
-    setting: FormServiceItermSetting,
     preview: FormServiceItermPreview,
-    build: FormServiceIterm
+    build: FormServiceIterm,
+    extend: {
+      'task_serviceIterm_setting': FormServiceItermSetting
+    }
   }
 };
 
