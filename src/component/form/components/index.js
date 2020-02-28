@@ -7,6 +7,7 @@ import FormAttachment from './FormAttachment';
 import FormUser from './FormUser';
 import FormDate from './FormDate';
 import FormDatetime from './FormDatetime';
+import FormPlantime from './FormPlantime';
 import FormPhone from './FormPhone';
 import FormEmail from './FormEmail';
 import FormSeparator from './FormSeparator';
@@ -34,6 +35,7 @@ const ALL_FORM_FIELDS = [
   FormUser,
   FormDate,
   FormDatetime,
+  FormPlantime,
   FormPhone,
   FormEmail,
   FormSeparator,

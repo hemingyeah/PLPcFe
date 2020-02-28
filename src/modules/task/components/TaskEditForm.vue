@@ -17,16 +17,9 @@
       </template>
       <!-- 计划时间 -->
       <template slot="planTime" slot-scope="{ field, value }">
-        <template v-if="field.setting === 'date'">
-          <form-item :label="field.displayName">
-            <form-date :field="field" :value="value" @update="update"></form-date>
-          </form-item>
-        </template>
-        <template v-else>
-          <form-item :label="field.displayName">
-            <form-datetime :field="field" :value="value" @update="update"></form-datetime>
-          </form-item>
-        </template>
+        <form-item :label="field.displayName">
+          <form-plantime :field="field" :value="value" @update="update"></form-plantime>
+        </form-item>
       </template>
       <!-- 客户 -->
       <template slot="customer" slot-scope="{ field }">
@@ -66,14 +59,6 @@
           </base-select>
         </form-item>
       </template>
-      <!-- <template slot="serialNumber" slot-scope="{field}">
-        <form-item :label="field.displayName" >
-          <form-text
-            :field="field"
-            :value="value.serialNumber" @update="update"
-          />
-        </form-item>
-      </template> -->
     </form-builder>
   </div>
 </template>

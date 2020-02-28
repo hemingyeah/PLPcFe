@@ -17,17 +17,5 @@ let FormDateField = {
     }
   }
 }
-const TaskPlanTimeField = {
-  formType: 'planTime',
-  name: '计划时间',
-  isSystem: 1,
-  setting: {
-    dateType: 'date'
-  },
-  component: {
-    setting: FormDateSetting,
-    preview: FormDatePreview,
-    build: FormDate
-  }
-}
-export default [FormDateField, TaskPlanTimeField]
+
+export default FormDateField

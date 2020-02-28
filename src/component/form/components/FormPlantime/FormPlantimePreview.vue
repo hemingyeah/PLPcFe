@@ -4,6 +4,7 @@
     <div class="form-preview-mock">
       <p class="form-preview-control form-preview-withIcon">
         {{field.placeHolder}}
+        <i :class="`iconfont icon-fd-${type}`"></i>
       </p>
     </div>
   </div>
@@ -11,7 +12,7 @@
 
 <script>
 export default {
-  name: 'form-autograph-preview',
+  name: 'form-plantime-preview',
   props: {
     field: {
       type: Object,
@@ -21,6 +22,21 @@ export default {
       type: Object,
       default: () => ({})
     }
+  },
+  data() {
+    return {
+      type: this.field.setting.dateType === 'date' ? 'date' : 'datetime'
+    }
+  },
+  watch: {
+    'field.setting.dateType': {
+      handler(newValue, oldValue) {
+        this.type = newValue === 'date' ? 'date' : 'datetime';
+      },
+      deep: true,
+      immediate: true
+    }  
   }
 }
 </script>
+
