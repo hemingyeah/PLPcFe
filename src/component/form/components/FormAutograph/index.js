@@ -2,21 +2,32 @@ import FormAutographSetting from './FormAutographSetting.vue';
 import FormAutographPreview from './FormAutographPreview.vue';
 import FormAutographView from './FormAutographView.vue';
 import FormAutograph from './FormAutograph.vue';
-import FormAutographSearch from './extend/FormAutographSearch.vue';
 
 let FormLocationField = {
   formType: 'autograph', // 字段类型
-  name: '签名',
+  name: '电子签名',
   isSystem: 0,
   component: {
     build: FormAutograph,
     setting: FormAutographSetting,
     preview: FormAutographPreview,
     view: FormAutographView,
+  }
+};
+
+let FormSystemAutographField = {
+  formType: 'systemAutograph', // 字段类型
+  name: '客户签名',
+  isSystem: 1,
+  component: {
+    build: FormAutograph,
+    setting: FormAutographSetting,
+    preview: FormAutographPreview,
+    view: FormAutographView,
     extend: {
-      'location_search': FormAutographSearch
+      'task_systemAutograph_setting': FormAutographSetting
     }
   }
 };
 
-export default FormLocationField;
+export default [FormLocationField, FormSystemAutographField];

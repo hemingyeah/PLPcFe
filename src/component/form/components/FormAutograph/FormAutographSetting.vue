@@ -1,20 +1,16 @@
 <template>
 
-  <!-- start location setting -->
+  <!-- start autograph setting -->
   <div class="form-setting-panel">
-    <h3>基础字段 -- {{setting.name}}</h3>
+    <h3>{{setting.isSystem == 1 ? '系统' : '基础'}}字段 -- {{setting.name}}</h3>
     <div class="form-setting-group">
-      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
-    </div>
-    <div class="form-setting-group">
-      <textarea placeholder="一种支持在移动端上传地理位置的字段，pc端无法填写" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+      <textarea rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-      <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
     </div>
   </div>
-  <!-- end location setting -->
+  <!-- end autograph setting -->
 
 </template>
 

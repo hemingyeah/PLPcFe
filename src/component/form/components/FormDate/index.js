@@ -6,7 +6,7 @@ import DateSearch from './extend/DateSearch.vue'
 
 let FormDateField = {
   formType: 'date', // 字段类型
-  name: 'date',
+  name: '日期',
   isSystem: 0,
   component: {
     setting: FormDateSetting,
@@ -27,7 +27,7 @@ const TaskPlanTimeField = {
   component: {
     setting: FormDateSetting,
     preview: FormDatePreview,
-    build: FormDateField
+    build: FormDate
   }
 }
 export default [FormDateField, TaskPlanTimeField]

@@ -19,7 +19,6 @@ import FormCustomer from './FormCustomer';
 import FormRelation from './FormRelation';
 
 import FormAutograph from './FormAutograph'
-import FormSystemAutograph from './FormSystemAutograph'
 import FormSparepart from './FormSparepart'
 import FormServiceIterm from './FormServiceIterm'
 
@@ -45,7 +44,6 @@ const ALL_FORM_FIELDS = [
   FormCustomer,
   FormRelation,
   FormAutograph,
-  FormSystemAutograph,
   FormSparepart,
   FormServiceIterm
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
@@ -126,7 +124,7 @@ const MODE_MANAGER = {
   task: {
     include: [
       ...COMMON_FIELDS,
-      ...['taskNo', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
+      ...['taskNo', 'cascader', 'address', 'relationCustomer', 'relationProduct', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
     ]
   },
   findMode(mode){

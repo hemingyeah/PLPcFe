@@ -26,7 +26,7 @@ const TaskAttachmentField = {
     build: FormAttachment,
     view: FormAttachmentView,
     extend: {
-      setting: FormAttachmentSetting
+      'task_attachment_setting': FormAttachmentSetting
     }
   }
 }
@@ -43,7 +43,7 @@ const TaskReceiptAttachmentField = {
     build: FormAttachment,
     view: FormAttachmentView,
     extend: {
-      setting: FormAttachmentSetting
+      'task_receiptAttachment_setting': FormAttachmentSetting
     }
   }
 }

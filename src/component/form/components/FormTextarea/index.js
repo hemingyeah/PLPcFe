@@ -26,10 +26,7 @@ let TaskDescriptionField = {
   forceDelete: true,
   component: {
     preview: FormTextareaPreview,
-    build: FormTextarea,
-    extend: {
-      'task_description_setting': FormTextareaSetting
-    }
+    build: FormTextarea
   }
 }
 
