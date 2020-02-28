@@ -7,9 +7,11 @@ let FormSparepartField = {
   name: '备件',
   isSystem: 1,
   component: {
-    setting: FormSparepartSetting,
     preview: FormSparepartPreview,
-    build: FormSparepart
+    build: FormSparepart,
+    extend: {
+      'task_sparepart_setting': FormSparepartSetting
+    }
   }
 };
 
