@@ -125,6 +125,10 @@ export default class FormField{
     if(field.formType === 'info') {
       option.placeHolder = option.placeHolder || FormInfoConfig.PLACE_HOLDER;
     }
+
+    if(field.formType === 'cascader') {
+      defaultValue = field.defaultValue;
+    }
     
     if (field.setting) {
       setting = {
