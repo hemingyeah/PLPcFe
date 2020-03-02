@@ -11,11 +11,16 @@
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
       <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
     </div>
+    <h3>选项</h3>
+    <div class="form-setting-group form-select-setting-operation">
+      <button type="button" class="btn-text" @click="open">配置选项</button>
+    </div>
   </div>
 </template>
 
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
+import Cascader from './components/index';
 
 export default {
   name: 'form-cascader-setting',
@@ -36,10 +41,23 @@ export default {
       let prop = el.dataset.prop;
       let value = el.value;
       
-      this.update(value, prop)
+      this.update(value, prop);
     },
     update(value, prop){
-      this.$emit('input', {value, prop})
+      this.$emit('input', {value, prop});
+    },
+    open(){
+      let source = this.field.setting.dataSource || [];
+      let maxDeep = this.field.setting.maxDeep || 2;
+      let defaultValue = (this.field.defaultValue && this.field.defaultValue.split(',')) || [];
+
+      Cascader.setting(source, maxDeep, defaultValue).then(result => {
+        if(result.status == 0) {
+          this.field.setting.dataSource = result.data.dataSource;
+          this.field.setting.maxDeep = result.data.maxDeep;
+          this.field.defaultValue = result.data.defaultValue.join(',');
+        }
+      })
     }
   }
 }
