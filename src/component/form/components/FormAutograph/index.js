@@ -1,6 +1,5 @@
 import FormAutographSetting from './FormAutographSetting.vue';
 import FormAutographPreview from './FormAutographPreview.vue';
-import FormAutographView from './FormAutographView.vue';
 import FormAutograph from './FormAutograph.vue';
 
 let FormLocationField = {
@@ -10,8 +9,7 @@ let FormLocationField = {
   component: {
     build: FormAutograph,
     setting: FormAutographSetting,
-    preview: FormAutographPreview,
-    view: FormAutographView,
+    preview: FormAutographPreview
   }
 };
 
@@ -23,7 +21,6 @@ let FormSystemAutographField = {
     build: FormAutograph,
     setting: FormAutographSetting,
     preview: FormAutographPreview,
-    view: FormAutographView,
     extend: {
       'task_systemAutograph_setting': FormAutographSetting
     }

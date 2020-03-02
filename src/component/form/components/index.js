@@ -126,7 +126,13 @@ const MODE_MANAGER = {
   task: {
     include: [
       ...COMMON_FIELDS,
-      ...['taskNo', 'cascader', 'address', 'relationCustomer', 'relationProduct', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
+      ...['taskNo', 'cascader', 'address', 'relationCustomer', 'relationProduct', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment']
+    ]
+  },
+  task_receipt: {
+    include: [
+      ...COMMON_FIELDS,
+      ...['cascader', 'address', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
     ]
   },
   findMode(mode){

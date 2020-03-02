@@ -10,9 +10,5 @@ module.exports = {
   'task.receipt': {
     entry: './src/modules/task/receipt.js',
     template: 'src/templates/map.html'
-  },
-  'task.fields': {
-    entry: './src/modules/setting/task/fields.js',
   }
-
 }

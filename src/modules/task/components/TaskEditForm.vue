@@ -6,13 +6,7 @@
           <div class="form-taskNo">{{ value || "工单编号将在创建后由系统生成" }}</div>
         </form-item>
         <form-item label="工单类型" :validation="false">
-          <form-select
-            :field="field"
-            :source="taskTypes"
-            :value="taskType"
-            :clearable="false"
-            @input="chooseTemplate"
-          />
+          <form-select :field="field" :source="taskTypes" :value="taskType" :clearable="false" @input="chooseTemplate"/>
         </form-item>
       </template>
       <!-- 计划时间 -->
@@ -174,7 +168,6 @@ export default {
         id: value[0].value
       }
       console.info('forRelation: ', forRelation);
-      
       EventBus.$emit('es.Relation.Customer', forRelation)
     },
 
@@ -241,7 +234,7 @@ export default {
         module: 'product',
         id: value[0].value
       }
-      console.info('forRelation: ', forRelation);
+      console.info('Product forRelation: ', forRelation);
       EventBus.$emit('es.Relation.Product', forRelation)
 
       // 获取产品明细

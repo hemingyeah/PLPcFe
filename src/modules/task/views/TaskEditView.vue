@@ -86,7 +86,7 @@ export default {
           // if (this.action === 'createFromEvent') {
           //   return this.createCustomerForEvent(params)
           // }
-          console.log(params)
+          console.info(params)
 
           this.createMethod(params)
         })
@@ -112,20 +112,20 @@ export default {
           if (!isSucc) return
 
           this.reloadTab()
-          //window.location.href = `/task/view/${res.data.customerId}`
+          // window.location.href = `/task/view/${res.data.customerId}`
         })
         .catch(err => console.error('err', err))
     },
     updateMethod(params) {
       this.$http
-        .post(`/customer/update?id=${this.editId}`, params)
+        .post(`/task/update?id=${this.editId}`, params)
         .then(res => {
           if (res.status == 1) {
             this.loadingPage = false
             this.pending = false
             return platform.notification({
               type: 'error',
-              title: '更新客户失败',
+              title: '更新工单失败',
               message: res.message
             })
           }
@@ -133,7 +133,7 @@ export default {
           let fromId = window.frameElement.getAttribute('fromid')
           this.$platform.refreshTab(fromId)
 
-          window.location.href = `/customer/view/${res.data || this.editId}`
+          // window.location.href = `/task/view/${res.data || this.editId}`
         })
         .catch(err => {
           this.pending = false
@@ -149,7 +149,7 @@ export default {
   },
   async mounted() {
     try {
-      console.log('initData:', this.initData)
+      console.info('initData:', this.initData)
 
       this.auth = this.initData.auth || {}
       // 初始化默认值
@@ -161,7 +161,7 @@ export default {
 
       this.fields = await TaskApi.getTemplateFields(this.types[0].id)
       this.form = FormUtil.initialize(this.fields, this.form)
-      console.log(this.fields, this.form)
+      console.info(this.fields, this.form)
 
       this.init = true
     } catch (e) {

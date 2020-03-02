@@ -29,11 +29,4 @@ router.get('/task/receipt', async ctx => {
   ctx.body = Template.renderWithData('表单回执', {}, script, modConfig.template)
 });
 
-router.get('/task/fields', async ctx => {
-  let modConfig = modules['task.fields'];
-  let script = ['/task.fields.js'];
-  
-  ctx.body = Template.renderWithData('工单设置', {}, script, modConfig.template)
-});
-
 module.exports = router;

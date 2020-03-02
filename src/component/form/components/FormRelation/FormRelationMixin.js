@@ -28,7 +28,6 @@ export default {
     }
   },
   mounted() {
-    // console.log('formType:', this.field.formType)
     if (this.field.formType == 'relationCustomer') {
       EventBus.$on('es.Relation.Customer', this.update)
     }
@@ -40,23 +39,20 @@ export default {
     async update(forRelation) {  
       let action = 'task/relatedFieldValue'
       let oldValue = this._value
+      console.info('oldvalue: ', oldValue);
+      
       let newValue
       forRelation.fieldName = this.setting.fieldName
       forRelation.formType = this.setting.formType
       if (forRelation.from == 'event') action = 'event/relatedFieldValue'
-      // console.log(forRelation)
+      console.info('forRelation:', forRelation)
       if (forRelation.id && forRelation.id !== '') { 
-        try {
-          const res = await this.$http.get('/dd/task/relatedFieldValue', forRelation)
-          // console.log('relation:', res)
+        this.$http.get('/task/getRelatedInfo', forRelation).then(res => {
           if(res.status == 0){
             newValue = res.data
-            // this.$emit('input', {newValue, oldValue})
             this.$emit('update', {newValue, oldValue, field: this.field})
           }
-        } catch (error) {
-          console.error(error)
-        }
+        }).catch(err => console.error(err))
       } 
     }
   }

@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="setting-task-design">
-      <form-design v-model="fields" mode="task" v-if="init"></form-design>
+      <form-design v-model="fields" mode="task_receipt" v-if="init"></form-design>
     </div>
   </div>
 </template>
@@ -31,15 +31,8 @@ export default {
     }
   },
   async mounted(){
-    let fields = await http.get('/task/getTaskTemplateFields', {tableName: 'task', templateId: '1'});
+    let fields = await http.get('/task/getTaskTemplateFields', {tableName: 'task_receipt', templateId: '1'});
     let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
-
-    // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
-    sortedFields.forEach(f => {
-      if(f.formType == 'attachment' && f.isSystem == 1){
-        f.formType = 'taskAttachment'
-      }
-    }) 
     
     this.fields = FormUtil.toFormField(sortedFields);
     this.init = true;
@@ -53,14 +46,11 @@ export default {
         let fields = FormUtil.toField(this.fields);
         let index = 0;
         fields.forEach(item => {
-          item.tableName = 'task';
+          item.tableName = 'task_receipt';
           item.orderId = index++;
           item.tenantId = this.tenantId;
           item.templateId = this.templateId;
           item.templateName = this.templateName;
-          if(item.formType == 'taskAttachment' && item.isSystem) {
-            item.formType = 'attachment';
-          }
         });
 
         let message = FormUtil.validate(fields);
@@ -74,14 +64,14 @@ export default {
           platform.notification({
             type: 'success',
             title: '成功',
-            message: '工单字段更新成功'
+            message: '工单回执表单更新成功'
           })  
           return window.location.reload()
         }
 
         platform.notification({
           type: 'error',
-          title: '工单字段更新失败',
+          title: '工单回执表单更新失败',
           message: result.message
         })
       } catch (error) {

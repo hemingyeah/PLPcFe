@@ -10,5 +10,8 @@ module.exports = {
   },
   'setting.task.fields': {
     entry: './src/modules/setting/task/fields.js'
+  },
+  'setting.task.receipt_fields': {
+    entry: './src/modules/setting/task/receipt_fields.js',
   }
 }
