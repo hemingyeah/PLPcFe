@@ -1,4 +1,5 @@
 /* eslint-disable vue/html-indent */
+import _ from 'lodash'
 import EventBus from '@src/util/eventBus'
 export default {
   name: 'form-relation-mixin',
@@ -37,23 +38,20 @@ export default {
   },
   methods: {
     async update(forRelation) {  
-      let action = 'task/relatedFieldValue'
+      // let action = 'task/relatedFieldValue'
       let oldValue = this._value
-      console.info('oldvalue: ', oldValue);
-      
-      let newValue
+      let newValue = _.cloneDeep(this.value)
       forRelation.fieldName = this.setting.fieldName
       forRelation.formType = this.setting.formType
-      if (forRelation.from == 'event') action = 'event/relatedFieldValue'
-      console.info('forRelation:', forRelation)
+      // if (forRelation.from == 'event') action = 'event/relatedFieldValue'
       if (forRelation.id && forRelation.id !== '') { 
-        this.$http.get('/task/getRelatedInfo', forRelation).then(res => {
+        this.$http.get('/task/getRelatedInfo', _.cloneDeep(forRelation)).then(res => {
           if(res.status == 0){
             newValue = res.data
             this.$emit('update', {newValue, oldValue, field: this.field})
           }
         }).catch(err => console.error(err))
-      } 
+      }
     }
   }
 }

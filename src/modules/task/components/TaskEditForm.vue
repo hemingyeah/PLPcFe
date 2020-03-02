@@ -17,7 +17,7 @@
       </template>
       <!-- 客户 -->
       <template slot="customer" slot-scope="{ field }">
-        <form-item :label="field.displayName" validation>
+        <form-item :label="field.displayName">
           <customer-select
             v-model="value.customer"
             :field="customerField"
@@ -58,11 +58,11 @@
 </template>
 
 <script>
+import platform from '@src/platform'
 import * as TaskApi from '@src/api/TaskApi'
 import * as FormUtil from '@src/component/form/util'
 import FormMixin from '@src/component/form/mixin/form'
 import EventBus from '@src/util/eventBus'
-import _ from 'lodash'
 export default {
   name: 'task-edit-form',
   props: {
@@ -157,7 +157,6 @@ export default {
 
     async updateCustomer(value) {
       const cf = this.fields.filter(f => f.fieldName === 'customer')[0]
-      console.info('val===', cf, value);
       this.update({
         field: cf,
         newValue: value
@@ -167,7 +166,6 @@ export default {
         module: 'customer',
         id: value[0].value
       }
-      console.info('forRelation: ', forRelation);
       EventBus.$emit('es.Relation.Customer', forRelation)
     },
 
@@ -204,53 +202,41 @@ export default {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {}
       // 这里判断是否有客户信息
-      console.info(this.selectCustomer);
+      // console.info(this.selectCustomer);
       if(this.selectCustomer && this.selectCustomer.value){
         pms.customerId = this.selectCustomer.value;
       }
-      return this.$http
-        .post('/product/list/data', pms)
-        .then(res => {
-          if (!res || !res.list) return
-          res.list = res.list.map(template =>
-            Object.freeze({
-              label: template.name,
-              value: template.id,
-              ...template
-            })
-          )
-          // console.info('product list:', res);          
-          return res
-        })
-        .catch(e => console.error(e))
+      return this.$http.post('/task/customer/product', pms).then(res => {
+        if (!res || !res.list) return
+        res.list = res.list.map(template =>
+          Object.freeze({
+            label: template.name,
+            value: template.id,
+            ...template
+          })
+        )     
+        return res
+      }).catch(e => console.error(e))
     },
     
     async updateProduct(value) {
       let nv = null;
-      const template = value[0];
-      console.info(template);     
+      const template = value[0];   
       // 查询产品关联字段
       let forRelation = {
         module: 'product',
         id: value[0].value
       }
-      console.info('Product forRelation: ', forRelation);
       EventBus.$emit('es.Relation.Product', forRelation)
 
       // 获取产品明细
       // let res = await getProductDetail({id: template.id});
       // console.log('product res:', res);
-      
-      // 产品说明信息 field_8pBY7AYs6W4axVzK
-      // 产品多行文本 field_hQ47BtvO7WFKDA7y
-      // 地址关联 field_AC7SqxMQEfVOP2G7
-      // 产品类型 field_BgW8LzfV3yeDnlj7
-      // 产品编号 field_JwYLcnHcAS9Z4lbY
     
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
         if (f.formType === 'address') {
-          console.info('nv:', nv)
+          // console.info('nv:', nv)
         }
         if (!!nv && f.fieldName != 'customer' && f.fieldName != 'template') { 
           this.update(({
@@ -328,5 +314,8 @@ export default {
       }
     }
   }
+}
+.input-and-btn .base-select-container{
+  flex: 1;
 }
 </style>
