@@ -1,24 +1,19 @@
-const FormCustomerField = {
+import FormCustomerSetting from './FormCustomerSetting.vue'
+import FormCustomerPreview from './FormCustomerPreview.vue'
+import FormCustomer from './FormCustomer.vue'
+
+let FormCustomerField = {
   formType: 'customer',
   name: '客户',
   isSystem: 1,
   component: {
-    setting: {
-      name: 'form-customer-setting',
-      render(){
-        return <div>form customer setting</div>
-      }
-    },
-    preview: {
-      name: 'form-customer-preview',
-      render(){
-        return <div>form customer preview</div>
-      }
-    },
+    setting: FormCustomerSetting,
+    preview: FormCustomerPreview,
+    build: FormCustomer,
     extend: {
-      
+      'task_customer_setting': FormCustomerSetting
     }
   }
-};
+}
 
-export default FormCustomerField;
+export default FormCustomerField

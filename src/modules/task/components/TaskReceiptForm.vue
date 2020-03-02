@@ -38,7 +38,7 @@
 
             <el-table-column label="小计" prop="total" width="100px"></el-table-column>
           
-            <el-table-column label="操作" width="70px">
+            <el-table-column label="操作" width="70px" fixed="right">
               <template slot-scope="scope">
                 <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleSparepartDelete(scope.$index)"/>
               </template>

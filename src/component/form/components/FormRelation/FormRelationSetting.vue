@@ -2,35 +2,27 @@
   <div class="form-setting-panel">
     <h3>基础字段 -- {{ setting.name }}</h3>
     <div class="form-setting-group">
-      <input
-        type="text"
-        placeholder="[必填] 请输入字段标题"
-        data-prop="displayName"
-        :value="field.displayName"
-        @input="updateForDom"
-        :maxlength="nameMaxLength"/>
+      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
     </div>
     <div class="form-setting-group">
-      <textarea
-        placeholder="请在此添加描述信息"
-        rows="3"
-        data-prop="placeHolder"
-        :value="field.placeHolder"
-        @input="updateForDom"
-        :maxlength="placeholderMaxLength">
-      </textarea>
+      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+    </div>
+    <h3>关联项字段</h3>
+    <div class="form-setting-group"> 
+      <el-select v-model="field.setting.fieldName">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.displayName"
+          :value="item.fieldName">
+        </el-option>
+      </el-select>
     </div>
     <div class="form-setting-group">
-      <el-checkbox
-        :value="field.isNull"
-        @input="update($event, 'isNull')"
-        :true-label="0"
-        :false-label="1">必填
-      </el-checkbox>
+      <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
     </div>
   </div>
 </template>
-
 <script>
 import SettingMixin from '@src/component/form/mixin/setting'
 
@@ -45,6 +37,29 @@ export default {
     setting: {
       type: Object,
       default: () => ({})
+    }
+  },
+  computed: {
+    options() {
+      return this.field.formType === 'relationCustomer' ? this.customerFields : this.productFields; 
+    }
+  },
+  data() {
+    return {
+      customerFields: [
+        {fieldId: 'serialNumber', tableName: 'customer', fieldName: 'serialNumber', 
+          displayName: '客户编号', isSystem: '0', isSearch: '1', formType: 'text'},
+        {fieldId: 'tags', tableName: 'customer', fieldName: 'tags', displayName: '服务团队',
+          isSystem: '0', isSearch: '1', formType: 'selectMulti'},
+        {fieldId: 'customerManager', tableName: 'customer', fieldName: 'customerManager',
+          displayName: '客户负责人', isSystem: '0', isSearch: '1', formType: 'text'}
+      ],
+      productFields: [
+        {fieldId: 'serialNumber', tableName: 'customer', fieldName: 'serialNumber', 
+          displayName: '产品编号', isSystem: '0', isSearch: '1', formType: 'text'},
+        {fieldId: 'type', tableName: 'customer', fieldName: 'type', displayName: '产品类型', 
+          isSystem: '0', isSearch: '1', formType: 'select'}
+      ],
     }
   },
   methods: {

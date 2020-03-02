@@ -20,9 +20,8 @@ export default {
     _value() {
       return this.value
     },
-
     setting() {
-      return this.field.setting
+      return this.field.setting || {}
     },
     required() {
       return this.field.isNull === 0
@@ -44,19 +43,16 @@ export default {
       let newValue
       forRelation.fieldName = this.setting.fieldName
       forRelation.formType = this.setting.formType
-
       if (forRelation.from == 'event') action = 'event/relatedFieldValue'
-      
-      //console.log(forRelation)
-
+      // console.log(forRelation)
       if (forRelation.id && forRelation.id !== '') { 
         try {
           const res = await this.$http.get('/dd/task/relatedFieldValue', forRelation)
-          // console.log('relation:', res);
+          // console.log('relation:', res)
           if(res.status == 0){
             newValue = res.data
-            //this.$emit('input', {newValue, oldValue});
-            this.$emit('update', {newValue, oldValue, field: this.field});
+            // this.$emit('input', {newValue, oldValue})
+            this.$emit('update', {newValue, oldValue, field: this.field})
           }
         } catch (error) {
           console.error(error)

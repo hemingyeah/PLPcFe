@@ -6,10 +6,9 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-import FormRelationMixin from './FormRelationMixin.js'
 export default {
-  name: 'form-relation',
-  mixins: [FormMixin, FormRelationMixin],
+  name: 'form-customer',
+  mixins: [FormMixin],
   props: {
     value: {
       type: String,
@@ -19,14 +18,12 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .form-text{
   width: 100%;
 
   input{
     width: 100%;
-    background: #eee;
   }
 }
 </style>
-

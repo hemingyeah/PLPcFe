@@ -4,7 +4,7 @@
       <span class="form-preview-notNull" v-if="field.isNull == 0">*</span>
     </label>
     <div class="form-preview-mock">
-      <p class="form-preview-control">
+      <p class="form-preview-control form-relation-preview-control">
         {{ field.placeHolder }}
       </p>
     </div>
@@ -26,3 +26,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.form-relation-preview-control{
+  background: #eee;
+}
+</style>

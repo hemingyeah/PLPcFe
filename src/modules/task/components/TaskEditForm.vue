@@ -64,7 +64,6 @@
 </template>
 
 <script>
-import { getProductDetail } from '@src/api/ProductApi';
 import * as TaskApi from '@src/api/TaskApi'
 import * as FormUtil from '@src/component/form/util'
 import FormMixin from '@src/component/form/mixin/form'
@@ -80,10 +79,6 @@ export default {
     value: {
       type: Object,
       required: true
-    },
-    customerIsReadonly: {
-      type: Boolean,
-      default: false
     },
     types:{
       type: Array
@@ -137,7 +132,6 @@ export default {
   },
   methods: {
     async chooseTemplate(id) {
-      console.log(id);
       let loading = this.$loading()
       try {
         this.templateId = id
@@ -169,7 +163,7 @@ export default {
 
     async updateCustomer(value) {
       const cf = this.fields.filter(f => f.fieldName === 'customer')[0]
-      console.log('val===', cf, value);
+      console.info('val===', cf, value);
       this.update({
         field: cf,
         newValue: value
@@ -179,7 +173,7 @@ export default {
         module: 'customer',
         id: value[0].value
       }
-      console.log('forRelation: ', forRelation);
+      console.info('forRelation: ', forRelation);
       
       EventBus.$emit('es.Relation.Customer', forRelation)
     },
@@ -217,7 +211,7 @@ export default {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {}
       // 这里判断是否有客户信息
-      console.log(this.selectCustomer);
+      console.info(this.selectCustomer);
       if(this.selectCustomer && this.selectCustomer.value){
         pms.customerId = this.selectCustomer.value;
       }
@@ -232,7 +226,7 @@ export default {
               ...template
             })
           )
-          console.log('product list:', res);          
+          // console.info('product list:', res);          
           return res
         })
         .catch(e => console.error(e))
@@ -241,14 +235,13 @@ export default {
     async updateProduct(value) {
       let nv = null;
       const template = value[0];
-      console.log(template);
-      
+      console.info(template);     
       // 查询产品关联字段
       let forRelation = {
         module: 'product',
         id: value[0].value
       }
-      console.log('forRelation: ', forRelation);
+      console.info('forRelation: ', forRelation);
       EventBus.$emit('es.Relation.Product', forRelation)
 
       // 获取产品明细
@@ -264,7 +257,7 @@ export default {
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
         if (f.formType === 'address') {
-          console.log('nv:', nv)
+          console.info('nv:', nv)
         }
         if (!!nv && f.fieldName != 'customer' && f.fieldName != 'template') { 
           this.update(({
