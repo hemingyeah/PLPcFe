@@ -41,6 +41,7 @@ export default {
   },
   computed: {
     options() {
+      // TODO: 此处不是本地数据 需要从服务端获取 或 服务端塞进来数据
       return this.field.formType === 'relationCustomer' ? this.customerFields : this.productFields; 
     }
   },
@@ -64,14 +65,14 @@ export default {
   },
   methods: {
     updateForDom(event) {
-      let el = event.target
-      let prop = el.dataset.prop
-      let value = el.value
+      let el = event.target;
+      let prop = el.dataset.prop;
+      let value = el.value;
 
-      this.update(value, prop)
+      this.update(value, prop);
     },
     update(value, prop) {
-      this.$emit('input', { value, prop })
+      this.$emit('input', { value, prop });
     }
   }
 }

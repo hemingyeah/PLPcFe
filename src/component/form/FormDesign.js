@@ -220,7 +220,7 @@ const FormDesign = {
       if(this.fieldGroup == 1){
         groupFields = groupFields.filter(f => this.value.findIndex(v => v.formType == f.formType) == -1);
       }
-     
+    
       return groupFields;
     },
     // 是否为空
@@ -345,7 +345,7 @@ const FormDesign = {
     beginInsert(field, event) {
       // 屏蔽非鼠标左键的点击事件
       if(event.button !== 0) return;
- 
+
       // 限制字段数量
       if (this.value.length >= this.max) {
         return Platform.alert(`单个表单最多支持${ this.max }个字段`)

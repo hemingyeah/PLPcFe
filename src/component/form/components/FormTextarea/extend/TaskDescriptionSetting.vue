@@ -1,10 +1,6 @@
 <template>
   <div class="form-setting-panel">
-    <h3>系统字段 -- {{ field.displayName }}</h3>
-    <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
-    <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
-    </div>
+    <h3>{{ isSystem ? '系统' : '基础' }}字段 -- {{setting.name}}</h3>
   </div>
 </template>
 
@@ -12,7 +8,7 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 
 export default {
-  name: 'product-name-extend-setting',
+  name: 'task-description-setting',
   mixins: [SettingMixin],
   props: {
     field: {
@@ -26,8 +22,8 @@ export default {
   },
   computed: {
     isSystem() {
-      return this.field.isSystem === 1;
-    }
+      return this.field.isSystem === 1
+    },
   },
   methods: {
     updateForDom(event){

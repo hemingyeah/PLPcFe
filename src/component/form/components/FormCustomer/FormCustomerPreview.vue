@@ -4,7 +4,7 @@
       <label>{{field.displayName}} <span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
       <div class="form-preview-mock">
         <p class="form-preview-control form-preview-withIcon">
-          {{field.placeHolder}}
+          {{ field.placeHolder }}
         </p>
       </div>
     </div>
@@ -62,9 +62,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
- .form-preview-task-customer{
-   display: flex;
-   flex-direction: column;
- }
+  .form-preview-task-customer{
+    display: flex;
+    flex-direction: column;
+  }
 </style>
 

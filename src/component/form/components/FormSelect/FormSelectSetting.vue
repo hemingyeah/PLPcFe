@@ -57,19 +57,18 @@
 
 <script>
 import {
-  SELECT_OPTION_MAX,
   SELECT_OPTION_LENGTH_MAX,
   FORM_FIELD_LOGICAL_DISABLE
 } from '../../config'
 
 import _ from 'lodash';
-import Platform from '@src/platform';
 import LogicalFieldModal from './components/LogicalFieldModal';
 import SettingMixin from '@src/component/form/mixin/setting';
+import FormSelectMixin from '@src/component/form/mixin/form.select';
 
 export default {
   name: 'form-select-setting',
-  mixins: [SettingMixin],
+  mixins: [SettingMixin, FormSelectMixin],
   props: {
     field: {
       type: Object,
@@ -83,9 +82,6 @@ export default {
     getContext: Function
   },
   computed: {
-    options(){
-      return this.field.options || [];
-    },
     /** 
      * 满足以下条件允许配置显示逻辑：
      * 1. 单选
@@ -159,36 +155,6 @@ export default {
       let context = this.getContext();
       this.$refs.logical.showModal(this.field, context.value);
     },
-    updateForDom(event){
-      let el = event.target;
-      let prop = el.dataset.prop;
-      let value = el.value;
-      
-      this.update(value, prop)
-    },
-    update(value, prop){
-      if(prop == 'isMulti') {
-        // 如果是多选，清空默认值
-        this.options.forEach(item => item.isDefault = false);
-        this.$emit('input', {value: this.options, prop: 'options'})
-        this.$emit('input', {value: null, prop: 'defaultValue'});
-      }
-
-      this.$emit('input', {value, prop})
-    },
-    addOption(){
-      if(this.options.length >= SELECT_OPTION_MAX) return Platform.alert(`选项数量不能超过${SELECT_OPTION_MAX}`);
-
-      let options = _.cloneDeep(this.options);
-      this.index++;
-
-      options.push({
-        value: `选项${ this.index }`,
-        isDefault: false
-      })
-
-      this.$emit('input', {value: options, prop: 'options'})
-    },
     updateOption(event, option){
       option.value = event.target.value;
       
@@ -205,50 +171,6 @@ export default {
 
       this.$emit('input', {value: options, prop: 'options'})
       this.$emit('input', {value: this.field, prop: 'dependencies', operate: 'delete'})
-    },
-    // 设置默认值
-    setDefaultOption(option){
-      if(this.field.isMulti) return Platform.alert('多选暂不支持设置默认值');
-      if(!option.value) return Platform.alert('请先补全选项');
-
-      this.options.forEach(item => item.isDefault = false);
-      option.isDefault = true;
-
-      this.$emit('input', {value: this.options, prop: 'options'})
-      this.$emit('input', {value: option.value, prop: 'defaultValue'});
-    },
-    showBatchModal(){
-      this.optionText = this.field.options.map(item => item.value).join('\n');
-      this.batchModalShow = true;
-      this.errMessage = null;
-    },
-    updateOptionText(event){
-      this.optionText = event.target.value;
-
-      let newOption = this.optionText.split('\n');
-      this.errMessage = this.validateOptions(newOption);
-    },
-    validateOptions(opts){
-      let options = opts[opts.length - 1] == null ? opts.slice(0, -1) : opts;
-      let message = [];
-
-      // 验证数量
-      if(options.length > SELECT_OPTION_MAX){
-        message.push(`选项数量不能超过${SELECT_OPTION_MAX}`);
-      }
-
-      // 是否有空白项
-      if(options.some(item => item == null || item.trim().length == 0)){
-        message.push('不能存在空白项');
-      }
-
-      // 验证每一项长度
-      let errIndex = options.map((item, index) => item.length > SELECT_OPTION_LENGTH_MAX ? index + 1 : -1).filter(item => item != -1);
-      if(errIndex.length > 0){
-        message.push(`第${errIndex.join('，')}行字数超过${SELECT_OPTION_LENGTH_MAX}个`);
-      }
-
-      return message.length > 0 ? message.join('\n') : null;
     },
     batchEdit(){
       let newValues = this.optionText.split('\n').filter(option => option);

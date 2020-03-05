@@ -1,7 +1,7 @@
 <template>
   <div class="form-setting-panel">
     <h3>系统字段 -- {{setting.name}}</h3>
-    <p class="form-design-warning" style="margin-bottom: 5px">该字段为系统内置字段，暂不支持修改、删除。</p>
+    <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
     </div>

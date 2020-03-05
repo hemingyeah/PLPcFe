@@ -2,6 +2,9 @@ import {randomString} from '@src/util/lang';
 import Field from '@model/Field'
 import * as FormInfoConfig from './components/FormInfo/config';
 
+// TODO: 临时的，之后需要修改
+const FORM_SELECT_TYPES = ['select', 'level', 'serviceType', 'serviceContent']
+
 /** 补全formType 为select时的所需字段 */
 function fillPropForSelect(params){
   let setting = params.setting || {};
@@ -10,7 +13,8 @@ function fillPropForSelect(params){
   let isMulti = false;
   let dependencies = setting.dependencies || {};
 
-  if(params.formType == 'select'){
+  if(FORM_SELECT_TYPES.indexOf(params.formType)){
+
     let dataSource = setting.dataSource || [];
     let initDefault = false;
 
@@ -27,7 +31,8 @@ function fillPropForSelect(params){
     })
 
     // 没有选项，添加默认项
-    if(options.length == 0) options.push({value: '选项1', isDefault: false})
+    if(options.length == 0) options.push({value: '选项1', isDefault: false});
+    
   }
 
   return {options, isMulti, dependencies};

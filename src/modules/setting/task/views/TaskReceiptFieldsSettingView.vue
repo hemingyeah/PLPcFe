@@ -14,12 +14,15 @@
 </template>
 
 <script>
+/* api */
+import { getTaskTemplateFields } from '@src/api/TaskApi';
+/* util */
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
 import platform from '@src/platform';
 
 export default {
-  name: 'task-fields-setting-view',
+  name: 'task-receipt-fields-setting-view',
   data(){
     return {
       init: false,
@@ -31,11 +34,17 @@ export default {
     }
   },
   async mounted(){
-    let fields = await http.get('/task/getTaskTemplateFields', {tableName: 'task_receipt', templateId: '1'});
-    let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
-    
-    this.fields = FormUtil.toFormField(sortedFields);
-    this.init = true;
+    try {
+      // TODO: 修改参数
+      let fields = await getTaskTemplateFields({ tableName: 'task_receipt', templateId: '1' });
+      let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+      
+      this.fields = FormUtil.toFormField(sortedFields);
+      this.init = true;
+      
+    } catch (error) {
+      console.log('task-receipt-fields-setting-view: mounted -> error', error)
+    }
   },
   methods: {
     back(){

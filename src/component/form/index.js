@@ -1,7 +1,6 @@
 import './common.scss';
 
 import {BuildComponents, ViewComponents} from './components';
-
 import FormDesign from './FormDesign';
 import FormBuilder from './FormBuilder';
 import FormView from './FormView';

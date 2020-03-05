@@ -100,10 +100,22 @@ export function getTemplateFields(templateId, tableName = 'task') {
 /**
  * 工单表单 关联字段
  * module为 customer/product 
-id为已选择的客户或产品的id，选择的产品数量=1的时候才去查值赋值
-fieldName和formType填这种字段setting里存的值
+ * id为已选择的客户或产品的id，选择的产品数量=1的时候才去查值赋值
+ * fieldName和formType填这种字段setting里存的值
  * @param {*} params = {String module,String id,String fieldName,String formType}
  */
 export function relatedFieldValue(params) {
   return http.get('/dd/task/relatedFieldValue', params)
 }
+
+/** 
+ * @description 获取工单表单数据
+ * @param {Object} params-- params
+ * @param {String} params.tableName -- 表名
+ * @param {String} params.templateId -- 类型模板id
+*/
+
+export function getTaskTemplateFields(params) {
+  return http.get('/task/getTaskTemplateFields', params)
+}
+

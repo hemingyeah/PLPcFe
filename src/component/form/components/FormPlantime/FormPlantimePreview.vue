@@ -25,17 +25,22 @@ export default {
   },
   data() {
     return {
-      type: this.field.setting.dateType === 'date' ? 'date' : 'datetime'
+      type: this.getType(this.field.setting.dateType)
     }
   },
   watch: {
     'field.setting.dateType': {
       handler(newValue, oldValue) {
-        this.type = newValue === 'date' ? 'date' : 'datetime';
+        this.type = this.getType(newValue);
       },
       deep: true,
       immediate: true
     }  
+  },
+  methods: {
+    getType(type) {
+      return type === 'date' ? 'date' : 'datetime';
+    }
   }
 }
 </script>

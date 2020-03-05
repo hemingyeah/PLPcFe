@@ -4,9 +4,13 @@ import FormSelectSetting from './FormSelectSetting.vue';
 import FormSelectPreview from './FormSelectPreview.vue';
 import FormSelect from './FormSelect.vue';
 
+// 产品类型
 import ProductTypeExtendSetting from './extend/ProductTypeExtendSetting.vue';
+// 客户团队
 import CustomerTagsExtendSetting from './extend/CustomerTagsExtendSetting.vue';
 import CustomerExtend from './extend/CustomerExtend.vue'
+// 工单优先级
+import TaskExtendSetting from './extend/TaskExtendSetting.vue';
 
 let FormSelectField = {
   formType: 'select', // 字段类型
@@ -34,7 +38,7 @@ let TaskLevelField = {
     preview: FormSelectPreview,
     build: FormSelect,
     extend: {
-      'task_level_setting': ProductTypeExtendSetting
+      'task_level_setting': TaskExtendSetting
     }
   }
 }
@@ -49,7 +53,7 @@ const TaskServiceTypeField = {
     preview: FormSelectPreview,
     build: FormSelect,
     extend: {
-      'task_serviceType_setting': ProductTypeExtendSetting
+      'task_serviceType_setting': TaskExtendSetting
     }
   }
 }
@@ -64,7 +68,7 @@ const TaskServiceContentField = {
     preview: FormSelectPreview,
     build: FormSelect,
     extend: {
-      'task_serviceContent_setting': ProductTypeExtendSetting
+      'task_serviceContent_setting': TaskExtendSetting
     }
   }
 }
