@@ -221,6 +221,11 @@ export default {
     },
   },
   directives: { Clickoutside },
+  watch: {
+    'value'(n) {
+      console.log('value select', n)
+    }
+  }
 }
 </script>
 

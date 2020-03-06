@@ -140,6 +140,14 @@ export default {
         field: 'type',
         show: true,
       }, {
+        label: '默认联系人',
+        field: 'lmName',
+        show: true,
+      },  {
+        label: '产品地址',
+        field: 'address',
+        show: true,
+      },  {
         label: '创建时间',
         field: 'createTime',
         show: true,

@@ -46,6 +46,8 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
+
+        <base-button type="plain" icon="icon-add" @event="openDialog('contact')">联系人</base-button>
       </div>
     </div>
 
@@ -119,6 +121,9 @@
     <bind-code :product-id="productId" ref="bindCodeDialog"></bind-code>
     <download-code :code-data="downloadCodeData" ref="downloadCodeDialog"></download-code>
 
+    <!-- :is-phone-unique="isPhoneUnique" -->
+    <edit-contact-dialog ref="EditContactDialog" :customer="customer" :product="product" />
+
   </div>
 </template>
 
@@ -139,6 +144,9 @@ import InfoRecord from './components/InfoRecord.vue';
 import RemindDialog from './components/RemindDialog.vue';
 import BindCodeDialog from './components/BindCodeDialog.vue';
 import DownloadCodeDialog from './components/DownloadCodeDialog.vue';
+
+import EditContactDialog from './components/EditContactDialog.vue';
+import ProductContactTable from './components/ProductContactTable.vue';
 
 
 import qs from '@src/util/querystring';
@@ -174,6 +182,55 @@ export default {
   computed: {
     product() {
       return this.newestProduct || this.initData.product || {};
+    },
+    customer () {
+      return this.product.customer || {};
+    },
+    /** 客户是否被禁用 */
+    isDisable(){
+      return this.customer.status == null || this.customer.status === 0;
+    },
+    /** 
+     * 满足以下条件允许编辑客户
+     * 1. 客户没有被删除
+     * 2. 有客户编辑权限
+     */
+    allowEditCustomer() {
+      return !this.isDelete && this.hasEditCustomerAuth;
+    },
+    /** 
+     * 客户是否被删除
+     * 在客户删除时不允许做任何操作，只能查询 
+     * 所有操作的权限应该以此为基础
+     */
+    isDelete(){
+      return this.customer.isDelete == null || this.customer.isDelete === 1;
+    },
+    /** 
+     * 是否有编辑客户权限，需要满足以下条件之一：
+     * 
+     * 1. 编辑客户全部权限： 全部客户
+     * 2. 编辑客户团队权限： 没有团队的客户都可编辑，有团队的按团队匹配。 包含个人权限
+     * 3. 编辑客户个人权限： 自己创建的 或 客户负责人
+     */
+    hasEditCustomerAuth(){
+      let customer = this.customer;
+      let loginUserId = this.loginUser.userId;
+      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT',
+        // 团队权限判断
+        () => {
+          let tags = Array.isArray(customer.tags) ? customer.tags : [];
+          // 无团队则任何人都可编辑
+          if(tags.length == 0) return true;
+
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
+          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
+        }, 
+        // 个人权限判断
+        () => {
+          return customer.createUser == loginUserId || this.isCustomerManager
+        }
+      );
     },
     eventTypes() {
       if (!this.initData || (this.initData && !this.initData.eventTypeInfo)) return [];
@@ -258,10 +315,14 @@ export default {
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
+        customer: this.customer,
         product: this.product,
         loginUser: this.initData.loginUser,
         allowEditProduct: this.allowEditProduct,
         isDelete: this.isDelete,
+        isDisable: this.isDisable,
+        allowEditCustomer: this.allowEditCustomer,
+        // isPhoneUnique: this.initData.isPhoneUnique,
       };
     },
     /** 当前登录的用户 */
@@ -375,12 +436,14 @@ export default {
     this.$eventBus.$on('product_view.update_detail', this.refreshProduct); // 更新详情
     this.$eventBus.$on('product_view_record_update', this.fetchStatisticalData); // 更新动态
     this.$eventBus.$on('product_view_remind_update', this.fetchStatisticalData); // 更新提醒
+    this.$eventBus.$on('product_view.select_tab', this.selectTab);
   },
   beforeDestroy() {
     this.$eventBus.$off('product_view.open_remind_dialog', this.openRemindDialog);
     this.$eventBus.$off('product_view.update_detail', this.refreshProduct);
     this.$eventBus.$off('product_view_record_update', this.fetchStatisticalData);
     this.$eventBus.$off('product_view_remind_update', this.fetchStatisticalData);
+    this.$eventBus.$off('product_view.select_tab', this.selectTab);
   },
   methods: {
     openBindCodeDialog() {
@@ -546,7 +609,7 @@ export default {
     },
     // 构建tab
     buildTabs() {
-      const {taskQuantity, eventQuantity, unfinishedTaskQuantity, unfinishedEventQuantity, recordQuantity, plantaskQuantity, remindQuantity} = this.statisticalData;
+      const {taskQuantity, linkmanQuantity, eventQuantity, unfinishedTaskQuantity, unfinishedEventQuantity, recordQuantity, plantaskQuantity, remindQuantity} = this.statisticalData;
 
       return [
         {
@@ -554,6 +617,11 @@ export default {
           component: InfoRecord.name,
           slotName: 'record-tab',
           show: true,
+        }, {
+          displayName: `联系人(${linkmanQuantity || 0})`,
+          component: ProductContactTable.name,
+          show: true,
+          
         }, {
           displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
           component: TaskTable.name,
@@ -572,7 +640,23 @@ export default {
           show: true,
         }
       ].filter(tab => tab.show)
-    }
+    },
+
+    selectTab(tab) {
+      this.currTab = tab;
+    },
+
+    openDialog(action) {
+      if (action === 'address') {
+        this.$refs.EditAddressDialog.openDialog();
+      } else if (action === 'contact') {
+        this.$refs.EditContactDialog.openDialog();
+      } else if (action === 'remark') {
+        this.$refs.addRemarkDialog.openDialog();
+      } else if (action === 'remind') {
+        this.$refs.addRemindDialog.openDialog();
+      }
+    },
   },
   components: {
     [EventTable.name]: EventTable,
@@ -583,6 +667,8 @@ export default {
     [RemindDialog.name]: RemindDialog,
     [BindCodeDialog.name]: BindCodeDialog,
     [DownloadCodeDialog.name]: DownloadCodeDialog,
+    [EditContactDialog.name]: EditContactDialog,
+    [ProductContactTable.name]: ProductContactTable
   }
 }
 </script>
