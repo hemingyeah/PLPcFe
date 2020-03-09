@@ -58,7 +58,6 @@ export default {
   },
   methods: {
     updatetemplateId(e) {
-      // console.log('e: ', e);
       taskTemplate = e
     },
     goBack() {
@@ -73,11 +72,13 @@ export default {
       this.$refs.form
         .validate()
         .then(valid => {
-          this.submitting = false
-          if (!valid) return Promise.reject('validate fail.')
+          this.submitting = false;
+
+          if (!valid) return Promise.reject('validate fail.');
+          
           const params = util.packToTask(this.fields, this.form)
-          params.templateId = taskTemplate.value
-          params.templateName = taskTemplate.text
+          params.templateId = taskTemplate.value;
+          params.templateName = taskTemplate.text;
           this.pending = true
           this.loadingPage = true
           // if (this.action === 'edit') {
@@ -149,8 +150,6 @@ export default {
   },
   async mounted() {
     try {
-      console.info('initData:', this.initData)
-
       this.auth = this.initData.auth || {}
       // 初始化默认值
       // 清空表单
@@ -159,9 +158,8 @@ export default {
 
       // let tasktypes = (await TaskApi.taskType()) || []
 
-      this.fields = await TaskApi.getTemplateFields(this.types[0].id)
-      this.form = FormUtil.initialize(this.fields, this.form)
-      console.info(this.fields, this.form)
+      this.fields = await TaskApi.getTaskTemplateFields({ templateId: this.types[0].id, tableName: 'task' })
+      this.form = FormUtil.initialize(this.fields, this.form);
 
       this.init = true
     } catch (e) {

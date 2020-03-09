@@ -37,17 +37,18 @@ export default {
   },
   async mounted() {
     try {
-      console.info('initData:', this.initData)
-      this.auth = this.initData.auth || {}
+      this.auth = this.initData.auth || {};
+
       // 初始化默认值
       // 清空表单
       this.$emit('input', {})
-      this.init = false
+      this.init = false;
+
       // let tasktypes = (await TaskApi.taskType()) || []
-      this.fields = await TaskApi.getTemplateFields('1', 'task_receipt')
-      this.form = FormUtil.initialize(this.fields, this.form)
-      // console.log(this.fields, this.form)
-      this.init = true
+      this.fields = await TaskApi.getTaskTemplateFields({ templateId: '1', tableName: 'task-receipt' })
+      this.form = FormUtil.initialize(this.fields, this.form);
+      this.init = true;
+
     } catch (e) {
       console.error('error ', e)
     }

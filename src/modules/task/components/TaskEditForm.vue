@@ -1,34 +1,52 @@
 <template>
   <div>
-    <form-builder ref="form" :fields="task_fields" :value="task_value" @update="update">
+    <form-builder ref="form" :fields="taskFields" :value="taskValue" @update="update">
+
       <template slot="taskNo" slot-scope="{ field, value }">
+
+        <!-- start 工单编号 -->
         <form-item :label="field.displayName" :validation="false">
           <div class="form-taskNo">{{ value || "工单编号将在创建后由系统生成" }}</div>
         </form-item>
+        <!-- end 工单编号 -->
+
+        <!-- start 工单类型 -->
         <form-item label="工单类型" :validation="false">
-          <form-select :field="field" :source="taskTypes" :value="taskType" :clearable="false" @input="chooseTemplate"/>
+          <form-select :field="field" :source="taskTypes" :value="selectedType.value" :clearable="false" @input="chooseTemplate"/>
         </form-item>
+        <!-- end 工单类型 -->
+
       </template>
-      <!-- 计划时间 -->
+
+      <!-- start 计划时间 -->
       <template slot="planTime" slot-scope="{ field, value }">
         <form-item :label="field.displayName">
           <form-plantime :field="field" :value="value" @update="update"></form-plantime>
         </form-item>
       </template>
-      <!-- 客户 -->
+      <!-- end 计划时间 -->
+
+      <!-- start 客户字段 -->
       <template slot="customer" slot-scope="{ field }">
+        
+        <!-- start 客户 -->
         <form-item :label="field.displayName">
-          <customer-select
+          <biz-form-remote-select
             v-model="value.customer"
             :field="customerField"
             :remote-method="searchCustomer"
-            :update-customer="updateCustomer"
+            :choose="updateCustomer"
             placeholder="请输入关键字搜索客户">
-          </customer-select>
+          </biz-form-remote-select>
         </form-item>
+        <!-- end 客户 -->
+
+        <!-- start 联系人 -->
         <form-item v-if="customerOption.linkman" label="联系人">
-          <form-text :field="field" :value="selectCustomer.lmName" @update="update" />
+          <form-text :field="field" :value="selectedCustomer.lmName" @update="update" />
         </form-item>
+        <!-- end 联系人 -->
+
         <form-item v-if="customerOption.address" label="地址">
           <form-address :field="field" :value="customerAddress" @update="update" :task-disable-update="true"/>
         </form-item>
@@ -53,16 +71,21 @@
           </base-select>
         </form-item>
       </template>
+      <!-- end 客户字段 -->
+
     </form-builder>
   </div>
 </template>
 
 <script>
-import platform from '@src/platform'
-import * as TaskApi from '@src/api/TaskApi'
-import * as FormUtil from '@src/component/form/util'
-import FormMixin from '@src/component/form/mixin/form'
-import EventBus from '@src/util/eventBus'
+/* api */
+import * as TaskApi from '@src/api/TaskApi';
+/* util */
+import _ from 'lodash';
+import * as FormUtil from '@src/component/form/util';
+/* mixin */
+import FormMixin from '@src/component/form/mixin/form';
+
 export default {
   name: 'task-edit-form',
   props: {
@@ -70,30 +93,51 @@ export default {
       type: Array,
       default: () => []
     },
+    types:{
+      type: Array,
+      default: () => []
+    },
     value: {
       type: Object,
-      required: true
+      required: true,
+      default: () => ({})
     },
-    types:{
-      type: Array
-    }
   },
-  inject: ['initData'],
   data() {
     return {
-      validation:false, // this.buildValidation(),
-      template:[],
-      taskType:'',
-      task_fields:[],
-      task_value:{}
+      selectedType: {},
+      taskFields: [],
+      taskValue: {},
+      taskType: '',
+      validation: false, // this.buildValidation(),
     }
   },
-  mounted () {
-    this.task_fields = this.fields;
-    this.task_value = this.value;
-    this.taskType = this.types[0].name;
-  },
   computed: {
+    /* 客户字段 */
+    customerField() {
+      return this.fields.filter(f => f.fieldName === 'customer')[0];
+    },
+    /* 客户字段配置 */
+    customerOption(){
+      return (this.customerField.setting && this.customerField.setting.customerOption) || {} ;
+    },
+    /* 客户地址 */
+    customerAddress(){
+      const address = (this.selectedCustomer && this.selectedCustomer.customerAddress ) || {};
+      return {
+        province: address.adProvince,
+        city: address.adCity,
+        dist: address.adDist,
+        address: address.adAddress,
+        latitude: address.adLongitude,
+        longitude: address.adLatitude,
+        addressType: address.addressType
+      };
+    },
+    selectedCustomer(){
+      return (this.value.customer && this.value.customer[0]) || {};
+    },
+    /* 工单类型 */
     taskTypes(){
       return this.types.map(d => {
         return {
@@ -102,47 +146,42 @@ export default {
         }
       }) || [];
     },
-    customerField() {
-      return this.fields.filter(f => f.fieldName === 'customer')[0]
-    },
-    customerOption(){
-      return (this.customerField.setting && this.customerField.setting.customerOption) || {} ;
-    },
-    selectCustomer(){
-      return (this.value.customer && this.value.customer[0]) || {};
-    },
-    customerAddress(){
-      const address = (this.selectCustomer && this.selectCustomer.customerAddress ) || {};
-      return {
-        province:address.adProvince,
-        city:address.adCity,
-        dist:address.adDist,
-        address:address.adAddress,
-        latitude:address.adLongitude,
-        longitude:address.adLatitude,
-        addressType:address.addressType
-      };
+    /* 工单类型对象 */
+    taskTypesMap() {
+      return _.reduce(this.taskTypes, (result, value) => {
+        result[value.value] = value;
+        return result;
+      }, {})
     },
   },
+  mounted () {
+    this.taskFields = this.fields;
+    this.taskValue = this.value;
+    this.selectedType = this.taskTypes[0] || {};
+  },
   methods: {
+    // TODO: 切换工单类型 数据清除问题
     async chooseTemplate(id) {
-      let loading = this.$loading()
+      let loading = this.$loading();
       try {
         this.templateId = id
         // 清空表单
-        this.$emit('input', {})
-        this.task_fields = await TaskApi.getTemplateFields(id)
-        this.task_value = FormUtil.initialize(this.fields, this.value)    
-        this.taskType = this.taskTypes[this.taskTypes.findIndex(item=>item.value == id)].text;
-        this.$emit('updatetemplateId', this.taskTypes[this.taskTypes.findIndex(item=>item.value == id)]);
+        this.$emit('input', {});
+
+        this.taskFields = await TaskApi.getTaskTemplateFields({ templateId: id, tableName: 'task' })
+        this.taskValue = FormUtil.initialize(this.fields, this.value);
+
+        this.selectedType = this.taskTypesMap[id];
+        this.$emit('updatetemplateId', this.selectedType);
       } catch (error) {
         console.error(error)
       }
-      loading.close()
-    },
 
+      loading.close();
+    },
     update({ field, newValue, oldValue }) {
-      let { fieldName, displayName } = field
+      let { fieldName, displayName } = field;
+
       if (this.$appConfig.debug) {
         console.info(
           `[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(
@@ -150,75 +189,82 @@ export default {
           )}`
         )
       }
-      let value = this.value
-      this.$set(value, fieldName, newValue)
-      this.$emit('input', value)      
-    },
 
-    async updateCustomer(value) {
-      const cf = this.fields.filter(f => f.fieldName === 'customer')[0]
+      let value = this.value;
+      this.$set(value, fieldName, newValue);
+      this.$emit('input', value);
+    },
+    async updateCustomer(value = []) {
+      const customerField = this.customerField;
+
       this.update({
-        field: cf,
+        field: customerField,
         newValue: value
-      })
+      });
+
       // 查询客户关联字段
       let forRelation = {
         module: 'customer',
         id: value[0].value
-      }
-      EventBus.$emit('es.Relation.Customer', forRelation)
-    },
+      };
 
+      this.$eventBus.$emit('es.Relation.Customer', forRelation)
+    },
     validate() {
-      return this.$refs.form.validate().then(valid => {
-        return valid
-      })
+      return this.$refs.form.validate();
     },
+    async searchCustomer(params = {}) {
 
-    async searchCustomer(params) {
-      // params has three properties include keyword、pageSize、pageNum.
-      const pms = params || {}
       try {
-        const res = await this.$http.post('/customer/list', pms)
-        if (!res || !res.list) return
-        res.list = res.list.map(customer =>
+        const result = await TaskApi.getTaskCustomerList(params);
+
+        if (!result || !result.list) return
+
+        result.list = result.list.map(customer =>
           Object.freeze({
             label: customer.name,
             value: customer.id,
-            serialNumber:customer.serialNumber,
-            lmName:customer.lmName,
-            lmPhone:customer.lmPhone,
-            customerAddress:customer.customerAddress
+            serialNumber: customer.serialNumber,
+            lmName: customer.lmName,
+            lmPhone: customer.lmPhone,
+            customerAddress: customer.customerAddress
           })
         )
-        // console.log('customers : ', res);
-        return res
+
+        return result;
+
       } catch (error) {
         console.error(error)
       }
     },
-
-    searchProduct(params) {
-      // params has three properties include keyword、pageSize、pageNum.
+    async searchProduct(params) {
       const pms = params || {}
+
       // 这里判断是否有客户信息
-      // console.info(this.selectCustomer);
-      if(this.selectCustomer && this.selectCustomer.value){
-        pms.customerId = this.selectCustomer.value;
+      if(this.selectedCustomer && this.selectedCustomer.value){
+        pms.customerId = this.selectedCustomer.value;
       }
-      return this.$http.post('/task/customer/product', pms).then(res => {
-        if (!res || !res.list) return
-        res.list = res.list.map(template =>
+
+      try {
+        const result = await TaskApi.getTaskCustomerProduct(pms);
+
+        if (!result || !result.list) return;
+
+        result.list = result.list.map(template =>
           Object.freeze({
             label: template.name,
             value: template.id,
             ...template
           })
-        )     
-        return res
-      }).catch(e => console.error(e))
+        );
+        
+        return result;  
+
+      } catch (error) {
+        console.log('task-edit-form: searchProduct -> error', error)
+      }
+
     },
-    
     async updateProduct(value) {
       let nv = null;
       const template = value[0];   
@@ -227,12 +273,9 @@ export default {
         module: 'product',
         id: value[0].value
       }
-      EventBus.$emit('es.Relation.Product', forRelation)
 
-      // 获取产品明细
-      // let res = await getProductDetail({id: template.id});
-      // console.log('product res:', res);
-    
+      this.$eventBus.$emit('es.Relation.Product', forRelation)
+  
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
         if (f.formType === 'address') {
@@ -272,7 +315,18 @@ export default {
             placeholder={this.placeholder}
             remoteMethod={this.remoteMethod}
             onInput={this.updateCustomer}
-          />
+            scopedSlots={{
+              option: slotProps => {
+                let option = slotProps.option;
+                return (
+                  <div>
+                    { option.label }
+                  </div>
+                );
+              }
+            }}
+          >
+          </base-select>
         )
       }
     }

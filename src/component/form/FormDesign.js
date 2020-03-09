@@ -10,7 +10,7 @@ import {
   SettingComponents
 } from './components';
 
-import { 
+import {
   cloneDeep, 
   isEmpty 
 } from 'lodash';

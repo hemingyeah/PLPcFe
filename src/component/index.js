@@ -28,9 +28,10 @@ import BaseMapPicker from './common/BaseMapPicker';
 import BaseContact from './common/BaseContact';
 
 // 业务组件
-import BizUserSelect from './business/BizUserSelect'
-import BizTeamSelect from './business/BizTeamSelect'
-import SampleTooltip from './common/SampleTooltip'
+import BizUserSelect from './business/BizUserSelect';
+import BizTeamSelect from './business/BizTeamSelect';
+import BizFormRemoteSelect from './business/BizFormRemoteSelect';
+import SampleTooltip from './common/SampleTooltip';
 
 import BaseEditor from './lessUsed/BaseEditor'
 
@@ -63,6 +64,8 @@ const components = [
   
   BizUserSelect,
   BizTeamSelect,
+  BizFormRemoteSelect,
+  
   BaseWindow,
   SampleTooltip,
   BaseCascader,

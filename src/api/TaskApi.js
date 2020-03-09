@@ -86,18 +86,6 @@ export function taskType() {
 }
 
 /**
- * 获取某一工单类型下的字段
- * @param {*} templateId - 工单类型id
- * @returns [fields]
- */
-export function getTemplateFields(templateId, tableName = 'task') {
-  return http.get('/task/getTaskTemplateFields', {
-    tableName,
-    templateId
-  })
-}
-
-/**
  * 工单表单 关联字段
  * module为 customer/product 
  * id为已选择的客户或产品的id，选择的产品数量=1的时候才去查值赋值
@@ -119,3 +107,37 @@ export function getTaskTemplateFields(params) {
   return http.get('/task/getTaskTemplateFields', params)
 }
 
+/** 
+ * @description 查询客户产品关联字段
+ * @param {Object} params -- 参数对象
+ * @param {String} params.module -- 模块 customer/product
+ * @param {String} params.id -- 客户id
+ * @param {String} params.fieldName -- 字段名称
+ * @param {String} params.formType -- 字段类型
+*/
+export function getTaskRelatedInfo(params) {
+  return http.get('/task/getRelatedInfo', params)
+}
+
+/** 
+ * @description 获取客户数据
+ * @param {Object} params -- 参数对象
+ * @param {String} params.pageSize -- 页码大小
+ * @param {String} params.pageNum -- 分页数
+ * @param {String} params.keyword -- 关键字
+*/
+export function getTaskCustomerList(params) {
+  return http.get('/task/customer/list', params)
+}
+
+/** 
+ * @description 获取客户产品数据
+ * @param {Object} params -- 参数对象
+ * @param {String} params.pageSize -- 页码大小
+ * @param {String} params.pageNum -- 分页数
+ * @param {String} params.keyword -- 关键字
+ * @param {String} params.customerId -- 客户id
+*/
+export function getTaskCustomerProduct(params) {
+  return http.post('/task/customer/product', params);
+}

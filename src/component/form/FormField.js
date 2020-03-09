@@ -1,9 +1,7 @@
 import {randomString} from '@src/util/lang';
-import Field from '@model/Field'
+import Field from '@model/Field';
+import { isSelect, isMultiSelect } from './util';
 import * as FormInfoConfig from './components/FormInfo/config';
-
-// TODO: 临时的，之后需要修改
-const FORM_SELECT_TYPES = ['select', 'level', 'serviceType', 'serviceContent']
 
 /** 补全formType 为select时的所需字段 */
 function fillPropForSelect(params){
@@ -13,7 +11,7 @@ function fillPropForSelect(params){
   let isMulti = false;
   let dependencies = setting.dependencies || {};
 
-  if(FORM_SELECT_TYPES.indexOf(params.formType)){
+  if(isSelect(params) || isMultiSelect(params)){
 
     let dataSource = setting.dataSource || [];
     let initDefault = false;

@@ -1,6 +1,10 @@
 /* eslint-disable vue/html-indent */
-import _ from 'lodash'
-import EventBus from '@src/util/eventBus'
+/* api */
+import { getTaskRelatedInfo } from '@src/api/TaskApi';
+/* utils */
+import _ from 'lodash';
+import EventBus from '@src/util/eventBus';
+
 export default {
   name: 'form-relation-mixin',
   props: {
@@ -17,41 +21,74 @@ export default {
       default: ''
     }
   },
+  data() {
+    return {
+      eventNameMap: {
+        'relationCustomer': 'es.Relation.Customer',
+        'relationProduct': 'es.Relation.Product'
+      }
+    }
+  },
   computed: {
     _value() {
       return this.value
     },
+    /** 
+     * @description 获取管理字段 函数对象
+     * -- 因为后端 工单/事件 查询虽然分了不同的接口，但是都是相同的查询
+    */
+    getTaskRelatedInfoFuncMap() {
+      return {
+        'task': getTaskRelatedInfo,
+        'event': getTaskRelatedInfo,
+      }
+    },
+    isTaskField() {
+      return this.tableName === 'task';
+    },
+    isEventField() {
+      return this.tableName === 'event';
+    },
+    required() {
+      return this.field.isNull === 0;
+    },
     setting() {
       return this.field.setting || {}
     },
-    required() {
-      return this.field.isNull === 0
+    tableName() {
+      return this.field.tableName || '';
     }
   },
   mounted() {
-    if (this.field.formType == 'relationCustomer') {
-      EventBus.$on('es.Relation.Customer', this.update)
-    }
-    if (this.field.formType == 'relationProduct') {
-      EventBus.$on('es.Relation.Product', this.update)
+    let formType = this.field.formType;
+    let eventName = this.eventNameMap[formType];
+
+    if (eventName) {
+      EventBus.$on(eventName, this.update)
     }
   },
   methods: {
-    async update(forRelation) {  
-      // let action = 'task/relatedFieldValue'
-      let oldValue = this._value
-      let newValue = _.cloneDeep(this.value)
-      forRelation.fieldName = this.setting.fieldName
-      forRelation.formType = this.setting.formType
-      // if (forRelation.from == 'event') action = 'event/relatedFieldValue'
-      if (forRelation.id && forRelation.id !== '') { 
-        this.$http.get('/task/getRelatedInfo', _.cloneDeep(forRelation)).then(res => {
+    async update(forRelation) {
+      let params = JSON.parse(JSON.stringify(forRelation));
+      let oldValue = this._value;
+      let newValue = _.cloneDeep(this.value);
+
+      params.fieldName = this.setting.fieldName;
+      params.formType = this.setting.formType;
+
+      let getTaskRelatedInfoFunc = this.getTaskRelatedInfoFuncMap[this.tableName];
+      if(!params.id || !getTaskRelatedInfoFunc) return
+
+      getTaskRelatedInfoFunc(params)
+        .then(res => {
           if(res.status == 0){
             newValue = res.data
             this.$emit('update', {newValue, oldValue, field: this.field})
           }
-        }).catch(err => console.error(err))
-      }
+        }).catch(err => {
+          console.error(err)
+        })
+
     }
   }
 }
