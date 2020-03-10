@@ -45,10 +45,9 @@ export default {
       this.init = false;
 
       // let tasktypes = (await TaskApi.taskType()) || []
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: '1', tableName: 'task-receipt' })
+      this.fields = await TaskApi.getTaskTemplateFields({ templateId: '1', tableName: 'task_receipt' })
       this.form = FormUtil.initialize(this.fields, this.form);
       this.init = true;
-
     } catch (e) {
       console.error('error ', e)
     }

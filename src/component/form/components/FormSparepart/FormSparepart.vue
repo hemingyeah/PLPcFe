@@ -158,11 +158,11 @@ export default {
       // o.modifiedPrice = this.sparepart.nowPrice - this.sparepart.salePrice;
       o.serialNumber = this.sparepart.serialNumber || '';
       o.total = (o.number * o.salePrice).toFixed(2);
-      if(!newValue.sparepart){
-        newValue.sparepart = [];
+      if(!newValue[this.field.fieldName]){
+        newValue[this.field.fieldName] = [];
       }
-      newValue.sparepart.push(o);
-      this.$emit('update', {newValue: newValue.sparepart, oldValue: oldValue.sparepart, field: this.field});
+      newValue[this.field.fieldName].push(o);
+      this.$emit('update', {newValue: newValue[this.field.fieldName], oldValue: oldValue[this.field.fieldName], field: this.field});
       this.visible = false;    
     },
   }

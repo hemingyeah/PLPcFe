@@ -14,25 +14,27 @@
         </form-item>
       </template>
 
-      <template slot="sparepart" slot-scope="{ field }">
+      <template slot="sparepart" slot-scope="{ field }"> 
+        
         <form-item :label="field.displayName">
           <form-sparepart :field="field" :value="value" @update="update"></form-sparepart>
         </form-item>
-        <template v-if="value.sparepart">
-          <el-table :data="value.sparepart" border stripe>
+
+        <template v-if="value[field.fieldName]">
+          <el-table :data="value[field.fieldName]" border stripe>
             <el-table-column label="备件" prop="name"></el-table-column>
             <el-table-column label="编号" prop="serialNumber"></el-table-column>
             <el-table-column label="类别" prop="primaryType"></el-table-column>
             <el-table-column label="规格" prop="standard"></el-table-column>
             <el-table-column prop="number" label="数量" width="100px">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.number" @input="handleSparepartNum(scope.$index,$event)"></el-input>
+                <el-input v-model="scope.row.number" @input="handleSparepartNum(scope.row,$event)"></el-input>
               </template>
             </el-table-column>
 
             <el-table-column label="单价" prop="salePrice" width="100px">
               <template slot-scope="scope"> 
-                <el-input v-model="scope.row.salePrice" @input="handleSparepartPrice(scope.$index,$event)"></el-input>           
+                <el-input v-model="scope.row.salePrice" @input="handleSparepartPrice(scope.row,$event)"></el-input>           
               </template>
             </el-table-column>
 
@@ -40,7 +42,7 @@
           
             <el-table-column label="操作" width="70px" fixed="right">
               <template slot-scope="scope">
-                <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleSparepartDelete(scope.$index)"/>
+                <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleSparepartDelete(scope.$index,value[field.fieldName])"/>
               </template>
             </el-table-column>
           </el-table>
@@ -48,7 +50,7 @@
         </template>
       </template>
 
-      <template slot="serviceIterm" slot-scope="{ field }">      
+      <template slot="serviceIterm" slot-scope="{ field }">    
         <form-item :label="field.displayName">
           <form-serviceterm :field="field" :value="value" @update="update"></form-serviceterm>
         </form-item>
@@ -141,11 +143,11 @@ export default {
         }
       ]
     },
-    hasExpense() {
-      return this.value.sparepart || this.value.serviceIterm
+    hasExpense() {  
+      return this.getSparepartExpense() || this.value.serviceIterm
     },
     totalExpense() {
-      return (this.sparepartExpense - this.disExpense + this.serviceItermExpense).toFixed(2) || 0
+      return (this.getSparepartExpense() - this.disExpense + this.serviceItermExpense).toFixed(2) || 0
     }
   },
   mounted() {
@@ -155,8 +157,13 @@ export default {
   methods: {
     getSparepartExpense(){
       let total = 0;
-      (this.value.sparepart || []).forEach(item => {
-        total += item.total - 0;
+      this.fields.forEach(field=>{
+        if(field.formType == 'sparepart'){
+          const arr = this.value[field.fieldName] || []
+          arr.forEach(item=>{
+            total += item.total - 0;
+          })
+        }
       });
       return total;
     },
@@ -169,8 +176,7 @@ export default {
       return total;
     },
 
-    handleSparepartNum(index, e){ 
-      const item = this.value.sparepart[index];
+    handleSparepartNum(item, e){       
       item.number = e;
       item.total = (e * item.salePrice).toFixed(2);  
       this.$nextTick(()=>{
@@ -178,8 +184,7 @@ export default {
       }); 
     },
 
-    handleSparepartPrice(index, e){
-      const item = this.value.sparepart[index];
+    handleSparepartPrice(item, e){
       item.salePrice = e;
       item.total = (e * item.number).toFixed(2);
       this.$nextTick(()=>{
@@ -187,8 +192,8 @@ export default {
       }); 
     },
 
-    handleSparepartDelete(index){
-      this.value.sparepart.splice(index, 1);
+    handleSparepartDelete(index, arr){
+      arr.splice(index, 1);
       this.$nextTick(()=>{
         this.sparepartExpense = this.getServiceItermExpense();
       }); 
