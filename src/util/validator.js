@@ -32,6 +32,7 @@ const RuleMap = {
   attachment,
   address,
   link,
+  customer: select
 };
 
 /** 单行文本验证，50字以内 */

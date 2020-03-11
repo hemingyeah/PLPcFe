@@ -15,25 +15,46 @@ export function packToTask(fields, form){
       let customer = form.customer || [];
       // customer
       if(customer[0]){
-        return task.customer = {
+        task.customer = {
           id: customer[0].value
         };
-      }  
-    }
+      }
 
-    if(fieldName === 'customerAddress'){
-      let customerAddress = form.customerAddress || {};
-      // address
-      return task.customerAddress = {
-        adCountry: '',
-        adProvince: customerAddress.province,
-        adCity: customerAddress.city,
-        adDist: customerAddress.dist,
-        adLatitude: customerAddress.latitude || '',
-        adLongitude: customerAddress.longitude || '',
-        addressType: customerAddress.addressType || 0,
-        adAddress: customerAddress.address,
-      };
+      // 客户联系人
+      if(form.linkman && form.linkman[0]){
+        let linkman = form.linkman[0];
+        task.tlmId = linkman.id;
+        task.tlmName = linkman.name;
+        task.tlmPhone = linkman.phone;
+      }
+      
+      // 客户地址
+      if(form.address && form.address[0]){
+        let address = form.address[0];
+        let taddress = {};
+        taddress.id = address.id;
+        taddress.province = address.province;
+        taddress.city = address.city;
+        taddress.dist = address.dist;
+        taddress.latitude = address.latitude;
+        taddress.longitude = address.longitude;
+        taddress.address = address.address;
+
+        task.taddress = taddress;
+      } 
+
+      // 产品
+      if(form.product && form.product.length > 0){
+        task.products = [];
+        form.product.map(product => {
+          task.products.push({
+            id: product.id,
+            name: product.name,
+            serialNumber: product.serialNumber,
+            type: product.type
+          })
+        })
+      }
     }
 
     if (field.formType === 'address' && !field.isSystem) {

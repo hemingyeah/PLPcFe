@@ -35,7 +35,7 @@
             v-model="value.customer"
             :field="customerField"
             :remote-method="searchCustomer"
-            :choose="updateCustomer"
+            @input="updateCustomer"
             placeholder="请输入关键字搜索客户">
           </biz-form-remote-select>
         </form-item>
@@ -43,18 +43,32 @@
 
         <!-- start 联系人 -->
         <form-item v-if="customerOption.linkman" label="联系人">
-          <form-text :field="field" :value="selectedCustomer.lmName" @update="update" />
+          <biz-form-remote-select
+            v-model="value.linkman"
+            :remote-method="searchLinkman"
+            placeholder="请输入关键字搜索联系人">
+          </biz-form-remote-select>
         </form-item>
         <!-- end 联系人 -->
 
+        <!-- start 地址 -->
         <form-item v-if="customerOption.address" label="地址">
-          <form-address :field="field" :value="customerAddress" @update="update" :task-disable-update="true"/>
+          <biz-form-remote-select
+            v-model="value.address"
+            :remote-method="searchAddress"
+            placeholder="请输入关键字搜索地址">
+          </biz-form-remote-select>
         </form-item>
+        <!-- start 地址 -->
+
+        <!-- start 产品 -->
         <form-item v-if="customerOption.product" label="产品">
-          <base-select
-            v-model="value.template"
+          <biz-form-remote-select
+            :field="productField"
+            v-model="value.product"
             :remote-method="searchProduct"
-            @input="updateProduct">
+            @input="updateProduct"
+            placeholder="请输入关键字搜索产品">
             <div class="product-template-option" slot="option" slot-scope="{ option }">
               <h3>{{ option.name }}</h3>
               <p>
@@ -68,8 +82,9 @@
                 </span>
               </p>
             </div>
-          </base-select>
+          </biz-form-remote-select>
         </form-item>
+        <!-- start 产品 -->
       </template>
       <!-- end 客户字段 -->
 
@@ -121,21 +136,16 @@ export default {
     customerOption(){
       return (this.customerField.setting && this.customerField.setting.customerOption) || {} ;
     },
-    /* 客户地址 */
-    customerAddress(){
-      const address = (this.selectedCustomer && this.selectedCustomer.customerAddress ) || {};
-      return {
-        province: address.adProvince,
-        city: address.adCity,
-        dist: address.adDist,
-        address: address.adAddress,
-        latitude: address.adLongitude,
-        longitude: address.adLatitude,
-        addressType: address.addressType
-      };
-    },
     selectedCustomer(){
       return (this.value.customer && this.value.customer[0]) || {};
+    },
+    productField(){
+      return {
+        displayName: '产品',
+        fieldName: 'product',
+        formType: 'select',
+        isNull: this.customerOption.productNotNull ? 0 : 1
+      }
     },
     /* 工单类型 */
     taskTypes(){
@@ -195,12 +205,27 @@ export default {
       this.$emit('input', value);
     },
     async updateCustomer(value = []) {
-      const customerField = this.customerField;
 
-      this.update({
-        field: customerField,
-        newValue: value
-      });
+      try {
+        const result = await TaskApi.getTaskDefaultInfo({ customerId: value[0].value });
+
+        let { linkman, address } = result;
+
+        this.$set(this.value, 'linkman', [{
+          value: linkman.id,
+          label: linkman.name + linkman.phone,
+          ...linkman
+        }]);
+
+        this.$set(this.value, 'address', [{
+          value: address.id,
+          label: address.province + address.city + address.dist + address.address,
+          ...address
+        }]);
+        
+      } catch (error) {
+        console.log('task-edit-form: updateCustomer -> error', error);
+      }
 
       // 查询客户关联字段
       let forRelation = {
@@ -218,24 +243,70 @@ export default {
       try {
         const result = await TaskApi.getTaskCustomerList(params);
 
-        if (!result || !result.list) return
+        if (!result || !result.list) return;
 
         result.list = result.list.map(customer =>
           Object.freeze({
             label: customer.name,
-            value: customer.id,
-            serialNumber: customer.serialNumber,
-            lmName: customer.lmName,
-            lmPhone: customer.lmPhone,
-            customerAddress: customer.customerAddress
+            value: customer.id
           })
         )
 
         return result;
 
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
+    },
+    async searchLinkman(params) {
+      const pms = params || {};
+      pms.customerId = this.selectedCustomer.value;
+
+      try {
+        const data = await TaskApi.getTaskCustomerLinkman(pms);
+        
+        let result = data.result;
+        
+        if (!result || !result.list) return;
+
+        result.list = result.list.map(linkman =>
+          Object.freeze({
+            label: linkman.name + linkman.phone,
+            value: linkman.id,
+            ...linkman
+          })
+        );
+        
+        return result;  
+
+      } catch (error) {
+        console.log('task-edit-form: searchProduct -> error', error);
+      }
+
+    },
+    async searchAddress(params) {
+      const pms = params || {};
+      pms.customerId = this.selectedCustomer.value;
+
+      try {
+        const result = await TaskApi.getTaskCustomerAddress(pms);
+
+        if (!result || !result.data) return;
+
+        result.list = result.data.map(address =>
+          Object.freeze({
+            label: address.province + address.city + address.dist + address.address,
+            value: address.id,
+            ...address
+          })
+        );
+        
+        return result;  
+
+      } catch (error) {
+        console.log('task-edit-form: searchAddress -> error', error)
+      }
+
     },
     async searchProduct(params) {
       const pms = params || {}
@@ -265,70 +336,15 @@ export default {
       }
 
     },
-    async updateProduct(value) {
-      let nv = null;
-      const template = value[0];   
+    updateProduct(value) {
+
       // 查询产品关联字段
       let forRelation = {
         module: 'product',
         id: value[0].value
       }
 
-      this.$eventBus.$emit('es.Relation.Product', forRelation)
-  
-      this.fields.forEach(f => {
-        nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
-        if (f.formType === 'address') {
-          // console.info('nv:', nv)
-        }
-        if (!!nv && f.fieldName != 'customer' && f.fieldName != 'template') { 
-          this.update(({
-            field: f,
-            newValue: nv
-          }))
-        }
-      });
-    }
-  },
-  components: {
-    'customer-select': {
-      name: 'customer-select',
-      mixins: [FormMixin],
-      props: {
-        value: {
-          type: Array,
-          default: () => []
-        },
-        remoteMethod: Function,
-        updateCustomer: Function,
-        placeholder: String
-      },
-      methods: {
-        input(value) {
-          this.$emit('input', value)
-        }
-      },
-      render(h) {
-        return (
-          <base-select
-            value={this.value}
-            placeholder={this.placeholder}
-            remoteMethod={this.remoteMethod}
-            onInput={this.updateCustomer}
-            scopedSlots={{
-              option: slotProps => {
-                let option = slotProps.option;
-                return (
-                  <div>
-                    { option.label }
-                  </div>
-                );
-              }
-            }}
-          >
-          </base-select>
-        )
-      }
+      this.$eventBus.$emit('es.Relation.Product', forRelation);
     }
   }
 }

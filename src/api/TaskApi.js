@@ -141,3 +141,38 @@ export function getTaskCustomerList(params) {
 export function getTaskCustomerProduct(params) {
   return http.post('/task/customer/product', params);
 }
+
+/** 
+ * @description 获取客户联系人数据
+ * @param {Object} params -- 参数对象
+ * @param {String} params.pageSize -- 页码大小
+ * @param {String} params.pageNum -- 分页数
+ * @param {String} params.keyword -- 关键字
+ * @param {String} params.customerId -- 客户id
+*/
+export function getTaskCustomerLinkman(params) {
+  return http.get('/api/elasticsearch/outside/es/linkman/list', params);
+}
+
+/** 
+ * @description 获取客户地址数据
+ * @param {Object} params -- 参数对象
+ * @param {String} params.pageSize -- 页码大小
+ * @param {String} params.pageNum -- 分页数
+ * @param {String} params.keyword -- 关键字
+ * @param {String} params.customerId -- 客户id
+*/
+export function getTaskCustomerAddress(params) {
+  return http.get('/task/customer/address', params);
+}
+
+/** 
+ * @description 获取客户地址数据
+ * @param {Object} params -- 参数对象
+ * @param {String} params.customerId -- 客户id
+ * @param {String} params.productId -- 产品id
+ * @param {String} params.notNull -- 分页数
+*/
+export function getTaskDefaultInfo(params) {
+  return http.get('/task/defaultInfo', params);
+}
