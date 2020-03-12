@@ -1,6 +1,6 @@
 <template>
   <div class="form-serviceterm">
-    <button class="btn btn-primary base-upload-btn" @click="add">添加</button>
+    <button type="button" class="btn btn-primary base-upload-btn" @click="add">添加</button>
     <base-modal :show.sync="visible" title="服务项目添加" class="form-serviceterm-modal">
 
       <form-item label="名称">
@@ -49,7 +49,7 @@
       </form-item>
 
       <div class="footer-save">
-        <button class="btn btn-primary base-upload-btn btn-save" @click="save">保存</button>
+        <button type="button" class="btn btn-primary base-upload-btn btn-save" @click="save">保存</button>
       </div>
  
     </base-modal>
