@@ -61,7 +61,7 @@ export default {
       return false;
     },
     seeHelp(){
-      platform.openLink('https://help.shb.ltd/doc?id=10102');
+      platform.openLink(`https://www.yuque.com/shb/updatelog/${this.version.replace(' ', '')}`);
       this.show = false;
     }
   },
