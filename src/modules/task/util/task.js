@@ -55,6 +55,7 @@ export function packToTask(fields, form){
           })
         })
       }
+      return;
     }
 
     if (field.formType === 'address' && !field.isSystem) {

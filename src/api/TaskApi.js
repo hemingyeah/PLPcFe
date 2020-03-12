@@ -139,7 +139,7 @@ export function getTaskCustomerList(params) {
  * @param {String} params.customerId -- 客户id
 */
 export function getTaskCustomerProduct(params) {
-  return http.post('/task/customer/product', params);
+  return http.get('/task/customer/product', params);
 }
 
 /** 
@@ -167,7 +167,7 @@ export function getTaskCustomerAddress(params) {
 }
 
 /** 
- * @description 获取客户地址数据
+ * @description 获取客户联系人和地址数据
  * @param {Object} params -- 参数对象
  * @param {String} params.customerId -- 客户id
  * @param {String} params.productId -- 产品id
@@ -175,4 +175,13 @@ export function getTaskCustomerAddress(params) {
 */
 export function getTaskDefaultInfo(params) {
   return http.get('/task/defaultInfo', params);
+}
+
+/** 
+ * @description 通过产品id获取客户数据
+ * @param {Object} params -- 参数对象
+ * @param {String} params.id -- 产品id
+*/
+export function getCustomerByProduct(params) {
+  return http.get('/customer/product/detail/data', params);
 }

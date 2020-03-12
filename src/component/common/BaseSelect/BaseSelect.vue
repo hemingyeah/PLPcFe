@@ -218,6 +218,9 @@ export default {
       this.keyword = keyword || '';
       this.page = new Page();
     },
+    close() {
+      this.showList = false;
+    }
   },
   directives: { Clickoutside },
 }

@@ -64,11 +64,13 @@
         <!-- start 产品 -->
         <form-item v-if="customerOption.product" label="产品">
           <biz-form-remote-select
+            ref="product"
             :field="productField"
             v-model="value.product"
             :remote-method="searchProduct"
             @input="updateProduct"
-            placeholder="请输入关键字搜索产品">
+            placeholder="请输入关键字搜索产品"
+            multiple>
             <div class="product-template-option" slot="option" slot-scope="{ option }">
               <h3>{{ option.name }}</h3>
               <p>
@@ -98,6 +100,7 @@ import * as TaskApi from '@src/api/TaskApi';
 /* util */
 import _ from 'lodash';
 import * as FormUtil from '@src/component/form/util';
+import { findComponentDownward } from '@src/util/assist';
 /* mixin */
 import FormMixin from '@src/component/form/mixin/form';
 
@@ -211,18 +214,26 @@ export default {
 
         let { linkman, address } = result;
 
-        this.$set(this.value, 'linkman', [{
-          value: linkman.id,
-          label: linkman.name + linkman.phone,
-          ...linkman
-        }]);
-
-        this.$set(this.value, 'address', [{
-          value: address.id,
-          label: address.province + address.city + address.dist + address.address,
-          ...address
-        }]);
+        if (linkman) {
+          this.$set(this.value, 'linkman', [{
+            value: linkman.id,
+            label: linkman.name + linkman.phone,
+            ...linkman
+          }]);
+        }
         
+        if (address) {
+          this.$set(this.value, 'address', [{
+            value: address.id,
+            label: address.province + address.city + address.dist + address.address,
+            ...address
+          }]);
+        }
+
+        if (this.value.product && this.value.product.length) {
+          this.value.product = this.value.product.filter(item => item.customerId == value[0].value);
+        }
+
       } catch (error) {
         console.log('task-edit-form: updateCustomer -> error', error);
       }
@@ -309,12 +320,8 @@ export default {
 
     },
     async searchProduct(params) {
-      const pms = params || {}
-
-      // 这里判断是否有客户信息
-      if(this.selectedCustomer && this.selectedCustomer.value){
-        pms.customerId = this.selectedCustomer.value;
-      }
+      const pms = params || {};
+      pms.customerId = this.selectedCustomer.value;
 
       try {
         const result = await TaskApi.getTaskCustomerProduct(pms);
@@ -336,15 +343,35 @@ export default {
       }
 
     },
-    updateProduct(value) {
+    async updateProduct(value) {
 
-      // 查询产品关联字段
-      let forRelation = {
-        module: 'product',
-        id: value[0].value
+      try {
+        // 判断客户是否存在
+        if (!this.value.customer || !this.value.customer.length) {
+          // 客户不存在时则下拉框隐藏
+          findComponentDownward(this.$refs.product, 'base-select').close();
+          const result = await TaskApi.getCustomerByProduct({ id: value[value.length - 1].value });
+
+          const customerData = [{
+            label: result.customerName,
+            value: result.customerId
+          }];
+
+          this.$set(this.value, 'customer', customerData);
+          this.updateCustomer(customerData);
+        }
+
+        // 查询产品关联字段
+        let forRelation = {
+          module: 'product',
+          id: value[0].value
+        }
+
+        this.$eventBus.$emit('es.Relation.Product', forRelation);
+
+      } catch (error) {
+        console.log('task-edit-form: updateProduct -> error', error);
       }
-
-      this.$eventBus.$emit('es.Relation.Product', forRelation);
     }
   }
 }

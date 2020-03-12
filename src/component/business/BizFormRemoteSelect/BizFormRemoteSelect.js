@@ -16,6 +16,10 @@ const BizFormRemoteSelect = {
     value: {
       type: Array,
       default: () => []
+    },
+    multiple: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -30,7 +34,8 @@ const BizFormRemoteSelect = {
         placeholder={ this.placeholder }
         remoteMethod={ this.remoteMethod }
         value={ this.value }
-        scopedSlots= { this.$scopedSlots }
+        scopedSlots={ this.$scopedSlots }
+        multiple={ this.multiple }
       >
       </base-select>
     )
