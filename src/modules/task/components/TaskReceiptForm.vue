@@ -188,14 +188,14 @@ export default {
       item.salePrice = e;
       item.total = (e * item.number).toFixed(2);
       this.$nextTick(()=>{
-        this.sparepartExpense = this.getServiceItermExpense();
+        this.sparepartExpense = this.getSparepartExpense();
       }); 
     },
 
     handleSparepartDelete(index, arr){
       arr.splice(index, 1);
       this.$nextTick(()=>{
-        this.sparepartExpense = this.getServiceItermExpense();
+        this.sparepartExpense = this.getSparepartExpense();
       }); 
     },
 
@@ -225,7 +225,7 @@ export default {
     },
 
     update({ field, newValue, oldValue }) { 
-      let { fieldName, displayName } = field
+      let { fieldName, displayName, formType } = field
       if (this.$appConfig.debug) {
         console.info(
           `[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(
@@ -237,7 +237,7 @@ export default {
       this.$set(value, fieldName, newValue)  
       this.$emit('input', newValue)
       this.$nextTick(()=>{
-        if(fieldName === 'sparepart') {
+        if(formType === 'sparepart') {
           this.sparepartExpense = this.getSparepartExpense();  
         } else if(fieldName === 'serviceIterm') {
           this.serviceItermExpense = this.getServiceItermExpense();  
