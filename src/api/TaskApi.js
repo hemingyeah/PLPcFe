@@ -185,3 +185,12 @@ export function getTaskDefaultInfo(params) {
 export function getCustomerByProduct(params) {
   return http.get('/customer/product/detail/data', params);
 }
+
+/** 
+ * @description 通过联系人id获取地址数据
+ * @param {Object} params -- 参数对象
+ * @param {String} params.lmId -- 产品id
+*/
+export function getLmBindAddress(params) {
+  return http.get('/task/getLmBindAddress', params);
+}

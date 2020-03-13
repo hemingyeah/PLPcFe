@@ -31,66 +31,82 @@
         
         <!-- start 客户 -->
         <form-item :label="field.displayName">
-          <biz-form-remote-select
-            v-model="value.customer"
-            :field="customerField"
-            :remote-method="searchCustomer"
-            @input="updateCustomer"
-            placeholder="请输入关键字搜索客户">
-          </biz-form-remote-select>
+          <div class="input-and-btn">
+            <biz-form-remote-select
+              v-model="value.customer"
+              :field="customerField"
+              :remote-method="searchCustomer"
+              @input="updateCustomer"
+              placeholder="请输入关键字搜索客户">
+            </biz-form-remote-select>
+            <el-button @click="createCustomer">新建</el-button>
+          </div>
         </form-item>
         <!-- end 客户 -->
 
         <!-- start 联系人 -->
         <form-item v-if="customerOption.linkman" label="联系人">
-          <biz-form-remote-select
-            v-model="value.linkman"
-            :remote-method="searchLinkman"
-            placeholder="请输入关键字搜索联系人">
-          </biz-form-remote-select>
+          <div class="input-and-btn">
+            <biz-form-remote-select
+              v-model="value.linkman"
+              :remote-method="searchLinkman"
+              @input="updateLinkman(value.linkman[0])"
+              placeholder="请输入关键字搜索联系人">
+            </biz-form-remote-select>
+            <el-button @click="openDialog('contact')">新建</el-button>
+          </div>
         </form-item>
         <!-- end 联系人 -->
 
         <!-- start 地址 -->
         <form-item v-if="customerOption.address" label="地址">
-          <biz-form-remote-select
-            v-model="value.address"
-            :remote-method="searchAddress"
-            placeholder="请输入关键字搜索地址">
-          </biz-form-remote-select>
+          <div class="input-and-btn">
+            <biz-form-remote-select
+              v-model="value.address"
+              :remote-method="searchAddress"
+              placeholder="请输入关键字搜索地址">
+            </biz-form-remote-select>
+            <el-button @click="openDialog('address')">新建</el-button>
+          </div>
         </form-item>
         <!-- start 地址 -->
 
         <!-- start 产品 -->
         <form-item v-if="customerOption.product" label="产品">
-          <biz-form-remote-select
-            ref="product"
-            :field="productField"
-            v-model="value.product"
-            :remote-method="searchProduct"
-            @input="updateProduct"
-            placeholder="请输入关键字搜索产品"
-            multiple>
-            <div class="product-template-option" slot="option" slot-scope="{ option }">
-              <h3>{{ option.name }}</h3>
-              <p>
-                <span>
-                  <label>产品编号：</label>
-                  <span>{{ option.serialNumber }}</span>
-                </span>
-                <span>
-                  <label>产品类型：</label>
-                  <span>{{ option.type }}</span>
-                </span>
-              </p>
-            </div>
-          </biz-form-remote-select>
+          <div class="input-and-btn">
+            <biz-form-remote-select
+              ref="product"
+              :field="productField"
+              v-model="value.product"
+              :remote-method="searchProduct"
+              @input="updateProduct"
+              placeholder="请输入关键字搜索产品"
+              multiple>
+              <div class="product-template-option" slot="option" slot-scope="{ option }">
+                <h3>{{ option.name }}</h3>
+                <p>
+                  <span>
+                    <label>产品编号：</label>
+                    <span>{{ option.serialNumber }}</span>
+                  </span>
+                  <span>
+                    <label>产品类型：</label>
+                    <span>{{ option.type }}</span>
+                  </span>
+                </p>
+              </div>
+            </biz-form-remote-select>
+            <el-button>新建</el-button>
+          </div>
         </form-item>
         <!-- start 产品 -->
       </template>
       <!-- end 客户字段 -->
 
     </form-builder>
+
+    <edit-contact-dialog ref="EditContactDialog" :customer="selectedCustomer" :is-phone-unique="isPhoneUnique"/>
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="selectedCustomer.id"/>
   </div>
 </template>
 
@@ -103,6 +119,9 @@ import * as FormUtil from '@src/component/form/util';
 import { findComponentDownward } from '@src/util/assist';
 /* mixin */
 import FormMixin from '@src/component/form/mixin/form';
+
+import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAddressDialog.vue';
+import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue';
 
 export default {
   name: 'task-edit-form',
@@ -128,6 +147,7 @@ export default {
       taskValue: {},
       taskType: '',
       validation: false, // this.buildValidation(),
+      isPhoneUnique: false
     }
   },
   computed: {
@@ -171,6 +191,12 @@ export default {
     this.taskFields = this.fields;
     this.taskValue = this.value;
     this.selectedType = this.taskTypes[0] || {};
+    this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);
+    this.$eventBus.$on('task_create_or_edit.update_address', this.bindAddress);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('task_create_or_edit.update_linkman', this.updateLinkman);
+    this.$eventBus.$off('task_create_or_edit.update_address', this.bindAddress);
   },
   methods: {
     // TODO: 切换工单类型 数据清除问题
@@ -207,6 +233,30 @@ export default {
       this.$set(value, fieldName, newValue);
       this.$emit('input', value);
     },
+    validate() {
+      return this.$refs.form.validate();
+    },
+    async searchCustomer(params = {}) {
+
+      try {
+        const result = await TaskApi.getTaskCustomerList(params);
+
+        if (!result || !result.list) return;
+
+        result.list = result.list.map(customer =>
+          Object.freeze({
+            label: customer.name,
+            value: customer.id,
+            ...customer
+          })
+        )
+
+        return result;
+
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async updateCustomer(value = []) {
 
       try {
@@ -214,21 +264,13 @@ export default {
 
         let { linkman, address } = result;
 
-        if (linkman) {
-          this.$set(this.value, 'linkman', [{
-            value: linkman.id,
-            label: linkman.name + linkman.phone,
-            ...linkman
-          }]);
-        }
-        
-        if (address) {
-          this.$set(this.value, 'address', [{
-            value: address.id,
-            label: address.province + address.city + address.dist + address.address,
-            ...address
-          }]);
-        }
+        // 重置联系人和地址
+        this.$set(this.value, 'linkman', []);
+        this.$set(this.value, 'address', []);
+
+        // 绑定联系人和地址
+        linkman && this.bindLinkman(linkman);
+        address && this.bindAddress(address);
 
         if (this.value.product && this.value.product.length) {
           this.value.product = this.value.product.filter(item => item.customerId == value[0].value);
@@ -245,29 +287,6 @@ export default {
       };
 
       this.$eventBus.$emit('es.Relation.Customer', forRelation)
-    },
-    validate() {
-      return this.$refs.form.validate();
-    },
-    async searchCustomer(params = {}) {
-
-      try {
-        const result = await TaskApi.getTaskCustomerList(params);
-
-        if (!result || !result.list) return;
-
-        result.list = result.list.map(customer =>
-          Object.freeze({
-            label: customer.name,
-            value: customer.id
-          })
-        )
-
-        return result;
-
-      } catch (error) {
-        console.error(error);
-      }
     },
     async searchLinkman(params) {
       const pms = params || {};
@@ -295,6 +314,27 @@ export default {
       }
 
     },
+    async updateLinkman(linkman) {
+      this.bindLinkman(linkman);
+
+      try {
+        const result = await TaskApi.getLmBindAddress({ lmId: linkman.id });
+
+        // 如果存在地址信息则绑定地址
+        result.data.id && this.bindAddress(result.data);
+
+      } catch (error) {
+        console.log('task-edit-form: updateLinkmanByCreate -> error', error);
+      }
+
+    },
+    bindLinkman(linkman) {
+      this.$set(this.value, 'linkman', [{
+        value: linkman.id,
+        label: linkman.name + linkman.phone,
+        ...linkman
+      }]);
+    },
     async searchAddress(params) {
       const pms = params || {};
       pms.customerId = this.selectedCustomer.value;
@@ -318,6 +358,13 @@ export default {
         console.log('task-edit-form: searchAddress -> error', error)
       }
 
+    },
+    bindAddress(address) {
+      this.$set(this.value, 'address', [{
+        value: address.id,
+        label: address.province + address.city + address.dist + address.address,
+        ...address
+      }]);
     },
     async searchProduct(params) {
       const pms = params || {};
@@ -372,7 +419,22 @@ export default {
       } catch (error) {
         console.log('task-edit-form: updateProduct -> error', error);
       }
+    },
+    openDialog(action) {
+      if (!this.selectedCustomer.id) {
+        this.$platform.alert('请先选择客户');
+        return;
+      }
+      if (action === 'address') {
+        this.$refs.EditAddressDialog.openDialog();
+      } else if (action === 'contact') {
+        this.$refs.EditContactDialog.openDialog();
+      }
     }
+  },
+  components: {
+    [EditAddressDialog.name]: EditAddressDialog,
+    [EditContactDialog.name]: EditContactDialog
   }
 }
 </script>

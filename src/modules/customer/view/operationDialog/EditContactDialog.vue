@@ -214,6 +214,10 @@ export default {
 
         this.pending = false;
         this.addContactDialog = false;
+
+        // 新建、编辑工单页面新建联系人
+        this.$eventBus.$emit('task_create_or_edit.update_linkman', { ...this.form, id: result.data });
+
         this.reset();
         this.$eventBus.$emit("customer_contact_table.update_linkman_list");
         this.$eventBus.$emit("customer_info_record.update_record_list");
@@ -361,6 +365,22 @@ export default {
   .edit-contact-form-container {
     width: 100%;
     margin: 0 auto;
+  }
+  
+  .edit-contact-dialog {
+    .base-modal-body {
+      padding: 15px 30px 0;
+    }
+
+
+    .edit-contact-form-container {
+      width: 100%;
+      margin: 0 auto;
+
+      .edit-contact-form {
+        width: 100%;
+        padding: 10px 0 5px;
+      }
 
     .edit-contact-form {
       padding: 10px 0 5px;
