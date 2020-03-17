@@ -128,7 +128,7 @@
           <el-form-item label="按状态" class="state-btn-group">
             <el-radio-group :value="paramsForSelector.state" @input="stateChangeHandler" size="medium">
               <el-radio-button label="待审批"></el-radio-button>
-              <el-radio-button label="已审批"></el-radio-button>
+              <el-radio-button label="已通过"></el-radio-button>
               <el-radio-button label="已拒绝"></el-radio-button>
               <el-radio-button label="已撤回"></el-radio-button>
             </el-radio-group>
@@ -668,7 +668,7 @@ export default {
       case '待审批':
         this.params.state = 'unapproved';
         break;
-      case '已审批':
+      case '已通过':
         this.params.state = 'success';
         break;
       case '已拒绝':
