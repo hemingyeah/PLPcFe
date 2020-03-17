@@ -24,6 +24,7 @@ const dataScreenRouter = require('./dataScreen');
 
 const repositoryRouter = require('./repository')
 const BillRouter = require('./bill')
+const jobtransferRouter = require('./jobtransfer')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -96,6 +97,7 @@ router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
 
 router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
+router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.all('/api/*', async ctx => {
   
   let option = {
