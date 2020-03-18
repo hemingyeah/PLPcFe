@@ -2,7 +2,7 @@
   <div class="form-setting-panel">
     <h3>系统字段 -- {{ field.displayName }}</h3>
     <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
-    <h3>选项</h3>
+    <h3>关联项</h3>
     <div class="form-setting-group">
       <el-checkbox v-model="customerOption.address">地址</el-checkbox>
       <el-checkbox v-model="customerOption.linkman">联系人</el-checkbox>

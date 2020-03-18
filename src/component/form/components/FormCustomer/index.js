@@ -10,6 +10,9 @@ let FormCustomerField = {
     setting: FormCustomerSetting,
     preview: FormCustomerPreview,
     build: FormCustomer,
+    extend: {
+      'task_customer_setting': FormCustomerSetting
+    }
   }
 }
 

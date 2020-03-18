@@ -20,6 +20,10 @@ const BizFormRemoteSelect = {
     multiple: {
       type: Boolean,
       default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -36,6 +40,7 @@ const BizFormRemoteSelect = {
         value={ this.value }
         scopedSlots={ this.$scopedSlots }
         multiple={ this.multiple }
+        disabled={ this.disabled }
       >
       </base-select>
     )

@@ -85,6 +85,10 @@ export default {
     customerIsReadonly: {
       type: Boolean,
       default: false,
+    },
+    remoteInitData: {
+      type: Object,
+      default: () => ({})
     }
   },
   inject: ['initData'],
@@ -98,6 +102,9 @@ export default {
     customerField() {
       return this.fields.filter(f => f.fieldName === 'customer')[0]
     },
+    initNewData() {
+      return Object.keys(this.initData).length ? this.initData : this.remoteInitData;
+    }
   },
   methods: {
     updateTemplate(value) {
@@ -120,7 +127,7 @@ export default {
       });
     },
     buildValidation(){
-      const serialNumberUnique = this.initData.productConfig.serialNumberUnique;
+      const serialNumberUnique = this.initNewData?.productConfig?.serialNumberUnique;
 
       let checkSerialNumberFn = _.debounce(function(params, resolve, changeStatus){
 

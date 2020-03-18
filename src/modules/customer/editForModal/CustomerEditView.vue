@@ -17,6 +17,12 @@ import platform from '@src/platform';
 export default {
   name: 'customer-edit-view',
   inject: ['initData'],
+  props: {
+    remoteInitData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       submitting: false,
@@ -27,15 +33,18 @@ export default {
     };
   },
   computed: {
+    initNewData() {
+      return Object.keys(this.initData).length ? this.initData : this.remoteInitData;
+    },
     action() {
-      return this.initData.action;
+      return this.initNewData.action;
     },
     fields() {
-      let originFields = this.initData.fieldInfo || [];
+      let originFields = this.initNewData.fieldInfo || [];
       let sortedFields = originFields.sort((a, b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
-            f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
+            f.isNull = this.initNewData.isAddressAllowNull ? 1 : 0;
           }
           return f;
         })
@@ -43,7 +52,7 @@ export default {
           return (
             (
               f.fieldName !== 'tags' 
-              || (f.fieldName === 'tags' && this.initData.isDivideByTag)
+              || (f.fieldName === 'tags' && this.initNewData.isDivideByTag)
             )
           )
         });
@@ -64,7 +73,7 @@ export default {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
 
-          const params = util.packToCustomer(this.fields, this.form, this.initData.tags);
+          const params = util.packToCustomer(this.fields, this.form, this.initNewData.tags);
           this.pending = true;
           this.loadingPage = true;
           this.createMethod(params, callBack);
@@ -125,7 +134,7 @@ export default {
 
     try {
       // 初始化默认值
-      let form = util.packToForm(this.fields, {}, this.initData.customerAddress);
+      let form = util.packToForm(this.fields, {}, this.initNewData.customerAddress);
       this.form = FormUtil.initialize(this.fields, form);
       this.addressBackup = this.form.customerAddress;
       this.init = true;

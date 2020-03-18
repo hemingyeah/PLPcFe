@@ -1,7 +1,7 @@
 <template>
   <div class="product-container" v-loading.fullscreen.lock="loadingPage">
     <form @submit.prevent="submit" class="base-form" v-if="init">
-      <product-edit-form :fields="productFields" v-model="form" customer-is-readonly ref="productEditForm">
+      <product-edit-form :fields="productFields" :remote-init-data="remoteInitData" v-model="form" customer-is-readonly ref="productEditForm">
 
       </product-edit-form>
     </form>
@@ -22,6 +22,12 @@ import * as util from './utils/ProductMapping';
 export default {
   name: 'product-edit',
   inject: ['initData'],
+  props: {
+    remoteInitData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       loadingPage: false,
@@ -32,6 +38,10 @@ export default {
     }
   },
   computed: {
+    initNewData() {
+      console.log(this.remoteInitData)
+      return Object.keys(this.initData).length ? this.initData : this.remoteInitData;
+    },
     productFields() {
       return [
         {
@@ -40,7 +50,7 @@ export default {
           formType: 'select',
           isSystem: 1
         },
-        ...this.initData.productFields
+        ...this.initNewData.productFields
       ]
     },
   },

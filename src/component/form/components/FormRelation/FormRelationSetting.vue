@@ -9,12 +9,12 @@
     </div>
     <h3>关联项字段</h3>
     <div class="form-setting-group"> 
-      <el-select v-model="field.setting.fieldName">
+      <el-select v-model="selectedRelatedField">
         <el-option
           v-for="item in options"
           :key="item.value"
           :label="item.displayName"
-          :value="item.fieldName">
+          :value="item.fieldId">
         </el-option>
       </el-select>
     </div>
@@ -40,9 +40,32 @@ export default {
     }
   },
   computed: {
+    module () {
+      return this.field.formType === 'relationCustomer' ? 'customer' : 'product';
+    },
     options() {
       // TODO: 此处不是本地数据 需要从服务端获取 或 服务端塞进来数据
-      return this.field.formType === 'relationCustomer' ? this.customerFields : this.productFields; 
+      let moduleOptionName = `${this.module}Fields`;
+      return this[moduleOptionName];
+    },
+    selectedRelatedField: {
+      get() {
+        return this.field.setting.fieldId || '';
+      },
+      set(newVal) {
+        const selectedField = this.options.filter(field => field.fieldId == newVal);
+
+        if (selectedField.length) {
+          const { fieldName, formType } = selectedField[0];
+
+          this.field.setting = {
+            module: this.module,
+            fieldId: newVal,
+            fieldName,
+            formType
+          }
+        }
+      }
     }
   },
   data() {

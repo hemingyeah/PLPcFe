@@ -110,7 +110,7 @@ export default class FormField{
     let defaultValue = null;
 
     // 处理下拉选项
-    if(field.formType == 'select'){
+    if(isSelect(field) || isMultiSelect(field)){
       let dataSource = [];
       let opts = field.options || [];
       for(let i = 0; i < opts.length; i++){
@@ -121,7 +121,7 @@ export default class FormField{
           defaultValue = opt.value;
         }
       }
-      setting.isMulti = field.isMulti;
+      field.formType == 'select' && (setting.isMulti = field.isMulti);
       setting.dataSource = dataSource;
     }
 

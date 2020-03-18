@@ -194,3 +194,17 @@ export function getCustomerByProduct(params) {
 export function getLmBindAddress(params) {
   return http.get('/task/getLmBindAddress', params);
 }
+
+/** 
+ * @description 获取新建客户相关数据
+*/
+export function getCreateCustomerData(params) {
+  return http.get('/customer/edit/getData', params);
+}
+
+/** 
+ * @description 获取新建产品相关数据
+*/
+export function getCreateProductData(params) {
+  return http.get('/customer/product/edit/getData', params);
+}

@@ -3,7 +3,6 @@
 import { getTaskRelatedInfo } from '@src/api/TaskApi';
 /* utils */
 import _ from 'lodash';
-import EventBus from '@src/util/eventBus';
 
 export default {
   name: 'form-relation-mixin',
@@ -64,31 +63,34 @@ export default {
     let eventName = this.eventNameMap[formType];
 
     if (eventName) {
-      EventBus.$on(eventName, this.update)
+      this.$eventBus.$on(eventName, this.update);
     }
   },
   methods: {
     async update(forRelation) {
-      let params = JSON.parse(JSON.stringify(forRelation));
-      let oldValue = this._value;
-      let newValue = _.cloneDeep(this.value);
+      if (Object.keys(forRelation).length) {
+        let params = JSON.parse(JSON.stringify(forRelation));
+        let oldValue = this._value;
+        let newValue = _.cloneDeep(this.value);
 
-      params.fieldName = this.setting.fieldName;
-      params.formType = this.setting.formType;
+        params.fieldName = this.setting.fieldName;
+        params.formType = this.setting.formType;
 
-      let getTaskRelatedInfoFunc = this.getTaskRelatedInfoFuncMap[this.tableName];
-      if(!params.id || !getTaskRelatedInfoFunc) return
+        let getTaskRelatedInfoFunc = this.getTaskRelatedInfoFuncMap[this.tableName];
+        if(!params.id || !getTaskRelatedInfoFunc) return
 
-      getTaskRelatedInfoFunc(params)
-        .then(res => {
-          if(res.status == 0){
-            newValue = res.data
-            this.$emit('update', {newValue, oldValue, field: this.field})
-          }
-        }).catch(err => {
-          console.error(err)
-        })
-
+        getTaskRelatedInfoFunc(params)
+          .then(res => {
+            if(res.status == 0){
+              newValue = res.data
+              this.$emit('update', {newValue, oldValue, field: this.field})
+            }
+          }).catch(err => {
+            console.error(err)
+          })
+      } else {
+        this.$emit('update', {newValue: '', field: this.field});
+      }
     }
   }
 }
