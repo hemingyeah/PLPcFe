@@ -22,6 +22,13 @@ router.get('/task/create', async ctx => {
   ctx.body = Template.renderWithData('新建工单', {}, script, modConfig.template)
 });
 
+router.get('/task/edit/:id', async ctx => {
+  let modConfig = modules['task.edit'];
+  let script = ['/task.edit.js'];
+  
+  ctx.body = Template.renderWithHtml('编辑工单', {}, script, modConfig.template)
+});
+
 router.get('/task/receipt', async ctx => {
   let modConfig = modules['task.receipt'];
   let script = ['/task.receipt.js'];

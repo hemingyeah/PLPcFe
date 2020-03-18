@@ -23,7 +23,7 @@ export function packToTask(fields, form){
       // 客户联系人
       if(form.linkman && form.linkman[0]){
         let linkman = form.linkman[0];
-        task.tlmId = linkman.id;
+        task.tlmId = linkman.value;
         task.tlmName = linkman.name;
         task.tlmPhone = linkman.phone;
       }
@@ -32,7 +32,7 @@ export function packToTask(fields, form){
       if(form.address && form.address[0]){
         let address = form.address[0];
         let taddress = {};
-        taddress.id = address.id;
+        taddress.id = address.value;
         taddress.province = address.province;
         taddress.city = address.city;
         taddress.dist = address.dist;
@@ -78,29 +78,48 @@ export function packToTask(fields, form){
 }
 
 /** 将工单对象转成form表单，用于初始化表单 */
-export function packToForm(field, data, defaultAddress = {}){
-  let cusAdr = data.customerAddress || defaultAddress || {};
+export function packToForm(field, data){
+
+  console.log('data', data)
+
+  // 初始化客户
+  let customer = [{
+    value: data.customer.id,
+    label: data.customer.name
+  }];
+
+  // 初始化联系人
+  let linkman = [{
+    value: data.tlmId,
+    label: data.tlmName + data.tlmPhone,
+    name: data.tlmName,
+    phone: data.tlmPhone
+  }];
+
+  // 初始化地址
+  let address = [];
+  if (data.taddress.id) {
+    address = [{
+      value: data.taddress.id,
+      label: data.taddress.province + data.taddress.city + data.taddress.dist + data.taddress.address,
+      ...data.taddress
+    }];
+  }
+
+  // 初始化产品
+  data.products.length && data.products.map(item => {
+    item.value = item.id;
+    item.label = item.name;
+  })
 
   let attribute = {
     ...data.attribute
   };
   let form = {
-    id: data.id,
-    name: data.name,
-    lmName: data.lmName,
-    lmPhone: data.lmPhone,
-    serialNumber: data.serialNumber,
-    customerAddress: {
-      province: cusAdr.adProvince,
-      city: cusAdr.adCity,
-      dist: cusAdr.adDist,
-      address: cusAdr.adAddress,
-      longitude: cusAdr.adLongitude || '',
-      latitude: cusAdr.adLatitude || '',
-      addressType: cusAdr.addressType || 0
-    },
-    tags: toArray(data.tags),
-    manager: data.customerManager ? {displayName: data.customerManagerName, userId: data.customerManager} : null,
+    customer,
+    linkman,
+    address,
+    product: data.products
   };
 
   return Object.assign(attribute, form)
