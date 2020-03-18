@@ -17,12 +17,6 @@ import platform from '@src/platform';
 export default {
   name: 'customer-edit-view',
   inject: ['initData'],
-  props: {
-    remoteInitData: {
-      type: Object,
-      default: () => ({})
-    }
-  },
   data() {
     return {
       submitting: false,
@@ -33,18 +27,15 @@ export default {
     };
   },
   computed: {
-    initNewData() {
-      return Object.keys(this.initData).length ? this.initData : this.remoteInitData;
-    },
     action() {
-      return this.initNewData.action;
+      return this.initData.action;
     },
     fields() {
-      let originFields = this.initNewData.fieldInfo || [];
+      let originFields = this.initData.fieldInfo || [];
       let sortedFields = originFields.sort((a, b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
-            f.isNull = this.initNewData.isAddressAllowNull ? 1 : 0;
+            f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
           }
           return f;
         })
@@ -52,7 +43,7 @@ export default {
           return (
             (
               f.fieldName !== 'tags' 
-              || (f.fieldName === 'tags' && this.initNewData.isDivideByTag)
+              || (f.fieldName === 'tags' && this.initData.isDivideByTag)
             )
           )
         });
@@ -73,7 +64,7 @@ export default {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
 
-          const params = util.packToCustomer(this.fields, this.form, this.initNewData.tags);
+          const params = util.packToCustomer(this.fields, this.form, this.initData.tags);
           this.pending = true;
           this.loadingPage = true;
           this.createMethod(params, callBack);
@@ -126,6 +117,11 @@ export default {
           callBack && typeof callBack == 'function' && callBack(customer);
         })
         .catch(err => console.error('err', err));
+    },
+    initFormData() {
+      let form = util.packToForm(this.fields, {}, this.initData.customerAddress);
+      this.form = FormUtil.initialize(this.fields, form);
+      this.addressBackup = this.form.customerAddress;
     }
   },
   async mounted() {
@@ -134,9 +130,7 @@ export default {
 
     try {
       // 初始化默认值
-      let form = util.packToForm(this.fields, {}, this.initNewData.customerAddress);
-      this.form = FormUtil.initialize(this.fields, form);
-      this.addressBackup = this.form.customerAddress;
+      this.initFormData();
       this.init = true;
     } catch (e) {
       console.error('CustomerEditView caught an error ', e);

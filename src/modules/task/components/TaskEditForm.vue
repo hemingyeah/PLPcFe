@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading.fullscreen.lock="loading">
     <form-builder ref="form" :fields="taskFields" :value="taskValue" @update="update">
 
       <template slot="taskNo" slot-scope="{ field, value }">
@@ -108,20 +108,18 @@
     </form-builder>
 
     <!-- start 新建客户弹窗 -->
-    <base-modal title="新建客户" :show.sync="addCustomerDialog" class="add-dialog-container" width="800px" v-if="addCustomerDialog">
-      <div id="createCustomerView">
-        <customer-edit-view ref="CustomerCreateView" :remote-init-data="customerInitData"></customer-edit-view>
-        <div class="dialog-footer" slot="footer">
-          <el-button @click="addCustomerDialog = false">关闭</el-button>
-          <el-button type="primary" @click="addCustomerSubmit">保存</el-button>
-        </div>
+    <base-modal title="新建客户" :show.sync="addCustomerDialog" class="add-dialog-container" width="800px" @closed="closeDialog('customer')">
+      <div id="createCustomerView"></div>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="addCustomerDialog = false">关闭</el-button>
+        <el-button type="primary" @click="addCustomerSubmit">保存</el-button>
       </div>
     </base-modal>
     <!-- end 新建客户弹窗 -->
 
     <!-- start 新建产品弹窗 -->
-    <base-modal title="新建产品" :show.sync="addProductDialog" class="add-dialog-container" width="800px" v-if="addProductDialog">
-      <product-edit ref="ProductCreateView" :remote-init-data="productInitData"></product-edit>
+    <base-modal title="新建产品" :show.sync="addProductDialog" class="add-dialog-container" width="800px" @closed="closeDialog('product')">
+      <div id="createProductView"></div>
       <div class="dialog-footer" slot="footer">
         <el-button @click="addProductDialog = false">关闭</el-button>
         <el-button type="primary" @click="addProductSubmit">保存</el-button>
@@ -135,6 +133,7 @@
 </template>
 
 <script>
+import Vue from '@src/common/entry';
 /* api */
 import * as TaskApi from '@src/api/TaskApi';
 /* util */
@@ -166,6 +165,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       isCreateCustomer: false,
       addCustomerDialog: false,
       addProductDialog: false,
@@ -212,16 +212,21 @@ export default {
         result[value.value] = value;
         return result;
       }, {})
+    },
+    customerFormDom() {
+      return this.customerFormView.$refs.CustomerCreateView;
+    },
+    productFormDom() {
+      return this.productFormView.$refs.ProductCreateView;
     }
+  },
+  created () {
+    this.init();
   },
   mounted () {
     this.taskFields = this.fields;
     this.taskValue = this.value;
     this.selectedType = this.taskTypes[0] || {};
-
-    // 获取客户、产品数据
-    this.getCustomerData();
-    this.getProductData();
 
     this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);
     this.$eventBus.$on('task_create_or_edit.update_address', this.bindAddress);
@@ -231,6 +236,67 @@ export default {
     this.$eventBus.$off('task_create_or_edit.update_address', this.bindAddress);
   },
   methods: {
+    init() {
+      this.loading = true;
+
+      // 获取客户、产品数据
+      Promise.all([
+        this.getCustomerData(),
+        this.getProductData()
+      ])
+        .then(res => {
+          this.loading = false;
+        })
+        .catch(err => console.error('error', err));
+    },
+    getCustomerData () {
+      return TaskApi.getCreateCustomerData()
+        .then(res => {
+          this.customerInitData = res.data;
+          this.renderCustomerForm(res.data);
+        })
+        .catch(err => console.error('error', err));
+    },
+    getProductData() {
+      return TaskApi.getCreateProductData()
+        .then(res => {
+          this.productInitData = res.data;
+          this.renderProductForm(res.data);
+        })
+        .catch(err => console.error('error', err));
+    },
+    renderCustomerForm(data) {
+      this.customerFormView = new Vue({
+        el: '#createCustomerView',
+        provide: {
+          initData: Object.freeze(data)
+        },
+        components: {
+          [CustomerEditView.name]: CustomerEditView
+        },
+        render(h) {
+          return (
+            <customer-edit-view ref="CustomerCreateView" />
+          )
+        }
+      })
+    },
+    renderProductForm(data) {
+      this.productFormView = new Vue({
+        el: '#createProductView',
+        provide: {
+          initData: Object.freeze(data)
+        },
+        components: {
+          [EditModal.name]: EditModal
+        },
+        render(h) {
+          return (
+            <product-edit ref="ProductCreateView" />
+          )
+        }
+      })
+    },
     // TODO: 切换工单类型 数据清除问题
     async chooseTemplate(id) {
       let loading = this.$loading();
@@ -313,12 +379,16 @@ export default {
       }
 
       // 查询客户关联字段
+      this.selectCustomerRelation(value[0].value);
+
+    },
+    selectCustomerRelation(id) {
       let forRelation = {
         module: 'customer',
-        id: value[0].value
+        id
       };
 
-      this.$eventBus.$emit('es.Relation.Customer', forRelation)
+      this.$eventBus.$emit('es.Relation.Customer', forRelation);
     },
     async searchLinkman(params) {
       const pms = params || {};
@@ -433,7 +503,8 @@ export default {
 
           const customerData = [{
             label: result.customerName,
-            value: result.customerId
+            value: result.customerId,
+            id: result.customerId
           }];
 
           this.$set(this.value, 'customer', customerData);
@@ -457,34 +528,15 @@ export default {
         console.log('task-edit-form: updateProduct -> error', error);
       }
     },
-    async getCustomerData () {
-      try {
-        const result = await TaskApi.getCreateCustomerData();
-
-        this.customerInitData = result.data;
-
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async getProductData() {
-      try {
-        const result = await TaskApi.getCreateProductData();
-
-        this.productInitData = result.data;
-
-      } catch (error) {
-        console.error(error);
-      }
-    },
     addCustomerSubmit() {
-      this.$refs.CustomerCreateView.submit(data => {
+      this.customerFormDom.submit(data => {
         this.isCreateCustomer = true;
         
         // 绑定客户
         this.$set(this.value, 'customer', [{
           label: data.name,
-          value: data.id
+          value: data.id,
+          id: data.id
         }]);
 
         // 绑定联系人
@@ -506,20 +558,26 @@ export default {
           longitude: data.longitude,
         })
 
+        // 查询客户关联字段
+        this.selectCustomerRelation(data.id);
+
         this.addCustomerDialog = false;
 
       });
     },
     addProductSubmit() {
-      this.$refs.ProductCreateView.submit(this.value.customer[0], data => {
+      this.productFormDom.submit(this.value.customer[0], data => {
 
-        this.$set(this.value, 'product', [{
+        let productArr = this.value.product?.length ? _.cloneDeep(this.value.product) : [];
+        productArr.push({
           value: data.productId,
           label: data.productName,
           id: data.productId,
           name: data.productName,
           ...data
-        }])
+        })
+
+        this.$set(this.value, 'product', productArr);
 
         this.addProductDialog = false;
 
@@ -536,16 +594,25 @@ export default {
         this.$refs.EditContactDialog.openDialog();
       } else if (action === 'customer') {
         this.addCustomerDialog = true;
+        this.customerFormDom.init = true;
       } else if (action === 'product') {
         this.addProductDialog = true;
+        this.productFormDom.init = true;
+      }
+    },
+    closeDialog(action) {
+      if (action === 'customer') {
+        this.customerFormDom.initFormData();
+        this.customerFormDom.init = false;
+      } else if (action === 'product') {
+        this.productFormDom.initFormData();
+        this.productFormDom.init = false;
       }
     }
   },
   components: {
-    [CustomerEditView.name]: CustomerEditView,
     [EditAddressDialog.name]: EditAddressDialog,
-    [EditContactDialog.name]: EditContactDialog,
-    [EditModal.name]: EditModal
+    [EditContactDialog.name]: EditContactDialog
   }
 }
 </script>
