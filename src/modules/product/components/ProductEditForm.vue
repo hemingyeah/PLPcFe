@@ -25,15 +25,16 @@
         <form-item :label="field.displayName" validation>
           <customer-select v-model="value.customer" :field="customerField" :remote-method="searchCustomer" :update-customer="updateCustomer" placeholder="请输入关键字搜索客户"></customer-select>
         </form-item>
-        <form-item label="联系人" validation v-if="field.setting.customerOption && field.setting.customerOption.linkman">
+        <form-item label="联系人" validation :is-not-null="field.setting.customerOption.linkmanNotNull" v-if="field.setting.customerOption && field.setting.customerOption.linkman">
           <form-customer-select v-model="value.linkman" :field="customerField" :remote-method="searchCustomerLinkman" :update-linkman="updateLinkman" @createInfo="createInfo" type="linkman" placeholder="请先选择客户"></form-customer-select>
         </form-item>
-        <form-item label="地址" validation v-if="field.setting.customerOption && field.setting.customerOption.address">
+        <form-item label="地址" validation :is-not-null="field.setting.customerOption.addressNotNull" v-if="field.setting.customerOption && field.setting.customerOption.address">
           <form-customer-select-address v-model="value.customerAddress" :field="customerField" :remote-method="searchCustomerAddress" :update-customer-address="updateCustomerAddress" @createInfo="createInfo" type="address" placeholder="请先选择客户"></form-customer-select-address>
         </form-item>
       </template>
+
       <template slot="serialNumber" slot-scope="{field}">
-        <form-item :label="field.displayName" :validation="validation.serialNumber">
+        <form-item :label="field.displayName">
           <form-text
             :field="field"
             :value="value.serialNumber" @update="update"
@@ -43,7 +44,7 @@
 
       <!-- start 产品类型 -->
       <template slot="type" slot-scope="{field}">
-        <form-item :label="field.displayName" validation>
+        <form-item :label="field.displayName">
           <div class="input-and-btn">
             <form-select
               :field="field" 
@@ -62,11 +63,9 @@
       <!-- end 产品类型 -->
 
     </form-builder>
-
-    <edit-contact-dialog ref="EditContactDialog" :customer="value.customer[0]" :is-phone-unique="isPhoneUnique"/>
-    <edit-address-dialog ref="EditAddressDialog" />
-    <!-- :customer-id="customerId"
-                         :default-address="selectedAddress" -->
+    <edit-contact-dialog ref="EditContactDialog" :customer="customer" @updateLinkman="updateLinkman" />
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="customerId" @updateCustomerAddress="updateCustomerAddress" />
+                        <!-- :default-address="selectedAddress" -->
   </div>
 </template>
 
@@ -116,6 +115,15 @@ export default {
     isPhoneUnique() {
       return this.initData.isPhoneUnique || false;
     },
+
+    customer() {
+      let customer = this.value.customer[0];
+      return customer || {};
+    },
+
+    customerId() {
+      return this.customer.id || '';
+    }
   },
   methods: {
     updateTemplate(value) {
@@ -179,7 +187,6 @@ export default {
       let value = this.value;
 
       this.$set(value, fieldName, newValue);
-      console.log('value', value);
       this.$emit('input', value);
     },
     updateCustomer(value) {
@@ -188,6 +195,7 @@ export default {
         field: cf,
         newValue: value
       })
+      this.fetchCustomer(value);
     },
     updateLinkman(value) {
       let field = {
@@ -225,6 +233,7 @@ export default {
           if (!res || !res.list) return;
           if (res.list) {
             res.list = res.list.map(customer => Object.freeze({
+              id: customer.id,
               label: customer.name,
               value: customer.id,
               lmPhone: customer.lmPhone,
@@ -233,6 +242,38 @@ export default {
               customerAddress: customer.customerAddress
             }))
           }
+
+          return res;
+        })
+        .catch(e => console.error(e));
+    },
+    fetchCustomer(params) {
+      const pms = {
+        customerId: params[0].id,
+        notNull: true,
+        productId: ''
+      };
+      
+
+      return this.$http.get('/task/defaultInfo', pms)
+        .then(res => {
+          if (!res) return;
+          let linkman = [
+            {
+              label: res.linkman.name,
+              value: res.linkman.id,
+              phone: res.linkman.phone
+            }
+          ]
+          this.updateLinkman(linkman);
+
+          let address = [
+            {
+              label: res.address && (res.address.province + res.address.city + res.address.dist + res.address.address),
+              vlaue: res.address && res.address.id
+            }
+          ]
+          res.address ? this.updateCustomerAddress(address) : '';
 
           return res;
         })
@@ -303,7 +344,6 @@ export default {
         this.$platform.alert('请先选择客户');
         return;
       }
-
       if(type == 'linkman') this.$refs.EditContactDialog.openDialog();
       if(type == 'address') this.$refs.EditAddressDialog.openDialog();
     }
@@ -372,7 +412,7 @@ export default {
         remoteMethod: Function,
         updateLinkman: Function,
         placeholder: String,
-        type: String
+        type: String,
       },
       methods: {
         input(value){
@@ -395,7 +435,6 @@ export default {
               {...{
                 scopedSlots: {
                   option: props => {
-                    console.log('props', props)
                     return (
                       <p class="customer-linkman">
                         <span><label>姓名：</label><span>{props.option.label}</span></span>

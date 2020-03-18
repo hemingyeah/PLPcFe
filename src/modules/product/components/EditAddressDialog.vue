@@ -19,10 +19,6 @@ export default {
       type: String,
       default: '',
     },
-    action: {
-      type: String,
-      default: 'create',
-    },
     loginUserId: {
       type: String,
       default: '',
@@ -51,14 +47,14 @@ export default {
       addressField: {
         formType: 'address',
         fieldName: 'customerAddress',
-        displayName: "地址",
+        displayName: '地址',
         placeholder: '请输入详细地址[最多50字]',
         isNull: 0,
       },
       fields: [{
         formType: 'address',
         fieldName: 'customerAddress',
-        displayName: "地址",
+        displayName: '地址',
         placeholder: '请输入详细地址[最多50字]',
         isNull: 0,
       }]
@@ -66,7 +62,7 @@ export default {
   },
   computed: {
     title() {
-      return this.action === 'create' ? '添加地址' : '编辑地址';
+      return '添加地址';
     }
   },
   methods: {
@@ -90,17 +86,23 @@ export default {
 
         this.pending = true;
         const params = this.buildParams();
-        const url = `/customer/address/${this.action === 'create' ? 'create' : 'update'}`;
+        const url = '/customer/address/create';
 
         let result = await this.$http.post(url, params, false);
 
         if(result.status != 0) {
           return this.$platform.notification({
-              title: '失败',
-              message: result.message || `${this.action === 'create' ? '新建' : '更新'}失败`,
-              type: 'error',
+            title: '失败',
+            message: result.message || '新建失败',
+            type: 'error',
           });
         }
+        
+        let address = [{
+          label: params.province + params.city + params.dist + params.address,
+          value: result.data
+        }]
+        this.$emit('updateCustomerAddress', address);
 
         this.pending = false;
         this.$emit('submit-success');
@@ -109,9 +111,7 @@ export default {
         this.$eventBus.$emit('customer_detail_view.update_statistical_data');
         this.$eventBus.$emit('customer_detail_view.update_customer_detail');
         this.addAddressDialog = false;
-        if (this.action === 'create') {
-          this.$eventBus.$emit('customer_detail_view.select_tab', 'customer-address-table');
-        }
+        this.$eventBus.$emit('customer_detail_view.select_tab', 'customer-address-table');
 
       } catch (e) {
         console.error('edit-address-dialog catch err', e);
@@ -171,10 +171,6 @@ export default {
     },
     openDialog() {
       this.addAddressDialog = true;
-      if (this.action === 'edit') {
-        this.update({field: this.fields[0], newValue: this.defaultAddress});
-      }
-
       this.updateAddressBackup(this.defaultAddress);
       this.setDefaultAddress(this.defaultAddress);
       this.init = true;

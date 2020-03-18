@@ -167,7 +167,7 @@ export default {
   }
 
   .form-builder{
-    width: 655px;
+    width: 700px;
     padding: 10px 0 0 10px;
 
     .input-and-btn{

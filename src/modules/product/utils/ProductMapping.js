@@ -4,9 +4,9 @@ import {toArray} from '@src/util/lang';
 export function packToProduct(fields, form){
   let product = {};
   let attribute = {};
-  const {customer, template, type, serialNumber, name, id} = form;
+  const {customer, template, type, serialNumber, name, id, linkman, customerAddress} = form;
   let tv = null;
-  
+  console.log('fields', fields)
   fields.forEach(f => {
     if (!f.isSystem) {
       attribute[f.fieldName] = form[f.fieldName];
@@ -41,6 +41,14 @@ export function packToProduct(fields, form){
   
   if (id) {
     product.id = id;
+  }
+
+  if (Array.isArray(linkman) && linkman.length) {
+    product.linkmanId = linkman[0].value
+  }
+
+  if (Array.isArray(customerAddress) && customerAddress.length) {
+    product.customerAddressId = customerAddress[0].value
   }
   
   return {

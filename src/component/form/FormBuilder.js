@@ -52,16 +52,29 @@ const FormBuilder = {
      * 检测所有字段的结果，都验证通过，返回true, 否则返回false
      */
     validate(){
-      let promises = Object.keys(this.validateMap).map(key => this.validateMap[key]());
+      // console.log('this.validateMap', this.validateMap)
+      let promises = Object.keys(this.validateMap).map(key => {
+        // console.log('333', this.validateMap[key])
+        return this.validateMap[key]()
+      });
       return Promise.all(promises)
         .then(results => results.every(msg => !msg))
         .catch(err => console.error('validate error', err))
     },
     /** 注册待验证的组件 */
     addFieldHandler(event){
-      let {fieldName, validate} = event.detail;
+      let {fieldName, validate, field} = event.detail;
       if (event.detail && event.detail.field && event.detail.field.formType === 'info') {
         return;
+      }
+      if(field.fieldName == 'customer') {
+        if(field.setting.customerOption.linkmanNotNull) {
+          this.validateMap.linkman = validate;
+        }
+
+        if(field.setting.customerOption.addressNotNull) {
+          this.validateMap.address = validate;
+        }
       }
       this.validateMap[fieldName] = validate;
     },

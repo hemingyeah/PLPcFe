@@ -1,5 +1,5 @@
 <template>
-  <base-modal :title="modalTitle" :show.sync="addContactDialog" width="600px" class="edit-contact-dialog" @closed="reset">
+  <base-modal title="添加联系人" :show.sync="addContactDialog" width="600px" class="edit-contact-dialog" @closed="reset">
     <form @submit.prevent="submit" class="edit-contact-form-container" v-if="init">
       <form-builder :fields="fields" class="edit-contact-form" ref="form" :value="form" @update="update">
 
@@ -12,23 +12,6 @@
           </form-item>
         </template>
 
-        <template slot="productId" slot-scope="{field}">
-          <form-item :label="field.displayName">
-            <el-input
-              v-model="product.name"
-              :disabled="true">
-            </el-input>
-          </form-item>
-        </template>
-
-        <template slot="address" slot-scope="{field}">
-          <form-item :label="field.displayName">
-            <el-input
-              v-model="customer.customerAddress"
-              :disabled="true">
-            </el-input>
-          </form-item>
-        </template>
       </form-builder>
       <div class="dialog-footer" slot="footer">
         <el-button @click="addContactDialog = false">关闭</el-button>
@@ -91,9 +74,6 @@ export default {
     }
   },
   computed: {
-    action() {
-      return this.originalValue.name ? 'edit' : 'create';
-    },
     customerId() {
       return (this.customer && this.customer.id) || '';
     },
@@ -144,7 +124,7 @@ export default {
         placeholder: '[最多500字]',
         isNull: 1,
       }, {
-        formType: 'text',
+        formType: 'select',
         fieldName: 'productId',
         displayName: '关联产品',
         placeholder: '请选择',
@@ -154,7 +134,7 @@ export default {
           dataSource: this.products || [],
         }
       }, {
-        formType: 'text',
+        formType: 'select',
         fieldName: 'address',
         displayName: '关联地址',
         placeholder: '请选择',
@@ -164,8 +144,9 @@ export default {
         }
       }]
     },
-    modalTitle() {
-      return this.originalValue.name ? '编辑联系人' : '添加联系人';
+    address () {
+      let address = this.customer.customerAddress ? (this.customer.customerAddress.adProvince || '') + (this.customer.customerAddress.adCity || '') + (this.customer.customerAddress.adDist || '') + (this.customer.customerAddress.adAddress || '') : '';
+      return address;
     }
   },
   methods: {
@@ -190,31 +171,31 @@ export default {
             })),
         };
 
-        let result = {};
-
-        if (this.action === 'create') {
-          result = await this.$http.post('/linkman/createByJson', params);
-        } else {
-          result = await this.$http.post('/linkman/updateByJson', params);
-        }
+        let result = await this.$http.post('/linkman/createByJson', params);
 
         if(result.status != 0) {
           return this.$platform.notification({
             title: '失败',
-            message: result.message || `${this.action === 'create' ? '新建' : '更新'}失败`,
+            message: result.message || '新建失败',
             type: 'error',
           });
         }
 
         this.pending = false;
         this.addContactDialog = false;
+        let linkman = [
+          {
+            label: this.form.name,
+            value: result.data,
+            phone: this.form.phone
+          }
+        ]
+        this.$emit('updateLinkman', linkman);
         this.reset();
-        this.$eventBus.$emit('product_view_record_update');
-        this.$eventBus.$emit('product_view.update_detail');
-
-        if (this.action === 'create') {
-          this.$eventBus.$emit('product_view.select_tab', 'product-contact-table');
-        }
+        this.$eventBus.$emit('customer_contact_table.update_linkman_list');
+        this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+        this.$eventBus.$emit('customer_detail_view.update_customer_detail');
 
       } catch (e) {
         this.pending = false;
@@ -247,32 +228,9 @@ export default {
     },
     openDialog() {
       this.addContactDialog = true;
-      if (this.action === 'edit') {
-        this.matchValueToForm(this.originalValue);
-      }
       this.fetchAddress();
       this.fetchProducts();
       this.init = true;
-    },
-    matchValueToForm(val) {
-      const {name, remark, sex, position, department, customerId, customer, id, phone, email} = val;
-
-      this.form = {
-        name,
-        remark,
-        sex: ['男', '女'].indexOf(sex) === -1 ? '' : sex,
-        position,
-        department,
-        address: '',
-        customId: customerId || customer.id,
-        customer: customer || {},
-        id,
-        phone,
-        email,
-        productId: [],
-      };
-
-      // 联系人的产品和地址在获取到产品和地址的列表之后过滤掉被删除的再给form使用
     },
     fetchAddress() {
       return this.$http.get('/customer/address/list', {
