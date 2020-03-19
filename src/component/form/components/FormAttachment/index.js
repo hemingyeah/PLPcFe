@@ -43,7 +43,7 @@ const TaskReceiptAttachmentField = {
     build: FormAttachment,
     view: FormAttachmentView,
     extend: {
-      'task_receiptAttachment_setting': FormAttachmentSetting
+      'task_receipt_receiptAttachment_setting': FormAttachmentSetting
     }
   }
 }

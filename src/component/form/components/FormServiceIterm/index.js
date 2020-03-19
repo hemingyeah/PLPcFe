@@ -6,11 +6,12 @@ let FormServiceItermField = {
   formType: 'serviceIterm', // 字段类型
   name: '服务项目',
   isSystem: 1,
+  forceDelete: true,
   component: {
     preview: FormServiceItermPreview,
     build: FormServiceIterm,
     extend: {
-      'task_serviceIterm_setting': FormServiceItermSetting
+      'task_receipt_serviceIterm_setting': FormServiceItermSetting
     }
   }
 };

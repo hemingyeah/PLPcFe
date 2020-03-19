@@ -6,11 +6,12 @@ let FormSparepartField = {
   formType: 'sparepart', // 字段类型
   name: '备件',
   isSystem: 1,
+  forceDelete: true,
   component: {
     preview: FormSparepartPreview,
     build: FormSparepart,
     extend: {
-      'task_sparepart_setting': FormSparepartSetting
+      'task_receipt_sparepart_setting': FormSparepartSetting
     }
   }
 };
