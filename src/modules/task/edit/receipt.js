@@ -1,10 +1,8 @@
 import Vue from '@src/common/entry'
 import http from '@src/util/http'
-import TaskEditView from './views/TaskEditView.vue'
+import TaskReceipt from './TaskReceiptView.vue'
 
-Vue.prototype.$http = http;
-Vue.prototype.$eventBus = new Vue();
-
+Vue.prototype.$http = http
 // 处理注入的参数
 let initData = {}
 try {
@@ -18,7 +16,7 @@ const app = new Vue({
   provide: {
     initData: Object.freeze(initData)
   },
-  render: h => h(TaskEditView),
+  render: h => h(TaskReceipt),
   el: '#app'
 })
 

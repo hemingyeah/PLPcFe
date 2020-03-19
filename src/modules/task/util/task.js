@@ -78,51 +78,57 @@ export function packToTask(fields, form){
 }
 
 /** 将工单对象转成form表单，用于初始化表单 */
-export function packToForm(field, data){
-
-  console.log('data', data)
-
-  // 初始化客户
-  let customer = [{
-    value: data.customer.id,
-    label: data.customer.name
-  }];
-
-  // 初始化联系人
-  let linkman = [{
-    value: data.tlmId,
-    label: data.tlmName + data.tlmPhone,
-    name: data.tlmName,
-    phone: data.tlmPhone
-  }];
-
-  // 初始化地址
-  let address = [];
-  if (data.taddress.id) {
-    address = [{
-      value: data.taddress.id,
-      label: data.taddress.province + data.taddress.city + data.taddress.dist + data.taddress.address,
-      ...data.taddress
-    }];
-  }
-
-  // 初始化产品
-  data.products.length && data.products.map(item => {
-    item.value = item.id;
-    item.label = item.name;
-  })
-
-  let attribute = {
+export function packToForm(fields, data){
+  let task = {
+    id: data.id,
+    taskNo: data.taskNo,
     ...data.attribute
   };
-  let form = {
-    customer,
-    linkman,
-    address,
-    product: data.products
-  };
 
-  return Object.assign(attribute, form)
+  fields.forEach(field => {
+    let {fieldName, isSystem} = field;
+    let value = data[fieldName];
+
+    if(fieldName === 'customer'){
+      // 初始化客户
+      task.customer = [{
+        value: data.customer.id,
+        label: data.customer.name
+      }];
+
+      // 初始化联系人
+      task.linkman = [{
+        value: data.tlmId,
+        label: data.tlmName + data.tlmPhone,
+        name: data.tlmName,
+        phone: data.tlmPhone
+      }];
+
+      // 初始化地址
+      task.address = [];
+      if (data.taddress.id) {
+        task.address = [{
+          value: data.taddress.id,
+          label: data.taddress.province + data.taddress.city + data.taddress.dist + data.taddress.address,
+          ...data.taddress
+        }];
+      }
+
+      // 初始化产品
+      data.products.length && data.products.map(item => {
+        item.value = item.id;
+        item.label = item.name;
+      })
+      task.product = data.products;
+
+      return;
+    }
+
+    isSystem == 1 && (task[fieldName] = value);
+
+  });
+
+  return task;
 }
 
 

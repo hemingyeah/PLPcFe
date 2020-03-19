@@ -52,9 +52,7 @@ const FormView = {
       
       return value;
     },
-    buildCommonDom(field, value) {
-      let {displayName, formType} = field;
-      
+    buildCommonDom({displayName, value, formType}) {
       let className = {
         'form-view-row-content': true,
         'form-view-textarea-preview': formType === 'textarea'
@@ -152,7 +150,7 @@ const FormView = {
         return this.$scopedSlots[fieldName]({displayName, value, formType, field});
       }
       // 组件默认视图
-      let FormField = FieldManager.get(field.formType);
+      let FormField = FieldManager.findField(field.formType);
       if(FormField && FormField.view){
         let attrs = {props: {field, value}}
         return createElement(FormField.view, attrs);
@@ -233,12 +231,19 @@ const FormView = {
         return this.buildTextarea(params);
       }
 
-      // if(formType === 'icon' && ) {
-      //   params = {
-      //     ...params,
-      //     value: <i class="iconfont icon-weixin" style="color:#55b7b4"></i>
-      //   };
-      // }
+      if (formType === 'cascader') {
+        params = {
+          ...params,
+          value: toArray(value).join('/')
+        };
+      }
+
+      if (formType === 'timestamp') {
+        params = {
+          ...params,
+          value: fmt_datetime(value)
+        };
+      }
       
       // other types: text date number datetime phone
       return this.buildCommonDom(params);

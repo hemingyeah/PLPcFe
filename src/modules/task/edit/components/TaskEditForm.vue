@@ -578,6 +578,7 @@ export default {
         })
 
         this.$set(this.value, 'product', productArr);
+        this.updateProduct(productArr);
 
         this.addProductDialog = false;
 
