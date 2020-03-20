@@ -12,7 +12,8 @@
 
         <!-- start 工单类型 -->
         <form-item label="工单类型" :validation="false">
-          <form-select :field="field" :source="taskTypes" :value="selectedType.value" :clearable="false" @input="chooseTemplate"/>
+          <form-select v-if="!value" :field="field" :source="taskTypes" :value="selectedType.value" :clearable="false" @input="chooseTemplate"/>
+          <div class="form-taskNo" v-else>{{ taskValue.templateName }}</div>
         </form-item>
         <!-- end 工单类型 -->
 
@@ -301,12 +302,21 @@ export default {
     async chooseTemplate(id) {
       let loading = this.$loading();
       try {
-        this.templateId = id
-        // 清空表单
-        this.$emit('input', {});
+        this.taskFields = await TaskApi.getTaskTemplateFields({ templateId: id, tableName: 'task' });
+        this.taskValue = FormUtil.initialize(this.taskFields, {});
 
-        this.taskFields = await TaskApi.getTaskTemplateFields({ templateId: id, tableName: 'task' })
-        this.taskValue = FormUtil.initialize(this.fields, this.value);
+        // 表单初始化
+        this.$emit('update:value', this.taskValue);
+        this.$emit('update:fields', this.taskFields);
+
+        // 清空校验结果
+        setTimeout(() => {
+          this.$refs.form.$children.map(child => {
+            if (child.$el.className == 'form-item err') {
+              child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
+            }
+          })
+        }, 0);
 
         this.selectedType = this.taskTypesMap[id];
         this.$emit('updatetemplateId', this.selectedType);

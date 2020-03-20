@@ -32,7 +32,8 @@ const RuleMap = {
   attachment,
   address,
   link,
-  customer: select
+  customer: select,
+  planTime
 };
 
 /** 单行文本验证，50字以内 */
@@ -104,6 +105,16 @@ function datetime(value, field = {}) {
     if (field.isNull === 1) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
     if (!DATETIME_REG.test(value)) return resolve('请输入正确格式的日期');
+    resolve(null);
+  });
+}
+
+function planTime(value, field = {}) {
+  return new Promise(resolve => {
+    if (field.isNull === 1) return resolve(null);
+    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
+    let REG = field.setting.dateType == 'date' ? DATE_REG : DATETIME_REG;
+    if (!REG.test(value)) return resolve('请输入正确格式的日期');
     resolve(null);
   });
 }

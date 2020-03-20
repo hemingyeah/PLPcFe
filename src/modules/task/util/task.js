@@ -79,9 +79,12 @@ export function packToTask(fields, form){
 
 /** 将工单对象转成form表单，用于初始化表单 */
 export function packToForm(fields, data){
+  if (!data.id) return;
+  
   let task = {
     id: data.id,
     taskNo: data.taskNo,
+    templateName: data.templateName,
     ...data.attribute
   };
 
@@ -92,8 +95,8 @@ export function packToForm(fields, data){
     if(fieldName === 'customer'){
       // 初始化客户
       task.customer = [{
-        value: data.customer.id,
-        label: data.customer.name
+        value: value.id,
+        label: value.name
       }];
 
       // 初始化联系人
