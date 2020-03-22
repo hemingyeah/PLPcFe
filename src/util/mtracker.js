@@ -15,20 +15,20 @@ const defaultConfig = {
 export default function (options = {}) {
   // 防止SDK引入失败阻塞其他流程
   window.TDAPP = {
-    onEvent () {
-      return '';
+    onEvent (eventName) {
+      return eventName;
     }
   }
-  const script = document.createElement('script');
+  // const script = document.createElement('script');
 
-  const isHttps = document.location.protocol === 'https:';
-  const srcPrefix = isHttps ? 'https://jic.talkingdata.com/app/h5/v1?' : 'http://sdk.talkingdata.com/app/h5/v1?';
+  // const isHttps = document.location.protocol === 'https:';
+  // const srcPrefix = isHttps ? 'https://jic.talkingdata.com/app/h5/v1?' : 'http://sdk.talkingdata.com/app/h5/v1?';
 
-  const appId = options.appId || defaultConfig.appId;
-  const vn = options.vn || defaultConfig.vn;
-  const vc = options.vc || defaultConfig.vc;
-  const src = `${srcPrefix}appid=${appId}&vn=${vn}&vc=${vc}`;
+  // const appId = options.appId || defaultConfig.appId;
+  // const vn = options.vn || defaultConfig.vn;
+  // const vc = options.vc || defaultConfig.vc;
+  // const src = `${srcPrefix}appid=${appId}&vn=${vn}&vc=${vc}`;
 
-  script.setAttribute('src', src);
-  document.querySelector('head').appendChild(script);
+  // script.setAttribute('src', src);
+  // document.querySelector('head').appendChild(script);
 }
