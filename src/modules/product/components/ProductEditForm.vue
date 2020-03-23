@@ -25,11 +25,11 @@
         <form-item :label="field.displayName" validation>
           <customer-select v-model="value.customer" :field="customerField" :remote-method="searchCustomer" :update-customer="updateCustomer" placeholder="请输入关键字搜索客户"></customer-select>
         </form-item>
-        <form-item label="联系人" validation :is-not-null="field.setting.customerOption.linkmanNotNull" v-if="field.setting.customerOption && field.setting.customerOption.linkman">
-          <form-customer-select v-model="value.linkman" :field="customerField" :remote-method="searchCustomerLinkman" :update-linkman="updateLinkman" @createInfo="createInfo" type="linkman" placeholder="请先选择客户"></form-customer-select>
+        <form-item label="联系人" :is-not-null="field.setting.customerOption.linkmanNotNull" v-if="field.setting.customerOption && field.setting.customerOption.linkman">
+          <form-customer-select v-model="value.linkman" :field="getField('linkman', customerField)" :remote-method="searchCustomerLinkman" :update-linkman="updateLinkman" @createInfo="createInfo" type="linkman" placeholder="请先选择客户"></form-customer-select>
         </form-item>
-        <form-item label="地址" validation :is-not-null="field.setting.customerOption.addressNotNull" v-if="field.setting.customerOption && field.setting.customerOption.address">
-          <form-customer-select-address v-model="value.customerAddress" :field="customerField" :remote-method="searchCustomerAddress" :update-customer-address="updateCustomerAddress" @createInfo="createInfo" type="address" placeholder="请先选择客户"></form-customer-select-address>
+        <form-item label="地址" :is-not-null="field.setting.customerOption.addressNotNull" v-if="field.setting.customerOption && field.setting.customerOption.address">
+          <form-customer-select-address v-model="value.customerAddress" :field="getField('productAddress', customerField)" :remote-method="searchCustomerAddress" :update-customer-address="updateCustomerAddress" @createInfo="createInfo" type="address" placeholder="请先选择客户"></form-customer-select-address>
         </form-item>
       </template>
 
@@ -126,6 +126,15 @@ export default {
     }
   },
   methods: {
+    getField(tag, field) {
+      let tv = Object.assign({}, field);
+      tv.fieldName = tag;
+      tv.formType = 'extend';
+      tv.displayName = tag == 'linkman' ? '联系人' : '地址';
+      tv.isNull = tag == 'linkman' ? !tv.setting.customerOption.linkmanNotNull : !tv.setting.customerOption.addressNotNull
+
+      return tv;
+    },
     updateTemplate(value) {
       let nv = null;
       const template = value[0];
@@ -206,6 +215,7 @@ export default {
         field,
         newValue: value
       })
+      this.fetchLinkmanAddress(value);
     },
     updateCustomerAddress(value) {
       let field = {
@@ -215,6 +225,26 @@ export default {
       this.update({
         field,
         newValue: value
+      })
+    },
+    clearLinkman() {
+      let field = {
+        fieldName: 'linkman',
+        displayName: '联系人'
+      }
+      this.update({
+        field,
+        newValue: []
+      })
+    },
+    clearCustomerAddress() {
+      let field = {
+        fieldName: 'customerAddress',
+        displayName: '地址'
+      }
+      this.update({
+        field,
+        newValue: []
       })
     },
     validate() {
@@ -254,7 +284,8 @@ export default {
         productId: ''
       };
       
-
+      this.clearLinkman();
+      this.clearCustomerAddress();
       return this.$http.get('/task/defaultInfo', pms)
         .then(res => {
           if (!res) return;
@@ -270,10 +301,32 @@ export default {
           let address = [
             {
               label: res.address && (res.address.province + res.address.city + res.address.dist + res.address.address),
-              vlaue: res.address && res.address.id
+              value: res.address && res.address.id
             }
           ]
           res.address ? this.updateCustomerAddress(address) : '';
+
+          return res;
+        })
+        .catch(e => console.error(e));
+    },
+    fetchLinkmanAddress(params) {
+      let linkman = value[0];
+      const pms = {
+        lmId: linkman.value
+      };
+      
+      this.clearCustomerAddress();
+      return this.$http.get('task/getLmBindAddress', pms)
+        .then(res => {
+          if (!res) return;
+          let address = [
+            {
+              label: res.address && (res.address.province + res.address.city + res.address.dist + res.address.address),
+              value: res.address && res.address.id
+            }
+          ]
+          rthis.updateCustomerAddress(address) : '';
 
           return res;
         })
@@ -299,7 +352,12 @@ export default {
         .catch(e => console.error(e));
     },
     searchCustomerLinkman (params) {
-      if(!this.value.customer.length) return;
+      if(!this.value.customer.length) {
+        return new Promise((resolve, reject) => {
+          resolve(null)
+        })
+      }
+
       const pms = params || {};
       let customer = this.value.customer[0];
       pms.customerId = customer.value;
@@ -320,22 +378,29 @@ export default {
         .catch(e => console.error(e));
     },
     searchCustomerAddress (params) {
-      if(!this.value.customer.length) return;
+      if(!this.value.customer.length) {
+        return new Promise((resolve, reject) => {
+          resolve(null)
+        })
+      }
+
       const pms = params || {};
       let customer = this.value.customer[0];
+      let linkman = this.value.linkman[0];
       pms.customerId = customer.value;
+      pms.linkmanId = linkman.value;
 
-      return this.$http.get('/customer/address/list', pms)
+      return this.$http.get('/product/address', pms)
         .then(res => {
-          if (!res || !res.list) return;
-          if (res.list) {
-            res.list = res.list.map(address => Object.freeze({
+          if (!res || !res.data) return;
+          if (res.data.list) {
+            res.data.list = res.data.list.map(address => Object.freeze({
               label: `${ address.province } ${ address.city } ${ address.dist } ${ address.address }`,
               value: address.id,
             }))
           }
 
-          return res;
+          return res.data;
         })
         .catch(e => console.error(e));
     },
@@ -404,6 +469,7 @@ export default {
     'form-customer-select': {
       name: 'form-customer-select',
       mixins: [FormMixin],
+      inject: ['initData'],
       props: {
         value: {
           type: Array,
@@ -414,6 +480,15 @@ export default {
         placeholder: String,
         type: String,
       },
+      computed: {
+        auth() {
+          return this.initData.auth || []
+        },
+
+        createdPermission() {
+          return this.auth.indexOf('CUSTOMER_CREATE') != -1;
+        },
+      },
       methods: {
         input(value){
           this.$emit('input', value)
@@ -421,9 +496,16 @@ export default {
 
         createInfo(type, event) {
           this.$emit('createInfo', type);
+        },
+
+        renderBtn() {
+          if(!this.createdPermission) return null;
+          return (
+            <div class="btn btn-primary" onClick={e => this.createInfo(this.type, e)}>新建</div>
+          )
         }
       },
-      render(h){
+      render(h){        
         return (
           <div class="form-customer-select">
             <base-select
@@ -431,6 +513,7 @@ export default {
               placeholder={this.placeholder}
               remoteMethod={this.remoteMethod}
               onInput={this.updateLinkman}
+              clearable
 
               {...{
                 scopedSlots: {
@@ -445,7 +528,7 @@ export default {
                 }
               }}
             />
-            <div class="btn btn-primary" onClick={e => this.createInfo(this.type, e)}>新建</div>
+            { this.renderBtn(h) }
           </div>
         )
       }
@@ -481,6 +564,7 @@ export default {
               placeholder={this.placeholder}
               remoteMethod={this.remoteMethod}
               onInput={this.updateCustomerAddress}
+              clearable
             />
             <div class="btn btn-primary" onClick={e => this.createInfo(this.type, e)}>新建</div>
           </div>

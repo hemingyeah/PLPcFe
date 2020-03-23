@@ -43,7 +43,6 @@ export default {
   },
   computed: {
     productFields() {
-      let field = this.initData.productFields.filter(item => item.fieldName == 'customer' )
       return [
         {
           displayName: '从模板中选择',
@@ -51,8 +50,7 @@ export default {
           formType: 'select',
           isSystem: 1
         },
-        // ...this.initData.productFields
-        ...field
+        ...this.initData.productFields
       ]
     },
     auth() {
@@ -110,7 +108,6 @@ export default {
 
   methods: {
     submit() {
-      console.log('this.form', this.form);
       this.submitting = true;
       this.$refs.productEditForm.validate()
         .then(valid => {
@@ -122,46 +119,44 @@ export default {
           this.loadingPage = true;
           let fn = this.action === 'create' ? createProduct : updateProduct;
           
-          this.pending = false;
-          this.loadingPage = false;
-          // fn(params)
-          //   .then(res => {
-          //     let action = this.action === 'create' ? '新建' : '更新';
+          fn(params)
+            .then(res => {
+              let action = this.action === 'create' ? '新建' : '更新';
 
-          //     if (res.status) {
-          //       this.pending = false;
-          //       this.loadingPage = false;
+              if (res.status) {
+                this.pending = false;
+                this.loadingPage = false;
 
-          //       return this.$platform.notification({
-          //         title: `${action}产品失败`,
-          //         message: res.message || '',
-          //         type: 'error',
-          //       })
-          //     }
+                return this.$platform.notification({
+                  title: `${action}产品失败`,
+                  message: res.message || '',
+                  type: 'error',
+                })
+              }
 
-          //     this.$platform.notification({
-          //       title: `${action}产品成功`,
-          //       type: 'success',
-          //     });
+              this.$platform.notification({
+                title: `${action}产品成功`,
+                type: 'success',
+              });
 
-          //     if(this.action == 'create') {
-          //       this.reloadTab();
-          //     } else {
-          //       let fromId = window.frameElement.getAttribute('fromid');
-          //       this.$platform.refreshTab(fromId);
-          //     }
+              if(this.action == 'create') {
+                this.reloadTab();
+              } else {
+                let fromId = window.frameElement.getAttribute('fromid');
+                this.$platform.refreshTab(fromId);
+              }
 
-          //     if (this.customer) {
-          //       window.location.href = `/customer/view/${this.customer.id}`;
-          //     } else {
-          //       window.location.href = `/customer/product/view/${res.data}`;
-          //     }
-          //   })
-          //   .catch(err => {
-          //     console.error(err);
-          //     this.pending = false;
-          //     this.loadingPage = false;
-          //   });
+              if (this.customer) {
+                window.location.href = `/customer/view/${this.customer.id}`;
+              } else {
+                window.location.href = `/customer/product/view/${res.data}`;
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              this.pending = false;
+              this.loadingPage = false;
+            });
         })
         .catch(err => {
           console.error(err);

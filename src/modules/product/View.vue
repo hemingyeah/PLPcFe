@@ -47,7 +47,7 @@
           </el-dropdown-menu>
         </el-dropdown>
 
-        <base-button type="plain" icon="icon-add" @event="openDialog('contact')">联系人</base-button>
+        <!-- <base-button type="plain" icon="icon-add" @event="openDialog('contact')">联系人</base-button> -->
       </div>
     </div>
 
@@ -77,6 +77,18 @@
             <div class="form-view-row" v-if="value">
               <label>客户</label>
               <div class="form-view-row-content link" @click="openCustomer">{{product.customerName}}</div>
+            </div>
+            <div class="form-view-row" v-if="value && hasLinkman">
+              <label>联系人</label>
+              <div class="form-view-row-content">
+                {{product.linkman && (product.linkman.name + ' ' + product.linkman.phone)}}
+              </div>
+            </div>
+            <div class="form-view-row" v-if="value && hasAddress">
+              <label>地址</label>
+              <div class="form-view-row-content">
+                {{getAddress(product.address)}}
+              </div>
             </div>
           </template>
 
@@ -180,6 +192,14 @@ export default {
     }
   },
   computed: {
+    hasLinkman () {
+      let field = this.initData.productFields.filter(item => item.formType == 'customer')[0];
+      return field && field.setting.customerOption?.linkman;
+    },
+    hasAddress () {
+      let field = this.initData.productFields.filter(item => item.formType == 'customer')[0];
+      return field && field.setting.customerOption?.address;
+    },
     product() {
       return this.newestProduct || this.initData.product || {};
     },
@@ -283,19 +303,34 @@ export default {
         .concat(fixedFields)
         .map(f => {
           // if (f.fieldName === 'name') {
-          //   f.orderId = -10;
-          // }
-
-          // if (f.fieldName === 'customer') {
-          //   f.orderId = -7;
+          //   f.orderId = -11;
           // }
 
           // if (f.fieldName === 'serialNumber') {
-          //   f.orderId = -9;
+          //   f.orderId = -10;
           // }
 
           // if (f.fieldName === 'type') {
+          //   f.orderId = -9;
+          // }
+
+          // if (f.fieldName === 'customer') {
           //   f.orderId = -8;
+          // }
+
+          // if (f.fieldName === 'linkman') {
+          //   f.orderId = -7;
+          //   f.show = true
+          // }
+
+          // if (f.fieldName === 'linkmanPhone') {
+          //   f.orderId = -6;
+          //   f.show = true
+          // }
+
+          // if (f.fieldName === 'address') {
+          //   f.orderId = -5;
+          //   f.show = true
           // }
 
           return f;
@@ -446,6 +481,10 @@ export default {
     this.$eventBus.$off('product_view.select_tab', this.selectTab);
   },
   methods: {
+    getAddress(field) {
+      if(!field) return '';
+      return field.province + field.city + field.dist + field.address || ''
+    },
     openBindCodeDialog() {
       this.$refs.bindCodeDialog.open();
     },
@@ -609,7 +648,7 @@ export default {
     },
     // 构建tab
     buildTabs() {
-      const {taskQuantity, linkmanQuantity, eventQuantity, unfinishedTaskQuantity, unfinishedEventQuantity, recordQuantity, plantaskQuantity, remindQuantity} = this.statisticalData;
+      const {taskQuantity, eventQuantity, unfinishedTaskQuantity, unfinishedEventQuantity, recordQuantity, plantaskQuantity, remindQuantity} = this.statisticalData;
 
       return [
         {
@@ -617,11 +656,6 @@ export default {
           component: InfoRecord.name,
           slotName: 'record-tab',
           show: true,
-        }, {
-          displayName: `联系人(${linkmanQuantity || 0})`,
-          component: ProductContactTable.name,
-          show: true,
-          
         }, {
           displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
           component: TaskTable.name,

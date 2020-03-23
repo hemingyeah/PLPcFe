@@ -106,7 +106,6 @@ export default {
       this.valueFn = event.detail.value;
       this.field = event.detail.field;
       event.detail.validate = this.validate;
-      console.log('event', event)
     },
     removeFieldHandler(event) {
       if(!this.needValidation) return event.stopPropagation();

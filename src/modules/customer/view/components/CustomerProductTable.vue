@@ -40,6 +40,12 @@
               </sample-tooltip>
             
           </template>
+          <template v-else-if="column.field == 'address'">
+            {{getAddress(scope.row[column.field])}}
+          </template>
+          <template v-else-if="column.field == 'linkman'">
+            {{scope.row[column.field].name}}
+          </template>
           <template v-else>
             {{scope.row[column.field]}}
           </template>
@@ -93,6 +99,9 @@ export default {
     this.fetchData();
   },
   methods: {
+    getAddress(field) {
+      return field.province + field.city + field.dist + field.address || ''
+    },
     createProductTab(productId){
       let fromId = window.frameElement.getAttribute('id');
 
@@ -141,13 +150,13 @@ export default {
         show: true,
       }, {
         label: '默认联系人',
-        field: 'lmName',
+        field: 'linkman',
         show: true,
-      },  {
+      }, {
         label: '产品地址',
         field: 'address',
         show: true,
-      },  {
+      }, {
         label: '创建时间',
         field: 'createTime',
         show: true,

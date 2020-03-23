@@ -490,6 +490,9 @@ export default {
             if (field.formType === 'area') {
               tv = [];
             }
+            if (field.formType === 'area') {
+              tv = []
+            }
 
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 

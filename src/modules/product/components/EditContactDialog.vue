@@ -174,6 +174,7 @@ export default {
         let result = await this.$http.post('/linkman/createByJson', params);
 
         if(result.status != 0) {
+          this.pending = false;
           return this.$platform.notification({
             title: '失败',
             message: result.message || '新建失败',
