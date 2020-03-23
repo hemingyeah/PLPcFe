@@ -34,7 +34,8 @@ import {
   Tag,
   Tooltip,
   Steps,
-  Step
+  Step,
+  Dialog
 } from 'shb-element-ui';
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
 
@@ -74,8 +75,9 @@ const ElementUI = {
     Vue.use(Tooltip);
     Vue.use(Steps);
     Vue.use(Step);
-    
+    Vue.use(Dialog);
     Vue.component(CollapseTransition.name, CollapseTransition);
+    Vue.prototype.$loading = Loading.service;
   }
 };
 

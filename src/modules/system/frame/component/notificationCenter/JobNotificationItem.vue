@@ -48,6 +48,8 @@ export default {
 
     /** 打开工作通知详情页 */
     async toJobNotificationDetails (info) {
+
+      
       try {
         if(info.pcUrl) {
           if(info.source != 'daily') {
@@ -79,6 +81,8 @@ export default {
       }
     },
     getId (info) {
+      // pcUrl=/security/user?ranKey=123456&select=delete      
+      if(info.pcUrl.indexOf('/security/user') != -1) return 'M_JOBTRANSFER_DETAIL';
       if(info.pcUrl.indexOf('/task/view/') != -1) return `taskView_${info.primaryId}`;
       if(info.pcUrl.indexOf('/partV2/repertory/record') != -1) return 'M_VIP_SPAREPART_RECORD';
       if(info.pcUrl.indexOf('/event/view/') != -1) return 'M_SERVICE_PROJECT';

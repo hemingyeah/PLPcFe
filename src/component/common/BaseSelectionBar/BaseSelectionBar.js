@@ -10,6 +10,10 @@ export default {
     isNoDataHide: {
       type: Boolean,
       default: true,
+    },
+    isNotShowTooltip: {
+      type: Boolean,
+      default: false,
     }
   },
   data() {
@@ -48,7 +52,7 @@ export default {
       
               <span onClick={() => this.$emit('show-panel')} onMouseover={() => this.visible = true} onMouseleave={() => this.visible = false}>
                 {this.value.length}
-                {this.visible && <div class="tooltip">可点击查看详情 <div class="arrow"></div></div>}
+                {!this.isNotShowTooltip && this.visible && <div class="tooltip">可点击查看详情 <div class="arrow"></div></div>}
               </span>
       
               条数据
