@@ -30,7 +30,7 @@
           
           <div class="item">
             <label>折扣费用</label>
-            <form-number v-model="value.disExpense" @update="update" />
+            <form-number :value="value.disExpense" @update="updateDisExpense" />
           </div>
           <div class="item">
             <label>总计</label>
@@ -122,6 +122,9 @@ export default {
       return this.$refs.form.validate().then(valid => {
         return valid
       })
+    },
+    updateDisExpense({ newValue }) {
+      this.value.disExpense = 0 - Math.abs(newValue);
     }
   }
 }
