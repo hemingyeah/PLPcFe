@@ -1,5 +1,5 @@
 <template>
-  <div class="task-container">
+  <div class="task-container" v-loading.fullscreen.lock="loadingPage">
     <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
       <div class="page-title">
         <div class="title">
@@ -7,7 +7,7 @@
             <i class="iconfont icon-arrow-left"></i> 返回
           </button>
           <span class="text">|</span>
-          <button type="submit" class="btn btn-primary">暂存</button>
+          <button type="submit" :disabled="pending" class="btn btn-primary">暂存</button>
         </div>
       </div>
       <task-receipt-form :fields="fields" :value="form" ref="form"></task-receipt-form>
@@ -16,18 +16,17 @@
 </template>
 
 <script>
-import TaskReceiptForm from './components/TaskReceiptForm.vue'
-import * as TaskApi from '@src/api/TaskApi'
-import * as FormUtil from '@src/component/form/util'
-import * as util from '../util/task'
-import platform from '@src/platform'
+import TaskReceiptForm from './components/TaskReceiptForm.vue';
+import * as TaskApi from '@src/api/TaskApi';
+import * as FormUtil from '@src/component/form/util';
+import * as util from '../util/receipt';
+import platform from '@src/platform';
 
 export default {
   name: 'task-receipt-view',
   inject: ['initData'],
   data() {
     return {
-      submitting: false,
       pending: false,
       loadingPage: false,
       form: {},
@@ -39,14 +38,20 @@ export default {
     try {
       this.auth = this.initData.auth || {};
 
-      // 初始化默认值
-      // 清空表单
-      this.$emit('input', {})
-      this.init = false;
+      // TODO: 暂时用假数据
+      const expenseSheet = {"serviceExpense":[{"standard":"","serialNumber":"SE-87","salePrice":190.00,"guideProfessions":[],"primaryId":"00171866-b3b6-4875-9cbe-23774a4497bf","type":"服务","isGuideData":false,"number":1555.00,"outPrice":150.00,"guideData":false,"unit":"次","primaryType":"服务类型2","name":"SDI","id":"d879be92-6e42-11ea-bfc9-00163e304a25","taskId":"9be21f43-69c2-11ea-bfc9-00163e304a25","realPrice":190.00}],"sparePartsExpense":[{"standard":"12","serialNumber":"TEST_UPLOAD_FIELD_20022502ab","repertoryCount":3.00,"salePrice":999.0,"guideProfessions":[],"primaryId":"bac6d473-6cc5-11ea-bfc9-00163e304a25","type":"备件","isGuideData":false,"number":1,"outPrice":0.01,"guideData":false,"unit":"个","primaryType":"备件类型1","subtotal":999.00,"name":"20022502sunab","id":"d879a9c0-6e42-11ea-bfc9-00163e304a25","modifiedPrice":0.00,"taskId":"9be21f43-69c2-11ea-bfc9-00163e304a25","realPrice":999.00}],"discountExpense":{"salePrice":-1000.00,"guideProfessions":[],"type":"折扣","isGuideData":false,"number":1,"guideData":false,"subtotal":-1000.00,"id":"d879c443-6e42-11ea-bfc9-00163e304a25","taskId":"9be21f43-69c2-11ea-bfc9-00163e304a25","realPrice":-1000.00}}
+      const task = {"id":"9be21f43-69c2-11ea-bfc9-00163e304a25","taskNo":"TKB10020030002","name":null,"customer":{"createUser":"d33846ee-6fa9-11e9-bfc9-00163e304a25","updateUser":null,"createTime":null,"updateTime":null,"id":"8383ac6c-b2a4-437e-bf3b-c5105beb4abe","name":"客户导入测试222","enName":null,"serialNumber":"CUSWR50164","status":null,"level":null,"superior":null,"teamId":null,"customerManager":"e105a6fa-6769-11ea-bfc9-00163e304a25","customerManagerName":"吴陈正","remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[{"id":"bda400f6-2ae1-11ea-bfc9-00163e304a25","tagName":"杭州团队"}],"createUserId":null,"createLoginUser":null,"lmName":"客户导入测试222","lmPhone":"15093383493","lmEmail":null,"customerAddress":{"adCountry":"","adDist":"","adProvince":"其他区域","adCity":"其他","adAddress":"","adLongitude":null,"adLatitude":null,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"guideData":false,"focus":false},"type":null,"level":"中","serviceType":"保内免费","serviceContent":"安装","description":null,"state":"finished","createTime":1584609515000,"executorId":null,"executor":{"userId":"f4cea5f7-49eb-11e9-bfc9-00163e304a25","loginName":null,"displayName":"张爱军","email":null,"cellPhone":null,"lastLoginTime":null,"enabled":1,"weixinid":null,"powercode":null,"head":"https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg","sex":null,"firstLogin":0,"tagList":[],"departments":null,"roles":null,"attribute":{},"openid":"$:LWCP_v1:$MDwa66wol79LFsAILOB8VA==","longitude":null,"latitude":null,"isDelete":null,"synOpenid":null,"staffId":"050857046524329386","tenantId":null,"mainTeamId":null,"unfinishedTask":null,"todayFinishedTask":null,"state":null,"cusDistance":null,"superAdmin":null,"isTeamLeader":0},"synergies":[],"attribute":{"sparepart":"","serviceIterm":"","customReceipt":"true","paymentMethod":"","systemAutograph":"","receiptAttachment":[],"field_K7cX1GUgxqxFsXks":"回执12345666"},"balanceAttribute":{},"createUserId":"f4cea5f7-49eb-11e9-bfc9-00163e304a25","createUser":{"userId":"f4cea5f7-49eb-11e9-bfc9-00163e304a25","loginName":null,"displayName":"张爱军","email":null,"cellPhone":null,"lastLoginTime":null,"enabled":1,"weixinid":null,"powercode":null,"head":"https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg","sex":null,"firstLogin":0,"tagList":[],"departments":null,"roles":null,"attribute":{},"openid":"$:LWCP_v1:$MDwa66wol79LFsAILOB8VA==","longitude":null,"latitude":null,"isDelete":null,"synOpenid":null,"staffId":"050857046524329386","tenantId":null,"mainTeamId":null,"unfinishedTask":null,"todayFinishedTask":null,"state":null,"cusDistance":null,"superAdmin":null,"isTeamLeader":0},"attachment":[],"planTime":"2020-03-19 18:15:00","isReview":0,"degree":null,"suggestion":null,"balanceConfirm":0,"balanceTime":null,"balanceUserId":null,"balanceUser":null,"remark":[],"receiptContent":"","product":null,"productId":null,"completeTime":1584609598000,"startTime":1584609565000,"startOn":1,"autograph":"","reviewTime":null,"reviewUserId":null,"reviewUser":null,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","allotTime":1584609531000,"allotUserId":"f4cea5f7-49eb-11e9-bfc9-00163e304a25","allotUser":{"userId":"f4cea5f7-49eb-11e9-bfc9-00163e304a25","loginName":null,"displayName":"张爱军","email":null,"cellPhone":null,"lastLoginTime":null,"enabled":1,"weixinid":null,"powercode":null,"head":"https://static-legacy.dingtalk.com/media/lADPDgQ9qrulS2fNA7zNA9I_978_956.jpg","sex":null,"firstLogin":0,"tagList":[],"departments":null,"roles":null,"attribute":{},"openid":null,"longitude":null,"latitude":null,"isDelete":null,"synOpenid":null,"staffId":"050857046524329386","tenantId":null,"mainTeamId":null,"unfinishedTask":null,"todayFinishedTask":null,"state":null,"cusDistance":null,"superAdmin":null,"isTeamLeader":0},"acceptTime":1584609552000,"closeTime":null,"taddress":{"id":"7ffa2dd5-6440-11ea-bfc9-00163e304a25","city":"其他","dist":"","address":null,"latitude":null,"province":"其他区域","longitude":null},"tlmId":"8005bc04-6440-11ea-bfc9-00163e304a25","tlmName":"客户导入测试222","tlmPhone":"15093383493","tversion":"v2","inTaskPool":0,"updateTime":1585104395000,"products":[],"evaluate":null,"evaluateContent":null,"evaluateSource":null,"profit":null,"sale":null,"cost":null,"templateId":"3042c40f-4e3f-4997-aac9-bc3df0189dcb","templateName":"工时1234","cardInfo":[{"attribute":{"field_gPB3PtWB":"单行电脑","field_j3IseoLX":"","field_UJgdcRaz":"","field_KtBBZ97u":null,"field_Fc5qPJIb":null,"field_EcR8prWr":"","field_6hVZWJxC":"","id":"c5dadb3a-7b40-4505-b4cb-f5f860f916aa","userId":"3f20b9ac-36af-11ea-bfc9-00163e304a25","userName":"庞海翠","updateTime":1584868344937},"cardId":"ccdddc47-390b-11ea-bfc9-00163e304a25","inputType":"single"},{"attribute":[{"field_D2GNO1TI":"测试22","field_aTKeVkIX":"第四十丢货电视电话的abc","field_ethUqoas":"","field_NUqlPmjq":null,"field_gqjGL3DF":null,"field_7zGFvzfI":"","field_A5T4yNSU":"","id":"792d8e2f-a65e-4120-9930-851b56291c6e","userId":"3f20b9ac-36af-11ea-bfc9-00163e304a25","userName":"庞海翠","updateTime":1584874071236}],"cardId":"d85b27c8-3906-11ea-bfc9-00163e304a25","inputType":"multiple"}],"inApprove":0,"isPaused":0,"overTime":null,"isOverTime":0,"taskUsedTime":46,"taskUsedTimeStr":"0小时01分钟","acceptUsedTime":21,"acceptUsedTimeStr":"0小时01分钟","workUsedTime":33,"workUsedTimeStr":"0小时01分钟","onceOverTime":0,"taskResponseTime":50,"taskResponseTimeStr":"0小时01分钟","expenseDetail":null,"isDelete":0,"settlement":null,"sparepart":"personalRepertory","onceRefused":0,"oncePaused":0,"allotType":1,"allotTypeStr":"手动派单","onceReallot":0,"positionException":0,"oncePrinted":0,"onceRollback":0,"validAddress":true,"expenseSheet":null,"evaluateObj":null,"source":null,"guideProfessions":[],"isGuideData":false,"isSettled":0,"isReviewed":-1,"isEvaluated":0,"isClosed":-1,"taddressStr":"其他区域,其他","v2":true,"guideData":false}
 
-      // let tasktypes = (await TaskApi.taskType()) || []
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: '1', tableName: 'task_receipt' })
-      this.form = FormUtil.initialize(this.fields, this.form);
+      let form = {
+        expenseSheet, // 回执表单备件、服务项目数据
+        task // 工单详情数据
+      };
+
+      this.fields = await TaskApi.getTaskTemplateFields({ templateId: task.templateId, tableName: 'task_receipt' });
+
+      form = util.packToForm(this.fields, form);
+      this.form = FormUtil.initialize(this.fields, form);
+
       this.init = true;
     } catch (e) {
       console.error('error ', e)
@@ -61,18 +66,16 @@ export default {
       parent.frameHistoryBack(window)
     },
     submit() {
-      this.submitting = true
       this.$refs.form
         .validate()
         .then(valid => {
-          this.submitting = false
-          if (!valid) return Promise.reject('validate fail.')
-          const params = util.packToTask(this.fields, this.form)
-          params.templateId = 1
-          // params.templateName = taskTemplate.text;
-          this.pending = true
-          this.loadingPage = true
-          console.info(params)
+
+          if (!valid) return Promise.reject('validate fail.');
+
+          const params = util.packToReceipt(this.fields, this.form);
+
+          // this.pending = true;
+          // this.loadingPage = true;
           // this.createMethod(params)
         })
         .catch(err => {

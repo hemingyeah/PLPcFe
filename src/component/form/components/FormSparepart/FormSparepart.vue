@@ -1,84 +1,114 @@
 <template>
   <div class="form-sparepart">
-    <button type="button" class="btn btn-primary base-upload-btn" @click="add">添加</button>
-    <base-modal :show.sync="visible" title="备件添加" class="form-sparepart-modal">
+    <button type="button" class="btn btn-primary base-upload-btn" @click="openDialog">添加</button>
 
-      <!-- <form-item label="仓库">
-        <base-select
-          v-model="value.template"
-          :remote-method="searchPart"
-          @input="updatePart">
-          <div class="product-template-option" slot="option" slot-scope="{ option }">
-            <h3>{{ option.name }}</h3>
-          </div>
-        </base-select>
-      </form-item> -->
+    <el-table :data="value[field.fieldName]" border stripe>
+      <el-table-column label="备件" prop="name"></el-table-column>
+      <el-table-column label="编号" prop="serialNumber"></el-table-column>
+      <el-table-column label="类别" prop="primaryType"></el-table-column>
+      <el-table-column label="规格" prop="standard"></el-table-column>
+      <el-table-column prop="number" label="数量" width="100px">
+        <template slot-scope="scope">
+          <input class="sparepart-number-input" type="number" v-model="scope.row.number" @change="handleSparepartNum(scope.row)" />
+        </template>
+      </el-table-column>
 
-      <form-item label="名称">
-        <base-select
-          v-model="value.template"
-          :remote-method="searchPart"
-          @input="updatePart">
-          <div class="product-template-option" slot="option" slot-scope="{ option }">
-            <h3>{{ option.name }}</h3>
-            <p>
-              <span>
-                <label>编号：</label>
-                <span>{{ option.serialNumber }}</span>
-              </span>
-              <span>
-                <label>类别：</label>
-                <span>{{ option.type }}</span>
-              </span>
-              <span>
-                <label>规格</label>
-                <span>{{ option.standard }}</span>
-              </span>
-              <span>
-                <label>库存</label>
-                <span>{{ option.availableNum }} {{option.unit}}</span>
-              </span>
-            </p>
-          </div>
-        </base-select>
-      </form-item>
+      <el-table-column label="单价" prop="salePrice" width="100px">
+        <template slot-scope="scope">
+          <input class="sparepart-number-input" type="number" v-model="scope.row.salePrice" />      
+        </template>
+      </el-table-column>
 
-      <form-item label="编号">   
-        <input class="form-sparepart-text" :value="sparepart.serialNumber" disabled/>      
-      </form-item>
+      <el-table-column label="小计" width="100px">
+        <template slot-scope="scope">
+          {{(Number(scope.row.number) * Number(scope.row.salePrice)).toFixed(2)}}
+        </template>
+      </el-table-column>
+    
+      <el-table-column label="操作" width="70px" fixed="right">
+        <template slot-scope="scope">
+          <el-button size="mini" type="danger" icon="el-icon-delete" @click="value.sparepart.splice(scope.$index, 1)" />
+        </template>
+      </el-table-column>
+    </el-table>
 
-      <form-item label="类别">
-        <input class="form-sparepart-text" :value="sparepart.type" disabled/>
-      </form-item>
-      
-      <form-item label="规格">
-        <input class="form-sparepart-text" :value="sparepart.standard" disabled/>
-      </form-item>
+    <!-- 添加备件弹窗 -->
+    <base-modal :show.sync="visible" title="备件添加" class="form-sparepart-modal" width="700px" @closed="reset">
+      <form @submit.prevent="submit" v-if="init">
+        <form-builder :fields="fields" ref="form" :value="sparepart" @update="update">
 
-      <form-item label="单价">
-        <input class="form-sparepart-text" :value="sparepart.salePrice" disabled/>
-      </form-item>
+          <!-- start 仓库 -->
+          <template slot="repertory" slot-scope="{ field }">
+            <form-item :label="field.displayName">
+              <form-select :field="field" :source="repertoryList" :value="repertoryId" @update="updateRepertory" :clearable="false"/>
+            </form-item>
+          </template>
+          <!-- end 仓库 -->
 
-      <form-item label="数量">
-        <form-number v-model="number" />
-      </form-item>
+          <!-- start 备件 -->
+          <template slot="sparepart" slot-scope="{ field }">
+            <form-item :label="field.displayName">
+              <biz-form-remote-select
+                :field="field"
+                v-model="value.template"
+                :remote-method="searchPart"
+                @input="updatePart"
+                placeholder="请选择">
+                <div class="sparepart-template-option" slot="option" slot-scope="{ option }">
+                  <h3>{{ option.name }}</h3>
+                  <p>
+                    <span>
+                      <label>编号：</label>
+                      <span>{{ option.serialNumber }}</span>
+                    </span>
+                    <span>
+                      <label>类别：</label>
+                      <span>{{ option.type }}</span>
+                    </span>
+                    <span>
+                      <label>规格</label>
+                      <span>{{ option.standard }}</span>
+                    </span>
+                    <span>
+                      <label>库存</label>
+                      <span>{{ option.availableNum }} {{option.unit}}</span>
+                    </span>
+                  </p>
+                </div>
+              </biz-form-remote-select>
+            </form-item>
+          </template>
+          <!-- end 备件 -->
 
-      <form-item label="小计">
-        <input class="form-sparepart-text" :value="total" disabled/>
-      </form-item>
+          <!-- start 数量 -->
+          <template slot="number" slot-scope="{ field, value }">
+            <form-item :label="field.displayName" :validation="validateNumber">
+              <form-number :field="field" :value="value" @update="update" />
+            </form-item>
+          </template>
+          <!-- end 数量 -->
 
-      <div class="footer-save">
-        <button type="button" class="btn btn-primary base-upload-btn btn-save" @click="save">保存</button>
-      </div>
- 
+          <!-- start 小计 -->
+          <template slot="total" slot-scope="{ field }">
+            <form-item :label="field.displayName">
+              <form-text :field="field" :value="total" />
+            </form-item>
+          </template>
+          <!-- end 小计 -->
+        </form-builder>
+
+        <div class="dialog-footer" slot="footer">
+          <el-button @click="visible = false">关闭</el-button>
+          <el-button native-type="submit" type="primary">保存</el-button>
+        </div>
+      </form>
     </base-modal>
   </div>
 </template>
 
 <script>
-import * as FormUtil from '@src/component/form/util';
-import _ from 'lodash'
-import EventBus from '@src/util/eventBus'
+/* api */
+import * as TaskApi from '@src/api/TaskApi';
 export default {
   name: 'form-sparepart',
   props: {
@@ -93,31 +123,103 @@ export default {
   },
   data() {
     return {
+      init: false,
       visible: false,
-      pending: false,
-      sparepart:{},
-      number:'1'
+      repertoryId: 0, // 仓库ID
+      repertoryList: [], // 仓库列表数据
+      sparepart: this.initData() // 备件信息
     }
   },
   computed: {
-    _value() {
-      return this.value
+    fields() {
+      return [{
+        formType: 'select',
+        fieldName: 'repertory',
+        displayName: '仓库',
+        placeholder: '请选择',
+        isNull: 0
+      }, {
+        formType: 'select',
+        fieldName: 'sparepart',
+        displayName: '备件',
+        placeholder: '请选择',
+        isNull: 0,
+      }, {
+        formType: 'text',
+        fieldName: 'serialNumber',
+        displayName: '编号',
+        isNull: 1,
+        disabled: true
+      }, {
+        formType: 'text',
+        fieldName: 'type',
+        displayName: '类别',
+        isNull: 1,
+        disabled: true
+      }, {
+        formType: 'text',
+        fieldName: 'standard',
+        displayName: '规格',
+        isNull: 1,
+        disabled: true
+      }, {
+        formType: 'text',
+        fieldName: 'salePrice',
+        displayName: '单价',
+        isNull: 1,
+        disabled: true
+      }, {
+        formType: 'number',
+        fieldName: 'number',
+        displayName: '数量',
+        isNull: 0,
+      }, {
+        formType: 'text',
+        fieldName: 'total',
+        displayName: '小计',
+        isNull: 1,
+        disabled: true
+      }]
     },
-    total(){  
-      return this.sparepart.salePrice ? (this.sparepart.salePrice * this.number).toFixed(2) : 0; 
+    total() {
+      let { number, salePrice } = this.sparepart;
+      return number && salePrice ? (number * salePrice).toFixed(2) : '';
     }
   },
   methods: {
+    initData() {
+      return {
+        id: '',
+        name: '',
+        serialNumber: '',
+        type: '',
+        standard: '',
+        salePrice: '',
+        costPrice: '',
+        number: '',
+        unit: '',
+        availableNum: '',
+        repertoryCount: ''
+      }
+    },
+    validateNumber(value, field){
+      const maxNum = this.sparepart.availableNum || '';
+      return new Promise((resolve, reject) => {
+        if(maxNum && value > maxNum) {
+          return resolve('库存不足，请输入正确的数量');
+        } 
+        resolve(null);
+      })
+    },
     searchPart(params) {
       // params has three properties include keyword、pageSize、pageNum.
-      const pms = params || {}
-      pms.repertoryId = '';
+      const pms = params || {};
+      pms.repertoryId = this.repertoryId || '';
       pms.with_OOS = false;
       return this.$http
         .post('/task/spare/list', pms)
         .then(res => {
-          if (!res || !res.list) return
-          // console.log('part list:', res);     
+          if (!res || !res.list) return;   
           res.list = res.list.map(template =>
             Object.freeze({
               label: template.name,
@@ -125,78 +227,160 @@ export default {
               ...template
             })
           )     
-          return res
+          return res;
         })
-        .catch(e => console.error(e))
+        .catch(e => console.error(e));
     },
-    updatePart(){
-      // console.log('update: ', this.value.template[0]);
-      this.sparepart = this.value.template[0];
-    },
-    add() {
-      this.visible = !this.visible;
-      if (this.visible) {
-        this.value.template = [];
-        this.sparepart = {};
+    updatePart(value) {
+      let newValue = value[0];
+
+      for (let key in this.sparepart) {
+        if (key == 'salePrice') {
+          this.sparepart.salePrice = newValue.salePrice.toFixed(2);
+        } else if (key == 'number') {
+          this.sparepart.number = newValue.availableNum > 1 ? 1 : newValue.availableNum;
+        } else {
+          this.sparepart[key] = newValue[key];
+        }
       }
     },
-    save(){
+    updateRepertory() {
+      // 重置备件信息
       this.value.template = [];
-      let oldValue = this._value;
-      let newValue = _.cloneDeep(this.value); 
-      let o = {};
-      o.id = this.sparepart.id;
-      o.taskId = this.taskId;
-      o.name = this.sparepart.name;
-      o.number = parseInt(this.num || 1);
-      o.type = '备件';
-      o.salePrice = this.sparepart.salePrice;
-      o.outPrice = this.sparepart.costPrice;
-      o.unit = this.sparepart.unit;
-      o.primaryId = this.sparepart.id;
-      o.primaryType = this.sparepart.type;
-      // o.modifiedPrice = this.sparepart.nowPrice - this.sparepart.salePrice;
-      o.serialNumber = this.sparepart.serialNumber || '';
-      o.total = (o.number * o.salePrice).toFixed(2);
-      if(!newValue[this.field.fieldName]){
-        newValue[this.field.fieldName] = [];
-      }
-      newValue[this.field.fieldName].push(o);
-      this.$emit('update', {newValue: newValue[this.field.fieldName], oldValue: oldValue[this.field.fieldName], field: this.field});
-      this.visible = false;    
+      this.sparepart = this.initData();
     },
+    update({field, newValue, oldValue}) {
+      let {fieldName, displayName} = field;
+      if (this.$appConfig.debug) {
+        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+      this.$set(this.sparepart, fieldName, newValue);
+    },
+    handleSparepartNum(item){
+      const maxNum = item.repertoryCount;
+      let value = Number(item.number);
+
+      item.number = value > maxNum ? maxNum : (value <= 0 ? 1 : value);
+    },
+    async submit() {
+      const { fieldName } = this.field;
+
+      try {
+        const validateRes = await this.$refs.form.validate();
+        if (!validateRes) return;
+
+        let sparepartObj = JSON.parse(JSON.stringify(this.sparepart));
+        sparepartObj.outPrice = sparepartObj.costPrice;
+        sparepartObj.primaryType = sparepartObj.type;
+        sparepartObj.primaryId = sparepartObj.id;
+        sparepartObj.type = '备件';
+        sparepartObj.taskId = this.value.id;
+        delete sparepartObj.costPrice;
+
+        let newValue = this.value[fieldName] || [];
+
+        // 查找已添加的备件中是否存在该备件
+        let ids = newValue.findIndex(val => val.primaryId == sparepartObj.id);
+
+        if (ids > -1) {
+          const sum = Number(newValue[ids].number) + Number(sparepartObj.number);
+          newValue[ids].number = sum > sparepartObj.availableNum ? sparepartObj.availableNum : sum;
+
+        } else {
+          newValue.push(sparepartObj);
+        }
+
+        this.$emit('update', {field: this.field, newValue});
+
+        this.visible = false;
+
+      } catch (e) {
+        console.error('err', e);
+      }
+    },
+    reset() {
+      this.repertoryId = this.repertoryList[0]?.value || 0;
+      this.sparepart = this.initData();
+      this.value.template = [];
+      this.init = false;
+    },
+    openDialog() {
+      this.init = true;
+      this.visible = true;
+    }
+  },
+  async mounted(){
+    try {
+      const config = await TaskApi.getSparepartConfig();
+
+      if (config.sparepart2) {
+        if (config.personalRepertory) {
+          this.repertoryList = [{
+            text: '个人备件库',
+            value: 0
+          }];
+        } else {
+          const list = await TaskApi.getRepertoryList();
+          list.length && list.map(item => {
+            this.repertoryList.push({
+              text: item.name,
+              value: item.id
+            })
+          })
+        }
+      }
+
+      // 设置仓库默认值
+      this.repertoryId = this.repertoryList[0].value;
+      
+    } catch (err) {
+      console.log('err', err);
+    }
   }
 }
 </script>
 
 <style lang="scss">
- .form-sparepart-text{
-    width: 100%;
-    background: #eee;  
-  }
 .form-sparepart{
-  height: 30px;
   line-height: 30px;
   text-align: left;
+
+  .el-table {
+    margin: 10px 0;
+
+    .sparepart-number-input {
+      width: 100%;
+    }
+  }
+
   .form-sparepart-modal{
     .base-modal-body{
-      padding: 10px 20px 60px 10px;
-      .form-item label{
-        width: 80px;
-      }
-      .footer-save{
-        position: relative;
-        .btn-save{
-          position: absolute;
-          top: 5px;
-          right: 10px;
+      padding: 10px 20px 20px 10px;
+
+      .form-builder {
+        width: 100%;
+
+        .form-item {
+          label {
+            width: 80px;
+          }
+
+          .form-text {
+            input {
+              background: #eee;
+            }
+          }
         }
+      }
+
+      .dialog-footer {
+        text-align: right;
       }
     }
   }
 }
 
-.product-template-option {
+.sparepart-template-option {
   * {
     margin: 0;
   }
@@ -213,7 +397,7 @@ export default {
     line-height: 24px;
 
     & > span {
-      width: 50%;
+      width: 25%;
       display: flex;
       justify-content: flex-start;
       font-size: 12px;
@@ -222,7 +406,7 @@ export default {
 
       & > label {
         padding: 0;
-        width: 70px;
+        width: 40px !important;
       }
       & > span {
         @include text-ellipsis();

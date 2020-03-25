@@ -4,6 +4,7 @@ import FormPlantime from './FormPlantime.vue'
 
 const TaskPlanTimeField = {
   formType: 'planTime',
+  fieldName: 'fieldName',
   name: '计划时间',
   isSystem: 1,
   component: {

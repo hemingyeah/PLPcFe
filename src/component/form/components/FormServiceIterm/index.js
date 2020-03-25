@@ -4,6 +4,7 @@ import FormServiceItermSetting from './FormServiceItermSetting.vue';
 
 let FormServiceItermField = {
   formType: 'serviceIterm', // 字段类型
+  fieldName: 'serviceIterm',
   name: '服务项目',
   isSystem: 1,
   forceDelete: true,

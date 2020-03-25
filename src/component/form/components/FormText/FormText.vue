@@ -8,7 +8,8 @@
       @input="inputEvent"
       :placeholder="field.placeholder?field.placeholder:placeholder"
       :id="`form_${field.fieldName}`" 
-      autocomplete="off"/>
+      autocomplete="off"
+      :disabled="field.disabled"/>
   </div>
 </template>
 

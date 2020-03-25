@@ -208,3 +208,17 @@ export function getCreateCustomerData(params) {
 export function getCreateProductData(params) {
   return http.get('/customer/product/edit/getData', params);
 }
+
+/** 
+ * @description 获取备件配置信息
+*/
+export function getSparepartConfig(params) {
+  return http.post('/partV2/repertory/sparepartConfig', params);
+}
+
+/** 
+ * @description 获取备件仓库列表数据
+*/
+export function getRepertoryList(params) {
+  return http.get('/task/repertory', params);
+}

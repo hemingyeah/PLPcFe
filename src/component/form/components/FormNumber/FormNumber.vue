@@ -11,7 +11,7 @@ export default {
   name: 'form-number',
   mixins: [FormMixin],
   props: {
-    value: String
+    value: [String, Number]
   },
   methods: {
     input(event){

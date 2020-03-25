@@ -77,10 +77,6 @@ const FormBuilder = {
         if(this.$slots[fieldName]) {
           return this.$slots[fieldName];
         }
-        // 这里备件fieldName有时候是sparepart 有时候是不固定的
-        if(field.formType == 'sparepart' && fieldName != 'sparepart' && this.$scopedSlots[field.formType]) {
-          return this.$scopedSlots[field.formType]({field, value: getValue(field, this)});
-        }
 
         if(this.$scopedSlots[fieldName]) {
           return this.$scopedSlots[fieldName]({field, value: getValue(field, this)});

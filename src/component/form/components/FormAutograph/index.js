@@ -15,6 +15,7 @@ let FormLocationField = {
 
 let FormSystemAutographField = {
   formType: 'systemAutograph', // 字段类型
+  fieldName: 'systemAutograph',
   name: '客户签名',
   isSystem: 1,
   forceDelete: true,

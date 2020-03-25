@@ -4,6 +4,7 @@ import FormSparepartSetting from './FormSparepartSetting.vue';
 
 let FormSparepartField = {
   formType: 'sparepart', // 字段类型
+  fieldName: 'sparepart',
   name: '备件',
   isSystem: 1,
   forceDelete: true,
