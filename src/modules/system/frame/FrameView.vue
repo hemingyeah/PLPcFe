@@ -54,7 +54,7 @@
               <button 
                 type="button" class="btn-text frame-header-btn frame-header-btn-bg" 
                 @click="openSaleManager"
-                title="售后宝服务群" v-tooltip>
+                title="专属客服" v-tooltip>
                 <i class="iconfont icon-kefu"></i>
               </button>
 
@@ -155,7 +155,7 @@
       </div>
 
       <version :version="releaseVersion"/>
-      <sale-manager :service-group-url="initData.serviceGroupUrl" :show.sync="saleManagerShow"/>
+      <sale-manager :service-group-url="initData.serviceGroupUrl" :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow"/>
       <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum" @getNum="getNum"></notification-center>
     <!-- <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu> -->
     </div>

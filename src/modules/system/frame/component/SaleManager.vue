@@ -3,14 +3,18 @@
     <div class="saleManager-mask" @click.self="close" v-if="show">
       <div class="saleManager transition__container">
         <div class="saleManager-header">
-          <h3>售后宝服务群</h3>
+          <h3>专属客服</h3>
           <button type="button" class="btn-text saleManager-close" @click="close">
             <i class="iconfont icon-fe-close"></i>
           </button>
         </div>
         <div class="saleManager-qrcode">
-          <div class="saleManager-qrcode-block" ref="qrcode"></div>
+          <img :src="saleManagerQRCode" alt="专属客服"/>
+          <p>钉钉扫码联系专属客服</p>
         </div>
+        <!-- <div class="saleManager-qrcode">
+          <div class="saleManager-qrcode-block" ref="qrcode"></div>
+        </div> -->
         <div class="saleManager-line"></div>
         <div class="saleManager-contact">
           <p>统一客服电话： 010-86461890</p>
@@ -45,13 +49,13 @@ export default {
       return `/files/getQrcode?fileName=${this.qrcode}`;
     }
   },
-  watch: {
-    show(newValue) {
-      if(newValue) {
-        this.createCode();
-      }
-    }
-  },
+  // watch: {
+  //   show(newValue) {
+  //     if(newValue) {
+  //       this.createCode();
+  //     }
+  //   }
+  // },
   methods: {
     close(){
       this.$emit('update:show', false)
