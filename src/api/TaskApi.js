@@ -222,3 +222,10 @@ export function getSparepartConfig(params) {
 export function getRepertoryList(params) {
   return http.get('/task/repertory', params);
 }
+
+/** 
+ * @description 编辑回执表单
+*/
+export function editReceipt(params) {
+  return http.post('/task/editReceipt', params);
+}

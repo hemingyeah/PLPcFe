@@ -1,8 +1,8 @@
 <template>
   <div class="form-serviceterm">
-    <button type="button" class="btn btn-primary base-upload-btn" @click="openDialog">添加</button>
+    <button type="button" class="btn btn-primary base-upload-btn" @click="visible = true">添加</button>
 
-    <el-table :data="value[field.fieldName]" border stripe>
+    <el-table :data="value" border stripe>
       <el-table-column label="服务项目" prop="name"></el-table-column>
       <el-table-column label="编号" prop="serialNumber"></el-table-column>
       <el-table-column label="类别" prop="primaryType"></el-table-column>
@@ -27,14 +27,14 @@
     
       <el-table-column label="操作" width="70px" fixed="right">
         <template slot-scope="scope">
-          <el-button size="mini" type="danger" icon="el-icon-delete" @click="value.serviceIterm.splice(scope.$index, 1)"/>
+          <el-button size="mini" type="danger" icon="el-icon-delete" @click="value.splice(scope.$index, 1)"/>
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 添加服务项目弹窗 -->
     <base-modal :show.sync="visible" title="服务项目添加" class="form-serviceterm-modal" width="700px" @closed="reset">
-      <form @submit.prevent="submit" v-if="init">
+      <form @submit.prevent="submit">
         <form-builder :fields="fields" ref="form" :value="serviceitem" @update="update">
 
           <!-- start 服务项目名称 -->
@@ -95,21 +95,22 @@
 </template>
 
 <script>
+import FormMixin from '@src/component/form/mixin/form';
 export default {
   name: 'form-serviceterm',
+  mixins: [FormMixin],
   props: {
     field: {
       type: Object,
       default: () => ({})
     },
     value: {
-      type: Object,
-      default: () => ({})
+      type: Array,
+      default: () => ([])
     },
   },
   data() {
     return {
-      init: false,
       visible: false,
       selectedItem: [],
       serviceitem: this.initData()
@@ -225,8 +226,6 @@ export default {
       item.number = value <= 1 ? 1 : Math.floor(value);
     },
     async submit() {
-      const { fieldName } = this.field;
-
       try {
         const validateRes = await this.$refs.form.validate();
         if (!validateRes) return;
@@ -234,15 +233,12 @@ export default {
         let serviceObj = JSON.parse(JSON.stringify(this.serviceitem));
         serviceObj.outPrice = serviceObj.costPrice;
         serviceObj.primaryType = serviceObj.type;
-        serviceObj.primaryId = serviceObj.id;
         serviceObj.type = '服务';
-        serviceObj.taskId = this.value.id;
-        delete serviceObj.costPrice;
 
-        let newValue = this.value[fieldName] || [];
+        let newValue = this.value;
 
         // 查找已添加的服务项目中是否存在该服务项目
-        let ids = newValue.findIndex(val => val.primaryId == serviceObj.id);
+        let ids = newValue.findIndex(val => val.id == serviceObj.id);
 
         if (ids > -1) {
           newValue[ids].number = Number(newValue[ids].number) + Number(serviceObj.number);
@@ -261,17 +257,35 @@ export default {
     reset() {
       this.serviceitem = this.initData();
       this.selectedItem = [];
-      this.init = false;
-    },
-    openDialog() {
-      this.init = true;
-      this.visible = true;
+
+      // 清空校验结果
+      setTimeout(() => {
+        this.$refs.form.$children.map(child => {
+          if (child.$el.className == 'form-item err') {
+            child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
+          }
+        })
+      }, 0);
     }
   }
 }
 </script>
 
 <style lang="scss">
+.form-item.err :not(.is-success){
+  .form-item :not(.err) {
+    input, .base-select-main-content {
+      border-color: #e0e1e2 !important;
+    }
+  }
+
+  .form-item.err {
+    input, .base-select-main-content {
+      border-color: #f56c6c !important;
+    }
+  }
+}
+
 .form-serviceterm {
   line-height: 30px;
   text-align: left;

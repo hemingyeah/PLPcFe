@@ -33,6 +33,8 @@ const RuleMap = {
   address,
   link,
   customer: select,
+  sparepart: select,
+  serviceIterm: select,
   planTime
 };
 

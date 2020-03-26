@@ -20,19 +20,22 @@ export function packToReceipt(fields, form){
 
     // 备件
     if(fieldName === 'sparepart'){
-      expenseSheet.sparePartsExpense = [...value];
-      value = '';
+      value.forEach(item => item.taskId = form.id);
+      expenseSheet.sparePartsExpense = value;
+      return;
     }
 
     // 服务项目
     if(fieldName === 'serviceIterm'){
-      expenseSheet.serviceExpense = [...value];
-      value = '';
+      value.forEach(item => item.taskId = form.id);
+      expenseSheet.serviceExpense = value;
+      return;
     }
 
     if(fieldName === 'receiptAttachment'){
       // 拼附件和回执附件
-      task.attachment = value.concat(form.attachment);
+      task.attachment = value;
+      return;
     }
 
     if (field.formType === 'address' && !field.isSystem) {
@@ -65,12 +68,14 @@ export function packToForm(fields, data){
 
     // 备件
     if(fieldName === 'sparepart'){
+      expenseSheet.sparePartsExpense.map(part => part.id = part.primaryId);
       task.attribute[fieldName] = expenseSheet.sparePartsExpense || [];
       return;
     }
 
     // 服务项目
     if(fieldName === 'serviceIterm'){
+      expenseSheet.serviceExpense.map(service => service.id = service.primaryId);
       task.attribute[fieldName] = expenseSheet.serviceExpense || [];
       return;
     }
@@ -79,7 +84,6 @@ export function packToForm(fields, data){
       // 分离附件和回执附件
       if (task.attachment.length) {
         task.attribute[fieldName] = task.attachment.filter(img => img.receipt);
-        task.attachment = task.attachment.filter(img => !img.receipt);
       }
     }
 
@@ -87,7 +91,6 @@ export function packToForm(fields, data){
 
   return {
     id: task.id,
-    attachment: task.attachment,
     disExpense,
     ...task.attribute
   };

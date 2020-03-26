@@ -1,22 +1,7 @@
 <template>
   <div>
     <form-builder ref="form" :fields="receiptFields" :value="value" @update="update">
-      <!-- start 备件 -->
-      <template slot="sparepart" slot-scope="{ field }">
-        <form-item :label="field.displayName">
-          <form-sparepart :field="field" :value="value" @update="update"></form-sparepart>
-        </form-item>
-      </template>
-      <!-- end 备件 -->
-
-      <!-- start 服务项目 -->
-      <template slot="serviceIterm" slot-scope="{ field }">
-        <form-item :label="field.displayName">
-          <form-serviceterm :field="field" :value="value" @update="update"></form-serviceterm>
-        </form-item>
-      </template>
-      <!-- end 服务项目 -->
-       
+      <!-- start 合计 -->
       <template v-if="hasExpense" slot="template" slot-scope="{ field }">    
         <form-item :label="field.displayName" class="task-receipt-expense">
           <div class="item">
@@ -27,7 +12,6 @@
             <label>服务费用</label>
             <span>{{ serviceItermExpense }}</span>
           </div>
-          
           <div class="item">
             <label>折扣费用</label>
             <form-number :value="value.disExpense" @update="updateDisExpense" />
@@ -36,10 +20,9 @@
             <label>总计</label>
             <span>{{ totalExpense }}</span>
           </div>
-
         </form-item> 
       </template>
-
+      <!-- end 合计 -->
     </form-builder>
   </div>
 </template>

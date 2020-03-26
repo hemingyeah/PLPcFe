@@ -1,8 +1,8 @@
 <template>
   <div class="form-sparepart">
-    <button type="button" class="btn btn-primary base-upload-btn" @click="openDialog">添加</button>
+    <button type="button" class="btn btn-primary base-upload-btn" @click="visible = true">添加</button>
 
-    <el-table :data="value[field.fieldName]" border stripe>
+    <el-table :data="value" border stripe>
       <el-table-column label="备件" prop="name"></el-table-column>
       <el-table-column label="编号" prop="serialNumber"></el-table-column>
       <el-table-column label="类别" prop="primaryType"></el-table-column>
@@ -27,14 +27,14 @@
     
       <el-table-column label="操作" width="70px" fixed="right">
         <template slot-scope="scope">
-          <el-button size="mini" type="danger" icon="el-icon-delete" @click="value.sparepart.splice(scope.$index, 1)" />
+          <el-button size="mini" type="danger" icon="el-icon-delete" @click="value.splice(scope.$index, 1)" />
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 添加备件弹窗 -->
     <base-modal :show.sync="visible" title="备件添加" class="form-sparepart-modal" width="700px" @closed="reset">
-      <form @submit.prevent="submit" v-if="init">
+      <form @submit.prevent="submit">
         <form-builder :fields="fields" ref="form" :value="sparepart" @update="update">
 
           <!-- start 仓库 -->
@@ -50,7 +50,7 @@
             <form-item :label="field.displayName">
               <biz-form-remote-select
                 :field="field"
-                v-model="value.template"
+                v-model="selectedSparepart"
                 :remote-method="searchPart"
                 @input="updatePart"
                 placeholder="请选择">
@@ -107,26 +107,28 @@
 </template>
 
 <script>
+import FormMixin from '@src/component/form/mixin/form';
 /* api */
 import * as TaskApi from '@src/api/TaskApi';
 export default {
   name: 'form-sparepart',
+  mixins: [FormMixin],
   props: {
     field: {
       type: Object,
       default: () => ({})
     },
     value: {
-      type: Object,
-      default: () => ({})
+      type: Array,
+      default: () => ([])
     },
   },
   data() {
     return {
-      init: false,
       visible: false,
       repertoryId: 0, // 仓库ID
       repertoryList: [], // 仓库列表数据
+      selectedSparepart: [], // 当前选中的备件
       sparepart: this.initData() // 备件信息
     }
   },
@@ -246,7 +248,7 @@ export default {
     },
     updateRepertory() {
       // 重置备件信息
-      this.value.template = [];
+      this.selectedSparepart = [];
       this.sparepart = this.initData();
     },
     update({field, newValue, oldValue}) {
@@ -263,8 +265,6 @@ export default {
       item.number = value > maxNum ? maxNum : (value <= 0 ? 1 : value);
     },
     async submit() {
-      const { fieldName } = this.field;
-
       try {
         const validateRes = await this.$refs.form.validate();
         if (!validateRes) return;
@@ -272,15 +272,12 @@ export default {
         let sparepartObj = JSON.parse(JSON.stringify(this.sparepart));
         sparepartObj.outPrice = sparepartObj.costPrice;
         sparepartObj.primaryType = sparepartObj.type;
-        sparepartObj.primaryId = sparepartObj.id;
         sparepartObj.type = '备件';
-        sparepartObj.taskId = this.value.id;
-        delete sparepartObj.costPrice;
 
-        let newValue = this.value[fieldName] || [];
+        let newValue = this.value;
 
         // 查找已添加的备件中是否存在该备件
-        let ids = newValue.findIndex(val => val.primaryId == sparepartObj.id);
+        let ids = newValue.findIndex(val => val.id == sparepartObj.id);
 
         if (ids > -1) {
           const sum = Number(newValue[ids].number) + Number(sparepartObj.number);
@@ -301,12 +298,16 @@ export default {
     reset() {
       this.repertoryId = this.repertoryList[0]?.value || 0;
       this.sparepart = this.initData();
-      this.value.template = [];
-      this.init = false;
-    },
-    openDialog() {
-      this.init = true;
-      this.visible = true;
+      this.selectedSparepart = [];
+
+      // 清空校验结果
+      setTimeout(() => {
+        this.$refs.form.$children.map(child => {
+          if (child.$el.className == 'form-item err') {
+            child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
+          }
+        })
+      }, 0);
     }
   },
   async mounted(){
@@ -341,6 +342,20 @@ export default {
 </script>
 
 <style lang="scss">
+.form-item.err :not(.is-success){
+  .form-item :not(.err) {
+    input, .base-select-main-content {
+      border-color: #e0e1e2 !important;
+    }
+  }
+
+  .form-item.err {
+    input, .base-select-main-content {
+      border-color: #f56c6c !important;
+    }
+  }
+}
+
 .form-sparepart{
   line-height: 30px;
   text-align: left;
