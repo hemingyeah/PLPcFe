@@ -30,9 +30,9 @@ export function packToReceipt(fields, form){
       value = '';
     }
 
-    // 回执附件
     if(fieldName === 'receiptAttachment'){
-      // TODO: 待处理
+      // 拼附件和回执附件
+      task.attachment = value.concat(form.attachment);
     }
 
     if (field.formType === 'address' && !field.isSystem) {
@@ -75,10 +75,19 @@ export function packToForm(fields, data){
       return;
     }
 
+    if(fieldName === 'receiptAttachment'){
+      // 分离附件和回执附件
+      if (task.attachment.length) {
+        task.attribute[fieldName] = task.attachment.filter(img => img.receipt);
+        task.attachment = task.attachment.filter(img => !img.receipt);
+      }
+    }
+
   });
 
   return {
     id: task.id,
+    attachment: task.attachment,
     disExpense,
     ...task.attribute
   };

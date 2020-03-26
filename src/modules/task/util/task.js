@@ -68,6 +68,11 @@ export function packToTask(fields, form){
     if (field.formType === 'location') {
       value = {};
     }
+
+    if (fieldName === 'attachment') {
+      // 拼附件和回执附件
+      value = value.concat(form.receiptAttachment);
+    }
     
     isSystem == 0
       ? task.attribute[fieldName] = value
@@ -125,6 +130,14 @@ export function packToForm(fields, data){
       task.product = data.products;
 
       return;
+    }
+
+    if (fieldName === 'attachment') {
+      // 分离附件和回执附件
+      if (value.length) {
+        task.receiptAttachment = value.filter(img => img.receipt);
+        value = value.filter(img => !img.receipt);
+      }
     }
 
     isSystem == 1 && (task[fieldName] = value);
