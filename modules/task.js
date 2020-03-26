@@ -15,4 +15,8 @@ module.exports = {
     entry: './src/modules/task/view/index.js',
     template: 'src/templates/map.html'
   },
+  'task.receipt.view': {
+    entry: './src/modules/task/view/receipt.js',
+    template: 'src/templates/map.html'
+  },
 }

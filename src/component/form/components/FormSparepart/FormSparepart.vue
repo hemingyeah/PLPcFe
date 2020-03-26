@@ -21,7 +21,7 @@
 
       <el-table-column label="小计" width="100px">
         <template slot-scope="scope">
-          {{(Number(scope.row.number) * Number(scope.row.salePrice)).toFixed(2)}}
+          {{(scope.row.number * scope.row.salePrice).toFixed(2)}}
         </template>
       </el-table-column>
     

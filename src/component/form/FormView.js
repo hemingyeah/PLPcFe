@@ -149,6 +149,12 @@ const FormView = {
       if (this.$scopedSlots[fieldName]) {
         return this.$scopedSlots[fieldName]({displayName, value, formType, field});
       }
+
+      // 电子签名
+      if (formType === 'autograph' && this.$scopedSlots[formType]) {
+        return this.$scopedSlots[formType]({displayName, value, formType, field});
+      }
+
       // 组件默认视图
       let FormField = FieldManager.findField(field.formType);
       if(FormField && FormField.view){
@@ -156,7 +162,7 @@ const FormView = {
         return createElement(FormField.view, attrs);
       }
       
-      if (formType === 'attachment') {
+      if (formType === 'attachment' || formType === 'receiptAttachment') {
         params = {
           ...params,
           value: toArray(value).map(a => <base-file-item file={a} readonly key={a.id}/>)

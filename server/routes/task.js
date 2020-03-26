@@ -43,4 +43,11 @@ router.get('/task/receipt', async ctx => {
   ctx.body = Template.renderWithData('表单回执', {}, script, modConfig.template)
 });
 
+router.get('/task/receipt/view/:id', async ctx => {
+  let modConfig = modules['task.receipt.view'];
+  let script = ['/task.receipt.view.js'];
+  
+  ctx.body = Template.renderWithHtml('回执表单详情', {}, script, modConfig.template)
+});
+
 module.exports = router;
