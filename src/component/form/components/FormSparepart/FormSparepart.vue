@@ -219,7 +219,7 @@ export default {
       pms.repertoryId = this.repertoryId || '';
       pms.with_OOS = false;
       return this.$http
-        .post('/task/spare/list', pms)
+        .get('/task/spare/list', pms)
         .then(res => {
           if (!res || !res.list) return;   
           res.list = res.list.map(template =>

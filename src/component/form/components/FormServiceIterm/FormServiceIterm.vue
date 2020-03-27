@@ -186,7 +186,7 @@ export default {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {}
       return this.$http
-        .post('/task/service/list', pms)
+        .get('/task/service/list', pms)
         .then(res => {
           if (!res || !res.list) return;   
           res.list = res.list.map(template =>
