@@ -40,10 +40,10 @@
               </sample-tooltip>
             
           </template>
-          <template v-else-if="column.field == 'address'">
+          <template v-else-if="column.field == 'address' && scope.row[column.field]">
             {{getAddress(scope.row[column.field])}}
           </template>
-          <template v-else-if="column.field == 'linkman'">
+          <template v-else-if="column.field == 'linkman' && scope.row[column.field]">
             {{scope.row[column.field].name}}
           </template>
           <template v-else>
@@ -132,6 +132,8 @@ export default {
               return Object.freeze(product);
             });
           this.paginationInfo.totalItems = res.total;
+          if(!this.productList[0].linkman) this.columns[3].show = false;
+          if(!this.productList[0].address) this.columns[4].show = false;
         })
         .catch(e => console.error('fetchData product caught e', e));
     },

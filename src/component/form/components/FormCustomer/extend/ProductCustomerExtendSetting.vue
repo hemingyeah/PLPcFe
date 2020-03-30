@@ -5,11 +5,11 @@
     <h3>关联项</h3>
     <div class="form-setting-group">
       <el-checkbox :value="field.setting.customerOption.linkman" @input="updateOptions($event, 'linkman')">联系人</el-checkbox>
-      <el-checkbox :value="field.setting.customerOption.linkmanNotNull" @input="updateOptions($event, 'linkmanNotNull')">联系人必填</el-checkbox>
+      <el-checkbox :value="field.setting.customerOption.linkmanNotNull" @input="updateOptions($event, 'linkmanNotNull')" :disabled="!field.setting.customerOption.linkman">联系人必填</el-checkbox>
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.setting.customerOption.address" @input="updateOptions($event, 'address')">地址</el-checkbox>
-      <el-checkbox :value="field.setting.customerOption.addressNotNull" @input="updateOptions($event, 'addressNotNull')">地址必填</el-checkbox>
+      <el-checkbox :value="field.setting.customerOption.addressNotNull" @input="updateOptions($event, 'addressNotNull')" :disabled="!field.setting.customerOption.address">地址必填</el-checkbox>
     </div>
   </div>
 </template>

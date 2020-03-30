@@ -310,7 +310,7 @@ export default {
         })
         .catch(e => console.error(e));
     },
-    fetchLinkmanAddress(params) {
+    fetchLinkmanAddress(value) {
       let linkman = value[0];
       const pms = {
         lmId: linkman.value
@@ -326,7 +326,7 @@ export default {
               value: res.address && res.address.id
             }
           ]
-          rthis.updateCustomerAddress(address) : '';
+          res.address ? this.updateCustomerAddress(address) : '';
 
           return res;
         })
