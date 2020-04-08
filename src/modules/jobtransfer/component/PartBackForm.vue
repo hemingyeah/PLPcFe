@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="退回" :visible.sync="visible" width="600px">
+  <el-dialog title="退回" :visible.sync="visible" width="600px" top="10vh">
     <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="common-form">
       <el-form-item label="备件名称：">
         <el-input type="text" :value="part.name" readonly class="srp-readonly"></el-input>
@@ -73,15 +73,12 @@ export default {
             validator:(rule, value, callback) => {
               let err = [];
               let max = this.holdNum || 0;
-              console.info('value:', value, window._init_data);
-              // const count = this.decimalNumber(value);
-              const count = parseFloat(value);
-              console.info('count:', count);
-               
+              const count = this.decimalNumber(value);
+
               if(value > max) err.push('数量不能大于持有数量')
               if(value < 0) err.push('数量不能小于0')
-              // if (count != -1 && count == 0) err.push('请填写大于0的正整数')
-              // if (count != -1 && count != 0) err.push(`请填写大于0的${ count }位小数`)
+              if (count != -1 && count == 0) err.push('请填写大于0的正整数')
+              if (count != -1 && count != 0) err.push(`请填写大于0的${ count }位小数`)
 
               callback(err)
             }
@@ -165,6 +162,8 @@ export default {
     },
     decimalNumber(num) {
       let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      console.info('initData', initData);
+      
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 
