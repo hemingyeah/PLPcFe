@@ -412,6 +412,7 @@ export default {
         // url = '/partV2/repertory/person/list';
         url = '/dd/partV2/repertory/personalStock';
         params.userId = this.userId;
+        params.with_OOS = false;
         break;
       default:
         break;
@@ -671,13 +672,13 @@ export default {
       },
       {
         label: '开始时间',
-        field: 'updateTime',
+        field: 'startTime',
         minWidth: '150px',
         show: true
       },
       {
         label: '更新时间',
-        field: 'startTime',
+        field: 'updateTime',
         minWidth: '150px',
         show: true
       }]
