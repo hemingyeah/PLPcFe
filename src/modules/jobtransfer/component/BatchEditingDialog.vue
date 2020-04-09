@@ -109,10 +109,9 @@ export default {
           params.executorName = manager.displayName;
           break;
         case '未完成工单':
-          url = '/task/allotTasks';
-          params.taskIds = this.selectedIds.join(',');
+          url = '/task/redeployBatch';
+          params.taskIdList = this.selectedIds;
           params.executorId = manager.userId;
-          emulateJSON = false;
           break;
         case '负责客户':
           url = '/customer/editBatch';
