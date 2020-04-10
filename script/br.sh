@@ -4,7 +4,8 @@ projects=("shb-pc-fe" "sm4_dd" "sm4-pc" "shb_ssp")
 root="/Users/zhengqiangmao/Aaronmao/workspace/"
 releaseBranchName="release/$(date +'%m%d')"
 echo $1
-echo $2
+echo $2                 
+echo $3                 
 # $1：前端项目所在路径，不传默认/Users/zhengqiangmao/Aaronmao/workspace/
 # $2：更新只更新各项目release分支或者bugFix分支或者pre_master
 
@@ -23,8 +24,8 @@ do
     cd "$root""$p"
     # check working area
     if [ -n "$(git status --porcelain)" ]; then
-      echo "warn: working area not clean";
-      exit;
+        echo "warn: working area not clean";
+        exit;
     fi
 
     if [[ -z $2 ]] || [[ $2 == "release" ]]; then
@@ -46,14 +47,25 @@ do
 
     if [ "$2" == "pre_master" ]; then
         # 创建pre_master并推送
-        git checkout dev
+        git checkout gray
         git pull
-        preMasterBranchName="pre_master_$(date +'%m%d')"
+        preMasterBranchName="pre_master_$($3)"
         git checkout -b $preMasterBranchName
         git push --set-upstream origin $preMasterBranchName
+        
+        if [ "$p" == "sm4_dd" ]; then
+        # 创建pre_master并推送
+        git checkout gray_stable
+        git pull
+        preMasterBranchName="pre_master_gray_stable$($3)"
+        git checkout -b $preMasterBranchName
+        git push --set-upstream origin $preMasterBranchName
+
+        fi
+
     fi
 
-    # echo "Successfully create branch $releaseBranchName for fe project"
+    echo "Successfully create branch $releaseBranchName for fe project"
 done
 
 #echo "数组元素个数为: ${#projects[*]}"
