@@ -92,7 +92,7 @@ export default {
       const manager = form[sf.fieldName];
       // userId: "6839d043-683e-11ea-bfc9-00163e304a25" displayName: "薄德忠"
       // ids: this.selectedIds.join(','),
-      console.info('params:', manager.userId, manager.displayName);
+      // console.info('params:', manager.userId, manager.displayName);
       let params = {}, emulateJSON = true;   
       //  {mapJson: 
       // "{"manager":{"id":"b33e25bb-380e-11ea-bfc9-00163e304a25","name":"安迪"}}",
@@ -103,13 +103,13 @@ export default {
         let url = '';
         switch (this.module) {
         case '未完成事件':
-          url = '/event/redeployBatch';
+          url = '/event/allotBatch';
           params.eventIdList = this.selectedIds;
           params.executorId = manager.userId;
           params.executorName = manager.displayName;
           break;
         case '未完成工单':
-          url = '/task/redeployBatch';
+          url = '/task/allotBatch';
           params.taskIdList = this.selectedIds;
           params.executorId = manager.userId;
           break;
@@ -121,7 +121,7 @@ export default {
         default:
           break;
         }
-        console.info('params', params);
+        // console.info('params', params);
         const res = await this.$http.post(url, params, emulateJSON);
         const failure = res.status;
         this.pending = false;
@@ -145,7 +145,7 @@ export default {
     },
     open() {
       if (!this.selectedIds.length) {
-        console.info('this.module', this.module);
+        // console.info('this.module', this.module);
         
         return this.$platform.alert(`请选择需要批量编辑的${this.module}`);
       }
