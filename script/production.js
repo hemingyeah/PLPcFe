@@ -18,7 +18,7 @@ const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.prod.conf');
 
 const ROOT_PATH = config.targetRootPath;
-const monitorScript = '<script>!(function(c,i,e,b){var h=i.createElement("script");var f=i.getElementsByTagName("script")[0];h.type="text/javascript";h.crossorigin=true;h.onload=function(){c[b]||(c[b]=new c.wpkReporter({bid:"${env == "production" ? "dta_2_3144" : "dta_2_3397"}"}));c[b].installAll()};f.parentNode.insertBefore(h,f);h.src=e})(window,document,"https://g.alicdn.com/woodpeckerx/jssdk??wpkReporter.js","__wpk");</script>'
+const monitorScript = '<script>!(function(c,i,e,b){var h=i.createElement("script");var f=i.getElementsByTagName("script")[0];h.type="text/javascript";h.defer=true;h.crossorigin=true;h.onload=function(){c[b]||(c[b]=new c.wpkReporter({bid:window.location.host=="app.shb.ltd"?"dta_2_3144":"dta_2_3397"}));c[b].installAll()};f.parentNode.insertBefore(h,f);h.src=e})(window,document,"https://g.alicdn.com/woodpeckerx/jssdk??wpkReporter.js","__wpk");</script>'
 
 // 编译
 webpack(webpackConfig, function (err, stats) {
