@@ -30,15 +30,28 @@ do
 
     if [[ -z $2 ]] || [[ $2 == "release" ]]; then
         # 创建release并推送
-        git checkout dev
+        git checkout gray
         git pull
+        releaseBranchName="release/gray_$(date +'%m%d')"
         git checkout -b $releaseBranchName
         git push --set-upstream origin $releaseBranchName
+
+        # 移动端特殊处理 兼容 旧移动端
+        if [ "$p" == "sm4_dd" ]; then
+        # 创建release并推送
+        git checkout gray_stable
+        git pull
+        releaseBranchName="release/gray_stable_$(date +'%m%d')"
+        git checkout -b $releaseBranchName
+        git push --set-upstream origin $releaseBranchName
+
+        fi
+
     fi
 
     if [[ -z $2 ]] || [[ $2 == "bugFix" ]]; then
         # 创建bugFix并推送
-        git checkout dev
+        git checkout gray
         git pull
         buFixBranchName="bugFix/$(git describe --tags --abbrev=0)"
         git checkout -b $buFixBranchName
@@ -46,18 +59,23 @@ do
     fi
 
     if [ "$2" == "pre_master" ]; then
+        if [ -z $3 ]; then
+            echo "pre_master branch need version name";
+            exit;
+        fi
         # 创建pre_master并推送
         git checkout gray
         git pull
-        preMasterBranchName="pre_master_$($3)"
+        preMasterBranchName="pre_master_"$3
         git checkout -b $preMasterBranchName
         git push --set-upstream origin $preMasterBranchName
         
+        # 移动端特殊处理 兼容 旧移动端
         if [ "$p" == "sm4_dd" ]; then
         # 创建pre_master并推送
         git checkout gray_stable
         git pull
-        preMasterBranchName="pre_master_gray_stable$($3)"
+        preMasterBranchName="pre_master_gray_stable_"$3
         git checkout -b $preMasterBranchName
         git push --set-upstream origin $preMasterBranchName
 
