@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # print variable
- echo $1
- echo $2
- echo "$branchName"
+echo $1
+echo $2
+echo "$branchName"
 
 # check variable
 if [ -z $1 ]; then

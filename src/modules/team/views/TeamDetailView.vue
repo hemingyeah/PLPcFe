@@ -403,8 +403,10 @@ export default {
       options.title = '请选择成员';
       options.selected = this.page.list;
 
-      this.$fast.contact.choose('dept', options).then(res => {
-        this.personAdd(res.data.users)
+      this.$fast.contact.choose('dept', options).then((res = {}) => {
+        let data = res.data || {};
+        let users = data.users || [];
+        this.personAdd(users)
       })
     },
     /** 添加成员 */
