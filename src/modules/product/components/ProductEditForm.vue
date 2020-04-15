@@ -566,7 +566,7 @@ export default {
               onInput={this.updateCustomerAddress}
               clearable
             />
-            <div class="btn btn-primary" onClick={e => this.createInfo(this.type, e)}>新建</div>
+            { this.renderBtn(h) }
           </div>
         )
       }

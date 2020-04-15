@@ -125,16 +125,6 @@ export default {
         isNull: 1,
       }, {
         formType: 'select',
-        fieldName: 'productId',
-        displayName: '关联产品',
-        placeholder: '请选择',
-        isNull: 1,
-        setting: {
-          isMulti: true,
-          dataSource: this.products || [],
-        }
-      }, {
-        formType: 'select',
         fieldName: 'address',
         displayName: '关联地址',
         placeholder: '请选择',
