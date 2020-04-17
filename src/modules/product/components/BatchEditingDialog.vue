@@ -134,7 +134,8 @@ export default {
         params.mapJson = JSON.stringify({
           [sf.fieldName]: {
             userId: tv.userId,
-            name: tv.displayName,
+            displayName: tv.displayName,
+            staffId: tv.staffId
           },
         })
       }
@@ -145,6 +146,7 @@ export default {
           [sf.fieldName]: {
             id: tv.userId,
             name: tv.displayName,
+            staffId: tv.staffId
           },
         })
       }
