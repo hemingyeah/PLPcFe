@@ -7,11 +7,16 @@
     remote
     reserve-keyword
     :placeholder="field.placeHolder?field.placeHolder:'请输入关键词搜索'"
-    clearable
+    :clearable="field.clearable?field.clearable:false"
     :loading="loading"
     :remote-method="searchLinkman"
   >
-    <el-option v-for="item in options" :key="item.id" :label="item.name" :value="field.returnData?item[field.returnData]:item.id"></el-option>
+    <el-option
+      v-for="item in options"
+      :key="item.id"
+      :label="item.name"
+      :value="field.returnData?item[field.returnData]:item.id"
+    ></el-option>
   </el-select>
 </template>
 
@@ -48,7 +53,7 @@ export default {
       this.loading = true;
       this.$emit("input", { keyword, field: this.field });
       this.$http
-        .get("/customer/userTag/list", {
+        .get("/api/elasticsearch/outside/es/linkman/list", {
           keyword,
           pageNum: 1
         })
