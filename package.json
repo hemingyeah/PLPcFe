@@ -16,6 +16,7 @@
     "build:hbc": "node script/production.js --user=huangbc",
     "build:zaj": "node script/production.js --user=zhangaj",
     "build:mao": "node script/production.js --user=aaronmao",
+    "build:bodz": "node script/production.js --user=bodz",
     "build:swj": "node script/production.js --user=sunwj",
     "build:cdh": "node script/production.js --user=cdh",
     "tag": "./script/tag.sh ${1} ${2}",
