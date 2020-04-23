@@ -614,8 +614,10 @@ export default {
 
   .detail-top {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    height: 60px;
+    min-height: 60px;
+    max-height: 120px;
     padding: 10px 15px;
     border-bottom: 1px solid #E8EFF0;
 
