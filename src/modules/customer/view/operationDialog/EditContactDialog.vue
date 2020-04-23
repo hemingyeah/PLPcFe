@@ -344,6 +344,7 @@ export default {
               .filter(pId => this.products.some(p => p.value === pId));
           }
 
+          this.form.productId = this.products.map(p => p.value);
           return this.products;
         })
         .catch(err => console.error("fetchProducts catch err", err));

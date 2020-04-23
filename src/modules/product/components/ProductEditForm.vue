@@ -537,6 +537,7 @@ export default {
     'form-customer-select-address': {
       name: 'form-customer-select-address',
       mixins: [FormMixin],
+      inject: ['initData'],
       props: {
         value: {
           type: Array,
@@ -547,6 +548,15 @@ export default {
         placeholder: String,
         type: String
       },
+      computed: {
+        auth() {
+          return this.initData.auth || []
+        },
+
+        createdPermission() {
+          return this.auth.indexOf('CUSTOMER_CREATE') != -1;
+        },
+      },
       methods: {
         input(value){
           this.$emit('input', value)
@@ -554,6 +564,13 @@ export default {
 
         createInfo(type, event) {
           this.$emit('createInfo', type);
+        },
+
+        renderBtn() {
+          if(!this.createdPermission) return null;
+          return (
+            <div class="btn btn-primary" onClick={e => this.createInfo(this.type, e)}>新建</div>
+          )
         }
       },
       render(h){
