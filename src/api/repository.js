@@ -3,13 +3,6 @@ import http from '@src/util/http';
 // let head = '';
 let prefixAppPath = '/api/app';
 let prefixSearchPath = '/api/search';
-
-
-if(process && process.env.NODE_ENV === 'development') {
-  prefixAppPath = '';
-  prefixSearchPath = '';
-}
-
 // 文档库
 
 /**

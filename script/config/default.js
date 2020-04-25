@@ -1,5 +1,4 @@
 module.exports = {
-  targetRootPath: '/Users/hbc/SHB/web',
   loginUser: {
     test: {
       corpId: 'ding73b203abd39ac5e935c2f4657eb6378f',

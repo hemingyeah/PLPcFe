@@ -1,44 +1,9 @@
-/** 请求代理 @author dongls */
-const http = require('http');
-
-const DEFAULT_OPIONS = {
-  host: 'dev.api.shb.ltd',
-  port: 8080,
-  headers: {}
-};
-
-const AGENT = new http.Agent({
-  keepAlive: true,
-  maxSockets: 1024,
-  maxFreeSockets: 256
-});
-
-/** 如果解析失败返回原值 */
-function toJSON(data) {
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return data;
-  }
-}
-
-/**
- * 拆解返回体
- * @param {*} response @see http://nodejs.cn/api/http.html#http_class_http_serverresponse
- * @param {*} body 返回的数据
- * @param {*} error 
- */
-function getBody(response, body, error){  
-  let statusCode = error ? 500 : response.statusCode;
-  let status = statusCode >= 200 && statusCode < 300;
-
-  let headers = {};
-  if(response && response.headers) {
-    headers = response.headers;
-  }
-
-  return {statusCode, status, headers, body, error};
-}
+/** 请求代理 
+ * @author dongls 
+*/
+// utils
+const https = require('https');
+const { getRequestOptions, getProxyOptions, toJSON, getBody } = require('./HttpUtil');
 
 module.exports = {
   /**
@@ -51,19 +16,11 @@ module.exports = {
    * @param {*} options 
    */
   request(path, method, rawBody, options = {}){
-    let proxyOptions = {};
     
-    proxyOptions.host = options.host || DEFAULT_OPIONS.host;
-    proxyOptions.port = options.port || DEFAULT_OPIONS.port;
-    proxyOptions.method = method;
-    proxyOptions.path = path;
-    // proxyOptions.path = '/sm4-web/' + path;
-
-    proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, options.headers)
-    proxyOptions.agent = AGENT;
+    let requestOptions = getRequestOptions(path, method, options);
 
     return new Promise((resolve, reject) => {
-      let req = http.request(proxyOptions, res => {
+      let req = https.request(requestOptions, res => {
         let chunks = [];
         let size = 0;
 
@@ -71,7 +28,7 @@ module.exports = {
           chunks.push(chunk);
           size += chunk.length;
         })
-     
+    
         // 请求完成
         res.on('end', () => {
           // 拼接返回数据
@@ -107,28 +64,16 @@ module.exports = {
     let request = ctx.request;
     let response = ctx.response;
 
-    let path = request.originalUrl;
-    let method = request.method;
     let rawBody = request.rawBody;
-
-    let proxyOptions = {};
-
-    proxyOptions.host = options.host || DEFAULT_OPIONS.host;
-    proxyOptions.port = options.port || DEFAULT_OPIONS.port;
-    proxyOptions.method = method;
-    proxyOptions.path = path;
-    // proxyOptions.path = '/sm4-web/' + path;
-
-    proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, request.headers, options.headers)
-    proxyOptions.agent = AGENT;
-
     let isMultipart = request.is('multipart/form-data');
 
+    let proxyOptions = getProxyOptions(ctx, options);
+
     return new Promise((resolve, reject) => {
-      let req = http.request(proxyOptions, res => {
+      let req = https.request(proxyOptions, res => {
         // 设定response的header
         let headers = res.headers;
-        for(let name in headers){
+        for(let name in headers) {
           response.set(name, headers[name])
         }
         

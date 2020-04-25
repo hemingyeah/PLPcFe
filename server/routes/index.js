@@ -35,23 +35,24 @@ router.get('/', async ctx => {
   let result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
   
   // 请求失败,模拟登陆
-  if(!result.status){
+  if (!result.status) {
     let mockUser = USER_CONFIG.loginUser;
     let userToken = 'dev_corpId';
-    if(null != mockUser){
+
+    if (null != mockUser){
       userToken = `${mockUser.userId}_${mockUser.tenantId}`;
     }
 
     let loginRes = await HttpClient.request(`/dd/mockLogin?code=dev_code&corpId=${userToken}`, 'get', null);
     
-    if(loginRes.status){
+    if (loginRes.status) {
       let cookie = loginRes.headers['set-cookie'] || {};
       headers['set-cookie'] = cookie;
       reqHeaders['cookie'] = cookie[0];
 
       // 再次请求
       result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
-    }else{
+    } else {
       console.log(loginRes)
     }
   }
@@ -65,13 +66,9 @@ router.get('/', async ctx => {
   }
 
   // 返回html
-  ctx.body = Template.renderWithHtml('售后宝', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('售后宝', body, script, modConfig.template);
 })
 
-// router.get('/home', async ctx => {
-//   let script = ['/system.home.js'];
-//   ctx.body = Template.renderWithData('首页', {}, script)
-// })
 
 router.get('/demo', async ctx => {
   let script = ['/system.demo.js'];
@@ -87,47 +84,6 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-// /api/app/outside/es
-router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  host: '192.168.31.237',
-  port: 10004,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
-  },
-}))
-
-// /api/app/outside
-router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  host: '47.98.255.79',
-  // host: '192.168.31.70',
-  port: 10004,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=802755db-e26b-4d8a-96a8-17795613766e`
-  },
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
-  // }
-}))
-
-// router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
-//   host: '192.168.31.249',
-//   // host: '192.168.31.70',
-//   port: 8080,
-//   headers: {
-//     'cookie': `VIPPUBLINKJSESSIONID=71a54c18-dcfd-4f2d-99a9-a5faf00835e1`
-//   },
-//   // headers: {
-//   //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
-//   // }
-// }))
-
-router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
-  host: '47.98.255.79',
-  port: 10002,
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=e7b50d17-9e1b-4190-bacb-e4029634a82f`
-  // }
-}))
 
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
@@ -155,6 +111,8 @@ router.all('/api/*', async ctx => {
 });
 
 
-router.all('/*', ctx => HttpClient.proxy(ctx));
+router.all('/*', ctx => {
+  return HttpClient.proxy(ctx)
+});
 
 module.exports = router;

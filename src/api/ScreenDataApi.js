@@ -6,12 +6,6 @@ import http from '@src/util/http';
 
 let urlAppPrefix = '/api/app';
 
-// 可独立出来
-if(process && process.env.NODE_ENV === 'development') {
-  urlAppPrefix = '';
-}
-
-
 /**
  * 更新设置信息
  * @param {*} params 
