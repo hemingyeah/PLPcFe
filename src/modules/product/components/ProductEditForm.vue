@@ -65,7 +65,7 @@
     </form-builder>
     <edit-contact-dialog ref="EditContactDialog" :customer="customer" @updateLinkman="updateLinkman" />
     <edit-address-dialog ref="EditAddressDialog" :customer-id="customerId" @updateCustomerAddress="updateCustomerAddress" />
-                        <!-- :default-address="selectedAddress" -->
+    <!-- :default-address="selectedAddress" -->
   </div>
 </template>
 
@@ -481,13 +481,12 @@ export default {
         type: String,
       },
       computed: {
-        auth() {
-          return this.initData.auth || []
+        auth() {          
+          return this.initData?.loginUser?.authorities || this.initData?.authorities;
         },
-
         createdPermission() {
-          return this.auth.indexOf('CUSTOMER_CREATE') != -1;
-        },
+          return this.auth.CUSTOMER_CREATE == 3;
+        }
       },
       methods: {
         input(value){
@@ -501,7 +500,7 @@ export default {
         renderBtn() {
           if(!this.createdPermission) return null;
           return (
-            <div class="btn btn-primary" onClick={e => this.createInfo(this.type, e)}>新建</div>
+            <el-button type="button" onClick={e => this.createInfo(this.type, e)} class="action-btn margin-left-10">新建</el-button>
           )
         }
       },
@@ -549,12 +548,12 @@ export default {
         type: String
       },
       computed: {
-        auth() {
-          return this.initData.auth || []
+        auth() {          
+          return this.initData?.loginUser?.authorities || this.initData?.authorities;
         },
 
         createdPermission() {
-          return this.auth.indexOf('CUSTOMER_CREATE') != -1;
+          return this.auth.CUSTOMER_CREATE == 3;
         },
       },
       methods: {
@@ -569,7 +568,7 @@ export default {
         renderBtn() {
           if(!this.createdPermission) return null;
           return (
-            <div class="btn btn-primary" onClick={e => this.createInfo(this.type, e)}>新建</div>
+            <el-button type="button" onClick={e => this.createInfo(this.type, e)} class="action-btn margin-left-10">新建</el-button>
           )
         }
       },
@@ -594,7 +593,9 @@ export default {
 </script>
 
 <style lang="scss">
-
+  .margin-left-10{
+    margin-left: 10px;
+  }
   .product-template-option {
     * {
       margin: 0;
