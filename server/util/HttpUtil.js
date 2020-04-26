@@ -1,6 +1,6 @@
 const https = require('https');
 const chalk = require('chalk');
-const chalkError = chalk.red();
+const chalkError = chalk.red;
 // model
 const MODEL_PATH = './../model';
 const { proxyConfig, isNotLocalEnv, envMap } = require(`${MODEL_PATH}/proxyConfigModel`);
