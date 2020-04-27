@@ -32,7 +32,6 @@ import * as Utils from '@src/component/form/util';
 import { formatDate } from '@src/util/lang';
 import _ from 'lodash';
 import { isEmptyStringObject } from '@src/util/function';
-import Field from '../../../../model/Field';
 
 export default {
   name: 'search-panel',
@@ -518,13 +517,13 @@ export default {
           const f = {
             ...Object.freeze(field)
           };
-          
 
           let comp = FormFieldMap.get(f.formType);
 
-          if (!comp || (f.formType === 'tags' || f.formType === 'customer' || f.formType === 'area' || f.formType === 'linkman')) {
+          if (!comp || f.formType === 'area' ) {
             return null;
           }
+
           if (f.formType === 'select') {
             f.setting.isMulti = false;
           }
@@ -538,6 +537,22 @@ export default {
               },
               on: {
                 input: event => this.update(event, 'isTags')
+              }
+            });
+          } else if (f.formType === 'linkman') {
+            childComp = h('linkman-search', {
+              props: {
+                field: f,
+                value: this.form[f.fieldName],
+                disableMap: true
+              },
+              on: {
+                update: event => {
+                  this.update(event);
+                },
+                input: event => {
+                  this.form[f.fieldName] = event.keyword;
+                }
               }
             });
           } else if (f.formType === 'customer') {
