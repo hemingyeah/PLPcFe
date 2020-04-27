@@ -83,6 +83,7 @@ export default {
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
+        
       return fields;
     },
     panelWidth() {
