@@ -12,7 +12,7 @@
       </el-dropdown>
     </h3>
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :column-num="columnNum"></search-form>
+      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :column-num="columnNum" ></search-form>
       <slot name="footer"></slot>
     </el-form>
 </base-panel></template>
@@ -88,7 +88,7 @@ export default {
     fields() {
       let f = {};
       return [...this.config.fields, ...this.selfFields]
-        .filter(f => (f.isSearch || f.isSystem) && f.fieldName !== 'qrcodeId')
+        .filter(f => (f.isSearch || f.isSystem))// qrcodeId?
         .map(field => {
 
           f = _.cloneDeep(field);
@@ -130,7 +130,7 @@ export default {
   methods: {
     computedWhetherAddQrcodeField() {
       if (this.initData?.productConfig?.qrcodeEnabled) {
-        this.selfFields.push({
+        this.selfFields = [...this.selfFields, {
           displayName: '是否绑定二维码',
           fieldName: 'qrcodeState',
           formType: 'select',
@@ -152,8 +152,26 @@ export default {
               value: 2
             }]
           }
-        })
+        }, {
+          displayName: '创建人',
+          fieldName: 'createUser',
+          formType: 'linkman',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -3.5,
+          placeHolder:'请输入创建人',
+        }, {
+          displayName: '二维码编号',
+          fieldName: 'qrcodeId',
+          formType: 'text',
+          placeHolder:'请输入产品二维码',
+          isExport: false,
+          isSystem: 1,
+          orderId: 1001,
+        }]
       }
+      
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
@@ -309,7 +327,7 @@ export default {
           value: form[fn],
         });
       }
-
+      // 返回接口数据
       return params;
     },
     setAdvanceSearchColumn(command) {
@@ -383,7 +401,6 @@ export default {
           if (isTags) {
             return this.form.tags = event;
           }
-
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },
@@ -391,9 +408,10 @@ export default {
           const f = {
             ...Object.freeze(field),
           }
+          
           let comp = FormFieldMap.get(f.formType);
 
-          if (!comp && f.formType !== 'tags' && f.formType !== 'customer') {
+          if (!comp && f.formType !== 'tags' && f.formType !== 'customer' && f.formType !== 'linkman') {
             return null;
           }
 
@@ -415,6 +433,19 @@ export default {
                 }
               }
             )
+          } else if (f.formType === 'linkman') {
+            childComp = h(
+              'linkman-search',
+              {
+                props: {
+                  field: f,
+                  value: this.form[f.fieldName],
+                  disableMap: true,
+                },
+                on: {
+                  update: event => this.update(event)
+                }
+              });
           } else if (f.formType === 'customer') {
             childComp = h(
               'customer-search',
