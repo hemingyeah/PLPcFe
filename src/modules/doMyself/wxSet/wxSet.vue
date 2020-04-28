@@ -1,5 +1,5 @@
 <template>
-  <div id="doMyself-components-box">
+  <div id="doMyself-components-box" v-loading.fullscreen.lock="fullscreenLoading">
     <div class="top-state" v-if="!haveWx">
       <h2>绑定公众号</h2>
       <div>
@@ -18,8 +18,8 @@
       </div>
       <div class="menu-set-box" v-show="topType===0">
         <div class="top-state">
-          <h2>绑定公众号</h2>
           <div>
+            <h2>绑定公众号</h2>
             <div class="wx-con">
               <div class="wx-img">
                 <img src="../../../assets/img/avatar.png" alt />
@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="top-state">
-          <menu-set></menu-set>
+          <menu-set @pageLoading="pageLoading"></menu-set>
         </div>
       </div>
       <div v-show="topType==1">
@@ -51,16 +51,14 @@
               <div class="flex-1"></div>
               <div class="set-arr-item-right">
                 <div class="flex-1"></div>
-
-                <el-tooltip :content="'当前状态:' + (totalActive===true?'开启':'禁止')" placement="top">
-                  <el-switch
-                    v-model="totalActive"
-                    active-color="#55b7b4"
-                    inactive-color="#999"
-                    :active-value="true"
-                    :inactive-value="false"
-                  ></el-switch>
-                </el-tooltip>
+                <el-switch
+                  v-model="totalActive"
+                  active-color="#55b7b4"
+                  inactive-color="#B8BEBC"
+                  :active-text="totalActive?'开启':'关闭'"
+                  :active-value="true"
+                  :inactive-value="false"
+                ></el-switch>
               </div>
             </div>
 
@@ -77,34 +75,11 @@
                   </div>
                 </div>
                 <div class="flex-1"></div>
-                <div class="set-arr-item-right">
-                  <p>应用范围：</p>
-                  <el-select
-                    class="flex-1 mar-r-15"
-                    v-model="item.select"
-                    multiple
-                    collapse-tags
-                    :disabled="item.radius>0?false:true"
-                    style="margin-left: 20px;"
-                    :placeholder="item.pleasHolder"
-                  >
-                    <el-option
-                      v-for="items in item.options"
-                      :key="items.value"
-                      :label="items.label"
-                      :value="items.value"
-                    ></el-option>
-                  </el-select>
-                  <el-tooltip :content="'当前状态:' + (item.radius>0?'开启':'禁止')" placement="top">
-                    <el-switch
-                      v-model="item.radius"
-                      active-color="#55b7b4"
-                      inactive-color="#999"
-                      active-value="100"
-                      inactive-value="0"
-                    ></el-switch>
-                  </el-tooltip>
-                </div>
+                <set-arr-item-right
+                  :disabled="item.radius>0?false:true"
+                  :item-data="item"
+                  :item-index="index"
+                ></set-arr-item-right>
               </div>
             </div>
           </div>
@@ -116,10 +91,12 @@
   </div>
 </template>
 <script>
-import menuSet from "./components/menuSet";
-import toastTemplate from "./components/toastTemplate";
+import menuSet from './components/menuSet';
+import toastTemplate from './components/toastTemplate';
+import setArrItemRight from './components/setArrItemRight';
+
 export default {
-  name: "wx-set",
+  name: 'wx-set',
   watch: {
     topType: {
       handler(newValue, oldValue) {},
@@ -132,77 +109,87 @@ export default {
       topType: 0, // 微信设置顶部切换 0 绑定公众号 1 公众号通知
       haveWx: true,
       totalActive: true,
+      fullscreenLoading: false, // 整屏loading
       toastSetArr: [
         {
-          title: "事件分配通知",
-          childTitle: "当事件被分配时,发送给客户联系人",
+          title: '事件分配通知',
+          childTitle: '当事件被分配时,发送给客户联系人',
           options: [
             {
-              value: "选项1",
-              label: "黄金糕"
+              value: '选项1',
+              label: '黄金糕'
             },
             {
-              value: "选项2",
-              label: "双皮奶"
+              value: '选项2',
+              label: '双皮奶'
             },
             {
-              value: "选项3",
-              label: "蚵仔煎"
+              value: '选项3',
+              label: '蚵仔煎'
             },
             {
-              value: "选项4",
-              label: "龙须面"
+              value: '选项4',
+              label: '龙须面'
             },
             {
-              value: "选项5",
-              label: "北京烤鸭"
+              value: '选项5',
+              label: '北京烤鸭'
             }
           ],
-          pleasHolder: "全部事件类型",
+          pleasHolder: '全部事件类型',
           radius: 0,
           time: null
         },
         {
-          title: "事件完成通知",
-          childTitle: "当事件被标记为完成时,发送给客户联系人",
+          title: '事件完成通知',
+          childTitle: '当事件被标记为完成时,发送给客户联系人',
           options: [],
           select: 0,
-          pleasHolder: "全部事件类型",
+          pleasHolder: '全部事件类型',
           radius: 0,
           time: null
         },
         {
-          title: "工单响应通知",
-          childTitle: "当工单被接收时,发送给客户联系人",
+          title: '工单响应通知',
+          childTitle: '当工单被接收时,发送给客户联系人',
           options: [],
           select: 0,
-          pleasHolder: "全部工单类型",
+          pleasHolder: '全部工单类型',
           radius: 0,
           time: null
         },
         {
-          title: "工单完成通知",
-          childTitle: "进行中的工单被标记为完成时,发送给客户联系人",
+          title: '工单完成通知',
+          childTitle: '进行中的工单被标记为完成时,发送给客户联系人',
           options: [],
           select: 0,
-          pleasHolder: "全部工单类型",
+          pleasHolder: '全部工单类型',
           radius: 0,
           time: null
         },
         {
-          title: "工单计划时间提醒客户",
+          title: '工单计划时间提醒客户',
           options: [],
           select: 0,
-          pleasHolder: "全部工单类型",
+          pleasHolder: '全部工单类型',
           radius: 0,
-          time: ""
+          time: ''
         }
       ]
     };
   },
+  methods: {
+    pageLoading(data = false) {
+      this.fullscreenLoading = data;
+    },
+    itemRadiusChange(e, b) {
+      console.log(e, b);
+    }
+  },
   components: {
     [menuSet.name]: menuSet,
-    [toastTemplate.name]: toastTemplate
+    [toastTemplate.name]: toastTemplate,
+    [setArrItemRight.name]: setArrItemRight
   }
 };
 </script>
@@ -359,5 +346,8 @@ p {
   .set-arr-box .set-arr-item:not(:last-child) {
     margin-bottom: 10px;
   }
+}
+.el-switch__label {
+  color: #b8bebc;
 }
 </style>

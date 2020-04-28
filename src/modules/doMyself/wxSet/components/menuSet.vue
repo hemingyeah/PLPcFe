@@ -137,7 +137,15 @@
             </el-radio-group>
             <div v-if="ruleForm.menuType==='跳转页面'">
               <p class="tips-con mar-b-12">订阅者点击该子菜单会跳到以下链接</p>
-              <div class="flex-x al-c">
+              <el-form-item label="页面地址" prop="input_url" v-show="!now_chooseed_menu.onlyName">
+                <el-input
+                  v-model="ruleForm.input_url"
+                  class="url-input"
+                  size="small"
+                  placeholder="请输入页面地址"
+                ></el-input>
+              </el-form-item>
+              <!-- <div class="flex-x al-c">
                 <div class="flex-x al-c">
                   <p class="font-12 mar-r-12">页面地址</p>
                 </div>
@@ -149,7 +157,7 @@
                     placeholder="请输入页面地址"
                   ></el-input>
                 </div>
-              </div>
+              </div>-->
             </div>
 
             <el-input
@@ -170,7 +178,7 @@
       <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(2)">菜单排序</button>
 
       <button class="btn btn-primary" v-if="edit_type===0" @click="change_edit_type(1)">编辑模式</button>
-      <button class="btn btn-primary" v-if="edit_type===0" @click="updateMenu(1)">同步菜单</button>
+      <button class="btn btn-primary" v-if="edit_type===0" @click="getMenuList(false)">同步菜单</button>
       <button
         class="btn btn-primary"
         v-if="edit_type===1||edit_type===2"
@@ -185,11 +193,11 @@
 let menu_arr_stash = [];
 
 let url_obj = {
-  服务请求: "www.baidu.com",
-  服务进度: "www.baidu2.com",
-  服务评价: "www.baidu3.com",
-  服务商城: "www.baidu4.com",
-  知识库: "www.baidu5.com"
+  服务请求: "http://www.baidu.com",
+  服务进度: "http://www.baidu2.com",
+  服务评价: "http://www.baidu3.com",
+  服务商城: "http://www.baidu4.com",
+  知识库: "http://www.baidu5.com"
 };
 let input_obj = {
   售后宝功能: "config_url",
@@ -293,9 +301,6 @@ export default {
   },
   data() {
     let input_length = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("名称不能为空"));
-      }
       if (computedStrLen(value) > 16) {
         callback(new Error("字数不超过16个字节"));
       } else {
@@ -312,6 +317,13 @@ export default {
         callback();
       }
     };
+    let url_check = (rule, value, callback) => {
+      if (/(http|https):\/\/([\w.]+\/?)\S*/.test(value)) {
+        callback();
+      } else {
+        callback(new Error("请输入前缀是http://或https://的网址"));
+      }
+    };
 
     return {
       edit_type: 0, // 当前菜单的编辑方式 0 不可编辑 1 修改菜单内容模式 2 拖拽模式
@@ -323,24 +335,21 @@ export default {
         name: [
           { required: true, message: "请输入菜单名称", trigger: "blur" },
           { validator: input_length, trigger: "blur" }
+        ],
+        input_url: [
+          { required: true, message: "请输入跳转页面网址", trigger: "blur" },
+          { validator: url_check, trigger: "blur" }
         ]
       },
-      now_chooseed_menu: false
+      now_chooseed_menu: false,
+      wxInfo: {
+        appid: "wx896d29a4f5d87e75"
+      }
     };
   },
   created() {},
   mounted() {
-    this.getMenuList().then(res => {
-      let result = res.data.wechatMenu
-        ? JSON.parse(res.data.selfmenu_info).button
-        : [];
-      // 微信菜单数据转换成我们识别的数据
-
-      // this.menu_arr = this.wxMenuChange(result);
-      this.menu_arr = result;
-      menu_arr_stash = this.menu_arr;
-      console.log("getSuccess", JSON.parse(res.data.wechatMenu).menu.button);
-    });
+    this.getMenuList();
   },
   methods: {
     wxMenuChange(data = []) {
@@ -401,7 +410,7 @@ export default {
           this.main_menu_click(index, indexs);
         })
         .catch(err => {
-          console.error("valid_menu_formerror", err);
+          console.error("valid_menu_formerror");
         });
     },
     main_menu_click(index = 0, indexs = -1) {
@@ -491,6 +500,9 @@ export default {
             return res;
           });
           arr_.forEach((res, index) => {
+            if (res.hasOwnProperty("shb_type") === true) {
+              arr_[index] = this.filerArrByMenuType(arr_[index]);
+            }
             if (res.sub_button.length > 0) {
               res.sub_button.forEach((res_, index_) => {
                 if (res_.hasOwnProperty("shb_type") === true) {
@@ -501,7 +513,6 @@ export default {
               });
             }
           });
-
           resolve(arr_);
         } catch (error) {
           reject(error);
@@ -530,17 +541,10 @@ export default {
           input_url: "",
           reserve: res.reserve,
           value: res.reserve,
-          key: this.makeKey(res),
           type: "click"
         }
       };
       return { ...res, ...obj[res.menuType] };
-    },
-    makeKey(res) {
-      let time = new Date().getTime();
-      let number = Math.random(0, 99);
-      let res_ = window.btoa(time + "" + number);
-      return res_;
     },
     change_edit_type(type, save = false) {
       if (type === this.edit_type) {
@@ -558,8 +562,9 @@ export default {
               this.slice_add(this.menu_arr).then(res => {
                 this.menu_arr = res;
                 menu_arr_stash = _.cloneDeep(res);
-                return console.log(res, "httpdata, key_arr");
+                this.$emit("pageLoading", true);
                 this.setMenuList().then(res_ => {
+                  this.$emit("pageLoading", false);
                   console.log("saveSuccess");
                 });
               });
@@ -585,6 +590,50 @@ export default {
       }
     },
     resetForm(formName) {
+      let a = {
+        menu: {
+          button: [
+            {
+              name: "售后宝",
+              sub_button: [
+                {
+                  key: "12345679",
+                  name: "售后宝1",
+                  type: "text",
+                  value: "一年级(2)班",
+                  sub_button: []
+                }
+              ]
+            },
+            {
+              shb_type: "main_menu",
+              url: "",
+              input_url: "",
+              config_url: "",
+              type: "view",
+              sub_button: [
+                {
+                  shb_type: "children_menu",
+                  type: "view",
+                  name: "随便",
+                  menuType: "售后宝功能",
+                  menuTypeArr: "服务评价",
+                  url: "www.baidu3.com",
+                  input_url: "",
+                  config_url: "",
+                  reserve: "",
+                  sub_button: []
+                }
+              ],
+              name: "自定义",
+              menuType: "回复文本消息",
+              menuTypeArr: "服务请求",
+              reserve: "自定义"
+            }
+          ]
+        }
+      };
+
       this.now_chooseed_menu = false;
       this[formName] = _.cloneDeep(form_tem);
       this.$refs[formName].clearValidate();
@@ -592,32 +641,69 @@ export default {
     deleteMenu() {
       if (!this.now_chooseed_menu) return;
       let now_chooseed_menu = this.now_chooseed_menu;
+      let add_tem = _.cloneDeep(menu_add_tem);
       if (now_chooseed_menu.indexs > -1) {
         // 删除子菜单
         this.menu_arr[now_chooseed_menu.index].sub_button.splice(
           now_chooseed_menu.indexs,
           1
         );
+        let length = this.menu_arr[now_chooseed_menu.index].sub_button.length;
+        if (
+          length < 5 &&
+          (this.menu_arr[now_chooseed_menu.index].sub_button[
+            length - 1
+          ].hasOwnProperty("shb_type") === false ||
+            this.menu_arr[now_chooseed_menu.index].sub_button[length - 1]
+              .shb_type !== "add")
+        ) {
+          this.menu_arr[now_chooseed_menu.index].sub_button.push(add_tem);
+        }
       } else {
         // 删除主菜单 需要提示风险
         this.menu_arr.splice(now_chooseed_menu.index, 1);
+        console.log(this.menu_arr);
+        let length = this.menu_arr.length;
+        if (
+          length < 3 &&
+          (this.menu_arr[length - 1].hasOwnProperty("shb_type") === false ||
+            this.menu_arr[length - 1].shb_type !== "add")
+        ) {
+          this.menu_arr.push(add_tem);
+        }
       }
       this.resetForm("ruleForm");
     },
-    updateMenu() {
-      // 拉取微信菜单数据在后台做数据转换
-      return;
-    },
-    getMenuList() {
-      return this.$http.get("/weixin/outside/api/getMenuList", {
-        appid: "wx896d29a4f5d87e75"
-      });
+    getMenuList(type = true) {
+      this.$emit("pageLoading", true);
+      this.$http
+        .get("/weixin/outside/api/getMenuList", {
+          appid: this.wxInfo.appid,
+          type
+        })
+        .then(res => {
+          let result = res.data.wechatMenu
+            ? JSON.parse(res.data.wechatMenu).menu.button
+            : [];
+          // 微信菜单数据转换成我们识别的数据
+
+          // this.menu_arr = this.wxMenuChange(result);
+          this.menu_arr = result;
+          menu_arr_stash = this.menu_arr;
+          setTimeout(() => {
+            this.$emit("pageLoading", false);
+          }, 500);
+          console.log("getSuccess", result, res);
+        })
+        .catch(err => {
+          this.$emit("pageLoading", false);
+        });
     },
     setMenuList() {
       return this.$http.post(
         "/weixin/outside/api/saveMenuList",
         {
-          appid: "wx896d29a4f5d87e75",
+          appid: this.wxInfo.appid,
           wechatMenu: JSON.stringify({ menu: { button: menu_arr_stash } })
         },
         false
@@ -743,8 +829,7 @@ export default {
               height: 0;
               border-width: 6px;
               border-style: solid;
-              border-color: rgb(226, 226, 226) transparent transparent
-                transparent;
+              border-color: #d2d6de transparent transparent transparent;
               position: absolute;
               z-index: 97;
               left: 0;
@@ -759,11 +844,12 @@ export default {
               position: relative;
               z-index: 98;
               height: 30px;
+              color: #fff;
               display: flex;
               justify-content: center;
               align-items: center;
               padding: 0 5px;
-              background: rgb(226, 226, 226);
+              background: #d2d6de;
               margin-bottom: 2px;
               > p {
                 font-size: 12px;

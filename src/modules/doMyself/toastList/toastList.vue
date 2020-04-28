@@ -15,7 +15,7 @@ export default {
   name: "toast-list",
   data() {
     return {
-      nowPage: "customer"
+      nowPage: "visitor"
     };
   },
   components: {

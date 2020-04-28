@@ -7,8 +7,8 @@
         <el-table-column prop="date" label="模板类型" width="180"></el-table-column>
         <el-table-column prop="name" label="模板名称" width="180"></el-table-column>
         <el-table-column prop="address" label="模板内容"></el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
+        <el-table-column label="操作" width="80">
+          <template slot-scope="scope" >
             <a class="color-g" @click="visible=true">配置</a>
           </template>
         </el-table-column>

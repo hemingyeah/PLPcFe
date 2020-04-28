@@ -44,7 +44,7 @@ export default {
           icon: "icon-shouye"
         }
       ],
-      nowMenu: 1 // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
+      nowMenu: 3 // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
     };
   },
   created() {

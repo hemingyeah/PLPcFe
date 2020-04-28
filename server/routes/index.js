@@ -110,6 +110,15 @@ router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   // }
 }))
 
+
+router.use('/weixin/*', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.57.167',
+  port: 8083,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+  },
+}))
+
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.57.167', // 仇太俊
   // host: '192.168.31.70',

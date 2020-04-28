@@ -13,7 +13,7 @@
         @submit.prevent="searchModel.pageNum=1;search();trackEventHandler('search')"
       >
         <div class="product-template-list-base-search-group">
-          <el-input v-model="searchModel.keyword" placeholder="请输入关键字">
+          <el-input v-model="searchModel.keyword" placeholder="请输入手机号或关联编号">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">搜索</base-button>
@@ -153,8 +153,8 @@
               v-else-if="column.field === 'createUser'"
             >{{ scope.row.createUser && scope.row.createUser.displayName }}</template>
             <template
-              v-else-if="column.field === 'createTime'"
-            >{{ scope.row.createTime | formatDate }}</template>
+              v-else-if="column.field === 'sendTime'"
+            >{{ scope.row.sendTime | formatDate }}</template>
 
             <div
               v-else-if="column.formType === 'textarea'"
@@ -257,22 +257,6 @@
 
     <!-- 编辑联系人弹窗 -->
     <edit-contact-dialog ref="EditContactDialog" :original-value="selectedContact"></edit-contact-dialog>
-
-    <base-table-advanced-setting ref="advanced" @save="columnStatusModify" />
-
-    <!-- 提示框 -->
-    <base-modal :show.sync="visible" title="请维护客户信息" class="form-address-modal">
-      <div class="modal-box">
-        <p>
-          您可以将该事件中的客户信息保存为新的客户或增加到现有客户消息中，
-          <strong>修改后的客户信息将覆盖现有的客户信息</strong>
-        </p>
-        <div class="flex-x">
-          <el-button type="primary" @click>保存为新客户</el-button>
-          <el-button type="primary" @click="popSaveCustomerForm">保存到现有客户</el-button>
-        </div>
-      </div>
-    </base-modal>
   </div>
   <!-- end 产品模板列表 -->
 </template>
@@ -285,7 +269,7 @@ import { formatDate } from "@src/util/lang";
 
 import EditContactDialog from "@src/modules/customer/view/operationDialog/EditContactDialog.vue";
 
-import { getContactList } from "@src/api/CustomerContact.js";
+import { getToastWxList } from "@src/api/doMyself.js";
 
 import SearchPanel from "../components/SearchPanel.vue";
 import AuthUtil from "@src/util/auth";
@@ -803,8 +787,6 @@ export default {
           conditions: []
         }
       },
-      visible: false, // 提示弹窗参数
-      visible_form: false, // 表单弹窗
       selectedContact: {}, // 编辑联系人弹窗参数,
       // 表单选择系列组件相关参数
       multipleSelection: [],
@@ -816,135 +798,147 @@ export default {
       return (
         this.initData.productFields || [
           {
-            displayName: "联系人",
+            displayName: "通知类型",
             fieldName: "name",
-            formType: "text",
+            formType: "select",
             placeHolder: "请输入联系人姓名",
             isExport: false,
+            setting: {
+              isMulti: false,
+              dataSource: [
+                {
+                  text: "全部类型",
+                  value: ""
+                },
+                {
+                  text: "工单响应通知",
+                  value: "taskResponseHandle"
+                },
+                {
+                  text: "工单完成通知（回访）",
+                  value: "autoReviewHandle"
+                },
+                {
+                  text: "工单动态更新通知",
+                  value: "taskRemarkEdit"
+                },
+                {
+                  text: "新建事件通知",
+                  value: "eventCreateHandle"
+                },
+                {
+                  text: "事件完成通知",
+                  value: "eventFinishHandle"
+                },
+                {
+                  text: "定时通知",
+                  value: "remindMessageHandle"
+                },
+                {
+                  text: "计划时间通知",
+                  value: "taskPlanSmsRemindHandle"
+                },
+                {
+                  text: "客户短信提醒",
+                  value: "sendSms2Cus"
+                },
+                {
+                  text: "产品短信提醒",
+                  value: "sendSms2CusByPro"
+                },
+                {
+                  text: "自助门户验证码",
+                  value: "SSP"
+                },
+                {
+                  text: "验证码",
+                  value: "SuperAdmin"
+                }
+              ]
+            },
             isSystem: 1,
             orderId: 1
           },
           {
-            displayName: "电话",
+            displayName: "手机号码",
             fieldName: "phone",
             formType: "text",
-            placeHolder: "请输入电话",
+            placeHolder: "请输入手机号",
             isExport: false,
             isSystem: 1,
             orderId: 2
           },
           {
-            displayName: "客户",
-            fieldName: "customerName",
-            formType: "customer",
+            displayName: "模板名称",
+            fieldName: "templateId",
+            formType: "select",
             placeHolder: "请选择客户",
             isExport: false,
-            isNull: 1,
+            setting: {
+              isMulti: false,
+              dataSource: []
+            },
             isSystem: 1,
             orderId: 3
           },
           {
-            displayName: "当前事件编号",
-            fieldName: "event",
+            displayName: "关联编号",
+            fieldName: "relevanceNumber",
             formType: "text",
-            placeHolder: "请输入当前事件编号",
+            placeHolder: "请输入手机号",
             isExport: false,
             isSystem: 1,
             orderId: 4
           },
           {
-            displayName: "注册来源",
-            fieldName: "from",
-            formType: "select",
+            displayName: "按时间查询",
+            fieldName: "time",
+            formType: "date",
+            placeHolder: "请输入关联编号",
+            // defaultTime: ["00:00:00", "23:59:59"],
+            returnData: result => {
+              let obj = {
+                startTime: formatDate(result[0], "YYYY-MM-DD HH:mm:ss"),
+                endTime: formatDate(result[1], "YYYY-MM-DD HH:mm:ss")
+              };
+              return obj;
+            },
             isExport: false,
-            isNull: 1,
             isSystem: 1,
-            operator: "between",
-            orderId: 10,
+            orderId: 5
+          },
+          {
+            displayName: "选择状态",
+            fieldName: "sta",
+            formType: "select",
+            placeHolder: "请输入关联编号",
+            isExport: false,
             setting: {
               isMulti: false,
               dataSource: [
                 {
-                  text: "全部来源",
+                  text: "全部",
                   value: ""
                 },
                 {
-                  text: "公众号",
-                  value: 1
+                  text: "成功",
+                  value: "succ_send"
+                },
+                {
+                  text: "失败",
+                  value: "fail_send"
+                },
+                {
+                  text: "发送中",
+                  value: "doing_send"
                 }
               ]
-            }
+            },
+            isSystem: 1,
+            orderId: 6
           }
         ]
       ).sort((a, b) => a.orderId - b.orderId);
-    },
-    productFieldsSaveCustomer() {
-      return [
-        {
-          displayName: "客户",
-          fieldName: "customerExtend",
-          customerExtend: "056cd57b-6db3-11ea-bfc9-00163e304a25",
-          formType: "customer",
-          placeHolder: "请选择客户",
-          disabled: true,
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: 3
-        },
-        {
-          displayName: "联系人",
-          fieldName: "address",
-          formType: "select",
-          extendType: "customerExtend",
-          extendData: "customerExtend",
-          formRight: {
-            icon: "icon-shouye",
-            con: "自定义提示内容"
-          },
-          searchUrl: "/api/elasticsearch/outside/es/linkman/list",
-          searchType: "GET",
-          mainKey: "customerId",
-          resShowKey: "",
-          resTranslate: obj => {
-            return {
-              value: obj.contactName,
-              id: obj.id
-            };
-          },
-          extendDisplayName: "客户",
-          placeholder: "请输入关联联系人",
-          isNull: 1,
-          isSystem: 1,
-          orderId: 3
-        },
-        {
-          displayName: "地址",
-          fieldName: "address",
-          formType: "select",
-          extendType: "customerExtend",
-          extendData: "customerExtend",
-          searchUrl: "/customer/address/list",
-          searchType: "GET",
-          mainKey: "customerId",
-          resShowKey: "",
-          resTranslate: obj => {
-            return {
-              value:
-                (obj.province ? obj.province : "") +
-                (obj.city ? obj.city : "") +
-                (obj.dist ? obj.dist : "") +
-                (obj.address ? obj.address : ""),
-              id: obj.id
-            };
-          },
-          extendDisplayName: "客户",
-          placeholder: "请输入关联地址",
-          isNull: 1,
-          isSystem: 1,
-          orderId: 3
-        }
-      ].sort((a, b) => a.orderId - b.orderId);
     },
     // 导出权限
     authExport() {
@@ -984,14 +978,39 @@ export default {
       )
     };
 
-    this.paramsSearchRevert();
+    // this.paramsSearchRevert();
     this.columns = this.buildTableColumn();
+    this.getTemplate();
     this.search();
 
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
   methods: {
+    getTemplate() {
+      // 获取所有的模板
+      this.$http
+        .get("/vipsms/getTemplates", { pageSize: "999", pageNum: "1" })
+        .then(res => {
+          this.productFields[2].setting.dataSource = [
+            {
+              text: "全部",
+              value: ""
+            },
+            ...res.data.list
+              .filter(
+                item =>
+                  item.status == "pass_approval" && item.notice == "自定义通知"
+              )
+              .map(item => {
+                return {
+                  text: item.name,
+                  value: item.id
+                };
+              })
+          ];
+        });
+    },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");
       this.$refs.advanced.open(this.columns);
@@ -1033,81 +1052,55 @@ export default {
       // return []
       return [
         {
-          label: "联系人",
-          field: "name",
+          label: "通知类型",
+          field: "operation",
           show: true,
           fixed: true,
           minWidth: "150px"
         },
         {
-          label: "电话",
-          field: "custName",
+          label: "接收号码",
+          field: "phones",
           fixed: true,
           show: true
         },
         {
-          label: "客户",
-          field: "cusName",
-          conType: "click",
-          color: "#55b7b4",
-          click: obj => {},
+          label: "联系人",
+          field: "linkmanName",
+          fixed: true,
           show: true
         },
         {
-          label: "当前事件",
-          field: "dept",
-          conType: "click",
-          color: "#55b7b4",
-          click: obj => {},
+          label: "模板名称",
+          field: "model",
+          fixed: true,
           show: true
         },
         {
-          label: "注册来源",
-          field: "registeredSource",
-          minWidth: "150px",
+          label: "发送时间",
+          field: "sendTime",
+          fixed: true,
           show: true
         },
         {
-          label: "操作",
-          field: "btnArray",
-          conType: "btnArray",
-          btnArr: [
-            {
-              name: "保存客户信息",
-              color: "#55b7b4",
-              click: obj => {
-                this.openDialog(obj);
-              }
-            },
-            { name: "删除", color: "#999", click: obj => {} }
-          ],
-          minWidth: "150px",
-          show: 'important'
+          label: "关联编号",
+          field: "relevanceNumber",
+          fixed: true,
+          show: true
+        },
+        {
+          label: "状态",
+          field: "status",
+          fixed: true,
+          show: true
+        },
+        {
+          label: "反馈",
+          field: "feedbackStatus",
+          fixed: true,
+          show: true
         }
       ];
-    },
-    async deleteLinkman(lm) {
-      if (lm.isMain) return platform.alert("默认联系人不能删除");
-      try {
-        const res = await platform.confirm("确定要删除该联系人？");
-        if (!res) return;
-        pending = true;
-        const reqRes = await this.$http.post(
-          "/linkman/delete",
-          { ids: lm.id },
-          false
-        );
-        pending = false;
-        if (reqRes.status === 0) {
-          this.fetchData();
-        } else {
-          platform.alert(res.message);
-        }
-        this.search();
-        // this.$eventBus.$emit("customer_info_record.update_record_list");
-      } catch (e) {
-        console.error("err");
-      }
     },
     // 构建表格列
     buildTableColumn() {
@@ -1304,7 +1297,7 @@ export default {
       const params = this.buildParams();
 
       this.loadingListData = true;
-      return getContactList(params)
+      return getToastWxList(params)
         .then(res => {
           res = res.result;
           if (!res || !res.list) {
@@ -1461,24 +1454,6 @@ export default {
       this.searchModel.pageNum = 1;
       this.searchModel.moreConditions = this.$refs.searchPanel.buildParams();
 
-      this.trackEventHandler("search");
-      this.search();
-    },
-    popSaveCustomerForm() {
-      this.visible = false;
-      this.visible_form = true;
-
-      this.$nextTick(() => {
-        let forms = document.getElementsByClassName("advanced-search-form");
-        for (let i = 0; i < forms.length; i++) {
-          let form = forms[i];
-          form.setAttribute("novalidate", true);
-        }
-      });
-    },
-    saveCustomer() {
-      let res = this.$refs.diyForm.buildParams();
-      return console.log(res);
       this.trackEventHandler("search");
       this.search();
     },
@@ -1715,7 +1690,7 @@ export default {
   },
   components: {
     [SearchPanel.name]: SearchPanel,
-    [EditContactDialog.name]: EditContactDialog,
+    [EditContactDialog.name]: EditContactDialog
   }
 };
 </script>

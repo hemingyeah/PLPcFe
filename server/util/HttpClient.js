@@ -2,12 +2,12 @@
 const http = require('http');
 
 const DEFAULT_OPIONS = {
-  host: '127.0.0.1', 
-  port: 8028,
-  // host: '30.40.58.161', 
+  // host: '127.0.0.1', 
+  // port: 8028,
+  // host: '30.40.58.161', // 丁建文
   // port: 8080,
-  // host: '30.40.57.167', // 仇太俊
-  // port: 10006,
+  host: '30.40.57.167', // 仇太俊
+  port: 8083,
   headers: {}
 };
 
