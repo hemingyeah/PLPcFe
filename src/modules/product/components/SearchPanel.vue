@@ -27,14 +27,15 @@
 import {
   FormFieldMap,
   SettingComponents
-} from "@src/component/form/components";
-import * as Utils from "@src/component/form/util";
-import { formatDate } from "@src/util/lang";
-import _ from "lodash";
-import { isEmptyStringObject } from "@src/util/function";
+} from '@src/component/form/components';
+import * as Utils from '@src/component/form/util';
+import { formatDate } from '@src/util/lang';
+import _ from 'lodash';
+import { isEmptyStringObject } from '@src/util/function';
+import Field from '../../../../model/Field';
 
 export default {
-  name: "search-panel",
+  name: 'search-panel',
   props: {
     config: {
       type: Object,
@@ -50,77 +51,29 @@ export default {
       visible: false,
       formBackup: {},
       columnNum: 1,
-      selfFields: [
-        {
-          displayName: "选择团队",
-          fieldName: "tags",
-          formType: "tags",
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          operator: "between",
-          orderId: -2.5
-        },
-        {
-          displayName: "创建时间",
-          fieldName: "createTime",
-          formType: "date",
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          operator: "between",
-          orderId: -2
-        },
-        {
-          displayName: "有无提醒",
-          fieldName: "hasRemind",
-          formType: "select",
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          operator: "between",
-          orderId: -3,
-          setting: {
-            isMulti: false,
-            dataSource: [
-              {
-                text: "全部",
-                value: ""
-              },
-              {
-                text: "有",
-                value: 1
-              },
-              {
-                text: "无",
-                value: 2
-              }
-            ]
-          }
-        }
-      ]
-    };
+      selfFields: this.buildSelfFields()
+    }
   },
   computed: {
     fields() {
       let f = {};
-      return [...this.config.fields, ...this.selfFields]
-        .filter(f => f.isSearch || f.isSystem) // qrcodeId?
+      let fields = [...this.config.fields, ...this.selfFields]
+        .filter(f => (f.isSearch || f.isSystem))
         .map(field => {
           f = _.cloneDeep(field);
 
           let formType = f.formType;
 
-          if (formType === "datetime") {
-            formType = "date";
+          if (formType === 'datetime') {
+            formType = 'date';
           }
 
-          if (f.fieldName === "customer") {
-            formType = "customer";
+          if (f.fieldName === 'customer') {
+            formType = 'customer';
           }
 
-          if (formType === "updateTime") {
-            f.displayName = "更新时间";
+          if (formType === 'updateTime') {
+            f.displayName = '更新时间';
           }
 
           return Object.freeze({
@@ -132,6 +85,8 @@ export default {
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
+      return fields
+
     },
     panelWidth() {
       return `${420 * this.columnNum}px`;
@@ -144,57 +99,140 @@ export default {
     this.computedWhetherAddQrcodeField();
   },
   methods: {
+    buildSelfFields () {
+      let fields = [{
+        displayName: '选择团队',
+        fieldName: 'tags',
+        formType: 'tags',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        operator: 'between',
+        orderId: -2.5
+      }, {
+        displayName: '创建时间',
+        fieldName: 'createTime',
+        formType: 'date',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        operator: 'between',
+        orderId: -2
+      }, {
+        displayName: '有无提醒',
+        fieldName: 'hasRemind',
+        formType: 'select',
+        isExport: false,
+        isNull: 1,
+        isSystem: 1,
+        operator: 'between',
+        orderId: -3,
+        setting: {
+          isMulti: false,
+          dataSource: [{
+            text: '全部',
+            value: ''
+          }, {
+            text: '有',
+            value: 1
+          }, {
+            text: '无',
+            value: 2
+          }]
+        }
+      }]
+
+      let hasLinkman = this.config.fields.filter(item => item.fieldName == 'linkmanName')[0];
+      let hasAddress = this.config.fields.filter(item => item.fieldName == 'address')[0];
+
+      if(hasLinkman) {
+        fields.push({
+          displayName: '联系人',
+          fieldName: 'linkmanId',
+          formType: 'linkman',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -11,
+          placeholder: '请输入关键字搜索联系人'
+        })
+      }
+
+      if(hasAddress) {
+        fields.push({
+          displayName: '区域',
+          fieldName: 'area',
+          formType: 'area',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -10
+        })
+        fields.push({
+          displayName: '详细地址',
+          fieldName: 'addressDetail',
+          formType: 'text',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -9
+        })
+      }
+
+      return fields;
+    },
     computedWhetherAddQrcodeField() {
       if (this.initData?.productConfig?.qrcodeEnabled) {
         this.selfFields = [
           ...this.selfFields,
           {
-            displayName: "是否绑定二维码",
-            fieldName: "qrcodeState",
-            formType: "select",
+            displayName: '是否绑定二维码',
+            fieldName: 'qrcodeState',
+            formType: 'select',
             isExport: false,
             isNull: 1,
             isSystem: 1,
-            operator: "between",
+            operator: 'between',
             orderId: 1000,
             setting: {
               isMulti: false,
               dataSource: [
                 {
-                  text: "全部",
-                  value: ""
+                  text: '全部',
+                  value: ''
                 },
                 {
-                  text: "是",
+                  text: '是',
                   value: 1
                 },
                 {
-                  text: "否",
+                  text: '否',
                   value: 2
                 }
               ]
             }
           },
           {
-            displayName: "创建人",
-            fieldName: "createUser",
-            formType: "linkman",
-            returnData:name,
+            displayName: '创建人',
+            fieldName: 'createUser',
+            formType: 'user',
+            returnData: 'name',
+            noClearable: true,
             isExport: false,
             isNull: 1,
             isSystem: 1,
             orderId: -3.5,
-            placeHolder: "请输入创建人"
-          },
-          {
-            displayName: "二维码编号",
-            fieldName: "qrcodeId",
-            formType: "text",
-            placeHolder: "请输入产品二维码",
-            isExport: false,
-            isSystem: 1,
-            orderId: 1001
+            placeHolder: '请输入创建人'
           }
+          // {
+          //   displayName: '二维码编号',
+          //   fieldName: 'qrcodeId',
+          //   formType: 'text',
+          //   placeHolder: '请输入产品二维码',
+          //   isExport: false,
+          //   isSystem: 1,
+          //   orderId: 1001
+          // }
         ];
       }
     },
@@ -202,52 +240,52 @@ export default {
       const data = this.getLocalStorageData();
       data[key] = value;
       localStorage.setItem(
-        "product_list_localStorage_19_4_24",
+        'product_list_localStorage_19_4_24',
         JSON.stringify(data)
       );
     },
     getLocalStorageData() {
       const dataStr =
-        localStorage.getItem("product_list_localStorage_19_4_24") || "{}";
+        localStorage.getItem('product_list_localStorage_19_4_24') || '{}';
       return JSON.parse(dataStr);
     },
     matchOperator(field) {
       let formType = field.formType;
-      let operator = "";
+      let operator = '';
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case 'date': {
+        operator = 'between';
+        break;
+      }
+      case 'datetime': {
+        operator = 'between';
+        break;
+      }
+      case 'select': {
+        if (field.setting && field.setting.isMulti) {
+          operator = 'contain';
+        } else {
+          operator = 'eq';
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case 'user': {
+        operator = 'user';
+        break;
+      }
+      case 'address': {
+        operator = 'address';
+        break;
+      }
+      case 'location': {
+        operator = 'location';
+        break;
+      }
+      default: {
+        operator = 'like';
+        break;
+      }
       }
       return operator;
     },
@@ -268,20 +306,38 @@ export default {
       };
 
       let tv = null;
-      let fn = "";
+      let fn = '';
 
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
 
         // hasRemind
-        if (fn === "hasRemind" && form[fn] !== "") {
+        if (fn === 'hasRemind' && form[fn] !== '') {
           params.hasRemind = form[fn] == 2 ? 0 : form[fn];
           continue;
         }
 
-        if (fn === "qrcodeState" && form[fn] !== "") {
+        if (fn === 'qrcodeState' && form[fn] !== '') {
           params.qrcodeState = form[fn] == 2 ? 0 : form[fn];
+          continue;
+        }
+
+        if (fn == 'area') {
+          params.productAddress = {
+            ...params.productAddress || {},
+            province: form[fn][0],
+            city: form[fn][1],
+            dist: form[fn][2],
+          }
+          continue;
+        }
+
+        if (fn === 'addressDetail') {
+          params.productAddress = {
+            ...params.productAddress || {},
+            address: form[fn]
+          }
           continue;
         }
 
@@ -289,18 +345,18 @@ export default {
           continue;
         }
 
-        if (typeof form[fn] === "string") {
-          params[fn === "customer" ? "customerId" : fn] = form[fn];
+        if (typeof form[fn] === 'string') {
+          params[fn === 'customer' ? 'customerId' : fn] = form[fn];
           continue;
         }
 
-        if (tv.formType === "date" || tv.formType === "datetime") {
-          params[fn] = form[fn].map(t => formatDate(t, "YYYY/MM/DD")).join("-");
+        if (tv.formType === 'date' || tv.formType === 'datetime') {
+          params[fn] = form[fn].map(t => formatDate(t, 'YYYY/MM/DD')).join('-');
           continue;
         }
 
-        if (tv.formType === "tags") {
-          params.tagId = form[fn].map(({ id }) => id).join("");
+        if (tv.formType === 'tags') {
+          params.tagId = form[fn].map(({ id }) => id).join('');
         }
       }
 
@@ -314,34 +370,34 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
+          typeof form[fn] === 'object' &&
           !Array.isArray(form[fn]) &&
           !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
-        if (tv.originalFormType === "date") {
+        if (tv.originalFormType === 'date') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD"),
-            betweenValue2: formatDate(form[fn][1], "YYYY-MM-DD")
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
+            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD')
           });
           continue;
         }
 
-        if (tv.originalFormType === "datetime") {
+        if (tv.originalFormType === 'datetime') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`
           });
           continue;
         }
 
-        if (tv.formType === "address") {
+        if (tv.formType === 'address') {
           let address = {
             property: fn,
             operator: tv.operator
@@ -350,10 +406,10 @@ export default {
 
           if (!isEmpty) {
             address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+              (form[fn].province || '') +
+              (form[fn].city || '') +
+              (form[fn].dist || '') +
+              (form[fn].address || '');
           }
           params.conditions.push(address);
           continue;
@@ -370,7 +426,7 @@ export default {
     },
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
-      this.saveDataToStorage("column_number", command);
+      this.saveDataToStorage('column_number', command);
     },
     open() {
       this.visible = true;
@@ -378,7 +434,7 @@ export default {
   },
   components: {
     SearchForm: {
-      name: "search-form",
+      name: 'search-form',
       props: {
         fields: {
           type: Array,
@@ -396,7 +452,7 @@ export default {
       data() {
         return {
           form: {},
-          tableName: "product"
+          tableName: 'product'
         };
       },
       mounted() {
@@ -413,23 +469,26 @@ export default {
         initFormVal() {
           let fields = this.fields;
           let form = {};
-          let tv = "";
+          let tv = '';
 
           fields.forEach(field => {
-            tv = "";
+            tv = '';
             // 地址的默认值初始化为对象
             if (
-              field.formType == "customerAddress" ||
-              field.formType == "address"
+              field.formType == 'customerAddress' ||
+              field.formType == 'address'
             )
               tv = {};
-            if (field.formType == "date" || field.formType == "datetime")
+            if (field.formType == 'date' || field.formType == 'datetime')
               tv = [];
-            if (field.formType === "link") {
+            if (field.formType === 'link') {
               tv = {};
             }
-            if (field.formType === "tags") {
+            if (field.formType === 'tags') {
               tv = [];
+            }
+            if (field.formType === 'area') {
+              tv = []
             }
 
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
@@ -443,10 +502,15 @@ export default {
 
           return form;
         },
-        update(event, isTags) {
-          if (isTags) {
-            return (this.form.tags = event);
+        update(event, action) {
+          if (action === 'tags') {
+            return this.form.tags = event;
           }
+
+          if (action === 'dist') {
+            return this.form.area = event;
+          }
+
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },
@@ -454,51 +518,30 @@ export default {
           const f = {
             ...Object.freeze(field)
           };
+          
 
           let comp = FormFieldMap.get(f.formType);
 
-          if (
-            !comp &&
-            f.formType !== "tags" &&
-            f.formType !== "customer" &&
-            f.formType !== "linkman"
-          ) {
+          if (!comp || (f.formType === 'tags' || f.formType === 'customer' || f.formType === 'area' || f.formType === 'linkman')) {
             return null;
           }
-
-          if (f.formType === "select") {
+          if (f.formType === 'select') {
             f.setting.isMulti = false;
           }
 
           let childComp = null;
 
-          if (f.formType === "tags") {
-            childComp = h("biz-team-select", {
+          if (f.formType === 'tags') {
+            childComp = h('biz-team-select', {
               props: {
                 value: this.form[f.fieldName]
               },
               on: {
-                input: event => this.update(event, "isTags")
+                input: event => this.update(event, 'isTags')
               }
             });
-          } else if (f.formType === "linkman") {
-            childComp = h("linkman-search", {
-              props: {
-                field: f,
-                value: this.form[f.fieldName],
-                disableMap: true
-              },
-              on: {
-                update: event => {
-                  this.update(event);
-                },
-                input: event => {
-                  this.form[f.fieldName] = event.keyword;
-                }
-              }
-            });
-          } else if (f.formType === "customer") {
-            childComp = h("customer-search", {
+          } else if (f.formType === 'customer') {
+            childComp = h('customer-search', {
               props: {
                 field: f,
                 value: this.form[f.fieldName],
@@ -506,6 +549,20 @@ export default {
               },
               on: {
                 update: event => this.update(event)
+              }
+            });
+          }else if (f.formType === 'user') {
+            childComp = h('user-search', {
+              props: {
+                field: f,
+                value: this.form[f.fieldName],
+                disableMap: true
+              },
+              on: {
+                update: event => this.update(event),
+                input: (event) => {
+                  this.form[f.fieldName] = event.keyword;
+                }
               }
             });
           } else {
@@ -528,7 +585,7 @@ export default {
           }
 
           return h(
-            "form-item",
+            'form-item',
             {
               props: {
                 label: f.displayName,
@@ -543,7 +600,7 @@ export default {
         return (
           <div
             class={`form-item-container ${
-              this.columnNum == 2 ? "two-columns" : ""
+              this.columnNum == 2 ? 'two-columns' : ''
             }`}
           >
             {this.fields.map(f => this.renderInput(h, f))}

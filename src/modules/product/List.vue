@@ -395,7 +395,8 @@ export default {
           formType: 'text',
           isExport: false,
           isSystem: 1,
-          orderId: -4
+          placeholder: '请输入产品二维码',
+          orderId: 10001
         })
       }
 
