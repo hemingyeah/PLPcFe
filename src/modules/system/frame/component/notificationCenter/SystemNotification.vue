@@ -6,40 +6,58 @@
         <span class="system-notification-readed-text">全部标记为已读</span>
       </div>
       <div class="system-header-select-view">
-        <el-select class="system-notification-select system-notification-select-left" :value="systemOption" placeholder="消息来源" @input="getSource">
+        <el-select
+          class="system-notification-select system-notification-select-left"
+          :value="systemOption"
+          placeholder="消息来源"
+          @input="getSource"
+        >
           <el-option
             v-for="(item, index) in systemOptions"
             :key="index"
             :label="item.label"
-            :value="item.value"></el-option>
+            :value="item.value"
+          ></el-option>
         </el-select>
         <span class="system-notification-dividing-line"></span>
-        <el-select class="system-notification-select system-notification-select-right" :value="dataOption" placeholder="选择日期" @input="getTime">
+        <el-select
+          class="system-notification-select system-notification-select-right"
+          :value="dataOption"
+          placeholder="选择日期"
+          @input="getTime"
+        >
           <el-option
             v-for="(item, index) in dataOptions"
             :key="index"
             :label="item.label"
-            :value="item.value"></el-option>
-        </el-select>  
+            :value="item.value"
+          ></el-option>
+        </el-select>
       </div>
     </div>
     <div class="system-notification-content" v-if="systemPage.list.length != 0">
-      <div class="system-notification-item" 
-           v-for="(item) in systemPage.list"
-           :key="item.id - 0"
-           @click="toSystemNotificationDetail(item)">
+      <div
+        class="system-notification-item"
+        v-for="(item) in systemPage.list"
+        :key="item.id - 0"
+        @click="toSystemNotificationDetail(item)"
+      >
         <div class="system-notification-item-header">
           <span class="system-notification-item-new" v-if="item.readed == 0"></span>
-          <img class="system-notification-item-img" v-if="item.img" :src="item.img">
+          <img class="system-notification-item-img" v-if="item.img" :src="item.img" />
         </div>
         <span class="system-notification-item-title">{{ item.title }}</span>
-        <p class="system-notification-item-info">{{ item.content }}</p> 
+        <p class="system-notification-item-info">{{ item.content }}</p>
         <div class="system-notification-item-footer">
           <p class="system-notification-item-time">{{ item.createTime | fmt_datetime }}</p>
         </div>
       </div>
       <div class="system-notification-footer">
-        <button class="system-notification-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
+        <button
+          class="system-notification-footer-more"
+          @click="getMore"
+          v-if="moreShow && !loading"
+        >加载更多</button>
         <div v-if="loading">正在加载...</div>
         <div v-if="!moreShow && !loading">
           <span class="system-notification-footer-line"></span>
@@ -56,7 +74,7 @@
 <script>
 import * as Lang from '@src/util/lang/index.js';
 import * as NotificationApi from '@src/api/NotificationApi';
-import SystemNotificationDetails from '../notificationCenter/SystemNotificationDetails'
+import SystemNotificationDetails from '../notificationCenter/SystemNotificationDetails';
 import Page from '@model/Page';
 import platform from '@src/platform';
 
@@ -68,7 +86,7 @@ export default {
   props: {
     info: Object
   },
-  data () {
+  data() {
     return {
       detailShow: true,
       loading: false,
@@ -78,54 +96,64 @@ export default {
       systemPage: new Page(),
       btnShow: false,
       btnStyle: {
-        'border': '5px solid #eaeaea'
+        border: '5px solid #eaeaea'
       },
       params: {
         pageSize: 20,
         pageNum: 1
       },
       systemOption: '',
-      systemOptions: [{
-        value: null,
-        label: '全部'
-      }, {
-        value: 'update',
-        label: '更新通知'
-      }, {
-        value: 'activity',
-        label: '活动通知'
-      }],
+      systemOptions: [
+        {
+          value: null,
+          label: '全部'
+        },
+        {
+          value: 'update',
+          label: '更新通知'
+        },
+        {
+          value: 'activity',
+          label: '活动通知'
+        }
+      ],
       dataOption: '',
-      dataOptions: [{
-        value: null,
-        label: '全部'
-      }, {
-        value: 0,
-        label: '今日'
-      }, {
-        value: 1,
-        label: '昨日'
-      }, {
-        value: 7,
-        label: '近七天'
-      }, {
-        value: 30,
-        label: '近30天'
-      }]
-    }
+      dataOptions: [
+        {
+          value: null,
+          label: '全部'
+        },
+        {
+          value: 0,
+          label: '今日'
+        },
+        {
+          value: 1,
+          label: '昨日'
+        },
+        {
+          value: 7,
+          label: '近七天'
+        },
+        {
+          value: 30,
+          label: '近30天'
+        }
+      ]
+    };
   },
-  async created () {
+  async created() {
     this.getInfo();
   },
   methods: {
     /** 获取信息，刷新列表 */
-    async getInfo () {
+    async getInfo() {
       try {
         this.systemPage.list = [];
         this.params.pageNum = 1;
         this.loading = true;
         let systemPage = await NotificationApi.getSystemList(this.params);
-        if(systemPage.status == 0) {
+        if (systemPage.status == 0) {
           this.systemPage.merge(Page.as(systemPage.data));
         }
         this.loading = false;
@@ -135,19 +163,19 @@ export default {
     },
 
     /** 删除单个通知 */
-    async deleteItem (info, index) {
+    async deleteItem(info, index) {
       try {
         let params = {
           type: 'system',
           id: info.id
-        }
-        if(await platform.confirm('确定要删除该信息吗？')) {
+        };
+        if (await platform.confirm('确定要删除该信息吗？')) {
           let result = await NotificationApi.deleteNotification(params);
-          if(result.status == 0) {
+          if (result.status == 0) {
             this.systemPage.list.splice(index, 1);
           }
         }
-        if(info.readed == 0) {
+        if (info.readed == 0) {
           this.$emit('clearNum', 'system', 1);
         }
       } catch (error) {
@@ -156,61 +184,75 @@ export default {
     },
 
     /** 打开系统通知详情页 */
-    async toSystemNotificationDetail (info) {
+    async toSystemNotificationDetail(info = {}) {
       try {
-        if(info.readed == 0) {
+        if (info.readed == 0) {
           let params = {
             type: 'system',
             id: info.id
-          }
+          };
           let result = await NotificationApi.haveRead(params);
-          if(result.status == 0) {
+          if (result.status == 0) {
             info.readed = 1;
-            this.$emit('clearNum', 'system', 1)
+            this.$emit('clearNum', 'system', 1);
           }
         }
 
-        if(info.url) {
-          platform.openLink(info.url);
-        }
+        this.systemNotificationOpen(info);
+
       } catch (error) {
         console.error(error);
       }
     },
-    back () {
+    back() {
       this.detailShow = true;
     },
-    getSource (value) {
+    getSource(value) {
       this.systemOption = value;
       this.params.source = value;
       this.getInfo();
     },
 
     /** 格式化选择的时间 */
-    getTime (value) {
+    getTime(value) {
       this.dataOption = value;
 
       let startTime = '';
       let endTime = '';
 
-      if(value != 100 && value != null && value != 1) {
+      if (value != 100 && value != null && value != 1) {
         endTime = Lang.formatDate(new Date(), 'YYYY-MM-DD 23:59:59');
       } else if (value == 1) {
-        endTime = Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 23:59:59');
+        endTime = Lang.formatDate(
+          new Date() - 1 * 24 * 60 * 60 * 1000,
+          'YYYY-MM-DD 23:59:59'
+        );
       } else if (value == 100) {
-        endTime = Lang.formatDate(new Date() - (30 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 23:59:59');
+        endTime = Lang.formatDate(
+          new Date() - 30 * 24 * 60 * 60 * 1000,
+          'YYYY-MM-DD 23:59:59'
+        );
       } else {
         endTime = null;
       }
 
-      if(value == 0) {
+      if (value == 0) {
         startTime = Lang.formatDate(new Date(), 'YYYY-MM-DD 00:00:00');
       } else if (value == 1) {
-        startTime = Lang.formatDate(new Date() - (1 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
+        startTime = Lang.formatDate(
+          new Date() - 1 * 24 * 60 * 60 * 1000,
+          'YYYY-MM-DD 00:00:00'
+        );
       } else if (value == 7) {
-        startTime = Lang.formatDate(new Date() - (6 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
+        startTime = Lang.formatDate(
+          new Date() - 6 * 24 * 60 * 60 * 1000,
+          'YYYY-MM-DD 00:00:00'
+        );
       } else if (value == 30) {
-        startTime = Lang.formatDate(new Date() - (29 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD 00:00:00');
+        startTime = Lang.formatDate(
+          new Date() - 29 * 24 * 60 * 60 * 1000,
+          'YYYY-MM-DD 00:00:00'
+        );
       } else {
         startTime = null;
       }
@@ -220,35 +262,34 @@ export default {
     },
 
     /** 将系统通知全部设为已读 */
-    async setReaded () {
+    async setReaded() {
       try {
-        if(this.info.systemMsg == 0) {
+        if (this.info.systemMsg == 0) {
           this.btnShow = false;
           this.btnStyle = {
-            'border': '5px solid #eaeaea'
-          }
+            border: '5px solid #eaeaea'
+          };
           return;
         }
         let params = {
           type: 'system'
         };
         this.btnShow = !this.btnShow;
-        if(this.btnShow) {
-          if(await platform.confirm('您确定将全部未读通知信息标记为已读?')) {
+        if (this.btnShow) {
+          if (await platform.confirm('您确定将全部未读通知信息标记为已读?')) {
             let res = await NotificationApi.haveRead(params);
-            if(res.status == 0) {
+            if (res.status == 0) {
               this.getInfo();
               this.btnStyle = {
-                'border': '5px solid #55B7B4'
+                border: '5px solid #55B7B4'
               };
               this.$emit('clearNum', 'system');
             }
-            
           }
         } else {
           this.btnStyle = {
-            'border': '5px solid #eaeaea'
-          }
+            border: '5px solid #eaeaea'
+          };
         }
       } catch (error) {
         console.error(error);
@@ -256,17 +297,33 @@ export default {
     },
 
     /** 分页操作 */
-    async getMore () {
+    async getMore() {
       try {
         this.params.pageNum++;
         this.loading = true;
         let systemPage = await NotificationApi.getSystemList(this.params);
-        if(systemPage.status == 0) {
+        if (systemPage.status == 0) {
           this.systemPage.merge(Page.as(systemPage.data));
         }
         this.loading = false;
-      } catch(error) {
+      } catch (error) {
         console.error(error);
+      }
+    },
+    systemNotificationOpen (info = {}) {
+      // 系统通知点击跳转网页内页面 feat:2612 by bodz
+      // 判断是否是内部域名
+      let url = info.url || '';
+      let urlReg = /shb.ltd/;
+
+      if (urlReg.test(url)) {
+        info.url = info.url
+          .split('/')
+          .slice(3)
+          .join('/');
+        platform.openTab(info);
+      } else {
+        platform.openLink(info.url);
       }
     }
   },
@@ -274,21 +331,21 @@ export default {
     /** ture：显示加载更多按钮
      *  false：不显示
      */
-    moreShow () {
+    moreShow() {
       return this.systemPage.hasNextPage;
     },
-    change () {
+    change() {
       return this.info.systemMsg;
     }
   },
   watch: {
     change(newValue, oldValue) {
-      if(newValue > oldValue) {
+      if (newValue > oldValue) {
         this.getInfo();
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -302,7 +359,7 @@ export default {
   z-index: 99;
 
   background: #fff;
-  box-shadow: 0 3px 5px #E5E5E5;
+  box-shadow: 0 3px 5px #e5e5e5;
   font-size: 0;
   text-align: right;
 
@@ -321,22 +378,26 @@ export default {
   display: inline-block;
   input {
     color: #525252 !important;
-    background: #EAEAEA;
+    background: #eaeaea;
     border: 0;
   }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
-      /* WebKit browsers */
+  input::-webkit-input-placeholder,
+  textarea::-webkit-input-placeholder {
+    /* WebKit browsers */
     color: #525252;
   }
-  input:-moz-placeholder, textarea:-moz-placeholder {
+  input:-moz-placeholder,
+  textarea:-moz-placeholder {
     /* Mozilla Firefox 4 to 18 */
     color: #525252;
   }
-  input::-moz-placeholder, textarea::-moz-placeholder {
+  input::-moz-placeholder,
+  textarea::-moz-placeholder {
     /* Mozilla Firefox 19+ */
     color: #525252;
   }
-  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+  input:-ms-input-placeholder,
+  textarea:-ms-input-placeholder {
     /* Internet Explorer 10+ */
     color: #525252;
   }
@@ -400,18 +461,18 @@ export default {
   border: none;
   outline: none;
   background-color: transparent;
-  transition: color ease .15s;
+  transition: color ease 0.15s;
 
   i {
     font-size: 14px;
   }
 
-  &:hover{
+  &:hover {
     color: #e84040;
   }
 }
 .system-notification-item-info {
-  color: #8C8989;
+  color: #8c8989;
   word-break: break-all;
   line-height: 24px;
   margin: 0;
@@ -427,10 +488,10 @@ export default {
   border: 1px solid;
   border-radius: 4px;
   text-align: center;
-  color: #55B7B4;
+  color: #55b7b4;
 }
 .system-notification-item-time {
-  color: #8C8989;
+  color: #8c8989;
   margin: 0;
   padding: 4px 0 8px 0;
 }
@@ -447,7 +508,7 @@ export default {
   width: 15px;
   height: 15px;
   background: #fff;
-  border-radius: 50%
+  border-radius: 50%;
 }
 .system-notification-readed-text {
   font-size: 13px;
@@ -462,7 +523,7 @@ export default {
   text-align: center;
   margin-top: 10px;
   height: 30px;
-  color: #8C8989;
+  color: #8c8989;
 }
 .system-notification-footer-more {
   margin: 0;
@@ -470,9 +531,9 @@ export default {
   outline: none;
   border: none;
   background: none;
-  color: #8C8989;
+  color: #8c8989;
   &:hover {
-    color: #55B7B4;
+    color: #55b7b4;
   }
 }
 .system-notification-detail {
@@ -495,7 +556,7 @@ export default {
   position: relative;
   bottom: 4px;
   display: inline-block;
-  background: #D0D0D0;
+  background: #d0d0d0;
   height: 1px;
   width: 158px;
 }
