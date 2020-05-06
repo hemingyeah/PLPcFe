@@ -1159,15 +1159,11 @@ export default {
           false
         );
         pending = false;
-        if (reqRes.status === 0) {
-          this.fetchData();
-        } else {
-          platform.alert(res.message);
-        }
+        platform.alert(res.message);
         this.search();
         // this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
-        console.error("err");
+        console.error(e, "err");
       }
     },
     // 构建表格列
@@ -1572,6 +1568,7 @@ export default {
       return row.id;
     },
     openDialog(contact) {
+      console.log(contact)
       // 弹窗参考数据
       // TO DO 权限
       this.selectedContact = contact;

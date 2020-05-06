@@ -176,7 +176,6 @@ img {
     }
     .menu-checked {
       border-left: 3px solid #55b7b4;
-      
       span {
         font-size: 13px;
         font-weight: 700;

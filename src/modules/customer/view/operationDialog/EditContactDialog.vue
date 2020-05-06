@@ -156,10 +156,12 @@ export default {
         if (!validateRes) return;
 
         this.pending = true;
+        
+          
 
         const params = {
           ...this.form,
-          customer: this.customer,
+          customer: this.customer.hasOwnProperty('id') === false ? {id : this.form.customId} : this.customer,
           productId: this.products
             .filter(p => this.form.productId.some((pId => pId === p.value)))
             .map(p => ({
