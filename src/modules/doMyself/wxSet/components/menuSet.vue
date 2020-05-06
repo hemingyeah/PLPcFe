@@ -113,7 +113,6 @@
               class="change-con-radio-group"
               v-model="ruleForm.menuTypeArr"
               v-if="ruleForm.menuType==='售后宝功能'"
-              @change="radioChange"
             >
               <p class="tips-con">选择需要为此菜单配置的售后宝功能，订阅者点击后通过登录验证将打开对应页面</p>
               <div class="flex-x change-con-radio">
@@ -638,7 +637,7 @@ export default {
     getMenuList(type = true) {
       this.$emit("pageLoading", true);
       this.$http
-        .get("/outside/weixin/api/getMenuList", {
+        .get("/api/weixin/outside/weixin/api/getMenuList", {
           appid: this.wxInfo.appid,
           type
         })
@@ -662,7 +661,7 @@ export default {
     },
     setMenuList() {
       return this.$http.post(
-        "/outside/weixin/api/saveMenuList",
+        "/api/weixin/outside/weixin/api/saveMenuList",
         {
           appid: this.wxInfo.appid,
           wechatMenu: JSON.stringify({ menu: { button: menu_arr_stash } })
@@ -670,12 +669,6 @@ export default {
         false
       );
     },
-    radioChange(e) {
-      if (!this.now_chooseed_menu) {
-        return;
-      }
-      console.log(e, "12313123");
-    }
   }
 };
 </script>

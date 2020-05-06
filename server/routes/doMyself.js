@@ -5,11 +5,11 @@ const Template = require('../util/Template')
 const router = new KoaRouter();
 const modules = require('../../modules');
 
-router.get('/doMyself/:type', async ctx => {
+router.get('/setting/doMyself/:type', async ctx => {
   let script = ['/doMyself.home.js'];
   let modConfig = modules['doMyself.home'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request(`/doMyself/${ctx.params.type}`, 'get', null, { headers: reqHeaders });
+  let result = await HttpClient.request(`/setting/doMyself/${ctx.params.type}`, 'get', null, { headers: reqHeaders });
   let body = result.body;
   // let type = ctx.params.type;
   // let title = {

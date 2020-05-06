@@ -7,7 +7,7 @@
         <div class="wx-img">
           <img src="../../../assets/img/avatar.png" alt />
         </div>
-        <button type="submit" class="btn btn-primary">绑定公众号</button>
+        <button type="submit" class="btn btn-primary" @click="concatWx">绑定公众号</button>
       </div>
     </div>
 
@@ -184,7 +184,8 @@ export default {
       ],
       eventArr: [],
       taskArr: [],
-      timeInputing: 0
+      timeInputing: 0,
+      scanQrCode: false
     };
   },
   computed: {},
@@ -204,45 +205,55 @@ export default {
     },
     getWxInfo() {
       this.pageLoading(true);
-      this.$http.get("/outside/weixin/api/getAuthInfo").then(res => {
-        this.pageLoading(false);
-        this.wxInfo = res.data.data;
-        if (res.data.eventTypeList) {
-          let arr = res.data.eventTypeList.map(res => {
-            return { label: res.name, value: res.id };
-          });
-          this.toastSetArr[0].options = arr;
-          this.toastSetArr[1].options = arr;
-        }
-        if (res.data.taskTypeList) {
-          let arr = res.data.taskTypeList.map(res => {
-            return { label: res.name, value: res.id };
-          });
-          this.toastSetArr[2].options = arr;
-          this.toastSetArr[3].options = arr;
-          this.toastSetArr[4].options = arr;
-        }
-        if (res.data.wxTemplateMessageConfig) {
-          let wxToast = res.data.wxTemplateMessageConfig;
-          this.totalActive = wxToast.wxRemindMaster;
-          for (let i = 0; i < this.toastSetArr.length; i++) {
-            this.toastSetArr[i].radius = wxToast[setRaduisArr[i]];
-            if (wxToast[setSelectArr[i]].length > 0) {
-              this.toastSetArr[i].select = wxToast[setSelectArr[i]];
-            }
-            if (i === 4 && wxToast.reportSendTime) {
-              this.toastSetArr[i].time = wxToast.reportSendTime;
+      this.$http
+        .get("/api/weixin/outside/weixin/api/getAuthInfo")
+        .then(res => {
+          this.pageLoading(false);
+          this.wxInfo = res.data.data;
+          if (res.data.eventTypeList) {
+            let arr = res.data.eventTypeList.map(res => {
+              return { label: res.name, value: res.id };
+            });
+            this.toastSetArr[0].options = arr;
+            this.toastSetArr[1].options = arr;
+          }
+          if (res.data.taskTypeList) {
+            let arr = res.data.taskTypeList.map(res => {
+              return { label: res.name, value: res.id };
+            });
+            this.toastSetArr[2].options = arr;
+            this.toastSetArr[3].options = arr;
+            this.toastSetArr[4].options = arr;
+          }
+          if (res.data.wxTemplateMessageConfig) {
+            let wxToast = res.data.wxTemplateMessageConfig;
+            this.totalActive = wxToast.wxRemindMaster;
+            for (let i = 0; i < this.toastSetArr.length; i++) {
+              this.toastSetArr[i].radius = wxToast[setRaduisArr[i]];
+              if (wxToast[setSelectArr[i]].length > 0) {
+                this.toastSetArr[i].select = wxToast[setSelectArr[i]];
+              }
+              if (i === 4 && wxToast.reportSendTime) {
+                this.toastSetArr[i].time = wxToast.reportSendTime;
+              }
             }
           }
-        }
-      });
+        })
+        .catch(err => {
+          this.pageLoading(false);
+          if (this.scanQrCode === true) {
+            setTimeout(() => {
+              this.getWxInfo();
+            }, 1000);
+          }
+        });
     },
     mainChange(e) {
       this.totalActive = !e;
       this.pageLoading(true);
       this.$http
         .post(
-          "/outside/weixin/setting/wxMessage/save",
+          "/api/weixin/outside/weixin/setting/wxMessage/save",
           {
             message: "wxRemindMaster",
             state: e
@@ -263,7 +274,7 @@ export default {
     eventGet() {
       return new Promise((resolve, reject) => {
         this.$http
-          .get("/outside/weixin/setting/message/eventTypeList")
+          .get("/api/weixin/outside/weixin/setting/message/eventTypeList")
           .then(res => {
             let arr = res.data.map(res => {
               return { label: res.name, value: res.id };
@@ -277,7 +288,7 @@ export default {
     taskGet() {
       return new Promise((resolve, reject) => {
         this.$http
-          .get("/outside/weixin/setting/message/taskTypeList")
+          .get("/api/weixin/outside/weixin/setting/message/taskTypeList")
           .then(res => {
             let arr = res.data.map(res => {
               return { label: res.name, value: res.id };
@@ -296,7 +307,7 @@ export default {
         if (now > this.timeInputing + 1500) {
           this.$http
             .post(
-              "/outside/weixin/setting/saveSendTime",
+              "/api/weixin/outside/weixin/setting/saveSendTime",
               {
                 reportSendTime: this.toastSetArr[4].time
               },
@@ -305,7 +316,12 @@ export default {
             .then(res => {});
         }
       }, 1500);
-    }
+    },
+    concatWx() {
+      this.scanQrCode = true;
+      this.$platform.openLink('');
+      this.getWxInfo();
+    },
   },
   components: {
     [menuSet.name]: menuSet,

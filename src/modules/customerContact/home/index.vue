@@ -5,7 +5,7 @@
       <!--TO DO <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">访客</nav> -->
     </div>
     <customer-conctact-customer v-if="nowPage==='customer'"></customer-conctact-customer>
-    <customer-conctact-visitor v-if="nowPage==='visitor'"></customer-conctact-visitor>
+    <!-- <customer-conctact-visitor v-if="nowPage==='visitor'"></customer-conctact-visitor> -->
   </div>
 </template>
 <script>

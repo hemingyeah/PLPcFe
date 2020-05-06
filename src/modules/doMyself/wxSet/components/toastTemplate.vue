@@ -110,7 +110,7 @@ export default {
   methods: {
     getTemp() {
       // 获取模板列表
-      this.$http.get("/outside/weixin/api/getTemplateList").then(res => {
+      this.$http.get("/api/weixin/outside/weixin/api/getTemplateList").then(res => {
         res.list.map(item => {
           item.modelMap = JSON.parse(item.modelMap);
           return item;
@@ -138,7 +138,7 @@ export default {
       this.$emit("pageLoading", true);
       // 编辑模板
       this.$http
-        .get("/outside/weixin/api/saveTemplate", {
+        .get("/api/weixin/outside/weixin/api/saveTemplate", {
           id,
           first,
           remark
@@ -173,9 +173,6 @@ export default {
   }
   .form-box {
     width: 50%;
-
-    .form-con {
-    }
   }
   .result-show {
     width: 212px;

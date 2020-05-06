@@ -68,7 +68,7 @@ export default {
       this.$emit("pageLoading", true);
       this.$http
         .post(
-          "/outside/weixin/setting/changeTypes",
+          "/api/weixin/outside/weixin/setting/changeTypes",
           {
             typeIds: e.length > 0 ? [...e].join(",") : "",
             name: typesSelect[this.itemIndex]
@@ -85,7 +85,7 @@ export default {
       this.itemData.radius = !e;
       this.$http
         .post(
-          "/outside/weixin/setting/wxMessage/save",
+          "/api/weixin/outside/weixin/setting/wxMessage/save",
           {
             message: typesRadius[this.itemIndex],
             state: e

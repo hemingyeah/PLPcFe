@@ -1292,37 +1292,10 @@ export default {
 
       this.loadingListData = true;
       this.loadingListData = false;
-      this.$http.get("/vipsms/getRecords", params).then(res => {});
-      return;
-      return getContactList(params)
-        .then(res => {
-          res = res.result;
-          if (!res || !res.list) {
-            this.page = new Page();
-          } else {
-            this.page.merge(res);
-
-            this.page.list = res.list.map(l => {
-              let attribute = l.attribute ? l.attribute : {};
-
-              let list = {
-                ...l,
-                ...attribute
-              };
-              return list;
-            });
-          }
-
-          return res;
-        })
-        .then(() => {
-          this.$refs.productTemplateListPage.scrollTop = 0;
-          this.loadingListData = false;
-        })
-        .catch(err => {
-          this.loadingListData = false;
-          console.error("err", err);
-        });
+      return this.$http.get("/vipsms/getRecords", params).then(res => {
+        this.page = res;
+        this.matchSelected(); // 把选中的匹配出来
+      });
     },
     // 设置高级搜索面板 列
     setAdvanceSearchColumn(command) {
@@ -1585,10 +1558,10 @@ export default {
           if (isNotOnCurrentPage) return;
         }
         rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
+          this.$refs.productTemplateTable.toggleRowSelection(row);
         });
       } else {
-        this.$refs.multipleTable.clearSelection();
+        this.$refs.productTemplateTable.clearSelection();
         this.multipleSelection = [];
       }
     },
@@ -1683,7 +1656,25 @@ export default {
       this.multipleSelection.length < 1
         ? this.selectionToggle()
         : this.selectionToggle([productItem]);
-    }
+    },
+    // match data
+    matchSelected() {
+      if (!this.multipleSelection.length) return;
+      const selected =
+        this.page.list.filter(c => {
+          if (this.multipleSelection.some(sc => sc.id === c.id)) {
+            this.multipleSelection = this.multipleSelection.filter(
+              sc => sc.id !== c.id
+            );
+            this.multipleSelection.push(c);
+            return c;
+          }
+        }) || [];
+
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
+    },
   },
   components: {
     [SearchPanel.name]: SearchPanel,

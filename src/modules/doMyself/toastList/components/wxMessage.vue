@@ -1302,7 +1302,7 @@ export default {
       this.loadingListData = true;
 
       return this.$http
-        .get("/outside/weixin/api/getTemplateMessageList", params)
+        .get("/api/weixin/outside/weixin/api/getTemplateMessageList", params)
         .then(res => {
           if (!res || !res.list) {
             this.page = new Page();

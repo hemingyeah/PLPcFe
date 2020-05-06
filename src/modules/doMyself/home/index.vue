@@ -70,14 +70,14 @@ export default {
       } else if (index === 0) {
         window.location.href = "/setting/serviceStation/customerPortal";
       }else if (index === 1) {
-        window.location.href = "/doMyself/wxSet";
+        window.location.href = "/setting/doMyself/wxSet";
       }else if (index === 3) {
-        window.location.href = "/doMyself/toastList";
+        window.location.href = "/setting/doMyself/toastList";
       }
       this.nowMenu === index
     },
     loadWxdata(){
-      this.$http.get('/outside/weixin/api/getAuthInfo',)
+      this.$http.get('/api/weixin/outside/weixin/api/getAuthInfo',)
     }
   },
   components: {

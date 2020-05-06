@@ -1100,18 +1100,13 @@ export default {
           show: false
         },
         {
-          label: "部门",
-          field: "department",
-          show: false
-        },
-        {
           label: "备注",
-          field: "remark",
+          field: "remarks",
           show: false
         },
         {
           label: "关联产品",
-          field: "productId",
+          field: "esProductEntities",
           show: false
         },
         {
@@ -1359,10 +1354,7 @@ export default {
     // 搜索
     search() {
       const params = this.buildParams();
-
       this.loadingListData = true;
-      // this.$http.post('/outside/es/linkman/searchLinkManByTid', params)
-      // return
       return getContactList(params)
         .then(res => {
           res = res.result;
@@ -1386,6 +1378,7 @@ export default {
         })
         .then(() => {
           this.$refs.productTemplateListPage.scrollTop = 0;
+          this.matchSelected(); // 把选中的匹配出来
           this.loadingListData = false;
         })
         .catch(err => {
@@ -1568,7 +1561,6 @@ export default {
       return row.id;
     },
     openDialog(contact) {
-      console.log(contact)
       // 弹窗参考数据
       // TO DO 权限
       this.selectedContact = contact;
@@ -1662,10 +1654,10 @@ export default {
           if (isNotOnCurrentPage) return;
         }
         rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
+          this.$refs.productTemplateTable.toggleRowSelection(row);
         });
       } else {
-        this.$refs.multipleTable.clearSelection();
+        this.$refs.productTemplateTable.clearSelection();
         this.multipleSelection = [];
       }
     },
@@ -1717,7 +1709,7 @@ export default {
         if (
           c.field !== "customerAddress" &&
           c.field !== "remindCount" &&
-          c.field !== "updateTime"
+          c.field !== "updateTime" && c.field !== 'btnArray'
         ) {
           c.export = true;
         }
@@ -1734,9 +1726,12 @@ export default {
             exportTotal: this.page.total
           }
         : { exportTotal: ids.length };
-
+      if (checkedArr.indexOf("registeredSource") > -1) {
+        checkedArr[checkedArr.indexOf("registeredSource")] =
+          "esLinkManWXEntities";
+      }
       return {
-        productChecked: checkedArr.join(","),
+        linkmanChecked: checkedArr.join(","),
         data: exportAll ? "" : ids.join(","),
         exportSearchModel: JSON.stringify(exportSearchModel)
       };
@@ -1760,7 +1755,26 @@ export default {
       this.multipleSelection.length < 1
         ? this.selectionToggle()
         : this.selectionToggle([productItem]);
-    }
+    },
+    
+    // match data
+    matchSelected() {
+      if (!this.multipleSelection.length) return;
+      const selected =
+        this.page.list.filter(c => {
+          if (this.multipleSelection.some(sc => sc.id === c.id)) {
+            this.multipleSelection = this.multipleSelection.filter(
+              sc => sc.id !== c.id
+            );
+            this.multipleSelection.push(c);
+            return c;
+          }
+        }) || [];
+
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
+    },
   },
   components: {
     [SearchPanel.name]: SearchPanel,

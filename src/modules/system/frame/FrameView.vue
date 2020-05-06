@@ -596,7 +596,7 @@ export default {
       platform.openTab({
         id: "do_myself",
         title: "自助门户设置",
-        url: "/doMyself/wxSet",
+        url: "/setting/doMyself/wxSet",
         reload: true
       });
     }
