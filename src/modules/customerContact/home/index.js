@@ -22,7 +22,9 @@ try {
 const homeView = Vue.extend(index);
 
 const app = new homeView({
-
+  propsData: {
+    initData
+  }
 });
 
 app.$mount('#app');

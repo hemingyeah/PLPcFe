@@ -30,7 +30,7 @@
                 <p>主体名称：{{wxInfo.principalName}}</p>
               </div>
             </div>
-            <button type="submit" class="btn btn-ghost cancel-wx">解除绑定</button>
+            <button type="submit" class="btn btn-ghost cancel-wx" @click="desertWx">解除绑定</button>
           </div>
         </div>
         <div class="top-state">
@@ -118,6 +118,7 @@ let setSelectArr = [
   "taskFinishTaskTypeList",
   "taskPlanTimeTaskTypeList"
 ];
+let timeOut;
 export default {
   name: "wx-set",
   watch: {
@@ -130,7 +131,8 @@ export default {
   data() {
     return {
       topType: 0, // 微信设置顶部切换 0 绑定公众号 1 公众号通知
-      haveWx: true,
+      haveWx: false,
+      concatWxUrl: "", // 授权微信公众号的链接
       totalActive: false,
       fullscreenLoading: false, // 整屏loading
       wxInfo: {
@@ -194,14 +196,8 @@ export default {
   },
   methods: {
     pageLoading(data = false) {
-      // loadKeyArr.indexOf(data.key)>-1?loadTypeArr
-      // this.loadKeyArr.push({ key: data.key, type: data.type });
-      // this.loadingArr.indexOf(false);
       if (this.fullscreenLoading === data) return;
       this.fullscreenLoading = data;
-    },
-    itemRadiusChange(e, b) {
-      console.log(e, b);
     },
     getWxInfo() {
       this.pageLoading(true);
@@ -209,6 +205,19 @@ export default {
         .get("/api/weixin/outside/weixin/api/getAuthInfo")
         .then(res => {
           this.pageLoading(false);
+          if (res.data.status === 0) {
+            // 未绑定公众号
+            this.haveWx = false;
+            this.concatWxUrl = this.data.mpAuthorizeUrl;
+            if (this.scanQrCode === true) {
+              timeOut = setTimeout(() => {
+                this.getWxInfo();
+              }, 2500);
+            }
+            return;
+          }
+          this.haveWx = true;
+          this.scanQrCode = false;
           this.wxInfo = res.data.data;
           if (res.data.eventTypeList) {
             let arr = res.data.eventTypeList.map(res => {
@@ -241,11 +250,7 @@ export default {
         })
         .catch(err => {
           this.pageLoading(false);
-          if (this.scanQrCode === true) {
-            setTimeout(() => {
-              this.getWxInfo();
-            }, 1000);
-          }
+          console.log(err, "erro");
         });
     },
     mainChange(e) {
@@ -319,9 +324,28 @@ export default {
     },
     concatWx() {
       this.scanQrCode = true;
-      this.$platform.openLink('');
+      this.$platform.openLink(this.concatWxUrl);
       this.getWxInfo();
     },
+    async desertWx() {
+      try {
+        const res = await this.$platform.confirm("确定要解除绑定？");
+        if (!res) return;
+        this.pageLoading(true);
+        const reqRes = await this.$http.post(
+          "/api/weixin/outside/weixin/api/cancleAuthorizer"
+        );
+        this.pageLoading(false);
+        this.$platform.alert(res.message);
+        this.getWxInfo();
+        // this.$eventBus.$emit("customer_info_record.update_record_list");
+      } catch (e) {
+        console.error(e, "err");
+      }
+    }
+  },
+  beforeDestroy() {
+    clearTimeout(timeOut);
   },
   components: {
     [menuSet.name]: menuSet,

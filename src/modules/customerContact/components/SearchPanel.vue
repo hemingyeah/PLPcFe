@@ -183,7 +183,6 @@ export default {
       const isSystemFields = this.fields.filter(f => f.isSystem);
       const notSystemFields = this.fields.filter(f => !f.isSystem);
       let params = {
-        conditions: []
       };
 
       let tv = null;
@@ -204,6 +203,7 @@ export default {
         }
 
         if (typeof form[fn] === "string") {
+          
           params[fn === "customer" ? "customerId" : fn] = form[fn];
           continue;
         }
@@ -279,7 +279,6 @@ export default {
           value: form[fn]
         });
       }
-
       return params;
     },
     setAdvanceSearchColumn(command) {
@@ -364,7 +363,7 @@ export default {
           if (isTags) {
             return (this.form.tags = event);
           }
-
+          
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },

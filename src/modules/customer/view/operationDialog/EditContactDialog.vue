@@ -194,6 +194,7 @@ export default {
         this.$eventBus.$emit('customer_info_record.update_record_list');
         this.$eventBus.$emit('customer_detail_view.update_statistical_data');
         this.$eventBus.$emit('customer_detail_view.update_customer_detail');
+        this.$eventBus.$emit('customer_contact.update_contact_list');
 
         if (this.action === 'create') {
           this.$eventBus.$emit('customer_detail_view.select_tab', 'customer-contact-table');

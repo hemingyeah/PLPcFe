@@ -7,6 +7,7 @@ import mtracker from '@src/util/mtracker';
 mtracker();
 
 Vue.prototype.$http = http;
+Vue.prototype.$eventBus = new Vue();
 
 //处理注入的参数
 let initData = {};
@@ -21,7 +22,9 @@ try {
 const homeView = Vue.extend(index);
 
 const app = new homeView({
-  
+  propsData: {
+    initData
+  }
 });
 
 app.$mount('#app');

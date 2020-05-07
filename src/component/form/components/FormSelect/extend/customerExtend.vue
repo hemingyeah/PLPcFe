@@ -6,11 +6,12 @@
         filterable
         remote
         clearable
-        :placeholder="`${extendData[field.mainKey]===''?`请先选择${field.extendDisplayName}`:field.placeholder}`"
+        :placeholder="`${extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined ?`请先选择${field.extendDisplayName}`:field.placeholder}`"
         @focus="remoteMethod"
-        :disabled="extendData[field.mainKey]===''?true:false"
+        :disabled="extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined?true:false"
         :remote-method="remoteMethod"
         :loading="loading"
+        @change="update"
       >
         <el-option
           v-for="item in options"
@@ -65,7 +66,12 @@ export default {
   },
   watch: {
     extendData: {
-      handler(newValue, oldValue) {},
+      handler(newValue, oldValue) {
+        if (!newValue.customerId && newValue.customerId !== 0) {
+          this.value = "";
+          this.$emit("update", { newValue: "", field: this.field });
+        }
+      },
       deep: true,
       immediate: true
     }
@@ -75,7 +81,7 @@ export default {
     return {
       options: [],
       value: "",
-      loading: false,
+      loading: false
     };
   },
   methods: {
@@ -95,7 +101,7 @@ export default {
       });
     },
     update(value, prop) {
-      this.$emit("input", { value, prop });
+      this.$emit("update", { newValue: value, field: this.field });
     }
   }
 };

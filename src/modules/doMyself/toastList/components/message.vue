@@ -51,7 +51,7 @@
 
         <!-- start 操作按钮组 -->
         <div class="action-button-group">
-          <el-dropdown trigger="click" v-if="authExport">
+          <!-- <el-dropdown trigger="click" v-if="authExport">
             <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('moreAction')">
               更多操作
               <i class="iconfont icon-nav-down"></i>
@@ -64,7 +64,7 @@
                 <div @click="exportProduct(true)">导出全部</div>
               </el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown>
+          </el-dropdown> -->
           <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">
             选择列
             <i class="iconfont icon-nav-down"></i>
@@ -74,14 +74,14 @@
       </div>
       <!-- end  -->
 
-      <div style="background: #fff;padding: 0 10px">
+      <!-- <div style="background: #fff;padding: 0 10px">
         <base-selection-bar
           ref="baseSelectionBar"
           v-model="multipleSelection"
           @toggle-selection="selectionToggle"
           @show-panel="() => panelTheMultipleSelectionShow = true"
         />
-      </div>
+      </div> -->
 
       <!-- start 表格 -->
       <el-table
@@ -96,7 +96,7 @@
         ref="productTemplateTable"
         class="product-template-table"
       >
-        <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+        <!-- <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column> -->
         <el-table-column
           v-for="column in columns"
           v-if="column.show"
@@ -152,9 +152,11 @@
             <template
               v-else-if="column.field === 'createUser'"
             >{{ scope.row.createUser && scope.row.createUser.displayName }}</template>
+            <template v-else-if="column.field === 'operation'">{{ getChiType(scope.row.operation)}}</template>
+            <template v-else-if="column.field === 'status'">{{ conversionStatus[scope.row.status] ? conversionStatus[scope.row.status]['text'] : ''}}</template>
             <template
-              v-else-if="column.field === 'createTime'"
-            >{{ scope.row.createTime | formatDate }}</template>
+              v-else-if="column.field === 'sendTime'"
+            >{{ scope.row.sendTime | formatDate }}</template>
 
             <div
               v-else-if="column.formType === 'textarea'"
@@ -172,13 +174,13 @@
       <div class="table-footer">
         <div class="list-info">
           共
-          <span class="level-padding">{{ page.total || 0 }}</span>记录，
-          已选中
+          <span class="level-padding">{{ page.total || 0 }}</span>记录
+          <!-- ，已选中
           <span
             class="product-template-selected-count"
             @click="panelTheMultipleSelectionShow = true"
           >{{ multipleSelection.length }}</span>条
-          <span class="product-template-selected-count" @click="selectionToggle()">清空</span>
+          <span class="product-template-selected-count" @click="selectionToggle()">清空</span> -->
         </div>
         <el-pagination
           class="product-template-table-pagination"
@@ -784,13 +786,29 @@ export default {
         pageNum: 1,
         orderDetail: {},
         moreConditions: {
-          conditions: []
         }
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
       // 表单选择系列组件相关参数
       multipleSelection: [],
-      panelTheMultipleSelectionShow: false
+      panelTheMultipleSelectionShow: false,
+      conversionStatus: {
+        fail_send: {
+          text: "发送失败",
+          value: "fail_send",
+          className: "error-text"
+        },
+        succ_send: {
+          text: "发送成功",
+          value: "succ_send",
+          className: "success-text"
+        },
+        doing_send: {
+          text: "发送中",
+          value: "doing_send",
+          className: "loading-text"
+        }
+      }
     };
   },
   computed: {
@@ -987,6 +1005,41 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    getChiType(type) {
+      if (type == "taskResponseHandle") {
+        return "工单响应通知";
+      } else if (type == "autoReviewHandle") {
+        return "工单完成通知（回访）";
+      } else if (type == "taskFinaishHandle_finish") {
+        return "工单完成通知";
+      } else if (type == "taskRemarkEdit") {
+        return "工单动态更新通知";
+      } else if (type == "eventCreateHandle") {
+        return "新建事件通知";
+      } else if (type == "eventFinishHandle") {
+        return "事件完成通知";
+      } else if (type == "eventUpdateHandle") {
+        return "事件动态更新通知";
+      } else if (type == "remindMessageHandle") {
+        return "定时通知";
+      } else if (type == "taskPlanSmsRemindHandle") {
+        return "计划时间通知";
+      } else if (type == "sendSms2Cus") {
+        return "客户短信提醒";
+      } else if (type == "sendSms2CusByPro") {
+        return "产品短信提醒";
+        // }else if(type == 'sendBatchSms2Cus'){
+        //     type = "客户批量发送短信提醒";
+        // }else if(type == 'sendBatchSms2CusByPro'){
+        //     type = "产品批量发送短信提醒";
+      } else if (type == "SSP") {
+        return "自助门户验证码";
+      } else if (type == "SuperAdmin") {
+        return "验证码";
+      } else {
+        return "其他";
+      }
+    },
     getTemplate() {
       // 获取所有的模板
       this.$http
@@ -1028,8 +1081,7 @@ export default {
       }
 
       if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
+        Object.keys(sm.moreConditions).length > 0 
       ) {
         params = {
           ...params,
@@ -1293,7 +1345,7 @@ export default {
       this.loadingListData = true;
       this.loadingListData = false;
       return this.$http.get("/vipsms/getRecords", params).then(res => {
-        this.page = res;
+        this.page = res.data;
         this.matchSelected(); // 把选中的匹配出来
       });
     },
@@ -1356,40 +1408,6 @@ export default {
       } catch (e) {
         console.error("product template sortChange err", e);
       }
-    },
-    // 参数构建
-    paramsBuild() {
-      const sm = Object.assign({}, this.searchModel);
-      let params = {
-        keyword: sm.keyword,
-        pageSize: sm.pageSize,
-        pageNum: sm.pageNum
-      };
-
-      if (Object.keys(sm.orderDetail || {}).length) {
-        params.orderDetail = sm.orderDetail;
-      }
-
-      if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
-      ) {
-        params = {
-          ...params,
-          ...sm.moreConditions
-        };
-      }
-
-      if (params.createTime && params.createTime.length) {
-        params.createTimeStart = formatDate(params.createTime[0]);
-        params.createTimeEnd = `${formatDate(params.createTime[1]).replace(
-          "00:00:00",
-          "23:59:59"
-        )}`;
-        delete params.createTime;
-      }
-
-      return params;
     },
     // 搜索参数恢复
     paramsSearchRevert() {
@@ -1674,7 +1692,7 @@ export default {
       this.$nextTick(() => {
         this.toggleSelection(selected);
       });
-    },
+    }
   },
   components: {
     [SearchPanel.name]: SearchPanel,

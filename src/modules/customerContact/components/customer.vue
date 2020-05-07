@@ -149,6 +149,10 @@
             <template v-else-if="column.field === 'registeredSource'">
               <i :class="['iconfont', scope.row.registeredSource===1?'icon-weixin1':'']"></i>
             </template>
+            <template v-else-if="column.field === 'registeredSource'">
+              <i v-if="registeredSource===1" class="iconfont icon-weixin1 color-green font-16"></i>
+            </template>
+
             <template
               v-else-if="column.field === 'createUser'"
             >{{ scope.row.createUser && scope.row.createUser.displayName }}</template>
@@ -783,9 +787,7 @@ export default {
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
-        moreConditions: {
-          conditions: []
-        }
+        moreConditions: {}
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
       // 表单选择系列组件相关参数
@@ -817,7 +819,7 @@ export default {
           },
           {
             displayName: "客户",
-            fieldName: "customerName",
+            fieldName: "customerId",
             formType: "customer",
             placeHolder: "请选择客户",
             isExport: false,
@@ -831,7 +833,7 @@ export default {
             formType: "select",
             isExport: false,
             extendType: "customerExtend", // 组件的type
-            extendData: "customerName", // 需要依赖的参数名称
+            extendData: "customerId", // 需要依赖的参数名称
             extendDisplayName: "客户", // 需要依赖的参数描述
             searchUrl: "/customer/product/list", // 依赖的参数的获取接口
             searchType: "GET", // 依赖的参数的获取接口方式
@@ -853,7 +855,7 @@ export default {
             fieldName: "addr",
             formType: "select",
             extendType: "customerExtend",
-            extendData: "customerName",
+            extendData: "customerId",
             searchUrl: "/customer/address/list",
             searchType: "GET",
             mainKey: "customerId",
@@ -946,7 +948,7 @@ export default {
                 },
                 {
                   text: "公众号",
-                  value: 1
+                  value: "1"
                 }
               ]
             }
@@ -991,6 +993,11 @@ export default {
         (a, b) => a.orderId - b.orderId
       )
     };
+    this.$eventBus.$on(
+      'customer_contact.update_contact_list',
+      this.search
+    );
+    
 
     this.paramsSearchRevert();
     this.columns = this.buildTableColumn();
@@ -1015,11 +1022,7 @@ export default {
       if (Object.keys(sm.orderDetail || {}).length) {
         params.orderDetail = sm.orderDetail;
       }
-
-      if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
-      ) {
+      if (Object.keys(sm.moreConditions).length > 0) {
         params = {
           ...params,
           ...sm.moreConditions
@@ -1154,7 +1157,7 @@ export default {
           false
         );
         pending = false;
-        platform.alert(res.message);
+        platform.alert('删除成功');
         this.search();
         // this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
@@ -1446,40 +1449,6 @@ export default {
         console.error("product template sortChange err", e);
       }
     },
-    // 参数构建
-    paramsBuild() {
-      const sm = Object.assign({}, this.searchModel);
-      let params = {
-        keyword: sm.keyword,
-        pageSize: sm.pageSize,
-        pageNum: sm.pageNum
-      };
-
-      if (Object.keys(sm.orderDetail || {}).length) {
-        params.orderDetail = sm.orderDetail;
-      }
-
-      if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
-      ) {
-        params = {
-          ...params,
-          ...sm.moreConditions
-        };
-      }
-
-      if (params.createTime && params.createTime.length) {
-        params.createTimeStart = formatDate(params.createTime[0]);
-        params.createTimeEnd = `${formatDate(params.createTime[1]).replace(
-          "00:00:00",
-          "23:59:59"
-        )}`;
-        delete params.createTime;
-      }
-
-      return params;
-    },
     // 搜索参数恢复
     paramsSearchRevert() {
       const localStorageData = this.localStorageGet(PRODUCT_TEMPLATE_LIST_DATA);
@@ -1524,9 +1493,7 @@ export default {
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
-        moreConditions: {
-          conditions: []
-        }
+        moreConditions: {}
       };
 
       this.$refs.searchPanel.resetParams();
@@ -1709,7 +1676,8 @@ export default {
         if (
           c.field !== "customerAddress" &&
           c.field !== "remindCount" &&
-          c.field !== "updateTime" && c.field !== 'btnArray'
+          c.field !== "updateTime" &&
+          c.field !== "btnArray"
         ) {
           c.export = true;
         }
@@ -1756,7 +1724,7 @@ export default {
         ? this.selectionToggle()
         : this.selectionToggle([productItem]);
     },
-    
+
     // match data
     matchSelected() {
       if (!this.multipleSelection.length) return;
@@ -1774,7 +1742,7 @@ export default {
       this.$nextTick(() => {
         this.toggleSelection(selected);
       });
-    },
+    }
   },
   components: {
     [SearchPanel.name]: SearchPanel,
@@ -1793,6 +1761,12 @@ body {
 
 .mar-l-10 {
   margin-left: 10px;
+}
+.color-green {
+  color: #55b7b4;
+}
+.font-16 {
+  font-size: 16px;
 }
 
 .product-template-list-view {

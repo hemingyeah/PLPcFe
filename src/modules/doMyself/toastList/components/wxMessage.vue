@@ -74,14 +74,14 @@
       </div>
       <!-- end  -->
 
-      <div style="background: #fff;padding: 0 10px">
+      <!-- <div style="background: #fff;padding: 0 10px">
         <base-selection-bar
           ref="baseSelectionBar"
           v-model="multipleSelection"
           @toggle-selection="selectionToggle"
           @show-panel="() => panelTheMultipleSelectionShow = true"
         />
-      </div>
+      </div> -->
 
       <!-- start 表格 -->
       <el-table
@@ -785,7 +785,6 @@ export default {
         pageNum: 1,
         orderDetail: {},
         moreConditions: {
-          conditions: []
         }
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
@@ -1029,8 +1028,7 @@ export default {
       }
 
       if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
+        Object.keys(sm.moreConditions).length > 0
       ) {
         params = {
           ...params,
@@ -1302,7 +1300,7 @@ export default {
       this.loadingListData = true;
 
       return this.$http
-        .get("/api/weixin/outside/weixin/api/getTemplateMessageList", params)
+        .post("/api/weixin/outside/weixin/api/getTemplateMessageList", params)
         .then(res => {
           if (!res || !res.list) {
             this.page = new Page();
@@ -1372,40 +1370,6 @@ export default {
         console.error("product template sortChange err", e);
       }
     },
-    // 参数构建
-    paramsBuild() {
-      const sm = Object.assign({}, this.searchModel);
-      let params = {
-        keyword: sm.keyword,
-        pageSize: sm.pageSize,
-        pageNum: sm.pageNum
-      };
-
-      if (Object.keys(sm.orderDetail || {}).length) {
-        params.orderDetail = sm.orderDetail;
-      }
-
-      if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
-      ) {
-        params = {
-          ...params,
-          ...sm.moreConditions
-        };
-      }
-
-      if (params.createTime && params.createTime.length) {
-        params.createTimeStart = formatDate(params.createTime[0]);
-        params.createTimeEnd = `${formatDate(params.createTime[1]).replace(
-          "00:00:00",
-          "23:59:59"
-        )}`;
-        delete params.createTime;
-      }
-
-      return params;
-    },
     // 搜索参数恢复
     paramsSearchRevert() {
       const localStorageData = this.localStorageGet(PRODUCT_TEMPLATE_LIST_DATA);
@@ -1451,7 +1415,6 @@ export default {
         pageSize: this.page.pageSize,
         orderDetail: {},
         moreConditions: {
-          conditions: []
         }
       };
 

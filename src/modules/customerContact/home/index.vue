@@ -4,7 +4,7 @@
       <nav :class="nowPage==='customer'?'nav-checked':''" @click="nowPage='customer'">客户联系人</nav>
       <!--TO DO <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">访客</nav> -->
     </div>
-    <customer-conctact-customer v-if="nowPage==='customer'"></customer-conctact-customer>
+    <customer-conctact-customer v-if="nowPage==='customer'" :init-data="initData"></customer-conctact-customer>
     <!-- <customer-conctact-visitor v-if="nowPage==='visitor'"></customer-conctact-visitor> -->
   </div>
 </template>
@@ -13,6 +13,12 @@ import customer from "../components/customer";
 import visitor from "../components/visitor";
 export default {
   name: "customer-contact-home",
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       nowPage: "customer"

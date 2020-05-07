@@ -6,5 +6,5 @@ import http from '@src/util/http';
  * @returns Promise<Customer>
  */
 export function getContactList(params) {
-  return http.post('/outside/es/linkman/searchLinkManByTid', params)
+  return http.post('/api/elasticsearch/outside/es/linkman/searchLinkManByTid', params)
 }

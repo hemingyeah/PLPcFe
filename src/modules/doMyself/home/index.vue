@@ -27,6 +27,12 @@ import toastList from "../toastList/toastList";
 import wxSet from "../wxSet/wxSet";
 export default {
   name: "do-myself-view",
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
       menuList: [

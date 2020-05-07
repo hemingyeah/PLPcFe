@@ -638,7 +638,6 @@ export default {
       this.$emit("pageLoading", true);
       this.$http
         .get("/api/weixin/outside/weixin/api/getMenuList", {
-          appid: this.wxInfo.appid,
           type
         })
         .then(res => {
@@ -663,7 +662,6 @@ export default {
       return this.$http.post(
         "/api/weixin/outside/weixin/api/saveMenuList",
         {
-          appid: this.wxInfo.appid,
           wechatMenu: JSON.stringify({ menu: { button: menu_arr_stash } })
         },
         false
