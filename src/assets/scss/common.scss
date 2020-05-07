@@ -58,3 +58,13 @@
     vertical-align: middle;
   }
 }
+
+// 保留文本中的空格使用pre标签样式
+.pre-text {
+  margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+  overflow: hidden;
+  word-break: break-all;
+  text-overflow: ellipsis;
+}

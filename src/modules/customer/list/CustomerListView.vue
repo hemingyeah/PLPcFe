@@ -118,7 +118,7 @@
                       :class="scope.row.isGuideData ? column.className : ''" 
                       class="view-detail-btn"
                       @click.stop.prevent="createCustomerTab(scope.row.id)">
-                      {{ scope.row[column.field] }}
+                      <pre class="pre-text">{{ scope.row[column.field] }}</pre>
                     </a>
                   </el-tooltip>
                 </template>
@@ -128,7 +128,7 @@
               {{formatAddress(scope.row[column.field])}}
             </template>
             <template v-else-if="column.field === 'detailAddress'">
-              {{scope.row.customerAddress && scope.row.customerAddress.adAddress}}
+              <pre class="pre-text">{{scope.row.customerAddress && scope.row.customerAddress.adAddress}}</pre>
             </template>
             <template v-else-if="column.field === 'tags' && scope.row.tags">
               {{scope.row.tags | tagName}}
@@ -175,14 +175,13 @@
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
 
-            <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
-            </div>
+            <div class="pre-text" v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink"></div>
 
             <template v-else-if="column.isSystem === 0">
-              {{scope.row.attribute[column.field]}}
+              <pre class="pre-text">{{scope.row.attribute[column.field]}}</pre>
             </template>
             <template v-else>
-              {{scope.row[column.field]}}
+              <pre class="pre-text">{{scope.row[column.field]}}</pre>
             </template>
           </template>
         </el-table-column>
@@ -1069,11 +1068,13 @@ export default {
       this.$platform.openLink(url)
     },
     buildTextarea(value) {
-      return value
+      let textareaValue = value
         ? value.replace(link_reg, (match) => {
           return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
         })
         : '';
+
+      return textareaValue.replace(/\s/g, '&nbsp;');
     },
     getRowKey(row) {
       return row.id
@@ -1281,6 +1282,7 @@ export default {
       }
 
       .view-detail-btn {
+        width: 100%;
         color: $color-primary;
       }
 
