@@ -147,10 +147,15 @@
               v-else-if="column.formType === 'location'"
             >{{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}</template>
             <template v-else-if="column.field === 'registeredSource'">
-              <i :class="['iconfont', scope.row.registeredSource===1?'icon-weixin1':'']"></i>
-            </template>
-            <template v-else-if="column.field === 'registeredSource'">
-              <i v-if="registeredSource===1" class="iconfont icon-weixin1 color-green font-16"></i>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="scope.row.esLinkManWXEntities.length>0?scope.row.esLinkManWXEntities[0].nickName:''"
+                placement="right"
+                v-if="scope.row.registeredSource===1"
+              >
+                <i class="iconfont icon-weixin1 color-green font-16"></i>
+              </el-tooltip>
             </template>
 
             <template
@@ -993,11 +998,7 @@ export default {
         (a, b) => a.orderId - b.orderId
       )
     };
-    this.$eventBus.$on(
-      'customer_contact.update_contact_list',
-      this.search
-    );
-    
+    this.$eventBus.$on("customer_contact.update_contact_list", this.search);
 
     this.paramsSearchRevert();
     this.columns = this.buildTableColumn();
@@ -1082,7 +1083,7 @@ export default {
           show: true
         },
         {
-          label: "会员来源",
+          label: "注册来源",
           field: "registeredSource",
           show: true
         },
@@ -1157,7 +1158,7 @@ export default {
           false
         );
         pending = false;
-        platform.alert('删除成功');
+        platform.alert("删除成功");
         this.search();
         // this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
@@ -1696,7 +1697,10 @@ export default {
         : { exportTotal: ids.length };
       if (checkedArr.indexOf("registeredSource") > -1) {
         checkedArr[checkedArr.indexOf("registeredSource")] =
-          "esLinkManWXEntities";
+          "weChatFansExportEntities";
+      }
+      if (checkedArr.indexOf("esProductEntities") > -1) {
+        checkedArr[checkedArr.indexOf("esProductEntities")] = "products";
       }
       return {
         linkmanChecked: checkedArr.join(","),

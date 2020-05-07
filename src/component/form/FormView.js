@@ -208,13 +208,12 @@ const FormView = {
         return this.buildTextarea(params);
       }
 
-      if(formType === 'icon') {
-        console.log(params)
-        params = {
-          ...params,
-          value: <i class="iconfont icon-home"></i>
-        };
-      }
+      // if(formType === 'icon' && ) {
+      //   params = {
+      //     ...params,
+      //     value: <i class="iconfont icon-weixin" style="color:#55b7b4"></i>
+      //   };
+      // }
       
       // other types: text date number datetime phone
       return this.buildCommonDom(params);

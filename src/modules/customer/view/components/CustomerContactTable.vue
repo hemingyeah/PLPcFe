@@ -6,7 +6,8 @@
       :highlight-current-row="false"
       header-row-class-name="customer-contact-table-header"
       row-class-name="customer-contact-table-row"
-      class="customer-contact-table">
+      class="customer-contact-table"
+    >
       <el-table-column
         v-for="column in columns"
         v-if="column.show"
@@ -16,38 +17,52 @@
         :width="column.width"
         :sortable="column.sortable"
         show-overflow-tooltip
-        :align="column.align">
+        :align="column.align"
+      >
         <template slot-scope="scope">
-          <template v-if="column.field === 'state'">
-            {{scope.row[column.field]}}
-          </template>
+          <template v-if="column.field === 'state'">{{scope.row[column.field]}}</template>
           <template v-else-if="column.field === 'name'">
-            <a v-if="allowEditCustomer" href="javascript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
+            <a
+              v-if="allowEditCustomer"
+              href="javascript:;"
+              @click="openDialog(scope.row)"
+              class="edit-btn"
+            >{{scope.row[column.field]}}</a>
             <template v-else>{{scope.row[column.field]}}</template>
           </template>
           <template v-else-if="column.field === 'from'">
-            <i class="iconfont icon-home"></i>
+            <el-tooltip class="item" effect="dark" :content="scope.row.esLinkManWXEntities.length>0?scope.row.esLinkManWXEntities[0].nickName:''" placement="right" v-if="scope.row.registeredSource===1">
+              <i class="iconfont icon-weixin1 color-green"></i>
+            </el-tooltip>
           </template>
           <div class="lm-action" v-else-if="column.field === 'action'">
             <template>
               <span v-if="scope.row.isMain" style="line-height: 26px;padding: 1px">默认联系人</span>
-              <el-button v-else @click="setDefaultLinkman(scope.row)" type="text" :disabled="pending[scope.row.id]">
-                设为默认
-              </el-button>
+              <el-button
+                v-else
+                @click="setDefaultLinkman(scope.row)"
+                type="text"
+                :disabled="pending[scope.row.id]"
+              >设为默认</el-button>
             </template>
-            <el-button type="text" @click="deleteLinkman(scope.row)" :disabled="pending[scope.row.id]" class="delete-contact-btn"
-                       size="mini">删除
-            </el-button>
+            <el-button
+              type="text"
+              @click="deleteLinkman(scope.row)"
+              :disabled="pending[scope.row.id]"
+              class="delete-contact-btn"
+              size="mini"
+            >删除</el-button>
           </div>
 
-          <template v-else>
-            {{scope.row[column.field]}}
-          </template>
+          <template v-else>{{scope.row[column.field]}}</template>
         </template>
       </el-table-column>
     </el-table>
     <div class="contact-table-footer">
-      <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
+      <p class="total-count">
+        共
+        <span>{{paginationInfo.totalItems}}</span>条记录
+      </p>
       <el-pagination
         class="customer-contact-table-pagination"
         v-if="paginationInfo.totalItems"
@@ -56,19 +71,24 @@
         :page-size="paginationInfo.pageSize"
         :current-page="paginationInfo.pageNum"
         layout="prev, pager, next"
-        :total="paginationInfo.totalItems">
-      </el-pagination>
+        :total="paginationInfo.totalItems"
+      ></el-pagination>
     </div>
 
-    <edit-contact-dialog ref="EditContactDialog" :customer="shareData.customer" :original-value="selectedContact"
-                         :is-phone-unique="shareData.isPhoneUnique" @submit-success="selectedContact = {}"></edit-contact-dialog>
+    <edit-contact-dialog
+      ref="EditContactDialog"
+      :customer="shareData.customer"
+      :original-value="selectedContact"
+      :is-phone-unique="shareData.isPhoneUnique"
+      @submit-success="selectedContact = {}"
+    ></edit-contact-dialog>
   </div>
 </template>
 
 <script>
-import {formatDate,} from '@src/util/lang';
-import platform from '@src/platform';
-import EditContactDialog from '../operationDialog/EditContactDialog.vue';
+import { formatDate } from "@src/util/lang";
+import platform from "@src/platform";
+import EditContactDialog from "../operationDialog/EditContactDialog.vue";
 
 export default {
   name: "customer-contact-table",
@@ -76,7 +96,7 @@ export default {
     shareData: {
       type: Object,
       default: () => ({})
-    },
+    }
   },
   data() {
     return {
@@ -87,25 +107,35 @@ export default {
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
-        totalItems: 0,
+        totalItems: 0
       }
-    }
+    };
   },
   computed: {
     customerId() {
-      return this.shareData.customer ? this.shareData.customer.id : '';
+      return this.shareData.customer ? this.shareData.customer.id : "";
     },
     allowEditCustomer() {
-      return !this.shareData.isDelete && !this.shareData.isDisable && this.shareData.allowEditCustomer;
-    },
+      return (
+        !this.shareData.isDelete &&
+        !this.shareData.isDisable &&
+        this.shareData.allowEditCustomer
+      );
+    }
   },
   mounted() {
     this.fetchData();
     this.columns = this.buildColumns();
-    this.$eventBus.$on('customer_contact_table.update_linkman_list', this.fetchData);
+    this.$eventBus.$on(
+      "customer_contact_table.update_linkman_list",
+      this.fetchData
+    );
   },
   beforeDestroy() {
-    this.$eventBus.$off('customer_contact_table.update_linkman_list', this.fetchData);
+    this.$eventBus.$off(
+      "customer_contact_table.update_linkman_list",
+      this.fetchData
+    );
   },
   methods: {
     openDialog(contact) {
@@ -116,7 +146,8 @@ export default {
     setDefaultLinkman(lm) {
       if (this.pending[lm.id]) return;
       this.pending[lm.id] = true;
-      this.$http.post('/linkman/setMain', {id: lm.id}, false)
+      this.$http
+        .post("/linkman/setMain", { id: lm.id }, false)
         .then(res => {
           if (res.status === 0) {
             this.fetchData();
@@ -124,27 +155,31 @@ export default {
             platform.alert(res.message);
           }
           this.pending[lm.id] = false;
-          this.$eventBus.$emit('customer_detail_view.update_customer_detail');
+          this.$eventBus.$emit("customer_detail_view.update_customer_detail");
         })
-        .catch(err => console.error('err', err));
+        .catch(err => console.error("err", err));
     },
     async deleteLinkman(lm) {
-      if (lm.isMain) return platform.alert('默认联系人不能删除');
+      if (lm.isMain) return platform.alert("默认联系人不能删除");
       try {
-        const res = await platform.confirm('确定要删除该联系人？');
+        const res = await platform.confirm("确定要删除该联系人？");
         if (!res) return;
         this.pending[lm.id] = true;
-        const reqRes = await this.$http.post('/linkman/delete', {ids: lm.id,}, false);
+        const reqRes = await this.$http.post(
+          "/linkman/delete",
+          { ids: lm.id },
+          false
+        );
         delete this.pending[lm.id];
         if (reqRes.status === 0) {
           this.fetchData();
         } else {
           platform.alert(res.message);
         }
-        this.$eventBus.$emit('customer_info_record.update_record_list');
-        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+        this.$eventBus.$emit("customer_info_record.update_record_list");
+        this.$eventBus.$emit("customer_detail_view.update_statistical_data");
       } catch (e) {
-        console.error('err',);
+        console.error("err");
       }
     },
     jump(pN) {
@@ -155,119 +190,129 @@ export default {
       const params = {
         customerId: this.customerId,
         pageNum: this.paginationInfo.pageNum,
-        pageSize: this.paginationInfo.pageSize,
+        pageSize: this.paginationInfo.pageSize
       };
-        
-      this.$http.get('/customer/linkman/list', params)
-        .then(res => {
-          this.contactList = res.list
-            .map(contact => {
 
-              this.$set(this.pending, contact.id, !!contact.isMain);
-              contact.createTime = formatDate(new Date(contact.createTime), 'YYYY-MM-DD HH:mm:ss');
-              return Object.freeze(contact);
-            });
+      this.$http
+        .get("/customer/linkman/list", params)
+        .then(res => {
+          this.contactList = res.list.map(contact => {
+            this.$set(this.pending, contact.id, !!contact.isMain);
+            contact.createTime = formatDate(
+              new Date(contact.createTime),
+              "YYYY-MM-DD HH:mm:ss"
+            );
+            return Object.freeze(contact);
+          });
           this.paginationInfo.totalItems = res.total;
         })
-        .catch(err => console.error('err', err));
+        .catch(err => console.error("err", err));
     },
     buildColumns() {
-      return [{
-        label: '姓名',
-        field: 'name',
-        show: true,
-        // sortable: 'custom',
-      }, {
-        label: '部门',
-        field: 'department',
-        show: true,
-      }, {
-        label: '注册来源',
-        field: 'from',
-        show: true,
-        width: '150px',
-      }, {
-        label: '电话',
-        field: 'phone',
-        show: true,
-        width: '150px',
-      }, {
-        label: '操作',
-        field: 'action',
-        show: this.allowEditCustomer,
-        width: '150px',
-      }]
+      return [
+        {
+          label: "姓名",
+          field: "name",
+          show: true
+          // sortable: 'custom',
+        },
+        {
+          label: "部门",
+          field: "department",
+          show: true
+        },
+        {
+          label: "注册来源",
+          field: "from",
+          show: true,
+          width: "150px"
+        },
+        {
+          label: "电话",
+          field: "phone",
+          show: true,
+          width: "150px"
+        },
+        {
+          label: "操作",
+          field: "action",
+          show: this.allowEditCustomer,
+          width: "150px"
+        }
+      ];
     }
   },
   components: {
-    [EditContactDialog.name]: EditContactDialog,
+    [EditContactDialog.name]: EditContactDialog
   }
-}
+};
 </script>
 
 <style lang="scss">
+.color-green {
+  color: #55b7b4;
+}
 
-  .customer-contact-table-container {
-    padding: 10px 10px 10px 5px;
+.customer-contact-table-container {
+  padding: 10px 10px 10px 5px;
 
-    .edit-btn {
-      color: $color-primary;
+  .edit-btn {
+    color: $color-primary;
+  }
+
+  .customer-contact-table-header th {
+    background: #f5f5f5;
+    color: $text-color-primary;
+  }
+
+  .lm-action {
+    display: flex;
+    justify-content: space-between;
+
+    .delete-contact-btn {
+      color: $color-danger;
     }
 
-    .customer-contact-table-header th{
-      background: #F5F5F5;
-      color: $text-color-primary;
+    .delete-contact-btn.is-disabled,
+    .delete-contact-btn.is-disabled:hover,
+    .el-button.delete-contact-btn:focus {
+      color: #c0c4cc;
+      cursor: not-allowed;
+      background-image: none;
     }
+  }
 
-    .lm-action {
-      display: flex;
-      justify-content: space-between;
+  .set-default-lm-btn {
+    line-height: 34px;
+    display: block;
+    text-align: center;
+    border-radius: 3px;
 
-      .delete-contact-btn {
-        color: $color-danger;
-      }
-
-      .delete-contact-btn.is-disabled,
-      .delete-contact-btn.is-disabled:hover,
-      .el-button.delete-contact-btn:focus {
-        color: #c0c4cc;
-        cursor: not-allowed;
-        background-image: none;
-      }
-
+    &:hover {
+      cursor: pointer;
+      background-color: #e7e7e7;
     }
+  }
 
-    .set-default-lm-btn {
-      line-height: 34px;
-      display: block;
-      text-align: center;
-      border-radius: 3px;
+  .customer-contact-table-pagination {
+    text-align: right;
+    margin-top: 7px;
+  }
 
-      &:hover {
-        cursor: pointer;
-        background-color: #e7e7e7;
-      }
-    }
+  .contact-table-footer {
+    display: flex;
+    justify-content: space-between;
 
-    .customer-contact-table-pagination {
-      text-align: right;
-      margin-top: 7px;
-    }
-
-    .contact-table-footer {
-      display: flex;
-      justify-content: space-between;
-
-      .total-count {
-        padding: 0 10px;
-        font-size: 12px;
-        margin: 0;
-        line-height: 46px;
-        span {
-          padding: 0 5px;
-          color: $color-primary;
-        }
+    .total-count {
+      padding: 0 10px;
+      font-size: 12px;
+      margin: 0;
+      line-height: 46px;
+      span {
+        padding: 0 5px;
+        color: $color-primary;
       }
     }
   }
+}
 </style>

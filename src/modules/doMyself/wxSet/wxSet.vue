@@ -208,7 +208,7 @@ export default {
           if (res.data.status === 0) {
             // 未绑定公众号
             this.haveWx = false;
-            this.concatWxUrl = this.data.mpAuthorizeUrl;
+            this.concatWxUrl = res.data.mpAuthorizeUrl;
             if (this.scanQrCode === true) {
               timeOut = setTimeout(() => {
                 this.getWxInfo();
@@ -336,7 +336,7 @@ export default {
           "/api/weixin/outside/weixin/api/cancleAuthorizer"
         );
         this.pageLoading(false);
-        this.$platform.alert(res.message);
+        this.$platform.alert('成功解除绑定');
         this.getWxInfo();
         // this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
