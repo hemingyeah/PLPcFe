@@ -29,7 +29,7 @@
               <draggable
                 class="pop-top-menu-box"
                 :group="{name:'shared'}"
-                v-if="item.shb_type!=='add' && item.sub_button.length>0"
+                v-if="item.shb_type!=='add'"
                 v-model="item.sub_button"
                 :fallback-on-body="true"
                 swap-threshold="1"
@@ -45,7 +45,7 @@
                   <p class="overHideCon_1" v-else>{{items.name}}</p>
                 </div>
                 <div :class="['hide_virtual',item.sub_button.length<=0?'show_virtual':'']"></div>
-                <div class="arrow-css"></div>
+                <div class="arrow-css" v-if="item.sub_button.length>0"></div>
               </draggable>
             </div>
           </draggable>
@@ -269,6 +269,12 @@ export default {
   components: {
     draggable
   },
+  props: {
+    urlObj: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   watch: {
     ruleForm: {
       handler(newValue, oldValue) {
@@ -335,18 +341,15 @@ export default {
       ruleForm: {},
       rules: {
         name: [
-          { required: true, message: "请输入菜单名称", trigger: "blur" },
-          { validator: input_length, trigger: "blur" }
+          { required: true, message: "请输入菜单名称", trigger: "change" },
+          { validator: input_length, trigger: "change" }
         ],
         input_url: [
-          { required: true, message: "请输入跳转页面网址", trigger: "blur" },
-          { validator: url_check, trigger: "blur" }
+          { required: true, message: "请输入跳转页面网址", trigger: "change" },
+          { validator: url_check, trigger: "change" }
         ]
       },
       now_chooseed_menu: false,
-      wxInfo: {
-        appid: "wx896d29a4f5d87e75"
-      }
     };
   },
   created() {},
@@ -460,8 +463,6 @@ export default {
               : this.menu_arr[index];
           this.ruleForm = { ...now_chooseed };
         }
-      } else {
-        return;
       }
     },
     // 统一将菜单参数转换成编辑模式可识别的参数
@@ -526,7 +527,7 @@ export default {
     filerArrByMenuType(res) {
       let obj = {
         售后宝功能: {
-          url: url_obj[res.menuTypeArr],
+          url: this.urlObj[res.menuTypeArr] || "https://www.baidu.com", // 后台自己填数据
           config_url: res.config_url,
           input_url: "",
           type: "view",
@@ -564,12 +565,15 @@ export default {
               });
             } else {
               this.slice_add(this.menu_arr).then(res => {
-                this.menu_arr = res;
-                menu_arr_stash = _.cloneDeep(res);
                 this.$emit("pageLoading", true);
-                this.setMenuList().then(res_ => {
-                  this.$emit("pageLoading", false);
-                  console.log("saveSuccess");
+                this.setMenuList(res).then(res_ => {
+                  if (res_.success) {
+                    this.menu_arr = res;
+                    menu_arr_stash = _.cloneDeep(res);
+                    this.$emit("pageLoading", false);
+                  }else{
+                    this.$platform.alert(res_.message)
+                  }
                 });
               });
             }
@@ -598,12 +602,14 @@ export default {
       this[formName] = _.cloneDeep(form_tem);
       this.$refs[formName].clearValidate();
     },
-    deleteMenu() {
+    async deleteMenu() {
       if (!this.now_chooseed_menu) return;
       let now_chooseed_menu = this.now_chooseed_menu;
       let add_tem = _.cloneDeep(menu_add_tem);
       if (now_chooseed_menu.indexs > -1) {
         // 删除子菜单
+        const alert_res = await this.$platform.confirm("确认删除该菜单？");
+        if (!alert_res) return;
         this.menu_arr[now_chooseed_menu.index].sub_button.splice(
           now_chooseed_menu.indexs,
           1
@@ -621,6 +627,8 @@ export default {
         }
       } else {
         // 删除主菜单 需要提示风险
+        const alert_res = await this.$platform.confirm("该菜单下的子菜单会同时删除。");
+        if (!alert_res) return;
         this.menu_arr.splice(now_chooseed_menu.index, 1);
         console.log(this.menu_arr);
         let length = this.menu_arr.length;
@@ -658,15 +666,15 @@ export default {
           this.$emit("pageLoading", false);
         });
     },
-    setMenuList() {
+    setMenuList(data) {
       return this.$http.post(
         "/api/weixin/outside/weixin/api/saveMenuList",
         {
-          wechatMenu: JSON.stringify({ menu: { button: menu_arr_stash } })
+          wechatMenu: JSON.stringify({ menu: { button: data } })
         },
         false
       );
-    },
+    }
   }
 };
 </script>

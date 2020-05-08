@@ -11,7 +11,7 @@
         >
           <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
           <div class="icon-box">
-            <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16':'font-12'}`"></i>
+            <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16':'font-14'}`"></i>
           </div>
           <span>{{item.name}}</span>
         </nav>
@@ -75,15 +75,15 @@ export default {
         window.location.href = "/setting/message/smsmessage";
       } else if (index === 0) {
         window.location.href = "/setting/serviceStation/customerPortal";
-      }else if (index === 1) {
+      } else if (index === 1) {
         window.location.href = "/setting/doMyself/wxSet";
-      }else if (index === 3) {
+      } else if (index === 3) {
         window.location.href = "/setting/doMyself/toastList";
       }
-      this.nowMenu === index
+      this.nowMenu === index;
     },
-    loadWxdata(){
-      this.$http.get('/api/weixin/outside/weixin/api/getAuthInfo',)
+    loadWxdata() {
+      this.$http.get("/api/weixin/outside/weixin/api/getAuthInfo");
     }
   },
   components: {
@@ -105,7 +105,10 @@ export default {
 .font-12 {
   font-size: 12px;
 }
-.font-16{
+.font-14{
+  font-size: 14px;
+}
+.font-16 {
   font-size: 16px;
 }
 .al-c {
@@ -179,6 +182,9 @@ img {
         align-items: center;
         margin-right: 13px;
       }
+    }
+    .menu-list :hover {
+      background: rgb(246, 246, 246);
     }
     .menu-checked {
       border-left: 3px solid #55b7b4;

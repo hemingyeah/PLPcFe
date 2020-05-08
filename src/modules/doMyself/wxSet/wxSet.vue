@@ -1,8 +1,8 @@
 <template>
   <div id="doMyself-components-box" v-loading.fullscreen.lock="fullscreenLoading">
     <div class="top-state" v-if="!haveWx">
-      <h2>绑定公众号</h2>
       <div>
+        <h2>绑定公众号</h2>
         <p>您尚未绑定公众号，绑定前请确认您的公众号为已认证的公众号</p>
         <div class="wx-img">
           <img src="../../../assets/img/avatar.png" alt />
@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="top-state">
-          <menu-set @pageLoading="pageLoading"></menu-set>
+          <menu-set @pageLoading="pageLoading" :url-obj="urlObj"></menu-set>
         </div>
       </div>
       <div v-if="topType==1">
@@ -68,7 +68,7 @@
               <div class="set-arr-item" v-for="(item,index) in toastSetArr" :key="index">
                 <div class="set-arr-item-left">
                   <el-tooltip class="item" effect="dark" content="启用公众号通知" placement="bottom">
-                    <span>{{item.title}}</span>
+                    <span>{{item.title}}</span><i class="iconfont icon-info mar-l-10"></i>
                   </el-tooltip>
                   <p v-if="item.time===null">{{item.childTitle}}</p>
                   <div class="small-form" v-else>
@@ -200,7 +200,10 @@ export default {
       this.fullscreenLoading = data;
     },
     getWxInfo() {
-      this.pageLoading(true);
+      if (!this.scanQrCode) {
+        // 如果是轮询不需要loading 加载动画
+        this.pageLoading(true);
+      }
       this.$http
         .get("/api/weixin/outside/weixin/api/getAuthInfo")
         .then(res => {
@@ -218,6 +221,7 @@ export default {
           }
           this.haveWx = true;
           this.scanQrCode = false;
+          this.urlObj = res.data.wechatMenu;
           this.wxInfo = res.data.data;
           if (res.data.eventTypeList) {
             let arr = res.data.eventTypeList.map(res => {
@@ -324,19 +328,28 @@ export default {
     },
     concatWx() {
       this.scanQrCode = true;
-      this.$platform.openLink(this.concatWxUrl);
+      let fromId = window.frameElement.getAttribute("id");
+      this.$platform.openTab({
+        id: "wx_auth",
+        title: "微信授权",
+        url: this.concatWxUrl,
+        reload: true,
+        close: true,
+        fromId
+      });
+      // this.$platform.openLink(this.concatWxUrl);
       this.getWxInfo();
     },
     async desertWx() {
       try {
-        const res = await this.$platform.confirm("确定要解除绑定？");
+        const res = await this.$platform.confirm("解除后您将失去公众号相关联的功能!");
         if (!res) return;
         this.pageLoading(true);
         const reqRes = await this.$http.post(
           "/api/weixin/outside/weixin/api/cancleAuthorizer"
         );
         this.pageLoading(false);
-        this.$platform.alert('成功解除绑定');
+        this.$platform.alert("成功解除绑定");
         this.getWxInfo();
         // this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
@@ -362,6 +375,9 @@ p {
 }
 .mar-b-10 {
   margin-bottom: 10px;
+}
+.mar-l-10 {
+  margin-left: 10px;
 }
 .mar-r-15 {
   margin-right: 15px;

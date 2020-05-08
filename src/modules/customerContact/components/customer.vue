@@ -217,7 +217,7 @@
       <!-- start 已选择列表 -->
       <base-panel :show.sync="panelTheMultipleSelectionShow" width="420px">
         <h3 slot="title">
-          <span>已选中产品模板({{ multipleSelection.length }})</span>
+          <span>已选中客户联系人({{ multipleSelection.length }})</span>
           <i
             v-if="multipleSelection.length > 0"
             class="iconfont icon-qingkongshanchu product-template-panel-btn"
