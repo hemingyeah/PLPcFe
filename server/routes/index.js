@@ -57,33 +57,32 @@ router.get('/', async ctx => {
     } else {
       console.log(loginRes)
     }
-  }
 
-  headers = Object.assign(headers, result.headers);
-  body = result.body;
+    headers = Object.assign(headers, result.headers);
+    body = result.body;
 
   // 补全headers
   for (let name in headers) {
     ctx.response.set(name, headers[name])
   }
 
-  // 返回html
-  ctx.body = Template.renderWithHtml('售后宝', body, script, modConfig.template);
+    // 返回html
+    ctx.body = Template.renderWithHtml('售后宝', body, script, modConfig.template);
 })
 
 
 router.get('/demo', async ctx => {
-  let script = ['/system.demo.js'];
-  ctx.body = Template.renderWithData('demo', {}, script)
+    let script = ['/system.demo.js'];
+    ctx.body = Template.renderWithData('demo', {}, script)
 });
 
 router.get('/performance/list', async ctx => {
-  ctx.redirect('/performance/v2/report')
+    ctx.redirect('/performance/v2/report')
 });
 
 router.get('/window', async ctx => {
-  let script = ['/window.js'];
-  ctx.body = Template.renderWithData('window', {}, script)
+    let script = ['/window.js'];
+    ctx.body = Template.renderWithData('window', {}, script)
 });
 
 // 本地调试 outside/callcenter
@@ -167,7 +166,6 @@ router.use('', teamRouter.routes(), teamRouter.allowedMethods());
 router.use('', productRouter.routes(), productRouter.allowedMethods());
 router.use('', approveRouter.routes(), productRouter.allowedMethods());
 router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
-
 router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
@@ -191,7 +189,7 @@ router.use('', customerContact.routes(), customerContact.allowedMethods());
 
 
 router.all('/*', ctx => {
-  return HttpClient.proxy(ctx)
+    return HttpClient.proxy(ctx)
 });
 
 module.exports = router;

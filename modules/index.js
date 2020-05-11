@@ -13,6 +13,8 @@ const callcenter = require('./callcenter')
 const doMyself = require('./doMyself')
 const customerContact = require('./customerContact')
 
+const sparePart = require('./sparePart')
+
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
  * 
@@ -50,5 +52,6 @@ module.exports = {
   ...jobtransfer,
   ...callcenter,
   ...doMyself,
-  ...customerContact
+  ...customerContact,
+  ...sparePart
 }
