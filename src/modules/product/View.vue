@@ -84,12 +84,11 @@
                 {{product.linkman && (product.linkman.name + ' ' + product.linkman.phone)}}
               </div>
             </div>
-            <div class="form-view-row" v-if="value && hasAddress">
-              <label>地址</label>
-              <div class="form-view-row-content">
-                {{getAddress(product.address)}}
-              </div>
-            </div>
+            <form-address-view 
+              v-if="value && hasAddress"
+              :field="{ displayName: '地址' }"
+              :value="product.address">
+            </form-address-view>
           </template>
 
           <div slot="qrcodeId" slot-scope="{value}">
