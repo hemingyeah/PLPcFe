@@ -50,7 +50,15 @@ export function packToCustomer(fields, form, initTags){
     }
     
     if (field.formType === 'address' && !field.isSystem) {
-      let all = value.province + value.city + value.dist + value.address;
+      
+      // 兼容处理(包括旧数据)
+      let all = (
+        [value.province, value.city, value.dist, value.address]
+          .filter(str => !!str)
+          .join('')
+          .replace(/undefined/g)
+      );
+
       if(all) {
         value.all = all;
       }
