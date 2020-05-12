@@ -68,7 +68,8 @@
               <div class="set-arr-item" v-for="(item,index) in toastSetArr" :key="index">
                 <div class="set-arr-item-left">
                   <el-tooltip class="item" effect="dark" content="启用公众号通知" placement="bottom">
-                    <span>{{item.title}}</span><i class="iconfont icon-info mar-l-10"></i>
+                    <span>{{item.title}}</span>
+                    <i class="iconfont icon-info mar-l-10"></i>
                   </el-tooltip>
                   <p v-if="item.time===null">{{item.childTitle}}</p>
                   <div class="small-form" v-else>
@@ -218,6 +219,10 @@ export default {
               }, 2500);
             }
             return;
+          } else if (res.data.status === 2) {
+            clearTimeout(timeOut);
+            this.scanQrCode = false;
+            return;
           }
           this.haveWx = true;
           this.scanQrCode = false;
@@ -327,6 +332,9 @@ export default {
       }, 1500);
     },
     concatWx() {
+      if (this.scanQrCode) {
+        return;
+      }
       this.scanQrCode = true;
       let fromId = window.frameElement.getAttribute("id");
       this.$platform.openTab({
@@ -342,7 +350,9 @@ export default {
     },
     async desertWx() {
       try {
-        const res = await this.$platform.confirm("解除后您将失去公众号相关联的功能!");
+        const res = await this.$platform.confirm(
+          "解除后您将失去公众号相关联的功能!"
+        );
         if (!res) return;
         this.pageLoading(true);
         const reqRes = await this.$http.post(
