@@ -64,7 +64,7 @@
                 <div @click="exportProduct(true)">导出全部</div>
               </el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown> -->
+          </el-dropdown>-->
           <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">
             选择列
             <i class="iconfont icon-nav-down"></i>
@@ -81,7 +81,7 @@
           @toggle-selection="selectionToggle"
           @show-panel="() => panelTheMultipleSelectionShow = true"
         />
-      </div> -->
+      </div>-->
 
       <!-- start 表格 -->
       <el-table
@@ -153,10 +153,10 @@
               v-else-if="column.field === 'createUser'"
             >{{ scope.row.createUser && scope.row.createUser.displayName }}</template>
             <template v-else-if="column.field === 'operation'">{{ getChiType(scope.row.operation)}}</template>
-            <template v-else-if="column.field === 'status'">{{ conversionStatus[scope.row.status] ? conversionStatus[scope.row.status]['text'] : ''}}</template>
             <template
-              v-else-if="column.field === 'sendTime'"
-            >{{ scope.row.sendTime | formatDate }}</template>
+              v-else-if="column.field === 'status'"
+            >{{ conversionStatus[scope.row.status] ? conversionStatus[scope.row.status]['text'] : ''}}</template>
+            <template v-else-if="column.field === 'sendTime'">{{ scope.row.sendTime | formatDate }}</template>
 
             <div
               v-else-if="column.formType === 'textarea'"
@@ -180,7 +180,7 @@
             class="product-template-selected-count"
             @click="panelTheMultipleSelectionShow = true"
           >{{ multipleSelection.length }}</span>条
-          <span class="product-template-selected-count" @click="selectionToggle()">清空</span> -->
+          <span class="product-template-selected-count" @click="selectionToggle()">清空</span>-->
         </div>
         <el-pagination
           class="product-template-table-pagination"
@@ -275,6 +275,8 @@ import { getContactList } from "@src/api/CustomerContact.js";
 
 import SearchPanel from "../components/SearchPanel.vue";
 import AuthUtil from "@src/util/auth";
+
+import { getTemplates, getRecords } from "@src/api/doMyself.js";
 
 /* 高级搜索面板 列数 */
 const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER =
@@ -785,8 +787,7 @@ export default {
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
-        moreConditions: {
-        }
+        moreConditions: {}
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
       // 表单选择系列组件相关参数
@@ -903,7 +904,7 @@ export default {
             displayName: "关联编号",
             fieldName: "relevanceNumber",
             formType: "text",
-            placeHolder: "请输入手机号",
+            placeHolder: "请输入关联编号",
             isExport: false,
             isSystem: 1,
             orderId: 4
@@ -1042,27 +1043,25 @@ export default {
     },
     getTemplate() {
       // 获取所有的模板
-      this.$http
-        .get("/vipsms/getTemplates", { pageSize: "999", pageNum: "1" })
-        .then(res => {
-          this.productFields[2].setting.dataSource = [
-            {
-              text: "全部",
-              value: ""
-            },
-            ...res.data.list
-              .filter(
-                item =>
-                  item.status == "pass_approval" && item.notice == "自定义通知"
-              )
-              .map(item => {
-                return {
-                  text: item.name,
-                  value: item.id
-                };
-              })
-          ];
-        });
+      getTemplates({ pageSize: "999", pageNum: "1" }).then(res => {
+        this.productFields[2].setting.dataSource = [
+          {
+            text: "全部",
+            value: ""
+          },
+          ...res.data.list
+            .filter(
+              item =>
+                item.status == "pass_approval" && item.notice == "自定义通知"
+            )
+            .map(item => {
+              return {
+                text: item.name,
+                value: item.id
+              };
+            })
+        ];
+      });
     },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");
@@ -1080,9 +1079,7 @@ export default {
         params.orderDetail = sm.orderDetail;
       }
 
-      if (
-        Object.keys(sm.moreConditions).length > 0 
-      ) {
+      if (Object.keys(sm.moreConditions).length > 0) {
         params = {
           ...params,
           ...sm.moreConditions
@@ -1344,7 +1341,7 @@ export default {
 
       this.loadingListData = true;
       this.loadingListData = false;
-      return this.$http.get("/vipsms/getRecords", params).then(res => {
+      return getRecords(params).then(res => {
         this.page = res.data;
         this.matchSelected(); // 把选中的匹配出来
       });

@@ -40,7 +40,6 @@ body {
 .product-template-list-view {
   height: 100%;
   overflow: auto;
-  padding: 10px;
 
   .panel-title {
     border-bottom: 1px solid rgb(242, 248, 247);

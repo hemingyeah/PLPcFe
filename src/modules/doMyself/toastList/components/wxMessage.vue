@@ -13,7 +13,7 @@
         @submit.prevent="searchModel.pageNum=1;search();trackEventHandler('search')"
       >
         <div class="product-template-list-base-search-group">
-          <el-input v-model="searchModel.keyword" placeholder="请输入手机号或关联编号">
+          <el-input v-model="searchModel.keyword" placeholder="请输入客户或关联编号">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">搜索</base-button>
@@ -81,7 +81,7 @@
           @toggle-selection="selectionToggle"
           @show-panel="() => panelTheMultipleSelectionShow = true"
         />
-      </div> -->
+      </div>-->
 
       <!-- start 表格 -->
       <el-table
@@ -270,7 +270,7 @@ import { formatDate } from "@src/util/lang";
 
 import EditContactDialog from "@src/modules/customer/view/operationDialog/EditContactDialog.vue";
 
-import { getToastWxList } from "@src/api/doMyself.js";
+import { getTemplateMessageList } from "@src/api/doMyself.js";
 
 import SearchPanel from "../components/SearchPanel.vue";
 import AuthUtil from "@src/util/auth";
@@ -784,8 +784,7 @@ export default {
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
-        moreConditions: {
-        }
+        moreConditions: {}
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
       // 表单选择系列组件相关参数
@@ -799,7 +798,7 @@ export default {
         this.initData.productFields || [
           {
             displayName: "通知类型",
-            fieldName: "name",
+            fieldName: "remindType",
             formType: "select",
             placeHolder: "请输入联系人姓名",
             isExport: false,
@@ -811,48 +810,24 @@ export default {
                   value: ""
                 },
                 {
-                  text: "工单响应通知",
-                  value: "taskResponseHandle"
-                },
-                {
-                  text: "工单完成通知（回访）",
-                  value: "autoReviewHandle"
-                },
-                {
-                  text: "工单动态更新通知",
-                  value: "taskRemarkEdit"
-                },
-                {
-                  text: "新建事件通知",
-                  value: "eventCreateHandle"
+                  text: "事件分配通知",
+                  value: "事件分配通知"
                 },
                 {
                   text: "事件完成通知",
-                  value: "eventFinishHandle"
+                  value: "事件完成通知"
                 },
                 {
-                  text: "定时通知",
-                  value: "remindMessageHandle"
+                  text: "工单响应通知",
+                  value: "工单响应通知"
                 },
                 {
-                  text: "计划时间通知",
-                  value: "taskPlanSmsRemindHandle"
+                  text: "工单完成通知",
+                  value: "工单完成通知"
                 },
                 {
-                  text: "客户短信提醒",
-                  value: "sendSms2Cus"
-                },
-                {
-                  text: "产品短信提醒",
-                  value: "sendSms2CusByPro"
-                },
-                {
-                  text: "自助门户验证码",
-                  value: "SSP"
-                },
-                {
-                  text: "验证码",
-                  value: "SuperAdmin"
+                  text: "工单计划时间提醒客户",
+                  value: "工单计划时间提醒客户"
                 }
               ]
             },
@@ -860,41 +835,28 @@ export default {
             orderId: 1
           },
           {
-            displayName: "手机号码",
-            fieldName: "phone",
-            formType: "text",
-            placeHolder: "请输入手机号",
+            displayName: "客户",
+            fieldName: "receiveCustomerName",
+            formType: "customer",
+            placeHolder: "请输入客户名称",
             isExport: false,
+            isNull: 1,
             isSystem: 1,
             orderId: 2
           },
           {
-            displayName: "模板名称",
-            fieldName: "templateId",
-            formType: "select",
-            placeHolder: "请选择客户",
+            displayName: "联系人",
+            fieldName: "linkmanName",
+            formType: "text",
+            placeHolder: "请输入联系人名称",
             isExport: false,
-            setting: {
-              isMulti: false,
-              dataSource: []
-            },
             isSystem: 1,
             orderId: 3
           },
           {
-            displayName: "关联编号",
-            fieldName: "relevanceNumber",
-            formType: "text",
-            placeHolder: "请输入手机号",
-            isExport: false,
-            isSystem: 1,
-            orderId: 4
-          },
-          {
-            displayName: "按时间查询",
+            displayName: "发送时间",
             fieldName: "time",
             formType: "date",
-            placeHolder: "请输入关联编号",
             defaultTime: ["00:00:00", "23:59:59"],
             returnData: result => {
               let obj = {
@@ -905,13 +867,21 @@ export default {
             },
             isExport: false,
             isSystem: 1,
+            orderId: 4
+          },
+          {
+            displayName: "关联编号",
+            fieldName: "relationNumber",
+            formType: "text",
+            placeHolder: "请输入关联编号",
+            isExport: false,
+            isSystem: 1,
             orderId: 5
           },
           {
-            displayName: "选择状态",
-            fieldName: "sta",
+            displayName: "状态",
+            fieldName: "status",
             formType: "select",
-            placeHolder: "请输入关联编号",
             isExport: false,
             setting: {
               isMulti: false,
@@ -922,20 +892,41 @@ export default {
                 },
                 {
                   text: "成功",
-                  value: "succ_send"
+                  value: "0"
                 },
                 {
                   text: "失败",
-                  value: "fail_send"
-                },
-                {
-                  text: "发送中",
-                  value: "doing_send"
+                  value: "1"
                 }
               ]
             },
             isSystem: 1,
             orderId: 6
+          },
+          {
+            displayName: "反馈",
+            fieldName: "feedbackStatus",
+            formType: "select",
+            isExport: false,
+            setting: {
+              isMulti: false,
+              dataSource: [
+                {
+                  text: "全部",
+                  value: ""
+                },
+                {
+                  text: "已点击",
+                  value: "1"
+                },
+                {
+                  text: "未点击",
+                  value: "0"
+                }
+              ]
+            },
+            isSystem: 1,
+            orderId: 7
           }
         ]
       ).sort((a, b) => a.orderId - b.orderId);
@@ -980,37 +971,12 @@ export default {
 
     // this.paramsSearchRevert();
     this.columns = this.buildTableColumn();
-    this.getTemplate();
     this.search();
 
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
   methods: {
-    getTemplate() {
-      // 获取所有的模板
-      this.$http
-        .get("/vipsms/getTemplates", { pageSize: "999", pageNum: "1" })
-        .then(res => {
-          this.productFields[2].setting.dataSource = [
-            {
-              text: "全部",
-              value: ""
-            },
-            ...res.data.list
-              .filter(
-                item =>
-                  item.status == "pass_approval" && item.notice == "自定义通知"
-              )
-              .map(item => {
-                return {
-                  text: item.name,
-                  value: item.id
-                };
-              })
-          ];
-        });
-    },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");
       this.$refs.advanced.open(this.columns);
@@ -1027,9 +993,7 @@ export default {
         params.orderDetail = sm.orderDetail;
       }
 
-      if (
-        Object.keys(sm.moreConditions).length > 0
-      ) {
+      if (Object.keys(sm.moreConditions).length > 0) {
         params = {
           ...params,
           ...sm.moreConditions
@@ -1299,16 +1263,14 @@ export default {
 
       this.loadingListData = true;
 
-      return this.$http
-        .post("/api/weixin/outside/weixin/api/getTemplateMessageList", params)
-        .then(res => {
-          if (!res || !res.list) {
-            this.page = new Page();
-          } else {
-            this.page = res;
-          }
-          this.loadingListData = false;
-        });
+      return getTemplateMessageList(params).then(res => {
+        if (!res || !res.list) {
+          this.page = new Page();
+        } else {
+          this.page = res;
+        }
+        this.loadingListData = false;
+      });
     },
     // 设置高级搜索面板 列
     setAdvanceSearchColumn(command) {
@@ -1414,8 +1376,7 @@ export default {
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
-        moreConditions: {
-        }
+        moreConditions: {}
       };
 
       this.$refs.searchPanel.resetParams();

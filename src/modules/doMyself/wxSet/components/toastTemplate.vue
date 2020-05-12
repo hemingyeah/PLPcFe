@@ -76,7 +76,7 @@
           <div class="flex-x mar-l-15">
             <p>样例</p>
             <div class="result-show mar-l-15">
-              <img src="@src/assets/img/wx/temp.png" alt="">
+              <img src="@src/assets/img/wx/temp.png" alt />
             </div>
           </div>
         </div>
@@ -89,12 +89,15 @@
       </div>
     </base-modal>
     <!-- 编辑框 end-->
-
   </div>
 </template>
 <script>
 import Page from "@model/Page";
 import _ from "lodash";
+import {
+  getToastTemplateList,
+  setToastTemplateList
+} from "@src/api/doMyself.js";
 export default {
   name: "toast-template",
   data() {
@@ -110,7 +113,7 @@ export default {
   methods: {
     getTemp() {
       // 获取模板列表
-      this.$http.get("/api/weixin/outside/weixin/api/getTemplateList").then(res => {
+      getToastTemplateList().then(res => {
         res.list.map(item => {
           item.modelMap = JSON.parse(item.modelMap);
           return item;
@@ -137,21 +140,19 @@ export default {
       let { first, remark, id } = { ...this.form };
       this.$emit("pageLoading", true);
       // 编辑模板
-      this.$http
-        .get("/api/weixin/outside/weixin/api/saveTemplate", {
-          id,
-          first,
-          remark
-        })
-        .then(res => {
-          this.$emit("pageLoading", false);
-          this.visible = false;
-          this.getTemp();
-        });
+      setToastTemplateList({
+        id,
+        first,
+        remark
+      }).then(res => {
+        this.$emit("pageLoading", false);
+        this.visible = false;
+        this.getTemp();
+      });
     },
     cancelTemp() {
       this.visible = false;
-    },
+    }
   },
   created() {
     this.getTemp();
@@ -178,7 +179,7 @@ export default {
     width: 212px;
     height: 307px;
     position: relative;
-    img{
+    img {
       width: 100%;
       height: 100%;
     }

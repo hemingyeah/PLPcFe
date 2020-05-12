@@ -1,6 +1,6 @@
 <template>
   <div id="doMyself-components-box" v-loading.fullscreen.lock="fullscreenLoading">
-    <div class="top-state" v-if="!haveWx">
+    <div class="top-state" v-if="!haveWx && fullscreenLoading===false">
       <div>
         <h2>绑定公众号</h2>
         <p>您尚未绑定公众号，绑定前请确认您的公众号为已认证的公众号</p>
@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="top-state">
-          <menu-set @pageLoading="pageLoading" :url-obj="urlObj"></menu-set>
+          <menu-set @pageLoading="pageLoading"></menu-set>
         </div>
       </div>
       <div v-if="topType==1">
@@ -79,6 +79,7 @@
                       v-model="item.time"
                       style="padding:none;display: inline;"
                       @input="inputTime"
+                      type="number"
                     />小时发送消息提醒客户，为空时不提醒
                   </div>
                 </div>
@@ -103,6 +104,14 @@
 import menuSet from "./components/menuSet";
 import toastTemplate from "./components/toastTemplate";
 import setArrItemRight from "./components/setArrItemRight";
+import {
+  getAuthInfoWX,
+  saveWxMessage,
+  eventTypeList,
+  taskTypeList,
+  saveSendTime,
+  cancleAuthorizer
+} from "@src/api/doMyself.js";
 let loadKeyArr = [];
 let loadTypeArr = [];
 let setRaduisArr = [
@@ -120,6 +129,7 @@ let setSelectArr = [
   "taskPlanTimeTaskTypeList"
 ];
 let timeOut;
+let inputTimeOut;
 export default {
   name: "wx-set",
   watch: {
@@ -136,9 +146,7 @@ export default {
       concatWxUrl: "", // 授权微信公众号的链接
       totalActive: false,
       fullscreenLoading: false, // 整屏loading
-      wxInfo: {
-        appid: "wx896d29a4f5d87e75"
-      },
+      wxInfo: {},
       toastSetArr: [
         {
           title: "事件分配通知",
@@ -205,8 +213,7 @@ export default {
         // 如果是轮询不需要loading 加载动画
         this.pageLoading(true);
       }
-      this.$http
-        .get("/api/weixin/outside/weixin/api/getAuthInfo")
+      getAuthInfoWX()
         .then(res => {
           this.pageLoading(false);
           if (res.data.status === 0) {
@@ -221,12 +228,17 @@ export default {
             return;
           } else if (res.data.status === 2) {
             clearTimeout(timeOut);
+            // 未绑定公众号
+            this.haveWx = false;
             this.scanQrCode = false;
+            this.$platform.closeTab("wx_auth");
             return;
           }
           this.haveWx = true;
+          if (this.scanQrCode) {
+            this.$platform.closeTab("wx_auth");
+          }
           this.scanQrCode = false;
-          this.urlObj = res.data.wechatMenu;
           this.wxInfo = res.data.data;
           if (res.data.eventTypeList) {
             let arr = res.data.eventTypeList.map(res => {
@@ -265,15 +277,10 @@ export default {
     mainChange(e) {
       this.totalActive = !e;
       this.pageLoading(true);
-      this.$http
-        .post(
-          "/api/weixin/outside/weixin/setting/wxMessage/save",
-          {
-            message: "wxRemindMaster",
-            state: e
-          },
-          false
-        )
+      saveWxMessage({
+        message: "wxRemindMaster",
+        state: e
+      })
         .then(res => {
           if (res.success === true) {
             this.totalActive = e;
@@ -287,48 +294,40 @@ export default {
     },
     eventGet() {
       return new Promise((resolve, reject) => {
-        this.$http
-          .get("/api/weixin/outside/weixin/setting/message/eventTypeList")
-          .then(res => {
-            let arr = res.data.map(res => {
-              return { label: res.name, value: res.id };
-            });
-            this.toastSetArr[0].options = arr;
-            this.toastSetArr[1].options = arr;
-            resolve();
+        eventTypeList().then(res => {
+          let arr = res.data.map(res => {
+            return { label: res.name, value: res.id };
           });
+          this.toastSetArr[0].options = arr;
+          this.toastSetArr[1].options = arr;
+          resolve();
+        });
       });
     },
     taskGet() {
       return new Promise((resolve, reject) => {
-        this.$http
-          .get("/api/weixin/outside/weixin/setting/message/taskTypeList")
-          .then(res => {
-            let arr = res.data.map(res => {
-              return { label: res.name, value: res.id };
-            });
-            this.toastSetArr[2].options = arr;
-            this.toastSetArr[3].options = arr;
-            this.toastSetArr[4].options = arr;
-            resolve();
+        taskTypeList().then(res => {
+          let arr = res.data.map(res => {
+            return { label: res.name, value: res.id };
           });
+          this.toastSetArr[2].options = arr;
+          this.toastSetArr[3].options = arr;
+          this.toastSetArr[4].options = arr;
+          resolve();
+        });
       });
     },
     inputTime(e) {
-      this.timeInputing = new Date().getTime();
-      setTimeout(() => {
-        let now = new Date().getTime();
-        if (now > this.timeInputing + 1500) {
-          this.$http
-            .post(
-              "/api/weixin/outside/weixin/setting/saveSendTime",
-              {
-                reportSendTime: this.toastSetArr[4].time
-              },
-              false
-            )
-            .then(res => {});
+      clearTimeout(inputTimeOut);
+      inputTimeOut = setTimeout(() => {
+        if (!/^(([0-9]+)|([0-9]+\.[0-9]{0,2}))$/.test(e)) {
+          this.$platform.alert("时间需为正数且最多保留两位小数");
+          this.toastSetArr[4].time = "";
+          return;
         }
+        saveSendTime({
+          reportSendTime: this.toastSetArr[4].time
+        }).then(res => {});
       }, 1500);
     },
     concatWx() {
@@ -355,9 +354,7 @@ export default {
         );
         if (!res) return;
         this.pageLoading(true);
-        const reqRes = await this.$http.post(
-          "/api/weixin/outside/weixin/api/cancleAuthorizer"
-        );
+        const reqRes = await cancleAuthorizer();
         this.pageLoading(false);
         this.$platform.alert("成功解除绑定");
         this.getWxInfo();
@@ -501,7 +498,7 @@ p {
         font-size: 12px;
         margin-top: 10px;
         input {
-          width: 30px;
+          width: 40px;
           height: 20px;
           font-size: 12px;
           padding: 1px;

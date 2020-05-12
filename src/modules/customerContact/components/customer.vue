@@ -116,7 +116,7 @@
                 :key="index"
                 href
                 :class="`view-detail-btn ${index>0?'mar-l-10':''}`"
-                :style="`color:${item.color}`"
+                :style="item.styleType(scope.row)"
                 @click.stop.prevent="item.click(scope.row)"
               >{{item.name}}</a>
             </template>
@@ -265,7 +265,8 @@
     <base-table-advanced-setting ref="advanced" @save="columnStatusModify" />
 
     <!-- 编辑联系人弹窗 -->
-    <edit-contact-dialog ref="EditContactDialog" :original-value="selectedContact"></edit-contact-dialog>
+    <edit-contact-dialog ref="EditContactDialog" :original-value="selectedContact" :customer-type="'cutsomerContact'"
+    ></edit-contact-dialog>
   </div>
   <!-- end 产品模板列表 -->
 </template>
@@ -894,7 +895,7 @@ export default {
               isMulti: false,
               dataSource: [
                 {
-                  text: "暂不选择",
+                  text: "全部",
                   value: ""
                 },
                 {
@@ -1125,7 +1126,9 @@ export default {
           btnArr: [
             {
               name: "编辑",
-              color: "#55b7b4",
+              styleType: obj => {
+                return "color:#55b7b4";
+              },
               click: obj => {
                 if (pending) return;
                 if (!this.hasEditCustomerAuth(obj)) return;
@@ -1134,10 +1137,15 @@ export default {
             },
             {
               name: "删除",
-              color: "#999",
+              styleType: obj => {
+                return obj.isMain
+                  ? "color:#999;cursor: not-allowed;"
+                  : "color:#55b7b4";
+              },
               click: obj => {
                 if (pending) return;
                 if (!this.hasEditCustomerAuth(obj)) return;
+                if (obj.isMain) return;
                 this.deleteLinkman(obj);
               }
             }

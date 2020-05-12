@@ -101,7 +101,7 @@ router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   // host: '30.40.57.167',
   // port: 8083,
   host: '30.40.56.211',
-  port: 8080,
+  port: 10007,
   headers: {
     // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
     'cookie': `VIPPUBLINKJSESSIONID=ca75490e-a20d-4bc9-b115-72d167e7a0bc`

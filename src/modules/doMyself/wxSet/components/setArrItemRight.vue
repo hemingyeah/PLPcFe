@@ -30,6 +30,7 @@
   </div>
 </template>
 <script>
+import { changeTypes, wxMessageSave } from "@src/api/doMyself.js";
 let typesSelect = {
   0: "eventAllotEventTypeList", // 事件分配通知的事件类型应用范围
   1: "eventFinishEventTypeList", // 事件完成通知的事件类型应用范围
@@ -66,15 +67,10 @@ export default {
   methods: {
     changeSelect(e) {
       this.$emit("pageLoading", true);
-      this.$http
-        .post(
-          "/api/weixin/outside/weixin/setting/changeTypes",
-          {
-            typeIds: e.length > 0 ? [...e].join(",") : "",
-            name: typesSelect[this.itemIndex]
-          },
-          false
-        )
+      changeTypes({
+        typeIds: e.length > 0 ? [...e].join(",") : "",
+        name: typesSelect[this.itemIndex]
+      })
         .then(res => {
           this.$emit("pageLoading", false);
         })
@@ -83,19 +79,13 @@ export default {
     changeRadius(e) {
       this.$emit("pageLoading", true);
       this.itemData.radius = !e;
-      this.$http
-        .post(
-          "/api/weixin/outside/weixin/setting/wxMessage/save",
-          {
-            message: typesRadius[this.itemIndex],
-            state: e
-          },
-          false
-        )
-        .then(res => {
-          this.$emit("pageLoading", false);
-          this.itemData.radius = e;
-        });
+      wxMessageSave({
+        message: typesRadius[this.itemIndex],
+        state: e
+      }).then(res => {
+        this.$emit("pageLoading", false);
+        this.itemData.radius = e;
+      });
     }
   }
 };

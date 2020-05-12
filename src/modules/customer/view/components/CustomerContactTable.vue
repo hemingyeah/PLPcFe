@@ -31,7 +31,13 @@
             <template v-else>{{scope.row[column.field]}}</template>
           </template>
           <template v-else-if="column.field === 'from'">
-            <el-tooltip class="item" effect="dark" :content="scope.row.esLinkManWXEntities.length>0?scope.row.esLinkManWXEntities[0].nickName:''" placement="right" v-if="scope.row.registeredSource===1">
+            <el-tooltip
+              class="item"
+              effect="dark"
+              :content="scope.row.esLinkManWXEntities.length>0?scope.row.esLinkManWXEntities[0].nickName:''"
+              placement="right"
+              v-if="scope.row.registeredSource===1"
+            >
               <i class="iconfont icon-weixin1 color-green"></i>
             </el-tooltip>
           </template>
@@ -81,6 +87,7 @@
       :original-value="selectedContact"
       :is-phone-unique="shareData.isPhoneUnique"
       @submit-success="selectedContact = {}"
+      :customer-type="'cutsomerContact'"
     ></edit-contact-dialog>
   </div>
 </template>
@@ -89,6 +96,7 @@
 import { formatDate } from "@src/util/lang";
 import platform from "@src/platform";
 import EditContactDialog from "../operationDialog/EditContactDialog.vue";
+import { getContactList } from "@src/api/CustomerContact.js";
 
 export default {
   name: "customer-contact-table",
@@ -192,11 +200,11 @@ export default {
         pageNum: this.paginationInfo.pageNum,
         pageSize: this.paginationInfo.pageSize
       };
-
-      this.$http
-        .get("/customer/linkman/list", params)
+      // this.$http
+      //   .get("/customer/linkman/list", params)
+      getContactList(params)
         .then(res => {
-          this.contactList = res.list.map(contact => {
+          this.contactList = res.result.list.map(contact => {
             this.$set(this.pending, contact.id, !!contact.isMain);
             contact.createTime = formatDate(
               new Date(contact.createTime),
@@ -204,7 +212,7 @@ export default {
             );
             return Object.freeze(contact);
           });
-          this.paginationInfo.totalItems = res.total;
+          this.paginationInfo.totalItems = res.result.total;
         })
         .catch(err => console.error("err", err));
     },

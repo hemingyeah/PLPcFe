@@ -1114,12 +1114,6 @@ export default {
           width: "150px"
         },
         {
-          label: "注册来源",
-          field: "createTime",
-          show: true,
-          width: "150px"
-        },
-        {
           label: "最近更新",
           field: "updateTime",
           show: true,

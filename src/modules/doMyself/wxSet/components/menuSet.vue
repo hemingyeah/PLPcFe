@@ -1,8 +1,11 @@
 <template>
   <div id="menu-set-box">
     <p class="set-des">
-      您可以在此将自助门户功能配置到您的公众号菜单，也可以
-      <span class="color-b">将客户自助门户</span>内的链接嵌入到您的公众号菜单。在配置公众号菜单前，请先确认以下内容
+      您可以在此将自助门户功能配置到您的公众号菜单，也可以将
+      <a
+        class="color-b"
+        href="/setting/serviceStation/customerPortal#protalUrl"
+      >客户自助门户</a>内的链接嵌入到您的公众号菜单。在配置公众号菜单前，请先确认您的公众号已经经过认证
     </p>
     <div class="set-box">
       <!-- box-left start -->
@@ -27,13 +30,16 @@
               <p class="overHideCon_1" v-else>{{item.name}}</p>
 
               <draggable
-                class="pop-top-menu-box"
+                :class="[`popTopMenuBox-${index}`, 'pop-top-menu-box']"
                 :group="{name:'shared'}"
+                :disabled="(nowMoveBox>-1 && nowMoveBox!==index && item.sub_button.length>4)?true:false"
                 v-if="item.shb_type!=='add'"
                 v-model="item.sub_button"
                 :fallback-on-body="true"
                 swap-threshold="1"
                 animation="150"
+                @choose="onMenuMoveChoose"
+                @unchoose="onMenuMoveUnchoose"
               >
                 <div
                   v-for="(items,indexs) in item.sub_button"
@@ -99,7 +105,8 @@
         >
           <el-form-item label="菜单名称" prop="name">
             <el-input v-model="ruleForm.name" class="name-input" size="small" placeholder="菜单名称"></el-input>
-            <p class="tips-con">底部菜单内容最多16个字节，子菜单内容最多60个字节</p>
+            <p class="tips-con" v-if="now_chooseed_menu.indexs<0">仅支持中英文和数字，字数不超过4个汉字或8个字母</p>
+            <p class="tips-con" v-else>仅支持中英文和数字，字数不超过8个汉字或16个字母</p>
           </el-form-item>
           <el-form-item label="菜单内容" prop="menuType" v-show="!now_chooseed_menu.onlyName">
             <el-radio-group v-model="ruleForm.menuType">
@@ -138,7 +145,7 @@
               </div>
             </el-radio-group>
             <div v-if="ruleForm.menuType==='跳转页面'">
-              <p class="tips-con mar-b-12">订阅者点击该子菜单会跳到以下链接</p>
+              <p class="tips-con mar-b-12">订阅者点击该菜单会跳到以下链接</p>
               <el-form-item label="页面地址" prop="input_url" v-show="!now_chooseed_menu.onlyName">
                 <el-input
                   v-model="ruleForm.input_url"
@@ -166,6 +173,7 @@
               v-if="ruleForm.menuType==='回复文本消息'"
               type="textarea"
               resize="none"
+              maxlength="200"
               :rows="5"
               placeholder="请输入内容"
               v-model="ruleForm.reserve"
@@ -179,7 +187,7 @@
     <div class="bottom-btn">
       <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(2)">菜单排序</button>
 
-      <button class="btn btn-primary" v-if="edit_type===0" @click="change_edit_type(1)">编辑模式</button>
+      <button class="btn btn-primary" v-if="edit_type===0" @click="change_edit_type(1)">编辑菜单</button>
       <button class="btn btn-primary" v-if="edit_type===0" @click="getMenuList(false)">同步菜单</button>
       <button
         class="btn btn-primary"
@@ -191,6 +199,7 @@
   </div>
 </template>
 <script>
+import { getMenuListWx, setMenuListWx } from "@src/api/doMyself.js";
 // 缓存数据
 let menu_arr_stash = [];
 
@@ -246,6 +255,34 @@ let form_tem = {
   input_url: "",
   config_url: "",
   reserve: ""
+};
+
+let input_length = (rule, value, callback) => {
+  if (!/^[\u4e00-\u9fa5_a-zA-Z0-9]+$/.test(value)) {
+    callback(new Error("请输入正确的名称"));
+  } else if (computedStrLen(value) > 8) {
+    callback(new Error("字数不超过4个汉字或8个字母"));
+  } else {
+    callback();
+  }
+};
+let input_length_child = (rule, value, callback) => {
+  if (!/^[\u4e00-\u9fa5_a-zA-Z0-9]+$/.test(value)) {
+    callback(new Error("请输入正确的名称"));
+  } else if (computedStrLen(value) > 16) {
+    callback(new Error("字数不超过8个汉字或16个字母"));
+  } else {
+    callback();
+  }
+};
+let url_check = (rule, value, callback) => {
+  if (computedStrLen(value) > 1024) {
+    callback(new Error("地址不超过1024个字节"));
+  } else if (/(http|https):\/\/([\w.]+\/?)\S*/.test(value)) {
+    callback();
+  } else {
+    callback(new Error("请输入前缀是http://或https://的网址"));
+  }
 };
 
 import draggable from "vuedraggable";
@@ -308,51 +345,49 @@ export default {
     }
   },
   data() {
-    let input_length = (rule, value, callback) => {
-      if (computedStrLen(value) > 16) {
-        callback(new Error("字数不超过16个字节"));
-      } else {
-        callback();
-      }
-    };
-    let input_length_child = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("名称不能为空"));
-      }
-      if (computedStrLen(value) > 60) {
-        callback(new Error("字数不超过60个字节"));
-      } else {
-        callback();
-      }
-    };
-    let url_check = (rule, value, callback) => {
-      if (/(http|https):\/\/([\w.]+\/?)\S*/.test(value)) {
-        callback();
-      } else {
-        callback(new Error("请输入前缀是http://或https://的网址"));
-      }
-    };
-
     return {
       edit_type: 0, // 当前菜单的编辑方式 0 不可编辑 1 修改菜单内容模式 2 拖拽模式
       show_type: 0, // 不可编辑模式下展现第几个菜单栏
       now_main_menu: 0,
+      nowMoveBox: -1, // 当某个菜单子菜单为5个时不可拖入子菜单进入
       menu_arr: [],
       ruleForm: {},
-      rules: {
-        name: [
-          { required: true, message: "请输入菜单名称", trigger: "change" },
-          { validator: input_length, trigger: "change" }
-        ],
-        input_url: [
-          { required: true, message: "请输入跳转页面网址", trigger: "change" },
-          { validator: url_check, trigger: "change" }
-        ]
-      },
-      now_chooseed_menu: false,
+      now_chooseed_menu: false
     };
   },
-  created() {},
+  computed: {
+    rules() {
+      return this.now_chooseed_menu && this.now_chooseed_menu.indexs > -1
+        ? {
+            name: [
+              { required: true, message: "请输入菜单名称", trigger: "change" },
+              { validator: input_length_child, trigger: "change" }
+            ],
+            input_url: [
+              {
+                required: true,
+                message: "请输入跳转页面网址",
+                trigger: "change"
+              },
+              { validator: url_check, trigger: "change" }
+            ]
+          }
+        : {
+            name: [
+              { required: true, message: "请输入菜单名称", trigger: "change" },
+              { validator: input_length, trigger: "change" }
+            ],
+            input_url: [
+              {
+                required: true,
+                message: "请输入跳转页面网址",
+                trigger: "change"
+              },
+              { validator: url_check, trigger: "change" }
+            ]
+          };
+    }
+  },
   mounted() {
     if (this.menu_arr.length <= 0) {
       this.getMenuList();
@@ -381,7 +416,7 @@ export default {
         return `menu-item ${this.edit_type === 1 ? "can-point" : ""} ${
           this.now_chooseed_menu.index === index ? "menu-checked" : ""
         }`;
-      else return `menu-item ${this.edit_type === 1 ? "can-point" : ""}`;
+      return `menu-item ${this.edit_type === 1 ? "can-point" : ""}`;
     },
     child_menu_class(index, indexs) {
       return [
@@ -447,15 +482,14 @@ export default {
           this.main_menu_click(index, indexs > -1 ? indexs : -1);
         } else {
           this.now_chooseed_menu = {
-            index: index,
-            indexs: indexs,
-            onlyName:
+            index,
+            indexs,
+            onlyName: !!(
               (indexs < 0 && _arr[index].sub_button.length > 1) ||
               item.hasOwnProperty("shb_type") === false ||
               (item.hasOwnProperty("shb_type") === true &&
                 item.shb_type === "system_menu")
-                ? true
-                : false
+            )
           };
           let now_chooseed =
             indexs > -1
@@ -571,8 +605,8 @@ export default {
                     this.menu_arr = res;
                     menu_arr_stash = _.cloneDeep(res);
                     this.$emit("pageLoading", false);
-                  }else{
-                    this.$platform.alert(res_.message)
+                  } else {
+                    this.$platform.alert(res_.message);
                   }
                 });
               });
@@ -627,7 +661,9 @@ export default {
         }
       } else {
         // 删除主菜单 需要提示风险
-        const alert_res = await this.$platform.confirm("该菜单下的子菜单会同时删除。");
+        const alert_res = await this.$platform.confirm(
+          "该菜单下的子菜单会同时删除。"
+        );
         if (!alert_res) return;
         this.menu_arr.splice(now_chooseed_menu.index, 1);
         console.log(this.menu_arr);
@@ -644,10 +680,10 @@ export default {
     },
     getMenuList(type = true) {
       this.$emit("pageLoading", true);
-      this.$http
-        .get("/api/weixin/outside/weixin/api/getMenuList", {
-          type
-        })
+      // URL 本地调试 无/api/weixin  发布需加上
+      getMenuListWx({
+        type
+      })
         .then(res => {
           let result = res.data.wechatMenu
             ? JSON.parse(res.data.wechatMenu).menu.button
@@ -667,13 +703,16 @@ export default {
         });
     },
     setMenuList(data) {
-      return this.$http.post(
-        "/api/weixin/outside/weixin/api/saveMenuList",
-        {
-          wechatMenu: JSON.stringify({ menu: { button: data } })
-        },
-        false
-      );
+      return setMenuListWx({
+        wechatMenu: JSON.stringify({ menu: { button: data } })
+      });
+    },
+    onMenuMoveChoose(e) {
+      let nowIndex = e.from.classList[0].split("-")[1];
+      this.nowMoveBox = nowIndex * 1;
+    },
+    onMenuMoveUnchoose() {
+      this.nowMoveBox = -1;
     }
   }
 };
@@ -693,6 +732,9 @@ export default {
   color: #000;
   width: 672px;
   margin-bottom: 25px;
+  a {
+    text-decoration: none;
+  }
 }
 .color-b {
   color: #3aa7ff;
@@ -702,10 +744,10 @@ export default {
   align-items: flex-start;
   margin-bottom: 20px;
   .box-left {
-    width: 212px;
-    min-width: 212px;
-    height: 377px;
-    min-height: 377px;
+    width: 290px;
+    min-width: 290px;
+    height: 516px;
+    min-height: 516px;
     border: 1px solid rgba(226, 226, 226, 1);
     box-sizing: border-box;
     border-top: none;
@@ -718,8 +760,8 @@ export default {
     -ms-user-select: none;
     user-select: none;
     .box-left-top-img {
-      width: 212px;
-      height: 50.35px;
+      width: 290px;
+      height: 69px;
       position: absolute;
       top: 0;
       left: -1px;
@@ -734,7 +776,7 @@ export default {
       left: 0;
       width: 100%;
       display: flex;
-      height: 30px;
+      height: 41px;
       background: rgba(251, 251, 251, 1);
       border-top: 1px solid rgba(226, 226, 226, 1);
       box-sizing: border-box;
@@ -781,7 +823,7 @@ export default {
             display: none;
           }
           .show_virtual {
-            height: 30px;
+            height: 41px;
             width: 100%;
             outline: 1px dotted #55b7b4;
             display: block;
@@ -797,7 +839,7 @@ export default {
             left: 0;
             right: 0;
             margin: auto;
-            bottom: 130%;
+            bottom: 122.5%;
             display: flex;
             flex-direction: column;
             .arrow-css {
@@ -819,7 +861,7 @@ export default {
             .menu-items {
               position: relative;
               z-index: 98;
-              height: 30px;
+              height: 41px;
               color: #fff;
               display: flex;
               justify-content: center;

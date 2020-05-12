@@ -81,9 +81,6 @@ export default {
         window.location.href = "/setting/doMyself/toastList";
       }
       this.nowMenu === index;
-    },
-    loadWxdata() {
-      this.$http.get("/api/weixin/outside/weixin/api/getAuthInfo");
     }
   },
   components: {
@@ -105,7 +102,7 @@ export default {
 .font-12 {
   font-size: 12px;
 }
-.font-14{
+.font-14 {
   font-size: 14px;
 }
 .font-16 {
@@ -121,17 +118,15 @@ label {
   padding: 10px;
   position: relative;
   box-sizing: border-box;
-  max-height: 100vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  min-height: 100vh;
+  max-width: 100vw;
 }
 #doMyself-components-box {
   margin-left: 10px;
   flex: 1;
+  min-width: 920px;
   box-sizing: border-box;
-  max-height: 100vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  min-height: 100vh;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -150,6 +145,9 @@ img {
     box-sizing: border-box;
     border-radius: 3px;
     overflow: hidden;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 10px;
     .menu-title {
       font-size: 18px;
       color: #454648;
@@ -164,6 +162,9 @@ img {
       display: flex;
       align-items: center;
       cursor: pointer;
+      &:hover {
+        background: rgb(246, 246, 246);
+      }
       span {
         font-size: 12px;
       }
@@ -183,11 +184,11 @@ img {
         margin-right: 13px;
       }
     }
-    .menu-list :hover {
-      background: rgb(246, 246, 246);
-    }
     .menu-checked {
       border-left: 3px solid #55b7b4;
+      &:hover {
+        background: #fff;
+      }
       span {
         font-size: 13px;
         font-weight: 700;

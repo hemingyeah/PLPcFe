@@ -1,9 +1,9 @@
 <template>
   <div id="doMyself-components-box">
-    <div class="top-menu">
+    <!-- <div class="top-menu">
       <nav :class="nowPage==='customer'?'nav-checked':''" @click="nowPage='customer'">客户联系人</nav>
-      <!--TO DO <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">访客</nav> -->
-    </div>
+      TO DO <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">访客</nav>
+    </div> -->
     <customer-conctact-customer v-if="nowPage==='customer'" :init-data="initData"></customer-conctact-customer>
     <!-- <customer-conctact-visitor v-if="nowPage==='visitor'"></customer-conctact-visitor> -->
   </div>
