@@ -129,7 +129,7 @@ export default {
                 return window.location.href = `/event/view/${this.initData.eventId}`;
               }
               if (this.initData.goto === 'createTask') {
-                return window.location.href = `/event/convent2Task/jump?eventId=${this.initData.eventId}`;
+                return window.location.href = `/event/convent2Task/jump?eventId=${this.initData.eventId}&flow=${this.initData.flow}`;
               }
             })
         })
