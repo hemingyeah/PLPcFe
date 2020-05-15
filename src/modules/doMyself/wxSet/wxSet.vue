@@ -1,6 +1,6 @@
 <template>
   <div id="doMyself-components-box" v-loading.fullscreen.lock="fullscreenLoading">
-    <div class="top-state" v-if="!haveWx && fullscreenLoading===false">
+    <div class="top-state" v-if="!haveWx">
       <div>
         <h2>绑定公众号</h2>
         <p>您尚未绑定公众号，绑定前请确认您的公众号为已认证的公众号</p>
@@ -274,8 +274,19 @@ export default {
           console.log(err, "erro");
         });
     },
-    mainChange(e) {
+    async mainChange(e) {
       this.totalActive = !e;
+      if (e === true) {
+        if (this.wxInfo.serviceTypeInfo != 2) {
+          return this.$platform.alert(
+            "您的公众号不是认证服务号，无法开启该功能。若要使用该功能，请绑定认证服务号。"
+          );
+        }
+        const res_plat = await this.$platform.confirm(
+          "请确认：开启后，如果您原本就有消息模板，它们将会被去除。"
+        );
+        if (!res_plat) return;
+      }
       this.pageLoading(true);
       saveWxMessage({
         message: "wxRemindMaster",

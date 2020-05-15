@@ -42,11 +42,11 @@ export default {
         },
         {
           name: "公众号设置",
-          icon: "icon-iconfontweixin"
+          icon: "icon-weixin2"
         },
         {
           name: "短信消息设置",
-          icon: "icon-xinxiduanxinxiaoxitixingyoujiansixinyouxiang"
+          icon: "icon-duanxin3"
         },
         {
           name: "消息记录",

@@ -104,6 +104,10 @@ export default {
     shareData: {
       type: Object,
       default: () => ({})
+    },
+    initData: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -217,7 +221,7 @@ export default {
         .catch(err => console.error("err", err));
     },
     buildColumns() {
-      return [
+      let arr = [
         {
           label: "姓名",
           field: "name",
@@ -248,6 +252,14 @@ export default {
           width: "150px"
         }
       ];
+      if (
+        this.initData &&
+        (!this.initData.menus || this.initData.menus.length <= 0)
+      ) {
+        arr.splice(2, 1);
+      }
+
+      return arr;
     }
   },
   components: {

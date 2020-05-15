@@ -1264,10 +1264,10 @@ export default {
       this.loadingListData = true;
 
       return getTemplateMessageList(params).then(res => {
-        if (!res || !res.list) {
+        if (!res || !res.result.list) {
           this.page = new Page();
         } else {
-          this.page = res;
+          this.page = res.result;
         }
         this.loadingListData = false;
       });

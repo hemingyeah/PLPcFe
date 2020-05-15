@@ -6,18 +6,18 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "546307",
-      "name": "微信",
-      "font_class": "iconfontweixin",
-      "unicode": "e675",
-      "unicode_decimal": 58997
+      "icon_id": "10467642",
+      "name": "短信",
+      "font_class": "duanxin3",
+      "unicode": "e6f4",
+      "unicode_decimal": 59124
     },
     {
-      "icon_id": "10941712",
-      "name": "信息 短信 消息 提醒 邮件 私信 邮箱",
-      "font_class": "xinxiduanxinxiaoxitixingyoujiansixinyouxiang",
-      "unicode": "e676",
-      "unicode_decimal": 58998
+      "icon_id": "13144167",
+      "name": "微信",
+      "font_class": "weixin2",
+      "unicode": "e82f",
+      "unicode_decimal": 59439
     },
     {
       "icon_id": "12580401",

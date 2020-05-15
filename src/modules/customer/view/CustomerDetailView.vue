@@ -152,10 +152,10 @@
         </form-view>
       </div>
       <div class="customer-relation" v-if="this.customer.id">
-        <base-tabbar :tabs="tabs" v-model="currTab"></base-tabbar>
+        <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
         <div class="customer-relation-content">
           <keep-alive>
-            <component :is="currTab" :share-data="propsForSubComponents"></component>
+            <component :is="currTab" :share-data="propsForSubComponents" :init-data="initData"></component>
           </keep-alive>
         </div>
       </div>

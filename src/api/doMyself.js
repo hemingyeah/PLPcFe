@@ -1,5 +1,5 @@
 import http from '@src/util/http';
-let urlHead = '';
+let urlHead = '/api/weixin';
 
 
 export function getToastWxList(params) {
