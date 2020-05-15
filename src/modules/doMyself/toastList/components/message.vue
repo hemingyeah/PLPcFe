@@ -153,9 +153,11 @@
               v-else-if="column.field === 'createUser'"
             >{{ scope.row.createUser && scope.row.createUser.displayName }}</template>
             <template v-else-if="column.field === 'operation'">{{ getChiType(scope.row.operation)}}</template>
-            <template
-              v-else-if="column.field === 'status'"
-            >{{ conversionStatus[scope.row.status] ? conversionStatus[scope.row.status]['text'] : ''}}</template>
+            <template v-else-if="column.field === 'status'">
+              <p
+                :class="conversionStatus[scope.row.status] ? conversionStatus[scope.row.status]['className'] : ''"
+              >{{ conversionStatus[scope.row.status] ? conversionStatus[scope.row.status]['text'] : ''}}</p>
+            </template>
             <template v-else-if="column.field === 'sendTime'">{{ scope.row.sendTime | formatDate }}</template>
 
             <div
@@ -1699,4 +1701,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.error-text {
+  color: #e51c23;
+}
+.success-text {
+  color: #0db3a6;
+}
+.loading-text {
+  color: #259b24;
+}
 </style>

@@ -5,7 +5,7 @@
       <a
         class="color-b"
         href="/setting/serviceStation/customerPortal#protalUrl"
-      >客户自助门户</a>内的链接嵌入到您的公众号菜单。在配置公众号菜单前，请先确认您的公众号已经经过认证
+      >客户自助门户</a>内的链接嵌入到您的公众号菜单。</br>在配置公众号菜单前，请先确认您的公众号已经经过认证
     </p>
     <div class="set-box">
       <!-- box-left start -->
@@ -730,7 +730,6 @@ export default {
 .set-des {
   font-size: 14px;
   color: #000;
-  width: 672px;
   margin-bottom: 25px;
   a {
     text-decoration: none;
@@ -777,7 +776,7 @@ export default {
       width: 100%;
       display: flex;
       height: 41px;
-      background: rgba(251, 251, 251, 1);
+      background: #F7F8F9;
       border-top: 1px solid rgba(226, 226, 226, 1);
       box-sizing: border-box;
       .bottom-icon-img {
@@ -847,7 +846,7 @@ export default {
               height: 0;
               border-width: 6px;
               border-style: solid;
-              border-color: #d2d6de transparent transparent transparent;
+              border-color: #F7F8F9 transparent transparent transparent;
               position: absolute;
               z-index: 97;
               left: 0;
@@ -862,12 +861,12 @@ export default {
               position: relative;
               z-index: 98;
               height: 41px;
-              color: #fff;
+              color: #000;
               display: flex;
               justify-content: center;
               align-items: center;
               padding: 0 5px;
-              background: #d2d6de;
+              background: #F7F8F9;
               margin-bottom: 2px;
               > p {
                 font-size: 12px;
@@ -883,9 +882,12 @@ export default {
     height: 377px;
     min-width: 540px;
     min-height: 377px;
-    background: #fdfbfe;
+    background: #F7F8F9;
     border: 1px solid rgba(226, 226, 226, 1);
     box-sizing: border-box;
+    .el-radio{
+      font-weight: 400;
+    }
     .box-head {
       height: 50px;
       border-bottom: 1px solid #e2e2e2;

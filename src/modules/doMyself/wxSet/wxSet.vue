@@ -396,7 +396,7 @@ p {
   background: #fff;
   box-sizing: border-box;
   padding: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   nav {
@@ -428,7 +428,7 @@ p {
 
 .menu-set-box {
   > .top-state:not(:last-child) {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 }
 .top-state {

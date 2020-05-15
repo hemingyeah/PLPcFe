@@ -1,5 +1,5 @@
 import http from '@src/util/http';
-let urlHead = '/api/weixin';
+let urlHead = '';
 
 
 export function getToastWxList(params) {
@@ -18,7 +18,7 @@ export function getRecords(params = {}) {
 
 // toast/com/wxMessage.vue
 export function getTemplateMessageList(params = {}) {
-  return http.post(`${urlHead}/outside/weixin/api/getTemplateMessageList`, params)
+  return http.post(`${urlHead}/outside/weixin/msg/getTemplateMsgList`, params)
 }
 
 // wxSet/com/menuset.vue
