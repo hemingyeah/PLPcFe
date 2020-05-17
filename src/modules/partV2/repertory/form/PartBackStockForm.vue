@@ -18,6 +18,7 @@
 <script>
 export default {
   name: 'part-backstock-form',
+  inject: ['initData'],
   props: {
     formdata: {
       type: Object,

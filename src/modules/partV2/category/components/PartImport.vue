@@ -46,6 +46,7 @@ import DateUtil from '@src/util/date';
 
 export default {
   name: 'part-import',
+  inject: ['initData'],
   props: {
     templateUrl: String,
     templateBlankUrl: String, // 空白模板url

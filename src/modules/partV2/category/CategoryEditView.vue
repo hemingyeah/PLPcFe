@@ -220,7 +220,7 @@ export default {
         if(result.status == 0){
           window.location.href = '/partV2/category/list'
         }else{
-          this.$platform.alert(result.message)
+          this.$platform.toast(result.message)
         }
       } catch (error) {
         console.error(error)

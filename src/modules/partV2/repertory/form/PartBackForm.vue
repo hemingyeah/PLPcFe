@@ -44,6 +44,7 @@ import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-back-form',
+  inject: ['initData'],
   props: {
     repertory: {
       type: Array,
@@ -93,7 +94,7 @@ export default {
   computed:{
     // TODO: 支持小数 提示
     minVariation () {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     },
     part(){
@@ -145,10 +146,10 @@ export default {
 
         if(result.status == 0){
           this.$emit('success')
-          this.$platform.alert('请求已提交，请等待备件库管理员处理');
+          this.$platform.toast('请求已提交，请等待备件库管理员处理');
           this.visible = false;
         }else{
-          this.$platform.alert(result.message);
+          this.$platform.toast(result.message);
         }
       } catch (error) {
         console.log(error)
@@ -157,7 +158,7 @@ export default {
       this.pending = false;
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 

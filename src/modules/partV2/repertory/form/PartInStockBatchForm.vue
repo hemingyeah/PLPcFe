@@ -54,6 +54,7 @@ import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-instockBatch-form',
+  inject: ['initData'],
   props: {
     sparepartConfig: Object,
     repertory: Array
@@ -67,7 +68,7 @@ export default {
   computed: {
     // TODO: 支持小数 提示
     minVariation () {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     },
   },
@@ -139,7 +140,7 @@ export default {
       let form = this.form;
       try {
         let message = '';
-        let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+        let initData = this.initData;
         form.forEach((item, index) => {
           let count = this.decimalNumber(item.variation);
           if(!item.sparepart || !item.repertory || !item.type || !item.variation || item.variation <= 0 || count != -1){
@@ -149,7 +150,7 @@ export default {
         })
 
         if(message){
-          this.$platform.alert(message)
+          this.$platform.toast(message)
           return null;
         } 
 
@@ -172,12 +173,12 @@ export default {
     },
     receive(data = []){
       if(data.length > 50){
-        return this.$platform.alert('单次最多支持入库50个备件');
+        return this.$platform.toast('单次最多支持入库50个备件');
       }
       data.forEach(item => this.add(null, item));
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 

@@ -64,6 +64,7 @@
 <script>
   export default {
     name: 'part-transfer-form',
+    inject: ['initData'],
     props: {
       formdata: Object,
     },

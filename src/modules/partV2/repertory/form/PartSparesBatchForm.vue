@@ -91,6 +91,7 @@ import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-spares-batch-form',
+  inject: ['initData'],
   props: {
     sparepartConfig: Object,
     repertory: Array,
@@ -116,7 +117,7 @@ export default {
   computed: {
     // TODO: 支持小数 提示
     minVariation () {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     },
   },
@@ -152,7 +153,7 @@ export default {
     addPart() {
       if(this.form.length > 49){
         this.isAddBtnDisabled = true;
-        return this.$platform.alert('单次最多支持分配50个备件');
+        return this.$platform.toast('单次最多支持分配50个备件');
       }
       let row = this.add(null);
       this.form.push(row);
@@ -317,7 +318,7 @@ export default {
           }
         }
         let bool = false;
-        let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+        let initData = this.initData;
         form.forEach((item, index) => {
           // bool = false;
           let count = this.decimalNumber(item.variation);
@@ -358,7 +359,7 @@ export default {
             message = message.slice(0, 4);
             message[message.length - 1] += '...'
           }
-          this.$platform.alert(message.join('\n'))
+          this.$platform.toast(message.join('\n'))
           return null;
         } 
         return form.map(item => ({
@@ -386,7 +387,7 @@ export default {
     },
     receive(data = [], userId = ''){
       if (data.length > 50) {
-        return this.$platform.alert('单次最多支持分配50个备件');
+        return this.$platform.toast('单次最多支持分配50个备件');
       }
 
       this.form = data.map(item => this.add(null, item));
@@ -396,7 +397,7 @@ export default {
       this.userId = userId;
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 

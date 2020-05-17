@@ -60,6 +60,7 @@
 <script>
   export default {
     name: 'part-cancel-transfer-form',
+    inject: ['initData'],
     props: {
       formdata: Object,
     },

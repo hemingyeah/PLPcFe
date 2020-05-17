@@ -56,6 +56,7 @@
 
   export default {
     name: "part-set-safety-stock-form",
+    inject: ['initData'],
     data() {
       return {
         unifiedValue: '',
@@ -123,7 +124,7 @@
           const data = this.formData;
           let params = [];
           let msg = '';
-          let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+          let initData = this.initData;
 
           for (let i = 0; i < data.length; i++) {
             params.push(data[i]);
@@ -142,7 +143,7 @@
             }
           }
           if(msg) {
-            this.$platform.alert(msg)
+            this.$platform.toast(msg)
             return null;
           }
 
@@ -164,7 +165,7 @@
         })
       },
       decimalNumber(num) {
-        let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+        let initData = this.initData;
         let count = MathUtil.decimalNumber(num);
         let isPartV2 = initData.isSparepart2;
 

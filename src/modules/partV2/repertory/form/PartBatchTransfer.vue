@@ -77,6 +77,7 @@
 
   export default {
     name: 'part-batch-transfer',
+    inject: ['initData'],
     props: {
       sparepartConfig: Object,
       repertory: Array // 可见仓库
@@ -93,7 +94,7 @@
     computed: {
       // TODO: 支持小数 提示
       minVariation () {
-        let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+        let initData = this.initData;
         return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
       },
       targetRepertory() {
@@ -224,7 +225,7 @@
         this.submitted = true;
         try {
           let message = '';
-          let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+          let initData = this.initData;
           form.forEach((item, index) => {
             let count = this.decimalNumber(item.variation);
             if(!item.sparepart || !item.repertory || !item.type || !this.targetRepertoryId || !item.variation || item.variation <= 0 || item.variation > item.repertoryCount || !item.repertoryCount || count != -1){
@@ -234,9 +235,9 @@
           });
 
           if(message){
-            this.$platform.alert(message)
+            this.$platform.toast(message)
             return null;
-            // let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+            // let initData = this.initData;
             // let msg = initData.precision ? `${ initData.precision }位小数` : '整数'
             // this.$platform.toast(`表单数据有误，请仔细检查是否选择了备件、目标库以及调拨数是否正确（调拨数应是大于0的${ msg }且小于等于该备件的库存数）`, 'error', { duration: 5000});
             // return null;
@@ -257,13 +258,13 @@
       },
       receive(data = [], userId = ''){
         if(data.length > 50){
-          return this.$platform.alert('单次最多支持调拨50个备件');
+          return this.$platform.toast('单次最多支持调拨50个备件');
         }
         data.forEach(item => this.add(item));
         this.userId = userId;
       },
       decimalNumber(num) {
-        let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+        let initData = this.initData;
         let count = MathUtil.decimalNumber(num);
         let isPartV2 = initData.isSparepart2;
 

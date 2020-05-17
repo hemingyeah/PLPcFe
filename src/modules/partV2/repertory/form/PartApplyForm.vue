@@ -54,6 +54,7 @@ import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-apply-form',
+  inject: ['initData'],
   props: {
     formdata: {
       type: Object,
@@ -108,7 +109,7 @@ export default {
   computed: {
     // TODO: 支持小数 提示
     minVariation () {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     },
 
@@ -125,11 +126,11 @@ export default {
         if(isSucc){
           let number = this.form.number
           if(number < this.minVariation){
-            this.$platform.alert(`请填写大于${ this.minVariation }的数`)
+            this.$platform.toast(`请填写大于${ this.minVariation }的数`)
             return
           }
           if(this.formdata.repertoryCount < number){
-            this.$platform.alert('申领数不能大于库存数')
+            this.$platform.toast('申领数不能大于库存数')
             return
           }
           let parms = {
@@ -164,7 +165,7 @@ export default {
         });
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 

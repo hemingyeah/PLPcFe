@@ -440,7 +440,7 @@ export default {
           // reload data
           this.loadData();
         }else{
-          this.$platform.alert(result.message);
+          this.$platform.toast(result.message);
         }
 
       } catch (error) {
@@ -452,7 +452,7 @@ export default {
       this.trackEventHandler('batchEdit');
       // 编辑的权限
       if (!this.selected.length) {
-        return this.$platform.alert('请先勾选要编辑的备件');
+        return this.$platform.toast('请先勾选要编辑的备件');
       }
       this.editBatchDialog = true;
     },
@@ -484,7 +484,7 @@ export default {
       let fileName = `${DateUtil.format(new Date(),'yyyy-MM-dd')}备件数据.xlsx`;
 
       if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
+        if(this.selected.length == 0) return this.$platform.toast('请选择要导出的数据');
         ids = this.selected.map(item => item.id);
       }
 
@@ -505,7 +505,7 @@ export default {
       };
 
       // if (!this.selected.length) {
-        // return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
+        // return this.$platform.toast('您尚未选择数据，请选择数据后点击批量更新');
       // }
 
       if(this.selected.length > 0) param.ids = this.selected.map(item => item.id);
@@ -543,7 +543,7 @@ export default {
         let selected = this.selected;
 
         if(!this.allowEdit) return;
-        if(!selected || selected.length == 0) return this.$platform.alert('请选择要删除的备件')
+        if(!selected || selected.length == 0) return this.$platform.toast('请选择要删除的备件')
         if(!await this.$platform.confirm('确定要删除选中的备件？')) return;
 
         this.pending = true;
@@ -554,7 +554,7 @@ export default {
           this.selected = [];
           this.loadData();
         }else{
-          this.$platform.alert(result.message || '选中的备件尚有库存，请先办理出库后再删除');
+          this.$platform.toast(result.message || '选中的备件尚有库存，请先办理出库后再删除');
         }
 
         this.pending = false;
@@ -574,7 +574,7 @@ export default {
       this.$http.post('/partV2/category/toggleEnable', params, false).then(result => {
         if(result.status != 0){
           row.enable = !row.enable;
-          this.$platform.alert(result.message);
+          this.$platform.toast(result.message);
         }
       })
         .catch(err => console.error(err))
@@ -599,7 +599,7 @@ export default {
             })
             : this.$refs.table.clearSelection();
         })
-        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+        return this.$platform.toast(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.selected = tv;
 

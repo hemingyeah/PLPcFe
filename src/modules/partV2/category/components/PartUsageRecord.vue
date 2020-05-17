@@ -23,6 +23,7 @@
 
 export default {
   name: 'part-usage-record',
+  inject: ['initData'],
   props: {
     page:{
       type: Object

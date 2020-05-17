@@ -85,6 +85,7 @@
 
   export default {
     name: 'part-spares-form',
+    inject: ['initData'],
     props: {
       formdata: Object,
       repertory: Array,
@@ -145,7 +146,7 @@
     computed: {
       // TODO: 支持小数 提示
       minVariation () {
-        let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+        let initData = this.initData;
         return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
       },
       isSafetyStock() {
@@ -153,7 +154,7 @@
       }
     },
     created() {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       this.userId = initData.userId || '';
 
       let data = this.formdata;
@@ -242,7 +243,7 @@
           this.$refs['ruleForm'].validate((valid) => {
             let num = this.ruleForm.repertoryCount;
             if (Number(this.ruleForm.sparesNum) > Number(num)) {
-              this.$platform.alert('分配数不能大于库存数');
+              this.$platform.toast('分配数不能大于库存数');
               return false
             }
             if (valid && (this.ruleForm.repertoryCount != '0')) {
@@ -253,7 +254,7 @@
 
             } else {
               if((this.ruleForm.repertoryCount == '0')) {
-                this.$platform.alert('库存数为0，暂时不能分配');
+                this.$platform.toast('库存数为0，暂时不能分配');
               }
               return false;
             }
@@ -266,7 +267,7 @@
         }
       },
       decimalNumber(num) {
-        let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+        let initData = this.initData;
         let count = MathUtil.decimalNumber(num);
         let isPartV2 = initData.isSparepart2;
 

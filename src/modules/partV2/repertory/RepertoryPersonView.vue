@@ -788,7 +788,7 @@ export default {
         this.applyBackingTask = result.data;
         this.isTooltipShow = true;
       }else{
-        this.$platform.alert(result.message);
+        this.$platform.toast(result.message);
       }
     },
 
@@ -846,7 +846,7 @@ export default {
             })
             : this.$refs.table.clearSelection();
         })
-        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+        return this.$platform.toast(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.selected = tv;
 
@@ -910,7 +910,7 @@ export default {
       let fileName = `${DateUtil.format(new Date(),'yyyy-MM-dd')}个人备件库${title}.xlsx`;
 
       if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
+        if(this.selected.length == 0) return this.$platform.toast('请选择要导出的数据');
         ids = this.selected.map(item => item.id);
       }
 
@@ -1607,7 +1607,7 @@ export default {
           this.loadData();
 
         }else{
-          this.$platform.alert(result.message);
+          this.$platform.toast(result.message);
         }
 
       } catch (error) {

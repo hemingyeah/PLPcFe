@@ -40,6 +40,7 @@ import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-instock-form',
+  inject: ['initData'],
   props: {
     formdata: '',
     sparepartConfig: {
@@ -55,7 +56,7 @@ export default {
   computed:{
     // TODO: 支持小数 提示
     minVariation () {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     },
     _inStoreType(){
@@ -108,7 +109,7 @@ export default {
       try {
         let number = this.form.number
         if( number < this.minVariation){
-          this.$platform.alert(`请填写大于${ this.minVariation }的数`)
+          this.$platform.toast(`请填写大于${ this.minVariation }的数`)
           return
         }
         let isSucc = await this.$refs.form.validate();
@@ -135,7 +136,7 @@ export default {
       this.type = type;
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 

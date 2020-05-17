@@ -42,6 +42,7 @@ import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-instock-form',
+  inject: ['initData'],
   props: {
     formdata: {
       type: Object,
@@ -116,23 +117,23 @@ export default {
   computed: {
     // TODO: 支持小数 提示
     minNumber () {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     }
   },
   methods: {
     async pack(){
       if(this.form.number <= 0){
-        this.$platform.alert('入库数必须为大于0的数')
+        this.$platform.toast('入库数必须为大于0的数')
         return
       }
       if(this.form.number > Number(this.variationNum())){
-        this.$platform.alert('入库数不能大于申请数');
+        this.$platform.toast('入库数不能大于申请数');
         return
       }
 
       if(!this.form.repertoryId){
-        this.$platform.alert('请选择要入库的仓库')
+        this.$platform.toast('请选择要入库的仓库')
         return;
       }
 
@@ -154,7 +155,7 @@ export default {
       return null;
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 

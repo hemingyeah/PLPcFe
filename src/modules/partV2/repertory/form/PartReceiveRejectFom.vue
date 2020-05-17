@@ -60,6 +60,7 @@
 <script>
   export default {
     name: 'part-receive-reject-form',
+    inject: ['initData'],
     props: {
       formdata: Object,
       receiveOrReject: String

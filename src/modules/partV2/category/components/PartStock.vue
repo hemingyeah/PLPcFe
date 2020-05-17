@@ -42,6 +42,7 @@
 <script>
 export default {
   name: 'part-stock',
+  inject: ['initData'],
   props: {
     stock: {
       type: Array,

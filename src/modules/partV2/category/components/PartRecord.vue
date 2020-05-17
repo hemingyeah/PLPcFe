@@ -69,6 +69,7 @@ import BasePreview from 'packages/BasePreview';
 
 export default {
   name: 'part-record',
+  inject: ['initData'],
   props: ['items'],
   components: {
     [BasePreview.name]: BasePreview

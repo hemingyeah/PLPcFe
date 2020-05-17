@@ -54,6 +54,7 @@
 <script>
   export default {
     name: 'part-re-stock-form',
+    inject: ['initData'],
     props: {
       formdata: Object,
     },

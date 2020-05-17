@@ -1,78 +1,85 @@
-.el-table{
-  td, th{
-    padding: 8px 0;
+// pc项目迁移
+.page {
+  .el-table{
+    td, th{
+      padding: 8px 0;
+    }
   }
-}
-
-.el-checkbox{
-  margin: 0;
-}
-
-.el-input input{
-  padding: 0 8px;
-}
-
-.el-textarea textarea{
-  padding: 7px 10px;
-}
-
-.el-form label{
-  font-weight: 500;
-  color: #444;
-}
-
-.el-form-item:last-child{
-  margin-bottom: 0;
-}
-
-.el-select{
-  width: 100%;
-}
-
-a.el-button{
-  text-decoration: none;
-}
-
-.el-dialog{
-  .el-dialog__close{
-    font-size: 18px;
-    color: #666;
+  
+  .el-checkbox{
+    margin: 0;
+  }
+  
+  .el-input input{
+    padding: 0 8px;
+  }
+  
+  .el-textarea textarea{
+    padding: 7px 10px;
+  }
+  
+  .el-form label{
+    font-weight: 500;
+    color: #444;
   }
 
-  .el-dialog__header{
-    padding: 8px 10px;
-    border-bottom: 1px solid #f4f4f4;
+  .el-form-item{
+    margin-bottom: 0;
   }
-
-  .el-dialog__body{
-    padding: 10px;
+  
+  .el-form-item:last-child{
+    margin-bottom: 0;
   }
-
-  .el-dialog__footer{
-    border-top: 1px solid #f4f4f4;
+  
+  .el-select{
+    width: 100%;
   }
-}
-
-.el-date-editor {
-  padding: 3px 5px;
-
-  .el-range-separator{
-    line-height: 24px ;
-    box-sizing: content-box;
-    padding: 0 3px;
+  
+  a.el-button{
+    text-decoration: none;
   }
-
-  .el-input__icon{
-    line-height: 24px;
+  
+  .el-dialog{
+    .el-dialog__close{
+      font-size: 18px;
+      color: #666;
+    }
+  
+    .el-dialog__header{
+      padding: 8px 10px;
+      border-bottom: 1px solid #f4f4f4;
+    }
+  
+    .el-dialog__body{
+      padding: 10px;
+    }
+  
+    .el-dialog__footer{
+      border-top: 1px solid #f4f4f4;
+    }
   }
-}
-
-.el-date-editor--daterange.el-input__inner {
-  width: 350px !important;
-}
-
-.form-item {
+  
+  .el-date-editor {
+    padding: 3px 5px;
+  
+    .el-range-separator{
+      line-height: 24px ;
+      box-sizing: content-box;
+      padding: 0 3px;
+    }
+  
+    .el-input__icon{
+      line-height: 24px;
+    }
+  }
+  
   .el-date-editor--daterange.el-input__inner {
-    width: 100% !important;
+    width: 350px !important;
+  }
+  
+  .form-item {
+    .el-date-editor--daterange.el-input__inner {
+      width: 100% !important;
+    }
   }
 }

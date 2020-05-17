@@ -73,6 +73,7 @@ import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-applybatchin-form',
+  inject: ['initData'],
   props: {
     formdata: {
       type: Array,
@@ -117,14 +118,14 @@ export default {
           if(obj[i].number > 0){
             if(count != -1){
               if(count == 0) {
-                this.$platform.alert('请填写大于0的正整数')
+                this.$platform.toast('请填写大于0的正整数')
                 return
               } else {
-                this.$platform.alert(`请填写大于0的${ count }位小数`)
+                this.$platform.toast(`请填写大于0的${ count }位小数`)
                 return
               }
             }else if(obj[i].number > Number(this.variationNum(obj[i].variation, obj[i].solvedVariation))){
-              this.$platform.alert('通过数不能大于申请数')
+              this.$platform.toast('通过数不能大于申请数')
               return
             }else{
               let parm = {}
@@ -136,9 +137,9 @@ export default {
               parms.push(parm)
             }
           }else{
-            let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+            let initData = this.initData;
             let msg = initData.precision ? `请填写大于0的${ initData.precision }位小数` : '请填写大于0的整数'
-            this.$platform.alert(msg)
+            this.$platform.toast(msg)
             return
           }
         }
@@ -224,7 +225,7 @@ export default {
       ]
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       let count = MathUtil.decimalNumber(num);
       let isPartV2 = initData.isSparepart2;
 
@@ -240,7 +241,7 @@ export default {
   computed: {
     // TODO: 支持小数 提示
     minNumber () {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     }
   },
