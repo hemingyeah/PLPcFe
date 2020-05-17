@@ -109,7 +109,7 @@ export default {
       try {
         let number = this.form.number
         if( number < this.minVariation){
-          this.$platform.toast(`请填写大于${ this.minVariation }的数`)
+          this.$platform.alert(`请填写大于${ this.minVariation }的数`)
           return
         }
         let isSucc = await this.$refs.form.validate();

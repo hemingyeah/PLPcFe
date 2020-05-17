@@ -235,7 +235,7 @@
           });
 
           if(message){
-            this.$platform.toast(message)
+            this.$platform.alert(message)
             return null;
             // let initData = this.initData;
             // let msg = initData.precision ? `${ initData.precision }位小数` : '整数'
@@ -258,7 +258,7 @@
       },
       receive(data = [], userId = ''){
         if(data.length > 50){
-          return this.$platform.toast('单次最多支持调拨50个备件');
+          return this.$platform.alert('单次最多支持调拨50个备件');
         }
         data.forEach(item => this.add(item));
         this.userId = userId;

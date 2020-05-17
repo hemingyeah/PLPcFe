@@ -170,7 +170,7 @@ export default {
         })
 
         if(message){
-          this.$platform.toast(message)
+          this.$platform.alert(message)
           return null;
         } 
 
@@ -193,7 +193,7 @@ export default {
     },
     receive(data = [], userId = ''){
       if (data.length > 50){
-        return this.$platform.toast('单次最多支持入库50个备件');
+        return this.$platform.alert('单次最多支持入库50个备件');
       }
 
       data.forEach(item => this.add(item));

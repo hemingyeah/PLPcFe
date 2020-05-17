@@ -3,7 +3,6 @@ import Vue from '@src/common/entry';
 import http from '@src/util/http';
 import mtracker from '@src/util/mtracker';
 
-import BaseUpload from 'packages/BaseUpload';
 import BaseTimeline from 'packages/BaseTimeline';
 import BaseTimelineItem from 'packages/BaseTimelineItem';
 
@@ -12,7 +11,6 @@ import CategoryDetailView from './CategoryDetailView.vue';
 Vue.prototype.$http = http;
 mtracker();
 
-Vue.component(BaseUpload.name, BaseUpload);
 Vue.component(BaseTimeline.name, BaseTimeline);
 Vue.component(BaseTimelineItem.name, BaseTimelineItem);
 

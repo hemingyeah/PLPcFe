@@ -243,7 +243,7 @@
           this.$refs['ruleForm'].validate((valid) => {
             let num = this.ruleForm.repertoryCount;
             if (Number(this.ruleForm.sparesNum) > Number(num)) {
-              this.$platform.toast('分配数不能大于库存数');
+              this.$platform.alert('分配数不能大于库存数');
               return false
             }
             if (valid && (this.ruleForm.repertoryCount != '0')) {
@@ -254,7 +254,7 @@
 
             } else {
               if((this.ruleForm.repertoryCount == '0')) {
-                this.$platform.toast('库存数为0，暂时不能分配');
+                this.$platform.alert('库存数为0，暂时不能分配');
               }
               return false;
             }

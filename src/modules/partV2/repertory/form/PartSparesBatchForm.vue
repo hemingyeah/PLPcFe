@@ -153,7 +153,7 @@ export default {
     addPart() {
       if(this.form.length > 49){
         this.isAddBtnDisabled = true;
-        return this.$platform.toast('单次最多支持分配50个备件');
+        return this.$platform.alert('单次最多支持分配50个备件');
       }
       let row = this.add(null);
       this.form.push(row);
@@ -359,7 +359,7 @@ export default {
             message = message.slice(0, 4);
             message[message.length - 1] += '...'
           }
-          this.$platform.toast(message.join('\n'))
+          this.$platform.alert(message.join('\n'))
           return null;
         } 
         return form.map(item => ({
@@ -387,7 +387,7 @@ export default {
     },
     receive(data = [], userId = ''){
       if (data.length > 50) {
-        return this.$platform.toast('单次最多支持分配50个备件');
+        return this.$platform.alert('单次最多支持分配50个备件');
       }
 
       this.form = data.map(item => this.add(null, item));

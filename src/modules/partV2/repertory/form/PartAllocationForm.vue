@@ -128,15 +128,15 @@ export default {
         if(isSucc){
           let number = this.form.number
           if(number < this.minVariation){
-            this.$platform.toast(`请填写大于${ this.minVariation }的数`)
+            this.$platform.alert(`请填写大于${ this.minVariation }的数`)
             return
           }
           if(this.formdata.repertoryCount < number){
-            this.$platform.toast('调拨数不能大于库存数')
+            this.$platform.alert('调拨数不能大于库存数')
             return
           }
           if(!this.form.toRepertory){
-            this.$platform.toast('请选择目标库')
+            this.$platform.alert('请选择目标库')
             return ;
           } 
 

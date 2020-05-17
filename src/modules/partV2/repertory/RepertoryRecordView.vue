@@ -463,7 +463,7 @@ export default {
             })
             : this.$refs.table.clearSelection();
         })
-        return this.$platform.toast(`最多只能选择${this.selectedLimit}条数据`);
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.selected = tv;
 
@@ -532,7 +532,7 @@ export default {
       let ids = [];
 
       if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.toast('请选择要导出的数据');
+        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
         ids = this.selected.map(item => item.id);
       }
       

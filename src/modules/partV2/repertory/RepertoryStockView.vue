@@ -748,7 +748,7 @@ export default {
             })
             : this.$refs.table.clearSelection();
         })
-        return this.$platform.toast(`最多只能选择${this.selectedLimit}条数据`);
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.selected = tv;
 
@@ -790,11 +790,11 @@ export default {
     openDialogForSetSafetyStock(selected) {
       // permission granted
       if (!selected || !selected.length) {
-        return this.$platform.toast('请先勾选要设置安全库存的的备件');
+        return this.$platform.alert('请先勾选要设置安全库存的的备件');
       }
 
       if (selected.length > 50) {
-        return this.$platform.toast('单次最多为50个备件设置安全库存');
+        return this.$platform.alert('单次最多为50个备件设置安全库存');
       }
 
       this.formdata = [];
@@ -817,7 +817,7 @@ export default {
       repertoryNames = [...new Set(repertoryNames)];
 
       if (!this.formdata || !this.formdata.length && repertoryNames.length > 0) {
-        return this.$platform.toast(
+        return this.$platform.alert(
           `尚未给您分配"${repertoryNames.join(' ,')}"的管理员权限，请联系管理员或到备件库管理中设置`
         );
       }
@@ -863,7 +863,7 @@ export default {
           this.$platform.toast('更新库存安全值成功');
           this.safetyStockDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
       } catch (e) {
         console.error(e);
@@ -898,7 +898,7 @@ export default {
       let ids = [];
 
       if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.toast('请选择要导出的数据');
+        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
         ids = this.selected.map(item => item.id);
       }
       
@@ -1057,7 +1057,7 @@ export default {
     // 出库（单次）
     outstock(value,num) {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
       this.outstockDialog = true;
@@ -1067,7 +1067,7 @@ export default {
     // 入库（单次）
     instock(value,num) {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
       this.instockDialog = true;
@@ -1077,7 +1077,7 @@ export default {
     // allocation
     allocation(value) {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
       this.allocationDialog = true;
@@ -1096,7 +1096,7 @@ export default {
           this.$platform.toast(`${result.data ? '调拨成功，请等待备件库管理员处理' : '调拨成功'}`).then(() => location.reload());
           this.allocationDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1122,7 +1122,7 @@ export default {
           this.$platform.toast('申领成功，请等待备件库管理员处理').then(() => location.reload());
           this.applyDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1143,7 +1143,7 @@ export default {
           this.$platform.toast('出库成功').then(() => location.reload());
           this.outstockDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
       } catch (error) {
         console.log(error)
@@ -1154,14 +1154,14 @@ export default {
     // 支持从列表选中数据
     outstockBatch(value) {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }   
       let { status, message } = this.judgeSelectManager();
       let isSucc = (status == 0);
 
       if(!isSucc) {
-        return this.$platform.toast(message);
+        return this.$platform.alert(message);
       }
 
       let data = this.selected.filter(item => this.allowInOutStore(item));    
@@ -1200,7 +1200,7 @@ export default {
         }
 
         if(message.length > 0){
-          return this.$platform.toast(message.join('\n'));
+          return this.$platform.alert(message.join('\n'));
         }
 
         try {
@@ -1211,14 +1211,14 @@ export default {
           if(result.status == 0){
             this.$platform.toast('移除成功').then(() => location.reload());
           }else{
-            this.$platform.toast(result.message);
+            this.$platform.alert(result.message);
           }
         } catch (error) {
           console.log(error)
         }
         this.pending = false;
       }else{
-        this.$platform.toast('请先勾选要移除的备件');
+        this.$platform.alert('请先勾选要移除的备件');
       }
     },
     //出库（批量）
@@ -1238,7 +1238,7 @@ export default {
           this.$platform.toast('批量出库成功').then(() => location.reload());
           this.outstockBatchDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
       } catch (error) {
         console.log(error)
@@ -1258,7 +1258,7 @@ export default {
           this.$platform.toast('入库成功').then(() => location.reload());
           this.instockDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1270,7 +1270,7 @@ export default {
     transferBatch() {
       // 权限判断
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
 
@@ -1278,7 +1278,7 @@ export default {
       let isSucc = (status == 0);
 
       if(!isSucc) {
-        return this.$platform.toast(message);
+        return this.$platform.alert(message);
       }
 
       // 为仓库管理员或者管理员为空
@@ -1315,7 +1315,7 @@ export default {
           this.$platform.toast('批量调拨成功').then(() => location.reload());
           this.transferBatchDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1327,7 +1327,7 @@ export default {
     // 支持从列表选中数据
     instockBatch() {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
 
@@ -1335,7 +1335,7 @@ export default {
       let isSucc = (status == 0);
 
       if(!isSucc) {
-        return this.$platform.toast(message);
+        return this.$platform.alert(message);
       }
 
       let data = this.selected.filter(item => this.allowInOutStore(item));
@@ -1359,7 +1359,7 @@ export default {
           this.$platform.toast('批量入库成功').then(() => location.reload());
           this.instockBatchDialog = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1401,7 +1401,7 @@ export default {
           this.isPartSparesDialog = false;
 
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
       } catch (e) {
         console.error(e);
@@ -1412,7 +1412,7 @@ export default {
     // 分配 批量 (弹窗)
     partSparesBatchDialog() {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
 
@@ -1420,7 +1420,7 @@ export default {
       let isSucc = (status == 0);
 
       if(!isSucc) {
-        return this.$platform.toast(message);
+        return this.$platform.alert(message);
       }
 
       let data = this.selected.filter(item => this.allowInOutStore(item));
@@ -1441,7 +1441,7 @@ export default {
         return
       }
       if(partSparesData.length < 1) {
-        this.$platform.toast('请先添加数据');
+        this.$platform.alert('请先添加数据');
         this.pending = false;
         return
       } 
@@ -1461,7 +1461,7 @@ export default {
           });
 
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
           this.pending = false;
         }
       } catch (e) {

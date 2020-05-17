@@ -115,11 +115,11 @@ export default {
       try {
         let number = this.form.number;
         if(number < this.minVariation){
-          this.$platform.toast(`请填写大于${ this.minVariation }的数`);
+          this.$platform.alert(`请填写大于${ this.minVariation }的数`);
           return
         }
         if(this.formdata.repertoryCount < number){
-          this.$platform.toast('出库数不能大于库存数');
+          this.$platform.alert('出库数不能大于库存数');
           return
         }
         let isSucc = await this.$refs.form.validate();

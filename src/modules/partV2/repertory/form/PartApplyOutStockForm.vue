@@ -132,11 +132,11 @@ export default {
     
     async pack(){
       if(this.form.number <= 0){
-        this.$platform.toast('出库数必须为大0的数')
+        this.$platform.alert('出库数必须为大0的数')
         return
       }
       if(this.form.number > Number(this.variationNum())){
-        this.$platform.toast('出库数不能大于申请数');
+        this.$platform.alert('出库数不能大于申请数');
         return
       }
       try {

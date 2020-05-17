@@ -118,14 +118,14 @@ export default {
           if(obj[i].number > 0){
             if(count != -1){
               if(count == 0) {
-                this.$platform.toast('请填写大于0的正整数')
+                this.$platform.alert('请填写大于0的正整数')
                 return
               } else {
-                this.$platform.toast(`请填写大于0的${ count }位小数`)
+                this.$platform.alert(`请填写大于0的${ count }位小数`)
                 return
               }
             }else if(obj[i].number > Number(this.variationNum(obj[i].variation, obj[i].solvedVariation))){
-              this.$platform.toast('通过数不能大于申请数')
+              this.$platform.alert('通过数不能大于申请数')
               return
             }else{
               let parm = {}
@@ -139,7 +139,7 @@ export default {
           }else{
             let initData = this.initData;
             let msg = initData.precision ? `请填写大于0的${ initData.precision }位小数` : '请填写大于0的整数'
-            this.$platform.toast(msg)
+            this.$platform.alert(msg)
             return
           }
         }

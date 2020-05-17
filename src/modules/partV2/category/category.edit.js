@@ -2,11 +2,8 @@ import Vue from '@src/common/entry';
 import http from '@src/util/http';
 import mtracker from '@src/util/mtracker';
 
-import BaseUpload from 'packages/BaseUpload';
 import CategoryEditView from './CategoryEditView.vue';
 
-
-Vue.component(BaseUpload.name, BaseUpload);
 Vue.prototype.$http = http;
 mtracker();
 

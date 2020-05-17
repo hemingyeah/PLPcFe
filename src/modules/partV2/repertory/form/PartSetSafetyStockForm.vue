@@ -143,7 +143,7 @@
             }
           }
           if(msg) {
-            this.$platform.toast(msg)
+            this.$platform.alert(msg)
             return null;
           }
 

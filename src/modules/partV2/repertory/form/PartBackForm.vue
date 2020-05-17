@@ -146,10 +146,10 @@ export default {
 
         if(result.status == 0){
           this.$emit('success')
-          this.$platform.toast('请求已提交，请等待备件库管理员处理');
+          this.$platform.alert('请求已提交，请等待备件库管理员处理');
           this.visible = false;
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
       } catch (error) {
         console.log(error)

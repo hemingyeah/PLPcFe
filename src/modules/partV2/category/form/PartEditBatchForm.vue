@@ -63,17 +63,17 @@
         try {
           let params = this.form;
           if (!params.field) {
-            this.$platform.toast('想要修改的字段不能为空');
+            this.$platform.alert('想要修改的字段不能为空');
             return
           }
           if (!params.value) {
-            this.$platform.toast('字段的新值不能为空');
+            this.$platform.alert('字段的新值不能为空');
             return
           }
           if ((params.field === 'salePrice' || params.field === 'costPrice') &&
           Number(params.value) < 0
           ) {
-            this.$platform.toast('价格不能为负数');
+            this.$platform.alert('价格不能为负数');
             return
           }
           return params;

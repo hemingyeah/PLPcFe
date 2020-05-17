@@ -124,16 +124,16 @@ export default {
   methods: {
     async pack(){
       if(this.form.number <= 0){
-        this.$platform.toast('入库数必须为大于0的数')
+        this.$platform.alert('入库数必须为大于0的数')
         return
       }
       if(this.form.number > Number(this.variationNum())){
-        this.$platform.toast('入库数不能大于申请数');
+        this.$platform.alert('入库数不能大于申请数');
         return
       }
 
       if(!this.form.repertoryId){
-        this.$platform.toast('请选择要入库的仓库')
+        this.$platform.alert('请选择要入库的仓库')
         return;
       }
 

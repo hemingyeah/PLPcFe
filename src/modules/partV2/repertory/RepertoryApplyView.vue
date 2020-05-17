@@ -762,7 +762,7 @@ export default {
       let fileName = `${DateUtil.format(new Date(),'yyyy-MM-dd')}备件办理出入库数据.xlsx`;
 
       if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.toast('请选择要导出的数据');
+        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
         ids = this.selected.map(item => item.id);
       }
 
@@ -858,7 +858,7 @@ export default {
       })
     },
     exportData(){
-      this.$platform.toast('export')
+      this.$platform.alert('export')
     },
     // select part
     handleSelection(selection) {
@@ -877,7 +877,7 @@ export default {
             })
             : this.$refs.table.clearSelection();
         })
-        return this.$platform.toast(`最多只能选择${this.selectedLimit}条数据`);
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.selected = tv;
 
@@ -1254,7 +1254,7 @@ export default {
           this.loadData();
 
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1276,7 +1276,7 @@ export default {
           this.outstockDialog = false;
           this.loadData()
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1297,7 +1297,7 @@ export default {
           this.backstockDialog = false;
           this.loadData()
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
       } catch (error) {
         console.log(error)
@@ -1318,7 +1318,7 @@ export default {
           this.instockDialog = false;
           this.loadData()
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1339,7 +1339,7 @@ export default {
           this.outstockBatchDialog = false;
           this.loadData();
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1360,7 +1360,7 @@ export default {
           this.instockBatchDialog = false;
           this.loadData()
         }else{
-          this.$platform.toast(result.message);
+          this.$platform.alert(result.message);
         }
 
       } catch (error) {
@@ -1371,11 +1371,11 @@ export default {
     // 出库（批量）
     outstockBatch(value) {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
       if(value.length < 1){
-        this.$platform.toast('请先勾选要批量操作的备件');
+        this.$platform.alert('请先勾选要批量操作的备件');
         return
       }
       if(!this.isPersonalRepertory) {
@@ -1384,7 +1384,7 @@ export default {
 
       for (let i = 0; i < value.length;i++) {
         if(value[i].type == '退回' || value[i].type == '分配' || value[i].state != 'suspending') {
-          this.$platform.toast('请先结合高级搜索中筛选条件确保已勾选备件类别为【申领】且状态为【待办理】，再进行批量操作');
+          this.$platform.alert('请先结合高级搜索中筛选条件确保已勾选备件类别为【申领】且状态为【待办理】，再进行批量操作');
           return
         }
       }
@@ -1394,11 +1394,11 @@ export default {
     // 入库（批量）
     instockBatch(value) {
       if(!this.allowInout){
-        this.$platform.toast('对不起，您没有该操作权限');
+        this.$platform.alert('对不起，您没有该操作权限');
         return
       }
       if(value.length < 1){
-        this.$platform.toast('请先勾选要批量操作的备件');
+        this.$platform.alert('请先勾选要批量操作的备件');
         return
       }
       if(!this.isPersonalRepertory) {
@@ -1406,7 +1406,7 @@ export default {
       }
       for (let i = 0; i < value.length;i++) {
         if(value[i].type == '申领' || value[i].type == '分配' || value[i].state != 'suspending') {
-          this.$platform.toast('请先结合高级搜索中筛选条件确保已勾选备件类别为【退回】且状态为【待办理】，再进行批量操作'); 
+          this.$platform.alert('请先结合高级搜索中筛选条件确保已勾选备件类别为【退回】且状态为【待办理】，再进行批量操作'); 
           return
         }
       }
@@ -1553,7 +1553,7 @@ export default {
       return columns;
     },
     personalRepertoryNotMeaage() {
-      return this.$platform.toast('个人备件库功能已经关闭，需系统管理员开启个人备件库功能(系统管理-备件库管理)后继续操作。');
+      return this.$platform.alert('个人备件库功能已经关闭，需系统管理员开启个人备件库功能(系统管理-备件库管理)后继续操作。');
     },
     // TalkingData事件埋点
     trackEventhandler (type) {
