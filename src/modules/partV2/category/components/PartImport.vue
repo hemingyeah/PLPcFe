@@ -42,7 +42,7 @@
 import Uploader from 'packages/BaseUpload/uploader';
 import Platform from '@src/util/Platform';
 import http from '@src/util/HttpUtil';
-import DateUtil from '@src/util/DateUtil';  
+import DateUtil from '@src/util/date';  
 
 export default {
   name: 'part-import',

@@ -1,18 +1,14 @@
-import 'src/assets/scss/index.scss'
-
-import BaseUpload from 'packages/BaseUpload';
-
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
-import CategoryEditView from './CategoryEditView.vue';
-import component from '../../../component';
-
-
 import mtracker from '@src/util/mtracker';
 
-Vue.prototype.$http = http;
+import BaseUpload from 'packages/BaseUpload';
+import CategoryEditView from './CategoryEditView.vue';
+
+
 Vue.component(BaseUpload.name, BaseUpload);
-Vue.use(component);
+Vue.prototype.$http = http;
+mtracker();
 
 // 处理注入的参数
 let initData = {};

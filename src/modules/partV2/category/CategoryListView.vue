@@ -299,8 +299,8 @@
 <script>
 import _ from 'lodash';
 import Page from "@src/model/Page";
-import AuthUtil from '@src/util/AuthUtil';
-import DateUtil from '@src/util/DateUtil';  
+import AuthUtil from '@src/util/auth';
+import DateUtil from '@src/util/date';  
 import StorageUtil from '@src/util/StorageUtil';
 import PartEditBatchForm from './form/PartEditBatchForm.vue';
 import PartImport from './components/PartImport.vue';

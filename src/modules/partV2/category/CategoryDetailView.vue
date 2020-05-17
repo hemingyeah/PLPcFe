@@ -137,7 +137,7 @@
 import $ from 'jQuery';
 import _ from 'lodash';
 import qs from '@src/util/QueryString';
-import AuthUtil from '@src/util/AuthUtil';
+import AuthUtil from '@src/util/auth';
 
 import Page from '@src/model/Page';
 

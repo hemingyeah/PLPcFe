@@ -42,7 +42,7 @@
 
 
 <script>
-import MathUtil from '@src/util/MathUtil';
+import MathUtil from '@src/util/math';
 
 export default {
   name: 'part-outstock-form',

@@ -44,6 +44,8 @@ $--select-border-color-hover: $input-border-hover-color !default;
 @import "~shb-element-ui/packages/theme-chalk/src/dialog.scss";
 @import "~shb-element-ui/packages/theme-chalk/src/tabs.scss";
 @import "~shb-element-ui/packages/theme-chalk/src/tab-pane.scss";
+@import "~shb-element-ui/packages/theme-chalk/src/row.scss";
+@import "~shb-element-ui/packages/theme-chalk/src/option-group.scss";
 
 .el-input__inner{
   padding-left: 10px;

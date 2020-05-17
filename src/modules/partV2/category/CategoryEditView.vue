@@ -62,7 +62,7 @@
 <script>
 import BaseGallery from 'packages/BaseGallery/index';
 import qs from '@src/util/QueryString';
-import AuthUtil from '@src/util/AuthUtil';
+import AuthUtil from '@src/util/auth';
 import _ from 'lodash';
         
 export default {

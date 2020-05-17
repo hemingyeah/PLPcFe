@@ -483,20 +483,20 @@
                 <!-- 分配 -->
                 <template v-if="scope.row.state == 'suspending' && scope.row.type =='分配'">
                   <el-tooltip class="item" effect="dark" content="当前状态为个人库未接受状态" placement="bottom">
-                    <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="00"> 待入库</el-button>
+                    <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="00"> 待入库</el-button>
                   </el-tooltip>
                   <!-- 当前用户与目标库用户 一直 并且 待办理数大于0 -->
                   <el-button key="11" v-if="userId == scope.row.targetId && scope.row._variation > 0" type="text" class="no-padding" @click="receiveAndRejectDialog(scope.row, '0')">接收</el-button>
                   <el-button key="22" v-if="userId == scope.row.targetId && scope.row._variation > 0" type="text" class="no-padding" @click="receiveAndRejectDialog(scope.row, '1')" style="margin-left: 15px">拒收</el-button>
                 </template>
                 <template v-if="scope.row.state == 'solved' && scope.row.type =='分配'">
-                  <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="33"> 已入库</el-button>
+                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="33"> 已入库</el-button>
                 </template>
                 <template v-if="scope.row.state == 'revoked' && scope.row.type =='分配'">
-                  <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="44"> 已撤回</el-button>
+                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="44"> 已撤回</el-button>
                 </template>
                 <template v-if="scope.row.state == 'rejected' && scope.row.type =='分配'">
-                  <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="55"> 已退回</el-button>
+                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="55"> 已退回</el-button>
                 </template>
               </template>
             </el-table-column>
@@ -607,8 +607,8 @@
 <script>
 import _ from 'lodash';
 import Page from "../../../model/Page";
-import DateUtil from '@src/util/DateUtil'
-import AuthUtil from '@src/util/AuthUtil';
+import DateUtil from '@src/util/date'
+import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/StorageUtil';
 
 import PartBackForm from './form/PartBackForm.vue';  
@@ -626,6 +626,7 @@ const STORAGE_PROCESS_PAGESIZE_KEY = 'repe_person_list_process_pagesize';
 
 export default {
   name: 'sparepartRepertory-person-view',
+  inject: ['initData'],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PART_PAGESIZE_KEY) || 10;
 
@@ -1682,7 +1683,7 @@ export default {
     }
   },
   created(){
-    let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+    let initData = this.initData;
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || {};
     this.userId = initData.userId;

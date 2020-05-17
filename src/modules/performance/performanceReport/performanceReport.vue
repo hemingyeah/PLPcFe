@@ -91,7 +91,7 @@
 import queryString from '../../../util/QueryString';
 import errorMsg from '../common/errorMsg';
 import ReportDetil from './ReportDetil.vue';
-import DateUtil from '../../../util/DateUtil';
+import DateUtil from '../../../util/date';
 import qs from '../../../util/QueryString';
 export default {
   data(){

@@ -6,7 +6,7 @@ import "echarts/lib/component/calendar";
 import "echarts/lib/chart/scatter";
 import "echarts/lib/chart/pie";
 
-import DateUtil from 'src/util/DateUtil';
+import DateUtil from 'src/util/date';
 
 let cellSize = [64, 64];
 let pieRadius = 20;

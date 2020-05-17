@@ -35,7 +35,7 @@
 /*global AMap, moment, _init_data*/
 import $ from "jQuery";
 import qs from 'src/util/QueryString';
-import AuthUtil from 'src/util/AuthUtil';
+import AuthUtil from 'src/util/auth';
 import StatsPartStock from './StatsPartStock.vue'
 import StatsPartUse from './StatsPartUse.vue'
 

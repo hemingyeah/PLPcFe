@@ -326,8 +326,8 @@
 import _ from 'lodash';
 import qs from '@src/util/QueryString';
 import Page from "../../../model/Page";
-import DateUtil from '@src/util/DateUtil';
-import AuthUtil from '@src/util/AuthUtil';
+import DateUtil from '@src/util/date';
+import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/StorageUtil';
 
 const STORAGE_COLNUM_KEY = 'repe_record_list_column';
@@ -335,6 +335,7 @@ const STORAGE_PAGESIZE_KEY = 'repe_record_list_pagesize';
 
 export default {
   name: 'repertory-record-view',
+  inject: ['initData'],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
 
@@ -823,7 +824,7 @@ export default {
     }
   },
   async created(){
-    let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+    let initData = this.initData;
 
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || [];

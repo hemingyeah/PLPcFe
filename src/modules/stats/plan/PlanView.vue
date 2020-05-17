@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import DateUtil from "src/util/DateUtil";
+import DateUtil from "src/util/date";
 import http from 'src/util/HttpUtil';       
 
 import TaskStateEnum from 'src/model/enum/TaskStateEnum'

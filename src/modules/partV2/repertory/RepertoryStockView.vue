@@ -228,11 +228,11 @@
               <template v-if="scope.row.repertory">{{scope.row.repertory.type}}</template>
             </template>
             <template v-else-if="column.field == 'operate'" slot-scope="scope">
-              <el-button @click="outstock(scope.row);tableTrackEventHandler('outStock')" type="text" class="no-padding" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">出库</el-button>
-              <el-button @click="instock(scope.row);tableTrackEventHandler('inStock')" type="text" class="no-padding" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">入库</el-button>
-              <el-button @click="allocation(scope.row);tableTrackEventHandler('allocation')" type="text" class="no-padding" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">调拨</el-button>
-              <el-button @click="partSparesDialog(scope.row);tableTrackEventHandler('spare')" type="text" class="no-padding" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isPersonalRepertory !== false">分配</el-button>
-              <el-button @click="apply(scope.row);tableTrackEventHandler('apply')" type="text" class="no-padding" v-if="isEnableSparePart(scope.row) && allowApply">申领</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="outstock(scope.row);tableTrackEventHandler('outStock')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">出库</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="instock(scope.row);tableTrackEventHandler('inStock')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">入库</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="allocation(scope.row);tableTrackEventHandler('allocation')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">调拨</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="partSparesDialog(scope.row);tableTrackEventHandler('spare')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isPersonalRepertory !== false">分配</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="apply(scope.row);tableTrackEventHandler('apply')" v-if="isEnableSparePart(scope.row) && allowApply">申领</el-button>
             </template>
             <template v-else>
               {{scope.row[column.field]}}
@@ -539,8 +539,8 @@ import PartSparesBatchForm from "./form/PartSparesBatchForm.vue";
 import PartBatchTransfer from './form/PartBatchTransfer.vue';
 import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
 
-import DateUtil from '@src/util/DateUtil'
-import AuthUtil from '@src/util/AuthUtil';
+import DateUtil from '@src/util/date'
+import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/StorageUtil';
 
 
@@ -548,7 +548,8 @@ const STORAGE_COLNUM_KEY = 'repertory_list_column';
 const STORAGE_PAGESIZE_KEY = 'repertory_list_pagesize';
 
 export default {
-  name: 'part-list-view',
+  name: 'part-stock-view',
+  inject: ['initData'],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
     let originModel = {
@@ -1675,7 +1676,7 @@ export default {
     }
   },
   mounted(){
-    let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+    let initData = this.initData;
 
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || {};

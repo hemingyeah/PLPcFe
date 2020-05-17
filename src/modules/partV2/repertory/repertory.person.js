@@ -1,45 +1,40 @@
-// import '../../../../resource/component/css/component_v2_pc.css'
-import Vue from 'vue';
+import Vue from '@src/common/entry';
+import http from '@src/util/http';
+import mtracker from '@src/util/mtracker';
 
-import 'packages/ElementUI'
-import '../../../../src/assets/scss/index.scss'
-import component from '../../../component';
 import BaseCollapsePanel from 'packages/BaseCollapsePanel';
 import BaseExport from 'packages/BaseExport';
-import BasePanel from 'packages/BasePanel';
-import BaseSelectionBar from 'packages/BaseSelectionBar';
-import directive from '../../../directive';
-
-import Platform from '@src/util/Platform';
-import Http from '@src/util/HttpUtil';
-
-//copy了resource整体文件夹
-// import BizTeamSelect from '../../../../resource/component/component_v2_pc.js'
+import * as math from 'mathjs';
 
 import RepertoryPersonView from './RepertoryPersonView.vue';
 
-
-import * as mtracker from '../../../util/Mtrackers';
-import * as math from 'mathjs';
-
-mtracker.initializeTalkingData();
-
-Vue.use(component)
-Vue.use(BizTeamSelect)
-Vue.use(directive)
 Vue.component(BaseCollapsePanel.name, BaseCollapsePanel);
 Vue.component(BaseExport.name, BaseExport);
-Vue.component(BasePanel.name, BasePanel);
-Vue.component(BaseSelectionBar.name, BaseSelectionBar);
 
-Vue.prototype.$platform = Platform;
-Vue.prototype.$http = Http;
-Vue.prototype.$tdOnEvent = mtracker.onEvent;
+Vue.prototype.$tdOnEvent = function () {
+
+};
 Vue.prototype.$math = math;
+Vue.prototype.$http = http;
+mtracker();
+
+// 处理注入的参数
+let initData = {};
+
+try {
+  initData = typeof window._init == 'string' ? JSON.parse(window._init || '{}') : window._init;
+} catch (error) {
+  console.error(error)
+  console.error('no init data')
+}
 
 const app = new Vue({
-    el: "#app",
-    render: h => h(RepertoryPersonView)
+  el: '#app',
+  provide: {
+    initData: Object.freeze(initData)
+  },
+  render: h => h(RepertoryPersonView)
 });
+
 
 export default app;

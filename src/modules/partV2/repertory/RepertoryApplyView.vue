@@ -385,51 +385,51 @@
             <template v-else-if="column.field == 'enable'" slot-scope="scope">
               <template v-if="scope.row.type !== '调拨'">
                 <template v-if="scope.row.state == 'solved' && scope.row.type !='分配'">
-                  <el-button v-if="scope.row.type === '申领'" type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="0"> 已出库</el-button>
-                  <el-button v-else-if="scope.row.type === '退回'" type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="0"> 已入库</el-button>
-                  <el-button v-else type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="0"> 已办理</el-button>
+                  <el-button v-if="scope.row.type === '申领'" type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="0"> 已出库</el-button>
+                  <el-button v-else-if="scope.row.type === '退回'" type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="0"> 已入库</el-button>
+                  <el-button v-else type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="0"> 已办理</el-button>
                 </template>
                 <template v-if="scope.row.state == 'cancel' && scope.row.type !='分配'">
-                  <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="1"> 已拒绝</el-button>
+                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="1"> 已拒绝</el-button>
                 </template>
 
                 <template v-if="allowInout && scope.row.state == 'suspending' && scope.row.type !='分配'">
                   <template v-if="scope.row.type == '申领' ">
-                    <el-button @click="outstock(scope.row);tableTrackEventHandler('stock-out')" type="text" size="" class="no-padding" key="2"> 办理出库</el-button>
+                    <el-button @click="outstock(scope.row);tableTrackEventHandler('stock-out')" type="text" size="medium" class="no-padding" key="2"> 办理出库</el-button>
                   </template>
                   <template v-if="scope.row.type == '退回' ">
-                    <el-button @click="instock(scope.row)" type="text" size="" class="no-padding" key="3"> 办理入库</el-button>
+                    <el-button @click="instock(scope.row)" type="text" size="medium" class="no-padding" key="3"> 办理入库</el-button>
                   </template>
                   <template>
-                    <el-button @click="backstock(scope.row);tableTrackEventHandler('reject')" type="text" size="" class="no-padding" key="4"> 拒绝</el-button>
+                    <el-button @click="backstock(scope.row);tableTrackEventHandler('reject')" type="text" size="medium" class="no-padding" key="4"> 拒绝</el-button>
                   </template>
                 </template>
                 <!-- 分配 -->
                 <template v-if="scope.row.state == 'suspending' && scope.row.type =='分配'">
                   <el-tooltip class="item" effect="dark" content="当前状态为个人库未接受状态" placement="bottom">
-                    <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="5"> 待入库</el-button>
+                    <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="5"> 待入库</el-button>
                   </el-tooltip>
-                  <el-button @click="reStockOpenDialog(scope.row)" type="text" size="" class="no-padding" key="6"> 撤回</el-button>
+                  <el-button @click="reStockOpenDialog(scope.row)" type="text" size="medium" class="no-padding" key="6"> 撤回</el-button>
                 </template>
                 <template v-if="scope.row.state == 'solved' && scope.row.type =='分配'">
-                  <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="7"> 已入库</el-button>
+                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="7"> 已入库</el-button>
                 </template>
                 <template v-if="scope.row.state == 'revoked' && (scope.row.type =='分配' || scope.row.type =='申领')">
-                  <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="8"> 已撤回</el-button>
+                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="8"> 已撤回</el-button>
                 </template>
                 <template v-if="scope.row.state == 'rejected' && scope.row.type =='分配'">
-                  <el-button type="text" size="" class="no-padding" style="color:#333;cursor: text;" key="9"> 已退回</el-button>
+                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="9"> 已退回</el-button>
                 </template>
               </template>
               <!-- 调拨 -->
               <template v-if="scope.row.type === '调拨'">
                 <template v-if="scope.row.state === 'suspending'">
                   <template v-if="scope.row.isOriginalRepertoryManager">
-                    <el-button type="text" @click="openCancelTransferDialog(scope.row)">撤回</el-button>
+                    <el-button type="text" size="medium" @click="openCancelTransferDialog(scope.row)">撤回</el-button>
                   </template>
                   <template v-if="scope.row.isTargetRepertoryManager">
-                    <el-button type="text" @click="openTransferDialog(scope.row, 0)">拒绝</el-button>
-                    <el-button type="text" @click="openTransferDialog(scope.row, 1)">接收</el-button>
+                    <el-button type="text" size="medium" @click="openTransferDialog(scope.row, 0)">拒绝</el-button>
+                    <el-button type="text" size="medium" @click="openTransferDialog(scope.row, 1)">接收</el-button>
                   </template>
                 </template>
                 <template v-if="scope.row.state === 'revoked'">
@@ -629,15 +629,16 @@ import PartReStockForm from './form/PartReStockForm.vue';
 import PartCancelTransferForm from './form/PartCancelTransferForm.vue';
 import PartTransferForm from './form/PartTransferForm.vue';
 
-import DateUtil from '@src/util/DateUtil';
-import AuthUtil from '@src/util/AuthUtil';
-import StorageUtil from '@src/util/StorageUtil';
+import DateUtil from '@src/util/date';
+import AuthUtil from '@src/util/auth';
+import StorageUtil from '@src/util/storageUtil';
 
 const STORAGE_COLNUM_KEY = 'repe_apply_list_column';
 const STORAGE_PAGESIZE_KEY = 'repe_apply_list_pagesize';
 
 export default {
-  name: 'part-list-view',
+  name: 'part-apply-view',
+  inject: ['initData'],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
 
@@ -727,7 +728,6 @@ export default {
       timeValue: '',
       updateTimeValue:'',
       isPersonalRepertory: false,
-      initData: {}
     }
   },
   computed: {
@@ -1620,8 +1620,8 @@ export default {
     }
   },
   mounted(){
-    let initData = JSON.parse(JSON.stringify(window._init_data || {}));
-    this.initData = initData;
+    let initData = this.initData;
+    
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || {};
     this.userId = initData.userId || '';

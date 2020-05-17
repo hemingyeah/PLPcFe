@@ -48,7 +48,7 @@
 
 <script>
 import qs from '../../../util/QueryString';
-import DateUtil from '../../../util/DateUtil'
+import DateUtil from '../../../util/date'
 export default {
   data(){
     return {

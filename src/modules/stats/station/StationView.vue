@@ -46,7 +46,7 @@
 <script>
 import http from 'src/util/HttpUtil';
 import qs from 'src/util/QueryString';
-import DateUtil from 'src/util/DateUtil';
+import DateUtil from 'src/util/date';
 import StationChart from './StationChart.vue';
 import StationTable from './StationTable.vue';
 

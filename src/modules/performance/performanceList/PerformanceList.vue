@@ -172,7 +172,7 @@ import errMsg from '../common/errorMsg';
 import ReportStaMode from './ReportStaMode.vue';
 import AddReportSucc from './AddReportSucc.vue';
 import _ from 'lodash';
-import DateUtil from '../../../util/DateUtil'
+import DateUtil from '../../../util/date'
 const STORAGE_COLNUM_KEY = 'category_list_column';
 export default {
   data(){
