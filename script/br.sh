@@ -14,7 +14,7 @@ if [[ -z $1 ]] || [[ $1 == "m" ]]; then
 fi
 
 if [ "$1" == "h" ]; then
-    root="/Users/hbc/SHB/"
+    root="/Users/huangbaocheng/SHB/fontend/"
 fi
 
 echo $root
