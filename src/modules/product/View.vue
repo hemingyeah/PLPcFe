@@ -74,9 +74,7 @@
           <template slot="customer" slot-scope="{value}">
             <div class="form-view-row" v-if="value">
               <label>客户</label>
-              <div class="form-view-row-content link" @click="openCustomer">
-                {{product.customerName}}
-              </div>
+              <div class="form-view-row-content link" @click="openCustomer">{{product.customerName}}</div>
             </div>
           </template>
 
