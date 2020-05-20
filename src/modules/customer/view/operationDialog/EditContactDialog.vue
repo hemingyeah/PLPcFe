@@ -50,10 +50,6 @@ export default {
       default: () => ({})
     },
     isPhoneUnique: Boolean,
-    customerType: {
-      type: String,
-      default: "default"
-    }
   },
   data() {
     return {
@@ -311,10 +307,7 @@ export default {
     fetchAddress() {
       return this.$http
         .get("/customer/address/list", {
-          customerId:
-            this.customerType === "default"
-              ? this.customer.id
-              : this.form.customId,
+          customerId: this.customer.id,
           pageSize: 100000,
           pageNum: 1
         })
@@ -337,10 +330,7 @@ export default {
     fetchProducts() {
       return this.$http
         .get("/customer/product/list", {
-          customerId:
-            this.customerType === "default"
-              ? this.customer.id
-              : this.form.customId,
+          customerId: this.customer.id,
           pageSize: 100000,
           pageNum: 1
         })

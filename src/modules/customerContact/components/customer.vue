@@ -157,7 +157,7 @@
                 <i class="iconfont icon-weixin1 color-green font-16"></i>
               </el-tooltip>
             </template>
-            <template v-else-if="column.field === 'addr'">{{ transhForm(scope.row)}}</template>
+            <template v-else-if="column.field === 'esProductEntities'">{{ transhForm(scope.row)}}</template>
 
             <template
               v-else-if="column.field === 'createUser'"
@@ -1014,13 +1014,13 @@ export default {
   },
   methods: {
     transhForm(data) {
-      let str = "";
+      let str = [];
       if (data && data.length > 0) {
         data.forEach(res => {
-          str += res.name;
+          str.push(res.name);
         });
       }
-      return str;
+      return str.join(",");
     },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");

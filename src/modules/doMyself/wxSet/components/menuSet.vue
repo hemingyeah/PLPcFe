@@ -5,7 +5,7 @@
       <a
         class="color-b"
         href="/setting/serviceStation/customerPortal#protalUrl"
-      >客户自助门户</a>内的链接嵌入到您的公众号菜单。</br>在配置公众号菜单前，请先确认您的公众号已经经过认证
+      >客户自助门户</a>内的链接嵌入到您的公众号菜单。<br />在配置公众号菜单前，请先确认您的公众号已经经过认证
     </p>
     <div class="set-box">
       <!-- box-left start -->
@@ -307,9 +307,9 @@ export default {
     draggable
   },
   props: {
-    urlObj: {
-      type: Object,
-      default: () => ({})
+    menuArr: {
+      type: Array,
+      default: () => []
     }
   },
   watch: {
@@ -389,9 +389,8 @@ export default {
     }
   },
   mounted() {
-    if (this.menu_arr.length <= 0) {
-      this.getMenuList();
-    }
+    this.menu_arr = this.menuArr;
+    menu_arr_stash = this.menuArr;
   },
   methods: {
     wxMenuChange(data = []) {
@@ -561,7 +560,7 @@ export default {
     filerArrByMenuType(res) {
       let obj = {
         售后宝功能: {
-          url: this.urlObj[res.menuTypeArr] || "https://www.baidu.com", // 后台自己填数据
+          url: "", // 后台自己填数据
           config_url: res.config_url,
           input_url: "",
           type: "view",
@@ -604,6 +603,7 @@ export default {
                   if (res_.success) {
                     this.menu_arr = res;
                     menu_arr_stash = _.cloneDeep(res);
+                    this.$emit("changeMenuArr", res);
                     this.$emit("pageLoading", false);
                   } else {
                     this.$platform.alert(res_.message);
@@ -689,10 +689,10 @@ export default {
             ? JSON.parse(res.data.wechatMenu).menu.button
             : [];
           // 微信菜单数据转换成我们识别的数据
-
-          // this.menu_arr = this.wxMenuChange(result);
           this.menu_arr = result;
           menu_arr_stash = this.menu_arr;
+          this.$emit("changeMenuArr", result);
+
           setTimeout(() => {
             this.$emit("pageLoading", false);
           }, 500);
@@ -776,7 +776,7 @@ export default {
       width: 100%;
       display: flex;
       height: 41px;
-      background: #F7F8F9;
+      background: #f7f8f9;
       border-top: 1px solid rgba(226, 226, 226, 1);
       box-sizing: border-box;
       .bottom-icon-img {
@@ -846,7 +846,7 @@ export default {
               height: 0;
               border-width: 6px;
               border-style: solid;
-              border-color: #F7F8F9 transparent transparent transparent;
+              border-color: #f7f8f9 transparent transparent transparent;
               position: absolute;
               z-index: 97;
               left: 0;
@@ -866,7 +866,7 @@ export default {
               justify-content: center;
               align-items: center;
               padding: 0 5px;
-              background: #F7F8F9;
+              background: #f7f8f9;
               margin-bottom: 2px;
               > p {
                 font-size: 12px;
@@ -882,10 +882,10 @@ export default {
     height: 377px;
     min-width: 540px;
     min-height: 377px;
-    background: #F7F8F9;
+    background: #f7f8f9;
     border: 1px solid rgba(226, 226, 226, 1);
     box-sizing: border-box;
-    .el-radio{
+    .el-radio {
       font-weight: 400;
     }
     .box-head {

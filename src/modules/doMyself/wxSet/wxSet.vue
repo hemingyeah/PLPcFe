@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="top-state">
-          <menu-set @pageLoading="pageLoading"></menu-set>
+          <menu-set @pageLoading="pageLoading" :menu-arr="menuArr" @changeMenuArr="changeMenuArr"></menu-set>
         </div>
       </div>
       <div v-if="topType==1">
@@ -196,7 +196,8 @@ export default {
       eventArr: [],
       taskArr: [],
       timeInputing: 0,
-      scanQrCode: false
+      scanQrCode: false,
+      menuArr: []
     };
   },
   computed: {},
@@ -240,6 +241,9 @@ export default {
           }
           this.scanQrCode = false;
           this.wxInfo = res.data.data;
+          this.menuArr = res.data.data.wechatMenu
+            ? JSON.parse(res.data.data.wechatMenu).menu.button
+            : [];
           if (res.data.eventTypeList) {
             let arr = res.data.eventTypeList.map(res => {
               return { label: res.name, value: res.id };
@@ -361,7 +365,7 @@ export default {
     async desertWx() {
       try {
         const res = await this.$platform.confirm(
-          "解除后您将失去公众号相关联的功能!"
+          `您将要解除${this.wxInfo.nickName}公众号的绑定，请确认。`
         );
         if (!res) return;
         this.pageLoading(true);
@@ -373,6 +377,9 @@ export default {
       } catch (e) {
         console.error(e, "err");
       }
+    },
+    changeMenuArr(e) {
+      this.menuArr = e;
     }
   },
   beforeDestroy() {

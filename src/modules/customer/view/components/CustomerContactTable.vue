@@ -87,7 +87,6 @@
       :original-value="selectedContact"
       :is-phone-unique="shareData.isPhoneUnique"
       @submit-success="selectedContact = {}"
-      :customer-type="grayControler?'default':'cutsomerContact'"
     ></edit-contact-dialog>
   </div>
 </template>
@@ -233,6 +232,11 @@ export default {
         getContactList(params)
           .then(res => {
             this.contactList = res.result.list.map(contact => {
+              contact["customer"] = { customerId: contact.customerId };
+              contact["address"] = contact.addr || "";
+              contact["remark"] = contact.remarks || "";
+              contact["department"] = contact.dept || "";
+              contact["productId"] = contact.esProductEntities || [];
               this.$set(this.pending, contact.id, !!contact.isMain);
               contact.createTime = formatDate(
                 new Date(contact.createTime),
