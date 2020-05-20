@@ -1,11 +1,11 @@
 <template>
-  <div id="doMyself-components-box">
+  <div id="doMyself-components-box" v-loading.fullscreen.lock="fullscreenLoading">
     <div class="top-menu">
       <nav :class="nowPage==='customer'?'nav-checked':''" @click="nowPage='customer'">短信记录</nav>
       <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">公众号消息记录</nav>
     </div>
-    <customer-conctact-message v-if="nowPage==='customer'"></customer-conctact-message>
-    <customer-conctact-wxMessage v-if="nowPage==='visitor'"></customer-conctact-wxMessage>
+    <customer-conctact-message v-if="nowPage==='customer'" @pageLoading="pageLoading"></customer-conctact-message>
+    <customer-conctact-wxMessage v-if="nowPage==='visitor'" @pageLoading="pageLoading"></customer-conctact-wxMessage>
   </div>
 </template>
 <script>
@@ -15,8 +15,16 @@ export default {
   name: "toast-list",
   data() {
     return {
-      nowPage: "customer"
+      nowPage: "customer",
+
+      fullscreenLoading: false // 整屏loading
     };
+  },
+  methods: {
+    pageLoading(data = false) {
+      if (this.fullscreenLoading === data) return;
+      this.fullscreenLoading = data;
+    }
   },
   components: {
     [message.name]: message,
@@ -25,7 +33,6 @@ export default {
 };
 </script>
 <style lang="scss">
-
 $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
 html,

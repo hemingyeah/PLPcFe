@@ -1,10 +1,6 @@
 <template>
   <!-- start 产品模板列表 -->
-  <div
-    class="product-template-list-view"
-    ref="productTemplateListPage"
-    v-loading.fullscreen.lock="loadingListData"
-  >
+  <div class="product-template-list-view" ref="productTemplateListPage">
     <!-- start 搜索 -->
     <div class="product-template-list-search-group">
       <!-- start  搜索header -->
@@ -778,7 +774,6 @@ export default {
       auth: {}, // 权限
       columns: this.buildTableFixedColumns(), // 列
       columnNum: 1, // 高级搜索 列数
-      loadingListData: false, // 加载列表数据
       page: new Page(), // page 对象
       productTemplateConfig: {
         productTemplateConfig: {},
@@ -1340,13 +1335,16 @@ export default {
     // 搜索
     search() {
       const params = this.buildParams();
-
-      this.loadingListData = true;
-      this.loadingListData = false;
-      return getRecords(params).then(res => {
-        this.page = res.data;
-        this.matchSelected(); // 把选中的匹配出来
-      });
+      this.$emit("pageLoading", true);
+      return getRecords(params)
+        .then(res => {
+          this.$emit("pageLoading", false);
+          this.page = res.data;
+          this.matchSelected(); // 把选中的匹配出来
+        })
+        .catch(err => {
+          this.$emit("pageLoading", false);
+        });
     },
     // 设置高级搜索面板 列
     setAdvanceSearchColumn(command) {
