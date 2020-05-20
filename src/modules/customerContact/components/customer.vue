@@ -157,6 +157,7 @@
                 <i class="iconfont icon-weixin1 color-green font-16"></i>
               </el-tooltip>
             </template>
+            <template v-else-if="column.field === 'addr'">{{ transhForm(scope.row)}}</template>
 
             <template
               v-else-if="column.field === 'createUser'"
@@ -265,7 +266,10 @@
     <base-table-advanced-setting ref="advanced" @save="columnStatusModify" />
 
     <!-- 编辑联系人弹窗 -->
-    <edit-contact-dialog ref="EditContactDialog" :original-value="selectedContact" :customer-type="'cutsomerContact'"
+    <edit-contact-dialog
+      ref="EditContactDialog"
+      :original-value="selectedContact"
+      :customer-type="'cutsomerContact'"
     ></edit-contact-dialog>
   </div>
   <!-- end 产品模板列表 -->
@@ -1009,6 +1013,15 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    transhForm(data) {
+      let str = "";
+      if (data && data.length > 0) {
+        data.forEach(res => {
+          str += res.name;
+        });
+      }
+      return str;
+    },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");
       this.$refs.advanced.open(this.columns);

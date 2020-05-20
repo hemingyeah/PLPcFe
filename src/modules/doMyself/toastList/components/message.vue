@@ -1463,11 +1463,7 @@ export default {
     // TalkingData事件埋点
     trackEventHandler(type) {
       if (type === "search") {
-        window.TDAPP.onEvent("pc：产品模板-搜索事件");
-        return;
-      }
-      if (type === "moreAction") {
-        window.TDAPP.onEvent("pc：产品管理-更多操作事件");
+        window.TDAPP.onEvent("pc：短信记录-搜索事件");
         return;
       }
     },

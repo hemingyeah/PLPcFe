@@ -2,7 +2,7 @@
   <div class="form-select">
     <div class="flex-x">
       <el-select
-        v-model="value"
+        :value="value"
         filterable
         remote
         clearable
@@ -45,6 +45,10 @@ export default {
   name: "customer-extend",
   mixins: [SettingMixin],
   props: {
+    values: {
+      type: String,
+      default: () => ""
+    },
     field: {
       type: Object,
       default: () => ({})
@@ -54,8 +58,7 @@ export default {
       default: () => ({})
     },
     extendData: {
-      type: Object,
-      default: () => ({})
+      type: Object
     },
     extendDisplayName: {
       type: String,
@@ -64,11 +67,20 @@ export default {
     /** 用于获取FormDesign实例 */
     getContext: Function
   },
+  computed: {
+    value() {
+      return this.values;
+    }
+  },
   watch: {
     extendData: {
       handler(newValue, oldValue) {
-        if (!newValue.customerId && newValue.customerId !== 0) {
-          this.value = "";
+        if (
+          !newValue[this.field.mainKey] &&
+          newValue[this.field.mainKey] !== 0 &&
+          newValue[this.field.fieldName] !== "" &&
+          newValue[this.field.fieldName] !== undefined
+        ) {
           this.$emit("update", { newValue: "", field: this.field });
         }
       },
@@ -76,14 +88,13 @@ export default {
       immediate: true
     }
   },
-  computed: {},
   data() {
     return {
       options: [],
-      value: "",
       loading: false
     };
   },
+  mounted() {},
   methods: {
     remoteMethod() {
       this.loading = true;
@@ -100,7 +111,7 @@ export default {
         this.loading = false;
       });
     },
-    update(value, prop) {
+    update(value) {
       this.$emit("update", { newValue: value, field: this.field });
     }
   }

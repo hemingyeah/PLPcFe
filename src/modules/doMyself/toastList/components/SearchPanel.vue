@@ -188,7 +188,6 @@ export default {
 
       let tv = null;
       let fn = "";
-      console.log(isSystemFields, "1231312");
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
@@ -320,7 +319,8 @@ export default {
       data() {
         return {
           form: {},
-          tableName: "product"
+          tableName: "product",
+          render: false
         };
       },
       mounted() {
@@ -364,6 +364,7 @@ export default {
               this.formBackup[field.fieldName] || tv
             );
           });
+          this.render = true;
 
           return form;
         },
@@ -381,13 +382,19 @@ export default {
               [f.fieldName]: event.newValue
             };
           } else {
-            this.form[f.fieldName] = event.newValue;
+            this.form = {
+              ...this.form,
+              [f.fieldName]: event.newValue
+            };
           }
         },
         renderInput(h, field) {
           const f = {
             ...Object.freeze(field)
           };
+          if (!this.render) {
+            return null;
+          }
 
           let comp = FormFieldMap.get(f.formType);
 
@@ -430,7 +437,7 @@ export default {
             childComp = h("customer-extend", {
               props: {
                 field: f,
-                value: this.form[f.fieldName],
+                values: this.form[f.fieldName],
                 disableMap: true,
                 extendData: {
                   [f.mainKey]: this.form[f.extendData],

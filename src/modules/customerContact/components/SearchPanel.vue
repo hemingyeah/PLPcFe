@@ -182,8 +182,7 @@ export default {
 
       const isSystemFields = this.fields.filter(f => f.isSystem);
       const notSystemFields = this.fields.filter(f => !f.isSystem);
-      let params = {
-      };
+      let params = {};
 
       let tv = null;
       let fn = "";
@@ -203,7 +202,6 @@ export default {
         }
 
         if (typeof form[fn] === "string") {
-          
           params[fn === "customer" ? "customerId" : fn] = form[fn];
           continue;
         }
@@ -356,14 +354,13 @@ export default {
               this.formBackup[field.fieldName] || tv
             );
           });
-
           return form;
         },
         update(event, isTags) {
           if (isTags) {
             return (this.form.tags = event);
           }
-          
+
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },
@@ -413,7 +410,7 @@ export default {
             childComp = h("customer-extend", {
               props: {
                 field: f,
-                value: this.form[f.fieldName],
+                values: this.form[f.fieldName],
                 disableMap: true,
                 extendData: {
                   [f.mainKey]: this.form[f.extendData],
