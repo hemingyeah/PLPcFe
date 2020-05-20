@@ -87,7 +87,7 @@
       :original-value="selectedContact"
       :is-phone-unique="shareData.isPhoneUnique"
       @submit-success="selectedContact = {}"
-      :customer-type="'cutsomerContact'"
+      :customer-type="grayControler?'default':'cutsomerContact'"
     ></edit-contact-dialog>
   </div>
 </template>
@@ -133,6 +133,16 @@ export default {
         !this.shareData.isDisable &&
         this.shareData.allowEditCustomer
       );
+    },
+    grayControler() {
+      if (
+        this.initData &&
+        (!this.initData.menus || this.initData.menus.length <= 0)
+      ) {
+        // 灰度开启 无公众号相关功能
+        return true;
+      }
+      return false;
     }
   },
   mounted() {
@@ -204,21 +214,36 @@ export default {
         pageNum: this.paginationInfo.pageNum,
         pageSize: this.paginationInfo.pageSize
       };
-      // this.$http
-      //   .get("/customer/linkman/list", params)
-      getContactList(params)
-        .then(res => {
-          this.contactList = res.result.list.map(contact => {
-            this.$set(this.pending, contact.id, !!contact.isMain);
-            contact.createTime = formatDate(
-              new Date(contact.createTime),
-              "YYYY-MM-DD HH:mm:ss"
-            );
-            return Object.freeze(contact);
-          });
-          this.paginationInfo.totalItems = res.result.total;
-        })
-        .catch(err => console.error("err", err));
+      if (this.grayControler) {
+        this.$http
+          .get("/customer/linkman/list", params)
+          .then(res => {
+            this.contactList = res.list.map(contact => {
+              this.$set(this.pending, contact.id, !!contact.isMain);
+              contact.createTime = formatDate(
+                new Date(contact.createTime),
+                "YYYY-MM-DD HH:mm:ss"
+              );
+              return Object.freeze(contact);
+            });
+            this.paginationInfo.totalItems = res.total;
+          })
+          .catch(err => console.error("err", err));
+      } else {
+        getContactList(params)
+          .then(res => {
+            this.contactList = res.result.list.map(contact => {
+              this.$set(this.pending, contact.id, !!contact.isMain);
+              contact.createTime = formatDate(
+                new Date(contact.createTime),
+                "YYYY-MM-DD HH:mm:ss"
+              );
+              return Object.freeze(contact);
+            });
+            this.paginationInfo.totalItems = res.result.total;
+          })
+          .catch(err => console.error("err", err));
+      }
     },
     buildColumns() {
       let arr = [
@@ -252,10 +277,7 @@ export default {
           width: "150px"
         }
       ];
-      if (
-        this.initData &&
-        (!this.initData.menus || this.initData.menus.length <= 0)
-      ) {
+      if (this.grayControler) {
         arr.splice(2, 1);
       }
 
