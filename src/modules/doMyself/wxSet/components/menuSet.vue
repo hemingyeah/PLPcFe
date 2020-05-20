@@ -642,7 +642,7 @@ export default {
       let add_tem = _.cloneDeep(menu_add_tem);
       if (now_chooseed_menu.indexs > -1) {
         // 删除子菜单
-        const alert_res = await this.$platform.confirm("确认删除该菜单？");
+        const alert_res = await this.$platform.confirm(`删除后${this.ruleForm.name}菜单下设置的内容将被删除`);
         if (!alert_res) return;
         this.menu_arr[now_chooseed_menu.index].sub_button.splice(
           now_chooseed_menu.indexs,
@@ -662,7 +662,7 @@ export default {
       } else {
         // 删除主菜单 需要提示风险
         const alert_res = await this.$platform.confirm(
-          "该菜单下的子菜单会同时删除。"
+          `删除后${this.ruleForm.name}菜单下设置的内容将被删除`
         );
         if (!alert_res) return;
         this.menu_arr.splice(now_chooseed_menu.index, 1);

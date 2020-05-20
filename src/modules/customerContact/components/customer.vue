@@ -157,7 +157,7 @@
                 <i class="iconfont icon-weixin1 color-green font-16"></i>
               </el-tooltip>
             </template>
-            <template v-else-if="column.field === 'esProductEntities'">{{ transhForm(scope.row)}}</template>
+            <template v-else-if="column.field === 'esProductEntities'">{{ transhForm(scope.row.esProductEntities)}}</template>
 
             <template
               v-else-if="column.field === 'createUser'"
