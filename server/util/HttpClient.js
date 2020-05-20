@@ -2,7 +2,8 @@
  * @author dongls 
 */
 // utils
-const https = require('https');
+const { isNotLocalEnv } = require('../model/proxyConfigModel');
+const https = require(isNotLocalEnv ? 'https' : 'http');
 const { getRequestOptions, getProxyOptions, toJSON, getBody } = require('./HttpUtil');
 
 module.exports = {
