@@ -51,7 +51,7 @@ export function getToastTemplateList(params = {}) {
 }
 
 export function setToastTemplateList(params = {}) {
-  return http.get(`${urlHead}/outside/weixin/api/saveTemplate`, params)
+  return http.post(`${urlHead}/outside/weixin/api/saveTemplate`, params, false)
 }
 
 //  wxSet/wxSet.vue

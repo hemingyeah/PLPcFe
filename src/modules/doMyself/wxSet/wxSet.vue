@@ -1,6 +1,6 @@
 <template>
   <div id="doMyself-components-box" v-loading.fullscreen.lock="fullscreenLoading">
-    <div class="top-state" v-if="!haveWx">
+    <div class="top-state" v-if="haveWx===0">
       <div>
         <h2>绑定公众号</h2>
         <p>您尚未绑定公众号，绑定前请确认您的公众号为已认证的公众号</p>
@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div v-else>
+    <div v-else-if="haveWx===1">
       <div class="top-menu">
         <nav :class="topType===0?'nav-checked':''" @click="topType=0">绑定公众号</nav>
         <nav :class="topType===1?'nav-checked':''" @click="topType=1">公众号通知</nav>
@@ -142,7 +142,7 @@ export default {
   data() {
     return {
       topType: 0, // 微信设置顶部切换 0 绑定公众号 1 公众号通知
-      haveWx: false,
+      haveWx: -1,
       concatWxUrl: "", // 授权微信公众号的链接
       totalActive: false,
       fullscreenLoading: false, // 整屏loading
@@ -219,7 +219,7 @@ export default {
           this.pageLoading(false);
           if (res.data.status === 0) {
             // 未绑定公众号
-            this.haveWx = false;
+            this.haveWx = 0;
             this.concatWxUrl = res.data.mpAuthorizeUrl;
             if (this.scanQrCode === true) {
               timeOut = setTimeout(() => {
@@ -230,12 +230,13 @@ export default {
           } else if (res.data.status === 2) {
             clearTimeout(timeOut);
             // 未绑定公众号
-            this.haveWx = false;
+            this.haveWx = 0;
             this.scanQrCode = false;
             this.$platform.closeTab("wx_auth");
+            this.$platform.alert(res.data.message || '系统错误');
             return;
           }
-          this.haveWx = true;
+          this.haveWx = 1;
           if (this.scanQrCode) {
             this.$platform.closeTab("wx_auth");
           }

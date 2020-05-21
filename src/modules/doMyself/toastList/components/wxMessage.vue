@@ -1017,7 +1017,7 @@ export default {
           minWidth: "150px"
         },
         {
-          label: "接收号码",
+          label: "接收客户",
           field: "phones",
           fixed: true,
           show: true

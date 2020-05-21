@@ -6,7 +6,7 @@
     filterable
     remote
     reserve-keyword
-    placeholder="请输入关键词搜索"
+    :placeholder="field.placeHolder?field.placeHolder:'请输入关键词搜索'"
     :disabled="field.disabled?field.disabled:false"
     clearable
     :loading="loading"

@@ -5,8 +5,8 @@
       <!-- 表格 start -->
       <el-table class="mar-b-10" :data="tableData" stripe style="width: 100%">
         <el-table-column prop="remindType" label="模板类型" width="180"></el-table-column>
-        <el-table-column prop="name" label="模板名称" width="180"></el-table-column>
-        <el-table-column prop="first" label="模板内容"></el-table-column>
+        <el-table-column prop="name" :show-overflow-tooltip="true" label="模板名称" width="180"></el-table-column>
+        <el-table-column prop="first" :show-overflow-tooltip="true" label="模板内容" width="200"></el-table-column>
         <el-table-column label="操作" width="80">
           <template slot-scope="scope">
             <a class="color-g can-point" @click="showAlterTemp(scope)">配置</a>
@@ -55,6 +55,7 @@
                   type="textarea"
                   :autosize="{ minRows: 2, maxRows: 4}"
                   v-model="form.first"
+                  maxlength="120"
                   resize="none"
                 ></el-input>
                 <el-input
@@ -69,6 +70,7 @@
                   :autosize="{ minRows: 2, maxRows: 4}"
                   v-model="form.remark"
                   resize="none"
+                  maxlength="300"
                 ></el-input>
               </div>
             </div>
