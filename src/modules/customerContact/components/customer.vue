@@ -1389,6 +1389,10 @@ export default {
             this.page.merge(res);
 
             this.page.list = res.list.map(l => {
+              l["customer"] = { customerId: l.customerId };
+              l["remark"] = l.remarks || "";
+              l["department"] = l.dept || "";
+              l["productId"] = l.esProductEntities || [];
               let attribute = l.attribute ? l.attribute : {};
 
               let list = {

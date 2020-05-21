@@ -233,7 +233,6 @@ export default {
           .then(res => {
             this.contactList = res.result.list.map(contact => {
               contact["customer"] = { customerId: contact.customerId };
-              contact["address"] = contact.addr || "";
               contact["remark"] = contact.remarks || "";
               contact["department"] = contact.dept || "";
               contact["productId"] = contact.esProductEntities || [];
