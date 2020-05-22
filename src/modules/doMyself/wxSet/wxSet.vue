@@ -5,7 +5,7 @@
         <h2>绑定公众号</h2>
         <p>您尚未绑定公众号，绑定前请确认您的公众号为已认证的公众号</p>
         <div class="wx-img">
-          <img src="../../../assets/img/avatar.png" alt />
+          <img src="../../../assets/img/wx/wxDefault.png" alt />
         </div>
         <button type="submit" class="btn btn-primary" @click="concatWx">绑定公众号</button>
       </div>
