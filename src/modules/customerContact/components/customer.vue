@@ -1389,7 +1389,7 @@ export default {
             this.page.merge(res);
 
             this.page.list = res.list.map(l => {
-              l["customer"] = { customerId: l.customerId };
+              l["customer"] = { id: l.customerId };
               l["remark"] = l.remarks || "";
               l["department"] = l.dept || "";
               l["productId"] = l.esProductEntities || [];

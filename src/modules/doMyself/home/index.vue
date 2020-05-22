@@ -11,7 +11,7 @@
         >
           <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
           <div class="icon-box">
-            <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16':'font-14'}`"></i>
+            <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16 font-w-600':'font-14'}`"></i>
           </div>
           <span>{{item.name}}</span>
         </nav>
@@ -107,6 +107,9 @@ export default {
 }
 .font-16 {
   font-size: 16px;
+}
+.font-w-600{
+  font-weight: 500;
 }
 .al-c {
   align-items: center !important;
