@@ -104,9 +104,12 @@ export default {
         this.field.searchUrl,
         this.extendData || {}
       ).then(res => {
-        if (res.list.length > 0 && this.field.resTranslate) {
+        if (res.list.length > 0) {
           res.list = res.list.map(res_ => {
-            return this.field.resTranslate(res_);
+            if (this.field.resTranslate) {
+              res_ = this.field.resTranslate(res_);
+            }
+            return res_;
           });
           this.options = res.list;
         }
