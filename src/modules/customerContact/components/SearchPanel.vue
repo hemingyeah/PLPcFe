@@ -310,7 +310,8 @@ export default {
       data() {
         return {
           form: {},
-          tableName: "product"
+          tableName: "product",
+          render: false
         };
       },
       mounted() {
@@ -354,6 +355,8 @@ export default {
               this.formBackup[field.fieldName] || tv
             );
           });
+
+          this.render = true;
           return form;
         },
         update(event, isTags) {
@@ -362,12 +365,20 @@ export default {
           }
 
           const f = event.field;
+          if (f.children && f.children.length > 0) {
+            f.children.forEach(item => {
+              this.form[item] = "";
+            });
+          }
           this.form[f.fieldName] = event.newValue;
         },
         renderInput(h, field) {
           const f = {
             ...Object.freeze(field)
           };
+          if (!this.render) {
+            return null;
+          }
 
           let comp = FormFieldMap.get(f.formType);
 

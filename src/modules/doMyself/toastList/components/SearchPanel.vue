@@ -374,6 +374,11 @@ export default {
           }
 
           const f = event.field;
+          if (f.children && f.children.length > 0) {
+            f.children.forEach(item => {
+              this.form[item] = "";
+            });
+          }
           if (f.returnData) {
             let result = f.returnData(event.newValue);
             this.form = {

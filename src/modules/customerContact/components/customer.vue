@@ -157,7 +157,9 @@
                 <i class="iconfont icon-weixin1 color-green font-16"></i>
               </el-tooltip>
             </template>
-            <template v-else-if="column.field === 'esProductEntities'">{{ transhForm(scope.row.esProductEntities)}}</template>
+            <template
+              v-else-if="column.field === 'esProductEntities'"
+            >{{ transhForm(scope.row.esProductEntities)}}</template>
 
             <template
               v-else-if="column.field === 'createUser'"
@@ -832,6 +834,7 @@ export default {
             fieldName: "customerId",
             formType: "customer",
             placeHolder: "请选择客户",
+            children:['product', 'addr'], // 有子搜索组件需要声明子组件的fieldName
             isExport: false,
             isNull: 1,
             isSystem: 1,
@@ -843,7 +846,7 @@ export default {
             formType: "select",
             isExport: false,
             extendType: "customerExtend", // 组件的type
-            extendData: "customerId", // 需要依赖的参数名称
+            extendData: "customerId", // 需要依赖的参数名称  
             extendDisplayName: "客户", // 需要依赖的参数描述
             searchUrl: "/customer/product/list", // 依赖的参数的获取接口
             searchType: "GET", // 依赖的参数的获取接口方式

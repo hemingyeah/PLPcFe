@@ -897,6 +897,7 @@ export default {
           customerExtend: "056cd57b-6db3-11ea-bfc9-00163e304a25",
           formType: "customer",
           placeHolder: "请选择客户",
+          children:['address', 'addr'],
           disabled: true,
           isExport: false,
           isNull: 1,

@@ -4,23 +4,29 @@
       <el-select
         :value="value"
         filterable
+        :placeholder="`${extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined ?`请先选择${field.extendDisplayName}`:field.placeholder}`"
+        :disabled="extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined?true:false"
+        @change="update"
+      >
+        <el-option v-for="item in options" :key="item.id" :label="item.value" :value="item.value"></el-option>
+      </el-select>
+      <!-- <el-select
+        :value="value"
+        filterable
         remote
         clearable
         :placeholder="`${extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined ?`请先选择${field.extendDisplayName}`:field.placeholder}`"
-        @focus="remoteMethod"
         :disabled="extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined?true:false"
         :filter-method="remoteMethod"
+        @focus="remoteMethod"
+        @blur="filterBlur"
+        @visible-change="visibleChange"
         :loading="loading"
         @change="update"
-        automatic-dropdown
+        ref="searchSelect"
       >
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.value"
-          :value="item.value"
-        ></el-option>
-      </el-select>
+        <el-option v-for="item in options" :key="item.id" :label="item.value" :value="item.value"></el-option>
+      </el-select>-->
       <el-tooltip
         v-if="field.formRight"
         class="item"
@@ -69,25 +75,20 @@ export default {
     getContext: Function
   },
   computed: {
-    value() {
-      return this.values;
+    value(){
+      return this.values
     }
   },
   watch: {
     extendData: {
       handler(newValue, oldValue) {
-        if (
-          newValue[this.field.fieldName] !== "" &&
-          newValue[this.field.fieldName] !== undefined &&
-          this.extend_data !== newValue[this.field.mainKey]
-        ) {
-          this.$emit("update", { newValue: "", field: this.field });
+        if (newValue[this.field.mainKey]) {
+          this.remoteMethod();
         }
-        this.extend_data = newValue[this.field.mainKey];
       },
       deep: true,
       immediate: true
-    }
+    },
   },
   data() {
     return {
@@ -111,7 +112,7 @@ export default {
             }
             return res_;
           });
-          this.options = res.list;
+          this.$set(this, "options", res.list);
         } else {
           this.options = [];
         }
@@ -120,7 +121,14 @@ export default {
     },
     update(value) {
       this.$emit("update", { newValue: value, field: this.field });
-    }
+    },
+    visibleChange(val) {
+      if (!val) {
+        const input = this.$refs.searchSelect.$children[0].$refs.input;
+        input.blur();
+      }
+    },
+    filterBlur() {}
   }
 };
 </script>
