@@ -49,7 +49,7 @@ export default {
       type: Object,
       default: () => ({})
     },
-    isPhoneUnique: Boolean,
+    isPhoneUnique: Boolean
   },
   data() {
     return {
@@ -266,7 +266,7 @@ export default {
     openDialog() {
       this.addContactDialog = true;
 
-      console.log(this.originalValue, "asdadsa");
+      // console.log(this.originalValue, "asdadsa");
       if (this.action === "edit") {
         this.matchValueToForm(this.originalValue);
       }
@@ -307,7 +307,9 @@ export default {
     fetchAddress() {
       return this.$http
         .get("/customer/address/list", {
-          customerId: this.customer.id,
+          customerId: this.originalValue.customer
+            ? this.originalValue.customer.id
+            : this.originalValue.customerId,
           pageSize: 100000,
           pageNum: 1
         })
@@ -330,7 +332,9 @@ export default {
     fetchProducts() {
       return this.$http
         .get("/customer/product/list", {
-          customerId: this.customer.id,
+          customerId: this.originalValue.customer
+            ? this.originalValue.customer.id
+            : this.originalValue.customerId,
           pageSize: 100000,
           pageNum: 1
         })

@@ -271,7 +271,6 @@
     <edit-contact-dialog
       ref="EditContactDialog"
       :original-value="selectedContact"
-      :customer-type="'cutsomerContact'"
     ></edit-contact-dialog>
   </div>
   <!-- end 产品模板列表 -->
