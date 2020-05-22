@@ -144,7 +144,7 @@
             >{{scope.row.feedbackStatus === 0 ? '未点击':'已点击' }}</template>
             <template
               v-else-if="column.field === 'status'"
-            >{{scope.row.statusInfo === 1 ? '成功':'失败' }}</template>
+            >{{scope.row.status === 0 ? '成功':'失败' }}</template>
             <template
               v-else-if="column.formType === 'addr'"
             >{{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}</template>
