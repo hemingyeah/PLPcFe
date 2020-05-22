@@ -112,6 +112,8 @@ export default {
             return res_;
           });
           this.options = res.list;
+        } else {
+          this.options = [];
         }
         this.loading = false;
       });
