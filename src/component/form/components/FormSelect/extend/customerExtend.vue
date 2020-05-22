@@ -9,9 +9,10 @@
         :placeholder="`${extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined ?`请先选择${field.extendDisplayName}`:field.placeholder}`"
         @focus="remoteMethod"
         :disabled="extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined?true:false"
-        :remote-method="remoteMethod"
+        :filter-method="remoteMethod"
         :loading="loading"
         @change="update"
+        automatic-dropdown
       >
         <el-option
           v-for="item in options"
@@ -76,13 +77,13 @@ export default {
     extendData: {
       handler(newValue, oldValue) {
         if (
-          !newValue[this.field.mainKey] &&
-          newValue[this.field.mainKey] !== 0 &&
           newValue[this.field.fieldName] !== "" &&
-          newValue[this.field.fieldName] !== undefined
+          newValue[this.field.fieldName] !== undefined &&
+          this.extend_data !== newValue[this.field.mainKey]
         ) {
           this.$emit("update", { newValue: "", field: this.field });
         }
+        this.extend_data = newValue[this.field.mainKey];
       },
       deep: true,
       immediate: true
@@ -91,7 +92,8 @@ export default {
   data() {
     return {
       options: [],
-      loading: false
+      loading: false,
+      extend_data: ""
     };
   },
   mounted() {},

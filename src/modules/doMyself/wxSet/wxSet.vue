@@ -22,7 +22,7 @@
             <h2>绑定公众号</h2>
             <div class="wx-con">
               <div class="wx-img">
-                <img v-show="wxInfo.headImg === null" src="../../../assets/img/avatar.png" alt />
+                <img v-show="wxInfo.headImg === null" src="../../../assets/img/wx/wxDefault.png" alt />
                 <img v-show="wxInfo.headImg !== null" :src="wxInfo.headImg" alt />
               </div>
               <div>
