@@ -268,10 +268,7 @@
     <base-table-advanced-setting ref="advanced" @save="columnStatusModify" />
 
     <!-- 编辑联系人弹窗 -->
-    <edit-contact-dialog
-      ref="EditContactDialog"
-      :original-value="selectedContact"
-    ></edit-contact-dialog>
+    <edit-contact-dialog ref="EditContactDialog" :original-value="selectedContact"></edit-contact-dialog>
   </div>
   <!-- end 产品模板列表 -->
 </template>
@@ -833,7 +830,7 @@ export default {
             fieldName: "customerId",
             formType: "customer",
             placeHolder: "请选择客户",
-            children:['product', 'addr'], // 有子搜索组件需要声明子组件的fieldName
+            children: ["product", "addr"], // 有子搜索组件需要声明子组件的fieldName
             isExport: false,
             isNull: 1,
             isSystem: 1,

@@ -28,6 +28,8 @@
           :current-page="page.pageNum"
           layout="prev, pager, next, sizes, jumper"
           :total="page.total"
+          @size-change="handleSizeChange"
+          @current-change="jump"
         ></el-pagination>
         <!-- end 表格底部 -->
       </div>
@@ -55,7 +57,7 @@
                   type="textarea"
                   :autosize="{ minRows: 2, maxRows: 4}"
                   v-model="form.first"
-                  maxlength="120"
+                  maxlength="300"
                   resize="none"
                 ></el-input>
                 <el-input
@@ -114,7 +116,10 @@ export default {
   methods: {
     getTemp() {
       // 获取模板列表
-      getToastTemplateList().then(res => {
+      getToastTemplateList({
+        pageSize: this.page.pageSize,
+        pageNum: this.page.pageNum
+      }).then(res => {
         res.list.map(item => {
           item.modelMap = JSON.parse(item.modelMap);
           return item;
@@ -153,7 +158,18 @@ export default {
     },
     cancelTemp() {
       this.visible = false;
-    }
+    },
+    // 页码数切换
+    handleSizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+      this.page.pageNum = 1;
+      this.getTemp();
+    },
+    // 跳转
+    jump(pageNum) {
+      this.searchModel.pageNum = pageNum;
+      this.getTemp();
+    },
   },
   created() {
     this.getTemp();

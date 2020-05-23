@@ -22,7 +22,11 @@
             <h2>绑定公众号</h2>
             <div class="wx-con">
               <div class="wx-img">
-                <img v-show="wxInfo.headImg === null" src="../../../assets/img/wx/wxDefault.png" alt />
+                <img
+                  v-show="wxInfo.headImg === null"
+                  src="../../../assets/img/wx/wxDefault.png"
+                  alt
+                />
                 <img v-show="wxInfo.headImg !== null" :src="wxInfo.headImg" alt />
               </div>
               <div>
@@ -44,9 +48,11 @@
             <h2>通知设置</h2>
             <div :class="totalActive===true?'mar-b-10 set-arr-item':'set-arr-item'">
               <div class="set-arr-item-left">
-                <el-tooltip class="item" effect="dark" content="启用公众号通知" placement="bottom">
+                <!-- <el-tooltip class="item" effect="dark" content="启用公众号通知" placement="bottom"> -->
+                  <div class="item">
                   <span>启用公众号通知</span>
-                </el-tooltip>
+                  </div>
+                <!-- </el-tooltip> -->
                 <p>开启后，允许通过公众号为用户推送消息通知</p>
               </div>
               <div class="flex-1"></div>
@@ -67,10 +73,13 @@
             <div class="set-arr-box" v-show="totalActive===true">
               <div class="set-arr-item" v-for="(item,index) in toastSetArr" :key="index">
                 <div class="set-arr-item-left">
-                  <el-tooltip class="item" effect="dark" content="启用公众号通知" placement="bottom">
+                  <div class="item">
+                    <!-- <el-tooltip class="item" effect="dark" :content="{{item.title}}" placement="bottom"> -->
                     <span>{{item.title}}</span>
-                    <i class="iconfont icon-info mar-l-10"></i>
-                  </el-tooltip>
+                    <!-- <i class="iconfont icon-info mar-l-10"></i> -->
+
+                    <!-- </el-tooltip> -->
+                  </div>
                   <p v-if="item.time===null">{{item.childTitle}}</p>
                   <div class="small-form" v-else>
                     在计划时间到期前
@@ -233,7 +242,7 @@ export default {
             this.haveWx = 0;
             this.scanQrCode = false;
             this.$platform.closeTab("wx_auth");
-            this.$platform.alert(res.data.message || '系统错误');
+            this.$platform.alert(res.data.message || "系统错误");
             return;
           }
           this.haveWx = 1;
@@ -527,7 +536,7 @@ p {
       span {
         font-size: 14px;
         font-weight: 600;
-        cursor: pointer;
+        // cursor: pointer;
       }
 
       p:last-child {
