@@ -1018,7 +1018,7 @@ export default {
         },
         {
           label: "接收客户",
-          field: "phones",
+          field: "receiveCustomerName",
           fixed: true,
           show: true
         },
@@ -1042,7 +1042,7 @@ export default {
         },
         {
           label: "关联编号",
-          field: "relevanceNumber",
+          field: "relationNumber",
           fixed: true,
           show: true
         },

@@ -3,7 +3,7 @@
     <h2>消息模板</h2>
     <div>
       <!-- 表格 start -->
-      <el-table class="mar-b-10" :data="tableData" stripe style="width: 100%">
+      <el-table class="mar-b-10" :data="page.list" stripe style="width: 100%">
         <el-table-column prop="remindType" label="模板类型" width="180"></el-table-column>
         <el-table-column prop="name" :show-overflow-tooltip="true" label="模板名称" width="180"></el-table-column>
         <el-table-column prop="first" :show-overflow-tooltip="true" label="模板内容" width="450"></el-table-column>
@@ -107,7 +107,6 @@ export default {
       type: 1, // 页面状态 0 列表形态 1 编辑形态
       visible: false, // 编辑页面弹窗
       page: new Page(),
-      tableData: [],
       form: {},
       nowAlerTemp: -1
     };
@@ -120,7 +119,7 @@ export default {
           item.modelMap = JSON.parse(item.modelMap);
           return item;
         });
-        this.tableData = res.list;
+        this.page = res;
       });
     },
     showAlterTemp(item) {
@@ -129,7 +128,7 @@ export default {
       }
       this.nowAlerTemp = item.$index;
 
-      this.form = _.cloneDeep(this.tableData[item.$index]);
+      this.form = _.cloneDeep(this.page.list[item.$index]);
       this.visible = true;
     },
     saveTemp() {
