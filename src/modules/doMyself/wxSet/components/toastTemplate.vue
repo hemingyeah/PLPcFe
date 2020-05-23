@@ -4,9 +4,9 @@
     <div>
       <!-- 表格 start -->
       <el-table class="mar-b-10" :data="page.list" stripe style="width: 100%">
-        <el-table-column prop="remindType" label="模板类型" width="180"></el-table-column>
+        <el-table-column prop="remindType" :show-overflow-tooltip="true" label="模板类型" width="180"></el-table-column>
         <el-table-column prop="name" :show-overflow-tooltip="true" label="模板名称" width="180"></el-table-column>
-        <el-table-column prop="first" :show-overflow-tooltip="true" label="模板内容" width="450"></el-table-column>
+        <el-table-column prop="first" :show-overflow-tooltip="true" label="模板内容" width="430"></el-table-column>
         <el-table-column label="操作" width="80">
           <template slot-scope="scope">
             <a class="color-g can-point" @click="showAlterTemp(scope)">配置</a>
@@ -47,7 +47,7 @@
           <div class="form-box">
             <div class="flex-x mar-b-10">
               <p>标题：</p>
-              <p>{{form.name}}</p>
+              <p>{{form.title}}</p>
             </div>
             <div class="flex-x">
               <p>模板：</p>
@@ -80,7 +80,8 @@
           <div class="flex-x mar-l-15">
             <p>样例</p>
             <div class="result-show mar-l-15">
-              <img src="@src/assets/img/wx/temp.png" alt />
+              <img v-if="form.title==='服务状态提醒'" src="@src/assets/img/wx/temp_status.png" alt />
+              <img v-if="form.title==='服务工单提醒'" src="@src/assets/img/wx/temp_task.png" alt />
             </div>
           </div>
         </div>

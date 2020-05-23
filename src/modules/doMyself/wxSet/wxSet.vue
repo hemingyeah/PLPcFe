@@ -483,10 +483,10 @@ p {
     width: 80px;
     height: 80px;
     position: relative;
-    margin: 24px 44px 24px 24px;
+    margin: 24px 44px 24px 0;
   }
   .cancel-wx {
-    margin-left: 24px;
+
   }
 
   .table-footer {
