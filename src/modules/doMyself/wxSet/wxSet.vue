@@ -121,6 +121,7 @@ import {
   saveSendTime,
   cancleAuthorizer
 } from "@src/api/doMyself.js";
+import { Message } from "shb-element-ui";
 let loadKeyArr = [];
 let loadTypeArr = [];
 let setRaduisArr = [
@@ -396,9 +397,10 @@ export default {
           .then(res => {
             this.pageLoading(false);
             this.getWxInfo();
-            setTimeout(() => {
-              this.$platform.alert(`成功解除绑定`);
-            }, 500);
+            Message.success({
+              message: "成功解除绑定",
+              type: "success"
+            });
           })
           .catch(err => {
             this.$platform.alert(err);
