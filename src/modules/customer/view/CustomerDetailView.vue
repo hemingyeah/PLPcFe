@@ -423,6 +423,7 @@ export default {
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
+      console.log(this.customer,'asdasdasdsa')
       return {
         customer: this.customer,
         loginUser: this.initData.loginUser,

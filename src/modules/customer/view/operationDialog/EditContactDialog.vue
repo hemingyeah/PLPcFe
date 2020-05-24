@@ -184,10 +184,7 @@ export default {
 
         const params = {
           ...this.form,
-          customer:
-            this.customer.hasOwnProperty("id") === false
-              ? { id: this.form.customId }
-              : this.customer,
+          customer:{ id: this.customer.id },
           productId: this.products
             .filter(p => this.form.productId.some(pId => pId === p.value))
             .map(p => ({
@@ -307,9 +304,7 @@ export default {
     fetchAddress() {
       return this.$http
         .get("/customer/address/list", {
-          customerId: this.originalValue.customer
-            ? this.originalValue.customer.id
-            : this.originalValue.customerId,
+          customerId: this.customer.id,
           pageSize: 100000,
           pageNum: 1
         })
@@ -332,9 +327,7 @@ export default {
     fetchProducts() {
       return this.$http
         .get("/customer/product/list", {
-          customerId: this.originalValue.customer
-            ? this.originalValue.customer.id
-            : this.originalValue.customerId,
+          customerId: this.customer.id,
           pageSize: 100000,
           pageNum: 1
         })

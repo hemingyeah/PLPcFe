@@ -223,10 +223,10 @@ export default {
         // 如果是轮询不需要loading 加载动画
         this.pageLoading(true);
       }
-      if (sessionStorage.getItem("wx_auth_auth_page_close") === true) {
-        this.scanQrCode === false;
-        clearTimeout(timeOut);
-        sessionStorage.setItem("wx_auth_auth_page_close", false);
+      if (sessionStorage.getItem("wx_auth_auth_page_close") === "true") {
+        this.scanQrCode = false;
+        sessionStorage.removeItem("wx_auth_auth_page_close");
+        return;
       }
       getAuthInfoWX()
         .then(res => {

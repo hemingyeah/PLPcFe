@@ -5,7 +5,8 @@
       <a
         class="color-b"
         href="/setting/serviceStation/customerPortal#protalUrl"
-      >客户自助门户</a>内的链接嵌入到您的公众号菜单。<br />在配置公众号菜单前，请先确认您的公众号已经经过认证
+      >客户自助门户</a>内的链接嵌入到您的公众号菜单。
+      <br />在配置公众号菜单前，请先确认您的公众号已经经过认证
     </p>
     <div class="set-box">
       <!-- box-left start -->
@@ -19,7 +20,7 @@
             <img class="bottom-icon-img" src="@src/assets/img/wx/wxKey.png" />
           </div>
           <!-- move-menu-box start -->
-          <draggable class="menu-box" v-model="menu_arr" v-show="edit_type===2">
+          <draggable class="menu-box" v-model="menu_arr" v-if="edit_type===2">
             <div
               v-for="(item,index) in menu_arr"
               :key="index"
@@ -57,7 +58,7 @@
           </draggable>
           <!-- move-menu-box end -->
           <!-- menu-box start -->
-          <div class="menu-box" v-model="menu_arr" v-show="edit_type!==2">
+          <div class="menu-box" v-model="menu_arr" v-if="edit_type!==2">
             <div
               v-for="(item,index) in menu_arr"
               :key="index"
@@ -69,7 +70,7 @@
 
               <div
                 class="pop-top-menu-box"
-                v-if="item.shb_type!=='add' && now_main_menu===index && item.sub_button.length>0"
+                v-if="item.shb_type!=='add' && now_main_menu===index &&item.sub_button && item.sub_button.length>0"
               >
                 <div
                   v-for="(items,indexs) in item.sub_button"
@@ -393,23 +394,6 @@ export default {
     menu_arr_stash = this.menuArr;
   },
   methods: {
-    wxMenuChange(data = []) {
-      if (data.length <= 0) {
-        return data;
-      }
-      let data_stash = _.cloneDeep(data);
-      data.forEach((item, index) => {
-        if (item.sub_button.list && item.sub_button.list.length > 0) {
-          item.sub_button.list.forEach((items, indexs) => {
-            if (items.sub_button.list && items.sub_button.list.length > 0) {
-              data_stash[index].sub_button.list[indexs].sub_button =
-                items.sub_button.list;
-            }
-          });
-          data_stash[index].sub_button = item.sub_button.list;
-        }
-      });
-    },
     main_menu_class(index) {
       if (this.now_chooseed_menu && this.now_chooseed_menu.indexs < 0)
         return `menu-item ${this.edit_type === 1 ? "can-point" : ""} ${
@@ -484,7 +468,9 @@ export default {
             index,
             indexs,
             onlyName: !!(
-              (indexs < 0 && _arr[index].sub_button.length > 1) ||
+              (indexs < 0 &&
+                _arr[index].sub_button &&
+                _arr[index].sub_button.length > 1) ||
               item.hasOwnProperty("shb_type") === false ||
               (item.hasOwnProperty("shb_type") === true &&
                 item.shb_type === "system_menu")
@@ -505,7 +491,12 @@ export default {
           let arr_ = _.cloneDeep(arr);
           let add_tem = _.cloneDeep(menu_add_tem);
           arr_.map(res => {
-            if (res.sub_button.length < 5) {
+            if (res.sub_button) {
+              if (res.sub_button.length < 5) {
+                res.sub_button.push(add_tem);
+              }
+            } else {
+              res.sub_button = [];
               res.sub_button.push(add_tem);
             }
             return res;
@@ -532,7 +523,10 @@ export default {
             arr_.splice(arr_.length - 1, 1);
           }
           arr_.map(res => {
-            if (res.sub_button[res.sub_button.length - 1].shb_type === "add") {
+            if (
+              res.sub_button &&
+              res.sub_button[res.sub_button.length - 1].shb_type === "add"
+            ) {
               res.sub_button.splice(res.sub_button.length - 1, 1);
             }
             return res;
@@ -541,7 +535,7 @@ export default {
             if (res.hasOwnProperty("shb_type") === true) {
               arr_[index] = this.filerArrByMenuType(arr_[index]);
             }
-            if (res.sub_button.length > 0) {
+            if (res.sub_button && res.sub_button.length > 0) {
               res.sub_button.forEach((res_, index_) => {
                 if (res_.hasOwnProperty("shb_type") === true) {
                   arr_[index].sub_button[index_] = this.filerArrByMenuType(
@@ -642,7 +636,9 @@ export default {
       let add_tem = _.cloneDeep(menu_add_tem);
       if (now_chooseed_menu.indexs > -1) {
         // 删除子菜单
-        const alert_res = await this.$platform.confirm(`删除后${this.ruleForm.name}菜单下设置的内容将被删除`);
+        const alert_res = await this.$platform.confirm(
+          `删除后${this.ruleForm.name}菜单下设置的内容将被删除`
+        );
         if (!alert_res) return;
         this.menu_arr[now_chooseed_menu.index].sub_button.splice(
           now_chooseed_menu.indexs,
@@ -679,7 +675,7 @@ export default {
       this.resetForm("ruleForm");
     },
     getMenuList(type = true) {
-      this.$emit("pageLoading", true);
+      // this.$emit("pageLoading", true);
       // URL 本地调试 无/api/weixin  发布需加上
       getMenuListWx({
         type

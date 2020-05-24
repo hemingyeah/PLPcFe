@@ -268,7 +268,7 @@
     <base-table-advanced-setting ref="advanced" @save="columnStatusModify" />
 
     <!-- 编辑联系人弹窗 -->
-    <edit-contact-dialog ref="EditContactDialog" :original-value="selectedContact"></edit-contact-dialog>
+    <edit-contact-dialog ref="EditContactDialog" :customer="selectedContact.customer" :original-value="selectedContact"></edit-contact-dialog>
   </div>
   <!-- end 产品模板列表 -->
 </template>
