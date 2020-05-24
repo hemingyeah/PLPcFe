@@ -392,10 +392,18 @@ export default {
         );
         if (!res) return;
         this.pageLoading(true);
-        const reqRes = await cancleAuthorizer();
-        this.pageLoading(false);
-        this.$platform.alert("成功解除绑定");
-        this.getWxInfo();
+        cancleAuthorizer()
+          .then(res => {
+            this.pageLoading(false);
+            this.getWxInfo();
+            setTimeout(() => {
+              this.$platform.alert(`成功解除绑定`);
+            }, 500);
+          })
+          .catch(err => {
+            this.$platform.alert(err);
+          });
+
         // this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
         console.error(e, "err");
