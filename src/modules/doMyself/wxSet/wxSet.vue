@@ -249,6 +249,14 @@ export default {
             this.$platform.closeTab("wx_auth");
             this.$platform.alert(res.data.message || "系统错误");
             return;
+          } else if (res.data.status === 3) {
+            clearTimeout(timeOut);
+            // 未绑定公众号
+            this.haveWx = 0;
+            this.scanQrCode = false;
+            this.$platform.closeTab("wx_auth");
+            this.$platform.alert(res.data.message || "系统错误");
+            return;
           }
           this.haveWx = 1;
           if (this.scanQrCode) {

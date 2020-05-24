@@ -1051,13 +1051,13 @@ export default {
           field: "status",
           fixed: true,
           show: true,
-          minWidth: "60px"
+          minWidth: "80px"
         },
         {
           label: "反馈",
           field: "feedbackStatus",
           fixed: true,
-          minWidth: "60px",
+          minWidth: "90px",
           show: true
         }
       ];
