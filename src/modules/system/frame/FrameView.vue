@@ -397,8 +397,8 @@ export default {
           : "/logout";
       }
     },
-    openHelpDoc(event){
-      platform.openLink('https://www.yuque.com/shb/help');
+    openHelpDoc(event) {
+      platform.openLink("https://www.yuque.com/shb/help");
       this.profilePopperVisible = false;
     },
     openUserView(event) {
@@ -592,7 +592,7 @@ export default {
         reload: true
       });
     },
-    goDoMyself(){
+    goDoMyself() {
       platform.openTab({
         id: "do_myself",
         title: "自助门户设置",

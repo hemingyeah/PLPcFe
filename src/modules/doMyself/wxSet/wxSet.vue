@@ -49,9 +49,9 @@
             <div :class="totalActive===true?'mar-b-10 set-arr-item':'set-arr-item'">
               <div class="set-arr-item-left">
                 <!-- <el-tooltip class="item" effect="dark" content="启用公众号通知" placement="bottom"> -->
-                  <div class="item">
+                <div class="item">
                   <span>启用公众号通知</span>
-                  </div>
+                </div>
                 <!-- </el-tooltip> -->
                 <p>开启后，允许通过公众号为用户推送消息通知</p>
               </div>
@@ -222,6 +222,11 @@ export default {
       if (!this.scanQrCode) {
         // 如果是轮询不需要loading 加载动画
         this.pageLoading(true);
+      }
+      if (sessionStorage.getItem("wx_auth_auth_page_close") === true) {
+        this.scanQrCode === false;
+        clearTimeout(timeOut);
+        sessionStorage.setItem("wx_auth_auth_page_close", false);
       }
       getAuthInfoWX()
         .then(res => {
@@ -486,7 +491,6 @@ p {
     margin: 24px 44px 24px 0;
   }
   .cancel-wx {
-
   }
 
   .table-footer {
