@@ -12,12 +12,7 @@
       </el-dropdown>
     </h3>
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <search-form
-        :fields="fields"
-        ref="searchForm"
-        :form-backup="formBackup"
-        :column-num="columnNum"
-      ></search-form>
+      <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :column-num="columnNum" ></search-form>
       <slot name="footer"></slot>
     </el-form>
   </base-panel>
@@ -56,8 +51,8 @@ export default {
   computed: {
     fields() {
       let f = {};
-      let fields = [...this.config.fields, ...this.selfFields]
-        .filter(f => f.isSearch || f.isSystem)
+      return [...this.config.fields, ...this.selfFields]
+        .filter(f => (f.isSearch || f.isSystem))// qrcodeId?
         .map(field => {
           f = _.cloneDeep(field);
 
@@ -97,31 +92,11 @@ export default {
     this.computedWhetherAddQrcodeField();
   },
   methods: {
-    buildSelfFields() {
-      let fields = [
-        {
-          displayName: '选择团队',
-          fieldName: 'tags',
-          formType: 'tags',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          operator: 'between',
-          orderId: -2.5
-        },
-        {
-          displayName: '创建时间',
-          fieldName: 'createTime',
-          formType: 'date',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          operator: 'between',
-          orderId: -2
-        },
-        {
-          displayName: '有无提醒',
-          fieldName: 'hasRemind',
+    computedWhetherAddQrcodeField() {
+      if (this.initData?.productConfig?.qrcodeEnabled) {
+        this.selfFields = [...this.selfFields, {
+          displayName: '是否绑定二维码',
+          fieldName: 'qrcodeState',
           formType: 'select',
           isExport: false,
           isNull: 1,
@@ -145,97 +120,26 @@ export default {
               }
             ]
           }
-        }
-      ];
-
-      let hasLinkman = this.config.fields.filter(
-        item => item.fieldName == 'linkmanName'
-      )[0];
-      let hasAddress = this.config.fields.filter(
-        item => item.fieldName == 'address'
-      )[0];
-
-      if (hasLinkman) {
-        fields.push({
-          displayName: '联系人',
-          fieldName: 'linkmanId',
+        }, {
+          displayName: '创建人',
+          fieldName: 'createUser',
           formType: 'linkman',
           isExport: false,
           isNull: 1,
           isSystem: 1,
-          orderId: -11,
-          placeholder: '请输入关键字搜索联系人'
-        });
-      }
-
-      if (hasAddress) {
-        fields.push({
-          displayName: '区域',
-          fieldName: 'area',
-          formType: 'area',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -10
-        });
-        fields.push({
-          displayName: '详细地址',
-          fieldName: 'addressDetail',
-          formType: 'text',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -9
-        });
-      }
-
-      return fields;
-    },
-    computedWhetherAddQrcodeField() {
-      this.selfFields = [
-        ...this.selfFields,
-        {
-          displayName: '创建人',
-          fieldName: 'createUser',
-          formType: 'user',
-          returnData: 'name',
-          noClearable: true,
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
           orderId: -3.5,
-          placeHolder: '请输入创建人'
-        },
-        this.initData?.productConfig?.qrcodeEnabled
-          ? {
-            displayName: '是否绑定二维码',
-            fieldName: 'qrcodeState',
-            formType: 'select',
-            isExport: false,
-            isNull: 1,
-            isSystem: 1,
-            operator: 'between',
-            orderId: 1000,
-            setting: {
-              isMulti: false,
-              dataSource: [
-                {
-                  text: '全部',
-                  value: ''
-                },
-                {
-                  text: '是',
-                  value: 1
-                },
-                {
-                  text: '否',
-                  value: 2
-                }
-              ]
-            }
-          }
-          : {}
-      ];
+          placeHolder:'请输入创建人',
+        }, {
+          displayName: '二维码编号',
+          fieldName: 'qrcodeId',
+          formType: 'text',
+          placeHolder:'请输入产品二维码',
+          isExport: false,
+          isSystem: 1,
+          orderId: 1001,
+        }]
+      }
+      
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
@@ -511,18 +415,17 @@ export default {
           if (action === 'dist') {
             return (this.form.area = event);
           }
-
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },
         renderInput(h, field) {
           const f = {
-            ...Object.freeze(field)
-          };
-
+            ...Object.freeze(field),
+          }
+          
           let comp = FormFieldMap.get(f.formType);
 
-          if (!comp || f.formType === 'area') {
+          if (!comp && f.formType !== 'tags' && f.formType !== 'customer' && f.formType !== 'linkman') {
             return null;
           }
 
@@ -556,7 +459,20 @@ export default {
                   this.form[f.fieldName] = event.keyword;
                 }
               }
-            });
+            )
+          } else if (f.formType === 'linkman') {
+            childComp = h(
+              'linkman-search',
+              {
+                props: {
+                  field: f,
+                  value: this.form[f.fieldName],
+                  disableMap: true,
+                },
+                on: {
+                  update: event => this.update(event)
+                }
+              });
           } else if (f.formType === 'customer') {
             childComp = h('customer-search', {
               props: {

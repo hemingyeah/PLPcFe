@@ -1,10 +1,44 @@
-/** 请求代理 
- * @author dongls 
-*/
-// utils
-const { isNotLocalEnv } = require('../model/proxyConfigModel');
-const https = require(isNotLocalEnv ? 'https' : 'http');
-const { getRequestOptions, getProxyOptions, toJSON, getBody } = require('./HttpUtil');
+/** 请求代理 @author dongls */
+const http = require('http');
+
+const DEFAULT_OPIONS = {
+  host: 'dev.api.shb.ltd',
+  port: 8028, // bodz:本地启动端口为8028
+  headers: {}
+};
+
+const AGENT = new http.Agent({
+  keepAlive: true,
+  maxSockets: 1024,
+  maxFreeSockets: 256
+});
+
+/** 如果解析失败返回原值 */
+function toJSON(data) {
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    return data;
+  }
+}
+
+/**
+ * 拆解返回体
+ * @param {*} response @see http://nodejs.cn/api/http.html#http_class_http_serverresponse
+ * @param {*} body 返回的数据
+ * @param {*} error 
+ */
+function getBody(response, body, error){  
+  let statusCode = error ? 500 : response.statusCode;
+  let status = statusCode >= 200 && statusCode < 300;
+
+  let headers = {};
+  if(response && response.headers) {
+    headers = response.headers;
+  }
+
+  return {statusCode, status, headers, body, error};
+}
 
 module.exports = {
   /**
