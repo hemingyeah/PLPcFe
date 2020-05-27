@@ -388,17 +388,16 @@ export default {
       ];
 
 
-      if (this.initData.productConfig.qrcodeEnabled) {
-        fixedFields.push({
-          displayName: '二维码编号',
-          fieldName: 'qrcodeId',
-          formType: 'text',
-          isExport: false,
-          isSystem: 1,
-          placeholder: '请输入产品二维码',
-          orderId: 10001
-        })
-      }
+      // if (this.initData.productConfig.qrcodeEnabled) {
+      //   fixedFields.push({
+      //     displayName: '二维码编号',
+      //     fieldName: 'qrcodeId',
+      //     formType: 'text',
+      //     isExport: false,
+      //     isSystem: 1,
+      //     orderId: -4
+      //   })
+      // }
 
       return (this.initData.productFields || [])
         .concat(fixedFields)

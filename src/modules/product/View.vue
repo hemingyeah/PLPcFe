@@ -212,15 +212,15 @@ export default {
         },
       ];
 
-      if (this.initData.productConfig.qrcodeEnabled) {
-        fixedFields.push({
-          displayName: '二维码编号',
-          fieldName: 'qrcodeId',
-          isSystem: 1,
-          formType: 'text',
-          orderId: 10000
-        })
-      }
+      // if (this.initData.productConfig.qrcodeEnabled) {
+      //   fixedFields.push({
+      //     displayName: '二维码编号',
+      //     fieldName: 'qrcodeId',
+      //     isSystem: 1,
+      //     formType: 'text',
+      //     orderId: 10000
+      //   })
+      // }
 
       return this.initData.productFields
         .concat(fixedFields)
