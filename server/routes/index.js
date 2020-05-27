@@ -25,6 +25,8 @@ const dataScreenRouter = require('./dataScreen');
 const repositoryRouter = require('./repository')
 const BillRouter = require('./bill')
 const jobtransferRouter = require('./jobtransfer')
+const doMyselft = require('./doMyself');
+const customerContact = require('./customerContact')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -33,26 +35,24 @@ router.get('/', async ctx => {
   let headers = {};
   let body = null;
 
-  let result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
-  
+  let result = await HttpClient.request('/', 'get', null, { headers: reqHeaders });
+
   // 请求失败,模拟登陆
   if (!result.status) {
     let mockUser = USER_CONFIG.loginUser;
     let userToken = 'dev_corpId';
-
-    if (null != mockUser){
+    if (null != mockUser) {
       userToken = `${mockUser.userId}_${mockUser.tenantId}`;
     }
 
     let loginRes = await HttpClient.request(`/dd/mockLogin?code=dev_code&corpId=${userToken}`, 'get', null);
-    
     if (loginRes.status) {
       let cookie = loginRes.headers['set-cookie'] || {};
       headers['set-cookie'] = cookie;
       reqHeaders['cookie'] = cookie[0];
 
       // 再次请求
-      result = await HttpClient.request('/', 'get', null, {headers: reqHeaders});
+      result = await HttpClient.request('/', 'get', null, { headers: reqHeaders });
     } else {
       console.log(loginRes)
     }
@@ -62,7 +62,7 @@ router.get('/', async ctx => {
   body = result.body;
 
   // 补全headers
-  for(let name in headers){
+  for (let name in headers) {
     ctx.response.set(name, headers[name])
   }
 
@@ -85,6 +85,51 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
+// /api/app/outside/es
+// router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
+//   host: '192.168.31.237',
+//   port: 10004,
+//   headers: {
+//     'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
+//   },
+// }))
+
+// /api/app/outside
+router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
+  // host: '47.98.255.79',
+  host: '30.40.57.167',
+  port: 10006,
+  // host: '192.168.31.70',
+  // port: 10004,
+  headers: {
+    // 'cookie': `VIPPUBLINKJSESSIONID=802755db-e26b-4d8a-96a8-17795613766e`
+    'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+  },
+  // headers: {
+  //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
+  // }
+}))
+
+router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.57.167', // 仇太俊
+  // host: '192.168.31.70',
+  port: 8080,
+  headers: {
+    // 'cookie': `VIPPUBLINKJSESSIONID=71a54c18-dcfd-4f2d-99a9-a5faf00835e1`
+    'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+  },
+  // headers: {
+  //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
+  // }
+}))
+
+router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
+  host: '47.98.255.79',
+  port: 10002,
+  // headers: {
+  //   'cookie': `VIPPUBLINKJSESSIONID=e7b50d17-9e1b-4190-bacb-e4029634a82f`
+  // }
+}))
 
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
@@ -98,16 +143,19 @@ router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
 router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
+router.use('', doMyselft.routes(), doMyselft.allowedMethods());
+router.use('', customerContact.routes(), customerContact.allowedMethods());
+
 router.all('/api/*', async ctx => {
-  
+
   let option = {
     headers: Object.assign({}, ctx.request.headers)
   };
-  
+
   const request = ctx.request;
-  
+
   let result = await HttpsClient.request(request.url, request.method, request.rawBody, option);
-  
+
   ctx.status = result.statusCode;
   ctx.body = result.body;
 });

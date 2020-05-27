@@ -1,23 +1,30 @@
 <template>
   <base-modal title="导出列选择" :show.sync="visible" width="600px" class="base-export-modal">
     <div>
-      <el-checkbox v-model="isCheckedAll" @change="toggle">
-        全选
-      </el-checkbox>
+      <el-checkbox v-model="isCheckedAll" @change="toggle">全选</el-checkbox>
     </div>
-    <el-checkbox-group v-model="checkedArr" @change="handleChange" style="width:100%;" class="base-export-field-wrap">
-      <el-checkbox v-for="col in filterColumns" :key="col.field" :label="col.exportAlias ? col.exportAlias : col.field" >
-        {{col.label}}
-      </el-checkbox>
+    <el-checkbox-group
+      v-model="checkedArr"
+      @change="handleChange"
+      style="width:100%;"
+      class="base-export-field-wrap"
+    >
+      <el-checkbox
+        v-for="col in filterColumns"
+        :key="col.field"
+        :label="col.exportAlias ? col.exportAlias : col.field"
+        v-if="!col.conType || col.conType !== 'btnArray'"
+      >{{col.label}}</el-checkbox>
     </el-checkbox-group>
-  
+
     <div slot="footer" class="export-footer">
-      <button type="button" class="btn base-modal-text-btn" @click="visible = false">
-        关闭
-      </button>
-      <button type="button" class="btn btn-primary" :disabled="pending" @click="exportData">
-        {{pending ? '正在导出' : '导出'}}
-      </button>
+      <button type="button" class="btn base-modal-text-btn" @click="visible = false">关闭</button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        :disabled="pending"
+        @click="exportData"
+      >{{pending ? '正在导出' : '导出'}}</button>
     </div>
 
     <div class="base-export-bridge" ref="bridge"></div>
@@ -25,24 +32,24 @@
 </template>
 
 <script>
-import Platform from '@src/platform';
-import http from '@src/util/http';
+import Platform from "@src/platform";
+import http from "@src/util/http";
 
 const MAX_COUNT = 5000;
 
 export default {
-  name: 'base-export',
+  name: "base-export",
   props: {
     columns: Array,
     action: String,
     buildParams: Function,
     title: {
       type: String,
-      default: '导出列选择'
+      default: "导出列选择"
     },
     method: {
       type: String,
-      default: 'get'
+      default: "get"
     },
     /**
      * 函数必须返回Promise对象
@@ -51,54 +58,60 @@ export default {
     validate: Function,
     downloadUrl: String
   },
-  data(){
+  data() {
     return {
       ids: [],
-      fileName: '',
+      fileName: "",
       visible: false,
       pending: false,
       checkedArr: [],
       isCheckedAll: true,
       isDownloadNow: false, // 导出是否是立刻下载模式
 
-      checked: ''
-    }
+      checked: ""
+    };
   },
   computed: {
-    filterColumns(){
-      return this.columns.filter(item => item.export)
+    filterColumns() {
+      return this.columns.filter(item => item.export);
     }
   },
   methods: {
-    open(ids = [], fileName = '导出数据.xlsx', isDownloadNow = false){
+    open(ids = [], fileName = "导出数据.xlsx", isDownloadNow = false) {
       this.pending = false;
       this.ids = ids;
       this.fileName = fileName;
 
-      this.checkedArr = this.filterColumns.map(item => item.exportAlias ? item.exportAlias : item.field);
+      this.checkedArr = this.filterColumns.map(item =>
+        item.exportAlias ? item.exportAlias : item.field
+      );
       this.isCheckedAll = true;
       this.isDownloadNow = isDownloadNow;
 
       this.visible = true;
     },
-    toggle(value){
-      this.checkedArr = value ? this.filterColumns.map(item => item.exportAlias ? item.exportAlias : item.field) : []
+    toggle(value) {
+      this.checkedArr = value
+        ? this.filterColumns.map(item =>
+            item.exportAlias ? item.exportAlias : item.field
+          )
+        : [];
     },
-    handleChange(){
+    handleChange() {
       this.isCheckedAll = this.checkedArr.length == this.filterColumns.length;
     },
     // 表单形式导出 TODO: 修改
-    formExport(params){
-      let form = document.createElement('form');
-      this.$refs.bridge.appendChild(form)
-      
-      for(let prop in params){
-        let input = document.createElement('input');  
-        input.name = prop;  
-        input.value = params[prop];  
-        form.appendChild(input);  
+    formExport(params) {
+      let form = document.createElement("form");
+      this.$refs.bridge.appendChild(form);
+
+      for (let prop in params) {
+        let input = document.createElement("input");
+        input.name = prop;
+        input.value = params[prop];
+        form.appendChild(input);
       }
-      
+
       form.method = this.method;
       form.action = this.action;
       form.submit();
@@ -107,98 +120,110 @@ export default {
       this.pending = false;
 
       setTimeout(() => {
-        this.$refs.bridge.removeChild(form)
+        this.$refs.bridge.removeChild(form);
       }, 150);
     },
     // ajax形式导出
-    async ajaxExport(params){
+    async ajaxExport(params) {
       let ajax = null;
       // 是否是立即下载
-      if(this.isDownloadNow) {
-        if(this.downloadUrl) {
+      if (this.isDownloadNow) {
+        if (this.downloadUrl) {
           this.billExport(params);
           return;
         }
-        ajax = http.axios(this.method, this.action, params, false, {responseType: 'blob'}).then(blob => {
-          let link = document.createElement('a');
+        ajax = http
+          .axios(this.method, this.action, params, false, {
+            responseType: "blob"
+          })
+          .then(blob => {
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.download = this.fileName;
+            link.href = url;
+            this.$refs.bridge.appendChild(link);
+            link.click();
+
+            this.visible = false;
+            this.pending = false;
+            setTimeout(() => {
+              URL.revokeObjectURL(url);
+              this.$refs.bridge.removeChild(link);
+            }, 150);
+          })
+          .catch(err => console.error(err));
+      } else {
+        ajax = http
+          .axios(this.method, this.action, params, false)
+          .then(res => {
+            this.visible = false;
+            this.pending = false;
+
+            Platform.alert(res.message);
+
+            if (res.status == 0) {
+              window.parent.showExportList();
+              window.parent.exportPopoverToggle(true);
+            }
+          })
+          .catch(err => console.error(err));
+      }
+
+      return ajax;
+    },
+    async billExport(params) {
+      let ajax = null;
+      let token = await http.post(this.downloadUrl, params, false);
+      let url = `${this.action}?token=${token.data}`;
+      ajax = http
+        .axios(this.method, url, {}, false, { responseType: "blob" })
+        .then(blob => {
+          let link = document.createElement("a");
           let url = URL.createObjectURL(blob);
           link.download = this.fileName;
           link.href = url;
-          this.$refs.bridge.appendChild(link)
+          this.$refs.bridge.appendChild(link);
           link.click();
 
           this.visible = false;
           this.pending = false;
           setTimeout(() => {
             URL.revokeObjectURL(url);
-            this.$refs.bridge.removeChild(link)
+            this.$refs.bridge.removeChild(link);
           }, 150);
-        }).catch(err => console.error(err));
-
-      } else {
-        ajax = http.axios(this.method, this.action, params, false).then(res => {
-
-          this.visible = false;
-          this.pending = false;
-
-          Platform.alert(res.message);
-
-          if(res.status == 0) {
-            window.parent.showExportList();
-            window.parent.exportPopoverToggle(true);
-          }
-
-        }).catch(err => console.error(err))
-      }
-
-      return ajax
-    },
-    async billExport(params) {
-      let ajax = null;
-      let token = await http.post(this.downloadUrl, params, false);
-      let url = `${ this.action }?token=${ token.data }`;
-      ajax = http.axios(this.method, url, {}, false, {responseType: 'blob'}).then(blob => {
-        let link = document.createElement('a');
-        let url = URL.createObjectURL(blob);
-        link.download = this.fileName;
-        link.href = url;
-        this.$refs.bridge.appendChild(link)
-        link.click();
-
-        this.visible = false;
-        this.pending = false;
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-          this.$refs.bridge.removeChild(link)
-        }, 150);
-      }).catch(err => console.error(err));
+        })
+        .catch(err => console.error(err));
 
       return ajax;
     },
 
-    async exportData(){
-      if(this.checkedArr.length == 0) return Platform.alert('请至少选择一列导出');
+    async exportData() {
+      if (this.checkedArr.length == 0)
+        return Platform.alert("请至少选择一列导出");
 
       this.pending = true;
 
       // 如果提供验证函数，则进行验证
-      if(typeof this.validate == 'function'){
-        let validateRes = await this.validate(this.ids, MAX_COUNT)
-        if(validateRes) {
+      if (typeof this.validate == "function") {
+        let validateRes = await this.validate(this.ids, MAX_COUNT);
+        if (validateRes) {
           this.pending = false;
           this.visible = false;
-          return Platform.alert(validateRes)
+          return Platform.alert(validateRes);
         }
       }
 
-      let params = typeof this.buildParams == 'function' 
-        ? this.buildParams(this.checkedArr, this.ids)
-        : {checked: this.checkedArr.join(','), ids: this.ids.join(',')};
+      let params =
+        typeof this.buildParams == "function"
+          ? this.buildParams(this.checkedArr, this.ids)
+          : { checked: this.checkedArr.join(","), ids: this.ids.join(",") };
 
-      return navigator.userAgent.indexOf('Trident') >= 0 ? this.formExport(params) : this.ajaxExport(params);
+      return navigator.userAgent.indexOf("Trident") >= 0
+        ? this.formExport(params)
+        : this.ajaxExport(params);
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -215,13 +240,13 @@ export default {
 .export-footer {
   display: flex;
   justify-content: flex-end;
-  
-  .btn-text{
+
+  .btn-text {
     margin-right: 10px;
   }
 }
 
-.base-export-title{
+.base-export-title {
   display: inline-block;
   min-width: 80px;
   margin-right: 10px;
@@ -230,23 +255,23 @@ export default {
   color: #303133;
 }
 
-.base-export-field-wrap{
+.base-export-field-wrap {
   display: flex;
   flex-flow: row wrap;
 
-  .el-checkbox{
+  .el-checkbox {
     margin-left: 0;
     margin-top: 10px;
     width: 25%;
   }
 }
 
-.base-export-bridge{
+.base-export-bridge {
   position: absolute;
   top: -1000px;
   left: -1000px;
 
-  a{
+  a {
     display: block;
     border: none;
     outline: none;

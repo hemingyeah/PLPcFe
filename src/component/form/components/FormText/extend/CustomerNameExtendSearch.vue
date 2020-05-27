@@ -7,65 +7,65 @@
     remote
     reserve-keyword
     placeholder="请输入关键词搜索"
+    :disabled="field.disabled?field.disabled:false"
     clearable
     :loading="loading"
-    :remote-method="searchCustomer">
-    <el-option
-      v-for="item in options"
-      :key="item.id"
-      :label="item.name"
-      :value="item.id">
-    </el-option>
+    :remote-method="searchCustomer"
+  >
+    <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
   </el-select>
-
 </template>
 
 <script>
-import FormMixin from '@src/component/form/mixin/form';
+import FormMixin from "@src/component/form/mixin/form";
 
 export default {
-  name: 'customer-search',
+  name: "customer-search",
   mixins: [FormMixin],
   props: {
     value: {
       type: String,
-      default: ''
+      default: ""
     }
   },
   data() {
     return {
       loading: false,
-      options: [],
+      options: []
     };
   },
   created() {
-
     let options = sessionStorage.getItem(`${this.field.fieldName}_options`);
 
-    this.options = JSON.parse(options || '[]');
-
+    this.options = JSON.parse(options || "[]");
   },
   methods: {
-    choose(newValue){
+    choose(newValue) {
       let oldValue = null;
-      this.$emit('update', {newValue, oldValue, field: this.field});
+      this.$emit("update", { newValue, oldValue, field: this.field });
     },
     searchCustomer(keyword) {
       this.loading = true;
-      this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+      this.$http
+        .get("/customer/getListAsyn", { keyword, pageNum: 1 })
         .then(res => {
           this.options = res.list;
           this.loading = false;
-          sessionStorage.setItem(`${this.field.fieldName}_options`, JSON.stringify(this.options));
+          sessionStorage.setItem(
+            `${this.field.fieldName}_options`,
+            JSON.stringify(this.options)
+          );
         })
-        .catch(err => console.error('searchCustomerManager function catch err', err));
-    },
-  },
-}
+        .catch(err =>
+          console.error("searchCustomerManager function catch err", err)
+        );
+    }
+  }
+};
 </script>
 
 <style lang="scss">
-  .user-search {
-    width: 100%;
-  }
+.user-search {
+  width: 100%;
+}
 </style>

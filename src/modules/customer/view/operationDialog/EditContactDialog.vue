@@ -177,6 +177,7 @@ export default {
         }
 
         if(result.status != 0) {
+          this.pending = false;
           return this.$platform.notification({
             title: '失败',
             message: result.message || `${this.action === 'create' ? '新建' : '更新'}失败`,

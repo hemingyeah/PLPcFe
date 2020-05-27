@@ -1,0 +1,846 @@
+<template>
+  <div id="menu-set-box">
+    <p class="set-des">
+      您可以在此将自助门户功能配置到您的公众号菜单，也可以
+      <span class="color-b">将客户自助门户</span>内的链接嵌入到您的公众号菜单。在配置公众号菜单前，请先确认以下内容
+    </p>
+    <div class="set-box">
+      <!-- box-left start -->
+      <div class="box-left">
+        <!-- bottom-menu start -->
+        <div class="bottom-menu">
+          <div class="bottom-icon">
+            <i class="iconfont icon-home"></i>
+          </div>
+          <!-- move-menu-box start -->
+          <draggable class="menu-box" v-model="menu_arr" v-show="edit_type===2">
+            <div
+              v-for="(item,index) in menu_arr"
+              :key="index"
+              class="menu-item can-move"
+              draggable="true"
+            >
+              <i v-if="item.type==='add'" class="iconfont icon-home"></i>
+              <p class="overHideCon_1" v-else>{{item.name}}</p>
+
+              <draggable
+                class="pop-top-menu-box"
+                :group="{name:'shared'}"
+                v-if="item.shb_type!=='add' && item.sub_button.length>0"
+                v-model="item.sub_button"
+                :fallback-on-body="true"
+                swap-threshold="1"
+                animation="150"
+              >
+                <div
+                  v-for="(items,indexs) in item.sub_button"
+                  :key="indexs"
+                  class="menu-items can-move"
+                  draggable="true"
+                >
+                  <i v-if="items.shb_type==='add'" class="iconfont icon-home"></i>
+                  <p class="overHideCon_1" v-else>{{items.name}}</p>
+                </div>
+                <div :class="['hide_virtual',item.sub_button.length<=0?'show_virtual':'']"></div>
+                <div class="arrow-css"></div>
+              </draggable>
+            </div>
+          </draggable>
+          <!-- move-menu-box end -->
+          <!-- menu-box start -->
+          <div class="menu-box" v-model="menu_arr" v-show="edit_type!==2">
+            <div
+              v-for="(item,index) in menu_arr"
+              :key="index"
+              :class="main_menu_class(index)"
+              @click="valid_menu_form(index)"
+            >
+              <i v-if="item.shb_type==='add'" class="iconfont icon-home"></i>
+              <p class="overHideCon_1" v-else>{{item.name}}</p>
+
+              <div
+                class="pop-top-menu-box"
+                v-if="item.shb_type!=='add' && now_main_menu===index && item.sub_button.length>0"
+              >
+                <div
+                  v-for="(items,indexs) in item.sub_button"
+                  :key="indexs"
+                  :class="child_menu_class(index, indexs)"
+                  @click.stop="valid_menu_form(index,indexs)"
+                >
+                  <i v-if="items.shb_type==='add'" class="iconfont icon-home"></i>
+                  <p class="overHideCon_1" v-else>{{items.name}}</p>
+                </div>
+                <div class="arrow-css"></div>
+              </div>
+            </div>
+          </div>
+          <!-- menu-box end -->
+        </div>
+        <!-- bottom-menu end -->
+      </div>
+      <!-- box-left end -->
+      <!-- box-right start -->
+      <div class="box-right" v-show="now_chooseed_menu && edit_type===1">
+        <div class="flex-x box-head">
+          <p class="flex-1 overHideCon_1">{{ruleForm.name}}</p>
+          <p @click="deleteMenu()">删除菜单</p>
+        </div>
+        <el-form
+          class="menu-con-form"
+          :model="ruleForm"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          label-position="left"
+        >
+          <el-form-item label="菜单名称" prop="name">
+            <el-input v-model="ruleForm.name" class="name-input" size="small" placeholder="菜单名称"></el-input>
+            <p class="tips-con">底部菜单内容最多16个字节，子菜单内容最多60个字节</p>
+          </el-form-item>
+          <el-form-item label="菜单内容" prop="menuType" v-show="!now_chooseed_menu.onlyName">
+            <el-radio-group v-model="ruleForm.menuType">
+              <el-radio label="售后宝功能"></el-radio>
+              <el-radio label="跳转页面"></el-radio>
+              <el-radio label="回复文本消息"></el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <div class="menu-change-con" v-show="!now_chooseed_menu.onlyName">
+            <el-radio-group
+              class="change-con-radio-group"
+              v-model="ruleForm.menuTypeArr"
+              v-if="ruleForm.menuType==='售后宝功能'"
+              @change="radioChange"
+            >
+              <p class="tips-con">选择需要为此菜单配置的售后宝功能，订阅者点击后通过登录验证将打开对应页面</p>
+              <div class="flex-x change-con-radio">
+                <div>
+                  <el-radio label="服务请求" value="www.baidu1.com"></el-radio>
+                </div>
+                <div>
+                  <el-radio label="服务进度" value="www.baidu2.com"></el-radio>
+                </div>
+              </div>
+              <div class="flex-x change-con-radio">
+                <div>
+                  <el-radio label="服务评价" value="www.baidu3.com"></el-radio>
+                </div>
+                <div>
+                  <el-radio label="服务商城" value="www.baidu4.com"></el-radio>
+                </div>
+              </div>
+              <div class="flex-x change-con-radio">
+                <div>
+                  <el-radio label="知识库" value="www.baidu5.com"></el-radio>
+                </div>
+              </div>
+            </el-radio-group>
+            <div v-if="ruleForm.menuType==='跳转页面'">
+              <p class="tips-con mar-b-12">订阅者点击该子菜单会跳到以下链接</p>
+              <div class="flex-x al-c">
+                <div class="flex-x al-c">
+                  <p class="font-12 mar-r-12">页面地址</p>
+                </div>
+                <div class="flex-1">
+                  <el-input
+                    v-model="ruleForm.input_url"
+                    class="url-input"
+                    size="small"
+                    placeholder="请输入页面地址"
+                  ></el-input>
+                </div>
+              </div>
+            </div>
+
+            <el-input
+              v-if="ruleForm.menuType==='回复文本消息'"
+              type="textarea"
+              resize="none"
+              :rows="5"
+              placeholder="请输入内容"
+              v-model="ruleForm.reserve"
+            ></el-input>
+          </div>
+        </el-form>
+      </div>
+      <!-- box-right end -->
+    </div>
+
+    <div class="bottom-btn">
+      <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(2)">菜单排序</button>
+
+      <button class="btn btn-primary" v-if="edit_type===0" @click="change_edit_type(1)">编辑模式</button>
+      <button class="btn btn-primary" v-if="edit_type===0" @click="updateMenu(1)">同步菜单</button>
+      <button
+        class="btn btn-primary"
+        v-if="edit_type===1||edit_type===2"
+        @click="change_edit_type(edit_type===1?0:1,edit_type===1?true:false)"
+      >{{edit_type===1?'保存并发布':'继续编辑'}}</button>
+      <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(0)">取消编辑</button>
+    </div>
+  </div>
+</template>
+<script>
+// 缓存数据
+let menu_arr_stash = [];
+
+let url_obj = {
+  服务请求: "www.baidu.com",
+  服务进度: "www.baidu2.com",
+  服务评价: "www.baidu3.com",
+  服务商城: "www.baidu4.com",
+  知识库: "www.baidu5.com"
+};
+let input_obj = {
+  售后宝功能: "config_url",
+  跳转网页: "input_url"
+};
+let menu_main_tem = {
+  shb_type: "main_menu",
+  url: "",
+  input_url: "",
+  config_url: "",
+  type: "view",
+  sub_button: [
+    {
+      shb_type: "add"
+    }
+  ],
+  name: "菜单名称",
+  menuType: "售后宝功能",
+  menuTypeArr: "服务请求",
+  url: "",
+  input_url: "",
+  config_url: "",
+  reserve: ""
+};
+let menu_add_tem = {
+  shb_type: "add"
+};
+let menu_children_tem = {
+  shb_type: "children_menu",
+  type: "view",
+  name: "菜单名称",
+  menuType: "售后宝功能",
+  menuTypeArr: "服务请求",
+  url: "",
+  input_url: "",
+  config_url: "",
+  reserve: "",
+  sub_button: []
+};
+let form_tem = {
+  name: "菜单名称",
+  menuType: "售后宝功能",
+  menuTypeArr: "服务请求",
+  input_url: "",
+  config_url: "",
+  reserve: ""
+};
+
+import draggable from "vuedraggable";
+import _ from "lodash";
+// 校验字节数
+let computedStrLen = function(str) {
+  let len = 0;
+  for (let i = 0; i < str.length; i++) {
+    let c = str.charCodeAt(i);
+    // 单字节加1
+    if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+      len++;
+    } else {
+      len += 2;
+    }
+  }
+  return len;
+};
+export default {
+  name: "menu-set",
+  components: {
+    draggable
+  },
+  watch: {
+    ruleForm: {
+      handler(newValue, oldValue) {
+        if (!this.now_chooseed_menu) {
+          return;
+        }
+        let now_menu = this.now_chooseed_menu;
+        if (now_menu.indexs > -1) {
+          let now_data = this.menu_arr[now_menu.index].sub_button[
+            now_menu.indexs
+          ];
+          this.menu_arr[now_menu.index].sub_button[now_menu.indexs] = {
+            ...now_data,
+            ...newValue
+          };
+        } else {
+          let now_data = this.menu_arr[now_menu.index];
+          this.menu_arr[now_menu.index] = {
+            ...now_data,
+            ...newValue
+          };
+        }
+      },
+      deep: true,
+      immediate: true
+    },
+    edit_type: {
+      handler(newValue, oldValue) {
+        this.now_chooseed_menu = false;
+      }
+    }
+  },
+  data() {
+    let input_length = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("名称不能为空"));
+      }
+      if (computedStrLen(value) > 16) {
+        callback(new Error("字数不超过16个字节"));
+      } else {
+        callback();
+      }
+    };
+    let input_length_child = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("名称不能为空"));
+      }
+      if (computedStrLen(value) > 60) {
+        callback(new Error("字数不超过60个字节"));
+      } else {
+        callback();
+      }
+    };
+
+    return {
+      edit_type: 0, // 当前菜单的编辑方式 0 不可编辑 1 修改菜单内容模式 2 拖拽模式
+      show_type: 0, // 不可编辑模式下展现第几个菜单栏
+      now_main_menu: 0,
+      menu_arr: [],
+      ruleForm: {},
+      rules: {
+        name: [
+          { required: true, message: "请输入菜单名称", trigger: "blur" },
+          { validator: input_length, trigger: "blur" }
+        ]
+      },
+      now_chooseed_menu: false
+    };
+  },
+  created() {},
+  mounted() {
+    this.getMenuList().then(res => {
+      let result = res.data.wechatMenu
+        ? JSON.parse(res.data.selfmenu_info).button
+        : [];
+      // 微信菜单数据转换成我们识别的数据
+
+      // this.menu_arr = this.wxMenuChange(result);
+      this.menu_arr = result;
+      menu_arr_stash = this.menu_arr;
+      console.log("getSuccess", JSON.parse(res.data.wechatMenu).menu.button);
+    });
+  },
+  methods: {
+    wxMenuChange(data = []) {
+      if (data.length <= 0) {
+        return data;
+      }
+      let data_stash = _.cloneDeep(data);
+      data.forEach((item, index) => {
+        if (item.sub_button.list && item.sub_button.list.length > 0) {
+          item.sub_button.list.forEach((items, indexs) => {
+            if (items.sub_button.list && items.sub_button.list.length > 0) {
+              data_stash[index].sub_button.list[indexs].sub_button =
+                items.sub_button.list;
+            }
+          });
+          data_stash[index].sub_button = item.sub_button.list;
+        }
+      });
+    },
+    main_menu_class(index) {
+      if (this.now_chooseed_menu && this.now_chooseed_menu.indexs < 0)
+        return `menu-item ${this.edit_type === 1 ? "can-point" : ""} ${
+          this.now_chooseed_menu.index === index ? "menu-checked" : ""
+        }`;
+      else return `menu-item ${this.edit_type === 1 ? "can-point" : ""}`;
+    },
+    child_menu_class(index, indexs) {
+      return [
+        "menu-items",
+        this.edit_type === 1 ? "can-point" : "",
+        this.now_chooseed_menu
+          ? this.now_chooseed_menu.index === index &&
+            this.now_chooseed_menu.indexs === indexs
+            ? "menu-checked"
+            : ""
+          : ""
+      ];
+    },
+    pub_valid_menu() {
+      return new Promise((resolve, reject) => {
+        if (this.edit_type === 1 && this.now_chooseed_menu) {
+          this.$refs["ruleForm"].validate(valid => {
+            if (valid) {
+              resolve();
+            } else {
+              console.log("error submit!!");
+              reject();
+            }
+          });
+        } else {
+          resolve();
+        }
+      });
+    },
+    valid_menu_form(index = 0, indexs = -1) {
+      this.pub_valid_menu()
+        .then(() => {
+          this.main_menu_click(index, indexs);
+        })
+        .catch(err => {
+          console.error("valid_menu_formerror", err);
+        });
+    },
+    main_menu_click(index = 0, indexs = -1) {
+      let maxLength = 3;
+      let _arr = this.menu_arr;
+      let item = _arr[index];
+      this.now_main_menu = index;
+
+      this.resetForm("ruleForm");
+
+      let main_tem = _.cloneDeep(menu_main_tem);
+      let add_tem = _.cloneDeep(menu_add_tem);
+      if (indexs > -1) {
+        maxLength = 5;
+        main_tem = _.cloneDeep(menu_children_tem);
+        _arr = this.menu_arr[index].sub_button;
+        item = _arr[indexs];
+      }
+      if (this.edit_type === 1) {
+        if (item.shb_type === "add") {
+          if (_arr.length < maxLength) {
+            _arr.splice(_arr.length - 1, 1, main_tem, add_tem);
+          } else {
+            _arr.splice(_arr.length - 1, 1, main_tem);
+          }
+
+          this.main_menu_click(index, indexs > -1 ? indexs : -1);
+        } else {
+          this.now_chooseed_menu = {
+            index: index,
+            indexs: indexs,
+            onlyName:
+              (indexs < 0 && _arr[index].sub_button.length > 1) ||
+              item.hasOwnProperty("shb_type") === false ||
+              (item.hasOwnProperty("shb_type") === true &&
+                item.shb_type === "system_menu")
+                ? true
+                : false
+          };
+          let now_chooseed =
+            indexs > -1
+              ? this.menu_arr[index].sub_button[indexs]
+              : this.menu_arr[index];
+          this.ruleForm = { ...now_chooseed };
+        }
+      } else {
+        return;
+      }
+    },
+    // 统一将菜单参数转换成编辑模式可识别的参数
+    push_add(arr = []) {
+      return new Promise((resolve, reject) => {
+        try {
+          let arr_ = _.cloneDeep(arr);
+          let add_tem = _.cloneDeep(menu_add_tem);
+          arr_.map(res => {
+            if (res.sub_button.length < 5) {
+              res.sub_button.push(add_tem);
+            }
+            return res;
+          });
+          if (arr_.length < 3) {
+            arr_.push(add_tem);
+          }
+          resolve(arr_);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    // 统一将编辑模式参数转换成微信菜单可识别的参数
+    slice_add(arr = []) {
+      return new Promise((resolve, reject) => {
+        try {
+          if (arr.length <= 0) {
+            resolve(arr);
+          }
+          let arr_ = _.cloneDeep(arr);
+          // 剥离自定义的add类型菜单
+          if (arr_[arr_.length - 1].shb_type === "add") {
+            arr_.splice(arr_.length - 1, 1);
+          }
+          arr_.map(res => {
+            if (res.sub_button[res.sub_button.length - 1].shb_type === "add") {
+              res.sub_button.splice(res.sub_button.length - 1, 1);
+            }
+            return res;
+          });
+          arr_.forEach((res, index) => {
+            if (res.sub_button.length > 0) {
+              res.sub_button.forEach((res_, index_) => {
+                if (res_.hasOwnProperty("shb_type") === true) {
+                  arr_[index].sub_button[index_] = this.filerArrByMenuType(
+                    arr_[index].sub_button[index_]
+                  );
+                }
+              });
+            }
+          });
+
+          resolve(arr_);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    filerArrByMenuType(res) {
+      let obj = {
+        售后宝功能: {
+          url: url_obj[res.menuTypeArr],
+          config_url: res.config_url,
+          input_url: "",
+          type: "view",
+          reserve: ""
+        },
+        跳转页面: {
+          url: res.input_url,
+          config_url: "",
+          input_url: res.input_url,
+          type: "view",
+          reserve: ""
+        },
+        回复文本消息: {
+          url: "",
+          config_url: "",
+          input_url: "",
+          reserve: res.reserve,
+          value: res.reserve,
+          key: this.makeKey(res),
+          type: "click"
+        }
+      };
+      return { ...res, ...obj[res.menuType] };
+    },
+    makeKey(res) {
+      let time = new Date().getTime();
+      let number = Math.random(0, 99);
+      let res_ = window.btoa(time + "" + number);
+      return res_;
+    },
+    change_edit_type(type, save = false) {
+      if (type === this.edit_type) {
+        return;
+      }
+      this.now_main_menu = 0;
+      if (save) {
+        this.pub_valid_menu()
+          .then(() => {
+            if (type === 1) {
+              this.push_add(this.menu_arr).then(res => {
+                this.menu_arr = res;
+              });
+            } else {
+              this.slice_add(this.menu_arr).then(res => {
+                this.menu_arr = res;
+                menu_arr_stash = _.cloneDeep(res);
+                return console.log(res, "httpdata, key_arr");
+                this.setMenuList().then(res_ => {
+                  console.log("saveSuccess");
+                });
+              });
+            }
+            this.edit_type = type;
+          })
+          .catch(err => {
+            console.error("change_edit_type error", err);
+          });
+      } else {
+        if (type === 1) {
+          this.push_add(this.menu_arr).then(res => {
+            this.menu_arr = res;
+          });
+        } else {
+          this.slice_add(this.menu_arr).then(res => {
+            this.menu_arr = res;
+
+            if (type === 0) this.menu_arr = _.cloneDeep(menu_arr_stash);
+          });
+        }
+        this.edit_type = type;
+      }
+    },
+    resetForm(formName) {
+      this.now_chooseed_menu = false;
+      this[formName] = _.cloneDeep(form_tem);
+      this.$refs[formName].clearValidate();
+    },
+    deleteMenu() {
+      if (!this.now_chooseed_menu) return;
+      let now_chooseed_menu = this.now_chooseed_menu;
+      if (now_chooseed_menu.indexs > -1) {
+        // 删除子菜单
+        this.menu_arr[now_chooseed_menu.index].sub_button.splice(
+          now_chooseed_menu.indexs,
+          1
+        );
+      } else {
+        // 删除主菜单 需要提示风险
+        this.menu_arr.splice(now_chooseed_menu.index, 1);
+      }
+      this.resetForm("ruleForm");
+    },
+    updateMenu() {
+      // 拉取微信菜单数据在后台做数据转换
+      return;
+    },
+    getMenuList() {
+      return this.$http.get("/weixin/outside/api/getMenuList", {
+        appid: "wx896d29a4f5d87e75"
+      });
+    },
+    setMenuList() {
+      return this.$http.post(
+        "/weixin/outside/api/saveMenuList",
+        {
+          appid: "wx896d29a4f5d87e75",
+          wechatMenu: JSON.stringify({ menu: { button: menu_arr_stash } })
+        },
+        false
+      );
+    },
+    radioChange(e) {
+      if (!this.now_chooseed_menu) {
+        return;
+      }
+      console.log(e, "12313123");
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+.overHideCon_1 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.set-des {
+  font-size: 14px;
+  color: #000;
+  width: 672px;
+  margin-bottom: 25px;
+}
+.color-b {
+  color: #3aa7ff;
+}
+.set-box {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  .box-left {
+    width: 212px;
+    min-width: 212px;
+    height: 377px;
+    min-height: 377px;
+    border: 1px solid rgba(226, 226, 226, 1);
+    box-sizing: border-box;
+    background: #fff;
+    margin-left: 11px;
+    margin-right: 40px;
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    .bottom-menu {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      height: 30px;
+      background: rgba(251, 251, 251, 1);
+      border-top: 1px solid rgba(226, 226, 226, 1);
+      box-sizing: border-box;
+      .bottom-icon {
+        width: 24px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        border-right: 1px solid rgba(226, 226, 226, 1);
+        justify-content: center;
+      }
+      .menu-box {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        .menu-item:not(:last-child) {
+          border-right: 1px solid rgba(226, 226, 226, 1);
+        }
+        .can-move {
+          cursor: move;
+        }
+        .can-point {
+          cursor: pointer;
+        }
+        .menu-checked {
+          outline: 1px solid #55b7b4;
+        }
+        .menu-item {
+          position: relative;
+          display: flex;
+          box-sizing: border-box;
+          flex: 1;
+          justify-content: center;
+          align-items: center;
+          padding: 0 5px;
+          > p {
+            font-size: 12px;
+          }
+          .hide_virtual {
+            display: none;
+          }
+          .show_virtual {
+            height: 30px;
+            width: 100%;
+            outline: 1px dotted #55b7b4;
+            display: block;
+            margin-bottom: 2px;
+            position: absolute;
+            bottom: 0;
+            z-index: 98;
+          }
+          .pop-top-menu-box {
+            width: 98%;
+            position: absolute;
+            z-index: 98;
+            left: 0;
+            right: 0;
+            margin: auto;
+            bottom: 130%;
+            display: flex;
+            flex-direction: column;
+            .arrow-css {
+              width: 0;
+              height: 0;
+              border-width: 6px;
+              border-style: solid;
+              border-color: rgb(226, 226, 226) transparent transparent
+                transparent;
+              position: absolute;
+              z-index: 97;
+              left: 0;
+              right: 0;
+              margin: auto;
+              bottom: -10px;
+            }
+            .menu-items:last-child {
+              margin-bottom: none;
+            }
+            .menu-items {
+              position: relative;
+              z-index: 98;
+              height: 30px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 0 5px;
+              background: rgb(226, 226, 226);
+              margin-bottom: 2px;
+              > p {
+                font-size: 12px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .box-right {
+    width: 540px;
+    height: 377px;
+    min-width: 540px;
+    min-height: 377px;
+    background: #fdfbfe;
+    border: 1px solid rgba(226, 226, 226, 1);
+    box-sizing: border-box;
+    .box-head {
+      height: 50px;
+      border-bottom: 1px solid #e2e2e2;
+      align-items: center;
+      padding: 0 20px;
+      p {
+        font-size: 12px;
+      }
+      p:last-child {
+        color: #ff4d4f;
+        cursor: pointer;
+      }
+    }
+    .menu-con-form {
+      padding: 15px 20px 0;
+      .el-form-item--small.el-form-item {
+        margin-bottom: 22px;
+      }
+      .url-input {
+        width: 344px;
+      }
+      .el-form-item {
+        .name-input {
+          width: 160px;
+        }
+        label {
+          font-size: 12px;
+        }
+        .el-radio__label {
+          font-size: 14px;
+        }
+      }
+      .tips-con {
+        font-size: 12px;
+        color: #999;
+      }
+    }
+    .menu-change-con {
+      width: 500px;
+      height: 136px;
+      min-width: 500px;
+      min-height: 136px;
+      border: 1px solid rgba(226, 226, 226, 1);
+      padding: 10px;
+      .change-con-radio-group {
+        .change-con-radio {
+          div {
+            flex: 1;
+            text-align: left;
+            margin-top: 12px;
+          }
+        }
+      }
+    }
+  }
+}
+.bottom-btn {
+  .btn:not(:first-child) {
+    margin-left: 30px;
+  }
+}
+</style>

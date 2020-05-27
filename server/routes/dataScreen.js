@@ -18,4 +18,31 @@ router.get('/data-screen', async ctx => {
   ctx.body = Template.renderWithHtml('数据大屏', body, script, modConfig.template);
 });
 
+
+
+router.use('/setting/screen/save', ctx => HttpClient.proxy(ctx, {
+  host: WEB_URI,
+  port: 8080,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=${DS_COOKIE}`
+  },
+}))
+
+router.use('/getOpenWebCode', ctx => HttpClient.proxy(ctx, {
+  host: WEB_URI,
+  port: 8080,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=${DS_COOKIE}`
+  },
+}))
+
+
+router.use('/stats/screenData/*', ctx => HttpClient.proxy(ctx, {
+  host: WEB_URI,
+  port: 8080,
+  headers: {
+    'cookie': `VIPPUBLINKJSESSIONID=${DS_COOKIE}`
+  },
+}))
+
 module.exports = router;

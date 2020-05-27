@@ -9,6 +9,9 @@ const dataScreen = require('./dataScreen')
 const bill = require('./bill')
 const jobtransfer = require('./jobtransfer')
 
+const doMyself = require('./doMyself')
+const customerContact = require('./customerContact')
+
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
  * 
@@ -28,7 +31,7 @@ module.exports = {
   'system.demo': {
     entry: './src/modules/system/demo/index.js'
   },
-  
+
   // ------------ 订阅通知日报 ------------
   'open.dailyReport': {
     entry: './src/modules/open/DailyReport/index.js',
@@ -43,5 +46,7 @@ module.exports = {
   ...repository,
   ...dataScreen,
   ...bill,
-  ...jobtransfer
+  ...jobtransfer,
+  ...doMyself,
+  ...customerContact
 }

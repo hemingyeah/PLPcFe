@@ -123,7 +123,8 @@ export default {
         removeClass(document.body, 'overflow-body-for-modal');
       }
       this.withoutHiddenClass = true;
-    }
+    },
+    
   },
   mounted() {
     //document.addEventL.body-heightistener('keydown', this.escClose)

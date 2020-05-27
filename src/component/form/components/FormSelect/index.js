@@ -6,6 +6,7 @@ import FormSelect from './FormSelect.vue';
 
 import ProductTypeExtendSetting from './extend/ProductTypeExtendSetting.vue';
 import CustomerTagsExtendSetting from './extend/CustomerTagsExtendSetting.vue';
+import CustomerExtend from './extend/CustomerExtend.vue'
 
 let FormSelectField = {
   formType: 'select', // 字段类型
@@ -18,6 +19,7 @@ let FormSelectField = {
     extend: {
       'product_type_setting': ProductTypeExtendSetting,
       'customer_tags_setting': CustomerTagsExtendSetting,
+      'customer_extend': CustomerExtend
     }
   }
 };
