@@ -6,8 +6,8 @@
     filterable
     remote
     reserve-keyword
-    :placeholder="field.placeHolder?field.placeHolder:'请输入关键词搜索'"
-    :clearable="field.clearable?field.clearable:false"
+    :placeholder="placeholder?placeholder:请输入关键词搜索"
+    clearable
     :loading="loading"
     :remote-method="searchLinkman"
   >
@@ -51,15 +51,21 @@ export default {
     },
     searchLinkman: _.debounce(function(keyword) {
       this.loading = true;
-      this.$emit("input", { keyword, field: this.field });
-      this.$http
-        .get("/api/elasticsearch/outside/es/linkman/list", {
-          keyword,
-          pageNum: 1
-        })
+      this.$http.get(this.field.searchUrl ? this.field.searchUrl : '/api/elasticsearch/outside/es/linkman/list', {keyword, pageNum: 1, })
         .then(res => {
           let result = res.result || {};
+          // 创建人字段
+          if(this.field.fieldName === 'createUser' && res.list.length > 0) {
+            result = res;
+            result.list.map(res=>{
+              res['id'] = res.userId;
+              res['name'] = res.displayName; 
+              return res
+            })
+
+          }
           this.options = result.list || [];
+          
           this.loading = false;
           sessionStorage.setItem(
             `${this.field.fieldName}_options`,

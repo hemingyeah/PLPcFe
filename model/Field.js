@@ -27,5 +27,9 @@ export default class Field{
     this.tableChsName = options.tableChsName;
     // 工单、事件的字段id
     this.id = options.id;
+
+
+    // linkman组件自定义接口参数
+    this.searchUrl = options.searchUrl || '';
   }
 }

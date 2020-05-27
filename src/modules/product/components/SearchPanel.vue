@@ -69,7 +69,6 @@ export default {
           if (formType === 'updateTime') {
             f.displayName = '更新时间';
           }
-
           return Object.freeze({
             ...f,
             isNull: 1,
@@ -124,11 +123,12 @@ export default {
           displayName: '创建人',
           fieldName: 'createUser',
           formType: 'linkman',
+          placeHolder:'请输入创建人',
+          searchUrl:'/customer/userTag/list',
           isExport: false,
           isNull: 1,
           isSystem: 1,
-          orderId: -3.5,
-          placeHolder:'请输入创建人',
+          orderId: -2.4,
         }, {
           displayName: '二维码编号',
           fieldName: 'qrcodeId',

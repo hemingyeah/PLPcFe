@@ -2,8 +2,8 @@
 const http = require('http');
 
 const DEFAULT_OPIONS = {
-  host: 'dev.api.shb.ltd',
-  port: 8028, // bodz:本地启动端口为8028
+  host: '127.0.0.1',
+  port: 8028,
   headers: {}
 };
 
