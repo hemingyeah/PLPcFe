@@ -80,9 +80,7 @@
             </div>
             <div class="form-view-row" v-if="value && hasLinkman">
               <label>联系人</label>
-              <div class="form-view-row-content">
-                {{product.linkman && (product.linkman.name + ' ' + product.linkman.phone)}}
-              </div>
+              <div class="form-view-row-content">{{product.linkman && (product.linkman.name + ' ' + product.linkman.phone)}}</div>
             </div>
             <form-address-view 
               v-if="value && hasAddress"
