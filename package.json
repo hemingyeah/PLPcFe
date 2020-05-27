@@ -18,7 +18,7 @@
     "build:mao": "node script/production.js --user=aaronmao",
     "build:bodz": "node script/production.js --user=bodz",
     "build:swj": "node script/production.js --user=sunwj",
-    "build:bodz": "node script/production.js --user=bodz",
+    "build:cdh": "node script/production.js --user=cdh",
     "tag": "./script/tag.sh ${1} ${2}",
     "br": "./script/br.sh ${1} ${2} ${3}"
   },
@@ -83,7 +83,7 @@
     "element-ui": "2.11.1",
     "fecha": "^2.3.3",
     "koa2-origin-cors": "^1.0.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.11",
     "mathjs": "^6.2.3",
     "popper.js": "^1.14.5",
     "qrcodejs2": "0.0.2",

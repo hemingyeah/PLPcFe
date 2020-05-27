@@ -78,7 +78,7 @@
                   {{scope.row[column.field]}}
                 </template>
                 <template v-else-if="column.field === 'cusName'">
-                  {{scope.row[column.field]}}
+                  {{formatCustomerName(scope.row[column.field])}}
                 </template>
                 <template v-else-if="column.field === 'state'">
                   {{ formatState(scope.row[column.field])}}
@@ -409,8 +409,8 @@ export default {
       case 'stock':
         this.columns = this.buildStockColumns();
         this.fetchRepertory();  
-        // url = '/partV2/repertory/person/list';
-        url = '/dd/partV2/repertory/personalStock';
+        url = '/partV2/repertory/person/list';
+        // url = '/dd/partV2/repertory/personalStock';
         params.userId = this.userId;
         params.with_OOS = false;
         break;
@@ -862,6 +862,10 @@ export default {
         break;
       }
       return stateName;
+    },
+    formatCustomerName(cusName){
+      if(!cusName) return '';
+      return cusName.replace(/<[^>]+>/g, '');
     }
   },
   components: {
@@ -998,4 +1002,18 @@ export default {
   text-align: center;
 }
 
+.transfer-detail-list-content{
+  .el-dialog__header{
+    padding: 10px 20px;
+  }
+  .el-dialog__body{
+    padding: 0px 20px;
+    .el-form-item{
+      margin-bottom: 15px;
+    }
+  }
+  .el-dialog__footer{
+    padding: 0px 20px 10px;
+  }
+}
 </style>
