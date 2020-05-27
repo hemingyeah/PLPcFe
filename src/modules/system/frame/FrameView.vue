@@ -300,7 +300,7 @@ export default {
       }
     },
     openHelpDoc(event){
-      platform.openLink('https://www.yuque.com/shb');
+      platform.openLink('https://www.yuque.com/shb/help');
       this.profilePopperVisible = false;
     },
     openUserView(event){
