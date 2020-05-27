@@ -2,15 +2,18 @@
   <div id="doMyself-box">
     <div class="flex-x">
       <div class="left-menu">
-        <h3 class="menu-title">自助门户设置</h3>
+        <div class="menu-title">自助门户设置</div>
         <nav
           :class="`menu-list ${nowMenu==index?'menu-checked':''}`"
           v-for="(item,index) in menuList"
-          @click="nowMenu=index"
+          :key="index"
+          @click="changePage(index)"
         >
-          <div class="left-border" v-if="nowMenu==index"></div>
-          <i :class="`iconfont ${item.icon}`"></i>
-          {{item.name}}
+          <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
+          <div class="icon-box">
+            <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16':'font-12'}`"></i>
+          </div>
+          <span>{{item.name}}</span>
         </nav>
       </div>
 
@@ -29,26 +32,53 @@ export default {
       menuList: [
         {
           name: "客户自助门户",
-          icon: "icon-shouye"
+          icon: "icon-Gateway"
         },
         {
           name: "公众号设置",
-          icon: "icon-shouye"
+          icon: "icon-weixin1"
         },
         {
           name: "短信消息设置",
-          icon: "icon-shouye"
+          icon: "icon-duanxinxiaoxishezhi"
         },
         {
           name: "消息记录",
-          icon: "icon-shouye"
+          icon: "icon-message"
         }
       ],
-      nowMenu: 3 // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
+      nowMenu: 1 // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
     };
   },
   created() {
-    // console.log(this.$route);
+    let type = window.location.href.split("/")[
+      window.location.href.split("/").length - 1
+    ];
+    let typeObj = {
+      wxSet: 1,
+      toastList: 3
+    };
+    this.nowMenu = typeObj[type];
+  },
+  methods: {
+    changePage(index) {
+      if (this.nowMenu === index) {
+        return;
+      }
+      if (index === 2) {
+        window.location.href = "/setting/message/smsmessage";
+      } else if (index === 0) {
+        window.location.href = "/setting/serviceStation/customerPortal";
+      }else if (index === 1) {
+        window.location.href = "/doMyself/wxSet";
+      }else if (index === 3) {
+        window.location.href = "/doMyself/toastList";
+      }
+      this.nowMenu === index
+    },
+    loadWxdata(){
+      this.$http.get('/outside/weixin/api/getAuthInfo',)
+    }
   },
   components: {
     [toastList.name]: toastList,
@@ -68,6 +98,9 @@ export default {
 }
 .font-12 {
   font-size: 12px;
+}
+.font-16{
+  font-size: 16px;
 }
 .al-c {
   align-items: center !important;
@@ -92,7 +125,7 @@ label {
   overflow-x: hidden;
 }
 ::-webkit-scrollbar-track {
-  background: #d7dadc;
+  background: transparent;
 }
 img {
   width: 100%;
@@ -102,20 +135,29 @@ img {
   display: flex;
   align-items: flex-start;
   .left-menu {
-    min-width: 354px;
+    width: 25%;
+    min-width: 200px;
     background: #fff;
     box-sizing: border-box;
+    border-radius: 3px;
+    overflow: hidden;
     .menu-title {
       font-size: 18px;
       color: #454648;
-      padding: 13px 0 13px 10px;
+      padding: 10px;
+      font-weight: 600;
     }
     .menu-list {
-      font-size: 12px;
-      border-top: 1px solid #e9ecef;
+      border-left: 3px solid transparent;
+      border-top: 1px solid #f4f4f4;
       padding: 10px 15px;
       position: relative;
+      display: flex;
+      align-items: center;
       cursor: pointer;
+      span {
+        font-size: 12px;
+      }
       .left-border {
         height: 100%;
         width: 3px;
@@ -124,14 +166,21 @@ img {
         background: #55b7b4;
         top: 0;
       }
-      .iconfont {
-        font-size: 12px;
+      .icon-box {
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
         margin-right: 13px;
       }
     }
     .menu-checked {
-      // border-left: 3px solid #55b7b4;
-      font-weight: 700;
+      border-left: 3px solid #55b7b4;
+      
+      span {
+        font-size: 13px;
+        font-weight: 700;
+      }
     }
   }
 }

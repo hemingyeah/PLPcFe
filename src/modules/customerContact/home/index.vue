@@ -2,7 +2,7 @@
   <div id="doMyself-components-box">
     <div class="top-menu">
       <nav :class="nowPage==='customer'?'nav-checked':''" @click="nowPage='customer'">客户联系人</nav>
-      <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">访客</nav>
+      <!--TO DO <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">访客</nav> -->
     </div>
     <customer-conctact-customer v-if="nowPage==='customer'"></customer-conctact-customer>
     <customer-conctact-visitor v-if="nowPage==='visitor'"></customer-conctact-visitor>
@@ -31,7 +31,6 @@ export default {
   padding: 10px;
   display: flex;
   align-items: center;
-  cursor: pointer;
   nav {
     width: 194px;
     height: 35px;
@@ -40,6 +39,7 @@ export default {
     font-size: 12px;
     border: 1px solid #d2d6de;
     overflow: hidden;
+    cursor: pointer;
   }
   nav:nth-child(1) {
     border-right: none;

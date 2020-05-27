@@ -4,11 +4,13 @@ const http = require('http');
 const DEFAULT_OPIONS = {
   // host: '127.0.0.1', 
   // port: 8028,
-  // host: '30.40.58.161', // 丁建文
-  // port: 8080,
-  host: '30.40.57.167', // 仇太俊
-  port: 8083,
-  headers: {}
+  // host: '30.40.56.211', // 丁建文
+  // port: 8081,
+  host: '30.40.56.177', // 仇太俊
+  port: 8080,
+  headers: {
+    'cookie': `__wpkreporterwid_=f11f999d-c622-4d10-afdc-27bec73803fc; VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac; JSESSIONID=72D77D855576B2F287B1E8952B3DB5FF`
+  }
 };
 
 const AGENT = new http.Agent({

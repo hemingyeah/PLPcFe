@@ -16,17 +16,18 @@
         <nav :class="topType===0?'nav-checked':''" @click="topType=0">绑定公众号</nav>
         <nav :class="topType===1?'nav-checked':''" @click="topType=1">公众号通知</nav>
       </div>
-      <div class="menu-set-box" v-show="topType===0">
+      <div class="menu-set-box" v-if="topType===0">
         <div class="top-state">
           <div>
             <h2>绑定公众号</h2>
             <div class="wx-con">
               <div class="wx-img">
-                <img src="../../../assets/img/avatar.png" alt />
+                <img v-show="wxInfo.headImg === null" src="../../../assets/img/avatar.png" alt />
+                <img v-show="wxInfo.headImg !== null" :src="wxInfo.headImg" alt />
               </div>
               <div>
-                <p>昵称：</p>
-                <p>主体名称：</p>
+                <p>昵称：{{wxInfo.nickName}}</p>
+                <p>主体名称：{{wxInfo.principalName}}</p>
               </div>
             </div>
             <button type="submit" class="btn btn-ghost cancel-wx">解除绑定</button>
@@ -36,7 +37,7 @@
           <menu-set @pageLoading="pageLoading"></menu-set>
         </div>
       </div>
-      <div v-show="topType==1">
+      <div v-if="topType==1">
         <div class="top-state">
           <!-- 通知设置 start -->
           <div>
@@ -58,6 +59,7 @@
                   :active-text="totalActive?'开启':'关闭'"
                   :active-value="true"
                   :inactive-value="false"
+                  @change="mainChange"
                 ></el-switch>
               </div>
             </div>
@@ -71,7 +73,12 @@
                   <p v-if="item.time===null">{{item.childTitle}}</p>
                   <div class="small-form" v-else>
                     在计划时间到期前
-                    <input :value="item.time" style="padding:none;" />小时发送消息提醒客户，为空时不提醒
+                    <el-input
+                      :disabled="item.radius?false:true"
+                      v-model="item.time"
+                      style="padding:none;display: inline;"
+                      @input="inputTime"
+                    />小时发送消息提醒客户，为空时不提醒
                   </div>
                 </div>
                 <div class="flex-1"></div>
@@ -79,24 +86,40 @@
                   :disabled="item.radius>0?false:true"
                   :item-data="item"
                   :item-index="index"
+                  @pageLoading="pageLoading"
                 ></set-arr-item-right>
               </div>
             </div>
           </div>
           <!-- 通知设置 end -->
-          <toast-template></toast-template>
+          <toast-template v-if="totalActive===true" @pageLoading="pageLoading"></toast-template>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import menuSet from './components/menuSet';
-import toastTemplate from './components/toastTemplate';
-import setArrItemRight from './components/setArrItemRight';
-
+import menuSet from "./components/menuSet";
+import toastTemplate from "./components/toastTemplate";
+import setArrItemRight from "./components/setArrItemRight";
+let loadKeyArr = [];
+let loadTypeArr = [];
+let setRaduisArr = [
+  "smsEventAllot",
+  "smsEventFinish",
+  "smsTaskResponse",
+  "smsTaskFinish",
+  "taskPlanTimeRemind"
+];
+let setSelectArr = [
+  "eventAllotEventTypeList",
+  "eventFinishEventTypeList",
+  "taskResponseTaskTypeList",
+  "taskFinishTaskTypeList",
+  "taskPlanTimeTaskTypeList"
+];
 export default {
-  name: 'wx-set',
+  name: "wx-set",
   watch: {
     topType: {
       handler(newValue, oldValue) {},
@@ -108,82 +131,180 @@ export default {
     return {
       topType: 0, // 微信设置顶部切换 0 绑定公众号 1 公众号通知
       haveWx: true,
-      totalActive: true,
+      totalActive: false,
       fullscreenLoading: false, // 整屏loading
+      wxInfo: {
+        appid: "wx896d29a4f5d87e75"
+      },
       toastSetArr: [
         {
-          title: '事件分配通知',
-          childTitle: '当事件被分配时,发送给客户联系人',
-          options: [
-            {
-              value: '选项1',
-              label: '黄金糕'
-            },
-            {
-              value: '选项2',
-              label: '双皮奶'
-            },
-            {
-              value: '选项3',
-              label: '蚵仔煎'
-            },
-            {
-              value: '选项4',
-              label: '龙须面'
-            },
-            {
-              value: '选项5',
-              label: '北京烤鸭'
-            }
-          ],
-          pleasHolder: '全部事件类型',
-          radius: 0,
+          title: "事件分配通知",
+          childTitle: "当事件被分配时,发送给客户联系人",
+          options: [],
+          select: [],
+          pleasHolder: "全部事件类型",
+          radius: false,
           time: null
         },
         {
-          title: '事件完成通知',
-          childTitle: '当事件被标记为完成时,发送给客户联系人',
+          title: "事件完成通知",
+          childTitle: "当事件被标记为完成时,发送给客户联系人",
           options: [],
-          select: 0,
-          pleasHolder: '全部事件类型',
-          radius: 0,
+          select: [],
+          pleasHolder: "全部事件类型",
+          radius: false,
           time: null
         },
         {
-          title: '工单响应通知',
-          childTitle: '当工单被接收时,发送给客户联系人',
+          title: "工单响应通知",
+          childTitle: "当工单被接收时,发送给客户联系人",
           options: [],
-          select: 0,
-          pleasHolder: '全部工单类型',
-          radius: 0,
+          select: [],
+          pleasHolder: "全部工单类型",
+          radius: false,
           time: null
         },
         {
-          title: '工单完成通知',
-          childTitle: '进行中的工单被标记为完成时,发送给客户联系人',
+          title: "工单完成通知",
+          childTitle: "进行中的工单被标记为完成时,发送给客户联系人",
           options: [],
-          select: 0,
-          pleasHolder: '全部工单类型',
-          radius: 0,
+          select: [],
+          pleasHolder: "全部工单类型",
+          radius: false,
           time: null
         },
         {
-          title: '工单计划时间提醒客户',
+          title: "工单计划时间提醒客户",
           options: [],
-          select: 0,
-          pleasHolder: '全部工单类型',
-          radius: 0,
-          time: ''
+          select: [],
+          pleasHolder: "全部工单类型",
+          radius: false,
+          time: ""
         }
-      ]
+      ],
+      eventArr: [],
+      taskArr: [],
+      timeInputing: 0
     };
+  },
+  computed: {},
+  created() {
+    this.getWxInfo();
   },
   methods: {
     pageLoading(data = false) {
+      // loadKeyArr.indexOf(data.key)>-1?loadTypeArr
+      // this.loadKeyArr.push({ key: data.key, type: data.type });
+      // this.loadingArr.indexOf(false);
+      if (this.fullscreenLoading === data) return;
       this.fullscreenLoading = data;
     },
     itemRadiusChange(e, b) {
       console.log(e, b);
+    },
+    getWxInfo() {
+      this.pageLoading(true);
+      this.$http.get("/outside/weixin/api/getAuthInfo").then(res => {
+        this.pageLoading(false);
+        this.wxInfo = res.data.data;
+        if (res.data.eventTypeList) {
+          let arr = res.data.eventTypeList.map(res => {
+            return { label: res.name, value: res.id };
+          });
+          this.toastSetArr[0].options = arr;
+          this.toastSetArr[1].options = arr;
+        }
+        if (res.data.taskTypeList) {
+          let arr = res.data.taskTypeList.map(res => {
+            return { label: res.name, value: res.id };
+          });
+          this.toastSetArr[2].options = arr;
+          this.toastSetArr[3].options = arr;
+          this.toastSetArr[4].options = arr;
+        }
+        if (res.data.wxTemplateMessageConfig) {
+          let wxToast = res.data.wxTemplateMessageConfig;
+          this.totalActive = wxToast.wxRemindMaster;
+          for (let i = 0; i < this.toastSetArr.length; i++) {
+            this.toastSetArr[i].radius = wxToast[setRaduisArr[i]];
+            if (wxToast[setSelectArr[i]].length > 0) {
+              this.toastSetArr[i].select = wxToast[setSelectArr[i]];
+            }
+            if (i === 4 && wxToast.reportSendTime) {
+              this.toastSetArr[i].time = wxToast.reportSendTime;
+            }
+          }
+        }
+      });
+    },
+    mainChange(e) {
+      this.totalActive = !e;
+      this.pageLoading(true);
+      this.$http
+        .post(
+          "/outside/weixin/setting/wxMessage/save",
+          {
+            message: "wxRemindMaster",
+            state: e
+          },
+          false
+        )
+        .then(res => {
+          if (res.success === true) {
+            this.totalActive = e;
+          }
+          this.pageLoading(false);
+          // Promise.all([this.eventGet(), this.taskGet()]).then(res => {
+          //   this.pageLoading(false);
+          // });
+        })
+        .catch(err => {});
+    },
+    eventGet() {
+      return new Promise((resolve, reject) => {
+        this.$http
+          .get("/outside/weixin/setting/message/eventTypeList")
+          .then(res => {
+            let arr = res.data.map(res => {
+              return { label: res.name, value: res.id };
+            });
+            this.toastSetArr[0].options = arr;
+            this.toastSetArr[1].options = arr;
+            resolve();
+          });
+      });
+    },
+    taskGet() {
+      return new Promise((resolve, reject) => {
+        this.$http
+          .get("/outside/weixin/setting/message/taskTypeList")
+          .then(res => {
+            let arr = res.data.map(res => {
+              return { label: res.name, value: res.id };
+            });
+            this.toastSetArr[2].options = arr;
+            this.toastSetArr[3].options = arr;
+            this.toastSetArr[4].options = arr;
+            resolve();
+          });
+      });
+    },
+    inputTime(e) {
+      this.timeInputing = new Date().getTime();
+      setTimeout(() => {
+        let now = new Date().getTime();
+        if (now > this.timeInputing + 1500) {
+          this.$http
+            .post(
+              "/outside/weixin/setting/saveSendTime",
+              {
+                reportSendTime: this.toastSetArr[4].time
+              },
+              false
+            )
+            .then(res => {});
+        }
+      }, 1500);
     }
   },
   components: {
@@ -215,7 +336,6 @@ p {
   margin-bottom: 20px;
   display: flex;
   align-items: center;
-  cursor: pointer;
   nav {
     width: 194px;
     height: 35px;
@@ -225,6 +345,7 @@ p {
     border: 1px solid #d2d6de;
     overflow: hidden;
     position: relative;
+    cursor: pointer;
   }
   nav:nth-child(1) {
     border-right: none;

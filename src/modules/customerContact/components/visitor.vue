@@ -13,7 +13,7 @@
         @submit.prevent="searchModel.pageNum=1;search();trackEventHandler('search')"
       >
         <div class="product-template-list-base-search-group">
-          <el-input v-model="searchModel.keyword" placeholder="请输入关键字">
+          <el-input v-model="searchModel.keyword" placeholder="输入联系人、电话或客户名称进行搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">搜索</base-button>
@@ -126,7 +126,7 @@
                 class="view-detail-btn"
                 :style="`color:${column.color}`"
                 @click.stop.prevent="column.click(scope.row)"
-                v-if="hasViewCustomerAuth(scope.row)"
+                v-if="!scope.needAuth"
               >{{scope.row[column.field]}}</a>
               <p v-else>{{scope.row[column.field]}}</p>
             </template>
@@ -1061,7 +1061,19 @@ export default {
           field: "cusName",
           conType: "click",
           color: "#55b7b4",
-          click: obj => {},
+          needAuth: true,
+          click: obj => {
+            console.log(this.hasViewCustomerAuth(obj))
+            if (!this.hasViewCustomerAuth(obj)) return;
+            let fromId = window.frameElement.getAttribute("id");
+            this.$platform.openTab({
+              id: `customer_view_${obj.customerId}`,
+              title: "客户详情",
+              close: true,
+              url: `/customer/view/${obj.customerId}?noHistory=1`,
+              fromId
+            });
+          },
           show: true
         },
         {
@@ -1087,10 +1099,13 @@ export default {
               name: "保存客户信息",
               color: "#55b7b4",
               click: obj => {
+                if (!this.hasEditCustomerAuth(obj)) return;
                 this.openDialog(obj);
               }
             },
-            { name: "删除", color: "#999", click: obj => {} }
+            { name: "删除", color: "#999", click: obj => {
+              if (!this.hasEditCustomerAuth(obj)) return;
+            } }
           ],
           minWidth: "150px",
           show: 'important'
@@ -1553,7 +1568,7 @@ export default {
     hasEditCustomerAuth(customer) {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
-        this.permission,
+        this.permission(),
         "CUSTOMER_EDIT",
         // 团队权限判断
         () => {
@@ -1591,10 +1606,10 @@ export default {
     hasViewCustomerAuth(customer) {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
-        this.permission,
+        this.permission(),
         "CUSTOMER_VIEW",
         // 团队权限判断
-        () => {
+        (() => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
@@ -1602,12 +1617,16 @@ export default {
           let loginUserTagIds =
             this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
-        },
+        }),
         // 个人权限判断
-        () => {
-          return customer.createUser == loginUserId || this.isCustomerManager;
-        }
+        (() => {
+          return customer.createUser == loginUserId || this.isCustomerManager(customer);
+        })
       );
+    },
+    /** 当前用户的权限 */
+    permission() {
+      return this.initData.loginUser.authorities;
     },
 
     toggleSelection(rows) {

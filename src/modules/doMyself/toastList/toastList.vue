@@ -4,13 +4,13 @@
       <nav :class="nowPage==='customer'?'nav-checked':''" @click="nowPage='customer'">短信记录</nav>
       <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">公众号消息记录</nav>
     </div>
-    <customer-conctact-customer v-if="nowPage==='customer'"></customer-conctact-customer>
-    <customer-conctact-visitor v-if="nowPage==='visitor'"></customer-conctact-visitor>
+    <customer-conctact-message v-if="nowPage==='customer'"></customer-conctact-message>
+    <customer-conctact-wxMessage v-if="nowPage==='visitor'"></customer-conctact-wxMessage>
   </div>
 </template>
 <script>
-import customer from "./components/customer";
-import visitor from "./components/visitor";
+import message from "./components/message";
+import wxMessage from "./components/wxMessage";
 export default {
   name: "toast-list",
   data() {
@@ -19,43 +19,12 @@ export default {
     };
   },
   components: {
-    [customer.name]: customer,
-    [visitor.name]: visitor
+    [message.name]: message,
+    [wxMessage.name]: wxMessage
   }
 };
 </script>
 <style lang="scss">
-.top-menu {
-  background: #fff;
-  box-sizing: border-box;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  nav {
-    width: 194px;
-    height: 35px;
-    text-align: center;
-    line-height: 35px;
-    font-size: 12px;
-    border: 1px solid #d2d6de;
-    overflow: hidden;
-  }
-  nav:nth-child(1) {
-    border-right: none;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
-  }
-  nav:last-child {
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-  }
-  .nav-checked {
-    background: #55b7b4;
-    border-color: #55b7b4;
-    color: #fff;
-  }
-}
 
 $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
@@ -238,8 +207,8 @@ body {
       position: relative;
       top: 3px;
     }
-    .el-tooltip{
-      p{
+    .el-tooltip {
+      p {
         font-size: 13px;
       }
     }

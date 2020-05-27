@@ -51,7 +51,7 @@
 
         <!-- start 操作按钮组 -->
         <div class="action-button-group">
-          <el-dropdown trigger="click" v-if="authExport">
+          <!-- <el-dropdown trigger="click" v-if="authExport">
             <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('moreAction')">
               更多操作
               <i class="iconfont icon-nav-down"></i>
@@ -64,7 +64,7 @@
                 <div @click="exportProduct(true)">导出全部</div>
               </el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown>
+          </el-dropdown>-->
           <span class="el-dropdown-link el-dropdown-btn" @click="showAdvancedSetting">
             选择列
             <i class="iconfont icon-nav-down"></i>
@@ -96,7 +96,7 @@
         ref="productTemplateTable"
         class="product-template-table"
       >
-        <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+        <!-- <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column> -->
         <el-table-column
           v-for="column in columns"
           v-if="column.show"
@@ -144,17 +144,18 @@
               v-else-if="column.formType === 'user'"
             >{{ scope.row[column.field] && (scope.row[column.field].displayName || scope.row[column.field].name) }}</template>
             <template
-              v-else-if="column.formType === 'location'"
-            >{{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}</template>
+              v-else-if="column.field === 'feedbackStatus'"
+            >{{scope.row.feedbackStatus === 0 ? '未点击':'已点击' }}</template>
+            <template
+              v-else-if="column.field === 'status'"
+            >{{scope.row.statusInfo === 1 ? '成功':'失败' }}</template>
             <template
               v-else-if="column.formType === 'addr'"
             >{{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}</template>
             <template
               v-else-if="column.field === 'createUser'"
             >{{ scope.row.createUser && scope.row.createUser.displayName }}</template>
-            <template
-              v-else-if="column.field === 'sendTime'"
-            >{{ scope.row.sendTime | formatDate }}</template>
+            <template v-else-if="column.field === 'sendTime'">{{ scope.row.sendTime}}</template>
 
             <div
               v-else-if="column.formType === 'textarea'"
@@ -172,13 +173,13 @@
       <div class="table-footer">
         <div class="list-info">
           共
-          <span class="level-padding">{{ page.total || 0 }}</span>记录，
-          已选中
+          <span class="level-padding">{{ page.total || 0 }}</span>记录
+          <!-- ，已选中
           <span
             class="product-template-selected-count"
             @click="panelTheMultipleSelectionShow = true"
           >{{ multipleSelection.length }}</span>条
-          <span class="product-template-selected-count" @click="selectionToggle()">清空</span>
+          <span class="product-template-selected-count" @click="selectionToggle()">清空</span>-->
         </div>
         <el-pagination
           class="product-template-table-pagination"
@@ -289,7 +290,7 @@ const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?
 
 let pending = false; // 记录交互pending
 export default {
-  name: "customer-conctact-visitor",
+  name: "customer-conctact-wxMessage",
   props: {
     initData: {
       type: Object,
@@ -895,7 +896,7 @@ export default {
             fieldName: "time",
             formType: "date",
             placeHolder: "请输入关联编号",
-            // defaultTime: ["00:00:00", "23:59:59"],
+            defaultTime: ["00:00:00", "23:59:59"],
             returnData: result => {
               let obj = {
                 startTime: formatDate(result[0], "YYYY-MM-DD HH:mm:ss"),
@@ -1053,7 +1054,7 @@ export default {
       return [
         {
           label: "通知类型",
-          field: "operation",
+          field: "remindType",
           show: true,
           fixed: true,
           minWidth: "150px"
@@ -1092,12 +1093,14 @@ export default {
           label: "状态",
           field: "status",
           fixed: true,
-          show: true
+          show: true,
+          minWidth: "60px"
         },
         {
           label: "反馈",
           field: "feedbackStatus",
           fixed: true,
+          minWidth: "60px",
           show: true
         }
       ];
@@ -1297,34 +1300,16 @@ export default {
       const params = this.buildParams();
 
       this.loadingListData = true;
-      return getToastWxList(params)
+
+      return this.$http
+        .get("/outside/weixin/api/getTemplateMessageList", params)
         .then(res => {
-          res = res.result;
           if (!res || !res.list) {
             this.page = new Page();
           } else {
-            this.page.merge(res);
-
-            this.page.list = res.list.map(l => {
-              let attribute = l.attribute ? l.attribute : {};
-
-              let list = {
-                ...l,
-                ...attribute
-              };
-              return list;
-            });
+            this.page = res;
           }
-
-          return res;
-        })
-        .then(() => {
-          this.$refs.productTemplateListPage.scrollTop = 0;
           this.loadingListData = false;
-        })
-        .catch(err => {
-          this.loadingListData = false;
-          console.error("err", err);
         });
     },
     // 设置高级搜索面板 列

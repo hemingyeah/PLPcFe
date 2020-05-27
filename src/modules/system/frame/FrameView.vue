@@ -50,6 +50,7 @@
                   <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
+                  <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
                 </div>
               </el-popover>
 
@@ -588,6 +589,14 @@ export default {
         id: "customer_contact",
         title: "产品设置",
         url: "/customerContact",
+        reload: true
+      });
+    },
+    goDoMyself(){
+      platform.openTab({
+        id: "do_myself",
+        title: "自助门户设置",
+        url: "/doMyself/wx-set",
         reload: true
       });
     }

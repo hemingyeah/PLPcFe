@@ -6,5 +6,5 @@ import http from '@src/util/http';
  * @returns Promise<Customer>
  */
 export function getToastWxList(params) {
-  return http.post('/weixin/outside/msg/getTemplateMsgList', params)
+  return http.post('/outside/weixin/msg/getTemplateMsgList', params)
 }

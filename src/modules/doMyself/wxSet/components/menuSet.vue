@@ -7,10 +7,13 @@
     <div class="set-box">
       <!-- box-left start -->
       <div class="box-left">
+        <div class="box-left-top-img">
+          <img src="@src/assets/img/wx/menSetTop.png" />
+        </div>
         <!-- bottom-menu start -->
         <div class="bottom-menu">
           <div class="bottom-icon">
-            <i class="iconfont icon-home"></i>
+            <img class="bottom-icon-img" src="@src/assets/img/wx/wxKey.png" />
           </div>
           <!-- move-menu-box start -->
           <draggable class="menu-box" v-model="menu_arr" v-show="edit_type===2">
@@ -20,7 +23,7 @@
               class="menu-item can-move"
               draggable="true"
             >
-              <i v-if="item.type==='add'" class="iconfont icon-home"></i>
+              <i v-if="item.type==='add'" class="iconfont icon-add"></i>
               <p class="overHideCon_1" v-else>{{item.name}}</p>
 
               <draggable
@@ -38,7 +41,7 @@
                   class="menu-items can-move"
                   draggable="true"
                 >
-                  <i v-if="items.shb_type==='add'" class="iconfont icon-home"></i>
+                  <i v-if="items.shb_type==='add'" class="iconfont icon-add"></i>
                   <p class="overHideCon_1" v-else>{{items.name}}</p>
                 </div>
                 <div :class="['hide_virtual',item.sub_button.length<=0?'show_virtual':'']"></div>
@@ -55,7 +58,7 @@
               :class="main_menu_class(index)"
               @click="valid_menu_form(index)"
             >
-              <i v-if="item.shb_type==='add'" class="iconfont icon-home"></i>
+              <i v-if="item.shb_type==='add'" class="iconfont icon-add"></i>
               <p class="overHideCon_1" v-else>{{item.name}}</p>
 
               <div
@@ -68,7 +71,7 @@
                   :class="child_menu_class(index, indexs)"
                   @click.stop="valid_menu_form(index,indexs)"
                 >
-                  <i v-if="items.shb_type==='add'" class="iconfont icon-home"></i>
+                  <i v-if="items.shb_type==='add'" class="iconfont icon-add"></i>
                   <p class="overHideCon_1" v-else>{{items.name}}</p>
                 </div>
                 <div class="arrow-css"></div>
@@ -193,11 +196,11 @@
 let menu_arr_stash = [];
 
 let url_obj = {
-  服务请求: "http://www.baidu.com",
-  服务进度: "http://www.baidu2.com",
-  服务评价: "http://www.baidu3.com",
-  服务商城: "http://www.baidu4.com",
-  知识库: "http://www.baidu5.com"
+  服务请求: "https://pubapp.shb.ltd/p/102308#/chooseEvent",
+  服务进度: "https://pubapp.shb.ltd/p/102308#/event",
+  服务评价: "https://pubapp.shb.ltd/p/102308#/event/evaluate",
+  服务商城: "https://pubapp.shb.ltd/p/102308#/shop",
+  知识库: "https://pubapp.shb.ltd/p/102308#/wiki"
 };
 let input_obj = {
   售后宝功能: "config_url",
@@ -349,7 +352,9 @@ export default {
   },
   created() {},
   mounted() {
-    this.getMenuList();
+    if (this.menu_arr.length <= 0) {
+      this.getMenuList();
+    }
   },
   methods: {
     wxMenuChange(data = []) {
@@ -410,7 +415,7 @@ export default {
           this.main_menu_click(index, indexs);
         })
         .catch(err => {
-          console.error("valid_menu_formerror");
+          console.error("valid_menu_form_error");
         });
     },
     main_menu_click(index = 0, indexs = -1) {
@@ -590,50 +595,6 @@ export default {
       }
     },
     resetForm(formName) {
-      let a = {
-        menu: {
-          button: [
-            {
-              name: "售后宝",
-              sub_button: [
-                {
-                  key: "12345679",
-                  name: "售后宝1",
-                  type: "text",
-                  value: "一年级(2)班",
-                  sub_button: []
-                }
-              ]
-            },
-            {
-              shb_type: "main_menu",
-              url: "",
-              input_url: "",
-              config_url: "",
-              type: "view",
-              sub_button: [
-                {
-                  shb_type: "children_menu",
-                  type: "view",
-                  name: "随便",
-                  menuType: "售后宝功能",
-                  menuTypeArr: "服务评价",
-                  url: "www.baidu3.com",
-                  input_url: "",
-                  config_url: "",
-                  reserve: "",
-                  sub_button: []
-                }
-              ],
-              name: "自定义",
-              menuType: "回复文本消息",
-              menuTypeArr: "服务请求",
-              reserve: "自定义"
-            }
-          ]
-        }
-      };
-
       this.now_chooseed_menu = false;
       this[formName] = _.cloneDeep(form_tem);
       this.$refs[formName].clearValidate();
@@ -677,7 +638,7 @@ export default {
     getMenuList(type = true) {
       this.$emit("pageLoading", true);
       this.$http
-        .get("/weixin/outside/api/getMenuList", {
+        .get("/outside/weixin/api/getMenuList", {
           appid: this.wxInfo.appid,
           type
         })
@@ -701,7 +662,7 @@ export default {
     },
     setMenuList() {
       return this.$http.post(
-        "/weixin/outside/api/saveMenuList",
+        "/outside/weixin/api/saveMenuList",
         {
           appid: this.wxInfo.appid,
           wechatMenu: JSON.stringify({ menu: { button: menu_arr_stash } })
@@ -748,6 +709,7 @@ export default {
     min-height: 377px;
     border: 1px solid rgba(226, 226, 226, 1);
     box-sizing: border-box;
+    border-top: none;
     background: #fff;
     margin-left: 11px;
     margin-right: 40px;
@@ -756,6 +718,17 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    .box-left-top-img {
+      width: 212px;
+      height: 50.35px;
+      position: absolute;
+      top: 0;
+      left: -1px;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
     .bottom-menu {
       position: absolute;
       bottom: 0;
@@ -766,6 +739,10 @@ export default {
       background: rgba(251, 251, 251, 1);
       border-top: 1px solid rgba(226, 226, 226, 1);
       box-sizing: border-box;
+      .bottom-icon-img {
+        width: 20px;
+        height: 20px;
+      }
       .bottom-icon {
         width: 24px;
         height: 100%;

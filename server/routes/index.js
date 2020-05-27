@@ -86,38 +86,42 @@ router.get('/window', async ctx => {
 });
 
 // /api/app/outside/es
-// router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-//   host: '192.168.31.237',
-//   port: 10004,
+// router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
+//   // host: '192.168.31.237',
+//   host: '30.40.58.161',
+//   port: 10006,
 //   headers: {
-//     'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
+//     // 'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
+//     'cookie': `VIPPUBLINKJSESSIONID=324bd997-42e0-44db-bb67-83f1bc77e44a`
 //   },
 // }))
 
-// /api/app/outside
-router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  // host: '47.98.255.79',
-  host: '30.40.57.167',
+
+router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
+  // host: '30.40.57.167',
+  // port: 8083,
+  host: '30.40.56.211',
+  port: 8080,
+  headers: {
+    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+    'cookie': `VIPPUBLINKJSESSIONID=ca75490e-a20d-4bc9-b115-72d167e7a0bc`
+  },
+}))
+
+router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
+  // host: '30.40.57.167',
+  // port: 8083,
+  host: '30.40.56.177',
   port: 10006,
-  // host: '192.168.31.70',
-  // port: 10004,
   headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=802755db-e26b-4d8a-96a8-17795613766e`
-    'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+    'cookie': `__wpkreporterwid_=f11f999d-c622-4d10-afdc-27bec73803fc; VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac; JSESSIONID=72D77D855576B2F287B1E8952B3DB5FF`
   },
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
-  // }
 }))
 
 
-router.use('/weixin/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.57.167',
-  port: 8083,
-  headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
-  },
-}))
+
+
 
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.57.167', // 仇太俊

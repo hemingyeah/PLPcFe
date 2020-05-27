@@ -13,7 +13,7 @@
         @submit.prevent="searchModel.pageNum=1;search();trackEventHandler('search')"
       >
         <div class="product-template-list-base-search-group">
-          <el-input v-model="searchModel.keyword" placeholder="请输入关键字">
+          <el-input v-model="searchModel.keyword" placeholder="输入联系人、电话或客户名称进行搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">搜索</base-button>
@@ -75,7 +75,12 @@
       <!-- end  -->
 
       <div style="background: #fff;padding: 0 10px">
-        <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection" @toggle-selection="selectionToggle" @show-panel="() => panelTheMultipleSelectionShow = true" />
+        <base-selection-bar
+          ref="baseSelectionBar"
+          v-model="multipleSelection"
+          @toggle-selection="selectionToggle"
+          @show-panel="() => panelTheMultipleSelectionShow = true"
+        />
       </div>
 
       <!-- start 表格 -->
@@ -121,15 +126,15 @@
                 class="view-detail-btn"
                 :style="`color:${column.color}`"
                 @click.stop.prevent="column.click(scope.row)"
-                v-if="hasViewCustomerAuth(scope.row)"
+                v-if="!scope.needAuth"
               >{{scope.row[column.field]}}</a>
               <p v-else>{{scope.row[column.field]}}</p>
             </template>
-            <!-- <template v-else-if="column.field === 'name'">
+            <!-- <template v-else-if="column.field === 'cusName'">
               <a
                 href
                 class="view-detail-btn"
-                @click.stop.prevent="goProductTemplateView(scope.row.id)"
+                @click.stop.prevent="goCustomerInfo(scope.row.customerId)"
               >{{scope.row[column.field]}}</a>
             </template>-->
             <template
@@ -141,9 +146,9 @@
             <template
               v-else-if="column.formType === 'location'"
             >{{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}</template>
-            <template
-              v-else-if="column.formType === 'addr'"
-            >{{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}</template>
+            <template v-else-if="column.field === 'registeredSource'">
+              <i :class="['iconfont', scope.row.registeredSource===1?'icon-weixin1':'']"></i>
+            </template>
             <template
               v-else-if="column.field === 'createUser'"
             >{{ scope.row.createUser && scope.row.createUser.displayName }}</template>
@@ -957,7 +962,7 @@ export default {
     /* 已选择 id列表 */
     selectedIds() {
       return this.multipleSelection.map(item => item.id) || [];
-    },
+    }
   },
   filters: {
     displaySelect(value) {
@@ -1053,7 +1058,10 @@ export default {
           field: "cusName",
           conType: "click",
           color: "#55b7b4",
+          needAuth: true,
           click: obj => {
+            console.log(this.hasViewCustomerAuth(obj));
+            if (!this.hasViewCustomerAuth(obj)) return;
             let fromId = window.frameElement.getAttribute("id");
             this.$platform.openTab({
               id: `customer_view_${obj.customerId}`,
@@ -1121,6 +1129,7 @@ export default {
               color: "#55b7b4",
               click: obj => {
                 if (pending) return;
+                if (!this.hasEditCustomerAuth(obj)) return;
                 this.openDialog(obj);
               }
             },
@@ -1129,6 +1138,7 @@ export default {
               color: "#999",
               click: obj => {
                 if (pending) return;
+                if (!this.hasEditCustomerAuth(obj)) return;
                 this.deleteLinkman(obj);
               }
             }
@@ -1231,7 +1241,6 @@ export default {
     // 操作选择
     selectionHandle(selection) {
       let tv = this.selectionCompute(selection);
-      
 
       let original = this.multipleSelection.filter(ms =>
         this.page.list.some(cs => cs.id === ms.id)
@@ -1253,7 +1262,7 @@ export default {
       }
 
       this.multipleSelection = tv;
-      console.log(this.multipleSelection, 'select')
+      console.log(this.multipleSelection, "select");
 
       this.$refs.baseSelectionBar.openTooltip();
     },
@@ -1302,17 +1311,17 @@ export default {
       return undefined;
     },
     // 跳转 至客户详情
-    // goProductTemplateView(id) {
-    //   let fromId = window.frameElement.getAttribute("id");
+    goCustomerInfo(id) {
+      let fromId = window.frameElement.getAttribute("id");
 
-    //   this.$platform.openTab({
-    //     id: `product_template_view_${id}`,
-    //     title: "产品模板信息",
-    //     close: true,
-    //     url: `/product/detail/${id}?noHistory=1`,
-    //     fromId
-    //   });
-    // },
+      this.$platform.openTab({
+        id: `customer_view_${id}`,
+        title: "客户详情",
+        close: true,
+        url: `/customer/view/${id}?noHistory=1`,
+        fromId
+      });
+    },
     // 页码数切换
     handleSizeChange(pageSize) {
       this.searchModel.pageSize = pageSize;
@@ -1356,6 +1365,8 @@ export default {
       const params = this.buildParams();
 
       this.loadingListData = true;
+      // this.$http.post('/outside/es/linkman/searchLinkManByTid', params)
+      // return
       return getContactList(params)
         .then(res => {
           res = res.result;
@@ -1576,7 +1587,7 @@ export default {
     hasEditCustomerAuth(customer) {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
-        this.permission,
+        this.permission(),
         "CUSTOMER_EDIT",
         // 团队权限判断
         () => {
@@ -1614,7 +1625,7 @@ export default {
     hasViewCustomerAuth(customer) {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
-        this.permission,
+        this.permission(),
         "CUSTOMER_VIEW",
         // 团队权限判断
         () => {
@@ -1628,9 +1639,16 @@ export default {
         },
         // 个人权限判断
         () => {
-          return customer.createUser == loginUserId || this.isCustomerManager;
+          return (
+            customer.createUser == loginUserId ||
+            this.isCustomerManager(customer)
+          );
         }
       );
+    },
+    /** 当前用户的权限 */
+    permission() {
+      return this.initData.loginUser.authorities;
     },
 
     toggleSelection(rows) {
@@ -1662,12 +1680,12 @@ export default {
       let row = undefined;
 
       if (rows) {
-        for(let i = 0; i < rows.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
           row = rows[i];
           isNotOnCurrentPage = this.page.list.every(item => {
             return item.id !== row.id;
-          })
-          if(isNotOnCurrentPage) return 
+          });
+          if (isNotOnCurrentPage) return;
         }
         rows.forEach(row => {
           this.$refs.productTemplateTable.toggleRowSelection(row);
@@ -1693,7 +1711,7 @@ export default {
           return this.$platform.alert("请选择要导出的数据");
         ids = this.selectedIds;
       }
-      console.log(ids, 'export')
+      console.log(ids, "export");
       this.$refs.exportProductTemplatePanel.open(ids, fileName);
     },
     // 导出 列
@@ -1739,9 +1757,13 @@ export default {
     selectProductTemplateCancel(productItem) {
       if (!productItem || !productItem.id) return;
 
-      this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== productItem.id);
-      this.multipleSelection.length < 1 ? this.selectionToggle() : this.selectionToggle([productItem]);
-    },
+      this.multipleSelection = this.multipleSelection.filter(
+        ms => ms.id !== productItem.id
+      );
+      this.multipleSelection.length < 1
+        ? this.selectionToggle()
+        : this.selectionToggle([productItem]);
+    }
   },
   components: {
     [SearchPanel.name]: SearchPanel,

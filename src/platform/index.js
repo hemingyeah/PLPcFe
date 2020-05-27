@@ -74,6 +74,17 @@ function setTabLoadingStatus (options) {
   win.postMessage(message, origin)
 }
 
+function changeWindowTitle (options) {
+  let win = getRootWindow(window);
+  let origin = window.location.origin;
+  let message = {
+    action: 'shb.system.changeWindowTitle',
+    data: options
+  }
+
+  win.postMessage(message)
+}
+
 /**
  * 图片预览
  *
@@ -99,6 +110,8 @@ export const platform = {
 
   openLink,
   imagePreview,
+
+  changeWindowTitle
 };
 
 export default platform;

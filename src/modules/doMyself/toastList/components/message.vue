@@ -289,7 +289,7 @@ const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?
 
 let pending = false; // 记录交互pending
 export default {
-  name: "customer-conctact-customer",
+  name: "customer-conctact-message",
   props: {
     initData: {
       type: Object,

@@ -25,6 +25,9 @@
             <a v-if="allowEditCustomer" href="javascript:;" @click="openDialog(scope.row)" class="edit-btn">{{scope.row[column.field]}}</a>
             <template v-else>{{scope.row[column.field]}}</template>
           </template>
+          <template v-else-if="column.field === 'from'">
+            <i class="iconfont icon-home"></i>
+          </template>
           <div class="lm-action" v-else-if="column.field === 'action'">
             <template>
               <span v-if="scope.row.isMain" style="line-height: 26px;padding: 1px">默认联系人</span>
@@ -178,6 +181,11 @@ export default {
         label: '部门',
         field: 'department',
         show: true,
+      }, {
+        label: '注册来源',
+        field: 'from',
+        show: true,
+        width: '150px',
       }, {
         label: '电话',
         field: 'phone',

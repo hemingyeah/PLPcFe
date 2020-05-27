@@ -207,6 +207,14 @@ const FormView = {
         };
         return this.buildTextarea(params);
       }
+
+      if(formType === 'icon') {
+        console.log(params)
+        params = {
+          ...params,
+          value: <i class="iconfont icon-home"></i>
+        };
+      }
       
       // other types: text date number datetime phone
       return this.buildCommonDom(params);
@@ -243,7 +251,7 @@ const FormView = {
   render(h) {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     let groups = this.groupField(this.fields);
-    
+    console.log(groups, 'form-view')
     let domGroups = groups.map(group => {
       let currentGroupId = 0;
       
@@ -256,7 +264,6 @@ const FormView = {
       });
 
       let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, h));
-      
       return (
         <div class="view-group">
           {title}
