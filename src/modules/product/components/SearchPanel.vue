@@ -122,7 +122,7 @@ export default {
         }, {
           displayName: '创建人',
           fieldName: 'createUser',
-          formType: 'linkman',
+          formType: 'user',
           placeHolder:'请输入创建人',
           searchUrl:'/customer/userTag/list',
           isExport: false,
@@ -418,6 +418,13 @@ export default {
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
         },
+        createUserInput(event, isTags) {
+          if (isTags) {
+            return this.form.tags = event;
+          }
+          const f = event.field;
+          this.form[f.fieldName] = event.keyword;
+        },
         renderInput(h, field) {
           const f = {
             ...Object.freeze(field),
@@ -470,7 +477,8 @@ export default {
                   disableMap: true,
                 },
                 on: {
-                  update: event => this.update(event)
+                  update: event => this.update(event),
+                  input: event => this.createUserInput(event)
                 }
               });
           } else if (f.formType === 'customer') {
@@ -496,8 +504,21 @@ export default {
                 input: event => {
                   this.form[f.fieldName] = event.keyword;
                 }
-              }
-            });
+              });
+          } else if (f.formType === 'user') {
+            childComp = h(
+              'user-search',
+              {
+                props: {
+                  field: f,
+                  value: this.form[f.fieldName],
+                  disableMap: true,
+                },
+                on: {
+                  update: event => this.update(event),
+                  input: event => this.createUserInput(event),
+                }
+              });
           } else {
             childComp = h(
               comp.extend && comp.extend[`${f.formType}_search`]

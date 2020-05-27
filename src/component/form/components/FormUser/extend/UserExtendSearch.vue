@@ -46,13 +46,13 @@ export default {
   methods: {
     choose(newValue) {
       let oldValue = null;
-      this.$emit("update", { newValue, oldValue, field: this.field });
+      this.$emit('update', {newValue, oldValue, field: this.field});
+      
     },
     searchUser(keyword) {
       this.loading = true;
-      this.$emit("input", { keyword, field: this.field });
-      this.$http
-        .get("/customer/userTag/list", { keyword, pageNum: 1 })
+      this.$emit('input', {keyword, field: this.field});
+      this.$http.get('/customer/userTag/list', {keyword, pageNum: 1, })
         .then(res => {
           this.options = res.list.map(({ displayName, userId }) =>
             Object.freeze({
