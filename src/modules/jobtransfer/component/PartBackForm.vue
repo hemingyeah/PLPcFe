@@ -96,7 +96,7 @@ export default {
   computed:{
     // TODO: 支持小数 提示
     minVariation () {
-      let initData = JSON.parse(JSON.stringify(window._init || {}));
+      let initData = JSON.parse(window._init || {});
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     },
     part(){
@@ -161,7 +161,7 @@ export default {
       this.pending = false;
     },
     decimalNumber(num) {
-      let initData = JSON.parse(JSON.stringify(window._init || {}));
+      let initData = JSON.parse(window._init || {});
       let count = MathUtil.decimalNumber(num);
       // let isPartV2 = initData.isSparepart2;
       // if(!isPartV2 && count != 0) return 0;

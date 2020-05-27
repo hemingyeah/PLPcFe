@@ -140,21 +140,22 @@
                       href
                       :class="scope.row.isGuideData ? column.className : ''"
                       class="view-detail-btn"
-                      @click.stop.prevent="createCustomerTab(scope.row.id)"
-                    >{{ scope.row[column.field] }}</a>
+                      @click.stop.prevent="createCustomerTab(scope.row.id)">
+                      <pre class="pre-text">{{ scope.row[column.field] }}</pre>
+                    </a>
                   </el-tooltip>
                 </template>
               </sample-tooltip>
             </template>
-            <template
-              v-else-if="column.field === 'customerAddress'"
-            >{{formatAddress(scope.row[column.field])}}</template>
-            <template
-              v-else-if="column.field === 'detailAddress'"
-            >{{scope.row.customerAddress && scope.row.customerAddress.adAddress}}</template>
-            <template
-              v-else-if="column.field === 'tags' && scope.row.tags"
-            >{{scope.row.tags | tagName}}</template>
+            <template v-else-if="column.field === 'customerAddress'">
+              {{formatAddress(scope.row[column.field])}}
+            </template>
+            <template v-else-if="column.field === 'detailAddress'">
+              <pre class="pre-text">{{scope.row.customerAddress && scope.row.customerAddress.adAddress}}</pre>
+            </template>
+            <template v-else-if="column.field === 'tags' && scope.row.tags">
+              {{scope.row.tags | tagName}}
+            </template>
             <template v-else-if="column.field === 'status'">
               <el-switch
                 :disabled="scope.row.pending"
@@ -177,32 +178,34 @@
                 <div @mouseover="showLatestUpdateRecord(scope.row)">{{scope.row[column.field]}}</div>
               </template>
             </template>
-            <template v-else-if="column.field === 'createUser'">{{scope.row.createUserName}}</template>
-            <template
-              v-else-if="column.field === 'remindCount'"
-            >{{scope.row.attribute.remindCount || 0}}</template>
-            <template
-              v-else-if="column.formType === 'select' && scope.row.attribute[column.field]"
-            >{{scope.row.attribute[column.field] | displaySelect}}</template>
-            <template
-              v-else-if="column.formType === 'user' && scope.row.attribute[column.field]"
-            >{{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}</template>
-            <template
-              v-else-if="column.formType === 'location'"
-            >{{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}</template>
+            <template v-else-if="column.field === 'createUser'">
+              {{scope.row.createUserName}}
+            </template>
+            <template v-else-if="column.field === 'remindCount'">
+              {{scope.row.attribute.remindCount || 0}}
+            </template>
+            <template v-else-if="column.formType === 'select' && scope.row.attribute[column.field]">
+              {{scope.row.attribute[column.field] | displaySelect}}
+            </template>
+            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+              {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+            </template>
+            <template v-else-if="column.formType === 'location'">
+              {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
+            </template>
 
-            <template
-              v-else-if="column.formType === 'address'"
-            >{{formatCustomizeAddress(scope.row.attribute[column.field])}}</template>
+            <template v-else-if="column.formType === 'address'">
+              {{formatCustomizeAddress(scope.row.attribute[column.field])}}
+            </template>
 
-            <div
-              v-else-if="column.formType === 'textarea'"
-              v-html="buildTextarea(scope.row.attribute[column.field])"
-              @click="openOutsideLink"
-            ></div>
+            <div class="pre-text" v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink"></div>
 
-            <template v-else-if="column.isSystem === 0">{{scope.row.attribute[column.field]}}</template>
-            <template v-else>{{scope.row[column.field]}}</template>
+            <template v-else-if="column.isSystem === 0">
+              <pre class="pre-text">{{scope.row.attribute[column.field]}}</pre>
+            </template>
+            <template v-else>
+              <pre class="pre-text">{{scope.row[column.field]}}</pre>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -1164,11 +1167,13 @@ export default {
       this.$platform.openLink(url);
     },
     buildTextarea(value) {
-      return value
-        ? value.replace(link_reg, match => {
-            return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
-          })
-        : "";
+      let textareaValue = value
+        ? value.replace(link_reg, (match) => {
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
+        })
+        : '';
+
+      return textareaValue.replace(/\s/g, '&nbsp;');
     },
     getRowKey(row) {
       return row.id;
@@ -1363,14 +1368,10 @@ body {
       font-weight: normal;
     }
 
-    th {
-      color: #606266;
-      font-size: 14px;
-    }
-    td {
-      color: #909399;
-      font-size: 13px;
-    }
+      .view-detail-btn {
+        width: 100%;
+        color: $color-primary;
+      }
 
     .view-detail-btn {
       color: $color-primary;

@@ -1,50 +1,10 @@
-/** 请求代理 @author dongls */
-const http = require('http');
-
-const DEFAULT_OPIONS = {
-  // host: '127.0.0.1', 
-  // port: 8028,
-  // host: '30.40.56.211', // 丁建文
-  // port: 8081,
-  host: '30.40.56.177', // 仇太俊
-  port: 8080,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
-  }
-};
-
-const AGENT = new http.Agent({
-  keepAlive: true,
-  maxSockets: 1024,
-  maxFreeSockets: 256
-});
-
-/** 如果解析失败返回原值 */
-function toJSON(data) {
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return data;
-  }
-}
-
-/**
- * 拆解返回体
- * @param {*} response @see http://nodejs.cn/api/http.html#http_class_http_serverresponse
- * @param {*} body 返回的数据
- * @param {*} error 
- */
-function getBody(response, body, error) {
-  let statusCode = error ? 500 : response.statusCode;
-  let status = statusCode >= 200 && statusCode < 300;
-
-  let headers = {};
-  if (response && response.headers) {
-    headers = response.headers;
-  }
-
-  return { statusCode, status, headers, body, error };
-}
+/** 请求代理 
+ * @author dongls 
+*/
+// utils
+const { isNotLocalEnv } = require('../model/proxyConfigModel');
+const https = require(isNotLocalEnv ? 'https' : 'http');
+const { getRequestOptions, getProxyOptions, toJSON, getBody } = require('./HttpUtil');
 
 module.exports = {
   /**
@@ -56,17 +16,9 @@ module.exports = {
    * @param {*} rawBody 请求体
    * @param {*} options 
    */
-  request(path, method, rawBody, options = {}) {
-    let proxyOptions = {};
-
-    proxyOptions.host = options.host || DEFAULT_OPIONS.host;
-    proxyOptions.port = options.port || DEFAULT_OPIONS.port;
-    proxyOptions.method = method;
-    proxyOptions.path = path;
-    // proxyOptions.path = '/sm4-web/' + path;
-
-    proxyOptions.headers = Object.assign({}, DEFAULT_OPIONS.headers, options.headers)
-    proxyOptions.agent = AGENT;
+  request(path, method, rawBody, options = {}){
+    
+    let requestOptions = getRequestOptions(path, method, options);
 
     return new Promise((resolve, reject) => {
       let req = https.request(requestOptions, res => {
@@ -77,6 +29,7 @@ module.exports = {
           chunks.push(chunk);
           size += chunk.length;
         })
+    
         // 请求完成
         res.on('end', () => {
           // 拼接返回数据
@@ -121,7 +74,7 @@ module.exports = {
       let req = https.request(proxyOptions, res => {
         // 设定response的header
         let headers = res.headers;
-        for (let name in headers) {
+        for(let name in headers) {
           response.set(name, headers[name])
         }
 

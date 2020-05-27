@@ -117,24 +117,10 @@
                   'customer-name-expand': showWholeName == 1,
                 }"
               >
-                <span
-                  class="customer-name-delete"
-                  v-if="isDelete"
-                  title="该客户已被删除，只能查看数据。"
-                  v-tooltip
-                >已删除</span>
-                <span
-                  class="customer-name-disable"
-                  v-if="isDisable"
-                  title="该客户已被禁用，无法添加提醒和新建工单、事件、计划任务。"
-                  v-tooltip
-                >已禁用</span>
-                <span ref="customerName">{{customer.name}}</span>
-                <i
-                  v-if="showWholeName >= 0"
-                  @click="showWholeName = !showWholeName"
-                  class="iconfont icon-gongsimingchengxiala"
-                ></i>
+                <span class="customer-name-delete" v-if="isDelete" title="该客户已被删除，只能查看数据。" v-tooltip>已删除</span>
+                <span class="customer-name-disable" v-if="isDisable" title="该客户已被禁用，无法添加提醒和新建工单、事件、计划任务。" v-tooltip>已禁用</span>
+                <span ref="customerName"><pre class="pre-text">{{customer.name}}</pre></span>
+                <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
               </h3>
             </el-tooltip>
           </template>
