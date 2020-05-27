@@ -18,7 +18,7 @@
     "build:mao": "node script/production.js --user=aaronmao",
     "build:bodz": "node script/production.js --user=bodz",
     "build:swj": "node script/production.js --user=sunwj",
-    "build:cdh": "node script/production.js --user=cdh",
+    "build:bodz": "node script/production.js --user=bodz",
     "tag": "./script/tag.sh ${1} ${2}",
     "br": "./script/br.sh ${1} ${2} ${3}"
   },
