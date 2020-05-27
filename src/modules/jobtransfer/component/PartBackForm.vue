@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="退回" :visible.sync="visible" width="600px" top="10vh">
+  <el-dialog title="退回" :visible.sync="visible" width="600px">
     <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="common-form">
       <el-form-item label="备件名称：">
         <el-input type="text" :value="part.name" readonly class="srp-readonly"></el-input>
@@ -22,7 +22,7 @@
         <el-input type="text" :value="holdNum" readonly class="srp-readonly"></el-input>
       </el-form-item>
       <el-form-item label="退回数量：" prop="count">
-        <el-input type="number" step="any" :min="0" :max="holdNum" v-model="form.count"></el-input>
+        <el-input type="number" step="any" :min="0" :max="holdNum" v-model.number="form.count"></el-input>
       </el-form-item>
 
       <el-form-item label="备注：" prop="remark">
@@ -68,17 +68,20 @@ export default {
 
       rules: {
         count: [
-          {required: true, message: '数量不能为空'},
+          {required: true, type: 'number', message: '数量不能为空'},
           {
             validator:(rule, value, callback) => {
               let err = [];
               let max = this.holdNum || 0;
-              const count = this.decimalNumber(value);
-              
+              console.info('value:', value, window._init_data);
+              // const count = this.decimalNumber(value);
+              const count = parseFloat(value);
+              console.info('count:', count);
+               
               if(value > max) err.push('数量不能大于持有数量')
               if(value < 0) err.push('数量不能小于0')
-              if (count != -1 && count == 0) err.push('请填写大于0的正整数')
-              if (count != -1 && count != 0) err.push(`请填写大于0的${ count }位小数`)
+              // if (count != -1 && count == 0) err.push('请填写大于0的正整数')
+              // if (count != -1 && count != 0) err.push(`请填写大于0的${ count }位小数`)
 
               callback(err)
             }
@@ -96,7 +99,7 @@ export default {
   computed:{
     // TODO: 支持小数 提示
     minVariation () {
-      let initData = JSON.parse(window._init || {});
+      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
       return !initData || !initData.precision ? 1 : (initData.precision == 1 ? 0.1 : 0.01);
     },
     part(){
@@ -161,10 +164,11 @@ export default {
       this.pending = false;
     },
     decimalNumber(num) {
-      let initData = JSON.parse(window._init || {});
+      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
       let count = MathUtil.decimalNumber(num);
-      // let isPartV2 = initData.isSparepart2;
-      // if(!isPartV2 && count != 0) return 0;
+      let isPartV2 = initData.isSparepart2;
+
+      if(!isPartV2 && count != 0) return 0;
       if(initData.precision >= count) return -1;
       return initData.precision;
     }
