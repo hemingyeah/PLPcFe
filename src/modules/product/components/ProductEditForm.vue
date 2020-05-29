@@ -317,7 +317,7 @@ export default {
       };
       
       this.clearCustomerAddress();
-      return this.$http.get('task/getLmBindAddress', pms)
+      return this.$http.get('/task/getLmBindAddress', pms)
         .then(res => {
           if (!res) return;
           let address = [
@@ -388,7 +388,7 @@ export default {
       let customer = this.value.customer[0];
       let linkman = this.value.linkman[0];
       pms.customerId = customer.value;
-      pms.linkmanId = linkman.value;
+      // pms.linkmanId = linkman.value;
 
       return this.$http.get('/product/address', pms)
         .then(res => {

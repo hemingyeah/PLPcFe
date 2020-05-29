@@ -90,6 +90,9 @@ export default {
     customerId() {
       return (this.customer && this.customer.id) || "";
     },
+    linkmanId() {
+      return (this.originalValue && this.originalValue.id) || '';
+    },
     fields() {
       return [
         {
@@ -325,12 +328,11 @@ export default {
         .catch(err => console.error("fetchAddress catch err", err));
     },
     fetchProducts() {
-      return this.$http
-        .get("/customer/product/list", {
-          customerId: this.customer.id,
-          pageSize: 100000,
-          pageNum: 1
-        })
+      return this.$http.get('/product/linkmanRelation', {
+        linkmanId: this.linkmanId,
+        pageSize: 0,
+        pageNum: 1,
+      })
         .then(res => {
           this.products = res.list.map(p => ({
             text: p.name,
