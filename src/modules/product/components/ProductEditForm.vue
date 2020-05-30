@@ -206,7 +206,7 @@ export default {
       })
       this.fetchCustomer(value);
     },
-    updateLinkman(value) {
+    updateLinkman(value) {      
       let field = {
         fieldName: 'linkman',
         displayName: '联系人'
@@ -312,22 +312,21 @@ export default {
     },
     fetchLinkmanAddress(value) {
       let linkman = value[0];
+      if (!linkman) return;
       const pms = {
         lmId: linkman.value
       };
-      
       this.clearCustomerAddress();
       return this.$http.get('/task/getLmBindAddress', pms)
         .then(res => {
           if (!res) return;
           let address = [
             {
-              label: res.address && (res.address.province + res.address.city + res.address.dist + res.address.address),
-              value: res.address && res.address.id
+              label: res.data && `${res.data.province || ''}${res.data.city || ''}${res.data.dist || ''}${res.data.address || ''}`,
+              value: res.data && res.data.id
             }
           ]
-          res.address ? this.updateCustomerAddress(address) : '';
-
+          res.data && res.data.id ? this.updateCustomerAddress(address) : '';
           return res;
         })
         .catch(e => console.error(e));
