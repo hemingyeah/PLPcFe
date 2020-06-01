@@ -104,7 +104,7 @@ router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   port: 10007,
   headers: {
     // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
-    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
+    'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
   },
 }))
 

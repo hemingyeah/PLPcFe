@@ -64,7 +64,7 @@
                   class="mar-b-10"
                   v-for="(item, index) in form.modelMap"
                   :key="index"
-                  v-model="item.name+'：'+item.value"
+                  v-model="item.name+'：'+item.value+'【不可编辑】'"
                   disabled
                 ></el-input>
                 <el-input
@@ -80,8 +80,25 @@
           <div class="flex-x mar-l-15">
             <p>样例</p>
             <div class="result-show mar-l-15">
-              <img v-if="form.title==='服务状态提醒'" src="@src/assets/img/wx/temp_status.png" alt />
-              <img v-if="form.title==='服务工单提醒'" src="@src/assets/img/wx/temp_task.png" alt />
+              <div class="tem-top-img" src alt></div>
+              <div class="tem-box">
+                <div class="tem-con">
+                  <div class="tem-write">
+                    <div class="flex-x al-center">
+                      <div class="tem-title flex-1">{{form.title}}</div>
+                      <i class="iconfont icon-diandiandian color-gray"></i>
+                    </div>
+
+                    <div class>{{form.first}}</div>
+                    <div
+                      v-for="(item, index) in form.modelMap"
+                      :key="index"
+                    >{{item.name+'：'+item.value+'【不可编辑】'}}</div>
+                    <div>{{form.remark}}</div>
+                  </div>
+                </div>
+              </div>
+              <img class="tem-bottom-img" src="@src/assets/img/wx/bottom.png" alt />
             </div>
           </div>
         </div>
@@ -170,7 +187,7 @@ export default {
     jump(pageNum) {
       this.searchModel.pageNum = pageNum;
       this.getTemp();
-    },
+    }
   },
   created() {
     this.getTemp();
@@ -194,12 +211,18 @@ export default {
     width: 50%;
   }
   .result-show {
-    width: 212px;
-    height: 307px;
+    max-height: 400px;
+    overflow-y: scroll;
+    overflow-x: hidden;
     position: relative;
-    img {
-      width: 100%;
-      height: 100%;
+    .tem-top-img {
+      width: 240px;
+      height: 83px;
+      background-image: url("../../../../assets/img/wx/top.png");
+    }
+    .tem-bottom-img {
+      width: 240px;
+      height: 59px;
     }
   }
 }
@@ -213,5 +236,41 @@ export default {
   .el-input__inner {
     padding-left: 15px;
   }
+}
+.tem-box {
+  width: 240px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  font-size: 12px;
+  background: rgb(237, 237, 237);
+  div {
+    word-wrap: break-word;
+  }
+  .tem-title {
+    font-size: 14px;
+  }
+  .tem-con {
+    background: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #f5f5f5;
+    box-sizing: border-box;
+  }
+  .tem-write {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f5f5f5;
+    margin-bottom: 28px;
+  }
+}
+.al-center {
+  align-items: center;
+
+  margin-bottom: 10px;
+}
+.font-16 {
+  font-size: 16px;
+}
+.color-gray {
+  color: rgb(199, 199, 203);
 }
 </style>
