@@ -388,12 +388,12 @@ export default {
     },
     async desertWx() {
       try {
-        const res = await this.$platform.confirm(
+        const res_ = await this.$platform.confirm(
           `您将要解除${this.wxInfo.nickName}公众号的绑定，请确认。`
         );
-        if (!res) return;
+        if (!res_) return;
         this.pageLoading(true);
-        cancleAuthorizer()
+        await cancleAuthorizer()
           .then(res => {
             this.pageLoading(false);
             this.getWxInfo();
