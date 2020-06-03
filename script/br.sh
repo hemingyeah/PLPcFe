@@ -75,7 +75,7 @@ do
         # 创建pre_master并推送
         git checkout stable
         git pull
-        preMasterBranchName="pre_master_table_"$3
+        preMasterBranchName="pre_master_stable_"$3
         git checkout -b $preMasterBranchName
         git push --set-upstream origin $preMasterBranchName
 
