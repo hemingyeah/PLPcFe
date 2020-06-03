@@ -194,7 +194,7 @@ img {
       }
       span {
         font-size: 13px;
-        font-weight: 700;
+        font-weight: 500;
       }
     }
   }

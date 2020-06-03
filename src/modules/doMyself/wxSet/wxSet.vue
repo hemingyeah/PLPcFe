@@ -212,6 +212,7 @@ export default {
   },
   computed: {},
   created() {
+    sessionStorage.removeItem("wx_auth_auth_page_close");
     this.getWxInfo();
   },
   methods: {
@@ -220,18 +221,18 @@ export default {
       this.fullscreenLoading = data;
     },
     getWxInfo() {
-      if (!this.scanQrCode) {
-        // 如果是轮询不需要loading 加载动画
-        this.pageLoading(true);
-      }
       if (sessionStorage.getItem("wx_auth_auth_page_close") === "true") {
         this.scanQrCode = false;
         sessionStorage.removeItem("wx_auth_auth_page_close");
         return;
       }
+      if (!this.scanQrCode) {
+        // 如果是轮询不需要loading 加载动画
+        this.pageLoading(true);
+      }
+
       getAuthInfoWX()
         .then(res => {
-          this.pageLoading(false);
           if (res.data.status === 0) {
             // 未绑定公众号
             this.haveWx = 0;
@@ -298,8 +299,10 @@ export default {
           }
         })
         .catch(err => {
-          this.pageLoading(false);
           console.log(err, "erro");
+        })
+        .finally(res => {
+          this.pageLoading(false);
         });
     },
     async mainChange(e) {
@@ -392,8 +395,7 @@ export default {
           `您将要解除${this.wxInfo.nickName}公众号的绑定，请确认。`
         );
         if (!res_) return;
-        this.pageLoading(true);
-        await cancleAuthorizer()
+        cancleAuthorizer()
           .then(res => {
             this.pageLoading(false);
             this.getWxInfo();
