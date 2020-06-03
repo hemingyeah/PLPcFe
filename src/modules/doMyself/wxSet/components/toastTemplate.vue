@@ -64,7 +64,7 @@
                   class="mar-b-10"
                   v-for="(item, index) in form.modelMap"
                   :key="index"
-                  v-model="item.name+'：'+item.value+'【不可编辑】'"
+                  v-model="item.name+'：【不可编辑】'"
                   disabled
                 ></el-input>
                 <el-input
@@ -93,7 +93,7 @@
                     <div
                       v-for="(item, index) in form.modelMap"
                       :key="index"
-                    >{{item.name+'：'+item.value+'【不可编辑】'}}</div>
+                    >{{item.name+'：【不可编辑】'}}</div>
                     <div>{{form.remark}}</div>
                   </div>
                 </div>
