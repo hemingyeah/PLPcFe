@@ -436,7 +436,7 @@
                     class="dropdown-item"
                     @click="instockBatch(selected);trackEventhandler('batch-stock-in')"
                   >批量入库</span>
-                </el-dropdown-item> -->
+                </el-dropdown-item>-->
                 <el-dropdown-item>
                   <span
                     class="dropdown-item"
@@ -1030,92 +1030,97 @@
         </template>
       </div>
     </base-panel>
-
   </div>
 </template>
 
 <script>
-import _ from 'lodash';
-import Page from '@src/model/Page';
-import PartBackStockForm from './form/PartBackStockForm.vue';
-import PartOutStockForm from './form/PartAPPlyOutStockForm.vue';
-import PartInStockForm from './form/PartApplyInStockForm.vue';
-import PartApplyFormBatchOut from './form/PartApplyFormBatchOut.vue';
-import PartApplyFormBatchIn from './form/PartApplyFormBatchIn.vue';
-import PartReStockForm from './form/PartReStockForm.vue';
-import PartCancelTransferForm from './form/PartCancelTransferForm.vue';
-import PartTransferForm from './form/PartTransferForm.vue';
-import PartDealWithForm from './form/PartDealWithForm.vue';
+import _ from "lodash";
+import Page from "@src/model/Page";
+import PartBackStockForm from "./form/PartBackStockForm.vue";
+import PartOutStockForm from "./form/PartAPPlyOutStockForm.vue";
+import PartInStockForm from "./form/PartApplyInStockForm.vue";
+import PartApplyFormBatchOut from "./form/PartApplyFormBatchOut.vue";
+import PartApplyFormBatchIn from "./form/PartApplyFormBatchIn.vue";
+import PartReStockForm from "./form/PartReStockForm.vue";
+import PartCancelTransferForm from "./form/PartCancelTransferForm.vue";
+import PartTransferForm from "./form/PartTransferForm.vue";
+import PartDealWithForm from "./form/PartDealWithForm.vue";
 
-import DateUtil from '@src/util/date';
-import AuthUtil from '@src/util/auth';
-import StorageUtil from '@src/util/storageUtil';
+import DateUtil from "@src/util/date";
+import AuthUtil from "@src/util/auth";
+import {
+  rejectBatch,
+  revokeBatch,
+  approveBatch,
+  getRelationListByApproveNo
+} from "@src/api/SparePart";
+import StorageUtil from "@src/util/storageUtil";
 
 let allPerson = [];
 
-const STORAGE_COLNUM_KEY = 'repe_apply_list_column';
-const STORAGE_PAGESIZE_KEY = 'repe_apply_list_pagesize';
+const STORAGE_COLNUM_KEY = "repe_apply_list_column";
+const STORAGE_PAGESIZE_KEY = "repe_apply_list_pagesize";
 
 export default {
-  name: 'part-apply-view',
-  inject: ['initData'],
-  data(){
+  name: "part-apply-view",
+  inject: ["initData"],
+  data() {
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
 
     let originModel = {
-      keyWord: '',
+      keyWord: "",
       type: [],
       // enable: "",
       pageNum: 1,
       pageSize,
-      sparepartType: '',
+      sparepartType: "",
       targetIds: [],
       sourceIds: [],
-      state: ['suspending']
+      state: ["suspending"]
     };
 
     return {
       stateArr: [
-        { value: 'suspending', label: '待处理', key: 'suspending' },
-        { value: 'solved', label: '已办理', key: 'solved' },
-        { value: 'rejected', label: '已拒绝', key: 'rejected' },
-        { value: 'cancel', label: '已取消', key: 'cancel' },
-        { value: 'revoked', label: '已撤回', key: 'revoked' }
+        { value: "suspending", label: "待处理", key: "suspending" },
+        { value: "solved", label: "已办理", key: "solved" },
+        { value: "rejected", label: "已拒绝", key: "rejected" },
+        { value: "cancel", label: "已取消", key: "cancel" },
+        { value: "revoked", label: "已撤回", key: "revoked" }
       ],
       typeArr: [
-        { value: '出库', label: '出库', key: '0' },
-        { value: '入库', label: '入库', key: '1' },
-        { value: '调拨', label: '调拨', key: '2' },
-        { value: '分配', label: '分配', key: '3' },
-        { value: '申领', label: '申领 ', key: '4' },
-        { value: '退回', label: '退回', key: '5' }
+        { value: "出库", label: "出库", key: "0" },
+        { value: "入库", label: "入库", key: "1" },
+        { value: "调拨", label: "调拨", key: "2" },
+        { value: "分配", label: "分配", key: "3" },
+        { value: "申领", label: "申领 ", key: "4" },
+        { value: "退回", label: "退回", key: "5" }
       ],
       selectedLimit: 500,
       auths: {},
       columns: this.buildColumns(),
       isExpand: false,
       pending: false,
-      userName: '',
-      userId: '',
-      
+      userName: "",
+      userId: "",
+
       types: [],
       userApply: {
-        prosperId: '',
+        prosperId: "",
         loading: false,
         options: []
       },
       userApprove: {
-        approveId: '',
+        approveId: "",
         loading: false,
         options: []
       },
       sparepart: {
-        sparepartType: '',
-        sparepartName: '',
+        sparepartType: "",
+        sparepartName: "",
         loading: false,
         options: []
       },
-      
+
       originModel,
       multipleSelectionPanelShow: false,
       model: _.assign({}, originModel),
@@ -1139,77 +1144,80 @@ export default {
       repertories: [], // 所有仓库
       repertory_1: [],
       repertory_2: [],
-      sourceType: '备件库',
-      targetType: '备件库',
-      repertorySelected: '',
+      sourceType: "备件库",
+      targetType: "备件库",
+      repertorySelected: "",
       sparepartConfig: {},
-      repertoryName: '',
-      state: '',
+      repertoryName: "",
+      state: "",
       pickerOptions2: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            }
           }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
+        ]
       },
-      timeValue: '',
-      updateTimeValue:'',
+      timeValue: "",
+      updateTimeValue: "",
       isPersonalRepertory: false,
       initData: {},
       rejectForm: {
-        reason: '',
-        reasons: ''
+        reason: "",
+        reasons: ""
       },
       rejectRules: {
         reason: [
-          { required: true, message: '请填写拒绝理由', trigger: 'change' }
+          { required: true, message: "请填写拒绝理由", trigger: "change" }
         ]
       },
       cancelType: 0 // 0 拒绝 1 撤销
-
-    }
+    };
   },
   computed: {
-    allowInout(){
-      return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_INOUT');
+    allowInout() {
+      return AuthUtil.hasAuth(this.auths, "VIP_SPAREPART_INOUT");
     },
     // 是否允许导入导出
-    allowImportAndExport(){
-      return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
+    allowImportAndExport() {
+      return AuthUtil.hasAuth(this.auths, "EXPORT_IN");
     }
   },
   watch: {
     backstockDialog() {
-      this.$refs['rejectForm'].resetFields();
+      this.$refs["rejectForm"].resetFields();
     }
   },
   filters: {
     state(s) {
-      if (s === 'solved') return '已处理';
-      if (s === 'suspending') return '待处理';
-      if (s === 'cancel') return '已取消';
-      if (s === 'rejected') return '已拒绝';
-      if (s === 'revoked') return '已撤回';
+      if (s === "solved") return "已处理";
+      if (s === "suspending") return "待处理";
+      if (s === "cancel") return "已取消";
+      if (s === "rejected") return "已拒绝";
+      if (s === "revoked") return "已撤回";
       return s;
     }
   },
@@ -1217,16 +1225,22 @@ export default {
     /** 检测导出条数 */
     checkExportCount(ids, max) {
       let exportAll = !ids || !ids.length;
-      return exportAll && this.page.total > max ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。' : null;
+      return exportAll && this.page.total > max
+        ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
+        : null;
     },
-    exportPart(exportAll = false){
-      if(!this.allowImportAndExport || !this.allowInout) return;
+    exportPart(exportAll = false) {
+      if (!this.allowImportAndExport || !this.allowInout) return;
 
       let ids = [];
-      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件出入库办理数据.xlsx`;
+      let fileName = `${DateUtil.format(
+        new Date(),
+        "yyyy-MM-dd"
+      )}备件出入库办理数据.xlsx`;
 
-      if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
+      if (!exportAll) {
+        if (this.selected.length == 0)
+          return this.$platform.alert("请选择要导出的数据");
         ids = this.selected.map(item => item.id);
       }
 
@@ -1242,12 +1256,12 @@ export default {
       let row = undefined;
 
       if (rows) {
-        for(let i = 0; i < rows.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
           row = rows[i];
           isNotOnCurrentPage = this.page.list.every(item => {
             return item.id !== row.id;
-          })
-          if(isNotOnCurrentPage) return
+          });
+          if (isNotOnCurrentPage) return;
         }
         rows.forEach(row => {
           this.$refs.table.toggleRowSelection(row);
@@ -1258,89 +1272,103 @@ export default {
       }
     },
 
-    getApproveTimeArr(i, id){
-      if(this.page.list[i].isApproveTimeArr) return;
+    getApproveTimeArr(i, id) {
+      if (this.page.list[i].isApproveTimeArr) return;
 
-      this.$set(this.page.list[i], 'disabled', false);
-      this.$set(this.page.list[i], 'approveTimeArr', '加载中...');
-      try{
-        this.$http.get('/partV2/repertory/diposal/time', {approveId:id}).then(res => {
-          this.$set(this.page.list[i], 'approveTimeArr', res.data.join('\n'));
-          this.$set(this.page.list[i], 'isApproveTimeArr', true);
-          if(res.data.length == 0) this.$set(this.page.list[i], 'disabled', true);
-        })
-      }catch(error){
-        console.log(error)
+      this.$set(this.page.list[i], "disabled", false);
+      this.$set(this.page.list[i], "approveTimeArr", "加载中...");
+      try {
+        this.$http
+          .get("/partV2/repertory/diposal/time", { approveId: id })
+          .then(res => {
+            this.$set(this.page.list[i], "approveTimeArr", res.data.join("\n"));
+            this.$set(this.page.list[i], "isApproveTimeArr", true);
+            if (res.data.length == 0)
+              this.$set(this.page.list[i], "disabled", true);
+          });
+      } catch (error) {
+        console.log(error);
       }
     },
     getRecordNoArr(i, id) {
-      if(this.page.list[i].isRecordNoArr) return;
-      this.$set(this.page.list[i], 'disabled', false);
-      this.$set(this.page.list[i], 'recordNoArr', '加载中...');
-      try{
-        this.$http.get('/partV2/repertory/diposal/recordNo', {approveId:id}).then(res => {
-          this.$set(this.page.list[i], 'recordNoArr', res.data.join('\n'));
-          this.$set(this.page.list[i], 'isRecordNoArr', true);
-          if(res.data.length == 0) this.$set(this.page.list[i], 'disabled', true);
-        })
-      }catch(error){
-        console.log(error)
+      if (this.page.list[i].isRecordNoArr) return;
+      this.$set(this.page.list[i], "disabled", false);
+      this.$set(this.page.list[i], "recordNoArr", "加载中...");
+      try {
+        this.$http
+          .get("/partV2/repertory/diposal/recordNo", { approveId: id })
+          .then(res => {
+            this.$set(this.page.list[i], "recordNoArr", res.data.join("\n"));
+            this.$set(this.page.list[i], "isRecordNoArr", true);
+            if (res.data.length == 0)
+              this.$set(this.page.list[i], "disabled", true);
+          });
+      } catch (error) {
+        console.log(error);
       }
     },
-    chooseColnum(column){
-      this.trackEventhandler('selectColumn');
+    chooseColnum(column) {
+      this.trackEventhandler("selectColumn");
 
       column.show = !column.show;
 
       let data = {};
-      this.columns.forEach(item => data[item.field] = item.show)
+      this.columns.forEach(item => (data[item.field] = item.show));
       StorageUtil.save(STORAGE_COLNUM_KEY, data);
     },
-    seeTime(){
-      if(!this.timeValue) {
+    seeTime() {
+      if (!this.timeValue) {
         delete this.model.timeStart;
         delete this.model.timeEnd;
       } else {
-        this.model.timeStart = DateUtil.format(this.timeValue[0])
-        this.model.timeEnd = DateUtil.format(this.timeValue[1], 'yyyy-MM-dd 23:59:59')
+        this.model.timeStart = DateUtil.format(this.timeValue[0]);
+        this.model.timeEnd = DateUtil.format(
+          this.timeValue[1],
+          "yyyy-MM-dd 23:59:59"
+        );
       }
     },
-    seeUpdateTime(){
-      if(!this.updateTimeValue) {
+    seeUpdateTime() {
+      if (!this.updateTimeValue) {
         delete this.model.updateTimeStart;
         delete this.model.updateTimeEnd;
       } else {
-        this.model.updateTimeStart = DateUtil.format(this.updateTimeValue[0])
-        this.model.updateTimeEnd = DateUtil.format(this.updateTimeValue[1], 'yyyy-MM-dd 23:59:59')
+        this.model.updateTimeStart = DateUtil.format(this.updateTimeValue[0]);
+        this.model.updateTimeEnd = DateUtil.format(
+          this.updateTimeValue[1],
+          "yyyy-MM-dd 23:59:59"
+        );
       }
     },
-    openDetail(row){
+    openDetail(row) {
       this.$platform.openTab({
         id: `partV2_detail_${row.id}`,
-        url:`/partV2/detail?id=${row.id}`,
-        title: '备件品类详情'
-      })
+        url: `/partV2/detail?id=${row.id}`,
+        title: "备件品类详情"
+      });
     },
-    exportData(){
-      this.$platform.alert('export')
+    exportData() {
+      this.$platform.alert("export");
     },
     // select part
     handleSelection(selection) {
       let tv = this.computeSelection(selection);
       // 在需要限制最多选择500个备件时，取消function内部全部注释即可
-      let original = this.selected
-        .filter(ms => this.page.list.some(cs => cs.id === ms.id));
-      let unSelected = this.page.list
-        .filter(c => original.every(oc => oc.id !== c.id));
+      let original = this.selected.filter(ms =>
+        this.page.list.some(cs => cs.id === ms.id)
+      );
+      let unSelected = this.page.list.filter(c =>
+        original.every(oc => oc.id !== c.id)
+      );
 
       if (tv.length > this.selectedLimit) {
         this.$nextTick(() => {
           original.length > 0
             ? unSelected.forEach(row => {
-              this.$refs.table.toggleRowSelection(row, false);
-            })
+                this.$refs.table.toggleRowSelection(row, false);
+              })
             : this.$refs.table.clearSelection();
-        })
+        });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
       this.selected = tv;
@@ -1349,15 +1377,16 @@ export default {
     },
     computeSelection(selection) {
       let tv = [];
-      tv = this.selected
-        .filter(ms => this.page.list.every(c => c.id !== ms.id));
+      tv = this.selected.filter(ms =>
+        this.page.list.every(c => c.id !== ms.id)
+      );
       tv = _.uniqWith([...tv, ...selection], _.isEqual);
       return tv;
     },
     matchSelected() {
       if (!this.selected.length) return;
-      const selected = this.page.list
-        .filter(c => {
+      const selected =
+        this.page.list.filter(c => {
           if (this.selected.some(sc => sc.id === c.id)) {
             this.selected = this.selected.filter(sc => sc.id !== c.id);
             this.selected.push(c);
@@ -1369,14 +1398,14 @@ export default {
         this.toggleSelection(selected);
       });
     },
-    create(){
+    create() {
       this.$platform.openTab({
-        id: 'partV2_create',
-        url: '/partV2/create',
-        title: '创建备件品类'
-      })
+        id: "partV2_create",
+        url: "/partV2/create",
+        title: "创建备件品类"
+      });
     },
-    initialize(){
+    initialize() {
       Promise.all([
         this.fetchAllRepertory(), // 所有仓库
         this.loadData(),
@@ -1392,49 +1421,49 @@ export default {
 
           this.page.list = list.map(item => {
             let tv = allRepertory.filter(r => r.id === item.targetId);
-            if (item.type === '调拨' && tv && tv[0]) {
+            if (item.type === "调拨" && tv && tv[0]) {
               item.targetName = tv[0].name;
               item.targetRepertory = tv[0] || {};
             }
 
             item = this.judgeRelationshipBetweenUserAndRepertory(item);
             return item;
-          })
+          });
         })
-        .catch(e => console.log('e', e));
+        .catch(e => console.log("e", e));
     },
-    jump(pageNum){
+    jump(pageNum) {
       this.model.pageNum = pageNum;
       this.loadData();
     },
-    pageSizeChange(pageSize){
+    pageSizeChange(pageSize) {
       this.model.pageSize = pageSize;
       this.originModel.pageSize = pageSize;
 
       this.loadData();
       StorageUtil.save(STORAGE_PAGESIZE_KEY, pageSize);
     },
-    search(){
+    search() {
       this.model.pageNum = 1;
       this.loadData();
     },
-    reset(){
+    reset() {
       this.model = _.assign({}, this.originModel);
       this.timeValue = [];
       this.updateTimeValue = [];
-      this.sparepart.sparepartName = '';
-      this.userApply.userId = '';
-      this.userApprove.userId = '';
-      this.state = '';
-      this.repertoryName = '';
+      this.sparepart.sparepartName = "";
+      this.userApply.userId = "";
+      this.userApprove.userId = "";
+      this.state = "";
+      this.repertoryName = "";
       this.loadData();
     },
     resetAll() {
       // 搜索条件初始化
       this.model = _.assign({}, this.originModel);
-      this.userApply.prosperId = '';
-      this.userApprove.approveId = '';
-      this.targetType = '备件库';
+      this.userApply.prosperId = "";
+      this.userApprove.approveId = "";
+      this.targetType = "备件库";
       this.userApprove.options = _.cloneDeep(allPerson);
       this.sparepart.options = _.cloneDeep(allPerson);
       this.repertory_1 = this.repertories;
@@ -1443,87 +1472,89 @@ export default {
       this.updateTimeValue = [];
       this.loadData();
     },
-    async loadData(){
+    async loadData() {
       let loading = this.$loading();
-      try{
+      try {
         this.page = await this.fetchData();
         this.model.pageNum = this.page.pageNum;
         this.model.pageSize = this.page.pageSize;
 
         this.matchSelected();
-      }catch(error){
-        console.log(error)
+      } catch (error) {
+        console.log(error);
       }
       loading.close();
       return this.page.list;
     },
-    fetchUserApply(keyword){
+    fetchUserApply(keyword) {
       // 获取用户
       let model = {
         keyword,
         pageSize: 50
-      }
+      };
       this.userApply.loading = true;
       this.$http
-        .get('/partV2/repertory/users', model)
+        .get("/partV2/repertory/users", model)
         .then(result => (this.userApply.options = result))
         .catch(err => console.log(err))
-        .finally(() => this.userApply.loading = false);
+        .finally(() => (this.userApply.loading = false));
     },
     visibleUserApply(e) {
-      if (this.userApply.prosperId === '') {
+      if (this.userApply.prosperId === "") {
         setTimeout(() => {
           this.userApply.loading = false;
           this.userApply.options = _.cloneDeep(allPerson);
         }, 500);
       }
     },
-    fetchUserApprove(keyword){
+    fetchUserApprove(keyword) {
       // 获取用户
       let model = {
         keyword,
         pageSize: 50
-      }
+      };
       this.userApply.loading = true;
-      this.$http.get('/partV2/repertory/users', model)
+      this.$http
+        .get("/partV2/repertory/users", model)
         .then(
           result => (
             (this.userApprove.options = result),
             (this.repertory = result.map(item => {
               item = {
-                id: item.userId || '',
-                name: item.displayName || ''
+                id: item.userId || "",
+                name: item.displayName || ""
               };
-              return item
+              return item;
             }))
           )
         )
 
         .catch(err => console.log(err))
-        .finally(() => this.userApprove.loading = false);
+        .finally(() => (this.userApprove.loading = false));
     },
     visibleUserApprove(e) {
-      if (this.userApprove.approveId === '') {
+      if (this.userApprove.approveId === "") {
         setTimeout(() => {
           this.userApprove.loading = false;
           this.userApprove.options = _.cloneDeep(allPerson);
         }, 500);
       }
     },
-    fetchSparepart(keyword){
+    fetchSparepart(keyword) {
       // 获取备件
       let model = {
         keyWord: keyword,
         // enable: 1,
         pageSize: 50
-      }
-      this.sparepart.loading = true
-      this.$http.get('/partV2/repertory/sparepart/list', model)
-        .then(result => this.sparepart.options = result.list)
+      };
+      this.sparepart.loading = true;
+      this.$http
+        .get("/partV2/repertory/sparepart/list", model)
+        .then(result => (this.sparepart.options = result.list))
         .catch(err => console.log(err))
-        .finally(() => this.sparepart.loading = false);
+        .finally(() => (this.sparepart.loading = false));
     },
-    
+
     chooseUserApply(value) {
       this.model.prosperId = value;
     },
@@ -1535,32 +1566,32 @@ export default {
       this.sparepart.sparepartName = value;
       this.model.sparepartName = value;
     },
-    hooseSparepartType(value){
-      if(this.sparepart.sparepartType == value) return;
+    hooseSparepartType(value) {
+      if (this.sparepart.sparepartType == value) return;
       this.sparepart.sparepartType = value;
       this.model.sparepartType = value;
     },
     fetchData() {
       // 获取申请列表
       return this.$http
-        .get('/partV2/approve/approveList/list', this.model)
+        .get("/partV2/approve/approveList/list", this.model)
         .then(result => {
           // repertory
           let list = (result.data.list || []).map(item => {
             item.approveTime = item.approveTime
               ? DateUtil.format(
-                new Date(item.approveTime),
-                'yyyy-MM-dd HH:mm:ss'
-              )
-              : '';
+                  new Date(item.approveTime),
+                  "yyyy-MM-dd HH:mm:ss"
+                )
+              : "";
             item.prosperTime = item.prosperTime
               ? DateUtil.format(
-                new Date(item.prosperTime),
-                'yyyy-MM-dd HH:mm:ss'
-              )
-              : '';
+                  new Date(item.prosperTime),
+                  "yyyy-MM-dd HH:mm:ss"
+                )
+              : "";
             let tv = this.repertories.filter(r => r.id === item.targetId);
-            if (item.type === '调拨' && tv && tv[0]) {
+            if (item.type === "调拨" && tv && tv[0]) {
               item.targetName = tv[0].name;
               item.targetRepertory = tv[0] || {};
             }
@@ -1581,7 +1612,9 @@ export default {
 
       if (!row || !row.sparepartRepertory || !row.targetRepertory) return row;
 
-      if (row.sparepartRepertory.repertory.manager.some(m => m.userId === userId)) {
+      if (
+        row.sparepartRepertory.repertory.manager.some(m => m.userId === userId)
+      ) {
         row.isOriginalRepertoryManager = true;
       }
 
@@ -1590,44 +1623,45 @@ export default {
       }
       return row;
     },
-    fetchRepertory(){
+    fetchRepertory() {
       // 获取仓库类型
-      return this.$http.get('/partV2/approve/repertory').then(result => {
+      return this.$http.get("/partV2/approve/repertory").then(result => {
         this.repertory = result || [];
-      })
+      });
     },
 
     // 获取全部仓库列表
-    fetchAllRepertory(){
-      return this.$http.get('/partV2/repertory/allRepertory')
+    fetchAllRepertory() {
+      return this.$http
+        .get("/partV2/repertory/allRepertory")
         .then(result => {
           this.repertory_1 = result || [];
           this.repertory_2 = result || [];
-          return this.repertories = result || []
+          return (this.repertories = result || []);
         })
-        .catch(err => console.warn(err))
+        .catch(err => console.warn(err));
     },
     chooseSourceType(e) {
-      if (e === '个人备件库') {
+      if (e === "个人备件库") {
         this.repertory_1 = this.repertory;
       } else {
         this.repertory_1 = this.repertories;
       }
       this.model.sourceIds = [];
-      console.log(e, '原始');
+      console.log(e, "原始");
     },
     chooseTargetType(e) {
-      if (e === '个人备件库') {
+      if (e === "个人备件库") {
         this.repertory_2 = this.repertory;
       } else {
         this.repertory_2 = this.repertories;
       }
       this.model.targetIds = [];
-      this.trackEventhandler('chooseTargetType');
-      console.log(e, '目标');
+      this.trackEventhandler("chooseTargetType");
+      console.log(e, "目标");
     },
-    chooseRepertory(value){
-      this.trackEventhandler('chooseRepertory');
+    chooseRepertory(value) {
+      this.trackEventhandler("chooseRepertory");
 
       // this.repertoryName = value;
       // if(value){
@@ -1636,9 +1670,9 @@ export default {
       //   delete this.model.repertoryId
       // }
       this.model.pageNum = 1;
-      this.loadData()
+      this.loadData();
     },
-    chooseState(value){
+    chooseState(value) {
       this.stateTrackEventHandler(value);
 
       // this.state = value;
@@ -1648,44 +1682,46 @@ export default {
       //   delete this.model.state
       // }
       this.model.pageNum = 1;
-      this.loadData()
+      this.loadData();
     },
-    fecthSparepartConfig(){
+    fecthSparepartConfig() {
       // 获取备件设置
-      return this.$http.post('/partV2/repertory/sparepartConfig').then(result => {
-        this.sparepartConfig = result
-      })
+      return this.$http
+        .post("/partV2/repertory/sparepartConfig")
+        .then(result => {
+          this.sparepartConfig = result;
+        });
     },
     /** 办理出库 */
     outstock(value) {
-      if(!this.isPersonalRepertory) {
-        return this.personalRepertoryNotMeaage()
+      if (!this.isPersonalRepertory) {
+        return this.personalRepertoryNotMeaage();
       }
       this.outstockDialog = true;
       this.formdata = value;
     },
     /** 入库 */
     instock(value) {
-      if(!this.isPersonalRepertory) {
-        return this.personalRepertoryNotMeaage()
+      if (!this.isPersonalRepertory) {
+        return this.personalRepertoryNotMeaage();
       }
       this.instockDialog = true;
-      this.formdata = value
+      this.formdata = value;
     },
     /** 取消 */
-    backstock(value){
-      if(!this.isPersonalRepertory) {
-        return this.personalRepertoryNotMeaage()
+    backstock(value) {
+      if (!this.isPersonalRepertory) {
+        return this.personalRepertoryNotMeaage();
       }
       this.backstockDialog = true;
-      this.formdata = value
+      this.formdata = value;
       //
     },
     openTransferDialog(value, action) {
       this.transferDialog = true;
       this.formdata = {
         ...value,
-        action,
+        action
       };
     },
     transfer() {
@@ -1697,12 +1733,14 @@ export default {
         remark: form.remarks
       };
       this.pending = true;
-      const actionName = action ? '接收调入' : '拒绝调入';
-      const url = action ? '/partV2/approve/transfer/accept' : '/partV2/approve/transfer/reject';
+      const actionName = action ? "接收调入" : "拒绝调入";
+      const url = action
+        ? "/partV2/approve/transfer/accept"
+        : "/partV2/approve/transfer/reject";
 
-      this.$http.post(url, params)
+      this.$http
+        .post(url, params)
         .then(res => {
-
           if (!res.status) {
             this.$platform.toast(`${actionName}成功`);
             this.transferDialog = false;
@@ -1711,19 +1749,18 @@ export default {
             return;
           }
 
-          this.$platform.toast(res.message, 'warning');
+          this.$platform.toast(res.message, "warning");
           this.pending = false;
         })
         .catch(error => {
-          this.$platform.toast(`${actionName}失败`, 'error');
-          console.log('err', error)
-        })
-
+          this.$platform.toast(`${actionName}失败`, "error");
+          console.log("err", error);
+        });
     },
 
     /** 调拨撤回（弹窗） **/
     openCancelTransferDialog(value) {
-      this.tableTrackEventHandler('recall');
+      this.tableTrackEventHandler("recall");
 
       this.cancelTransferDialog = true;
       this.formdata = value;
@@ -1737,31 +1774,31 @@ export default {
       };
       this.pending = true;
 
-      this.$http.post('/partV2/approve/transfer/revoke', params)
+      this.$http
+        .post("/partV2/approve/transfer/revoke", params)
         .then(res => {
-
           if (!res.status) {
-            this.$platform.toast('撤回调拨成功');
+            this.$platform.toast("撤回调拨成功");
             this.loadData();
             this.cancelTransferDialog = false;
             this.pending = false;
             return;
           }
 
-          this.$platform.toast(res.message, 'warning');
+          this.$platform.toast(res.message, "warning");
           this.pending = false;
         })
         .catch(error => {
-          this.$platform.toast('撤回调拨失败', 'error');
-          console.log('err', error)
-        })
+          this.$platform.toast("撤回调拨失败", "error");
+          console.log("err", error);
+        });
     },
     /** 分配撤回 (弹窗) */
     reStockOpenDialog(value) {
-      this.tableTrackEventHandler('recall');
+      this.tableTrackEventHandler("recall");
 
-      if(!this.isPersonalRepertory) {
-        return this.personalRepertoryNotMeaage()
+      if (!this.isPersonalRepertory) {
+        return this.personalRepertoryNotMeaage();
       }
       this.reStockDialog = true;
       this.formdata = value;
@@ -1769,10 +1806,10 @@ export default {
     /** 分配撤回 */
     async reStock() {
       let form = this.$refs.reStockForm;
-      if(null == form) return;
+      if (null == form) return;
 
       let reStockForm = await form.pack();
-      if(!reStockForm) return;
+      if (!reStockForm) return;
 
       this.pending = true;
       let params = {
@@ -1781,151 +1818,168 @@ export default {
         remark: reStockForm.remarks
       };
       try {
-        let result = await this.$http.post('/partV2/approve/allot/revoke', params);
-        if(result.status == 0){
-
-          this.$platform.toast('撤回成功');
+        let result = await this.$http.post(
+          "/partV2/approve/allot/revoke",
+          params
+        );
+        if (result.status == 0) {
+          this.$platform.toast("撤回成功");
           this.reStockDialog = false;
           this.loadData();
-
-        }else{
+        } else {
           this.$platform.alert(result.message);
         }
-
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
       this.pending = false;
     },
     // 出库
-    async outstockSave(){
+    async outstockSave() {
       let form = this.$refs.outstockForm;
-      if(null == form) return;
+      if (null == form) return;
       let outstock = await form.pack();
-      if(null == outstock) return;
+      if (null == outstock) return;
       this.pending = true;
       try {
-        let result = await this.$http.get('/partV2/approve/inOutStore', outstock);
-        if(result.status == 0){
-          this.$platform.toast('出库办理成功');
+        let result = await this.$http.get(
+          "/partV2/approve/inOutStore",
+          outstock
+        );
+        if (result.status == 0) {
+          this.$platform.toast("出库办理成功");
           this.outstockDialog = false;
-          this.loadData()
-        }else{
+          this.loadData();
+        } else {
           this.$platform.alert(result.message);
         }
-
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
       this.pending = false;
     },
-    async backstockSave(){
+    async backstockSave() {
       let form = this.$refs.backstockForm;
-      if(null == form) return;
+      if (null == form) return;
       let backstock = await form.pack();
-      if(null == backstock) return;
+      if (null == backstock) return;
       this.pending = true;
       try {
-        let result = await this.$http.get('/partV2/approve/cancelApply', backstock);
-        if(result.status == 0){
-          this.$platform.toast('取消成功');
+        let result = await this.$http.get(
+          "/partV2/approve/cancelApply",
+          backstock
+        );
+        if (result.status == 0) {
+          this.$platform.toast("取消成功");
           this.backstockDialog = false;
-          this.loadData()
-        }else{
+          this.loadData();
+        } else {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
       this.pending = false;
     },
     // 入库
-    async instockSave(){
+    async instockSave() {
       let form = this.$refs.instockForm;
-      if(null == form) return;
+      if (null == form) return;
       let instock = await form.pack();
-      if(null == instock) return;
+      if (null == instock) return;
       this.pending = true;
       try {
-        let result = await this.$http.get('/partV2/approve/inOutStore', instock);
-        if(result.status == 0){
-          this.$platform.toast('入库办理成功');
+        let result = await this.$http.get(
+          "/partV2/approve/inOutStore",
+          instock
+        );
+        if (result.status == 0) {
+          this.$platform.toast("入库办理成功");
           this.instockDialog = false;
-          this.loadData()
-        }else{
+          this.loadData();
+        } else {
           this.$platform.alert(result.message);
         }
-
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
       this.pending = false;
     },
-    async outstockBatchSave(){
+    async outstockBatchSave() {
       let form = this.$refs.outstockBatchForm;
-      if(null == form) return;
+      if (null == form) return;
       let outstock = await form.pack();
-      if(null == outstock) return;
+      if (null == outstock) return;
       this.pending = true;
       try {
-        let result = await this.$http.post('/partV2/approve/applyOutBach', outstock);
-        if(result.status == 0){
-          this.$platform.toast('批量出库办理成功');
+        let result = await this.$http.post(
+          "/partV2/approve/applyOutBach",
+          outstock
+        );
+        if (result.status == 0) {
+          this.$platform.toast("批量出库办理成功");
           this.outstockBatchDialog = false;
           this.loadData();
-        }else{
+        } else {
           this.$platform.alert(result.message);
         }
-
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
       this.pending = false;
     },
-    async instockBatchSave(){
+    async instockBatchSave() {
       let form = this.$refs.instockBatchForm;
-      if(null == form) return;
+      if (null == form) return;
       let instock = await form.pack();
-      if(null == instock) return;
+      if (null == instock) return;
       this.pending = true;
       try {
-        let result = await this.$http.post('/partV2/approve/applyInBach', instock);
-        if(result.status == 0){
-          this.$platform.toast('批量入库办理成功');
+        let result = await this.$http.post(
+          "/partV2/approve/applyInBach",
+          instock
+        );
+        if (result.status == 0) {
+          this.$platform.toast("批量入库办理成功");
           this.instockBatchDialog = false;
-          this.loadData()
-        }else{
+          this.loadData();
+        } else {
           this.$platform.alert(result.message);
         }
-
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
       this.pending = false;
     },
     // 出库（批量）
     outstockBatch(value) {
-      if(!this.allowInout){
-        this.$platform.alert('对不起，您没有该操作权限');
-        return
+      if (!this.allowInout) {
+        this.$platform.alert("对不起，您没有该操作权限");
+        return;
       }
-      if(value.length < 1){
-        this.$platform.alert('请先勾选要批量操作的备件');
-        return
+      if (value.length < 1) {
+        this.$platform.alert("请先勾选要批量操作的备件");
+        return;
       }
       if (value.length > 5) {
-        this.$platform.alert('批量操作数量最多只支持5个');
+        this.$platform.alert("批量操作数量最多只支持5个");
         return;
       }
 
-      if(!this.isPersonalRepertory) {
-        return this.personalRepertoryNotMeaage()
+      if (!this.isPersonalRepertory) {
+        return this.personalRepertoryNotMeaage();
       }
 
-      for (let i = 0; i < value.length;i++) {
-        if(value[i].type == '退回' || value[i].type == '分配' || value[i].state != 'suspending') {
-          this.$platform.alert('请先结合高级搜索中筛选条件确保已勾选备件类别为【申领】且状态为【待办理】，再进行批量操作');
-          return
+      for (let i = 0; i < value.length; i++) {
+        if (
+          value[i].type == "退回" ||
+          value[i].type == "分配" ||
+          value[i].state != "suspending"
+        ) {
+          this.$platform.alert(
+            "请先结合高级搜索中筛选条件确保已勾选备件类别为【申领】且状态为【待办理】，再进行批量操作"
+          );
+          return;
         }
       }
       this.outstockBatchDialog = true;
@@ -1933,77 +1987,79 @@ export default {
     },
     // 入库（批量）
     instockBatch(value) {
-      if(!this.allowInout){
-        this.$platform.alert('对不起，您没有该操作权限');
-        return
-      }
-      if(value.length < 1){
-        this.$platform.alert('请先勾选要批量操作的备件');
-        return
-      }
-      if (value.length > 5) {
-        this.$platform.alert('批量操作数量最多只支持5个');
+      if (!this.allowInout) {
+        this.$platform.alert("对不起，您没有该操作权限");
         return;
       }
-      if(!this.isPersonalRepertory) {
-        return this.personalRepertoryNotMeaage()
+      if (value.length < 1) {
+        this.$platform.alert("请先勾选要批量操作的备件");
+        return;
       }
-      for (let i = 0; i < value.length;i++) {
-        if(value[i].type == '申领' || value[i].type == '分配' || value[i].state != 'suspending') {
-          this.$platform.alert('请先结合高级搜索中筛选条件确保已勾选备件类别为【退回】且状态为【待办理】，再进行批量操作'); 
-          return
+      if (value.length > 5) {
+        this.$platform.alert("批量操作数量最多只支持5个");
+        return;
+      }
+      if (!this.isPersonalRepertory) {
+        return this.personalRepertoryNotMeaage();
+      }
+      for (let i = 0; i < value.length; i++) {
+        if (
+          value[i].type == "申领" ||
+          value[i].type == "分配" ||
+          value[i].state != "suspending"
+        ) {
+          this.$platform.alert(
+            "请先结合高级搜索中筛选条件确保已勾选备件类别为【退回】且状态为【待办理】，再进行批量操作"
+          );
+          return;
         }
       }
       this.instockBatchDialog = true;
       this.formdata = value;
     },
     partDealDataCancel(approveNo) {
-      console.log(this.rejectForm.reason, '拒绝');
+      console.log(this.rejectForm.reason, "拒绝");
       // return;
-      this.$refs['rejectForm'].validate((valid, obj) => {
+      this.$refs["rejectForm"].validate((valid, obj) => {
         if (valid) {
           // 拒绝
-          this.$http
-            .get('/outside/dd/part/approveList/rejectBatch', {
-              approveNo,
-              remark: this.rejectForm.reason
-            })
-            .then(res => {
-              if (res.status == 0) {
-                this.partDealDialog = false;
-                this.backstockDialog = false;
-                this.$message({
-                  showClose: true,
-                  message: res.message,
-                  type: 'success'
-                });
-                this.loadData();
-              }
-            });
+          rejectBatch({
+            approveNo,
+            remark: this.rejectForm.reason
+          }).then(res => {
+            if (res.status == 0) {
+              this.partDealDialog = false;
+              this.backstockDialog = false;
+              this.$message({
+                showClose: true,
+                message: res.message,
+                type: "success"
+              });
+              this.loadData();
+            }
+          });
         }
       });
     },
     partDealDataReset(approveNo) {
-      console.log(this.rejectForm.reasons, '撤销');
+      console.log(this.rejectForm.reasons, "撤销");
       // return;
       // 撤销
-      this.$http
-        .get('/outside/dd/part/approveList/revokeBatch', {
-          approveNo,
-          remark: this.rejectForm.reasons
-        })
-        .then(res => {
-          if (res.status == 0) {
-            this.partDealDialog = false;
-            this.backstockDialog = false;
-            this.$message({
-              showClose: true,
-              message: res.message,
-              type: 'success'
-            });
-            this.loadData();
-          }
-        });
+      revokeBatch({
+        approveNo,
+        remark: this.rejectForm.reasons
+      }).then(res => {
+        if (res.status == 0) {
+          this.partDealDialog = false;
+          this.backstockDialog = false;
+          this.$message({
+            showClose: true,
+            message: res.message,
+            type: "success"
+          });
+          this.loadData();
+        }
+      });
     },
 
     partDealDataDone() {
@@ -2021,8 +2077,7 @@ export default {
               type: res.propData.data.type
             });
           });
-          this.$http
-            .post('/outside/dd/part/approveList/approveBatch', arr)
+          approveBatch(arr)
             .then(res => {
               if (res.code == 0) {
                 this.$refs.partDealWithForm.resetData();
@@ -2030,7 +2085,7 @@ export default {
                 this.$message({
                   showClose: true,
                   message: res.message,
-                  type: 'success'
+                  type: "success"
                 });
                 this.loadData();
               }
@@ -2042,7 +2097,7 @@ export default {
           this.$message({
             showClose: true,
             message: err.message,
-            type: 'error'
+            type: "error"
           });
         });
     },
@@ -2058,17 +2113,17 @@ export default {
 
       let columns = [
         {
-          label: '申请日期',
-          field: 'prosperTime',
-          exportAlias: 'proposeTime',
+          label: "申请日期",
+          field: "prosperTime",
+          exportAlias: "proposeTime",
           show: true,
-          sortable: 'custom',
+          sortable: "custom",
           width: 160
         },
         {
-          label: '办理编号',
-          exportAlias: 'approveNo',
-          field: 'approveNo',
+          label: "办理编号",
+          exportAlias: "approveNo",
+          field: "approveNo",
           overflow: true,
           show: true,
           width: 160,
@@ -2077,194 +2132,201 @@ export default {
           }
         },
         {
-          label: '状态',
-          exportAlias: 'state',
-          field: 'state',
-          sortable: 'state',
+          label: "状态",
+          exportAlias: "state",
+          field: "state",
+          sortable: "state",
           width: 80,
           overflow: true,
           show: true
         },
         {
-          label: '申请类别',
-          exportAlias: 'type',
-          field: 'type',
+          label: "申请类别",
+          exportAlias: "type",
+          field: "type",
           width: 90,
           overflow: true,
           show: true
         },
         {
-          label: '申请备件名称',
-          field: 'sparepartName',
-          exportAlias: 'sparepartName',
+          label: "申请备件名称",
+          field: "sparepartName",
+          exportAlias: "sparepartName",
           show: true,
           minWidth: 170,
           overflow: true
         },
         {
-          label: '申请数量',
-          exportAlias: 'variation',
-          field: 'num',
+          label: "申请数量",
+          exportAlias: "variation",
+          field: "num",
           width: 80,
           overflow: true,
           show: false
         },
 
         {
-          label: '涉及金额',
-          exportAlias: 'price',
-          field: 'price',
+          label: "涉及金额",
+          exportAlias: "price",
+          field: "price",
           width: 90,
           overflow: true,
           show: true
         },
         {
-          label: '目标仓库',
-          field: 'targetName',
-          exportAlias: 'targetName',
+          label: "目标仓库",
+          field: "targetName",
+          exportAlias: "targetName",
           show: true,
           minWidth: 120,
           overflow: true
         },
         {
-          label: '原始仓库',
-          field: 'sourceTargetName',
-          exportAlias: 'sourceName',
+          label: "原始仓库",
+          field: "sourceTargetName",
+          exportAlias: "sourceName",
           show: true,
           minWidth: 120,
           overflow: true
         },
         {
-          label: '发起人',
-          field: 'prosperName',
-          exportAlias: 'prosperName',
+          label: "发起人",
+          field: "prosperName",
+          exportAlias: "prosperName",
           width: 80,
           overflow: true,
           show: true
         },
 
         {
-          label: '待办数/已办数',
-          field: 'applyCount',
-          exportAlias: 'pendingVariation,solvedVariation',
+          label: "待办数/已办数",
+          field: "applyCount",
+          exportAlias: "pendingVariation,solvedVariation",
           show: true,
           width: 120
         },
         {
-          field: 'approveName',
-          label: '办理人',
-          exportAlias: 'executorName',
+          field: "approveName",
+          label: "办理人",
+          exportAlias: "executorName",
           show: true,
           width: 80,
           overflow: true
         },
         {
-          field: 'approveTime',
-          label: '办理时间',
-          exportAlias: 'updateTime',
+          field: "approveTime",
+          label: "办理时间",
+          exportAlias: "updateTime",
           show: false,
           width: 160,
           overflow: false,
-          sortable: 'approveTime'
+          sortable: "approveTime"
         },
         {
-          label: '操作',
-          field: 'enable',
-          width: '150px',
+          label: "操作",
+          field: "enable",
+          width: "150px",
           show: true,
-          fixed: 'right',
+          fixed: "right",
           export: false
         }
       ];
 
       columns.forEach(column => {
         let isShow = localData[column.field];
-        if (typeof isShow == 'boolean') column.show = isShow;
+        if (typeof isShow == "boolean") column.show = isShow;
       });
 
       return columns;
     },
     personalRepertoryNotMeaage() {
-      return this.$platform.alert('个人备件库功能已经关闭，需系统管理员开启个人备件库功能(系统管理-备件库管理)后继续操作。');
+      return this.$platform.alert(
+        "个人备件库功能已经关闭，需系统管理员开启个人备件库功能(系统管理-备件库管理)后继续操作。"
+      );
     },
     // TalkingData事件埋点
     trackEventhandler(type) {
       switch (type) {
-      case 'search':
-        this.$tdOnEvent('pc：出入库办理-搜索事件');
-        break;
-      case 'reset':
-        this.$tdOnEvent('pc：出入库办理-重置事件');
-        break;
-      case 'advSearch':
-        this.$tdOnEvent('pc：出入库办理-高级搜索事件');
-        break;
-      case 'chooseRepertory':
-        this.$tdOnEvent('pc：出入库办理-原始仓库筛选下拉框事件');
-        break;
-      case 'chooseSourceType':
-        this.$tdOnEvent('pc：出入库办理-目标仓库筛选下拉框事件');
-        break;
-      case 'batch-stock-out':
-        this.$tdOnEvent('pc：出入库办理-批量出库事件');
-        break;
-      case 'batch-stock-in':
-        this.$tdOnEvent('pc：出入库办理-批量入库事件');
-        break;
-      case 'selectColumn':
-        this.$tdOnEvent('pc：出入库办理-选择列事件');
-        break;
-      default:
-        break;
+        case "search":
+          this.$tdOnEvent("pc：出入库办理-搜索事件");
+          break;
+        case "reset":
+          this.$tdOnEvent("pc：出入库办理-重置事件");
+          break;
+        case "advSearch":
+          this.$tdOnEvent("pc：出入库办理-高级搜索事件");
+          break;
+        case "chooseRepertory":
+          this.$tdOnEvent("pc：出入库办理-原始仓库筛选下拉框事件");
+          break;
+        case "chooseSourceType":
+          this.$tdOnEvent("pc：出入库办理-目标仓库筛选下拉框事件");
+          break;
+        case "batch-stock-out":
+          this.$tdOnEvent("pc：出入库办理-批量出库事件");
+          break;
+        case "batch-stock-in":
+          this.$tdOnEvent("pc：出入库办理-批量入库事件");
+          break;
+        case "selectColumn":
+          this.$tdOnEvent("pc：出入库办理-选择列事件");
+          break;
+        default:
+          break;
       }
     },
     // state (selector) TalingData事件埋点
     stateTrackEventHandler(type) {
       switch (type) {
-      case '':
-        this.$tdOnEvent('pc：出入库办理-全部事件');
-        break;
-      case 'suspending':
-        this.$tdOnEvent('pc：出入库办理-待办理事件');
-        break;
-      case 'solved':
-        this.$tdOnEvent('pc：出入库办理-已办理事件');
-        break;
-      case 'rejected':
-        this.$tdOnEvent('pc：出入库办理-已拒绝事件');
-        break;
-      case 'cancel':
-        this.$tdOnEvent('pc：出入库办理-已取消事件');
-        break;
-      case 'revoked':
-        this.$tdOnEvent('pc：出入库办理-已撤回事件');
-        break;
-      default:
-        break;
+        case "":
+          this.$tdOnEvent("pc：出入库办理-全部事件");
+          break;
+        case "suspending":
+          this.$tdOnEvent("pc：出入库办理-待办理事件");
+          break;
+        case "solved":
+          this.$tdOnEvent("pc：出入库办理-已办理事件");
+          break;
+        case "rejected":
+          this.$tdOnEvent("pc：出入库办理-已拒绝事件");
+          break;
+        case "cancel":
+          this.$tdOnEvent("pc：出入库办理-已取消事件");
+          break;
+        case "revoked":
+          this.$tdOnEvent("pc：出入库办理-已撤回事件");
+          break;
+        default:
+          break;
       }
     },
     // table TalkingData事件埋点
     tableTrackEventHandler(type) {
       switch (type) {
-      case 'done':
-        this.$tdOnEvent('pc：出入库办理-列表办理事件');
-        break;
-      case 'reject':
-        this.$tdOnEvent('pc：出入库办理-列表拒绝事件');
-        break;
-      case 'recall':
-        this.$tdOnEvent('pc：出入库办理-列表撤回事件');
-        break;
-      default:
-        break;
+        case "done":
+          this.$tdOnEvent("pc：出入库办理-列表办理事件");
+          break;
+        case "reject":
+          this.$tdOnEvent("pc：出入库办理-列表拒绝事件");
+          break;
+        case "recall":
+          this.$tdOnEvent("pc：出入库办理-列表撤回事件");
+          break;
+        default:
+          break;
       }
     },
-    variationNum (num1, num2) {
-      return this.$math.format(this.$math.subtract(this.$math.bignumber(num1), this.$math.bignumber(num2)))
+    variationNum(num1, num2) {
+      return this.$math.format(
+        this.$math.subtract(
+          this.$math.bignumber(num1),
+          this.$math.bignumber(num2)
+        )
+      );
     },
     headerClick(option) {
       if (option.order == null) {
-        this.model[option.property] = option.order ? option.order : '';
+        this.model[option.property] = option.order ? option.order : "";
         this.loadData();
       }
     },
@@ -2272,18 +2334,39 @@ export default {
       console.log(option);
     },
     dingMessage() {
-      console.log('ding');
-      return;
-      window.ding_part_message();
+      window.send_ding_part_message(this.partDealData.data.staffs, this.partDealData.data.approveNo);
     },
     showPartDealDetail(obj) {
-      this.$http
-        .get('/outside/dd/part/approveList/getRelationListByApproveNo', {
-          approveNo: obj.approveNo
-        })
-        .then(res => {
-          let result = res.result;
-          let {
+      getRelationListByApproveNo({
+        approveNo: obj.approveNo
+      }).then(res => {
+        let result = res.result;
+        let {
+          prosperTime,
+          approveNo,
+          type,
+          prosperName,
+          targetName,
+          sourceTargetName,
+          state,
+          cancel,
+          isreject,
+          suggestion,
+          approved
+        } = obj;
+        if (result.relations.length > 0) {
+          result.relations = result.relations.map(item => {
+            item.variation = Math.abs(item.variation);
+            item.solvedVariation = Math.abs(item.solvedVariation);
+            item["number"] =
+              Math.abs(item.variation) - (Math.abs(item.solvedVariation) || 0);
+            return item;
+          });
+        }
+
+        this.partDealData = {
+          arr: result.relations || [],
+          data: {
             prosperTime,
             approveNo,
             type,
@@ -2293,55 +2376,31 @@ export default {
             state,
             cancel,
             isreject,
+            approved,
             suggestion,
-            approved
-          } = obj;
-          if (result.relations.length > 0) {
-            result.relations = result.relations.map(item => {
-              item.variation = Math.abs(item.variation);
-              item.solvedVariation = Math.abs(item.solvedVariation);
-              item['number'] = Math.abs(item.variation)
-                - (Math.abs(item.solvedVariation) || 0);
-              return item;
-            });
-          }
-
-          this.partDealData = {
-            arr: result.relations || [],
-            data: {
-              prosperTime,
-              approveNo,
-              type,
-              prosperName,
-              targetName,
-              sourceTargetName,
-              state,
-              cancel,
-              isreject,
-              approved,
-              suggestion,
-              remark:
-                result.relations.length > 0
+            remark:
+              result.relations.length > 0
+                ? result.relations[0].remark
                   ? result.relations[0].remark
-                    ? result.relations[0].remark
-                    : ''
-                  : ''
-            }
-          };
-          this.partDealDialog = true;
-        });
+                  : ""
+                : "",
+            staffs: res.staffs
+          }
+        };
+        this.partDealDialog = true;
+      });
     }
   },
-  mounted(){
+  mounted() {
     let initData = this.initData;
-    
+
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || {};
-    this.userId = initData.userId || '';
-    this.userName = initData.userName || ''
+    this.userId = initData.userId || "";
+    this.userName = initData.userName || "";
     this.isPersonalRepertory = initData.isPersonalRepertory || false;
 
-    this.initialize()
+    this.initialize();
   },
   components: {
     PartCancelTransferForm,
@@ -2355,33 +2414,33 @@ export default {
     [PartTransferForm.name]: PartTransferForm,
     [PartDealWithForm.name]: PartDealWithForm
   }
-}
+};
 </script>
 
 <style lang="scss">
- $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
-.no-padding{
-  padding:0;
+$color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+.no-padding {
+  padding: 0;
 }
-.srp-user-item{
+.srp-user-item {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
   padding: 2px 0;
   justify-content: space-between;
 
-  &:last-child{
+  &:last-child {
     margin: 0;
   }
 
-  img{
+  img {
     display: block;
     width: 28px;
     height: 28px;
     border-radius: 2px;
   }
 
-  p{
+  p {
     flex: 1;
     margin: 0;
     margin-left: 10px;
@@ -2389,7 +2448,7 @@ export default {
     font-size: 14px;
     overflow: hidden;
     line-height: 28px;
-    width:0;
+    width: 0;
   }
 }
 
@@ -2413,10 +2472,10 @@ export default {
   }
 }
 
-.part-option{
+.part-option {
   margin: 5px 0;
 
-  p{
+  p {
     overflow: hidden;
     margin: 0;
     line-height: 24px;
@@ -2468,7 +2527,7 @@ export default {
     }
 
     .part-selected-head {
-      background-color: #F0F5F5;
+      background-color: #f0f5f5;
       color: #333;
       font-size: 14px;
     }
@@ -2496,7 +2555,7 @@ export default {
       border: none;
       background-color: transparent;
       outline: none;
-      color: #646B78;
+      color: #646b78;
       visibility: hidden;
 
       i {
@@ -2509,7 +2568,6 @@ export default {
     }
   }
 }
-
 
 .part-panel-btn {
   float: right;
@@ -2545,5 +2603,4 @@ a {
 .mar-r-15 {
   margin-right: 15px;
 }
-
 </style>

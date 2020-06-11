@@ -1,6 +1,6 @@
 //https://github.com/mzabriskie/axios
 import axios from 'axios';
-import qs from './QueryString';
+import qs from './QueryString2';
 
 function http(method = 'get', url = '', config = {}){
   config.url = url;
@@ -12,6 +12,7 @@ function http(method = 'get', url = '', config = {}){
 function get(url = '', data = {}, config = {}){
   if(null != data){
     let params = qs.stringify(data);  
+    console.log(params)
     let hyphen = url.indexOf('?') != -1 ? "&" : "?";
     url = url + hyphen + params
   }

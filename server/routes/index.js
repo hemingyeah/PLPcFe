@@ -156,6 +156,15 @@ router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   // }
 }))
 
+
+router.use('/api/part/outside', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.162',
+  port: 10008,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=bc8e2f95-d341-4d92-8ee1-99ad003c2316'
+  }
+}))
+
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
 router.use('', openRouter.routes(), openRouter.allowedMethods());

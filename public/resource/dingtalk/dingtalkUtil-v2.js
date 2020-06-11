@@ -12,8 +12,8 @@
         message: message,
         title: title || '提示',//可传空
         buttonName: buttonName || '确定',
-        onSuccess: function(){},
-        onFail: function(err){}
+        onSuccess: function () { },
+        onFail: function (err) { }
       });
     } else {
       alert(message);
@@ -28,32 +28,32 @@
         title: title || '提示',//可传空
         buttonLabels: buttonNames || ['是', '否'],
         onSuccess: function (result) {
-          if(typeof callback == 'function') callback(result.buttonIndex)
+          if (typeof callback == 'function') callback(result.buttonIndex)
         },
         onFail: function (err) { }
       });
     } else {
       if (confirm(message)) {
-        if(typeof callback == 'function') callback(0)
+        if (typeof callback == 'function') callback(0)
       } else {
-        if(typeof callback == 'function') callback(1)
+        if (typeof callback == 'function') callback(1)
       }
     }
   };
-  
+
   //====================================openLink 实现========================================
   window.dd_openLink = function (url) {
     if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
       console.log('window.DingTalkPC.device', window.DingTalkPC.device);
       console.log('window.DingTalkPC.device', window.DingTalkPC.util);
-  
+
       return window.DingTalkPC.biz.util.openLink({
         "url": url,
-        onSuccess: function (result) {},
-        onFail: function (error) {}
+        onSuccess: function (result) { },
+        onFail: function (error) { }
       });
-  
-  
+
+
     } else {
       return window.open(url)
     }
@@ -92,7 +92,7 @@
       contentType = "application/json";
       params = JSON.stringify(params);
     }
-    
+
     var random = '_t=' + (Math.random() * 100000 >> 0)
     url = url + (url.indexOf("?") >= 0 ? '&' : '?') + random;
 
@@ -139,7 +139,7 @@
   window.common_http_encodeParams = encodeParams;
 
   window.send_ding_message = function (users, text) {
-    if(!window.DingTalkPC) return;
+    if (!window.DingTalkPC) return;
     window.DingTalkPC.biz.ding.post({
       users: users,//用户列表，userid
       corpId: window._global_data_corpId, //加密的企业id
@@ -150,13 +150,13 @@
         images: [''], //只取第一个image
       }, //附件信息
       text: text, //消息体
-      onSuccess: function() { },
-      onFail: function() { }
+      onSuccess: function () { },
+      onFail: function () { }
     })
   }
-  
+
   window.send_link_ding_message = function (users, text, id) {
-    if(!window.DingTalkPC) return;
+    if (!window.DingTalkPC) return;
 
     var url = window.location.origin + '/v_open/jump';
     var query = '?dd_nav_bgcolor=ff00ac9&type=1&id=' + id + '&corpId=' + window._global_data_corpId;
@@ -175,17 +175,45 @@
         text: text //附件显示时的消息体 【可选】
       },
       text: bodyText, //消息体
-      onSuccess: function() { },
-      onFail: function() { }
+      onSuccess: function () { },
+      onFail: function () { }
     })
   }
+
+  window.send_ding_part_message = function (users, approveNo) {
+    if (!window.DingTalkPC) return;
+
+    var url = window.location.origin + '/v_open/jump';
+    var query = '?dd_nav_bgcolor=ff00ac9&type=4&corpId=' + window._global_data_corpId;
+    var route = '&route=/spareParts/myJob/detail?approveNo=' + approveNo
+    url = url + query + route;
+    var bodyText = `您有一个备件办理(${this.approveNo})需要关注`;
+    window.DingTalkPC.biz.ding.post({
+      users: users, //用户列表，userid
+      corpId: window._global_data_corpId, //企业id
+      type: 2, //钉类型 1：image  2：link
+      alertType: 2,
+      alertDate: { "format": "yyyy-MM-dd HH:mm", "value": "" },
+      attachment: {
+        title: '办理信息（仅支持移动端查看）', //附件的标题
+        url: url, //附件点击后跳转url
+        image: window.location.origin + '/resource/images/att.png', //附件显示时的图片 【可选】
+        text: '办理信息（仅支持移动端查看）' //附件显示时的消息体 【可选】
+      },
+      text: bodyText, //消息体
+      onSuccess: function () { },
+      onFail: function () { }
+    })
+  }
+
+
 
   window.openHelp = function (url) {
     if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {
       window.DingTalkPC.biz.util.openLink({
         "url": url,
-        onSuccess: function (result) {},
-        onFail: function (error) {}
+        onSuccess: function (result) { },
+        onFail: function (error) { }
       });
     } else {
       window.open(url);
@@ -211,11 +239,11 @@
 
   // 提示
   window.toast = function (message, type) {
-      let types = ['warning', 'error', 'success', 'info'];
+    let types = ['warning', 'error', 'success', 'info'];
 
-      if(types.indexOf(type) <= -1) type = 'info';
+    if (types.indexOf(type) <= -1) type = 'info';
 
-      window.toastr[type](message);
+    window.toastr[type](message);
   }
 
 })();
