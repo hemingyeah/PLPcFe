@@ -43,7 +43,8 @@ import {
   Row,
   OptionGroup,
   Message,
-  MessageBox
+  MessageBox,
+  Autocomplete
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
@@ -91,6 +92,7 @@ const ElementUI = {
     Vue.use(Row);
     Vue.use(OptionGroup);
     Vue.use(Message.name, Message);
+    Vue.use(Autocomplete.name, Autocomplete);
     
     Vue.component(CollapseTransition.name, CollapseTransition);
     Vue.prototype.$loading = Loading.service;
