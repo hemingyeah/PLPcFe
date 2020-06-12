@@ -66,6 +66,35 @@ export function fmt_address(value){
   return province + city + dist + address;
 }
 
+// 工单状态
+export function fmt_state(value) {
+  let state = ''
+  switch (value) {
+  case 'created':
+    state = '待分配';
+    break;
+  case 'allocated':
+    state = '待处理';
+    break;
+  case 'processing':
+    state = '处理中';
+    break;
+  case 'convert2Task':
+    state = '转工单';
+    break;
+  case 'finished':
+    state = '已完成';
+    break;
+  case 'offed':
+    state = '已取消';
+    break;
+
+  default:
+    break;
+  }
+  return state
+}
+
 const fmt = {
   fmt_date,
   fmt_datetime,
@@ -73,7 +102,8 @@ const fmt = {
   fmt_number_fixed2,
   fmt_number_int,
   fmt_address,
-  fmt_datehour
+  fmt_datehour,
+  fmt_state
 }
 
 export default fmt;

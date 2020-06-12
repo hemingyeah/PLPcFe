@@ -25,6 +25,7 @@ const dataScreenRouter = require('./dataScreen');
 const repositoryRouter = require('./repository')
 const BillRouter = require('./bill')
 const jobtransferRouter = require('./jobtransfer')
+const callCenterRouter = require('./callcenter')
 const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact')
 
@@ -85,6 +86,15 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
+// outside/callcenter
+router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.211',
+  port: 8080,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=591bda79-09b7-4577-b009-3b0b6fc88b52'
+  }
+}))
+
 // /api/app/outside/es
 // router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
 //   // host: '192.168.31.237',
@@ -119,10 +129,6 @@ router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
   },
 }))
 
-
-
-
-
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.177', // 仇太俊
   // host: '192.168.31.70',
@@ -156,6 +162,7 @@ router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
 router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
+router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 

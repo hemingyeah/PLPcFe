@@ -1,4 +1,4 @@
-const https = require('https');
+const https = require('http');
 const chalk = require('chalk');
 const chalkError = chalk.red;
 // model
