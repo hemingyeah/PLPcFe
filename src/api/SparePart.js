@@ -1,5 +1,5 @@
 import http from '@src/util/HttpUtil';
-let urlHead = '';
+let urlHead = '/api/part';
 
 
 // partV2/repertory/repertoryApply.vue
