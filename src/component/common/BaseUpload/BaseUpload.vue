@@ -142,6 +142,11 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+
+  .btn-primary {
+    background-color: $color-primary !important;
+  }
+
 }
 
 .base-upload-placeholder{

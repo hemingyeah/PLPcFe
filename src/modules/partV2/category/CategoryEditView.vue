@@ -43,7 +43,7 @@
           <el-form-item label="说明：" prop="description">
             <el-input style="width: 66.6666667%" type="textarea" placeholder="备件说明" :autosize="{minRows:2, maxRows: 4}" v-model="part.description"></el-input>
           </el-form-item>
-          <el-form-item label="图片：">
+          <el-form-item label="图片：" class="category-edit-form-item-upload">
             <base-upload style="width: 66.6666667%" :value="attachments" @input="uploadImg" :limit="1" accept="image/*">
               <template slot="preview">
                 <div class="part-image-preview" v-show="partImg">
@@ -320,5 +320,9 @@ export default {
       display: block;
     }
   }
+}
+
+.category-edit-form-item-upload {
+  margin-top: 10px;
 }
 </style>
