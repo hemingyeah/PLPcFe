@@ -42,7 +42,7 @@ $btn-color-primary-light-1: mix(#fff, $color-primary, 10%) !default;
   background-color: $color-primary;
 
   &:hover{
-    //background: #33bdac;
+    color: #fff;
     background-color: lighten($color-primary, 3%) !important;
   }
 

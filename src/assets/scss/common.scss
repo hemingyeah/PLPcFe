@@ -63,14 +63,13 @@
 // --------  pc -------------
 .page{
   background-color: #F2F2F2;
-  min-width: 960px;
+  min-width: 1100px;
   padding: 10px;
   overflow: auto;
 }
 
 .page-panel{
   background-color: #fff;
-  
   border-radius: 2px;
   margin-bottom: 10px;
 }
@@ -195,9 +194,9 @@
   border-color: transparent;
 
   &:hover{
-    color: #409eff;
-    background-color: #ecf5ff;
-    border-color: #ecf5ff;
+    background-color: transparent;
+    border-color: transparent;
+    color: $color-primary;
   }
 }
 

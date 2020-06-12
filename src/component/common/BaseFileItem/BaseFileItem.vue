@@ -141,13 +141,9 @@ export default {
       });
     },
     async deleteFile(){
-      try {
-        const name = this.file.filename;
-        if(await platform.confirm(`确定要删除该附件？\n${name}`)){
-          this.$emit('delete', this.file);
-        }
-      } catch (error) {
-        console.error('error', error);
+      const name = this.file.filename || '';
+      if(await platform.confirm(`确定要删除该附件？\n${name}`)){
+        this.$emit('delete', this.file);
       }
     }
   }

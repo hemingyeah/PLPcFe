@@ -4,9 +4,7 @@
     <div class="flex-x only-see-box">
       <div class="form-only-see flex-x" v-for="(item,index) in formArr" :key="index">
         <div class="form-only-see-title">{{item.lable}}</div>
-        <div class="form-only-see-input">
-          <el-input v-model="item.value" :readonly="true"></el-input>
-        </div>
+        <div class="form-only-see-input">{{item.value}}</div>
       </div>
     </div>
     <!-- 仅看数据展示 end -->
@@ -15,23 +13,14 @@
 
     <div class="flex-x mar-b-20 al-start">
       <div class="form-only-see-title mar-r-15">备注</div>
-      <div>
-        <el-input
-          type="textarea"
-          resize="none"
-          style="width:500px;"
-          :autosize="{ minRows: 2, maxRows: 6 }"
-          v-model="remark"
-          :readonly="true"
-        ></el-input>
-      </div>
+      <div>{{propData.data.remark}}</div>
     </div>
     <!-- 备注 end -->
 
     <!-- 备件清单 start-->
     <div class="mar-b-20">
       <div class="mar-b-15 font-w-500">备件清单</div>
-      <el-table :data="propData.arr" stripe style="width: 100%" max-height="350">
+      <el-table border :data="propData.arr" stripe style="width: 100%" max-height="350">
         <el-table-column
           v-for="(item,index) in tableColumn"
           :key="index"
@@ -47,8 +36,10 @@
                 <el-form-item prop="number">
                   <el-input
                     v-model="scope.row.number"
-                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation"
+                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type ==='调拨') || scope.row.variation < scope.row.solvedVariation || !propData.data.approved"
                     type="number"
+                    min="0"
+                    :max="scope.row.type === '退回' ? (scope.row.variation || undefined) : undefined"
                   ></el-input>
                 </el-form-item>
               </el-form>
@@ -64,16 +55,15 @@
     </div>
     <!-- 备件清单 end-->
     <div>
-      <div v-if="inputonlyread===false">
+      <div v-if="inputonlyread===false && propData.data.approved">
         <div class="mar-b-15 font-w-500">办理意见</div>
 
         <el-input
           type="textarea"
-          maxlength="100"
+          maxlength="500"
           resize="none"
-          style="width:500px;"
           :autosize="{ minRows: 2, maxRows: 6 }"
-          :placeholder="inputonlyread?'':'请输入办理意见'"
+          :placeholder="inputonlyread?'':'请输入办理意见[500个字以内]'"
           v-model="suggestion"
           :readonly="inputonlyread"
         ></el-input>
@@ -107,15 +97,23 @@ export default {
     let validateNumber = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入数量"));
+      } else if (value < 0) {
+        callback(new Error("请输入大于或等于0的数"));
       } else if (
         !/^(([0-9][0-9]*)|(([0]\.\d{1,2}|[0-9][0-9]*\.\d{1,2})))$/.test(value)
       ) {
-        callback(new Error("请输入大于或等于0的数，且最多保留两位小数"));
+        callback(new Error("最多保留两位小数"));
       } else {
         callback();
       }
     };
     let tableColumn = [
+      {
+        field: "variation",
+        prop: "variation",
+        lable: "申请数量",
+        width: "180"
+      },
       {
         field: "child_2",
         prop: "name",
@@ -147,15 +145,9 @@ export default {
         width: "180"
       },
       {
-        field: "variation",
-        prop: "variation",
-        lable: "申请数量",
-        width: "180"
-      },
-      {
         field: "price",
         prop: "data1",
-        lable: "涉及金额",
+        lable: "金额(¥)",
         width: "180"
       },
       {
@@ -179,18 +171,16 @@ export default {
       {
         normalType: "controler",
         lable: "办理数量",
-        width: "100",
-        fixed: "right"
+        width: "150",
+        fixed: "left"
       }
     ];
     let inputonlyread = this.propData.data.state !== "suspending";
-    let remark = this.propData.data.remark;
     return {
       input: "测试数据",
       rules: {
         number: [{ validator: validateNumber, trigger: "change" }]
       },
-      remark,
       suggestion: "",
       tableColumn,
       inputonlyread
@@ -206,6 +196,7 @@ export default {
     validator() {
       return new Promise((resolves, rejects) => {
         let func_arr = [];
+
         for (let index = 0; index < this.propData.arr.length; index++) {
           const func = new Promise((resolve, reject) => {
             this.$refs["ruleForm"][index].validate((valid, obj) => {
@@ -221,11 +212,28 @@ export default {
           });
           func_arr.push(func);
         }
+
+        let type = (this.propData.data && this.propData.data.type) || '';
+        let isApply = type === '申领';
+
         Promise.all(func_arr)
           .then(res => {
             this.propData.arr.forEach(element => {
+              // 只处理申请情况
+              if (element.number * 1 > element.repertoryCount && isApply) {
+                rejects(
+                  new Error(
+                    `"${
+                      element.sparepart.name.length > 10
+                        ? `${element.sparepart.name.slice(0, 9)}...`
+                        : element.sparepart.name
+                    }"的库存数量不足`
+                  )
+                );
+                return false;
+              }
               if (
-                element.number >
+                element.number * 1 >
                 mathAccSub(element.variation, element.solvedVariation)
               ) {
                 rejects(
@@ -240,9 +248,8 @@ export default {
                 return false;
               }
             });
-            let { remark, suggestion, propData } = this;
+            let { suggestion, propData } = this;
             resolves({
-              remark,
               suggestion,
               propData
             });
@@ -259,6 +266,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.normal-box {
+  padding: 10px;
+  box-sizing: border-box;
+}
 .flex-x {
   display: flex;
   align-items: center;
@@ -281,14 +292,14 @@ export default {
 .form-only-see {
   width: 33.3%;
   margin-bottom: 15px;
-  .form-only-see-title {
-    min-width: 56px;
-    text-align: end;
-    margin-right: 15px;
-  }
   .form-only-see-input {
     width: 180px;
   }
+}
+
+.form-only-see-title {
+  min-width: 56px;
+  margin-right: 15px;
 }
 .only-see-box {
   flex-wrap: wrap;

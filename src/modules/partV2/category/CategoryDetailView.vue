@@ -136,7 +136,7 @@
 /*global AMap, moment, _init_data*/
 import $ from 'jQuery';
 import _ from 'lodash';
-import qs from '@src/util/queryString2';
+import qs from '@src/util/querystring2';
 import AuthUtil from '@src/util/auth';
 
 import Page from '@src/model/Page';

@@ -230,19 +230,19 @@ export default {
         list-style: none;
         position: relative;
         &:hover {
-          color: #409EFF;
+          color: $color-primary;
           cursor: pointer;
         }
 
       }
       li.actived {
-        color: #409EFF;
+        color: $color-primary;
         &::after {
           content: '';
           position: absolute;
           width: 100%;
           height: 2px;
-          background: #409EFF;
+          background: $color-primary;
           bottom: 0;
           left: 0;
         }

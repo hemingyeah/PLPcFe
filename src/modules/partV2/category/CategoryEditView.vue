@@ -61,7 +61,7 @@
 
 <script>
 import BaseGallery from 'packages/BaseGallery/index';
-import qs from '@src/util/queryString2';
+import qs from '@src/util/querystring2';
 import AuthUtil from '@src/util/auth';
 import _ from 'lodash';
         

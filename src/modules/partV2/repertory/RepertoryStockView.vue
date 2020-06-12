@@ -4,18 +4,18 @@
     <div class="base-search-group-container">
 
       <form class="base-search" onsubmit="return false;">
-        <div class="customer-list-base-search-group" style="width: 540px;">
+        <div class="customer-list-base-search-group" style="width: auto;">
           <base-button type="primary" @event="openStock($event);trackEventHandler('stockTable')" v-if="viewReport" icon="icon-depot">
             仓库报表
           </base-button>
 
-          <el-input v-model="model.keyWord" placeholder="根据备件信息搜索">
+          <el-input style="margin-left:10px" v-model="model.keyWord" placeholder="根据备件信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="model.pageNum=1;search();trackEventHandler('search')" native-type="submit">
+          <base-button style="margin-left:10px" type="primary" @event="model.pageNum=1;search();trackEventHandler('search')" native-type="submit">
             搜索
           </base-button>
-          <base-button type="ghost" @event="reset();trackEventHandler('reset')">
+          <base-button style="margin-left:10px" type="ghost" @event="reset();trackEventHandler('reset')">
             重置
           </base-button>
         </div>
@@ -394,9 +394,9 @@
           <span class="el-dialog__title">
             批量分配操作
           </span>
-          <button type="button" aria-label="Close" class="el-dialog__headerbtn">
+          <!-- <button type="button" aria-label="Close" class="el-dialog__headerbtn">
             <i class="el-dialog__close el-icon el-icon-close"></i>
-          </button>
+          </button> -->
           <p class="dialog-title-tip">
             分配是指由仓库管理员向个人库出库备件，个人库收到后确认入库的操作方式
           </p>
@@ -525,7 +525,7 @@
 
 <script>
 import _ from 'lodash';
-import qs from '@src/util/queryString2';
+import qs from '@src/util/querystring2';
 import Page from '@src/model/Page';
 import PartOutStockForm from './form/PartOutStockForm.vue';
 import PartInStockForm from './form/PartInStockForm.vue';
@@ -1222,7 +1222,7 @@ export default {
       }
     },
     // 出库（批量）
-    async outstockBatchSave(){
+    outstockBatchSave: _.debounce(async function(){
       let form = this.$refs.outstockBatchForm;
 
       if(null == form) return;
@@ -1230,21 +1230,24 @@ export default {
       let outstock = await form.pack();
 
       if(!Array.isArray(outstock) || outstock.length == 0) return;
-      
+        
       this.pending = true;
+
       try {
         let result = await this.$http.post('/partV2/repertory/stockInOutBach', outstock);
         if(result.status == 0){
           this.$platform.toast('批量出库成功').then(() => location.reload());
           this.outstockBatchDialog = false;
-        }else{
+        } else{
           this.$platform.alert(result.message);
+          this.pending = false;
         }
       } catch (error) {
+        this.pending = false;
         console.log(error)
       }
-      this.pending = false;
-    },
+
+    }, 1000),
     // 入库（单次）
     async instockSave(){
       let form = this.$refs.instockForm;
@@ -1290,7 +1293,8 @@ export default {
         this.$refs.transferBatchForm.receive(data, this.userId);
       });
     },
-    async transferBatchSave() {
+    // 批量调拨 (保存)
+    transferBatchSave: _.debounce(async function(){
       let form = this.$refs.transferBatchForm;
       if(null == form) return;
       let params = await form.pack();
@@ -1298,31 +1302,40 @@ export default {
 
 
       if (params.some(s => s.repertoryId === s.targetId)) {
+
         let message = `第${params.map((sr, index) => {
           if (sr.repertoryId === sr.targetId) {
             return index + 1;
           }
           return null
         }).filter(n => n).join('，')}行数据调入调出仓库为同一仓库已自动过滤，是否继续？`;
+
         if(!await this.$platform.confirm(message)) return;
+
         params = params.filter(row => row.repertoryId !== row.targetId);
       }
 
       this.pending = true;
+
       try {
         let result = await this.$http.post('/partV2/approve/transfer/initiate/batch', params);
+
         if(result.status == 0){
-          this.$platform.toast('批量调拨成功').then(() => location.reload());
+          this.$platform.toast('批量调拨成功').then(() => {
+            location.reload();
+          });
           this.transferBatchDialog = false;
-        }else{
+        } else{
           this.$platform.alert(result.message);
+          this.pending = false;
         }
 
       } catch (error) {
+        this.pending = false;
         console.log(error)
       }
-      this.pending = false;
-    },
+
+    }, 1000),
     // 入库弹窗（批量）
     // 支持从列表选中数据
     instockBatch() {
@@ -1346,27 +1359,32 @@ export default {
       });
     },
     // 入库（批量）
-    async instockBatchSave(){
+    instockBatchSave: _.debounce(async function(){
       let form = this.$refs.instockBatchForm;
       if(null == form) return;
+
       let instock = await form.pack();
       if(!Array.isArray(instock) || instock.length == 0) return;
 
       this.pending = true;
+
       try {
         let result = await this.$http.post('/partV2/repertory/stockInOutBach', instock);
-        if(result.status == 0){
+
+        if (result.status == 0){
           this.$platform.toast('批量入库成功').then(() => location.reload());
           this.instockBatchDialog = false;
-        }else{
+        } else{
           this.$platform.alert(result.message);
+          this.pending = false;
         }
 
       } catch (error) {
+        this.pending = false;
         console.log(error)
       }
-      this.pending = false;
-    },
+
+    }, 1000),
     // 分配 （弹窗）
     partSparesDialog(val) {
       this.formdata = val;
@@ -1453,14 +1471,13 @@ export default {
         let result = await this.$http.post(`/partV2/approve/allot/initiate/batch?remark=${remark}`, partSparesData);
   
         if((result && result.status === 0)){
-
+          
           this.$platform.toast('批量分配成功').then(() => {
             location.reload();
             this.isPartSparesDialog = false;
-            this.pending = false;
           });
 
-        }else{
+        } else{
           this.$platform.alert(result.message);
           this.pending = false;
         }
@@ -1468,7 +1485,8 @@ export default {
         console.warn(e);
         this.pending = false;
       }
-    }, 100),
+
+    }, 1000),
     buildParams(pageNum, pageSize){
       return {
         ...this.model,
@@ -1676,14 +1694,14 @@ export default {
     }
   },
   mounted(){
-    let initData = this.initData;
+    let initData = _.cloneDeep(this.initData);
 
-    this.types = initData.sparepartType || [];
-    this.auths = initData.auths || {};
-    this.isPersonalRepertory = initData.isPersonalRepertory;
-    this.userId = initData.userId || '';
-    this.tagIds = initData.tagIds || [];
-    this.tagIdsWithChildTag = initData.tagIdsWithChildTag || [];
+    this.types = _.cloneDeep(initData.sparepartType) || [];
+    this.auths = _.cloneDeep(initData.auths) || {};
+    this.isPersonalRepertory = _.cloneDeep(initData.isPersonalRepertory);
+    this.userId = _.cloneDeep(initData.userId) || '';
+    this.tagIds = _.cloneDeep(initData.tagIds) || [];
+    this.tagIdsWithChildTag = _.cloneDeep(initData.tagIdsWithChildTag) || [];
 
     let urlParams = qs.parse(window.location.search);
     if(urlParams.id){
