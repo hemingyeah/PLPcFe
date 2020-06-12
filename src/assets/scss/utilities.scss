@@ -47,28 +47,3 @@
   display: flex;
   align-items: center;
 }
-
-.pull-right{
-  float: right;
-}
-
-.text-right{
-  text-align: right;
-}
-
-.clearfix:after {
-  display: block;
-  clear: both;
-  content: "";
-}
-
-.pre{
-  white-space: pre-line;
-}
-
-.text-overflow-hidden{
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  word-break: break-all;
-}

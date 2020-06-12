@@ -87,21 +87,57 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-router.use('/outside', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.82',
-  port: 10007,
+// 本地调试 outside/callcenter
+router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.211',
+  port: 9001,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
+    'cookie': 'VIPPUBLINKJSESSIONID=80458f50-6ddc-4b5b-89df-953db0db4a81; __wpkreporterwid_=68404129-96e2-4bd1-036f-cc601580be04; JSESSIONID=A70E9B611B1FCF88156EFC040F183B32'
   }
 }))
 
-router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.211',
-  port: 10007,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
-  },
-}))
+// 内网测试环境
+// router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
+//   host: '30.40.59.111',
+//   port: 9001,
+//   headers: {
+//     'cookie': 'VIPPUBLINKJSESSIONID=1c3e88ee-ab44-48c8-9dc6-f9b7fe7e28bf'
+//   }
+// }))
+
+// /api/app/outside/es
+// router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
+//   // host: '192.168.31.237',
+//   host: '30.40.58.161',
+//   port: 10006,
+//   headers: {
+//     // 'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
+//     'cookie': `VIPPUBLINKJSESSIONID=324bd997-42e0-44db-bb67-83f1bc77e44a`
+//   },
+// }))
+
+
+// router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
+//   // host: '30.40.57.167',
+//   // port: 8083,
+//   host: '30.40.56.211',
+//   port: 10007,
+//   headers: {
+//     // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+//     'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
+//   },
+// }))
+
+// router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
+//   // host: '30.40.57.167',
+//   // port: 8083,
+//   host: '30.40.56.177',
+//   port: 10006,
+//   headers: {
+//     // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+//     'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
+//   },
+// }))
 
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
   host: '127.0.0.1',
@@ -132,7 +168,21 @@ router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
-router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
+
+// router.all('/api/*', async ctx => {
+
+//   let option = {
+//     headers: Object.assign({}, ctx.request.headers)
+//   };
+
+//   const request = ctx.request;
+
+//   let result = await HttpsClient.request(request.url, request.method, request.rawBody, option);
+
+//   ctx.status = result.statusCode;
+//   ctx.body = result.body;
+// });
+
 
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)

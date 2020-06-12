@@ -5,7 +5,7 @@
         <div class="menu-title">呼叫中心设置</div>
         <nav class="menu-list">
           <div class="icon-box">
-            <i class="iconfont icon-setting"></i>
+            <i class="iconfont icon-duanxin3"></i>
           </div>
           <span>呼叫中心设置</span>
         </nav>

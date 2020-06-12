@@ -278,7 +278,7 @@ export default {
       if(currentProtocol === 'https:') {
         protocol = 'wss'
       }
-      return `${protocol}://app.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
+      return `${protocol}://pre2app.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
     },
     /** 是否显示devtool */
     showDevTool() {
@@ -647,7 +647,7 @@ export default {
       this.goCallCenterWorkbench() 
     },
     openCallCenterWorkbench(data) {
-      // console.info('data::', data);
+      console.info('data::', data);
       let url = data && data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
       platform.openTab({
         id: 'M_CALLCENTER_WORKBENCH_LIST',
@@ -677,16 +677,16 @@ export default {
         this.send(JSON.stringify({'action':'ping', 'content':'15267183070'}))
       }, 500)
     },
-    async webSocketOnMessage(e) { 
+    webSocketOnMessage(e) { 
       this.heartCheck.start();
-      // console.info('数据内容：{0}', e.data)
+      console.info('数据内容：{0}', e.data)
       // pong 是心跳
       if(e.data === 'pong') return
       // 这里处理接受到来电的消息
       try {
         const data = JSON.parse(e.data);
         // {"callPhone":"15267183070","callState":"Hangup","callType":"dialout","ringTime":1592636121000}
-        // console.info('data:', data.callType, data.callState);
+        console.info('data:', data.callType, data.callState);
         
         if(data.callType === 'normal' || data.callType === 'dialout') {
           if(data.callState === 'Hangup'){
@@ -699,11 +699,6 @@ export default {
             this.openCallCenterWorkbench(data)
           } else {
             this.callData = data
-            const res = await CallCenterApi.getLinkmanInfo({linkmanPhone: data.callPhone})
-            if(res.status == 0 && res.data) {
-              this.callData.taskCount = res.data.unfinishedTaskCount
-              this.callData.eventCount = res.data.unfinishedEventCount
-            }
             this.showCallCenter = true
           } 
         }
@@ -713,18 +708,18 @@ export default {
     },
     send(param) { 
       try {
-        // console.info('readyState:', webSocketClient.readyState)
+        console.info('readyState:', webSocketClient.readyState)
         webSocketClient.send(param)
       } catch (err) {
         console.error('error', err)
       }
     },
     webSocketClose(e) { 
-      // console.error('WebSocket连接关闭', e)
+      console.error('WebSocket连接关闭', e)
       this.reconnect(this.wsUrl);
     },
     webSocketError() { 
-      // console.error('WebSocket连接失败')
+      console.error('WebSocket连接失败')
       this.reconnect(this.wsUrl);
     },
     reconnect(url) {
