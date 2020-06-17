@@ -13,7 +13,7 @@ router.get('/partV2/category/list', async ctx => {
   let result = await HttpClient.request('/partV2/category/list', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('备件品类', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('备件品类', body, script, modConfig.template);
 
 })
 
@@ -25,7 +25,7 @@ router.get('/partV2/category/detail', async ctx => {
   let result = await HttpClient.request('/partV2/category/detail', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('备件库详情', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('备件库详情', body, script, modConfig.template);
 
 })
 
@@ -37,7 +37,7 @@ router.get('/partV2/category/create', async ctx => {
   let result = await HttpClient.request('/partV2/category/create', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('新建备件', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('新建备件', body, script, modConfig.template);
 
 })
 
@@ -49,7 +49,7 @@ router.get('/partV2/category/edit', async ctx => {
   let result = await HttpClient.request('/partV2/category/edit', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('编辑备件', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('编辑备件', body, script, modConfig.template);
 
 })
 
@@ -61,7 +61,7 @@ router.get('/partV2/repertory/stock', async ctx => {
   let result = await HttpClient.request('/partV2/repertory/stock', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('备件库存', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('备件库存', body, script, modConfig.template);
 
 })
 
@@ -73,7 +73,7 @@ router.get('/partV2/repertory/record', async ctx => {
   let result = await HttpClient.request('/partV2/repertory/record', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('出入库记录', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('出入库记录', body, script, modConfig.template);
 
 })
 
@@ -85,7 +85,7 @@ router.get('/partV2/repertory/apply', async ctx => {
   let result = await HttpClient.request('/partV2/repertory/apply', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('出入库办理', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('出入库办理', body, script, modConfig.template);
 
 })
 
@@ -97,7 +97,7 @@ router.get('/partV2/repertory/person', async ctx => {
   let result = await HttpClient.request('/partV2/repertory/person', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('个人备件库', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml('个人备件库', body, script, modConfig.template);
 
 })
 

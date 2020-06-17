@@ -300,7 +300,7 @@
         </div>
       </el-dialog>
       <el-dialog title="批量出库操作" :visible.sync="outstockBatchDialog" width="940px">
-        <part-outstockBatch-form v-if="outstockBatchDialog" ref="outstockBatchForm" :sparepart-config="sparepartConfig"></part-outstockBatch-form>
+        <part-outstock-batch-form v-if="outstockBatchDialog" ref="outstockBatchForm" :sparepart-config="sparepartConfig"></part-outstock-batch-form>
         <div slot="footer" class="dialog-footer">
 
           <base-button type="ghost" @event="outstockBatchDialog = false" >取 消</base-button>
