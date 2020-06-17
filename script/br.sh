@@ -16,6 +16,9 @@ fi
 if [ "$1" == "h" ]; then
     root="/Users/huangbaocheng/SHB/fontend/"
 fi
+if [ "$1" == "phc" ]; then
+    root="/Users/lichai/Desktop/pubLink/"
+fi
 
 echo $root
 
