@@ -265,8 +265,8 @@ export default {
       return null;
     },
     receive(data = [], userId = ''){
-      if(data.length > 50){
-        return this.$platform.alert('单次最多支持调拨50个备件');
+      if(data.length > 20){
+        return this.$platform.alert('单次最多支持调拨20个备件');
       }
       data.forEach(item => this.add(item));
       this.userId = userId;

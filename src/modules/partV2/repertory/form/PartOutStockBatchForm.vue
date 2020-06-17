@@ -200,8 +200,8 @@ export default {
       return null;
     },
     receive(data = [], userId = ''){
-      if (data.length > 50){
-        return this.$platform.alert('单次最多支持入库50个备件');
+      if (data.length > 20){
+        return this.$platform.alert('单次最多支持入库20个备件');
       }
 
       data.forEach(item => this.add(item));

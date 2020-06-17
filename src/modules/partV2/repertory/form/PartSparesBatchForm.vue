@@ -390,8 +390,8 @@ export default {
       return this.remark
     },
     receive(data = [], userId = ''){
-      if (data.length > 50) {
-        return this.$platform.alert('单次最多支持分配50个备件');
+      if (data.length > 20) {
+        return this.$platform.alert('单次最多支持分配2s0个备件');
       }
 
       this.form = data.map(item => this.add(null, item));

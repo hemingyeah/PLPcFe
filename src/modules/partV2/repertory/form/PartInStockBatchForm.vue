@@ -84,6 +84,13 @@ export default {
       if(index >= 0) this.form.splice(index, 1);
     },
     add(event, row = {}){
+      if (this.form.length > 19) {
+        return this.$message({
+          showClose: true,
+          message: '最多添加20个备件',
+          type: "error"
+        });
+      }
       let config = this.sparepartConfig || {};
       let types = config.inStoreType || [];
 
@@ -172,8 +179,8 @@ export default {
       return null;
     },
     receive(data = []){
-      if(data.length > 50){
-        return this.$platform.alert('单次最多支持入库50个备件');
+      if(data.length > 20){
+        return this.$platform.alert('单次最多支持入库20个备件');
       }
       data.forEach(item => this.add(null, item));
     },
