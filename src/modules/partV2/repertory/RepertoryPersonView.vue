@@ -291,7 +291,7 @@
             <el-option label="持有备件" value="part"></el-option>
             <el-option label="库存记录" value="stockRecord"></el-option>
             <el-option label="使用记录" value="useRecord"></el-option>
-            <el-option label="个人库办理" value="personProcess"></el-option>
+            <!-- <el-option label="个人库办理" value="personProcess"></el-option> -->
           </el-select>
           <el-date-picker class="srp-list-form-item" style="width:350px;"
                           v-if="listType != 'part' && listType != 'personProcess'"
@@ -1695,7 +1695,7 @@ export default {
     if(this.tab == '0') select = 'part'
     else if(this.tab == '1') select = 'stockRecord'
     else if(this.tab == '2') select = 'useRecord'
-    else if(this.tab == '3') select = 'personProcess'
+    // else if(this.tab == '3') select = 'personProcess'
     this.listType = select;
 
     let columns = this.buildColumns();
