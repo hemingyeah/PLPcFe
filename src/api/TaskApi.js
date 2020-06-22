@@ -4,11 +4,6 @@ let prefixAppPath = '/api/app' // todo add switcher
 let fixedPrefixAppPath = '/api/app'
 let prefixSearchPath = '/api/search'
 
-// eslint-disable-next-line no-undef
-if (process && process.env === 'development') {
-  prefixAppPath = ''
-  prefixSearchPath = ''
-}
 /**
  * 删除计划任务
  * @param {Object} params - 参数
@@ -199,14 +194,14 @@ export function getLmBindAddress(params) {
  * @description 获取新建客户相关数据
 */
 export function getCreateCustomerData(params) {
-  return http.get('/customer/edit/getData', params);
+  return http.get('/customer/editGetData', params);
 }
 
 /** 
  * @description 获取新建产品相关数据
 */
 export function getCreateProductData(params) {
-  return http.get('/customer/product/edit/getData', params);
+  return http.get('/customer/product/editGetData', params);
 }
 
 /** 

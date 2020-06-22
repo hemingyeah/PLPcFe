@@ -1,6 +1,6 @@
 import { toArray } from '@src/util/lang';
 import { fmt_address, fmt_datetime, fmt_date } from '@src/filter/fmt';
-import { FormFieldMap, FieldManager } from './components';
+import { FieldManager } from './components';
 import * as FormUtil from './util';
 
 import platform from '@src/platform';

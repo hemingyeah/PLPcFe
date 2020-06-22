@@ -73,14 +73,6 @@ export default {
         productId: [] // 数组，包含产品对象
       },
       loadData: false,
-      validation: this.isPhoneUnique
-        ? createRemoteValidate(LinkmanApi.checkUnique4Phone, (value, field) => {
-          return {
-            id: this.originalValue.id || '',
-            phone: value
-          };
-        })
-        : true
       
     }
   },
@@ -391,23 +383,24 @@ export default {
         padding: 10px 0 5px;
       }
 
-    .edit-contact-form {
-      padding: 10px 0 5px;
+      .edit-contact-form {
+        padding: 10px 0 5px;
+      }
+
+      .form-item label {
+        /*text-align: right;*/
+        width: 80px;
+      }
+
+      .form-item-control {
+        max-width: calc(100% - 80px);
+      }
     }
 
-    .form-item label {
-      /*text-align: right;*/
-      width: 80px;
+    .dialog-footer {
+      text-align: right;
+      padding: 0px 0px 15px;
     }
-
-    .form-item-control {
-      max-width: calc(100% - 80px);
-    }
-  }
-
-  .dialog-footer {
-    text-align: right;
-    padding: 0px 0px 15px;
   }
 }
 </style>

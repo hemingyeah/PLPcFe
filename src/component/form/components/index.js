@@ -178,5 +178,6 @@ export {
   PreviewComponents,
   SettingComponents,
   BuildComponents,
-  ViewComponents
+  ViewComponents,
+  FormFieldMap
 }

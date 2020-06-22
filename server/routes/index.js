@@ -86,63 +86,34 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-// /api/app/outside/es
-// router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-//   // host: '192.168.31.237',
-//   host: '30.40.58.161',
-//   port: 10006,
-//   headers: {
-//     // 'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
-//     'cookie': `VIPPUBLINKJSESSIONID=324bd997-42e0-44db-bb67-83f1bc77e44a`
-//   },
-// }))
-
-
 router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
-  // host: '30.40.57.167',
-  // port: 8083,
   host: '30.40.56.211',
   port: 10007,
   headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
     'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
   },
 }))
 
 router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  // host: '30.40.57.167',
-  // port: 8083,
   host: '30.40.56.177',
   port: 10006,
   headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
     'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
   },
 }))
 
 
-
-
-
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.177', // 仇太俊
-  // host: '192.168.31.70',
+  host: '30.40.56.177',
   port: 8080,
   headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=71a54c18-dcfd-4f2d-99a9-a5faf00835e1`
-    'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
   },
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=69430f30-9abb-4eb7-af4e-7e1c3120fe2a`
-  // }
 }))
 
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
   port: 10002,
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=e7b50d17-9e1b-4190-bacb-e4029634a82f`
-  // }
 }))
 
 router.use('', performanceRouter.routes());
@@ -159,6 +130,7 @@ router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
+router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 
 router.all('/api/*', async ctx => {
 
@@ -174,7 +146,6 @@ router.all('/api/*', async ctx => {
   ctx.body = result.body;
 });
 
-router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.all('/*', ctx => HttpClient.proxy(ctx))
 
 module.exports = router;
