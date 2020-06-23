@@ -6,6 +6,55 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "15469180",
+      "name": "话费",
+      "font_class": "huafei",
+      "unicode": "e713",
+      "unicode_decimal": 59155
+    },
+    {
+      "icon_id": "15469181",
+      "name": "电话",
+      "font_class": "dianhua1",
+      "unicode": "e717",
+      "unicode_decimal": 59159
+    },
+    {
+      "icon_id": "15469182",
+      "name": "坐席",
+      "font_class": "zuoxi",
+      "unicode": "e71a",
+      "unicode_decimal": 59162
+    },
+    {
+      "icon_id": "15469183",
+      "name": "时间",
+      "font_class": "shijian",
+      "unicode": "e71b",
+      "unicode_decimal": 59163
+    },
+    {
+      "icon_id": "15469355",
+      "name": "去电",
+      "font_class": "qudian",
+      "unicode": "e72b",
+      "unicode_decimal": 59179
+    },
+    {
+      "icon_id": "15469356",
+      "name": "来电",
+      "font_class": "laidian",
+      "unicode": "e72c",
+      "unicode_decimal": 59180
+    },
+    {
+      "icon_id": "15101249",
+      "name": "time-circle-fill",
+      "font_class": "time-circle-fill",
+      "unicode": "e711",
+      "unicode_decimal": 59153
+    },
+    {
       "icon_id": "10467642",
       "name": "短信",
       "font_class": "duanxin3",

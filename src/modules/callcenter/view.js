@@ -1,5 +1,5 @@
 import Vue from '@src/common/entry';
-import Stage from './views/Stage.vue';
+import CallDetail from './views/CallDetail.vue';
 import http from '@src/util/http';
 
 Vue.prototype.$http = http;
@@ -14,7 +14,7 @@ try {
   console.error('no init data')
 }
 
-const CallCenterComp = Vue.extend(Stage);
+const CallCenterComp = Vue.extend(CallDetail);
 const app = new Vue({
   provide: {
     initData: Object.freeze(initData)

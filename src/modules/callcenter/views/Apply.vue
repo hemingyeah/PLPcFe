@@ -36,36 +36,38 @@
     <el-dialog title="申请开通呼叫中心" :visible.sync="applyDialogVisible" width="30%" @close="applyDialogClosed">
       <el-form :model="applyForm" :rules="applyFormRules" ref="applyFormRef" label-width="100px" label-position="left">
         <el-form-item label="公司名称" prop="companyName">
-          <el-input v-model="applyForm.companyName"></el-input>
+          <el-input v-model="applyForm.companyName" placeholder="请输入公司名称"></el-input>
         </el-form-item>
         <el-form-item label="联系人" prop="linkmanName">
-          <el-input v-model="applyForm.linkmanName"></el-input>
+          <el-input v-model="applyForm.linkmanName" placeholder="请输入联系人"></el-input>
         </el-form-item>
         <el-form-item label="联系电话" prop="phone">
-          <el-input v-model="applyForm.phone"></el-input>
+          <el-input v-model="applyForm.phone" placeholder="请输入联系电话"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="applyDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="apply">申 请</el-button>
+        <el-button type="primary" :disabled="pending" :loading="pending" @click="apply">申 请</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
+import * as CallCenterApi from '@src/api/CallCenterApi'
 export default {
   name: 'call-center-apply',
   data() {
     // 验证固话手机号的规则
     const checkMobile = (rule, value, cb) => {
-      const regPhone = /^([0-9]{3,4}-)?[0-9]{7,8}$/
-      const regMobile = /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      const regPhone = /^(((0\d{2,3}-{0,1})?\d{7,8})|(\d{6}))$/
+      const regMobile = /^((1[3578496]\d{9})|([+][0-9-]{1,30}))$/
       if (regPhone.test(value) || regMobile.test(value)) {
         return cb()
       }
       cb(new Error('请输入合法的电话号码'))
     }
     return {
+      pending: false,
       isAduiting: false,
       applyDialogVisible: false,
       applyForm: {
@@ -77,20 +79,9 @@ export default {
       applyFormRules: {
         companyName: [
           { required: true, message: '请输入公司名称', trigger: 'blur' },
-          {
-            min: 3,
-            max: 15,
-            message: '公司名称的长度在3~10个字符之间',
-            trigger: 'blur'
-          }
         ],
         linkmanName: [
           { required: true, message: '请输入联系人', trigger: 'blur' },
-          {
-            min: 2,
-            message: '联系人的长度至少2个字符',
-            trigger: 'blur'
-          }
         ],
         phone: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
@@ -106,19 +97,26 @@ export default {
     apply() {
       this.$refs.applyFormRef.validate(async valid => {
         if (!valid) return
-        const { code, message } = await this.$http.post('/outside/callcenter/api/saveAccount', this.applyForm, false)
-        if (code !== 0) return this.$platform.notification({
-          title: '申请失败',
-          message: message || '',
-          type: 'error',
-        });
-        this.applyDialogVisible = false
-        this.applyDialogClosed()    
-        this.isAduiting = true
-        this.$platform.notification({
-          title: '申请成功',
-          type: 'success',
-        });       
+        try {
+          this.pending = true;
+          const { code, message } = await CallCenterApi.saveAccount(this.applyForm)
+          if (code !== 0) return this.$platform.notification({
+            title: '申请失败',
+            message: message || '',
+            type: 'error',
+          })
+          this.pending = false;
+          this.applyDialogVisible = false
+          this.applyDialogClosed()    
+          this.isAduiting = true
+          this.$platform.notification({
+            title: '申请成功',
+            type: 'success',
+          })
+        } catch (error) {
+          this.pending = false;
+          console.error(error)
+        }   
       })
     }
   }

@@ -1,31 +1,35 @@
 <template>
   <div class="call-center-workbench">
     <div class="left">
-      <el-card class="current-card">
-        <div slot="header" >当前通话</div>
+      <div class="current-header">当前通话</div>
+      <el-card v-if="query.callPhone" class="current-card">
         <div class="current-item">
           <div class="item">
-            <p>{{unkonwn ? '未知联系人' : '张三 15000000000'}} </p>
-            <span>18:00</span>
+            <p>{{query.linkmanName ? `${query.linkmanName} ${query.callPhone}` : '未知联系人'}} </p>
+            <span>{{query.ringTime |fmt_short_time}}</span>
           </div>
           <div class="item">
-            <p v-if="!unkonwn" style="margin-bottom:0">张三</p>
-            <i class="iconfont icon-fd-phone"></i>
+            <p style="margin-bottom:0">{{query.customerName}}</p>
+            <i class="iconfont" :class="query.callType === 'dialout' ? 'icon-qudian' : 'icon-laidian'"></i>
           </div>
         </div>
       </el-card>
       <el-card class="history-card">
         <div slot="header">今日历史通话（{{historyList.length}}）</div>
-        <div v-for="(item,index) in historyList" :key="item.id" class="history-item" :class="{'item-selected':currentIndex===index}" @click="handleHistoryItem(index)">
-          <i v-if="currentIndex===index" class="iconfont icon-fe-close" @click.stop="delHistoryItem(index)"></i>
+        <div v-for="(item,index) in historyList" :key="item.id" class="history-item" 
+             :class="{'item-active': item.id == activeLinkId,'item-hover':index==hoverIndex}"
+             @click="handleHistoryItem(item,index)"
+             @mouseover="hoverIndex = index"
+             @mouseout="hoverIndex = -1">
+          <i v-if="hoverIndex===index && item.id != activeLinkId" class="iconfont icon-fe-close" @click.stop="delHistoryItem(index)"></i>
           <div class="current-item">
             <div class="item">
-              <p>张三 15000000000</p>
-              <span>18:00</span>
+              <p>{{item.linkmanName}} {{item.dialPhone}}</p>
+              <span>{{item.ring |fmt_short_time}}</span>
             </div>
             <div class="item">
-              <p style="margin-bottom:0">张三</p>
-              <i class="iconfont icon-fd-phone"></i>
+              <p style="margin-bottom:0">{{item.customerName}}</p>
+              <i class="iconfont" :class="query.callType === 'dialout' ? 'icon-laidian' : 'icon-qudian'"></i>
             </div>
           </div>
 
@@ -35,15 +39,15 @@
     <div class="main">
       <base-tabbar :tabs="tabs" v-model="currTab"></base-tabbar>
       <keep-alive>
-        <component :is="currTab"></component>
+        <component :is="currTab" :item="item"></component>
       </keep-alive>
     </div>
     <div class="right">
+
       <template v-if="remarkList.length">
         <div v-for="(item, index) in remarkList" :key="item.id" class="item" @click="delRemark(item, index)">
           <div class="item-title">
             <h4>服务备注（{{index + 1}}）</h4>
-            {{item.isDelete}}
             <i v-if="!item.isDelete" class="iconfont icon-qingkongshanchu"></i>
           </div>
           <div class="item-header">
@@ -56,7 +60,7 @@
             <span>删除了服务备注</span>
           </div>
           <div v-else class="item-content">
-            <el-tag>{{item.sortName}}</el-tag>
+            <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
             <el-tag :type="item.status ==1 ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
             <p>{{item.remark}}</p>
           </div>
@@ -76,8 +80,8 @@
             <el-option label="已解决" value="1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input type="textarea" v-model="ruleForm.remark" :autosize="{ minRows: 2, maxRows: 4}"></el-input>
+        <el-form-item label="备注" prop="remark" style="margin-right: 20px;">
+          <el-input type="textarea" v-model="ruleForm.remark" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="saveRemark('ruleForm')">保存</el-button>
@@ -89,15 +93,20 @@
 </template>
 
 <script>
+import * as CallCenterApi from '@src/api/CallCenterApi'
 import ContactInfo from './ContactInfo.vue'
 import ServiceRecord from './ServiceRecord.vue'
+import { parse } from '@src/util/querystring';
+
 export default {
   name: 'workbench',
   data() {
     return {
+      query: {},
       unkonwn: false,
-      currentIndex: -1,
-      historyList: [{ id: '1' }, { id: '2' }, { id: '3' }],
+      hoverIndex: -1, // 菜单hover索引
+      activeLinkId: 0, // 当前激活的菜单id
+      historyList: [],
       tabs: [
         {
           displayName: '联系人信息',
@@ -111,6 +120,7 @@ export default {
         }
       ],
       currTab: 'contact-info',
+      item: {},
       remarkList: [],
       showAddRemarkForm:false,
       categoryList: [],
@@ -131,6 +141,12 @@ export default {
     }
   },
   mounted() {
+    this.query = parse(window.location.search) || {};
+    if(this.query.id && this.query.callPhone) {
+      // 获取联系人信息 
+      this.item = {id:this.query.id, dialPhone:this.query.callPhone, dialCount:this.query.dialCount} 
+    }
+    // console.log('query::', this.query);
     this.$eventBus.$on('callcenter-workbench.select_tab', this.selectTab)
     this.getHistoryList()
     this.getRemarkList()
@@ -141,28 +157,27 @@ export default {
   },
   methods: {
     // 获取服务备注列表
-    async getRemarkList(){
+    getRemarkList(){
       const params = {
-        recordId: 1
+        recordId: this.item.id
       }
-      try {
-        let {code, message, result} = await this.$http.get('/outside/callcenter/api/getFwRemarkList', params)
+      if(!this.item.id) return
+      CallCenterApi.getFwRemarkList(params).then(({code, message, result}) => {
         if (code != 0) return this.$message.error(message || '内部错误')
         this.remarkList = result || []
-      } catch (error) {
-        console.error(error)
-      }
+      }).catch((err) => {
+        console.error(err)
+      })
     },
     // 获取咨询分类列表
-    async getCategoryList(){
-      try {
-        const {code, message, result} = await this.$http.get('/outside/callcenter/api/getZxSortList')
+    getCategoryList(){
+      CallCenterApi.getZxSortList().then(({code, message, result}) => {
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.categoryList = result || []
         console.info('this.categoryList:', this.categoryList);
-      } catch (error) {
-        console.error(error);
-      }
+      }).catch((err) => {
+        console.error(err)
+      })
     },
     // 选择项发生变化触发这个函数
     parentCateChanged() {
@@ -174,12 +189,22 @@ export default {
         this.ruleForm.sortId = 0
       }
     },
-    async getHistoryList(){
-      const res = await this.$http.get('/outside/callcenter/api/getTodayCalledRecordList', {phone :'13956914854'})
-      console.info('res', res);
+    // 今日通话记录
+    getHistoryList(){
+      CallCenterApi.getTodayCallRecordList().then(({code, message, result}) => {
+        if (code !== 0) return this.$message.error(message || '内部错误')
+        this.historyList = result || []
+        if(!this.query.linkmanName) {
+          this.item = this.historyList[0]
+          console.info('item:', this.item)
+        }
+      }).catch((err) => {
+        console.error(err)
+      })
     },
-    handleHistoryItem(index) {
-      this.currentIndex = index
+    handleHistoryItem(item, index) {
+      this.activeLinkId = item.id
+      this.item = item
     },
     delHistoryItem(index) {
       this.historyList.splice(index, 1)
@@ -192,11 +217,16 @@ export default {
         if (!valid) {
           return false
         } 
+        if(!this.item.id) return this.$platform.notification({
+          title: '操作失败',
+          message: '请先选中一条通话记录',
+          type: 'error',
+        })
         const params = this.ruleForm
-        params.recordId = 1
+        params.recordId = this.item.id
         // console.info('params', params)
         try {
-          const {code, message} = await this.$http.post('/outside/callcenter/api/saveFwRemark', params, false)
+          const {code, message} = await CallCenterApi.saveFwRemark(params)
           if (code !== 0) return this.$platform.notification({
             title: '保存失败',
             message: message || '',
@@ -217,13 +247,13 @@ export default {
     async delRemark(item, index){
       try {
         if (!await this.$platform.confirm('确定要删除该服务备注？')) return;
-        const {code, message} = await this.$http.post('/outside/callcenter/api/deleteFwRemark', {id:item.id}, false)
+        const {code, message} = await CallCenterApi.deleteFwRemark({id:item.id})
         if (code !== 0) return this.$platform.notification({
           title: '删除失败',
           message: message || '',
           type: 'error',
         });
-        this.remarkList.splice(index, 1)
+        this.getRemarkList()
         this.$platform.notification({
           title: '删除成功',
           type: 'success',
@@ -241,9 +271,15 @@ export default {
 </script>
 
 <style lang="scss">
-.item-selected {
-  background: #f5f5f5;
+.item-hover {
+  background-color: #f5f5f5;
 }
+.item-active {
+  // 链接菜单激活样式
+  background-color: #f5f5f5;
+  border-left: 3px solid #55B7B4;
+}
+
 .call-center-workbench {
   display: flex;
   padding: 10px;
@@ -254,6 +290,15 @@ export default {
   .left {
     width: 25%;
     min-width: 270px;
+    .current-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid #ebeef5;
+      box-sizing: border-box;
+      background: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      color: #051A13;
+    }
     .current-card {
       box-shadow: 0 0 0 0;
       border: none;
@@ -314,7 +359,7 @@ export default {
 
   .main {
     flex: 1;
-    margin: 0 20px;
+    margin: 0 10px;
     background: #fff;
   }
   .right {
@@ -358,6 +403,19 @@ export default {
         }
       }
     }
+    .el-textarea__inner{
+      padding: 5px 10px;
+    }
+
+    .el-form-item--small .el-form-item__label {
+      position: relative;
+      padding-left: 10px;
+    }
+    .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
+      position: absolute;
+      left: -5px;
+    }
+
   }
 }
 </style>

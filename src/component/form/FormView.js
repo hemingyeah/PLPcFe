@@ -3,6 +3,7 @@ import { fmt_address } from '@src/filter/fmt';
 import { isHiddenField } from './util';
 import { FormFieldMap } from './components';
 import platform from '@src/platform'
+import http from '@src/util/http';
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
@@ -58,6 +59,29 @@ const FormView = {
         </div>
       )
     },
+
+    buildPhoneDom(lmPhone) {
+      const { value, displayName} = lmPhone;
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+          <div class="form-view-row-content" onClick={() => this.makePhoneCall(value)}>
+            <span>{value}</span>
+            {value && <i class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;"></i>}
+          </div>
+        </div>
+      )
+    },
+
+    async makePhoneCall(phone){
+      if(!phone) return
+      try {
+        await http.post('/outside/callcenter/api/dialout', {phone, taskType:'客户'}, false)
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     buildTextarea({displayName, value, formType}) {
       const newVal = value ? value.replace(link_reg, (match) => {
         // return `<a href=${match} traget="_blank" >${match}</a>`
@@ -190,6 +214,15 @@ const FormView = {
         };
         
         return this.buildAddressDom(params);
+      }
+     
+      if (formType === 'phone' && fieldName === 'lmPhone') {
+        params = {
+          ...params,
+          value,
+        };
+        
+        return this.buildPhoneDom(params);
       }
 
       if (formType == 'info') {

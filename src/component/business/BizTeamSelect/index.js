@@ -4,6 +4,7 @@ import { getReferenceEl } from './util';
 import fastCall from '@src/component/util/fastCall'
 
 import Vue from 'vue';
+import BizCategorySelect from './BizCategorySelect';
 import BizTeamSelect from './BizTeamSelect';
 
 const BizTeamSelectComp = Vue.extend(BizTeamSelect);
@@ -58,6 +59,7 @@ function initTeamSelect(options = {}){
 
 const component = {
   install(Vue){
+    Vue.component(BizCategorySelect.name, BizCategorySelect);
     Vue.component(BizTeamSelect.name, BizTeamSelect);
     // 注册快速调用方法
     fastCall(Vue, 'biz', {initTeamSelect})

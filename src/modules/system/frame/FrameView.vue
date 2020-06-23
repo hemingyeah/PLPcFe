@@ -27,27 +27,41 @@
             <div class="frame-quick-right">
 
               <el-popover popper-class="call-center-popper" ref="callCenterRef" v-model="showCallCenter" :visible-arrow="false">
-                <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference">
-                  <i class="iconfont icon-customerservice"></i>
+                <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference" @click="openCallCenterWorkbench">
+                  <i class="iconfont icon-dianhua1"></i>
                 </button>
                 <div class="call-center-box">
-                  <p class="customer-name" v-if="unknownLinkman">未知联系人</p>
-                  <p v-if="!unknownLinkman">维尼</p>
-                  <p v-if="!unknownLinkman">众联</p>
+                  <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
+                  <p v-if="callData.linkmanName">{{callData.linkmanName}}</p>
+                  <p v-if="callData.linkmanName">{{callData.customerName}}</p>
                   <div class="divider"></div>
                   <div class="call-ripple">
                     <div class="icon-ripple">
-                      <img src="../../../assets/img/avatar.png">
+                      <img src="../../../assets/img/phone.png">
                       <div class="ripple1"></div>
                       <div class="ripple2"></div>
-                      <div class="ripple3"></div>
                     </div>
                   </div>
-                  <p style="margin-top:10px;">15200000000</p>
-                  <p class="today">今日已来电（<span>1</span>）</p>
-                  <p v-if="!unknownLinkman">未完成工单（<span>1</span>）</p>
-                  <p v-if="!unknownLinkman">未完成事件（<span>1</span>）</p>
-                  <p class="last">话机 15299999999 上已接通，请注意接听</p>
+                  <p style="margin-top:10px;">{{callData.callPhone}}</p>
+                  <!-- 呼入 -->
+                  <template v-if="callData.callType=='normal'">
+                    <div class="call-in" >
+                      <p class="today">今日已来电（<span>{{callData.dialCount}}</span>）</p>
+                      <p >未完成工单（<span>{{callData.taskCount}}</span>）</p>
+                      <p >未完成事件（<span>{{callData.eventCount}}</span>）</p>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <!-- 呼出 -->
+                    <div class="call-out">
+                      <p>今日已来电（<span>{{callData.dialCount}}</span>）</p>
+                      <div class="unfinsh">
+                        <p>未完成工单（<span>{{callData.taskCount}}</span>）</p>
+                        <p>未完成事件（<span>{{callData.eventCount}}</span>）</p>
+                      </div>
+                    </div>
+                  </template>
+                  <p class="last">{{callData.message}}</p>
                 </div>
               </el-popover>
 
@@ -76,7 +90,7 @@
               </button>
 
               <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" @click="openSaleManager" title="专属客服" v-tooltip>
-                <i class="iconfont icon-kefu"></i>
+                <i class="iconfont icon-customerservice"></i>
               </button>
 
               <el-popover trigger="click" :value="exportPopperVisible" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
@@ -194,8 +208,9 @@ import * as NotificationApi from '@src/api/NotificationApi'
 
 const NOTIFICATION_TIME = 1000 * 60 * 10
 
-// const wsUrl = 'ws://30.40.56.211:8080/websocket/asset'
-const wsUrl = 'ws://30.40.61.216:9001/websocket/asset'
+// const wsUrl = 'ws://shb-callcenter.vaiwan.com/websocket/asset/'
+// const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
+// const wsUrl = 'ws://30.40.61.216:9001/websocket/asset/dd4531bf-7598-11ea-bfc9-00163e304a25_123'
 let webSocketClient = null, lockReconnect = false,
   reconnectTimmer = null
 
@@ -231,9 +246,8 @@ export default {
       // 后台任务
       backgroundTaskTitle: '后台任务',
 
-      unknownLinkman:true,
       showCallCenter:false,
-     
+      callData:{}, 
       heartCheck: {
         timeout: 5000, // 每隔5秒发送心跳
         num: 3, // 3次心跳均未响应重连
@@ -257,6 +271,11 @@ export default {
     }
   },
   computed: {
+    wsUrl() {
+      // websocket连接地址
+      return `ws://30.40.61.216:9001/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
+      // return `ws://shb-callcenter.vaiwan.com/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
+    },
     /** 是否显示devtool */
     showDevTool() {
       return (
@@ -578,8 +597,22 @@ export default {
         reload: true
       })
     },
+    openCallCenterWorkbench(data) {
+      // console.log('data::', data);
+      this.$nextTick(()=>{
+        this.showCallCenter = false
+      });      
+      let url = data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
+      platform.openTab({
+        id: 'callcenter_workbench',
+        title: '呼叫工作台',
+        url,
+        reload: true
+      })
+    },
     initWebSocket() {
-      webSocketClient = new WebSocket(wsUrl) 
+
+      webSocketClient = new WebSocket(this.wsUrl) 
       try {
         webSocketClient.onopen = this.webSocketOpen
         webSocketClient.onmessage = this.webSocketOnMessage
@@ -587,7 +620,7 @@ export default {
         webSocketClient.onerror = this.webSocketError
       } catch(error) {
         console.error(error)
-        this.reconnect(wsUrl);
+        this.reconnect(this.wsUrl);
       }
     },
     webSocketOpen() { 
@@ -595,14 +628,34 @@ export default {
       // this.heartCheck.start();
       
       setTimeout(() => {
-        this.send(JSON.stringify({'action':'dialout', 'content':'15267183070'}))
+        this.send(JSON.stringify({'action':'ping', 'content':'15267183070'}))
       }, 500)
     },
     webSocketOnMessage(e) { 
       this.heartCheck.start();
-      console.info('数据内容：{0}', e)
-      // 这里处理接受到的消息
-      
+      console.info('数据内容：{0}', e.data)
+      // pong 是心跳
+      if(e.data === 'pong') return
+      // 这里处理接受到来电的消息
+      try {
+        const data = JSON.parse(e.data);
+        // "callPhone":"15267183070","callType":"dialout","message":"已经在话机：18072725367上呼出，请注意接听"
+        // {"callPhone":"15267183070","callState":"Hangup","callType":"dialout","ringTime":1592636121000}
+        console.info('data:', data.callType, data.callState);
+        if(data.callState === 'Unlink' || data.callState === 'Hangup' || data.callState === 'Link') {
+          // 挂断 接听
+          this.showCallCenter = false 
+          return 
+        }
+        if(data.callType === 'normal' || data.callType === 'dialout') {
+          // linkmanName 为空是未知联系人
+          this.callData = data
+          this.showCallCenter = true
+          this.openCallCenterWorkbench(data)
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
     send(param) { 
       try {
@@ -614,11 +667,11 @@ export default {
     },
     webSocketClose(e) { 
       console.error('WebSocket连接关闭', e)
-      this.reconnect(wsUrl);
+      this.reconnect(this.wsUrl);
     },
     webSocketError() { 
       console.error('WebSocket连接失败')
-      this.reconnect(wsUrl);
+      this.reconnect(this.wsUrl);
     },
     reconnect(url) {
       if(lockReconnect) {
@@ -632,17 +685,6 @@ export default {
         lockReconnect = false;
       }, 4000);
     },
-  
-    // connection() {
-    //   const socket = new SockJS('http://localhost:18080/websocket/asset')
-    //   this.stompClient = Stomp.over(socket)
-    //   this.stompClient.connect({}, frame => {
-    //     console.info('Connected: ', frame); // 连接服务器成功
-    //     // this.stompClient.subscribe('/topic/greetings', greeting => {
-    //     //   console.info(JSON.parse(greeting.body))
-    //     // })
-    //   })
-    // }
   },
   created() {
     // TODO: 迁移完成后删除
@@ -660,12 +702,7 @@ export default {
       this.getSystemMsg();
     }, NOTIFICATION_TIME);
   },
-  mounted() {
-    setTimeout(()=>{
-      // this.showCallCenter = true;
-      // this.goCallCenterWorkbench()
-    }, 5000)
-    
+  async mounted() { 
     if ('WebSocket' in window) {
       this.initWebSocket()
     } else {

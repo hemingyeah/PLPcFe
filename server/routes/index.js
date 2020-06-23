@@ -86,14 +86,23 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-// outside/callcenter
+// 本地调试 outside/callcenter
 router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.211',
   port: 8080,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=591bda79-09b7-4577-b009-3b0b6fc88b52'
+    'cookie': 'VIPPUBLINKJSESSIONID=80458f50-6ddc-4b5b-89df-953db0db4a81; __wpkreporterwid_=68404129-96e2-4bd1-036f-cc601580be04; JSESSIONID=A70E9B611B1FCF88156EFC040F183B32'
   }
 }))
+
+// 内网测试环境
+// router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
+//   host: '30.40.61.216',
+//   port: 9001,
+//   headers: {
+//     'cookie': 'VIPPUBLINKJSESSIONID=edc718f8-a4b8-462c-9ea4-7fb6fbd9dea0'
+//   }
+// }))
 
 // /api/app/outside/es
 // router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
@@ -107,27 +116,27 @@ router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
 // }))
 
 
-router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
-  // host: '30.40.57.167',
-  // port: 8083,
-  host: '30.40.56.211',
-  port: 10007,
-  headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
-    'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
-  },
-}))
+// router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
+//   // host: '30.40.57.167',
+//   // port: 8083,
+//   host: '30.40.56.211',
+//   port: 10007,
+//   headers: {
+//     // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+//     'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
+//   },
+// }))
 
-router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  // host: '30.40.57.167',
-  // port: 8083,
-  host: '30.40.56.177',
-  port: 10006,
-  headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
-    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
-  },
-}))
+// router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
+//   // host: '30.40.57.167',
+//   // port: 8083,
+//   host: '30.40.56.177',
+//   port: 10006,
+//   headers: {
+//     // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+//     'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
+//   },
+// }))
 
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.177', // 仇太俊

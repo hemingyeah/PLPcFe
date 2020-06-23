@@ -13,10 +13,10 @@
       <div class="main">
         <template v-if="current == 0">
           <div class="service-line">
-            <p>欢迎使用售后宝呼叫中心</p>
+            <p><img src="../../../assets/img/callcenter.png">欢迎使用售后宝呼叫中心</p>
             <div class="info">
               <div class="info-item">
-                <i class="iconfont icon-duanxin3"></i>
+                <i class="iconfont icon-dianhua1"></i>
                 <div class="item-content">
                   <p>呼叫中心号码：</p>
                   <span>{{AccountInfo.hotLine}}</span>
@@ -25,27 +25,29 @@
                 </div>
               </div>
               <div class="info-item">
-                <i class="iconfont icon-duanxin3"></i>
+                <i class="iconfont icon-zuoxi"></i>
                 <div class="item-content">
                   <p>坐席：</p>
-                  <span style="display:inline-block;">{{AccountInfo.agentNum}}</span>
-                  <el-tooltip content="已配置坐席数/购买坐席数">
-                    <i class="iconfont icon-info" style="color: #b9bfbd;margin-left: 10px;"></i>
-                  </el-tooltip>
+                  <div class="align-items-center">
+                    <div>{{AccountInfo.agentNum}}</div>
+                    <el-tooltip content="已配置坐席数/购买坐席数">
+                      <i class="iconfont icon-info icon-agent-tip"></i>
+                    </el-tooltip>
+                  </div>
                 </div>
               </div>
               <div class="info-item">
-                <i class="iconfont icon-duanxin3"></i>
+                <i class="iconfont icon-shijian"></i>
                 <div class="item-content">
                   <p>到期时间：</p>
                   <span>{{AccountInfo.endTime}}</span>
                 </div>
               </div>
               <div class="info-item">
-                <i class="iconfont icon-duanxin3"></i>
+                <i class="iconfont icon-huafei"></i>
                 <div class="item-content">
                   <p>话费余额：</p>
-                  <span class="money">{{AccountInfo.cost}}</span>
+                  <span class="money">{{AccountInfo.cost}}元</span>
                 </div>
               </div>
             </div>
@@ -69,19 +71,21 @@
               </el-table-column>
               <el-table-column label="状态">
                 <template slot-scope="scope">
-                  {{fmt_user_state(scope.row.verifyStatus)}}
+                  <span v-if="scope.row.verifyStatus ==-1" style="color:#FB602C;">{{fmt_user_state(scope.row.verifyStatus)}}</span>  
+                  <span v-else-if="scope.row.verifyStatus == 2" style="color:#6ECF40;">{{fmt_user_state(scope.row.verifyStatus)}}</span>  
+                  <span v-else style="color:#999999;">{{fmt_user_state(scope.row.verifyStatus)}}</span>  
                 </template>
               </el-table-column>
               <el-table-column label="上线">
                 <template slot-scope="scope">
-                  <el-switch v-model="scope.row.status" @change="statusChange(scope.row,$event)">
+                  <el-switch v-if="scope.row.verifyStatus==2" :disabled="scope.row.pending" :value="Boolean(scope.row.status)" @change="statusChange(scope.row)">
                   </el-switch>
                 </template>
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="text" :disabled="scope.row.verifyStatus!=0" @click="submit(scope.row,'present')">提交</el-button>
-                  <el-button type="text" :disabled="scope.row.verifyStatus==1" @click="del(scope.row,scope.$index,'present')">删除</el-button>
+                  <el-button :style="{color:scope.row.verifyStatus!=0 ? '#999999;' : '#55B7B4'}" type="text" :disabled="scope.row.verifyStatus!=0" :loading="pending" @click="submit(scope.row,'present')">提交</el-button>
+                  <el-button :style="{color:scope.row.verifyStatus==1 ? '#999999;' : '#FB602C'}" type="text" :disabled="scope.row.verifyStatus==1" :loading="pending" @click="del(scope.row,scope.$index,'present')">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -97,8 +101,8 @@
           
             <tree-table class="treeTable" :data="categoryList" :columns="columns" :selection-type="false" :expand-type="false" border :show-row-hover="false">
               <template slot="opt" slot-scope="scope">
-                <el-button type="primary" @click="edit(scope.row,'category')">编辑</el-button>
-                <el-button type="danger" @click="del(scope.row,scope.$index,'category')">删除</el-button>
+                <el-button type="text" @click="edit(scope.row,'category')">编辑</el-button>
+                <el-button type="text" style="color:#FB602C" @click="del(scope.row,scope.$index,'category')">删除</el-button>
               </template>
             </tree-table>
 
@@ -127,7 +131,7 @@
         </el-form-item>
 
         <el-form-item label="父级分类">
-          <el-cascader style="width:100%;" expand-trigger="hover" :options="categoryList" :props="cascaderProps" v-model="selectedKeys" @change="parentCateChanged" clearable change-on-select>
+          <el-cascader style="width:100%;" expand-trigger="hover" :options="pCategoryList" :props="cascaderProps" v-model="selectedKeys" @change="parentCateChanged" clearable change-on-select>
           </el-cascader>
         </el-form-item>
        
@@ -135,12 +139,13 @@
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="categoryDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addCategory">确 定</el-button>
+        <el-button type="primary" :loading="pending" @click="addCategory">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
+import * as CallCenterApi from '@src/api/CallCenterApi'
 export default {
   name: 'call-center',
   props: {
@@ -160,6 +165,7 @@ export default {
   },
   data() {
     return {
+      pending:false,
       field: {
         displayName: '成员',
         fieldName: 'user',
@@ -184,6 +190,7 @@ export default {
       current: 0,
       userList: [],
       categoryList: [],
+      pCategoryList: [],
       columns: [{
         label: '分类名称',
         prop: 'name'
@@ -200,7 +207,8 @@ export default {
         parentId: ''
       },
       categoryFormRules: {
-        name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
+        name: [{ required: true, message: '请输入分类名称', trigger: 'blur' },
+          { max: 20, message: '分类名称最大长度在20个字符', trigger: 'blur' }]
       },
       cascaderProps: {
         value: 'id',
@@ -237,41 +245,51 @@ export default {
       return state
     },
     // 获取坐席列表
-    async getAgentList(){
-      try {
-        const {code, message, result} = await this.$http.get('/outside/callcenter/api/getAgentList')
+    getAgentList(){
+      CallCenterApi.getAgentList().then(({code, message, result}) => {
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.userList = result || []
-      } catch (error) {
-        console.error(error);
-      }
+      }).catch((err) => {
+        console.error(err)
+      })
     },
     // 获取咨询分类列表
-    async getCategoryList(){
-      try {
-        const {code, message, result} = await this.$http.get('/outside/callcenter/api/getZxSortList')
+    getCategoryList(){
+      CallCenterApi.getZxSortList().then(({code, message, result}) => {
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.categoryList = result || []
         console.info('this.categoryList:', this.categoryList);
-      } catch (error) {
-        console.error(error);
-      }
+      }).catch((err) => {
+        console.error(err)
+      })
     },
     // 坐席上线下线
-    async statusChange(item, status) {
-      console.info('item:', item, status);
+    async statusChange(row) {
+      const ns = row.status ? 0 : 1;
+      row.pending = true;
+      const params = {
+        id: row.id,
+        status: ns
+      };
       try {
-        const { code, message } = await this.$http.post('/outside/callcenter/api/updateStatus', {id:item.id, status:status ? 1 : 0}, false)
+        const { code, message } = await CallCenterApi.updateStatus(params)
         if (code !== 0) return this.$platform.notification({
           title: '操作失败',
           message: message || '',
           type: 'error',
         });
+        row.pending = false;
         this.$platform.notification({
           title: '操作成功',
           type: 'success',
-        });  
+        }); 
+        this.userList.forEach(c => {
+          if (c.id === row.id) {
+            c.status = ns;
+          }
+        });
       } catch (error) {
+        row.pending = false;
         console.error(error);
       }
     },
@@ -285,8 +303,10 @@ export default {
     // 坐席修改提交
     async submit(item, type) {
       try {
-        const { status, message } = await this.$http.post('/outside/callcenter/api/updateAgent', {id:item.id, phone:item.phone}, false)
-        if (status !== 0) return this.$platform.notification({
+        this.pending = true
+        const { code, message } = await CallCenterApi.updateAgent({id:item.id, phone:item.phone})
+        this.pending = false
+        if (code !== 0) return this.$platform.notification({
           title: '提交失败',
           message: message || '',
           type: 'error',
@@ -297,6 +317,7 @@ export default {
         });  
         this.getAgentList();
       } catch (error) {
+        this.pending = false
         console.error(error);
       }
     },
@@ -305,13 +326,24 @@ export default {
       console.info('item:', item)
       this.categoryDialogVisible = true
       if(item) {
+        // 如果是编辑的时候
+        this.pCategoryList = []
+        if(!item.children || !item.children.length) {
+          for (let e of this.categoryList) {
+            if(e.id != item.id) {
+              delete e.children 
+              this.pCategoryList.push(e)
+            } 
+          }
+        } 
         this.categoryId = item.id
         this.categoryForm.name = item.name 
-        this.categoryForm.parentId = item.parentId 
         if(item.parentId) {
-          this.selectedKeys = [item.parentId, item.id]
+          this.selectedKeys = [item.parentId]
+          this.categoryForm.parentId = item.parentId 
         } else {
-          this.selectedKeys = [item.id]
+          this.selectedKeys = []
+          this.categoryForm.parentId = 0
         }
       }
     },
@@ -330,9 +362,11 @@ export default {
       console.info('item-index:', item, index, type)
       try {
         if (!await this.$platform.confirm(`确定要删除该${ type === 'present' ? '坐席？' : '咨询分类？'}`)) return;
+        this.pending = true
         const url = type === 'present' ? '/outside/callcenter/api/deleteAgent' : '/outside/callcenter/api/deleteZxSort'
-        const { status, message } = await this.$http.post(url, {id:item.id}, false)
-        if (status !== 0) return this.$platform.notification({
+        const { code, message } = await this.$http.post(url, {id:item.id}, false)
+        this.pending = false
+        if (code !== 0) return this.$platform.notification({
           title: '删除失败',
           message: message || '',
           type: 'error',
@@ -341,12 +375,14 @@ export default {
           this.userList.splice(index, 1);
         } else if (type === 'category') {
           this.categoryList.splice(index, 1);  
+          this.getCategoryList()
         }  
         this.$platform.notification({
           title: '删除成功',
           type: 'success',
         }); 
       } catch (error) {
+        this.pending = false
         console.error(error);
       }
     },
@@ -359,9 +395,15 @@ export default {
     async addCategory() {
       try {
         const params = this.categoryForm;
-        if(this.categoryId) params.id = this.categoryId
+        if(this.categoryId) {
+          params.id = this.categoryId
+        } else {
+          params.id = ''
+        }
         console.info('params:', params);
-        const { code, message } = await this.$http.post('/outside/callcenter/api/saveZxSort', params, false)
+        this.pending = true
+        const { code, message } = await CallCenterApi.saveZxSort(params)
+        this.pending = false
         if (code !== 0) return this.$platform.notification({
           title: this.categoryId ? '编辑失败' : '添加失败',
           message: message || '',
@@ -375,10 +417,30 @@ export default {
         this.categoryDialogClosed()  
         this.getCategoryList()  
       } catch (error) {
+        this.pending = false
         console.error(error)
       }
     },
-   
+    // 添加坐席
+    async saveAgent(newValue) {
+      try {
+        if(!newValue.userId || !newValue.displayName) return
+        const {code, message} = await CallCenterApi.saveAgent({userId:newValue.userId, agentName: newValue.displayName})
+        if (code !== 0) return this.$platform.notification({
+          title: '添加失败',
+          message: message || '',
+          type: 'error',
+        });
+        this.$platform.notification({
+          title: '添加成功',
+          type: 'success',
+        }); 
+        this.getAgentList();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
   },
   watch: {
     selectUsers: {
@@ -387,19 +449,8 @@ export default {
       handler(newValue, oldValue) {
         console.info('new:', newValue)
         // 添加坐席成员后
-        if (newValue && newValue[0]) {
-          const {code, message} = this.$http.post('/outside/callcenter/api/saveAgent', {userId:newValue[0].userId, agentName: newValue[0].displayName}, false)
-          // this.addUser(newValue[0])
-          if (code !== 0) return this.$platform.notification({
-            title: '添加失败',
-            message: message || '',
-            type: 'error',
-          });
-          this.$platform.notification({
-            title: '添加成功',
-            type: 'success',
-          }); 
-          this.getAgentList();
+        if (newValue) {
+          this.saveAgent(newValue)
         }
       }
     }
@@ -485,13 +536,19 @@ export default {
       min-width: 920px;
       box-sizing: border-box;
       min-height: 100vh;
+
       .service-line {
         background: #fff;
         p {
           font-size: 20px;
           font-weight: 500;
-          padding: 20px 108px;
+          padding: 15px;
           margin: 0;
+          img {
+            width: 36px;
+            height: 36px;
+            margin-right: 10px;
+          }
         }
         .info {
           display: flex;
@@ -502,7 +559,9 @@ export default {
             flex: 1;
             margin: 12px;
             i {
-              margin-top: 10px;
+              margin-top: 5px;
+              font-size: 24px;
+              color: #55B7B4;
             }
             .item-content {
               flex: 1;
@@ -510,6 +569,12 @@ export default {
               border-right: 1px solid rgba(235, 237, 237, 1);
               text-align: left;
               margin-left: 10px;
+              .icon-agent-tip{
+                color: #b9bfbd;
+                margin-left: 10px;
+                margin-top: 0;
+                font-size: 18px;
+              }
               p {
                 padding: 0;
                 font-size: 16px;
@@ -567,6 +632,16 @@ export default {
       }
     }
   }
+  
+  .el-form-item--small .el-form-item__label {
+    position: relative;
+    padding-left: 10px;
+  }
+  .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
+    position: absolute;
+    left: -5px;
+  }
+
 }
 
 .el-table .warning-row {

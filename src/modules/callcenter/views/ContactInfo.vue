@@ -2,18 +2,17 @@
   <div class="call-center-contact-info">
     <h4>通话信息</h4>
     <div class="call-info">
-      <p>呼入电话：<span>15200000000</span></p>
-      <p>今日来电：<span>3</span></p>
+      <p>呼入电话：<span>{{linkmanPhone}}</span></p>
+      <p>今日来电：<span>{{dialCount}}</span></p>
     </div>
     <div class="call-info">
-      <p>归属地：<span>浙江杭州</span></p>
-      <p>呼入时间：<span>2020-05-12 12:30</span></p>
+      <p>归属地：<span>{{callDetail.attribution}}</span></p>
+      <p>呼入时间：<span>{{callDetail.ring}}</span></p>
     </div>
     <h4 class="customer-info-header">客户信息</h4>
     <div class="customer-info">
-      <!-- <audio src="http://65.ierge.cn/12/186/372266.mp3" controls="controls" preload style="height:42px;"></audio>  -->
       <template v-if="unknown">
-        <p>未完成的事件：<span class="unFinishEvent">{{unfinishedEventCount}}</span></p>
+        <p>未完成的事件：<span class="unFinishEvent">{{contact.unfinishedEventCount}}</span></p>
         <div v-if="showCreateUser" class="customer-container" v-loading.fullscreen.lock="loadingPage">
           <form @submit.prevent="submit" class="base-form" v-if="init">
             <customer-edit-form :fields="fields" v-model="form" ref="form" />
@@ -24,8 +23,8 @@
         <div v-else>
           <p>客户：<span>未知</span></p>
           <p>联系人：<span>未知</span></p>
-          <base-button type="primary" @event="showCreateUser=true">新建客户</base-button>
-          <base-button type="ghost" @event="saveDialogVisible=true">添加到现有客户</base-button>
+          <el-button :disabled="!linkmanPhone" type="primary" @click="showCreateUser=true">新建客户</el-button>
+          <el-button :disabled="!linkmanPhone" type="ghost" @click="saveDialog(linkmanPhone)" style="margin-left:10px;">添加到现有客户</el-button>
         </div>
       </template>
       <template v-else>
@@ -43,7 +42,7 @@
       <template v-if="unknown">
         <el-tooltip content="请新建客户或添加到现有客户" placement="top" :enterable="false">
           <el-dropdown trigger="click">
-            <el-button type="primary" size="mini" disabled>新建工单</el-button>
+            <el-button type="info" plain size="mini" disabled>新建工单</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="type in taskTypes" :key="type.id">
                 <span class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</span>
@@ -74,7 +73,7 @@
       <template v-if="unknown">
         <el-tooltip content="请新建客户或添加到现有客户" placement="top" :enterable="false">
           <el-dropdown trigger="click">
-            <el-button type="primary" size="mini" disabled>新建事件</el-button>
+            <el-button type="info" plain size="mini" disabled>新建事件</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="event in eventTypes" :key="event.id">
                 <span class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</span>
@@ -106,11 +105,10 @@
       <!-- 内容主体区域 -->
       <el-form :model="saveForm" :rules="saveFormRules" ref="saveFormRef" label-width="100px" label-position="left">
         <el-form-item label="客户">
-          <customer-select v-model="customer" :field="customerField" :remote-method="searchCustomer" :update-customer="updateCustomer" placeholder="请输入关键字搜索客户"></customer-select>
-          <!-- <el-input v-model="saveForm.name"></el-input> -->
+          <customer-select v-model="customer" :field="customerField" :remote-method="searchCustomer" :update-customer="updateCustomer" placeholder="请选择客户"></customer-select>
         </el-form-item>
         <el-form-item label="联系人" prop="name">
-          <el-input v-model="saveForm.name"></el-input>
+          <el-input v-model="saveForm.name" placeholder="请输入联系人"></el-input>
         </el-form-item>
         <el-form-item label="联系电话" prop="phone">
           <el-input v-model="saveForm.phone" disabled></el-input>
@@ -132,13 +130,20 @@ import CustomerEditForm from '../../customer/components/CustomerEditForm.vue'
 import * as FormUtil from '@src/component/form/util'
 import * as util from '../../customer/util/customer'
 import platform from '@src/platform'
-
+import * as CallCenterApi from '@src/api/CallCenterApi'
 export default {
   name: 'contact-info',
   inject: ['initData'],
+  props: {
+    item: {
+      type: Object,
+      default: () => ({})
+    },
+  },
   data() {
     return {
-      linkmanPhone:'18397952979',
+      callDetail:{},
+      // linkmanPhone:'18397952979',
       unknown: true,
       contact: {},
       showCreateUser: false,
@@ -147,13 +152,11 @@ export default {
       loadingPage: false,
       form: {},
       init: false,
-      customerId: 'd68cc004-6821-11ea-bfc9-00163e304a25',
-      audioList:['http://devtest.qiniudn.com/Preparation.mp3'],
-      
+      customerId: '',
       saveDialogVisible: false,
       saveForm: {
         name: '',
-        phone: '15200000000'
+        phone: this.linkmanPhone
       },
       saveFormRules: {
         name: [{ required: true, message: '请选择客户', trigger: 'blur' }]
@@ -166,6 +169,15 @@ export default {
     }
   },
   computed: {
+    linkmanPhone(){
+      return this.item.dialPhone 
+    },
+    callRecordId(){
+      return this.item.id 
+    },
+    dialCount(){
+      return this.item.dialCount 
+    },
     action() {
       return 'create'
     },
@@ -205,19 +217,16 @@ export default {
       return (this.contact.eventBindRecord && this.contact.eventBindRecord.businessNo) || ''
     }
   },
-  async created () {
-    try {
-      const {status, message, data} = await this.$http.get('/customer/detail4CallCenterRemark', {linkmanPhone:this.linkmanPhone, callRecordId:2});
-      console.info('', status, message, data);
-      // 如果data为null说明是未知联系人 
-      if(!data) {
-        this.unknown = true;
-      } else {
-        this.unknown = false; 
+  watch: {
+    item: {
+      immediate: true,
+      deep: true,
+      handler(newValue, oldValue) {
+        if(newValue) {
+          this.getCallRecord(newValue.id)
+          this.getCustomerInfo()
+        }
       }
-      this.contact = data || {};
-    } catch (e) {
-      console.error(e);
     }
   },
   async mounted() {
@@ -228,11 +237,44 @@ export default {
       this.form = FormUtil.initialize(this.fields, form);
       this.init = true;
     } catch (e) {
-      console.error('CustomerEditView caught an error ', e);
+      console.error(e);
     }
   },
  
   methods: {
+    saveDialog(phone){
+      this.saveDialogVisible = true 
+      this.saveForm.phone = phone
+    },
+    // 通话信息
+    getCallRecord(id) {
+      if (!id) return
+      CallCenterApi.getCallRecord({id}).then(({ code, message, result }) => {
+        console.info('', status, message, result)
+        // 如果data为null说明是未知联系人
+        if(code !== 0) return
+        this.callDetail = result || {}
+      }).catch((err) => {
+        console.error(err)
+      })
+    },
+    // 联系人信息
+    getCustomerInfo(){
+      if(!this.linkmanPhone || !this.callRecordId) return
+      const params = {linkmanPhone:this.linkmanPhone, callRecordId:this.callRecordId}
+      CallCenterApi.getCustomerInfo(params).then(({status, message, data}) => {
+        console.info('', status, message, data);
+        // 如果data为null说明是未知联系人 
+        if(!data) {
+          this.unknown = true;
+        } else {
+          this.unknown = false; 
+        }
+        this.contact = data || {}
+      }).catch((err) => {
+        console.error(err)
+      })
+    },
     prettyAddress(adr = {}) {
       if (!adr) return '';
       let province = adr.adProvince || adr.province || '';
@@ -283,13 +325,12 @@ export default {
           this.customerId = res.data.customerId;
           // 是否还有后续动作
           console.info('createMethod:', this.customerId);
-          
+          this.getCustomerInfo();
         })
         .catch(err => console.error('err', err));
     },
     cancelCreate(){
       this.showCreateUser = false;
-
     },
     saveUser() {
       this.$refs.saveFormRef.validate(async valid => {
@@ -393,7 +434,6 @@ export default {
     updateCustomer(value) {
       console.info('value:', value);
       this.customer = value;
-      
     },
     
   },
@@ -437,11 +477,21 @@ export default {
 }
 .call-center-contact-info {
   padding: 20px;
+  
+  .el-form-item--small .el-form-item__label {
+    position: relative;
+    padding-left: 10px;
+  }
+  
+  .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
+    position: absolute;
+    left: -5px;
+  }
 
   .call-info {
     display: flex;
-    justify-content: space-between;
     p {
+      flex: 1;
       color: #999;
       span {
         color: #333;

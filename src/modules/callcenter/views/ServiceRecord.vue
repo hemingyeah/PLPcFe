@@ -1,6 +1,6 @@
 <template>
   <div class="call-center-service-record">
-    <el-card class="session-card">
+    <el-card class="session-card" shadow="hover">
       <div slot="header" @click="expand('session')">
         <span><i class="iconfont icon-nav-down toggle-up" :class="sessionToggle ? 'is-reverse': ''"></i>历史通话</span>
       </div>
@@ -8,18 +8,18 @@
         <img src="../../../assets/img/avatar.png">
         <div class="list-content">
           <div class="list-header">
-            <p>张三</p>
-            <p>2020-03-01 18:00</p>
+            <p>{{item.agentName}}</p>
+            <p>{{item.ring}}</p>
           </div>
-          <el-tag>类型一</el-tag>
-          <el-tag type="danger">标签五</el-tag>
+          <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
+          <el-tag :type="item.status ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
           <div class="remark">
-            <p>备注备注备注备注备注备注备注备注</p>
+            <p>{{item.remark}}</p>
           </div>
         </div>
       </div>
     </el-card>
-    <el-card class="task-card">
+    <el-card class="task-card" shadow="hover">
       <div slot="header" @click="expand('task')">
         <span><i class="iconfont icon-nav-down toggle-up" :class="taskToggle ? 'is-reverse': ''"></i>历史工单</span>
       </div>
@@ -40,7 +40,7 @@
         </div>
       </div>
     </el-card>
-    <el-card class="event-card">
+    <el-card class="event-card" shadow="hover">
       <div slot="header" @click="expand('event')">
         <span><i class="iconfont icon-nav-down toggle-up" :class="eventToggle ? 'is-reverse': ''"></i>历史事件</span>
       </div>
@@ -65,8 +65,15 @@
 </template>
 
 <script>
+import * as CallCenterApi from '@src/api/CallCenterApi'
 export default {
   name: 'service-record',
+  props: {
+    item: {
+      type: Object,
+      default: () => ({})
+    },
+  },
   data() {
     return {
       sessionToggle: false,
@@ -75,60 +82,56 @@ export default {
       showSession: false,
       showTask: false,
       showEvent: false,
-      linkmanPhone: '18397952974',
-      sessionList: [{ id: 1 }, { id: 2 }, { id: 3 }],
+      // linkmanPhone: '18397952974',
+      sessionList: [],
       taskList: [],
       eventList: []
     }
   },
-  created() {
-    // this.getSession();
-    this.getTaskList()
-    this.getEventList()
+  watch: {
+    item: {
+      immediate: true,
+      deep: true,
+      handler(newValue, oldValue) {
+        this.getSessionList();
+        this.getTaskList()
+        this.getEventList()
+      }
+    }
   },
-  computed: {},
+  computed: {
+    linkmanPhone(){
+      return this.item.dialPhone || this.item.dialPhone
+    }
+  },
   methods: {
-    async getSessionList() {
-      try {
-        const { status, message, data } = await this.$http.get('', {
-          linkmanPhone: this.linkmanPhone
-        })
-        console.info('', status, message, data)
-
-        this.sessionList = data.list || []
-      } catch (e) {
-        console.error(e)
-      }
+    getSessionList() {
+      CallCenterApi.getHistoryCallRecordList().then(({ code, result }) => {
+        if(code !== 0) return
+        this.sessionList = result || []
+      }).catch((err) => {
+        console.error(err)
+      })
     },
-    async getTaskList() {
-      try {
-        const { status, message, data } = await this.$http.get(
-          '/task/list4CallCenterHistory',
-          {
-            linkmanPhone: this.linkmanPhone
-          }
-        )
+    getTaskList() {
+      if(!this.linkmanPhone) return
+      CallCenterApi.getTaskHistoryList({linkmanPhone: this.linkmanPhone}).then(({ status, message, data }) => {
+        if(status !== 0) return
         console.info('', status, message, data)
-
         this.taskList = data.list || []
-      } catch (e) {
-        console.error(e)
-      }
+      }).catch((err) => {
+        console.error(err)
+      })
     },
-    async getEventList() {
-      try {
-        const { status, message, data } = await this.$http.get(
-          '/evet/list4CallCenterHistory',
-          {
-            linkmanPhone: this.linkmanPhone
-          }
-        )
+    getEventList() {
+      if(!this.linkmanPhone) return
+      CallCenterApi.getEventHistoryList({linkmanPhone: this.linkmanPhone}).then(({ status, message, data }) => {
+        if(status !== 0) return
         console.info('', status, message, data)
-
         this.eventList = data.list || []
-      } catch (e) {
-        console.error(e)
-      }
+      }).catch((err) => {
+        console.error(err)
+      })
     },
     expand(type) {
       switch (type) {

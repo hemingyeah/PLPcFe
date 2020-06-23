@@ -2,14 +2,14 @@
   <div class="call-center-stats-container">
 
     <div class="stats-station-header">
-      <p>呼叫中心号码：<span>400-2404670</span></p>
-      <p>坐席数：<span>4/3</span>
+      <p>呼叫中心号码：<span>{{callState.hotLine}}</span></p>
+      <p>坐席数：<span>{{callState.agentNum}}</span>
         <el-tooltip content="已购买/已使用">
           <i class="iconfont icon-info"></i>
         </el-tooltip>
       </p>
-      <p>到期时间：<span>2002-02-18</span></p>
-      <p>话费余额：<span class="money">100元</span></p>
+      <p>到期时间：<span>{{callState.endTime}}</span></p>
+      <p>话费余额：<span class="money">{{callState.cost}}元</span></p>
 
     </div>
     <div class="stats-station-today-header">今日统计</div>
@@ -17,33 +17,33 @@
 
       <div class="stats-station-card">
         <p>呼入已接通话量</p>
-        <h3>1223</h3>
-        <div class="card-bottom">未接来电：50 接通率：66.7%
+        <h3> {{statisticsRecord.normalDealingCount}}</h3>
+        <div class="card-bottom">未接来电：{{statisticsRecord.normalNotDealCount}} 接通率：{{statisticsRecord.normalDealingRate}}
         </div>
       </div>
 
       <div class="stats-station-card">
         <p>呼入已解决通话</p>
-        <h3>1223</h3>
-        <div class="card-bottom">解决率：66.7%</div>
+        <h3>{{statisticsRecord.normalSolvedCount}}</h3>
+        <div class="card-bottom">解决率：{{statisticsRecord.normalSolvedRate}}</div>
       </div>
 
       <div class="stats-station-card">
         <p>呼入通话时长</p>
-        <h3>1小时30分</h3>
-        <div class="card-bottom">平均通话时长：90秒</div>
+        <h3>{{statisticsRecord.totalNormalDealings}}</h3>
+        <div class="card-bottom">平均通话时长：{{statisticsRecord.avgNormalDealings}}</div>
       </div>
 
       <div class="stats-station-card">
         <p>呼出通话量</p>
-        <h3>1小时30分</h3>
-        <div class="card-bottom">未接来电：50 接通率：66.7%</div>
+        <h3>{{statisticsRecord.dialoutDealingCount}}</h3>
+        <div class="card-bottom">未接来电：{{statisticsRecord.dialoutNotDealCount}} 接通率：{{statisticsRecord.dialoutDealingRate}}</div>
       </div>
 
       <div class="stats-station-card">
         <p>呼出通话时长</p>
-        <h3>1小时30分</h3>
-        <div class="card-bottom">平均通话时长：1分30秒</div>
+        <h3>{{statisticsRecord.totalDialoutDealings}}</h3>
+        <div class="card-bottom">平均通话时长：{{statisticsRecord.avgDialoutDealings}}</div>
       </div>
 
     </div>
@@ -56,7 +56,7 @@
             <el-input v-model="params.keyword" placeholder="根据客户信息搜索">
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
-            <base-button type="primary" @event="params.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button>
+            <base-button type="primary" @event="params.pageNum=1;getRecordList();trackEventHandler('search')" native-type="submit">搜索</base-button>
             <base-button type="ghost" @event="resetParams">重置</base-button>
           </div>
           <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">
@@ -92,75 +92,29 @@
           <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection" @toggle-selection="toggleSelection" @show-panel="() => multipleSelectionPanelShow = true" />
         </div>
 
-        <!-- <el-table :data="customers" stripe @select-all="handleSelection" :row-key="getRowKey" header-row-class-name="customer-table-header" ref="multipleTable" class="customer-table">
-             
+        <el-table :data="recordList" stripe @select-all="handleSelection" :row-key="getRowKey" header-row-class-name="customer-table-header" ref="multipleTable" class="customer-table">
           <el-table-column v-for="column in columns" v-if="column.show" :key="column.field" :label="column.label" :prop="column.field" :width="column.width" :min-width="column.minWidth || '120px'"
                            :class-name="column.field == 'name' ? 'customer-name-superscript-td' : ''" :show-overflow-tooltip="column.field !== 'name'" :align="column.align">
             <template slot-scope="scope">
-              <template v-if="column.field === 'name'">
-                <sample-tooltip :row="scope.row">
-                  <template slot="content" slot-scope="{isContentTooltip}">
-                    <el-tooltip :content="scope.row[column.field]" placement="top" :disabled="!isContentTooltip">
-                      <a href :class="scope.row.isGuideData ? column.className : ''" class="view-detail-btn" @click.stop.prevent="createCustomerTab(scope.row.id)">
-                        <pre class="pre-text">{{ scope.row[column.field] }}</pre>
-                      </a>
-                    </el-tooltip>
-                  </template>
-                </sample-tooltip>
-              </template>
-              <template v-else-if="column.field === 'customerAddress'">
-                {{formatAddress(scope.row[column.field])}}
-              </template>
-              <template v-else-if="column.field === 'detailAddress'">
-                <pre class="pre-text">{{scope.row.customerAddress && scope.row.customerAddress.adAddress}}</pre>
-              </template>
-              <template v-else-if="column.field === 'tags' && scope.row.tags">
-                {{scope.row.tags | tagName}}
+              <template v-if="column.field === 'callType'">
+                {{fmt_callType(scope.row[column.field])}}
               </template>
               <template v-else-if="column.field === 'status'">
-                <el-switch :disabled="scope.row.pending" @change="toggleStatus(scope.row)" :value="Boolean(scope.row.status)"></el-switch>
+                <span v-if="scope.row[column.field] == 0" style="color:#FB602C">未解决</span>
+                <span v-else-if="scope.row[column.field] == 1">已解决</span>
               </template>
-              <template v-else-if="column.field === 'updateTime'">
-                <template v-if="scope.row.latesetUpdateRecord">
-                  <el-tooltip class="item" effect="dark" :content="scope.row.latesetUpdateRecord" placement="top">
-                    <div @mouseover="showLatestUpdateRecord(scope.row)">{{scope.row[column.field]}}</div>
-                  </el-tooltip>
-                </template>
-                <template v-else>
-                  <div @mouseover="showLatestUpdateRecord(scope.row)">{{scope.row[column.field]}}</div>
-                </template>
+              <template v-else-if="column.field === 'operation'">
+                <!-- 处理未接来电 -->
+                <el-button type="text" :disabled="scope.row.callType!='notDeal'" @click="dealDialog(scope.row)">处理</el-button>
+                <el-button type="text" @click="detail(scope.row)">详情</el-button>
               </template>
-              <template v-else-if="column.field === 'createUser'">
-                {{scope.row.createUserName}}
-              </template>
-              <template v-else-if="column.field === 'remindCount'">
-                {{scope.row.attribute.remindCount || 0}}
-              </template>
-              <template v-else-if="column.formType === 'select' && scope.row.attribute[column.field]">
-                {{scope.row.attribute[column.field] | displaySelect}}
-              </template>
-              <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-                {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
-              </template>
-              <template v-else-if="column.formType === 'location'">
-                {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
-              </template>
-
-              <template v-else-if="column.formType === 'address'">
-                {{formatCustomizeAddress(scope.row.attribute[column.field])}}
-              </template>
-
-              <div class="pre-text" v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink"></div>
-
-              <template v-else-if="column.isSystem === 0">
-                <pre class="pre-text">{{scope.row.attribute[column.field]}}</pre>
-              </template>
+             
               <template v-else>
                 <pre class="pre-text">{{scope.row[column.field]}}</pre>
               </template>
             </template>
           </el-table-column>
-        </el-table> -->
+        </el-table>
 
         <div class="table-footer">
           <el-pagination class="customer-table-pagination" background @current-change="jump" @size-change="handleSizeChange" :page-sizes="[10, 20, 50]" :page-size="params.pageSize" :current-page="params.pageNum"
@@ -171,7 +125,7 @@
 
       <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" />
 
-      <search-panel :config="{fields: this.initData.fieldInfo}" ref="searchPanel">
+      <search-panel ref="searchPanel">
         <div class="advanced-search-btn-group" slot="footer">
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button type="primary" @event="powerfulSearch" native-type="submit">搜索</base-button>
@@ -183,19 +137,19 @@
       <!-- 内容主体区域 -->
       <el-form :model="missCallForm" ref="missCallFormRef" label-width="100px" label-position="left">
         <el-form-item label="呼叫电话">
-          15700079887 <span><i class="iconfont el-icon-phone"></i> 拨打电话</span>
+          {{missCallForm.dialPhone}} <span class="make-phone-call" @click="makePhoneCall(missCallForm.dialPhone)">拨打电话<i class="iconfont icon-dianhua1"></i></span>
         </el-form-item>
         
         <el-form-item label="处理状态">
-          <el-radio-group v-model="missCallForm.status">
+          <el-radio-group v-model="missCallForm.handleStatus">
             <el-radio :label="0">未处理</el-radio>
             <el-radio :label="1">已处理</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="备注" prop="remark">
+        <el-form-item label="备注" prop="handleRemark">
           <el-input type="textarea"
                     placeholder="请输入备注"
-                    v-model="missCallForm.remark"
+                    v-model="missCallForm.handleRemark"
                     maxlength="500"
                     show-word-limit></el-input>
         </el-form-item>
@@ -213,7 +167,7 @@
 import _ from 'lodash'
 import { formatDate } from '../../../util/lang'
 import SearchPanel from '../component/SearchPanel'
-
+import * as CallCenterApi from '@src/api/CallCenterApi'
 export default {
   name: 'stage',
   props: {
@@ -227,12 +181,13 @@ export default {
       pending: false,
       loadingListData: false,
       activeName: '全部',
-      
+      callState: {},
+      statisticsRecord: {},
       params: {
-        orderDetail: {},
-        moreConditions: {
-          conditions: []
-        },
+        // orderDetail: {},
+        // moreConditions: {
+        //   conditions: []
+        // },
         keyword: '',
         pageNum: 1,
         pageSize: 10
@@ -240,16 +195,18 @@ export default {
       totalItems: 0,
       multipleSelection: [],
       defaultAddress: [],
-      // data from remote
-      customers: [],
+    
+      recordList: [],
       columns: this.fixedColumns(),
       selectedLimit: 500,
       columnNum: 1,
       tableKey: (Math.random() * 1000) >> 2,
       missCallDialogVisible: false,
       missCallForm: {
-        status: 0,
-        remark: ''
+        id:'',
+        dialPhone:'',
+        handleStatus: 0,
+        handleRemark: ''
       },
     
     }
@@ -262,45 +219,140 @@ export default {
   },
 
   mounted() {
+    this.getTodayCallState()
+    this.getTodayStatisticsRecord()
     this.columns = this.buildTableColumn()
-    this.search()
+    this.getRecordList()
+  
+    // this.search()
   },
 
   methods: {
+    // 处理未接来电打电话
+    async makePhoneCall(tel){
+      if(!tel) return
+      try {
+        await this.$http.post('/outside/callcenter/api/dialout', {phone:tel, taskType:'未接来电'}, false)
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getRecordList(){
+      try {
+        let {code, message, result} = await CallCenterApi.getRecordList(this.params)
+        if (code != 0) return this.$message.error(message || '内部错误')
+        if (!result || !result.list) {
+          this.recordList = [];
+          this.totalItems = 0;
+          this.params.pageNum = 1;
+        } else {
+          const { total, pageNum, list } = result;
+          this.recordList = list.map(c => {
+            c.pending = false;
+            return c;
+          });
+          this.totalItems = total;
+          this.params.pageNum = pageNum;
+          this.matchSelected(); // 把选中的匹配出来
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    getTodayCallState(){
+      CallCenterApi.getTodayCallState().then(({code, message, result}) => {
+        if (code != 0) return this.$message.error(message || '内部错误')
+        this.callState = result || {}
+      }).catch((err) => {
+        console.error(err)
+      })
+    },
+
+    getTodayStatisticsRecord(){
+      CallCenterApi.getTodayStatisticsRecord().then(({code, message, result}) => {
+        if (code != 0) return this.$message.error(message || '内部错误')
+        this.statisticsRecord = result || {}
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+
     stateChangeHandler (state) {
       console.info('state:', state); 
       // 切换tab
-      this.activeName = state;     
+      this.activeName = state; 
+      switch (state) {
+      case '全部':
+        this.params.state = ''
+        break;
+      case '已接来电':
+        this.params.state = 'dealing'
+        break;
+      case '未接来电':
+        this.params.state = 'notDeal'
+        break;
+      case '呼出电话':
+        this.params.state = 'dialout'
+        break;
+      default:
+        break;
+      }
+      this.getRecordList()
     },
-    powerfulSearch() {
-      this.params.pageNum = 1
-      this.params.moreConditions = this.$refs.searchPanel.buildParams()
 
-      this.search()
+    powerfulSearch() {
+      // 高级搜索
+      let keyword = this.params.keyword
+      this.params = {
+        keyword,
+        pageNum: 1,
+        pageSize: 10
+      }
+      // this.params.pageNum = 1
+      // this.params.moreConditions = this.$refs.searchPanel.buildParams()
+      const moreConditions = this.$refs.searchPanel.buildParams().conditions || []
+      
+      moreConditions.forEach(item=>{
+        if(item.property == 'sortId') {
+          // 咨询分类
+          this.params.sortId = item.value[0].id || ''
+        }else if(item.property == 'ringTime') {
+          this.params.ringStartTime = item.betweenValue1 || ''
+          this.params.beginTimeStart = item.betweenValue2 || ''
+        } else if(item.property == 'beginTime') {
+          this.params.beginTimeStart = item.betweenValue1 || ''
+          this.params.beginTimeEnd = item.betweenValue2 || ''
+        } else if(item.property == 'endTime') { 
+          this.params.endTimeStart = item.betweenValue1 || ''
+          this.params.endTimeEnd = item.betweenValue2 || ''
+        } else {
+          this.params[item.property] = item.value || ''
+        }
+      })
+      // console.log(this.params); 
+      this.getRecordList() 
+      // this.search()
     },
     showAdvancedSetting() {
-      window.TDAPP.onEvent('pc：通话记录-选择列事件')
-
+      // window.TDAPP.onEvent('pc：通话记录-选择列事件')
+      
+      console.info('open;', this.columns);
+       
       this.$refs.advanced.open(this.columns)
     },
-    createCustomerTab(customerId) {
-      let fromId = window.frameElement.getAttribute('id')
+    // createCustomerTab(customerId) {
+    //   let fromId = window.frameElement.getAttribute('id')
 
-      this.$platform.openTab({
-        id: `customer_view_${customerId}`,
-        title: '客户详情',
-        close: true,
-        url: `/customer/view/${customerId}?noHistory=1`,
-        fromId
-      })
-    },
-    setAdvanceSearchColumn(command) {
-      this.columnNum = Number(command)
-      localStorage.setItem(
-        'customer_list_advance_search_column_number',
-        command
-      )
-    },
+    //   this.$platform.openTab({
+    //     id: `customer_view_${customerId}`,
+    //     title: '客户详情',
+    //     close: true,
+    //     url: `/customer/view/${customerId}?noHistory=1`,
+    //     fromId
+    //   })
+    // },
+    
     formatAddress(ad) {
       if (null == ad) return ''
 
@@ -321,42 +373,42 @@ export default {
       }
       if (column_number) this.columnNum = Number(column_number)
     },
-    search() {
-      const params = this.buildParams()
+    // search() {
+    //   const params = this.buildParams()
 
-      this.loadingListData = true
+    //   this.loadingListData = true
 
-      return this.$http
-        .post('/customer/list', params)
-        .then(res => {
-          if (!res || !res.list) {
-            this.customers = []
-            this.totalItems = 0
-            this.params.pageNum = 1
-          } else {
-            const { total, pageNum, list } = res
+    //   return this.$http
+    //     .post('/customer/list', params)
+    //     .then(res => {
+    //       if (!res || !res.list) {
+    //         this.customers = []
+    //         this.totalItems = 0
+    //         this.params.pageNum = 1
+    //       } else {
+    //         const { total, pageNum, list } = res
 
-            this.customers = list.map(c => {
-              c.pending = false
-              return c
-            })
+    //         this.customers = list.map(c => {
+    //           c.pending = false
+    //           return c
+    //         })
 
-            this.totalItems = total
-            this.params.pageNum = pageNum
-            this.matchSelected() // 把选中的匹配出来
-          }
+    //         this.totalItems = total
+    //         this.params.pageNum = pageNum
+    //         this.matchSelected() // 把选中的匹配出来
+    //       }
 
-          return res
-        })
-        .then(() => {
-          this.$refs.customerListPage.scrollTop = 0
-          this.loadingListData = false
-        })
-        .catch(err => {
-          this.loadingListData = false
-          console.error('err', err)
-        })
-    },
+    //       return res
+    //     })
+    //     .then(() => {
+    //       this.$refs.customerListPage.scrollTop = 0
+    //       this.loadingListData = false
+    //     })
+    //     .catch(err => {
+    //       this.loadingListData = false
+    //       console.error('err', err)
+    //     })
+    // },
     buildParams() {
       const sm = Object.assign({}, this.params)
       let params = {
@@ -365,36 +417,89 @@ export default {
         pageNum: sm.pageNum
       }
 
-      if (Object.keys(sm.orderDetail || {}).length) {
-        params.orderDetail = sm.orderDetail
-      }
+      // if (Object.keys(sm.orderDetail || {}).length) {
+      //   params.orderDetail = sm.orderDetail
+      // }
 
-      if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
-      ) {
-        params = {
-          ...params,
-          ...sm.moreConditions
-        }
-      }
+      // if (
+      //   Object.keys(sm.moreConditions).length > 1 ||
+      //   sm.moreConditions.conditions.length
+      // ) {
+      //   params = {
+      //     ...params,
+      //     ...sm.moreConditions
+      //   }
+      // }
 
       return params
     },
 
     jump(pageNum) {
       this.params.pageNum = pageNum
-      this.search()
+      // this.search()
+      this.getRecordList()
     },
     handleSizeChange(pageSize) {
       this.saveDataToStorage('pageSize', pageSize)
       this.params.pageNum = 1
       this.params.pageSize = pageSize
-      this.search()
+      // this.search()
+      this.getRecordList()
     },
+    handleSelection(selection) {
+      let tv = this.computeSelection(selection);
+      let original = this.multipleSelection.filter(ms =>
+        this.customers.some(cs => cs.id === ms.id)
+      );
+      let unSelected = this.customers.filter(c =>
+        original.every(oc => oc.id !== c.id)
+      );
 
+      if (tv.length > this.selectedLimit) {
+        this.$nextTick(() => {
+          original.length > 0
+            ? unSelected.forEach(row => {
+              this.$refs.multipleTable.toggleRowSelection(row, false);
+            })
+            : this.$refs.multipleTable.clearSelection();
+        });
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+      }
+      this.multipleSelection = tv;
+
+      this.$refs.baseSelectionBar.openTooltip();
+    },
+    computeSelection(selection) {
+      let tv = [];
+      tv = this.multipleSelection.filter(ms =>
+        this.customers.every(c => c.id !== ms.id)
+      );
+      tv = _.uniqWith([...tv, ...selection], _.isEqual);
+      return tv;
+    },
+    toggleSelection(rows) {
+      let isNotOnCurrentPage = false;
+      let row = undefined;
+
+      if (rows) {
+        for (let i = 0; i < rows.length; i++) {
+          row = rows[i];
+          isNotOnCurrentPage = this.recordList.every(item => {
+            return item.id !== row.id;
+          });
+          if (isNotOnCurrentPage) return;
+        }
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+        this.multipleSelection = [];
+      }
+    },
     // columns
     modifyColumnStatus(event) {
+      console.log(event);
       let columns = event.data || []
       let colMap = columns.reduce(
         (acc, col) => (acc[col.field] = col) && acc,
@@ -418,13 +523,13 @@ export default {
     },
     // common methods
     getLocalStorageData() {
-      const dataStr = localStorage.getItem('customerListData') || '{}'
+      const dataStr = localStorage.getItem('callCenterListData') || '{}'
       return JSON.parse(dataStr)
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData()
       data[key] = value
-      localStorage.setItem('customerListData', JSON.stringify(data))
+      localStorage.setItem('callCenterListData', JSON.stringify(data))
     },
     buildTableColumn() {
       const localStorageData = this.getLocalStorageData()
@@ -434,14 +539,7 @@ export default {
         .reduce((acc, col) => (acc[col.field] = col) && acc, {})
 
       let baseColumns = this.fixedColumns()
-      let dynamicColumns = this.customerConfig.fieldInfo
-        .filter(
-          f =>
-            !f.isSystem &&
-            f.formType !== 'attachment' &&
-            f.formType !== 'separator' &&
-            f.formType !== 'info'
-        )
+      let dynamicColumns = this.getDynamicColumns()
         .map(field => {
           let sortable = false
           let minWidth = null
@@ -451,13 +549,13 @@ export default {
             minWidth = 100
           }
 
-          if (field.displayName.length > 4) {
-            minWidth = field.displayName.length * 20
-          }
+          // if (field.displayName.length > 4) {
+          //   minWidth = field.displayName.length * 20
+          // }
 
-          if (sortable && field.displayName.length >= 4) {
-            minWidth = 125
-          }
+          // if (sortable && field.displayName.length >= 4) {
+          //   minWidth = 125
+          // }
 
           if (field.formType === 'datetime') {
             minWidth = 150
@@ -494,110 +592,175 @@ export default {
       return columns
     },
     resetParams() {
-      window.TDAPP.onEvent('pc：客户管理-重置事件')
+      // window.TDAPP.onEvent('pc：客户管理-重置事件')
       this.$refs.searchPanel.resetParams()
 
       this.params = {
         keyword: '',
         pageNum: 1,
         pageSize: this.params.pageSize,
-        orderDetail: {},
-        moreConditions: {
-          conditions: []
-        }
+        // orderDetail: {},
+        // moreConditions: {
+        //   conditions: []
+        // }
       }
+      this.getRecordList()
+      // this.search()
+    },
+    // match data
+    matchSelected() {
+      if (!this.multipleSelection.length) return;
+      const selected = this.recordList.filter(c => {
+        if (this.multipleSelection.some(sc => sc.id === c.id)) {
+          this.multipleSelection = this.multipleSelection.filter(
+            sc => sc.id !== c.id
+          );
+          this.multipleSelection.push(c);
+          return c;
+        }
+      }) || [];
 
-      this.search()
+      this.$nextTick(() => {
+        this.toggleSelection(selected);
+      });
+    },
+    fmt_callType(type){
+      // 呼叫类型：已接：dealing 未接：notDeal 呼出：dialout
+      let res = ''
+      switch (type) {
+      case 'dealing':
+        res = '已接' 
+        break;
+      case 'notDeal':
+        res = '未接' 
+        break;
+      case 'dialout':
+        res = '呼出' 
+        break;
+      default:
+        break;
+      }
+      return res
     },
     fixedColumns() {
       return [
         {
-          label: '客户',
-          field: 'name',
+          label: '通话ID',
+          field: 'callId',
           show: true,
-          fixed: true,
           minWidth: '150px'
         },
         {
-          label: '客户编号',
-          field: 'serialNumber',
+          label: '接待坐席',
+          field: 'agentName',
           // width: '150px',
-          fixed: true,
           show: true
         },
         {
-          label: '联系人',
-          field: 'lmName',
+          label: '呼叫类型',
+          field: 'callType',
           // width: '100px',
           show: true
         },
         {
-          label: '电话',
-          field: 'lmPhone',
-          // width: '130px',
+          label: '来去电时间',
+          field: 'ring',
+          width: '180px',
           show: true
         },
         {
-          label: '区域',
-          field: 'customerAddress',
+          label: '咨询分类',
+          field: 'sortName',
           // width: '180px',
           show: true
         },
         {
-          label: '详细地址',
-          field: 'detailAddress',
+          label: '解决状态',
+          field: 'status',
           // width: '160px',
           show: true
         },
         {
-          label: '服务团队',
-          field: 'tags',
-          // width: '110px',
-          show: true
-        },
-        {
-          label: '客户负责人',
-          field: 'customerManagerName',
+          label: '呼叫电话',
+          field: 'dialPhone',
           show: true,
-          width: '110px'
+          // width: '110px'
         },
+        // {
+        //   label: '客户',
+        //   field: 'status',
+        //   show: true,
+        //   align: 'center',
+        //   width: '100px'
+        // },
+        // {
+        //   label: '联系人',
+        //   field: 'createTime',
+        //   show: true,
+        //   width: '150px'
+        // },
         {
-          label: '启用/禁用',
-          field: 'status',
+          label: '消耗话费(元)',
+          field: 'cost',
           show: true,
-          align: 'center',
-          width: '100px'
+          // width: '150px'
         },
         {
-          label: '创建时间',
-          field: 'createTime',
-          show: true,
-          sortable: 'custom',
-          width: '150px'
-        },
-        {
-          label: '最近更新',
-          field: 'updateTime',
-          show: true,
-          sortable: 'custom',
-          width: '150px'
-        },
-        {
-          label: '创建人',
-          field: 'createUser',
-          // width: '80px',
-          show: true
-        },
-        {
-          label: '提醒数量',
-          field: 'remindCount',
+          label: '操作',
+          field: 'operation',
           // width: '80px',
           show: true
         }
       ]
     },
+    getDynamicColumns(){
+      return [
+        {
+          displayName: '归属地',
+          label: '归属地',
+          fieldName: 'attribution',
+          // width: '150px',
+          show: false
+        },
+        {
+          displayName: '通话开始时间',
+          label: '通话开始时间',
+          fieldName: 'beginTime',
+          // width: '150px',
+          show: false
+        },
+        {
+          displayName: '通话结束时间',
+          label: '通话结束时间',
+          fieldName: 'endTime',
+          // width: '150px',
+          show: false
+        },
+        {
+          displayName: '通话时长',
+          label: '通话时长',
+          fieldName: 'talkTime',
+          // width: '150px',
+          show: false
+        },
+        {
+          displayName: '关联工单',
+          label: '关联工单',
+          fieldName: 'taskId',
+          // width: '150px',
+          show: false
+        },
+        {
+          displayName: '关联事件',
+          label: '关联事件',
+          fieldName: 'eventId',
+          // width: '150px',
+          show: false
+        },
+      ]
+    },
     panelSearchAdvancedToggle() {
-      window.TDAPP.onEvent('pc：客户管理-高级搜索事件')
+      // window.TDAPP.onEvent('pc：客户管理-高级搜索事件')
       this.$refs.searchPanel.open()
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form')
@@ -609,28 +772,58 @@ export default {
     },
     // TalkingData事件埋点
     trackEventHandler(type) {
-      if (type === 'search') {
-        window.TDAPP.onEvent('pc：客户管理-搜索事件')
-        return
-      }
+      // if (type === 'search') {
+      //   window.TDAPP.onEvent('pc：呼叫工作台-搜索事件')
+      //   return
+      // }
     },
     getRowKey(row) {
       return row.id
     },
-    detail(){
-
+    detail(row){
+      // let fromId = window.frameElement.getAttribute('id');
+      this.$platform.openTab({
+        id: `callcenter_view_${row.id}`,
+        title: '通话详情',
+        close: true,
+        url: `/setting/callcenter/view?id=${row.id}&phone=${row.dialPhone}`,
+        fromId: 'M_CASE'
+      }); 
     },
     missCallDialogClosed() {
       this.$refs.missCallFormRef.resetFields()
     },
-    deal(){
-      // this.missCallDialogVisible = false
-      // this.missCallDialogClosed()  
-      console.info('form::', this.missCallForm);
-       
-      
-    }
-
+    dealDialog(item){
+      this.missCallDialogVisible = true
+      this.missCallForm.id = item.id  
+      this.missCallForm.dialPhone = item.dialPhone  
+    },
+    async deal(row){
+      // 处理未接来电
+      // console.info('form::', this.missCallForm);
+      try {
+        this.pending = true;
+        const params = this.missCallForm
+        delete params.dialPhone
+        const { code, message } = await CallCenterApi.updateHandleStatus(params)
+        if (code !== 0) return this.$platform.notification({
+          title: '处理失败',
+          message: message || '',
+          type: 'error',
+        })
+        this.pending = false;
+        this.missCallDialogVisible = false
+        this.missCallDialogClosed()    
+        this.$platform.notification({
+          title: '处理成功',
+          type: 'success',
+        })
+      } catch (error) {
+        this.pending = false;
+        console.error(error)
+      } 
+    },
+    
   },
 
   components: {
@@ -641,6 +834,16 @@ export default {
 
 <style lang="scss">
 $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+.make-phone-call {
+  color: #ffffff;
+  background: #55b7b4;
+  border-color: #55b7b4;
+  padding: 3px 5px;
+  border-radius: 2px;
+  height: 24px;
+  line-height: 24px;
+  margin-left: 5px;
+}
 .call-center-stats-container {
   margin: 12px;
   .stats-station-header {
@@ -652,7 +855,6 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
     p {
       flex: 1;
       margin: 0;
-      text-align: center;
       font-size: 16px;
       color: #051a13;
       font-weight: 500;
@@ -679,7 +881,7 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
     font-weight: 500;
     color: #051a13;
     align-items: center;
-    margin-top: 12px;
+    margin-top: 10px;
     padding-left: 16px;
   }
 
@@ -853,7 +1055,7 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
   // list
   .customer-list-component {
-    padding-top: 10px;
+    // padding-top: 10px;
     /*min-height: calc(100% - 100px);*/
 
     .customer-table {
