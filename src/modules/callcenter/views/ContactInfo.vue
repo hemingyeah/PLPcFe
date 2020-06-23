@@ -269,6 +269,7 @@ export default {
           this.unknown = true;
         } else {
           this.unknown = false; 
+          this.customerId = data.id || ''
         }
         this.contact = data || {}
       }).catch((err) => {
@@ -326,6 +327,7 @@ export default {
           // 是否还有后续动作
           console.info('createMethod:', this.customerId);
           this.getCustomerInfo();
+          this.showCreateUser = false;
         })
         .catch(err => console.error('err', err));
     },
@@ -338,7 +340,7 @@ export default {
         const params = this.saveForm        
         params.customerId = this.customer[0].value
         try {
-          const {status, message} = await this.$http.post('/linkman/save4Dialog', params, false)
+          const {status, message} = await this.$http.post('/linkman/save4Dialog', params)
           if (status !== 0) return this.$platform.notification({
             title: '保存失败',
             message: message || '',

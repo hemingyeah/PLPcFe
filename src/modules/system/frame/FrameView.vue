@@ -26,11 +26,11 @@
             <!-- profile -->
             <div class="frame-quick-right">
 
-              <el-popover popper-class="call-center-popper" ref="callCenterRef" v-model="showCallCenter" :visible-arrow="false">
-                <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference" @click="openCallCenterWorkbench">
+              <el-popover :popper-class="['call-center-popper',{'hide':callCenterWorkbenchVisible}]" ref="callCenterRef" v-model="showCallCenter" :visible-arrow="false">
+                <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference" @click="handleCallCenterClick">
                   <i class="iconfont icon-dianhua1"></i>
                 </button>
-                <div class="call-center-box">
+                <div class="call-center-box" >
                   <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
                   <p v-if="callData.linkmanName">{{callData.linkmanName}}</p>
                   <p v-if="callData.linkmanName">{{callData.customerName}}</p>
@@ -220,6 +220,7 @@ export default {
   inject: ['initData'],
   data() {
     return {
+      callCenterWorkbenchVisible:false,
       notificationInfo: {},
       notification: {
         count: 0
@@ -597,12 +598,13 @@ export default {
         reload: true
       })
     },
+    handleCallCenterClick() {
+      this.callCenterWorkbenchVisible = true  
+      this.openCallCenterWorkbench() 
+    },
     openCallCenterWorkbench(data) {
       // console.log('data::', data);
-      this.$nextTick(()=>{
-        this.showCallCenter = false
-      });      
-      let url = data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
+      let url = data && data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
       platform.openTab({
         id: 'callcenter_workbench',
         title: '呼叫工作台',

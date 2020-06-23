@@ -102,6 +102,12 @@
               <template v-else-if="column.field === 'status'">
                 <span v-if="scope.row[column.field] == 0" style="color:#FB602C">未解决</span>
                 <span v-else-if="scope.row[column.field] == 1">已解决</span>
+                <span v-else>-</span>
+              </template>
+              <template v-else-if="column.field === 'handleStatus'">
+                <span v-if="scope.row[column.field] == 0" style="color:#FB602C">未处理</span>
+                <span v-else-if="scope.row[column.field] == 1">已处理</span>
+                <span v-else>-</span>
               </template>
               <template v-else-if="column.field === 'operation'">
                 <!-- 处理未接来电 -->
@@ -681,6 +687,12 @@ export default {
           show: true
         },
         {
+          label: '处理状态',
+          field: 'handleStatus',
+          // width: '160px',
+          show: true
+        },
+        {
           label: '呼叫电话',
           field: 'dialPhone',
           show: true,
@@ -818,6 +830,7 @@ export default {
           title: '处理成功',
           type: 'success',
         })
+        this.getRecordList() 
       } catch (error) {
         this.pending = false;
         console.error(error)

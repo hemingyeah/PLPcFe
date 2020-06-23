@@ -21,7 +21,7 @@
              @click="handleHistoryItem(item,index)"
              @mouseover="hoverIndex = index"
              @mouseout="hoverIndex = -1">
-          <i v-if="hoverIndex===index && item.id != activeLinkId" class="iconfont icon-fe-close" @click.stop="delHistoryItem(index)"></i>
+          <i v-if="hoverIndex===index && item.id != activeLinkId" class="iconfont icon-fe-close" @click.stop="delHistoryItem(index,item)"></i>
           <div class="current-item">
             <div class="item">
               <p>{{item.linkmanName}} {{item.dialPhone}}</p>
@@ -43,7 +43,7 @@
       </keep-alive>
     </div>
     <div class="right">
-
+      <h4 style="padding-left: 10px;font-size: 16px;margin-bottom: 12px;">服务备注</h4>
       <template v-if="remarkList.length">
         <div v-for="(item, index) in remarkList" :key="item.id" class="item" @click="delRemark(item, index)">
           <div class="item-title">
@@ -196,6 +196,7 @@ export default {
         this.historyList = result || []
         if(!this.query.linkmanName) {
           this.item = this.historyList[0]
+          this.activeLinkId = this.item.id
           console.info('item:', this.item)
         }
       }).catch((err) => {
@@ -206,8 +207,22 @@ export default {
       this.activeLinkId = item.id
       this.item = item
     },
-    delHistoryItem(index) {
-      this.historyList.splice(index, 1)
+    async delHistoryItem(index, item) {
+      try {
+        const {code, message} = await CallCenterApi.deleteTodayCallRecord({id:item.id})
+        if (code !== 0) return this.$platform.notification({
+          title: '删除失败',
+          message: message || '',
+          type: 'error',
+        })
+        this.historyList.splice(index, 1)
+        this.$platform.notification({
+          title: '删除成功',
+          type: 'success',
+        })
+      } catch (e) {
+        console.error(e)
+      }
     },
     selectTab(tab) {
       this.currTab = tab

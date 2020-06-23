@@ -106,7 +106,8 @@ export default {
   },
   methods: {
     getSessionList() {
-      CallCenterApi.getHistoryCallRecordList().then(({ code, result }) => {
+      if(!this.linkmanPhone) return
+      CallCenterApi.getHistoryCallRecordList({dialPhone:this.linkmanPhone}).then(({ code, result }) => {
         if(code !== 0) return
         this.sessionList = result || []
       }).catch((err) => {

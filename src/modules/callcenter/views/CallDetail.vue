@@ -409,6 +409,7 @@ export default {
           this.unknown = true
         } else {
           this.unknown = false
+          this.customerId = data.id || ''
         }
         this.contact = data || {}
       }).catch((err) => {
@@ -472,6 +473,7 @@ export default {
           // 是否还有后续动作
           console.info('createMethod:', this.customerId)
           this.getCustomerInfo()
+          this.showCreateUser = false;
         })
         .catch(err => console.error('err', err))
     },

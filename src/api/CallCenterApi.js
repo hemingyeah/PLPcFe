@@ -136,6 +136,14 @@ export function getHistoryCallRecordList(params = {}) {
 }
 
 /**
+ * 删除今日通话记录
+ * @param {*} params 
+ */
+export function deleteTodayCallRecord(params = {}) {
+  return http.post('/outside/callcenter/api/deleteTodayCallRecord', params)
+}
+
+/**
  * 服务记录--历史工单
  * @param {*} params 
  */
