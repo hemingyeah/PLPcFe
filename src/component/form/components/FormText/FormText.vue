@@ -6,7 +6,7 @@
       @compositionstart="compositionstart"
       @compositionend="compositionend"
       @input="inputEvent"
-      :placeholder="field.placeholder?field.placeholder:placeholder"
+      :placeholder="field.placeholder ? field.placeholder : placeholder"
       :id="`form_${field.fieldName}`" 
       autocomplete="off"
       :disabled="field.disabled"/>

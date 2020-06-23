@@ -5,6 +5,7 @@ export * from './validate';
 
 const DEFAULT_PLACEHOLDER = {
   text: '最多50字',
+  textarea: '最多500字',
   number: '请输入数字',
   customerAddress: '请填写详细地址',
   relationCustomer: '由客户信息查询',
@@ -96,6 +97,7 @@ export function genPlaceholder(field, defaultText = ''){
   if(isDate(field)) key = 'date';
   if(isDatetime(field)) key = 'datetime';
   if(isSelect(field) || isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
+
   return text + (DEFAULT_PLACEHOLDER[key] || '');
 }
 /**

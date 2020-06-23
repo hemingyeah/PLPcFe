@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import TaskEditForm from './components/TaskEditForm.vue'
+import TaskEditForm from './components/TaskEditForm/TaskEditForm.vue'
 import * as TaskApi from '@src/api/TaskApi'
 import * as FormUtil from '@src/component/form/util'
 import * as util from '../util/task'
