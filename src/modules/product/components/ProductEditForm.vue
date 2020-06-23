@@ -118,6 +118,7 @@ export default {
 
     customer() {
       let customer = this.value.customer[0];
+      customer.id = customer.value;
       return customer || {};
     },
 
