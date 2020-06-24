@@ -124,7 +124,7 @@ export default {
         pageSize: this.paginationInfo.pageSize,
       };
 
-      this.$http.get('/customer/product/list', params)
+      this.$http.get('/product/getProductByPage', params)
         .then(res => {
           this.productList = res.list
             .map(product => {
