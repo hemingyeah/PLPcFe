@@ -11,18 +11,11 @@
 </template>
 
 <script>
+import { previewProps } from '@src/component/form/components/props';
+
 export default {
   name: 'form-plantime-preview',
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    }
-  },
+  props: previewProps,
   data() {
     return {
       type: this.getType(this.field.setting.dateType)

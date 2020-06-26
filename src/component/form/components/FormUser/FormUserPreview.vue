@@ -11,14 +11,11 @@
 </template>
 
 <script>
+import { previewProps } from '@src/component/form/components/props';
+
 export default {
   name: 'form-user-preview',
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    }
-  }
+  props: previewProps
 }
 </script>
 

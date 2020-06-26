@@ -30,18 +30,11 @@
 </template>
 
 <script>
+import { previewProps } from '@src/component/form/components/props';
+
 export default {
   name: 'form-customer-preview',
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    }
-  },
+  props: previewProps,
   computed: {
     customerOption() {
       return this.field.setting.customerOption || {} 

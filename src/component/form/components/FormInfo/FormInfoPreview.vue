@@ -7,19 +7,13 @@
 </template>
 
 <script>
-import {PLACE_HOLDER} from './config';
+import { previewProps } from '@src/component/form/components/props';
+import { PLACE_HOLDER } from './config';
 
 export default {
   name: 'form-info-preview',
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    },
+    ...previewProps,
     placeholder: {
       type: String,
       default: PLACE_HOLDER
