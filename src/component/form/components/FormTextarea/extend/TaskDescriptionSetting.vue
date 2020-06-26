@@ -6,20 +6,12 @@
 
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
+import { settingProps } from '@src/component/form/components/props';
 
 export default {
   name: 'task-description-setting',
   mixins: [SettingMixin],
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    }
-  },
+  props: settingProps,
   computed: {
     isSystem() {
       return this.field.isSystem === 1

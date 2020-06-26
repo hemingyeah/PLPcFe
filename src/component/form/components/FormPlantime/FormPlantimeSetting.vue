@@ -19,20 +19,12 @@
 
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
+import { settingProps } from '@src/component/form/components/props';
 
 export default {
   name: 'form-plantime-setting',
   mixins: [SettingMixin],
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    }
-  },
+  props: settingProps,
   methods: {
     updateForDom(event){
       let el = event.target;

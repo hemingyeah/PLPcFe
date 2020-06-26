@@ -10,19 +10,13 @@
 
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
+import { settingProps } from '@src/component/form/components/props';
 
 export default {
   name: 'form-select-setting-customer-tags',
   mixins: [SettingMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    },
+    ...settingProps,
     /** 用于获取FormDesign实例 */
     getContext: Function
   },

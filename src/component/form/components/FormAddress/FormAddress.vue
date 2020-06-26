@@ -24,7 +24,8 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-import {parseAddress} from '@src/api/CommonApi';
+import { parseAddress } from '@src/api/CommonApi';
+
 /* global AMap */
 export default {
   name: 'form-address',

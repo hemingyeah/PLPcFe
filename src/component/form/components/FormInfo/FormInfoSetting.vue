@@ -12,6 +12,8 @@
 
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
+import { settingProps } from '@src/component/form/components/props';
+
 import {INFO_FIELD_LENGTH_MAX} from '../../config';
 import {PLACE_HOLDER} from './config';
 
@@ -19,14 +21,7 @@ export default {
   name: 'form-info-setting',
   mixins: [SettingMixin],
   props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    },
+    ...settingProps,
     placeHolder: {
       type: String,
       default: PLACE_HOLDER
