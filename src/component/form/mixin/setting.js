@@ -1,4 +1,5 @@
-import * as config from '../config';
+/* config */
+import * as config from '@src/component/form/config';
 /* component */
 import MobileShowSetting from '@src/component/form/common/setting/MobileShowSetting.vue';
 
@@ -7,6 +8,10 @@ const SettingMixin = {
     // 是否是 工单模式
     isTaskMode() {
       return this.mode === 'task';
+    },
+    // 工单：移动端显示的 字段列表
+    mobileShowField() {
+      return this.fields.filter(field => field.isAppShow === 1);
     },
     // 名字最大长度
     nameMaxLength(){

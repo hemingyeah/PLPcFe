@@ -91,7 +91,7 @@ function createSettingComp(h, field){
     </div> 
   );
 
-  let props = { field, setting: comp, mode: this.mode, fields: this.filterFields };
+  let props = { field, setting: comp, mode: this.mode, fields: this.value };
   if(isSelect(field)) props.getContext = () => this;
   
   return h(compName, {

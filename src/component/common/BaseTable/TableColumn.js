@@ -1,4 +1,5 @@
-import * as CONFIG from './Config';
+/* config */
+import * as CONFIG from '@src/component/form/config';
 
 export default class TableColumn{
   constructor(options = {}){    
