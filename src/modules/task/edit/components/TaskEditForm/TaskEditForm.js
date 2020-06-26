@@ -1,14 +1,17 @@
+/* api */
+import * as TaskApi from '@src/api/TaskApi';
+/* components */
+import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAddressDialog.vue'
+import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue'
 /* util */
 import _ from 'lodash';
-import * as FormUtil from '@src/component/form/util';
-import { findComponentDownward } from '@src/util/assist';
-
-import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAddressDialog.vue';
-import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue';
+import * as FormUtil from '@src/component/form/util'
+import { findComponentDownward } from '@src/util/assist'
 /* Vue */
 import props from './props'
 import data from './data'
 import computed from './computed'
+import methods from './methods'
 
 export default {
   name: 'task-edit-form',
@@ -33,260 +36,14 @@ export default {
     this.$eventBus.$off('task_create_or_edit.update_address', this.bindAddress);
   },
   methods: {
-    init() {
-      this.loading = true;
-
-      // 获取客户、产品数据
-      Promise.all([
-        this.getTaskTypes(),
-        this.fetchCustomerData(),
-        this.fetchProductData()
-      ])
-        .then(res => {
-          this.loading = false;
-        })
-        .catch(err => console.error('error', err));
-    },
-    async chooseTemplate(id) {
-      let loading = this.$loading();
-      try {
-        this.taskFields = await TaskApi.getTaskTemplateFields({ templateId: id, tableName: 'task' });
-        this.taskValue = FormUtil.initialize(this.taskFields, {});
-
-        // 表单初始化
-        this.$emit('update:value', this.taskValue);
-        this.$emit('update:fields', this.taskFields);
-
-        // 清空校验结果
-        setTimeout(() => {
-          this.$refs.form.$children.map(child => {
-            if (child.$el.className == 'form-item err') {
-              child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
-            }
-          })
-        }, 0);
-
-        this.selectedType = this.taskTypesMap[id];
-        this.$emit('updatetemplateId', this.selectedType);
-      } catch (error) {
-        console.error(error)
-      }
-
-      loading.close();
-    },
-    update({ field, newValue, oldValue }) {
-      let { fieldName, displayName } = field;
-
-      if (this.$appConfig.debug) {
-        console.info(
-          `[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(
-            newValue
-          )}`
-        )
-      }
-
-      let value = this.value;
-      this.$set(value, fieldName, newValue);
-      this.$emit('input', value);
-    },
-    validate() {
-      return this.$refs.form.validate();
-    },
-    async searchCustomer(params = {}) {
-
-      try {
-        const result = await TaskApi.getTaskCustomerList(params);
-
-        if (!result || !result.list) return;
-
-        result.list = result.list.map(customer =>
-          Object.freeze({
-            label: customer.name,
-            value: customer.id,
-            ...customer
-          })
-        )
-
-        return result;
-
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async updateCustomer(value = []) {
-
-      try {
-        const result = await TaskApi.getTaskDefaultInfo({ customerId: value[0].value });
-
-        let { linkman, address } = result;
-
-        // 重置联系人和地址
-        this.$set(this.value, 'linkman', []);
-        this.$set(this.value, 'address', []);
-
-        // 绑定联系人和地址
-        linkman && this.bindLinkman(linkman);
-        address && this.bindAddress(address);
-
-        if (this.value.product && this.value.product.length) {
-          this.value.product = this.value.product.filter(item => item.customerId == value[0].value);
-        }
-
-      } catch (error) {
-        console.log('task-edit-form: updateCustomer -> error', error);
-      }
-
-      // 查询客户关联字段
-      this.selectCustomerRelation(value[0].value);
-
-    },
-    selectCustomerRelation(id) {
-      let forRelation = {
-        module: 'customer',
-        id
-      };
-
-      this.$eventBus.$emit('es.Relation.Customer', forRelation);
-    },
-    async searchLinkman(params) {
-      const pms = params || {};
-      pms.customerId = this.selectedCustomer.value;
-
-      try {
-        const data = await TaskApi.getTaskCustomerLinkman(pms);
-        
-        let result = data.result;
-        
-        if (!result || !result.list) return;
-
-        result.list = result.list.map(linkman =>
-          Object.freeze({
-            label: linkman.name + linkman.phone,
-            value: linkman.id,
-            ...linkman
-          })
-        );
-        
-        return result;  
-
-      } catch (error) {
-        console.log('task-edit-form: searchProduct -> error', error);
-      }
-
-    },
-    async updateLinkman(linkman) {
-      this.bindLinkman(linkman);
-
-      try {
-        const result = await TaskApi.getLmBindAddress({ lmId: linkman.id });
-
-        // 如果存在地址信息则绑定地址
-        result.data.id && this.bindAddress(result.data);
-
-      } catch (error) {
-        console.log('task-edit-form: updateLinkmanByCreate -> error', error);
-      }
-
-    },
-    bindLinkman(linkman) {
-      this.$set(this.value, 'linkman', [{
-        value: linkman.id,
-        label: linkman.name + linkman.phone,
-        ...linkman
-      }]);
-    },
-    async searchAddress(params) {
-      const pms = params || {};
-      pms.customerId = this.selectedCustomer.value;
-
-      try {
-        const result = await TaskApi.getTaskCustomerAddress(pms);
-
-        if (!result || !result.data) return;
-
-        result.list = result.data.map(address =>
-          Object.freeze({
-            label: address.province + address.city + address.dist + address.address,
-            value: address.id,
-            ...address
-          })
-        );
-        
-        return result;  
-
-      } catch (error) {
-        console.log('task-edit-form: searchAddress -> error', error)
-      }
-
-    },
-    bindAddress(address) {
-      this.$set(this.value, 'address', [{
-        value: address.id,
-        label: address.province + address.city + address.dist + address.address,
-        ...address
-      }]);
-    },
-    async searchProduct(params) {
-      const pms = params || {};
-      pms.customerId = this.selectedCustomer.value;
-
-      try {
-        const result = await TaskApi.getTaskCustomerProduct(pms);
-
-        if (!result || !result.list) return;
-
-        result.list = result.list.map(template =>
-          Object.freeze({
-            label: template.name,
-            value: template.id,
-            ...template
-          })
-        );
-        
-        return result;  
-
-      } catch (error) {
-        console.log('task-edit-form: searchProduct -> error', error)
-      }
-
-    },
-    async updateProduct(value) {
-
-      try {
-        // 判断客户是否存在
-        if (!this.value.customer || !this.value.customer.length) {
-          // 客户不存在时则下拉框隐藏
-          findComponentDownward(this.$refs.product, 'base-select').close();
-          const result = await TaskApi.getCustomerByProduct({ id: value[value.length - 1].value });
-
-          const customerData = [{
-            label: result.customerName,
-            value: result.customerId,
-            id: result.customerId
-          }];
-
-          this.$set(this.value, 'customer', customerData);
-          this.updateCustomer(customerData);
-        }
-
-        // 查询产品关联字段, 选一个产品才带入
-        if (value.length === 1) {
-          let forRelation = {
-            module: 'product',
-            id: value[0].value
-          }
-
-          this.$eventBus.$emit('es.Relation.Product', forRelation);
-        } else {
-          // 清空产品关联字段数据
-          this.$eventBus.$emit('es.Relation.Product', {});
-        }
-
-      } catch (error) {
-        console.log('task-edit-form: updateProduct -> error', error);
-      }
-    },
+    ...methods.fetch,
+    ...methods.render,
+    ...methods.search,
+    /** 
+     * @description 添加客户 提交
+    */
     addCustomerSubmit() {
+      // 提交
       this.customerFormDom.submit(data => {
         this.isCreateCustomer = true;
         
@@ -317,13 +74,18 @@ export default {
         })
 
         // 查询客户关联字段
-        this.selectCustomerRelation(data.id);
-
+        let customerId = data.id || '';
+        this.selectCustomerRelation(customerId);
+        // 关闭弹窗
         this.addCustomerDialog = false;
 
       });
     },
+    /** 
+     * @description 添加产品 提交
+    */
     addProductSubmit() {
+      // 提交
       this.productFormDom.submit(this.value.customer[0], data => {
 
         let productArr = this.value.product?.length ? _.cloneDeep(this.value.product) : [];
@@ -334,40 +96,284 @@ export default {
           name: data.productName,
           ...data
         })
-
+        // 绑定产品
         this.$set(this.value, 'product', productArr);
+        // 更新产品信息
         this.updateProduct(productArr);
-
+        // 关闭弹窗
         this.addProductDialog = false;
 
       });
     },
-    openDialog(action) {
+    /** 
+     * @description 绑定地址
+     * @param {Object} address 地址数据
+    */
+    bindAddress(address = {}) {
+      this.$set(this.value, 'address', [{
+        value: address.id,
+        label: address.province + address.city + address.dist + address.address,
+        ...address
+      }]);
+    },
+    /** 
+     * @description 绑定联系人
+     * @param {Object} linkman 联系人数据
+    */
+    bindLinkman(linkman = {}) {
+      this.$set(this.value, 'linkman', [{
+        value: linkman.id,
+        label: linkman.name + linkman.phone,
+        ...linkman
+      }]);
+    },
+    /** 
+     * @description 选择工单类型
+     * @param {String} templateId 工单类型id
+    */
+    async chooseTemplate(templateId) {
+      let loading = this.$loading();
+      try {
+        this.taskFields = await TaskApi.getTaskTemplateFields({ templateId, tableName: 'task' });
+        this.taskValue = FormUtil.initialize(this.taskFields, {});
+
+        // 表单初始化
+        this.$emit('update:value', this.taskValue);
+        this.$emit('update:fields', this.taskFields);
+
+        // 清空校验结果
+        setTimeout(() => {
+          this.$refs.form.$children.map(child => {
+            if (child.$el.className == 'form-item err') {
+              child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
+            }
+          })
+        }, 0);
+
+        this.selectedType = this.taskTypesMap[templateId];
+        this.$emit('updatetemplateId', this.selectedType);
+      } catch (error) {
+        console.error(error)
+      }
+
+      loading.close();
+    },
+    /** 
+     * @description 关闭弹窗
+     * @param {String} 动作 customer/product 
+    */
+    dislogClose(action = '') {
+      switch (action) {
+      case 'customer': {
+        this.customerFormDom.initFormData();
+        this.customerFormDom.init = false;
+        break;
+      }
+      case 'product': {
+        this.productFormDom.initFormData();
+        this.productFormDom.init = false;
+        break;
+      }
+      default: {
+        break;
+      }
+      }
+    },
+    /** 
+     * @description 打开弹窗
+     * @param {String} 动作 address/contact/customer/product 
+    */
+    dialogOpen(action) {
       if (!this.selectedCustomer.id && action != 'customer') {
         this.$platform.alert('请先选择客户');
         return;
       }
-      if (action === 'address') {
+
+      switch (action) {
+      case 'address': {
         this.$refs.EditAddressDialog.openDialog();
-      } else if (action === 'contact') {
+        break;
+      }
+      case 'contact': {
         this.$refs.EditContactDialog.openDialog();
-      } else if (action === 'customer') {
+        break;
+      }
+      case 'customer': {
         this.addCustomerDialog = true;
         this.customerFormDom.init = true;
-      } else if (action === 'product') {
+        break;
+      }
+      case 'product': {
         this.addProductDialog = true;
         this.productFormDom.init = true;
+        break;
+      }
+      default: {
+        break;
+      }
       }
     },
-    closeDialog(action) {
-      if (action === 'customer') {
-        this.customerFormDom.initFormData();
-        this.customerFormDom.init = false;
-      } else if (action === 'product') {
-        this.productFormDom.initFormData();
-        this.productFormDom.init = false;
+    /** 
+     * @description 初始化
+    */
+    init() {
+      this.loading = true;
+
+      // 获取客户、产品数据
+      Promise.all([
+        this.fetchCustomerData(),
+        this.fetchProductData()
+      ])
+        .then(res => {
+          this.loading = false;
+        })
+        .catch(err => console.error('error', err));
+
+    },
+    /** 
+     * @description 搜索地址 外层处理器
+     * @param {Object} params 搜索参数
+    */
+    async searchAddressOuterHandler(params = {}) {
+      params.customerId = this.selectedCustomer.value || '';
+      return this.searchAddress(params);
+    },
+    /** 
+     * @description 搜索联系人 外层处理器
+     * @param {Object} params 搜索参数
+    */
+    async searchLinkmanOuterHandler(params = {}) {
+      params.customerId = this.selectedCustomer.value || '';
+      return this.searchLinkman(params);
+    },
+    /** 
+     * @description 搜索产品 外层处理器
+     * @param {Object} params 搜索参数
+    */
+    async searchProductOuterHandler(params = {}) {
+      params.customerId = this.selectedCustomer.value || '';
+      return this.searchProduct(params);
+    },
+    /** 
+     * @description 选择客户关联
+     * @param {String} customerId 客户id
+    */
+    selectCustomerRelation(customerId) {
+      let forRelation = {
+        module: 'customer',
+        customerId
+      };
+
+      this.$eventBus.$emit('es.Relation.Customer', forRelation);
+    },
+    update({ field, newValue, oldValue }) {
+      let { fieldName, displayName } = field;
+
+      if (this.$appConfig.debug) {
+        console.info(
+          `[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(
+            newValue
+          )}`
+        )
       }
-    }
+
+      let value = this.value;
+      this.$set(value, fieldName, newValue);
+      this.$emit('input', value);
+    },
+    /** 
+     * @description 更新客户信息
+     * @param {Array<Object>} value 客户数据
+    */
+    async updateCustomer(value = []) {
+      let selectedCustomer = value[0] || {};
+      try {
+        const result = await TaskApi.getTaskDefaultInfo({ customerId: selectedCustomer.value || '' });
+
+        let { linkman, address } = result;
+
+        // 重置联系人和地址
+        this.$set(this.value, 'linkman', []);
+        this.$set(this.value, 'address', []);
+
+        // 绑定联系人和地址
+        linkman && this.bindLinkman(linkman);
+        address && this.bindAddress(address);
+
+        if (Array.isArray(this.value.product) && this.value.product.length) {
+          this.value.product = this.value.product.filter(item => item.customerId == value[0].value);
+        }
+
+      } catch (error) {
+        console.warn('task-edit-form: updateCustomer -> error', error);
+      }
+
+      // 查询客户关联字段
+      this.selectCustomerRelation(value[0].value);
+    },
+    /** 
+     * @description 更新联系人信息
+    */
+    async updateLinkman(linkman) {
+      this.bindLinkman(linkman);
+
+      try {
+        const result = await TaskApi.getLmBindAddress({ lmId: linkman.id });
+
+        // 如果存在地址信息则绑定地址
+        result.data.id && this.bindAddress(result.data);
+
+      } catch (error) {
+        console.warn('task-edit-form: updateLinkman -> error', error);
+      }
+
+    },
+    /** 
+     * @description 更新产品信息
+    */
+    async updateProduct(value) {
+      try {
+        // 判断客户是否存在
+        if (!this.value.customer || !this.value.customer.length) {
+          // 客户不存在时则下拉框隐藏
+          findComponentDownward(this.$refs.product, 'base-select').close();
+
+          const result = await TaskApi.getCustomerByProduct({ id: value[value.length - 1].value });
+
+          const customerData = [{
+            label: result.customerName,
+            value: result.customerId,
+            id: result.customerId
+          }];
+          // 设置客户数据
+          this.$set(this.value, 'customer', customerData);
+          // 更新客户信息
+          this.updateCustomer(customerData);
+        }
+
+        // 查询产品关联字段, 选一个产品才带入
+        if (value.length === 1) {
+          let forRelation = {
+            module: 'product',
+            id: value[0].value
+          }
+          // 产品关联字段数据
+          this.$eventBus.$emit('es.Relation.Product', forRelation);
+        } else {
+          // 清空产品关联字段数据
+          this.$eventBus.$emit('es.Relation.Product', {});
+        }
+
+      } catch (error) {
+        console.warn('task-edit-form: updateProduct -> error', error);
+      }
+    },
+    /** 
+     * @description 效验
+    */
+    validate() {
+      return this.$refs.form.validate();
+    },
   },
   components: {
     [EditAddressDialog.name]: EditAddressDialog,

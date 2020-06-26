@@ -10,7 +10,17 @@ export default {
     return TaskApi.getCreateCustomerData()
       .then(res => {
         this.customerInitData = res.data;
-        this.renderCustomerForm(res.data);
+        this.customerFormView = this.renderCustomerForm(res.data);
+      })
+      .catch(err => console.error('error', err));
+  },
+  /** 
+   * @description 获取工单类型数据
+  */
+  fetchTaskTypes () {
+    return TaskApi.getTaskTypes()
+      .then(res => {
+        // this.selectedType = this.taskTypes[0] || {};
       })
       .catch(err => console.error('error', err));
   },

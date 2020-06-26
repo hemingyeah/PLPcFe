@@ -6,7 +6,7 @@ export default {
     return this.fields.filter(f => f.fieldName === 'customer')[0];
   },
   customerFormDom() {
-    return this.customerFormView.$refs.CustomerCreateView;
+    return this?.customerFormView?.$refs?.CustomerCreateView || {};
   },
   /* 客户字段配置 */
   customerOption(){
@@ -22,7 +22,7 @@ export default {
     }
   },
   productFormDom() {
-    return this.productFormView.$refs.ProductCreateView;
+    return this?.productFormView?.$refs?.ProductCreateView || {};
   },
   // 选择的客户值
   selectedCustomer(){

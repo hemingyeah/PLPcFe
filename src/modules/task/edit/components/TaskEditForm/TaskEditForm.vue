@@ -41,7 +41,7 @@
               placeholder="请输入关键字搜索客户"
               :disabled="isCreateCustomer">
             </biz-form-remote-select>
-            <el-button @click="openDialog('customer')" v-if="!isCreateCustomer">新建</el-button>
+            <el-button @click="dialogOpen('customer')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
         <!-- end 客户 -->
@@ -51,12 +51,12 @@
           <div class="input-and-btn">
             <biz-form-remote-select
               v-model="value.linkman"
-              :remote-method="searchLinkman"
+              :remote-method="searchLinkmanOuterHandler"
               @input="updateLinkman(value.linkman[0])"
               placeholder="请输入关键字搜索联系人"
               :disabled="isCreateCustomer">
             </biz-form-remote-select>
-            <el-button @click="openDialog('contact')" v-if="!isCreateCustomer">新建</el-button>
+            <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
         <!-- end 联系人 -->
@@ -66,10 +66,10 @@
           <div class="input-and-btn">
             <biz-form-remote-select
               v-model="value.address"
-              :remote-method="searchAddress"
+              :remote-method="searchAddressOuterHandler"
               placeholder="请输入关键字搜索地址">
             </biz-form-remote-select>
-            <el-button @click="openDialog('address')" v-if="!isCreateCustomer">新建</el-button>
+            <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
         <!-- start 地址 -->
@@ -81,7 +81,7 @@
               ref="product"
               :field="productField"
               v-model="value.product"
-              :remote-method="searchProduct"
+              :remote-method="searchProductOuterHandler"
               @input="updateProduct"
               placeholder="请输入关键字搜索产品"
               multiple>
@@ -99,17 +99,18 @@
                 </p>
               </div>
             </biz-form-remote-select>
-            <el-button @click="openDialog('product')">新建</el-button>
+            <el-button @click="dialogOpen('product')">新建</el-button>
           </div>
         </form-item>
         <!-- start 产品 -->
+
       </template>
       <!-- end 客户字段 -->
 
     </form-builder>
 
     <!-- start 新建客户弹窗 -->
-    <base-modal title="新建客户" :show.sync="addCustomerDialog" class="add-dialog-container" width="800px" @closed="closeDialog('customer')">
+    <base-modal title="新建客户" :show.sync="addCustomerDialog" class="add-dialog-container" width="800px" @closed="dislogClose('customer')">
       <div id="createCustomerView"></div>
       <div class="dialog-footer" slot="footer">
         <el-button @click="addCustomerDialog = false">关闭</el-button>
@@ -119,7 +120,7 @@
     <!-- end 新建客户弹窗 -->
 
     <!-- start 新建产品弹窗 -->
-    <base-modal title="新建产品" :show.sync="addProductDialog" class="add-dialog-container" width="800px" @closed="closeDialog('product')">
+    <base-modal title="新建产品" :show.sync="addProductDialog" class="add-dialog-container" width="800px" @closed="dislogClose('product')">
       <div id="createProductView"></div>
       <div class="dialog-footer" slot="footer">
         <el-button @click="addProductDialog = false">关闭</el-button>

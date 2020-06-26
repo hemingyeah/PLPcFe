@@ -8,7 +8,7 @@ export default {
    * @description 渲染客户表单
   */
   renderCustomerForm(data) {
-    this.customerFormView = new Vue({
+    return new Vue({
       el: '#createCustomerView',
       provide: {
         initData: Object.freeze(data)

@@ -5,7 +5,7 @@ let fixedPrefixAppPath = '/api/app'
 /**
  * 获取工单类型
  */
-export function taskType(){
+export function getTaskTypes(){
   return http.get(`${fixedPrefixAppPath}/outside/dd/task/types`);
 }
 
