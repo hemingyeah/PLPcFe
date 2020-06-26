@@ -15,6 +15,7 @@ export default class Field{
     this.isNull = options.isNull || 0;
     this.isSearch = options.isSearch || 0;
     this.isAdd = options.isAdd || 1;
+    this.isAppShow = options.isAppShow || 0;
 
     this.placeHolder = options.placeHolder;
     this.setting = options.setting || {};

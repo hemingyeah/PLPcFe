@@ -65,6 +65,8 @@ export default class FormField{
     this.defaultValue = params.defaultValue; // 默认值
     // 是否为系统字段 0 - 非系统字段，1 - 系统字段
     this.isSystem = typeof params.isSystem == 'number' ? params.isSystem : 0;
+    // 工单专属字段： 是否在移动端显示 0 - 不显示，1 - 显示
+    this.isAppShow = typeof params.isAppShow == 'number' ? params.isAppShow : 0;
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -105,6 +107,7 @@ export default class FormField{
     option.isSearch = field.isSearch;
     option.placeHolder = field.placeHolder;
     option.isSystem = field.isSystem;
+    option.isAppShow = field.isAppShow;
 
     let setting = {};
     let defaultValue = null;
