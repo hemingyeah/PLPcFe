@@ -16,36 +16,45 @@
     <div class="stats-station-today-content">
 
       <div class="stats-station-card">
-        <p>呼入已接通话量</p>
-        <h3> {{statisticsRecord.normalDealingCount}}</h3>
-        <div class="card-bottom">未接来电：{{statisticsRecord.normalNotDealCount}} 接通率：{{statisticsRecord.normalDealingRate}}
+        <div class="card-content">
+          <p><i class="iconfont icon-huru"></i> 呼入已接通话量</p>
+          <h3> {{statisticsRecord.normalDealingCount}}</h3>
+          <div class="card-bottom">未接来电：{{statisticsRecord.normalNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{statisticsRecord.normalDealingRate}}
+          </div>
         </div>
       </div>
 
       <div class="stats-station-card">
-        <p>呼入已解决通话</p>
-        <h3>{{statisticsRecord.normalSolvedCount}}</h3>
-        <div class="card-bottom">解决率：{{statisticsRecord.normalSolvedRate}}</div>
+        <div class="card-content">
+          <p><i class="iconfont icon-huru"></i> 呼入已解决通话</p>
+          <h3>{{statisticsRecord.normalSolvedCount}}</h3>
+          <div class="card-bottom">解决率：{{statisticsRecord.normalSolvedRate}}</div>
+        </div>
       </div>
 
       <div class="stats-station-card">
-        <p>呼入通话时长</p>
-        <h3>{{statisticsRecord.totalNormalDealings}}</h3>
-        <div class="card-bottom">平均通话时长：{{statisticsRecord.avgNormalDealings}}</div>
+        <div class="card-content">
+          <p><i class="iconfont icon-huru"></i> 呼入通话时长</p>
+          <h3>{{statisticsRecord.totalNormalDealings}}</h3>
+          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgNormalDealings}}</div>
+        </div>
       </div>
 
       <div class="stats-station-card">
-        <p>呼出通话量</p>
-        <h3>{{statisticsRecord.dialoutDealingCount}}</h3>
-        <div class="card-bottom">未接来电：{{statisticsRecord.dialoutNotDealCount}} 接通率：{{statisticsRecord.dialoutDealingRate}}</div>
+        <div class="card-content">
+          <p><i class="iconfont icon-huchu"></i> 呼出通话量</p>
+          <h3>{{statisticsRecord.dialoutDealingCount}}</h3>
+          <div class="card-bottom">未接来电：{{statisticsRecord.dialoutNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{statisticsRecord.dialoutDealingRate}}</div>
+        </div>
       </div>
 
       <div class="stats-station-card">
-        <p>呼出通话时长</p>
-        <h3>{{statisticsRecord.totalDialoutDealings}}</h3>
-        <div class="card-bottom">平均通话时长：{{statisticsRecord.avgDialoutDealings}}</div>
+        <div class="card-content">
+          <p><i class="iconfont icon-huchu"></i> 呼出通话时长</p>
+          <h3>{{statisticsRecord.totalDialoutDealings}}</h3>
+          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgDialoutDealings}}</div>
+        </div>
       </div>
-
     </div>
 
     <div class="customer-list-container" ref="customerListPage" v-loading.fullscreen.lock="loadingListData">
@@ -53,7 +62,7 @@
       <div class="customer-list-search-group-container">
         <form class="base-search" onsubmit="return false;">
           <div class="customer-list-base-search-group">
-            <el-input v-model="params.keyword" placeholder="根据客户信息搜索">
+            <el-input v-model="params.keyword" placeholder="请输入要查询的坐席、客户、联系人或呼叫电话">
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
             <base-button type="primary" @event="params.pageNum=1;getRecordList();trackEventHandler('search')" native-type="submit">搜索</base-button>
@@ -93,23 +102,35 @@
         </div>
 
         <el-table :data="recordList" stripe @select-all="handleSelection" :row-key="getRowKey" header-row-class-name="customer-table-header" ref="multipleTable" class="customer-table">
-          <el-table-column v-for="column in columns" v-if="column.show" :key="column.field" :label="column.label" :prop="column.field" :width="column.width" :min-width="column.minWidth || '120px'"
+          <el-table-column v-for="column in columns" v-if="column.show" :fixed="column.fixed" :key="column.field" :label="column.label" :prop="column.field" :width="column.width" :min-width="column.minWidth || '120px'"
                            :class-name="column.field == 'name' ? 'customer-name-superscript-td' : ''" :show-overflow-tooltip="column.field !== 'name'" :align="column.align">
             <template slot-scope="scope">
               <template v-if="column.field === 'callType'">
                 {{fmt_callType(scope.row[column.field])}}
               </template>
-              <template v-else-if="column.field === 'status'">
+              <template v-else-if="column.field === 'customerName'">
+                <span v-if="scope.row[column.field]">{{scope.row[column.field]}}</span>
+                <span v-else>--</span>                
+              </template>
+              <template v-else-if="column.field === 'sortName'">
+                <span v-if="scope.row[column.field]">{{scope.row[column.field]}}</span>
+                <span v-else>--</span>
+              </template>
+              <template v-else-if="column.field === 'linkmanName'">
+                <span v-if="scope.row[column.field]">{{scope.row[column.field]}}</span>
+                <span v-else>--</span>
+              </template>
+              <template v-else-if="activeName != '呼出电话' && column.field === 'status'">
                 <span v-if="scope.row[column.field] == 0" style="color:#FB602C">未解决</span>
                 <span v-else-if="scope.row[column.field] == 1">已解决</span>
-                <span v-else>-</span>
+                <span v-else>--</span>
               </template>
-              <template v-else-if="column.field === 'handleStatus'">
+              <template v-else-if="(activeName === '' || activeName === '呼出电话') && column.field === 'handleStatus'">
                 <span v-if="scope.row[column.field] == 0" style="color:#FB602C">未处理</span>
                 <span v-else-if="scope.row[column.field] == 1">已处理</span>
-                <span v-else>-</span>
+                <span v-else>--</span>
               </template>
-              <template v-else-if="column.field === 'operation'">
+              <template v-else-if="column.field === 'operation'" slot-scope="scope">
                 <!-- 处理未接来电 -->
                 <el-button type="text" :disabled="scope.row.callType!='notDeal'" @click="dealDialog(scope.row)">处理</el-button>
                 <el-button type="text" @click="detail(scope.row)">详情</el-button>
@@ -171,7 +192,6 @@
 
 <script>
 import _ from 'lodash'
-import { formatDate } from '../../../util/lang'
 import SearchPanel from '../component/SearchPanel'
 import * as CallCenterApi from '@src/api/CallCenterApi'
 export default {
@@ -244,9 +264,11 @@ export default {
       }
     },
     async getRecordList(){
+      this.loadingListData = true
       try {
         let {code, message, result} = await CallCenterApi.getRecordList(this.params)
         if (code != 0) return this.$message.error(message || '内部错误')
+        this.loadingListData = false
         if (!result || !result.list) {
           this.recordList = [];
           this.totalItems = 0;
@@ -262,6 +284,7 @@ export default {
           this.matchSelected(); // 把选中的匹配出来
         }
       } catch (error) {
+        this.loadingListData = false
         console.error(error)
       }
     },
@@ -505,7 +528,6 @@ export default {
     },
     // columns
     modifyColumnStatus(event) {
-      console.log(event);
       let columns = event.data || []
       let colMap = columns.reduce(
         (acc, col) => (acc[col.field] = col) && acc,
@@ -555,9 +577,9 @@ export default {
             minWidth = 100
           }
 
-          // if (field.displayName.length > 4) {
-          //   minWidth = field.displayName.length * 20
-          // }
+          if (field.displayName && field.displayName.length > 4) {
+            minWidth = field.displayName.length * 20
+          }
 
           // if (sortable && field.displayName.length >= 4) {
           //   minWidth = 125
@@ -583,8 +605,7 @@ export default {
         let localField = localColumns[col.field]
 
         if (null != localField) {
-          width =
-            typeof localField.width == 'number' ? `${localField.width}px` : ''
+          width = typeof localField.width == 'number' ? `${localField.width}px` : ''
           show = localField.show !== false
         }
 
@@ -594,7 +615,6 @@ export default {
 
         return col
       })
-
       return columns
     },
     resetParams() {
@@ -671,7 +691,7 @@ export default {
         {
           label: '来去电时间',
           field: 'ring',
-          width: '180px',
+          minWidth: '180px',
           show: true
         },
         {
@@ -698,19 +718,18 @@ export default {
           show: true,
           // width: '110px'
         },
-        // {
-        //   label: '客户',
-        //   field: 'status',
-        //   show: true,
-        //   align: 'center',
-        //   width: '100px'
-        // },
-        // {
-        //   label: '联系人',
-        //   field: 'createTime',
-        //   show: true,
-        //   width: '150px'
-        // },
+        {
+          label: '客户',
+          field: 'customerName',
+          show: true,
+          // width: '100px'
+        },
+        {
+          label: '联系人',
+          field: 'linkmanName',
+          show: true,
+          // width: '150px'
+        },
         {
           label: '消耗话费(元)',
           field: 'cost',
@@ -721,7 +740,8 @@ export default {
           label: '操作',
           field: 'operation',
           // width: '80px',
-          show: true
+          show: true,
+          fixed: 'right'
         }
       ]
     },
@@ -738,14 +758,14 @@ export default {
           displayName: '通话开始时间',
           label: '通话开始时间',
           fieldName: 'beginTime',
-          // width: '150px',
+          minWidth: '150px',
           show: false
         },
         {
           displayName: '通话结束时间',
           label: '通话结束时间',
           fieldName: 'endTime',
-          // width: '150px',
+          minWidth: '150px',
           show: false
         },
         {
@@ -903,16 +923,36 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
     flex-flow: row nowrap;
     padding: 1px 0px 10px 0;
     justify-content: flex-end;
+    
     .stats-station-card {
       flex: 1;
       border-radius: 2px;
       background-color: #fff;
-      text-align: center;
+      border-right: 1px solid #eee;
+      .card-content {
+       
+        p {
+          display: flex;
+           padding-left: 20px;
+        }
+        h3 {
+           padding-left: 20px;
+        }
+        .icon-huru{
+          color: #6ECF40;
+          margin-right: 8px;
+        }
+        .icon-huchu{
+          color: #FFAE00;
+          margin-right: 8px;
+        }
+      }
       .card-bottom {
         background: rgba(250, 251, 252, 1);
         border-radius: 0px 0px 0px 2px;
-        height: 60px;
-        line-height: 60px;
+        height: 40px;
+        line-height: 40px;
+        padding-left: 20px;
       }
       p {
         padding: 15px 0 8px;
@@ -1070,7 +1110,11 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
   .customer-list-component {
     // padding-top: 10px;
     /*min-height: calc(100% - 100px);*/
-
+    .el-table__fixed-right {
+      // 操作栏固定到最右侧
+      top: 10px;
+    }
+    
     .customer-table {
       padding: 10px;
 
@@ -1246,7 +1290,7 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
   .operation-bar-container {
     background: #fff;
-    border-radius: 3px 3px 0 0;
+    border-radius: 0;
     display: flex;
     justify-content: space-between;
     padding: 10px;

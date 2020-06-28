@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "15540901",
+      "name": "呼入",
+      "font_class": "huru",
+      "unicode": "e72d",
+      "unicode_decimal": 59181
+    },
+    {
+      "icon_id": "15540902",
+      "name": "呼出",
+      "font_class": "huchu",
+      "unicode": "e72e",
+      "unicode_decimal": 59182
+    },
+    {
       "icon_id": "15469180",
       "name": "话费",
       "font_class": "huafei",

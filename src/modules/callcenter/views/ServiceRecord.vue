@@ -4,7 +4,7 @@
       <div slot="header" @click="expand('session')">
         <span><i class="iconfont icon-nav-down toggle-up" :class="sessionToggle ? 'is-reverse': ''"></i>历史通话</span>
       </div>
-      <div v-show="showSession" v-for="item in sessionList" :key="item.id" class="list-item">
+      <div v-show="showSession" v-for="item in sessionList" :key="item.id" class="list-item" @click="goHistoryDetail(item.id)">
         <img src="../../../assets/img/avatar.png">
         <div class="list-content">
           <div class="list-header">
@@ -13,7 +13,7 @@
           </div>
           <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
           <el-tag :type="item.status ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
-          <div class="remark">
+          <div v-if="item.remark" class="remark">
             <p>{{item.remark}}</p>
           </div>
         </div>
@@ -23,7 +23,7 @@
       <div slot="header" @click="expand('task')">
         <span><i class="iconfont icon-nav-down toggle-up" :class="taskToggle ? 'is-reverse': ''"></i>历史工单</span>
       </div>
-      <div v-show="showTask" v-for="item in taskList" :key="item.id" class="list-item">
+      <div v-show="showTask" v-for="item in taskList" :key="item.id" class="list-item" @click="goTaskDetail(item.id)">
         <div class="list-content">
           <div class="list-header">
             <p>{{item.templateName}} <el-tag class="task-type-tag" effect="dark">{{item.state | fmt_state}}</el-tag>
@@ -44,7 +44,7 @@
       <div slot="header" @click="expand('event')">
         <span><i class="iconfont icon-nav-down toggle-up" :class="eventToggle ? 'is-reverse': ''"></i>历史事件</span>
       </div>
-      <div v-show="showEvent" v-for="item in eventList" :key="item.id" class="list-item">
+      <div v-show="showEvent" v-for="item in eventList" :key="item.id" class="list-item" @click="goEventDetail(item.id)">
         <div class="list-content">
           <div class="list-header">
             <p>{{item.templateName}} <el-tag class="task-type-tag" effect="dark">{{item.state | fmt_state}}</el-tag>
@@ -93,6 +93,8 @@ export default {
       immediate: true,
       deep: true,
       handler(newValue, oldValue) {
+        console.info('item newval:', newValue);
+        
         this.getSessionList();
         this.getTaskList()
         this.getEventList()
@@ -101,7 +103,7 @@ export default {
   },
   computed: {
     linkmanPhone(){
-      return this.item.dialPhone || this.item.dialPhone
+      return this.item.dialPhone
     }
   },
   methods: {
@@ -134,6 +136,41 @@ export default {
         console.error(err)
       })
     },
+    goHistoryDetail(row){
+      // 跳转到历史通话记录详情
+      // todo 确认phone
+      this.$platform.openTab({
+        id: `callcenter_view_${row.id}`,
+        title: '通话详情',
+        close: true,
+        url: `/setting/callcenter/view?id=${row.id}&phone=${row.dialPhone}`,
+        fromId: 'M_CASE'
+      }); 
+    },
+    goTaskDetail(id){
+      // 跳转到工单详情
+      // todo确认id
+      let fromId = window.frameElement.getAttribute('id')
+      this.$platform.openTab({
+        id: `task_view_${id}`,
+        title: '工单详情',
+        close: true,
+        url: `/task/view/${id}`,
+        fromId
+      })
+    },
+    goEventDetail(id){
+      // 跳转到事件详情
+      let fromId = window.frameElement.getAttribute('id')
+      this.$platform.openTab({
+        id: `event_view_${id}`,
+        title: '事件详情',
+        close: true,
+        url: `/event/view/${id}`,
+        fromId
+      })
+    },
+
     expand(type) {
       switch (type) {
       case 'session':

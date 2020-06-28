@@ -172,6 +172,14 @@ body,
 }
 
 .call-center-box{
+  position: absolute;
+  width: 300px;
+  top: 50px;
+  transform-origin: center top;
+  z-index: 2001;
+  background: #fff;
+  border: 1px solid #ebeef5;   
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -179,6 +187,8 @@ body,
   .customer-name{
     color: $text-color-main;
     font-size: 24px;
+    margin: 14px 0;
+    color: #333;
   }
   p > span {
     color: #ed3f14;
@@ -223,6 +233,7 @@ body,
   }
 
   .call-in,.call-out{
+    width: 100%;
     display: flex;
     flex-direction: column;
     padding: 0 10px;
@@ -240,10 +251,12 @@ body,
   .last{
     width: 100%;
     background:#FB602C;
-    padding: 4px 16px;
-    margin-bottom: -10px;
+    height: 26px;
+    padding: 4px 0;
+    margin-bottom: 0;
     color: #fff;
     opacity: 0.8;
+    text-align: center;
   }
 
   @keyframes ripple {

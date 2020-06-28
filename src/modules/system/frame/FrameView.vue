@@ -26,44 +26,42 @@
             <!-- profile -->
             <div class="frame-quick-right">
 
-              <el-popover :popper-class="['call-center-popper',{'hide':callCenterWorkbenchVisible}]" ref="callCenterRef" v-model="showCallCenter" :visible-arrow="false">
-                <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference" @click="handleCallCenterClick">
-                  <i class="iconfont icon-dianhua1"></i>
-                </button>
-                <div class="call-center-box" >
-                  <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
-                  <p v-if="callData.linkmanName">{{callData.linkmanName}}</p>
-                  <p v-if="callData.linkmanName">{{callData.customerName}}</p>
-                  <div class="divider"></div>
-                  <div class="call-ripple">
-                    <div class="icon-ripple">
-                      <img src="../../../assets/img/phone.png">
-                      <div class="ripple1"></div>
-                      <div class="ripple2"></div>
+              <button type="button" class="btn-text frame-header-btn" @click="handleCallCenterClick">
+                <i class="iconfont icon-dianhua1"></i>
+              </button>
+              <div v-if="showCallCenter" class="call-center-box" > 
+                <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
+                <p class="customer-name" v-if="callData.linkmanName">{{callData.linkmanName}}</p>
+                <p v-if="callData.linkmanName">{{callData.customerName}}</p>
+                <div class="divider"></div>
+                <div class="call-ripple">
+                  <div class="icon-ripple">
+                    <img src="../../../assets/img/phone.png">
+                    <div class="ripple1"></div>
+                    <div class="ripple2"></div>
+                  </div>
+                </div>
+                <p style="margin-top:10px;">{{callData.callPhone}}</p>
+                <!-- 呼入 -->
+                <template v-if="callData.callType=='normal'">
+                  <div class="call-in" >
+                    <p class="today">今日已来电（<span>{{callData.dialCount}}</span>）</p>
+                    <p >未完成工单（<span>{{callData.taskCount}}</span>）</p>
+                    <p >未完成事件（<span>{{callData.eventCount}}</span>）</p>
+                  </div>
+                </template>
+                <template v-else>
+                  <!-- 呼出 -->
+                  <div class="call-out">
+                    <p>今日已来电（<span>{{callData.dialCount}}</span>）</p>
+                    <div class="unfinsh">
+                      <p>未完成工单（<span>{{callData.taskCount}}</span>）</p>
+                      <p>未完成事件（<span>{{callData.eventCount}}</span>）</p>
                     </div>
                   </div>
-                  <p style="margin-top:10px;">{{callData.callPhone}}</p>
-                  <!-- 呼入 -->
-                  <template v-if="callData.callType=='normal'">
-                    <div class="call-in" >
-                      <p class="today">今日已来电（<span>{{callData.dialCount}}</span>）</p>
-                      <p >未完成工单（<span>{{callData.taskCount}}</span>）</p>
-                      <p >未完成事件（<span>{{callData.eventCount}}</span>）</p>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <!-- 呼出 -->
-                    <div class="call-out">
-                      <p>今日已来电（<span>{{callData.dialCount}}</span>）</p>
-                      <div class="unfinsh">
-                        <p>未完成工单（<span>{{callData.taskCount}}</span>）</p>
-                        <p>未完成事件（<span>{{callData.eventCount}}</span>）</p>
-                      </div>
-                    </div>
-                  </template>
-                  <p class="last">{{callData.message}}</p>
-                </div>
-              </el-popover>
+                </template>
+                <p class="last">{{callData.message}}</p>
+              </div>
 
               <el-popover v-if="showDevTool">
                 <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference">
@@ -220,7 +218,6 @@ export default {
   inject: ['initData'],
   data() {
     return {
-      callCenterWorkbenchVisible:false,
       notificationInfo: {},
       notification: {
         count: 0
@@ -592,22 +589,22 @@ export default {
     },
     goCallCenterWorkbench() {
       platform.openTab({
-        id: 'callcenter_workbench',
-        title: '呼叫工作台',
+        id: 'M_CALLCENTER_WORKBENCH_LIST',
+        title: '呼叫中心工作台',
         url: '/setting/callcenter/workbench',
         reload: true
       })
     },
     handleCallCenterClick() {
-      this.callCenterWorkbenchVisible = true  
-      this.openCallCenterWorkbench() 
+      // this.showCallCenter = true
+      this.goCallCenterWorkbench() 
     },
     openCallCenterWorkbench(data) {
       // console.log('data::', data);
       let url = data && data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
       platform.openTab({
-        id: 'callcenter_workbench',
-        title: '呼叫工作台',
+        id: 'M_CALLCENTER_WORKBENCH_LIST',
+        title: '呼叫中心工作台',
         url,
         reload: true
       })

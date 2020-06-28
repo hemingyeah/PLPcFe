@@ -42,9 +42,9 @@
         </template>
         <template v-else>
           <p>客户：<a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createCustomerTab(contact.id)">{{contact.name}}</a></p>
-          <p>联系人：<span>{{contact.lmName}}</span></p>
-          <p>区域：<span>浙江杭州</span></p>
-          <p>详细地址：<span>{{prettyAddress(contact.customerAddress)}}</span></p>
+          <p>联系人：<span v-if="contact.linkman">{{contact.linkman.name}}</span></p>
+          <p>区域：<span v-if="contact.customerAddress">{{contact.customerAddress.adProvince}}</span></p>
+          <p>详细地址：<span v-if="contact.customerAddress">{{contact.customerAddress.adAddress}}</span></p>
           <p>负责人：<img src="../../../assets/img/avatar.png"><span>{{contact.customerManagerName}}</span></p>
           <p>服务团队：<span>{{dealTags(contact.tags)}}</span></p>
           <p>未完成的工单：<span class="unFinishTask">{{contact.unfinishedTaskCount}}</span></p>
@@ -58,7 +58,7 @@
               <el-button type="info" plain size="mini" disabled>新建工单</el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item v-for="type in taskTypes" :key="type.id">
-                  <span class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</span>
+                  <div class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -74,7 +74,7 @@
               <el-button type="primary" size="mini">新建工单</el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item v-for="type in taskTypes" :key="type.id">
-                  <span class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</span>
+                  <div class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -89,7 +89,7 @@
               <el-button type="info" plain size="mini" disabled>新建事件</el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item v-for="event in eventTypes" :key="event.id">
-                  <span class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</span>
+                  <div class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -105,7 +105,7 @@
               <el-button type="primary" size="mini">新建事件</el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item v-for="event in eventTypes" :key="event.id">
-                  <span class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</span>
+                  <div class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -132,7 +132,7 @@
           <div v-else class="item-content">
             <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
             <el-tag :type="item.status ==1 ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
-            <p>{{item.remark}}</p>
+            <p v-if="item.remark">{{item.remark}}</p>
           </div>
 
         </div>
@@ -151,7 +151,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input type="textarea" v-model="ruleForm.remark" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入"></el-input>
+          <el-input type="textarea" maxlength="500" v-model="ruleForm.remark" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="saveRemark('ruleForm')">保存</el-button>
@@ -513,11 +513,12 @@ export default {
       // console.info('typeId:', typeId);
       if (!this.customerId) return this.$message.error('请先新建或者保存客户！')
       let fromId = window.frameElement.getAttribute('id')
+      const linkmanId = this.contact.linkman.id
       this.$platform.openTab({
         id: 'createTask',
         title: '新建工单',
         close: true,
-        url: `/task/createFromCustomer/${this.customerId}?defaultTypeId=${typeId}&callRecordId=1`,
+        url: `/task/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${this.callRecordId}&linkmanId=${linkmanId}`,
         fromId
       })
     },
@@ -537,11 +538,12 @@ export default {
       // console.info('typeId:', typeId);
       if (!this.customerId) return this.$message.error('请先新建或者保存客户！')
       let fromId = window.frameElement.getAttribute('id')
+      const linkmanId = this.contact.linkman.id
       this.$platform.openTab({
         id: 'createEvent',
         title: '新建事件',
         close: true,
-        url: `/event/createFromCustomer/${this.customerId}?defaultTypeId=${typeId}&callRecordId=1`,
+        url: `/event/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${this.callRecordId}&linkmanId=${linkmanId}`,
         fromId
       })
     },

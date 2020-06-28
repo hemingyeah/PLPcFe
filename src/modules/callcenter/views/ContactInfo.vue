@@ -23,15 +23,15 @@
         <div v-else>
           <p>客户：<span>未知</span></p>
           <p>联系人：<span>未知</span></p>
-          <el-button :disabled="!linkmanPhone" type="primary" @click="showCreateUser=true">新建客户</el-button>
-          <el-button :disabled="!linkmanPhone" type="ghost" @click="saveDialog(linkmanPhone)" style="margin-left:10px;">添加到现有客户</el-button>
+          <el-button :disabled="!linkmanPhone" type="primary" style="margin-top: 20px;" @click="showCreateUser=true">新建客户</el-button>
+          <el-button :disabled="!linkmanPhone" type="ghost" style="margin-top: 20px;margin-left:10px;" @click="saveDialog(linkmanPhone)">添加到现有客户</el-button>
         </div>
       </template>
       <template v-else>
         <p>客户：<a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createCustomerTab(contact.id)">{{contact.name}}</a></p>
-        <p>联系人：<span>{{contact.lmName}}</span></p>
-        <p>区域：<span>浙江杭州</span></p>
-        <p>详细地址：<span>{{prettyAddress(contact.customerAddress)}}</span></p>
+        <p>联系人：<span v-if="contact.linkman">{{contact.linkman.name}}</span></p>
+        <p>区域：<span v-if="contact.customerAddress">{{contact.customerAddress.adProvince}}</span></p>
+        <p>详细地址：<span v-if="contact.customerAddress">{{contact.customerAddress.adAddress}}</span></p>
         <p>负责人：<img src="../../../assets/img/avatar.png"><span>{{contact.customerManagerName}}</span></p>
         <p>服务团队：<span>{{dealTags(contact.tags)}}</span></p>
         <p>未完成的工单：<span class="unFinishTask">{{contact.unfinishedTaskCount}}</span></p>
@@ -42,10 +42,10 @@
       <template v-if="unknown">
         <el-tooltip content="请新建客户或添加到现有客户" placement="top" :enterable="false">
           <el-dropdown trigger="click">
-            <el-button type="info" plain size="mini" disabled>新建工单</el-button>
+            <el-button type="info" plain disabled>新建工单</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="type in taskTypes" :key="type.id">
-                <span class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</span>
+                <div class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -58,10 +58,10 @@
             <a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createTaskTab(contact.taskBindRecord.wordId)">{{taskBusinessNo}}</a>
           </template>
           <template v-else>
-            <el-button type="primary" size="mini">新建工单</el-button>
+            <el-button type="primary">新建工单</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="type in taskTypes" :key="type.id">
-                <span class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</span>
+                <div class="link-of-dropdown" @click="createTask(type.id)">{{type.name}}</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -73,10 +73,10 @@
       <template v-if="unknown">
         <el-tooltip content="请新建客户或添加到现有客户" placement="top" :enterable="false">
           <el-dropdown trigger="click">
-            <el-button type="info" plain size="mini" disabled>新建事件</el-button>
+            <el-button type="info" plain disabled>新建事件</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="event in eventTypes" :key="event.id">
-                <span class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</span>
+                <div class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -89,10 +89,10 @@
             <a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createEventTab(contact.eventBindRecord.wordId)">{{eventBusinessNo}}</a>
           </template>
           <template v-else>
-            <el-button type="primary" size="mini">新建事件</el-button>
+            <el-button type="primary">新建事件</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="event in eventTypes" :key="event.id">
-                <span class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</span>
+                <div class="link-of-dropdown" @click="createEvent(event.id)">{{event.name}}</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -143,7 +143,6 @@ export default {
   data() {
     return {
       callDetail:{},
-      // linkmanPhone:'18397952979',
       unknown: true,
       contact: {},
       showCreateUser: false,
@@ -246,11 +245,22 @@ export default {
       this.saveDialogVisible = true 
       this.saveForm.phone = phone
     },
+    // 今日该号码来电数
+    getTodayNormalCount(phone) {
+      if (!phone) return
+      CallCenterApi.getTodayNormalCount({dialPhone:phone}).then(({ code, message, result }) => {
+        console.info('', code, message, result)
+        if(code !== 0) return
+        this.dialCount = result.normalCount
+      }).catch((err) => {
+        console.error(err)
+      })
+    },
     // 通话信息
     getCallRecord(id) {
       if (!id) return
       CallCenterApi.getCallRecord({id}).then(({ code, message, result }) => {
-        console.info('', status, message, result)
+        console.info('', code, message, result);
         // 如果data为null说明是未知联系人
         if(code !== 0) return
         this.callDetail = result || {}
@@ -362,13 +372,14 @@ export default {
       // console.info('typeId:', typeId);
       if(!this.customerId) return this.$message.error('请先新建或者保存客户！')
       let fromId = window.frameElement.getAttribute('id');
+      const linkmanId = this.contact.linkman.id
       this.$platform.openTab({
         id: 'createTask',
         title: '新建工单',
         close: true,
-        url: `/task/createFromCustomer/${this.customerId}?defaultTypeId=${typeId}&callRecordId=1`,
+        url: `/task/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${this.callRecordId}&linkmanId=${linkmanId}`,
         fromId
-      });
+      })
     },
     // 工单详情
     createTaskTab(taskId) {
@@ -385,12 +396,13 @@ export default {
     createEvent(typeId) {
       // console.info('typeId:', typeId);
       if(!this.customerId) return this.$message.error('请先新建或者保存客户！')
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute('id')
+      const linkmanId = this.contact.linkman.id
       this.$platform.openTab({
         id: 'createEvent',
         title: '新建事件',
         close: true,
-        url: `/event/createFromCustomer/${this.customerId}?defaultTypeId=${typeId}&callRecordId=1`,
+        url: `/event/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${this.callRecordId}&linkmanId=${linkmanId}`,
         fromId
       });
     },
@@ -493,6 +505,8 @@ export default {
   .call-info {
     display: flex;
     p {
+      margin-top: 12px;
+      margin-bottom: 0;
       flex: 1;
       color: #999;
       span {
@@ -502,14 +516,17 @@ export default {
   }
 
   .customer-info-header {
-    margin-top: 20px;
+    margin-top: 30px;
     button {
       margin-left: 10px;
     }
   }
 
   .customer-info {
+    margin-bottom: 12px;
     p {
+      margin-top: 12px;
+      margin-bottom: 0;
       color: #999;
       span {
         color: #333;

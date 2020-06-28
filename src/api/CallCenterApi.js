@@ -206,4 +206,12 @@ export function updateHandleStatus(params = {}) {
   return http.post('/outside/callcenter/api/updateHandleStatus', params, false)
 }
 
+/**
+ * 获取今日该号码来电数和归属地
+ * @param {*} params 
+ */
+export function getTodayNormalCount(params = {}) {
+  return http.get('/outside/callcenter/api/getTodayNormalCount')
+}
+
 

@@ -10,7 +10,7 @@
           </div>
           <div class="item">
             <p style="margin-bottom:0">{{query.customerName}}</p>
-            <i class="iconfont" :class="query.callType === 'dialout' ? 'icon-qudian' : 'icon-laidian'"></i>
+            <i class="iconfont" style="color:#55B7B4" :class="query.callType === 'dialout' ? 'icon-qudian' : 'icon-laidian'"></i>
           </div>
         </div>
       </el-card>
@@ -28,8 +28,8 @@
               <span>{{item.ring |fmt_short_time}}</span>
             </div>
             <div class="item">
-              <p style="margin-bottom:0">{{item.customerName}}</p>
-              <i class="iconfont" :class="query.callType === 'dialout' ? 'icon-laidian' : 'icon-qudian'"></i>
+              <p style="margin-bottom:0;color:#999;">{{item.customerName}}</p>
+              <i class="iconfont" :class="item.callType === 'dialout' ? 'icon-laidian' : 'icon-qudian'"></i>
             </div>
           </div>
 
@@ -43,7 +43,7 @@
       </keep-alive>
     </div>
     <div class="right">
-      <h4 style="padding-left: 10px;font-size: 16px;margin-bottom: 12px;">服务备注</h4>
+      <h4 style="font-size: 16px;margin-bottom: 20px;padding-top: 8px;">服务备注</h4>
       <template v-if="remarkList.length">
         <div v-for="(item, index) in remarkList" :key="item.id" class="item" @click="delRemark(item, index)">
           <div class="item-title">
@@ -62,7 +62,7 @@
           <div v-else class="item-content">
             <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
             <el-tag :type="item.status ==1 ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
-            <p>{{item.remark}}</p>
+            <p v-if="item.remark">{{item.remark}}</p>
           </div>
 
         </div>
@@ -71,17 +71,17 @@
 
       <el-form v-if="remarkList.length == 0 || showAddRemarkForm" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" label-position="left">
         <el-form-item label="咨询分类">
-          <el-cascader expand-trigger="hover" :options="categoryList" :props="cascaderProps" v-model="selectedKeys" @change="parentCateChanged" clearable change-on-select>
+          <el-cascader style="width: 100%;" expand-trigger="hover" :options="categoryList" :props="cascaderProps" v-model="selectedKeys" @change="parentCateChanged" clearable change-on-select>
           </el-cascader>
         </el-form-item>
         <el-form-item label="解决状态" prop="status">
-          <el-select v-model="ruleForm.status" placeholder="请选择解决状态">
+          <el-select v-model="ruleForm.status" placeholder="请选择解决状态" style="width: 100%;">
             <el-option label="未解决" value="0"></el-option>
             <el-option label="已解决" value="1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="备注" prop="remark" style="margin-right: 20px;">
-          <el-input type="textarea" v-model="ruleForm.remark" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入"></el-input>
+        <el-form-item label="备注" prop="remark" style="width: 100%;">
+          <el-input type="textarea" maxlength="500" v-model="ruleForm.remark" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="saveRemark('ruleForm')">保存</el-button>
@@ -143,7 +143,7 @@ export default {
   mounted() {
     this.query = parse(window.location.search) || {};
     if(this.query.id && this.query.callPhone) {
-      // 获取联系人信息 
+      // 说明是websocket过来的 获取联系人信息 
       this.item = {id:this.query.id, dialPhone:this.query.callPhone, dialCount:this.query.dialCount} 
     }
     // console.log('query::', this.query);
@@ -196,6 +196,7 @@ export default {
         this.historyList = result || []
         if(!this.query.linkmanName) {
           this.item = this.historyList[0]
+          this.getRemarkList()
           this.activeLinkId = this.item.id
           console.info('item:', this.item)
         }
@@ -206,6 +207,7 @@ export default {
     handleHistoryItem(item, index) {
       this.activeLinkId = item.id
       this.item = item
+      this.getRemarkList()
     },
     async delHistoryItem(index, item) {
       try {
@@ -287,7 +289,7 @@ export default {
 
 <style lang="scss">
 .item-hover {
-  background-color: #f5f5f5;
+  background-color: #fafafa;
 }
 .item-active {
   // 链接菜单激活样式
@@ -296,6 +298,10 @@ export default {
 }
 
 .call-center-workbench {
+  h4 {
+    font-size: 16px;
+    font-weight: 500;
+  }
   display: flex;
   padding: 10px;
   position: relative;
@@ -303,10 +309,13 @@ export default {
   min-height: 100vh;
   max-width: 100vw;
   .left {
-    width: 25%;
+    width: 20%;
     min-width: 270px;
+    .el-card__header {
+      padding: 13px 20px;
+    }
     .current-header {
-      padding: 18px 20px;
+      padding: 13px 20px;
       border-bottom: 1px solid #ebeef5;
       box-sizing: border-box;
       background: #fff;
@@ -327,6 +336,7 @@ export default {
             justify-content: flex-end;
             p {
               flex: 1;
+              margin-bottom: 4px;
             }
             i,
             span {
@@ -338,10 +348,11 @@ export default {
     }
     .history-card {
       box-shadow: 0 0 0 0;
+      border-radius: 0 0 4px 4px;
       .el-card__body {
         padding: 0;
         .history-item {
-          padding: 10px 15px;
+          padding: 12px 15px;
           display: flex;
           align-items: center;
           border-bottom: 1px solid #e0e1e2;
@@ -354,6 +365,9 @@ export default {
             .item {
               display: flex;
               justify-content: space-between;
+              p {
+                margin-bottom: 4px;
+              }
               i,
               span {
                 color: #999;
@@ -367,18 +381,18 @@ export default {
     .el-card__header {
       font-size: 16px;
       font-weight: 500;
-      color: #051A13;
+      color: #333;
     }
 
   }
 
   .main {
     flex: 1;
-    margin: 0 10px;
     background: #fff;
+    border-right: 1px solid #f5f5f5;
   }
   .right {
-    background: #fff;
+    background: #fafafa;
     width: 25%;
     min-width: 330px;
     padding: 10px;

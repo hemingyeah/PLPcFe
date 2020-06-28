@@ -44,14 +44,16 @@ export default {
           displayName: '通话ID',
           fieldName: 'callId',
           formType: 'text',
-          placeholder: '请输入通话ID'
+          placeholder: '请输入通话ID',
+          maxlength:50
         },
         {
           orderId: 2,
           displayName: '接待坐席',
           fieldName: 'agentName',
           formType: 'text',
-          placeholder: '请输入接待坐席'
+          placeholder: '请输入接待坐席',
+          maxlength:50
         },
         {
           orderId: 3,
@@ -102,35 +104,40 @@ export default {
           displayName: '客户',
           fieldName: 'customerName',
           formType: 'text',
-          placeholder: '请输入客户'
+          placeholder: '请输入客户',
+          maxlength:50
         },
         {
           orderId: 8,
           displayName: '联系人',
           fieldName: 'linkmanName',
           formType: 'text',
-          placeholder: '请输入联系人名称'
+          placeholder: '请输入联系人名称',
+          maxlength:50
         },
         {
           orderId: 9,
           displayName: '呼叫电话',
           fieldName: 'dialPhone',
           formType: 'text',
-          placeholder: '请输入电话'
+          placeholder: '请输入电话',
+          maxlength:50
         },
         {
           orderId: 10,
           displayName: '消耗话费',
           fieldName: 'cost',
           formType: 'text',
-          placeholder: '请输入话费数目'
+          placeholder: '请输入话费数目',
+          maxlength:50
         },
         {
           orderId: 13,
           displayName: '负责人',
           fieldName: 'cost',
           formType: 'text',
-          placeholder: '请输入负责人'
+          placeholder: '请输入负责人',
+          maxlength:50
         },
         {
           orderId: 14,

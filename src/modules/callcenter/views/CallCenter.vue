@@ -393,33 +393,36 @@ export default {
     },
     // 添加或者编辑咨询分类
     async addCategory() {
-      try {
-        const params = this.categoryForm;
-        if(this.categoryId) {
-          params.id = this.categoryId
-        } else {
-          params.id = ''
+      this.$refs.categoryFormRef.validate(async valid => {
+        if (!valid) return
+        try {
+          const params = this.categoryForm;
+          if(this.categoryId) {
+            params.id = this.categoryId
+          } else {
+            params.id = ''
+          }
+          console.info('params:', params);
+          this.pending = true
+          const { code, message } = await CallCenterApi.saveZxSort(params)
+          this.pending = false
+          if (code !== 0) return this.$platform.notification({
+            title: this.categoryId ? '编辑失败' : '添加失败',
+            message: message || '',
+            type: 'error',
+          })
+          this.$platform.notification({
+            title: '保存成功',
+            type: 'success',
+          })
+          this.categoryDialogVisible = false
+          this.categoryDialogClosed()  
+          this.getCategoryList()  
+        } catch (error) {
+          this.pending = false
+          console.error(error)
         }
-        console.info('params:', params);
-        this.pending = true
-        const { code, message } = await CallCenterApi.saveZxSort(params)
-        this.pending = false
-        if (code !== 0) return this.$platform.notification({
-          title: this.categoryId ? '编辑失败' : '添加失败',
-          message: message || '',
-          type: 'error',
-        })
-        this.$platform.notification({
-          title: '保存成功',
-          type: 'success',
-        })
-        this.categoryDialogVisible = false
-        this.categoryDialogClosed()  
-        this.getCategoryList()  
-      } catch (error) {
-        this.pending = false
-        console.error(error)
-      }
+      })  
     },
     // 添加坐席
     async saveAgent(newValue) {
