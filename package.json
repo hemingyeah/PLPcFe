@@ -20,6 +20,7 @@
     "build:bodz": "node script/production.js --user=bodz",
     "build:bodzPub": "node script/production.js --user=bodzPublic",
     "build:cdh": "node script/production.js --user=cdh",
+    "build:cloud": "node script/production.js --user=cloud",
     "tag": "./script/tag.sh ${1} ${2}",
     "br": "./script/br.sh ${1} ${2} ${3}"
   },
