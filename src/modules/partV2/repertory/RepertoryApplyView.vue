@@ -1061,6 +1061,7 @@ import PartDealWithForm from "./form/PartDealWithForm.vue";
 
 import DateUtil from "@src/util/date";
 import AuthUtil from "@src/util/auth";
+import { getRootWindow } from '@src/util/dom';
 import {
   rejectBatch,
   revokeBatch,
@@ -2139,7 +2140,7 @@ export default {
           field: "prosperTime",
           exportAlias: "proposeTime",
           show: true,
-          sortable: "custom",
+          // sortable: "custom",
           width: 160
         },
         {
@@ -2157,7 +2158,7 @@ export default {
           label: "状态",
           exportAlias: "state",
           field: "state",
-          sortable: "state",
+          // sortable: "state",
           width: 80,
           overflow: true,
           show: true
@@ -2242,7 +2243,7 @@ export default {
           show: false,
           width: 160,
           overflow: false,
-          sortable: "approveTime"
+          // sortable: "approveTime"
         },
         {
           label: "操作",
@@ -2356,7 +2357,8 @@ export default {
       console.log(option);
     },
     dingMessage() {
-      window.send_ding_part_message(
+      let rootWindow = getRootWindow(window);
+      rootWindow.send_ding_part_message(
         this.partDealData.data.staffs,
         this.partDealData.data.approveNo
       );
