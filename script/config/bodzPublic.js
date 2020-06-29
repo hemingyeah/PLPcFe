@@ -1,5 +1,5 @@
 module.exports = {
-  targetRootPath: '/Users/liuxiaohan/Desktop/code/web',
+  targetRootPath: '/Users/mac/code/web',
   loginUser: {
     // 登录用户
     userId: '6839d043-683e-11ea-bfc9-00163e304a25',
