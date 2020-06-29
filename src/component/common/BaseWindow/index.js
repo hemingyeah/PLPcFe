@@ -1,5 +1,5 @@
 import './BaseWindow.scss';
-import Vue from 'Vue'
+import Vue from 'vue'
 import BaseWindowOptions from './BaseWindow';
 
 const BaseWindow = Vue.extend(BaseWindowOptions);
