@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import querystring from './QueryString'
+import querystring from './querystring'
 // https://github.com/axios/axios
 import axios from 'axios';
 

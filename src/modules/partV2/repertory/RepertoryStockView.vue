@@ -525,7 +525,7 @@
 
 <script>
 import _ from 'lodash';
-import qs from '@src/util/queryString2';
+import qs from '@src/util/querystring2';
 import Page from '@src/model/Page';
 import PartOutStockForm from './form/PartOutStockForm.vue';
 import PartInStockForm from './form/PartInStockForm.vue';

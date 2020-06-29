@@ -1,6 +1,6 @@
 //https://github.com/mzabriskie/axios
 import axios from 'axios';
-import qs from './QueryString2';
+import qs from './querystring2';
 
 function http(method = 'get', url = '', config = {}){
   config.url = url;
