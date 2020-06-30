@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry'
 import http from '@src/util/http'
-import TaskEditView from './TaskEditView.vue'
+import TaskEditView from './view/TaskEditView.vue'
 
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();

@@ -624,7 +624,7 @@ export default {
       platform.openTab({
         id: 'task_create',
         title: '新建工单',
-        url: '/task/create',
+        url: '/task/edit',
         reload: true,
       });
     },
