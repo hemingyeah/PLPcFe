@@ -1199,7 +1199,6 @@ export default {
       timeValue: "",
       updateTimeValue: "",
       isPersonalRepertory: false,
-      initData: {},
       rejectForm: {
         reason: "",
         reasons: ""
