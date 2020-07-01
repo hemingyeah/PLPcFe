@@ -168,7 +168,7 @@ export default {
 
       parent.frameHistoryBack(window)
     },
-    init() {
+    initialize() {
       this.initUrl();
       this.initTitle();
     },
@@ -186,9 +186,17 @@ export default {
       this.submitModel.url = url;
     },
     initTitle() {
-      let title = this.isPlanTaskEdit ? '编辑计划任务' : '新建工单';
-      title = this.isFromPlan ? '新建计划任务' : title;
-      title = this.isFromEvent && this.isTaskEdit ? '新建工单' : '编辑工单';
+      let title = '';
+
+      if(this.isPlanTaskEdit) {
+        title = '编辑计划任务';
+      } else if(this.isFromPlan) {
+        title = '新建计划任务';
+      } else if(!this.isFromEvent && this.isTaskEdit) {
+        title = '编辑工单';
+      } else {
+        title = '新建工单';
+      }
 
       document.title = title;
     },
@@ -268,7 +276,7 @@ export default {
   },
   async mounted() {
     try {
-      this.init();
+      this.initialize();
 
       // 初始化默认值
       let form = {};
