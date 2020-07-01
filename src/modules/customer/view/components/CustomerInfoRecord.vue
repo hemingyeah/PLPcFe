@@ -315,13 +315,14 @@ export default {
       
       // 呼入接听、呼入未接听、呼出接听、呼出未接听
       if(item.module == 'callCenter' && action == '通话结束') {
-        if(content.isDealing) {
-          return <h5><strong>{content.agentName}</strong>{content.isCallIn} ? '接听了' : '拨打了'<strong>{content.linkmanName}</strong>的电话。</h5>
+        if(content.isDealing === 'true') {
+          const str = ` ${content.isCallIn === 'true' ? '接听了' : '拨打了'} `;
+          return <h5><strong>{content.agentName}</strong>{str}<strong>{content.linkmanName}</strong>的电话。</h5>
         } 
-        if(content.isCallIn) {
-          return <h5><strong>{content.linkmanName}</strong>的来电，未被接听。</h5> 
+        if(content.isCallIn === 'true') {
+          return <h5><strong>{content.linkmanName}</strong>的电话，未被接听。</h5> 
         } 
-        return <h5><strong>{content.agentName}</strong>拨打了<strong>{content.linkmanName}</strong>的来电，未被接听。</h5>
+        return <h5><strong>{content.agentName}</strong>拨打了<strong>{content.linkmanName}</strong>的电话，未被接听。</h5>
       }
 
       return [

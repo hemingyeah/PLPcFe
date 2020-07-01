@@ -2,12 +2,10 @@
   <div class="call-center-contact-info">
     <h4>通话信息</h4>
     <div class="call-info">
-      <p>呼入电话：<span>{{linkmanPhone}}</span></p>
+      <p>呼叫电话：<span>{{linkmanPhone}}</span></p>
       <p>今日来电：<span>{{dialCount}}</span></p>
-    </div>
-    <div class="call-info">
       <p>归属地：<span>{{callDetail.attribution}}</span></p>
-      <p>呼入时间：<span>{{callDetail.ring}}</span></p>
+      <p>呼叫时间：<span>{{callDetail.ring}}</span></p>
     </div>
     <h4 class="customer-info-header">客户信息</h4>
     <div class="customer-info">
@@ -32,7 +30,7 @@
         <p>联系人：<span v-if="contact.linkman">{{contact.linkman.name}}</span></p>
         <p>区域：<span v-if="contact.customerAddress">{{contact.customerAddress.adProvince}}</span></p>
         <p>详细地址：<span v-if="contact.customerAddress">{{contact.customerAddress.adAddress}}</span></p>
-        <p>负责人：<img src="../../../assets/img/avatar.png"><span>{{contact.customerManagerName}}</span></p>
+        <p>负责人：<span>{{contact.customerManagerName}}</span></p>
         <p>服务团队：<span>{{dealTags(contact.tags)}}</span></p>
         <p>未完成的工单：<span class="unFinishTask">{{contact.unfinishedTaskCount}}</span></p>
         <p>未完成的事件：<span class="unFinishEvent">{{contact.unfinishedEventCount}}</span></p>
@@ -188,6 +186,9 @@ export default {
           if (f.formType === 'address' && f.isSystem) {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0
           }
+          if (f.formType === 'phone' && f.isSystem) {
+            f.defaultValue = this.linkmanPhone
+          }
           return f
         })
         .filter(f => {
@@ -196,7 +197,9 @@ export default {
             && (f.fieldName !== 'tags'
               || (f.fieldName === 'tags' && this.initData.isDivideByTag))
           )
-        })        
+        })   
+      console.info('sortedFields:', sortedFields);
+             
       return FormUtil.migration(sortedFields)
     },
     eventTypes() {
@@ -234,6 +237,7 @@ export default {
       let form = {};
       form = util.packToForm(this.fields, form, this.initData.customerAddress);
       this.form = FormUtil.initialize(this.fields, form);
+      
       this.init = true;
     } catch (e) {
       console.error(e);
@@ -504,8 +508,9 @@ export default {
 
   .call-info {
     display: flex;
+    flex-direction: column;
     p {
-      margin-top: 12px;
+      margin-top: 10px;
       margin-bottom: 0;
       flex: 1;
       color: #999;

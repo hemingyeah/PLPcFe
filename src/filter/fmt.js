@@ -120,13 +120,19 @@ export function fmt_state(value) {
   let state = ''
   switch (value) {
   case 'created':
-    state = '待分配';
+    state = '待指派';
     break;
   case 'allocated':
-    state = '待处理';
+    state = '已指派';
+    break;
+  case 'taskPool':
+    state = '工单池';
+    break;
+  case 'accepted':
+    state = '已接受';
     break;
   case 'processing':
-    state = '处理中';
+    state = '进行中';
     break;
   case 'convert2Task':
     state = '转工单';
@@ -134,14 +140,36 @@ export function fmt_state(value) {
   case 'finished':
     state = '已完成';
     break;
-  case 'offed':
-    state = '已取消';
+  case 'refused':
+    state = '已拒绝';
+    break;
+  case 'costed':
+    state = '已结算';
     break;
 
   default:
     break;
   }
   return state
+}
+
+export function fmt_h_m_s(sec = 0) {
+  const HOUR_SEC = 60 * 60;
+  const MIN_SEC = 60;
+
+  let hour = sec / HOUR_SEC >> 0;
+  sec = sec % HOUR_SEC;
+
+  let min = sec / MIN_SEC >> 0;
+  sec = sec % MIN_SEC;
+
+  let temp = '';
+
+  if(hour > 0) temp += `${hour}时`;
+  if(min > 0) temp += `${min}分`;
+  if(sec > 0) temp += `${sec}秒`;
+
+  return temp ? temp : '--';
 }
 
 const fmt = {
@@ -153,7 +181,8 @@ const fmt = {
   fmt_address,
   fmt_datehour,
   fmt_state,
-  fmt_short_time
+  fmt_short_time,
+  fmt_h_m_s
 }
 
 export default fmt;

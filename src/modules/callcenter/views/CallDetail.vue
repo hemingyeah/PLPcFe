@@ -3,7 +3,7 @@
     <div class="main">
       <h4>通话信息</h4>
       <div class="call-info">
-        <p>通话ID：<span>{{callDetail.callId}}</span></p>
+        <p>通话ID：<span>{{callDetail.recordId}}</span></p>
         <p>通话时长：<span>{{callDetail.talkTime}}</span></p>
         <p>接待坐席：<span>{{callDetail.agentName}}</span></p>
       </div>
@@ -45,7 +45,7 @@
           <p>联系人：<span v-if="contact.linkman">{{contact.linkman.name}}</span></p>
           <p>区域：<span v-if="contact.customerAddress">{{contact.customerAddress.adProvince}}</span></p>
           <p>详细地址：<span v-if="contact.customerAddress">{{contact.customerAddress.adAddress}}</span></p>
-          <p>负责人：<img src="../../../assets/img/avatar.png"><span>{{contact.customerManagerName}}</span></p>
+          <p>负责人：<span>{{contact.customerManagerName}}</span></p>
           <p>服务团队：<span>{{dealTags(contact.tags)}}</span></p>
           <p>未完成的工单：<span class="unFinishTask">{{contact.unfinishedTaskCount}}</span></p>
           <p>未完成的事件：<span class="unFinishEvent">{{contact.unfinishedEventCount}}</span></p>
@@ -114,25 +114,26 @@
       </h4>
     </div>
     <div class="right">
+      <h4 style="font-size: 16px;margin-bottom: 20px;padding-top: 8px;">服务备注</h4>
       <template v-if="remarkList.length">
-        <div v-for="(item, index) in remarkList" :key="item.id" class="item" @click="delRemark(item, index)">
+        <div v-for="(item, index) in remarkList" :key="item.id" class="item">
           <div class="item-title">
             <h4>服务备注（{{index + 1}}）</h4>
-            <i v-if="!item.isDelete" class="iconfont icon-qingkongshanchu"></i>
+            <i v-if="!item.isDelete" class="iconfont icon-qingkongshanchu" @click="delRemark(item, index)"></i>
           </div>
           <div class="item-header">
-            <img src="../../../assets/img/avatar.png">
             <p>{{item.createUser}}</p>
             <span>{{item.createTime}}</span>
           </div>
 
           <div v-if="item.isDelete" class="item-isDelete">
             <span>删除了服务备注</span>
+            <span class="delete-time">删除时间:{{item.deleteTime}}</span>
           </div>
           <div v-else class="item-content">
-            <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
+            <el-tag v-if="item.sortName" class="sort">{{item.sortName}}</el-tag>
             <el-tag :type="item.status ==1 ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
-            <p v-if="item.remark">{{item.remark}}</p>
+            <p v-if="item.remark">备注:{{item.remark}}</p>
           </div>
 
         </div>
@@ -197,12 +198,6 @@ let query;
 export default {
   name: 'call-detail',
   inject: ['initData'],
-  props: {
-    item: {
-      type: Object,
-      default: () => ({})
-    }
-  },
   data() {
     return {
       callDetail:{},
@@ -259,12 +254,6 @@ export default {
     }
   },
   computed: {
-    linkmanPhone() {
-      return this.item.dialPhone
-    },
-    callRecordId() {
-      return this.item.id
-    },
     action() {
       return 'create'
     },
@@ -299,10 +288,10 @@ export default {
       return this.initData.taskTypeList.map(t => Object.freeze(t))
     },
     taskBusinessNo() {
-      return (this.callDetail && this.callDetail.taskId) || '' 
+      return (this.contact.taskBindRecord && this.contact.taskBindRecord.businessNo) || '' 
     },
     eventBusinessNo() {
-      return (this.callDetail && this.callDetail.eventId) || ''
+      return (this.contact.eventBindRecord && this.contact.eventBindRecord.businessNo) || ''
     }
   },
   async mounted() {
@@ -325,9 +314,9 @@ export default {
     // 获取服务备注列表
     getRemarkList(){
       const params = {
-        recordId: this.item.id
+        recordId: query.id
       }
-      if(!this.item.id) return
+      if(!query.id) return
       CallCenterApi.getFwRemarkList(params).then(({code, message, result}) => {
         if (code != 0) return this.$message.error(message || '内部错误')
         this.remarkList = result || []
@@ -361,9 +350,9 @@ export default {
         if (!valid) {
           return false
         } 
-        if(!this.item.id) return false
+        if(!query.id) return false
         const params = this.ruleForm
-        params.recordId = this.item.id
+        params.recordId = query.id
         // console.info('params', params)
         try {
           const {code, message} = await CallCenterApi.saveFwRemark(params)
@@ -518,7 +507,7 @@ export default {
         id: 'createTask',
         title: '新建工单',
         close: true,
-        url: `/task/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${this.callRecordId}&linkmanId=${linkmanId}`,
+        url: `/task/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${query.id}&linkmanId=${linkmanId}`,
         fromId
       })
     },
@@ -543,7 +532,7 @@ export default {
         id: 'createEvent',
         title: '新建事件',
         close: true,
-        url: `/event/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${this.callRecordId}&linkmanId=${linkmanId}`,
+        url: `/event/edit4CallCenter?defaultTypeId=${typeId}&callRecordId=${query.id}&linkmanId=${linkmanId}`,
         fromId
       })
     },
@@ -709,6 +698,61 @@ export default {
     width: 25%;
     background: #fff;
     padding: 12px;
+    .item {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #f5f5f5;
+      .item-title {
+        display: flex;
+        justify-content: space-between;
+        h4{
+          font-size: 14px;
+          margin-bottom: 10px;
+          margin-left: 8px;
+        }
+      }
+      .item-header {
+        display: flex;
+        align-items: center;
+        p {
+          flex: 1;
+          margin-bottom: 10px;
+          margin-left: 8px;
+        }
+      }
+      .item-isDelete {
+        display: flex;
+        justify-content: space-between;
+        color: #fb602c;
+        height: 42px;
+        font-size: 14px;
+        line-height: 42px;
+        .delete-time {
+          color: #666;
+          font-size: 12px;
+        }
+      }
+      .item-content {
+        padding: 5px;
+        p {
+          background-color: #fafbfc;
+          padding: 10px;
+          margin: 10px 0;
+          color: #737f7b;
+        }
+        .el-tag--small {
+          overflow: hidden;
+        }
+        .sort {
+          width: 90px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          margin-right: 8px;
+        }
+      }
+    }
+    .el-textarea__inner{
+      padding: 5px 10px;
+    }
     .el-form-item--small .el-form-item__label {
       position: relative;
       padding-left: 10px;

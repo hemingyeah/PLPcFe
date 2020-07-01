@@ -140,7 +140,7 @@ export function getHistoryCallRecordList(params = {}) {
  * @param {*} params 
  */
 export function deleteTodayCallRecord(params = {}) {
-  return http.post('/outside/callcenter/api/deleteTodayCallRecord', params)
+  return http.post('/outside/callcenter/api/deleteTodayCallRecord', params, false)
 }
 
 /**

@@ -4,8 +4,14 @@
       <el-table-column v-for="column in columns" :key="column.field" :label="column.label" :prop="column.field" :width="column.width"
                        :class-name="column.field == 'name' ? 'customer-product-name-superscript-td' : ''" :sortable="column.sortable" :show-overflow-tooltip="column.field !== 'name'" :align="column.align">
         <template slot-scope="scope">
+          <template v-if="column.field === 'customerInfo' && scope.row[column.field]">
+            {{scope.row[column.field].linkmanName}}
+          </template>
+          <template v-else-if="column.field === 'agentInfo' && scope.row[column.field]">
+            {{scope.row[column.field].agentName}}
+          </template>
           <template v-if="column.field === 'remarkStatus'">
-            {{scope.row[column.field] ? '已解决' : '未解决'}}
+            {{scope.row[column.field] == 1 ? '已解决' : (scope.row[column.field] == 0 ? '未解决' : '')}}
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -23,8 +29,6 @@
 </template>
 
 <script>
-import { formatDate } from '@src/util/lang'
-
 export default {
   name: 'customer-call-table',
   props: {
@@ -44,6 +48,11 @@ export default {
       }
     }
   },
+  computed: {
+    customerId() {
+      return this.shareData.customer ? this.shareData.customer.id : '';
+    },
+  },
   mounted() {
     this.fetchData()
   },
@@ -54,20 +63,14 @@ export default {
     },
     fetchData() {
       const params = {
-        linkmanPhone: this.customerId,
+        customerId: this.customerId,
         page: this.paginationInfo.pageNum,
         pageSize: this.paginationInfo.pageSize
       }
 
       this.$http.get('/outside/callcenter/callrecord/page4CallTab', params)
         .then(res => {
-          this.callList = res.result && res.result.list.map(product => {
-            product.createTime = formatDate(
-              new Date(product.createTime),
-              'YYYY-MM-DD HH:mm:ss'
-            )
-            return Object.freeze(product)
-          })
+          this.callList = res.result && res.result.list
           this.paginationInfo.totalItems = res.result.total
         })
         .catch(e => console.error('fetchData product caught e', e))
@@ -81,12 +84,12 @@ export default {
         },
         {
           label: '联系人',
-          field: 'customerInfo.linkmanName',
+          field: 'customerInfo',
           show: true
         },
         {
           label: '接待坐席',
-          field: 'agentInfo.agentName',
+          field: 'agentInfo',
           show: true
         },
         {

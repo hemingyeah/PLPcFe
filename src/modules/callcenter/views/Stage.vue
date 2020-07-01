@@ -4,7 +4,7 @@
     <div class="stats-station-header">
       <p>呼叫中心号码：<span>{{callState.hotLine}}</span></p>
       <p>坐席数：<span>{{callState.agentNum}}</span>
-        <el-tooltip content="已购买/已使用">
+        <el-tooltip content="已配置坐席数/购买坐席数">
           <i class="iconfont icon-info"></i>
         </el-tooltip>
       </p>
@@ -19,7 +19,7 @@
         <div class="card-content">
           <p><i class="iconfont icon-huru"></i> 呼入已接通话量</p>
           <h3> {{statisticsRecord.normalDealingCount}}</h3>
-          <div class="card-bottom">未接来电：{{statisticsRecord.normalNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{statisticsRecord.normalDealingRate}}
+          <div class="card-bottom">未接来电：{{statisticsRecord.normalNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{parseFloat((statisticsRecord.normalDealingRate*100).toFixed(2)) }}%
           </div>
         </div>
       </div>
@@ -28,15 +28,15 @@
         <div class="card-content">
           <p><i class="iconfont icon-huru"></i> 呼入已解决通话</p>
           <h3>{{statisticsRecord.normalSolvedCount}}</h3>
-          <div class="card-bottom">解决率：{{statisticsRecord.normalSolvedRate}}</div>
+          <div class="card-bottom">解决率：{{ parseFloat((statisticsRecord.normalSolvedRate*100).toFixed(2)) }}%</div>
         </div>
       </div>
 
       <div class="stats-station-card">
         <div class="card-content">
           <p><i class="iconfont icon-huru"></i> 呼入通话时长</p>
-          <h3>{{statisticsRecord.totalNormalDealings}}</h3>
-          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgNormalDealings}}</div>
+          <h3>{{statisticsRecord.totalNormalDealings|fmt_h_m_s}}</h3>
+          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgNormalDealings|fmt_h_m_s}}</div>
         </div>
       </div>
 
@@ -44,15 +44,15 @@
         <div class="card-content">
           <p><i class="iconfont icon-huchu"></i> 呼出通话量</p>
           <h3>{{statisticsRecord.dialoutDealingCount}}</h3>
-          <div class="card-bottom">未接来电：{{statisticsRecord.dialoutNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{statisticsRecord.dialoutDealingRate}}</div>
+          <div class="card-bottom">未接来电：{{statisticsRecord.dialoutNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{ parseFloat((statisticsRecord.dialoutDealingRate*100).toFixed(2)) }}%</div>
         </div>
       </div>
 
       <div class="stats-station-card">
         <div class="card-content">
           <p><i class="iconfont icon-huchu"></i> 呼出通话时长</p>
-          <h3>{{statisticsRecord.totalDialoutDealings}}</h3>
-          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgDialoutDealings}}</div>
+          <h3>{{statisticsRecord.totalDialoutDealings|fmt_h_m_s}}</h3>
+          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgDialoutDealings|fmt_h_m_s}}</div>
         </div>
       </div>
     </div>
@@ -82,10 +82,11 @@
         <div class="operation-bar-container">
           <div class="top-btn-group">
             <el-radio-group v-model="activeName" @change="stateChangeHandler" size="medium">
-              <el-radio-button label="全部" name="all"></el-radio-button>
-              <el-radio-button label="已接来电" name="task"></el-radio-button>
-              <el-radio-button label="未接来电" name="customer"></el-radio-button>
-              <el-radio-button label="呼出电话" name="stock"></el-radio-button>
+              <el-radio-button label="全部"></el-radio-button>
+              <el-radio-button label="已接来电"></el-radio-button>
+              <el-radio-button label="未接来电"></el-radio-button>
+              <el-radio-button label="呼出已接"></el-radio-button>
+              <el-radio-button label="呼出未接"></el-radio-button>
             </el-radio-group>
           </div>
           <div class="action-button-group">
@@ -102,11 +103,13 @@
         </div>
 
         <el-table :data="recordList" stripe @select-all="handleSelection" :row-key="getRowKey" header-row-class-name="customer-table-header" ref="multipleTable" class="customer-table">
-          <el-table-column v-for="column in columns" v-if="column.show" :fixed="column.fixed" :key="column.field" :label="column.label" :prop="column.field" :width="column.width" :min-width="column.minWidth || '120px'"
+          
+          <el-table-column v-for="column in columns" v-if="column.show" 
+                           :fixed="column.fixed" :key="column.field" :label="column.label" :prop="column.field" :width="column.width" :min-width="column.minWidth || '120px'"
                            :class-name="column.field == 'name' ? 'customer-name-superscript-td' : ''" :show-overflow-tooltip="column.field !== 'name'" :align="column.align">
             <template slot-scope="scope">
               <template v-if="column.field === 'callType'">
-                {{fmt_callType(scope.row[column.field])}}
+                {{fmt_callType(scope.row)}}
               </template>
               <template v-else-if="column.field === 'customerName'">
                 <span v-if="scope.row[column.field]">{{scope.row[column.field]}}</span>
@@ -120,20 +123,20 @@
                 <span v-if="scope.row[column.field]">{{scope.row[column.field]}}</span>
                 <span v-else>--</span>
               </template>
-              <template v-else-if="activeName != '呼出电话' && column.field === 'status'">
+              <template v-else-if="column.field === 'status'">
                 <span v-if="scope.row[column.field] == 0" style="color:#FB602C">未解决</span>
                 <span v-else-if="scope.row[column.field] == 1">已解决</span>
                 <span v-else>--</span>
               </template>
-              <template v-else-if="(activeName === '' || activeName === '呼出电话') && column.field === 'handleStatus'">
+              <template v-else-if="column.field === 'handleStatus'">
                 <span v-if="scope.row[column.field] == 0" style="color:#FB602C">未处理</span>
                 <span v-else-if="scope.row[column.field] == 1">已处理</span>
                 <span v-else>--</span>
               </template>
               <template v-else-if="column.field === 'operation'" slot-scope="scope">
                 <!-- 处理未接来电 -->
-                <el-button type="text" :disabled="scope.row.callType!='notDeal'" @click="dealDialog(scope.row)">处理</el-button>
-                <el-button type="text" @click="detail(scope.row)">详情</el-button>
+                <el-button type="text" v-if="scope.row.state=='notDeal'" @click="dealDialog(scope.row)">处理</el-button>
+                <el-button type="text" v-else @click="detail(scope.row)">详情</el-button>
               </template>
              
               <template v-else>
@@ -258,7 +261,7 @@ export default {
     async makePhoneCall(tel){
       if(!tel) return
       try {
-        await this.$http.post('/outside/callcenter/api/dialout', {phone:tel, taskType:'未接来电'}, false)
+        await this.$http.post('/outside/callcenter/api/dialout', {phone:tel, taskType:'handle'}, false)
       } catch (error) {
         console.error(error);
       }
@@ -311,18 +314,33 @@ export default {
       console.info('state:', state); 
       // 切换tab
       this.activeName = state; 
+      this.columns.forEach(col => {
+        if (col.field == 'handleStatus') {
+          this.$set(col, 'show', this.activeName === '全部' || this.activeName === '未接来电');
+        } else if (col.field == 'status') {
+          this.$set(col, 'show', this.activeName != '未接来电');
+        }
+      })
       switch (state) {
       case '全部':
+        this.params.callType = ''
         this.params.state = ''
         break;
       case '已接来电':
+        this.params.callType = 'normal'
         this.params.state = 'dealing'
         break;
       case '未接来电':
+        this.params.callType = 'normal'
         this.params.state = 'notDeal'
         break;
-      case '呼出电话':
-        this.params.state = 'dialout'
+      case '呼出已接':
+        this.params.callType = 'dialout'
+        this.params.state = 'dealing'
+        break;
+      case '呼出未接':
+        this.params.callType = 'dialout'
+        this.params.state = 'notDeal'
         break;
       default:
         break;
@@ -650,29 +668,22 @@ export default {
         this.toggleSelection(selected);
       });
     },
-    fmt_callType(type){
-      // 呼叫类型：已接：dealing 未接：notDeal 呼出：dialout
+    fmt_callType(row){
+      // 呼叫类型
       let res = ''
-      switch (type) {
-      case 'dealing':
-        res = '已接' 
-        break;
-      case 'notDeal':
-        res = '未接' 
-        break;
-      case 'dialout':
-        res = '呼出' 
-        break;
-      default:
-        break;
+      if(row.callType === 'normal') {
+        res = row.state === 'dealing' ? '已接来电' : '未接来电'
+      } else if(row.callType === 'dialout'){
+        res = row.state === 'dealing' ? '呼出已接' : '呼出未接'
       }
       return res
     },
     fixedColumns() {
+      console.info('activeName:', this.activeName);
       return [
         {
           label: '通话ID',
-          field: 'callId',
+          field: 'recordId',
           show: true,
           minWidth: '150px'
         },
@@ -758,14 +769,14 @@ export default {
           displayName: '通话开始时间',
           label: '通话开始时间',
           fieldName: 'beginTime',
-          minWidth: '150px',
+          width: '180px',
           show: false
         },
         {
           displayName: '通话结束时间',
           label: '通话结束时间',
           fieldName: 'endTime',
-          minWidth: '150px',
+          width: '180px',
           show: false
         },
         {
@@ -876,6 +887,9 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
   height: 24px;
   line-height: 24px;
   margin-left: 5px;
+  i {
+    cursor:pointer;
+  }
 }
 .call-center-stats-container {
   margin: 12px;

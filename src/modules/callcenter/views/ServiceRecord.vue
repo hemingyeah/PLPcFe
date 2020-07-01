@@ -2,10 +2,10 @@
   <div class="call-center-service-record">
     <el-card class="session-card" shadow="hover">
       <div slot="header" @click="expand('session')">
-        <span><i class="iconfont icon-nav-down toggle-up" :class="sessionToggle ? 'is-reverse': ''"></i>历史通话</span>
+        <span><i class="iconfont icon-nav-down toggle-up" :class="sessionToggle ? 'is-reverse': ''"></i>{{sessionList.length ? `历史通话(${sessionList.length})`: '历史通话'}}</span>
       </div>
-      <div v-show="showSession" v-for="item in sessionList" :key="item.id" class="list-item" @click="goHistoryDetail(item.id)">
-        <img src="../../../assets/img/avatar.png">
+      <div v-show="showSession" v-for="item in sessionList" :key="item.id" class="list-item" @click="goHistoryDetail(item)">
+        <!-- <img src="../../../assets/img/avatar.png"> -->
         <div class="list-content">
           <div class="list-header">
             <p>{{item.agentName}}</p>
@@ -21,7 +21,7 @@
     </el-card>
     <el-card class="task-card" shadow="hover">
       <div slot="header" @click="expand('task')">
-        <span><i class="iconfont icon-nav-down toggle-up" :class="taskToggle ? 'is-reverse': ''"></i>历史工单</span>
+        <span><i class="iconfont icon-nav-down toggle-up" :class="taskToggle ? 'is-reverse': ''"></i>{{taskList.length ? `历史工单(${taskList.length})` : '历史工单'}}</span>
       </div>
       <div v-show="showTask" v-for="item in taskList" :key="item.id" class="list-item" @click="goTaskDetail(item.id)">
         <div class="list-content">
@@ -35,14 +35,14 @@
               {{ tag.type }}
             </el-tag>
           </p>
-          <p>负责人：{{item.customer && item.customer.customerManagerName}}</p>
+          <p>负责人：{{item.executor && item.executor.displayName}}</p>
           <p v-if="item.synergies && item.synergies.length">协同人：{{fmt_synergies(item.synergies)}}</p>
         </div>
       </div>
     </el-card>
     <el-card class="event-card" shadow="hover">
       <div slot="header" @click="expand('event')">
-        <span><i class="iconfont icon-nav-down toggle-up" :class="eventToggle ? 'is-reverse': ''"></i>历史事件</span>
+        <span><i class="iconfont icon-nav-down toggle-up" :class="eventToggle ? 'is-reverse': ''"></i>{{eventList.length ? `历史事件(${eventList.length})`: '历史事件'}}</span>
       </div>
       <div v-show="showEvent" v-for="item in eventList" :key="item.id" class="list-item" @click="goEventDetail(item.id)">
         <div class="list-content">
@@ -82,7 +82,6 @@ export default {
       showSession: false,
       showTask: false,
       showEvent: false,
-      // linkmanPhone: '18397952974',
       sessionList: [],
       taskList: [],
       eventList: []
@@ -92,9 +91,7 @@ export default {
     item: {
       immediate: true,
       deep: true,
-      handler(newValue, oldValue) {
-        console.info('item newval:', newValue);
-        
+      handler(newValue, oldValue) {        
         this.getSessionList();
         this.getTaskList()
         this.getEventList()
@@ -120,7 +117,7 @@ export default {
       if(!this.linkmanPhone) return
       CallCenterApi.getTaskHistoryList({linkmanPhone: this.linkmanPhone}).then(({ status, message, data }) => {
         if(status !== 0) return
-        console.info('', status, message, data)
+        // console.info('', status, message, data)
         this.taskList = data.list || []
       }).catch((err) => {
         console.error(err)
@@ -130,7 +127,7 @@ export default {
       if(!this.linkmanPhone) return
       CallCenterApi.getEventHistoryList({linkmanPhone: this.linkmanPhone}).then(({ status, message, data }) => {
         if(status !== 0) return
-        console.info('', status, message, data)
+        // console.info('', status, message, data)
         this.eventList = data.list || []
       }).catch((err) => {
         console.error(err)
@@ -221,7 +218,7 @@ export default {
 .event-card {
   .list-item {
     display: flex;
-    padding: 12px 12px 0;
+    padding: 20px 12px 10px 12px;
     border-bottom: 1px solid #eee;
     img {
       width: 48px;

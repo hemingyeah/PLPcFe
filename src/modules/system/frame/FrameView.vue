@@ -26,7 +26,7 @@
             <!-- profile -->
             <div class="frame-quick-right">
 
-              <button type="button" class="btn-text frame-header-btn" @click="handleCallCenterClick">
+              <button v-if="has_call_center_module" type="button" class="btn-text frame-header-btn" @click="handleCallCenterClick">
                 <i class="iconfont icon-dianhua1"></i>
               </button>
               <div v-if="showCallCenter" class="call-center-box" > 
@@ -203,10 +203,10 @@ import ImportAndExport from './component/ImportAndExport.vue'
 import DefaultHead from '@src/assets/img/user-avatar.png'
 import NotificationCenter from './component/NotificationCenter.vue'
 import * as NotificationApi from '@src/api/NotificationApi'
+import * as CallCenterApi from '@src/api/CallCenterApi'
 
 const NOTIFICATION_TIME = 1000 * 60 * 10
 
-// const wsUrl = 'ws://shb-callcenter.vaiwan.com/websocket/asset/'
 // const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
 // const wsUrl = 'ws://30.40.61.216:9001/websocket/asset/dd4531bf-7598-11ea-bfc9-00163e304a25_123'
 let webSocketClient = null, lockReconnect = false,
@@ -265,13 +265,15 @@ export default {
             }
           }, this.timeout)
         }
-      }
+      },
+      has_call_center_module:false
     }
   },
   computed: {
     wsUrl() {
       // websocket连接地址
-      return `ws://30.40.61.216:9001/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
+      // return `ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25`
+      return `ws://30.40.59.111:9001/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
       // return `ws://shb-callcenter.vaiwan.com/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
     },
     /** 是否显示devtool */
@@ -298,6 +300,27 @@ export default {
     }
   },
   methods: {
+    async getAccountInfo() {
+      try {
+        const { code, result } = await CallCenterApi.getAccountInfo()
+        // result为null未申请开通
+        if (code !== 0 || !result) {
+          return
+        } 
+        // 审核状态：0待审核，1已审核
+        if(result.verifyStatus == 1) {
+          this.has_call_center_module = true
+          localStorage.setItem('call_center_module', 1)
+          if ('WebSocket' in window) {
+            this.initWebSocket()
+          } else {
+            alert('当前浏览器 Not support websocket')
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
     menuRender(h, target) {
       let menus = [
         <base-context-menu-item command="other">
@@ -641,16 +664,17 @@ export default {
         // "callPhone":"15267183070","callType":"dialout","message":"已经在话机：18072725367上呼出，请注意接听"
         // {"callPhone":"15267183070","callState":"Hangup","callType":"dialout","ringTime":1592636121000}
         console.info('data:', data.callType, data.callState);
-        if(data.callState === 'Unlink' || data.callState === 'Hangup' || data.callState === 'Link') {
-          // 挂断 接听
-          this.showCallCenter = false 
-          return 
-        }
         if(data.callType === 'normal' || data.callType === 'dialout') {
-          // linkmanName 为空是未知联系人
-          this.callData = data
-          this.showCallCenter = true
-          this.openCallCenterWorkbench(data)
+          if(data.callState === 'Hangup'){
+            // 没接听 
+            this.showCallCenter = false
+          } else if(data.callState === 'Unlink' || data.callState === 'Link') {
+            // 接听了和接听然后挂断了
+            this.callData = data
+            this.openCallCenterWorkbench(data)
+          } else {
+            this.showCallCenter = true
+          } 
         }
       } catch (error) {
         console.error(error);
@@ -700,14 +724,11 @@ export default {
     setInterval(() => {
       this.getSystemMsg();
     }, NOTIFICATION_TIME);
+      
+
   },
   async mounted() { 
-    if ('WebSocket' in window) {
-      this.initWebSocket()
-    } else {
-      alert('当前浏览器 Not support websocket')
-    }
-
+    this.getAccountInfo()
     let userGuide = this?.initData?.userGuide === true || false
 
     if (userGuide) {

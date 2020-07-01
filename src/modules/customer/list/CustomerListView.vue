@@ -179,7 +179,7 @@
               </template>
             </template>
             <template v-else-if="column.field === 'lmPhone'">
-              <span @click.stop="makePhoneCall(scope.row.lmPhone)"> {{scope.row.lmPhone}} <i class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;"></i></span>
+              <span class="align-items-center" @click.stop="makePhoneCall(scope.row.lmPhone)"> {{scope.row.lmPhone}} <i v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></span>
             </template>
             <template v-else-if="column.field === 'createUser'">
               {{scope.row.createUserName}}
@@ -404,7 +404,8 @@ export default {
       columns: this.fixedColumns(),
       selectedLimit: 500,
       columnNum: 1,
-      tableKey: (Math.random() * 1000) >> 2
+      tableKey: (Math.random() * 1000) >> 2,
+      hasCallCenterModule:localStorage.getItem('call_center_module')
     };
   },
   computed: {
@@ -522,8 +523,9 @@ export default {
   },
   methods: {
     async makePhoneCall(phone){
+      if(!this.hasCallCenterModule) return
       try {
-        await this.$http.post('/outside/callcenter/api/dialout', {phone, taskType:'客户'}, false)
+        await this.$http.post('/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
       } catch (error) {
         console.error(error);
       }
@@ -1074,7 +1076,7 @@ export default {
         {
           label: '电话',
           field: 'lmPhone',
-          // width: '130px',
+          minWidth: '150px',
           show: true
         },
         {

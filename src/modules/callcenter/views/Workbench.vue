@@ -29,7 +29,7 @@
             </div>
             <div class="item">
               <p style="margin-bottom:0;color:#999;">{{item.customerName}}</p>
-              <i class="iconfont" :class="item.callType === 'dialout' ? 'icon-laidian' : 'icon-qudian'"></i>
+              <i class="iconfont" :class="item.callType === 'dialout' ? 'icon-qudian' : 'icon-laidian'"></i>
             </div>
           </div>
 
@@ -45,24 +45,25 @@
     <div class="right">
       <h4 style="font-size: 16px;margin-bottom: 20px;padding-top: 8px;">服务备注</h4>
       <template v-if="remarkList.length">
-        <div v-for="(item, index) in remarkList" :key="item.id" class="item" @click="delRemark(item, index)">
+        <div v-for="(item, index) in remarkList" :key="item.id" class="item">
           <div class="item-title">
             <h4>服务备注（{{index + 1}}）</h4>
-            <i v-if="!item.isDelete" class="iconfont icon-qingkongshanchu"></i>
+            <i v-if="!item.isDelete" class="iconfont icon-qingkongshanchu" @click="delRemark(item, index)"></i>
           </div>
           <div class="item-header">
-            <img src="../../../assets/img/avatar.png">
             <p>{{item.createUser}}</p>
             <span>{{item.createTime}}</span>
           </div>
 
           <div v-if="item.isDelete" class="item-isDelete">
             <span>删除了服务备注</span>
+            <span class="delete-time">删除时间:{{item.deleteTime}}</span>
+
           </div>
           <div v-else class="item-content">
-            <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
+            <el-tag v-if="item.sortName" class="sort">{{item.sortName}}</el-tag>
             <el-tag :type="item.status ==1 ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
-            <p v-if="item.remark">{{item.remark}}</p>
+            <p v-if="item.remark">备注:{{item.remark}}</p>
           </div>
 
         </div>
@@ -350,6 +351,8 @@ export default {
       box-shadow: 0 0 0 0;
       border-radius: 0 0 4px 4px;
       .el-card__body {
+        overflow: auto;
+        max-height: 800px;
         padding: 0;
         .history-item {
           padding: 12px 15px;
@@ -402,33 +405,47 @@ export default {
       .item-title {
         display: flex;
         justify-content: space-between;
+        h4{
+          font-size: 14px;
+          margin-bottom: 10px;
+          margin-left: 8px;
+        }
       }
       .item-header {
         display: flex;
         align-items: center;
-        img {
-          width: 36px;
-          height: 36px;
-        }
         p {
           flex: 1;
-          margin-bottom: 0;
-          margin-left: 10px;
+          margin-bottom: 10px;
+          margin-left: 8px;
         }
       }
       .item-isDelete {
+        display: flex;
+        justify-content: space-between;
         color: #fb602c;
         height: 42px;
         font-size: 14px;
         line-height: 42px;
+        .delete-time {
+          color: #666;
+          font-size: 12px;
+        }
       }
       .item-content {
         padding: 5px;
         p {
-          background-color: #fafbfc;
-          padding: 10px;
-          margin: 10px 0;
+          padding: 10px 2px;
           color: #737f7b;
+        }
+        .el-tag--small {
+          overflow: hidden;
+        }
+        .sort {
+          width: 90px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          margin-right: 8px;
         }
       }
     }

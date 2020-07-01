@@ -42,7 +42,7 @@ export default {
         {
           orderId: 1,
           displayName: '通话ID',
-          fieldName: 'callId',
+          fieldName: 'recordId',
           formType: 'text',
           placeholder: '请输入通话ID',
           maxlength:50

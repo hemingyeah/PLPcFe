@@ -62,21 +62,23 @@ const FormView = {
 
     buildPhoneDom(lmPhone) {
       const { value, displayName} = lmPhone;
+      const hasCallCenterModule = localStorage.getItem('call_center_module')
+      const str = hasCallCenterModule && value ? <i v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i> : ''
       return (
         <div class="form-view-row">
           <label>{displayName}</label>
-          <div class="form-view-row-content" onClick={() => this.makePhoneCall(value)}>
+          <div class="form-view-row-content" onClick={() => this.makePhoneCall(value, hasCallCenterModule)}>
             <span>{value}</span>
-            {value && <i class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;"></i>}
+            {str}
           </div>
         </div>
       )
     },
 
-    async makePhoneCall(phone){
-      if(!phone) return
+    async makePhoneCall(phone, hasCallCenterModule){
+      if(!phone || !hasCallCenterModule) return
       try {
-        await http.post('/outside/callcenter/api/dialout', {phone, taskType:'客户'}, false)
+        await http.post('/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
       } catch (error) {
         console.error(error);
       }

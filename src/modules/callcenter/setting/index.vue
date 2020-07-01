@@ -35,7 +35,6 @@ export default {
           return
         } 
         console.info('res:', code, message, result)
-        // localStorage.setItem('call_center_module', JSON.stringify(result))
         this.result = result
         // 审核状态：0待审核，1已审核
         this.show = result.verifyStatus ? 'call-center' : 'call-center-auditing'
