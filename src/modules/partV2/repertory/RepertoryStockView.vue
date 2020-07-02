@@ -4,18 +4,18 @@
     <div class="base-search-group-container">
 
       <form class="base-search" onsubmit="return false;">
-        <div class="customer-list-base-search-group" style="width: 540px;">
+        <div class="customer-list-base-search-group" style="width: auto;">
           <base-button type="primary" @event="openStock($event);trackEventHandler('stockTable')" v-if="viewReport" icon="icon-depot">
             仓库报表
           </base-button>
 
-          <el-input v-model="model.keyWord" placeholder="根据备件信息搜索">
+          <el-input style="margin-left:10px" v-model="model.keyWord" placeholder="根据备件信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="model.pageNum=1;search();trackEventHandler('search')" native-type="submit">
+          <base-button style="margin-left:10px" type="primary" @event="model.pageNum=1;search();trackEventHandler('search')" native-type="submit">
             搜索
           </base-button>
-          <base-button type="ghost" @event="reset();trackEventHandler('reset')">
+          <base-button style="margin-left:10px" type="ghost" @event="reset();trackEventHandler('reset')">
             重置
           </base-button>
         </div>

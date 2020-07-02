@@ -5,7 +5,7 @@
         <el-autocomplete
           slot-scope="scope"
           popper-class="batch-in-part"
-          :value="scope.row.sparepartName"
+          v-model="scope.row.sparepartName"
           :fetch-suggestions="fetchSparepart"
           placeholder="请输入内容"
           @select="choosePart($event,scope.row)">
