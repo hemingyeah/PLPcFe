@@ -22,11 +22,27 @@ router.get('/task/create', async ctx => {
   ctx.body = Template.renderWithData('新建工单', {}, script, modConfig.template)
 });
 
-router.get('/task/edit/:id', async ctx => {
+router.get('/task/edit', async ctx => {
   let modConfig = modules['task.edit'];
+  let reqHeaders = ctx.request.headers;
   let script = ['/task.edit.js'];
+
+  let url = '/task/edit';
+  let result = await HttpClient.request(url, 'get', null, {headers: reqHeaders});
+  let body = result.body;
   
-  ctx.body = Template.renderWithHtml('编辑工单', {}, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('编辑工单', body, script, modConfig.template)
+
+}).get('/task/edit/:id', async ctx => {
+  let modConfig = modules['task.edit'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/task.edit.js'];
+
+  let url = `/task/edit/${ctx.params.id}`;
+  let result = await HttpClient.request(url, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('编辑工单', body, script, modConfig.template)
 });
 
 router.get('/task/view/:id', async ctx => {

@@ -13,13 +13,17 @@
 
           <!-- start 新建按钮组 -->
           <template v-if="isShowTaskButtonGroup">
+
             <button type="button" class="btn-text btn-back" :disabled="disabled" @click="submit" v-if="isShowSaveButton">
               保存
             </button>
+
             <button type="button" class="btn-text btn-back" :disabled="disabled" @click="submit" v-if="isShowOnlySaveButton">
               只保存
             </button>
-            <span class="text">|</span>
+
+            <span class="text" v-if="isShowSaveAndAllotButton">|</span>
+            
             <button type="button" class="btn btn-primary" :disabled="disabled" @click="submit(true)" v-if="isShowSaveAndAllotButton">
               保存并派单
             </button>
