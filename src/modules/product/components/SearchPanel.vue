@@ -531,7 +531,7 @@ export default {
 
           let comp = FormFieldMap.get(f.formType);
 
-          if (!comp || f.formType === 'area') {
+          if (!comp && f.formType !== 'tags' && f.formType !== 'area' && f.formType !== 'linkman') {
             return null;
           }
 
@@ -566,6 +566,17 @@ export default {
                 }
               }
             });
+          } else if (f.formType === 'area') {
+            childComp = h(
+              'base-dist-picker',
+              {
+                props: {
+                  value: this.form[f.fieldName],
+                },
+                on: {
+                  input: event => this.update(event, 'dist')
+                }
+              });
           } else if (f.formType === 'customer') {
             childComp = h('customer-search', {
               props: {

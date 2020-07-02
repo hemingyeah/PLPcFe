@@ -136,21 +136,6 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 
-// router.all('/api/*', async ctx => {
-
-//   let option = {
-//     headers: Object.assign({}, ctx.request.headers)
-//   };
-
-//   const request = ctx.request;
-
-//   let result = await HttpsClient.request(request.url, request.method, request.rawBody, option);
-
-//   ctx.status = result.statusCode;
-//   ctx.body = result.body;
-// });
-
-
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)
 });

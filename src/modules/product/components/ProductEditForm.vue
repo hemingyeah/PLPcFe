@@ -117,7 +117,7 @@ export default {
     },
 
     customer() {
-      let customer = this.value.customer[0];
+      let customer = (this.value.customer && this.value.customer[0]) || {};
       customer.id = customer.value;
       return customer || {};
     },
@@ -516,6 +516,14 @@ export default {
 
               {...{
                 scopedSlots: {
+                  label: props => {
+                    let value = props.value || [];
+                    let linkman = value[0] || {};
+                    let nameAndPhone = `${linkman.label || ''} ${linkman.phone || ''}`
+                    return (
+                      <span>{ nameAndPhone }</span>
+                    )
+                  },
                   option: props => {
                     return (
                       <p class="customer-linkman">

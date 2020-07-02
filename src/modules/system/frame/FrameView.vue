@@ -162,7 +162,7 @@
                 @transitionend="tabTransitionEnd"
               >
                 <frame-tab
-                  v-for="tab in frameTabs"
+                  v-for="(tab, index) in frameTabs"
                   :key="`${index}_${tab.url}`"
                   :tab="tab"
                   @jump="jumpFrameTab"
@@ -181,7 +181,7 @@
 
         <div class="frame-main">
           <div class="frame-tab-content">
-            <div class="frame-tab-window" v-for="tab in frameTabs" :key="`${index}_${tab.url}`" v-show="tab.show">
+            <div class="frame-tab-window" v-for="(tab, index) in frameTabs" :key="`${index}_${tab.url}`" v-show="tab.show">
               <iframe
                 :id="`frame_tab_${tab.id}`"
                 :fromid="tab.fromId"
