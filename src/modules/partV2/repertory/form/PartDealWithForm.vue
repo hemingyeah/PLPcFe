@@ -38,6 +38,7 @@
                     v-model="scope.row.number"
                     :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation"
                     type="number"
+                    min="0"
                   ></el-input>
                 </el-form-item>
               </el-form>
@@ -249,6 +250,8 @@ export default {
 <style lang="scss" scoped>
 .normal-box {
   padding: 10px;
+  min-width: 900px;
+  box-sizing: border-box;
 }
 .flex-x {
   display: flex;
