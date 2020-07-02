@@ -25,9 +25,9 @@ export default {
     /** 
      * @description 创建工单方法
     */
-    createTaskMethod(params) {
+    createTaskMethod(params, isAllot) {
       this.$http
-        .post('/task/create', params)
+        .post(`/task/create${isAllot ? '?allot=true' : ''}`, params)
         .then(res => {
           let isSucc = !res.status;
           platform.notification({
@@ -96,7 +96,7 @@ export default {
    * @description 提交
    * @param {Boolean} isAllot 是否派单
   */
-    submit(isAllot) {
+    submit(isAllot = false) {
       this.submitting = true;
 
       this.$refs.form
@@ -117,7 +117,7 @@ export default {
             return this.updateTaskMethod(params);
           }
           if (this.isTaskCreate) {
-            return this.createTaskMethod(params);
+            return this.createTaskMethod(params, isAllot);
           }
 
         })
@@ -163,7 +163,7 @@ export default {
       this.initialize();
 
       // 初始化默认值
-      let form = {};
+      let form = this.workTask;
 
       this.fields = await TaskApi.getTaskTemplateFields({ templateId: form.templateId || this.types[0].id, tableName: 'task' });
 

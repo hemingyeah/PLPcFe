@@ -162,3 +162,17 @@ export function getRepertoryList(params) {
 export function editReceipt(params) {
   return http.post('/task/editReceipt', params);
 }
+
+/** 
+ * @description 新建工单
+*/
+export function createTask(params) {
+  return http.post('/task/create', params);
+}
+
+/** 
+ * @description 编辑工单
+*/
+export function editTask(params) {
+  return http.post('/task/update', params);
+}

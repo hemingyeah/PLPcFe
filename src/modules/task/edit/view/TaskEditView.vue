@@ -14,7 +14,7 @@
           <!-- start 新建按钮组 -->
           <template v-if="isShowTaskButtonGroup">
 
-            <button type="button" class="btn-text btn-back" :disabled="disabled" @click="submit" v-if="isShowSaveButton">
+            <button type="button" class="btn btn-primary" :disabled="disabled" @click="submit" v-if="isShowSaveButton">
               保存
             </button>
 
