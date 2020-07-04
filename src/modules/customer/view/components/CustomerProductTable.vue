@@ -132,8 +132,10 @@ export default {
               return Object.freeze(product);
             });
           this.paginationInfo.totalItems = res.total;
-          if(!this.productList[0].linkman) this.columns[3].show = false;
-          if(!this.productList[0].address) this.columns[4].show = false;
+
+          if(!this.productList[0].linkmanName) this.columns[3].show = false;
+          if(!this.productList[0].addressName) this.columns[4].show = false;
+          
         })
         .catch(e => console.error('fetchData product caught e', e));
     },
@@ -152,11 +154,11 @@ export default {
         show: true,
       }, {
         label: '默认联系人',
-        field: 'linkman',
+        field: 'linkmanName',
         show: true,
       }, {
         label: '产品地址',
-        field: 'address',
+        field: 'addressName',
         show: true,
       }, {
         label: '创建时间',
