@@ -96,10 +96,12 @@ export default {
     let validateNumber = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入数量"));
+      } else if (value < 0) {
+        callback(new Error("请输入大于或等于0的数"));
       } else if (
         !/^(([0-9][0-9]*)|(([0]\.\d{1,2}|[0-9][0-9]*\.\d{1,2})))$/.test(value)
       ) {
-        callback(new Error("请输入大于或等于0的数，且最多保留两位小数"));
+        callback(new Error("最多保留两位小数"));
       } else {
         callback();
       }
@@ -168,8 +170,8 @@ export default {
       {
         normalType: "controler",
         lable: "办理数量",
-        width: "100",
-        fixed: "right"
+        width: "150",
+        fixed: "left"
       }
     ];
     let inputonlyread = this.propData.data.state !== "suspending";
