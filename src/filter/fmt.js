@@ -146,6 +146,12 @@ export function fmt_state(value) {
   case 'costed':
     state = '已结算';
     break;
+  case 'closed':
+    state = '已关闭';
+    break;
+  case 'offed':
+    state = '已取消';
+    break;
 
   default:
     break;

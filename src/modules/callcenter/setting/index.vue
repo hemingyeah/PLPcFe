@@ -1,7 +1,7 @@
 <template>
   <keep-alive>
     <div v-loading.fullscreen.lock="loading">
-      <component :is="show" :account-info="result"></component>
+      <component :is="show" :account-info="result" :current="current"></component>
     </div>
   </keep-alive>
 </template>
@@ -12,11 +12,17 @@ import CallCenter from '../views/CallCenter.vue'
 import Apply from '../views/Apply.vue'
 import Auditing from '../views/Auditing.vue'
 export default {
+  inject: ['initData'],
   data() {
     return {
       show: '',
       result: null,
       loading: false,
+    }
+  },
+  computed: {
+    current() {
+      return (this.initData && this.initData.current) || 0;
     }
   },
   async mounted() {

@@ -18,7 +18,9 @@ try {
 
 const CallCenterComp = Vue.extend(CallCenter);
 const app = new CallCenterComp({
-  propsData: { initData }
+  provide: {
+    initData: Object.freeze(initData)
+  },
 });
 
 app.$mount('#app');

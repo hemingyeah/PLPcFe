@@ -57,7 +57,7 @@ export default {
         },
         {
           orderId: 3,
-          displayName: '电话时间',
+          displayName: '来去电时间',
           fieldName: 'ringTime',
           formType: 'date',
           operator: 'between'
@@ -88,7 +88,7 @@ export default {
               },
               {
                 text: '未解决',
-                value: 0
+                value: 2
               }
             ]
           }
@@ -99,22 +99,22 @@ export default {
           fieldName: 'area',
           formType: 'area'
         },
-        {
-          orderId: 7,
-          displayName: '客户',
-          fieldName: 'customerName',
-          formType: 'text',
-          placeholder: '请输入客户',
-          maxlength:50
-        },
-        {
-          orderId: 8,
-          displayName: '联系人',
-          fieldName: 'linkmanName',
-          formType: 'text',
-          placeholder: '请输入联系人名称',
-          maxlength:50
-        },
+        // {
+        //   orderId: 7,
+        //   displayName: '客户',
+        //   fieldName: 'customerName',
+        //   formType: 'text',
+        //   placeholder: '请输入客户',
+        //   maxlength:50
+        // },
+        // {
+        //   orderId: 8,
+        //   displayName: '联系人',
+        //   fieldName: 'linkmanName',
+        //   formType: 'text',
+        //   placeholder: '请输入联系人名称',
+        //   maxlength:50
+        // },
         {
           orderId: 9,
           displayName: '呼叫电话',
@@ -129,14 +129,6 @@ export default {
           fieldName: 'cost',
           formType: 'text',
           placeholder: '请输入话费数目',
-          maxlength:50
-        },
-        {
-          orderId: 13,
-          displayName: '负责人',
-          fieldName: 'cost',
-          formType: 'text',
-          placeholder: '请输入负责人',
           maxlength:50
         },
         {
@@ -195,7 +187,6 @@ export default {
     }
   },
   mounted() {
-    // console.info('fields::', this.fields)
     const { column_number } = this.getLocalStorageData()
     if (column_number) this.columnNum = Number(column_number)
   },
@@ -446,9 +437,7 @@ export default {
         this.buildForm()
       },
       methods: {
-        returnData() {
-          console.info('return:', this.form);
-          
+        returnData() {          
           return Object.assign({}, this.form)
         },
         buildForm() {

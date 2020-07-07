@@ -158,7 +158,7 @@ export default {
       showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       statisticalData: {},
 
-      attentionUsers: [] // 该客户的关注用户
+      attentionUsers: [] // 该客户的关注用户,
     }
   },
   computed: {
@@ -610,7 +610,7 @@ export default {
         {
           displayName: `通话(${callQuantity || 0})`,
           component: CustomerCallTable.name,
-          show: !this.isDelete
+          show: !this.isDelete && localStorage.getItem('call_center_module') == 1
         },
         {
           displayName: taskQuantity
@@ -675,17 +675,24 @@ export default {
           )
         )
     },
-    fetchStatisticalData() {
+    async fetchStatisticalData() {
       const params = {
         customerId: this.initData.id || this.customer.id
       }
-
+      let callCount = 0
+      try {
+        const res = await this.$http.get('/api/callcenter/outside/callcenter/callrecord/total4CallTab', params)
+        callCount = res.result || 0
+      } catch (error) {
+        console.error(error);
+      }
       this.$http
         .get('/customer/statistics/init', params)
         .then(res => {
           if (Object.keys(res).every(key => key !== 'taskQuantity')) return
 
           this.StatisticalData = res
+          this.StatisticalData.callQuantity = callCount
           this.tabs = this.buildTabs()
         })
         .catch(err => console.error('fetchStatisticalData', err))

@@ -2,10 +2,10 @@
   <div class="call-center-contact-info">
     <h4>通话信息</h4>
     <div class="call-info">
-      <p>呼叫电话：<span>{{linkmanPhone}}</span></p>
-      <p>今日来电：<span>{{dialCount}}</span></p>
-      <p>归属地：<span>{{callDetail.attribution}}</span></p>
-      <p>呼叫时间：<span>{{callDetail.ring}}</span></p>
+      <p>呼叫电话：<span>{{linkmanPhone || ''}}</span></p>
+      <p>今日来电：<span>{{dialCount || 0}}</span></p>
+      <p>归属地：<span>{{callDetail.attribution || ''}}</span></p>
+      <p>呼叫时间：<span>{{callDetail.ring || ''}}</span></p>
     </div>
     <h4 class="customer-info-header">客户信息</h4>
     <div class="customer-info">
@@ -198,8 +198,6 @@ export default {
               || (f.fieldName === 'tags' && this.initData.isDivideByTag))
           )
         })   
-      console.info('sortedFields:', sortedFields);
-             
       return FormUtil.migration(sortedFields)
     },
     eventTypes() {
@@ -224,27 +222,30 @@ export default {
       immediate: true,
       deep: true,
       handler(newValue, oldValue) {
-        if(newValue) {
+        // console.info('watch item::', newValue, oldValue);
+        if(newValue.id) {
+          this.cancelCreate()
+          this.initForm()
+          this.form.lmPhone = newValue.dialPhone
           this.getCallRecord(newValue.id)
-          this.getCustomerInfo()
+          this.getCustomerInfo()        
         }
       }
     }
   },
-  async mounted() {
-    try {
-      // 初始化默认值
-      let form = {};
-      form = util.packToForm(this.fields, form, this.initData.customerAddress);
-      this.form = FormUtil.initialize(this.fields, form);
-      
-      this.init = true;
-    } catch (e) {
-      console.error(e);
-    }
-  },
- 
   methods: {
+    initForm(){
+      try {
+      // 初始化默认值
+        let form = {};
+        form = util.packToForm(this.fields, form, this.initData.customerAddress);
+        this.form = FormUtil.initialize(this.fields, form);
+        // console.info('this.form::', this.form);
+        this.init = true;
+      } catch (e) {
+        console.error(e);
+      }
+    },
     saveDialog(phone){
       this.saveDialogVisible = true 
       this.saveForm.phone = phone
@@ -253,7 +254,7 @@ export default {
     getTodayNormalCount(phone) {
       if (!phone) return
       CallCenterApi.getTodayNormalCount({dialPhone:phone}).then(({ code, message, result }) => {
-        console.info('', code, message, result)
+        // console.info('', code, message, result)
         if(code !== 0) return
         this.dialCount = result.normalCount
       }).catch((err) => {
@@ -264,7 +265,7 @@ export default {
     getCallRecord(id) {
       if (!id) return
       CallCenterApi.getCallRecord({id}).then(({ code, message, result }) => {
-        console.info('', code, message, result);
+        // console.info('', code, message, result);
         // 如果data为null说明是未知联系人
         if(code !== 0) return
         this.callDetail = result || {}
@@ -277,7 +278,7 @@ export default {
       if(!this.linkmanPhone || !this.callRecordId) return
       const params = {linkmanPhone:this.linkmanPhone, callRecordId:this.callRecordId}
       CallCenterApi.getCustomerInfo(params).then(({status, message, data}) => {
-        console.info('', status, message, data);
+        // console.info('', status, message, data);
         // 如果data为null说明是未知联系人 
         if(!data) {
           this.unknown = true;
@@ -339,7 +340,7 @@ export default {
           if(!isSucc) return;
           this.customerId = res.data.customerId;
           // 是否还有后续动作
-          console.info('createMethod:', this.customerId);
+          // console.info('createMethod:', this.customerId);
           this.getCustomerInfo();
           this.showCreateUser = false;
         })
@@ -450,7 +451,7 @@ export default {
     },
 
     updateCustomer(value) {
-      console.info('value:', value);
+      // console.info('value:', value);
       this.customer = value;
     },
     
@@ -549,6 +550,7 @@ export default {
     }
 
     .customer-container{
+      margin-top: 20px;
       .form-builder{
         padding: 0;
         .form-item {

@@ -149,13 +149,13 @@ import * as CallCenterApi from '@src/api/CallCenterApi'
 export default {
   name: 'call-center',
   props: {
-    initData: {
-      type: Object,
-      default: () => ({})
-    },
     AccountInfo: {
       type: Object,
       default: () => ({})
+    },
+    current: {
+      type: Number,
+      default: 0
     },
   },
   computed: {
@@ -187,7 +187,6 @@ export default {
           icon: 'icon-duanxin3'
         }
       ],
-      current: 0,
       userList: [],
       categoryList: [],
       pCategoryList: [],
@@ -258,7 +257,7 @@ export default {
       CallCenterApi.getZxSortList().then(({code, message, result}) => {
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.categoryList = result || []
-        console.info('this.categoryList:', this.categoryList);
+        // console.info('this.categoryList:', this.categoryList);
       }).catch((err) => {
         console.error(err)
       })
@@ -323,7 +322,6 @@ export default {
     },
     // 咨询分类添加编辑
     edit(item) {
-      console.info('item:', item)
       this.categoryDialogVisible = true
       if(item) {
         // 如果是编辑的时候
@@ -349,7 +347,7 @@ export default {
     },
     // 选择项发生变化触发这个函数
     parentCateChanged() {
-      console.info('this.selectedKeys:', this.selectedKeys)
+      // console.info('this.selectedKeys:', this.selectedKeys)
       // 如果 selectedKeys 数组中的 length 大于0，证明选中父级分类
       if (this.selectedKeys.length > 0) {
         this.categoryForm.parentId = this.selectedKeys[this.selectedKeys.length - 1]
@@ -359,11 +357,10 @@ export default {
     },
     // 删除
     async del(item, index, type) {
-      console.info('item-index:', item, index, type)
       try {
         if (!await this.$platform.confirm(`确定要删除该${ type === 'present' ? '坐席？' : '咨询分类？'}`)) return;
         this.pending = true
-        const url = type === 'present' ? '/outside/callcenter/api/deleteAgent' : '/outside/callcenter/api/deleteZxSort'
+        const url = type === 'present' ? '/api/callcenter/outside/callcenter/api/deleteAgent' : '/api/callcenter/outside/callcenter/api/deleteZxSort'
         const { code, message } = await this.$http.post(url, {id:item.id}, false)
         this.pending = false
         if (code !== 0) return this.$platform.notification({
@@ -402,7 +399,7 @@ export default {
           } else {
             params.id = ''
           }
-          console.info('params:', params);
+          // console.info('params:', params);
           this.pending = true
           const { code, message } = await CallCenterApi.saveZxSort(params)
           this.pending = false
@@ -450,7 +447,7 @@ export default {
       immediate: true,
       deep: true,
       handler(newValue, oldValue) {
-        console.info('new:', newValue)
+        // console.info('new:', newValue)
         // 添加坐席成员后
         if (newValue) {
           this.saveAgent(newValue)
@@ -462,6 +459,17 @@ export default {
 }
 </script>
 <style lang="scss">
+.el-cascader-menus .el-cascader-menu__item{
+  padding: 8px 15px;
+  display: flex;
+  line-height: 21px;
+}
+.el-cascader-menus .el-cascader-menu__item div{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 120px!important;
+}
 .call-center-setting {
   padding: 10px;
   position: relative;

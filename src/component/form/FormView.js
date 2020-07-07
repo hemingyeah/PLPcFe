@@ -63,11 +63,11 @@ const FormView = {
     buildPhoneDom(lmPhone) {
       const { value, displayName} = lmPhone;
       const hasCallCenterModule = localStorage.getItem('call_center_module')
-      const str = hasCallCenterModule && value ? <i v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i> : ''
+      const str = hasCallCenterModule == 1 && value ? <el-tooltip content="拨打电话" placement="top"><i onClick={() => this.makePhoneCall(value, hasCallCenterModule)} v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></el-tooltip> : ''
       return (
         <div class="form-view-row">
           <label>{displayName}</label>
-          <div class="form-view-row-content" onClick={() => this.makePhoneCall(value, hasCallCenterModule)}>
+          <div class="form-view-row-content">
             <span>{value}</span>
             {str}
           </div>
@@ -78,7 +78,12 @@ const FormView = {
     async makePhoneCall(phone, hasCallCenterModule){
       if(!phone || !hasCallCenterModule) return
       try {
-        await http.post('/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        const { code, message } = await http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        })
       } catch (error) {
         console.error(error);
       }

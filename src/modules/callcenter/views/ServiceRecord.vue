@@ -12,7 +12,7 @@
             <p>{{item.ring}}</p>
           </div>
           <el-tag v-if="item.sortName">{{item.sortName}}</el-tag>
-          <el-tag :type="item.status ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
+          <el-tag v-if="item.status == 0 || item.status == 1" :type="item.status ? 'info' : 'danger'">{{item.status == 1 ? '已解决' : (item.status == 0 ? '未解决' : '')}}</el-tag>
           <div v-if="item.remark" class="remark">
             <p>{{item.remark}}</p>
           </div>
@@ -115,7 +115,7 @@ export default {
     },
     getTaskList() {
       if(!this.linkmanPhone) return
-      CallCenterApi.getTaskHistoryList({linkmanPhone: this.linkmanPhone}).then(({ status, message, data }) => {
+      CallCenterApi.getTaskHistoryList({linkmanPhone: this.linkmanPhone, pageSize:999999}).then(({ status, message, data }) => {
         if(status !== 0) return
         // console.info('', status, message, data)
         this.taskList = data.list || []
@@ -125,7 +125,7 @@ export default {
     },
     getEventList() {
       if(!this.linkmanPhone) return
-      CallCenterApi.getEventHistoryList({linkmanPhone: this.linkmanPhone}).then(({ status, message, data }) => {
+      CallCenterApi.getEventHistoryList({linkmanPhone: this.linkmanPhone, pageSize:999999}).then(({ status, message, data }) => {
         if(status !== 0) return
         // console.info('', status, message, data)
         this.eventList = data.list || []
@@ -202,12 +202,17 @@ export default {
 
 <style lang="scss">
 .call-center-service-record {
+  overflow: auto;
+  max-height: 800px;
   padding: 0 20px;
   .el-card {
     margin-top: 15px;
   }
   .el-card__header {
     padding: 12px 20px;
+    i {
+      font-size: 12px!important;
+    }
   }
   .el-card__body {
     padding: 0 !important;

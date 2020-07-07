@@ -179,7 +179,7 @@
               </template>
             </template>
             <template v-else-if="column.field === 'lmPhone'">
-              <span class="align-items-center" @click.stop="makePhoneCall(scope.row.lmPhone)"> {{scope.row.lmPhone}} <i v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></span>
+              <span class="align-items-center"> {{scope.row.lmPhone}} <el-tooltip content="拨打电话" placement="top"><i @click.stop="makePhoneCall(scope.row.lmPhone)" v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></el-tooltip></span>
             </template>
             <template v-else-if="column.field === 'createUser'">
               {{scope.row.createUserName}}
@@ -405,7 +405,7 @@ export default {
       selectedLimit: 500,
       columnNum: 1,
       tableKey: (Math.random() * 1000) >> 2,
-      hasCallCenterModule:localStorage.getItem('call_center_module')
+      hasCallCenterModule:localStorage.getItem('call_center_module') == 1
     };
   },
   computed: {
@@ -525,7 +525,12 @@ export default {
     async makePhoneCall(phone){
       if(!this.hasCallCenterModule) return
       try {
-        await this.$http.post('/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        const { code, message } = await this.$http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        }) 
       } catch (error) {
         console.error(error);
       }

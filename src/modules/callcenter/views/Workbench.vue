@@ -1,12 +1,12 @@
 <template>
-  <div class="call-center-workbench">
+  <div class="call-center-workbench" v-loading.fullscreen.lock="loadingListData">
     <div class="left">
       <div class="current-header">当前通话</div>
-      <el-card v-if="query.callPhone" class="current-card">
+      <el-card v-if="query.callPhone && query.callState === 'Link'" class="current-card">
         <div class="current-item">
           <div class="item">
             <p>{{query.linkmanName ? `${query.linkmanName} ${query.callPhone}` : '未知联系人'}} </p>
-            <span>{{query.ringTime |fmt_short_time}}</span>
+            <span>{{ringTime}}</span>
           </div>
           <div class="item">
             <p style="margin-bottom:0">{{query.customerName}}</p>
@@ -47,7 +47,7 @@
       <template v-if="remarkList.length">
         <div v-for="(item, index) in remarkList" :key="item.id" class="item">
           <div class="item-title">
-            <h4>服务备注（{{index + 1}}）</h4>
+            <h4>服务备注</h4>
             <i v-if="!item.isDelete" class="iconfont icon-qingkongshanchu" @click="delRemark(item, index)"></i>
           </div>
           <div class="item-header">
@@ -62,7 +62,7 @@
           </div>
           <div v-else class="item-content">
             <el-tag v-if="item.sortName" class="sort">{{item.sortName}}</el-tag>
-            <el-tag :type="item.status ==1 ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
+            <el-tag v-if="item.status == 0 || item.status == 1" :type="item.status ? 'info' : 'danger'">{{item.status == 1 ? '已解决' : (item.status == 0 ? '未解决' : '')}}</el-tag>
             <p v-if="item.remark">备注:{{item.remark}}</p>
           </div>
 
@@ -98,12 +98,14 @@ import * as CallCenterApi from '@src/api/CallCenterApi'
 import ContactInfo from './ContactInfo.vue'
 import ServiceRecord from './ServiceRecord.vue'
 import { parse } from '@src/util/querystring';
-
+let callInterval;
 export default {
   name: 'workbench',
   data() {
     return {
+      loadingListData: false,
       query: {},
+      ringTime:'00:00',
       unkonwn: false,
       hoverIndex: -1, // 菜单hover索引
       activeLinkId: 0, // 当前激活的菜单id
@@ -144,19 +146,44 @@ export default {
   mounted() {
     this.query = parse(window.location.search) || {};
     if(this.query.id && this.query.callPhone) {
+      if(this.query.callState === 'Link'){
+        let callSec = 0;
+        callInterval = setInterval(()=>{
+          callSec ++;
+          this.getCallTime(callSec)
+        }, 1000);
+      } else {
+        callInterval && clearInterval(callInterval)
+        callInterval = null
+      }
       // 说明是websocket过来的 获取联系人信息 
-      this.item = {id:this.query.id, dialPhone:this.query.callPhone, dialCount:this.query.dialCount} 
+      this.item = {id:this.query.id, dialPhone:this.query.callPhone || '', dialCount:this.query.dialCount || 0} 
     }
-    // console.log('query::', this.query);
+    // console.info('query::', this.query);
     this.$eventBus.$on('callcenter-workbench.select_tab', this.selectTab)
     this.getHistoryList()
     this.getRemarkList()
     this.getCategoryList()
   },
   beforeDestroy() {
+    callInterval && clearInterval(callInterval)
+    callInterval = null
     this.$eventBus.$off('callcenter-workbench.select_tab', this.selectTab)
   },
   methods: {
+    getCallTime(sec){
+      const HOUR_SEC = 60 * 60;
+      const MIN_SEC = 60;
+      let hour = sec / HOUR_SEC >> 0;
+      sec = sec % HOUR_SEC;
+      let min = sec / MIN_SEC >> 0;
+      sec = sec % MIN_SEC;
+      hour = hour > 0 && hour < 10 ? `0${ hour }` : hour;
+      min = min < 10 ? `0${ min }` : min;       
+      sec = sec < 10 ? `0${ sec }` : sec;
+      console.info('temp:', hour == 0 ? `${ min }:${ sec }` : `${ hour }:${ min }:${ sec }`);
+      this.ringTime = hour == 0 ? `${ min }:${ sec }` : `${ hour }:${ min }:${ sec }`;
+    },
     // 获取服务备注列表
     getRemarkList(){
       const params = {
@@ -175,14 +202,14 @@ export default {
       CallCenterApi.getZxSortList().then(({code, message, result}) => {
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.categoryList = result || []
-        console.info('this.categoryList:', this.categoryList);
+        // console.info('this.categoryList:', this.categoryList);
       }).catch((err) => {
         console.error(err)
       })
     },
     // 选择项发生变化触发这个函数
     parentCateChanged() {
-      console.info('this.selectedKeys:', this.selectedKeys)
+      // console.info('this.selectedKeys:', this.selectedKeys)
       // 如果 selectedKeys 数组中的 length 大于0，证明选中父级分类
       if (this.selectedKeys.length > 0) {
         this.ruleForm.sortId = this.selectedKeys[this.selectedKeys.length - 1]
@@ -192,16 +219,21 @@ export default {
     },
     // 今日通话记录
     getHistoryList(){
+      this.loadingListData = true
       CallCenterApi.getTodayCallRecordList().then(({code, message, result}) => {
+        this.loadingListData = false
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.historyList = result || []
-        if(!this.query.linkmanName) {
-          this.item = this.historyList[0]
-          this.getRemarkList()
-          this.activeLinkId = this.item.id
-          console.info('item:', this.item)
+        if(!this.query.linkmanName && this.query.callState !== 'Link') {
+          if(this.historyList.length) {
+            this.item = this.historyList[0]
+            this.getRemarkList()
+            this.activeLinkId = this.item.id
+          // console.info('item:', this.item)
+          }
         }
       }).catch((err) => {
+        this.loadingListData = false
         console.error(err)
       })
     },
@@ -289,6 +321,17 @@ export default {
 </script>
 
 <style lang="scss">
+.el-cascader-menus .el-cascader-menu__item{
+  padding: 8px 15px;
+  display: flex;
+  line-height: 21px;
+}
+.el-cascader-menus .el-cascader-menu__item div{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 120px!important;
+}
 .item-hover {
   background-color: #fafafa;
 }
@@ -395,6 +438,8 @@ export default {
     border-right: 1px solid #f5f5f5;
   }
   .right {
+    overflow: auto;
+    max-height: 820px;
     background: #fafafa;
     width: 25%;
     min-width: 330px;
@@ -457,11 +502,18 @@ export default {
       position: relative;
       padding-left: 10px;
     }
+
+    .el-cascader__label{
+      max-width: 160px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
     .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
       position: absolute;
       left: -5px;
     }
-
   }
 }
 </style>

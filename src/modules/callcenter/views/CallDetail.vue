@@ -4,7 +4,7 @@
       <h4>通话信息</h4>
       <div class="call-info">
         <p>通话ID：<span>{{callDetail.recordId}}</span></p>
-        <p>通话时长：<span>{{callDetail.talkTime}}</span></p>
+        <p>通话时长：<span>{{callDetail.talkTime >>0 |fmt_h_m_s}}</span></p>
         <p>接待坐席：<span>{{callDetail.agentName}}</span></p>
       </div>
       <div class="call-info">
@@ -68,7 +68,7 @@
           <el-dropdown trigger="click">
             <!-- 如果已经有关联工单了显示关联工单单号 -->
             <template v-if="taskBusinessNo">
-              <a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createTaskTab(callDetail.taskId)">{{taskBusinessNo}}</a>
+              <a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createTaskTab(contact.taskBindRecord.wordId)">{{taskBusinessNo}}</a>
             </template>
             <template v-else>
               <el-button type="primary" size="mini">新建工单</el-button>
@@ -99,7 +99,7 @@
           <el-dropdown trigger="click">
             <!-- 如果已经有关联事件了显示关联事件编号 -->
             <template v-if="eventBusinessNo">
-              <a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createEventTab(callDetail.taskId)">{{eventBusinessNo}}</a>
+              <a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createEventTab(contact.eventBindRecord.wordId)">{{eventBusinessNo}}</a>
             </template>
             <template v-else>
               <el-button type="primary" size="mini">新建事件</el-button>
@@ -118,7 +118,7 @@
       <template v-if="remarkList.length">
         <div v-for="(item, index) in remarkList" :key="item.id" class="item">
           <div class="item-title">
-            <h4>服务备注（{{index + 1}}）</h4>
+            <h4>服务备注</h4>
             <i v-if="!item.isDelete" class="iconfont icon-qingkongshanchu" @click="delRemark(item, index)"></i>
           </div>
           <div class="item-header">
@@ -132,7 +132,7 @@
           </div>
           <div v-else class="item-content">
             <el-tag v-if="item.sortName" class="sort">{{item.sortName}}</el-tag>
-            <el-tag :type="item.status ==1 ? 'info' : 'danger'">{{item.status ? '已解决' : '未解决'}}</el-tag>
+            <el-tag v-if="item.status == 0 || item.status == 1" :type="item.status ? 'info' : 'danger'">{{item.status == 1 ? '已解决' : (item.status == 0 ? '未解决' : '--')}}</el-tag>
             <p v-if="item.remark">备注:{{item.remark}}</p>
           </div>
 
@@ -329,14 +329,13 @@ export default {
       CallCenterApi.getZxSortList().then(({code, message, result}) => {
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.categoryList = result || []
-        console.info('this.categoryList:', this.categoryList);
       }).catch((err) => {
         console.error(err)
       })
     },
     // 选择项发生变化触发这个函数
     parentCateChanged() {
-      console.info('this.selectedKeys:', this.selectedKeys)
+      // console.info('this.selectedKeys:', this.selectedKeys)
       // 如果 selectedKeys 数组中的 length 大于0，证明选中父级分类
       if (this.selectedKeys.length > 0) {
         this.ruleForm.sortId = this.selectedKeys[this.selectedKeys.length - 1]
@@ -377,7 +376,6 @@ export default {
     getCallRecord(id) {
       if (!id) return
       CallCenterApi.getCallRecord({id}).then(({ code, message, result }) => {
-        console.info('', status, message, result)
         // 如果data为null说明是未知联系人
         if(code !== 0) return
         this.callDetail = result || {}
@@ -392,7 +390,7 @@ export default {
         linkmanPhone: query.phone,
         callRecordId: query.id
       }).then(({ status, message, data }) => {
-        console.info('', status, message, data)
+        // console.info('', status, message, data)
         // 如果data为null说明是未知联系人
         if (!data) {
           this.unknown = true
@@ -460,7 +458,7 @@ export default {
           if (!isSucc) return
           this.customerId = res.data.customerId
           // 是否还有后续动作
-          console.info('createMethod:', this.customerId)
+          // console.info('createMethod:', this.customerId)
           this.getCustomerInfo()
           this.showCreateUser = false;
         })
@@ -622,6 +620,19 @@ export default {
 .audio__play--next {
   display: none;
 }
+
+.el-cascader-menus .el-cascader-menu__item{
+  padding: 8px 15px;
+  display: flex;
+  line-height: 21px;
+}
+.el-cascader-menus .el-cascader-menu__item div{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 120px!important;
+}
+
 .call-center-detail-info {
   padding: 10px;
   display: flex;

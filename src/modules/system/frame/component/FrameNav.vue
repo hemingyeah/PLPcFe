@@ -50,7 +50,7 @@ import MenuIcon from '../model/MenuIcon';
 
 import Logo from '@src/assets/img/logo.png';
 import MiniLogo from '@src/assets/svg/logo.svg';
-
+let call_center_gray = localStorage.getItem('call_center_gray');
 export default {
   name: 'frame-nav',
   props: {
@@ -86,6 +86,15 @@ export default {
       if(event.target != this.$el || event.propertyName != 'width') return;
       this.$emit('collapse-changed')
     },
+    pushMenu(menu, menus){
+      if((menu.menuKey == 'M_CALLCENTER_WORKBENCH_LIST' || menu.menuKey == 'M_CALLCENTER_STATISTICS' || menu.menuKey == 'M_CALLCENTER_STAGE')) {
+        if (call_center_gray == 1){
+          menus.push(menu);
+        }
+      } else {
+        menus.push(menu);
+      }
+    },
     /** 将后端返回的菜单，重整为多根树形结构 */
     buildMenus(source, parent){
       let menus = [];
@@ -93,10 +102,11 @@ export default {
 
       for(let i = 0; i < source.length; i++){
         let menu = source[i]
+        // 这里判断下如果呼叫中心开启灰度控制 
         if(menu.parent == parent){
-          menus.push(menu);
+          this.pushMenu(menu, menus);
         }else{
-          otherMenus.push(menu)
+          this.pushMenu(menu, otherMenus);
         }
       }
 

@@ -1,10 +1,11 @@
 import http from '@src/util/http'
+let prefix = '/api/callcenter'
 /**
  * 开通申请
  * @param {*} params 
  */
 export function saveAccount(params) {
-  return http.post('/outside/callcenter/api/saveAccount', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/saveAccount`, params, false)
 }
 
 /**
@@ -12,7 +13,7 @@ export function saveAccount(params) {
  * @param {*} params 
  */
 export function getAccountInfo(params = {}) {
-  return http.get('/outside/callcenter/api/getAccountInfo', params)
+  return http.get(`${prefix}/outside/callcenter/api/getAccountInfo`, params)
 }
 
 /**
@@ -20,7 +21,7 @@ export function getAccountInfo(params = {}) {
  * @param {*} params 
  */
 export function saveAgent(params) {
-  return http.post('/outside/callcenter/api/saveAgent', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/saveAgent`, params, false)
 }
 
 /**
@@ -28,7 +29,7 @@ export function saveAgent(params) {
  * @param {*} params 
  */
 export function getAgentList(params = {}) {
-  return http.get('/outside/callcenter/api/getAgentList', params)
+  return http.get(`${prefix}/outside/callcenter/api/getAgentList`, params)
 }
 
 /**
@@ -36,7 +37,7 @@ export function getAgentList(params = {}) {
  * @param {*} params 
  */
 export function updateAgent(params) {
-  return http.post('/outside/callcenter/api/updateAgent', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/updateAgent`, params, false)
 }
 
 /**
@@ -44,7 +45,7 @@ export function updateAgent(params) {
  * @param {*} params 
  */
 export function deleteAgent(params) {
-  return http.post('/outside/callcenter/api/deleteAgent', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/deleteAgent`, params, false)
 }
 
 /**
@@ -52,7 +53,7 @@ export function deleteAgent(params) {
  * @param {*} params 
  */
 export function updateStatus(params) {
-  return http.post('/outside/callcenter/api/updateStatus', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/updateStatus`, params, false)
 }
 
 /**
@@ -60,7 +61,7 @@ export function updateStatus(params) {
  * @param {*} params 
  */
 export function saveZxSort(params) {
-  return http.post('/outside/callcenter/api/saveZxSort', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/saveZxSort`, params, false)
 }
 
 /**
@@ -68,7 +69,7 @@ export function saveZxSort(params) {
  * @param {*} params 
  */
 export function getZxSortList(params = {}) {
-  return http.get('/outside/callcenter/api/getZxSortList', params)
+  return http.get(`${prefix}/outside/callcenter/api/getZxSortList`, params)
 }
 
 /**
@@ -76,7 +77,7 @@ export function getZxSortList(params = {}) {
  * @param {*} params 
  */
 export function deleteZxSort(params) {
-  return http.post('/outside/callcenter/api/deleteZxSort', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/deleteZxSort`, params, false)
 }
 
 /**
@@ -84,7 +85,7 @@ export function deleteZxSort(params) {
  * @param {*} params 
  */
 export function getFwRemarkList(params = {}) {
-  return http.get('/outside/callcenter/api/getFwRemarkList', params)
+  return http.get(`${prefix}/outside/callcenter/api/getFwRemarkList`, params)
 }
 
 /**
@@ -92,7 +93,7 @@ export function getFwRemarkList(params = {}) {
  * @param {*} params 
  */
 export function saveFwRemark(params) {
-  return http.post('/outside/callcenter/api/saveFwRemark', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/saveFwRemark`, params, false)
 }
 
 /**
@@ -100,7 +101,7 @@ export function saveFwRemark(params) {
  * @param {*} params 
  */
 export function deleteFwRemark(params) {
-  return http.post('/outside/callcenter/api/deleteFwRemark', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/deleteFwRemark`, params, false)
 }
 
 /**
@@ -108,7 +109,7 @@ export function deleteFwRemark(params) {
  * @param {*} params 
  */
 export function getTodayCallRecordList(params = {}) {
-  return http.get('/outside/callcenter/api/getTodayCallRecordList', params)
+  return http.get(`${prefix}/outside/callcenter/api/getTodayCallRecordList`, params)
 }
 
 /**
@@ -132,7 +133,7 @@ export function getCustomerInfo(params = {}) {
  * @param {*} params 
  */
 export function getHistoryCallRecordList(params = {}) {
-  return http.get('/outside/callcenter/api/getHistoryCallRecordList', params)
+  return http.get(`${prefix}/outside/callcenter/api/getHistoryCallRecordList`, params)
 }
 
 /**
@@ -140,7 +141,7 @@ export function getHistoryCallRecordList(params = {}) {
  * @param {*} params 
  */
 export function deleteTodayCallRecord(params = {}) {
-  return http.post('/outside/callcenter/api/deleteTodayCallRecord', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/deleteTodayCallRecord`, params, false)
 }
 
 /**
@@ -164,7 +165,7 @@ export function getEventHistoryList(params = {}) {
  * @param {*} params 
  */
 export function getTodayCallState(params = {}) {
-  return http.get('/outside/callcenter/api/getTodayCallState', params)
+  return http.get(`${prefix}/outside/callcenter/api/getTodayCallState`, params)
 }
 
 /**
@@ -172,7 +173,7 @@ export function getTodayCallState(params = {}) {
  * @param {*} params 
  */
 export function getTodayStatisticsRecord(params = {}) {
-  return http.get('/outside/callcenter/api/getTodayStatisticsRecord', params)
+  return http.get(`${prefix}/outside/callcenter/api/getTodayStatisticsRecord`, params)
 }
 
 /**
@@ -180,14 +181,14 @@ export function getTodayStatisticsRecord(params = {}) {
  * @param {*} params 
  */
 export function getRecordList(params = {}) {
-  return http.post('/outside/callcenter/api/recordList', params)
+  return http.post(`${prefix}/outside/callcenter/api/recordList`, params)
 }
 /**
  * 通话记录详情
  * @param {*} params 
  */
 export function getCallRecord(params = {}) {
-  return http.get('/outside/callcenter/api/getCallRecord', params)
+  return http.get(`${prefix}/outside/callcenter/api/getCallRecord`, params)
 }
 
 /**
@@ -195,7 +196,7 @@ export function getCallRecord(params = {}) {
  * @param {*} params 
  */
 export function dialout(params = {}) {
-  return http.post('/outside/callcenter/api/dialout', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/dialout`, params, false)
 }
 
 /**
@@ -203,7 +204,7 @@ export function dialout(params = {}) {
  * @param {*} params 
  */
 export function updateHandleStatus(params = {}) {
-  return http.post('/outside/callcenter/api/updateHandleStatus', params, false)
+  return http.post(`${prefix}/outside/callcenter/api/updateHandleStatus`, params, false)
 }
 
 /**
@@ -211,7 +212,7 @@ export function updateHandleStatus(params = {}) {
  * @param {*} params 
  */
 export function getTodayNormalCount(params = {}) {
-  return http.get('/outside/callcenter/api/getTodayNormalCount')
+  return http.get(`${prefix}/outside/callcenter/api/getTodayNormalCount`)
 }
 
 

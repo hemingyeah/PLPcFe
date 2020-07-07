@@ -45,18 +45,18 @@
                 <!-- 呼入 -->
                 <template v-if="callData.callType=='normal'">
                   <div class="call-in" >
-                    <p class="today">今日已来电（<span>{{callData.dialCount}}</span>）</p>
-                    <p >未完成工单（<span>{{callData.taskCount}}</span>）</p>
-                    <p >未完成事件（<span>{{callData.eventCount}}</span>）</p>
+                    <p class="today">今日已来电（<span>{{callData.dialCount || 0}}</span>）</p>
+                    <p >未完成工单（<span>{{callData.taskCount || 0}}</span>）</p>
+                    <p >未完成事件（<span>{{callData.eventCount || 0}}</span>）</p>
                   </div>
                 </template>
                 <template v-else>
                   <!-- 呼出 -->
                   <div class="call-out">
-                    <p>今日已来电（<span>{{callData.dialCount}}</span>）</p>
+                    <p>今日已来电（<span>{{callData.dialCount || 0}}</span>）</p>
                     <div class="unfinsh">
-                      <p>未完成工单（<span>{{callData.taskCount}}</span>）</p>
-                      <p>未完成事件（<span>{{callData.eventCount}}</span>）</p>
+                      <p>未完成工单（<span>{{callData.taskCount || 0}}</span>）</p>
+                      <p>未完成事件（<span>{{callData.eventCount || 0}}</span>）</p>
                     </div>
                   </div>
                 </template>
@@ -273,8 +273,12 @@ export default {
     wsUrl() {
       // websocket连接地址
       // return `ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25`
-      return `ws://30.40.59.111:9001/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
-      // return `ws://shb-callcenter.vaiwan.com/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
+      const currentProtocol = window.location.protocol
+      let protocol = 'ws'
+      if(currentProtocol === 'https:') {
+        protocol = 'wss'
+      }
+      return `${protocol}://preapp.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
     },
     /** 是否显示devtool */
     showDevTool() {
@@ -300,11 +304,31 @@ export default {
     }
   },
   methods: {
+    // 判断当前租户是否开启呼叫中心灰度功能
+    async judgeCallCenterGray() {
+      try {
+        const { status, data } = await http.get('/setting/callCenterGray')
+        if (status !== 0 || !data) {
+          return
+        } 
+        if(data.callcenter){
+          // 说明开启呼叫中心灰度
+          localStorage.setItem('call_center_gray', 1);
+          this.getAccountInfo(); 
+        } else {
+          localStorage.setItem('call_center_module', 0);
+          localStorage.setItem('call_center_gray', 0);
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
     async getAccountInfo() {
       try {
         const { code, result } = await CallCenterApi.getAccountInfo()
         // result为null未申请开通
         if (code !== 0 || !result) {
+          localStorage.setItem('call_center_module', 0)
           return
         } 
         // 审核状态：0待审核，1已审核
@@ -623,8 +647,8 @@ export default {
       this.goCallCenterWorkbench() 
     },
     openCallCenterWorkbench(data) {
-      // console.log('data::', data);
-      let url = data && data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
+      console.info('data::', data);
+      let url = data && data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
       platform.openTab({
         id: 'M_CALLCENTER_WORKBENCH_LIST',
         title: '呼叫中心工作台',
@@ -661,9 +685,9 @@ export default {
       // 这里处理接受到来电的消息
       try {
         const data = JSON.parse(e.data);
-        // "callPhone":"15267183070","callType":"dialout","message":"已经在话机：18072725367上呼出，请注意接听"
         // {"callPhone":"15267183070","callState":"Hangup","callType":"dialout","ringTime":1592636121000}
         console.info('data:', data.callType, data.callState);
+        
         if(data.callType === 'normal' || data.callType === 'dialout') {
           if(data.callState === 'Hangup'){
             // 没接听 
@@ -671,8 +695,10 @@ export default {
           } else if(data.callState === 'Unlink' || data.callState === 'Link') {
             // 接听了和接听然后挂断了
             this.callData = data
+            this.showCallCenter = false
             this.openCallCenterWorkbench(data)
           } else {
+            this.callData = data
             this.showCallCenter = true
           } 
         }
@@ -709,7 +735,7 @@ export default {
       }, 4000);
     },
   },
-  created() {
+  created() { 
     // TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
@@ -724,11 +750,9 @@ export default {
     setInterval(() => {
       this.getSystemMsg();
     }, NOTIFICATION_TIME);
-      
-
   },
   async mounted() { 
-    this.getAccountInfo()
+    this.judgeCallCenterGray(); 
     let userGuide = this?.initData?.userGuide === true || false
 
     if (userGuide) {

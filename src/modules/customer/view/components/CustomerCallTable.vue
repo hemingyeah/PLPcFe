@@ -4,11 +4,11 @@
       <el-table-column v-for="column in columns" :key="column.field" :label="column.label" :prop="column.field" :width="column.width"
                        :class-name="column.field == 'name' ? 'customer-product-name-superscript-td' : ''" :sortable="column.sortable" :show-overflow-tooltip="column.field !== 'name'" :align="column.align">
         <template slot-scope="scope">
-          <template v-if="column.field === 'customerInfo' && scope.row[column.field]">
-            {{scope.row[column.field].linkmanName}}
+          <template v-if="column.field === 'linkmanName'">
+            {{scope.row.customerInfo && scope.row.customerInfo.linkmanName }}
           </template>
-          <template v-else-if="column.field === 'agentInfo' && scope.row[column.field]">
-            {{scope.row[column.field].agentName}}
+          <template v-else-if="column.field === 'agentname'">
+            {{scope.row.agentInfo && scope.row.agentInfo.agentName}}
           </template>
           <template v-if="column.field === 'remarkStatus'">
             {{scope.row[column.field] == 1 ? '已解决' : (scope.row[column.field] == 0 ? '未解决' : '')}}
@@ -68,7 +68,7 @@ export default {
         pageSize: this.paginationInfo.pageSize
       }
 
-      this.$http.get('/outside/callcenter/callrecord/page4CallTab', params)
+      this.$http.get('/api/callcenter/outside/callcenter/callrecord/page4CallTab', params)
         .then(res => {
           this.callList = res.result && res.result.list
           this.paginationInfo.totalItems = res.result.total
@@ -79,22 +79,22 @@ export default {
       return [
         {
           label: '通话ID',
-          field: 'callSheetId',
+          field: 'recordId',
           show: true
         },
         {
           label: '联系人',
-          field: 'customerInfo',
+          field: 'linkmanName',
           show: true
         },
         {
           label: '接待坐席',
-          field: 'agentInfo',
+          field: 'agentname',
           show: true
         },
         {
-          label: '电话时间',
-          field: 'begin',
+          label: '来去电时间',
+          field: 'ring',
           show: true
         },
         {

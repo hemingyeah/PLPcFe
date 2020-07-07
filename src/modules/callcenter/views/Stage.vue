@@ -19,7 +19,9 @@
         <div class="card-content">
           <p><i class="iconfont icon-huru"></i> 呼入已接通话量</p>
           <h3> {{statisticsRecord.normalDealingCount}}</h3>
-          <div class="card-bottom">未接来电：{{statisticsRecord.normalNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{parseFloat((statisticsRecord.normalDealingRate*100).toFixed(2)) }}%
+          <div class="card-bottom">
+            <h4>未接来电：{{statisticsRecord.normalNotDealCount}}</h4>
+            <h4>接通率：{{parseFloat((statisticsRecord.normalDealingRate || 0) * 100).toFixed(2) }}%</h4>
           </div>
         </div>
       </div>
@@ -28,15 +30,15 @@
         <div class="card-content">
           <p><i class="iconfont icon-huru"></i> 呼入已解决通话</p>
           <h3>{{statisticsRecord.normalSolvedCount}}</h3>
-          <div class="card-bottom">解决率：{{ parseFloat((statisticsRecord.normalSolvedRate*100).toFixed(2)) }}%</div>
+          <div class="card-bottom" style="padding-top:0;">解决率：{{ parseFloat((statisticsRecord.normalSolvedRate || 0)*100).toFixed(2) }}%</div>
         </div>
       </div>
 
       <div class="stats-station-card">
         <div class="card-content">
           <p><i class="iconfont icon-huru"></i> 呼入通话时长</p>
-          <h3>{{statisticsRecord.totalNormalDealings|fmt_h_m_s}}</h3>
-          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgNormalDealings|fmt_h_m_s}}</div>
+          <h3>{{statisticsRecord.totalNormalDealings >> 0|fmt_h_m_s}}</h3>
+          <div class="card-bottom" style="padding-top:0;">平均通话时长：{{statisticsRecord.avgNormalDealings >> 0|fmt_h_m_s}}</div>
         </div>
       </div>
 
@@ -44,15 +46,18 @@
         <div class="card-content">
           <p><i class="iconfont icon-huchu"></i> 呼出通话量</p>
           <h3>{{statisticsRecord.dialoutDealingCount}}</h3>
-          <div class="card-bottom">未接来电：{{statisticsRecord.dialoutNotDealCount}}&nbsp;&nbsp;&nbsp;&nbsp;接通率：{{ parseFloat((statisticsRecord.dialoutDealingRate*100).toFixed(2)) }}%</div>
+          <div class="card-bottom">
+            <h4>未接来电：{{statisticsRecord.dialoutNotDealCount}}</h4>
+            <h4>接通率：{{ parseFloat((statisticsRecord.dialoutDealingRate || 0)*100).toFixed(2) }}%</h4>
+          </div>
         </div>
       </div>
 
       <div class="stats-station-card">
         <div class="card-content">
           <p><i class="iconfont icon-huchu"></i> 呼出通话时长</p>
-          <h3>{{statisticsRecord.totalDialoutDealings|fmt_h_m_s}}</h3>
-          <div class="card-bottom">平均通话时长：{{statisticsRecord.avgDialoutDealings|fmt_h_m_s}}</div>
+          <h3>{{statisticsRecord.totalDialoutDealings >> 0|fmt_h_m_s}}</h3>
+          <div class="card-bottom" style="padding-top:0;">平均通话时长：{{statisticsRecord.avgDialoutDealings >> 0|fmt_h_m_s}}</div>
         </div>
       </div>
     </div>
@@ -62,7 +67,7 @@
       <div class="customer-list-search-group-container">
         <form class="base-search" onsubmit="return false;">
           <div class="customer-list-base-search-group">
-            <el-input v-model="params.keyword" placeholder="请输入要查询的坐席、客户、联系人或呼叫电话">
+            <el-input v-model="params.keyword" placeholder="请输入要查询的坐席或呼叫电话">
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
             <base-button type="primary" @event="params.pageNum=1;getRecordList();trackEventHandler('search')" native-type="submit">搜索</base-button>
@@ -147,6 +152,7 @@
         </el-table>
 
         <div class="table-footer">
+          <div class="list-info">共<span class="level-padding">{{totalItems}}</span>记录</div>
           <el-pagination class="customer-table-pagination" background @current-change="jump" @size-change="handleSizeChange" :page-sizes="[10, 20, 50]" :page-size="params.pageSize" :current-page="params.pageNum"
                          layout="prev, pager, next, sizes, jumper" :total="totalItems"></el-pagination>
         </div>
@@ -261,7 +267,12 @@ export default {
     async makePhoneCall(tel){
       if(!tel) return
       try {
-        await this.$http.post('/outside/callcenter/api/dialout', {phone:tel, taskType:'handle'}, false)
+        const { code, message } = await this.$http.post('/api/callcenter/outside/callcenter/api/dialout', {phone:tel, taskType:'handle'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        }) 
       } catch (error) {
         console.error(error);
       }
@@ -311,7 +322,6 @@ export default {
     },
 
     stateChangeHandler (state) {
-      console.info('state:', state); 
       // 切换tab
       this.activeName = state; 
       this.columns.forEach(col => {
@@ -366,7 +376,7 @@ export default {
           this.params.sortId = item.value[0].id || ''
         }else if(item.property == 'ringTime') {
           this.params.ringStartTime = item.betweenValue1 || ''
-          this.params.beginTimeStart = item.betweenValue2 || ''
+          this.params.ringEndTime = item.betweenValue2 || ''
         } else if(item.property == 'beginTime') {
           this.params.beginTimeStart = item.betweenValue1 || ''
           this.params.beginTimeEnd = item.betweenValue2 || ''
@@ -383,8 +393,6 @@ export default {
     },
     showAdvancedSetting() {
       // window.TDAPP.onEvent('pc：通话记录-选择列事件')
-      
-      console.info('open;', this.columns);
        
       this.$refs.advanced.open(this.columns)
     },
@@ -604,7 +612,7 @@ export default {
           // }
 
           if (field.formType === 'datetime') {
-            minWidth = 150
+            minWidth = 180
           }
 
           return {
@@ -626,7 +634,8 @@ export default {
           width = typeof localField.width == 'number' ? `${localField.width}px` : ''
           show = localField.show !== false
         }
-
+        console.info('width::', width);
+        
         col.show = show
         col.width = width
         col.type = 'column'
@@ -679,7 +688,6 @@ export default {
       return res
     },
     fixedColumns() {
-      console.info('activeName:', this.activeName);
       return [
         {
           label: '通话ID',
@@ -750,7 +758,7 @@ export default {
         {
           label: '操作',
           field: 'operation',
-          // width: '80px',
+          minWidth: '60px',
           show: true,
           fixed: 'right'
         }
@@ -769,14 +777,14 @@ export default {
           displayName: '通话开始时间',
           label: '通话开始时间',
           fieldName: 'beginTime',
-          width: '180px',
+          minWidth: '180px',
           show: false
         },
         {
           displayName: '通话结束时间',
           label: '通话结束时间',
           fieldName: 'endTime',
-          width: '180px',
+          minWidth: '180px',
           show: false
         },
         {
@@ -964,9 +972,16 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
       .card-bottom {
         background: rgba(250, 251, 252, 1);
         border-radius: 0px 0px 0px 2px;
-        height: 40px;
-        line-height: 40px;
+        height: 80px;
+        line-height: 80px;
         padding-left: 20px;
+        padding: 10px 0 10px 20px;
+        h4 {
+          font-weight: 400;
+          margin: 0;
+          height: 30px;
+          line-height: 30px;
+        }
       }
       p {
         padding: 15px 0 8px;
