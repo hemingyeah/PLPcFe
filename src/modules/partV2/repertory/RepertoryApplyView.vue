@@ -572,8 +572,10 @@
             <template v-else-if="column.field ==='approveNo'">
               <a
                 class="view-detail-btn el-tooltip"
+                v-if="scope.row.approve || scope.row.cancel || scope.row.reject"
                 @click="column.clickFnc(scope.row)"
               >{{scope.row.approveNo}}</a>
+              <div class="el-tooltip" v-else>{{scope.row.approveNo}}</div>
             </template>
             <template v-else-if="column.field == 'remark'">
               <el-tooltip placement="top" popper-class="common-tooltip">
@@ -592,14 +594,14 @@
                 type="text"
                 size
                 class="no-padding"
-                v-if="scope.row.approved"
+                v-if="scope.row.approve"
               >办理</el-button>
               <el-button
                 @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=0,tableTrackEventHandler('reject')"
                 type="text"
                 size
                 class="no-padding"
-                v-if="scope.row.isreject"
+                v-if="scope.row.reject"
               >拒绝</el-button>
               <el-button
                 @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=1,tableTrackEventHandler('recall'),backstock_type=scope.row.type"
@@ -2383,9 +2385,9 @@ export default {
           sourceTargetName,
           state,
           cancel,
-          isreject,
+          reject,
           suggestion,
-          approved
+          approve
         } = obj;
         if (result.relations.length > 0) {
           result.relations = result.relations.map(item => {
@@ -2408,8 +2410,8 @@ export default {
             sourceTargetName,
             state,
             cancel,
-            isreject,
-            approved,
+            reject,
+            approve,
             suggestion,
             remark:
               result.relations.length > 0
