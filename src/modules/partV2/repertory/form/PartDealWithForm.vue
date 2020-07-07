@@ -252,7 +252,6 @@ export default {
 <style lang="scss" scoped>
 .normal-box {
   padding: 10px;
-  min-width: 900px;
   box-sizing: border-box;
 }
 .flex-x {

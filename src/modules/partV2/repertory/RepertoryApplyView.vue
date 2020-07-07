@@ -837,12 +837,12 @@
           <base-button
             class="mar-r-15"
             type="danger"
-            v-if="partDealData.data.isreject"
+            v-if="partDealData.data.reject"
             @event="cancelType=0,backstockDialog = true"
           >拒绝</base-button>
           <base-button
             type="primary"
-            v-if="partDealData.data.approved "
+            v-if="partDealData.data.approve "
             @event="partDealDataDone"
             :disabled="pending"
           >办理</base-button>
@@ -2163,7 +2163,7 @@ export default {
           field: "approveNo",
           overflow: true,
           show: true,
-          width: 160,
+          width: 200,
           clickFnc: obj => {
             this.showPartDealDetail(obj);
           }
