@@ -572,7 +572,7 @@
             <template v-else-if="column.field ==='approveNo'">
               <a
                 class="view-detail-btn el-tooltip"
-                v-if="scope.row.approve || scope.row.cancel || scope.row.reject"
+                v-if="scope.row.approved || scope.row.cancel || scope.row.isreject"
                 @click="column.clickFnc(scope.row)"
               >{{scope.row.approveNo}}</a>
               <div class="el-tooltip" v-else>{{scope.row.approveNo}}</div>
@@ -594,14 +594,14 @@
                 type="text"
                 size
                 class="no-padding"
-                v-if="scope.row.approve"
+                v-if="scope.row.approved"
               >办理</el-button>
               <el-button
                 @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=0,tableTrackEventHandler('reject')"
                 type="text"
                 size
                 class="no-padding"
-                v-if="scope.row.reject"
+                v-if="scope.row.isreject"
               >拒绝</el-button>
               <el-button
                 @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=1,tableTrackEventHandler('recall'),backstock_type=scope.row.type"
@@ -839,12 +839,12 @@
           <base-button
             class="mar-r-15"
             type="danger"
-            v-if="partDealData.data.reject"
+            v-if="partDealData.data.isreject"
             @event="cancelType=0,backstockDialog = true"
           >拒绝</base-button>
           <base-button
             type="primary"
-            v-if="partDealData.data.approve "
+            v-if="partDealData.data.approved "
             @event="partDealDataDone"
             :disabled="pending"
           >办理</base-button>
@@ -2385,9 +2385,9 @@ export default {
           sourceTargetName,
           state,
           cancel,
-          reject,
+          isreject,
           suggestion,
-          approve
+          approved
         } = obj;
         if (result.relations.length > 0) {
           result.relations = result.relations.map(item => {
@@ -2410,8 +2410,8 @@ export default {
             sourceTargetName,
             state,
             cancel,
-            reject,
-            approve,
+            isreject,
+            approved,
             suggestion,
             remark:
               result.relations.length > 0

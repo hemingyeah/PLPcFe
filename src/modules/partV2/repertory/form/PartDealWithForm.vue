@@ -36,7 +36,7 @@
                 <el-form-item prop="number">
                   <el-input
                     v-model="scope.row.number"
-                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation || !propData.data.approve"
+                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation || !propData.data.approved"
                     type="number"
                     min="0"
                   ></el-input>
@@ -54,7 +54,7 @@
     </div>
     <!-- 备件清单 end-->
     <div>
-      <div v-if="inputonlyread===false && propData.data.approve">
+      <div v-if="inputonlyread===false && propData.data.approved">
         <div class="mar-b-15 font-w-500">办理意见</div>
 
         <el-input
