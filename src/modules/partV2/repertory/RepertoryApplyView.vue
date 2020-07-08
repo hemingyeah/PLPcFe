@@ -2419,7 +2419,7 @@ export default {
                   ? result.relations[0].remark
                   : ""
                 : "",
-            staffs: res.staffs
+            staffs: result.staffs
           }
         };
         this.partDealDialog = true;
