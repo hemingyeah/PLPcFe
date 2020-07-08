@@ -105,6 +105,7 @@ export default {
     return {
       validation: this.buildValidation(),
       template: [],
+      customer: {}
     }
   },
   computed: {
@@ -116,14 +117,14 @@ export default {
       return this.initData.isPhoneUnique || false;
     },
 
-    customer() {
-      let customer = (this.value.customer && this.value.customer[0]) || {};
-      customer.id = customer.value;
-      return customer || {};
-    },
+    // customer() {
+    //   let customer = (this.value.customer && this.value.customer[0]) || {};
+    //   customer.id = customer.value;
+    //   return customer || {};
+    // },
 
     customerId() {
-      return this.customer.id || '';
+      return (this.customer && this.customer.id) || '';
     }
   },
   methods: {
@@ -205,6 +206,7 @@ export default {
         field: cf,
         newValue: value
       })
+      this.customer = value[0]
       this.fetchCustomer(value);
     },
     updateLinkman(value) {      
@@ -301,7 +303,7 @@ export default {
 
           let address = [
             {
-              label: res.address && (res.address.province + res.address.city + res.address.dist + res.address.address),
+              label: res.address && ((res.address.province || '') + (res.address.city || '') + (res.address.dist || '') + (res.address.address || '')),
               value: res.address && res.address.id
             }
           ]
