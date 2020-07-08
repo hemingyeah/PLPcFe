@@ -176,15 +176,15 @@ export default {
       menuList: [
         {
           name: '客服热线',
-          icon: 'icon-Gateway'
+          icon: 'icon-dianhua'
         },
         {
           name: '坐席设置',
-          icon: 'icon-weixin2'
+          icon: 'icon-kefu1'
         },
         {
           name: '工作台设置',
-          icon: 'icon-duanxin3'
+          icon: 'icon-gongzuotai'
         }
       ],
       userList: [],
