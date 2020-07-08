@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3320274",
+      "name": "服务评价-客服",
+      "font_class": "kefu1",
+      "unicode": "e7b0",
+      "unicode_decimal": 59312
+    },
+    {
+      "icon_id": "11631536",
+      "name": "工作台",
+      "font_class": "gongzuotai",
+      "unicode": "e93b",
+      "unicode_decimal": 59707
+    },
+    {
+      "icon_id": "12780415",
+      "name": "电 话",
+      "font_class": "dianhua",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
+      "icon_id": "4026874",
+      "name": "Ding",
+      "font_class": "Ding",
+      "unicode": "e6cc",
+      "unicode_decimal": 59084
+    },
+    {
+      "icon_id": "14350420",
+      "name": "移动端显示",
+      "font_class": "yidongduanxianshi",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
       "icon_id": "15540901",
       "name": "呼入",
       "font_class": "huru",
