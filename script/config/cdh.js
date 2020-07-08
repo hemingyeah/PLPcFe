@@ -1,5 +1,5 @@
 module.exports = {
-  targetRootPath: '/Users/publink/shb/web',
+  targetRootPath: '/Users/mac/shb/web',
   loginUser: { // 登录用户
     test: {
       corpId: 'ding73b203abd39ac5e935c2f4657eb6378f',

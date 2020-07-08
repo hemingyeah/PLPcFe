@@ -99,22 +99,24 @@ export default {
           fieldName: 'area',
           formType: 'area'
         },
-        // {
-        //   orderId: 7,
-        //   displayName: '客户',
-        //   fieldName: 'customerName',
-        //   formType: 'text',
-        //   placeholder: '请输入客户',
-        //   maxlength:50
-        // },
-        // {
-        //   orderId: 8,
-        //   displayName: '联系人',
-        //   fieldName: 'linkmanName',
-        //   formType: 'text',
-        //   placeholder: '请输入联系人名称',
-        //   maxlength:50
-        // },
+        {
+          orderId: 7,
+          displayName: '客户',
+          fieldName: 'customer',
+          formType: 'customer',
+          placeholder: '请输入客户',
+          isSystem: 1,
+          maxlength:50
+        },
+        {
+          orderId: 8,
+          displayName: '联系人',
+          fieldName: 'linkmanId',
+          formType: 'linkman',
+          placeholder: '请输入联系人名称',
+          isSystem: 1,
+          maxlength:50
+        },
         {
           orderId: 9,
           displayName: '呼叫电话',
@@ -175,7 +177,7 @@ export default {
               isNull: 1,
               formType: f.formType,
               originalFormType: f.formType,
-              orderId: f.isSystem ? f.orderId - 100 : f.orderId,
+              // orderId: f.isSystem ? f.orderId - 100 : f.orderId,
               operator: this.matchOperator(f)
             })
           })
@@ -517,7 +519,6 @@ export default {
 
           const f = event.field
           this.form[f.fieldName] = event.newValue
-          console.log(this.form);
         },
         renderInput(h, field) {
           const f = {
@@ -525,12 +526,12 @@ export default {
           }
 
           let comp = FormFieldMap.get(f.formType)
-
           if (
             !comp &&
             f.formType !== 'category' &&
             f.formType !== 'tags' &&
             f.formType !== 'area' &&
+            f.formType !== 'customer' &&
             f.formType !== 'linkman'
           ) {
             return null
@@ -580,7 +581,18 @@ export default {
                 update: event => this.update(event)
               }
             })
-          } else {
+          } else if (f.formType === 'customer') {
+            childComp = h('customer-search', {
+              props: {
+                field: f,
+                value: this.form[f.fieldName],
+                disableMap: true
+              },
+              on: {
+                update: event => this.update(event)
+              }
+            });
+          }else {
             childComp = h(
               comp.extend && comp.extend[`${f.formType}_search`]
                 ? comp.extend[`${f.formType}_search`]

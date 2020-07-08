@@ -15,25 +15,38 @@
         </div>
       </el-card>
       <el-card class="history-card">
-        <div slot="header">今日历史通话（{{historyList.length}}）</div>
-        <div v-for="(item,index) in historyList" :key="item.id" class="history-item" 
-             :class="{'item-active': item.id == activeLinkId,'item-hover':index==hoverIndex}"
-             @click="handleHistoryItem(item,index)"
-             @mouseover="hoverIndex = index"
-             @mouseout="hoverIndex = -1">
-          <i v-if="hoverIndex===index && item.id != activeLinkId" class="iconfont icon-fe-close" @click.stop="delHistoryItem(index,item)"></i>
-          <div class="current-item">
-            <div class="item">
-              <p>{{item.linkmanName}} {{item.dialPhone}}</p>
-              <span>{{item.ring |fmt_short_time}}</span>
+        <div slot="header">今日历史通话（{{recordListPage.list.length}}）</div>
+        <div v-if="recordListPage.list.length != 0">
+          <div v-for="(item,index) in recordListPage.list" :key="item.id" class="history-item" 
+               :class="{'item-active': item.id == activeLinkId,'item-hover':index==hoverIndex}"
+               @click="handleHistoryItem(item,index)"
+               @mouseover="hoverIndex = index"
+               @mouseout="hoverIndex = -1">
+            <i v-if="hoverIndex===index && item.id != activeLinkId" class="iconfont icon-fe-close" @click.stop="delHistoryItem(index,item)"></i>
+            <div class="current-item">
+              <div class="item">
+                <p>{{item.linkmanName}} {{item.dialPhone}}</p>
+                <span>{{item.ring |fmt_short_time}}</span>
+              </div>
+              <div class="item">
+                <p style="margin-bottom:0;color:#999;">{{item.customerName}}</p>
+                <i class="iconfont" :class="item.callType === 'dialout' ? 'icon-qudian' : 'icon-laidian'"></i>
+              </div>
             </div>
-            <div class="item">
-              <p style="margin-bottom:0;color:#999;">{{item.customerName}}</p>
-              <i class="iconfont" :class="item.callType === 'dialout' ? 'icon-qudian' : 'icon-laidian'"></i>
+
+          </div>
+          <div class="call-center-list-footer">
+            <button class="call-center-list-footer-more" @click="getMore" v-if="moreShow && !loading">加载更多</button>
+            <div v-if="loading">正在加载...</div>
+            <div v-if="!moreShow && !loading">
+              <span class="call-center-list-footer-line"></span>
+              <span class="call-center-list-footer-text">没有更多数据</span>
+              <span class="call-center-list-footer-line"></span>
             </div>
           </div>
-
         </div>
+        <div class="call-center-list-footer" v-else-if="recordListPage.list.length == 0 && !loading">暂无数据</div>
+        <div class="call-center-list-footer" v-else>正在加载...</div>
       </el-card>
     </div>
     <div class="main">
@@ -98,11 +111,18 @@ import * as CallCenterApi from '@src/api/CallCenterApi'
 import ContactInfo from './ContactInfo.vue'
 import ServiceRecord from './ServiceRecord.vue'
 import { parse } from '@src/util/querystring';
+import Page from '@model/Page';
 let callInterval;
 export default {
   name: 'workbench',
   data() {
     return {
+      loading: false,
+      params: {
+        pageSize: 10,
+        pageNum: 1,
+      },
+      recordListPage: new Page(),
       loadingListData: false,
       query: {},
       ringTime:'00:00',
@@ -143,6 +163,11 @@ export default {
       }
     }
   },
+  computed: {
+    moreShow () {
+      return this.recordListPage.hasNextPage;
+    },
+  },
   mounted() {
     this.query = parse(window.location.search) || {};
     if(this.query.id && this.query.callPhone) {
@@ -171,6 +196,20 @@ export default {
     this.$eventBus.$off('callcenter-workbench.select_tab', this.selectTab)
   },
   methods: {
+    async getMore () {
+      console.log("1111111111");
+      try {
+        this.params.pageNum++;
+        this.loading = true;
+        let recordListPage = await CallCenterApi.getTodayCallRecordList(this.params);
+        if(recordListPage.code == 0) {
+          this.recordListPage.merge(Page.as(recordListPage.result));
+        }
+        this.loading = false;
+      } catch(error) {
+        console.error(error);
+      }
+    },
     getCallTime(sec){
       const HOUR_SEC = 60 * 60;
       const MIN_SEC = 60;
@@ -218,24 +257,45 @@ export default {
       }
     },
     // 今日通话记录
-    getHistoryList(){
-      this.loadingListData = true
-      CallCenterApi.getTodayCallRecordList().then(({code, message, result}) => {
-        this.loadingListData = false
-        if (code !== 0) return this.$message.error(message || '内部错误')
-        this.historyList = result || []
-        if(!this.query.linkmanName && this.query.callState !== 'Link') {
-          if(this.historyList.length) {
-            this.item = this.historyList[0]
-            this.getRemarkList()
-            this.activeLinkId = this.item.id
-          // console.info('item:', this.item)
+    async getHistoryList(){
+      // this.loadingListData = true
+      try {
+        this.recordListPage.list = [];
+        this.params.pageNum = 1;
+        this.loading = true;
+        let recordListPage = await CallCenterApi.getTodayCallRecordList(this.params);
+        if(recordListPage.code == 0) {
+          this.recordListPage.merge(Page.as(recordListPage.result));
+          if(!this.query.linkmanName && this.query.callState !== 'Link') {
+            if(this.recordListPage.list.length) {
+              this.item = this.recordListPage.list[0]
+              this.getRemarkList()
+              this.activeLinkId = this.item.id
+              // console.info('item:', this.item)
+            }
           }
         }
-      }).catch((err) => {
-        this.loadingListData = false
-        console.error(err)
-      })
+        this.loading = false;
+      } catch(error) {
+        console.error(error);
+      }
+
+      // CallCenterApi.getTodayCallRecordList().then(({code, message, result}) => {
+      //   this.loadingListData = false
+      //   if (code !== 0) return this.$message.error(message || '内部错误')
+      //   this.historyList = result || []
+      //   if(!this.query.linkmanName && this.query.callState !== 'Link') {
+      //     if(this.historyList.length) {
+      //       this.item = this.historyList[0]
+      //       this.getRemarkList()
+      //       this.activeLinkId = this.item.id
+      //     // console.info('item:', this.item)
+      //     }
+      //   }
+      // }).catch((err) => {
+      //   this.loadingListData = false
+      //   console.error(err)
+      // })
     },
     handleHistoryItem(item, index) {
       this.activeLinkId = item.id
@@ -250,7 +310,7 @@ export default {
           message: message || '',
           type: 'error',
         })
-        this.historyList.splice(index, 1)
+        this.recordListPage.list.splice(index, 1)
         this.$platform.notification({
           title: '删除成功',
           type: 'success',
@@ -421,6 +481,44 @@ export default {
             }
           }
         }
+      }
+      .call-center-list-footer {
+        text-align: center;
+        margin-top: 10px;
+        height: 30px;
+        line-height: 30px;
+        color: #8C8989;
+      }
+      .call-center-list-footer-more {
+        margin: 0;
+        padding: 0;
+        outline: none;
+        border: none;
+        background: none;
+        color: #8C8989;
+        &:hover {
+          color: #55B7B4;
+        }
+      }
+      .job-notification-dividing-line {
+        width: 2px;
+        height: 15px;
+        background: #fff;
+        position: absolute;
+        right: 113px;
+        top: 28px;
+        z-index: 100;
+      }
+      .call-center-list-footer-line {
+        position: relative;
+        bottom: 4px;
+        display: inline-block;
+        background: #D0D0D0;
+        height: 1px;
+        width: 18px;
+      }
+      .call-center-list-footer-text {
+        padding: 0 16px;
       }
     }
 
