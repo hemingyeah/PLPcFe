@@ -401,7 +401,7 @@ export default {
           value: form[fn]
         })
       }
-      console.log('buildParams:', params);
+      // console.log('buildParams:', params);
       return params
     },
     setAdvanceSearchColumn(command) {

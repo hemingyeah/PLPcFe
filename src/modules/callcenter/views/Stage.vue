@@ -368,8 +368,10 @@ export default {
       }
       // this.params.pageNum = 1
       // this.params.moreConditions = this.$refs.searchPanel.buildParams()
-      const moreConditions = this.$refs.searchPanel.buildParams().conditions || []
-      
+      const p = this.$refs.searchPanel.buildParams()
+      const moreConditions = p.conditions || []
+      this.params.customerId = p.customerId || ''
+      this.params.linkmanId = p.linkmanId || ''
       moreConditions.forEach(item=>{
         if(item.property == 'sortId') {
           // 咨询分类

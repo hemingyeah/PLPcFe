@@ -278,7 +278,7 @@ export default {
       if(currentProtocol === 'https:') {
         protocol = 'wss'
       }
-      return `${protocol}://preapp.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
+      return `${protocol}://pre2app.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
     },
     /** 是否显示devtool */
     showDevTool() {

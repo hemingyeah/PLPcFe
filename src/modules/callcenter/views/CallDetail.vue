@@ -8,7 +8,7 @@
         <p>接待坐席：<span>{{callDetail.agentName}}</span></p>
       </div>
       <div class="call-info">
-        <p>呼入电话：<span>{{callDetail.dialPhone}}</span></p>
+        <p>呼叫电话：<span>{{callDetail.dialPhone}}</span></p>
         <p>通话开始时间：<span>{{callDetail.beginTime}}</span></p>
         <p>来去电时间：<span>{{callDetail.ring}}</span></p>
       </div>
@@ -341,6 +341,24 @@ export default {
         this.ruleForm.sortId = this.selectedKeys[this.selectedKeys.length - 1]
       } else {
         this.ruleForm.sortId = 0
+      }
+    },
+    async delRemark(item, index){
+      try {
+        if (!await this.$platform.confirm('确定要删除该服务备注？')) return;
+        const {code, message} = await CallCenterApi.deleteFwRemark({id:item.id})
+        if (code !== 0) return this.$platform.notification({
+          title: '删除失败',
+          message: message || '',
+          type: 'error',
+        });
+        this.getRemarkList()
+        this.$platform.notification({
+          title: '删除成功',
+          type: 'success',
+        });
+      } catch (e) {
+        console.error(e);
       }
     },
     // 保存备注

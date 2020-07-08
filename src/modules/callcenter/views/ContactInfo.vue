@@ -26,8 +26,8 @@
         </div>
       </template>
       <template v-else>
-        <p>客户：<a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createCustomerTab(contact.id)">{{contact.name}}</a></p>
-        <p>联系人：<span v-if="contact.linkman">{{contact.linkman.name}}</span></p>
+        <p>客户：<a href="" style="color: #55b7b4;cursor: pointer;" @click.stop.prevent="createCustomerTab(customerId)">{{customerName}}</a></p>
+        <p>联系人：<span >{{linkmanName}}</span></p>
         <p>区域：<span v-if="contact.customerAddress">{{contact.customerAddress.adProvince}}</span></p>
         <p>详细地址：<span v-if="contact.customerAddress">{{contact.customerAddress.adAddress}}</span></p>
         <p>负责人：<span>{{contact.customerManagerName}}</span></p>
@@ -166,6 +166,12 @@ export default {
     }
   },
   computed: {
+    linkmanName(){
+      return this.item.linkmanName || '' 
+    },
+    customerName(){
+      return this.item.customerName || '' 
+    },
     linkmanPhone(){
       return this.item.dialPhone 
     },

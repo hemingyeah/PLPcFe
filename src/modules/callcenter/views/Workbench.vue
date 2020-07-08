@@ -197,7 +197,6 @@ export default {
   },
   methods: {
     async getMore () {
-      console.log("1111111111");
       try {
         this.params.pageNum++;
         this.loading = true;
