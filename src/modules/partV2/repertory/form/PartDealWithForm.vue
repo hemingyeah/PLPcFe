@@ -36,7 +36,7 @@
                 <el-form-item prop="number">
                   <el-input
                     v-model="scope.row.number"
-                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation"
+                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation || !propData.data.approve"
                     type="number"
                     min="0"
                   ></el-input>
@@ -64,7 +64,7 @@
           :autosize="{ minRows: 2, maxRows: 6 }"
           :placeholder="inputonlyread?'':'请输入办理意见'"
           v-model="suggestion"
-          :readonly="inputonlyread"
+          :readonly="inputonlyread || !propData.data.approve"
         ></el-input>
       </div>
     </div>
