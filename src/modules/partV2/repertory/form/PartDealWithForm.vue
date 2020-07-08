@@ -54,7 +54,7 @@
     </div>
     <!-- 备件清单 end-->
     <div>
-      <div v-if="inputonlyread===false">
+      <div v-if="inputonlyread===false && propData.data.approve">
         <div class="mar-b-15 font-w-500">办理意见</div>
 
         <el-input
@@ -64,7 +64,7 @@
           :autosize="{ minRows: 2, maxRows: 6 }"
           :placeholder="inputonlyread?'':'请输入办理意见'"
           v-model="suggestion"
-          :readonly="inputonlyread || !propData.data.approve"
+          :readonly="inputonlyread"
         ></el-input>
       </div>
     </div>
