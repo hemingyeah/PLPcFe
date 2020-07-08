@@ -40,7 +40,7 @@
       <!--</div>-->
       <!--</div>-->
 
-      <base-collapse-panel :value="isExpand" class="page-panel" style="min-width:1115px;">
+      <base-collapse-panel :value="isExpand" class="page-panel">
         <div class="page-panel-head">
           <h5>高级搜索</h5>
         </div>
