@@ -2058,6 +2058,12 @@ export default {
                 type: "success"
               });
               this.loadData();
+            } else {
+              this.$message({
+                showClose: true,
+                message: res.message || "http error",
+                type: "error"
+              });
             }
           });
         }
@@ -2080,6 +2086,12 @@ export default {
             type: "success"
           });
           this.loadData();
+        } else {
+          this.$message({
+            showClose: true,
+            message: res.message || "http error",
+            type: "error"
+          });
         }
       });
     },
@@ -2104,7 +2116,7 @@ export default {
           if (arr.length <= 0) {
             return this.$message({
               showClose: true,
-              message: '没有可以办理的备件！',
+              message: "没有可以办理的备件！",
               type: "warning"
             });
           }
@@ -2119,6 +2131,12 @@ export default {
                   type: "success"
                 });
                 this.loadData();
+              } else {
+                this.$message({
+                  showClose: true,
+                  message: res.message || "http error",
+                  type: "error"
+                });
               }
             })
             .catch(err => {});
@@ -2375,6 +2393,13 @@ export default {
       getRelationListByApproveNo({
         approveNo: obj.approveNo
       }).then(res => {
+        if (res.code != 0) {
+          return this.$message({
+            showClose: true,
+            message: res.message || "http error",
+            type: "error"
+          });
+        }
         let result = res.result;
         let {
           prosperTime,
