@@ -1325,7 +1325,7 @@ export default {
               this.$set(this.page.list[i], "disabled", true);
           });
       } catch (error) {
-        console.log(error);
+        console.log(error, "getRecordNoArr");
       }
     },
     chooseColnum(column, index) {
@@ -1450,7 +1450,7 @@ export default {
             return item;
           });
         })
-        .catch(e => console.log("e", e));
+        .catch(e => console.log("initialize", e));
     },
     jump(pageNum) {
       this.model.pageNum = pageNum;
@@ -1501,7 +1501,7 @@ export default {
 
         this.matchSelected();
       } catch (error) {
-        console.log(error);
+        console.log(error, "loadData");
       }
       loading.close();
       return this.page.list;
@@ -1516,7 +1516,7 @@ export default {
       this.$http
         .get("/partV2/repertory/users", model)
         .then(result => (this.userApply.options = result))
-        .catch(err => console.log(err))
+        .catch(err => console.log(err, "fetchUserApply"))
         .finally(() => (this.userApply.loading = false));
     },
     visibleUserApply(e) {
@@ -1549,7 +1549,7 @@ export default {
           )
         )
 
-        .catch(err => console.log(err))
+        .catch(err => console.log(err, "fetchUserApprove"))
         .finally(() => (this.userApprove.loading = false));
     },
     visibleUserApprove(e) {
@@ -1571,7 +1571,7 @@ export default {
       this.$http
         .get("/partV2/repertory/sparepart/list", model)
         .then(result => (this.sparepart.options = result.list))
-        .catch(err => console.log(err))
+        .catch(err => console.log(err, "fetchSparepart"))
         .finally(() => (this.sparepart.loading = false));
     },
 
@@ -1776,7 +1776,7 @@ export default {
         })
         .catch(error => {
           this.$platform.toast(`${actionName}失败`, "error");
-          console.log("err", error);
+          console.log("transfer", error);
         });
     },
 
@@ -1812,7 +1812,7 @@ export default {
         })
         .catch(error => {
           this.$platform.toast("撤回调拨失败", "error");
-          console.log("err", error);
+          console.log("cancelTransfer", error);
         });
     },
     /** 分配撤回 (弹窗) */
@@ -1852,7 +1852,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log(error);
+        console.log(error, "reStock");
       }
       this.pending = false;
     },
@@ -1876,7 +1876,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log(error);
+        console.log(error, "outstockSave");
       }
       this.pending = false;
     },
@@ -1899,7 +1899,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log(error);
+        console.log(error, "backstockSave");
       }
       this.pending = false;
     },
@@ -1923,7 +1923,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log(error);
+        console.log(error, "instockSave");
       }
       this.pending = false;
     },
@@ -1946,7 +1946,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log(error);
+        console.log(error, "outstockBatchSave");
       }
       this.pending = false;
     },
@@ -1969,7 +1969,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log(error);
+        console.log(error, "instockBatchSave");
       }
       this.pending = false;
     },
@@ -2040,8 +2040,7 @@ export default {
       this.formdata = value;
     },
     partDealDataCancel(approveNo) {
-      console.log(this.rejectForm.reason, "拒绝");
-      // return;
+      // 拒绝
       this.$refs["rejectForm"].validate((valid, obj) => {
         if (valid) {
           // 拒绝
@@ -2070,8 +2069,6 @@ export default {
       });
     },
     partDealDataReset(approveNo) {
-      console.log(this.rejectForm.reasons, "撤销");
-      // return;
       // 撤销
       revokeBatch({
         approveNo,
@@ -2140,7 +2137,6 @@ export default {
               }
             })
             .catch(err => {});
-          console.log(res);
         })
         .catch(err => {
           this.$message({
@@ -2380,6 +2376,7 @@ export default {
       }
     },
     sortChange(option) {
+      // TO DO 表单排序
       console.log(option);
     },
     dingMessage() {
