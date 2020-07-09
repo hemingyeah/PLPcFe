@@ -1257,7 +1257,7 @@ export default {
       let fileName = `${DateUtil.format(
         new Date(),
         "yyyy-MM-dd"
-      )}备件出入库办理数据.xlsx`;
+      )}备件办理出入库数据.xlsx`;
 
       if (!exportAll) {
         if (this.selected.length == 0)
@@ -2297,28 +2297,28 @@ export default {
     trackEventhandler(type) {
       switch (type) {
         case "search":
-          this.$tdOnEvent("pc：出入库办理-搜索事件");
+          this.$tdOnEvent("pc：办理出入库-搜索事件");
           break;
         case "reset":
-          this.$tdOnEvent("pc：出入库办理-重置事件");
+          this.$tdOnEvent("pc：办理出入库-重置事件");
           break;
         case "advSearch":
-          this.$tdOnEvent("pc：出入库办理-高级搜索事件");
+          this.$tdOnEvent("pc：办理出入库-高级搜索事件");
           break;
         case "chooseRepertory":
-          this.$tdOnEvent("pc：出入库办理-原始仓库筛选下拉框事件");
+          this.$tdOnEvent("pc：办理出入库-原始仓库筛选下拉框事件");
           break;
         case "chooseSourceType":
-          this.$tdOnEvent("pc：出入库办理-目标仓库筛选下拉框事件");
+          this.$tdOnEvent("pc：办理出入库-目标仓库筛选下拉框事件");
           break;
         case "batch-stock-out":
-          this.$tdOnEvent("pc：出入库办理-批量出库事件");
+          this.$tdOnEvent("pc：办理出入库-批量出库事件");
           break;
         case "batch-stock-in":
-          this.$tdOnEvent("pc：出入库办理-批量入库事件");
+          this.$tdOnEvent("pc：办理出入库-批量入库事件");
           break;
         case "selectColumn":
-          this.$tdOnEvent("pc：出入库办理-选择列事件");
+          this.$tdOnEvent("pc：办理出入库-选择列事件");
           break;
         default:
           break;
@@ -2328,22 +2328,22 @@ export default {
     stateTrackEventHandler(type) {
       switch (type) {
         case "":
-          this.$tdOnEvent("pc：出入库办理-全部事件");
+          this.$tdOnEvent("pc：办理出入库-全部事件");
           break;
         case "suspending":
-          this.$tdOnEvent("pc：出入库办理-待办理事件");
+          this.$tdOnEvent("pc：办理出入库-待办理事件");
           break;
         case "solved":
-          this.$tdOnEvent("pc：出入库办理-已办理事件");
+          this.$tdOnEvent("pc：办理出入库-已办理事件");
           break;
         case "rejected":
-          this.$tdOnEvent("pc：出入库办理-已拒绝事件");
+          this.$tdOnEvent("pc：办理出入库-已拒绝事件");
           break;
         case "cancel":
-          this.$tdOnEvent("pc：出入库办理-已取消事件");
+          this.$tdOnEvent("pc：办理出入库-已取消事件");
           break;
         case "revoked":
-          this.$tdOnEvent("pc：出入库办理-已撤回事件");
+          this.$tdOnEvent("pc：办理出入库-已撤回事件");
           break;
         default:
           break;
@@ -2353,13 +2353,13 @@ export default {
     tableTrackEventHandler(type) {
       switch (type) {
         case "done":
-          this.$tdOnEvent("pc：出入库办理-列表办理事件");
+          this.$tdOnEvent("pc：办理出入库-列表办理事件");
           break;
         case "reject":
-          this.$tdOnEvent("pc：出入库办理-列表拒绝事件");
+          this.$tdOnEvent("pc：办理出入库-列表拒绝事件");
           break;
         case "recall":
-          this.$tdOnEvent("pc：出入库办理-列表撤回事件");
+          this.$tdOnEvent("pc：办理出入库-列表撤回事件");
           break;
         default:
           break;
