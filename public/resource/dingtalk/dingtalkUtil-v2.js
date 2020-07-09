@@ -187,7 +187,7 @@
     var query = '?dd_nav_bgcolor=ff00ac9&type=4&corpId=' + window._global_data_corpId;
     var route = '&route=/spareParts/myJob/detail?approveNo=' + approveNo
     url = url + query + route;
-    var bodyText = `您有一个备件办理(${this.approveNo})需要关注`;
+    var bodyText = `您有一个备件办理(${approveNo})需要关注`;
     window.DingTalkPC.biz.ding.post({
       users: users, //用户列表，userid
       corpId: window._global_data_corpId, //企业id
