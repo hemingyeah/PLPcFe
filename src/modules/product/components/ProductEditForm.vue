@@ -104,8 +104,7 @@ export default {
   data() {
     return {
       validation: this.buildValidation(),
-      template: [],
-      customer: {}
+      template: []
     }
   },
   computed: {
@@ -116,15 +115,15 @@ export default {
     isPhoneUnique() {
       return this.initData.isPhoneUnique || false;
     },
-
-    // customer() {
-    //   let customer = (this.value.customer && this.value.customer[0]) || {};
-    //   customer.id = customer.value;
-    //   return customer || {};
-    // },
-
+    customer() {
+      let customer = (this.value.customer && this.value.customer[0]) || {};
+      if(!customer.id && customer.value) {
+        customer.id = customer.value;
+      }
+      return customer || {};
+    },
     customerId() {
-      return (this.customer && this.customer.id) || '';
+      return (this.customer && (this.customer.id || this.customer.value)) || '';
     }
   },
   methods: {
@@ -206,7 +205,6 @@ export default {
         field: cf,
         newValue: value
       })
-      this.customer = value[0]
       this.fetchCustomer(value);
     },
     updateLinkman(value) {      

@@ -31,7 +31,7 @@
         </template>
         <template v-else>
           <el-radio-group v-model="form.isAllLm">
-            <el-radio :label="0" style="width: 120px">默认联系人</el-radio>
+            <el-radio :label="0" style="width: 120px">客户默认联系人</el-radio>
             <el-radio :label="1" style="width: 120px">所有联系人</el-radio>
           </el-radio-group>
         </template>

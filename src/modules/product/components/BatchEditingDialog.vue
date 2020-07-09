@@ -42,7 +42,7 @@ export default {
     fields() {
       let tv = null;
       let formTypes = ['attachment', 'separator', 'location', 'info'];
-      let fieldNames = ['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'];
+      let fieldNames = ['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId', 'linkmanName', 'phone', 'address'];
 
       let fields = (this.config.fields || [])
         .filter(f => formTypes.indexOf(f.formType) < 0 &&  !fieldNames.some(key => key === f.fieldName))
