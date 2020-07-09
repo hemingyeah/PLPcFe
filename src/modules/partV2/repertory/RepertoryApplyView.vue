@@ -2211,7 +2211,7 @@ export default {
         },
 
         {
-          label: "金额",
+          label: "金额(¥)",
           exportAlias: "price",
           field: "showPrice",
           width: 90,

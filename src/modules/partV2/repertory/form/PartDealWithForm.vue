@@ -146,7 +146,7 @@ export default {
       {
         field: "price",
         prop: "data1",
-        lable: "金额",
+        lable: "金额(¥)",
         width: "180"
       },
       {
