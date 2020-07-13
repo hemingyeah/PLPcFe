@@ -1,9 +1,10 @@
 <template>
   <base-panel
     :show.sync="show"
+    :diy-transfer="true"
     width="468px"
     class="notification-center">
-    <div class="notification-center-header" slot="header">
+    <!-- <div class="notification-center-header" slot="header">
       <button type="button" class="btn-text notification-center-btn" @click="show = false">
         <i class="iconfont icon-open notification-close"></i>
       </button>
@@ -29,7 +30,7 @@
 
     <keep-alive>
       <component :is="component" :info="info" @clearNum="clearNum" @getNum="getNum"></component>
-    </keep-alive>
+    </keep-alive> -->
   </base-panel>
 </template>
 
@@ -230,4 +231,5 @@ export default {
   float: right;
   height: 50px;
 }
+
 </style>
