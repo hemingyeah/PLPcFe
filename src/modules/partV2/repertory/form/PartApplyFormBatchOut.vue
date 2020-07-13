@@ -341,7 +341,7 @@ export default {
     border-color:#dadada;
     &:focus{
       outline: none;
-      border-color: #409EFF;
+      border-color: $color-primary;
     }  
   }   
 }

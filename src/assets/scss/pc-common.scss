@@ -133,9 +133,9 @@
   border-color: transparent;
 
   &:hover{
-    color: #409eff;
-    background-color: #ecf5ff;
-    border-color: #ecf5ff;
+    background-color: transparent;
+    border-color: transparent;
+    color: $color-primary;
   }
 }
 
