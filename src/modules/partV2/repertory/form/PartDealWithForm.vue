@@ -13,7 +13,7 @@
 
     <div class="flex-x mar-b-20 al-start">
       <div class="form-only-see-title mar-r-15">备注</div>
-      <div>{{remark}}</div>
+      <div>{{propData.data.remark}}</div>
     </div>
     <!-- 备注 end -->
 
@@ -175,13 +175,11 @@ export default {
       }
     ];
     let inputonlyread = this.propData.data.state !== "suspending";
-    let remark = this.propData.data.remark;
     return {
       input: "测试数据",
       rules: {
         number: [{ validator: validateNumber, trigger: "change" }]
       },
-      remark,
       suggestion: "",
       tableColumn,
       inputonlyread
@@ -231,9 +229,8 @@ export default {
                 return false;
               }
             });
-            let { remark, suggestion, propData } = this;
+            let {  suggestion, propData } = this;
             resolves({
-              remark,
               suggestion,
               propData
             });

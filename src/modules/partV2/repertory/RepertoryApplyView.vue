@@ -2118,20 +2118,20 @@ export default {
             });
           }
           approveBatch(arr)
-            .then(res => {
-              if (res.code == 0) {
+            .then(res_ => {
+              if (res_.code == 0) {
                 this.$refs.partDealWithForm.resetData();
                 this.partDealDialog = false;
                 this.$message({
                   showClose: true,
-                  message: res.message,
+                  message: res_.message,
                   type: "success"
                 });
                 this.loadData();
               } else {
                 this.$message({
                   showClose: true,
-                  message: res.message || "http error",
+                  message: res_.message || "http error",
                   type: "error"
                 });
               }
