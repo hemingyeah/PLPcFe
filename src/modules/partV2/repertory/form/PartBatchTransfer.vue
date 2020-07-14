@@ -400,21 +400,20 @@ export default {
   }
 }
 
-  .in-stock-remark{
-    width: 100%;
-    display: flex;
-    margin: 10px 0 0;
-    padding: 0 5px;
-    textarea {
-      flex: 1;
-      height: 40px;
-      min-height: 40px;
-      padding: 10px;
-      border-color: #dadada;
-      &:focus{
-        outline: none;
-        border-color: $color-primary;
-      }
+.in-stock-remark {
+  width: 100%;
+  display: flex;
+  margin: 10px 0 0;
+  padding: 0 5px;
+  textarea {
+    flex: 1;
+    height: 40px;
+    min-height: 40px;
+    padding: 10px;
+    border-color: #dadada;
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
     }
   }
 }
