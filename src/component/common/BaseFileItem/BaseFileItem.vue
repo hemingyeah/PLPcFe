@@ -5,7 +5,8 @@
         <img v-if="isImage" :data-origin="file.url" :alt="file.filename">
       </div>
       <div class="base-file-info">
-        <a :href="genDownloadUrl(file)">{{file.filename}}</a>
+        <a :href="genDownloadUrl(file)">
+          {{ file.filename }}</a>
         <p>
           <span>{{file.fileSize}}</span>
           <button type="button" class="btn-text base-file-del" @click="deleteFile" v-if="!readonly">删除</button>
@@ -53,7 +54,7 @@ export default {
     icon(){
       let file = this.file;
       let icon = '';
-      const name = file.filename;
+      const name = file.filename || file.url;
 
       if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(name)) {
         icon = 'img';
