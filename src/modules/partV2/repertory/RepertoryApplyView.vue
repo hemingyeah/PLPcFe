@@ -1496,8 +1496,8 @@ export default {
       let loading = this.$loading();
       try {
         this.page = await this.fetchData();
-        this.model.pageNum = this.page.pageNum;
-        this.model.pageSize = this.page.pageSize;
+        // this.model.pageNum = this.page.pageNum;
+        // this.model.pageSize = this.page.pageSize; list 接口返回 pageSize异常 不由后端刷新
 
         this.matchSelected();
       } catch (error) {
@@ -2435,12 +2435,7 @@ export default {
             isreject,
             approved,
             suggestion,
-            remark:
-              result.relations.length > 0
-                ? result.relations[0].remark
-                  ? result.relations[0].remark
-                  : ""
-                : "",
+            remark:result.list.remark || '',
             staffs: result.staffs
           }
         };
