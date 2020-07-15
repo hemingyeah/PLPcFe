@@ -1103,14 +1103,6 @@ export default {
         { value: "cancel", label: "已取消", key: "cancel" },
         { value: "revoked", label: "已撤回", key: "revoked" }
       ],
-      typeArr: [
-        { value: "出库", label: "出库", key: "0" },
-        { value: "入库", label: "入库", key: "1" },
-        { value: "调拨", label: "调拨", key: "2" },
-        { value: "分配", label: "分配", key: "3" },
-        { value: "申领", label: "申领 ", key: "4" },
-        { value: "退回", label: "退回", key: "5" }
-      ],
       selectedLimit: 500,
       auths: {},
       columns: this.buildColumns(),
@@ -1220,6 +1212,22 @@ export default {
     // 是否允许导入导出
     allowImportAndExport() {
       return AuthUtil.hasAuth(this.auths, "EXPORT_IN");
+    },
+    typeArr() {
+      return this.isPersonalRepertory
+        ? [
+            { value: "出库", label: "出库", key: "0" },
+            { value: "入库", label: "入库", key: "1" },
+            { value: "调拨", label: "调拨", key: "2" },
+            { value: "分配", label: "分配", key: "3" },
+            { value: "申领", label: "申领 ", key: "4" },
+            { value: "退回", label: "退回", key: "5" }
+          ]
+        : [
+            { value: "出库", label: "出库", key: "0" },
+            { value: "入库", label: "入库", key: "1" },
+            { value: "调拨", label: "调拨", key: "2" }
+          ];
     }
   },
   watch: {
@@ -2435,7 +2443,7 @@ export default {
             isreject,
             approved,
             suggestion,
-            remark:result.list.remark || '',
+            remark: result.list.remark || "",
             staffs: result.staffs
           }
         };
