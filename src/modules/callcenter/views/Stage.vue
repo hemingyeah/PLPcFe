@@ -377,14 +377,14 @@ export default {
           // 咨询分类
           this.params.sortId = item.value[0].id || ''
         }else if(item.property == 'ringTime') {
-          this.params.ringStartTime = item.betweenValue1 || ''
-          this.params.ringEndTime = item.betweenValue2 || ''
+          this.params.ringStartTime = `${item.betweenValue1} 00:00:00` || ''
+          this.params.ringEndTime = `${item.betweenValue2} 23:59:59` || ''
         } else if(item.property == 'beginTime') {
-          this.params.beginTimeStart = item.betweenValue1 || ''
-          this.params.beginTimeEnd = item.betweenValue2 || ''
+          this.params.beginTimeStart = `${item.betweenValue1} 00:00:00` || ''
+          this.params.beginTimeEnd = `${item.betweenValue2} 23:59:59` || ''
         } else if(item.property == 'endTime') { 
-          this.params.endTimeStart = item.betweenValue1 || ''
-          this.params.endTimeEnd = item.betweenValue2 || ''
+          this.params.endTimeStart = `${item.betweenValue1} 00:00:00` || ''
+          this.params.endTimeEnd = `${item.betweenValue2} 23:59:59` || ''
         } else {
           this.params[item.property] = item.value || ''
         }
