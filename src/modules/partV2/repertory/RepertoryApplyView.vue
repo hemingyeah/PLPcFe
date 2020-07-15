@@ -2161,7 +2161,7 @@ export default {
           label: "申请数量",
           exportAlias: "variation",
           field: "showNum",
-          width: 80,
+          width: 100,
           overflow: true,
           show: false
         },
@@ -2189,7 +2189,7 @@ export default {
           exportAlias: "state",
           field: "state",
           // sortable: "state",
-          width: 80,
+          width: 100,
           overflow: true,
           show: true
         },
@@ -2197,7 +2197,7 @@ export default {
           label: "申请类别",
           exportAlias: "type",
           field: "type",
-          width: 90,
+          width: 100,
           overflow: true,
           show: true
         },
@@ -2214,7 +2214,7 @@ export default {
           label: "金额(¥)",
           exportAlias: "price",
           field: "showPrice",
-          width: 90,
+          width: 100,
           overflow: true,
           show: true
         },
@@ -2238,7 +2238,7 @@ export default {
           label: "发起人",
           field: "prosperName",
           exportAlias: "prosperName",
-          width: 80,
+          width: 100,
           overflow: true,
           show: true
         },
@@ -2248,14 +2248,14 @@ export default {
           field: "applyCount",
           exportAlias: "pendingVariation,solvedVariation",
           show: true,
-          width: 120
+          width: 160
         },
         {
           field: "approveName",
           label: "办理人",
           exportAlias: "executorName",
           show: true,
-          width: 80,
+          width: 100,
           overflow: true
         },
         {
