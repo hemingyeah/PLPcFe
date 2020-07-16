@@ -59,10 +59,10 @@
 
         <el-input
           type="textarea"
-          maxlength="100"
+          maxlength="500"
           resize="none"
           :autosize="{ minRows: 2, maxRows: 6 }"
-          :placeholder="inputonlyread?'':'请输入办理意见'"
+          :placeholder="inputonlyread?'':'请输入办理意见[500个字以内]'"
           v-model="suggestion"
           :readonly="inputonlyread"
         ></el-input>

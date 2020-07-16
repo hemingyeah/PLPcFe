@@ -300,7 +300,7 @@
             <el-option
               v-for="item in stateArr"
               :value="item.value"
-              :label="item.label"
+              :label="item.label" 
               :key="item.key"
             ></el-option>
           </el-select>
@@ -873,9 +873,9 @@
               type="textarea"
               resize="none"
               style="width:580px;"
-              maxlength="100"
+              maxlength="500"
               :autosize="{ minRows: 2, maxRows: 6 }"
-              :placeholder="'请填写拒绝理由[100个字以内]'"
+              :placeholder="'请填写拒绝理由[500个字以内]'"
               v-model="rejectForm.reason"
             ></el-input>
           </el-form-item>
@@ -884,9 +884,9 @@
               type="textarea"
               resize="none"
               style="width:580px;"
-              maxlength="50"
+              maxlength="500"
               :autosize="{ minRows: 2, maxRows: 6 }"
-              :placeholder="'请填写撤销理由[50个字以内]'"
+              :placeholder="'请填写撤销理由[500个字以内]'"
               v-model="rejectForm.reasons"
             ></el-input>
           </el-form-item>
@@ -1584,6 +1584,11 @@ export default {
     },
 
     chooseUserApply(value) {
+      console.log(value,'asdadas')
+      if (this.model.prosperId === value) {
+        this.model.prosperId = "";
+        return
+      }
       this.model.prosperId = value;
       this.model.pageNum = 1;
       this.loadData();
