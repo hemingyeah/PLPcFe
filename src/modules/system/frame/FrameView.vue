@@ -30,6 +30,7 @@
                 <i class="iconfont icon-dianhua1"></i>
               </button>
               <div v-if="showCallCenter" class="call-center-box" > 
+                <i style="position: absolute;right: 15px;top: 20px;" class="iconfont icon-fe-close" @click="showCallCenter=false"></i>
                 <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
                 <p class="customer-name" v-if="callData.linkmanName">{{callData.linkmanName}}</p>
                 <p v-if="callData.linkmanName">{{callData.customerName}}</p>
