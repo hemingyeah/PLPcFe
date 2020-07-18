@@ -114,7 +114,15 @@ export default {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
           const params = util.packToProduct(this.productFields, this.form);
-
+          this.productFields.forEach(field =>{
+            if(field.fieldName == 'customer' && field.isSystem == 1) {
+              if (!field.setting.customerOption.address) {
+                params.address = {}
+              } else if (field.setting.customerOption.linkman){
+                params.linkman = {}
+              }  
+            }
+          });
           this.pending = true;
           this.loadingPage = true;
           let fn = this.action === 'create' ? createProduct : updateProduct;
