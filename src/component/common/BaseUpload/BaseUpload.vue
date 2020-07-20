@@ -7,7 +7,7 @@
     </div>
     
     <div class="base-upload-operation">
-      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
+      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" v-if="allowUpload">
         <i class="iconfont icon-loading" v-if="pending"></i>
         <span>{{pending ? '正在上传' : '点击上传'}}</span>
       </button>
@@ -28,6 +28,10 @@ export default {
     }
   },
   props: {
+    limit: {
+      type: Number,
+      default: 9,
+    },
     displayName: {
       type: String,
       default: () => '附件',
@@ -53,8 +57,17 @@ export default {
       default: ''
     }
   },
+  computed: {
+    allowUpload(){
+      return !(this.limit && this.queue.length >= this.limit);
+    },
+    queue(){
+      return this.value;
+    },
+  },
   methods: {
     chooseFile(){
+      if(!this.allowUpload) return console.warn('Caused: dont chooseFile, because of this.allowUpload is false');
       if(this.pending) return platform.alert('请等待文件上传完成');
       if(this.value.length >= Uploader.FILE_MAX_NUM) {
         return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);

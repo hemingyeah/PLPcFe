@@ -141,7 +141,7 @@ export default {
       });
     },
     async deleteFile(){
-      const name = this.file.filename;
+      const name = this.file.filename || '';
       if(await platform.confirm(`确定要删除该附件？\n${name}`)){
         this.$emit('delete', this.file);
       }
