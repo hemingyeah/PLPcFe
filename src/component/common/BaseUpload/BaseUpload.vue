@@ -93,7 +93,7 @@ export default {
         return platform.alert(message)
       }
 
-      if(allFilesLength >= this.limit) {
+      if(allFilesLength > this.limit) {
         return platform.alert(`上传文件数量不能超过${this.limit}个`);
       }
 
