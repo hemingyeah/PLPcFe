@@ -30,7 +30,7 @@ export default {
   props: {
     limit: {
       type: Number,
-      default: 9,
+      default: Uploader.FILE_MAX_NUM,
     },
     displayName: {
       type: String,
@@ -79,16 +79,22 @@ export default {
     handleChange(event){
       const files = event.target.files;
       if(!files || !files.length) return;
+      
+      let allFilesLength = this.value.length + files.length;
 
-      if(this.value.length + files.length > Uploader.FILE_MAX_NUM) {
+      if(allFilesLength > Uploader.FILE_MAX_NUM) {
         let message = `上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`;
-        let max = 9 - this.value.length;
+        let max = Uploader.FILE_MAX_NUM - this.value.length;
 
-        if(max > 0 && files.length < 9){
+        if(max > 0 && files.length < Uploader.FILE_MAX_NUM){
           message += `, 您还能上传${max}个文件`;
         }
 
         return platform.alert(message)
+      }
+
+      if(allFilesLength >= this.limit) {
+        return platform.alert(`上传文件数量不能超过${this.limit}个`);
       }
 
       this.pending = true;
