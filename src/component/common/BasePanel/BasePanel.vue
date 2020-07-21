@@ -1,10 +1,9 @@
 <template>
   <transition name="slide-left" @after-leave="$emit('closed')">
     <template v-if="diyTransfer">
-      <div v-if="show" class="normal-note-box">
-        <div class="normal-note-right-box"></div>
-        <div class="normal-note-left-box"></div>
-      </div>
+      <slot name="diyTransferCon" v-if="show">
+      
+      </slot>
     </template>
     <template v-else>
       <!-- <div v-show="show" class="base-panel-mask" @click.self="close"> -->
@@ -74,37 +73,7 @@ export default {
 </script>
 
 <style lang="scss">
-.normal-note-box {
-  width: 300px;
-  position: absolute;
-  height: 100%;
-  right: 0;
-  z-index: 99;
-  box-shadow: none !important;
-}
-.normal-note-right-box {
-  width: 300px;
-  position: absolute;
-  height: 100%;
-  right: 0;
-  z-index: 99;
-  background: #fff;
-  box-shadow: -3px 0px 5px #ccc;
-}
 
-.normal-note-left-box {
-  width: 300px;
-  background: #fff;
-  position: absolute;
-  height: 100%;
-  transform: translateX(0);
-  transition: all 0.8s;
-  box-shadow: -3px 0px 5px #ccc;
-  z-index: 98;
-}
-.normal-note-left-box-show{
-  transform: translateX(-300px);
-}
 .base-panel {
   position: fixed;
   top: 0;
