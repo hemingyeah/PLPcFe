@@ -1,7 +1,7 @@
 // pc项目迁移
 .page{
   background-color: #F2F2F2;
-  min-width: 1100px;
+  min-width: 960px;
   padding: 10px;
   overflow: auto;
 }
@@ -133,9 +133,9 @@
   border-color: transparent;
 
   &:hover{
-    background-color: transparent;
-    border-color: transparent;
-    color: $color-primary;
+    color: #409eff;
+    background-color: #ecf5ff;
+    border-color: #ecf5ff;
   }
 }
 

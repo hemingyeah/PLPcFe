@@ -37,7 +37,15 @@ import {
   Steps,
   Step,
   Dialog,
-  Message
+  Tabs,
+  TabPane,
+  Row,
+  OptionGroup,
+  Message,
+  MessageBox,
+  Autocomplete,
+  Col,
+  Notification,
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
@@ -79,11 +87,20 @@ const ElementUI = {
     Vue.use(Steps);
     Vue.use(Step);
     Vue.use(Dialog);
-    Vue.use(Card);
+    Vue.use(Tabs);
+    Vue.use(TabPane);
+    Vue.use(Row);
+    Vue.use(OptionGroup);
+    Vue.use(Message.name, Message);
+    Vue.use(Autocomplete.name, Autocomplete);
+    Vue.use(Col.name, Col);
+    
     Vue.component(CollapseTransition.name, CollapseTransition);
 
     Vue.prototype.$loading = Loading.service;
-    Vue.prototype.$message = Message
+    Vue.prototype.$message = Message;
+    Vue.prototype.$confirm = MessageBox.confirm;
+    Vue.prototype.$notify = Notification;
   }
 };
 

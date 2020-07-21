@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import Uploader from 'packages/BaseUpload/uploader';
+import Uploader from '../BaseUpload/BaseUpload';
 import Platform from '@src/util/Platform';
 
 export default {

@@ -36,7 +36,7 @@ import {
   Notification,
   RadioButton,
   Tag,
-  Popover,
+  Popover
 } from 'element-ui';
 
 Vue.component(Row.name, Row);
@@ -82,7 +82,6 @@ Vue.component(Tooltip.name, Tooltip);
 Vue.component(RadioButton.name, RadioButton);
 Vue.component(Tag.name, Tag);
 Vue.component(Popover.name, Popover);
-
 
 Vue.prototype.$loading = Loading.service;
 Vue.prototype.$message = Message;

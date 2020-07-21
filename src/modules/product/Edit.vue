@@ -118,7 +118,7 @@ export default {
             if(field.fieldName == 'customer' && field.isSystem == 1) {
               if (!field.setting.customerOption.address) {
                 params.address = {}
-              } else if (field.setting.customerOption.linkman){
+              } else if (!field.setting.customerOption.linkman){
                 params.linkman = {}
               }  
             }
@@ -126,7 +126,6 @@ export default {
           this.pending = true;
           this.loadingPage = true;
           let fn = this.action === 'create' ? createProduct : updateProduct;
-          
           fn(params)
             .then(res => {
               let action = this.action === 'create' ? '新建' : '更新';

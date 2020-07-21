@@ -8,16 +8,14 @@ import BaseExport from 'packages/BaseExport';
 import * as math from 'mathjs';
 
 import RepertoryStockView from './RepertoryStockView.vue';
-// import { Autocomplete } from 'element-ui';
-// Vue.component(Autocomplete.name, Autocomplete);
 
 Vue.component(BaseCollapsePanel.name, BaseCollapsePanel);
 Vue.component(BaseImport.name, BaseImport);
 Vue.component(BaseExport.name, BaseExport);
 
 Vue.prototype.$http = http;
-Vue.prototype.$tdOnEvent = function () {
-
+Vue.prototype.$tdOnEvent = function() {
+  
 };
 Vue.prototype.$math = math;
 Vue.prototype.$http = http;

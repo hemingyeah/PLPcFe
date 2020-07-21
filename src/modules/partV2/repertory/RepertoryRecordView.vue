@@ -376,7 +376,7 @@
 
 <script>
 import _ from 'lodash';
-import qs from '@src/util/querystring2';
+import qs from '@src/util/queryString2';
 import Page from '@src/model/Page';
 import DateUtil from '@src/util/date';
 import AuthUtil from '@src/util/auth';

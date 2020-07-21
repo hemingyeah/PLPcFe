@@ -1,14 +1,14 @@
 import http from '@src/util/HttpUtil';
-let urlHead = '/api/part';
+let urlHead = '';
 
 
 // partV2/repertory/repertoryApply.vue
 export function rejectBatch(params = {}) {
-  return http.post(`${urlHead}/outside/dd/part/approveList/rejectBatch`, params, false)
+  return http.get(`${urlHead}/outside/dd/part/approveList/rejectBatch`, params)
 }
 
 export function revokeBatch(params = {}) {
-  return http.post(`${urlHead}/outside/dd/part/approveList/revokeBatch`, params, false)
+  return http.get(`${urlHead}/outside/dd/part/approveList/revokeBatch`, params)
 }
 
 export function approveBatch(params = {}) {

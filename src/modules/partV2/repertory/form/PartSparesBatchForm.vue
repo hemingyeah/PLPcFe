@@ -12,7 +12,7 @@
         <el-autocomplete
           slot-scope="scope"
           popper-class="batch-in-part"
-          v-model="scope.row.sparepartName"
+          :value="scope.row.sparepartName"
           :fetch-suggestions="selectPart(scope.row)"
           placeholder="请选择备件"
           @select="choosePart($event, scope.row)">
@@ -390,8 +390,8 @@ export default {
       return this.remark
     },
     receive(data = [], userId = ''){
-      if (data.length > 20) {
-        return this.$platform.alert('单次最多支持分配2s0个备件');
+      if (data.length > 50) {
+        return this.$platform.alert('单次最多支持分配50个备件');
       }
 
       this.form = data.map(item => this.add(null, item));
@@ -471,7 +471,7 @@ export default {
     border-color:#dadada;
     &:focus{
       outline: none;
-      border-color: $color-primary;
+      border-color: #409EFF;
     }  
   }   
 }

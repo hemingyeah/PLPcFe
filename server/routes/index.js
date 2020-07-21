@@ -87,6 +87,25 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
+router.use('/outside', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.82',
+  port: 10007,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
+  }
+}))
+// /api/app/outside/es
+// router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
+//   // host: '192.168.31.237',
+//   host: '30.40.58.161',
+//   port: 10006,
+//   headers: {
+//     // 'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
+//     'cookie': `VIPPUBLINKJSESSIONID=324bd997-42e0-44db-bb67-83f1bc77e44a`
+//   },
+// }))
+
+
 router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.211',
   port: 10007,
@@ -95,19 +114,21 @@ router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   },
 }))
 
-router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  host: '47.98.255.79',
-  port: 10004,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=b47bb687-fcc1-4d9e-998a-16978f6d3cf7'
-  },
-}))
+// router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
+//   host: '30.40.56.177',
+//   port: 10006,
+//   headers: {
+//     'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
+//   },
+// }))
+
+
 
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.177', // 仇太俊
+  host: '127.0.0.1',
   port: 8080,
   headers: {
-    'cookie': `VIPPUBLINKJSESSIONID=b47bb687-fcc1-4d9e-998a-16978f6d3cf7`
+    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
   },
 }))
 
@@ -135,6 +156,7 @@ router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
+router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)

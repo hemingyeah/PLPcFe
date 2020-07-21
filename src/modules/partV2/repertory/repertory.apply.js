@@ -28,7 +28,6 @@ try {
   console.warn(error)
   console.warn('no init data')
 }
-// initData = require('@src/modules/doMyself/home/initData')
 
 const app = new Vue({
   el: '#app',
