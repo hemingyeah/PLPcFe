@@ -166,7 +166,8 @@ export default {
             id: item.sparepart,
           },
           repertory: {
-            id: item.repertory
+            id: item.repertory,
+            name: item.sparepartName
           },
           item: item.type,
           type: '入库',
