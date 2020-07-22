@@ -8,16 +8,33 @@
     </div>-->
     <div class="job-notification-content" v-show="!dailyShow">
       <div v-if="notificationPage.list.length != 0">
-        <job-notification-item
-          v-for="(item, index) in notificationPage.list"
-          :key="item.id - 0"
-          :info="item"
-          :index="index"
-          @getInfo="getInfo"
-          @clearNum="clearNum"
-          @toDaily="toDaily(item)"
-          @deleteItem="deleteItem"
-        ></job-notification-item>
+        <div v-for="(item, index) in notificationPage.list" :key="index">
+          <job-notification-item
+            v-if="item.type!=1"
+            :info="item"
+            :index="index"
+            @getInfo="getInfo"
+            @clearNum="clearNum"
+            @toDaily="toDaily(item)"
+            @deleteItem="deleteItem"
+          ></job-notification-item>
+          <div
+            v-if="item.type==1"
+            class="system-notification-item"
+            @click="toSystemNotificationDetail(item)"
+          >
+            <div class="system-notification-item-header">
+              <span class="system-notification-item-new" v-if="item.readed == 0"></span>
+              <img class="system-notification-item-img" v-if="item.img" :src="item.img" />
+            </div>
+            <span class="system-notification-item-title">{{ item.title }}</span>
+            <p class="system-notification-item-info">{{ item.content }}</p>
+            <div class="system-notification-item-footer">
+              <p class="system-notification-item-time">{{ item.createTime | fmt_datetime }}</p>
+            </div>
+          </div>
+        </div>
+
         <div class="job-notification-footer">
           <button
             class="job-notification-footer-more"
@@ -25,7 +42,7 @@
             v-if="moreShow && !loading"
           >加载更多</button>
           <div v-if="loading">正在加载...</div>
-          <div v-if="!moreShow && !loading">
+          <div class="flex-x" v-if="!moreShow && !loading">
             <span class="job-notification-footer-line"></span>
             <span class="job-notification-footer-text">没有更多数据</span>
             <span class="job-notification-footer-line"></span>
@@ -40,7 +57,12 @@
     </div>
     <div class="job-notification-daily" v-show="dailyShow">
       <iframe :src="dailyUrl" class="job-notification-daily-iframe" v-if="dailyShow" @load="onload"></iframe>
-      <button type="button" class="job-notification-details-return" @click="close" v-if="returnShow">
+      <button
+        type="button"
+        class="job-notification-details-return"
+        @click="close"
+        v-if="returnShow"
+      >
         <i class="iconfont">&#xe61e;</i>
       </button>
     </div>
@@ -65,6 +87,7 @@ export default {
   data() {
     return {
       returnShow: false,
+      dailyShow: false,
       loading: false,
       btnShow: false,
       btnStyle: {
@@ -163,9 +186,7 @@ export default {
       ]
     };
   },
-  created() {
-    this.getInfo();
-  },
+  created() {},
   methods: {
     /** 将选择的时间格式化 */
     getTime(value) {
@@ -215,16 +236,6 @@ export default {
       this.params.endTime = endTime;
       this.getInfo();
     },
-    getReaded(value) {
-      this.readedOption = value;
-      this.params.readed = value;
-      this.getInfo();
-    },
-    getSource(val) {
-      this.jobOption = val;
-      this.params.source = val;
-      this.getInfo();
-    },
 
     /** 设置为全部已读 */
     async setReaded() {
@@ -267,7 +278,11 @@ export default {
         this.notificationPage.list = [];
         this.params.pageNum = 1;
         this.loading = true;
-        let notificationPage = await NotificationApi.getJobList(this.params);
+        // let notificationPage = await NotificationApi.getJobList(this.params);
+
+        let notificationPage = await NotificationApi.newGetMessage(
+          this.info.value
+        );
         if (notificationPage.status == 0) {
           this.notificationPage.merge(Page.as(notificationPage.data));
           this.getNum();
@@ -315,7 +330,38 @@ export default {
         this.$emit("getNum", count);
       }
     },
-    toDaily(info) {
+    toDaily(url) {
+      this.dailyUrl = url;
+      this.dailyShow = true;
+    },
+    close() {
+      this.dailyShow = false;
+      this.returnShow = false;
+    },
+    onload() {
+      this.returnShow = true;
+    },
+    /** 打开系统通知详情页 */
+    async toSystemNotificationDetail(info = {}) {
+      try {
+        if (info.readed == 0) {
+          let params = {
+            type: "system",
+            id: info.id
+          };
+          let result = await NotificationApi.haveRead(params);
+          if (result.status == 0) {
+            info.readed = 1;
+            this.$emit("clearNum", "system", 1);
+          }
+        }
+
+        this.systemNotificationOpen(info);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    systemNotificationOpen(info = {}) {
       // 系统通知点击跳转网页内页面 feat:2612 by bodz
       // 判断是否是内部域名
       let url = info.url || "";
@@ -338,22 +384,30 @@ export default {
      */
     moreShow() {
       return this.notificationPage.hasNextPage;
-    },
-    change() {
-      return this.info.workMsg;
     }
+    // change() {
+    //   return this.info.workMsg;
+    // }
   },
   watch: {
-    change(newValue, oldValue) {
-      if (newValue > oldValue) {
-        this.getInfo();
+    info: {
+      handler(newValue) {
+        if (newValue.value !== "none") {
+          this.getInfo();
+          this.dailyShow = false;
+        }
       }
     }
+    // change(newValue, oldValue) {
+    //   if (newValue > oldValue) {
+    //     this.getInfo();
+    //   }
+    // }
   }
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .job-notification {
   display: flex;
   flex-flow: column;
@@ -452,9 +506,8 @@ export default {
 }
 .job-notification-footer {
   text-align: center;
-  margin-top: 10px;
+  margin: 10px;
   height: 30px;
-  line-height: 30px;
   color: #8c8989;
 }
 .job-notification-footer-more {
@@ -479,11 +532,11 @@ export default {
 }
 .job-notification-footer-line {
   position: relative;
-  bottom: 4px;
   display: inline-block;
   background: #d0d0d0;
   height: 1px;
-  width: 158px;
+  // width: 158px;
+  flex: 1;
 }
 .job-notification-footer-text {
   padding: 0 16px;
@@ -518,5 +571,56 @@ export default {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.system-notification-item-info {
+  color: #8c8989;
+  word-break: break-all;
+  line-height: 24px;
+  margin: 0;
+}
+.system-notification-item {
+  position: relative;
+  margin: 10px;
+  padding: 0 21px;
+  background: #fff;
+  cursor: pointer;
+}
+.system-notification-item-new {
+  position: absolute;
+  top: 25px;
+  left: 7px;
+  width: 9px;
+  height: 9px;
+  background: #f44552;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
+.system-notification-item-header {
+  display: inline-block;
+}
+.system-notification-item-title {
+  display: inline-block;
+  width: 320px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 24px;
+  line-height: 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #525252;
+}
+.system-notification-item-img {
+  width: 100%;
+  padding: 24px 0 14px 0;
+}
+.system-notification-item-time {
+  color: #8c8989;
+  margin: 0;
+  padding: 4px 0 8px 0;
+}
+.system-notification-item-footer {
+  text-align: right;
 }
 </style>

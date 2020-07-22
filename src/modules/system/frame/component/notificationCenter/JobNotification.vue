@@ -327,7 +327,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .job-notification {
   display: flex;
   flex-flow: column;

@@ -67,66 +67,40 @@
         <!-- normal-note-left-data start -->
         <div class="normal-note-left-data">
           <keep-alive>
-            <component :is="'new-note-center'" :info="info" @clearNum="clearNum" @getNum="getNum"></component>
+            <component
+              :is="'new-note-center'"
+              :info="note_index>-1?note_arr[note_index]:{value:'none'}"
+              @clearNum="clearNum"
+              @getNum="getNum"
+            ></component>
           </keep-alive>
         </div>
         <!-- normal-note-left-data end -->
       </div>
     </div>
-    <!-- <div class="notification-center-header" slot="header">
-      <button type="button" class="btn-text notification-center-btn" @click="show = false">
-        <i class="iconfont icon-open notification-close"></i>
-      </button>
-      <p class="notification-center-title">
-        <i class="iconfont icon-notification"></i>通知中心
-      </p>
-    </div>
-
-    <div class="notification-center-type">
-      <input class="notification-center-tab notification-center-tab-left" type="radio" id="job-notification" :checked="component == 'job-notification'" @change="notificationChange" />
-      <label class="notification-center-tab-text" for="job-notification">
-        <span>工作通知</span>
-        <div class="notification-center-tab-new" v-show="info.workMsg && info.workMsg >= 0">{{workMore || info.workMsg}}</div>
-        <div class="notification-center-checked-border"></div>
-      </label>
-      <input class="notification-center-tab notification-center-tab-right" type="radio" id="system-notification" :checked="component == 'system-notification'" @change="notificationChange" />
-      <label class="notification-center-tab-text" for="system-notification">
-        <span>系统通知</span>
-        <div class="notification-center-tab-new" v-show="info.systemMsg && info.systemMsg >= 0">{{systemMore || info.systemMsg}}</div>
-        <div class="notification-center-checked-border"></div>
-      </label>
-    </div>
-
-    <keep-alive>
-      <component :is="component" :info="info" @clearNum="clearNum" @getNum="getNum"></component>
-    </keep-alive>-->
   </base-panel>
 </template>
 
 <script>
-import JobNotification from "./notificationCenter/JobNotification";
-import SystemNotification from "./notificationCenter/SystemNotification";
 import newNoteCenter from "./notificationCenter/newNoteCenter";
 
 import info_ from "./data.js";
 
 // 引入图片
-import note_img_1 from "@src/assets/img/noteCenter/task-small.png";
+import note_img_1 from "@src/assets/img/noteCenter/task.png";
 import note_img_2 from "@src/assets/img/noteCenter/workBench.png";
 import note_img_3 from "@src/assets/img/noteCenter/part.png";
-import note_img_4 from "@src/assets/img/noteCenter/approval-small.png";
-import note_img_5 from "@src/assets/img/noteCenter/approval-small.png";
-import note_img_6 from "@src/assets/img/noteCenter/jx.png";
-import note_img_7 from "@src/assets/img/noteCenter/jx.png";
-import note_img_8 from "@src/assets/img/noteCenter/help_zhqx.png";
+import note_img_4 from "@src/assets/img/noteCenter/approve.png";
+import note_img_5 from "@src/assets/img/noteCenter/daily.png";
+import note_img_6 from "@src/assets/img/noteCenter/value.png";
+import note_img_7 from "@src/assets/img/noteCenter/inTime.png";
+import note_img_8 from "@src/assets/img/noteCenter/permissions.png";
 import note_img_9 from "@src/assets/img/noteCenter/info.png";
 import note_img_10 from "@src/assets/img/noteCenter/wiki.png";
 
 export default {
   name: "notification-center",
   components: {
-    [JobNotification.name]: JobNotification,
-    [SystemNotification.name]: SystemNotification,
     [newNoteCenter.name]: newNoteCenter
   },
   props: {
@@ -220,7 +194,7 @@ export default {
           value: "wiki"
         }
       ],
-      note_index: 1,
+      note_index: -1,
       date_arr: [
         { name: "全部", value: "" },
         { name: "今日", value: "" },
@@ -235,7 +209,7 @@ export default {
         { name: "已读", value: "" }
       ],
       state_index: 0,
-      data_list: info_
+      nowInfo: {}
     };
   },
   methods: {
@@ -254,7 +228,7 @@ export default {
       }
     },
     // new 通知中心
-    showItem(index) {
+    async showItem(index) {
       this.note_index = this.note_index == index ? -1 : index;
     },
     change_filter_item(key, val) {
@@ -600,9 +574,6 @@ export default {
         color: #fff;
       }
     }
-  }
-  .normal-note-left-data {
-    height: 100%;
   }
 }
 ::-webkit-scrollbar {
