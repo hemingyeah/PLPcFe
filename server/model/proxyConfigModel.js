@@ -18,7 +18,7 @@ const ENV_MAP = {
     port: 443
   },
   'pre2': {
-    user: LOGIN_USER.pre || {},
+    user: LOGIN_USER.pre2 || {},
     location: 'https://pre2app.shb.ltd',
     host: 'pre2app.shb.ltd',
     port: 443
