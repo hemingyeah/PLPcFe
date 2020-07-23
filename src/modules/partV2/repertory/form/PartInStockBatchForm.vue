@@ -22,11 +22,7 @@
       <el-table-column label="类别" prop="sparepartType"></el-table-column>
       <el-table-column label="备件规格" prop="standard" width="100px"></el-table-column>
       <el-table-column label="仓库">
-        <el-select
-          v-model="scope.row.repertory"
-          slot-scope="scope"
-          value-key="id"
-        >
+        <el-select v-model="scope.row.repertory" slot-scope="scope" value-key="id">
           <el-option
             v-for="option in repertory"
             :key="option.id"
@@ -195,10 +191,11 @@ export default {
           this.$platform.alert(message);
           return null;
         }
-        
+
         return form.map(item => ({
           sparepart: {
-            id: item.sparepart
+            id: item.sparepart,
+            name: item.sparepartName
           },
           repertory: {
             id: item.repertory.id,
