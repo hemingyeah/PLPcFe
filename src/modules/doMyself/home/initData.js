@@ -471,3 +471,4 @@ let initData={
     isAddressAllowNull: true,
     planTaskEnabled: true
   }
+  export default initData

@@ -291,7 +291,7 @@
             <el-option label="持有备件" value="part"></el-option>
             <el-option label="库存记录" value="stockRecord"></el-option>
             <el-option label="使用记录" value="useRecord"></el-option>
-            <!-- <el-option label="个人库办理" value="personProcess"></el-option> -->
+            <el-option label="个人库办理" value="personProcess"></el-option>
           </el-select>
           <el-date-picker class="srp-list-form-item" style="width:350px;"
                           v-if="listType != 'part' && listType != 'personProcess'"
@@ -775,6 +775,15 @@ export default {
     // },
   },
   methods: {
+    toReApply(){
+      let fromId = window.frameElement.getAttribute('id');
+      this.$platform.openTab({
+        url:'/partV2/repertory/apply',
+        title: '正在加载',
+        close: true,
+        fromId
+      })
+    },
     repertoryCount(num1, num2) {
       return this.$math.format(this.$math.add(this.$math.bignumber(num1), this.$math.bignumber(num2)))
     },
@@ -946,6 +955,9 @@ export default {
       this.$refs.partBackForm.open(stock)
     },
     chooseType(value){
+      if(value == 'personProcess'){
+        return this.toReApply()
+      }
       this.trackEventHandler('chooseType')
 
       if(this.listType == value) return;

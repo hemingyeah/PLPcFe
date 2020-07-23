@@ -213,8 +213,20 @@ export default {
         Promise.all(func_arr)
           .then(res => {
             this.propData.arr.forEach(element => {
+              if (element.number * 1 > element.repertoryCount) {
+                rejects(
+                  new Error(
+                    `"${
+                      element.sparepart.name.length > 10
+                        ? `${element.sparepart.name.slice(0, 9)}...`
+                        : element.sparepart.name
+                    }"的库存数量不足`
+                  )
+                );
+                return false;
+              }
               if (
-                element.number >
+                element.number * 1 >
                 mathAccSub(element.variation, element.solvedVariation)
               ) {
                 rejects(
@@ -229,7 +241,7 @@ export default {
                 return false;
               }
             });
-            let {  suggestion, propData } = this;
+            let { suggestion, propData } = this;
             resolves({
               suggestion,
               propData
