@@ -757,6 +757,8 @@
             <template
               v-else-if="column.field === 'applyCount'"
             >{{`${scope.row['unsolved'] || 0}/${scope.row['solved'] || 0}`}}</template>
+            <template v-else-if="column.field == 'sparepartName'">{{`${scope.row[column.field]}${scope.row['partSize']>0?`等${scope.row['partSize']}个`:''}`}}</template>
+            
             <template v-else>{{scope.row[column.field]}}</template>
           </template>
         </el-table-column>
