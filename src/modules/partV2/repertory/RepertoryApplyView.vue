@@ -1076,7 +1076,7 @@ import StorageUtil from "@src/util/storageUtil";
 
 let allPerson = [];
 
-const STORAGE_COLNUM_KEY = "repe_apply_list_column";
+const STORAGE_COLNUM_KEY = "shb_repe_apply_list_column";
 const STORAGE_PAGESIZE_KEY = "repe_apply_list_pagesize";
 
 export default {
@@ -1343,7 +1343,7 @@ export default {
       column.show = !column.show;
 
       let data = {};
-      this.columns.forEach(item => (data[item.field] = item.field));
+      this.columns.forEach(item => (data[item.field] = item.show));
       StorageUtil.save(STORAGE_COLNUM_KEY, data);
     },
     seeTime() {
@@ -2178,7 +2178,7 @@ export default {
           field: "showNum",
           width: 100,
           overflow: true,
-          show: false
+          show: true
         },
         {
           label: "申请日期",
@@ -2277,7 +2277,7 @@ export default {
           field: "approveTime",
           label: "办理时间",
           exportAlias: "updateTime",
-          show: false,
+          show: true,
           width: 160,
           overflow: false
           // sortable: "approveTime"
