@@ -570,12 +570,15 @@
               </el-tooltip>
             </template>
             <template v-else-if="column.field ==='approveNo'">
+              <!-- 所有状态都可以查看审批单 -->
+              <!-- v-if="scope.row.approved || scope.row.cancel || scope.row.isreject" -->
               <a
                 class="view-detail-btn el-tooltip"
-                v-if="scope.row.approved || scope.row.cancel || scope.row.isreject"
                 @click="column.clickFnc(scope.row)"
-              >{{scope.row.approveNo}}</a>
-              <div class="el-tooltip" v-else>{{scope.row.approveNo}}</div>
+              >
+                {{scope.row.approveNo}}
+              </a>
+              <!-- <div class="el-tooltip" v-else>{{scope.row.approveNo}}</div> -->
             </template>
             <template v-else-if="column.field == 'remark'">
               <el-tooltip placement="top" popper-class="common-tooltip">
