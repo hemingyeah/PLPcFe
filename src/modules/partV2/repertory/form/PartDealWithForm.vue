@@ -36,9 +36,10 @@
                 <el-form-item prop="number">
                   <el-input
                     v-model="scope.row.number"
-                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation || !propData.data.approved"
+                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type ==='调拨') || scope.row.variation < scope.row.solvedVariation || !propData.data.approved"
                     type="number"
                     min="0"
+                    :max="scope.row.type === '退回' ? (scope.row.variation || undefined) : undefined"
                   ></el-input>
                 </el-form-item>
               </el-form>
@@ -195,6 +196,7 @@ export default {
     validator() {
       return new Promise((resolves, rejects) => {
         let func_arr = [];
+
         for (let index = 0; index < this.propData.arr.length; index++) {
           const func = new Promise((resolve, reject) => {
             this.$refs["ruleForm"][index].validate((valid, obj) => {
@@ -210,10 +212,15 @@ export default {
           });
           func_arr.push(func);
         }
+
+        let type = (this.propData.data && this.propData.data.type) || '';
+        let isApply = type === '申领';
+
         Promise.all(func_arr)
           .then(res => {
             this.propData.arr.forEach(element => {
-              if (element.number * 1 > element.repertoryCount) {
+              // 只处理申请情况
+              if (element.number * 1 > element.repertoryCount && isApply) {
                 rejects(
                   new Error(
                     `"${
