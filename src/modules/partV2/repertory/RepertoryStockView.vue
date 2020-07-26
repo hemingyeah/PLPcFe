@@ -1238,14 +1238,14 @@ export default {
         if(result.status == 0){
           this.$platform.toast('批量出库成功').then(() => location.reload());
           this.outstockBatchDialog = false;
-        }else{
+        } else{
           this.$platform.alert(result.message);
+          this.pending = false;
         }
       } catch (error) {
+        this.pending = false;
         console.log(error)
       }
-        
-      this.pending = false;
 
     }, 1000),
     // 入库（单次）
@@ -1321,17 +1321,19 @@ export default {
         let result = await this.$http.post('/partV2/approve/transfer/initiate/batch', params);
 
         if(result.status == 0){
-          this.$platform.toast('批量调拨成功').then(() => location.reload());
+          this.$platform.toast('批量调拨成功').then(() => {
+            location.reload();
+          });
           this.transferBatchDialog = false;
         } else{
           this.$platform.alert(result.message);
+          this.pending = false;
         }
 
       } catch (error) {
+        this.pending = false;
         console.log(error)
       }
-
-      this.pending = false;
 
     }, 1000),
     // 入库弹窗（批量）
@@ -1374,13 +1376,14 @@ export default {
           this.instockBatchDialog = false;
         } else{
           this.$platform.alert(result.message);
+          this.pending = false;
         }
 
       } catch (error) {
+        this.pending = false;
         console.log(error)
       }
 
-      this.pending = false;
     }, 1000),
     // 分配 （弹窗）
     partSparesDialog(val) {
@@ -1468,14 +1471,13 @@ export default {
         let result = await this.$http.post(`/partV2/approve/allot/initiate/batch?remark=${remark}`, partSparesData);
   
         if((result && result.status === 0)){
-
+          
           this.$platform.toast('批量分配成功').then(() => {
             location.reload();
             this.isPartSparesDialog = false;
-            this.pending = false;
           });
 
-        }else{
+        } else{
           this.$platform.alert(result.message);
           this.pending = false;
         }
@@ -1483,6 +1485,7 @@ export default {
         console.warn(e);
         this.pending = false;
       }
+
     }, 1000),
     buildParams(pageNum, pageSize){
       return {

@@ -2110,7 +2110,11 @@ export default {
       });
     },
 
-    partDealDataDone() {
+    partDealDataDone: _.debounce(async function(){
+      if(this.pending) return;
+
+      this.pending = true;
+
       // 办理
       let data = this.$refs.partDealWithForm
         .getData()
@@ -2127,7 +2131,9 @@ export default {
               });
             }
           });
+
           if (arr.length <= 0) {
+            this.pending = false;
             return this.$message({
               showClose: true,
               message: '没有可以办理的备件！',
@@ -2153,16 +2159,23 @@ export default {
                 });
               }
             })
-            .catch(err => {});
+            .catch(err => {
+
+            })
+            .finally(() => {
+              this.pending = false;
+            });
         })
         .catch(err => {
+          this.pending = false;
           this.$message({
             showClose: true,
             message: err.message,
             type: 'error'
           });
         });
-    },
+        
+    }, 1000),
     buildParams(pageNum, pageSize) {
       return {
         ...this.model,
