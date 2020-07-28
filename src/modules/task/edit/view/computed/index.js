@@ -59,11 +59,11 @@ export default {
     return !this.workTask.state || this.workTask.state == TaskStateEnum.CREATED.value;
   },
   /** 
-       * @description 是否显示 [保存并派单] 按钮
-       * 1. 当前工单状态 为空
-       * 2. 且 当前工单状态 等于 创建
-       * 3. 有工单派单权限
-      */
+   * @description 是否显示 [保存并派单] 按钮
+   * 1. 当前工单状态 为空
+   * 2. 且 当前工单状态 等于 创建
+   * 3. 有工单派单权限
+  */
   isShowSaveAndAllotButton() {
     return this.isShowOnlySaveButton && this.auth.indexOf('TASK_DISPATCH') > -1;
   },
