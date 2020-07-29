@@ -586,7 +586,7 @@
               {{variationNum(scope.row.variation, scope.row.solvedVariation)}}
             </template>
             <template v-else-if="column.field == 'variation_'">{{scope.row.solvedVariation}}</template>
-            <template v-else-if="column.field =='enable'">
+            <template v-else-if="column.field =='enable' && scope.row.state === 'suspending'">
               <el-button
                 @click="showPartDealDetail(scope.row),tableTrackEventHandler('done')"
                 type="text"
@@ -810,12 +810,12 @@
       >
         <part-deal-with-form ref="partDealWithForm" :prop-data="partDealData"></part-deal-with-form>
 
-        <div slot="footer" class="dialog-footer flex-x">
-          <div
-            class="ding-btn"
-            v-if="partDealData.data.state === 'suspending' && partDealData.data.cancel"
-            @click="dingMessage"
-          >
+        <div
+          slot="footer"
+          class="dialog-footer flex-x"
+          v-if="partDealData.data.state === 'suspending'"
+        >
+          <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
             DING
           </div>
@@ -1061,7 +1061,7 @@ import PartDealWithForm from "./form/PartDealWithForm.vue";
 
 import DateUtil from "@src/util/date";
 import AuthUtil from "@src/util/auth";
-import { getRootWindow } from '@src/util/dom';
+import { getRootWindow } from "@src/util/dom";
 import {
   rejectBatch,
   revokeBatch,
@@ -2099,6 +2099,13 @@ export default {
               });
             }
           });
+          if (arr.length <= 0) {
+            return this.$message({
+              showClose: true,
+              message: '没有可以办理的备件！',
+              type: "warning"
+            });
+          }
           approveBatch(arr)
             .then(res => {
               if (res.code == 0) {
@@ -2134,6 +2141,14 @@ export default {
       let localData = StorageUtil.get(STORAGE_COLNUM_KEY) || {};
 
       let columns = [
+        {
+          label: "申请数量",
+          exportAlias: "variation",
+          field: "showNum",
+          width: 80,
+          overflow: true,
+          show: false
+        },
         {
           label: "申请日期",
           field: "prosperTime",
@@ -2178,17 +2193,9 @@ export default {
           minWidth: 170,
           overflow: true
         },
-        {
-          label: "申请数量",
-          exportAlias: "variation",
-          field: "showNum",
-          width: 80,
-          overflow: true,
-          show: false
-        },
 
         {
-          label: "涉及金额",
+          label: "金额",
           exportAlias: "price",
           field: "showPrice",
           width: 90,
@@ -2241,7 +2248,7 @@ export default {
           exportAlias: "updateTime",
           show: false,
           width: 160,
-          overflow: false,
+          overflow: false
           // sortable: "approveTime"
         },
         {

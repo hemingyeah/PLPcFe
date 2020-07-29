@@ -106,6 +106,12 @@ export default {
     };
     let tableColumn = [
       {
+        field: "variation",
+        prop: "variation",
+        lable: "申请数量",
+        width: "180"
+      },
+      {
         field: "child_2",
         prop: "name",
         lable: "备件名称",
@@ -136,15 +142,9 @@ export default {
         width: "180"
       },
       {
-        field: "variation",
-        prop: "variation",
-        lable: "申请数量",
-        width: "180"
-      },
-      {
         field: "price",
         prop: "data1",
-        lable: "涉及金额",
+        lable: "金额",
         width: "180"
       },
       {
