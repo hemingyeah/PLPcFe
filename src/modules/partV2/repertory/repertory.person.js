@@ -1,13 +1,13 @@
 // import '../../../../resource/component/css/component_v2_pc.css'
 import Vue from 'vue';
 
-import '../../../../packages/ElementUI'
+import 'packages/ElementUI'
 import '../../../../src/assets/scss/index.scss'
 import component from '../../../component';
-import BaseCollapsePanel from '../../../../packages/BaseCollapsePanel';
-import BaseExport from '../../../../packages/BaseExport';
-import BasePanel from '../../../../packages/BasePanel';
-import BaseSelectionBar from '../../../../packages/BaseSelectionBar';
+import BaseCollapsePanel from 'packages/BaseCollapsePanel';
+import BaseExport from 'packages/BaseExport';
+import BasePanel from 'packages/BasePanel';
+import BaseSelectionBar from 'packages/BaseSelectionBar';
 import directive from '../../../directive';
 
 import Platform from '@src/util/Platform';

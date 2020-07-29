@@ -851,7 +851,7 @@ export default {
       }
     },
     openDetail(row){
-      this.$platform.openView({
+      this.$platform.openTab({
         id: `partV2_detail_${row.id}`,
         url:`/partV2/detail?id=${row.id}`,
         title: '备件品类详情'
@@ -906,7 +906,7 @@ export default {
       });
     },
     create(){
-      this.$platform.openView({
+      this.$platform.openTab({
         id: 'partV2_create',
         url: '/partV2/create',
         title: '创建备件品类'

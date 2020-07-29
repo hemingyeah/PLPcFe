@@ -11,7 +11,7 @@
 
       </div>   
     </div>   
-   
+  
     <div class="page-panel">
       <div class="page-panel-body">
         <el-form :model="part" :rules="rules" ref="partForm" label-width="16.6666667%" :inline-message="true">
@@ -60,13 +60,14 @@
 </template>
 
 <script>
-import BaseGallery from '../../../../packages/BaseGallery/index';
+import BaseGallery from 'packages/BaseGallery/index';
 import qs from '@src/util/QueryString';
 import AuthUtil from '@src/util/AuthUtil';
 import _ from 'lodash';
         
 export default {
   name: 'partV2-edit-view',
+  inject: ['initData'],
   data() {
     return {
       auths: {},
@@ -258,7 +259,7 @@ export default {
   },
   async mounted(){
     try {
-      let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+      let initData = this.initData;
       this.units = initData.units || [];
       this.types = initData.sparepartType || [];
       this.auths = initData.auths;

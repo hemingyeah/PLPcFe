@@ -324,7 +324,7 @@ export default {
       } else if(title == '出入库记录') {
         id = `partV2_repertory_record_${this.categoryStockId}`;
       }
-      this.$platform.openView({
+      this.$platform.openTab({
         id: id,
         url:event.target.getAttribute('href'),
         title: title,

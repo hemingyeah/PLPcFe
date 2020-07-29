@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import Uploader from '../../../../../packages/BaseUpload/uploader';
+import Uploader from 'packages/BaseUpload/uploader';
 import Platform from '@src/util/Platform';
 import http from '@src/util/HttpUtil';
 import DateUtil from '@src/util/DateUtil';  

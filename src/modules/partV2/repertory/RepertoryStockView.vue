@@ -537,7 +537,7 @@ import PartSetSafetyStockForm from './form/PartSetSafetyStockForm.vue';
 import PartSparesForm from "./form/PartSparesForm.vue";
 import PartSparesBatchForm from "./form/PartSparesBatchForm.vue";
 import PartBatchTransfer from './form/PartBatchTransfer.vue';
-import SampleTooltip from '../../../../packages/SampleTooltip/SampleTooltip'
+import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
 
 import DateUtil from '@src/util/DateUtil'
 import AuthUtil from '@src/util/AuthUtil';
@@ -778,7 +778,7 @@ export default {
 
     openStock(){
 
-      this.$platform.openView({
+      this.$platform.openTab({
         id: `stats_part_${this.repertoryName}`,
         url: `/stats/sparepart/showStatistics?id=${this.repertoryName}&source=1`,
         title: "仓库报表",
@@ -944,7 +944,7 @@ export default {
       this.model.timeEnd = DateUtil.format(this.timeValue[1])
     },
     openDetail(row){
-      this.$platform.openView({
+      this.$platform.openTab({
         id: `partV2_detail_${row.id}`,
         url:`/partV2/detail?id=${row.id}`,
         title: '备件品类详情'
@@ -954,7 +954,7 @@ export default {
       this.selected = data;
     },
     create(){
-      this.$platform.openView({
+      this.$platform.openTab({
         id: 'partV2_create',
         url: '/partV2/create',
         title: '创建备件品类'

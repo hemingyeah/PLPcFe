@@ -305,13 +305,14 @@ import StorageUtil from '@src/util/StorageUtil';
 import PartEditBatchForm from './form/PartEditBatchForm.vue';
 import PartImport from './components/PartImport.vue';
 
-import SampleTooltip from '../../../../packages/SampleTooltip/SampleTooltip'
+import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
 
 const STORAGE_COLNUM_KEY = 'category_list_column';
 const STORAGE_PAGESIZE_KEY = 'category_list_pagesize';
 
 export default {
   name: 'part-list-view',
+  inject: ['initData'],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
     let originModel = {
@@ -369,7 +370,13 @@ export default {
         field: 'costPrice'
       }]
     }
-  },
+	},
+	props: {
+		initData: {
+			type: Object,
+			default: () => ({})
+		}
+	},
   computed: {
     //筛选可显示
     showColnums(){
@@ -523,7 +530,7 @@ export default {
       window.location.href = '/partV2/category/create'
     },
     openDetail(row){
-      this.$platform.openView({
+      this.$platform.openTab({
         id: `partV2_category_detail_${row.id}`,
         url:`/partV2/category/detail?id=${row.id}`,
         title: '备件品类详情',
@@ -809,7 +816,7 @@ export default {
     }
   },
   mounted(){
-    let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+    let initData = this.initData;
 
     this.types = initData.sparepartType || [];
     this.units = initData.units || [];

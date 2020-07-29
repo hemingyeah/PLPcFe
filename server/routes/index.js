@@ -28,6 +28,8 @@ const jobtransferRouter = require('./jobtransfer')
 const callCenterRouter = require('./callcenter')
 const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact')
+const sparePartRouter = require('./sparePart')
+
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -172,6 +174,7 @@ router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
+router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 // router.all('/api/*', async ctx => {
 

@@ -1,28 +1,41 @@
-import '../../../../packages/ElementUI'
-import '../../../../src/assets/scss/index.scss'
+import 'src/assets/scss/index.scss'
 
-import BaseUpload from '../../../../packages/BaseUpload';
-import BaseTimeline from '../../../../packages/BaseTimeline';
-import BaseTimelineItem from '../../../../packages/BaseTimelineItem';
+import BaseUpload from 'packages/BaseUpload';
+import BaseTimeline from 'packages/BaseTimeline';
+import BaseTimelineItem from 'packages/BaseTimelineItem';
 import component from '../../../component';
-import Vue from 'vue';
 
-import Platform from '@src/util/Platform';
-import Http from '@src/util/HttpUtil';
+import Vue from '@src/common/entry';
+
+import http from '@src/util/http';
+import mtracker from '@src/util/mtracker';
 
 import CategoryDetailView from './CategoryDetailView.vue';
 
-Vue.prototype.$platform = Platform;
-Vue.prototype.$http = Http;
+Vue.prototype.$http = http;
+mtracker();
 
 Vue.use(component);
 Vue.component(BaseUpload.name, BaseUpload);
 Vue.component(BaseTimeline.name, BaseTimeline);
 Vue.component(BaseTimelineItem.name, BaseTimelineItem);
 
+// 处理注入的参数
+let initData = {};
+
+try {
+  initData = typeof window._init == 'string' ? JSON.parse(window._init || '{}') : window._init;
+} catch (error) {
+  console.error(error)
+  console.error('no init data')
+}
+
 const app = new Vue({
-    el: "#app",
-    render: h => h(CategoryDetailView)
+  el: '#app',
+  provide: {
+    initData: Object.freeze(initData)
+  },
+  render: h => h(CategoryDetailView)
 });
 
 export default app;

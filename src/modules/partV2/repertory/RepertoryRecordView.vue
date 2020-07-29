@@ -519,7 +519,7 @@ export default {
     },
 
     openDetail(row){
-      this.$platform.openView({
+      this.$platform.openTab({
         id: `partV2_detail_${row.id}`,
         url:`/partV2/detail?id=${row.id}`,
         title: '备件品类详情'
@@ -576,7 +576,6 @@ export default {
         this.page = await this.fetchData();
         this.model.pageNum = this.page.pageNum;
         this.model.pageSize = this.page.pageSize;
-
         this.matchSelected();
       }catch(error){
         console.log(error)

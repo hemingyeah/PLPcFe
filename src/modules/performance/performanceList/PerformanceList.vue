@@ -472,7 +472,7 @@ export default {
     },
     showReport(row){
       //查看绩效报告
-      this.$platform.openView({
+      this.$platform.openTab({
         id:'u_performance_report' + '_' + row.id,
         title: '绩效报告',
         url: '/performance/report' + '?id=' + row.id,

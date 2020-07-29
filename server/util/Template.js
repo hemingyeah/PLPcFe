@@ -4,6 +4,11 @@ const path = require('path');
 const ROOT_PATH = path.resolve(__dirname, '../../')
 
 module.exports = {
+  // 临时 渲染备件
+  renderWithHtmlForPart(title, html = '', script, templatePath = 'src/index.html'){
+    let js = this.parseHtmlForPart(html);
+    return this.render(title, js, script, templatePath);
+  },
   renderWithHtml(title, html = '', script, templatePath = 'src/index.html'){
     let js = this.parseHtml(html);
     return this.render(title, js, script, templatePath);
@@ -38,5 +43,19 @@ module.exports = {
     let result = scriptReg.exec(html);
 
     return result ? result[1] : null;
-  }
+  },
+  /** 临时 提取script中的数据 */
+  parseHtmlForPart(html){
+    let initDataStr = '<script>var _init_data =';
+    let newInitDataStr = 'window._init =';
+    
+    let htmlArr = html.split(initDataStr) || [];
+    let initDataAfterHtml = htmlArr[1] || '';
+
+    let initDataAfterHtmlArr = initDataAfterHtml.split('</script>') || [];
+    let initData = initDataAfterHtmlArr[0] ? `${newInitDataStr} ${initDataAfterHtmlArr[0]}` : null;
+  
+    return initData;
+  },
+
 }

@@ -35,7 +35,7 @@ export default {
     showDetil() {
       this.dialogVisible = false;
       //查看绩效报告
-      this.$platform.openView({
+      this.$platform.openTab({
         id:'u_performanceReport_report' + '_' + this.reportSummary.mainId,
         title: '绩效报告',
         url: '/performance/report' + '?id=' + this.reportSummary.mainId,

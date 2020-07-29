@@ -145,12 +145,13 @@ import PartRecord from './components/PartRecord.vue';
 import PartUsageRecord from './components/PartUsageRecord.vue';
 import PartStock from './components/PartStock.vue';
 import PartRemarkForm from './form/PartRemarkForm.vue';
-import SampleTooltip from '../../../../packages/SampleTooltip/SampleTooltip'
+import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
 
-import BaseGallery from '../../../../packages/BaseGallery/index'
+import BaseGallery from 'packages/BaseGallery/index'
 
 export default {
   name: 'part-detail-view',
+  inject: ['initData'],
   data() {
     return {
       activeTab: 'record',
@@ -425,7 +426,7 @@ export default {
     }
   },
   mounted(){
-    let initData = JSON.parse(JSON.stringify(window._init_data || {}));
+    let initData = this.initData;
     this.auths = initData.auths || {};
 
     let urlParams = qs.parse(window.location.search);
@@ -541,6 +542,11 @@ export default {
   .page-main-addition{
     overflow: hidden;
   }
+  .base-timeline {
+    padding-left: 0;
+  }
+  .base-timeline-item {
+    border-left: 0px;
+  }
 }
-  
 </style>

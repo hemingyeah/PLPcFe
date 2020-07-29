@@ -73,7 +73,7 @@ export default {
     },
     showTaskView(row){
       //查看工单详情
-      this.$platform.openView({
+      this.$platform.openTab({
         id:'taskView_' + row.id,
         title: `工单${row.taskNo}`,
         url: `/task/view/${row.id}`

@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import BasePreview from '../../../../../packages/BasePreview';
+import BasePreview from 'packages/BasePreview';
 
 export default {
   name: 'part-record',

@@ -793,7 +793,7 @@ export default {
 
     openTaskDetail(item){
       let fromId = window.frameElement.getAttribute('id');
-      this.$platform.openView({
+      this.$platform.openTab({
         id: `taskView_${item.id}`,
         url:`/task/view/${item.id}`,
         title: '正在加载',

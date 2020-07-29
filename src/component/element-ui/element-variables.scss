@@ -41,7 +41,9 @@ $--select-border-color-hover: $input-border-hover-color !default;
 @import "~shb-element-ui/packages/theme-chalk/src/switch.scss";
 @import "~shb-element-ui/packages/theme-chalk/src/tooltip.scss";
 @import "~shb-element-ui/packages/theme-chalk/src/step.scss";
-@import "~shb-element-ui/packages/theme-chalk/src/steps.scss";
+@import "~shb-element-ui/packages/theme-chalk/src/dialog.scss";
+@import "~shb-element-ui/packages/theme-chalk/src/tabs.scss";
+@import "~shb-element-ui/packages/theme-chalk/src/tab-pane.scss";
 
 .el-input__inner{
   padding-left: 10px;
