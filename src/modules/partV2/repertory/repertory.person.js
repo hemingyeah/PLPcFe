@@ -1,5 +1,5 @@
 import Vue from '@src/common/entry';
-import http from '@src/util/http';
+import http from '@src/util/HttpUtil';
 import mtracker from '@src/util/mtracker';
 
 import BaseCollapsePanel from 'packages/BaseCollapsePanel';

@@ -370,9 +370,9 @@
           <span class="el-dialog__title">
             分配备件
           </span>
-          <button type="button" aria-label="Close" class="el-dialog__headerbtn">
+          <!-- <button type="button" aria-label="Close" class="el-dialog__headerbtn">
             <i class="el-dialog__close el-icon el-icon-close"></i>
-          </button>
+          </button> -->
           <p class="dialog-title-tip">
             分配是指由仓库管理员向个人库出库备件，个人库收到后确认入库的操作方式
           </p>
@@ -525,7 +525,7 @@
 
 <script>
 import _ from 'lodash';
-import qs from '@src/util/QueryString';
+import qs from '@src/util/queryString2';
 import Page from '@src/model/Page';
 import PartOutStockForm from './form/PartOutStockForm.vue';
 import PartInStockForm from './form/PartInStockForm.vue';

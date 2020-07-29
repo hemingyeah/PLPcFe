@@ -21,7 +21,6 @@
           resize="none"
           style="width:500px;"
           :autosize="{ minRows: 2, maxRows: 6 }"
-          :placeholder="inputonlyread ? '' : '请输入备注内容'"
           v-model="remark"
           :readonly="true"
         ></el-input>
@@ -58,6 +57,7 @@
             <!-- <template v-else-if="item.field==='child'">{{scope.row.sparepartRepertory[item.prop]}}</template> -->
             <template v-else-if="item.field==='sourceTargetName'">{{propData.data.sourceTargetName}}</template>
             <template v-else-if="item.field==='child_2'">{{scope.row.sparepart[item.prop]}}</template>
+            <template v-else>{{scope.row[item.prop]}}</template>
           </template>
         </el-table-column>
       </el-table>
@@ -82,7 +82,7 @@
   </div>
 </template>
 <script>
-import { mathMul } from "@src/util/math";
+import { mathMul, mathAccSub } from "@src/util/math";
 
 export default {
   name: "part-deal-with-form",
@@ -224,14 +224,17 @@ export default {
         Promise.all(func_arr)
           .then(res => {
             this.propData.arr.forEach(element => {
-              if (element.number > element.variation) {
+              if (
+                element.number >
+                mathAccSub(element.variation, element.solvedVariation)
+              ) {
                 rejects(
                   new Error(
                     `"${
                       element.sparepart.name.length > 10
                         ? `${element.sparepart.name.slice(0, 9)}...`
                         : element.sparepart.name
-                    }"的办理数量不得大于申请数量`
+                    }"的办理数量不得大于可办理数量`
                   )
                 );
                 return false;

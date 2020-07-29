@@ -20,7 +20,7 @@
 <script>
 import _ from 'lodash';
 import Platform from '@src/util/Platform';
-import qs from '@src/util/QueryString';
+import qs from '@src/util/queryString2';
 import http from '@src/util/HttpUtil';
 
 const MAX_COUNT = 5000;

@@ -88,24 +88,13 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-// 本地调试 outside/callcenter
-router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.211',
-  port: 9001,
+router.use('/outside', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.82',
+  port: 10007,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=80458f50-6ddc-4b5b-89df-953db0db4a81; __wpkreporterwid_=68404129-96e2-4bd1-036f-cc601580be04; JSESSIONID=A70E9B611B1FCF88156EFC040F183B32'
+    'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
   }
 }))
-
-// 内网测试环境
-// router.use('/outside/callcenter/*', ctx => HttpClient.proxy(ctx, {
-//   host: '30.40.59.111',
-//   port: 9001,
-//   headers: {
-//     'cookie': 'VIPPUBLINKJSESSIONID=1c3e88ee-ab44-48c8-9dc6-f9b7fe7e28bf'
-//   }
-// }))
-
 // /api/app/outside/es
 // router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
 //   // host: '192.168.31.237',
@@ -129,14 +118,13 @@ router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   },
 }))
 
-router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.177',
-  port: 10006,
-  headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
-    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
-  },
-}))
+// router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
+//   host: '30.40.56.177',
+//   port: 10006,
+//   headers: {
+//     'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
+//   },
+// }))
 
 
 
@@ -157,13 +145,6 @@ router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
 }))
 
 
-router.use('/api/part/outside', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.162',
-  port: 10008,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=bc8e2f95-d341-4d92-8ee1-99ad003c2316'
-  }
-}))
 
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());

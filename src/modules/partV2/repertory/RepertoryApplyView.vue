@@ -391,8 +391,11 @@
                 </span>
 
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item v-for="column in columns" :key="column.field">
-                    <el-checkbox :value="column.show" @input="chooseColnum(column)">{{column.label}}</el-checkbox>
+                  <el-dropdown-item v-for="(column,index) in columns" :key="column.field">
+                    <el-checkbox
+                      :value="column.show"
+                      @input="chooseColnum(column,index)"
+                    >{{column.label}}</el-checkbox>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -484,7 +487,7 @@
           v-for="column in columns"
           :key="column.field"
           :prop="column.field"
-          v-show="column.show"
+          v-if="column.show"
           :label="column.label"
           :width="column.width"
           :min-width="column.minWidth"
@@ -599,7 +602,7 @@
                 v-if="scope.row.isreject"
               >拒绝</el-button>
               <el-button
-                @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=1,tableTrackEventHandler('recall')"
+                @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=1,tableTrackEventHandler('recall'),backstock_type=scope.row.type"
                 type="text"
                 size
                 class="no-padding"
@@ -825,7 +828,7 @@
             class="mar-r-15"
             type="ghost"
             v-if="partDealData.data.cancel"
-            @event="cancelType=1,backstockDialog = true"
+            @event="cancelType=1,backstockDialog = true,backstock_type=partDealData.data.type"
           >撤销</base-button>
           <base-button
             type="primary"
@@ -851,8 +854,8 @@
           :userId="userId"
           :userName="userName"
         ></part-backstock-form>-->
-        <p v-if="cancelType===1">确定要撤销「调拨」审批吗？撤销后，已办理的数量不受影响</p>
-        <el-form :model="rejectForm" :rules="rejectRules" :ref="'rejectForm'" class="mar-b-15">
+        <p v-if="cancelType===1">{{`确定要撤销「${backstock_type}」审批吗？撤销后，已办理的数量不受影响`}}</p>
+        <el-form :model="rejectForm" :rules="rejectRules" ref="rejectForm" class="mar-b-15">
           <el-form-item v-if="cancelType===0" prop="reason">
             <el-input
               type="textarea"
@@ -872,13 +875,13 @@
               maxlength="50"
               :autosize="{ minRows: 2, maxRows: 6 }"
               :placeholder="'请填写撤销理由[50个字以内]'"
-              v-model="rejectForm.reason"
+              v-model="rejectForm.reasons"
             ></el-input>
           </el-form-item>
         </el-form>
 
         <div slot="footer" class="dialog-footer">
-          <base-button type="ghost" @event="backstockDialog = false,this.rejectForm.reason=''">取 消</base-button>
+          <base-button type="ghost" @event="backstockDialog = false,rest_rejectForm()">取 消</base-button>
           <base-button
             v-if="cancelType===0"
             type="primary"
@@ -1128,6 +1131,7 @@ export default {
       page: new Page(),
       selected: [],
       backstockDialog: false,
+      backstock_type: "",
       instockDialog: false,
       outstockDialog: false,
       outstockBatchDialog: false,
@@ -1207,8 +1211,8 @@ export default {
     }
   },
   watch: {
-    backstockDialog() {
-      this.$refs["rejectForm"].resetFields();
+    backstockDialog: function(newVal) {
+      this.rest_rejectForm();
     }
   },
   filters: {
@@ -1222,6 +1226,11 @@ export default {
     }
   },
   methods: {
+    rest_rejectForm() {
+      if (this.$refs["rejectForm"]) {
+        this.$refs["rejectForm"].resetFields();
+      }
+    },
     /** 检测导出条数 */
     checkExportCount(ids, max) {
       let exportAll = !ids || !ids.length;
@@ -1307,13 +1316,12 @@ export default {
         console.log(error);
       }
     },
-    chooseColnum(column) {
+    chooseColnum(column, index) {
       this.trackEventhandler("selectColumn");
-
       column.show = !column.show;
 
       let data = {};
-      this.columns.forEach(item => (data[item.field] = item.show));
+      this.columns.forEach(item => (data[item.field] = item.field));
       StorageUtil.save(STORAGE_COLNUM_KEY, data);
     },
     seeTime() {
@@ -1557,6 +1565,8 @@ export default {
 
     chooseUserApply(value) {
       this.model.prosperId = value;
+      this.model.pageNum = 1;
+      this.loadData();
     },
     chooseUserApprove(value) {
       this.model.approveId = value;
@@ -2027,7 +2037,7 @@ export default {
             approveNo,
             remark: this.rejectForm.reason
           }).then(res => {
-            if (res.status == 0) {
+            if (res.code == 0) {
               this.partDealDialog = false;
               this.backstockDialog = false;
               this.$message({
@@ -2049,7 +2059,7 @@ export default {
         approveNo,
         remark: this.rejectForm.reasons
       }).then(res => {
-        if (res.status == 0) {
+        if (res.code == 0) {
           this.partDealDialog = false;
           this.backstockDialog = false;
           this.$message({
@@ -2069,13 +2079,15 @@ export default {
         .then(res => {
           let arr = [];
           res.propData.arr.forEach(item => {
-            arr.push({
-              approveNo: res.propData.data.approveNo,
-              id: item.id,
-              remark: res.suggestion,
-              solvedVariation: item.number,
-              type: res.propData.data.type
-            });
+            if (item.number > 0) {
+              arr.push({
+                approveNo: res.propData.data.approveNo,
+                id: item.id,
+                remark: res.suggestion,
+                solvedVariation: item.number,
+                type: res.propData.data.type
+              });
+            }
           });
           approveBatch(arr)
             .then(res => {
@@ -2159,7 +2171,7 @@ export default {
         {
           label: "申请数量",
           exportAlias: "variation",
-          field: "num",
+          field: "showNum",
           width: 80,
           overflow: true,
           show: false
@@ -2168,7 +2180,7 @@ export default {
         {
           label: "涉及金额",
           exportAlias: "price",
-          field: "price",
+          field: "showPrice",
           width: 90,
           overflow: true,
           show: true
@@ -2334,7 +2346,10 @@ export default {
       console.log(option);
     },
     dingMessage() {
-      window.send_ding_part_message(this.partDealData.data.staffs, this.partDealData.data.approveNo);
+      window.send_ding_part_message(
+        this.partDealData.data.staffs,
+        this.partDealData.data.approveNo
+      );
     },
     showPartDealDetail(obj) {
       getRelationListByApproveNo({
