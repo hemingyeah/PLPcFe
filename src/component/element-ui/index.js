@@ -37,7 +37,6 @@ import {
   Steps,
   Step,
   Dialog,
-  Message,
   Tabs,
   TabPane,
   Row,
@@ -95,9 +94,10 @@ const ElementUI = {
     Vue.use(OptionGroup);
     Vue.use(Message.name, Message);
     Vue.use(Col.name, Col);
-    
+
     Vue.component(Autocomplete.name, Autocomplete);
     Vue.component(CollapseTransition.name, CollapseTransition);
+
     Vue.prototype.$loading = Loading.service;
     Vue.prototype.$message = Message;
     Vue.prototype.$confirm = MessageBox.confirm;

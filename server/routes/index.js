@@ -7,7 +7,6 @@ const USER_CONFIG = require(`../../script/config/${user}`);
 
 const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
-const HttpsClient = require('../util/HttpsClient')
 const Template = require('../util/Template')
 
 const modules = require('../../modules');
@@ -95,38 +94,14 @@ router.use('/outside', ctx => HttpClient.proxy(ctx, {
     'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
   }
 }))
-// /api/app/outside/es
-// router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-//   // host: '192.168.31.237',
-//   host: '30.40.58.161',
-//   port: 10006,
-//   headers: {
-//     // 'cookie': 'VIPPUBLINKJSESSIONID=38f7c6ee-14fa-44f7-ac56-55976970b8ed'
-//     'cookie': `VIPPUBLINKJSESSIONID=324bd997-42e0-44db-bb67-83f1bc77e44a`
-//   },
-// }))
-
 
 router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
-  // host: '30.40.57.167',
-  // port: 8083,
   host: '30.40.56.211',
   port: 10007,
   headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
     'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
   },
 }))
-
-// router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-//   host: '30.40.56.177',
-//   port: 10006,
-//   headers: {
-//     'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
-//   },
-// }))
-
-
 
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
   host: '127.0.0.1',
@@ -139,9 +114,6 @@ router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
   port: 10002,
-  // headers: {
-  //   'cookie': `VIPPUBLINKJSESSIONID=e7b50d17-9e1b-4190-bacb-e4029634a82f`
-  // }
 }))
 
 
@@ -161,21 +133,6 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
-
-// router.all('/api/*', async ctx => {
-
-//   let option = {
-//     headers: Object.assign({}, ctx.request.headers)
-//   };
-
-//   const request = ctx.request;
-
-//   let result = await HttpsClient.request(request.url, request.method, request.rawBody, option);
-
-//   ctx.status = result.statusCode;
-//   ctx.body = result.body;
-// });
-
 
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)
