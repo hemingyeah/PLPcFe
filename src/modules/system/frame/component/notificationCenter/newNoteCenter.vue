@@ -10,15 +10,15 @@
       <div v-if="notificationPage.list.length != 0">
         <div v-for="(item, index) in notificationPage.list" :key="index">
           <job-notification-item
-            v-if="info.source!=='system'"
+            v-if="params.source!=='system'"
             :info="item"
             :index="index"
             @getInfo="getInfo"
             @clearNum="clearNum"
-            @toDaily="toDaily(item)"
+            @toDaily="toDaily"
           ></job-notification-item>
           <div
-            v-if="info.source==='system'"
+            v-if="params.source==='system'"
             class="system-notification-item"
             @click="toSystemNotificationDetail(item)"
           >
@@ -81,7 +81,7 @@ export default {
     [JobNotificationItem.name]: JobNotificationItem
   },
   props: {
-    info: Object
+    // info: Object
   },
   data() {
     return {
@@ -97,6 +97,17 @@ export default {
     };
   },
   methods: {
+    changeParams(e) {
+      this.params = { ...this.params, ...e };
+      this.getInfo(true);
+    },
+    clearAllRead() {
+      if (this.notificationPage.list && this.notificationPage.list.length > 0) {
+        this.notificationPage.list.forEach(item => {
+          item.readed = 1;
+        });
+      }
+    },
     /** 获取信息，刷新列表 */
     async getInfo(falsh = false) {
       try {
@@ -137,8 +148,8 @@ export default {
         console.error(error);
       }
     },
-    clearNum() {
-      this.$emit("clearNum", "work", 1);
+    clearNum(e) {
+      this.$emit("clearNum", e);
     },
     // haveNotRead() {
     //   let res = false;
@@ -152,10 +163,10 @@ export default {
     //   }
     //   return res;
     // },
-    toDaily(url) {
-      this.dailyUrl = url;
+    toDaily(e) {
+      this.dailyUrl = e.url;
       this.dailyShow = true;
-      this.$emit("clearNum", { count: 1 });
+      this.$emit("clearNum", e);
     },
     close() {
       this.dailyShow = false;
@@ -175,7 +186,7 @@ export default {
           let result = await NotificationApi.haveRead(params);
           if (result.status == 0) {
             info.readed = 1;
-            this.$emit("clearNum", { count: 1 });
+            this.$emit("clearNum", { count: 1, id: info.id });
           }
         }
 
@@ -214,16 +225,15 @@ export default {
     // }
   },
   watch: {
-    info: {
-      handler(newValue) {
-        if (newValue.source !== "none") {
-          console.log(newValue, "newValue");
-          this.params = { ...this.params, ...newValue };
-          this.getInfo(true);
-          this.dailyShow = false;
-        }
-      }
-    }
+    // info: {
+    //   deep: true,
+    //   handler(newValue) {
+    //     if (newValue.source !== "none") {
+    //       console.log(newValue, "newValue");
+    //       this.dailyShow = false;
+    //     }
+    //   }
+    // }
     // change(newValue, oldValue) {
     //   if (newValue > oldValue) {
     //     this.getInfo();

@@ -81,7 +81,6 @@
             <component
               :is="'new-note-center'"
               ref="newNoteCenter"
-              :info="note_index>-1?{source:this.note_arr[this.note_index].source,readed:readedParams[searchModel.state_index],...choseTime}:{source:'none'}"
               @clearNum="clearNum"
               @getNum="getNum"
             ></component>
@@ -130,8 +129,6 @@ export default {
     return {
       component: "job-notification",
       show: false,
-      workMore: "",
-      systemMore: "",
       note_obj: {
         task: {
           img: note_img_1,
@@ -245,23 +242,31 @@ export default {
       if (type == "all") {
         NotificationApi.newGetMessageMark().then(result => {
           if (result.status == 0) {
+            this.$refs.newNoteCenter.clearAllRead();
+            if (this.note_arr && this.note_arr.length > 0) {
+              this.note_arr.forEach(item => {
+                item.unReadNum = 0;
+              });
+            }
             this.$emit("clearNum", { count: "-1" });
           }
         });
       } else {
         let { startTime, endTime } = this.choseTime;
         let source = this.note_arr[this.note_index].source;
-        debugger
+        let count = this.note_arr[this.note_index].unReadNum * 1;
+
         NotificationApi.newGetMessageMark({
           source,
           startTime,
           endTime
         }).then(result => {
           if (result.status == 0) {
-            this.note_arr[this.note_index].unReadNum = 0;
             this.$emit("clearNum", {
-              count: this.note_arr[this.note_index].unReadNum || 0
+              count: count || 0
             });
+            this.note_arr[this.note_index].unReadNum = 0;
+            this.$refs.newNoteCenter.clearAllRead();
           }
         });
       }
@@ -270,8 +275,17 @@ export default {
       this.show = true;
     },
     clearNum(e) {
-      this.note_arr[this.note_index].unReadNum -= e.count || 0;
-      this.$emit("clearNum", e);
+      let source = this.note_arr[this.note_index].source;
+      let { id } = e;
+      NotificationApi.newGetMessageMark({
+        source,
+        id
+      }).then(result => {
+        if (result.status == 0) {
+          this.note_arr[this.note_index].unReadNum -= e.count || 0;
+          this.$emit("clearNum", e);
+        }
+      });
     },
     getNum(count) {
       if (this.info.workMsg < count) {
@@ -284,11 +298,28 @@ export default {
         this.$set(this.searchModel, "state_index", 0);
         this.$set(this.searchModel, "date_index", 0);
         this.now_note = index;
+        this.$refs.newNoteCenter.changeParams({
+          source: this.note_arr[index].source,
+          readed: this.readedParams[this.searchModel.state_index],
+          ...this.choseTime
+        });
       }
       this.note_index = this.note_index == index ? -1 : index;
     },
     change_filter_item(key, val) {
       this.searchModel[key] = val;
+      this.$refs.newNoteCenter.changeParams({
+        source: this.note_arr[this.note_index].source,
+        readed: this.readedParams[this.searchModel.state_index],
+        ...this.choseTime
+      });
+    },
+    loadData() {
+      NotificationApi.newGetMessageGroup().then(result => {
+        if (result.status == 0) {
+          this.note_arr = result.data || [];
+        }
+      });
     }
   },
   computed: {
@@ -353,29 +384,15 @@ export default {
   },
   watch: {
     info: {
-      handler(newValue) {
-        if (newValue.workMsg > 99) {
-          this.workMore = "99+";
-        } else {
-          this.workMore = "";
-        }
-        if (newValue.systemMsg > 99) {
-          this.systemMore = "99+";
-        } else {
-          this.systemMore = "";
-        }
-      }
+      handler(newValue) {}
     },
     show: {
       handler(newValue) {
         if (newValue == false) {
           this.note_index = -1;
+          this.now_note = -1;
         } else {
-          NotificationApi.newGetMessageGroup().then(result => {
-            if (result.status == 0) {
-              this.note_arr = result.data || [];
-            }
-          });
+          this.loadData();
         }
       }
     }

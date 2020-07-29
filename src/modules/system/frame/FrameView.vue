@@ -102,8 +102,17 @@
               </el-popover>
               <!--导出下载-->
 
-              <button type="button" class="btn-text frame-header-btn frame-header-btn-bg notification-btn" @click="openNotificationCenter" title="通知中心" v-tooltip>
-                <span class="notification-new" v-show="notification.count && notification.count > 0">{{ msgCount || notification.count }}</span>
+              <button
+                type="button"
+                class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
+                @click="openNotificationCenter"
+                title="通知中心"
+                v-tooltip
+              >
+                <span
+                  class="notification-new"
+                  v-show="notification.count && notification.count > 0"
+                >{{ notification.count>99?99:notification.count }}</span>
                 <i class="iconfont">&#xe624;</i>
               </button>
 
@@ -255,9 +264,7 @@ export default {
       systemMsg: '',
       notificationShow: false,
       notificationStyle: {},
-      msgCount: '',
       loginUser: this.initData.user || {}, // 当前登录的用户
-
       profilePopperVisible: false,
       userStatePopperVisible: false,
       saleManagerShow: false, // 是否显示专属客服
@@ -579,11 +586,6 @@ export default {
           this.notification.count = info.data.unReadTotalCount;
           let msgSystem = sessionStorage.getItem("shb_systemMsg");
 
-          if (this.notification.count > 99) {
-            this.msgCount = "99+";
-          } else {
-            this.msgCount = "";
-          }
           if (
             this.notificationInfo.lastMessage &&
             (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
@@ -618,7 +620,9 @@ export default {
 
     /** 删除未读消息或消息已读后更新新通知数量 */
     clearNum(e) {
-      if (e.count == -1) this.notification.count = 0;
+      console.log(e, "aaaaaa");
+      if (e.count == -1) return (this.notification.count = 0);
+
       this.notification.count = this.notification.count - e.count;
     },
     getNum() {
