@@ -811,25 +811,35 @@
         <part-deal-with-form ref="partDealWithForm" :prop-data="partDealData"></part-deal-with-form>
 
         <div slot="footer" class="dialog-footer flex-x">
-          <base-button
+          <div
+            class="ding-btn"
+            v-if="partDealData.data.state === 'suspending' && partDealData.data.cancel"
+            @click="dingMessage"
+          >
+            <i class="iconfont icon-Ding"></i>
+            DING
+          </div>
+          <!-- <base-button
             v-if="partDealData.data.state === 'suspending' && partDealData.data.cancel"
             type="primary"
             @event="dingMessage"
             :disabled="pending"
-          >DING</base-button>
+          >DING</base-button>-->
+
           <div class="flex-1"></div>
-          <base-button
-            class="mar-r-15"
-            type="ghost"
-            v-if="partDealData.data.isreject"
-            @event="cancelType=0,backstockDialog = true"
-          >拒绝</base-button>
+
           <base-button
             class="mar-r-15"
             type="ghost"
             v-if="partDealData.data.cancel"
             @event="cancelType=1,backstockDialog = true,backstock_type=partDealData.data.type"
           >撤销</base-button>
+          <base-button
+            class="mar-r-15"
+            type="danger"
+            v-if="partDealData.data.isreject"
+            @event="cancelType=0,backstockDialog = true"
+          >拒绝</base-button>
           <base-button
             type="primary"
             v-if="partDealData.data.approved "
@@ -2617,5 +2627,9 @@ a {
 }
 .mar-r-15 {
   margin-right: 15px;
+}
+.ding-btn {
+  color: $color-ding-blue;
+  cursor: pointer;
 }
 </style>

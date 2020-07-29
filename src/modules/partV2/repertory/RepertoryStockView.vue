@@ -1676,14 +1676,14 @@ export default {
     }
   },
   mounted(){
-    let initData = this.initData;
+    let initData =  _.cloneDeep(this.initData);
 
-    this.types = initData.sparepartType || [];
-    this.auths = initData.auths || {};
-    this.isPersonalRepertory = initData.isPersonalRepertory;
-    this.userId = initData.userId || '';
-    this.tagIds = initData.tagIds || [];
-    this.tagIdsWithChildTag = initData.tagIdsWithChildTag || [];
+    this.types = _.cloneDeep(initData.sparepartType) || [];
+    this.auths = _.cloneDeep(initData.auths) || {};
+    this.isPersonalRepertory = _.cloneDeep(initData.isPersonalRepertory);
+    this.userId = _.cloneDeep(initData.userId) || '';
+    this.tagIds = _.cloneDeep(initData.tagIds) || [];
+    this.tagIdsWithChildTag = _.cloneDeep(initData.tagIdsWithChildTag) || [];
 
     let urlParams = qs.parse(window.location.search);
     if(urlParams.id){

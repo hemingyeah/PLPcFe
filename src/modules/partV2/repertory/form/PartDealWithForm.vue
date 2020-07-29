@@ -4,9 +4,7 @@
     <div class="flex-x only-see-box">
       <div class="form-only-see flex-x" v-for="(item,index) in formArr" :key="index">
         <div class="form-only-see-title">{{item.lable}}</div>
-        <div class="form-only-see-input">
-          <el-input v-model="item.value" :readonly="true"></el-input>
-        </div>
+        <div class="form-only-see-input">{{item.value}}</div>
       </div>
     </div>
     <!-- 仅看数据展示 end -->
@@ -15,23 +13,14 @@
 
     <div class="flex-x mar-b-20 al-start">
       <div class="form-only-see-title mar-r-15">备注</div>
-      <div>
-        <el-input
-          type="textarea"
-          resize="none"
-          style="width:500px;"
-          :autosize="{ minRows: 2, maxRows: 6 }"
-          v-model="remark"
-          :readonly="true"
-        ></el-input>
-      </div>
+      <div>{{remark}}</div>
     </div>
     <!-- 备注 end -->
 
     <!-- 备件清单 start-->
     <div class="mar-b-20">
       <div class="mar-b-15 font-w-500">备件清单</div>
-      <el-table :data="propData.arr" stripe style="width: 100%" max-height="350">
+      <el-table border :data="propData.arr" stripe style="width: 100%" max-height="350">
         <el-table-column
           v-for="(item,index) in tableColumn"
           :key="index"
@@ -71,7 +60,6 @@
           type="textarea"
           maxlength="100"
           resize="none"
-          style="width:500px;"
           :autosize="{ minRows: 2, maxRows: 6 }"
           :placeholder="inputonlyread?'':'请输入办理意见'"
           v-model="suggestion"
@@ -259,6 +247,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.normal-box {
+  padding: 10px;
+}
 .flex-x {
   display: flex;
   align-items: center;
@@ -281,14 +272,14 @@ export default {
 .form-only-see {
   width: 33.3%;
   margin-bottom: 15px;
-  .form-only-see-title {
-    min-width: 56px;
-    text-align: end;
-    margin-right: 15px;
-  }
   .form-only-see-input {
     width: 180px;
   }
+}
+
+.form-only-see-title {
+  min-width: 56px;
+  margin-right: 15px;
 }
 .only-see-box {
   flex-wrap: wrap;
