@@ -85,7 +85,7 @@ router.get('/partV2/repertory/apply', async ctx => {
   let result = await HttpClient.request('/partV2/repertory/apply', 'get', null, { headers: reqHeaders });
   let body = result.body;
 
-  ctx.body = Template.renderWithHtmlForPart('办理出入库', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtmlForPart('出入库办理', body, script, modConfig.template);
 
 })
 

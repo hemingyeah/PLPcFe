@@ -9,7 +9,6 @@ import BaseExport from 'packages/BaseExport';
 
 import RepertoryApplyView from './RepertoryApplyView.vue';
 
-
 Vue.component(BaseCollapsePanel.name, BaseCollapsePanel);
 Vue.component(BaseExport.name, BaseExport);
 

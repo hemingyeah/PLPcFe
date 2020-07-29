@@ -41,7 +41,8 @@ import {
   Tabs,
   TabPane,
   Row,
-  OptionGroup
+  OptionGroup,
+  Message
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
@@ -88,6 +89,7 @@ const ElementUI = {
     Vue.use(TabPane);
     Vue.use(Row);
     Vue.use(OptionGroup);
+    Vue.use(Message.name, Message);
     
     Vue.component(CollapseTransition.name, CollapseTransition);
     Vue.prototype.$loading = Loading.service;

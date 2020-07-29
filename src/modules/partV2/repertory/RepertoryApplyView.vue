@@ -1,33 +1,38 @@
 <template>
   <div class="page">
-
     <div class="base-search-group-container">
       <form class="base-search" onsubmit="return false;">
         <div class="customer-list-base-search-group">
           <el-input v-model="model.keyWord" placeholder="根据备件信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="model.pageNum=1;search();trackEventhandler('search')" native-type="submit">搜索</base-button>
+          <base-button
+            type="primary"
+            @event="model.pageNum=1;search();trackEventhandler('search')"
+            native-type="submit"
+          >搜索</base-button>
           <base-button type="ghost" @event="reset();trackEventhandler('reset')">重置</base-button>
         </div>
-        <span class="advanced-search-visible-btn" @click="isExpand = !isExpand;trackEventhandler('advSearch')" >
-          <i :class="`iconfont ${isExpand ? 'el-icon-minus' : 'el-icon-plus'}`" ></i>
+        <span
+          class="advanced-search-visible-btn"
+          @click="isExpand = !isExpand;trackEventhandler('advSearch')"
+        >
+          <i :class="`iconfont ${isExpand ? 'el-icon-minus' : 'el-icon-plus'}`"></i>
           高级搜索
         </span>
       </form>
     </div>
 
-
     <form @submit.prevent="search();trackEventhandler('search')">
       <!--<div class="page-panel">-->
-        <!--<div class="page-panel-body search-form-nano">-->
-          <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
-          <!--<el-button-group>-->
-            <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
-            <!--<el-button @click="reset();trackEventhandler('reset')">重置</el-button>-->
-          <!--</el-button-group>-->
-          <!--<el-button type="text" @click="isExpand = !isExpand;trackEventhandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
-        <!--</div>-->
+      <!--<div class="page-panel-body search-form-nano">-->
+      <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
+      <!--<el-button-group>-->
+      <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
+      <!--<el-button @click="reset();trackEventhandler('reset')">重置</el-button>-->
+      <!--</el-button-group>-->
+      <!--<el-button type="text" @click="isExpand = !isExpand;trackEventhandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
+      <!--</div>-->
       <!--</div>-->
 
       <base-collapse-panel :value="isExpand" class="page-panel">
@@ -35,51 +40,101 @@
           <h5>高级搜索</h5>
         </div>
         <div class="page-panel-body">
+          <!-- 第一行高级搜索  start-->
           <div class="form-row">
-            <div class="form-item">
+            <!-- <div class="form-item">
               <label>类别</label>
               <div class="form-item-content">
-                <!-- <el-select placeholder="请选择备件类别" v-model="model.type">
-                  <el-option label="全部" value=""></el-option>
-                  <el-option :label="item" :value="item" v-for="item in types" :key="item"></el-option>
-                </el-select> -->
                 <el-select placeholder="请选择备件类别" v-model="model.type">
-                  <el-option label="全部" value=""></el-option>
+                  <el-option label="全部" value></el-option>
                   <el-option label="申领" value="申领"></el-option>
                   <el-option label="退回" value="退回"></el-option>
                   <el-option label="分配" value="分配"></el-option>
                   <el-option label="调拨" value="调拨"></el-option>
                 </el-select>
               </div>
-            </div>
-            <div class="form-item">
+            </div>-->
+
+            <!-- <div class="form-item">
               <label>是否启用</label>
               <div class="form-item-content">
                 <el-select placeholder="请选择备件类别" v-model="model.enable">
-                  <el-option label="全部" value=""></el-option>
+                  <el-option label="全部" value></el-option>
                   <el-option label="启用" value="1"></el-option>
                   <el-option label="禁用" value="0"></el-option>
                 </el-select>
               </div>
+            </div>-->
+            <div class="form-item">
+              <label>目标仓库</label>
+              <div class="form-item-content">
+                <el-select
+                  v-model="model.sourceIds"
+                  class="srp-list-form-item"
+                  style="width:100%"
+                  multiple
+                  collapse-tags
+                  placeholder="原始仓库"
+                >
+                  <el-option
+                    v-for="item in repertory"
+                    :key="item.id"
+                    :value="item.id"
+                    :label="item.name"
+                  ></el-option>
+                </el-select>
+              </div>
+            </div>
+
+            <div class="form-item">
+              <div class="form-item">
+                <label>备件名称</label>
+                <div class="form-item-content">
+                  <el-select
+                    popper-class="common-advance-popper"
+                    style="width: 100%;"
+                    :value="sparepart.sparepartId"
+                    @input="chooseSparepart"
+                    filterable
+                    clearable
+                    remote
+                    placeholder="选择备件"
+                    :remote-method="fetchSparepart"
+                    :loading="sparepart.loading"
+                  >
+                    <el-option
+                      v-for="item in sparepart.options"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    >
+                      <div class="part-option">
+                        <p>编号：{{item.serialNumber}}</p>
+                        <p>名称：{{item.name}}</p>
+                      </div>
+                    </el-option>
+                  </el-select>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class="form-row">
+          <!-- 第一行高级搜索  end-->
+          <!-- 第2行高级搜索  start-->
+          <!-- <div class="form-row">
             <div class="form-item">
               <label>备件类别</label>
               <div class="form-item-content">
-                <el-select popper-class="common-advance-popper" style="width: 100%;"
-                           :value="sparepart.sparepartType"
-                           @input="hooseSparepartType"
-                           filterable
-                           clearable
-                           remote
-                           placeholder="选择备件类别">
-                  <el-option
-                    v-for="item in types"
-                    :key="item"
-                    :label="item"
-                    :value="item">
+                <el-select
+                  popper-class="common-advance-popper"
+                  style="width: 100%;"
+                  :value="sparepart.sparepartType"
+                  @input="hooseSparepartType"
+                  filterable
+                  clearable
+                  remote
+                  placeholder="选择备件类别"
+                >
+                  <el-option v-for="item in types" :key="item" :label="item" :value="item">
                     <div class="part-option">
                       <p>{{item}}</p>
                     </div>
@@ -88,128 +143,114 @@
               </div>
             </div>
 
-            <div class="form-item">
-              <div class="form-item">
-              <label>备件名称</label>
-              <div class="form-item-content">
-                  <el-select popper-class="common-advance-popper" style="width: 100%;"
-                      :value="sparepart.sparepartId"
-                      @input="chooseSparepart"
-                      filterable
-                      clearable
-                      remote
-                      placeholder="选择备件"
-                      :remote-method="fetchSparepart"
-                      :loading="sparepart.loading">
 
-                      <el-option
-                        v-for="item in sparepart.options"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id">
-                        <div class="part-option">
-                          <p>编号：{{item.serialNumber}}</p>
-                          <p>名称：{{item.name}}</p>
-                        </div>
-                      </el-option>
-                  </el-select>
-                </div>
-            </div>
-            </div>            
-          </div>
-
-          <div class="form-row">  
-            <div class="form-item">
+            
+          </div>-->
+          <!-- 第2行高级搜索  end-->
+          <!-- 第3行高级搜索  start-->
+          <div class="form-row">
+            <!-- <div class="form-item">
               <label>发起人</label>
               <div class="form-item-content">
-                  <el-select class="srp-list-form-item" style="width: 100%;"
-                      :value="userApply.userId"   
-                      @input="chooseUserApply"
-                      filterable
-                      clearable
-                      remote
-                      placeholder="选择人员"
-                      :remote-method="fetchUserApply"
-                      :loading="userApply.loading">
+                <el-select
+                  class="srp-list-form-item"
+                  style="width: 100%;"
+                  :value="userApply.userId"
+                  @input="chooseUserApply"
+                  filterable
+                  clearable
+                  remote
+                  placeholder="选择人员"
+                  :remote-method="fetchUserApply"
+                  :loading="userApply.loading"
+                >
+                  <el-option
+                    v-for="item in userApply.options"
+                    :key="item.userId"
+                    :label="item.displayName"
+                    :value="item.userId"
+                  >
+                    <div class="srp-user-item">
+                      <img :src="item.head || '/resource/images/account_userhead.png'" />
+                      <p>{{item.displayName}}</p>
+                    </div>
+                  </el-option>
+                </el-select>
+              </div>
+            </div>-->
 
-                      <el-option
-                        v-for="item in userApply.options"
-                        :key="item.userId"
-                        :label="item.displayName"
-                        :value="item.userId">
-
-                        <div class="srp-user-item">
-                          <img :src="item.head || '/resource/images/account_userhead.png'">
-                          <p>{{item.displayName}}</p>
-                        </div>
-                      </el-option>
-                  </el-select>
-                </div>
-            </div>
             <div class="form-item">
-              <div class="form-item">
               <label>办理人</label>
               <div class="form-item-content">
-                  <el-select class="srp-list-form-item" style="width: 100%;"
-                      :value="userApprove.userId"   
-                      @input="chooseUserApprove"
-                      filterable
-                      clearable
-                      remote
-                      placeholder="选择人员"
-                      :remote-method="fetchUserApprove"
-                      :loading="userApprove.loading">
-
-                      <el-option
-                        v-for="item in userApprove.options"
-                        :key="item.userId"
-                        :label="item.displayName"
-                        :value="item.userId">
-
-                        <div class="srp-user-item">
-                          <img :src="item.head || '/resource/images/account_userhead.png'">
-                          <p>{{item.displayName}}</p>
-                        </div>
-                      </el-option>
-                  </el-select>
-                </div>
-            </div>
-            </div>            
-          </div>
-          <div class="form-row">
-            <div class="form-item">
-              <label>发起日期</label>
-              <div class="form-item-content">
-                <el-date-picker @change="seeTime" style="width:100%"
-                                v-model="timeValue"
-                                type="daterange"
-                                align="right"
-                                unlink-panels
-                                range-separator="至"
-                                start-placeholder="开始日期"
-                                end-placeholder="结束日期"
-                                :picker-options="pickerOptions2">
-                </el-date-picker>
+                <el-select
+                  class="srp-list-form-item"
+                  style="width: 100%;"
+                  :value="userApprove.userId"
+                  @input="chooseUserApprove"
+                  filterable
+                  clearable
+                  remote
+                  placeholder="选择人员"
+                  :remote-method="fetchUserApprove"
+                  :loading="userApprove.loading"
+                >
+                  <el-option
+                    v-for="item in userApprove.options"
+                    :key="item.userId"
+                    :label="item.displayName"
+                    :value="item.userId"
+                  >
+                    <div class="srp-user-item">
+                      <img :src="item.head || '/resource/images/account_userhead.png'" />
+                      <p>{{item.displayName}}</p>
+                    </div>
+                  </el-option>
+                </el-select>
               </div>
             </div>
+
+            <div class="form-item">
+              <label>申请日期</label>
+              <div class="form-item-content">
+                <el-date-picker
+                  @change="seeTime"
+                  style="width:100%"
+                  v-model="timeValue"
+                  type="daterange"
+                  align="right"
+                  unlink-panels
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :picker-options="pickerOptions2"
+                ></el-date-picker>
+              </div>
+            </div>
+          </div>
+          <!-- 第3行高级搜索  end-->
+          <!-- 第4行高级搜索  start-->
+          <div class="form-row">
             <div class="form-item">
               <label>办理日期</label>
               <div class="form-item-content">
-                <el-date-picker @change="seeUpdateTime" style="width:100%"
-                                v-model="updateTimeValue"
-                                type="daterange"
-                                align="right"
-                                unlink-panels
-                                range-separator="至"
-                                start-placeholder="开始日期"
-                                end-placeholder="结束日期"
-                                :picker-options="pickerOptions2">
-                </el-date-picker>
+                <el-date-picker
+                  @change="seeUpdateTime"
+                  style="width:100%"
+                  v-model="updateTimeValue"
+                  type="daterange"
+                  align="right"
+                  unlink-panels
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :picker-options="pickerOptions2"
+                ></el-date-picker>
               </div>
             </div>
+            <div class="form-item"></div>
           </div>
-
-
+          <!-- 第4行高级搜索  end-->
+          <!-- 第5行高级搜索  start-->
           <div class="form-row">
             <div class="text-right" style="width:100%;">
               <!--<el-button @click="reset">重置</el-button>-->
@@ -218,42 +259,117 @@
               <!--<el-button type="primary" native-type="submit">确定</el-button>-->
             </div>
           </div>
+          <!-- 第5行高级搜索  end-->
         </div>
       </base-collapse-panel>
     </form>
-
-
-
 
     <div class="page-panel" style="margin: 0;">
       <div class="page-panel-body">
         <!-- 选择仓库（默认全部） -->
         <el-row class="block-col-2">
-        <el-select :value="repertoryName" @input="chooseRepertory" class="srp-list-form-item" style="width: 150px;">
-             <el-option value="" label="全部仓库"></el-option>
-             <el-option v-for="item in repertory" :key="item.id" :value="item.id" :label="item.name"></el-option>
-        </el-select>
-        <el-select :value="state" @input="chooseState" class="srp-list-form-item" style="width: 150px;">
-             <el-option value="" label="全部(状态)"></el-option>
-             <el-option value="suspending" label="待办理"></el-option>
-             <el-option value="solved" label="已办理"></el-option>
-        </el-select>
+          <!-- <el-select
+            :value="repertoryName"
+            @input="chooseRepertory"
+            class="srp-list-form-item"
+            style="width: 150px;"
+          >
+            <el-option value label="全部仓库"></el-option>
+            <el-option v-for="item in repertory" :key="item.id" :value="item.id" :label="item.name"></el-option>
+          </el-select>-->
+          <el-select
+            v-model="model.state"
+            @change="chooseState"
+            class="srp-list-form-item"
+            style="width: 150px;"
+            multiple
+            collapse-tags
+            placeholder="状态"
+          >
+            <el-option
+              v-for="item in stateArr"
+              :value="item.value"
+              :label="item.label"
+              :key="item.key"
+            ></el-option>
+          </el-select>
 
+          <el-select
+            v-model="model.type"
+            @change="chooseState"
+            class="srp-list-form-item"
+            style="width: 150px;"
+            multiple
+            collapse-tags
+            placeholder="申请类型"
+          >
+            <el-option
+              v-for="item in typeArr"
+              :value="item.value"
+              :label="item.label"
+              :key="item.key"
+            ></el-option>
+            <!-- <el-option value label="全部(状态)"></el-option> -->
+            <!-- <el-option value="suspending" label="申领" :key="'suspending'"></el-option>
+            <el-option value="solved" label="调拨" :key></el-option>
+            <el-option value="solved" label="退回" :key="item.value"></el-option>
+            <el-option value="solved" label="分配" :key="item.value"></el-option>-->
+          </el-select>
 
-         <div class="pull-right">
-          <el-button-group>
-            <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150"> 
-              <!--<el-button>选择列 <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i></el-button>-->
-              <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn" >选择列<i class="iconfont icon-nav-down"></i></span>
+          <el-select
+            class="srp-list-form-item"
+            style="width: 180px;"
+            :value="userApply.userId"
+            @input="chooseUserApply"
+            filterable
+            clearable
+            remote
+            placeholder="发起人"
+            :remote-method="fetchUserApply"
+            :loading="userApply.loading"
+          >
+            <el-option
+              v-for="item in userApply.options"
+              :key="item.userId"
+              :label="item.displayName"
+              :value="item.userId"
+            >
+              <div class="srp-user-item">
+                <img :src="item.head || '/resource/images/account_userhead.png'" />
+                <p>{{item.displayName}}</p>
+              </div>
+            </el-option>
+          </el-select>
 
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-for="column in columns" :key="column.field"> 
-                  <el-checkbox :value="column.show" @input="chooseColnum(column)">{{column.label}}</el-checkbox>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>  
+          <el-select
+            v-model="model.targetIds"
+            @change="chooseRepertory"
+            class="srp-list-form-item"
+            style="width: 150px;"
+            multiple
+            collapse-tags
+            placeholder="原始仓库"
+          >
+            <el-option v-for="item in repertory" :key="item.id" :value="item.id" :label="item.name"></el-option>
+          </el-select>
 
-          <!-- <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150"> 
+          <div class="pull-right">
+            <el-button-group>
+              <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
+                <!--<el-button>选择列 <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i></el-button>-->
+                <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn">
+                  选择列
+                  <i class="iconfont icon-nav-down"></i>
+                </span>
+
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item v-for="column in columns" :key="column.field">
+                    <el-checkbox :value="column.show" @input="chooseColnum(column)">{{column.label}}</el-checkbox>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+
+              <!-- <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150"> 
             <el-button>
               更多操作 <i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -263,72 +379,93 @@
                 <span class="dropdown-item" @click="exportData">导出</span>
               </el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown>   -->
-          </el-button-group>  
-        </div>
+              </el-dropdown>-->
+            </el-button-group>
+          </div>
 
-        <div class="pull-right" v-if="allowInout">
-          <!--<el-button class="el-button el-button&#45;&#45;primary" @click="outstockBatch(selected);trackEventhandler('batch-stock-out')">批量出库</el-button>-->
-          <!--<base-button type="plain" @event="outstockBatch(selected);trackEventhandler('batch-stock-out')">批量出库</base-button>-->
-          <!--<base-button type="plain" @event="instockBatch(selected);trackEventhandler('batch-stock-in')">批量入库</base-button>-->
+          <div class="pull-right" v-if="allowInout">
+            <!--<el-button class="el-button el-button&#45;&#45;primary" @click="outstockBatch(selected);trackEventhandler('batch-stock-out')">批量出库</el-button>-->
+            <!--<base-button type="plain" @event="outstockBatch(selected);trackEventhandler('batch-stock-out')">批量出库</base-button>-->
+            <!--<base-button type="plain" @event="instockBatch(selected);trackEventhandler('batch-stock-in')">批量入库</base-button>-->
 
-          <!--<el-button class="el-button el-button&#45;&#45;primary" @click="instockBatch(selected);trackEventhandler('batch-stock-in')">批量入库</el-button>-->
+            <!--<el-button class="el-button el-button&#45;&#45;primary" @click="instockBatch(selected);trackEventhandler('batch-stock-in')">批量入库</el-button>-->
 
+            <el-dropdown trigger="click" :show-timeout="150">
+              <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn">
+                更多操作
+                <i class="iconfont icon-nav-down"></i>
+              </span>
 
-          <el-dropdown trigger="click" :show-timeout="150" >
-
-            <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn" >更多操作<i class="iconfont icon-nav-down"></i></span>
-
-            <el-dropdown-menu slot="dropdown" class="dropdown-more">
-              <el-dropdown-item>
-                <span class="dropdown-item" @click="outstockBatch(selected);trackEventhandler('batch-stock-out')" >批量出库</span>
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <span class="dropdown-item" @click="instockBatch(selected);trackEventhandler('batch-stock-in')" >批量入库</span>
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <span class="dropdown-item" @click="exportPart(false)" v-if="allowImportAndExport">导出</span>
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <span class="dropdown-item" @click="exportPart(true)" v-if="allowImportAndExport">导出全部</span>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </div>
-
-      
+              <el-dropdown-menu slot="dropdown" class="dropdown-more">
+                <el-dropdown-item>
+                  <span
+                    class="dropdown-item"
+                    @click="outstockBatch(selected);trackEventhandler('batch-stock-out')"
+                  >批量出库</span>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <span
+                    class="dropdown-item"
+                    @click="instockBatch(selected);trackEventhandler('batch-stock-in')"
+                  >批量入库</span>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <span
+                    class="dropdown-item"
+                    @click="exportPart(false)"
+                    v-if="allowImportAndExport"
+                  >导出</span>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <span
+                    class="dropdown-item"
+                    @click="exportPart(true)"
+                    v-if="allowImportAndExport"
+                  >导出全部</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
         </el-row>
       </div>
     </div>
 
     <div style="background: #fff;padding: 0 10px">
-      <base-selection-bar ref="baseSelectionBar" v-model="selected" @toggle-selection="toggleSelection" @show-panel="() => multipleSelectionPanelShow = true" />
+      <base-selection-bar
+        ref="baseSelectionBar"
+        v-model="selected"
+        @toggle-selection="toggleSelection"
+        @show-panel="() => multipleSelectionPanelShow = true"
+      />
     </div>
 
     <div class="table-container">
-      <el-table stripe
-                :data="page.list"
-                ref="table"
-                @select="handleSelection"
-                @select-all="handleSelection"
-                header-row-class-name="base-table-header">
+      <el-table
+        stripe
+        :data="page.list"
+        ref="table"
+        @select="handleSelection"
+        @select-all="handleSelection"
+        header-row-class-name="base-table-header"
+        @sort-change="sortChange"
+      >
+        <el-table-column type="selection" width="44"></el-table-column>
 
         <el-table-column
-          type="selection"
-          width="44">
-        </el-table-column>
-
-        <el-table-column v-for="column in columns" :key="column.field"
-                         v-if="column.show"
-                         :label="column.label"
-                         :width="column.width"
-                         :min-width="column.minWidth"
-                         :fixed="column.fixed"
-                         :show-overflow-tooltip="column.overflow">
-
+          v-for="column in columns"
+          :key="column.field"
+          :prop="column.field"
+          v-if="column.show"
+          :label="column.label"
+          :width="column.width"
+          :min-width="column.minWidth"
+          :fixed="column.fixed"
+          :show-overflow-tooltip="column.overflow"
+          :sortable="column.sortable"
+        >
           <template slot-scope="scope">
             <!-- <a :href="`/partV2/detail?id=${scope.row.id}`" @click.prevent="openDetail(scope.row)"
-              v-if="column.field == 'serialNumber'">{{scope.row.serialNumber}}</a> -->
+            v-if="column.field == 'serialNumber'">{{scope.row.serialNumber}}</a>-->
             <template v-if="column.field == 'propserName'">
               <template>{{scope.row.propserName}}</template>
             </template>
@@ -339,33 +476,57 @@
               <template>{{scope.row.propserTime}}</template>
             </template>
             <template v-else-if="column.field == 'name'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.name}}</template>
+              <template
+                v-if="scope.row.sparepartRepertory"
+              >{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.name}}</template>
             </template>
             <template v-else-if="column.field == 'serialNumber'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.serialNumber}}</template>
+              <template
+                v-if="scope.row.sparepartRepertory"
+              >{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.serialNumber}}</template>
             </template>
             <template v-else-if="column.field == 'sparepart.type'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.type}}</template>
+              <template
+                v-if="scope.row.sparepartRepertory"
+              >{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.type}}</template>
             </template>
             <template v-else-if="column.field == 'standard'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.standard}}</template>
+              <template
+                v-if="scope.row.sparepartRepertory"
+              >{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.standard}}</template>
             </template>
             <template v-else-if="column.field == 'repertory'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.repertory&&scope.row.sparepartRepertory.repertory.name}}</template>
+              <template
+                v-if="scope.row.sparepartRepertory"
+              >{{scope.row.sparepartRepertory.repertory&&scope.row.sparepartRepertory.repertory.name}}</template>
             </template>
             <template v-else-if="column.field == 'safetyStock'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.safetyStock || ''}}</template>
+              <template
+                v-if="scope.row.sparepartRepertory"
+              >{{scope.row.sparepartRepertory.safetyStock || ''}}</template>
             </template>
             <template v-else-if="column.field == 'updateTime'">
-              <el-tooltip placement="top" popper-class="common-tooltip" :disabled="scope.row.disabled">
+              <el-tooltip
+                placement="top"
+                popper-class="common-tooltip"
+                :disabled="scope.row.disabled"
+              >
                 <div slot="content" class="pre">{{scope.row.approveTimeArr}}</div>
-                <div @mouseover="getApproveTimeArr(scope.$index, scope.row.id)">{{scope.row.updateTime || ''}}</div>
+                <div
+                  @mouseover="getApproveTimeArr(scope.$index, scope.row.id)"
+                >{{scope.row.updateTime || ''}}</div>
               </el-tooltip>
             </template>
             <template v-else-if="column.field == 'recordNo'">
-              <el-tooltip placement="top" popper-class="common-tooltip" :disabled="scope.row.disabled">
+              <el-tooltip
+                placement="top"
+                popper-class="common-tooltip"
+                :disabled="scope.row.disabled"
+              >
                 <div slot="content" class="pre">{{scope.row.recordNoArr}}</div>
-                <div @mouseover="getRecordNoArr(scope.$index, scope.row.id)">{{scope.row.recordNo || ''}}</div>
+                <div
+                  @mouseover="getRecordNoArr(scope.$index, scope.row.id)"
+                >{{scope.row.recordNo || ''}}</div>
               </el-tooltip>
             </template>
             <template v-else-if="column.field == 'remark'">
@@ -378,58 +539,135 @@
               <!-- <template v-if="scope.row.variation == scope.row.solvedVariation">{{scope.row.variation}}</template> -->
               {{variationNum(scope.row.variation, scope.row.solvedVariation)}}
             </template>
-            <template v-else-if="column.field == 'variation_'">
-              {{scope.row.solvedVariation}}
-            </template>
+            <template v-else-if="column.field == 'variation_'">{{scope.row.solvedVariation}}</template>
             <!-- 操作 -->
             <template v-else-if="column.field == 'enable'" slot-scope="scope">
               <template v-if="scope.row.type !== '调拨'">
                 <template v-if="scope.row.state == 'solved' && scope.row.type !='分配'">
-                  <el-button v-if="scope.row.type === '申领'" type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="0"> 已出库</el-button>
-                  <el-button v-else-if="scope.row.type === '退回'" type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="0"> 已入库</el-button>
-                  <el-button v-else type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="0"> 已办理</el-button>
+                  <el-button
+                    v-if="scope.row.type === '申领'"
+                    type="text"
+                    size
+                    class="no-padding"
+                    style="color:#333;cursor: text;"
+                    key="0"
+                  >已出库</el-button>
+                  <el-button
+                    v-else-if="scope.row.type === '退回'"
+                    type="text"
+                    size
+                    class="no-padding"
+                    style="color:#333;cursor: text;"
+                    key="0"
+                  >已入库</el-button>
+                  <el-button
+                    v-else
+                    type="text"
+                    size
+                    class="no-padding"
+                    style="color:#333;cursor: text;"
+                    key="0"
+                  >已办理</el-button>
                 </template>
                 <template v-if="scope.row.state == 'cancel' && scope.row.type !='分配'">
-                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="1"> 已拒绝</el-button>
+                  <el-button
+                    type="text"
+                    size
+                    class="no-padding"
+                    style="color:#333;cursor: text;"
+                    key="1"
+                  >已拒绝</el-button>
                 </template>
 
-                <template v-if="allowInout && scope.row.state == 'suspending' && scope.row.type !='分配'">
+                <template
+                  v-if="allowInout && scope.row.state == 'suspending' && scope.row.type !='分配'"
+                >
                   <template v-if="scope.row.type == '申领' ">
-                    <el-button @click="outstock(scope.row);tableTrackEventHandler('stock-out')" type="text" size="medium" class="no-padding" key="2"> 办理出库</el-button>
+                    <el-button
+                      @click="outstock(scope.row);tableTrackEventHandler('stock-out')"
+                      type="text"
+                      size
+                      class="no-padding"
+                      key="2"
+                    >办理出库</el-button>
                   </template>
-                  <template v-if="scope.row.type == '退回' ">
-                    <el-button @click="instock(scope.row)" type="text" size="medium" class="no-padding" key="3"> 办理入库</el-button>
+                  <template v-if="scope.row.type == '退回' || scope.row.type == '调拨'">
+                    <el-button
+                      @click="instock(scope.row)"
+                      type="text"
+                      size
+                      class="no-padding"
+                      key="3"
+                    >办理入库</el-button>
                   </template>
                   <template>
-                    <el-button @click="backstock(scope.row);tableTrackEventHandler('reject')" type="text" size="medium" class="no-padding" key="4"> 拒绝</el-button>
+                    <el-button
+                      @click="backstock(scope.row);tableTrackEventHandler('reject')"
+                      type="text"
+                      size
+                      class="no-padding"
+                      key="4"
+                    >拒绝</el-button>
                   </template>
                 </template>
                 <!-- 分配 -->
                 <template v-if="scope.row.state == 'suspending' && scope.row.type =='分配'">
                   <el-tooltip class="item" effect="dark" content="当前状态为个人库未接受状态" placement="bottom">
-                    <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="5"> 待入库</el-button>
+                    <el-button
+                      type="text"
+                      size
+                      class="no-padding"
+                      style="color:#333;cursor: text;"
+                      key="5"
+                    >待入库</el-button>
                   </el-tooltip>
-                  <el-button @click="reStockOpenDialog(scope.row)" type="text" size="medium" class="no-padding" key="6"> 撤回</el-button>
+                  <el-button
+                    @click="reStockOpenDialog(scope.row)"
+                    type="text"
+                    size
+                    class="no-padding"
+                    key="6"
+                  >撤回</el-button>
                 </template>
                 <template v-if="scope.row.state == 'solved' && scope.row.type =='分配'">
-                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="7"> 已入库</el-button>
+                  <el-button
+                    type="text"
+                    size
+                    class="no-padding"
+                    style="color:#333;cursor: text;"
+                    key="7"
+                  >已入库</el-button>
                 </template>
-                <template v-if="scope.row.state == 'revoked' && (scope.row.type =='分配' || scope.row.type =='申领')">
-                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="8"> 已撤回</el-button>
+                <template
+                  v-if="scope.row.state == 'revoked' && (scope.row.type =='分配' || scope.row.type =='申领')"
+                >
+                  <el-button
+                    type="text"
+                    size
+                    class="no-padding"
+                    style="color:#333;cursor: text;"
+                    key="8"
+                  >已撤回</el-button>
                 </template>
                 <template v-if="scope.row.state == 'rejected' && scope.row.type =='分配'">
-                  <el-button type="text" size="medium" class="no-padding" style="color:#333;cursor: text;" key="9"> 已退回</el-button>
+                  <el-button
+                    type="text"
+                    size
+                    class="no-padding"
+                    style="color:#333;cursor: text;"
+                    key="9"
+                  >已退回</el-button>
                 </template>
               </template>
               <!-- 调拨 -->
               <template v-if="scope.row.type === '调拨'">
                 <template v-if="scope.row.state === 'suspending'">
                   <template v-if="scope.row.isOriginalRepertoryManager">
-                    <el-button type="text" size="medium" @click="openCancelTransferDialog(scope.row)">撤回</el-button>
+                    <el-button type="text" @click="openCancelTransferDialog(scope.row)">撤回</el-button>
                   </template>
                   <template v-if="scope.row.isTargetRepertoryManager">
-                    <el-button type="text" size="medium" @click="openTransferDialog(scope.row, 0)">拒绝</el-button>
-                    <el-button type="text" size="medium" @click="openTransferDialog(scope.row, 1)">接收</el-button>
+                    <el-button type="text" @click="openTransferDialog(scope.row, 0)">拒绝</el-button>
+                    <el-button type="text" @click="openTransferDialog(scope.row, 1)">接收</el-button>
                   </template>
                 </template>
                 <template v-if="scope.row.state === 'revoked'">
@@ -444,22 +682,25 @@
                 <!--<button @click="logRow(scope.row)">test</button>-->
               </template>
             </template>
-            <template v-else-if="column.field == 'state'">
-              {{scope.row[column.field] | state}}
-            </template>
-            <template v-else>
-              {{scope.row[column.field]}}
-            </template>
+            <template v-else-if="column.field == 'state'">{{scope.row[column.field] | state}}</template>
+            <template
+              v-else-if="column.field === 'applyCount'"
+            >{{`${scope.row['unsolved'] || 0}/${scope.row['solved'] || 0}`}}</template>
+            <template v-else>{{scope.row[column.field]}}</template>
           </template>
-
         </el-table-column>
       </el-table>
     </div>
 
     <div class="table-footer">
       <div class="list-info">
-        共<span class="level-padding">{{page.total}}</span>记录，
-        已选中<span class="base-table-selected-count" @click="multipleSelectionPanelShow = true">{{selected.length}}</span>条
+        共
+        <span class="level-padding">{{page.total}}</span>记录，
+        已选中
+        <span
+          class="base-table-selected-count"
+          @click="multipleSelectionPanelShow = true"
+        >{{selected.length}}</span>条
         <span class="base-table-selected-count" @click="toggleSelection()">清空</span>
       </div>
       <el-pagination
@@ -471,18 +712,24 @@
         :page-size="model.pageSize"
         :current-page="model.pageNum"
         layout="prev, pager, next, sizes, jumper"
-        :total="page.total">
-      </el-pagination>
+        :total="page.total"
+      ></el-pagination>
     </div>
 
     <div class="page-panel">
-
       <el-dialog title="拒绝操作" :visible.sync="backstockDialog" width="600px">
-        <part-backstock-form v-if="backstockDialog"  ref="backstockForm" :formdata="formdata" :repertory="repertory" :sparepartConfig="sparepartConfig" :userId="userId" :userName="userName"></part-backstock-form>
+        <part-backstock-form
+          v-if="backstockDialog"
+          ref="backstockForm"
+          :formdata="formdata"
+          :repertory="repertory"
+          :sparepart-config="sparepartConfig"
+          :user-id="userId"
+          :user-name="userName"
+        ></part-backstock-form>
         <div slot="footer" class="dialog-footer">
-
-          <base-button type="ghost" @event="backstockDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="backstockSave" :disabled="pending" >确 定</base-button>
+          <base-button type="ghost" @event="backstockDialog = false">取 消</base-button>
+          <base-button type="primary" @event="backstockSave" :disabled="pending">确 定</base-button>
 
           <!--<el-button @click="backstockDialog = false">取 消</el-button>-->
           <!--<el-button type="primary" @click="backstockSave" :disabled="pending">确 定</el-button>-->
@@ -490,23 +737,42 @@
       </el-dialog>
 
       <el-dialog title="入库操作" :visible.sync="instockDialog" width="600px">
-        <part-instock-form v-if="instockDialog"  ref="instockForm" :formdata="formdata" :repertory="repertory" :sparepartConfig="sparepartConfig" :initData="initData"></part-instock-form>
+        <!-- <part-instock-form
+          v-if="instockDialog"
+          ref="instockForm"
+          :formdata="formdata"
+          :repertory="repertory"
+          :sparepartConfig="sparepartConfig"
+          :initData="initData"
+        ></part-instock-form>-->
+
         <div slot="footer" class="dialog-footer">
-
-          <base-button type="ghost" @event="instockDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="instockSave" :disabled="pending" >确 定</base-button>
-
-          <!--<el-button @click="instockDialog = false">取 消</el-button>-->
-          <!--<el-button type="primary" @click="instockSave" :disabled="pending">确 定</el-button>-->
+          <base-button type="ghost" @event="instockDialog = false">取 消</base-button>
+          <base-button type="primary" @event="instockSave" :disabled="pending">确 定</base-button>
         </div>
       </el-dialog>
 
-      <el-dialog title="出库操作" :visible.sync="outstockDialog" width="600px">
-        <part-outstock-form v-if="outstockDialog"  ref="outstockForm" :formdata="formdata" :sparepartConfig="sparepartConfig" :initData="initData"></part-outstock-form>
-        <div slot="footer" class="dialog-footer">
+      <el-dialog title="申请" :visible.sync="supplyDialog" width="900px">
+        <part-deal-with-form ref="partDealWithForm"></part-deal-with-form>
 
-          <base-button type="ghost" @event="outstockDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="outstockSave" :disabled="pending" >确 定</base-button>
+        <div slot="footer" class="dialog-footer">
+          <base-button type="ghost" @event="supplyDialog = false">取 消</base-button>
+          <base-button type="primary" @event="supplySave" :disabled="pending">确 定</base-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog title="出库操作" :visible.sync="outstockDialog" width="900px">
+        <part-outstock-form
+          v-if="outstockDialog"
+          ref="outstockForm"
+          :formdata="formdata"
+          :sparepart-config="sparepartConfig"
+          :init-data="initData"
+        ></part-outstock-form>
+
+        <div slot="footer" class="dialog-footer">
+          <base-button type="ghost" @event="outstockDialog = false">取 消</base-button>
+          <base-button type="primary" @event="outstockSave" :disabled="pending">确 定</base-button>
 
           <!--<el-button @click="outstockDialog = false">取 消</el-button>-->
           <!--<el-button type="primary" @click="outstockSave" :disabled="pending">确 定</el-button>-->
@@ -514,11 +780,16 @@
       </el-dialog>
 
       <el-dialog title="批量操作" :visible.sync="outstockBatchDialog" width="900px">
-        <part-applybatchout-form v-if="outstockBatchDialog"  ref="outstockBatchForm" :formdata="formdata" :repertory="repertory" :sparepartConfig="sparepartConfig"></part-applybatchout-form>
+        <part-applybatchout-form
+          v-if="outstockBatchDialog"
+          ref="outstockBatchForm"
+          :formdata="formdata"
+          :repertory="repertory"
+          :sparepart-config="sparepartConfig"
+        ></part-applybatchout-form>
         <div slot="footer" class="dialog-footer">
-
-          <base-button type="ghost" @event="outstockBatchDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="outstockBatchSave" :disabled="pending" >确 定</base-button>
+          <base-button type="ghost" @event="outstockBatchDialog = false">取 消</base-button>
+          <base-button type="primary" @event="outstockBatchSave" :disabled="pending">确 定</base-button>
 
           <!--<el-button @click="outstockBatchDialog = false">取 消</el-button>-->
           <!--<el-button type="primary" @click="outstockBatchSave" :disabled="pending">确 定</el-button>-->
@@ -526,11 +797,16 @@
       </el-dialog>
 
       <el-dialog title="批量操作" :visible.sync="instockBatchDialog" width="900px">
-        <part-applybatchin-form v-if="instockBatchDialog"  ref="instockBatchForm" :formdata="formdata" :repertory="repertory" :sparepartConfig="sparepartConfig"></part-applybatchin-form>
+        <part-applybatchin-form
+          v-if="instockBatchDialog"
+          ref="instockBatchForm"
+          :formdata="formdata"
+          :repertory="repertory"
+          :sparepart-config="sparepartConfig"
+        ></part-applybatchin-form>
         <div slot="footer" class="dialog-footer">
-
-          <base-button type="ghost" @event="instockBatchDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="instockBatchSave" :disabled="pending" >确 定</base-button>
+          <base-button type="ghost" @event="instockBatchDialog = false">取 消</base-button>
+          <base-button type="primary" @event="instockBatchSave" :disabled="pending">确 定</base-button>
 
           <!--<el-button @click="instockBatchDialog = false">取 消</el-button>-->
           <!--<el-button type="primary" @click="instockBatchSave" :disabled="pending">确 定</el-button>-->
@@ -538,11 +814,10 @@
       </el-dialog>
 
       <el-dialog title="备件分配撤回操作" :visible.sync="reStockDialog" width="600px">
-        <part-re-stock-form v-if="reStockDialog"  ref="reStockForm" :formdata="formdata"></part-re-stock-form>
+        <part-re-stock-form v-if="reStockDialog" ref="reStockForm" :formdata="formdata"></part-re-stock-form>
         <div slot="footer" class="dialog-footer">
-
-          <base-button type="ghost" @event="reStockDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="reStock" :disabled="pending" >确 定</base-button>
+          <base-button type="ghost" @event="reStockDialog = false">取 消</base-button>
+          <base-button type="primary" @event="reStock" :disabled="pending">确 定</base-button>
 
           <!--<el-button @click="reStockDialog = false">取 消</el-button>-->
           <!--<el-button type="primary" @click="reStock" :disabled="pending">确 定</el-button>-->
@@ -550,11 +825,14 @@
       </el-dialog>
 
       <el-dialog title="备件调拨撤回操作" :visible.sync="cancelTransferDialog" width="600px">
-        <part-cancel-transfer-form v-if="cancelTransferDialog"  ref="cancelTransferForm" :formdata="formdata"></part-cancel-transfer-form>
+        <part-cancel-transfer-form
+          v-if="cancelTransferDialog"
+          ref="cancelTransferForm"
+          :formdata="formdata"
+        ></part-cancel-transfer-form>
         <div slot="footer" class="dialog-footer">
-
-          <base-button type="ghost" @event="cancelTransferDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="cancelTransfer" :disabled="pending" >确 定</base-button>
+          <base-button type="ghost" @event="cancelTransferDialog = false">取 消</base-button>
+          <base-button type="primary" @event="cancelTransfer" :disabled="pending">确 定</base-button>
 
           <!--<el-button @click="cancelTransferDialog = false">取 消</el-button>-->
           <!--<el-button type="primary" @click="cancelTransfer" :disabled="pending">确 定</el-button>-->
@@ -564,34 +842,40 @@
       <el-dialog title="调拨入库操作" :visible.sync="transferDialog" width="600px">
         <part-transfer-form v-if="transferDialog" ref="transferForm" :formdata="formdata"></part-transfer-form>
         <div slot="footer" class="dialog-footer">
-
-          <base-button type="ghost" @event="transferDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="transfer" :disabled="pending" >确 定</base-button>
+          <base-button type="ghost" @event="transferDialog = false">取 消</base-button>
+          <base-button type="primary" @event="transfer" :disabled="pending">确 定</base-button>
 
           <!--<el-button @click="transferDialog = false">取 消</el-button>-->
           <!--<el-button type="primary" @click="transfer" :disabled="pending">确 定</el-button>-->
         </div>
       </el-dialog>
 
-      <base-export ref="exportPanel"
-         v-if="allowImportAndExport"
-         :columns="columns"
-         :validate="checkExportCount"
-         action="/partV2/approve/export"
-         :method="'post'"></base-export>
-
-
+      <base-export
+        ref="exportPanel"
+        v-if="allowImportAndExport"
+        :columns="columns"
+        :validate="checkExportCount"
+        action="/partV2/approve/export"
+        :method="'post'"
+      ></base-export>
     </div>
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title" style="display: flex;justify-content: space-between;align-items: center">
         <span>已选中数据({{selected.length}})</span>
-        <span v-if="selected.length" class="part-panel-btn" @click="toggleSelection()" title="清空已选中数据" data-placement="right" v-tooltip></span>
+        <span
+          v-if="selected.length"
+          class="part-panel-btn"
+          @click="toggleSelection()"
+          title="清空已选中数据"
+          data-placement="right"
+          v-tooltip
+        ></span>
       </h3>
 
       <div class="part-selected-panel">
         <div class="part-selected-tip" v-if="!selected.length">
-          <img src="../../../assets/img/no-data.png">
+          <img src="../../../assets/img/no-data.png" />
           <p>暂无选中的数据，请从列表中选择。</p>
         </div>
         <template v-else>
@@ -613,13 +897,12 @@
         </template>
       </div>
     </base-panel>
-
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
-import Page from "../../../model/Page";
+import Page from '@src/model/Page';
 import PartBackStockForm from './form/PartBackStockForm.vue';
 import PartOutStockForm from './form/PartAPPlyOutStockForm.vue';
 import PartInStockForm from './form/PartApplyInStockForm.vue';
@@ -628,6 +911,7 @@ import PartApplyFormBatchIn from './form/PartApplyFormBatchIn.vue';
 import PartReStockForm from './form/PartReStockForm.vue';
 import PartCancelTransferForm from './form/PartCancelTransferForm.vue';
 import PartTransferForm from './form/PartTransferForm.vue';
+import PartDealWithForm from './form/PartDealWithForm.vue';
 
 import DateUtil from '@src/util/date';
 import AuthUtil from '@src/util/auth';
@@ -647,11 +931,29 @@ export default {
       type: '',
       enable: '',
       pageNum: 1,
-      pageSize: pageSize,
+      pageSize,
       sparepartType: '',
+      sourceIds: '',
+      targetIds: '',
+      state:''
     };
 
     return {
+      stateArr: [
+        { value: 'suspending', label: '待处理', key: 'suspending' },
+        { value: 'solved', label: '已办理', key: 'solved' },
+        { value: 'rejected', label: '已拒绝', key: 'rejected' },
+        { value: 'cancel', label: '已取消', key: 'cancel' },
+        { value: 'revoked', label: '已撤回', key: 'revoked' }
+      ],
+      typeArr: [
+        { value: '出库', label: '出库', key: '0' },
+        { value: '入库', label: '入库', key: '1' },
+        { value: '调拨', label: '调拨', key: '2' },
+        { value: '分配', label: '分配', key: '3' },
+        { value: '申领', label: '申领 ', key: '4' },
+        { value: '退回', label: '退回', key: '5' }
+      ],
       selectedLimit: 500,
       auths: {},
       columns: this.buildColumns(),
@@ -678,7 +980,7 @@ export default {
         options: []
       },
       
-      originModel: originModel,
+      originModel,
       multipleSelectionPanelShow: false,
       model: _.assign({}, originModel),
 
@@ -692,7 +994,8 @@ export default {
       cancelTransferDialog: false,
       transferDialog: false,
       reStockDialog: false,
-      repertory:[], // 所有管理仓库
+      supplyDialog: false, // 申请弹窗
+      repertory: [], // 所有管理仓库
       repertories: [], // 所有仓库
       repertorySelected:'',
       sparepartConfig:{},
@@ -734,7 +1037,7 @@ export default {
     allowInout(){
       return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_INOUT');
     },
-    //是否允许导入导出
+    // 是否允许导入导出
     allowImportAndExport(){
       return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
     }
@@ -759,7 +1062,7 @@ export default {
       if(!this.allowImportAndExport || !this.allowInout) return;
 
       let ids = [];
-      let fileName = `${DateUtil.format(new Date(),'yyyy-MM-dd')}备件办理出入库数据.xlsx`;
+      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件办理出入库数据.xlsx`;
 
       if(!exportAll){
         if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
@@ -797,13 +1100,13 @@ export default {
     getApproveTimeArr(i, id){
       if(this.page.list[i].isApproveTimeArr) return;
 
-      this.$set(this.page.list[i],'disabled', false);
-      this.$set(this.page.list[i],'approveTimeArr', '加载中...');
+      this.$set(this.page.list[i], 'disabled', false);
+      this.$set(this.page.list[i], 'approveTimeArr', '加载中...');
       try{
-        this.$http.get('/partV2/repertory/diposal/time',{approveId:id}).then(res => {
-          this.$set(this.page.list[i],'approveTimeArr', res.data.join('\n'));
-          this.$set(this.page.list[i],'isApproveTimeArr', true);
-          if(res.data.length == 0) this.$set(this.page.list[i],'disabled', true);
+        this.$http.get('/partV2/repertory/diposal/time', {approveId:id}).then(res => {
+          this.$set(this.page.list[i], 'approveTimeArr', res.data.join('\n'));
+          this.$set(this.page.list[i], 'isApproveTimeArr', true);
+          if(res.data.length == 0) this.$set(this.page.list[i], 'disabled', true);
         })
       }catch(error){
         console.log(error)
@@ -811,13 +1114,13 @@ export default {
     },
     getRecordNoArr(i, id) {
       if(this.page.list[i].isRecordNoArr) return;
-      this.$set(this.page.list[i],'disabled', false);
-      this.$set(this.page.list[i],'recordNoArr', '加载中...');
+      this.$set(this.page.list[i], 'disabled', false);
+      this.$set(this.page.list[i], 'recordNoArr', '加载中...');
       try{
-        this.$http.get('/partV2/repertory/diposal/recordNo',{approveId:id}).then(res => {
-          this.$set(this.page.list[i],'recordNoArr', res.data.join('\n'));
-          this.$set(this.page.list[i],'isRecordNoArr', true);
-          if(res.data.length == 0) this.$set(this.page.list[i],'disabled', true);
+        this.$http.get('/partV2/repertory/diposal/recordNo', {approveId:id}).then(res => {
+          this.$set(this.page.list[i], 'recordNoArr', res.data.join('\n'));
+          this.$set(this.page.list[i], 'isRecordNoArr', true);
+          if(res.data.length == 0) this.$set(this.page.list[i], 'disabled', true);
         })
       }catch(error){
         console.log(error)
@@ -914,13 +1217,13 @@ export default {
     },
     initialize(){
       Promise.all([
-        this.fetchRepertory(),
-        this.fetchAllRepertory(),
+        this.fetchRepertory(), // 个人管理所有仓库
+        this.fetchAllRepertory(), // 所有仓库
         this.loadData(),
         this.fecthSparepartConfig(),
-        this.fetchUserApply(),
-        this.fetchUserApprove(),
-        this.fetchSparepart(),
+        this.fetchUserApply(), // 所有管理人员
+        this.fetchUserApprove(), // 所有管理人员
+        this.fetchSparepart()
       ])
         .then(res => {
           let allRepertory = res[1];
@@ -955,7 +1258,7 @@ export default {
       this.loadData();
     },
     reset(){
-      this.model = _.assign({},this.originModel);
+      this.model = _.assign({}, this.originModel);
       this.timeValue = [];
       this.updateTimeValue = [];
       this.sparepart.sparepartId = '';
@@ -982,24 +1285,25 @@ export default {
     fetchUserApply(keyword){
       // 获取用户
       let model = {
-        keyword: keyword,
+        keyword,
         pageSize: 50
       }
-      this.userApply.loading = true
-      this.$http.get('/partV2/repertory/user/list',model)
-        .then(result => this.userApply.options = result.list)
+      this.userApply.loading = true;
+      this.$http
+        .get('/partV2/repertory/users', model)
+        .then(result => (this.userApply.options = result))
         .catch(err => console.log(err))
         .finally(() => this.userApply.loading = false);
     },
     fetchUserApprove(keyword){
       // 获取用户
       let model = {
-        keyword: keyword,
+        keyword,
         pageSize: 50
       }
-      this.userApply.loading = true
-      this.$http.get('/partV2/repertory/user/list',model)
-        .then(result => this.userApprove.options = result.list)
+      this.userApply.loading = true;
+      this.$http.get('/partV2/repertory/users', model)
+        .then(result => (this.userApprove.options = result))
         .catch(err => console.log(err))
         .finally(() => this.userApprove.loading = false);
     },
@@ -1011,7 +1315,7 @@ export default {
         pageSize: 50
       }
       this.sparepart.loading = true
-      this.$http.get('/partV2/repertory/sparepart/list',model)
+      this.$http.get('/partV2/repertory/sparepart/list', model)
         .then(result => this.sparepart.options = result.list)
         .catch(err => console.log(err))
         .finally(() => this.sparepart.loading = false);
@@ -1040,7 +1344,7 @@ export default {
     },
     fetchData(){
       // 获取申请列表
-      return this.$http.get('/partV2/approve/list/allApprove',this.model).then(result => {
+      return this.$http.get('/partV2/approve/list/allApprove', this.model).then(result => {
         // repertory
         let list = (result.data.list || [])
           .map(item => {
@@ -1083,35 +1387,35 @@ export default {
       })
     },
 
-    //获取全部仓库列表
+    // 获取全部仓库列表
     fetchAllRepertory(){
       return this.$http.get('/partV2/repertory/allRepertory')
         .then(result => {
-         return this.repertories = result || []
+          return this.repertories = result || []
         })
         .catch(err => console.error(err))
     },
     chooseRepertory(value){
       this.trackEventhandler('chooseRepertory');
 
-      this.repertoryName = value;
-      if(value){
-        this.model.repertoryId = value
-      }else{
-        delete this.model.repertoryId
-      }
+      // this.repertoryName = value;
+      // if(value){
+      //   this.model.repertoryId = value
+      // }else{
+      //   delete this.model.repertoryId
+      // }
       this.model.pageNum = 1;
       this.loadData()
     },
     chooseState(value){
       this.stateTrackEventHandler(value);
 
-      this.state = value;
-      if(value){
-        this.model.state = value
-      }else{
-        delete this.model.state
-      }
+      // this.state = value;
+      // if(value){
+      //   this.model.state = value
+      // }else{
+      //   delete this.model.state
+      // }
       this.model.pageNum = 1;
       this.loadData()
     },
@@ -1262,7 +1566,7 @@ export default {
       }
       this.pending = false;
     },
-    //出库
+    // 出库
     async outstockSave(){
       let form = this.$refs.outstockForm;
       if(null == form) return;
@@ -1304,7 +1608,7 @@ export default {
       }
       this.pending = false;
     },
-    //入库
+    // 入库
     async instockSave(){
       let form = this.$refs.instockForm;
       if(null == form) return;
@@ -1427,113 +1731,105 @@ export default {
 
       let columns = [
         {
-          label: '发起人',
-          field: 'propserName',
-          show: true,
-          minWidth: 120
-        },
-        {
-          label: '类别',
-          field: 'type',
-          show: true,
-          width: 80
-        },
-        {
-          label: '状态',
-          field: 'state',
-          show: true
-        },
-        {
-          label: '发起时间',
+          label: '申请日期',
           field: 'propserTime',
           exportAlias: 'proposeTime',
           show: true,
+          sortable: 'prosperTime',
           width: 160
         },
         {
-          label: '备件名称',
+          label: '办理编号',
+          exportAlias: 'approveNo',
+          field: 'approveNo',
+          show: true,
+          width: 150
+        },
+        {
+          label: '状态',
+          exportAlias: 'state',
+          field: 'state',
+          sortable: 'state',
+          show: true
+        },
+        {
+          label: '申请类别',
+          exportAlias: 'type',
+          field: 'type',
+          show: true
+        },
+        {
+          label: '申请备件名称',
           field: 'name',
-          exportAlias: 'sparepartName',
+          exportAlias: 'name',
           show: true,
           minWidth: 150
         },
         {
-          label: '备件编号',
-          field: 'serialNumber',
-          exportAlias: 'sparepartSN',
-          show: true,
-          minWidth: 150
+          label: '申请数量',
+          exportAlias: 'num',
+          field: 'num',
+          show: false
+        },
+
+        {
+          label: '涉及金额',
+          exportAlias: 'price',
+          field: 'price',
+          show: true
         },
         {
-          label: '备件类别',
-          field: 'sparepart.type',
-          exportAlias: 'sparepartType',
-          show: true,
-          minWidth: 150
-        },
-        {
-          label: '备件规格',
-          field: 'standard',
-          exportAlias: 'sparepartStandard',
-          show: true,
-          minWidth: 150
-        },
-        {
-          label: '仓库',
-          field: 'repertory',
-          exportAlias: 'repertoryName',
-          show: true,
-          minWidth: 150
-        },
-        {
-          label: '目标库',
+          label: '目标仓库',
           field: 'targetName',
+          exportAlias: 'targetName',
           show: true,
           minWidth: 120
         },
         {
-          field: 'executorName',
+          label: '原始仓库',
+          field: 'repertory',
+          exportAlias: 'repertory',
+          show: true,
+          minWidth: 150
+        },
+        {
+          label: '发起人',
+          field: 'prosperName',
+          exportAlias: 'prosperName',
+          show: true
+        },
+
+        {
+          label: '待办数／已办数',
+          field: 'applyCount',
+          exportAlias: 'applyCount',
+          show: true,
+          width: 150
+        },
+        // {
+        //   label: '已办理数',
+        //   field: 'variation_',
+        //   exportAlias: 'solvedVariation',
+        //   show: true,
+        //   width: 80
+        // },
+
+        {
+          field: 'approvaName',
           label: '办理人',
+          exportAlias: 'approvaName',
           show: true,
           width: 120,
-          minWidth: 120,
-          overflow:false
+          overflow: false
         },
         {
-          field: 'updateTime',
+          field: 'approveTime',
           label: '办理时间',
-          show: true,
-          width: 180,
-          minWidth: 180,
-          overflow:false
-        },
-        {
-          field: 'recordNo',
-          label: '出入库编号',
-          show: true,
-          width: 250,
-          minWidth: 250,
-          overflow:false
-        },
-        {
-          label: '备注',
-          field: 'remark',
-          show: true,
-          minWidth: 120
-        },
-        {
-          label: '待办理数',
-          field: 'variation',
-          exportAlias: 'pendingVariation',
-          show: true,
-          width: 80
-        },
-        {
-          label: '已办理数',
-          field: 'variation_',
-          exportAlias: 'solvedVariation',
-          show: true,
-          width: 80
+          exportAlias: 'approveTime',
+          show: false,
+          width: 120,
+          overflow: false,
+          sortable: 'approveTime'
         },
         {
           label: '操作',
@@ -1543,7 +1839,7 @@ export default {
           fixed: 'right',
           export: false
         }
-      ]
+      ];
 
       columns.forEach(column => {
         let isShow = localData[column.field];
@@ -1558,65 +1854,82 @@ export default {
     // TalkingData事件埋点
     trackEventhandler (type) {
       switch (type) {
-        case 'search':
-          this.$tdOnEvent('pc：办理出入库-搜索事件');
-          break;
-        case 'reset':
-          this.$tdOnEvent('pc：办理出入库-重置事件');
-          break;
-        case 'advSearch':
-          this.$tdOnEvent('pc：办理出入库-高级搜索事件');
-          break;
-        case 'chooseRepertory':
-          this.$tdOnEvent('pc：办理出入库-仓库筛选下拉框事件');
-          break;
-        case 'batch-stock-out':
-          this.$tdOnEvent('pc：办理出入库-批量出库事件');
-          break;
-        case 'batch-stock-in':
-          this.$tdOnEvent('pc：办理出入库-批量入库事件');
-          break;
-        case 'selectColumn':
-          this.$tdOnEvent('pc：办理出入库-选择列事件');
-          break;
-        default:
-          break;                                      
+      case 'search':
+        this.$tdOnEvent('pc：办理出入库-搜索事件');
+        break;
+      case 'reset':
+        this.$tdOnEvent('pc：办理出入库-重置事件');
+        break;
+      case 'advSearch':
+        this.$tdOnEvent('pc：办理出入库-高级搜索事件');
+        break;
+      case 'chooseRepertory':
+        this.$tdOnEvent('pc：办理出入库-仓库筛选下拉框事件');
+        break;
+      case 'batch-stock-out':
+        this.$tdOnEvent('pc：办理出入库-批量出库事件');
+        break;
+      case 'batch-stock-in':
+        this.$tdOnEvent('pc：办理出入库-批量入库事件');
+        break;
+      case 'selectColumn':
+        this.$tdOnEvent('pc：办理出入库-选择列事件');
+        break;
+      default:
+        break;                                      
       }
     },
     // state (selector) TalingData事件埋点
     stateTrackEventHandler (type) {
       switch (type) {
-        case '':
-          this.$tdOnEvent('pc：办理出入库-全部事件');
-          break;
-        case 'suspending':
-          this.$tdOnEvent('pc：办理出入库-待办理事件');
-          break;
-        case 'solved':
-          this.$tdOnEvent('pc：办理出入库-已办理事件');
-          break;
-        default:
-          break;
+      case '':
+        this.$tdOnEvent('pc：办理出入库-全部事件');
+        break;
+      case 'suspending':
+        this.$tdOnEvent('pc：办理出入库-待办理事件');
+        break;
+      case 'solved':
+        this.$tdOnEvent('pc：办理出入库-已办理事件');
+        break;
+      default:
+        break;
       }
     },
     // table TalkingData事件埋点
     tableTrackEventHandler (type) {
       switch (type) {
-        case 'stock-out':
-          this.$tdOnEvent('pc：办理出入库-列表办理出库事件');
-          break;
-        case 'reject':
-          this.$tdOnEvent('pc：办理出入库-列表拒绝事件');
-          break;
-        case 'recall':
-          this.$tdOnEvent('pc：办理出入库-列表撤回事件');
-          break;
-        default:
-          break;                                      
+      case 'stock-out':
+        this.$tdOnEvent('pc：办理出入库-列表办理出库事件');
+        break;
+      case 'reject':
+        this.$tdOnEvent('pc：办理出入库-列表拒绝事件');
+        break;
+      case 'recall':
+        this.$tdOnEvent('pc：办理出入库-列表撤回事件');
+        break;
+      default:
+        break;                                      
       }
     },
     variationNum (num1, num2) {
       return this.$math.format(this.$math.subtract(this.$math.bignumber(num1), this.$math.bignumber(num2)))
+    },
+    sortChange(option) {
+      console.log(option);
+    },
+    supplySave() {
+      let data = this.$refs.partDealWithForm
+        .getData()
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          this.$message({
+            showClose: true,
+            message: err.message,
+            type: 'error'
+          });
+        });
     }
   },
   mounted(){
@@ -1640,6 +1953,7 @@ export default {
     [PartReStockForm.name]: PartReStockForm,
     [PartCancelTransferForm.name]: PartCancelTransferForm,
     [PartTransferForm.name]: PartTransferForm,
+    [PartDealWithForm.name]: PartDealWithForm
   }
 }
 </script>

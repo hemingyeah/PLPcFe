@@ -1,40 +1,38 @@
 <template>
   <div class="page">
-
     <div class="base-search-group-container">
       <form class="base-search" onsubmit="return false;">
         <div class="customer-list-base-search-group">
           <el-input v-model="model.keyWord" placeholder="根据备件信息搜索">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <base-button type="primary" @event="model.pageNum=1;search();trackEventHandler('search')" native-type="submit">
-            搜索
-          </base-button>
-          <base-button type="ghost" @event="reset();trackEventHandler('reset')">
-            重置
-          </base-button>
+          <base-button
+            type="primary"
+            @event="model.pageNum=1;search();trackEventHandler('search')"
+            native-type="submit"
+          >搜索</base-button>
+          <base-button type="ghost" @event="reset();trackEventHandler('reset')">重置</base-button>
         </div>
-        <span class="advanced-search-visible-btn" @click="isExpand = !isExpand;trackEventHandler('advSearch')">
-          <i :class="`iconfont ${isExpand ? 'el-icon-minus' : 'el-icon-plus'}`" ></i>
+        <span
+          class="advanced-search-visible-btn"
+          @click="isExpand = !isExpand;trackEventHandler('advSearch')"
+        >
+          <i :class="`iconfont ${isExpand ? 'el-icon-minus' : 'el-icon-plus'}`"></i>
           高级搜索
         </span>
       </form>
     </div>
 
-
-
-
-
     <form @submit.prevent="search();trackEventHandler('search');">
       <!--<div class="page-panel">-->
-        <!--<div class="page-panel-body search-form-nano">-->
-          <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
-          <!--<el-button-group>-->
-            <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
-            <!--<el-button @click="reset();trackEventHandler('reset')">重置</el-button>-->
-          <!--</el-button-group>-->
-          <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
-        <!--</div>-->
+      <!--<div class="page-panel-body search-form-nano">-->
+      <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
+      <!--<el-button-group>-->
+      <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
+      <!--<el-button @click="reset();trackEventHandler('reset')">重置</el-button>-->
+      <!--</el-button-group>-->
+      <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
+      <!--</div>-->
       <!--</div>-->
 
       <base-collapse-panel :value="isExpand" class="page-panel">
@@ -51,68 +49,82 @@
                   <el-option :label="item" :value="item" v-for="item in types" :key="item"></el-option>
                 </el-select>
               </div>
-            </div> -->
+            </div>-->
             <div class="form-item">
               <label>备件名称</label>
               <div class="form-item-content">
-                  <el-select popper-class="common-advance-popper" style="width: 100%;"
-                      :value="sparepart.sparepartId"   
-                      @input="chooseSparepart"
-                      filterable
-                      clearable
-                      remote
-                      placeholder="选择备件"
-                      :remote-method="fetchSparepart"
-                      :loading="sparepart.loading">
-
-                      <el-option
-                        v-for="item in sparepart.options"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id">
-                        <div class="part-option">
-                          <p>编号：{{item.serialNumber}}</p>
-                          <p>名称：{{item.name}}</p>
-                        </div>
-                      </el-option>
-                  </el-select>
-                </div>
+                <el-select
+                  popper-class="common-advance-popper"
+                  style="width: 100%;"
+                  :value="sparepart.sparepartId"
+                  @input="chooseSparepart"
+                  filterable
+                  clearable
+                  remote
+                  placeholder="选择备件"
+                  :remote-method="fetchSparepart"
+                  :loading="sparepart.loading"
+                >
+                  <el-option
+                    v-for="item in sparepart.options"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                    <div class="part-option">
+                      <p>编号：{{item.serialNumber}}</p>
+                      <p>名称：{{item.name}}</p>
+                    </div>
+                  </el-option>
+                </el-select>
+              </div>
             </div>
             <div class="form-item">
               <label>类别</label>
               <div class="form-item-content">
-                 <el-select placeholder="请选择操作类型" v-model="model.type">
-                  <el-option label="全部" value=""></el-option>
+                <el-select placeholder="请选择操作类型" v-model="model.type">
+                  <el-option label="全部" value></el-option>
                   <el-option label="出库" value="出库"></el-option>
                   <el-option label="入库" value="入库"></el-option>
                 </el-select>
               </div>
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-item">
               <label>日期筛选</label>
               <div class="form-item-content">
-                 <el-date-picker @change="seeTime()" style="width:100%"
-                v-model="timeValue"
-                type="daterange"
-                align="right"
-                unlink-panels
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :picker-options="pickerOptions2">
-              </el-date-picker>
+                <el-date-picker
+                  @change="seeTime()"
+                  style="width:100%"
+                  v-model="timeValue"
+                  type="daterange"
+                  align="right"
+                  unlink-panels
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :picker-options="pickerOptions2"
+                ></el-date-picker>
               </div>
             </div>
             <div class="form-item">
               <label>出入库类型</label>
               <div class="form-item-content">
-                <el-select  placeholder="请选择出入库类型" v-model="model.item">
+                <el-select placeholder="请选择出入库类型" v-model="model.item">
                   <!-- <el-option label="全部" value=""></el-option> -->
-                  <el-option-group v-for="group in sparepartConfig" :key="group.label" :label="group.label">
-                    <el-option :label="item" :value="item" v-for="item in group.options" :key="item"></el-option>
+                  <el-option-group
+                    v-for="group in sparepartConfig"
+                    :key="group.label"
+                    :label="group.label"
+                  >
+                    <el-option
+                      :label="item"
+                      :value="item"
+                      v-for="item in group.options"
+                      :key="item"
+                    ></el-option>
                   </el-option-group>
                 </el-select>
               </div>
@@ -123,36 +135,40 @@
             <div class="form-item">
               <label>办理人</label>
               <div class="form-item-content">
-                  <el-select class="srp-list-form-item" style="width: 100%;"
-                      :value="user.userId"   
-                      @input="chooseUser"
-                      filterable
-                      clearable
-                      remote
-                      placeholder="选择人员"
-                      :remote-method="fetchUser"
-                      :loading="user.loading">
-
-                      <el-option
-                        v-for="item in user.options"
-                        :key="item.userId"
-                        :label="item.displayName"
-                        :value="item.userId">
-
-                        <div class="srp-user-item">
-                          <img :src="item.head || '/resource/images/account_userhead.png'">
-                          <p>{{item.displayName}}</p>
-                        </div>
-                      </el-option>
-                  </el-select>
-                </div>
+                <el-select
+                  class="srp-list-form-item"
+                  style="width: 100%;"
+                  :value="user.userId"
+                  @input="chooseUser"
+                  filterable
+                  clearable
+                  remote
+                  placeholder="选择人员"
+                  :remote-method="fetchUser"
+                  :loading="user.loading"
+                >
+                  <el-option
+                    v-for="item in user.options"
+                    :key="item.userId"
+                    :label="item.displayName"
+                    :value="item.userId"
+                  >
+                    <div class="srp-user-item">
+                      <img :src="item.head || '/resource/images/account_userhead.png'" />
+                      <p>{{item.displayName}}</p>
+                    </div>
+                  </el-option>
+                </el-select>
               </div>
+            </div>
 
             <div class="form-item">
-              
+              <label>办理编号</label>
+              <div class="form-item-content">
+                <el-input v-model="model.approveNo"></el-input>
+              </div>
             </div>
           </div>
-                  
 
           <div class="form-row">
             <div class="text-right" style="width:100%;">
@@ -168,81 +184,107 @@
 
     <div class="page-panel" style="margin: 0;">
       <div class="page-panel-body">
-        
         <!-- 选择仓库（默认全部） -->
         <el-row class="block-col-2">
-         <el-select  :value="repertoryName" @input="chooseRepertory" class="srp-list-form-item" style="width: 150px;">
-             <el-option label="全部仓库" value=""></el-option>
-             <el-option v-for="item in repertory" :key="item.id" :value="item.id" :label="item.name"></el-option>
-        </el-select>
-        <div class="pull-right">
-          <el-button-group>
-            <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150"> 
-              <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn" >选择列<i class="iconfont icon-nav-down"></i></span>
+          <el-select
+            :value="repertoryName"
+            @input="chooseRepertory"
+            class="srp-list-form-item"
+            style="width: 150px;"
+          >
+            <el-option label="全部仓库" value></el-option>
+            <el-option v-for="item in repertory" :key="item.id" :value="item.id" :label="item.name"></el-option>
+          </el-select>
+          <div class="pull-right">
+            <el-button-group>
+              <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
+                <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn">
+                  选择列
+                  <i class="iconfont icon-nav-down"></i>
+                </span>
 
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-for="column in columns" :key="column.field"> 
-                  <el-checkbox :value="column.show" @input="chooseColnum(column)">{{column.label}}</el-checkbox>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>  
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item v-for="column in columns" :key="column.field">
+                    <el-checkbox :value="column.show" @input="chooseColnum(column)">{{column.label}}</el-checkbox>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
 
-          <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150" v-if="allowImportAndExport" @command="trackEventHandler('moreAction')"> 
-            <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn" >更多操作<i class="iconfont icon-nav-down"></i></span>
+              <el-dropdown
+                :hide-on-click="false"
+                trigger="click"
+                :show-timeout="150"
+                v-if="allowImportAndExport"
+                @command="trackEventHandler('moreAction')"
+              >
+                <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn">
+                  更多操作
+                  <i class="iconfont icon-nav-down"></i>
+                </span>
 
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item> 
-                <span class="dropdown-item" @click="exportData(false)">导出</span>
-              </el-dropdown-item>
-               <el-dropdown-item> 
-                <span class="dropdown-item" @click="exportData(true)">导出全部</span>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>  
-          </el-button-group>  
-        </div>
-      
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <span class="dropdown-item" @click="exportData(false)">导出</span>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <span class="dropdown-item" @click="exportData(true)">导出全部</span>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </el-button-group>
+          </div>
         </el-row>
       </div>
     </div>
 
     <div style="background: #fff;padding: 0 10px">
-      <base-selection-bar ref="baseSelectionBar" v-model="selected" @toggle-selection="toggleSelection" @show-panel="() => multipleSelectionPanelShow = true" />
+      <base-selection-bar
+        ref="baseSelectionBar"
+        v-model="selected"
+        @toggle-selection="toggleSelection"
+        @show-panel="() => multipleSelectionPanelShow = true"
+      />
     </div>
 
     <div class="table-container">
-      <el-table stripe
-                ref="table"
-                :data="page.list"
-                header-row-class-name="base-table-header"
-                @select="handleSelection"
-                @select-all="handleSelection">
+      <el-table
+        stripe
+        ref="table"
+        :data="page.list"
+        header-row-class-name="base-table-header"
+        @select="handleSelection"
+        @select-all="handleSelection"
+      >
+        <el-table-column type="selection" width="44"></el-table-column>
 
         <el-table-column
-          type="selection"
-          width="44">
-        </el-table-column>
-
-        <el-table-column v-for="column in columns" :key="column.field"
-                         v-if="column.show"
-                         :label="column.label"
-                         :width="column.width"
-                         :prop="column.field"
-                         :min-width="column.minWidth"
-                         :show-overflow-tooltip="column.showTip !== false">
-
+          v-for="column in columns"
+          :key="column.field"
+          v-if="column.show"
+          :label="column.label"
+          :width="column.width"
+          :prop="column.field"
+          :min-width="column.minWidth"
+          :show-overflow-tooltip="column.showTip !== false"
+        >
           <template slot-scope="scope">
             <template v-if="column.field == 'sparepart.serialNumber'">
               <template v-if="scope.row.sparepart">{{scope.row.sparepart.serialNumber}}</template>
             </template>
             <template v-else-if="column.field == 'sparepart.name'">
-              <template v-if="scope.row.sparepart">{{scope.row.sparepart && scope.row.sparepart.name}}</template>
+              <template
+                v-if="scope.row.sparepart"
+              >{{scope.row.sparepart && scope.row.sparepart.name}}</template>
             </template>
             <template v-else-if="column.field == 'sparepart.type'">
-              <template v-if="scope.row.sparepart">{{scope.row.sparepart && scope.row.sparepart.type}}</template>
+              <template
+                v-if="scope.row.sparepart"
+              >{{scope.row.sparepart && scope.row.sparepart.type}}</template>
             </template>
             <template v-else-if="column.field == 'sparepart.standard'">
-              <template v-if="scope.row.sparepart">{{scope.row.sparepart && scope.row.sparepart.standard}}</template>
+              <template
+                v-if="scope.row.sparepart"
+              >{{scope.row.sparepart && scope.row.sparepart.standard}}</template>
             </template>
             <template v-else-if="column.field == 'repertory.name'">
               <template v-if="scope.row.repertory">{{scope.row.repertory.name}}</template>
@@ -256,19 +298,21 @@
                 <div class="text-overflow-hidden">{{scope.row[column.field]}}</div>
               </el-tooltip>
             </template>
-            <template v-else>
-              {{scope.row[column.field]}}
-            </template>
+            <template v-else>{{scope.row[column.field]}}</template>
           </template>
-
         </el-table-column>
       </el-table>
     </div>
 
     <div class="table-footer">
       <div class="list-info">
-        共<span class="level-padding">{{page.total}}</span>记录，
-        已选中<span class="base-table-selected-count" @click="multipleSelectionPanelShow = true">{{selected.length}}</span>条
+        共
+        <span class="level-padding">{{page.total}}</span>记录，
+        已选中
+        <span
+          class="base-table-selected-count"
+          @click="multipleSelectionPanelShow = true"
+        >{{selected.length}}</span>条
         <span class="base-table-selected-count" @click="toggleSelection()">清空</span>
       </div>
       <el-pagination
@@ -280,25 +324,34 @@
         :page-size="model.pageSize"
         :current-page="model.pageNum"
         layout="prev, pager, next, sizes, jumper"
-        :total="page.total">
-      </el-pagination>
+        :total="page.total"
+      ></el-pagination>
     </div>
 
-    <base-export ref="exportPanel"
+    <base-export
+      ref="exportPanel"
       v-if="allowImportAndExport"
       :columns="columns"
       action="/partV2/repertory/exportRepoRecord"
-      :method="'post'"></base-export>
+      :method="'post'"
+    ></base-export>
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title" style="display: flex;justify-content: space-between;align-items: center">
         <span>已选中数据({{selected.length}})</span>
-        <span v-if="selected.length" class="part-panel-btn" @click="toggleSelection()" title="清空已选中数据" data-placement="right" v-tooltip></span>
+        <span
+          v-if="selected.length"
+          class="part-panel-btn"
+          @click="toggleSelection()"
+          title="清空已选中数据"
+          data-placement="right"
+          v-tooltip
+        ></span>
       </h3>
 
       <div class="part-selected-panel">
         <div class="part-selected-tip" v-if="!selected.length">
-          <img src="../../../assets/img/no-data.png">
+          <img src="../../../assets/img/no-data.png" />
           <p>暂无选中的数据，请从列表中选择。</p>
         </div>
         <template v-else>
@@ -318,17 +371,16 @@
         </template>
       </div>
     </base-panel>
-
   </div>
 </template>
 
 <script>
 import _ from 'lodash';
 import qs from '@src/util/QueryString';
-import Page from "../../../model/Page";
+import Page from '@src/model/Page';
 import DateUtil from '@src/util/date';
 import AuthUtil from '@src/util/auth';
-import StorageUtil from '@src/util/StorageUtil';
+import StorageUtil from '@src/util/storageUtil';
 
 const STORAGE_COLNUM_KEY = 'repe_record_list_column';
 const STORAGE_PAGESIZE_KEY = 'repe_record_list_pagesize';
@@ -346,7 +398,8 @@ export default {
       item: '',
       enable: '',
       pageNum: 1,
-      pageSize: pageSize
+      pageSize,
+      approveNo: '' //  办理编号
     };
 
     return {
@@ -369,7 +422,7 @@ export default {
         loading: false,
         options: []
       },
-      originModel: originModel,
+      originModel,
       model: _.assign({}, originModel),
 
       page: new Page(),
@@ -415,7 +468,7 @@ export default {
     }
   },
   computed: {
-    //是否允许导入导出
+    // 是否允许导入导出
     allowImportAndExport(){
       return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
     }
@@ -526,7 +579,7 @@ export default {
         title: '备件品类详情'
       })
     },
-    //导出库存记录
+    // 导出库存记录
     exportData(exportAll){
       if(!this.allowImportAndExport) return;
       let ids = [];
@@ -536,7 +589,7 @@ export default {
         ids = this.selected.map(item => item.id);
       }
       
-      this.$refs.exportPanel.open(ids, `${DateUtil.format(new Date(),'yyyy-MM-dd')}出入库记录.xlsx`);
+      this.$refs.exportPanel.open(ids, `${DateUtil.format(new Date(), 'yyyy-MM-dd')}出入库记录.xlsx`);
     },
     select(data){
       this.selected = data;
@@ -544,7 +597,7 @@ export default {
     
     initialize(){
       this.loadData();
-      //this.fetchRepertory();
+      // this.fetchRepertory();
       this.fecthSparepartConfig()
       this.fetchUser();
       this.fetchSparepart();
@@ -565,7 +618,7 @@ export default {
       this.loadData();
     },
     reset(){
-      this.model = _.assign({},this.originModel);
+      this.model = _.assign({}, this.originModel);
       this.sparepart.sparepartId = '';
       this.timeValue = [];
       this.user.userId = '';
@@ -625,11 +678,11 @@ export default {
     fetchUser(keyword){
       // 获取用户
       let model = {
-        keyword: keyword,
+        keyword,
         pageSize: 50
       }
       this.user.loading = true
-      this.$http.get('/partV2/repertory/user/list',model)
+      this.$http.get('/partV2/repertory/user/list', model)
         .then(result => this.user.options = result.list)
         .catch(err => console.log(err))
         .finally(() => this.user.loading = false);
@@ -642,7 +695,7 @@ export default {
         pageSize: 50
       }
       this.sparepart.loading = true
-      this.$http.get('/partV2/repertory/sparepart/list',model)
+      this.$http.get('/partV2/repertory/sparepart/list', model)
         .then(result => this.sparepart.options = result.list)
         .catch(err => console.log(err))
         .finally(() => this.sparepart.loading = false);
@@ -800,26 +853,26 @@ export default {
     // TalkingData事件埋点
     trackEventHandler (type) {
       switch (type) {
-        case 'search':
-          this.$tdOnEvent('pc：出入库记录-搜索事件');
-          break;
-        case 'reset':
-          this.$tdOnEvent('pc：出入库记录-重置事件');
-          break;
-        case 'advSearch':
-          this.$tdOnEvent('pc：出入库记录-高级搜索事件');
-          break;
-        case 'chooseRepertory':
-          this.$tdOnEvent('pc：出入库记录-仓库筛选下拉框事件');
-          break;
-        case 'selectColumn':
-          this.$tdOnEvent('pc：出入库记录-选择列事件');
-          break;
-        case 'moreAction':
-          this.$tdOnEvent('pc：出入库记录-更多操作事件');
-          break;                                                  
-        default:
-          break;
+      case 'search':
+        this.$tdOnEvent('pc：出入库记录-搜索事件');
+        break;
+      case 'reset':
+        this.$tdOnEvent('pc：出入库记录-重置事件');
+        break;
+      case 'advSearch':
+        this.$tdOnEvent('pc：出入库记录-高级搜索事件');
+        break;
+      case 'chooseRepertory':
+        this.$tdOnEvent('pc：出入库记录-仓库筛选下拉框事件');
+        break;
+      case 'selectColumn':
+        this.$tdOnEvent('pc：出入库记录-选择列事件');
+        break;
+      case 'moreAction':
+        this.$tdOnEvent('pc：出入库记录-更多操作事件');
+        break;                                                  
+      default:
+        break;
       }
     }
   },

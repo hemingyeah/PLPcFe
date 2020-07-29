@@ -48,6 +48,21 @@
     .el-dialog__header{
       padding: 8px 10px;
       border-bottom: 1px solid #f4f4f4;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .el-dialog__headerbtn {
+      position: relative;
+      top: unset;
+      bottom: unset;
+
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      
+      font-size: 16px;
     }
   
     .el-dialog__body{
