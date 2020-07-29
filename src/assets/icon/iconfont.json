@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "308752",
+      "name": "微信",
+      "font_class": "weixin",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "3320274",
+      "name": "服务评价-客服",
+      "font_class": "kefu1",
+      "unicode": "e7b0",
+      "unicode_decimal": 59312
+    },
+    {
+      "icon_id": "11631536",
+      "name": "工作台",
+      "font_class": "gongzuotai",
+      "unicode": "e93b",
+      "unicode_decimal": 59707
+    },
+    {
+      "icon_id": "12780415",
+      "name": "电 话",
+      "font_class": "dianhua",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
       "icon_id": "4026874",
       "name": "Ding",
       "font_class": "Ding",
