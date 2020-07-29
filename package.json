@@ -9,11 +9,10 @@
   },
   "scripts": {
     "dev": "node --max_old_space_size=8192 script/development.js",
-    "build": "node script/production.js",
+    "build:new": "node script/production.js",
     "lint": "eslint --fix --ext .js,.vue src",
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
     "comp": "node script/component.js",
-    "build:new": "node script/production.js",
     "tag": "./script/tag.sh ${1} ${2}",
     "br": "./script/br.sh ${1} ${2} ${3}"
   },
