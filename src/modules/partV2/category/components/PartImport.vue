@@ -19,8 +19,12 @@
       <slot name="next">2、上传修改后批量更新文件</slot>
       <p>{{fileName}}</p>
       <el-button type="primary" @click="choose" :disabled="pending">上传</el-button>
-      <input type="file" ref="file" @change="change"
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+      <input 
+        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        type="file" 
+        ref="file" 
+        @change="change"
+      />
     </div>
     
     <div class="base-import-error" v-if="errors.length > 0">
@@ -100,7 +104,7 @@ export default {
       this.file = file
     },
     upload(){
-      if(null == this.file || !(this.file instanceof File)) return Platform.alert(`请选择要导入的文件`);
+      if(null == this.file || !(this.file instanceof File)) return Platform.alert('请选择要导入的文件');
       this.$confirm('更新成功后将无法恢复，是否确认?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消'
@@ -120,17 +124,17 @@ export default {
           this.errors = data;
         }
       })
-      .catch(err => {
-        console.error(err)
-      })
-      .finally(() => {
-        this.pending = false;
-      })
+        .catch(err => {
+          console.warn(err)
+        })
+        .finally(() => {
+          this.pending = false;
+        })
     },
     downloadData() {
       // /partV2/category/export/update/template?
       let params = this.templateParams;
-      let fileName = `${DateUtil.format(new Date(),'yyyy-MM-dd')}备件数据.xlsx`;
+      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件数据.xlsx`;
 
       http.post(this.templateUrl, params, true, {responseType: 'blob'})
         .then(blob => {
@@ -146,7 +150,7 @@ export default {
             this.$refs.bridge.removeChild(link);
           }, 150);
         })
-        .catch(err => console.error(err))
+        .catch(err => console.warn(err))
     }
   }
 }

@@ -403,7 +403,7 @@ export default {
         this.record.data = recordData;
         loading.close();
       } catch (error) {
-        console.error(error)
+        console.warn(error)
       }
 
       this.initDateRangePicker(start, end);

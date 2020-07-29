@@ -53,8 +53,8 @@
 
             <el-option v-for="(option, index) in repertorys" :key="index + option.userId" :label="option.displayName" :value="option.userId">
               <div class="srp-user-item">
-                  <img :src="option.head || '/resource/images/account_userhead.png'">
-                  <p>{{option.displayName}}</p>
+                <img :src="option.head || '/resource/images/account_userhead.png'">
+                <p>{{option.displayName}}</p>
               </div>
             </el-option>
 
@@ -96,9 +96,9 @@ export default {
     sparepartConfig: Object,
     repertory: Array,
     repertories: {
-        type: Array,
-        default: () => []
-      }
+      type: Array,
+      default: () => []
+    }
   },
   data(){
     return {
@@ -109,7 +109,7 @@ export default {
       },
       repertoryTargetText: '',
       form: [],
-      remark:"",
+      remark:'',
       userName: '',
       isAddBtnDisabled: false
     }
@@ -151,9 +151,13 @@ export default {
       }
     },
     addPart() {
-      if(this.form.length > 49){
+      if (this.form.length > 19) {
         this.isAddBtnDisabled = true;
-        return this.$platform.alert('单次最多支持分配50个备件');
+        return this.$message({
+          showClose: true,
+          message: '最多添加20个备件',
+          type: 'error'
+        });
       }
       let row = this.add(null);
       this.form.push(row);
@@ -168,7 +172,7 @@ export default {
       let repertory = row.repertory || {};
       let sparepart = row.sparepart || {};
 
-      let id = repertory.id + "_" + sparepart.id;
+      let id = `${repertory.id }_${ sparepart.id}`;
       return {
         _id: id,
         sparepart: sparepart.id || '',
@@ -210,14 +214,14 @@ export default {
         .catch(err => console.log(err))
     },
     getFetchUsers(keyword) {
-        let params = {
-          pageSize: 50,
-          tagIds: [],
-          keyword: keyword
-        }
-        this.user.loading = true;
+      let params = {
+        pageSize: 50,
+        tagIds: [],
+        keyword
+      }
+      this.user.loading = true;
 
-        this.$http.get('/partV2/repertory/users', params)
+      this.$http.get('/partV2/repertory/users', params)
         .then(result => {
           let repertorys = result;
           if(this.form.length > 0 && !keyword) {
@@ -226,7 +230,7 @@ export default {
           }
           this.repertorys = repertorys;
         })
-        .catch(err => console.error(err))
+        .catch(err => console.warn(err))
         .finally(() => this.user.loading = false);
     },
     hasRow(value){
@@ -245,7 +249,7 @@ export default {
       row.repertory = val;
     },
     choosePart(value, row){
-      let id = row.repertory + "_" + value.sparepart.id;
+      let id = `${row.repertory }_${ value.sparepart.id}`;
       
       // if(this.hasRow(id)) {
       //   this.$platform.toast('该记录已存在！', "warning");
@@ -281,12 +285,12 @@ export default {
         let ids = [];
         for(let j = 0; j < uniqueRepertorys.length; j++) {
           let repertory = uniqueRepertorys[j];
-            for(let i = 0; i < this.repertories.length; i++) {
-              let item = this.repertories[i];
-              if(item.id == repertory) {
-                ids.push(item.teamIds || []);
-                break;
-              }
+          for(let i = 0; i < this.repertories.length; i++) {
+            let item = this.repertories[i];
+            if(item.id == repertory) {
+              ids.push(item.teamIds || []);
+              break;
+            }
           }
         }
         // 请求数据
@@ -339,13 +343,13 @@ export default {
               }
             }
           }
-          if( !item.sparepart || 
-              !item.repertory || 
-              !item.repertoryTarget || 
-              item.variation <= 0 || 
-              item.repertoryCount == 0 ||
-              item.variation > Number(item.repertoryCount) ||
-              count != -1){
+          if( !item.sparepart 
+              || !item.repertory 
+              || !item.repertoryTarget 
+              || item.variation <= 0 
+              || item.repertoryCount == 0
+              || item.variation > Number(item.repertoryCount)
+              || count != -1){
             if(!bool) {
               msgStr = '仓库、备件、目标库不能为空；';
               msgStr += initData.precision == 0 ? '数量为大于0的正整数' : `数量大于0，支持${ initData.precision }位小数`
@@ -376,8 +380,8 @@ export default {
     },
     fetchData(tagIds){
       let params = {
-          pageSize: 0,
-          tagIds: tagIds
+        pageSize: 0,
+        tagIds
       }
 
       return this.$http.get('/partV2/repertory/users', params)

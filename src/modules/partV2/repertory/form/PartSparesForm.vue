@@ -233,7 +233,7 @@
           this.repertorys = repertorys;
 
         })
-        .catch(err => console.error(err))
+        .catch(err => console.warn(err))
         .finally(() => this.user.loading = false);
       },
       pack() {
@@ -263,7 +263,7 @@
             return _this.ruleForm
           }
         } catch (e) {
-          console.error('err', e);
+          console.warn('err', e);
         }
       },
       decimalNumber(num) {

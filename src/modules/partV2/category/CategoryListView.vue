@@ -22,14 +22,14 @@
 
     <form @submit.prevent="search();trackEventHandler('search')">
       <!--<div class="page-panel">-->
-        <!--<div class="page-panel-body search-form-nano">-->
-          <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
-          <!--<el-button-group>-->
-            <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
-            <!--<el-button @click="reset();trackEventHandler('reset')">重置</el-button>-->
-          <!--</el-button-group>-->
-          <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
-        <!--</div>-->
+      <!--<div class="page-panel-body search-form-nano">-->
+      <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
+      <!--<el-button-group>-->
+      <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
+      <!--<el-button @click="reset();trackEventHandler('reset')">重置</el-button>-->
+      <!--</el-button-group>-->
+      <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
+      <!--</div>-->
       <!--</div>-->
 
       <base-collapse-panel :value="isExpand" class="page-panel">
@@ -65,14 +65,14 @@
               <label>创建时间</label>
               <div class="form-item-content">
                 <el-date-picker style="width:100%;"
-                  :value="dateRange"
-                  @input="chooseDate"
-                  type="daterange"
-                  align="right"
-                  unlink-panels
-                  range-separator="-"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期">
+                                :value="dateRange"
+                                @input="chooseDate"
+                                type="daterange"
+                                align="right"
+                                unlink-panels
+                                range-separator="-"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期">
                 </el-date-picker>
               </div>
             </div>
@@ -116,7 +116,7 @@
 
         <el-dropdown trigger="click" :show-timeout="150" v-if="allowImportAndExport && allowEdit && allowInout" @command="trackEventHandler('moreAction')">
           <span class="el-dropdown-link el-dropdown-btn">
-              更多操作<i class="iconfont icon-nav-down"></i>
+            更多操作<i class="iconfont icon-nav-down"></i>
           </span>
 
           <el-dropdown-menu slot="dropdown" class="dropdown-more">
@@ -225,23 +225,23 @@
     </div>
 
 
-  <base-import ref="importPart"
-      v-if="allowImportAndExport"
-      template-url="/partV2/category/import/template" 
-      action="/partV2/category/import" @success="importSucc"></base-import>
+    <base-import ref="importPart"
+                 v-if="allowImportAndExport"
+                 template-url="/partV2/category/import/template" 
+                 action="/partV2/category/import" @success="importSucc"></base-import>
 
     <base-export ref="exportPanel" 
-      v-if="allowImportAndExport"
-      :columns="exportColumns"
-      action="/partV2/category/export"
-      :method="'post'"></base-export>
+                 v-if="allowImportAndExport"
+                 :columns="exportColumns"
+                 action="/partV2/category/export"
+                 :method="'post'"></base-export>
 
     <part-import ref="importEditPart" 
-      v-if="allowEdit" title="备件" :selected="selected" :total="page.total"
-      :template-url="`/partV2/category/export/update/template`" 
-      :templateBlankUrl="'/partV2/category/export/exportBlankUpdateTemplate'"
-      :templateParams="editPartPostParam"
-      action="/partV2/category/update/batch" @success="importSucc">
+                 v-if="allowEdit" title="备件" :selected="selected" :total="page.total"
+                 :template-url="`/partV2/category/export/update/template`" 
+                 :template-blank-url="'/partV2/category/export/exportBlankUpdateTemplate'"
+                 :template-params="editPartPostParam"
+                 action="/partV2/category/update/batch" @success="importSucc">
       <el-popover slot="explain" trigger="hover">
         <ul class="title-explain">
           <li>数据覆盖上传后无法恢复，请谨慎操作，保留好数据导出文件</li>
@@ -298,10 +298,10 @@
 
 <script>
 import _ from 'lodash';
-import Page from "@src/model/Page";
+import Page from '@src/model/Page';
 import AuthUtil from '@src/util/auth';
 import DateUtil from '@src/util/date';  
-import StorageUtil from '@src/util/StorageUtil';
+import StorageUtil from '@src/util/storageUtil';
 import PartEditBatchForm from './form/PartEditBatchForm.vue';
 import PartImport from './components/PartImport.vue';
 
@@ -322,7 +322,7 @@ export default {
       timeStart: '',
       timeEnd: '',
       pageNum: 1,
-      pageSize: pageSize,
+      pageSize,
       sortBy: {}
     };
 
@@ -338,7 +338,7 @@ export default {
       types: [],
       units: [],
       
-      originModel: originModel,
+      originModel,
       model: _.assign({}, originModel),
 
       page: new Page(),
@@ -370,19 +370,19 @@ export default {
         field: 'costPrice'
       }]
     }
-	},
-	props: {
-		initData: {
-			type: Object,
-			default: () => ({})
-		}
-	},
+  },
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   computed: {
-    //筛选可显示
+    // 筛选可显示
     showColnums(){
       return this.columns.filter(item => item.show);
     },
-    //是否允许编辑、删除备件
+    // 是否允许编辑、删除备件
     allowEdit(){
       return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_EDIT');
     },
@@ -392,7 +392,7 @@ export default {
     allowInout(){
       return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_INOUT');
     },
-    //是否允许导入导出
+    // 是否允许导入导出
     allowImportAndExport(){
       return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
     }
@@ -473,7 +473,7 @@ export default {
         delete this.model.timeStart;
         delete this.model.timeEnd;
       } else {
-        this.model.timeStart = DateUtil.format(range[0],'yyyy-MM-dd 00:00:00')
+        this.model.timeStart = DateUtil.format(range[0], 'yyyy-MM-dd 00:00:00')
         this.model.timeEnd = DateUtil.format(range[1], 'yyyy-MM-dd 23:59:59')
       }
     },
@@ -481,7 +481,7 @@ export default {
       if(!this.allowImportAndExport || !this.allowEdit || !this.allowInout) return;
 
       let ids = [];
-      let fileName = `${DateUtil.format(new Date(),'yyyy-MM-dd')}备件数据.xlsx`;
+      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件数据.xlsx`;
 
       if(!exportAll){
         if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
@@ -505,7 +505,7 @@ export default {
       };
 
       // if (!this.selected.length) {
-        // return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
+      // return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
       // }
 
       if(this.selected.length > 0) param.ids = this.selected.map(item => item.id);
@@ -513,13 +513,13 @@ export default {
       delete param.pageSize;
       delete param.pageNum;
       delete param.sortBy;
-      var arr = [];
+      let arr = [];
       
       this.editPartPostParam = param;
       for (let i in param) {
-        arr.push(i + '=' + param[i]);
+        arr.push(`${i }=${ param[i]}`);
       }
-      this.editPartParam = arr.join("&");
+      this.editPartParam = arr.join('&');
 
       let instance = this.$refs.importEditPart;
       instance.open(param);
@@ -559,7 +559,7 @@ export default {
 
         this.pending = false;
       } catch (error) {
-        console.error(error)
+        console.warn(error)
       }
     },
     toggleEnable(row){
@@ -577,7 +577,7 @@ export default {
           this.$platform.alert(result.message);
         }
       })
-        .catch(err => console.error(err))
+        .catch(err => console.warn(err))
         .finally(() => {
           row.disabled = false;
         })
@@ -640,7 +640,7 @@ export default {
       
       this.loadData();
 
-      //存入localStorage
+      // 存入localStorage
       StorageUtil.save(STORAGE_PAGESIZE_KEY, pageSize);
     },
     search(){
@@ -648,7 +648,7 @@ export default {
       this.loadData();
     },
     reset(){
-      this.model = _.assign({},this.originModel);
+      this.model = _.assign({}, this.originModel);
       this.dateRange = [];
       this.$refs.table.clearSort();
       this.loadData();
@@ -674,7 +674,7 @@ export default {
 
         this.matchSelected();
       }catch(error){
-        console.error(error)
+        console.warn(error)
       }
       loading.close();
     },
@@ -704,7 +704,7 @@ export default {
           label: '编号',
           field: 'serialNumber',
           show: true,
-          fixed: "left",
+          fixed: 'left',
           sortable: 'custom',
           minWidth: 150
         },
@@ -786,32 +786,32 @@ export default {
     // TalkingData事件埋点
     trackEventHandler (type) {
       switch (type) {
-        case 'search':
-          this.$tdOnEvent('pc：备件品类-搜索事件');
-          break;
-        case 'reset':
-          this.$tdOnEvent('pc：备件品类-重置事件');
-          break;
-        case 'advSearch':
-          this.$tdOnEvent('pc：备件品类-高级搜索事件');
-          break;
-        case 'create':
-          this.$tdOnEvent('pc：备件品类-新建事件');
-          break;
-        case 'remove':
-          this.$tdOnEvent('pc：备件品类-删除事件');
-          break;
-        case 'batchEdit':
-          this.$tdOnEvent('pc：备件品类-批量编辑事件');
-          break;
-        case 'selectColumn':
-          this.$tdOnEvent('pc：备件品类-选择列事件');
-          break;
-        case 'moreAction':
-          this.$tdOnEvent('pc：备件品类-更多操作事件');
-          break;
-        default:
-          break;
+      case 'search':
+        this.$tdOnEvent('pc：备件品类-搜索事件');
+        break;
+      case 'reset':
+        this.$tdOnEvent('pc：备件品类-重置事件');
+        break;
+      case 'advSearch':
+        this.$tdOnEvent('pc：备件品类-高级搜索事件');
+        break;
+      case 'create':
+        this.$tdOnEvent('pc：备件品类-新建事件');
+        break;
+      case 'remove':
+        this.$tdOnEvent('pc：备件品类-删除事件');
+        break;
+      case 'batchEdit':
+        this.$tdOnEvent('pc：备件品类-批量编辑事件');
+        break;
+      case 'selectColumn':
+        this.$tdOnEvent('pc：备件品类-选择列事件');
+        break;
+      case 'moreAction':
+        this.$tdOnEvent('pc：备件品类-更多操作事件');
+        break;
+      default:
+        break;
       }
     }
   },

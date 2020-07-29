@@ -735,6 +735,12 @@ export default {
           minWidth: 220
         },
         {
+          field: 'approveNo',
+          label: '办理编号',
+          show: true,
+          minWidth: 220
+        },
+        {
           field: 'sparepart.serialNumber',
           label: '备件编号',
           show: true,

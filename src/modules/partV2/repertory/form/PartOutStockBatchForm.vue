@@ -1,7 +1,7 @@
 <template>
-    <div class="part-batchIn-form">
+  <div class="part-batchIn-form">
     <el-table :data="form" empty-text="请点击下方按钮添加要出库的数据">
-      <el-table-column label="名称"  width="150px">
+      <el-table-column label="名称" width="150px">
         <el-autocomplete
           slot-scope="scope"
           popper-class="batch-in-part"
@@ -30,7 +30,7 @@
         <template slot-scope="scope">
           {{scope.row.repertoryCount}}
           <el-tooltip class="item" effect="dark" :content="`安全库存：${scope.row.safetyStock}`" placement="top">
-            <el-tag v-if="scope.row.safetyStock && (scope.row.safetyStock > scope.row.repertoryCount)"  size="mini" type="danger">库存提醒</el-tag>
+            <el-tag v-if="scope.row.safetyStock && (scope.row.safetyStock > scope.row.repertoryCount)" size="mini" type="danger">库存提醒</el-tag>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -56,7 +56,7 @@
 import MathUtil from '@src/util/math';
 
 export default {
-  name: 'part-outstockBatch-form',
+  name: 'part-outstock-batch-form',
   inject: ['initData'],
   props: {
     sparepartConfig: Object
@@ -65,7 +65,7 @@ export default {
     return {
       userId: '',
       form: [],
-      remark:"",
+      remark:'',
       partOptions: [],
       numberValidateForm: {
         number: ''
@@ -102,6 +102,14 @@ export default {
       if(index >= 0) this.form.splice(index, 1);
     },
     add(row = {}){
+      if (this.form.length > 19) {
+        return this.$message({
+          showClose: true,
+          message: '最多添加20个备件',
+          type: 'error'
+        });
+      }
+
       let config = this.sparepartConfig || {};
       let types = config.outStoreType || [];
 
@@ -135,13 +143,13 @@ export default {
         managers: [this.userId]
       }
 
-      this.$http.get('/partV2/repertory/list',model)
+      this.$http.get('/partV2/repertory/list', model)
         .then(result => cb(result.list))
         .catch(err => console.log(err))
     },
     choosePart(value, row){
       if(this.hasRow(value)) {
-        this.$platform.toast('该记录已存在！', "warning");
+        this.$platform.toast('该记录已存在！', 'warning');
         return
       }
 

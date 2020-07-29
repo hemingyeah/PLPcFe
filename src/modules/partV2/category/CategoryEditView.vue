@@ -105,7 +105,7 @@ export default {
               .then(result => {
                 if(result.status != 0) err.push(new Error('备件编号已存在'))
               })
-              .catch(err => console.error(err))
+              .catch(err => console.warn(err))
               .finally(() => callback(err))
           }, 500)}
         ],
@@ -223,7 +223,7 @@ export default {
           this.$platform.alert(result.message)
         }
       } catch (error) {
-        console.error(error)
+        console.warn(error)
       }
 
       loading.close();
@@ -280,7 +280,7 @@ export default {
       this.initialize(part);
       this.origin = part;
     } catch (error) {
-      console.error(error)
+      console.warn(error)
     }
   }          
 }

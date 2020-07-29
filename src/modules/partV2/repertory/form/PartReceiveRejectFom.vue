@@ -142,7 +142,7 @@
         try {
           return _this.ruleForm;
         } catch (e) {
-          console.error('err', e);
+          console.warn('err', e);
         }
       },
     }

@@ -29,15 +29,15 @@
 
     <form @submit.prevent="search();trackEventHandler('search')">
       <!--<div class="page-panel">-->
-        <!--<div class="page-panel-body search-form-nano">-->
-          <!--<a class="toStock" v-if="viewReport" :href="`/stats/sparepart/showStatistics?id=${repertoryName}&source=1`" @click.prevent="openStock($event);trackEventHandler('stockTable')"><i class="iconfont icon-depot"></i>仓库报表</a>-->
-          <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
-          <!--<el-button-group>-->
-            <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
-            <!--<el-button @click="reset();trackEventHandler('reset');">重置</el-button>-->
-          <!--</el-button-group>-->
-          <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
-        <!--</div>-->
+      <!--<div class="page-panel-body search-form-nano">-->
+      <!--<a class="toStock" v-if="viewReport" :href="`/stats/sparepart/showStatistics?id=${repertoryName}&source=1`" @click.prevent="openStock($event);trackEventHandler('stockTable')"><i class="iconfont icon-depot"></i>仓库报表</a>-->
+      <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
+      <!--<el-button-group>-->
+      <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
+      <!--<el-button @click="reset();trackEventHandler('reset');">重置</el-button>-->
+      <!--</el-button-group>-->
+      <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
+      <!--</div>-->
       <!--</div>-->
 
       <base-collapse-panel :value="isExpand" class="page-panel">
@@ -49,28 +49,28 @@
             <div class="form-item">
               <label>备件名称</label>
               <div class="form-item-content">
-                  <el-select popper-class="common-advance-popper" style="width: 100%;"
-                    placeholder="选择备件"
-                    :value="sparepart.sparepartId"   
-                    @input="chooseSparepart"
-                    filterable
-                    clearable
-                    remote
-                    :remote-method="fetchSparepart"
-                    :loading="sparepart.loading">
+                <el-select popper-class="common-advance-popper" style="width: 100%;"
+                           placeholder="选择备件"
+                           :value="sparepart.sparepartId"   
+                           @input="chooseSparepart"
+                           filterable
+                           clearable
+                           remote
+                           :remote-method="fetchSparepart"
+                           :loading="sparepart.loading">
 
-                      <el-option
-                        v-for="item in sparepart.options"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id">
-                        <div class="part-option">
-                          <p>编号：{{item.serialNumber}}</p>
-                          <p>名称：{{item.name}}</p>
-                        </div>
-                      </el-option>
-                  </el-select>
-                </div>
+                  <el-option
+                    v-for="item in sparepart.options"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                    <div class="part-option">
+                      <p>编号：{{item.serialNumber}}</p>
+                      <p>名称：{{item.name}}</p>
+                    </div>
+                  </el-option>
+                </el-select>
+              </div>
             </div> 
             <div class="form-item">
               <label>备件类别</label>
@@ -118,11 +118,11 @@
 
       </div>
       <div class="action-button-group">
-        <base-button v-if="allowInout" type="primary" @event="outstockBatch($event);trackEventHandler('outStock')"native-type="submit">出库</base-button>
-        <base-button v-if="allowInout" type="primary" @event="instockBatch($event);trackEventHandler('inStock')"native-type="submit">入库</base-button>
-        <base-button v-if="allowInout" type="primary" @event="transferBatch($event);trackEventHandler('transfer')"native-type="submit">调拨</base-button>
-        <base-button v-if="allowInout && isPersonalRepertory !== false" type="primary" @event="partSparesBatchDialog($event);trackEventHandler('spare')"native-type="submit">分配</base-button>
-        <base-button v-if="allowInout" type="primary" @event="openDialogForSetSafetyStock(selected);trackEventHandler('setSafeStock')"native-type="submit">设置安全库存</base-button>
+        <base-button v-if="allowInout" type="primary" @event="outstockBatch();trackEventHandler('outStock')" native-type="submit">出库</base-button>
+        <base-button v-if="allowInout" type="primary" @event="instockBatch($event);trackEventHandler('inStock')" native-type="submit">入库</base-button>
+        <base-button v-if="allowInout" type="primary" @event="transferBatch($event);trackEventHandler('transfer')" native-type="submit">调拨</base-button>
+        <base-button v-if="allowInout && isPersonalRepertory !== false" type="primary" @event="partSparesBatchDialog($event);trackEventHandler('spare')" native-type="submit">分配</base-button>
+        <base-button v-if="allowInout" type="primary" @event="openDialogForSetSafetyStock(selected);trackEventHandler('setSafeStock')" native-type="submit">设置安全库存</base-button>
 
         <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
           <span class="el-dropdown-link el-dropdown-btn" >选择列<i class="iconfont icon-nav-down"></i></span>
@@ -136,7 +136,7 @@
 
         <el-dropdown trigger="click" :show-timeout="150" v-if="allowImportAndExport && allowEdit && allowInout && !model.isMissingPart">
           <span class="el-dropdown-link el-dropdown-btn">
-              更多操作<i class="iconfont icon-nav-down"></i>
+            更多操作<i class="iconfont icon-nav-down"></i>
           </span>
 
           <el-dropdown-menu slot="dropdown" class="dropdown-more">
@@ -267,7 +267,7 @@
     <div class="page-panel">
 
       <el-dialog title="入库操作" :visible.sync="instockDialog" width="600px">
-        <part-instock-form v-if="instockDialog"  ref="instockForm" :formdata="formdata" :sparepartConfig="sparepartConfig"></part-instock-form>
+        <part-instock-form v-if="instockDialog" ref="instockForm" :formdata="formdata" :sparepart-config="sparepartConfig"></part-instock-form>
         <div slot="footer" class="dialog-footer">
 
           <base-button type="ghost" @event="instockDialog = false" >取 消</base-button>
@@ -278,7 +278,7 @@
         </div>
       </el-dialog>
       <el-dialog title="批量入库操作" :visible.sync="instockBatchDialog" width="940px">
-        <part-instockBatch-form v-if="instockBatchDialog" ref="instockBatchForm" :repertory="manageRepertories" :sparepartConfig="sparepartConfig"></part-instockBatch-form>
+        <part-instockBatch-form v-if="instockBatchDialog" ref="instockBatchForm" :repertory="manageRepertories" :sparepart-config="sparepartConfig"></part-instockBatch-form>
         <div slot="footer" class="dialog-footer">
 
           <base-button type="ghost" @event="instockBatchDialog = false" >取 消</base-button>
@@ -290,7 +290,7 @@
       </el-dialog>
 
       <el-dialog title="出库操作" :visible.sync="outstockDialog" width="600px">
-        <part-outstock-form v-if="outstockDialog" ref="outstockForm" :formdata="formdata" :sparepartConfig="sparepartConfig"></part-outstock-form>
+        <part-outstock-form v-if="outstockDialog" ref="outstockForm" :formdata="formdata" :sparepart-config="sparepartConfig"></part-outstock-form>
         <div slot="footer" class="dialog-footer">
           <base-button type="ghost" @event="outstockDialog = false" >取 消</base-button>
           <base-button type="primary" @event="outstockSave" :disabled="pending" v-if="sparepartConfig">确 定</base-button>
@@ -300,7 +300,7 @@
         </div>
       </el-dialog>
       <el-dialog title="批量出库操作" :visible.sync="outstockBatchDialog" width="940px">
-        <part-outstockBatch-form v-if="outstockBatchDialog" ref="outstockBatchForm" :sparepartConfig="sparepartConfig"></part-outstockBatch-form>
+        <part-outstockBatch-form v-if="outstockBatchDialog" ref="outstockBatchForm" :sparepart-config="sparepartConfig"></part-outstockBatch-form>
         <div slot="footer" class="dialog-footer">
 
           <base-button type="ghost" @event="outstockBatchDialog = false" >取 消</base-button>
@@ -310,7 +310,7 @@
         </div>
       </el-dialog>
       <el-dialog title="批量调拨操作" :visible.sync="transferBatchDialog" width="940px">
-        <part-batch-transfer v-if="transferBatchDialog" ref="transferBatchForm" :repertory="visibleRepertories" :sparepartConfig="sparepartConfig"></part-batch-transfer>
+        <part-batch-transfer v-if="transferBatchDialog" ref="transferBatchForm" :repertory="visibleRepertories" :sparepart-config="sparepartConfig"></part-batch-transfer>
         <div slot="footer" class="dialog-footer">
 
           <base-button type="ghost" @event="transferBatchDialog = false" >取 消</base-button>
@@ -322,7 +322,7 @@
       </el-dialog>
 
       <el-dialog title="申领备件" :visible.sync="applyDialog" width="600px">
-        <part-apply-form v-if="applyDialog"  ref="applyForm" :formdata="formdata" :sparepartConfig="sparepartConfig"></part-apply-form>
+        <part-apply-form v-if="applyDialog" ref="applyForm" :formdata="formdata" :sparepart-config="sparepartConfig"></part-apply-form>
         <div slot="footer" class="dialog-footer">
 
           <base-button type="ghost" @event="applyDialog = false" >取 消</base-button>
@@ -334,7 +334,7 @@
       </el-dialog>
 
       <el-dialog title="调拨备件" :visible.sync="allocationDialog" width="600px">
-        <part-allocation-form v-if="allocationDialog"  ref="allocationForm"></part-allocation-form>
+        <part-allocation-form v-if="allocationDialog" ref="allocationForm"></part-allocation-form>
         <div slot="footer" class="dialog-footer">
 
           <base-button type="ghost" @event="allocationDialog = false" >取 消</base-button>
@@ -471,8 +471,8 @@
       </el-dialog>
 
       <base-import ref="importStock" 
-        v-if="allowImportAndExport"
-        action="/partV2/category/import/repertory" @success="importSucc">
+                   v-if="allowImportAndExport"
+                   action="/partV2/category/import/repertory" @success="importSucc">
         <div slot="tip">
           <div class="base-import-warn">
             请先下载<a :href="`/partV2/category/import/repertory/template?withSerialNumber=${withSerialNumber}`">导入模版 </a>
@@ -483,10 +483,10 @@
       </base-import>
 
       <base-export ref="exportPanel" 
-        v-if="allowImportAndExport"
-        :columns="filterColumns"
-        action="/partV2/repertory/sparepartRepertory"
-        :method="'post'"></base-export>
+                   v-if="allowImportAndExport"
+                   :columns="filterColumns"
+                   action="/partV2/repertory/sparepartRepertory"
+                   :method="'post'"></base-export>
     </div>
 
 
@@ -526,7 +526,7 @@
 <script>
 import _ from 'lodash';
 import qs from '@src/util/QueryString';
-import Page from "@src/model/Page";
+import Page from '@src/model/Page';
 import PartOutStockForm from './form/PartOutStockForm.vue';
 import PartInStockForm from './form/PartInStockForm.vue';
 import PartOutStockBatchForm from './form/PartOutStockBatchForm.vue';
@@ -534,14 +534,14 @@ import PartInStockBatchForm from './form/PartInStockBatchForm.vue';
 import PartApplyForm from './form/PartApplyForm.vue';
 import PartAllocationForm from './form/PartAllocationForm.vue';
 import PartSetSafetyStockForm from './form/PartSetSafetyStockForm.vue';
-import PartSparesForm from "./form/PartSparesForm.vue";
-import PartSparesBatchForm from "./form/PartSparesBatchForm.vue";
+import PartSparesForm from './form/PartSparesForm.vue';
+import PartSparesBatchForm from './form/PartSparesBatchForm.vue';
 import PartBatchTransfer from './form/PartBatchTransfer.vue';
 import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
 
 import DateUtil from '@src/util/date'
 import AuthUtil from '@src/util/auth';
-import StorageUtil from '@src/util/StorageUtil';
+import StorageUtil from '@src/util/storageUtil';
 
 
 const STORAGE_COLNUM_KEY = 'repertory_list_column';
@@ -557,7 +557,7 @@ export default {
       type: '',
       enable: '',
       pageNum: 1,
-      pageSize: pageSize,
+      pageSize,
       sortBy: {},
       isMissingPart: 0,
     };
@@ -565,10 +565,10 @@ export default {
     return {
       multipleSelectionPanelShow: false,
       selectedLimit: 500,
-      auths: {}, //权限对象
-      isPersonalRepertory: false, //是否开启个人备件库
-      userId: '', //当前登录用户的Id
-      tagIds: [], //当前用户所属团队
+      auths: {}, // 权限对象
+      isPersonalRepertory: false, // 是否开启个人备件库
+      userId: '', // 当前登录用户的Id
+      tagIds: [], // 当前用户所属团队
       tagIdsWithChildTag: [],
       types: [],
 
@@ -582,7 +582,7 @@ export default {
       },
       
       
-      originModel: originModel,
+      originModel,
       model: _.assign({}, originModel),
 
       page: new Page(),
@@ -632,21 +632,21 @@ export default {
       },
       timeValue: '',
 
-      repertories: [], //所有可见的仓库
+      repertories: [], // 所有可见的仓库
       withSerialNumber: false,
-      isManage: false, //仓库报表按钮是否可见
+      isManage: false, // 仓库报表按钮是否可见
       isPartSparesDialog: false, // 审批弹窗
       isPartSparesBatchDialog: false // 批量审批弹窗
     }
   },
   computed: {
-    //是否允许导入导出
+    // 是否允许导入导出
     allowImportAndExport(){
       return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
     },
-    //是否有编辑权限
+    // 是否有编辑权限
     allowEdit(){
-      //return true;
+      // return true;
       return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_EDIT');
     },
     allowInout(){
@@ -679,7 +679,7 @@ export default {
           || item.manager.some(m => m.userId === this.userId); // 仓库管理员
       });
     },
-     /**
+    /**
      * 所有可操作的仓库
      *  
      * 以下情况能够进行出入库操作
@@ -782,7 +782,7 @@ export default {
       this.$platform.openTab({
         id: `stats_part_${this.repertoryName}`,
         url: `/stats/sparepart/showStatistics?id=${this.repertoryName}&source=1`,
-        title: "仓库报表",
+        title: '仓库报表',
         close: true,
         reload:true
       })
@@ -805,13 +805,13 @@ export default {
         let isManage = this.allowInOutStore(row);
 
         isManage
-        ? this.formdata.push({
+          ? this.formdata.push({
             ...row.sparepart,
             repertory: row.repertory.name,
             sparepartRepertoryId: row.id,
             safetyStock: row.safetyStock || '',
           })
-        : repertoryNames.push(row.repertory.name);
+          : repertoryNames.push(row.repertory.name);
       }
       // 仓库列表名字去重
       repertoryNames = [...new Set(repertoryNames)];
@@ -866,7 +866,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (e) {
-        console.error(e);
+        console.warn(e);
       }
       this.pending = false;
       this.loadData();
@@ -892,7 +892,7 @@ export default {
         console.log(error)
       }
     },
-    //导出库存记录
+    // 导出库存记录
     exportData(exportAll){
       if(!this.allowImportAndExport || !this.allowEdit || !this.allowInout) return;
       let ids = [];
@@ -902,7 +902,7 @@ export default {
         ids = this.selected.map(item => item.id);
       }
       
-      this.$refs.exportPanel.open(ids, `${DateUtil.format(new Date(),'yyyy-MM-dd')}备件库存记录.xlsx`);
+      this.$refs.exportPanel.open(ids, `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件库存记录.xlsx`);
     },
     importSucc(){
       this.loadData();
@@ -972,7 +972,7 @@ export default {
       
       this.loadData();
 
-      //存入localStorage
+      // 存入localStorage
       StorageUtil.save(STORAGE_PAGESIZE_KEY, pageSize);
     },
     search(){
@@ -980,7 +980,7 @@ export default {
       this.loadData();
     },
     reset(){
-      this.model = _.assign({},this.originModel);
+      this.model = _.assign({}, this.originModel);
       this.sparepart.sparepartId = '';
       this.$refs.table.clearSort();
       this.loadData();
@@ -1023,7 +1023,7 @@ export default {
         pageSize: 50
       }
       this.sparepart.loading = true
-      this.$http.get('/partV2/repertory/sparepart/list',model)
+      this.$http.get('/partV2/repertory/sparepart/list', model)
         .then(result => this.sparepart.options = result.list)
         .catch(err => console.log(err))
         .finally(() => this.sparepart.loading = false);
@@ -1047,7 +1047,7 @@ export default {
       this.sparepart.sparepartId = value;
       this.model.sparepartId = value;
     },
-    //TODO: 不再异步获取，改为注入参数
+    // TODO: 不再异步获取，改为注入参数
     fecthSparepartConfig(){
       // 获取备件设置
       return this.$http.post('/partV2/repertory/sparepartConfig').then(result => {
@@ -1055,7 +1055,7 @@ export default {
       })
     },
     // 出库（单次）
-    outstock(value,num) {
+    outstock(value, num) {
       if(!this.allowInout){
         this.$platform.alert('对不起，您没有该操作权限');
         return
@@ -1065,7 +1065,7 @@ export default {
     },
   
     // 入库（单次）
-    instock(value,num) {
+    instock(value, num) {
       if(!this.allowInout){
         this.$platform.alert('对不起，您没有该操作权限');
         return
@@ -1083,7 +1083,7 @@ export default {
       this.allocationDialog = true;
       this.$nextTick(() => this.$refs.allocationForm.init(value, this.visibleRepertories, this.sparepartConfig, this.userId))
     },
-    //调拨
+    // 调拨
     async allocationSave(){
       let form = this.$refs.allocationForm;
       if(null == form) return;
@@ -1109,7 +1109,7 @@ export default {
       this.applyDialog = true;
       this.formdata = value
     },
-    //申领
+    // 申领
     async applySave(){
       let form = this.$refs.applyForm;
       if(null == form) return;
@@ -1130,7 +1130,7 @@ export default {
       }
       this.pending = false;
     },
-    //出库（单次）
+    // 出库（单次）
     async outstockSave(){
       let form = this.$refs.outstockForm;
       if(null == form) return;
@@ -1181,13 +1181,13 @@ export default {
         
         for(let i = 0;i < val.length;i++){
           let repe = val[i];
-          //确定该库存能否被删除
+          // 确定该库存能否被删除
           let notAllow = true;
-          //判断仓库是否存在
+          // 判断仓库是否存在
           notAllow = notAllow && repe.repertory && repe.repertory.id && repe.repertory.name != null;
-          //判断备件是否存在
+          // 判断备件是否存在
           notAllow = notAllow && repe.sparepart && repe.sparepart.id;
-          //判断是否有库存
+          // 判断是否有库存
           notAllow = notAllow && repe.repertoryCount > 0;
 
           if(notAllow){
@@ -1195,7 +1195,7 @@ export default {
             continue;
           }
           
-          if(repe.sparepart && repe.sparepart.name) remove.push('【' + repe.sparepart.name + '】')
+          if(repe.sparepart && repe.sparepart.name) remove.push(`【${ repe.sparepart.name }】`)
           ids.push(repe.id);
         }
 
@@ -1204,7 +1204,7 @@ export default {
         }
 
         try {
-          if(!await this.$platform.confirm('确定从仓库列表中移除备件' + remove + '吗?')) return;
+          if(!await this.$platform.confirm(`确定从仓库列表中移除备件${ remove }吗?`)) return;
 
           this.pending = true;
           let result = await this.$http.post('/partV2/repertory/batchRemove', ids)
@@ -1221,7 +1221,7 @@ export default {
         this.$platform.alert('请先勾选要移除的备件');
       }
     },
-    //出库（批量）
+    // 出库（批量）
     async outstockBatchSave(){
       let form = this.$refs.outstockBatchForm;
 
@@ -1245,7 +1245,7 @@ export default {
       }
       this.pending = false;
     },
-    //入库（单次）
+    // 入库（单次）
     async instockSave(){
       let form = this.$refs.instockForm;
       if(null == form) return;
@@ -1345,7 +1345,7 @@ export default {
         this.$refs.instockBatchForm.receive(data);
       });
     },
-    //入库（批量）
+    // 入库（批量）
     async instockBatchSave(){
       let form = this.$refs.instockBatchForm;
       if(null == form) return;
@@ -1370,7 +1370,7 @@ export default {
     // 分配 （弹窗）
     partSparesDialog(val) {
       this.formdata = val;
-        // 打开弹窗
+      // 打开弹窗
       this.isPartSparesDialog = true;
       this.pending = false;
     },
@@ -1404,7 +1404,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (e) {
-        console.error(e);
+        console.warn(e);
       } finally {
         this.pending = false;
       }
@@ -1465,7 +1465,7 @@ export default {
           this.pending = false;
         }
       } catch (e) {
-        console.error(e);
+        console.warn(e);
         this.pending = false;
       }
     }, 100),
@@ -1477,14 +1477,14 @@ export default {
       };
     },
 
-    //获取仓库列表
+    // 获取仓库列表
     fetchRepertory(){
       this.$http.get('/partV2/repertory/allRepertory')
         .then(result => {
           this.repertories = result || []
           if(this.manageRepertories.length > 0) this.isManage = true;
         })
-        .catch(err => console.error(err))
+        .catch(err => console.warn(err))
     },
     initialize(){      
       this.fetchRepertory();
@@ -1501,7 +1501,7 @@ export default {
           field: 'serialNumber',
           show: true,
           width: '170px',
-          exportAlias: "sparepart.serialNumber",
+          exportAlias: 'sparepart.serialNumber',
           tooltip: true,
         },
         {
@@ -1515,7 +1515,7 @@ export default {
           label: '名称',
           field: 'name',
           show: true,
-          exportAlias: "sparepart.name",
+          exportAlias: 'sparepart.name',
           tooltip: true,
         },
         {
@@ -1528,28 +1528,28 @@ export default {
           label: '备件规格',
           field: 'standard',
           show: true,
-          exportAlias: "sparepart.standard",
+          exportAlias: 'sparepart.standard',
           tooltip: true,
         },
         {
           label: '仓库',
           field: 'repertory',
           show: true,
-          exportAlias: "repertory.name",
+          exportAlias: 'repertory.name',
           tooltip: true,
         },
         {
           label: '仓库分类',
           field: 'repertoryType',
           show: true,
-          exportAlias: "repertory.type",
+          exportAlias: 'repertory.type',
           tooltip: true,
         },
         {
           label: '安全库存',
           field: 'safetyStock',
           show: false,
-          exportAlias: "safetyStock",
+          exportAlias: 'safetyStock',
           tooltip: true,
         },
         {
@@ -1590,88 +1590,88 @@ export default {
         let isManage = this.allowInOutStore(row);
 
         isManage
-        ? managers.push(row.repertory.name)
-        : repertoryNames.push(row.repertory.name);
+          ? managers.push(row.repertory.name)
+          : repertoryNames.push(row.repertory.name);
       }
       // 仓库列表名字去重
       repertoryNames = [...new Set(repertoryNames)];
 
       return (
         Array.isArray(repertoryNames) && repertoryNames.length > 0 && managers.length == 0
-        ? {
-          status: 1,
-          succ: true,
-          data: repertoryNames,
-          message: `尚未给您分配"${repertoryNames.join(' ,')}"的管理员权限，请联系管理员或到备件库管理中设置`
-        }
-        : {status: 0}
+          ? {
+            status: 1,
+            succ: true,
+            data: repertoryNames,
+            message: `尚未给您分配"${repertoryNames.join(' ,')}"的管理员权限，请联系管理员或到备件库管理中设置`
+          }
+          : {status: 0}
       );
     },
     trackEventHandler(type) {
       switch (type) {
-        case 'stockTable':
-          this.$tdOnEvent('pc：备件库存-仓库报表事件');
-          break;
-        case 'search':
-          this.$tdOnEvent('pc：备件库存-搜索事件');
-          break;
-        case 'reset':
-          this.$tdOnEvent('pc：备件库存-重置事件');
-          break;
-        case 'advSearch':
-          this.$tdOnEvent('pc：备件库存-高级搜索事件');
-          break;
-        case 'chooseRepertory':
-          this.$tdOnEvent('pc：备件库存-仓库筛选下拉框事件');
-          break;
-        case 'switchPart':
-          this.model && this.model.isMissingPart === 0 && this.$tdOnEvent('pc：备件库存-全部备件事件');
-          this.model && this.model.isMissingPart === 1 &&this.$tdOnEvent('pc：备件库存-库存提醒事件');
-          break;
-        case 'remove':
-          this.$tdOnEvent('pc：备件库存-移除事件');
-          break;
-        case 'outStock':
-          this.$tdOnEvent('pc：备件库存-出库事件');
-          break;
-        case 'inStock':
-          this.$tdOnEvent('pc：备件库存-入库事件');
-          break;
-        case 'transfer':
-          this.$tdOnEvent('pc：备件库存-调拨事件');
-          break;
-        case 'spare':
-          this.$tdOnEvent('pc：备件库存-分配事件');
-          break;
-        case 'setSafeStock':
-          this.$tdOnEvent('pc：备件库存-设置安全库存事件');
-          break;
-        case 'selectColumn':
-          this.$tdOnEvent('pc：备件库存-选择列事件');
-          break;
-        default:
-          break;
+      case 'stockTable':
+        this.$tdOnEvent('pc：备件库存-仓库报表事件');
+        break;
+      case 'search':
+        this.$tdOnEvent('pc：备件库存-搜索事件');
+        break;
+      case 'reset':
+        this.$tdOnEvent('pc：备件库存-重置事件');
+        break;
+      case 'advSearch':
+        this.$tdOnEvent('pc：备件库存-高级搜索事件');
+        break;
+      case 'chooseRepertory':
+        this.$tdOnEvent('pc：备件库存-仓库筛选下拉框事件');
+        break;
+      case 'switchPart':
+        this.model && this.model.isMissingPart === 0 && this.$tdOnEvent('pc：备件库存-全部备件事件');
+        this.model && this.model.isMissingPart === 1 && this.$tdOnEvent('pc：备件库存-库存提醒事件');
+        break;
+      case 'remove':
+        this.$tdOnEvent('pc：备件库存-移除事件');
+        break;
+      case 'outStock':
+        this.$tdOnEvent('pc：备件库存-出库事件');
+        break;
+      case 'inStock':
+        this.$tdOnEvent('pc：备件库存-入库事件');
+        break;
+      case 'transfer':
+        this.$tdOnEvent('pc：备件库存-调拨事件');
+        break;
+      case 'spare':
+        this.$tdOnEvent('pc：备件库存-分配事件');
+        break;
+      case 'setSafeStock':
+        this.$tdOnEvent('pc：备件库存-设置安全库存事件');
+        break;
+      case 'selectColumn':
+        this.$tdOnEvent('pc：备件库存-选择列事件');
+        break;
+      default:
+        break;
       }
     },
     tableTrackEventHandler (type) {
       switch (type) {
-        case 'outStock':
-          this.$tdOnEvent('pc：备件库存-列表出库事件');
-          break;
-        case 'inStock':
-          this.$tdOnEvent('pc：备件库存-列表入库事件');
-          break;
-        case 'allocation':
-          this.$tdOnEvent('pc：备件库存-列表调拨事件');
-          break;
-        case 'spare':
-          this.$tdOnEvent('pc：备件库存-列表分配事件');
-          break;
-        case 'apply':
-          this.$tdOnEvent('pc：备件库存-列表申领事件');
-          break;
-        default:
-          break;
+      case 'outStock':
+        this.$tdOnEvent('pc：备件库存-列表出库事件');
+        break;
+      case 'inStock':
+        this.$tdOnEvent('pc：备件库存-列表入库事件');
+        break;
+      case 'allocation':
+        this.$tdOnEvent('pc：备件库存-列表调拨事件');
+        break;
+      case 'spare':
+        this.$tdOnEvent('pc：备件库存-列表分配事件');
+        break;
+      case 'apply':
+        this.$tdOnEvent('pc：备件库存-列表申领事件');
+        break;
+      default:
+        break;
       }
     }
   },

@@ -58,75 +58,75 @@
 </template>
 
 <script>
-  export default {
-    name: 'part-cancel-transfer-form',
-    inject: ['initData'],
-    props: {
-      formdata: Object,
-    },
-    data() {
-      return {
-        ruleForm: {
-          applayId: '',
-          applyName: '',
-          name: '',
-          time: '',
-          applyRemarks: '',
-          serialNumber: '',
-          type: '',
-          standard: '',
-          currentDepot: '',
-          repertoryCount: 0,
-          repertory: '',
-          sparesNum: '',
-          operate: true,
-          remarks: ''
-        },
-        rules: {
-          repertoryCount: [
-            { type:'number', message: '', trigger: 'change' }
-          ],
-          sparesNum: [
-            { type: 'number', message: '', trigger: 'change' }
-          ],
-          remarks: [
-            { message: '请输入备注', trigger: 'change' }
-          ],
+export default {
+  name: 'part-cancel-transfer-form',
+  inject: ['initData'],
+  props: {
+    formdata: Object,
+  },
+  data() {
+    return {
+      ruleForm: {
+        applayId: '',
+        applyName: '',
+        name: '',
+        time: '',
+        applyRemarks: '',
+        serialNumber: '',
+        type: '',
+        standard: '',
+        currentDepot: '',
+        repertoryCount: 0,
+        repertory: '',
+        sparesNum: '',
+        operate: true,
+        remarks: ''
+      },
+      rules: {
+        repertoryCount: [
+          { type:'number', message: '', trigger: 'change' }
+        ],
+        sparesNum: [
+          { type: 'number', message: '', trigger: 'change' }
+        ],
+        remarks: [
+          { message: '请输入备注', trigger: 'change' }
+        ],
 
-        }
+      }
+    }
+  },
+  created() {
+    let data = this.formdata;
+    // 赋值
+
+    this.ruleForm.applayId = data.id;
+    this.ruleForm.propserName = data.propserName;
+    this.ruleForm.propserTime = data.propserTime;
+    this.ruleForm.applyName = data.propserName;
+    this.ruleForm.time = data.propserTime;
+    this.ruleForm.applyRemarks = data.remark;
+    this.ruleForm.name = data.sparepartRepertory.sparepart.name || '';
+    this.ruleForm.type = data.sparepartRepertory.sparepart.type || '';
+    this.ruleForm.serialNumber = data.sparepartRepertory.sparepart.serialNumber || '';
+    this.ruleForm.standard = data.sparepartRepertory.sparepart.standard || '';
+    this.ruleForm.currentDepot = data.sparepartRepertory.repertory.name || '';
+    this.ruleForm.safetyStock = data.sparepartRepertory.safetyStock || 0;
+    this.ruleForm.repertoryCount = data.sparepartRepertory.repertoryCount || 0;
+    this.ruleForm.repertory = data.targetName || '';
+    this.ruleForm.sparesNum = data.variation - data.solvedVariation || 0;
+  },
+  methods: {
+    pack() {
+      let _this = this;
+      try {
+        return _this.ruleForm;
+      } catch (e) {
+        console.warn('err', e);
       }
     },
-    created() {
-      let data = this.formdata;
-      // 赋值
-
-      this.ruleForm.applayId = data.id;
-      this.ruleForm.propserName = data.propserName;
-      this.ruleForm.propserTime = data.propserTime;
-      this.ruleForm.applyName = data.propserName;
-      this.ruleForm.time = data.propserTime;
-      this.ruleForm.applyRemarks = data.remark;
-      this.ruleForm.name = data.sparepartRepertory.sparepart.name || '';
-      this.ruleForm.type = data.sparepartRepertory.sparepart.type || '';
-      this.ruleForm.serialNumber = data.sparepartRepertory.sparepart.serialNumber || '';
-      this.ruleForm.standard = data.sparepartRepertory.sparepart.standard || '';
-      this.ruleForm.currentDepot = data.sparepartRepertory.repertory.name || '';
-      this.ruleForm.safetyStock = data.sparepartRepertory.safetyStock || 0;
-      this.ruleForm.repertoryCount = data.sparepartRepertory.repertoryCount || 0;
-      this.ruleForm.repertory = data.targetName || '';
-      this.ruleForm.sparesNum = data.variation - data.solvedVariation || 0;
-    },
-    methods: {
-      pack() {
-        let _this = this;
-        try {
-          return _this.ruleForm;
-        } catch (e) {
-          console.error('err', e);
-        }
-      },
-    }
   }
+}
 </script>
 
 <style lang="scss">

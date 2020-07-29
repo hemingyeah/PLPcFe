@@ -1,90 +1,90 @@
 <template>
   <div>
     <el-table stripe
-        :data="fdata"
-        class="part-apply-form-batch-out-table"
-       >
-        <el-table-column v-for="column in columns" :key="column.field" :fdate='fdata'
-          v-if="column.show"
-          :label="column.label"
-          :width="column.width"
-          :fixed="column.fixed"
-          :align="column.align"
-          :render-header="column.renderHeader"
-          show-overflow-tooltip>
+              :data="fdata"
+              class="part-apply-form-batch-out-table"
+    >
+      <el-table-column v-for="column in columns" :key="column.field" :fdate='fdata'
+                       v-if="column.show"
+                       :label="column.label"
+                       :width="column.width"
+                       :fixed="column.fixed"
+                       :align="column.align"
+                       :render-header="column.renderHeader"
+                       show-overflow-tooltip>
 
-          <template slot-scope="scope">
-             <template v-if="column.field == 'propserName'">
-              <template>{{scope.row.propserName}}</template>
-            </template> 
-            <template v-else-if="column.field == 'type'">
-              <template>{{scope.row && scope.row.type}}</template>
-            </template>
-            <template v-else-if="column.field == 'propserTime'">
-              <template>{{scope.row.propserTime}}</template>
-            </template>
-            <template v-else-if="column.field == 'name'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.name}}</template>
-            </template>
-            <template v-else-if="column.field == 'serialNumber'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.serialNumber}}</template>
-            </template>
-            <template v-else-if="column.field == 'sparepart.type'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.type}}</template>
-            </template>
-            <template v-else-if="column.field == 'sparepart.standard'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.standard}}</template>
-            </template>
-            <template v-else-if="column.field == 'repertory'">
-              <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.repertory&&scope.row.sparepartRepertory.repertory.name}}</template>
-            </template>
-            <template v-else-if="column.field == 'repertoryCount'">
-              <template v-if="scope.row.sparepartRepertory">
-                {{scope.row.sparepartRepertory&&scope.row.sparepartRepertory.repertoryCount}}
+        <template slot-scope="scope">
+          <template v-if="column.field == 'propserName'">
+            <template>{{scope.row.propserName}}</template>
+          </template> 
+          <template v-else-if="column.field == 'type'">
+            <template>{{scope.row && scope.row.type}}</template>
+          </template>
+          <template v-else-if="column.field == 'propserTime'">
+            <template>{{scope.row.propserTime}}</template>
+          </template>
+          <template v-else-if="column.field == 'name'">
+            <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.name}}</template>
+          </template>
+          <template v-else-if="column.field == 'serialNumber'">
+            <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.serialNumber}}</template>
+          </template>
+          <template v-else-if="column.field == 'sparepart.type'">
+            <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.type}}</template>
+          </template>
+          <template v-else-if="column.field == 'sparepart.standard'">
+            <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.sparepart&&scope.row.sparepartRepertory.sparepart.standard}}</template>
+          </template>
+          <template v-else-if="column.field == 'repertory'">
+            <template v-if="scope.row.sparepartRepertory">{{scope.row.sparepartRepertory.repertory&&scope.row.sparepartRepertory.repertory.name}}</template>
+          </template>
+          <template v-else-if="column.field == 'repertoryCount'">
+            <template v-if="scope.row.sparepartRepertory">
+              {{scope.row.sparepartRepertory&&scope.row.sparepartRepertory.repertoryCount}}
 
-                <el-tooltip class="item" effect="dark" :content="`安全库存：${scope.row.sparepartRepertory.safetyStock}`" placement="top">
-                  <el-tag size="mini" type="danger" style="float: right"
-                          v-if="scope.row.sparepartRepertory.safetyStock && (scope.row.sparepartRepertory.safetyStock > scope.row.sparepartRepertory.repertoryCount)"
-                  >库存提醒</el-tag>
-                </el-tooltip>
-              </template>
-            </template>
-
-            <div v-else-if="column.field == 'holdCount' && scope.row.sparepartRepertory" style="text-align: center">
-                {{scope.row.holdCount}}/{{scope.row.holdCountSum || 0}}
-            </div>
-             <template v-else-if="column.field == 'variation'">
-               {{variationNum(scope.row.variation, scope.row.solvedVariation)}}
-            </template>
-            <template v-else-if="column.field == 'passnumber'" slot-scope="scope">
-               <el-input v-model="scope.row.number" type="number" step="any" :min="0" :max="variationNum(scope.row.variation, scope.row.solvedVariation)"></el-input>
-            </template>
-            <template v-else-if="column.field == 'enable'" slot-scope="scope">
-               <template v-if="scope.row.state == 'solved'">
-                  <el-button type="text" size="small" class="no-padding" style="color:#333;cursor: text;"> 已办理</el-button>
-              </template>
-              <template v-if="scope.row.state == 'suspending'">
-                <template v-if="scope.row.type == '申领' ">
-                  <el-button type="text" size="small" class="no-padding" style="color:#333;cursor: text;"> 出库</el-button>
-                </template>
-                <template v-if="scope.row.type == '退回' ">
-                  <el-button type="text" size="small" class="no-padding" style="color:#333;cursor: text;"> 入库</el-button>
-                </template>
-              </template>
-              
-            </template>
-            <template v-else>
-              {{scope.row[column.field]}}
+              <el-tooltip class="item" effect="dark" :content="`安全库存：${scope.row.sparepartRepertory.safetyStock}`" placement="top">
+                <el-tag size="mini" type="danger" style="float: right"
+                        v-if="scope.row.sparepartRepertory.safetyStock && (scope.row.sparepartRepertory.safetyStock > scope.row.sparepartRepertory.repertoryCount)"
+                >库存提醒</el-tag>
+              </el-tooltip>
             </template>
           </template>
 
-        </el-table-column>
-      </el-table>
+          <div v-else-if="column.field == 'holdCount' && scope.row.sparepartRepertory" style="text-align: center">
+            {{scope.row.holdCount}}/{{scope.row.holdCountSum || 0}}
+          </div>
+          <template v-else-if="column.field == 'variation'">
+            {{variationNum(scope.row.variation, scope.row.solvedVariation)}}
+          </template>
+          <template v-else-if="column.field == 'passnumber'" slot-scope="scope">
+            <el-input v-model="scope.row.number" type="number" step="any" :min="0" :max="variationNum(scope.row.variation, scope.row.solvedVariation)"></el-input>
+          </template>
+          <template v-else-if="column.field == 'enable'" slot-scope="scope">
+            <template v-if="scope.row.state == 'solved'">
+              <el-button type="text" size="small" class="no-padding" style="color:#333;cursor: text;"> 已办理</el-button>
+            </template>
+            <template v-if="scope.row.state == 'suspending'">
+              <template v-if="scope.row.type == '申领' ">
+                <el-button type="text" size="small" class="no-padding" style="color:#333;cursor: text;"> 出库</el-button>
+              </template>
+              <template v-if="scope.row.type == '退回' ">
+                <el-button type="text" size="small" class="no-padding" style="color:#333;cursor: text;"> 入库</el-button>
+              </template>
+            </template>
+              
+          </template>
+          <template v-else>
+            {{scope.row[column.field]}}
+          </template>
+        </template>
 
-      <div class="out-stock-remark">
-        <textarea maxlength="500" placeholder="请输入备注内容" v-model="remark"></textarea>
-      </div>
+      </el-table-column>
+    </el-table>
+
+    <div class="out-stock-remark">
+      <textarea maxlength="500" placeholder="请输入备注内容" v-model="remark"></textarea>
     </div>
+  </div>
 </template>
 
 <script>
@@ -147,21 +147,21 @@ export default {
               if(count == 0) {
                 this.$platform.alert('请填写大于0的正整数')
                 return
-              } else {
-                this.$platform.alert(`请填写大于0的${ count }位小数`)
-                return
-              }
+              } 
+              this.$platform.alert(`请填写大于0的${ count }位小数`)
+              return
+              
             } else if(obj[i].number > Number(this.variationNum(obj[i].variation, obj[i].solvedVariation))){
               this.$platform.alert('通过数不能大于申请数')
               return
-            }else{
-              let parm = {}
-              parm['id'] = obj[i].id
-              parm['solvedVariation'] = obj[i].number
-              parm['type'] = obj[i].type
-              parm['remark'] = this.remark
-              parms.push(parm)
             }
+            let parm = {}
+            parm['id'] = obj[i].id
+            parm['solvedVariation'] = obj[i].number
+            parm['type'] = obj[i].type
+            parm['remark'] = this.remark
+            parms.push(parm)
+            
           }else{
             let initData = this.initData;
             let msg = initData.precision ? `请填写大于0的${ initData.precision }位小数` : '请填写大于0的整数'
@@ -197,7 +197,7 @@ export default {
           })
         })
         .catch(err => {
-          console.error('getUserTotalCount Error', err);
+          console.warn('getUserTotalCount Error', err);
         })
     },
     initData(obj){
@@ -251,7 +251,7 @@ export default {
           label: '仓库',
           field: 'repertory',
           show: true
-        },{
+        }, {
           label: '当前库存',
           width: '120px',
           field: 'repertoryCount',
@@ -299,9 +299,9 @@ export default {
     renderHeader(h) {
       return (
         <span>
-        <el-tooltip class="item" effect="dark" content="个人库该备件数量/个人库备件总数" placement="top">
-          <span>个人库已有备件<i class="el-icon-question"></i></span>
-        </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="个人库该备件数量/个人库备件总数" placement="top">
+            <span>个人库已有备件<i class="el-icon-question"></i></span>
+          </el-tooltip>
         </span>
       )
     }

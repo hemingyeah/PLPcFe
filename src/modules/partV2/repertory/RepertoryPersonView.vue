@@ -23,14 +23,14 @@
 
     <form @submit.prevent="search();trackEventHandler('search')">
       <!--<div class="page-panel">  -->
-        <!--<div class="page-panel-body search-form-nano">-->
-          <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
-          <!--<el-button-group>-->
-            <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
-            <!--<el-button @click="reset();trackEventHandler('reset')">重置</el-button>-->
-          <!--</el-button-group>-->
-          <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
-        <!--</div>-->
+      <!--<div class="page-panel-body search-form-nano">-->
+      <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
+      <!--<el-button-group>-->
+      <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
+      <!--<el-button @click="reset();trackEventHandler('reset')">重置</el-button>-->
+      <!--</el-button-group>-->
+      <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
+      <!--</div>-->
       <!--</div>-->
       <!-- 高级搜索  -->
       <base-collapse-panel :value="isExpand" class="page-panel">
@@ -43,27 +43,27 @@
               <div class="form-item">
                 <label>备件名称</label>
                 <div class="form-item-content">
-                    <el-select popper-class="common-advance-popper" style="width:100%;"
-                        :value="partData.id"   
-                        @input="chooseSparepart"
-                        filterable
-                        clearable
-                        remote
-                        placeholder="搜索备件"
-                        :remote-method="fetchSparepart"
-                        :loading="partData.loading">
+                  <el-select popper-class="common-advance-popper" style="width:100%;"
+                             :value="partData.id"   
+                             @input="chooseSparepart"
+                             filterable
+                             clearable
+                             remote
+                             placeholder="搜索备件"
+                             :remote-method="fetchSparepart"
+                             :loading="partData.loading">
 
-                        <el-option
-                          v-for="item in partData.options"
-                          :key="item.id"
-                          :label="item.name"
-                          :value="item.id">
-                          <div class="part-option">
-                            <p>编号：{{item.serialNumber}}</p>
-                            <p>名称：{{item.name}}</p>
-                          </div>
-                        </el-option>
-                    </el-select>
+                    <el-option
+                      v-for="item in partData.options"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id">
+                      <div class="part-option">
+                        <p>编号：{{item.serialNumber}}</p>
+                        <p>名称：{{item.name}}</p>
+                      </div>
+                    </el-option>
+                  </el-select>
                 </div>
               </div>
               <div class="form-item">
@@ -123,12 +123,12 @@
                 <label>备件类别</label>
                 <div class="form-item-content">
                   <el-select popper-class="common-advance-popper" style="width: 100%;"
-                            :value="modelOther.sparepartType"
-                            @input="hooseSparepartType"
-                            filterable
-                            clearable
-                            remote
-                            placeholder="选择备件类别">
+                             :value="modelOther.sparepartType"
+                             @input="hooseSparepartType"
+                             filterable
+                             clearable
+                             remote
+                             placeholder="选择备件类别">
                     <el-option
                       v-for="item in types"
                       :key="item"
@@ -144,31 +144,31 @@
 
               <div class="form-item">
                 <div class="form-item">
-                <label>备件名称</label>
-                <div class="form-item-content">
+                  <label>备件名称</label>
+                  <div class="form-item-content">
                     <el-select popper-class="common-advance-popper" style="width: 100%;"
-                        :value="modelOther.sparepartId"
-                        @input="chooseSparepart"
-                        filterable
-                        clearable
-                        remote
-                        placeholder="选择备件"
-                        :remote-method="fetchSparepart"
-                        :loading="sparepart.loading">
+                               :value="modelOther.sparepartId"
+                               @input="chooseSparepart"
+                               filterable
+                               clearable
+                               remote
+                               placeholder="选择备件"
+                               :remote-method="fetchSparepart"
+                               :loading="sparepart.loading">
 
-                        <el-option
-                          v-for="item in sparepart.options"
-                          :key="item.id"
-                          :label="item.name"
-                          :value="item.id">
-                          <div class="part-option">
-                            <p>编号：{{item.serialNumber}}</p>
-                            <p>名称：{{item.name}}</p>
-                          </div>
-                        </el-option>
+                      <el-option
+                        v-for="item in sparepart.options"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                        <div class="part-option">
+                          <p>编号：{{item.serialNumber}}</p>
+                          <p>名称：{{item.name}}</p>
+                        </div>
+                      </el-option>
                     </el-select>
                   </div>
-              </div>
+                </div>
               </div>            
             </div>
 
@@ -176,41 +176,41 @@
               <div class="form-item">
                 <label>发起人</label>
                 <div class="form-item-content">
-                    <el-select class="srp-list-form-item" style="width: 100%;"
-                        :value="modelOther.propser"   
-                        @input="chooseUserApply"
-                        filterable
-                        clearable
-                        remote
-                        placeholder="选择人员"
-                        :remote-method="fetchUserApply"
-                        :loading="userApply.loading">
+                  <el-select class="srp-list-form-item" style="width: 100%;"
+                             :value="modelOther.propser"   
+                             @input="chooseUserApply"
+                             filterable
+                             clearable
+                             remote
+                             placeholder="选择人员"
+                             :remote-method="fetchUserApply"
+                             :loading="userApply.loading">
 
-                        <el-option
-                          v-for="item in userApply.options"
-                          :key="item.userId"
-                          :label="item.displayName"
-                          :value="item.userId">
+                    <el-option
+                      v-for="item in userApply.options"
+                      :key="item.userId"
+                      :label="item.displayName"
+                      :value="item.userId">
 
-                          <div class="srp-user-item">
-                            <img :src="item.head || '/resource/images/account_userhead.png'">
-                            <p>{{item.displayName}}</p>
-                          </div>
-                        </el-option>
-                    </el-select>
-                  </div>
-              </div>
-              <div class="form-item">
-                <div class="form-item">
-                <label>状态</label>
-                <div class="form-item-content">
-                  <el-select v-if="listType == 'personProcess'" :value="state" @input="chooseState" class="srp-list-form-item">
-                    <el-option value="" label="全部"></el-option>
-                    <el-option value="suspending" label="待办理"></el-option>
-                    <el-option value="solved" label="已办理"></el-option>
+                      <div class="srp-user-item">
+                        <img :src="item.head || '/resource/images/account_userhead.png'">
+                        <p>{{item.displayName}}</p>
+                      </div>
+                    </el-option>
                   </el-select>
                 </div>
               </div>
+              <div class="form-item">
+                <div class="form-item">
+                  <label>状态</label>
+                  <div class="form-item-content">
+                    <el-select v-if="listType == 'personProcess'" :value="state" @input="chooseState" class="srp-list-form-item">
+                      <el-option value="" label="全部"></el-option>
+                      <el-option value="suspending" label="待办理"></el-option>
+                      <el-option value="solved" label="已办理"></el-option>
+                    </el-select>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="form-row">
@@ -264,15 +264,15 @@
       <div class="page-panel-body srp-list-form">
         <div>
           <el-select class="srp-list-form-item" style="width: 180px;"
-            v-if="personDataLevel > 1"
-            :value="user.userId"   
-            @input="chooseUser"
-            filterable
-            clearable
-            remote
-            placeholder="搜索人员"
-            :remote-method="fetchUser"
-            :loading="user.loading">
+                     v-if="personDataLevel > 1"
+                     :value="user.userId"   
+                     @input="chooseUser"
+                     filterable
+                     clearable
+                     remote
+                     placeholder="搜索人员"
+                     :remote-method="fetchUser"
+                     :loading="user.loading">
 
             <el-option
               v-for="item in user.options"
@@ -294,15 +294,15 @@
             <el-option label="个人库办理" value="personProcess"></el-option>
           </el-select>
           <el-date-picker class="srp-list-form-item" style="width:350px;"
-            v-if="listType != 'part' && listType != 'personProcess'"
-            :value="dateRange"
-            @input="chooseDate"
-            type="daterange"
-            align="right"
-            unlink-panels
-            range-separator="-"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期">
+                          v-if="listType != 'part' && listType != 'personProcess'"
+                          :value="dateRange"
+                          @input="chooseDate"
+                          type="daterange"
+                          align="right"
+                          unlink-panels
+                          range-separator="-"
+                          start-placeholder="开始日期"
+                          end-placeholder="结束日期">
           </el-date-picker>
           <span v-if="listType === 'part' && this.user.userId" style="margin-left: 10px">个人库存品类：{{sparepartStatistics.sparepartNumTotal}}</span>
           <span v-if="listType === 'part'" style="margin-left: 10px">个人库存数量：{{Number(sparepartStatistics.sparepartCountTotal)}} </span>
@@ -322,7 +322,7 @@
           <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150" v-if="allowImportAndExport && listType != 'personProcess'" @command="trackEventHandler('moreAction')">
             <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn">
               更多操作<i class="iconfont icon-nav-down"></i>
-          </span>
+            </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item> 
                 <span class="dropdown-item" @click="exportData(false)">导出</span>
@@ -341,7 +341,7 @@
     </div>
 
     <div class="table-container">
-      <el-table :data="page.list"  ref="table"
+      <el-table :data="page.list" ref="table"
                 @sort-change="sort"
                 key="pageListTable"
                 header-row-class-name="base-table-header"
@@ -469,7 +469,7 @@
         <template v-else-if="listType == 'personProcess'">
           <template v-for="(column, index) in showColumns">
 
-            <el-table-column  v-if="column.field == 'variation'" :key="index + '123'" slot-scope="scope">
+            <el-table-column v-if="column.field == 'variation'" :key="index + '123'" slot-scope="scope">
               {{scope.row.variation - scope.row.solvedVariation}}111
             </el-table-column>
             <el-table-column
@@ -538,22 +538,22 @@
     </div>
 
     <el-dialog title="备件分配操作" :visible.sync="isReceiveAndRejectDialog" width="600px">
-        <part-receive-reject-form v-if="isReceiveAndRejectDialog"  ref="partReceiveRejectFom" :formdata="formdata" :receiveOrReject="receiveOrReject"></part-receive-reject-form>
-        <div slot="footer" class="dialog-footer">
+      <part-receive-reject-form v-if="isReceiveAndRejectDialog" ref="partReceiveRejectFom" :formdata="formdata" :receive-or-reject="receiveOrReject"></part-receive-reject-form>
+      <div slot="footer" class="dialog-footer">
 
-          <base-button type="ghost" @event="isReceiveAndRejectDialog = false" >取 消</base-button>
-          <base-button type="primary" @event="receiveAndReject" >确 定</base-button>
+        <base-button type="ghost" @event="isReceiveAndRejectDialog = false" >取 消</base-button>
+        <base-button type="primary" @event="receiveAndReject" >确 定</base-button>
 
-          <!--<el-button @click="isReceiveAndRejectDialog = false">取 消</el-button>-->
-          <!--<el-button type="primary" @click="receiveAndReject">确 定</el-button>-->
-        </div>
-      </el-dialog>
+        <!--<el-button @click="isReceiveAndRejectDialog = false">取 消</el-button>-->
+        <!--<el-button type="primary" @click="receiveAndReject">确 定</el-button>-->
+      </div>
+    </el-dialog>
 
     <base-export ref="exportPanel" 
-      v-if="allowImportAndExport"
-      :columns="columns"
-      :action="exportAction"
-      :method="'post'"></base-export>
+                 v-if="allowImportAndExport"
+                 :columns="columns"
+                 :action="exportAction"
+                 :method="'post'"></base-export>
 
     <part-back-form ref="partBackForm" @success="loadData" :repertory="repertory" ></part-back-form>
 
@@ -606,10 +606,10 @@
 
 <script>
 import _ from 'lodash';
-import Page from "../../../model/Page";
+import Page from '@src/model/Page';
 import DateUtil from '@src/util/date'
 import AuthUtil from '@src/util/auth';
-import StorageUtil from '@src/util/StorageUtil';
+import StorageUtil from '@src/util/storageUtil';
 
 import PartBackForm from './form/PartBackForm.vue';  
 import PartReceiveRejectFom from './form/PartReceiveRejectFom.vue';
@@ -625,30 +625,30 @@ const STORAGE_USE_PAGESIZE_KEY = 'repe_person_list_use_pagesize';
 const STORAGE_PROCESS_PAGESIZE_KEY = 'repe_person_list_process_pagesize';
 
 export default {
-  name: 'sparepartRepertory-person-view',
+  name: 'sparepart-repertory-person-view',
   inject: ['initData'],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PART_PAGESIZE_KEY) || 10;
 
     let originModel = {
       pageNum: 1,
-      pageSize: pageSize,
+      pageSize,
       type: '',
       keyWord: '',
       sortBy: {},
       teamId: null,
     };
     let processModel = {
-        enable: '',
-        sparepartType: '',
-        sparepartId: '',
-        propser: '',
-        approver: '',
-        timeEnd: '',
-        timeStart: '',
-        updateTimeEnd: '',
-        updateTimeStart: '',
-        typeSpec: ''
+      enable: '',
+      sparepartType: '',
+      sparepartId: '',
+      propser: '',
+      approver: '',
+      timeEnd: '',
+      timeStart: '',
+      updateTimeEnd: '',
+      updateTimeStart: '',
+      typeSpec: ''
     }
     return {
       multipleSelectionPanelShow: false,
@@ -656,8 +656,8 @@ export default {
       tag: [],
       auths: {},
       tab: '', // 页签展示
-      userId: '', //当前用户的Id
-      tagIds: [], //当前用户的团队
+      userId: '', // 当前用户的Id
+      tagIds: [], // 当前用户的团队
       tagIdsWithChildTag: [], // 包含子团队
       isExpand: false,
       columns: this.buildColumns(),
@@ -675,8 +675,8 @@ export default {
       },
       dateRange: [],
 
-      originModel: originModel,
-      processModel: processModel,
+      originModel,
+      processModel,
       model: _.assign({}, originModel),
       page: new Page(),
       selected: [],
@@ -744,7 +744,7 @@ export default {
     }
   },
   computed: {
-    //是否允许导入导出
+    // 是否允许导入导出
     allowImportAndExport(){
       return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
     },
@@ -761,9 +761,9 @@ export default {
       return this.auths.VIP_SPAREPART_PERSION || 0;
     },
     exportAction(){
-      let action = "/partV2/repertory/person/exportStockRecord";
-      if(this.listType == 'useRecord') action = "/partV2/repertory/person/exportUseRecord";
-      if(this.listType == 'part') action = "/partV2/repertory/person/exportSparepartUser";
+      let action = '/partV2/repertory/person/exportStockRecord';
+      if(this.listType == 'useRecord') action = '/partV2/repertory/person/exportUseRecord';
+      if(this.listType == 'part') action = '/partV2/repertory/person/exportSparepartUser';
       return action;
     },
     // filteredTeams() {
@@ -799,7 +799,7 @@ export default {
         url:`/task/view/${item.id}`,
         title: '正在加载',
         close: true,
-        fromId:fromId
+        fromId
       })
     },
 
@@ -907,7 +907,7 @@ export default {
       let title = '库存记录';
       if(this.listType == 'useRecord') title = '使用记录';
       if(this.listType == 'part') title = '持有备件';
-      let fileName = `${DateUtil.format(new Date(),'yyyy-MM-dd')}个人备件库${title}.xlsx`;
+      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}个人备件库${title}.xlsx`;
 
       if(!exportAll){
         if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
@@ -1008,7 +1008,7 @@ export default {
       if(this.personDataLevel == 1) return;
 
       let model = {
-        keyword: keyword,
+        keyword,
         pageSize: 50
       }
 
@@ -1025,7 +1025,7 @@ export default {
       this.user.loading = true
       this.$http.get('/partV2/repertory/users', model)
         .then(result => this.user.options = result)
-        .catch(err => console.error(err))
+        .catch(err => console.warn(err))
         .finally(() => this.user.loading = false);
     },
     select(data){
@@ -1054,7 +1054,7 @@ export default {
       this.loadData();
     },
     reset(){
-      this.model = _.assign({},this.originModel);
+      this.model = _.assign({}, this.originModel);
       this.partData.id = '';
       this.$refs.table.clearSort();
 
@@ -1101,18 +1101,18 @@ export default {
 
         this.matchSelected();
       }catch(error){
-        console.error(error)
+        console.warn(error)
       }
       this.$nextTick(() => loading.close());
     },
     fetchUserApply(keyword){
       // 获取用户
       let model = {
-        keyword: keyword,
+        keyword,
         pageSize: 50
       }
       this.userApply.loading = true
-      this.$http.get('/partV2/repertory/user/list',model)
+      this.$http.get('/partV2/repertory/user/list', model)
         .then(result => this.userApply.options = result.list)
         .catch(err => console.log(err))
         .finally(() => this.userApply.loading = false);
@@ -1120,11 +1120,11 @@ export default {
     fetchUserApprove(keyword){
       // 获取用户
       let model = {
-        keyword: keyword,
+        keyword,
         pageSize: 50
       }
       this.userApply.loading = true
-      this.$http.get('/partV2/repertory/user/list',model)
+      this.$http.get('/partV2/repertory/user/list', model)
         .then(result => this.userApprove.options = result.list)
         .catch(err => console.log(err))
         .finally(() => this.userApprove.loading = false);
@@ -1132,7 +1132,7 @@ export default {
     fetchData(){
       let userId = this.userId;
 
-      //如果是管理员可查看他人数据
+      // 如果是管理员可查看他人数据
       if(this.personDataLevel > 1){
         userId = this.user.userId;
       }
@@ -1154,7 +1154,7 @@ export default {
     },
     fetchStockRecord(){
       let userId = this.userId;
-      //如果是管理员可查看他人数据
+      // 如果是管理员可查看他人数据
       if(this.personDataLevel > 1){
         userId = this.user.userId;
       }
@@ -1174,14 +1174,14 @@ export default {
         }
       }
       
-      //删除type字段，备件type和记录type冲突
+      // 删除type字段，备件type和记录type冲突
       delete params.type;
 
       return this.$http.get('/partV2/repertory/person/stockRecord', params)
     },
     fetchUseRecord(){
       let userId = this.userId;
-      //如果是管理员可查看他人数据
+      // 如果是管理员可查看他人数据
       if(this.personDataLevel > 1){
         userId = this.user.userId;
       }
@@ -1201,7 +1201,7 @@ export default {
         }
       }
 
-      //删除type字段，备件type和记录type冲突
+      // 删除type字段，备件type和记录type冲突
       delete params.type;
 
       return this.$http.get('/partV2/repertory/person/useRecord', params)
@@ -1209,7 +1209,7 @@ export default {
     // 个人处理 
     fetchProcessRecord() {
       let targetId = '';
-      //如果是管理员可查看他人数据
+      // 如果是管理员可查看他人数据
       if(this.personDataLevel > 1){
         targetId = this.user.userId;
       }      
@@ -1217,7 +1217,7 @@ export default {
         ...this.model,
         ...this.modelOther,
         state: this.state,
-        targetId: targetId
+        targetId
       };
       if(Array.isArray(this.dateRange)){
         let [start, end] = this.dateRange;
@@ -1228,7 +1228,7 @@ export default {
         }
       }
       
-      //删除type字段，备件type和记录type冲突
+      // 删除type字段，备件type和记录type冲突
       delete params.type;
 
       return this.$http.get('/partV2/approve/list/allApprove/person', params)
@@ -1633,12 +1633,12 @@ export default {
 
       this.partData.loading = true;
       this.sparepart.loading = true;
-      this.$http.get('/partV2/repertory/sparepart/list',model)
+      this.$http.get('/partV2/repertory/sparepart/list', model)
         .then(result => {
           this.partData.options = result.list;
           this.sparepart.options = result.list;
-          })
-        .catch(err => console.error(err))
+        })
+        .catch(err => console.warn(err))
         .finally(() => {
           this.partData.loading = false;
           this.sparepart.loading = false;
@@ -1653,32 +1653,32 @@ export default {
     // TalkingData事件埋点
     trackEventHandler(type) {
       switch (type) {
-        case 'search':
-          this.$tdOnEvent('pc：个人备件库-搜索事件');
-          break;
-        case 'reset':
-          this.$tdOnEvent('pc：个人备件库-重置事件');
-          break;
-        case 'advSearch':
-          this.$tdOnEvent('pc：个人备件库-高级搜索事件');
-          break;
-        case 'choosePerson':
-          this.$tdOnEvent('pc：个人备件库-搜索人员出入框事件');
-          break;
-        case 'chooseType':
-          this.$tdOnEvent('pc：个人备件库-备件状态下拉框事件');
-          break;
-        case 'selectColumn':
-          this.$tdOnEvent('pc：个人备件库-选择列事件');
-          break;
-        case 'moreAction':
-          this.$tdOnEvent('pc：个人备件库-更多操作事件');
-          break;
-        case 'listBack':
-          this.$tdOnEvent('pc：个人备件库-列表退回事件');
-          break;                                                                      
-        default:
-          break;
+      case 'search':
+        this.$tdOnEvent('pc：个人备件库-搜索事件');
+        break;
+      case 'reset':
+        this.$tdOnEvent('pc：个人备件库-重置事件');
+        break;
+      case 'advSearch':
+        this.$tdOnEvent('pc：个人备件库-高级搜索事件');
+        break;
+      case 'choosePerson':
+        this.$tdOnEvent('pc：个人备件库-搜索人员出入框事件');
+        break;
+      case 'chooseType':
+        this.$tdOnEvent('pc：个人备件库-备件状态下拉框事件');
+        break;
+      case 'selectColumn':
+        this.$tdOnEvent('pc：个人备件库-选择列事件');
+        break;
+      case 'moreAction':
+        this.$tdOnEvent('pc：个人备件库-更多操作事件');
+        break;
+      case 'listBack':
+        this.$tdOnEvent('pc：个人备件库-列表退回事件');
+        break;                                                                      
+      default:
+        break;
       }
     }
   },

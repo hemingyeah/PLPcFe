@@ -11,7 +11,7 @@
             @event="model.pageNum=1;search();trackEventhandler('search')"
             native-type="submit"
           >搜索</base-button>
-          <base-button type="ghost" @event="reset();trackEventhandler('reset')">重置</base-button>
+          <base-button type="ghost" @event="resetAll();trackEventhandler('reset')">重置</base-button>
         </div>
         <span
           class="advanced-search-visible-btn"
@@ -23,7 +23,7 @@
       </form>
     </div>
 
-    <form @submit.prevent="search();trackEventhandler('search')">
+    <form @submit.prevent="search();trackEventhandler('advSearch')">
       <!--<div class="page-panel">-->
       <!--<div class="page-panel-body search-form-nano">-->
       <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
@@ -67,17 +67,26 @@
             </div>-->
             <div class="form-item">
               <label>目标仓库</label>
-              <div class="form-item-content">
+              <div class="form-item-content flex-x">
                 <el-select
-                  v-model="model.sourceIds"
+                  v-model="sourceType"
+                  @change="chooseTargetType"
                   class="srp-list-form-item"
-                  style="width:100%"
+                  style="width: 120px;"
+                >
+                  <el-option key="0" value="备件库" :label="'备件库'"></el-option>
+                  <el-option key="1" value="个人备件库" :label="'个人备件库'"></el-option>
+                </el-select>
+                <el-select
+                  v-model="model.targetIds"
+                  class="srp-list-form-item flex-1"
+                  style="margin-left:1px;"
                   multiple
                   collapse-tags
-                  placeholder="原始仓库"
+                  placeholder="目标仓库"
                 >
                   <el-option
-                    v-for="item in repertory"
+                    v-for="item in repertory_2"
                     :key="item.id"
                     :value="item.id"
                     :label="item.name"
@@ -93,7 +102,7 @@
                   <el-select
                     popper-class="common-advance-popper"
                     style="width: 100%;"
-                    :value="sparepart.sparepartId"
+                    :value="sparepart.sparepartName"
                     @input="chooseSparepart"
                     filterable
                     clearable
@@ -185,13 +194,15 @@
                 <el-select
                   class="srp-list-form-item"
                   style="width: 100%;"
-                  :value="userApprove.userId"
-                  @input="chooseUserApprove"
+                  v-model="userApprove.approveId"
+                  @change="chooseUserApprove"
                   filterable
                   clearable
                   remote
+                  reserve-keyword
                   placeholder="选择人员"
-                  :remote-method="fetchUserApprove"
+                  :filter-method="fetchUserApprove"
+                  @visible-change="visibleUserApprove"
                   :loading="userApprove.loading"
                 >
                   <el-option
@@ -254,7 +265,7 @@
           <div class="form-row">
             <div class="text-right" style="width:100%;">
               <!--<el-button @click="reset">重置</el-button>-->
-              <base-button type="ghost" @event="reset">重置</base-button>
+              <base-button type="ghost" @event="resetAll">重置</base-button>
               <base-button type="primary" native-type="submit">确定</base-button>
               <!--<el-button type="primary" native-type="submit">确定</el-button>-->
             </div>
@@ -319,13 +330,14 @@
           <el-select
             class="srp-list-form-item"
             style="width: 180px;"
-            :value="userApply.userId"
-            @input="chooseUserApply"
+            v-model="userApply.prosperId"
+            @change="chooseUserApply"
             filterable
             clearable
             remote
             placeholder="发起人"
-            :remote-method="fetchUserApply"
+            :filter-method="fetchUserApply"
+            @visible-change="visibleUserApply"
             :loading="userApply.loading"
           >
             <el-option
@@ -341,17 +353,33 @@
             </el-option>
           </el-select>
 
-          <el-select
-            v-model="model.targetIds"
-            @change="chooseRepertory"
-            class="srp-list-form-item"
-            style="width: 150px;"
-            multiple
-            collapse-tags
-            placeholder="原始仓库"
-          >
-            <el-option v-for="item in repertory" :key="item.id" :value="item.id" :label="item.name"></el-option>
-          </el-select>
+          <div class="flex-x group-select">
+            <el-select
+              v-model="targetType"
+              @change="chooseSourceType"
+              class="srp-list-form-item"
+              style="width: 120px;"
+            >
+              <el-option key="0" value="备件库" :label="'备件库'"></el-option>
+              <el-option key="1" value="个人备件库" :label="'个人备件库'"></el-option>
+            </el-select>
+            <el-select
+              v-model="model.sourceIds"
+              @change="chooseRepertory"
+              class="srp-list-form-item"
+              style="width: 180px;margin-left:-3px;"
+              multiple
+              collapse-tags
+              placeholder="原始仓库"
+            >
+              <el-option
+                v-for="item in repertory_1"
+                :key="item.id"
+                :value="item.id"
+                :label="item.name"
+              ></el-option>
+            </el-select>
+          </div>
 
           <div class="pull-right">
             <el-button-group>
@@ -397,7 +425,7 @@
               </span>
 
               <el-dropdown-menu slot="dropdown" class="dropdown-more">
-                <el-dropdown-item>
+                <!-- <el-dropdown-item>
                   <span
                     class="dropdown-item"
                     @click="outstockBatch(selected);trackEventhandler('batch-stock-out')"
@@ -408,7 +436,7 @@
                     class="dropdown-item"
                     @click="instockBatch(selected);trackEventhandler('batch-stock-in')"
                   >批量入库</span>
-                </el-dropdown-item>
+                </el-dropdown-item> -->
                 <el-dropdown-item>
                   <span
                     class="dropdown-item"
@@ -448,6 +476,7 @@
         @select-all="handleSelection"
         header-row-class-name="base-table-header"
         @sort-change="sortChange"
+        @header-click="headerClick"
       >
         <el-table-column type="selection" width="44"></el-table-column>
 
@@ -455,7 +484,7 @@
           v-for="column in columns"
           :key="column.field"
           :prop="column.field"
-          v-if="column.show"
+          v-show="column.show"
           :label="column.label"
           :width="column.width"
           :min-width="column.minWidth"
@@ -469,6 +498,14 @@
             <template v-if="column.field == 'propserName'">
               <template>{{scope.row.propserName}}</template>
             </template>
+            <!-- <template
+              v-else-if="column.field =='prosperTime'"
+            >{{scope.row.prosperTime}}</template>
+
+            <template
+              v-else-if="column.field =='approveTime'"
+            >{{scope.row.approveTime}}</template>-->
+
             <template v-else-if="column.field == 'type'">
               <template>{{scope.row && scope.row.type}}</template>
             </template>
@@ -529,6 +566,12 @@
                 >{{scope.row.recordNo || ''}}</div>
               </el-tooltip>
             </template>
+            <template v-else-if="column.field ==='approveNo'">
+              <a
+                class="view-detail-btn el-tooltip"
+                @click="column.clickFnc(scope.row)"
+              >{{scope.row.approveNo}}</a>
+            </template>
             <template v-else-if="column.field == 'remark'">
               <el-tooltip placement="top" popper-class="common-tooltip">
                 <div slot="content" class="pre">{{scope.row.remark}}</div>
@@ -540,8 +583,31 @@
               {{variationNum(scope.row.variation, scope.row.solvedVariation)}}
             </template>
             <template v-else-if="column.field == 'variation_'">{{scope.row.solvedVariation}}</template>
+            <template v-else-if="column.field =='enable'">
+              <el-button
+                @click="showPartDealDetail(scope.row),tableTrackEventHandler('done')"
+                type="text"
+                size
+                class="no-padding"
+                v-if="scope.row.approved"
+              >办理</el-button>
+              <el-button
+                @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=0,tableTrackEventHandler('reject')"
+                type="text"
+                size
+                class="no-padding"
+                v-if="scope.row.isreject"
+              >拒绝</el-button>
+              <el-button
+                @click="partDealData['data']['approveNo']=scope.row.approveNo,backstockDialog=true,cancelType=1,tableTrackEventHandler('recall')"
+                type="text"
+                size
+                class="no-padding"
+                v-if="scope.row.cancel"
+              >撤销</el-button>
+            </template>
             <!-- 操作 -->
-            <template v-else-if="column.field == 'enable'" slot-scope="scope">
+            <template v-else-if="column.field == 'enable2222'" slot-scope="scope">
               <template v-if="scope.row.type !== '调拨'">
                 <template v-if="scope.row.state == 'solved' && scope.row.type !='分配'">
                   <el-button
@@ -717,25 +783,6 @@
     </div>
 
     <div class="page-panel">
-      <el-dialog title="拒绝操作" :visible.sync="backstockDialog" width="600px">
-        <part-backstock-form
-          v-if="backstockDialog"
-          ref="backstockForm"
-          :formdata="formdata"
-          :repertory="repertory"
-          :sparepart-config="sparepartConfig"
-          :user-id="userId"
-          :user-name="userName"
-        ></part-backstock-form>
-        <div slot="footer" class="dialog-footer">
-          <base-button type="ghost" @event="backstockDialog = false">取 消</base-button>
-          <base-button type="primary" @event="backstockSave" :disabled="pending">确 定</base-button>
-
-          <!--<el-button @click="backstockDialog = false">取 消</el-button>-->
-          <!--<el-button type="primary" @click="backstockSave" :disabled="pending">确 定</el-button>-->
-        </div>
-      </el-dialog>
-
       <el-dialog title="入库操作" :visible.sync="instockDialog" width="600px">
         <!-- <part-instock-form
           v-if="instockDialog"
@@ -752,12 +799,98 @@
         </div>
       </el-dialog>
 
-      <el-dialog title="申请" :visible.sync="supplyDialog" width="900px">
-        <part-deal-with-form ref="partDealWithForm"></part-deal-with-form>
+      <el-dialog
+        :title="`申请单详情-${partDealData.data ? partDealData.data.type : ''}`"
+        :visible.sync="partDealDialog"
+        width="900px"
+        :close-on-click-modal="false"
+      >
+        <part-deal-with-form ref="partDealWithForm" :prop-data="partDealData"></part-deal-with-form>
+
+        <div slot="footer" class="dialog-footer flex-x">
+          <base-button
+            v-if="partDealData.data.state === 'suspending' && partDealData.data.cancel"
+            type="primary"
+            @event="dingMessage"
+            :disabled="pending"
+          >DING</base-button>
+          <div class="flex-1"></div>
+          <base-button
+            class="mar-r-15"
+            type="ghost"
+            v-if="partDealData.data.isreject"
+            @event="cancelType=0,backstockDialog = true"
+          >拒绝</base-button>
+          <base-button
+            class="mar-r-15"
+            type="ghost"
+            v-if="partDealData.data.cancel"
+            @event="cancelType=1,backstockDialog = true"
+          >撤销</base-button>
+          <base-button
+            type="primary"
+            v-if="partDealData.data.approved "
+            @event="partDealDataDone"
+            :disabled="pending"
+          >办理</base-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog
+        :title="`${cancelType==0?'拒绝':'撤销'}`"
+        :modal="false"
+        :visible.sync="backstockDialog"
+        width="600px"
+      >
+        <!-- <part-backstock-form
+          v-if="backstockDialog"
+          ref="backstockForm"
+          :formdata="formdata"
+          :repertory="repertory"
+          :sparepartConfig="sparepartConfig"
+          :userId="userId"
+          :userName="userName"
+        ></part-backstock-form>-->
+        <p v-if="cancelType===1">确定要撤销「调拨」审批吗？撤销后，已办理的数量不受影响</p>
+        <el-form :model="rejectForm" :rules="rejectRules" :ref="'rejectForm'" class="mar-b-15">
+          <el-form-item v-if="cancelType===0" prop="reason">
+            <el-input
+              type="textarea"
+              resize="none"
+              style="width:580px;"
+              maxlength="100"
+              :autosize="{ minRows: 2, maxRows: 6 }"
+              :placeholder="'请填写拒绝理由[100个字以内]'"
+              v-model="rejectForm.reason"
+            ></el-input>
+          </el-form-item>
+          <el-form-item v-if="cancelType===1" prop="reasons">
+            <el-input
+              type="textarea"
+              resize="none"
+              style="width:580px;"
+              maxlength="50"
+              :autosize="{ minRows: 2, maxRows: 6 }"
+              :placeholder="'请填写撤销理由[50个字以内]'"
+              v-model="rejectForm.reason"
+            ></el-input>
+          </el-form-item>
+        </el-form>
 
         <div slot="footer" class="dialog-footer">
-          <base-button type="ghost" @event="supplyDialog = false">取 消</base-button>
-          <base-button type="primary" @event="supplySave" :disabled="pending">确 定</base-button>
+          <base-button type="ghost" @event="backstockDialog = false,this.rejectForm.reason=''">取 消</base-button>
+          <base-button
+            v-if="cancelType===0"
+            type="primary"
+            @event="partDealDataCancel(partDealData.data.approveNo)"
+            :disabled="pending"
+          >确 定</base-button>
+          <base-button
+            v-if="cancelType===1"
+            type="primary"
+            @event="partDealDataReset(partDealData.data.approveNo)"
+            :disabled="pending"
+          >确 定</base-button>
         </div>
       </el-dialog>
 
@@ -855,7 +988,7 @@
         v-if="allowImportAndExport"
         :columns="columns"
         :validate="checkExportCount"
-        action="/partV2/approve/export"
+        action="/partV2/approve/approveExport"
         :method="'post'"
       ></base-export>
     </div>
@@ -887,8 +1020,8 @@
             </div>
             <div class="part-selected-row" v-for="c in selected" :key="c.id">
               <span class="part-selected-sn">{{c.type}}</span>
-              <span class="part-selected-name">{{c.propserName}}</span>
-              <span class="part-selected-name">{{c.propserTime}}</span>
+              <span class="part-selected-name">{{c.prosperName}}</span>
+              <span class="part-selected-name">{{c.prosperTime}}</span>
               <button type="button" class="part-selected-delete" @click="cancelSelectPart(c)">
                 <i class="iconfont icon-fe-close"></i>
               </button>
@@ -897,6 +1030,7 @@
         </template>
       </div>
     </base-panel>
+
   </div>
 </template>
 
@@ -917,6 +1051,8 @@ import DateUtil from '@src/util/date';
 import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
 
+let allPerson = [];
+
 const STORAGE_COLNUM_KEY = 'repe_apply_list_column';
 const STORAGE_PAGESIZE_KEY = 'repe_apply_list_pagesize';
 
@@ -928,14 +1064,14 @@ export default {
 
     let originModel = {
       keyWord: '',
-      type: '',
-      enable: '',
+      type: [],
+      // enable: "",
       pageNum: 1,
       pageSize,
       sparepartType: '',
-      sourceIds: '',
-      targetIds: '',
-      state:''
+      targetIds: [],
+      sourceIds: [],
+      state: ['suspending']
     };
 
     return {
@@ -964,18 +1100,18 @@ export default {
       
       types: [],
       userApply: {
-        userId: '',
+        prosperId: '',
         loading: false,
         options: []
       },
       userApprove: {
-        userId: '',
+        approveId: '',
         loading: false,
         options: []
       },
       sparepart: {
         sparepartType: '',
-        sparepartId: '',
+        sparepartName: '',
         loading: false,
         options: []
       },
@@ -994,13 +1130,21 @@ export default {
       cancelTransferDialog: false,
       transferDialog: false,
       reStockDialog: false,
-      supplyDialog: false, // 申请弹窗
-      repertory: [], // 所有管理仓库
+      partDealDialog: false, // 新处理弹窗显隐判断条件
+      partDealData: {
+        data: {},
+        arr: []
+      }, // 新处理弹窗需要的数据
+      repertory: [], // 所有原始仓库
       repertories: [], // 所有仓库
-      repertorySelected:'',
-      sparepartConfig:{},
-      repertoryName:'',
-      state:'',
+      repertory_1: [],
+      repertory_2: [],
+      sourceType: '备件库',
+      targetType: '备件库',
+      repertorySelected: '',
+      sparepartConfig: {},
+      repertoryName: '',
+      state: '',
       pickerOptions2: {
         shortcuts: [{
           text: '最近一周',
@@ -1031,6 +1175,18 @@ export default {
       timeValue: '',
       updateTimeValue:'',
       isPersonalRepertory: false,
+      initData: {},
+      rejectForm: {
+        reason: '',
+        reasons: ''
+      },
+      rejectRules: {
+        reason: [
+          { required: true, message: '请填写拒绝理由', trigger: 'change' }
+        ]
+      },
+      cancelType: 0 // 0 拒绝 1 撤销
+
     }
   },
   computed: {
@@ -1040,6 +1196,11 @@ export default {
     // 是否允许导入导出
     allowImportAndExport(){
       return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
+    }
+  },
+  watch: {
+    backstockDialog() {
+      this.$refs['rejectForm'].resetFields();
     }
   },
   filters: {
@@ -1062,7 +1223,7 @@ export default {
       if(!this.allowImportAndExport || !this.allowInout) return;
 
       let ids = [];
-      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件办理出入库数据.xlsx`;
+      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件出入库办理数据.xlsx`;
 
       if(!exportAll){
         if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
@@ -1217,7 +1378,6 @@ export default {
     },
     initialize(){
       Promise.all([
-        this.fetchRepertory(), // 个人管理所有仓库
         this.fetchAllRepertory(), // 所有仓库
         this.loadData(),
         this.fecthSparepartConfig(),
@@ -1228,6 +1388,7 @@ export default {
         .then(res => {
           let allRepertory = res[1];
           let list = res[2];
+          allPerson = this.userApply.options;
 
           this.page.list = list.map(item => {
             let tv = allRepertory.filter(r => r.id === item.targetId);
@@ -1261,11 +1422,25 @@ export default {
       this.model = _.assign({}, this.originModel);
       this.timeValue = [];
       this.updateTimeValue = [];
-      this.sparepart.sparepartId = '';
+      this.sparepart.sparepartName = '';
       this.userApply.userId = '';
       this.userApprove.userId = '';
       this.state = '';
       this.repertoryName = '';
+      this.loadData();
+    },
+    resetAll() {
+      // 搜索条件初始化
+      this.model = _.assign({}, this.originModel);
+      this.userApply.prosperId = '';
+      this.userApprove.approveId = '';
+      this.targetType = '备件库';
+      this.userApprove.options = _.cloneDeep(allPerson);
+      this.sparepart.options = _.cloneDeep(allPerson);
+      this.repertory_1 = this.repertories;
+      this.repertory_2 = this.repertories;
+      this.timeValue = [];
+      this.updateTimeValue = [];
       this.loadData();
     },
     async loadData(){
@@ -1295,6 +1470,14 @@ export default {
         .catch(err => console.log(err))
         .finally(() => this.userApply.loading = false);
     },
+    visibleUserApply(e) {
+      if (this.userApply.prosperId === '') {
+        setTimeout(() => {
+          this.userApply.loading = false;
+          this.userApply.options = _.cloneDeep(allPerson);
+        }, 500);
+      }
+    },
     fetchUserApprove(keyword){
       // 获取用户
       let model = {
@@ -1303,15 +1486,35 @@ export default {
       }
       this.userApply.loading = true;
       this.$http.get('/partV2/repertory/users', model)
-        .then(result => (this.userApprove.options = result))
+        .then(
+          result => (
+            (this.userApprove.options = result),
+            (this.repertory = result.map(item => {
+              item = {
+                id: item.userId || '',
+                name: item.displayName || ''
+              };
+              return item
+            }))
+          )
+        )
+
         .catch(err => console.log(err))
         .finally(() => this.userApprove.loading = false);
+    },
+    visibleUserApprove(e) {
+      if (this.userApprove.approveId === '') {
+        setTimeout(() => {
+          this.userApprove.loading = false;
+          this.userApprove.options = _.cloneDeep(allPerson);
+        }, 500);
+      }
     },
     fetchSparepart(keyword){
       // 获取备件
       let model = {
         keyWord: keyword,
-        enable: 1,
+        // enable: 1,
         pageSize: 50
       }
       this.sparepart.loading = true
@@ -1321,33 +1524,41 @@ export default {
         .finally(() => this.sparepart.loading = false);
     },
     
-    chooseUserApply(value){
-      if(this.userApply.userId == value) return;
-      this.userApply.userId = value;
-      this.model.propser = value;
+    chooseUserApply(value) {
+      this.model.prosperId = value;
     },
-    chooseUserApprove(value){
-      if(this.userApprove.userId == value) return;
-      this.userApprove.userId = value;
-      // this.model.approver = value;
-      this.model.executor = value;
+    chooseUserApprove(value) {
+      this.model.approveId = value;
     },
-    chooseSparepart(value){
-      if(this.sparepart.sparepartId == value) return;
-      this.sparepart.sparepartId = value;
-      this.model.sparepartId = value;
+    chooseSparepart(value) {
+      if (this.sparepart.sparepartName == value) return;
+      this.sparepart.sparepartName = value;
+      this.model.sparepartName = value;
     },
     hooseSparepartType(value){
       if(this.sparepart.sparepartType == value) return;
       this.sparepart.sparepartType = value;
       this.model.sparepartType = value;
     },
-    fetchData(){
+    fetchData() {
       // 获取申请列表
-      return this.$http.get('/partV2/approve/list/allApprove', this.model).then(result => {
-        // repertory
-        let list = (result.data.list || [])
-          .map(item => {
+      return this.$http
+        .get('/partV2/approve/approveList/list', this.model)
+        .then(result => {
+          // repertory
+          let list = (result.data.list || []).map(item => {
+            item.approveTime = item.approveTime
+              ? DateUtil.format(
+                new Date(item.approveTime),
+                'yyyy-MM-dd HH:mm:ss'
+              )
+              : '';
+            item.prosperTime = item.prosperTime
+              ? DateUtil.format(
+                new Date(item.prosperTime),
+                'yyyy-MM-dd HH:mm:ss'
+              )
+              : '';
             let tv = this.repertories.filter(r => r.id === item.targetId);
             if (item.type === '调拨' && tv && tv[0]) {
               item.targetName = tv[0].name;
@@ -1358,13 +1569,12 @@ export default {
 
             item = this.judgeRelationshipBetweenUserAndRepertory(item);
             return item;
-          })
-        ;
-        return {
-          ...result.data,
-          list
-        };
-      })
+          });
+          return {
+            ...result.data,
+            list
+          };
+        });
     },
     judgeRelationshipBetweenUserAndRepertory(row) {
       const userId = this.userId;
@@ -1391,9 +1601,30 @@ export default {
     fetchAllRepertory(){
       return this.$http.get('/partV2/repertory/allRepertory')
         .then(result => {
+          this.repertory_1 = result || [];
+          this.repertory_2 = result || [];
           return this.repertories = result || []
         })
-        .catch(err => console.error(err))
+        .catch(err => console.warn(err))
+    },
+    chooseSourceType(e) {
+      if (e === '个人备件库') {
+        this.repertory_1 = this.repertory;
+      } else {
+        this.repertory_1 = this.repertories;
+      }
+      this.model.sourceIds = [];
+      console.log(e, '原始');
+    },
+    chooseTargetType(e) {
+      if (e === '个人备件库') {
+        this.repertory_2 = this.repertory;
+      } else {
+        this.repertory_2 = this.repertories;
+      }
+      this.model.targetIds = [];
+      this.trackEventhandler('chooseTargetType');
+      console.log(e, '目标');
     },
     chooseRepertory(value){
       this.trackEventhandler('chooseRepertory');
@@ -1682,6 +1913,11 @@ export default {
         this.$platform.alert('请先勾选要批量操作的备件');
         return
       }
+      if (value.length > 5) {
+        this.$platform.alert('批量操作数量最多只支持5个');
+        return;
+      }
+
       if(!this.isPersonalRepertory) {
         return this.personalRepertoryNotMeaage()
       }
@@ -1705,6 +1941,10 @@ export default {
         this.$platform.alert('请先勾选要批量操作的备件');
         return
       }
+      if (value.length > 5) {
+        this.$platform.alert('批量操作数量最多只支持5个');
+        return;
+      }
       if(!this.isPersonalRepertory) {
         return this.personalRepertoryNotMeaage()
       }
@@ -1716,59 +1956,157 @@ export default {
       }
       this.instockBatchDialog = true;
       this.formdata = value;
-      
-    
     },
-    buildParams(pageNum, pageSize){
+    partDealDataCancel(approveNo) {
+      console.log(this.rejectForm.reason, '拒绝');
+      // return;
+      this.$refs['rejectForm'].validate((valid, obj) => {
+        if (valid) {
+          // 拒绝
+          this.$http
+            .get('/outside/dd/part/approveList/rejectBatch', {
+              approveNo,
+              remark: this.rejectForm.reason
+            })
+            .then(res => {
+              if (res.status == 0) {
+                this.partDealDialog = false;
+                this.backstockDialog = false;
+                this.$message({
+                  showClose: true,
+                  message: res.message,
+                  type: 'success'
+                });
+                this.loadData();
+              }
+            });
+        }
+      });
+    },
+    partDealDataReset(approveNo) {
+      console.log(this.rejectForm.reasons, '撤销');
+      // return;
+      // 撤销
+      this.$http
+        .get('/outside/dd/part/approveList/revokeBatch', {
+          approveNo,
+          remark: this.rejectForm.reasons
+        })
+        .then(res => {
+          if (res.status == 0) {
+            this.partDealDialog = false;
+            this.backstockDialog = false;
+            this.$message({
+              showClose: true,
+              message: res.message,
+              type: 'success'
+            });
+            this.loadData();
+          }
+        });
+    },
+
+    partDealDataDone() {
+      // 办理
+      let data = this.$refs.partDealWithForm
+        .getData()
+        .then(res => {
+          let arr = [];
+          res.propData.arr.forEach(item => {
+            arr.push({
+              approveNo: res.propData.data.approveNo,
+              id: item.id,
+              remark: res.suggestion,
+              solvedVariation: item.number,
+              type: res.propData.data.type
+            });
+          });
+          this.$http
+            .post('/outside/dd/part/approveList/approveBatch', arr)
+            .then(res => {
+              if (res.code == 0) {
+                this.$refs.partDealWithForm.resetData();
+                this.partDealDialog = false;
+                this.$message({
+                  showClose: true,
+                  message: res.message,
+                  type: 'success'
+                });
+                this.loadData();
+              }
+            })
+            .catch(err => {});
+          console.log(res);
+        })
+        .catch(err => {
+          this.$message({
+            showClose: true,
+            message: err.message,
+            type: 'error'
+          });
+        });
+    },
+    buildParams(pageNum, pageSize) {
       return {
         ...this.model,
         pageNum,
         pageSize
       };
     },
-    buildColumns(){
+    buildColumns() {
       let localData = StorageUtil.get(STORAGE_COLNUM_KEY) || {};
 
       let columns = [
         {
           label: '申请日期',
-          field: 'propserTime',
+          field: 'prosperTime',
           exportAlias: 'proposeTime',
           show: true,
-          sortable: 'prosperTime',
+          sortable: 'custom',
           width: 160
         },
         {
           label: '办理编号',
           exportAlias: 'approveNo',
           field: 'approveNo',
+          overflow: true,
           show: true,
-          width: 150
+          width: 160,
+          clickFnc: obj => {
+            this.showPartDealDetail(obj);
+          }
         },
         {
           label: '状态',
           exportAlias: 'state',
           field: 'state',
           sortable: 'state',
+          width: 80,
+          overflow: true,
           show: true
         },
         {
           label: '申请类别',
           exportAlias: 'type',
           field: 'type',
+          width: 90,
+          overflow: true,
           show: true
         },
         {
           label: '申请备件名称',
-          field: 'name',
-          exportAlias: 'name',
+          field: 'sparepartName',
+          exportAlias: 'sparepartName',
           show: true,
-          minWidth: 150
+          minWidth: 170,
+          overflow: true
         },
         {
           label: '申请数量',
-          exportAlias: 'num',
+          exportAlias: 'variation',
           field: 'num',
+          width: 80,
+          overflow: true,
           show: false
         },
 
@@ -1776,6 +2114,8 @@ export default {
           label: '涉及金额',
           exportAlias: 'price',
           field: 'price',
+          width: 90,
+          overflow: true,
           show: true
         },
         {
@@ -1783,51 +2123,47 @@ export default {
           field: 'targetName',
           exportAlias: 'targetName',
           show: true,
-          minWidth: 120
+          minWidth: 120,
+          overflow: true
         },
         {
           label: '原始仓库',
-          field: 'repertory',
-          exportAlias: 'repertory',
+          field: 'sourceTargetName',
+          exportAlias: 'sourceName',
           show: true,
-          minWidth: 150
+          minWidth: 120,
+          overflow: true
         },
         {
           label: '发起人',
           field: 'prosperName',
           exportAlias: 'prosperName',
+          width: 80,
+          overflow: true,
           show: true
         },
 
         {
-          label: '待办数／已办数',
+          label: '待办数/已办数',
           field: 'applyCount',
-          exportAlias: 'applyCount',
+          exportAlias: 'pendingVariation,solvedVariation',
           show: true,
-          width: 150
+          width: 120
         },
-        // {
-        //   label: '已办理数',
-        //   field: 'variation_',
-        //   exportAlias: 'solvedVariation',
-        //   show: true,
-        //   width: 80
-        // },
-
         {
-          field: 'approvaName',
+          field: 'approveName',
           label: '办理人',
-          exportAlias: 'approvaName',
+          exportAlias: 'executorName',
           show: true,
-          width: 120,
-          overflow: false
+          width: 80,
+          overflow: true
         },
         {
           field: 'approveTime',
           label: '办理时间',
-          exportAlias: 'approveTime',
+          exportAlias: 'updateTime',
           show: false,
-          width: 120,
+          width: 160,
           overflow: false,
           sortable: 'approveTime'
         },
@@ -1843,8 +2179,8 @@ export default {
 
       columns.forEach(column => {
         let isShow = localData[column.field];
-        if(typeof isShow == 'boolean') column.show = isShow;
-      })
+        if (typeof isShow == 'boolean') column.show = isShow;
+      });
 
       return columns;
     },
@@ -1852,83 +2188,147 @@ export default {
       return this.$platform.alert('个人备件库功能已经关闭，需系统管理员开启个人备件库功能(系统管理-备件库管理)后继续操作。');
     },
     // TalkingData事件埋点
-    trackEventhandler (type) {
+    trackEventhandler(type) {
       switch (type) {
       case 'search':
-        this.$tdOnEvent('pc：办理出入库-搜索事件');
+        this.$tdOnEvent('pc：出入库办理-搜索事件');
         break;
       case 'reset':
-        this.$tdOnEvent('pc：办理出入库-重置事件');
+        this.$tdOnEvent('pc：出入库办理-重置事件');
         break;
       case 'advSearch':
-        this.$tdOnEvent('pc：办理出入库-高级搜索事件');
+        this.$tdOnEvent('pc：出入库办理-高级搜索事件');
         break;
       case 'chooseRepertory':
-        this.$tdOnEvent('pc：办理出入库-仓库筛选下拉框事件');
+        this.$tdOnEvent('pc：出入库办理-原始仓库筛选下拉框事件');
+        break;
+      case 'chooseSourceType':
+        this.$tdOnEvent('pc：出入库办理-目标仓库筛选下拉框事件');
         break;
       case 'batch-stock-out':
-        this.$tdOnEvent('pc：办理出入库-批量出库事件');
+        this.$tdOnEvent('pc：出入库办理-批量出库事件');
         break;
       case 'batch-stock-in':
-        this.$tdOnEvent('pc：办理出入库-批量入库事件');
+        this.$tdOnEvent('pc：出入库办理-批量入库事件');
         break;
       case 'selectColumn':
-        this.$tdOnEvent('pc：办理出入库-选择列事件');
+        this.$tdOnEvent('pc：出入库办理-选择列事件');
         break;
       default:
-        break;                                      
+        break;
       }
     },
     // state (selector) TalingData事件埋点
-    stateTrackEventHandler (type) {
+    stateTrackEventHandler(type) {
       switch (type) {
       case '':
-        this.$tdOnEvent('pc：办理出入库-全部事件');
+        this.$tdOnEvent('pc：出入库办理-全部事件');
         break;
       case 'suspending':
-        this.$tdOnEvent('pc：办理出入库-待办理事件');
+        this.$tdOnEvent('pc：出入库办理-待办理事件');
         break;
       case 'solved':
-        this.$tdOnEvent('pc：办理出入库-已办理事件');
+        this.$tdOnEvent('pc：出入库办理-已办理事件');
+        break;
+      case 'rejected':
+        this.$tdOnEvent('pc：出入库办理-已拒绝事件');
+        break;
+      case 'cancel':
+        this.$tdOnEvent('pc：出入库办理-已取消事件');
+        break;
+      case 'revoked':
+        this.$tdOnEvent('pc：出入库办理-已撤回事件');
         break;
       default:
         break;
       }
     },
     // table TalkingData事件埋点
-    tableTrackEventHandler (type) {
+    tableTrackEventHandler(type) {
       switch (type) {
-      case 'stock-out':
-        this.$tdOnEvent('pc：办理出入库-列表办理出库事件');
+      case 'done':
+        this.$tdOnEvent('pc：出入库办理-列表办理事件');
         break;
       case 'reject':
-        this.$tdOnEvent('pc：办理出入库-列表拒绝事件');
+        this.$tdOnEvent('pc：出入库办理-列表拒绝事件');
         break;
       case 'recall':
-        this.$tdOnEvent('pc：办理出入库-列表撤回事件');
+        this.$tdOnEvent('pc：出入库办理-列表撤回事件');
         break;
       default:
-        break;                                      
+        break;
       }
     },
     variationNum (num1, num2) {
       return this.$math.format(this.$math.subtract(this.$math.bignumber(num1), this.$math.bignumber(num2)))
     },
+    headerClick(option) {
+      if (option.order == null) {
+        this.model[option.property] = option.order ? option.order : '';
+        this.loadData();
+      }
+    },
     sortChange(option) {
       console.log(option);
     },
-    supplySave() {
-      let data = this.$refs.partDealWithForm
-        .getData()
-        .then(res => {
-          console.log(res);
+    dingMessage() {
+      console.log('ding');
+      return;
+      window.ding_part_message();
+    },
+    showPartDealDetail(obj) {
+      this.$http
+        .get('/outside/dd/part/approveList/getRelationListByApproveNo', {
+          approveNo: obj.approveNo
         })
-        .catch(err => {
-          this.$message({
-            showClose: true,
-            message: err.message,
-            type: 'error'
-          });
+        .then(res => {
+          let result = res.result;
+          let {
+            prosperTime,
+            approveNo,
+            type,
+            prosperName,
+            targetName,
+            sourceTargetName,
+            state,
+            cancel,
+            isreject,
+            suggestion,
+            approved
+          } = obj;
+          if (result.relations.length > 0) {
+            result.relations = result.relations.map(item => {
+              item.variation = Math.abs(item.variation);
+              item.solvedVariation = Math.abs(item.solvedVariation);
+              item['number'] = Math.abs(item.variation)
+                - (Math.abs(item.solvedVariation) || 0);
+              return item;
+            });
+          }
+
+          this.partDealData = {
+            arr: result.relations || [],
+            data: {
+              prosperTime,
+              approveNo,
+              type,
+              prosperName,
+              targetName,
+              sourceTargetName,
+              state,
+              cancel,
+              isreject,
+              approved,
+              suggestion,
+              remark:
+                result.relations.length > 0
+                  ? result.relations[0].remark
+                    ? result.relations[0].remark
+                    : ''
+                  : ''
+            }
+          };
+          this.partDealDialog = true;
         });
     }
   },
@@ -2124,4 +2524,26 @@ export default {
     background-size: cover;
   }
 }
+
+.flex-x {
+  display: flex;
+  align-items: center;
+}
+.flex-1 {
+  flex: 1;
+}
+
+a {
+  cursor: pointer;
+}
+.group-select {
+  display: inline-block;
+}
+.mar-b-15 {
+  margin-bottom: 15px;
+}
+.mar-r-15 {
+  margin-right: 15px;
+}
+
 </style>

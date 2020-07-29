@@ -42,7 +42,8 @@ import {
   TabPane,
   Row,
   OptionGroup,
-  Message
+  Message,
+  MessageBox
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
@@ -93,7 +94,8 @@ const ElementUI = {
     
     Vue.component(CollapseTransition.name, CollapseTransition);
     Vue.prototype.$loading = Loading.service;
-    Vue.prototype.$message = Message
+    Vue.prototype.$message = Message;
+    Vue.prototype.$confirm = MessageBox.confirm;
   }
 };
 

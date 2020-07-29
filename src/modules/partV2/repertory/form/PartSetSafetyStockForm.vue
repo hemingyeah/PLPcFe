@@ -149,7 +149,7 @@
 
           return params;
         } catch (e) {
-          console.error('e', e);
+          console.warn('e', e);
         }
       },
       setUnifiedValue(value) {

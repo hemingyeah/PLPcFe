@@ -24,8 +24,8 @@ let initData = {};
 try {
   initData = typeof window._init == 'string' ? JSON.parse(window._init || '{}') : window._init;
 } catch (error) {
-  console.error(error)
-  console.error('no init data')
+  console.warn(error)
+  console.warn('no init data')
 }
 
 

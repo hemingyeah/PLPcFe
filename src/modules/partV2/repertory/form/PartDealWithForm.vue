@@ -13,18 +13,27 @@
 
     <!-- 备注 start-->
 
-    <div class="flex-x mar-b-20">
+    <div class="flex-x mar-b-20 al-start">
       <div class="form-only-see-title mar-r-15">备注</div>
-      <div class="flex-1">
-        <el-input placeholder="请输入备注内容" v-model="remark" :readonly="false"></el-input>
+      <div>
+        <el-input
+          type="textarea"
+          resize="none"
+          style="width:500px;"
+          :autosize="{ minRows: 2, maxRows: 6 }"
+          :placeholder="inputonlyread ? '' : '请输入备注内容'"
+          v-model="remark"
+          :readonly="true"
+        >
+        </el-input>
       </div>
     </div>
     <!-- 备注 end -->
 
     <!-- 备件清单 start-->
     <div class="mar-b-20">
-      <div>备件清单</div>
-      <el-table :data="tableData" stripe style="width: 100%" max-height="350">
+      <div class="mar-b-15 font-w-500">备件清单</div>
+      <el-table :data="propData.arr" stripe style="width: 100%" max-height="350">
         <el-table-column
           v-for="(item,index) in tableColumn"
           :key="index"
@@ -35,151 +44,176 @@
           :show-overflow-tooltip="true"
         >
           <template slot-scope="scope">
+
             <template v-if="item.normalType==='controler'">
               <el-form :model="scope.row" :rules="rules" :ref="'ruleForm'" class="demo-ruleForm">
                 <el-form-item prop="number">
-                  <el-input v-model="scope.row.number" :readonly="false" type="number"></el-input>
+                  <el-input
+                    v-model="scope.row.number"
+                    :readonly="inputonlyread || (scope.row.type==='分配' || scope.row.type==='调拨') || scope.row.variation < scope.row.solvedVariation"
+                    type="number"
+                  >
+                  </el-input>
                 </el-form-item>
               </el-form>
             </template>
-            <template v-else slot-scope="scope">{{scope.row[item.prop]}}</template>
+            <template v-else-if="item.field==='price'">{{countPrice(scope.row)}}</template>
+            <!-- <template v-else-if="item.field==='child'">{{scope.row.sparepartRepertory[item.prop]}}</template> -->
+            <template v-else-if="item.field==='sourceTargetName'">{{propData.data.sourceTargetName}}</template>
+            <template v-else-if="item.field==='child_2'">{{scope.row.sparepart[item.prop]}}</template>
+
           </template>
         </el-table-column>
       </el-table>
     </div>
     <!-- 备件清单 end-->
     <div>
-      <div class="mar-b-20">办理意见</div>
-      <el-input placeholder="请输入办理意见" maxlength="100" v-model="suggestion" :readonly="false"></el-input>
+      <div v-if="inputonlyread===false">
+        <div class="mar-b-15 font-w-500">办理意见</div>
+
+        <el-input
+          type="textarea"
+          maxlength="100"
+          resize="none"
+          style="width:500px;"
+          :autosize="{ minRows: 2, maxRows: 6 }"
+          :placeholder="inputonlyread?'':'请输入办理意见'"
+          v-model="suggestion"
+          :readonly="inputonlyread"
+        >
+        </el-input>
+
+      </div>
     </div>
   </div>
 </template>
 <script>
+import { mathMul } from '@src/util/math';
+
 export default {
   name: 'part-deal-with-form',
+  props: {
+    propData: {
+      type: Object
+    }
+  },
+  computed: {
+    formArr() {
+      let arr = [
+        { lable: '申请日期', value: this.propData.data.prosperTime },
+        { lable: '办理编号', value: this.propData.data.approveNo },
+        { lable: '申请类型', value: this.propData.data.type },
+        { lable: '申请人', value: this.propData.data.prosperName },
+        { lable: '目标仓库', value: this.propData.data.targetName }
+      ];
+      return arr;
+    }
+  },
   data() {
     let validateNumber = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入数量'));
-      } else if (!/^[1-9]\d*$/.test(value)) {
-        callback(new Error('请输入正整数'));
+      } else if (
+        !/^(([0-9][0-9]*)|(([0]\.\d{1,2}|[0-9][0-9]*\.\d{1,2})))$/.test(value)
+      ) {
+        callback(new Error('请输入大于或等于0的数，且最多保留两位小数'));
+
       } else {
         callback();
       }
     };
+    let tableColumn = [
+      {
+        field: 'child_2',
+        prop: 'name',
+        lable: '备件名称',
+        width: '180'
+      },
+      {
+        field: 'child_2',
+        prop: 'serialNumber',
+        lable: '编号',
+        width: '180'
+      },
+      {
+        field: 'child_2',
+        prop: 'type',
+        lable: '类型',
+        width: '180'
+      },
+      {
+        field: 'child_2',
+        prop: 'standard',
+        lable: '规格',
+        width: '180'
+      },
+      {
+        field: 'child_2',
+        prop: 'unit',
+        lable: '单位',
+        width: '180'
+      },
+      {
+        field: 'variation',
+        prop: 'variation',
+        lable: '申请数量',
+        width: '180'
+      },
+      {
+        field: 'price',
+        prop: 'data1',
+        lable: '涉及金额',
+        width: '180'
+      },
+      {
+        field: 'sourceTargetName',
+        prop: 'sourceTargetName',
+        lable: '原始仓库',
+        width: '180'
+      },
+      {
+        field: 'repertoryCount',
+        prop: 'repertoryCount',
+        lable: '原仓库存',
+        width: '180'
+      },
+      {
+        field: 'solvedVariation',
+        prop: 'solvedVariation',
+        lable: '已办理数量',
+        width: '180'
+      },
+      {
+        normalType: 'controler',
+        lable: '办理数量',
+        width: '100',
+        fixed: 'right'
+      }
+    ];
+    let inputonlyread = this.propData.data.state !== 'suspending';
+    let remark = this.propData.data.remark;
     return {
       input: '测试数据',
       rules: {
         number: [{ validator: validateNumber, trigger: 'change' }]
       },
-      formArr: [
-        { lable: '申请日期', value: '' },
-        { lable: '办理编号', value: '' },
-        { lable: '申请类型', value: '' },
-        { lable: '申请人', value: '' },
-        { lable: '目标仓库', value: '' }
-      ],
-      remark: '',
+      remark,
       suggestion: '',
-      tableData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路1518弄',
-          number: 1,
-          count: 1
-        },
-        {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄',
-          number: 1,
-          count: 1
-        },
-        {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄',
-          number: 1,
-          count: 1
-        },
-        {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄',
-          number: 1,
-          count: 1
-        }
-      ],
-      tableColumn: [
-        {
-          prop: 'date',
-          lable: '备件名称',
-          width: '180'
-        },
-        {
-          prop: 'name',
-          lable: '编号',
-          width: '180'
-        },
-        {
-          prop: 'address',
-          lable: '类型',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          lable: '规格',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          lable: '单位',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          lable: '申请数量',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          lable: '涉及金额',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          lable: '原始仓库',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          lable: '原仓库存',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          lable: '已办理数量',
-          width: '180'
-        },
-        {
-          prop: 'data1',
-          normalType: 'controler',
-          lable: '办理数量',
-          width: '100',
-          fixed: 'right'
-        }
-      ]
+      tableColumn,
+      inputonlyread
     };
   },
   methods: {
+    countPrice(obj) {
+      return mathMul(obj.variation, obj.sparepart.salePrice);
+    },
     getData() {
       return this.validator();
     },
     validator() {
       return new Promise((resolves, rejects) => {
         let func_arr = [];
-        for (let index = 0; index < this.tableData.length; index++) {
+        for (let index = 0; index < this.propData.arr.length; index++) {
           const func = new Promise((resolve, reject) => {
             this.$refs['ruleForm'][index].validate((valid, obj) => {
               let keys = Object.keys(this.rules);
@@ -196,17 +230,34 @@ export default {
         }
         Promise.all(func_arr)
           .then(res => {
-            let { remark, suggestion, tableData } = this;
+            this.propData.arr.forEach(element => {
+              if (element.number > element.variation) {
+                rejects(
+                  new Error(
+                    `"${
+                      element.sparepart.name.length > 10
+                        ? `${element.sparepart.name.slice(0, 9) }...`
+                        : element.sparepart.name
+                    }"的办理数量不得大于申请数量`
+                  )
+                );
+                return false;
+              }
+            });
+            let { remark, suggestion, propData } = this;
             resolves({
               remark,
               suggestion,
-              tableData
+              propData
             });
           })
           .catch(obj => {
             rejects(obj[0]);
           });
       });
+    },
+    resetData() {
+      this.suggestion = '';
     }
   }
 };
@@ -222,8 +273,14 @@ export default {
 .mar-r-15 {
   margin-right: 15px;
 }
+.mar-b-15 {
+  margin-bottom: 15px;
+}
 .mar-b-20 {
   margin-bottom: 20px;
+}
+.font-w-500 {
+  font-weight: 500;
 }
 .form-only-see {
   width: 33.3%;
@@ -245,5 +302,8 @@ export default {
   white-space: nowrap;
   display: block;
   overflow: hidden;
+}
+.al-start {
+  align-items: flex-start;
 }
 </style>
