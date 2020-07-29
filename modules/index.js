@@ -8,10 +8,13 @@ const repository = require('./repository')
 const dataScreen = require('./dataScreen')
 const bill = require('./bill')
 const jobtransfer = require('./jobtransfer')
+const callcenter = require('./callcenter')
 
 const doMyself = require('./doMyself')
 const customerContact = require('./customerContact')
 const department = require('./department')
+
+const sparePart = require('./sparePart')
 
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
@@ -48,7 +51,9 @@ module.exports = {
   ...dataScreen,
   ...bill,
   ...jobtransfer,
+  ...callcenter,
   ...doMyself,
   ...customerContact,
   ...department,
+  ...sparePart
 }

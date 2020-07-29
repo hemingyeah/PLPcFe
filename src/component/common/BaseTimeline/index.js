@@ -11,13 +11,15 @@ const BaseTimeline = {
   },
   render(h){
     let items = toArray(this.data).map(item => {
+      // 呼叫中心时间取content.ring
+      let time = item.module == 'callCenter' ? item.content.ring : item.createTime
       let content = this.recordRender(h, item);
       return (
         <div class="base-timeline-item">
           <div class="base-timeline-head"></div>
           <div class="base-timeline-main">
             <div class="base-timeline-content">{content}</div>
-            <p class="base-timeline-time">{item.createTime}</p>
+            <p class="base-timeline-time">{time}</p>
           </div>
         </div>
       )

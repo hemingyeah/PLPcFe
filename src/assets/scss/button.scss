@@ -31,6 +31,8 @@ $btn-color-primary-light-1: mix(#fff, $color-primary, 10%) !default;
   background-color: transparent;
 
   &:hover{
+    background-color: transparent;
+    border-color: transparent;
     color: $color-primary;
   }
 }
@@ -40,11 +42,12 @@ $btn-color-primary-light-1: mix(#fff, $color-primary, 10%) !default;
   background-color: $color-primary;
 
   &:hover{
-    //background: #33bdac;
-    background-color: lighten($color-primary, 3%);
+    color: #fff;
+    background-color: lighten($color-primary, 3%) !important;
   }
 
   &:disabled{
+    color: #fff;
     //background: #33bdac;
     background-color: lighten($color-primary, 3%) !important;
     opacity: 0.65 !important;

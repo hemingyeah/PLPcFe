@@ -1,6 +1,7 @@
 $color-primary: #55B7B4 !default;
 $color-danger: #ed3f14 !default;
 $color-regular: #eef8f8 !default;
+$color-ding-blue:#3aa3ff !default;
 
 //$color-primary-hover: rgba($color-primary,.1) !default;
 $color-primary-hover: mix(#fff, $color-primary, 89.88%) !default;
@@ -13,3 +14,6 @@ $border-color-base: #e0e1e2 !default;
 $border-radius-base: 2px !default; //边框圆角
 
 $input-border-hover-color: mix(#fff, $color-primary, 45%) !default;
+
+$text-color-main: #051A13 !default;
+$color-primary-light-9: mix(#fff, $color-primary, 90%) !default;

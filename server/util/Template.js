@@ -38,5 +38,6 @@ module.exports = {
     let result = scriptReg.exec(html);
 
     return result ? result[1] : null;
-  }
+  },
+
 }

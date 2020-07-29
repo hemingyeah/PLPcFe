@@ -20,7 +20,7 @@ import http from '@src/util/http';
 import platform from '@src/platform';
 /* mixin */
 import fieldMixin from '@src/mixins/fieldMixin';
-import FormDesignMixin from '@src/mixins/FormDesign';
+import FormDesignMixin from '@src/mixins/formDesign';
 
 export default {
   name: 'setting-product-fields-view',

@@ -55,7 +55,7 @@
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import _ from 'lodash';
-import BillAmountRange from './amountRange.vue'
+import BillAmountRange from './AmountRange.vue'
 
 export default {
   name: 'list-search',

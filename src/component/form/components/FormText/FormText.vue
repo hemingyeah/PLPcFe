@@ -7,6 +7,7 @@
       @compositionend="compositionend"
       @input="inputEvent"
       :placeholder="field.placeholder?field.placeholder:placeholder"
+      :maxlength="field.maxlength?field.maxlength:500"
       :id="`form_${field.fieldName}`" 
       autocomplete="off"/>
   </div>

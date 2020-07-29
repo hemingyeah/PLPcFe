@@ -30,3 +30,45 @@
 .text-danger{
   color: $color-danger !important;
 }
+
+.font-size-14{
+  font-size: 14px;
+}
+
+.font-size-16{
+  font-size: 16px;
+}
+
+.font-w-600{
+  font-weight: 600;
+}
+
+.align-items-center {
+  display: flex;
+  align-items: center;
+}
+
+.pull-right{
+  float: right;
+}
+
+.text-right{
+  text-align: right;
+}
+
+.clearfix:after {
+  display: block;
+  clear: both;
+  content: "";
+}
+
+.pre{
+  white-space: pre-line;
+}
+
+.text-overflow-hidden{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+}

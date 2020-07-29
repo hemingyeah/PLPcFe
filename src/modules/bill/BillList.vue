@@ -126,7 +126,7 @@
 
 <script>
 import _ from 'lodash';
-import Page from '../../../model/Page';
+import Page from '@src/model/Page';
 import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
 import {formatDate} from '@src/util/lang';

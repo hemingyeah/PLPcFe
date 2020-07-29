@@ -22,6 +22,7 @@ import BaseSteps from './common/BaseSteps';
 import BaseCascader from './common/BaseCascader';
 import BaseSelectionBar from './common/BaseSelectionBar'
 
+
 // 可快速调用的组件
 import BaseMapDisplay from './common/BaseMapDisplay';
 import BaseMapPicker from './common/BaseMapPicker';
@@ -37,41 +38,42 @@ import BaseEditor from './lessUsed/BaseEditor'
 import Form from './form';
 
 const components = [
-  ElementUI,
-  BaseModal,
-  BasePanel,
-  BaseUpload,
-  BaseTree,
-  BaseContact,
-  BaseMapPicker,
-  BaseDistPicker,
-  BaseMapDisplay,
-  Form,
-  BaseImport,
-  BaseExport,
-  BaseFileItem,
-  BaseTabBar,
-  BaseTimeline,
-  BaseComment,
-  BaseSpin,
-  BaseButton,
-  BaseSelect,
-  BaseSteps,
+    ElementUI,
+    BaseModal,
+    BasePanel,
+    BaseUpload,
+    BaseTree,
+    BaseContact,
+    BaseMapPicker,
+    BaseDistPicker,
+    BaseMapDisplay,
+    Form,
+    BaseImport,
+    BaseExport,
+    BaseFileItem,
+    BaseTabBar,
+    BaseTimeline,
+    BaseComment,
+    BaseSpin,
+    BaseButton,
+    BaseSelect,
+    BaseSteps,
 
-  BaseContextMenu,
-  BaseTable,
-  
-  BizUserSelect,
-  BizTeamSelect,
-  BaseWindow,
-  SampleTooltip,
-  BaseCascader,
-  BaseSelectionBar,
-  BaseEditor
+
+    BaseContextMenu,
+    BaseTable,
+
+    BizUserSelect,
+    BizTeamSelect,
+    BaseWindow,
+    SampleTooltip,
+    BaseCascader,
+    BaseSelectionBar,
+    BaseEditor
 ];
 
 export default {
-  install(Vue){
-    components.forEach(component => Vue.use(component))
-  }
+    install(Vue) {
+        components.forEach(component => Vue.use(component))
+    }
 }
