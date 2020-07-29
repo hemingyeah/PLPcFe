@@ -10,16 +10,15 @@
       <div v-if="notificationPage.list.length != 0">
         <div v-for="(item, index) in notificationPage.list" :key="index">
           <job-notification-item
-            v-if="item.type!=1"
+            v-if="info.source!=='system'"
             :info="item"
             :index="index"
             @getInfo="getInfo"
             @clearNum="clearNum"
             @toDaily="toDaily(item)"
-            @deleteItem="deleteItem"
           ></job-notification-item>
           <div
-            v-if="item.type==1"
+            v-if="info.source==='system'"
             class="system-notification-item"
             @click="toSystemNotificationDetail(item)"
           >
@@ -90,202 +89,39 @@ export default {
       dailyShow: false,
       loading: false,
       btnShow: false,
-      btnStyle: {
-        border: "5px solid #eaeaea"
-      },
-      notificationCount: 0,
       params: {
         pageSize: 20,
         pageNum: 1
       },
-      notificationPage: new Page(),
-      readedOption: " ",
-      readedOptions: [
-        {
-          value: " ",
-          label: "全部"
-        },
-        {
-          value: 0,
-          label: "未读"
-        },
-        {
-          value: 1,
-          label: "已读"
-        }
-      ],
-      jobOption: "",
-      jobOptions: [
-        {
-          value: null,
-          label: "全部"
-        },
-        {
-          value: "task",
-          label: "工单"
-        },
-        {
-          value: "event",
-          label: "服务台"
-        },
-        {
-          value: "spare",
-          label: "备件"
-        },
-        {
-          value: "approve",
-          label: "审批"
-        },
-        {
-          value: "daily",
-          label: "日报"
-        },
-        {
-          value: "performance",
-          label: "绩效"
-        },
-        {
-          value: "timing",
-          label: "定时提醒"
-        },
-        {
-          value: "authority",
-          label: "权限变更"
-        },
-        {
-          value: "notice",
-          label: "信息公告"
-        },
-        {
-          value: "wiki",
-          label: "知识库"
-        }
-      ],
-      dataOption: "",
-      dataOptions: [
-        {
-          value: null,
-          label: "全部"
-        },
-        {
-          value: 0,
-          label: "今日"
-        },
-        {
-          value: 1,
-          label: "昨日"
-        },
-        {
-          value: 7,
-          label: "近七天"
-        },
-        {
-          value: 30,
-          label: "近30天"
-        }
-      ]
+      notificationPage: new Page()
     };
   },
-  created() {},
   methods: {
-    /** 将选择的时间格式化 */
-    getTime(value) {
-      this.dataOption = value;
-
-      let startTime = "";
-      let endTime = "";
-
-      if (value != 100 && value != null && value != 1) {
-        endTime = Lang.formatDate(new Date(), "YYYY-MM-DD 23:59:59");
-      } else if (value == 1) {
-        endTime = Lang.formatDate(
-          new Date() - 1 * 24 * 60 * 60 * 1000,
-          "YYYY-MM-DD 23:59:59"
-        );
-      } else if (value == 100) {
-        endTime = Lang.formatDate(
-          new Date() - 30 * 24 * 60 * 60 * 1000,
-          "YYYY-MM-DD 23:59:59"
-        );
-      } else {
-        endTime = null;
-      }
-
-      if (value == 0) {
-        startTime = Lang.formatDate(new Date(), "YYYY-MM-DD 00:00:00");
-      } else if (value == 1) {
-        startTime = Lang.formatDate(
-          new Date() - 1 * 24 * 60 * 60 * 1000,
-          "YYYY-MM-DD 00:00:00"
-        );
-      } else if (value == 7) {
-        startTime = Lang.formatDate(
-          new Date() - 6 * 24 * 60 * 60 * 1000,
-          "YYYY-MM-DD 00:00:00"
-        );
-      } else if (value == 30) {
-        startTime = Lang.formatDate(
-          new Date() - 29 * 24 * 60 * 60 * 1000,
-          "YYYY-MM-DD 00:00:00"
-        );
-      } else {
-        startTime = null;
-      }
-
-      this.params.startTime = startTime;
-      this.params.endTime = endTime;
-      this.getInfo();
-    },
-
-    /** 设置为全部已读 */
-    async setReaded() {
-      try {
-        if (this.info.workMsg == 0) {
-          this.btnShow = false;
-          this.btnStyle = {
-            border: "5px solid #eaeaea"
-          };
-          return;
-        }
-        this.btnShow = !this.btnShow;
-        if (this.btnShow) {
-          if (await platform.confirm("您确定将全部未读通知信息标记为已读?")) {
-            let params = {
-              type: "work"
-            };
-            let result = await NotificationApi.haveRead(params);
-            if (result.status == 0) {
-              this.getInfo();
-              this.btnStyle = {
-                border: "5px solid #55B7B4"
-              };
-              this.$emit("clearNum", "work");
-            }
-          }
-        } else {
-          this.btnStyle = {
-            border: "5px solid #eaeaea"
-          };
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
     /** 获取信息，刷新列表 */
-    async getInfo() {
+    async getInfo(falsh = false) {
       try {
-        this.notificationPage.list = [];
-        this.params.pageNum = 1;
+        if (falsh) {
+          this.notificationPage.list = [];
+          this.params.pageNum = 1;
+        }
         this.loading = true;
-        // let notificationPage = await NotificationApi.getJobList(this.params);
 
-        let notificationPage = await NotificationApi.newGetMessage(
-          this.info.value
-        );
+        let notificationPage = await NotificationApi.newGetMessageQuery({
+          ...this.params
+        });
         if (notificationPage.status == 0) {
-          this.notificationPage.merge(Page.as(notificationPage.data));
-          this.getNum();
+          this.notificationPage.list = [
+            ...this.notificationPage.list,
+            ...notificationPage.data.dataList
+          ];
+          if (
+            this.notificationPage.list.length < notificationPage.data.totalCount
+          ) {
+            this.params.pageNum++;
+            this.notificationPage.hasNextPage = true;
+          } else {
+            this.notificationPage.hasNextPage = false;
+          }
         }
         this.loading = false;
       } catch (error) {
@@ -296,13 +132,7 @@ export default {
     /** 分页处理 */
     async getMore() {
       try {
-        this.params.pageNum++;
-        this.loading = true;
-        let notificationPage = await NotificationApi.getJobList(this.params);
-        if (notificationPage.status == 0) {
-          this.notificationPage.merge(Page.as(notificationPage.data));
-        }
-        this.loading = false;
+        this.getInfo();
       } catch (error) {
         console.error(error);
       }
@@ -310,29 +140,22 @@ export default {
     clearNum() {
       this.$emit("clearNum", "work", 1);
     },
-    deleteItem(info, index) {
-      this.notificationPage.list.splice(index, 1);
-      if (info.readed == 0) {
-        this.$emit("clearNum", "work", 1);
-      }
-    },
-    getNum() {
-      let count = 0;
-      if (
-        this.notificationPage.list.length != 0 &&
-        this.notificationPage.list[0].readed == 0
-      ) {
-        this.notificationPage.list.forEach(item => {
-          if (item.readed == 0) {
-            count++;
-          }
-        });
-        this.$emit("getNum", count);
-      }
-    },
+    // haveNotRead() {
+    //   let res = false;
+    //   if (!this.notificationPage.list || this.notificationPage.list.length <= 0)
+    //     return res;
+    //   for (let index = 0; index < this.notificationPage.list.length; index++) {
+    //     if (this.notificationPage.list[index].readed == 0) {
+    //       res = true;
+    //       break;
+    //     }
+    //   }
+    //   return res;
+    // },
     toDaily(url) {
       this.dailyUrl = url;
       this.dailyShow = true;
+      this.$emit("clearNum", { count: 1 });
     },
     close() {
       this.dailyShow = false;
@@ -352,7 +175,7 @@ export default {
           let result = await NotificationApi.haveRead(params);
           if (result.status == 0) {
             info.readed = 1;
-            this.$emit("clearNum", "system", 1);
+            this.$emit("clearNum", { count: 1 });
           }
         }
 
@@ -376,6 +199,7 @@ export default {
       } else {
         platform.openLink(info.url);
       }
+      this.$emit("clearNum", { count: 1 });
     }
   },
   computed: {
@@ -392,8 +216,10 @@ export default {
   watch: {
     info: {
       handler(newValue) {
-        if (newValue.value !== "none") {
-          this.getInfo();
+        if (newValue.source !== "none") {
+          console.log(newValue, "newValue");
+          this.params = { ...this.params, ...newValue };
+          this.getInfo(true);
           this.dailyShow = false;
         }
       }

@@ -1,17 +1,20 @@
 <template>
   <base-panel :show.sync="show" :diy-transfer="true" width="400px" class="notification-center">
-    <div class="normal-note-box" slot="diyTransferCon">
+    <div class="normal-note-box" slot="diyTransferCon" :style="`height:${windowInnerHeight}px`">
       <div class="normal-note-right-box">
         <div class="normal-note-right-header">
           <div class="normal-note-right-header-title">通知中心</div>
           <div class="normal-note-right-header-btn flex-x">
-            <div class="flex-x color-666">
+            <div
+              :class="['flex-x' ,'curs-point',read_all?'color-primary':'color-666']"
+              @click="clear_note('all')"
+            >
               <i class="iconfont icon-setting"></i>
               全标已读
             </div>
           </div>
         </div>
-        <div class="normal-note-right-list">
+        <div class="normal-note-right-list" v-if="note_arr && note_arr.length>0">
           <div
             v-for="(item,index) in note_arr"
             :class="['flex-x','normal-note-right-item',note_index === index?'normal-note-right-item-chosed':'']"
@@ -19,16 +22,21 @@
             @click.stop="showItem(index)"
           >
             <div class="normal-note-right-item-img">
-              <img :src="item.img" alt />
+              <img :src="note_obj[item.source].img || ''" alt />
             </div>
             <div class="flex-1">
               <div class="flex-x">
-                <div class="normal-note-right-item-title flex-1 overHideCon-1">{{item.title}}</div>
-                <div class="normal-note-right-item-time">{{item.time}}</div>
+                <div
+                  class="normal-note-right-item-title flex-1 overHideCon-1"
+                >{{note_obj[item.source].title || ''}}</div>
+                <div class="normal-note-right-item-time">{{item.createTime | noteTime}}</div>
               </div>
               <div class="flex-x">
-                <div class="normal-note-right-item-con flex-1 overHideCon-1">{{item.con}}</div>
-                <div class="normal-note-right-item-number">{{item.number > 99? 99 :item.number}}</div>
+                <div class="normal-note-right-item-con flex-1 overHideCon-1">{{item.description}}</div>
+                <div
+                  class="normal-note-right-item-number"
+                  v-if="item.unReadNum>0"
+                >{{item.unReadNum > 99? 99 :item.unReadNum}}</div>
               </div>
             </div>
           </div>
@@ -42,14 +50,17 @@
             <div
               v-for="(item, index) in date_arr"
               :key="index"
-              :class="['normal-note-left-filter-item',date_index===index?'normal-note-left-filter-item-chosed':'']"
+              :class="['normal-note-left-filter-item',searchModel.date_index===index?'normal-note-left-filter-item-chosed':'']"
               @click="change_filter_item('date_index',index)"
             >{{item.name}}</div>
           </div>
           <div class="flex-x mar-b-12">
             <div class="normal-note-left-filter-title flex-1">状态筛选标签：</div>
-            <div class="flex-x color-666 mar-r-12">
-              <i class="iconfont icon-setting"></i>
+            <div
+              :class="['flex-x','mar-r-12','curs-point',readNoteAll?'color-primary':'color-666']"
+              @click="clear_note('now_all')"
+            >
+              <i class="iconfont icon-setting curs-point"></i>
               全标已读
             </div>
           </div>
@@ -58,7 +69,7 @@
             <div
               v-for="(item, index) in state_arr"
               :key="index"
-              :class="['normal-note-left-filter-item',state_index===index?'normal-note-left-filter-item-chosed':'']"
+              :class="['normal-note-left-filter-item',searchModel.state_index===index?'normal-note-left-filter-item-chosed':'']"
               @click="change_filter_item('state_index',index)"
             >{{item.name}}</div>
           </div>
@@ -69,7 +80,8 @@
           <keep-alive>
             <component
               :is="'new-note-center'"
-              :info="note_index>-1?note_arr[note_index]:{value:'none'}"
+              ref="newNoteCenter"
+              :info="note_index>-1?{source:this.note_arr[this.note_index].source,readed:readedParams[searchModel.state_index],...choseTime}:{source:'none'}"
               @clearNum="clearNum"
               @getNum="getNum"
             ></component>
@@ -83,6 +95,8 @@
 
 <script>
 import newNoteCenter from "./notificationCenter/newNoteCenter";
+import * as Lang from "@src/util/lang/index.js";
+import * as NotificationApi from "@src/api/NotificationApi";
 
 import info_ from "./data.js";
 
@@ -97,6 +111,8 @@ import note_img_7 from "@src/assets/img/noteCenter/inTime.png";
 import note_img_8 from "@src/assets/img/noteCenter/permissions.png";
 import note_img_9 from "@src/assets/img/noteCenter/info.png";
 import note_img_10 from "@src/assets/img/noteCenter/wiki.png";
+import note_img_11 from "@src/assets/img/noteCenter/system.png";
+import note_img_12 from "@src/assets/img/noteCenter/attention.png";
 
 export default {
   name: "notification-center",
@@ -104,123 +120,158 @@ export default {
     [newNoteCenter.name]: newNoteCenter
   },
   props: {
-    info: Object
+    info: Object,
+    allCount: {
+      type: Number,
+      default: 0
+    }
   },
   data() {
     return {
       component: "job-notification",
-      show: true,
+      show: false,
       workMore: "",
       systemMore: "",
-      note_arr: [
-        {
+      note_obj: {
+        task: {
           img: note_img_1,
-          title: "工单",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "task"
+          title: "工单"
         },
-        {
+        event: {
           img: note_img_2,
-          title: "服务台",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "event"
+          title: "服务台"
         },
-        {
+        spare: {
           img: note_img_3,
-          title: "备件",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "spare"
+          title: "备件"
         },
-        {
+        approve: {
           img: note_img_4,
-          title: "审批",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "approve"
+          title: "审批"
         },
-        {
+        daily: {
           img: note_img_5,
-          title: "日报",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "daily"
+          title: "日报"
         },
-        {
+        performance: {
           img: note_img_6,
-          title: "绩效",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "performance"
+          title: "绩效"
         },
-        {
+        timing: {
           img: note_img_7,
-          title: "定时提醒",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "timing"
+          title: "定时提醒"
         },
-        {
+        authority: {
           img: note_img_8,
-          title: "权限变更",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "authority"
+          title: "权限变更"
         },
-        {
+        notice: {
           img: note_img_9,
-          title: "信息公告",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "notice"
+          title: "信息公告"
         },
-        {
+        wiki: {
           img: note_img_10,
-          title: "知识库",
-          con: "副标题",
-          number: 0,
-          time: "07-20",
-          value: "wiki"
+          title: "知识库"
+        },
+        system: {
+          img: note_img_11,
+          title: "系统通知"
+        },
+        attention: {
+          img: note_img_12,
+          title: "售后宝"
         }
-      ],
+      },
+      note_arr: [],
       note_index: -1,
+      now_note: -1,
       date_arr: [
-        { name: "全部", value: "" },
-        { name: "今日", value: "" },
-        { name: "昨日", value: "" },
-        { name: "近七天", value: "" },
-        { name: "近30天", value: "" }
+        { name: "全部", value: "all" },
+        { name: "今日", value: "0" },
+        { name: "昨日", value: "1" },
+        { name: "近七天", value: "7" },
+        { name: "近30天", value: "30" }
       ],
-      date_index: 0,
       state_arr: [
         { name: "全部", value: "" },
         { name: "未读", value: "" },
         { name: "已读", value: "" }
       ],
-      state_index: 0,
+      searchModel: {
+        date_index: 0,
+        state_index: 0
+      },
+      readedParams: {
+        0: "",
+        1: "0",
+        2: "1"
+      },
       nowInfo: {}
     };
   },
+  filters: {
+    noteTime(value) {
+      let time_source = Lang.formatDate(new Date(value), "YYYY-MM-DD");
+      let time_now = Lang.formatDate(new Date(), "YYYY-MM-DD");
+      let res;
+      if (time_now === time_source) {
+        res = Lang.formatDate(new Date(value), "HH:mm");
+      } else {
+        res = Lang.formatDate(new Date(value), "YYYY-MM-DD");
+      }
+      return res;
+    }
+  },
   methods: {
-    notificationChange(event) {
-      event.target.checked ? (this.component = event.target.id) : "";
+    async clear_note(type) {
+      if (type == "all" && this.allCount <= 0) {
+        return;
+      }
+      if (type == "now_all") {
+        if (this.note_arr[this.note_index].unReadNum <= 0) {
+          return;
+        }
+        // let haveNotRead = this.$refs.newNoteCenter.haveNotRead();
+        // if (!haveNotRead) return;
+      }
+      let confirm_con = {
+        all: "您确定将全部未读通知信息标记为已读?",
+        now_all: "您确定将该类型通知信息全部标记为已读？"
+      };
+      let confirm_res = await this.$platform.confirm(confirm_con[type]);
+      if (!confirm_res) {
+        return;
+      }
+      if (type == "all") {
+        NotificationApi.newGetMessageMark().then(result => {
+          if (result.status == 0) {
+            this.$emit("clearNum", { count: "-1" });
+          }
+        });
+      } else {
+        let { startTime, endTime } = this.choseTime;
+        let source = this.note_arr[this.note_index].source;
+        debugger
+        NotificationApi.newGetMessageMark({
+          source,
+          startTime,
+          endTime
+        }).then(result => {
+          if (result.status == 0) {
+            this.note_arr[this.note_index].unReadNum = 0;
+            this.$emit("clearNum", {
+              count: this.note_arr[this.note_index].unReadNum || 0
+            });
+          }
+        });
+      }
     },
     showComponent() {
       this.show = true;
     },
-    clearNum(val, n) {
-      this.$emit("clearNum", val, n);
+    clearNum(e) {
+      this.note_arr[this.note_index].unReadNum -= e.count || 0;
+      this.$emit("clearNum", e);
     },
     getNum(count) {
       if (this.info.workMsg < count) {
@@ -229,10 +280,75 @@ export default {
     },
     // new 通知中心
     async showItem(index) {
+      if (this.now_note !== index) {
+        this.$set(this.searchModel, "state_index", 0);
+        this.$set(this.searchModel, "date_index", 0);
+        this.now_note = index;
+      }
       this.note_index = this.note_index == index ? -1 : index;
     },
     change_filter_item(key, val) {
-      this[key] = val;
+      this.searchModel[key] = val;
+    }
+  },
+  computed: {
+    windowInnerHeight() {
+      return window.innerHeight * 1 - 91;
+    },
+    choseTime() {
+      let value = _.cloneDeep(this.date_arr[this.searchModel.date_index].value);
+      let startTime = "";
+      let endTime = "";
+
+      if (value != 100 && value != null && value != 1) {
+        endTime = Lang.formatDate(new Date(), "YYYY-MM-DD 23:59:59");
+      } else if (value == 1) {
+        endTime = Lang.formatDate(
+          new Date() - 1 * 24 * 60 * 60 * 1000,
+          "YYYY-MM-DD 23:59:59"
+        );
+      } else if (value == 100) {
+        endTime = Lang.formatDate(
+          new Date() - 30 * 24 * 60 * 60 * 1000,
+          "YYYY-MM-DD 23:59:59"
+        );
+      } else {
+        endTime = null;
+      }
+
+      if (value == 0) {
+        startTime = Lang.formatDate(new Date(), "YYYY-MM-DD 00:00:00");
+      } else if (value == 1) {
+        startTime = Lang.formatDate(
+          new Date() - 1 * 24 * 60 * 60 * 1000,
+          "YYYY-MM-DD 00:00:00"
+        );
+      } else if (value == 7) {
+        startTime = Lang.formatDate(
+          new Date() - 6 * 24 * 60 * 60 * 1000,
+          "YYYY-MM-DD 00:00:00"
+        );
+      } else if (value == 30) {
+        startTime = Lang.formatDate(
+          new Date() - 29 * 24 * 60 * 60 * 1000,
+          "YYYY-MM-DD 00:00:00"
+        );
+      } else {
+        startTime = null;
+      }
+      return {
+        startTime,
+        endTime
+      };
+    },
+    read_all() {
+      return this.allCount <= 0;
+    },
+    readNoteAll() {
+      return !(
+        this.note_arr[this.now_note] &&
+        this.note_arr[this.now_note].unReadNum > 0
+      );
     }
   },
   watch: {
@@ -254,6 +370,12 @@ export default {
       handler(newValue) {
         if (newValue == false) {
           this.note_index = -1;
+        } else {
+          NotificationApi.newGetMessageGroup().then(result => {
+            if (result.status == 0) {
+              this.note_arr = result.data || [];
+            }
+          });
         }
       }
     }
@@ -435,7 +557,6 @@ export default {
 .normal-note-box {
   width: 400px;
   position: absolute;
-  height: auto;
   min-height: 300px;
   max-height: 878px;
   right: 0;
@@ -479,7 +600,7 @@ export default {
 
   .normal-note-right-list {
     padding: 0 16px;
-    height: 100%;
+    // height: 100%;
     box-sizing: border-box;
     & .normal-note-right-item {
       margin-bottom: 12px;
@@ -522,6 +643,7 @@ export default {
         border-radius: 50%;
         background: #f56c6c;
         text-align: center;
+        font-size: 12px;
         line-height: 18px;
         color: #fff;
       }
@@ -584,5 +706,11 @@ export default {
   transform: translateX(-400px);
 
   box-shadow: -6px 0px 16px 0px rgba(0, 0, 0, 0.1);
+}
+.curs-point {
+  cursor: pointer;
+}
+.color-primary {
+  color: $color-primary;
 }
 </style>

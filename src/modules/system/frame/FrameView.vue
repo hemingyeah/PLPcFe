@@ -197,8 +197,18 @@
       </div>
 
       <version :version="releaseVersion" />
-      <sale-manager :service-group-url="initData.serviceGroupUrl" :qrcode="initData.saleManagerQRCode" :show.sync="saleManagerShow" />
-      <notification-center ref="notification" :info="notificationInfo" @clearNum="clearNum" @getNum="getNum"></notification-center>
+      <sale-manager
+        :service-group-url="initData.serviceGroupUrl"
+        :qrcode="initData.saleManagerQRCode"
+        :show.sync="saleManagerShow"
+      />
+      <notification-center
+        ref="notification"
+        :info="notificationInfo"
+        :all-count="notification.count"
+        @clearNum="clearNum"
+        @getNum="getNum"
+      ></notification-center>
       <!-- <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu> -->
     </div>
     <!-- start 用户向导 -->
@@ -226,6 +236,7 @@ import * as NotificationApi from '@src/api/NotificationApi'
 import * as CallCenterApi from '@src/api/CallCenterApi'
 
 const NOTIFICATION_TIME = 1000 * 60 * 10
+import { notification } from "../../../component/form/util";
 
 // const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
 let webSocketClient = null, lockReconnect = false,
@@ -541,10 +552,31 @@ export default {
     // 获取系统消息，本地存储，超出滚动
     async getSystemMsg() {
       try {
-        let info = await NotificationApi.getSystemMessage();
+        let info = await NotificationApi.newGetMessage();
         if (info.status == 0) {
+          // this.notificationInfo = info.data;
+          // this.notification.count = info.data.systemMsg + info.data.workMsg;
+          // let msgSystem = sessionStorage.getItem("shb_systemMsg");
+
+          // if (this.notification.count > 99) {
+          //   this.msgCount = "99+";
+          // } else {
+          //   this.msgCount = "";
+          // }
+          // if (
+          //   this.notificationInfo.msgSystem &&
+          //   (!msgSystem || msgSystem != this.notificationInfo.msgSystem.id)
+          // ) {
+          //   this.notification.title = info.data.msgSystem.title;
+          //   this.notificationShow = true;
+          //   this.setAnimation();
+          // } else {
+          //   this.notification.title = null;
+          //   this.notificationShow = false;
+          // }
+
           this.notificationInfo = info.data;
-          this.notification.count = info.data.systemMsg + info.data.workMsg;
+          this.notification.count = info.data.unReadTotalCount;
           let msgSystem = sessionStorage.getItem("shb_systemMsg");
 
           if (this.notification.count > 99) {
@@ -553,10 +585,10 @@ export default {
             this.msgCount = "";
           }
           if (
-            this.notificationInfo.msgSystem &&
-            (!msgSystem || msgSystem != this.notificationInfo.msgSystem.id)
+            this.notificationInfo.lastMessage &&
+            (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
           ) {
-            this.notification.title = info.data.msgSystem.title;
+            this.notification.title = info.data.lastMessage.title;
             this.notificationShow = true;
             this.setAnimation();
           } else {
@@ -585,16 +617,9 @@ export default {
     },
 
     /** 删除未读消息或消息已读后更新新通知数量 */
-    clearNum(val, n) {
-      if (val == "system") {
-        this.notificationInfo.systemMsg =
-          n == 1 ? --this.notificationInfo.systemMsg : 0;
-      } else if (val == "work") {
-        this.notificationInfo.workMsg =
-          n == 1 ? --this.notificationInfo.workMsg : 0;
-      }
-      this.notification.count =
-        this.notificationInfo.systemMsg + this.notificationInfo.workMsg;
+    clearNum(e) {
+      if (e.count == -1) this.notification.count = 0;
+      this.notification.count = this.notification.count - e.count;
     },
     getNum() {
       this.getSystemMsg();
