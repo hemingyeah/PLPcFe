@@ -9,7 +9,7 @@
               :class="['flex-x' ,'curs-point',read_all?'color-primary':'color-666']"
               @click="clear_note('all')"
             >
-              <i class="iconfont icon-setting"></i>
+              <i class="iconfont icon-quanbuyidu font-12 mar-r-5"></i>
               全标已读
             </div>
           </div>
@@ -60,7 +60,7 @@
               :class="['flex-x','mar-r-12','curs-point',readNoteAll?'color-primary':'color-666']"
               @click="clear_note('now_all')"
             >
-              <i class="iconfont icon-setting curs-point"></i>
+              <i class="iconfont icon-quanbuyidu font-12 mar-r-5"></i>
               全标已读
             </div>
           </div>
@@ -566,6 +566,15 @@ export default {
 }
 .color-666 {
   color: #666;
+  .icon-font {
+    color: #999;
+  }
+}
+.font-12 {
+  font-size: 12px;
+}
+.mar-r-5 {
+  margin-right: 5px;
 }
 .mar-r-12 {
   margin-right: 12px;
