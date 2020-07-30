@@ -67,7 +67,7 @@ export function getSystemMessage() {
 }
 
 
-let url_head = '/outside'
+let url_head = '/api/app/outside'
 
 // 轮询获取最新消息以及数量
 export function newGetMessage(params) {
