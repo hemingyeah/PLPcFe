@@ -255,7 +255,7 @@ export default {
         let { startTime, endTime } = this.choseTime;
         let source = this.note_arr[this.note_index].source;
         let count = this.note_arr[this.note_index].unReadNum * 1;
-      
+
         NotificationApi.newGetMessageMark({
           source,
           startTime,
@@ -288,7 +288,7 @@ export default {
       });
     },
     getNum(count) {
-      if (this.info.workMsg < count) {
+      if (this.allCount != count) {
         this.$emit("getNum");
       }
     },
@@ -318,6 +318,19 @@ export default {
     loadData() {
       NotificationApi.newGetMessageGroup().then(result => {
         if (result.status == 0) {
+          let num = 0;
+          if (result.data && result.data.length > 0) {
+            // 过滤掉不属于规定source的异常数据
+            for (let index = result.data.length - 1; index >= 0; index--) {
+              if (!this.note_obj.hasOwnProperty(result.data[index].source)) {
+                result.data.splice(index, 1);
+              } else {
+                num += result.data[index].unReadNum * 1;
+              }
+            }
+            this.getNum(num);
+          }
+
           this.note_arr = result.data || [];
         }
       });
