@@ -255,7 +255,7 @@ export default {
         let { startTime, endTime } = this.choseTime;
         let source = this.note_arr[this.note_index].source;
         let count = this.note_arr[this.note_index].unReadNum * 1;
-
+      
         NotificationApi.newGetMessageMark({
           source,
           startTime,
@@ -307,6 +307,7 @@ export default {
       this.note_index = this.note_index == index ? -1 : index;
     },
     change_filter_item(key, val) {
+      if (this.searchModel[key] == val) return;
       this.searchModel[key] = val;
       this.$refs.newNoteCenter.changeParams({
         source: this.note_arr[this.note_index].source,
