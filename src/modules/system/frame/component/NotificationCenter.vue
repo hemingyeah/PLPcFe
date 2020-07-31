@@ -324,6 +324,7 @@ export default {
       });
     },
     loadData() {
+      this.loading = true;
       NotificationApi.newGetMessageGroup().then(result => {
         if (result.status == 0) {
           let num = 0;
