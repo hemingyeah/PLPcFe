@@ -16,6 +16,7 @@
             @getInfo="getInfo"
             @clearNum="clearNum"
             @toDaily="toDaily"
+            @hideItem="hideItem"
           ></job-notification-item>
           <div
             v-if="params.source==='system'"
@@ -48,10 +49,14 @@
           </div>
         </div>
       </div>
-      <div
+      <!-- <div
         class="job-notification-footer"
         v-else-if="notificationPage.list.length == 0 && !loading"
-      >暂时没有信息</div>
+      >暂时没有信息</div>-->
+      <no-data-view-new
+        v-else-if="notificationPage.list.length == 0 && !loading"
+        :notice-msg="'暂无消息'"
+      ></no-data-view-new>
       <div class="job-notification-footer" v-else>正在加载...</div>
     </div>
     <div class="job-notification-daily" v-show="dailyShow">
@@ -74,11 +79,13 @@ import * as NotificationApi from "@src/api/NotificationApi";
 import * as Lang from "@src/util/lang/index.js";
 import Page from "@model/Page";
 import platform from "@src/platform";
+import NoDataViewNew from "@src/component/common/NoDataViewNew";
 
 export default {
   name: "new-note-center",
   components: {
-    [JobNotificationItem.name]: JobNotificationItem
+    [JobNotificationItem.name]: JobNotificationItem,
+    [NoDataViewNew.name]: NoDataViewNew
   },
   props: {
     // info: Object
@@ -210,7 +217,12 @@ export default {
       } else {
         platform.openLink(info.url);
       }
+      this.$emit("hideItem");
+
       this.$emit("clearNum", { count: 1 });
+    },
+    hideItem(){
+      this.$emit("hideItem");
     }
   },
   computed: {

@@ -6,7 +6,7 @@
           <div class="normal-note-right-header-title">通知中心</div>
           <div class="normal-note-right-header-btn flex-x">
             <div
-              :class="['flex-x' ,'curs-point',read_all?'color-primary':'color-666']"
+              :class="['flex-x' ,'curs-point',read_all?'color-primary curs-ban':'color-666 curs-point']"
               @click="clear_note('all')"
             >
               <i class="iconfont icon-quanbuyidu font-12 mar-r-5"></i>
@@ -41,6 +41,7 @@
             </div>
           </div>
         </div>
+        <no-data-view-new v-else-if="note_arr.length == 0 && !loading" :notice-msg="'暂无消息通知'"></no-data-view-new>
       </div>
       <div :class="['normal-note-left-box',note_index > -1?'normal-note-left-box-show':'']">
         <!-- normal-note-left-filter start -->
@@ -57,7 +58,7 @@
           <div class="flex-x mar-b-12">
             <div class="normal-note-left-filter-title flex-1">状态筛选标签：</div>
             <div
-              :class="['flex-x','mar-r-12','curs-point',readNoteAll?'color-primary':'color-666']"
+              :class="['flex-x','mar-r-12',readNoteAll?'color-primary curs-ban':'color-666 curs-point']"
               @click="clear_note('now_all')"
             >
               <i class="iconfont icon-quanbuyidu font-12 mar-r-5"></i>
@@ -83,6 +84,7 @@
               ref="newNoteCenter"
               @clearNum="clearNum"
               @getNum="getNum"
+              @hideItem="hideItem"
             ></component>
           </keep-alive>
         </div>
@@ -96,6 +98,7 @@
 import newNoteCenter from "./notificationCenter/newNoteCenter";
 import * as Lang from "@src/util/lang/index.js";
 import * as NotificationApi from "@src/api/NotificationApi";
+import NoDataViewNew from "@src/component/common/NoDataViewNew";
 
 import info_ from "./data.js";
 
@@ -116,7 +119,8 @@ import note_img_12 from "@src/assets/img/noteCenter/attention.png";
 export default {
   name: "notification-center",
   components: {
-    [newNoteCenter.name]: newNoteCenter
+    [newNoteCenter.name]: newNoteCenter,
+    [NoDataViewNew.name]: NoDataViewNew
   },
   props: {
     info: Object,
@@ -129,6 +133,7 @@ export default {
     return {
       component: "job-notification",
       show: false,
+      loading: true,
       note_obj: {
         task: {
           img: note_img_1,
@@ -306,6 +311,9 @@ export default {
       }
       this.note_index = this.note_index == index ? -1 : index;
     },
+    hideItem() {
+      this.note_index = -1;
+    },
     change_filter_item(key, val) {
       if (this.searchModel[key] == val) return;
       this.searchModel[key] = val;
@@ -332,6 +340,7 @@ export default {
           }
 
           this.note_arr = result.data || [];
+          this.loading = false;
         }
       });
     }
@@ -566,7 +575,7 @@ export default {
 }
 .color-666 {
   color: #666;
-  .icon-font {
+  .iconfont {
     color: #999;
   }
 }
@@ -749,6 +758,9 @@ export default {
 }
 .curs-point {
   cursor: pointer;
+}
+.curs-ban {
+  cursor: not-allowed;
 }
 .color-primary {
   color: $color-primary;

@@ -59,11 +59,13 @@ export default {
               close: true,
               url: info.pcUrl
             });
+            this.$emit("hideItem");
           } else {
             info.pcUrl = `${info.pcUrl}&DingTalkFlag=false`;
             this.$emit("toDaily", { coutn: 1, id: info.id, url: info.pcUrl });
           }
         }
+
         if (info.readed == 0) {
           // let params = {
           //   type: "work",
@@ -104,6 +106,7 @@ export default {
   padding: 14px 24px;
   background: #fff;
   cursor: pointer;
+  border-radius: 4px;
 }
 .job-notification-item-new {
   position: absolute;
