@@ -100,16 +100,6 @@ export default {
     buildSelfFields() {
       let fields = [
         {
-          displayName: '选择团队',
-          fieldName: 'tags',
-          formType: 'tags',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          operator: 'between',
-          orderId: -2.5
-        },
-        {
           displayName: '创建时间',
           fieldName: 'createTime',
           formType: 'date',
@@ -507,6 +497,7 @@ export default {
           return form;
         },
         update(event, action) {
+          console.log('update::', event, action);
           if (action === 'tags') {
             return (this.form.tags = event);
           }
