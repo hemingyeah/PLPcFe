@@ -28,7 +28,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .app-nodata-view {
     .app-nodata-img-container {
       display: flex;

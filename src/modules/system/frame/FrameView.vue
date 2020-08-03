@@ -620,7 +620,6 @@ export default {
 
     /** 删除未读消息或消息已读后更新新通知数量 */
     clearNum(e) {
-      console.log(e, "aaaaaa");
       if (e.count == -1) return (this.notification.count = 0);
 
       this.notification.count = this.notification.count - e.count;

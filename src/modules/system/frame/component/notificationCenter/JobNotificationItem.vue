@@ -50,6 +50,7 @@ export default {
     /** 打开工作通知详情页 */
     async toJobNotificationDetails(info) {
       try {
+        let needHide = false;
         if (info.pcUrl) {
           if (info.source != "daily") {
             let itemId = this.getId(info);
@@ -59,6 +60,7 @@ export default {
               close: true,
               url: info.pcUrl
             });
+            needHide = true;
           } else {
             info.pcUrl = `${info.pcUrl}&DingTalkFlag=false`;
             this.$emit("toDaily", { coutn: 1, id: info.id, url: info.pcUrl });
@@ -76,7 +78,7 @@ export default {
           this.$emit("clearNum", {
             count: 1,
             id: info.id,
-            needHide: info.source != "daily" ? true : false
+            needHide
           });
           // }
         }
