@@ -16,7 +16,6 @@
             @getInfo="getInfo"
             @clearNum="clearNum"
             @toDaily="toDaily"
-            @hideItem="hideItem"
           ></job-notification-item>
           <div
             v-if="params.source==='system'"
@@ -217,12 +216,8 @@ export default {
       } else {
         platform.openLink(info.url);
       }
-      this.$emit("hideItem");
 
-      this.$emit("clearNum", { count: 1 });
-    },
-    hideItem(){
-      this.$emit("hideItem");
+      this.$emit("clearNum", { count: 1, needHide: true });
     }
   },
   computed: {

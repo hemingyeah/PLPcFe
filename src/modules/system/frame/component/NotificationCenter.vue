@@ -66,7 +66,6 @@
           </div>
 
           <div class="normal-note-left-filter-title mar-b-12">状态筛选标签：</div>
-          
 
           <div class="flex-x normal-note-left-filter-list">
             <div
@@ -86,7 +85,6 @@
               ref="newNoteCenter"
               @clearNum="clearNum"
               @getNum="getNum"
-              @hideItem="hideItem"
             ></component>
           </keep-alive>
         </div>
@@ -291,6 +289,10 @@ export default {
         if (result.status == 0) {
           this.note_arr[this.note_index].unReadNum -= e.count || 0;
           this.$emit("clearNum", e);
+
+          if (e.needHide) {
+            this.hideItem();
+          }
         }
       });
     },

@@ -59,7 +59,6 @@ export default {
               close: true,
               url: info.pcUrl
             });
-            this.$emit("hideItem");
           } else {
             info.pcUrl = `${info.pcUrl}&DingTalkFlag=false`;
             this.$emit("toDaily", { coutn: 1, id: info.id, url: info.pcUrl });
@@ -74,7 +73,11 @@ export default {
           // let result = await NotificationApi.haveRead(params);
           // if(result.status == 0) {
           info.readed = 1;
-          this.$emit("clearNum", { count: 1, id: info.id });
+          this.$emit("clearNum", {
+            count: 1,
+            id: info.id,
+            needHide: info.source != "daily" ? true : false
+          });
           // }
         }
       } catch (error) {
