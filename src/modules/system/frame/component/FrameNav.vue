@@ -50,11 +50,14 @@ import MenuIcon from '../model/MenuIcon';
 
 import Logo from '@src/assets/img/logo.png';
 import MiniLogo from '@src/assets/svg/logo.svg';
-let call_center_gray = localStorage.getItem('call_center_gray');
 export default {
   name: 'frame-nav',
   props: {
     collapse: {
+      type: Boolean,
+      default: false
+    },
+    callcenter: {
       type: Boolean,
       default: false
     },
@@ -88,7 +91,7 @@ export default {
     },
     pushMenu(menu, menus){
       if((menu.menuKey == 'M_CALLCENTER_WORKBENCH_LIST' || menu.menuKey == 'M_CALLCENTER_STATISTICS' || menu.menuKey == 'M_CALLCENTER_STAGE')) {
-        if (call_center_gray == 1){
+        if (this.callcenter){
           menus.push(menu);
         }
       } else {
@@ -207,7 +210,20 @@ export default {
   mounted() {
     this.setMenuOffsetData();
     this.registerResizeListener();
-  }
+  },
+  watch: {
+    callcenter: {
+      immediate: true,
+      deep: true,
+      handler(newValue, oldValue) {
+        if(newValue) {
+          let originMenus = _.cloneDeep(this.source);
+          let m = this.buildMenus(originMenus, null).menus || []; 
+          this.menus = _.cloneDeep(m);          
+        }
+      }
+    }
+  },
 }
 </script>
 

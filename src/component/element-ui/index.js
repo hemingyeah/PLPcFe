@@ -87,6 +87,7 @@ const ElementUI = {
     Vue.use(Steps);
     Vue.use(Step);
     Vue.use(Dialog);
+    Vue.use(Card);
     Vue.use(Tabs);
     Vue.use(TabPane);
     Vue.use(Row);

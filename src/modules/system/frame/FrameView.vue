@@ -1,7 +1,7 @@
 <template>
   <div class="shb-main">
     <div class="frame">
-      <frame-nav :collapse.sync="collapse" :source="initData.menus" @open="openForNav" @collapse-changed="adjustOpenTab" />
+      <frame-nav :collapse.sync="collapse" :source="initData.menus" :callcenter="has_call_center_module" @open="openForNav" @collapse-changed="adjustOpenTab" />
 
       <div class="frame-content">
         <header class="frame-header">

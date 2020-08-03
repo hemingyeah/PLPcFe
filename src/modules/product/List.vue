@@ -431,7 +431,7 @@ export default {
 
       if(field && field.setting.customerOption?.address) {
         fixedFields.push({
-          displayName: '产品地址',
+          displayName: '地址',
           fieldName: 'address',
           isExport: true,
           formType: 'text',

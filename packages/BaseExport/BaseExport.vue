@@ -35,25 +35,25 @@
 </template>
 
 <script>
-import _ from "lodash";
-import Platform from "@src/util/Platform";
-import qs from "@src/util/queryString2";
-import http from "@src/util/HttpUtil";
+import _ from 'lodash';
+import Platform from '@src/util/Platform';
+import qs from '@src/util/querystring2';
+import http from '@src/util/HttpUtil';
 
 const MAX_COUNT = 5000;
 
 export default {
-  name: "base-export",
+  name: 'base-export',
   props: {
     columns: Array,
     action: String,
     title: {
       type: String,
-      default: "导出列选择"
+      default: '导出列选择'
     },
     method: {
       type: String,
-      default: "get"
+      default: 'get'
     },
     /**
      * 函数必须返回Promise对象
@@ -64,14 +64,14 @@ export default {
   data() {
     return {
       ids: [],
-      fileName: "",
+      fileName: '',
       params: {},
       visible: false,
       pending: false,
       checkedArr: [],
       isCheckedAll: true,
 
-      checked: ""
+      checked: ''
     };
   },
   computed: {
@@ -80,7 +80,7 @@ export default {
     }
   },
   methods: {
-    open(ids = [], fileName = "导出数据.xlsx", params) {
+    open(ids = [], fileName = '导出数据.xlsx', params) {
       this.pending = false;
       this.ids = ids;
       this.fileName = fileName;
@@ -96,8 +96,8 @@ export default {
     toggle(value) {
       this.checkedArr = value
         ? this.filterColumns.map(item =>
-            item.exportAlias ? item.exportAlias : item.field
-          )
+          item.exportAlias ? item.exportAlias : item.field
+        )
         : [];
     },
     handleChange() {
@@ -105,12 +105,12 @@ export default {
     },
     async exportData() {
       if (this.checkedArr.length == 0)
-        return Platform.alert("请至少选择一列导出");
+        return Platform.alert('请至少选择一列导出');
 
       this.pending = true;
 
       // 如果提供验证函数，则进行验证
-      if (typeof this.validate == "function") {
+      if (typeof this.validate == 'function') {
         let validateRes = await this.validate(this.ids, MAX_COUNT);
         if (validateRes) {
           this.pending = false;
@@ -120,20 +120,20 @@ export default {
       }
 
       let model = {
-        checked: this.checkedArr.join(","),
-        ids: this.ids.join(",")
+        checked: this.checkedArr.join(','),
+        ids: this.ids.join(',')
       };
       _.assign(model, this.params);
 
       let ua = navigator.userAgent;
-      if (ua.indexOf("Trident") >= 0) {
+      if (ua.indexOf('Trident') >= 0) {
         window.location.href = `${this.action}?${qs.stringify(model)}`;
         this.visible = false;
         return;
       }
 
-      let responseType = { responseType: "blob" };
-      if (this.method === "post") {
+      let responseType = { responseType: 'blob' };
+      if (this.method === 'post') {
         return http
           .post(this.action, model, true, responseType)
           .then(this.exportResponseHandler)
@@ -147,7 +147,7 @@ export default {
     },
 
     exportResponseHandler(blob) {
-      let link = document.createElement("a");
+      let link = document.createElement('a');
       let url = URL.createObjectURL(blob);
       link.download = this.fileName;
       link.href = url;
