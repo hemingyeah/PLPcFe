@@ -208,7 +208,8 @@ export default {
         1: "0",
         2: "1"
       },
-      nowInfo: {}
+      nowInfo: {},
+      windowInnerHeight: 0
     };
   },
   filters: {
@@ -348,12 +349,12 @@ export default {
           this.loading = false;
         }
       });
+    },
+    handleLableWidth() {
+      this.windowInnerHeight = window.innerHeight * 1 - 91;
     }
   },
   computed: {
-    windowInnerHeight() {
-      return window.innerHeight * 1 - 91;
-    },
     choseTime() {
       let value = _.cloneDeep(this.date_arr[this.searchModel.date_index].value);
       let startTime = "";
@@ -410,10 +411,15 @@ export default {
       );
     }
   },
+  mounted() {
+    window.onresize = () => {
+      return (() => {
+        this.handleLableWidth();
+      })();
+    };
+    this.handleLableWidth();
+  },
   watch: {
-    info: {
-      handler(newValue) {}
-    },
     show: {
       handler(newValue) {
         if (newValue == false) {
