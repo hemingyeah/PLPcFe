@@ -46,17 +46,8 @@
       <div :class="['normal-note-left-box',note_index > -1?'normal-note-left-box-show':'']">
         <!-- normal-note-left-filter start -->
         <div class="normal-note-left-filter">
-          <div class="normal-note-left-filter-title mar-b-12">时间筛选标签：</div>
-          <div class="flex-x normal-note-left-filter-list mar-b-30">
-            <div
-              v-for="(item, index) in date_arr"
-              :key="index"
-              :class="['normal-note-left-filter-item',searchModel.date_index===index?'normal-note-left-filter-item-chosed':'']"
-              @click="change_filter_item('date_index',index)"
-            >{{item.name}}</div>
-          </div>
           <div class="flex-x mar-b-12">
-            <div class="normal-note-left-filter-title flex-1">状态筛选标签：</div>
+            <div class="normal-note-left-filter-title flex-1">时间筛选标签：</div>
             <div
               :class="['flex-x','mar-r-12',readNoteAll?'color-primary curs-ban':'color-666 curs-point']"
               @click="clear_note('now_all')"
@@ -65,6 +56,17 @@
               全标已读
             </div>
           </div>
+          <div class="flex-x normal-note-left-filter-list mar-b-30">
+            <div
+              v-for="(item, index) in date_arr"
+              :key="index"
+              :class="['normal-note-left-filter-item',searchModel.date_index===index?'normal-note-left-filter-item-chosed':'']"
+              @click="change_filter_item('date_index',index)"
+            >{{item.name}}</div>
+          </div>
+
+          <div class="normal-note-left-filter-title mar-b-12">状态筛选标签：</div>
+          
 
           <div class="flex-x normal-note-left-filter-list">
             <div
