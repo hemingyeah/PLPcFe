@@ -63,7 +63,12 @@ export default {
             needHide = true;
           } else {
             info.pcUrl = `${info.pcUrl}&DingTalkFlag=false`;
-            this.$emit("toDaily", { coutn: 1, id: info.id, url: info.pcUrl });
+            this.$emit("toDaily", {
+              coutn: 1,
+              id: info.id,
+              url: info.pcUrl,
+              readed: info.readed
+            });
           }
         }
 

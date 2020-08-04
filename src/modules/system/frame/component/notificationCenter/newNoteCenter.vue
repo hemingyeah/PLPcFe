@@ -172,7 +172,9 @@ export default {
     toDaily(e) {
       this.dailyUrl = e.url;
       this.dailyShow = true;
-      this.$emit("clearNum", e);
+      if (e.readed == 0) {
+        this.$emit("clearNum", e);
+      }
     },
     close() {
       this.dailyShow = false;
