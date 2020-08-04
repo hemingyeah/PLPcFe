@@ -85,7 +85,7 @@ export default {
     formArr() {
       let arr = [
         { lable: "申请日期", value: this.propData.data.prosperTime },
-        { lable: "办理编号", value: this.propData.data.approveNo },
+        { lable: "申请编号", value: this.propData.data.approveNo },
         { lable: "申请类型", value: this.propData.data.type },
         { lable: "申请人", value: this.propData.data.prosperName },
         { lable: "目标仓库", value: this.propData.data.targetName }

@@ -1351,11 +1351,11 @@ export default {
     },
     seeTime() {
       if (!this.timeValue) {
-        delete this.model.timeStart;
-        delete this.model.timeEnd;
+        delete this.model.prosperTimeStart;
+        delete this.model.prosperTimeEnd;
       } else {
-        this.model.timeStart = DateUtil.format(this.timeValue[0]);
-        this.model.timeEnd = DateUtil.format(
+        this.model.prosperTimeStart = DateUtil.format(this.timeValue[0]);
+        this.model.prosperTimeEnd = DateUtil.format(
           this.timeValue[1],
           'yyyy-MM-dd 23:59:59'
         );
@@ -1363,11 +1363,11 @@ export default {
     },
     seeUpdateTime() {
       if (!this.updateTimeValue) {
-        delete this.model.updateTimeStart;
-        delete this.model.updateTimeEnd;
+        delete this.model.approveTimeStart;
+        delete this.model.approveTimeEnd;
       } else {
-        this.model.updateTimeStart = DateUtil.format(this.updateTimeValue[0]);
-        this.model.updateTimeEnd = DateUtil.format(
+        this.model.approveTimeStart = DateUtil.format(this.updateTimeValue[0]);
+        this.model.approveTimeEnd = DateUtil.format(
           this.updateTimeValue[1],
           'yyyy-MM-dd 23:59:59'
         );
