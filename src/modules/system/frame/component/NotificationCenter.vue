@@ -283,6 +283,12 @@ export default {
     clearNum(e) {
       let source = this.note_arr[this.note_index].source;
       let { id } = e;
+      if (e.readed == 1) {
+        if (e.needHide) {
+          this.hideItem();
+        }
+        return;
+      }
       NotificationApi.newGetMessageMark({
         source,
         id

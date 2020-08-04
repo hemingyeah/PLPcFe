@@ -186,18 +186,6 @@ export default {
     /** 打开系统通知详情页 */
     async toSystemNotificationDetail(info = {}) {
       try {
-        if (info.readed == 0) {
-          let params = {
-            type: "system",
-            id: info.id
-          };
-          let result = await NotificationApi.haveRead(params);
-          if (result.status == 0) {
-            info.readed = 1;
-            this.$emit("clearNum", { count: 1, id: info.id });
-          }
-        }
-
         this.systemNotificationOpen(info);
       } catch (error) {
         console.error(error);
@@ -218,8 +206,8 @@ export default {
       } else {
         platform.openLink(info.url);
       }
-
-      this.$emit("clearNum", { count: 1, needHide: true });
+      this.$emit("clearNum", { count: 1, needHide: true, readed: info.readed });
+      info.readed = 1;
     }
   },
   computed: {

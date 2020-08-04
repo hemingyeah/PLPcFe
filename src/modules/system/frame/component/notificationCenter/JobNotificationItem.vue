@@ -71,22 +71,13 @@ export default {
             });
           }
         }
-
-        if (info.readed == 0) {
-          // let params = {
-          //   type: "work",
-          //   id: info.id
-          // };
-          // let result = await NotificationApi.haveRead(params);
-          // if(result.status == 0) {
-          info.readed = 1;
-          this.$emit("clearNum", {
-            count: 1,
-            id: info.id,
-            needHide
-          });
-          // }
-        }
+        this.$emit("clearNum", {
+          count: 1,
+          id: info.id,
+          needHide,
+          readed: info.readed
+        });
+        info.readed = 1;
       } catch (error) {
         console.error(error);
       }
