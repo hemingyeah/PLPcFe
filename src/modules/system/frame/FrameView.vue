@@ -1,13 +1,23 @@
 <template>
   <div class="shb-main">
     <div class="frame">
-      <frame-nav :collapse.sync="collapse" :source="initData.menus" :callcenter="has_call_center_module" @open="openForNav" @collapse-changed="adjustOpenTab" />
+      <frame-nav
+        :collapse.sync="collapse"
+        :source="initData.menus"
+        :callcenter="has_call_center_module"
+        @open="openForNav"
+        @collapse-changed="adjustOpenTab"
+      />
 
       <div class="frame-content">
         <header class="frame-header">
           <div class="frame-quick">
             <div class="frame-quick-left">
-              <button type="button" class="btn-text frame-header-btn frame-collapse frame-header-btn-bg" @click="collapse = !collapse">
+              <button
+                type="button"
+                class="btn-text frame-header-btn frame-collapse frame-header-btn-bg"
+                @click="collapse = !collapse"
+              >
                 <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
               </button>
             </div>
@@ -15,7 +25,10 @@
             <div class="frame-quick-notification" v-show="notificationShow">
               <div class="frame-quick-notification-info" ref="notificationInfo">
                 <div class="frame-quick-notification-content" ref="notificationContent">
-                  <p ref="notificationText" class="frame-quick-notification-text">{{ notification.title }}</p>
+                  <p
+                    ref="notificationText"
+                    class="frame-quick-notification-text"
+                  >{{ notification.title }}</p>
                 </div>
               </div>
               <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
@@ -25,19 +38,27 @@
 
             <!-- profile -->
             <div class="frame-quick-right">
-
-              <button v-if="has_call_center_module" type="button" class="btn-text frame-header-btn" @click="handleCallCenterClick">
+              <button
+                v-if="has_call_center_module"
+                type="button"
+                class="btn-text frame-header-btn"
+                @click="handleCallCenterClick"
+              >
                 <i class="iconfont icon-dianhua1"></i>
               </button>
-              <div v-if="showCallCenter" class="call-center-box" > 
-                <i style="position: absolute;right: 15px;top: 20px;" class="iconfont icon-fe-close" @click="showCallCenter=false"></i>
+              <div v-if="showCallCenter" class="call-center-box">
+                <i
+                  style="position: absolute;right: 15px;top: 20px;"
+                  class="iconfont icon-fe-close"
+                  @click="showCallCenter=false"
+                ></i>
                 <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
                 <p class="customer-name" v-if="callData.linkmanName">{{callData.linkmanName}}</p>
                 <p v-if="callData.linkmanName">{{callData.customerName}}</p>
                 <div class="divider"></div>
                 <div class="call-ripple">
                   <div class="icon-ripple">
-                    <img src="../../../assets/img/phone.png">
+                    <img src="../../../assets/img/phone.png" />
                     <div class="ripple1"></div>
                     <div class="ripple2"></div>
                   </div>
@@ -45,19 +66,37 @@
                 <p style="margin-top:10px;">{{callData.callPhone}}</p>
                 <!-- 呼入 -->
                 <template v-if="callData.callType=='normal'">
-                  <div class="call-in" >
-                    <p class="today">今日已来电（<span>{{callData.dialCount || 0}}</span>）</p>
-                    <p >未完成工单（<span>{{callData.taskCount || 0}}</span>）</p>
-                    <p >未完成事件（<span>{{callData.eventCount || 0}}</span>）</p>
+                  <div class="call-in">
+                    <p class="today">
+                      今日已来电（
+                      <span>{{callData.dialCount || 0}}</span>）
+                    </p>
+                    <p>
+                      未完成工单（
+                      <span>{{callData.taskCount || 0}}</span>）
+                    </p>
+                    <p>
+                      未完成事件（
+                      <span>{{callData.eventCount || 0}}</span>）
+                    </p>
                   </div>
                 </template>
                 <template v-else>
                   <!-- 呼出 -->
                   <div class="call-out">
-                    <p>今日已来电（<span>{{callData.dialCount || 0}}</span>）</p>
+                    <p>
+                      今日已来电（
+                      <span>{{callData.dialCount || 0}}</span>）
+                    </p>
                     <div class="unfinsh">
-                      <p>未完成工单（<span>{{callData.taskCount || 0}}</span>）</p>
-                      <p>未完成事件（<span>{{callData.eventCount || 0}}</span>）</p>
+                      <p>
+                        未完成工单（
+                        <span>{{callData.taskCount || 0}}</span>）
+                      </p>
+                      <p>
+                        未完成事件（
+                        <span>{{callData.eventCount || 0}}</span>）
+                      </p>
                     </div>
                   </div>
                 </template>
@@ -84,20 +123,48 @@
                 </div>
               </el-popover>
 
-              <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" @click="openHelpDoc" title="帮助文档" v-tooltip>
+              <button
+                type="button"
+                class="btn-text frame-header-btn frame-header-btn-bg"
+                @click="openHelpDoc"
+                title="帮助文档"
+                v-tooltip
+              >
                 <i class="iconfont icon-bangzhu"></i>
               </button>
 
-              <button type="button" class="btn-text frame-header-btn frame-header-btn-bg" @click="openSaleManager" title="专属客服" v-tooltip>
+              <button
+                type="button"
+                class="btn-text frame-header-btn frame-header-btn-bg"
+                @click="openSaleManager"
+                title="专属客服"
+                v-tooltip
+              >
                 <i class="iconfont icon-customerservice"></i>
               </button>
 
-              <el-popover trigger="click" :value="exportPopperVisible" popper-class="export-panel-popper" placement="bottom-end" @input="exportPopoverToggle">
-                <button type="button" :title="backgroundTaskTitle" v-tooltip class="btn-text frame-header-btn frame-header-btn-bg" slot="reference">
+              <el-popover
+                trigger="click"
+                :value="exportPopperVisible"
+                popper-class="export-panel-popper"
+                placement="bottom-end"
+                @input="exportPopoverToggle"
+              >
+                <button
+                  type="button"
+                  :title="backgroundTaskTitle"
+                  v-tooltip
+                  class="btn-text frame-header-btn frame-header-btn-bg"
+                  slot="reference"
+                >
                   <i class="iconfont icon-xiazai"></i>
                 </button>
                 <!-- start 导入导出下载 -->
-                <import-and-export-view :title="backgroundTaskTitle" :source-list="exportList" @change="operationListChange"></import-and-export-view>
+                <import-and-export-view
+                  :title="backgroundTaskTitle"
+                  :source-list="exportList"
+                  @change="operationListChange"
+                ></import-and-export-view>
                 <!-- end 导入导出下载 -->
               </el-popover>
               <!--导出下载-->
@@ -119,9 +186,16 @@
               <!-- 个人信息 -->
               <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
                 <div class="frame-user-profile" slot="reference">
-                  <a class="user-avatar" :href="`/mine/` + loginUser.userId" @click.stop.prevent="openUserView">
+                  <a
+                    class="user-avatar"
+                    :href="`/mine/` + loginUser.userId"
+                    @click.stop.prevent="openUserView"
+                  >
                     <img :src="userAvatar" />
-                    <span class="user-color-icon user-color-icon-mini" :style="{backgroundColor: userStateColor}"></span>
+                    <span
+                      class="user-color-icon user-color-icon-mini"
+                      :style="{backgroundColor: userStateColor}"
+                    ></span>
                   </a>
                   <div class="user-info">
                     <h4>{{loginUser.displayName}}</h4>
@@ -130,13 +204,23 @@
                   <i class="iconfont icon-nav-down user-profile-down"></i>
                 </div>
 
-                <el-popover placement="left-start" popper-class="user-state-popper" trigger="hover" v-model="userStatePopperVisible">
+                <el-popover
+                  placement="left-start"
+                  popper-class="user-state-popper"
+                  trigger="hover"
+                  v-model="userStatePopperVisible"
+                >
                   <div class="user-profile-item" slot="reference">
                     <i class="iconfont icon-user-status"></i>工作状态
                   </div>
 
                   <div class="user-state-panel">
-                    <div class="user-profile-item user-state-item" v-for="(color, state) in userStateMap" :key="state" @click="chooseUserState(state)">
+                    <div
+                      class="user-profile-item user-state-item"
+                      v-for="(color, state) in userStateMap"
+                      :key="state"
+                      @click="chooseUserState(state)"
+                    >
                       <span class="user-color-icon" :style="{backgroundColor: color}"></span>
                       <span>{{state}}</span>
                     </div>
@@ -159,7 +243,12 @@
           </div>
 
           <div class="frame-tabs">
-            <button type="button" class="btn-text frame-tabs-prev" :class="{'frame-tab-highlight': prevBtnEnable}" @click="prev">
+            <button
+              type="button"
+              class="btn-text frame-tabs-prev"
+              :class="{'frame-tab-highlight': prevBtnEnable}"
+              @click="prev"
+            >
               <i class="iconfont icon-zuoyidong"></i>
             </button>
 
@@ -183,7 +272,12 @@
               <div class="frame-tabs-border"></div>
             </div>
 
-            <button type="button" class="btn-text frame-tabs-next" :class="{'frame-tab-highlight': nextBtnEnable}" @click="next">
+            <button
+              type="button"
+              class="btn-text frame-tabs-next"
+              :class="{'frame-tab-highlight': nextBtnEnable}"
+              @click="next"
+            >
               <i class="iconfont icon-youyidong"></i>
             </button>
           </div>
@@ -191,7 +285,12 @@
 
         <div class="frame-main">
           <div class="frame-tab-content">
-            <div class="frame-tab-window" v-for="(tab, index) in frameTabs" :key="`${index}_${tab.url}`" v-show="tab.show">
+            <div
+              class="frame-tab-window"
+              v-for="(tab, index) in frameTabs"
+              :key="`${index}_${tab.url}`"
+              v-show="tab.show"
+            >
               <iframe
                 :id="`frame_tab_${tab.id}`"
                 :fromid="tab.fromId"
@@ -227,29 +326,29 @@
 </template>
 
 <script>
-import platform from '@src/platform'
-import http from '@src/util/http'
-import FrameManager from './FrameManager'
+import platform from '@src/platform';
+import http from '@src/util/http';
+import FrameManager from './FrameManager';
 
-import FrameTab from './component/FrameTab.vue'
-import FrameNav from './component/FrameNav.vue'
-import Version from './component/Version.vue'
-import SaleManager from './component/SaleManager.vue'
-import UserGuide from './component/UserGuide.vue'
+import FrameTab from './component/FrameTab.vue';
+import FrameNav from './component/FrameNav.vue';
+import Version from './component/Version.vue';
+import SaleManager from './component/SaleManager.vue';
+import UserGuide from './component/UserGuide.vue';
 
-import ImportAndExport from './component/ImportAndExport.vue'
+import ImportAndExport from './component/ImportAndExport.vue';
 
-import DefaultHead from '@src/assets/img/user-avatar.png'
-import NotificationCenter from './component/NotificationCenter.vue'
-import * as NotificationApi from '@src/api/NotificationApi'
-import * as CallCenterApi from '@src/api/CallCenterApi'
+import DefaultHead from '@src/assets/img/user-avatar.png';
+import NotificationCenter from './component/NotificationCenter.vue';
+import * as NotificationApi from '@src/api/NotificationApi';
+import * as CallCenterApi from '@src/api/CallCenterApi';
 
-const NOTIFICATION_TIME = 1000 * 60 * 10
-import { notification } from "../../../component/form/util";
+const NOTIFICATION_TIME = 1000 * 60 * 10;
 
 // const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
-let webSocketClient = null, lockReconnect = false,
-  reconnectTimmer = null
+let webSocketClient = null,
+  lockReconnect = false,
+  reconnectTimmer = null;
 
 export default {
   mixins: [FrameManager],
@@ -281,63 +380,63 @@ export default {
       // 后台任务
       backgroundTaskTitle: '后台任务',
 
-      showCallCenter:false,
-      callData:{}, 
+      showCallCenter: false,
+      callData: {},
       heartCheck: {
         timeout: 5000, // 每隔5秒发送心跳
         num: 3, // 3次心跳均未响应重连
         timeoutObj: null,
         serverTimeoutObj: null,
-        start(){
+        start() {
           let _num = this.num;
           this.timeoutObj && clearTimeout(this.timeoutObj);
           this.serverTimeoutObj && clearTimeout(this.serverTimeoutObj);
-          this.timeoutObj = setTimeout(()=>{
+          this.timeoutObj = setTimeout(() => {
             // 这里发送一个心跳，后端收到后，返回一个心跳消息，
             // onmessage拿到返回的心跳就说明连接正常
-            webSocketClient.send(JSON.stringify({'action':'ping'}));
+            webSocketClient.send(JSON.stringify({ action: 'ping' }));
             _num--;
-            if(_num === 0) {
+            if (_num === 0) {
               webSocketClient.colse();
             }
-          }, this.timeout)
+          }, this.timeout);
         }
       },
-      has_call_center_module:false
-    }
+      has_call_center_module: false
+    };
   },
   computed: {
     wsUrl() {
       // websocket连接地址
       // return `ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25`
-      const currentProtocol = window.location.protocol
-      let protocol = 'ws'
-      if(currentProtocol === 'https:') {
-        protocol = 'wss'
+      const currentProtocol = window.location.protocol;
+      let protocol = 'ws';
+      if (currentProtocol === 'https:') {
+        protocol = 'wss';
       }
-      return `${protocol}://app.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`
+      return `${protocol}://app.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`;
     },
     /** 是否显示devtool */
     showDevTool() {
       return (
         this.$appConfig.env != 'production' || this.initData.env != 'production'
-      )
+      );
     },
     /** 用户工作状态颜色配置 */
     userStateMap() {
-      return this.initData.userStateMap || {}
+      return this.initData.userStateMap || {};
     },
     /** 用户工作状态颜色 */
     userStateColor() {
-      let state = this.loginUser.state
-      return this.userStateMap[state]
+      let state = this.loginUser.state;
+      return this.userStateMap[state];
     },
     /** 用户头像 */
     userAvatar() {
-      return this.loginUser.head || DefaultHead
+      return this.loginUser.head || DefaultHead;
     },
     releaseVersion() {
-      return this.initData.releaseVersion || ''
+      return this.initData.releaseVersion || '';
     }
   },
   methods: {
@@ -346,42 +445,42 @@ export default {
       localStorage.setItem('call_center_gray', 0);
       localStorage.setItem('call_center_module', 0);
       try {
-        const { status, data } = await http.get('/setting/callCenterGray')
+        const { status, data } = await http.get('/setting/callCenterGray');
         if (status !== 0 || !data) {
-          return
-        } 
-        if(data.callcenter){
+          return;
+        }
+        if (data.callcenter) {
           // 说明开启呼叫中心灰度
           localStorage.setItem('call_center_gray', 1);
-          this.getAccountInfo(); 
+          this.getAccountInfo();
         } else {
           localStorage.setItem('call_center_module', 0);
           localStorage.setItem('call_center_gray', 0);
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
     async getAccountInfo() {
-      localStorage.setItem('call_center_module', 0)
+      localStorage.setItem('call_center_module', 0);
       try {
-        const { code, result } = await CallCenterApi.getAccountInfo()
+        const { code, result } = await CallCenterApi.getAccountInfo();
         // result为null未申请开通
         if (code !== 0 || !result) {
-          return
-        } 
+          return;
+        }
         // 审核状态：0待审核，1已审核
-        if(result.verifyStatus == 1) {
-          this.has_call_center_module = true
-          localStorage.setItem('call_center_module', 1)
+        if (result.verifyStatus == 1) {
+          this.has_call_center_module = true;
+          localStorage.setItem('call_center_module', 1);
           if ('WebSocket' in window) {
-            this.initWebSocket()
+            this.initWebSocket();
           } else {
-            alert('当前浏览器 Not support websocket')
+            alert('当前浏览器 Not support websocket');
           }
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
     menuRender(h, target) {
@@ -390,85 +489,85 @@ export default {
           关闭其他
         </base-context-menu-item>,
         <base-context-menu-item command="all">关闭全部</base-context-menu-item>
-      ]
+      ];
 
       if (target && target.id != 'tab_HOME') {
         menus.unshift(
           <base-context-menu-item command="itself">关闭</base-context-menu-item>
-        )
+        );
       }
 
-      return menus
+      return menus;
     },
     adjustOpenTab() {
-      let tab = this.frameTabs.find(item => item.show)
-      this.adjustFrameTabs(tab)
+      let tab = this.frameTabs.find(item => item.show);
+      this.adjustFrameTabs(tab);
     },
     openDemo() {
       this.openForFrame({
         id: 'demo',
         url: '/payment/paymentBillOnline',
         title: 'demo'
-      })
+      });
     },
     /** @deprecated */
     async updateUser() {
       try {
         let result = await http.get(
           `/security/user/get/${this.loginUser.userId}`
-        )
+        );
         if (result.status == 0) {
           // 暂时只更新状态
-          this.loginUser.state = result.data.state
+          this.loginUser.state = result.data.state;
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
     /** 选择用户状态 */
     async chooseUserState(state) {
-      this.userStatePopperVisible = false
-      this.profilePopperVisible = false
+      this.userStatePopperVisible = false;
+      this.profilePopperVisible = false;
       try {
         let result = await http.post(
           '/security/user/updateState',
           { state },
           false
-        )
+        );
         if (result.status == 0) {
-          this.updateUserState(state)
+          this.updateUserState(state);
         } else {
-          platform.alert(result.message)
+          platform.alert(result.message);
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
     updateUserState(state) {
-      this.loginUser.state = state
+      this.loginUser.state = state;
     },
     async logout() {
       if (await platform.confirm('您确定要退出系统吗？')) {
         window.location.href = platform.inDingTalk
           ? '/smlogin/pc/logout'
-          : '/logout'
+          : '/logout';
       }
     },
     openHelpDoc(event) {
-      platform.openLink('https://www.yuque.com/shb/help')
-      this.profilePopperVisible = false
+      platform.openLink('https://www.yuque.com/shb/help');
+      this.profilePopperVisible = false;
     },
     openUserView(event) {
       this.openForFrame({
         id: 'userCenter',
         url: `/mine/${this.loginUser.userId}`,
         title: '个人中心'
-      })
-      this.profilePopperVisible = false
+      });
+      this.profilePopperVisible = false;
     },
     openSaleManager() {
-      this.saleManagerShow = true
-      this.profilePopperVisible = false
+      this.saleManagerShow = true;
+      this.profilePopperVisible = false;
     },
     openNotificationCenter() {
       this.$refs.notification.showComponent();
@@ -477,24 +576,23 @@ export default {
     /** 检测是否有导出 */
     async checkExports() {
       try {
-        this.exportList = (await http.get("/excels/getList")) || []; // 报错
+        this.exportList = (await http.get('/excels/getList')) || []; // 报错
         // 更新操作列表
         if (!Array.isArray(this.exportList)) this.exportList = [];
         // 更新操作列表
         this.operationList = this.operationList.filter(item => {
           return (
-            item.operate == "cancel" ||
-            (item.operate == "download" &&
-              this.exportList.some(exp => exp.id == item.id))
+            item.operate == 'cancel'
+            || (item.operate == 'download'
+              && this.exportList.some(exp => exp.id == item.id))
           );
         });
 
         // 以下情况需要刷新列表
         // 1. 有为导出完成的文件
         // 2. 操作列表中仍有下载的文件
-        let autoFetchExportList =
-          this.exportList.some(item => item.isFinished == 0) ||
-          this.operationList.some(item => item.operate == "download");
+        let autoFetchExportList = this.exportList.some(item => item.isFinished == 0)
+          || this.operationList.some(item => item.operate == 'download');
 
         // 如果不需要更新，清空定时器
         if (!autoFetchExportList) {
@@ -523,12 +621,12 @@ export default {
     },
     /** @deprecated */
     clearCachedIds() {
-      let cachedKey = localStorage.getItem("cachedKey");
+      let cachedKey = localStorage.getItem('cachedKey');
       let cachedKeyArray = [];
 
-      if (cachedKey) cachedKeyArray = cachedKey.split(",");
+      if (cachedKey) cachedKeyArray = cachedKey.split(',');
       cachedKeyArray.forEach(key => localStorage.setItem(key, []));
-      localStorage.removeItem("cachedKey");
+      localStorage.removeItem('cachedKey');
     },
     // popover manage
     exportPopoverToggle(visible) {
@@ -541,16 +639,16 @@ export default {
     },
     goRoleTeam() {
       platform.openTab({
-        id: "team",
-        title: "团队管理",
-        url: "/security/tag",
+        id: 'team',
+        title: '团队管理',
+        url: '/security/tag',
         reload: true
       });
     },
     closeNotification() {
       this.notificationShow = false;
       sessionStorage.setItem(
-        "shb_systemMsg",
+        'shb_systemMsg',
         this.notificationInfo.msgSystem.id
       );
       this.clearAnimation();
@@ -584,11 +682,11 @@ export default {
 
           this.notificationInfo = info.data;
           this.notification.count = info.data.unReadTotalCount;
-          let msgSystem = sessionStorage.getItem("shb_systemMsg");
+          let msgSystem = sessionStorage.getItem('shb_systemMsg');
 
           if (
-            this.notificationInfo.lastMessage &&
-            (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
+            this.notificationInfo.lastMessage
+            && (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
           ) {
             this.notification.title = info.data.lastMessage.title;
             this.notificationShow = true;
@@ -615,57 +713,63 @@ export default {
       });
     },
     clearAnimation() {
-      this.$refs.notificationContent.style.animation = "";
+      this.$refs.notificationContent.style.animation = '';
     },
 
     /** 删除未读消息或消息已读后更新新通知数量 */
     clearNum(e) {
       if (e.count == -1) return (this.notification.count = 0);
-
-      this.notification.count = this.notification.count - e.count;
+      let count_ = this.notification.count - e.count;
+      // 通知总数风险把控不把非正整数暴露给用户
+      if (count_ < 0) {
+        console.warn('通知消息总数为负数');
+        count_ = 0;
+      }
+      count_ = Math.round(count_);
+      this.notification.count = count_;
     },
     getNum() {
       this.getSystemMsg();
     },
     goProductTemplate() {
       platform.openTab({
-        id: "product_template",
-        title: "产品模板列表",
-        url: "/product/old",
+        id: 'product_template',
+        title: '产品模板列表',
+        url: '/product/old',
         reload: true
       });
     },
     goProductOld() {
       platform.openTab({
-        id: "product",
-        title: "产品管理",
-        url: "/customer/product/old",
+        id: 'product',
+        title: '产品管理',
+        url: '/customer/product/old',
         reload: true
       });
     },
     goProductSetting() {
       platform.openTab({
-        id: "product_setting",
-        title: "产品设置",
-        url: "/setting/product/fields",
+        id: 'product_setting',
+        title: '产品设置',
+        url: '/setting/product/fields',
         reload: true
       });
     },
     goCustomerContact() {
       platform.openTab({
-        id: "customer_contact",
-        title: "产品设置",
-        url: "/customerContact",
+        id: 'customer_contact',
+        title: '产品设置',
+        url: '/customerContact',
         reload: true
       });
     },
     goDoMyself() {
       platform.openTab({
-        id: "do_myself",
-        title: "自助门户设置",
-        url: "/setting/doMyself/wxSet",
+        id: 'do_myself',
+        title: '自助门户设置',
+        url: '/setting/doMyself/wxSet',
         reload: true
-      })
+      });
     },
     goCallCenterSetting() {
       platform.openTab({
@@ -673,7 +777,7 @@ export default {
         title: '呼叫中心设置',
         url: '/setting/callcenter/setting',
         reload: true
-      })
+      });
     },
     goCallCenter() {
       platform.openTab({
@@ -681,7 +785,7 @@ export default {
         title: '呼叫中心',
         url: '/setting/callcenter/stage',
         reload: true
-      })
+      });
     },
     goCallCenterWorkbench() {
       platform.openTab({
@@ -689,125 +793,128 @@ export default {
         title: '呼叫中心工作台',
         url: '/setting/callcenter/workbench',
         reload: true
-      })
+      });
     },
     handleCallCenterClick() {
       // this.showCallCenter = true
-      this.goCallCenterWorkbench() 
+      this.goCallCenterWorkbench();
     },
     openCallCenterWorkbench(data) {
       // console.info('data::', data);
-      let url = data && data.id ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}` : '/setting/callcenter/workbench'
+      let url = data && data.id
+        ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}`
+        : '/setting/callcenter/workbench';
       platform.openTab({
         id: 'M_CALLCENTER_WORKBENCH_LIST',
         title: '呼叫中心工作台',
         url,
         reload: true
-      })
+      });
     },
     initWebSocket() {
-
-      webSocketClient = new WebSocket(this.wsUrl) 
+      webSocketClient = new WebSocket(this.wsUrl);
       try {
-        webSocketClient.onopen = this.webSocketOpen
-        webSocketClient.onmessage = this.webSocketOnMessage
-        webSocketClient.onclose = this.webSocketClose
-        webSocketClient.onerror = this.webSocketError
-      } catch(error) {
-        console.error(error)
+        webSocketClient.onopen = this.webSocketOpen;
+        webSocketClient.onmessage = this.webSocketOnMessage;
+        webSocketClient.onclose = this.webSocketClose;
+        webSocketClient.onerror = this.webSocketError;
+      } catch (error) {
+        console.error(error);
         this.reconnect(this.wsUrl);
       }
     },
-    webSocketOpen() { 
+    webSocketOpen() {
       // console.info('WebSocket连接成功')
       // this.heartCheck.start();
-      
+
       setTimeout(() => {
-        this.send(JSON.stringify({'action':'ping'}))
-      }, 500)
+        this.send(JSON.stringify({ action: 'ping' }));
+      }, 500);
     },
-    async webSocketOnMessage(e) { 
+    async webSocketOnMessage(e) {
       this.heartCheck.start();
       // console.info('数据内容：{0}', e.data)
       // pong 是心跳
-      if(e.data === 'pong') return
+      if (e.data === 'pong') return;
       // 这里处理接受到来电的消息
       try {
         const data = JSON.parse(e.data);
         // {"callPhone":"15267183070","callState":"Hangup","callType":"dialout","ringTime":1592636121000}
         // console.info('data:', data.callType, data.callState);
-        
-        if(data.callType === 'normal' || data.callType === 'dialout') {
-          if(data.callState === 'Hangup'){
-            // 没接听 
-            this.showCallCenter = false
-          } else if(data.callState === 'Unlink' || data.callState === 'Link') {
+
+        if (data.callType === 'normal' || data.callType === 'dialout') {
+          if (data.callState === 'Hangup') {
+            // 没接听
+            this.showCallCenter = false;
+          } else if (data.callState === 'Unlink' || data.callState === 'Link') {
             // 接听了和接听然后挂断了
-            this.callData = data
-            this.showCallCenter = false
-            this.openCallCenterWorkbench(data)
+            this.callData = data;
+            this.showCallCenter = false;
+            this.openCallCenterWorkbench(data);
           } else {
-            this.callData = data
-            const res = await CallCenterApi.getLinkmanInfo({linkmanPhone: data.callPhone})
-            if(res.status == 0 && res.data) {
-              this.callData.taskCount = res.data.unfinishedTaskCount
-              this.callData.eventCount = res.data.unfinishedEventCount
+            this.callData = data;
+            const res = await CallCenterApi.getLinkmanInfo({
+              linkmanPhone: data.callPhone
+            });
+            if (res.status == 0 && res.data) {
+              this.callData.taskCount = res.data.unfinishedTaskCount;
+              this.callData.eventCount = res.data.unfinishedEventCount;
             }
-            this.showCallCenter = true
-          } 
+            this.showCallCenter = true;
+          }
         }
       } catch (error) {
         console.error(error);
       }
     },
-    send(param) { 
+    send(param) {
       try {
         // console.info('readyState:', webSocketClient.readyState)
-        webSocketClient.send(param)
+        webSocketClient.send(param);
       } catch (err) {
-        console.error('error', err)
+        console.error('error', err);
       }
     },
-    webSocketClose(e) { 
+    webSocketClose(e) {
       // console.error('WebSocket连接关闭', e)
       this.reconnect(this.wsUrl);
     },
-    webSocketError() { 
+    webSocketError() {
       // console.error('WebSocket连接失败')
       this.reconnect(this.wsUrl);
     },
     reconnect(url) {
-      if(lockReconnect) {
-        return
+      if (lockReconnect) {
+        return;
       }
       lockReconnect = true;
       // 没连接上会一直重连，设置延迟避免请求过多
       reconnectTimmer && clearTimeout(reconnectTimmer);
-      reconnectTimmer = setTimeout(()=> {
+      reconnectTimmer = setTimeout(() => {
         this.initWebSocket();
         lockReconnect = false;
       }, 4000);
-    },
+    }
   },
-  created() { 
+  created() {
     // TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
     window.exportPopoverToggle = this.exportPopoverToggle;
 
     window.resizeFrame = function() {
-      console.warn("此方法只用于兼容旧页面，无实际效果，不推荐调用");
+      console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     };
     this.clearCachedIds();
-    sessionStorage.removeItem("shb_systemMsg");
+    sessionStorage.removeItem('shb_systemMsg');
     this.getSystemMsg();
     setInterval(() => {
       this.getSystemMsg();
     }, NOTIFICATION_TIME);
   },
-  async mounted() { 
-    this.judgeCallCenterGray(); 
-    let userGuide = this?.initData?.userGuide === true || false
+  async mounted() {
+    this.judgeCallCenterGray();
+    let userGuide = this?.initData?.userGuide === true || false;
 
     if (userGuide) {
       this.$refs.userGuideView.show();
