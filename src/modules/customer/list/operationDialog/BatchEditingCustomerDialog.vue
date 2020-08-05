@@ -84,28 +84,32 @@ export default {
       this.validate = event.detail.validate;
     },
     async onSubmit() {
-      if (await this.validate()) return;
+      try {
+        if (await this.validate()) return;
 
-      const params = this.buildParams();
-      this.pending = true;
+        const params = this.buildParams();
+        this.pending = true;
 
-      CustomerApi.batchEditCustomer(params)
-        .then(res => {
-          const failure = res.status;
+        CustomerApi.batchEditCustomer(params)
+          .then(res => {
+            const failure = res.status;
 
-          this.pending = false;
-          this.$platform.notification({
-            type: !failure ? 'success' : 'error',
-            title: `批量编辑客户${!failure ? '成功' : '失败'}`,
-            message: !failure ? null : res.message
-          });
+            this.pending = false;
+            this.$platform.notification({
+              type: !failure ? 'success' : 'error',
+              title: `批量编辑客户${!failure ? '成功' : '失败'}`,
+              message: !failure ? null : res.message
+            });
 
-          if (failure) return;
-          this.visible = false;
-          this.reset();
-          this.callback && this.callback();
-        })
-        .catch(e => console.error('e', e));
+            if (failure) return;
+            this.visible = false;
+            this.reset();
+            this.callback && this.callback();
+          })
+          .catch(e => console.error('e', e));
+      } catch (error) {
+        console.error('error', error)
+      }
     },
     reset() {
       this.$refs.batchForm.reset();

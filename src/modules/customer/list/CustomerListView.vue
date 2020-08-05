@@ -115,9 +115,9 @@
       >
         <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
         <el-table-column
-          v-for="column in columns"
+          v-for="(column, index) in columns"
           v-if="column.show"
-          :key="column.field"
+          :key="`${column.field}_${index}`"
           :label="column.label"
           :prop="column.field"
           :width="column.width"

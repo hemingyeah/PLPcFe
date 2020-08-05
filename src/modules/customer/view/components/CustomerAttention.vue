@@ -41,24 +41,28 @@ export default {
       if(index >= 0) this.users.splice(index, 1)
     },
     async submit(){
-      let removeUsers = this.originUsers.filter(u => !this.users.find(i => i.userId == u.userId));
-      if(removeUsers.length == 0) return this.show = false;
+      try {
+        let removeUsers = this.originUsers.filter(u => !this.users.find(i => i.userId == u.userId));
+        if(removeUsers.length == 0) return this.show = false;
 
-      let userName = removeUsers.reduce((acc, cur, index, arr) => {
-        if(index > 3) return acc;
-        if(index == 3) {
-          return `${acc.slice(0, -1)}等${arr.length}人`;
-        }
+        let userName = removeUsers.reduce((acc, cur, index, arr) => {
+          if(index > 3) return acc;
+          if(index == 3) {
+            return `${acc.slice(0, -1)}等${arr.length}人`;
+          }
 
-        return `${acc}${cur.displayName || cur.userName},`;
-      }, '');
+          return `${acc}${cur.displayName || cur.userName},`;
+        }, '');
 
-      if(userName.endsWith(',')) userName = userName.slice(0, -1);
-      
-      if(!await Platform.confirm(`确定要取消${userName}对该客户的关注吗？`)) return;
+        if(userName.endsWith(',')) userName = userName.slice(0, -1);
+        
+        if(!await Platform.confirm(`确定要取消${userName}对该客户的关注吗？`)) return;
 
-      this.$emit('submit', {removeUsers, userName})
-      this.show = false;
+        this.$emit('submit', {removeUsers, userName})
+        this.show = false;
+      } catch (error) {
+        console.error('error', error)
+      }
     }
   }
 }

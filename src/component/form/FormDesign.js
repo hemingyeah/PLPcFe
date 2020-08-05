@@ -112,6 +112,9 @@ function createSettingComp(h, field){
         } else {
           field[event.prop] = event.value;
         }
+      },
+      updateOptions: event => {
+        this.updateOptions(field, event);
       }
     }
   });
@@ -144,8 +147,15 @@ function getTemplate(el){
     return el.outerHTML;
   }
   
-  let tmp = el.querySelector('.form-design__ghost');
-  return tmp ? tmp.outerHTML : '';
+  let tmp = el.querySelectorAll('.form-design__ghost');
+  let outerHTML = '';
+  if (tmp.length > 1) {
+    tmp.forEach(item => {
+      outerHTML += item.outerHTML
+    })
+  }
+
+  return outerHTML;
 }
 
 const FormDesign = {
@@ -587,6 +597,10 @@ const FormDesign = {
       
       let {pixelY} = normalizeWheel(e);
       containerEl.scrollTop += pixelY;
+    },
+    updateOptions(field, event) {
+      if(!field.setting.customerOption) return;
+      field.setting.customerOption[event.prop] = event.value;
     }
   },
   render(h){

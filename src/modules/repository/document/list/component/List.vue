@@ -168,10 +168,14 @@ export default {
     },
 
     async getShareUrl () {
-      let protocol = window.location.protocol;
-      let host = window.location.host;
-      let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.chosenItem.id}`;
-      this.shareUrl = await RepositoryApi.getShareLink(url);
+      try {
+        let protocol = window.location.protocol;
+        let host = window.location.host;
+        let url = `${protocol}//${host}/v_open/wiki/view?wikiId=${this.chosenItem.id}`;
+        this.shareUrl = await RepositoryApi.getShareLink(url);
+      } catch (error) {
+        console.error('error', error)
+      }
     },
 
     // 内部分享，选择人员或者组织

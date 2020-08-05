@@ -19,8 +19,8 @@
         <div class="setting-content">
           <!-- 所选group下的设置项 -->
           <div 
-            v-for="setting in activeGroup.items || []"
-            :key="setting.key"
+            v-for="(setting, index) in activeGroup.items || []"
+            :key="index"
             class="setting-item"
           >
             <!-- <el-checkbox-group

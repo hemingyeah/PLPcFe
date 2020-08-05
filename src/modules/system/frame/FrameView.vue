@@ -1,7 +1,7 @@
 <template>
   <div class="shb-main">
     <div class="frame">
-      <frame-nav :collapse.sync="collapse" :source="initData.menus" @open="openForNav" @collapse-changed="adjustOpenTab" />
+      <frame-nav :collapse.sync="collapse" :source="initData.menus" :callcenter="has_call_center_module" @open="openForNav" @collapse-changed="adjustOpenTab" />
 
       <div class="frame-content">
         <header class="frame-header">
@@ -30,6 +30,7 @@
                 <i class="iconfont icon-dianhua1"></i>
               </button>
               <div v-if="showCallCenter" class="call-center-box" > 
+                <i style="position: absolute;right: 15px;top: 20px;" class="iconfont icon-fe-close" @click="showCallCenter=false"></i>
                 <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
                 <p class="customer-name" v-if="callData.linkmanName">{{callData.linkmanName}}</p>
                 <p v-if="callData.linkmanName">{{callData.customerName}}</p>
@@ -156,8 +157,20 @@
 
             <!-- tabs -->
             <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
-              <div ref="list" :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}" :style="{transform: `translateX(${-offset}px)`}" @transitionend="tabTransitionEnd">
-                <frame-tab v-for="tab in frameTabs" :key="tab.url" :tab="tab" @jump="jumpFrameTab" @reload="reloadFrameTab" @close="closeFrameTab" />
+              <div
+                ref="list"
+                :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}"
+                :style="{transform: `translateX(${-offset}px)`}"
+                @transitionend="tabTransitionEnd"
+              >
+                <frame-tab
+                  v-for="(tab, index) in frameTabs"
+                  :key="`${index}_${tab.url}`"
+                  :tab="tab"
+                  @jump="jumpFrameTab"
+                  @reload="reloadFrameTab"
+                  @close="closeFrameTab"
+                />
               </div>
               <div class="frame-tabs-border"></div>
             </div>
@@ -170,8 +183,15 @@
 
         <div class="frame-main">
           <div class="frame-tab-content">
-            <div class="frame-tab-window" v-for="tab in frameTabs" :key="tab.url" v-show="tab.show">
-              <iframe :id="`frame_tab_${tab.id}`" :fromid="tab.fromId" :data-id="tab.id" :src="tab.url" @load="updateFrameTab($event,tab)" allowfullscreen />
+            <div class="frame-tab-window" v-for="(tab, index) in frameTabs" :key="`${index}_${tab.url}`" v-show="tab.show">
+              <iframe
+                :id="`frame_tab_${tab.id}`"
+                :fromid="tab.fromId"
+                :data-id="tab.id"
+                :src="tab.url"
+                @load="updateFrameTab($event,tab)"
+                allowfullscreen
+              />
             </div>
           </div>
         </div>
@@ -209,7 +229,6 @@ import * as CallCenterApi from '@src/api/CallCenterApi'
 const NOTIFICATION_TIME = 1000 * 60 * 10
 
 // const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
-// const wsUrl = 'ws://30.40.61.216:9001/websocket/asset/dd4531bf-7598-11ea-bfc9-00163e304a25_123'
 let webSocketClient = null, lockReconnect = false,
   reconnectTimmer = null
 
@@ -259,7 +278,7 @@ export default {
           this.timeoutObj = setTimeout(()=>{
             // 这里发送一个心跳，后端收到后，返回一个心跳消息，
             // onmessage拿到返回的心跳就说明连接正常
-            webSocketClient.send(JSON.stringify({'heart':'check'}));
+            webSocketClient.send(JSON.stringify({'action':'ping'}));
             _num--;
             if(_num === 0) {
               webSocketClient.colse();
@@ -307,6 +326,8 @@ export default {
   methods: {
     // 判断当前租户是否开启呼叫中心灰度功能
     async judgeCallCenterGray() {
+      localStorage.setItem('call_center_gray', 0);
+      localStorage.setItem('call_center_module', 0);
       try {
         const { status, data } = await http.get('/setting/callCenterGray')
         if (status !== 0 || !data) {
@@ -325,11 +346,11 @@ export default {
       }
     },
     async getAccountInfo() {
+      localStorage.setItem('call_center_module', 0)
       try {
         const { code, result } = await CallCenterApi.getAccountInfo()
         // result为null未申请开通
         if (code !== 0 || !result) {
-          localStorage.setItem('call_center_module', 0)
           return
         } 
         // 审核状态：0待审核，1已审核
@@ -655,11 +676,11 @@ export default {
       }
     },
     webSocketOpen() { 
-      console.info('WebSocket连接成功')
+      // console.info('WebSocket连接成功')
       // this.heartCheck.start();
       
       setTimeout(() => {
-        this.send(JSON.stringify({'action':'ping', 'content':'15267183070'}))
+        this.send(JSON.stringify({'action':'ping'}))
       }, 500)
     },
     async webSocketOnMessage(e) { 

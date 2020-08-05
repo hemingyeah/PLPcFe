@@ -34,12 +34,12 @@
 </template>
 
 <script>
-import * as FormUtil from "@src/component/form/util";
-import * as LinkmanApi from "@src/api/LinkmanApi";
-import { createRemoteValidate } from "@src/util/validator";
+import * as FormUtil from '@src/component/form/util';
+import * as LinkmanApi from '@src/api/LinkmanApi';
+import { createRemoteValidate } from '@src/util/validator';
 
 export default {
-  name: "edit-contact-dialog",
+  name: 'edit-contact-dialog',
   props: {
     customer: {
       type: Object,
@@ -60,14 +60,14 @@ export default {
       addresses: [],
       form: {
         name: null,
-        remark: "",
-        sex: "",
-        position: "",
-        department: "",
-        address: "", // address的ID
-        customId: "",
+        remark: '',
+        sex: '',
+        position: '',
+        department: '',
+        address: '', // address的ID
+        customId: '',
         customer: {},
-        id: "",
+        id: '',
         phone: null,
         email: null,
         productId: [] // 数组，包含产品对象
@@ -75,80 +75,87 @@ export default {
       loadData: false,
       validation: this.isPhoneUnique
         ? createRemoteValidate(LinkmanApi.checkUnique4Phone, (value, field) => {
-            return {
-              id: this.originalValue.id || "",
-              phone: value
-            };
-          })
-        : true
+          return {
+            id: this.originalValue.id || '',
+            phone: value
+          };
+        })
+        : true,
+      createOriginalValue: {},
     };
   },
   computed: {
     action() {
-      return this.originalValue.name ? "edit" : "create";
+      return this.originalValue.name ? 'edit' : 'create';
     },
     customerId() {
-      return (this.customer && this.customer.id) || "";
+      return (this.customer && this.customer.id) || '';
+    },
+    isEdit() {
+      return this.action === 'edit';
+    },
+    linkmanId() {
+      return (this.originalValue && this.originalValue.id) || '';
     },
     fields() {
       return [
         {
-          formType: "text",
-          fieldName: "name",
-          displayName: "联系人",
-          placeholder: "[最多50字]",
+          formType: 'text',
+          fieldName: 'name',
+          displayName: '联系人',
+          placeholder: '[最多50字]',
           isNull: 0
         },
         {
-          formType: "phone",
-          fieldName: "phone",
-          displayName: "电话",
-          placeholder: "建议使用手机号,可发送短信通知",
+          formType: 'phone',
+          fieldName: 'phone',
+          displayName: '电话',
+          placeholder: '建议使用手机号,可发送短信通知',
           isNull: 0
         },
         {
-          formType: "select",
-          fieldName: "sex",
-          displayName: "性别",
-          placeholder: "请选择",
+          formType: 'select',
+          fieldName: 'sex',
+          displayName: '性别',
+          placeholder: '请选择',
           isNull: 1,
           setting: {
-            dataSource: ["男", "女"]
+            dataSource: ['男', '女']
           }
         },
         {
-          formType: "email",
-          fieldName: "email",
-          displayName: "邮箱",
-          placeholder: "",
+          formType: 'email',
+          fieldName: 'email',
+          displayName: '邮箱',
+          placeholder: '',
           isNull: 1
         },
         {
-          formType: "text",
-          fieldName: "position",
-          displayName: "职位",
-          placeholder: "",
+          formType: 'text',
+          fieldName: 'position',
+          displayName: '职位',
+          placeholder: '',
           isNull: 1
         },
         {
-          formType: "text",
-          fieldName: "department",
-          displayName: "部门",
-          placeholder: "",
+          formType: 'text',
+          fieldName: 'department',
+          displayName: '部门',
+          placeholder: '',
           isNull: 1
         },
         {
-          formType: "textarea",
-          fieldName: "remark",
-          displayName: "备注",
-          placeholder: "[最多500字]",
+          formType: 'textarea',
+          fieldName: 'remark',
+          displayName: '备注',
+          placeholder: '[最多500字]',
           isNull: 1
         },
         {
-          formType: "select",
-          fieldName: "productId",
-          displayName: "关联产品",
-          placeholder: "请选择",
+          formType: 'select',
+          fieldName: 'productId',
+          displayName: '关联产品',
+          placeholder: '请选择',
           isNull: 1,
           setting: {
             isMulti: true,
@@ -156,10 +163,10 @@ export default {
           }
         },
         {
-          formType: "select",
-          fieldName: "address",
-          displayName: "关联地址",
-          placeholder: "请选择",
+          formType: 'select',
+          fieldName: 'address',
+          displayName: '关联地址',
+          placeholder: '请选择',
           isNull: 1,
           setting: {
             dataSource: this.addresses || []
@@ -168,7 +175,7 @@ export default {
       ];
     },
     modalTitle() {
-      return this.originalValue.name ? "编辑联系人" : "添加联系人";
+      return this.originalValue.name ? '编辑联系人' : '添加联系人';
     }
   },
   methods: {
@@ -195,54 +202,54 @@ export default {
 
         let result = {};
 
-        if (this.action === "create") {
-          result = await this.$http.post("/linkman/createByJson", params);
+        if (this.action === 'create') {
+          result = await this.$http.post('/linkman/createByJson', params);
         } else {
-          result = await this.$http.post("/linkman/updateByJson", params);
+          result = await this.$http.post('/linkman/updateByJson', params);
         }
 
         if (result.status != 0) {
           this.pending = false;
           return this.$platform.notification({
-            title: "失败",
+            title: '失败',
             message:
-              result.message ||
-              `${this.action === "create" ? "新建" : "更新"}失败`,
-            type: "error"
+              result.message
+              || `${this.action === 'create' ? '新建' : '更新'}失败`,
+            type: 'error'
           });
         }
 
         this.pending = false;
         this.addContactDialog = false;
         this.reset();
-        this.$eventBus.$emit("customer_contact_table.update_linkman_list");
-        this.$eventBus.$emit("customer_info_record.update_record_list");
-        this.$eventBus.$emit("customer_detail_view.update_statistical_data");
-        this.$eventBus.$emit("customer_detail_view.update_customer_detail");
-        this.$eventBus.$emit("customer_contact.update_contact_list");
+        this.$eventBus.$emit('customer_contact_table.update_linkman_list');
+        this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit('customer_detail_view.update_statistical_data');
+        this.$eventBus.$emit('customer_detail_view.update_customer_detail');
+        this.$eventBus.$emit('customer_contact.update_contact_list');
 
-        if (this.action === "create") {
+        if (this.action === 'create') {
           this.$eventBus.$emit(
-            "customer_detail_view.select_tab",
-            "customer-contact-table"
+            'customer_detail_view.select_tab',
+            'customer-contact-table'
           );
         }
       } catch (e) {
         this.pending = false;
-        console.error("addContactDialog submit catch e", e);
+        console.error('addContactDialog submit catch e', e);
       }
     },
     reset() {
       this.form = {
         name: null,
-        remark: "",
-        sex: "",
-        position: "",
-        department: "",
-        address: "",
-        customId: "",
+        remark: '',
+        sex: '',
+        position: '',
+        department: '',
+        address: '',
+        customId: '',
         customer: {},
-        id: "",
+        id: '',
         phone: null,
         email: null,
         productId: []
@@ -260,13 +267,15 @@ export default {
       }
       this.$set(this.form, fieldName, newValue);
     },
-    openDialog() {
+    openDialog(createOriginalValue = {}) {
       this.addContactDialog = true;
 
-      // console.log(this.originalValue, "asdadsa");
-      if (this.action === "edit") {
+      if (this.action === 'edit') {
         this.matchValueToForm(this.originalValue);
       }
+      
+      this.createOriginalValue = createOriginalValue;
+
       this.fetchAddress();
       this.fetchProducts();
       this.init = true;
@@ -287,10 +296,10 @@ export default {
       this.form = {
         name,
         remark,
-        sex: ["男", "女"].indexOf(sex) === -1 ? "" : sex,
+        sex: ['男', '女'].indexOf(sex) === -1 ? '' : sex,
         position,
         department,
-        address: "",
+        address: '',
         customId: customerId || customer.id,
         customer: customer || {},
         id,
@@ -303,7 +312,7 @@ export default {
     },
     fetchAddress() {
       return this.$http
-        .get("/customer/address/list", {
+        .get('/customer/address/list', {
           customerId: this.customer.id,
           pageSize: 100000,
           pageNum: 1
@@ -322,15 +331,14 @@ export default {
 
           return this.addresses;
         })
-        .catch(err => console.error("fetchAddress catch err", err));
+        .catch(err => console.error('fetchAddress catch err', err));
     },
     fetchProducts() {
-      return this.$http
-        .get("/customer/product/list", {
-          customerId: this.customer.id,
-          pageSize: 100000,
-          pageNum: 1
-        })
+      return this.$http.get('/product/linkmanRelation', {
+        linkmanId: this.linkmanId,
+        pageSize: 0,
+        pageNum: 1,
+      })
         .then(res => {
           this.products = res.list.map(p => ({
             text: p.name,
@@ -344,9 +352,10 @@ export default {
               .filter(pId => this.products.some(p => p.value === pId));
           }
 
+          this.form.productId = this.products.map(p => p.value);
           return this.products;
         })
-        .catch(err => console.error("fetchProducts catch err", err));
+        .catch(err => console.error('fetchProducts catch err', err));
     }
   }
 };

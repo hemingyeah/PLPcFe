@@ -86,6 +86,7 @@ export default {
         item.users = result?.data?.users || [];
         this.$emit('update', this.list);
       })
+        .catch(err => console.error(err))
     },
     
   },

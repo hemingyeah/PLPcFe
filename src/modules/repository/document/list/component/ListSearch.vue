@@ -7,7 +7,7 @@
       <div class="search-middle">
         <!-- 视图删选 -->
         <el-select v-model="params.view" class="search-type search-type-left" @change="search" v-if="viewOptions.length > 0">
-          <el-option v-for="item in viewOptions" :key="item.value" :label="item.label" :value="item.value">
+          <el-option v-for="(item, index) in viewOptions" :key="`${item.value}_${index}`" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
 
@@ -282,8 +282,12 @@ export default {
 
     // 展开下拉面板时添加新建按钮，并监听click事件，关闭时移除新建按钮
     async showCascader (flag) {
-      // 获取分类文章数量
-      await this.getTypesCount();
+      try {
+        // 获取分类文章数量
+        await this.getTypesCount();
+      } catch (error) {
+        console.error('error', error)
+      }
     },
 
     // 跳转到新建页面

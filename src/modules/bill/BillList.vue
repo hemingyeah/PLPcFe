@@ -56,7 +56,8 @@
           align="center">
         </el-table-column>
 
-        <el-table-column v-for="column in columns" :key="column.field"
+        <el-table-column v-for="(column, index) in columns" 
+                         :key="`${column.field}_${index}`"
                          v-if="column.show"
                          :label="column.label"
                          :width="column.width"

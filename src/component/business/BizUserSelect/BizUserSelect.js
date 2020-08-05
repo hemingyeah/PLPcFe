@@ -167,7 +167,8 @@ const BizUserSelect = {
     fetchData(params){
       return this.fetch(params).then(res => {
         return null == res ? Promise.reject('[biz-user-select]: no result data.') : res
-      });
+      })
+        .catch(err => console.error(err));
     },
     /** 显示popper */
     showPopper(event){

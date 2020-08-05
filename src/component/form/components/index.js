@@ -15,6 +15,8 @@ import FormAddress from './FormAddress';
 import FormLocation from './FormLocation';
 import FormInfo from './FormInfo';
 
+import FormCustomer from './FormCustomer'
+
 // base fields
 const BaseFormField = [
   FormText,
@@ -31,7 +33,8 @@ const BaseFormField = [
   FormSeparator,
   FormAddress,
   FormLocation,
-  FormInfo
+  FormInfo,
+  FormCustomer
 ];
 
 const allFields = [...BaseFormField, FormAddress];

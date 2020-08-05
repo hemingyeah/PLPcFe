@@ -72,9 +72,9 @@
         <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
 
         <el-table-column
-          v-for="column in columns"
+          v-for="(column, index) in columns"
           v-if="column.show"
-          :key="column.field"
+          :key="`${column.field}_${index}`"
           :label="column.label"
           :prop="column.field"
           :width="column.width"
@@ -148,6 +148,18 @@
             </template>
             <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
             </div>
+
+            <template v-else-if="column.fieldName == 'linkmanName'">
+              {{ scope.row.linkman.name }}
+            </template>
+
+            <template v-else-if="column.fieldName == 'phone'">
+              {{ scope.row.linkman.phone }}
+            </template>
+
+            <template v-else-if="column.fieldName == 'address'">
+              {{ getAddress(scope.row.address) }}
+            </template>
 
             <template v-else-if="!column.isSystem">
               {{scope.row.attribute[column.field]}}
@@ -399,6 +411,33 @@ export default {
           orderId: 10001
         })
       }
+      let field = this.initData.productFields.filter(item => item.formType == 'customer')[0]
+      if(field && field.setting.customerOption?.linkman) {
+        fixedFields.push({
+          displayName: '联系人',
+          fieldName: 'linkmanName',
+          formType: 'text',
+          isExport: true,
+          isSystem: 0,
+        })
+
+        fixedFields.push({
+          displayName: '电话',
+          fieldName: 'phone',
+          isExport: true,
+          isSystem: 0,
+        })
+      }
+
+      if(field && field.setting.customerOption?.address) {
+        fixedFields.push({
+          displayName: '地址',
+          fieldName: 'address',
+          isExport: true,
+          formType: 'text',
+          isSystem: 0,
+        })
+      }
 
       return (this.initData.productFields || [])
         .concat(fixedFields)
@@ -407,11 +446,26 @@ export default {
 
           // 调整字段顺序
           if (f.fieldName === 'name') {
-            f.orderId = -10;
+            f.orderId = -13;
             f.show = true
           }
 
           if (f.fieldName === 'customer') {
+            f.orderId = -12;
+            f.show = true
+          }
+
+          if (f.fieldName === 'linkmanName') {
+            f.orderId = -11;
+            f.show = true
+          }
+
+          if (f.fieldName === 'phone') {
+            f.orderId = -10;
+            f.show = true
+          }
+
+          if (f.fieldName === 'address') {
             f.orderId = -9;
             f.show = true
           }
@@ -542,6 +596,9 @@ export default {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
   },
   methods: {
+    getAddress(field) {
+      return field.province + field.city + field.dist + field.address || ''
+    },
     openOutsideLink(e) {
       let url = e.target.getAttribute('url');
       if (!url) return;

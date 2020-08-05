@@ -701,7 +701,7 @@ export default {
       if (action === 'address') {
         this.$refs.EditAddressDialog.openDialog()
       } else if (action === 'contact') {
-        this.$refs.EditContactDialog.openDialog()
+        this.$refs.EditContactDialog.openDialog(this.customer);
       } else if (action === 'remark') {
         this.$refs.addRemarkDialog.openDialog()
       } else if (action === 'remind') {

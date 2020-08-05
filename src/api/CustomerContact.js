@@ -1,5 +1,5 @@
 import http from '@src/util/http';
-let urlHead = "/api/elasticsearch"
+let urlHead = '/api/elasticsearch'
 
 /** 
  * 获取客户联系人列表，用于客户编辑

@@ -83,6 +83,7 @@ export default {
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
+        
       return fields;
     },
     panelWidth() {
@@ -98,16 +99,6 @@ export default {
   methods: {
     buildSelfFields() {
       let fields = [
-        {
-          displayName: '选择团队',
-          fieldName: 'tags',
-          formType: 'tags',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          operator: 'between',
-          orderId: -2.5
-        },
         {
           displayName: '创建时间',
           fieldName: 'createTime',
@@ -490,6 +481,9 @@ export default {
             if (field.formType === 'area') {
               tv = [];
             }
+            if (field.formType === 'area') {
+              tv = []
+            }
 
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
@@ -503,6 +497,7 @@ export default {
           return form;
         },
         update(event, action) {
+          console.log('update::', event, action);
           if (action === 'tags') {
             return (this.form.tags = event);
           }
@@ -527,7 +522,7 @@ export default {
 
           let comp = FormFieldMap.get(f.formType);
 
-          if (!comp || f.formType === 'area') {
+          if (!comp && f.formType !== 'tags' && f.formType !== 'area' && f.formType !== 'linkman') {
             return null;
           }
 
@@ -562,6 +557,17 @@ export default {
                 }
               }
             });
+          } else if (f.formType === 'area') {
+            childComp = h(
+              'base-dist-picker',
+              {
+                props: {
+                  value: this.form[f.fieldName],
+                },
+                on: {
+                  input: event => this.update(event, 'dist')
+                }
+              });
           } else if (f.formType === 'customer') {
             childComp = h('customer-search', {
               props: {

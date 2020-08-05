@@ -3,7 +3,7 @@ const { isNotLocalEnv } = require('./proxyConfigModel');
 const https = require(isNotLocalEnv ? 'https' : 'http');
 // 默认配置
 const DEFAULT_OPIONS = {
-  host: '30.40.56.82',
+  host: '127.0.0.1',
   port: 8080,
 };
 // https agent

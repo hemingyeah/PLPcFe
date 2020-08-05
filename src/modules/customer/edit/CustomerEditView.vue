@@ -245,26 +245,26 @@ body {
       }
     }
   }
-}
 
-.form-builder{
-  width: 655px;
-  padding: 10px 0 0 10px;
+  .form-builder{
+    width: 700px;
+    padding: 10px 0 0 10px;
 
-  .input-and-btn{
-    display: flex !important;
-    flex-flow: row nowrap;
+    .input-and-btn{
+      display: flex !important;
+      flex-flow: row nowrap;
 
-    .form-item, .form-text, .form-select, .biz-team-select {
-      flex: 1;
-    }
+      .form-item, .form-text, .form-select, .biz-team-select {
+        flex: 1;
+      }
 
-    .base-dist-picker{
-      padding-right: 0;
-    }
+      .base-dist-picker{
+        padding-right: 0;
+      }
 
-    button{
-      margin-left: 10px;
+      button{
+        margin-left: 10px;
+      }
     }
   }
 }

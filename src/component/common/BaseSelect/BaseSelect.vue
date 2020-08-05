@@ -12,9 +12,17 @@
         </span>
       </div>
 
-      <div class="base-select-main-content" @click.stop="focusInput" v-else
-           :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable,}">
-        {{value.map(tag => tag.label).join('')}}
+      <div 
+        class="base-select-main-content" 
+        @click.stop="focusInput" 
+        v-else
+        :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable,}"
+      >
+        <slot name="label" :value="value" v-if="labelSlot"> </slot>
+        <template v-else>
+          {{ value.map(tag => tag.label).join('') }}
+        </template>
+
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
         </span>
@@ -110,6 +118,9 @@ export default {
     optionSlot() {
       return !!this.$scopedSlots.option;
     },
+    labelSlot() {
+      return !!this.$scopedSlots.label;
+    },
     message() {
       const {total, hasNextPage, } = this.page;
       if (this.pending) {
@@ -185,6 +196,7 @@ export default {
           this.loadmoreOptions.disabled = res ? !res.hasNextPage : false;
           return res;
         })
+        .catch(err => console.error(err))
     },
     searchByKeyword(e) {
       this.resetStatus(e.target.value);
@@ -220,6 +232,11 @@ export default {
     },
   },
   directives: { Clickoutside },
+  watch: {
+    'value'(n) {
+      console.log('value select', n)
+    }
+  }
 }
 </script>
 

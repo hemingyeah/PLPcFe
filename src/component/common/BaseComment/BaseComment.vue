@@ -99,16 +99,21 @@ export default {
       this.submit();
     },
     async submit(){
-      if(!this.allowOperate) return;
-      if(this.$refs.editor) this.$refs.editor.blur();
+      try {
+        if(!this.allowOperate) return;
+        if(this.$refs.editor) this.$refs.editor.blur();
 
-      //去除前后空白
-      let form = _.cloneDeep(this.form);
+        //去除前后空白
+        let form = _.cloneDeep(this.form);
 
-      // form.content = form.content.trimEnd();
-      form.content = form.content.replace(/\s+$/g, '');
+        // form.content = form.content.trimEnd();
+        form.content = form.content.replace(/\s+$/g, '');
 
-      if(!await this.validateContent(this.form.content)) this.$emit('submit', form)
+        if(!await this.validateContent(this.form.content)) this.$emit('submit', form)
+      } catch (error) {
+        console.error(error)
+      }
+      
     },
     buildForm(){
       return {
