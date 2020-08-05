@@ -15,4 +15,9 @@ module.exports = {
     entry: './src/modules/task/view/receipt.js',
     template: 'src/templates/map.html'
   },
+  // 工单列表
+  'task.list': {
+    entry: './src/modules/task/list/index.js',
+    template: 'src/modules/task/index.html'
+  }
 }

@@ -1,0 +1,803 @@
+/* Api */
+import * as TaskApi from '@src/api/TaskApi';
+
+/* components */
+import TaskSearchPanel from '@src/modules/task/components/list/TaskSearchPanel.vue';
+
+/** model */
+import TaskStateEnum from '@model/enum/TaskStateEnum';
+import { fields } from './TaskFieldModel';
+import { LINK_REG } from '@src/model/reg';
+
+/** utils */
+import _ from 'lodash';
+import Page from '@model/Page';
+import { storageGet, storageSet } from '@src/util/storage';
+import { formatDate } from '@src/util/lang';
+
+/* constants */
+const TASK_LIST_KEY = 'task_list';
+const TRACK_EVENT_MAP = {
+  'search': 'pc：工单列表-搜索事件',
+  'moreAction': 'pc：工单列表-更多操作事件',
+  'reset': 'pc：工单列表-重置事件',
+  'avvancedSearch': 'pc：工单列表-高级搜索事件',
+  'columns': 'pc：工单列表-选择列事件'
+}
+const TASK_SELF_FIELD_NAMES = ['taskNo', 'templateName', 'customer', 'tlmName', 'tlmPhone', 'taddress', 'serviceType', 'serviceContent', 'planTime', 'description'];
+const EXPORT_FILTER_FORM_TYPE = ['attachment', 'address', 'autograph'];
+
+export default {
+  name: 'task-list',
+  inject: ['initData'],
+  data() {
+    return {
+      columns: [],
+      columnNum: 1,
+      currentTaskType: {},
+      loading: false,
+      multipleSelection: [],
+      multipleSelectionPanelShow: false,
+      params: this.initParams(),
+      selectPanelColumns: [
+        {
+          key: 'taskNo',
+          text: '编号'
+        }
+      ],
+      tableKey: Math.random() * 1000 >> 2,
+      taskStateEnum: TaskStateEnum,
+      taskStatusFields: ['onceOverTime', 'onceRefused', 'oncePaused', 'onceRollback', 'onceReallot', 'oncePrinted', 'positionException'],
+      taskTypes: [
+        {
+          name: '全部',
+          id: ''
+        }
+      ],
+      taskFields: [],
+      taskReceiptFields: [],
+      taskPage: new Page(),
+      totalItems: 0,
+    }
+  },
+  computed: {
+    /** 权限数据 */
+    auth() {
+      return this.initData.auth || {};
+    },
+    // 获取是否开启联系人地址产品
+    customerSetting() {
+      let { address, product, linkman } = this.currentTaskTypeCustomerFieldSetting;
+      return {
+        addressOn: address == true,
+        productOn: product == true,
+        linkmanOn: linkman == true,
+      };
+    },
+    currentTaskTypeCustomerFieldSetting() {
+      let customerFields = this.taskFields.filter(field => field.formType == 'customer');
+      let customerField = customerFields[0];
+      let customerSetting = {};
+
+      if(customerField) {
+        let setting = customerField.setting || {};
+        customerSetting = setting.customerOption || {};
+      }
+
+      return customerSetting;
+
+    },
+
+    exportColumns() {
+      // 工单自身字段
+      let taskSelfFields = [];
+      // 工单系统字段
+      let taskSystemFields = [];
+      // 工单回执字段
+      let taskReceiptSystemFields = [{
+        'id': 5460,
+        'isSystem': 1,
+        'fieldName': 'sysReceiptContent',
+        'field': 'sysReceiptContent',
+        'displayName': '回执内容',
+        'label': '回执内容',
+        'formType': 'text',
+        'isNull': 1,
+        'isSearch': 0,
+      }];
+
+      this.columns.forEach(field => {
+        field.export = true;
+        
+        let isTaskSeldField = TASK_SELF_FIELD_NAMES.indexOf(field.fieldName) > -1;
+        let fields = isTaskSeldField ? taskSelfFields : taskSystemFields;
+        fields.push(field);
+      })
+      
+      let taskFields = this.taskFields;
+      let taskReceiptFields = this.taskReceiptFields;
+
+      taskFields = taskFields.filter(field => this.filterFieldFuncHandle(field));
+      taskReceiptFields = taskReceiptFields.filter(field => this.filterFieldFuncHandle(field));
+
+      taskSelfFields = [...taskSelfFields, ...taskFields].map(field => {
+        field.export = true;
+        return field;
+      })
+      
+      taskReceiptSystemFields = [...taskReceiptSystemFields, ...taskReceiptFields].map(field => {
+        field.export = true;
+        return field;
+      })
+
+      return [
+        {
+          label: '工单信息',
+          value: 'taskChecked',
+          columns: taskSelfFields
+        },
+        {
+          label: '回执信息',
+          value: 'receiptChecked',
+          columns: taskReceiptSystemFields
+        },
+        {
+          label: '系统信息',
+          value: 'systemChecked',
+          columns: taskSystemFields
+        }
+      ]
+    },
+    exportPermission() {
+      return this.auth.EXPORT_IN;
+    },
+    panelWidth() {
+      return `${420 * this.columnNum}px`;
+    },
+    permissionTaskView() {
+      return this.auth.TASK_VIEW === 3;
+    },
+    selectedIds() {
+      return this.multipleSelection.map(p => p.id);
+    },
+    // 服务项目 服务内容 系统字段设置
+    sysFieldsSetting() {
+      let serviceContentFields = this.taskFields.filter(field => field.formType == 'serviceContent');
+      let serviceTypeFields = this.taskFields.filter(field => field.formType == 'serviceType');
+      
+      let serviceContentField = serviceContentFields[0] || {};
+      let serviceTypeField = serviceTypeFields[0] || {};
+
+      let isServiceContentFieldEnabled = serviceContentField.enabled == 1;
+      let isServiceTypeFieldEnabled = serviceTypeField.enabled == 1;
+
+      return {
+        hasServiceContent: isServiceContentFieldEnabled,
+        hasServiceType: isServiceTypeFieldEnabled,
+      };
+    },
+    taskTypeList() {
+      return this?.initData?.taskTypeList || [];
+    },
+    taskListFields() {
+      let fixedFields = fields.slice();
+
+      return ([])
+        .concat(fixedFields)
+        .filter(f => f.formType !== 'separator' && f.formType !== 'info')
+        .sort((a, b) => a.orderId - b.orderId)
+    },
+    taskTypeFilterFields() {
+      let fields = this.taskFields.concat(this.taskReceiptFields) || [];
+
+      let taskTypeFilterFields = fields.filter(field => this.filterFieldFuncHandle(field))
+
+      return taskTypeFilterFields;
+    },
+  },
+  mounted(){
+    this.taskTypes = [ ...this.taskTypes, ...this.taskTypeList];
+    this.currentTaskType = this.taskTypes[0];
+
+    this.revertStorage();
+    this.initialize();
+  },
+  methods: {
+    /* 高级搜索 */
+    advancedSearch() {
+      this.params.pageNum = 1;
+      this.taskPage.list = [];
+
+      this.params.moreConditions = this.$refs.searchPanel.buildParams();
+    
+      this.search();    
+    },
+    buildColumns() {
+      const localStorageData = this.getLocalStorageData();
+    
+      let columnStatus = localStorageData.columnStatus || [];
+      let localColumns = (
+        columnStatus
+          .map(i => typeof i == 'string' ? { field: i, show: true} : i)
+          .reduce((acc, col) => (acc[col.field] = col) && acc, {})
+      );
+
+      let taskListFields = this.filterTaskListFields();
+      let fields = taskListFields.concat(this.taskTypeFilterFields)
+
+      this.columns = fields
+        .map(field => {
+          let sortable = false;
+          let minWidth = null;
+
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+            sortable = 'custom';
+            minWidth = 100;
+          } 
+
+          if (['address'].indexOf(field.formType) >= 0) {
+            minWidth = 200;
+          } 
+
+          if (['taskNo', 'level', 'updateTime'].indexOf(field.fieldName) >= 0) {
+            sortable = 'custom';
+          }
+
+          if (field.displayName.length > 4) {
+            minWidth = field.displayName.length * 20;
+          }
+
+          if (sortable && field.displayName.length >= 4) {
+            minWidth = 125;
+          }
+
+          if (field.formType === 'datetime' || field.fieldName === 'updateTime' || field.fieldName === 'createTime') {
+            minWidth = 150;
+          }
+
+          if (['taskNo', 'customer', 'taddress', 'templateName'].indexOf(field.fieldName) >= 0) {
+            minWidth = 200;
+          }
+
+          return {
+            ...field,
+            label: field.displayName,
+            field: field.fieldName,
+            formType: field.formType,
+            minWidth: typeof minWidth == 'number' ? minWidth : `${minWidth}px`,
+            sortable,
+            isSystem: field.isSystem,
+          }
+        })
+        .map(col => {
+          let show = col.show === true;
+          let width = col.width;
+          let localField = localColumns[col.field];
+          
+          if(null != localField){
+            width = typeof localField.width == 'number' ? `${localField.width}px` : ''
+            show = localField.show !== false;
+          } else {
+            show = true;
+          }
+          
+          col.show = show;
+          col.width = width;
+          col.type = 'column';
+
+          return col;
+        });
+
+    },
+    buildExportParams(checkedMap, ids) {
+      const Params = Object.assign({}, this.params);
+      let exportAll = !ids || !ids.length;
+      
+      let taskQueryInput = {
+        ids: exportAll ? [] : ids,
+        keyword: Params.keyword,
+        pageSize: exportAll ? 0 : Params.pageSize,
+        page: exportAll ? 1 : Params.pageNum,
+        typeId: this.currentTaskType.id,
+        ...Params.moreConditions,
+      }
+
+      let params = {
+        taskQueryInput: JSON.stringify(taskQueryInput)
+      }
+      
+      for (let key in checkedMap) {
+        params[key] = checkedMap[key].join(',');
+      }
+
+      return params;
+    },
+    /** 
+     * @description 构建搜索参数
+    */
+    buildSearchParams() {
+      const Params = Object.assign({}, this.params);
+      let searchParams = {
+        keyword: Params.keyword,
+        pageSize: Params.pageSize,
+        page: Params.pageNum,
+        typeId: this.currentTaskType.id,
+      };
+
+      if (Object.keys(Params.orderDetail || {}).length) {
+        searchParams.orderDetail = Params.orderDetail;
+      }
+
+      if (
+        Object.keys(Params.moreConditions).length > 1
+        || Params.moreConditions.conditions.length
+      ) {
+        searchParams = {
+          ...searchParams,
+          ...Params.moreConditions
+        };
+      }
+
+      return searchParams;
+    },
+    buildTextarea(value) {
+      return value
+        ? value.replace(LINK_REG, match => {
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
+        })
+        : '';
+    },
+    changeTaskType(taskType) {
+      this.currentTaskType = taskType;
+      this.initialize();
+    },
+    /** 检测导出条数 */
+    checkExportCount(ids, max) {
+      let exportAll = !ids || ids.length == 0;
+      return exportAll && this.taskPage.total > max
+        ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。'
+        : null;
+    },
+    exportAlert(result, params = {}) {
+      let taskQueryInputString = params?.taskQueryInput || '{}';
+      let taskQueryInput = JSON.parse(taskQueryInputString);
+      let ids = taskQueryInput.ids || [];
+      let idsArr = ids;
+      let exportNum = idsArr.length > 0 && ids.length > 0 ? idsArr.length : this.taskPage.total;
+      let message = `您已选择${exportNum}条数据进行导出，导出进行中，导出完成后，您可以到右上角后台任务中查看导出数据，关闭本窗口不影响数据导出。`
+      
+      this.$platform.alert(message);
+    },
+    exportTask(exportAll) {
+      let ids = [];
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}工单数据.xlsx`;
+
+      if (!exportAll) {
+        if (!this.multipleSelection.length) return this.$platform.alert('请选择要导出的数据');
+        ids = this.selectedIds;
+      }
+
+      this.$refs.exportPanel.open(ids, fileName);
+    },
+    fetchTaskFields() {
+      let params = {
+        templateId: this.currentTaskType.id || '',
+        tableName: 'task'
+      }
+      return (
+        TaskApi.getTaskTemplateFields(params).then(result => {
+          result.forEach(field => {
+            field.group = 'task';
+            field.label = field.displayName;
+            field.field = field.fieldName;
+          });
+          this.$set(this, 'taskFields', result || []);
+          return result;
+        })
+      )
+    },
+    fetchTaskReceiptFields() {
+      let params = {
+        templateId: this.currentTaskType.id || '',
+        tableName: 'task_receipt'
+      }
+      return (
+        TaskApi.getTaskTemplateFields(params).then(result => {
+          result.forEach(field => {
+            field.group = 'task_receipt';
+            field.label = field.displayName;
+            field.field = field.fieldName;
+          });
+          this.$set(this, 'taskReceiptFields', result || []);
+          return result;
+        })
+      )
+    },
+    filterFieldFuncHandle(field) {
+      return EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1 && field.isSystem == 0;
+    },
+    filterTaskListFields() {
+      let fields = this.taskListFields || [];
+      let field = null;
+
+      let customerSetting = this.customerSetting;
+      let sysFieldsSetting = this.sysFieldsSetting;
+
+      let newFields = [];
+
+      for(let i = 0; i < fields.length; i++) {
+        field = fields[i];
+        
+        // 未开启联系人
+        if(!customerSetting.linkmanOn && (field.fieldName == 'tlmName' || field.fieldName == 'tlmPhone')) {
+          continue
+        }
+
+        // 未开启地址
+        if(!customerSetting.addressOn && (field.fieldName == 'taddress')) {
+          continue
+        }
+
+        // 未开启产品
+        if(!customerSetting.productOn && (field.fieldName == 'product')) {
+          continue
+        }
+
+        // 服务类型
+        if(!sysFieldsSetting.hasServiceType && (field.fieldName == 'serviceType')) {
+          continue
+        }
+
+        // 服务内容
+        if(!sysFieldsSetting.hasServiceContent && (field.fieldName == 'serviceContent')) {
+          continue
+        }
+
+        newFields.push(field);
+      }
+
+      return newFields;
+    },
+    formatCustomizeAddress(ad) {
+      if (null == ad) return '';
+
+      const { province, city, dist, address } = ad;
+      return [province, city, dist, address].filter(d => !!d).join('-');
+    },
+    getLocalStorageData() {
+      const dataStr = storageGet(TASK_LIST_KEY, '{}');
+      return JSON.parse(dataStr);
+    },
+    getRowKey(row = {}) {
+      return `${row.id}${Math.random() * 1000 >> 2}`;
+    },
+    handleSelection(selection) {
+      let tv = this.selectionCompute(selection);
+    
+      let original = this.multipleSelection
+        .filter(ms => this.taskPage.list.some(cs => cs.id === ms.id));
+    
+      let unSelected = this.taskPage.list
+        .filter(c => original.every(oc => oc.id !== c.id));
+    
+      if (tv.length > this.selectedLimit) {
+        this.$nextTick(() => {
+          original.length > 0
+            ? unSelected.forEach(row => {
+              this.$refs.multipleTable.toggleRowSelection(row, false);
+            })
+            : this.$refs.multipleTable.clearSelection();
+        });
+        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+      }
+    
+      this.multipleSelection = tv;
+    
+      // this.$refs.baseSelectionBar.openTooltip();
+    },
+    handleSizeChange(pageSize) {
+      this.saveDataToStorage('pageSize', pageSize);
+
+      this.params.pageSize = pageSize;
+      this.params.pageNum = 1;
+
+      this.search();
+    },
+    initialize() {
+      this.initPage();
+      this.loading = true;
+
+      Promise.all([
+        this.fetchTaskFields(),
+        this.fetchTaskReceiptFields()
+      ]).then(() => {
+        this.buildColumns();
+        this.search();
+      }).catch(err => {
+        console.warn(err)
+      })
+
+    },
+    initPage() {
+      this.taskPage = new Page();
+      this.taskPage.list = [];
+      this.params.pageNum = 1;
+    },
+    /**
+     * @description 初始化参数
+     * @param {Number} pageSize 页大小
+     * @returns {Object} params
+     */
+    initParams(pageSize = 10) {
+      return {
+        keyword: '',
+        pageNum: 1,
+        pageSize,
+        orderDetail: {},
+        moreConditions: {
+          conditions: []
+        }
+      };
+    },
+    jump(pageNum) {
+      this.params.pageNum = pageNum;
+      this.taskPage.list = [];
+      this.search();
+    },
+    modifyColumnStatus(event) {
+      let columns = event.data || [];
+      let colMap = columns.reduce((acc, col) => (acc[col.field] = col) && acc, {});
+
+      this.columns.forEach(col => {
+        let newCol = colMap[col.field];
+        if(null != newCol) {
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
+        }
+      })
+
+      const columnsStatus = this.columns.map(c => ({field: c.field, show: c.show, width: c.width}));
+      this.saveDataToStorage('columnStatus', columnsStatus);
+    },
+    openOutsideLink(e) {
+      let url = e.target.getAttribute('url');
+      if (!url) return;
+      if (!/http/gi.test(url)) return this.$platform.alert('请确保输入的链接以http或者https开始');
+      
+      this.$platform.openLink(url)
+    },
+    openSelectionPanel() {
+      this.$refs.openSelectionPanel.open();
+    },
+    openTaskTab(taskId) {
+      if(!taskId) return;
+
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `task_view_${taskId}`,
+        title: '工单详情',
+        close: true,
+        url: `/task/view/${taskId}?noHistory=1`,
+        fromId
+      })
+
+    },
+    openUserTab(userId) {
+      if(!userId) return;
+
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `security_user_view_${userId}`,
+        title: '工单详情',
+        close: true,
+        url: `/security/user/view/${userId}?noHistory=1&from=task`,
+        fromId
+      })
+
+    },
+    panelSearchAdvancedToggle() {
+      this.trackEventHandler('avvancedSearch');
+      this.$refs.searchPanel.open();
+
+      this.$nextTick(() => {
+        let forms = document.getElementsByClassName('advanced-search-form');
+        for(let i = 0; i < forms.length; i++) {
+          let form = forms[i];
+          form.setAttribute('novalidate', true)
+        }
+      })
+    },
+    resetParams() {
+      this.trackEventHandler('reset');
+
+      this.currentTaskType = this.taskTypes[0];
+      this.$refs.searchPanel.resetParams();
+
+      let pageSize = this.params.pageSize;
+      this.params = this.initParams(pageSize);
+
+      this.search();
+    },
+    revertStorage() {
+      const {pageSize, column_number} = this.getLocalStorageData();
+
+      if (pageSize) {
+        this.params.pageSize = pageSize;
+      }
+      if(column_number) this.columnNum = Number(column_number)
+    },
+    saveDataToStorage(key, value) {
+      const data = this.getLocalStorageData();
+      data[key] = value;
+
+      storageSet(TASK_LIST_KEY, JSON.stringify(data));
+    },
+    searchBefore() {
+      this.params.pageNum = 1;
+      this.taskPage.list = [];
+
+      this.search();
+      this.trackEventHandler('search')
+    },
+    search() {
+      const params = this.buildSearchParams();
+
+      this.loading = true;
+
+      return (
+        TaskApi.taskList(params)
+          .then(result => {
+            let isSuccess = result?.success === true;
+            if(!isSuccess) {
+              this.$platform.alert(result?.message);
+              this.initPage()
+              return;
+            }
+
+            let data = result?.data || {};
+            let { pageNum, list } = data;
+
+            list.map(c => {
+              c.pending = false;
+              return c;
+            });
+            
+            this.taskPage.merge(Page.as(data));
+            this.params.pageNum = pageNum;
+
+            // 把选中的匹配出来
+            this.matchSelected();
+
+            return data;
+          })
+          .then(() => {
+            this.$refs.taskListPage.scrollTop = 0;
+          })
+          .catch(err => {
+            console.warn('Caused: TaskList search Function err', err);
+          })
+          .finally(() => {
+            this.loading = false;
+          })
+      )
+    },
+    selectionPanelInputChange(value) {
+      this.multipleSelection = value.slice();
+    },
+    selectionPanelRemoveItem({ selection, item }) {
+      selection.length < 1 ? this.toggleSelection() : this.toggleSelection([item])
+    },
+    // 计算已选择
+    selectionCompute(selection) {
+      let tv = [];
+          
+      tv = this.multipleSelection
+        .filter(ms => this.taskPage.list.every(c => c.id !== ms.id));
+      tv = _.uniqWith([...tv, ...selection], _.isEqual);
+    
+      return tv;
+    },
+    showLatestUpdateRecord(row) {
+      if (row.latesetUpdateRecord) return;
+
+      TaskApi.getTaskUpdateRecord({ taskId: row.id })
+        .then(res => {
+          if (!res || res.status) return;
+
+          this.taskPage.list = this.taskPage.list
+            .map(c => {
+              if (c.id === row.id) {
+                c.latesetUpdateRecord = res.data;
+              }
+              return c;
+            });
+        })
+        .catch(e => console.error('e', e));
+    },
+    showAdvancedSetting(){
+      this.trackEventHandler('columns');
+
+      this.$refs.advanced.open(this.columns);
+    },
+    // TODO: 排序
+    sortChange(option) {
+      try {
+        const { prop, order } = option;
+
+        if (!order) {
+          this.params.orderDetail = {};
+          return this.search();
+        }
+        const sortedField = this.taskListFields.filter(sf => sf.fieldName === prop)[0] || {};
+
+        let isSystem = 0;
+
+        if (prop === 'createTime' || prop === 'updateTime') {
+          isSystem = 1;
+        } else {
+          isSystem = sortedField.isSystem;
+        }
+
+        let sortModel = {
+          isSystem,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
+          // column: isSystem ? `task.${prop}` : prop,
+          column: prop,
+        };
+
+
+        if (prop === 'createTime' || prop === 'updateTime' || sortedField.formType === 'date' || sortedField.formType === 'datetime') {
+          sortModel.type = 'date';
+        } else if (prop === 'level' || prop === 'taskNo') {
+          sortModel.type = 'string';
+        } else {
+          sortModel.type = sortedField.formType;
+        }
+
+        this.params.orderDetail = sortModel;
+        this.taskPage.list = [];
+
+        this.search();
+
+      } catch (e) {
+        console.error('e', e);
+      }
+    },
+    toggleSelection(rows = []) {
+      let isNotOnCurrentPage = false;
+      let row = undefined;
+
+      if (Array.isArray(rows) && rows.length > 0) {
+        for(let i = 0; i < rows.length; i++) {
+          row = rows[i];
+          isNotOnCurrentPage = this.taskPage.list.every(item => {
+            return item.id !== row.id;
+          })
+          if(isNotOnCurrentPage) return
+        }
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+
+      } else {
+        this.$refs.multipleTable.clearSelection();
+        this.multipleSelection = [];
+      }
+    },
+    /** 
+     * @description TalkingData事件埋点 
+     * @param {String} type The constant TRACK_EVENT_MAP of the keys
+    */
+    trackEventHandler(type = '') {
+      let eventName = TRACK_EVENT_MAP[type];
+      if(!eventName) return
+
+      window.TDAPP.onEvent(eventName);
+    },
+  },
+  components: {
+    [TaskSearchPanel.name]: TaskSearchPanel
+  }
+}

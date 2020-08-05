@@ -1,0 +1,16 @@
+.task-state-block {
+  border-radius: 3px;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+
+  &-overtime,
+  &-approve {
+    background-color: #ff9100;
+  }
+
+}
+
+.task-list-operation-bar-container {
+  justify-content: flex-end !important;
+}

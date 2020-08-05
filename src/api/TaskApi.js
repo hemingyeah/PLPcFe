@@ -2,12 +2,7 @@ import http from '@src/util/http'
 
 let fixedPrefixAppPath = '/api/app'
 
-/**
- * 获取工单类型
- */
-export function getTaskTypes(){
-  return http.get(`${fixedPrefixAppPath}/outside/dd/task/types`);
-}
+/* ------------- start 旧工单api ---------------- */
 
 /**
  * 删除计划任务
@@ -35,7 +30,6 @@ export function relatedFieldValue(params) {
  * @param {String} params.tableName -- 表名
  * @param {String} params.templateId -- 类型模板id
 */
-
 export function getTaskTemplateFields(params) {
   return http.get('/task/getTaskTemplateFields', params)
 }
@@ -197,3 +191,52 @@ export function deleteTask(params) {
 export function rollBackTask(params) {
   return http.post('/task/rollBack', params, true);
 }
+
+/**
+ * @description 获取工单最近更新记录
+ * @param {Object} params - 参数
+ * @param {String} params.taskId - 工单id
+ * @return {MsgModal<String>} 最近更新记录
+ */
+export function getTaskUpdateRecord(params) {
+  return http.get('/task/getLatestRecord', params, false)
+}
+
+/**
+ * @description 获取产品列表
+ * @param {Object} params - 参数
+ */
+export function getTaskCustonerProductList(params) {
+  return http.get('/task/customer/product', params, false)
+}
+
+/* -------------  end  旧工单api ---------------- */
+
+
+
+
+
+
+/* ------------- start 新工单api ---------------- */
+
+/**
+ * 获取工单类型
+ */
+export function getTaskTypes(){
+  return http.get(`${fixedPrefixAppPath}/outside/dd/task/types`);
+}
+
+/**
+ * 获取工单列表
+ * @param {Object} params - 参数对象
+ * @param {String} params.tenantId - 租户id
+ * @param {String} params.customerId - 客户id
+ * @param {String} params.keyword - 关键字
+ * @param {String} params.productId - 产品id
+ * @param {String} params.typeId - 工单类型id
+ */
+export function taskList(params) {
+  return http.post('/task/findList', params)
+}
+
+/* -------------  end  新工单api ---------------- */

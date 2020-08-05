@@ -31,6 +31,12 @@ import BaseContact from './common/BaseContact';
 import BizUserSelect from './business/BizUserSelect';
 import BizTeamSelect from './business/BizTeamSelect';
 import BizFormRemoteSelect from './business/BizFormRemoteSelect';
+import BizSearchForm from './business/BizSearchForm';
+import BizSearchPanel from './business/BizSearchPanel';
+import BizSelectionPanel from './business/BizSelectionPanel';
+import BizSearchCustomerSelect from './business/BizSearchCustomerSelect';
+import BizSearchProductSelect from './business/BizSearchProductSelect';
+
 import SampleTooltip from './common/SampleTooltip';
 
 import BaseEditor from './lessUsed/BaseEditor'
@@ -65,6 +71,11 @@ const components = [
   BizUserSelect,
   BizTeamSelect,
   BizFormRemoteSelect,
+  BizSearchForm,
+  BizSearchPanel,
+  BizSelectionPanel,
+  BizSearchCustomerSelect,
+  BizSearchProductSelect,
   
   BaseWindow,
   SampleTooltip,
