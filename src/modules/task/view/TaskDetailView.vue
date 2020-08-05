@@ -1,10 +1,21 @@
 <template>
   <div class="page-container">
-    <div class="task-tool-bar">
+    <!-- start 顶部操作区 -->
+    <div class="task-tool-bar" v-if="!isDelete">
       <div class="task-toolbar-left">
-        <button type="button" class="btn btn-text" @click="jump"><i class="iconfont icon-edit"></i> 编辑</button>
+        <button type="button" class="btn btn-text" @click="jump" v-if="allowEditTask">
+          <i class="iconfont icon-edit"></i> 编辑
+        </button>
+        <button type="button" class="btn btn-text" @click="deleteTask" v-if="allowDeleteTask">
+          <i class="iconfont icon-yemianshanchu"></i> 删除
+        </button>
+      </div>
+
+      <div class="task-toolbar-right">
+        <base-button type="plain" @event="backTask" v-if="allowBackTask">回退工单</base-button>
       </div>
     </div>
+    <!-- end 顶部操作区 -->
     <div class="main-content" v-loading="loading">
       <div class="task-detail">
         <form-view :fields="fields" :value="task">
@@ -73,6 +84,19 @@
         </form-view>
       </div>
     </div>
+
+    <!-- start 回退工单弹窗 -->
+    <base-modal title="回退工单" :show.sync="backDialog.visible" width="500px" class="task-back-dialog">
+      <div class="back-main-content">
+        <p>回退工单将工单退回工单负责人，可以重新提交回执信息，原有回执信息将不再保存</p>
+        <textarea v-model="backDialog.content" placeholder="[最多500字][必填]" rows="3" maxlength="500" />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="backDialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="back" :disabled="pending">确 定</el-button>
+      </div>
+    </base-modal>
+    <!-- end 回退工单弹窗 -->
   </div>
 </template>
 
@@ -86,6 +110,7 @@ export default {
   data() {
     return {
       loading: false,
+      pending: false,
       task: {},
       fields: [],
       // TODO: 工单状态从移动端拷贝的数据 后面要修改
@@ -95,7 +120,12 @@ export default {
         processing: '进行中',
         finished: '已完成',
         offed: '已取消',
-      }
+      },
+      // 回退工单弹窗
+      backDialog: {
+        visible: false,
+        content: ''
+      },
     }
   },
   computed: {
@@ -106,14 +136,130 @@ export default {
     /* 客户字段配置 */
     customerOption() {
       return (this.customerField.setting && this.customerField.setting.customerOption) || {} ;
-    }
+    },
+    /** 当前登录用户 */
+    loginUser() {
+      return this.initData.loginUser || {};
+    },
+    /* 该登录账户是否是工单创建人 */
+    isCreator(){
+      let createUser = this.task.createUser || {};
+      return createUser.userId == this.loginUser.userId;
+    },
+    /* 该登录账户是否是工单负责人 */
+    isExecutor() {
+      let executor = this.task.executor || {};          
+      return executor.userId == this.loginUser.userId;
+    },
+    /** 当前用户的权限 */
+    permission() {
+      // TODO: 暂时使用假数据
+      return {"TASK_ADD":3,"PRODUCT_CREATE":3,"CUSTOMER_CREATE":3,"VIP_PAYMENT_ONLINE":3,"TASK_BATCH_DISPATCH":3,"CASE_ADD":3,"SERVICE_CREATE":3,"CASE_VIEW":3,"TASK_EDIT":3,"TASK_FEEDBACK":3,"VIP_INFO_NOTICE_SELECT":3,"LOGIN_PC":3,"SMS_CONFIG":3,"VIP_INFO_NOTICE_CREATE":3,"SERVICE_EDIT":3,"PRODUCT_EDIT":3,"TASK_DISPATCH":3,"TASK_POOL":3,"VIP_REPORT_VIEW":3,"TASK_VIEW":3,"AUTH_STAFF":3,"AUTH_ROLE":3,"TASK_CLOSE":3,"TASK_BATCH_CLOSE":3,"VIP_SPAREPART_PERSION":3,"INFO_EDIT":3,"VIP_SPAREPART_INOUT":3,"TASK_AUDIT":3,"PRODUCT_VIEW":3,"CUSTOMER_DELETE":3,"CASE_DELETE":3,"INFO_VIEW":3,"EXPORT_IN":3,"VIP_APPROVE":3,"PART_EDIT":3,"SERVICE_VIEW":3,"CUSTOMER_VIEW":3,"VIP_SPAREPART_CREATE":3,"VIP_SPAREPART_VIEW":3,"CUSTOMER_PQRCODE":3,"TASK_DELETE":3,"VIP_TASK_PLAN":3,"PRODUCT_DELETE":3,"CASE_EDIT":3,"VIP_INFO_CREATE":3,"SYSTEM_SEETING":3,"LOGIN_YD":3,"VIP_SPAREPART_EDIT":3,"PART_VIEW":3,"AUTH_TAG":3,"VIP_SPAREPART_STOCK":3,"TASK_BATCH_AUDIT":3,"CUSTOMER_EDIT":3};
+    },
+    /* 工单编辑权限 */
+    editAuth() {
+      return this.permission.TASK_EDIT;
+    },
+    /* 工单删除权限 */
+    deleteAuth() {
+      return this.permission.TASK_DELETE;
+    },
+    /** 
+    * @description 工单是否被删除
+    * 在工单删除时不允许做任何操作，只能查询 
+    * 所有操作的权限应该以此为基础
+    */
+    isDelete(){
+      return this.task.isDelete === 1;
+    },
+    /* 工单是否在审批状态 */
+    isApproving() {
+      return this.task.inApprove == 1;
+    }, 
+    /* 工单是否在暂停状态 */
+    isPaused() {
+      return this.task.isPaused == 1;
+    },
+    /** 
+    * @description 是否显示编辑按钮
+    * 1. 不是审批状态
+    * 2. 且 不是暂停状态
+    * 3. 且 工单允许编辑 canEditTask
+    * 4. 且 工单允许编辑isAllowUpdate
+    * 5. 满足以上条件就会显示编辑按钮 无论是否有工单编辑权限TASK_EDIT
+    */
+    allowEditTask() {
+      return !this.isApproving && !this.isPaused && this.canEditTask && this.isAllowUpdate;
+    },
+    /** 
+    * @description 工单允许编辑
+    * 1. 工单编辑设置修改工单开关开启 且 登录账户是工单负责人
+    * 2. 或 角色编辑权限是全部权限this.editAuth == 3
+    * 3. 或 角色编辑权限是团队权限this.editAuth == 2时 且 登录用户是工单的创建人
+    * 4. 或 角色编辑权限是团队权限this.editAuth == 2时 且 工单有负责人且登录用户是工单的负责人任意所在团队的主管(生产环境疑问：若该工单类*    型设置可用团队，则该团队应在可用团队范围内)
+    * 5. 或 角色编辑权限是个人权限this.editAuth == 1时 且 登录用户是工单的创建人
+    */
+    canEditTask() {
+      return this.initData.canEditTask;
+    },
+    /** 
+    * @description 工单允许编辑 canEditTask
+    * 默认是true，当工单编辑设置“当工单处于以下状态之后，不允许对工单再进行编辑”，限制了工单状态
+    * 1. 当前工单的状态刚好被限制编辑
+    * 2. 或 限制的工单状态包含‘已完成‘则已完成以及以后的节点都不可编辑
+    * 3. 或 限制的工单状态包含‘已结算‘则已结算以及以后的节点都不可编辑
+    * 4. 或 限制的工单状态包含‘已回访‘则已回访以及以后的节点都不可编辑
+    */
+    isAllowUpdate() {
+      return this.initData.isAllowUpdate;
+    },
+    /** 
+    * @description 是否显示删除按钮
+    * 1. 不是审批状态
+    * 2. 且 不是暂停状态
+    * 3. 且 有工单删除权限TASK_DELETE
+    * 4. 且 工单允许删除 canDeleteTask
+    */
+    allowDeleteTask() {
+      return !this.isApproving && !this.isPaused && this.deleteAuth && this.canDeleteTask;
+    },
+    /** 
+    * @description 工单允许删除
+    * 1. 满足工单允许编辑canEditTask
+    * 2. 且 当前登录用户有工单删除权限TASK_DELETE
+    */
+    canDeleteTask() {
+      return this.initData.canDeleteTask;
+    },
+    /** 
+    * @description 是否显示回退工单按钮
+    * 1. 不是审批状态
+    * 2. 且 工单是已完成状态finished
+    * 3. 且 工单编辑设置开启了允许退回工单回执taskConfig.taskRollBack
+    * 4. 且 允许回退工单 canRollBack
+    */
+    allowBackTask() {
+      return !this.inApprove && this.task.state === 'finished' && this.taskConfig.taskRollBack && this.canRollBack;
+    },
+    /** 
+    * @description 允许回退工单
+    * 1. 满足工单允许编辑canEditTask
+    * 2. 或 当前登录用户有工单审核结算权限TASK_AUDIT
+    */
+    canRollBack() {
+      return this.initData.canRollBack;
+    },
+    /** 工单设置 */
+    taskConfig(){
+      return this.initData.taskConfig;
+    },
   },
   methods: {
     jump() {
       const id = this.task.id || this.initData.id;
-      window.location.href = `/task/edit/${id}`;
+      window.location.href = this.editAuth ? `/task/edit/${id}` : `/task/noFilterEdit/${id}`;
     },
-    prettyAddress(address){
+    prettyAddress(address) {
       if(!address || Object.keys(address).length === 0) return '';
 
       let province = address.province || '';
@@ -122,6 +268,86 @@ export default {
       let adr = address.address || '';
 
       return [province, city, dist, adr].filter(a => a).join('-');
+    },
+    // 删除工单
+    async deleteTask() {
+      try {
+        /** 
+        * 如果工单为未完成状态，则需要判断工单是否曾回退，而且在最后一次完成时是否使用了备件
+        * 如果使用了备件，需要提示
+        */
+        let warningMsg = '确定要删除吗？';
+        const unfinishedStateArr = ['created', 'allocated', 'taskPool', 'accepted', 'refused', 'processing'];
+        let state = this.task.state;
+
+        if (unfinishedStateArr.indexOf(state) != -1) {
+          const res = await TaskApi.taskFilterWithPart({ taskIds: this.task.id });
+          if (res.status == 1) {
+            warningMsg = `${res.message}，确定要删除所选工单吗？`;
+          } else if (res.status == 0 && res.data.length == 0) {
+            warningMsg = '工单已添加备件，确定要删除吗？';
+          }
+        }
+
+        const result = await this.$platform.confirm(warningMsg);
+        if (!result) return;
+
+        const params = [this.task.id];
+        TaskApi.deleteTask(params).then(res => {
+          if (res.status == 0) {
+            let fromId = window.frameElement.getAttribute('fromid');
+            this.$platform.refreshTab(fromId);
+
+            location.href = '/task';
+          } else {
+            this.$platform.alert(res.message);
+          }
+        }).catch(err => console.log(err))
+
+      } catch (e) {
+        console.error("deleteTask error", e);
+      }
+    },
+    // 回退工单
+    async backTask() {
+      try {
+        if (this.initData.isRepertoryDiff == 'true') {
+          const result = await this.$platform.confirm('回执备件来源与当前备件库配置不同，回退工单将会把已使用的备件退回到原仓库，是否继续？');
+          if (!result) return;
+
+          this.backDialog.visible = true;
+        } else {
+          this.backDialog.visible = true;
+        }
+      } catch (e) {
+        console.error("backTask error", e);
+      }
+    },
+    // 回退工单
+    async back() {
+      let content = this.backDialog.content.trim();
+      if (!content) {
+        this.$platform.alert('请填写回退说明');
+        return;
+      }
+
+      this.pending = true;
+
+      const params = {taskId: this.task.id, content};
+      TaskApi.rollBackTask(params).then(res => {
+        if (res.status == 0) {
+          let fromId = window.frameElement.getAttribute('fromid');
+          this.$platform.refreshTab(fromId);
+
+          window.location.reload();
+        } else {
+          this.$platform.alert(res.message);
+          this.pending = false;
+        }
+      }).catch(err => {
+        this.pending = false;
+        console.log(err);
+      })
     }
   },
   async mounted() {
@@ -129,7 +355,7 @@ export default {
       this.loading = true;
 
       // TODO: 暂时用假数据
-      this.task = {"id":"efc9a6bd-6983-11ea-bfc9-00163e304a25","taskNo":"TAW0120030012","name":null,"customer":{"createUser":"3f20b9ac-36af-11ea-bfc9-00163e304a25","updateUser":null,"createTime":null,"updateTime":null,"id":"7ef4f1e3-607a-11ea-bfc9-00163e304a25","name":"呼呼","enName":null,"serialNumber":"CUSBT50157","status":null,"level":null,"superior":null,"teamId":null,"customerManager":"","customerManagerName":"","remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[{"id":"095bf30d-96ea-11e9-bfc9-00163e304a25","tagName":"新建团队测试 子团队2"}],"createUserId":null,"createLoginUser":null,"lmName":"呼呼2","lmPhone":"18900000","lmEmail":null,"customerAddress":{"adCountry":"","adDist":"市北区","adProvince":"山东省","adCity":"青岛市","adAddress":"呼呼的家","adLongitude":120.37473100,"adLatitude":36.08760900,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"guideData":false,"focus":false},"type":null,"level":"中","serviceType":"服务类型三","serviceContent":"服务内容B ","description":"测试新建表单o","state":"created","createTime":1584582597000,"executorId":null,"executor":{"userId":"e09eeb90-5d10-11ea-bfc9-00163e304a25","loginName":null,"displayName":"庞海翠","email":null,"cellPhone":null,"lastLoginTime":null,"enabled":1,"weixinid":null,"powercode":null,"head":"https://static-legacy.dingtalk.com/media/lADPDgQ9sF74RVrNBgHNBgE_1537_1537.jpg","sex":null,"firstLogin":0,"tagList":[],"departments":null,"roles":null,"attribute":{},"openid":"$:LWCP_v1:$uJRv42qKlYjuaXTvvWs4sw==","longitude":null,"latitude":null,"isDelete":null,"synOpenid":null,"staffId":"170937546621540920","tenantId":null,"mainTeamId":null,"unfinishedTask":null,"todayFinishedTask":null,"state":null,"cusDistance":null,"superAdmin":null,"isTeamLeader":0},"synergies":[{"head":"https://static-legacy.dingtalk.com/media/lADPDgQ9sF74RVrNBgHNBgE_1537_1537.jpg","userId":"e09eeb90-5d10-11ea-bfc9-00163e304a25","staffId":"170937546621540920","displayName":"叶泽伟"}],"attribute":{"field_CsbTwPJbFheGm8KG":"数据库的圣彼得堡","field_E8mJWecKceDPiN1D":"选项一","field_ESKLNCW8qAh8vegq":"2020-03-19 09:49:20","field_Jug4AptnM3ooJ7Pz":"CUSBT50157","field_MQA9ZXlhkPNBv2B9":"2020-03-19","field_X0m3Pq8PXdB9E6ck":"の8328","field_Z9fYURBrnGzpFlq7":["一级选项 1","二级选项 1"],"field_b5sDM1KR0T56NMF0":"17098748513","field_f83Ztxr8UgfGgRmi":"会计师事务所","field_iULucLkdl3bL7248":"62376482","field_myx87dCC6W98wAdO":{"all":"浙江省杭州市拱墅区祥符街道莫干山路809号杭州中粮大悦城","city":"杭州市","dist":"拱墅区","address":"祥符街道莫干山路809号杭州中粮大悦城","latitude":30.301169,"province":"浙江省","longitude":120.130316,"addressType":1},"field_pG4Zn4dJ42cMtkFl":{"head":"https://static-legacy.dingtalk.com/media/lADPDgQ9reHuWmbNA43NA44_910_909.jpg","userId":"3f20b9ac-36af-11ea-bfc9-00163e304a25","staffId":"122463461724178791","displayName":"庞海翠"},"field_tRw0mwlUtuIMceG0":[{"id":"9bb7e2a8-a09e-482c-846c-ebc1ba050f52","url":"https://she-dev.oss-cn-hangzhou.aliyuncs.com/acs/newfiles/7416b42a-25cc-11e7-a500-00163e12f748/202003/c9c7fcb2-a7b8-4411-bdda-f506748e311e.jpg","fileSize":"14.67KB","filename":"VCG41N1206123634-庞海翠-2020-03-19.jpg"}],"field_xt0TZ7dbBQpo59dD":"の8328","field_y1cm38WWTEPMiqoa":"250"},"balanceAttribute":{},"createUserId":"3f20b9ac-36af-11ea-bfc9-00163e304a25","createUser":{"userId":"3f20b9ac-36af-11ea-bfc9-00163e304a25","loginName":null,"displayName":"庞海翠","email":null,"cellPhone":null,"lastLoginTime":null,"enabled":1,"weixinid":null,"powercode":null,"head":"https://static-legacy.dingtalk.com/media/lADPDgQ9reHuWmbNA43NA44_910_909.jpg","sex":null,"firstLogin":0,"tagList":[],"departments":null,"roles":null,"attribute":{},"openid":"$:LWCP_v1:$/neeSv3WmGtXXgNmqx0XGQ==","longitude":null,"latitude":null,"isDelete":null,"synOpenid":null,"staffId":"122463461724178791","tenantId":null,"mainTeamId":null,"unfinishedTask":null,"todayFinishedTask":null,"state":null,"cusDistance":null,"superAdmin":null,"isTeamLeader":0},"attachment":[{"id":"04dbfc16-9f50-400f-a392-e530a2b672d3","filename":"服务报告TJR0320020002addPic-庞海翠-2020-03-19.pdf","url":"https://she-dev.oss-cn-hangzhou.aliyuncs.com/acs/newfiles/7416b42a-25cc-11e7-a500-00163e12f748/202003/d27d02d6-90cf-4006-9931-22038d5f5129.pdf","fileSize":"0B"}],"planTime":"2020-03-27 10:09:27","isReview":0,"degree":null,"suggestion":null,"balanceConfirm":0,"balanceTime":null,"balanceUserId":null,"balanceUser":null,"remark":[],"receiptContent":null,"product":null,"productId":null,"completeTime":null,"startTime":null,"startOn":1,"autograph":null,"reviewTime":null,"reviewUserId":null,"reviewUser":null,"tenantId":"7416b42a-25cc-11e7-a500-00163e12f748","allotTime":null,"allotUserId":null,"allotUser":null,"acceptTime":null,"closeTime":null,"taddress":{"id":"7f2b6197-607a-11ea-bfc9-00163e304a25","city":"青岛市","dist":"市北区","address":"呼呼的家","latitude":36.087609,"province":"山东省","longitude":120.374731},"tlmId":"7f402112-607a-11ea-bfc9-00163e304a25","tlmName":"呼呼2","tlmPhone":"18900000","tversion":"v2","inTaskPool":0,"updateTime":1584583942000,"products":[{"id":"8618e631-6983-11ea-bfc9-00163e304a25","name":"哔哔机","type":"其他设备","serialNumber":"の8328"}],"evaluate":null,"evaluateContent":null,"evaluateSource":null,"profit":null,"sale":null,"cost":null,"templateId":"1","templateName":"默认工单","cardInfo":[],"inApprove":0,"isPaused":0,"overTime":1584586197000,"isOverTime":0,"taskUsedTime":null,"taskUsedTimeStr":"","acceptUsedTime":null,"acceptUsedTimeStr":"","workUsedTime":null,"workUsedTimeStr":"","onceOverTime":0,"taskResponseTime":null,"taskResponseTimeStr":"","expenseDetail":null,"isDelete":0,"settlement":null,"sparepart":null,"onceRefused":0,"oncePaused":0,"allotType":0,"allotTypeStr":"","onceReallot":0,"positionException":0,"oncePrinted":0,"onceRollback":0,"validAddress":true,"expenseSheet":null,"evaluateObj":null,"source":null,"guideProfessions":[],"isGuideData":false,"isSettled":-1,"isReviewed":-1,"isEvaluated":-1,"isClosed":-1,"taddressStr":"山东省,青岛市,市北区,呼呼的家","v2":true,"guideData":false}
+      this.task = this.initData.task;
 
       const fields = await TaskApi.getTaskTemplateFields({ templateId: this.task.templateId, tableName: 'task' });
       this.fields = [...fields, {
@@ -173,71 +399,92 @@ export default {
 </script>
 
 <style lang="scss">
-  html, body, .page-container {
+html, body, .page-container {
+  height: 100%;
+}
+
+body {
+  padding: 10px;
+  min-width: 1100px;
+  overflow-x: auto;
+}
+
+.page-container {
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(216,216,216, .65);
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.task-tool-bar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: $text-color-regular;
+  border-bottom: 1px solid #f2f2f2;
+
+  .task-toolbar-left{
+    padding: 10px 5px 10px 10px;
+  }
+
+  .task-toolbar-right {
+    padding: 10px 10px 10px 5px;
+  }
+
+  .btn-text {
+    padding: 5px 12px;
+    .iconfont{
+      font-size: 14px;
+    }
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-flow: row nowrap;
+  flex: 1;
+  position: relative;
+
+  .task-detail {
+    flex: 3;
+    min-width: 420px;
     height: 100%;
-  }
-
-  body {
-    padding: 10px;
-    min-width: 1100px;
-    overflow-x: auto;
-  }
-
-  .page-container {
-    background: #fff;
-    border-radius: 3px;
-    box-shadow: 0 1px 4px rgba(216,216,216, .65);
     display: flex;
     flex-flow: column nowrap;
-  }
 
-  .task-tool-bar {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    color: $text-color-regular;
-    border-bottom: 1px solid #f2f2f2;
+    .form-view{
+      flex: 1;
+      padding-top: 5px;
+      overflow-y: auto;
+      border-right: 1px solid #f2f2f2;
 
-    .task-toolbar-left{
-      padding: 10px 5px 10px 10px;
-    }
-
-    .btn-text {
-      padding: 5px 12px;
-      .iconfont{
-        font-size: 14px;
-      }
-    }
-  }
-
-  .main-content {
-    display: flex;
-    flex-flow: row nowrap;
-    flex: 1;
-    position: relative;
-
-    .task-detail {
-      flex: 3;
-      min-width: 420px;
-      height: 100%;
-      display: flex;
-      flex-flow: column nowrap;
-
-      .form-view{
-        flex: 1;
-        padding-top: 5px;
-        overflow-y: auto;
-        border-right: 1px solid #f2f2f2;
-
-        .form-view-row {
-          .row-item-margin {
-            margin-right: 10px;
-          }
+      .form-view-row {
+        .row-item-margin {
+          margin-right: 10px;
         }
       }
+    }
 
+  }
+}
+
+.task-back-dialog {
+  .back-main-content {
+    padding: 15px 30px;
+
+    p {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
     }
   }
 
-  
+  .base-modal-footer {
+    text-align: right;
+  }
+}  
 </style>

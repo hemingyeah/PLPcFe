@@ -47,9 +47,14 @@ router.get('/task/edit', async ctx => {
 
 router.get('/task/view/:id', async ctx => {
   let modConfig = modules['task.view'];
+  let reqHeaders = ctx.request.headers;
   let script = ['/task.view.js'];
+
+  let url = `/task/view/${ctx.params.id}`;
+  let result = await HttpClient.request(url, 'get', null, {headers: reqHeaders});
+  let body = result.body;
   
-  ctx.body = Template.renderWithHtml('工单详情', {}, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('工单详情', body, script, modConfig.template)
 });
 
 router.get('/task/receipt', async ctx => {

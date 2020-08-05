@@ -176,3 +176,24 @@ export function createTask(params) {
 export function editTask(params) {
   return http.post('/task/update', params);
 }
+
+/** 
+ * @description 判断工单是否使用了备件
+*/
+export function taskFilterWithPart(params) {
+  return http.get('/task/filter/withPart', params);
+}
+
+/** 
+ * @description 删除工单
+*/
+export function deleteTask(params) {
+  return http.post('/task/delete', params, true);
+}
+
+/** 
+ * @description 回退工单
+*/
+export function rollBackTask(params) {
+  return http.post('/task/rollBack', params, true);
+}

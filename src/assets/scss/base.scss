@@ -15,6 +15,23 @@ input,textarea{
   &:focus{
     border-color: $color-primary;
   }
+
+  &::-webkit-input-placeholder {
+    /* WebKit browsers */
+    color: #B3B7C1;
+  }
+  &:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #B3B7C1;
+  }
+  &::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #B3B7C1;
+  }
+  &:-ms-input-placeholder {
+    /* Internet Explorer 10+ */
+    color: #B3B7C1;
+  }
 }
 
 textarea{
