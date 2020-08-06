@@ -484,7 +484,7 @@
         <el-table-column type="selection" width="44"></el-table-column>
 
         <el-table-column
-          v-for="column in columns"
+          v-for="column in columns.filter(item=>item.show)"
           :key="column.field"
           :prop="column.field"
           v-if="column.show"
