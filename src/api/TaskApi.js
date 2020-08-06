@@ -192,6 +192,69 @@ export function rollBackTask(params) {
   return http.post('/task/rollBack', params, true);
 }
 
+/** 
+ * @description 取消工单
+*/
+export function cancelTask(params) {
+  return http.post('/task/off', params, true);
+}
+
+/** 
+ * @description 暂停工单
+*/
+export function pauseTask(params) {
+  return http.get('/task/pause', params);
+}
+
+/** 
+ * @description 继续工单
+*/
+export function unpauseTask(params) {
+  return http.get('/task/unpause', params);
+}
+
+/** 
+ * @description 拒绝工单验证
+*/
+export function refuseCheckTask(params) {
+  return http.get('/task/refuseCheck', params);
+}
+
+/** 
+ * @description 拒绝工单
+*/
+export function refuseTask(params) {
+  return http.get('/task/refuse', params);
+}
+
+/** 
+ * @description 检查附加组件是否必填
+*/
+export function checkNotNullForCard(params) {
+  return http.post('/task/checkNotNullForCard', params, false);
+}
+
+/** 
+ * @description 开始工单
+*/
+export function startTask(params) {
+  return http.get('/task/start', params);
+}
+
+/** 
+ * @description 打印工单
+*/
+export function printTask(params) {
+  return http.get('/task/getPrintToken', params);
+}
+
+/** 
+ * @description 撤回审批
+*/
+export function offApprove(params) {
+  return http.get('/approve/offApprove', params);
+}
+
 /**
  * @description 获取工单最近更新记录
  * @param {Object} params - 参数
