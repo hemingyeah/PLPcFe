@@ -255,6 +255,27 @@ export function offApprove(params) {
   return http.get('/approve/offApprove', params);
 }
 
+/** 
+ * @description 从工单池接单
+*/
+export function acceptFromPool(params) {
+  return http.get('/task/acceptFromPool', params);
+}
+
+/** 
+ * @description 修改计划时间
+*/
+export function modifyPlanTime(params) {
+  return http.post('/task/modifyPlanTime', params, false);
+}
+
+/** 
+ * @description 接受工单
+*/
+export function accept(params) {
+  return http.get('/task/accept', params);
+}
+
 /**
  * @description 获取工单最近更新记录
  * @param {Object} params - 参数
