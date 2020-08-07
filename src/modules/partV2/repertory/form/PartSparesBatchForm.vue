@@ -80,7 +80,7 @@
     <div class="part-batchIn-footer">
       <el-button type="text" @click="addPart" icon="el-icon-plus" :disabled="isAddBtnDisabled"> 添加</el-button>
       <p v-if="isAddBtnDisabled">
-        单次批量操作最多支持50条。
+        单次批量操作最多支持20条。
       </p>
     </div>
   </div>
