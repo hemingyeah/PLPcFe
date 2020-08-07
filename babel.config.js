@@ -1,5 +1,5 @@
 const presets = [
-  ['@babel/env', {useBuiltIns: 'usage', corejs: 3 }]
+  ['@babel/env', {useBuiltIns: 'usage', corejs: 2 }]
 ];
 
 const plugins = [
