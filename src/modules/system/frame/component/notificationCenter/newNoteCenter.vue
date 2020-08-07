@@ -120,6 +120,7 @@ export default {
         if (falsh) {
           this.notificationPage.list = [];
           this.params.pageNum = 1;
+          this.dailyShow = false;
         }
         this.loading = true;
 
