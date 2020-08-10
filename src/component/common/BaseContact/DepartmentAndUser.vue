@@ -89,7 +89,7 @@ export default {
     },
     selectedUser: {
       type: Array,
-      default: () => ({})
+      default: () => []
     },
     title: {
       type: String,
@@ -186,24 +186,6 @@ export default {
       stateColor: {}, //用户工作状态颜色
       isSeeAllOrg: false, /** 是否 只可见本团队成员 */
     }
-
-    let selectedUser = this.selectedUser;
-    data.chosen = selectedUser.map(user => {
-      return {
-        userId: user.userId,
-        displayName: user.displayName,
-        staffId: user.staffId,
-        head: user.head || ''
-      }
-    })
-
-    let selectedDepts = this.selectedDepts;
-    data.chosenDept = selectedDepts.map(dept => {
-      return {
-        id: dept.id,
-        name: dept.name
-      }
-    })
 
     return data
   },

@@ -73,9 +73,6 @@
                   <a href="javascript:;" @click="clearStorage">清空缓存</a>
                   <a href="javascript:;" @click="openDemo">demo</a>
                   <a href="javascript:;" @click="goRoleTeam">团队管理</a>
-                  <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
-                  <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
-                  <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
                   <a href="javascript:;" @click="goDepartment">组织架构管理</a>
