@@ -249,10 +249,31 @@ export function printTask(params) {
 }
 
 /** 
+ * @description 审批详情
+*/
+export function getApprove(params) {
+  return http.get('/approve/get', params);
+}
+
+/** 
+ * @description 审批
+*/
+export function saveApprove(params) {
+  return http.post('/approve/saveResult', params, false);
+}
+
+/** 
  * @description 撤回审批
 */
 export function offApprove(params) {
   return http.get('/approve/offApprove', params);
+}
+
+/** 
+ * @description 发起审批
+*/
+export function applyApprove(params) {
+  return http.post('/approve/apply', params);
 }
 
 /** 

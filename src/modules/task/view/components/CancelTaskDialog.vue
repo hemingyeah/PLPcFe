@@ -79,6 +79,10 @@ export default {
       this.isGoBack = '';
     },
     async openDialog() {
+      if (this.pending) return;
+      this.pending = true;
+
+      // 重置
       this.reset();
 
       try {
@@ -95,10 +99,11 @@ export default {
           }
         }
 
+        this.pending = false;
         this.visible = true;
 
       } catch (e) {
-        console.error("cancelTask error", e);
+        console.error('cancelTask error', e);
       }
     },
     submit() {
@@ -120,6 +125,7 @@ export default {
           if (res.message == '需要审批') {
             // TODO：需要审批
             this.visible = false;
+            this.$parent.$refs.proposeApprove.openDialog(res.data);
           } else {
             this.$platform.alert(res.message);
           }

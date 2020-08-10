@@ -61,6 +61,9 @@ export default {
       this.$set(this, 'planTime', newValue);
     },
     async openDialog(action) {
+      if (this.pending) return;
+      this.pending = true;
+
       try {
         this.action = action;
 
@@ -70,26 +73,32 @@ export default {
         if (action === 'modifyPlanTime') {
           this.planTime = planTime;
           this.sendSMS = false;
+          this.pending = false;
           this.visible = true;
           return;
         }
 
         // 从工单池接单或者接受工单前需要判断附加组件
         let result = await TaskApi.checkNotNullForCard({id: this.task.id, flow: 'accept'});
-        if (result.status != 0) return this.$platform.alert(result.message);
+        if (result.status != 0) {
+          this.$platform.alert(result.message);
+          this.pending = false;
+          return;
+        } 
 
         // 计划时间格式为日期时需格式化
         if (this.dateType == 'date' && planTime) {
-          planTime = planTime.slice(0, 10) + ' 00:00:00';
+          planTime = `${planTime.slice(0, 10)} 00:00:00`;
         }
         this.planTime = planTime;
 
         // 工单设置禁用了修改计划时间并且有计划时间
         if (!this.initData.taskConfig.taskPlanTime && planTime) return this.submit(false);
         
+        this.pending = false;
         this.visible = true;
       } catch (e) {
-        console.error("taskpool or accept openDialog error", e);
+        console.error('taskpool or accept openDialog error', e);
       }
     },
     submit(change = true) {

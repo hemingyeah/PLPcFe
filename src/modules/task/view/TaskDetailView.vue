@@ -1,57 +1,62 @@
 <template>
   <div class="page-container task-detail-container">
     <!-- start 顶部操作区 -->
-    <div class="task-tool-bar" v-if="!isDelete">
-      <div class="task-toolbar-left">
-        <button type="button" class="btn btn-text" @click="jump" v-if="allowEditTask">
-          <i class="iconfont icon-edit"></i> 编辑
-        </button>
-        <button type="button" class="btn btn-text" @click="deleteTask" v-if="allowDeleteTask">
-          <i class="iconfont icon-yemianshanchu"></i> 删除
-        </button>
-      </div>
+    <div class="task-tool-bar">
+      <template v-if="!isDelete">
+        <div class="task-toolbar-left">
+          <button type="button" class="btn btn-text" @click="jump" v-if="allowEditTask">
+            <i class="iconfont icon-edit"></i> 编辑
+          </button>
+          <button type="button" class="btn btn-text" @click="deleteTask" v-if="allowDeleteTask">
+            <i class="iconfont icon-yemianshanchu"></i> 删除
+          </button>
+        </div>
 
-      <div class="task-toolbar-right action-btn">
-        <base-button type="plain" @event="backTask" v-if="allowBackTask">回退工单</base-button>
-        <base-button type="plain" @event="openDialog('cancel')" v-if="allowCancelTask">取消工单</base-button>
-        <base-button type="plain" @event="openDialog('acceptFromPool')" v-if="allowPoolTask">接单</base-button>
-        <base-button type="plain" @event="pauseDialog.visible = true" v-if="allowPauseTask">暂停</base-button>
-        <base-button type="plain" @event="unpause" v-if="allowGoOnTask" :disabled="pending">继续</base-button>
-        <base-button type="plain" @event="openDialog('accept')" v-if="allowAcceptTask">接受</base-button>
-        <base-button type="plain" @event="refuseTask" v-if="allowRefuseTask" :disabled="pending">拒绝</base-button>
-        <base-button type="plain" @event="startTask" v-if="allowStartTask" :disabled="pending">开始</base-button>
-        <base-button type="plain" @event="finishTask" v-if="allowFinishTask" :disabled="pending">回执完成</base-button>
-        <base-button type="plain" @event="allot" v-if="allowAllotTask" :disabled="pending">指派</base-button>
-        <base-button type="plain" @event="redeploy" v-if="allowRedeployTask" :disabled="pending">转派</base-button>
-        <base-button type="plain" @event="printTask" v-if="allowPrintTask" :disabled="pending">打印工单</base-button>
+        <div class="task-toolbar-right action-btn">
+          <base-button type="ghost" @event="backTask" :disabled="pending" v-if="allowBackTask">回退工单</base-button>
+          <base-button type="ghost" @event="openDialog('cancel')" :disabled="pending" v-if="allowCancelTask">取消工单</base-button>
+          <base-button type="primary" @event="openDialog('acceptFromPool')" :disabled="pending" v-if="allowPoolTask">接单</base-button>
+          <base-button type="primary" @event="openDialog('pause')" :disabled="pending" v-if="allowPauseTask">暂停</base-button>
+          <base-button type="primary" @event="unpause" :disabled="pending" v-if="allowGoOnTask">继续</base-button>
+          <base-button type="primary" @event="openDialog('accept')" :disabled="pending" v-if="allowAcceptTask">接受</base-button>
+          <base-button type="danger" @event="refuseTask" :disabled="pending" v-if="allowRefuseTask">拒绝</base-button>
+          <base-button type="primary" @event="startTask" :disabled="pending" v-if="allowStartTask">开始</base-button>
+          <base-button type="primary" @event="finishTask" :disabled="pending" v-if="allowFinishTask">回执完成</base-button>
+          <base-button type="primary" @event="allot" :disabled="pending" v-if="allowAllotTask">指派</base-button>
+          <base-button type="primary" @event="redeploy" :disabled="pending" v-if="allowRedeployTask">转派</base-button>
+          <base-button type="primary" :class="{'once-printed': task.oncePrinted == 1}" @event="printTask" :disabled="pending" v-if="allowPrintTask">打印工单</base-button>
 
-        <!-- start 服务报告 -->
-        <template v-if="allowServiceReport">
-          <base-button type="plain" @event="printTask" v-if="srSysTemplate || srSysTemplate == null" :disabled="pending">服务报告</base-button>
+          <!-- start 服务报告 -->
+          <template v-if="allowServiceReport">
+            <base-button type="primary" @event="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null">服务报告</base-button>
 
-          <el-dropdown trigger="click" v-if="!srSysTemplate && srSysTemplate != null">
-            <span class="el-dropdown-link el-dropdown-btn">服务报告</span>
+            <el-dropdown trigger="click" v-if="!srSysTemplate && srSysTemplate != null">
+              <span class="el-dropdown-link el-dropdown-btn">服务报告</span>
 
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
-                <el-tooltip class="item" effect="dark" content="如果图片过多导致文件过大，将会返回Excel格式，需要您自行另存为PDF格式" placement="left-start">
-                  <a class="link-of-dropdown" href="javascript:;" @click.prevent="createReport(true)">PDF格式</a>
-                </el-tooltip>
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <a class="link-of-dropdown" href="javascript:;" @click.prevent="createReport(false)">Excel格式</a>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </template>
-        <!-- end 服务报告 -->
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <el-tooltip class="item" effect="dark" content="如果图片过多导致文件过大，将会返回Excel格式，需要您自行另存为PDF格式" placement="left-start">
+                    <a class="link-of-dropdown" href="javascript:;" @click.prevent="createReport(true)">PDF格式</a>
+                  </el-tooltip>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <a class="link-of-dropdown" href="javascript:;" @click.prevent="createReport(false)">Excel格式</a>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+          <!-- end 服务报告 -->
 
-        <base-button type="plain" @event="offApprove" v-if="allowoffApprove" :disabled="pending">撤回审批</base-button>
-      </div>
+          <base-button type="primary" @event="openDialog('approve')" :disabled="pending" v-if="allowApprove">审批</base-button>
+          <base-button type="primary" @event="offApprove" :disabled="pending" v-if="allowoffApprove">撤回审批</base-button>
+        </div>
+      </template>
+      <div class="task-isDelete" v-else>[已删除]</div>
     </div>
     <!-- end 顶部操作区 -->
 
     <div class="main-content" v-loading="loading">
+      <!-- start 工单信息 -->
       <div class="task-detail">
         <form-view :fields="fields" :value="task">
           <template slot="taskNo" slot-scope="{ field, value }">
@@ -118,6 +123,18 @@
 
         </form-view>
       </div>
+      <!-- end 工单信息 -->
+
+      <!-- start 关联数据 -->
+      <div class="task-relation" v-if="this.task.id">
+        <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
+        <div class="task-relation-content">
+          <keep-alive>
+            <component :is="currTab" :share-data="propsForSubComponents" :init-data="initData"></component>
+          </keep-alive>
+        </div>
+      </div>
+      <!-- end 关联数据 -->
     </div>
 
     <!-- start 回退工单弹窗 -->
@@ -137,7 +154,7 @@
     <cancel-task-dialog
       ref="cancelTaskDialog"
       :task-id="task.id"
-      :unFinished="unFinishedState"
+      :un-finished="unFinishedState"
     />
     <!-- end 取消工单弹窗 -->
 
@@ -172,6 +189,20 @@
       :init-data="initData"
     />
     <!-- end 计划时间弹窗 -->
+
+    <!-- start 审批弹窗 -->
+    <task-approve-dialog
+      ref="approveTaskDialog"
+      :approve-id="unFinishedAppr.id"
+    />
+    <!-- end 审批弹窗 -->
+
+    <!-- start 工单发起审批弹窗 -->
+    <propose-approve-dialog
+      ref="proposeApprove"
+      :remark-required="taskConfig.approveRemark"
+    />
+    <!-- end 工单发起审批弹窗 -->
   </div>
 </template>
 
