@@ -228,8 +228,8 @@ export default {
         },
         update(event) {
           /**
-             * 选择团队使用的是单独的组件，不是统一的form组件，所以更新时的返回值不同，需要特殊处理
-             */
+           * 选择团队使用的是单独的组件，不是统一的form组件，所以更新时的返回值不同，需要特殊处理
+          */
           if (this.selectedField.fieldName === 'customer') {
             this.form[this.selectedField.fieldName] = event;
             return
@@ -312,7 +312,10 @@ export default {
                   placeholder: '请输入关键词搜索',
                 },
                 on: {
-                  input: event => this.update(event)
+                  input: event => {
+                    this.update(event)
+                    this.$forceUpdate()
+                  }
                 }
               },
               this.inputRemoteSearch.customer.options
