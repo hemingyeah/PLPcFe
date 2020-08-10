@@ -307,7 +307,7 @@
 
           <el-select
             v-model="model.type"
-            @change="chooseState"
+            @change="chooseApplyType"
             class="srp-list-form-item"
             style="width: 150px;"
             multiple
@@ -462,12 +462,13 @@
     </div>
 
     <div style="background: #fff;padding: 0 10px">
-      <base-selection-bar
-        ref="baseSelectionBar"
-        v-model="selected"
-        @toggle-selection="toggleSelection"
-        @show-panel="() => multipleSelectionPanelShow = true"
-      />
+      <div class="tooltipWrapper" v-show="selected.length">您已选择
+        <el-tooltip class="item" content="可点击查看详情" placement="top">
+          <span class="toolText" @click="multipleSelectionPanelShow = true">{{selected.length}}</span>
+        </el-tooltip>
+        条数据
+        <span class="toolText" @click="toggleSelection()">清空</span>
+      </div>
     </div>
 
     <div class="table-container">
@@ -487,7 +488,6 @@
           v-for="column in columns.filter(item=>item.show)"
           :key="column.field"
           :prop="column.field"
-          v-if="column.show"
           :label="column.label"
           :width="column.width"
           :min-width="column.minWidth"
@@ -579,12 +579,6 @@
                 {{scope.row.approveNo}}
               </a>
               <!-- <div class="el-tooltip" v-else>{{scope.row.approveNo}}</div> -->
-            </template>
-            <template v-else-if="column.field == 'remark'">
-              <el-tooltip placement="top" popper-class="common-tooltip">
-                <div slot="content" class="pre">{{scope.row.remark}}</div>
-                <div class="text-overflow-hidden">{{scope.row.remark || ''}}</div>
-              </el-tooltip>
             </template>
             <template v-else-if="column.field == 'variation'">
               <!-- <template v-if="scope.row.variation == scope.row.solvedVariation">{{scope.row.variation}}</template> -->
@@ -756,11 +750,36 @@
                 <!--<button @click="logRow(scope.row)">test</button>-->
               </template>
             </template>
-            <template v-else-if="column.field == 'state'">{{scope.row[column.field] | state}}</template>
+            <template v-else-if="column.field == 'state'">
+              <div :class='`state-text state-${scope.row[column.field]}`'>{{scope.row[column.field] | state}}</div>
+            </template>
+            <template v-else-if="column.field == 'showNum'">{{Number(scope.row[column.field])}}</template>
             <template
               v-else-if="column.field === 'applyCount'"
             >{{`${scope.row['unsolved'] || 0}/${scope.row['solved'] || 0}`}}</template>
-            <template v-else-if="column.field == 'sparepartName'">{{`${scope.row[column.field]}${scope.row['partSize']>0?`等${scope.row['partSize']}个`:''}`}}</template>
+            <template v-else-if="column.field == 'sparepartIds'">
+              <div>
+                <span v-if="scope.row.showState==='close'">
+                  <span v-for="(item,index) in scope.row[column.field].slice(0,3)" :key='index'><img v-if="scope.row.targetId[index]==='true'" style="display:inline-block;width:13px;" src="../../../assets/img/partGou.png" alt="" title='该备件已完成办理'> {{item}}<br></span>
+                </span>
+                <span v-else>
+                  <span v-for="(item,index) in scope.row[column.field]" :key='index'><img v-if="scope.row.targetId[index]==='true'" style="display:inline-block;width:13px;" src="../../../assets/img/partGou.png" alt="" title='该备件已完成办理'> {{item}}<br></span>
+                </span>
+                <span v-if="scope.row[column.field].length>3 && scope.row.showState==='close'">等{{scope.row[column.field].length}}个</span>
+                <i v-if="scope.row.showState" :class="scope.row.showState==='close'?'el-icon-arrow-down showMore':'el-icon-arrow-up showMore'" @click="showMore(scope.$index)"></i>
+              </div>
+            </template>
+            <template v-else-if="column.field == 'remark'">
+              <el-popover
+                placement="top"
+                width="300"
+                trigger="hover"
+                @show='remarkShow(scope.row.approveNo,scope.$index)'
+              >
+                <span v-html='scope.row.remarkDetail'></span>
+                <span slot="reference" style='overflow: hidden;text-overflow:ellipsis;white-space: nowrap;display:inline-block;min-width:50px;min-height:16px;'>{{scope.row.remark}}</span>
+              </el-popover>
+            </template>
             
             <template v-else>{{scope.row[column.field]}}</template>
           </template>
@@ -810,12 +829,13 @@
       </el-dialog>
 
       <el-dialog
-        :title="`申请单详情-${partDealData.data ? partDealData.data.type : ''}`"
+        :title="partDealTitle"
         :visible.sync="partDealDialog"
-        width="900px"
+        width="90%"
+        @open='partDearOpen'
         :close-on-click-modal="false"
       >
-        <part-deal-with-form ref="partDealWithForm" :prop-data="partDealData"></part-deal-with-form>
+        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' :prop-data="partDealData"></part-deal-with-form>
 
         <div
           slot="footer"
@@ -1006,7 +1026,7 @@
       <base-export
         ref="exportPanel"
         v-if="allowImportAndExport"
-        :columns="columns"
+        :columns="exportColumns"
         :validate="checkExportCount"
         action="/partV2/approve/approveExport"
         :method="'post'"
@@ -1073,7 +1093,8 @@ import {
   rejectBatch,
   revokeBatch,
   approveBatch,
-  getRelationListByApproveNo
+  getRelationListByApproveNo,
+  getProgress
 } from '@src/api/SparePart';
 import StorageUtil from '@src/util/storageUtil';
 
@@ -1102,7 +1123,8 @@ export default {
 
     return {
       stateArr: [
-        { value: 'suspending', label: '待处理', key: 'suspending' },
+        { value: '', label: '状态：全部', key: 'all' },
+        { value: 'suspending', label: '待办理', key: 'suspending' },
         { value: 'solved', label: '已办理', key: 'solved' },
         { value: 'rejected', label: '已拒绝', key: 'rejected' },
         { value: 'cancel', label: '已取消', key: 'cancel' },
@@ -1111,6 +1133,7 @@ export default {
       selectedLimit: 500,
       auths: {},
       columns: this.buildColumns(),
+      exportColumns:this.builcExportColumns(),  // 先不导出备注，后面后台实现删除，用回 columns
       isExpand: false,
       pending: false,
       userName: '',
@@ -1152,8 +1175,10 @@ export default {
       partDealDialog: false, // 新处理弹窗显隐判断条件
       partDealData: {
         data: {},
-        arr: []
+        arr: [],
+        progress:[]
       }, // 新处理弹窗需要的数据
+      partDealTitle:'', // 新处理弹窗标题
       repertory: [], // 所有原始仓库
       repertories: [], // 所有仓库
       repertory_1: [],
@@ -1207,7 +1232,8 @@ export default {
           { required: true, message: '请填写拒绝理由', trigger: 'change' }
         ]
       },
-      cancelType: 0 // 0 拒绝 1 撤销
+      cancelType: 0, // 0 拒绝 1 撤销
+      partDealKey:1
     };
   },
   computed: {
@@ -1242,8 +1268,8 @@ export default {
   },
   filters: {
     state(s) {
-      if (s === 'solved') return '已处理';
-      if (s === 'suspending') return '待处理';
+      if (s === 'solved') return '已办理';
+      if (s === 'suspending') return '待办理';
       if (s === 'cancel') return '已取消';
       if (s === 'rejected') return '已拒绝';
       if (s === 'revoked') return '已撤回';
@@ -1251,6 +1277,56 @@ export default {
     }
   },
   methods: {
+    // 打开详情弹窗
+    partDearOpen(){
+      this.partDealKey++;
+      if(this.$refs.partDealWithForm){
+        this.$refs.partDealWithForm.suggestion='';
+      }
+    },
+    // 显示详细备注
+    remarkShow(approveNo,index){
+      if(!this.page.list[index].remarkReq){
+        getProgress({approveNo}).then(res=>{
+          if(res.success){
+            const result=res.result.data;
+            this.page.list[index].remarkReq=true;
+            let content='';
+            let applyRemark='';
+            const applyItem=result.find(item=>item.state===0);
+            if(applyItem){
+              applyRemark=`申请人：${applyItem.remark}`;
+            }
+            let handleRemark='';
+            const handleItems=result.filter(item=>item.state!==0);
+            if(handleItems.length>0){
+              handleRemark='办理人：';
+              handleItems.forEach(item=>{
+                handleRemark+=item.remark+'；';
+              });
+            }
+            if(handleRemark && applyRemark){
+              content=`${applyRemark}<br>------------------------------------------<br>${handleRemark}`;
+            }else if(!applyRemark){
+              content=handleRemark;
+            }else if(!handleRemark){
+              content=applyRemark;
+            }
+            this.page.list[index].remarkDetail=content;
+          }else{
+            this.$platform.toast(res.message, 'error');
+          }
+        }).catch(err=>{});
+      }
+    },
+    // 显示剩余备件信息
+    showMore(index){
+      if(this.page.list[index].showState==='close'){
+        this.page.list[index].showState='open';
+      }else{
+        this.page.list[index].showState='close';
+      }
+    },
     rest_rejectForm() {
       if (this.$refs['rejectForm']) {
         this.$refs['rejectForm'].resetFields();
@@ -1406,7 +1482,7 @@ export default {
       }
       this.selected = tv;
 
-      this.$refs.baseSelectionBar.openTooltip();
+      // this.$refs.baseSelectionBar.openTooltip();
     },
     computeSelection(selection) {
       let tv = [];
@@ -1640,6 +1716,13 @@ export default {
             item = this.judgeRelationshipBetweenUserAndRepertory(item);
             return item;
           });
+          list.forEach(item=>{
+            if(item.sparepartIds.length>3){
+              item.showState='close';
+            }
+            item.remarkDetail='';   // 备注详情
+            item.remarkReq=false;   // 是否已请求过备注详情
+          })
           return {
             ...result.data,
             list
@@ -1714,12 +1797,16 @@ export default {
     chooseState(value) {
       this.stateTrackEventHandler(value);
 
-      // this.state = value;
-      // if(value){
-      //   this.model.state = value
-      // }else{
-      //   delete this.model.state
-      // }
+      if(value.length && value[value.length-1]===''){
+        this.model.state=[''];
+      }else if(value.length && value[value.length-1]){
+        this.model.state=this.model.state.filter(item=>item);
+      }
+
+      this.model.pageNum = 1;
+      this.loadData();
+    },
+    chooseApplyType(value){
       this.model.pageNum = 1;
       this.loadData();
     },
@@ -2121,12 +2208,12 @@ export default {
         .then(res => {
           let arr = [];
           res.propData.arr.forEach(item => {
-            if (item.number > 0) {
+            if (item.handleNum > 0) {
               arr.push({
                 approveNo: res.propData.data.approveNo,
                 id: item.id,
                 remark: res.suggestion,
-                solvedVariation: item.number,
+                solvedVariation: item.handleNum,
                 type: res.propData.data.type
               });
             }
@@ -2196,7 +2283,146 @@ export default {
           width: 160
         },
         {
-          label: '办理编号',
+          label: '申请编号',
+          exportAlias: 'approveNo',
+          field: 'approveNo',
+          overflow: true,
+          show: true,
+          width: 160,
+          clickFnc: obj => {
+            this.showPartDealDetail(obj);
+          }
+        },
+        {
+          label: '状态',
+          exportAlias: 'state',
+          field: 'state',
+          // sortable: "state",
+          width: 90,
+          overflow: true,
+          show: true
+        },
+        {
+          label: '申请类别',
+          exportAlias: 'type',
+          field: 'type',
+          width: 90,
+          overflow: true,
+          show: true
+        },
+        {
+          label: '备件名称/编号/规格',
+          field: 'sparepartIds',
+          exportAlias: 'sparepartName',
+          show: true,
+          minWidth: 350,
+          overflow: false,
+        },
+        {
+          label: '申请数量',
+          exportAlias: 'variation',
+          field: 'showNum',
+          width: 90,
+          overflow: true,
+          show: true
+        },
+        {
+          label: '待办数/已办数',
+          field: 'applyCount',
+          exportAlias: 'pendingVariation,solvedVariation',
+          show: true,
+          width: 110
+        },
+        {
+          label: '金额(¥)',
+          exportAlias: 'price',
+          field: 'showPrice',
+          width: 100,
+          overflow: true,
+          show: true
+        },
+        {
+          label: '目标仓库',
+          field: 'targetName',
+          exportAlias: 'targetName',
+          show: true,
+          minWidth: 120,
+          overflow: true
+        },
+        {
+          label: '原始仓库',
+          field: 'sourceTargetName',
+          exportAlias: 'sourceName',
+          show: true,
+          minWidth: 120,
+          overflow: true
+        },
+        {
+          label: '申请人',
+          field: 'prosperName',
+          exportAlias: 'prosperName',
+          width: 90,
+          overflow: true,
+          show: true
+        },
+        {
+          label: '备注',
+          field: 'remark',
+          exportAlias: 'remark',
+          show: true,
+          minWidth: 100,
+          overflow: false,
+        },
+        
+        {
+          field: 'approveName',
+          label: '办理人',
+          exportAlias: 'executorName',
+          show: true,
+          width: 100,
+          overflow: true
+        },
+        {
+          field: 'approveTime',
+          label: '办理时间',
+          exportAlias: 'updateTime',
+          show: true,
+          width: 160,
+          overflow: false
+          // sortable: "approveTime"
+        },
+        {
+          label: '操作',
+          field: 'enable',
+          width: '150px',
+          show: true,
+          fixed: 'right',
+          export: false
+        }
+      ];
+
+      columns.forEach(column => {
+        let isShow = localData[column.field];
+        if (typeof isShow == 'boolean') column.show = isShow;
+      });
+
+      return columns;
+    },
+    // 暂时，备注&备件信息不导出，后台实现后删除
+    builcExportColumns(){
+      let localData = StorageUtil.get(STORAGE_COLNUM_KEY) || {};
+
+      let columns = [
+        {
+          label: '申请日期',
+          field: 'prosperTime',
+          exportAlias: 'proposeTime',
+          show: true,
+          // sortable: "custom",
+          width: 160
+        },
+        {
+          label: '申请编号',
           exportAlias: 'approveNo',
           field: 'approveNo',
           overflow: true,
@@ -2223,14 +2449,14 @@ export default {
           overflow: true,
           show: true
         },
-        {
-          label: '申请备件名称',
-          field: 'sparepartName',
-          exportAlias: 'sparepartName',
-          show: true,
-          minWidth: 170,
-          overflow: true
-        },
+        // {
+        //   label: '备件名称/编号/规格',
+        //   field: 'sparepartIds',
+        //   exportAlias: 'sparepartName',
+        //   show: true,
+        //   minWidth: 170,
+        //   overflow: false,
+        // },
         {
           label: '申请数量',
           exportAlias: 'variation',
@@ -2264,14 +2490,13 @@ export default {
           overflow: true
         },
         {
-          label: '发起人',
+          label: '申请人',
           field: 'prosperName',
           exportAlias: 'prosperName',
           width: 100,
           overflow: true,
           show: true
         },
-
         {
           label: '待办数/已办数',
           field: 'applyCount',
@@ -2444,8 +2669,15 @@ export default {
         
         if (result.relations.length > 0) {
           result.relations = result.relations.map(item => {
+            item.handleNum='';
+            item.checked=false;
             item.variation = Math.abs(item.variation);
             item.solvedVariation = Math.abs(item.solvedVariation);
+            if(item.variation===item.solvedVariation){
+              item.disabled=true;
+            }else{
+              item.disabled=false;
+            }
             item['number'] = Math.abs(item.variation) - (Math.abs(item.solvedVariation) || 0);
             return item;
           });
@@ -2467,20 +2699,32 @@ export default {
             suggestion,
             remark: result.list.remark || '',
             staffs: result.staffs
-          }
+          },
+          progress:result.progress
         };
+        if(this.partDealData.data.state==='suspending'){
+          this.partDealTitle=`申请单-${this.partDealData.data.type}`;
+        }else{
+          this.partDealTitle='出入库单详情';
+        }
         this.partDealDialog = true;
       });
     }
   },
   mounted() {
     let initData = this.initData;
+    if(window.location.search==='?fromId=1'){
+      this.model.type='分配';
+    }
 
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || {};
     this.userId = initData.userId || '';
     this.userName = initData.userName || '';
     this.isPersonalRepertory = initData.isPersonalRepertory || false;
+    if(location.search && this.isPersonalRepertory){
+      this.model.type=['分配'];
+    }
 
     this.initialize();
   },
@@ -2688,5 +2932,58 @@ a {
 .ding-btn {
   color: $color-ding-blue;
   cursor: pointer;
+}
+
+.showMore{
+  color:$color-primary;
+  cursor:pointer;
+}
+</style>
+
+<style lang='scss' scoped>
+.tooltipWrapper{
+  background: #fe8b2514;
+  font-size: 12px;
+  padding: 0 7px;
+  line-height: 28px;
+
+  .toolText{
+    cursor: pointer;
+    color:$color-primary;
+  }
+}
+
+.state-text{
+  border-radius: 11px;
+  text-align: center;
+  width: 54px;
+  height: 22px;
+  font-size: 12px;
+  box-sizing: border-box;
+  line-height: 20px;
+}
+// 已办理
+.state-solved{
+  color:#67C23A;
+  background: rgba(103,194,58,.2);
+  border:1px solid rgba(103,194,58,.16);
+}
+// 待办理
+.state-suspending{
+  color:#FAAE14;
+  background: rgba(250,174,20,.2);
+  border:1px solid rgba(250,174,20,.16);
+}
+// 已取消,已撤回
+.state-cancel,.state-revoked{
+  color:#999999;
+  background: rgba(153,153,153,.2);
+  border:1px solid rgba(153,153,153,.16);
+}
+// 已拒绝
+.state-rejected{
+  color:#F56C6C;
+  background: rgba(245,108,108,.2);
+  border:1px solid rgba(245,108,108,.16);
 }
 </style>

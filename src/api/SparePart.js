@@ -19,5 +19,6 @@ export function getRelationListByApproveNo(params = {}) {
   return http.get(`${urlHead}/outside/dd/part/approveList/getRelationListByApproveNo`, params)
 }
 
-
-
+export function getProgress(params={}){
+  return http.get(`${urlHead}/outside/dd/part/approveList/getProgress`,params);
+}

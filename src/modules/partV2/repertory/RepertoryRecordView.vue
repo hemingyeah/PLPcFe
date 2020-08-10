@@ -884,6 +884,10 @@ export default {
   },
   async created(){
     let initData = this.initData;
+    const href = window.location.href;
+    if(href.indexOf('?fromId') > -1){
+      this.model.keyWord = href.split('?fromId=')[1];
+    }
 
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || [];

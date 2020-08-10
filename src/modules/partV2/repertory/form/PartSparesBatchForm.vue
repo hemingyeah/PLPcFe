@@ -251,11 +251,11 @@ export default {
     choosePart(value, row){
       let id = `${row.repertory }_${ value.sparepart.id}`;
       
-      // if(this.hasRow(id)) {
-      //   this.$platform.toast('该记录已存在！', "warning");
-      //   row.sparepart = ''
-      //   return
-      // }
+      if(this.hasRow(id)) {
+        this.$platform.toast('该记录已存在！', "warning");
+        row.sparepart = ''
+        return
+      }
       row['_id'] = id;
       row.sparepart = value.sparepart.id;
       row.sparepartName = value.sparepart.name;
