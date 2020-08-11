@@ -555,9 +555,12 @@ const FormDesign = {
       if (!await Platform.confirm(tip)) return;
       let isNext = true;
       //mode:task为工单设置form
-      if(this.mode == "task" && item.formType == "user" && item.id) {
+      //mode:task_receipt为回执工单设置form
+      if(this.mode == "task" || this.mode == "task_receipt"
+          && item.formType == "user" && item.id) {
         isNext = await this.deleteUser(item);
       }
+
       if(!isNext) {
         return false;
       }
@@ -583,8 +586,14 @@ const FormDesign = {
           let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果删除，对应的审批流程将设置为“无需审批”，确定要删除吗？');
           if(confirm) {
             //取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
-            let result = await  http.post("/setting/fieldInfo/confirm",{ id : item.id },false);
-            return true;
+            let result = await  http.post("/setting/fieldInfo/delete2",{ id : item.id },false);
+            console.log(result)
+            if(result.code) {
+              this.$platform.alert(result.message);
+              return false;
+            }else{
+              return true;
+            }
           }else{
             return false;
           }
@@ -596,6 +605,7 @@ const FormDesign = {
       }
 
     },
+
     /** 添加新字段 */
     insertField(option = {}, value, index) {
       let newField = new FormField({

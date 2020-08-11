@@ -38,7 +38,8 @@ export default {
     async isNullUserField() {
       let { id , isNull } = this.field;
       //mode:task为工单设置form
-      if(this.mode === 'task' && id && isNull) {
+      if(this.mode === 'task' || this.mode === "task_receipt"
+          && id && isNull) {
         //后端已经存在的人员字段，如果从必填变成非必填，与后端做交互
         let result = await http.post("/setting/fieldInfo/check", { id },false);
         if(result.status == 0) {
@@ -59,6 +60,9 @@ export default {
     async cancelFormUserAprover(id) {
       //取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
       let result = await  http.post("/setting/fieldInfo/confirm",{ id },false);
+      if(result.status) {
+        this.$platform.alert(result.message);
+      }
     }
   }
 }

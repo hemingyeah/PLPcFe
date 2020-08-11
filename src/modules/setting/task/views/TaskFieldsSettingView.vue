@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-task" v-loading="pending">
+  <div class="setting-task" v-loading.fullscreen.lock="pending">
     <div class="setting-task-header">
       <p>工单表单设置  |  配置创建工单时填写的表单</p>
       <div v-if="false">
