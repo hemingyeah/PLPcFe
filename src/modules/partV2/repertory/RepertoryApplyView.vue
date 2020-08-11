@@ -1305,6 +1305,7 @@ export default {
               handleItems.forEach(item=>{
                 handleRemark+=item.remark+'；';
               });
+              handleRemark=handleRemark.slice(0,-1);
             }
             if(handleRemark && applyRemark){
               content=`${applyRemark}<br>------------------------------------------<br>${handleRemark}`;
