@@ -112,12 +112,12 @@
     <div class="mar-b-20" style="margin-top:20px;">
       <div class="mar-b-15 font-w-500">办理日志</div>
       <p class="partP" v-for="item in logs" :key='item.id'>
-        <span style="width:130px;">办理人：{{item.executorName}}</span>
+        <span style="width:180px;" :title="item.executorName">办理人：{{item.executorName}}</span>
         <span style="width:230px;">办理时间：{{formmatTime(item.createTime)}}</span>
         <!-- <span style="width:230px;">出入库编号：
           <span style="color:#55b7b4;cursor:pointer;" @click="toWareRecord(item.approveNo)">{{item.approveNo}}</span>
         </span> -->
-        <span style="width:calc(100% - 610px);">办理意见：{{item.remark}}</span>
+        <span style="width:calc(100% - 430px);" :title='item.remark'>办理意见：{{item.remark}}</span>
       </p>
     </div>
     <!-- 办理日志 end -->
@@ -617,6 +617,9 @@ export default {
 .partP{
   span{
     display: inline-block;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
   }
 }
 </style>
