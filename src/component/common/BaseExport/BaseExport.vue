@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="导出列选择" :show.sync="visible" width="60px" class="base-export-modal">
+  <base-modal title="导出列选择" :show.sync="visible" width="650px" class="base-export-modal">
     <div>
       <el-checkbox v-model="isCheckedAll" @change="toggle">全选</el-checkbox>
     </div>
