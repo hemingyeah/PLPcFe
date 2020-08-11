@@ -2456,7 +2456,7 @@ export default {
           show: true
         },
         {
-          label: '备件信息',
+          label: '备件名称/编号/规格',
           field: 'sparepartIds',
           exportAlias: 'sparepartName',
           show: true,
