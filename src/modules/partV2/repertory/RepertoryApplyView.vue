@@ -1573,7 +1573,8 @@ export default {
       this.userApprove.approveId = '';
       this.targetType = '备件库';
       this.userApprove.options = _.cloneDeep(allPerson);
-      this.sparepart.options = _.cloneDeep(allPerson);
+      // this.sparepart.options = _.cloneDeep(allPerson);
+      this.sparepart.sparepartName='';
       this.repertory_1 = this.repertories;
       this.repertory_2 = this.repertories;
       this.timeValue = [];
@@ -2450,7 +2451,7 @@ export default {
           show: true
         },
         // {
-        //   label: '备件名称/编号/规格',
+        //   label: '备件信息',
         //   field: 'sparepartIds',
         //   exportAlias: 'sparepartName',
         //   show: true,
@@ -2528,7 +2529,15 @@ export default {
           show: true,
           fixed: 'right',
           export: false
-        }
+        },
+        // {
+        //   label: '备注',
+        //   field: 'remark',
+        //   exportAlias: 'remark',
+        //   show: true,
+        //   minWidth: 100,
+        //   overflow: false,
+        // },
       ];
 
       columns.forEach(column => {
