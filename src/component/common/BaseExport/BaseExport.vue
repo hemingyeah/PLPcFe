@@ -176,7 +176,6 @@ export default {
           ajax=objHttp
             .post(this.action, model, true)
             .then(res => {
-              console.log(res);
               this.visible = false;
               this.pending = false;
 
