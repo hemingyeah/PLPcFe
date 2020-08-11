@@ -69,11 +69,12 @@ export default {
 
         let planTime = this.task.planTime || '';
 
-        // 修改计划时间时直接显示弹窗
+        // 修改计划时间时重置数据并显示弹窗
         if (action === 'modifyPlanTime') {
           this.planTime = planTime;
           this.sendSMS = false;
           this.pending = false;
+
           this.visible = true;
           return;
         }
@@ -93,7 +94,14 @@ export default {
         this.planTime = planTime;
 
         // 工单设置禁用了修改计划时间并且有计划时间
-        if (!this.initData.taskConfig.taskPlanTime && planTime) return this.submit(false);
+        if (!this.initData.taskConfig.taskPlanTime && planTime) {
+
+          // 上边已经对格式为日期时格式化了，现禁止修改计划时间，所以初始化为原始值
+          if (this.dateType == 'date') this.planTime = this.task.planTime;
+
+          this.submit(false);
+          return;
+        }
         
         this.pending = false;
         this.visible = true;
@@ -101,8 +109,8 @@ export default {
         console.error('taskpool or accept openDialog error', e);
       }
     },
-    submit(change = true) {
-      if (change && !this.planTime) return this.$platform.alert('请填写计划时间');
+    submit(modifiable = true) {
+      if (modifiable && !this.planTime) return this.$platform.alert('请填写计划时间');
 
       let params = {id: this.task.id, planTime: this.planTime};
       if (this.action == 'modifyPlanTime') {

@@ -95,15 +95,41 @@
           </template>
           <!-- end 客户字段 -->
 
-          <!-- 完成时间 -->
-          <template slot="completeTime" slot-scope="{ field, value }" v-if="task.state == 'finished' || task.state == 'costed' || task.state == 'closed'">
+          <!-- start 计划时间 -->
+          <template slot="planTime" slot-scope="{ field, value }">
             <div class="form-view-row">
-              <label>{{field.displayName}}</label>
-              <div class="form-view-row-content">{{value}}</div>
+              <label>{{ field.displayName }}</label>
+              <div class="form-view-row-content form-view-row-plantime">
+                {{ value }}
+                <template v-if="allowModifyPlanTime">
+                  <el-tooltip class="item" effect="dark" content="修改计划时间" placement="top">
+                    <i class="iconfont icon-edit" @click="openDialog('modifyPlanTime')"></i>
+                  </el-tooltip>
+                </template>
+              </div>
             </div>
           </template>
+          <!-- end 计划时间 -->
 
-          <!-- 协同人 -->
+          <!-- start 完成时间 -->
+          <template slot="completeTime" slot-scope="{ field }" v-if="finishedState">
+            <div class="form-view-row">
+              <label>{{field.displayName}}</label>
+              <div class="form-view-row-content">{{ task.completeTime | fmt_datetime }}</div>
+            </div>
+          </template>
+          <!-- end 完成时间 -->
+
+          <!-- start 满意度 -->
+          <template slot="degree" slot-scope="{ field }" v-if="task.isReview == 1">
+            <div class="form-view-row">
+              <label>{{field.displayName}}</label>
+              <div class="form-view-row-content">{{ task.degree }}</div>
+            </div>
+          </template>
+          <!-- end 满意度 -->
+
+          <!-- start 协同人 -->
           <template slot="synergies" slot-scope="{ field, value }">
             <div class="form-view-row">
               <label>{{field.displayName}}</label>
@@ -112,14 +138,16 @@
               </div>
             </div>
           </template>
+          <!-- end 协同人 -->
 
-          <!-- 工单状态 -->
+          <!-- start 工单状态 -->
           <template slot="state" slot-scope="{ field, value }">
             <div class="form-view-row">
               <label>{{field.displayName}}</label>
               <div class="form-view-row-content">{{stateText[value]}}</div>
             </div>
           </template>
+          <!-- end 工单状态 -->
 
         </form-view>
       </div>

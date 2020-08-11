@@ -462,6 +462,18 @@ export default {
       let { canLookCompleteReceipt, receiptDraft } = this.initData;
       return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.canApprove || canLookCompleteReceipt) && receiptDraft;
     },
+    /** 
+    * @description 工单信息中计划时间是否可以修改
+    * 1. 工单状态是accepted/processing其中一种
+    * 2. 当前登录账户是工单负责人
+    * 3. 工单存在计划时间
+    */
+    allowModifyPlanTime() {
+      let stateArr = ['accepted', 'processing'];
+      let { planTime, state } = this.task;
+
+      return this.isExecutor && planTime && stateArr.indexOf(state) >= 0;
+    },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
@@ -820,6 +832,9 @@ export default {
         displayName: '完成时间',
         fieldName: 'completeTime',
         formType: 'timestamp',
+      }, {
+        displayName: '满意度',
+        fieldName: 'degree'
       }, {
         displayName: '工单状态',
         fieldName: 'state',
