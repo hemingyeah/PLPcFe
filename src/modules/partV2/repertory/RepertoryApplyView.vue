@@ -1028,7 +1028,7 @@
         v-if="allowImportAndExport"
         :columns="exportColumns"
         :validate="checkExportCount"
-        action="/partV2/approve/approveExport"
+        action="/excels/approveExport"
         :method="'post'"
       ></base-export>
     </div>
@@ -2450,14 +2450,14 @@ export default {
           overflow: true,
           show: true
         },
-        // {
-        //   label: '备件信息',
-        //   field: 'sparepartIds',
-        //   exportAlias: 'sparepartName',
-        //   show: true,
-        //   minWidth: 170,
-        //   overflow: false,
-        // },
+        {
+          label: '备件信息',
+          field: 'sparepartIds',
+          exportAlias: 'sparepartName',
+          show: true,
+          minWidth: 170,
+          overflow: false,
+        },
         {
           label: '申请数量',
           exportAlias: 'variation',
@@ -2530,14 +2530,14 @@ export default {
           fixed: 'right',
           export: false
         },
-        // {
-        //   label: '备注',
-        //   field: 'remark',
-        //   exportAlias: 'remark',
-        //   show: true,
-        //   minWidth: 100,
-        //   overflow: false,
-        // },
+        {
+          label: '备注',
+          field: 'remark',
+          exportAlias: 'remark',
+          show: true,
+          minWidth: 100,
+          overflow: false,
+        },
       ];
 
       columns.forEach(column => {
