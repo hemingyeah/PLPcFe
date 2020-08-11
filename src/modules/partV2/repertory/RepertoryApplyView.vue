@@ -1030,6 +1030,7 @@
         :validate="checkExportCount"
         action="/excels/approveExport"
         :method="'post'"
+        :needObjReq='true'
       ></base-export>
     </div>
 
@@ -2419,6 +2420,7 @@ export default {
           field: 'prosperTime',
           exportAlias: 'proposeTime',
           show: true,
+          export: true,
           // sortable: "custom",
           width: 160
         },
@@ -2428,6 +2430,7 @@ export default {
           field: 'approveNo',
           overflow: true,
           show: true,
+          export: true,
           width: 200,
           clickFnc: obj => {
             this.showPartDealDetail(obj);
@@ -2439,6 +2442,7 @@ export default {
           field: 'state',
           // sortable: "state",
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2447,6 +2451,7 @@ export default {
           exportAlias: 'type',
           field: 'type',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2455,6 +2460,7 @@ export default {
           field: 'sparepartIds',
           exportAlias: 'sparepartName',
           show: true,
+          export: true,
           minWidth: 170,
           overflow: false,
         },
@@ -2463,6 +2469,7 @@ export default {
           exportAlias: 'variation',
           field: 'showNum',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2471,6 +2478,7 @@ export default {
           exportAlias: 'price',
           field: 'showPrice',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2479,6 +2487,7 @@ export default {
           field: 'targetName',
           exportAlias: 'targetName',
           show: true,
+          export: true,
           minWidth: 120,
           overflow: true
         },
@@ -2487,6 +2496,7 @@ export default {
           field: 'sourceTargetName',
           exportAlias: 'sourceName',
           show: true,
+          export: true,
           minWidth: 120,
           overflow: true
         },
@@ -2495,6 +2505,7 @@ export default {
           field: 'prosperName',
           exportAlias: 'prosperName',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2503,11 +2514,13 @@ export default {
           field: 'applyCount',
           exportAlias: 'pendingVariation,solvedVariation',
           show: true,
+          export: true,
           width: 160
         },
         {
           field: 'approveName',
           label: '办理人',
+          export: true,
           exportAlias: 'executorName',
           show: true,
           width: 100,
@@ -2516,6 +2529,7 @@ export default {
         {
           field: 'approveTime',
           label: '办理时间',
+          export: true,
           exportAlias: 'updateTime',
           show: true,
           width: 160,
@@ -2526,6 +2540,7 @@ export default {
           label: '操作',
           field: 'enable',
           width: '150px',
+          export: true,
           show: true,
           fixed: 'right',
           export: false
@@ -2534,6 +2549,7 @@ export default {
           label: '备注',
           field: 'remark',
           exportAlias: 'remark',
+          export: true,
           show: true,
           minWidth: 100,
           overflow: false,

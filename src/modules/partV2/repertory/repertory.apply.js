@@ -5,12 +5,12 @@ import mtracker from '@src/util/mtracker';
 import * as math from 'mathjs';
 
 import BaseCollapsePanel from 'packages/BaseCollapsePanel';
-import BaseExport from 'packages/BaseExport';
+// import BaseExport from 'packages/BaseExport';
 
 import RepertoryApplyView from './RepertoryApplyView.vue';
 
 Vue.component(BaseCollapsePanel.name, BaseCollapsePanel);
-Vue.component(BaseExport.name, BaseExport);
+// Vue.component(BaseExport.name, BaseExport);
 
 Vue.prototype.$tdOnEvent = function () {
 
