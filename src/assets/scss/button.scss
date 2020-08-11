@@ -71,3 +71,14 @@ $btn-color-primary-light-1: mix(#fff, $color-primary, 10%) !default;
     color: #fff;
   }
 }
+
+//返回按钮
+.btn-default{
+  background-color: #f4f4f4;
+  color: #333;
+  border-color: #adadad;
+
+  &:hover{
+    background-color: #e7e7e7;
+  }
+}

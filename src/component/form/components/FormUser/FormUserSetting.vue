@@ -8,7 +8,7 @@
       <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
     </div>
     <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
+      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" @change="isNullUserField" :true-label="0" :false-label="1">必填</el-checkbox>
       <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
       <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
     </div>
@@ -18,6 +18,7 @@
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
+import http from '@src/util/http';
 
 export default {
   name: 'form-user-setting',
@@ -33,6 +34,31 @@ export default {
     },
     update(value, prop){
       this.$emit('input', {value, prop})
+    },
+    async isNullUserField() {
+      let { id , isNull } = this.field;
+      //mode:task为工单设置form
+      if(this.mode === 'task' && id && isNull) {
+        //后端已经存在的人员字段，如果从必填变成非必填，与后端做交互
+        let result = await http.post("/setting/fieldInfo/check", { id },false);
+        if(result.status == 0) {
+          if(result.data && result.data.show == 1) {
+            //是审批人
+            let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果取消必填，对应的审批流程将设置为“无需审批”，确定要继续吗？');
+            if(confirm) {
+              this.cancelFormUserAprover(id);
+            }else{
+              this.field.isNull = 0;
+            }
+          }
+        }else{
+          console.log("校验审批人失败！");
+        }
+      }
+    },
+    async cancelFormUserAprover(id) {
+      //取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
+      let result = await  http.post("/setting/fieldInfo/confirm",{ id },false);
     }
   }
 }

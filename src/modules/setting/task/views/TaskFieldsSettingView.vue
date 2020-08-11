@@ -1,15 +1,22 @@
 <template>
-  <div class="setting-task">
+  <div class="setting-task" v-loading="pending">
     <div class="setting-task-header">
-      <div>
+      <p>工单表单设置  |  配置创建工单时填写的表单</p>
+      <div v-if="false">
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
-        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
+        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存测试</button>
       </div>
     </div>
     <div class="setting-task-design">
       <form-design v-model="fields" mode="task" v-if="init"></form-design>
     </div>
+
+    <div class="btn-content">
+      <button type="button" class="btn btn-default" style="margin-right:5px;" @click="back">返回</button>
+      <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">下一步</button>
+    </div>
+
   </div>
 </template>
 
@@ -84,15 +91,16 @@ export default {
             type: 'success',
             title: '成功',
             message: '工单字段更新成功'
-          })  
-          return window.location.reload()
+          })
+          window.location.href = "/setting/task/receipt";
+        }else{
+          platform.notification({
+            type: 'error',
+            title: '工单字段更新失败',
+            message: result.message
+          })
         }
 
-        platform.notification({
-          type: 'error',
-          title: '工单字段更新失败',
-          message: result.message
-        })
       } catch (error) {
         console.error(error)
       }
@@ -138,6 +146,12 @@ body{
     line-height: 12px;
     font-size: 12px;
   }
+}
+
+.btn-content{
+  position:fixed;
+  right:100px;
+  bottom:10px;
 }
 
 </style>
