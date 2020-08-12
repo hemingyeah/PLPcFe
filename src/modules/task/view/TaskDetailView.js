@@ -45,7 +45,7 @@ export default {
       // 拒绝工单弹窗
       refuseDialog: {
         visible: false,
-        remark: ''
+        reason: ''
       },
     }
   },
@@ -474,6 +474,19 @@ export default {
 
       return this.isExecutor && planTime && stateArr.indexOf(state) >= 0;
     },
+    /** 
+    * @description 是否显示DING按钮
+    * 1. 有工单查看权限 canViewTask
+    * 2. 且 在钉钉pc端
+    * 3. 且 有工单负责人
+    * 4. 且 工单不是关闭状态closed
+    */
+    allowDing() {
+      // 是否有负责人
+      let hasExecutor = this.task.executor && this.task.executor.userId;
+
+      return this.initData.canViewTask && parent.inDingTalkPC() && this.task.state != 'closed' && hasExecutor;
+    },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
@@ -537,6 +550,9 @@ export default {
       } else if (action === 'pause') {
         this.pauseDialog.reason = '';
         this.pauseDialog.visible = true;
+      } else if (action === 'refuse') {
+        this.refuseDialog.reason = '';
+        this.refuseDialog.visible = true;
       }
     },
     // 删除工单
@@ -664,70 +680,36 @@ export default {
       })
     },
     // 拒绝工单
-    refuseTask() {
-      this.pending = true;
-
-      TaskApi.refuseCheckTask({ id: this.task.id }).then(res => {
-        if (res.status == 0) {
-          this.refuseDialog.remark = '';
-          this.refuseDialog.visible = true;
-        } else {
-          this.$platform.alert(res.message);
-        }
-      })
-        .catch(err => console.log(err))
-        .finally(() => {
-          this.pending = false;
-        })
-    },
-    // 拒绝工单
     async refuse() {
-      let { remark } = this.refuseDialog;
-      if (!remark) return this.$platform.alert('请填写拒绝原因');
+      let reason = this.refuseDialog.reason.trim();
+      if (!reason) return this.$platform.alert('请填写拒绝原因');
 
       const result = await this.$platform.confirm('确认拒绝此工单吗？');
       if (!result) return;
 
       this.pending = true;
 
-      const params = { id: this.task.id, remark };
+      const params = { taskId: this.task.id, reason };
       TaskApi.refuseTask(params).then(res => {
-        if (res.status == 0) {
+        if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
           location.href = '/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute';
         } else {
           this.$platform.alert(res.message);
+          this.pending = false;
         }
+      }).catch(err => {
+        this.pending = false;
       })
-        .catch(err => console.log(err))
-        .finally(() => {
-          this.pending = false;
-        })
-    },
-    // 开始
-    async startTask() {
-      try {
-        this.pending = true;
-
-        let result = await TaskApi.checkNotNullForCard({ id: this.task.id, flow: 'start' });
-
-        if (result.status == 0) {
-          this.start();
-        } else {
-          this.$platform.alert(result.message);
-          this.pending = false;
-        }
-
-      } catch (e) {
-        console.error('startTask error', e);
-      }
     },
     // 开始
     start() {
-      TaskApi.startTask({ id: this.task.id }).then(res => {
-        if (res.status == 0) {
+      this.pending = true;
+      
+      TaskApi.startTask({ taskId: this.task.id }).then(res => {
+        if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
@@ -809,6 +791,19 @@ export default {
       } catch (e) {
         console.error('startTask error', e);
       }
+    },
+    // DING
+    ding(all = true) {
+      let users = [];
+      users.push(this.task.executor.staffId);
+      
+      // 所有人(工单负责人和协同人)
+      if (all && this.task.synergies && this.task.synergies.length > 0) {
+        this.task.synergies.forEach(item => users.push(item.staffId));
+      }
+
+      let {id, taskNo} = this.task;
+      window.parent.send_link_ding_message(users, taskNo, id);
     }
   },
   async mounted() {

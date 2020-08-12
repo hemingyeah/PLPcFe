@@ -193,13 +193,6 @@ export function rollBackTask(params) {
 }
 
 /** 
- * @description 取消工单
-*/
-export function cancelTask(params) {
-  return http.post('/task/off', params, true);
-}
-
-/** 
  * @description 暂停工单
 */
 export function pauseTask(params) {
@@ -214,31 +207,10 @@ export function unpauseTask(params) {
 }
 
 /** 
- * @description 拒绝工单验证
-*/
-export function refuseCheckTask(params) {
-  return http.get('/task/refuseCheck', params);
-}
-
-/** 
- * @description 拒绝工单
-*/
-export function refuseTask(params) {
-  return http.get('/task/refuse', params);
-}
-
-/** 
  * @description 检查附加组件是否必填
 */
 export function checkNotNullForCard(params) {
   return http.post('/task/checkNotNullForCard', params, false);
-}
-
-/** 
- * @description 开始工单
-*/
-export function startTask(params) {
-  return http.get('/task/start', params);
 }
 
 /** 
@@ -283,20 +255,6 @@ export function acceptFromPool(params) {
   return http.get('/task/acceptFromPool', params);
 }
 
-/** 
- * @description 修改计划时间
-*/
-export function modifyPlanTime(params) {
-  return http.post('/task/modifyPlanTime', params, false);
-}
-
-/** 
- * @description 接受工单
-*/
-export function accept(params) {
-  return http.get('/task/accept', params);
-}
-
 /**
  * @description 获取工单最近更新记录
  * @param {Object} params - 参数
@@ -316,9 +274,6 @@ export function getTaskCustonerProductList(params) {
 }
 
 /* -------------  end  旧工单api ---------------- */
-
-
-
 
 
 
@@ -342,6 +297,61 @@ export function getTaskTypes(){
  */
 export function taskList(params) {
   return http.post('/task/findList', params)
+}
+
+
+/** 
+ * 开始工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.planTime - 计划时间时间戳
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.tick - 是否勾选 1勾选 0不勾选
+*/
+export function startTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/start`, params);
+}
+
+/** 
+ * 接受工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.newPlanTime - 计划时间
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.tick - 是否勾选 1勾选 0不勾选
+*/
+export function accept(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/accept`, params);
+}
+
+/** 
+ * 修改计划时间
+ * @param {Object} params - 参数对象
+ * @param {String} params.planTime - 计划时间
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.sendSMS - 是否发送短信
+*/
+export function modifyPlanTime(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/updatePlanTime`, params);
+}
+
+/** 
+ * 拒绝工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.reason - 拒绝原因
+ * @param {String} params.taskId - 工单id
+*/
+export function refuseTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/refuse`, params);
+}
+
+/** 
+ * 取消工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.reason - 取消原因
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.isGoBack - 是否回退备件 1是0否
+*/
+export function cancelTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/off`, params);
 }
 
 /* -------------  end  新工单api ---------------- */
