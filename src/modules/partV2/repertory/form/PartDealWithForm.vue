@@ -617,9 +617,9 @@ export default {
 .partP{
   span{
     display: inline-block;
-    overflow: hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow:ellipsis;
+    // white-space: nowrap;
   }
 }
 </style>
