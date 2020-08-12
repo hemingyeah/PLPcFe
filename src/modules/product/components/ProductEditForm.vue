@@ -40,6 +40,7 @@
             :value="value.serialNumber" @update="update"
             :placeholder="genPlaceholder(field)"/>
         </form-item>
+        <span style="color:red;margin:0 0 5px 135px;display:inline-block;" v-if="serialNumberExist">产品编号已存在</span>
       </template>
 
       <!-- start 产品类型 -->
@@ -104,7 +105,8 @@ export default {
   data() {
     return {
       validation: this.buildValidation(),
-      template: []
+      template: [],
+      serialNumberExist:false
     }
   },
   computed: {
@@ -189,16 +191,50 @@ export default {
       return FormUtil.genPlaceholder(field)
     },
 
-    update({field, newValue, oldValue}){
+    // update({field, newValue, oldValue}){
+    //   let {fieldName, displayName} = field;
+    //   if (this.$appConfig.debug) {
+    //     console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+    //   }
+
+    //   if(fieldName==='serialNumber'){
+    //     this.$http.post(`/customer/product/checkUniqueForSerialNumber`,{id:this.productId,serialNumber:newValue},false).then(res=>{
+    //       if(res.hasOwnProperty('ok')){
+    //         this.serialNumberExist=false;
+    //       }else{
+    //         this.serialNumberExist=true;
+    //       }
+    //     })
+    //   }
+    //   let value = this.value;
+
+    //   this.$set(value, fieldName, newValue);
+    //   this.$emit('input', value);
+    // },
+    update:_.debounce(function({field, newValue, oldValue}){
       let {fieldName, displayName} = field;
       if (this.$appConfig.debug) {
         console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+
+      if(fieldName==='serialNumber'){
+        if(newValue){
+          this.$http.post(`/customer/product/checkUniqueForSerialNumber`,{id:this.productId,serialNumber:newValue},false).then(res=>{
+            if(res.hasOwnProperty('ok')){
+              this.serialNumberExist=false;
+            }else{
+              this.serialNumberExist=true;
+            }
+          })
+        }else{
+          this.serialNumberExist=false;
+        }
       }
       let value = this.value;
 
       this.$set(value, fieldName, newValue);
       this.$emit('input', value);
-    },
+    },500),
     updateCustomer(value) {
       const cf = this.fields.filter(f => f.fieldName === 'customer')[0];
       this.update({
