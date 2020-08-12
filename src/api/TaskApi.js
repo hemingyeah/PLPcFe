@@ -344,4 +344,61 @@ export function taskList(params) {
   return http.post('/task/findList', params)
 }
 
+/**
+ * 保存工单设置信息
+ * @param {Object} params - 参数对象
+ * @param {String} params.fields - 设置form对象
+ */
+export function taskSettingSave(params) {
+  return http.post('/setting/taskType/field/save', params)
+}
+
+/**
+ * 校验人员是否是审批人
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 人员id
+ */
+export function checkUser(params) {
+  return http.post('/setting/fieldInfo/check', params,false)
+}
+
+/**
+ * 取消人员在流程中的审批人身份
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 人员id
+ */
+export function cancelUserApproval(params) {
+  return http.post("/setting/fieldInfo/confirm",params,false);
+}
+
+/**
+ * 工单设置，删除组件
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 人员id
+ */
+export function deleteComponent(params) {
+  return http.post("/setting/fieldInfo/delete2",params,false);
+}
+
+/**
+ * 获取工单设置的除组件外的其他信息
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 工单id
+ */
+export function getTaskType(params) {
+  return http.get("/setting/taskType/getOne",params);
+}
+
+/**
+ * 工单设置，回执其他设置模块的配置修改
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 配置id
+ * @param {String} params.name - 配置名
+ * @param {String} params.state - 配置状态
+ */
+export function modifyOption(params) {
+  return http.post("/setting/taskType/saveOption",params,false);
+}
+
+
 /* -------------  end  新工单api ---------------- */

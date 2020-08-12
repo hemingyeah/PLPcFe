@@ -22,7 +22,7 @@
 
 <script>
 /* api */
-import { getTaskTemplateFields } from '@src/api/TaskApi';
+import {getTaskTemplateFields, taskSettingSave} from '@src/api/TaskApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
@@ -83,8 +83,8 @@ export default {
         if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
-        
-        let result = await http.post('/setting/taskType/field/save', fields);
+
+        let result = await taskSettingSave(fields);
         
         if(result.status == 0){
           platform.notification({
