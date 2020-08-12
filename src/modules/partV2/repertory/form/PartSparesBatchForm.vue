@@ -80,7 +80,7 @@
     <div class="part-batchIn-footer">
       <el-button type="text" @click="addPart" icon="el-icon-plus" :disabled="isAddBtnDisabled"> 添加</el-button>
       <p v-if="isAddBtnDisabled">
-        单次批量操作最多支持50条。
+        单次批量操作最多支持20条。
       </p>
     </div>
   </div>
@@ -251,11 +251,11 @@ export default {
     choosePart(value, row){
       let id = `${row.repertory }_${ value.sparepart.id}`;
       
-      // if(this.hasRow(id)) {
-      //   this.$platform.toast('该记录已存在！', "warning");
-      //   row.sparepart = ''
-      //   return
-      // }
+      if(this.hasRow(id)) {
+        this.$platform.toast('该记录已存在！', "warning");
+        row.sparepart = ''
+        return
+      }
       row['_id'] = id;
       row.sparepart = value.sparepart.id;
       row.sparepartName = value.sparepart.name;
@@ -391,7 +391,7 @@ export default {
     },
     receive(data = [], userId = ''){
       if (data.length > 20) {
-        return this.$platform.alert('单次最多支持分配2s0个备件');
+        return this.$platform.alert('单次最多支持分配20个备件');
       }
 
       this.form = data.map(item => this.add(null, item));

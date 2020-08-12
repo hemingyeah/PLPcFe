@@ -10,10 +10,10 @@
 </template>
 
 <script>
-import NO_DATA_IMG from '../../../assets/img/empty.png';
+import NO_DATA_IMG from '../../../assets/img/noData.png';
 
 export default {
-  name: 'no-data-view',
+  name: 'no-data-view-new',
   props: {
     noticeMsg: {
       type: String,
@@ -30,20 +30,12 @@ export default {
 
 <style lang="scss" scoped>
   .app-nodata-view {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    background-color: #ffffff;
-    
     .app-nodata-img-container {
       display: flex;
       justify-content: center;
       align-items: center;
 
-      padding: 100px 0 0;
+      padding-top: 40px;
       
       .app-nodata-img {
         width: 100px;
@@ -52,9 +44,9 @@ export default {
     }
 
     .app-nodata-notice {
-      padding-top: 10px;
+      padding-top: 14px;
       text-align: center;
-
+      color: #666;
       font-size: 14px;
     }
   }

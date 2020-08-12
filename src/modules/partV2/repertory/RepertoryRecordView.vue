@@ -163,7 +163,7 @@
             </div>
 
             <div class="form-item">
-              <label>办理编号</label>
+              <label>申请编号</label>
               <div class="form-item-content">
                 <el-input v-model="model.approveNo"></el-input>
               </div>
@@ -399,7 +399,7 @@ export default {
       enable: '',
       pageNum: 1,
       pageSize,
-      approveNo: '' //  办理编号
+      approveNo: '' //  申请编号
     };
 
     return {
@@ -736,7 +736,7 @@ export default {
         },
         {
           field: 'approveNo',
-          label: '办理编号',
+          label: '申请编号',
           show: true,
           minWidth: 220
         },
@@ -884,6 +884,10 @@ export default {
   },
   async created(){
     let initData = this.initData;
+    const href = window.location.href;
+    if(href.indexOf('?fromId') > -1){
+      this.model.keyWord = href.split('?fromId=')[1];
+    }
 
     this.types = initData.sparepartType || [];
     this.auths = initData.auths || [];

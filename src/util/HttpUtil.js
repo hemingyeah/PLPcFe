@@ -45,6 +45,7 @@ function ajax(url) {
   })
 }
 
+
 export default {
   get,
   post,

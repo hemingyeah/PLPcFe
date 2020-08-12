@@ -778,7 +778,7 @@ export default {
     toReApply(){
       let fromId = window.frameElement.getAttribute('id');
       this.$platform.openTab({
-        url:'/partV2/repertory/apply',
+        url:'/partV2/repertory/apply?fromId=1',
         title: '正在加载',
         close: true,
         fromId
