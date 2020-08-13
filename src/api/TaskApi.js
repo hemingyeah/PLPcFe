@@ -34,6 +34,18 @@ export function getTaskTemplateFields(params) {
   return http.get('/task/getTaskTemplateFields', params)
 }
 
+/**
+ * @description 获取工单表单数据(老版本，可以获取被隐藏的系统组件)
+ * @param {Object} params-- params
+ * @param {String} params.tableName -- 表名
+ * @param {String} params.typeId -- 类型模板id
+ */
+export function getFields(params) {
+  return http.get('/setting/taskType/getFields', params)
+}
+
+
+
 /** 
  * @description 查询客户产品关联字段
  * @param {Object} params -- 参数对象
@@ -408,6 +420,28 @@ export function getTaskType(params) {
 export function modifyOption(params) {
   return http.post('/setting/taskType/saveOption', params, false);
 }
+
+/**
+ * 工单设置，回执合规设置模块的配置修改
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 配置id
+ * @param {String} params.name - 配置名
+ * @param {String} params.state - 配置状态
+ */
+export function modifyConfig(params) {
+  return http.post('/setting/taskType/saveConfig', params, false);
+}
+
+/**
+ * 工单设置，回执合规设置模块的配置修改
+ * @param {Object} params - 参数对象
+ * @param {String} params.typeId - 配置id
+ */
+export function getTaskCardDetailList(params) {
+  return http.get('/setting/getTaskCardDetailList', params);
+}
+
+
 
 
 /* -------------  end  新工单api ---------------- */

@@ -13,19 +13,21 @@
       <form-design v-model="fields" mode="task_receipt" v-if="init"></form-design>
     </div>
 
-    <other-setting></other-setting>
+    <other-setting @submit="submit" ref="otherSetting">
 
-    <div class="btn-content">
-      <button type="button" class="btn btn-default" style="margin-right:5px;" @click="back">返回</button>
-      <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">下一步</button>
-    </div>
+      <div class="btn-content">
+        <button type="button" class="btn btn-default" style="margin-right:5px;" @click="back">返回</button>
+        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">下一步</button>
+      </div>
+
+    </other-setting>
 
   </div>
 </template>
 
 <script>
 /* api */
-import { getTaskTemplateFields , taskSettingSave } from '@src/api/TaskApi';
+import {getFields, taskSettingSave} from '@src/api/TaskApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
 import platform from '@src/platform';
@@ -47,7 +49,8 @@ export default {
   async mounted(){
     try {
       // TODO: 修改参数
-      let fields = await getTaskTemplateFields({ tableName: 'task_receipt', templateId: '1' });
+      // let fields = await getTaskTemplateFields({ tableName: 'task_receipt', templateId: '1' });
+      let fields = await getFields({ tableName: 'task_receipt', typeId: '1' });
       let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
       
       this.fields = FormUtil.toFormField(sortedFields);
@@ -61,7 +64,10 @@ export default {
     back(){
       window.parent.frameHistoryBack(window)
     },
-    async submit(){
+    async submit(_obj){
+      console.log("submit")
+      console.log(_obj)
+      // return false;
       try {
         let fields = FormUtil.toField(this.fields);
         let index = 0;
@@ -80,20 +86,26 @@ export default {
 
         let result = await taskSettingSave(fields);
 
-        if(result.status == 0){
-          platform.notification({
-            type: 'success',
-            title: '成功',
-            message: '工单回执表单更新成功'
-          })  
-          return window.location.reload()
+        if(_obj.clickType) {
+          console.log(this.$refs.otherSetting)
+          this.$refs.otherSetting.didShowSystemPanel();
         }else{
-          platform.notification({
-            type: 'error',
-            title: '工单回执表单更新失败',
-            message: result.message
-          })
+          if(result.status == 0){
+            platform.notification({
+              type: 'success',
+              title: '成功',
+              message: '工单回执表单更新成功'
+            })
+            return window.location.reload()
+          }else{
+            platform.notification({
+              type: 'error',
+              title: '工单回执表单更新失败',
+              message: result.message
+            })
+          }
         }
+
       } catch (error) {
         console.error(error)
       }
@@ -135,7 +147,6 @@ body{
 
 .setting-task-design{
   height: calc(100% - 53px);
-  background: red;
 }
 
 .setting-back-btn{
@@ -144,5 +155,12 @@ body{
     font-size: 12px;
   }
 }
+
+.btn-content{
+  position: relative;
+  left: 50%;
+  margin-bottom: 30px;
+}
+
 
 </style>
