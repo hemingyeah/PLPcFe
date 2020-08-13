@@ -143,7 +143,7 @@
           </div>
 
           <div v-else class="no-data-block">
-            当前部门暂无人员 <span class="active-btn" @click="openCreateUserPanel">添加成员</span>
+            当前部门暂无人员 <span v-if="allowAddUser" class="active-btn" @click="openCreateUserPanel">添加成员</span>
           </div>
 
         </div>
