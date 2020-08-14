@@ -191,34 +191,6 @@ export function taskFilterWithPart(params) {
 }
 
 /** 
- * @description 删除工单
-*/
-export function deleteTask(params) {
-  return http.post('/task/delete', params, true);
-}
-
-/** 
- * @description 回退工单
-*/
-export function rollBackTask(params) {
-  return http.post('/task/rollBack', params, true);
-}
-
-/** 
- * @description 暂停工单
-*/
-export function pauseTask(params) {
-  return http.get('/task/pause', params);
-}
-
-/** 
- * @description 继续工单
-*/
-export function unpauseTask(params) {
-  return http.get('/task/unpause', params);
-}
-
-/** 
  * @description 检查附加组件是否必填
 */
 export function checkNotNullForCard(params) {
@@ -261,10 +233,24 @@ export function applyApprove(params) {
 }
 
 /** 
- * @description 从工单池接单
+ * @description 开始工单时校验是否需要审批
 */
-export function acceptFromPool(params) {
-  return http.get('/task/acceptFromPool', params);
+export function startApproveCheck(params) {
+  return http.get('/task/approve/start', params);
+}
+
+/** 
+ * @description 取消工单时校验是否需要审批
+*/
+export function offApproveCheck(params) {
+  return http.post('/task/approve/off', params, true);
+}
+
+/** 
+ * @description 暂停工单时校验是否需要审批
+*/
+export function pauseApproveCheck(params) {
+  return http.get('/task/approve/pause', params);
 }
 
 /**
@@ -334,6 +320,17 @@ export function accept(params) {
 }
 
 /** 
+ * 从工单池接单
+ * @param {Object} params - 参数对象
+ * @param {String} params.newPlanTime - 计划时间
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.tick - 是否勾选 1勾选 0不勾选
+*/
+export function acceptFromPool(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/acceptFromPool`, params);
+}
+
+/** 
  * 修改计划时间
  * @param {Object} params - 参数对象
  * @param {String} params.planTime - 计划时间
@@ -363,6 +360,53 @@ export function refuseTask(params) {
 */
 export function cancelTask(params) {
   return http.post(`${fixedPrefixAppPath}/outside/pc/task/off`, params);
+}
+
+/** 
+ * 判断曾回退、且当前状态未完成的工单，在最后一次完成时是否使用了备件
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+*/
+export function finishedWithPart(params) {
+  return http.get(`${fixedPrefixAppPath}/outside/pc/task/finishedWithPart`, params);
+}
+
+/** 
+ * 暂停工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.reason - 暂停原因
+ * @param {String} params.taskId - 工单id
+*/
+export function pauseTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/pause`, params);
+}
+
+/** 
+ * 继续
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+*/
+export function unpauseTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/unpause`, params);
+}
+
+/** 
+ * 回退工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.reason - 回退原因
+*/
+export function rollBackTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/rollBack`, params);
+}
+
+/** 
+ * 删除工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskIds - 需要删除的工单id数组
+*/
+export function deleteTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/delete`, params);
 }
 
 /**

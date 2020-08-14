@@ -170,7 +170,7 @@
     <base-modal title="回退工单" :show.sync="backDialog.visible" width="500px" class="task-back-dialog">
       <div class="base-modal-content">
         <p>回退工单将工单退回工单负责人，可以重新提交回执信息，原有回执信息将不再保存</p>
-        <textarea v-model="backDialog.content" placeholder="[最多500字][必填]" rows="3" maxlength="500" />
+        <textarea v-model="backDialog.reason" placeholder="[最多500字][必填]" rows="3" maxlength="500" />
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="backDialog.visible = false">取 消</el-button>

@@ -98,7 +98,6 @@ export default {
         }
       }).catch(err => {
         this.pending = false;
-        console.log(err)
       })
     },
 
