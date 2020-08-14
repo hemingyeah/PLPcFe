@@ -27,7 +27,7 @@
 
             <ul 
               :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
-              v-show="!collapse && menu == currMenu">
+              v-show="!collapse && menu.menuKey == (currMenu && currMenu.menuKey)">
               <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
               <div class="frame-subMenu-item-wrap" :style="getMenuItemWrapStyle(menu)">
                 <template v-for="menu in menu.children">
@@ -68,7 +68,7 @@ export default {
   },
   data(){
     let originMenus = _.cloneDeep(this.source);
-    let {menus} = this.buildMenus(originMenus, null);
+    let { menus } = this.buildMenus(originMenus, null);
 
     return {
       originMenus,
@@ -136,6 +136,21 @@ export default {
       if(!menu.url) return;
 
       let parentMenu = null;
+
+
+      // 临时解决方案
+      if(this.callcenter) {
+        this.menus.map(menu => {
+          let children = menu.children;
+          let isHaveChildren = Array.isArray(children);
+          if(isHaveChildren) {
+            children.map(child => {
+              child.active && (child.active = false)
+            })
+          }
+        })
+      }
+
       this.originMenus.forEach(item => {
         item.active && (item.active = false)
         if(item.menuKey == menu.parent) parentMenu = item;
