@@ -206,9 +206,16 @@ export default {
       if (this.$appConfig.debug) {
         console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
       }
+<<<<<<< HEAD
       if(fieldName==='serialNumber'){
         if(newValue){
           this.$http.post('/customer/product/checkUniqueForSerialNumber',{id:this.productId,serialNumber:newValue},false).then(res=>{
+=======
+
+      if(fieldName==='serialNumber'){
+        if(newValue){
+          this.$http.post(`/customer/product/checkUniqueForSerialNumber`,{id:this.productId,serialNumber:newValue},false).then(res=>{
+>>>>>>> 4598_product
             if(res.hasOwnProperty('ok')){
               this.serialNumberExist=false;
             }else{
@@ -219,7 +226,10 @@ export default {
           this.serialNumberExist=false;
         }
       }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4598_product
       let value = this.value;
 
       this.$set(value, fieldName, newValue);
