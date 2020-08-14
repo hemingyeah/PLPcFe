@@ -191,27 +191,7 @@ export default {
       return FormUtil.genPlaceholder(field)
     },
 
-    // update({field, newValue, oldValue}){
-    //   let {fieldName, displayName} = field;
-    //   if (this.$appConfig.debug) {
-    //     console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
-    //   }
-
-    //   if(fieldName==='serialNumber'){
-    //     this.$http.post(`/customer/product/checkUniqueForSerialNumber`,{id:this.productId,serialNumber:newValue},false).then(res=>{
-    //       if(res.hasOwnProperty('ok')){
-    //         this.serialNumberExist=false;
-    //       }else{
-    //         this.serialNumberExist=true;
-    //       }
-    //     })
-    //   }
-    //   let value = this.value;
-
-    //   this.$set(value, fieldName, newValue);
-    //   this.$emit('input', value);
-    // },
-    update:_.debounce(function({field, newValue, oldValue}){
+    update({field, newValue, oldValue}){
       let {fieldName, displayName} = field;
       if (this.$appConfig.debug) {
         console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
@@ -234,7 +214,7 @@ export default {
 
       this.$set(value, fieldName, newValue);
       this.$emit('input', value);
-    },500),
+    },
     updateCustomer(value) {
       const cf = this.fields.filter(f => f.fieldName === 'customer')[0];
       this.update({
