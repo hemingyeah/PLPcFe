@@ -235,9 +235,10 @@ export default {
     showSystemPanel(clickType,templateType) {
       this.$emit("submit",{clickType,templateType})
       this.templateTypeTemp = templateType;
-      this.clickTypeTemp = templateType;
+      this.clickTypeTemp = clickType;
     },
     didShowSystemPanel() {
+      console.log("didShowSystemPanel")
       if(this.templateTypeTemp == "system") {
         this.isShowSystemModal = true;
         this.isShowSelfModal = false;
@@ -246,6 +247,9 @@ export default {
         this.isShowSelfModal = true;
       }
       this.clickType = this.clickTypeTemp;
+      console.log(this.isShowSystemModal)
+      console.log(this.isShowSelfModal)
+      console.log(this.clickType)
     },
     showSelfPanel() {
       console.log("显示自己的模板")
