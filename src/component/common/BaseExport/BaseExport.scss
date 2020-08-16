@@ -1,0 +1,52 @@
+.base-export-modal {
+  .base-modal-body {
+    padding: 15px;
+  }
+
+  .base-modal-footer {
+    padding: 15px;
+  }
+}
+
+.export-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  .btn-text {
+    margin-right: 10px;
+  }
+}
+
+.base-export-title {
+  display: inline-block;
+  min-width: 80px;
+  margin-right: 10px;
+  line-height: 20px;
+  font-size: 16px;
+  color: #303133;
+}
+
+.base-export-field-wrap {
+  display: flex;
+  flex-flow: row wrap;
+
+  .el-checkbox {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 25%;
+  }
+}
+
+.base-export-bridge {
+  position: absolute;
+  top: -1000px;
+  left: -1000px;
+
+  a {
+    display: block;
+    border: none;
+    outline: none;
+    width: 0;
+    height: 0;
+  }
+}
