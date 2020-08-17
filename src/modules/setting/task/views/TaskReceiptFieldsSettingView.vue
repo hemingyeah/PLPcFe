@@ -1,25 +1,38 @@
 <template>
-  <div class="setting-task">
+  <div class="setting-task" v-loading.fullscreen.lock="pending">
     <div class="setting-task-header">
-      <div>
+      <p>工单表单设置  |  配置工单回执表单及选项</p>
+      <div style="display: none">
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
         <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
       </div>
     </div>
+
     <div class="setting-task-design">
       <form-design v-model="fields" mode="task_receipt" v-if="init"></form-design>
     </div>
+
+    <other-setting @submit="submit" ref="otherSetting">
+
+      <div class="btn-content">
+        <button type="button" class="btn btn-default" style="margin-right:5px;" @click="back">返回</button>
+        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">下一步</button>
+      </div>
+
+    </other-setting>
+
   </div>
 </template>
 
 <script>
 /* api */
-import { getTaskTemplateFields } from '@src/api/TaskApi';
+import {getFields, taskSettingSave} from '@src/api/TaskApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
-import http from '@src/util/http';
 import platform from '@src/platform';
+/* components */
+import OtherSetting from './components/OtherSetting';
 
 export default {
   name: 'task-receipt-fields-setting-view',
@@ -36,7 +49,8 @@ export default {
   async mounted(){
     try {
       // TODO: 修改参数
-      let fields = await getTaskTemplateFields({ tableName: 'task_receipt', templateId: '1' });
+      // let fields = await getTaskTemplateFields({ tableName: 'task_receipt', templateId: '1' });
+      let fields = await getFields({ tableName: 'task_receipt', typeId: '1' });
       let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
       
       this.fields = FormUtil.toFormField(sortedFields);
@@ -50,7 +64,10 @@ export default {
     back(){
       window.parent.frameHistoryBack(window)
     },
-    async submit(){
+    async submit(_obj){
+      console.log("submit")
+      console.log(_obj)
+      // return false;
       try {
         let fields = FormUtil.toField(this.fields);
         let index = 0;
@@ -66,28 +83,37 @@ export default {
         if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
-        
-        let result = await http.post('/setting/taskType/field/save', fields);
-        
-        if(result.status == 0){
-          platform.notification({
-            type: 'success',
-            title: '成功',
-            message: '工单回执表单更新成功'
-          })  
-          return window.location.reload()
+
+        let result = await taskSettingSave(fields);
+
+        if(_obj.clickType) {
+          console.log(this.$refs.otherSetting)
+          this.$refs.otherSetting.didShowSystemPanel();
+        }else{
+          if(result.status == 0){
+            platform.notification({
+              type: 'success',
+              title: '成功',
+              message: '工单回执表单更新成功'
+            })
+            return window.location.reload()
+          }else{
+            platform.notification({
+              type: 'error',
+              title: '工单回执表单更新失败',
+              message: result.message
+            })
+          }
         }
 
-        platform.notification({
-          type: 'error',
-          title: '工单回执表单更新失败',
-          message: result.message
-        })
       } catch (error) {
         console.error(error)
       }
       this.pending = false;
     }
+  },
+  components: {
+    [OtherSetting.name]: OtherSetting
   }
 }
 </script>
@@ -129,5 +155,12 @@ body{
     font-size: 12px;
   }
 }
+
+.btn-content{
+  position: relative;
+  left: 50%;
+  margin-bottom: 30px;
+}
+
 
 </style>

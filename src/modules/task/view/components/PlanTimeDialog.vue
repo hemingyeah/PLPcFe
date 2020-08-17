@@ -61,68 +61,45 @@ export default {
       this.$set(this, 'planTime', newValue);
     },
     async openDialog(action) {
-      if (this.pending) return;
-      this.pending = true;
+      let planTime = this.task.planTime || '';
 
-      try {
-        this.action = action;
-
-        let planTime = this.task.planTime || '';
-
-        // 修改计划时间时重置数据并显示弹窗
-        if (action === 'modifyPlanTime') {
-          this.planTime = planTime;
-          this.sendSMS = false;
-          this.pending = false;
-
-          this.visible = true;
-          return;
-        }
-
-        // 从工单池接单或者接受工单前需要判断附加组件
-        let result = await TaskApi.checkNotNullForCard({id: this.task.id, flow: 'accept'});
-        if (result.status != 0) {
-          this.$platform.alert(result.message);
-          this.pending = false;
-          return;
-        } 
-
-        // 计划时间格式为日期时需格式化
-        if (this.dateType == 'date' && planTime) {
-          planTime = `${planTime.slice(0, 10)} 00:00:00`;
-        }
-        this.planTime = planTime;
-
-        // 工单设置禁用了修改计划时间并且有计划时间
-        if (!this.initData.taskConfig.taskPlanTime && planTime) {
-
-          // 上边已经对格式为日期时格式化了，现禁止修改计划时间，所以初始化为原始值
-          if (this.dateType == 'date') this.planTime = this.task.planTime;
-
-          this.submit(false);
-          return;
-        }
-        
-        this.pending = false;
-        this.visible = true;
-      } catch (e) {
-        console.error('taskpool or accept openDialog error', e);
+      // 计划时间格式为日期时需格式化
+      if (this.dateType == 'date' && planTime) {
+        planTime = `${planTime.slice(0, 10)} 00:00:00`;
       }
+      this.planTime = planTime;
+
+      // 工单设置禁用了修改计划时间并且有计划时间
+      if (!this.initData.taskConfig.taskPlanTime && planTime) {
+
+        // 上边已经对格式为日期时格式化了，现禁止修改计划时间，所以初始化为原始值
+        if (this.dateType == 'date') this.planTime = this.task.planTime;
+
+        this.submit(false);
+        return;
+      }
+      
+      this.action = action;
+      this.sendSMS = false;
+
+      this.visible = true;
     },
     submit(modifiable = true) {
       if (modifiable && !this.planTime) return this.$platform.alert('请填写计划时间');
 
-      let params = {id: this.task.id, planTime: this.planTime};
+      let params = { taskId: this.task.id, newPlanTime: this.planTime };
+
+      // 修改计划时间时参数
       if (this.action == 'modifyPlanTime') {
-        params.taskId = this.task.id;
+        params.planTime = this.planTime;
         params.sendSMS = this.sendSMS;
-        delete params.id;
+        delete params.newPlanTime;
       }
 
       this.pending = true;
 
       TaskApi[this.action](params).then(res => {
-        if (res.status == 0) {
+        if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
@@ -133,7 +110,6 @@ export default {
         }
       }).catch(err => {
         this.pending = false;
-        console.log(err)
       })
     }
   }

@@ -35,7 +35,7 @@ export default {
       // 回退工单弹窗
       backDialog: {
         visible: false,
-        content: ''
+        reason: ''
       },
       // 暂停工单弹窗
       pauseDialog: {
@@ -45,7 +45,7 @@ export default {
       // 拒绝工单弹窗
       refuseDialog: {
         visible: false,
-        remark: ''
+        reason: ''
       },
     }
   },
@@ -474,6 +474,19 @@ export default {
 
       return this.isExecutor && planTime && stateArr.indexOf(state) >= 0;
     },
+    /** 
+    * @description 是否显示DING按钮
+    * 1. 有工单查看权限 canViewTask
+    * 2. 且 在钉钉pc端
+    * 3. 且 有工单负责人
+    * 4. 且 工单不是关闭状态closed
+    */
+    allowDing() {
+      // 是否有负责人
+      let hasExecutor = this.task.executor && this.task.executor.userId;
+
+      return this.initData.canViewTask && parent.inDingTalkPC() && this.task.state != 'closed' && hasExecutor;
+    },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
@@ -537,6 +550,9 @@ export default {
       } else if (action === 'pause') {
         this.pauseDialog.reason = '';
         this.pauseDialog.visible = true;
+      } else if (action === 'refuse') {
+        this.refuseDialog.reason = '';
+        this.refuseDialog.visible = true;
       }
     },
     // 删除工单
@@ -562,20 +578,19 @@ export default {
         const result = await this.$platform.confirm(warningMsg);
         if (!result) return this.pending = false;
 
-        const params = [this.task.id];
-        TaskApi.deleteTask(params).then(res => {
-          if (res.status == 0) {
+        TaskApi.deleteTask({taskIds: [this.task.id]}).then(res => {
+          if (res.success) {
             let fromId = window.frameElement.getAttribute('fromid');
             this.$platform.refreshTab(fromId);
 
             location.href = '/task';
           } else {
             this.$platform.alert(res.message);
-          }
-        }).catch(err => console.log(err))
-          .finally(() => {
             this.pending = false;
-          });
+          }
+        }).catch(err => {
+          this.pending = false;
+        })
 
       } catch (e) {
         console.error('deleteTask error', e);
@@ -583,35 +598,28 @@ export default {
     },
     // 回退工单
     async backTask() {
-      // 清空回退说明
-      this.backDialog.content = '';
-
       try {
+        // 工单上备件用的库和当前租户备件库配置不同
         if (this.initData.isRepertoryDiff) {
-          const result = await this.$platform.confirm('回执备件来源与当前备件库配置不同，回退工单将会把已使用的备件退回到原仓库，是否继续？');
-          if (!result) return;
-          
-          this.backDialog.visible = true;
-        } else {
-          this.backDialog.visible = true;
+          if (!await this.$platform.confirm('回执备件来源与当前备件库配置不同，回退工单将会把已使用的备件退回到原仓库，是否继续？')) return;
         }
+        
+        this.backDialog.reason = '';
+        this.backDialog.visible = true;
       } catch (e) {
         console.error('backTask error', e);
       }
     },
     // 回退工单
-    async back() {
-      let content = this.backDialog.content.trim();
-      if (!content) {
-        this.$platform.alert('请填写回退说明');
-        return;
-      }
+    back() {
+      let reason = this.backDialog.reason.trim();
+      if (!reason) return this.$platform.alert('请填写回退说明');
 
       this.pending = true;
 
-      const params = { taskId: this.task.id, content };
+      const params = { taskId: this.task.id, reason };
       TaskApi.rollBackTask(params).then(res => {
-        if (res.status == 0) {
+        if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
@@ -622,38 +630,41 @@ export default {
         }
       }).catch(err => {
         this.pending = false;
-        console.log(err);
       })
     },
     // 暂停工单
-    pause() {
+    async pause() {
+      if (this.pending) return;
       this.pending = true;
 
-      const params = { id: this.task.id, reason: this.pauseDialog.reason };
-      TaskApi.pauseTask(params).then(res => {
-        if (res.status == 0) {
+      let { reason } = this.pauseDialog;
+
+      // 暂停是否需要审批
+      const result = await TaskApi.pauseApproveCheck({ id: this.task.id, reason });
+      if (!result.succ && result.message == '需要审批') {
+        this.pauseDialog.visible = false;
+        this.$refs.proposeApprove.openDialog(result.data);
+        this.pending = false;
+        return;
+      }
+
+      TaskApi.pauseTask({ taskId: this.task.id, reason }).then(res => {
+        if (res.success) {
           window.location.reload();
         } else {
-          if (res.message == '需要审批') {
-            // TODO：需要审批
-            this.pauseDialog.visible = false;
-            this.$refs.proposeApprove.openDialog(res.data);
-          } else {
-            this.$platform.alert(res.message);
-          }
-        }
-      })
-        .catch(err => console.log(err))
-        .finally(() => {
+          this.$platform.alert(res.message);
           this.pending = false;
-        })
+        }
+      }).catch(err => {
+        this.pending = false;
+      })
     },
     // 继续
     unpause() {
       this.pending = true;
 
-      TaskApi.unpauseTask({ id: this.task.id }).then(res => {
-        if (res.status == 0) {
+      TaskApi.unpauseTask({ taskId: this.task.id }).then(res => {
+        if (res.success) {
           window.location.reload();
         } else {
           this.$platform.alert(res.message);
@@ -664,82 +675,50 @@ export default {
       })
     },
     // 拒绝工单
-    refuseTask() {
-      this.pending = true;
-
-      TaskApi.refuseCheckTask({ id: this.task.id }).then(res => {
-        if (res.status == 0) {
-          this.refuseDialog.remark = '';
-          this.refuseDialog.visible = true;
-        } else {
-          this.$platform.alert(res.message);
-        }
-      })
-        .catch(err => console.log(err))
-        .finally(() => {
-          this.pending = false;
-        })
-    },
-    // 拒绝工单
     async refuse() {
-      let { remark } = this.refuseDialog;
-      if (!remark) return this.$platform.alert('请填写拒绝原因');
+      let reason = this.refuseDialog.reason.trim();
+      if (!reason) return this.$platform.alert('请填写拒绝原因');
 
-      const result = await this.$platform.confirm('确认拒绝此工单吗？');
-      if (!result) return;
+      if (!await this.$platform.confirm('确认拒绝此工单吗？')) return;
 
       this.pending = true;
 
-      const params = { id: this.task.id, remark };
+      const params = { taskId: this.task.id, reason };
       TaskApi.refuseTask(params).then(res => {
-        if (res.status == 0) {
+        if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
           location.href = '/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute';
         } else {
           this.$platform.alert(res.message);
+          this.pending = false;
         }
+      }).catch(err => {
+        this.pending = false;
       })
-        .catch(err => console.log(err))
-        .finally(() => {
-          this.pending = false;
-        })
     },
     // 开始
-    async startTask() {
-      try {
-        this.pending = true;
+    async start() {
+      if (this.pending) return;
+      this.pending = true;
 
-        let result = await TaskApi.checkNotNullForCard({ id: this.task.id, flow: 'start' });
-
-        if (result.status == 0) {
-          this.start();
-        } else {
-          this.$platform.alert(result.message);
-          this.pending = false;
-        }
-
-      } catch (e) {
-        console.error('startTask error', e);
+      // 开始是否需要审批
+      const result = await TaskApi.startApproveCheck({ id: this.task.id });
+      if (!result.succ && result.message == '需要审批') {
+        this.$refs.proposeApprove.openDialog(result.data);
+        this.pending = false;
+        return;
       }
-    },
-    // 开始
-    start() {
-      TaskApi.startTask({ id: this.task.id }).then(res => {
-        if (res.status == 0) {
+
+      TaskApi.startTask({ taskId: this.task.id }).then(res => {
+        if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
           window.location.reload();
         } else {
-          if (res.message == '需要审批') {
-            // TODO：需要审批
-            this.$refs.proposeApprove.openDialog(res.data);
-          } else {
-            this.$platform.alert(res.message);
-          }
-
+          this.$platform.alert(res.message);
           this.pending = false;
         }
       }).catch(err => {
@@ -763,7 +742,7 @@ export default {
           let url = `${window.location.origin}/print/printTaskDispatcher?token=${res.data}`;
           parent.openHelp(url);
         }
-      }).catch(err => console.log(err));
+      }).catch(err => console.error(err));
     },
     // 生产服务报告
     createReport(isPdf) {
@@ -809,6 +788,19 @@ export default {
       } catch (e) {
         console.error('startTask error', e);
       }
+    },
+    // DING
+    ding(all = true) {
+      let users = [];
+      users.push(this.task.executor.staffId);
+      
+      // 所有人(工单负责人和协同人)
+      if (all && this.task.synergies && this.task.synergies.length > 0) {
+        this.task.synergies.forEach(item => users.push(item.staffId));
+      }
+
+      let {id, taskNo} = this.task;
+      window.parent.send_link_ding_message(users, taskNo, id);
     }
   },
   async mounted() {

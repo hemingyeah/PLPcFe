@@ -19,8 +19,8 @@
           <base-button type="primary" @event="openDialog('pause')" :disabled="pending" v-if="allowPauseTask">暂停</base-button>
           <base-button type="primary" @event="unpause" :disabled="pending" v-if="allowGoOnTask">继续</base-button>
           <base-button type="primary" @event="openDialog('accept')" :disabled="pending" v-if="allowAcceptTask">接受</base-button>
-          <base-button type="danger" @event="refuseTask" :disabled="pending" v-if="allowRefuseTask">拒绝</base-button>
-          <base-button type="primary" @event="startTask" :disabled="pending" v-if="allowStartTask">开始</base-button>
+          <base-button type="danger" @event="openDialog('refuse')" :disabled="pending" v-if="allowRefuseTask">拒绝</base-button>
+          <base-button type="primary" @event="start" :disabled="pending" v-if="allowStartTask">开始</base-button>
           <base-button type="primary" @event="finishTask" :disabled="pending" v-if="allowFinishTask">回执完成</base-button>
           <base-button type="primary" @event="allot" :disabled="pending" v-if="allowAllotTask">指派</base-button>
           <base-button type="primary" @event="redeploy" :disabled="pending" v-if="allowRedeployTask">转派</base-button>
@@ -49,6 +49,7 @@
 
           <base-button type="primary" @event="openDialog('approve')" :disabled="pending" v-if="allowApprove">审批</base-button>
           <base-button type="primary" @event="offApprove" :disabled="pending" v-if="allowoffApprove">撤回审批</base-button>
+          <base-button type="primary" @event="ding" :disabled="pending" v-if="allowDing">DING</base-button>
         </div>
       </template>
       <div class="task-isDelete" v-else>[已删除]</div>
@@ -169,7 +170,7 @@
     <base-modal title="回退工单" :show.sync="backDialog.visible" width="500px" class="task-back-dialog">
       <div class="base-modal-content">
         <p>回退工单将工单退回工单负责人，可以重新提交回执信息，原有回执信息将不再保存</p>
-        <textarea v-model="backDialog.content" placeholder="[最多500字][必填]" rows="3" maxlength="500" />
+        <textarea v-model="backDialog.reason" placeholder="[最多500字][必填]" rows="3" maxlength="500" />
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="backDialog.visible = false">取 消</el-button>
@@ -201,7 +202,7 @@
     <!-- start 拒绝工单弹窗 -->
     <base-modal title="拒绝工单" :show.sync="refuseDialog.visible" width="500px">
       <div class="base-modal-content">
-        <textarea v-model="refuseDialog.remark" placeholder="请输入拒绝说明[最多500字][必填]" rows="3" maxlength="500" />
+        <textarea v-model="refuseDialog.reason" placeholder="请输入拒绝说明[最多500字][必填]" rows="3" maxlength="500" />
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="refuseDialog.visible = false">取 消</el-button>

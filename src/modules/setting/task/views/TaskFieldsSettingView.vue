@@ -22,7 +22,7 @@
 
 <script>
 /* api */
-import { getTaskTemplateFields } from '@src/api/TaskApi';
+import {getFields, taskSettingSave} from '@src/api/TaskApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
@@ -43,7 +43,8 @@ export default {
   async mounted(){
     try {
       // TODO: 修改参数
-      let fields = await getTaskTemplateFields({ tableName: 'task', templateId: '1' });
+      // let fields = await getTaskTemplateFields({ tableName: 'task', templateId: '1' });
+      let fields = await getFields({ tableName: 'task', typeId: '1' });
       let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
 
       // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
@@ -83,8 +84,8 @@ export default {
         if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
-        
-        let result = await http.post('/setting/taskType/field/save', fields);
+
+        let result = await taskSettingSave(fields);
         
         if(result.status == 0){
           platform.notification({

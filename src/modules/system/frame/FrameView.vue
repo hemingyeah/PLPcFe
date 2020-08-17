@@ -55,6 +55,7 @@
                   <a href="javascript:;" @click="goTaskReceiptSetting">工单回执表单设置</a>
                   <a href="javascript:;" @click="goCreateTask">新建工单</a>
                   <a href="javascript:;" @click="goTaskReceipt">工单回执</a>
+                  <a href="javascript:;" @click="goTaskList">工单列表</a>
                 </div>
               </el-popover>
 
@@ -633,6 +634,14 @@ export default {
         id: 'task_receipt',
         title: '工单回执',
         url: '/task/receipt',
+        reload: true,
+      });
+    },
+    goTaskList() {
+      platform.openTab({
+        id: 'task_list',
+        title: '工单列表',
+        url: '/task',
         reload: true,
       });
     },

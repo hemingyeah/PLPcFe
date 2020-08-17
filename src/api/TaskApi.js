@@ -34,6 +34,18 @@ export function getTaskTemplateFields(params) {
   return http.get('/task/getTaskTemplateFields', params)
 }
 
+/**
+ * @description 获取工单表单数据(老版本，可以获取被隐藏的系统组件)
+ * @param {Object} params-- params
+ * @param {String} params.tableName -- 表名
+ * @param {String} params.typeId -- 类型模板id
+ */
+export function getFields(params) {
+  return http.get('/setting/taskType/getFields', params)
+}
+
+
+
 /** 
  * @description 查询客户产品关联字段
  * @param {Object} params -- 参数对象
@@ -179,66 +191,10 @@ export function taskFilterWithPart(params) {
 }
 
 /** 
- * @description 删除工单
-*/
-export function deleteTask(params) {
-  return http.post('/task/delete', params, true);
-}
-
-/** 
- * @description 回退工单
-*/
-export function rollBackTask(params) {
-  return http.post('/task/rollBack', params, true);
-}
-
-/** 
- * @description 取消工单
-*/
-export function cancelTask(params) {
-  return http.post('/task/off', params, true);
-}
-
-/** 
- * @description 暂停工单
-*/
-export function pauseTask(params) {
-  return http.get('/task/pause', params);
-}
-
-/** 
- * @description 继续工单
-*/
-export function unpauseTask(params) {
-  return http.get('/task/unpause', params);
-}
-
-/** 
- * @description 拒绝工单验证
-*/
-export function refuseCheckTask(params) {
-  return http.get('/task/refuseCheck', params);
-}
-
-/** 
- * @description 拒绝工单
-*/
-export function refuseTask(params) {
-  return http.get('/task/refuse', params);
-}
-
-/** 
  * @description 检查附加组件是否必填
 */
 export function checkNotNullForCard(params) {
   return http.post('/task/checkNotNullForCard', params, false);
-}
-
-/** 
- * @description 开始工单
-*/
-export function startTask(params) {
-  return http.get('/task/start', params);
 }
 
 /** 
@@ -277,24 +233,24 @@ export function applyApprove(params) {
 }
 
 /** 
- * @description 从工单池接单
+ * @description 开始工单时校验是否需要审批
 */
-export function acceptFromPool(params) {
-  return http.get('/task/acceptFromPool', params);
+export function startApproveCheck(params) {
+  return http.get('/task/approve/start', params);
 }
 
 /** 
- * @description 修改计划时间
+ * @description 取消工单时校验是否需要审批
 */
-export function modifyPlanTime(params) {
-  return http.post('/task/modifyPlanTime', params, false);
+export function offApproveCheck(params) {
+  return http.post('/task/approve/off', params, true);
 }
 
 /** 
- * @description 接受工单
+ * @description 暂停工单时校验是否需要审批
 */
-export function accept(params) {
-  return http.get('/task/accept', params);
+export function pauseApproveCheck(params) {
+  return http.get('/task/approve/pause', params);
 }
 
 /**
@@ -319,9 +275,6 @@ export function getTaskCustonerProductList(params) {
 
 
 
-
-
-
 /* ------------- start 新工单api ---------------- */
 
 /**
@@ -343,5 +296,196 @@ export function getTaskTypes(){
 export function taskList(params) {
   return http.post('/task/findList', params)
 }
+
+/** 
+ * 开始工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.planTime - 计划时间时间戳
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.tick - 是否勾选 1勾选 0不勾选
+*/
+export function startTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/start`, params);
+}
+
+/** 
+ * 接受工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.newPlanTime - 计划时间
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.tick - 是否勾选 1勾选 0不勾选
+*/
+export function accept(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/accept`, params);
+}
+
+/** 
+ * 从工单池接单
+ * @param {Object} params - 参数对象
+ * @param {String} params.newPlanTime - 计划时间
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.tick - 是否勾选 1勾选 0不勾选
+*/
+export function acceptFromPool(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/acceptFromPool`, params);
+}
+
+/** 
+ * 修改计划时间
+ * @param {Object} params - 参数对象
+ * @param {String} params.planTime - 计划时间
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.sendSMS - 是否发送短信
+*/
+export function modifyPlanTime(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/updatePlanTime`, params);
+}
+
+/** 
+ * 拒绝工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.reason - 拒绝原因
+ * @param {String} params.taskId - 工单id
+*/
+export function refuseTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/refuse`, params);
+}
+
+/** 
+ * 取消工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.reason - 取消原因
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.isGoBack - 是否回退备件 1是0否
+*/
+export function cancelTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/off`, params);
+}
+
+/** 
+ * 判断曾回退、且当前状态未完成的工单，在最后一次完成时是否使用了备件
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+*/
+export function finishedWithPart(params) {
+  return http.get(`${fixedPrefixAppPath}/outside/pc/task/finishedWithPart`, params);
+}
+
+/** 
+ * 暂停工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.reason - 暂停原因
+ * @param {String} params.taskId - 工单id
+*/
+export function pauseTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/pause`, params);
+}
+
+/** 
+ * 继续
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+*/
+export function unpauseTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/unpause`, params);
+}
+
+/** 
+ * 回退工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.reason - 回退原因
+*/
+export function rollBackTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/rollBack`, params);
+}
+
+/** 
+ * 删除工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskIds - 需要删除的工单id数组
+*/
+export function deleteTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/delete`, params);
+}
+
+/**
+ * 保存工单设置信息
+ * @param {Object} params - 参数对象
+ * @param {String} params.fields - 设置form对象
+ */
+export function taskSettingSave(params) {
+  return http.post('/setting/taskType/field/save', params)
+}
+
+/**
+ * 校验人员是否是审批人
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 人员id
+ */
+export function checkUser(params) {
+  return http.post('/setting/fieldInfo/check', params, false)
+}
+
+/**
+ * 取消人员在流程中的审批人身份
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 人员id
+ */
+export function cancelUserApproval(params) {
+  return http.post('/setting/fieldInfo/confirm', params, false);
+}
+
+/**
+ * 工单设置，删除组件
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 人员id
+ */
+export function deleteComponent(params) {
+  return http.post('/setting/fieldInfo/delete2', params, false);
+}
+
+/**
+ * 获取工单设置的除组件外的其他信息
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 工单id
+ */
+export function getTaskType(params) {
+  return http.get('/setting/taskType/getOne', params);
+}
+
+/**
+ * 工单设置，回执其他设置模块的配置修改
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 配置id
+ * @param {String} params.name - 配置名
+ * @param {String} params.state - 配置状态
+ */
+export function modifyOption(params) {
+  return http.post('/setting/taskType/saveOption', params, false);
+}
+
+/**
+ * 工单设置，回执合规设置模块的配置修改
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 配置id
+ * @param {String} params.name - 配置名
+ * @param {String} params.state - 配置状态
+ */
+export function modifyConfig(params) {
+  return http.post('/setting/taskType/saveConfig', params, false);
+}
+
+/**
+ * 工单设置，回执合规设置模块的配置修改
+ * @param {Object} params - 参数对象
+ * @param {String} params.typeId - 配置id
+ */
+export function getTaskCardDetailList(params) {
+  return http.get('/setting/getTaskCardDetailList', params);
+}
+
+
+
 
 /* -------------  end  新工单api ---------------- */

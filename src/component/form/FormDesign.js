@@ -19,6 +19,7 @@ import {
   isSelect 
 } from './util'
 import http from "@src/util/http";
+import {checkUser,deleteComponent} from "@src/api/TaskApi";
 
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
@@ -556,8 +557,8 @@ const FormDesign = {
       let isNext = true;
       //mode:task为工单设置form
       //mode:task_receipt为回执工单设置form
-      if(this.mode == "task" || this.mode == "task_receipt"
-          && item.formType == "user" && item.id) {
+      if((this.mode == "task" || this.mode == "task_receipt")
+          && (item.formType == "user" && item.id)) {
         isNext = await this.deleteUser(item);
       }
 
@@ -579,15 +580,16 @@ const FormDesign = {
       }
     },
     async deleteUser(item) {
-      let result = await http.post("/setting/fieldInfo/check", { id : item.id },false);
+      // let result = await http.post("/setting/fieldInfo/check", { id : item.id },false);
+      let result = await checkUser({id : item.id});
       if(result.status == 0) {
         if(result.data && result.data.show == 1) {
           //是审批人
           let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果删除，对应的审批流程将设置为“无需审批”，确定要删除吗？');
           if(confirm) {
             //取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
-            let result = await  http.post("/setting/fieldInfo/delete2",{ id : item.id },false);
-            console.log(result)
+            // let result = await  http.post("/setting/fieldInfo/delete2",{ id : item.id },false);
+            let result = await deleteComponent({ id : item.id });
             if(result.code) {
               this.$platform.alert(result.message);
               return false;
