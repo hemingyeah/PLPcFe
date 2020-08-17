@@ -7,6 +7,7 @@ import BaseUpload from './common/BaseUpload';
 import BaseTree from './common/BaseTree';
 import BaseImport from './common/BaseImport';
 import BaseExport from './common/BaseExport';
+import BaseExportGroup from './common/BaseExportGroup';
 import BaseFileItem from './common/BaseFileItem';
 import BaseTabBar from './common/BaseTabBar';
 import BaseTimeline from './common/BaseTimeline';
@@ -56,6 +57,7 @@ const components = [
   Form,
   BaseImport,
   BaseExport,
+  BaseExportGroup,
   BaseFileItem,
   BaseTabBar,
   BaseTimeline,

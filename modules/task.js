@@ -18,6 +18,5 @@ module.exports = {
   // 工单列表
   'task.list': {
     entry: './src/modules/task/list/index.js',
-    template: 'src/modules/task/index.html'
   }
 }

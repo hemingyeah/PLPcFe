@@ -94,23 +94,6 @@ router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   },
 }))
 
-router.use('/outside/es/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.177',
-  port: 10006,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
-  },
-}))
-
-
-router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.177',
-  port: 8080,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
-  },
-}))
-
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
   port: 10002,
