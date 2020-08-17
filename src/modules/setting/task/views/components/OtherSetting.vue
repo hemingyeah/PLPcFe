@@ -169,6 +169,7 @@
     <slot></slot>
 
     <system-template-dialog :isShowSystemModal="isShowSystemModal" :clickType="clickType" @hideModal="hideModal"></system-template-dialog>
+    <template-upload-dialog :isShowUploadModal="isShowUploadModal" :clickType="clickType" @hideModal="hideModal"></template-upload-dialog>
 
   </div>
 </template>
@@ -177,6 +178,7 @@
 import {getTaskType,modifyOption,modifyConfig} from "@src/api/TaskApi";
 
 import SystemTemplateDialog from "./SystemTemplateDialog";
+import TemplateUploadDialog from "./TemplateUploadDialog";
 
 export default {
   name: 'other-setting',
@@ -222,6 +224,7 @@ export default {
         {label : "完成", value : "finish"}
       ],
       isShowSystemModal : false,
+      isShowUploadModal : false,
       clickType : "",
       templateTypeTemp : "",
       clickTypeTemp : ""
@@ -357,6 +360,7 @@ export default {
 
   },
   components : {
+    TemplateUploadDialog,
     [SystemTemplateDialog.name] : SystemTemplateDialog
   }
 }
