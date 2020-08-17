@@ -8,9 +8,87 @@
   &-approve {
     background-color: #ff9100;
   }
-
 }
 
 .task-list-operation-bar-container {
   justify-content: flex-end !important;
 }
+
+// S 顶部筛选
+.common-list {
+  &-filter {
+    padding-bottom: 10px;
+    &-flow {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      height: 35px;
+      background-color: #eee;
+      font-size: 12px;
+      text-align: center;
+      line-height: 35px;
+      cursor: pointer;
+      border-radius: 3px;
+      &-item, &-dropdown {
+        height: 100%;
+        transition: background-color ease 0.3s, color ease 0.3s;
+        &:hover {
+          background-color: #55b7b4;
+          color: #fff;
+        }
+        &:nth-of-type(5) {
+          &:hover {
+            background-color: #ef6b6b;
+            color: #fff;
+          }
+        }
+        &:first-child {
+          border-radius: 3px 0 0 3px;
+        }
+      }
+      &-dropdown {
+        padding: 0 8px;
+        border-radius: 0 3px 3px 0;
+      }
+      &-active {
+        background-color: #55b7b4;
+        color: #fff !important;
+      }
+    }
+    &-span1 {
+      flex: 1;
+    }
+    &-other {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 120px;
+      height: 35px;
+      margin-left: 10px;
+      border-radius: 3px;
+      background-color: #eee;
+      font-size: 12px;
+      cursor: pointer;
+      &-item {
+        transition: background-color ease 0.3s, color ease 0.3s,
+          border-color ease 0.3s;
+        height: 100%;
+        width: 100%;
+        text-align: center;
+        line-height: 35px;
+        border-radius: 3px;
+        &:hover {
+          background-color: #55b7b4;
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+//颜色
+.ce6 {
+  color: #ef6b6b;
+}
+// E 顶部筛选

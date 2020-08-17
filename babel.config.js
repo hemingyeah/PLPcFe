@@ -1,4 +1,4 @@
-const presets = [
+ const presets = [
   ['@babel/env', {useBuiltIns: 'usage'}]
 ];
 
