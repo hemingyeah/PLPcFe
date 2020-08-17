@@ -485,6 +485,13 @@ export function getTaskCardDetailList(params) {
   return http.get('/setting/getTaskCardDetailList', params);
 }
 
+/**
+ * 顶部筛选, 状态数据展示
+ */
+export function getTaskCountByState(params) {
+  return http.get('/task/getTaskCountByState', params);
+}
+
 
 
 

@@ -7,7 +7,7 @@ import TaskSelect from "./components/TaskSelect.vue";
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum";
-import { fields, filterList } from "./TaskFieldModel";
+import { fields, selectIds } from "./TaskFieldModel";
 import { LINK_REG } from "@src/model/reg";
 
 /** utils */
@@ -17,29 +17,44 @@ import { storageGet, storageSet } from "@src/util/storage";
 import { formatDate } from "@src/util/lang";
 
 /* constants */
-const TASK_LIST_KEY = 'task_list';
+const TASK_LIST_KEY = "task_list";
 // 埋点事件对象
 const TRACK_EVENT_MAP = {
-  'search': 'pc：工单列表-搜索事件',
-  'moreAction': 'pc：工单列表-更多操作事件',
-  'reset': 'pc：工单列表-重置事件',
-  'avvancedSearch': 'pc：工单列表-高级搜索事件',
-  'columns': 'pc：工单列表-选择列事件'
-}
+  search: "pc：工单列表-搜索事件",
+  moreAction: "pc：工单列表-更多操作事件",
+  reset: "pc：工单列表-重置事件",
+  avvancedSearch: "pc：工单列表-高级搜索事件",
+  columns: "pc：工单列表-选择列事件",
+};
 // 工单字段名字
-const TASK_SELF_FIELD_NAMES = ['taskNo', 'templateName', 'customer', 'tlmName', 'tlmPhone', 'taddress', 'serviceType', 'serviceContent', 'planTime', 'description'];
+const TASK_SELF_FIELD_NAMES = [
+  "taskNo",
+  "templateName",
+  "customer",
+  "tlmName",
+  "tlmPhone",
+  "taddress",
+  "serviceType",
+  "serviceContent",
+  "planTime",
+  "description",
+];
 // 导出过来字段类型
-const EXPORT_FILTER_FORM_TYPE = ['attachment', 'address', 'autograph'];
+const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
 
 export default {
   name: "task-list",
   inject: ["initData"],
   data() {
     return {
-      filterList, // 顶部筛选列表
-      filterId: 1, //顶部筛选选中的状态id
+      selectIds, // id
+      taskView: [], // 顶部筛选列表
+      otherList: [], //其他列表
+      filterId: selectIds.createdId, //顶部筛选选中的状态id
       allShow: false, // 全部工单
       otherShow: false, //其他
+      otherText: "其他", //其他文案
+      filterData: {}, //状态数据
       columns: [],
       columnNum: 1,
       currentTaskType: {},
@@ -242,15 +257,19 @@ export default {
   },
   mounted() {
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
+    console.log("taskView", this.initData);
+    this.taskView = this.initData.taskView;
     this.currentTaskType = this.taskTypes[0];
 
     this.revertStorage();
     this.initialize();
+    this.otherLists();
+    this.getTaskCountByState();
   },
   methods: {
-    /** 
+    /**
      * @description 高级搜索
-    */
+     */
     advancedSearch() {
       this.params.pageNum = 1;
       this.taskPage.list = [];
@@ -259,18 +278,90 @@ export default {
 
       this.search();
     },
+    /* 其他,列表 */
+    otherLists() {
+      const { taskView } = this.initData;
+      taskView.map((item, index) => {
+        if (
+          item.id === "1e930239-1ea3-11e7-8d4e-00163e304a25" ||
+          item.id === "2a53a0ff-4141-11e7-a318-00163e304a25" ||
+          item.region === "所有用户" ||
+          item.region === "只有我"
+        ) {
+          this.otherList.push(item);
+        }
+      });
+    },
+    /* 其他, 选择 */
+    checkOther({ name }) {
+      this.otherText = name;
+      this.filterId = "";
+    },
     /* 顶部筛选 */
     checkFilter(id) {
       this.filterId = id;
+      this.otherText = "其他";
+    },
+    /*全部工单 */
+    checkAll() {
+      this.filterId = selectIds.allId;
     },
     // 最高事件
     allEvent() {
       this.allShow = false;
       this.otherShow = false;
     },
-    /** 
+    /**
+     * 顶部筛选, 状态数据展示
+     */
+    getTaskCountByState() {
+      // 如果没有缓存时间或者超过1小时
+      var now = new Date().getTime();
+      const localData = JSON.parse(localStorage.getItem("getTaskCountByState"));
+      if (!localData || now - localData.date > 60 * 60 * 1000) {
+        TaskApi.getTaskCountByState().then((res) => {
+          const {
+            created,
+            refused,
+            allocated,
+            accepted,
+            exception,
+            processing,
+            taskPool,
+            finished,
+            costed,
+          } = res;
+          this.filterData = {
+            allocated,
+            accepted,
+            processing,
+            exception,
+            created: created + refused,
+            finished: finished + costed,
+            all:
+              allocated +
+              accepted +
+              processing +
+              taskPool +
+              created +
+              refused +
+              finished +
+              costed,
+            unfinished:
+              created + refused + allocated + taskPool + accepted + processing,
+          };
+          localStorage.setItem(
+            "getTaskCountByState",
+            JSON.stringify({ data: now, filterData: this.filterData })
+          );
+        });
+      } else {
+        this.filterData = localData.filterData;
+      }
+    },
+    /**
      * @description 构建列
-    */
+     */
     buildColumns() {
       const localStorageData = this.getLocalStorageData();
 
@@ -278,10 +369,8 @@ export default {
       let localColumns = columnStatus
         .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
-
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
-
       this.columns = fields
         .map((field) => {
           let sortable = false;
@@ -356,10 +445,10 @@ export default {
           return col;
         });
     },
-    /** 
+    /**
      * @description 构建导出参数
      * @return {Object} 导出参数
-    */
+     */
     buildExportParams(checkedMap, ids) {
       const Params = Object.assign({}, this.params);
       let exportAll = !ids || !ids.length;
@@ -386,7 +475,7 @@ export default {
     /**
      * @description 构建搜索参数
      * @return {Object} 搜索参数
-    */
+     */
     buildSearchParams() {
       const Params = Object.assign({}, this.params);
       let searchParams = {
@@ -412,10 +501,10 @@ export default {
 
       return searchParams;
     },
-    /** 
+    /**
      * @description 构建多行文本
      * @return {String}
-    */
+     */
     buildTextarea(value) {
       return value
         ? value.replace(LINK_REG, (match) => {
@@ -423,26 +512,26 @@ export default {
           })
         : "";
     },
-    /** 
+    /**
      * @description 工单类型改变
-    */
+     */
     changeTaskType(taskType) {
       this.currentTaskType = taskType;
       this.initialize();
     },
-    /** 
+    /**
      * @description 检测导出条数
-     * @return {String | null} 
-    */
+     * @return {String | null}
+     */
     checkExportCount(ids, max) {
       let exportAll = !ids || ids.length == 0;
       return exportAll && this.taskPage.total > max
         ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
         : null;
     },
-    /** 
+    /**
      * @description 导出提示
-    */
+     */
     exportAlert(result, params = {}) {
       let taskQueryInputString = params?.taskQueryInput || "{}";
       let taskQueryInput = JSON.parse(taskQueryInputString);
@@ -456,10 +545,10 @@ export default {
 
       this.$platform.alert(message);
     },
-    /** 
+    /**
      * @description 导出工单
      * @param {Boolean} exportAll 是否导出全部
-    */
+     */
     exportTask(exportAll) {
       let ids = [];
       let fileName = `${formatDate(new Date(), "YYYY-MM-DD")}工单数据.xlsx`;
@@ -472,10 +561,10 @@ export default {
 
       this.$refs.exportPanel.open(ids, fileName);
     },
-    /** 
+    /**
      * @description 获取工单字段列表
      * @return {Promise}
-    */
+     */
     fetchTaskFields() {
       let params = {
         templateId: this.currentTaskType.id || "",
@@ -491,10 +580,10 @@ export default {
         return result;
       });
     },
-    /** 
+    /**
      * @description 获取工单回执字段列表
      * @return {Promise}
-    */
+     */
     fetchTaskReceiptFields() {
       let params = {
         templateId: this.currentTaskType.id || "",
@@ -510,20 +599,20 @@ export default {
         return result;
       });
     },
-    /** 
+    /**
      * @description 过滤字段函数操作处理
-     * @return {Boolean} 
-    */
+     * @return {Boolean}
+     */
     filterFieldFuncHandle(field) {
       return (
         EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1 &&
         field.isSystem == 0
       );
     },
-    /** 
+    /**
      * @description 过滤工单列表字段
      * @return {Array<TaskField>} 过滤后工单列表字段
-    */
+     */
     filterTaskListFields() {
       let fields = this.taskListFields || [];
       let field = null;
@@ -575,37 +664,37 @@ export default {
 
       return newFields;
     },
-    /** 
+    /**
      * @description 格式话自定义地址
      * @param {Object} customizeAddress 自定义地址
      * @return {String} 过滤后的地址
-    */
+     */
     formatCustomizeAddress(customizeAddress) {
-      if (null == customizeAddress) return '';
+      if (null == customizeAddress) return "";
 
       const { province, city, dist, address } = customizeAddress;
-      return [province, city, dist, address].filter(d => !!d).join('-');
+      return [province, city, dist, address].filter((d) => !!d).join("-");
     },
-    /** 
+    /**
      * @description 获取本地存储数据
      * @return {Object} 本地存取数据对象
-    */
+     */
     getLocalStorageData() {
       const dataStr = storageGet(TASK_LIST_KEY, "{}");
       return JSON.parse(dataStr);
     },
-    /** 
+    /**
      * @description 获取行的key
      * @param {Object} row 行数据
-     * @return {String} key 
-    */
+     * @return {String} key
+     */
     getRowKey(row = {}) {
       return `${row.id}${(Math.random() * 1000) >> 2}`;
     },
-    /** 
+    /**
      * @description 表格选择操作
      * @param {Array} selection 选择的数据
-    */
+     */
     handleSelection(selection) {
       let tv = this.selectionCompute(selection);
 
@@ -632,10 +721,10 @@ export default {
 
       // this.$refs.baseSelectionBar.openTooltip();
     },
-    /** 
+    /**
      * @description 页大小改变操作
      * @param {Number} pageSize 页大小
-    */
+     */
     handleSizeChange(pageSize) {
       this.saveDataToStorage("pageSize", pageSize);
 
@@ -644,9 +733,9 @@ export default {
 
       this.search();
     },
-    /** 
+    /**
      * @description 初始化
-    */
+     */
     initialize() {
       this.initPage();
       this.loading = true;
@@ -660,9 +749,9 @@ export default {
           console.warn(err);
         });
     },
-    /** 
+    /**
      * @description 初始化page
-    */
+     */
     initPage() {
       this.taskPage = new Page();
       this.taskPage.list = [];
@@ -684,19 +773,19 @@ export default {
         },
       };
     },
-    /** 
+    /**
      * @description 页码跳转
      * @param {Number} pageNum 页码
-    */
+     */
     jump(pageNum) {
       this.params.pageNum = pageNum;
       this.taskPage.list = [];
       this.search();
     },
-    /** 
+    /**
      * @description 修改选择列设置
      * @param {Object} event 事件对象
-    */
+     */
     modifyColumnStatus(event) {
       let columns = event.data || [];
       let colMap = columns.reduce(
@@ -719,10 +808,10 @@ export default {
       }));
       this.saveDataToStorage("columnStatus", columnsStatus);
     },
-    /** 
+    /**
      * @description 打开外部链接
      * @param {Object} e 事件对象
-    */
+     */
     openOutsideLink(e) {
       let url = e.target.getAttribute("url");
       if (!url) return;
@@ -731,16 +820,16 @@ export default {
 
       this.$platform.openLink(url);
     },
-    /** 
+    /**
      * @description 打开已选中列表面板
-    */
+     */
     openSelectionPanel() {
       this.$refs.openSelectionPanel.open();
     },
-    /** 
+    /**
      * @description 打开工单详情tab
      * @param {String} taskId 工单id
-    */
+     */
     openTaskTab(taskId) {
       if (!taskId) return;
 
@@ -754,10 +843,10 @@ export default {
         fromId,
       });
     },
-    /** 
+    /**
      * @description 打开用户详情tab
      * @param {String} userId 用户id
-    */
+     */
     openUserTab(userId) {
       if (!userId) return;
 
@@ -771,9 +860,9 @@ export default {
         fromId,
       });
     },
-    /** 
+    /**
      * @description 高级搜索切换
-    */
+     */
     panelSearchAdvancedToggle() {
       this.trackEventHandler("avvancedSearch");
       this.$refs.searchPanel.open();
@@ -786,9 +875,9 @@ export default {
         }
       });
     },
-    /** 
+    /**
      * @description 重置参数
-    */
+     */
     resetParams() {
       this.trackEventHandler("reset");
 
@@ -800,9 +889,9 @@ export default {
 
       this.search();
     },
-    /** 
+    /**
      * @description 还原本地存储
-    */
+     */
     revertStorage() {
       const { pageSize, column_number } = this.getLocalStorageData();
 
@@ -811,18 +900,18 @@ export default {
       }
       if (column_number) this.columnNum = Number(column_number);
     },
-    /** 
+    /**
      * @description 保存数据到本地存储
-    */
+     */
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
 
       storageSet(TASK_LIST_KEY, JSON.stringify(data));
     },
-    /** 
+    /**
      * @description 搜索之前处理
-    */
+     */
     searchBefore() {
       this.params.pageNum = 1;
       this.taskPage.list = [];
@@ -830,10 +919,10 @@ export default {
       this.search();
       this.trackEventHandler("search");
     },
-    /** 
+    /**
      * @description 搜索
      * @return {Promise}
-    */
+     */
     search() {
       const params = this.buildSearchParams();
 
@@ -874,38 +963,39 @@ export default {
           this.loading = false;
         });
     },
-    /** 
+    /**
      * @description 已选择面板数据变化
-    */
+     */
     selectionPanelInputChange(value) {
       this.multipleSelection = value.slice();
     },
-    /** 
+    /**
      * @description 已选择面板移除某一项
-    */
+     */
     selectionPanelRemoveItem({ selection, item }) {
       selection.length < 1
         ? this.toggleSelection()
         : this.toggleSelection([item]);
     },
-    /** 
+    /**
      * @description 计算已选择
      * @param {Array} selection 已选择列表
      * @return {Array} 计算过滤后的列表
-    */
+     */
     selectionCompute(selection) {
       let tv = [];
-      
-      tv = this.multipleSelection
-        .filter(ms => this.taskPage.list.every(c => c.id !== ms.id));
+
+      tv = this.multipleSelection.filter((ms) =>
+        this.taskPage.list.every((c) => c.id !== ms.id)
+      );
       tv = _.uniqWith([...tv, ...selection], _.isEqual);
 
       return tv;
     },
-    /** 
+    /**
      * @description 显示最后一次更新记录
      * @param {Object} row 行数据
-    */
+     */
     showLatestUpdateRecord(row) {
       if (row.latesetUpdateRecord) return;
 
@@ -922,18 +1012,18 @@ export default {
         })
         .catch((e) => console.error("e", e));
     },
-    /** 
+    /**
      * @description 显示高级搜索设置
-    */
-    showAdvancedSetting(){
-      this.trackEventHandler('columns');
+     */
+    showAdvancedSetting() {
+      this.trackEventHandler("columns");
 
       this.$refs.advanced.open(this.columns);
     },
-    /** 
+    /**
      * @description 排序变化
      * @param {Object} option 配置
-    */
+     */
     sortChange(option) {
       try {
         const { prop, order } = option;
@@ -981,10 +1071,10 @@ export default {
         console.error("e", e);
       }
     },
-    /** 
+    /**
      * @description 选择项切换
      * @param {Array<Row>} rows 行
-    */
+     */
     toggleSelection(rows = []) {
       let isNotOnCurrentPage = false;
       let row = undefined;

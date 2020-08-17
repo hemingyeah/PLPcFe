@@ -4,19 +4,19 @@
       class="common-list-filter-select-option"
       v-for="(item, index) in list"
       :key="index"
-      @click="checkId(index)"
-      :class="{ 'common-list-filter-select-active': id === index }"
+      @click="checkId(index, item)"
     >
-      {{ item }}
+      {{ item.name }}
     </div>
   </div>
 </template>
 <script>
+// :class="{ 'common-list-filter-select-active': id === index }"
 export default {
   props: {
     list: {
       type: Array,
-      default: [1, 2, 3, 4, 5, 6, 7], // 筛选列表
+      default: [], // 筛选列表
     },
     show: {
       type: Boolean,
@@ -30,8 +30,9 @@ export default {
     };
   },
   methods: {
-    checkId(index) {
+    checkId(index, item) {
       this.id = index;
+      this.$emit("checkOther", item);
     },
   },
 };
@@ -49,6 +50,8 @@ export default {
   cursor: pointer;
   &-option {
     padding: 3px 20px;
+    min-width: 130px;
+    line-height: 20px;
     color: #777;
     font-size: 14px;
     transition: background-color ease 0.3s, color ease 0.3s,

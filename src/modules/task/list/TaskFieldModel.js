@@ -736,41 +736,16 @@ let fields = [
   },
 ];
 
-/* 顶部状态筛选数据 */
-const filterList = [
-  {
-    id: 1,
-    value: "待指派",
-    num: 0,
-  },
-  {
-    id: 2,
-    value: "已指派",
-    num: 0,
-  },
-  {
-    id: 3,
-    value: "已接受",
-    num: 0,
-  },
-  {
-    id: 4,
-    value: "进行中",
-    num: 0,
-  },
-  {
-    id: 5,
-    value: "异常工单",
-    num: 0,
-  },
-  {
-    id: 6,
-    value: "全部工单",
-    num: 0,
-  },
-];
-
+// 顶部筛选id
+const selectIds = {
+  createdId: "133d2ef7-19a8-11e7-8d4e-00163e304a25", //待指派
+  allocatedId: "12fcb144-1ea3-11e7-8d4e-00163e304a25", //已指派
+  acceptedId: "475e3328-1e63-11e7-8d4e-00163e304a25", //已接受
+  processingId: "06db63fe-5017-11e7-a318-00163e304a25", //进行中
+  exceptionId: "a78cbfec-d7d2-420f-9a56-32a503702f2d", //异常工单
+  allId: "998620df-0d55-11e7-8d4e-00163e304a25", //全部工单
+};
 module.exports = {
   fields,
-  filterList,
+  selectIds,
 };

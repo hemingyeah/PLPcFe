@@ -9,36 +9,129 @@
     <div class="common-list-filter">
       <div class="common-list-header-search">
         <div class="common-list-filter-flow common-list-filter-span1">
+          <!-- 待指派 -->
           <div
-            v-for="(item, index) in filterList"
+            v-for="(item, index) in taskView"
             :key="index"
             @click="checkFilter(item.id)"
             class="common-list-filter-span1 common-list-filter-flow-item"
+            v-if="item.id === selectIds.createdId"
             :class="{
-              ce6: index === 4,
               'common-list-filter-flow-active': item.id === filterId,
             }"
           >
-            {{ `${item.value}(${item.num})` }}
+            {{ `待指派(${filterData.created || 0})` }}
           </div>
+          <!-- 已指派 -->
+          <div
+            v-for="(item, index) in taskView"
+            :key="index"
+            @click="checkFilter(item.id)"
+            class="common-list-filter-span1 common-list-filter-flow-item"
+            v-if="item.id === selectIds.allocatedId"
+            :class="{
+              'common-list-filter-flow-active': item.id === filterId,
+            }"
+          >
+            {{ `已指派(${filterData.allocated || 0})` }}
+          </div>
+          <!-- 已接受 -->
+          <div
+            v-for="(item, index) in taskView"
+            :key="index"
+            @click="checkFilter(item.id)"
+            class="common-list-filter-span1 common-list-filter-flow-item"
+            v-if="item.id === selectIds.acceptedId"
+            :class="{
+              'common-list-filter-flow-active': item.id === filterId,
+            }"
+          >
+            {{ `已接受(${filterData.accepted || 0})` }}
+          </div>
+          <!-- 进行中 -->
+          <div
+            v-for="(item, index) in taskView"
+            :key="index"
+            @click="checkFilter(item.id)"
+            class="common-list-filter-span1 common-list-filter-flow-item"
+            v-if="item.id === selectIds.processingId"
+            :class="{
+              'common-list-filter-flow-active': item.id === filterId,
+            }"
+          >
+            {{ `进行中(${filterData.processing || 0})` }}
+          </div>
+          <!-- 异常工单 -->
+          <div
+            v-for="(item, index) in taskView"
+            :key="index"
+            @click="checkFilter(item.id)"
+            class="common-list-filter-span1 common-list-filter-flow-item ce6"
+            v-if="
+              item.id === selectIds.exceptionId && initData.tenantVersion === 2
+            "
+            :class="{
+              'common-list-filter-flow-active': item.id === filterId,
+            }"
+          >
+            {{ `异常工单(${filterData.exception || 0})` }}
+          </div>
+          <!-- 全部工单 -->
+          <div
+            @click="checkFilter(selectIds.allId)"
+            class="common-list-filter-span1 common-list-filter-flow-item"
+            :class="{
+              'common-list-filter-flow-active': selectIds.allId === filterId,
+            }"
+          >
+            {{ initData.allDropdownView && initData.allDropdownView.name }}({{
+              filterData.all || 0
+            }})
+          </div>
+
+          <!--  -->
           <div
             class="common-list-filter-flow-dropdown"
-            @click.stop="allShow = true"
+            @click.stop="
+              allShow = true;
+              otherShow = false;
+            "
+            :class="{ 'common-list-filter-flow-active': allShow }"
           >
             <i class="icon-down"></i>
           </div>
           <!-- 其他筛选列表 -->
-          <TaskSelect :list="[`全部完工(1990)`]" :show="allShow" />
+          <TaskSelect
+            :list="[
+              { name: `全部完工(${filterData.all || 0})` },
+              { name: `未完成工单(${filterData.unfinished || 0})` },
+              { name: `已完成工单(${filterData.finished || 0})` },
+            ]"
+            :show="allShow"
+            @checkOther="checkAll"
+          />
         </div>
         <div class="common-list-filter-other">
           <div
             class="common-list-filter-other-item"
-            @click.stop="otherShow = true"
+            @click.stop="
+              otherShow = true;
+              allShow = false;
+            "
+            :class="{
+              'common-list-filter-flow-active':
+                otherShow || otherText !== '其他',
+            }"
           >
-            其他
+            {{ otherText }}
+            <i class="iconfont icon-more"></i>
           </div>
           <!-- 其他筛选列表 -->
-          <TaskSelect :show="otherShow" />
+          <TaskSelect
+            :show="otherShow"
+            :list="otherList"
+            @checkOther="checkOther"
+          />
         </div>
       </div>
     </div>
