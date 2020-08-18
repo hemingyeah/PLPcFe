@@ -1,58 +1,55 @@
-.full-page{
+.full-page {
   height: 100vh;
   padding: 10px;
 }
 
-.full-page-main{
+.full-page-main {
   background-color: #fff;
   padding: 0 10px;
 }
 
-.full-page-header{
- 
+.full-page-header {
 }
 
-.full-page-pagination{
-
+.full-page-pagination {
 }
 
-
-.form-page{
+.form-page {
   background-color: #fff;
 
-  .form-builder{
+  .form-builder {
     max-width: 665px;
     padding: 10px 10px;
   }
 }
 
-.form-page-header{
+.form-page-header {
   border-bottom: 1px solid #f4f7f5;
   padding: 12px 10px;
 
   .iconfont {
     font-size: 12px;
   }
-  
-  .btn-back{
+
+  .btn-back {
     padding: 7px 15px;
     color: #333;
   }
 
-  .cut-off-line{
+  .cut-off-line {
     line-height: 34px;
     margin-right: 12px;
   }
 }
 
-.form-page-tool{
+.form-page-tool {
   display: flex;
   flex-flow: row nowrap;
 }
 
 .is-required {
   &:before {
-    content: '*';
+    content: "*";
     color: #f56c6c;
     margin-right: 4px;
     vertical-align: middle;
@@ -67,4 +64,16 @@
   overflow: hidden;
   word-break: break-all;
   text-overflow: ellipsis;
+}
+
+// 三角形
+.icon-down {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
 }

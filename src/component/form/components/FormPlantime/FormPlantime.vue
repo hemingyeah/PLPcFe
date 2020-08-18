@@ -4,7 +4,7 @@
       :id="`form_${field.fieldName}`"
       :type="type"
       :prefix-icon="`iconfont icon-fd-${type}`"
-      value-format="yyyy-MM-dd HH:mm:ss"
+      :value-format="formate"
       :placeholder="placeholder"
       :value="value" @input="choose"/>
   </div>
@@ -25,6 +25,11 @@ export default {
   data() {
     return {
       type: this.field.setting.dateType === 'date' ? 'date' : 'datetime'
+    }
+  },
+  computed: {
+    formate() {
+      return this.type == 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-dd HH:mm:ss'
     }
   },
   methods: {

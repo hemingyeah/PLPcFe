@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="该操作需要审批" :show.sync="visible" width="500px" class="task-need-approve-dialog">
+  <base-modal title="该操作需要审批" :show.sync="visible" width="700px" class="task-need-approve-dialog">
     <div class="base-modal-content">
       <div class="form-item">
         <label><span class="form-item-required" v-if="chooseApprover">*</span>审批人：</label>
