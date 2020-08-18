@@ -486,6 +486,15 @@ export function getTaskCardDetailList(params) {
 }
 
 
+/**
+ * 工单设置，回执合规设置模块 下载此工单类型的标识对应表
+ * @param {Object} params - 参数对象
+ * @param {String} params.typeId - 配置id
+ */
+export function getTaskTemplate(params) {
+  return http.get('/setting/taskType/getTemplateDic', params);
+}
+
 
 
 /* -------------  end  新工单api ---------------- */

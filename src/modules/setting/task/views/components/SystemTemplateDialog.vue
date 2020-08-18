@@ -1,6 +1,6 @@
 <template>
   <base-modal
-      :title="clickType == 'report' ? '设置服务报告' : '设置打印模板'" width="700px" class="form-select-setting-modal"
+      :title="clickType == 'report' ? '设置服务报告系统模板' : '设置打印系统模板'" width="700px" class="form-select-setting-modal"
       @cancel="cancel"
       :show.sync="isShow" :mask-closeable="false">
 
@@ -213,13 +213,14 @@ export default {
       type : String,
       default: ""
     },
+    id : {
+      type : String,
+      default: ""
+    }
   },
   data() {
     return {
-      checkList : ["名称"],
       isShow : false,
-      //TODO: id后期需要动态获取
-      id : 1,
       taskList : [],
       receiptList : [],
       cardDetailList : [],
@@ -288,8 +289,8 @@ export default {
     },
     cancel(res) {
       console.log("cancal")
-      this.$emit("hideModal",{templateType : "system",})
-      //将后台那台的数据全部清空
+      this.$emit("hideModal")
+      //将后台拿到的数据全部清空
 
     },
     setCheckArr() {

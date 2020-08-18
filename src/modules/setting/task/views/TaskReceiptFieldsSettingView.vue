@@ -43,7 +43,7 @@ export default {
       fields: [],
       templateId: '1',
       templateName: '默认工单',
-      tenantId: '7416b42a-25cc-11e7-a500-00163e12f748',
+      tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
     }
   },
   async mounted(){

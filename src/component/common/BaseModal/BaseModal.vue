@@ -11,7 +11,10 @@
         <div class="base-modal-header">
           <slot name="header">
             <slot name="title">
-              <h3 v-if="title">{{title}}</h3>
+              <h3 v-if="title">
+                {{title}}
+                <span v-if="describe" class="describe-text" @click="describeClick">{{describe}}</span>
+              </h3>
             </slot>
             <button type="button" v-if="allowFullscreen" @click="isFullscreen = !isFullscreen">
               <i class="iconfont icon-quanping"></i>
@@ -43,6 +46,10 @@ export default {
       default: false
     },
     title: {
+      type: String,
+      default: ''
+    },
+    describe: {
       type: String,
       default: ''
     },
@@ -124,6 +131,9 @@ export default {
       }
       this.withoutHiddenClass = true;
     },
+    describeClick() {
+      this.$emit('describeClick');
+    }
     
   },
   mounted() {
@@ -249,5 +259,12 @@ export default {
   & + button{
     margin-left: 10px;
   }
+}
+
+.describe-text{
+  margin-left: 10px;
+  cursor: pointer;
+  color: #3c8dbc;
+  font-size: 10px;
 }
 </style>

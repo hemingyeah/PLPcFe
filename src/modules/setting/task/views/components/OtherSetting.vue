@@ -33,12 +33,14 @@
               <div style="display: inline-block;margin-right: 30px;">
                 <el-radio :label="0">使用系统模板</el-radio>
                 <button type="button" class="btn btn-primary"
-                        @click="showSystemPanel('report','system')"
+                        @click="showSystemPanel('report')"
                         :disabled="reportForm.templateSelect == 1">设置字段</button>
               </div>
               <div style="display: inline-block;">
                 <el-radio :label="1">上传自己的模板</el-radio>
-                <button type="button" class="btn btn-primary" :disabled="reportForm.templateSelect == 0">配置</button>
+                <button type="button" class="btn btn-primary"
+                        @click="showSelfPanel('report')"
+                        :disabled="reportForm.templateSelect == 0">配置</button>
               </div>
 
             </el-radio-group>
@@ -64,7 +66,7 @@
             <div style="display: inline-block;margin-right: 30px;">
               <el-radio :label="0">使用系统模板</el-radio>
               <button type="button" class="btn btn-primary"
-                      @click="showSystemPanel('print','system')"
+                      @click="showSystemPanel('print')"
                       :disabled="printForm.templateSelect == 1">
                 设置字段
               </button>
@@ -72,7 +74,7 @@
             <div style="display: inline-block;">
               <el-radio :label="1">上传自己的模板</el-radio>
               <button type="button" class="btn btn-primary"
-                      @click="showSelfPanel"
+                      @click="showSelfPanel('print')"
                       :disabled="printForm.templateSelect == 0">配置</button>
             </div>
           </el-radio-group>
@@ -168,8 +170,12 @@
 
     <slot></slot>
 
-    <system-template-dialog :isShowSystemModal="isShowSystemModal" :clickType="clickType" @hideModal="hideModal"></system-template-dialog>
-    <template-upload-dialog :isShowUploadModal="isShowUploadModal" :clickType="clickType" @hideModal="hideModal"></template-upload-dialog>
+    <system-template-dialog :id="id" :isShowSystemModal="isShowSystemModal" :clickType="clickType" @hideModal="hideModal"></system-template-dialog>
+    <template-upload-dialog :id="id" :isShowUploadModal="isShowUploadModal" :uploadTemplateType="uploadTemplateType"
+                            :reportSetting="reportSetting" :printSetting="printSetting"
+                            @hideModal="hideModal">
+
+    </template-upload-dialog>
 
   </div>
 </template>
@@ -185,7 +191,7 @@ export default {
   data() {
     return {
       //TODO: id后期需要动态获取
-      id : 1,
+      id : "1",
       taskForm : {
         "editUnitPrice" : "修改单品价格",
         "showDiscountCost" : "修改工单总折扣价"
@@ -227,7 +233,10 @@ export default {
       isShowUploadModal : false,
       clickType : "",
       templateTypeTemp : "",
-      clickTypeTemp : ""
+      clickTypeTemp : "",
+      uploadTemplateType : "",
+      reportSetting: {},
+      printSetting : {}
     }
   },
   created() {
@@ -235,41 +244,28 @@ export default {
   },
   methods: {
 
-    showSystemPanel(clickType,templateType) {
-      this.$emit("submit",{clickType,templateType})
-      this.templateTypeTemp = templateType;
+    showSystemPanel(clickType) {
+      //clickType区分服务报告还是打印
+      this.$emit("submit",{clickType})
       this.clickTypeTemp = clickType;
     },
     didShowSystemPanel() {
-      console.log("didShowSystemPanel")
-      if(this.templateTypeTemp == "system") {
-        this.isShowSystemModal = true;
-        this.isShowSelfModal = false;
-      }else{
-        this.isShowSystemModal = false;
-        this.isShowSelfModal = true;
-      }
+      this.isShowSystemModal = true;
       this.clickType = this.clickTypeTemp;
-      console.log(this.isShowSystemModal)
-      console.log(this.isShowSelfModal)
-      console.log(this.clickType)
     },
-    showSelfPanel() {
+    showSelfPanel(type) {
       console.log("显示自己的模板")
+      console.log(type)
+      this.isShowUploadModal = true;
+      this.uploadTemplateType = type;
     },
-    hideModal(_obj) {
-      //重置弹窗
-      let {templateType} = _obj;
+    hideModal() {
       //系统弹窗
       this.isShowSystemModal = false;
       //自选弹窗
-      this.isShowSelfModal = false;
+      this.isShowUploadModal = false;
       //类型
       this.clickType = "";
-      // if(templateType == "system") {
-      //   this.isShowSystemModal = false;
-      //   this.isShowSelfModal = false;
-      // }
     },
     checkNum(name,value,desc) {
       if(isNaN(value)) {
@@ -308,6 +304,9 @@ export default {
         }
 
         Object.assign(this.cameraForm,data.config.positionExceptionConfig);
+
+        this.reportSetting = data.reportSetting;
+        this.printSetting = data.printSetting;
 
       }
 
