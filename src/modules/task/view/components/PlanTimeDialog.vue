@@ -1,7 +1,7 @@
 <template>
   <base-modal title="调整计划时间" :show.sync="visible" width="500px" class="task-plantime-dialog">
     <div class="base-modal-content">
-      <form-item :label="field.displayName">
+      <form-item :label="field.displayName" v-if="field.id">
         <form-plantime :field="field" :value="planTime" @update="update"></form-plantime>
       </form-item>
       <el-checkbox class="task-planTime-notice" v-model="sendSMS" v-if="action == 'modifyPlanTime'">发送短信预约通知</el-checkbox>
@@ -27,6 +27,10 @@ export default {
     initData: {
       type: Object,
       default: () => ({})
+    },
+    field: {
+      type: Object,
+      default: () => ({})
     }
   },
   data: () => {
@@ -40,20 +44,7 @@ export default {
   },
   computed: {
     dateType() {
-      return this.initData.planTimeType;
-    },
-    field() {
-      return {
-        displayName: '计划时间',
-        fieldName: 'planTime',
-        formType: 'planTime',
-        isNull: 1,
-        isSystem: 1,
-        placeHolder: this.initData.planTimePlaceholder,
-        setting: {
-          dateType: this.dateType
-        }
-      }
+      return this.field.setting.dateType;
     }
   },
   methods: {
@@ -65,7 +56,7 @@ export default {
 
       // 计划时间格式为日期时需格式化
       if (this.dateType == 'date' && planTime) {
-        planTime = `${planTime.slice(0, 10)} 00:00:00`;
+        planTime = planTime.slice(0, 10);
       }
       this.planTime = planTime;
 
@@ -87,11 +78,14 @@ export default {
     submit(modifiable = true) {
       if (modifiable && !this.planTime) return this.$platform.alert('请填写计划时间');
 
-      let params = { taskId: this.task.id, newPlanTime: this.planTime };
+      let newPlanTime = this.planTime;
+      if(this.dateType == 'date') newPlanTime += ' 00:00:00';
+
+      let params = { taskId: this.task.id, newPlanTime };
 
       // 修改计划时间时参数
       if (this.action == 'modifyPlanTime') {
-        params.planTime = this.planTime;
+        params.planTime = newPlanTime;
         params.sendSMS = this.sendSMS;
         delete params.newPlanTime;
       }

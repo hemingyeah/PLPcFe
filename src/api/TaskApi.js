@@ -253,6 +253,13 @@ export function pauseApproveCheck(params) {
   return http.get('/task/approve/pause', params);
 }
 
+/** 
+ * @description 审核结算时校验是否需要审批
+*/
+export function balanceApproveCheck(params) {
+  return http.post('/balance/approve/confirm', params, false);
+}
+
 /**
  * @description 获取工单最近更新记录
  * @param {Object} params - 参数
@@ -403,10 +410,42 @@ export function rollBackTask(params) {
 /** 
  * 删除工单
  * @param {Object} params - 参数对象
- * @param {String} params.taskIds - 需要删除的工单id数组
+ * @param {Array} params.taskIds - 需要删除的工单id数组
 */
 export function deleteTask(params) {
   return http.post(`${fixedPrefixAppPath}/outside/pc/task/delete`, params);
+}
+
+/** 
+ * 结算工单
+ * @param {Object} params - 参数对象
+ * @param {Array} params.balanceAttachments - 附件
+ * @param {Object} params.balanceAttributes - 自定义结算字段值集合
+ * @param {String} params.taskId - 工单id
+*/
+export function balanceTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/balance`, params);
+}
+
+/** 
+ * 编辑结算
+ * @param {Object} params - 参数对象
+ * @param {Array} params.balanceAttachments - 附件
+ * @param {Object} params.balanceAttributes - 自定义结算字段值集合
+ * @param {String} params.taskId - 工单id
+*/
+export function editBalance(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/editBalance`, params);
+}
+
+/** 
+ * 回退结算
+ * @param {Object} params - 参数对象
+ * @param {Array} params.reason - 回退原因
+ * @param {String} params.taskId - 工单id
+*/
+export function rollBackBalance(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/rollBackBalance`, params);
 }
 
 /**

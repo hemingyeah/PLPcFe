@@ -22,6 +22,7 @@ export default {
       task: {},
       fields: [],
       tabs: [],
+      planTimeField: {},
       // 当前选中的tab
       currTab: 'task-info-record',
       // TODO: 工单状态从移动端拷贝的数据 后面要修改
@@ -491,8 +492,6 @@ export default {
     propsForSubComponents() {
       return {
         task: this.task,
-        loginUser: this.loginUser,
-        isDelete: this.isDelete
       };
     },
   },
@@ -553,6 +552,9 @@ export default {
       } else if (action === 'refuse') {
         this.refuseDialog.reason = '';
         this.refuseDialog.visible = true;
+      } else if (action === 'back') {
+        this.backDialog.reason = '';
+        this.backDialog.visible = true;
       }
     },
     // 删除工单
@@ -604,8 +606,7 @@ export default {
           if (!await this.$platform.confirm('回执备件来源与当前备件库配置不同，回退工单将会把已使用的备件退回到原仓库，是否继续？')) return;
         }
         
-        this.backDialog.reason = '';
-        this.backDialog.visible = true;
+        this.openDialog('back');
       } catch (e) {
         console.error('backTask error', e);
       }
@@ -618,7 +619,9 @@ export default {
       this.pending = true;
 
       const params = { taskId: this.task.id, reason };
-      TaskApi.rollBackTask(params).then(res => {
+      const API = this.task.state == 'finished' ? 'rollBackTask' : 'rollBackBalance';
+      
+      TaskApi[API](params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
@@ -842,6 +845,8 @@ export default {
         formType: 'timestamp',
         isSystem: 1,
       }];
+
+      this.planTimeField = fields.filter(field => field.formType == 'planTime')[0];
 
       this.tabs = this.buildTabs();
 

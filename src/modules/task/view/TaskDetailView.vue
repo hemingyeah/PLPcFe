@@ -169,8 +169,9 @@
     <!-- start 回退工单弹窗 -->
     <base-modal title="回退工单" :show.sync="backDialog.visible" width="500px" class="task-back-dialog">
       <div class="base-modal-content">
-        <p>回退工单将工单退回工单负责人，可以重新提交回执信息，原有回执信息将不再保存</p>
-        <textarea v-model="backDialog.reason" placeholder="[最多500字][必填]" rows="3" maxlength="500" />
+        <p v-if="task.state == 'finished'">回退工单将工单退回工单负责人，可以重新提交回执信息，原有回执信息将不再保存</p>
+        <p v-else-if="task.state == 'costed'">回退工单将工单退回已完成状态，可以重新提交审核结算信息，原有审核结算信息将不再保存</p>
+        <textarea v-model="backDialog.reason" placeholder="请输入回退说明[最多500字][必填]" rows="3" maxlength="500" />
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="backDialog.visible = false">取 消</el-button>
@@ -216,6 +217,7 @@
       ref="planTimeDialog"
       :task="task"
       :init-data="initData"
+      :field="planTimeField"
     />
     <!-- end 计划时间弹窗 -->
 
