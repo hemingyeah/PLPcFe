@@ -13,7 +13,7 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter(item.id)"
+            @click="checkFilter({ id: item.id, name: '待指派工单' })"
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.createdId"
             :class="{
@@ -26,7 +26,7 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter(item.id)"
+            @click="checkFilter({ id: item.id, name: '已指派工单' })"
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.allocatedId"
             :class="{
@@ -39,7 +39,7 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter(item.id)"
+            @click="checkFilter({ id: item.id, name: '已接受工单' })"
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.acceptedId"
             :class="{
@@ -52,7 +52,7 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter(item.id)"
+            @click="checkFilter({ id: item.id, name: '进行中工单' })"
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.processingId"
             :class="{
@@ -65,7 +65,7 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter(item.id)"
+            @click="checkFilter({ id: item.id, name: '异常工单' })"
             class="common-list-filter-span1 common-list-filter-flow-item ce6"
             v-if="
               item.id === selectIds.exceptionId && initData.tenantVersion === 2
@@ -78,7 +78,7 @@
           </div>
           <!-- 全部工单 -->
           <div
-            @click="checkFilter(selectIds.allId)"
+            @click="checkFilter({ id: selectIds.allId, name: '全部工单' })"
             class="common-list-filter-span1 common-list-filter-flow-item"
             :class="{
               'common-list-filter-flow-active': selectIds.allId === filterId,
@@ -171,7 +171,7 @@
     <!-- end header -->
 
     <!-- start 高级搜索 -->
-    <task-search-panel :init-data="initData" :config="{}" ref="searchPanel">
+    <task-search-panel :init-data="initData" :config="columns" ref="searchPanel"  v-if="columns.length">
       <div class="advanced-search-btn-group" slot="footer">
         <base-button type="ghost" @event="resetParams">重置</base-button>
         <base-button type="primary" @event="advancedSearch" native-type="submit"
@@ -180,7 +180,6 @@
       </div>
     </task-search-panel>
     <!-- end 高级搜索 -->
-
     <div class="common-list-section">
       <!--operation bar start-->
       <div class="operation-bar-container task-list-operation-bar-container">
@@ -498,7 +497,7 @@
     <!-- end 选择列设置 -->
 
     <!-- start 已选择面板 -->
-    <selection-panel
+    <!-- <selection-panel
       ref="openSelectionPanel"
       title="工单"
       :columns="selectPanelColumns"
@@ -507,7 +506,7 @@
       @input="selectionPanelInputChange"
       @remove="selectionPanelRemoveItem"
     >
-    </selection-panel>
+    </selection-panel> -->
     <!-- ebd 已选择面板 -->
 
     <!-- start 导出工单 -->

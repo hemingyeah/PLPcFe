@@ -6,11 +6,13 @@ const router = new KoaRouter();
 const modules = require('../../modules');
 
 router.get('/task', async ctx => {
+  // console.log('task',ctx)
   let script = ['/task.list.js'];
   let modConfig = modules['task.list'];
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request('/task', 'get', null, {headers: reqHeaders});
   let body = result.body;
+  // console.log('task', result)
   
   ctx.body = Template.renderWithHtml('工单列表', body, script, modConfig.template)
 });

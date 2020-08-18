@@ -6,11 +6,11 @@ const https = require(isNotLocalEnv ? "https" : "http");
 //   port: 8080,
 // };
 const DEFAULT_OPIONS = {
-  host: "30.40.61.57",
+  host: "127.0.0.1",
   port: 8080,
-  headers: {
-    cookie: "VIPPUBLINKJSESSIONID=054e95fe-e787-4fdc-b4de-6bb5c44bc99f",
-  },
+  // headers: {
+  //   cookie: "VIPPUBLINKJSESSIONID=6dd19f76-97f7-4eba-9302-dba466aeee40",
+  // },
 };
 // https agent
 const AGENT = new https.Agent({

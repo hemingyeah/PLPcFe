@@ -257,7 +257,6 @@ export default {
   },
   mounted() {
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
-    console.log("taskView", this.initData);
     this.taskView = this.initData.taskView;
     this.currentTaskType = this.taskTypes[0];
 
@@ -265,6 +264,10 @@ export default {
     this.initialize();
     this.otherLists();
     this.getTaskCountByState();
+
+    // 对外开放刷新方法，用于其他tab刷新本tab数据
+    window.__exports__refresh = this.search;
+    console.log("taskView", this.initData);
   },
   methods: {
     /**
@@ -275,6 +278,7 @@ export default {
       this.taskPage.list = [];
 
       this.params.moreConditions = this.$refs.searchPanel.buildParams();
+      // this.$refs.searchPanel.hide();
 
       this.search();
     },
@@ -298,9 +302,11 @@ export default {
       this.filterId = "";
     },
     /* 顶部筛选 */
-    checkFilter(id) {
+    checkFilter({ id, name }) {
       this.filterId = id;
       this.otherText = "其他";
+      // 埋点
+      window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
     /*全部工单 */
     checkAll() {
