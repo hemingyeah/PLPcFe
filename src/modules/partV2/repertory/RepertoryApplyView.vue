@@ -1399,11 +1399,19 @@ export default {
       approveBatchByApproveNos(params).then(res=>{
         this.mulHandleDialog=false;
         this.pending = false;
-        this.$message({
-          showClose: true,
-          message: res.message,
-          type: 'success'
-        });
+        if(res.success){
+          this.$message({
+            showClose: true,
+            message: res.message || '办理成功',
+            type: 'success'
+          });
+        }else{
+          this.$message({
+            showClose: true,
+            message: res.message,
+            type: 'error'
+          });
+        }
       }).catch(err=>{
         this.pending = false;
         this.$message({
