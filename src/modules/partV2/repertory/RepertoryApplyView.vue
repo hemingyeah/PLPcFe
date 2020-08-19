@@ -1147,6 +1147,7 @@ export default {
       stateArr: [
         { value: '', label: '状态：全部', key: 'all' },
         { value: 'suspending', label: '待办理', key: 'suspending' },
+        { value: 'dealing', label: '办理中', key: 'dealing' },
         { value: 'solved', label: '已办理', key: 'solved' },
         { value: 'rejected', label: '已拒绝', key: 'rejected' },
         { value: 'cancel', label: '已取消', key: 'cancel' },
@@ -1295,6 +1296,7 @@ export default {
     state(s) {
       if (s === 'solved') return '已办理';
       if (s === 'suspending') return '待办理';
+      if (s === 'dealing') return '办理中';
       if (s === 'cancel') return '已取消';
       if (s === 'rejected') return '已拒绝';
       if (s === 'revoked') return '已撤回';
@@ -2752,6 +2754,9 @@ export default {
       case 'suspending':
         this.$tdOnEvent('pc：办理出入库-待办理事件');
         break;
+      case 'dealing':
+        this.$tdOnEvent('pc：办理出入库-办理中事件');
+        break;
       case 'solved':
         this.$tdOnEvent('pc：办理出入库-已办理事件');
         break;
@@ -3138,8 +3143,8 @@ a {
   background: rgba(103,194,58,.2);
   border:1px solid rgba(103,194,58,.16);
 }
-// 待办理
-.state-suspending{
+// 待办理，办理中
+.state-suspending,.state-dealing{
   color:#FAAE14;
   background: rgba(250,174,20,.2);
   border:1px solid rgba(250,174,20,.16);

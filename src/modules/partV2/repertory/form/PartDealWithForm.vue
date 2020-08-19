@@ -397,6 +397,8 @@ export default {
           return '已办理'
         case 'suspending':
           return '待办理'
+        case 'dealing':
+          return '办理中'
         case 'cancel':
           return '已取消'
         case 'rejected':
@@ -570,8 +572,8 @@ export default {
     background: rgba(103,194,58,.2);
     border:1px solid rgba(103,194,58,.16);
   }
-  // 待办理
-  .form-only-see-suspending{
+  // 待办理，办理中
+  .form-only-see-suspending,.form-only-see-dealing{
     color:#FAAE14;
     background: rgba(250,174,20,.2);
     border:1px solid rgba(250,174,20,.16);
