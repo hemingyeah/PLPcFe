@@ -6,7 +6,7 @@
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
     
-    <div class="base-upload-operation">
+    <div class="base-upload-operation" v-if="isShowOperateContent">
       <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
         <i class="iconfont icon-loading" v-if="pending"></i>
         <span>{{pending ? '正在上传' : '点击上传'}}</span>
@@ -51,6 +51,10 @@ export default {
     placeholder: {
       type: String,
       default: ''
+    },
+    isShowOperateContent : {
+      type: Boolean,
+      default: true
     }
   },
   methods: {

@@ -16,8 +16,7 @@
       </div>
       <div class="upload-content-line">
         <p class="upload-content-desc">2、上传打印模板</p>
-<!--        <base-upload @input="input" :value="value" :for-id="`form_${field.fieldName}`" :placeholder="placeHolder"></base-upload>-->
-        <base-upload @input="input" :value="value"></base-upload>
+        <base-upload @input="input" :value="value" :isShowOperateContent="isShowOperateContent"></base-upload>
       </div>
       <p class="note-text">注：上传的模板仅支持[xlsx]格式的文件</p>
     </div>
@@ -30,7 +29,8 @@
 </template>
 
 <script>
-import {getTaskTemplate} from "@src/api/TaskApi";
+import {getTaskTemplate,savePrintTemplate,saveReportTemplate} from "@src/api/TaskApi";
+import platform from "@src/platform";
 export default {
   name: "TemplateUploadDialog",
   props: {
@@ -58,7 +58,8 @@ export default {
   data() {
     return {
       isShow : false,
-      value : []
+      value : [],
+      isShowOperateContent : true
     }
   },
   methods : {
@@ -75,6 +76,13 @@ export default {
     input(newValue) {
       console.log("baseupload的input事件")
       console.log(newValue)
+      console.log("uploadTemplateType")
+      console.log(this.uploadTemplateType)
+      if(newValue.length) {
+        this.uploadTemplate();
+      }else{
+        this.deleteTemplate();
+      }
       // let oldValue = null;
       // this.$emit('update', {newValue, oldValue, field: this.field});
       // this.$emit('input', newValue);
@@ -92,6 +100,21 @@ export default {
       a.click();
 
     },
+    async uploadTemplate() {
+
+    },
+    async deleteTemplate() {
+      let result;
+      if(this.uploadTemplateType == "report") {
+        result = await saveReportTemplate({typeId:this.id});
+      }else if(this.uploadTemplateType == "print") {
+        result = await savePrintTemplate({typeId:this.id});
+      }
+
+      if(result.status == 1){
+        platform.alert(result.message);
+      }
+    },
     describeClick() {
       // window.location.href = 'https://www.yuque.com/shb/help/custom_report';
       window.open('https://www.yuque.com/shb/help/custom_report')
@@ -108,10 +131,13 @@ export default {
       if(newVal == "report") {
         console.log("报告模板")
         console.log(this.reportSetting)
+        this.value = this.reportSetting.templates;
       }else if(newVal == "print"){
-        console.log("打印模板")
+        console.log("打印模板11111")
         console.log(this.printSetting)
+        this.value = this.printSetting.templates;
       }
+      console.log(this.value);
     },
     reportSetting(newVal,oldVal) {
       console.log("reportSetting")
@@ -121,10 +147,14 @@ export default {
       console.log("printSetting")
       console.log(newVal)
     },
-  },
-  computed: {
-    placeHolder() {
-      return `${!this.field.isNull ? ' + 添加' : ''}${this.field.placeHolder || '点击上传文件'}`;
+    value(newVal,oldVal) {
+      console.log("value")
+      console.log(newVal)
+      if(newVal.length) {
+        this.isShowOperateContent = false;
+      }else{
+        this.isShowOperateContent = true;
+      }
     }
   },
 }
@@ -136,7 +166,7 @@ export default {
 }
 .upload-content-line{
   display: flex;
-  align-items: baseline;
+  align-items: end;
   margin-bottom: 10px;
 }
 .upload-content-desc{

@@ -5,7 +5,7 @@
       :show.sync="isShow" :mask-closeable="false">
 
 
-    <div class="scroll-content">
+    <div class="scroll-content" v-loading="loadingCheck">
       <div class="row">
         <p class="title">公司信息</p>
         <div class="section-line">
@@ -148,9 +148,8 @@
         <p class="title">附件信息</p>
         <div class="section-line">
           <div class="checkbox-group">
+            <!--          工单信息附件类型-->
             <el-checkbox-group class="flex-el-checkbox-group" v-model="attachmentTasklistCheck">
-
-              <!--          工单信息附件类型-->
               <template v-for="item in taskList" v-if="item.formType == 'attachment'">
                 <div class="checkbox-item">
                   <el-checkbox :label=item.fieldName :value=item.fieldName name="attachment_Fields">工单-{{item.displayName}}</el-checkbox>
@@ -158,20 +157,19 @@
               </template>
             </el-checkbox-group>
 
-            <el-checkbox-group class="flex-el-checkbox-group" v-model="attachmentReceiptCheck">
+<!--            回执附件-->
+            <el-checkbox-group class="flex-el-checkbox-group" v-model="receiptAttachmentsCheck">
               <!--          回执附件-->
-              <div class="checkbox-item">
+              <div class="checkbox-item" v-if="showReceiptAttachment ">
                 <el-checkbox label="receiptAttachment" value="receiptAttachment" name="attachment_Fields">回执-回执附件</el-checkbox>
               </div>
-            </el-checkbox-group>
-
-            <el-checkbox-group class="flex-el-checkbox-group" v-model="attachmentReceiptListCheck">
               <template v-for="item in receiptList" v-if="item.formType == 'attachment'">
                 <div class="checkbox-item">
                   <el-checkbox :label=item.fieldName :value=item.fieldName name="attachment_Fields">回执{{item.displayName}}</el-checkbox>
                 </div>
               </template>
             </el-checkbox-group>
+
 
             <!--          附件组件附件-->
             <template v-for="(cardInfo,index) in cardDetailList" >
@@ -199,8 +197,9 @@
 </template>
 
 <script>
-import {getTaskTemplateFields, getFields, taskSettingSave, getTaskCardDetailList, getTaskType} from '@src/api/TaskApi';
+import {getTaskTemplateFields, getFields, taskSettingSave, getTaskCardDetailList, getTaskType, saveSystemReport,saveSystemPrint} from '@src/api/TaskApi';
 import TeamDetailView from "@src/modules/team/views/TeamDetailView";
+import platform from "@src/platform";
 export default {
   name: "system-template-dialog",
   components: {TeamDetailView},
@@ -221,6 +220,7 @@ export default {
   data() {
     return {
       isShow : false,
+      loadingCheck : false,
       taskList : [],
       receiptList : [],
       cardDetailList : [],
@@ -229,20 +229,39 @@ export default {
         attachmentFields: {}
       },
       //复选组里被选中的值
+      //公司信息
       companyCheck : [],
+      //客户信息
       userCheck : [],
+      //工单信息
       orderCheck : [],
+      //回执信息
       receiptCheck : [],
+      //附加组件勾选信息(二位数组)
       additionalCheck : [],
+      showReceiptAttachment : false,
+
       attachmentTasklistCheck : [],
       attachmentReceiptCheck : [],
       attachmentReceiptListCheck : [],
-      attachmentCardDetailListCheck : []
+      receiptAttachmentsCheck : [],
+      attachmentCardDetailListCheck : [],
+      //附加组件数组的最外层id数组(提交时候使用)
+      cardDetailCardIdList : [],
+      //附加信息attachmentFields提交时需要的数据
+      attachmentFieldsObj : {
+        multipleCardInfoAttachments : [],
+        singleCardInfoAttachments : [],
+        taskAttachments : {},
+        receiptAttachments : {},
+      }
+
 
     }
   },
   methods : {
     async getTemplateInfo() {
+      this.loadingCheck = true;
       console.log("异步查看配置")
       console.log(this.clickType)
       //查看配置
@@ -268,9 +287,16 @@ export default {
           }
         }
       }
+      this.showReceiptAttachment = result.data.options.showAttachment;
       //创建工单组件时的配置
       let firstFields = await getFields({ tableName: 'task', typeId:this.id});
       this.taskList = firstFields;
+      for(let item of this.taskList) {
+        this.attachmentFieldsObj.taskAttachments[item.fieldName] = {
+          fieldName: item.fieldName,
+          displayName: item.displayName
+        };
+      }
       //回执组件的配置
       let secondFields = await getFields({ tableName: 'task_receipt', typeId:this.id});
       let msg = [];
@@ -278,14 +304,119 @@ export default {
         return item.enabled == 1
       });
       this.receiptList = msg;
+      console.log("receiptList")
+      console.log(this.receiptList)
+      for(let item of this.receiptList) {
+        this.attachmentFieldsObj.receiptAttachments[item.fieldName] = {
+          fieldName: item.fieldName,
+          displayName: item.displayName
+        };
+      }
+
       //附加组件的配置
       let thirdFields = await getTaskCardDetailList({typeId:this.id});
       this.cardDetailList = thirdFields;
 
+      this.loadingCheck = false;
+
+      console.log("cardDetailList")
+      console.log(this.cardDetailList)
+
+      for(let item of this.cardDetailList) {
+        this.cardDetailCardIdList.push(item.cardId);
+      }
       this.setCheckArr();
     },
     async submit() {
       console.log("保存系统模板配置");
+
+      let result;
+      if(this.clickType == "report") {
+        //服务报告
+        let reportSetting = this.handleData("reportSetting");
+        result = await saveSystemReport({id:this.id,reportSetting});
+      }else if(this.clickType == "print") {
+        //打印
+        let printSetting = this.handleData('printSetting');
+        result = await saveSystemPrint({id:this.id,printSetting});
+      }
+      if(result.status == 0){
+        platform.alert("保存成功");
+        this.cancel();
+      }else{
+        platform.alert("保存失败");
+      }
+    },
+    handleData(type) {
+      let _outObj = {};
+      //公司信息
+      _outObj.tenantFields = this.companyCheck;
+      //客户信息
+      _outObj.customerFields = this.userCheck;
+      //工单信息
+      _outObj.taskFields = this.orderCheck;
+      //回执信息
+      _outObj.receiptFields = this.receiptCheck;
+      //附加组件
+      let cardFields = [];
+      for(let item in this.additionalCheck) {
+        let _obj = {
+          cardId : this.cardDetailCardIdList[item],
+          fields : this.additionalCheck[item]
+        };
+        cardFields.push(_obj);
+      }
+      _outObj.cardFields = cardFields;
+      //最下方附件信息
+      let attachmentFields = {
+        taskAttachments : [],
+        receiptAttachments : [],
+        singleCardInfoAttachments : [],
+        multipleCardInfoAttachments : []
+      };
+
+      console.log("最后的")
+
+      for(let item of this.attachmentTasklistCheck) {
+        if(this.attachmentFieldsObj.taskAttachments[item].fieldName == item) {
+          attachmentFields.taskAttachments.push(this.attachmentFieldsObj.taskAttachments[item]);
+        }
+      }
+      for(let item of this.receiptAttachmentsCheck) {
+        if(this.attachmentFieldsObj.receiptAttachments[item].fieldName == item) {
+          attachmentFields.receiptAttachments.push(this.attachmentFieldsObj.receiptAttachments[item]);
+        }
+      }
+      for(let item in this.attachmentCardDetailListCheck) {
+        //获取附件信息选中数组
+        console.log(this.cardDetailList[item])
+        let {cardId,cardName,inputType} = this.cardDetailList[item];
+        for(let selectItem of this.attachmentCardDetailListCheck[item]) {
+          //获取附件信息选中数组每一组的值
+          for(let cardItem of this.cardDetailList[item].fields) {
+            //查看后端返回的每个附件信息的信息
+            console.log(cardItem)
+            if(cardItem.fieldName == selectItem) {
+              let _obj = {
+                cardId,
+                cardName,
+                displayName: cardItem.displayName,
+                fieldName: cardItem.fieldName
+              };
+              if(inputType == "single") {
+                attachmentFields.singleCardInfoAttachments.push(_obj);
+              }else if(inputType=="multiple") {
+                attachmentFields.multipleCardInfoAttachments.push(_obj);
+              }
+            }
+          }
+        }
+      }
+
+      _outObj.attachmentFields = attachmentFields;
+
+      return _outObj;
+
     },
     cancel(res) {
       console.log("cancal")
@@ -305,16 +436,44 @@ export default {
     },
     setAdditionalCheck() {
       this.additionalCheck = [];
-      let cardFields = this.reviewSetting.cardFields;
-      for(let item of cardFields) {
-        this.additionalCheck.push(item.fields);
+      // let cardFields = this.reviewSetting.cardFields;
+      // for(let item of cardFields) {
+      //   this.additionalCheck.push(item.fields);
+      // }
+
+      console.log("======")
+      console.log(this.additionalCheck)
+      console.log(this.cardDetailList)
+
+      for(let item of this.cardDetailList) {
+        //5次
+        console.log("外层id")
+        console.log(item)
+        let _arr = [];
+        //按照cardDetailList来循环
+        for(let cardItem of this.reviewSetting.cardFields) {
+          //4次
+          console.log("内层id")
+          console.log(cardItem)
+          if(item.cardId == cardItem.cardId) {
+            _arr = cardItem.fields;
+          }
+        }
+        this.additionalCheck.push(_arr);
       }
+
+
+
     },
     setAttachmentCheck() {
       //工单信息附件类型
       this.attachmentTasklistCheck = this.isInAttachmentArray111(this.taskList,this.reviewSetting.attachmentFields.taskAttachments);
-      this.attachmentReceiptCheck = this.isInAttachmentArray111([{fieldName:"receiptAttachment"}],this.reviewSetting.attachmentFields.receiptAttachments);
-      this.attachmentReceiptListCheck = this.isInAttachmentArray111(this.receiptList,this.reviewSetting.attachmentFields.receiptAttachments);
+      this.attachmentReceiptCheck = this.isInAttachmentArray111([{fieldName:"receiptAttachment"}],this.reviewSetting.attachmentFields.receiptAttachments)
+      let _filterReceiptList = this.receiptList.filter(item => {
+        return item.formType == 'attachment';
+      })
+      this.attachmentReceiptListCheck = this.isInAttachmentArray111(_filterReceiptList,this.reviewSetting.attachmentFields.receiptAttachments);
+      this.receiptAttachmentsCheck = [...this.attachmentReceiptCheck,...this.attachmentReceiptListCheck];
       this.attachmentCardDetailListCheck = [];
       for(let item of this.cardDetailList) {
         let _arr = this.isInAttachmentArray111(item.fields,this.reviewSetting.attachmentFields.singleCardInfoAttachments,this.reviewSetting.attachmentFields.multipleCardInfoAttachments);
@@ -355,11 +514,6 @@ export default {
       // console.log(_arr)
 
       return _arr;
-    },
-    isInArray(_arr,_value) {
-      let arr = _arr || [];
-      let _index = arr.indexOf(_value);
-      return _index >= 0;
     }
   },
   watch : {
