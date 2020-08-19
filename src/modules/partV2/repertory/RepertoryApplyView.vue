@@ -454,6 +454,12 @@
                     v-if="allowImportAndExport"
                   >导出全部</span>
                 </el-dropdown-item>
+                <el-dropdown-item>
+                  <span
+                    class="dropdown-item"
+                    @click="mulHandle(selected)"
+                  >批量办理</span>
+                </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -877,6 +883,18 @@
       </el-dialog>
 
       <el-dialog
+        title='批量办理'
+        :visible.sync="mulHandleDialog"
+        width='90%'
+      >
+        <mul-handle-form ref='mulHandleForm' :formdata='formdata' :mulHandleKey='mulHandleKey'></mul-handle-form>
+        <div slot="footer" class="dialog-footer">
+          <base-button type="ghost" @event="mulHandleDialog = false">取 消</base-button>
+          <base-button type="primary" @event="mulHandleSave" :disabled="pending">确 定</base-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog
         :title="`${cancelType==0?'拒绝':'撤销'}`"
         :modal="false"
         :visible.sync="backstockDialog"
@@ -1086,6 +1104,7 @@ import PartReStockForm from './form/PartReStockForm.vue';
 import PartCancelTransferForm from './form/PartCancelTransferForm.vue';
 import PartTransferForm from './form/PartTransferForm.vue';
 import PartDealWithForm from './form/PartDealWithForm.vue';
+import MulHandleForm from './form/MulHandleForm';
 
 import DateUtil from '@src/util/date';
 import AuthUtil from '@src/util/auth';
@@ -1095,7 +1114,9 @@ import {
   revokeBatch,
   approveBatch,
   getRelationListByApproveNo,
-  getProgress
+  getProgress,
+  getRelationsByApproveNos,
+  approveBatchByApproveNos
 } from '@src/api/SparePart';
 import StorageUtil from '@src/util/storageUtil';
 
@@ -1173,6 +1194,7 @@ export default {
       cancelTransferDialog: false,
       transferDialog: false,
       reStockDialog: false,
+      mulHandleDialog:false,
       partDealDialog: false, // 新处理弹窗显隐判断条件
       partDealData: {
         data: {},
@@ -1234,7 +1256,9 @@ export default {
         ]
       },
       cancelType: 0, // 0 拒绝 1 撤销
-      partDealKey:1
+      partDealKey:1,
+      formdata:[],
+      mulHandleKey:1
     };
   },
   computed: {
@@ -1278,6 +1302,125 @@ export default {
     }
   },
   methods: {
+    // 批量办理
+    mulHandle(value){
+      if(value.length===0){
+        this.$platform.alert('请至少选择1条数据');
+        return;
+      }
+      if(value.length>20){
+        this.$platform.alert('单次选择不能超过20个申请单');
+        return;
+      }
+      // 只能选择可办理的数据
+      const cannotApprove=value.filter(item=>!item.approved);
+      if(cannotApprove.length>0){
+        this.$platform.alert('有'+cannotApprove.length+'条数据，您无办理权限');
+        return;
+      }
+      // 只能选择状态为"待办理"，申请类别为 申领、调拨、退回、分配 的数据
+      const allSuspending=value.every(item=>item.state==='suspending');
+      const allSL=value.every(item=>item.type==='申领');
+      const allDB=value.every(item=>item.type==='调拨');
+      const allTH=value.every(item=>item.type==='退回');
+      const allFP=value.every(item=>item.type==='分配');
+      if(!allSuspending || (!allSL && !allDB && !allTH && !allFP)){
+        this.$platform.alert('单次办理请选择同一申请类别的数据，且状态为【待办理】的申请单进行批量入库办理');
+        return;
+      }
+      const params={
+        ids:value.map(item=>item.id),
+        type:value[0].type
+      }
+      getRelationsByApproveNos(params).then(res=>{
+        if(!res.success){
+          this.$message({
+            showClose: true,
+            message: res.message || 'http error',
+            type: 'error'
+          });
+          return
+        }
+        const result=res.result.data;
+        this.formdata=result.map(item=>{
+          return {
+            id:item.id,
+            solvedVariation:item.solvedVariation,
+            variation:item.variation,
+            targetName:item.targetName,
+            propserName:item.propserName,
+            approveNo:item.approveNo,
+            type:item.type,
+            name:item.sparepart.name,
+            serialNumber:item.sparepart.serialNumber,
+            standard:item.sparepart.standard,
+            unit:item.sparepart.unit,
+            sourceName:item.sourceName,
+            sType:item.sparepart.type,
+            propserTime:this.formmatTime(item.propserTime),
+            repertoryCount:item.repertoryCount,
+            handleNum:null,
+            checked:false,
+            max:''
+          }
+        });
+        this.mulHandleKey++;
+        this.mulHandleDialog=true;
+      });
+      this.mulHandleKey++;
+      this.mulHandleDialog=true;
+    },
+    // 批量办理-保存
+    mulHandleSave(){
+      let form=this.$refs.mulHandleForm;
+      if(form.selected.length===0){
+        this.$platform.alert('请选择要办理的数据');
+        return
+      }
+      if(form.remark.length>500){
+        this.$platform.alert('办理意见不能超过500字');
+        return
+      }
+
+      if(this.pending) return;
+
+      this.pending = true;
+      const params=form.selected.map(item=>{
+        return {
+          approveNo:item.approveNo,
+          id:item.id,
+          remark:form.remark,
+          solvedVariation:item.handleNum,
+          type:item.type
+        }
+      });
+      approveBatchByApproveNos(params).then(res=>{
+        this.mulHandleDialog=false;
+        this.pending = false;
+        this.$message({
+          showClose: true,
+          message: res.message,
+          type: 'success'
+        });
+      }).catch(err=>{
+        this.pending = false;
+        this.$message({
+          showClose: true,
+          message: err.message,
+          type: 'error'
+        });
+      })
+    },
+    formmatTime(time){
+      const t=new Date(time);
+      const year=t.getFullYear();
+      const month=(t.getMonth()+1).toString().padStart(2,'0');
+      const day=(t.getDate()).toString().padStart(2,'0');
+      const hour=(t.getHours()).toString().padStart(2,'0');
+      const minute=(t.getMinutes()).toString().padStart(2,'0');
+      const second=(t.getSeconds()).toString().padStart(2,'0');
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+    },
     // 打开详情弹窗
     partDearOpen(){
       this.partDealKey++;
@@ -2735,7 +2878,7 @@ export default {
         }
         this.partDealDialog = true;
       });
-    }
+    },
   },
   mounted() {
     let initData = this.initData;
@@ -2764,7 +2907,8 @@ export default {
     [PartReStockForm.name]: PartReStockForm,
     [PartCancelTransferForm.name]: PartCancelTransferForm,
     [PartTransferForm.name]: PartTransferForm,
-    [PartDealWithForm.name]: PartDealWithForm
+    [PartDealWithForm.name]: PartDealWithForm,
+    MulHandleForm
   }
 };
 </script>
