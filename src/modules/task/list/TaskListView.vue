@@ -171,12 +171,20 @@
     <!-- end header -->
 
     <!-- start 高级搜索 -->
-    <task-search-panel :init-data="initData" :config="columns" ref="searchPanel"  v-if="columns.length">
+    <task-search-panel
+      :init-data="initData"
+      :config="columns"
+      ref="searchPanel"
+      v-if="columns.length"
+    >
       <div class="advanced-search-btn-group" slot="footer">
-        <base-button type="ghost" @event="resetParams">重置</base-button>
+        <base-button type="primary" @event="editView">{{
+          isViewModel === "默认" ? "存为视图" : "编辑视图"
+        }}</base-button>
         <base-button type="primary" @event="advancedSearch" native-type="submit"
           >搜索</base-button
         >
+        <base-button type="ghost" @event="resetParams">重置</base-button>
       </div>
     </task-search-panel>
     <!-- end 高级搜索 -->
@@ -521,6 +529,9 @@
       action="/excels/task/export"
     />
     <!-- end 导出工单 -->
+    <!-- S 存为视图弹框 -->
+    <view-model ref="viewModel" :region="region" :isViewModel="isViewModel" :otherText="otherText" />
+    <!-- E 存为视图弹框 -->
   </div>
 </template>
 
