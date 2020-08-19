@@ -4,6 +4,7 @@ import * as TaskApi from "@src/api/TaskApi";
 /* components */
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";
 import TaskSelect from "./components/TaskSelect.vue";
+import TaskViewModel from "./components/TaskViewModel.vue";
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum";
@@ -55,6 +56,8 @@ export default {
       otherShow: false, //其他
       otherText: "其他", //其他文案
       filterData: {}, //状态数据
+      region: {}, //保存视图的数据
+      isViewModel: '默认', //视图是否保存过
       columns: [],
       columnNum: 1,
       currentTaskType: {},
@@ -297,17 +300,22 @@ export default {
       });
     },
     /* 其他, 选择 */
-    checkOther({ name }) {
+    checkOther({ name, region, id }) {
+      this.isViewModel = region
+      this.region['editViewId'] = id
       this.otherText = name;
       this.filterId = "";
     },
     /* 顶部筛选 */
     checkFilter({ id, name }) {
+      this.isViewModel = '默认'
+      this.region['editViewId'] = id
       this.filterId = id;
       this.otherText = "其他";
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
+    /*创建视图接口的参数 */
     /*全部工单 */
     checkAll() {
       this.filterId = selectIds.allId;
@@ -364,6 +372,22 @@ export default {
       } else {
         this.filterData = localData.filterData;
       }
+    },
+    /**
+     * 存为视图和编辑视图
+     */
+    editView() {
+      window.__exports__refresh = ''
+      const selectCols = []
+      this.columns.map((item, index) => {
+        if (item.show) {
+          selectCols.push(item.fieldName)
+        }
+      }) 
+      this.region['editViewId'] = this.otherList[0].id
+      this.region['tsmStr'] = JSON.stringify(this.initData.expTSMJSON)
+      this.region['selectedCols'] = selectCols
+      this.$refs.viewModel.open();
     },
     /**
      * @description 构建列
@@ -806,7 +830,6 @@ export default {
           this.$set(col, "width", newCol.width);
         }
       });
-
       const columnsStatus = this.columns.map((c) => ({
         field: c.field,
         show: c.show,
@@ -1114,6 +1137,7 @@ export default {
   },
   components: {
     [TaskSearchPanel.name]: TaskSearchPanel,
+    [TaskViewModel.name]: TaskViewModel,
     TaskSelect,
   },
 };

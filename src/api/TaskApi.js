@@ -530,7 +530,40 @@ export function getTaskCardDetailList(params) {
 export function getTaskCountByState(params) {
   return http.get('/task/getTaskCountByState', params);
 }
+/**
+ * 存为视图
+ * @param {Object} params -对象参数
+ * @param {String} params.viewName -视图名称
+ * @param {String} params.viewRegion -是否全员可见
+ * @param {String} params.editViewId -视图id
+ * @param {Array} params.selectedCols -选择列选中的参数
+ * @param {String} params.tsmStr
+ */
+export function createView(params) {
+  return http.post('/task/createView', params)
+}
 
+/**
+ * 编辑视图
+ * @param {Object} params -对象参数
+ * @param {String} params.viewName -视图名称
+ * @param {String} params.viewRegion -是否全员可见
+ * @param {String} params.editViewId -视图id
+ * @param {Array} params.selectedCols -选择列选中的参数
+ * @param {String} params.tsmStr
+ */
+export function editView(params) {
+  return http.post('/task/editView', params)
+}
+
+/**
+ * 删除视图
+ * @param {Object} params -对象参数
+ * @param {String} params.editViewId -视图id
+ */
+export function deleteView(params) {
+  return http.get('/task/deleteView', params)
+}
 
 /**
  * 工单设置，回执合规设置模块 下载此工单类型的标识对应表
