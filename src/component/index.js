@@ -21,7 +21,8 @@ import BaseDistPicker from './common/BaseDistPicker';
 import BaseWindow from './common/BaseWindow';
 import BaseSteps from './common/BaseSteps';
 import BaseCascader from './common/BaseCascader';
-import BaseSelectionBar from './common/BaseSelectionBar'
+import BaseSelectionBar from './common/BaseSelectionBar';
+import BaseServiceStar from './common/BaseServiceStar';
 
 // 可快速调用的组件
 import BaseMapDisplay from './common/BaseMapDisplay';
@@ -83,7 +84,8 @@ const components = [
   SampleTooltip,
   BaseCascader,
   BaseSelectionBar,
-  BaseEditor
+  BaseEditor,
+  BaseServiceStar
 ];
 
 export default {

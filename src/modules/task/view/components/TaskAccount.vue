@@ -1,5 +1,5 @@
 <template>
-  <div class="task-account-tab">
+  <div class="task-tab-container task-account-tab">
     <!-- start 审核结算字段 -->
     <div class="task-account-main-content">
 
@@ -7,7 +7,7 @@
       <template v-if="isApproving">
         <div class="no-text" v-if="!openUserDefinedBalance">未配置任何审核结算字段</div>
         <form-view :fields="balanceAvailableFields" :value="balanceJson" v-else></form-view>
-        <div class="approving-img"><img src="../../../../assets/img/approving.png" /></div>
+        <div class="approving-img"><img :src="getApprovingImg()" /></div>
       </template>
       <!-- end 审批中 -->
 
@@ -64,6 +64,9 @@ import * as TaskApi from '@src/api/TaskApi';
 
 /* util */
 import * as Utils from '@src/component/form/util';
+
+/* image */
+import APPROVING_IMG from '@src/assets/img/task/approving.png';
 
 export default {
   name: 'task-account',
@@ -165,6 +168,9 @@ export default {
     }
   },
   methods: {
+    getApprovingImg() {
+      return APPROVING_IMG;
+    },
     // 打开弹窗
     async openDialog(action) {
       if (action === 'create' || action === 'edit') {
@@ -286,34 +292,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.task-account-tab {
-  position: relative;
-  padding: 10px;
-
-  .no-text {
-    padding: 10px 15px;
-  }
-
-  .approving-img {
-    width: 75px;
-    position: absolute;
-    right: 20px;
-    top: 0px;
-
-    img {
-      width: 100%;
-    }
-  }
-
-  .btn-group {
-    text-align: right;
-    padding-right: 10px;
-
-    button {
-      min-width: 86px;
-    }
-  }
-}
-</style>

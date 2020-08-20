@@ -260,6 +260,13 @@ export function balanceApproveCheck(params) {
   return http.post('/balance/approve/confirm', params, false);
 }
 
+/** 
+ * @description 回访时校验是否需要审批
+*/
+export function reviewApproveCheck(params) {
+  return http.post('/task/approve/degreeForView', params);
+}
+
 /**
  * @description 获取工单最近更新记录
  * @param {Object} params - 参数
@@ -441,11 +448,24 @@ export function editBalance(params) {
 /** 
  * 回退结算
  * @param {Object} params - 参数对象
- * @param {Array} params.reason - 回退原因
+ * @param {String} params.reason - 回退原因
  * @param {String} params.taskId - 工单id
 */
 export function rollBackBalance(params) {
   return http.post(`${fixedPrefixAppPath}/outside/pc/task/rollBackBalance`, params);
+}
+
+/** 
+ * 回访工单
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.suggestion - 回访备注
+ * @param {Object} params.evaluate - 自定义回访信息
+ * @param {String} params.degree - 满意度
+ * @param {Boolean} params.autoClosed - 回访并关闭true，光回访传false
+*/
+export function reviewTask(params) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/review`, params);
 }
 
 /**

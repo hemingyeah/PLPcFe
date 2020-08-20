@@ -10,7 +10,7 @@ import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 import TaskInfoRecord from './components/TaskInfoRecord.vue';
 import TaskReceipt from './components/TaskReceipt.vue';
 import TaskAccount from './components/TaskAccount.vue';
-import TaskFeedback from './components/TaskFeedback.vue';
+import TaskFeedback from './components/TaskFeedback';
 
 export default {
   name: 'task-detail-view',
