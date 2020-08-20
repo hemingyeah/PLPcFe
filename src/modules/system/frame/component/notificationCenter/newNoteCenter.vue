@@ -313,7 +313,6 @@ export default {
 }
 .job-notification-content {
   flex: 1;
-  overflow: auto;
 }
 .job-notification-readed {
   display: inline-block;
