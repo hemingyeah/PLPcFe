@@ -54,7 +54,7 @@
         style="width: 100%"
         max-height="350"
       >
-        <el-table-column type='selection' :selectable='selectable' width='50px'></el-table-column>
+        <el-table-column type='selection' width='50px'></el-table-column>
         <el-table-column
           v-for="(item,index) in tableColumn"
           :key="index"
@@ -67,7 +67,7 @@
         >
           <template slot-scope="scope">
             <template v-if="item.normalType==='controler'">
-              <el-input type='number' :max='scope.row.max' :min='0' :disabled="!scope.row.checked || scope.row.disabled" v-model="scope.row.handleNum"></el-input>
+              <el-input type='number' :max='scope.row.max' :min='0' :disabled="!scope.row.checked" v-model="scope.row.handleNum"></el-input>
             </template>
             <template v-else-if="item.field==='price'">{{countPrice(scope.row)}}</template>
             <template v-else-if="item.field==='mulNumber'">{{scope.row.solvedVariation}}/{{scope.row.variation}}</template>
@@ -349,20 +349,24 @@ export default {
           item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
         });
       }else{
-        if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
-          this.propData.arr.forEach(item=>{
-            item.checked=true;
-            item.disabled=true;
-            const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
-            item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
-            this.$refs.selectTable.toggleRowSelection(item,true);
-          });
-        }else{
-          this.propData.arr.forEach(item=>{
-            item.checked=false;
-            item.handleNum='';
-          });
-        }
+        // if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=true;
+        //     item.disabled=true;
+        //     const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+        //     item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
+        //     this.$refs.selectTable.toggleRowSelection(item,true);
+        //   });
+        // }else{
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=false;
+        //     item.handleNum='';
+        //   });
+        // }
+        this.propData.arr.forEach(item=>{
+          item.checked=false;
+          item.handleNum='';
+        });
       }
       this.selects=[...selection];
     },
