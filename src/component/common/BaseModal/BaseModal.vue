@@ -252,11 +252,4 @@ export default {
     margin-left: 10px;
   }
 }
-
-.describe-text{
-  margin-left: 10px;
-  cursor: pointer;
-  color: #3c8dbc;
-  font-size: 10px;
-}
 </style>

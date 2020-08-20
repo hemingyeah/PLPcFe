@@ -55,6 +55,10 @@ export default {
     isShowOperateContent : {
       type: Boolean,
       default: true
+    },
+    fileType : {
+      type : String,
+      default: null
     }
   },
   methods: {
@@ -63,7 +67,7 @@ export default {
       if(this.value.length >= Uploader.FILE_MAX_NUM) {
         return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
       }
-        
+
       this.$refs.input.value = null;
       this.$refs.input.click();
     },
@@ -80,6 +84,22 @@ export default {
         }
 
         return platform.alert(message)
+      }
+
+      if(this.fileType) {
+        //需要做文件类型校验
+        for(let item of files) {
+          let _fileName = item.name;
+          if(!_fileName.includes(Uploader.fileTypeObj[this.fileType]["fileName"])) {
+            //没有匹配到
+            this.$platform.notification({
+              title: '文件上传失败',
+              message: Uploader.fileTypeObj[this.fileType]["errMsg"],
+              type: 'error',
+            })
+            return false;
+          }
+        }
       }
 
       this.pending = true;

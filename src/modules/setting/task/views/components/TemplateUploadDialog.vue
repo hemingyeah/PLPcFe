@@ -18,7 +18,7 @@
       </div>
       <div class="upload-content-line">
         <p class="upload-content-desc">2、上传打印模板</p>
-        <base-upload @input="input" :value="value" :isShowOperateContent="isShowOperateContent"></base-upload>
+        <base-upload @input="input" :value="value" :fileType="fileType" :isShowOperateContent="isShowOperateContent"></base-upload>
       </div>
       <p class="note-text">注：上传的模板仅支持[xlsx]格式的文件</p>
     </div>
@@ -61,7 +61,8 @@ export default {
     return {
       isShow : false,
       value : [],
-      isShowOperateContent : true
+      isShowOperateContent : true,
+      fileType : "xlsx"
     }
   },
   methods : {
@@ -131,7 +132,6 @@ export default {
       }
     },
     describeClick() {
-      // window.location.href = 'https://www.yuque.com/shb/help/custom_report';
       window.open('https://www.yuque.com/shb/help/custom_report')
     },
   },
@@ -192,5 +192,11 @@ export default {
 .note-text{
   font-size: 13px;
   color: #ff0000;
+}
+.describe-text{
+  margin-left: 10px;
+  cursor: pointer;
+  color: #3c8dbc;
+  font-size: 10px;
 }
 </style>
