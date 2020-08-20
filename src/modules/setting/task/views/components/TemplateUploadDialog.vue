@@ -81,7 +81,7 @@ export default {
       if(newValue.length) {
         this.uploadTemplate();
       }else{
-        this.deleteTemplate();
+        this.deleteTemplate(newValue);
       }
       // let oldValue = null;
       // this.$emit('update', {newValue, oldValue, field: this.field});
@@ -100,17 +100,30 @@ export default {
       a.click();
 
     },
-    async uploadTemplate() {
+    uploadTemplate(newValue) {
+      let _size = (newValue.size/1024).toFixed(2) + "KB";
+      let p_templates = [
+        {id:newValue.id,filename:newValue.fileName,url:newValue.ossUrl,fileSize:_size}
+      ];
 
-    },
-    async deleteTemplate() {
-      let result;
-      if(this.uploadTemplateType == "report") {
-        result = await saveReportTemplate({typeId:this.id});
-      }else if(this.uploadTemplateType == "print") {
-        result = await savePrintTemplate({typeId:this.id});
+      let _obj = {
+        typeId:this.id,
+        p_templates
       }
 
+      this.didUpload(_obj);
+    },
+    deleteTemplate() {
+      let _obj = {typeId:this.id};
+      this.didUpload(_obj);
+    },
+    async didUpload(_obj) {
+      let result;
+      if(this.uploadTemplateType == "report") {
+        result = await saveReportTemplate(_obj);
+      }else if(this.uploadTemplateType == "print") {
+        result = await savePrintTemplate(_obj);
+      }
       if(result.status == 1){
         platform.alert(result.message);
       }

@@ -5,7 +5,7 @@
       :show.sync="isShow" :mask-closeable="false">
 
 
-    <div class="scroll-content" v-loading="loadingCheck">
+    <div class="scroll-content" v-loading.fullscreen.lock="loadingCheck">
       <div class="row">
         <p class="title">公司信息</p>
         <div class="section-line">
@@ -441,20 +441,10 @@ export default {
       //   this.additionalCheck.push(item.fields);
       // }
 
-      console.log("======")
-      console.log(this.additionalCheck)
-      console.log(this.cardDetailList)
-
       for(let item of this.cardDetailList) {
-        //5次
-        console.log("外层id")
-        console.log(item)
         let _arr = [];
         //按照cardDetailList来循环
         for(let cardItem of this.reviewSetting.cardFields) {
-          //4次
-          console.log("内层id")
-          console.log(cardItem)
           if(item.cardId == cardItem.cardId) {
             _arr = cardItem.fields;
           }

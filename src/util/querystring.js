@@ -16,7 +16,7 @@ export function parse(str = ''){
  * {a: 1} => a = 1
  */
 export function stringify(params){
-  return qs.stringify(params, {arrayFormat: 'brackets'})
+  return qs.stringify(params, {arrayFormat: 'indices'})
 }
 
 const querystring = {
