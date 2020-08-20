@@ -574,6 +574,101 @@ export function getTaskTemplate(params) {
   return http.get('/setting/taskType/getTemplateDic', params);
 }
 
+/**
+ * 获取工单列表
+ * @param {Object} params - 参数对象
+ * @param {String} params.allotUser - 派单人userId
+ * @param {Object} params.conditions - 自定义字段的搜索条件
+ * @param {String} params.createUser - 创建人userId
+ * @param {String} params.cusAddress - 详细地址搜索
+ * @param {String} params.cusCity - 市搜索
+ * @param {String} params.cusDist - 区搜索
+ * @param {String} params.cusProvince - 省搜索
+ * @param {String} params.cusTagIds - 团队ID，用于查询符合团队的客户
+ * @param {String} params.customerId - 客户id	
+ * @param {String} params.customerLinkman - 客户联系人
+ * @param {number} params.dataLevel - 数据权限
+ * @param {String} params.executor - 负责人userId	
+ * @param {String} params.executorIdList - 负责人userIdList，配合数据权限使用
+ * @param {String} params.ids - 工单idList
+ * @param {boolean} params.ignoreTaskPoolAuth - 忽略工单池权限	
+ * @param {String} params.keyword - 关键字搜索
+ * @param {boolean} params.mobileState - 是否是移动端的工单状态，search方法特殊处理
+ * @param {String} params.myId - 搜索人id，配合数据权限使用	
+ * @param {boolean} params.noGeo - 获取是否有定位的工单
+ * @param {boolean} params.orderByDistance - 是否按距离排序	
+ * @param {number} params.page - 页码	
+ * @param {number} params.pageSize - 每页显示数量
+ * @param {String} params.productId - 产品id
+ * @param {String} params.serviceContent - 服务内容	
+ * @param {String} params.serviceType - 服务类型
+ * @param {String} params.state - 工单状态
+ * @param {String} params.stateList - 工单状态list
+ * @param {String} params.synergyId - 协同人userId
+ * @param {String} params.tagId - 工单按团队搜索
+ * @param {String} params.templateId - 工单类型Id
+ * @param {String} params.tenantId	 - 租户Id
+ * @param {integer} params.onceException	 - 异常标记：曾超时暂停拒绝整合 1超时 2拒绝 3暂停 4回退 5位置异常	
+ * @param {integer} params.onceOverTime	 - 曾超时
+ * @param {integer} params.onceRefused	 - 曾拒绝	
+ * @param {integer} params.oncePaused	 - 曾暂停	
+ * @param {integer} params.onceReallot	 - 曾转派	
+ * @param {integer} params.oncePrinted	 - 曾打印	
+ * @param {integer} params.allotType	 - 派单方式
+ * @param {String} params.updateTimeStart	 - 更新时间start
+ * @param {String} params.updateTimeEnd	 - 更新时间end
+ * @param {integer} params.inApprove	 - 是否审批中	
+ * @param {integer} params.isException	 - 是否异常
+ * @param {String} params.oneTagExecutorIdList	 - 服务团队负责人userIdList，配合tagId一起使用
+ * @param {String} params.tagIds	 - 多个团队
+ * @param {String} params.tagExecutorIdList	 - 团队负责人userIdList，配合tagIds一起使用	
+ * @param {String} params.customerUserIdList	 - 我所有客户
+ * @param {String} params.customerUserId	 - 我客户的：工单的客户的创建人和负责人id
+ * @param {String} params.timeStart	 - 开始时间
+ * @param {String} params.timeEnd	 - 结束时间
+ * @param {String} params.createTimeStart	 - 创建时间start
+ * @param {String} params.createTimeEnd	 - 创建时间end
+ * @param {String} params.planTimeStart	 - 计划时间start
+ * @param {String} params.planTimeEnd	 - 计划时间end
+ * @param {String} params.allotTimeStart	 - 派单时间start
+ * @param {String} params.allotTimeEnd	 - 派单时间end
+ * @param {String} params.completeTimeStart	 - 完成时间start
+ * @param {String} params.completeTimeEnd	 - 完成时间end
+ * @param {String} params.reviewTimeStart	 - 回访时间start
+ * @param {String} params.reviewTimeEnd	 - 回访时间end
+ * @param {String} params.balanceTimeStart	 - 结算时间start
+ * @param {String} params.balanceTimeEnd	 - 结算时间end
+ * @param {String} params.closeTimeStart	 - 关闭时间start
+ * @param {String} params.closeTimeEnd	 - 关闭时间end
+ * @param {String} params.acceptTimeStart	 - 接收时间start
+ * @param {String} params.acceptTimeEnd	 - 接收时间end	
+ * @param {String} params.startTimeStart	 - 开始时间start
+ * @param {String} params.startTimeEnd	 - 开始时间end
+ * @param {String} params.level	 - 优先级	
+ * @param {String} params.overTime	 - 超时时间
+ * @param {String} params.inTaskPool	 - 工单池标记	
+ * @param {String} params.isReview	 - 已回访
+ * @param {integer} params.exceptionType	 - 异常类型 0全部 1暂停 2超时	
+ * @param {String} params.customerIdList	 - 客户IdList，配合数据权限使用	
+ * @param {String} params.sorts	 - 排序，默认按照创建时间倒序	
+ * @param {String} params.taskTypeIdList	 - 工单类型IdList，用来工单池顶部统计查询时筛选工单类型
+ * @param {integer} params.onceRollback	 - 是否回退过 1回退过 2未回退过
+ * @param {boolean} params.validAddress	 - 地址是否有效	
+ * @param {integer} params.startDistance	 - 起始距离	
+ * @param {String} params.endDistance	 - 终止距离
+ * @param {number} params.myLongitude	 - 当前位置经度
+ * @param {number} params.myLatitude	 - 当前位置纬度	
+ * @param {string} params.taskIds	 - 已经筛选过的工单ID
+ * @param {integer} params.isSettled	 - 已结算	
+ * @param {string} params.reviewType	 - 回访列表选 1人工回访 2客户评价
+ * @param {string} params.degree	 - 满意度: 不满意, 满意, 一般
+ * @param {string} params.searchCondition	 - 关键词搜索类型	
+ * @param {string} params.view	 - 视图										
+ */
+export function search(params) {
+  return http.post('/outside/es/task/search', params);
+}
+
 
 
 /* -------------  end  新工单api ---------------- */

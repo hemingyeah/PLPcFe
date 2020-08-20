@@ -173,9 +173,9 @@
     <!-- start 高级搜索 -->
     <task-search-panel
       :init-data="initData"
-      :config="columns"
+      :config="advanceds"
       ref="searchPanel"
-      v-if="columns.length"
+      v-if="advanceds.length"
     >
       <div class="advanced-search-btn-group" slot="footer">
         <base-button type="primary" @event="editView">{{

@@ -8,7 +8,7 @@ import TaskViewModel from "./components/TaskViewModel.vue";
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum";
-import { fields, selectIds } from "./TaskFieldModel";
+import { fields, selectIds, advanceds } from "./TaskFieldModel";
 import { LINK_REG } from "@src/model/reg";
 
 /** utils */
@@ -57,7 +57,8 @@ export default {
       otherText: "其他", //其他文案
       filterData: {}, //状态数据
       region: {}, //保存视图的数据
-      isViewModel: '默认', //视图是否保存过
+      isViewModel: "默认", //视图是否保存过
+      advanceds, //高级搜索列表
       columns: [],
       columnNum: 1,
       currentTaskType: {},
@@ -267,12 +268,30 @@ export default {
     this.initialize();
     this.otherLists();
     this.getTaskCountByState();
+    this.searchList();
+    this.isAdvanced()
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     window.__exports__refresh = this.search;
     console.log("taskView", this.initData);
   },
   methods: {
+    /**
+     * @description 高级搜索列表匹配
+     */
+    isAdvanced(list = '') {
+      const {initData} = this
+      let selects = list ? list : initData.allFieldInfo
+      selects.map((v, i) => {
+        if (v.displayName === '优先级') {
+          this.advanceds[8].setting = v.setting
+        } else if (v.displayName === '服务类型') {
+          this.advanceds[5].setting = v.setting
+        } else if (v.displayName === '服务内容') {
+          this.advanceds[6].setting = v.setting
+        }
+      })
+    },
     /**
      * @description 高级搜索
      */
@@ -301,15 +320,15 @@ export default {
     },
     /* 其他, 选择 */
     checkOther({ name, region, id }) {
-      this.isViewModel = region
-      this.region['editViewId'] = id
+      this.isViewModel = region;
+      this.region["editViewId"] = id;
       this.otherText = name;
       this.filterId = "";
     },
     /* 顶部筛选 */
     checkFilter({ id, name }) {
-      this.isViewModel = '默认'
-      this.region['editViewId'] = id
+      this.isViewModel = "默认";
+      this.region["editViewId"] = id;
       this.filterId = id;
       this.otherText = "其他";
       // 埋点
@@ -377,17 +396,26 @@ export default {
      * 存为视图和编辑视图
      */
     editView() {
-      window.__exports__refresh = ''
-      const selectCols = []
+      window.__exports__refresh = "";
+      const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
-          selectCols.push(item.fieldName)
+          selectCols.push(item.fieldName);
         }
-      }) 
-      this.region['editViewId'] = this.otherList[0].id
-      this.region['tsmStr'] = JSON.stringify(this.initData.expTSMJSON)
-      this.region['selectedCols'] = selectCols
+      });
+      this.region["editViewId"] = this.otherList[0].id;
+      this.region["tsmStr"] = JSON.stringify(this.initData.expTSMJSON);
+      this.region["selectedCols"] = selectCols;
       this.$refs.viewModel.open();
+    },
+    /**
+     * @description 工单列表展示
+     * @return {Object} 页面展示数据
+     */
+    searchList() {
+      TaskApi.search().then((res) => {
+        console.log("工单列表", res);
+      });
     },
     /**
      * @description 构建列
@@ -607,6 +635,7 @@ export default {
           field.field = field.fieldName;
         });
         this.$set(this, "taskFields", result || []);
+        this.isAdvanced(result)
         return result;
       });
     },
@@ -771,7 +800,7 @@ export default {
       this.loading = true;
 
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
-        .then(() => {
+        .then((res) => {
           this.buildColumns();
           this.search();
         })
@@ -956,7 +985,7 @@ export default {
       const params = this.buildSearchParams();
 
       this.loading = true;
-
+      console.log(params)
       return TaskApi.taskList(params)
         .then((result) => {
           let isSuccess = result?.success === true;

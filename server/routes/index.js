@@ -94,6 +94,14 @@ router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   },
 }))
 
+router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.163',
+  port: 10006,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=d81503d7-bb29-4198-851d-bfa94081b3a9'
+  },
+}))
+
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
   port: 10002,

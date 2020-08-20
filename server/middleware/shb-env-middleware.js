@@ -26,6 +26,7 @@ async function shbEnvMiddlewareHandler(ctx, next, options) {
         .replace('/api/search', '')
         .replace('/api/calendar', '')
         .replace('/api/payment', '')
+        .replace('/api/elasticsearch', '')
     )
 
     request.originalUrl = originalUrl;
