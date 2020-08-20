@@ -591,7 +591,7 @@
               {{variationNum(scope.row.variation, scope.row.solvedVariation)}}
             </template>
             <template v-else-if="column.field == 'variation_'">{{scope.row.solvedVariation}}</template>
-            <template v-else-if="column.field =='enable' && scope.row.state === 'suspending'">
+            <template v-else-if="column.field =='enable' && (scope.row.state === 'suspending' || scope.row.state === 'dealing')">
               <el-button
                 @click="showPartDealDetail(scope.row),tableTrackEventHandler('done')"
                 type="text"
@@ -846,7 +846,7 @@
         <div
           slot="footer"
           class="dialog-footer flex-x"
-          v-if="partDealData.data.state === 'suspending'"
+          v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'dealing'"
         >
           <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
@@ -1321,13 +1321,13 @@ export default {
         return;
       }
       // 只能选择状态为"待办理"，申请类别为 申领、调拨、退回、分配 的数据
-      const allSuspending=value.every(item=>item.state==='suspending');
+      const allSuspending=value.every(item=>item.state==='suspending' || item.state==='dealing');
       const allSL=value.every(item=>item.type==='申领');
       const allDB=value.every(item=>item.type==='调拨');
       const allTH=value.every(item=>item.type==='退回');
       const allFP=value.every(item=>item.type==='分配');
       if(!allSuspending || (!allSL && !allDB && !allTH && !allFP)){
-        this.$platform.alert('单次办理请选择同一申请类别的数据，且状态为【待办理】的申请单进行批量入库办理');
+        this.$platform.alert('单次办理请选择同一申请类别的数据，且状态为【待办理】或【办理中】的申请单进行批量入库办理');
         return;
       }
       const params={
@@ -1399,11 +1399,19 @@ export default {
       approveBatchByApproveNos(params).then(res=>{
         this.mulHandleDialog=false;
         this.pending = false;
-        this.$message({
-          showClose: true,
-          message: res.message,
-          type: 'success'
-        });
+        if(res.success){
+          this.$message({
+            showClose: true,
+            message: res.message || '办理成功',
+            type: 'success'
+          });
+        }else{
+          this.$message({
+            showClose: true,
+            message: res.message,
+            type: 'error'
+          });
+        }
       }).catch(err=>{
         this.pending = false;
         this.$message({
