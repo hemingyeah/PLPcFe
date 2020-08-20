@@ -204,7 +204,7 @@ export default {
       } else {
         platform.openLink(info.url);
       }
-      this.$emit("clearNum", { count: 1, needHide: true, readed: info.readed });
+      this.$emit("clearNum", { count: 1, needHide: true, readed: info.readed, id: info.id });
       info.readed = 1;
     }
   },
