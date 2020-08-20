@@ -846,7 +846,7 @@
         <div
           slot="footer"
           class="dialog-footer flex-x"
-          v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'suspending'"
+          v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'dealing'"
         >
           <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
@@ -1327,7 +1327,7 @@ export default {
       const allTH=value.every(item=>item.type==='退回');
       const allFP=value.every(item=>item.type==='分配');
       if(!allSuspending || (!allSL && !allDB && !allTH && !allFP)){
-        this.$platform.alert('单次办理请选择同一申请类别的数据，且状态为【待办理】活【办理中】的申请单进行批量入库办理');
+        this.$platform.alert('单次办理请选择同一申请类别的数据，且状态为【待办理】或【办理中】的申请单进行批量入库办理');
         return;
       }
       const params={
