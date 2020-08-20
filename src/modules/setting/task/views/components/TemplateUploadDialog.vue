@@ -4,8 +4,10 @@
       :title=" uploadTemplateType == 'report' ? '设置服务报告自定义模板' : '设置打印自定义模板'"
       describe="使用前，请阅读使用说明" width="700px" class="form-select-setting-modal"
       @cancel="cancel"
-      @describeClick="describeClick"
       :show.sync="isShow" :mask-closeable="false">
+
+
+    <span slot="describe" class="describe-text" @click="describeClick">使用前，请阅读使用说明</span>
 
 
 

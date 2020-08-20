@@ -13,7 +13,7 @@
             <slot name="title">
               <h3 v-if="title">
                 {{title}}
-                <span v-if="describe" class="describe-text" @click="describeClick">{{describe}}</span>
+                <slot name="describe"></slot>
               </h3>
             </slot>
             <button type="button" v-if="allowFullscreen" @click="isFullscreen = !isFullscreen">
@@ -46,10 +46,6 @@ export default {
       default: false
     },
     title: {
-      type: String,
-      default: ''
-    },
-    describe: {
       type: String,
       default: ''
     },
@@ -130,11 +126,7 @@ export default {
         removeClass(document.body, 'overflow-body-for-modal');
       }
       this.withoutHiddenClass = true;
-    },
-    describeClick() {
-      this.$emit('describeClick');
     }
-    
   },
   mounted() {
     //document.addEventL.body-heightistener('keydown', this.escClose)
