@@ -11,6 +11,22 @@
       >搜索</base-button>
       <base-button type="ghost" @event="reset()">重置</base-button>
     </div>
+    <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150" style="position:absolute;top:50px;right:30px;">
+      <span class="el-dropdown-link el-dropdown-btn customize-el-dropdown-btn">
+        选择列
+        <i class="iconfont icon-nav-down"></i>
+      </span>
+
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item v-for="(column,index) in columns" :key="column.field">
+          <el-checkbox
+            :value="column.show"
+            :disabled="column.disabled"
+            @input="chooseColnum(column,index)"
+          >{{column.label}}</el-checkbox>
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
     <el-table
       class="mar-b-10 mar-t-15"
       :data='tableData'
@@ -22,29 +38,29 @@
       @select="tableSelect"
       @select-all="selectAll"
     >
-      <el-table-column type='selection' width="50"></el-table-column>
-      <el-table-column label='办理数量' width="100">
+      <el-table-column type='selection' fixed width="50"></el-table-column>
+
+      <el-table-column
+        v-for="column in columns.filter(item=>item.show)"
+        :key='column.field'
+        :prop="column.field"
+        :label="column.label"
+        :width="column.width"
+        :min-width="column.minWidth"
+        :fixed="column.fixed"
+      >
         <template slot-scope="scope">
-          <el-input v-model="scope.row.handleNum" :disabled="!scope.row.checked" type='number' :max='scope.row.max' :min='0'></el-input>
+          <template v-if="column.field==='handleNum'">
+            <el-input v-model="scope.row.handleNum" :disabled="!scope.row.checked" type='number' :max='scope.row.max' :min='0'></el-input>
+          </template>
+          <template v-else-if="column.field==='number'">
+            {{scope.row.solvedVariation}}/{{scope.row.variation}}
+          </template>
+          <template v-else>
+            {{scope.row[column.field]}}
+          </template>
         </template>
       </el-table-column>
-      <el-table-column label='已办数量/申请量' width="130">
-        <template slot-scope="scope">
-          {{scope.row.solvedVariation}}/{{scope.row.variation}}
-        </template>
-      </el-table-column>
-      <el-table-column label='目标仓库' prop='targetName' width="100"></el-table-column>
-      <el-table-column label='申请人' prop='propserName' width="100"></el-table-column>
-      <el-table-column label='申请编号' prop='approveNo' width="140"></el-table-column>
-      <el-table-column label='申请类型' prop='type' width="100"></el-table-column>
-      <el-table-column label='申请日期' prop='propserTime' width="160"></el-table-column>
-      <el-table-column label='备件名称' prop='name' width="120"></el-table-column>
-      <el-table-column label='编号' prop='serialNumber' width="100"></el-table-column>
-      <el-table-column label='类别' prop='sType' width="100"></el-table-column>
-      <el-table-column label='规格' prop='standard' width="120"></el-table-column>
-      <el-table-column label='单位' prop='unit' width="60"></el-table-column>
-      <el-table-column label='原始仓库' prop='sourceName' width="120"></el-table-column>
-      <el-table-column label='原仓库存' prop='repertoryCount' width="90"></el-table-column>
     </el-table>
     <div>
       <div class="mar-b-15 font-w-500">办理意见</div>
@@ -61,6 +77,10 @@
 </template>
 
 <script>
+import StorageUtil from '@src/util/storageUtil';
+
+const STORAGE_MULHANDLE_KEY = 'shb_mul_handle_column';
+
 export default {
   name:'MulHandleForm',
   data(){
@@ -69,7 +89,8 @@ export default {
       tableData:[],
       remark:'',
       keyWord:'',
-      selected:[]
+      selected:[],
+      columns:this.buildColumns(),
     }
   },
   props:{
@@ -95,14 +116,110 @@ export default {
     }
   },
   mounted(){
+    this.buildColumns();
     this.tableData=JSON.parse(JSON.stringify(this.formdata));
     this.allTableData=JSON.parse(JSON.stringify(this.formdata));
   },
   methods:{
+    buildColumns(){
+      let localData = StorageUtil.get(STORAGE_MULHANDLE_KEY) || {};
+      let columns=[
+        {
+          field:'handleNum',
+          label:'办理数量',
+          minWidth:'100',
+          show:true,
+          fixed:true,
+          disabled:true
+        },{
+          field:'number',
+          label:'已办数量/申请量',
+          minWidth:'130',
+          show:true,
+          fixed:true,
+          disabled:true
+        },{
+          field:'targetName',
+          label:'目标仓库',
+          show:true,
+          minWidth:'100',
+        },{
+          field:'propserName',
+          label:'申请人',
+          show:true,
+          minWidth:'100',
+        },{
+          field:'approveNo',
+          label:'申请编号',
+          show:true,
+          minWidth:'140',
+        },{
+          field:'type',
+          label:'申请类型',
+          show:true,
+          minWidth:'100',
+        },{
+          field:'propserTime',
+          label:'申请日期',
+          show:true,
+          minWidth:'160',
+        },{
+          field:'name',
+          label:'备件名称',
+          show:true,
+          minWidth:'120',
+        },{
+          field:'serialNumber',
+          label:'编号',
+          show:true,
+          minWidth:'100',
+        },{
+          field:'sType',
+          label:'类别',
+          show:true,
+          minWidth:'100',
+        },{
+          field:'standard',
+          label:'规格',
+          show:true,
+          minWidth:'120',
+        },{
+          field:'unit',
+          label:'单位',
+          show:true,
+          minWidth:'60',
+        },{
+          field:'sourceName',
+          label:'原始仓库',
+          show:true,
+          minWidth:'120',
+        },{
+          field:'repertoryCount',
+          label:'原仓库存',
+          show:true,
+          minWidth:'90',
+        }
+      ];
+      columns.forEach(column => {
+        let isShow = localData[column.field];
+        if (typeof isShow == 'boolean') column.show = isShow;
+      });
+      return columns;
+    },
     // 单个选择
     tableSelect(selection,row){
+      if(selection.length>20){
+        this.$message({
+          message:'单次办理数量不能超过20条',
+          type:'error'
+        })
+        for(let i=20;i<selection.length;i++){
+          this.$refs.selectTable.toggleRowSelection(selection[i],false);
+        }
+        return
+      }
       this.selected=[...selection];
-      const exist=selection.find(item=>item.id===row.id);
+      const exist=this.selected.find(item=>item.id===row.id);
       if(exist){
         const decimals=Math.max(this.countDecimals(row.variation),this.countDecimals(row.solvedVariation));
         row.max=(row.variation-row.solvedVariation).toFixed(decimals);
@@ -115,8 +232,27 @@ export default {
     },
     // 全选
     selectAll(selection){
-      if(selection.length>0){
-        const leftArr=selection.filter(item=>!this.selected.find(sItem=>sItem.id===item.id));
+      let selections=[];
+      if(selection.length>20){
+        this.$platform.confirm('单次办理数量不能超过20条，是否选择前20条进行办理？').then(res=>{
+          if(res){
+            for(let i=selection.length-1;i>=20;i--){
+              this.$refs.selectTable.toggleRowSelection(selection[i],false);
+            }
+            selections=selection.slice(0,20);
+            this.selectChange(selections);
+          }else{
+            this.$refs.selectTable.clearSelection();
+          }
+        });
+      }else if(selection.length>0){
+        selections=[...selection];
+        this.selectChange(selections);
+      }
+    },
+    selectChange(selections){
+      if(selections.length>0){
+        const leftArr=selections.filter(item=>!this.selected.find(sItem=>sItem.id===item.id));
         leftArr.forEach(item=>{
           const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
           item.checked=true;
@@ -129,12 +265,21 @@ export default {
           item.handleNum='';
         });
       }
-      this.selected=[...selection];
+      this.selected=[...selections];
     },
     // 获取小数位数
     countDecimals(num){
       if(Math.floor(num)===num) return 0;
       return num.toString().split('.')[1].length || 0;
+    },
+    // 选择列
+    chooseColnum(column,index){
+      this.$tdOnEvent('pc：办理出入库-批量办理-选择列事件');
+
+      column.show = !column.show;
+      let data = {};
+      this.columns.forEach(item => (data[item.field] = item.show));
+      StorageUtil.save(STORAGE_MULHANDLE_KEY, data);
     },
     // 搜索
     search(){

@@ -95,7 +95,7 @@
           :readonly="inputonlyread"
         ></el-input>
       </div> -->
-      <div v-if="propData.data.state==='suspending'">
+      <div v-if="propData.data.state==='suspending' || propData.data.state==='dealing'">
         <div class="mar-b-15 font-w-500">办理意见</div>
         <el-input
           type="textarea"
