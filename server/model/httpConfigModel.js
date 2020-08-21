@@ -8,9 +8,9 @@ const https = require(isNotLocalEnv ? "https" : "http");
 const DEFAULT_OPIONS = {
   host: "127.0.0.1",
   port: 8080,
-  // headers: {
-  //   cookie: "VIPPUBLINKJSESSIONID=6dd19f76-97f7-4eba-9302-dba466aeee40",
-  // },
+  headers: {
+    cookie: "VIPPUBLINKJSESSIONID=4e223c02-ed94-44cd-abad-ede0695dffbd",
+  },
 };
 // https agent
 const AGENT = new https.Agent({ 
