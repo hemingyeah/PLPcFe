@@ -1369,8 +1369,6 @@ export default {
         this.mulHandleKey++;
         this.mulHandleDialog=true;
       });
-      this.mulHandleKey++;
-      this.mulHandleDialog=true;
     },
     // 批量办理-保存
     mulHandleSave(){
