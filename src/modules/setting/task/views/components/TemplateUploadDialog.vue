@@ -150,7 +150,7 @@ export default {
         this.value = (this.reportSetting.hasOwnProperty("templates") && this.reportSetting.templates) ?
             this.reportSetting.templates : [];
       }else if(newVal == "print"){
-        console.log("打印模板11111")
+        console.log("打印模板111112221122")
         console.log(this.printSetting)
         this.value = (this.printSetting.hasOwnProperty("templates") && this.printSetting.templates) ?
             this.printSetting.templates : [];
