@@ -336,11 +336,6 @@ export default {
           continue;
         }
 
-        if (typeof form[fn] === 'string') {
-          params[fn === 'customer' ? 'customerId' : fn] = form[fn];
-          continue;
-        }
-
         if (tv.formType === 'date' || tv.formType === 'datetime') {
           params[fn] = form[fn].map(t => formatDate(t, 'YYYY/MM/DD')).join('-');
           continue;
@@ -348,6 +343,11 @@ export default {
 
         if (tv.formType === 'tags') {
           params.tagId = form[fn].map(({ id }) => id).join('');
+        }
+
+        if (typeof form[fn] === 'string') {
+          params[fn === 'customer' ? 'customerId' : fn] = form[fn];
+          continue;
         }
       }
 

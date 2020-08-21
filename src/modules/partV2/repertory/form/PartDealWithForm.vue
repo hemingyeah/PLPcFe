@@ -19,7 +19,7 @@
     <!-- 备注 end -->
 
     <!-- 备件清单 start-->
-    <div class="mar-b-20" v-if="propData.data.state!=='suspending'">
+    <div class="mar-b-20" v-if="propData.data.state!=='suspending' && propData.data.state!=='dealing'">
       <div class="mar-b-15 font-w-500">备件清单</div>
       <el-table border :data="propData.arr" stripe :key="partDealKey" style="width: 100%" max-height="350">
         <el-table-column type='index' label='序号' width='50px'></el-table-column>
@@ -54,7 +54,7 @@
         style="width: 100%"
         max-height="350"
       >
-        <el-table-column type='selection' :selectable='selectable' width='50px'></el-table-column>
+        <el-table-column type='selection' width='50px'></el-table-column>
         <el-table-column
           v-for="(item,index) in tableColumn"
           :key="index"
@@ -67,7 +67,7 @@
         >
           <template slot-scope="scope">
             <template v-if="item.normalType==='controler'">
-              <el-input type='number' :max='scope.row.max' :min='0' :disabled="!scope.row.checked || scope.row.disabled" v-model="scope.row.handleNum"></el-input>
+              <el-input type='number' :max='scope.row.max' :min='0' :disabled="!scope.row.checked" v-model="scope.row.handleNum"></el-input>
             </template>
             <template v-else-if="item.field==='price'">{{countPrice(scope.row)}}</template>
             <template v-else-if="item.field==='mulNumber'">{{scope.row.solvedVariation}}/{{scope.row.variation}}</template>
@@ -112,12 +112,12 @@
     <div class="mar-b-20" style="margin-top:20px;">
       <div class="mar-b-15 font-w-500">办理日志</div>
       <p class="partP" v-for="item in logs" :key='item.id'>
-        <span style="width:130px;">办理人：{{item.executorName}}</span>
+        <span style="width:180px;" :title="item.executorName">办理人：{{item.executorName}}</span>
         <span style="width:230px;">办理时间：{{formmatTime(item.createTime)}}</span>
         <!-- <span style="width:230px;">出入库编号：
           <span style="color:#55b7b4;cursor:pointer;" @click="toWareRecord(item.approveNo)">{{item.approveNo}}</span>
         </span> -->
-        <span style="width:calc(100% - 610px);">办理意见：{{item.remark}}</span>
+        <span style="width:calc(100% - 430px);" :title='item.remark'>办理意见：{{item.remark}}</span>
       </p>
     </div>
     <!-- 办理日志 end -->
@@ -349,32 +349,26 @@ export default {
           item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
         });
       }else{
-        if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
-          this.propData.arr.forEach(item=>{
-            item.checked=true;
-            item.disabled=true;
-            const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
-            item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
-            this.$refs.selectTable.toggleRowSelection(item,true);
-          });
-        }else{
-          this.propData.arr.forEach(item=>{
-            item.checked=false;
-            item.handleNum='';
-          });
-        }
+        // if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=true;
+        //     item.disabled=true;
+        //     const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+        //     item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
+        //     this.$refs.selectTable.toggleRowSelection(item,true);
+        //   });
+        // }else{
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=false;
+        //     item.handleNum='';
+        //   });
+        // }
+        this.propData.arr.forEach(item=>{
+          item.checked=false;
+          item.handleNum='';
+        });
       }
       this.selects=[...selection];
-    },
-    // 是否可选
-    selectable(row,index){
-      if(row.disabled){
-        return false
-      }else if(this.propData.data.type==='调拨' || this.propData.data.type==='分配'){
-        return false
-      }else{
-        return true
-      }
     },
     // 获取小数位数
     countDecimals(num){
@@ -397,6 +391,8 @@ export default {
           return '已办理'
         case 'suspending':
           return '待办理'
+        case 'dealing':
+          return '办理中'
         case 'cancel':
           return '已取消'
         case 'rejected':
@@ -570,8 +566,8 @@ export default {
     background: rgba(103,194,58,.2);
     border:1px solid rgba(103,194,58,.16);
   }
-  // 待办理
-  .form-only-see-suspending{
+  // 待办理，办理中
+  .form-only-see-suspending,.form-only-see-dealing{
     color:#FAAE14;
     background: rgba(250,174,20,.2);
     border:1px solid rgba(250,174,20,.16);
@@ -617,6 +613,9 @@ export default {
 .partP{
   span{
     display: inline-block;
+    // overflow: hidden;
+    // text-overflow:ellipsis;
+    // white-space: nowrap;
   }
 }
 </style>

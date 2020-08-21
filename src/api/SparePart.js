@@ -22,3 +22,14 @@ export function getRelationListByApproveNo(params = {}) {
 export function getProgress(params={}){
   return http.get(`${urlHead}/outside/dd/part/approveList/getProgress`,params);
 }
+
+
+// 查询多个清单详情
+export function getRelationsByApproveNos(params={}){
+  return http.get(`${urlHead}/outside/dd/part/approveList/getRelationsByApproveNos`,params);
+}
+
+// 批量办理
+export function approveBatchByApproveNos(params={}){
+  return http.post(`${urlHead}/outside/dd/part/approveList/approveBatchByApproveNos`,params);
+}

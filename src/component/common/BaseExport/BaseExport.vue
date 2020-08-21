@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="导出列选择" :show.sync="visible" width="600px" class="base-export-modal">
+  <base-modal title="导出列选择" :show.sync="visible" width="650px" class="base-export-modal">
     <div>
       <el-checkbox v-model="isCheckedAll" @change="toggle">全选</el-checkbox>
     </div>
@@ -35,8 +35,9 @@
 </template>
 
 <script>
-import Platform from '@src/platform';
-import http from '@src/util/http';
+import Platform from "@src/platform";
+import http from "@src/util/http";
+import objHttp from '@src/util/HttpUtil';   // 不以form表单提交
 
 const MAX_COUNT = 5000;
 
@@ -53,6 +54,10 @@ export default {
     method: {
       type: String,
       default: 'get'
+    },
+    needObjReq:{
+      type:Boolean,
+      default:false
     },
     /**
      * 函数必须返回Promise对象
@@ -164,20 +169,51 @@ export default {
           })
           .catch(err => console.error(err));
       } else {
-        ajax = http
-          .axios(this.method, this.action, params, false)
-          .then(res => {
+        if(this.needObjReq){
+          let model = {
+            checked: this.checkedArr.join(','),
+            ids: this.ids.join(',')
+          };
+          _.assign(model, this.params);
+
+          let ua = navigator.userAgent;
+          if (ua.indexOf('Trident') >= 0) {
+            window.location.href = `${this.action}?${qs.stringify(model)}`;
             this.visible = false;
-            this.pending = false;
+            return;
+          }
 
-            Platform.alert(res.message);
+          // let responseType = { responseType: 'blob' };
+          ajax=objHttp
+            .post(this.action, model, true)
+            .then(res => {
+              this.visible = false;
+              this.pending = false;
 
-            if (res.status == 0) {
-              window.parent.showExportList();
-              window.parent.exportPopoverToggle(true);
-            }
-          })
-          .catch(err => console.error(err));
+              Platform.alert(res.message);
+
+              if (res.status == 0) {
+                window.parent.showExportList();
+                window.parent.exportPopoverToggle(true);
+              }
+            })
+            .catch(err => console.error(err));
+        }else{
+          ajax = http
+            .axios(this.method, this.action, params, false)
+            .then(res => {
+              this.visible = false;
+              this.pending = false;
+
+              Platform.alert(res.message);
+
+              if (res.status == 0) {
+                window.parent.showExportList();
+                window.parent.exportPopoverToggle(true);
+              }
+            })
+            .catch(err => console.error(err));  
+        }
       }
 
       return ajax;
@@ -229,7 +265,6 @@ export default {
         let params = typeof this.buildParams == 'function' 
           ? this.buildParams(this.checkedArr, this.ids)
           : {checked: this.checkedArr.join(','), ids: this.ids.join(',')};
-
         return navigator.userAgent.indexOf('Trident') >= 0 ? this.formExport(params) : this.ajaxExport(params);
       } catch (error) {
         console.error(error)
