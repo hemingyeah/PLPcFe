@@ -19,7 +19,7 @@
     <!-- 备注 end -->
 
     <!-- 备件清单 start-->
-    <div class="mar-b-20" v-if="propData.data.state!=='suspending'">
+    <div class="mar-b-20" v-if="propData.data.state!=='suspending' && propData.data.state!=='dealing'">
       <div class="mar-b-15 font-w-500">备件清单</div>
       <el-table border :data="propData.arr" stripe :key="partDealKey" style="width: 100%" max-height="350">
         <el-table-column type='index' label='序号' width='50px'></el-table-column>
@@ -369,16 +369,6 @@ export default {
         });
       }
       this.selects=[...selection];
-    },
-    // 是否可选
-    selectable(row,index){
-      if(row.disabled){
-        return false
-      }else if(this.propData.data.type==='调拨' || this.propData.data.type==='分配'){
-        return false
-      }else{
-        return true
-      }
     },
     // 获取小数位数
     countDecimals(num){
