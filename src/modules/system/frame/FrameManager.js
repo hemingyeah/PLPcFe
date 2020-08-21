@@ -231,7 +231,8 @@ const FrameManager = {
           return iframe.contentWindow.__exports__refresh().then(() => {
             tab.loading = false;
             tab.title = iframe.contentWindow.document.title;
-          });
+          })
+            .catch(err => console.error(err));
         }
         iframe.contentWindow.location.reload(true);
       }

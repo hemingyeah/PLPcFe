@@ -128,21 +128,26 @@ export default {
     },
 
     async deftCheck () {
-      if(this.params.selectedDepts.length > 0) {
-        let num = 0;
-        this.params.selectedDepts.forEach(async item => {
-          let params = {
-            deptId: item.id,
-            pageNum: 1,
-            pageSize: 50,
-            sellAllOrg: false,
-            keyword: '',
-          }
-          let res = await http.get('/security/department/user', params);
-          num = res.list.length + num;
-          this.params.deptPerson = num;
-        })
+      try {
+        if(this.params.selectedDepts.length > 0) {
+          let num = 0;
+          this.params.selectedDepts.forEach(async item => {
+            let params = {
+              deptId: item.id,
+              pageNum: 1,
+              pageSize: 50,
+              sellAllOrg: false,
+              keyword: '',
+            }
+            let res = await http.get('/security/department/user', params);
+            num = res.list.length + num;
+            this.params.deptPerson = num;
+          })
+        }
+      } catch (error) {
+        console.error('error', error)
       }
+      
     },
 
     // 添加标签，最多5个

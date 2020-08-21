@@ -15,7 +15,7 @@
       <el-table-column
         v-for="column in columns"
         v-if="column.show"
-        :key="column.field"
+        :key="`${column.field}_${index}`"
         :label="column.label"
         :prop="column.field"
         :width="column.width"

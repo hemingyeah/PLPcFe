@@ -15,6 +15,10 @@ body,
   flex-flow: row nowrap;
 }
 
+.hide{
+  display: none;
+}
+
 .frame-content{
   flex: 1;
   height: 100%;
@@ -162,6 +166,115 @@ body,
   background-color: #CFEAE9;
 }
 
+.call-center-popper{
+  padding: 10px 0!important;
+  margin-top: 0!important;
+}
+
+.call-center-box{
+  position: absolute;
+  width: 300px;
+  top: 50px;
+  transform-origin: center top;
+  z-index: 2001;
+  background: #fff;
+  border: 1px solid #ebeef5;   
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  .customer-name{
+    color: $text-color-main;
+    font-size: 24px;
+    margin: 14px 0;
+    color: #333;
+  }
+  p > span {
+    color: #ed3f14;
+  }
+
+  .divider{
+    height: 1px;
+    width: 100%;
+    background: #f5f5f5;
+  }
+
+  .call-ripple{
+    position:relative;
+    width: 90px;
+    height: 90px;
+    .icon-ripple {
+      position: absolute; 
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+      }
+      div[class^="ripple"] {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 48px;
+          height: 48px;
+          box-shadow: 0 0 1.5px $color-primary;
+          border-radius: 50%;
+          animation: ripple 1.2s linear infinite;
+      }
+      div.ripple2 {
+          animation-delay: 0.4s;
+      }
+     
+    }
+  }
+
+  .call-in,.call-out{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px;
+    .unfinsh {
+      display: flex;
+      p {
+        flex: 1;
+        span {
+          color: #FB602C;
+        }
+      }
+    }
+  }
+  
+  .last{
+    width: 100%;
+    background:#FB602C;
+    height: 26px;
+    padding: 4px 0;
+    margin-bottom: 0;
+    color: #fff;
+    opacity: 0.8;
+    text-align: center;
+  }
+
+  @keyframes ripple {
+    0% {}
+    50% {
+        width: 70px;
+        height: 70px;
+        opacity: 1;
+    }
+    100% {
+        width: 90px;
+        height: 90px;
+        opacity: 0;
+    }
+  }
+
+}
+
 /**************** frame tabs ****************/
 .frame-tabs{
   display: flex;
@@ -305,7 +418,7 @@ body,
 
 .export-row-badge{
   border-radius: 4px;
-  background-color: #409EFF;
+  background-color: $color-primary;
   font-size: 12px;
   color: #fff;
   text-align: center;

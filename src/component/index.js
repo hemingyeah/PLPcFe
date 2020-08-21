@@ -24,6 +24,7 @@ import BaseCascader from './common/BaseCascader';
 import BaseSelectionBar from './common/BaseSelectionBar';
 import BaseServiceStar from './common/BaseServiceStar';
 
+
 // 可快速调用的组件
 import BaseMapDisplay from './common/BaseMapDisplay';
 import BaseMapPicker from './common/BaseMapPicker';
@@ -89,7 +90,7 @@ const components = [
 ];
 
 export default {
-  install(Vue){
-    components.forEach(component => Vue.use(component))
-  }
+    install(Vue) {
+        components.forEach(component => Vue.use(component))
+    }
 }

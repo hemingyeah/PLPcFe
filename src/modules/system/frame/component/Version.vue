@@ -157,5 +157,9 @@ export default {
   background-color: $color-primary;
   border-radius: 4px;
   box-shadow: 0 1px 4px 0px rgba($color-primary,0.5);
+  &:hover {
+    border-color: $color-primary !important;
+    background-color: $color-primary !important;
+  }
 }
 </style>

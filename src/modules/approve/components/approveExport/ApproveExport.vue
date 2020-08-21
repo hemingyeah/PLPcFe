@@ -129,19 +129,23 @@ export default {
 
       this.pending = true;
 
-      // 如果提供验证函数，则进行验证
-      if(typeof this.validate == 'function'){
-        let validateRes = await this.validate(this.ids, MAX_COUNT)
-        if(validateRes) {
-          this.pending = false;
-          this.visible = false;
-          return Platform.alert(validateRes)
+      try {
+        // 如果提供验证函数，则进行验证
+        if(typeof this.validate == 'function'){
+          let validateRes = await this.validate(this.ids, MAX_COUNT)
+          if(validateRes) {
+            this.pending = false;
+            this.visible = false;
+            return Platform.alert(validateRes)
+          }
         }
+
+        let params = this.buildParams(this.checkedArr, this.ids)
+
+        return this.formExport(params);
+      } catch (error) {
+        console.error('error', error);
       }
-
-      let params = this.buildParams(this.checkedArr, this.ids)
-
-      return this.formExport(params);
     }
   }
 }

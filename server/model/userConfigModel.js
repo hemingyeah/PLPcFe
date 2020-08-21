@@ -1,4 +1,4 @@
-const ENVS = ['test', 'pre', 'prod'];
+const ENVS = ['test', 'pre', 'prod', 'pre2'];
 const SCRIPT_PATH = '../../script';
 
 // 当前用户的配置

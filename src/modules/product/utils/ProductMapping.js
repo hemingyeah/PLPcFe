@@ -2,11 +2,13 @@ import {toArray} from '@src/util/lang';
 
 /** 将form对象转成产品对象，用于提交表单 */
 export function packToProduct(fields, form){
-  let product = {};
+  let product = {
+    linkman: {},
+    address: {}
+  };
   let attribute = {};
-  const {customer, template, type, serialNumber, name, id} = form;
+  const {customer, template, type, serialNumber, name, id, linkman, customerAddress} = form;
   let tv = null;
-  
   fields.forEach(f => {
     if (!f.isSystem) {
       attribute[f.fieldName] = form[f.fieldName];
@@ -42,6 +44,14 @@ export function packToProduct(fields, form){
   if (id) {
     product.id = id;
   }
+
+  if (Array.isArray(linkman) && linkman.length) {
+    product.linkman.id = linkman[0].value
+  }
+
+  if (Array.isArray(customerAddress) && customerAddress.length) {
+    product.address.id = customerAddress[0].value
+  }
   
   return {
     ...product,
@@ -55,7 +65,7 @@ export function packToProduct(fields, form){
 
 /** 将产品对象转成form表单，用于初始化表单 */
 export function packToForm(field, product){
-  const {id, name, serialNumber, type, templateId, templateName, customerId, customerName} = product;
+  const {id, name, serialNumber, type, templateId, templateName, customerId, customerName, address, linkman} = product;
   let form = {};
   
   if (customerId) {
@@ -74,6 +84,25 @@ export function packToForm(field, product){
     }]
   } else {
     form.template = []
+  }
+
+  if (linkman?.id) {
+    form.linkman = [{
+      value: linkman.id,
+      label: linkman.name,
+      phone: linkman.phone
+    }]
+  } else {
+    form.linkman = []
+  }
+
+  if (address?.id) {
+    form.customerAddress = [{
+      value: address.id,
+      label: address.province + address.city + address.dist + address.address
+    }]
+  } else {
+    form.customerAddress = []
   }
   
   return {

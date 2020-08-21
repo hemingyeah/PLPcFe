@@ -61,7 +61,12 @@ export default {
     }
   },
   async mounted(){
-    this.options = await this.loadDistData();
+    try {
+      this.options = await this.loadDistData();
+    } catch (error) {
+      console.error(error)
+    }
+    
   }
 }
 </script>

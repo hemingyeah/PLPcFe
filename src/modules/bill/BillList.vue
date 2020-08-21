@@ -56,7 +56,8 @@
           align="center">
         </el-table-column>
 
-        <el-table-column v-for="column in columns" :key="column.field"
+        <el-table-column v-for="(column, index) in columns" 
+                         :key="`${column.field}_${index}`"
                          v-if="column.show"
                          :label="column.label"
                          :width="column.width"
@@ -126,7 +127,7 @@
 
 <script>
 import _ from 'lodash';
-import Page from '../../../model/Page';
+import Page from '@src/model/Page';
 import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
 import {formatDate} from '@src/util/lang';

@@ -1,8 +1,8 @@
 import { toArray } from '@src/util/lang';
 import { fmt_address, fmt_datetime, fmt_date } from '@src/filter/fmt';
-import { FieldManager } from './components';
 import * as FormUtil from './util';
-
+import { FieldManager } from './components';
+import http from '@src/util/http';
 import platform from '@src/platform';
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
@@ -82,6 +82,36 @@ const FormView = {
         </div>
       )
     },
+
+    buildPhoneDom(lmPhone) {
+      const { value, displayName} = lmPhone;
+      const hasCallCenterModule = localStorage.getItem('call_center_module')
+      const str = hasCallCenterModule == 1 && value ? <el-tooltip content="拨打电话" placement="top"><i onClick={() => this.makePhoneCall(value, hasCallCenterModule)} v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></el-tooltip> : ''
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+          <div class="form-view-row-content">
+            <span>{value}</span>
+            {str}
+          </div>
+        </div>
+      )
+    },
+
+    async makePhoneCall(phone, hasCallCenterModule){
+      if(!phone || !hasCallCenterModule) return
+      try {
+        const { code, message } = await http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        })
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     buildTextarea({displayName, value, formType}) {
       const newVal = value ? value.replace(link_reg, (match) => {
         // return `<a href=${match} traget="_blank" >${match}</a>`
@@ -219,6 +249,15 @@ const FormView = {
         };
         
         return this.buildAddressDom(params);
+      }
+     
+      if (formType === 'phone' && fieldName === 'lmPhone') {
+        params = {
+          ...params,
+          value,
+        };
+        
+        return this.buildPhoneDom(params);
       }
 
       if (formType == 'info') {

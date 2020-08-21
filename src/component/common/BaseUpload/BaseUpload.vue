@@ -5,9 +5,9 @@
     <div class="base-file-list base-file__preview" >
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
-    
-    <div class="base-upload-operation" v-if="isShowOperateContent">
-      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId">
+
+    <div class="base-upload-operation">
+      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" v-if="allowUpload">
         <i class="iconfont icon-loading" v-if="pending"></i>
         <span>{{pending ? '正在上传' : '点击上传'}}</span>
       </button>
@@ -28,6 +28,10 @@ export default {
     }
   },
   props: {
+    limit: {
+      type: Number,
+      default: Uploader.FILE_MAX_NUM,
+    },
     displayName: {
       type: String,
       default: () => '附件',
@@ -61,8 +65,17 @@ export default {
       default: null
     }
   },
+  computed: {
+    allowUpload(){
+      return !(this.limit && this.queue.length >= this.limit);
+    },
+    queue(){
+      return this.value;
+    },
+  },
   methods: {
     chooseFile(){
+      if(!this.allowUpload) return console.warn('Caused: dont chooseFile, because of this.allowUpload is false');
       if(this.pending) return platform.alert('请等待文件上传完成');
       if(this.value.length >= Uploader.FILE_MAX_NUM) {
         return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
@@ -74,12 +87,14 @@ export default {
     handleChange(event){
       const files = event.target.files;
       if(!files || !files.length) return;
+      
+      let allFilesLength = this.value.length + files.length;
 
-      if(this.value.length + files.length > Uploader.FILE_MAX_NUM) {
+      if(allFilesLength > Uploader.FILE_MAX_NUM) {
         let message = `上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`;
-        let max = 9 - this.value.length;
+        let max = Uploader.FILE_MAX_NUM - this.value.length;
 
-        if(max > 0 && files.length < 9){
+        if(max > 0 && files.length < Uploader.FILE_MAX_NUM){
           message += `, 您还能上传${max}个文件`;
         }
 
@@ -88,9 +103,9 @@ export default {
 
       if(this.fileType) {
         //需要做文件类型校验
-        for(let item of files) {
+        for (let item of files) {
           let _fileName = item.name;
-          if(!_fileName.includes(Uploader.fileTypeObj[this.fileType]["fileName"])) {
+          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]["fileName"])) {
             //没有匹配到
             this.$platform.notification({
               title: '文件上传失败',
@@ -100,6 +115,10 @@ export default {
             return false;
           }
         }
+      }
+
+      if(allFilesLength > this.limit) {
+        return platform.alert(`上传文件数量不能超过${this.limit}个`);
       }
 
       this.pending = true;
@@ -166,6 +185,11 @@ export default {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+
+  .btn-primary {
+    background-color: $color-primary !important;
+  }
+
 }
 
 .base-upload-placeholder{

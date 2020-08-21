@@ -39,6 +39,55 @@ export function fmt_date_16(value){
   return reg.test(value) ? value.slice(0, 16) : value;
 }
 
+export function fmt_short_time(shorttime){
+  if(!shorttime) return ''
+  shorttime = new Date(shorttime).getTime();
+  let now = (new Date()).getTime();
+  let cha = (now - parseInt(shorttime)) / 1000;
+  
+  if (cha < 43200) {
+    // 当天
+    return dateFormat(new Date(shorttime), '{A} {t}:{ii}');
+  } else if(cha < 518400){
+    // 隔天 显示日期+时间
+    return dateFormat(new Date(shorttime), '{Mon}月{DD}日 {A} {t}:{ii}');
+  } 
+  // 隔年 显示完整日期+时间
+  return dateFormat(new Date(shorttime), '{Y}-{MM}-{DD} {A} {t}:{ii}');
+  
+}
+
+export function dateFormat(date, formatStr) {
+  let dateObj = {},
+    rStr = /\{([^}]+)\}/,
+    mons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+   
+  dateObj['Y'] = date.getFullYear();
+  dateObj['M'] = date.getMonth() + 1;
+  dateObj['MM'] = parseNumber(dateObj['M']);
+  dateObj['Mon'] = mons[dateObj['M'] - 1];
+  dateObj['D'] = date.getDate();
+  dateObj['DD'] = parseNumber(dateObj['D']);
+  dateObj['h'] = date.getHours();
+  dateObj['hh'] = parseNumber(dateObj['h']);
+  dateObj['t'] = dateObj['h'] > 12 ? dateObj['h'] - 12 : dateObj['h'];
+  dateObj['tt'] = parseNumber(dateObj['t']);
+  dateObj['A'] = dateObj['h'] > 12 ? '下午' : '上午';
+  dateObj['i'] = date.getMinutes();
+  dateObj['ii'] = parseNumber(dateObj['i']);
+  dateObj['s'] = date.getSeconds();
+  dateObj['ss'] = parseNumber(dateObj['s']);
+ 
+  while(rStr.test(formatStr)) {
+    formatStr = formatStr.replace(rStr, dateObj[RegExp.$1]);
+  }
+  return formatStr;
+}
+
+export function parseNumber(num) {
+  return num < 10 ? `0${num}` : num;
+}
+
 /** 数字保留两位小数 */
 export function fmt_number_fixed2(value){
   // 不是数字 或 是NaN 或 是无穷，直接返回原值
@@ -66,6 +115,69 @@ export function fmt_address(value){
   return province + city + dist + address;
 }
 
+// 工单状态
+export function fmt_state(value) {
+  let state = ''
+  switch (value) {
+  case 'created':
+    state = '待指派';
+    break;
+  case 'allocated':
+    state = '已指派';
+    break;
+  case 'taskPool':
+    state = '工单池';
+    break;
+  case 'accepted':
+    state = '已接受';
+    break;
+  case 'processing':
+    state = '进行中';
+    break;
+  case 'convert2Task':
+    state = '转工单';
+    break;
+  case 'finished':
+    state = '已完成';
+    break;
+  case 'refused':
+    state = '已拒绝';
+    break;
+  case 'costed':
+    state = '已结算';
+    break;
+  case 'closed':
+    state = '已关闭';
+    break;
+  case 'offed':
+    state = '已取消';
+    break;
+
+  default:
+    break;
+  }
+  return state
+}
+
+export function fmt_h_m_s(sec = 0) {
+  const HOUR_SEC = 60 * 60;
+  const MIN_SEC = 60;
+
+  let hour = sec / HOUR_SEC >> 0;
+  sec = sec % HOUR_SEC;
+
+  let min = sec / MIN_SEC >> 0;
+  sec = sec % MIN_SEC;
+
+  let temp = '';
+
+  if(hour > 0) temp += `${hour}时`;
+  if(min > 0) temp += `${min}分`;
+  if(sec > 0) temp += `${sec}秒`;
+
+  return temp ? temp : '--';
+}
+
 const fmt = {
   fmt_date,
   fmt_datetime,
@@ -73,7 +185,10 @@ const fmt = {
   fmt_number_fixed2,
   fmt_number_int,
   fmt_address,
-  fmt_datehour
+  fmt_datehour,
+  fmt_state,
+  fmt_short_time,
+  fmt_h_m_s
 }
 
 export default fmt;

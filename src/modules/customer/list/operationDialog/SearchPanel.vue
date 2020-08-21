@@ -269,14 +269,6 @@ export default {
           continue;
         }
 
-        if (fn === 'addressDetail') {
-          params.customerAddress = {
-            ...params.customerAddress || {},
-            adAddress: form[fn]
-          }
-          continue;
-        }
-
         if (typeof form[fn] === 'string') {
           params[fn === 'customer' ? 'customerId' : fn] = form[fn];
           continue;

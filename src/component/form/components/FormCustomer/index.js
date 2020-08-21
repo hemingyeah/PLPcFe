@@ -1,6 +1,8 @@
 import FormCustomerSetting from './FormCustomerSetting.vue'
 import FormCustomerPreview from './FormCustomerPreview.vue'
 import FormCustomer from './FormCustomer.vue'
+import ProductCustomerExtendSetting from './extend/ProductCustomerExtendSetting';
+
 
 let FormCustomerField = {
   formType: 'customer',
@@ -11,9 +13,11 @@ let FormCustomerField = {
     preview: FormCustomerPreview,
     build: FormCustomer,
     extend: {
-      'task_customer_setting': FormCustomerSetting
+      'product_customer_setting': ProductCustomerExtendSetting
     }
   }
 }
 
-export default FormCustomerField
+
+export default FormCustomerField;
+

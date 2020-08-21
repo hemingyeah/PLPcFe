@@ -6,7 +6,8 @@
       @compositionstart="compositionstart"
       @compositionend="compositionend"
       @input="inputEvent"
-      :placeholder="field.placeholder ? field.placeholder : placeholder"
+      :placeholder="field.placeholder?field.placeholder:placeholder"
+      :maxlength="field.maxlength?field.maxlength:500"
       :id="`form_${field.fieldName}`" 
       autocomplete="off"
       :disabled="field.disabled"/>

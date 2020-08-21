@@ -1,5 +1,6 @@
 import dingtalk from '@src/util/dingtalk';
 import {getRootWindow} from '../util/dom';
+import { Message } from 'shb-element-ui' 
 
 /**
  * 抹平钉钉和浏览器alert之间的差异
@@ -75,4 +76,22 @@ export function notification(params = {}){
   opt.customClass = params.customClass ? `base-notification ${params.customClass}` : 'base-notification';
 
   return notification({...params, ...opt})
+}
+
+/**
+ * @see http://element.eleme.io/#/zh-CN/component/message
+ * 
+ * @param {*} message - 提示信息 
+ * @param {*} type 
+ * @param {*} options 
+ */
+export function toast(message, type = 'success', options = {}) {
+  return new Promise((resolve, reject) => {
+    Message({ //eslint-disable-line
+      message,
+      duration: options.duration || 1500,
+      type,
+      onClose: () => resolve()
+    })
+  })
 }

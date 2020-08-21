@@ -34,6 +34,10 @@ export default {
     needValidate: {
       type: Boolean,
       default: true,
+    },
+    isNotNull: {
+      type: Boolean,
+      default: undefined
     }
   },
   data() {
@@ -41,12 +45,14 @@ export default {
       field: {},
       errMessage: '',
       valueFn: null, // function 用于获取注册字段的值
-      status: false // true 代表正在验证
+      status: false, // true 代表正在验证
+      showErr: false
     }
   },
   computed: {
     /** 字段是否必填 */
     isRequired() {
+      if(this.isNotNull !== undefined) return this.isNotNull;
       return this.field.isNull == 0;
     },
     forId(){
@@ -75,7 +81,9 @@ export default {
             ? validator(value, this.field, this.changeStatus)
             : res;
         })
-        .then(res => this.errMessage = res)
+        .then(res => {
+          return this.errMessage = res
+        })
         .catch(err => {
           if(!err.message.startsWith('Request cancelled:')){
             console.error('validate err', err)

@@ -183,29 +183,30 @@ export default {
       return ajax;
     },
     async billExport(params) {
-      let ajax = null;
-      let token = await http.post(this.downloadUrl, params, false);
-      let url = `${this.action}?token=${token.data}`;
-      ajax = http
-        .axios(this.method, url, {}, false, { responseType: 'blob' })
-        .then(blob => {
+      try {
+        let ajax = null;
+        let token = await http.post(this.downloadUrl, params, false);
+        let url = `${ this.action }?token=${ token.data }`;
+        ajax = http.axios(this.method, url, {}, false, {responseType: 'blob'}).then(blob => {
           let link = document.createElement('a');
           let url = URL.createObjectURL(blob);
           link.download = this.fileName;
           link.href = url;
-          this.$refs.bridge.appendChild(link);
+          this.$refs.bridge.appendChild(link)
           link.click();
 
           this.visible = false;
           this.pending = false;
           setTimeout(() => {
             URL.revokeObjectURL(url);
-            this.$refs.bridge.removeChild(link);
+            this.$refs.bridge.removeChild(link)
           }, 150);
-        })
-        .catch(err => console.error(err));
+        }).catch(err => console.error(err));
 
-      return ajax;
+        return ajax;
+      } catch (error) {
+        console.error(error)
+      }
     },
 
     async exportData() {
@@ -214,23 +215,25 @@ export default {
 
       this.pending = true;
 
-      // 如果提供验证函数，则进行验证
-      if (typeof this.validate == 'function') {
-        let validateRes = await this.validate(this.ids, MAX_COUNT);
-        if (validateRes) {
-          this.pending = false;
-          this.visible = false;
-          return Platform.alert(validateRes);
+      try {
+        // 如果提供验证函数，则进行验证
+        if(typeof this.validate == 'function'){
+          let validateRes = await this.validate(this.ids, MAX_COUNT)
+          if(validateRes) {
+            this.pending = false;
+            this.visible = false;
+            return Platform.alert(validateRes)
+          }
         }
+
+        let params = typeof this.buildParams == 'function' 
+          ? this.buildParams(this.checkedArr, this.ids)
+          : {checked: this.checkedArr.join(','), ids: this.ids.join(',')};
+
+        return navigator.userAgent.indexOf('Trident') >= 0 ? this.formExport(params) : this.ajaxExport(params);
+      } catch (error) {
+        console.error(error)
       }
-
-      let params = typeof this.buildParams == 'function'
-        ? this.buildParams(this.checkedArr, this.ids)
-        : { checked: this.checkedArr.join(','), ids: this.ids.join(',') };
-
-      return navigator.userAgent.indexOf('Trident') >= 0
-        ? this.formExport(params)
-        : this.ajaxExport(params);
     }
   }
 };

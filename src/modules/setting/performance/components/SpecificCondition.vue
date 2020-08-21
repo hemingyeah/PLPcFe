@@ -11,8 +11,8 @@
       :class="{'input-is-error': currentItemValidation.fields.some(k => k === 'types')}"
       :placeholder="value.placeHolder || '请选择'">
       <el-option
-        v-for="item in options"
-        :key="item.value"
+        v-for="(item, index) in options"
+        :key="`${item.value}_${index}`"
         :label="item.label"
         :disabled="otherConditionValue.some(val => val === item.value)"
         :value="item.value">

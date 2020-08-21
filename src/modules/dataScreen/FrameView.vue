@@ -212,13 +212,24 @@ export default {
       this.settingParams = params;
       this.settingGroup = group;
 
-      await this.saveSetting(params);
+      try {
+        await this.saveSetting(params);
+      } catch (error) {
+        console.error('error', error)
+      }
+      
       this.refreshFrameData();
     }, 100),
 
     rightTimeUpdateHandler: _.debounce(async function(time) {
       let params = { cycleRange: (time || {}).key };
-      await this.saveSetting(params);
+
+      try {
+        await this.saveSetting(params);
+      } catch (error) {
+        console.error('error', error)
+      }
+      
       // ...刷新数据
       this.refreshFrameData();
     }, 100),

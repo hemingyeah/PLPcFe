@@ -9,9 +9,9 @@
       class="customer-contact-table"
     >
       <el-table-column
-        v-for="column in columns"
+        v-for="(column, index) in columns"
         v-if="column.show"
-        :key="column.field"
+        :key="`${column.field}_${index}`"
         :label="column.label"
         :prop="column.field"
         :width="column.width"
@@ -40,6 +40,9 @@
             >
               <i class="iconfont icon-weixin1 color-green"></i>
             </el-tooltip>
+          </template>
+          <template v-else-if="column.field === 'phone'">
+            <span class="align-items-center"> {{scope.row.phone}} <el-tooltip content="拨打电话" placement="top"><i @click.stop="makePhoneCall(scope.row.phone)" v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></el-tooltip></span>
           </template>
           <div class="lm-action" v-else-if="column.field === 'action'">
             <template>
@@ -119,7 +122,8 @@ export default {
         pageSize: 10,
         pageNum: 1,
         totalItems: 0
-      }
+      },
+      hasCallCenterModule:localStorage.getItem('call_center_module') == 1
     };
   },
   computed: {
@@ -159,6 +163,19 @@ export default {
     );
   },
   methods: {
+    async makePhoneCall(phone){
+      if(!this.hasCallCenterModule) return
+      try {
+        const { code, message } = await this.$http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        }) 
+      } catch (error) {
+        console.error(error);
+      }
+    },
     openDialog(contact) {
       if (!this.allowEditCustomer) return;
       this.selectedContact = contact;
@@ -271,7 +288,7 @@ export default {
           label: "电话",
           field: "phone",
           show: true,
-          width: "150px"
+          width: "180px"
         },
         {
           label: "操作",

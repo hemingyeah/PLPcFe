@@ -7,7 +7,6 @@ const USER_CONFIG = require(`../../script/config/${user}`);
 
 const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
-const HttpsClient = require('../util/HttpsClient')
 const Template = require('../util/Template')
 
 const modules = require('../../modules');
@@ -25,9 +24,11 @@ const dataScreenRouter = require('./dataScreen');
 const repositoryRouter = require('./repository')
 const BillRouter = require('./bill')
 const jobtransferRouter = require('./jobtransfer')
+const callCenterRouter = require('./callcenter')
 const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact')
 const taskRouter = require('./task')
+const sparePartRouter = require('./sparePart')
 
 router.get('/', async ctx => {
   let modConfig = modules['system.frame'];
@@ -40,6 +41,7 @@ router.get('/', async ctx => {
 
   // 请求失败,模拟登陆
   if (!result.status) {
+    console.warn('请求失败')
     let mockUser = USER_CONFIG.loginUser;
     let userToken = 'dev_corpId';
     if (null != mockUser) {
@@ -86,6 +88,15 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
+
+router.use('/outside', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.82',
+  port: 10007,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
+  }
+}))
+
 router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.211',
   port: 10007,
@@ -98,7 +109,32 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.163',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=d81503d7-bb29-4198-851d-bfa94081b3a9'
+    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
+  },
+}))
+
+// 通知中心改造
+router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
+  // host: '30.40.57.167',
+  // port: 8083,
+  host: '30.40.59.106',
+  port: 10002,
+  headers: {
+    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
+    'cookie': 'VIPPUBLINKJSESSIONID=f560fed5-4bc4-4ff0-8638-e6666c18a31a; JSESSIONID=5442CD36355252A20E2CC1DAB778E536; __wpkreporterwid_=a99f79d5-3645-407a-3bf8-d6774e411773'
+  },
+}))
+
+
+
+
+
+router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
+  host: '127.0.0.1',
+  port: 8080,
+  headers: {
+    // 'cookie': `VIPPUBLINKJSESSIONID=71a54c18-dcfd-4f2d-99a9-a5faf00835e1`
+    'cookie': `VIPPUBLINKJSESSIONID=91d3c950-e301-4ef1-b714-e40f62d2257f`
   },
 }))
 
@@ -115,10 +151,10 @@ router.use('', teamRouter.routes(), teamRouter.allowedMethods());
 router.use('', productRouter.routes(), productRouter.allowedMethods());
 router.use('', approveRouter.routes(), productRouter.allowedMethods());
 router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
-
 router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
+router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
@@ -138,5 +174,10 @@ router.all('/api/*', async ctx => {
 });
 
 router.all('/*', ctx => HttpClient.proxy(ctx))
+router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
+
+router.all('/*', ctx => {
+  return HttpClient.proxy(ctx)
+});
 
 module.exports = router;

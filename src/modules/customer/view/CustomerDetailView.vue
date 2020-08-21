@@ -9,20 +9,10 @@
           <button type="button" class="btn btn-text" @click="jump" v-if="allowEditCustomer">
             <i class="iconfont icon-edit"></i> 编辑
           </button>
-          <button
-            type="button"
-            class="btn btn-text"
-            @click="deleteCustomer"
-            v-if="allowDeleteCustomer"
-          >
+          <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer">
             <i class="iconfont icon-yemianshanchu"></i> 删除
           </button>
-          <button
-            type="button"
-            class="btn btn-text"
-            @click="openDialog('remind')"
-            v-if="!isDisable"
-          >
+          <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable">
             <i class="iconfont icon-notification"></i> 添加提醒
           </button>
 
@@ -47,11 +37,7 @@
 
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="type in taskTypes" :key="type.id">
-              <a
-                class="link-of-dropdown"
-                href="javascript:;"
-                @click.prevent="createTask(type.id)"
-              >{{type.name}}</a>
+              <a class="link-of-dropdown" href="javascript:;" @click.prevent="createTask(type.id)">{{type.name}}</a>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -62,11 +48,7 @@
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="event in eventTypes" :key="event.id">
-              <a
-                class="link-of-dropdown"
-                href="javascript:;"
-                @click.prevent="createEvent(event.id)"
-              >{{event.name}}</a>
+              <a class="link-of-dropdown" href="javascript:;" @click.prevent="createEvent(event.id)">{{event.name}}</a>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -78,32 +60,13 @@
 
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="task in taskTypes" :key="task.id">
-              <a
-                class="link-of-dropdown"
-                href="javascript:;"
-                @click.prevent="createPlanTask(task.id)"
-              >{{task.name}}</a>
+              <a class="link-of-dropdown" href="javascript:;" @click.prevent="createPlanTask(task.id)">{{task.name}}</a>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <base-button
-          type="plain"
-          icon="icon-add"
-          @event="openDialog('contact')"
-          v-if="allowEditCustomer"
-        >联系人</base-button>
-        <base-button
-          type="plain"
-          icon="icon-add"
-          @event="openDialog('address')"
-          v-if="allowEditCustomer"
-        >地址</base-button>
-        <base-button
-          type="plain"
-          icon="icon-add"
-          @event="createProduct('address')"
-          v-if="allowCreateProduct"
-        >产品</base-button>
+        <base-button type="plain" icon="icon-add" @event="openDialog('contact')" v-if="allowEditCustomer">联系人</base-button>
+        <base-button type="plain" icon="icon-add" @event="openDialog('address')" v-if="allowEditCustomer">地址</base-button>
+        <base-button type="plain" icon="icon-add" @event="createProduct('address')" v-if="allowCreateProduct">产品</base-button>
       </div>
     </div>
     <div class="main-content" v-loading="loading">
@@ -111,15 +74,11 @@
         <sample-tooltip :row="customer">
           <template slot="content" slot-scope="{isContentTooltip}">
             <el-tooltip :content="customer.name" placement="top" :disabled="!isContentTooltip">
-              <h3
-                class="customer-name"
-                :class="{
-                  'customer-name-expand': showWholeName == 1,
-                }"
-              >
+              <h3 class="customer-name" :class="{'customer-name-expand': showWholeName == 1}">
                 <span class="customer-name-delete" v-if="isDelete" title="该客户已被删除，只能查看数据。" v-tooltip>已删除</span>
                 <span class="customer-name-disable" v-if="isDisable" title="该客户已被禁用，无法添加提醒和新建工单、事件、计划任务。" v-tooltip>已禁用</span>
-                <span ref="customerName"><pre class="pre-text">{{customer.name}}</pre></span>
+                <span ref="customerName">
+                <pre class="pre-text">{{customer.name}}</pre></span>
                 <i v-if="showWholeName >= 0" @click="showWholeName = !showWholeName" class="iconfont icon-gongsimingchengxiala"></i>
               </h3>
             </el-tooltip>
@@ -138,7 +97,7 @@
         </form-view>
       </div>
       <div class="customer-relation" v-if="this.customer.id">
-        <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
+        <base-tabbar :tabs="tabs" v-model="currTab"></base-tabbar>
         <div class="customer-relation-content">
           <keep-alive>
             <component :is="currTab" :share-data="propsForSubComponents" :init-data="initData"></component>
@@ -147,47 +106,35 @@
       </div>
     </div>
 
-    <edit-contact-dialog
-      ref="EditContactDialog"
-      :customer="customer"
-      :is-phone-unique="isPhoneUnique"
-    />
-    <edit-address-dialog
-      ref="EditAddressDialog"
-      :customer-id="customer.id"
-      :default-address="initData.customerAddress"
-    />
-    <remind-customer-dialog
-      ref="addRemindDialog"
-      :customer="customer"
-      :edited-remind="selectedRemind"
-      @success-callback="selectedRemind = {}"
-    />
+    <edit-contact-dialog ref="EditContactDialog" :customer="customer" :is-phone-unique="isPhoneUnique" />
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="customer.id" :default-address="initData.customerAddress" />
+    <remind-customer-dialog ref="addRemindDialog" :customer="customer" :edited-remind="selectedRemind" @success-callback="selectedRemind = {}" />
     <customer-attention ref="customerAttention" @submit="updateAttentionUser" />
   </div>
 </template>
 
 <script>
-import Exception from '@model/Exception';
-import * as CustomerApi from '@src/api/CustomerApi';
-import Platform from '@src/platform';
+import Exception from '@model/Exception'
+import * as CustomerApi from '@src/api/CustomerApi'
+import Platform from '@src/platform'
 
-import CustomerInfoRecord from './components/CustomerInfoRecord.vue';
-import CustomerEventTable from './components/CustomerEventTable.vue';
-import CustomerTaskTable from './components/CustomerTaskTable.vue';
-import CustomerProductTable from './components/CustomerProductTable.vue';
-import CustomerContactTable from './components/CustomerContactTable.vue';
-import CustomerAddressTable from './components/CustomerAddressTable.vue';
-import CustomerPlanTable from './components/CustomerPlanTable';
-import CustomerRemindTable from './components/CustomerRemindTable';
-import CustomerAttention from './components/CustomerAttention.vue';
+import CustomerInfoRecord from './components/CustomerInfoRecord.vue'
+import CustomerEventTable from './components/CustomerEventTable.vue'
+import CustomerTaskTable from './components/CustomerTaskTable.vue'
+import CustomerProductTable from './components/CustomerProductTable.vue'
+import CustomerCallTable from './components/CustomerCallTable.vue'
+import CustomerContactTable from './components/CustomerContactTable.vue'
+import CustomerAddressTable from './components/CustomerAddressTable.vue'
+import CustomerPlanTable from './components/CustomerPlanTable'
+import CustomerRemindTable from './components/CustomerRemindTable'
+import CustomerAttention from './components/CustomerAttention.vue'
 
-import EditAddressDialog from './operationDialog/EditAddressDialog.vue';
-import EditContactDialog from './operationDialog/EditContactDialog.vue';
-import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue';
+import EditAddressDialog from './operationDialog/EditAddressDialog.vue'
+import EditContactDialog from './operationDialog/EditContactDialog.vue'
+import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue'
 
-import AuthUtil from '@src/util/auth';
-import qs from '@src/util/querystring';
+import AuthUtil from '@src/util/auth'
+import qs from '@src/util/querystring'
 
 export default {
   name: 'customer-detail-view',
@@ -211,28 +158,28 @@ export default {
       showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       statisticalData: {},
 
-      attentionUsers: [] // 该客户的关注用户
-    };
+      attentionUsers: [] // 该客户的关注用户,
+    }
   },
   computed: {
     /** 是否显示返回按钮 */
     allowBack() {
-      let allow = true;
+      let allow = true
 
       // 如果带入noHistory参数，则不显示
-      let query = qs.parse(window.location.search);
-      if (query.noHistory) return false;
+      let query = qs.parse(window.location.search)
+      if (query.noHistory) return false
 
       // 验证路径
-      let path = window.location.pathname;
-      let disablePathReg = [/^\/customer\/view\/\S+$/];
-      if (disablePathReg.some(reg => reg.test(path))) return false;
+      let path = window.location.pathname
+      let disablePathReg = [/^\/customer\/view\/\S+$/]
+      if (disablePathReg.some(reg => reg.test(path))) return false
 
-      return allow;
+      return allow
     },
     /** 当前登录的用户 */
     loginUser() {
-      return this.initData.loginUser || {};
+      return this.initData.loginUser || {}
     },
     /**
      * 客户是否被删除
@@ -240,11 +187,11 @@ export default {
      * 所有操作的权限应该以此为基础
      */
     isDelete() {
-      return this.customer.isDelete == null || this.customer.isDelete === 1;
+      return this.customer.isDelete == null || this.customer.isDelete === 1
     },
     /** 客户是否被禁用 */
     isDisable() {
-      return this.customer.status == null || this.customer.status === 0;
+      return this.customer.status == null || this.customer.status === 0
     },
     fields() {
       // console.log(this.initData.fieldInfo, 'init_data');
@@ -269,7 +216,7 @@ export default {
       // });
       const fields = (this.initData.fieldInfo || []).sort(
         (a, b) => a.orderId - b.orderId
-      );
+      )
       return [
         ...fields,
         {
@@ -294,25 +241,25 @@ export default {
           formType: 'text',
           isSystem: 1
         }
-      ];
+      ]
     },
     eventTypes() {
       if (!this.initData || (this.initData && !this.initData.eventTypeList))
-        return [];
-      return this.initData.eventTypeList.map(t => Object.freeze(t));
+        return []
+      return this.initData.eventTypeList.map(t => Object.freeze(t))
     },
     taskTypes() {
       if (!this.initData || (this.initData && !this.initData.taskTypeList))
-        return [];
-      return this.initData.taskTypeList.map(t => Object.freeze(t));
+        return []
+      return this.initData.taskTypeList.map(t => Object.freeze(t))
     },
     /** 当前用户的权限 */
     permission() {
       // console.log(this.initData.loginUser.authorities);
-      return this.initData.loginUser.authorities;
+      return this.initData.loginUser.authorities
     },
     allowDeleteCustomer() {
-      return this.allowEditCustomer && this.permission.CUSTOMER_DELETE;
+      return this.allowEditCustomer && this.permission.CUSTOMER_DELETE
     },
     /**
      * 满足以下条件允许编辑客户
@@ -320,7 +267,7 @@ export default {
      * 2. 有客户编辑权限
      */
     allowEditCustomer() {
-      return !this.isDelete && this.hasEditCustomerAuth;
+      return !this.isDelete && this.hasEditCustomerAuth
     },
     /**
      * 满足以下条件允许为客户添加产品
@@ -328,7 +275,7 @@ export default {
      * 2. 产品创建权限
      */
     allowCreateProduct() {
-      return !this.isDelete && this.permission.PRODUCT_CREATE;
+      return !this.isDelete && this.permission.PRODUCT_CREATE
     },
     /**
      * 是否有编辑客户权限，需要满足以下条件之一：
@@ -338,26 +285,25 @@ export default {
      * 3. 编辑客户个人权限： 自己创建的 或 客户负责人
      */
     hasEditCustomerAuth() {
-      let customer = this.customer;
-      let loginUserId = this.loginUser.userId;
+      let customer = this.customer
+      let loginUserId = this.loginUser.userId
       return AuthUtil.hasAuthWithDataLevel(
         this.permission,
         'CUSTOMER_EDIT',
         // 团队权限判断
         () => {
-          let tags = Array.isArray(customer.tags) ? customer.tags : [];
+          let tags = Array.isArray(customer.tags) ? customer.tags : []
           // 无团队则任何人都可编辑
-          if (tags.length == 0) return true;
+          if (tags.length == 0) return true
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
-          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || []
+          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0)
         },
         // 个人权限判断
         () => {
-          return customer.createUser == loginUserId || this.isCustomerManager;
+          return customer.createUser == loginUserId || this.isCustomerManager
         }
-      );
+      )
     },
     /**
      * 是否有查看客户权限，需要满足以下条件之一：
@@ -367,26 +313,25 @@ export default {
      * 3. 查看客户个人权限： 自己创建的 或 客户负责人
      */
     hasViewCustomerAuth() {
-      let customer = this.customer;
-      let loginUserId = this.loginUser.userId;
+      let customer = this.customer
+      let loginUserId = this.loginUser.userId
       return AuthUtil.hasAuthWithDataLevel(
         this.permission,
         'CUSTOMER_VIEW',
         // 团队权限判断
         () => {
-          let tags = Array.isArray(customer.tags) ? customer.tags : [];
+          let tags = Array.isArray(customer.tags) ? customer.tags : []
           // 无团队则任何人都可编辑
-          if (tags.length == 0) return true;
+          if (tags.length == 0) return true
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
-          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || []
+          return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0)
         },
         // 个人权限判断
         () => {
-          return customer.createUser == loginUserId || this.isCustomerManager;
+          return customer.createUser == loginUserId || this.isCustomerManager
         }
-      );
+      )
     },
     // permissionAccordingToTag() {
     //   const c = this.customer;
@@ -405,7 +350,7 @@ export default {
      * 客户负责人用于和客户创建人相同权限
      */
     isCustomerManager() {
-      return this.loginUser.userId === this.customer.customerManager;
+      return this.loginUser.userId === this.customer.customerManager
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
@@ -417,7 +362,7 @@ export default {
         isPhoneUnique: this.initData.isPhoneUnique,
         isDisable: this.isDisable,
         isDelete: this.isDelete
-      };
+      }
     },
     /**
      * 满足以下提交见允许创建工单
@@ -433,7 +378,7 @@ export default {
         !this.isDisable &&
         this.hasEditCustomerAuth &&
         AuthUtil.hasAuth(this.permission, 'TASK_ADD')
-      );
+      )
     },
     /**
      * 满足以下提交可以创建事件
@@ -449,7 +394,7 @@ export default {
         !this.isDisable &&
         this.hasEditCustomerAuth &&
         AuthUtil.hasAuth(this.permission, 'CASE_ADD')
-      );
+      )
     },
     /**
      * 满足以下条件可以创建计划任务
@@ -461,54 +406,54 @@ export default {
      * 5. 工单新建权限和工单指派权限
      */
     allowCreatePlanTask() {
-      let planTaskEnabled = this.initData.planTaskEnabled;
+      let planTaskEnabled = this.initData.planTaskEnabled
       return (
         !this.isDelete &&
         !this.isDisable &&
         this.hasEditCustomerAuth &&
         planTaskEnabled &&
         AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
-      );
+      )
     },
     isPhoneUnique() {
-      return this.initData.isPhoneUnique;
+      return this.initData.isPhoneUnique
     },
     isDivideByTag() {
-      return this.initData.isDivideByTag;
+      return this.initData.isDivideByTag
     },
     /** 是否关注该客户 */
     isAttention() {
-      return this.attentionUsers.some(u => u.userId == this.loginUser.userId);
+      return this.attentionUsers.some(u => u.userId == this.loginUser.userId)
     }
   },
   filters: {
     /** @deprecated */
     fmt_tag(value) {
-      if (!Array.isArray(value) || !value || !value.length) return '';
-      return value.map(t => t.tagName).join('， ');
+      if (!Array.isArray(value) || !value || !value.length) return ''
+      return value.map(t => t.tagName).join('， ')
     }
   },
   methods: {
     /** 抓取该客户的关注列表 */
     async fetchAttentionUsers() {
       try {
-        let params = { customerId: this.id };
-        let result = await CustomerApi.attentionList(params);
+        let params = { customerId: this.id }
+        let result = await CustomerApi.attentionList(params)
 
         if (result.status == 0) {
-          this.attentionUsers = result.data || [];
+          this.attentionUsers = result.data || []
         }
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
     },
     execAttentionCommand(command) {
-      if (command == 'toggle') return this.toggleAttention();
+      if (command == 'toggle') return this.toggleAttention()
       if (command == 'view') {
         return (
           this.hasEditCustomerAuth &&
           this.$refs.customerAttention.view(this.attentionUsers)
-        );
+        )
       }
     },
     /** 切换该客户的关注状态 */
@@ -518,11 +463,11 @@ export default {
           customerId: this.id,
           module: 'customer',
           action: this.isAttention ? '取消关注' : '关注'
-        };
+        }
 
-        let result = await CustomerApi.toggleAttention(params);
+        let result = await CustomerApi.toggleAttention(params)
         // 这里推荐至直接throw Exception
-        if (result.status == 1) throw new Exception(result.message);
+        if (result.status == 1) throw new Exception(result.message)
 
         Platform.notification({
           type: 'success',
@@ -530,18 +475,18 @@ export default {
           message: this.isAttention
             ? '您不会再接收该客户信息动态变更的通知'
             : '当该客户信息动态变更时，您会收到钉钉通知'
-        });
+        })
 
-        this.fetchAttentionUsers();
-        this.fetchStatisticalData();
-        this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.fetchAttentionUsers()
+        this.fetchStatisticalData()
+        this.$eventBus.$emit('customer_info_record.update_record_list')
       } catch (e) {
         if (e instanceof Exception) {
           Platform.notification({
             type: 'error',
             title: '失败',
             message: e.message
-          });
+          })
         }
       }
     },
@@ -551,42 +496,42 @@ export default {
         let params = {
           customerId: this.id,
           userIds: removeUsers.map(u => u.userId).join(',')
-        };
+        }
 
-        let result = await CustomerApi.cancelAttention(params);
+        let result = await CustomerApi.cancelAttention(params)
         // 这里推荐至直接throw Exception
-        if (result.status == 1) throw new Exception(result.message);
+        if (result.status == 1) throw new Exception(result.message)
 
         Platform.notification({
           type: 'success',
           title: '取消关注成功',
           message: `${userName}不会再接收该客户信息动态变更的通知`
-        });
+        })
 
-        this.fetchAttentionUsers();
-        this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.fetchAttentionUsers()
+        this.$eventBus.$emit('customer_info_record.update_record_list')
       } catch (e) {
         if (e instanceof Exception) {
           Platform.notification({
             type: 'error',
             title: '失败',
             message: e.message
-          });
+          })
         }
       }
     },
     // 更新客户名称的样式
     updateCustomerStyle() {
-      let cnEl = this.$refs.customerName;
-      let width = cnEl.offsetWidth;
-      let maxWidth = cnEl.closest('h3').offsetWidth;
+      let cnEl = this.$refs.customerName
+      let width = cnEl.offsetWidth
+      let maxWidth = cnEl.closest('h3').offsetWidth
 
-      this.showWholeName = maxWidth - 20 < width ? 0 : -1;
+      this.showWholeName = maxWidth - 20 < width ? 0 : -1
     },
     /** 从客户创建工单 */
     createTask(typeId) {
-      let customer = this.customer || {};
-      let fromId = window.frameElement.getAttribute('id');
+      let customer = this.customer || {}
+      let fromId = window.frameElement.getAttribute('id')
 
       this.$platform.openTab({
         id: 'createTask',
@@ -594,12 +539,12 @@ export default {
         close: true,
         url: `/task/createFromCustomer/${customer.id}?defaultTypeId=${typeId}`,
         fromId
-      });
+      })
     },
     /** 从客户创建事件 */
     createEvent(typeId) {
-      let customer = this.customer || {};
-      let fromId = window.frameElement.getAttribute('id');
+      let customer = this.customer || {}
+      let fromId = window.frameElement.getAttribute('id')
 
       this.$platform.openTab({
         id: 'createEvent',
@@ -607,12 +552,12 @@ export default {
         close: true,
         url: `/event/createFromCustomer/${customer.id}?defaultTypeId=${typeId}`,
         fromId
-      });
+      })
     },
     /** 从客户创建计划工单 */
     createPlanTask(typeId) {
-      let customer = this.customer || {};
-      let fromId = window.frameElement.getAttribute('id');
+      let customer = this.customer || {}
+      let fromId = window.frameElement.getAttribute('id')
 
       this.$platform.openTab({
         id: 'createPlan',
@@ -620,10 +565,10 @@ export default {
         close: true,
         url: `/task/planTask/create?defaultTypeId=${typeId}&customerId=${customer.id}`,
         fromId
-      });
+      })
     },
     selectTab(tab) {
-      this.currTab = tab;
+      this.currTab = tab
     },
     buildTabs() {
       const {
@@ -632,12 +577,13 @@ export default {
         linkmanQuantity,
         plantaskQuantity,
         productQuantity,
+        callQuantity,
         remindQuantity,
         taskQuantity,
         unfinishedEventQuantity,
         unfinishedTaskQuantity,
         recordQuantity
-      } = this.StatisticalData || {};
+      } = this.StatisticalData || {}
 
       return [
         {
@@ -660,6 +606,11 @@ export default {
           displayName: `客户产品(${productQuantity || 0})`,
           component: CustomerProductTable.name,
           show: !this.isDelete
+        },
+        {
+          displayName: `通话(${callQuantity || 0})`,
+          component: CustomerCallTable.name,
+          show: !this.isDelete && localStorage.getItem('call_center_module') == 1
         },
         {
           displayName: taskQuantity
@@ -689,129 +640,134 @@ export default {
           component: CustomerRemindTable.name,
           show: !this.isDelete && !this.isDisable
         }
-      ].filter(tab => tab.show);
+      ].filter(tab => tab.show)
     },
     async deleteCustomer() {
       try {
-        if (!(await this.$platform.confirm('确定要删除该客户？'))) return;
+        if (!(await this.$platform.confirm('确定要删除该客户？'))) return
 
-        const params = { ids: this.customer.id };
-        const result = await this.$http.post('/customer/delete', params);
+        const params = { ids: this.customer.id }
+        const result = await this.$http.post('/customer/delete', params)
         if (!result.status) {
-          let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          let fromId = window.frameElement.getAttribute('fromid')
+          this.$platform.refreshTab(fromId)
 
-          window.location.reload();
+          window.location.reload()
         }
       } catch (e) {
-        console.error('customer-detail-view deleteCustomer error', e);
+        console.error('customer-detail-view deleteCustomer error', e)
       }
     },
     fetchCustomer() {
-      const id = this.initData.id;
+      const id = this.initData.id
       this.$http
         .get('/customer/get', { id })
         .then(res => {
-          if (res.status) return;
-          this.customer = Object.freeze(res.data);
-          this.loading = false;
-          this.$nextTick(this.updateCustomerStyle);
+          if (res.status) return
+          this.customer = Object.freeze(res.data)
+          this.loading = false
+          this.$nextTick(this.updateCustomerStyle)
         })
         .catch(err =>
           console.error(
             'customer-detail-view fetchCustomer catch error /n',
             err
           )
-        );
+        )
     },
-    fetchStatisticalData() {
+    async fetchStatisticalData() {
       const params = {
         customerId: this.initData.id || this.customer.id
-      };
-
+      }
+      let callCount = 0
+      try {
+        const res = await this.$http.get('/api/callcenter/outside/callcenter/callrecord/total4CallTab', params)
+        callCount = res.result || 0
+      } catch (error) {
+        console.error(error);
+      }
       this.$http
         .get('/customer/statistics/init', params)
         .then(res => {
-          if (Object.keys(res).every(key => key !== 'taskQuantity')) return;
+          if (Object.keys(res).every(key => key !== 'taskQuantity')) return
 
-          this.StatisticalData = res;
-          this.tabs = this.buildTabs();
+          this.StatisticalData = res
+          this.StatisticalData.callQuantity = callCount
+          this.tabs = this.buildTabs()
         })
-        .catch(err => console.error('fetchStatisticalData', err));
+        .catch(err => console.error('fetchStatisticalData', err))
     },
     openDialog(action) {
       if (action === 'address') {
-        this.$refs.EditAddressDialog.openDialog();
+        this.$refs.EditAddressDialog.openDialog()
       } else if (action === 'contact') {
-        this.$refs.EditContactDialog.openDialog();
+        this.$refs.EditContactDialog.openDialog(this.customer);
       } else if (action === 'remark') {
-        this.$refs.addRemarkDialog.openDialog();
+        this.$refs.addRemarkDialog.openDialog()
       } else if (action === 'remind') {
-        this.$refs.addRemindDialog.openDialog();
+        this.$refs.addRemindDialog.openDialog()
       }
     },
     jump() {
-      const id = this.id || this.initData.id;
-      window.location.href = `/customer/edit/${id}`;
+      const id = this.id || this.initData.id
+      window.location.href = `/customer/edit/${id}`
     },
     createProduct() {
-      const id = this.id || this.initData.id;
-      window.location.href = `/customer/product/create?customerId=${id}`;
+      const id = this.id || this.initData.id
+      window.location.href = `/customer/product/create?customerId=${id}`
     },
     goBack() {
-      parent.frameHistoryBack(window);
+      parent.frameHistoryBack(window)
     },
     updateRemind(remind) {
-      this.selectedRemind = remind || {};
+      this.selectedRemind = remind || {}
       this.$nextTick(() => {
         this.$refs.addRemindDialog.openDialog(
           this.selectedRemind.sendRoleSetting || {}
-        );
-      });
+        )
+      })
     }
   },
   mounted() {
-    this.loading = true;
-    this.fetchCustomer();
-    this.fetchStatisticalData();
-    this.fetchAttentionUsers();
+    this.loading = true
+    this.fetchCustomer()
+    this.fetchStatisticalData()
+    this.fetchAttentionUsers()
 
-    let query = qs.parse(window.location.search);
+    let query = qs.parse(window.location.search)
     if (query && query.active === 'product') {
-      this.currTab = 'customer-product-table';
+      this.currTab = 'customer-product-table'
     }
 
-    this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind);
+    this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind)
     this.$eventBus.$on(
       'customer_detail_view.update_statistical_data',
       this.fetchStatisticalData
-    );
+    )
     this.$eventBus.$on(
       'customer_detail_view.update_customer_detail',
       this.fetchCustomer
-    );
-    this.$eventBus.$on('customer_detail_view.select_tab', this.selectTab);
+    )
+    this.$eventBus.$on('customer_detail_view.select_tab', this.selectTab)
   },
   beforeDestroy() {
-    this.$eventBus.$off(
-      'customer_detail_view.update_remind',
-      this.updateRemind
-    );
+    this.$eventBus.$off('customer_detail_view.update_remind', this.updateRemind)
     this.$eventBus.$off(
       'customer_detail_view.update_statistical_data',
       this.fetchStatisticalData
-    );
+    )
     this.$eventBus.$off(
       'customer_detail_view.update_customer_detail',
       this.fetchCustomer
-    );
-    this.$eventBus.$off('customer_detail_view.select_tab', this.selectTab);
+    )
+    this.$eventBus.$off('customer_detail_view.select_tab', this.selectTab)
   },
   components: {
     [CustomerInfoRecord.name]: CustomerInfoRecord,
     [CustomerEventTable.name]: CustomerEventTable,
     [CustomerTaskTable.name]: CustomerTaskTable,
     [CustomerProductTable.name]: CustomerProductTable,
+    [CustomerCallTable.name]: CustomerCallTable,
     [CustomerContactTable.name]: CustomerContactTable,
     [CustomerAddressTable.name]: CustomerAddressTable,
     [CustomerPlanTable.name]: CustomerPlanTable,
@@ -821,7 +777,7 @@ export default {
     [RemindCustomerDialog.name]: RemindCustomerDialog,
     [CustomerAttention.name]: CustomerAttention
   }
-};
+}
 </script>
 
 <style lang="scss">
