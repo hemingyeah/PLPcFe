@@ -103,7 +103,6 @@ export default {
     },
   },
   mounted() {
-    console.log("config", this.config);
     const { column_number } = this.getLocalStorageData();
     if (column_number) this.columnNum = Number(column_number);
   },
@@ -111,20 +110,16 @@ export default {
     buildParams() {
       const form = this.$refs.searchForm.returnData();
       this.formBackup = Object.assign({}, form);
-
       const isSystemFields = this.fields.filter((f) => f.isSystem);
       const notSystemFields = this.fields.filter((f) => !f.isSystem);
       let params = {
         conditions: [],
       };
-
       let tv = null;
       let fn = "";
-
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
-
         // hasRemind
         if (fn === "hasRemind" && form[fn] !== "") {
           params.hasRemind = form[fn] == 2 ? 0 : form[fn];
@@ -172,15 +167,32 @@ export default {
           continue;
         }
 
-        if (tv.formType === "tags") {
+        if (tv.fieldName === "tags") {
           params.tagId = form[fn].map(({ id }) => id).join("");
+        }
+
+        if (tv.formType === "address") {
+          let address = {
+            property: fn,
+            operator: tv.operator,
+          };
+          let isEmpty = isEmptyStringObject(form[fn]);
+
+          if (!isEmpty) {
+            address.value =
+              (form[fn].province || "") +
+              (form[fn].city || "") +
+              (form[fn].dist || "") +
+              (form[fn].address || "");
+          }
+          params.conditions.push(address);
+          continue;
         }
       }
 
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
-
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
@@ -215,6 +227,7 @@ export default {
         }
 
         if (tv.formType === "address") {
+          console.log(form[fn]);
           let address = {
             property: fn,
             operator: tv.operator,
@@ -242,7 +255,7 @@ export default {
       return params;
     },
     buildSelfFields() {
-      let fields = this.config
+      let fields = this.config;
       return fields;
     },
     getLocalStorageData() {

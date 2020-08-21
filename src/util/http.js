@@ -61,8 +61,9 @@ axios.interceptors.response.use(response => {
   return Promise.reject(error); // 返回一个空对象，主要是防止控制台报错
 });
 
-function get(url = '', params = {}, option = {}) {
-  return axiosHttp('get', url, params, true, option);
+function get(url = '', params = {}, emulateJSON = true, option = {}) {
+  console.log(url, params, emulateJSON)
+  return axiosHttp('get', url, params, emulateJSON, option);
 }
 
 function post(url = '', params = {}, emulateJSON = true, option = {}) {
