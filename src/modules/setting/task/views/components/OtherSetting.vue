@@ -32,13 +32,13 @@
             <el-radio-group v-model="reportForm.templateSelect" @change="modifyOption('srSysTemplate',!$event,'服务报告模板')">
               <div style="display: inline-block;margin-right: 30px;">
                 <el-radio :label="0">使用系统模板</el-radio>
-                <button type="button" class="btn btn-primary"
+                <button type="button" class="btn setting-btn-primary"
                         @click="showSystemPanel('report')"
                         :disabled="reportForm.templateSelect == 1">设置字段</button>
               </div>
               <div style="display: inline-block;">
                 <el-radio :label="1">上传自己的模板</el-radio>
-                <button type="button" class="btn btn-primary"
+                <button type="button" class="btn setting-btn-primary"
                         @click="showSelfPanel('report')"
                         :disabled="reportForm.templateSelect == 0">配置</button>
               </div>
@@ -65,7 +65,7 @@
           <el-radio-group v-model="printForm.templateSelect" @change="modifyOption('ptSysTemplate',!$event,'打印功能模板')">
             <div style="display: inline-block;margin-right: 30px;">
               <el-radio :label="0">使用系统模板</el-radio>
-              <button type="button" class="btn btn-primary"
+              <button type="button" class="btn setting-btn-primary"
                       @click="showSystemPanel('print')"
                       :disabled="printForm.templateSelect == 1">
                 设置字段
@@ -73,7 +73,7 @@
             </div>
             <div style="display: inline-block;">
               <el-radio :label="1">上传自己的模板</el-radio>
-              <button type="button" class="btn btn-primary"
+              <button type="button" class="btn setting-btn-primary"
                       @click="showSelfPanel('print')"
                       :disabled="printForm.templateSelect == 0">配置</button>
             </div>

@@ -7,6 +7,7 @@ const USER_CONFIG = require(`../../script/config/${user}`);
 
 const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
+const HttpsClient = require('../util/HttpsClient')
 const Template = require('../util/Template')
 
 const modules = require('../../modules');

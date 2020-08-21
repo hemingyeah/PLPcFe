@@ -14,7 +14,7 @@
     <div class="upload-content">
       <div class="upload-content-line">
         <p class="upload-content-desc">1、下载此工单类型的标识对应表</p>
-        <button type="button" class="btn btn-primary" @click="downloadTemplate">下载</button>
+        <button type="button" class="btn setting-btn-primary" @click="downloadTemplate">下载</button>
       </div>
       <div class="upload-content-line">
         <p class="upload-content-desc">2、上传打印模板</p>
@@ -24,7 +24,7 @@
     </div>
 
     <template slot="footer">
-      <button type="button" class="btn btn-primary" @click="close">关闭</button>
+      <button type="button" class="btn setting-btn-primary" @click="close">关闭</button>
     </template>
   </base-modal>
 
@@ -140,6 +140,7 @@ export default {
       this.isShow = newVal;
     },
     uploadTemplateType(newVal,oldVal) {
+      console.log()
       // console.log("watch uploadTemplateType")
       // console.log(newVal)
       // console.log(this.reportSetting)

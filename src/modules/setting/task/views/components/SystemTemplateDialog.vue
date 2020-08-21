@@ -191,7 +191,7 @@
 
 
     <template slot="footer">
-      <button type="button" class="btn btn-primary" @click="submit">保存</button>
+      <button type="button" class="btn setting-btn-primary" @click="submit">保存</button>
     </template>
   </base-modal>
 </template>

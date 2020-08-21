@@ -5,7 +5,7 @@
       <div style="display: none">
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
-        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
+        <button type="button" class="btn setting-btn-primary" @click="submit" :disabled="pending">保存</button>
       </div>
     </div>
 
@@ -16,8 +16,8 @@
     <other-setting @submit="submit" ref="otherSetting">
 
       <div class="btn-content">
-        <button type="button" class="btn btn-default" style="margin-right:5px;" @click="back">返回</button>
-        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">下一步</button>
+        <button type="button" class="btn setting-btn-default" style="margin-right:5px;" @click="back">返回</button>
+        <button type="button" class="btn setting-btn-primary" @click="submit" :disabled="pending">下一步</button>
       </div>
 
     </other-setting>
