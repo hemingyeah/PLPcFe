@@ -19,7 +19,7 @@
     <!-- 备注 end -->
 
     <!-- 备件清单 start-->
-    <div class="mar-b-20" v-if="propData.data.state!=='suspending'">
+    <div class="mar-b-20" v-if="propData.data.state!=='suspending' && propData.data.state!=='dealing'">
       <div class="mar-b-15 font-w-500">备件清单</div>
       <el-table border :data="propData.arr" stripe :key="partDealKey" style="width: 100%" max-height="350">
         <el-table-column type='index' label='序号' width='50px'></el-table-column>
@@ -54,7 +54,7 @@
         style="width: 100%"
         max-height="350"
       >
-        <el-table-column type='selection' :selectable='selectable' width='50px'></el-table-column>
+        <el-table-column type='selection' width='50px'></el-table-column>
         <el-table-column
           v-for="(item,index) in tableColumn"
           :key="index"
@@ -67,7 +67,7 @@
         >
           <template slot-scope="scope">
             <template v-if="item.normalType==='controler'">
-              <el-input type='number' :max='scope.row.max' :min='0' :disabled="!scope.row.checked || scope.row.disabled" v-model="scope.row.handleNum"></el-input>
+              <el-input type='number' :max='scope.row.max' :min='0' :disabled="!scope.row.checked" v-model="scope.row.handleNum"></el-input>
             </template>
             <template v-else-if="item.field==='price'">{{countPrice(scope.row)}}</template>
             <template v-else-if="item.field==='mulNumber'">{{scope.row.solvedVariation}}/{{scope.row.variation}}</template>
@@ -352,7 +352,7 @@ export default {
         if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
           this.propData.arr.forEach(item=>{
             item.checked=true;
-            item.disabled=true;
+            // item.disabled=true;
             const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
             item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
             this.$refs.selectTable.toggleRowSelection(item,true);
@@ -365,16 +365,6 @@ export default {
         }
       }
       this.selects=[...selection];
-    },
-    // 是否可选
-    selectable(row,index){
-      if(row.disabled){
-        return false
-      }else if(this.propData.data.type==='调拨' || this.propData.data.type==='分配'){
-        return false
-      }else{
-        return true
-      }
     },
     // 获取小数位数
     countDecimals(num){

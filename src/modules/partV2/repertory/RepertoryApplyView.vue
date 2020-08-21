@@ -2884,7 +2884,7 @@ export default {
           },
           progress:result.progress
         };
-        if(this.partDealData.data.state==='suspending'){
+        if(this.partDealData.data.state==='suspending' || this.partDealData.data.state==='dealing'){
           this.partDealTitle=`申请单-${this.partDealData.data.type}`;
         }else{
           this.partDealTitle='出入库单详情';
