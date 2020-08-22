@@ -93,7 +93,7 @@ export default {
             title: '成功',
             message: '工单字段更新成功'
           })
-          window.location.href = "/setting/task/receipt";
+          window.location.href = "/setting/task/field/taskReceipt";
         }else{
           platform.notification({
             type: 'error',
