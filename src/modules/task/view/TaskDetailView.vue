@@ -4,7 +4,7 @@
     <div class="task-tool-bar">
       <template v-if="!isDelete">
         <div class="task-toolbar-left">
-          <button type="button" class="btn btn-text" @click="jump" v-if="allowEditTask">
+          <button type="button" class="btn btn-text" @click="goEdit" v-if="allowEditTask">
             <i class="iconfont icon-edit"></i> 编辑
           </button>
           <button type="button" class="btn btn-text" @click="deleteTask" v-if="allowDeleteTask">
@@ -155,7 +155,7 @@
       <!-- end 工单信息 -->
 
       <!-- start 关联数据 -->
-      <div class="task-relation" v-if="this.task.id">
+      <div class="task-relation" v-if="task.id">
         <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
         <div class="task-relation-content">
           <keep-alive>

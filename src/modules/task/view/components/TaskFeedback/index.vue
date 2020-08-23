@@ -1,6 +1,6 @@
 <template>
   <div class="task-tab-container task-feedback-tab">
-    <!-- start 回访信息 -->
+    <!-- start 客户评价信息 -->
     <div class="task-account-main-content">
       <!-- start 审批中 -->
       <template v-if="isApproving">
@@ -21,7 +21,7 @@
       <template v-else-if="!task.reviewTime">
         <div class="no-text">暂无评价信息</div>
       </template>
-      <!-- start 未回访 -->
+      <!-- end 未回访 -->
 
       <!-- start 已回访 -->
       <template v-else>
@@ -31,14 +31,16 @@
           :evaluate="task"
         />
       </template>
-      <!-- start 已回访 -->
+      <!-- end 已回访 -->
 
     </div>
-    <!-- end 回访信息 -->
+    <!-- end 客户评价信息 -->
 
+    <!-- start 操作 -->
     <div class="btn-group">
       <base-button type="primary" @event="feedback" :disabled="pending" v-if="allowReviewTask">回访</base-button>
     </div>
+    <!-- end 操作 -->
 
     <!-- start 回访弹窗 -->
     <task-feedback-dialog
@@ -76,13 +78,7 @@ export default {
   },
   data() {
     return {
-      pending: false,
-      balanceForm: {},
-      // 审核结算弹窗参数
-      balanceDialog: {
-        visible: false,
-        action: ''
-      }
+      pending: false
     }
   },
   computed: {
@@ -108,12 +104,13 @@ export default {
     * @description 是否显示回访按钮
     * 1. 当前登录账户有工单回访权限TASK_FEEDBACK
     * 2. 且 不是审批状态
-    * 3. 且 未回访过 task.isReviewed == 0 && workTask.isReview == 0
+    * 3. 且 未回访过
     */
     allowReviewTask() {
       let { inApprove, isReviewed, isReview } = this.task;
+      let feedbackAuth = this.shareData.auth.TASK_FEEDBACK;
 
-      return inApprove != 1 && isReviewed == 0 && isReview == 0;
+      return feedbackAuth && inApprove != 1 && isReviewed == 0 && isReview == 0;
     }
   },
   methods: {
@@ -144,7 +141,7 @@ export default {
   },
   components: {
     [FeedbackDetail.name]: FeedbackDetail,
-    [FeedbackDialog.name]: FeedbackDialog,
+    [FeedbackDialog.name]: FeedbackDialog
   }
 }
 </script>
