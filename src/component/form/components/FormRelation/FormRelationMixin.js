@@ -77,8 +77,10 @@ export default {
         params.formType = this.setting.formType;
 
         let getTaskRelatedInfoFunc = this.getTaskRelatedInfoFuncMap[this.tableName];
+
         if(!params.id || !getTaskRelatedInfoFunc) return
 
+        // 更新关联项数据
         getTaskRelatedInfoFunc(params)
           .then(res => {
             if(res.status == 0){

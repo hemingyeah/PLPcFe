@@ -1,5 +1,3 @@
-/* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
 /* components */
 import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAddressDialog.vue'
 import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue'
@@ -12,6 +10,12 @@ import props from './props'
 import data from './data'
 import computed from './computed'
 import methods from './methods'
+/* constant */
+// 关联项类型
+const RELATION_TYPE_MAP = {
+  customer: 'relationCustomer',
+  product: 'relationProduct',
+}
 
 export default {
   name: 'task-edit-form',
@@ -134,7 +138,7 @@ export default {
     async chooseTemplate(templateId) {
       let loading = this.$loading();
       try {
-        this.taskFields = await TaskApi.getTaskTemplateFields({ templateId, tableName: 'task' });
+        this.taskFields = await this.fetchTaskTemplateFields({ templateId, tableName: 'task' });
         this.taskValue = FormUtil.initialize(this.taskFields, {});
 
         // 表单初始化
@@ -158,7 +162,7 @@ export default {
 
       loading.close();
     },
-    /** 
+    /**
      * @description 关闭弹窗
      * @param {String} 动作 customer/product 
     */
@@ -273,6 +277,66 @@ export default {
       }
     },
     /** 
+     * @description 关联显示项字段选择处理
+     * @param {string} type customer/product
+    */
+    async relationFieldSelectHandler(type = 'customer') {
+      // 判断类型是否存在
+      let types = ['customer', 'product'];
+      if(types.indexOf(type) < 0) {
+        return console.warn(`Caused: relationFieldHandler params.type is not in ${types}`)
+      }
+      
+      // 判断对应类型的关联显示项字段是否存在
+      let formType = RELATION_TYPE_MAP[type];
+      let relationFields = this.taskFields.filter(field => field.formType == formType);
+      if(relationFields.length <= 0) {
+        return console.warn(`Caused: this.taskFields not have ${formType} filed`);
+      }
+      
+      try {
+        let params = {
+          customerId: this.selectedCustomer?.value || '',
+          productId: this.selectProduct?.[0]?.value || ''
+        }
+        let res = await this.fetchTaskTemplateFields(params);
+        let isSuccess = res.success;
+
+        if (isSuccess) {
+          let result = res.result || {};
+          let { customerInfo, productInfo, relateCustomerFields, relateProductFields } = result;
+          let isCustomerRelation = type == 'customer';
+
+          this.relationFieldUpdateHandler(
+            isCustomerRelation ? customerInfo : productInfo,
+            relationFields,
+          );
+
+        } else {
+          this.$platform.alert(res.message);
+        }
+
+      } catch (error) {
+        console.warn('relationFieldSelectHandler -> error', error)
+      }
+
+    },
+    /** 
+     * @description 关联显示项字段更新处理
+    */
+    relationFieldUpdateHandler(info, relationFields = []) {
+      let fieldName = '';
+      let fieldValue = '';
+
+      relationFields.forEach(relationField => {
+        fieldName = relationField.fieldName;
+        fieldValue = info[fieldName] || info.attribute?.[fieldName] || '';
+
+        this.update({ field: relationField, newValue: fieldValue });
+      })
+
+    },
+    /** 
      * @description 搜索地址 外层处理器
      * @param {Object} params 搜索参数
     */
@@ -297,13 +361,14 @@ export default {
       return this.searchProduct(params);
     },
     /** 
+     * @deprecated 旧的方法，已废弃
      * @description 选择客户关联
      * @param {String} customerId 客户id
     */
     selectCustomerRelation(customerId) {
       let forRelation = {
         module: 'customer',
-        customerId
+        id: customerId
       };
 
       this.$eventBus.$emit('es.Relation.Customer', forRelation);
@@ -330,7 +395,7 @@ export default {
     async updateCustomer(value = []) {
       let selectedCustomer = value[0] || {};
       try {
-        const result = await TaskApi.getTaskDefaultInfo({ customerId: selectedCustomer.value || '' });
+        const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomer.value || '' });
 
         let { linkman, address } = result;
 
@@ -341,9 +406,10 @@ export default {
         // 绑定联系人和地址
         linkman && this.bindLinkman(linkman);
         address && this.bindAddress(address);
-
+        
+        // 更新产品数据
         if (Array.isArray(this.value.product) && this.value.product.length) {
-          this.value.product = this.value.product.filter(item => item.customerId == value[0].value);
+          this.value.product = this.value.product.filter(item => item.customerId == selectedCustomer.value);
         }
 
       } catch (error) {
@@ -351,7 +417,8 @@ export default {
       }
 
       // 查询客户关联字段
-      this.selectCustomerRelation(value[0].value);
+      // this.selectCustomerRelation(selectedCustomer.value);
+      this.relationFieldSelectHandler();
     },
     /** 
      * @description 更新联系人信息
@@ -360,7 +427,7 @@ export default {
       this.bindLinkman(linkman);
 
       try {
-        const result = await TaskApi.getLmBindAddress({ lmId: linkman.id });
+        const result = await this.fetchLmBindAddress({ lmId: linkman.id });
 
         // 如果存在地址信息则绑定地址
         result.data.id && this.bindAddress(result.data);
@@ -380,7 +447,7 @@ export default {
           // 客户不存在时则下拉框隐藏
           findComponentDownward(this.$refs.product, 'base-select').close();
 
-          const result = await TaskApi.getCustomerByProduct({ id: value[value.length - 1].value });
+          const result = await this.fetchCustomerByProduct({ id: value[value.length - 1].value });
 
           const customerData = [{
             label: result.customerName,
@@ -400,10 +467,10 @@ export default {
             id: value[0].value
           }
           // 产品关联字段数据
-          this.$eventBus.$emit('es.Relation.Product', forRelation);
+          // this.$eventBus.$emit('es.Relation.Product', forRelation);
         } else {
           // 清空产品关联字段数据
-          this.$eventBus.$emit('es.Relation.Product', {});
+          // this.$eventBus.$emit('es.Relation.Product', {});
         }
 
       } catch (error) {

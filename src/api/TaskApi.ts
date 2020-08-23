@@ -728,4 +728,14 @@ export function editTask(params: TaskCreateAndEditModel) {
   return http.post(`${fixedPrefixAppPath}/outside/pc/task/edit`, params);
 }
 
+/**
+ * @description 查询关联显示项数据
+ * @param {Object} params 参数对象
+ * @param {String} params.customerId 客户id
+ * @param {String} params.productId 产品id
+ */
+export function getRelatedInfo(params: {} | undefined) {
+  return http.get(`${fixedPrefixAppPath}/outside/pc/task/getRelatedInfo`, params);
+}
+
 /* -------------  end  新工单api ---------------- */

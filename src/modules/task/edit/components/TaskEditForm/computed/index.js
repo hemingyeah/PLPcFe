@@ -28,6 +28,10 @@ export default {
   selectedCustomer(){
     return (this.value.customer && this.value.customer[0]) || {};
   },
+  // 选择的产品值
+  selectProduct() {
+    return this.value.product || [];
+  },
   /* 工单类型 */
   taskTypes(){
     return this.types.map(d => {
