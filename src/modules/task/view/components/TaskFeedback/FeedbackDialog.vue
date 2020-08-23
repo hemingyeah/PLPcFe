@@ -41,16 +41,16 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取 消</el-button>
+      <el-button @click="visible = false" v-if="!evaluateConfig.autoCloseTask">取 消</el-button>
+      <el-button @click="submit(true)" :disabled="pending" v-else>回访并关闭工单</el-button>
       <el-button type="primary" @click="submit(false)" :disabled="pending">回 访</el-button>
-      <el-button type="primary" @click="submit(true)" :disabled="pending">回访并关闭</el-button>
     </div>
   </base-modal>
 </template>
 
 <script>
 /* api */
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* util */
 import _ from 'lodash';
@@ -174,9 +174,9 @@ export default {
       this.pending = true;
 
       const checkParams = {
+        id: this.task.id,
         degree: this.form.degree,
         suggestion: this.form.suggestion,
-        id: this.task.id,
         evaluateObj: this.form.evaluate
       }
 
@@ -192,6 +192,8 @@ export default {
         this.$emit('proposeApprove', result.data);
         return;
       }
+
+      if (!await this.$platform.confirm('确定要回访该工单？ 回访后不能再次回访')) return this.pending = false;
 
       const params = _.cloneDeep(this.form);
       params.autoClosed = autoClosed;

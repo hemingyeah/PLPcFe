@@ -5,7 +5,7 @@
       <div v-if="false">
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
-        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存测试</button>
+        <button type="button" class="btn setting-btn-primary" @click="submit" :disabled="pending">保存测试</button>
       </div>
     </div>
     <div class="setting-task-design">
@@ -13,8 +13,8 @@
     </div>
 
     <div class="btn-content">
-      <button type="button" class="btn btn-default" style="margin-right:5px;" @click="back">返回</button>
-      <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">下一步</button>
+      <button type="button" class="btn setting-btn-default" style="margin-right:5px;" @click="back">返回</button>
+      <button type="button" class="btn setting-btn-primary" @click="submit" :disabled="pending">下一步</button>
     </div>
 
   </div>
@@ -22,7 +22,7 @@
 
 <script>
 /* api */
-import {getFields, taskSettingSave} from '@src/api/TaskApi';
+import { getFields, taskSettingSave } from '@src/api/TaskApi.ts';
 /* util */
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';

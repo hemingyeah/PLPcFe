@@ -1,6 +1,6 @@
 /* eslint-disable vue/html-indent */
 /* api */
-import { getTaskRelatedInfo } from '@src/api/TaskApi';
+import { getTaskRelatedInfo } from '@src/api/TaskApi.ts';
 /* utils */
 import _ from 'lodash';
 

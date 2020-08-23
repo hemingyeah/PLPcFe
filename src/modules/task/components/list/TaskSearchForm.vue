@@ -1,6 +1,6 @@
 <script>
 /* api */
-import * as TaskApi from "@src/api/TaskApi";
+import * as TaskApi from "@src/api/TaskApi.ts";
 import * as CustomerApi from "@src/api/CustomerApi";
 
 /* utils */

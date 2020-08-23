@@ -10,9 +10,9 @@
       v-loading="loading"
       class="customer-plan-table">
       <el-table-column
-        v-for="column in columns"
+        v-for="(column, index) in columns"
         v-if="column.show"
-        :key="column.field"
+        :key="`${column.field}_${index}`"
         :label="column.label"
         :prop="column.field"
         :width="column.width"
@@ -98,7 +98,7 @@
 import {formatDate, } from '@src/util/lang';
 import platform from '@src/platform';
 import { getPlanOfProduct } from '@src/api/ProductApi';
-import { deletePlanTask } from '@src/api/TaskApi';
+import { deletePlanTask } from '@src/api/TaskApi.ts';
 
 
 export default {

@@ -1,5 +1,5 @@
 /* api */
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 /* components */
 import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAddressDialog.vue'
 import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue'
@@ -183,7 +183,7 @@ export default {
      * @description 打开弹窗
      * @param {String} 动作 address/contact/customer/product 
     */
-    dialogOpen(action) {
+    async dialogOpen(action) {
       if (!this.selectedCustomer.id && action != 'customer') {
         this.$platform.alert('请先选择客户');
         return;
@@ -199,13 +199,11 @@ export default {
         break;
       }
       case 'customer': {
-        this.addCustomerDialog = true;
-        this.customerFormDom.init = true;
+        this.openCustomerDialogHandler();
         break;
       }
       case 'product': {
-        this.addProductDialog = true;
-        this.productFormDom.init = true;
+        this.openProductDialogHandler();
         break;
       }
       default: {
@@ -217,18 +215,62 @@ export default {
      * @description 初始化
     */
     init() {
-      this.loading = true;
+      // this.loading = true;
 
-      // 获取客户、产品数据
-      Promise.all([
-        this.fetchCustomerData(),
-        this.fetchProductData()
-      ])
-        .then(res => {
-          this.loading = false;
-        })
-        .catch(err => console.error('error', err));
+      // // 获取客户、产品数据
+      // Promise.all([
+      //   this.fetchCustomerData(),
+      //   this.fetchProductData()
+      // ])
+      //   .then(res => {
+      //     this.loading = false;
+      //   })
+      //   .catch(err => console.error('error', err));
 
+    },
+    /** 
+     * @description 打开客户弹窗处理
+    */
+    async openCustomerDialogHandler() {
+      try {
+        // 打开客户弹窗前，判断是否存在客户初始化数据
+        let isHaveCustomerInitData = Object.keys(this.customerInitData) > 0;
+        if(!isHaveCustomerInitData) {
+          this.loading = true;
+          await this.fetchCustomerData();
+        }
+        
+        this.addCustomerDialog = true;
+        this.customerFormDom.init = true;
+
+      } catch (error) {
+        this.$platform.alert('请稍后再试');
+        console.warn('openCustomerDialogHandler -> error', error)
+      } finally {
+        this.loading = false;
+      }
+    },
+    /** 
+     * @description 打开产品弹窗处理
+    */
+    async openProductDialogHandler() {
+      try {
+        // 打开产品弹窗前，判断是否存在产品初始化数据
+        let isHaveProductInitData = Object.keys(this.productInitData) > 0;
+        if(!isHaveProductInitData) {
+          this.loading = true;
+          await this.fetchProductData();
+        }
+        
+        this.addProductDialog = true;
+        this.productFormDom.init = true;
+        
+      } catch (error) {
+        this.$platform.alert('请稍后再试');
+        console.warn('openProductDialogHandler -> error', error)
+      } finally {
+        this.loading = false;
+      }
     },
     /** 
      * @description 搜索地址 外层处理器

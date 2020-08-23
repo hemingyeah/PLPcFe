@@ -269,19 +269,6 @@ export default {
           continue;
         }
 
-        if (fn === 'addressDetail') {
-          params.customerAddress = {
-            ...params.customerAddress || {},
-            adAddress: form[fn]
-          }
-          continue;
-        }
-
-        if (typeof form[fn] === 'string') {
-          params[fn === 'customer' ? 'customerId' : fn] = form[fn];
-          continue;
-        }
-
         if (fn === 'area') {
           params.customerAddress = {
             ...params.customerAddress || {},
@@ -319,6 +306,11 @@ export default {
 
         if (tv.formType === 'tags') {
           params.tagId = form[fn].map(({id}) => id).join('');
+        }
+
+        if (typeof form[fn] === 'string') {
+          params[fn === 'customer' ? 'customerId' : fn] = form[fn];
+          continue;
         }
       }
 

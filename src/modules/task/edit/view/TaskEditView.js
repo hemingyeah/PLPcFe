@@ -1,5 +1,5 @@
 /* api */
-import * as TaskApi from '@src/api/TaskApi'
+import * as TaskApi from '@src/api/TaskApi.ts'
 /* component */
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 /* utils */
@@ -26,8 +26,7 @@ export default {
      * @description 创建工单方法
     */
     createTaskMethod(params, isAllot) {
-      this.$http
-        .post(`/task/create${isAllot ? '?allot=true' : ''}`, params)
+      TaskApi.createTask(params)
         .then(res => {
           let isSucc = !res.status;
           platform.notification({
@@ -44,6 +43,9 @@ export default {
         })
         .catch(err => console.error('err', err))
     },
+    /** 
+     * @description 返回
+    */
     goBack() {
       if (this.isTaskCreate) {
         let id = window.frameElement.dataset.id;
@@ -52,10 +54,16 @@ export default {
 
       parent.frameHistoryBack(window)
     },
+    /** 
+     * @description 初始化
+    */
     initialize() {
       this.initUrl();
       this.initTitle();
     },
+    /** 
+     * @description 初始化url
+    */
     initUrl() {
       let url = '';
       let createUrl = '/task/create';
@@ -69,6 +77,9 @@ export default {
 
       this.submitModel.url = url;
     },
+    /** 
+     * @description 初始化标题
+    */
     initTitle() {
       let title = '';
 
@@ -85,17 +96,17 @@ export default {
       document.title = title;
     },
     /** 
-   * @description 刷新tab
-  */
+     * @description 刷新tab
+    */
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid');
 
       this.$platform.refreshTab(fromId);
     },
     /** 
-   * @description 提交
-   * @param {Boolean} isAllot 是否派单
-  */
+     * @description 提交
+     * @param {Boolean} isAllot 是否派单
+    */
     submit(isAllot = false) {
       this.submitting = true;
 
@@ -109,16 +120,18 @@ export default {
           const params = util.packToTask(this.fields, this.form);
           params.templateId = taskTemplate.value;
           params.templateName = taskTemplate.text;
-        
-          this.pending = true;
-          this.loadingPage = true;
 
-          if (this.isTaskEdit) {
-            return this.updateTaskMethod(params);
-          }
-          if (this.isTaskCreate) {
-            return this.createTaskMethod(params, isAllot);
-          }
+          console.log('hbc: submit -> params', params)
+        
+          // this.pending = true;
+          // this.loadingPage = true;
+
+          // if (this.isTaskEdit) {
+          //   return this.updateTaskMethod(params);
+          // }
+          // if (this.isTaskCreate) {
+          //   return this.createTaskMethod(params, isAllot);
+          // }
 
         })
         .catch(err => {
@@ -128,11 +141,10 @@ export default {
         })
     },
     /** 
-   * @description 编辑工单方法
-  */
+     * @description 编辑工单方法
+    */
     updateTaskMethod(params) {
-      this.$http
-        .post(`/task/update?id=${this.editId}`, params)
+      TaskApi.editTask(params)
         .then(res => {
           if (res.status == 1) {
             this.loadingPage = false;
@@ -152,8 +164,8 @@ export default {
         })
     },
     /** 
-   * @description 更新工单类型
-  */
+     * @description 更新工单类型
+    */
     updateTaskTemplateId(template = {}) {
       taskTemplate = template || {};
     },

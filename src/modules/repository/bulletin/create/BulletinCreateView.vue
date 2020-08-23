@@ -131,15 +131,15 @@ export default {
 
     // 新建文章提交操作
     async sumbit () {
-      let result = await this.paramsCheck()
-      if(!result) return;
-      if(this.params.deptPerson <= 0 && this.params.selectedUsers.length <= 0) {
-        let result = await this.$platform.confirm('您选择的通知范围不包含任何人，将不会发出通知，是否继续！');
-        if(!result) return;
-      }
-      this.sumbtting = true;
-
       try {
+        let result = await this.paramsCheck()
+        if(!result) return;
+        if(this.params.deptPerson <= 0 && this.params.selectedUsers.length <= 0) {
+          let result = await this.$platform.confirm('您选择的通知范围不包含任何人，将不会发出通知，是否继续！');
+          if(!result) return;
+        }
+        this.sumbtting = true;
+
         let params = this.buildParams();
         this.pending = true; 
         let res = await RepositoryApi.createBulletin(params);
@@ -281,20 +281,25 @@ export default {
     },
 
     async deftCheck () {
-      if(this.params.selectedDepts.length > 0) {
-        let num = 0;
-        this.params.selectedDepts.forEach(async item => {
-          let params = {
-            deptId: item.id,
-            pageNum: 1,
-            pageSize: 50,
-            sellAllOrg: false,
-            keyword: '',
-          }
-          let res = await http.get('/security/department/user', params);
-          num = res.list.length + num;
-        })
+      try {
+        if(this.params.selectedDepts.length > 0) {
+          let num = 0;
+          this.params.selectedDepts.forEach(async item => {
+            let params = {
+              deptId: item.id,
+              pageNum: 1,
+              pageSize: 50,
+              sellAllOrg: false,
+              keyword: '',
+            }
+            let res = await http.get('/security/department/user', params);
+            num = res.list.length + num;
+          })
+        }
+      } catch (error) {
+        console.error('error', error)
       }
+      
     },
 
     // 构建参数

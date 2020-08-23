@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry'
 import http from '@src/util/http';
-import ProductView from './view.vue';
+import ProductView from './View.vue';
 
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
@@ -9,16 +9,16 @@ Vue.prototype.$eventBus = new Vue();
 let initData = {};
 
 try {
-  initData = JSON.parse(window._init || '{}');
+    initData = JSON.parse(window._init || '{}');
 } catch (error) {
-  console.error(error)
-  console.error('no init data')
+    console.error(error)
+    console.error('no init data')
 }
 const PageComponent = Vue.extend(ProductView);
 const app = new PageComponent({
-  propsData: {
-    initData
-  }
+    propsData: {
+        initData
+    }
 });
 
 app.$mount('#app');

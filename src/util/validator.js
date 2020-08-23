@@ -174,6 +174,30 @@ function link(value, field = {}) {
   });
 }
 
+function customer(value, field = {}) {
+  return new Promise((resolve, reject) => {
+    // 先验证长度
+    if(value != null && value.toString().length > SINGLE_LINE_MAX_LEN){
+      return resolve(`长度不能超过${SINGLE_LINE_MAX_LEN}个字符`);
+    }
+    // 允许为空则不继续验证
+    if(field.isNull) return resolve(null);
+    // 不允许为空
+    if(!value || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
+    resolve(null);
+  })
+}
+
+function extend(value, field = {}) {
+  return new Promise((resolve, reject) => {
+    // 允许为空则不继续验证
+    if(field.isNull) return resolve(null);
+    // 不允许为空
+    if(!value || value.toString().length == 0) return resolve(`请选择${field.displayName}`);
+    resolve(null);
+  })
+} 
+
 /**
  * 根据字段类型验证值
  * @param {*} value 值
@@ -200,6 +224,7 @@ export function createRemoteValidate(api, build, delay = 500){
       changeStatus(false);
       return resolve(res.error ? res.error : null);
     })
+      .catch(err => console.error(err))
   }, delay);
 
   return function(value, field, changeStatus){

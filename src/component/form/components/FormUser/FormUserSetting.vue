@@ -18,7 +18,7 @@
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
-import {checkUser,cancelUserApproval} from "@src/api/TaskApi";
+import {checkUser,cancelUserApproval} from "@src/api/TaskApi.ts";
 
 export default {
   name: 'form-user-setting',

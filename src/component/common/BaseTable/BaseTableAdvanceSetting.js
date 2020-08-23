@@ -33,8 +33,7 @@ const BaseTableAdvancedSetting = {
     },
     /** 保存设置 */
     save(event) {
-      event.preventDefault();
-
+      event.preventDefault();       
       let data = this.rows.map(item => {
         return {
           field: item.field,

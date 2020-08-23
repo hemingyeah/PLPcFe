@@ -25,7 +25,7 @@
 </template>
 <script>
 /* Api */
-import * as TaskApi from "@src/api/TaskApi";
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 export default {
   name: "view-model",

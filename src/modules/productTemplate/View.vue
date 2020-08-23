@@ -293,6 +293,7 @@ export default {
         // this.tabs = this.buildTabs();
 
       })
+        .catch(err => console.error(err))
     },
     goBack() {
       parent.frameHistoryBack(window);

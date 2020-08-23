@@ -1,9 +1,9 @@
 /** 用于抹平浏览器和钉钉之间的差异 @author dongls */
-import {getRootWindow} from '../util/dom';
+import { getRootWindow } from '../util/dom';
 import dingtalk from '@src/util/dingtalk';
 import BaseGallery from '@src/component/common/BaseGallery';
 
-import {alert, confirm, notification} from './message';
+import {alert, confirm, notification, toast} from './message';
 
 /** 在新的窗口打开链接，链接必须是全路径 */
 function openLink(url){
@@ -102,6 +102,7 @@ export const platform = {
   alert,
   confirm,
   notification,
+  toast,
 
   openTab,
   refreshTab,

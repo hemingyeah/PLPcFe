@@ -191,13 +191,13 @@
 
 
     <template slot="footer">
-      <button type="button" class="btn btn-primary" @click="submit">保存</button>
+      <button type="button" class="btn setting-btn-primary" @click="submit">保存</button>
     </template>
   </base-modal>
 </template>
 
 <script>
-import {getTaskTemplateFields, getFields, taskSettingSave, getTaskCardDetailList, getTaskType, saveSystemReport,saveSystemPrint} from '@src/api/TaskApi';
+import {getTaskTemplateFields, getFields, taskSettingSave, getTaskCardDetailList, getTaskType, saveSystemReport,saveSystemPrint} from '@src/api/TaskApi.ts';
 import TeamDetailView from "@src/modules/team/views/TeamDetailView";
 import platform from "@src/platform";
 export default {

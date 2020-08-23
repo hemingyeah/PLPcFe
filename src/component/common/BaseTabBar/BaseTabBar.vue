@@ -9,7 +9,7 @@
         :style="{transform: `translateX(${-offset}px)`}"
         @transitionend="tabTransitionEnd">
         <div 
-          v-for="t in tabs" :key="t.component"
+          v-for="(t, index) in tabs" :key="`${t.component}_${index}`"
           class="base-tabbar-item" :class="{'base-tabbar-selected': t.component === value}"
           @click="selectTab(t)">
           <slot :name="`${t.component}__tab`">{{t.displayName}}</slot>
@@ -20,7 +20,7 @@
       <button type="button" slot="reference" :class="{'base-tabbar-all': true, 'base-tabbar-highlight': nextBtnEnable, 'base-tabbar-rotate': isShowPopver}"><i class="iconfont icon-more"></i></button>
       <div class="base-tabbar-panel">
         <div 
-          v-for="t in tabs" :key="t.component"
+          v-for="(t, index) in tabs" :key="`${t.component}_${index}`"
           class="base-tabbar-item" :class="{'base-tabbar-selected': t.component === value}"
           @click="jump(t)">
           <slot :name="`${t.component}__tab`">{{t.displayName}}</slot>

@@ -121,6 +121,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
+          .catch(err => console.error(err))
       }, 500);
 
       let checkCustomerSN = _.debounce(function(params, resolve, changeStatus){
@@ -129,6 +130,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
+          .catch(err => console.error(err))
       }, 500);
 
       let checkLmPhone = _.debounce(function(params, resolve, changeStatus){
@@ -137,6 +139,7 @@ export default {
           changeStatus(false);
           return resolve(res.error ? res.error : null);
         })
+          .catch(err => console.error(err))
       }, 500)
       
       const that = this;

@@ -5,14 +5,14 @@
     </div>
     <div class="frame-menu-scroll">
       <ul class="frame-menu">
-        <template v-for="menu in menus">
+        <template v-for="(menu, index) in menus">
           <li 
             :class="{
               'frame-menu-item': true, 
               'frame-menu-active': menu == currMenu,
               'frame-menu-expand': menu == currMenu
             }" 
-            :key="menu.url"
+            :key="`${menu.url}_${index}`"
             :id="menu.menuKey">
             <a 
               :href="menu.url ? menu.url : 'javascript:;'" 
@@ -27,7 +27,7 @@
 
             <ul 
               :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
-              v-show="!collapse && menu == currMenu">
+              v-show="!collapse && menu.menuKey == (currMenu && currMenu.menuKey)">
               <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
               <div class="frame-subMenu-item-wrap" :style="getMenuItemWrapStyle(menu)">
                 <template v-for="menu in menu.children">
@@ -50,11 +50,14 @@ import MenuIcon from '../model/MenuIcon';
 
 import Logo from '@src/assets/img/logo.png';
 import MiniLogo from '@src/assets/svg/logo.svg';
-
 export default {
   name: 'frame-nav',
   props: {
     collapse: {
+      type: Boolean,
+      default: false
+    },
+    callcenter: {
       type: Boolean,
       default: false
     },
@@ -65,7 +68,7 @@ export default {
   },
   data(){
     let originMenus = _.cloneDeep(this.source);
-    let {menus} = this.buildMenus(originMenus, null);
+    let { menus } = this.buildMenus(originMenus, null);
 
     return {
       originMenus,
@@ -86,6 +89,15 @@ export default {
       if(event.target != this.$el || event.propertyName != 'width') return;
       this.$emit('collapse-changed')
     },
+    pushMenu(menu, menus){
+      if((menu.menuKey == 'M_CALLCENTER_WORKBENCH_LIST' || menu.menuKey == 'M_CALLCENTER_STATISTICS' || menu.menuKey == 'M_CALLCENTER_STAGE')) {
+        if (this.callcenter){
+          menus.push(menu);
+        }
+      } else {
+        menus.push(menu);
+      }
+    },
     /** 将后端返回的菜单，重整为多根树形结构 */
     buildMenus(source, parent){
       let menus = [];
@@ -93,10 +105,11 @@ export default {
 
       for(let i = 0; i < source.length; i++){
         let menu = source[i]
+        // 这里判断下如果呼叫中心开启灰度控制 
         if(menu.parent == parent){
-          menus.push(menu);
+          this.pushMenu(menu, menus);
         }else{
-          otherMenus.push(menu)
+          this.pushMenu(menu, otherMenus);
         }
       }
 
@@ -123,6 +136,21 @@ export default {
       if(!menu.url) return;
 
       let parentMenu = null;
+
+
+      // 临时解决方案
+      if(this.callcenter) {
+        this.menus.map(menu => {
+          let children = menu.children;
+          let isHaveChildren = Array.isArray(children);
+          if(isHaveChildren) {
+            children.map(child => {
+              child.active && (child.active = false)
+            })
+          }
+        })
+      }
+
       this.originMenus.forEach(item => {
         item.active && (item.active = false)
         if(item.menuKey == menu.parent) parentMenu = item;
@@ -197,7 +225,20 @@ export default {
   mounted() {
     this.setMenuOffsetData();
     this.registerResizeListener();
-  }
+  },
+  watch: {
+    callcenter: {
+      immediate: true,
+      deep: true,
+      handler(newValue, oldValue) {
+        if(newValue) {
+          let originMenus = _.cloneDeep(this.source);
+          let m = this.buildMenus(originMenus, null).menus || []; 
+          this.menus = _.cloneDeep(m);          
+        }
+      }
+    }
+  },
 }
 </script>
 

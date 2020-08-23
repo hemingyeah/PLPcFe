@@ -1,5 +1,5 @@
 /* Api */
-import * as TaskApi from "@src/api/TaskApi";
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* components */
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";

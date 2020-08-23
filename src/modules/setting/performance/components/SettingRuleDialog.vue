@@ -21,8 +21,8 @@
       <el-form-item label="计算方式" v-if="form.ruleType">
         <el-select v-model="form.rewardType" @change="validate" placeholder="请选择">
           <el-option
-            v-for="item in calculations"
-            :key="item.value"
+            v-for="(item, index) in calculations"
+            :key="`${item.value}_${index}`"
             :label="item.label"
             :value="item.value">
           </el-option>
@@ -32,8 +32,8 @@
       <el-form-item label="生效条件" class="base-condition-wrap">
         <el-select v-model="form.effectCondition" @change="changeEffectCondition" placeholder="请选择">
           <el-option
-            v-for="item in includeTypes"
-            :key="item.value"
+            v-for="(item, index) in includeTypes"
+            :key="`${item.value}_${index}`"
             :label="item.label"
             :value="item.value">
           </el-option>
@@ -42,8 +42,8 @@
         <span class="ordinary-text" v-if="form.effectCondition">为</span>
         <el-select v-model="form.category" v-if="form.effectCondition" :class="{'input-is-error': formValidationResult.category}" @change="changeCategory" placeholder="请选择">
           <el-option
-            v-for="item in categories"
-            :key="item.value"
+            v-for="(item, index) in categories"
+            :key="`${item.value}_${index}`"
             :label="item.label"
             :value="item.value">
           </el-option>
@@ -67,8 +67,8 @@
       <el-form-item class="base-condition-wrap">
         <el-select v-model="form.custFieldOfTask" :class="{'input-is-error': formValidationResult.custFieldOfTask}" @change="changeCustFieldOfTask" v-if="form.category === 'customizedFields'" placeholder="请选择">
           <el-option
-            v-for="item in taskTypes"
-            :key="item.value"
+            v-for="(item, index) in taskTypes"
+            :key="`${item.value}_${index}`"
             :label="item.label"
             :value="item.value">
           </el-option>
@@ -76,8 +76,8 @@
         <span class="ordinary-text" v-if="form.custFieldOfTask">的</span>
         <el-select v-model="form.customizedField" :class="{'input-is-error': formValidationResult.customizedField}" v-if="form.custFieldOfTask" @change="changeCustomizedField" :disabled="!taskSelectFields.length" placeholder="请选择">
           <el-option
-            v-for="item in taskSelectFields"
-            :key="item.value"
+            v-for="(item, index) in taskSelectFields"
+            :key="`${item.value}_${index}`"
             :label="item.label"
             :value="item.value">
           </el-option>
@@ -759,6 +759,7 @@ export default {
             // res 是条件被选中的字段，如果长度为0就是选中的字段被删除了， reset
             this.clearSomeFieldsVal(['rules', 'customizedField']);
           })
+          .catch(err => console.error(err))
       }
       this.formValidationResult.rules = newRules.map(() => ({
         status: 0,

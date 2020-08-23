@@ -14,7 +14,7 @@
     <div class="upload-content">
       <div class="upload-content-line">
         <p class="upload-content-desc">1、下载此工单类型的标识对应表</p>
-        <button type="button" class="btn btn-primary" @click="downloadTemplate">下载</button>
+        <button type="button" class="btn setting-btn-primary" @click="downloadTemplate">下载</button>
       </div>
       <div class="upload-content-line">
         <p class="upload-content-desc">2、上传打印模板</p>
@@ -24,14 +24,14 @@
     </div>
 
     <template slot="footer">
-      <button type="button" class="btn btn-primary" @click="close">关闭</button>
+      <button type="button" class="btn setting-btn-primary" @click="close">关闭</button>
     </template>
   </base-modal>
 
 </template>
 
 <script>
-import {getTaskTemplate,savePrintTemplate,saveReportTemplate} from "@src/api/TaskApi";
+import {getTaskTemplate,savePrintTemplate,saveReportTemplate} from "@src/api/TaskApi.ts";
 import platform from "@src/platform";
 export default {
   name: "TemplateUploadDialog",
@@ -140,17 +140,20 @@ export default {
       this.isShow = newVal;
     },
     uploadTemplateType(newVal,oldVal) {
+      console.log()
       // console.log("watch uploadTemplateType")
       // console.log(newVal)
       // console.log(this.reportSetting)
       if(newVal == "report") {
         console.log("报告模板")
         console.log(this.reportSetting)
-        this.value = this.reportSetting.templates;
+        this.value = (this.reportSetting.hasOwnProperty("templates") && this.reportSetting.templates) ?
+            this.reportSetting.templates : [];
       }else if(newVal == "print"){
         console.log("打印模板11111")
         console.log(this.printSetting)
-        this.value = this.printSetting.templates;
+        this.value = (this.printSetting.hasOwnProperty("templates") && this.printSetting.templates) ?
+            this.printSetting.templates : [];
       }
       console.log(this.value);
     },

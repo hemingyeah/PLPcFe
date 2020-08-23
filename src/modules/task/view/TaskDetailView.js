@@ -1,5 +1,8 @@
 /* api */
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
+
+/* util */
+import AuthUtil from '@src/util/auth';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -19,12 +22,10 @@ export default {
     return {
       loading: false,
       pending: false,
-      task: {},
-      fields: [],
-      tabs: [],
-      planTimeField: {},
-      // 当前选中的tab
-      currTab: 'task-info-record',
+      task: this.initData.task,
+      fields: [], // 工单表单字段
+      tabs: [], // 工单关联数据tab
+      currTab: 'task-info-record', // 当前选中的tab
       // TODO: 工单状态从移动端拷贝的数据 后面要修改
       stateText: {
         created: '待分配',
@@ -59,14 +60,21 @@ export default {
     customerOption() {
       return (this.customerField.setting && this.customerField.setting.customerOption) || {};
     },
+    /* 计划时间字段 */
+    planTimeField() {
+      return this.fields.filter(f => f.fieldName === 'planTime')[0];
+    },
+    /** 工单设置 */
+    taskConfig() {
+      return this.initData.taskConfig;
+    },
+    /** 工单类型设置 */
+    taskType() {
+      return this.initData.taskType;
+    },
     /** 当前登录用户 */
     loginUser() {
       return this.initData.loginUser || {};
-    },
-    /* 该登录账户是否是工单创建人 */
-    isCreator() {
-      let createUser = this.task.createUser || {};
-      return createUser.userId == this.loginUser.userId;
     },
     /* 该登录账户是否是工单负责人 */
     isExecutor() {
@@ -75,16 +83,11 @@ export default {
     },
     /** 当前用户的权限 */
     permission() {
-      // TODO: 暂时使用假数据
-      return { 'TASK_ADD': 3, 'PRODUCT_CREATE': 3, 'CUSTOMER_CREATE': 3, 'VIP_PAYMENT_ONLINE': 3, 'TASK_BATCH_DISPATCH': 3, 'CASE_ADD': 3, 'SERVICE_CREATE': 3, 'CASE_VIEW': 3, 'TASK_EDIT': 3, 'TASK_FEEDBACK': 3, 'VIP_INFO_NOTICE_SELECT': 3, 'LOGIN_PC': 3, 'SMS_CONFIG': 3, 'VIP_INFO_NOTICE_CREATE': 3, 'SERVICE_EDIT': 3, 'PRODUCT_EDIT': 3, 'TASK_DISPATCH': 3, 'TASK_POOL': 3, 'VIP_REPORT_VIEW': 3, 'TASK_VIEW': 3, 'AUTH_STAFF': 3, 'AUTH_ROLE': 3, 'TASK_CLOSE': 3, 'TASK_BATCH_CLOSE': 3, 'VIP_SPAREPART_PERSION': 3, 'INFO_EDIT': 3, 'VIP_SPAREPART_INOUT': 3, 'TASK_AUDIT': 3, 'PRODUCT_VIEW': 3, 'CUSTOMER_DELETE': 3, 'CASE_DELETE': 3, 'INFO_VIEW': 3, 'EXPORT_IN': 3, 'VIP_APPROVE': 3, 'PART_EDIT': 3, 'SERVICE_VIEW': 3, 'CUSTOMER_VIEW': 3, 'VIP_SPAREPART_CREATE': 3, 'VIP_SPAREPART_VIEW': 3, 'CUSTOMER_PQRCODE': 3, 'TASK_DELETE': 3, 'VIP_TASK_PLAN': 3, 'PRODUCT_DELETE': 3, 'CASE_EDIT': 3, 'VIP_INFO_CREATE': 3, 'SYSTEM_SEETING': 3, 'LOGIN_YD': 3, 'VIP_SPAREPART_EDIT': 3, 'PART_VIEW': 3, 'AUTH_TAG': 3, 'VIP_SPAREPART_STOCK': 3, 'TASK_BATCH_AUDIT': 3, 'CUSTOMER_EDIT': 3 };
+      return this.loginUser.authorities || {};
     },
     /* 工单编辑权限 */
     editAuth() {
-      return this.permission.TASK_EDIT;
-    },
-    /* 工单删除权限 */
-    deleteAuth() {
-      return this.permission.TASK_DELETE;
+      return this.hasAuth('TASK_EDIT');
     },
     /** 
     * @description 工单是否被删除
@@ -117,33 +120,11 @@ export default {
     * 1. 不是审批状态
     * 2. 且 不是暂停状态
     * 3. 且 工单允许编辑 canEditTask
-    * 4. 且 工单允许编辑isAllowUpdate
+    * 4. 且 工单允许修改 isAllowUpdate
     * 5. 满足以上条件就会显示编辑按钮 无论是否有工单编辑权限TASK_EDIT
     */
     allowEditTask() {
-      return !this.isApproving && !this.isPaused && this.canEditTask && this.isAllowUpdate;
-    },
-    /** 
-    * @description 工单允许编辑
-    * 1. 工单编辑设置修改工单开关开启 且 登录账户是工单负责人
-    * 2. 或 角色编辑权限是全部权限this.editAuth == 3
-    * 3. 或 角色编辑权限是团队权限this.editAuth == 2时 且 登录用户是工单的创建人
-    * 4. 或 角色编辑权限是团队权限this.editAuth == 2时 且 工单有负责人且登录用户是工单的负责人任意所在团队的主管(生产环境疑问：若该工单类*    型设置可用团队，则该团队应在可用团队范围内)
-    * 5. 或 角色编辑权限是个人权限this.editAuth == 1时 且 登录用户是工单的创建人
-    */
-    canEditTask() {
-      return this.initData.canEditTask;
-    },
-    /** 
-    * @description 工单允许编辑 canEditTask
-    * 默认是true，当工单编辑设置“当工单处于以下状态之后，不允许对工单再进行编辑”，限制了工单状态
-    * 1. 当前工单的状态刚好被限制编辑
-    * 2. 或 限制的工单状态包含‘已完成‘则已完成以及以后的节点都不可编辑
-    * 3. 或 限制的工单状态包含‘已结算‘则已结算以及以后的节点都不可编辑
-    * 4. 或 限制的工单状态包含‘已回访‘则已回访以及以后的节点都不可编辑
-    */
-    isAllowUpdate() {
-      return this.initData.isAllowUpdate;
+      return !this.isApproving && !this.isPaused && this.initData.canEditTask && this.initData.isAllowUpdate;
     },
     /** 
     * @description 是否显示删除按钮
@@ -153,64 +134,33 @@ export default {
     * 4. 且 工单允许删除 canDeleteTask
     */
     allowDeleteTask() {
-      return !this.isApproving && !this.isPaused && this.deleteAuth && this.canDeleteTask;
-    },
-    /** 
-    * @description 工单允许删除
-    * 1. 满足工单允许编辑canEditTask
-    * 2. 且 当前登录用户有工单删除权限TASK_DELETE
-    */
-    canDeleteTask() {
-      return this.initData.canDeleteTask;
+      return !this.isApproving && !this.isPaused && this.hasAuth('TASK_DELETE') && this.initData.canDeleteTask;
     },
     /** 
     * @description 是否显示回退工单按钮
     * 1. 不是审批状态
-    * 2. 且 工单是已完成状态finished
+    * 2. 且 工单是已完成状态
     * 3. 且 工单编辑设置开启了允许退回工单回执taskConfig.taskRollBack
     * 4. 且 允许回退工单 canRollBack
     */
     allowBackTask() {
-      return !this.isApproving && this.task.state === 'finished' && this.taskConfig.taskRollBack && this.canRollBack;
-    },
-    /** 
-    * @description 允许回退工单
-    * 1. 满足工单允许编辑canEditTask
-    * 2. 或 当前登录用户有工单审核结算权限TASK_AUDIT
-    */
-    canRollBack() {
-      return this.initData.canRollBack;
-    },
-    /** 工单设置 */
-    taskConfig() {
-      return this.initData.taskConfig;
-    },
-    /** 工单类型设置 */
-    taskType() {
-      return this.initData.taskType;
+      return !this.isApproving && this.task.state === 'finished' && this.taskConfig.taskRollBack && this.initData.canRollBack;
     },
     /** 
     * @description 是否显示取消工单按钮
     * 1. 当前登录用户有工单编辑权限TASK_EDIT
     * 2. 不是审批状态
     * 3. 且 不是暂停状态
-    * 4. 且 工单状态是created/allocated/refused/taskPool/accepted/processing其中一种
+    * 4. 且 工单是未完成状态
     * 5. 且 允许取消工单 canOffTask
     */
     allowCancelTask() {
-      return this.editAuth && !this.isApproving && !this.isPaused && this.canOffTask && this.unFinishedState;
-    },
-    /** 
-    * @description 可以取消工单
-    * 满足工单允许编辑canEditTask
-    */
-    canOffTask() {
-      return this.initData.canOffTask;
+      return this.editAuth && !this.isApproving && !this.isPaused && this.initData.canOffTask && this.unFinishedState;
     },
     /** 
     * @description 是否显示接单按钮
     * 1. 不是审批状态
-    * 2. 且 工单状态是工单池taskPool
+    * 2. 且 工单状态是工单池
     */
     allowPoolTask() {
       return !this.isApproving && this.task.state === 'taskPool';
@@ -224,7 +174,7 @@ export default {
     */
     allowPauseTask() {
       let stateArr = ['created', 'allocated', 'accepted', 'processing'];
-      return !this.isApproving && !this.isPaused && this.canPause && stateArr.indexOf(this.task.state) >= 0;
+      return !this.isApproving && !this.isPaused && this.initData.canPause && stateArr.indexOf(this.task.state) >= 0;
     },
     /** 
     * @description 是否显示继续按钮
@@ -233,36 +183,25 @@ export default {
     * 3. 且 允许暂停工单 canPause
     */
     allowGoOnTask() {
-      return !this.isApproving && this.isPaused && this.canPause;
-    },
-    /** 
-    * @description 可以暂停工单
-    * 1. 满足工单允许编辑canEditTask
-    * 2. 工单类型设置中开启了允许工单负责人将工单设置为暂停状态 且 当前登录用户是工单负责人
-    */
-    canPause() {
-      return this.initData.canPause;
+      return !this.isApproving && this.isPaused && this.initData.canPause;
     },
     /** 
     * @description 是否显示接受按钮
     * 1. 当前登录用户是工单负责人
     * 2. 不是审批状态
     * 3. 且 不是暂停状态
-    * 4. 且 工单状态是allocated
+    * 4. 且 工单是已指派状态
     */
     allowAcceptTask() {
       return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === 'allocated';
     },
     /** 
     * @description 是否显示拒绝按钮
-    * 1. 当前登录用户是工单负责人
-    * 2. 不是审批状态
-    * 3. 且 不是暂停状态
-    * 4. 且 工单状态是allocated
-    * 5. 且 工单设置中开启了允许工单负责人拒绝工单taskConfig.taskRefuse
+    * 1. 满足显示接受按钮判断逻辑
+    * 2. 且 工单设置中开启了允许工单负责人拒绝工单
     */
     allowRefuseTask() {
-      return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === 'allocated' && this.taskConfig.taskRefuse;
+      return this.allowAcceptTask && this.taskConfig.taskRefuse;
     },
     /** 
     * @description 是否显示开始按钮
@@ -270,7 +209,7 @@ export default {
     * 2. 不是审批状态
     * 3. 且 不是暂停状态
     * 4. 且 工单状态是accepted
-    * 5. 且 工单类型设置中流程设置开启了开始流程节点taskType.flowSetting.start.state
+    * 5. 且 工单类型设置中流程设置开启了开始流程节点
     */
     allowStartTask() {
       return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === 'accepted' && this.taskType.flowSetting.start.state;
@@ -284,7 +223,7 @@ export default {
     */
     allowAllotTask() {
       let stateArr = ['created', 'refused', 'taskPool'];
-      return this.permission.TASK_DISPATCH && !this.isApproving && !this.isPaused && stateArr.indexOf(this.task.state) >= 0;
+      return this.hasAuth('TASK_DISPATCH') && !this.isApproving && !this.isPaused && stateArr.indexOf(this.task.state) >= 0;
     },
     /** 
     * @description 是否显示转派按钮
@@ -295,38 +234,28 @@ export default {
     */
     allowRedeployTask() {
       let stateArr = ['allocated', 'accepted', 'processing'];
-      return !this.isApproving && !this.isPaused && this.canRedeploy && stateArr.indexOf(this.task.state) >= 0;
-    },
-    /** 
-    * @description 可以转派
-    * 1. 满足工单允许编辑canEditTask且登录账户有TASK_DISPATCH权限
-    * 2. 或 当前登录用户是工单负责人且工单设置中派单设置开启允许工单负责人转派工单taskConfig.taskReallot
-    */
-    canRedeploy() {
-      return this.initData.canRedeploy;
+      return !this.isApproving && !this.isPaused && this.initData.canRedeploy && stateArr.indexOf(this.task.state) >= 0;
     },
     /** 
     * @description 是否显示打印工单按钮
-    * 1. 工单类型设置开启了启用打印功能taskType.options.printTask
+    * 1. 工单类型设置开启了启用打印功能
     * 2. 满足以上条件即会显示打印工单 
       (1)曾打印 task.oncePrinted == 1 样式有区别
     */
     allowPrintTask() {
-      return this.taskType.options.printTask || this.taskType.options.printTask == null;
+      let { printTask } = this.taskType.options;
+      return printTask || printTask == null;
     },
     /** 
     * @description 是否显示服务报告按钮
-    * 1. 工单类型设置开启了发送服务报告taskType.options.serviceReport
-    * 2. 且 工单状态是finished/closed/costed其中一种
-    * 3. 且 是否使用系统模板taskType.options.srSysTemplate
-      (1)使用系统模板taskType.options.srSysTemplate == null || taskType.options.srSysTemplate
-      (2)或 上传自己的模板taskType.options.srSysTemplate != null || !taskType.options.srSysTemplate
+    * 1. 工单类型设置开启了发送服务报告
+    * 2. 且 工单是已完成状态
     */
     allowServiceReport() {
       let { serviceReport } = this.taskType.options;
       return (serviceReport || serviceReport == null) && this.finishedState;
     },
-    /** 使用系统模板 */
+    /** 服务报告是否使用系统模板 */
     srSysTemplate() {
       return this.taskType.options.srSysTemplate;
     },
@@ -337,14 +266,7 @@ export default {
     * 3. 允许审批 canApprove
     */
     allowApprove() {
-      return this.isApproving && this.unFinishedAppr.id && this.canApprove;
-    },
-    /** 
-    * @description 可以审批
-    * 当前登录用户是审批人
-    */
-    canApprove() {
-      return this.initData.canApprove;
+      return this.isApproving && this.unFinishedAppr.id && this.initData.canApprove;
     },
     /** 
     * @description 是否显示撤回审批按钮
@@ -353,18 +275,11 @@ export default {
     * 3. 允许撤回审批 canOffAppr
     */
     allowoffApprove() {
-      return this.isApproving && this.unFinishedAppr.id && this.canOffAppr;
+      return this.isApproving && this.unFinishedAppr.id && this.initData.canOffAppr;
     },
     /** 工单审批数据 */
     unFinishedAppr() {
       return this.initData.unFinishedAppr || {};
-    },
-    /** 
-    * @description 可以撤回审批
-    * 当前登录用户是审批发起人
-    */
-    canOffAppr() {
-      return this.initData.canOffAppr;
     },
     /** 
     * @description 是否显示回执完成按钮
@@ -379,61 +294,48 @@ export default {
 
       return this.isExecutor && !this.isApproving && !this.isPaused && ((state === 'accepted' && !startFlow) || (state === 'processing' && startFlow));
     },
-    /** 
-    * @description 是否显示添加备注按钮
-    * 1. 有工单查看权限TASK_VIEW canViewTask
-    * (1)拥有全部权限TASK_VIEW == 3
-    * (2)或 有团队权限TASK_VIEW == 2且当前登录账户是工单创建人
-    * (3)或 有团队权限TASK_VIEW == 2且当前登录账户是工单负责人
-    * (4)或 有团队权限TASK_VIEW == 2且当前登录账户是工单协同人
-    * (5)或 有团队权限TASK_VIEW == 2且工单有负责人且登录用户是工单的负责人任意所在团队的主管
-    * (6)或 有个人权限TASK_VIEW == 1且当前登录账户是工单创建人
-    * (7)或 有个人权限TASK_VIEW == 1且当前登录账户是工单负责人
-    * (8)或 有个人权限TASK_VIEW == 1且当前登录账户是工单协同人
-    */
+    /* 是否显示添加备注按钮 */
     allowRemark() {
       return this.initData.canViewTask;
     },
     /** 
      * @description 是否显示 [审核结算]tab
-     * 1. 工单状态是finished/costed/closed其中一种
-     * 2. 且 工单是否结算过 workTask.isSettled == 0 || workTask.isSettled == 1
-     * 3. 且 根据工单结算设置结算信息查看权限taskConfig.taskBalanceConfig.balanceViewAuthiroty
+     * 1. 工单是已完成状态
+     * 2. 且 工单是否结算过
+     * 3. 且 根据工单结算设置结算信息查看权限
       (1)仅有审核结算权限可见“onlyHasBalanceAuthiroty”且登录账户有工单审核结算权限TASK_AUDIT
       (2)或 有工单查看权限即可见“hasTaskViewAuthiroty”且(登录账户有工单审核结算权限TASK_AUDIT或有工单查看权限TASK_VIEW)
       (3)或 有工单编辑权限即可见“hasTaskEditAuthiroty”且(登录账户有工单审核结算权限TASK_AUDIT或有工单编辑权限TASK_EDIT)
     */
     viewBalanceTab() {
       let { isSettled } = this.task;
-      let { hasRollbackTask, hasViewTask, hasEditTask } = this.initData;
       let balanceViewAuthiroty = this.taskConfig.taskBalanceConfig.balanceViewAuthiroty;
       
       return (
         this.finishedState
         && (isSettled == 0 || isSettled == 1)
-        && ((balanceViewAuthiroty === 'onlyHasBalanceAuthiroty' && hasRollbackTask)
-          || (balanceViewAuthiroty === 'hasTaskViewAuthiroty' && (hasRollbackTask || hasViewTask))
-          || (balanceViewAuthiroty === 'hasTaskEditAuthiroty' && (hasRollbackTask || hasEditTask)))
+        && ((balanceViewAuthiroty === 'onlyHasBalanceAuthiroty' && this.hasAuth('TASK_AUDIT'))
+          || (balanceViewAuthiroty === 'hasTaskViewAuthiroty' && this.hasAuth(['TASK_AUDIT', 'TASK_VIEW']))
+          || (balanceViewAuthiroty === 'hasTaskEditAuthiroty' && this.hasAuth(['TASK_AUDIT', 'TASK_EDIT'])))
       );
     },
     /** 
      * @description 是否显示 [客户评价]tab
-     * 1. workTask.reviewTime != null || workTask.isEvaluated == 0 || workTask.isReviewed == 0
-     * 2. 且 根据客户满意度设置中客户评价信息查看权限evaluateConfig.reviewViewAuthiroty
+     * 1. 评价时间不为null 或 未回访过
+     * 2. 且 根据客户满意度设置中客户评价信息查看权限
       (1)仅有回访权限可见“onlyHasReviewAuthiroty”且登录账户有工单回访权限TASK_FEEDBACK
       (2)或 有工单查看权限即可见“hasTaskViewAuthiroty”且(登录账户有工单审核结算权限TASK_FEEDBACK或有工单查看权限TASK_VIEW)
       (3)或 有工单编辑权限即可见“hasTaskEditAuthiroty”且(登录账户有工单审核结算权限TASK_FEEDBACK或有工单编辑权限TASK_EDIT)
     */
     viewFeedbackTab() {
       let { reviewTime, isEvaluated, isReviewed } = this.task;
-      let { hasReviewTask, hasViewTask, hasEditTask } = this.initData;
       let reviewViewAuthiroty = this.initData.evaluateConfig.reviewViewAuthiroty;
       
       return (
         (reviewTime != null || isEvaluated == 0 || isReviewed == 0)
-        && ((reviewViewAuthiroty === 'onlyHasReviewAuthiroty' && hasReviewTask)
-          || (reviewViewAuthiroty === 'hasTaskViewAuthiroty' && (hasReviewTask || hasViewTask))
-          || (reviewViewAuthiroty === 'hasTaskEditAuthiroty' && (hasReviewTask || hasEditTask)))
+        && ((reviewViewAuthiroty === 'onlyHasReviewAuthiroty' && this.hasAuth('TASK_FEEDBACK'))
+          || (reviewViewAuthiroty === 'hasTaskViewAuthiroty' && this.hasAuth(['TASK_FEEDBACK', 'TASK_VIEW']))
+          || (reviewViewAuthiroty === 'hasTaskEditAuthiroty' && this.hasAuth(['TASK_FEEDBACK', 'TASK_EDIT'])))
       );
     },
     /** 
@@ -460,8 +362,10 @@ export default {
     },
     // 处理完成审批
     approvingForComplete(){
-      let { canLookCompleteReceipt, receiptDraft } = this.initData;
-      return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.canApprove || canLookCompleteReceipt) && receiptDraft;
+      let { canEditTask, receiptDraft } = this.initData;
+      let canLookCompleteReceipt = canEditTask || this.permission.VIP_APPROVE == 3;
+
+      return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.initData.canApprove || canLookCompleteReceipt) && receiptDraft;
     },
     /** 
     * @description 工单信息中计划时间是否可以修改
@@ -484,35 +388,21 @@ export default {
     */
     allowDing() {
       // 是否有负责人
-      let hasExecutor = this.task.executor && this.task.executor.userId;
+      let { state, executor } = this.task;
+      let hasExecutor = executor && executor.userId;
 
-      return this.initData.canViewTask && parent.inDingTalkPC() && this.task.state != 'closed' && hasExecutor;
+      return this.initData.canViewTask && parent.inDingTalkPC() && state != 'closed' && hasExecutor;
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
         task: this.task,
-      };
+        auth: this.permission
+      }
     },
   },
   methods: {
-    jump() {
-      const id = this.task.id;
-      window.location.href = this.editAuth ? `/task/edit/${id}` : `/task/noFilterEdit/${id}`;
-    },
-    prettyAddress(address) {
-      if (!address || Object.keys(address).length === 0) return '';
-
-      let province = address.province || '';
-      let city = address.city || '';
-      let dist = address.dist || '';
-      let adr = address.address || '';
-
-      return [province, city, dist, adr].filter(a => a).join('-');
-    },
-    selectTab(tab) {
-      this.currTab = tab;
-    },
+    // 构建工单关联tabs
     buildTabs() {
       // TODO: 附加组件
       return [
@@ -538,24 +428,25 @@ export default {
         }
       ].filter(tab => tab.show);
     },
-    // 打开弹窗
-    openDialog(action) {
-      if (action === 'cancel') {
-        this.$refs.cancelTaskDialog.openDialog();
-      } else if (action === 'acceptFromPool' || action === 'accept' || action === 'modifyPlanTime') {
-        this.$refs.planTimeDialog.openDialog(action);
-      } else if (action === 'approve') {
-        this.$refs.approveTaskDialog.openDialog();
-      } else if (action === 'pause') {
-        this.pauseDialog.reason = '';
-        this.pauseDialog.visible = true;
-      } else if (action === 'refuse') {
-        this.refuseDialog.reason = '';
-        this.refuseDialog.visible = true;
-      } else if (action === 'back') {
-        this.backDialog.reason = '';
-        this.backDialog.visible = true;
-      }
+    // 格式化地址显示
+    prettyAddress(address) {
+      if (!address || Object.keys(address).length === 0) return '';
+
+      let province = address.province || '';
+      let city = address.city || '';
+      let dist = address.dist || '';
+      let adr = address.address || '';
+
+      return [province, city, dist, adr].filter(a => a).join('-');
+    },
+    // 是否含有某一指定权限
+    hasAuth(keys) {
+      return AuthUtil.hasAuth(this.permission, keys);
+    },
+    // 编辑跳转
+    goEdit() {
+      const id = this.task.id;
+      window.location.href = this.editAuth ? `/task/edit/${id}` : `/task/noFilterEdit/${id}`;
     },
     // 删除工单
     async deleteTask() {
@@ -618,9 +509,10 @@ export default {
 
       this.pending = true;
 
-      const params = { taskId: this.task.id, reason };
+      // 判断是完成状态回退还是结算回退
       const API = this.task.state == 'finished' ? 'rollBackTask' : 'rollBackBalance';
       
+      const params = { taskId: this.task.id, reason };
       TaskApi[API](params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
@@ -804,14 +696,30 @@ export default {
 
       let {id, taskNo} = this.task;
       window.parent.send_link_ding_message(users, taskNo, id);
+    },
+    // 打开弹窗
+    openDialog(action) {
+      if (action === 'cancel') {
+        this.$refs.cancelTaskDialog.openDialog();
+      } else if (action === 'acceptFromPool' || action === 'accept' || action === 'modifyPlanTime') {
+        this.$refs.planTimeDialog.openDialog(action);
+      } else if (action === 'approve') {
+        this.$refs.approveTaskDialog.openDialog();
+      } else if (action === 'pause') {
+        this.pauseDialog.reason = '';
+        this.pauseDialog.visible = true;
+      } else if (action === 'refuse') {
+        this.refuseDialog.reason = '';
+        this.refuseDialog.visible = true;
+      } else if (action === 'back') {
+        this.backDialog.reason = '';
+        this.backDialog.visible = true;
+      }
     }
   },
   async mounted() {
     try {
       this.loading = true;
-
-      // TODO: 暂时用假数据
-      this.task = this.initData.task;
 
       const fields = await TaskApi.getTaskTemplateFields({ templateId: this.task.templateId, tableName: 'task' });
       this.fields = [...fields, {
@@ -845,8 +753,6 @@ export default {
         formType: 'timestamp',
         isSystem: 1,
       }];
-
-      this.planTimeField = fields.filter(field => field.formType == 'planTime')[0];
 
       this.tabs = this.buildTabs();
 

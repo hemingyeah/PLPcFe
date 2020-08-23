@@ -73,8 +73,8 @@ export default {
         productId: [] // 数组，包含产品对象
       },
       loadData: false,
-      
-    }
+      createOriginalValue: {},
+    };
   },
   computed: {
     action() {
@@ -82,6 +82,12 @@ export default {
     },
     customerId() {
       return (this.customer && this.customer.id) || '';
+    },
+    isEdit() {
+      return this.action === 'edit';
+    },
+    linkmanId() {
+      return (this.originalValue && this.originalValue.id) || '';
     },
     fields() {
       return [
@@ -265,15 +271,18 @@ export default {
       }
       this.$set(this.form, fieldName, newValue);
     },
-    openDialog() {
+    openDialog(createOriginalValue = {}) {
       this.addContactDialog = true;
 
       // console.log(this.originalValue, "asdadsa");
       if (this.action === 'edit') {
         this.matchValueToForm(this.originalValue);
       }
+      
+      this.createOriginalValue = createOriginalValue;
+
       this.fetchAddress();
-      this.fetchProducts();
+      this.action === 'edit' ? this.fetchEditProducts() : this.fetchProducts();
       this.init = true;
     },
     matchValueToForm(val) {
@@ -349,10 +358,36 @@ export default {
               .filter(pId => this.products.some(p => p.value === pId));
           }
 
+          // this.form.productId = this.products.map(p => p.value);
           return this.products;
         })
         .catch(err => console.error('fetchProducts catch err', err));
-    }
+    },
+    fetchEditProducts() {
+      return this.$http.get('/product/linkmanRelation', {
+        linkmanId: this.linkmanId,
+        customerId: this.customer.id,
+        pageSize: 0,
+        pageNum: 1,
+      })
+        .then(res => {
+          this.products = res.list.map(p => ({
+            text: p.name,
+            value: p.id
+          }));
+          // 把被删除的产品过滤掉
+          const productId = this.originalValue.productId;
+          if (productId && productId.length) {
+            this.form.productId = productId
+              .map(p => p.id)
+              .filter(pId => this.products.some(p => p.value === pId));
+          }
+
+          this.form.productId = this.products.map(p => p.value);
+          return this.products;
+        })
+        .catch(err => console.error('fetchProducts catch err', err));
+    },
   }
 };
 </script>

@@ -133,6 +133,7 @@ export default {
         changeStatus(false);
         return resolve(validate ? null : '团队名称不能重复');
       })
+        .catch(err => console.error(err))
     }, 500),
 
     checkPlace(){

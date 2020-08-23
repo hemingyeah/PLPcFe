@@ -21,8 +21,8 @@
       class="rule-table"
       :highlight-current-row="false">
       <el-table-column
-        v-for="column in columns"
-        :key="column.field"
+        v-for="(column, index) in columns"
+        :key="`${column.field}_${index}`"
         :label="column.label"
         :prop="column.field"
         :width="column.width"

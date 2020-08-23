@@ -19,7 +19,7 @@ import {
   isSelect 
 } from './util'
 import http from "@src/util/http";
-import {checkUser,deleteComponent} from "@src/api/TaskApi";
+import {checkUser,deleteComponent} from "@src/api/TaskApi.ts";
 
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
@@ -118,6 +118,9 @@ function createSettingComp(h, field){
         } else {
           this.$set(field, event.prop, event.value);
         }
+      },
+      updateOptions: event => {
+        this.updateOptions(field, event);
       }
     }
   });
@@ -150,8 +153,15 @@ function getTemplate(el){
     return el.outerHTML;
   }
   
-  let tmp = el.querySelector('.form-design__ghost');
-  return tmp ? tmp.outerHTML : '';
+  let tmp = el.querySelectorAll('.form-design__ghost');
+  let outerHTML = '';
+  if (tmp.length > 1) {
+    tmp.forEach(item => {
+      outerHTML += item.outerHTML
+    })
+  }
+
+  return outerHTML;
 }
 
 const FormDesign = {
@@ -644,16 +654,16 @@ const FormDesign = {
     },
     renderTabHeader(){
       if(!this.hasSystemField) return (
-        <div class="form-design-tabs">
-          <div class="form-design-tab">基础字段</div>
-        </div>
+          <div class="form-design-tabs">
+            <div class="form-design-tab">基础字段</div>
+          </div>
       );
 
       return (
-        <div class="form-design-tabs form-design-withSys">
-          <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
-          <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
-        </div>
+          <div class="form-design-tabs form-design-withSys">
+            <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
+            <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
+          </div>
       )
     },
     renderFieldList(fields){
@@ -663,56 +673,56 @@ const FormDesign = {
 
       return fields.map(field => {
         return (
-          <div class="form-design-field-wrap"
-            onMousedown={e => this.beginInsert(field, e)}
-            onClick={e => this.immediateInsert(field, e)}>
-            <div class="form-design-field form-design__ghost">
-              {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
+            <div class="form-design-field-wrap"
+                 onMousedown={e => this.beginInsert(field, e)}
+                 onClick={e => this.immediateInsert(field, e)}>
+              <div class="form-design-field form-design__ghost">
+                {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
+              </div>
             </div>
-          </div>
         )
       });
     },
     renderPreviewList(h){
       if(this.isEmpty) return (
-        <div class="form-design-tip">
-          <p>选择左侧控件拖动到此处</p>
-        </div>
+          <div class="form-design-tip">
+            <p>选择左侧控件拖动到此处</p>
+          </div>
       )
 
-      return this.value.map(f => createPreviewComp.call(this, h, f)) 
+      return this.value.map(f => createPreviewComp.call(this, h, f))
     },
     renderSettingPanel(h){
       let fieldSetting = createSettingComp.call(this, h, this.currField);
       if(null == fieldSetting) return null;
 
       return (
-        <div class="form-design-setting" key="form-design-setting">
-          {fieldSetting}
-        </div> 
+          <div class="form-design-setting" key="form-design-setting">
+            {fieldSetting}
+          </div>
       )
-    }
+    },
   },
   render(h){
     return (
-      <div class="form-design">
-        <div class="form-design-panel">
-          { this.renderTabHeader() }
-          <div class="form-design-tabs-content">
-            { this.renderFieldList(this.filterFields) } 
+        <div class="form-design">
+          <div class="form-design-panel">
+            { this.renderTabHeader() }
+            <div class="form-design-tabs-content">
+              { this.renderFieldList(this.filterFields) }
+            </div>
+          </div>
+          <div class="form-design-main">
+            <div class={['form-design-list', this.silence ? 'form-design-silence' : null]}>
+              { this.renderPreviewList(h) }
+            </div>
+          </div>
+          { this.renderSettingPanel(h) }
+          <div class="form-design-ghost" key="form-design-ghost" onWheel={this.scrollPreviewList}>
+            <div class="form-design__template"></div>
+            <div class="form-design-cover"></div>
           </div>
         </div>
-        <div class="form-design-main">
-          <div class={['form-design-list', this.silence ? 'form-design-silence' : null]}>
-            { this.renderPreviewList(h) }
-          </div>
-        </div>
-        { this.renderSettingPanel(h) }
-        <div class="form-design-ghost" key="form-design-ghost" onWheel={this.scrollPreviewList}>
-          <div class="form-design__template"></div>
-          <div class="form-design-cover"></div>
-        </div>
-      </div>
     );
   },
   mounted(){

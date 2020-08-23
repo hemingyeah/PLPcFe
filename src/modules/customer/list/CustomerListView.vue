@@ -115,9 +115,9 @@
       >
         <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
         <el-table-column
-          v-for="column in columns"
+          v-for="(column, index) in columns"
           v-if="column.show"
-          :key="column.field"
+          :key="`${column.field}_${index}`"
           :label="column.label"
           :prop="column.field"
           :width="column.width"
@@ -177,6 +177,9 @@
               <template v-else>
                 <div @mouseover="showLatestUpdateRecord(scope.row)">{{scope.row[column.field]}}</div>
               </template>
+            </template>
+            <template v-else-if="column.field === 'lmPhone'">
+              <span class="align-items-center"> {{scope.row.lmPhone}} <el-tooltip content="拨打电话" placement="top"><i @click.stop="makePhoneCall(scope.row.lmPhone)" v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></el-tooltip></span>
             </template>
             <template v-else-if="column.field === 'createUser'">
               {{scope.row.createUserName}}
@@ -345,8 +348,8 @@
     <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" />
 
     <search-panel :config="{
-        fields: this.initData.fieldInfo,
-      }" ref="searchPanel">
+      fields: this.initData.fieldInfo,
+    }" ref="searchPanel">
       <div class="advanced-search-btn-group" slot="footer">
         <base-button type="ghost" @event="resetParams">重置</base-button>
         <base-button type="primary" @event="powerfulSearch" native-type="submit">搜索</base-button>
@@ -356,21 +359,21 @@
 </template>
 
 <script>
-import _ from "lodash";
-import { formatDate } from "../../../util/lang";
-import SendMessageDialog from "./operationDialog/SendMessageDialog.vue";
-import BatchEditingCustomerDialog from "./operationDialog/BatchEditingCustomerDialog.vue";
-import BatchRemindingCustomerDialog from "./operationDialog/BatchRemindingCustomerDialog.vue";
-import BatchUpdateCustomerDialog from "./operationDialog/BatchUpdateCustomerDialog.vue";
-import SearchPanel from "./operationDialog/SearchPanel.vue";
+import _ from 'lodash';
+import { formatDate } from '../../../util/lang';
+import SendMessageDialog from './operationDialog/SendMessageDialog.vue';
+import BatchEditingCustomerDialog from './operationDialog/BatchEditingCustomerDialog.vue';
+import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustomerDialog.vue';
+import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
+import SearchPanel from './operationDialog/SearchPanel.vue';
 
-import * as CustomerApi from "@src/api/CustomerApi";
+import * as CustomerApi from '@src/api/CustomerApi';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
-import TeamMixin from "@src/mixins/teamMixin";
+import TeamMixin from '@src/mixins/teamMixin';
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 export default {
-  name: "customer-list-view",
+  name: 'customer-list-view',
   mixins: [TeamMixin],
   props: {
     initData: {
@@ -389,7 +392,7 @@ export default {
         moreConditions: {
           conditions: []
         },
-        keyword: "",
+        keyword: '',
         pageNum: 1,
         pageSize: 10
       },
@@ -401,7 +404,8 @@ export default {
       columns: this.fixedColumns(),
       selectedLimit: 500,
       columnNum: 1,
-      tableKey: (Math.random() * 1000) >> 2
+      tableKey: (Math.random() * 1000) >> 2,
+      hasCallCenterModule:localStorage.getItem('call_center_module') == 1
     };
   },
   computed: {
@@ -426,36 +430,36 @@ export default {
     exportColumns() {
       const fixedFields = [
         {
-          field: "id",
+          field: 'id',
           export: true,
-          label: "客户系统编号"
+          label: '客户系统编号'
         }
       ];
 
       return this.columns.concat(fixedFields).map(c => {
         if (
-          c.field !== "customerAddress" &&
-          c.field !== "remindCount" &&
-          c.field !== "updateTime" &&
-          c.formType !== "info"
+          c.field !== 'customerAddress'
+          && c.field !== 'remindCount'
+          && c.field !== 'updateTime'
+          && c.formType !== 'info'
         ) {
           c.export = true;
         }
 
-        if (c.field === "detailAddress") {
-          c.exportAlias = "customerAddress";
+        if (c.field === 'detailAddress') {
+          c.exportAlias = 'customerAddress';
         }
 
         // if (c.field === 'tags') {
         //   c.exportAlias = 'customerTags';
         // }
 
-        if (c.field === "customerManagerName") {
-          c.exportAlias = "manager";
+        if (c.field === 'customerManagerName') {
+          c.exportAlias = 'manager';
         }
 
-        if (c.field === "status") {
-          c.label = "状态";
+        if (c.field === 'status') {
+          c.label = '状态';
         }
 
         return c;
@@ -483,20 +487,20 @@ export default {
   },
   filters: {
     tagName(value) {
-      if (!value || !Array.isArray(value) || !value.length) return "";
+      if (!value || !Array.isArray(value) || !value.length) return '';
 
       return value
         .filter(tag => tag && tag.tagName)
         .map(tag => tag.tagName)
-        .join("，");
+        .join('，');
     },
     displaySelect(value) {
       if (!value) return null;
-      if (value && typeof value === "string") {
+      if (value && typeof value === 'string') {
         return value;
       }
       if (Array.isArray(value) && value.length) {
-        return value.join("，");
+        return value.join('，');
       }
       return null;
     }
@@ -515,9 +519,22 @@ export default {
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
-    console.log("onEvent", this.initData.fieldInfo);
+    console.log('onEvent', this.initData.fieldInfo);
   },
   methods: {
+    async makePhoneCall(phone){
+      if(!this.hasCallCenterModule) return
+      try {
+        const { code, message } = await this.$http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        }) 
+      } catch (error) {
+        console.error(error);
+      }
+    },
     powerfulSearch() {
       this.params.pageNum = 1;
       this.params.moreConditions = this.$refs.searchPanel.buildParams();
@@ -525,7 +542,7 @@ export default {
       this.search();
     },
     showAdvancedSetting() {
-      window.TDAPP.onEvent("pc：客户管理-选择列事件");
+      window.TDAPP.onEvent('pc：客户管理-选择列事件');
 
       this.$refs.advanced.open(this.columns);
     },
@@ -546,14 +563,14 @@ export default {
           });
           this.matchSelected();
         })
-        .catch(e => console.error("e", e));
+        .catch(e => console.error('e', e));
     },
     createCustomerTab(customerId) {
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: `customer_view_${customerId}`,
-        title: "客户详情",
+        title: '客户详情',
         close: true,
         url: `/customer/view/${customerId}?noHistory=1`,
         fromId
@@ -562,21 +579,21 @@ export default {
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
       localStorage.setItem(
-        "customer_list_advance_search_column_number",
+        'customer_list_advance_search_column_number',
         command
       );
     },
     formatAddress(ad) {
-      if (null == ad) return "";
+      if (null == ad) return '';
 
       const { adProvince, adCity, adDist } = ad;
-      return [adProvince, adCity, adDist].filter(d => !!d).join("-");
+      return [adProvince, adCity, adDist].filter(d => !!d).join('-');
     },
     formatCustomizeAddress(ad) {
-      if (null == ad) return "";
+      if (null == ad) return '';
 
       const { province, city, dist, address } = ad;
-      return [province, city, dist, address].filter(d => !!d).join("-");
+      return [province, city, dist, address].filter(d => !!d).join('-');
     },
     remindSuccess(ids) {
       let tv = false;
@@ -593,15 +610,15 @@ export default {
       });
     },
     jumpPage() {
-      window.TDAPP.onEvent("pc：客户管理-新建事件");
+      window.TDAPP.onEvent('pc：客户管理-新建事件');
 
       // window.location = '/customer/create';
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: "customer_create",
-        title: "新建客户",
-        url: "/customer/create",
+        id: 'customer_create',
+        title: '新建客户',
+        url: '/customer/create',
         reload: true,
         close: true,
         fromId
@@ -612,24 +629,24 @@ export default {
       let exportAll = !ids || ids.length == 0;
       let exportSearchModel = exportAll
         ? {
-            ...this.buildParams(),
-            exportTotal: this.totalItems
-          }
+          ...this.buildParams(),
+          exportTotal: this.totalItems
+        }
         : { exportTotal: ids.length };
 
       return {
-        customerChecked: checkedArr.join(","),
-        data: exportAll ? "" : ids.join(","),
+        customerChecked: checkedArr.join(','),
+        data: exportAll ? '' : ids.join(','),
         exportSearchModel: JSON.stringify(exportSearchModel)
       };
     },
     /** 导出客户 */
     exportCustomer(exportAll) {
       let ids = [];
-      let fileName = `${formatDate(new Date(), "YYYY-MM-DD")}客户数据.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}客户数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length)
-          return this.$platform.alert("请选择要导出的数据");
+          return this.$platform.alert('请选择要导出的数据');
         ids = this.selectedIds;
       }
       this.$refs.exportPanel.open(ids, fileName);
@@ -638,7 +655,7 @@ export default {
     checkExportCount(ids, max) {
       let exportAll = !ids || ids.length == 0;
       return exportAll && this.totalItems > max
-        ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
+        ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。'
         : null;
     },
     importSucc() {
@@ -658,7 +675,7 @@ export default {
       this.loadingListData = true;
 
       return this.$http
-        .post("/customer/list", params)
+        .post('/customer/list', params)
         .then(res => {
           if (!res || !res.list) {
             this.customers = [];
@@ -671,7 +688,6 @@ export default {
               c.pending = false;
               return c;
             });
-
             this.totalItems = total;
             this.params.pageNum = pageNum;
             this.matchSelected(); // 把选中的匹配出来
@@ -685,7 +701,7 @@ export default {
         })
         .catch(err => {
           this.loadingListData = false;
-          console.error("err", err);
+          console.error('err', err);
         });
     },
     buildParams() {
@@ -701,8 +717,8 @@ export default {
       }
 
       if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
+        Object.keys(sm.moreConditions).length > 1
+        || sm.moreConditions.conditions.length
       ) {
         params = {
           ...params,
@@ -720,7 +736,7 @@ export default {
       this.toggleSelection([customer]);
     },
     toggleStatus(row) {
-      window.TDAPP.onEvent("pc：客户管理-状态开启事件");
+      window.TDAPP.onEvent('pc：客户管理-状态开启事件');
 
       const ns = row.status ? 0 : 1;
       row.pending = true;
@@ -730,7 +746,7 @@ export default {
       };
 
       this.$http
-        .post("/customer/changeState", params, false, { cancelable: false })
+        .post('/customer/changeState', params, false, { cancelable: false })
         .then(res => {
           row.pending = false;
 
@@ -746,7 +762,7 @@ export default {
         })
         .catch(err => {
           row.pending = false;
-          console.error("toggleStatus catch err", err);
+          console.error('toggleStatus catch err', err);
         });
     },
     sortChange(option) {
@@ -763,26 +779,18 @@ export default {
         }
 
         let sortModel = {
-          isSystem: prop === "createTime" || prop === "updateTime" ? 1 : 0,
-          sequence: order === "ascending" ? "ASC" : "DESC",
+          isSystem: prop === 'createTime' || prop === 'updateTime' ? 1 : 0,
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
           column:
-            prop === "createTime" || prop === "updateTime"
+            prop === 'createTime' || prop === 'updateTime'
               ? `customer.${prop}`
               : prop
         };
 
-        const sortedField =
-          this.customerConfig.fieldInfo.filter(
-            sf => sf.fieldName === prop
-          )[0] || {};
+        const sortedField = this.customerConfig.fieldInfo.filter(sf => sf.fieldName === prop)[0] || {};
 
-        if (
-          prop === "createTime" ||
-          prop === "updateTime" ||
-          sortedField.formType === "date" ||
-          sortedField.formType === "datetime"
-        ) {
-          sortModel.type = "date";
+        if (prop === 'createTime' || prop === 'updateTime' || sortedField.formType === 'date' || sortedField.formType === 'datetime') {
+          sortModel.type = 'date';
         } else {
           sortModel.type = sortedField.formType;
         }
@@ -791,7 +799,7 @@ export default {
 
         this.search();
       } catch (e) {
-        console.error("e", e);
+        console.error('e', e);
       }
     },
     jump(pageNum) {
@@ -799,7 +807,7 @@ export default {
       this.search();
     },
     handleSizeChange(pageSize) {
-      this.saveDataToStorage("pageSize", pageSize);
+      this.saveDataToStorage('pageSize', pageSize);
       this.params.pageNum = 1;
       this.params.pageSize = pageSize;
       this.search();
@@ -818,8 +826,8 @@ export default {
         this.$nextTick(() => {
           original.length > 0
             ? unSelected.forEach(row => {
-                this.$refs.multipleTable.toggleRowSelection(row, false);
-              })
+              this.$refs.multipleTable.toggleRowSelection(row, false);
+            })
             : this.$refs.multipleTable.clearSelection();
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
@@ -860,28 +868,28 @@ export default {
 
     // operation dialog
     openDialog(category) {
-      if (category === "sendMessage") {
-        window.TDAPP.onEvent("pc：客户管理-发送短信事件");
+      if (category === 'sendMessage') {
+        window.TDAPP.onEvent('pc：客户管理-发送短信事件');
 
         this.$refs.messageDialog.openSendMessageDialog();
       }
-      if (category === "edit") {
-        window.TDAPP.onEvent("pc：客户管理-批量编辑事件");
+      if (category === 'edit') {
+        window.TDAPP.onEvent('pc：客户管理-批量编辑事件');
 
         this.$refs.batchEditingCustomerDialog.open();
       }
-      if (category === "remind") {
-        window.TDAPP.onEvent("pc：客户管理-批量提醒事件");
+      if (category === 'remind') {
+        window.TDAPP.onEvent('pc：客户管理-批量提醒事件');
 
         this.$refs.batchRemindingCustomerDialog.openBatchRemindingCustomerDialog();
       }
-      if (category === "importCustomer") {
+      if (category === 'importCustomer') {
         this.$refs.importCustomerModal.open();
       }
-      if (category === "importLinkman") {
+      if (category === 'importLinkman') {
         this.$refs.importLinkmanModal.open();
       }
-      if (category === "update") {
+      if (category === 'update') {
         // if (!this.multipleSelection || !this.multipleSelection.length) {
         //   return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
         // }
@@ -889,30 +897,30 @@ export default {
       }
     },
     async deleteCustomer() {
-      window.TDAPP.onEvent("pc：客户管理-删除事件");
+      window.TDAPP.onEvent('pc：客户管理-删除事件');
 
       if (!this.multipleSelection.length) {
-        return this.$platform.alert("请选择需要删除的客户");
+        return this.$platform.alert('请选择需要删除的客户');
       }
       try {
         // fuck
-        const result = await this.$platform.confirm("确定要删除选择的客户？");
+        const result = await this.$platform.confirm('确定要删除选择的客户？');
         if (!result) return;
 
         this.loadingListData = true;
-        const params = { ids: this.selectedIds.join(",") };
+        const params = { ids: this.selectedIds.join(',') };
         this.$http
-          .post("/customer/delete", params)
+          .post('/customer/delete', params)
           .then(res => {
             this.multipleSelection = [];
             this.search();
           })
-          .catch(err => console.error("deleteCustomer err", err))
+          .catch(err => console.error('deleteCustomer err', err))
           .finally(() => {
             this.loadingListData = false;
           });
       } catch (e) {
-        console.error("deleteCustomer catch error", e);
+        console.error('deleteCustomer catch error', e);
         this.loadingListData = false;
       }
     },
@@ -927,8 +935,8 @@ export default {
       this.columns.forEach(col => {
         let newCol = colMap[col.field];
         if (null != newCol) {
-          this.$set(col, "show", newCol.show);
-          this.$set(col, "width", newCol.width);
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
         }
       });
 
@@ -937,40 +945,40 @@ export default {
         show: c.show,
         width: c.width
       }));
-      this.saveDataToStorage("columnStatus", showColumns);
+      this.saveDataToStorage('columnStatus', showColumns);
     },
     // common methods
     getLocalStorageData() {
-      const dataStr = localStorage.getItem("customerListData") || "{}";
+      const dataStr = localStorage.getItem('customerListData') || '{}';
       return JSON.parse(dataStr);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
-      localStorage.setItem("customerListData", JSON.stringify(data));
+      localStorage.setItem('customerListData', JSON.stringify(data));
     },
     buildTableColumn() {
       const localStorageData = this.getLocalStorageData();
       let columnStatus = localStorageData.columnStatus || [];
       let localColumns = columnStatus
-        .map(i => (typeof i == "string" ? { field: i, show: true } : i))
+        .map(i => (typeof i == 'string' ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
       let baseColumns = this.fixedColumns();
       let dynamicColumns = this.customerConfig.fieldInfo
         .filter(
           f =>
-            !f.isSystem &&
-            f.formType !== "attachment" &&
-            f.formType !== "separator" &&
-            f.formType !== "info"
+            !f.isSystem
+            && f.formType !== 'attachment'
+            && f.formType !== 'separator'
+            && f.formType !== 'info'
         )
         .map(field => {
           let sortable = false;
           let minWidth = null;
 
-          if (["date", "datetime", "number"].indexOf(field.formType) >= 0) {
-            sortable = "custom";
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+            sortable = 'custom';
             minWidth = 100;
           }
 
@@ -982,7 +990,7 @@ export default {
             minWidth = 125;
           }
 
-          if (field.formType === "datetime") {
+          if (field.formType === 'datetime') {
             minWidth = 150;
           }
 
@@ -990,7 +998,7 @@ export default {
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
-            minWidth: typeof minWidth == "number" ? minWidth : `${minWidth}px`,
+            minWidth: typeof minWidth == 'number' ? minWidth : `${minWidth}px`,
             sortable,
             isSystem: field.isSystem
           };
@@ -1002,14 +1010,13 @@ export default {
         let localField = localColumns[col.field];
 
         if (null != localField) {
-          width =
-            typeof localField.width == "number" ? `${localField.width}px` : "";
+          width = typeof localField.width == 'number' ? `${localField.width}px` : '';
           show = localField.show !== false;
         }
 
         col.show = show;
         col.width = width;
-        col.type = "column";
+        col.type = 'column';
 
         return col;
       });
@@ -1017,11 +1024,11 @@ export default {
       return columns;
     },
     resetParams() {
-      window.TDAPP.onEvent("pc：客户管理-重置事件");
+      window.TDAPP.onEvent('pc：客户管理-重置事件');
       this.$refs.searchPanel.resetParams();
 
       this.params = {
-        keyword: "",
+        keyword: '',
         pageNum: 1,
         pageSize: this.params.pageSize,
         orderDetail: {},
@@ -1035,16 +1042,15 @@ export default {
     // match data
     matchSelected() {
       if (!this.multipleSelection.length) return;
-      const selected =
-        this.customers.filter(c => {
-          if (this.multipleSelection.some(sc => sc.id === c.id)) {
-            this.multipleSelection = this.multipleSelection.filter(
-              sc => sc.id !== c.id
-            );
-            this.multipleSelection.push(c);
-            return c;
-          }
-        }) || [];
+      const selected = this.customers.filter(c => {
+        if (this.multipleSelection.some(sc => sc.id === c.id)) {
+          this.multipleSelection = this.multipleSelection.filter(
+            sc => sc.id !== c.id
+          );
+          this.multipleSelection.push(c);
+          return c;
+        }
+      }) || [];
 
       this.$nextTick(() => {
         this.toggleSelection(selected);
@@ -1053,117 +1059,117 @@ export default {
     fixedColumns() {
       return [
         {
-          label: "客户",
-          field: "name",
+          label: '客户',
+          field: 'name',
           show: true,
           fixed: true,
-          minWidth: "150px"
+          minWidth: '150px'
         },
         {
-          label: "客户编号",
-          field: "serialNumber",
+          label: '客户编号',
+          field: 'serialNumber',
           // width: '150px',
           fixed: true,
           show: true
         },
         {
-          label: "联系人",
-          field: "lmName",
+          label: '联系人',
+          field: 'lmName',
           // width: '100px',
           show: true
         },
         {
-          label: "电话",
-          field: "lmPhone",
-          // width: '130px',
+          label: '电话',
+          field: 'lmPhone',
+          minWidth: '150px',
           show: true
         },
         {
-          label: "区域",
-          field: "customerAddress",
+          label: '区域',
+          field: 'customerAddress',
           // width: '180px',
           show: true
         },
         {
-          label: "详细地址",
-          field: "detailAddress",
+          label: '详细地址',
+          field: 'detailAddress',
           // width: '160px',
           show: true
         },
         {
-          label: "服务团队",
-          field: "tags",
+          label: '服务团队',
+          field: 'tags',
           // width: '110px',
           show: true
         },
         {
-          label: "客户负责人",
-          field: "customerManagerName",
+          label: '客户负责人',
+          field: 'customerManagerName',
           show: true,
-          width: "110px"
+          width: '110px'
         },
         {
-          label: "启用/禁用",
-          field: "status",
+          label: '启用/禁用',
+          field: 'status',
           show: true,
-          align: "center",
-          width: "100px"
+          align: 'center',
+          width: '100px'
         },
         {
-          label: "创建时间",
-          field: "createTime",
+          label: '创建时间',
+          field: 'createTime',
           show: true,
-          sortable: "custom",
-          width: "150px"
+          sortable: 'custom',
+          width: '150px'
         },
         {
-          label: "最近更新",
-          field: "updateTime",
+          label: '最近更新',
+          field: 'updateTime',
           show: true,
-          sortable: "custom",
-          width: "150px"
+          sortable: 'custom',
+          width: '150px'
         },
         {
-          label: "创建人",
-          field: "createUser",
+          label: '创建人',
+          field: 'createUser',
           // width: '80px',
           show: true
         },
         {
-          label: "提醒数量",
-          field: "remindCount",
+          label: '提醒数量',
+          field: 'remindCount',
           // width: '80px',
           show: true
         }
       ];
     },
     panelSearchAdvancedToggle() {
-      window.TDAPP.onEvent("pc：客户管理-高级搜索事件");
+      window.TDAPP.onEvent('pc：客户管理-高级搜索事件');
       this.$refs.searchPanel.open();
       this.$nextTick(() => {
-        let forms = document.getElementsByClassName("advanced-search-form");
+        let forms = document.getElementsByClassName('advanced-search-form');
         for (let i = 0; i < forms.length; i++) {
           let form = forms[i];
-          form.setAttribute("novalidate", true);
+          form.setAttribute('novalidate', true);
         }
       });
     },
     // TalkingData事件埋点
     trackEventHandler(type) {
-      if (type === "search") {
-        window.TDAPP.onEvent("pc：客户管理-搜索事件");
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：客户管理-搜索事件');
         return;
       }
-      if (type === "moreAction") {
-        window.TDAPP.onEvent("pc：客户管理-更多操作事件");
+      if (type === 'moreAction') {
+        window.TDAPP.onEvent('pc：客户管理-更多操作事件');
         return;
       }
     },
     openOutsideLink(e) {
-      let url = e.target.getAttribute("url");
+      let url = e.target.getAttribute('url');
       if (!url) return;
       if (!/http/gi.test(url))
-        return this.$platform.alert("请确保输入的链接以http或者https开始");
+        return this.$platform.alert('请确保输入的链接以http或者https开始');
       this.$platform.openLink(url);
     },
     buildTextarea(value) {

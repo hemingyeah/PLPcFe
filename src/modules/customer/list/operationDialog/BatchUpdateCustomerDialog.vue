@@ -33,7 +33,7 @@
       </div>
       <ul class="error-message" v-if="errors.length">
         <li>导入失败！</li>
-        <li v-for="item in errors" :key="item">{{item}}</li>
+        <li v-for="(item, index) in errors" :key="index">{{item}}</li>
       </ul>
     </div>
     <div slot="footer" class="import-footer">

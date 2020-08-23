@@ -408,6 +408,7 @@ export default {
         let users = data.users || [];
         this.personAdd(users)
       })
+        .catch(err => console.error(err))
     },
     /** 添加成员 */
     async personAdd(users) {

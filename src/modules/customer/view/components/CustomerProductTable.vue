@@ -8,9 +8,9 @@
       row-class-name="customer-product-table-row"
       class="customer-product-table">
       <el-table-column
-        v-for="column in columns"
+        v-for="(column, index) in columns"
         v-if="column.show"
-        :key="column.field"
+        :key="`${column.field}_${index}`"
         :label="column.label"
         :prop="column.field"
         :width="column.width"
@@ -39,6 +39,12 @@
                 </template>
               </sample-tooltip>
             
+          </template>
+          <template v-else-if="column.field == 'address' && scope.row[column.field]">
+            {{getAddress(scope.row[column.field])}}
+          </template>
+          <template v-else-if="column.field == 'linkman' && scope.row[column.field]">
+            {{scope.row[column.field].name}}
           </template>
           <template v-else>
             {{scope.row[column.field]}}
@@ -93,6 +99,9 @@ export default {
     this.fetchData();
   },
   methods: {
+    getAddress(field) {
+      return field.province + field.city + field.dist + field.address || ''
+    },
     createProductTab(productId){
       let fromId = window.frameElement.getAttribute('id');
 
@@ -123,6 +132,10 @@ export default {
               return Object.freeze(product);
             });
           this.paginationInfo.totalItems = res.total;
+
+          // if(!this.productList[0].linkmanName) this.columns[3].show = false;
+          // if(!this.productList[0].addressName) this.columns[4].show = false;
+          
         })
         .catch(e => console.error('fetchData product caught e', e));
     },
@@ -138,6 +151,14 @@ export default {
       }, {
         label: '类型',
         field: 'type',
+        show: true,
+      }, {
+        label: '默认联系人',
+        field: 'linkman',
+        show: true,
+      }, {
+        label: '产品地址',
+        field: 'address',
         show: true,
       }, {
         label: '创建时间',

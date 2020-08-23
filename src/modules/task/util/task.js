@@ -1,4 +1,4 @@
-import {toArray} from '@src/util/lang';
+import { toArray } from '@src/util/lang';
 
 /** 将form对象转成客户对象，用于提交表单 */
 export function packToTask(fields, form){
@@ -23,15 +23,16 @@ export function packToTask(fields, form){
       // 客户联系人
       if(form.linkman && form.linkman[0]){
         let linkman = form.linkman[0];
-        task.tlmId = linkman.value;
-        task.tlmName = linkman.name;
-        task.tlmPhone = linkman.phone;
+        let { value, name, phone } = linkman;
+
+        task.linkman = { id: value, name, phone };
       }
       
       // 客户地址
       if(form.address && form.address[0]){
         let address = form.address[0];
         let taddress = {};
+
         taddress.id = address.value;
         taddress.province = address.province;
         taddress.city = address.city;
@@ -40,7 +41,7 @@ export function packToTask(fields, form){
         taddress.longitude = address.longitude;
         taddress.address = address.address;
 
-        task.taddress = taddress;
+        task.address = address;
       } 
 
       // 产品

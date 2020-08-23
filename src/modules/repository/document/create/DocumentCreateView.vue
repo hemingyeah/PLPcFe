@@ -75,21 +75,25 @@ export default {
     }
   },
   async created () {
-    this.getId();
-    let detail = JSON.parse(localStorage.getItem(`document_article_${ this.initData.userInfo.userId }`));
-    if (detail && !this.isEdit) {
-      this.isSaveData = true;
-      let res = await this.$platform.confirm('上次有尚未保存的内容，是否从上次保存内容开始填写?');
-      if(res) {
-        this.getArticle();
-      } else {
-        this.params.article = ' ';
-        localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
+    try {
+      this.getId();
+      let detail = JSON.parse(localStorage.getItem(`document_article_${ this.initData.userInfo.userId }`));
+      if (detail && !this.isEdit) {
+        this.isSaveData = true;
+        let res = await this.$platform.confirm('上次有尚未保存的内容，是否从上次保存内容开始填写?');
+        if(res) {
+          this.getArticle();
+        } else {
+          this.params.article = ' ';
+          localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
+        }
       }
+      if(!this.isEdit) this.saveArticle();
+      await this.getTypes();
+      if(this.isEdit) this.getArticle();
+    } catch (error) {
+      console.error('error', error)
     }
-    if(!this.isEdit) this.saveArticle();
-    await this.getTypes();
-    if(this.isEdit) this.getArticle();
   },
 
   beforeDestroy() {

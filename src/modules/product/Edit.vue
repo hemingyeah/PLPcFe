@@ -109,17 +109,23 @@ export default {
   methods: {
     submit() {
       this.submitting = true;
-
       this.$refs.productEditForm.validate()
         .then(valid => {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
           const params = util.packToProduct(this.productFields, this.form);
-
+          this.productFields.forEach(field =>{
+            if(field.fieldName == 'customer' && field.isSystem == 1) {
+              if (!field.setting.customerOption.address) {
+                params.address = {}
+              } else if (!field.setting.customerOption.linkman){
+                params.linkman = {}
+              }  
+            }
+          });
           this.pending = true;
           this.loadingPage = true;
           let fn = this.action === 'create' ? createProduct : updateProduct;
-
           fn(params)
             .then(res => {
               let action = this.action === 'create' ? '新建' : '更新';
@@ -217,7 +223,7 @@ body {
 }
 
 .form-builder{
-  width: 655px;
+  width: 700px;
   padding: 10px 0 0 10px;
 
   .input-and-btn{

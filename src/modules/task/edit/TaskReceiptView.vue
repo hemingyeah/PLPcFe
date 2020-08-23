@@ -17,7 +17,7 @@
 
 <script>
 import TaskReceiptForm from './components/TaskReceiptForm.vue';
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 import * as FormUtil from '@src/component/form/util';
 import * as util from '../util/receipt';
 import platform from '@src/platform';
@@ -36,7 +36,7 @@ export default {
   },
   async mounted() {
     try {
-      this.auth = this.initData.auth || {};
+      this.auth = this.initData?.auth || [];
 
       // TODO: 暂时用假数据
       const expenseSheet = {"serviceExpense":[{"standard":"","serialNumber":"SE-278","salePrice":190.00,"guideProfessions":[],"primaryId":"05d4ae69-af70-471c-95cd-78784ba99c4e","type":"服务","isGuideData":false,"number":1.00,"outPrice":150.00,"guideData":false,"unit":"次","primaryType":"服务类型2","name":"SDI","id":"fa81d300-6fd6-11ea-bfc9-00163e304a25","taskId":"72e289e0-56a6-11ea-bfc9-00163e304a25","realPrice":190.00}],"sparePartsExpense":[{"standard":"2019","serialNumber":"1-1-19","repertoryCount":4.00,"salePrice":300.0,"guideProfessions":[],"primaryId":"9f7d51ad-6fd2-11ea-bfc9-00163e304a25","type":"备件","isGuideData":false,"number":1,"outPrice":200.0,"guideData":false,"unit":"个","primaryType":"备件类型1","subtotal":300.00,"name":"显示器","id":"fa81b9bd-6fd6-11ea-bfc9-00163e304a25","modifiedPrice":0.00,"taskId":"72e289e0-56a6-11ea-bfc9-00163e304a25","realPrice":300.00}],"discountExpense":{"salePrice":-90.00,"guideProfessions":[],"type":"折扣","isGuideData":false,"number":1,"guideData":false,"subtotal":-90.00,"id":"fa83c550-6fd6-11ea-bfc9-00163e304a25","taskId":"72e289e0-56a6-11ea-bfc9-00163e304a25","realPrice":-90.00}}
