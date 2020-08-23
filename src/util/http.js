@@ -62,7 +62,6 @@ axios.interceptors.response.use(response => {
 });
 
 function get(url = '', params = {}, emulateJSON = true, option = {}) {
-  console.log(url, params, emulateJSON)
   return axiosHttp('get', url, params, emulateJSON, option);
 }
 

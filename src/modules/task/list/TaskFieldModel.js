@@ -781,7 +781,7 @@ const advanceds = [
     id: 5460,
     tableName: "customer",
     isSystem: 1,
-    fieldName: "taddress",
+    fieldName: "area",
     exportAlias: "customerAddress",
     displayName: "区域",
     formType: "address",
@@ -1367,6 +1367,8 @@ const selectIds = {
   processingId: "06db63fe-5017-11e7-a318-00163e304a25", //进行中
   exceptionId: "a78cbfec-d7d2-420f-9a56-32a503702f2d", //异常工单
   allId: "998620df-0d55-11e7-8d4e-00163e304a25", //全部工单
+  unfinishedId: 'wangyue6-6666-6666-6666-666666666666', //未完成工单
+  finished: '5ac722d9-1e63-11e7-8d4e-00163e304a25', //已完成工单 
 };
 module.exports = {
   fields,

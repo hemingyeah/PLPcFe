@@ -109,6 +109,7 @@ export default {
   methods: {
     buildParams() {
       const form = this.$refs.searchForm.returnData();
+
       this.formBackup = Object.assign({}, form);
       const isSystemFields = this.fields.filter((f) => f.isSystem);
       const notSystemFields = this.fields.filter((f) => !f.isSystem);
@@ -117,6 +118,7 @@ export default {
       };
       let tv = null;
       let fn = "";
+      // 固定条件
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
@@ -134,9 +136,9 @@ export default {
         if (fn == "area") {
           params.productAddress = {
             ...(params.productAddress || {}),
-            province: form[fn][0],
-            city: form[fn][1],
-            dist: form[fn][2],
+            province: form[fn].province,
+            city: form[fn].city,
+            dist: form[fn].dist,
           };
           continue;
         }
@@ -170,26 +172,9 @@ export default {
         if (tv.fieldName === "tags") {
           params.tagId = form[fn].map(({ id }) => id).join("");
         }
-
-        if (tv.formType === "address") {
-          let address = {
-            property: fn,
-            operator: tv.operator,
-          };
-          let isEmpty = isEmptyStringObject(form[fn]);
-
-          if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
-          }
-          params.conditions.push(address);
-          continue;
-        }
       }
 
+      // 自定义条件
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;

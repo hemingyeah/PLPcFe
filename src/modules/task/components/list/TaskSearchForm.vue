@@ -56,7 +56,6 @@ export default {
       let fields = this.fields;
       let form = {};
       let tv = "";
-      console.log('高级搜索', fields)
       fields.forEach((field) => {
         tv = "";
         // 地址的默认值初始化为对象

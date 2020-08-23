@@ -13,7 +13,13 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter({ id: item.id, name: '待指派工单' })"
+            @click="
+              checkFilter({
+                id: item.id,
+                name: '待指派工单',
+                searchModel: item.searchModel,
+              })
+            "
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.createdId"
             :class="{
@@ -26,7 +32,13 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter({ id: item.id, name: '已指派工单' })"
+            @click="
+              checkFilter({
+                id: item.id,
+                name: '已指派工单',
+                searchModel: item.searchModel,
+              })
+            "
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.allocatedId"
             :class="{
@@ -39,7 +51,13 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter({ id: item.id, name: '已接受工单' })"
+            @click="
+              checkFilter({
+                id: item.id,
+                name: '已接受工单',
+                searchModel: item.searchModel,
+              })
+            "
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.acceptedId"
             :class="{
@@ -52,7 +70,13 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter({ id: item.id, name: '进行中工单' })"
+            @click="
+              checkFilter({
+                id: item.id,
+                name: '进行中工单',
+                searchModel: item.searchModel,
+              })
+            "
             class="common-list-filter-span1 common-list-filter-flow-item"
             v-if="item.id === selectIds.processingId"
             :class="{
@@ -65,7 +89,13 @@
           <div
             v-for="(item, index) in taskView"
             :key="index"
-            @click="checkFilter({ id: item.id, name: '异常工单' })"
+            @click="
+              checkFilter({
+                id: item.id,
+                name: '异常工单',
+                searchModel: item.searchModel,
+              })
+            "
             class="common-list-filter-span1 common-list-filter-flow-item ce6"
             v-if="
               item.id === selectIds.exceptionId && initData.tenantVersion === 2
@@ -78,7 +108,13 @@
           </div>
           <!-- 全部工单 -->
           <div
-            @click="checkFilter({ id: selectIds.allId, name: '全部工单' })"
+            @click="
+              checkFilter({
+                id: selectIds.allId,
+                name: '全部工单',
+                searchModel: allSearchParams.all,
+              })
+            "
             class="common-list-filter-span1 common-list-filter-flow-item"
             :class="{
               'common-list-filter-flow-active': selectIds.allId === filterId,
@@ -103,9 +139,9 @@
           <!-- 其他筛选列表 -->
           <TaskSelect
             :list="[
-              { name: `全部完工(${filterData.all || 0})` },
-              { name: `未完成工单(${filterData.unfinished || 0})` },
-              { name: `已完成工单(${filterData.finished || 0})` },
+              { name: `全部完工(${filterData.all || 0})`, searchModel: allSearchParams.all},
+              { name: `未完成工单(${filterData.unfinished || 0})`, searchModel: allSearchParams.unfinished},
+              { name: `已完成工单(${filterData.finished || 0})`, searchModel: allSearchParams.finished},
             ]"
             :show="allShow"
             @checkOther="checkAll"
@@ -530,7 +566,12 @@
     />
     <!-- end 导出工单 -->
     <!-- S 存为视图弹框 -->
-    <view-model ref="viewModel" :region="region" :isViewModel="isViewModel" :otherText="otherText" />
+    <view-model
+      ref="viewModel"
+      :region="region"
+      :isViewModel="isViewModel"
+      :otherText="otherText"
+    />
     <!-- E 存为视图弹框 -->
   </div>
 </template>

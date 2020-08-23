@@ -59,6 +59,8 @@ export default {
       region: {}, //保存视图的数据
       isViewModel: "默认", //视图是否保存过
       advanceds, //高级搜索列表
+      searchParams: {}, //筛选列表的参数
+      allSearchParams: {}, //全部工单搜索条件
       columns: [],
       columnNum: 1,
       currentTaskType: {},
@@ -260,37 +262,47 @@ export default {
     },
   },
   mounted() {
+    const { taskView } = this.initData;
+
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
-    this.taskView = this.initData.taskView;
+    this.taskView = taskView;
     this.currentTaskType = this.taskTypes[0];
 
     this.revertStorage();
     this.initialize();
     this.otherLists();
     this.getTaskCountByState();
-    this.searchList();
-    this.isAdvanced()
+    this.isAdvanced();
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
-    window.__exports__refresh = this.search;
+    window.__exports__refresh = this.searchList;
     console.log("taskView", this.initData);
+    taskView.map((item) => {
+      if (item.id === selectIds.allId) {
+        this.allSearchParams["all"] = item.searchModel;
+      } else if (item.id === selectIds.unfinishedId) {
+        this.allSearchParams["unfinished"] = item.searchModel;
+      } else if (item.id === selectIds.finished) {
+        this.allSearchParams["finished"] = item.searchModel;
+      }
+    });
   },
   methods: {
     /**
      * @description 高级搜索列表匹配
      */
-    isAdvanced(list = '') {
-      const {initData} = this
-      let selects = list ? list : initData.allFieldInfo
+    isAdvanced(list = "") {
+      const { initData } = this;
+      let selects = list ? list : initData.allFieldInfo;
       selects.map((v, i) => {
-        if (v.displayName === '优先级') {
-          this.advanceds[8].setting = v.setting
-        } else if (v.displayName === '服务类型') {
-          this.advanceds[5].setting = v.setting
-        } else if (v.displayName === '服务内容') {
-          this.advanceds[6].setting = v.setting
+        if (v.displayName === "优先级") {
+          this.advanceds[8].setting = v.setting;
+        } else if (v.displayName === "服务类型") {
+          this.advanceds[5].setting = v.setting;
+        } else if (v.displayName === "服务内容") {
+          this.advanceds[6].setting = v.setting;
         }
-      })
+      });
     },
     /**
      * @description 高级搜索
@@ -319,25 +331,29 @@ export default {
       });
     },
     /* 其他, 选择 */
-    checkOther({ name, region, id }) {
+    checkOther(params) {
+      const { name, region, id, searchModel } = params
+      console.log(params)
       this.isViewModel = region;
       this.region["editViewId"] = id;
       this.otherText = name;
       this.filterId = "";
+      this.search(JSON.parse(searchModel));
     },
     /* 顶部筛选 */
-    checkFilter({ id, name }) {
+    checkFilter({ id, name, searchModel }) {
       this.isViewModel = "默认";
       this.region["editViewId"] = id;
       this.filterId = id;
       this.otherText = "其他";
+      this.search(JSON.parse(searchModel));
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
     /*创建视图接口的参数 */
     /*全部工单 */
-    checkAll() {
-      this.filterId = selectIds.allId;
+    checkAll({ searchModel }) {
+      this.search(JSON.parse(searchModel));
     },
     // 最高事件
     allEvent() {
@@ -413,14 +429,52 @@ export default {
      * @return {Object} 页面展示数据
      */
     searchList() {
-      TaskApi.search().then((res) => {
-        console.log("工单列表", res);
-      });
+      const { searchParams } = this;
+
+      return TaskApi.search(searchParams)
+        .then((result) => {
+          let isSuccess = result?.success === true;
+          if (!isSuccess) {
+            this.$platform.alert(result?.message);
+            this.initPage();
+            return;
+          }
+
+          let data = result?.result || {};
+          let { number, content, totalPages } = data;
+
+          data["list"] = content;
+          data["total"] = totalPages;
+          data["pageNum"] = number;
+
+          content.map((c) => {
+            c.pending = false;
+            return c;
+          });
+          this.taskPage.merge(Page.as(data));
+          this.params.pageNum = number;
+
+          // 把选中的匹配出来
+          // this.matchSelected();
+          console.log("工单列表渲染数据", data);
+          return data;
+        })
+        .then(() => {
+          this.$refs.taskListPage.scrollTop = 0;
+        })
+        .catch((err) => {
+          console.warn("Caused: TaskList search Function err", err);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     /**
      * @description 构建列
      */
     buildColumns() {
+      console.log("过滤数据", this.taskTypeFilterFields);
+
       const localStorageData = this.getLocalStorageData();
 
       let columnStatus = localStorageData.columnStatus || [];
@@ -429,6 +483,7 @@ export default {
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
+      this.advanceds = [...advanceds, ...this.taskTypeFilterFields];
       this.columns = fields
         .map((field) => {
           let sortable = false;
@@ -575,7 +630,7 @@ export default {
      */
     changeTaskType(taskType) {
       this.currentTaskType = taskType;
-      this.initialize();
+      this.initialize()
     },
     /**
      * @description 检测导出条数
@@ -635,7 +690,7 @@ export default {
           field.field = field.fieldName;
         });
         this.$set(this, "taskFields", result || []);
-        this.isAdvanced(result)
+        this.isAdvanced(result);
         return result;
       });
     },
@@ -802,7 +857,13 @@ export default {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
         .then((res) => {
           this.buildColumns();
-          this.search();
+          let searchModel;
+          this.initData.taskView.map((item) => {
+            if (item.id === this.filterId) {
+              searchModel = JSON.parse(item.searchModel);
+            }
+          });
+          this.search(searchModel);
         })
         .catch((err) => {
           console.warn(err);
@@ -851,7 +912,7 @@ export default {
         (acc, col) => (acc[col.field] = col) && acc,
         {}
       );
-
+      console.log(colMap)
       this.columns.forEach((col) => {
         let newCol = colMap[col.field];
         if (null != newCol) {
@@ -981,45 +1042,198 @@ export default {
      * @description 搜索
      * @return {Promise}
      */
-    search() {
+    search(searchModel = "") {
       const params = this.buildSearchParams();
-
       this.loading = true;
-      console.log(params)
-      return TaskApi.taskList(params)
-        .then((result) => {
-          let isSuccess = result?.success === true;
-          if (!isSuccess) {
-            this.$platform.alert(result?.message);
-            this.initPage();
-            return;
-          }
+      console.log("陈杰", params);
+      if (!searchModel) {
+        /* S 高级搜索条件 */
 
-          let data = result?.data || {};
-          let { pageNum, list } = data;
+        // 城市
+        let citys = {};
+        if (params.productAddress) {
+          const { province, city, dist } = params.productAddress;
+          citys = {
+            cusProvince: province,
+            cusCity: city,
+            cusDist: dist,
+          };
+        }
+        // 自定义
+        const conditions = params.conditions || [];
+        const paymentMethod = params.paymentMethod
+          ? [
+              {
+                property: "paymentMethod",
+                value: params.paymentMethod,
+                operator: "eq",
+              },
+            ]
+          : [];
+        // 创建时间
+        const createTimeStart = this._time(params.createTime, 0);
+        const createTimeEnd = this._time(params.createTime, 1);
+        // 计划时间
+        const planTimeStart = this._time(params.planTime, 0);
+        const planTimeEnd = this._time(params.planTime, 1);
+        // 派单时间
+        const allotTimeStart = this._time(params.allotTime, 0);
+        const allotTimeEnd = this._time(params.allotTime, 1);
+        // 接收时间
+        const acceptTimeStart = this._time(params.acceptTime, 0);
+        const acceptTimeEnd = this._time(params.acceptTime, 1);
+        // 开始时间
+        const startTimeStart = this._time(params.startTime, 0);
+        const startTimeEnd = this._time(params.startTime, 1);
+        // 完成时间
+        const completeTimeStart = this._time(params.completeTime, 0);
+        const completeTimeEnd = this._time(params.completeTime, 1);
+        // 更新时间
+        const updateTimeStart = this._time(params.updateTime, 0);
+        const updateTimeEnd = this._time(params.updateTime, 1);
+        // 更新时间
+        const reviewTimeStart = this._time(params.reviewTime, 0);
+        const reviewTimeEnd = this._time(params.reviewTime, 1);
+        // 结算时间
+        const balanceTimeStart = this._time(params.balanceTime, 0);
+        const balanceTimeEnd = this._time(params.balanceTime, 1);
+        // 结算时间
+        const closeTimeStart = this._time(params.closeTime, 0);
+        const closeTimeEnd = this._time(params.closeTime, 1);
+        // 派单方式
+        let allotType;
+        switch (params.allotTypeStr) {
+          case "手动派单":
+            allotType = 1;
+            break;
+          case "工单池派单":
+            allotType = 2;
+            break;
+          case "自动派单":
+            allotType = 3;
+            break;
+          default:
+            allotType = "";
+            break;
+        }
+        // 异常标记
+        let onceException;
+        switch (params.onceException) {
+          case "曾超时":
+            onceException = 1;
+            break;
+          case "曾拒绝":
+            onceException = 2;
+            break;
+          case "曾暂停":
+            onceException = 3;
+            break;
+          case "曾回退":
+            onceException = 4;
+            break;
+          case "位置异常":
+            onceException = 5;
+            break;
+          default:
+            onceException = "";
+            break;
+        }
+        // 曾转派
+        let onceReallot;
+        switch (params.onceReallot) {
+          case "是":
+            onceReallot = 1;
+            break;
+          default:
+            onceReallot = "";
+            break;
+        }
+        //曾打印
+        let oncePrinted;
+        switch (params.oncePrinted) {
+          case "是":
+            oncePrinted = 1;
+            break;
+          case "否":
+            oncePrinted = 0;
+            break;
+          default:
+            oncePrinted = "";
+            break;
+        }
+        // 是否审批中
+        let inApprove;
+        switch (params.inApprove) {
+          case "是":
+            inApprove = 1;
+            break;
+          case "否":
+            inApprove = 0;
+            break;
+          default:
+            inApprove = "";
+            break;
+        }
 
-          list.map((c) => {
-            c.pending = false;
-            return c;
-          });
-
-          this.taskPage.merge(Page.as(data));
-          this.params.pageNum = pageNum;
-
-          // 把选中的匹配出来
-          this.matchSelected();
-
-          return data;
-        })
-        .then(() => {
-          this.$refs.taskListPage.scrollTop = 0;
-        })
-        .catch((err) => {
-          console.warn("Caused: TaskList search Function err", err);
-        })
-        .finally(() => {
-          this.loading = false;
-        });
+        const par = {
+          ...citys,
+          conditions: [...paymentMethod, ...conditions], //支付方式
+          customerId: params.customerId,
+          customerLinkman: params.tlmName,
+          cusAddress: params.cusAddress,
+          productId: params.productId,
+          serviceType: params.serviceType,
+          serviceContent: params.serviceContent,
+          level: params.level,
+          createUser: params.createUser,
+          allotUser: params.allotUser,
+          executor: params.executor,
+          synergyId: params.synergyId,
+          state: params.state,
+          createTimeStart,
+          createTimeEnd,
+          planTimeStart,
+          planTimeEnd,
+          allotTimeStart,
+          allotTimeEnd,
+          acceptTimeStart,
+          acceptTimeEnd,
+          startTimeStart,
+          startTimeEnd,
+          completeTimeStart,
+          completeTimeEnd,
+          updateTimeStart,
+          updateTimeEnd,
+          reviewTimeStart,
+          reviewTimeEnd,
+          balanceTimeStart,
+          balanceTimeEnd,
+          closeTimeStart,
+          closeTimeEnd,
+          allotType,
+          onceException,
+          onceReallot,
+          inApprove,
+          tagId: params.tagId,
+          keyword: params.keyword,
+          page: params.page,
+          pageSize: params.pageSize,
+        };
+        this.searchParams = { ...this.searchParams, ...par };
+        /* E 高级搜索条件*/
+      } else {
+        searchModel['page'] = params.page,
+        this.searchParams = { ...searchModel, ...this.searchParams };
+      }
+      this.searchList();
+    },
+    /**
+     * @description 时间字符串切割
+     */
+    _time(params, num) {
+      if (params) {
+        return new Date(params.split("-")[num]);
+      }
     },
     /**
      * @description 已选择面板数据变化
@@ -1160,7 +1374,6 @@ export default {
     trackEventHandler(type = "") {
       let eventName = TRACK_EVENT_MAP[type];
       if (!eventName) return;
-
       window.TDAPP.onEvent(eventName);
     },
   },
