@@ -4,16 +4,7 @@ import TaskStateEnum from '@model/enum/TaskStateEnum';
 export default {
   /* 权限 */
   auth() {
-    let auth = null;
-
-    try {
-      auth = JSON.parse(this.initData?.auth);
-    } catch (error) {
-      auth = {};
-      console.warn('taskEdit json.parse auth -> error', error);
-    }
-
-    return auth;
+    return this.initData?.auth || [];
   },
   /* 禁用状态 */
   disabled() {

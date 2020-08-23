@@ -138,14 +138,14 @@ export function getLmBindAddress(params) {
  * @description 获取新建客户相关数据
 */
 export function getCreateCustomerData(params) {
-  return http.get('/customer/editGetData', params);
+  return http.get('/task/getCustomerEditInitData', params);
 }
 
 /** 
  * @description 获取新建产品相关数据
 */
 export function getCreateProductData(params) {
-  return http.get('/customer/product/editGetData', params);
+  return http.get('/task/getProducEditInitData', params);
 }
 
 /** 

@@ -62,7 +62,6 @@ export default {
       form = util.packToForm(this.productFields, form);
 
       // 客户详情新建产品，会带的客户信息
-
       /**
          * 初始化所有字段的初始值
          * @param {*} fields 字段

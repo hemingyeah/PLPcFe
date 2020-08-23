@@ -22,7 +22,7 @@
 import FormMixin from '@src/component/form/mixin/form';
 
 export default {
-  name: 'form-select',
+  name: 'form-customer',
   mixins: [FormMixin],
   props: {
     value: [String, Number, Array],

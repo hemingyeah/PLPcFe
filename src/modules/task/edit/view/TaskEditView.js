@@ -44,6 +44,9 @@ export default {
         })
         .catch(err => console.error('err', err))
     },
+    /** 
+     * @description 返回
+    */
     goBack() {
       if (this.isTaskCreate) {
         let id = window.frameElement.dataset.id;
@@ -52,10 +55,16 @@ export default {
 
       parent.frameHistoryBack(window)
     },
+    /** 
+     * @description 初始化
+    */
     initialize() {
       this.initUrl();
       this.initTitle();
     },
+    /** 
+     * @description 初始化url
+    */
     initUrl() {
       let url = '';
       let createUrl = '/task/create';
@@ -69,6 +78,9 @@ export default {
 
       this.submitModel.url = url;
     },
+    /** 
+     * @description 初始化标题
+    */
     initTitle() {
       let title = '';
 
@@ -85,17 +97,17 @@ export default {
       document.title = title;
     },
     /** 
-   * @description 刷新tab
-  */
+     * @description 刷新tab
+    */
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid');
 
       this.$platform.refreshTab(fromId);
     },
     /** 
-   * @description 提交
-   * @param {Boolean} isAllot 是否派单
-  */
+     * @description 提交
+     * @param {Boolean} isAllot 是否派单
+    */
     submit(isAllot = false) {
       this.submitting = true;
 
@@ -128,8 +140,8 @@ export default {
         })
     },
     /** 
-   * @description 编辑工单方法
-  */
+     * @description 编辑工单方法
+    */
     updateTaskMethod(params) {
       this.$http
         .post(`/task/update?id=${this.editId}`, params)
@@ -152,8 +164,8 @@ export default {
         })
     },
     /** 
-   * @description 更新工单类型
-  */
+     * @description 更新工单类型
+    */
     updateTaskTemplateId(template = {}) {
       taskTemplate = template || {};
     },

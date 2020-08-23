@@ -111,20 +111,20 @@
                 <div class="dev-tool-menu">
                   <a href="javascript:;" @click="clearStorage">清空缓存</a>
                   <a href="javascript:;" @click="openDemo">demo</a>
-                  <a href="javascript:;" @click="goRoleTeam">团队管理</a>
-                  <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
+                  <!-- <a href="javascript:;" @click="goRoleTeam">团队管理</a> -->
+                  <!-- <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
                   <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
-                  <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
+                  <a href="javascript:;" @click="goDoMyself">自助门户设置</a> -->
                   <a href="javascript:;" @click="goTaskSetting">工单表单设置</a>
                   <a href="javascript:;" @click="goTaskReceiptSetting">工单回执表单设置</a>
                   <a href="javascript:;" @click="goCreateTask">新建工单</a>
                   <a href="javascript:;" @click="goTaskReceipt">工单回执</a>
                   <a href="javascript:;" @click="goTaskList">工单列表</a>
-                  <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
+                  <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
-                  <a href="javascript:;" @click="goCallCenter">呼叫中心</a>
+                  <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
                 </div>
               </el-popover>
 

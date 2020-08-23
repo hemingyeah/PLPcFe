@@ -73,14 +73,6 @@ export default {
         productId: [] // 数组，包含产品对象
       },
       loadData: false,
-      validation: this.isPhoneUnique
-        ? createRemoteValidate(LinkmanApi.checkUnique4Phone, (value, field) => {
-          return {
-            id: this.originalValue.id || '',
-            phone: value
-          };
-        })
-        : true,
       createOriginalValue: {},
     };
   },
