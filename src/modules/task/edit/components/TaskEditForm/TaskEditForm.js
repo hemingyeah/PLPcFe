@@ -1,5 +1,5 @@
 /* api */
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 /* components */
 import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAddressDialog.vue'
 import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue'

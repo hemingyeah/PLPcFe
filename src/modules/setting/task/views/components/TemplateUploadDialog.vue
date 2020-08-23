@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {getTaskTemplate,savePrintTemplate,saveReportTemplate} from "@src/api/TaskApi";
+import {getTaskTemplate,savePrintTemplate,saveReportTemplate} from "@src/api/TaskApi.ts";
 import platform from "@src/platform";
 export default {
   name: "TemplateUploadDialog",

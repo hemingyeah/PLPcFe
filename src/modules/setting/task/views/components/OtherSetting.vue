@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import {getTaskType,modifyOption,modifyConfig} from "@src/api/TaskApi";
+import {getTaskType,modifyOption,modifyConfig} from "@src/api/TaskApi.ts";
 
 import SystemTemplateDialog from "./SystemTemplateDialog";
 import TemplateUploadDialog from "./TemplateUploadDialog";

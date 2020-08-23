@@ -1,5 +1,5 @@
 /* api */
-import * as TaskApi from '@src/api/TaskApi'
+import * as TaskApi from '@src/api/TaskApi.ts'
 /* component */
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 /* utils */
@@ -26,8 +26,7 @@ export default {
      * @description 创建工单方法
     */
     createTaskMethod(params, isAllot) {
-      this.$http
-        .post(`/task/create${isAllot ? '?allot=true' : ''}`, params)
+      TaskApi.createTask(params)
         .then(res => {
           let isSucc = !res.status;
           platform.notification({
@@ -121,16 +120,18 @@ export default {
           const params = util.packToTask(this.fields, this.form);
           params.templateId = taskTemplate.value;
           params.templateName = taskTemplate.text;
-        
-          this.pending = true;
-          this.loadingPage = true;
 
-          if (this.isTaskEdit) {
-            return this.updateTaskMethod(params);
-          }
-          if (this.isTaskCreate) {
-            return this.createTaskMethod(params, isAllot);
-          }
+          console.log('hbc: submit -> params', params)
+        
+          // this.pending = true;
+          // this.loadingPage = true;
+
+          // if (this.isTaskEdit) {
+          //   return this.updateTaskMethod(params);
+          // }
+          // if (this.isTaskCreate) {
+          //   return this.createTaskMethod(params, isAllot);
+          // }
 
         })
         .catch(err => {
@@ -143,8 +144,7 @@ export default {
      * @description 编辑工单方法
     */
     updateTaskMethod(params) {
-      this.$http
-        .post(`/task/update?id=${this.editId}`, params)
+      TaskApi.editTask(params)
         .then(res => {
           if (res.status == 1) {
             this.loadingPage = false;

@@ -60,7 +60,7 @@
 
 <script>
 /* api */
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* util */
 import * as Utils from '@src/component/form/util';

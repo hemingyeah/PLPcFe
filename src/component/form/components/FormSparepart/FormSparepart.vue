@@ -109,7 +109,7 @@
 <script>
 import FormMixin from '@src/component/form/mixin/form';
 /* api */
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 export default {
   name: 'form-sparepart',
   mixins: [FormMixin],

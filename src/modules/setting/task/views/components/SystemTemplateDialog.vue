@@ -197,7 +197,7 @@
 </template>
 
 <script>
-import {getTaskTemplateFields, getFields, taskSettingSave, getTaskCardDetailList, getTaskType, saveSystemReport,saveSystemPrint} from '@src/api/TaskApi';
+import {getTaskTemplateFields, getFields, taskSettingSave, getTaskCardDetailList, getTaskType, saveSystemReport,saveSystemPrint} from '@src/api/TaskApi.ts';
 import TeamDetailView from "@src/modules/team/views/TeamDetailView";
 import platform from "@src/platform";
 export default {

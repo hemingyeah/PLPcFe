@@ -1,5 +1,5 @@
 /* api */
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';

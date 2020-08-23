@@ -19,7 +19,7 @@ import {
   isSelect 
 } from './util'
 import http from "@src/util/http";
-import {checkUser,deleteComponent} from "@src/api/TaskApi";
+import {checkUser,deleteComponent} from "@src/api/TaskApi.ts";
 
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){

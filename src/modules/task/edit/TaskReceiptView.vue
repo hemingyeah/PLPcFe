@@ -17,7 +17,7 @@
 
 <script>
 import TaskReceiptForm from './components/TaskReceiptForm.vue';
-import * as TaskApi from '@src/api/TaskApi';
+import * as TaskApi from '@src/api/TaskApi.ts';
 import * as FormUtil from '@src/component/form/util';
 import * as util from '../util/receipt';
 import platform from '@src/platform';

@@ -22,7 +22,7 @@
 
 <script>
 /* api */
-import {getFields, taskSettingSave} from '@src/api/TaskApi';
+import { getFields, taskSettingSave } from '@src/api/TaskApi.ts';
 /* util */
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
