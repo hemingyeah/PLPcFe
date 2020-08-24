@@ -7,7 +7,6 @@ const USER_CONFIG = require(`../../script/config/${user}`);
 
 const KoaRouter = require('koa-router')
 const HttpClient = require('../util/HttpClient')
-const HttpsClient = require('../util/HttpsClient')
 const Template = require('../util/Template')
 
 const modules = require('../../modules');
@@ -116,26 +115,18 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
 
 // 通知中心改造
 router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
-  // host: '30.40.57.167',
-  // port: 8083,
   host: '30.40.59.106',
   port: 10002,
   headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac`
     'cookie': 'VIPPUBLINKJSESSIONID=f560fed5-4bc4-4ff0-8638-e6666c18a31a; JSESSIONID=5442CD36355252A20E2CC1DAB778E536; __wpkreporterwid_=a99f79d5-3645-407a-3bf8-d6774e411773'
   },
 }))
-
-
-
-
 
 router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
   host: '127.0.0.1',
   port: 8080,
   headers: {
-    // 'cookie': `VIPPUBLINKJSESSIONID=71a54c18-dcfd-4f2d-99a9-a5faf00835e1`
-    'cookie': `VIPPUBLINKJSESSIONID=91d3c950-e301-4ef1-b714-e40f62d2257f`
+    'cookie': 'VIPPUBLINKJSESSIONID=91d3c950-e301-4ef1-b714-e40f62d2257f'
   },
 }))
 
@@ -159,20 +150,6 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
-
-router.all('/api/*', async ctx => {
-
-  let option = {
-    headers: Object.assign({}, ctx.request.headers)
-  };
-
-  const request = ctx.request;
-
-  let result = await HttpsClient.request(request.url, request.method, request.rawBody, option);
-
-  ctx.status = result.statusCode;
-  ctx.body = result.body;
-});
 
 router.all('/*', ctx => HttpClient.proxy(ctx))
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
