@@ -1,3 +1,5 @@
+import { FieldNameMappingEnum } from '@src/model/enum/MappingEnum.ts';
+
 export default {
   // 新建客户弹窗
   addCustomerDialog: false,
@@ -11,6 +13,11 @@ export default {
   loading: false,
   // 产品初始化数据
   productInitData: {},
+  // 关联的工单数量数据
+  relevanceTaskCountData: {
+    [FieldNameMappingEnum.Customer]: { all: 0, unfinished: 0 },
+    [FieldNameMappingEnum.Product]: { all: 0, unfinished: 0 },
+  },
   // 当前选择的工单类型
   selectedType: {},
   // 工单字段列表

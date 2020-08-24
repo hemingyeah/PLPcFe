@@ -11,17 +11,17 @@ import data from './data'
 import computed from './computed'
 import methods from './methods'
 /* enum */
-import { FieldNameMappingEnum } from '@src/model/enum/MappingEnum.ts';
+import { FieldNameMappingEnum } from '@src/model/enum/MappingEnum.ts'
 /* constant */
 import { 
   TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE,
   TASK_PRODUCT_LINKMAN_NOT_EQUAL_MESSAGE,
   TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE
-} from '@src/model/const/Alert.ts';
+} from '@src/model/const/Alert.ts'
 // 关联项类型
 const RELATION_TYPE_MAP = {
   customer: 'relationCustomer',
-  product: 'relationProduct',
+  product: 'relationProduct'
 }
 
 export default {
@@ -241,6 +241,38 @@ export default {
 
     },
     /** 
+     * @description 打开客户详情
+    */
+    openCustomerView() {
+      let fromId = window.frameElement.getAttribute('id');
+      let customerId = this.selectedCustomer.id;
+      if(!customerId) return
+
+      this.$platform.openTab({
+        id: `customer_view_${customerId}`,
+        title: '客户详情',
+        close: true,
+        url: `/customer/view/${customerId}?noHistory=1`,
+        fromId
+      });
+    },
+    /** 
+     * @description 打开产品详情
+    */
+    openProductView() {
+      let fromId = window.frameElement.getAttribute('id');
+      let productId = this.selectProduct.id;
+      if(!productId) return
+      
+      this.$platform.openTab({
+        id: `product_view_${productId}`,
+        title: '产品详情',
+        close: true,
+        url: `/customer/product/view/${productId}?noHistory=1`,
+        fromId
+      })
+    },
+    /** 
      * @description 打开客户弹窗处理
     */
     async openCustomerDialogHandler() {
@@ -352,7 +384,7 @@ export default {
       try {
         let params = {
           customerId: this.selectedCustomer?.value || '',
-          productId: this.selectProduct?.[0]?.value || ''
+          productId: this.selectProduct?.value || ''
         }
         let res = await this.fetchTaskTemplateFields(params);
         let isSuccess = res.success;
@@ -466,6 +498,9 @@ export default {
           )
         }
 
+        // 查询关联工单数量
+        this.fetchCountForCreate({ module: FieldNameMappingEnum.Customer, id: selectedCustomerId });
+
       } catch (error) {
         console.warn('task-edit-form: updateCustomer -> error', error);
       }
@@ -557,6 +592,11 @@ export default {
         else {
           // TODO: 清空产品关联字段数据
           // this.$eventBus.$emit('es.Relation.Product', {});
+        }
+
+        if(isOnlyOneProduct) {
+          // 查询关联工单数量
+          this.fetchCountForCreate({ module: FieldNameMappingEnum.Product, id: product.id });
         }
 
       } catch (error) {
