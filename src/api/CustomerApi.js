@@ -151,4 +151,12 @@ export function batchEditCustomer(params) {
   return http.post('/customer/editBatch', params, false);
 }
 
+/**
+ * 获取客户列表
+ * @param {Object} params - 参数
+ * @returns {*}
+ */
+export function getCustomerListAsyn(params) {
+  return http.get('/customer/getListAsyn', params);
+}
 

@@ -31,6 +31,30 @@ let FormTextField = {
   }
 };
 
-export default FormTextField;
+let TaskNoField = {
+  formType: 'taskNo', // 字段类型
+  name: '工单编号',
+  isSystem: 1,
+  component: {
+    preview: {
+      name: 'form-taskNo-preview',
+      render(){
+        return (
+          <div class="form-preview-group">
+            <label>工单编号</label>
+            <div class="form-preview-mock">
+              <p class="form-preview-control">工单编号将在创建后由系统生成</p>
+            </div>
+          </div>
+        )
+      }
+    }
+  }
+};
+
+export default [
+  FormTextField,
+  TaskNoField
+];
 
 

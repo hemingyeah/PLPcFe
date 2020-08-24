@@ -48,8 +48,16 @@ export default {
     window.submit = this.submit;
 
     try {
-
       // 初始化默认值
+      this.initFormData();
+      this.init = true;
+    } catch (e) {
+      console.error('CustomerEditView caught an error ', e);
+    }
+  },
+
+  methods: {
+    initFormData() {
       let form = {};
       form = util.packToForm(this.productFields, form);
 
@@ -63,14 +71,7 @@ export default {
          */
 
       this.form = FormUtil.initialize(this.productFields, form);
-
-      this.init = true;
-    } catch (e) {
-      console.error('CustomerEditView caught an error ', e);
-    }
-  },
-
-  methods: {
+    },
     submit(customer, callBack) {
       this.submitting = true;
 

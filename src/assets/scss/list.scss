@@ -99,3 +99,183 @@ $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
     }
   }
 }
+
+/** --- start 通用列表页 */
+.common-list-container {
+  height: 100%;
+  overflow: auto;
+  padding: 10px;
+}
+/** --- end 通用列表页 */
+
+/** --- start 通用列表页 头部  */
+.common-list-header {
+
+  .advanced-search-function,
+  &-search {
+    background: #fff;
+    border-radius: 3px;
+  }
+
+  &-search {
+    font-size: $font-size-base;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 10px;
+
+    &-group {
+      display: flex;
+      min-width: 440px;
+      justify-content: space-between;
+
+      .el-input {
+        width: 300px;
+        input {
+          height: 34px;
+          line-height: 34px;
+          width: 300px;
+        }
+      }
+
+      a {
+        line-height: 33px;
+      }
+    }
+
+    .advanced-search-visible-btn {
+      font-size: $font-size-base;
+      line-height: 32px;
+      color: $color-primary;
+      border-color: $color-primary;
+      background: #fff;
+      padding: 0 13px;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      .iconfont {
+        font-size: $font-size-small;
+        font-weight: bolder;
+      }
+    }
+  }
+
+}
+/** --- end 通用列表页 头部  */
+
+/** --- start 通用列表页  button */
+.common-list-section {
+  padding-top: 10px;
+
+  .operation-bar-container {
+    background: #fff;
+    border-radius: 3px 3px 0 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+
+    .top-btn-group .base-button {
+      margin-right: 5px;
+    }
+
+    .action-button-group {
+      .base-button {
+        margin-left: 5px;
+      }
+    }
+
+    .el-dropdown-btn {
+      padding: 0 15px;
+      line-height: 32px;
+      display: inline-block;
+      background: $color-primary-light-9;
+      color: $text-color-primary;
+      outline: none;
+      margin-left: 5px;
+      .iconfont {
+        margin-left: 5px;
+        font-size: 12px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: #fff;
+        background: $color-primary;
+      }
+    }
+  }
+
+}
+/** --- end 通用列表页  button  */
+
+/** --- start 通用列表页 表格  */
+.common-list-table-view {
+  padding-top: 10px;
+  min-height: calc(100% - 100px);
+}
+.common-list-table-header {
+  background: #FAFAFA !important;
+
+  th {
+    background: #FAFAFA !important;
+  }
+
+}
+
+.common-list-table {
+  padding: 10px;
+
+  &:before {
+    height: 0!important;
+  }
+
+  td > .cell {
+    height: 31px;
+  }
+
+  .view-detail-btn {
+    color: $color-primary;
+  }
+
+}
+/** --- end 通用列表页 表格  */
+
+/** --- start 通用列表页 表格底部  */
+.comment-list-table-footer {
+  background: #fff;
+  border-radius: 0 0 3px 3px;
+
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0px 10px 10px 10px;
+
+  &-info {
+    color: #767e89;
+    font-size: 13px;
+    line-height: 32px;
+    margin: 0;
+  }
+
+  &-pagination {
+    white-space: nowrap;
+    padding: 2px 5px;
+    color: #303133;
+    font-weight: bold; 
+  }
+
+  .common-selected-count {
+    cursor: pointer;
+    color: $color-primary;
+
+    font-size: 13px;
+    text-align: center;
+
+    padding: 0 3px;
+    width: 15px;
+  }
+
+}
+/** --- end 通用列表页 表格底部  */
+

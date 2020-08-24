@@ -7,6 +7,7 @@ import FormAttachment from './FormAttachment';
 import FormUser from './FormUser';
 import FormDate from './FormDate';
 import FormDatetime from './FormDatetime';
+import FormPlantime from './FormPlantime';
 import FormPhone from './FormPhone';
 import FormEmail from './FormEmail';
 import FormSeparator from './FormSeparator';
@@ -14,11 +15,17 @@ import FormSeparator from './FormSeparator';
 import FormAddress from './FormAddress';
 import FormLocation from './FormLocation';
 import FormInfo from './FormInfo';
+import FormCascader from './FormCascader';
+import FormCustomer from './FormCustomer';
+import FormRelation from './FormRelation';
 
-import FormCustomer from './FormCustomer'
+import FormAutograph from './FormAutograph'
+import FormSparepart from './FormSparepart'
+import FormServiceIterm from './FormServiceIterm'
 
-// base fields
-const BaseFormField = [
+
+// 所有字段
+const ALL_FORM_FIELDS = [
   FormText,
   FormTextarea,
   FormNumber,
@@ -28,32 +35,20 @@ const BaseFormField = [
   FormUser,
   FormDate,
   FormDatetime,
+  FormPlantime,
   FormPhone,
   FormEmail,
   FormSeparator,
   FormAddress,
   FormLocation,
   FormInfo,
-  FormCustomer
-];
-
-const allFields = [...BaseFormField, FormAddress];
-const BaseModeField = BaseFormField.map(item => item.formType)
-
-const Modes = {
-  base: {
-    fields: BaseModeField
-  },
-  customer: {
-    fields: [...BaseModeField]
-  },
-  product: {
-    fields: [...BaseModeField]
-  }
-  // task: {
-  //   fields: [FormText.formType]
-  // }
-}
+  FormCascader,
+  FormCustomer,
+  FormRelation,
+  FormAutograph,
+  FormSparepart,
+  FormServiceIterm
+].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
 const FormFieldMap = {};
 const PreviewComponents = {};
@@ -61,17 +56,16 @@ const SettingComponents = {};
 const BuildComponents = {};
 const ViewComponents = {};
 
-const FormFields = [...allFields]
-
-for(let i = 0; i < FormFields.length; i++){
-  let formField = FormFields[i];
+for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
+  let formField = ALL_FORM_FIELDS[i];
   let field = {
     name: formField.name, // 组件显示名称
     formType: formField.formType, // 组件类型
-    isSystem: formField.isSystem // 是否为为系统组件
+    fieldName: formField.fieldName, // 字段名，部分系统字段会提供
+    isSystem: formField.isSystem || 0, // 是否为为系统组件
+    alias: formField.alias,
+    forceDelete: formField.forceDelete === true
   }
-
-  if(formField.alias) field.alias = formField.alias;
 
   if(!formField.alias){
     // 预览组件
@@ -118,33 +112,72 @@ for(let i = 0; i < FormFields.length; i++){
   FormFieldMap[formField.formType] = field;
 }
 
-/** 获取字段 */
-FormFieldMap.get = function(formType){
-  let field = FormFieldMap[formType];
-
-  if(field && field.alias){
-    let aliasField = FormFieldMap[field.alias];
-
-    field.preview = aliasField.preview;
-    field.setting = aliasField.setting;
-    field.build = aliasField.build;
-    field.extend = aliasField.extend || {};
-
-    return {...aliasField, ...field};
+const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator']
+const MODE_MANAGER = {
+  base: {
+    include: [...COMMON_FIELDS]
+  },
+  customer: {
+    include: [...COMMON_FIELDS]
+  },
+  product: {
+    include: [...COMMON_FIELDS]
+  },
+  task: {
+    include: [
+      ...COMMON_FIELDS,
+      ...['taskNo', 'cascader', 'address', 'relationCustomer', 'relationProduct', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment']
+    ]
+  },
+  task_receipt: {
+    include: [
+      ...COMMON_FIELDS,
+      ...['cascader', 'address', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
+    ]
+  },
+  findMode(mode){
+    return MODE_MANAGER[mode] || MODE_MANAGER.base;
   }
- 
-  return field;
 }
 
-// 冻结字段
-Object.freeze(FormFieldMap);
+const FieldManager = {
+  /** 根据mode获取字段 */
+  findModeFields(mode = 'base'){
+    let fields = ALL_FORM_FIELDS;
+    let modeConfig = MODE_MANAGER.findMode(mode);
+    let include = modeConfig.include || []
+
+    // 排除字段
+    if(include.length > 0) {
+      fields = fields.filter(f => include.indexOf(f.formType) >= 0)
+    }
+
+    return fields.map(f => f.formType);
+  },
+  /** 根据字段类型获取单个字段 */
+  findField(formType){
+    let field = FormFieldMap[formType];
+
+    if(field && field.alias){
+      let aliasField = FormFieldMap[field.alias];
+  
+      field.preview = aliasField.preview;
+      field.setting = aliasField.setting;
+      field.build = aliasField.build;
+      field.extend = aliasField.extend || {};
+  
+      return {...aliasField, ...field};
+    }
+  
+    return field;
+  }
+}
 
 export {
-  FormFields,
-  FormFieldMap,
-  Modes,
+  FieldManager,
   PreviewComponents,
   SettingComponents,
   BuildComponents,
-  ViewComponents
+  ViewComponents,
+  FormFieldMap
 }

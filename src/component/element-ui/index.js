@@ -53,6 +53,7 @@ import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transiti
 const ElementUI = {
   install(Vue){
     Vue.prototype.$ELEMENT = { size: 'small'};
+    Vue.prototype.$loading = Loading.service;
 
     // 分页组件
     Vue.use(Pagination);

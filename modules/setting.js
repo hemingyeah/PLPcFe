@@ -8,4 +8,10 @@ module.exports = {
   'setting.performance.rule': {
     entry: './src/modules/setting/performance/index.js'
   },
+  'setting.task.fields': {
+    entry: './src/modules/setting/task/fields.js'
+  },
+  'setting.task.receipt_fields': {
+    entry: './src/modules/setting/task/receipt_fields.js',
+  }
 }

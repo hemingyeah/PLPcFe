@@ -4,17 +4,18 @@ const path = require('path');
 const ROOT_PATH = path.resolve(__dirname, '../../')
 
 module.exports = {
-  renderWithHtml(title, html = '', script, templatePath = 'src/index.html'){
+  renderWithHtml(title, html = '', script, templatePath = 'src/templates/index.html'){
     let js = this.parseHtml(html);
     return this.render(title, js, script, templatePath);
   },
-  renderWithData(title, data = {}, script, templatePath = 'src/index.html'){
+  renderWithData(title, data = {}, script, templatePath = 'src/templates/index.html'){
     let js = `window._init = '${JSON.stringify(data)}';`
     return this.render(title, js, script, templatePath);
   },
   /** 渲染模板（开发用） */
-  render(title = '售后宝', js, script, templatePath = 'src/index.html'){
-    let template = fs.readFileSync(path.resolve(ROOT_PATH, templatePath), 'utf-8');
+  render(title = '售后宝', js, script, templatePath = 'src/templates/index.html'){
+    let buffer = fs.readFileSync(path.resolve(ROOT_PATH, templatePath));
+    let template = buffer.toString();
     
     // 注入标题
     template = template.replace('#{title}', title)

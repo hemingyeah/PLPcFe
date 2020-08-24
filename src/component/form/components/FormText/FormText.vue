@@ -9,7 +9,8 @@
       :placeholder="field.placeholder?field.placeholder:placeholder"
       :maxlength="field.maxlength?field.maxlength:500"
       :id="`form_${field.fieldName}`" 
-      autocomplete="off"/>
+      autocomplete="off"
+      :disabled="field.disabled"/>
   </div>
 </template>
 

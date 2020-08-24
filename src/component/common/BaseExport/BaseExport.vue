@@ -9,12 +9,15 @@
       style="width:100%;"
       class="base-export-field-wrap"
     >
-      <el-checkbox
-        v-for="col in filterColumns"
-        :key="col.field"
-        :label="col.exportAlias ? col.exportAlias : col.field"
-        v-if="!col.conType || col.conType !== 'btnArray'"
-      >{{col.label}}</el-checkbox>
+      <template v-for="col in filterColumns">
+        <el-checkbox
+          v-if="!col.conType || col.conType !== 'btnArray'"
+          :key="col.field"
+          :label="col.exportAlias ? col.exportAlias : col.field"
+        >
+          {{col.label}}
+        </el-checkbox>
+      </template>
     </el-checkbox-group>
 
     <div slot="footer" class="export-footer">
@@ -39,18 +42,18 @@ import objHttp from '@src/util/HttpUtil';   // 不以form表单提交
 const MAX_COUNT = 5000;
 
 export default {
-  name: "base-export",
+  name: 'base-export',
   props: {
     columns: Array,
     action: String,
     buildParams: Function,
     title: {
       type: String,
-      default: "导出列选择"
+      default: '导出列选择'
     },
     method: {
       type: String,
-      default: "get"
+      default: 'get'
     },
     needObjReq:{
       type:Boolean,
@@ -66,14 +69,14 @@ export default {
   data() {
     return {
       ids: [],
-      fileName: "",
+      fileName: '',
       visible: false,
       pending: false,
       checkedArr: [],
       isCheckedAll: true,
       isDownloadNow: false, // 导出是否是立刻下载模式
 
-      checked: ""
+      checked: ''
     };
   },
   computed: {
@@ -82,7 +85,15 @@ export default {
     }
   },
   methods: {
-    open(ids = [], fileName = "导出数据.xlsx", isDownloadNow = false) {
+    buildParamsFunc() {
+      return typeof this.buildParams == 'function'
+        ? this.buildParams(this.checkedArr, this.ids)
+        : { checked: this.checkedArr.join(','), ids: this.ids.join(',') };
+    },
+    isCheckedEmpty() {
+      return this.checkedArr.length == 0;
+    },
+    open(ids = [], fileName = '导出数据.xlsx', isDownloadNow = false) {
       this.pending = false;
       this.ids = ids;
       this.fileName = fileName;
@@ -98,8 +109,8 @@ export default {
     toggle(value) {
       this.checkedArr = value
         ? this.filterColumns.map(item =>
-            item.exportAlias ? item.exportAlias : item.field
-          )
+          item.exportAlias ? item.exportAlias : item.field
+        )
         : [];
     },
     handleChange() {
@@ -107,11 +118,11 @@ export default {
     },
     // 表单形式导出 TODO: 修改
     formExport(params) {
-      let form = document.createElement("form");
+      let form = document.createElement('form');
       this.$refs.bridge.appendChild(form);
 
       for (let prop in params) {
-        let input = document.createElement("input");
+        let input = document.createElement('input');
         input.name = prop;
         input.value = params[prop];
         form.appendChild(input);
@@ -139,10 +150,10 @@ export default {
         }
         ajax = http
           .axios(this.method, this.action, params, false, {
-            responseType: "blob"
+            responseType: 'blob'
           })
           .then(blob => {
-            let link = document.createElement("a");
+            let link = document.createElement('a');
             let url = URL.createObjectURL(blob);
             link.download = this.fileName;
             link.href = url;
@@ -236,7 +247,7 @@ export default {
 
     async exportData() {
       if (this.checkedArr.length == 0)
-        return Platform.alert("请至少选择一列导出");
+        return Platform.alert('请至少选择一列导出');
 
       this.pending = true;
 
@@ -264,56 +275,5 @@ export default {
 </script>
 
 <style lang="scss">
-.base-export-modal {
-  .base-modal-body {
-    padding: 15px;
-  }
-
-  .base-modal-footer {
-    padding: 15px;
-  }
-}
-
-.export-footer {
-  display: flex;
-  justify-content: flex-end;
-
-  .btn-text {
-    margin-right: 10px;
-  }
-}
-
-.base-export-title {
-  display: inline-block;
-  min-width: 80px;
-  margin-right: 10px;
-  line-height: 20px;
-  font-size: 16px;
-  color: #303133;
-}
-
-.base-export-field-wrap {
-  display: flex;
-  flex-flow: row wrap;
-
-  .el-checkbox {
-    margin-left: 0;
-    margin-top: 10px;
-    width: 25%;
-  }
-}
-
-.base-export-bridge {
-  position: absolute;
-  top: -1000px;
-  left: -1000px;
-
-  a {
-    display: block;
-    border: none;
-    outline: none;
-    width: 0;
-    height: 0;
-  }
-}
+  @import './BaseExport.scss';
 </style>

@@ -23,8 +23,11 @@ const FormMixin = {
   },
   methods: {
     input(event){
+      this.inputForValue(event.target.value)
+    },
+    inputForValue(value){
       let oldValue = null;
-      let newValue = event.target.value;
+      let newValue = value;
       
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);

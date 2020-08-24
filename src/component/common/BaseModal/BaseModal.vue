@@ -11,7 +11,10 @@
         <div class="base-modal-header">
           <slot name="header">
             <slot name="title">
-              <h3 v-if="title">{{title}}</h3>
+              <h3 v-if="title">
+                {{title}}
+                <slot name="describe"></slot>
+              </h3>
             </slot>
             <button type="button" v-if="allowFullscreen" @click="isFullscreen = !isFullscreen">
               <i class="iconfont icon-quanping"></i>
@@ -123,8 +126,7 @@ export default {
         removeClass(document.body, 'overflow-body-for-modal');
       }
       this.withoutHiddenClass = true;
-    },
-    
+    }
   },
   mounted() {
     //document.addEventL.body-heightistener('keydown', this.escClose)

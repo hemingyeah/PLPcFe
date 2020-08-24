@@ -1,4 +1,4 @@
-import { FormFieldMap } from './components';
+import { FieldManager } from './components';
 import * as util from './util';
 
 function createFormField(h, field, comp){
@@ -76,20 +76,22 @@ const FormBuilder = {
     let formGroups = this.fields
       .map(field => {
         let fieldName = field.fieldName;
-
         if(this.$slots[fieldName]) {
           return this.$slots[fieldName];
         }
-        
+
         if(this.$scopedSlots[fieldName]) {
           return this.$scopedSlots[fieldName]({field, value: getValue(field, this)});
         }
         
         // 判读是否隐藏该字段
         if(util.isHiddenField(field, this.value, this.fields)) return null;
-        
-        let comp = FormFieldMap.get(field.formType);
-        if(comp == null) return;
+
+        let comp = FieldManager.findField(field.formType);
+        if(comp == null) {
+          console.warn(`[not implement]: ${field.displayName}(${field.fieldName}): ${field.formType}. `)
+          return null;
+        }
 
         let formField = createFormField.call(this, h, field, comp);
         if(comp.formType == 'separator' || null == formField) return formField;

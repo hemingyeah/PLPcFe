@@ -117,6 +117,11 @@
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
+                  <a href="javascript:;" @click="goTaskSetting">工单表单设置</a>
+                  <a href="javascript:;" @click="goTaskReceiptSetting">工单回执表单设置</a>
+                  <a href="javascript:;" @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;" @click="goTaskReceipt">工单回执</a>
+                  <a href="javascript:;" @click="goTaskList">工单列表</a>
                   <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a>
@@ -769,6 +774,46 @@ export default {
         title: '自助门户设置',
         url: '/setting/doMyself/wxSet',
         reload: true
+      });
+    },
+    goTaskSetting() {
+      platform.openTab({
+        id: 'task_fields_setting',
+        title: '工单表单设置',
+        url: '/setting/task/field/task',
+        reload: true,
+      });
+    },
+    goTaskReceiptSetting() {
+      platform.openTab({
+        id: 'task_receipt_fields_setting',
+        title: '工单回执表单设置',
+        url: '/setting/task/field/taskReceipt',
+        reload: true,
+      });
+    },
+    goCreateTask() {
+      platform.openTab({
+        id: 'task_create',
+        title: '新建工单',
+        url: '/task/edit',
+        reload: true,
+      });
+    },
+    goTaskReceipt() {
+      platform.openTab({
+        id: 'task_receipt',
+        title: '工单回执',
+        url: '/task/receipt',
+        reload: true,
+      });
+    },
+    goTaskList() {
+      platform.openTab({
+        id: 'task_list',
+        title: '工单列表',
+        url: '/task',
+        reload: true,
       });
     },
     goCallCenterSetting() {

@@ -1,25 +1,59 @@
-input,textarea{
+input,
+textarea {
   padding: 3px 10px;
   line-height: 24px;
   border: 1px solid #e0e1e2;
   border-radius: 2px;
   margin: 0;
   outline: none;
-  color: #333 !important; 
+  color: #333 !important;
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-  
-  &:hover{
+
+  &:hover {
     border-color: $input-border-hover-color;
   }
 
-  &:focus{
+  &:focus {
     border-color: $color-primary;
+  }
+
+  &::-webkit-input-placeholder {
+    /* WebKit browsers */
+    color: #b3b7c1;
+  }
+  &:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #b3b7c1;
+  }
+  &::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #b3b7c1;
+  }
+  &:-ms-input-placeholder {
+    /* Internet Explorer 10+ */
+    color: #b3b7c1;
   }
 }
 
-textarea{
+textarea {
   min-height: 32px;
   max-height: 320px;
   display: block;
   word-break: break-all;
 }
+
+// S 工单列表
+.task {
+  // flex布局
+  &-flex {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  &-span1 {
+    flex: 1;
+  }
+  &-span3 {
+    flex: 3;
+  }
+}
+// E 工单列表

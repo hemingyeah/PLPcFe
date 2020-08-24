@@ -5,6 +5,7 @@ export * from './validate';
 
 const DEFAULT_PLACEHOLDER = {
   text: '最多50字',
+  textarea: '最多500字',
   number: '请输入数字',
   customerAddress: '请填写详细地址',
   relationCustomer: '由客户信息查询',
@@ -96,6 +97,7 @@ export function genPlaceholder(field, defaultText = ''){
   if(isDate(field)) key = 'date';
   if(isDatetime(field)) key = 'datetime';
   if(isSelect(field) || isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
+
   return text + (DEFAULT_PLACEHOLDER[key] || '');
 }
 /**
@@ -133,7 +135,7 @@ export function initialize(fields = [], origin = {}, callback){
     }
 
     // 多选和附件的默认值初始化为空数组
-    if(isMultiSelect(field) || field.formType == 'attachment'){
+    if(isMultiSelect(field) || field.formType == 'attachment' || field.formType == 'taskAttachment' || field.formType == 'receiptAttachment'){
       defaultValue = [];
     }
 
@@ -145,11 +147,10 @@ export function initialize(fields = [], origin = {}, callback){
       defaultValue = cascaderDefaultValue;
     }
 
-    // 地址的默认值初始化为对象
-    if(field.formType == 'customerAddress' || field.formType == 'address') defaultValue = {};
-    // 人员的默认值初始化为对象
-    if(field.formType == 'user') defaultValue = {}
-
+    // 地址、人员的默认值初始化为对象
+    let objValueFields = ['customerAddress', 'address', 'user']
+    if(objValueFields.indexOf(field.formType) >= 0) defaultValue = {};
+   
     // 来自表单的值，用于编辑时初始化值
     let attribute = origin.attribute || {};
     let formData = field.isSystem === 1 ? origin[fieldName] : attribute[fieldName];

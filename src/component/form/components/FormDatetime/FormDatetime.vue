@@ -23,7 +23,7 @@ export default {
     }
   },
   methods: {
-    choose(newValue){
+    choose(newValue){    
       let oldValue = null;
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);

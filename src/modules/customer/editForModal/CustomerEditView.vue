@@ -117,6 +117,11 @@ export default {
           callBack && typeof callBack == 'function' && callBack(customer);
         })
         .catch(err => console.error('err', err));
+    },
+    initFormData() {
+      let form = util.packToForm(this.fields, {}, this.initData.customerAddress);
+      this.form = FormUtil.initialize(this.fields, form);
+      this.addressBackup = this.form.customerAddress;
     }
   },
   async mounted() {
@@ -125,9 +130,7 @@ export default {
 
     try {
       // 初始化默认值
-      let form = util.packToForm(this.fields, {}, this.initData.customerAddress);
-      this.form = FormUtil.initialize(this.fields, form);
-      this.addressBackup = this.form.customerAddress;
+      this.initFormData();
       this.init = true;
     } catch (e) {
       console.error('CustomerEditView caught an error ', e);

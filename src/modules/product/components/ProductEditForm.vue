@@ -141,7 +141,7 @@ export default {
     updateTemplate(value) {
       let nv = null;
       const template = value[0];
-
+      
       this.fields.forEach(f => {
         nv = f.isSystem ? template[f.fieldName] : template.attribute[f.fieldName];
 
