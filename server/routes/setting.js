@@ -33,14 +33,14 @@ router.get('/setting/performance/v2/rule', async ctx => {
   ctx.body = Template.renderWithHtml('绩效规则', body, script, modConfig.template)
 });
 
-router.get('/setting/task/fields', async ctx => {
+router.get('/setting/task/field/task', async ctx => {
   let modConfig = modules['setting.task.fields'];
   let script = ['/setting.task.fields.js'];
   
   ctx.body = Template.renderWithData('工单表单设置', {}, script, modConfig.template)
 });
 
-router.get('/setting/task/receipt', async ctx => {
+router.get('/setting/task/field/taskReceipt', async ctx => {
   let modConfig = modules['setting.task.receipt_fields'];
   let script = ['/setting.task.receipt_fields.js'];
   
