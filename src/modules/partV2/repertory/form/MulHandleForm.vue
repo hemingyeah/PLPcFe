@@ -51,7 +51,7 @@
       >
         <template slot-scope="scope">
           <template v-if="column.field==='handleNum'">
-            <el-input v-model="scope.row.handleNum" :disabled="!scope.row.checked" type='number' :max='scope.row.max' :min='0'></el-input>
+            <el-input v-model="scope.row.handleNum" @change="handleNumChange(scope.$index,scope.row)" :disabled="!scope.row.checked" type='number' :max='scope.row.max' :min='0'></el-input>
           </template>
           <template v-else-if="column.field==='number'">
             {{scope.row.solvedVariation}}/{{scope.row.variation}}
@@ -108,6 +108,7 @@ export default {
        this.$nextTick(()=>{
          if(this.$refs.selectTable){
             this.keyWord='';
+            this.remark='';
             this.tableData=JSON.parse(JSON.stringify(this.formdata));
             this.allTableData=JSON.parse(JSON.stringify(this.formdata));
             this.selected=[];
@@ -121,6 +122,16 @@ export default {
     this.allTableData=JSON.parse(JSON.stringify(this.formdata));
   },
   methods:{
+    handleNumChange(index,row){
+      const decimals=Math.max(this.countDecimals(row.variation),this.countDecimals(row.solvedVariation));
+      if(!(row.handleNum>=0 && row.handleNum<=(row.variation-row.solvedVariation).toFixed(decimals))){
+        this.$message({
+          type:'error',
+          message:'办理数量需为满足 大于等于0且小于等于申请量-已办数量 的数字'
+        });
+        row.handleNum=(row.variation-row.solvedVariation).toFixed(decimals);
+      }
+    },
     buildColumns(){
       let localData = StorageUtil.get(STORAGE_MULHANDLE_KEY) || {};
       let columns=[

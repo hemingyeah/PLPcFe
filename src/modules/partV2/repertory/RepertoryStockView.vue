@@ -101,7 +101,7 @@
       <div class="top-btn-group">
         <!--<base-button type="primary" icon="el-icon-plus" @event="create" v-if="allowEdit">新建</base-button>-->
         <!--<base-button type="ghost" icon="el-icon-delete" v-if="allowEdit" @event="remove">删除</base-button>-->
-        <el-select :value="repertoryName" @input="chooseRepertory($event);trackEventHandler('chooseRepertory')" class="srp-list-form-item" style="width: 150px;">
+        <el-select :value="repertoryName" filterable @input="chooseRepertory($event);trackEventHandler('chooseRepertory')" class="srp-list-form-item" style="width: 150px;">
           <el-option value="" label="全部仓库"></el-option>
           <el-option v-for="item in visibleRepertories" :key="item.id" :value="item.id" :label="item.name"></el-option>
         </el-select>

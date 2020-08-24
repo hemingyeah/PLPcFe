@@ -82,6 +82,7 @@
                   class="srp-list-form-item flex-1"
                   style="margin-left:1px;"
                   multiple
+                  filterable
                   collapse-tags
                   placeholder="目标仓库"
                 >
@@ -369,6 +370,7 @@
               class="srp-list-form-item"
               style="width: 180px;margin-left:-3px;"
               multiple
+              filterable
               collapse-tags
               placeholder="原始仓库"
             >
