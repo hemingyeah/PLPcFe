@@ -24,13 +24,13 @@ export default {
       type: Object,
       default: () => ({})
     },
-    initData: {
-      type: Object,
-      default: () => ({})
-    },
     field: {
       type: Object,
       default: () => ({})
+    },
+    modifiable: { // 工单设置修改计划时间开关
+      type: Boolean,
+      default: true
     }
   },
   data: () => {
@@ -52,6 +52,8 @@ export default {
       this.$set(this, 'planTime', newValue);
     },
     async openDialog(action) {
+      this.action = action;
+
       let planTime = this.task.planTime || '';
 
       // 计划时间格式为日期时需格式化
@@ -61,22 +63,20 @@ export default {
       this.planTime = planTime;
 
       // 工单设置禁用了修改计划时间并且有计划时间
-      if (!this.initData.taskConfig.taskPlanTime && planTime) {
+      if (!this.modifiable && planTime) {
 
         // 上边已经对格式为日期时格式化了，现禁止修改计划时间，所以初始化为原始值
         if (this.dateType == 'date') this.planTime = this.task.planTime;
 
-        this.submit(false);
+        this.submit();
         return;
       }
-      
-      this.action = action;
-      this.sendSMS = false;
 
+      this.sendSMS = false;
       this.visible = true;
     },
-    submit(modifiable = true) {
-      if (modifiable && !this.planTime) return this.$platform.alert('请填写计划时间');
+    submit() {
+      if (!this.planTime) return this.$platform.alert('请填写计划时间');
 
       let newPlanTime = this.planTime;
       if(this.dateType == 'date') newPlanTime += ' 00:00:00';
@@ -90,6 +90,7 @@ export default {
         delete params.newPlanTime;
       }
 
+      if (this.pending) return;
       this.pending = true;
 
       TaskApi[this.action](params).then(res => {

@@ -167,7 +167,7 @@
     </div>
 
     <!-- start 回退工单弹窗 -->
-    <base-modal title="回退工单" :show.sync="backDialog.visible" width="500px" class="task-back-dialog">
+    <base-modal title="回退工单" :show.sync="backDialog.visible" width="700px" class="task-back-dialog">
       <div class="base-modal-content">
         <p v-if="task.state == 'finished'">回退工单将工单退回工单负责人，可以重新提交回执信息，原有回执信息将不再保存</p>
         <p v-else-if="task.state == 'costed'">回退工单将工单退回已完成状态，可以重新提交审核结算信息，原有审核结算信息将不再保存</p>
@@ -179,14 +179,6 @@
       </div>
     </base-modal>
     <!-- end 回退工单弹窗 -->
-
-    <!-- start 取消工单弹窗 -->
-    <cancel-task-dialog
-      ref="cancelTaskDialog"
-      :task-id="task.id"
-      :un-finished="unFinishedState"
-    />
-    <!-- end 取消工单弹窗 -->
 
     <!-- start 暂停工单弹窗 -->
     <base-modal title="暂停工单" :show.sync="pauseDialog.visible" width="500px">
@@ -212,12 +204,19 @@
     </base-modal>
     <!-- end 拒绝工单弹窗 -->
 
+    <!-- start 取消工单弹窗 -->
+    <cancel-task-dialog
+      ref="cancelTaskDialog"
+      :task-id="task.id"
+    />
+    <!-- end 取消工单弹窗 -->
+
     <!-- start 计划时间弹窗 -->
     <plantime-dialog
       ref="planTimeDialog"
       :task="task"
-      :init-data="initData"
       :field="planTimeField"
+      :modifiable="taskConfig.taskPlanTime"
     />
     <!-- end 计划时间弹窗 -->
 

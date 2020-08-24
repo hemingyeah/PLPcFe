@@ -40,9 +40,6 @@ export default {
     taskId: {
       type: String,
       default: '',
-    },
-    unFinished: {
-      type: Boolean
     }
   },
   data() {
@@ -83,17 +80,12 @@ export default {
       this.cancelModal = this.buildModalParams();
 
       try {
-        /** 
-        * 如果工单为未完成状态，则需要判断工单是否曾回退，而且在最后一次完成时是否使用了备件
-        * 如果使用了备件，需要提示
-        */
-        if (this.unFinished) {
-          const res = await TaskApi.finishedWithPart({ taskId: this.taskId });
-          if (res.success) {
-            this.cancelModal.showWithPart = res.result;
-          } else {
-            this.cancelModal.errorWithPart = true;
-          }
+        // 需要判断工单是否曾回退，而且在最后一次完成时是否使用了备件
+        const res = await TaskApi.finishedWithPart({ taskId: this.taskId });
+        if (res.success) {
+          this.cancelModal.showWithPart = res.result;
+        } else {
+          this.cancelModal.errorWithPart = true;
         }
 
         this.pending = false;
