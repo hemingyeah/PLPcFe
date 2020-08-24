@@ -187,6 +187,7 @@
         <!-- 选择仓库（默认全部） -->
         <el-row class="block-col-2">
           <el-select
+            filterable
             :value="repertoryName"
             @input="chooseRepertory"
             class="srp-list-form-item"
@@ -779,6 +780,18 @@ export default {
         {
           field: 'repertory.name',
           label: '仓库',
+          show: true,
+          minWidth: 120
+        },
+        {
+          field: 'sourceName',
+          label: '原始仓库',
+          show: true,
+          minWidth: 120
+        },
+        {
+          field: 'targetName',
+          label: '目标仓库',
           show: true,
           minWidth: 120
         },

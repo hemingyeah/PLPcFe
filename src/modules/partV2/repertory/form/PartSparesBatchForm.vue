@@ -4,7 +4,7 @@
   <div class="part-spares-batch-form">
     <el-table :data="form" empty-text="请点击下方按钮添加要分配的数据">
       <el-table-column label="仓库" width="140px">
-        <el-select v-model="scope.row.repertory" slot-scope="scope" @input="chooseRepertory($event,scope.row)">
+        <el-select v-model="scope.row.repertory" filterable slot-scope="scope" @input="chooseRepertory($event,scope.row)">
           <el-option v-for="(option, index) in repertory" :key="index + option.id" :label="option.name" :value="option.id"></el-option>
         </el-select>
       </el-table-column>
