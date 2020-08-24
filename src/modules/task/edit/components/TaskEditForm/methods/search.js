@@ -51,6 +51,27 @@ export default {
     }
   },
   /** 
+   * @description 搜索客户
+  */
+  async searchCustomerByPhone(params = {}) {
+    try {
+      const result = await TaskApi.getCustomerByPhone(params);
+
+      if (!result || !result.data) return;
+
+      result.list = result.data.map(item => {
+        let { customer, id, isMain, name, phone } = item;
+        let label = `姓名：${name} 电话：${phone} 客户：${customer && customer.name}`;
+        return Object.freeze({ customer, id, isMain, name, phone, label, value: id });
+      })
+      
+      return result;
+
+    } catch (error) {
+      console.warn('task-edit-form: searchCustomer -> error', error);
+    }
+  },
+  /** 
    * @description 搜索联系人
   */
   async searchLinkman(params = {}) {
