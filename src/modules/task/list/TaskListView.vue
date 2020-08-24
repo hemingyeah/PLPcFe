@@ -21,7 +21,7 @@
               })
             "
             class="common-list-filter-span1 common-list-filter-flow-item"
-            v-if="item.id === selectIds.createdId"
+            v-show="item.id === selectIds.createdId"
             :class="{
               'common-list-filter-flow-active': item.id === filterId,
             }"
@@ -40,7 +40,7 @@
               })
             "
             class="common-list-filter-span1 common-list-filter-flow-item"
-            v-if="item.id === selectIds.allocatedId"
+            v-show="item.id === selectIds.allocatedId"
             :class="{
               'common-list-filter-flow-active': item.id === filterId,
             }"
@@ -59,7 +59,7 @@
               })
             "
             class="common-list-filter-span1 common-list-filter-flow-item"
-            v-if="item.id === selectIds.acceptedId"
+            v-show="item.id === selectIds.acceptedId"
             :class="{
               'common-list-filter-flow-active': item.id === filterId,
             }"
@@ -78,7 +78,7 @@
               })
             "
             class="common-list-filter-span1 common-list-filter-flow-item"
-            v-if="item.id === selectIds.processingId"
+            v-show="item.id === selectIds.processingId"
             :class="{
               'common-list-filter-flow-active': item.id === filterId,
             }"
@@ -97,7 +97,7 @@
               })
             "
             class="common-list-filter-span1 common-list-filter-flow-item ce6"
-            v-if="
+            v-show="
               item.id === selectIds.exceptionId && initData.tenantVersion === 2
             "
             :class="{
@@ -304,7 +304,7 @@
 
         <el-table-column
           v-for="column in columns"
-          v-show="column.show"
+          v-if="column.show"
           :align="column.align"
           :class-name="
             column.field == 'name'

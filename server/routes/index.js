@@ -89,13 +89,13 @@ router.get('/window', async ctx => {
 });
 
 
-router.use('/outside', ctx => HttpClient.proxy(ctx, {
-  host: '30.40.56.82',
-  port: 10007,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
-  }
-}))
+// router.use('/outside', ctx => HttpClient.proxy(ctx, {
+//   host: '30.40.56.82',
+//   port: 10007,
+//   headers: {
+//     'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
+//   }
+// }))
 
 router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.211',
@@ -109,7 +109,7 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.163',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=34bc38dd-2e8c-47e0-b8ee-526b032044ac'
+    'cookie': 'VIPPUBLINKJSESSIONID=b0a4b34c-1e33-45ba-81b4-2acf328ad399'
   },
 }))
 
