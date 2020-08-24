@@ -332,8 +332,8 @@ export default {
     },
     /* 其他, 选择 */
     checkOther(params) {
-      const { name, region, id, searchModel } = params
-      console.log(params)
+      const { name, region, id, searchModel } = params;
+      console.log(params);
       this.isViewModel = region;
       this.region["editViewId"] = id;
       this.otherText = name;
@@ -630,7 +630,7 @@ export default {
      */
     changeTaskType(taskType) {
       this.currentTaskType = taskType;
-      this.initialize()
+      this.initialize();
     },
     /**
      * @description 检测导出条数
@@ -912,7 +912,6 @@ export default {
         (acc, col) => (acc[col.field] = col) && acc,
         {}
       );
-      console.log(colMap)
       this.columns.forEach((col) => {
         let newCol = colMap[col.field];
         if (null != newCol) {
@@ -1025,7 +1024,6 @@ export default {
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
-
       storageSet(TASK_LIST_KEY, JSON.stringify(data));
     },
     /**
@@ -1222,8 +1220,8 @@ export default {
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/
       } else {
-        searchModel['page'] = params.page,
-        this.searchParams = { ...searchModel, ...this.searchParams };
+        (searchModel["page"] = params.page),
+          (this.searchParams = { ...searchModel, ...this.searchParams });
       }
       this.searchList();
     },
