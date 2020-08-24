@@ -82,7 +82,7 @@ export default {
       console.log("uploadTemplateType")
       console.log(this.uploadTemplateType)
       if(newValue.length) {
-        this.uploadTemplate();
+        this.uploadTemplate(newValue);
       }else{
         this.deleteTemplate(newValue);
       }
