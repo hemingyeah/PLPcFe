@@ -780,7 +780,7 @@ export default {
       platform.openTab({
         id: 'task_fields_setting',
         title: '工单表单设置',
-        url: '/setting/task/fields',
+        url: '/setting/task/field/task',
         reload: true,
       });
     },
@@ -788,7 +788,7 @@ export default {
       platform.openTab({
         id: 'task_receipt_fields_setting',
         title: '工单回执表单设置',
-        url: '/setting/task/receipt',
+        url: '/setting/task/field/taskReceipt',
         reload: true,
       });
     },

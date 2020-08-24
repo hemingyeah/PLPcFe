@@ -34,7 +34,7 @@
         <form-item :label="field.displayName">
           <div class="input-and-btn">
             <biz-form-remote-select
-              v-model="value.customer"
+              :value="value.customer"
               :field="customerField"
               :remote-method="searchCustomer"
               @input="updateCustomer"
