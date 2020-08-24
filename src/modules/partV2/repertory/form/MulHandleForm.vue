@@ -299,6 +299,7 @@ export default {
           || item.serialNumber.toString().indexOf(this.keyWord)>-1
           || item.standard.toString().indexOf(this.keyWord)>-1
           || item.sType.toString().indexOf(this.keyWord)>-1
+          || item.approveNo.toString().indexOf(this.keyWord)>-1
       });
       this.tableData.forEach(item=>{
         item.checked=false;
