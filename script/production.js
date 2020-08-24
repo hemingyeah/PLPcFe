@@ -23,7 +23,8 @@ function searchWeb(path_) {
     url: ''
   };
   files.forEach(function (itm, index) {
-    if (itm == 'web') {
+    // 兼容阿里云
+    if (itm == 'web' || itm.indexOf('web') > -1) {
       haveWeb.have = true
       haveWeb.url = path_ + itm
     }
