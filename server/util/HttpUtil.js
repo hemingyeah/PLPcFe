@@ -82,7 +82,6 @@ function getRequestOptions(path, method, options = {}) {
     
   requestOptions.path = path;
   requestOptions.method = method;
-
   requestOptions.headers = Object.assign({}, isNotLocalEnv ? options.headers : DEFAULT_OPIONS.headers);
 
   setBaseOptions(requestOptions, options);
@@ -106,8 +105,7 @@ function getProxyOptions(ctx, options = {}) {
   proxyOptions.method = method;
 
   let originHeaders = Object.assign({}, request.header, options.headers);
-  let localHeaders = Object.assign({}, request.header, DEFAULT_OPIONS.headers);
-  proxyOptions.headers = Object.assign({}, isNotLocalEnv ? originHeaders : localHeaders);
+  proxyOptions.headers = Object.assign({}, isNotLocalEnv ? originHeaders : DEFAULT_OPIONS.headers);
 
   setBaseOptions(proxyOptions, options);
 
