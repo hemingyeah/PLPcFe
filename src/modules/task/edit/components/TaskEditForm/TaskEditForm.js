@@ -11,6 +11,11 @@ import data from './data'
 import computed from './computed'
 import methods from './methods'
 /* constant */
+import { 
+  TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE,
+  TASK_PRODUCT_LINKMAN_NOT_EQUAL_MESSAGE,
+  TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE
+} from '@src/model/const/Alert.ts';
 // 关联项类型
 const RELATION_TYPE_MAP = {
   customer: 'relationCustomer',
@@ -277,6 +282,53 @@ export default {
       }
     },
     /** 
+     * @description 产品关联联系人/地址处理
+     * 判断选择的产品的 关联联系人/地址 是否 当前选择的的 联系人/地址相同，如果不相同，则提示，并替换
+     * @param {Object} product 产品
+    */
+    async productBindLinkmanAndAddressHandler(product) {
+      // 产品联系人
+      let productLinkman = product.linkman || {};
+      // 产品地址
+      let productAddress = product.address || {};
+      // 当前已选择的联系人地址
+      let { linkman, address } = this.value;
+      linkman = linkman[0] || {};
+      address = address[0] || {};
+
+      // 是否是相同的 联系人/地址
+      let isSameLinkman = productLinkman.id === linkman.id;
+      let isSameAddress = productAddress.id === address.id;
+
+      let confirm = false;
+      
+      // 联系人和地址都不相同
+      if(!isSameLinkman && !isSameAddress) {
+        confirm = await this.$platform.confirm(TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE);
+        if(!confirm) return
+
+        this.bindLinkman(productLinkman);
+        this.bindAddress(productAddress);
+
+      }
+      // 联系人不相同
+      else if(!isSameLinkman) {
+        confirm = await this.$platform.confirm(TASK_PRODUCT_LINKMAN_NOT_EQUAL_MESSAGE);
+        if(!confirm) return
+
+        this.bindLinkman(productLinkman);
+
+      } 
+      // 地址不相同
+      else if(!isSameAddress) {
+        confirm = await this.$platform.confirm(TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE);
+        if(!confirm) return
+
+        this.bindAddress(productAddress);
+      }
+
+    },
+    /** 
      * @description 关联显示项字段选择处理
      * @param {string} type customer/product
     */
@@ -393,15 +445,24 @@ export default {
      * @param {Array<Object>} value 客户数据
     */
     async updateCustomer(value = []) {
-      let selectedCustomer = value[0] || {};
+      let selectedCustomer = value?.[0] || {};
+      let currentCustomerId = this.selectedCustomer?.id;
+      let selectedCustomerId = selectedCustomer?.id || '';
+
+      // 更新客户数据
+      this.update({ field: { fieldName: 'customer' }, newValue: value.slice() });
+
+      // 判断选中的客户是否与当前客户数据一致
+      if(currentCustomerId == selectedCustomerId) return
+
       try {
         const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomer.value || '' });
 
         let { linkman, address } = result;
 
         // 重置联系人和地址
-        this.$set(this.value, 'linkman', []);
-        this.$set(this.value, 'address', []);
+        this.update({ field: { fieldName: 'linkman' }, newValue: [] });
+        this.update({ field: { fieldName: 'address' }, newValue: [] });
 
         // 绑定联系人和地址
         linkman && this.bindLinkman(linkman);
@@ -409,7 +470,7 @@ export default {
         
         // 更新产品数据
         if (Array.isArray(this.value.product) && this.value.product.length) {
-          this.value.product = this.value.product.filter(item => item.customerId == selectedCustomer.value);
+          this.update({ field: { fieldName: 'product' }, newValue: this.value.product.filter(item => item.customerId == selectedCustomer.value) });
         }
 
       } catch (error) {
@@ -441,13 +502,16 @@ export default {
      * @description 更新产品信息
     */
     async updateProduct(value) {
+      let product = value[0] || {};
+      let isHaveCustomer = this.value.customer && this.value.customer.length;
+
       try {
         // 判断客户是否存在
-        if (!this.value.customer || !this.value.customer.length) {
+        if (!isHaveCustomer) {
           // 客户不存在时则下拉框隐藏
           findComponentDownward(this.$refs.product, 'base-select').close();
 
-          const result = await this.fetchCustomerByProduct({ id: value[value.length - 1].value });
+          const result = await this.fetchCustomerByProduct({ id: product.value });
 
           const customerData = [{
             label: result.customerName,
@@ -457,19 +521,31 @@ export default {
           // 设置客户数据
           this.$set(this.value, 'customer', customerData);
           // 更新客户信息
-          this.updateCustomer(customerData);
+          await this.updateCustomer(customerData);
         }
 
         // 查询产品关联字段, 选一个产品才带入
-        if (value.length === 1) {
-          let forRelation = {
-            module: 'product',
-            id: value[0].value
-          }
+        let isOnlyOneProduct = value.length === 1;
+        
+        // 只有一个产品 且 客户存在
+        if (isOnlyOneProduct && isHaveCustomer) {
           // 产品关联字段数据
-          // this.$eventBus.$emit('es.Relation.Product', forRelation);
-        } else {
-          // 清空产品关联字段数据
+          this.relationFieldSelectHandler('product');
+          // 产品关联联系人地址
+          this.productBindLinkmanAndAddressHandler(product);
+        }
+        // 只有一个产品 且 客户不存在
+        else if(isOnlyOneProduct && !isHaveCustomer) {
+          let { linkman, address } = product;
+          console.log('hbc: updateProduct -> linkman', linkman)
+          let linkmanId = linkman?.id || '';
+          let addressId = address?.id || '';
+          
+          linkmanId && this.bindLinkman(linkman);
+          addressId && this.bindAddress(address);
+        }
+        else {
+          // TODO: 清空产品关联字段数据
           // this.$eventBus.$emit('es.Relation.Product', {});
         }
 

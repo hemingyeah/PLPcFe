@@ -272,6 +272,15 @@ export function getTaskCustonerProductList(params: {} | undefined) {
   return http.get('/task/customer/product', params, false)
 }
 
+/**
+ * @description 获取产品列表
+ * @param {Object} params - 参数
+ * @param {String} params.phone - 手机号
+ */
+export function getCustomerByPhone(params: {} | undefined) {
+  return http.get('task/getCustomerByPhone', params, false)
+}
+
 /* -------------  end  旧工单api ---------------- */
 
 
