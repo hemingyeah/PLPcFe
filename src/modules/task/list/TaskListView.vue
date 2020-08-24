@@ -11,8 +11,8 @@
         <div class="common-list-filter-flow common-list-filter-span1">
           <!-- 待指派 -->
           <div
-            v-for="(item, index) in taskView"
-            :key="index"
+            v-for="(item) in taskView"
+            :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
                 id: item.id,
@@ -30,8 +30,8 @@
           </div>
           <!-- 已指派 -->
           <div
-            v-for="(item, index) in taskView"
-            :key="index"
+            v-for="(item) in taskView"
+            :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
                 id: item.id,
@@ -49,8 +49,8 @@
           </div>
           <!-- 已接受 -->
           <div
-            v-for="(item, index) in taskView"
-            :key="index"
+            v-for="(item) in taskView"
+            :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
                 id: item.id,
@@ -68,8 +68,8 @@
           </div>
           <!-- 进行中 -->
           <div
-            v-for="(item, index) in taskView"
-            :key="index"
+            v-for="(item) in taskView"
+            :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
                 id: item.id,
@@ -87,8 +87,8 @@
           </div>
           <!-- 异常工单 -->
           <div
-            v-for="(item, index) in taskView"
-            :key="index"
+            v-for="(item) in taskView"
+            :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
                 id: item.id,
@@ -139,9 +139,18 @@
           <!-- 其他筛选列表 -->
           <TaskSelect
             :list="[
-              { name: `全部完工(${filterData.all || 0})`, searchModel: allSearchParams.all},
-              { name: `未完成工单(${filterData.unfinished || 0})`, searchModel: allSearchParams.unfinished},
-              { name: `已完成工单(${filterData.finished || 0})`, searchModel: allSearchParams.finished},
+              {
+                name: `全部完工(${filterData.all || 0})`,
+                searchModel: allSearchParams.all,
+              },
+              {
+                name: `未完成工单(${filterData.unfinished || 0})`,
+                searchModel: allSearchParams.unfinished,
+              },
+              {
+                name: `已完成工单(${filterData.finished || 0})`,
+                searchModel: allSearchParams.finished,
+              },
             ]"
             :show="allShow"
             @checkOther="checkAll"
@@ -205,7 +214,6 @@
       </form>
     </div>
     <!-- end header -->
-
     <!-- start 高级搜索 -->
     <task-search-panel
       :init-data="initData"
@@ -240,7 +248,7 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="type in taskTypes" :key="type.id">
                 <div @click="changeTaskType(type)">
-                  {{ type.name }}
+                  {{ type.name }} 
                 </div>
               </el-dropdown-item>
             </el-dropdown-menu>

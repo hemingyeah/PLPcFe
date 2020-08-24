@@ -8,7 +8,7 @@ import TaskViewModel from "./components/TaskViewModel.vue";
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum";
-import { fields, selectIds, advanceds } from "./TaskFieldModel";
+import { fields, selectIds, advancedList } from "./TaskFieldModel";
 import { LINK_REG } from "@src/model/reg";
 
 /** utils */
@@ -58,7 +58,7 @@ export default {
       filterData: {}, //状态数据
       region: {}, //保存视图的数据
       isViewModel: "默认", //视图是否保存过
-      advanceds, //高级搜索列表
+      advanceds: advancedList, //高级搜索列表
       searchParams: {}, //筛选列表的参数
       allSearchParams: {}, //全部工单搜索条件
       columns: [],
@@ -259,6 +259,18 @@ export default {
       );
 
       return taskTypeFilterFields;
+    },
+  },
+  filters: {
+    displaySelect(value) {
+      if (!value) return null;
+      if (value && typeof value === "string") {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join("，");
+      }
+      return null;
     },
   },
   mounted() {
@@ -483,7 +495,7 @@ export default {
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
-      this.advanceds = [...advanceds, ...this.taskTypeFilterFields];
+      this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       this.columns = fields
         .map((field) => {
           let sortable = false;
@@ -803,7 +815,7 @@ export default {
      * @return {String} key
      */
     getRowKey(row = {}) {
-      return `${row.id}${(Math.random() * 1000) >> 2}`;
+      return `${row.iid}${(Math.random() * 1000) >> 2}`;
     },
     /**
      * @description 表格选择操作
@@ -1046,7 +1058,17 @@ export default {
       console.log("陈杰", params);
       if (!searchModel) {
         /* S 高级搜索条件 */
-
+        // 排序条件
+        let sorts = [];
+        if (params.orderDetail) {
+          const { column, isSystem, sequence } = params.orderDetail;
+          sorts = [
+            {
+              property: isSystem ? column : `attribute.${column}`,
+              direction: sequence,
+            },
+          ];
+        }
         // 城市
         let citys = {};
         if (params.productAddress) {
@@ -1212,16 +1234,50 @@ export default {
           onceException,
           onceReallot,
           inApprove,
+          sorts,
           tagId: params.tagId,
           keyword: params.keyword,
           page: params.page,
           pageSize: params.pageSize,
         };
-        this.searchParams = { ...this.searchParams, ...par };
+        this.searchParams = { ...par };
         /* E 高级搜索条件*/
       } else {
-        (searchModel["page"] = params.page),
-          (this.searchParams = { ...searchModel, ...this.searchParams });
+        this.$refs.searchPanel.resetParams();
+        this.params.keyword = "";
+        searchModel["page"] = params.page;
+        searchModel.createTimeStart = this._time(searchModel.createTimeStart);
+        searchModel.createTimeEnd = this._time(searchModel.createTimeEnd);
+        // 计划时间
+        searchModel.planTimeStart = this._time(searchModel.planTimeStart);
+        searchModel.planTimeEnd = this._time(searchModel.planTimeEnd);
+        // 派单时间
+        searchModel.allotTimeStart = this._time(searchModel.allotTimeStart);
+        searchModel.allotTimeEnd = this._time(searchModel.allotTimeEnd);
+        // 接收时间
+        searchModel.acceptTimeStart = this._time(searchModel.acceptTimeStart);
+        searchModel.acceptTimeEnd = this._time(searchModel.acceptTimeEnd);
+        // 开始时间
+        searchModel.startTimeStart = this._time(searchModel.startTimeStart);
+        searchModel.startTimeEnd = this._time(searchModel.startTimeEnd);
+        // 完成时间
+        searchModel.completeTimeStart = this._time(
+          searchModel.completeTimeStart
+        );
+        searchModel.completeTimeEnd = this._time(searchModel.completeTimeEnd);
+        // 更新时间
+        searchModel.updateTimeStart = this._time(searchModel.updateTimeStart);
+        searchModel.updateTimeEnd = this._time(searchModel.updateTimeEnd);
+        // 更新时间
+        searchModel.reviewTimeStart = this._time(searchModel.reviewTimeStart);
+        searchModel.reviewTimeEnd = this._time(searchModel.reviewTimeEnd);
+        // 结算时间
+        searchModel.balanceTimeStart = this._time(searchModel.balanceTimeStart);
+        searchModel.balanceTimeEnd = this._time(searchModel.balanceTimeEnd);
+        // 结算时间
+        searchModel.closeTimeStart = this._time(searchModel.closeTimeStart);
+        searchModel.closeTimeEnd = this._time(searchModel.closeTimeEnd);
+        this.searchParams = { ...searchModel };
       }
       this.searchList();
     },
@@ -1229,8 +1285,10 @@ export default {
      * @description 时间字符串切割
      */
     _time(params, num) {
-      if (params) {
+      if (params && !isNaN(num)) {
         return new Date(params.split("-")[num]);
+      } else {
+        return new Date(params);
       }
     },
     /**

@@ -70,11 +70,17 @@ export default {
       visible: false,
     };
   },
+  watch: {
+    config(value) {
+      this.selfFields = value
+      this.fields
+    }
+  },
   computed: {
     fields() {
       let f = {};
       let fields = [...this.selfFields]
-        .filter((f) => f.isSearch || f.isSystem)
+        .filter((f) => f.isSearch)
         .map((field) => {
           f = _.cloneDeep(field);
 
