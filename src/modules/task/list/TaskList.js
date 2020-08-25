@@ -54,6 +54,7 @@ export default {
       filterId: selectIds.createdId, //顶部筛选选中的状态id
       allShow: false, // 全部工单
       otherShow: false, //其他
+      addShow: false, //新建
       otherText: "其他", //其他文案
       filterData: {}, //状态数据
       region: {}, //保存视图的数据
@@ -215,7 +216,7 @@ export default {
     },
     /** 当前选中的工单ids */
     selectedIds() {
-      return this.multipleSelection.map((p) => p.id);
+      return this.multipleSelection.map((p) => p.taskUUID);
     },
     /** 服务项目 服务内容 系统字段设置 */
     sysFieldsSetting() {
@@ -345,12 +346,74 @@ export default {
     /* 其他, 选择 */
     checkOther(params) {
       const { name, region, id, searchModel } = params;
-      console.log(params);
       this.isViewModel = region;
       this.region["editViewId"] = id;
       this.otherText = name;
       this.filterId = "";
+      this.allShow = false;
       this.search(JSON.parse(searchModel));
+    },
+    /**
+     * @description 新建视图
+     */
+    addView({ id }) {
+      let fromId = window.frameElement.getAttribute("id");
+
+      this.$platform.openTab({
+        id: "createEvent",
+        title: "正在加载",
+        url: `/task/edit?defaultTypeId=${id}`,
+        close: true,
+        fromId,
+      });
+    },
+    /**
+     *
+     * @description 删除工单列表人员
+     */
+    async delTask() {
+      const { selectedIds, $platform } = this;
+      let params = {};
+      let ids = []
+      selectedIds.map((item) => {
+        params = {
+          ...{taskIds: item}
+        }
+      })
+      if (!selectedIds.length) {
+        $platform.alert("请选择需要删除的数据");
+        return;
+      }
+      window.TDAPP.onEvent(`pc：工单列表-删除工单`);
+      try {
+        const { succ, status, message, data } = await TaskApi.withPart(params);
+        if (succ) {
+          let warningMsg = "确定要删除所选工单吗？";
+          if (status) {
+            warningMsg = `${message}，确定要删除所选工单吗？`;
+          } else if (!data.status && data.length > 0) {
+            warningMsg = "以下工单已添加备件: 工单编号";
+            if (data.length <= 5) {
+              warningMsg += data.join("、");
+            } else {
+              let ids = [];
+              for (let i = 0; i < 5; i++) {
+                ids.push(data[i]);
+              }
+              warningMsg += `${ids.join("、")}等${data.length}个`;
+            }
+            warningMsg += "，确定要删除么？";
+          }
+          let confirm = await this.$platform.confirm(warningMsg);
+          if (confirm) {
+            // 删除工单
+            const { success } = await TaskApi.deleteTask(params);
+            if (success) {
+              this.searchList();
+            }
+          }
+        }
+      } catch (error) {}
     },
     /* 顶部筛选 */
     checkFilter({ id, name, searchModel }) {
@@ -362,7 +425,6 @@ export default {
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
-    /*创建视图接口的参数 */
     /*全部工单 */
     checkAll({ searchModel }) {
       this.search(JSON.parse(searchModel));
@@ -371,6 +433,7 @@ export default {
     allEvent() {
       this.allShow = false;
       this.otherShow = false;
+      this.addShow = false;
     },
     /**
      * 顶部筛选, 状态数据展示
@@ -463,6 +526,8 @@ export default {
             c.pending = false;
             return c;
           });
+          // let list = [...data.content, ...data.content, ...data.content, ...data.content, ...data.content, ...data.content]
+          // this.taskPage.list = list
           this.taskPage.merge(Page.as(data));
           this.params.pageNum = number;
 
@@ -494,6 +559,7 @@ export default {
         .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
       let taskListFields = this.filterTaskListFields();
+      // let fields = [...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields),...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields),...taskListFields.concat(this.taskTypeFilterFields)];
       let fields = taskListFields.concat(this.taskTypeFilterFields);
       this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       this.columns = fields
@@ -574,11 +640,38 @@ export default {
      * @description 构建导出参数
      * @return {Object} 导出参数
      */
-    buildExportParams(checkedMap, ids) {
+    // buildExportParams(checkedMap, ids) {
+    //   const Params = Object.assign({}, this.params);
+    //   let exportAll = !ids || !ids.length;
+
+    //   let taskQueryInput = {
+    //     ids: exportAll ? [] : ids,
+    //     keyword: Params.keyword,
+    //     pageSize: exportAll ? 0 : Params.pageSize,
+    //     page: exportAll ? 1 : Params.pageNum,
+    //     typeId: this.currentTaskType.id,
+    //     ...Params.moreConditions,
+    //   };
+
+    //   let params = {
+    //     taskQueryInput: JSON.stringify(taskQueryInput),
+    //   };
+
+    //   for (let key in checkedMap) {
+    //     params[key] = checkedMap[key].join(",");
+    //   }
+
+    //   return params;
+    // },
+    /**
+     * @description 构建导出参数
+     * @return {Object} 导出参数
+     */
+    buildExportParams({ receiptChecked, systemChecked, taskChecked }, ids) {
       const Params = Object.assign({}, this.params);
       let exportAll = !ids || !ids.length;
 
-      let taskQueryInput = {
+      let exportSearchModel = {
         ids: exportAll ? [] : ids,
         keyword: Params.keyword,
         pageSize: exportAll ? 0 : Params.pageSize,
@@ -588,14 +681,15 @@ export default {
       };
 
       let params = {
-        taskQueryInput: JSON.stringify(taskQueryInput),
+        exportSearchModel: JSON.stringify({}),
       };
-
-      for (let key in checkedMap) {
-        params[key] = checkedMap[key].join(",");
-      }
-
-      return params;
+      params['data'] = exportSearchModel.ids.join(',')
+      params['typeId'] = exportSearchModel.typeId
+      params["receiptChecked"] = receiptChecked.map((item) => {return item}).join(',')
+      params['sysChecked'] = systemChecked.map((item) => {return item}).join(',')
+      params['checked'] = taskChecked.map((item) => {return item}).join(',')
+     
+      return params
     },
     /**
      * @description 构建搜索参数

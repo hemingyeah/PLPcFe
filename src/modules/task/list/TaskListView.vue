@@ -11,7 +11,7 @@
         <div class="common-list-filter-flow common-list-filter-span1">
           <!-- 待指派 -->
           <div
-            v-for="(item) in taskView"
+            v-for="item in taskView"
             :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
@@ -30,7 +30,7 @@
           </div>
           <!-- 已指派 -->
           <div
-            v-for="(item) in taskView"
+            v-for="item in taskView"
             :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
@@ -49,7 +49,7 @@
           </div>
           <!-- 已接受 -->
           <div
-            v-for="(item) in taskView"
+            v-for="item in taskView"
             :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
@@ -68,7 +68,7 @@
           </div>
           <!-- 进行中 -->
           <div
-            v-for="(item) in taskView"
+            v-for="item in taskView"
             :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
@@ -87,7 +87,7 @@
           </div>
           <!-- 异常工单 -->
           <div
-            v-for="(item) in taskView"
+            v-for="item in taskView"
             :key="`${item.createTime}${Math.random() * 1000}`"
             @click="
               checkFilter({
@@ -131,6 +131,7 @@
             @click.stop="
               allShow = true;
               otherShow = false;
+              addShow = false;
             "
             :class="{ 'common-list-filter-flow-active': allShow }"
           >
@@ -140,19 +141,20 @@
           <TaskSelect
             :list="[
               {
-                name: `全部完工(${filterData.all || 0})`,
-                searchModel: allSearchParams.all,
+                name: `全部完工(${this.filterData.all || 0})`,
+                searchModel: this.allSearchParams.all,
               },
               {
-                name: `未完成工单(${filterData.unfinished || 0})`,
-                searchModel: allSearchParams.unfinished,
+                name: `未完成工单(${this.filterData.unfinished || 0})`,
+                searchModel: this.allSearchParams.unfinished,
               },
               {
-                name: `已完成工单(${filterData.finished || 0})`,
-                searchModel: allSearchParams.finished,
+                name: `已完成工单(${this.filterData.finished || 0})`,
+                searchModel: this.allSearchParams.finished,
               },
             ]"
             :show="allShow"
+            :right="true"
             @checkOther="checkAll"
           />
         </div>
@@ -162,6 +164,7 @@
             @click.stop="
               otherShow = true;
               allShow = false;
+              addShow = false;
             "
             :class="{
               'common-list-filter-flow-active':
@@ -235,6 +238,23 @@
     <div class="common-list-section">
       <!--operation bar start-->
       <div class="operation-bar-container task-list-operation-bar-container">
+        <div class="top-btn-group task-span1 task-flex">
+          <base-button
+            type="primary"
+            icon="icon-add"
+            @event.stop="
+              addShow = true;
+              otherShow = false;
+              allShow = false;
+            "
+            >新建</base-button
+          >
+          <TaskSelect :show="addShow" :list="taskTypes" @checkOther="addView" />
+          <base-button type="ghost" icon="icon-qingkongshanchu" @event="delTask"
+            >删除</base-button
+          >
+        </div>
+
         <div class="action-button-group">
           <!-- start 工单类型 -->
           <el-dropdown trigger="click">
@@ -248,7 +268,7 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="type in taskTypes" :key="type.id">
                 <div @click="changeTaskType(type)">
-                  {{ type.name }} 
+                  {{ type.name }}
                 </div>
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -256,7 +276,7 @@
           <!-- end 工单类型 -->
 
           <!-- start 更多操作 -->
-          <el-dropdown trigger="click" v-if="exportPermission">
+          <el-dropdown trigger="click" >
             <span
               class="el-dropdown-link el-dropdown-btn"
               @click="trackEventHandler('moreAction')"
@@ -589,6 +609,6 @@ import TaskList from "./TaskList";
 export default TaskList;
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "./TaskList.scss";
 </style>

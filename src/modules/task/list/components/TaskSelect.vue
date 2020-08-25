@@ -1,5 +1,9 @@
 <template>
-  <div class="common-list-filter-select" v-if="show">
+  <div
+    class="common-list-filter-select"
+    v-if="show"
+    :class="{ postion: right, left: !right }"
+  >
     <div
       class="common-list-filter-select-option"
       v-for="(item, index) in list"
@@ -22,6 +26,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    right: {
+      type: Boolean,
+      default: false,
+    },
   },
   name: "TaskSelect",
   data() {
@@ -37,12 +45,11 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .common-list-filter-select {
   background-color: #fff;
   border: 1px solid #eee;
   position: absolute;
-  right: 0;
   top: 40px;
   border-radius: 3px;
   padding-top: 3px;
@@ -65,5 +72,11 @@ export default {
     background-color: #55b7b4;
     color: #fff;
   }
+}
+.postion {
+  right: 0 ;
+}
+.left {
+  left: 0;
 }
 </style>

@@ -747,4 +747,11 @@ export function getRelatedInfo(params: {} | undefined) {
   return http.get(`${fixedPrefixAppPath}/outside/pc/task/getRelatedInfo`, params);
 }
 
+/**
+ * @description 是否删除工单列表
+ * @param {Object} 删除对象id
+ */
+export function withPart(params: Object = {}) {
+  return http.get(`${fixedPrefixAppPath}/task/filter/withPart`, params)
+}
 /* -------------  end  新工单api ---------------- */
