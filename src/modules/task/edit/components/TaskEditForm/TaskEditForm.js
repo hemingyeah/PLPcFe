@@ -241,6 +241,12 @@ export default {
 
     },
     /** 
+     * @description 同时通知客户 checkbox变化
+    */
+    noticeCustomerCheckdChange(value) {
+      this.updateTickValue(Number(value));
+    },
+    /** 
      * @description 打开客户详情
     */
     openCustomerView() {

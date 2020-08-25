@@ -28,18 +28,25 @@ export default {
     createTaskMethod(params, isAllot) {
       TaskApi.createTask(params)
         .then(res => {
-          let isSucc = !res.status;
+          let isSucc = res.success;
+
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建工单${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
+
           this.pending = false;
           this.loadingPage = false;
 
           if (!isSucc) return;
+          
+          // 根据是否派单决定跳转地址
+          let taskId = res.result;
+          let taskDetailPath = `/task/view/${taskId}`;
+          let taskAllotPath = `/task/allotTask?id=${taskId}`;
 
-          window.location.href = `${res.data}`;
+          window.location.href = isAllot ? taskAllotPath : taskDetailPath;
         })
         .catch(err => console.error('err', err))
     },
@@ -146,7 +153,7 @@ export default {
     updateTaskMethod(params) {
       TaskApi.editTask(params)
         .then(res => {
-          if (res.status == 1) {
+          if (!res.success) {
             this.loadingPage = false;
             this.pending = false;
             return platform.notification({
@@ -155,7 +162,9 @@ export default {
               message: res.message
             })
           }
+          
           window.location.href = `/task/view/${this.editId}`;
+
         })
         .catch(err => {
           this.pending = false;

@@ -36,6 +36,14 @@ export default {
     let { all } = this.productRelevanceTaskCountData;
     return this.selectProduct?.id && Number(all) > 0 && this.value?.product?.length == 1;
   },
+  /** 
+   * @description 是否显示 同时通知客户 字段
+   * 1. 新建工单/新建计划任务不显示
+  */
+  isShowNoticeCustomer() {
+    let { isFromPlan, isTaskCreate } = this.state;
+    return !isFromPlan && !isTaskCreate;
+  },
   // 产品字段
   productField(){
     return {

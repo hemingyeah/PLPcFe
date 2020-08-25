@@ -23,6 +23,16 @@
       <template slot="planTime" slot-scope="{ field, value }">
         <form-item :label="field.displayName">
           <form-plantime :field="field" :value="value" @update="update"></form-plantime>
+
+          <!-- start 通知客户 checkbox -->
+          <div class="task-notice-customer-block" v-if="isShowNoticeCustomer">
+            <el-checkbox :value="value.tick" @input="noticeCustomerCheckdChange">同时通知客户</el-checkbox>
+            <el-tooltip placement="top" content="勾选后，将会向用户发送短信通知：尊敬的客户您好，{tenant}计划{time}安排{user}联系电话{umobile}为您提供服务，客服电话{phone}。">
+              <i class="iconfont icon-info"></i>
+            </el-tooltip>
+          </div>
+          <!-- end 通知客户 checkbox -->
+
         </form-item>
       </template>
       <!-- end 计划时间 -->
@@ -39,7 +49,21 @@
               :remote-method="searchCustomer"
               @input="updateCustomer"
               placeholder="请输入关键字搜索客户"
-              :disabled="isCreateCustomer">
+              :disabled="isCreateCustomer"
+            >
+              <div class="customer-template-option" slot="option" slot-scope="{ option }">
+                <h3>{{ option.name }}</h3>
+                <p>
+                  <span>
+                    <label>电话：</label>
+                    <span>{{ option.lmPhone }}</span>
+                  </span>
+                  <span>
+                    <label>编号：</label>
+                    <span>{{ option.serialNumber }}</span>
+                  </span>
+                </p>
+              </div>
             </biz-form-remote-select>
             <el-button @click="dialogOpen('customer')" v-if="!isCreateCustomer">新建</el-button>
           </div>
@@ -106,6 +130,20 @@
                   <span>
                     <label>产品类型：</label>
                     <span>{{ option.type }}</span>
+                  </span>
+                  <span>
+                    <label>客户：</label>
+                    <span>{{ option.customer && option.customer.name }}</span>
+                  </span>
+                </p>
+                <p>
+                  <span>
+                    <label>联系人：</label>
+                    <span>{{ option.linkman && option.linkman.name }}</span>
+                  </span>
+                  <span>
+                    <label>产品地址：</label>
+                    <span>{{ option.address | fmt_address }}</span>
                   </span>
                 </p>
               </div>

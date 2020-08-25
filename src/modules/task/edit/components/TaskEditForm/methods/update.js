@@ -40,4 +40,10 @@ export default {
   updateProductValue(value) {
     this.update({ field: { fieldName: FieldNameMappingEnum.Product }, newValue: value });
   },
+  /** 
+   * @description 更新通知客户短信数据
+  */
+  updateTickValue(value) {
+    this.update({ field: { fieldName: FieldNameMappingEnum.Tick }, newValue: value });
+  }
 }

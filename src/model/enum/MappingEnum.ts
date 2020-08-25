@@ -4,4 +4,5 @@ export enum FieldNameMappingEnum {
   Customer = 'customer',
   Linkman = 'linkman',
   Product = 'product',
+  Tick = 'tick',
 }
