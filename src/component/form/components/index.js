@@ -112,7 +112,10 @@ for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
   FormFieldMap[formField.formType] = field;
 }
 
-const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator']
+const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator'];
+// 工单字段列表，工单彻底改造完成后删除，用 COMMON_FIELDS 替代
+const TASK_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone'];
+
 const MODE_MANAGER = {
   base: {
     include: [...COMMON_FIELDS]
@@ -125,13 +128,13 @@ const MODE_MANAGER = {
   },
   task: {
     include: [
-      ...COMMON_FIELDS,
+      ...TASK_FIELDS,
       ...['taskNo', 'cascader', 'address', 'relationCustomer', 'relationProduct', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment']
     ]
   },
   task_receipt: {
     include: [
-      ...COMMON_FIELDS,
+      ...TASK_FIELDS,
       ...['cascader', 'address', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
     ]
   },
