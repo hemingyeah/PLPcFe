@@ -53,8 +53,13 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取 消</el-button>
-      <el-button type="primary" @click="submit" :disabled="pending">审 批</el-button>
+      <div class="dialog-footer-left">
+        <p class="tips">备注：审批后不能修改审批结果</p>
+      </div>
+      <div class="dialog-footer-right">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" @click="submit" :disabled="pending">审 批</el-button>
+      </div>
     </div>
   </base-modal>
 </template>
@@ -97,14 +102,15 @@ export default {
         .then((res) => {
           if (res.status == 0) {
             this.approve = res.data;
-            
-            this.pending = false;
             this.visible = true;
           } else {
             this.$platform.alert(res.message);
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err))
+        .finally(() => {
+          this.pending = false;
+        })
     },
     submit() {
       this.pending = true;
@@ -126,7 +132,6 @@ export default {
         })
         .catch((err) => {
           this.pending = false;
-          console.log(err);
         });
     },
     // 处理审批时相关展示的内容
@@ -188,7 +193,7 @@ export default {
           return '';
         }
       } catch (err) {
-        console.log('approveContent error', err);
+        console.error('approveContent error', err);
       }
     }
   }
@@ -199,6 +204,20 @@ export default {
 .task-approve-dialog {
   .form-view-row {
     padding: 6px 0px;
+  }
+
+  .dialog-footer {
+    text-align: left;
+    display: flex;
+
+    .dialog-footer-left {
+      flex: 1;
+      font-size: 12px;
+    }
+
+    .dialog-footer-right {
+      text-align: right;
+    }
   }
 }
 </style>

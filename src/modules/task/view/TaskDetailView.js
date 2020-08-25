@@ -371,13 +371,13 @@ export default {
     * @description 工单信息中计划时间是否可以修改
     * 1. 工单状态是accepted/processing其中一种
     * 2. 当前登录账户是工单负责人
-    * 3. 工单存在计划时间
+    * 3. 工单设置允许修改计划时间
     */
     allowModifyPlanTime() {
       let stateArr = ['accepted', 'processing'];
-      let { planTime, state } = this.task;
+      let { state } = this.task;
 
-      return this.isExecutor && planTime && stateArr.indexOf(state) >= 0;
+      return this.isExecutor && this.taskConfig.taskPlanTime && stateArr.indexOf(state) >= 0;
     },
     /** 
     * @description 是否显示DING按钮
@@ -450,6 +450,7 @@ export default {
     },
     // 删除工单
     async deleteTask() {
+      // TODO：接口联调问题
       this.pending = true;
 
       try {
@@ -509,7 +510,7 @@ export default {
 
       this.pending = true;
 
-      // 判断是完成状态回退还是结算回退
+      // 判断是完成回退还是结算回退
       const API = this.task.state == 'finished' ? 'rollBackTask' : 'rollBackBalance';
       
       const params = { taskId: this.task.id, reason };
@@ -533,9 +534,10 @@ export default {
       this.pending = true;
 
       let { reason } = this.pauseDialog;
+      let taskId = this.task.id;
 
       // 暂停是否需要审批
-      const result = await TaskApi.pauseApproveCheck({ id: this.task.id, reason });
+      const result = await TaskApi.pauseApproveCheck({ id: taskId, reason });
       if (!result.succ && result.message == '需要审批') {
         this.pauseDialog.visible = false;
         this.$refs.proposeApprove.openDialog(result.data);
@@ -543,7 +545,7 @@ export default {
         return;
       }
 
-      TaskApi.pauseTask({ taskId: this.task.id, reason }).then(res => {
+      TaskApi.pauseTask({ taskId, reason }).then(res => {
         if (res.success) {
           window.location.reload();
         } else {
@@ -632,12 +634,17 @@ export default {
     },
     // 打印工单
     printTask() {
+      this.pending = true;
       TaskApi.printTask({ id: this.task.id }).then(res => {
         if (res.status == 0) {
           let url = `${window.location.origin}/print/printTaskDispatcher?token=${res.data}`;
           parent.openHelp(url);
         }
-      }).catch(err => console.error(err));
+      })
+        .catch(err => console.error(err))
+        .finally(() => {
+          this.pending = false;
+        })
     },
     // 生产服务报告
     createReport(isPdf) {
@@ -686,15 +693,16 @@ export default {
     },
     // DING
     ding(all = true) {
+      let { id, taskNo, executor, synergies } = this.task;
+
       let users = [];
-      users.push(this.task.executor.staffId);
+      users.push(executor.staffId);
       
       // 所有人(工单负责人和协同人)
-      if (all && this.task.synergies && this.task.synergies.length > 0) {
-        this.task.synergies.forEach(item => users.push(item.staffId));
+      if (all && synergies && synergies.length) {
+        synergies.forEach(item => users.push(item.staffId));
       }
 
-      let {id, taskNo} = this.task;
       window.parent.send_link_ding_message(users, taskNo, id);
     },
     // 打开弹窗

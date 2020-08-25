@@ -6,6 +6,7 @@
         <div class="form-item-control">
           <form-user
             v-if="chooseApprover"
+            :field="{ displayName: '审批人' }"
             v-model="approver"
             :see-all-org="true"
             placeholder="请选择审批人"
@@ -74,7 +75,6 @@ export default {
       }
 
       this.visible = true;
-      
     },
     submit() {
       // 审批人由发起人选择时

@@ -1,4 +1,5 @@
-.product-template-option {
+.product-template-option,
+.customer-template-option {
   * {
     margin: 0;
   }
@@ -55,5 +56,29 @@
     .dialog-footer {
       text-align: right;
     }
+  }
+}
+
+.form-item-control {
+  position: relative;
+  .task-count-button,
+  .task-notice-customer-block {
+    position: absolute;
+    right: -80px;
+    top: 0;
+  }
+  .task-notice-customer-block {
+    display: flex;
+    align-items: center;
+    right: -150px;
+    .el-checkbox {
+      padding-top: 0;
+    }
+  }
+}
+
+.base-select-container {
+  .option-list {
+    max-height: 400px;
   }
 }

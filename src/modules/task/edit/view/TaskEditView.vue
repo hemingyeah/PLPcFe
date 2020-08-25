@@ -48,7 +48,7 @@
 
       </div>
 
-      <task-edit-form :fields.sync="fields" :types="types" :value.sync="form" ref="form" @updatetemplateId="updateTaskTemplateId"></task-edit-form>
+      <task-edit-form :fields.sync="fields" :state="state" :types="types" :value.sync="form" ref="form" @updatetemplateId="updateTaskTemplateId"></task-edit-form>
     </form>
   </div>
 </template>

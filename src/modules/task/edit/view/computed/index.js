@@ -10,7 +10,7 @@ export default {
   disabled() {
     return this.submitting || this.pending;
   },
-  /* 编辑功夫id */
+  /* 编辑工单id */
   editId() {
     return this.workTask?.id || '';
   },
@@ -88,6 +88,12 @@ export default {
   },
   path() {
     return this.initData?.path || '';
+  },
+  state() {
+    return {
+      isFromPlan: this.isFromPlan,
+      isTaskCreate: this.isTaskCreate
+    }
   },
   task() {
     let task = null;

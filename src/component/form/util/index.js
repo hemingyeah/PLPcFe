@@ -120,10 +120,10 @@ export function initialize(fields = [], origin = {}, callback){
     if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
     // 如果已经存在值 则无需初始化
     if(result[fieldName]) return;
-
+    
     // 屏蔽工单上单选里不存在默认值
     if(isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = '';
-
+    
     // 优先级、服务类型、服务内容在空值时选中第一个
     if(field.formType == 'level' || field.formType == 'serviceContent' || field.formType == 'serviceType') {
       if(defaultValue == '') defaultValue = dataSource[0];
@@ -133,28 +133,28 @@ export function initialize(fields = [], origin = {}, callback){
     if (field.formType === 'link') {
       defaultValue = {}
     }
-
+    
     // 多选和附件的默认值初始化为空数组
     if(isMultiSelect(field) || field.formType == 'attachment' || field.formType == 'taskAttachment' || field.formType == 'receiptAttachment'){
       defaultValue = [];
     }
-
+    
     // 多级选择，需要拆解默认值
     if(formType == 'cascader'){
       let cascaderDefaultValue = [];
       if(defaultValue) cascaderDefaultValue = defaultValue.split(',')
-
+    
       defaultValue = cascaderDefaultValue;
     }
-
+    
     // 地址、人员的默认值初始化为对象
     let objValueFields = ['customerAddress', 'address', 'user']
     if(objValueFields.indexOf(field.formType) >= 0) defaultValue = {};
-   
+    
     // 来自表单的值，用于编辑时初始化值
     let attribute = origin.attribute || {};
     let formData = field.isSystem === 1 ? origin[fieldName] : attribute[fieldName];
-
+    
     // 多选改单选,若原来有值则保留第一个
     if(isSelect(field) && Array.isArray(formData)) {
       formData = (formData && formData.length >= 1) ? formData[0] : '';
@@ -163,7 +163,7 @@ export function initialize(fields = [], origin = {}, callback){
     if(isMultiSelect(field) && !Array.isArray(formData)) {
       formData = formData ? [formData] : [];
     }
-
+    
     result[fieldName] = formData == null ? defaultValue : formData;
   });
 

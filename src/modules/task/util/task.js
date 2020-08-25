@@ -1,10 +1,9 @@
-import { toArray } from '@src/util/lang';
-
 /** 将form对象转成客户对象，用于提交表单 */
 export function packToTask(fields, form){
   let task = {
     id: form.id,
-    attribute: {}
+    attribute: {},
+    tick: form.tick || 0,
   };
 
   fields.forEach(field => {

@@ -12,7 +12,7 @@
       <!-- end 审批中 -->
 
       <!-- start 未结算 -->
-      <template v-else-if="!shareData.task.balanceConfirm">
+      <template v-else-if="!task.balanceConfirm">
         <div class="no-text" v-if="!openUserDefinedBalance">未配置任何审核结算字段</div>
         <div class="no-text" v-else>暂无审核结算数据</div>
       </template>
@@ -22,14 +22,14 @@
       <template v-else>
         <form-view :fields="balanceAvailableFields" :value="balanceJson" v-if="openUserDefinedBalance"></form-view>
 
-        <template v-if="shareData.task.balanceUser">
+        <template v-if="task.balanceUser">
           <div class="form-view-row">
             <label>操作人</label>
-            <div class="form-view-row-content">{{shareData.task.balanceUser.displayName}}</div>
+            <div class="form-view-row-content">{{task.balanceUser.displayName}}</div>
           </div>
           <div class="form-view-row">
             <label>操作时间</label>
-            <div class="form-view-row-content">{{shareData.task.balanceTime | fmt_datetime}}</div>
+            <div class="form-view-row-content">{{task.balanceTime | fmt_datetime}}</div>
           </div>
         </template>
       </template>
@@ -51,7 +51,7 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="balanceDialog.visible = false">取 消</el-button>
-        <el-button type="primary" @click="submit" :disabled="pending">{{!shareData.task.balanceConfirm ? '结 算' : '保 存'}}</el-button>
+        <el-button type="primary" @click="submit" :disabled="pending">{{!task.balanceConfirm ? '结 算' : '保 存'}}</el-button>
       </div>
     </base-modal>
     <!-- end 结算弹窗 -->
@@ -92,29 +92,35 @@ export default {
     }
   },
   computed: {
+    // 工单详情信息
+    task() {
+      return this.shareData.task || {};
+    },
+    // 工单设置
+    taskConfig() {
+      return this.initData.taskConfig || {};
+    },
     // 审批数据
     approve() {
       return this.initData.unFinishedAppr || {};
     },
     // 是否在结算审批中
     isApproving() {
-      return this.shareData.task.inApprove == 1 && this.approve.action == '结算';
-    },
-    // 审核结算自定义字段
-    balanceFields() {
-      return this.initData.balanceFieldInfos || [];
+      return this.task.inApprove == 1 && this.approve.action == '结算';
     },
     // 审核结算开启的可用字段
     balanceAvailableFields() {
-      return this.balanceFields.filter(field => field.setting.isOpen);
+      let balanceFields = this.initData.balanceFieldInfos || [];
+      return balanceFields.filter(field => field.setting.isOpen);
     },
     // 是否配置审核结算字段
     openUserDefinedBalance() {
-      return this.initData.taskConfig.taskBalanceConfig.openUserDefinedBalance && this.balanceAvailableFields.length > 0;
+      let openUserDefinedBalance = this.taskConfig.taskBalanceConfig?.openUserDefinedBalance;
+      return openUserDefinedBalance && this.balanceAvailableFields.length > 0;
     },
     // 审核结算数据
     balanceJson() {
-      let balanceAttribute = this.shareData.task.balanceAttribute;
+      let balanceAttribute = this.task.balanceAttribute;
       let taskBalanceJson = this.approve.otherInfo?.params.taskBalanceJson || {};
 
       let attribute = this.isApproving ? JSON.parse(taskBalanceJson) : balanceAttribute;
@@ -127,44 +133,34 @@ export default {
     * @description 是否显示结算按钮
     * 1. 工单状态是已完成finished
     * 2. 且 不是审批状态
-    * 3. 且 未结算过 workTask.isSettled == 0
+    * 3. 且 未结算过
     * 4. 且 允许回退工单 canRollBack
     */
     allowBalanceTask() {
-      let { state, inApprove, isSettled } = this.shareData.task;
+      let { state, inApprove, isSettled } = this.task;
 
-      return state === 'finished' && inApprove != 1 && isSettled == 0 && this.canRollBack;
+      return state === 'finished' && inApprove != 1 && isSettled == 0 && this.initData.canRollBack;
     },
     /** 
      * @description 是否显示编辑按钮
      * 1. 工单状态是已结算costed
      * 2. 且 不是审批状态
-     * 3. 且 结算过 workTask.isSettled == 1
-     * 4. 且 未回访过 workTask.isReview == 0
+     * 3. 且 结算过
+     * 4. 且 未回访过
      * 5. 且 允许回退工单 canRollBack
     */
     allowEditBalance() {
-      let { state, inApprove, isSettled, isReview } = this.shareData.task;
+      let { state, inApprove, isSettled, isReview } = this.task;
 
-      return state === 'costed' && inApprove != 1 && isSettled == 1 && isReview == 0 && this.canRollBack;
+      return state === 'costed' && inApprove != 1 && isSettled == 1 && isReview == 0 && this.initData.canRollBack;
     },
     /** 
      * @description 是否显示回退按钮
-     * 1. 工单状态是已结算costed
-     * 2. 且 不是审批状态
-     * 3. 且 结算过 workTask.isSettled == 1
-     * 4. 且 未回访过 workTask.isReview == 0
-     * 5. 且 工单设置开启了允许退回工单回执 taskConfig.taskRollBack
-     * 6. 且 允许回退工单 canRollBack
+     * 1. 满足现实编辑按钮权限
+     * 5. 且 工单设置开启了允许退回工单回执
     */
     allowRollBack() {
-      let { state, inApprove, isSettled, isReview } = this.shareData.task;
-
-      return state === 'costed' && inApprove != 1 && isSettled == 1 && isReview == 0 && this.canRollBack && this.initData.taskConfig.taskRollBack;
-    },
-    /* 允许回退工单 */
-    canRollBack() {
-      return this.initData.canRollBack;
+      return this.allowEditBalance && this.taskConfig.taskRollBack;
     }
   },
   methods: {
@@ -206,13 +202,13 @@ export default {
     },
     // 将数据拆解成自定义表单可接收的数据
     unpack() {
-      let attribute = this.shareData.task.balanceAttribute;
+      let attribute = this.task.balanceAttribute;
       let result = Utils.initialize(this.balanceAvailableFields, { attribute });
       this.balanceForm = result;
     },
     // 将数据打包成服务器可接收的数据
     pack(form) {
-      let { id, taskNo } = this.shareData.task;
+      let { id, taskNo } = this.task;
 
       let data = { taskId: id };
       let attribute = {

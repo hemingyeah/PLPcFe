@@ -23,6 +23,16 @@
       <template slot="planTime" slot-scope="{ field, value }">
         <form-item :label="field.displayName">
           <form-plantime :field="field" :value="value" @update="update"></form-plantime>
+
+          <!-- start 通知客户 checkbox -->
+          <div class="task-notice-customer-block" v-if="isShowNoticeCustomer">
+            <el-checkbox :value="value.tick" @input="noticeCustomerCheckdChange">同时通知客户</el-checkbox>
+            <el-tooltip placement="top" content="勾选后，将会向用户发送短信通知：尊敬的客户您好，{tenant}计划{time}安排{user}联系电话{umobile}为您提供服务，客服电话{phone}。">
+              <i class="iconfont icon-info"></i>
+            </el-tooltip>
+          </div>
+          <!-- end 通知客户 checkbox -->
+
         </form-item>
       </template>
       <!-- end 计划时间 -->
@@ -39,10 +49,32 @@
               :remote-method="searchCustomer"
               @input="updateCustomer"
               placeholder="请输入关键字搜索客户"
-              :disabled="isCreateCustomer">
+              :disabled="isCreateCustomer"
+            >
+              <div class="customer-template-option" slot="option" slot-scope="{ option }">
+                <h3>{{ option.name }}</h3>
+                <p>
+                  <span>
+                    <label>电话：</label>
+                    <span>{{ option.lmPhone }}</span>
+                  </span>
+                  <span>
+                    <label>编号：</label>
+                    <span>{{ option.serialNumber }}</span>
+                  </span>
+                </p>
+              </div>
             </biz-form-remote-select>
             <el-button @click="dialogOpen('customer')" v-if="!isCreateCustomer">新建</el-button>
           </div>
+
+          <el-tooltip v-if="isShowCustomerRelevanceTaskCountButton" placement="top">
+            <div slot="content" v-html="`未完成工单：${customerRelevanceTaskCountData.unfinished} </br> 全部工单：${customerRelevanceTaskCountData.all}`"></div>
+            <el-button class="task-count-button" @click="openCustomerView">
+              {{ `${customerRelevanceTaskCountData.unfinished}/${customerRelevanceTaskCountData.all}` }}
+            </el-button>
+          </el-tooltip>
+
         </form-item>
         <!-- end 客户 -->
 
@@ -50,11 +82,13 @@
         <form-item v-if="customerOption.linkman" label="联系人">
           <div class="input-and-btn">
             <biz-form-remote-select
+              ref="linkman"
               v-model="value.linkman"
               :remote-method="searchLinkmanOuterHandler"
               @input="updateLinkman(value.linkman[0])"
               placeholder="请输入关键字搜索联系人"
-              :disabled="isCreateCustomer">
+              :disabled="isCreateCustomer"
+            >
             </biz-form-remote-select>
             <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer">新建</el-button>
           </div>
@@ -72,10 +106,11 @@
             <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
-        <!-- start 地址 -->
+        <!-- end 地址 -->
 
         <!-- start 产品 -->
         <form-item v-if="customerOption.product" label="产品">
+
           <div class="input-and-btn">
             <biz-form-remote-select
               ref="product"
@@ -96,13 +131,35 @@
                     <label>产品类型：</label>
                     <span>{{ option.type }}</span>
                   </span>
+                  <span>
+                    <label>客户：</label>
+                    <span>{{ option.customer && option.customer.name }}</span>
+                  </span>
+                </p>
+                <p>
+                  <span>
+                    <label>联系人：</label>
+                    <span>{{ option.linkman && option.linkman.name }}</span>
+                  </span>
+                  <span>
+                    <label>产品地址：</label>
+                    <span>{{ option.address | fmt_address }}</span>
+                  </span>
                 </p>
               </div>
             </biz-form-remote-select>
             <el-button @click="dialogOpen('product')">新建</el-button>
           </div>
+
+          <el-tooltip v-if="isShowProductRelevanceTaskCountButton" placement="top">
+            <div slot="content" v-html="`未完成工单：${productRelevanceTaskCountData.unfinished} </br> 全部工单：${productRelevanceTaskCountData.all}`"></div>
+            <el-button class="task-count-button" @click="openProductView">
+              {{ `${productRelevanceTaskCountData.unfinished}/${productRelevanceTaskCountData.all}` }}
+            </el-button>
+          </el-tooltip>
+
         </form-item>
-        <!-- start 产品 -->
+        <!-- end 产品 -->
 
       </template>
       <!-- end 客户字段 -->
@@ -129,8 +186,14 @@
     </base-modal>
     <!-- end 新建产品弹窗 -->
 
+    <!-- start 联系人弹窗 -->
     <edit-contact-dialog ref="EditContactDialog" :customer="selectedCustomer" :is-phone-unique="customerInitData.isPhoneUnique"/>
+    <!-- end 联系人弹窗 -->
+
+    <!-- start 地址弹窗 -->
     <edit-address-dialog ref="EditAddressDialog" :customer-id="selectedCustomer.id" :default-address="customerInitData.customerAddress"/>
+    <!-- end 地址弹窗 -->
+
   </div>
 </template>
 

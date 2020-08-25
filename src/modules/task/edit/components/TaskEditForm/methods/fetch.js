@@ -4,6 +4,20 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 
 export default {
   /** 
+   * @description 通过联系人获取地址数据
+  */
+  fetchLmBindAddress(params) {
+    return TaskApi.getLmBindAddress(params);
+  },
+  /** 
+   * @description 获取客户/产品 关联的工单数量数据
+  */
+  fetchCountForCreate(params) {
+    return TaskApi.getCountForCreate(params).then((result = {}) => {
+      this.relevanceTaskCountData[params.module] = result;
+    });
+  },
+  /** 
    * @description 获取客户数据
   */
   fetchCustomerData () {
@@ -28,10 +42,23 @@ export default {
     return TaskApi.getCustomerByProduct(params);
   },
   /** 
-   * @description 通过联系人获取地址数据
+   * @description 获取产品数据
   */
-  fetchLmBindAddress(params) {
-    return TaskApi.getLmBindAddress(params);
+  fetchProductData(cb = () => {}) {
+    return TaskApi.getCreateProductData()
+      .then(res => {
+
+        let isSuccess = res.status == 0;
+
+        if(isSuccess) {
+          this.productInitData = res.data;
+          this.productFormView = this.renderProductForm(res.data);
+        } else {
+          this.$platform.alert(res.message);
+        }
+
+      })
+      .catch(err => console.error('error', err));
   },
   /** 
    * @description 关联显示项数据查询
@@ -60,24 +87,5 @@ export default {
   */
   fetchTaskDefaultInfo(params) {
     return TaskApi.getTaskDefaultInfo(params);
-  },
-  /** 
-   * @description 获取产品数据
-  */
-  fetchProductData(cb = () => {}) {
-    return TaskApi.getCreateProductData()
-      .then(res => {
-
-        let isSuccess = res.status == 0;
-
-        if(isSuccess) {
-          this.productInitData = res.data;
-          this.productFormView = this.renderProductForm(res.data);
-        } else {
-          this.$platform.alert(res.message);
-        }
-
-      })
-      .catch(err => console.error('error', err));
   },
 }
