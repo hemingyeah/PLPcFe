@@ -215,4 +215,11 @@ export function getTodayNormalCount(params = {}) {
   return http.get(`${prefix}/outside/callcenter/api/getTodayNormalCount`)
 }
 
+/**
+ * 通话挂断
+ * @param {*} params 
+ */
+export function hangUpCall(params = {}) {
+  return http.get(`${prefix}/outside/callcenter/api/hangUpCall`)
+}
 
