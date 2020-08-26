@@ -1405,6 +1405,7 @@ export default {
             message: res.message || '办理成功',
             type: 'success'
           });
+          this.loadData();
         }else{
           this.$message({
             showClose: true,
