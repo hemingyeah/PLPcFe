@@ -159,6 +159,7 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
+router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/api/*', async ctx => {
 
@@ -175,10 +176,5 @@ router.all('/api/*', async ctx => {
 });
 
 router.all('/*', ctx => HttpClient.proxy(ctx))
-router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
-
-router.all('/*', ctx => {
-  return HttpClient.proxy(ctx)
-});
 
 module.exports = router;
