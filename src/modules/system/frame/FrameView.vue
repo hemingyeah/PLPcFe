@@ -63,7 +63,8 @@
                     <div class="ripple2"></div>
                   </div>
                 </div>
-                <p style="margin-top:10px;">{{callData.callPhone}}</p>
+                <p style="margin-top:10px;font-size: 26px;">{{callData.callPhone}}</p>
+                <el-button type="danger" @click="hangUpCall" style="margin-bottom: 20px;">挂断</el-button>
                 <!-- 呼入 -->
                 <template v-if="callData.callType=='normal'">
                   <div class="call-in">
@@ -440,6 +441,15 @@ export default {
     }
   },
   methods: {
+    async hangUpCall(){
+      try {
+        let {code, message} = await CallCenterApi.hangUpCall();
+        if(code != 0) this.$message.error(message || '内部错误')
+        console.log('res:', code, message);
+      } catch(error) {
+        console.error(error);
+      }
+    },
     // 判断当前租户是否开启呼叫中心灰度功能
     async judgeCallCenterGray() {
       localStorage.setItem('call_center_gray', 0);
