@@ -123,6 +123,18 @@ export default {
             this.selected=[];
          }
       })
+    },
+    tableData:{
+      handler(val){
+        this.allTableData.forEach(item=>{
+          const exist=val.find(v=>v.id===item.id);
+          if(exist){
+            item.handleNum=exist.handleNum;
+            item.checked=exist.checked;
+          }
+        })
+      },
+      deep:true
     }
   },
   mounted(){
@@ -238,16 +250,22 @@ export default {
         }
         return
       }
-      this.selected=[...selection];
-      const exist=this.selected.find(item=>item.id===row.id);
-      if(exist){
+      if(selection.length){
+        const max=(row.variation-row.solvedVariation).toFixed(decimals);
         const decimals=Math.max(this.countDecimals(row.variation),this.countDecimals(row.solvedVariation));
-        row.max=(row.variation-row.solvedVariation).toFixed(decimals);
+        row.max=max;
         row.checked=true;
-        row.handleNum=(row.variation-row.solvedVariation).toFixed(decimals);
+        row.handleNum=max;
+        const exist=this.selected.find(item=>item.id===row.id);
+        if(exist){
+          exist=JSON.parse(JSON.stringify(row));
+        }else{
+          this.selected.push(row);
+        }
       }else{
         row.checked=false;
         row.handleNum='';
+        this.selected=this.selected.filter(item=>item.id!==row.id);
       }
     },
     // 全选
@@ -268,6 +286,12 @@ export default {
       }else if(selection.length>0){
         selections=[...selection];
         this.selectChange(selections);
+      }else{
+        this.tableData.forEach(item=>{
+          item.checked=false;
+          item.handleNum='';
+        });
+        this.selected=this.selected.filter(item=>!this.tableData.find(t=>t.id===item.id));
       }
     },
     selectChange(selections){
@@ -275,9 +299,10 @@ export default {
         const leftArr=selections.filter(item=>!this.selected.find(sItem=>sItem.id===item.id));
         leftArr.forEach(item=>{
           const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+          const max=(item.variation-item.solvedVariation).toFixed(decimals);
           item.checked=true;
-          item.max=(item.variation-item.solvedVariation).toFixed(decimals);
-          item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
+          item.max=max;
+          item.handleNum=max;
         });
       }else{
         this.tableData.forEach(item=>{
@@ -285,7 +310,7 @@ export default {
           item.handleNum='';
         });
       }
-      this.selected=[...selections];
+      this.selected=[...selections,...this.selected];
     },
     // 获取小数位数
     countDecimals(num){
@@ -311,15 +336,17 @@ export default {
           || item.approveNo.toString().indexOf(this.keyWord)>-1
       });
       this.tableData.forEach(item=>{
-        item.checked=false;
-        item.handleNum='';
-      });
-      this.selected=[];
+        if(item.checked){
+          this.$nextTick(()=>{
+            this.$refs.selectTable.toggleRowSelection(item,true);
+          })
+        }
+      })
     },
     // 重置
     reset(){
       this.keyWord='';
-      this.tableData=JSON.parse(JSON.stringify(this.formdata));
+      this.search();
     }
   }
 }
