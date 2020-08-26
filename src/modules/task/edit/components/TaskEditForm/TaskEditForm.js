@@ -38,6 +38,7 @@ export default {
     this.taskFields = this.fields;
     this.taskValue = this.value;
     this.selectedType = this.taskTypes[0] || {};
+    this.$emit('updatetemplateId', this.selectedType);
 
     this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);
     this.$eventBus.$on('task_create_or_edit.update_address', this.bindAddress);
@@ -196,7 +197,10 @@ export default {
      * @param {String} 动作 address/contact/customer/product 
     */
     async dialogOpen(action) {
-      if (!this.selectedCustomer.id && action != FieldNameMappingEnum.Customer) {
+      let { id, value } = this.selectedCustomer;
+      let customerId = id || value;
+
+      if (!customerId && action != FieldNameMappingEnum.Customer) {
         this.$platform.alert('请先选择客户');
         return;
       }
@@ -251,7 +255,8 @@ export default {
     */
     openCustomerView() {
       let fromId = window.frameElement.getAttribute('id');
-      let customerId = this.selectedCustomer.id;
+      let { id, value } = this.selectedCustomer;
+      let customerId = id || value;
       if(!customerId) return
 
       this.$platform.openTab({
@@ -434,7 +439,8 @@ export default {
      * @param {Object} params 搜索参数
     */
     async searchAddressOuterHandler(params = {}) {
-      params.customerId = this.selectedCustomer.id || '';
+      let { id, value } = this.selectedCustomer;
+      params.customerId = id || value;
       return this.searchAddress(params);
     },
     /** 
@@ -454,7 +460,8 @@ export default {
      * @param {Object} params 搜索参数
     */
     async searchProductOuterHandler(params = {}) {
-      params.customerId = this.selectedCustomer.id || '';
+      let { id, value } = this.selectedCustomer;
+      params.customerId = id || value || '';
       return this.searchProduct(params);
     },
     /** 
@@ -476,7 +483,7 @@ export default {
     */
     async updateCustomer(value = []) {
       let selectedCustomer = value?.[0] || {};
-      let currentCustomerId = this.selectedCustomer?.id;
+      let currentCustomerId = this.selectedCustomer?.id || this.selectedCustomer?.value;
       let selectedCustomerId = selectedCustomer?.id || '';
 
       // 更新客户数据
