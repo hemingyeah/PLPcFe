@@ -1,24 +1,24 @@
 interface Task {
   // 系统附件
-  attachment ?: String[];
+  attachment ?: string[];
   // 自定义字段
   attribute ?: Object;
   // 任务描述
-  description ?: String;
+  description ?: string;
   // 优先级
-  level ?: String;
+  level ?: string;
   // 计划时间
-  planTime ?: String;
+  planTime ?: string;
   // 产品 (JSON格式)
-  products ?: String[];
+  products ?: string[];
   // 服务内容
-  serviceContent ?: String;
+  serviceContent ?: string;
   // 服务类型
-  serviceType ?: String;
+  serviceType ?: string;
   // 工单类型id
-  templateId ?: String;
+  templateId ?: string;
   // 工单类型名称
-  templateName ?: String;
+  templateName ?: string;
 
 }
 

@@ -1,5 +1,19 @@
 /* 字段映射 */
 
+/* 通用映射 */
+export enum CommonMappingEnum {
+  // 自定义属性
+  Attribute = 'attribute',
+  // 客户
+  Customer = 'customer',
+  // 事件
+  Event = 'event',
+  // 产品
+  Product = 'product',
+  // 工单
+  Task = 'task',
+}
+
 /* 字段类型映射 */
 export enum FieldTypeMappingEnum {
   Address = 'address',
@@ -29,6 +43,8 @@ export enum CustomerFieldNameMappingEnum {
   Customer = 'customer',
   // 客户负责人
   CustomerManager = 'customerManager',
+  // 客户负责人名字
+  CustomerManagerName = 'customerManagerName',
   // 联系人
   Linkman = 'linkman',
   // 产品
@@ -39,20 +55,20 @@ export enum CustomerFieldNameMappingEnum {
   Tags = 'tags',
 }
 
-/* 客户字段映射 */
+/* 产品字段映射 */
 export enum ProductFieldNameMappingEnum {
   // 地址
   Address = 'address',
   // 客户
   Customer = 'customer',
-  // 客户负责人
-  CustomerManager = 'customerManager',
   // 联系人
   Linkman = 'linkman',
   // 产品
   Product = 'product',
   // 编号
   SerialNumber = 'serialNumber',
+  // 类型
+  Type = 'type',
   // 团队
   Tags = 'tags',
 }

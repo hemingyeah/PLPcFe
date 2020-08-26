@@ -1,10 +1,10 @@
 interface Linkman {
   // 联系人名字
-  name ?: String;
+  name ?: string;
   // id
-  id ?: String;
+  id ?: string;
   // 联系人手机号
-  phone ?: String;
+  phone ?: string;
 }
 
 export default Linkman
