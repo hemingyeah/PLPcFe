@@ -785,13 +785,13 @@ export default {
         },
         {
           field: 'sourceName',
-          label: '原始仓库',
+          label: '原仓库',
           show: true,
           minWidth: 120
         },
         {
           field: 'targetName',
-          label: '目标仓库',
+          label: '目标库',
           show: true,
           minWidth: 120
         },
