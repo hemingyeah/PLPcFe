@@ -11,7 +11,7 @@ import data from './data'
 import computed from './computed'
 import methods from './methods'
 /* enum */
-import { FieldNameMappingEnum } from '@src/model/enum/MappingEnum.ts'
+import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
 
 let taskTemplate = {};
 
@@ -38,12 +38,12 @@ export default {
       // 更新联系人/客户数据
       if (linkman) {
         let { customer } = linkman;
-        this.$set(this.form, FieldNameMappingEnum.Customer, [customer]);
-        this.$set(this.form, FieldNameMappingEnum.Linkman, [linkman]);
+        this.$set(this.form, TaskFieldNameMappingEnum.Customer, [customer]);
+        this.$set(this.form, TaskFieldNameMappingEnum.Linkman, [linkman]);
       }
       // 更新地址数据
       if(address) {
-        this.$set(this.form, FieldNameMappingEnum.Address, [address]);
+        this.$set(this.form, TaskFieldNameMappingEnum.Address, [address]);
       }
     },
     /** 
