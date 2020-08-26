@@ -20,6 +20,7 @@
     </div>
     <div class="form-setting-group">
       <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
+      <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
     </div>
   </div>
 </template>
@@ -37,6 +38,9 @@ export default {
     },
     options() {
       // TODO: 此处不是本地数据 需要从服务端获取 或 服务端塞进来数据
+      console.log("获取基础字段 -- 产品关联字段  下拉")
+      console.log(this.module)
+      console.log(`${this.module}Fields`)
       let moduleOptionName = `${this.module}Fields`;
       return this[moduleOptionName];
     },
