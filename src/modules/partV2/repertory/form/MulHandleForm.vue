@@ -51,7 +51,16 @@
       >
         <template slot-scope="scope">
           <template v-if="column.field==='handleNum'">
-            <el-input v-model="scope.row.handleNum" @change="handleNumChange(scope.$index,scope.row)" :disabled="!scope.row.checked" type='number' :max='scope.row.max' :min='0'></el-input>
+            <!-- <el-input v-model="scope.row.handleNum" @change="handleNumChange(scope.$index,scope.row)" :disabled="!scope.row.checked" type='number' :max='scope.row.max' :min='0'></el-input> -->
+            <input
+              v-model="scope.row.handleNum"
+              @change="handleNumChange(scope.$index,scope.row)"
+              :disabled="!scope.row.checked"
+              type='number'
+              style="width:100%;"
+              oninput="value = value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
+              :max='scope.row.max' :min='0'
+            />
           </template>
           <template v-else-if="column.field==='number'">
             {{scope.row.solvedVariation}}/{{scope.row.variation}}
