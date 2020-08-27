@@ -1,6 +1,13 @@
 /* eslint-disable no-empty-function */
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
+import { 
+  customerAddressSelectConversion,
+  customerSelectConversion,
+  customerLinkmanSelectConversion,
+  linkmanSelectConversion,
+  productSelectConversion 
+} from '@src/util/conversionFunctionUtil.ts';
 
 export default {
   /** 
@@ -12,13 +19,7 @@ export default {
 
       if (!result || !result.data) return;
 
-      result.list = result.data.map(address =>
-        Object.freeze({
-          label: address.province + address.city + address.dist + address.address,
-          value: address.id,
-          ...address
-        })
-      );
+      result.list = result.data.map(address => customerAddressSelectConversion(address));
       
       return result;  
 
@@ -36,13 +37,7 @@ export default {
 
       if (!result || !result.list) return;
 
-      result.list = result.list.map(customer =>
-        Object.freeze({
-          label: customer.name,
-          value: customer.id,
-          ...customer
-        })
-      )
+      result.list = result.list.map(customer => customerSelectConversion(customer));
 
       return result;
 
@@ -59,11 +54,7 @@ export default {
 
       if (!result || !result.data) return;
 
-      result.list = result.data.map(item => {
-        let { customer, id, isMain, name, phone } = item;
-        let label = `姓名：${name} 电话：${phone} 客户：${customer && customer.name}`;
-        return Object.freeze({ customer, id, isMain, name, phone, label, value: id });
-      })
+      result.list = result.data.map(linkman => customerLinkmanSelectConversion(linkman))
       
       return result;
 
@@ -82,13 +73,7 @@ export default {
       
       if (!result || !result.list) return;
 
-      result.list = result.list.map(linkman =>
-        Object.freeze({
-          label: linkman.name + linkman.phone,
-          value: linkman.id,
-          ...linkman
-        })
-      );
+      result.list = result.list.map(linkman => linkmanSelectConversion(linkman));
       
       return result;  
 
@@ -106,13 +91,7 @@ export default {
 
       if (!result || !result.list) return;
 
-      result.list = result.list.map(template =>
-        Object.freeze({
-          label: template.name,
-          value: template.id,
-          ...template
-        })
-      );
+      result.list = result.list.map(product => productSelectConversion(product));
       
       return result;  
 
