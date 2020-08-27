@@ -36,7 +36,6 @@ router.get('/', async ctx => {
   let reqHeaders = ctx.request.headers;
   let headers = {};
   let body = null;
-
   let result = await HttpClient.request('/', 'get', null, { headers: reqHeaders });
 
   // 请求失败,模拟登陆
@@ -100,7 +99,7 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.163',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=3a8344e7-bc4f-41cd-9c83-d1dd5a46106d'
+    'cookie': 'VIPPUBLINKJSESSIONID=a4d5f270-a011-4862-bf73-69046a56d90f'
   },
 }))
 
