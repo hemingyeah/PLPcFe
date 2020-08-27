@@ -100,6 +100,7 @@ export default {
       keyWord:'',
       selected:[],
       columns:this.buildColumns(),
+      pending:false
     }
   },
   props:{
@@ -144,14 +145,18 @@ export default {
   },
   methods:{
     handleNumChange(index,row){
+      this.pending=true;
       const decimals=Math.max(this.countDecimals(row.variation),this.countDecimals(row.solvedVariation));
       if(!(row.handleNum>=0 && row.handleNum<=(row.variation-row.solvedVariation).toFixed(decimals))){
         this.$message({
-          type:'waning',
+          type:'warning',
           message:'办理数量需为满足 大于0且小于等于申请量-已办数量 的数字'
         });
         row.handleNum=(row.variation-row.solvedVariation).toFixed(decimals);
       }
+      this.$nextTick(()=>{
+        this.pending=false;
+      })
     },
     buildColumns(){
       let localData = StorageUtil.get(STORAGE_MULHANDLE_KEY) || {};
@@ -269,7 +274,6 @@ export default {
         row.handleNum='';
         this.selected=[];
       }
-      console.log(this.selected);
     },
     // 全选
     selectAll(selection){
