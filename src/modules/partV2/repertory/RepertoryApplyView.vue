@@ -1389,6 +1389,18 @@ export default {
         this.$platform.alert('办理数量需为大于0的数字');
         return
       }
+      const existMore=form.selected.find(item=>{
+        const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+        const max=(item.variation-item.solvedVariation).toFixed(decimals);
+        return item.handleNum>max
+      });
+      if(existMore){
+        this.$message({
+          type:'warning',
+          message:'办理数量需为满足 大于0且小于等于申请量-已办数量 的数字'
+        });
+        return
+      }
 
       if(this.pending) return;
 
@@ -1427,6 +1439,11 @@ export default {
           type: 'error'
         });
       })
+    },
+    // 获取小数位数
+    countDecimals(num){
+      if(Math.floor(num)===num) return 0;
+      return num.toString().split('.')[1].length || 0;
     },
     formmatTime(time){
       const t=new Date(time);

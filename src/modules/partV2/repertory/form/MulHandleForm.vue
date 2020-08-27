@@ -53,7 +53,6 @@
           <template v-if="column.field==='handleNum'">
             <input
               v-model="scope.row.handleNum"
-              @change="handleNumChange(scope.$index,scope.row)"
               :disabled="!scope.row.checked"
               type='number'
               style="width:100%;"
