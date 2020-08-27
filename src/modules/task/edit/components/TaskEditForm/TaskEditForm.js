@@ -5,6 +5,7 @@ import EditContactDialog from '@src/modules/customer/view/operationDialog/EditCo
 import _ from 'lodash';
 import * as FormUtil from '@src/component/form/util'
 import { findComponentDownward } from '@src/util/assist'
+import { getFieldValue2string } from '@service/TaskService.ts';
 /* Vue */
 import props from './props'
 import data from './data'
@@ -408,6 +409,8 @@ export default {
           this.relationFieldUpdateHandler(
             isCustomerRelation ? customerInfo : productInfo,
             relationFields,
+            isCustomerRelation ? relateCustomerFields : relateProductFields,
+            isCustomerRelation
           );
 
         } else {
@@ -422,15 +425,15 @@ export default {
     /** 
      * @description 关联显示项字段更新处理
     */
-    relationFieldUpdateHandler(info, relationFields = []) {
-      console.log('hbc: relationFieldUpdateHandler -> info', info)
-      console.log('hbc: relationFieldUpdateHandler -> relationFields', relationFields)
+    relationFieldUpdateHandler(info, relationFields = [], customerOrPorductFields = [], isCustomerRelation = true) {
       let fieldName = '';
+      let formType = '';
       let fieldValue = '';
 
       relationFields.forEach(relationField => {
         fieldName = relationField?.setting?.fieldName;
-        fieldValue = info[fieldName] || info.attribute?.[fieldName] || '';
+        formType = relationField?.setting?.formType;
+        fieldValue = getFieldValue2string(info, fieldName, formType, customerOrPorductFields, isCustomerRelation);
 
         this.update({ field: relationField, newValue: fieldValue });
       })

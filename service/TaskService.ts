@@ -14,18 +14,19 @@ import {
  * @param {Object} data
  * @param {string} fieldName
  * @param {string} formType
+ * @param {Array} fields 字段列表
  * @return
 */
-export function getFieldValue2string(data: any, fieldName: string, formType: string, module: string = CommonMappingEnum.Customer): string {
+export function getFieldValue2string(data: any, fieldName: string, formType: string, fields = [], isCustomerRelation: Boolean): string {
 	// 判断字段名称是否存在
 	if (!fieldName) return '';
 	// 是否是客户模块，暂时先这么判断
-	let isCustomerModule = module === CommonMappingEnum.Customer;
+	let isCustomerModule = isCustomerRelation;
 
   return (
-		isCustomerModule 
-		? getCustomerFieldValue2string(data, fieldName, formType) 
-		: getProductFieldValue2string(data, fieldName, formType)
+		isCustomerModule
+		? getCustomerFieldValue2string(data, fieldName, formType, fields) 
+		: getProductFieldValue2string(data, fieldName, formType, fields)
 	)
 }
 
@@ -34,14 +35,14 @@ export function getFieldValue2string(data: any, fieldName: string, formType: str
  * @param {Object} data 数据
  * @param {string} fieldName 字段名称
  * @param {string} formType 字段类型
+ * @param {Array} fields 字段列表
  * @return
 */
-function getCustomerFieldValue2string(data: any, fieldName: string, formType: string): string {
+function getCustomerFieldValue2string(data: any, fieldName: string, formType: string, fields = []): string {
 	// 客户数据
 	const Customer: any = data || {};
 	// 返回结果
 	let result: string = '';
-	
 	// 团队
 	if (fieldName == CustomerFieldNameMappingEnum.Tags) {
 		let tags = Customer[CustomerFieldNameMappingEnum.Tags] || [];
@@ -63,6 +64,11 @@ function getCustomerFieldValue2string(data: any, fieldName: string, formType: st
 			let addressData = Attribute[fieldName];
 			result = addressData.all || '';
 		}
+		// 说明信息类型
+		else if (formType == FieldTypeMappingEnum.Info) {
+			let infoField = fields.filter(field => field.fieldName == fieldName);
+			result = infoField?.[0]?.placeholder || '';
+		}
 		// 位置类型
 		else if (formType == FieldTypeMappingEnum.Location) {
 			let locationData = Attribute[fieldName];
@@ -70,7 +76,9 @@ function getCustomerFieldValue2string(data: any, fieldName: string, formType: st
 		}
 		// 其他自定义字段
 		else {
-			result = Attribute[fieldName] || '';
+			let attributeValue =  Attribute[fieldName];
+			let isStringArray = Array.isArray(attributeValue) && attributeValue.every(item => typeof item === 'string');
+			result = isStringArray ? attributeValue.join(',') : attributeValue || '';
 		}
 	}
 
@@ -82,9 +90,10 @@ function getCustomerFieldValue2string(data: any, fieldName: string, formType: st
  * @param {Object} data 数据
  * @param {string} fieldName 字段名称
  * @param {string} formType 字段类型
+ * @param {Array} fields 字段列表
  * @return
 */
-function getProductFieldValue2string(data: any, fieldName: string, formType: string): string {
+function getProductFieldValue2string(data: any, fieldName: string, formType: string, fields = []): string {
 		// 产品数据
 	const Product: any = data || {};
 	// 返回结果
@@ -106,6 +115,11 @@ function getProductFieldValue2string(data: any, fieldName: string, formType: str
 			let addressData = Attribute[fieldName];
 			result = addressData.all || '';
 		}
+		// 说明信息类型
+		else if (formType == FieldTypeMappingEnum.Info) {
+			let infoField = fields.filter(field => field.fieldName == fieldName);
+			result = infoField?.[0]?.placeholder || '';
+		}
 		// 位置类型
 		else if (formType == FieldTypeMappingEnum.Location) {
 			let locationData = Attribute[fieldName];
@@ -113,7 +127,9 @@ function getProductFieldValue2string(data: any, fieldName: string, formType: str
 		}
 		// 其他自定义字段
 		else {
-			result = Attribute[fieldName] || '';
+			let attributeValue =  Attribute[fieldName];
+			let isStringArray = Array.isArray(attributeValue) && attributeValue.every(item => typeof item === 'string');
+			result = isStringArray ? attributeValue.join(',') : attributeValue || '';
 		}
 	}
 	
