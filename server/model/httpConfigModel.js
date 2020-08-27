@@ -5,8 +5,8 @@ const DEFAULT_OPIONS = {
   host: '127.0.0.1',
   port: 8080,
   headers: {
-    cookie: "VIPPUBLINKJSESSIONID=7da3a367-0cce-40f6-a678-1b43a6c0b382",
-    "Content-Type" : "application/json"
+    cookie: "VIPPUBLINKJSESSIONID=b0cac679-ac9e-4fbd-909d-1de94fd567df",
+    // "Content-Type" : "application/json"
   },
 };
 // https agent
