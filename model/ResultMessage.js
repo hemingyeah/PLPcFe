@@ -1,6 +1,6 @@
 class ResultMessage{
   constructor(status, message, data){
-    //成功 - 0 失败 - 1
+    // 成功 - 0 失败 - 1
     this.status = status;
     this.message = message;
 
