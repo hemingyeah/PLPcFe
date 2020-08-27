@@ -36,8 +36,11 @@ router.get('/setting/performance/v2/rule', async ctx => {
 router.get('/setting/task/field/task', async ctx => {
   let modConfig = modules['setting.task.fields'];
   let script = ['/setting.task.fields.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
   
-  ctx.body = Template.renderWithData('工单表单设置', {}, script, modConfig.template)
+  ctx.body = Template.renderWithData('工单表单设置', body, script, modConfig.template)
 });
 
 router.get('/setting/task/field/taskReceipt', async ctx => {
