@@ -102,3 +102,13 @@
   position: relative;
 }
 // E 新建 and 删除
+
+// S 头部
+.select-list {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  &-item {
+    padding: 5px 10px;
+  }
+}
+// E 头部

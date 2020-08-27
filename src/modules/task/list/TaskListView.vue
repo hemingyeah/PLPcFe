@@ -188,6 +188,9 @@
     <!-- start header -->
     <div class="common-list-header">
       <form class="common-list-header-search" onsubmit="return false;">
+        <div class="task-font12 select-list task-flex">
+          <div v-for="(item, index) in selectList" :key="index" class="select-list-item">{{item.name}}</div>
+        </div>
         <div class="common-list-header-search-group">
           <el-input
             v-model="params.keyword"
@@ -256,6 +259,12 @@
         </div>
 
         <div class="action-button-group">
+          <!-- 批量编辑 S-->
+          <!-- initData.loginUser.authorities.TASK_EDIT === 3 -->
+          <span class="el-dropdown-link el-dropdown-btn" @click="Alledit" v-if="initData.loginUser && initData.loginUser.authorities.TASK_EDIT === 3"
+            >批量编辑</span
+          >
+          <!-- 批量编辑 E-->
           <!-- start 工单类型 -->
           <el-dropdown trigger="click">
             <span
@@ -276,8 +285,7 @@
           <!-- end 工单类型 -->
 
           <!-- start 更多操作 -->
-          <!-- v-if="exportPermission" -->
-          <el-dropdown trigger="click">
+          <el-dropdown trigger="click" v-if="exportPermission">
             <span
               class="el-dropdown-link el-dropdown-btn"
               @click="trackEventHandler('moreAction')"
@@ -295,7 +303,6 @@
             </el-dropdown-menu>
           </el-dropdown>
           <!-- end 更多操作 -->
-
           <span
             class="el-dropdown-link el-dropdown-btn"
             @click="showAdvancedSetting"
@@ -602,6 +609,15 @@
       :otherText="otherText"
     />
     <!-- E 存为视图弹框 -->
+    <!-- S 批量编辑 -->
+
+      <batch-editing-customer-dialog
+      ref="batchEditingCustomerDialog"
+      :config="{fields: initData.allFieldInfo, currentTaskType: currentTaskType}"
+      :selectedIds="selectedIds"
+      @update="updatEedit"
+    ></batch-editing-customer-dialog>
+    <!-- E 批量编辑 -->
   </div>
 </template>
 

@@ -569,7 +569,7 @@ export function getTaskCountByState(params: {} | undefined) {
  * @param {String} params.tsmStr
  */
 export function createView(params: {} | undefined) {
-  return http.post('/task/createView', params)
+  return http.post(`${fixedPrefixAppPath}/outside/pc/view/createTaskView`, params)
 }
 
 /**
@@ -582,7 +582,7 @@ export function createView(params: {} | undefined) {
  * @param {String} params.tsmStr
  */
 export function editView(params: {} | undefined) {
-  return http.post('/task/editView', params)
+  return http.post(`${fixedPrefixAppPath}/outside/pc/view/editTaskView`, params)
 }
 
 /**
@@ -591,7 +591,7 @@ export function editView(params: {} | undefined) {
  * @param {String} params.editViewId -视图id
  */
 export function deleteView(params: {} | undefined) {
-  return http.get('/task/deleteView', params)
+  return http.get(`${fixedPrefixAppPath}/outside/pc/view/deleteOneView`, params)
 }
 
 /**
@@ -766,5 +766,12 @@ export function getRelatedInfo(params: {} | undefined) {
  */
 export function withPart(params: Object = {}) {
   return http.get(`/task/filter/withPart?${params}`)
+}
+
+/**
+ * @description 批量更新
+ */
+export function editBatchTask(params: Object = {}) {
+  return http.post('/outside/pc/task/editBatchTask', params)
 }
 /* -------------  end  新工单api ---------------- */
