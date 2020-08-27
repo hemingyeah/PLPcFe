@@ -71,7 +71,7 @@ export function packToTask(fields, form){
 
     if (fieldName === 'attachment') {
       // 拼附件和回执附件
-      value = value.concat(form.receiptAttachment);
+      value = value.concat(form.receiptAttachment).filter(attachment => !!attachment);
     }
     
     isSystem == 0
