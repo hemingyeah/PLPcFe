@@ -59,7 +59,7 @@
               style="width:100%;"
               oninput="value = value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
               :max='scope.row.max'
-              :min='0.01'
+              :min='0'
             />
           </template>
           <template v-else-if="column.field==='number'">
@@ -151,13 +151,6 @@ export default {
           message:'办理数量需为满足 大于0且小于等于申请量-已办数量 的数字'
         });
         row.handleNum=(row.variation-row.solvedVariation).toFixed(decimals);
-      }
-      if(row.handleNum==0){
-        this.$message({
-          type:'warning',
-          message:'办理数量需为大于0的数字'
-        });
-        row.handleNum=0.01;
       }
     },
     buildColumns(){
