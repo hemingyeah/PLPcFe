@@ -11,7 +11,7 @@ import data from './data'
 import computed from './computed'
 import methods from './methods'
 /* enum */
-import { FieldNameMappingEnum } from '@src/model/enum/MappingEnum.ts'
+import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
 /* constant */
 import { 
   TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE,
@@ -200,7 +200,7 @@ export default {
       let { id, value } = this.selectedCustomer;
       let customerId = id || value;
 
-      if (!customerId && action != FieldNameMappingEnum.Customer) {
+      if (!customerId && action != TaskFieldNameMappingEnum.Customer) {
         this.$platform.alert('请先选择客户');
         return;
       }
@@ -378,9 +378,9 @@ export default {
      * @description 关联显示项字段选择处理
      * @param {string} type customer/product
     */
-    async relationFieldSelectHandler(type = FieldNameMappingEnum.Customer) {
+    async relationFieldSelectHandler(type = TaskFieldNameMappingEnum.Customer) {
       // 判断类型是否存在
-      let types = [FieldNameMappingEnum.Customer, FieldNameMappingEnum.Customer.Product];
+      let types = [TaskFieldNameMappingEnum.Customer, TaskFieldNameMappingEnum.Customer.Product];
       if(types.indexOf(type) < 0) {
         return console.warn(`Caused: relationFieldHandler params.type is not in ${types}`)
       }
@@ -397,13 +397,13 @@ export default {
           customerId: this.selectedCustomer?.value || '',
           productId: this.selectProduct?.value || ''
         }
-        let res = await this.fetchTaskTemplateFields(params);
+        let res = await this.fetchRelatedInfo(params);
         let isSuccess = res.success;
 
         if (isSuccess) {
           let result = res.result || {};
           let { customerInfo, productInfo, relateCustomerFields, relateProductFields } = result;
-          let isCustomerRelation = type == FieldNameMappingEnum.Customer;
+          let isCustomerRelation = type == TaskFieldNameMappingEnum.Customer;
 
           this.relationFieldUpdateHandler(
             isCustomerRelation ? customerInfo : productInfo,
@@ -423,11 +423,13 @@ export default {
      * @description 关联显示项字段更新处理
     */
     relationFieldUpdateHandler(info, relationFields = []) {
+      console.log('hbc: relationFieldUpdateHandler -> info', info)
+      console.log('hbc: relationFieldUpdateHandler -> relationFields', relationFields)
       let fieldName = '';
       let fieldValue = '';
 
       relationFields.forEach(relationField => {
-        fieldName = relationField.fieldName;
+        fieldName = relationField?.setting?.fieldName;
         fieldValue = info[fieldName] || info.attribute?.[fieldName] || '';
 
         this.update({ field: relationField, newValue: fieldValue });
@@ -512,7 +514,7 @@ export default {
         }
 
         // 查询关联工单数量
-        this.fetchCountForCreate({ module: FieldNameMappingEnum.Customer, id: selectedCustomerId });
+        this.fetchCountForCreate({ module: TaskFieldNameMappingEnum.Customer, id: selectedCustomerId });
 
       } catch (error) {
         console.warn('task-edit-form: updateCustomer -> error', error);
@@ -589,7 +591,7 @@ export default {
         // 只有一个产品 且 客户存在
         if (isOnlyOneProduct && isHaveCustomer) {
           // 产品关联字段数据
-          this.relationFieldSelectHandler(FieldNameMappingEnum.Product);
+          this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
           // 产品关联联系人地址
           this.productBindLinkmanAndAddressHandler(product);
         }
@@ -609,7 +611,7 @@ export default {
 
         if(isOnlyOneProduct) {
           // 查询关联工单数量
-          this.fetchCountForCreate({ module: FieldNameMappingEnum.Product, id: product.id });
+          this.fetchCountForCreate({ module: TaskFieldNameMappingEnum.Product, id: product.id });
         }
 
       } catch (error) {

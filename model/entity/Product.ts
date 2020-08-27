@@ -1,10 +1,10 @@
 interface Product {
   // id
-  id ?: String;
+  id ?: string;
   // 产品名称
-  name ?: String;
+  name ?: string;
   // 产品编号
-  serialNumber ?: String;
+  serialNumber ?: string;
 }
 
 export default Product

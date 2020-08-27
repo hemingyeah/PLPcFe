@@ -276,7 +276,8 @@
           <!-- end 工单类型 -->
 
           <!-- start 更多操作 -->
-          <el-dropdown trigger="click" >
+          <!-- v-if="exportPermission" -->
+          <el-dropdown trigger="click">
             <span
               class="el-dropdown-link el-dropdown-btn"
               @click="trackEventHandler('moreAction')"

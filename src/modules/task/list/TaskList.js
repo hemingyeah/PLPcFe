@@ -373,13 +373,11 @@ export default {
      */
     async delTask() {
       const { selectedIds, $platform } = this;
-      let params = {};
-      let ids = []
-      selectedIds.map((item) => {
-        params = {
-          ...{taskIds: item}
-        }
-      })
+      let params = selectedIds
+        .map((item) => {
+          return `taskIds=${item}`;
+        })
+        .join("&");
       if (!selectedIds.length) {
         $platform.alert("请选择需要删除的数据");
         return;
@@ -407,9 +405,9 @@ export default {
           let confirm = await this.$platform.confirm(warningMsg);
           if (confirm) {
             // 删除工单
-            const { success } = await TaskApi.deleteTask(params);
+            const { success } = await TaskApi.deleteTask(selectedIds);
             if (success) {
-              this.searchList();
+              this.initialize();
             }
           }
         }
@@ -674,22 +672,32 @@ export default {
       let exportSearchModel = {
         ids: exportAll ? [] : ids,
         keyword: Params.keyword,
-        pageSize: exportAll ? 0 : Params.pageSize,
-        page: exportAll ? 1 : Params.pageNum,
         typeId: this.currentTaskType.id,
         ...Params.moreConditions,
+        ...this.searchParams
       };
-
       let params = {
         exportSearchModel: JSON.stringify({}),
       };
-      params['data'] = exportSearchModel.ids.join(',')
-      params['typeId'] = exportSearchModel.typeId
-      params["receiptChecked"] = receiptChecked.map((item) => {return item}).join(',')
-      params['sysChecked'] = systemChecked.map((item) => {return item}).join(',')
-      params['checked'] = taskChecked.map((item) => {return item}).join(',')
-     
-      return params
+      params["data"] = this.selectedIds.join(",");
+      params["typeId"] = exportSearchModel.typeId;
+      params["receiptChecked"] = receiptChecked
+        .map((item) => {
+          return item;
+        })
+        .join(",");
+      params["sysChecked"] = systemChecked
+        .map((item) => {
+          return item;
+        })
+        .join(",");
+      params["checked"] = taskChecked
+        .map((item) => {
+          return item;
+        })
+        .join(",");
+
+      return params;
     },
     /**
      * @description 构建搜索参数

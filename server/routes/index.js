@@ -88,15 +88,6 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-
-// router.use('/outside', ctx => HttpClient.proxy(ctx, {
-//   host: '30.40.56.82',
-//   port: 10007,
-//   headers: {
-//     'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
-//   }
-// }))
-
 router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.211',
   port: 10007,
@@ -109,7 +100,15 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.163',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=438873b8-5319-4113-9035-60cb5baac58f'
+    'cookie': 'VIPPUBLINKJSESSIONID=3a8344e7-bc4f-41cd-9c83-d1dd5a46106d'
+  },
+}))
+
+router.use('/outside/pc/task/delete', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.59.137',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=316e588e-fe61-486d-9cb8-d90e9afa5d91'
   },
 }))
 
@@ -119,14 +118,6 @@ router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   port: 10002,
   headers: {
     'cookie': 'VIPPUBLINKJSESSIONID=f560fed5-4bc4-4ff0-8638-e6666c18a31a; JSESSIONID=5442CD36355252A20E2CC1DAB778E536; __wpkreporterwid_=a99f79d5-3645-407a-3bf8-d6774e411773'
-  },
-}))
-
-router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
-  host: '127.0.0.1',
-  port: 8080,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=91d3c950-e301-4ef1-b714-e40f62d2257f'
   },
 }))
 
@@ -150,9 +141,9 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
+router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', ctx => HttpClient.proxy(ctx))
-router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)

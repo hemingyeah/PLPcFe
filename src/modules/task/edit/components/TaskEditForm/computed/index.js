@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { FieldNameMappingEnum } from '@src/model/enum/MappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
 
 export default {
   /* 客户字段 */
@@ -15,7 +15,7 @@ export default {
   },
   /* 客户关联工单的数量数据 */
   customerRelevanceTaskCountData() {
-    return this.relevanceTaskCountData[FieldNameMappingEnum.Customer];
+    return this.relevanceTaskCountData[TaskFieldNameMappingEnum.Customer];
   },
   /** 
    * @description 是否显示 客户关联的工单数量 按钮 
@@ -58,7 +58,7 @@ export default {
   },
   /* 产品关联工单的数量数据 */
   productRelevanceTaskCountData() {
-    return this.relevanceTaskCountData[FieldNameMappingEnum.Product];
+    return this.relevanceTaskCountData[TaskFieldNameMappingEnum.Product];
   },
   // 选择的客户值
   selectedCustomer(){

@@ -104,6 +104,7 @@ module.exports = {
       'vue$': 'vue/dist/vue.esm.js',
       '@src': path.join(__dirname, '../src'),
       '@model': path.join(__dirname, '../model'),
+      '@service': path.join(__dirname, '../service'),
       'src': path.join(__dirname, '../src'),
       'packages': path.join(__dirname, '../packages'),
       'element-scss': path.join(__dirname, '../node_modules/element-ui/packages/theme-chalk/src')

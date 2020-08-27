@@ -1,5 +1,5 @@
 /* 字段映射 */
-export enum FieldNameMappingEnum {
+export enum TaskFieldNameMappingEnum {
   Address = 'address',
   Customer = 'customer',
   Linkman = 'linkman',

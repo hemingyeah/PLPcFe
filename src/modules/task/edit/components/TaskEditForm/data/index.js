@@ -1,4 +1,4 @@
-import { FieldNameMappingEnum } from '@src/model/enum/MappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
 
 export default {
   // 新建客户弹窗
@@ -15,8 +15,8 @@ export default {
   productInitData: {},
   // 关联的工单数量数据
   relevanceTaskCountData: {
-    [FieldNameMappingEnum.Customer]: { all: 0, unfinished: 0 },
-    [FieldNameMappingEnum.Product]: { all: 0, unfinished: 0 },
+    [TaskFieldNameMappingEnum.Customer]: { all: 0, unfinished: 0 },
+    [TaskFieldNameMappingEnum.Product]: { all: 0, unfinished: 0 },
   },
   // 当前选择的工单类型
   selectedType: {},
