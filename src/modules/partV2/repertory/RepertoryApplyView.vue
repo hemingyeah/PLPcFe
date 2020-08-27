@@ -1375,6 +1375,7 @@ export default {
     // 批量办理-保存
     mulHandleSave(){
       let form=this.$refs.mulHandleForm;
+      if(form.pending) return
       if(form.selected.length===0){
         this.$platform.alert('请选择要办理的数据');
         return
