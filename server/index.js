@@ -36,5 +36,4 @@ server.init = async function(){
   server.use(router.allowedMethods())
 }
 
-
 module.exports = server;

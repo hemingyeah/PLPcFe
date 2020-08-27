@@ -143,6 +143,21 @@ const MODE_MANAGER = {
   }
 }
 
+/** 获取字段 */
+FormFieldMap.get = function(formType){
+  let field = FormFieldMap[formType];
+
+  if(field && field.alias){
+    let aliasField = FormFieldMap[field.alias];
+    field.preview = aliasField.preview;
+    field.setting = aliasField.setting;
+    field.build = aliasField.build;
+    field.extend = aliasField.extend || {};
+  }
+
+  return field;
+}
+
 const FieldManager = {
   /** 根据mode获取字段 */
   findModeFields(mode = 'base'){
@@ -159,7 +174,7 @@ const FieldManager = {
   },
   /** 根据字段类型获取单个字段 */
   findField(formType){
-    let field = FormFieldMap[formType];
+    let field = FormFieldMap.get(formType);
 
     if(field && field.alias){
       let aliasField = FormFieldMap[field.alias];
