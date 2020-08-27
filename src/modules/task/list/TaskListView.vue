@@ -256,6 +256,12 @@
         </div>
 
         <div class="action-button-group">
+          <!-- 批量编辑 S-->
+          <!-- initData.loginUser.authorities.TASK_EDIT === 3 -->
+          <span class="el-dropdown-link el-dropdown-btn" @click="Alledit"
+            >批量编辑</span
+          >
+          <!-- 批量编辑 E-->
           <!-- start 工单类型 -->
           <el-dropdown trigger="click">
             <span
@@ -276,8 +282,7 @@
           <!-- end 工单类型 -->
 
           <!-- start 更多操作 -->
-          <!-- v-if="exportPermission" -->
-          <el-dropdown trigger="click">
+          <el-dropdown trigger="click" v-if="exportPermission">
             <span
               class="el-dropdown-link el-dropdown-btn"
               @click="trackEventHandler('moreAction')"
@@ -295,7 +300,6 @@
             </el-dropdown-menu>
           </el-dropdown>
           <!-- end 更多操作 -->
-
           <span
             class="el-dropdown-link el-dropdown-btn"
             @click="showAdvancedSetting"
@@ -602,6 +606,13 @@
       :otherText="otherText"
     />
     <!-- E 存为视图弹框 -->
+    <!-- S 批量编辑 -->
+
+      <batch-editing-customer-dialog
+      ref="batchEditingCustomerDialog"
+      :config="{fields: initData.allFieldInfo, defaultAddress: defaultAddress}"
+    ></batch-editing-customer-dialog>
+    <!-- E 批量编辑 -->
   </div>
 </template>
 

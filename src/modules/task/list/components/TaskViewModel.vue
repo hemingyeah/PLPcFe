@@ -82,19 +82,24 @@ export default {
         return;
       }
       // 保存
-      TaskApi.createView(params).then((res) => {
+      TaskApi.createView({
+        ...view,
+        searchModel: region.searchModel,
+        selectedCols: region.selectedCols
+      }).then((res) => {
         this.success(res);
       });
     },
     // 删除
     deleteViewBtn() {
-      TaskApi.deleteView({ viewId: this.region.editViewId }).then((res) => {
+      TaskApi.deleteView({ viewId: this.region.viewId }).then((res) => {
         this.success(res, "del");
       });
     },
     // 成功后的操作
     success({ status, message }, type) {
       if (status === 0) {
+        this.visible = false;
         if (type === "del") {
           this.$platform.alert("删除成功");
         } else {
