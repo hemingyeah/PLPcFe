@@ -247,6 +247,10 @@ const FormDesign = {
     },
     /** 更新字段依赖 */
     updateDependencies(target){
+
+      console.log("更新字段依赖")
+      console.log(target)
+
       let fieldMap = {};
       for(let i = 0; i < this.value.length; i++) {
         fieldMap[this.value[i].fieldName] = this.value[i];
@@ -562,15 +566,27 @@ const FormDesign = {
     },
     /** 删除字段 */
     async deleteField(item) {
+
       let tip = item.isSystem == 0 ? '删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除？' : '该字段为系统内置字段，请确认是否删除？'
       if (!await Platform.confirm(tip)) return;
       let isNext = true;
       //mode:task为工单设置form
       //mode:task_receipt为回执工单设置form
-      if((this.mode == "task" || this.mode == "task_receipt")
-          && (item.formType == "user" && item.id)) {
-        isNext = await this.deleteUser(item);
+
+      if((this.mode == "task" || this.mode == "task_receipt") && item.id) {
+        //item.id表明该字段已经在后端存储过，不是本次的新增字段
+        if(item.formType == "user") {
+          //删除的是人员，先check是否在审批流程中
+          isNext = await this.deleteUser(item,this.deleteFormField);
+        }else{
+          isNext = await this.deleteFormField(item);
+        }
       }
+
+      // if((this.mode == "task" || this.mode == "task_receipt")
+      //     && (item.formType == "user" && item.id)) {
+      //   isNext = await this.deleteUser(item);
+      // }
 
       if(!isNext) {
         return false;
@@ -589,8 +605,7 @@ const FormDesign = {
         this.emitInput(value)
       }
     },
-    async deleteUser(item) {
-      // let result = await http.post("/setting/fieldInfo/check", { id : item.id },false);
+    async deleteUser(item,callback) {
       let result = await checkUser({id : item.id});
       if(result.status == 0) {
         if(result.data && result.data.show == 1) {
@@ -598,14 +613,14 @@ const FormDesign = {
           let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果删除，对应的审批流程将设置为“无需审批”，确定要删除吗？');
           if(confirm) {
             //取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
-            // let result = await  http.post("/setting/fieldInfo/delete2",{ id : item.id },false);
-            let result = await deleteComponent({ id : item.id });
-            if(result.code) {
-              this.$platform.alert(result.message);
-              return false;
-            }else{
-              return true;
-            }
+            return callback(item);
+            // let result = await deleteComponent({ id : item.id });
+            // if(result.code) {
+            //   this.$platform.alert(result.message);
+            //   return false;
+            // }else{
+            //   return true;
+            // }
           }else{
             return false;
           }
@@ -616,6 +631,16 @@ const FormDesign = {
         return false;
       }
 
+    },
+
+    async deleteFormField(item) {
+      let result = await deleteComponent({ id : item.id });
+      if(result.code) {
+        this.$platform.alert(result.message);
+        return false;
+      }else{
+        return true;
+      }
     },
 
     /** 添加新字段 */
