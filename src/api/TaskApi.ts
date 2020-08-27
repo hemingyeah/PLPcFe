@@ -767,4 +767,11 @@ export function getRelatedInfo(params: {} | undefined) {
 export function withPart(params: Object = {}) {
   return http.get(`/task/filter/withPart?${params}`)
 }
+
+/**
+ * @description 批量更新
+ */
+export function editBatchTask(params: Object = {}) {
+  return http.post('/outside/pc/task/editBatchTask', params)
+}
 /* -------------  end  新工单api ---------------- */

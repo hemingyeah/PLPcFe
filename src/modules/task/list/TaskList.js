@@ -5,7 +5,7 @@ import * as TaskApi from "@src/api/TaskApi.ts";
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";
 import TaskSelect from "./components/TaskSelect.vue";
 import TaskViewModel from "./components/TaskViewModel.vue";
-import BatchEditingCustomerDialog from './components/BatchEditingCustomerDialog.vue'
+import BatchEditingCustomerDialog from "./components/BatchEditingCustomerDialog.vue";
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum";
 import { fields, selectIds, advancedList } from "./TaskFieldModel";
@@ -16,7 +16,7 @@ import _ from "lodash";
 import Page from "@model/Page";
 import { storageGet, storageSet } from "@src/util/storage";
 import { formatDate } from "@src/util/lang";
-import { getRootWindow } from '@src/util/dom';
+import { getRootWindow } from "@src/util/dom";
 
 /* constants */
 const TASK_LIST_KEY = "task_list";
@@ -63,7 +63,12 @@ export default {
       advanceds: advancedList, //高级搜索列表
       searchParams: {}, //筛选列表的参数
       allSearchParams: {}, //全部工单搜索条件
-      defaultAddress: [],
+      selectList: [
+        { name: "全部" },
+        { name: "我创建的" },
+        { name: "我负责的" },
+        { name: "我协同的" },
+      ], //头部筛选列表
       columns: [],
       columnNum: 1,
       currentTaskType: {},
@@ -277,15 +282,9 @@ export default {
     },
   },
   mounted() {
-    const { taskView, customerAddressConfig } = this.initData;
-    const {
-      adProvince,
-      adCity,
-      adDist
-    } = customerAddressConfig;
+    const { taskView } = this.initData;
 
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
-    this.defaultAddress = [adProvince, adCity, adDist];
     this.taskView = taskView;
     this.currentTaskType = this.taskTypes[0];
 
@@ -493,17 +492,23 @@ export default {
      * @description 批量编辑
      */
     Alledit() {
-      const {currentTaskType, selectedIds} = this
+      const { currentTaskType, selectedIds } = this;
       if (!currentTaskType.id) {
-        this.$platform.alert('请选择工单类型');
-        return
+        this.$platform.alert("请选择工单类型");
+        return;
       }
       if (!selectedIds.length) {
-        this.$platform.alert('请选择需要批量编辑的工单');
-        return
+        this.$platform.alert("请选择需要批量编辑的工单");
+        return;
       }
-      window.TDAPP.onEvent("pc：工单列表-批量编辑工单")
-      this.$refs.batchEditingCustomerDialog.open()
+      window.TDAPP.onEvent("pc：工单列表-批量编辑工单");
+      this.$refs.batchEditingCustomerDialog.open();
+    },
+    /**
+     * @description 批量编辑成功
+     */
+    updatEedit() {
+      this.initialize();
     },
     /**
      * 存为视图和编辑视图
@@ -556,6 +561,7 @@ export default {
           // 把选中的匹配出来
           // this.matchSelected();
           console.log("工单列表渲染数据", data);
+          this.selectedIds = [];
           return data;
         })
         .then(() => {
@@ -698,8 +704,8 @@ export default {
         taskIds: this.selectedIds,
         tagIds: loginUser.tagIds,
         dataLevel: loginUser.authorities.TASK_VIEW,
-        tenantId: rootWindow._init.user.tenantId
-      }
+        tenantId: rootWindow._init.user.tenantId,
+      };
       let exportAll = !ids || !ids.length;
 
       let exportSearchModel = {
@@ -709,7 +715,7 @@ export default {
       let params = {
         exportSearchModel: exportAll ? JSON.stringify(all) : JSON.stringify({}),
       };
-      params["data"] = exportAll ? '' : this.selectedIds.join(",");
+      params["data"] = exportAll ? "" : this.selectedIds.join(",");
       params["typeId"] = exportSearchModel.typeId;
       params["receiptChecked"] = receiptChecked
         .map((item) => {
@@ -1370,8 +1376,9 @@ export default {
           keyword: params.keyword,
           page: params.page,
           pageSize: params.pageSize,
+          templateId: this.currentTaskType.id,
         };
-        this.searchParams = {...this.searchParams, ...par };
+        this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/
       } else {
         this.$refs.searchPanel.resetParams();
@@ -1408,6 +1415,8 @@ export default {
         // 结算时间
         searchModel.closeTimeStart = this._time(searchModel.closeTimeStart);
         searchModel.closeTimeEnd = this._time(searchModel.closeTimeEnd);
+
+        searchModel.templateId = this.currentTaskType.id;
         this.searchParams = { ...searchModel };
       }
       this.searchList();

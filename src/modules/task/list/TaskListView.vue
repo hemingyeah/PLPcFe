@@ -188,6 +188,9 @@
     <!-- start header -->
     <div class="common-list-header">
       <form class="common-list-header-search" onsubmit="return false;">
+        <div class="task-font12 select-list task-flex">
+          <div v-for="(item, index) in selectList" :key="index" class="select-list-item">{{item.name}}</div>
+        </div>
         <div class="common-list-header-search-group">
           <el-input
             v-model="params.keyword"
@@ -258,7 +261,7 @@
         <div class="action-button-group">
           <!-- 批量编辑 S-->
           <!-- initData.loginUser.authorities.TASK_EDIT === 3 -->
-          <span class="el-dropdown-link el-dropdown-btn" @click="Alledit"
+          <span class="el-dropdown-link el-dropdown-btn" @click="Alledit" v-if="initData.loginUser && initData.loginUser.authorities.TASK_EDIT === 3"
             >批量编辑</span
           >
           <!-- 批量编辑 E-->
@@ -610,7 +613,9 @@
 
       <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
-      :config="{fields: initData.allFieldInfo, defaultAddress: defaultAddress}"
+      :config="{fields: initData.allFieldInfo, currentTaskType: currentTaskType}"
+      :selectedIds="selectedIds"
+      @update="updatEedit"
     ></batch-editing-customer-dialog>
     <!-- E 批量编辑 -->
   </div>
