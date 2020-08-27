@@ -36,9 +36,4 @@ server.init = async function(){
   server.use(router.allowedMethods())
 }
 
-// 初始化server
-server.init();
-// 启动server 4300 方便本地调试的
-server.listen(4300);
-
 module.exports = server;
