@@ -1142,7 +1142,7 @@ export default {
       sparepartType: '',
       targetIds: [],
       sourceIds: [],
-      state: ['suspending']
+      state: ['suspending','dealing']
     };
 
     return {
