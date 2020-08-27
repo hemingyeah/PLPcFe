@@ -1383,7 +1383,7 @@ export default {
         this.$platform.alert('办理意见不能超过500字');
         return
       }
-      const existZero=form.selected.find(item=>item.solvedVariation==0);
+      const existZero=form.selected.find(item=>item.handleNum==0);
       if(existZero){
         this.$platform.alert('办理数量需为大于0的数字');
         return
