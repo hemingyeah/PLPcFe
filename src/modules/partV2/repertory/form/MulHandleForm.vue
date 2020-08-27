@@ -51,7 +51,6 @@
       >
         <template slot-scope="scope">
           <template v-if="column.field==='handleNum'">
-            <!-- <el-input v-model="scope.row.handleNum" @change="handleNumChange(scope.$index,scope.row)" :disabled="!scope.row.checked" type='number' :max='scope.row.max' :min='0'></el-input> -->
             <input
               v-model="scope.row.handleNum"
               @change="handleNumChange(scope.$index,scope.row)"
@@ -59,7 +58,8 @@
               type='number'
               style="width:100%;"
               oninput="value = value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
-              :max='scope.row.max' :min='0'
+              :max='scope.row.max'
+              :min='0.01'
             />
           </template>
           <template v-else-if="column.field==='number'">
@@ -147,10 +147,17 @@ export default {
       const decimals=Math.max(this.countDecimals(row.variation),this.countDecimals(row.solvedVariation));
       if(!(row.handleNum>=0 && row.handleNum<=(row.variation-row.solvedVariation).toFixed(decimals))){
         this.$message({
-          type:'error',
-          message:'办理数量需为满足 大于等于0且小于等于申请量-已办数量 的数字'
+          type:'waning',
+          message:'办理数量需为满足 大于0且小于等于申请量-已办数量 的数字'
         });
         row.handleNum=(row.variation-row.solvedVariation).toFixed(decimals);
+      }
+      if(row.handleNum==0){
+        this.$message({
+          type:'warning',
+          message:'办理数量需为大于0的数字'
+        });
+        row.handleNum=0.01;
       }
     },
     buildColumns(){
@@ -251,22 +258,25 @@ export default {
         return
       }
       if(selection.length){
-        const max=(row.variation-row.solvedVariation).toFixed(decimals);
-        const decimals=Math.max(this.countDecimals(row.variation),this.countDecimals(row.solvedVariation));
-        row.max=max;
-        row.checked=true;
-        row.handleNum=max;
-        const exist=this.selected.find(item=>item.id===row.id);
+        let exist=this.selected.find(item=>item.id===row.id);
         if(exist){
-          exist=JSON.parse(JSON.stringify(row));
+          row.checked=false;
+          row.handleNum='';
+          this.selected=this.selected.filter(item=>item.id!==row.id);
         }else{
+          const max=(row.variation-row.solvedVariation).toFixed(decimals);
+          const decimals=Math.max(this.countDecimals(row.variation),this.countDecimals(row.solvedVariation));
+          row.max=max;
+          row.checked=true;
+          row.handleNum=max;
           this.selected.push(row);
         }
       }else{
         row.checked=false;
         row.handleNum='';
-        this.selected=this.selected.filter(item=>item.id!==row.id);
+        this.selected=[];
       }
+      console.log(this.selected);
     },
     // 全选
     selectAll(selection){
