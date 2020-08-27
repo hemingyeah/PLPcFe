@@ -40,7 +40,7 @@ router.get('/setting/task/field/task', async ctx => {
   let result = await HttpClient.request(url, 'get', null, { headers });
   let body = result.body;
   
-  ctx.body = Template.renderWithData('工单表单设置', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('工单表单设置', body, script, modConfig.template)
 });
 
 router.get('/setting/task/field/taskReceipt', async ctx => {
