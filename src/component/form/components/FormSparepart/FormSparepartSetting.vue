@@ -1,6 +1,6 @@
 <template>
   <div class="form-setting-panel">
-    <h3>基础字段 -- {{setting.name}}</h3>
+    <h3>系统字段 -- {{setting.name}}</h3>
     <div class="form-setting-group">
       <p class="form-separator-setting-tips">备件组件可以在工单完成时选择备件库中的备件直接管理核销出库，并生成价格。</p>
       <div class="form-setting-group">

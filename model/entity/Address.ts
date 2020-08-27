@@ -1,18 +1,18 @@
 interface Address {
   // 详细地址
-  address ?: String;
+  address ?: string;
   // 城市
-  city ?: String;
+  city ?: string;
   // 区域
-  dist ?: String;
+  dist ?: string;
   // id
-  id ?: String;
+  id ?: string;
   // 纬度
-  latitude ?: String;
+  latitude ?: string;
   // 经度
-  longitude ?: String;
+  longitude ?: string;
   // 省份
-  province ?: String;
+  province ?: string;
 }
 
 export default Address

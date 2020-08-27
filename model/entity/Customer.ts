@@ -1,8 +1,8 @@
 interface Customer {
   // 客户名称
-  name ?: String;
+  name ?: string;
   // id
-  id ?: String;
+  id ?: string;
 }
 
 export default Customer

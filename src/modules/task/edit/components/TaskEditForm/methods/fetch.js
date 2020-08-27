@@ -80,7 +80,7 @@ export default {
    * @description 获取工单类型字段列表
   */
   fetchTaskTemplateFields(params) {
-    return TaskApi.getRelatedInfo(params);
+    return TaskApi.getTaskTemplateFields(params);
   },
   /** 
    * @description 获取工单客户默认数据

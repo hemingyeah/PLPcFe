@@ -150,9 +150,10 @@ body{
 }
 
 .btn-content{
-  position:fixed;
-  right:100px;
-  bottom:10px;
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 </style>

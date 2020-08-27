@@ -45,6 +45,16 @@ router.get('/task/edit', async ctx => {
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('编辑工单', body, script, modConfig.template)
+}).get('/task/edit4CallCenter', async ctx => {
+  let modConfig = modules['task.edit'];
+  let reqHeaders = ctx.request.headers;
+  let script = ['/task.edit.js'];
+
+  let url = ctx.request.url;
+  let result = await HttpClient.request(url, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('新建工单', body, script, modConfig.template)
 });
 
 router.get('/task/view/:id', async ctx => {

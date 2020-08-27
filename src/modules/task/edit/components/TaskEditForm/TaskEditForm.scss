@@ -25,11 +25,29 @@
 
       & > label {
         padding: 0;
-        width: 70px;
+        width: 60px;
       }
       & > span {
         @include text-ellipsis();
       }
+    }
+  }
+}
+
+.customer-template-option {
+  p {
+    span {
+      label {
+        width: 40px;
+      }
+    }
+  }
+}
+
+.product-template-option {
+  p {
+    span {
+      max-width: 33.33%;
     }
   }
 }

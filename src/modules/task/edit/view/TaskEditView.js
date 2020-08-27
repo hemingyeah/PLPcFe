@@ -10,6 +10,8 @@ import platform from '@src/platform';
 import data from './data'
 import computed from './computed'
 import methods from './methods'
+/* enum */
+import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
 
 let taskTemplate = {};
 
@@ -22,6 +24,28 @@ export default {
   computed,
   methods: {
     ...methods,
+    /** 
+     * @description 呼叫中心与工单数据的处理 linkman/address/customer
+    */
+    callCenterWithTaskDataHandler() {
+      let callRecordId = this.initData?.callRecordId;
+      if(!callRecordId) {
+        return console.warn(`Caused: current is not have callRecordId, The value is ${callRecordId}`);
+      }
+
+      // 联系人 地址
+      let { linkman, address } = this.initData;
+      // 更新联系人/客户数据
+      if (linkman) {
+        let { customer } = linkman;
+        this.$set(this.form, TaskFieldNameMappingEnum.Customer, [customer]);
+        this.$set(this.form, TaskFieldNameMappingEnum.Linkman, [linkman]);
+      }
+      // 更新地址数据
+      if(address) {
+        this.$set(this.form, TaskFieldNameMappingEnum.Address, [address]);
+      }
+    },
     /** 
      * @description 创建工单方法
     */
@@ -124,21 +148,33 @@ export default {
 
           if (!valid) return Promise.reject('validate fail.');
         
-          const params = util.packToTask(this.fields, this.form);
+          const task = util.packToTask(this.fields, this.form);
+          task.templateId = taskTemplate.value;
+          task.templateName = taskTemplate.text;
+          
+          const { address, customer, tick, linkman } = task;
+          const params = {
+            address,
+            customer,
+            eventId: '',
+            eventNo: '',
+            linkman,
+            task,
+            tick,
+          };
           params.templateId = taskTemplate.value;
           params.templateName = taskTemplate.text;
-
-          console.log('hbc: submit -> params', params)
+          params.callRecordId = this.initData?.callRecordId;
         
-          // this.pending = true;
-          // this.loadingPage = true;
+          this.pending = true;
+          this.loadingPage = true;
 
-          // if (this.isTaskEdit) {
-          //   return this.updateTaskMethod(params);
-          // }
-          // if (this.isTaskCreate) {
-          //   return this.createTaskMethod(params, isAllot);
-          // }
+          if (this.isTaskEdit) {
+            return this.updateTaskMethod(params);
+          }
+          if (this.isTaskCreate) {
+            return this.createTaskMethod(params, isAllot);
+          }
 
         })
         .catch(err => {
@@ -190,6 +226,9 @@ export default {
 
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
+
+      // 呼叫中心需求处理
+      this.callCenterWithTaskDataHandler();
 
       this.init = true;
 

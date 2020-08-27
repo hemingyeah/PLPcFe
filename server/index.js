@@ -31,9 +31,14 @@ server.init = async function(){
   // 售后宝环境中间件
   server.use(shbEnvMiddleware({ isNotLocalEnv, cookie }));
 
-  // 路由
+  // 路由 -> 可通过 router.stack 查看堆栈信息
   server.use(router.routes())
   server.use(router.allowedMethods())
 }
+
+// 初始化server
+server.init();
+// 启动server 4300 方便本地调试的
+server.listen(4300);
 
 module.exports = server;

@@ -1,6 +1,6 @@
 <template>
   <div class="form-setting-panel">
-    <h3>基础字段 -- {{setting.name}}</h3>
+    <h3>系统字段 -- {{setting.name}}</h3>
     <div class="form-setting-group">
       <p class="form-separator-setting-tips">服务项目组件可以在工单完成时选择已维护的标准服务项目，并生成价格。</p>
       <div class="form-setting-group">

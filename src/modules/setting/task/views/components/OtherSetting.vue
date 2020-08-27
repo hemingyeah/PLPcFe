@@ -268,10 +268,16 @@ export default {
       this.clickType = "";
     },
     checkNum(name,value,desc) {
-      if(isNaN(value)) {
+      if(isNaN(value) || !value.trim()) {
         return this.$platform.notification({
           title: '失败',
           message: '距离只支持数字',
+          type: 'error',
+        })
+      }if(value < 0 ) {
+        return this.$platform.notification({
+          title: '失败',
+          message: '距离不可以为负数',
           type: 'error',
         })
       }else{

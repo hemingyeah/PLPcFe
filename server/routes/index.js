@@ -88,15 +88,6 @@ router.get('/window', async ctx => {
   ctx.body = Template.renderWithData('window', {}, script)
 });
 
-
-// router.use('/outside', ctx => HttpClient.proxy(ctx, {
-//   host: '30.40.56.82',
-//   port: 10007,
-//   headers: {
-//     'cookie': 'VIPPUBLINKJSESSIONID=9138cd11-1919-43e8-8460-0cfeaaad7050'
-//   }
-// }))
-
 router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.211',
   port: 10007,
@@ -130,14 +121,6 @@ router.use('/outside/*', ctx => HttpClient.proxy(ctx, {
   },
 }))
 
-router.use('/excels/*', ctx => HttpClient.proxy(ctx, {
-  host: '127.0.0.1',
-  port: 8080,
-  headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=91d3c950-e301-4ef1-b714-e40f62d2257f'
-  },
-}))
-
 router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   host: '47.98.255.79',
   port: 10002,
@@ -158,9 +141,9 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
+router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', ctx => HttpClient.proxy(ctx))
-router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)

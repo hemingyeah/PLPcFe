@@ -120,6 +120,7 @@
                   <a href="javascript:;" @click="goTaskSetting">工单表单设置</a>
                   <a href="javascript:;" @click="goTaskReceiptSetting">工单回执表单设置</a>
                   <a href="javascript:;" @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;" @click="goCreateTaskForCallcenter">新建工单呼叫中心</a>
                   <a href="javascript:;" @click="goTaskReceipt">工单回执</a>
                   <a href="javascript:;" @click="goTaskList">工单列表</a>
                   <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
@@ -798,6 +799,14 @@ export default {
         title: '新建工单',
         url: '/task/edit',
         reload: true,
+      });
+    },
+    goCreateTaskForCallcenter() {
+      platform.openTab({
+        id: 'task_create',
+        title: '新建工单呼叫中心',
+        close: true,
+        url: '/task/edit4CallCenter?callRecordId=1&linkmanId=e8540bd4-e5eb-11ea-9929-00163e304a25',
       });
     },
     goTaskReceipt() {
