@@ -109,7 +109,15 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.163',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=438873b8-5319-4113-9035-60cb5baac58f'
+    'cookie': 'VIPPUBLINKJSESSIONID=3a8344e7-bc4f-41cd-9c83-d1dd5a46106d'
+  },
+}))
+
+router.use('/outside/pc/task/delete', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.59.137',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=316e588e-fe61-486d-9cb8-d90e9afa5d91'
   },
 }))
 

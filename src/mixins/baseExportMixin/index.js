@@ -65,7 +65,7 @@ export default {
           .catch(err => console.error(err));
       } else {
         ajax = http
-          .axios(this.method, this.action, params, false)
+          .axios(this.method, this.action, params)
           .then(res => {
             this.visible = false;
             this.pending = false;
