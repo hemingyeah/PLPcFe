@@ -34,6 +34,8 @@
     "model/*.tsx",
     "model/**/*.ts",
     "model/**/*.tsx",
+    "model/**/**/*.ts",
+    "model/**/**/*.tsx",
     "service/**/*.ts",
     "service/**/*.tsx",
     "service/*.ts",
