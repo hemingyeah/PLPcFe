@@ -18,7 +18,7 @@
               保存
             </button>
 
-            <button type="button" class="btn-text btn-back" :disabled="disabled" @click="submit" v-if="isShowOnlySaveButton">
+            <button type="button" class="btn-text btn-back" :disabled="disabled" @click="submit(false)" v-if="isShowOnlySaveButton">
               只保存
             </button>
 

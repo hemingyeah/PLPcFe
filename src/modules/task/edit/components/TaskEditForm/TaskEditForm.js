@@ -6,6 +6,7 @@ import _ from 'lodash';
 import * as FormUtil from '@src/component/form/util'
 import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts';
+import { taskTypeSelectConversion } from '@src/util/conversionFunctionUtil.ts';
 /* Vue */
 import props from './props'
 import data from './data'
@@ -27,6 +28,7 @@ const RELATION_TYPE_MAP = {
 
 export default {
   name: 'task-edit-form',
+  inject: ['initData'],
   props,
   data() {
     return data
@@ -38,7 +40,7 @@ export default {
   mounted () {
     this.taskFields = this.fields;
     this.taskValue = this.value;
-    this.selectedType = this.taskTypes[0] || {};
+    this.selectedType = taskTypeSelectConversion(this?.initData?.defaultType) || this.taskTypes[0] || {};
     this.$emit('updatetemplateId', this.selectedType);
 
     this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);

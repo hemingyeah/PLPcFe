@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
+import { taskTypeSelectConversion } from '@src/util/conversionFunctionUtil.ts';
 
 export default {
   /* 客户字段 */
@@ -70,12 +71,7 @@ export default {
   },
   /* 工单类型 */
   taskTypes(){
-    return this.types.map(d => {
-      return {
-        text: d.name,
-        value: d.id
-      }
-    }) || [];
+    return this.types.map(type => taskTypeSelectConversion(type)) || [];
   },
   /* 工单类型对象 */
   taskTypesMap() {

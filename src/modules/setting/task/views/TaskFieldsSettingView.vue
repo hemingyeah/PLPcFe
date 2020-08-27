@@ -30,6 +30,7 @@ import platform from '@src/platform';
 
 export default {
   name: 'task-fields-setting-view',
+  inject:  ['initData'],
   data(){
     return {
       init: false,

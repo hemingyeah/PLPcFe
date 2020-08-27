@@ -21,7 +21,7 @@ export function getFieldValue2string(data: any, fieldName: string, formType: str
 	// 判断字段名称是否存在
 	if (!fieldName) return '';
 	// 是否是客户模块，暂时先这么判断
-	let isCustomerModule = isCustomerRelation;
+	let isCustomerModule: Boolean = isCustomerRelation;
 
   return (
 		isCustomerModule
@@ -46,7 +46,7 @@ function getCustomerFieldValue2string(data: any, fieldName: string, formType: st
 	// 团队
 	if (fieldName == CustomerFieldNameMappingEnum.Tags) {
 		let tags = Customer[CustomerFieldNameMappingEnum.Tags] || [];
-		result = tags.map(tag => tag[TagEntityMappingEnum.TagName]).join(',');
+		result = tags.map((tag: any) => tag[TagEntityMappingEnum.TagName]).join(',');
 	}
 	// 编号
 	else if (fieldName == CustomerFieldNameMappingEnum.SerialNumber) {
@@ -66,7 +66,7 @@ function getCustomerFieldValue2string(data: any, fieldName: string, formType: st
 		}
 		// 说明信息类型
 		else if (formType == FieldTypeMappingEnum.Info) {
-			let infoField = fields.filter(field => field.fieldName == fieldName);
+			let infoField: any = fields.filter((field: any) => field.fieldName == fieldName);
 			result = infoField?.[0]?.placeholder || '';
 		}
 		// 位置类型
@@ -117,7 +117,7 @@ function getProductFieldValue2string(data: any, fieldName: string, formType: str
 		}
 		// 说明信息类型
 		else if (formType == FieldTypeMappingEnum.Info) {
-			let infoField = fields.filter(field => field.fieldName == fieldName);
+			let infoField: any = fields.filter((field: any) => field.fieldName == fieldName);
 			result = infoField?.[0]?.placeholder || '';
 		}
 		// 位置类型
