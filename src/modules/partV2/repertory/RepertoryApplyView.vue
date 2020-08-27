@@ -1397,7 +1397,7 @@ export default {
       if(existMore){
         this.$message({
           type:'warning',
-          message:'办理数量需为满足 大于0且小于等于申请量-已办数量 的数字'
+          message:'办理数量不得大于可办理数量'
         });
         return
       }
