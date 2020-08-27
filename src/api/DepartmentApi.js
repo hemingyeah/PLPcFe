@@ -100,3 +100,12 @@ export function updateDepartmentUserBatch (params) {
 export function userLoginNameUnique (params) {
   return http.get('/security/user/unique', params)
 }
+
+
+/**
+ * @description 获取角色下人员列表
+ * @returns {*}
+ */
+export function getRoleUser (params) {
+  return http.post('/security/user/list', params, false)
+}

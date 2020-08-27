@@ -115,6 +115,7 @@
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
                   <a href="javascript:;" @click="goDepartment">组织架构管理</a>
+                  <a href="javascript:;" @click="goDepartment2">组织架构管理2</a>
                   <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a>
@@ -472,7 +473,7 @@ export default {
           this.has_call_center_module = true;
           localStorage.setItem('call_center_module', 1);
           if ('WebSocket' in window) {
-            this.initWebSocket();
+            // this.initWebSocket();
           } else {
             alert('当前浏览器 Not support websocket');
           }
@@ -737,6 +738,14 @@ export default {
         reload: true,
       });
     },
+    goDepartment2() {
+      platform.openTab({
+        id: 'dept_view',
+        title: '组织架构管理',
+        url: '/security/dept/view',
+        reload: true,
+      });
+    },
     goCustomerContact() {
       platform.openTab({
         id: 'customer_contact',
@@ -794,16 +803,16 @@ export default {
       });
     },
     initWebSocket() {
-      webSocketClient = new WebSocket(this.wsUrl);
-      try {
-        webSocketClient.onopen = this.webSocketOpen;
-        webSocketClient.onmessage = this.webSocketOnMessage;
-        webSocketClient.onclose = this.webSocketClose;
-        webSocketClient.onerror = this.webSocketError;
-      } catch (error) {
-        console.error(error);
-        this.reconnect(this.wsUrl);
-      }
+      // webSocketClient = new WebSocket(this.wsUrl);
+      // try {
+      //   webSocketClient.onopen = this.webSocketOpen;
+      //   webSocketClient.onmessage = this.webSocketOnMessage;
+      //   webSocketClient.onclose = this.webSocketClose;
+      //   webSocketClient.onerror = this.webSocketError;
+      // } catch (error) {
+      //   console.error(error);
+      //   this.reconnect(this.wsUrl);
+      // }
     },
     webSocketOpen() {
       // console.info('WebSocket连接成功')
