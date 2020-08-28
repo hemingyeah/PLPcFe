@@ -29,14 +29,15 @@ const FORM_SELECT = {
 
       this.$emit('input', {value: options, prop: 'options'})
     },
-    // 设置默认值
+    // 设置默认值(默认和取消默认可以切换)
     setDefaultOption(option){
       if(this.field.isMulti) return Platform.alert('多选暂不支持设置默认值');
       if(!option.value) return Platform.alert('请先补全选项');
-        
+      let _formState = option.isDefault;
+
       this.options.forEach(item => item.isDefault = false);
-      option.isDefault = true;
-        
+      option.isDefault = !_formState;
+
       this.$emit('input', {value: this.options, prop: 'options'})
       this.$emit('input', {value: option.value, prop: 'defaultValue'});
     },

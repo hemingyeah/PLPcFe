@@ -12,12 +12,20 @@
         <input type="text" :value="option.value" @input="updateOption($event, option)" maxlength="20">
         <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
         <template v-if="!field.isMulti">
-          <button 
-            type="button" class="btn-text form-select-setting-default" 
-            @click="setDefaultOption(option)" v-if="!option.isDefault">
+<!--          <button -->
+<!--            type="button" class="btn-text form-select-setting-default" -->
+<!--            @click="setDefaultOption(option)" v-if="!option.isDefault">-->
+<!--            <i class="iconfont icon-check-fill"></i>-->
+<!--          </button>-->
+<!--          <span class="form-select-setting-defaultValue" v-else>默认</span>-->
+
+          <button
+              type="button" class="btn-text form-select-setting-default"
+              @click="setDefaultOption(option)">
             <i class="iconfont icon-check-fill"></i>
           </button>
-          <span class="form-select-setting-defaultValue" v-else>默认</span>
+          <span class="form-select-setting-defaultValue" v-if="option.isDefault">默认</span>
+
         </template>
       </div>
     </div>
