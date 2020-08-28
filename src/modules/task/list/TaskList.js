@@ -64,11 +64,13 @@ export default {
       searchParams: {}, //筛选列表的参数
       allSearchParams: {}, //全部工单搜索条件
       selectList: [
-        { name: "全部" },
-        { name: "我创建的" },
-        { name: "我负责的" },
-        { name: "我协同的" },
+        { name: "全部", id: "all" },
+        { name: "我创建的", id: "create" },
+        { name: "我负责的", id: "execute" },
+        { name: "我协同的", id: "synergy" },
       ], //头部筛选列表
+      selectId: "all",
+      checkImportTask: '',
       columns: [],
       columnNum: 1,
       currentTaskType: {},
@@ -213,6 +215,13 @@ export default {
     exportPermission() {
       return this.auth.EXPORT_IN;
     },
+    // 转派条件
+    exportPermissionTaskEdit() {
+      return this.auth.TASK_EDIT === 3;
+    },
+    exportPermissionTaskBatchDispatch() {
+      return this.auth.TASK_BATCH_DISPATCH;
+    },
     /** 高级搜索面板宽度 */
     panelWidth() {
       return `${420 * this.columnNum}px`;
@@ -336,6 +345,9 @@ export default {
 
       this.search();
     },
+    /**
+     * @description 头部筛选
+     */
     /* 其他,列表 */
     otherLists() {
       const { taskView } = this.initData;
@@ -489,6 +501,13 @@ export default {
       }
     },
     /**
+     * @description 工单导入
+     */
+    imporTask(item) {
+      this.checkImportTask = item
+      this.$refs.importCustomerModal.open();
+    },
+    /**
      * @description 批量编辑
      */
     Alledit() {
@@ -532,7 +551,6 @@ export default {
      */
     searchList() {
       const { searchParams } = this;
-
       return TaskApi.search(searchParams)
         .then((result) => {
           let isSuccess = result?.success === true;
@@ -554,7 +572,7 @@ export default {
             return c;
           });
           // let list = [...data.content, ...data.content, ...data.content, ...data.content, ...data.content, ...data.content]
-          // this.taskPage.list = list
+          this.taskPage.list = []
           this.taskPage.merge(Page.as(data));
           this.params.pageNum = number;
 
@@ -1001,7 +1019,7 @@ export default {
      */
     initialize() {
       this.initPage();
-      this.loading = true;
+      // this.loading = true;
 
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
         .then((res) => {
@@ -1191,8 +1209,25 @@ export default {
      */
     search(searchModel = "") {
       const params = this.buildSearchParams();
+      const { selectId, initData } = this;
+      let mySearch;
       this.loading = true;
       console.log("陈杰", params);
+      switch (selectId) {
+        case "all":
+          mySearch = {};
+          break;
+        case "create":
+          mySearch = { createUser: initData.currentUserId };
+          break;
+        case "execute":
+          mySearch = { executor: initData.currentUserId };
+          break;
+        default:
+          mySearch = { synergyId: initData.currentUserId };
+          break;
+      }
+
       if (!searchModel) {
         /* S 高级搜索条件 */
         // 排序条件
@@ -1377,6 +1412,7 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
+          ...mySearch,
         };
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/
@@ -1417,7 +1453,8 @@ export default {
         searchModel.closeTimeEnd = this._time(searchModel.closeTimeEnd);
 
         searchModel.templateId = this.currentTaskType.id;
-        this.searchParams = { ...searchModel };
+
+        this.searchParams = { ...searchModel, ...mySearch };
       }
       this.searchList();
     },

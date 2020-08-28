@@ -189,7 +189,19 @@
     <div class="common-list-header">
       <form class="common-list-header-search" onsubmit="return false;">
         <div class="task-font12 select-list task-flex">
-          <div v-for="(item, index) in selectList" :key="index" class="select-list-item">{{item.name}}</div>
+          <div
+            v-for="(item, index) in selectList"
+            :key="index"
+            class="select-list-item"
+            :class="{ 'select-list-active': selectId === item.id }"
+            @click="
+              loading = true;
+              selectId = item.id;
+              search();
+            "
+          >
+            {{ item.name }}
+          </div>
         </div>
         <div class="common-list-header-search-group">
           <el-input
@@ -261,7 +273,13 @@
         <div class="action-button-group">
           <!-- 批量编辑 S-->
           <!-- initData.loginUser.authorities.TASK_EDIT === 3 -->
-          <span class="el-dropdown-link el-dropdown-btn" @click="Alledit" v-if="initData.loginUser && initData.loginUser.authorities.TASK_EDIT === 3"
+          <span
+            class="el-dropdown-link el-dropdown-btn"
+            @click="Alledit"
+            v-if="
+              initData.loginUser &&
+                initData.loginUser.authorities.TASK_EDIT === 3
+            "
             >批量编辑</span
           >
           <!-- 批量编辑 E-->
@@ -285,7 +303,8 @@
           <!-- end 工单类型 -->
 
           <!-- start 更多操作 -->
-          <el-dropdown trigger="click" v-if="exportPermission">
+          <!-- v-if="exportPermission" -->
+          <el-dropdown trigger="click">
             <span
               class="el-dropdown-link el-dropdown-btn"
               @click="trackEventHandler('moreAction')"
@@ -294,11 +313,29 @@
               <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
+              <el-dropdown-item v-if="exportPermission">
+                <div class="import-task">
+                  导入工单
+                  <div class="import-task-item">
+                    <div
+                      v-for="(item, index) in taskTypes"
+                      :key="index"
+                      @click="imporTask(item)"
+                    >
+                      {{ item.name }}
+                    </div>
+                  </div>
+                </div>
+              </el-dropdown-item>
+              <el-dropdown-item v-if="exportPermission">
                 <div @click="exportTask(false)">导出</div>
               </el-dropdown-item>
-              <el-dropdown-item>
+              <el-dropdown-item v-if="exportPermission">
                 <div @click="exportTask(true)">导出全部</div>
+              </el-dropdown-item>
+              <!-- v-if="exportPermissionTaskEdit || exportPermissionTaskBatchDispatch" -->
+              <el-dropdown-item >
+                <div>工单转派</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -611,13 +648,32 @@
     <!-- E 存为视图弹框 -->
     <!-- S 批量编辑 -->
 
-      <batch-editing-customer-dialog
+    <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
-      :config="{fields: initData.allFieldInfo, currentTaskType: currentTaskType}"
+      :config="{
+        fields: initData.allFieldInfo,
+        currentTaskType: currentTaskType,
+      }"
       :selectedIds="selectedIds"
       @update="updatEedit"
     ></batch-editing-customer-dialog>
     <!-- E 批量编辑 -->
+    <!-- S 导入工单 -->
+    <base-import
+      :title="`导入工单-${checkImportTask.name}`"
+      ref="importCustomerModal"
+      :action="`/excels/task/import?typeId=${checkImportTask.id}`"
+    >
+      <div slot="tip">
+        <div class="base-import-warn">
+          请先下载
+          <a :href="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
+            >导入模版文档</a
+          >，填写完成后再上传导入。
+        </div>
+      </div>
+    </base-import>
+    <!-- E 导入工单 -->
   </div>
 </template>
 
