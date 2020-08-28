@@ -6,6 +6,11 @@ import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEdi
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
 import platform from '@src/platform';
+import { 
+  customerAddressSelectConversion,
+  customerSelectConversion,
+  linkmanSelectConversion
+} from '@src/util/conversionFunctionUtil.ts';
 /* vue */
 import data from './data'
 import computed from './computed'
@@ -22,6 +27,27 @@ export default {
     return data
   },
   computed,
+  async mounted() {
+    try {
+      this.initialize();
+
+      // 初始化默认值
+      let form = this.workTask;
+
+      this.fields = await TaskApi.getTaskTemplateFields({ templateId: form.templateId || this.types[0].id, tableName: 'task' });
+
+      form = util.packToForm(this.fields, form);
+      this.form = FormUtil.initialize(this.fields, form);
+
+      // 呼叫中心需求处理
+      this.callCenterWithTaskDataHandler();
+
+      this.init = true;
+
+    } catch (e) {
+      console.error('error ', e)
+    }
+  },
   methods: {
     ...methods,
     /** 
@@ -38,12 +64,12 @@ export default {
       // 更新联系人/客户数据
       if (linkman) {
         let { customer } = linkman;
-        this.$set(this.form, TaskFieldNameMappingEnum.Customer, [customer]);
-        this.$set(this.form, TaskFieldNameMappingEnum.Linkman, [linkman]);
+        this.$set(this.form, TaskFieldNameMappingEnum.Customer, [customerSelectConversion(customer)]);
+        this.$set(this.form, TaskFieldNameMappingEnum.Linkman, [linkmanSelectConversion(linkman)]);
       }
       // 更新地址数据
       if(address) {
-        this.$set(this.form, TaskFieldNameMappingEnum.Address, [address]);
+        this.$set(this.form, TaskFieldNameMappingEnum.Address, [customerAddressSelectConversion(address)]);
       }
     },
     /** 
@@ -214,27 +240,6 @@ export default {
     updateTaskTemplateId(template = {}) {
       taskTemplate = template || {};
     },
-  },
-  async mounted() {
-    try {
-      this.initialize();
-
-      // 初始化默认值
-      let form = this.workTask;
-
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: form.templateId || this.types[0].id, tableName: 'task' });
-
-      form = util.packToForm(this.fields, form);
-      this.form = FormUtil.initialize(this.fields, form);
-
-      // 呼叫中心需求处理
-      this.callCenterWithTaskDataHandler();
-
-      this.init = true;
-
-    } catch (e) {
-      console.error('error ', e)
-    }
   },
   components: {
     [TaskEditForm.name]: TaskEditForm

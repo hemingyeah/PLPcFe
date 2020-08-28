@@ -6,7 +6,11 @@ import _ from 'lodash';
 import * as FormUtil from '@src/component/form/util'
 import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts';
-import { taskTypeSelectConversion } from '@src/util/conversionFunctionUtil.ts';
+import { 
+  customerAddressSelectConversion,
+  linkmanSelectConversion,
+  taskTypeSelectConversion
+} from '@src/util/conversionFunctionUtil.ts';
 /* Vue */
 import props from './props'
 import data from './data'
@@ -126,22 +130,14 @@ export default {
      * @param {Object} address 地址数据
     */
     bindAddress(address = {}) {
-      this.updateAddressValue([{
-        value: address.id,
-        label: address.province + address.city + address.dist + address.address,
-        ...address
-      }])
+      this.updateAddressValue([customerAddressSelectConversion(address)])
     },
     /** 
      * @description 绑定联系人
      * @param {Object} linkman 联系人数据
     */
     bindLinkman(linkman = {}) {
-      this.updateLinkmanValue([{
-        value: linkman.id,
-        label: linkman.name + linkman.phone,
-        ...linkman
-      }] )
+      this.updateLinkmanValue([linkmanSelectConversion(linkman)])
     },
     /** 
      * @description 选择工单类型
@@ -500,7 +496,7 @@ export default {
       if(currentCustomerId == selectedCustomerId) return
 
       try {
-        const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomer.id || '' });
+        const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomerId });
         let { linkman, address } = result;
 
         // 重置联系人和地址
