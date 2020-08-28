@@ -3,6 +3,7 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* util */
 import AuthUtil from '@src/util/auth';
+import { getRootWindow } from '@src/util/dom';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -390,8 +391,16 @@ export default {
       // 是否有负责人
       let { state, executor } = this.task;
       let hasExecutor = executor && executor.userId;
+      let allowDing = false;
 
-      return this.initData.canViewTask && parent.inDingTalkPC() && state != 'closed' && hasExecutor;
+      try {
+        let rootWindow = getRootWindow(window);
+        allowDing = this.initData.canViewTask && rootWindow.inDingTalkPC() && state != 'closed' && hasExecutor;
+      } catch (error) {
+        console.warn('Caused: TaskView allowDing -> error', error) 
+      }
+
+      return allowDing;
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
