@@ -22,7 +22,7 @@ export default {
     return {
       loading: false,
       pending: false,
-      task: this.initData.task,
+      task: this.initData?.task || {},
       fields: [], // 工单表单字段
       tabs: [], // 工单关联数据tab
       currTab: 'task-info-record', // 当前选中的tab
@@ -66,11 +66,11 @@ export default {
     },
     /** 工单设置 */
     taskConfig() {
-      return this.initData.taskConfig;
+      return this.initData?.taskConfig || {};
     },
     /** 工单类型设置 */
     taskType() {
-      return this.initData.taskType;
+      return this.initData?.taskType || {};
     },
     /** 当前登录用户 */
     loginUser() {
@@ -212,7 +212,7 @@ export default {
     * 5. 且 工单类型设置中流程设置开启了开始流程节点
     */
     allowStartTask() {
-      return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === 'accepted' && this.taskType.flowSetting.start.state;
+      return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === 'accepted' && this.taskType?.flowSetting?.start?.state;
     },
     /** 
     * @description 是否显示指派按钮
@@ -243,7 +243,7 @@ export default {
       (1)曾打印 task.oncePrinted == 1 样式有区别
     */
     allowPrintTask() {
-      let { printTask } = this.taskType.options;
+      let { printTask } = this.taskType?.options || {};
       return printTask || printTask == null;
     },
     /** 
@@ -252,12 +252,12 @@ export default {
     * 2. 且 工单是已完成状态
     */
     allowServiceReport() {
-      let { serviceReport } = this.taskType.options;
+      let { serviceReport } = this.taskType.options || {};
       return (serviceReport || serviceReport == null) && this.finishedState;
     },
     /** 服务报告是否使用系统模板 */
     srSysTemplate() {
-      return this.taskType.options.srSysTemplate;
+      return this.taskType?.options?.srSysTemplate;
     },
     /** 
     * @description 是否显示审批按钮
@@ -289,7 +289,7 @@ export default {
     * 4. 且 (如果工单状态是accepted且工单流程设置禁用了开始流程 或 如果工单状态是processing且工单流程设置开启了开始流程)
     */
     allowFinishTask() {
-      let startFlow = this.taskType.flowSetting.start.state;
+      let startFlow = this.taskType?.flowSetting?.start?.state;
       let { state } = this.task;
 
       return this.isExecutor && !this.isApproving && !this.isPaused && ((state === 'accepted' && !startFlow) || (state === 'processing' && startFlow));
@@ -309,7 +309,7 @@ export default {
     */
     viewBalanceTab() {
       let { isSettled } = this.task;
-      let balanceViewAuthiroty = this.taskConfig.taskBalanceConfig.balanceViewAuthiroty;
+      let balanceViewAuthiroty = this.taskConfig?.taskBalanceConfig?.balanceViewAuthiroty;
       
       return (
         this.finishedState
@@ -329,7 +329,7 @@ export default {
     */
     viewFeedbackTab() {
       let { reviewTime, isEvaluated, isReviewed } = this.task;
-      let reviewViewAuthiroty = this.initData.evaluateConfig.reviewViewAuthiroty;
+      let reviewViewAuthiroty = this.initData?.evaluateConfig?.reviewViewAuthiroty;
       
       return (
         (reviewTime != null || isEvaluated == 0 || isReviewed == 0)
@@ -354,7 +354,7 @@ export default {
         showAttachment,
         showService,
         showSparepart
-      } = this.taskType.options;
+      } = this.taskType.options || {};
 
       // TODO: 回执表单是否包含字段
       let hasField = true;
