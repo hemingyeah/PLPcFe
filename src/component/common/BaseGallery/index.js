@@ -4,7 +4,7 @@ import 'viewerjs/dist/viewer.css';
 
 function preview(element, currIndex, multiple){
   let viewer = null;
-  var options = {
+  let options = {
     navbar: multiple,
     initialViewIndex: currIndex,
     fullscreen: false,
@@ -15,11 +15,11 @@ function preview(element, currIndex, multiple){
       oneToOne:true,
       prev: {
         show: multiple,
-        size: "large"
+        size: 'large'
       },
       next: {
         show: multiple,
-        size: "large"
+        size: 'large'
       },
       rotateLeft: true,
       rotateRight: true,
@@ -38,5 +38,5 @@ function preview(element, currIndex, multiple){
   return viewer;
 }
 
-const BaseGallery = {preview};
+const BaseGallery = { preview };
 export default BaseGallery;

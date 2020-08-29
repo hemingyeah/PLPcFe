@@ -17,6 +17,12 @@ export default {
   eventId() {
     return this.initData?.eventId || '';
   },
+  /** 
+   * @description 是否是 复制工单
+  */
+  isCopyTask() {
+    return this.initData?.fromCopy || window.location.href.indexOf('copyTask') > -1;
+  },
   /**
    * @description 是否显示 [返回] 按钮 
    * 1. 工单编辑有工单id
@@ -91,15 +97,17 @@ export default {
   },
   state() {
     return {
+      isCopyTask: this.isCopyTask,
       isFromPlan: this.isFromPlan,
-      isTaskCreate: this.isTaskCreate
+      isTaskCreate: this.isTaskCreate,
     }
   },
   task() {
     let task = null;
+    let isTaskJson = typeof this.initData.task === 'string';
 
     try {
-      task = JSON.parse(this.initData?.task);
+      task = (isTaskJson ? JSON.parse(this.initData?.task) : this.initData?.task) || {};
     } catch (error) {
       task = {};
       console.warn('taskEdit json.parse task -> error', error);

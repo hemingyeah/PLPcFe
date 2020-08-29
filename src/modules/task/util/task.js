@@ -82,9 +82,12 @@ export function packToTask(fields, form){
   return task;
 }
 
-/** 将工单对象转成form表单，用于初始化表单 */
+/** 
+ * @description 将工单对象转成form表单，用于初始化表单 
+*/
 export function packToForm(fields, data){
-  if (!data.id) return;
+  // TODO: 临时注掉，如果有需要再修改
+  // if (!data.id) return;
   
   let task = {
     id: data.id,
@@ -94,7 +97,7 @@ export function packToForm(fields, data){
   };
 
   fields.forEach(field => {
-    let {fieldName, isSystem} = field;
+    let { fieldName, isSystem } = field;
     let value = data[fieldName];
 
     if(fieldName === 'customer'){

@@ -2,15 +2,16 @@
 import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAddressDialog.vue'
 import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue'
 /* util */
-import _ from 'lodash';
+import _ from 'lodash'
+import qs from '@src/util/querystring'
 import * as FormUtil from '@src/component/form/util'
 import { findComponentDownward } from '@src/util/assist'
-import { getFieldValue2string } from '@service/TaskService.ts';
+import { getFieldValue2string } from '@service/TaskService.ts'
 import { 
   customerAddressSelectConversion,
   linkmanSelectConversion,
   taskTypeSelectConversion
-} from '@src/util/conversionFunctionUtil.ts';
+} from '@src/util/conversionFunctionUtil.ts'
 /* Vue */
 import props from './props'
 import data from './data'
@@ -144,6 +145,10 @@ export default {
      * @param {String} templateId 工单类型id
     */
     async chooseTemplate(templateId) {
+      if(this.state.isCopyTask) {
+        return this.copyTaskHandler(templateId);
+      }
+
       let loading = this.$loading();
       try {
         this.taskFields = await this.fetchTaskTemplateFields({ templateId, tableName: 'task' });
@@ -169,6 +174,18 @@ export default {
       }
 
       loading.close();
+    },
+    /** 
+     * @description 复制工单处理
+     * @param {String} templateId 工单类型id
+    */
+    copyTaskHandler(templateId = '') {
+      if(!this.state.isCopyTask) return
+
+      let urlParams = qs.parse(window.location.search);
+      let { taskId = '' } = urlParams;
+
+      window.location.href = `/task/copyTask?taskId=${taskId}&newTaskTemplateId=${templateId}`
     },
     /**
      * @description 关闭弹窗

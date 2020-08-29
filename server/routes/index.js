@@ -142,8 +142,6 @@ router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
-router.all('/*', ctx => HttpClient.proxy(ctx))
-
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)
 });

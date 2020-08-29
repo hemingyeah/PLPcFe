@@ -3,14 +3,15 @@ import * as TaskApi from '@src/api/TaskApi.ts'
 /* component */
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 /* utils */
+import qs from '@src/util/querystring'
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
-import platform from '@src/platform';
+import platform from '@src/platform'
 import { 
   customerAddressSelectConversion,
   customerSelectConversion,
   linkmanSelectConversion
-} from '@src/util/conversionFunctionUtil.ts';
+} from '@src/util/conversionFunctionUtil.ts'
 /* vue */
 import data from './data'
 import computed from './computed'
@@ -34,7 +35,7 @@ export default {
       // 初始化默认值
       let form = this.workTask;
 
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: form.templateId || this.types[0].id, tableName: 'task' });
+      this.fields = await TaskApi.getTaskTemplateFields({ templateId: form.templateId || this.types?.[0]?.id, tableName: 'task' });
 
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
@@ -44,8 +45,8 @@ export default {
 
       this.init = true;
 
-    } catch (e) {
-      console.error('error ', e)
+    } catch (error) {
+      console.warn('error ', error)
     }
   },
   methods: {
@@ -104,8 +105,20 @@ export default {
      * @description 返回
     */
     goBack() {
+      // 复制工单
+      if(this.isCopyTask) {
+        let urlParams = qs.parse(window.location.search);
+        let { taskId = '' } = urlParams;
+
+        this.pending = true;
+        
+        return window.location.href = `/task/view/${taskId}`;
+      }
+
+      // 工单新建
       if (this.isTaskCreate) {
         let id = window.frameElement.dataset.id;
+        
         return this.$platform.closeTab(id)
       }
 

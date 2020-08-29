@@ -27,7 +27,7 @@ export default {
       fields: [], // 工单表单字段
       tabs: [], // 工单关联数据tab
       currTab: 'task-info-record', // 当前选中的tab
-      // TODO: 工单状态从移动端拷贝的数据 后面要修改
+      // TODO: 工单状态从移动端拷贝的数据
       stateText: {
         created: '待分配',
         allocated: '已指派',
