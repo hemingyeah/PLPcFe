@@ -1,3 +1,5 @@
+/* util */
+import qs from '@src/util/querystring'
 /* model */
 import TaskStateEnum from '@model/enum/TaskStateEnum';
 
@@ -14,8 +16,9 @@ export default {
   editId() {
     return this.workTask?.id || '';
   },
+  /* 事件id 事件转工单用 */
   eventId() {
-    return this.initData?.eventId || '';
+    return this.initData?.eventId || this.urlParams.eventId || '';
   },
   /** 
    * @description 是否是 复制工单
@@ -95,11 +98,15 @@ export default {
   path() {
     return this.initData?.path || '';
   },
+  urlParams() {
+    return qs.parse(window.location.search);
+  },
   state() {
     return {
       isCopyTask: this.isCopyTask,
       isFromPlan: this.isFromPlan,
-      isTaskCreate: this.isTaskCreate,
+      isFromEvent: this.isFromEvent,
+      isTaskCreate: this.isTaskCreate
     }
   },
   task() {
@@ -116,9 +123,9 @@ export default {
     return task;
   },
   types() {
-    return this.initData?.taskTypeList || [];
+    return this.initData?.taskTypeList || this.initData?.typeList || [];
   },
   workTask() {
-    return this.initData?.workTask || {};
+    return this.initData?.workTask || this.initData?.task || {};
   },
 }

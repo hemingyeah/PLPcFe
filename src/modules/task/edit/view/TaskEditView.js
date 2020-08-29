@@ -3,11 +3,10 @@ import * as TaskApi from '@src/api/TaskApi.ts'
 /* component */
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 /* utils */
-import qs from '@src/util/querystring'
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
 import platform from '@src/platform'
-import { 
+import {
   customerAddressSelectConversion,
   customerSelectConversion,
   linkmanSelectConversion
@@ -44,6 +43,9 @@ export default {
       this.callCenterWithTaskDataHandler();
 
       this.init = true;
+
+      // 关联项查询处理
+      this.relationFieldHandler();
 
     } catch (error) {
       console.warn('error ', error)
@@ -107,22 +109,25 @@ export default {
     goBack() {
       // 复制工单
       if(this.isCopyTask) {
-        let urlParams = qs.parse(window.location.search);
-        let { taskId = '' } = urlParams;
-
+        let { taskId = '' } = this.urlParams;
         this.pending = true;
-        
         return window.location.href = `/task/view/${taskId}`;
       }
-
+      // 事件转工单
+      else if(this.isFromEvent) {
+        let { eventId = '' } = this.urlParams;
+        this.pending = true;
+        return window.location.href = `/event/view/${eventId}`;
+      }
       // 工单新建
-      if (this.isTaskCreate) {
+      else if (this.isTaskCreate) {
         let id = window.frameElement.dataset.id;
         
         return this.$platform.closeTab(id)
       }
 
       parent.frameHistoryBack(window)
+
     },
     /** 
      * @description 初始化
@@ -174,6 +179,24 @@ export default {
       this.$platform.refreshTab(fromId);
     },
     /** 
+     * @description 关联显示项
+    */
+    relationFieldHandler() {
+      // 事件转工单/拷贝工单
+      if(!this.isFromEvent && !this.isCopyTask) return
+
+      // 子组件form
+      this.$nextTick(() => {
+        let form = this.$refs.form;
+        if(!form) return;
+        
+        // 关联显示项选择
+        form.relationFieldSelectHandler(TaskFieldNameMappingEnum.Customer);
+        form.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
+      })
+
+    },
+    /** 
      * @description 提交
      * @param {Boolean} isAllot 是否派单
     */
@@ -195,8 +218,8 @@ export default {
           const params = {
             address,
             customer,
-            eventId: '',
-            eventNo: '',
+            eventId: this.isFromEvent ? this.eventId : '',
+            flow: this.isFromEvent ? this.urlParams.flow : '',
             linkman,
             task,
             tick,

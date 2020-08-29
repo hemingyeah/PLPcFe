@@ -10,9 +10,14 @@ export default {
     default: () => ({})
   },
   /* 工单类型 */
-  types:{
+  types: {
     type: Array,
     default: () => []
+  },
+  /* url地址参数数据 */
+  urlParams: {
+    type: Object,
+    default: () => ({})
   },
   /* 值数据 */
   value: {

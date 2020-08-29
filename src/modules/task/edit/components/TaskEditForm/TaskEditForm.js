@@ -3,7 +3,6 @@ import EditAddressDialog from '@src/modules/customer/view/operationDialog/EditAd
 import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue'
 /* util */
 import _ from 'lodash'
-import qs from '@src/util/querystring'
 import * as FormUtil from '@src/component/form/util'
 import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts'
@@ -148,6 +147,9 @@ export default {
       if(this.state.isCopyTask) {
         return this.copyTaskHandler(templateId);
       }
+      if(this.state.isFromEvent) {
+        return this.convertTaskHandler(templateId);
+      }
 
       let loading = this.$loading();
       try {
@@ -182,10 +184,20 @@ export default {
     copyTaskHandler(templateId = '') {
       if(!this.state.isCopyTask) return
 
-      let urlParams = qs.parse(window.location.search);
-      let { taskId = '' } = urlParams;
+      let { taskId = '' } = this.urlParams;
 
       window.location.href = `/task/copyTask?taskId=${taskId}&newTaskTemplateId=${templateId}`
+    },
+    /** 
+     * @description 事件转工单处理
+     * @param {String} templateId 工单类型id
+    */
+    convertTaskHandler(templateId = '') {
+      if(!this.state.isFromEvent) return
+
+      let { eventId = '', flow = '' } = this.urlParams;
+
+      window.location.href = `/event/convent2Task/jump?eventId=${eventId}&defaultTypeId=${templateId}&flow=${flow}`
     },
     /**
      * @description 关闭弹窗
