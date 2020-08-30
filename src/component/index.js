@@ -42,7 +42,7 @@ import BizSearchProductSelect from './business/BizSearchProductSelect';
 
 import SampleTooltip from './common/SampleTooltip';
 
-import BaseEditor from './lessUsed/BaseEditor'
+import BaseEditor from './common/BaseEditor'
 
 import Form from './form';
 
@@ -90,7 +90,7 @@ const components = [
 ];
 
 export default {
-    install(Vue) {
-        components.forEach(component => Vue.use(component))
-    }
+  install(Vue) {
+    components.forEach(component => Vue.use(component))
+  }
 }
