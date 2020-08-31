@@ -5,6 +5,7 @@
       <el-table-column label="仓库" width="140px">
         <el-select
           v-model="scope.row.repertoryId"
+          filterable
           slot-scope="scope"
           @input="chooseRepertory($event,scope.row)"
         >
@@ -61,6 +62,7 @@
         <template slot-scope="scope">
           <template v-if="!scope.row.index">
             <el-select
+              filterable
               v-model="targetRepertoryId"
               :class="{'error-column': submitted && !targetRepertoryId,}"
             >
