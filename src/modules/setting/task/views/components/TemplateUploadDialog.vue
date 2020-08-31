@@ -184,7 +184,7 @@ export default {
 }
 .upload-content-line{
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   margin-bottom: 10px;
 }
 .upload-content-desc{
