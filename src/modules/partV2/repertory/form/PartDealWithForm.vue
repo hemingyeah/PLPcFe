@@ -67,7 +67,15 @@
         >
           <template slot-scope="scope">
             <template v-if="item.normalType==='controler'">
-              <el-input type='number' :max='scope.row.max' :min='0' :disabled="!scope.row.checked" v-model="scope.row.handleNum"></el-input>
+              <input
+                type='number'
+                style="width:100%;"
+                :max='scope.row.max'
+                :min='0'
+                :disabled="!scope.row.checked"
+                v-model="scope.row.handleNum"
+                oninput="value = value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
+              />
             </template>
             <template v-else-if="item.field==='price'">{{countPrice(scope.row)}}</template>
             <template v-else-if="item.field==='mulNumber'">{{scope.row.solvedVariation}}/{{scope.row.variation}}</template>
@@ -95,7 +103,7 @@
           :readonly="inputonlyread"
         ></el-input>
       </div> -->
-      <div v-if="propData.data.state==='suspending'">
+      <div v-if="propData.data.state==='suspending' || propData.data.state==='dealing'">
         <div class="mar-b-15 font-w-500">办理意见</div>
         <el-input
           type="textarea"

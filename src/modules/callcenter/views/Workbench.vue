@@ -1,7 +1,10 @@
 <template>
   <div class="call-center-workbench" v-loading.fullscreen.lock="loadingListData">
     <div class="left">
-      <div class="current-header">当前通话</div>
+      <div class="current-header">
+        <span>当前通话</span>   
+        <el-button type="danger" @click="hangUpCall">挂断</el-button>
+      </div>
       <el-card v-if="query.callPhone && query.callState === 'Link'" class="current-card">
         <div class="current-item">
           <div class="item">
@@ -169,6 +172,7 @@ export default {
     },
   },
   mounted() {
+    console.log('22222222222');
     this.query = parse(window.location.search) || {};
     if(this.query.id && this.query.callPhone) {
       if(this.query.callState === 'Link'){
@@ -196,6 +200,17 @@ export default {
     this.$eventBus.$off('callcenter-workbench.select_tab', this.selectTab)
   },
   methods: {
+    async hangUpCall(){
+      if(this.query.callPhone && this.query.callState === 'Link') {
+        try {
+          let {code, message} = await CallCenterApi.hangUpCall();
+          if(code != 0) this.$message.error(message || '内部错误')
+          console.log('res:', code, message);
+        } catch(error) {
+          console.error(error);
+        }
+      }
+    },
     async getMore () {
       try {
         this.params.pageNum++;
@@ -418,7 +433,10 @@ export default {
       padding: 13px 20px;
     }
     .current-header {
-      padding: 13px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 20px;
       border-bottom: 1px solid #ebeef5;
       box-sizing: border-box;
       background: #fff;
