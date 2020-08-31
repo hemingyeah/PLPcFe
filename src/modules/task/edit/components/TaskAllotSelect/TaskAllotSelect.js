@@ -1,8 +1,14 @@
 const TaskAllowSelect = {
   name: 'task-allot-select',
+  props: {
+    taskConfig: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data() {
     return {
-      allotType: 'pool',
+      allotType: 'normal',
       allotTypeMap: {
         pool: {
           text: '派单到工单池',
@@ -18,13 +24,16 @@ const TaskAllowSelect = {
         }
       },
       value: {
-        beforeDayNum: '',
         executors: [],
         synergies: []
       }
     }
   },
   computed: {
+    /* 自动派单 */
+    autoDispatch() {
+      return this.taskConfig.autoDispatch === true;
+    },
     /* 是否按团队派单 */
     isAllotByTag() {
       return this.initData?.isAllotByTag === true;
@@ -32,6 +41,15 @@ const TaskAllowSelect = {
     /* 是否显示选择负责人 */
     isShowSelectExecutor() {
       return this.allotType === this.allotTypeMap.normal.value;
+    },
+    /* 是否开启工单池 */
+    taskPoolOn() {
+      return this.taskConfig.taskPoolOn === true;
+    }
+  },
+  watch: {
+    'allotType'(newValue) {
+      this.$emit('update:type', newValue);
     }
   },
   mounted() {
@@ -51,6 +69,7 @@ const TaskAllowSelect = {
         .then(res => {
           if(res.status != 0) return
           this.value.synergies = res?.data?.users || [];
+          this.$emit('update:synergies', this.value.synergies);
         })
         .catch(err => {
           console.warn(err)
@@ -60,7 +79,7 @@ const TaskAllowSelect = {
     selectExecutorUser() {
       let choose = this.isAllotByTag ? 'team' : 'dept';
       let options = {
-        max: -1,
+        max: 1,
         isHideTeam: true,
         selected: (
           this.isAllotByTag 
@@ -73,6 +92,7 @@ const TaskAllowSelect = {
         .then(res => {
           if(res.status != 0) return
           this.value.executors = res?.data?.users || [];
+          this.$emit('update:executors', this.value.executors);
         })
         .catch(err => {
           console.warn(err)

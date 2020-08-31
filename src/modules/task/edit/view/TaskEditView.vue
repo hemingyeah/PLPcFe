@@ -32,7 +32,7 @@
           <!-- end 新建按钮组 -->
 
           <!-- start 新建计划任务 -->
-          <button type="button" class="btn btn-primary" :disabled="disabled" v-if="isFromPlan" @click="planTaskCreate">
+          <button type="button" class="btn btn-primary" :disabled="disabled" v-if="isFromPlan" @click="planTaskCreateDialogOpen">
             保存为计划任务
           </button>
           <!-- end 新建计划任务 -->
@@ -52,7 +52,7 @@
     </form>
 
     <!-- start 新建/编辑 计划任务弹窗 -->
-    <plan-task-edit-form ref="planTaskEditForm">
+    <plan-task-edit-form :task-config="taskConfig" @submit="submitWithPlanTask" ref="planTaskEditForm">
 
     </plan-task-edit-form>
     <!-- end 新建/编辑 计划任务弹窗 -->

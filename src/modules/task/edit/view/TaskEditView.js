@@ -50,11 +50,6 @@ export default {
       // 关联项查询处理
       this.relationFieldHandler();
 
-      this.$nextTick(() => {
-        let planTaskEditFormEl = this.$refs.planTaskEditForm;
-        planTaskEditFormEl.toggle();
-      })
-
     } catch (error) {
       console.warn('error ', error)
     }
@@ -138,6 +133,12 @@ export default {
 
     },
     /** 
+     * @description 查询工单配置
+     */
+    fetchTaskConfig() {
+      return TaskApi.getTaskConfig().catch(err => console.warn(err));
+    },
+    /** 
      * @description 初始化
     */
     initialize() {
@@ -179,9 +180,20 @@ export default {
       document.title = title;
     },
     /** 
-     * @description 新建计划任务
+     * @description 新建计划任务弹窗
     */
-    planTaskCreate() {
+    async planTaskCreateDialogOpen() {
+      try {
+        // 获取工单配置
+        let result = await this.fetchTaskConfig();
+        let taskConfig = result?.taskConfig || {};
+
+        this.$set(this, 'taskConfig', taskConfig);
+        
+      } catch (error) {
+        console.warn('planTaskCreate -> error', error)
+      }
+      
       let planTaskEditFormEl = this.$refs.planTaskEditForm;
       planTaskEditFormEl.toggle();
 
@@ -198,6 +210,54 @@ export default {
       //     if (!valid) return Promise.reject('validate fail.');
           
       //   })
+    },
+    /** 
+     * @description 新建计划任务提交
+    */
+    planTaskCreateSubmit(params = {}) {
+      TaskApi.createPlanTask(params)
+        .then(res => {
+          let isSucc = res.success;
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `创建计划任务${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+
+          this.pending = false;
+          this.loadingPage = false;
+
+          if (!isSucc) return;
+          
+          // 跳转计划任务列表
+          window.location.href = '/task/planTask/list';
+        })
+        .catch(err => console.error('err', err))
+    },
+    /** 
+     * @description 编辑计划任务提交
+    */
+    planTaskEditSubmit(params = {}) {
+      TaskApi.editPlanTask(params)
+        .then(res => {
+          let isSucc = res.success;
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `编辑计划任务${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+
+          this.pending = false;
+          this.loadingPage = false;
+
+          if (!isSucc) return;
+          
+          // 跳转计划任务列表
+          window.location.href = '/task/planTask/list';
+        })
+        .catch(err => console.error('err', err))
     },
     /** 
      * @description 刷新tab
@@ -273,6 +333,32 @@ export default {
           this.loadingPage = false;
           console.error(err);
         })
+    },
+    /** 
+     * @description 计划任务提交
+    */
+    submitWithPlanTask(planTaskParams = {}) {
+      if(this.pending) return;
+
+      this.loadingPage = false;
+      this.pending = false;
+      
+      const task = util.packToTask(this.fields, this.form);
+      task.templateId = taskTemplate.value;
+      task.templateName = taskTemplate.text;
+      
+      const params = {
+        ...planTaskParams,
+        task
+      };
+      
+      if (this.isFromPlan) {
+        return this.planTaskCreateSubmit(params);
+      }
+      if (this.isPlanTaskEdit) {
+        return this.planTaskEditSubmit(params);
+      }
+
     },
     /** 
      * @description 编辑工单方法

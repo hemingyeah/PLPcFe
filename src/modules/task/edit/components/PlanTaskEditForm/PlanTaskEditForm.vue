@@ -6,16 +6,16 @@
         <el-form ref="form" :model="form" label-width="110px" label-position="left">
           
           <!-- start 计划名称 -->
-          <el-form-item label="计划名称：" required>
-            <el-input v-model="form.name" :maxlength="50"> </el-input>
+          <el-form-item label="计划名称：" :error="validation.name" required>
+            <el-input v-model="form.name" @change="validate" :maxlength="50"></el-input>
           </el-form-item>
           <!-- end 计划名称 -->          
 
           <!-- start 重复周期 -->
-          <el-form-item label="重复周期：" required>
+          <el-form-item label="重复周期：" :error="validation.period" required>
             每
-            <el-input class="plan-task-edit-repetion-num" type="number" v-model="form.repetitionPeriod.num"></el-input>
-            <el-select class="plan-task-edit-repetion-time" v-model="form.repetitionPeriod.time" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
+            <el-input class="plan-task-edit-repetion-num" type="number" :value="form.periodSetting.period" @input="changePeriod"></el-input>
+            <el-select :disabled="isEdit" class="plan-task-edit-repetion-time" v-model="form.periodSetting.periodUnit" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
               <el-option
                 v-for="item in repetitionPeriodList"
                 :key="item.value"
@@ -29,9 +29,9 @@
           <!-- end 重复周期 -->
 
           <!-- start 截止 -->
-          <el-form-item label="截止：" required>
+          <el-form-item label="截止：" :error="isEndTime ? validation.endTime : validation.endNum" required>
 
-            <el-select class="plan-task-edit-abort-select" v-model="form.abort.select" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
+            <el-select class="plan-task-edit-abort-select" :disabled="isEdit" v-model="form.endSetting.select" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
               <el-option
                 v-for="item in abortList"
                 :key="item.value"
@@ -43,36 +43,45 @@
 
             <!-- start 按截止日期 -->
             <el-date-picker
-              v-if="isAbortTime"
-              v-model="form.abort.time"
+              v-if="isEndTime"
+              v-model="form.endSetting.time"
+              @change="validate"
+              :editable="false"
               type="date"
               prefix-icon="iconfont icon-fd-date"
-              :editable="false"
               clearable
-              placeholder="请选择日期"
+              placeholder="请选择截止日期"
               value-format="yyyy-MM-dd"
             >
             </el-date-picker>
             <!-- end 按截止日期 -->
 
             <!-- start 按执行次数 -->
-            <el-input v-else class="plan-task-edit-abort-num" type="number" v-model="form.abort.num"></el-input>
+            <el-input v-else class="plan-task-edit-abort-num" type="number" :value="form.endSetting.num" @input="changeEndSettingNum"></el-input>
             <!-- end 按执行次数 -->
 
           </el-form-item>
           <!-- end 截止 -->
 
           <!-- start 创建时间 -->
-          <el-form-item label="创建时间：" required>
+          <el-form-item label="创建时间：" :error="validation.advance" required>
             在计划时间前 
-            <el-input class="plan-task-edit-create-time" type="number" v-model="form.beforeDayNum"></el-input>
+            <el-input class="plan-task-edit-create-time" type="number" :value="form.advance" @input="changeAdvance"></el-input>
             天创建工单
           </el-form-item>
           <!-- end 创建时间 -->
 
           <h3>派单设置</h3>
 
-          <task-allot-select></task-allot-select>
+          <!-- start 工单分配负责人/协同人select -->
+          <task-allot-select 
+            :task-config="taskConfig"
+            @update:type="changeAllotType"
+            @update:synergies="changeSynergies"
+            @update:executors="changeExecutors"
+          >
+          </task-allot-select>
+          <!-- end -->
 
         </el-form>
         <div class="dialog-footer">
