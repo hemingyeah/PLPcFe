@@ -103,21 +103,21 @@ export function packToForm(fields, data){
     if(fieldName === 'customer'){
       // 初始化客户
       task.customer = [{
-        value: value.id,
-        label: value.name
+        value: value?.id,
+        label: value?.name
       }];
 
       // 初始化联系人
       task.linkman = [{
-        value: data.tlmId,
-        label: data.tlmName + data.tlmPhone,
-        name: data.tlmName,
-        phone: data.tlmPhone
+        value: data?.tlmId,
+        label: data?.tlmName + data?.tlmPhone,
+        name: data?.tlmName,
+        phone: data?.tlmPhone
       }];
 
       // 初始化地址
       task.address = [];
-      if (data.taddress.id) {
+      if (data?.taddress?.id) {
         task.address = [{
           value: data.taddress.id,
           label: data.taddress.province + data.taddress.city + data.taddress.dist + data.taddress.address,

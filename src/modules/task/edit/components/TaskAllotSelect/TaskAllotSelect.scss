@@ -1,0 +1,13 @@
+.task-allot-select-container {
+  padding: 20px 0;
+  &-type {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+  &-user {
+    .el-input {
+      padding: 5px 0;
+    }
+  }
+}

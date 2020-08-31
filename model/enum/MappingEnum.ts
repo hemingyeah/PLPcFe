@@ -29,6 +29,8 @@ export enum TaskFieldNameMappingEnum {
   Customer = 'customer',
   // 联系人
   Linkman = 'linkman',
+  // 计划时间
+  PlanTime = 'planTime',
   // 产品
   Product = 'product',
   // 是否发送短信标记

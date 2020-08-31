@@ -32,7 +32,7 @@
           <!-- end 新建按钮组 -->
 
           <!-- start 新建计划任务 -->
-          <button type="button" class="btn btn-primary" :disabled="disabled" v-if="isFromPlan">
+          <button type="button" class="btn btn-primary" :disabled="disabled" v-if="isFromPlan" @click="planTaskCreate">
             保存为计划任务
           </button>
           <!-- end 新建计划任务 -->
@@ -50,6 +50,13 @@
 
       <task-edit-form :fields.sync="fields" :state="state" :types="types" :url-params="urlParams" :value.sync="form" ref="form" @updatetemplateId="updateTaskTemplateId"></task-edit-form>
     </form>
+
+    <!-- start 新建/编辑 计划任务弹窗 -->
+    <plan-task-edit-form ref="planTaskEditForm">
+
+    </plan-task-edit-form>
+    <!-- end 新建/编辑 计划任务弹窗 -->
+
   </div>
 </template>
 

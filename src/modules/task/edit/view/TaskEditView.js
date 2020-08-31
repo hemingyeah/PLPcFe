@@ -2,6 +2,7 @@
 import * as TaskApi from '@src/api/TaskApi.ts'
 /* component */
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
+import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm/PlanTaskEditForm.vue'
 /* utils */
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
@@ -17,6 +18,8 @@ import computed from './computed'
 import methods from './methods'
 /* enum */
 import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
+/* constant */
+import { PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE } from '@src/model/const/Alert.ts'
 
 let taskTemplate = {};
 
@@ -46,6 +49,11 @@ export default {
 
       // 关联项查询处理
       this.relationFieldHandler();
+
+      this.$nextTick(() => {
+        let planTaskEditFormEl = this.$refs.planTaskEditForm;
+        planTaskEditFormEl.toggle();
+      })
 
     } catch (error) {
       console.warn('error ', error)
@@ -171,6 +179,27 @@ export default {
       document.title = title;
     },
     /** 
+     * @description 新建计划任务
+    */
+    planTaskCreate() {
+      let planTaskEditFormEl = this.$refs.planTaskEditForm;
+      planTaskEditFormEl.toggle();
+
+      // let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
+      // if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
+
+      // this.submitting = true;
+
+      // this.$refs.form
+      //   .validate()
+      //   .then(valid => {
+      //     this.submitting = false;
+
+      //     if (!valid) return Promise.reject('validate fail.');
+          
+      //   })
+    },
+    /** 
      * @description 刷新tab
     */
     reloadTab() {
@@ -278,6 +307,7 @@ export default {
     },
   },
   components: {
-    [TaskEditForm.name]: TaskEditForm
+    [TaskEditForm.name]: TaskEditForm,
+    [PlanTaskEditForm.name]: PlanTaskEditForm
   }
 }
