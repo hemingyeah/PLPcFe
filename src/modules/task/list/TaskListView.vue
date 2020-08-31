@@ -265,21 +265,28 @@
             >新建</base-button
           >
           <TaskSelect :show="addShow" :list="taskTypes" @checkOther="addView" />
-          <base-button type="ghost" icon="icon-qingkongshanchu" @event="delTask"
+          <base-button
+            type="ghost"
+            icon="icon-qingkongshanchu"
+            v-if="exportPermissionTaskEdit"
+            @event="delTask"
             >删除</base-button
           >
         </div>
 
         <div class="action-button-group">
+          <!-- S 地图视图 -->
+          <span
+            class="el-dropdown-link el-dropdown-btn"
+            >地图视图</span
+          >
+          <!-- E 地图视图 -->
           <!-- 批量编辑 S-->
           <!-- initData.loginUser.authorities.TASK_EDIT === 3 -->
           <span
             class="el-dropdown-link el-dropdown-btn"
             @click="Alledit"
-            v-if="
-              initData.loginUser &&
-                initData.loginUser.authorities.TASK_EDIT === 3
-            "
+            v-if="exportPermissionTaskEdit"
             >批量编辑</span
           >
           <!-- 批量编辑 E-->
@@ -304,7 +311,10 @@
 
           <!-- start 更多操作 -->
           <!-- v-if="exportPermission" -->
-          <el-dropdown trigger="click">
+          <el-dropdown
+            trigger="click"
+            v-if="exportPermission || exportPermissionTaskEdit"
+          >
             <span
               class="el-dropdown-link el-dropdown-btn"
               @click="trackEventHandler('moreAction')"
@@ -333,9 +343,12 @@
               <el-dropdown-item v-if="exportPermission">
                 <div @click="exportTask(true)">导出全部</div>
               </el-dropdown-item>
-              <!-- v-if="exportPermissionTaskEdit || exportPermissionTaskBatchDispatch" -->
-              <el-dropdown-item >
-                <div>工单转派</div>
+              <el-dropdown-item
+                v-if="
+                  exportPermissionTaskEdit || exportPermissionTaskBatchDispatch
+                "
+              >
+                <div @click="reallotBatch">工单转派</div>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -674,6 +687,9 @@
       </div>
     </base-import>
     <!-- E 导入工单 -->
+    <!-- S 工单转换 -->
+    <task-transfer ref="TaskTransfer" :taskIdList="selectedIds" />
+    <!-- E 工单转换 -->
   </div>
 </template>
 
