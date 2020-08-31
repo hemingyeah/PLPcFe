@@ -82,6 +82,7 @@
                   class="srp-list-form-item flex-1"
                   style="margin-left:1px;"
                   multiple
+                  filterable
                   collapse-tags
                   placeholder="目标仓库"
                 >
@@ -369,6 +370,7 @@
               class="srp-list-form-item"
               style="width: 180px;margin-left:-3px;"
               multiple
+              filterable
               collapse-tags
               placeholder="原始仓库"
             >
@@ -1140,7 +1142,7 @@ export default {
       sparepartType: '',
       targetIds: [],
       sourceIds: [],
-      state: ['suspending']
+      state: ['suspending','dealing']
     };
 
     return {
@@ -1373,12 +1375,30 @@ export default {
     // 批量办理-保存
     mulHandleSave(){
       let form=this.$refs.mulHandleForm;
+      if(form.pending) return
       if(form.selected.length===0){
         this.$platform.alert('请选择要办理的数据');
         return
       }
       if(form.remark.length>500){
         this.$platform.alert('办理意见不能超过500字');
+        return
+      }
+      const existZero=form.selected.find(item=>item.handleNum==0);
+      if(existZero){
+        this.$platform.alert('办理数量需为大于0的数字');
+        return
+      }
+      const existMore=form.selected.find(item=>{
+        const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+        const max=(item.variation-item.solvedVariation).toFixed(decimals);
+        return item.handleNum>max
+      });
+      if(existMore){
+        this.$message({
+          type:'warning',
+          message:'办理数量不得大于可办理数量'
+        });
         return
       }
 
@@ -1403,6 +1423,7 @@ export default {
             message: res.message || '办理成功',
             type: 'success'
           });
+          this.loadData();
         }else{
           this.$message({
             showClose: true,
@@ -1418,6 +1439,11 @@ export default {
           type: 'error'
         });
       })
+    },
+    // 获取小数位数
+    countDecimals(num){
+      if(Math.floor(num)===num) return 0;
+      return num.toString().split('.')[1].length || 0;
     },
     formmatTime(time){
       const t=new Date(time);

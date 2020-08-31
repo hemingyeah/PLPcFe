@@ -6,6 +6,8 @@ import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.v
 import TaskSelect from "./components/TaskSelect.vue";
 import TaskViewModel from "./components/TaskViewModel.vue";
 import BatchEditingCustomerDialog from "./components/BatchEditingCustomerDialog.vue";
+import TaskTransfer from "./components/TaskTransfer.vue";
+
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum";
 import { fields, selectIds, advancedList } from "./TaskFieldModel";
@@ -70,7 +72,7 @@ export default {
         { name: "我协同的", id: "synergy" },
       ], //头部筛选列表
       selectId: "all",
-      checkImportTask: '',
+      checkImportTask: "",
       columns: [],
       columnNum: 1,
       currentTaskType: {},
@@ -504,7 +506,7 @@ export default {
      * @description 工单导入
      */
     imporTask(item) {
-      this.checkImportTask = item
+      this.checkImportTask = item;
       this.$refs.importCustomerModal.open();
     },
     /**
@@ -522,6 +524,17 @@ export default {
       }
       window.TDAPP.onEvent("pc：工单列表-批量编辑工单");
       this.$refs.batchEditingCustomerDialog.open();
+    },
+    /**
+     * @description 工单转派
+     */
+    reallotBatch() {
+      const { selectedIds } = this;
+      if (!selectedIds.length) {
+        this.$platform.alert("请选择要转派的工单");
+        return;
+      }
+      this.$refs.TaskTransfer.openSendMessageDialog()
     },
     /**
      * @description 批量编辑成功
@@ -572,7 +585,7 @@ export default {
             return c;
           });
           // let list = [...data.content, ...data.content, ...data.content, ...data.content, ...data.content, ...data.content]
-          this.taskPage.list = []
+          this.taskPage.list = [];
           this.taskPage.merge(Page.as(data));
           this.params.pageNum = number;
 
@@ -1212,7 +1225,6 @@ export default {
       const { selectId, initData } = this;
       let mySearch;
       this.loading = true;
-      console.log("陈杰", params);
       switch (selectId) {
         case "all":
           mySearch = {};
@@ -1611,6 +1623,7 @@ export default {
     },
   },
   components: {
+    [TaskTransfer.name]: TaskTransfer,
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
