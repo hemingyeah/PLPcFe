@@ -190,7 +190,6 @@ export default {
       }
 
       this.errMessage = this.validateOptions(newValues);
-
       if(this.errMessage) return false;
 
       let newOptions = newValues.map(item => ({value: item, isDefault: false}));

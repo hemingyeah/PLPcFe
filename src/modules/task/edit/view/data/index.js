@@ -6,5 +6,6 @@ export default {
   submitting: false,
   submitModel: {
     url: ''
-  }
+  },
+  taskConfig: {}
 }

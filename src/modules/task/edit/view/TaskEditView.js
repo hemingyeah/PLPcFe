@@ -2,6 +2,7 @@
 import * as TaskApi from '@src/api/TaskApi.ts'
 /* component */
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
+import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm/PlanTaskEditForm.vue'
 /* utils */
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
@@ -17,6 +18,8 @@ import computed from './computed'
 import methods from './methods'
 /* enum */
 import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
+/* constant */
+import { PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE } from '@src/model/const/Alert.ts'
 
 let taskTemplate = {};
 
@@ -130,6 +133,12 @@ export default {
 
     },
     /** 
+     * @description 查询工单配置
+     */
+    fetchTaskConfig() {
+      return TaskApi.getTaskConfig().catch(err => console.warn(err));
+    },
+    /** 
      * @description 初始化
     */
     initialize() {
@@ -169,6 +178,121 @@ export default {
       }
 
       document.title = title;
+    },
+    /** 
+     * @description 新建计划任务弹窗
+    */
+    async planTaskCreateDialogOpen() {
+      let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
+      if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
+
+      this.submitting = true;
+
+      this.$refs.form
+        .validate()
+        .then(async (valid) => {
+          this.submitting = false;
+          
+          if (!valid) return Promise.reject('validate fail.');
+
+          // 获取工单配置
+          let result = await this.fetchTaskConfig();
+          let taskConfig = result?.taskConfig || {};
+          this.$set(this, 'taskConfig', taskConfig);
+          
+          // 显示计划任务弹窗
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          planTaskEditFormEl.toggle();
+
+          this.submitting = false;
+        })
+    },
+    /** 
+     * @description 编辑计划任务弹窗
+    */
+    async planTaskEditDialogOpen() {
+      let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
+      if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
+
+      this.submitting = true;
+
+      this.$refs.form
+        .validate()
+        .then(async (valid) => {
+          this.submitting = false;
+          
+          if (!valid) return Promise.reject('validate fail.');
+
+          // 获取工单配置
+          let result = await this.fetchTaskConfig();
+          let taskConfig = result?.taskConfig || {};
+          this.$set(this, 'taskConfig', taskConfig);
+          
+          // 显示计划任务弹窗
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          let planTask = this.initData?.planTask || {};
+          planTaskEditFormEl.toggle(true, planTask);
+
+          this.submitting = false;
+        })
+    },
+    /** 
+     * @description 新建计划任务提交
+    */
+    planTaskCreateSubmit(params = {}) {
+      TaskApi.createPlanTask(params)
+        .then(res => {
+          let isSucc = res.success;
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `创建计划任务${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+
+          this.pending = false;
+          this.loadingPage = false;
+
+          if (!isSucc) return;
+          
+          // 跳转计划任务列表
+          window.location.href = '/task/planTask/list';
+        })
+        .catch(err => console.error('err', err))
+        .finally(() => {
+          // 计划任务元素
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          planTaskEditFormEl && planTaskEditFormEl.togglePending();
+        })
+    },
+    /** 
+     * @description 编辑计划任务提交
+    */
+    planTaskEditSubmit(params = {}) {
+      TaskApi.editPlanTask(params)
+        .then(res => {
+          let isSucc = res.success;
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `编辑计划任务${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+
+          this.pending = false;
+          this.loadingPage = false;
+
+          if (!isSucc) return;
+          
+          // 跳转计划任务列表
+          window.location.href = '/task/planTask/list';
+        })
+        .catch(err => console.error('err', err))
+        .finally(() => {
+          // 计划任务元素
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          planTaskEditFormEl && planTaskEditFormEl.togglePending();
+        })
     },
     /** 
      * @description 刷新tab
@@ -224,9 +348,6 @@ export default {
             task,
             tick,
           };
-          params.templateId = taskTemplate.value;
-          params.templateName = taskTemplate.text;
-          params.callRecordId = this.initData?.callRecordId;
         
           this.pending = true;
           this.loadingPage = true;
@@ -244,6 +365,35 @@ export default {
           this.loadingPage = false;
           console.error(err);
         })
+    },
+    /** 
+     * @description 计划任务提交
+    */
+    submitWithPlanTask(planTaskParams = {}) {
+      if(this.pending) return;
+
+      this.loadingPage = false;
+      this.pending = false;
+      // 计划任务元素
+      let planTaskEditFormEl = this.$refs.planTaskEditForm;
+      planTaskEditFormEl && planTaskEditFormEl.togglePending(true);
+      
+      const task = util.packToTask(this.fields, this.form);
+      task.templateId = taskTemplate.value;
+      task.templateName = taskTemplate.text;
+      
+      const params = {
+        ...planTaskParams,
+        task
+      };
+      
+      if (this.isFromPlan) {
+        return this.planTaskCreateSubmit(params);
+      }
+      if (this.isPlanTaskEdit) {
+        return this.planTaskEditSubmit(params);
+      }
+
     },
     /** 
      * @description 编辑工单方法
@@ -278,6 +428,7 @@ export default {
     },
   },
   components: {
-    [TaskEditForm.name]: TaskEditForm
+    [TaskEditForm.name]: TaskEditForm,
+    [PlanTaskEditForm.name]: PlanTaskEditForm
   }
 }

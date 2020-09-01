@@ -1,3 +1,5 @@
+import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
+
 /** 将form对象转成客户对象，用于提交表单 */
 export function packToTask(fields, form){
   let task = {
@@ -10,7 +12,7 @@ export function packToTask(fields, form){
     let {fieldName, isSystem} = field;
     let value = form[fieldName];
 
-    if(fieldName === 'customer'){
+    if(fieldName === TaskFieldNameMappingEnum.Customer){
       let customer = form.customer || [];
       // customer
       if(customer[0]){
@@ -58,18 +60,22 @@ export function packToTask(fields, form){
       return;
     }
 
-    if (field.formType === 'address' && !field.isSystem) {
+    if (field.formType === TaskFieldNameMappingEnum.Address && !field.isSystem) {
       let all = value.province + value.city + value.dist + value.address;
       if(all) {
         value.all = all;
       }
     }
     
-    if (field.formType === 'location') {
+    if (field.formType === TaskFieldNameMappingEnum.Location) {
       value = {};
     }
 
-    if (fieldName === 'attachment') {
+    if (field.formType === TaskFieldNameMappingEnum.PlanTime) {
+      value = value.length === 10 ? `${value} 00:00:00` : value;
+    }
+
+    if (fieldName === TaskFieldNameMappingEnum.Attachment) {
       // 拼附件和回执附件
       value = value.concat(form.receiptAttachment).filter(attachment => !!attachment);
     }
@@ -100,24 +106,27 @@ export function packToForm(fields, data){
     let { fieldName, isSystem } = field;
     let value = data[fieldName];
 
-    if(fieldName === 'customer'){
+    if(fieldName === TaskFieldNameMappingEnum.Customer){
       // 初始化客户
       task.customer = [{
-        value: value.id,
-        label: value.name
+        value: value?.id,
+        label: value?.name
       }];
-
+      
       // 初始化联系人
-      task.linkman = [{
-        value: data.tlmId,
-        label: data.tlmName + data.tlmPhone,
-        name: data.tlmName,
-        phone: data.tlmPhone
-      }];
+      task.linkman = [];
+      if(data.tlmId) {
+        task.linkman = [{
+          value: data?.tlmId,
+          label: data?.tlmName + data?.tlmPhone,
+          name: data?.tlmName,
+          phone: data?.tlmPhone
+        }];
+      }
 
       // 初始化地址
       task.address = [];
-      if (data.taddress.id) {
+      if (data?.taddress?.id) {
         task.address = [{
           value: data.taddress.id,
           label: data.taddress.province + data.taddress.city + data.taddress.dist + data.taddress.address,
@@ -126,16 +135,18 @@ export function packToForm(fields, data){
       }
 
       // 初始化产品
-      data.products.length && data.products.map(item => {
+      data.products 
+      && data.products.length 
+      && data.products.map(item => {
         item.value = item.id;
         item.label = item.name;
       })
-      task.product = data.products;
+      task.product = data.products || [];
 
       return;
     }
 
-    if (fieldName === 'attachment') {
+    if (fieldName === TaskFieldNameMappingEnum.Attachment) {
       // 分离附件和回执附件
       if (value.length) {
         task.receiptAttachment = value.filter(img => img.receipt);

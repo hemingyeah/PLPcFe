@@ -51,6 +51,7 @@ import _ from 'lodash';
 import SettingMixin from '@src/component/form/mixin/setting';
 import FormSelectMixin from '@src/component/form/mixin/form.select';
 import { settingProps } from '@src/component/form/components/props';
+import Platform from "@src/platform";
 
 export default {
   name: 'form-select-setting-task',
@@ -71,6 +72,11 @@ export default {
   methods: {
     batchEdit(){
       let newValues = this.optionText.split('\n').filter(option => option);
+
+      if(!newValues.length) {
+        Platform.alert("至少要有一个选项");
+        return false;
+      }
 
       this.errMessage = this.validateOptions(newValues);
       if(this.errMessage) return;

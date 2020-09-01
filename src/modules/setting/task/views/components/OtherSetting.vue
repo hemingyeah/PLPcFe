@@ -364,6 +364,14 @@ export default {
     }
 
   },
+  watch : {
+    'cameraForm.exceptionRange'(newValue,oldValue) {
+      if(newValue && parseFloat(newValue) != newValue) {
+        this.cameraForm.exceptionRange = oldValue;
+      }
+    }
+  },
+
   components : {
     TemplateUploadDialog,
     [SystemTemplateDialog.name] : SystemTemplateDialog
