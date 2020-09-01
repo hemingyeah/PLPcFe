@@ -38,8 +38,8 @@
           <!-- end 新建计划任务 -->
 
           <!-- start 编辑计划任务 -->
-          <button type="button" class="btn btn-primary" :disabled="disabled" v-if="isPlanTaskEdit">
-            保存为计划任务
+          <button type="button" class="btn btn-primary" :disabled="disabled" @click="planTaskEditDialogOpen" v-if="isPlanTaskEdit">
+            保存计划任务
           </button>
           <!-- end 编辑计划任务 -->
 

@@ -173,7 +173,45 @@ const PlanTaskEditForm = {
      * @param {Object} data 数据
     */
     packData(data = {}) {
-      // 
+      const { advance = '', allotSetting = {}, endSetting = {}, id = '', name = '', periodSetting = {} } = data;
+      const { allotType = 'normal', synergies = [], executorId = '' } = allotSetting;
+      const { value = '', endBy = '' } = endSetting;
+      const { period = 1, periodUnit = '天' } = periodSetting;
+      const IsEndTime = endBy == 'date';
+
+      let form = {
+        // 计划任务id
+        id,
+        // 计划任务名称
+        name,
+        // 周期设置
+        periodSetting: {
+          // 周期数
+          period,
+          // 周期单位(天、周、月)
+          periodUnit
+        },
+        // 截止设置
+        endSetting: {
+          // 截止单位(times、date)
+          select: endBy,
+          num: IsEndTime ? 1 : value,
+          time: IsEndTime ? value : ''
+        },
+        // 提前几天创建
+        advance,
+        // 派单设置
+        allotSetting: {
+          // 派单方式 (normal、pool、auto)
+          allotType,
+          // 协同人
+          synergies,
+          // 负责人
+          executors: [{ userId: executorId }]
+        }
+      }
+
+      this.$set(this, 'form', form);
     },
     reset() {
       this.form = this.initForm();
@@ -194,6 +232,9 @@ const PlanTaskEditForm = {
 
       this.show = show;
       this.validate();
+    },
+    togglePending(pending = false) {
+      this.pending = pending;
     },
     unPackDataToParams(data = {}) {
       let { id, name, periodSetting = {}, endSetting = {}, advance, allotSetting } = this.form;

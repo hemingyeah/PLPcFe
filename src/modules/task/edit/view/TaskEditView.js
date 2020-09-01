@@ -183,33 +183,58 @@ export default {
      * @description 新建计划任务弹窗
     */
     async planTaskCreateDialogOpen() {
-      try {
-        // 获取工单配置
-        let result = await this.fetchTaskConfig();
-        let taskConfig = result?.taskConfig || {};
+      let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
+      if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
 
-        this.$set(this, 'taskConfig', taskConfig);
-        
-      } catch (error) {
-        console.warn('planTaskCreate -> error', error)
-      }
-      
-      let planTaskEditFormEl = this.$refs.planTaskEditForm;
-      planTaskEditFormEl.toggle();
+      this.submitting = true;
 
-      // let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
-      // if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
-
-      // this.submitting = true;
-
-      // this.$refs.form
-      //   .validate()
-      //   .then(valid => {
-      //     this.submitting = false;
-
-      //     if (!valid) return Promise.reject('validate fail.');
+      this.$refs.form
+        .validate()
+        .then(async (valid) => {
+          this.submitting = false;
           
-      //   })
+          if (!valid) return Promise.reject('validate fail.');
+
+          // 获取工单配置
+          let result = await this.fetchTaskConfig();
+          let taskConfig = result?.taskConfig || {};
+          this.$set(this, 'taskConfig', taskConfig);
+          
+          // 显示计划任务弹窗
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          planTaskEditFormEl.toggle();
+
+          this.submitting = false;
+        })
+    },
+    /** 
+     * @description 编辑计划任务弹窗
+    */
+    async planTaskEditDialogOpen() {
+      let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
+      if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
+
+      this.submitting = true;
+
+      this.$refs.form
+        .validate()
+        .then(async (valid) => {
+          this.submitting = false;
+          
+          if (!valid) return Promise.reject('validate fail.');
+
+          // 获取工单配置
+          let result = await this.fetchTaskConfig();
+          let taskConfig = result?.taskConfig || {};
+          this.$set(this, 'taskConfig', taskConfig);
+          
+          // 显示计划任务弹窗
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          let planTask = this.initData?.planTask || {};
+          planTaskEditFormEl.toggle(true, planTask);
+
+          this.submitting = false;
+        })
     },
     /** 
      * @description 新建计划任务提交
@@ -234,6 +259,11 @@ export default {
           window.location.href = '/task/planTask/list';
         })
         .catch(err => console.error('err', err))
+        .finally(() => {
+          // 计划任务元素
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          planTaskEditFormEl && planTaskEditFormEl.togglePending();
+        })
     },
     /** 
      * @description 编辑计划任务提交
@@ -258,6 +288,11 @@ export default {
           window.location.href = '/task/planTask/list';
         })
         .catch(err => console.error('err', err))
+        .finally(() => {
+          // 计划任务元素
+          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          planTaskEditFormEl && planTaskEditFormEl.togglePending();
+        })
     },
     /** 
      * @description 刷新tab
@@ -313,9 +348,6 @@ export default {
             task,
             tick,
           };
-          params.templateId = taskTemplate.value;
-          params.templateName = taskTemplate.text;
-          params.callRecordId = this.initData?.callRecordId;
         
           this.pending = true;
           this.loadingPage = true;
@@ -342,6 +374,9 @@ export default {
 
       this.loadingPage = false;
       this.pending = false;
+      // 计划任务元素
+      let planTaskEditFormEl = this.$refs.planTaskEditForm;
+      planTaskEditFormEl && planTaskEditFormEl.togglePending(true);
       
       const task = util.packToTask(this.fields, this.form);
       task.templateId = taskTemplate.value;

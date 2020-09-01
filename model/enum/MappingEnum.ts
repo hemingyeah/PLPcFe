@@ -25,10 +25,14 @@ export enum FieldTypeMappingEnum {
 export enum TaskFieldNameMappingEnum {
   // 地址
   Address = 'address',
+  // 附件
+  Attachment = 'attachment',
   // 客户
   Customer = 'customer',
   // 联系人
   Linkman = 'linkman',
+  // 位置
+  Location = 'location',
   // 计划时间
   PlanTime = 'planTime',
   // 产品

@@ -15,7 +15,7 @@
           <el-form-item label="重复周期：" :error="validation.period" required>
             每
             <el-input class="plan-task-edit-repetion-num" type="number" :value="form.periodSetting.period" @input="changePeriod"></el-input>
-            <el-select :disabled="isEdit" class="plan-task-edit-repetion-time" v-model="form.periodSetting.periodUnit" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
+            <el-select class="plan-task-edit-repetion-time" v-model="form.periodSetting.periodUnit" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
               <el-option
                 v-for="item in repetitionPeriodList"
                 :key="item.value"
@@ -31,7 +31,7 @@
           <!-- start 截止 -->
           <el-form-item label="截止：" :error="isEndTime ? validation.endTime : validation.endNum" required>
 
-            <el-select class="plan-task-edit-abort-select" :disabled="isEdit" v-model="form.endSetting.select" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
+            <el-select class="plan-task-edit-abort-select" v-model="form.endSetting.select" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
               <el-option
                 v-for="item in abortList"
                 :key="item.value"
@@ -85,7 +85,7 @@
 
         </el-form>
         <div class="dialog-footer">
-          <el-button @click="show = false">取 消</el-button>
+          <el-button @click="show = false" :disabled="pending">取 消</el-button>
           <el-button type="primary" @click="onSubmit" :disabled="pending">确 定</el-button>
         </div>
       </div>
