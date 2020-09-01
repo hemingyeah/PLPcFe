@@ -52,7 +52,7 @@
     </form>
 
     <!-- start 新建/编辑 计划任务弹窗 -->
-    <plan-task-edit-form :task-config="taskConfig" @submit="submitWithPlanTask" ref="planTaskEditForm">
+    <plan-task-edit-form :origin-form="form" :task-config="taskConfig" @submit="submitWithPlanTask" ref="planTaskEditForm">
 
     </plan-task-edit-form>
     <!-- end 新建/编辑 计划任务弹窗 -->

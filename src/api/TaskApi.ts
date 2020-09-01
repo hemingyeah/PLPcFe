@@ -819,7 +819,7 @@ export function createPlanTask(params: PlanTaskCreateAndEditModel) {
  * @description 编辑计划任务
  */
 export function editPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/create`, params);
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/update`, params);
 }
 
 /* -------------  end  新工单api ---------------- */

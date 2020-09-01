@@ -75,6 +75,7 @@
 
           <!-- start 工单分配负责人/协同人select -->
           <task-allot-select 
+            ref="TaskAllotSelect"
             :task-config="taskConfig"
             @update:type="changeAllotType"
             @update:synergies="changeSynergies"

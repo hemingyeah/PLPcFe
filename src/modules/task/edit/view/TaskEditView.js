@@ -203,6 +203,7 @@ export default {
           // 显示计划任务弹窗
           let planTaskEditFormEl = this.$refs.planTaskEditForm;
           planTaskEditFormEl.toggle();
+          planTaskEditFormEl.fetchExeinsyn(this.form?.customer?.[0]?.id);
 
           this.submitting = false;
         })

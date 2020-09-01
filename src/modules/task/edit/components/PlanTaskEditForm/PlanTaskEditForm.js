@@ -2,14 +2,28 @@
 import TaskAllotSelect from '@src/modules/task/edit/components/TaskAllotSelect/TaskAllotSelect.vue'
 /* utils */
 import _ from 'lodash'
+import DateUtil from '@src/util/date';  
 /* constant */
-import { TASK_NO_EXECUTOR_MESSAGE } from '@src/model/const/Alert.ts'
+import { 
+  TASK_NO_EXECUTOR_MESSAGE,
+  PLATN_TASK_PERIOD_NOT_ZERO_MESSAGE,
+  PLATN_TASK_CREATE_TIME_NOT_GREATER_THEAN_PERIOD_TIME_MESSAGE,
+  PLATN_TASK_END_TIME_NOT_GREATER_ONE_YEAR_MESSAGE,
+  PLATN_TASK_PERFORM_NUMBER_MAX_MESSAGE
+} from '@src/model/const/Alert.ts'
+import { PLAN_TASK_MAX_DAY, PLAN_TASK_MAX_PERFORM_NUMBER } from '@src/model/const/Number.ts';
+
+
 const NumberReg = /\D/g;
 
 const PlanTaskEditForm = {
   name: 'plan-task-edit-form',
   initject: ['initData'],
   props: {
+    originForm: {
+      type: Object,
+      default: () => ({})
+    },
     taskConfig: {
       type: Object,
       default: () => ({})
@@ -62,6 +76,9 @@ const PlanTaskEditForm = {
     isEndTime() {
       return this.form?.endSetting?.select == this.abortList?.[0]?.value;
     },
+    taskAllotSelectEl() {
+      return this.$refs.TaskAllotSelect;
+    },
     validation() {
       let { name, period, periodUnit, endTime, endNum, advance } = this.formValidation;
       return {
@@ -104,6 +121,10 @@ const PlanTaskEditForm = {
     changeAdvance(value) {
       this.form.advance = this.formatNumber(value);
       this.validate();
+    },
+    fetchExeinsyn(customerId = '') {
+      const TaskAllotSelectEl = this.taskAllotSelectEl;
+      TaskAllotSelectEl && TaskAllotSelectEl.fetchExeinsynWithCustomerManager(customerId);
     },
     formatNumber(value) {
       return value.replace(NumberReg, '');
@@ -155,8 +176,11 @@ const PlanTaskEditForm = {
      * @description 提交
     */
     onSubmit: _.debounce(function(){
-      // 效验
+      // 效验是否必填
       let validated = this.validate();
+      if (!validated) return;
+
+      validated = this.validateDataCorrectly();
       if (!validated) return;
       
       // 判断是否选择工单负责人
@@ -174,7 +198,7 @@ const PlanTaskEditForm = {
     */
     packData(data = {}) {
       const { advance = '', allotSetting = {}, endSetting = {}, id = '', name = '', periodSetting = {} } = data;
-      const { allotType = 'normal', synergies = [], executorId = '' } = allotSetting;
+      const { allotType = 'normal', synergies = [], executorId = '', executorName = '' } = allotSetting;
       const { value = '', endBy = '' } = endSetting;
       const { period = 1, periodUnit = '天' } = periodSetting;
       const IsEndTime = endBy == 'date';
@@ -207,9 +231,12 @@ const PlanTaskEditForm = {
           // 协同人
           synergies,
           // 负责人
-          executors: [{ userId: executorId }]
+          executors: [{ userId: executorId, displayName: executorName }]
         }
       }
+
+      const TaskAllotSelectEl = this.taskAllotSelectEl;
+      TaskAllotSelectEl && TaskAllotSelectEl.changeAllotData(form.allotSetting);
 
       this.$set(this, 'form', form);
     },
@@ -240,6 +267,7 @@ const PlanTaskEditForm = {
       let { id, name, periodSetting = {}, endSetting = {}, advance, allotSetting } = this.form;
       let { select, time, num } = endSetting;
       let { allotType, synergies, executors } = allotSetting;
+      let executor = executors?.[0] || {};
       let params = {
         id,
         name,
@@ -252,7 +280,8 @@ const PlanTaskEditForm = {
         allotSetting: {
           allotType,
           synergies,
-          executorId: executors?.[0]?.userId
+          executorId: executor.userId,
+          executorName: executor.displayName
         }
       };
 
@@ -270,6 +299,64 @@ const PlanTaskEditForm = {
           })
           .every(bool => bool)
       )
+    },
+    /** 
+     * @description 效验数据正确性
+     */
+    validateDataCorrectly() {
+      let { advance = '', allotSetting = {}, endSetting = {}, id = '', name = '', periodSetting = {} } = this.form;
+      let { allotType = 'normal', synergies = [], executorId = '', executorName = '' } = allotSetting;
+      let { num, time = '', select = '' } = endSetting;
+      let { period, periodUnit = '天' } = periodSetting;
+      let IsEndTime = select == 'date';
+      let validated = true;
+      
+      try {
+        period = isNaN(Number(period)) ? 0 : Number(period);
+        advance = isNaN(Number(advance)) ? 0 : Number(advance);
+  
+        if (period == 0){
+          this.$platform.alert(PLATN_TASK_PERIOD_NOT_ZERO_MESSAGE)
+          return validated = false;
+        }
+        
+        if(periodUnit == '天') {
+          if(advance > period) {
+            this.$platform.alert(PLATN_TASK_CREATE_TIME_NOT_GREATER_THEAN_PERIOD_TIME_MESSAGE)
+            return validated = false;
+          }
+        }
+        else if(periodUnit == '周') {
+          if(advance > period * 7) {
+            this.$platform.alert(PLATN_TASK_CREATE_TIME_NOT_GREATER_THEAN_PERIOD_TIME_MESSAGE)
+            return validated = false;
+          }
+        }
+        else if(periodUnit == '月') {
+          if(advance > period * 30) {
+            this.$platform.alert(PLATN_TASK_CREATE_TIME_NOT_GREATER_THEAN_PERIOD_TIME_MESSAGE)
+            return validated = false;
+          }
+        }
+  
+        if(IsEndTime) {
+          let dateDiff = DateUtil.datedifference(this.originForm.planTime.substr(0, 10), time);
+          if(dateDiff > PLAN_TASK_MAX_DAY) {
+            this.$platform.alert(PLATN_TASK_END_TIME_NOT_GREATER_ONE_YEAR_MESSAGE)
+            return validated = false;
+          }
+        } else {
+          if(Number(num) > PLAN_TASK_MAX_PERFORM_NUMBER){
+            this.$platform.alert(PLATN_TASK_PERFORM_NUMBER_MAX_MESSAGE)
+            return validated = false;
+          }
+        }
+      } catch (error) {
+        validated = false;
+        console.warn('validateDataCorrectly -> error', error)
+      }
+
+      return validated;
     }
   },
   components: {
