@@ -49,6 +49,9 @@ textarea {
     display: flex;
     flex-wrap: wrap;
   }
+  &-ai {
+    align-items: center;
+  }
   &-span1 {
     flex: 1;
   }
@@ -58,6 +61,20 @@ textarea {
   // 字体大小
   &-font12 {
     font-size: 12px;
+  }
+  &-font16 {
+    font-size: 12px;
+  }
+  &-font24 {
+    font-size: 24px;
+  }
+  // 加粗
+  &-fw6{
+    font-weight: 600;
+  }
+  // 颜色
+  &-c6 {
+    color: #666;
   }
 }
 // E 工单列表

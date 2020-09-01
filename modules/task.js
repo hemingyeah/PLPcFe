@@ -16,7 +16,8 @@ module.exports = {
     template: "src/templates/map.html",
   },
   // 工单列表
-  'task.list': {
-    entry: './src/modules/task/list/index.js',
-  }
-}
+  "task.list": {
+    entry: "./src/modules/task/list/index.js",
+    template: "src/templates/map.html",
+  },
+};

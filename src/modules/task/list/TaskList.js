@@ -7,6 +7,7 @@ import TaskSelect from "./components/TaskSelect.vue";
 import TaskViewModel from "./components/TaskViewModel.vue";
 import BatchEditingCustomerDialog from "./components/BatchEditingCustomerDialog.vue";
 import TaskTransfer from "./components/TaskTransfer.vue";
+import TaskMap from "./components/TaskMap.vue";
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum";
@@ -65,6 +66,7 @@ export default {
       advanceds: advancedList, //高级搜索列表
       searchParams: {}, //筛选列表的参数
       allSearchParams: {}, //全部工单搜索条件
+      mapShow: true, //地图预览
       selectList: [
         { name: "全部", id: "all" },
         { name: "我创建的", id: "create" },
@@ -534,7 +536,7 @@ export default {
         this.$platform.alert("请选择要转派的工单");
         return;
       }
-      this.$refs.TaskTransfer.openSendMessageDialog()
+      this.$refs.TaskTransfer.openSendMessageDialog();
     },
     /**
      * @description 批量编辑成功
@@ -563,6 +565,7 @@ export default {
      * @return {Object} 页面展示数据
      */
     searchList() {
+      this.loading = false;
       const { searchParams } = this;
       return TaskApi.search(searchParams)
         .then((result) => {
@@ -1623,6 +1626,7 @@ export default {
     },
   },
   components: {
+    [TaskMap.name]: TaskMap,
     [TaskTransfer.name]: TaskTransfer,
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,

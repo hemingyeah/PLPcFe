@@ -29,7 +29,7 @@ export default {
     right: {
       type: Boolean,
       default: false,
-    },
+    }
   },
   name: "TaskSelect",
   data() {
