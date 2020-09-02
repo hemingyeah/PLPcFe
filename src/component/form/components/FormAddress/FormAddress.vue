@@ -9,14 +9,14 @@
         type="text"
         :value="detail"
         @input="input"
-        maxlength="50"
+        maxlength="1000"
         :id="`form_${field.fieldName}`"
         autocomplete="off"/>
       <el-button type="button" class="action-btn" @click="toggleModal">解析地址</el-button>
     </div>
 
     <base-modal :show.sync="visible" title="解析地址" class="form-address-modal">
-      <textarea v-model.trim="copy" placeholder="请输入或粘贴地址到文本框进行解析" maxlength="500"></textarea>
+      <textarea v-model.trim="copy" placeholder="请输入或粘贴地址到文本框进行解析" maxlength="1000"></textarea>
       <el-button type="primary" @click="analyze" :disabled="!copy.length || pending">解析</el-button>
     </base-modal>
   </div>
