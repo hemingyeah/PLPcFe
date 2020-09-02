@@ -287,7 +287,11 @@
 
           <div class="action-button-group">
             <!-- S 地图视图 -->
-            <span class="el-dropdown-link el-dropdown-btn" @click="mapShow = false">地图视图</span>
+            <span
+              class="el-dropdown-link el-dropdown-btn"
+              @click="mapShow = false"
+              >地图视图</span
+            >
             <!-- E 地图视图 -->
             <!-- 批量编辑 S-->
             <!-- initData.loginUser.authorities.TASK_EDIT === 3 -->
@@ -444,10 +448,22 @@
               <!-- 客户  TODO: 客户查看权限 -->
               <template v-else-if="column.field === 'customer'">
                 <div>
-                  {{ scope.row[column.field] && scope.row[column.field] }}
+                  {{ scope.row["customerEntity"].name }}
                 </div>
               </template>
 
+              <!-- 联系人 -->
+              <template v-else-if="column.field === 'tlmName'">
+                <div>
+                  {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
+                </div>
+              </template>
+              <!-- 电话 -->
+              <template v-else-if="column.field === 'tlmPhone'">
+                <div>
+                  {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                </div>
+              </template>
               <!-- 自定义的选择类型字段显示， 与type 区别-->
               <template
                 v-else-if="column.formType === 'select' && !column.isSystem"
@@ -498,15 +514,28 @@
                     @click.stop.prevent="
                       openUserTab(
                         column.field === 'createUserName'
-                          ? scope.row.createUser
-                          : scope.row.executor
+                          ? scope.row.createUser.displayName
+                          : scope.row.executorUser.displayName
                       )
                     "
                   >
-                    {{ scope.row[column.field] }}
+                    {{
+                      column.field === "executorName"
+                        ? scope.row.executorUser &&
+                          scope.row.executorUser.displayName
+                        : scope.row.createUser &&
+                          scope.row.createUser.displayName
+                    }}
                   </a>
                 </template>
-                <template v-else>{{ scope.row[column.field] }}</template>
+                <template v-else>
+                  {{
+                    column.field === "executorName"
+                      ? scope.row.executorUser &&
+                        scope.row.executorUser.displayName
+                      : scope.row.createUser && scope.row.createUser.displayName
+                  }}
+                </template>
               </template>
 
               <!-- 协同人 -->
@@ -517,6 +546,11 @@
                       .map((synergie) => synergie.displayName)
                       .join(", ")
                 }}
+              </template>
+
+              <!-- 派单方式 -->
+              <template v-else-if="column.field === 'allotTypeStr'">
+                {{ allotTypeText(scope.row.allotType) }}
               </template>
 
               <!-- 工单状态 -->
@@ -553,7 +587,7 @@
 
               <!-- 地址 -->
               <template v-else-if="column.formType === 'address'">
-                {{ formatCustomizeAddress(scope.row[column.field]) }}
+                {{ formatCustomizeAddress(scope.row[column.formType]) }}
               </template>
 
               <!-- 用户 -->
@@ -591,7 +625,41 @@
               <template v-else-if="!column.isSystem">
                 {{ scope.row.attribute[column.field] }}
               </template>
-
+              <!-- 接单用时 -->
+              <template v-else-if="column.field === 'acceptUsedTimeStr'">
+                {{
+                  scope.row.acceptUsedTime &&
+                    scope.row.acceptUsedTime
+                }}
+              </template>
+              <!-- 工单用时 -->
+              <template v-else-if="column.field === 'taskUsedTimeStr'">
+                {{
+                  scope.row.taskUsedTime &&
+                    scope.row.taskUsedTime
+                }}
+              </template>
+              <!-- 工作用时 -->
+              <template v-else-if="column.field === 'workUsedTimeStr'">
+                {{
+                  scope.row.workUsedTime &&
+                    scope.row.workUsedTime
+                }}
+              </template>
+              <!-- 响应用时 -->
+              <template v-else-if="column.field === 'taskResponseTimeStr'">
+                {{
+                  scope.row.taskResponseTime &&
+                    scope.row.taskResponseTime
+                }}
+              </template>
+              <!-- 支付方式 -->
+              <template v-else-if="column.field === 'paymentMethod'">
+                {{
+                  scope.row.attribute["paymentMethod"] &&
+                    scope.row.attribute["paymentMethod"]
+                }}
+              </template>
               <template v-else>
                 {{ scope.row[column.field] }}
               </template>
@@ -704,7 +772,11 @@
     <!-- E 列表展示 -->
 
     <!-- S 地图预览 -->
-    <task-map v-show="!mapShow" @hide="mapShow = true" />
+    <task-map
+      :mapShow="mapShow"
+      @hide="mapShow = true"
+      :config="{ selectedIds: selectedIds, searchParams: searchParams }"
+    />
     <!-- E 地图预览 -->
   </div>
 </template>
