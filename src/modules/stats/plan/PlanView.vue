@@ -61,7 +61,7 @@ import calendar from "./calendar";
 import PlanMap from "./PlanMap.vue"; 
 import PlanTrendChart from './PlanTrendChart.vue';
 import SampleTooltip from 'packages/SampleTooltip';
-
+import {isEnterprise} from '@src/util/Platform';
 export default {
   name: "stats-plan-view",
   data() {
@@ -90,7 +90,7 @@ export default {
   },
   methods: {
     fetchTeam(params){
-      return http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     chooseTeam(value){
       this.$tdOnEvent('pc：业务计划-工单日历团队选择事件');

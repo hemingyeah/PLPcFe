@@ -105,7 +105,7 @@ import echarts from "packages/Echarts";
 import Loading from 'packages/BaseLoading';
 import BaseCheckbox from 'packages/BaseCheckbox.vue';
 import SampleTooltip from 'packages/SampleTooltip'
-
+import {isEnterprise} from '@src/util/Platform';
 let categoryPartUse = null;
 
 
@@ -217,7 +217,7 @@ export default {
   },
   methods: {
     fetchTeam(params){
-      return http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     exportData(){ //导出
       let model = {};

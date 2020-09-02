@@ -109,3 +109,52 @@ export function userLoginNameUnique (params) {
 export function getRoleUser (params) {
   return http.post('/security/user/list', params, false)
 }
+
+/**
+ * @description 角色添加成员
+ * @returns {*}
+ */
+export function addRoleUser (params) {
+  return http.post('/security/role/addUser', params, false)
+}
+
+/**
+ * @description 角色移除成员
+ * @returns {*}
+ */
+export function delRoleUser (params) {
+  return http.post('/security/role/deleteUser', params, false)
+}
+
+/**
+ * @description 获取角色下已删除人员列表
+ * @returns {*}
+ */
+export function getDelUser (params) {
+  return http.post('/security/user/list/getDUserInfo', params, false)
+}
+
+/**
+ * @description 自动分配角色
+ * @returns {*}
+ */
+export function autoAuth (params) {
+  return http.post('/setting/autoAuth/save', params, false)
+}
+
+/**
+ * @description 重置密码
+ * @returns {*}
+ */
+export function resetPwd (params) {
+  return http.post('/security/user/resetPwd', params, false)
+}
+
+/**
+ * @description 启用禁用
+ * @returns {*}
+ */
+export function enable (params) {
+  return http.post('/security/user/resetPwd', params, false)
+}
+

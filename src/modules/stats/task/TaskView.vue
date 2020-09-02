@@ -100,7 +100,7 @@
 
 <script>
 /*global AMap, moment*/
-
+import {isEnterprise} from '@src/util/Platform';
 import _ from 'lodash';
 import $ from 'jQuery';
 
@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     fetchTeam(params){
-      return this.$http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return this.$http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     chooseChart(chart){
       this.trackEventHandler(chart);

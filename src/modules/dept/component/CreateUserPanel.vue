@@ -3,7 +3,7 @@
     <!-- 新建编辑部门 -->
     <base-panel :show.sync="visible" :width="panelWidth" class="createUserPanel">
       <h3 slot="title">
-        <span>{{ '添加成员' }}</span>
+        <span>{{ '新建账号' }}</span>
       </h3>
 
       <!-- start 添加成员 -->
@@ -11,30 +11,23 @@
 
         <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-ruleForm">
 
-          <el-form-item label="账户名" prop="accountName">
-            <el-input v-model="form.accountName" autocomplete="off" :maxlength="10"></el-input>
-          </el-form-item>
-
-          <el-form-item label="密码" prop="pass">
-            <el-input type="password" v-model="form.pass" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="确认密码" prop="checkPass">
-            <el-input type="password" v-model="form.checkPass" autocomplete="off"></el-input>
+          <el-form-item label="手机号" prop="phone">
+            <el-input v-model="form.phone" autocomplete="off" :maxlength="11"></el-input>
           </el-form-item>
 
           <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name" autocomplete="off" :maxlength="10"></el-input>
           </el-form-item>
 
-          <el-form-item label="手机" prop="phone">
-            <el-input v-model="form.phone" autocomplete="off" :maxlength="11"></el-input>
+          <el-form-item label="登录密码" prop="pass">
+            <el-input type="password" v-model="form.pass" autocomplete="off"></el-input>
           </el-form-item>
 
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="form.email" autocomplete="off" :maxlength="20"></el-input>
+          <el-form-item label="确认密码" prop="checkPass">
+            <el-input type="password" v-model="form.checkPass" autocomplete="off"></el-input>
           </el-form-item>
 
-          <el-form-item label="角色" prop="role" v-if="initData.canUpdateRole">
+          <el-form-item label="角色" prop="role">
             <el-select v-model="form.role" placeholder="请选择" multiple>
               <el-option
                 v-for="item in roleOptions"
@@ -46,13 +39,13 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="部门" prop="department">
+          <!-- <el-form-item label="部门" prop="department">
             <div @click="chooseDepartment" class="department-higher-name">{{ form.department.map(d => d.name).join(',') }}</div>
           </el-form-item>
 
           <el-form-item label="团队" prop="team" v-if="initData.canUpdateTag">
             <biz-team-select v-model="form.team" multiple />
-          </el-form-item>
+          </el-form-item> -->
 
         </el-form>
 
@@ -61,7 +54,8 @@
 
       <!-- start 底部按钮 -->
       <div class="create-user-panel-bottom">
-        <base-button type="primary" @event="validate">保存</base-button>
+        <base-button type="ghost" @event="visible = false">取消</base-button>
+        <base-button type="primary" @event="validate">确定</base-button>
         <!-- <base-button type="danger" @event="departmentDelete">删除</base-button> -->
       </div>
       <!-- end 底部按钮 -->
@@ -114,9 +108,9 @@ export default {
       higherDepartment: {},
       form: this.buildForm(),
       rules: {
-        accountName: [
-          { required: true, validator: this.checkAccountName, trigger: 'change' }
-        ],
+        // accountName: [
+        //   { required: true, validator: this.checkAccountName, trigger: 'change' }
+        // ],
         name: [
           { required: true, message: '请填写姓名', trigger: ['blur', 'change'] }
         ],
@@ -127,18 +121,18 @@ export default {
           { required: true, validator: validatePass2, trigger: ['blur', 'change'] }
         ],
         phone: [
-          { required: false, validator: validatePhone, trigger: ['blur', 'change'] },
+          { required: true, validator: this.checkAccountName, trigger: ['blur', 'change'] },
         ],
         role: [
           { required: true, message: '请选择角色', trigger: ['blue'] }
         ],
-        department: [
-          { required: true, message: '请选择部门', trigger: 'change' }
-        ],
-        email: [
-          { required: false, message: '请填写邮箱', trigger: 'change' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
-        ],
+        // department: [
+        //   { required: true, message: '请选择部门', trigger: 'change' }
+        // ],
+        // email: [
+        //   { required: false, message: '请填写邮箱', trigger: 'change' },
+        //   { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+        // ],
       },
       visible: false,
     }
@@ -148,9 +142,7 @@ export default {
       return this.action == 'edit';
     },
     roleOptions() {
-      let rolesJson = this.initData.rolesJson;
-      let roles = JSON.parse(rolesJson) || [];
-      
+      let roles = this.initData.rolesJson || [];
       return roles.map(role => ({ label: role.text, value: role.id}))
     },
     panelWidth() {
@@ -173,11 +165,13 @@ export default {
     },
     checkAccountName: _.debounce(function (rule, value, callback) {
       if (!value) {
-        return callback(new Error('请输入账户名'));
+        return callback(new Error('请输入手机号'));
+      } else if (!PHONE_REG.test(value)) {
+        return callback(new Error('请输入正确的手机号!'));
       }
 
       let params = {
-        loginName: this.form.accountName,
+        loginName: this.form.phone,
         userId: ''
       }
       userLoginNameUnique(params).then(result => {
@@ -243,18 +237,19 @@ export default {
 .create-user-panel {
 
   .create-user-form {
-    height: calc(100% - 110px);
+    // height: calc(100% - 110px);
     overflow-y: auto;
     padding: 20px 20px 0 0;
   }
 
   .create-user-panel-bottom {
     padding: 0 20px;
-
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
+    text-align: right;
+   
+    // position: absolute;
+    // bottom: 20px;
+    // left: 0;
+    // right: 0;
 
     .base-button {
       margin-right: 20px;

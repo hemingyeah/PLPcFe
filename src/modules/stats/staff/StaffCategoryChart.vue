@@ -141,6 +141,7 @@
 
 <script>
 /*global AMap, moment, _init_data*/
+import {isEnterprise} from '@src/util/Platform';
 import $ from "jQuery";
 import _ from 'lodash';
 import http from 'src/util/HttpUtil';
@@ -200,7 +201,7 @@ export default {
   },
   methods: {
     fetchTeam(params){
-      return http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     exportAllData(){
       let model = {

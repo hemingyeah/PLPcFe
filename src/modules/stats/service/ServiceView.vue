@@ -80,7 +80,7 @@ import ServiceUsageAmountReport from './ServiceUsageAmountReport.vue';
 import ServiceUsageCrowdReport from './ServiceUsageCrowdReport.vue';
 import ServiceCostReport from './ServiceCostReport.vue';
 import ServiceCategoryReport from './ServiceCategoryReport.vue';
-
+import {isEnterprise} from '@src/util/Platform';
 export default {
   name: 'service-view',
   data(){
@@ -106,7 +106,7 @@ export default {
   },
   methods: {
     fetchTeam(params){
-      return this.$http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return this.$http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     switchTab(tab){
       this.activeTab = tab;

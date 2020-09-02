@@ -57,7 +57,7 @@ import http from 'src/util/HttpUtil';
 import echarts from "packages/Echarts"
 
 import TaskStateEnum from 'src/model/enum/TaskStateEnum';
-
+import {isEnterprise} from '@src/util/Platform';
 let trend = null;
 
 export default {
@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     fetchTeam(params){
-      return http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     exportAllData(){
      let model = {

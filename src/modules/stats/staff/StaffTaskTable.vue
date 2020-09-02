@@ -90,6 +90,7 @@
 </template>
 
 <script>
+import {isEnterprise} from '@src/util/Platform';
 import http from 'src/util/HttpUtil';
 import StorageUtil from 'src/util/StorageUtil';
 
@@ -160,7 +161,7 @@ export default {
     },
 
     fetchTeam(params){
-      return http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     chooseColnum(column){
       this.$emit('trackEvent', 'chooseColumn');

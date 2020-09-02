@@ -155,7 +155,12 @@ export function notification(params = {}){
   return notification({...params, ...opt})
 }
 
+// 判断是否是多端环境(企业版)
+const host = window.location.host;
+export const isEnterprise = host === 'multi.linker.ltd';
+
 export default {
+  isEnterprise,
   getRootWindow,
   getDingTalkPC,
   inDingTalk,

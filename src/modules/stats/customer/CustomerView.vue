@@ -223,7 +223,7 @@ import SampleTooltip from 'packages/SampleTooltip'
 
 import CustomerMap from './CustomerMap.vue';
 import CustomerDegreeChart from './CustomerDegreeChart.vue';
-
+import {isEnterprise} from '@src/util/Platform';
 let chart = null;
 
 export default {
@@ -435,7 +435,7 @@ export default {
       })
     },
     fetchTeam(params){
-      return http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     chooseTeam(value){
       this.$tdOnEvent('pc：客户报表-选择团队事件');

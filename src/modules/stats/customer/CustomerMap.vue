@@ -82,7 +82,7 @@
 import DomUtil from 'src/util/DomUtil';
 import http from 'src/util/HttpUtil';
 import BaseCheckbox from 'packages/BaseCheckbox.vue';
-
+import {isEnterprise} from '@src/util/Platform';
 let map = null;
 let clusterer = null;
 let t1;
@@ -133,7 +133,7 @@ export default {
   },
   methods: {
     fetchTeam(params){
-      return http.post('/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
+      return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', {...params, ...{authKey: 'VIP_REPORT_VIEW'}})
     },
     openDetail(cId){
 

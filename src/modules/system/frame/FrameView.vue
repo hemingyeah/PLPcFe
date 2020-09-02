@@ -234,7 +234,7 @@
 
                 <div class="user-profile-item logout">
                   <a href="javascript:;" @click.prevent="logout">
-                    <i class="iconfont icon-logout"></i>注销
+                    <i class="iconfont icon-logout"></i>退出
                   </a>
                 </div>
               </el-popover>
