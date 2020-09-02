@@ -82,6 +82,7 @@
                   class="srp-list-form-item flex-1"
                   style="margin-left:1px;"
                   multiple
+                  filterable
                   collapse-tags
                   placeholder="目标仓库"
                 >
@@ -369,6 +370,7 @@
               class="srp-list-form-item"
               style="width: 180px;margin-left:-3px;"
               multiple
+              filterable
               collapse-tags
               placeholder="原始仓库"
             >
@@ -453,6 +455,12 @@
                     @click="exportPart(true)"
                     v-if="allowImportAndExport"
                   >导出全部</span>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <span
+                    class="dropdown-item"
+                    @click="mulHandle(selected)"
+                  >批量办理</span>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -585,7 +593,7 @@
               {{variationNum(scope.row.variation, scope.row.solvedVariation)}}
             </template>
             <template v-else-if="column.field == 'variation_'">{{scope.row.solvedVariation}}</template>
-            <template v-else-if="column.field =='enable' && scope.row.state === 'suspending'">
+            <template v-else-if="column.field =='enable' && (scope.row.state === 'suspending' || scope.row.state === 'dealing')">
               <el-button
                 @click="showPartDealDetail(scope.row),tableTrackEventHandler('done')"
                 type="text"
@@ -840,7 +848,7 @@
         <div
           slot="footer"
           class="dialog-footer flex-x"
-          v-if="partDealData.data.state === 'suspending'"
+          v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'dealing'"
         >
           <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
@@ -873,6 +881,18 @@
             @event="partDealDataDone"
             :disabled="pending"
           >办理</base-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog
+        title='批量办理'
+        :visible.sync="mulHandleDialog"
+        width='90%'
+      >
+        <mul-handle-form ref='mulHandleForm' :formdata='formdata' :mulHandleKey='mulHandleKey'></mul-handle-form>
+        <div slot="footer" class="dialog-footer">
+          <base-button type="ghost" @event="mulHandleDialog = false">取 消</base-button>
+          <base-button type="primary" @event="mulHandleSave" :disabled="pending">确 定</base-button>
         </div>
       </el-dialog>
 
@@ -1028,8 +1048,9 @@
         v-if="allowImportAndExport"
         :columns="exportColumns"
         :validate="checkExportCount"
-        action="/partV2/approve/approveExport"
+        action="/excels/approveExport"
         :method="'post'"
+        :needObjReq='true'
       ></base-export>
     </div>
 
@@ -1085,6 +1106,7 @@ import PartReStockForm from './form/PartReStockForm.vue';
 import PartCancelTransferForm from './form/PartCancelTransferForm.vue';
 import PartTransferForm from './form/PartTransferForm.vue';
 import PartDealWithForm from './form/PartDealWithForm.vue';
+import MulHandleForm from './form/MulHandleForm';
 
 import DateUtil from '@src/util/date';
 import AuthUtil from '@src/util/auth';
@@ -1094,7 +1116,9 @@ import {
   revokeBatch,
   approveBatch,
   getRelationListByApproveNo,
-  getProgress
+  getProgress,
+  getRelationsByApproveNos,
+  approveBatchByApproveNos
 } from '@src/api/SparePart';
 import StorageUtil from '@src/util/storageUtil';
 
@@ -1118,13 +1142,14 @@ export default {
       sparepartType: '',
       targetIds: [],
       sourceIds: [],
-      state: ['suspending']
+      state: ['suspending','dealing']
     };
 
     return {
       stateArr: [
         { value: '', label: '状态：全部', key: 'all' },
         { value: 'suspending', label: '待办理', key: 'suspending' },
+        { value: 'dealing', label: '办理中', key: 'dealing' },
         { value: 'solved', label: '已办理', key: 'solved' },
         { value: 'rejected', label: '已拒绝', key: 'rejected' },
         { value: 'cancel', label: '已取消', key: 'cancel' },
@@ -1172,6 +1197,7 @@ export default {
       cancelTransferDialog: false,
       transferDialog: false,
       reStockDialog: false,
+      mulHandleDialog:false,
       partDealDialog: false, // 新处理弹窗显隐判断条件
       partDealData: {
         data: {},
@@ -1233,7 +1259,9 @@ export default {
         ]
       },
       cancelType: 0, // 0 拒绝 1 撤销
-      partDealKey:1
+      partDealKey:1,
+      formdata:[],
+      mulHandleKey:1
     };
   },
   computed: {
@@ -1270,6 +1298,7 @@ export default {
     state(s) {
       if (s === 'solved') return '已办理';
       if (s === 'suspending') return '待办理';
+      if (s === 'dealing') return '办理中';
       if (s === 'cancel') return '已取消';
       if (s === 'rejected') return '已拒绝';
       if (s === 'revoked') return '已撤回';
@@ -1277,6 +1306,155 @@ export default {
     }
   },
   methods: {
+    // 批量办理
+    mulHandle(value){
+      if(value.length===0){
+        this.$platform.alert('请至少选择1条数据');
+        return;
+      }
+      if(value.length>20){
+        this.$platform.alert('单次选择不能超过20个申请单');
+        return;
+      }
+      // 只能选择可办理的数据
+      const cannotApprove=value.filter(item=>!item.approved);
+      if(cannotApprove.length>0){
+        this.$platform.alert('有'+cannotApprove.length+'条数据，您无办理权限');
+        return;
+      }
+      // 只能选择状态为"待办理"，申请类别为 申领、调拨、退回、分配 的数据
+      const allSuspending=value.every(item=>item.state==='suspending' || item.state==='dealing');
+      const allSL=value.every(item=>item.type==='申领');
+      const allDB=value.every(item=>item.type==='调拨');
+      const allTH=value.every(item=>item.type==='退回');
+      const allFP=value.every(item=>item.type==='分配');
+      if(!allSuspending || (!allSL && !allDB && !allTH && !allFP)){
+        this.$platform.alert('单次办理请选择同一申请类别的数据，且状态为【待办理】或【办理中】的申请单进行批量入库办理');
+        return;
+      }
+      const params={
+        ids:value.map(item=>item.id),
+        type:value[0].type
+      }
+      getRelationsByApproveNos(params).then(res=>{
+        if(!res.success){
+          this.$message({
+            showClose: true,
+            message: res.message || 'http error',
+            type: 'error'
+          });
+          return
+        }
+        const result=res.result.data;
+        this.formdata=result.map(item=>{
+          return {
+            id:item.id,
+            solvedVariation:item.solvedVariation,
+            variation:item.variation,
+            targetName:item.targetName,
+            propserName:item.propserName,
+            approveNo:item.approveNo,
+            type:item.type,
+            name:item.sparepart.name,
+            serialNumber:item.sparepart.serialNumber,
+            standard:item.sparepart.standard,
+            unit:item.sparepart.unit,
+            sourceName:item.sourceName,
+            sType:item.sparepart.type,
+            propserTime:this.formmatTime(item.propserTime),
+            repertoryCount:item.repertoryCount,
+            handleNum:null,
+            checked:false,
+            max:''
+          }
+        });
+        this.mulHandleKey++;
+        this.mulHandleDialog=true;
+      });
+    },
+    // 批量办理-保存
+    mulHandleSave(){
+      let form=this.$refs.mulHandleForm;
+      if(form.pending) return
+      if(form.selected.length===0){
+        this.$platform.alert('请选择要办理的数据');
+        return
+      }
+      if(form.remark.length>500){
+        this.$platform.alert('办理意见不能超过500字');
+        return
+      }
+      const existZero=form.selected.find(item=>item.handleNum==0);
+      if(existZero){
+        this.$platform.alert('办理数量需为大于0的数字');
+        return
+      }
+      const existMore=form.selected.find(item=>{
+        const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+        const max=(item.variation-item.solvedVariation).toFixed(decimals);
+        return item.handleNum>max
+      });
+      if(existMore){
+        this.$message({
+          type:'warning',
+          message:'办理数量不得大于可办理数量'
+        });
+        return
+      }
+
+      if(this.pending) return;
+
+      this.pending = true;
+      const params=form.selected.map(item=>{
+        return {
+          approveNo:item.approveNo,
+          id:item.id,
+          remark:form.remark,
+          solvedVariation:item.handleNum,
+          type:item.type
+        }
+      });
+      approveBatchByApproveNos(params).then(res=>{
+        this.mulHandleDialog=false;
+        this.pending = false;
+        if(res.success){
+          this.$message({
+            showClose: true,
+            message: res.message || '办理成功',
+            type: 'success'
+          });
+          this.loadData();
+        }else{
+          this.$message({
+            showClose: true,
+            message: res.message,
+            type: 'error'
+          });
+        }
+      }).catch(err=>{
+        this.pending = false;
+        this.$message({
+          showClose: true,
+          message: err.message,
+          type: 'error'
+        });
+      })
+    },
+    // 获取小数位数
+    countDecimals(num){
+      if(Math.floor(num)===num) return 0;
+      return num.toString().split('.')[1].length || 0;
+    },
+    formmatTime(time){
+      const t=new Date(time);
+      const year=t.getFullYear();
+      const month=(t.getMonth()+1).toString().padStart(2,'0');
+      const day=(t.getDate()).toString().padStart(2,'0');
+      const hour=(t.getHours()).toString().padStart(2,'0');
+      const minute=(t.getMinutes()).toString().padStart(2,'0');
+      const second=(t.getSeconds()).toString().padStart(2,'0');
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+    },
     // 打开详情弹窗
     partDearOpen(){
       this.partDealKey++;
@@ -1304,6 +1482,7 @@ export default {
               handleItems.forEach(item=>{
                 handleRemark+=item.remark+'；';
               });
+              handleRemark=handleRemark.slice(0,-1);
             }
             if(handleRemark && applyRemark){
               content=`${applyRemark}<br>------------------------------------------<br>${handleRemark}`;
@@ -1573,7 +1752,8 @@ export default {
       this.userApprove.approveId = '';
       this.targetType = '备件库';
       this.userApprove.options = _.cloneDeep(allPerson);
-      this.sparepart.options = _.cloneDeep(allPerson);
+      // this.sparepart.options = _.cloneDeep(allPerson);
+      this.sparepart.sparepartName='';
       this.repertory_1 = this.repertories;
       this.repertory_2 = this.repertories;
       this.timeValue = [];
@@ -2418,6 +2598,7 @@ export default {
           field: 'prosperTime',
           exportAlias: 'proposeTime',
           show: true,
+          export: true,
           // sortable: "custom",
           width: 160
         },
@@ -2427,6 +2608,7 @@ export default {
           field: 'approveNo',
           overflow: true,
           show: true,
+          export: true,
           width: 200,
           clickFnc: obj => {
             this.showPartDealDetail(obj);
@@ -2438,6 +2620,7 @@ export default {
           field: 'state',
           // sortable: "state",
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2446,22 +2629,25 @@ export default {
           exportAlias: 'type',
           field: 'type',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
-        // {
-        //   label: '备件名称/编号/规格',
-        //   field: 'sparepartIds',
-        //   exportAlias: 'sparepartName',
-        //   show: true,
-        //   minWidth: 170,
-        //   overflow: false,
-        // },
+        {
+          label: '备件名称/编号/规格',
+          field: 'sparepartIds',
+          exportAlias: 'sparepartName',
+          show: true,
+          export: true,
+          minWidth: 170,
+          overflow: false,
+        },
         {
           label: '申请数量',
           exportAlias: 'variation',
           field: 'showNum',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2470,6 +2656,7 @@ export default {
           exportAlias: 'price',
           field: 'showPrice',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2478,6 +2665,7 @@ export default {
           field: 'targetName',
           exportAlias: 'targetName',
           show: true,
+          export: true,
           minWidth: 120,
           overflow: true
         },
@@ -2486,6 +2674,7 @@ export default {
           field: 'sourceTargetName',
           exportAlias: 'sourceName',
           show: true,
+          export: true,
           minWidth: 120,
           overflow: true
         },
@@ -2494,6 +2683,7 @@ export default {
           field: 'prosperName',
           exportAlias: 'prosperName',
           width: 100,
+          export: true,
           overflow: true,
           show: true
         },
@@ -2502,11 +2692,13 @@ export default {
           field: 'applyCount',
           exportAlias: 'pendingVariation,solvedVariation',
           show: true,
+          export: true,
           width: 160
         },
         {
           field: 'approveName',
           label: '办理人',
+          export: true,
           exportAlias: 'executorName',
           show: true,
           width: 100,
@@ -2515,6 +2707,7 @@ export default {
         {
           field: 'approveTime',
           label: '办理时间',
+          export: true,
           exportAlias: 'updateTime',
           show: true,
           width: 160,
@@ -2525,10 +2718,20 @@ export default {
           label: '操作',
           field: 'enable',
           width: '150px',
+          export: true,
           show: true,
           fixed: 'right',
           export: false
-        }
+        },
+        {
+          label: '备注',
+          field: 'remark',
+          exportAlias: 'remark',
+          export: true,
+          show: true,
+          minWidth: 100,
+          overflow: false,
+        },
       ];
 
       columns.forEach(column => {
@@ -2582,6 +2785,9 @@ export default {
         break;
       case 'suspending':
         this.$tdOnEvent('pc：办理出入库-待办理事件');
+        break;
+      case 'dealing':
+        this.$tdOnEvent('pc：办理出入库-办理中事件');
         break;
       case 'solved':
         this.$tdOnEvent('pc：办理出入库-已办理事件');
@@ -2702,14 +2908,14 @@ export default {
           },
           progress:result.progress
         };
-        if(this.partDealData.data.state==='suspending'){
+        if(this.partDealData.data.state==='suspending' || this.partDealData.data.state==='dealing'){
           this.partDealTitle=`申请单-${this.partDealData.data.type}`;
         }else{
           this.partDealTitle='出入库单详情';
         }
         this.partDealDialog = true;
       });
-    }
+    },
   },
   mounted() {
     let initData = this.initData;
@@ -2738,7 +2944,8 @@ export default {
     [PartReStockForm.name]: PartReStockForm,
     [PartCancelTransferForm.name]: PartCancelTransferForm,
     [PartTransferForm.name]: PartTransferForm,
-    [PartDealWithForm.name]: PartDealWithForm
+    [PartDealWithForm.name]: PartDealWithForm,
+    MulHandleForm
   }
 };
 </script>
@@ -2968,8 +3175,8 @@ a {
   background: rgba(103,194,58,.2);
   border:1px solid rgba(103,194,58,.16);
 }
-// 待办理
-.state-suspending{
+// 待办理，办理中
+.state-suspending,.state-dealing{
   color:#FAAE14;
   background: rgba(250,174,20,.2);
   border:1px solid rgba(250,174,20,.16);

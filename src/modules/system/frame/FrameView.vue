@@ -47,11 +47,6 @@
                 <i class="iconfont icon-dianhua1"></i>
               </button>
               <div v-if="showCallCenter" class="call-center-box">
-                <i
-                  style="position: absolute;right: 15px;top: 20px;"
-                  class="iconfont icon-fe-close"
-                  @click="showCallCenter=false"
-                ></i>
                 <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
                 <p class="customer-name" v-if="callData.linkmanName">{{callData.linkmanName}}</p>
                 <p v-if="callData.linkmanName">{{callData.customerName}}</p>
@@ -63,7 +58,8 @@
                     <div class="ripple2"></div>
                   </div>
                 </div>
-                <p style="margin-top:10px;">{{callData.callPhone}}</p>
+                <p style="margin-top:10px;font-size: 26px;">{{callData.callPhone}}</p>
+                <el-button type="danger" @click="hangUpCall" style="margin-bottom: 20px;">挂断</el-button>
                 <!-- 呼入 -->
                 <template v-if="callData.callType=='normal'">
                   <div class="call-in">
@@ -413,7 +409,7 @@ export default {
       if (currentProtocol === 'https:') {
         protocol = 'wss';
       }
-      return `${protocol}://app.shb.ltd/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`;
+      return `${protocol}://${window.location.hostname}/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`;
     },
     /** 是否显示devtool */
     showDevTool() {
@@ -439,6 +435,15 @@ export default {
     }
   },
   methods: {
+    async hangUpCall(){
+      try {
+        let {code, message} = await CallCenterApi.hangUpCall();
+        if(code != 0) this.$message.error(message || '内部错误')
+        console.log('res:', code, message);
+      } catch(error) {
+        console.error(error);
+      }
+    },
     // 判断当前租户是否开启呼叫中心灰度功能
     async judgeCallCenterGray() {
       localStorage.setItem('call_center_gray', 0);

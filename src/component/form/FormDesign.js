@@ -627,7 +627,7 @@ const FormDesign = {
         <div class="form-design-panel">
           <div class={['form-design-tabs', this.hasSystemField ? 'form-design-withSys' : '']}>
             <div class="form-design-tab" onClick={e => this.fieldGroup = 0}>基础字段</div>
-            {this.hasSystemField && <div class="form-design-tab" onClick={e => this.fieldGroup = 1}>系统字段</div>}
+            {/* {this.hasSystemField && <div class="form-design-tab" onClick={e => this.fieldGroup = 1}>系统字段</div>} */}
           </div>
           <div class="form-design-tabs-content">{fieldList}</div>
         </div>

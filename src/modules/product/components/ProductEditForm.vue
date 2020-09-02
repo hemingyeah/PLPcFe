@@ -40,6 +40,7 @@
             :value="value.serialNumber" @update="update"
             :placeholder="genPlaceholder(field)"/>
         </form-item>
+        <span class="product_error" v-if="serialNumberExist">产品编号已存在</span>
       </template>
 
       <!-- start 产品类型 -->
@@ -104,7 +105,8 @@ export default {
   data() {
     return {
       validation: this.buildValidation(),
-      template: []
+      template: [],
+      serialNumberExist:false
     }
   },
   computed: {
@@ -193,6 +195,19 @@ export default {
       let {fieldName, displayName} = field;
       if (this.$appConfig.debug) {
         console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+      if(fieldName==='serialNumber'){
+        if(newValue){
+          this.$http.post(`/customer/product/checkUniqueForSerialNumber`,{id:this.productId,serialNumber:newValue},false).then(res=>{
+            if(res.hasOwnProperty('ok')){
+              this.serialNumberExist=false;
+            }else{
+              this.serialNumberExist=true;
+            }
+          })
+        }else{
+          this.serialNumberExist=false;
+        }
       }
       let value = this.value;
 
@@ -702,4 +717,14 @@ export default {
     }
   }
 
+</style>
+
+<style lang='scss' scoped>
+.product_error{
+  color:#f56c6c;
+  margin-left:131px;
+  display:inline-block;
+  transform:translateY(-8px);
+  font-size:12px;
+}
 </style>
