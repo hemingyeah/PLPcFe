@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
 // 单行最大长度
-export const SINGLE_LINE_MAX_LEN = 50;
+export const SINGLE_LINE_MAX_LEN = 1000;
 // 多行最大长度
-export const MULTI_LINE_MAX_LEN = 500;
+export const MULTI_LINE_MAX_LEN = 2000;
 // 电话
 export const TEL_REG = /^(((0\d{2,3}-{0,1})?\d{7,8})|(\d{6}))$/;
 // 手机号

@@ -179,6 +179,22 @@ export default {
 
       document.title = title;
     },
+    jumpWithPlanTask() {
+      try {
+        let isFromId = window.frameElement.getAttribute('fromid');
+
+        if(isFromId) {
+          let closeId = window.frameElement.dataset.id;
+          this.$platform.refreshTab(isFromId);
+          this.$platform.closeTab(closeId);
+        } else {
+          location.href = '/task/planTask/list';
+        }
+        
+      } catch (error) {
+        console.warn('jumpWithPlanTask -> error', error)
+      }
+    },
     /** 
      * @description 新建计划任务弹窗
     */
@@ -203,6 +219,7 @@ export default {
           // 显示计划任务弹窗
           let planTaskEditFormEl = this.$refs.planTaskEditForm;
           planTaskEditFormEl.toggle();
+          planTaskEditFormEl.fetchExeinsyn(this.form?.customer?.[0]?.id);
 
           this.submitting = false;
         })
@@ -255,8 +272,7 @@ export default {
 
           if (!isSucc) return;
           
-          // 跳转计划任务列表
-          window.location.href = '/task/planTask/list';
+          this.jumpWithPlanTask();
         })
         .catch(err => console.error('err', err))
         .finally(() => {
@@ -284,8 +300,7 @@ export default {
 
           if (!isSucc) return;
           
-          // 跳转计划任务列表
-          window.location.href = '/task/planTask/list';
+          this.jumpWithPlanTask();
         })
         .catch(err => console.error('err', err))
         .finally(() => {

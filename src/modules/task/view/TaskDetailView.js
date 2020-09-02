@@ -15,6 +15,7 @@ import TaskInfoRecord from './components/TaskInfoRecord.vue';
 import TaskReceipt from './components/TaskReceipt.vue';
 import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
+import TaskCard from './components/TaskCard';
 
 export default {
   name: 'task-detail-view',
@@ -413,7 +414,6 @@ export default {
   methods: {
     // 构建工单关联tabs
     buildTabs() {
-      // TODO: 附加组件
       return [
         {
           displayName: '工单进度',
@@ -434,6 +434,11 @@ export default {
           displayName: '客户评价',
           component: TaskFeedback.name,
           show: this.viewFeedbackTab
+        },
+        {
+          displayName: '附加组件',
+          component: TaskCard.name,
+          show: this.initData.cardInfo.length
         }
       ].filter(tab => tab.show);
     },
@@ -459,7 +464,6 @@ export default {
     },
     // 删除工单
     async deleteTask() {
-      // TODO：接口联调问题
       this.pending = true;
 
       try {
@@ -470,10 +474,10 @@ export default {
         * 如果使用了备件，需要提示
         */
         if (this.unFinishedState) {
-          const res = await TaskApi.taskFilterWithPart({ taskIds: this.task.id });
-          if (res.status == 1) {
-            warningMsg = `${res.message}，确定要删除所选工单吗？`;
-          } else if (res.status == 0 && res.data.length > 0) {
+          const res = await TaskApi.finishedWithPart({ taskIds: this.task.id });
+          if (!res.success) {
+            warningMsg = '获取工单的结算单失败，无法判断工单是否添加了备件，确定要删除所选工单吗？';
+          } else if (res.success && res.result) {
             warningMsg = '工单已添加备件，确定要删除吗？';
           }
         }
@@ -481,7 +485,7 @@ export default {
         const result = await this.$platform.confirm(warningMsg);
         if (!result) return this.pending = false;
 
-        TaskApi.deleteTask({taskIds: [this.task.id]}).then(res => {
+        TaskApi.deleteTask([this.task.id]).then(res => {
           if (res.success) {
             let fromId = window.frameElement.getAttribute('fromid');
             this.$platform.refreshTab(fromId);
@@ -788,5 +792,6 @@ export default {
     [TaskReceipt.name]: TaskReceipt,
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
+    [TaskCard.name]: TaskCard,
   }
 }

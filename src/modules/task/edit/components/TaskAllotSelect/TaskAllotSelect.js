@@ -1,3 +1,5 @@
+import { getCustomerExeinsyn } from '@src/api/CustomerApi';
+
 const TaskAllowSelect = {
   name: 'task-allot-select',
   props: {
@@ -32,11 +34,11 @@ const TaskAllowSelect = {
   computed: {
     /* 自动派单 */
     autoDispatch() {
-      return this.taskConfig.autoDispatch === true;
+      return this.taskConfig?.autoDispatch === true;
     },
     /* 是否按团队派单 */
     isAllotByTag() {
-      return this.initData?.isAllotByTag === true;
+      return this.taskConfig?.allotByTag === true;
     },
     /* 是否显示选择负责人 */
     isShowSelectExecutor() {
@@ -56,6 +58,27 @@ const TaskAllowSelect = {
     // 
   },
   methods: {
+    changeAllotData(data = {}) {
+      const { allotType, synergies, executors } = data;
+
+      if (allotType) this.allotType = allotType;
+      if (synergies && Array.isArray(synergies)) this.value.synergies = synergies;
+      if (executors && Array.isArray(executors)) this.value.executors = executors;
+
+    },
+    /** 根据客户id获取客户信息和客户负责人信息和开关 */
+    fetchExeinsynWithCustomerManager(customerId = '') {
+      if(!customerId) return console.warn('fetchExeinsynWithCustomerManager paramer not have customerId')
+
+      getCustomerExeinsyn({ id: customerId}).then(result => {
+        let exeInSynOfTaskOrEvent = result?.data?.exeInSynOfTaskOrEvent;
+        // 允许自动将客户负责人带入工单或事件协同人
+        if(exeInSynOfTaskOrEvent) {
+          this.value.synergies.push(result.data);
+        }
+      })
+
+    },
     /** 选择协同人人员  */
     selectSynergiesUser() {
       let choose = 'dept';

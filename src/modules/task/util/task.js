@@ -60,7 +60,7 @@ export function packToTask(fields, form){
       return;
     }
 
-    if (field.formType === TaskFieldNameMappingEnum.Address && !field.isSystem) {
+    if (field.formType === TaskFieldNameMappingEnum.Address && !field.isSystem && value) {
       let all = value.province + value.city + value.dist + value.address;
       if(all) {
         value.all = all;
@@ -71,11 +71,11 @@ export function packToTask(fields, form){
       value = {};
     }
 
-    if (field.formType === TaskFieldNameMappingEnum.PlanTime) {
+    if (field.formType === TaskFieldNameMappingEnum.PlanTime && value) {
       value = value.length === 10 ? `${value} 00:00:00` : value;
     }
 
-    if (fieldName === TaskFieldNameMappingEnum.Attachment) {
+    if (fieldName === TaskFieldNameMappingEnum.Attachment && value) {
       // 拼附件和回执附件
       value = value.concat(form.receiptAttachment).filter(attachment => !!attachment);
     }
@@ -146,7 +146,12 @@ export function packToForm(fields, data){
       return;
     }
 
-    if (fieldName === TaskFieldNameMappingEnum.Attachment) {
+    if (field.formType === TaskFieldNameMappingEnum.PlanTime && value) {
+      let { dateType = 'date' } = field.setting;
+      value = dateType == 'date' ? value.replace(' 00:00:00', '') : value;
+    }
+
+    if (fieldName === TaskFieldNameMappingEnum.Attachment && value) {
       // 分离附件和回执附件
       if (value.length) {
         task.receiptAttachment = value.filter(img => img.receipt);

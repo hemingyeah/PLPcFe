@@ -493,6 +493,85 @@ export function reviewTask(params: {} | undefined) {
 }
 
 /**
+ * @description 保存附加组件
+ * @param {Object} params 参数对象
+ * @param {String} params.cardId 附加组件id
+ * @param {String} params.inputType 附加组件填写类型
+ * @param {Object} params.attribute 附加组件自定义字段
+ * @param {String} params.taskId 工单id
+ */
+export function taskCreateCard(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/card/save`, params);
+}
+
+/**
+ * @description 编辑附加组件
+ * @param {Object} params 参数对象
+ * @param {String} params.cardId 附加组件id
+ * @param {String} params.inputType 附加组件填写类型
+ * @param {Object} params.attribute 附加组件自定义字段
+ * @param {String} params.taskId 工单id
+ */
+export function taskEditCard(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/card/edit`, params);
+}
+
+/**
+ * @description 删除附加组件
+ * @param {Object} params 参数对象
+ * @param {String} params.cardId 附加组件id
+ * @param {String} params.infoId 附加组件实例id
+ * @param {String} params.taskId 工单id
+ */
+export function taskDeleteCard(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/card/delete`, params);
+}
+
+/**
+ * @description 工时记录列表
+ * @param {Object} params 参数对象
+ * @param {String} params.cardId 附加组件id
+ * @param {String} params.orderId 工单id
+ */
+export function getHoursRecordList(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/tasktime/getMainList`, params);
+}
+
+/**
+ * @description 编辑工时记录
+ * @param {String} params.id 工时记录附加组件实例id
+ */
+export function updateHoursRecord(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/tasktime/updateWorkTimeRecord`, params);
+}
+
+/**
+ * @description 新增工时记录
+ * @param {String} params.cardId 工时记录id
+ * @param {String} params.orderId 工单id
+ * @param {String} params.recordFromType 默认1
+ */
+export function createHoursRecord(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/tasktime/createWorkTimeRecordForweb`, params);
+}
+
+/**
+ * @description 删除工时记录
+ * @param {String} params.mainId 工时记录附加组件实例id
+ */
+export function deleteHoursRecord(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/tasktime/deleteWorkTimeRecord`, params, false);
+}
+
+/**
+ * @description 工时记录位置详情
+ * @param {String} params.mainId 工时记录附加组件实例id
+ */
+export function hoursRecordLocation(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/tasktime/getDetailList`, params, false);
+}
+
+/**
  * 保存工单设置信息
  * @param {Object} params - 参数对象
  * @param {String} params.fields - 设置form对象
@@ -819,6 +898,6 @@ export function createPlanTask(params: PlanTaskCreateAndEditModel) {
  * @description 编辑计划任务
  */
 export function editPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/create`, params);
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/update`, params);
 }
 /* -------------  end  新工单api ---------------- */

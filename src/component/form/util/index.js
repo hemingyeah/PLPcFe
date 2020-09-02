@@ -4,8 +4,8 @@ import FormField from '../FormField';
 export * from './validate';
 
 const DEFAULT_PLACEHOLDER = {
-  text: '最多50字',
-  textarea: '最多500字',
+  text: '最多1000字',
+  textarea: '最多2000字',
   number: '请输入数字',
   customerAddress: '请填写详细地址',
   relationCustomer: '由客户信息查询',

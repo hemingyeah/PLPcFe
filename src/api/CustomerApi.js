@@ -160,3 +160,12 @@ export function getCustomerListAsyn(params) {
   return http.get('/customer/getListAsyn', params);
 }
 
+/**
+ * 根据客户id获取客户信息和客户负责人信息和开关
+ * @param {Object} params - 参数
+ * @param {String} params.id - 客户di
+ */
+export function getCustomerExeinsyn(params) {
+  return http.get('/customer/exeinsyn/get', params, false);
+}
+
