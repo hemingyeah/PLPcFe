@@ -25,9 +25,7 @@
     </div>
     <div class="dialog-footer">
       <el-button @click="sendMessageDialog = false">取 消</el-button>
-      <el-button type="primary" @click="onSubmit"
-        >确 定</el-button
-      >
+      <el-button type="primary" @click="onSubmit">确 定</el-button>
     </div>
   </base-modal>
 </template>
@@ -66,8 +64,8 @@ export default {
         executorId,
       };
       if (!synergies.length || !executorId) {
-        $platform.alert('请选择新负责人或新协同人')
-        return
+        $platform.alert("请选择新负责人或新协同人");
+        return;
       }
       const { status, message, data, succ } = await TaskApi.redeployBatch(
         params
