@@ -12,7 +12,7 @@ import ApproveTaskDialog from './components/ApproveTaskDialog.vue';
 import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 
 import TaskInfoRecord from './components/TaskInfoRecord.vue';
-import TaskReceipt from './components/TaskReceipt.vue';
+import TaskReceiptView from './components/TaskReceipt/TaskReceiptView.vue';
 import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
@@ -422,7 +422,7 @@ export default {
         },
         {
           displayName: '回执信息',
-          component: TaskReceipt.name,
+          component: TaskReceiptView.name,
           show: this.viewReceiptTab
         },
         {
@@ -789,7 +789,7 @@ export default {
     [ApproveTaskDialog.name]: ApproveTaskDialog,
     [ProposeApproveDialog.name]: ProposeApproveDialog,
     [TaskInfoRecord.name]: TaskInfoRecord,
-    [TaskReceipt.name]: TaskReceipt,
+    [TaskReceiptView.name]: TaskReceiptView,
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
