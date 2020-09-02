@@ -1,5 +1,5 @@
 <template>
-  <div class="task-map">
+  <div class="task-map" v-show="!mapShow">
     <!-- 头部 -->
     <div class="task-flex task-map-header">
       <div class="task-span1" @click="$emit('hide')">
@@ -24,13 +24,13 @@
           <i class="iconfont icon-xiangzuo-copy" v-show="mapPostion === 8"></i>
         </div>
         <div class="task-map-body-workSide-header task-flex task-ai">
-          <span class="task-span1">工单数量 10</span>
+          <span class="task-span1">工单数量 {{ mapList.length }}</span>
           <span @click="checkPostion = 282" v-show="checkPostion === 8"
             ><i class="iconfont icon-yemianshanchu task-font12"></i
           ></span>
         </div>
         <!-- 列表 -->
-        <task-map-list :mapHeight="mapHeight" />
+        <task-map-list :mapHeight="mapHeight" :mapList="mapList" @next="next" />
         <!-- 已选中列表 and 未选中 -->
         <div
           class="task-map-check"
@@ -38,15 +38,15 @@
             `transition: all ease 0.3s;transform: translate(${checkPostion}px,0);`
           "
         >
-          <task-map-list :mapHeight="mapHeight" />
+          <task-map-list :mapHeight="mapHeight" :mapList="mdataFilter" />
         </div>
         <!-- foot -->
         <div class="task-map-select" v-show="selectShow">
-          <div @click="checkList('check')">仅显示已选中项</div>
-          <div @click="checkList('no_check')">仅显示未选中项</div>
+          <div @click="chooseFilter('select')">仅显示已选中项</div>
+          <div @click="chooseFilter('unselect')">仅显示未选中项</div>
         </div>
         <div class="task-map-foot task-flex task-ai">
-          <span class="task-span1">批量工单转派(0/10)</span>
+          <span class="task-span1">批量工单转派(0/{{ mapList.length }})</span>
           <span class="task-map-foot-select" @click="selectShow = !selectShow"
             ><i class="iconfont icon-shaixuan"></i
           ></span>
@@ -56,16 +56,38 @@
   </div>
 </template>
 <script>
+/* Api */
+import * as TaskApi from "@src/api/TaskApi.ts";
 import TaskMapList from "./TaskMapList.vue";
 export default {
   name: "task-map",
+  props: {
+    config: {
+      type: Object, //接口测试
+    },
+    mapShow: {
+      type: Boolean,
+    },
+  },
   data() {
     return {
       mapHeight: window.innerHeight, //根据屏幕尺寸而变
       mapPostion: 8, // 列表滑动距离
       checkPostion: 282, // 仅显示已选中项活动距离
-      selectShow: false
+      mapList: [], //地图数据
+      mdataFilter: [], //筛选的地图数据
+      selectShow: false,
+      page: 1,
+      infoWindow: new AMap.InfoWindow({ offset: new AMap.Pixel(0, -28) }),
     };
+  },
+  watch: {
+    mapShow(v) {
+      if (!v) {
+        this.mapList = [];
+        this.search();
+      }
+    },
   },
   mounted() {
     const that = this;
@@ -75,29 +97,75 @@ export default {
         that.mapHeight = window.innerHeight;
       })();
     };
-    let position = new AMap.LngLat(116.480983, 40.0958);
-    let marker = new AMap.Marker({
-      position,
-      content: '<i class="bm-location-dot"></i>',
-    });
-
-    marker.on("click", this.jumpToAmap);
-
-    let map = new AMap.Map(this.$refs.container, {
-      zoom: 13,
-      center: position,
-    });
-    map.add(marker);
   },
   methods: {
     show() {
       const { mapPostion } = this;
       this.mapPostion = mapPostion === 8 ? 282 : 8;
     },
+    // 创建地图坐标
+    createMarker(mapList) {
+      const _that = this;
+      const map = new AMap.Map(this.$refs.container, {
+        resizeEnable: true,
+        zoom: 10,
+        center: [116.480983, 40.0958],
+        animateEnable: false,
+      });
 
-    checkList(type) {
+      let markerList = [];
+      mapList.forEach((item, index) => {
+        const marker = new AMap.Marker({
+          position: [item.address.longitude, item.address.latitude],
+          extData: { index: index, data: item },
+          map: map,
+          content: `<div class="task-map-body-workSide-body-item-index">${index +
+            1}</div>`,
+        });
+        marker.on("click", this.jumpToAmap);
+        markerList.push(marker);
+      });
+
+      map.add(markerList);
+    },
+    // 地图坐标点击事件
+    jumpToAmap({ target }) {
+      const markerId = target.getExtData().data.id;
+      console.log(target, markerId);
+    },
+    // 仅显示已选中项活动距离
+    chooseFilter(type) {
       this.checkPostion = 8;
-      this.selectShow = false
+      this.selectShow = false;
+      if (type === "select") {
+        this.mdataFilter = this.mapList.filter(function(item) {
+          return item.selected; // 目前不可进行转交的工单不在允许选中
+        });
+      }
+      if (type === "unselect") {
+        this.mdataFilter = this.mapList.filter(function(item) {
+          return !item.selected;
+        });
+      }
+    },
+    // 加载更多
+    next() {
+      this.page++;
+      this.search();
+    },
+    // 列表数据
+    async search() {
+      const { searchParams, selectedIds } = this.config;
+      const params = {
+        ...searchParams,
+        ids: selectedIds,
+        ...{ page: this.page },
+      };
+      const { success, result } = await TaskApi.search(params);
+      if (success) {
+        this.mapList = [...this.mapList, ...result.content];
+        this.createMarker(this.mapList);
+      }
     },
   },
   components: {
@@ -105,6 +173,21 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+// 地图图标
+.task-map-body-workSide-body-item-index {
+  background: url("../../../../assets/img/task/16-16.png") no-repeat 0 -65px;
+  width: 24px;
+  height: 30px;
+  margin-right: 10px;
+  line-height: 24px;
+  text-align: center;
+  color: #fff;
+  font-family: tahoma;
+  font-size: 12px;
+  font-weight: bold;
+}
+</style>
 <style lang="scss" scoped>
 .task-map {
   padding: 15px;
@@ -213,6 +296,7 @@ export default {
     }
   }
   &-check {
+    width: 100%;
     position: absolute;
     top: 50px;
     z-index: 100;
