@@ -52,14 +52,14 @@ export default {
         formType: 'address',
         fieldName: 'customerAddress',
         displayName: '地址',
-        placeholder: '请输入详细地址[最多50字]',
+        placeholder: '请输入详细地址[最多1000字]',
         isNull: 0,
       },
       fields: [{
         formType: 'address',
         fieldName: 'customerAddress',
         displayName: '地址',
-        placeholder: '请输入详细地址[最多50字]',
+        placeholder: '请输入详细地址[最多1000字]',
         isNull: 0,
       }]
     }

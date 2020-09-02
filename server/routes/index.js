@@ -146,4 +146,20 @@ router.all('/*', ctx => {
   return HttpClient.proxy(ctx)
 });
 
+router.all('/api/*', async ctx => {
+
+  let option = {
+    headers: Object.assign({}, ctx.request.headers)
+  };
+
+  const request = ctx.request;
+
+  let result = await HttpsClient.request(request.url, request.method, request.rawBody, option);
+
+  ctx.status = result.statusCode;
+  ctx.body = result.body;
+});
+
+router.all('/*', ctx => HttpClient.proxy(ctx))
+
 module.exports = router;
