@@ -168,7 +168,6 @@ export default {
             }
           })
         }, 0);
-
         this.selectedType = this.taskTypesMap[templateId];
         this.$emit('updatetemplateId', this.selectedType);
       } catch (error) {
@@ -184,19 +183,21 @@ export default {
     copyTaskHandler(templateId = '') {
       if(!this.state.isCopyTask) return
 
-      let { taskId = '' } = this.urlParams;
+      this.$emit('loading', true);
 
+      let { taskId = '' } = this.urlParams;
       window.location.href = `/task/copyTask?taskId=${taskId}&newTaskTemplateId=${templateId}`
     },
-    /** 
+    /**
      * @description 事件转工单处理
      * @param {String} templateId 工单类型id
     */
     convertTaskHandler(templateId = '') {
       if(!this.state.isFromEvent) return
 
-      let { eventId = '', flow = '' } = this.urlParams;
+      this.$emit('loading', true);
 
+      let { eventId = '', flow = '' } = this.urlParams;
       window.location.href = `/event/convent2Task/jump?eventId=${eventId}&defaultTypeId=${templateId}&flow=${flow}`
     },
     /**
@@ -271,6 +272,9 @@ export default {
       //   })
       //   .catch(err => console.error('error', err));
 
+    },
+    judegeSelectTaskType(value) {
+      return !value || this.state.isFromEvent;
     },
     /** 
      * @description 同时通知客户 checkbox变化

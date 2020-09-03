@@ -37,7 +37,7 @@ export default {
       // 初始化默认值
       let form = this.workTask;
 
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: form.templateId || this.types?.[0]?.id, tableName: 'task' });
+      this.fields = await TaskApi.getTaskTemplateFields({ templateId: this.genTemplateId(), tableName: 'task' });
 
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
@@ -92,10 +92,9 @@ export default {
             message: !isSucc && res.message
           })
 
-          this.pending = false;
-          this.loadingPage = false;
-
-          if (!isSucc) return;
+          if (!isSucc) {
+            return this.togglePending();
+          }
           
           // 根据是否派单决定跳转地址
           let taskId = res.result;
@@ -103,8 +102,27 @@ export default {
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
 
           window.location.href = isAllot ? taskAllotPath : taskDetailPath;
+
+          this.togglePending();
+
         })
-        .catch(err => console.error('err', err))
+        .catch(err => {
+          this.togglePending();
+          console.error('err', err)
+        })
+    },
+    /** 
+     * @description 获取工单类型id
+     * 1. 优先取 defaultType 的 id
+     * 2. task 数据里的 templateId
+     * 3. 工单类型列表中的第一个
+     */
+    genTemplateId() {
+      let defaultType = this.initData?.defaultType || {};
+      let workTask = this.workTask || {};
+      let firstType = this.types?.[0] || {};
+      
+      return defaultType.id || workTask.templateId || firstType.id;
     },
     /** 
      * @description 返回
@@ -267,18 +285,21 @@ export default {
             message: !isSucc && res.message
           })
 
-          this.pending = false;
-          this.loadingPage = false;
-
-          if (!isSucc) return;
+          if (!isSucc) {
+            return this.togglePending();
+          }
           
           this.jumpWithPlanTask();
+          this.togglePending();
+
         })
         .catch(err => console.error('err', err))
         .finally(() => {
           // 计划任务元素
           let planTaskEditFormEl = this.$refs.planTaskEditForm;
           planTaskEditFormEl && planTaskEditFormEl.togglePending();
+
+          this.togglePending();
         })
     },
     /** 
@@ -295,18 +316,20 @@ export default {
             message: !isSucc && res.message
           })
 
-          this.pending = false;
-          this.loadingPage = false;
-
-          if (!isSucc) return;
+          if (!isSucc) {
+            return this.togglePending();
+          }
           
           this.jumpWithPlanTask();
+          this.togglePending();
+
         })
         .catch(err => console.error('err', err))
         .finally(() => {
           // 计划任务元素
           let planTaskEditFormEl = this.$refs.planTaskEditForm;
           planTaskEditFormEl && planTaskEditFormEl.togglePending();
+          this.togglePending();
         })
     },
     /** 
@@ -410,28 +433,34 @@ export default {
       }
 
     },
+    togglePending(pending = false) {
+      this.pending = pending;
+      this.loadingPage = pending;
+    },
     /** 
      * @description 编辑工单方法
     */
     updateTaskMethod(params) {
       TaskApi.editTask(params)
         .then(res => {
-          if (!res.success) {
-            this.loadingPage = false;
-            this.pending = false;
-            return platform.notification({
-              type: 'error',
-              title: '更新工单失败',
-              message: res.message
-            })
+          let isSucc = res.success;
+
+          platform.notification({
+            type: isSucc ? 'success' : 'error',
+            title: `更新工单${isSucc ? '成功' : '失败'}`,
+            message: !isSucc && res.message
+          })
+
+          if (!isSucc) {
+            return this.togglePending();
           }
           
           window.location.href = `/task/view/${this.editId}`;
+          this.togglePending();
 
         })
         .catch(err => {
-          this.pending = false;
-          this.loadingPage = false;
+          this.togglePending();
           console.error('err', err);
         })
     },

@@ -12,7 +12,7 @@
 
         <!-- start 工单类型 -->
         <form-item label="工单类型" :validation="false">
-          <form-select v-if="!isDisabledSelectTaskType" :field="field" :source="taskTypes" :value="selectedType.value" :clearable="false" @input="chooseTemplate"/>
+          <form-select v-if="judegeSelectTaskType(value)" :field="field" :source="taskTypes" :value="selectedType.value" :clearable="false" @input="chooseTemplate"/>
           <div class="form-taskNo" v-else>{{ taskValue.templateName }}</div>
         </form-item>
         <!-- end 工单类型 -->

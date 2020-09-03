@@ -22,6 +22,7 @@ export function packToTask(fields, form){
       }
 
       // 客户联系人
+      task.linkman = {};
       if(form.linkman && form.linkman[0]){
         let linkman = form.linkman[0];
         let { value, name, phone } = linkman;
@@ -30,6 +31,7 @@ export function packToTask(fields, form){
       }
       
       // 客户地址
+      task.address = {};
       if(form.address && form.address[0]){
         let address = form.address[0];
         let taddress = {};
@@ -46,8 +48,8 @@ export function packToTask(fields, form){
       } 
 
       // 产品
+      task.products = [];
       if(form.product && form.product.length > 0){
-        task.products = [];
         form.product.map(product => {
           task.products.push({
             id: product.id,
@@ -57,6 +59,7 @@ export function packToTask(fields, form){
           })
         })
       }
+      
       return;
     }
 
@@ -79,7 +82,7 @@ export function packToTask(fields, form){
       // 拼附件和回执附件
       value = value.concat(form.receiptAttachment).filter(attachment => !!attachment);
     }
-    
+
     isSystem == 0
       ? task.attribute[fieldName] = value
       : task[fieldName] = value;

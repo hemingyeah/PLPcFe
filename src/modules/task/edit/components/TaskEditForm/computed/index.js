@@ -18,9 +18,6 @@ export default {
   customerRelevanceTaskCountData() {
     return this.relevanceTaskCountData[TaskFieldNameMappingEnum.Customer];
   },
-  isDisabledSelectTaskType() {
-    return this.value && !this.state.isFromEvent;
-  },
   /** 
    * @description 是否显示 客户关联的工单数量 按钮 
    * 1. 客户存在
