@@ -139,6 +139,14 @@ export default {
     bindLinkman(linkman = {}) {
       this.updateLinkmanValue([linkmanSelectConversion(linkman)])
     },
+    bindProductLinkmanAndAddress(product = {}) {
+      let { linkman, address } = product;
+      let linkmanId = linkman?.id || '';
+      let addressId = address?.id || '';
+      
+      linkmanId && this.bindLinkman(linkman);
+      addressId && this.bindAddress(address);
+    },
     /** 
      * @description 选择工单类型
      * @param {String} templateId 工单类型id
@@ -412,7 +420,7 @@ export default {
     */
     async relationFieldSelectHandler(type = TaskFieldNameMappingEnum.Customer) {
       // 判断类型是否存在
-      let types = [TaskFieldNameMappingEnum.Customer, TaskFieldNameMappingEnum.Customer.Product];
+      let types = [TaskFieldNameMappingEnum.Customer, TaskFieldNameMappingEnum.Product];
       if(types.indexOf(type) < 0) {
         return console.warn(`Caused: relationFieldHandler params.type is not in ${types}`)
       }
@@ -516,17 +524,22 @@ export default {
     /** 
      * @description 更新客户信息
      * @param {Array<Object>} value 客户数据
+     * @param {Object} options 配置
     */
-    async updateCustomer(value = []) {
+    async updateCustomer(value = [], options = { 
+      isForceUpdateCustomer: false,
+      isUpdateCustomerProduct: true
+    }) {
+      let { isForceUpdateCustomer, isUpdateCustomerProduct } = options;
       let selectedCustomer = value?.[0] || {};
       let currentCustomerId = this.selectedCustomer?.id || this.selectedCustomer?.value;
-      let selectedCustomerId = selectedCustomer?.id || '';
+      let selectedCustomerId = selectedCustomer?.id || selectedCustomer?.value || '';
 
       // 更新客户数据
       this.updateCustomerValue(value.slice());
 
       // 判断选中的客户是否与当前客户数据一致
-      if(currentCustomerId == selectedCustomerId) return
+      if(currentCustomerId == selectedCustomerId && !isForceUpdateCustomer) return
 
       try {
         const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomerId });
@@ -541,7 +554,7 @@ export default {
         address && this.bindAddress(address);
         
         // 更新产品数据
-        if (Array.isArray(this.value.product) && this.value.product.length) {
+        if (Array.isArray(this.value.product) && this.value.product.length && isUpdateCustomerProduct) {
           this.updateProductValue(
             this.value.product.filter(item => item.customerId == selectedCustomer.id)
           )
@@ -595,14 +608,21 @@ export default {
     },
     /** 
      * @description 更新产品信息
+     * @param {Array[Product]} value 产品数据
+     * @param {Object} options 配置
     */
-    async updateProduct(value) {
+    async updateProduct(value, options = { 
+      isForceUpdateCustomer: false,
+      isUpdateCustomerProduct: true,
+      isSilentUpdateLinkmanAndAddress: false
+    }) {
+      let { isForceUpdateCustomer, isUpdateCustomerProduct, isSilentUpdateLinkmanAndAddress } = options;
       let product = value[0] || {};
-      let isHaveCustomer = this.value.customer && this.value.customer.length;
+      let isHaveCustomer = (this.value.customer && this.value.customer.length);
 
       try {
         // 判断客户是否存在
-        if (!isHaveCustomer) {
+        if (!isHaveCustomer || isForceUpdateCustomer) {
           // 客户不存在时则下拉框隐藏
           findComponentDownward(this.$refs.product, 'base-select').close();
 
@@ -616,14 +636,20 @@ export default {
           // 设置客户数据
           this.updateCustomerValue(customerData);
           // 更新客户信息
-          await this.updateCustomer(customerData);
+          await this.updateCustomer(customerData, { isForceUpdateCustomer, isUpdateCustomerProduct });
         }
 
         // 查询产品关联字段, 选一个产品才带入
         let isOnlyOneProduct = value.length === 1;
         
+        if(isOnlyOneProduct && isSilentUpdateLinkmanAndAddress) {
+          // 产品关联字段数据
+          this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
+          // 静默绑定联系人/地址
+          this.bindProductLinkmanAndAddress(product);
+        }
         // 只有一个产品 且 客户存在
-        if (isOnlyOneProduct && isHaveCustomer) {
+        else if (isOnlyOneProduct && isHaveCustomer) {
           // 产品关联字段数据
           this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
           // 产品关联联系人地址
@@ -631,12 +657,7 @@ export default {
         }
         // 只有一个产品 且 客户不存在
         else if(isOnlyOneProduct && !isHaveCustomer) {
-          let { linkman, address } = product;
-          let linkmanId = linkman?.id || '';
-          let addressId = address?.id || '';
-          
-          linkmanId && this.bindLinkman(linkman);
-          addressId && this.bindAddress(address);
+          this.bindProductLinkmanAndAddress(product);
         }
         else {
           // TODO: 清空产品关联字段数据

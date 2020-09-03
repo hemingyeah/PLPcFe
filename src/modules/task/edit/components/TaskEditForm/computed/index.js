@@ -25,7 +25,7 @@ export default {
   */
   isShowCustomerRelevanceTaskCountButton() {
     let { all } = this.customerRelevanceTaskCountData;
-    return this.selectedCustomer?.id && Number(all) > 0;
+    return (this.selectedCustomer?.id || this.selectedCustomer?.value) && Number(all) > 0;
   },
   /** 
    * @description 是否显示 产品关联的工单数量 按钮 
@@ -35,7 +35,7 @@ export default {
   */
   isShowProductRelevanceTaskCountButton() {
     let { all } = this.productRelevanceTaskCountData;
-    return this.selectProduct?.id && Number(all) > 0 && this.value?.product?.length == 1;
+    return (this.selectProduct?.id || this.selectProduct?.value) && Number(all) > 0 && this.value?.product?.length == 1;
   },
   /** 
    * @description 是否显示 同时通知客户 字段

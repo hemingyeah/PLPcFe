@@ -46,7 +46,15 @@ export default {
       this.callCenterWithTaskDataHandler();
 
       this.init = true;
-
+      
+      // 从客户新建工单处理
+      this.$nextTick(() => {
+        this.customerCreateTaskHandler();
+      })
+      // 从产品新建工单处理
+      this.$nextTick(() => {
+        this.productCreateTaskHandler();
+      })
       // 关联项查询处理
       this.relationFieldHandler();
 
@@ -110,6 +118,18 @@ export default {
           this.togglePending();
           console.error('err', err)
         })
+    },
+    /** 
+     * @description 从客户新建工单处理
+    */
+    customerCreateTaskHandler() {
+      if(!this.isFromCustomer) return
+
+      let form = this.$refs.form;
+      if(!form) return;
+
+      form.updateCustomer(this.form.customer, { isForceUpdateCustomer: true });
+      form.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
     },
     /** 
      * @description 获取工单类型id
@@ -199,7 +219,7 @@ export default {
     },
     jumpWithPlanTask() {
       try {
-        let isFromId = window.frameElement.getAttribute('fromid');
+        let isFromId = window?.frameElement?.getAttribute('fromid');
 
         if(isFromId) {
           let closeId = window.frameElement.dataset.id;
@@ -235,9 +255,11 @@ export default {
           this.$set(this, 'taskConfig', taskConfig);
           
           // 显示计划任务弹窗
-          let planTaskEditFormEl = this.$refs.planTaskEditForm;
-          planTaskEditFormEl.toggle();
-          planTaskEditFormEl.fetchExeinsyn(this.form?.customer?.[0]?.id);
+          let planTaskEditFormEl = this.planTaskEditFormEl;
+          if(planTaskEditFormEl) {
+            planTaskEditFormEl.toggle();
+            planTaskEditFormEl.fetchExeinsyn(this.form?.customer?.[0]?.id);
+          }
 
           this.submitting = false;
         })
@@ -264,9 +286,9 @@ export default {
           this.$set(this, 'taskConfig', taskConfig);
           
           // 显示计划任务弹窗
-          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          let planTaskEditFormEl = this.planTaskEditFormEl;
           let planTask = this.initData?.planTask || {};
-          planTaskEditFormEl.toggle(true, planTask);
+          planTaskEditFormEl && planTaskEditFormEl.toggle(true, planTask);
 
           this.submitting = false;
         })
@@ -296,7 +318,7 @@ export default {
         .catch(err => console.error('err', err))
         .finally(() => {
           // 计划任务元素
-          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          let planTaskEditFormEl = this.planTaskEditFormEl;
           planTaskEditFormEl && planTaskEditFormEl.togglePending();
 
           this.togglePending();
@@ -327,10 +349,25 @@ export default {
         .catch(err => console.error('err', err))
         .finally(() => {
           // 计划任务元素
-          let planTaskEditFormEl = this.$refs.planTaskEditForm;
+          let planTaskEditFormEl = this.planTaskEditFormEl;
           planTaskEditFormEl && planTaskEditFormEl.togglePending();
           this.togglePending();
         })
+    },
+    /** 
+     * @description 从产品新建工单处理
+    */
+    productCreateTaskHandler() {
+      if(!this.isFromProduct) return
+
+      let form = this.$refs.form;
+      if(!form) return;
+
+      // 更新产品数据
+      form.updateProduct(
+        this.form.product,
+        { isForceUpdateCustomer: true, isUpdateCustomerProduct: false, isSilentUpdateLinkmanAndAddress: true }
+      );
     },
     /** 
      * @description 刷新tab
@@ -346,6 +383,8 @@ export default {
     relationFieldHandler() {
       // 事件转工单/拷贝工单
       if(!this.isFromEvent && !this.isCopyTask) return
+      // 从客户新建工单
+      if(this.isFromCustomer) return;
 
       // 子组件form
       this.$nextTick(() => {
@@ -387,8 +426,7 @@ export default {
             tick,
           };
         
-          this.pending = true;
-          this.loadingPage = true;
+          this.togglePending(true);
 
           if (this.isTaskEdit) {
             return this.updateTaskMethod(params);
@@ -399,8 +437,7 @@ export default {
 
         })
         .catch(err => {
-          this.pending = false;
-          this.loadingPage = false;
+          this.togglePending();
           console.error(err);
         })
     },
@@ -410,8 +447,7 @@ export default {
     submitWithPlanTask(planTaskParams = {}) {
       if(this.pending) return;
 
-      this.loadingPage = false;
-      this.pending = false;
+      this.togglePending(true);
       // 计划任务元素
       let planTaskEditFormEl = this.$refs.planTaskEditForm;
       planTaskEditFormEl && planTaskEditFormEl.togglePending(true);
