@@ -2417,7 +2417,9 @@ export default {
                   message: res_.message,
                   type: 'success'
                 });
-                this.loadData();
+                setTimeout(()=>{
+                  this.loadData();
+                },1000)
               } else {
                 this.$message({
                   showClose: true,
