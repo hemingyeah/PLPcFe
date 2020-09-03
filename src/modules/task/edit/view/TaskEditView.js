@@ -123,7 +123,7 @@ export default {
      * @description 从客户新建工单处理
     */
     customerCreateTaskHandler() {
-      if(!this.isFromCustomer) return
+      if(!this.isFromCustomer && !this.isFromPlan) return
 
       let form = this.$refs.form;
       if(!form) return;
@@ -358,7 +358,7 @@ export default {
      * @description 从产品新建工单处理
     */
     productCreateTaskHandler() {
-      if(!this.isFromProduct) return
+      if(!this.isFromProduct && !this.isFromPlan) return
 
       let form = this.$refs.form;
       if(!form) return;
