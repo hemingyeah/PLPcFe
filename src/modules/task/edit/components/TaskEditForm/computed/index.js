@@ -51,7 +51,7 @@ export default {
       displayName: '产品',
       fieldName: 'product',
       formType: 'select',
-      isNull: this.customerOption.productNotNull ? 0 : 1
+      isNull: this.customerOption?.productNotNull === true ? 0 : 1
     }
   },
   productFormDom() {

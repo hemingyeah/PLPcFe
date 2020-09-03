@@ -47,12 +47,10 @@ export default {
 
       this.init = true;
       
-      // 从客户新建工单处理
       this.$nextTick(() => {
+        // 从客户新建工单处理
         this.customerCreateTaskHandler();
-      })
-      // 从产品新建工单处理
-      this.$nextTick(() => {
+        // 从产品新建工单处理
         this.productCreateTaskHandler();
       })
       // 关联项查询处理

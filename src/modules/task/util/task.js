@@ -111,10 +111,13 @@ export function packToForm(fields, data){
 
     if(fieldName === TaskFieldNameMappingEnum.Customer){
       // 初始化客户
-      task.customer = [{
-        value: value?.id,
-        label: value?.name
-      }];
+      task.customer = [];
+      if(value?.id) {
+        task.customer = [{
+          value: value?.id,
+          label: value?.name
+        }];
+      }
       
       // 初始化联系人
       task.linkman = [];

@@ -4,6 +4,7 @@ import EditContactDialog from '@src/modules/customer/view/operationDialog/EditCo
 /* util */
 import _ from 'lodash'
 import * as FormUtil from '@src/component/form/util'
+import DateUtil from '@src/util/date'
 import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts'
 import { 
@@ -22,7 +23,9 @@ import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
 import { 
   TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE,
   TASK_PRODUCT_LINKMAN_NOT_EQUAL_MESSAGE,
-  TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE
+  TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE,
+  REQUIRES_PRODUCT_MESSAGE,
+  PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE
 } from '@src/model/const/Alert.ts'
 // 关联项类型
 const RELATION_TYPE_MAP = {
@@ -35,6 +38,7 @@ export default {
   inject: ['initData'],
   props,
   data() {
+    data.validation = this.buildValidation();
     return data
   },
   computed,
@@ -125,6 +129,39 @@ export default {
 
       });
     },
+    buildValidation(){
+      const that = this;
+      return Object.freeze({
+        product(value, field, changeStatus){
+          changeStatus(true);
+          let isProductRequired = that.customerOption?.productNotNull === true;
+          let isSelectedProduct = Array.isArray(value) && value.length > 0;
+
+          return new Promise((resolve, reject) => {
+            changeStatus(false);
+            let errorMessage = isSelectedProduct ? '' : REQUIRES_PRODUCT_MESSAGE;
+            resolve(isProductRequired ? errorMessage : '')
+          })
+        },
+        planTime(value, field, changeStatus){
+          changeStatus(true);
+          
+          let isDateTimeType = field?.setting?.dateType == 'dateTime';
+          let errorMessage = '';
+
+          if(isDateTimeType) {
+            let planTime = DateUtil.parseDateTime(value).getTime();
+            let nowTime = new Date().getTime();
+            errorMessage = planTime < nowTime ? PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE : '';
+          }
+
+          return new Promise((resolve, reject) => {
+            changeStatus(false);
+            resolve(errorMessage)
+          })
+        }
+      });
+    },
     /** 
      * @description 绑定地址
      * @param {Object} address 地址数据
@@ -176,8 +213,11 @@ export default {
             }
           })
         }, 0);
+        
+        // 更新工单类型数据
         this.selectedType = this.taskTypesMap[templateId];
         this.$emit('updatetemplateId', this.selectedType);
+
       } catch (error) {
         console.error(error)
       }
@@ -414,23 +454,41 @@ export default {
       }
 
     },
+    relationFieldsFilter(type = TaskFieldNameMappingEnum.Customer) {
+      let relationFields = [];
+
+      // 判断类型是否存在
+      let types = [TaskFieldNameMappingEnum.Customer, TaskFieldNameMappingEnum.Product];
+      if(types.indexOf(type) < 0) {
+        console.warn(`Caused: relationFieldHandler params.type is not in ${types}`);
+        return relationFields;
+      }
+      
+      // 判断对应类型的关联显示项字段是否存在
+      let formType = RELATION_TYPE_MAP[type];
+      relationFields = this.taskFields.filter(field => field.formType == formType);
+      if(relationFields.length <= 0) {
+        console.warn(`Caused: this.taskFields not have ${formType} field`);
+      }
+
+      return relationFields;
+    },
+    /** 
+     * @description 关联显示项字段清空
+     * @param {string} type customer/product
+    */
+    async relationFieldClear(type = TaskFieldNameMappingEnum.Customer) {
+      let relationFields = this.relationFieldsFilter(type);
+      relationFields.forEach(relationField => { 
+        this.update({ field: relationField, newValue: '' }) 
+      })
+    },
     /** 
      * @description 关联显示项字段选择处理
      * @param {string} type customer/product
     */
     async relationFieldSelectHandler(type = TaskFieldNameMappingEnum.Customer) {
-      // 判断类型是否存在
-      let types = [TaskFieldNameMappingEnum.Customer, TaskFieldNameMappingEnum.Product];
-      if(types.indexOf(type) < 0) {
-        return console.warn(`Caused: relationFieldHandler params.type is not in ${types}`)
-      }
-      
-      // 判断对应类型的关联显示项字段是否存在
-      let formType = RELATION_TYPE_MAP[type];
-      let relationFields = this.taskFields.filter(field => field.formType == formType);
-      if(relationFields.length <= 0) {
-        return console.warn(`Caused: this.taskFields not have ${formType} field`);
-      }
+      let relationFields = this.relationFieldsFilter(type);
       
       try {
         let params = {
@@ -660,8 +718,8 @@ export default {
           this.bindProductLinkmanAndAddress(product);
         }
         else {
-          // TODO: 清空产品关联字段数据
-          // this.$eventBus.$emit('es.Relation.Product', {});
+          // 清空产品关联字段数据
+          this.relationFieldClear(TaskFieldNameMappingEnum.Product);
         }
 
         if(isOnlyOneProduct) {

@@ -67,11 +67,27 @@ function datedifference(sDate1, sDate2) {
   return iDays
 }
 
+/**  
+ * @description 格式化日期时间
+ * @param {String} str -- 格式 2019-08-20 14:00:00
+ * @returns {Date} date 对象
+*/
+function parseDateTime(str) {
+  let date = (
+    /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\s((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$)/.test(str)
+      ? new Date(str.replace(/-/g, '/'))
+      : new Date()
+  );
+
+  return date;
+}
+
 
 export default {
   lastDayOfMonth,
   firstDayOfMonth,
   rangeOfMonth,
   format,
-  datedifference
+  datedifference,
+  parseDateTime
 };

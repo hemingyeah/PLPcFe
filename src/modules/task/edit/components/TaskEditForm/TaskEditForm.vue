@@ -21,8 +21,8 @@
 
       <!-- start 计划时间 -->
       <template slot="planTime" slot-scope="{ field, value }">
-        <form-item :label="field.displayName">
-          <form-plantime :field="field" :value="value" @update="update"></form-plantime>
+        <form-item :label="field.displayName" :validation="validation.planTime">
+          <form-plantime :picker-options="planTimeDatePickeroptions" :field="field" :value="value" @update="update"></form-plantime>
 
           <!-- start 通知客户 checkbox -->
           <div class="task-notice-customer-block" v-if="isShowNoticeCustomer">
@@ -109,7 +109,7 @@
         <!-- end 地址 -->
 
         <!-- start 产品 -->
-        <form-item v-if="customerOption.product" label="产品">
+        <form-item v-if="customerOption.product" label="产品" :validation="validation.product">
 
           <div class="input-and-btn">
             <biz-form-remote-select
