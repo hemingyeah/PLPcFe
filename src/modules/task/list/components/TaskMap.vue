@@ -11,7 +11,11 @@
     </div>
     <div class="task-map-body">
       <!-- 地图 -->
-      <div ref="container" :style="`height: ${mapHeight - 90}px`"></div>
+      <div
+        ref="container"
+        :style="`height: ${mapHeight - 90}px`"
+        @click="infoClick"
+      ></div>
       <!-- 列表 -->
       <div
         class="task-map-body-workSide"
@@ -30,7 +34,14 @@
           ></span>
         </div>
         <!-- 列表 -->
-        <task-map-list :mapHeight="mapHeight" :mapList="mapList" @next="next" />
+        <task-map-list
+          :mapHeight="mapHeight"
+          :mapList="mapList"
+          @next="next"
+          @openInfo="openInfo"
+          :type="1"
+          ref="taskMapList"
+        />
         <!-- 已选中列表 and 未选中 -->
         <div
           class="task-map-check"
@@ -38,7 +49,12 @@
             `transition: all ease 0.3s;transform: translate(${checkPostion}px,0);`
           "
         >
-          <task-map-list :mapHeight="mapHeight" :mapList="mdataFilter" />
+          <task-map-list
+            ref="taskMapList"
+            :mapHeight="mapHeight"
+            :mapList="mdataFilter"
+            @openInfo="openInfo"
+          />
         </div>
         <!-- foot -->
         <div class="task-map-select" v-show="selectShow">
@@ -46,19 +62,28 @@
           <div @click="chooseFilter('unselect')">仅显示未选中项</div>
         </div>
         <div class="task-map-foot task-flex task-ai">
-          <span class="task-span1">批量工单转派(0/{{ mapList.length }})</span>
+          <span class="task-span1" @click="reallotBatch"
+            >批量工单转派({{ selectIds.length }}/{{
+              checkPostion === 8 ? mdataFilter.length : mapList.length
+            }})</span
+          >
           <span class="task-map-foot-select" @click="selectShow = !selectShow"
             ><i class="iconfont icon-shaixuan"></i
           ></span>
         </div>
       </div>
     </div>
+    <!-- S 工单转换 -->
+    <task-transfer ref="TaskTransfer" :taskIdList="selectIds" />
+    <!-- E 工单转换 -->
   </div>
 </template>
 <script>
 /* Api */
+import vue from "vue";
 import * as TaskApi from "@src/api/TaskApi.ts";
 import TaskMapList from "./TaskMapList.vue";
+import TaskTransfer from "./TaskTransfer";
 export default {
   name: "task-map",
   props: {
@@ -76,8 +101,10 @@ export default {
       checkPostion: 282, // 仅显示已选中项活动距离
       mapList: [], //地图数据
       mdataFilter: [], //筛选的地图数据
+      currentMarkId: "", //当前打开marker的id
       selectShow: false,
       page: 1,
+      map: "",
       infoWindow: new AMap.InfoWindow({ offset: new AMap.Pixel(0, -28) }),
     };
   },
@@ -87,6 +114,18 @@ export default {
         this.mapList = [];
         this.search();
       }
+    },
+  },
+  computed: {
+    selectIds() {
+      const ids = this.mapList
+        .filter(function(item) {
+          return item.selected; // 目前不可进行转交的工单不在允许选中
+        })
+        .map((item) => {
+          return item.id;
+        });
+      return ids;
     },
   },
   mounted() {
@@ -106,32 +145,105 @@ export default {
     // 创建地图坐标
     createMarker(mapList) {
       const _that = this;
-      const map = new AMap.Map(this.$refs.container, {
+      this.map = new AMap.Map(this.$refs.container, {
         resizeEnable: true,
-        zoom: 10,
+        zoom: 5,
         center: [116.480983, 40.0958],
         animateEnable: false,
       });
 
       let markerList = [];
       mapList.forEach((item, index) => {
-        const marker = new AMap.Marker({
-          position: [item.address.longitude, item.address.latitude],
-          extData: { index: index, data: item },
-          map: map,
-          content: `<div class="task-map-body-workSide-body-item-index">${index +
-            1}</div>`,
-        });
-        marker.on("click", this.jumpToAmap);
-        markerList.push(marker);
+        if (item.address.longitude) {
+          const marker = new AMap.Marker({
+            position: [item.address.longitude, item.address.latitude],
+            extData: { index: index, data: item },
+            map: this.map,
+            content: `<div class="task-map-body-workSide-body-item-index ${
+              item.selected ? "active" : ""
+            }">${item.i}</div>`,
+          });
+          marker.on("click", this.jumpToAmap);
+          markerList.push(marker);
+        }
       });
 
-      map.add(markerList);
+      this.map.add(markerList);
     },
     // 地图坐标点击事件
     jumpToAmap({ target }) {
-      const markerId = target.getExtData().data.id;
-      console.log(target, markerId);
+      const item = target.getExtData().data;
+      const allowReallot = this.$refs.taskMapList.allowReallot(item);
+
+      if (allowReallot) {
+        // let currSelected = !item.selected;
+        item["selected"] = true;
+      }
+      this.openInfo({ allowReallot, item: item });
+    },
+
+    openInfo({ allowReallot, item, index, type }) {
+      if (type) {
+        let list = this.mapList.filter((val) => {
+          return item.id !== val.id;
+        });
+        list = [...list, ...[item]];
+        this.createMarker(list);
+      }
+      if (!item.selected && typeof item.selected === "boolean") {
+        this.infoWindow.close();
+        return;
+      }
+
+      this.openInfoWindow(item, allowReallot);
+    },
+    //信息框事件
+    infoClick({ target }) {
+      const { id } = target;
+      if (id === "view" || id === 'ids') {
+        let fromId = window.frameElement.getAttribute("id");
+        this.$platform.openTab({
+          id: `task_view_${this.currentMarkId}`,
+          title: "工单详情",
+          close: true,
+          url: `/task/view/${this.currentMarkId}?noHistory=1`,
+          fromId,
+        });
+      } else if (id === 'transfer') {
+        this.reallotBatch()
+      }
+    },
+    // 信息窗
+    openInfoWindow(marker, allowReallot) {
+      const { id, address, taskNo, linkMan, createTime } = marker;
+      const { infoWindow, map } = this;
+      const lat = [address.longitude, address.latitude];
+      this.currentMarkId = id;
+
+      const button = allowReallot
+        ? `<button type="button" class="btn btn-primary" id="transfer">转派</button>`
+        : `<button type="button" class="btn btn-primary map-modal-view-btn" id="view">查看</button>`;
+      const taddress = `${address.province}${address.city}${address.dist}${address.address}`;
+
+      const phoneIcon = this.has_call_center_module
+        ? `<i data-toggle="tooltip" title="拨打电话" style="width: 14px!important;margin-left: 5px;color: #55b7b4;font-size: 14px;cursor: pointer;" class="iconfont icon-dianhua1"></i>`
+        : "";
+      const content = `<div class="map-mark-box">
+                    <div class="map-mark-head task-flex">
+                      <a class="open-new-tab task-span1" id="ids">${taskNo}</a>${button}
+                    </div>
+                    <div class="map-mark-body">
+                      <p>联系人：${linkMan.name}</p>
+                      <p>电话：${linkMan.phone}</p>
+                      <p>地址：${taddress}</p>
+                      <p>创建时间：${createTime}</p>
+                    </div>
+                  </div>`;
+
+      map.setZoomAndCenter(12, lat);
+
+      infoWindow.setContent(content);
+      infoWindow.open(map, lat);
     },
     // 仅显示已选中项活动距离
     chooseFilter(type) {
@@ -164,12 +276,27 @@ export default {
       const { success, result } = await TaskApi.search(params);
       if (success) {
         this.mapList = [...this.mapList, ...result.content];
+        this.mapList.map((item, index) => {
+          item["i"] = index + 1;
+        });
         this.createMarker(this.mapList);
       }
+    },
+    /**
+     * @description 工单转派
+     */
+    reallotBatch() {
+      const { selectIds } = this;
+      if (!selectIds.length) {
+        this.$platform.alert("请选择要转派的工单");
+        return;
+      }
+      this.$refs.TaskTransfer.openSendMessageDialog();
     },
   },
   components: {
     [TaskMapList.name]: TaskMapList,
+    [TaskTransfer.name]: TaskTransfer,
   },
 };
 </script>
@@ -186,6 +313,43 @@ export default {
   font-family: tahoma;
   font-size: 12px;
   font-weight: bold;
+}
+.active {
+  background: url("../../../../assets/img/task/16-16.png") no-repeat 0 -34px;
+}
+// 信息框
+.map-mark-box {
+  width: 300px;
+  font-size: 13px;
+  padding-top: 10px;
+  padding-left: 8px;
+  padding-bottom: 10px;
+  a {
+    text-decoration: none;
+    color: #72afd2;
+    font-size: 17px;
+    font-weight: 100;
+  }
+  .map-mark-head {
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    flex-flow: row nowrap;
+    padding-bottom: 5px;
+    align-items: center;
+    button,
+    .map-modal-view-btn {
+      color: #ffffff;
+      background: #55b7b4;
+      border-color: #55b7b4;
+      font-size: 12px;
+    }
+  }
+  .map-mark-body {
+    p {
+      margin: 0;
+      margin-top: 5px;
+    }
+  }
 }
 </style>
 <style lang="scss" scoped>

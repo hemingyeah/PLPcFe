@@ -14,11 +14,11 @@
           class="task-map-body-workSide-body-item-index"
           :class="{ active: item.selected }"
         >
-          {{ index + 1 }}
+          {{ item.i }}
         </div>
         <div class="task-span1">
           <p>
-            工单编号: <span>{{ item.taskNo }}</span>
+            工单编号: <span @click.stop="openTaskTab(item.id)">{{ item.taskNo }}</span>
           </p>
           <p>工单类型: {{ item.templateName }}</p>
           <p>客户姓名: {{ item.customerEntity.name }}</p>
@@ -47,7 +47,7 @@
     <div
       class="side_list_loadmore"
       @click="$emit('next')"
-      v-show="mapList.length"
+      v-show="mapList.length && type"
     >
       加载更多
     </div>
@@ -70,6 +70,10 @@ export default {
         return [];
       },
     },
+    type: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -85,6 +89,23 @@ export default {
       if (taskConfig) {
         this.taskReallotConfig = taskConfig.taskReallot;
       }
+    },
+    /**
+     * @description 打开工单详情tab
+     * @param {String} taskId 工单id
+     */
+    openTaskTab(taskId) {
+      if (!taskId) return;
+
+      let fromId = window.frameElement.getAttribute("id");
+
+      this.$platform.openTab({
+        id: `task_view_${taskId}`,
+        title: "工单详情",
+        close: true,
+        url: `/task/view/${taskId}?noHistory=1`,
+        fromId,
+      });
     },
     /**
      * 获取提示..信息 内容
@@ -153,8 +174,10 @@ export default {
         allowReallot = this.allowReallot(item);
       // 可以正常指派
       if (allowReallot) {
-        this.$set(this.mapList[index], 'selected', currSelected);
+        this.$set(this.mapList[index], "selected", currSelected);
       }
+
+      this.$emit("openInfo", { allowReallot, item, type: 1 });
     },
   },
 };
@@ -188,6 +211,7 @@ export default {
         color: #a0a0a0;
         font-size: 13px;
         &-item {
+          cursor: pointer;
           padding: 10px;
           border-bottom: 1px dotted #ccc;
           &-info {
