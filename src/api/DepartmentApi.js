@@ -42,7 +42,7 @@ export function deleteBatchDepartmentUserByIdList (params) {
  * @returns {*}
  */
 export function addDepartmentUser (params) {
-  return http.post(`/security/department/createAndAddDepartmentUser?departmentId=${params.departmentId}`, params.loginUser)
+  return http.post('/security/department/createAndAddDepartmentUser', params.loginUser)
 }
 
 /**

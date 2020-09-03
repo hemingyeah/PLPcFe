@@ -1,9 +1,11 @@
 import Vue from 'vue';
 
+import {isEnterprise} from '@src/util/Platform';
 // 选部门和人员组件
 import DepartmentAndUser from './DepartmentAndUser.vue';
 // 团队选人组件
 import Team from './Team.vue';
+import MulTeam from './MulTeam.vue';
 // 选择部门组件
 import Department from './Department.vue';
 
@@ -14,6 +16,7 @@ const DepartmentAndUserComponent = Vue.extend(DepartmentAndUser);
 const MAX_NUM = 150; // 单次选人上限
 
 function choose(type = 'dept', options = {}){
+  console.log('type:', type);
   if(type == 'dept') return deptWithUser(options);
   if(type == 'team') return teamWithUser(options);
   if(type == 'dept_only') return department(options);
@@ -102,7 +105,7 @@ function teamWithUser( options = {} ){
   let selectedUser = [];
   let selectedTeam = [];
   let max = options.max;
-  let action = '/security/tag/tagComponet/getUserList';
+  let action = isEnterprise ? '/security/tag/userList' : '/security/tag/tagComponet/getUserList';
   let selectTypes = ['universal', 'performance'];
   let selectType = 'universal';
 
@@ -165,31 +168,54 @@ function teamWithUser( options = {} ){
       },
       render(){
         return (
-          <base-contact-team 
-            action={action}
-            dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
-            lat={options.lat}
-            lng={options.lng}
-            isRepeatUser={options.isRepeatUser === true}
-            isGroup={options.isGroup === true}
-            isHideTeam={options.isHideTeam === true}
-            max={max}
-            selectType={selectType}
-            selectedTeam={selectedTeam}
-            selectedUser={selectedUser}
-            showTeamCheckbox={ options.showTeamCheckbox === true}
-            showTaskCount={options.showTaskCount === true}
-            showUserState={options.showUserState === true}
-            title={options.title}
-            onDestroy={this.destroy.bind(this)}
-            onCancel={this.cancel.bind(this)}
-            onInput={this.input.bind(this)}
-          >
-          </base-contact-team>
+          isEnterprise 
+            ? <base-contact-team-mul 
+              action={action}
+              dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
+              lat={options.lat}
+              lng={options.lng}
+              isRepeatUser={options.isRepeatUser === true}
+              isGroup={options.isGroup === true}
+              isHideTeam={options.isHideTeam === true}
+              max={max}
+              selectType={selectType}
+              selectedTeam={selectedTeam}
+              selectedUser={selectedUser}
+              showTeamCheckbox={ options.showTeamCheckbox === true}
+              showTaskCount={options.showTaskCount === true}
+              showUserState={options.showUserState === true}
+              title={options.title}
+              onDestroy={this.destroy.bind(this)}
+              onCancel={this.cancel.bind(this)}
+              onInput={this.input.bind(this)}
+            >
+            </base-contact-team-mul> 
+            : <base-contact-team 
+              action={action}
+              dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
+              lat={options.lat}
+              lng={options.lng}
+              isRepeatUser={options.isRepeatUser === true}
+              isGroup={options.isGroup === true}
+              isHideTeam={options.isHideTeam === true}
+              max={max}
+              selectType={selectType}
+              selectedTeam={selectedTeam}
+              selectedUser={selectedUser}
+              showTeamCheckbox={ options.showTeamCheckbox === true}
+              showTaskCount={options.showTaskCount === true}
+              showUserState={options.showUserState === true}
+              title={options.title}
+              onDestroy={this.destroy.bind(this)}
+              onCancel={this.cancel.bind(this)}
+              onInput={this.input.bind(this)}
+            >
+            </base-contact-team>
         )
       },
       components: {
-        [Team.name]: Team
+        [Team.name]: Team,
+        [MulTeam.name]: MulTeam,
       }
     })
   })

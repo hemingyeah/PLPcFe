@@ -16,6 +16,7 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
+import {isEnterprise} from '@src/util/Platform';
 
 export default {
   name: 'form-user',
@@ -71,7 +72,7 @@ export default {
         selected: this.multiple ? this.value : null,
         max
       };
-      return this.$fast.contact.choose('dept', options).then(result => {
+      return this.$fast.contact.choose(isEnterprise ? 'team' : 'dept', options).then(result => {
         if(result.status == 0){
           let oldValue = null;
           let data = result.data || {};

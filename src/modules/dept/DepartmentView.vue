@@ -34,17 +34,12 @@
             content="开启本选项后，在选择协同人等只可见自己所属部门的成员，管理员除外">
             <i class="iconfont icon-help" slot="reference"></i>
           </el-popover>
-
-          <!-- <div class="department-child-item dept-role-item dept-del-role-item" @click="chooseDelRole()">
-            <span>
-              已删除账号 &nbsp;&nbsp;
-            </span>
-            <i class="iconfont icon-arrowright"></i>
-          </div> -->
-
         </el-tab-pane>
 
         <el-tab-pane label="角色管理" name="role">
+          <div class="create-role">
+            <el-button type="primary" @click="createRole">新建角色</el-button>  
+          </div>
           <div v-if="roles.length > 0" class="department-child-list">
             <div class="department-child-item dept-role-item" v-for="role in roles" :key="role.id" @click="chooseRole(role)"
                  :class="{'department-role-selected': role.id == selectedRole.id}">
@@ -57,9 +52,156 @@
           </div>
         </el-tab-pane>
       </el-tabs>
+      <div class="department-child-item dept-role-item dept-del-role-item" 
+           :class="{'department-role-selected': selectedRole.id == -1}" @click="chooseDelRole()">
+        <span>
+          已删除账号 &nbsp;&nbsp;
+        </span>
+        <i class="iconfont icon-arrowright"></i>
+      </div>
+
+      <!-- start 右侧角色列表 -->
+      <div v-if="activeName === 'role' || selectedRole.id == -1" class="department-main-right" v-loading.fullscreen.lock="roleLoading">
+
+        <!-- start 角色人员 -->
+        <div class="department-user-block">
+
+          <div v-if="showRoleDesc" class="department-user-block-header dept-role-desc">
+            <div class="department-user-block-header-text">
+              <h4>
+                角色名称： <a :href="`/security/role/view/${selectedRole.id}`" :data-id="selectedRole.id" @click="goRoleDetail" style="color:#55B7B4;">{{selectedRole.text}} </a>
+                <!-- <base-button style="margin-left:10px;" type="ghost" @event="openCreateUserPanel"> 查看 </base-button> -->
+                <base-button v-if="canEditSystemRole || isCustomeRole" style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)"> 编辑 </base-button>
+                <base-button v-if="canEditSystemRole" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.id)"> 重置权限 </base-button>
+                <base-button v-if="isCustomeRole" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)"> 删除角色 </base-button>
+              </h4> 
+              <h4 class="role-desc">角色描述：{{roleDes}} </h4>
+            </div>
+          </div>
+
+          <div class="dept-search-group">
+            <el-input v-model="roleKeyword" placeholder="请输入成员名称搜索" style="width:200px;" @keyup.enter.native="searchRole">
+              <i slot="prefix" class="el-input__icon el-icon-search"></i>
+            </el-input>
+            <base-button type="primary" @event="searchRole()">搜索</base-button>
+            <base-button v-if="isSystemRole || isCustomeRole" type="primary" @event="chooseUser('role')">添加成员</base-button>
+            <base-button v-if="(isSystemRole || isCustomeRole) && rolePage.list.length" type="primary" @event="roleDeleteConfirm()">移除成员</base-button>
+            <!-- <base-button v-if="isCustomeRole" type="primary" @event="createRole">新建角色</base-button> -->
+            <base-button v-if="selectedRole.id == 0" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
+          </div>
+
+          <div class="department-user-table" v-if="rolePage.list.length > 0">
+            <el-table
+              :data="rolePage.list"
+              stripe
+              @select="roleSelectionHandle"
+              @select-all="roleSelectionHandle"
+              :highlight-current-row="false"
+              show-overflow-tooltip
+              header-row-class-name="team-detail-table-header"
+              ref="roleMultipleTable" class="team-table"
+            >
+              
+              <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+              <el-table-column prop="displayName" label="姓名">
+                <div style="display: flex" slot-scope="scope">
+                  <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">
+                    {{scope.row.displayName}}
+                  </a>
+                  <span v-if="scope.row.superAdmin == 2" class="super-admin-label">主管理员</span>
+                </div>
+              </el-table-column>
+              <el-table-column prop="loginName" label="账号"/>
+              <template v-if="selectedRole.id == -1">
+                <el-table-column label="删除时间" width="180px">
+                  <template slot-scope="scope">
+                    {{scope.row.deleteTime | fmt_datetime}}
+                  </template>
+                </el-table-column>
+                <el-table-column label="未完成事件" width="120px">
+                  <template v-if="scope.row.eventCount" slot-scope="scope" >
+                    <a href="" class="text-center" @click.stop.prevent="createTransTab('event',scope.row.userId)">
+                      {{ scope.row.eventCount }}
+                    </a>
+                  </template>
+                </el-table-column>
+                <el-table-column label="未完成工单" width="120px">
+                  <template v-if="scope.row.taskCount" slot-scope="scope" >
+                    <a href="" class="text-center" @click.stop.prevent="createTransTab('task',scope.row.userId)">
+                      {{ scope.row.taskCount }}
+                    </a>
+                  </template>
+                </el-table-column>
+                <el-table-column label="负责客户数" width="120px">
+                  <template v-if="scope.row.customerCount" slot-scope="scope" >
+                    <a href="" class="text-center" @click.stop.prevent="createTransTab('customer',scope.row.userId)">
+                      {{ scope.row.customerCount }}
+                    </a>
+                  </template>
+                </el-table-column>
+                <el-table-column label="个人备件库" width="120px">
+                  <template v-if="scope.row.spareCount" slot-scope="scope" >
+                    <a href="" class="text-center" @click.stop.prevent="createTransTab('stock',scope.row.userId)">
+                      {{ scope.row.spareCount }}
+                    </a>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button v-if="scope.row.eventCount || scope.row.taskCount || scope.row.customerCount || scope.row.spareCount" type="text" @click="createTransTab('event')">去转交</el-button>
+                    <el-button type="text" @click="resume(scope.row.userId)">恢复</el-button>
+                  </template>
+                </el-table-column>
+                
+              </template>
+              <template v-else>
+                <el-table-column label="部门" show-overflow-tooltip>
+                  <template slot-scope="scope">
+                    {{scope.row.tagList.map(i => i.tagName).join('，')}}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="cellPhone" label="联系电话" />
+                <el-table-column prop="enabled" label="状态">
+                  <template slot-scope="scope">
+                    {{scope.row.enabled == 1 ? '启用' : '禁用'}}
+                  </template>
+                </el-table-column>
+              </template>
+              
+
+            </el-table>
+
+            <div class="table-footer">
+              <div class="list-info">
+                共<span class="level-padding">{{rolePage.total}}</span>记录，
+                已选中<span class="selectedCount">{{roleMultipleSelection.length}}</span>条
+              </div>
+              <el-pagination
+                class="customer-table-pagination"
+                background
+                @current-change="roleJump"
+                @size-change="roleHandleSizeChange"
+                :page-sizes="[10, 20, 50]"
+                :page-size="roleParams.pageSize"
+                :current-page="roleParams.pageNum"
+                layout="prev, pager, next, sizes, jumper"
+                :total="rolePage.total">
+              </el-pagination>
+            </div>
+
+          </div>
+
+          <div v-else class="no-data-block">
+            当前角色暂无人员 <span v-if="isSystemRole || isCustomeRole" class="active-btn" @click="chooseUser('role')">添加成员</span>
+          </div> 
+        </div>
+        <!-- end 角色人员 -->
+
+      </div>
+      <!-- end 右侧角色列表 -->
 
       <!-- start 右侧子部门 人员列表 -->
-      <div v-if="activeName === 'tag'" class="department-main-right">
+      <div v-else class="department-main-right">
 
         <!-- start 部门 header -->
         <div class="department-detail-header">
@@ -67,8 +209,8 @@
           <div class="department-detail-header-title" v-if="Object.keys(selectedDept).length > 0">
             <span> {{ deptInfo.tagName }} </span>
             <div class="dept-edit-del">
-              <base-button type="ghost" @event="openDepartmentEditPanel" v-if="!isRootDepartment(selectedDept)"> 编辑 </base-button>
-              <base-button type="danger" @event="delDepartment" v-if="!isRootDepartment(selectedDept)"> 删除 </base-button>
+              <base-button type="ghost" @event="openDepartmentEditPanel()" v-if="!isRootDepartment(selectedDept)"> 编辑 </base-button>
+              <base-button type="danger" @event="delDepartment()" v-if="!isRootDepartment(selectedDept)"> 删除 </base-button>
             </div>
           </div>
           <div class="dept-info">
@@ -305,146 +447,6 @@
       </div>
       <!-- end 右侧子部门 人员列表 -->
 
-      <!-- start 右侧角色列表 -->
-      <div v-if="activeName === 'role'" class="department-main-right" v-loading.fullscreen.lock="roleLoading">
-
-        <!-- start 角色人员 -->
-        <div class="department-user-block">
-
-          <div v-if="showRoleDesc" class="department-user-block-header dept-role-desc">
-            <div class="department-user-block-header-text">
-              <h4>
-                角色名称： <a :href="`/security/role/view/${selectedRole.id}`" :data-id="selectedRole.id" @click="goRoleDetail" style="color:#55B7B4;">{{selectedRole.text}} </a>
-                <!-- <base-button style="margin-left:10px;" type="ghost" @event="openCreateUserPanel"> 查看 </base-button> -->
-                <base-button v-if="canEditSystemRole || isCustomeRole" style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)"> 编辑 </base-button>
-                <base-button v-if="canEditSystemRole" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.id)"> 重置权限 </base-button>
-                <base-button v-if="isCustomeRole" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)"> 删除角色 </base-button>
-              </h4> 
-              <h4 class="role-desc">角色描述：{{roleDes}} </h4>
-            </div>
-          </div>
-
-          <div class="dept-search-group">
-            <el-input v-model="roleKeyword" placeholder="请输入成员名称搜索" style="width:200px;" @keyup.enter.native="searchRole">
-              <i slot="prefix" class="el-input__icon el-icon-search"></i>
-            </el-input>
-            <base-button type="primary" @event="searchRole()">搜索</base-button>
-            <base-button v-if="isSystemRole || isCustomeRole" type="primary" @event="chooseUser('role')">添加成员</base-button>
-            <base-button v-if="(isSystemRole || isCustomeRole) && rolePage.list.length" type="primary" @event="roleDeleteConfirm()">移除成员</base-button>
-            <base-button v-if="isCustomeRole" type="primary" @event="createRole">新建角色</base-button>
-            <base-button v-if="selectedRole.id == 0" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
-          </div>
-
-          <div class="department-user-table" v-if="rolePage.list.length > 0">
-            <el-table
-              :data="rolePage.list"
-              stripe
-              @select="roleSelectionHandle"
-              @select-all="roleSelectionHandle"
-              :highlight-current-row="false"
-              show-overflow-tooltip
-              header-row-class-name="team-detail-table-header"
-              ref="roleMultipleTable" class="team-table"
-            >
-              
-              <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
-              <el-table-column prop="displayName" label="姓名">
-                <div style="display: flex" slot-scope="scope">
-                  <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">
-                    {{scope.row.displayName}}
-                  </a>
-                  <span v-if="scope.row.superAdmin == 2" class="super-admin-label">主管理员</span>
-                </div>
-              </el-table-column>
-              <el-table-column prop="loginName" label="账号"/>
-              <template v-if="selectedRole.id == -1">
-                <el-table-column label="删除时间" width="180px">
-                  <template slot-scope="scope">
-                    {{scope.row.deleteTime | fmt_datetime}}
-                  </template>
-                </el-table-column>
-                <el-table-column label="未完成事件" width="120px">
-                  <template v-if="scope.row.eventCount" slot-scope="scope" >
-                    <a href="" class="text-center" @click.stop.prevent="createTransTab('event',scope.row.userId)">
-                      {{ scope.row.eventCount }}
-                    </a>
-                  </template>
-                </el-table-column>
-                <el-table-column label="未完成工单" width="120px">
-                  <template v-if="scope.row.taskCount" slot-scope="scope" >
-                    <a href="" class="text-center" @click.stop.prevent="createTransTab('task',scope.row.userId)">
-                      {{ scope.row.taskCount }}
-                    </a>
-                  </template>
-                </el-table-column>
-                <el-table-column label="负责客户数" width="120px">
-                  <template v-if="scope.row.customerCount" slot-scope="scope" >
-                    <a href="" class="text-center" @click.stop.prevent="createTransTab('customer',scope.row.userId)">
-                      {{ scope.row.customerCount }}
-                    </a>
-                  </template>
-                </el-table-column>
-                <el-table-column label="个人备件库" width="120px">
-                  <template v-if="scope.row.spareCount" slot-scope="scope" >
-                    <a href="" class="text-center" @click.stop.prevent="createTransTab('stock',scope.row.userId)">
-                      {{ scope.row.spareCount }}
-                    </a>
-                  </template>
-                </el-table-column>
-                <el-table-column label="操作">
-                  <template slot-scope="scope">
-                    <el-button v-if="scope.row.eventCount || scope.row.taskCount || scope.row.customerCount || scope.row.spareCount" type="text" @click="createTransTab('event')">去转交</el-button>
-                    <el-button type="text" @click="resume(scope.row.userId)">恢复</el-button>
-                  </template>
-                </el-table-column>
-                
-              </template>
-              <template v-else>
-                <el-table-column label="部门" show-overflow-tooltip>
-                  <template slot-scope="scope">
-                    {{scope.row.tagList.map(i => i.tagName).join('，')}}
-                  </template>
-                </el-table-column>
-                <el-table-column prop="cellPhone" label="联系电话" />
-                <el-table-column prop="enabled" label="状态">
-                  <template slot-scope="scope">
-                    {{scope.row.enabled == 1 ? '启用' : '禁用'}}
-                  </template>
-                </el-table-column>
-              </template>
-              
-
-            </el-table>
-
-            <div class="table-footer">
-              <div class="list-info">
-                共<span class="level-padding">{{rolePage.total}}</span>记录，
-                已选中<span class="selectedCount">{{roleMultipleSelection.length}}</span>条
-              </div>
-              <el-pagination
-                class="customer-table-pagination"
-                background
-                @current-change="roleJump"
-                @size-change="roleHandleSizeChange"
-                :page-sizes="[10, 20, 50]"
-                :page-size="roleParams.pageSize"
-                :current-page="roleParams.pageNum"
-                layout="prev, pager, next, sizes, jumper"
-                :total="rolePage.total">
-              </el-pagination>
-            </div>
-
-          </div>
-
-          <div v-else class="no-data-block">
-            当前角色暂无人员 <span v-if="isSystemRole || isCustomeRole" class="active-btn" @click="chooseUser('role')">添加成员</span>
-          </div> 
-        </div>
-        <!-- end 角色人员 -->
-
-      </div>
-      <!-- end 右侧角色列表 -->
-
     </div>
     <!-- end 主要内容 -->
 
@@ -678,7 +680,7 @@ export default {
   mounted() {
     this.initialize();
     this.dept_role_data = this.initData.rolesJson || [];
-    this.roles = [{id: '0', text:'待分配'}, {id: -1, text:'已删除账号'}].concat(this.dept_role_data)
+    this.roles = [{id: '0', text:'待分配'}].concat(this.dept_role_data)
     this.selectedRole = this.roles[0];
     // 自动分配角色
     this.autoAuthRoles = [{id: '0', text:'由管理员每次指定'}].concat(this.dept_role_data)
@@ -825,8 +827,6 @@ export default {
         url: '/security/role/create',
         fromId
       })
-      // window.location.href = '/security/role/create'
-      // /security/role/edit/2
     },
     editRole(id){
       let fromId = window.frameElement.getAttribute('id');
@@ -907,10 +907,14 @@ export default {
       this.chooseRole(this.selectedRole);
     },
     chooseDelRole(){
+      this.selectedDept = {}
       let role = {id: -1, text:'已删除账号'}
       this.chooseRole(role)
     },
     async chooseRole(role){
+      if(this.selectedRole.id != role.id) {
+        this.roleKeyword = '';
+      }
       this.selectedRole = role;
       this.roleLoading = true;
       // 获取角色下面的人员
@@ -962,7 +966,7 @@ export default {
       platform.openTab({
         id: 'createTag',
         title: '新建部门',
-        url: `/security/tag/createTag?${qs.stringify(parent)}`,
+        url: `/security/tag/createDept?${qs.stringify(parent)}`,
         reload: true,
       });
 
@@ -1001,13 +1005,13 @@ export default {
     chooseUser(type) {      
       let options = {
         title: '请选择成员',
-        // seeAllOrg: true,
+        seeAllOrg: true,
         max: -1,
-        // selectedUser: this.userPage.list,
+        selectedUser: this.userPage.list,
         mountEl: this.$el,
       };
 
-      this.$fast.contact.choose('dept', options).then(result => {
+      this.$fast.contact.choose('team', options).then(result => {
         // console.log(result);
         if(result.status == 0){
           let data = result.data || {};
@@ -1028,7 +1032,6 @@ export default {
         tagId: this.selectedDept.id
       }
       params.userIds = users.map(item => item.userId);
-      console.log('adddeptUser:', params)
 
       this.loading = true;
 
@@ -1338,7 +1341,13 @@ export default {
     },
     /** 选中一个部门 */
     async initDeptUser(dept){
+      if(this.activeName == 'tag' && this.selectedRole.id == -1){
+        this.selectedRole = {id: '0', text:'待分配'};
+      }
       try {
+        if(this.selectedDept.id != dept.id) {
+          this.keyword = '';
+        }
         this.selectedDept = dept;
 
         this.userPage.list = [];
@@ -1429,7 +1438,7 @@ export default {
       platform.openTab({
         id: 'editTag',
         title: '编辑部门',
-        url: id ? `/security/tag/editTag/${id}` : `/security/tag/editTag/${this.selectedDept.id}`,
+        url: id ? `/security/tag/editDept/${id}` : `/security/tag/editDept/${this.selectedDept.id}`,
         reload: true,
       });
     },
@@ -1608,7 +1617,7 @@ export default {
   min-width: 320px;
   overflow-x: hidden; 
   overflow-y: auto;
-  height: calc(100% - 50px);
+  height: calc(100% - 100px);
 }
 .dept-header-see {
   margin-top: 20px;
@@ -1622,6 +1631,9 @@ export default {
   }
 }
 .dept-del-role-item {
+  position: absolute;
+  bottom: 0;
+  min-width: 320px;
   margin-top: 10px;
   border: 1px solid #eee;
 }
@@ -1636,7 +1648,12 @@ export default {
   text-align: center;
   color: #55B7B4;
 }
-
+.create-role{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
 
 .dept-search-group {
   input {
