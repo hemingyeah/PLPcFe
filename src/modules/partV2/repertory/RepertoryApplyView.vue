@@ -1423,7 +1423,9 @@ export default {
             message: res.message || '办理成功',
             type: 'success'
           });
-          this.loadData();
+          setTimeout(()=>{
+            this.loadData();
+          },1000)
         }else{
           this.$message({
             showClose: true,
@@ -2340,7 +2342,9 @@ export default {
                 message: res.message,
                 type: 'success'
               });
-              this.loadData();
+              setTimeout(()=>{
+                this.loadData();
+              },1000);
             } else {
               this.$message({
                 showClose: true,
@@ -2366,7 +2370,9 @@ export default {
             message: res.message,
             type: 'success'
           });
-          this.loadData();
+          setTimeout(()=>{
+            this.loadData();
+          },1000);
         } else {
           this.$message({
             showClose: true,
