@@ -12,7 +12,8 @@ import ApproveTaskDialog from './components/ApproveTaskDialog.vue';
 import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 
 import TaskInfoRecord from './components/TaskInfoRecord.vue';
-import TaskReceiptView from './components/TaskReceipt/TaskReceiptView.vue';
+import TaskReceiptView from './components/TaskReceipt/View/TaskReceiptView.vue';
+import TaskReceiptEdit from './components/TaskReceipt/Edit/TaskReceiptEdit.vue';
 import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
@@ -735,6 +736,8 @@ export default {
       } else if (action === 'back') {
         this.backDialog.reason = '';
         this.backDialog.visible = true;
+      } else if (action === 'finish') {
+        this.$refs.taskReceiptEdit.openDialog();
       }
     }
   },
@@ -790,6 +793,7 @@ export default {
     [ProposeApproveDialog.name]: ProposeApproveDialog,
     [TaskInfoRecord.name]: TaskInfoRecord,
     [TaskReceiptView.name]: TaskReceiptView,
+    [TaskReceiptEdit.name]: TaskReceiptEdit,
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
