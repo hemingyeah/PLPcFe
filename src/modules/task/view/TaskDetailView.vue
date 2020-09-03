@@ -21,7 +21,7 @@
           <base-button type="primary" @event="openDialog('accept')" :disabled="pending" v-if="allowAcceptTask">接受</base-button>
           <base-button type="danger" @event="openDialog('refuse')" :disabled="pending" v-if="allowRefuseTask">拒绝</base-button>
           <base-button type="primary" @event="start" :disabled="pending" v-if="allowStartTask">开始</base-button>
-          <base-button type="primary" @event="finishTask" :disabled="pending" v-if="allowFinishTask">回执完成</base-button>
+          <base-button type="primary" @event="openDialog('finish')" :disabled="pending" v-if="allowFinishTask">回执完成</base-button>
           <base-button type="primary" @event="allot" :disabled="pending" v-if="allowAllotTask">指派</base-button>
           <base-button type="primary" @event="redeploy" :disabled="pending" v-if="allowRedeployTask">转派</base-button>
           <base-button type="primary" :class="{'once-printed': task.oncePrinted == 1}" @event="printTask" :disabled="pending" v-if="allowPrintTask">打印工单</base-button>
@@ -233,6 +233,13 @@
       :remark-required="taskConfig.approveRemark"
     />
     <!-- end 工单发起审批弹窗 -->
+
+    <!-- start 完成回执弹窗 -->
+    <task-receipt-edit-dialog
+      ref="taskReceiptEdit"
+      :init-data="initData"
+    />
+    <!-- end 完成回执弹窗 -->
   </div>
 </template>
 
