@@ -49,6 +49,12 @@ router
   })
   .get('/event/convent2Task/jump', async ctx => {
     await taskEditContent(ctx);
+  })
+  .get('/task/createFromCustomer/*', async ctx => {
+    await taskEditContent(ctx);
+  })
+  .get('/task/createFromProduct/*', async ctx => {
+    await taskEditContent(ctx);
   });
   
 router.get('/task/view/:id', async ctx => {
