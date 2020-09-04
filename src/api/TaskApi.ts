@@ -1,5 +1,8 @@
 import http from "@src/util/http";
-import { TaskCreateAndEditModel, PlanTaskCreateAndEditModel } from "@model/param/in/Task";
+import {
+  TaskCreateAndEditModel,
+  PlanTaskCreateAndEditModel,
+} from "@model/param/in/Task";
 
 let fixedPrefixAppPath = "/api/app";
 
@@ -534,7 +537,10 @@ export function taskDeleteCard(params: {} | undefined) {
  * @param {String} params.orderId 工单id
  */
 export function getHoursRecordList(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/getMainList`, params);
+  return http.post(
+    `${fixedPrefixAppPath}/outside/tasktime/getMainList`,
+    params
+  );
 }
 
 /**
@@ -542,7 +548,10 @@ export function getHoursRecordList(params: {} | undefined) {
  * @param {String} params.id 工时记录附加组件实例id
  */
 export function updateHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/updateWorkTimeRecord`, params);
+  return http.post(
+    `${fixedPrefixAppPath}/outside/tasktime/updateWorkTimeRecord`,
+    params
+  );
 }
 
 /**
@@ -552,7 +561,10 @@ export function updateHoursRecord(params: {} | undefined) {
  * @param {String} params.recordFromType 默认1
  */
 export function createHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/createWorkTimeRecordForweb`, params);
+  return http.post(
+    `${fixedPrefixAppPath}/outside/tasktime/createWorkTimeRecordForweb`,
+    params
+  );
 }
 
 /**
@@ -560,7 +572,11 @@ export function createHoursRecord(params: {} | undefined) {
  * @param {String} params.mainId 工时记录附加组件实例id
  */
 export function deleteHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/deleteWorkTimeRecord`, params, false);
+  return http.post(
+    `${fixedPrefixAppPath}/outside/tasktime/deleteWorkTimeRecord`,
+    params,
+    false
+  );
 }
 
 /**
@@ -568,7 +584,11 @@ export function deleteHoursRecord(params: {} | undefined) {
  * @param {String} params.mainId 工时记录附加组件实例id
  */
 export function hoursRecordLocation(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/getDetailList`, params, false);
+  return http.post(
+    `${fixedPrefixAppPath}/outside/tasktime/getDetailList`,
+    params,
+    false
+  );
 }
 
 /**
@@ -891,13 +911,26 @@ export function redeployBatch(params: Object = {}) {
  * @description 新建计划任务
  */
 export function createPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/create`, params);
+  return http.post(
+    `${fixedPrefixAppPath}/outside/pc/task/planTask/create`,
+    params
+  );
 }
 
 /**
  * @description 编辑计划任务
  */
 export function editPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/update`, params);
+  return http.post(
+    `${fixedPrefixAppPath}/outside/pc/task/planTask/update`,
+    params
+  );
+}
+
+/**
+ * @description 拨打电话
+ */
+export function dialout(params: object) {
+  return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params);
 }
 /* -------------  end  新工单api ---------------- */

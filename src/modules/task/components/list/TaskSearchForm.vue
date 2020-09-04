@@ -149,7 +149,7 @@ export default {
               if (event && event.length > 1) {
                 this.$set(this, "product", event[0]);
               }
-              this.form[f.fieldName] = event.keyword;
+              // this.form[f.fieldName] = event.keyword;
             },
           },
         });

@@ -22,7 +22,7 @@
           </p>
           <p>工单类型: {{ item.templateName }}</p>
           <p>客户姓名: {{ item.customerEntity.name }}</p>
-          <p>电话: {{ item.linkMan.phone }}</p>
+          <p>电话: {{ item.linkMan.phone }} <i class="icon-ziyuan iconfont" @click.stop="makePhoneCall(item.linkMan.phone)" v-if="has_call_center_module"></i></p>
           <p>
             地址:
             {{
@@ -74,6 +74,9 @@ export default {
       type: Number,
       default: 0,
     },
+    has_call_center_module: {
+      type: Boolean
+    }
   },
   data() {
     return {
@@ -89,6 +92,19 @@ export default {
       if (taskConfig) {
         this.taskReallotConfig = taskConfig.taskReallot;
       }
+    },
+    /**
+     * @description 拨打电话
+     */
+   async makePhoneCall(phone) {
+     const params = {
+       phone,
+       taskType:'task'
+     }
+     const {code, message} = await TaskApi.dialout(params)
+     if (code) {
+       this.$platform.alert(message);
+     }
     },
     /**
      * @description 打开工单详情tab
@@ -177,7 +193,7 @@ export default {
         this.$set(this.mapList[index], "selected", currSelected);
       }
 
-      this.$emit("openInfo", { allowReallot, item, type: 1 });
+      this.$emit("openInfo", { allowReallot, item});
     },
   },
 };

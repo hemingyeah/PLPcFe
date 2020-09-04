@@ -37,6 +37,7 @@
         <task-map-list
           :mapHeight="mapHeight"
           :mapList="mapList"
+          :has_call_center_module="has_call_center_module"
           @next="next"
           @openInfo="openInfo"
           :type="1"
@@ -53,6 +54,7 @@
             ref="taskMapList"
             :mapHeight="mapHeight"
             :mapList="mdataFilter"
+            :has_call_center_module="has_call_center_module"
             @openInfo="openInfo"
           />
         </div>
@@ -106,6 +108,7 @@ export default {
       page: 1,
       map: "",
       infoWindow: new AMap.InfoWindow({ offset: new AMap.Pixel(0, -28) }),
+      has_call_center_module: localStorage.getItem("call_center_module") == 1,
     };
   },
   watch: {
@@ -145,12 +148,6 @@ export default {
     // 创建地图坐标
     createMarker(mapList) {
       const _that = this;
-      this.map = new AMap.Map(this.$refs.container, {
-        resizeEnable: true,
-        zoom: 5,
-        center: [116.480983, 40.0958],
-        animateEnable: false,
-      });
 
       let markerList = [];
       mapList.forEach((item, index) => {
@@ -176,20 +173,18 @@ export default {
       const allowReallot = this.$refs.taskMapList.allowReallot(item);
 
       if (allowReallot) {
-        // let currSelected = !item.selected;
-        item["selected"] = true;
+        let currSelected = !item.selected;
+        this.$set(this.mapList[item.i - 1], "selected", currSelected);
       }
       this.openInfo({ allowReallot, item: item });
     },
 
     openInfo({ allowReallot, item, index, type }) {
-      if (type) {
         let list = this.mapList.filter((val) => {
           return item.id !== val.id;
         });
         list = [...list, ...[item]];
         this.createMarker(list);
-      }
       if (!item.selected && typeof item.selected === "boolean") {
         this.infoWindow.close();
         return;
@@ -200,7 +195,7 @@ export default {
     //信息框事件
     infoClick({ target }) {
       const { id } = target;
-      if (id === "view" || id === 'ids') {
+      if (id === "view" || id === "ids") {
         let fromId = window.frameElement.getAttribute("id");
         this.$platform.openTab({
           id: `task_view_${this.currentMarkId}`,
@@ -209,8 +204,10 @@ export default {
           url: `/task/view/${this.currentMarkId}?noHistory=1`,
           fromId,
         });
-      } else if (id === 'transfer') {
-        this.reallotBatch()
+      } else if (id === "transfer") {
+        this.reallotBatch();
+      } else if (id === "phone") {
+        this.$refs.taskMapList.makePhoneCall(target.getAttribute("value"));
       }
     },
     // 信息窗
@@ -226,7 +223,7 @@ export default {
       const taddress = `${address.province}${address.city}${address.dist}${address.address}`;
 
       const phoneIcon = this.has_call_center_module
-        ? `<i data-toggle="tooltip" title="拨打电话" style="width: 14px!important;margin-left: 5px;color: #55b7b4;font-size: 14px;cursor: pointer;" class="iconfont icon-dianhua1"></i>`
+        ? `<i class="icon-ziyuan iconfont" id="phone" value="${linkMan.phone}"></i>`
         : "";
       const content = `<div class="map-mark-box">
                     <div class="map-mark-head task-flex">
@@ -234,7 +231,7 @@ export default {
                     </div>
                     <div class="map-mark-body">
                       <p>联系人：${linkMan.name}</p>
-                      <p>电话：${linkMan.phone}</p>
+                      <p>电话：${linkMan.phone} ${phoneIcon}</p>
                       <p>地址：${taddress}</p>
                       <p>创建时间：${createTime}</p>
                     </div>
@@ -278,6 +275,12 @@ export default {
         this.mapList = [...this.mapList, ...result.content];
         this.mapList.map((item, index) => {
           item["i"] = index + 1;
+        });
+        this.map = new AMap.Map(this.$refs.container, {
+          resizeEnable: true,
+          zoom: 5,
+          center: [116.480983, 40.0958],
+          animateEnable: false,
         });
         this.createMarker(this.mapList);
       }
