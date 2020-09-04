@@ -1301,7 +1301,7 @@ const advancedList = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全是',
+      '全部',
       '是',
     ]},
     orderId: 1,
@@ -1323,7 +1323,7 @@ const advancedList = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全是',
+      '全部',
       '是',
       '否'
     ]},

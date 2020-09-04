@@ -1,5 +1,8 @@
 import http from "@src/util/http";
-import { TaskCreateAndEditModel, PlanTaskCreateAndEditModel } from "@model/param/in/Task";
+import {
+  TaskCreateAndEditModel,
+  PlanTaskCreateAndEditModel,
+} from "@model/param/in/Task";
 
 const fixedPrefixTaskPath = "/api/task";
 

@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1544452",
+      "name": "打电话",
+      "font_class": "ziyuan",
+      "unicode": "e66f",
+      "unicode_decimal": 58991
+    },
+    {
       "icon_id": "1001664",
       "name": "筛选",
       "font_class": "shaixuan",

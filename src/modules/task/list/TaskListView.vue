@@ -758,7 +758,7 @@
         <div slot="tip">
           <div class="base-import-warn">
             请先下载
-            <a :href="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
+            <a :href="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`" target="_blank"
               >导入模版文档</a
             >，填写完成后再上传导入。
           </div>
