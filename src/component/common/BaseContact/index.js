@@ -49,7 +49,7 @@ function deptWithUser(options){
   }
 
   let showLocation = !!options.allotMap;
-  let action = '/security/department/user';
+  let action = '/security/tag/userList';
   if(showLocation || options.allot) action = '/task/department/user/dispatch/list';
   if(options.action) action = options.action;
 

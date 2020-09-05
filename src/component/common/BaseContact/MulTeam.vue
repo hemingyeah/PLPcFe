@@ -510,7 +510,6 @@ export default {
           let teams = result[0] || []
 
           this.teams = teams;
-
           this.initTeamUser(this.teams[0]); // 默认选中第一个
           this.matchTeam();
         })

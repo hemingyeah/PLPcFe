@@ -1,7 +1,7 @@
 <template>
   <div class="base-tree-node" :ref="`${node.id}_base_tree_node`">
     <div class="base-tree-node-content" :class="{'base-tree-selected': isSelected}" :style="{paddingLeft: `${16 * deep}px`}">
-      <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle"><i class="iconfont icon-arrow-right" v-if="node.subDepartments.length > 0"></i></span>
+      <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle"><i class="iconfont icon-arrow-right" v-if="node.children.length > 0"></i></span>
       <el-checkbox v-if="showCheckbox" :value="node.isChecked" @input="input"/>
       <span class="base-tree-node-name" @click.stop="transmit(node)">
         <tree-node-content/>
@@ -10,7 +10,7 @@
     
     <template v-if="isExpand">
       <base-tree-node 
-        v-for="n in node.subDepartments" :key="n.id"
+        v-for="n in node.children" :key="n.id"
         :node="n" :selected="selected" :deep="deep + 1" :show-checkbox="showCheckbox"
         @node-click="transmit" @node-check="$emit('node-check', $event)"
         :node-render="nodeRender"/>  
@@ -72,7 +72,7 @@ export default {
       this.$emit('node-click', node);
     },
     toggle(){
-      if(this.node.subDepartments.length == 0) return;
+      if(this.node.children.length == 0) return;
       this.isExpand = !this.isExpand;
     },
     input(value){

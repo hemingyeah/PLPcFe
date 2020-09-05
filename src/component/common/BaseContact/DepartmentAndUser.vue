@@ -107,7 +107,7 @@ export default {
     },
     action: { // 用户数据请求地址
       type: String,
-      default: '/security/department/user'
+      default: '/security/tag/userList'
     },
     lat: {
       type: String,
@@ -176,10 +176,10 @@ export default {
 
       params: {
         keyword: '', // 搜索关键词
-        deptId: '',
-        departmentId: '',
+        // deptId: '',
+        // departmentId: '',
         pageNum: 1,
-        pageSize: 50
+        pageSize: 0
       }, // 参数
       userPage: new Page(),
 
@@ -312,8 +312,8 @@ export default {
         this.loading = true;
         this.userPage.list = [];
 
-        this.params.deptId = 'root';
-        this.params.departmentId = '';
+        // this.params.deptId = 'root';
+        this.params.tagId = '';
         this.params.pageNum = 1;
 
         if(this.showLocation){
@@ -341,8 +341,8 @@ export default {
 
         // 查询用户
         this.params.keyword = '';
-        this.params.deptId = this.selectedDept.id;
-        this.params.departmentId = this.selectedDept.id;
+        this.params.tagId = this.selectedDept.id;
+        // this.params.departmentId = this.selectedDept.id;
         this.params.pageNum = 1;
 
         if(this.showLocation){
@@ -371,7 +371,7 @@ export default {
     toggleDeptCheckStatus(dept, value){
       this.$set(dept, 'isChecked', value);
 
-      let subDepts = dept.subDepartments || [];
+      let subDepts = dept.children || [];
       if(subDepts.length > 0){
         subDepts.forEach(item => this.toggleDeptCheckStatus(item, value))
       }
@@ -384,7 +384,7 @@ export default {
       for(let i = 0; i < depts.length; i++){
         let dept = depts[i];
         if(dept.isChecked) chosen.push(dept);
-        if(dept.subDepartments) chosen = chosen.concat(this.filterChosenDept(dept.subDepartments))
+        if(dept.children) chosen = chosen.concat(this.filterChosenDept(dept.children))
       }
       return chosen;
     },
@@ -407,7 +407,7 @@ export default {
     },
     /** 抓取用户数据 */
     fetchUser(params = {}){      
-      return http.get(this.action, params).then(page => {
+      return http.post(this.action, params, false).then(page => {
         // 合并数据
         let rows = page.list || [];
 
@@ -437,25 +437,8 @@ export default {
     fetchDept(){
       let params = {};
       params.seeAllOrg = this.isSeeAllOrg;
-      return http.get('/security/department/tree', params).then(result => {
-        if(result.status == 1) return [];
-
-        let depts = result.data || [];
-        let index = -1;
-
-        for(var i = 0; i < depts.length; i++){
-          if(depts[i].name == '单独授权人员'){
-            index = i;
-            break;
-          }
-        }
-
-        // 将单独授权人员放在最后
-        if(index >= 0){
-          let arr = depts.splice(index,1);
-          depts.push(arr[0]); 
-        }
-        
+      return http.post('/security/tag/tree', params).then(result => {
+        let depts = (result && result.list) || [];
         return depts;
       })
         .catch(err => console.error('err', err));
@@ -497,7 +480,6 @@ export default {
             let deptUserCount = result[1] || {};
             this.deptUserCount = deptUserCount.data || {};
           }
-      
           this.depts = depts;
           this.initChosenDept(this.depts);
           this.initDeptUser(this.depts[0]); // 默认选中第一个
@@ -510,8 +492,8 @@ export default {
         depts.forEach (dept => {
           let value = true;
           if(chosen.id == dept.id) this.toggleDeptCheckStatus(dept, value)
-          if(dept.subDepartments.length > 0){
-            this.initChosenDept(dept.subDepartments)
+          if(dept.children.length > 0){
+            this.initChosenDept(dept.children)
           }
         })
       })
@@ -527,15 +509,16 @@ export default {
       return user.head || DefaultHead;
     },
     nodeRender(h, node){
-      let content = <span>{node.name}</span>;
+      let content = <span>{node.tagName}</span>;
       if(!this.allowCheckDept) return content
       
-      let count = this.deptUserCount[node.id] || 0
+      // let count = this.deptUserCount[node.id] || 0
+      let count =  0
       if(count <= 0) return content;
 
       return (
         <div class="bc-dept-node-wrap">
-          <span class="bc-dept-node-name">{node.name}</span>
+          <span class="bc-dept-node-name">{node.tagName}</span>
           <span class="bc-dept-node-count">{count}</span>
         </div>
       )

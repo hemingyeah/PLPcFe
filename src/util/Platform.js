@@ -157,7 +157,7 @@ export function notification(params = {}){
 
 // 判断是否是多端环境(企业版)
 const host = window.location.host;
-export const isEnterprise = host === 'shb.linker.ltd';
+export const isEnterprise = true // host === 'shb.linker.ltd';
 
 export default {
   isEnterprise,

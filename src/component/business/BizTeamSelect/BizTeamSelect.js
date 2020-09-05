@@ -216,7 +216,7 @@ const BizTeamSelect = {
         this.loading = true;
         let page = await this.fetchFunc(this.params);
         if (!page) return;
-        this.page[action](page);
+        this.page = page; 
         this.loadmoreOptions.disabled = !this.page.hasNextPage;
         this.loading = false;
       } catch(err) {
