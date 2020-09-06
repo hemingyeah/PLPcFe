@@ -31,6 +31,14 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 import Page from '@model/Page';
 import { trimAll } from '@src/util/lang';
 
+function createAttachmentDom(h, attachments){
+  return attachments && attachments.length > 0 
+    ? <div class="base-timeline-attachment base-file__preview">
+      {attachments.map(item => <base-file-item file={item} key={item.id} readonly size="small"/>)}
+    </div> 
+    : ''
+}
+
 export default {
   name: 'task-info-record',
   inject: ['initData'],
@@ -44,7 +52,7 @@ export default {
     return {
       commentPending: false,
       params: {
-        primaryId: this.taskId,
+        taskId: this.taskId,
         pageNum: 1,
         pageSize: 15,
       },
@@ -56,9 +64,30 @@ export default {
     auth() {
       return this.shareData?.auth || {};
     },
+    // 权限
+    authorities(){
+      let user = this.loginUser || {};
+      return user.authorities || {};
+    },
+    allTaskEdit() {
+      return this.authorities['TASK_EDIT'] === 3;
+    },
     /** 是否允许操作 */
     allowOperate(){
       return this.task?.isDelete === 0;
+    },
+    /** 
+     * 同时满足以下条件允许删除该记录
+     * 1. 该记录没有被删除
+     * 2. 工单编辑权限（CUSTOMER_EDIT）值为3 或者 是创建人
+     * 3. 该工单没有被删除
+     */
+    allowDeleteRecord(item){
+      let isDelete = item.content.isDelete == 'true'
+      let user = this.loginUser
+      let isCreator = item.userId == user.userId
+
+      return !isDelete && (this.allTaskEdit || isCreator) && this.allowOperate;
     },
     /** 查看单权限 */
     allowTaskView() {
@@ -69,7 +98,7 @@ export default {
       return this.allowTaskView && this.allowOperate;
     },
     loginUser(){
-      return this.shareData?.loginUser || {};
+      return this.initData?.loginUser || {};
     },
     task() {
       return this.shareData?.task || {};
@@ -84,6 +113,13 @@ export default {
       return this.initData.remarkList || [];
     }
   },
+  mounted() {
+    this.initializeRecord();
+    this.$eventBus.$on('customer_info_record.update_record_list', this.searchRecord);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('customer_info_record.update_record_list', this.searchRecord);
+  },
   methods: {
     /** 
      * @description 创建备注
@@ -94,15 +130,11 @@ export default {
 
         let params = {
           taskId: this.taskId,
-          taskNo: this.taskNo,
           attachments: form.attachments,
           showInOwn: form.showInOwn,
           toCustomer: form.toCustomer,
           cusNotice: form.cusNotice,
-          content: {
-            updateContent: form.content,
-            updateType: 'tRecord'
-          }
+          content: form.content
         }
 
         let result = await TaskApi.taskRecordCreate(params);
@@ -132,17 +164,32 @@ export default {
     async deleteRemark(record) {
       try {
         if (!await this.$platform.confirm('确认删除该备注吗？')) return;
-        const delRes = await this.$http.post('/customer/deleteCustomerRecord', {id: record.id}, false);
+        const delRes = await TaskApi.taskRecordDelete({ id: record.id });
+
         if(delRes.status == 0) this.initializeRecord();
+
       } catch (e) {
-        console.error('deleteMark catch err', e);
+        console.warn('task deleteRemark -> error', e);
       }
     },
     /** 
      * @description 抓取信息动态
     */
     fetchRecord(params){
-      return this.$http.get('/customer/cRecord', params);
+      params.taskId = this.taskId;
+      params.userId = this.loginUser.userId;
+      return TaskApi.taskRecordList(params).then(data => {
+        let { list = [] } = data?.result;
+        list.forEach(record => {
+          try {
+            record.attachments = JSON.parse(record.attachments);
+          } catch (error) {
+            console.warn('searchRecord recordPage.list.forEach -> error', error)
+          }
+        })
+
+        return data;
+      })
     },
     /** 
      * @description 初始化信息动态
@@ -158,12 +205,24 @@ export default {
       try {
         this.params.pageNum++;
         this.recordLoading = true;
-        let result = await this.fetchRecord(this.params);
-        this.recordLoading = false;
-        this.recordPage.merge(result)
+
+        let data = await this.fetchRecord(this.params);
+
+        this.recordLoading = false
+        this.recordPage.merge(data.result)
+
       } catch (error) {
-        console.error(error)
+        console.warn('loadmore -> error', error)
       }
+    },
+    recordPageListConvertHandler(list = []) {
+      list.forEach(record => {
+        try {
+          record.attachments = JSON.parse(record.attachments);
+        } catch (error) {
+          console.warn('searchRecord  recordPage.list.forEach -> error', error)
+        }
+      })
     },
     renderAddressRecordDom({action, userName, showInOwn, content}) {
       let address = trimAll(content.address);
@@ -202,18 +261,103 @@ export default {
     renderProductRecordDom({action, userName, showInOwn, content}) {
       return <h5><strong>{userName}</strong>{ `${content.type}了产品${content.name}`}。</h5>
     },
-    renderRecord() {
+    /* 渲染指派转派 */
+    renderAllot(record = {}) {
+      let { action, userName, content, attachments, taskNo, executorName } = record;
+      return (
+        <h5><strong>{userName}</strong>{ `把工单 &nbsp;&nbsp #${taskNo} &nbsp;&nbsp ${action} 给&nbsp;&nbsp; ${executorName} "&nbsp;&nbsp;`}。</h5>
+      )
+    },
+    /* 渲染添加备注 */
+    renderActionRemark(record = {}) {
+      let { userName, showInOwn, toCustomer, cusNotice, content, attachments } = record;
+      return [
+        <h5 class="main-info">
+          <strong>{ userName }</strong>添加了备注
+          {!!showInOwn && (
+            <span class="private">
+              <i class="iconfont icon-account1"></i>仅自己可见
+            </span>
+          )}。
+          {!!toCustomer && (
+            <span class="">
+                "(客户可见)"
+            </span>
+          )}
+          {!!cusNotice && (
+            <span class="">
+                "(短信通知客户)"
+            </span>
+          )}
+          {
+            this.allowDeleteRecord(record) 
+              && <button type='button' class="btn-text base-timeline-delete" onClick={e => this.deleteRemark(record)}>
+                <i class="iconfont icon-shanchu"></i>删除
+              </button>
+          }
+        </h5>,
+        content.isDelete == 'true'
+          ? <p class="text-danger">{content.deleteUserName}于{content.deleteTime}删除了该备注。</p> 
+          : [<p class="pre-line secondary-info">{content.updateContent}</p>, createAttachmentDom(h, attachments)]
+      ]
+    },
+    /* 渲染api新建 */
+    renderApiCreate(record = {}) {
+      let { userName, content, taskNo } = record;
+      return [
+        <h5><strong>{ userName }</strong>{` 通过API应用${content.clientName} 新建了工单  ${ taskNo }`}</h5>,
+      ]
+    },
+    /* 渲染电话日志 */
+    renderPhoneLog(record = {}) {
+      let { userName, content } = record;
+      return <h5><strong>{ userName }</strong>拨打了<strong>{ content.targetName }</strong>的电话。</h5>
+    },
+    /** 根据记录的action渲染对应的内容，支持jsx和render函数 */
+    renderRecord(h, record) {
+      let {action, userName, content, attachments, primaryName} = record;
 
+      try {
+        content = JSON.parse(content);
+      } catch (error) {
+        content = {
+          updateContent: content
+        }
+      }
+      
+      if (action == '指派' || action == '转派') return this.renderPhoneLog(record)
+      if (action == '备注') return this.renderActionRemark(record)
+      if (action === 'API新建') return this.renderApiCreate(record)
+      if (action == '电话日志') return this.renderPhoneLog(record)
+
+      if (/工单/.test(action)) {
+        const str = ` ${record.action.indexOf('新建工单') > -1 ? record.action.indexOf('API') > -1 ? 'API新建' : '新建' : '完成' } 了一个该客户的工单 #${content.taskNo}，工单类型为【${content.taskType}】。`;
+        return <h5><strong>{userName}</strong>{str}</h5>
+      }
+
+      if (/事件/.test(action)) {
+        const str = ` ${record.action.indexOf('新建事件') > -1 ? record.action.indexOf('API') > -1 ? 'API新建' : '新建' : '完成' } 了一个该客户的事件 #${content.eventNo}， 事件类型为【${content.taskType}】。`;
+        return <h5><strong>{userName}</strong>{str}</h5>
+      }
+
+      return [
+        <h5><strong>{userName}</strong>{action}了客户。</h5>,
+        content.updateFields ? <p class="secondary-info">修改字段：{content.updateFields}</p> : '',
+        createAttachmentDom(h, attachments)
+      ];
     },
     async searchRecord() {
       try {
         this.recordLoading = true;
-        let result = await this.fetchRecord(this.params);
+
+        let data = await this.fetchRecord(this.params);
+
         this.recordLoading = false;
         this.recordPage.list = [];
-        this.recordPage.merge(result)
+        this.recordPage.merge(data.result)
+
       } catch (error) {
-        console.error(error)
+        console.warn('searchRecord -> error', error)
       }
     }
   }
