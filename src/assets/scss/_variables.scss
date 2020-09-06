@@ -1,5 +1,7 @@
-$color-primary: #55B7B4 !default;
-$color-danger: #ed3f14 !default;
+$color-primary: #13C2C2 !default;
+$color-danger: #f56c6c !default;
+$color-success: #67c23a !default;
+$color-warning: #FAAE14 !default;
 $color-regular: #eef8f8 !default;
 $color-ding-blue:#3aa3ff !default;
 
@@ -9,6 +11,7 @@ $color-primary-hover: mix(#fff, $color-primary, 89.88%) !default;
 $text-color-primary: #333 !default;
 $text-color-regular: #666 !default;
 $text-color-secondary: #999 !default;
+$text-color-gray: #ccc !default;
 
 $border-color-base: #e0e1e2 !default;
 $border-radius-base: 2px !default; //边框圆角
@@ -21,3 +24,13 @@ $font-size-large: 16px !default;
 $font-size-larger: 18px !default;
 $text-color-main: #051A13 !default;
 $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
+
+// 背景颜色
+$bg-color-l1: #F5F5F5 !default;
+$bg-color-l2: #fafafa !default;
+
+// 边框颜色
+$color-border-l1: #D8D8D8 !default;
+$color-border-l2: #E5E5E5 !default;
+$color-border-l3: #EBEBEB !default;
+$color-border-l4: #F0F0F0 !default;

@@ -12,6 +12,7 @@ import ApproveTaskDialog from './components/ApproveTaskDialog.vue';
 import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 
 import TaskInfoRecord from './components/TaskInfoRecord.vue';
+import TaskReceipt from './components/TaskReceipt';
 import TaskReceiptView from './components/TaskReceipt/View/TaskReceiptView.vue';
 import TaskReceiptEdit from './components/TaskReceipt/Edit/TaskReceiptEdit.vue';
 import TaskAccount from './components/TaskAccount.vue';
@@ -792,6 +793,7 @@ export default {
     [ApproveTaskDialog.name]: ApproveTaskDialog,
     [ProposeApproveDialog.name]: ProposeApproveDialog,
     [TaskInfoRecord.name]: TaskInfoRecord,
+    [TaskReceipt.name]: TaskReceipt,
     [TaskReceiptView.name]: TaskReceiptView,
     [TaskReceiptEdit.name]: TaskReceiptEdit,
     [TaskAccount.name]: TaskAccount,

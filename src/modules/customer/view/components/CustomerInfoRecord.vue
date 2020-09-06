@@ -215,20 +215,6 @@ export default {
           ]
         }
 
-        // if(content.type == '发送失败'){
-        //   return [
-        //     <h5>使用短信模板【{content.templateName}】向客户发送短信失败。</h5>,
-        //     <p class="error-info">失败原因：{ content.errorStatus }</p>,
-        //     <p className="secondary-info">接收人：{content.remindToName}</p>
-        //   ]
-        // }
-
-        // if(content.type == '发送成功'){
-        //   return [
-        //     <h5>使用短信模板【{content.templateName}】向客户发送短信成功。</h5>,
-        //     <p className="secondary-info">接收人：{content.remindToName}</p>
-        //   ]
-        // }
       }
 
       if(action == '批量更新') return [

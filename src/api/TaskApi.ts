@@ -302,6 +302,20 @@ export function getTaskConfig() {
   return http.get("/task/getTaskConfig", {}, false);
 }
 
+/**
+ * @description 创建工单备注
+ * @param {Object} params - 参数
+ * @param {String} params.taskId - 工单Id
+ * @param {String} params.taskNo - 工单编号
+ * @param {Object} params.content - 内容信息
+ * @param {Number} params.showInOwn - 是否仅自己可见
+ * @param {Number} params.toCustomer - 客户可见
+ * @param {Number} params.cusNotice - 向客户发送短信
+ */
+// export function taskRecordCreate(params: any) {
+//   return http.post("/task/taskRecord/create", params, false);
+// }
+
 /* -------------  end  旧工单api ---------------- */
 
 /* ------------- start 新工单api ---------------- */
@@ -902,5 +916,12 @@ export function createPlanTask(params: PlanTaskCreateAndEditModel) {
  */
 export function editPlanTask(params: PlanTaskCreateAndEditModel) {
   return http.post(`${fixedPrefixTaskPath}/outside/pc/task/planTask/update`, params);
+}
+
+/**
+ * @description 插入工单日志
+ */
+export function taskRecordCreate(params: any) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/taskrecord/create`, params);
 }
 /* -------------  end  新工单api ---------------- */
