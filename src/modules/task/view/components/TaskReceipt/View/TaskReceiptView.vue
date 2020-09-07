@@ -7,10 +7,7 @@
           <div class="form-view-row">
             <label>{{ field.displayName }}</label>
             <div class="form-view-row-content">
-              <receipt-view-table
-                :data="value"
-                :colums="sparepartColums"
-              />
+              <receipt-view-common-table :data="value" :colums="sparepartColums" />
             </div>
           </div>
         </template>
@@ -21,10 +18,7 @@
           <div class="form-view-row">
             <label>{{ field.displayName }}</label>
             <div class="form-view-row-content">
-              <receipt-view-table
-                :data="value"
-                :colums="serviceColums"
-              />
+              <receipt-view-common-table :data="value" :colums="serviceColums" />
             </div>
           </div>
         </template>
@@ -61,7 +55,7 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 import ReceiptMixin from '../TaskReceiptMixin';
 
 /* components */
-import ReceiptViewTable from './ReceiptViewTable';
+import ReceiptCommonTable from './ReceiptCommonTable';
 import TaskReceiptEdit from '../Edit/TaskReceiptEdit';
 
 export default {
@@ -80,13 +74,16 @@ export default {
         field: 'primaryType'
       }, {
         label: '单价',
-        field: 'salePrice'
+        field: 'salePrice',
+        minWidth: '88px'
       }, {
         label: '数量',
-        field: 'number'
+        field: 'number',
+        minWidth: '88px'
       }, {
         label: '小计',
-        field: 'total'
+        field: 'total',
+        minWidth: '128px'
       }],
       serviceColums: [{
         label: '编号',
@@ -99,13 +96,16 @@ export default {
         field: 'primaryType'
       }, {
         label: '单价',
-        field: 'salePrice'
+        field: 'salePrice',
+        minWidth: '88px'
       }, {
         label: '数量',
-        field: 'number'
+        field: 'number',
+        minWidth: '88px'
       }, {
         label: '小计',
-        field: 'total'
+        field: 'total',
+        minWidth: '128px'
       }]
     }
   },
@@ -173,7 +173,7 @@ export default {
     }
   },
   components: {
-    [ReceiptViewTable.name]: ReceiptViewTable,
+    [ReceiptCommonTable.name]: ReceiptCommonTable,
     [TaskReceiptEdit.name]: TaskReceiptEdit
   }
 }
@@ -181,20 +181,6 @@ export default {
 
 <style lang="scss" scoped>
 .task-receipt-view-container {
-  /deep/ .receipt-view-table {
-    border: 1px solid $color-border-l1;
-
-    .receipt-view-table-header th {
-      background-color: $bg-color-l2;
-      color: $text-color-primary;
-      font-weight: 500;
-    }
-    
-    .receipt-view-table-row td {
-      color: $text-color-regular;
-    }
-  }
-
   .totalExpense {
     border-top: 1px solid #f4f4f4;
     text-align: right;

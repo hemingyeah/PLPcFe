@@ -1,8 +1,9 @@
 <template>
   <el-table
-    header-row-class-name="receipt-view-table-header"
-    row-class-name="receipt-view-table-row"
-    class="receipt-view-table"
+    v-if="data.length"
+    header-row-class-name="base-table-header-v3"
+    row-class-name="base-table-row-v3"
+    class="base-table-border-v3"
     :data="data"
     stripe>
     <el-table-column
@@ -28,7 +29,7 @@
 
 <script>
 export default {
-  name: 'receipt-view-table',
+  name: 'receipt-view-common-table',
   props: {
     data: {
       type: Array,
@@ -41,29 +42,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-/deep/ .receipt-view-table {
-  border: 1px solid $color-border-l1;
-
-  .receipt-view-table-header th {
-    background-color: $bg-color-l2;
-    color: $text-color-primary;
-    font-weight: 500;
-  }
-  
-  .receipt-view-table-row td {
-    color: $text-color-regular;
-  }
-}
-
-.totalExpense {
-  border-top: 1px solid #f4f4f4;
-  text-align: right;
-  padding: 10px;
-
-  span {
-    margin-left: 10px;
-  }
-}
-</style>

@@ -1,42 +1,64 @@
 <template>
   <div class="form-sparepart">
-    <button type="button" class="btn btn-primary base-upload-btn" @click="visible = true">添加</button>
+    <!-- start 添加按钮 -->
+    <el-button
+      class="add-sparepart-btn"
+      type="text"
+      size="medium"
+      @click="visible = true"
+    >添加</el-button>
+    <!-- end 添加按钮 -->
 
-    <el-table :data="value" border stripe>
-      <el-table-column label="备件" prop="name"></el-table-column>
-      <el-table-column label="编号" prop="serialNumber"></el-table-column>
-      <el-table-column label="类别" prop="primaryType"></el-table-column>
-      <el-table-column label="规格" prop="standard"></el-table-column>
-      <el-table-column prop="number" label="数量" width="100px">
+    <!-- start 备件列表 -->
+    <el-table
+      v-if="value.length"
+      header-row-class-name="base-table-header-v3"
+      row-class-name="base-table-row-v3"
+      class="base-table-border-v3"
+      :data="value"
+      stripe>
+      <el-table-column
+        v-for="(column, index) in colums"
+        :key="`${column.field}_${index}`"
+        :label="column.label"
+        :prop="column.field"
+        show-overflow-tooltip
+        :min-width="column.minWidth || '148px'">
         <template slot-scope="scope">
-          <input class="sparepart-number-input" type="number" v-model="scope.row.number" @change="handleSparepartNum(scope.row)" />
-        </template>
-      </el-table-column>
+          <!-- start 数量 -->
+          <template v-if="column.field === 'number'">
+            <input class="sparepart-number-input" type="number" v-model="scope.row.number" @change="handleSparepartNum(scope.row)" />
+          </template>
+          <!-- end 数量 -->
 
-      <el-table-column label="单价" prop="salePrice" width="100px">
-        <template slot-scope="scope">
-          <input class="sparepart-number-input" type="number" v-model="scope.row.salePrice" />      
-        </template>
-      </el-table-column>
+          <!-- start 单价 -->
+          <template v-else-if="column.field === 'salePrice' && editUnitPrice">
+            <input class="sparepart-number-input" type="number" v-model="scope.row.salePrice" @change="handlePrice(scope.row)" />
+          </template>
+          <!-- end 单价 -->
 
-      <el-table-column label="小计" width="100px">
-        <template slot-scope="scope">
-          {{(scope.row.number * scope.row.salePrice).toFixed(2)}}
-        </template>
-      </el-table-column>
-    
-      <el-table-column label="操作" width="70px" fixed="right">
-        <template slot-scope="scope">
-          <el-button size="mini" type="danger" icon="el-icon-delete" @click="value.splice(scope.$index, 1)" />
+          <!-- start 小计 -->
+          <template v-else-if="column.field === 'total'">
+            {{ (scope.row.number * scope.row.salePrice).toFixed(2) }}
+          </template>
+          <!-- end 小计 -->
+
+          <!-- start 操作 -->
+          <template v-else-if="column.field === 'action'">
+            <el-button size="small" type="text" icon="el-icon-delete" @click="value.splice(scope.$index, 1)" />
+          </template>
+          <!-- end 操作 -->
+
+          <template v-else>{{ scope.row[column.field] }}</template>
         </template>
       </el-table-column>
     </el-table>
+    <!-- end 备件列表 -->
 
-    <!-- 添加备件弹窗 -->
+    <!-- start 添加备件弹窗 -->
     <base-modal :show.sync="visible" title="备件添加" class="form-sparepart-modal" width="700px" @closed="reset">
-      <form @submit.prevent="submit">
-        <form-builder :fields="fields" ref="form" :value="sparepart" @update="update">
-
+      <div class="base-modal-content">
+        <form-builder ref="form" :fields="fields" :value="sparepart" @update="update">
           <!-- start 仓库 -->
           <template slot="repertory" slot-scope="{ field }">
             <form-item :label="field.displayName">
@@ -96,20 +118,27 @@
           </template>
           <!-- end 小计 -->
         </form-builder>
-
-        <div class="dialog-footer" slot="footer">
-          <el-button @click="visible = false">关闭</el-button>
-          <el-button native-type="submit" type="primary">保存</el-button>
-        </div>
-      </form>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" @click="submit">保 存</el-button>
+      </div>
     </base-modal>
+    <!-- end 添加备件弹窗 -->
   </div>
 </template>
 
 <script>
-import FormMixin from '@src/component/form/mixin/form';
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
+
+/* mixin */
+import FormMixin from '@src/component/form/mixin/form';
+
+/* util */
+import MathUtil from '@src/util/math';
+import * as math from 'mathjs';
+
 export default {
   name: 'form-sparepart',
   mixins: [FormMixin],
@@ -129,10 +158,48 @@ export default {
       repertoryId: 0, // 仓库ID
       repertoryList: [], // 仓库列表数据
       selectedSparepart: [], // 当前选中的备件
-      sparepart: this.initData() // 备件信息
+      sparepart: this.initData(), // 备件信息
+      config: {} // 备件配置
     }
   },
   computed: {
+    /**
+    * @description 备件列表项
+    */
+    colums() {
+      return [{
+        label: '备件',
+        field: 'name'
+      }, {
+        label: '编号',
+        field: 'serialNumber'
+      }, {
+        label: '类别',
+        field: 'primaryType'
+      }, {
+        label: '规格',
+        field: 'standard'
+      }, {
+        label: '数量',
+        field: 'number',
+        minWidth: '100px'
+      }, {
+        label: '单价',
+        field: 'salePrice',
+        minWidth: '100px'
+      }, {
+        label: '小计',
+        field: 'total',
+        minWidth: '128px'
+      }, {
+        label: '操作',
+        field: 'action',
+        minWidth: '70px'
+      }]
+    },
+    /**
+    * @description 备件字段
+    */
     fields() {
       return [{
         formType: 'select',
@@ -171,6 +238,12 @@ export default {
         isNull: 1,
         disabled: true
       }, {
+        formType: 'textarea',
+        fieldName: 'description',
+        displayName: '说明',
+        isNull: 1,
+        disabled: true
+      }, {
         formType: 'number',
         fieldName: 'number',
         displayName: '数量',
@@ -183,12 +256,25 @@ export default {
         disabled: true
       }]
     },
+    /**
+    * @description 小计
+    */
     total() {
       let { number, salePrice } = this.sparepart;
       return number && salePrice ? (number * salePrice).toFixed(2) : '';
+    },
+    /**
+    * @description 是否可以修改单品价格
+    */
+    editUnitPrice() {
+      // TODO：是否可以修改单品价格
+      return false;
     }
   },
   methods: {
+    /**
+    * @description 初始化备件默认值
+    */
     initData() {
       return {
         id: '',
@@ -201,18 +287,91 @@ export default {
         number: '',
         unit: '',
         availableNum: '',
-        repertoryCount: ''
+        repertoryCount: '',
+        description: ''
       }
     },
-    validateNumber(value, field){
-      const maxNum = this.sparepart.availableNum || '';
-      return new Promise((resolve, reject) => {
-        if(maxNum && value > maxNum) {
-          return resolve('库存不足，请输入正确的数量');
-        } 
-        resolve(null);
-      })
+    /**
+    * @description 修改列表备件数量
+    */
+    handleSparepartNum(item) {
+      const maxNum = item.repertoryCount;
+      let value = Number(item.number);
+      let count = this.decimalNumber(value);
+
+      if (value <= 0) {
+        this.$platform.alert('请输入正确的数量');
+        item.number = 1;
+        return;
+      }
+      
+      if (maxNum != '' && value > maxNum) {
+        this.$platform.alert(`库存数量为：${ maxNum}`);
+        item.number = maxNum;
+        return;
+      }
+      
+      if (count != -1 && count == 0) {
+        this.$platform.alert('请输入大于0的正整数');
+        item.number = 1;
+        return;
+      }
+      
+      if (count != -1 && count != 0) {
+        this.$platform.alert(`请输入大于0的${ count }位小数`);
+        item.number = 1;
+      }
     },
+    /**
+    * @description 修改列表备件单价
+    */
+    handlePrice(item) {
+      let value = Number(item.salePrice);
+
+      // TODO：oldPrice
+      if(value < 0){
+        this.$platform.alert('请输入不小于0的数值');
+        item.salePrice = item.oldPrice ? item.oldPrice : 0;
+      }
+    },
+    /**
+    * @description 弹窗关闭重置数据
+    */
+    reset() {
+      this.repertoryId = this.repertoryList[0]?.value || 0;
+      this.sparepart = this.initData();
+      this.selectedSparepart = [];
+
+      // 清空校验结果
+      setTimeout(() => {
+        this.$refs.form.$children.map(child => {
+          if (child.$el.className == 'form-item err') {
+            child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
+          }
+        })
+      }, 0);
+    },
+    /**
+    * @description 更新表单数据
+    */
+    update({field, newValue, oldValue}) {
+      let {fieldName, displayName} = field;
+      if (this.$appConfig.debug) {
+        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+      this.$set(this.sparepart, fieldName, newValue);
+    },
+    /**
+    * @description 选择仓库
+    */
+    updateRepertory() {
+      // 重置备件信息
+      this.selectedSparepart = [];
+      this.sparepart = this.initData();
+    },
+    /**
+    * @description 搜索备件
+    */
     searchPart(params) {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {};
@@ -233,6 +392,9 @@ export default {
         })
         .catch(e => console.error(e));
     },
+    /**
+    * @description 选择备件
+    */
     updatePart(value) {
       let newValue = value[0];
 
@@ -246,24 +408,42 @@ export default {
         }
       }
     },
-    updateRepertory() {
-      // 重置备件信息
-      this.selectedSparepart = [];
-      this.sparepart = this.initData();
-    },
-    update({field, newValue, oldValue}) {
-      let {fieldName, displayName} = field;
-      if (this.$appConfig.debug) {
-        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
-      }
-      this.$set(this.sparepart, fieldName, newValue);
-    },
-    handleSparepartNum(item){
-      const maxNum = item.repertoryCount;
-      let value = Number(item.number);
+    /**
+    * @description 数量校验
+    */
+    validateNumber(value, field) {
+      const maxNum = this.sparepart.availableNum || '';
+      const val = Number(value);
+      let count = this.decimalNumber(val);
 
-      item.number = value > maxNum ? maxNum : (value <= 0 ? 1 : value);
+      return new Promise((resolve, reject) => {
+        if (val <= 0) {
+          return resolve('请输入正确的数量');
+        } else if(maxNum && value > maxNum){
+          return resolve('库存不足，请输入正确的数量');
+        } else if (count != -1 && count == 0) {
+          return resolve('请输入大于0的正整数');
+        } else if (count != -1 && count != 0) {
+          return resolve(`请填写大于0的${ count }位小数`);
+        }
+
+        resolve(null);
+      })
     },
+    /**
+    * @description 数量小数位
+    */
+    decimalNumber(num) {
+      let { sparepart2, precision } = this.config;
+      let count = MathUtil.decimalNumber(num);
+
+      if(!sparepart2 && count != 0) return 0;
+      if(precision >= count) return -1;
+      return precision;
+    },
+    /**
+    * @description 添加备件
+    */
     async submit() {
       try {
         const validateRes = await this.$refs.form.validate();
@@ -280,7 +460,7 @@ export default {
         let ids = newValue.findIndex(val => val.id == sparepartObj.id);
 
         if (ids > -1) {
-          const sum = Number(newValue[ids].number) + Number(sparepartObj.number);
+          const sum = Number(math.add(math.bignumber(newValue[ids].number), math.bignumber(sparepartObj.number)));
           newValue[ids].number = sum > sparepartObj.availableNum ? sparepartObj.availableNum : sum;
 
         } else {
@@ -294,28 +474,16 @@ export default {
       } catch (e) {
         console.error('err', e);
       }
-    },
-    reset() {
-      this.repertoryId = this.repertoryList[0]?.value || 0;
-      this.sparepart = this.initData();
-      this.selectedSparepart = [];
-
-      // 清空校验结果
-      setTimeout(() => {
-        this.$refs.form.$children.map(child => {
-          if (child.$el.className == 'form-item err') {
-            child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
-          }
-        })
-      }, 0);
     }
   },
-  async mounted(){
+  async mounted() {
     try {
-      const config = await TaskApi.getSparepartConfig();
+      this.config = await TaskApi.getSparepartConfig();
 
-      if (config.sparepart2) {
-        if (config.personalRepertory) {
+      let { sparepart2, personalRepertory } = this.config;
+
+      if (sparepart2) {
+        if (personalRepertory) {
           this.repertoryList = [{
             text: '个人备件库',
             value: 0
@@ -330,12 +498,12 @@ export default {
           })
         }
       }
-
+      // TODO：备件2.0？？？
       // 设置仓库默认值
-      this.repertoryId = this.repertoryList[0].value;
+      this.repertoryId = this.repertoryList[0]?.value || '';
       
     } catch (err) {
-      console.log('err', err);
+      console.error('err', err);
     }
   }
 }
@@ -357,8 +525,12 @@ export default {
 }
 
 .form-sparepart{
-  line-height: 30px;
   text-align: left;
+
+  .add-sparepart-btn {
+    min-width: auto !important;
+    padding: 7px 0 0 0;
+  }
 
   .el-table {
     margin: 10px 0;
@@ -366,31 +538,11 @@ export default {
     .sparepart-number-input {
       width: 100%;
     }
-  }
 
-  .form-sparepart-modal{
-    .base-modal-body{
-      padding: 10px 20px 20px 10px;
-
-      .form-builder {
-        width: 100%;
-
-        .form-item {
-          label {
-            width: 80px;
-          }
-
-          .form-text {
-            input {
-              background: #eee;
-            }
-          }
-        }
-      }
-
-      .dialog-footer {
-        text-align: right;
-      }
+    .el-icon-delete {
+      font-size: 16px;
+      color: $color-danger;
+      font-weight: 700;
     }
   }
 }

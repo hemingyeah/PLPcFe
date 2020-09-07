@@ -13,7 +13,7 @@
               <label>服务费用</label>
               <span>{{ serviceTotal }}</span>
             </div>
-            <div class="item">
+            <div class="item" v-if="showDiscountCost">
               <label>折扣费用</label>
               <input type="number" class="text-red" v-model="form.disExpense" @input="updateDisExpense" @blur="disExpenseBlur" />
             </div>
@@ -75,6 +75,13 @@ export default {
     */
     expenseSheet() {
       return this.initData.receiptExpenseSheetForUpdate || {};
+    },
+    /** 
+    * @description 显示折扣费用
+    */
+    showDiscountCost() {
+      let { showSparepart, showService, showDiscountCost } = this.taskType?.options || {};
+      return (showSparepart || showService) && showDiscountCost;
     }
   },
   methods: {
@@ -193,6 +200,10 @@ export default {
 
 <style lang="scss">
 .task-receipt-edit-container {
+  .form-builder {
+    padding: 10px 0;
+  }
+
   .task-receipt-expense .item{
     display: flex;
     align-items: center;

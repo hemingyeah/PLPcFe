@@ -439,7 +439,7 @@ export default {
         {
           displayName: '附加组件',
           component: TaskCard.name,
-          show: this.initData.cardInfo.length
+          show: this.initData?.cardInfo?.length
         }
       ].filter(tab => tab.show);
     },
