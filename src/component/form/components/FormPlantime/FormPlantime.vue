@@ -4,6 +4,7 @@
       :id="`form_${field.fieldName}`"
       :type="type"
       :prefix-icon="`iconfont icon-fd-${type}`"
+      :picker-options="pickerOptions"
       :value-format="formate"
       :placeholder="placeholder"
       :value="value" @input="choose"/>
@@ -17,19 +18,21 @@ export default {
   name: 'form-plantime',
   mixins: [FormMixin],
   props: {
+    pickerOptions: {
+      type: Object,
+      default: () => ({})
+    },
     value: {
       type: String,
       default: ''
     }
   },
-  data() {
-    return {
-      type: this.field.setting.dateType === 'date' ? 'date' : 'datetime'
-    }
-  },
   computed: {
     formate() {
       return this.type == 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-dd HH:mm:ss'
+    },
+    type() {
+      return this.field.setting.dateType === 'date' ? 'date' : 'datetime';
     }
   },
   methods: {

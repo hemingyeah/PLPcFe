@@ -14,6 +14,9 @@ const FormMixin = {
     },
   },
   watch: {
+    field(newValue) {
+      this.addFieldEvent();
+    },
     value:{
       deep: true,
       handler() {
@@ -22,6 +25,12 @@ const FormMixin = {
     }
   },
   methods: {
+    addFieldEvent() {
+      // 触发注册事件，用于注册字段到外层 FormItem 组件，和 FormBuilder 组件
+      let params = {value: this.getValue, fieldName: this.field.fieldName, field: this.field};
+      let event = new CustomEvent('form.add.field', {detail: params, bubbles: true})
+      this.$nextTick(() => this.$el.dispatchEvent(event));
+    },
     input(event){
       this.inputForValue(event.target.value)
     },
@@ -38,10 +47,7 @@ const FormMixin = {
     }
   },
   mounted(){
-    // 触发注册事件，用于注册字段到外层 FormItem 组件，和 FormBuilder 组件
-    let params = {value: this.getValue, fieldName: this.field.fieldName, field: this.field};
-    let event = new CustomEvent('form.add.field', {detail: params, bubbles: true})
-    this.$nextTick(() => this.$el.dispatchEvent(event));
+    this.addFieldEvent();
   },
   destroyed(){
     // 注册解绑事件，用于解绑组件

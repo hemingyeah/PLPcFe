@@ -99,7 +99,7 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
   host: '30.40.56.163',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=a4d5f270-a011-4862-bf73-69046a56d90f'
+    'cookie': 'VIPPUBLINKJSESSIONID=593d511c-e54e-4709-ba01-65671a0c4cb2'
   },
 }))
 

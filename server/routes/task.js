@@ -49,6 +49,12 @@ router
   })
   .get('/event/convent2Task/jump', async ctx => {
     await taskEditContent(ctx);
+  })
+  .get('/task/createFromCustomer/*', async ctx => {
+    await taskEditContent(ctx);
+  })
+  .get('/task/createFromProduct/*', async ctx => {
+    await taskEditContent(ctx);
   });
   
 router.get('/task/view/:id', async ctx => {
@@ -61,20 +67,6 @@ router.get('/task/view/:id', async ctx => {
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('工单详情', body, script, modConfig.template)
-});
-
-router.get('/task/receipt', async ctx => {
-  let modConfig = modules['task.receipt'];
-  let script = ['/task.receipt.js'];
-
-  ctx.body = Template.renderWithData('表单回执', {}, script, modConfig.template)
-});
-
-router.get('/task/receipt/view/:id', async ctx => {
-  let modConfig = modules['task.receipt.view'];
-  let script = ['/task.receipt.view.js'];
-  
-  ctx.body = Template.renderWithHtml('回执表单详情', {}, script, modConfig.template)
 });
 
 async function taskEditContent(ctx) {

@@ -34,7 +34,7 @@
             </template>
             <!-- end label -->
             每
-            <el-input class="plan-task-edit-repetion-num" type="number" :value="form.periodSetting.period" @input="changePeriod"></el-input>
+            <el-input class="plan-task-edit-repetion-num" :value="form.periodSetting.period" @input="changePeriod"></el-input>
             <el-select class="plan-task-edit-repetion-time" v-model="form.periodSetting.periodUnit" placeholder="请选择运行规则，创建规则请到系统管理-绩效报告设置中设置" style="width: 100%;">
               <el-option
                 v-for="item in repetitionPeriodList"
@@ -85,7 +85,7 @@
             <!-- end 按截止日期 -->
 
             <!-- start 按执行次数 -->
-            <el-input v-else class="plan-task-edit-abort-num" type="number" :value="form.endSetting.num" @input="changeEndSettingNum"></el-input>
+            <el-input v-else class="plan-task-edit-abort-num" :value="form.endSetting.num" @input="changeEndSettingNum"></el-input>
             <!-- end 按执行次数 -->
 
           </el-form-item>
@@ -103,7 +103,7 @@
             </template>
             <!-- end label -->
             在计划时间前 
-            <el-input class="plan-task-edit-create-time" type="number" :value="form.advance" @input="changeAdvance"></el-input>
+            <el-input class="plan-task-edit-create-time" :value="form.advance" @input="changeAdvance"></el-input>
             天创建工单
           </el-form-item>
           <!-- end 创建时间 -->

@@ -79,9 +79,17 @@ export default {
   isFromPlan() {
     return this.initData?.fromPlan === true;
   },
+  /* 是否为 来自客户新建 */
+  isFromCustomer() {
+    return this.initData?.fromCus === true;
+  },
   /* 是否为 来自事件转工单 */
   isFromEvent() {
     return this.initData?.fromEve === true;
+  },
+  /* 是否为 来自产品新建 */
+  isFromProduct() {
+    return this.initData?.fromPro === true;
   },
   /* 是否为 编辑计划任务 */
   isPlanTaskEdit() {
@@ -97,6 +105,9 @@ export default {
   },
   path() {
     return this.initData?.path || '';
+  },
+  planTaskEditFormEl() {
+    return this.$refs.planTaskEditForm;
   },
   urlParams() {
     return qs.parse(window.location.search);

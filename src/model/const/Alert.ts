@@ -18,3 +18,7 @@ export const PLATN_TASK_CREATE_TIME_NOT_GREATER_THEAN_PERIOD_TIME_MESSAGE: strin
 export const PLATN_TASK_END_TIME_NOT_GREATER_ONE_YEAR_MESSAGE: string = '截止日期不得超过1年';
 // 计划任务执行次数不能超过 PLAN_TASK_MAX_PERFORM_NUMBER
 export const PLATN_TASK_PERFORM_NUMBER_MAX_MESSAGE: string = `执行次数不能超过${PLAN_TASK_MAX_PERFORM_NUMBER}次`;
+// 请选择产品
+export const REQUIRES_PRODUCT_MESSAGE: string = '请选择产品';
+// 计划时间不能早于现在
+export const PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE: string = '计划时间不能早于现在';

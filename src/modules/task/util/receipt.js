@@ -1,5 +1,7 @@
-/** 将form对象转成客户对象，用于提交表单 */
-export function packToReceipt(fields, form){
+/** 
+* @description 将form对象转成客户对象，用于提交表单 
+*/
+export function packToReceipt(fields, form) {
   let expenseSheet = {
     discountExpense: {
       taskId: form.id,
@@ -58,29 +60,39 @@ export function packToReceipt(fields, form){
   };
 }
 
-/** 将工单对象转成form表单，用于初始化表单 */
-export function packToForm(fields, data){
-  const { task, expenseSheet } = data;
-  const disExpense = expenseSheet?.discountExpense?.salePrice || 0;
+/** 
+* @description 将工单对象转成form表单，用于初始化表单 
+*/
+export function packToForm(fields, data) {
+  let { task, expenseSheet } = data;
+  
+  // 回执备件、服务项目、折扣信息
+  let {
+    discountExpense = {},
+    sparePartsExpense = [],
+    serviceExpense = []
+  } = expenseSheet;
+
+  const disExpense = discountExpense?.salePrice || 0;
 
   fields.forEach(field => {
     let { fieldName } = field;
 
     // 备件
-    if(fieldName === 'sparepart'){
-      expenseSheet.sparePartsExpense.map(part => part.id = part.primaryId);
-      task.attribute[fieldName] = expenseSheet.sparePartsExpense || [];
+    if(fieldName === 'sparepart') {
+      sparePartsExpense.map(part => part.id = part.primaryId);
+      task.attribute[fieldName] = sparePartsExpense;
       return;
     }
 
     // 服务项目
-    if(fieldName === 'serviceIterm'){
-      expenseSheet.serviceExpense.map(service => service.id = service.primaryId);
-      task.attribute[fieldName] = expenseSheet.serviceExpense || [];
+    if(fieldName === 'serviceIterm') {
+      serviceExpense.map(service => service.id = service.primaryId);
+      task.attribute[fieldName] = serviceExpense;
       return;
     }
 
-    if(fieldName === 'receiptAttachment'){
+    if(fieldName === 'receiptAttachment') {
       // 分离附件和回执附件
       if (task.attachment.length) {
         task.attribute[fieldName] = task.attachment.filter(img => img.receipt);

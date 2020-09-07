@@ -74,7 +74,9 @@ const TaskAllowSelect = {
         let exeInSynOfTaskOrEvent = result?.data?.exeInSynOfTaskOrEvent;
         // 允许自动将客户负责人带入工单或事件协同人
         if(exeInSynOfTaskOrEvent) {
-          this.value.synergies.push(result.data);
+          let synergies = this.value.synergies.slice();
+          let isHaveSynergies = synergies.some(synergies => synergies.userId === result?.data?.userId);
+          !isHaveSynergies && this.value.synergies.push(result.data);
         }
       })
 

@@ -18,9 +18,6 @@ export default {
   customerRelevanceTaskCountData() {
     return this.relevanceTaskCountData[TaskFieldNameMappingEnum.Customer];
   },
-  isDisabledSelectTaskType() {
-    return this.value && !this.state.isFromEvent;
-  },
   /** 
    * @description 是否显示 客户关联的工单数量 按钮 
    * 1. 客户存在
@@ -28,7 +25,7 @@ export default {
   */
   isShowCustomerRelevanceTaskCountButton() {
     let { all } = this.customerRelevanceTaskCountData;
-    return this.selectedCustomer?.id && Number(all) > 0;
+    return (this.selectedCustomer?.id || this.selectedCustomer?.value) && Number(all) > 0;
   },
   /** 
    * @description 是否显示 产品关联的工单数量 按钮 
@@ -38,7 +35,7 @@ export default {
   */
   isShowProductRelevanceTaskCountButton() {
     let { all } = this.productRelevanceTaskCountData;
-    return this.selectProduct?.id && Number(all) > 0 && this.value?.product?.length == 1;
+    return (this.selectProduct?.id || this.selectProduct?.value) && Number(all) > 0 && this.value?.product?.length == 1;
   },
   /** 
    * @description 是否显示 同时通知客户 字段
@@ -54,7 +51,7 @@ export default {
       displayName: '产品',
       fieldName: 'product',
       formType: 'select',
-      isNull: this.customerOption.productNotNull ? 0 : 1
+      isNull: this.customerOption?.productNotNull === true ? 0 : 1
     }
   },
   productFormDom() {

@@ -11,6 +11,11 @@ export default {
   isCreateCustomer: false,
   // 加载状态
   loading: false,
+  planTimeDatePickeroptions: {
+    disabledDate(time) {
+      return time.getTime() < new Date(new Date().toLocaleDateString()).getTime()
+    }
+  },
   // 产品初始化数据
   productInitData: {},
   // 关联的工单数量数据

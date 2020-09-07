@@ -236,7 +236,7 @@ export default {
     },
     /** 当前选中的工单ids */
     selectedIds() {
-      return this.multipleSelection.map((p) => p.taskUUID);
+      return this.multipleSelection.map((p) => p.id);
     },
     /** 服务项目 服务内容 系统字段设置 */
     sysFieldsSetting() {
@@ -565,7 +565,6 @@ export default {
      * @return {Object} 页面展示数据
      */
     searchList() {
-      this.loading = false;
       const { searchParams } = this;
       return TaskApi.search(searchParams)
         .then((result) => {
@@ -795,7 +794,6 @@ export default {
           ...Params.moreConditions,
         };
       }
-
       return searchParams;
     },
     /**
@@ -1218,6 +1216,27 @@ export default {
 
       this.search();
       this.trackEventHandler("search");
+    },
+    /**
+     * @description 派单方式文案
+     */
+    allotTypeText(params) {
+      let text;
+      switch (params) {
+        case 1:
+          text = '手动派单';
+          break;
+        case 2:
+          text = '工单池派单';
+          break;
+        case 3:
+          text = '自动派单';
+          break;
+        default:
+          text = "";
+          break;
+      }
+      return text
     },
     /**
      * @description 搜索

@@ -114,8 +114,7 @@ const FormView = {
 
     buildTextarea({displayName, value, formType}) {
       const newVal = value ? value.replace(link_reg, (match) => {
-        // return `<a href=${match} traget="_blank" >${match}</a>`
-        return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
+        return `<a href="javascript:;" url="${match}">${match}</a>`
       }) : '';
 
       return (

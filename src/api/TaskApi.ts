@@ -1,7 +1,10 @@
 import http from "@src/util/http";
-import { TaskCreateAndEditModel, PlanTaskCreateAndEditModel } from "@model/param/in/Task";
+import {
+  TaskCreateAndEditModel,
+  PlanTaskCreateAndEditModel,
+} from "@model/param/in/Task";
 
-let fixedPrefixAppPath = "/api/app";
+const fixedPrefixTaskPath = "/api/task";
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -299,6 +302,20 @@ export function getTaskConfig() {
   return http.get("/task/getTaskConfig", {}, false);
 }
 
+/**
+ * @description 创建工单备注
+ * @param {Object} params - 参数
+ * @param {String} params.taskId - 工单Id
+ * @param {String} params.taskNo - 工单编号
+ * @param {Object} params.content - 内容信息
+ * @param {Number} params.showInOwn - 是否仅自己可见
+ * @param {Number} params.toCustomer - 客户可见
+ * @param {Number} params.cusNotice - 向客户发送短信
+ */
+// export function taskRecordCreate(params: any) {
+//   return http.post("/task/taskRecord/create", params, false);
+// }
+
 /* -------------  end  旧工单api ---------------- */
 
 /* ------------- start 新工单api ---------------- */
@@ -307,7 +324,7 @@ export function getTaskConfig() {
  * 获取工单类型
  */
 export function getTaskTypes() {
-  return http.get(`${fixedPrefixAppPath}/outside/dd/task/types`);
+  return http.get(`${fixedPrefixTaskPath}/outside/dd/task/types`);
 }
 
 /**
@@ -331,7 +348,7 @@ export function taskList(params: {} | undefined) {
  * @param {String} params.tick - 是否勾选 1勾选 0不勾选
  */
 export function startTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/start`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/start`, params);
 }
 
 /**
@@ -342,7 +359,7 @@ export function startTask(params: {} | undefined) {
  * @param {String} params.tick - 是否勾选 1勾选 0不勾选
  */
 export function accept(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/accept`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/accept`, params);
 }
 
 /**
@@ -354,7 +371,7 @@ export function accept(params: {} | undefined) {
  */
 export function acceptFromPool(params: {} | undefined) {
   return http.post(
-    `${fixedPrefixAppPath}/outside/pc/task/acceptFromPool`,
+    `${fixedPrefixTaskPath}/outside/pc/task/acceptFromPool`,
     params
   );
 }
@@ -368,7 +385,7 @@ export function acceptFromPool(params: {} | undefined) {
  */
 export function modifyPlanTime(params: {} | undefined) {
   return http.post(
-    `${fixedPrefixAppPath}/outside/pc/task/updatePlanTime`,
+    `${fixedPrefixTaskPath}/outside/pc/task/updatePlanTime`,
     params
   );
 }
@@ -380,7 +397,7 @@ export function modifyPlanTime(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  */
 export function refuseTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/refuse`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/refuse`, params);
 }
 
 /**
@@ -391,7 +408,7 @@ export function refuseTask(params: {} | undefined) {
  * @param {String} params.isGoBack - 是否回退备件 1是0否
  */
 export function cancelTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/off`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/off`, params);
 }
 
 /**
@@ -401,7 +418,7 @@ export function cancelTask(params: {} | undefined) {
  */
 export function finishedWithPart(params: {} | undefined) {
   return http.get(
-    `${fixedPrefixAppPath}/outside/pc/task/finishedWithPart`,
+    `${fixedPrefixTaskPath}/outside/pc/task/finishedWithPart`,
     params
   );
 }
@@ -413,7 +430,7 @@ export function finishedWithPart(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  */
 export function pauseTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/pause`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/pause`, params);
 }
 
 /**
@@ -422,7 +439,7 @@ export function pauseTask(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  */
 export function unpauseTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/unpause`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/unpause`, params);
 }
 
 /**
@@ -432,7 +449,7 @@ export function unpauseTask(params: {} | undefined) {
  * @param {String} params.reason - 回退原因
  */
 export function rollBackTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/rollBack`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/rollBack`, params);
 }
 
 /**
@@ -452,7 +469,7 @@ export function deleteTask(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  */
 export function balanceTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/balance`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/balance`, params);
 }
 
 /**
@@ -463,7 +480,7 @@ export function balanceTask(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  */
 export function editBalance(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/editBalance`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/editBalance`, params);
 }
 
 /**
@@ -474,7 +491,7 @@ export function editBalance(params: {} | undefined) {
  */
 export function rollBackBalance(params: {} | undefined) {
   return http.post(
-    `${fixedPrefixAppPath}/outside/pc/task/rollBackBalance`,
+    `${fixedPrefixTaskPath}/outside/pc/task/rollBackBalance`,
     params
   );
 }
@@ -489,7 +506,7 @@ export function rollBackBalance(params: {} | undefined) {
  * @param {Boolean} params.autoClosed - 回访并关闭true，光回访传false
  */
 export function reviewTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/review`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/review`, params);
 }
 
 /**
@@ -501,7 +518,7 @@ export function reviewTask(params: {} | undefined) {
  * @param {String} params.taskId 工单id
  */
 export function taskCreateCard(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/card/save`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/card/save`, params);
 }
 
 /**
@@ -513,7 +530,7 @@ export function taskCreateCard(params: {} | undefined) {
  * @param {String} params.taskId 工单id
  */
 export function taskEditCard(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/card/edit`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/card/edit`, params);
 }
 
 /**
@@ -524,7 +541,7 @@ export function taskEditCard(params: {} | undefined) {
  * @param {String} params.taskId 工单id
  */
 export function taskDeleteCard(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/card/delete`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/card/delete`, params);
 }
 
 /**
@@ -534,7 +551,7 @@ export function taskDeleteCard(params: {} | undefined) {
  * @param {String} params.orderId 工单id
  */
 export function getHoursRecordList(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/getMainList`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/getMainList`, params);
 }
 
 /**
@@ -542,7 +559,7 @@ export function getHoursRecordList(params: {} | undefined) {
  * @param {String} params.id 工时记录附加组件实例id
  */
 export function updateHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/updateWorkTimeRecord`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/updateWorkTimeRecord`, params);
 }
 
 /**
@@ -552,7 +569,7 @@ export function updateHoursRecord(params: {} | undefined) {
  * @param {String} params.recordFromType 默认1
  */
 export function createHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/createWorkTimeRecordForweb`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/createWorkTimeRecordForweb`, params);
 }
 
 /**
@@ -560,7 +577,7 @@ export function createHoursRecord(params: {} | undefined) {
  * @param {String} params.mainId 工时记录附加组件实例id
  */
 export function deleteHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/deleteWorkTimeRecord`, params, false);
+  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/deleteWorkTimeRecord`, params, false);
 }
 
 /**
@@ -568,7 +585,7 @@ export function deleteHoursRecord(params: {} | undefined) {
  * @param {String} params.mainId 工时记录附加组件实例id
  */
 export function hoursRecordLocation(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/tasktime/getDetailList`, params, false);
+  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/getDetailList`, params, false);
 }
 
 /**
@@ -664,7 +681,7 @@ export function getTaskCountByState(params: {} | undefined) {
  */
 export function createView(params: {} | undefined) {
   return http.post(
-    `${fixedPrefixAppPath}/outside/pc/view/createTaskView`,
+    `${fixedPrefixTaskPath}/outside/pc/view/createTaskView`,
     params
   );
 }
@@ -680,7 +697,7 @@ export function createView(params: {} | undefined) {
  */
 export function editView(params: {} | undefined) {
   return http.post(
-    `${fixedPrefixAppPath}/outside/pc/view/editTaskView`,
+    `${fixedPrefixTaskPath}/outside/pc/view/editTaskView`,
     params
   );
 }
@@ -692,7 +709,7 @@ export function editView(params: {} | undefined) {
  */
 export function deleteView(params: {} | undefined) {
   return http.get(
-    `${fixedPrefixAppPath}/outside/pc/view/deleteOneView`,
+    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView`,
     params
   );
 }
@@ -842,14 +859,14 @@ export function saveSystemPrint(params: {} | undefined) {
  * @description 新建工单
  */
 export function createTask(params: TaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/create`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/create`, params);
 }
 
 /**
  * @description 编辑工单
  */
 export function editTask(params: TaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/edit`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/edit`, params);
 }
 
 /**
@@ -860,7 +877,7 @@ export function editTask(params: TaskCreateAndEditModel) {
  */
 export function getRelatedInfo(params: {} | undefined) {
   return http.get(
-    `${fixedPrefixAppPath}/outside/pc/task/getRelatedInfo`,
+    `${fixedPrefixTaskPath}/outside/pc/task/getRelatedInfo`,
     params
   );
 }
@@ -891,14 +908,20 @@ export function redeployBatch(params: Object = {}) {
  * @description 新建计划任务
  */
 export function createPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/create`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/planTask/create`, params);
 }
 
 /**
  * @description 编辑计划任务
  */
 export function editPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/planTask/update`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/planTask/update`, params);
 }
 
+/**
+ * @description 插入工单日志
+ */
+export function taskRecordCreate(params: any) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/taskrecord/create`, params);
+}
 /* -------------  end  新工单api ---------------- */

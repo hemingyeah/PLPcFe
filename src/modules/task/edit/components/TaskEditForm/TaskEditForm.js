@@ -4,6 +4,7 @@ import EditContactDialog from '@src/modules/customer/view/operationDialog/EditCo
 /* util */
 import _ from 'lodash'
 import * as FormUtil from '@src/component/form/util'
+import DateUtil from '@src/util/date'
 import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts'
 import { 
@@ -22,7 +23,9 @@ import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
 import { 
   TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE,
   TASK_PRODUCT_LINKMAN_NOT_EQUAL_MESSAGE,
-  TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE
+  TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE,
+  REQUIRES_PRODUCT_MESSAGE,
+  PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE
 } from '@src/model/const/Alert.ts'
 // 关联项类型
 const RELATION_TYPE_MAP = {
@@ -35,6 +38,7 @@ export default {
   inject: ['initData'],
   props,
   data() {
+    data.validation = this.buildValidation();
     return data
   },
   computed,
@@ -125,6 +129,39 @@ export default {
 
       });
     },
+    buildValidation(){
+      const that = this;
+      return Object.freeze({
+        product(value, field, changeStatus){
+          changeStatus(true);
+          let isProductRequired = that.customerOption?.productNotNull === true;
+          let isSelectedProduct = Array.isArray(value) && value.length > 0;
+
+          return new Promise((resolve, reject) => {
+            changeStatus(false);
+            let errorMessage = isSelectedProduct ? '' : REQUIRES_PRODUCT_MESSAGE;
+            resolve(isProductRequired ? errorMessage : '')
+          })
+        },
+        planTime(value, field, changeStatus){
+          changeStatus(true);
+          
+          let isDateTimeType = field?.setting?.dateType == 'dateTime';
+          let errorMessage = '';
+
+          if(isDateTimeType) {
+            let planTime = DateUtil.parseDateTime(value).getTime();
+            let nowTime = new Date().getTime();
+            errorMessage = planTime < nowTime ? PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE : '';
+          }
+
+          return new Promise((resolve, reject) => {
+            changeStatus(false);
+            resolve(errorMessage)
+          })
+        }
+      });
+    },
     /** 
      * @description 绑定地址
      * @param {Object} address 地址数据
@@ -138,6 +175,14 @@ export default {
     */
     bindLinkman(linkman = {}) {
       this.updateLinkmanValue([linkmanSelectConversion(linkman)])
+    },
+    bindProductLinkmanAndAddress(product = {}) {
+      let { linkman, address } = product;
+      let linkmanId = linkman?.id || '';
+      let addressId = address?.id || '';
+      
+      linkmanId && this.bindLinkman(linkman);
+      addressId && this.bindAddress(address);
     },
     /** 
      * @description 选择工单类型
@@ -168,9 +213,11 @@ export default {
             }
           })
         }, 0);
-
+        
+        // 更新工单类型数据
         this.selectedType = this.taskTypesMap[templateId];
         this.$emit('updatetemplateId', this.selectedType);
+
       } catch (error) {
         console.error(error)
       }
@@ -184,19 +231,21 @@ export default {
     copyTaskHandler(templateId = '') {
       if(!this.state.isCopyTask) return
 
-      let { taskId = '' } = this.urlParams;
+      this.$emit('loading', true);
 
+      let { taskId = '' } = this.urlParams;
       window.location.href = `/task/copyTask?taskId=${taskId}&newTaskTemplateId=${templateId}`
     },
-    /** 
+    /**
      * @description 事件转工单处理
      * @param {String} templateId 工单类型id
     */
     convertTaskHandler(templateId = '') {
       if(!this.state.isFromEvent) return
 
-      let { eventId = '', flow = '' } = this.urlParams;
+      this.$emit('loading', true);
 
+      let { eventId = '', flow = '' } = this.urlParams;
       window.location.href = `/event/convent2Task/jump?eventId=${eventId}&defaultTypeId=${templateId}&flow=${flow}`
     },
     /**
@@ -271,6 +320,9 @@ export default {
       //   })
       //   .catch(err => console.error('error', err));
 
+    },
+    judegeSelectTaskType(value) {
+      return !value || this.state.isFromEvent;
     },
     /** 
      * @description 同时通知客户 checkbox变化
@@ -402,23 +454,41 @@ export default {
       }
 
     },
+    relationFieldsFilter(type = TaskFieldNameMappingEnum.Customer) {
+      let relationFields = [];
+
+      // 判断类型是否存在
+      let types = [TaskFieldNameMappingEnum.Customer, TaskFieldNameMappingEnum.Product];
+      if(types.indexOf(type) < 0) {
+        console.warn(`Caused: relationFieldHandler params.type is not in ${types}`);
+        return relationFields;
+      }
+      
+      // 判断对应类型的关联显示项字段是否存在
+      let formType = RELATION_TYPE_MAP[type];
+      relationFields = this.taskFields.filter(field => field.formType == formType);
+      if(relationFields.length <= 0) {
+        console.warn(`Caused: this.taskFields not have ${formType} field`);
+      }
+
+      return relationFields;
+    },
+    /** 
+     * @description 关联显示项字段清空
+     * @param {string} type customer/product
+    */
+    async relationFieldClear(type = TaskFieldNameMappingEnum.Customer) {
+      let relationFields = this.relationFieldsFilter(type);
+      relationFields.forEach(relationField => { 
+        this.update({ field: relationField, newValue: '' }) 
+      })
+    },
     /** 
      * @description 关联显示项字段选择处理
      * @param {string} type customer/product
     */
     async relationFieldSelectHandler(type = TaskFieldNameMappingEnum.Customer) {
-      // 判断类型是否存在
-      let types = [TaskFieldNameMappingEnum.Customer, TaskFieldNameMappingEnum.Customer.Product];
-      if(types.indexOf(type) < 0) {
-        return console.warn(`Caused: relationFieldHandler params.type is not in ${types}`)
-      }
-      
-      // 判断对应类型的关联显示项字段是否存在
-      let formType = RELATION_TYPE_MAP[type];
-      let relationFields = this.taskFields.filter(field => field.formType == formType);
-      if(relationFields.length <= 0) {
-        return console.warn(`Caused: this.taskFields not have ${formType} field`);
-      }
+      let relationFields = this.relationFieldsFilter(type);
       
       try {
         let params = {
@@ -512,17 +582,22 @@ export default {
     /** 
      * @description 更新客户信息
      * @param {Array<Object>} value 客户数据
+     * @param {Object} options 配置
     */
-    async updateCustomer(value = []) {
+    async updateCustomer(value = [], options = { 
+      isForceUpdateCustomer: false,
+      isUpdateCustomerProduct: true
+    }) {
+      let { isForceUpdateCustomer, isUpdateCustomerProduct } = options;
       let selectedCustomer = value?.[0] || {};
       let currentCustomerId = this.selectedCustomer?.id || this.selectedCustomer?.value;
-      let selectedCustomerId = selectedCustomer?.id || '';
+      let selectedCustomerId = selectedCustomer?.id || selectedCustomer?.value || '';
 
       // 更新客户数据
       this.updateCustomerValue(value.slice());
 
       // 判断选中的客户是否与当前客户数据一致
-      if(currentCustomerId == selectedCustomerId) return
+      if(currentCustomerId == selectedCustomerId && !isForceUpdateCustomer) return
 
       try {
         const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomerId });
@@ -537,7 +612,7 @@ export default {
         address && this.bindAddress(address);
         
         // 更新产品数据
-        if (Array.isArray(this.value.product) && this.value.product.length) {
+        if (Array.isArray(this.value.product) && this.value.product.length && isUpdateCustomerProduct) {
           this.updateProductValue(
             this.value.product.filter(item => item.customerId == selectedCustomer.id)
           )
@@ -591,14 +666,21 @@ export default {
     },
     /** 
      * @description 更新产品信息
+     * @param {Array[Product]} value 产品数据
+     * @param {Object} options 配置
     */
-    async updateProduct(value) {
+    async updateProduct(value, options = { 
+      isForceUpdateCustomer: false,
+      isUpdateCustomerProduct: true,
+      isSilentUpdateLinkmanAndAddress: false
+    }) {
+      let { isForceUpdateCustomer, isUpdateCustomerProduct, isSilentUpdateLinkmanAndAddress } = options;
       let product = value[0] || {};
-      let isHaveCustomer = this.value.customer && this.value.customer.length;
+      let isHaveCustomer = (this.value.customer && this.value.customer.length);
 
       try {
         // 判断客户是否存在
-        if (!isHaveCustomer) {
+        if (!isHaveCustomer || isForceUpdateCustomer) {
           // 客户不存在时则下拉框隐藏
           findComponentDownward(this.$refs.product, 'base-select').close();
 
@@ -612,14 +694,20 @@ export default {
           // 设置客户数据
           this.updateCustomerValue(customerData);
           // 更新客户信息
-          await this.updateCustomer(customerData);
+          await this.updateCustomer(customerData, { isForceUpdateCustomer, isUpdateCustomerProduct });
         }
 
         // 查询产品关联字段, 选一个产品才带入
         let isOnlyOneProduct = value.length === 1;
         
+        if(isOnlyOneProduct && isSilentUpdateLinkmanAndAddress) {
+          // 产品关联字段数据
+          this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
+          // 静默绑定联系人/地址
+          this.bindProductLinkmanAndAddress(product);
+        }
         // 只有一个产品 且 客户存在
-        if (isOnlyOneProduct && isHaveCustomer) {
+        else if (isOnlyOneProduct && isHaveCustomer) {
           // 产品关联字段数据
           this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
           // 产品关联联系人地址
@@ -627,16 +715,11 @@ export default {
         }
         // 只有一个产品 且 客户不存在
         else if(isOnlyOneProduct && !isHaveCustomer) {
-          let { linkman, address } = product;
-          let linkmanId = linkman?.id || '';
-          let addressId = address?.id || '';
-          
-          linkmanId && this.bindLinkman(linkman);
-          addressId && this.bindAddress(address);
+          this.bindProductLinkmanAndAddress(product);
         }
         else {
-          // TODO: 清空产品关联字段数据
-          // this.$eventBus.$emit('es.Relation.Product', {});
+          // 清空产品关联字段数据
+          this.relationFieldClear(TaskFieldNameMappingEnum.Product);
         }
 
         if(isOnlyOneProduct) {
