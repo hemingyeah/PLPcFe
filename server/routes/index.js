@@ -28,6 +28,8 @@ const callCenterRouter = require('./callcenter')
 const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact')
 const sparePartRouter = require('./sparePart')
+const myShopRouter = require('./myShop')
+
 
 
 router.get('/', async ctx => {
@@ -160,6 +162,7 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', myShopRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)
