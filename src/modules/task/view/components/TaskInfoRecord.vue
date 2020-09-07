@@ -28,9 +28,11 @@
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
 /* utils */
+import _ from 'lodash';
 import { trimAll } from '@src/util/lang';
 import Page from '@model/Page';
 import { openTabForEventView } from '@src/util/business/openTab';
+
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length > 0 
     ? <div class="base-timeline-attachment base-file__preview">
@@ -178,6 +180,9 @@ export default {
     fetchRecord(params){
       params.taskId = this.taskId;
       params.userId = this.loginUser.userId;
+      params.hasViewBalanceRecord = 1;
+      params.hasViewReviewRecord = 1;
+
       return TaskApi.taskRecordList(params).then(data => {
         let { list = [] } = data?.result;
         list.forEach(record => {
@@ -301,7 +306,7 @@ export default {
     /* 渲染工单自动分配失败dom */
     renderTaskAutoAllotFailDom(record = {}) {
       let { content, taskNo } = record;
-      return <div className="task-record-fail">工单 #{ taskNo } 超时工单自动派单失败，失败原因  { content.fail }</div>
+      return <div class="task-record-fail">工单 #{ taskNo } 超时工单自动派单失败，失败原因  { content.fail }</div>
     },
     /* 渲染工单自动派单dom */
     renderTaskAutoDispatchDom(record = {}) {
@@ -327,7 +332,7 @@ export default {
     /* 渲染电话日志 */
     renderPhoneLogDom(record = {}) {
       let { userName, content } = record;
-      return <h5><strong>{ userName }</strong>拨打了<strong>{ content.targetName }</strong>的电话。</h5>
+      return <h5><strong>{ userName }</strong> 拨打了 <strong>{ content.targetName }</strong> 的电话。</h5>
     },
     /* 渲染编辑回执dom */
     renderReceiptEditDom({ userName, taskNo }) {
@@ -346,7 +351,7 @@ export default {
         : <p class="pre-line secondary-info">{ content.updateContent }</p>;
 
       return [
-        <h5> <strong>{userName}</strong> 把工单 #{ taskNo } { action } 到工单池。</h5>,
+        <h5><strong>{userName}</strong> 把工单 #{ taskNo } { action } 到工单池。</h5>,
         <div>
           { synergyDom }
           { content.updateType == 'tRecord' ? contentDom : '' }
@@ -414,7 +419,7 @@ export default {
         : '';
       // 未审批dom
       let unApprovedDom = [
-        <div><strong>{ userName }</strong> { address == 'PC端' ? '通过PC端 ' : '' } 提交了对工单#  { taskNo } 关于 { content.action } 操作的审批 </div>,
+        <div><strong>{ userName }</strong> { address == 'PC端' ? '通过PC端 ' : '' } 提交了对工单 #{ taskNo } 关于 { content.action } 操作的审批 </div>,
         content.remark && <div>备注：{ content.remark }</div>,
         content.apprNames && <div>审批人：{ content.apprNames }</div>,
         addressDom
@@ -423,19 +428,19 @@ export default {
 
       // 审批成功dom
       let isAutoApprove = userName == '自动审批';
-      let autoApproveDom = <h5>工单# { taskNo } { content.action }节点未设置审批人，流程自动审批通过</h5>;
+      let autoApproveDom = <h5>工单 #{ taskNo } { content.action }节点未设置审批人，流程自动审批通过</h5>;
       let notAutoApproveDom = [
-        <div><strong>{ userName }</strong> 通过了对工单# ${taskNo} { content.action } 操作的审批</div>,
+        <div><strong>{ userName }</strong> 通过了对工单 #{taskNo} { content.action } 操作的审批</div>,
         content.remark && <div>备注：{ content.remark }</div>
       ]
       let successDom = isAutoApprove ? autoApproveDom : notAutoApproveDom;
       // 审批失败dom
       let failDom = [
-        <div><strong>{ userName }</strong> 拒绝了对工单# ${taskNo} { content.action } 操作的审批</div>,
+        <div><strong>{ userName }</strong> 拒绝了对工单 #{taskNo} { content.action } 操作的审批</div>,
         content.remark && <div>备注：{ content.remark }</div>
       ];
       // 审批撤回dom
-      let offedDom = [<div><strong>{ userName }</strong> 撤回了对工单# {taskNo} { content.action } 操作的审批</div>];
+      let offedDom = [<div><strong>{ userName }</strong> 撤回了对工单 #{taskNo} { content.action } 操作的审批</div>];
 
       return [
         <div>
@@ -446,6 +451,28 @@ export default {
         </div>
       ]
 
+    },
+    /* 渲染工单修改结算dom */
+    renderTaskBalanceDom(record = {}) {
+      let { content, taskNo, userName } = record;
+      let balanceArr = [];
+
+      for (let name in content){
+        let value = content[name];
+        let arr = value.split('[ + + ]');
+        let data = { name, oldValue: arr[0], newValue: arr[1] }
+
+        balanceArr.push(data);
+      }
+
+      return [
+        <h5> <strong>{ userName }</strong> 修改了结算了工单 #{ taskNo }。</h5>,
+        balanceArr.map(review => {
+          return <div>
+            <strong>{ review.name }</strong> 由 <strong>{ review.oldValue }</strong> 修改为 <strong>{ review.newValue }</strong>
+          </div>
+        })
+      ]
     },
     /* 渲染工单附加组件卡片 */
     renderTaskCardDom(record = {}) {
@@ -461,6 +488,71 @@ export default {
         isEventToTask ? <span className="link" onClick={event => openTabForEventView(eventId)}>由事件# {eventNo} 创建</span> : ''
       ]
     },
+    /* 渲染工单修改dom */
+    renderTaskEditDom(record = {}) {
+      let { content } = record;
+      return [
+        this.renderBaseTaskAction(record),
+        content.updateFields && <div>修改字段：{ content.updateFields } </div>,
+        content.planTime && <div>计划时间：{ content.planTime } </div>
+      ]
+    },
+    /* 渲染工单暂停dom */
+    renderTaskPausedDom(record = {}) {
+      let { action, content, taskNo, userName } = record;
+      let reasonDom = content.reason && <div>暂停原因：{ content.reason }</div>
+      return (
+        <div class="task-record-fail">
+          <div><strong>{ userName }</strong> { action } 了工单 #{ taskNo } </div>
+          { reasonDom }
+        </div>
+      )
+    },
+    /* 渲染工单支付dom */
+    renderTaskPaymentDom(record = {}) {
+      let { userName, taskNo } = record;
+      return <h5><strong>{ userName }</strong> 已完成工单 #{ taskNo } 的支付。</h5>
+    },
+    /* 渲染工单回访dom */
+    renderTaskReviewDom(record = {}) {
+      let { content } = record;
+      let degree = ''; 
+      let tag = '';
+      let star = [];
+      let reviewArr = [];
+
+      for (let name in content){
+        let value = content[name];
+        let arr = value.split('[ + + ]');
+        let data = { name, oldValue: arr[0], newValue: arr[1] }
+
+        if (name == '满意度') {
+          degree = _.cloneDeep(data);
+        } else if (name == '服务标签') {
+          tag = _.cloneDeep(data);
+        } else {
+          star.push(data);
+        }
+      }
+
+      if (degree) reviewArr.push(degree)
+      if (star) reviewArr = reviewArr.concat(star)
+      if (tag) reviewArr.push(tag)
+
+      return [
+        this.renderBaseTaskAction(record),
+        reviewArr.map(review => {
+          return <div>
+            <strong>{ review.name }</strong> 由 <strong>{ review.oldValue }</strong> 修改为 <strong>{ review.newValue }</strong>
+          </div>
+        })
+      ]
+    },
+    /* 渲染工单服务报告dom */
+    renderTaskServiceReportDom(record = {}) {
+      let { userName, taskNo } = record;
+      return <div><strong>{ userName }</strong> 导出了 工单 #{ taskNo } 的服务报告 </div>
+    },
     /* 渲染工单超时dom */
     renderTaskTimeoutDom(record = {}) {
       let { content } = record;
@@ -475,15 +567,18 @@ export default {
       let { content, taskNo } = record;
       return <div className="task-record-fail">工单 #{ taskNo } 已在 { content.flow } 节点超时</div>
     },
+    /* 渲染工单转交dom */
+    renderTaskTransferDom(record = {}) {
+      let { executorName, userName, executorId, content, taskNo } = record;
+      return [
+        <h5> <strong>{userName}</strong> 对工单 #{ taskNo } 进行了转交处理。</h5>,
+        executorId && <div>负责人改为：{ executorName }</div>,
+        content.synergy && <div>协同人改为：{ content.synergy }</div>
+      ]
+    },
     /** 根据记录的action渲染对应的内容，支持jsx和render函数 */
     renderRecord(h, record) {
       let { action, userName, content, attachments, taskNo } = record;
-
-      try {
-        content = JSON.parse(content)
-      } catch (error) {
-        content = { updateContent: content }
-      }
       
       if (action == '指派' || action == '转派') return this.renderAllotDom(record)
       if (action == '开始' || action == '完成') return this.renderStartOrFinishDom(record)
@@ -502,11 +597,22 @@ export default {
       if (action === '自动派单') return this.renderTaskAutoDispatchDom(record)
       if (action === '超时') return this.renderTaskTimeoutDom(record)
       if (action === '已超时') return this.renderTaskTimeoutdDom(record)
+      if (action === '修改') return this.renderTaskEditDom(record)
+      if (action === '转交') return this.renderTaskTransferDom(record)
+      if (action === '暂停') return this.renderTaskPausedDom(record)
+      if (action === '回访' || action === '回访并关闭') return this.renderTaskReviewDom(record)
+      if (action === '修改结算') return this.renderTaskBalanceDom(record)
+      if (action === '服务报告') return this.renderTaskServiceReportDom(record)
       if (action == '电话日志') return this.renderPhoneLogDom(record)
+      if (action == '支付') return this.renderTaskPaymentDom(record)
+
+      const { isGoBack, synergy, updateType, updateContent } = content;
 
       return [
-        <h5><strong>{userName}</strong> {action}了工单 #{taskNo}。</h5>,
-        content.updateFields ? <p class="secondary-info"> 修改字段：{content.updateFields} </p> : '',
+        <h5><strong>{ userName }</strong> { action } 了工单 #{ taskNo }。</h5>,
+        synergy && <div>{`协同人：${ synergy }`}</div>,
+        updateType == 'tRecord' && <div>{ updateContent }</div>,
+        isGoBack !== undefined && <div> 工单被取消，备件及服务项目{ isGoBack == '1' ? '已' : '未' }退回 </div>,
         createAttachmentDom(h, attachments)
       ];
     },
