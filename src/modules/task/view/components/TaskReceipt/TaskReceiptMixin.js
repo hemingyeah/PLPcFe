@@ -19,6 +19,12 @@ export default {
       return this.initData.receiptConfig || {};
     },
     /** 
+    * @description 工单类型设置
+    */
+    taskType() {
+      return this.initData.taskType || {};
+    },
+    /** 
     * @description 非自定义回执
     */
     notCustom() {

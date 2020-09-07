@@ -150,9 +150,7 @@ const FormView = {
         <div class="form-view-row">
           <label>{displayName}</label>
           <div class="form-view-row-content">
-            <div class="form-view-autograph-content">
-              <img src={value} />
-            </div>
+            { value && <div class="form-view-autograph-content"><img src={value} /></div> }
           </div>
         </div>
       )
