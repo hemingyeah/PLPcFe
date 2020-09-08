@@ -32,6 +32,8 @@ import _ from 'lodash';
 import { trimAll } from '@src/util/lang';
 import Page from '@model/Page';
 import { openTabForEventView } from '@src/util/business/openTab';
+/* enum */
+import { TaskFieldNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
 
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length > 0 
@@ -104,10 +106,10 @@ export default {
   },
   mounted() {
     this.initializeRecord();
-    this.$eventBus.$on('customer_info_record.update_record_list', this.searchRecord);
+    this.$eventBus.$on(TaskFieldNameMappingEnum.UpdateRecord, this.searchRecord);
   },
   beforeDestroy() {
-    this.$eventBus.$off('customer_info_record.update_record_list', this.searchRecord);
+    this.$eventBus.$off(TaskFieldNameMappingEnum.UpdateRecord, this.searchRecord);
   },
   methods: {
     /** 
@@ -141,7 +143,7 @@ export default {
 
         let result = await TaskApi.taskRecordCreate(params);
         
-        if (result.status == 0) {
+        if (result.success) {
           // 清除备注信息
           this.$refs.comment.reset();
           // 初始化备注
@@ -166,9 +168,13 @@ export default {
     async deleteRemark(record) {
       try {
         if (!await this.$platform.confirm('确认删除该备注吗？')) return;
-        const delRes = await TaskApi.taskRecordDelete({ id: record.id });
+        const result = await TaskApi.taskRecordDelete({ id: record.id });
 
-        if(delRes.status == 0) this.initializeRecord();
+        if (result.success) {
+          this.initializeRecord(); 
+        } else {
+          this.$platform.alert(result.message)
+        }
 
       } catch (e) {
         console.warn('task deleteRemark -> error', e);

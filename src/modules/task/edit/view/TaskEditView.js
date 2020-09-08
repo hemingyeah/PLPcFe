@@ -17,7 +17,7 @@ import data from './data'
 import computed from './computed'
 import methods from './methods'
 /* enum */
-import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts'
 /* constant */
 import { PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE } from '@src/model/const/Alert.ts'
 

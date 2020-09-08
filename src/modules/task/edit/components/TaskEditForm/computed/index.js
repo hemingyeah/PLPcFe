@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
 import { taskTypeSelectConversion } from '@src/util/conversionFunctionUtil.ts';
 
 export default {

@@ -1,4 +1,4 @@
-import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
 
 export default {
   // 新建客户弹窗

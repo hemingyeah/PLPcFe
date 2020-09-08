@@ -4,7 +4,7 @@ import {
   FieldTypeMappingEnum, 
   ProductFieldNameMappingEnum,
   TagEntityMappingEnum
-} from './../model/enum/MappingEnum';
+} from '../model/enum/FieldMappingEnum';
 
 // 有重复的代码，后续优化
 
