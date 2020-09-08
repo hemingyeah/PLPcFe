@@ -156,22 +156,33 @@ export default {
     submit() {
       this.$refs.form
         .validate()
-        .then(valid => {
+        .then(async valid => {
 
           if (!valid) return Promise.reject('validate fail.');
 
           const params = util.packToReceipt(this.fields, this.form);
-          this.pending = true;
+          console.log(params, 777777)
 
-          TaskApi.editReceipt(params).then(res => {
-            let isSucc = res && !res.status;
-            this.$platform.notification({
-              type: isSucc ? 'success' : 'error',
-              title: `编辑${isSucc ? '成功' : '失败'}`,
-              message: !isSucc && res.message
-            })
+          // 回访是否需要审批
+          const result = await TaskApi.finishApproveCheck(params);
+          if (!result.succ && result.message == '需要审批') {
+            this.visible = false;
             this.pending = false;
-          }).catch(err => console.error('err', err))
+
+            this.$emit('proposeApprove', result.data);
+            return;
+          }
+          // this.pending = true;
+
+          // TaskApi.editReceipt(params).then(res => {
+          //   let isSucc = res && !res.status;
+          //   this.$platform.notification({
+          //     type: isSucc ? 'success' : 'error',
+          //     title: `编辑${isSucc ? '成功' : '失败'}`,
+          //     message: !isSucc && res.message
+          //   })
+          //   this.pending = false;
+          // }).catch(err => console.error('err', err))
         })
         .catch(err => {
           this.pending = false;
@@ -190,6 +201,10 @@ export default {
           isSystem: 1
         }
       ]
+
+
+
+      this.$eventBus.$emit('task_receipt_editUnitPrice', 'aaaa');
 
     } catch (e) {
       console.error('error ', e)

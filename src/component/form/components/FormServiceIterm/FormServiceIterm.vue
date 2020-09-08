@@ -152,7 +152,7 @@ export default {
         field: 'serialNumber'
       }, {
         label: '类别',
-        field: 'primaryType'
+        field: 'type'
       }, {
         label: '数量',
         field: 'number',
@@ -225,7 +225,7 @@ export default {
     */
     editUnitPrice() {
       // TODO：是否可以修改单品价格
-      return false;
+      return true;
     }
   },
   methods: {
@@ -264,7 +264,6 @@ export default {
     handlePrice(item) {
       let value = Number(item.salePrice);
       
-      // TODO：oldPrice
       if(value < 0){
         this.$platform.alert('请输入不小于0的数值');
         item.salePrice = item.oldPrice ? item.oldPrice : 0;
@@ -353,9 +352,7 @@ export default {
         if (!validateRes) return;
 
         let serviceObj = JSON.parse(JSON.stringify(this.serviceitem));
-        serviceObj.outPrice = serviceObj.costPrice;
-        serviceObj.primaryType = serviceObj.type;
-        serviceObj.type = '服务';
+        serviceObj.oldPrice = serviceObj.salePrice;
 
         let newValue = this.value;
 

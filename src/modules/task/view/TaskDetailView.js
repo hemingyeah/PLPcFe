@@ -739,6 +739,10 @@ export default {
       } else if (action === 'finish') {
         this.$refs.taskReceiptEdit.openDialog();
       }
+    },
+    // 发起审批
+    proposeApprove(data) {
+      this.$refs.proposeApprove.openDialog(data);
     }
   },
   async mounted() {

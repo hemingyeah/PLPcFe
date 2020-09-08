@@ -238,6 +238,7 @@
     <task-receipt-edit-dialog
       ref="taskReceiptEdit"
       :init-data="initData"
+      @proposeApprove="proposeApprove"
     />
     <!-- end 完成回执弹窗 -->
   </div>
