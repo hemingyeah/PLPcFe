@@ -61,6 +61,8 @@ const FormBuilder = {
     },
     /** 注册待验证的组件 */
     addFieldHandler(event){
+      event.stopPropagation();
+
       let {fieldName, validate, field} = event.detail;
       if (event.detail && event.detail.field && event.detail.field.formType === 'info') {
         return;
@@ -68,6 +70,8 @@ const FormBuilder = {
       this.validateMap[fieldName] = validate;
     },
     removeFieldHandler(event){
+      event.stopPropagation();
+      
       let {fieldName} = event.detail;
       delete this.validateMap[fieldName];
     }

@@ -137,6 +137,7 @@ export default {
       visible: false,
       selectedItem: [], // 当前选中的服务项目
       serviceitem: this.initData(), // 服务项目信息
+      editUnitPrice: false, // 是否可以修改单品价格
     }
   },
   computed: {
@@ -219,13 +220,6 @@ export default {
     total() {
       let { number, salePrice } = this.serviceitem;
       return number && salePrice ? (number * salePrice).toFixed(2) : '';
-    },
-    /**
-    * @description 是否可以修改单品价格
-    */
-    editUnitPrice() {
-      // TODO：是否可以修改单品价格
-      return true;
     }
   },
   methods: {
@@ -372,7 +366,18 @@ export default {
       } catch (e) {
         console.error('err', e);
       }
+    },
+    setEditPrice(config) {
+      let { editUnitPrice } = config?.options || {};
+
+      this.editUnitPrice = editUnitPrice;
     }
+  },
+  mounted() {
+    this.$eventBus.$on('task_receipt_update_editPrice', this.setEditPrice);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('task_receipt_update_editPrice', this.setEditPrice);
   }
 }
 </script>

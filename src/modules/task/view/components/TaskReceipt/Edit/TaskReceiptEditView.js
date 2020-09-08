@@ -1,39 +1,3 @@
-<template>
-  <base-modal class="task-receipt-edit-container" :title="title" :show.sync="visible" width="700px" @closed="reset">
-    <div class="base-modal-content" v-if="init">
-      <form-builder ref="form" :fields="fields" :value="form" @update="update">
-        <!-- start 合计 -->
-        <template v-if="hasExpense" slot="template" slot-scope="{ field }">
-          <form-item :label="field.displayName" class="task-receipt-expense">
-            <div class="item">
-              <label>备件费用</label>
-              <span>{{ sparepartTotal }}</span>
-            </div>
-            <div class="item">
-              <label>服务费用</label>
-              <span>{{ serviceTotal }}</span>
-            </div>
-            <div class="item" v-if="showDiscountCost">
-              <label>折扣费用</label>
-              <input type="number" class="text-red" v-model="form.disExpense" @input="updateDisExpense" @blur="disExpenseBlur" />
-            </div>
-            <div class="item">
-              <label>总计</label>
-              <span>{{ totalExpense }}</span>
-            </div>
-          </form-item>
-        </template>
-        <!-- end 合计 -->
-      </form-builder>
-    </div>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取 消</el-button>
-      <el-button type="primary" :disabled="pending" @click="submit">保 存</el-button>
-    </div>
-  </base-modal>
-</template>
-
-<script>
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
 
@@ -46,7 +10,7 @@ import * as util from '@src/modules/task/util/receipt';
 import _ from 'lodash';
 
 export default {
-  name: 'task-receipt-edit-dialog',
+  name: 'task-receipt-edit-view',
   mixins: [ReceiptMixin],
   data() {
     return {
@@ -122,6 +86,10 @@ export default {
       this.init = true;
       this.action = action;
       this.visible = true;
+
+      this.$nextTick(() => {
+        this.$eventBus.$emit('task_receipt_update_editPrice', this.taskType);
+      })
     },
     /**
     * @description 更新折扣费用
@@ -202,34 +170,8 @@ export default {
         }
       ]
 
-
-
-      this.$eventBus.$emit('task_receipt_editUnitPrice', 'aaaa');
-
     } catch (e) {
       console.error('error ', e)
     }
   }
 }
-</script>
-
-<style lang="scss">
-.task-receipt-edit-container {
-  .form-builder {
-    padding: 10px 0;
-  }
-
-  .task-receipt-expense .item{
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    height: 42px;
-    line-height: 42px;
-
-    input.text-red {
-      width: 100px;
-      color: #dd4b39 !important;
-    }
-  }
-}
-</style>

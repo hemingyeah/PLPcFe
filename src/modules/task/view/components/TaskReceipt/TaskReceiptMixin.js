@@ -3,6 +3,10 @@ export default {
     initData: {
       type: Object,
       default: () => ({})
+    },
+    shareData: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -26,6 +30,7 @@ export default {
     },
     /** 
     * @description 非自定义回执
+    * 默认工单且未开启自定义回执(老功能)
     */
     notCustom() {
       return !this.receiptConfig?.customReceipt && this.task.templateId == '1';

@@ -323,7 +323,6 @@ export default {
     handlePrice(item) {
       let value = Number(item.salePrice);
 
-      // TODO：oldPrice
       if(value < 0){
         this.$platform.alert('请输入不小于0的数值');
         item.salePrice = item.oldPrice ? item.oldPrice : 0;
@@ -469,20 +468,20 @@ export default {
       }
     },
     setEditPrice(config) {
-      console.log(config, 5555555)
-      let { editUnitPrice } = config;
+      let { editUnitPrice } = config?.options || {};
 
       this.editUnitPrice = editUnitPrice;
     }
   },
   async mounted() {
-    console.log(this.$eventBus, 8888)
+    this.$eventBus.$on('task_receipt_update_editPrice', this.setEditPrice);
+    
     try {
       this.config = await TaskApi.getSparepartConfig();
 
       let { sparepart2, personalRepertory } = this.config;
 
-      if (!sparepart2) {
+      if (sparepart2) {
         if (personalRepertory) {
           this.repertoryList = [{
             text: '个人备件库',
@@ -505,15 +504,13 @@ export default {
 
       // 设置仓库默认值
       this.repertoryId = this.repertoryList[0]?.value || 0;
-
-      this.$eventBus.$on('task_receipt_editUnitPrice', this.setEditPrice);
       
     } catch (err) {
       console.error('err', err);
     }
   },
   beforeDestroy() {
-    this.$eventBus.$off('task_receipt_editUnitPrice', this.setEditPrice);
+    this.$eventBus.$off('task_receipt_update_editPrice', this.setEditPrice);
   }
 }
 </script>
