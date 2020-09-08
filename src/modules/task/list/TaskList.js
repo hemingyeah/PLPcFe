@@ -449,6 +449,9 @@ export default {
       this.filterId = id;
       this.otherText = "其他";
       this.selectColumnState = title
+      
+      if (['all', 'unfinished', 'finished'].indexOf(title) === -1) this.dropDownInfo = ''
+
       this.search(JSON.parse(searchModel));
       this.buildColumns()
       // 埋点
@@ -796,7 +799,7 @@ export default {
         taskIds: this.selectedIds,
         tagIds: loginUser.tagIds,
         dataLevel: loginUser.authorities.TASK_VIEW,
-        tenantId: rootWindow._init.user.tenantId,
+        tenantId: JSON.parse(rootWindow._init).user.tenantId,
       };
       let exportAll = !ids || !ids.length;
 
