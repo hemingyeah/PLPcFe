@@ -18,7 +18,7 @@ import data from './data'
 import computed from './computed'
 import methods from './methods'
 /* enum */
-import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts'
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts'
 /* constant */
 import { 
   TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE,

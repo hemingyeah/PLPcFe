@@ -1,4 +1,4 @@
-import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
 
 /** 将form对象转成客户对象，用于提交表单 */
 export function packToTask(fields, form){

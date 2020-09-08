@@ -255,6 +255,23 @@ export function openTabForWikiList() {
 }
 /* ----- end 知识库 ------- */
 
+/* ----- start 事件 ------- */
+/** 
+ * @description 打开事件详情
+ * @param {String} eventId 事件id
+*/
+export function openTabForEventView(eventId) {
+  let fromId = getFromId();
+  this.$platform.openTab({
+    id: `event_view_${eventId}`,
+    title: '事件详情',
+    close: true,
+    url: `/event/view/${eventId}`,
+    fromId
+  })
+}
+/* ----- end 事件 ------- */
+
 
 /* ----- start 通用 ------- */
 /** 

@@ -920,8 +920,33 @@ export function editPlanTask(params: PlanTaskCreateAndEditModel) {
 
 /**
  * @description 插入工单日志
+ * @param {Object} params - 参数
+ * @param {String} params.taskId - 工单Id
+ * @param {String} params.taskNo - 工单编号
+ * @param {String} params.content - 内容信息
+ * @param {Number} params.showInOwn - 是否仅自己可见
+ * @param {Number} params.toCustomer - 客户可见
+ * @param {Number} params.cusNotice - 向客户发送短信
  */
 export function taskRecordCreate(params: any) {
   return http.post(`${fixedPrefixTaskPath}/outside/pc/taskrecord/create`, params);
+}
+
+/**
+ * @description 查询工单日志列表
+ * @param {Object} params - 参数
+ * @param {String} params.taskId - 工单Id
+ */
+export function taskRecordList(params: any) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/taskrecord/list`, params, false);
+}
+
+/**
+ * @description 删除工单日志
+ * @param {Object} params - 参数
+ * @param {String} params.id -  工单备注Id
+ */
+export function taskRecordDelete(params: any) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/taskrecord/logicDelete`, params, false);
 }
 /* -------------  end  新工单api ---------------- */

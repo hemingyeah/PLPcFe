@@ -1,4 +1,4 @@
-import { TaskFieldNameMappingEnum } from '@model/enum/MappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
 
 export default {
   update({ field, newValue, oldValue }) {

@@ -1,5 +1,5 @@
 import './BaseTimeline.scss'
-import {toArray} from '@src/util/lang'
+import { toArray, formatDate } from '@src/util/lang'
 
 const BaseTimeline = {
   name: 'base-timeline',
@@ -8,6 +8,22 @@ const BaseTimeline = {
     recordRender: Function,
     loading: Boolean,
     loadmore: Boolean
+  },
+  methods: {
+    getTime(item) {
+      let createTime = item.createTime;
+
+      try {
+        createTime = formatDate(new Date(createTime))
+      } catch (error) {
+        console.warn('base-timeline : getCreatime -> error', error)
+      }
+
+      // 呼叫中心时间取content.ring
+      let time = item.module == 'callCenter' ? item.content.ring : createTime;
+
+      return time;
+    }
   },
   render(h){
     let items = toArray(this.data).map(item => {
@@ -19,7 +35,7 @@ const BaseTimeline = {
           <div class="base-timeline-head"></div>
           <div class="base-timeline-main">
             <div class="base-timeline-content">{content}</div>
-            <p class="base-timeline-time">{time}</p>
+            <p class="base-timeline-time">{ this.getTime(item) }</p>
           </div>
         </div>
       )

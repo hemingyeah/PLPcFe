@@ -15,13 +15,6 @@ router.get('/task', async ctx => {
   ctx.body = Template.renderWithHtml('工单列表', body, script, modConfig.template)
 });
 
-router.get('/task/create', async ctx => {
-  let modConfig = modules['task.edit'];
-  let script = ['/task.edit.js'];
-
-  ctx.body = Template.renderWithData('新建工单', {}, script, modConfig.template)
-});
-
 router
   .get('/task/edit', async ctx => {
     await taskEditContent(ctx);
