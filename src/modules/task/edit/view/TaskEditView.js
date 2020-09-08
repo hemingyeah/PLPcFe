@@ -66,13 +66,14 @@ export default {
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
     */
     callCenterWithTaskDataHandler() {
-      let callRecordId = this.initData?.callRecordId;
+      let callCenterMap = this.initData?.callCenterMap || {};
+      let { callRecordId } = callCenterMap;
       if(!callRecordId) {
         return console.warn(`Caused: current is not have callRecordId, The value is ${callRecordId}`);
       }
 
       // 联系人 地址
-      let { linkman, address } = this.initData;
+      let { linkman, address } = callCenterMap;
       // 更新联系人/客户数据
       if (linkman) {
         let { customer } = linkman;
