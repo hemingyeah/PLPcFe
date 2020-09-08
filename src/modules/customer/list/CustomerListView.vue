@@ -1097,7 +1097,7 @@ export default {
           show: true
         },
         {
-          label: '服务团队',
+          label: '服务部门',
           field: 'tags',
           // width: '110px',
           show: true

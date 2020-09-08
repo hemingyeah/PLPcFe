@@ -20,7 +20,7 @@
               <label>绩效类型</label>
               <el-select class="form-item-content" placeholder="请选择绩效类型" v-model="model.settleType">
                 <el-option label="全部" value=""></el-option>
-                <el-option label="按团队" value="tuandui"></el-option>
+                <el-option label="按部门" value="tuandui"></el-option>
                 <el-option label="按个人" value="geren"></el-option>
               </el-select>
             </div>
@@ -79,7 +79,7 @@
       <div class="page-panel-body clearfix">
         <el-button type="primary" icon="el-icon-plus"  :loading="dialogWaitting" @click="addReport" v-if="allowEdit"> 新建</el-button>
         <el-button type="danger" icon="el-icon-delete" :disabled="deleting" @click="remove" v-if="allowEdit"> 删除</el-button>  
-        <a href="https://help.shb.ltd/doc?id=10501#Performance_report" @click.prevent="openDoc">如何通过绩效报告统计团队或个人数据?</a>
+        <a href="https://help.shb.ltd/doc?id=10501#Performance_report" @click.prevent="openDoc">如何通过绩效报告统计部门或个人数据?</a>
 
         <div class="pull-right">
           <el-button-group>
@@ -442,7 +442,7 @@ export default {
         item.cycle = DateUtil.format(new Date(data.startTime), 'yyyy-MM-dd') + '至' + DateUtil.format(new Date(data.endTime), 'yyyy-MM-dd');
         
         //后端返回数据中users是一个包含一个对象的数组 这个对象的字段如果是users_gr为个人 如果是users_td为团队
-        item.ptype = data.settleType == 'geren' ? '按个人' : '按团队';
+        item.ptype = data.settleType == 'geren' ? '按个人' : '按部门';
         item.id = data.id;
         //拼接成xxx等几人或xxx等几团队 处理后端格式不一样的数据
         if(data.settleType == 'geren') {
@@ -453,7 +453,7 @@ export default {
           }
         }else {
           if(data.users[0].usersName.length > 1){
-            item.users = data.users[0].usersName[0] + '等' + data.users[0].usersName.length + '团队';
+            item.users = data.users[0].usersName[0] + '等' + data.users[0].usersName.length + '部门';
           }else {
             item.users = data.users[0].usersName[0]
           }

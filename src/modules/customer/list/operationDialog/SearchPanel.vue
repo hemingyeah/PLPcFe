@@ -164,7 +164,7 @@ export default {
             f.fieldName = 'customerManager';
           }
 
-          if (f.displayName === '服务团队') {
+          if (f.displayName === '服务团队' || f.displayName === '服务部门') {
             formType = 'tags';
           }
 
@@ -432,7 +432,7 @@ export default {
             if (field.formType === 'area') {
               tv = []
             }
-            if (field.formType === 'select' && field.displayName === '服务团队') {
+            if (field.formType === 'select' && (field.displayName === '服务团队' || field.displayName === '服务部门')) {
               tv = []
             }
 

@@ -201,7 +201,7 @@ export default {
         if(result.status == 1){
           return platform.notification({
             type: 'error',
-            title: '服务团队匹配失败',
+            title: '服务部门匹配失败',
             message: result.message
           })
         }
@@ -229,8 +229,8 @@ export default {
     autoAssignFailNotification() {
       platform.notification({
         type: 'error',
-        title: '服务团队匹配失败',
-        message: '未能按照规则分配成功，请到服务团队中设置负责区域'
+        title: '服务部门匹配失败',
+        message: '未能按照规则分配成功，请到服务部门中设置负责区域'
       })
     },
     updateAddressBackup(ad) {

@@ -4,9 +4,14 @@
     
     <!-- start 主要内容 -->
     <div class="department-main">
-
       <el-tabs type="card" v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="组织架构" name="tag">
+          <!-- 部门搜索框 -->
+          <div class="dept-search">
+            <el-input v-model="deptKeyword" placeholder="请输入部门名称搜索" @input="debounce" @keyup.enter.native="debounce">
+              <i slot="prefix" class="el-input__icon el-icon-search"></i>
+            </el-input>
+          </div>
           <!-- start 左侧部门列表 -->
           <div class="department-main-left">
             <!-- start 部门列表树 -->
@@ -213,6 +218,7 @@
               <base-button type="danger" @event="delDepartment()" v-if="!isRootDepartment(selectedDept)"> 删除 </base-button>
             </div>
           </div>
+
           <div class="dept-info">
             <div class="form-view-row">
               <label>部门主管：</label>
@@ -223,17 +229,23 @@
 
             <div class="form-view-row">
               <label>负责区域：</label>
-              <div class="form-view-row-content">
-                <p v-for="place in deptInfo.tagPlaceList" :key="`${place.id}_index`">
-                  {{ place.province || '' }}
-                  {{ place.city ? `- ${place.city}` : '' }}
-                  {{ place.dist ? `- ${place.dist}` : '' }}
-                </p>
+              <div v-if="deptInfo.tagPlaceList && deptInfo.tagPlaceList.length == 1" class="form-view-row-content">
+                <span>{{ deptArea }}</span>
               </div>
+              <el-tooltip v-else placement="top">
+                <div slot="content">{{deptInfo.tagPlaceList && deptInfo.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}</div>
+                <a href="" style="text-decoration: none;color: #333;">{{deptArea}}</a>
+              </el-tooltip>
             </div>
             <div class="form-view-row">
               <label>部门描述：</label>
-              <div class="form-view-row-content">{{ deptInfo.description }}</div>
+              <div v-if="deptInfo.description && deptInfo.description.length < 10" class="form-view-row-content">
+                <span>{{ deptInfo.description }}</span>
+              </div>
+              <el-tooltip v-else placement="top">
+                <div slot="content">{{deptInfo.description}}</div>
+                <a href="" style="text-decoration: none;color: #333;">{{deptDescription}}</a>
+              </el-tooltip>
             </div>
           </div>
           <div class="dept-info">
@@ -244,10 +256,7 @@
 
             <div class="form-view-row">
               <label>部门位置：</label>
-              <div class="form-view-row-content" v-if="deptInfo.tagAddress">
-                {{deptInfo.tagAddress | fmt_address }}
-                <i v-if="deptInfo.tagAddress.longitude && deptInfo.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i>
-              </div>
+              <div class="form-view-row-content" v-if="deptInfo.tagAddress">{{deptInfo.tagAddress | fmt_address }}<i v-if="deptInfo.tagAddress.longitude && deptInfo.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i></div>
             </div>
 
           </div>
@@ -559,6 +568,7 @@ export default {
   inject: ['initData'],
   data(){
     return {
+      deptKeyword:'',
       activeName: 'tag',
       dept_role_data:[],
       roles:[],
@@ -675,6 +685,18 @@ export default {
     },
     teamLeadersName(){
       return this.deptInfo.teamLeaders && this.deptInfo.teamLeaders.map(i => i.displayName).join('，')
+    },
+    deptArea(){
+      const tagPlaceList = this.deptInfo.tagPlaceList || []
+      if(!tagPlaceList.length) return ''
+      const p = tagPlaceList[0] || {}
+      let tagPlace = `${p.province ? `${p.province}` : ''}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}` 
+      if(tagPlaceList.length > 1) tagPlace += '...'
+      return tagPlace
+    },
+    deptDescription(){
+      const desc = this.deptInfo.description || ''
+      return desc.length < 10 ? desc : `${desc.substring(0, 10)}...`
     }
   },
   mounted() {
@@ -686,6 +708,15 @@ export default {
     this.autoAuthRoles = [{id: '0', text:'由管理员每次指定'}].concat(this.dept_role_data)
   },
   methods: {
+    debounce:_.debounce(async function(){
+      // 部门模糊搜索
+      try {
+        this.depts = await this.fetchDept();
+        this.initDeptUser(this.depts[0]);
+      } catch (error) {
+        console.log(error);
+      }
+    }, 1000),
     toggleEnable(row) {
       row.pending = true;
       this.$http.post('/security/user/enable', {userId: row.userId}, false)
@@ -1194,29 +1225,12 @@ export default {
     /** 抓取部门数据 */
     fetchDept(){
       let params = {
-        seeAllOrg: this.isSeeAllOrg
+        seeAllOrg: this.isSeeAllOrg,
+        keyword: this.deptKeyword
       };
 
       return TeamApi.tagList(params).then(result => {
-        // if(result.status == 1) return [];
-
-        let depts = (result && result.list) || [];
-        let index = -1;
-
-        for(let i = 0; i < depts.length; i++){
-          if(depts[i].name == '单独授权人员'){
-            index = i;
-            break;
-          }
-        }
-
-        // 将单独授权人员放在最后
-        if(index >= 0){
-          let arr = depts.splice(index, 1);
-          depts.push(arr[0]); 
-        }
-        
-        return depts;
+        return (result && result.list) || [];
       })
         .catch(err => console.error('err', err));
     },
@@ -1619,6 +1633,17 @@ export default {
   overflow-y: auto;
   height: calc(100% - 100px);
 }
+ 
+.dept-search{
+  display: flex;
+  align-items: center;
+  width: 100%;
+  align-content: center; 
+  .el-input{
+     margin: 0 20px;
+  }
+} 
+
 .dept-header-see {
   margin-top: 20px;
   margin-left: 10px;

@@ -321,7 +321,7 @@ let initData={
         tableName: "customer",
         isSystem: 1,
         fieldName: "tags",
-        displayName: "服务团队",
+        displayName: "服务部门",
         formType: "select",
         defaultValue: null,
         isNull: 0,

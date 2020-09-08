@@ -90,7 +90,7 @@
 
           <template slot="tags" slot-scope="{value}">
             <div class="form-view-row" v-if="isDivideByTag">
-              <label>服务团队</label>
+              <label>服务部门</label>
               <div class="form-view-row-content">{{value | fmt_tag}}</div>
             </div>
           </template>

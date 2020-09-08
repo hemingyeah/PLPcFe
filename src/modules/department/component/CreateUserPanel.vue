@@ -46,13 +46,13 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="部门" prop="department">
+          <!-- <el-form-item label="部门" prop="department">
             <div @click="chooseDepartment" class="department-higher-name">{{ form.department.map(d => d.name).join(',') }}</div>
           </el-form-item>
 
           <el-form-item label="团队" prop="team" v-if="initData.canUpdateTag">
             <biz-team-select v-model="form.team" multiple />
-          </el-form-item>
+          </el-form-item> -->
 
         </el-form>
 

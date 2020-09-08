@@ -24,7 +24,7 @@
         <el-form-item label="统计以下对象" prop="targets">
           <div class="performance-rule-row">
             <el-select :value="formData.target" @input="_getOptions" style="width:140px;">
-              <el-option label="按团队" value="dept"></el-option>
+              <el-option label="按部门" value="dept"></el-option>
               <el-option label="按人员" value="person"></el-option>
             </el-select>
 

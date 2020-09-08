@@ -5,7 +5,7 @@
         placement="bottom-start"
         width="500"
         trigger="hover"
-        content="绩效管理模块可以帮助企业管理针对服务团队和服务人员的定期绩效数据统一，根据您在这里配置的规则到绩效管理创建绩效统计报告。">
+        content="绩效管理模块可以帮助企业管理针对服务部门和服务人员的定期绩效数据统一，根据您在这里配置的规则到绩效管理创建绩效统计报告。">
         <span style="vertical-align: middle" slot="reference">
           绩效规则<i class="icon-help iconfont" style="margin-left: 3px;"></i>
         </span>

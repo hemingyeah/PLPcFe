@@ -12,18 +12,22 @@
         <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-ruleForm">
 
           <el-form-item label="手机号" prop="phone">
+            <input type="password" style="position: fixed;left: -9999px;">
             <el-input v-model="form.phone" autocomplete="off" :maxlength="11"></el-input>
           </el-form-item>
 
           <el-form-item label="姓名" prop="name">
+            <input type="password" style="position: fixed;left: -9999px;">
             <el-input v-model="form.name" autocomplete="off" :maxlength="10"></el-input>
           </el-form-item>
 
           <el-form-item label="登录密码" prop="pass">
+            <input type="password" style="position: fixed;left: -9999px;">
             <el-input type="password" v-model="form.pass" autocomplete="off"></el-input>
           </el-form-item>
 
           <el-form-item label="确认密码" prop="checkPass">
+            <input type="password" style="position: fixed;left: -9999px;">
             <el-input type="password" v-model="form.checkPass" autocomplete="off"></el-input>
           </el-form-item>
 
@@ -54,7 +58,7 @@
 
       <!-- start 底部按钮 -->
       <div class="create-user-panel-bottom">
-        <base-button type="ghost" @event="visible = false">取消</base-button>
+        <base-button type="ghost" @event="close">取消</base-button>
         <base-button type="primary" @event="validate">确定</base-button>
         <!-- <base-button type="danger" @event="departmentDelete">删除</base-button> -->
       </div>
@@ -205,6 +209,7 @@ export default {
     },
     close() {
       this.visible = false;
+      this.$refs.form.resetFields();
     },
     open(data) {
       this.packData(data);

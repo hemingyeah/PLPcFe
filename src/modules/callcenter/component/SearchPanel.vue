@@ -169,7 +169,6 @@ export default {
       let f = {}
       return (
         [...this.selfFields]
-          // .filter(f => (f.isSearch || f.isSystem) && f.fieldName !== 'qrcodeId' && f.displayName !== '服务团队')
           .map(field => {
             f = _.cloneDeep(field)
             return Object.freeze({
@@ -177,7 +176,6 @@ export default {
               isNull: 1,
               formType: f.formType,
               originalFormType: f.formType,
-              // orderId: f.isSystem ? f.orderId - 100 : f.orderId,
               operator: this.matchOperator(f)
             })
           })
@@ -473,10 +471,8 @@ export default {
             if (field.formType === 'area') {
               tv = []
             }
-            if (
-              field.formType === 'select' &&
-              field.displayName === '服务团队'
-            ) {
+
+            if (field.formType === 'select' && (field.displayName === '服务团队' || field.displayName === '服务部门')) {
               tv = []
             }
 

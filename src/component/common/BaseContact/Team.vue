@@ -45,7 +45,7 @@
 
         <!-- start 已选择团队 -->
         <template v-if="allowCheckTeam && chosenTeam.length > 0">
-          <h4>已选团队</h4>
+          <h4>已选部门</h4>
           <div 
             class="bc-chosen-team-user" 
             v-for="team in chosenTeam" :key="team.id">

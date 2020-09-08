@@ -74,7 +74,7 @@
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
           <base-button type="ghost" icon="icon-qingkongshanchu" @event="deleteReport">删除</base-button>
-          <a href="https://www.yuque.com/shb/help/operating#IbBYe" target="_blank">如何通过绩效报告统计团队或个人数据？</a>
+          <a href="https://www.yuque.com/shb/help/operating#IbBYe" target="_blank">如何通过绩效报告统计部门或个人数据？</a>
         </div>
 
 
@@ -284,7 +284,7 @@ export default {
           value: 0,
         },
         {
-          label: '按团队',
+          label: '按部门',
           value: 1,
         },
       ],
@@ -414,7 +414,7 @@ export default {
               createTime: formatDate(new Date(createTime), 'YYYY-MM-DD'),
               startTime: formatDate(new Date(startTime), 'YYYY-MM-DD'),
               endTime: formatDate(new Date(endTime), 'YYYY-MM-DD'),
-              type: type ? '按团队' : '按个人',
+              type: type ? '按部门' : '按个人',
               id,
               carbonCopy: carbonCopy ? carbonCopy.replace(/\[|\]|"/g, '') : '',
               waitingForApprove: status === 1,

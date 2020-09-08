@@ -243,7 +243,7 @@ const BizUserSelect = {
           <input 
             type="text" ref="search"
             class="search-user-keyword" 
-            placeholder="请选择团队内的成员" 
+            placeholder="请选择部门内的成员" 
             onInput={this.handleInput}/>
           <div class="biz-user-select-panel" {...panelAttrs}>
             { content }
