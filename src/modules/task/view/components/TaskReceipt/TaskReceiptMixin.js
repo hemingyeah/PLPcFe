@@ -43,10 +43,11 @@ export default {
     sparepartTotal() {
       let { sparepart } = this.form;
       let total = 0;
-
-      sparepart.forEach(item => {
-        total += item.number * item.salePrice;
-      })
+      if (Array.isArray(sparepart)) {
+        sparepart.forEach(item => {
+          total += item.number * item.salePrice;
+        })
+      }
 
       return total.toFixed(2);
     },
@@ -56,10 +57,12 @@ export default {
     serviceTotal() {
       let { serviceIterm } = this.form;
       let total = 0;
-
-      serviceIterm.forEach(item => {
-        total += item.number * item.salePrice;
-      })
+      
+      if (Array.isArray(serviceIterm)) {
+        serviceIterm.forEach(item => {
+          total += item.number * item.salePrice;
+        })
+      }
 
       return total.toFixed(2);
     },

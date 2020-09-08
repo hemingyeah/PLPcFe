@@ -3,6 +3,8 @@
 */
 export function packToReceipt(fields, form) {
   let expenseSheet = {
+    sparePartsExpense: [],
+    serviceExpense: [],
     discountExpense: {
       taskId: form.id,
       number: 1,
@@ -22,21 +24,58 @@ export function packToReceipt(fields, form) {
 
     // 备件
     if(fieldName === 'sparepart'){
-      value.forEach(item => item.taskId = form.id);
-      expenseSheet.sparePartsExpense = value;
+      value.forEach(part => {
+        let o = {};
+        o.id = part.id;
+        o.taskId = form.id;
+        o.name = part.name;
+        o.serialNumber = part.serialNumber || '';
+        o.number = Number(part.number) || 0;
+        o.type = '备件';
+        o.salePrice = part.salePrice;
+        o.outPrice = part.costPrice;
+        o.standard = part.standard;
+        o.unit = part.unit;
+        o.primaryId = part.id;
+        o.primaryType = part.type;
+        o.modifiedPrice = part.salePrice - part.oldPrice;
+
+        expenseSheet.sparePartsExpense.push(o);
+      });
+
       return;
     }
 
     // 服务项目
     if(fieldName === 'serviceIterm'){
-      value.forEach(item => item.taskId = form.id);
-      expenseSheet.serviceExpense = value;
+      value.forEach(service => {
+        let o = {};
+        o.id = service.id;
+        o.taskId = form.id;
+        o.name = service.name;
+        o.number = parseInt(service.num || 0);
+        o.type = '服务';
+        o.salePrice = service.salePrice;
+        o.outPrice = service.costPrice;
+        o.unit = service.unit;
+        o.primaryId = service.id;
+        o.primaryType = service.type;
+        o.modifiedPrice = service.salePrice - service.oldPrice;
+        o.serialNumber = service.serialNumber || '';
+
+        expenseSheet.serviceExpense.push(o);
+      });
+
       return;
     }
 
     if(fieldName === 'receiptAttachment'){
       // 拼附件和回执附件
-      task.attachment = value;
+      task.attachment = (value || []).map(a => {
+        a.receipt = true;
+        return a;
+      })
+
       return;
     }
 
@@ -80,15 +119,25 @@ export function packToForm(fields, data) {
 
     // 备件
     if(fieldName === 'sparepart') {
-      sparePartsExpense.map(part => part.id = part.primaryId);
-      task.attribute[fieldName] = sparePartsExpense;
+      sparePartsExpense.map(part => {
+        part.id = part.primaryId;
+        part.type = part.primaryType;
+        part.oldPrice = part.salePrice;
+      });
+
+      task.attribute[fieldName] = sparePartsExpense || [];
       return;
     }
 
     // 服务项目
     if(fieldName === 'serviceIterm') {
-      serviceExpense.map(service => service.id = service.primaryId);
-      task.attribute[fieldName] = serviceExpense;
+      serviceExpense.map(service => {
+        service.id = service.primaryId;
+        service.type = service.primaryType;
+        service.oldPrice = service.salePrice;
+      });
+
+      task.attribute[fieldName] = serviceExpense || [];
       return;
     }
 

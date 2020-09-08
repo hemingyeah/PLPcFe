@@ -60,7 +60,7 @@
       <div class="base-modal-content">
         <form-builder ref="form" :fields="fields" :value="sparepart" @update="update">
           <!-- start 仓库 -->
-          <template slot="repertory" slot-scope="{ field }">
+          <template slot="repertory" slot-scope="{ field }" v-if="showRepertory">
             <form-item :label="field.displayName">
               <form-select :field="field" :source="repertoryList" :value="repertoryId" @update="updateRepertory" :clearable="false"/>
             </form-item>
@@ -68,7 +68,7 @@
           <!-- end 仓库 -->
 
           <!-- start 备件 -->
-          <template slot="sparepart" slot-scope="{ field }">
+          <template slot="part" slot-scope="{ field }">
             <form-item :label="field.displayName">
               <biz-form-remote-select
                 :field="field"
@@ -155,11 +155,13 @@ export default {
   data() {
     return {
       visible: false,
+      showRepertory: true,
       repertoryId: 0, // 仓库ID
       repertoryList: [], // 仓库列表数据
       selectedSparepart: [], // 当前选中的备件
       sparepart: this.initData(), // 备件信息
-      config: {} // 备件配置
+      config: {}, // 备件配置
+      editUnitPrice: false, // 是否可以修改单品价格
     }
   },
   computed: {
@@ -175,7 +177,7 @@ export default {
         field: 'serialNumber'
       }, {
         label: '类别',
-        field: 'primaryType'
+        field: 'type'
       }, {
         label: '规格',
         field: 'standard'
@@ -209,7 +211,7 @@ export default {
         isNull: 0
       }, {
         formType: 'select',
-        fieldName: 'sparepart',
+        fieldName: 'part',
         displayName: '备件',
         placeholder: '请选择',
         isNull: 0,
@@ -262,13 +264,6 @@ export default {
     total() {
       let { number, salePrice } = this.sparepart;
       return number && salePrice ? (number * salePrice).toFixed(2) : '';
-    },
-    /**
-    * @description 是否可以修改单品价格
-    */
-    editUnitPrice() {
-      // TODO：是否可以修改单品价格
-      return false;
     }
   },
   methods: {
@@ -450,9 +445,7 @@ export default {
         if (!validateRes) return;
 
         let sparepartObj = JSON.parse(JSON.stringify(this.sparepart));
-        sparepartObj.outPrice = sparepartObj.costPrice;
-        sparepartObj.primaryType = sparepartObj.type;
-        sparepartObj.type = '备件';
+        sparepartObj.oldPrice = sparepartObj.salePrice;
 
         let newValue = this.value;
 
@@ -474,15 +467,22 @@ export default {
       } catch (e) {
         console.error('err', e);
       }
+    },
+    setEditPrice(config) {
+      console.log(config, 5555555)
+      let { editUnitPrice } = config;
+
+      this.editUnitPrice = editUnitPrice;
     }
   },
   async mounted() {
+    console.log(this.$eventBus, 8888)
     try {
       this.config = await TaskApi.getSparepartConfig();
 
       let { sparepart2, personalRepertory } = this.config;
 
-      if (sparepart2) {
+      if (!sparepart2) {
         if (personalRepertory) {
           this.repertoryList = [{
             text: '个人备件库',
@@ -497,14 +497,23 @@ export default {
             })
           })
         }
+
+      } else {
+        // 备件1.0不显示仓库
+        this.showRepertory = false;
       }
-      // TODO：备件2.0？？？
+
       // 设置仓库默认值
-      this.repertoryId = this.repertoryList[0]?.value || '';
+      this.repertoryId = this.repertoryList[0]?.value || 0;
+
+      this.$eventBus.$on('task_receipt_editUnitPrice', this.setEditPrice);
       
     } catch (err) {
       console.error('err', err);
     }
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('task_receipt_editUnitPrice', this.setEditPrice);
   }
 }
 </script>
@@ -512,7 +521,7 @@ export default {
 <style lang="scss">
 .form-item.err :not(.is-success){
   .form-item :not(.err) {
-    input, .base-select-main-content {
+    input, textarea, .base-select-main-content {
       border-color: #e0e1e2 !important;
     }
   }
