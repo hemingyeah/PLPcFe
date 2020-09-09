@@ -256,6 +256,13 @@ export function reviewApproveCheck(params: {} | undefined) {
 }
 
 /**
+ * @description 完成时校验是否需要审批
+ */
+export function finishApproveCheck(params: {} | undefined) {
+  return http.post("/task/approve/finish", params);
+}
+
+/**
  * @description 获取工单最近更新记录
  * @param {Object} params - 参数
  * @param {String} params.taskId - 工单id
@@ -948,5 +955,12 @@ export function taskRecordList(params: any) {
  */
 export function taskRecordDelete(params: any) {
   return http.post(`${fixedPrefixTaskPath}/outside/pc/taskrecord/logicDelete`, params, false);
+}
+
+/**
+ * @description 拨打电话
+ */
+export function dialout(params: object) {
+  return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params);
 }
 /* -------------  end  新工单api ---------------- */

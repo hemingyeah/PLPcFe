@@ -1,42 +1,64 @@
 <template>
   <div class="form-serviceterm">
-    <button type="button" class="btn btn-primary base-upload-btn" @click="visible = true">添加</button>
+    <!-- start 添加按钮 -->
+    <el-button
+      class="add-serviceterm-btn"
+      type="text"
+      size="medium"
+      @click="visible = true"
+    >添加</el-button>
+    <!-- end 添加按钮 -->
 
-    <el-table :data="value" border stripe>
-      <el-table-column label="服务项目" prop="name"></el-table-column>
-      <el-table-column label="编号" prop="serialNumber"></el-table-column>
-      <el-table-column label="类别" prop="primaryType"></el-table-column>
-      
-      <el-table-column prop="number" label="数量" width="100px">
+    <!-- start 备件列表 -->
+    <el-table
+      v-if="value.length"
+      header-row-class-name="base-table-header-v3"
+      row-class-name="base-table-row-v3"
+      class="base-table-border-v3"
+      :data="value"
+      stripe>
+      <el-table-column
+        v-for="(column, index) in colums"
+        :key="`${column.field}_${index}`"
+        :label="column.label"
+        :prop="column.field"
+        show-overflow-tooltip
+        :min-width="column.minWidth || '148px'">
         <template slot-scope="scope">
-          <input class="service-number-input" type="number" v-model="scope.row.number" @change="handleServiceItermNum(scope.row)" />
-        </template>
-      </el-table-column>
+          <!-- start 数量 -->
+          <template v-if="column.field === 'number'">
+            <input class="service-number-input" type="number" v-model="scope.row.number" @change="handleServiceItermNum(scope.row)" />
+          </template>
+          <!-- end 数量 -->
 
-      <el-table-column label="单价" prop="salePrice" width="100px">
-        <template slot-scope="scope">
-          <input class="service-number-input" type="number" v-model="scope.row.salePrice" />           
-        </template>
-      </el-table-column>
+          <!-- start 单价 -->
+          <template v-else-if="column.field === 'salePrice' && editUnitPrice">
+            <input class="service-number-input" type="number" v-model="scope.row.salePrice" @change="handlePrice(scope.row)" />
+          </template>
+          <!-- end 单价 -->
 
-      <el-table-column label="小计" width="100px">
-        <template slot-scope="scope">
-          {{(scope.row.number * scope.row.salePrice).toFixed(2)}}
-        </template>
-      </el-table-column>
-    
-      <el-table-column label="操作" width="70px" fixed="right">
-        <template slot-scope="scope">
-          <el-button size="mini" type="danger" icon="el-icon-delete" @click="value.splice(scope.$index, 1)"/>
+          <!-- start 小计 -->
+          <template v-else-if="column.field === 'total'">
+            {{ (scope.row.number * scope.row.salePrice).toFixed(2) }}
+          </template>
+          <!-- end 小计 -->
+
+          <!-- start 操作 -->
+          <template v-else-if="column.field === 'action'">
+            <el-button size="small" type="text" icon="el-icon-delete" @click="value.splice(scope.$index, 1)"/>
+          </template>
+          <!-- end 操作 -->
+
+          <template v-else>{{ scope.row[column.field] }}</template>
         </template>
       </el-table-column>
     </el-table>
+    <!-- end 备件列表 -->
 
     <!-- 添加服务项目弹窗 -->
     <base-modal :show.sync="visible" title="服务项目添加" class="form-serviceterm-modal" width="700px" @closed="reset">
-      <form @submit.prevent="submit">
+      <div class="base-modal-content">
         <form-builder :fields="fields" ref="form" :value="serviceitem" @update="update">
-
           <!-- start 服务项目名称 -->
           <template slot="service" slot-scope="{ field }">
             <form-item :label="field.displayName">
@@ -84,18 +106,19 @@
           </template>
           <!-- end 小计 -->
         </form-builder>
-
-        <div class="dialog-footer" slot="footer">
-          <el-button @click="visible = false">关闭</el-button>
-          <el-button native-type="submit" type="primary">保存</el-button>
-        </div>
-      </form> 
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" @click="submit">保 存</el-button>
+      </div>
     </base-modal>
   </div>
 </template>
 
 <script>
+/* mixin */
 import FormMixin from '@src/component/form/mixin/form';
+
 export default {
   name: 'form-serviceterm',
   mixins: [FormMixin],
@@ -112,11 +135,46 @@ export default {
   data() {
     return {
       visible: false,
-      selectedItem: [],
-      serviceitem: this.initData()
+      selectedItem: [], // 当前选中的服务项目
+      serviceitem: this.initData(), // 服务项目信息
+      editUnitPrice: false, // 是否可以修改单品价格
     }
   },
   computed: {
+    /**
+    * @description 服务项目列表项
+    */
+    colums() {
+      return [{
+        label: '服务项目',
+        field: 'name'
+      }, {
+        label: '编号',
+        field: 'serialNumber'
+      }, {
+        label: '类别',
+        field: 'type'
+      }, {
+        label: '数量',
+        field: 'number',
+        minWidth: '100px'
+      }, {
+        label: '单价',
+        field: 'salePrice',
+        minWidth: '100px'
+      }, {
+        label: '小计',
+        field: 'total',
+        minWidth: '128px'
+      }, {
+        label: '操作',
+        field: 'action',
+        minWidth: '70px'
+      }]
+    },
+    /**
+    * @description 服务项目字段
+    */
     fields() {
       return [{
         formType: 'select',
@@ -156,12 +214,18 @@ export default {
         disabled: true
       }]
     },
+    /**
+    * @description 小计
+    */
     total() {
       let { number, salePrice } = this.serviceitem;
       return number && salePrice ? (number * salePrice).toFixed(2) : '';
     }
   },
   methods: {
+    /**
+    * @description 初始化服务项目默认值
+    */
     initData() {
       return {
         id: '',
@@ -174,14 +238,60 @@ export default {
         unit: ''
       }
     },
-    validateNumber(value, field){
-      return new Promise((resolve, reject) => {
-        if(!/^[1-9]\d*$/.test(value)) {
-          return resolve('请输入正整数');
-        } 
-        resolve(null);
-      })
+    /**
+    * @description 修改列表服务项目数量
+    */
+    handleServiceItermNum(item) {
+      let value = Number(item.number);
+
+      if (value <= 0) {
+        this.$platform.alert('请输入正确的数量');
+        item.number = 1;
+        return;
+      }
+
+      item.number = value <= 1 ? 1 : Math.floor(value);
     },
+    /**
+    * @description 修改列表服务项目单价
+    */
+    handlePrice(item) {
+      let value = Number(item.salePrice);
+      
+      if(value < 0){
+        this.$platform.alert('请输入不小于0的数值');
+        item.salePrice = item.oldPrice ? item.oldPrice : 0;
+      }
+    },
+    /**
+    * @description 弹窗关闭重置数据
+    */
+    reset() {
+      this.serviceitem = this.initData();
+      this.selectedItem = [];
+
+      // 清空校验结果
+      setTimeout(() => {
+        this.$refs.form.$children.map(child => {
+          if (child.$el.className == 'form-item err') {
+            child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
+          }
+        })
+      }, 0);
+    },
+    /**
+    * @description 更新表单数据
+    */
+    update({field, newValue, oldValue}) {
+      let {fieldName, displayName} = field;
+      if (this.$appConfig.debug) {
+        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+      this.$set(this.serviceitem, fieldName, newValue);
+    },
+    /**
+    * @description 搜索服务项目
+    */
     searchServiceItem(params) {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {}
@@ -200,6 +310,9 @@ export default {
         })
         .catch(e => console.error(e));
     },
+    /**
+    * @description 选择服务项目
+    */
     updateServiceItem(value) {
       let newValue = value[0];
 
@@ -213,27 +326,27 @@ export default {
         }
       }
     },
-    update({field, newValue, oldValue}) {
-      let {fieldName, displayName} = field;
-      if (this.$appConfig.debug) {
-        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
-      }
-      this.$set(this.serviceitem, fieldName, newValue);
+    /**
+    * @description 数量校验
+    */
+    validateNumber(value, field){
+      return new Promise((resolve, reject) => {
+        if(!/^[1-9]\d*$/.test(value)) {
+          return resolve('请输入正整数');
+        } 
+        resolve(null);
+      })
     },
-    handleServiceItermNum(item) {
-      let value = Number(item.number);
-
-      item.number = value <= 1 ? 1 : Math.floor(value);
-    },
+    /**
+    * @description 添加服务项目
+    */
     async submit() {
       try {
         const validateRes = await this.$refs.form.validate();
         if (!validateRes) return;
 
         let serviceObj = JSON.parse(JSON.stringify(this.serviceitem));
-        serviceObj.outPrice = serviceObj.costPrice;
-        serviceObj.primaryType = serviceObj.type;
-        serviceObj.type = '服务';
+        serviceObj.oldPrice = serviceObj.salePrice;
 
         let newValue = this.value;
 
@@ -254,19 +367,17 @@ export default {
         console.error('err', e);
       }
     },
-    reset() {
-      this.serviceitem = this.initData();
-      this.selectedItem = [];
+    setEditPrice(config) {
+      let { editUnitPrice } = config?.options || {};
 
-      // 清空校验结果
-      setTimeout(() => {
-        this.$refs.form.$children.map(child => {
-          if (child.$el.className == 'form-item err') {
-            child.$el.dispatchEvent(new CustomEvent('form.clear.validate', {bubbles: false}));
-          }
-        })
-      }, 0);
+      this.editUnitPrice = editUnitPrice;
     }
+  },
+  mounted() {
+    this.$eventBus.$on('task_receipt_update_editPrice', this.setEditPrice);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('task_receipt_update_editPrice', this.setEditPrice);
   }
 }
 </script>
@@ -287,8 +398,12 @@ export default {
 }
 
 .form-serviceterm {
-  line-height: 30px;
   text-align: left;
+
+  .add-serviceterm-btn {
+    min-width: auto !important;
+    padding: 7px 0 0 0;
+  }
 
   .el-table {
     margin: 10px 0;
@@ -296,31 +411,11 @@ export default {
     .service-number-input {
       width: 100%;
     }
-  }
 
-  .form-serviceterm-modal {
-    .base-modal-body{
-      padding: 10px 20px 20px 10px;
-    
-      .form-builder {
-        width: 100%;
-
-        .form-item {
-          label {
-            width: 110px;
-          }
-
-          .form-text {
-            input {
-              background: #eee;
-            }
-          }
-        }
-      }
-    }
-
-    .dialog-footer {
-      text-align: right;
+    .el-icon-delete {
+      font-size: 16px;
+      color: $color-danger;
+      font-weight: 700;
     }
   }
 }

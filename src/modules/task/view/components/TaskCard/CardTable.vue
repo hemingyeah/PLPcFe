@@ -1,7 +1,7 @@
 <template>
   <el-table
-    header-row-class-name="multiple-card-table-header"
-    row-class-name="multiple-card-table-row"
+    header-row-class-name="base-table-header-v3"
+    row-class-name="base-table-row-v3"
     class="multiple-card-table"
     :data="data"
     stripe>
@@ -148,14 +148,8 @@ export default {
 <style lang="scss">
 .multiple-card-table {
   margin-bottom: 20px;
-
-  .multiple-card-table-header th {
-    color: $text-color-primary;
-    background: #F5F5F5;
-    font-weight: 500;
-  }
-
-  .multiple-card-table-row td {
+  
+  .base-table-row-v3 td {
     .column-attachment {
       .iconfont {
         font-size: 12px;

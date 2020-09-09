@@ -3,10 +3,14 @@
   color: #fff;
   font-weight: 700;
   text-align: center;
+  padding: 3px;
+  margin-left: 5px;
 
-  &-overtime,
-  &-approve {
+  &-overtime {
     background-color: #ff9100;
+  }
+  &-approve {
+    background-color: #ffc200;
   }
 }
 
@@ -155,5 +159,39 @@
         color: #77c5c3;
       }
     }
+  }
+}
+
+.superscript {
+  position: relative;
+  padding-left: 22px !important;
+}
+.superscript::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #ff9900 50%, transparent 50%);
+}
+
+.superscript::after {
+  content: "示例";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 30px;
+  width: 30px;
+  line-height: 20px;
+  font-size: 12px;
+  color: #fff;
+  text-align: center;
+  transform: scale(0.9166666) rotateZ(-45deg);
+}
+.task-client {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
   }
 }

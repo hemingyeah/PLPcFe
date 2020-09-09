@@ -453,6 +453,25 @@
     position: relative;
     top: 3px;
   }
+
+  &.base-table-border-v3 {
+    border: 1px solid $color-border-l2;
+  }
+
+  .base-table-header-v3 th {
+    background: $bg-color-l2;
+    color: $text-color-primary;
+    font-weight: 500;
+  }
+
+  .base-table-row-v3 td {
+    color: $text-color-regular;
+    font-size: $font-size-small;
+  }
+
+  .base-table-row-v3:hover > td {
+    background-color: #f5fafa !important;
+  }
 }
 
 
