@@ -246,7 +246,7 @@ export default {
 .frame-nav{
   width: 50px;
   height: 100%;
-  background-color: $color-primary;
+  background-color: $color-nav-primary;
   box-shadow: 1px 0 8px rgba(0,0,0,.125);
   transition: width ease .2s;
   position: relative;
@@ -391,7 +391,7 @@ export default {
 }
 
 .frame-subMenu{
-  background-color: #4AA09E;
+  background-color: $color-nav-secondary;
   margin: 0;
   padding: 0;
 }
@@ -409,8 +409,9 @@ export default {
   
   &:hover,
   &.frame-subMenu-active{
-    background: mix(#fff, $color-primary, 89.88%);
-    color: $color-primary !important;
+    // background: mix(#fff, $color-primary, 89.88%);
+    background-color: $color-primary;
+    color: #fff !important;
   }
   
   & > a{

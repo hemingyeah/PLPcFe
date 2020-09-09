@@ -9,6 +9,9 @@ import * as FormUtil from '@src/component/form/util';
 import * as util from '@src/modules/task/util/receipt';
 import _ from 'lodash';
 
+/* enum */
+import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+
 export default {
   name: 'task-receipt-edit-view',
   mixins: [ReceiptMixin],
@@ -140,6 +143,8 @@ export default {
             this.$emit('proposeApprove', result.data);
             return;
           }
+
+          this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
           // this.pending = true;
 
           // TaskApi.editReceipt(params).then(res => {
