@@ -163,6 +163,13 @@ export default {
   background-color: #fff;
   border-radius: 1px;
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+
+  max-height: calc(100% - 100px);
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
 
   &.base-modal-fullscreen{
     position: absolute;
@@ -177,9 +184,8 @@ export default {
 
 .base-modal-header {
   position: relative;
-  padding: 8px 10px;
-  border-bottom: 1px solid #e9ecef;
-  background: #f8f8f8;
+  padding: 12px 15px 12px 20px;
+  background-color: $bg-color-l2;
   font-size: 16px;
   color: $text-color-primary;
   font-weight: normal;
@@ -194,6 +200,7 @@ export default {
     line-height: 24px;
     font-size: 16px;
     font-weight: 400;
+    font-size: 18px;
 
     @include text-ellipsis()
   }
@@ -229,9 +236,14 @@ export default {
   }
 }
 
+.base-modal-body {
+  overflow: auto;
+}
+
 //TODO: 统一边距
 .base-modal-footer {
-  padding: 15px 30px;
+  padding: 9px 20px;
+  border-top: 1px solid $color-border-l2;
 }
 
 .base-modal-text-btn{

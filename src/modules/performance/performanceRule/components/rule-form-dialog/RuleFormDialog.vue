@@ -4,7 +4,7 @@
     <div class="form-wrapper" v-loading="loading">
       <el-form label-width="100px" :model="formData" :rules="rules" ref="form">
         <el-form-item label="规则名称" prop="prName">
-          <el-input v-model="formData.prName" auto-complete="off" placeholder="[最多6个字]"></el-input>
+          <el-input v-model="formData.prName" auto-complete="off" placeholder="[最多20个字]"></el-input>
         </el-form-item>
         <el-form-item label="规则说明" prop="description">
           <el-input type="textarea" autosize v-model="formData.description" placeholder="[最多500字]" maxlength="500"></el-input>

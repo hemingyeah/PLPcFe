@@ -134,7 +134,6 @@ export default {
   mounted() {
     const that = this;
     window.onresize = () => {
-      console.log(window.innerHeight);
       return (() => {
         that.mapHeight = window.innerHeight;
       })();

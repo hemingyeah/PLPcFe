@@ -1,6 +1,6 @@
 <template>
   <div class="form-textarea">
-    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeholder" maxlength="500" autocomplete="off"></textarea>
+    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeholder" :disabled="field.disabled" maxlength="2000" autocomplete="off"></textarea>
     <span class="form-textarea-summary" :style="{right: `${offsetRight}px`}">{{summary}}</span>
   </div>
 </template>
@@ -21,7 +21,7 @@ export default {
   computed: {
     summary(){
       let length = this.value ? this.value.length : 0;
-      return `${length}/500`
+      return `${length}/2000`
     },
     offsetRight(){
       return getScrollBarWidth() + 4;

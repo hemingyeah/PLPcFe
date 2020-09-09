@@ -235,9 +235,11 @@
     <!-- end 工单发起审批弹窗 -->
 
     <!-- start 完成回执弹窗 -->
-    <task-receipt-edit-dialog
+    <task-receipt-edit-view
       ref="taskReceiptEdit"
       :init-data="initData"
+      :receipt-fields="receiptFields"
+      @proposeApprove="proposeApprove"
     />
     <!-- end 完成回执弹窗 -->
   </div>

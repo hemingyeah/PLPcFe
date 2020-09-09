@@ -85,8 +85,9 @@ export default {
           msg += "。成功分配" + data.succ.length + "个";
         }
         $platform.alert(msg);
-        this.sendMessageDialog = false;
       }
+      window.__exports__refresh = ''
+      this.sendMessageDialog = false;
       $platform.refreshTab(fromId);
     },
     /**

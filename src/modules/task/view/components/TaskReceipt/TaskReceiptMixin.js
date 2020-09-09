@@ -3,6 +3,10 @@ export default {
     initData: {
       type: Object,
       default: () => ({})
+    },
+    shareData: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -19,7 +23,14 @@ export default {
       return this.initData.receiptConfig || {};
     },
     /** 
+    * @description 工单类型设置
+    */
+    taskType() {
+      return this.initData.taskType || {};
+    },
+    /** 
     * @description 非自定义回执
+    * 默认工单且未开启自定义回执(老功能)
     */
     notCustom() {
       return !this.receiptConfig?.customReceipt && this.task.templateId == '1';
@@ -37,10 +48,11 @@ export default {
     sparepartTotal() {
       let { sparepart } = this.form;
       let total = 0;
-
-      sparepart.forEach(item => {
-        total += item.number * item.salePrice;
-      })
+      if (Array.isArray(sparepart)) {
+        sparepart.forEach(item => {
+          total += item.number * item.salePrice;
+        })
+      }
 
       return total.toFixed(2);
     },
@@ -50,10 +62,12 @@ export default {
     serviceTotal() {
       let { serviceIterm } = this.form;
       let total = 0;
-
-      serviceIterm.forEach(item => {
-        total += item.number * item.salePrice;
-      })
+      
+      if (Array.isArray(serviceIterm)) {
+        serviceIterm.forEach(item => {
+          total += item.number * item.salePrice;
+        })
+      }
 
       return total.toFixed(2);
     },

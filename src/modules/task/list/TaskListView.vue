@@ -21,6 +21,7 @@
                   id: item.id,
                   name: '待指派工单',
                   searchModel: item.searchModel,
+                  title: 'created'
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -40,6 +41,7 @@
                   id: item.id,
                   name: '已指派工单',
                   searchModel: item.searchModel,
+                  title: 'allocated'
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -59,6 +61,7 @@
                   id: item.id,
                   name: '已接受工单',
                   searchModel: item.searchModel,
+                  title: 'accepted'
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -78,6 +81,7 @@
                   id: item.id,
                   name: '进行中工单',
                   searchModel: item.searchModel,
+                  title: 'processing'
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -97,6 +101,7 @@
                   id: item.id,
                   name: '异常工单',
                   searchModel: item.searchModel,
+                  title: 'exception'
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item ce6"
@@ -112,11 +117,21 @@
             </div>
             <!-- 全部工单 -->
             <div
+              v-if="dropDownInfo"
+              @click="checkFilter(dropDownInfo)"
+              class="common-list-filter-span1 common-list-filter-flow-item"
+              :class="{
+                'common-list-filter-flow-active': dropDownInfo.id === filterId,
+              }"
+            >{{dropDownInfo.name}}</div>
+            <div
+              v-else
               @click="
                 checkFilter({
                   id: selectIds.allId,
                   name: '全部工单',
                   searchModel: allSearchParams.all,
+                  title: 'all'
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -147,14 +162,17 @@
                 {
                   name: `全部完工(${this.filterData.all || 0})`,
                   searchModel: this.allSearchParams.all,
+                  title: 'all'
                 },
                 {
                   name: `未完成工单(${this.filterData.unfinished || 0})`,
                   searchModel: this.allSearchParams.unfinished,
+                  title: 'unfinished'
                 },
                 {
                   name: `已完成工单(${this.filterData.finished || 0})`,
                   searchModel: this.allSearchParams.finished,
+                  title: 'finished'
                 },
               ]"
               :show="allShow"
@@ -420,34 +438,42 @@
           >
             <template slot-scope="scope">
               <!-- 工单编号 -->
-              <template v-if="column.field === 'taskNo'">
+              <div
+                v-if="column.field === 'taskNo'"
+                :class="{ superscript: scope.row.guideData }"
+              >
                 <a
                   href=""
                   class="view-detail-btn"
-                  @click.stop.prevent="openTaskTab(scope.row.id)"
+                  @click.stop.prevent="
+                    openTaskTab(scope.row.id, scope.row[column.field])
+                  "
                 >
                   {{ scope.row[column.field] }}
                 </a>
                 <!-- TODO: 曾超时 审批中标签 -->
                 <!-- 暂停中 -->
-                <div
-                  class="task-state-block task-state-block--approve"
+                <span
+                  class="task-state-block task-state-block-approve task-font12"
                   v-if="scope.row.inApprove == 1"
                 >
                   审批中
-                </div>
+                </span>
                 <!-- 暂停中 -->
-                <div
-                  class="task-state-block task-state-block--overtime"
-                  v-if="scope.row.isOverTime == 1"
+                <span
+                  class="task-state-block task-state-block-overtime task-font12"
+                  v-if="scope.row.onceOverTime == 1"
                 >
                   超时
-                </div>
-              </template>
+                </span>
+              </div>
 
               <!-- 客户  TODO: 客户查看权限 -->
               <template v-else-if="column.field === 'customer'">
-                <div>
+                <div
+                  :class="{ 'view-detail-btn task-client': scope.row.linkAuth }"
+                  @click.stop="openClientTab(scope.row)"
+                >
                   {{ scope.row["customerEntity"].name }}
                 </div>
               </template>
@@ -514,8 +540,8 @@
                     @click.stop.prevent="
                       openUserTab(
                         column.field === 'createUserName'
-                          ? scope.row.createUser.displayName
-                          : scope.row.executorUser.displayName
+                          ? scope.row.createUser.userId
+                          : scope.row.executorUser.userId
                       )
                     "
                   >
@@ -627,34 +653,28 @@
               </template>
               <!-- 接单用时 -->
               <template v-else-if="column.field === 'acceptUsedTimeStr'">
-                {{
-                  scope.row.acceptUsedTime &&
-                    scope.row.acceptUsedTime
-                }}
+                {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
               </template>
               <!-- 工单用时 -->
               <template v-else-if="column.field === 'taskUsedTimeStr'">
-                {{
-                  scope.row.taskUsedTime &&
-                    scope.row.taskUsedTime
-                }}
+                {{ scope.row.taskUsedTime && scope.row.taskUsedTime }}
               </template>
               <!-- 工作用时 -->
               <template v-else-if="column.field === 'workUsedTimeStr'">
-                {{
-                  scope.row.workUsedTime &&
-                    scope.row.workUsedTime
-                }}
+                {{ scope.row.workUsedTime && scope.row.workUsedTime }}
               </template>
               <!-- 响应用时 -->
               <template v-else-if="column.field === 'taskResponseTimeStr'">
-                {{
-                  scope.row.taskResponseTime &&
-                    scope.row.taskResponseTime
-                }}
+                {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
               </template>
               <!-- 支付方式 -->
-              <template v-else-if="column.field === 'paymentMethod'">
+              <template
+                v-else-if="
+                  column.field === 'paymentMethod' &&
+                    initData.paymentConfig &&
+                    initData.paymentConfig.version === 1
+                "
+              >
                 {{
                   scope.row.attribute["paymentMethod"] &&
                     scope.row.attribute["paymentMethod"]
@@ -758,7 +778,9 @@
         <div slot="tip">
           <div class="base-import-warn">
             请先下载
-            <a :href="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`" target="_blank"
+            <a
+              :href="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
+              target="_blank"
               >导入模版文档</a
             >，填写完成后再上传导入。
           </div>

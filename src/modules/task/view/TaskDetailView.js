@@ -12,9 +12,8 @@ import ApproveTaskDialog from './components/ApproveTaskDialog.vue';
 import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 
 import TaskInfoRecord from './components/TaskInfoRecord.vue';
-import TaskReceipt from './components/TaskReceipt';
 import TaskReceiptView from './components/TaskReceipt/View/TaskReceiptView.vue';
-import TaskReceiptEdit from './components/TaskReceipt/Edit/TaskReceiptEdit.vue';
+import TaskReceiptEditView from './components/TaskReceipt/Edit/TaskReceiptEditView.vue';
 import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
@@ -53,6 +52,7 @@ export default {
         visible: false,
         reason: ''
       },
+      receiptFields: [] // 自定义回执字段
     }
   },
   computed: {
@@ -343,30 +343,35 @@ export default {
       );
     },
     /** 
-     * @description 是否显示 [回执信息]tab
-     * 1. 工单状态是finished/costed/closed其中一种
-     * 2. 或 
-      (1)当前登录账户是工单负责人
-      (2)且 不是审批和暂停状态
-      (3)且 若工单状态是accepted且流程设置禁用开始节点 或者 若工单状态是processing且流程设置开启开始节点
-    * 3. 满足以上条件后，若回执表单自定义字段length=0且工单类型不是默认工单taskType != '1' 且 不显示回执附件/备件/服务项目且未开启自定义(!taskType.options.showAttachment && !taskType.options.showSparepart && !taskType.options.showService && !taskType.options.customerSign)时隐藏tab
+    * @description 非自定义回执
+    * 默认工单且未开启自定义回执(老功能)
+    */
+    notCustom() {
+      let receiptConfig = this.initData.receiptConfig || {};
+      return receiptConfig?.customReceipt && this.task.templateId == '1';
+    },
+    /** 
+    * @description 显示回执
+    * 1. 工单状态是finished/costed/closed其中一种
+    * 2. 或 满足显示回执按钮条件
+    * 3. 或 工单处于完成审批中
+    */
+    showReceipt() {
+      return this.finishedState || this.allowFinishTask || this.approvingForComplete;
+    },
+    /** 
+    * @description 是否显示 [回执信息]tab
+    * 满足显示回执条件后，回执表单自定义字段length=0且时隐藏tab(不包含默认工单且未开启自定义回执)
     */
     viewReceiptTab() {
-      let {
-        id,
-        customerSign,
-        showAttachment,
-        showService,
-        showSparepart
-      } = this.taskType.options || {};
-
-      // TODO: 回执表单是否包含字段
-      let hasField = true;
-      return (this.finishedState || this.allowFinishTask || this.approvingForComplete) && !(!hasField && id != '1' && !showAttachment && !showService && !showSparepart && !customerSign);
+      // 回执表单是否包含字段
+      let hasField = this.receiptFields.length > 0;
+      return this.showReceipt && (!this.notCustom && hasField);
     },
     // 处理完成审批
-    approvingForComplete(){
-      let { canEditTask, receiptDraft } = this.initData;
+    approvingForComplete() {
+      // TODO: receiptDraft
+      let { canEditTask, receiptDraft = true } = this.initData;
       let canLookCompleteReceipt = canEditTask || this.permission.VIP_APPROVE == 3;
 
       return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.initData.canApprove || canLookCompleteReceipt) && receiptDraft;
@@ -409,7 +414,8 @@ export default {
     propsForSubComponents() {
       return {
         task: this.task,
-        auth: this.permission
+        auth: this.permission,
+        isFinishApproving: this.approvingForComplete
       }
     },
   },
@@ -424,7 +430,7 @@ export default {
         },
         {
           displayName: '回执信息',
-          component: TaskReceipt.name,
+          component: TaskReceiptView.name,
           show: this.viewReceiptTab
         },
         {
@@ -440,7 +446,7 @@ export default {
         {
           displayName: '附加组件',
           component: TaskCard.name,
-          show: this.initData.cardInfo.length
+          show: this.initData?.cardInfo?.length
         }
       ].filter(tab => tab.show);
     },
@@ -740,13 +746,28 @@ export default {
       } else if (action === 'finish') {
         this.$refs.taskReceiptEdit.openDialog();
       }
+    },
+    // 发起审批
+    proposeApprove(data) {
+      this.$refs.proposeApprove.openDialog(data);
     }
   },
   async mounted() {
     try {
       this.loading = true;
 
-      const fields = await TaskApi.getTaskTemplateFields({ templateId: this.task.templateId, tableName: 'task' });
+      let { templateId } = this.task;
+
+      let subtask = [
+        TaskApi.getTaskTemplateFields({ templateId, tableName: 'task' })
+      ];
+
+      // 显示回执时获取回执字段信息
+      if (this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: 'task_receipt' }));
+
+      const result = await Promise.all(subtask);
+
+      const fields = result[0] || [];
       this.fields = [...fields, {
         displayName: '负责人',
         fieldName: 'executor',
@@ -779,6 +800,7 @@ export default {
         isSystem: 1,
       }];
 
+      this.receiptFields = result[1] || [];
       this.tabs = this.buildTabs();
 
       this.loading = false;
@@ -793,9 +815,8 @@ export default {
     [ApproveTaskDialog.name]: ApproveTaskDialog,
     [ProposeApproveDialog.name]: ProposeApproveDialog,
     [TaskInfoRecord.name]: TaskInfoRecord,
-    [TaskReceipt.name]: TaskReceipt,
     [TaskReceiptView.name]: TaskReceiptView,
-    [TaskReceiptEdit.name]: TaskReceiptEdit,
+    [TaskReceiptEditView.name]: TaskReceiptEditView,
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,

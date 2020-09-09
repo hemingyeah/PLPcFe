@@ -7,7 +7,7 @@
       @compositionend="compositionend"
       @input="inputEvent"
       :placeholder="field.placeholder?field.placeholder:placeholder"
-      :maxlength="field.maxlength?field.maxlength:500"
+      :maxlength="field.maxlength?field.maxlength:1000"
       :id="`form_${field.fieldName}`" 
       autocomplete="off"
       :disabled="field.disabled"/>

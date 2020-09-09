@@ -144,6 +144,16 @@ const FormView = {
         </div>
       )
     },
+    buildAutoGraph({displayName, value}) {
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+          <div class="form-view-row-content">
+            { value && <div class="form-view-autograph-content"><img src={value} /></div> }
+          </div>
+        </div>
+      )
+    },
 
     openMap({address, title}) {
       if (!address) return;
@@ -178,10 +188,14 @@ const FormView = {
       if (this.$scopedSlots[fieldName]) {
         return this.$scopedSlots[fieldName]({displayName, value, formType, field});
       }
-
-      // 电子签名
-      if (formType === 'autograph' && this.$scopedSlots[formType]) {
-        return this.$scopedSlots[formType]({displayName, value, formType, field});
+      
+      // 电子签名、客户签名
+      if (formType === 'autograph' || formType === 'systemAutograph') {
+        params = {
+          ...params,
+          value
+        };
+        return this.buildAutoGraph(params);
       }
 
       // 组件默认视图
