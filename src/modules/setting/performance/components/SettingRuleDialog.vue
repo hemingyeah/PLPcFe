@@ -3,7 +3,7 @@
     <el-form ref="form" :model="form" label-width="80px">
 
       <el-form-item label="规则名称" :error="formValidationResult.ruleName" required>
-        <el-input v-model="form.ruleName" @change="validate" placeholder="[最多6个字]" :maxlength="6"></el-input>
+        <el-input v-model="form.ruleName" @change="validate" placeholder="[最多20个字]" :maxlength="20"></el-input>
       </el-form-item>
       <el-form-item label="规则说明" :error="formValidationResult.ruleDesc" required>
         <el-input v-model="form.ruleDesc" @change="validate" type="textarea" placeholder="[最多500个字]" :maxlength="500"></el-input>

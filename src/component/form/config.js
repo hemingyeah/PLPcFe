@@ -4,7 +4,7 @@ export const FORM_FIELD_MAX = 100;
 export const FORM_FIELD_LOGICAL_DISABLE = ['separator'];
 
 // 字段名称最大字数
-export const FIELD_NAME_LENGTH_MAX = 6;
+export const FIELD_NAME_LENGTH_MAX = 20;
 // 字段说明最大字数
 export const FIELD_PLACEHOLER_LENGTH_MAX = 128;
 
@@ -14,5 +14,5 @@ export const SELECT_OPTION_MAX = 200;
 export const SELECT_OPTION_LENGTH_MAX = 50;
 
 // 信息字段最长文本限制
-export const INFO_FIELD_LENGTH_MAX = 500;
+export const INFO_FIELD_LENGTH_MAX = 2000;
 
