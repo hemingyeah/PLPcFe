@@ -53,7 +53,7 @@
     <div class="table-box">
       <div class="table-box-title">商品信息</div>
       <!-- table-info start -->
-      <el-table class="table-info" :data="tableData" stripe border>
+      <el-table class="table-info" :data="tableData" stripe border header-row-class-name="myShop-order-detail-heard">
         <el-table-column
           v-for="column in columns"
           :key="column.field"
@@ -295,6 +295,13 @@ export default {
   box-sizing: border-box;
 
   padding-left: 16px;
+  .el-table {
+    .myShop-order-detail-heard th {
+      background: #f5f5f5;
+      color: $text-color-primary;
+      font-weight: normal;
+    }
+  }
   .table-box-title {
     height: 58.51px;
     line-height: 58.51px;

@@ -47,7 +47,7 @@
     <div class="info-box flex-x al-start">
       <div class="flex-x min-w-406 mar-r-53 mar-b-20">
         门户网页地址：
-        <el-input class="flex-1" v-model="input" readonly placeholder="请输入内容"></el-input>
+        <el-input class="flex-1" readonly placeholder="请输入内容"></el-input>
         <el-button class type="primary">复制</el-button>
       </div>
 
@@ -74,7 +74,7 @@
           <i class="iconfont icon-fd-link mar-r-6"></i>
           绑定微信或钉钉服务窗
           <el-tooltip class="item" effect="dark" content="Right Center 提示文字" placement="right">
-            <i class="iconfont icon-question mar-l-6 "></i>
+            <i class="iconfont icon-question mar-l-6"></i>
           </el-tooltip>
         </div>
         <div class="flex-x info-tips mar-l-16 cur-point">
@@ -84,16 +84,72 @@
       </div>
     </div>
     <!-- info-box end -->
+
+    <!-- setting-box start -->
+    <div class="setting-box">
+      <div class="flex-x">
+        <div class="flex-x setting-show-box flex-1">
+          <div class="setting-show">
+            <div class="setting-show-data-box">
+              <draggable class="menu-box" v-model="dataList">
+                <div
+                  class="can-move"
+                  v-for="(item, index) in dataList"
+                  :key="index"
+                  draggable="true"
+                  @click="chooseNowSet(item)"
+                >
+                  <component
+                    :is="item.type"
+                    ref="customerIchangeThisnfo"
+                    :info-data="item.data"
+                    :cmp-id="item.id"
+                    @changeThis="changeThis"
+                    @pushIcon="pushIcon"
+                  ></component>
+                </div>
+              </draggable>
+            </div>
+          </div>
+        </div>
+        <div class="setting-data">
+          <keep-alive>
+            <component
+              v-if="nowSettingDataId > 0"
+              :is="nowSettingData.name"
+              ref="customerInfo"
+              :info-data="nowSettingData.data"
+              :cmp-id="nowSettingData.id"
+              :icon-set-id="nowSettingData.iconSetId"
+              @saveIconItem="saveIconItem"
+              @deleteIconItem="deleteIconItem"
+            ></component>
+          </keep-alive>
+        </div>
+      </div>
+    </div>
+    <!-- setting-box end -->
   </div>
 </template>
 <script>
+import draggable from "vuedraggable";
+import _ from "lodash";
+
+import settingMixin from "./settingShowCmp/index";
+import userImg from "@src/assets/img/myShop/logo.png";
 export default {
   name: "my-shop",
+  mixins: [settingMixin],
   props: {
     initData: {
       type: Object,
       default: () => ({}),
     },
+  },
+  provide() {
+    return {
+      cancelInfoData: this.cancelInfoData,
+    };
   },
   data() {
     return {
@@ -110,15 +166,118 @@ export default {
         },
       ],
       options_value: 1,
+      dataList: [
+        {
+          type: "company-card",
+          id: 1,
+          data: {
+            imageUrl: userImg,
+            name: "北京众联成业有限公司",
+            phone: "18289283849",
+            address: "湖南省株洲市石峰区兴安街584号",
+          },
+        },
+        {
+          type: "icon-list",
+          id: 2,
+          data: [],
+        },
+        {
+          type: "shops-list",
+          id: 3,
+          data: [],
+        },
+        {
+          type: "wiki-enter",
+          id: 4,
+          data: [
+            { title: "标题", name: "橘子", read: "1.2W" },
+            { title: "标题", name: "橘子", read: "1.2W" },
+          ],
+        },
+      ],
+      nowSettingDataId: -1,
+      nowSettingIconId: "",
+      nowSettingData: {},
     };
   },
+  computed: {},
+  methods: {
+    chooseNowSet(item) {
+      if (item.type == "icon-list") return;
+      let id = item.id;
+      if (this.nowSettingDataId == id) {
+        return;
+      }
+      this.nowSettingDataId = id;
+      if (id > 0) {
+        let res_ = this.findNowSetData(this.nowSettingDataId).item;
+        this.$set(this, "nowSettingData", {
+          name: `${res_.type}-data`,
+          data: res_.data,
+          id: res_.id,
+        });
+      }
+    },
+    changeThis(item) {
+      let data_ = this.findNowSetData(item.id).item;
+
+      let nowSettingData = {
+        id: item.item.cmpId,
+        name: `${data_.type}-data`,
+        data: data_.data,
+        iconSetId: item.item.id,
+      };
+      this.nowSettingDataId = 1;
+      this.$set(this, "nowSettingData", nowSettingData);
+    },
+    pushIcon(item) {
+      let index = this.findNowSetData(item.id).index;
+      this.dataList[index].data.push(item.item);
+    },
+    findNowSetData(id) {
+      let res;
+      if (id < 0) {
+        return false;
+      }
+      try {
+        for (let index = 0; index < this.dataList.length; index++) {
+          const item = this.dataList[index];
+          if (item.id == id) {
+            res = { item, index };
+            break;
+          }
+        }
+      } catch (error) {}
+
+      return res;
+    },
+    saveIconItem(e) {
+      let index = this.findNowSetData(e.id).index;
+      this.$set(this.dataList[index].data, `${e.indexs}`, e.item);
+    },
+    deleteIconItem(e) {
+      let index = this.findNowSetData(e.id).index;
+      let data_ = _.cloneDeep(this.dataList[index].data);
+      data_.splice(e.indexs, 1);
+      this.$set(this.dataList[index], "data", data_);
+      this.nowSettingDataId = -1;
+    },
+    cancelInfoData() {
+      this.nowSettingDataId = -1;
+    },
+  },
   created() {},
-  methods: {},
-  components: {},
+  components: {
+    draggable,
+  },
 };
 </script>
 <style lang="scss">
-@import url('../assets/public.scss');
+@import url("../assets/public.scss");
+.my-shop-box {
+  min-width: 730px;
+}
 
 .ruler-box {
   background: #fff;
@@ -140,6 +299,7 @@ export default {
   padding: 26px 11px 0 11px;
   border-radius: 4px;
   flex-wrap: wrap;
+  margin-bottom: 12px;
   .code-box {
     padding: 8px 16px 0 16px;
     border: 1px solid #ebeded;
@@ -161,7 +321,37 @@ export default {
     padding: 0 6px;
   }
 }
+.setting-box {
+  .setting-show-box {
+    justify-content: center;
+    .setting-show {
+      background: url("../../../assets/img/iphoneX.png") no-repeat center 0;
+      background-size: 100% 100%;
+      position: relative;
+      height: 669px;
+      width: 375px;
+      .setting-show-data-box {
+        background: #f2f2f2;
+        position: absolute;
+        width: 339px;
+        height: 572px;
+        top: 45px;
+        left: 18px;
+        overflow-y: scroll;
+        // background: #ff0000;
+      }
+    }
+  }
+  .setting-data {
+    width: 330px;
+    background: #fff;
+    height: 691px;
+  }
+}
 .el-switch__label {
   color: #9ba3a1;
+}
+::-webkit-scrollbar {
+  display: none;
 }
 </style>

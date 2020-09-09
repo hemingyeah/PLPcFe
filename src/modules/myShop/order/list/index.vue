@@ -9,7 +9,7 @@
         </el-input>
       </div>
 
-      <div class="search-more">
+      <div class="search-more min-w-700">
         <div class="search-checkbox flex-x mar-b-12">
           <div class="mar-r-38">订单状态：</div>
           <el-checkbox-group v-model="search_checked">
@@ -21,7 +21,7 @@
             ></el-checkbox>
           </el-checkbox-group>
         </div>
-        <div class="search-datecheck flex-x">
+        <div class="search-datecheck min-w-700 flex-x">
           <div class="mar-r-38">下单时间：</div>
           <div class="search-date">
             <el-date-picker
@@ -131,9 +131,10 @@
           @select="selectionHandle"
           @select-all="selectionHandle"
           :highlight-current-row="false"
-          header-row-class-name="product-template-table-header"
+          border
+          header-row-class-name="myShop-order-list-heard"
           ref="productTemplateTable"
-          class="product-template-table"
+          class="myShop-order-list-table"
         >
           <!-- <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column> -->
           <el-table-column
@@ -143,13 +144,21 @@
             :label="column.label"
             :prop="column.field"
             :width="column.width"
-            :min-width="column.minWidth || '120px'"
+            :min-width="column.minWidth"
             :sortable="column.sortable"
             show-overflow-tooltip
             :align="column.align"
           >
             <template slot-scope="scope">
-              <template v-if="column.conType === 'btnArray'">
+              <template v-if="column.conType === 'goods'">
+                <div class="flex-x">
+                  <div class="flex-x goods-img-list flex-1">
+                    <img v-for="(item, index) in 5" :key="index" src="@src/assets/img/no-data.png" >
+                  </div>
+                  <div>共5件</div>
+                </div>
+              </template>
+              <template v-else-if="column.conType === 'btnArray'">
                 <a
                   v-for="(item, index) in column.btnArr"
                   :key="index"
@@ -173,11 +182,11 @@
                 v-else-if="column.field === 'sendTime'"
               >{{ scope.row.sendTime | formatDate }}</template>
 
-              <div
+              <!-- <div
                 v-else-if="column.formType === 'textarea'"
                 v-html="buildTextarea(scope.row.attribute[column.field])"
                 @click="openOutsideLink"
-              ></div>
+              ></div> -->
 
               <template v-else>{{scope.row[column.field]}}</template>
             </template>
@@ -349,153 +358,54 @@ export default {
     };
   },
   created() {
+    this.page.list = [
+      {
+        goods: {
+          img: "",
+          name:
+            "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
+        },
+        data_1: "data_1",
+        data_2: "data_2",
+        data_3: "data_3",
+        data_4: "data_4",
+        data_5: "data_5",
+        data_6: "data_6",
+      },
+
+      {
+        goods: {
+          img: "",
+          name:
+            "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
+        },
+        data_1: "data_1",
+        data_2: "data_2",
+        data_3: "data_3",
+        data_4: "data_4",
+        data_5: "data_5",
+        data_6: "data_6",
+      },
+      {
+        goods: {
+          img: "",
+          name:
+            "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
+        },
+        data_1: "data_1",
+        data_2: "data_2",
+        data_3: "data_3",
+        data_4: "data_4",
+        data_5: "data_5",
+        data_6: "data_6",
+      },
+    ];
   },
   computed: {
     productFields() {
-      return (
-        this.initData.productFields || [
-          {
-            displayName: "通知类型",
-            fieldName: "name",
-            formType: "select",
-            placeHolder: "请输入联系人姓名",
-            isExport: false,
-            setting: {
-              isMulti: false,
-              dataSource: [
-                {
-                  text: "全部类型",
-                  value: "",
-                },
-                {
-                  text: "工单响应通知",
-                  value: "taskResponseHandle",
-                },
-                {
-                  text: "工单完成通知（回访）",
-                  value: "autoReviewHandle",
-                },
-                {
-                  text: "工单动态更新通知",
-                  value: "taskRemarkEdit",
-                },
-                {
-                  text: "新建事件通知",
-                  value: "eventCreateHandle",
-                },
-                {
-                  text: "事件完成通知",
-                  value: "eventFinishHandle",
-                },
-                {
-                  text: "定时通知",
-                  value: "remindMessageHandle",
-                },
-                {
-                  text: "计划时间通知",
-                  value: "taskPlanSmsRemindHandle",
-                },
-                {
-                  text: "客户短信提醒",
-                  value: "sendSms2Cus",
-                },
-                {
-                  text: "产品短信提醒",
-                  value: "sendSms2CusByPro",
-                },
-                {
-                  text: "自助门户验证码",
-                  value: "SSP",
-                },
-                {
-                  text: "验证码",
-                  value: "SuperAdmin",
-                },
-              ],
-            },
-            isSystem: 1,
-            orderId: 1,
-          },
-          {
-            displayName: "手机号码",
-            fieldName: "phone",
-            formType: "text",
-            placeHolder: "请输入手机号",
-            isExport: false,
-            isSystem: 1,
-            orderId: 2,
-          },
-          {
-            displayName: "模板名称",
-            fieldName: "templateId",
-            formType: "select",
-            placeHolder: "请选择客户",
-            isExport: false,
-            setting: {
-              isMulti: false,
-              dataSource: [],
-            },
-            isSystem: 1,
-            orderId: 3,
-          },
-          {
-            displayName: "关联编号",
-            fieldName: "relevanceNumber",
-            formType: "text",
-            placeHolder: "请输入关联编号",
-            isExport: false,
-            isSystem: 1,
-            orderId: 4,
-          },
-          {
-            displayName: "按时间查询",
-            fieldName: "time",
-            formType: "date",
-            placeHolder: "请输入关联编号",
-            // defaultTime: ["00:00:00", "23:59:59"],
-            returnData: (result) => {
-              let obj = {
-                startTime: formatDate(result[0], "YYYY-MM-DD HH:mm:ss"),
-                endTime: formatDate(result[1], "YYYY-MM-DD HH:mm:ss"),
-              };
-              return obj;
-            },
-            isExport: false,
-            isSystem: 1,
-            orderId: 5,
-          },
-          {
-            displayName: "选择状态",
-            fieldName: "sta",
-            formType: "select",
-            placeHolder: "请输入关联编号",
-            isExport: false,
-            setting: {
-              isMulti: false,
-              dataSource: [
-                {
-                  text: "全部",
-                  value: "",
-                },
-                {
-                  text: "成功",
-                  value: "succ_send",
-                },
-                {
-                  text: "失败",
-                  value: "fail_send",
-                },
-                {
-                  text: "发送中",
-                  value: "doing_send",
-                },
-              ],
-            },
-            isSystem: 1,
-            orderId: 6,
-          },
-        ]
-      ).sort((a, b) => a.orderId - b.orderId);
+      return (this.initData.productFields || []).sort(
+        (a, b) => a.orderId - b.orderId
+      );
     },
     // 导出权限
     authExport() {
@@ -554,37 +464,63 @@ export default {
         {
           label: "商品",
           field: "goods",
+          conType: "goods",
           show: true,
-          fixed: true,
           minWidth: "516px",
         },
         {
           label: "订单号",
-          field: "phones",
+          field: "data_1",
           minWidth: "181px",
           show: true,
         },
         {
           label: "下单时间",
-          field: "sendNum",
-          fixed: true,
+          field: "data_2",
           show: true,
         },
         {
           label: "实付金额",
-          field: "sendTime",
-          fixed: true,
+          field: "data_3",
           show: true,
         },
         {
           label: "订单状态",
-          field: "relevanceNumber",
-          fixed: true,
+          field: "data_4",
           show: true,
         },
         {
           label: "操作",
-          field: "status",
+          field: "btnArray",
+          conType: "btnArray",
+          minWidth: "180px",
+          btnArr: [
+            {
+              name: "编辑",
+              styleType: (obj) => {
+                return "color:#55b7b4";
+              },
+              click: (obj) => {
+                if (pending) return;
+                if (!this.hasEditCustomerAuth(obj)) return;
+                this.openDialog(obj);
+              },
+            },
+            {
+              name: "删除",
+              styleType: (obj) => {
+                return obj.isMain
+                  ? "color:#999;cursor: not-allowed;"
+                  : "color:#55b7b4";
+              },
+              click: (obj) => {
+                if (pending) return;
+                if (!this.hasEditCustomerAuth(obj)) return;
+                if (obj.isMain) return;
+                this.deleteLinkman(obj);
+              },
+            },
+          ],
           fixed: true,
           show: true,
         },
@@ -1136,6 +1072,23 @@ export default {
 @import url("../../assets/public.scss");
 label {
   margin-bottom: 0;
+}
+.myShop-order-list-table {
+  padding: 12px;
+  .goods-img-list{
+    img{
+      width: 32px;
+      height: 32px;
+      margin-right: 4px;
+    }
+  }
+}
+.el-table {
+  .myShop-order-list-heard th {
+    background: #f5f5f5;
+    color: $text-color-primary;
+    font-weight: normal;
+  }
 }
 .search-modal-box {
   background: #fff;
