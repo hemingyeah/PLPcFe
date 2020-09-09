@@ -5,6 +5,7 @@ import {
 } from "@model/param/in/Task";
 
 const fixedPrefixTaskPath = "/api/task";
+const ElASTICSEARCH = "/api/elasticsearch";
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -465,7 +466,7 @@ export function rollBackTask(params: {} | undefined) {
  * @param {Array} params.taskIds - 需要删除的工单id数组
  */
 export function deleteTask(params: {} | undefined) {
-  return http.post(`/outside/pc/task/delete`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/delete`, params);
 }
 
 /**
@@ -822,7 +823,7 @@ export function getTaskTemplate(params: {} | undefined) {
  * @param {string} params.view	 - 视图
  */
 export function search(params: {} | undefined) {
-  return http.post("/outside/es/task/search", params);
+  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
 }
 /*
  * 工单设置，回执合规设置模块 保存自定义打印模板
@@ -901,7 +902,7 @@ export function withPart(params: Object = {}) {
  * @description 批量更新
  */
 export function editBatchTask(params: Object = {}) {
-  return http.post("/outside/pc/task/editBatchTask", params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/editBatchTask`, params);
 }
 
 /**
