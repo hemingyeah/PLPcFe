@@ -7,14 +7,8 @@
       </div>
       <!-- end 审批中icon -->
 
-      <!-- start 非自定义回执 -->
-      <template v-if="notCustom">
-        
-      </template>
-      <!-- end 非自定义回执 -->
-
-      <!-- start 自定义回执 -->
-      <form-view :fields="fields" :value="form" v-else>
+      <!-- start 回执信息 -->
+      <form-view :fields="fields" :value="form">
         <!-- start 备件 -->
         <template slot="sparepart" slot-scope="{ field, value }">
           <div class="form-view-row">
@@ -37,15 +31,21 @@
         </template>
         <!-- end 服务项目 -->
       </form-view>
-      <!-- end 自定义回执 -->
+      <!-- end 回执信息 -->
 
       <!-- start 合计 -->
-      <div class="totalExpense" v-if="hasExpense">
-        <span v-if="form.disExpense">折扣费用：{{ form.disExpense }}</span>
-        <span>合计：{{ totalExpense }}</span>
+      <div class="form-view-row" v-if="hasExpense">
+        <label>费用合计</label>
+        <div class="form-view-row-content">
+          <el-table :data="totalData" header-row-class-name="base-table-header-v3" row-class-name="base-table-row-v3" border>
+            <el-table-column prop="sparepartTotal" label="备件费用" v-if="showSparepart"></el-table-column>
+            <el-table-column prop="serviceTotal" label="服务费用" v-if="showService"></el-table-column>
+            <el-table-column label="折扣费用" prop="disExpense" v-if="form.disExpense != null"></el-table-column>
+            <el-table-column prop="totalExpense" label="应收合计(元)"></el-table-column>
+          </el-table>
+        </div>
       </div>
       <!-- end 合计 -->
-
     </div>
 
     <!-- start 按钮组 -->
@@ -58,6 +58,7 @@
     <task-receipt-edit-view
       ref="taskReceiptEdit"
       :init-data="initData"
+      :receipt-fields="shareData.receiptFields"
     />
     <!-- end 编辑回执弹窗 -->
   </div>

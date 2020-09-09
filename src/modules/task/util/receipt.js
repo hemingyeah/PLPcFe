@@ -53,7 +53,7 @@ export function packToReceipt(fields, form) {
         o.id = service.id;
         o.taskId = form.id;
         o.name = service.name;
-        o.number = parseInt(service.num || 0);
+        o.number = Number(service.number) || 0;
         o.type = '服务';
         o.salePrice = service.salePrice;
         o.outPrice = service.costPrice;
@@ -69,6 +69,12 @@ export function packToReceipt(fields, form) {
       return;
     }
 
+    // 回执内容
+    if(fieldName === 'receiptContent') {
+      task.receiptContent = value || '';
+      return;
+    }
+
     if(fieldName === 'receiptAttachment'){
       // 拼附件和回执附件
       task.attachment = (value || []).map(a => {
@@ -77,6 +83,11 @@ export function packToReceipt(fields, form) {
       })
 
       return;
+    }
+
+    // 客户签名
+    if(fieldName === 'systemAutograph') {
+      task.autograph = value || '';
     }
 
     if (field.formType === 'address' && !field.isSystem) {
