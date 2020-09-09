@@ -33,7 +33,7 @@ import { trimAll } from '@src/util/lang';
 import Page from '@model/Page';
 import { openTabForEventView } from '@src/util/business/openTab';
 /* enum */
-import { TaskFieldNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
 
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length > 0 
