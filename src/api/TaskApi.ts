@@ -5,7 +5,10 @@ import {
 } from "@model/param/in/Task";
 
 const fixedPrefixTaskPath = "/api/task";
-const ElASTICSEARCH = "/api/elasticsearch";
+const ElASTICSEARCH =  "/api/elasticsearch";
+
+// const fixedPrefixTaskPath = "";
+// const ElASTICSEARCH =  "";
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -830,8 +833,7 @@ export function getTaskTemplate(params: {} | undefined) {
  * @param {string} params.view	 - 视图
  */
 export function search(params: {} | undefined) {
-  // return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
-  return http.post(`/outside/es/task/search`, params);
+  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
 }
 /*
  * 工单设置，回执合规设置模块 保存自定义打印模板

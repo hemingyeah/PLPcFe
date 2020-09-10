@@ -716,7 +716,7 @@
             :page-size="taskPage.pageSize"
             :current-page="taskPage.pageNum"
             layout="prev, pager, next, sizes, jumper"
-            :total="taskPage.total"
+            :total="taskPage.totalElements"
           >
           </el-pagination>
         </div>
@@ -749,7 +749,7 @@
         :group="true"
         :validate="checkExportCount"
         method="post"
-        action="/excels/task/export"
+        action="/excels/task/newExport"
       />
       <!-- end 导出工单 -->
       <!-- S 存为视图弹框 -->
