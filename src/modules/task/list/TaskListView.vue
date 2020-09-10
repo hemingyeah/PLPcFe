@@ -716,7 +716,7 @@
             :page-size="taskPage.pageSize"
             :current-page="taskPage.pageNum"
             layout="prev, pager, next, sizes, jumper"
-            :total="taskPage.total"
+            :total="taskPage.totalElements"
           >
           </el-pagination>
         </div>

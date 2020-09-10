@@ -517,19 +517,19 @@ export default {
           accepted,
           processing,
           exception,
-          created: created + refused,
-          finished: finished + costed,
+          created: this._number(created) + this._number(refused),
+          finished: this._number(finished) + this._number(costed),
           all:
-            allocated +
-            accepted +
-            processing +
-            taskPool +
-            created +
-            refused +
-            finished +
-            costed,
+          this._number(allocated) +
+          this._number(accepted) +
+          this._number(processing) +
+          this._number(taskPool) +
+          this._number(created) +
+          this._number(refused) +
+          this._number(finished) +
+          this._number(costed),
           unfinished:
-            created + refused + allocated + taskPool + accepted + processing,
+          this._number(created) + this._number(refused) + this._number(allocated) + this._number(taskPool) + this._number(accepted) + this._number(processing),
         };
         localStorage.setItem(
           "getTaskCountByState",
@@ -539,6 +539,9 @@ export default {
       // } else {
       //   this.filterData = localData.filterData;
       // }
+    },
+    _number(number) {
+      return number ? number : 0
     },
     /**
      * @description 工单导入
