@@ -676,7 +676,7 @@ export function getTaskCardDetailList(params: {} | undefined) {
  * 顶部筛选, 状态数据展示
  */
 export function getTaskCountByState(params: {} | undefined) {
-  return http.get("/task/getTaskCountByState", params);
+  return http.post(`${ElASTICSEARCH}/outside/es/task/getTaskCountByState`, params);
 }
 /**
  * 存为视图
@@ -964,4 +964,12 @@ export function taskRecordDelete(params: any) {
 export function dialout(params: object) {
   return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params);
 }
+
+/**
+ * @description 获取视图
+ */
+export function getUserViews(params: object) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getUserViews`, params);
+}
+
 /* -------------  end  新工单api ---------------- */
