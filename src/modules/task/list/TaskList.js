@@ -463,7 +463,7 @@ export default {
       if (["all", "unfinished", "finished"].indexOf(title) === -1) {
         this.dropDownInfo = "";
       }
-      this.getTaskCountByState(searchModel)
+      this.getTaskCountByState(searchModel);
       this.search(searchModel);
       this.buildColumns();
       // 埋点
@@ -481,7 +481,7 @@ export default {
       };
       this.otherText = "其他";
       this.filterId = id;
-      this.getTaskCountByState(searchModel)
+      this.getTaskCountByState(searchModel);
       this.search(searchModel);
       this.buildColumns();
     },
@@ -499,43 +499,43 @@ export default {
       // var now = new Date().getTime();
       // const localData = JSON.parse(localStorage.getItem("getTaskCountByState"));
       // if (!localData || now - localData.date > 60 * 60 * 1000) {
-        TaskApi.getTaskCountByState(searchModel).then((res) => {
-          if (!res.success) return
-          const {
-            created,
-            refused,
-            allocated,
-            accepted,
-            exception,
-            processing,
-            taskPool,
-            finished,
+      TaskApi.getTaskCountByState(searchModel).then((res) => {
+        if (!res.success) return;
+        const {
+          created,
+          refused,
+          allocated,
+          accepted,
+          exception,
+          processing,
+          taskPool,
+          finished,
+          costed,
+        } = res.result;
+        this.filterData = {
+          allocated,
+          accepted,
+          processing,
+          exception,
+          created: created + refused,
+          finished: finished + costed,
+          all:
+            allocated +
+            accepted +
+            processing +
+            taskPool +
+            created +
+            refused +
+            finished +
             costed,
-          } = res.result;
-          this.filterData = {
-            allocated,
-            accepted,
-            processing,
-            exception,
-            created: created + refused,
-            finished: finished + costed,
-            all:
-              allocated +
-              accepted +
-              processing +
-              taskPool +
-              created +
-              refused +
-              finished +
-              costed,
-            unfinished:
-              created + refused + allocated + taskPool + accepted + processing,
-          };
-          localStorage.setItem(
-            "getTaskCountByState",
-            JSON.stringify({ data: now, filterData: this.filterData })
-          );
-        });
+          unfinished:
+            created + refused + allocated + taskPool + accepted + processing,
+        };
+        localStorage.setItem(
+          "getTaskCountByState",
+          JSON.stringify({ data: now, filterData: this.filterData })
+        );
+      });
       // } else {
       //   this.filterData = localData.filterData;
       // }
@@ -593,8 +593,8 @@ export default {
       });
       this.region["viewId"] = this.otherList[0].id;
       this.region["searchModel"] = this.initData.expTSMJSON;
-      this.region["selectedCols"] = selectCols.join(',');
-      console.log(this.region)
+      this.region["selectedCols"] = selectCols.join(",");
+      console.log(this.region);
       this.$refs.viewModel.open();
     },
     /**
@@ -942,7 +942,7 @@ export default {
         templateId: this.currentTaskType.id || "",
         tableName: "task",
       };
-      console.log(params)
+      console.log(params);
       return TaskApi.getTaskTemplateFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task";
@@ -963,7 +963,7 @@ export default {
         templateId: this.currentTaskType.id || "",
         tableName: "task_receipt",
       };
-      console.log(params)
+      console.log(params);
       return TaskApi.getTaskTemplateFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task_receipt";
@@ -1613,6 +1613,7 @@ export default {
      * @description 时间字符串切割
      */
     _time(params, num) {
+      if (!params) return;
       if (params && !isNaN(num)) {
         return new Date(params.split("-")[num]);
       } else {

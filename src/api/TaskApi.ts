@@ -683,7 +683,8 @@ export function getTaskCardDetailList(params: {} | undefined) {
  * 顶部筛选, 状态数据展示
  */
 export function getTaskCountByState(params: {} | undefined) {
-  return http.post(`${ElASTICSEARCH}/outside/es/task/getTaskCountByState`, params);
+  // return http.post(`${ElASTICSEARCH}/outside/es/task/getTaskCountByState`, params);
+  return http.post(`/outside/es/task/getTaskCountByState`, params);
 }
 /**
  * 存为视图
@@ -695,8 +696,12 @@ export function getTaskCountByState(params: {} | undefined) {
  * @param {String} params.tsmStr
  */
 export function createView(params: {} | undefined) {
+  // return http.post(
+  //   `${fixedPrefixTaskPath}/outside/pc/view/createTaskView`,
+  //   params
+  // );
   return http.post(
-    `${fixedPrefixTaskPath}/outside/pc/view/createTaskView`,
+    `/outside/pc/view/createTaskView`,
     params
   );
 }
@@ -830,7 +835,8 @@ export function getTaskTemplate(params: {} | undefined) {
  * @param {string} params.view	 - 视图
  */
 export function search(params: {} | undefined) {
-  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
+  // return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
+  return http.post(`/outside/es/task/search`, params);
 }
 /*
  * 工单设置，回执合规设置模块 保存自定义打印模板
@@ -976,7 +982,7 @@ export function dialout(params: object) {
  * @description 获取视图
  */
 export function getUserViews(params: object) {
-  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getUserViews`, params);
-}
+  // return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getUserViews`, params);
+  return http.get(`/outside/pc/view/getUserViews`, params);}
 
 /* -------------  end  新工单api ---------------- */
