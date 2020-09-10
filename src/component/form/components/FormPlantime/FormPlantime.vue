@@ -7,12 +7,20 @@
       :picker-options="pickerOptions"
       :value-format="formate"
       :placeholder="placeholder"
-      :value="value" @input="choose"/>
+      :value="value" 
+      @focus="dateTimePickerFocusHandler"
+      @blur="dateTimePickerBlurHandler"
+      @input="choose"
+    />
   </div>
 </template>
 
 <script>
+/* utils */
+import { addClass, removeClass } from '@src/util/dom';
 import FormMixin from '@src/component/form/mixin/form';
+/* constants */
+const PlanTimeClassName = 'body-for-plantime';
 
 export default {
   name: 'form-plantime',
@@ -29,13 +37,30 @@ export default {
   },
   computed: {
     formate() {
-      return this.type == 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-dd HH:mm:ss'
+      return this.isDateTime ? 'yyyy-MM-dd HH:mm:ss' : 'yyyy-MM-dd';
+    },
+    isDateTime() {
+      return this.type == 'datetime';
     },
     type() {
       return this.field.setting.dateType === 'date' ? 'date' : 'datetime';
     }
   },
   methods: {
+    /**
+     * @description 日期时间选择器获得焦点事件处理 
+     * 只为 日期时间 处理，添加class, 为了隐藏 el-datetime-picker 此刻的按钮
+    */
+    dateTimePickerFocusHandler() {
+      if(!this.isDateTime) return
+
+      addClass(document.body, PlanTimeClassName);
+    },
+    dateTimePickerBlurHandler() {
+      if(!this.isDateTime) return
+
+      removeClass(document.body, PlanTimeClassName);
+    },
     choose(newValue){    
       let oldValue = null;
       this.$emit('update', {newValue, oldValue, field: this.field});
@@ -55,6 +80,16 @@ export default {
 
   .el-date-editor{
     width: 100%;
+  }
+}
+
+.body-for-plantime {
+  .el-date-picker {
+    .el-picker-panel__footer {
+      button:nth-child(1) {
+        display: none;
+      }
+    }
   }
 }
 </style>
