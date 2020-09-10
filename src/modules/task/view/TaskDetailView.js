@@ -351,7 +351,7 @@ export default {
     */
     notCustom() {
       let receiptConfig = this.initData.receiptConfig || {};
-      return receiptConfig?.customReceipt && this.task.templateId == '1';
+      return !receiptConfig?.customReceipt && this.task.templateId == '1';
     },
     /** 
     * @description 显示回执
@@ -369,15 +369,14 @@ export default {
     viewReceiptTab() {
       // 回执表单是否包含字段
       let hasField = this.receiptFields.length > 0;
-      return this.showReceipt && (!this.notCustom && hasField);
+      return this.showReceipt && hasField && !this.notCustom;
     },
     // 处理完成审批
     approvingForComplete() {
-      // TODO: receiptDraft
-      let { canEditTask, receiptDraft = true } = this.initData;
+      let { canEditTask } = this.initData;
       let canLookCompleteReceipt = canEditTask || this.permission.VIP_APPROVE == 3;
 
-      return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.initData.canApprove || canLookCompleteReceipt) && receiptDraft;
+      return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.initData.canApprove || canLookCompleteReceipt);
     },
     /** 
     * @description 工单信息中计划时间是否可以修改
@@ -418,6 +417,7 @@ export default {
       return {
         task: this.task,
         auth: this.permission,
+        receiptFields: this.receiptFields,
         isFinishApproving: this.approvingForComplete
       }
     },

@@ -4,7 +4,7 @@
     row-class-name="base-table-row-v3"
     class="multiple-card-table"
     :data="data"
-    stripe>
+    border>
     <el-table-column
       v-for="column in columns"
       :key="column.fieldId"

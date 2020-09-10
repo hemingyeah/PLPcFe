@@ -1,34 +1,36 @@
 <template>
   <base-modal class="task-receipt-edit-container" :title="title" :show.sync="visible" width="700px" @closed="reset">
     <div class="base-modal-content" v-if="init">
-      <form-builder ref="form" :fields="fields" :value="form" @update="update">
-        <!-- start 合计 -->
-        <template v-if="hasExpense" slot="template" slot-scope="{ field }">
-          <form-item :label="field.displayName" class="task-receipt-expense">
-            <div class="item">
-              <label>备件费用</label>
-              <span>{{ sparepartTotal }}</span>
-            </div>
-            <div class="item">
-              <label>服务费用</label>
-              <span>{{ serviceTotal }}</span>
-            </div>
-            <div class="item" v-if="showDiscountCost">
-              <label>折扣费用</label>
-              <input type="number" class="text-red" v-model="form.disExpense" @input="updateDisExpense" @blur="disExpenseBlur" />
-            </div>
-            <div class="item">
-              <label>总计</label>
-              <span>{{ totalExpense }}</span>
-            </div>
-          </form-item>
-        </template>
-        <!-- end 合计 -->
-      </form-builder>
+      <form-builder ref="form" :fields="fields" :value="form" @update="update"></form-builder>
+
+      <!-- start 合计 -->
+      <div class="form-item" v-if="showSparepart || showService">
+        <label>费用合计</label>
+        <div class="form-item-control">
+          <el-table :data="totalData" header-row-class-name="base-table-header-v3" row-class-name="base-table-row-v3" border>
+            <el-table-column prop="sparepartTotal" label="备件费用" v-if="showSparepart"></el-table-column>
+            <el-table-column prop="serviceTotal" label="服务费用" v-if="showService"></el-table-column>
+            <el-table-column label="折扣费用" v-if="showDiscountCost">
+              <template slot-scope="scope">
+                <input type="number" class="disExpense" v-model="scope.row.disExpense" @input="updateDisExpense" @blur="disExpenseBlur" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="totalExpense" label="应收合计(元)"></el-table-column>
+          </el-table>
+        </div>
+      </div>
+      <!-- end 合计 -->
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取 消</el-button>
-      <el-button type="primary" :disabled="pending" @click="submit">保 存</el-button>
+      <template v-if="action == 'edit'">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" :disabled="pending" @click="submit">保 存</el-button>
+      </template>
+      <template v-else>
+        <el-button type="danger" @click="visible = false">取 消</el-button>
+        <el-button :disabled="pending" @click="draft">暂 存</el-button>
+        <el-button type="primary" :disabled="pending" @click="submit">完成回执</el-button>
+      </template>
     </div>
   </base-modal>
 </template>

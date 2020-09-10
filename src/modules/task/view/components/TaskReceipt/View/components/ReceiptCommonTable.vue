@@ -3,9 +3,8 @@
     v-if="data.length"
     header-row-class-name="base-table-header-v3"
     row-class-name="base-table-row-v3"
-    class="base-table-border-v3"
     :data="data"
-    stripe>
+    border>
     <el-table-column
       v-for="(column, index) in colums"
       :key="`${column.field}_${index}`"
