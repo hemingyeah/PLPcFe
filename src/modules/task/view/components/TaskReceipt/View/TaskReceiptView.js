@@ -1,6 +1,3 @@
-/* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
-
 /* mixin */
 import ReceiptMixin from '../TaskReceiptMixin';
 
@@ -64,18 +61,30 @@ export default {
   },
   computed: {
     /** 
-    * @description 工单详情数据
+    * @description 回执自定义字段
+    * 判断非自定义回执、自定义回执
     */
-    task() {
-      // TODO: task数据不一致啊
-      let { task, receiptTaskForRead } = this.initData;
-      return receiptTaskForRead || task || {};
+    fields() {
+      return this.notCustom ? this.notCustomFields : this.shareData.receiptFields;
+    },
+    /** 
+    * @description 回执详情数据
+    */
+    receiptData() {
+      return this.initData?.receiptTaskForRead || {};
     },
     /** 
     * @description 备件、服务项目、折扣费用数据集合
     */
     expenseSheet() {
       return this.initData.receiptExpenseSheetForRead || {};
+    },
+    /** 
+    * @description 显示合计
+    */
+    hasExpense() {
+      let { sparepart = [], serviceIterm = [] } = this.form;
+      return sparepart.length || serviceIterm.length;
     },
     /** 
     * @description 是否完成审批中
@@ -92,7 +101,7 @@ export default {
     */
     allowEditReceipt() {
       let stateArr = ['costed', 'closed'];
-      let { state, inApprove } = this.initData.task;
+      let { state, inApprove } = this.task;
 
       return inApprove != 1 && this.initData.canEditTask && this.receiptConfig.editReceipt && stateArr.indexOf(state) == -1;
     }
@@ -109,27 +118,21 @@ export default {
     */
     async openDialog() {
       // 工单上备件用的库和当前租户备件库配置不同
-      if (this.initData.isRepertoryDiff) {
-        if (!await this.$platform.confirm('回执备件来源与当前备件库配置不同，无法编辑回执。如需要，请回退并重新完成。')) return;
-      }
+      if (this.initData.isRepertoryDiff) return this.$platform.alert('回执备件来源与当前备件库配置不同，无法编辑回执。如需要，请回退并重新完成。');
 
       // TODO: 支付完成提示
-      if(this.initData.isPaySuccess) {
-        if (!await this.$platform.confirm('该工单已经支付完成，备件、服务项目、折扣金额不可再编辑。')) return;
-      }
+      if(this.initData.isPaySuccess) return this.$platform.alert('该工单已经支付完成，备件、服务项目、折扣金额不可再编辑。');
 
       this.$refs.taskReceiptEdit.openDialog('edit');
     }
   },
   async mounted() {
     try {
-      let { templateId, attachment, attribute } = this.task;
       let { sparePartsExpense, serviceExpense, discountExpense } = this.expenseSheet;
-
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId, tableName: 'task_receipt' });
+      let { attachment = [], attribute = {}, receiptContent } = this.receiptData;
       
       // 初始化默认值
-      this.form = this.task;
+      this.form = this.receiptData;
 
       // 处理回执信息
       this.fields.forEach(field => {
@@ -146,11 +149,14 @@ export default {
         // 备件
         else if(fieldName === 'sparepart') {
           this.form[fieldName] = sparePartsExpense || [];
-          console.log(this.form[fieldName], sparePartsExpense, 8887776666)
         }
         // 服务项目
         else if(fieldName === 'serviceIterm') {
           this.form[fieldName] = serviceExpense || [];
+        }
+        // 回执内容
+        else if(fieldName === 'receiptContent') {
+          this.form[fieldName] = receiptContent || '';
         }
 
       });

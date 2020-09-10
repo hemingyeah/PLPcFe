@@ -12,6 +12,12 @@ import _ from 'lodash';
 export default {
   name: 'task-receipt-edit-view',
   mixins: [ReceiptMixin],
+  props: {
+    receiptFields: {
+      type: Array,
+      default: () => ([])
+    }
+  },
   data() {
     return {
       pending: false,
@@ -28,11 +34,16 @@ export default {
       return this.action == 'edit' ? '编辑回执' : '完成回执';
     },
     /** 
-    * @description 工单详情数据
+    * @description 回执自定义字段
     */
-    task() {
-      let { task, receiptTaskForUpdate } = this.initData;
-      return receiptTaskForUpdate || task || {};
+    fields() {
+      return this.notCustom ? this.notCustomFields : this.receiptFields;
+    },
+    /** 
+    * @description 回执详情数据
+    */
+    receiptData() {
+      return this.initData?.receiptTaskForUpdate || {};
     },
     /** 
     * @description 备件、服务项目、折扣费用数据集合
@@ -76,7 +87,7 @@ export default {
 
       // 初始化默认值
       let form = {
-        task: this.task,
+        task: this.receiptData,
         expenseSheet
       };
 
@@ -119,59 +130,103 @@ export default {
       this.form.disExpense = 0 - Math.abs(value);
     },
     /**
+    * @description 将回执数据格式化
+    */
+    packFormat(params) {
+      if(!this.notCustom) params.task.attribute['customReceipt'] = true;
+
+      let task = Object.assign({}, params.task);
+
+      delete params.task;
+
+      return Object.assign(params, task);
+    },
+    /**
+    * @description 暂存
+    */
+    draft() {
+      this.pending = true;
+
+      const params = util.packToReceipt(this.fields, this.form);
+      params.taskId = (params.task || {}).id;
+      TaskApi.receiptDraft(params).then(res => {
+        let isSucc = res && res.success;
+        this.$platform.notification({
+          type: isSucc ? 'success' : 'error',
+          title: `暂存${isSucc ? '成功' : '失败'}`,
+          message: !isSucc && res.message
+        })
+
+        this.pending = false;
+      })
+        .catch((err) => {
+          this.pending = false;
+        })
+    },
+    /**
     * @description 完成、编辑回执
     */
     submit() {
       this.$refs.form
         .validate()
-        .then(async valid => {
+        .then(valid => {
 
           if (!valid) return Promise.reject('validate fail.');
 
-          const params = util.packToReceipt(this.fields, this.form);
-          console.log(params, 777777)
+          let params = util.packToReceipt(this.fields, this.form);
+          params = this.packFormat(params);
 
-          // 回访是否需要审批
-          const result = await TaskApi.finishApproveCheck(params);
-          if (!result.succ && result.message == '需要审批') {
-            this.visible = false;
-            this.pending = false;
+          if (this.action === 'edit') return this.editReceipt(params);
 
-            this.$emit('proposeApprove', result.data);
-            return;
-          }
-          // this.pending = true;
-
-          // TaskApi.editReceipt(params).then(res => {
-          //   let isSucc = res && !res.status;
-          //   this.$platform.notification({
-          //     type: isSucc ? 'success' : 'error',
-          //     title: `编辑${isSucc ? '成功' : '失败'}`,
-          //     message: !isSucc && res.message
-          //   })
-          //   this.pending = false;
-          // }).catch(err => console.error('err', err))
+          this.finish(params);
         })
         .catch(err => {
           this.pending = false;
         })
-    }
-  },
-  async mounted() {
-    try {
-      let fields = await TaskApi.getTaskTemplateFields({ templateId: this.task.templateId, tableName: 'task_receipt' });
+    },
+    /**
+    * @description 完成
+    */
+    async finish(params) {
+      this.pending = true;
 
-      this.fields = [
-        ...fields,
-        { displayName: '合计',
-          fieldName: 'template',
-          formType: 'text',
-          isSystem: 1
+      // 回访是否需要审批
+      const result = await TaskApi.finishApproveCheck(params);
+      if (!result.succ && result.message == '需要审批') {
+        this.visible = false;
+        this.pending = false;
+
+        this.$emit('proposeApprove', result.data);
+        return;
+      }
+
+      TaskApi.finishTask(params).then(res => {
+        if (res.success) {
+          window.location.reload();
+        } else {
+          this.$platform.alert(res.message);
+          this.pending = false;
         }
-      ]
+      }).catch(err => {
+        this.pending = false;
+      })
+    },
+    /**
+    * @description 编辑回执
+    */
+    async editReceipt(params) {
+      this.pending = true;
 
-    } catch (e) {
-      console.error('error ', e)
+      TaskApi.editReceipt(params).then(res => {
+        if (res.success) {
+          window.location.reload();
+        } else {
+          this.$platform.alert(res.message);
+          this.pending = false;
+        }
+      }).catch(err => {
+        this.pending = false;
+      })
     }
   }
 }

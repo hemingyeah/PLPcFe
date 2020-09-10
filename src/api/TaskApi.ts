@@ -166,20 +166,6 @@ export function getRepertoryList(params: {} | undefined) {
 }
 
 /**
- * @description 编辑回执表单
- */
-export function editReceipt(params: {} | undefined) {
-  return http.post("/task/editReceipt", params);
-}
-
-/**
- * @description 判断工单是否使用了备件
- */
-export function taskFilterWithPart(params: {} | undefined) {
-  return http.get("/task/filter/withPart", params);
-}
-
-/**
  * @description 检查附加组件是否必填
  */
 export function checkNotNullForCard(params: {} | undefined) {
@@ -594,6 +580,27 @@ export function deleteHoursRecord(params: {} | undefined) {
  */
 export function hoursRecordLocation(params: {} | undefined) {
   return http.post(`${fixedPrefixTaskPath}/outside/tasktime/getDetailList`, params, false);
+}
+
+/**
+ * @description 完成回执
+ */
+export function finishTask(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/finish`, params);
+}
+
+/**
+ * @description 编辑回执
+ */
+export function editReceipt(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/editReceipt`, params);
+}
+
+/**
+ * @description 暂存回执
+ */
+export function receiptDraft(params: {} | undefined) {
+  return http.post(`${fixedPrefixAppPath}/outside/pc/task/receiptDraft/save`, params);
 }
 
 /**
