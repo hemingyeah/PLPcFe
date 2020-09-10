@@ -12,7 +12,8 @@
             <el-table-column prop="serviceTotal" label="服务费用" v-if="showService"></el-table-column>
             <el-table-column label="折扣费用" v-if="showDiscountCost">
               <template slot-scope="scope">
-                <input type="number" class="disExpense" v-model="scope.row.disExpense" @input="updateDisExpense" @blur="disExpenseBlur" />
+                <template v-if="isPaySuccess">{{ scope.row.disExpense }}</template>
+                <input type="number" class="disExpense" v-model="scope.row.disExpense" @input="updateDisExpense" @blur="disExpenseBlur" v-else />
               </template>
             </el-table-column>
             <el-table-column prop="totalExpense" label="应收合计(元)"></el-table-column>
@@ -20,6 +21,25 @@
         </div>
       </div>
       <!-- end 合计 -->
+
+      <!-- start 支付信息 -->
+      <div class="form-item" v-if="paymentMethod">
+        <label>客户支付方式</label>
+        <div class="form-item-control payment-info-row">
+          <p class="payment-method">
+            支付方式：
+            <img v-if="getPaymentMethodImg()" :src="getPaymentMethodImg()" />
+            {{ paymentMethod }}
+          </p>
+          <div class="payment-method-detail" v-if="payOnlineSuccess">
+            <p>收款方式：{{ paymentInfo.payType }}</p>
+            <p>付款账号：{{ paymentInfo.buyerLogonId }}</p>
+            <p>商家订单号：{{ paymentInfo.shbTradeNo }}</p>
+            <p>交易创建时间：{{ paymentInfo.createTime | fmt_datetime }}</p>
+          </div>
+        </div>
+      </div>
+      <!-- end 支付信息 -->
     </div>
     <div slot="footer" class="dialog-footer">
       <template v-if="action == 'edit'">
