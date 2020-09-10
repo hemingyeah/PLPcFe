@@ -1,5 +1,7 @@
 import http from '@src/util/http';
 
+const CustomerPreFixedPath = '';
+
 /** 
  * 获取客户信息，用于客户编辑
  * @param {string} id - 客户id
@@ -157,7 +159,7 @@ export function batchEditCustomer(params) {
  * @returns {*}
  */
 export function getCustomerListAsyn(params) {
-  return http.get('/customer/getListAsyn', params);
+  return http.get(`${CustomerPreFixedPath}/outside/pc/customer/getListAsyn`, params);
 }
 
 /**
@@ -169,3 +171,10 @@ export function getCustomerExeinsyn(params) {
   return http.get('/customer/exeinsyn/get', params, false);
 }
 
+/**
+ * 查询客户列表
+ * @param {Object} params - 参数
+ */
+export function getCustomerList(params) {
+  return http.post(`${CustomerPreFixedPath}/outside/pc/customer/list`, params);
+}

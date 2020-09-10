@@ -1,6 +1,7 @@
 /* eslint-disable no-empty-function */
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
+import * as ProductApi from '@src/api/ProductApi';
 
 export default {
   /** 
@@ -39,7 +40,7 @@ export default {
    * @description 根据产品获取客户数据
   */
   fetchCustomerByProduct(params) {
-    return TaskApi.getCustomerByProduct(params);
+    return ProductApi.getProductDetail(params);
   },
   /** 
    * @description 获取产品数据

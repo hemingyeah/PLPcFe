@@ -36,6 +36,7 @@
 <script>
 import * as FormUtil from '@src/component/form/util';
 import * as LinkmanApi from '@src/api/LinkmanApi';
+import * as ProductApi from '@src/api/ProductApi';
 import { createRemoteValidate } from '@src/util/validator';
 
 export default {
@@ -364,7 +365,7 @@ export default {
         .catch(err => console.error('fetchProducts catch err', err));
     },
     fetchEditProducts() {
-      return this.$http.get('/product/linkmanRelation', {
+      return ProductApi.searchCustomerLinkmanForProduct({
         linkmanId: this.linkmanId,
         customerId: this.customer.id,
         pageSize: 0,

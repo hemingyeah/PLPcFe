@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import * as CustomerApi from '@src/api/CustomerApi';
 import FormMixin from "@src/component/form/mixin/form";
 
 export default {
@@ -46,8 +47,7 @@ export default {
     },
     searchCustomer(keyword) {
       this.loading = true;
-      this.$http
-        .get("/customer/getListAsyn", { keyword, pageNum: 1 })
+      CustomerApi.getCustomerListAsyn({ keyword, pageNum: 1 })
         .then(res => {
           this.options = res.list;
           this.loading = false;

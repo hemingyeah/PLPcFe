@@ -1,5 +1,7 @@
 import http from '@src/util/http';
 
+const ProductPreFixedPath = '';
+
 /** ------------ start 产品 ----------------------- */
 /**
  * 获取产品列表
@@ -7,7 +9,7 @@ import http from '@src/util/http';
  * @returns {*}
  */
 function getProduct(params) {
-  return http.post('/customer/product/list/data', params)
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/list/data`, params)
 }
 
 /**
@@ -16,7 +18,7 @@ function getProduct(params) {
  * @returns {*}
  */
 function createProduct(params) {
-  return http.post('/customer/product/create/action', params);
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/create/action`, params);
 }
 
 /**
@@ -25,7 +27,7 @@ function createProduct(params) {
  * @returns {*}
  */
 function updateProduct(params) {
-  return http.post('/customer/product/updateProduct', params);
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/updateProduct`, params);
 }
 
 /**
@@ -34,7 +36,7 @@ function updateProduct(params) {
  * @returns {*}
  */
 function deleteProductByIds(ids) {
-  return http.post('/customer/product/deleteBatch', { ids})
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/deleteBatch`, { ids})
 }
 
 /**
@@ -45,7 +47,7 @@ function deleteProductByIds(ids) {
  * @returns {*}
  */
 function checkSerialNumber(params) {
-  return http.post('/customer/product/checkUniqueForSerialNumber', params, false);
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/checkUniqueForSerialNumber`, params, false);
 }
 
 /**
@@ -57,7 +59,7 @@ function checkSerialNumber(params) {
  * @param {Date} params.sendTime - 发送时间
  */
 function sendSmsBatch(params) {
-  return http.post('/customer/product/sendSmsBatch', params, false)
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/sendSmsBatch`, params, false)
 }
 
 /**
@@ -67,7 +69,7 @@ function sendSmsBatch(params) {
  * @param {Number} params.isAllLm - 是否是全部联系人
  */
 function computeSendNumForProduct(params) {
-  return http.post('/customer/product/computeSendNum', params)
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/computeSendNum`, params)
 }
 
 /**
@@ -77,14 +79,14 @@ function computeSendNumForProduct(params) {
  * @param {Number} params.isAllLm - 是否是全部联系人
  */
 function editBatchProduct(params) {
-  return http.post('/customer/product/editBatch', params, false)
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/editBatch`, params, false)
 }
 
 /**
  * 获取产品提醒模板
  */
 function getProductRemindTemplate() {
-  return http.get('/customer/product/remind/list')
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/remind/list`)
 }
 
 /**
@@ -93,7 +95,7 @@ function getProductRemindTemplate() {
  * @param {String} params.id - 产品id
  */
 function getProductDetail(params) {
-  return http.get('/customer/product/detail/data', params)
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/detail/data`, params)
 }
 
 /**
@@ -102,7 +104,7 @@ function getProductDetail(params) {
  * @param {String} params.id - 产品id
  */
 function getEventOfProduct(params) {
-  return http.get('/customer/product/event/list', params)
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/event/list`, params)
 }
 
 /**
@@ -111,7 +113,7 @@ function getEventOfProduct(params) {
  * @param {String} params.id - 产品id
  */
 function getTaskOfProduct(params) {
-  return http.get('/customer/product/task/list', params)
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/task/list`, params)
 }
 
 /**
@@ -120,8 +122,9 @@ function getTaskOfProduct(params) {
  * @param {String} params.id - 产品id
  */
 function getPlanOfProduct(params) {
-  return http.get('/customer/product/plantask/list', params)
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/plantask/list`, params)
 }
+
 
 /**
  * 获取产品记录
@@ -131,7 +134,7 @@ function getPlanOfProduct(params) {
  * @param {Number} params.pageSize - 页面大小
  */
 function getRecordOfProduct(params) {
-  return http.get('/customer/product/record/list', params)
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/record/list`, params)
 }
 
 /**
@@ -146,7 +149,7 @@ function getRecordOfProduct(params) {
  * @param {Object} params.content.updateType - 'pRecord'
  */
 function commentProduct(params) {
-  return http.post('/customer/product/record/create', params)
+  return http.post(`${ProductPreFixedPath}/outside/pc/customer/product/record/create`, params)
 }
 
 /**
@@ -155,7 +158,7 @@ function commentProduct(params) {
  * @param {String} params.productId - 产品id
  */
 function getUpdateRecord(params) {
-  return http.get('/customer/product/getLatestOne', params)
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/getLatestOne`, params)
 }
 
 /**
@@ -198,7 +201,7 @@ function downloadQrcode(params) {
  */
 
 function productStatisticsInit(params) {
-  return http.get('/customer/product/statistics/init', params)
+  return http.get(`${ProductPreFixedPath}/outside/pc/customer/product/statistics/init`, params)
 }
 
 /** ------------ end 产品 ----------------------- */
@@ -213,7 +216,7 @@ function productStatisticsInit(params) {
  * @returns Promise<>
  */
 function getProductTemplateList(params) {
-  return http.post('/product/list/data', params);
+  return http.post(`${ProductPreFixedPath}/outside/pc/product/list/data`, params);
 }
 
 /**
@@ -242,7 +245,7 @@ function productTemplateEditBatch(params) {
  * @returns Promise<>
  */
 function productTemplateCreate(params) {
-  return http.post('/product/create/action', params);
+  return http.post(`${ProductPreFixedPath}/outside/pc/product/create/action`, params);
 }
 
 /**
@@ -260,7 +263,7 @@ function productTemplateUpdate(params) {
  * @returns Promise<>
  */
 function getProductTemplate(id) {
-  return http.get(`/product/detail/data/${id}`);
+  return http.get(`${ProductPreFixedPath}/outside/pc/product/detail/data/${id}`);
 }
 
 
@@ -300,8 +303,23 @@ function productTemplateDeleteRecord(params) {
  * @returns Promise<>
  */
 function productTemplateRelatedProducts(params) {
-  return http.get('/product/relatedProducts', params);
+  return http.get(`${ProductPreFixedPath}/outside/pc/product/relatedProducts`, params);
 }
+
+/**
+ * 编辑产品时搜索客户地址
+ */
+function searchCustomerAddressForProduct(params) {
+  return http.get(`${ProductPreFixedPath}/outside/pc/product/address`, params);
+}
+
+/**
+ * 编辑产品时搜索客户联系人
+ */
+function searchCustomerLinkmanForProduct(params) {
+  return http.get(`${ProductPreFixedPath}/outside/pc/product/linkmanRelation`, params);
+}
+
 
 /** ------------ end 产品模板 ----------------------- */
 
@@ -336,4 +354,6 @@ export {
   deleteProductByIds,
   editBatchProduct,
   getProductRemindTemplate,
+  searchCustomerAddressForProduct,
+  searchCustomerLinkmanForProduct
 };
