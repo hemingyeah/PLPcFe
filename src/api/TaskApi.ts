@@ -586,21 +586,21 @@ export function hoursRecordLocation(params: {} | undefined) {
  * @description 完成回执
  */
 export function finishTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/finish`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/finish`, params);
 }
 
 /**
  * @description 编辑回执
  */
 export function editReceipt(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/editReceipt`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/editReceipt`, params);
 }
 
 /**
  * @description 暂存回执
  */
 export function receiptDraft(params: {} | undefined) {
-  return http.post(`${fixedPrefixAppPath}/outside/pc/task/receiptDraft/save`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/receiptDraft/save`, params);
 }
 
 /**
