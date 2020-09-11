@@ -104,6 +104,12 @@ export default {
       let { state, inApprove } = this.task;
 
       return inApprove != 1 && this.initData.canEditTask && this.receiptConfig.editReceipt && stateArr.indexOf(state) == -1;
+    },
+    /** 
+    * @description 支付方式
+    */
+    paymentMethod() {
+      return this.receiptData?.attribute?.paymentMethod || this.task?.attribute?.paymentMethod || '';
     }
   },
   methods: {
@@ -120,15 +126,18 @@ export default {
       // 工单上备件用的库和当前租户备件库配置不同
       if (this.initData.isRepertoryDiff) return this.$platform.alert('回执备件来源与当前备件库配置不同，无法编辑回执。如需要，请回退并重新完成。');
 
-      // TODO: 支付完成提示
-      if(this.initData.isPaySuccess) return this.$platform.alert('该工单已经支付完成，备件、服务项目、折扣金额不可再编辑。');
+      // 支付完成提示
+      if(this.isPaySuccess) this.$platform.alert('该工单已经支付完成，备件、服务项目、折扣金额不可再编辑。');
 
       this.$refs.taskReceiptEdit.openDialog('edit');
     }
   },
   async mounted() {
     try {
-      let { sparePartsExpense, serviceExpense, discountExpense } = this.expenseSheet;
+      // 在线支付成功
+      if (this.payOnlineSuccess) this.getPaymentMethodDetail();
+
+      let { sparePartsExpense = [], serviceExpense = [], discountExpense = {} } = this.expenseSheet;
       let { attachment = [], attribute = {}, receiptContent } = this.receiptData;
       
       // 初始化默认值
@@ -148,11 +157,25 @@ export default {
         }
         // 备件
         else if(fieldName === 'sparepart') {
-          this.form[fieldName] = sparePartsExpense || [];
+          // 计算修改后的单价
+          sparePartsExpense.forEach(item => {
+            let modifiedPrice = isNaN(item.modifiedPrice) ? 0 : item.modifiedPrice;
+            let nowPrice = item.salePrice + modifiedPrice;
+            item.salePrice = nowPrice.toFixed(2);
+          })
+
+          this.form[fieldName] = sparePartsExpense;
         }
         // 服务项目
         else if(fieldName === 'serviceIterm') {
-          this.form[fieldName] = serviceExpense || [];
+          // 计算修改后的单价
+          serviceExpense.forEach(item => {
+            let modifiedPrice = isNaN(item.modifiedPrice) ? 0 : item.modifiedPrice;
+            let nowPrice = item.salePrice + modifiedPrice;
+            item.salePrice = nowPrice.toFixed(2);
+          })
+
+          this.form[fieldName] = serviceExpense;
         }
         // 回执内容
         else if(fieldName === 'receiptContent') {

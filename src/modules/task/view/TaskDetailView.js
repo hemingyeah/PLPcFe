@@ -688,30 +688,6 @@ export default {
         this.pending = false;
       })
     },
-    // 完成回执
-    async finishTask() {
-      try {
-        this.pending = true;
-
-        let result = await TaskApi.checkNotNullForCard({ id: this.task.id, flow: 'finish' });
-
-        if (result.status == 0) {
-          let { showAttachment, showSparepart, showService } = this.taskType.options;
-          if (this.taskType.id != '1' && !showAttachment && !showSparepart && !showService) {
-            // TODO:判断回执表单自定义字段length等于0，直接完成
-          } else {
-            // TODO: 回执信息tab切换
-          }
-        } else {
-          this.$platform.alert(result.message);
-        }
-
-        this.pending = false;
-
-      } catch (e) {
-        console.error('startTask error', e);
-      }
-    },
     // DING
     ding(all = true) {
       let { id, taskNo, executor, synergies } = this.task;

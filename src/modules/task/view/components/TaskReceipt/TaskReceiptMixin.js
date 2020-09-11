@@ -1,3 +1,14 @@
+/* api */
+import * as TaskApi from '@src/api/TaskApi.ts';
+
+/* image */
+import ZFB_IMG from '@src/assets/img/task/pay.png';
+import ZFB_QRCODE_IMG from '@src/assets/img/task/payOnline.png';
+import WX_QRCODE_IMG from '@src/assets/img/task/weiChat.png';
+import BANK_IMG from '@src/assets/img/task/bankCard.png';
+
+import PAY_SUCCESS_IMG from '@src/assets/img/task/paySuccess.png';
+
 export default {
   props: {
     initData: {
@@ -11,7 +22,8 @@ export default {
   },
   data() {
     return {
-      form: {}
+      form: {},
+      paymentInfo: {}
     }
   },
   computed: {
@@ -105,12 +117,24 @@ export default {
         totalExpense
       }]
     },
+    /** 
+    * @description 是否支付成功
+    */
+    isPaySuccess() {
+      return this.initData?.isPay || false;
+    },
+    /** 
+    * @description 在线支付成功
+    */
+    payOnlineSuccess() {
+      return this.isPaySuccess && this.paymentMethod == '在线支付-支付宝';
+    },
     /**
     * @description 非自定义回执字段
     * 默认显示回执内容、系统附件、备件、服务项目
     */
     notCustomFields() {
-      let { receiptAttNotNull, sparepartNotNull, serviceNotNull } = this.taskType?.options || {};
+      let { receiptAttNotNull, sparepartNotNull, serviceNotNull, receiptSignNotNull } = this.taskType?.options || {};
 
       return [{
         displayName: '回执内容',
@@ -136,9 +160,44 @@ export default {
         formType: 'serviceIterm',
         isNull: serviceNotNull ? 0 : 1,
         isSystem: 1
+      }, {
+        displayName: '客户签名',
+        fieldName: 'systemAutograph',
+        formType: 'systemAutograph',
+        isNull: receiptSignNotNull ? 0 : 1,
+        isSystem: 1
       }]
     }
   },
   methods: {
+    /** 
+    * @description 支付成功icon
+    */
+    getPaySuccessImg() {
+      return PAY_SUCCESS_IMG;
+    },
+    /**
+    * @description 获取支付方式对应icon
+    */
+    getPaymentMethodImg() {
+      const imgConfig = {
+        '在线支付-支付宝': ZFB_IMG,
+        '支付宝收款码': ZFB_QRCODE_IMG,
+        '微信收款码': WX_QRCODE_IMG,
+        '银行卡收款': BANK_IMG
+      }
+
+      return imgConfig[this.paymentMethod] || '';
+    },
+    /**
+    * @description 获取在线支付详情
+    */
+    getPaymentMethodDetail() {
+      TaskApi.getPaymentDetail({taskId: this.task.id}).then(res => {
+        if (res.success && res.result) {
+          this.paymentInfo = res.result;
+        }
+      }).catch(err => console.error(err))
+    }
   }
 }

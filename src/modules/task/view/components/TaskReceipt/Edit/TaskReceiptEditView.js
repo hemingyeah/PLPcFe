@@ -57,6 +57,24 @@ export default {
     showDiscountCost() {
       let { showSparepart, showService, showDiscountCost } = this.taskType?.options || {};
       return (showSparepart || showService) && showDiscountCost;
+    },
+    /** 
+    * @description 支付方式
+    */
+    paymentMethod() {
+      let { state, attribute = {} } = this.task;
+      let stateArr = ['finished', 'costed', 'closed', 'offed'];
+      let paymentMethod = this.receiptData?.attribute?.paymentMethod || '';
+
+      return stateArr.indexOf(state) > -1 ? attribute.paymentMethod : paymentMethod;
+    },
+    /** 
+    * @description 是否开启支付
+    */
+    openPay() {
+      let { version, onlineAlipay } = this.initData?.paymentConfig || {};
+
+      return version == 1 && onlineAlipay;
     }
   },
   methods: {
@@ -94,12 +112,25 @@ export default {
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
 
+      // 自定义回执表单自定义字段length等于0时直接完成
+      if (this.fields.length == 0) {
+        let params = util.packToReceipt(this.fields, this.form);
+        params = this.packFormat(params);
+        this.finish(params);
+        return;
+      }
+
       this.init = true;
       this.action = action;
       this.visible = true;
 
       this.$nextTick(() => {
-        this.$eventBus.$emit('task_receipt_update_editPrice', this.taskType);
+        let config = {
+          editUnitPrice: this.taskType?.options?.editUnitPrice || false,
+          isPaySuccess: this.isPaySuccess
+        }
+
+        this.$eventBus.$emit('task_receipt_update_config', config);
       })
     },
     /**
@@ -169,15 +200,31 @@ export default {
     submit() {
       this.$refs.form
         .validate()
-        .then(valid => {
+        .then(async valid => {
 
           if (!valid) return Promise.reject('validate fail.');
 
           let params = util.packToReceipt(this.fields, this.form);
           params = this.packFormat(params);
 
-          if (this.action === 'edit') return this.editReceipt(params);
+          this.pending = true;
 
+          // 开启支付时判断支付状态
+          if (this.openPay) {
+            const data = await TaskApi.getPaymentOrder({taskId: this.task.id});
+            if(data.success) {
+              let statusArr = ['init', 'process', 'success'];
+              let { status } = data.result;
+
+              if(statusArr.indexOf(status) > -1 && statusArr.indexOf(status) < 2) {
+                this.pending = false;
+                this.$platform.alert('该工单正在支付中，请到售后宝移动端完成');
+                return;
+              }
+            }
+          }
+
+          if (this.action === 'edit') return this.editReceipt(params);
           this.finish(params);
         })
         .catch(err => {
@@ -188,8 +235,6 @@ export default {
     * @description 完成
     */
     async finish(params) {
-      this.pending = true;
-
       // 回访是否需要审批
       const result = await TaskApi.finishApproveCheck(params);
       if (!result.succ && result.message == '需要审批') {
@@ -200,8 +245,15 @@ export default {
         return;
       }
 
+      if (!await this.$platform.confirm('确认进行完成操作吗？')) return this.pending = false;
+
       TaskApi.finishTask(params).then(res => {
         if (res.success) {
+          this.$platform.notification({
+            type: 'success',
+            title: '提交成功'
+          })
+
           window.location.reload();
         } else {
           this.$platform.alert(res.message);
@@ -215,10 +267,15 @@ export default {
     * @description 编辑回执
     */
     async editReceipt(params) {
-      this.pending = true;
+      if (!await this.$platform.confirm('确认进行编辑操作吗？')) return this.pending = false;
 
       TaskApi.editReceipt(params).then(res => {
         if (res.success) {
+          this.$platform.notification({
+            type: 'success',
+            title: '编辑成功'
+          })
+
           window.location.reload();
         } else {
           this.$platform.alert(res.message);
@@ -228,5 +285,9 @@ export default {
         this.pending = false;
       })
     }
+  },
+  mounted() {
+    // 在线支付成功
+    if (this.payOnlineSuccess) this.getPaymentMethodDetail();
   }
 }
