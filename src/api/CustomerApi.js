@@ -159,7 +159,7 @@ export function batchEditCustomer(params) {
  * @returns {*}
  */
 export function getCustomerListAsyn(params) {
-  return http.get(`${CustomerPreFixedPath}/outside/pc/customer/getListAsyn`, params);
+  return http.get(`${CustomerPreFixedPath}/customer/getListAsyn`, params);
 }
 
 /**
@@ -176,5 +176,5 @@ export function getCustomerExeinsyn(params) {
  * @param {Object} params - 参数
  */
 export function getCustomerList(params) {
-  return http.post(`${CustomerPreFixedPath}/outside/pc/customer/list`, params);
+  return http.post(`${CustomerPreFixedPath}/customer/list`, params);
 }
