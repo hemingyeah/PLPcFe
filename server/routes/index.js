@@ -99,7 +99,7 @@ router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
   host: '30.40.58.199',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=2bacf42d-74dc-46da-8b7b-769da7807331'
+    'cookie': 'VIPPUBLINKJSESSIONID=840df68a-e3cd-47c2-9348-fb1c31c0aa21'
   },
 }))
 
@@ -115,16 +115,45 @@ router.use('/outside/pc/view/getUserViews', ctx => HttpClient.proxy(ctx, {
   host: '30.40.58.199',
   port: 10012,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=f3e18fe9-ff30-44b3-954a-2decb49adc61'
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
   },
 }))
 router.use('/outside/es/task/getTaskCountByState', ctx => HttpClient.proxy(ctx, {
   host: '30.40.58.199',
   port: 10006,
   headers: {
-    'cookie': 'VIPPUBLINKJSESSIONID=2bacf42d-74dc-46da-8b7b-769da7807331'
+    'cookie': 'VIPPUBLINKJSESSIONID=840df68a-e3cd-47c2-9348-fb1c31c0aa21'
   },
 }))
+
+
+
+router.use('/outside/pc/view/createTaskView', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
+  },
+}))
+
+router.use('/outside/pc/view/editTaskView', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
+  },
+}))
+
+router.use('/outside/pc/view/deleteOneView', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
+  },
+}))
+
+
+
 
 router.use('/outside/pc/task/delete', ctx => HttpClient.proxy(ctx, {
   host: '30.40.59.137',

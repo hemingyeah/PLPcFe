@@ -73,7 +73,7 @@ export default {
         }
 
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
-
+        console.log(form)
         this.$set(
           this.form,
           field.fieldName,
@@ -154,31 +154,26 @@ export default {
           },
         });
       } else if (f.fieldName === "tags") {
-          let value = this.form[f.fieldName];
-           childComp = h(
-              'biz-team-select',
-              {
-                props: {
-                  value: value ? value : [],
-                },
-                on: {
-                  input: event => this.update(event, 'tags')
-                }
-              }
-            )
+        let value = this.form[f.fieldName];
+        childComp = h("biz-team-select", {
+          props: {
+            value: value ? value : [],
+          },
+          on: {
+            input: (event) => this.update(event, "tags"),
+          },
+        });
       } else if (f.fieldName === "tlmName") {
-           childComp = h(
-              'linkman-search',
-              {
-                props: {
-                  field: f,
-                  value: this.form[f.fieldName],
-                  disableMap: true,
-                },
-                on: {
-                  update: event => this.update(event)
-                }
-              });
+        childComp = h("linkman-search", {
+          props: {
+            field: f,
+            value: this.form[f.fieldName],
+            disableMap: true,
+          },
+          on: {
+            update: (event) => this.update(event),
+          },
+        });
       } else {
         childComp = h(
           comp.extend && comp.extend[`${f.formType}_search`]
@@ -197,7 +192,6 @@ export default {
           }
         );
       }
-
       return h(
         "form-item",
         {

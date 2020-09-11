@@ -727,8 +727,7 @@ export function editView(params: {} | undefined) {
  */
 export function deleteView(params: {} | undefined) {
   return http.get(
-    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView`,
-    params
+    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView/${params}`,
   );
 }
 
