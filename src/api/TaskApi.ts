@@ -9,6 +9,7 @@ const ElASTICSEARCH =  "/api/elasticsearch";
 
 // const fixedPrefixTaskPath = "";
 // const ElASTICSEARCH =  "";
+const fixedPrefixPaymentPath = '/api/payment';
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -607,6 +608,24 @@ export function receiptDraft(params: {} | undefined) {
 }
 
 /**
+ * @description 获取工单对应的订单的支付状态
+ * @param {Object} params 参数
+ * @param {String} params.taskId 工单id
+ */
+export function getPaymentOrder(params: {} | undefined){
+  return http.get(`${fixedPrefixPaymentPath}/outside/payment/order/query`, params);
+}
+
+/**
+ * @description 获取工单对应的订单的支付状态
+ * @param {Object} params 参数
+ * @param {String} params.taskId 工单id
+ */
+export function getPaymentDetail(params: {} | undefined){
+  return http.get(`${fixedPrefixPaymentPath}/outside/paymentBill/online/getByTaskId`, params);
+}
+
+/**
  * 保存工单设置信息
  * @param {Object} params - 参数对象
  * @param {String} params.fields - 设置form对象
@@ -727,8 +746,7 @@ export function editView(params: {} | undefined) {
  */
 export function deleteView(params: {} | undefined) {
   return http.get(
-    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView`,
-    params
+    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView/${params}`,
   );
 }
 

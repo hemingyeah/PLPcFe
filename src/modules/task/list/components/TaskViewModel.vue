@@ -91,7 +91,7 @@ export default {
     },
     // 删除
     deleteViewBtn() {
-      TaskApi.deleteView({ viewId: this.region.viewId }).then((res) => {
+      TaskApi.deleteView(this.region.viewId).then((res) => {
         this.success(res, "del");
       });
     },
