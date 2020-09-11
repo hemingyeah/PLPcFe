@@ -67,6 +67,14 @@ export default {
       let paymentMethod = this.receiptData?.attribute?.paymentMethod || '';
 
       return stateArr.indexOf(state) > -1 ? attribute.paymentMethod : paymentMethod;
+    },
+    /** 
+    * @description 是否开启支付
+    */
+    openPay() {
+      let { version, onlineAlipay } = this.initData?.paymentConfig || {};
+
+      return version == 1 && onlineAlipay;
     }
   },
   methods: {
@@ -201,15 +209,18 @@ export default {
 
           this.pending = true;
 
-          const data = await TaskApi.getPaymentOrder({taskId: this.task.id});
-          if(data.success) {
-            let statusArr = ['init', 'process', 'success'];
-            let { status } = data.result;
+          // 开启支付时判断支付状态
+          if (this.openPay) {
+            const data = await TaskApi.getPaymentOrder({taskId: this.task.id});
+            if(data.success) {
+              let statusArr = ['init', 'process', 'success'];
+              let { status } = data.result;
 
-            if(statusArr.indexOf(status) > -1 && statusArr.indexOf(status) < 2) {
-              this.pending = false;
-              this.$platform.alert('该工单正在支付中，请到售后宝移动端完成');
-              return;
+              if(statusArr.indexOf(status) > -1 && statusArr.indexOf(status) < 2) {
+                this.pending = false;
+                this.$platform.alert('该工单正在支付中，请到售后宝移动端完成');
+                return;
+              }
             }
           }
 
