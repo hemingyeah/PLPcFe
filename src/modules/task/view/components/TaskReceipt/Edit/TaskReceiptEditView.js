@@ -9,6 +9,9 @@ import * as FormUtil from '@src/component/form/util';
 import * as util from '@src/modules/task/util/receipt';
 import _ from 'lodash';
 
+/* enum */
+import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+
 export default {
   name: 'task-receipt-edit-view',
   mixins: [ReceiptMixin],

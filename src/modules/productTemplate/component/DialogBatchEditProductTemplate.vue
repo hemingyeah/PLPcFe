@@ -18,6 +18,7 @@ import * as Utils from '@src/component/form/util';
 import { productTemplateEditBatch } from '@src/api/ProductApi.js';
 import FormItem from '@src/component/form/FormItem.vue';
 // import {searchCustomer} from '@src/api/EcSearchApi.js';
+import * as CustomerApi from '@src/api/CustomerApi';
 
 export default {
   name: 'batch-edit-product-template-dialog',
@@ -240,7 +241,7 @@ export default {
         },
         searchCustomer(keyword) {
           this.inputRemoteSearch.customer.loading = true;
-          this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+          CustomerApi.getCustomerListAsyn({keyword, pageNum: 1, })
             .then(res => {
               this.inputRemoteSearch.customer.options = res.list;
               this.inputRemoteSearch.customer.loading = false;

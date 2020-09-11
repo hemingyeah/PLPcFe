@@ -428,7 +428,7 @@ export default {
           this.togglePending(true);
 
           if (this.isTaskEdit) {
-            return this.updateTaskMethod(params);
+            return this.updateTaskMethod(params, isAllot);
           }
           if (this.isTaskCreate) {
             return this.createTaskMethod(params, isAllot);
@@ -475,7 +475,7 @@ export default {
     /** 
      * @description 编辑工单方法
     */
-    updateTaskMethod(params) {
+    updateTaskMethod(params, isAllot = false) {
       TaskApi.editTask(params)
         .then(res => {
           let isSucc = res.success;
@@ -489,8 +489,12 @@ export default {
           if (!isSucc) {
             return this.togglePending();
           }
+          // 根据是否派单决定跳转地址
+          let taskId = this.editId;
+          let taskDetailPath = `/task/view/${taskId}`;
+          let taskAllotPath = `/task/allotTask?id=${taskId}`;
           
-          window.location.href = `/task/view/${this.editId}`;
+          window.location.href = isAllot ? taskAllotPath : taskDetailPath;
           this.togglePending();
 
         })

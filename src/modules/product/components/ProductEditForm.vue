@@ -75,7 +75,7 @@ import * as FormUtil from '@src/component/form/util';
 import FormMixin from '@src/component/form/mixin/form'
 
 // import {searchCustomer} from '@src/api/EcSearchApi.js';
-import {checkSerialNumber} from '@src/api/ProductApi';
+import { checkSerialNumber, getProductTemplateList, searchCustomerAddressForProduct} from '@src/api/ProductApi';
 import _ from 'lodash'
 
 import EditContactDialog from './EditContactDialog.vue';
@@ -198,7 +198,7 @@ export default {
       }
       if(fieldName==='serialNumber'){
         if(newValue){
-          this.$http.post(`/customer/product/checkUniqueForSerialNumber`,{id:this.productId,serialNumber:newValue},false).then(res=>{
+          checkSerialNumber({id:this.productId,serialNumber:newValue}, false).then(res=>{
             if(res.hasOwnProperty('ok')){
               this.serialNumberExist=false;
             }else{
@@ -351,7 +351,7 @@ export default {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {};
 
-      return this.$http.post('/product/list/data', pms)
+      return getProductTemplateList(pms)
         .then(res => {
           if (!res || !res.list) return;
           if (res.list) {
@@ -405,7 +405,7 @@ export default {
       pms.customerId = customer.value;
       // pms.linkmanId = linkman.value;
 
-      return this.$http.get('/product/address', pms)
+      return searchCustomerAddressForProduct(pms)
         .then(res => {
           if (!res || !res.data) return;
           if (res.data.list) {

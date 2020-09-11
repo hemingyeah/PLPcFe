@@ -166,6 +166,7 @@ export default {
   border-radius: 8px;
 
   max-height: calc(100% - 100px);
+  max-height: calc(100vh - 100px);
   overflow: hidden;
 
   display: flex;

@@ -18,6 +18,9 @@ import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
 
+/* enum */
+import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
@@ -660,6 +663,8 @@ export default {
         if (res.status == 0) {
           let url = `${window.location.origin}/print/printTaskDispatcher?token=${res.data}`;
           parent.openHelp(url);
+
+          this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
         }
       })
         .catch(err => console.error(err))

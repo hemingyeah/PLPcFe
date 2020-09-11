@@ -186,7 +186,7 @@ const PlanTaskEditForm = {
       // 判断是否选择工单负责人
       let params = this.unPackDataToParams();
       let { allotSetting = {} } = params;
-      if(!allotSetting.executorId) {
+      if(!allotSetting.executorId && allotSetting.allotType == 'normal' ) {
         return this.$platform.alert(TASK_NO_EXECUTOR_MESSAGE);
       }
       

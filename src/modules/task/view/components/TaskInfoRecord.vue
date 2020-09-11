@@ -33,7 +33,7 @@ import { trimAll } from '@src/util/lang';
 import Page from '@model/Page';
 import { openTabForEventView } from '@src/util/business/openTab';
 /* enum */
-import { TaskFieldNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
 
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length > 0 
@@ -106,10 +106,10 @@ export default {
   },
   mounted() {
     this.initializeRecord();
-    this.$eventBus.$on(TaskFieldNameMappingEnum.UpdateRecord, this.searchRecord);
+    this.$eventBus.$on(TaskEventNameMappingEnum.UpdateRecord, this.searchRecord);
   },
   beforeDestroy() {
-    this.$eventBus.$off(TaskFieldNameMappingEnum.UpdateRecord, this.searchRecord);
+    this.$eventBus.$off(TaskEventNameMappingEnum.UpdateRecord, this.searchRecord);
   },
   methods: {
     /** 

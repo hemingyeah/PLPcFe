@@ -27,8 +27,6 @@ const BaseTimeline = {
   },
   render(h){
     let items = toArray(this.data).map(item => {
-      // 呼叫中心时间取content.ring
-      let time = item.module == 'callCenter' ? item.content.ring : item.createTime
       let content = this.recordRender(h, item);
       return (
         <div class="base-timeline-item">
