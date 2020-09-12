@@ -1,5 +1,12 @@
 <template>
   <div class="page-container task-detail-container">
+    
+    <!-- start 临时工单流程信息 -->
+    <div>
+      <biz-process :value="task.state"></biz-process>
+    </div>
+    <!-- end 临时工单流程信息 -->
+
     <!-- start 顶部操作区 -->
     <div class="task-tool-bar">
       <template v-if="!isDelete">

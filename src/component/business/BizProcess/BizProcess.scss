@@ -1,0 +1,151 @@
+// 流程信息高度
+$progress-height: 40px;
+$proccess-border-height: 20px;
+$progress-state-common-bg-color: #E6E6E6;
+$progress-state-before-bg-color: #E1F3D8;
+
+@mixin triangle-border-color($color) {
+  .biz-process-left-triangle {
+    &:before {
+      border-top-color: $color;
+    }
+    &:after {
+      border-bottom-color: $color;
+    }
+  }
+  .biz-process-right-triangle {
+    &:before {
+      border-bottom-color: $color;;
+    }
+    &:after {
+      border-left-color: $color;;
+    }
+  }
+}
+
+.biz-process {
+  display: flex;
+
+  &-state {
+    margin-right: 25px;
+    background-color: $progress-state-common-bg-color;
+    cursor: pointer;
+
+    height: $progress-height;
+    width: 120px;
+
+    line-height: $progress-height;
+    text-align: center;
+
+    position: relative;
+
+    &-current {
+      background-color: $color-primary;
+      color: #fff;
+    }
+
+    &-before {
+      background-color: $progress-state-before-bg-color;
+      color: $color-success;
+    }
+
+    &-first {
+      border-top-left-radius: ($progress-height / 2);
+      border-bottom-left-radius: ($progress-height / 2);
+    }
+
+    &-last {
+      border-top-right-radius: ($progress-height / 2);
+      border-bottom-right-radius: ($progress-height / 2);
+      border-right: 0;
+    }
+
+  }
+
+}
+
+.biz-process-state-first {
+  .biz-process-left-triangle {
+    display: none;
+  }
+}
+
+.biz-process-state-last {
+  .biz-process-right-triangle {
+    display: none;
+  }
+}
+
+.biz-process-state {
+  @include triangle-border-color($progress-state-common-bg-color);
+}
+
+.biz-process-state-current {
+  @include triangle-border-color($color-primary);
+}
+
+.biz-process-state-before {
+  @include triangle-border-color($progress-state-before-bg-color);
+}
+
+.biz-process-left-triangle {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  &:before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: $proccess-border-height solid;
+    border-left: $proccess-border-height solid transparent;
+
+    position: absolute;
+    left: -$proccess-border-height;
+    top: 0;
+  }
+
+  &:after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-bottom: $proccess-border-height solid;
+    border-left: $proccess-border-height solid transparent;
+
+    position: absolute;
+    left: -$proccess-border-height;
+    top: $proccess-border-height;
+  }
+
+}
+
+.biz-process-right-triangle {
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  &:before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-bottom: $proccess-border-height solid;
+    border-right: $proccess-border-height solid transparent;
+
+    position: absolute;
+    right: -$proccess-border-height;
+    top: 0;
+  }
+
+  &:after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: $proccess-border-height solid;
+    border-bottom: $proccess-border-height solid transparent;
+
+    position: absolute;
+    right: -$proccess-border-height;
+    top: $proccess-border-height;
+  }
+
+}
