@@ -55,7 +55,7 @@ export default {
       selectIds, // id
       taskView: [], // 顶部筛选列表
       otherList: [], //其他列表
-      filterId: selectIds.createdId, //顶部筛选选中的状态id
+      filterId: selectIds.allId, //顶部筛选选中的状态id
       allShow: false, // 全部工单
       otherShow: false, //其他
       addShow: false, //新建
@@ -70,6 +70,7 @@ export default {
       mapShow: true, //地图预览
       selectColumnState: "", //视图选择列状态存储
       planTimeType: "", //判断计划时间展示的样式
+      keyword_select: '表单内容', // 搜索筛选条件
       selectList: [
         { name: "全部", id: "all" },
         { name: "我创建的", id: "create" },
@@ -333,20 +334,17 @@ export default {
       if (success) {
         this.taskView = result;
         this.otherLists(result);
-        this.initialize();
-        console.log("视图", result);
         result.map((item) => {
           if (item.id === selectIds.allId) {
             this.allSearchParams["all"] = item.searchModel;
-            this.allSearchParams["id"] = item.id;
+            this.searchParams = item.searchModel
           } else if (item.id === selectIds.unfinishedId) {
             this.allSearchParams["unfinished"] = item.searchModel;
-            this.allSearchParams["id"] = item.id;
           } else if (item.id === selectIds.finished) {
             this.allSearchParams["finished"] = item.searchModel;
-            this.allSearchParams["id"] = item.id;
           }
         });
+        this.initialize();
       }
     },
     /**
@@ -457,33 +455,12 @@ export default {
       this.filterId = id;
       this.otherText = "其他";
       this.selectColumnState = title;
-
-      if (["all", "unfinished", "finished"].indexOf(title) === -1) {
-        this.dropDownInfo = "";
-      }
       this.getTaskCountByState(searchModel);
       this.params = this.initParams();
       this.search(searchModel);
       this.buildColumns();
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
-    },
-    /*全部工单 */
-    checkAll({ searchModel, id, name, title }) {
-      console.log(id, name, searchModel, title);
-      this.selectColumnState = title;
-      this.dropDownInfo = {
-        id,
-        name,
-        searchModel,
-        title,
-      };
-      this.otherText = "其他";
-      this.filterId = id;
-      this.params = this.initParams();
-      this.getTaskCountByState(searchModel);
-      this.search(searchModel);
-      this.buildColumns();
     },
     /**
      * @description 根据视图匹配高级筛选

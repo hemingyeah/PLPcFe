@@ -8,183 +8,232 @@
       @click="allEvent"
       v-loading.fullscreen.lock="loading"
     >
+      <div class="task-list-header">
+        <!-- 搜索 -->
+        <div class="task-list-header-seach">
+          <form onsubmit="return false;">
+            <div class="seach task-span1 task-flex task-ai">
+              <el-input
+                v-model="params.keyword"
+                placeholder="请输入工单编号或工单信息"
+                class="task-with-input"
+              >
+                <el-select
+                  v-model="keyword_select"
+                  slot="prepend"
+                  placeholder="请选择"
+                  class="task-with-select"
+                >
+                  <el-option label="表单内容" value="1"></el-option>
+                  <el-option label="备注" value="2"></el-option>
+                  <el-option label="附加组件" value="3"></el-option>
+                </el-select>
+              </el-input>
+
+              <base-button
+                type="primary"
+                @event="searchBefore"
+                native-type="submit"
+                class="task-ml12"
+              >
+                搜索
+              </base-button>
+              <base-button type="ghost" @event="resetParams" class="task-ml12">
+                重置
+              </base-button>
+              <div
+                class="advanced-search-visible-btn task-ml12"
+                @click.self="panelSearchAdvancedToggle"
+              >
+                高级搜索
+              </div>
+            </div>
+          </form>
+        </div>
+        <!-- 筛选 -->
+        <div class="task-list-header-nav">
+          <div class="task-flex task-ai">
+            <div class="task-font14 task-c6 state">工单状态：</div>
+            <div class="list task-flex task-ai">
+              <!-- 全部工单 -->
+              <div
+                @click="
+                  checkFilter({
+                    id: selectIds.allId,
+                    name: '全部工单',
+                    searchModel: allSearchParams.all,
+                    title: 'all',
+                  })
+                "
+                :class="{
+                  'task-c2': selectIds.allId === filterId,
+                }"
+              >
+                {{
+                  initData.allDropdownView && initData.allDropdownView.name
+                }}({{ filterData.all || 0 }})
+              </div>
+              <!-- 待指派 -->
+              <div
+                v-for="item in taskView"
+                :key="`${item.createTime}${Math.random() * 1000}`"
+                @click="
+                  checkFilter({
+                    id: item.id,
+                    name: '待指派工单',
+                    searchModel: item.searchModel,
+                    title: 'created',
+                  })
+                "
+                v-show="item.id === selectIds.createdId"
+                :class="{
+                  'task-c2': item.id === filterId,
+                }"
+              >
+                {{ `待指派(${filterData.created || 0})` }}
+              </div>
+              <!-- 已指派 -->
+              <div
+                v-for="item in taskView"
+                :key="`${item.createTime}${Math.random() * 1000}`"
+                @click="
+                  checkFilter({
+                    id: item.id,
+                    name: '已指派工单',
+                    searchModel: item.searchModel,
+                    title: 'allocated',
+                  })
+                "
+                v-show="item.id === selectIds.allocatedId"
+                :class="{
+                  'task-c2': item.id === filterId,
+                }"
+              >
+                {{ `已指派(${filterData.allocated || 0})` }}
+              </div>
+              <!-- 已接受 -->
+              <div
+                v-for="item in taskView"
+                :key="`${item.createTime}${Math.random() * 1000}`"
+                @click="
+                  checkFilter({
+                    id: item.id,
+                    name: '已接受工单',
+                    searchModel: item.searchModel,
+                    title: 'accepted',
+                  })
+                "
+                v-show="item.id === selectIds.acceptedId"
+                :class="{
+                  'task-c2': item.id === filterId,
+                }"
+              >
+                {{ `已接受(${filterData.accepted || 0})` }}
+              </div>
+              <!-- 进行中 -->
+              <div
+                v-for="item in taskView"
+                :key="`${item.createTime}${Math.random() * 1000}`"
+                @click="
+                  checkFilter({
+                    id: item.id,
+                    name: '进行中工单',
+                    searchModel: item.searchModel,
+                    title: 'processing',
+                  })
+                "
+                v-show="item.id === selectIds.processingId"
+                :class="{
+                  'task-c2': item.id === filterId,
+                }"
+              >
+                {{ `进行中(${filterData.processing || 0})` }}
+              </div>
+              <!-- 异常工单 -->
+              <div
+                v-for="item in taskView"
+                :key="`${item.createTime}${Math.random() * 1000}`"
+                @click="
+                  checkFilter({
+                    id: item.id,
+                    name: '异常工单',
+                    searchModel: item.searchModel,
+                    title: 'exception',
+                  })
+                "
+                v-show="
+                  item.id === selectIds.exceptionId &&
+                    initData.tenantVersion === 2
+                "
+                class="task-cef"
+                :class="{
+                  'task-c2': item.id === filterId,
+                }"
+              >
+                {{ `异常工单(${filterData.exception || 0})` }}
+              </div>
+              <!-- 未完成工单 -->
+              <div
+                @click="
+                  checkFilter({
+                    name: `未完成工单`,
+                    searchModel: allSearchParams.unfinished,
+                    title: 'unfinished',
+                    id: selectIds.unfinishedId,
+                  })
+                "
+                :class="{
+                  'task-c2': selectIds.unfinishedId === filterId,
+                }"
+              >
+                {{ `未完成(${filterData.unfinished || 0})` }}
+              </div>
+              <!-- 已完成工单 -->
+              <div
+                @click="
+                  checkFilter({
+                    name: `已完成工单`,
+                    searchModel: allSearchParams.finished,
+                    title: 'finished',
+                    id: selectIds.finished,
+                  })
+                "
+                :class="{
+                  'task-c2': selectIds.finished === filterId,
+                }"
+              >
+                {{ `已完成(${filterData.finished || 0})` }}
+              </div>
+            </div>
+          </div>
+          <!-- 创建 -->
+          <div class="task-flex task-ai">
+            <div class="task-font14 task-c6 state">创建视角：</div>
+            <div class="list task-flex task-ai">
+              <div
+                v-for="(item, index) in selectList"
+                :key="index"
+                class="task-nav-create"
+                :class="{ 'task-c2': selectId === item.id }"
+                @click="
+                  loading = true;
+                  selectId = item.id;
+                  search();
+                "
+              >
+                {{ item.name }}
+              </div>
+            </div>
+          </div>
+          <div class="task-flex task-ai">
+            <div class="task-font14 task-c6 state">工单类型：</div>
+          </div>
+        </div>
+      </div>
+
       <!-- S 顶部筛选 -->
       <div class="common-list-filter">
         <div class="common-list-header-search">
-          <div class="common-list-filter-flow common-list-filter-span1">
-            <!-- 待指派 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '待指派工单',
-                  searchModel: item.searchModel,
-                  title: 'created',
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.createdId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `待指派(${filterData.created || 0})` }}
-            </div>
-            <!-- 已指派 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '已指派工单',
-                  searchModel: item.searchModel,
-                  title: 'allocated',
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.allocatedId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `已指派(${filterData.allocated || 0})` }}
-            </div>
-            <!-- 已接受 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '已接受工单',
-                  searchModel: item.searchModel,
-                  title: 'accepted',
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.acceptedId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `已接受(${filterData.accepted || 0})` }}
-            </div>
-            <!-- 进行中 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '进行中工单',
-                  searchModel: item.searchModel,
-                  title: 'processing',
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.processingId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `进行中(${filterData.processing || 0})` }}
-            </div>
-            <!-- 异常工单 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '异常工单',
-                  searchModel: item.searchModel,
-                  title: 'exception',
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item extion ce6"
-              v-show="
-                item.id === selectIds.exceptionId &&
-                  initData.tenantVersion === 2
-              "
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `异常工单(${filterData.exception || 0})` }}
-            </div>
-            <!-- 全部工单 -->
-            <div
-              v-if="dropDownInfo"
-              @click="checkFilter(dropDownInfo)"
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              :class="{
-                'common-list-filter-flow-active': dropDownInfo.id === filterId,
-              }"
-            >
-              {{ dropDownInfo.name }}
-            </div>
-            <div
-              v-else
-              @click="
-                checkFilter({
-                  id: selectIds.allId,
-                  name: '全部工单',
-                  searchModel: allSearchParams.all,
-                  title: 'all',
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              :class="{
-                'common-list-filter-flow-active': selectIds.allId === filterId,
-              }"
-            >
-              {{ initData.allDropdownView && initData.allDropdownView.name }}({{
-                filterData.all || 0
-              }})
-            </div>
-
-            <!--  -->
-            <div
-              class="common-list-filter-flow-dropdown"
-              @click.stop="
-                allShow = true;
-                otherShow = false;
-                addShow = false;
-              "
-              :class="{ 'common-list-filter-flow-active': allShow }"
-            >
-              <i class="icon-down"></i>
-            </div>
-            <!-- 其他筛选列表 -->
-            <TaskSelect
-              :list="[
-                {
-                  name: `全部完工(${this.filterData.all || 0})`,
-                  searchModel: this.allSearchParams.all,
-                  title: 'all',
-                  id: this.allSearchParams.id,
-                },
-                {
-                  name: `未完成工单(${this.filterData.unfinished || 0})`,
-                  searchModel: this.allSearchParams.unfinished,
-                  title: 'unfinished',
-                  id: this.allSearchParams.id,
-                },
-                {
-                  name: `已完成工单(${this.filterData.finished || 0})`,
-                  searchModel: this.allSearchParams.finished,
-                  title: 'finished',
-                  id: this.allSearchParams.id,
-                },
-              ]"
-              :show="allShow"
-              :right="true"
-              @checkOther="checkAll"
-            />
-          </div>
           <div class="common-list-filter-other">
             <div
               class="common-list-filter-other-item"
@@ -213,51 +262,6 @@
       <!-- E 顶部筛选 -->
 
       <!-- start header -->
-      <div class="common-list-header">
-        <form class="common-list-header-search" onsubmit="return false;">
-          <div class="task-font12 select-list task-flex">
-            <div
-              v-for="(item, index) in selectList"
-              :key="index"
-              class="select-list-item"
-              :class="{ 'select-list-active': selectId === item.id }"
-              @click="
-                loading = true;
-                selectId = item.id;
-                search();
-              "
-            >
-              {{ item.name }}
-            </div>
-          </div>
-          <div class="common-list-header-search-group">
-            <el-input
-              v-model="params.keyword"
-              placeholder="请输入工单编号或工单信息"
-            >
-              <i slot="prefix" class="el-input__icon el-icon-search"></i>
-            </el-input>
-
-            <base-button
-              type="primary"
-              @event="searchBefore"
-              native-type="submit"
-            >
-              搜索
-            </base-button>
-            <base-button type="ghost" @event="resetParams">
-              重置
-            </base-button>
-          </div>
-          <span
-            class="advanced-search-visible-btn"
-            @click.self="panelSearchAdvancedToggle"
-          >
-            <i class="iconfont icon-add"></i>
-            高级搜索
-          </span>
-        </form>
-      </div>
       <!-- end header -->
       <!-- start 高级搜索 -->
       <task-search-panel

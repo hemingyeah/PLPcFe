@@ -62,19 +62,46 @@ textarea {
   &-font12 {
     font-size: 12px;
   }
+  &-font14 {
+    font-size: 14px;
+  }
   &-font16 {
-    font-size: 12px;
+    font-size: 16px;
   }
   &-font24 {
     font-size: 24px;
   }
   // 加粗
-  &-fw6{
+  &-fw6 {
     font-weight: 600;
   }
   // 颜色
   &-c6 {
     color: #666;
   }
+  &-cef {
+    color: #ef6b6b;
+  }
+  &-c2 {
+    color: #13c2c2;
+    font-weight: 500;
+  }
+  // 边距
+  &-ml12 {
+    margin-left: 12px;
+  }
 }
 // E 工单列表
+
+// element
+.base-button {
+  border-radius: 4px!important;
+  padding: 4px 15px!important;
+}
+
+.task-with-input {
+  width: 300px!important;
+}
+.task-with-select {
+  width: 100px!important;
+}

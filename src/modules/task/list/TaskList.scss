@@ -95,10 +95,6 @@
     }
   }
 }
-//颜色
-.ce6 {
-  color: #ef6b6b;
-}
 // E 顶部筛选
 
 // S 新建 and 删除
@@ -193,5 +189,58 @@
   cursor: pointer;
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.task-list {
+  &-header {
+    background: #ffffff;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.06);
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    border-top: none;
+    &-seach {
+      padding: 6px 0;
+      .seach {
+        justify-content: flex-end;
+        padding-right: 16px;
+        .advanced-search-visible-btn {
+          width: 98px;
+          height: 32px;
+          background: #e9f9f9;
+          border-radius: 4px;
+          border: 1px solid #d0f3f4;
+          font-size: 14px;
+          color: #13c2c2;
+          line-height: 32px;
+          text-align: center;
+          cursor: pointer;
+        }
+      }
+    }
+    &-nav {
+      > div {
+        cursor: pointer;
+        height: 32px;
+        line-height: 32px;
+        border-top: 1px solid #e6e6e6;
+        .state {
+          height: 31px;
+          padding-left: 11px;
+          width: 104px;
+          font-weight: 500;
+          background-color: #f2f2f2;
+        }
+        .list {
+          > div {
+            height: 31px;
+            padding-left: 11px;
+            font-size: 14px;
+            margin-right: 30px;
+          }
+        }
+      }
+    }
   }
 }
