@@ -372,7 +372,8 @@ export default {
         pageNum: 1,
       })
         .then(res => {
-          this.products = res.list.map(p => ({
+          let list = res.list || []
+          this.products = list.map(p => ({
             text: p.name,
             value: p.id
           }));

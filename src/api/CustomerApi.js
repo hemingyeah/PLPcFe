@@ -1,6 +1,6 @@
 import http from '@src/util/http';
 
-const CustomerPreFixedPath = '';
+const CustomerPreFixedPath = '/outside/pc';
 
 /** 
  * 获取客户信息，用于客户编辑

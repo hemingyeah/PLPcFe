@@ -1,6 +1,6 @@
 import http from '@src/util/http';
 
-const ProductPreFixedPath = '';
+const ProductPreFixedPath = '/outside/pc';
 
 /** ------------ start 产品 ----------------------- */
 /**
@@ -226,7 +226,7 @@ function getProductTemplateList(params) {
  */
 function productTemplateDelete(ids) {
   let params = (ids || '').split(',');
-  return http.post('/product/delete', params);
+  return http.post(`${ProductPreFixedPath}/product/delete`, params);
 }
 
 /**
@@ -236,7 +236,7 @@ function productTemplateDelete(ids) {
  * @returns Promise<>
  */
 function productTemplateEditBatch(params) {
-  return http.post('/product/editBatch', params, false);
+  return http.post(`${ProductPreFixedPath}/product/editBatch`, params, false);
 }
 
 /**
@@ -254,7 +254,7 @@ function productTemplateCreate(params) {
  * @returns Promise<>
  */
 function productTemplateUpdate(params) {
-  return http.post('/product/update', params);
+  return http.post(`${ProductPreFixedPath}/product/update`, params);
 }
 
 /**
@@ -275,7 +275,7 @@ function getProductTemplate(id) {
  * @returns Promise<>
  */
 function getProductTemplateRecord(params) {
-  return http.get('/product/record/list', params);
+  return http.get(`${ProductPreFixedPath}/product/record/list`, params);
 }
 
 /**
@@ -283,7 +283,7 @@ function getProductTemplateRecord(params) {
  * @returns Promise<>
  */
 function productTemplateCreateRecord(params) {
-  return http.post('/product/record/create', params);
+  return http.post(`${ProductPreFixedPath}/product/record/create`, params);
 }
 
 /**
