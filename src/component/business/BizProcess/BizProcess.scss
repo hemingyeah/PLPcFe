@@ -1,13 +1,13 @@
 // 流程信息高度
 $progress-height: 40px;
-$proccess-border-height: 20px;
+$proccess-border-height: 40px;
 $progress-state-common-bg-color: #E6E6E6;
 $progress-state-before-bg-color: #E1F3D8;
 
 @mixin triangle-border-color($color) {
   .biz-process-left-triangle {
     &:before {
-      border-top-color: $color;
+      border-bottom-color: $color;
     }
     &:after {
       border-bottom-color: $color;
@@ -15,19 +15,20 @@ $progress-state-before-bg-color: #E1F3D8;
   }
   .biz-process-right-triangle {
     &:before {
-      border-bottom-color: $color;;
+      border-top-color: $color;;
     }
     &:after {
-      border-left-color: $color;;
+      border-right-color: $color;;
     }
   }
 }
 
 .biz-process {
   display: flex;
+  overflow: hidden;
 
   &-state {
-    margin-right: 25px;
+    margin-right: 42px;
     background-color: $progress-state-common-bg-color;
     cursor: pointer;
 
@@ -78,6 +79,13 @@ $progress-state-before-bg-color: #E1F3D8;
 
 .biz-process-state {
   @include triangle-border-color($progress-state-common-bg-color);
+
+  &:hover {
+    background-color: $color-primary;
+    color: #fff;
+    @include triangle-border-color($color-primary);
+  }
+
 }
 
 .biz-process-state-current {
@@ -86,6 +94,24 @@ $progress-state-before-bg-color: #E1F3D8;
 
 .biz-process-state-before {
   @include triangle-border-color($progress-state-before-bg-color);
+
+  &:hover {
+    background-color: $progress-state-before-bg-color;
+    color: $color-success;
+    @include triangle-border-color($progress-state-before-bg-color);
+  }
+
+}
+
+.biz-process-state-after {
+  cursor: not-allowed;;
+
+  &:hover {
+    background-color: $progress-state-common-bg-color;
+    color: $text-color-primary;
+    @include triangle-border-color($progress-state-common-bg-color);
+  }
+
 }
 
 .biz-process-left-triangle {
@@ -97,12 +123,14 @@ $progress-state-before-bg-color: #E1F3D8;
     content: '';
     width: 0;
     height: 0;
-    border-top: $proccess-border-height solid;
+    border-bottom: $proccess-border-height solid;
     border-left: $proccess-border-height solid transparent;
 
     position: absolute;
-    left: -$proccess-border-height;
-    top: 0;
+    left: -$proccess-border-height / 2;
+    top: -$proccess-border-height / 2;
+
+    transform: rotate(45deg);
   }
 
   &:after {
@@ -113,8 +141,10 @@ $progress-state-before-bg-color: #E1F3D8;
     border-left: $proccess-border-height solid transparent;
 
     position: absolute;
-    left: -$proccess-border-height;
-    top: $proccess-border-height;
+    left: -$proccess-border-height / 2;
+    top: $proccess-border-height / 2;
+
+    transform: rotate(-135deg);
   }
 
 }
@@ -128,24 +158,28 @@ $progress-state-before-bg-color: #E1F3D8;
     content: '';
     width: 0;
     height: 0;
-    border-bottom: $proccess-border-height solid;
-    border-right: $proccess-border-height solid transparent;
+    border-top: $proccess-border-height solid;
+    border-left: $proccess-border-height solid transparent;
 
     position: absolute;
-    right: -$proccess-border-height;
+    right: -$proccess-border-height / 2;
     top: 0;
+
+    transform: rotate(315deg);
   }
 
   &:after {
     content: '';
     width: 0;
     height: 0;
-    border-left: $proccess-border-height solid;
-    border-bottom: $proccess-border-height solid transparent;
+    border-right: $proccess-border-height solid;
+    border-top: $proccess-border-height solid transparent;
 
     position: absolute;
-    right: -$proccess-border-height;
-    top: $proccess-border-height;
+    right: -$proccess-border-height / 2;
+    top: 0;
+
+    transform: rotate(-45deg);
   }
 
 }

@@ -34,14 +34,14 @@ const BizProcess = {
     genStateProcess() {
       return TaskStateProcessArray
     },
+    /* 获取当前状态的索引 */
     genCurrentStateIndex() {
       let index = 0;
       let state = null;
 
       for(let i = 0; i < this.genStateProcess.length; i++) {
         state = this.genStateProcess[i]
-        let isCurrent = state.value == this.value || (Array.isArray(state.value) && state.value.indexOf(this.value) > -1)
-        if (isCurrent) {
+        if (this.isCurrentState(state)) {
           index = i
           break
         }
@@ -51,25 +51,40 @@ const BizProcess = {
     }
   },
   methods: {
+    /* 获取流程信息状态的类名 */
     genStateProcessClassName(state, index) {
       let className = ['biz-process-state']
-      let isCurrent = this.genCurrentStateIndex == index
-      let isBefore = this.genCurrentStateIndex > index
-      let isAfter = this.genCurrentStateIndex < index
-      let isFirst = index == 0;
-      let isLast = index == this.genStateProcess.length - 1;
 
-      isCurrent && className.push('biz-process-state-current')
-      isBefore && className.push('biz-process-state-before')
-      isAfter && className.push('biz-process-state-after')
-      isFirst && className.push('biz-process-state-first')
-      isLast && className.push('biz-process-state-last')
+      state.isCurrent = this.genCurrentStateIndex == index
+      state.isBefore = this.genCurrentStateIndex > index
+      state.isAfter = this.genCurrentStateIndex < index
+      state.isFirst = index == 0;
+      state.isLast = index == this.genStateProcess.length - 1;
+
+      state.isCurrent && className.push('biz-process-state-current')
+      state.isBefore && className.push('biz-process-state-before')
+      state.isAfter && className.push('biz-process-state-after')
+      state.isFirst && className.push('biz-process-state-first')
+      state.isLast && className.push('biz-process-state-last')
 
       return className
     },
+    /* 判断是否是当前状态 */
+    isCurrentState(state) {
+      return state.value == this.value || (Array.isArray(state.value) && state.value.indexOf(this.value) > -1);
+    },
+    /* 流程信息点击事件处理 */
+    processClickHander(state) {
+      if(state.isAfter) {
+        return console.warn('Caused: because state is the after process state, So can not click')
+      }
+
+      this.$emit('change', state.value);
+    },
+    /* 渲染流程信息状态 */
     renderProcessStateItem(h, state, index) {
       return (
-        <div class="biz-process-state" class={ this.genStateProcessClassName(state, index) }>
+        <div class="biz-process-state" onClick={ e => this.processClickHander(state) } class={ this.genStateProcessClassName(state, index) }>
           <span class="biz-process-left-triangle"></span>
           { state.name }
           <span class="biz-process-right-triangle"></span>
