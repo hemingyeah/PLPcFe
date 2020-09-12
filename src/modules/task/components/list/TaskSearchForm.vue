@@ -73,7 +73,6 @@ export default {
         }
 
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
-        console.log(form)
         this.$set(
           this.form,
           field.fieldName,

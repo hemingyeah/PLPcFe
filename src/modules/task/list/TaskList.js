@@ -304,7 +304,6 @@ export default {
     this.getUserViews();
     this.getTaskCountByState();
     this.revertStorage();
-    this.isAdvanced();
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     window.__exports__refresh = this.searchList;
@@ -314,8 +313,8 @@ export default {
      * @description 高级搜索列表匹配
      */
     isAdvanced(list = "") {
-      const { initData } = this;
-      let selects = list ? list : initData.allFieldInfo;
+      if (!list) return;
+      let selects = list;
       selects.map((v, i) => {
         if (v.displayName === "优先级") {
           this.advanceds[8].setting = v.setting;
@@ -490,7 +489,7 @@ export default {
      * @description 根据视图匹配高级筛选
      */
     advancedFilter(searchModel) {
-      const {advanceds} = this
+      const { advanceds } = this;
     },
     // 最高事件
     allEvent() {
@@ -658,7 +657,7 @@ export default {
           // 把选中的匹配出来
           // this.matchSelected();
           console.log("工单列表渲染数据", this.taskPage);
-          this.multipleSelection = []
+          this.multipleSelection = [];
           return data;
         })
         .then(() => {
@@ -700,7 +699,7 @@ export default {
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
       // S 高级搜索
-      this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
+      this.advanceds = [...advancedList, ...this.taskTypeFilterFields]
       // E 高级搜索
 
       this.columns = fields

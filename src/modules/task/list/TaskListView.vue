@@ -21,7 +21,7 @@
                   id: item.id,
                   name: '待指派工单',
                   searchModel: item.searchModel,
-                  title: 'created'
+                  title: 'created',
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -41,7 +41,7 @@
                   id: item.id,
                   name: '已指派工单',
                   searchModel: item.searchModel,
-                  title: 'allocated'
+                  title: 'allocated',
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -61,7 +61,7 @@
                   id: item.id,
                   name: '已接受工单',
                   searchModel: item.searchModel,
-                  title: 'accepted'
+                  title: 'accepted',
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -81,7 +81,7 @@
                   id: item.id,
                   name: '进行中工单',
                   searchModel: item.searchModel,
-                  title: 'processing'
+                  title: 'processing',
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -101,7 +101,7 @@
                   id: item.id,
                   name: '异常工单',
                   searchModel: item.searchModel,
-                  title: 'exception'
+                  title: 'exception',
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item extion ce6"
@@ -123,7 +123,9 @@
               :class="{
                 'common-list-filter-flow-active': dropDownInfo.id === filterId,
               }"
-            >{{dropDownInfo.name}}</div>
+            >
+              {{ dropDownInfo.name }}
+            </div>
             <div
               v-else
               @click="
@@ -131,7 +133,7 @@
                   id: selectIds.allId,
                   name: '全部工单',
                   searchModel: allSearchParams.all,
-                  title: 'all'
+                  title: 'all',
                 })
               "
               class="common-list-filter-span1 common-list-filter-flow-item"
@@ -163,19 +165,19 @@
                   name: `全部完工(${this.filterData.all || 0})`,
                   searchModel: this.allSearchParams.all,
                   title: 'all',
-                  id: this.allSearchParams.id
+                  id: this.allSearchParams.id,
                 },
                 {
                   name: `未完成工单(${this.filterData.unfinished || 0})`,
                   searchModel: this.allSearchParams.unfinished,
                   title: 'unfinished',
-                  id: this.allSearchParams.id
+                  id: this.allSearchParams.id,
                 },
                 {
                   name: `已完成工单(${this.filterData.finished || 0})`,
                   searchModel: this.allSearchParams.finished,
                   title: 'finished',
-                  id: this.allSearchParams.id
+                  id: this.allSearchParams.id,
                 },
               ]"
               :show="allShow"
@@ -437,7 +439,7 @@
             :prop="column.field"
             :sortable="column.sortable"
             :show-overflow-tooltip="column.field !== 'name'"
-            :width="column.width"
+            :width="column.width || '120px'"
           >
             <template slot-scope="scope">
               <!-- 工单编号 -->
@@ -692,7 +694,9 @@
 
         <div class="table-footer comment-list-table-footer">
           <div class="comment-list-table-footer-info">
-            共<span class="level-padding">{{ taskPage.totalElements || 0 }}</span
+            共<span class="level-padding">{{
+              taskPage.totalElements || 0
+            }}</span
             >记录， 已选中
             <span
               class="task-list-selected-count common-selected-count"
@@ -765,7 +769,7 @@
       <batch-editing-customer-dialog
         ref="batchEditingCustomerDialog"
         :config="{
-          fields: initData.allFieldInfo,
+          fields: columns,
           currentTaskType: currentTaskType,
         }"
         :selectedIds="selectedIds"
