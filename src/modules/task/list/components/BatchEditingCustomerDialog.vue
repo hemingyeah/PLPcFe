@@ -143,7 +143,7 @@ export default {
       let params = {
         taskIds: selectedIds,
         templateId: config.currentTaskType.id,
-        fieldType: buildParams.fieldType,
+        fieldType: buildParams.fieldType ? 0 : 1,
         fieldName: "",
         value: "",
       };
@@ -235,7 +235,7 @@ export default {
           }
 
           const f = event.field;
-          this.form[f.fieldName] = event.newValue;
+          this.form = { [f.fieldName]: event.newValue };
         },
         selectField(val) {
           this.selectedField = this.fields.filter(
@@ -318,7 +318,6 @@ export default {
               update: (event) => this.update(event),
             },
           };
-
           // if (sf.formType === 'address' && !sf.isSystem) {
           //   data.props.disableMap = true;
           // }
