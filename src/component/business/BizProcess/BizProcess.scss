@@ -1,28 +1,49 @@
-// 流程信息高度
 $progress-height: 40px;
 $proccess-border-height: 40px;
 $progress-state-common-bg-color: #E6E6E6;
 $progress-state-before-bg-color: #E1F3D8;
 
-@mixin triangle-border-color($color) {
+@mixin triangle-border-color($color, $backgroundColor: '') {
   .biz-process-left-triangle {
-    &:before {
-      border-bottom-color: $color;
+    &-top {
+      background-color: $color;
+      &:before {
+        background-color: $backgroundColor;
+      }
     }
-    &:after {
-      border-bottom-color: $color;
+    &-bottom {
+      background-color: $color;
+      &:before {
+        background-color: $backgroundColor;
+      }
     }
   }
   .biz-process-right-triangle {
-    &:before {
-      border-top-color: $color;;
+    &-top {
+      background-color: $color;
+      &:before {
+        background-color: $backgroundColor;
+      }
     }
-    &:after {
-      border-right-color: $color;;
+    &-bottom {
+      background-color: $color;
+      &:before {
+        background-color: $backgroundColor;
+      }
     }
   }
 }
 
+@mixin process-state-border-color($color) {
+  & {
+    &:before,
+    &:after {
+      background-color: $color;
+    }
+  }
+}
+
+/* 流程信息 */
 .biz-process {
   display: flex;
   overflow: hidden;
@@ -65,18 +86,40 @@ $progress-state-before-bg-color: #E1F3D8;
 
 }
 
+/* 流程信息第一个 */
 .biz-process-state-first {
   .biz-process-left-triangle {
     display: none;
   }
+  &:hover {
+    background-color: #fff;
+    border: 1px solid $color-primary;
+    color: $color-primary;
+    @include triangle-border-color($color-primary);
+  }
+
+  &:before {
+    left: 107px !important;
+    top: -1px !important;
+    width: 20px !important;
+  }
+
+  &:after {
+    left: 107px !important;
+    bottom: -1px !important;
+    width: 22px !important;
+  }
+
 }
 
+/* 流程信息最后一个 */
 .biz-process-state-last {
   .biz-process-right-triangle {
     display: none;
   }
 }
 
+/* 流程信息状态 */
 .biz-process-state {
   @include triangle-border-color($progress-state-common-bg-color);
 
@@ -86,23 +129,53 @@ $progress-state-before-bg-color: #E1F3D8;
     @include triangle-border-color($color-primary);
   }
 
-}
+  &:before {
+    border-radius: 1px;
+    content: '';
 
-.biz-process-state-current {
-  @include triangle-border-color($color-primary);
-}
+    position: absolute;
+    top: 0px;
+    left: -29px;
+    z-index: 1; 
+    
+    height: 1px;
+    width: 159px;
+  }
 
-.biz-process-state-before {
-  @include triangle-border-color($progress-state-before-bg-color);
+  &:after {
+    border-radius: 1px;
+    content: '';
 
-  &:hover {
-    background-color: $progress-state-before-bg-color;
-    color: $color-success;
-    @include triangle-border-color($progress-state-before-bg-color);
+    position: absolute;
+    left: -28px;
+    bottom: 0px;
+    z-index: 1;
+
+    height: 1px;
+    width: 158px;
   }
 
 }
 
+/* 流程信息 当前的 */
+.biz-process-state-current {
+  @include triangle-border-color($color-primary);
+}
+
+/* 流程信息 之前的 */
+.biz-process-state-before {
+  @include triangle-border-color($progress-state-before-bg-color);
+
+  &:hover {
+    background-color: #fff;
+    color: $color-primary;
+    @include triangle-border-color(#fff, $color-primary);
+    @include process-state-border-color($color-primary);
+  }
+
+}
+
+/* 流程信息 之后的 */
 .biz-process-state-after {
   cursor: not-allowed;;
 
@@ -114,37 +187,88 @@ $progress-state-before-bg-color: #E1F3D8;
 
 }
 
+.biz-process-state-current.biz-process-state-last {
+  &:hover {
+    border: 1px solid $color-primary;
+    background-color: #fff;
+    color: $color-primary;
+    @include triangle-border-color(#fff, $color-primary);
+    @include process-state-border-color($color-primary);
+  }
+
+  &:before {
+    left: -30px !important;
+    top: -1px !important;
+    width: 60px !important;
+  }
+
+  &:after {
+    left: -27px !important;
+    bottom: -1px !important;
+    width: 60px !important;
+  }
+}
+
+
+/* 流程信息 三角形 */
+.biz-process-left-triangle,
+.biz-process-right-triangle {
+  span {
+    position: absolute;
+  }
+}
+
 .biz-process-left-triangle {
   position: absolute;
   left: 0;
   top: 0;
 
-  &:before {
-    content: '';
-    width: 0;
-    height: 0;
-    border-bottom: $proccess-border-height solid;
-    border-left: $proccess-border-height solid transparent;
+  &-top {
+    width: $proccess-border-height;
+    height: $proccess-border-height;
 
     position: absolute;
     left: -$proccess-border-height / 2;
     top: -$proccess-border-height / 2;
 
     transform: rotate(45deg);
+
+    &:before {
+      content: '';
+
+      position: absolute;
+      top: $proccess-border-height;
+      left: -10px;
+
+      width: $proccess-border-height;
+      height: 1px;
+    }
+
   }
 
-  &:after {
-    content: '';
-    width: 0;
-    height: 0;
-    border-bottom: $proccess-border-height solid;
-    border-left: $proccess-border-height solid transparent;
+  &-bottom {
+    width: $proccess-border-height;
+    height: $proccess-border-height;
 
     position: absolute;
     left: -$proccess-border-height / 2;
     top: $proccess-border-height / 2;
 
     transform: rotate(-135deg);
+
+    &:before {
+      border-radius: 1px;
+      content: '';
+
+      position: absolute;
+      top: 7.8px;
+      left: $proccess-border-height / 2;
+
+      width: $proccess-border-height;
+      height: 1px;
+
+      transform: rotate(90deg);
+    }
   }
 
 }
@@ -154,32 +278,51 @@ $progress-state-before-bg-color: #E1F3D8;
   right: 0;
   top: 0;
 
-  &:before {
-    content: '';
-    width: 0;
-    height: 0;
-    border-top: $proccess-border-height solid;
-    border-left: $proccess-border-height solid transparent;
+  &-top {
+    width: $proccess-border-height;
+    height: $proccess-border-height;
 
     position: absolute;
-    right: -$proccess-border-height / 2;
+    right: (-$proccess-border-height / 2) - 1;
     top: 0;
 
     transform: rotate(315deg);
+
+    &:before {
+      border-radius: 1px;
+      content: '';
+
+      position: absolute;
+      top: $proccess-border-height / 2;
+      left: $proccess-border-height / 2;
+
+      width: $proccess-border-height;
+      height: 1px;
+
+      transform: rotate(90deg);
+    }
   }
 
-  &:after {
-    content: '';
-    width: 0;
-    height: 0;
-    border-right: $proccess-border-height solid;
-    border-top: $proccess-border-height solid transparent;
+  &-bottom {
+    width: $proccess-border-height;
+    height: $proccess-border-height;
 
     position: absolute;
     right: -$proccess-border-height / 2;
     top: 0;
 
     transform: rotate(-45deg);
+
+    &:before {
+      content: '';
+
+      position: absolute;
+      top: $proccess-border-height;
+      left: 1px;
+
+      width: $proccess-border-height;
+      height: 1px;
+    }
   }
 
 }

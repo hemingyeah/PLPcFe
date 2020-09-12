@@ -85,9 +85,15 @@ const BizProcess = {
     renderProcessStateItem(h, state, index) {
       return (
         <div class="biz-process-state" onClick={ e => this.processClickHander(state) } class={ this.genStateProcessClassName(state, index) }>
-          <span class="biz-process-left-triangle"></span>
+          <span class="biz-process-left-triangle">
+            <span class="biz-process-left-triangle-top"></span>
+            <span class="biz-process-left-triangle-bottom"></span>
+          </span>
           { state.name }
-          <span class="biz-process-right-triangle"></span>
+          <span class="biz-process-right-triangle">
+            <span class="biz-process-right-triangle-top"></span>
+            <span class="biz-process-right-triangle-bottom"></span>
+          </span>
         </div>
       )
     }
