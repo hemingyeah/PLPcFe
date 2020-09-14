@@ -40,6 +40,7 @@ import BizSelectionPanel from './business/BizSelectionPanel';
 import BizSearchCustomerSelect from './business/BizSearchCustomerSelect';
 import BizSearchProductSelect from './business/BizSearchProductSelect';
 import BizProcess from './business/BizProcess';
+import BizProcessTime from './business/BizProcessTime';
 
 import SampleTooltip from './common/SampleTooltip';
 
@@ -82,6 +83,7 @@ const components = [
   BizSearchCustomerSelect,
   BizSearchProductSelect,
   BizProcess,
+  BizProcessTime,
   
   BaseWindow,
   SampleTooltip,

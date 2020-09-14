@@ -1,3 +1,5 @@
+import TaskStateEnum from './../../../../model/enum/TaskStateEnum';
+
 type TaskState = {
   name: string,
   value: string | string[]
@@ -15,27 +17,31 @@ class TaskStateProcessEnum {
 
     this.CREATED = {
       name: '待分配',
-      value: 'created'
+      value: TaskStateEnum.CREATED.value
     }
 
     this.ALLOCATED = {
       name: '已指派',
-      value: 'allocated'
+      value: TaskStateEnum.ALLOCATED.value
     }
 
     this.ACCEPTED = {
       name: '已接受',
-      value: 'accepted'
+      value: TaskStateEnum.ACCEPTED.value
     }
     
     this.PROCESSING = {
       name: '进行中',
-      value: 'processing'
+      value: TaskStateEnum.PROCESSING.value
     }
 
     this.FINISHED = {
       name: '已完成',
-      value: ['finished', 'costed', 'closed']
+      value: [
+        TaskStateEnum.FINISHED.value,
+        TaskStateEnum.COSTED.value,
+        TaskStateEnum.CLOSED.value
+      ]
     }
 
   }

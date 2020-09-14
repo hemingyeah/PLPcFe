@@ -1,4 +1,6 @@
 import './BizProcess.scss'
+
+import _ from 'lodash'
 /* 工单流程信息状态 */
 import TaskStateProcessEnum from './TaskStateProcessEnum.ts'
 /* 工单状态数组 */
@@ -25,6 +27,11 @@ const BizProcess = {
       type: String,
       default: ''
     },
+  },
+  data() {
+    return {
+      selected: ''
+    }
   },
   computed: {
     /** 
@@ -54,6 +61,7 @@ const BizProcess = {
     /* 获取流程信息状态的类名 */
     genStateProcessClassName(state, index) {
       let className = ['biz-process-state']
+      let isSelected = Array.isArray(this.selected) ? _.isEqual(this.selected, state.value) : this.selected == state.value;
 
       state.isCurrent = this.genCurrentStateIndex == index
       state.isBefore = this.genCurrentStateIndex > index
@@ -66,6 +74,7 @@ const BizProcess = {
       state.isAfter && className.push('biz-process-state-after')
       state.isFirst && className.push('biz-process-state-first')
       state.isLast && className.push('biz-process-state-last')
+      isSelected && className.push('biz-process-state-selected')
 
       return className
     },
@@ -79,6 +88,7 @@ const BizProcess = {
         return console.warn('Caused: because state is the after process state, So can not click')
       }
 
+      this.selected = state.value;
       this.$emit('change', state.value);
     },
     /* 渲染流程信息状态 */

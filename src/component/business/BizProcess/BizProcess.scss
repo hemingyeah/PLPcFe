@@ -172,7 +172,6 @@ $progress-state-before-bg-color: #E1F3D8;
     @include triangle-border-color(#fff, $color-primary);
     @include process-state-border-color($color-primary);
   }
-
 }
 
 /* 流程信息 之后的 */
@@ -209,6 +208,17 @@ $progress-state-before-bg-color: #E1F3D8;
   }
 }
 
+.biz-process-state-selected {
+  background-color: #fff;
+  color: $color-primary;
+  @include triangle-border-color(#fff, $color-primary);
+  @include process-state-border-color($color-primary);
+}
+
+.biz-process-state-selected.biz-process-state-first
+.biz-process-state-selected.biz-process-state-last {
+  border: 1px solid;
+}
 
 /* 流程信息 三角形 */
 .biz-process-left-triangle,

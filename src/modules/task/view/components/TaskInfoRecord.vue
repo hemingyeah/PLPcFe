@@ -653,4 +653,10 @@ export default {
 .task-record-fail {
   color: #f0ad4e;
 }
+
+.task-info-record {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+}
 </style>

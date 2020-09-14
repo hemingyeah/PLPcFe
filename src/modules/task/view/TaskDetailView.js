@@ -30,6 +30,7 @@ export default {
       loading: false,
       pending: false,
       task: this.initData?.task || {},
+      taskState: this.initData?.task?.state || '',
       fields: [], // 工单表单字段
       tabs: [], // 工单关联数据tab
       currTab: 'task-info-record', // 当前选中的tab
@@ -721,6 +722,9 @@ export default {
     // 发起审批
     proposeApprove(data) {
       this.$refs.proposeApprove.openDialog(data);
+    },
+    changeTaskProcessState(state) {
+      this.taskState = state;
     }
   },
   async mounted() {

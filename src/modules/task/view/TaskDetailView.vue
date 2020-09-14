@@ -3,7 +3,8 @@
     
     <!-- start 临时工单流程信息 -->
     <div>
-      <biz-process :value="task.state"></biz-process>
+      <biz-process :value="task.state" @change="changeTaskProcessState"></biz-process>
+      <biz-process-time :data="task" :state="taskState"></biz-process-time>
     </div>
     <!-- end 临时工单流程信息 -->
 
