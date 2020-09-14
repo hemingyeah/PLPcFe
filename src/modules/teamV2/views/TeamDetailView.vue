@@ -12,7 +12,7 @@
 
         <div class="action-btns">
           <div class="action-btn-view" v-if="!teamData.parent && showNewTeam" @click="teamChildCreate">
-            <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子团队</span>
+            <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子部门</span>
           </div>
           <div class="action-btn-view" @click="personAddChoose">
             <span class="action-btn"><i class="iconfont icon-add"></i>添加成员</span>
@@ -31,7 +31,7 @@
 
           <div class="team-detail-form-group">
             <div class="form-view-row">
-              <label>团队描述</label>
+              <label>部门描述</label>
               <div class="form-view-row-content">{{ teamData.description }}</div>
             </div>
 
@@ -49,25 +49,16 @@
 
             <div class="form-view-row">
               <label>负责区域</label>
-              <div class="form-view-row-content">
-                <p v-for="place in teamData.tagPlaceList" :key="`${place.id}_index`">
-                  {{ place.province || '' }}
-                  {{ place.city ? `- ${place.city}` : '' }}
-                  {{ place.dist ? `- ${place.dist}` : '' }}
-                </p>
-              </div>
+              <div class="form-view-row-content"><p v-for="place in teamData.tagPlaceList" :key="`${place.id}_index`">{{ place.province || '' }}{{ place.city ? `- ${place.city}` : '' }}{{ place.dist ? `- ${place.dist}` : '' }}</p></div>
             </div>
 
             <div class="form-view-row">
               <label>位置</label>
-              <div class="form-view-row-content" v-if="teamData.tagAddress">
-                {{ teamData.tagAddress | fmt_address }}
-                <i v-if="teamData.tagAddress.longitude && teamData.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i>
-              </div>
+              <div class="form-view-row-content" v-if="teamData.tagAddress">{{ teamData.tagAddress | fmt_address }}<i v-if="teamData.tagAddress.longitude && teamData.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i></div>
             </div>
 
             <div class="form-view-row" v-if="teamData.parent && showNewTeam">
-              <label>主团队</label>
+              <label>主部门</label>
               <div class="form-view-row-content">
                 <span @click="goTeamDetail(teamData.parent.id)" class="link-text">
                   {{ teamData.parent.tagName }}
@@ -76,7 +67,7 @@
             </div>
 
             <div class="form-view-row" v-else-if="!teamData.parent && showNewTeam">
-              <label>子团队</label>
+              <label>子部门</label>
               <div class="form-view-row-content">
                 <span @click="goTeamDetail(child.id)" v-for="(child, index) in teamData.children" :key="index + 'detail'" class="link-text">
                   {{ child.tagName }}
@@ -391,7 +382,7 @@ export default {
     },
     /** 编辑团队 */
     teamEdit() {
-      window.location.href = `/security/tag/editTag/${this.teamData.id}`
+      window.location.href = `/security/tag/editDept/${this.teamData.id}`
     },
     personAddChoose() {
       let options = {};

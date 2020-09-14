@@ -2,8 +2,6 @@
   <form @submit.prevent="submit" class="form-page" v-loading.fullscreen.lock="loadingPage">
     <div class="form-page-header">
       <div class="form-page-tool">
-        <button type="button" class="btn-text btn-back" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
-        <span class="cut-off-line">|</span>
         <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
       </div>
     </div>

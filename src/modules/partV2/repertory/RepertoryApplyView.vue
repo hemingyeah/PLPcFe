@@ -850,10 +850,12 @@
           class="dialog-footer flex-x"
           v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'dealing'"
         >
-          <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
+          <!-- 多端隐藏 -->
+          <!-- <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
             DING
-          </div>
+          </div> -->
+
           <!-- <base-button
             v-if="partDealData.data.state === 'suspending' && partDealData.data.cancel"
             type="primary"

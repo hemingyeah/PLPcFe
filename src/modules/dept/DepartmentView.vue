@@ -77,8 +77,8 @@
                 角色名称： <a :href="`/security/role/view/${selectedRole.id}`" :data-id="selectedRole.id" @click="goRoleDetail" style="color:#55B7B4;">{{selectedRole.text}} </a>
                 <!-- <base-button style="margin-left:10px;" type="ghost" @event="openCreateUserPanel"> 查看 </base-button> -->
                 <base-button v-if="canEditSystemRole || isCustomeRole" style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)"> 编辑 </base-button>
-                <base-button v-if="canEditSystemRole" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.id)"> 重置权限 </base-button>
-                <base-button v-if="isCustomeRole" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)"> 删除角色 </base-button>
+                <base-button v-if="selectedRole.custom" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.custom)"> 重置权限 </base-button>
+                <base-button v-if="selectedRole.isSys == 0" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)"> 删除角色 </base-button>
               </h4> 
               <h4 class="role-desc">角色描述：{{roleDes}} </h4>
             </div>
@@ -153,7 +153,7 @@
                 </el-table-column>
                 <el-table-column label="操作">
                   <template slot-scope="scope">
-                    <el-button v-if="scope.row.eventCount || scope.row.taskCount || scope.row.customerCount || scope.row.spareCount" type="text" @click="createTransTab('event')">去转交</el-button>
+                    <el-button v-if="scope.row.eventCount || scope.row.taskCount || scope.row.customerCount || scope.row.spareCount" type="text" @click="createTransTab('event', scope.row.userId)">去转交</el-button>
                     <el-button type="text" @click="resume(scope.row.userId)">恢复</el-button>
                   </template>
                 </el-table-column>
@@ -162,7 +162,7 @@
               <template v-else>
                 <el-table-column label="部门" show-overflow-tooltip>
                   <template slot-scope="scope">
-                    {{scope.row.tagList.map(i => i.tagName).join('，')}}
+                    {{scope.row.tagList && scope.row.tagList.map(i => (i && i.tagName) || '').join('，')}}
                   </template>
                 </el-table-column>
                 <el-table-column prop="cellPhone" label="联系电话" />
@@ -233,19 +233,19 @@
                 <span>{{ deptArea }}</span>
               </div>
               <el-tooltip v-else placement="top">
-                <div slot="content">{{deptInfo.tagPlaceList && deptInfo.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}</div>
-                <a href="" style="text-decoration: none;color: #333;">{{deptArea}}</a>
+                <div slot="content">{{deptInfo.tagPlaceList && deptInfo.tagPlaceList.map(p => p && `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}</div>
+                <a href="javascript:;" style="text-decoration: none;color: #333;">{{deptArea}}</a>
               </el-tooltip>
             </div>
             <div class="form-view-row">
               <label>部门描述：</label>
-              <div v-if="deptInfo.description && deptInfo.description.length < 10" class="form-view-row-content">
+              <el-tooltip v-if="deptInfo.description && deptInfo.description.length > 10" placement="top">
+                <div slot="content">{{deptInfo.description}}</div>
+                <a href="javascript:;" style="text-decoration: none;color: #333;">{{deptDescription}}</a>
+              </el-tooltip>
+              <div v-else class="form-view-row-content">
                 <span>{{ deptInfo.description }}</span>
               </div>
-              <el-tooltip v-else placement="top">
-                <div slot="content">{{deptInfo.description}}</div>
-                <a href="" style="text-decoration: none;color: #333;">{{deptDescription}}</a>
-              </el-tooltip>
             </div>
           </div>
           <div class="dept-info">
@@ -299,7 +299,7 @@
               <el-table-column prop="tagName" label="部门名称" show-overflow-tooltip/>
               <el-table-column label="部门主管" show-overflow-tooltip> 
                 <template slot-scope="scope">
-                  {{scope.row.teamLeaders.map(i => i.displayName).join('，')}}
+                  {{scope.row.teamLeaders.map(i => (i && i.displayName) || '').join('，')}}
                 </template>
               </el-table-column>
               <el-table-column prop="phone" label="联系电话" />
@@ -310,7 +310,7 @@
               </el-table-column>
               <el-table-column label="负责区域" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  {{scope.row.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}
+                  {{scope.row.tagPlaceList.map(p => p && `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}
                 </template>
               </el-table-column>
               
@@ -374,7 +374,7 @@
               </el-dropdown-menu>
             </el-dropdown>
             <base-button type="primary" @event="chooseUser()">添加成员</base-button>
-            <base-button type="primary" @event="userDeleteConfirm('multiple')">移除成员</base-button>
+            <base-button v-if="canRemove" type="primary" @event="userDeleteConfirm('multiple')">移除成员</base-button>
           <!-- <base-button type="primary" @event="searchModel.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button> -->
           </div>
 
@@ -403,7 +403,7 @@
               
               <el-table-column label="角色" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  {{scope.row.roles && scope.row.roles.map(i => i.name).join('，')}}
+                  {{scope.row.roles && scope.row.roles.map(i => (i && i.name) || '').join('，')}}
                 </template>
               </el-table-column>
 
@@ -510,7 +510,7 @@
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="exportDialogvisible = false">取 消</el-button>
+        <el-button @click="exportDialogClosed">取 消</el-button>
         <el-button type="primary" :disabled="pending" :loading="pending" @click="exportData">{{pending ? '正在导出' : '导出'}}</el-button>
       </span>
     </el-dialog>
@@ -520,12 +520,13 @@
       <el-form ref="restFormRef" label-width="120px" class="reset-dialog-form">
         <label>确定将该成员的密码重置吗？</label>
         <el-form-item label="重置后密码：" required>
-          <el-input placeholder="请输入密码" v-model="resetForm.pwd"></el-input>
+          <input type="password" style="position: fixed;left: -9999px;">
+          <el-input placeholder="请输入密码" v-model="resetForm.pwd" type="password" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="resetDialogvisible = false">取 消</el-button>
+        <el-button @click="resetDialogClosed">取 消</el-button>
         <el-button type="primary" :disabled="pending" :loading="pending" @click="resetUserPwd">确 定</el-button>
       </span>
     </el-dialog>
@@ -562,6 +563,7 @@ import http from '@src/util/http';
 import Page from '@model/Page';
 import platform from '@src/platform';
 import qs from 'qs';
+import url from 'url';
 let export_state, timeStart, timeEnd; 
 export default {
   name: 'department-view',
@@ -684,7 +686,7 @@ export default {
       if(this.isCustomeRole) return '自定义角色，支持编辑角色权限和删除角色';
     },
     teamLeadersName(){
-      return this.deptInfo.teamLeaders && this.deptInfo.teamLeaders.map(i => i.displayName).join('，')
+      return this.deptInfo.teamLeaders && this.deptInfo.teamLeaders.map(i => (i && i.displayName) || '').join('，')
     },
     deptArea(){
       const tagPlaceList = this.deptInfo.tagPlaceList || []
@@ -697,6 +699,10 @@ export default {
     deptDescription(){
       const desc = this.deptInfo.description || ''
       return desc.length < 10 ? desc : `${desc.substring(0, 10)}...`
+    },
+    canRemove(){
+      // 主部门下面成员不能移除
+      return this.selectedDept.parentId; 
     }
   },
   mounted() {
@@ -706,6 +712,12 @@ export default {
     this.selectedRole = this.roles[0];
     // 自动分配角色
     this.autoAuthRoles = [{id: '0', text:'由管理员每次指定'}].concat(this.dept_role_data)
+    let href = url.parse(window.location.href, true) || {};
+    if(href.query && href.query.from == 'role'){
+      // jsp新建角色后跳转过来的
+      this.activeName = 'role';
+      this.chooseRole(this.selectedRole)
+    }
   },
   methods: {
     debounce:_.debounce(async function(){
@@ -731,7 +743,7 @@ export default {
         });
     },
     async deleteDeptUser(row) {
-      if(await this.$platform.confirm('确定要把选中成员从该部门中移除吗？')){
+      if(await this.$platform.confirm('确定要把选中成员从该部门中删除吗？')){
         row.pending = true;
         this.$http.post('/security/user/delete', {userId: row.userId}, false)
           .then(res => {
@@ -765,13 +777,7 @@ export default {
       }
       if(export_state === 'all') {
         // 导出全部
-        let roleId = this.selectedRole.id;
-        if(roleId == 0) {
-          // 未分配
-          window.location.href = `/security/user/workState/exportBatch?roleType=noauth&timeStart=${timeStart}&timeEnd=${timeEnd}`;
-        } else {
-          window.location.href = `/security/user/workState/exportBatch?roleId=${roleId}&timeStart=${timeStart}&timeEnd=${timeEnd}`;
-        }
+        window.location.href = `/security/user/workState/exportBatch?tagId=${this.selectedDept.id}&timeStart=${timeStart}&timeEnd=${timeEnd}`;
       } else {
         // 导出选中的
         let ids = [];
@@ -782,9 +788,13 @@ export default {
         // console.log('ids::', `/security/user/workState/exportBatch?userIdsStr=${ids}&timeStart=${timeStart}&timeEnd=${timeEnd}`)
         window.location.href = `/security/user/workState/exportBatch?userIdsStr=${ids}&timeStart=${timeStart}&timeEnd=${timeEnd}`;
       }
+      export_state = '';
+      this.selectionToggle();
+      this.exportDialogClosed();
     },
     exportDialogClosed(){
       this.selectdatetime = '';
+      this.exportDialogvisible = false;
     },
     userResetPwdConfirm(userId){
       this.resetDialogvisible = true;
@@ -793,6 +803,7 @@ export default {
     resetDialogClosed(){
       this.resetForm.userId = '';
       this.resetForm.pwd = '';
+      this.resetDialogvisible = false;
     },
     /* 是否开启 降低组织架构 */
     async setSeeAllOrg(state = false) {
@@ -873,8 +884,14 @@ export default {
       try {
         if(await this.$platform.confirm('确定要恢复该账号吗？')){
           const {status, message} = await http.post('/security/user/resume', {userId}, false);
-          if(status !== 0) this.$message.error(message || '');
-          this.chooseRole(this.selectedRole);
+          // if(status !== 0) this.$message.error(message || '');
+          let isSucc = status == 0;
+          this.$platform.notification({
+            title: isSucc ? '成功' : '失败',
+            message: isSucc ? '账号恢复成功' : message,
+            type: isSucc ? 'success' : 'error',
+          });
+          isSucc && this.chooseRole(this.selectedRole);
         }
       } catch (error) {
         console.error(error);
@@ -884,8 +901,20 @@ export default {
       try {
         if(await this.$platform.confirm('确定要重置该角色权限吗？')){
           const {status, message} = await http.post(`/security/role/delete/${id}`, {type: 'post'}, false);
-          if(status !== 0) this.$message.error(message || '');
-          this.chooseRole(this.selectedRole);
+          // if(status !== 0) return this.$message.error(message || '');
+          let isSucc = status == 0;
+          this.$platform.notification({
+            title: isSucc ? '成功' : '失败',
+            message: isSucc ? '角色权限重置成功' : message,
+            type: isSucc ? 'success' : 'error',
+          });
+          if(isSucc) {
+            this.selectedRole.custom = null;
+            let role = _.cloneDeep(this.selectedRole);
+            role.custom = null;
+            let index = this.roles.findIndex((value)=>value.id==this.selectedRole.id);
+            this.$set(this.roles, index, role);
+          }
         }
       } catch (error) {
         console.error(error);
@@ -895,8 +924,14 @@ export default {
       try {
         if(await this.$platform.confirm('确定要删除该角色权限吗？')){
           const {status, message} = await http.post(`/security/role/delete/${id}`, {type: 'post'}, false);
-          if(status !== 0) this.$message.error(message || '');
-          this.chooseRole(this.selectedRole);
+          // if(status !== 0) this.$message.error(message || '');
+          let isSucc = status == 0;
+          this.$platform.notification({
+            title: isSucc ? '成功' : '失败',
+            message: isSucc ? '角色权限删除成功' : message,
+            type: isSucc ? 'success' : 'error',
+          });
+          isSucc && this.chooseRole(this.selectedRole);
         }
       } catch (error) {
         console.error(error);
@@ -913,6 +948,7 @@ export default {
       })
     },
     async resetUserPwd(){
+      if(!this.resetForm.pwd) return this.$platform.alert('重置密码不能为空');
       let params = {}
       params.userId = this.resetForm.userId;
       params.newPwd = md5(this.resetForm.pwd);
@@ -924,7 +960,7 @@ export default {
           message: isSucc ? '密码重置成功' : result.message,
           type: isSucc ? 'success' : 'error',
         });
-       
+        if(isSucc) this.resetDialogClosed();
       })
         .catch(err => console.log(err))
     },
@@ -943,6 +979,8 @@ export default {
       this.chooseRole(role)
     },
     async chooseRole(role){
+      this.multipleSelection = [];
+      this.roleMultipleSelection = [];
       if(this.selectedRole.id != role.id) {
         this.roleKeyword = '';
       }
@@ -1355,6 +1393,8 @@ export default {
     },
     /** 选中一个部门 */
     async initDeptUser(dept){
+      this.multipleSelection = [];
+      this.roleMultipleSelection = [];
       if(this.activeName == 'tag' && this.selectedRole.id == -1){
         this.selectedRole = {id: '0', text:'待分配'};
       }
@@ -1372,8 +1412,7 @@ export default {
         this.params.tagId = dept.id;
         // this.params.departmentId = dept.id;
         this.params.pageNum = 1;
-        this.params.pageSize = 0;
-        // this.params.seeAllOrg = this.isSeeAllOrg;
+        this.params.seeAllOrg = this.isSeeAllOrg;
         this.fetchTeamData();
         await this.fetchUser();
 
@@ -1697,6 +1736,7 @@ export default {
     border-radius: 2px;
     outline: none;
     line-height: 24px;
+    cursor: pointer;
   }
 }
 
