@@ -113,6 +113,7 @@ export default {
       taskReceiptFields: [],
       taskPage: new Page(),
       totalItems: 0,
+      pageSize: '10'
     };
   },
   computed: {
@@ -389,6 +390,12 @@ export default {
         close: true,
         fromId,
       });
+    },
+    /**
+     * @description 选择展示模式
+     */
+    taskMode(type) {
+      this.mapShow = type === '列表模式' ? 1 : 0
     },
     /**
      * @description 删除工单列表人员

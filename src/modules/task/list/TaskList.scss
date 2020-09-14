@@ -1,5 +1,5 @@
 .task-state-block {
-  border-radius: 3px;
+  border-radius: 4px;
   color: #fff;
   font-weight: 700;
   text-align: center;
@@ -20,6 +20,11 @@
 
 // S 顶部筛选
 .common-list {
+  &-section {
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 16px;
+  }
   &-filter {
     padding-bottom: 10px;
     &-flow {
@@ -228,19 +233,40 @@
         .state {
           height: 31px;
           padding-left: 11px;
-          width: 104px;
+          width: 10%;
           font-weight: 500;
           background-color: #f2f2f2;
         }
         .list {
-          > div {
-            height: 31px;
-            padding-left: 11px;
-            font-size: 14px;
-            margin-right: 30px;
+          width: 90%;
+          height: 31px;
+          overflow: hidden;
+          overflow-x: scroll;
+          &::-webkit-scrollbar {
+            display: none;
           }
+          .list-item {
+            > div {
+              height: 31px;
+              padding-left: 11px;
+              font-size: 14px;
+              width: 130px;
+            }
+          }
+        }
+        .list-crate {
+          overflow-x: hidden;
         }
       }
     }
   }
+}
+.task-list-del {
+  cursor: pointer;
+  width: 88px;
+  text-align: center;
+}
+.task-width103 {
+  padding: 0 25px;
+  text-align: center;
 }
