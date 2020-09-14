@@ -23,7 +23,7 @@
       <!-- end 合计 -->
 
       <!-- start 支付信息 -->
-      <div class="form-item" v-if="paymentMethod">
+      <div class="form-item" v-if="showPaymentMethod">
         <label>客户支付方式</label>
         <div class="form-item-control payment-info-row">
           <p class="payment-method">
