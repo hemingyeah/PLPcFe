@@ -7,15 +7,16 @@ export function packToReceipt(fields, form) {
     serviceExpense: [],
     discountExpense: {
       taskId: form.id,
-      number: 1,
       type: '折扣',
+      number: 1,
       salePrice: form.disExpense
     }
   };
 
   let task = {
     id: form.id,
-    attribute: {}
+    attribute: {},
+    attachment: []
   };
 
   fields.forEach(field => {
@@ -32,7 +33,7 @@ export function packToReceipt(fields, form) {
         o.serialNumber = part.serialNumber || '';
         o.number = Number(part.number) || 0;
         o.type = '备件';
-        o.salePrice = part.salePrice;
+        o.salePrice = part.oldPrice;
         o.outPrice = part.costPrice;
         o.standard = part.standard;
         o.unit = part.unit;
@@ -55,7 +56,7 @@ export function packToReceipt(fields, form) {
         o.name = service.name;
         o.number = Number(service.number) || 0;
         o.type = '服务';
-        o.salePrice = service.salePrice;
+        o.salePrice = service.oldPrice;
         o.outPrice = service.costPrice;
         o.unit = service.unit;
         o.primaryId = service.id;
@@ -133,7 +134,16 @@ export function packToForm(fields, data) {
       sparePartsExpense.map(part => {
         part.id = part.primaryId;
         part.type = part.primaryType;
-        part.oldPrice = part.salePrice;
+        part.costPrice = part.outPrice;
+
+        // 计算修改后的单价
+        let salePrice = isNaN(part.salePrice) ? 0 : part.salePrice;
+        let modifiedPrice = isNaN(part.modifiedPrice) ? 0 : part.modifiedPrice;
+        let nowPrice = salePrice + modifiedPrice;
+ 
+        part.oldPrice = salePrice;
+        part.salePrice = nowPrice.toFixed(2);
+        part.modifiedPrice = modifiedPrice;
       });
 
       task.attribute[fieldName] = sparePartsExpense || [];
@@ -145,7 +155,16 @@ export function packToForm(fields, data) {
       serviceExpense.map(service => {
         service.id = service.primaryId;
         service.type = service.primaryType;
-        service.oldPrice = service.salePrice;
+        service.costPrice = service.outPrice;
+        
+        // 计算修改后的单价
+        let salePrice = isNaN(service.salePrice) ? 0 : service.salePrice;
+        let modifiedPrice = isNaN(service.modifiedPrice) ? 0 : service.modifiedPrice;
+        let nowPrice = salePrice + modifiedPrice;
+
+        service.oldPrice = salePrice;
+        service.salePrice = nowPrice.toFixed(2);
+        service.modifiedPrice = modifiedPrice;
       });
 
       task.attribute[fieldName] = serviceExpense || [];

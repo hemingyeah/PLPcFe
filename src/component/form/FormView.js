@@ -188,6 +188,9 @@ const FormView = {
       if (this.$scopedSlots[fieldName]) {
         return this.$scopedSlots[fieldName]({displayName, value, formType, field});
       }
+
+      // 加密字段
+      if (value == '***') return this.buildCommonDom(params);
       
       // 电子签名、客户签名
       if (formType === 'autograph' || formType === 'systemAutograph') {
@@ -281,10 +284,11 @@ const FormView = {
         return this.buildInfoDom(params);
       }
 
-      if(formType === 'textarea') {
+      // 多行文本、客户关联字段、产品关联字段
+      if(formType === 'textarea' || formType === 'relationCustomer' || formType === 'relationProduct') {
         params = {
           ...params,
-          value: value
+          value
         };
         return this.buildTextarea(params);
       }

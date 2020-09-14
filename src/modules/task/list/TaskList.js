@@ -66,9 +66,9 @@ export default {
       advanceds: advancedList, //高级搜索列表
       searchParams: {}, //筛选列表的参数
       allSearchParams: {}, //全部工单搜索条件
-      dropDownInfo: '', //顶部下拉
+      dropDownInfo: "", //顶部下拉
       mapShow: true, //地图预览
-      selectColumnState: '', //视图选择列状态存储
+      selectColumnState: "", //视图选择列状态存储
       planTimeType: "", //判断计划时间展示的样式
       selectList: [
         { name: "全部", id: "all" },
@@ -277,7 +277,6 @@ export default {
     /** 工单类型过滤后的字段 */
     taskTypeFilterFields() {
       let fields = this.taskFields.concat(this.taskReceiptFields) || [];
-
       let taskTypeFilterFields = fields.filter((field) =>
         this.filterFieldFuncHandle(field)
       );
@@ -298,30 +297,17 @@ export default {
     },
   },
   mounted() {
-    const { taskView } = this.initData;
-
+    console.log("taskView", this.initData);
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
-    this.taskView = taskView;
     this.currentTaskType = this.taskTypes[0];
 
-    this.revertStorage();
-    this.initialize();
-    this.otherLists();
+    this.getUserViews();
     this.getTaskCountByState();
+    this.revertStorage();
     this.isAdvanced();
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     window.__exports__refresh = this.searchList;
-    console.log("taskView", this.initData);
-    taskView.map((item) => {
-      if (item.id === selectIds.allId) {
-        this.allSearchParams["all"] = item.searchModel;
-      } else if (item.id === selectIds.unfinishedId) {
-        this.allSearchParams["unfinished"] = item.searchModel;
-      } else if (item.id === selectIds.finished) {
-        this.allSearchParams["finished"] = item.searchModel;
-      }
-    });
   },
   methods: {
     /**
@@ -341,6 +327,30 @@ export default {
       });
     },
     /**
+     * 获取视图
+     */
+    async getUserViews() {
+      const { success, result } = await TaskApi.getUserViews();
+      if (success) {
+        this.taskView = result;
+        this.otherLists(result);
+        this.initialize();
+        console.log("视图", result);
+        result.map((item) => {
+          if (item.id === selectIds.allId) {
+            this.allSearchParams["all"] = item.searchModel;
+            this.allSearchParams["id"] = item.id;
+          } else if (item.id === selectIds.unfinishedId) {
+            this.allSearchParams["unfinished"] = item.searchModel;
+            this.allSearchParams["id"] = item.id;
+          } else if (item.id === selectIds.finished) {
+            this.allSearchParams["finished"] = item.searchModel;
+            this.allSearchParams["id"] = item.id;
+          }
+        });
+      }
+    },
+    /**
      * @description 高级搜索
      */
     advancedSearch() {
@@ -356,31 +366,18 @@ export default {
      * @description 头部筛选
      */
     /* 其他,列表 */
-    otherLists() {
-      const { taskView } = this.initData;
-      taskView.map((item, index) => {
+    otherLists(result) {
+      result.map((item, index) => {
         if (
           item.id === "1e930239-1ea3-11e7-8d4e-00163e304a25" ||
           item.id === "2a53a0ff-4141-11e7-a318-00163e304a25" ||
           item.region === "所有用户" ||
           item.region === "只有我"
         ) {
-          item['title'] = `other${index}`
+          item["title"] = `other${index}`;
           this.otherList.push(item);
         }
       });
-    },
-    /* 其他, 选择 */
-    checkOther(params) {
-      const { name, region, id, searchModel, title } = params;
-      this.isViewModel = region;
-      this.region["editViewId"] = id;
-      this.otherText = name;
-      this.filterId = "";
-      this.allShow = false;
-      this.selectColumnState = title
-      this.search(JSON.parse(searchModel));
-      this.buildColumns()
     },
     /**
      * @description 新建视图
@@ -397,7 +394,6 @@ export default {
       });
     },
     /**
-     *
      * @description 删除工单列表人员
      */
     async delTask() {
@@ -442,34 +438,59 @@ export default {
         }
       } catch (error) {}
     },
+    /* 其他, 选择 */
+    checkOther(params) {
+      const { name, region, id, searchModel, title } = params;
+      this.isViewModel = region;
+      this.region["viewId"] = id;
+      this.otherText = name;
+      this.filterId = "";
+      this.allShow = false;
+      this.selectColumnState = title;
+      this.params = this.initParams();
+      this.search(searchModel);
+      this.buildColumns();
+    },
     /* 顶部筛选 */
     checkFilter({ id, name, searchModel, title }) {
       this.isViewModel = "默认";
-      this.region["editViewId"] = id;
+      this.region["viewId"] = id;
       this.filterId = id;
       this.otherText = "其他";
-      this.selectColumnState = title
-      
-      if (['all', 'unfinished', 'finished'].indexOf(title) === -1) this.dropDownInfo = ''
+      this.selectColumnState = title;
 
-      this.search(JSON.parse(searchModel));
-      this.buildColumns()
+      if (["all", "unfinished", "finished"].indexOf(title) === -1) {
+        this.dropDownInfo = "";
+      }
+      this.getTaskCountByState(searchModel);
+      this.params = this.initParams();
+      this.search(searchModel);
+      this.buildColumns();
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
     /*全部工单 */
     checkAll({ searchModel, id, name, title }) {
-      this.selectColumnState = title
+      console.log(id, name, searchModel, title);
+      this.selectColumnState = title;
       this.dropDownInfo = {
         id,
         name,
         searchModel,
-        title
-      }
+        title,
+      };
       this.otherText = "其他";
       this.filterId = id;
-      this.search(JSON.parse(searchModel));
-      this.buildColumns()
+      this.params = this.initParams();
+      this.getTaskCountByState(searchModel);
+      this.search(searchModel);
+      this.buildColumns();
+    },
+    /**
+     * @description 根据视图匹配高级筛选
+     */
+    advancedFilter(searchModel) {
+      const {advanceds} = this
     },
     // 最高事件
     allEvent() {
@@ -480,50 +501,59 @@ export default {
     /**
      * 顶部筛选, 状态数据展示
      */
-    getTaskCountByState() {
+    getTaskCountByState(searchModel = {}) {
       // 如果没有缓存时间或者超过1小时
-      var now = new Date().getTime();
-      const localData = JSON.parse(localStorage.getItem("getTaskCountByState"));
-      if (!localData || now - localData.date > 60 * 60 * 1000) {
-        TaskApi.getTaskCountByState().then((res) => {
-          const {
-            created,
-            refused,
-            allocated,
-            accepted,
-            exception,
-            processing,
-            taskPool,
-            finished,
-            costed,
-          } = res;
-          this.filterData = {
-            allocated,
-            accepted,
-            processing,
-            exception,
-            created: created + refused,
-            finished: finished + costed,
-            all:
-              allocated +
-              accepted +
-              processing +
-              taskPool +
-              created +
-              refused +
-              finished +
-              costed,
-            unfinished:
-              created + refused + allocated + taskPool + accepted + processing,
-          };
-          localStorage.setItem(
-            "getTaskCountByState",
-            JSON.stringify({ data: now, filterData: this.filterData })
-          );
-        });
-      } else {
-        this.filterData = localData.filterData;
-      }
+      // var now = new Date().getTime();
+      // const localData = JSON.parse(localStorage.getItem("getTaskCountByState"));
+      // if (!localData || now - localData.date > 60 * 60 * 1000) {
+      TaskApi.getTaskCountByState(searchModel).then((res) => {
+        if (!res.success) return;
+        const {
+          created,
+          refused,
+          allocated,
+          accepted,
+          exception,
+          processing,
+          taskPool,
+          finished,
+          costed,
+        } = res.result;
+        this.filterData = {
+          allocated,
+          accepted,
+          processing,
+          exception,
+          created: this._number(created) + this._number(refused),
+          finished: this._number(finished) + this._number(costed),
+          all:
+            this._number(allocated) +
+            this._number(accepted) +
+            this._number(processing) +
+            this._number(taskPool) +
+            this._number(created) +
+            this._number(refused) +
+            this._number(finished) +
+            this._number(costed),
+          unfinished:
+            this._number(created) +
+            this._number(refused) +
+            this._number(allocated) +
+            this._number(taskPool) +
+            this._number(accepted) +
+            this._number(processing),
+        };
+        localStorage.setItem(
+          "getTaskCountByState",
+          JSON.stringify({ data: now, filterData: this.filterData })
+        );
+      });
+      // } else {
+      //   this.filterData = localData.filterData;
+      // }
+    },
+    _number(number) {
+      return number ? number : 0;
     },
     /**
      * @description 工单导入
@@ -569,16 +599,14 @@ export default {
      * 存为视图和编辑视图
      */
     editView() {
-      window.__exports__refresh = "";
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
           selectCols.push(item.fieldName);
         }
       });
-      this.region["viewId"] = this.otherList[0].id;
-      this.region["searchModel"] = this.initData.expTSMJSON;
-      this.region["selectedCols"] = selectCols;
+      this.region["searchModel"] = this.$refs.searchPanel.buildParams();
+      this.region["selectedCols"] = selectCols.join(",");
       this.$refs.viewModel.open();
     },
     /**
@@ -597,7 +625,7 @@ export default {
           }
 
           let data = result?.result || {};
-          let { number, content, totalPages } = data;
+          let { number, content, totalPages, totalElements } = data;
 
           data["list"] = content;
           data["total"] = totalPages;
@@ -621,6 +649,7 @@ export default {
             }
             return item;
           });
+          this.taskPage["totalElements"] = totalElements;
           // let list = [...data.content, ...data.content, ...data.content, ...data.content, ...data.content, ...data.content]
           this.taskPage.list = [];
           this.taskPage.merge(Page.as(data));
@@ -628,8 +657,8 @@ export default {
 
           // 把选中的匹配出来
           // this.matchSelected();
-          console.log("工单列表渲染数据", data);
-          this.selectedIds = [];
+          console.log("工单列表渲染数据", this.taskPage);
+          this.multipleSelection = []
           return data;
         })
         .then(() => {
@@ -655,11 +684,11 @@ export default {
       const localStorageData = this.getLocalStorageData();
       const { paymentConfig } = this.initData;
 
-      let columnStatus = []
+      let columnStatus = [];
       if (localStorageData.columnStatus) {
-        for(let key in localStorageData.columnStatus) {
+        for (let key in localStorageData.columnStatus) {
           if (key === this.selectColumnState) {
-            columnStatus = localStorageData.columnStatus[key]
+            columnStatus = localStorageData.columnStatus[key];
           }
         }
       }
@@ -668,11 +697,12 @@ export default {
         .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
       let taskListFields = this.filterTaskListFields();
-      // let fields = [...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields),...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields), ...taskListFields.concat(this.taskTypeFilterFields),...taskListFields.concat(this.taskTypeFilterFields)];
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
-      // 赋值
+      // S 高级搜索
       this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
+      // E 高级搜索
+
       this.columns = fields
         .map((field) => {
           let sortable = false;
@@ -926,6 +956,7 @@ export default {
         templateId: this.currentTaskType.id || "",
         tableName: "task",
       };
+      console.log(params);
       return TaskApi.getTaskTemplateFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task";
@@ -946,6 +977,7 @@ export default {
         templateId: this.currentTaskType.id || "",
         tableName: "task_receipt",
       };
+      console.log(params);
       return TaskApi.getTaskTemplateFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task_receipt";
@@ -1096,7 +1128,6 @@ export default {
     initialize() {
       this.initPage();
       // this.loading = true;
-
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
         .then((res) => {
           let searchModel;
@@ -1105,9 +1136,9 @@ export default {
               return item.displayName === "计划时间";
             })[0].setting.dateType || this.initData.planTimeType;
           this.buildColumns();
-          this.initData.taskView.map((item) => {
+          this.taskView.map((item) => {
             if (item.id === this.filterId) {
-              searchModel = JSON.parse(item.searchModel);
+              searchModel = item.searchModel;
             }
           });
           this.search(searchModel);
@@ -1175,10 +1206,12 @@ export default {
         field: c.field,
         show: c.show,
         width: c.width,
-      }))
+      }));
       if (localStorageData.columnStatus) {
-        localStorageData.columnStatus[`${this.selectColumnState}`] = columnsList
-        columnsStatus = localStorageData.columnStatus
+        localStorageData.columnStatus[
+          `${this.selectColumnState}`
+        ] = columnsList;
+        columnsStatus = localStorageData.columnStatus;
       } else {
         columnsStatus = {
           [`${this.selectColumnState}`]: columnsList,
@@ -1342,21 +1375,30 @@ export default {
      */
     search(searchModel = "") {
       const params = this.buildSearchParams();
-      const { selectId, initData } = this;
+      const { selectId, initData, searchParams } = this;
       let mySearch;
       this.loading = true;
       switch (selectId) {
         case "all":
           mySearch = {};
+          this.searchParams.createUser = "";
+          this.searchParams.executor = "";
+          this.searchParams.synergyId = "";
           break;
         case "create":
           mySearch = { createUser: initData.currentUserId };
+          this.searchParams.executor = "";
+          this.searchParams.synergyId = "";
           break;
         case "execute":
           mySearch = { executor: initData.currentUserId };
+          this.searchParams.createUser = "";
+          this.searchParams.synergyId = "";
           break;
         default:
           mySearch = { synergyId: initData.currentUserId };
+          this.searchParams.createUser = "";
+          this.searchParams.executor = "";
           break;
       }
 
@@ -1501,49 +1543,52 @@ export default {
 
         const par = {
           ...citys,
-          conditions: [...paymentMethod, ...conditions], //支付方式
-          customerId: params.customerId,
-          customerLinkman: params.tlmName,
-          cusAddress: params.cusAddress,
-          productId: params.productId,
-          serviceType: params.serviceType,
-          serviceContent: params.serviceContent,
-          level: params.level,
-          createUser: params.createUser,
-          allotUser: params.allotUser,
-          executor: params.executor,
-          synergyId: params.synergyId,
-          state: params.state,
-          createTimeStart,
-          createTimeEnd,
-          planTimeStart,
-          planTimeEnd,
-          allotTimeStart,
-          allotTimeEnd,
-          acceptTimeStart,
-          acceptTimeEnd,
-          startTimeStart,
-          startTimeEnd,
-          completeTimeStart,
-          completeTimeEnd,
-          updateTimeStart,
-          updateTimeEnd,
-          reviewTimeStart,
-          reviewTimeEnd,
-          balanceTimeStart,
-          balanceTimeEnd,
-          closeTimeStart,
-          closeTimeEnd,
-          allotType,
-          onceException,
-          onceReallot,
-          inApprove,
-          sorts,
-          tagId: params.tagId,
-          keyword: params.keyword,
-          page: params.page,
-          pageSize: params.pageSize,
-          templateId: this.currentTaskType.id,
+          conditions: [...paymentMethod, ...conditions].length
+            ? [...paymentMethod, ...conditions]
+            : searchParams.conditions, //支付方式
+          customerId: params.customerId || searchParams.customerId,
+          customerLinkman: params.tlmName || searchParams.customerLinkman,
+          cusAddress: params.cusAddress || searchParams.cusAddress,
+          productId: params.productId || searchParams.productId,
+          serviceType: params.serviceType || searchParams.serviceType,
+          serviceContent: params.serviceContent || searchParams.serviceContent,
+          level: params.level || searchParams.level,
+          createUser: params.createUser || searchParams.createUser,
+          allotUser: params.allotUser || searchParams.allotUser,
+          executor: params.executor || searchParams.executor,
+          synergyId: params.synergyId || searchParams.synergyId,
+          state: params.state || searchParams.state,
+          createTimeStart: createTimeStart || searchParams.createTimeStart,
+          createTimeEnd: createTimeEnd || searchParams.createTimeEnd,
+          planTimeStart: planTimeStart || searchParams.planTimeStart,
+          planTimeEnd: planTimeEnd || searchParams.planTimeEnd,
+          allotTimeStart: allotTimeStart || searchParams.allotTimeStart,
+          allotTimeEnd: allotTimeEnd || searchParams.allotTimeEnd,
+          acceptTimeStart: acceptTimeStart || searchParams.acceptTimeStart,
+          acceptTimeEnd: acceptTimeEnd || searchParams.acceptTimeEnd,
+          startTimeStart: startTimeStart || searchParams.startTimeStart,
+          startTimeEnd: startTimeEnd || searchParams.startTimeEnd,
+          completeTimeStart:
+            completeTimeStart || searchParams.completeTimeStart,
+          completeTimeEnd: completeTimeEnd || searchParams.completeTimeEnd,
+          updateTimeStart: updateTimeStart || searchParams.updateTimeStart,
+          updateTimeEnd: updateTimeEnd || searchParams.updateTimeEnd,
+          reviewTimeStart: reviewTimeStart || searchParams.reviewTimeStart,
+          reviewTimeEnd: reviewTimeEnd || searchParams.reviewTimeEnd,
+          balanceTimeStart: balanceTimeStart || searchParams.balanceTimeStart,
+          balanceTimeEnd: balanceTimeEnd || searchParams.balanceTimeEnd,
+          closeTimeStart: closeTimeStart || searchParams.closeTimeStart,
+          closeTimeEnd: closeTimeEnd || searchParams.closeTimeEnd,
+          allotType: allotType || searchParams.allotType,
+          onceException: onceException || searchParams.onceException,
+          onceReallot: onceReallot || searchParams.onceReallot,
+          inApprove: inApprove || searchParams.inApprove,
+          sorts: sorts || searchParams.sorts,
+          tagId: params.tagId || searchParams.tagId,
+          keyword: params.keyword || searchParams.keyword,
+          page: params.page || searchParams.page,
+          pageSize: params.pageSize || searchParams.pageSize,
+          templateId: this.currentTaskType.id || searchParams.templateId,
           ...mySearch,
         };
         this.searchParams = { ...this.searchParams, ...par };
@@ -1594,6 +1639,7 @@ export default {
      * @description 时间字符串切割
      */
     _time(params, num) {
+      if (!params) return;
       if (params && !isNaN(num)) {
         return new Date(params.split("-")[num]);
       } else {

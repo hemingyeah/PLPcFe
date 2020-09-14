@@ -66,98 +66,15 @@
     <div class="main-content" v-loading="loading">
       <!-- start 工单信息 -->
       <div class="task-detail">
-        <form-view :fields="fields" :value="task">
-          <template slot="taskNo" slot-scope="{ field, value }">
-            <!-- 工单编号 -->
-            <div class="form-view-row">
-              <label>{{field.displayName}}</label>
-              <div class="form-view-row-content">{{value}}</div>
-            </div>
-            <!-- 工单类型 -->
-            <div class="form-view-row">
-              <label>工单类型</label>
-              <div class="form-view-row-content">{{task.templateName}}</div>
-            </div>
-          </template>
-
-          <!-- start 客户字段 -->
-          <template slot="customer" slot-scope="{ field }">
-            <div class="form-view-row">
-              <label>{{field.displayName}}</label>
-              <div class="form-view-row-content">{{task.customer.name}}</div>
-            </div>
-            <div class="form-view-row" v-if="customerOption.linkman">
-              <label>联系人</label>
-              <div class="form-view-row-content">{{task.tlmName}} {{task.tlmPhone}}</div>
-            </div>
-            <div class="form-view-row" v-if="customerOption.address">
-              <label>地址</label>
-              <div class="form-view-row-content">{{prettyAddress(task.taddress)}}</div>
-            </div>
-            <div class="form-view-row" v-if="customerOption.product">
-              <label>产品</label>
-              <div class="form-view-row-content">
-                <span class="row-item-margin" v-for="product in task.products" :key="product.id">{{product.name}}</span>
-              </div>
-            </div>
-          </template>
-          <!-- end 客户字段 -->
-
-          <!-- start 计划时间 -->
-          <template slot="planTime" slot-scope="{ field, value }">
-            <div class="form-view-row">
-              <label>{{ field.displayName }}</label>
-              <div class="form-view-row-content form-view-row-plantime">
-                {{ value }}
-                <template v-if="allowModifyPlanTime">
-                  <el-tooltip class="item" effect="dark" content="修改计划时间" placement="top">
-                    <i class="iconfont icon-edit" @click="openDialog('modifyPlanTime')"></i>
-                  </el-tooltip>
-                </template>
-              </div>
-            </div>
-          </template>
-          <!-- end 计划时间 -->
-
-          <!-- start 完成时间 -->
-          <template slot="completeTime" slot-scope="{ field }" v-if="finishedState">
-            <div class="form-view-row">
-              <label>{{field.displayName}}</label>
-              <div class="form-view-row-content">{{ task.completeTime | fmt_datetime }}</div>
-            </div>
-          </template>
-          <!-- end 完成时间 -->
-
-          <!-- start 满意度 -->
-          <template slot="degree" slot-scope="{ field }" v-if="task.isReview == 1">
-            <div class="form-view-row">
-              <label>{{field.displayName}}</label>
-              <div class="form-view-row-content">{{ task.degree }}</div>
-            </div>
-          </template>
-          <!-- end 满意度 -->
-
-          <!-- start 协同人 -->
-          <template slot="synergies" slot-scope="{ field, value }">
-            <div class="form-view-row">
-              <label>{{field.displayName}}</label>
-              <div class="form-view-row-content">
-                <span class="row-item-margin" v-for="item in value" :key="item.userId">{{item.displayName}}</span>
-              </div>
-            </div>
-          </template>
-          <!-- end 协同人 -->
-
-          <!-- start 工单状态 -->
-          <template slot="state" slot-scope="{ field, value }">
-            <div class="form-view-row">
-              <label>{{field.displayName}}</label>
-              <div class="form-view-row-content">{{stateText[value]}}</div>
-            </div>
-          </template>
-          <!-- end 工单状态 -->
-
-        </form-view>
+        <task-view
+          :task="task"
+          :fields="fields"
+          :is-paused="isPaused"
+          :task-edit-auth="editAuth"
+          :finished-state="finishedState"
+          :can-see-customer="canSeeCustomer"
+          :allow-modify-plan-time="allowModifyPlanTime"
+        />
       </div>
       <!-- end 工单信息 -->
 

@@ -5,6 +5,7 @@
       class="add-serviceterm-btn"
       type="text"
       size="medium"
+      v-if="!isPaySuccess"
       @click="visible = true"
     >添加</el-button>
     <!-- end 添加按钮 -->
@@ -25,13 +26,13 @@
         :min-width="column.minWidth || '148px'">
         <template slot-scope="scope">
           <!-- start 数量 -->
-          <template v-if="column.field === 'number'">
+          <template v-if="column.field === 'number' && !isPaySuccess">
             <input class="service-number-input" type="number" v-model="scope.row.number" @change="handleServiceItermNum(scope.row)" />
           </template>
           <!-- end 数量 -->
 
           <!-- start 单价 -->
-          <template v-else-if="column.field === 'salePrice' && editUnitPrice">
+          <template v-else-if="column.field === 'salePrice' && allowEditPrice">
             <input class="service-number-input" type="number" v-model="scope.row.salePrice" @change="handlePrice(scope.row)" />
           </template>
           <!-- end 单价 -->
@@ -137,6 +138,7 @@ export default {
       selectedItem: [], // 当前选中的服务项目
       serviceitem: this.initData(), // 服务项目信息
       editUnitPrice: false, // 是否可以修改单品价格
+      isPaySuccess: false // 是否支付成功
     }
   },
   computed: {
@@ -144,7 +146,7 @@ export default {
     * @description 服务项目列表项
     */
     colums() {
-      return [{
+      let colums = [{
         label: '服务项目',
         field: 'name'
       }, {
@@ -165,11 +167,18 @@ export default {
         label: '小计',
         field: 'total',
         minWidth: '128px'
-      }, {
-        label: '操作',
-        field: 'action',
-        minWidth: '70px'
       }]
+
+      // 支付成功前可编辑
+      if (!this.isPaySuccess) {
+        colums.push({
+          label: '操作',
+          field: 'action',
+          minWidth: '70px'
+        })
+      }
+
+      return colums;
     },
     /**
     * @description 服务项目字段
@@ -219,6 +228,12 @@ export default {
     total() {
       let { number, salePrice } = this.serviceitem;
       return number && salePrice ? (number * salePrice).toFixed(2) : '';
+    },
+    /**
+    * @description 允许修改单价
+    */
+    allowEditPrice() {
+      return this.editUnitPrice && !this.isPaySuccess;
     }
   },
   methods: {
@@ -366,17 +381,18 @@ export default {
         console.error('err', e);
       }
     },
-    setEditPrice(config) {
-      let { editUnitPrice } = config?.options || {};
+    setEditConfig(config) {
+      let { editUnitPrice, isPaySuccess } = config || {};
 
       this.editUnitPrice = editUnitPrice;
+      this.isPaySuccess = isPaySuccess;
     }
   },
   mounted() {
-    this.$eventBus.$on('task_receipt_update_editPrice', this.setEditPrice);
+    this.$eventBus.$on('task_receipt_update_config', this.setEditConfig);
   },
   beforeDestroy() {
-    this.$eventBus.$off('task_receipt_update_editPrice', this.setEditPrice);
+    this.$eventBus.$off('task_receipt_update_config', this.setEditConfig);
   }
 }
 </script>

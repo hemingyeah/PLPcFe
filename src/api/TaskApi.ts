@@ -4,7 +4,12 @@ import {
   PlanTaskCreateAndEditModel,
 } from "@model/param/in/Task";
 
-const fixedPrefixTaskPath = "";
+const fixedPrefixTaskPath = "/api/task";
+const ElASTICSEARCH =  "/api/elasticsearch";
+
+// const fixedPrefixTaskPath = "";
+// const ElASTICSEARCH =  "";
+const fixedPrefixPaymentPath = '/api/payment';
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -451,7 +456,7 @@ export function rollBackTask(params: {} | undefined) {
  * @param {Array} params.taskIds - 需要删除的工单id数组
  */
 export function deleteTask(params: {} | undefined) {
-  return http.post(`/outside/pc/task/delete`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/delete`, params);
 }
 
 /**
@@ -603,6 +608,31 @@ export function receiptDraft(params: {} | undefined) {
 }
 
 /**
+ * @description 修改协同人
+ */
+export function updateSynergies(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`, params);
+}
+
+/**
+ * @description 获取工单对应的订单的支付状态
+ * @param {Object} params 参数
+ * @param {String} params.taskId 工单id
+ */
+export function getPaymentOrder(params: {} | undefined){
+  return http.get(`${fixedPrefixPaymentPath}/outside/payment/order/query`, params);
+}
+
+/**
+ * @description 获取工单对应的订单的支付状态
+ * @param {Object} params 参数
+ * @param {String} params.taskId 工单id
+ */
+export function getPaymentDetail(params: {} | undefined){
+  return http.get(`${fixedPrefixPaymentPath}/outside/paymentBill/online/getByTaskId`, params);
+}
+
+/**
  * 保存工单设置信息
  * @param {Object} params - 参数对象
  * @param {String} params.fields - 设置form对象
@@ -682,7 +712,7 @@ export function getTaskCardDetailList(params: {} | undefined) {
  * 顶部筛选, 状态数据展示
  */
 export function getTaskCountByState(params: {} | undefined) {
-  return http.get("/task/getTaskCountByState", params);
+  return http.post(`${ElASTICSEARCH}/outside/es/task/getTaskCountByState`, params);
 }
 /**
  * 存为视图
@@ -723,8 +753,7 @@ export function editView(params: {} | undefined) {
  */
 export function deleteView(params: {} | undefined) {
   return http.get(
-    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView`,
-    params
+    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView/${params}`,
   );
 }
 
@@ -829,7 +858,7 @@ export function getTaskTemplate(params: {} | undefined) {
  * @param {string} params.view	 - 视图
  */
 export function search(params: {} | undefined) {
-  return http.post("/outside/es/task/search", params);
+  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
 }
 /*
  * 工单设置，回执合规设置模块 保存自定义打印模板
@@ -908,7 +937,7 @@ export function withPart(params: Object = {}) {
  * @description 批量更新
  */
 export function editBatchTask(params: Object = {}) {
-  return http.post("/outside/pc/task/editBatchTask", params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/editBatchTask`, params);
 }
 
 /**
@@ -970,4 +999,12 @@ export function taskRecordDelete(params: any) {
 export function dialout(params: object) {
   return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params);
 }
+
+/**
+ * @description 获取视图
+ */
+export function getUserViews(params: object) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getUserViews`, params);
+}
+
 /* -------------  end  新工单api ---------------- */

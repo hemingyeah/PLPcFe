@@ -42,14 +42,14 @@
           background-color: #55b7b4;
           color: #fff;
         }
-        &:nth-of-type(4) {
-          &:hover {
-            background-color: #ef6b6b;
-            color: #fff;
-          }
-        }
         &:first-child {
           border-radius: 3px 0 0 3px;
+        }
+      }
+      .extion {
+        &:hover {
+          background-color: #ef6b6b;
+          color: #fff;
         }
       }
       &-dropdown {

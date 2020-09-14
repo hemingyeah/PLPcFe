@@ -104,7 +104,7 @@
                   title: 'exception'
                 })
               "
-              class="common-list-filter-span1 common-list-filter-flow-item ce6"
+              class="common-list-filter-span1 common-list-filter-flow-item extion ce6"
               v-show="
                 item.id === selectIds.exceptionId &&
                   initData.tenantVersion === 2
@@ -162,17 +162,20 @@
                 {
                   name: `全部完工(${this.filterData.all || 0})`,
                   searchModel: this.allSearchParams.all,
-                  title: 'all'
+                  title: 'all',
+                  id: this.allSearchParams.id
                 },
                 {
                   name: `未完成工单(${this.filterData.unfinished || 0})`,
                   searchModel: this.allSearchParams.unfinished,
-                  title: 'unfinished'
+                  title: 'unfinished',
+                  id: this.allSearchParams.id
                 },
                 {
                   name: `已完成工单(${this.filterData.finished || 0})`,
                   searchModel: this.allSearchParams.finished,
-                  title: 'finished'
+                  title: 'finished',
+                  id: this.allSearchParams.id
                 },
               ]"
               :show="allShow"
@@ -689,7 +692,7 @@
 
         <div class="table-footer comment-list-table-footer">
           <div class="comment-list-table-footer-info">
-            共<span class="level-padding">{{ taskPage.total }}</span
+            共<span class="level-padding">{{ taskPage.totalElements || 0 }}</span
             >记录， 已选中
             <span
               class="task-list-selected-count common-selected-count"
@@ -713,7 +716,7 @@
             :page-size="taskPage.pageSize"
             :current-page="taskPage.pageNum"
             layout="prev, pager, next, sizes, jumper"
-            :total="taskPage.total"
+            :total="taskPage.totalElements"
           >
           </el-pagination>
         </div>
@@ -746,7 +749,7 @@
         :group="true"
         :validate="checkExportCount"
         method="post"
-        action="/excels/task/export"
+        action="/excels/task/newExport"
       />
       <!-- end 导出工单 -->
       <!-- S 存为视图弹框 -->

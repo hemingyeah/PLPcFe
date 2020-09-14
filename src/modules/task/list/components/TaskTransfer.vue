@@ -63,8 +63,8 @@ export default {
         synergies,
         executorId,
       };
-      if (!synergies.length || !executorId) {
-        $platform.alert("请选择新负责人或新协同人");
+      if (!executorId) {
+        $platform.alert("请选择新负责人");
         return;
       }
       const { status, message, data, succ } = await TaskApi.redeployBatch(

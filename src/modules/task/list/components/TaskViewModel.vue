@@ -72,7 +72,6 @@ export default {
         ...view,
         ...region,
       };
-      const fromId = window.frameElement.getAttribute("id");
 
       // 编辑
       if (isViewModel !== "默认") {
@@ -92,14 +91,16 @@ export default {
     },
     // 删除
     deleteViewBtn() {
-      TaskApi.deleteView({ viewId: this.region.viewId }).then((res) => {
+      TaskApi.deleteView(this.region.viewId).then((res) => {
         this.success(res, "del");
       });
     },
     // 成功后的操作
-    success({ status, message }, type) {
-      if (status === 0) {
+    success({ success, message }, type) {
+      window.__exports__refresh = ''
+      if (success) {
         this.visible = false;
+        const fromId = window.frameElement.getAttribute("id");
         if (type === "del") {
           this.$platform.alert("删除成功");
         } else {

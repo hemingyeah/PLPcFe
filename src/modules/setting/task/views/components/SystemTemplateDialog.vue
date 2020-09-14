@@ -84,10 +84,10 @@
               <el-checkbox label="synergies" name="r_taskFields" value="synergies">协同人</el-checkbox>
             </div>
             <div class="checkbox-item">
-              <el-checkbox label="allotTime" name="r_taskFields" value="allotTime">派单时间</el-checkbox>
+              <el-checkbox label="createTime" name="r_taskFields" value="createTime">创建时间</el-checkbox>
             </div>
             <div class="checkbox-item">
-              <el-checkbox label="createTime" name="r_taskFields" value="createTime">创建时间</el-checkbox>
+              <el-checkbox label="allotTime" name="r_taskFields" value="allotTime">派单时间</el-checkbox>
             </div>
             <div class="checkbox-item">
               <el-checkbox label="startTime" name="r_taskFields" value="startTime">开始时间</el-checkbox>
