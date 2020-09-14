@@ -12,12 +12,17 @@ class TaskStateProcessEnum {
   ACCEPTED: TaskState
   PROCESSING: TaskState
   FINISHED: TaskState
+  OFFED: TaskState
 
   constructor(){
 
     this.CREATED = {
       name: '待分配',
-      value: TaskStateEnum.CREATED.value
+      value: [
+        TaskStateEnum.CREATED.value, 
+        TaskStateEnum.TASK_POOL.value,
+        TaskStateEnum.REFUSED.value
+      ]
     }
 
     this.ALLOCATED = {
@@ -42,6 +47,11 @@ class TaskStateProcessEnum {
         TaskStateEnum.COSTED.value,
         TaskStateEnum.CLOSED.value
       ]
+    }
+
+    this.OFFED = {
+      name: '已取消',
+      value: TaskStateEnum.OFFED.value
     }
 
   }

@@ -150,7 +150,7 @@
       <div class="form-view-row">
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content">
-          <span class="task-state" :style="{'background-color': getTaskStateColor(value)}">{{ getTaskStateName(value) }}</span>
+          <span class="task-state" :style="{'background-color': getTaskStateColor(task)}">{{ getTaskStateName(task) }}</span>
         </div>
       </div>
     </template>
@@ -165,7 +165,7 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* utils */
 import TaskStateEnum from '@model/enum/TaskStateEnum';
-import { prettyAddress } from '@src/filter/filter.js';
+import Filter from '@src/filter/filter.js';
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -248,7 +248,7 @@ export default {
     address() {
       let { validAddress, taddress, isEncryptTaddress } = this.task;
 
-      if (validAddress) return isEncryptTaddress ? ENCRYPT_FIELD_VALUE : prettyAddress(taddress);
+      if (validAddress) return isEncryptTaddress ? ENCRYPT_FIELD_VALUE : Filter.prettyAddress(taddress);
 
       return '';
     },
@@ -309,20 +309,14 @@ export default {
     /** 
     * @description 工单状态
     */
-    getTaskStateName(value) {
-      // 暂停
-      if (this.isPaused) return '已暂停';
-
-      return TaskStateEnum.getName(value);
+    getTaskStateName(task) {
+      return TaskStateEnum.getNameForTask(task);
     },
     /** 
     * @description 工单状态备件色
     */
-    getTaskStateColor(value) {
-      // 暂停
-      if (this.isPaused) return '#ef6b6b';
-      
-      return TaskStateEnum.getColor(value);
+    getTaskStateColor(task) {      
+      return TaskStateEnum.getColorForTask(task);
     },
     /** 
     * @description 修改计划时间

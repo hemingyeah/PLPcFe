@@ -491,7 +491,7 @@ export default {
       let isEventToTask = !!content.eventId;
       return [
         this.renderBaseTaskAction(record),
-        isEventToTask ? <span className="link" onClick={event => openTabForEventView(eventId)}>由事件# {eventNo} 创建</span> : ''
+        isEventToTask ? <span class="link" onClick={event => openTabForEventView(eventId)}>由事件# {eventNo} 创建</span> : ''
       ]
     },
     /* 渲染工单修改dom */
@@ -571,7 +571,7 @@ export default {
     /* 渲染工单已超时dom */
     renderTaskTimeoutdDom(record = {}) {
       let { content, taskNo } = record;
-      return <div className="task-record-fail">工单 #{ taskNo } 已在 { content.flow } 节点超时</div>
+      return <div class="task-record-fail">工单 #{ taskNo } 已在 { content.flow } 节点超时</div>
     },
     /* 渲染工单转交dom */
     renderTaskTransferDom(record = {}) {

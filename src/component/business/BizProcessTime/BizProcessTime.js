@@ -25,6 +25,10 @@ const BizProcessTime = {
 
   },
   methods: {
+    judgeIsSameOrContainsState(state) {
+      let isStateArray = Array.isArray(this.state);
+      return isStateArray ? _.isEqual(state, this.state) : state.indexOf(this.state) > -1
+    },
     /* 接单接受时间 */
     renderProcessAcceptTime(createElement) {
       return (
@@ -53,7 +57,7 @@ const BizProcessTime = {
       )
     },
     /* 完成包括完成之后的 */
-    renderProcessFinished(createElement, isStateArray = false) {
+    renderProcessFinished(createElement) {
       let { balanceTime, reviewTime, completeTime } = this.data;
       let finishTimeDom = (
         <div class={ ClassName.block }>
@@ -91,7 +95,8 @@ const BizProcessTime = {
     },
     renderProcessTime(createElement) {
       // 待分配
-      if(this.state == TaskStateProcessEnum.CREATED.value) {
+      let isCreated = this.judgeIsSameOrContainsState(TaskStateProcessEnum.CREATED.value)
+      if(isCreated) {
         return this.renderProcessCreateTime(createElement);
       }
       // 已指派
@@ -107,10 +112,9 @@ const BizProcessTime = {
         return this.renderProcessStartTime(createElement);
       }
       // 已完成
-      let isStateArray = Array.isArray(this.state);
-      let isFinished = isStateArray ? _.isEqual(TaskStateProcessEnum.FINISHED.value, this.state) : TaskStateProcessEnum.FINISHED.value.indexOf(this.state) > -1
+      let isFinished = this.judgeIsSameOrContainsState(TaskStateProcessEnum.FINISHED.value)
       if(isFinished) {
-        return this.renderProcessFinished(createElement, isStateArray);
+        return this.renderProcessFinished(createElement);
       }
     }
   },
