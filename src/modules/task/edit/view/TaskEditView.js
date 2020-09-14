@@ -6,6 +6,7 @@ import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm
 /* utils */
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
+import _ from 'lodash'
 import platform from '@src/platform'
 import {
   customerAddressSelectConversion,
@@ -400,7 +401,9 @@ export default {
      * @description 提交
      * @param {Boolean} isAllot 是否派单
     */
-    submit(isAllot = false) {
+    submit: _.debounce(function (isAllot = false) {
+      if(this.submitting) return
+
       this.submitting = true;
 
       this.$refs.form
@@ -439,11 +442,11 @@ export default {
           this.togglePending();
           console.error(err);
         })
-    },
+    }, 250),
     /** 
      * @description 计划任务提交
     */
-    submitWithPlanTask(planTaskParams = {}) {
+    submitWithPlanTask: _.debounce(function (planTaskParams = {}) {
       if(this.pending) return;
 
       this.togglePending(true);
@@ -467,7 +470,7 @@ export default {
         return this.planTaskEditSubmit(params);
       }
 
-    },
+    }, 250),
     togglePending(pending = false) {
       this.pending = pending;
       this.loadingPage = pending;
