@@ -16,59 +16,7 @@
       <!-- end 工单编号 -->
     </template>
 
-    <template slot="customer" slot-scope="{ field }">
-      
-      <!-- start 客户字段 -->
-      <div class="form-view-row">
-        <label>{{ field.displayName }}</label>
-        <div class="form-view-row-content nowrap">
-          <span
-            class="link-text"
-            @click="openCustomerView"
-            v-if="!isEncryptField(customer.name) && canSeeCustomer"
-          >{{ customer.name }}</span>
-
-          <template v-else>{{ customer.name }}</template>
-
-          <el-tooltip v-if="showCustomerRelationTaskCount" placement="top">
-            <div slot="content" v-html="`未完成工单：${customerRelationTaskCountData.unfinished} </br> 全部工单：${customerRelationTaskCountData.all}`"></div>
-            <el-button class="task-count-button" @click="openCustomerView">
-              {{ `${customerRelationTaskCountData.unfinished}/${customerRelationTaskCountData.all}` }}
-            </el-button>
-          </el-tooltip>
-        </div>
-      </div>
-      <!-- end 客户字段 -->
-
-      <!-- start 联系人 -->
-      <div class="form-view-row" v-if="customerOption.linkman">
-        <label>联系人</label>
-        <div class="form-view-row-content nowrap">
-          <template v-if="!hasCallCenterModule">{{ linkman }}</template>
-
-          <template v-else>
-            <span v-if="isEncryptField(linkman)" @click.stop="makePhoneCall">{{ linkman }}</span>
-            <template v-else>
-              {{ linkman }}
-              <el-tooltip content="拨打电话" placement="top" v-if="linkman">
-                <i class="iconfont icon-dianhua1" @click.stop="makePhoneCall"></i>
-              </el-tooltip>
-            </template>
-          </template>
-        </div>
-      </div>
-      <!-- end 联系人 -->
-
-      <!-- start 联系人地址 -->
-      <div class="form-view-row" v-if="customerOption.address">
-        <label>地址</label>
-        <div class="form-view-row-content nowrap">
-          {{ address }}
-          <i v-if="showMap" class="iconfont icon-address" @click="openMap"></i>
-        </div>
-      </div>
-      <!-- start 联系人地址 -->
-
+    <template slot="customer">
       <!-- start 产品 -->
       <div class="form-view-row" v-if="customerOption.product">
         <label>产品</label>
@@ -144,28 +92,12 @@
       </div>
     </template>
     <!-- end 协同人 -->
-
-    <!-- start 工单状态 -->
-    <template slot="state" slot-scope="{ field, value }">
-      <div class="form-view-row">
-        <label>{{ field.displayName }}</label>
-        <div class="form-view-row-content">
-          <span class="task-state" :style="{'background-color': getTaskStateColor(task)}">{{ getTaskStateName(task) }}</span>
-        </div>
-      </div>
-    </template>
-    <!-- end 工单状态 -->
-
   </form-view>
 </template>
 
 <script>
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
-
-/* utils */
-import TaskStateEnum from '@model/enum/TaskStateEnum';
-import Filter from '@src/filter/filter.js';
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -199,91 +131,19 @@ export default {
     taskEditAuth: {
       type: Boolean,
       default: false
+    },
+    customerOption: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
     return {
       products: this.buildProducts(),
-      // 客户、产品关联工单数量数据
-      relationTaskCountData: {
-        customer: { all: 0, unfinished: 0 },
-        product: { all: 0, unfinished: 0 }
-      },
-      hasCallCenterModule: localStorage.getItem('call_center_module') == 1
+      productRelationTaskCountData: {} // 产品关联的工单数量
     }
   },
   computed: {
-    /** 
-    * @description 客户字段 
-    */
-    customerField() {
-      return this.fields.filter(f => f.fieldName === 'customer')[0];
-    },
-    /** 
-    * @description 客户字段配置 
-    */
-    customerOption() {
-      return (this.customerField.setting && this.customerField.setting.customerOption) || {};
-    },
-    /** 
-    * @description 客户
-    */
-    customer() {
-      return this.task?.customer || {};
-    },
-    /** 
-    * @description 联系人
-    */
-    linkman() {
-      let lmName = this.task.tlmName || this.customer.lmName;
-      let lmPhone = this.task.tlmPhone || this.customer.lmPhone;
-
-      if (lmName) return this.isEncryptField(lmName) ? ENCRYPT_FIELD_VALUE : `${lmName} ${lmPhone}`;
-
-      return '';
-    },
-    /** 
-    * @description 地址
-    */
-    address() {
-      let { validAddress, taddress, isEncryptTaddress } = this.task;
-
-      if (validAddress) return isEncryptTaddress ? ENCRYPT_FIELD_VALUE : Filter.prettyAddress(taddress);
-
-      return '';
-    },
-    /** 
-    * @description 显示查看地图icon
-    * 1. 地址未加密
-    * 2. 经纬度
-    */
-    showMap() {
-      let { taddress, isEncryptTaddress } = this.task;
-      let { longitude, latitude } = taddress;
-      return longitude && latitude && !isEncryptTaddress;
-    },
-    /** 
-    * @description 客户关联的工单数量
-    */
-    customerRelationTaskCountData() {
-      return this.relationTaskCountData.customer;
-    },
-    /** 
-    * @description 产品关联的工单数量
-    */
-    productRelationTaskCountData() {
-      return this.relationTaskCountData.product;
-    },
-    /** 
-    * @description 是否显示客户关联的工单数量
-    * 1. 客户存在
-    * 2. 且全部数量>0
-    * 3. 客户未加密
-    */
-    showCustomerRelationTaskCount() {
-      let { all } = this.customerRelationTaskCountData;
-      return this.customer?.id && Number(all) > 0 && !this.isEncryptField(this.customer.name);
-    },
     /** 
     * @description 是否显示产品关联的工单数量
     * 1. 产品存在且只有一个
@@ -307,53 +167,10 @@ export default {
   },
   methods: {
     /** 
-    * @description 工单状态
-    */
-    getTaskStateName(task) {
-      return TaskStateEnum.getNameForTask(task);
-    },
-    /** 
-    * @description 工单状态备件色
-    */
-    getTaskStateColor(task) {      
-      return TaskStateEnum.getColorForTask(task);
-    },
-    /** 
     * @description 修改计划时间
     */
     modifyPlanTime() {
       this.$parent.openDialog('modifyPlanTime');
-    },
-    /** 
-    * @description 打开地图
-    */
-    openMap() {
-      let address = this.task.taddress;
-      let longitude = address.longitude;
-      let latitude = address.latitude;
-
-      if(!longitude || !latitude) return;
-      
-      this.$fast.map
-        .display({ ...address })
-        .catch(err => console.error('openMap catch an err: ', err));
-    },
-    /** 
-    * @description 打开客户详情
-    */
-    openCustomerView() {
-      let fromId = window.frameElement.getAttribute('id');
-      const customerId = this.customer.id;
-
-      if(!customerId) return;
-
-      this.$platform.openTab({
-        id: `customer_view_${customerId}`,
-        title: '客户详情',
-        close: true,
-        url: `/customer/view/${customerId}?noHistory=1`,
-        fromId
-      })
     },
     /** 
     * @description 打开产品详情
@@ -372,7 +189,7 @@ export default {
       })
     },
     /** 
-    * @description 获取客户关联的工单数量
+    * @description 获取关联的工单数量
     */
     getCountForCreate(params) {
       return TaskApi.getCountForCreate(params).then((result = {}) => {
@@ -380,27 +197,10 @@ export default {
       })
     },
     /**
-    * @description 拨打电话
-    */
-    async makePhoneCall() {
-      let phone = this.task.tlmPhone || this.customer.lmPhone;
-
-      if (!phone) return;
-
-      const result = await TaskApi.dialout({ taskType:'task', phone });
-      if (result.code != 0) {
-        return this.$platform.notification({
-          title: '呼出失败',
-          message: result.message || '',
-          type: 'error',
-        })
-      }
-    },
-    /**
     * @description 是否加密字段
     */
     isEncryptField(value) {
-      return value === '***';
+      return value === ENCRYPT_FIELD_VALUE;
     },
     /** 
     * @description 产品
@@ -461,27 +261,15 @@ export default {
     }
   },
   mounted() {
-    // 查询关联工单数量
-    if (this.canSeeCustomer) {
-      this.getCountForCreate({ module: 'customer', id: this.customer.id });
-
-      if (this.products && this.products.length == 1) {
-        this.getCountForCreate({ module: 'product', id: this.products[0].id });
-      }
+    // 查询产品关联工单数量
+    if (this.canSeeCustomer && this.products && this.products.length == 1) {
+      this.getCountForCreate({ module: 'product', id: this.products[0].id });
     }
   }
 }
 </script>
 <style lang="scss">
 .task-view-containner {
-  .task-state {
-    padding: 2px 8px;
-    border-radius: 2px;
-    display: inline-block;
-    color: #fff;
-    font-size: 12px;
-  }
-
   .nowrap {
     white-space: nowrap;
   }
