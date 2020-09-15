@@ -6,6 +6,12 @@
   margin-top: 5px;
   text-align: center;
   line-height: 22px;
+  &-overtime,
+  &-approve {
+    display: inline-block;
+    border-radius: 4px;
+    color: #fff;
+  }
   &-overtime {
     background-color: #ff9100;
   }
@@ -269,4 +275,18 @@
 .task-width103 {
   padding: 0 25px;
   text-align: center;
+}
+.table-footer {
+  margin-top: 50px;
+}
+.task-ic19 {
+  width: 19px;
+  height: 16px;
+  margin-right: 9px;
+}
+.task-list-wd252 {
+  width: 200px;
+}
+.task-list-dropdown-item {
+  width: 120px;
 }

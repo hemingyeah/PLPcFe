@@ -113,7 +113,6 @@ export default {
       taskReceiptFields: [],
       taskPage: new Page(),
       totalItems: 0,
-      pageSize: '10'
     };
   },
   computed: {
@@ -661,6 +660,24 @@ export default {
       return formatDate(value * 1000, "HH小时mm分钟");
     },
     /**
+     * @description 表头更改
+     */
+    headerDragend(newWidth, oldWidth, column, event) {
+      let data = this.columns.map((item) => {
+        if (item.displayName === column.label) {
+          item.width = column.width
+        }
+        return item
+      }).map(item => {
+        return {
+          field: item.field,
+          show: item.show,
+          width: item.width
+        }
+      })
+      this.modifyColumnStatus({ type: 'column', data })
+    },
+    /**
      * @description 构建列
      */
     buildColumns() {
@@ -758,10 +775,8 @@ export default {
           col.show = show;
           col.width = width;
           col.type = "column";
-
           return col;
         });
-        console.log(this.columns)
       // 根据版本号判断是否需要支付方式
       if (!paymentConfig.version) {
         this.advanceds = this.advanceds.filter((item) => {
@@ -1358,6 +1373,7 @@ export default {
      */
     search(searchModel = "") {
       const params = this.buildSearchParams();
+      console.log('列表参数', params)
       const { selectId, initData, searchParams } = this;
       let mySearch;
       this.loading = true;
@@ -1526,53 +1542,48 @@ export default {
 
         const par = {
           ...citys,
-          conditions: [...paymentMethod, ...conditions].length
-            ? [...paymentMethod, ...conditions]
-            : searchParams.conditions, //支付方式
-          customerId: params.customerId || searchParams.customerId,
-          customerLinkman: params.tlmName || searchParams.customerLinkman,
-          cusAddress: params.cusAddress || searchParams.cusAddress,
-          productId: params.productId || searchParams.productId,
-          serviceType: params.serviceType || searchParams.serviceType,
-          serviceContent: params.serviceContent || searchParams.serviceContent,
-          level: params.level || searchParams.level,
-          createUser: params.createUser || searchParams.createUser,
-          allotUser: params.allotUser || searchParams.allotUser,
-          executor: params.executor || searchParams.executor,
-          synergyId: params.synergyId || searchParams.synergyId,
-          state: params.state || searchParams.state,
-          createTimeStart: createTimeStart || searchParams.createTimeStart,
-          createTimeEnd: createTimeEnd || searchParams.createTimeEnd,
-          planTimeStart: planTimeStart || searchParams.planTimeStart,
-          planTimeEnd: planTimeEnd || searchParams.planTimeEnd,
-          allotTimeStart: allotTimeStart || searchParams.allotTimeStart,
-          allotTimeEnd: allotTimeEnd || searchParams.allotTimeEnd,
-          acceptTimeStart: acceptTimeStart || searchParams.acceptTimeStart,
-          acceptTimeEnd: acceptTimeEnd || searchParams.acceptTimeEnd,
-          startTimeStart: startTimeStart || searchParams.startTimeStart,
-          startTimeEnd: startTimeEnd || searchParams.startTimeEnd,
-          completeTimeStart:
-            completeTimeStart || searchParams.completeTimeStart,
-          completeTimeEnd: completeTimeEnd || searchParams.completeTimeEnd,
-          updateTimeStart: updateTimeStart || searchParams.updateTimeStart,
-          updateTimeEnd: updateTimeEnd || searchParams.updateTimeEnd,
-          reviewTimeStart: reviewTimeStart || searchParams.reviewTimeStart,
-          reviewTimeEnd: reviewTimeEnd || searchParams.reviewTimeEnd,
-          balanceTimeStart: balanceTimeStart || searchParams.balanceTimeStart,
-          balanceTimeEnd: balanceTimeEnd || searchParams.balanceTimeEnd,
-          closeTimeStart: closeTimeStart || searchParams.closeTimeStart,
-          closeTimeEnd: closeTimeEnd || searchParams.closeTimeEnd,
-          allotType: allotType || searchParams.allotType,
-          onceException: onceException || searchParams.onceException,
-          onceReallot: onceReallot || searchParams.onceReallot,
-          inApprove: inApprove || searchParams.inApprove,
-          sorts: sorts || searchParams.sorts,
-          tagId: params.tagId || searchParams.tagId,
-          keyword: params.keyword || searchParams.keyword,
-          page: params.page || searchParams.page,
-          pageSize: params.pageSize || searchParams.pageSize,
-          templateId: this.currentTaskType.id || searchParams.templateId,
-          ...mySearch,
+          conditions: [...paymentMethod, ...conditions], //支付方式
+          customerId: params.customerId,
+          customerLinkman: params.tlmName,
+          cusAddress: params.cusAddress,
+          productId: params.productId,
+          serviceType: params.serviceType,
+          serviceContent: params.serviceContent,
+          level: params.level,
+          createUser: mySearch.createUser || params.createUser,
+          allotUser: params.allotUser,
+          executor: mySearch.executor || params.executor,
+          synergyId: mySearch.synergyId || params.synergyId,
+          createTimeStart,
+          createTimeEnd,
+          planTimeStart,
+          planTimeEnd,
+          allotTimeStart,
+          allotTimeEnd,
+          acceptTimeStart,
+          acceptTimeEnd,
+          startTimeStart,
+          startTimeEnd,
+          completeTimeStart,
+          completeTimeEnd,
+          updateTimeStart,
+          updateTimeEnd,
+          reviewTimeStart,
+          reviewTimeEnd,
+          balanceTimeStart,
+          balanceTimeEnd,
+          closeTimeStart,
+          closeTimeEnd,
+          allotType,
+          onceException,
+          onceReallot,
+          inApprove,
+          sorts,
+          tagId: params.tagId,
+          keyword: params.keyword,
+          page: params.page,
+          pageSize: params.pageSize,
+          templateId: this.currentTaskType.id,
         };
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/
