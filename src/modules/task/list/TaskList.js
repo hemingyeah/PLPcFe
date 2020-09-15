@@ -761,7 +761,7 @@ export default {
 
           return col;
         });
-
+        console.log(this.columns)
       // 根据版本号判断是否需要支付方式
       if (!paymentConfig.version) {
         this.advanceds = this.advanceds.filter((item) => {

@@ -359,8 +359,16 @@
             <!-- 模式 -->
             <el-dropdown>
               <div class="task-ai task-flex task-font14 task-c6 task-pointer">
-                <i class="iconfont task-font12 task-top2" :class="{'icon-liebiaoshitu': mapShow, 'icon-ditu': !mapShow}"></i>
-                <span class="task-mr4 task-ml4">{{ mapShow ? '列表模式' : '地图模式' }}</span>
+                <i
+                  class="iconfont task-font12 task-top2"
+                  :class="{
+                    'icon-liebiaoshitu': mapShow,
+                    'icon-ditu': !mapShow,
+                  }"
+                ></i>
+                <span class="task-mr4 task-ml4">{{
+                  mapShow ? "列表模式" : "地图模式"
+                }}</span>
                 <i class="iconfont icon-triangle-down"></i>
               </div>
               <el-dropdown-menu slot="dropdown">
@@ -377,7 +385,7 @@
               class="task-ai task-flex task-font14 task-c6 task-pointer task-width103"
               @click="showAdvancedSetting"
             >
-             <span class="task-mr4 task-ml4">选择列</span>
+              <span class="task-mr4 task-ml4">选择列</span>
               <i class="iconfont icon-triangle-down"></i>
             </div>
 
@@ -482,7 +490,7 @@
             :prop="column.field"
             :sortable="column.sortable"
             :show-overflow-tooltip="column.field !== 'name'"
-            :width="column.width || '120px'"
+            :width="column.width || '125px'"
           >
             <template slot-scope="scope">
               <!-- 工单编号 -->
@@ -631,7 +639,7 @@
               <template v-else-if="column.field === 'state'">
                 <!-- 暂停中 -->
                 <div
-                  class="task-state-block"
+                  class="task-state-block task-font12"
                   v-if="scope.row.isPaused == 1"
                   style="background-color: #ef6b6b"
                 >
@@ -640,11 +648,12 @@
                 <!-- 其他状态 -->
                 <div
                   v-else
-                  class="task-state-block"
+                  class="task-state-block task-font12"
                   :style="{
                     backgroundColor: taskStateEnum.getColor(
                       scope.row[column.field]
                     ),
+                    color: taskStateEnum.getColorText(scope.row[column.field]),
                   }"
                 >
                   {{

@@ -1,11 +1,11 @@
 .task-state-block {
-  border-radius: 4px;
-  color: #fff;
-  font-weight: 700;
-  text-align: center;
-  padding: 3px;
+  width: 52px;
+  height: 22px;
+  border-radius: 11px;
   margin-left: 5px;
-
+  margin-top: 5px;
+  text-align: center;
+  line-height: 22px;
   &-overtime {
     background-color: #ff9100;
   }

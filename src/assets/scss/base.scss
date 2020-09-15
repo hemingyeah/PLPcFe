@@ -134,3 +134,29 @@ textarea {
 .task-header-tr {
   height: 40px;
 }
+.task-list-view {
+  .task-list-section th {
+    padding: 3px 0 !important;
+    border-bottom: 1px solid #ebebeb !important;
+    border-right: 1px solid #ebebeb !important;
+    &:first-child {
+      border-right: none !important;
+    }
+    > div {
+      font-size: 14px !important;
+    }
+  }
+  .task-list-section td {
+    padding: 4px 0 !important;
+    border-bottom: 1px solid #ebebeb !important;
+    border-right: 1px solid #ebebeb !important;
+    &:first-child {
+      border-right: none !important;
+    }
+    > div {
+      font-size: 14px !important;
+      line-height: 31px !important;
+      color: #666 !important;
+    }
+  }
+}
