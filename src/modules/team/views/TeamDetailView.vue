@@ -711,4 +711,9 @@ export default {
   .team-address-icon {
     color: $color-primary;
   }
+  .team-detail-form-group {
+    .form-view-row-content {
+      white-space: normal;
+    }
+  }
 </style>

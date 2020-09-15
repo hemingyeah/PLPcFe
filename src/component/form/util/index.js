@@ -1,11 +1,13 @@
 import { assign } from 'lodash'
+import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
+
 import FormField from '../FormField';
 
 export * from './validate';
 
 const DEFAULT_PLACEHOLDER = {
-  text: '最多1000字',
-  textarea: '最多2000字',
+  text: `最多${FORM_FIELD_TEXT_MAX_LENGTH}字`,
+  textarea: `最多${FORM_FIELD_TEXTAREA_MAX_LENGTH}字`,
   number: '请输入数字',
   customerAddress: '请填写详细地址',
   relationCustomer: '由客户信息查询',
@@ -15,6 +17,8 @@ const DEFAULT_PLACEHOLDER = {
   datetime: '日期 + 时间',
   select: '请选择',
   location: '请输入',
+  phone: '请输入电话号码',
+  scan: '请通过移动端扫码或手动输入'
 }
 
 /** 

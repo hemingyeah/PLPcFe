@@ -9,7 +9,7 @@
         type="text"
         :value="detail"
         @input="input"
-        maxlength="1000"
+        :maxlength="maxlength"
         :id="`form_${field.fieldName}`"
         autocomplete="off"/>
       <el-button type="button" class="action-btn" @click="toggleModal">解析地址</el-button>
@@ -25,6 +25,7 @@
 <script>
 import FormMixin from '@src/component/form/mixin/form';
 import { parseAddress } from '@src/api/CommonApi';
+import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 /* global AMap */
 export default {
@@ -71,7 +72,8 @@ export default {
     return {
       visible: false,
       pending: false,
-      copy: ''
+      copy: '',
+      maxlength: FORM_FIELD_TEXT_MAX_LENGTH
     }
   },
   computed: {

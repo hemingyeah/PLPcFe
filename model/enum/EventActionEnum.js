@@ -1,7 +1,7 @@
 /** 事件动作枚举 @author dongls */
 import BaseEnum from './BaseEnum';
 
-//TODO: 添加color字段
+// TODO: 添加color字段
 class EventActionEnum extends BaseEnum{
   constructor(){
     super();

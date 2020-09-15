@@ -62,7 +62,7 @@ const TaskAllowSelect = {
       const { allotType, synergies, executors } = data;
 
       if (allotType) this.allotType = allotType;
-      if (synergies && Array.isArray(synergies)) this.value.synergies = synergies;
+      if (synergies && Array.isArray(synergies)) this.value.synergies = synergies.filter(synergie => !!synergie.userId);
       if (executors && Array.isArray(executors)) this.value.executors = executors.filter(executor => !!executor.userId);
 
     },
