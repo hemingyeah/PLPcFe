@@ -17,6 +17,7 @@ import TaskReceiptEditView from './components/TaskReceipt/Edit/TaskReceiptEditVi
 import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
+import TaskView from './components/TaskView.vue';
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
@@ -32,14 +33,6 @@ export default {
       fields: [], // 工单表单字段
       tabs: [], // 工单关联数据tab
       currTab: 'task-info-record', // 当前选中的tab
-      // TODO: 工单状态从移动端拷贝的数据
-      stateText: {
-        created: '待分配',
-        allocated: '已指派',
-        processing: '进行中',
-        finished: '已完成',
-        offed: '已取消',
-      },
       // 回退工单弹窗
       backDialog: {
         visible: false,
@@ -59,13 +52,9 @@ export default {
     }
   },
   computed: {
-    /* 客户字段 */
-    customerField() {
-      return this.fields.filter(f => f.fieldName === 'customer')[0];
-    },
-    /* 客户字段配置 */
-    customerOption() {
-      return (this.customerField.setting && this.customerField.setting.customerOption) || {};
+    /* 是否可以查看客户详情 */
+    canSeeCustomer() {
+      return this.initData.canSeeCus;
     },
     /* 计划时间字段 */
     planTimeField() {
@@ -412,6 +401,14 @@ export default {
 
       return allowDing;
     },
+    /** 
+    * @description 是否显示复制工单按钮
+    * 1. 当前登录用户有新建工单权限TASK_ADD
+    * 2. 允许复制工单 canCopyTask
+    */
+    allowCopyTask() {
+      return this.hasAuth('TASK_EDIT') && this.initData.canCopyTask;
+    },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
@@ -453,17 +450,6 @@ export default {
         }
       ].filter(tab => tab.show);
     },
-    // 格式化地址显示
-    prettyAddress(address) {
-      if (!address || Object.keys(address).length === 0) return '';
-
-      let province = address.province || '';
-      let city = address.city || '';
-      let dist = address.dist || '';
-      let adr = address.address || '';
-
-      return [province, city, dist, adr].filter(a => a).join('-');
-    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
@@ -472,6 +458,10 @@ export default {
     goEdit() {
       const id = this.task.id;
       window.location.href = this.editAuth ? `/task/edit/${id}` : `/task/noFilterEdit/${id}`;
+    },
+    // 复制工单
+    goCopyTask() {
+      window.location.href = `/task/copyTask?taskId=${this.task.id}`;
     },
     // 删除工单
     async deleteTask() {
@@ -801,5 +791,6 @@ export default {
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
+    [TaskView.name]: TaskView,
   }
 }

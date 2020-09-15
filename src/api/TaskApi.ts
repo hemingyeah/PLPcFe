@@ -638,6 +638,13 @@ export function receiptDraft(params: {} | undefined) {
 }
 
 /**
+ * @description 修改协同人
+ */
+export function updateSynergies(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`, params);
+}
+
+/**
  * @description 获取工单对应的订单的支付状态
  * @param {Object} params 参数
  * @param {String} params.taskId 工单id

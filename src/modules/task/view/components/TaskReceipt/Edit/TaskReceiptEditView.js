@@ -72,6 +72,15 @@ export default {
       return stateArr.indexOf(state) > -1 ? attribute.paymentMethod : paymentMethod;
     },
     /** 
+    * @description 显示支付方式
+    */
+    showPaymentMethod() {
+      let { state, onceRollback } = this.task;
+      let stateArr = ['finished', 'costed', 'closed', 'offed'];
+
+      return (onceRollback < 1 || stateArr.indexOf(state) > -1) && this.paymentMethod;
+    },
+    /** 
     * @description 是否开启支付
     */
     openPay() {
@@ -169,6 +178,9 @@ export default {
     packFormat(params) {
       if(!this.notCustom) params.task.attribute['customReceipt'] = true;
 
+      let paymentMethod = this.isPaySuccess ? '在线支付-支付宝' : (this.task.state == 'processing' ? '' : this.paymentMethod);
+      params.task.attribute['paymentMethod'] = paymentMethod || '';
+
       let task = Object.assign({}, params.task);
 
       delete params.task;
@@ -184,14 +196,17 @@ export default {
       const params = util.packToReceipt(this.fields, this.form);
       params.taskId = (params.task || {}).id;
       TaskApi.receiptDraft(params).then(res => {
-        let isSucc = res && res.success;
-        this.$platform.notification({
-          type: isSucc ? 'success' : 'error',
-          title: `暂存${isSucc ? '成功' : '失败'}`,
-          message: !isSucc && res.message
-        })
+        if (res.success) {
+          this.$platform.notification({
+            type: 'success',
+            title: '暂存成功'
+          })
 
-        this.pending = false;
+          window.location.reload();
+        } else {
+          this.$platform.alert(res.message);
+          this.pending = false;
+        }
       })
         .catch((err) => {
           this.pending = false;
@@ -292,5 +307,11 @@ export default {
   mounted() {
     // 在线支付成功
     if (this.payOnlineSuccess) this.getPaymentMethodDetail();
+  },
+  watch: {
+    totalExpense(newValue) {
+      // 折扣费用大于总价
+      if (newValue < 0) this.form.disExpense = 0;
+    }
   }
 }
