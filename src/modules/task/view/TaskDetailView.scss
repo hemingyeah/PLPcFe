@@ -13,6 +13,7 @@ body {
 .task-detail-container {
   display: flex;
   flex-flow: column nowrap;
+  overflow: hidden;
 }
 
 // 顶部操作区
@@ -38,11 +39,19 @@ body {
   }
 
   .el-button {
-    max-width: 68px;
+    max-width: 74px;
     min-width: 60px;
-    border-radius: 4px;
+
     padding-left: 0;
     padding-right: 0;
+
+    font-weight: normal;
+    border-radius: 4px;
+
+    &.el-button--small {
+      font-size: $font-size-base;
+      padding: 8px;
+    }
   }
 
   &-top {
@@ -247,52 +256,111 @@ body {
   }
 }
 
-.main-content {
-  display: flex;
-  flex-flow: row nowrap;
+// 工单详情
+.task-detail-main-content {
   flex: 1;
   position: relative;
+  overflow: hidden;
 
-  .task-detail {
-    flex: 3;
-    min-width: 420px;
+  display: flex;
+  flex-flow: row nowrap;
+
+  // tabs标签页
+  .el-tabs {
     height: 100%;
     display: flex;
-    flex-flow: column nowrap;
+    flex-direction: column;
 
-    .form-view{
+    &__header {
+      margin: 0;
+
+      .el-tabs__item {
+        padding-left: 20px !important;
+        margin-right: 50px;
+        color: $text-color-regular;
+        font-weight: normal;
+  
+        &.is-active {
+          color: $color-primary;
+        }
+      }
+    }
+
+    &__content {
       flex: 1;
-      padding-top: 5px;
-      overflow-y: auto;
-      border-right: 1px solid #f2f2f2;
-
-      .form-view-row {
-        .row-item-margin {
-          margin-right: 10px;
-        }
-      }
-
-      .form-view-row-plantime {
-        white-space: nowrap;
-
-        .icon-edit {
-          font-weight: bold;
-        }
-      }
-    }
-  }
-
-  .task-relation {
-    height: 100%;
-    flex: 7;
-    background: #fff;
-    min-width: 500px;
-
-    .task-relation-content {
-      height: calc(100% - 50px);
       overflow: auto;
+
+      .el-tab-pane {
+        height: 100%;
+      }
     }
   }
+
+  &-left,
+  &-right {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 4px;
+  }
+
+  &-right {
+    margin-left: 12px;
+  }
+
+  // 审批中图片
+  .approving-img {
+    width: 75px;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+
+    img {
+      width: 100%;
+    }
+  }
+
+  // .task-detail {
+  //   flex: 3;
+  //   min-width: 420px;
+  //   height: 100%;
+  //   display: flex;
+  //   flex-flow: column nowrap;
+
+  //   .form-view{
+  //     flex: 1;
+  //     padding-top: 5px;
+  //     overflow-y: auto;
+  //     border-right: 1px solid #f2f2f2;
+
+  //     .form-view-row {
+  //       .row-item-margin {
+  //         margin-right: 10px;
+  //       }
+  //     }
+
+  //     .form-view-row-plantime {
+  //       white-space: nowrap;
+
+  //       .icon-edit {
+  //         font-weight: bold;
+  //       }
+  //     }
+  //   }
+  // }
+
+  // .task-relation {
+  //   height: 100%;
+  //   flex: 7;
+  //   background: #fff;
+  //   min-width: 500px;
+
+  //   .task-relation-content {
+  //     height: calc(100% - 50px);
+  //     overflow: auto;
+  //   }
+  // }
 }
 
 .task-detail-container {
@@ -378,16 +446,7 @@ body {
       padding: 10px 15px;
     }
 
-    .approving-img {
-      width: 75px;
-      position: absolute;
-      right: 20px;
-      top: 10px;
-
-      img {
-        width: 100%;
-      }
-    }
+    
 
     .btn-group {
       text-align: right;

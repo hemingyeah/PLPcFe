@@ -285,6 +285,12 @@ export default {
         this.pending = false;
       })
     }
+  },
+  mounted() {
+    this.$eventBus.$on('task_balance_tab_open_dialog', this.openDialog('create'));
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('task_balance_tab_open_dialog', this.openDialog('create'));
   }
 }
 </script>

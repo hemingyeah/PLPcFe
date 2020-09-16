@@ -4,6 +4,24 @@
     @keydown.enter.stop="enterDown" tabindex="0">
     <div class="base-comment-inner">
 
+      <!-- start 模板列表 -->
+      <div class="select-template" v-if="showSelectTemplate">
+        <label>选择模板：</label>
+        <el-select
+          :value="template"
+          placeholder="从备注模板中选择"
+          @input="selectTemplateChange"
+        >
+          <el-option
+            v-for="item in templateListOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+      </div>
+      <!-- end 模板列表 -->
+
       <!-- start textarea -->
       <textarea 
         ref="editor" 
@@ -33,22 +51,6 @@
         
         <!-- start 操作组 -->
         <div class="base-comment-action">
-
-          <!-- start 模板列表 -->
-          <el-select
-            v-if="showSelectTemplate"
-            :value="template"
-            placeholder="从备注模板中选择"
-            @input="selectTemplateChange"
-          >
-            <el-option
-              v-for="item in templateListOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-          <!-- end 模板列表 -->
 
           <el-checkbox v-model="form.showInOwn" @input="showInOwnChangeHandler" :disabled="checkboxDisabled.showInOwn" :true-label="1" :false-label="0">仅自己可见</el-checkbox>
           <template v-if="showCustomerAction">
@@ -406,6 +408,7 @@ textarea.base-comment-editor::-moz-placeholder{
     .el-checkbox__label{
       padding-left: 5px;
       color: #9a9a9a;
+      font-weight: normal;
     }
   }
 }
@@ -448,5 +451,10 @@ textarea.base-comment-editor::-moz-placeholder{
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
+}
+
+.select-template {
+  padding: 8px 8px 0;
+  color: $text-color-regular;
 }
 </style>

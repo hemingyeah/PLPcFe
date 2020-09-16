@@ -58,6 +58,8 @@ export default {
       customerRelationTaskCountData: {}, // 客户关联工单数量
       hasCallCenterModule: localStorage.getItem('call_center_module') == 1,
       stateButtonData: [], // 工单当前状态下主操作按钮
+      leftActiveTab: 'task-view',
+      rightActiveTab: ''
     }
   },
   computed: {
@@ -370,7 +372,7 @@ export default {
     * 3. 或 工单处于完成审批中
     */
     showReceipt() {
-      return this.finishedState || this.allowFinishTask || this.approvingForComplete;
+      return this.finishedState || this.approvingForComplete;
     },
     /** 
     * @description 是否显示 [回执信息]tab
@@ -429,6 +431,30 @@ export default {
     */
     allowCopyTask() {
       return this.hasAuth('TASK_EDIT') && this.initData.canCopyTask;
+    },
+    /** 
+    * @description 是否显示回访按钮
+    * 1. 当前登录账户有工单回访权限TASK_FEEDBACK
+    * 2. 且 不是审批状态
+    * 3. 且 未回访过
+    */
+    allowReviewTask() {
+      let { inApprove, isReviewed, isReview } = this.task;
+      let feedbackAuth = this.hasAuth('TASK_FEEDBACK');
+
+      return feedbackAuth && inApprove != 1 && isReviewed == 0 && isReview == 0;
+    },
+    /** 
+    * @description 是否显示结算按钮
+    * 1. 工单状态是已完成finished
+    * 2. 且 不是审批状态
+    * 3. 且 未结算过
+    * 4. 且 允许回退工单 canRollBack
+    */
+    allowBalanceTask() {
+      let { state, inApprove, isSettled } = this.task;
+
+      return state === 'finished' && inApprove != 1 && isSettled == 0 && this.initData.canRollBack;
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
@@ -805,6 +831,10 @@ export default {
         this.backDialog.visible = true;
       } else if (action === 'finish') {
         this.$refs.taskReceiptEdit.openDialog();
+      } else if (action === 'balance') {
+        this.$eventBus.$emit('task_balance_tab_open_dialog');
+      } else if (action === 'feedback') {
+        this.$eventBus.$emit('task_feedback_tab_open_dialog');
       }
     },
     // 发起审批
@@ -902,15 +932,15 @@ export default {
           { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
         ],
         processing: [
-          { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
+          { name: '完成', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
           { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
           { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
           { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
         ],
         finished: [
-          { name: '回退工单', type: 'primary', show: this.allowBackTask, event: () => this.backTask },
-          { name: '结算', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
-          { name: '回访', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } }
+          { name: '回退', type: 'primary', show: this.allowBackTask, event: () => this.backTask },
+          { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
+          { name: '回访', type: 'primary', show: this.viewFeedbackTab && this.allowReviewTask, event: () => { this.openDialog('feedback') } }
         ]
       }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="task-detail-container">
+  <div class="task-detail-container" v-loading="loading">
     <!-- start 顶部操作区 -->
     <div class="task-detail-header">
       <div class="task-detail-header-top">
@@ -58,9 +58,9 @@
             <!-- end 当前工单状态操作按钮 -->
 
             <!-- <base-button type="danger" @event="deleteTask" :disabled="pending" v-if="allowDeleteTask">删除</base-button> -->
-            <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消工单</el-button>
+            <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消</el-button>
             <el-button @click="redeploy" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
-            <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印工单</el-button>
+            <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
 
             <!-- start 服务报告 -->
             <template v-if="allowServiceReport">
@@ -164,32 +164,42 @@
       </div>
     </div>
 
-    <div class="main-content" v-loading="loading">
-      <!-- start 工单信息 -->
-      <div class="task-detail">
-        <task-view
-          :task="task"
-          :fields="fields"
-          :is-paused="isPaused"
-          :task-edit-auth="editAuth"
-          :finished-state="finishedState"
-          :customer-option="customerOption"
-          :can-see-customer="canSeeCustomer"
-          :allow-modify-plan-time="allowModifyPlanTime"
-        />
+    <div class="task-detail-main-content">
+      <div class="task-detail-main-content-left">  
+        <el-tabs v-model="leftActiveTab">
+          <el-tab-pane label="工单详情" name="task-view">
+            <task-view
+              :task="task"
+              :fields="fields"
+              :is-paused="isPaused"
+              :task-edit-auth="editAuth"
+              :finished-state="finishedState"
+              :customer-option="customerOption"
+              :can-see-customer="canSeeCustomer"
+              :allow-modify-plan-time="allowModifyPlanTime"
+            />
+          </el-tab-pane>
+          <el-tab-pane :label="finishedState?'回执信息':'完成回执'" name="receipt-view" v-if="viewReceiptTab">
+            <task-receipt-detail-view :share-data="propsForSubComponents" />
+          </el-tab-pane>
+          <el-tab-pane label="动态信息" name="record">
+            <task-info-record :share-data="propsForSubComponents" />
+          </el-tab-pane>
+        </el-tabs>
       </div>
-      <!-- end 工单信息 -->
 
-      <!-- start 关联数据 -->
-      <div class="task-relation" v-if="task.id">
-        <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
-        <div class="task-relation-content">
-          <keep-alive>
-            <component :is="currTab" :share-data="propsForSubComponents" :init-data="initData"></component>
-          </keep-alive>
+      <div class="task-detail-main-content-right">
+        <!-- start 关联数据 -->
+        <div class="task-relation" v-if="task.id">
+          <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
+          <div class="task-relation-content">
+            <keep-alive>
+              <component :is="currTab" :share-data="propsForSubComponents" :init-data="initData"></component>
+            </keep-alive>
+          </div>
         </div>
+        <!-- end 关联数据 -->
       </div>
-      <!-- end 关联数据 -->
     </div>
 
     <!-- start 回退工单弹窗 -->

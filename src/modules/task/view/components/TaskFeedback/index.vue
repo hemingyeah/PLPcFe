@@ -139,6 +139,12 @@ export default {
       this.$parent.$refs.proposeApprove.openDialog(data);
     }
   },
+  mounted() {
+    this.$eventBus.$on('task_feedback_tab_open_dialog', this.feedback);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('task_feedback_tab_open_dialog', this.feedback);
+  },
   components: {
     [FeedbackDetail.name]: FeedbackDetail,
     [FeedbackDialog.name]: FeedbackDialog
