@@ -67,7 +67,7 @@
               <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null" size="mini">服务报告</el-button>
 
               <el-dropdown trigger="click" v-if="!srSysTemplate && srSysTemplate != null">
-                <span class="el-dropdown-link el-dropdown-btn">服务报告</span>
+                <el-button :disabled="pending" size="mini">服务报告</el-button>
 
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
@@ -163,6 +163,7 @@
         </div>
       </div>
     </div>
+    <!-- end 顶部操作区 -->
 
     <div class="task-detail-main-content">
       <div class="task-detail-main-content-left">  
@@ -188,16 +189,27 @@
         </el-tabs>
       </div>
 
-      <div class="task-detail-main-content-right">
+      <div class="task-detail-main-content-right" v-if="viewBalanceTab || viewFeedbackTab || viewTaskCardTab">
+        <el-tabs v-model="rightActiveTab">
+          <el-tab-pane label="审核结算" name="balance-tab" v-if="viewBalanceTab">
+            <task-account ref="taskAccount" :share-data="propsForSubComponents" />
+          </el-tab-pane>
+          <el-tab-pane label="客户评价" name="feedback-tab" v-if="viewFeedbackTab">
+            <task-feedback ref="taskFeedback" :share-data="propsForSubComponents" />
+          </el-tab-pane>
+          <el-tab-pane label="附加组件" name="card-tab" v-if="viewTaskCardTab">
+            <task-detail-card :share-data="propsForSubComponents" />
+          </el-tab-pane>
+        </el-tabs>
         <!-- start 关联数据 -->
-        <div class="task-relation" v-if="task.id">
+        <!-- <div class="task-relation" v-if="task.id">
           <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
           <div class="task-relation-content">
             <keep-alive>
               <component :is="currTab" :share-data="propsForSubComponents" :init-data="initData"></component>
             </keep-alive>
           </div>
-        </div>
+        </div> -->
         <!-- end 关联数据 -->
       </div>
     </div>

@@ -14,6 +14,64 @@ body {
   display: flex;
   flex-flow: column nowrap;
   overflow: hidden;
+
+  // 弹窗
+  .base-modal {
+    .base-modal-body {
+      padding: 15px 30px;
+  
+      .base-modal-content {
+        textarea {
+          width: 100%;
+        }
+        
+        p {
+          margin-bottom: 8px;
+  
+          &.tips {
+            color: #999;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  
+    .base-modal-footer {
+      text-align: right;
+    }
+
+    .task-back-dialog {
+      p {
+        font-size: 12px;
+      }
+    }
+  }
+
+  // 按钮
+  .el-button {
+    max-width: 74px;
+    min-width: 60px;
+
+    padding-left: 0;
+    padding-right: 0;
+
+    font-weight: normal;
+    border-radius: 4px;
+
+    &.el-button--small {
+      font-size: $font-size-base;
+      padding: 8px;
+    }
+  }
+
+  // form-view
+  .form-view {
+    padding: 0;
+  }
+
+  .form-view-row {
+    padding: 4px 0;
+  }
 }
 
 // 顶部操作区
@@ -35,22 +93,6 @@ body {
     .form-view-row-content {
       white-space: normal;
       @include text-ellipsis;
-    }
-  }
-
-  .el-button {
-    max-width: 74px;
-    min-width: 60px;
-
-    padding-left: 0;
-    padding-right: 0;
-
-    font-weight: normal;
-    border-radius: 4px;
-
-    &.el-button--small {
-      font-size: $font-size-base;
-      padding: 8px;
     }
   }
 
@@ -120,6 +162,13 @@ body {
 
       .el-button {
         margin-left: 8px;
+
+        // 打印工单
+        &.once-printed {
+          background: $text-color-regular;
+          border-color: $text-color-regular;
+          color: #fff;
+        }
       }
       
       .current-state-button {
@@ -313,148 +362,32 @@ body {
   .approving-img {
     width: 75px;
     position: absolute;
-    right: 20px;
-    top: 10px;
+    right: 12px;
+    top: 12px;
 
     img {
       width: 100%;
     }
   }
 
-  // .task-detail {
-  //   flex: 3;
-  //   min-width: 420px;
-  //   height: 100%;
-  //   display: flex;
-  //   flex-flow: column nowrap;
-
-  //   .form-view{
-  //     flex: 1;
-  //     padding-top: 5px;
-  //     overflow-y: auto;
-  //     border-right: 1px solid #f2f2f2;
-
-  //     .form-view-row {
-  //       .row-item-margin {
-  //         margin-right: 10px;
-  //       }
-  //     }
-
-  //     .form-view-row-plantime {
-  //       white-space: nowrap;
-
-  //       .icon-edit {
-  //         font-weight: bold;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // .task-relation {
-  //   height: 100%;
-  //   flex: 7;
-  //   background: #fff;
-  //   min-width: 500px;
-
-  //   .task-relation-content {
-  //     height: calc(100% - 50px);
-  //     overflow: auto;
-  //   }
-  // }
-}
-
-.task-detail-container {
-  .base-modal-body {
-    padding: 15px 30px;
-
-    .base-modal-content {
-      textarea {
-        width: 100%;
-      }
-      
-      p {
-        margin-bottom: 8px;
-
-        &.tips {
-          color: #999;
-          font-size: 12px;
-        }
-      }
-    }
-  }
-
-  .base-modal-footer {
-    text-align: right;
-  }
-
-  .task-back-dialog {
-    p {
-      font-size: 12px;
-      
-    }
-  }
-
-  .action-btn {
-    .el-dropdown-btn {
-      padding: 0 15px;
-      line-height: 34px;
-      display: inline-block;
-      background: $color-primary;
-      color: #fff;
-      margin-left: 10px;
-      border-radius: 2px;
-      .iconfont {
-        line-height: 12px;
-        margin-right: 3px;
-        font-size: 12px;
-      }
-
-      &:hover {
-        cursor: pointer;
-        color: #fff;
-        background: $color-primary;
-      }
-    }
-
-    .base-button {
-      min-width: 86px;
-      margin-left: 10px;
-
-      &.once-printed {
-        background: #696969;
-        border-color: #696969;
-      }
+  .task-tab-container {
+    position: relative;
+    padding: 12px;
+    
+    .btn-group {
+      font-size: 0;
+      padding: 12px 0;
+      text-align: right;
     }
   }
 }
 
+// 服务报告
 .link-of-dropdown {
   color: $text-color-primary;
   display: block;
 
   &:hover {
     text-decoration: none;
-  }
-}
-
-.task-relation-content {
-  .task-tab-container {
-    position: relative;
-    padding: 10px;
-
-    .no-text {
-      padding: 10px 15px;
-    }
-
-    
-
-    .btn-group {
-      text-align: right;
-      padding-right: 20px;
-
-      button {
-        // min-width: 86px;
-      }
-    }
   }
 }

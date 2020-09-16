@@ -24,12 +24,12 @@
     <!-- end 合计 -->
 
     <!-- start 按钮组 -->
-    <div class="btn-group">
+    <div class="btn-group" v-if="showCreateBtn">
       <el-button
-        v-if="showCreateBtn"
-        type="primary"
-        size="small"
         @click="handleEvent({action: 'create'})"
+        type="primary"
+        size="mini"
+        plain
       >添加工时记录</el-button>
     </div>
     <!-- end 按钮组 -->
@@ -178,6 +178,11 @@ export default {
 <style lang="scss" scoped>
 .hours-record-total-panel {
   font-size: 12px;
-  color: #666;
+  color: $text-color-regular;
+  padding: 6px 12px 0;
+
+  .hours-record-total-item {
+    margin-top: 6px;
+  }
 }
 </style>

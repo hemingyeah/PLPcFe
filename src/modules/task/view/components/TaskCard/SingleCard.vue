@@ -12,16 +12,18 @@
     </form-view>
 
     <!-- start 按钮组 -->
-    <div class="btn-group">
+    <div class="btn-group" v-if="showDeleteBtn || showCreateBtn || showEditBtn">
       <el-button
         type="danger"
-        size="small"
+        size="mini"
+        plain
         v-if="showDeleteBtn"
         @click="deleteCard(cardInstanceId)"
       >删除</el-button>
 
       <el-button
-        size="small"
+        size="mini"
+        plain
         @click="openDialog"
         v-if="showCreateBtn || showEditBtn"
       >编辑</el-button>
@@ -108,3 +110,28 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.single-card-container {
+  .form-view {
+    padding: 0 12px;
+
+    /deep/ .items-of-group {
+      display: flex;
+      flex-wrap: wrap;
+
+      .form-view-row {
+        width: 50%;
+
+        &:nth-child(odd) {
+          padding-right: 10px;
+        }
+
+        &:nth-child(even) {
+          padding-left: 10px;
+        }
+      }
+    }
+  }
+}
+</style>

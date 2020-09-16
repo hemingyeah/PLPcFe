@@ -1,5 +1,5 @@
 <template>
-  <form-view class="task-view-containner" :fields="fields" :value="task">
+  <form-view class="task-tab-container task-view-containner" :fields="fields" :value="task">
     <template slot="taskNo" slot-scope="{ field, value }">
       <!-- start 工单编号 -->
       <div class="form-view-row">
@@ -51,7 +51,7 @@
           {{ getPlanTimeValue(field) }}
           <template v-if="allowModifyPlanTime">
             <el-tooltip class="item" effect="dark" content="修改计划时间" placement="top">
-              <i class="iconfont icon-edit" @click="modifyPlanTime"></i>
+              <i class="iconfont icon-bianji1" @click="modifyPlanTime"></i>
             </el-tooltip>
           </template>
         </div>
@@ -85,7 +85,7 @@
           <span class="row-item-margin" v-for="item in value" :key="item.userId">{{ item.displayName }}</span>
           <template v-if="allowEditSynergy">
             <el-tooltip class="item" effect="dark" content="修改协同人" placement="top">
-              <i class="iconfont icon-edit" @click="modifySynergies"></i>
+              <i class="iconfont icon-bianji1" @click="modifySynergies"></i>
             </el-tooltip>
           </template>
         </div>
@@ -270,8 +270,16 @@ export default {
 </script>
 <style lang="scss">
 .task-view-containner {
-  .nowrap {
+  .form-view-row-plantime {
     white-space: nowrap;
+  }
+
+  .row-item-margin {
+    margin-right: 10px;
+  }
+
+  .icon-bianji1 {
+    font-size: 14px;
   }
 }
 </style>

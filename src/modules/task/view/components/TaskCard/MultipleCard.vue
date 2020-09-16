@@ -12,12 +12,12 @@
     <!-- end 附加组件列表 -->
 
     <!-- start 按钮组 -->
-    <div class="btn-group">
+    <div class="btn-group" v-if="allowCreate">
       <el-button
-        type="primary"
-        size="small"
-        v-if="allowCreate"
         @click="handleEvent({action: 'create'})"
+        type="primary"
+        size="mini"
+        plain
       >添加记录</el-button>
     </div>
     <!-- end 按钮组 -->

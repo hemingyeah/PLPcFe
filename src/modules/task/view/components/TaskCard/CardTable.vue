@@ -147,8 +147,6 @@ export default {
 
 <style lang="scss">
 .multiple-card-table {
-  margin-bottom: 20px;
-  
   .base-table-row-v3 td {
     .column-attachment {
       .iconfont {

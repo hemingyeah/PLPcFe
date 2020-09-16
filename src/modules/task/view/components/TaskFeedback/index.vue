@@ -18,9 +18,10 @@
       <!-- end 审批中 -->
 
       <!-- start 未回访 -->
-      <template v-else-if="!task.reviewTime">
-        <div class="no-text">暂无评价信息</div>
-      </template>
+      <no-data-view-new
+        v-else-if="!task.reviewTime"
+        notice-msg="暂无评价信息"
+      ></no-data-view-new>
       <!-- end 未回访 -->
 
       <!-- start 已回访 -->
@@ -38,7 +39,7 @@
 
     <!-- start 操作 -->
     <div class="btn-group">
-      <base-button type="primary" @event="feedback" :disabled="pending" v-if="allowReviewTask">回访</base-button>
+      <el-button type="primary" size="mini" plain @click="feedback" :disabled="pending" v-if="allowReviewTask">回访</el-button>
     </div>
     <!-- end 操作 -->
 
@@ -60,18 +61,16 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 /* components */
 import FeedbackDialog from './FeedbackDialog';
 import FeedbackDetail from './FeedbackDetail';
+import NoDataViewNew from '@src/component/common/NoDataViewNew';
 
 /* image */
 import APPROVING_IMG from '@src/assets/img/task/approving.png';
 
 export default {
   name: 'task-feedback',
+  inject: ['initData'],
   props: {
     shareData: {
-      type: Object,
-      default: () => ({})
-    },
-    initData: {
       type: Object,
       default: () => ({})
     }
@@ -139,13 +138,8 @@ export default {
       this.$parent.$refs.proposeApprove.openDialog(data);
     }
   },
-  mounted() {
-    this.$eventBus.$on('task_feedback_tab_open_dialog', this.feedback);
-  },
-  beforeDestroy() {
-    this.$eventBus.$off('task_feedback_tab_open_dialog', this.feedback);
-  },
   components: {
+    [NoDataViewNew.name]: NoDataViewNew,
     [FeedbackDetail.name]: FeedbackDetail,
     [FeedbackDialog.name]: FeedbackDialog
   }

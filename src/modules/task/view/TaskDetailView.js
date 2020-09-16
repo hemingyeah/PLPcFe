@@ -456,6 +456,12 @@ export default {
 
       return state === 'finished' && inApprove != 1 && isSettled == 0 && this.initData.canRollBack;
     },
+    /** 
+    * @description 是否显示附加组件tab
+    */
+    viewTaskCardTab() {
+      return this.initData?.cardInfo?.length;
+    },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
@@ -832,9 +838,9 @@ export default {
       } else if (action === 'finish') {
         this.$refs.taskReceiptEdit.openDialog();
       } else if (action === 'balance') {
-        this.$eventBus.$emit('task_balance_tab_open_dialog');
+        this.$refs.taskAccount.openDialog('create');
       } else if (action === 'feedback') {
-        this.$eventBus.$emit('task_feedback_tab_open_dialog');
+        this.$refs.taskFeedback.feedback();
       }
     },
     // 发起审批
@@ -997,6 +1003,8 @@ export default {
       this.receiptFields = result[1] || [];
       this.tabs = this.buildTabs();
       this.stateButtonData = this.buildButtonData();
+
+      this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'card-tab';
 
       this.loading = false;
 
