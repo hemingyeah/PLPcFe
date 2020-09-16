@@ -1061,13 +1061,14 @@ export default {
       if (!window.frameElement) return;
 
       let el = event.target;
-
+      let fromId = window.frameElement.getAttribute('id');
       this.$platform.openTab({
         id: `tab_role_view_${el.dataset.id}`,
         title: "角色详情",
         close: true,
         reload: true,
         url: `/security/role/view/${el.dataset.id}?`,
+        fromId
       });
     },
     createRole() {
@@ -1257,12 +1258,13 @@ export default {
       };
 
       // window.location.href = `/security/tag/createTag?${qs.stringify(parent)}`;
-
+      let fromId = window.frameElement.getAttribute('id');
       platform.openTab({
         id: "createTag",
         title: "新建部门",
         url: `/security/tag/createDept?${qs.stringify(parent)}`,
         reload: true,
+        fromId
       });
     },
     async delDepartment(id) {
@@ -1529,13 +1531,14 @@ export default {
       if (!window.frameElement) return;
 
       let el = event.target;
-
+      let fromId = window.frameElement.getAttribute('id'); 
       this.$platform.openTab({
         id: `tab_department_view_${el.dataset.id}`,
         title: "成员详情",
         close: true,
         reload: true,
         url: `/security/user/view/${el.dataset.id}?from=department`,
+        fromId
       });
     },
     getHigherDepartment(data, department) {
@@ -1718,6 +1721,7 @@ export default {
       // 部门编辑就是之前的团队编辑
       // window.location.href = `/security/tag/editTag/${this.selectedDept.id}`
       // id 有值说明是子部门编辑
+      let fromId = window.frameElement.getAttribute('id');
       platform.openTab({
         id: "editTag",
         title: "编辑部门",
@@ -1725,6 +1729,7 @@ export default {
           ? `/security/tag/editDept/${id}`
           : `/security/tag/editDept/${this.selectedDept.id}`,
         reload: true,
+        fromId
       });
     },
     /** select dept person */

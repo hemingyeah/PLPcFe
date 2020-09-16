@@ -188,11 +188,9 @@ export default {
     },
     /* 返回 */
     goBack() {
-      if(this.action == 'create') {
+        window.parent.frameHistoryBack(window);
         let id = window.frameElement.dataset.id;
-        return this.$platform.closeTab(id);
-      }
-      window.parent.frameHistoryBack(window);
+        this.$platform.closeTab(id);
     },
     /* 打包给服务端的数据 */
     packData(data) {
@@ -267,8 +265,9 @@ export default {
         })
 
         if(result.status == 0) {
-          this.reloadTab();
-          window.location.href = `/security/tag/view/${result.data}?noHistory=1`;
+          let fromId = window.frameElement.getAttribute('fromid');
+          this.$platform.refreshTab(fromId);
+          this.goBack(); 
         }
       } catch (error) {
         console.error('error: ', error);
@@ -291,12 +290,11 @@ export default {
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `${child}部门编辑${result.status == 0 ? '成功' : '失败'}`,
+          title: `部门编辑${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
         if(result.status == 0) {
           let fromId = window.frameElement.getAttribute('fromid');
-
           this.$platform.refreshTab(fromId);
           this.goBack();
         }

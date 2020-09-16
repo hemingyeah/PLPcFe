@@ -478,7 +478,7 @@ export default {
           this.has_call_center_module = true;
           localStorage.setItem('call_center_module', 1);
           if ('WebSocket' in window) {
-            // this.initWebSocket();
+              this.initWebSocket();
           } else {
             alert('当前浏览器 Not support websocket');
           }
@@ -808,16 +808,16 @@ export default {
       });
     },
     initWebSocket() {
-      // webSocketClient = new WebSocket(this.wsUrl);
-      // try {
-      //   webSocketClient.onopen = this.webSocketOpen;
-      //   webSocketClient.onmessage = this.webSocketOnMessage;
-      //   webSocketClient.onclose = this.webSocketClose;
-      //   webSocketClient.onerror = this.webSocketError;
-      // } catch (error) {
-      //   console.error(error);
-      //   this.reconnect(this.wsUrl);
-      // }
+      webSocketClient = new WebSocket(this.wsUrl);
+      try {
+        webSocketClient.onopen = this.webSocketOpen;
+        webSocketClient.onmessage = this.webSocketOnMessage;
+        webSocketClient.onclose = this.webSocketClose;
+        webSocketClient.onerror = this.webSocketError;
+      } catch (error) {
+        console.error(error);
+        this.reconnect(this.wsUrl);
+      }
     },
     webSocketOpen() {
       // console.info('WebSocket连接成功')
