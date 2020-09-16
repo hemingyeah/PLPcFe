@@ -21,7 +21,7 @@
                     src="../../../assets/img/customize.png"
                     class="task-ic19"
                   />
-                  自定义筛选视图
+                  {{otherText}}
                   <i class="iconfont icon-triangle-down task-c3"></i>
                 </div>
                 <el-dropdown-menu slot="dropdown">
@@ -195,8 +195,7 @@
                     })
                   "
                   v-show="
-                    item.id === selectIds.exceptionId &&
-                      initData.tenantVersion === 2
+                    item.id === selectIds.exceptionId
                   "
                   class="task-cef"
                   :class="{
@@ -326,7 +325,7 @@
               >
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
-                  v-for="(item, index) in taskTypes"
+                  v-for="(item, index) in initData.tagTaskTypeList"
                   :key="index"
                 >
                   <div @click="addView(item)">{{ item.name }}</div>
@@ -641,7 +640,7 @@
                   <div
                     class="task-state-block task-font12"
                     v-if="scope.row.isPaused == 1"
-                    style="background-color: rgba(153, 153, 153);color: rgba(153, 153, 153, .2)"
+                    style="color: rgba(153, 153, 153);background-color: rgba(153, 153, 153, .2)"
                   >
                     已暂停
                   </div>
@@ -831,7 +830,7 @@
       <batch-editing-customer-dialog
         ref="batchEditingCustomerDialog"
         :config="{
-          fields: columns,
+          fields: taskFieldList,
           currentTaskType: currentTaskType,
         }"
         :selectedIds="selectedIds"
@@ -843,17 +842,8 @@
         :title="`导入工单-${checkImportTask.name}`"
         ref="importCustomerModal"
         :action="`/excels/task/import?typeId=${checkImportTask.id}`"
+        :templateUrl="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
       >
-        <div slot="tip">
-          <div class="base-import-warn">
-            请先下载
-            <a
-              :href="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
-              target="_blank"
-              >导入模版文档</a
-            >，填写完成后再上传导入。
-          </div>
-        </div>
       </base-import>
       <!-- E 导入工单 -->
       <!-- S 工单转换 -->

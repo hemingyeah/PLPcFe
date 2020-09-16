@@ -59,7 +59,7 @@ export default {
       allShow: false, // 全部工单
       otherShow: false, //其他
       addShow: false, //新建
-      otherText: "其他", //其他文案
+      otherText: "自定义筛选视图", //其他文案
       filterData: {}, //状态数据
       region: {}, //保存视图的数据
       isViewModel: "默认", //视图是否保存过
@@ -70,7 +70,7 @@ export default {
       mapShow: true, //地图预览
       selectColumnState: "", //视图选择列状态存储
       planTimeType: "", //判断计划时间展示的样式
-      keyword_select: '表单内容', // 搜索筛选条件
+      keyword_select: "表单内容", // 搜索筛选条件
       selectList: [
         { name: "全部", id: "all" },
         { name: "我创建的", id: "create" },
@@ -284,6 +284,15 @@ export default {
 
       return taskTypeFilterFields;
     },
+    /*批量编辑过滤后的字段 */
+    taskFieldList() {
+      let fields = this.taskFields || [];
+      let taskTypeFilterFields = fields.filter((field) =>
+        this.filterFieldFuncHandle(field)
+      );
+
+      return taskTypeFilterFields;
+    },
   },
   filters: {
     displaySelect(value) {
@@ -337,7 +346,7 @@ export default {
         result.map((item) => {
           if (item.id === selectIds.allId) {
             this.allSearchParams["all"] = item.searchModel;
-            this.searchParams = item.searchModel
+            this.searchParams = item.searchModel;
           } else if (item.id === selectIds.unfinishedId) {
             this.allSearchParams["unfinished"] = item.searchModel;
           } else if (item.id === selectIds.finished) {
@@ -394,7 +403,7 @@ export default {
      * @description 选择展示模式
      */
     taskMode(type) {
-      this.mapShow = type === '列表模式' ? 1 : 0
+      this.mapShow = type === "列表模式" ? 1 : 0;
     },
     /**
      * @description 删除工单列表人员
@@ -451,6 +460,24 @@ export default {
       this.allShow = false;
       this.selectColumnState = title;
       this.params = this.initParams();
+
+      if (searchModel.createUser) {
+        this.selectId = "create";
+      } else if (searchModel.executor) {
+        this.selectId = "execute";
+      } else if (searchModel.synergyId) {
+        this.selectId = "synergy";
+      } else {
+        this.selectId = "all";
+      }
+      this.taskTypes.forEach((item) => {
+        if (item.id === searchModel.templateId) {
+          this.currentTaskType = item;
+        }
+      });
+      if (!searchModel.templateId) {
+        this.currentTaskType = { id: "", name: "全部" };
+      }
       this.search(searchModel);
       this.buildColumns();
     },
@@ -459,7 +486,7 @@ export default {
       this.isViewModel = "默认";
       this.region["viewId"] = id;
       this.filterId = id;
-      this.otherText = "其他";
+      this.otherText = "自定义筛选视图";
       this.selectColumnState = title;
       this.getTaskCountByState(searchModel);
       this.params = this.initParams();
@@ -663,19 +690,21 @@ export default {
      * @description 表头更改
      */
     headerDragend(newWidth, oldWidth, column, event) {
-      let data = this.columns.map((item) => {
-        if (item.displayName === column.label) {
-          item.width = column.width
-        }
-        return item
-      }).map(item => {
-        return {
-          field: item.field,
-          show: item.show,
-          width: item.width
-        }
-      })
-      this.modifyColumnStatus({ type: 'column', data })
+      let data = this.columns
+        .map((item) => {
+          if (item.displayName === column.label) {
+            item.width = column.width;
+          }
+          return item;
+        })
+        .map((item) => {
+          return {
+            field: item.field,
+            show: item.show,
+            width: item.width,
+          };
+        });
+      this.modifyColumnStatus({ type: "column", data });
     },
     /**
      * @description 构建列
@@ -700,7 +729,7 @@ export default {
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
       // S 高级搜索
-      this.advanceds = [...advancedList, ...this.taskTypeFilterFields]
+      this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
 
       this.columns = fields
@@ -954,7 +983,6 @@ export default {
         templateId: this.currentTaskType.id || "",
         tableName: "task",
       };
-      console.log(params);
       return TaskApi.getTaskTemplateFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task";
@@ -1151,7 +1179,7 @@ export default {
     initPage() {
       this.taskPage = new Page();
       this.taskPage.list = [];
-      this.params.pageNum = 1;
+      this.params.page = 1;
     },
     /**
      * @description 初始化参数
@@ -1373,7 +1401,7 @@ export default {
      */
     search(searchModel = "") {
       const params = this.buildSearchParams();
-      console.log('列表参数', params)
+      console.log("列表参数", params);
       const { selectId, initData, searchParams } = this;
       let mySearch;
       this.loading = true;
