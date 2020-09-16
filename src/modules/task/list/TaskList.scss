@@ -257,6 +257,10 @@
               padding-left: 11px;
               font-size: 14px;
               width: 130px;
+              color: #666;
+              &:hover {
+                color: #333;
+              }
             }
           }
         }
@@ -285,8 +289,8 @@
   margin-right: 9px;
 }
 .task-list-wd252 {
-  width: 200px;
+  width: 170px;
 }
 .task-list-dropdown-item {
-  width: 120px;
+  width: 100px;
 }
