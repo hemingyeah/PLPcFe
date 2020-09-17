@@ -29,7 +29,7 @@
               <div class="form-view-row-content call-phone" @click.stop="makePhoneCall">
                 <span>{{ lmPhone }}</span>
                 <el-tooltip content="拨打电话" placement="top" v-if="showCallPhone">
-                  <i class="iconfont icon-dianhua1"></i>
+                  <i class="iconfont icon-dianhua2"></i>
                 </el-tooltip>
               </div>
             </div>
@@ -57,7 +57,6 @@
             </div>
             <!-- end 当前工单状态操作按钮 -->
 
-            <!-- <base-button type="danger" @event="deleteTask" :disabled="pending" v-if="allowDeleteTask">删除</base-button> -->
             <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消</el-button>
             <el-button @click="redeploy" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
             <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
@@ -94,7 +93,7 @@
           <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">{{ customer.name }}</div>
           <el-tooltip v-if="showCustomerRelationTaskCount" placement="top">
             <div slot="content" v-html="`未完成工单：${customerRelationTaskCountData.unfinished} </br> 全部工单：${customerRelationTaskCountData.all}`"></div>
-            <div class="task-count-button" @click="openCustomerView">
+            <div class="relation-count-button" @click="openCustomerView">
               {{ `${customerRelationTaskCountData.unfinished}/${customerRelationTaskCountData.all}` }}
             </div>
           </el-tooltip>
@@ -113,7 +112,7 @@
                 <div class="form-view-row-content call-phone" @click.stop="makePhoneCall">
                   <span>{{ lmPhone }}</span>
                   <el-tooltip content="拨打电话" placement="top" v-if="showCallPhone">
-                    <i class="iconfont icon-dianhua1"></i>
+                    <i class="iconfont icon-dianhua2"></i>
                   </el-tooltip>
                 </div>
               </div>
@@ -129,15 +128,17 @@
           <!-- end 联系人信息 -->
 
           <!-- start 已设置的显示项 -->
-          <div class="task-detail-header-bottom-list-item">
-            <div class="form-view-row">
-              <label>工单类型：</label>
-              <div class="form-view-row-content">{{ task.templateName }}</div>
-            </div>
-            <div class="form-view-row">
-              <label>服务内容：</label>
-              <div class="form-view-row-content">{{ task.serviceContent }}</div>
-            </div>
+          <div class="task-detail-header-bottom-list-item" id="keyFieldsView">
+            <task-view
+              :task="task"
+              :fields="keyFields"
+              :is-paused="isPaused"
+              :task-edit-auth="editAuth"
+              :finished-state="finishedState"
+              :customer-option="customerOption"
+              :can-see-customer="canSeeCustomer"
+              :allow-modify-plan-time="allowModifyPlanTime"
+            />
           </div>
           <!-- end 已设置的显示项 -->
 
@@ -166,7 +167,19 @@
     <!-- end 顶部操作区 -->
 
     <div class="task-detail-main-content">
-      <div class="task-detail-main-content-left">  
+      <div class="task-detail-main-content-left">
+        <div class="task-detail-btn-group">
+          <el-tooltip content="编辑工单" placement="top" v-if="allowEditTask">
+            <i class="iconfont icon-bianji1" @click="goEdit"></i>
+          </el-tooltip>
+          <el-tooltip content="复制工单" placement="top" v-if="allowCopyTask">
+            <i class="iconfont icon-fuzhi" @click="goCopyTask"></i>
+          </el-tooltip>
+          <el-tooltip content="删除工单" placement="top" v-if="allowDeleteTask">
+            <i class="iconfont icon-shanchu-copy" @click="deleteTask"></i>
+          </el-tooltip>
+        </div>
+        
         <el-tabs v-model="leftActiveTab">
           <el-tab-pane label="工单详情" name="task-view">
             <task-view

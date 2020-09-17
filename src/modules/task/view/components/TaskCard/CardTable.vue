@@ -153,6 +153,11 @@ export default {
         font-size: 12px;
       }
     }
+
+    .el-button {
+      min-width: auto !important;
+      padding: 0;
+    }
   }
 }
 </style>

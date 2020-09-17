@@ -316,7 +316,7 @@ export default {
 <style lang="scss">
 .base-comment{
   position: relative;
-  border: 1px solid #ccc;
+  border: 1px solid $color-border-l2;
   z-index: 8;
   outline: none;
 

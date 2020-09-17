@@ -83,6 +83,20 @@ export default {
     planTimeField() {
       return this.fields.filter(f => f.fieldName === 'planTime')[0];
     },
+    /** 
+    * @description 重点显示的自定义字段
+    * 默认显示工单类型、计划时间、服务内容
+    */
+    keyFields() {
+      let defaultFields = this.fields.filter(f => f.fieldName === 'planTime' || f.fieldName === 'serviceContent');
+      return [{
+        displayName: '工单类型',
+        fieldName: 'templateName',
+        isSystem: 1
+      },
+      ...defaultFields
+      ]
+    },
     /** 工单设置 */
     taskConfig() {
       return this.initData?.taskConfig || {};
@@ -507,7 +521,7 @@ export default {
     * @description 显示拨打电话
     */
     showCallPhone() {
-      return this.lmPhone && !this.hasCallCenterModule;
+      return this.lmPhone && this.hasCallCenterModule;
     },
     /** 
     * @description 地址
@@ -938,7 +952,7 @@ export default {
           { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
         ],
         processing: [
-          { name: '完成', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
+          { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
           { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
           { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
           { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
@@ -997,6 +1011,11 @@ export default {
         displayName: '创建时间',
         fieldName: 'createTime',
         formType: 'timestamp',
+        isSystem: 1,
+      }, {
+        displayName: '派单人',
+        fieldName: 'allotUser',
+        formType: 'user',
         isSystem: 1,
       }];
 

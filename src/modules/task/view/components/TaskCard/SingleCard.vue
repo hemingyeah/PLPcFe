@@ -1,6 +1,6 @@
 <template>
   <div class="single-card-container">
-    <form-view :fields="fields" :value="value">
+    <form-view class="form-view-two-column" :fields="fields" :value="value">
       <!-- start 操作时间 -->
       <template slot="updateTime" slot-scope="{ field, value }">
         <div class="form-view-row">
@@ -114,24 +114,11 @@ export default {
 <style lang="scss" scoped>
 .single-card-container {
   .form-view {
-    padding: 0 12px;
+    padding: 0 12px 12px;
+  }
 
-    /deep/ .items-of-group {
-      display: flex;
-      flex-wrap: wrap;
-
-      .form-view-row {
-        width: 50%;
-
-        &:nth-child(odd) {
-          padding-right: 10px;
-        }
-
-        &:nth-child(even) {
-          padding-left: 10px;
-        }
-      }
-    }
+  .btn-group {
+    padding-top: 0 !important;
   }
 }
 </style>

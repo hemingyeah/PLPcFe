@@ -2,12 +2,17 @@
   <div class="task-tab-container task-card-tab">
     <!-- start 附加组件名称 快速定位 -->
     <div class="card-name-list">
-      <a :href="`#${card.cardId}`" v-for="card in taskCards" :key="card.cardId">{{ card.cardName }}</a>
+      <span
+        :class="{'active': activeClass == index }"
+        v-for="(card, index) in taskCards"
+        :key="index"
+        @click="scrollTo(index)"
+      >{{ card.cardName }}</span>
     </div>
     <!-- end 附加组件名称 快速定位 -->
 
     <!-- start 附加组件内容 -->
-    <div class="card-info-list">
+    <div class="card-info-list" ref="cardLists">
 
       <div class="card-info-container" v-for="card in taskCards" :key="card.cardId" :id="card.cardId">
         <h3 class="card-name">{{ card.cardName }}</h3>
@@ -73,6 +78,11 @@ export default {
       default: () => ({})
     }
   },
+  data() {
+    return {
+      activeClass: 0
+    }
+  },
   computed: {
     /** 
     * @description 工单详情数据
@@ -103,7 +113,31 @@ export default {
     getCardValue(cardId) {
       let { cardInfo = [] } = this.task;
       return cardInfo.filter(card => card.cardId == cardId)[0];
+    },
+    /** 
+    * @description 锚点滚动定位
+    */
+    scrollTo(index) {
+      this.activeClass = index;
+
+      let jump = document.querySelectorAll('.card-info-container');
+      jump[index].scrollIntoView({ block: 'start', behavior: 'smooth' });
+    },
+    /** 
+    * @description 滚动事件
+    */
+    scroll(e) {
+      let cardInfos = document.querySelectorAll('.card-info-container');
+
+      for (let i = 0; i < cardInfos.length; i++ ) {
+        if (e.target.scrollTop >= cardInfos[i].offsetTop - cardInfos[0].offsetTop) {
+          this.activeClass = i;
+        }
+      }
     }
+  },
+  mounted() {
+    this.$refs.cardLists.addEventListener('scroll', this.scroll);
   },
   components: {
     [SingleCard.name]: SingleCard,
@@ -129,14 +163,18 @@ export default {
     background-color: #fff;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+    border-bottom: 1px solid $bg-color-l1;
 
-    a {
+    span {
       color: $text-color-regular;
       margin: 0 20px 4px 0;
       display: inline-block;
 
       &:hover {
-        text-decoration: none;
+        color: $text-color-primary;
+        cursor: pointer;
+      }
+      &.active {
         color: $color-primary;
       }
     }

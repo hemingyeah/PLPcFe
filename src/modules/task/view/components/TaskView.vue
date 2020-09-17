@@ -1,5 +1,5 @@
 <template>
-  <form-view class="task-tab-container task-view-containner" :fields="fields" :value="task">
+  <form-view class="task-tab-container task-view-containner" :fields="taskfields" :value="task">
     <template slot="taskNo" slot-scope="{ field, value }">
       <!-- start 工单编号 -->
       <div class="form-view-row">
@@ -18,28 +18,32 @@
 
     <template slot="customer">
       <!-- start 产品 -->
-      <div class="form-view-row" v-if="customerOption.product">
-        <label>产品</label>
-        <div class="form-view-row-content">
-          <template v-for="product in products">
-            <span
-              class="link-text row-item-margin"
-              :key="product.id"
-              @click="openProductView(product.id)"
-              v-if="!isEncryptField(product.name) && canSeeCustomer"
-            >{{ product.name }}</span>
-
-            <span class="row-item-margin" :key="product.id" v-else>{{ product.name }}</span>
-          </template>
-          
-          <el-tooltip v-if="showProductRelationTaskCount" placement="top">
-            <div slot="content" v-html="`未完成工单：${productRelationTaskCountData.unfinished} </br> 全部工单：${productRelationTaskCountData.all}`"></div>
-            <el-button class="task-count-button" @click="openProductView(products[0].id)">
-              {{ `${productRelationTaskCountData.unfinished}/${productRelationTaskCountData.all}` }}
-            </el-button>
-          </el-tooltip>
+      <template v-if="customerOption.product">
+        <div class="form-view-row" v-if="!products.length"><label>产品</label></div>
+        <div class="product-list" v-else>
+          <div class="product-item" v-for="product in products" :key="product.id">
+            <div class="product-item-name">
+              <label>产品</label>
+              <span
+                class="link-text"
+                :key="product.id"
+                @click="openProductView(product.id)"
+                v-if="!isEncryptField(product.name) && canSeeCustomer"
+              >{{ product.name }}</span>
+              <span v-else>{{ product.name }}</span>
+              <el-tooltip v-if="showProductRelationCount(product)" placement="top">
+                <div slot="content" v-html="`未完成工单：${productRelationCount[product.id].unfinished} </br> 全部工单：${productRelationCount[product.id].all}`"></div>
+                <div class="relation-count-button" @click="openProductView(product.id)">
+                  {{ `${productRelationCount[product.id].unfinished}/${productRelationCount[product.id].all}` }}
+                </div>
+              </el-tooltip>
+            </div>
+            <div class="product-item-relation" v-if="products.length == 1">
+              <form-view class="form-view-two-column" :fields="relationProductfields" :value="task"></form-view>
+            </div>
+          </div>
         </div>
-      </div>
+      </template>
       <!-- end 产品 -->
     </template>
 
@@ -82,7 +86,7 @@
       <div class="form-view-row">
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content">
-          <span class="row-item-margin" v-for="item in value" :key="item.userId">{{ item.displayName }}</span>
+          <span class="synergies-name" v-for="item in value" :key="item.userId">{{ item.displayName }}</span>
           <template v-if="allowEditSynergy">
             <el-tooltip class="item" effect="dark" content="修改协同人" placement="top">
               <i class="iconfont icon-bianji1" @click="modifySynergies"></i>
@@ -98,6 +102,9 @@
 <script>
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
+
+/* enum */
+import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -140,20 +147,22 @@ export default {
   data() {
     return {
       products: this.buildProducts(),
-      productRelationTaskCountData: {} // 产品关联的工单数量
+      productRelationCount: {} // 产品关联的工单数量
     }
   },
   computed: {
     /** 
-    * @description 是否显示产品关联的工单数量
-    * 1. 产品存在且只有一个
-    * 2. 且全部数量>0
-    * 3. 且未加密
+    * @description 工单自定义字段
+    * 过滤产品关联字段，需给每个产品显示对应产品关联字段
     */
-    showProductRelationTaskCount() {
-      let { products } = this.task;
-      let { all } = this.productRelationTaskCountData;
-      return products && products.length == 1 && Number(all) > 0 && this.isEncryptField(products[0].name);
+    taskfields() {
+      return this.fields.filter(field => field.formType != 'relationProduct');
+    },
+    /** 
+    * @description 产品关联字段
+    */
+    relationProductfields() {
+      return this.fields.filter(field => field.formType == 'relationProduct');
     },
     /** 
     * @description 允许修改协同人
@@ -193,8 +202,18 @@ export default {
     */
     getCountForCreate(params) {
       return TaskApi.getCountForCreate(params).then((result = {}) => {
-        this.relationTaskCountData[params.module] = result;
+        this.$set(this.productRelationCount, params.id, result);
       })
+    },
+    /** 
+    * @description 是否显示产品关联的工单数量
+    * 1. 全部数量>0
+    * 2. 且未加密
+    */
+    showProductRelationCount(product) {
+      let { id, name } = product;
+      let { all } = this.productRelationCount[id];
+      return Number(all) > 0 && !this.isEncryptField(name);
     },
     /**
     * @description 是否加密字段
@@ -251,6 +270,8 @@ export default {
           TaskApi.updateSynergies(params).then(res => {
             if (res.success) {
               this.task.synergies = synergies;
+
+              this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
             } else {
               this.$platform.alert(res.message);
             }
@@ -260,10 +281,13 @@ export default {
         .catch(err => console.error(err))
     }
   },
-  mounted() {
+  created() {
     // 查询产品关联工单数量
-    if (this.canSeeCustomer && this.products && this.products.length == 1) {
-      this.getCountForCreate({ module: 'product', id: this.products[0].id });
+    if (this.canSeeCustomer) {
+      this.products.map(item => {
+        this.$set(this.productRelationCount, item.id, { all: 0, unfinished: 0 });
+        this.getCountForCreate({ module: 'product', id: item.id });
+      })
     }
   }
 }
@@ -274,12 +298,52 @@ export default {
     white-space: nowrap;
   }
 
-  .row-item-margin {
-    margin-right: 10px;
-  }
-
   .icon-bianji1 {
     font-size: 14px;
+  }
+
+  .product-list {
+    .product-item {
+      &-name {
+        line-height: 20px;
+        display: flex;
+        align-items: baseline;
+
+        label {
+          width: 98px;
+          margin-bottom: 0;
+          padding-left: 20px;
+          color: $text-color-regular;
+          background: url(../../../../assets/img/task/product_icon.png) no-repeat left 4px;
+          background-size: 12px;
+        }
+
+        span {
+          margin-right: 0;
+        }
+      }
+
+      &-relation {
+        margin-top: 8px;
+        padding: 6px 10px;
+        background-color: $bg-color-l3;
+        border-radius: $border-radius-base;
+
+        .form-view {
+          background-color: $bg-color-l3;
+        }
+      }
+
+      &:not(:last-child) {
+        .product-item-relation {
+          margin-bottom: 16px;
+        }
+      }
+    }
+  }
+
+  .synergies-name {
+    margin-right: 12px;
   }
 }
 </style>

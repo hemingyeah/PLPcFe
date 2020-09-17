@@ -643,7 +643,6 @@ export default {
 .task-timeline{
   padding-top: 15px;
   flex: 1;
-  overflow: auto;
   padding-right: 15px;
   .private {
     color: $color-primary;
