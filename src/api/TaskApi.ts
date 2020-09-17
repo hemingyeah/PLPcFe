@@ -641,7 +641,10 @@ export function receiptDraft(params: {} | undefined) {
  * @description 修改协同人
  */
 export function updateSynergies(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`,
+    params
+  );
 }
 
 /**
@@ -1067,6 +1070,13 @@ export function getUserViews(params: object) {
     `${fixedPrefixTaskPath}/outside/pc/view/getUserViews`,
     params
   );
+}
+
+/**
+ * @description 获取附件
+ */
+export function getCardDetailList(params: object) {
+  return http.get(`${fixedPrefixTaskPath}/task/getCardDetailList`, params);
 }
 
 /* -------------  end  新工单api ---------------- */

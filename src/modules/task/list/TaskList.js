@@ -56,16 +56,12 @@ export default {
       taskView: [], // 顶部筛选列表
       otherList: [], //其他列表
       filterId: selectIds.allId, //顶部筛选选中的状态id
-      allShow: false, // 全部工单
-      otherShow: false, //其他
-      addShow: false, //新建
       otherText: "自定义筛选视图", //其他文案
       filterData: {}, //状态数据
       region: {}, //保存视图的数据
       isViewModel: "默认", //视图是否保存过
       advanceds: advancedList, //高级搜索列表
       searchParams: {}, //筛选列表的参数
-      allSearchParams: {}, //全部工单搜索条件
       dropDownInfo: "", //顶部下拉
       mapShow: true, //地图预览
       selectColumnState: "", //视图选择列状态存储
@@ -309,7 +305,10 @@ export default {
   mounted() {
     console.log("taskView", this.initData);
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
-    this.currentTaskType = this.taskTypes[0];
+    this.currentTaskType = this.taskTypeList.length === 1 ? this.taskTypes[1] : this.taskTypes[0];
+    if(this.taskTypeList.length === 1) {
+      this.getCardDetailList(this.taskTypes[1].id)
+    }
 
     this.getUserViews();
     this.getTaskCountByState();
@@ -336,6 +335,12 @@ export default {
       });
     },
     /**
+     * 获取附件
+     */
+    async getCardDetailList(typeId) {
+      const {} = await TaskApi.getCardDetailList({typeId})
+    },
+    /**
      * 获取视图
      */
     async getUserViews() {
@@ -343,16 +348,6 @@ export default {
       if (success) {
         this.taskView = result;
         this.otherLists(result);
-        result.map((item) => {
-          if (item.id === selectIds.allId) {
-            this.allSearchParams["all"] = item.searchModel;
-            this.searchParams = item.searchModel;
-          } else if (item.id === selectIds.unfinishedId) {
-            this.allSearchParams["unfinished"] = item.searchModel;
-          } else if (item.id === selectIds.finished) {
-            this.allSearchParams["finished"] = item.searchModel;
-          }
-        });
         this.initialize();
       }
     },
@@ -503,9 +498,6 @@ export default {
     },
     // 最高事件
     allEvent() {
-      this.allShow = false;
-      this.otherShow = false;
-      this.addShow = false;
     },
     /**
      * 顶部筛选, 状态数据展示
@@ -931,6 +923,7 @@ export default {
      */
     changeTaskType(taskType) {
       this.currentTaskType = taskType;
+      this.getCardDetailList(taskType.id)
       this.initialize();
     },
     /**
@@ -1160,7 +1153,7 @@ export default {
           this.planTimeType =
             res[0].filter((item) => {
               return item.displayName === "计划时间";
-            })[0].setting.dateType || this.initData.planTimeType;
+            })[0].setting.dateType;
           this.buildColumns();
           this.taskView.map((item) => {
             if (item.id === this.filterId) {

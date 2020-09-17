@@ -21,20 +21,43 @@
                     src="../../../assets/img/customize.png"
                     class="task-ic19"
                   />
-                  {{otherText}}
+                  {{ otherText }}
                   <i class="iconfont icon-triangle-down task-c3"></i>
                 </div>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item v-for="(item, index) in otherList" :key="index">
-                    <div @click="checkOther(item)" class="task-flex task-ai task-list-wd252 task-pointer">
-                      <span class="task-list-dropdown-item">{{item.name}}</span>
+                  <el-dropdown-item
+                    v-for="(item, index) in otherList"
+                    :key="index"
+                  >
+                    <div
+                      @click="checkOther(item)"
+                      class="task-flex task-ai task-list-wd252 task-pointer"
+                    >
+                      <span class="task-list-dropdown-item">{{
+                        item.name
+                      }}</span>
                       <i class="iconfont icon-yanjing task-font12"></i>
-                      <i class="iconfont icon-bianji1 task-ml12 task-font12" v-if="initData.loginUser && item.id === initData.loginUser.userId"></i>
-                      <i class="iconfont icon-shanchu-copy task-ml12 task-font12" v-if="initData.loginUser && item.id === initData.loginUser.userId"></i>
+                      <i
+                        class="iconfont icon-bianji1 task-ml12 task-font12"
+                        v-if="
+                          initData.loginUser &&
+                            item.id === initData.loginUser.userId
+                        "
+                      ></i>
+                      <i
+                        class="iconfont icon-shanchu-copy task-ml12 task-font12"
+                        v-if="
+                          initData.loginUser &&
+                            item.id === initData.loginUser.userId
+                        "
+                      ></i>
                     </div>
                   </el-dropdown-item>
                   <el-dropdown-item>
-                    <div class="task-flex task-ai task-cfa task-pointer task-list-wd252" @click="panelSearchAdvancedToggle">
+                    <div
+                      class="task-flex task-ai task-cfa task-pointer task-list-wd252"
+                      @click="panelSearchAdvancedToggle"
+                    >
                       <i class="iconfont icon-add task-mr4 task-font12"></i>
                       新建视图
                     </div>
@@ -90,21 +113,22 @@
               >
                 <!-- 全部工单 -->
                 <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
                   @click="
                     checkFilter({
-                      id: selectIds.allId,
+                      id: item.id,
                       name: '全部工单',
-                      searchModel: allSearchParams.all,
+                      searchModel: item.searchModel,
                       title: 'all',
                     })
                   "
+                  v-show="item.id === selectIds.allId"
                   :class="{
-                    'task-c2': selectIds.allId === filterId,
+                    'task-c2': item.id === filterId,
                   }"
                 >
-                  {{
-                    initData.allDropdownView && initData.allDropdownView.name
-                  }}({{ filterData.all || 0 }})
+                  {{ `全部工单(${filterData.all || 0})` }}
                 </div>
                 <!-- 待指派 -->
                 <div
@@ -194,9 +218,7 @@
                       title: 'exception',
                     })
                   "
-                  v-show="
-                    item.id === selectIds.exceptionId
-                  "
+                  v-show="item.id === selectIds.exceptionId"
                   class="task-cef"
                   :class="{
                     'task-c2': item.id === filterId,
@@ -206,32 +228,38 @@
                 </div>
                 <!-- 未完成工单 -->
                 <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
                   @click="
                     checkFilter({
-                      name: `未完成工单`,
-                      searchModel: allSearchParams.unfinished,
+                      id: item.id,
+                      name: '未完成工单',
+                      searchModel: item.searchModel,
                       title: 'unfinished',
-                      id: selectIds.unfinishedId,
                     })
                   "
+                  v-show="item.id === selectIds.unfinishedId"
                   :class="{
-                    'task-c2': selectIds.unfinishedId === filterId,
+                    'task-c2': item.id === filterId,
                   }"
                 >
                   {{ `未完成(${filterData.unfinished || 0})` }}
                 </div>
                 <!-- 已完成工单 -->
                 <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
                   @click="
                     checkFilter({
-                      name: `已完成工单`,
-                      searchModel: allSearchParams.finished,
+                      id: item.id,
+                      name: '已完成工单',
+                      searchModel: item.searchModel,
                       title: 'finished',
-                      id: selectIds.finished,
                     })
                   "
+                  v-show="item.id === selectIds.finished"
                   :class="{
-                    'task-c2': selectIds.finished === filterId,
+                    'task-c2': item.id === filterId,
                   }"
                 >
                   {{ `已完成(${filterData.finished || 0})` }}
@@ -316,11 +344,6 @@
               <base-button
                 type="primary"
                 icon="icon-add"
-                @event.stop="
-                  addShow = true;
-                  otherShow = false;
-                  allShow = false;
-                "
                 >新建</base-button
               >
               <el-dropdown-menu slot="dropdown">
