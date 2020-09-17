@@ -4,7 +4,7 @@
     <!-- start 主要内容 -->
     <div class="department-main">
       <div    :class="{'department-left': true, 'department-state': !isWeChat}">
-        <el-button type="primary" @click="synchronousWeChat"  :loading="synchronousState" class="base-button" v-if="isWeChat">{{synchronousState?'同步中':'同步企业微信通讯录'}}</el-button>
+        <el-button type="primary" @click="synchronousWeChat"  :loading="synchronousState" class="base-button" >{{synchronousState?'同步中':'同步企业微信通讯录'}}</el-button>
         <el-tabs type="card" v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="组织架构" name="tag">
             <!-- 部门搜索框 -->
@@ -879,10 +879,21 @@ export default {
   methods: {
     synchronousWeChat() {
       this.synchronousState = true;
+      this.$http
+        .get("/login/synContact")
+        .then((res) => {
+          console.log('同步通讯录',res)
+          
+        })
+        .catch((err) => {
+          row.pending = false;
+          console.error("toggleStatus catch err", err);
+        });
       let timeout = setTimeout(()=>{
         this.$platform.alert("同步时间较长，系统将在后台继续为您尝试同步");
         this.synchronousState = false;
       },30000);
+
 
 
     },
