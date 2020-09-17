@@ -58,7 +58,7 @@
           </draggable>
           <!-- move-menu-box end -->
           <!-- menu-box start -->
-          <div class="menu-box" v-model="menu_arr" v-if="edit_type!==2">
+          <div class="menu-box" v-if="edit_type!==2">
             <div
               v-for="(item,index) in menu_arr"
               :key="index"
@@ -600,9 +600,10 @@ export default {
                 this.$emit("pageLoading", true);
                 this.setMenuList(res).then((res_) => {
                   if (res_.success) {
-                    this.menu_arr = res;
-                    menu_arr_stash = _.cloneDeep(res);
-                    this.$emit("changeMenuArr", res);
+                    let result_ = JSON.parse(res_.data.wechatMenu).menu.button
+                    this.menu_arr = result_;
+                    menu_arr_stash = _.cloneDeep(result_);
+                    this.$emit("changeMenuArr", result_);
                     this.$emit("pageLoading", false);
                   } else {
                     this.$platform.alert(res_.message);
