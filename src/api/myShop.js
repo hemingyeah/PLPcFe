@@ -1,11 +1,34 @@
-import http from '../util/http'
+import http from '@src/util/http';
+let headeUrl = ''
 
-/**
- * 联系人手机号码唯一性验证
- * @param {Object} params - 参数
- * @param {String} params.customerId - 客户id
- * @param {String} params.phone - 手机号码
- */
-export function checkUnique4Phone(params){
-  return http.post('/linkman/checkUnique4Phone', params, false)
+export function getRules(params) {
+  return http.get(`${headeUrl}/linkc/getRules`, params)
+}
+
+export function saveRules(params) {
+  return http.post(`${headeUrl}/linkc/saveRules`, params)
+}
+
+export function getInfos(params) {
+  return http.get(`${headeUrl}/linkc/getInfos`, params)
+}
+
+export function saveInfos(params) {
+  return http.post(`${headeUrl}/linkc/saveInfos`, params)
+}
+
+export function weChat(params) {
+  return http.post(`${headeUrl}/linkc/weChat`, params)
+}
+
+export function orderList(params) {
+  return http.post(`${headeUrl}/linkc/order/list`, params)
+}
+
+export function orderNum() {
+  return http.get(`${headeUrl}/linkc/order/num`)
+}
+
+export function orderDetail(params) {
+  return http.get(`${headeUrl}/linkc/order/detail`, params)
 }

@@ -2,13 +2,13 @@
   <div class="setting-show-cmp-box">
     <draggable class="icon-list-box flex-x flex-w al-start" v-model="dataInfo">
       <div
-        class="can-move icon-list-item"
+        :class="['can-move', 'icon-list-item', nowId==item.id?'icon-list-item-check':'']"
         v-for="(item, index) in dataInfo"
         :key="index"
         draggable="true"
         @click="changeThis(item)"
       >
-        <img :src="imgObj[item.icon]" class="icon-list-item-img" />
+        <img :src="imgObj[`img_${item.iconType}`]" class="icon-list-item-img" />
         <div class="overHideCon-1 font-10">{{item.name}}</div>
       </div>
 
@@ -44,10 +44,11 @@ import img_16 from "@src/assets/img/myShop/icon16.png";
 
 export default {
   name: "icon-list",
-  props: ["infoData", "cmpId"],
+  props: ["infoData", "cmpId", "nowSettingDataId"],
   components: {
     draggable,
   },
+  inject: ["cancelInfoData"],
   data() {
     return {
       dataInfo: this.infoData || [],
@@ -69,6 +70,7 @@ export default {
         img_15,
         img_16,
       },
+      nowId: "",
     };
   },
   watch: {
@@ -79,20 +81,33 @@ export default {
         this.dataInfo = value;
       },
     },
+    nowSettingDataId(value) {
+      if (value == -1 || value != this.cmpId) {
+        this.$set(this, "nowId", "");
+      }
+    },
   },
   methods: {
     add_dataList() {
+      let id_ = new Date().getTime();
       let item = {
-        icon: "img_1",
+        iconType: "1",
         name: "",
         type: "",
-        id: new Date().getTime(),
+        id: id_,
         cmpId: this.cmpId,
       };
       this.$emit("pushIcon", { id: this.cmpId, item });
+
       this.changeThis(item);
     },
     changeThis(item) {
+      if (this.nowId == item.id) {
+        this.nowId = "";
+        this.cancelInfoData();
+        return;
+      }
+      this.nowId = item.id;
       this.$emit("changeThis", { id: this.cmpId, item });
     },
   },
@@ -109,11 +124,16 @@ export default {
       align-items: center;
       margin-bottom: 19px;
       width: 25%;
+      box-sizing: border-box;
+      min-height: 35px;
       .icon-list-item-img {
         margin-bottom: 6px;
         width: 38px;
         height: 29px;
       }
+    }
+    .icon-list-item-check {
+      outline: 1px dashed $color-primary;
     }
     .icon-list-item-add {
       margin-bottom: 6px;

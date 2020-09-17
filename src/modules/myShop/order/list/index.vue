@@ -1,10 +1,10 @@
 <template>
-  <div class="my-shop-box">
+  <div class="my-shop-box" v-loading.fullscreen.lock="fullscreenLoading">
     <!-- search-modal-box start -->
     <div class="search-modal-box">
       <div class="flex-x search-input-box">
         <div class="flex-1"></div>
-        <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="input3">
+        <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="searchModel.keyword">
           <i class="iconfont icon-search" slot="append"></i>
         </el-input>
       </div>
@@ -12,20 +12,43 @@
       <div class="search-more min-w-700">
         <div class="search-checkbox flex-x mar-b-12">
           <div class="mar-r-38">订单状态：</div>
-          <el-checkbox-group v-model="search_checked">
+          <el-select
+            v-model="searchModel.moreConditions.stateList"
+            @change="changeOrderState"
+            placeholder="请选择"
+            multiple
+            collapse-tags
+            style="width:400px"
+          >
+            <el-option
+              v-for="(item, index) in search_checkbox"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            >
+              <span style="float: left">{{ item.label }}</span>
+              <span
+                style="float: left; color: #8492a6; font-size: 13px; margin-left:12px;"
+              >{{ stateNumObj[stateObj[item.value].key]}}</span>
+            </el-option>
+          </el-select>
+          <!-- <el-checkbox-group
+            v-model="searchModel.moreConditions.stateList"
+            @change="changeOrderState"
+          >
             <el-checkbox
               class="w-128"
               v-for="(item, index) in search_checkbox"
               :key="index"
               :label="item.label"
             ></el-checkbox>
-          </el-checkbox-group>
+          </el-checkbox-group>-->
         </div>
         <div class="search-datecheck min-w-700 flex-x">
           <div class="mar-r-38">下单时间：</div>
           <div class="search-date">
             <el-date-picker
-              v-model="value2"
+              v-model="searchModel.moreConditions.orderTime"
               type="daterange"
               align="right"
               unlink-panels
@@ -33,10 +56,11 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
+              value-format="yyyy-MM-dd"
             ></el-date-picker>
           </div>
-          <el-button class="mar-l-32" type="primary">查询</el-button>
-          <el-button>重置</el-button>
+          <el-button class="mar-l-32" type="primary" @click="search">查询</el-button>
+          <el-button @click="resetParams">重置</el-button>
         </div>
       </div>
     </div>
@@ -123,76 +147,89 @@
         </div>-->
 
         <!-- start 表格 -->
-        <el-table
-          :data="page.list"
-          :row-key="getRowKey"
-          stripe
-          @sort-change="sortChange"
-          @select="selectionHandle"
-          @select-all="selectionHandle"
-          :highlight-current-row="false"
-          border
-          header-row-class-name="myShop-order-list-heard"
-          ref="productTemplateTable"
-          class="myShop-order-list-table"
-        >
-          <!-- <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column> -->
-          <el-table-column
-            v-for="column in columns"
-            v-if="column.show"
-            :key="column.field"
-            :label="column.label"
-            :prop="column.field"
-            :width="column.width"
-            :min-width="column.minWidth"
-            :sortable="column.sortable"
-            show-overflow-tooltip
-            :align="column.align"
+        <div class="myShop-order-list-table">
+          <el-table
+            :data="page.list"
+            :row-key="getRowKey"
+            stripe
+            @sort-change="sortChange"
+            @select="selectionHandle"
+            @select-all="selectionHandle"
+            :highlight-current-row="false"
+            border
+            header-row-class-name="myShop-order-list-heard"
+            ref="productTemplateTable"
           >
-            <template slot-scope="scope">
-              <template v-if="column.conType === 'goods'">
-                <div class="flex-x">
-                  <div class="flex-x goods-img-list flex-1">
-                    <img v-for="(item, index) in 5" :key="index" src="@src/assets/img/no-data.png" >
-                  </div>
-                  <div>共5件</div>
-                </div>
-              </template>
-              <template v-else-if="column.conType === 'btnArray'">
-                <a
-                  v-for="(item, index) in column.btnArr"
-                  :key="index"
-                  href
-                  :class="`view-detail-btn ${index>0?'mar-l-10':''}`"
-                  :style="`color:${item.color}`"
-                  @click.stop.prevent="item.click(scope.row)"
-                >{{item.name}}</a>
-              </template>
-              <template v-else-if="column.conType === 'click'">
-                <a
-                  href
-                  class="view-detail-btn"
-                  :style="`color:${column.color}`"
-                  @click.stop.prevent="column.click(scope.row)"
-                  v-if="hasViewCustomerAuth(scope.row)"
-                >{{scope.row[column.field]}}</a>
-                <p v-else>{{scope.row[column.field]}}</p>
-              </template>
-              <template
-                v-else-if="column.field === 'sendTime'"
-              >{{ scope.row.sendTime | formatDate }}</template>
+            <template v-for="column in columns">
+              <el-table-column
+                v-if="column.show"
+                :key="column.field"
+                :label="column.label"
+                :prop="column.field"
+                :width="column.width"
+                :min-width="column.minWidth"
+                :sortable="column.sortable"
+                show-overflow-tooltip
+                :align="column.align"
+              >
+                <template slot-scope="scope">
+                  <template v-if="column.conType === 'goods'">
+                    <div class="flex-x">
+                      <div class="flex-x goods-img-list flex-1">
+                        <img
+                          v-for="(item, index) in scope.row[column.field]"
+                          :key="index"
+                          :src="item.thumbnailUrl"
+                        />
+                        <div
+                          class="flex-1 overHideCon-1"
+                          v-if="scope.row[column.field].length==1"
+                        >{{item.name}}</div>
+                        <div>{{scope.row[column.field].length>5?`+${scope.row[column.field].length-5}`:''}}</div>
+                      </div>
+                      <div>共{{scope.row.goodsCount}}件</div>
+                    </div>
+                  </template>
+                  <template v-else-if="column.conType === 'btnArray'">
+                    <div class="flex-x btnArray-box">
+                      <a
+                        v-for="(item, index) in column.btnArr"
+                        :key="index"
+                        href
+                        :class="`view-detail-btn ${index>0?'mar-l-10':''}`"
+                        :style="item.styleType(scope.row)"
+                        @click.stop.prevent="item.click(scope.row)"
+                      >{{item.name}}</a>
+                    </div>
+                  </template>
+                  <template v-else-if="column.conType === 'click'">
+                    <a
+                      href
+                      class="view-detail-btn"
+                      :style="`color:${item.color}`"
+                      @click.stop.prevent="column.click(scope.row)"
+                      v-if="hasViewCustomerAuth(scope.row)"
+                    >{{scope.row[column.field]}}</a>
+                    <p v-else>{{scope.row[column.field]}}</p>
+                  </template>
+                  <template
+                    v-else-if="column.field === 'createTime'"
+                  >{{ scope.row.createTime | formatDate }}</template>
+                  <template v-else-if="column.field === 'logisticsState'">
+                    <div class="flex-x">
+                      <div
+                        :class="[`status-tips-${scope.row.logisticsState}`,'status-tips-box']"
+                      >{{stateObj[scope.row.logisticsState].name}}</div>
+                    </div>
+                  </template>
 
-              <!-- <div
-                v-else-if="column.formType === 'textarea'"
-                v-html="buildTextarea(scope.row.attribute[column.field])"
-                @click="openOutsideLink"
-              ></div> -->
-
-              <template v-else>{{scope.row[column.field]}}</template>
+                  <template v-else>{{scope.row[column.field]}}</template>
+                </template>
+              </el-table-column>
             </template>
-          </el-table-column>
-        </el-table>
-        <!-- end 表格 -->
+          </el-table>
+          <!-- end 表格 -->
+        </div>
 
         <!-- start 表格底部 -->
         <div class="table-footer">
@@ -280,11 +317,11 @@
       <!-- end content -->
 
       <base-table-advanced-setting ref="advanced" @save="columnStatusModify" />
-
-      <!-- 编辑联系人弹窗 -->
-      <edit-contact-dialog ref="EditContactDialog" :original-value="selectedContact"></edit-contact-dialog>
     </div>
     <!-- end 产品模板列表 -->
+
+    <goods-dialog ref="goodsDialog" :info-data="goodsInfo" @confirm="goodsConfirm"></goods-dialog>
+    <out-stock-dialog ref="outStockDialog" :info-data="outStockInfo" @confirm="outStockConfirm"></out-stock-dialog>
   </div>
 </template>
 <script>
@@ -293,9 +330,8 @@ import Page from "@model/Page";
 import platform from "@src/platform";
 import { formatDate } from "@src/util/lang";
 
-import EditContactDialog from "@src/modules/customer/view/operationDialog/EditContactDialog.vue";
-
-import { getContactList } from "@src/api/CustomerContact.js";
+import { orderList, orderNum } from "@src/api/myShop";
+import componentMixin from "../component/index";
 
 // import SearchPanel from "../components/SearchPanel.vue";
 import AuthUtil from "@src/util/auth";
@@ -307,9 +343,14 @@ const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER =
 const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE =
   "store_user_for_search_product_template";
 // 产品模板列表数据
-const PRODUCT_TEMPLATE_LIST_DATA = "product_template_list_data";
+const MYSHOP_ORDER_LIST_TEMPLATE_DATA = "myshop_order_list_template_data";
 // 产品模板列表选择
-const PRODUCT_CHECK = "productCheck";
+const MY_SHOP_ORDER_CHECK = "myShopOrderCheck";
+
+// 页面刷新记住当前页面信息
+const MY_SHOP_ORDER_SEARCH_MODEL = "my_shop_order_search_model";
+
+const MY_SHOP_ORDER_SEARCH_MODEL_REAL = "my_shop_order_search_model_real";
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
@@ -323,18 +364,46 @@ export default {
       default: () => ({}),
     },
   },
+  mixins: [componentMixin],
   data() {
     return {
-      input3: "",
+      fullscreenLoading: false,
       search_checkbox: [
-        { label: "全部" },
-        { label: "待发货" },
-        { label: "待收货" },
-        { label: "已完成" },
+        { label: "待发货", value: 1, num: 0 },
+        { label: "待收货", value: 2, num: 0 },
+        { label: "已完成", value: 3, num: 0 },
       ],
-      search_checked: ["全部"],
-      value2: "",
-      pickerOptions: "",
+      stateNumObj: {},
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "昨天",
+            onClick(picker) {
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", [start, start]);
+            },
+          },
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
 
       auth: {}, // 权限
       columns: this.buildTableFixedColumns(), // 列
@@ -349,57 +418,41 @@ export default {
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
-        moreConditions: {},
+        moreConditions: {
+          stateList: [],
+          orderTime: "",
+        },
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
       // 表单选择系列组件相关参数ƒ
       multipleSelection: [],
       panelTheMultipleSelectionShow: false,
+      goodsInfo: {},
+      outStockInfo: {},
     };
   },
   created() {
-    this.page.list = [
-      {
-        goods: {
-          img: "",
-          name:
-            "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
-        },
-        data_1: "data_1",
-        data_2: "data_2",
-        data_3: "data_3",
-        data_4: "data_4",
-        data_5: "data_5",
-        data_6: "data_6",
-      },
-
-      {
-        goods: {
-          img: "",
-          name:
-            "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
-        },
-        data_1: "data_1",
-        data_2: "data_2",
-        data_3: "data_3",
-        data_4: "data_4",
-        data_5: "data_5",
-        data_6: "data_6",
-      },
-      {
-        goods: {
-          img: "",
-          name:
-            "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
-        },
-        data_1: "data_1",
-        data_2: "data_2",
-        data_3: "data_3",
-        data_4: "data_4",
-        data_5: "data_5",
-        data_6: "data_6",
-      },
-    ];
+    if (localStorage.getItem(MY_SHOP_ORDER_SEARCH_MODEL_REAL)) {
+      this.$set(
+        this,
+        "searchModel",
+        JSON.parse(localStorage.getItem(MY_SHOP_ORDER_SEARCH_MODEL))
+      );
+      localStorage.removeItem(MY_SHOP_ORDER_SEARCH_MODEL_REAL);
+      localStorage.removeItem(MY_SHOP_ORDER_SEARCH_MODEL);
+    }
+    this.search();
+    this.getStateNum();
+  },
+  mounted() {
+    window.onbeforeunload = (e) => {
+      if (localStorage.getItem(MY_SHOP_ORDER_SEARCH_MODEL_REAL)) {
+        localStorage.setItem(
+          MY_SHOP_ORDER_SEARCH_MODEL,
+          JSON.stringify(this.searchModel)
+        );
+      }
+    };
   },
   computed: {
     productFields() {
@@ -428,8 +481,18 @@ export default {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");
       this.$refs.advanced.open(this.columns);
     },
+    openTab(id) {
+      let fromId = window.frameElement.getAttribute("id");
+      platform.openTab({
+        id: "my_shop_order_detail",
+        title: "订单详情",
+        url: `/myShop/order/detail?id=${id}`,
+        reload: true,
+        fromId,
+      });
+    },
     buildParams() {
-      const sm = Object.assign({}, this.searchModel);
+      const sm = _.cloneDeep(this.searchModel);
       let params = {
         keyword: sm.keyword,
         pageSize: sm.pageSize,
@@ -441,6 +504,11 @@ export default {
       }
 
       if (Object.keys(sm.moreConditions).length > 0) {
+        if (sm.moreConditions.orderTime.length > 0) {
+          sm.moreConditions["startTime"] = sm.moreConditions.orderTime[0];
+          sm.moreConditions["endTime"] = sm.moreConditions.orderTime[1];
+        }
+        delete sm.moreConditions.orderTime;
         params = {
           ...params,
           ...sm.moreConditions,
@@ -463,51 +531,52 @@ export default {
       return [
         {
           label: "商品",
-          field: "goods",
+          field: "goodsInfos",
           conType: "goods",
           show: true,
-          minWidth: "516px",
+          width: "450px",
         },
         {
           label: "订单号",
-          field: "data_1",
-          minWidth: "181px",
+          field: "orderNum",
           show: true,
         },
         {
           label: "下单时间",
-          field: "data_2",
+          field: "createTime",
+          width: "160px",
           show: true,
         },
         {
           label: "实付金额",
-          field: "data_3",
+          field: "payAmount",
           show: true,
         },
         {
           label: "订单状态",
-          field: "data_4",
+          field: "logisticsState",
           show: true,
         },
         {
           label: "操作",
           field: "btnArray",
           conType: "btnArray",
-          minWidth: "180px",
+          align: "center",
+          width: "140px",
           btnArr: [
             {
-              name: "编辑",
+              name: "查看详情",
               styleType: (obj) => {
-                return "color:#55b7b4";
+                return obj.isMain
+                  ? "color:#999;cursor: not-allowed;"
+                  : "color:#55b7b4";
               },
               click: (obj) => {
-                if (pending) return;
-                if (!this.hasEditCustomerAuth(obj)) return;
-                this.openDialog(obj);
+                this.openTab(obj.orderId);
               },
             },
             {
-              name: "删除",
+              name: "出库",
               styleType: (obj) => {
                 return obj.isMain
                   ? "color:#999;cursor: not-allowed;"
@@ -515,9 +584,22 @@ export default {
               },
               click: (obj) => {
                 if (pending) return;
-                if (!this.hasEditCustomerAuth(obj)) return;
-                if (obj.isMain) return;
-                this.deleteLinkman(obj);
+                this.outStockInfo = obj;
+                this.$refs.outStockDialog.changeDialog(true);
+              },
+            },
+            {
+              name: "发货",
+              styleType: (obj) => {
+                console.log(obj);
+                return obj.logisticsState != 1
+                  ? "color:#999;cursor: not-allowed;"
+                  : "color:#55b7b4";
+              },
+              click: (obj) => {
+                if (pending || obj.logisticsState != 1) return;
+                this.goodsInfo = obj;
+                this.$refs.goodsDialog.changeDialog(true);
               },
             },
           ],
@@ -553,12 +635,12 @@ export default {
     },
     // 兼容旧版本的 已选择列
     backwardCompatibleColumn() {
-      let checkedColumnsOldVersion = localStorage.getItem(PRODUCT_CHECK);
+      let checkedColumnsOldVersion = localStorage.getItem(MY_SHOP_ORDER_CHECK);
 
       if (!checkedColumnsOldVersion) return;
 
       let columns = checkedColumnsOldVersion.split(",");
-      localStorage.removeItem(PRODUCT_CHECK);
+      localStorage.removeItem(MY_SHOP_ORDER_CHECK);
 
       return (columns || [])
         .filter((c) => c)
@@ -590,8 +672,24 @@ export default {
       this.localStorageSet(
         "columnStatus",
         columnsStatus,
-        PRODUCT_TEMPLATE_LIST_DATA
+        MYSHOP_ORDER_LIST_TEMPLATE_DATA
       );
+    },
+    // 搜索参数恢复
+    paramsSearchRevert() {
+      const localStorageData = this.localStorageGet(
+        MYSHOP_ORDER_LIST_TEMPLATE_DATA
+      );
+
+      if (localStorageData && localStorageData.pageSize) {
+        this.searchModel.pageSize = Number(localStorageData.pageSize);
+      }
+
+      // const num =
+      //   localStorage.getItem(
+      //     PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER
+      //   ) || 1;
+      // this.columnNum = Number(num);
     },
 
     // 操作选择
@@ -683,7 +781,11 @@ export default {
       this.searchModel.pageSize = pageSize;
       this.searchModel.pageNum = 1;
 
-      this.localStorageSet("pageSize", pageSize, PRODUCT_TEMPLATE_LIST_DATA);
+      this.localStorageSet(
+        "pageSize",
+        pageSize,
+        MYSHOP_ORDER_LIST_TEMPLATE_DATA
+      );
       this.search();
     },
     // 跳转
@@ -719,28 +821,20 @@ export default {
     // 搜索
     search() {
       const params = this.buildParams();
-      this.$emit("pageLoading", true);
-      return getRecords(params)
+      console.log(params, "searchP");
+      this.fullscreenLoading = true;
+      return orderList(params)
         .then((res) => {
-          this.$emit("pageLoading", false);
-          this.page = res.data;
-          this.matchSelected(); // 把选中的匹配出来
+          if (res.status == 200) {
+            this.page = res.data;
+          }
         })
         .catch((err) => {
-          this.$emit("pageLoading", false);
+          // this.$emit("pageLoading", false);
+        })
+        .finally(() => {
+          this.fullscreenLoading = false;
         });
-    },
-    // 设置高级搜索面板 列
-    setAdvanceSearchColumn(command) {
-      this.columnNum = Number(command);
-      try {
-        localStorage.setItem(
-          PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER,
-          this.columnNum
-        );
-      } catch (error) {
-        console.log(error);
-      }
     },
     sortChange(option) {
       /**
@@ -790,20 +884,6 @@ export default {
         console.error("product template sortChange err", e);
       }
     },
-    // 搜索参数恢复
-    paramsSearchRevert() {
-      const localStorageData = this.localStorageGet(PRODUCT_TEMPLATE_LIST_DATA);
-
-      if (localStorageData && localStorageData.pageSize) {
-        this.searchModel.pageSize = Number(localStorageData.pageSize);
-      }
-
-      const num =
-        localStorage.getItem(
-          PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER
-        ) || 1;
-      this.columnNum = Number(num);
-    },
     panelSearchAdvancedToggle() {
       window.TDAPP.onEvent("pc：产品模板-高级搜索事件");
       this.$refs.searchPanel.open();
@@ -825,7 +905,7 @@ export default {
       this.search();
     },
     resetParams() {
-      window.TDAPP.onEvent("pc：产品模板-重置事件");
+      window.TDAPP.onEvent("pc：订单管理-重置事件");
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
         keyword: "",
@@ -833,11 +913,12 @@ export default {
         pageSize: this.page.pageSize,
         orderDetail: {},
         moreConditions: {
-          conditions: [],
+          stateList: [],
+          orderTime: "",
         },
       };
 
-      this.$refs.searchPanel.resetParams();
+      // this.$refs.searchPanel.resetParams();
       this.search();
     },
     openOutsideLink(e) {
@@ -1061,10 +1142,18 @@ export default {
         this.toggleSelection(selected);
       });
     },
-  },
-  components: {
-    // [SearchPanel.name]: SearchPanel,
-    [EditContactDialog.name]: EditContactDialog,
+    goodsConfirm() {},
+    outStockConfirm() {},
+    changeOrderState() {
+      this.search();
+    },
+    getStateNum() {
+      return orderNum().then((res) => {
+        if (res.status == 200) {
+          this.stateNumObj = res.data;
+        }
+      });
+    },
   },
 };
 </script>
@@ -1073,10 +1162,14 @@ export default {
 label {
   margin-bottom: 0;
 }
+.table-footer {
+  padding-top: 10px;
+}
 .myShop-order-list-table {
   padding: 12px;
-  .goods-img-list{
-    img{
+  background: #fff;
+  .goods-img-list {
+    img {
       width: 32px;
       height: 32px;
       margin-right: 4px;
@@ -1134,5 +1227,31 @@ label {
       }
     }
   }
+}
+.status-tips-box {
+  padding: 0 8px;
+  border-radius: 11px;
+  font-size: 12px;
+}
+.status-tips-1 {
+  border: 1px solid rgba(110, 207, 64, 0.16);
+  background: rgba(103, 194, 58, 0.2);
+  color: #67c23a;
+}
+.status-tips-2 {
+  border: 1px solid rgba(255, 174, 0, 0.41);
+
+  background: rgba(255, 174, 0, 0.18);
+  color: #ffae00;
+}
+.status-tips-3 {
+  border: 1px solid #999(110, 207, 64, 0.16);
+  color: #999;
+  background: rgba(153, 153, 153, 0.27);
+}
+
+.btnArray-box {
+  width: 100%;
+  justify-content: space-around;
 }
 </style>

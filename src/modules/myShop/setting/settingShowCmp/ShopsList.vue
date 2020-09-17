@@ -1,45 +1,47 @@
 <template>
   <div class="setting-show-cmp-box">
-    <div class>
+    <div class="shops-list-box">
       <div class="shops-title">商城橱窗</div>
-      <draggable class="shops-list-box flex-x flex-w" v-model="dataInfo">
+      <!-- <draggable class="flex-x flex-w" v-model="dataInfo"> 可拖动-->
+      <div class="flex-x flex-w">
         <div
-          class="can-move flex-x"
+          class="flex-x"
           v-for="(item, index) in dataInfo"
           :key="index"
-          draggable="true"
+          draggable="draggable"
         >
           <div class="shops-list-item">
-            <img src class="shops-list-item-img" />
+            <img :src="item.url" class="shops-list-item-img" />
             <div class="shops-info">
-              <div class="overHideCon-2 mar-b-30 font-12">示例商品</div>
-              <div class="flex-x">
-                <div class="flex-1">
-                  <span>¥</span>66.66
-                </div>
-                <div>3.5万件已售</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="can-move flex-x" v-if="dataInfo.length < 1">
-          <div class="shops-list-item">
-            <img class="shops-tag-img" :src="tagImg" alt />
-            <img :src="goodsImg" class="shops-list-item-img" />
-            <div class="shops-info">
-              <div class="overHideCon-2 mar-b-30 font-12">示例商品</div>
+              <div class="overHideCon-2 mar-b-30 font-12">{{item.name}}</div>
               <div class="flex-x">
                 <div class="flex-1 price-tag">
-                  <span class="font-12">¥</span>
-                  <span class="font-15">66.66</span>
+                  <span>¥</span>
+                  {{item.price}}
                 </div>
-                <div class="font-12">3.5万件已售</div>
+                <div>{{item.num | usual-num}}件已售</div>
               </div>
             </div>
           </div>
         </div>
-      </draggable>
+      </div>
+      <!-- </draggable> -->
+      <div class="flex-x" v-if="dataInfo.length < 1">
+        <div class="shops-list-item">
+          <img class="shops-tag-img" :src="tagImg" alt />
+          <img :src="goodsImg" class="shops-list-item-img" />
+          <div class="shops-info">
+            <div class="overHideCon-2 mar-b-30 font-12">示例商品</div>
+            <div class="flex-x">
+              <div class="flex-1 price-tag">
+                <span class="font-12">¥</span>
+                <span class="font-15">66.66</span>
+              </div>
+              <div class="font-12">3.5万件已售</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -56,12 +58,23 @@ export default {
   props: ["infoData", "cmpId"],
   data() {
     return {
-      dataInfo: this.infoData || [],
+      dataInfo: [],
       goodsImg,
       tagImg,
     };
   },
+  watch: {
+    infoData: {
+      deep: true,
+      handler(value) {
+        this.dataInfo = value;
+      },
+    },
+  },
   methods: {},
+  mounted() {
+    this.dataInfo = _.cloneDeep(this.infoData);
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -84,6 +97,8 @@ export default {
       flex-direction: column;
       margin-bottom: 5px;
       position: relative;
+      border-radius: 2px;
+      overflow: hidden;
       .shops-tag-img {
         position: absolute;
         left: 0;

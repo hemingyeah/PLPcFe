@@ -12,10 +12,10 @@
       <div class="wiki-info" v-for="(item, index) in dataInfo" :key="index">
         <div class="font-12 mar-b-28 font-w-500">{{item.title}}</div>
         <div class="flex-x font-10">
-          <div class="flex-10 flex-1 color-999">{{item.name}}</div>
+          <div class="flex-10 flex-1 color-999">{{item.author}}</div>
           <div class="color-999">
             阅读
-            <span class="font-12">{{item.read}}</span>
+            <span class="font-12">{{item.num | usual-num}}</span>
           </div>
         </div>
       </div>
@@ -34,7 +34,9 @@
   </div>
 </template>
 <script>
+import _ from "lodash";
 import tagImg from "@src/assets/img/myShop/tag.png";
+
 export default {
   name: "wiki-enter",
   props: ["infoData", "cmpId"],
@@ -43,6 +45,15 @@ export default {
       dataInfo: this.infoData || [],
       tagImg,
     };
+  },
+  watch: {
+    infoData: {
+      deep: true,
+      handler(value) {
+        console.log(value, "22222");
+        this.dataInfo = value;
+      },
+    },
   },
 };
 </script>

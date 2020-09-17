@@ -3,7 +3,7 @@
     <div class="font-16 font-w-500 mar-b-20">快捷入口</div>
     <div>选择图标</div>
     <div class="flex-x now-icon">
-      <img class="now-icon-img" :src="imgObj[dataInfo.icon]" />
+      <img class="now-icon-img" :src="imgObj[`img_${dataInfo.iconType}`]" />
     </div>
     <div class="flex-x mar-b-35">
       <div
@@ -14,7 +14,7 @@
       </div>
       <div class="flex-x flex-1">
         <div
-          :class="['img-list-item', item == dataInfo.icon?'img-list-item-check':'']"
+          :class="['img-list-item', item ==`img_${dataInfo.iconType}` ? 'img-list-item-check' : '']"
           v-for="(item, index) in imgList[imgListIndex]"
           :key="index"
           @click="choseNowIcon(item)"
@@ -39,15 +39,15 @@
       </el-form-item>
       <div class="form-label">关联事件模板</div>
       <el-form-item>
-        <el-select style="width:100%" v-model="dataInfo.type" placeholder="请选择">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
+        <el-select style="width:100%" v-model="dataInfo.eventTempId" placeholder="请选择">
+          <el-option label="区域一" value="007f81de-a49d-11ea-a340-00163e304a25"></el-option>
+          <el-option label="区域二" value="2"></el-option>
         </el-select>
       </el-form-item>
     </el-form>
     <div class="flex-x">
       <el-button @click="resetData">重置</el-button>
-      <el-button type="primary" @click="saveData">发布</el-button>
+      <el-button type="primary" @click="saveData">保存</el-button>
       <el-button type="danger" @click="deleteData">删除</el-button>
     </div>
   </div>
@@ -78,20 +78,24 @@ export default {
   components: {
     draggable,
   },
+  inject: ["cancelInfoData", "changeFullscreenLoading"],
   data() {
     return {
       dataInfo: {
         name: "",
         type: "",
-        icon: "",
+        iconType: "",
       },
       dataInforReturn: {
         name: "",
         type: "",
-        icon: "",
+        iconType: "",
       },
       rules: {
-        name: [{ max: 4, message: "最多4个字符", trigger: "blur" }],
+        name: [
+          { required: true, message: "请输入名称", trigger: "blur" },
+          { max: 4, message: "最多4个字符", trigger: "blur" },
+        ],
       },
       imgObj: {
         img_1,
@@ -122,76 +126,77 @@ export default {
   },
   watch: {
     iconSetId(value) {
-      let item = this.findIconItem(value).item;
-      this.$set(this, "dataInfo", item);
-      this.dataInforReturn = item;
-      let icon_ = this.findNowIcon(item.icon);
-      this.imgListIndex = icon_.index;
+      this.$refs["ruleForm"].clearValidate();
+      this.resetImgList(value);
     },
   },
   activated() {
     this.dataInfo = _.cloneDeep(this.findIconItem(this.iconSetId).item);
     this.dataInforReturn = _.cloneDeep(this.findIconItem(this.iconSetId).item);
+    this.$nextTick(() => {
+      this.resetImgList(this.iconSetId);
+    });
   },
   methods: {
     saveData() {
       this.$refs["ruleForm"].validate((valid) => {
         if (valid) {
-          alert("submit!");
-
-          this.dataInforReturn = _.cloneDeep(this.dataInfo);
-          let indexs = this.findIconItem(this.iconSetId).index;
-          let cmpId = _.cloneDeep(this.cmpId);
-          this.$emit("saveIconItem", {
-            id: cmpId,
-            ids: this.iconSetId,
-            indexs,
-            item: this.dataInforReturn,
-          });
+          for (var i = 0; i < this.infoData.length; i++) {
+            if (this.dataInfo.name == this.infoData[i].name && this.iconSetId != this.infoData[i].id) {
+              break;
+            }
+          }
+          if (i < this.infoData.length) {
+            let res_ = this.$confirm("已经存在相同名称", "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+            })
+              .then(() => {})
+              .catch(() => {});
+            return;
+          }
+          this.saveDataPass();
         } else {
           console.log("error submit!!");
           return false;
         }
       });
     },
-    async desertWx() {
-      try {
-        const res_ = await this.$platform.confirm(
-          `您将要解除${this.wxInfo.nickName}公众号的绑定，请确认。`
-        );
-        if (!res_) return;
-        cancleAuthorizer()
-          .then((res) => {
-            this.pageLoading(false);
-            this.getWxInfo();
-            Message.success({
-              message: "成功解除绑定",
-              type: "success",
-            });
-          })
-          .catch((err) => {
-            this.$platform.alert(err);
-          });
-
-        // this.$eventBus.$emit("customer_info_record.update_record_list");
-      } catch (e) {
-        console.error(e, "err");
-      }
-    },
-    async deleteData() {
-      const res_ = await this.$platform.confirm("确定删除当前选择项吗？");
-      if (!res_) return;
+    saveDataPass() {
+      // this.changeFullscreenLoading(true);
       this.dataInforReturn = _.cloneDeep(this.dataInfo);
       let indexs = this.findIconItem(this.iconSetId).index;
       let cmpId = _.cloneDeep(this.cmpId);
-      this.$emit("deleteIconItem", {
+      this.$emit("saveIconItem", {
         id: cmpId,
         ids: this.iconSetId,
         indexs,
+        item: _.cloneDeep(this.dataInforReturn),
+      });
+      this.cancelInfoData();
+      // setTimeout(() => {
+      //   this.changeFullscreenLoading(false);
+      // }, 1000);
+    },
+    async deleteData() {
+      this.$confirm("确定删除当前选择项吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "error",
+      }).then(() => {
+        this.dataInforReturn = _.cloneDeep(this.dataInfo);
+        let indexs = this.findIconItem(this.iconSetId).index;
+        let cmpId = _.cloneDeep(this.cmpId);
+        this.$emit("deleteIconItem", {
+          id: cmpId,
+          ids: this.iconSetId,
+          indexs,
+        });
       });
     },
     resetData() {
-      this.dataInfo = _.cloneDeep(this.dataInforReturn);
+      this.$refs["ruleForm"].clearValidate();
+      this.$set(this, "dataInfo", _.cloneDeep(this.dataInforReturn));
     },
     findIconItem(id) {
       let res;
@@ -212,7 +217,7 @@ export default {
       return res;
     },
     choseNowIcon(e) {
-      this.dataInfo.icon = e;
+      this.dataInfo.iconType = e.replace("img_", "");
     },
     changeImgPage(e) {
       let imgListIndex = _.cloneDeep(this.imgListIndex);
@@ -232,13 +237,20 @@ export default {
         const i_ = this.imgList[i];
         for (let j = 0; j < i_.length; j++) {
           const j_ = i_[j];
-          if (e == j_) {
+          if (`img_${e}` == j_) {
             res_ = { index: i, indexs: j };
             break;
           }
         }
       }
       return res_;
+    },
+    resetImgList(value) {
+      let item = this.findIconItem(value).item;
+      this.$set(this, "dataInfo", item);
+      this.dataInforReturn = _.cloneDeep(item);
+      let icon_ = this.findNowIcon(item.iconType);
+      this.imgListIndex = icon_.index;
     },
   },
 };
@@ -272,6 +284,7 @@ export default {
     align-items: center;
     overflow: hidden;
     color: #b9bfbd;
+    cursor: pointer;
     .iconfont {
       font-size: 20px;
     }

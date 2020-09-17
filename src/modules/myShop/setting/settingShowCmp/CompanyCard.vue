@@ -2,19 +2,19 @@
   <div class="setting-show-cmp-box">
     <div class="company-card-box">
       <div class="flex-x">
-        <img class="company-card-img" :src="infoData.imageUrl || ''" />
+        <img class="company-card-img" :src="infoData.logoUrl || ''" />
         <div class="flex-x font-12 font-w-500">
           <div class="overHideCon-1">{{infoData.name}}</div>
         </div>
       </div>
       <div class="company-info">
-        <div class="flex-x font-10">
+        <div class="flex-x font-10 al-start">
           <div>联系电话：</div>
-          <div class="color-gray">{{infoData.phone}}</div>
+          <div class="color-gray flex-1">{{infoData.mobile}}</div>
         </div>
-        <div class="flex-x font-10">
+        <div class="flex-x font-10 al-start">
           <div>企业地址：</div>
-          <div class="color-gray">{{infoData.address}}</div>
+          <div class="color-gray flex-1">{{infoData.address}}</div>
         </div>
       </div>
     </div>
@@ -30,9 +30,9 @@ export default {
       default: () => {
         return {
           name: "",
-          phone: "",
+          mobile: "",
           address: "",
-          imageUrl: userImg,
+          logoUrl: userImg,
         };
       }, // primary、plain、only-text、ghost、danger
     },
@@ -55,7 +55,8 @@ export default {
       overflow: hidden;
     }
     .company-info {
-      padding: 8px 13px;
+      padding: 8px 13px 0 13px;
+      color: #737F7B;
     }
   }
 }

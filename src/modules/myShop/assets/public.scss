@@ -1,5 +1,6 @@
 .my-shop-box {
     margin: 12px;
+    min-width: 650px;
 }
 
 .flex-x {
@@ -76,6 +77,10 @@
     margin-right: 9px;
 }
 
+.mar-r-10 {
+    margin-right: 10px;
+}
+
 .mar-r-12 {
     margin-right: 12px;
 }
@@ -86,6 +91,10 @@
 
 .mar-r-15 {
     margin-right: 15px;
+}
+
+.mar-r-16 {
+    margin-right: 16px !important;
 }
 
 .mar-r-20 {
@@ -232,6 +241,9 @@
 
 .color-ccc {
     color: #ccc;
+}
+.color-666 {
+    color: #666;
 }
 
 

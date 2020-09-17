@@ -5,17 +5,19 @@
         <div class="mar-r-20">logo</div>
         <el-upload
           class="avatar-uploader"
-          action="https://jsonplaceholder.typicode.com/posts/"
+          ref="upload"
+          action="string"
           :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload"
+          :before-upload="onBeforeUploadImage"
+          :http-request="UploadImage"
+          :on-change="fileChange"
         >
           <div
-            v-if="dataInfo.imageUrl"
+            v-if="dataInfo.logoUrl"
             @mouseover="changeImgCover(true)"
             @mouseleave="changeImgCover(false)"
           >
-            <img :src="dataInfo.imageUrl" class="avatar" />
+            <img :src="dataInfo.logoUrl" class="avatar" />
             <div class="img-cover" v-show="imgCover" @click.stop>
               <i @click.stop="clear()" class="iconfont icon-shanchu"></i>
             </div>
@@ -26,37 +28,38 @@
       <el-form ref="ruleForm" :model="dataInfo" :rules="rules">
         <div class="form-label">
           门户名称
-          <span>最多10个汉字</span>
+          <span>最多10个字符</span>
         </div>
         <el-form-item prop="name">
-          <el-input v-model="dataInfo.name"></el-input>
+          <el-input v-model="dataInfo.name" placeholder="请输入" maxlength="10"></el-input>
         </el-form-item>
         <div class="form-label">联系电话</div>
-        <el-form-item prop="phone">
-          <el-input v-model="dataInfo.phone"></el-input>
+        <el-form-item prop="mobile">
+          <el-input v-model="dataInfo.mobile" placeholder="请输入"></el-input>
         </el-form-item>
         <div class="form-label">企业地址</div>
         <el-form-item>
-          <el-input type="textarea" v-model="dataInfo.address"></el-input>
+          <el-input type="textarea" rows="4" v-model="dataInfo.address" placeholder="请输入" maxlength="1000" ></el-input>
         </el-form-item>
       </el-form>
 
       <div class="flex-x">
-        <el-button>重置</el-button>
-        <el-button type="primary" @click="saveData">发布</el-button>
+        <el-button type="button" @click="resetData">重置</el-button>
+        <el-button type="primary" @click="saveData">保存</el-button>
       </div>
     </div>
   </div>
 </template>
 <script>
 import _ from "lodash";
+import Uploader from "../../../../../packages/BaseUpload/uploader";
 import userImg from "@src/assets/img/myShop/logo.png";
 let reg_phone = /^(((0\d{2,3}-){0,1}\d{7,8})|(1[345678]\d{9}))$/;
 
 export default {
   name: "company-card-data",
   props: ["infoData"],
-  inject: ["cancelInfoData"],
+  inject: ["cancelInfoData", "changeFullscreenLoading"],
   data() {
     let validatePhone = (rule, value, callback) => {
       if (value !== "" && !reg_phone.test(value)) {
@@ -68,23 +71,23 @@ export default {
       userImg,
       dataInfo: {
         name: "",
-        phone: "",
+        mobile: "",
         address: "",
-        imageUrl: userImg,
+        logoUrl: userImg,
       },
       dataInforReturn: {
         name: "",
-        phone: "",
+        mobile: "",
         address: "",
-        imageUrl: userImg,
+        logoUrl: userImg,
       },
       rules: {
-        name: [{ max: 10, message: "最多10个字符", trigger: "blur" }],
-        phone: [
+        name: [{ max: 10, message: "最多10个字符", trigger: "change" }],
+        mobile: [
           {
             validator: validatePhone,
             message: "请输入正确的电话",
-            trigger: "blur",
+            trigger: "change",
           },
         ],
       },
@@ -92,22 +95,12 @@ export default {
       imgCover: false,
     };
   },
-  watch: {
-    // dataInforReturn: {
-    //   deep: true,
-    //   handler(value) {
-    //   },
-    // },
-  },
   activated() {
-    this.dataInfo = _.cloneDeep(this.infoData);
-    this.dataInforReturn = _.cloneDeep(this.infoData);
+    this.$set(this, "dataInfo", _.cloneDeep(this.infoData));
+    this.$set(this, "dataInforReturn", _.cloneDeep(this.infoData));
   },
   methods: {
-    handleAvatarSuccess(res, file) {
-      this.dataInfo.imageUrl = URL.createObjectURL(file.raw);
-    },
-    beforeAvatarUpload(file) {
+    onBeforeUploadImage(file) {
       const isJPG = file.type === "image/jpeg" || file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -119,21 +112,66 @@ export default {
       }
       return isJPG && isLt2M;
     },
+    UploadImage(param) {
+      const formData = new FormData();
+      formData.append("file", param.file);
+      Uploader.upload(formData, "/files/upload")
+        .then((result) => {
+          if (result.status != 0) {
+            this.$message({
+              message: `${result.message}`,
+              duration: 1500,
+              type: "error",
+            });
+            return;
+          }
+
+          let file = result.data;
+          let item = {
+            id: file.id,
+            filename: file.fileName,
+            //如果后端返回url,必须使用。如果后端不返回，需要拼接
+            url: file.ossUrl || file.url || `/files/get?fileId=${file.id}`,
+            fileSize: file.fileSizeStr,
+          };
+          console.log(item, "uploadImg");
+        })
+        .catch((err) => {
+          console.warn(err);
+        })
+        .finally(() => {});
+    },
+    fileChange(file) {
+      this.$refs.upload.clearFiles(); //清除文件对象
+      this.logo = file.raw; // 取出上传文件的对象，在其它地方也可以使用
+      this.fileList = [{ name: file.name, url: file.url }]; // 重新手动赋值filstList， 免得自定义上传成功了, 而fileList并没有动态改变， 这样每次都是上传一个对象
+    },
     changeImgCover(e) {
       this.imgCover = e;
     },
     saveData() {
       this.dataInforReturn = _.cloneDeep(this.dataInfo);
-      this.$emit("changeInfoData", this.dataInforReturn);
+      this.$emit("changeInfoData", {
+        item: this.dataInforReturn,
+      });
       this.cancelInfoData();
+      // this.changeFullscreenLoading(true);
+      // setTimeout(() => {
+      //   this.changeFullscreenLoading(false);
+      // }, 1000);
+    },
+    resetData() {
+      this.$refs["ruleForm"].clearValidate();
+      this.dataInfo = _.cloneDeep(this.dataInforReturn);
     },
     clear() {
-      this.dataInfo.imageUrl = "";
+      this.dataInfo.logoUrl = "";
+      this.imgCover = false;
     },
   },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .setting-data-cmp-box {
   width: 100%;
   .form-info {

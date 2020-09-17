@@ -209,11 +209,11 @@ let url_obj = {
   服务进度: "https://pubapp.shb.ltd/p/102308#/event",
   服务评价: "https://pubapp.shb.ltd/p/102308#/event/evaluate",
   服务商城: "https://pubapp.shb.ltd/p/102308#/shop",
-  知识库: "https://pubapp.shb.ltd/p/102308#/wiki"
+  知识库: "https://pubapp.shb.ltd/p/102308#/wiki",
 };
 let input_obj = {
   售后宝功能: "config_url",
-  跳转网页: "input_url"
+  跳转网页: "input_url",
 };
 let menu_main_tem = {
   shb_type: "main_menu",
@@ -223,8 +223,8 @@ let menu_main_tem = {
   type: "view",
   sub_button: [
     {
-      shb_type: "add"
-    }
+      shb_type: "add",
+    },
   ],
   name: "菜单名称",
   menuType: "售后宝功能",
@@ -232,10 +232,10 @@ let menu_main_tem = {
   url: "",
   input_url: "",
   config_url: "",
-  reserve: ""
+  reserve: "",
 };
 let menu_add_tem = {
-  shb_type: "add"
+  shb_type: "add",
 };
 let menu_children_tem = {
   shb_type: "children_menu",
@@ -247,7 +247,7 @@ let menu_children_tem = {
   input_url: "",
   config_url: "",
   reserve: "",
-  sub_button: []
+  sub_button: [],
 };
 let form_tem = {
   name: "菜单名称",
@@ -255,7 +255,7 @@ let form_tem = {
   menuTypeArr: "服务请求",
   input_url: "",
   config_url: "",
-  reserve: ""
+  reserve: "",
 };
 
 let input_length = (rule, value, callback) => {
@@ -289,7 +289,7 @@ let url_check = (rule, value, callback) => {
 import draggable from "vuedraggable";
 import _ from "lodash";
 // 校验字节数
-let computedStrLen = function(str) {
+let computedStrLen = function (str) {
   let len = 0;
   for (let i = 0; i < str.length; i++) {
     let c = str.charCodeAt(i);
@@ -305,13 +305,13 @@ let computedStrLen = function(str) {
 export default {
   name: "menu-set",
   components: {
-    draggable
+    draggable,
   },
   props: {
     menuArr: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   watch: {
     ruleForm: {
@@ -326,24 +326,24 @@ export default {
           ];
           this.menu_arr[now_menu.index].sub_button[now_menu.indexs] = {
             ...now_data,
-            ...newValue
+            ...newValue,
           };
         } else {
           let now_data = this.menu_arr[now_menu.index];
           this.menu_arr[now_menu.index] = {
             ...now_data,
-            ...newValue
+            ...newValue,
           };
         }
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
     edit_type: {
       handler(newValue, oldValue) {
         this.now_chooseed_menu = false;
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -353,7 +353,7 @@ export default {
       nowMoveBox: -1, // 当某个菜单子菜单为5个时不可拖入子菜单进入
       menu_arr: [],
       ruleForm: {},
-      now_chooseed_menu: false
+      now_chooseed_menu: false,
     };
   },
   computed: {
@@ -362,32 +362,32 @@ export default {
         ? {
             name: [
               { required: true, message: "请输入菜单名称", trigger: "change" },
-              { validator: input_length_child, trigger: "change" }
+              { validator: input_length_child, trigger: "change" },
             ],
             input_url: [
               {
                 required: true,
                 message: "请输入跳转页面网址",
-                trigger: "change"
+                trigger: "change",
               },
-              { validator: url_check, trigger: "change" }
-            ]
+              { validator: url_check, trigger: "change" },
+            ],
           }
         : {
             name: [
               { required: true, message: "请输入菜单名称", trigger: "change" },
-              { validator: input_length, trigger: "change" }
+              { validator: input_length, trigger: "change" },
             ],
             input_url: [
               {
                 required: true,
                 message: "请输入跳转页面网址",
-                trigger: "change"
+                trigger: "change",
               },
-              { validator: url_check, trigger: "change" }
-            ]
+              { validator: url_check, trigger: "change" },
+            ],
           };
-    }
+    },
   },
   mounted() {
     this.menu_arr = this.menuArr;
@@ -410,13 +410,13 @@ export default {
             this.now_chooseed_menu.indexs === indexs
             ? "menu-checked"
             : ""
-          : ""
+          : "",
       ];
     },
     pub_valid_menu() {
       return new Promise((resolve, reject) => {
         if (this.edit_type === 1 && this.now_chooseed_menu) {
-          this.$refs["ruleForm"].validate(valid => {
+          this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
               resolve();
             } else {
@@ -434,7 +434,7 @@ export default {
         .then(() => {
           this.main_menu_click(index, indexs);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("valid_menu_form_error");
         });
     },
@@ -474,7 +474,7 @@ export default {
               item.hasOwnProperty("shb_type") === false ||
               (item.hasOwnProperty("shb_type") === true &&
                 item.shb_type === "system_menu")
-            )
+            ),
           };
           let now_chooseed =
             indexs > -1
@@ -490,7 +490,7 @@ export default {
         try {
           let arr_ = _.cloneDeep(arr);
           let add_tem = _.cloneDeep(menu_add_tem);
-          arr_.map(res => {
+          arr_.map((res) => {
             if (res.sub_button) {
               if (res.sub_button.length < 5) {
                 res.sub_button.push(add_tem);
@@ -522,7 +522,7 @@ export default {
           if (arr_[arr_.length - 1].shb_type === "add") {
             arr_.splice(arr_.length - 1, 1);
           }
-          arr_.map(res => {
+          arr_.map((res) => {
             if (
               res.sub_button &&
               res.sub_button[res.sub_button.length - 1].shb_type === "add"
@@ -558,14 +558,14 @@ export default {
           config_url: res.config_url,
           input_url: "",
           type: "view",
-          reserve: ""
+          reserve: "",
         },
         跳转页面: {
           url: res.input_url,
           config_url: "",
           input_url: res.input_url,
           type: "view",
-          reserve: ""
+          reserve: "",
         },
         回复文本消息: {
           url: "",
@@ -573,8 +573,8 @@ export default {
           input_url: "",
           reserve: res.reserve,
           value: res.reserve,
-          type: "click"
-        }
+          type: "click",
+        },
       };
       return { ...res, ...obj[res.menuType] };
     },
@@ -587,13 +587,13 @@ export default {
         this.pub_valid_menu()
           .then(() => {
             if (type === 1) {
-              this.push_add(this.menu_arr).then(res => {
+              this.push_add(this.menu_arr).then((res) => {
                 this.menu_arr = res;
               });
             } else {
-              this.slice_add(this.menu_arr).then(res => {
+              this.slice_add(this.menu_arr).then((res) => {
                 this.$emit("pageLoading", true);
-                this.setMenuList(res).then(res_ => {
+                this.setMenuList(res).then((res_) => {
                   if (res_.success) {
                     this.menu_arr = res;
                     menu_arr_stash = _.cloneDeep(res);
@@ -607,16 +607,16 @@ export default {
             }
             this.edit_type = type;
           })
-          .catch(err => {
+          .catch((err) => {
             console.error("change_edit_type error", err);
           });
       } else {
         if (type === 1) {
-          this.push_add(this.menu_arr).then(res => {
+          this.push_add(this.menu_arr).then((res) => {
             this.menu_arr = res;
           });
         } else {
-          this.slice_add(this.menu_arr).then(res => {
+          this.slice_add(this.menu_arr).then((res) => {
             this.menu_arr = res;
 
             if (type === 0) this.menu_arr = _.cloneDeep(menu_arr_stash);
@@ -678,9 +678,9 @@ export default {
       // this.$emit("pageLoading", true);
       // URL 本地调试 无/api/weixin  发布需加上
       getMenuListWx({
-        type
+        type,
       })
-        .then(res => {
+        .then((res) => {
           let result = res.data.wechatMenu
             ? JSON.parse(res.data.wechatMenu).menu.button
             : [];
@@ -694,13 +694,13 @@ export default {
           }, 500);
           console.log("getSuccess", result, res);
         })
-        .catch(err => {
+        .catch((err) => {
           this.$emit("pageLoading", false);
         });
     },
     setMenuList(data) {
       return setMenuListWx({
-        wechatMenu: JSON.stringify({ menu: { button: data } })
+        wechatMenu: JSON.stringify({ menu: { button: data } }),
       });
     },
     onMenuMoveChoose(e) {
@@ -709,8 +709,8 @@ export default {
     },
     onMenuMoveUnchoose() {
       this.nowMoveBox = -1;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

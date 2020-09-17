@@ -1,24 +1,33 @@
 <template>
-  <div class="my-shop-box">
+  <div class="my-shop-box" v-loading.fullscreen.lock="fullscreenLoading">
     <!-- info-box start -->
     <div class="info-box">
       <!-- status-box start -->
       <div class="flex-x status-box">
         <div class="flex-x mar-l-14 min-w-214 mar-b-15">
           <span class="font-16 font-w-500 mar-r-12">订单状态</span>
-          <div class="status-tips status-tips-1">待发货</div>
+
+          <div
+            :class="[`status-tips-${dataInfo.logisticsState}`,'status-tips']"
+          >{{stateObj[dataInfo.logisticsState]? stateObj[dataInfo.logisticsState].name : ''}}</div>
         </div>
         <div class="flex-1 flex-x flex-w">
           <div class="flex-x mar-b-15" v-for="(item, index) in statusArr" :key="index">
-            <div class="status-item status-item-ready flex-x" v-if="index==0">
+            <div
+              class="status-item status-item-ready flex-x"
+              v-if="index > dataInfo.logisticsState-1"
+            >
               <div class="status-item-index status-item-index-ready mar-r-15 flex-x">{{index+1}}</div>
               <span class="font-16">{{item}}</span>
             </div>
-            <div class="status-item flex-x" v-if="index==1">
+            <div class="status-item flex-x" v-if="index == dataInfo.logisticsState-1">
               <div class="status-item-index status-item-index-now mar-r-15 flex-x">{{index+1}}</div>
               <span class="font-16">{{item}}</span>
             </div>
-            <div class="status-item status-item-pass flex-x" v-if="index==2">
+            <div
+              class="status-item status-item-pass flex-x"
+              v-if="index < dataInfo.logisticsState-1"
+            >
               <div class="status-item-index status-item-index-pass mar-r-15 flex-x">
                 <i class="el-icon-check"></i>
               </div>
@@ -34,8 +43,8 @@
         <div class="flex-x mar-b-14">
           <div class="flex-1 font-w-500">订单信息</div>
           <div class="flex-x">
-            <el-button>出库</el-button>
-            <el-button type="primary">发货</el-button>
+            <el-button @click="outStock">出库</el-button>
+            <el-button type="primary" @click="goods" v-if="dataInfo.logisticsState == 1">发货</el-button>
           </div>
         </div>
 
@@ -50,10 +59,16 @@
     </div>
     <!-- info-box end -->
     <!-- table-box start -->
-    <div class="table-box">
+    <div class="table-box" v-if="dataInfo">
       <div class="table-box-title">商品信息</div>
       <!-- table-info start -->
-      <el-table class="table-info" :data="tableData" stripe border header-row-class-name="myShop-order-detail-heard">
+      <el-table
+        class="table-info"
+        :data="dataInfo.goodsInfos"
+        stripe
+        border
+        header-row-class-name="myShop-order-detail-heard"
+      >
         <el-table-column
           v-for="column in columns"
           :key="column.field"
@@ -65,10 +80,10 @@
           :align="column.align"
         >
           <template slot-scope="scope">
-            <template v-if="column.field=='goods'">
+            <template v-if="column.field=='thumbnailUrl'">
               <div class="flex-x">
-                <img src="@src/assets/img/no-data.png" class="goods-img" />
-                <div>{{scope.row[column.field].name}}</div>
+                <img :src="scope.row.thumbnailUrl" class="goods-img" />
+                <div>{{scope.row.name}}</div>
               </div>
             </template>
             <template v-else>{{scope.row[column.field]}}</template>
@@ -81,59 +96,71 @@
         <div class="mar-r-14 mar-b-14 price-total">
           总计：
           <span>¥</span>
-          <span class="font-24 font-w-500 color-">160.00</span>
+          <span class="font-24 font-w-500 color-">{{dataInfo.payAmount}}</span>
         </div>
       </div>
     </div>
     <!-- table-box end -->
+    <goods-dialog ref="goodsDialog" :info-data="dataInfo" @confirm="goodsConfirm"></goods-dialog>
+    <out-stock-dialog ref="outStockDialog" :info-data="dataInfo" @confirm="outStockConfirm"></out-stock-dialog>
   </div>
 </template>
 
 <script>
+import { orderDetail } from "@src/api/myShop";
+import { formatDate } from "@src/util/lang";
+import componentMixin from "../component/index";
+
+// 页面刷新记住当前页面信息
+const MY_SHOP_ORDER_SEARCH_MODEL = "my_shop_order_search_model";
+
+const MY_SHOP_ORDER_SEARCH_MODEL_REAL = "my_shop_order_search_model_real";
 export default {
+  mixins: [componentMixin],
   data() {
     return {
+      fullscreenLoading: false,
       statusArr: ["待发货", "待收货", "已完成"],
       orderInfoArr: [
-        { label: "订单号：", value: "1231232131123" },
-        { label: "订单时间：", value: "1231232131123" },
-        { label: "买家：", value: "1231232131123" },
-        { label: "收货人：", value: "1231232131123" },
-        { label: "联系方式：", value: "1231232131123" },
-        { label: "收货地址：", value: "1231232131123" },
-        { label: "支付订单号：", value: "1231232131123" },
-        { label: "支付方式：", value: "1231232131123" },
-        { label: "支付时间：", value: "1231232131123" },
+        { label: "订单号：", value: "", key: "orderNum" },
+        { label: "订单时间：", value: "", key: "createTime" },
+        { label: "买家：", value: "", key: "nickName" },
+        { label: "收货人：", value: "", key: "name" },
+        { label: "联系方式：", value: "", key: "linkmanPhone" },
+        { label: "收货地址：", value: "", key: "address" },
+        { label: "支付订单号：", value: "", key: "payNum" },
+        { label: "支付方式：", value: "", key: "payState" },
+        { label: "支付时间：", value: "", key: "payTime" },
       ],
       columns: [
         {
           label: "商品",
-          field: "goods",
+          field: "thumbnailUrl",
           show: true,
           fixed: true,
           minWidth: "400px",
         },
         {
           label: "规格",
-          field: "data_1",
+          field: "standard",
           show: true,
         },
         {
           label: "编号",
-          field: "data_2",
+          field: "partSerialNumber",
           minWidth: "120px",
           fixed: true,
           show: true,
         },
         {
           label: "单价",
-          field: "data_3",
+          field: "salePrice",
           fixed: true,
           show: true,
         },
         {
           label: "数量",
-          field: "data_4",
+          field: "goodsCount",
           fixed: true,
           show: true,
         },
@@ -150,48 +177,10 @@ export default {
           show: true,
         },
       ],
-      tableData: [
-        {
-          goods: {
-            img: "",
-            name:
-              "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
-          },
-          data_1: "data_1",
-          data_2: "data_2",
-          data_3: "data_3",
-          data_4: "data_4",
-          data_5: "data_5",
-          data_6: "data_6",
-        },
-
-        {
-          goods: {
-            img: "",
-            name:
-              "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
-          },
-          data_1: "data_1",
-          data_2: "data_2",
-          data_3: "data_3",
-          data_4: "data_4",
-          data_5: "data_5",
-          data_6: "data_6",
-        },
-        {
-          goods: {
-            img: "",
-            name:
-              "什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品什么鬼商品",
-          },
-          data_1: "data_1",
-          data_2: "data_2",
-          data_3: "data_3",
-          data_4: "data_4",
-          data_5: "data_5",
-          data_6: "data_6",
-        },
-      ],
+      searchData: {},
+      dataInfo: {
+        goodsInfos: [],
+      },
     };
   },
   created() {
@@ -203,7 +192,51 @@ export default {
         obj[item_[0]] = item_[1];
       });
     }
+    this.searchData = obj;
+    this.getData();
     console.log(obj);
+  },
+  methods: {
+    outStock() {
+      this.$refs.outStockDialog.changeDialog(true);
+    },
+    goods() {
+      this.$refs.goodsDialog.changeDialog(true);
+    },
+    goodsConfirm() {},
+    outStockConfirm() {},
+    getData() {
+      this.fullscreenLoading = true;
+      orderDetail({
+        orderId: this.searchData.id,
+      })
+        .then((res) => {
+          if (res.status == 200) {
+            this.dataInfo = res.data;
+            this.orderInfoArr = this.orderInfoArr.map((item) => {
+              if (item.key == "payTime" || item.key == "createTime") {
+                item.value = formatDate(
+                  res.data[item.key],
+                  "YYYY-MM-DD HH:mm:ss"
+                );
+              } else if (item.key == "payState") {
+                item.value = this.stateObj[res.data[item.key]].name;
+              } else {
+                item.value = res.data[item.key];
+              }
+              return item;
+            });
+          }
+        })
+        .finally(() => {
+          this.fullscreenLoading = false;
+        });
+    },
+    needReloadList() {
+      localStorage.setItem(MY_SHOP_ORDER_SEARCH_MODEL_REAL, "true");
+      let fromId = window.frameElement.getAttribute("fromid");
+      this.$platform.refreshTab(fromId);
+    },
   },
 };
 </script>

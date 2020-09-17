@@ -15,7 +15,15 @@ export default {
     return {};
   },
   methods: {
-    goToShops() {},
+    goToShops() {
+      // this.$platform.openTab({
+      //   id: "createTask",
+      //   title: "商品列表",
+      //   close: true,
+      //   url: "/setting/serviceStation/markSpare",
+      // });
+      window.location.href = "/setting/serviceStation/markSpare";
+    },
   },
 };
 </script>
