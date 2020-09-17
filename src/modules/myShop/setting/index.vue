@@ -118,10 +118,7 @@
     <div class="setting-box">
       <div class="flex-x">
         <div class="flex-x setting-show-box flex-1">
-          <div class="setting-show-box-tips">
-            资料设置
-            <i class="iconfont icon-question"></i>
-          </div>
+          <div class="setting-show-box-tips">资料设置</div>
 
           <div class="setting-show">
             <div class="setting-show-box-submit">
@@ -161,6 +158,7 @@
               :info-data="nowSettingData.data"
               :cmp-id="nowSettingData.id"
               :icon-set-id="nowSettingData.iconSetId"
+              :event-list="eventList"
               @saveIconItem="saveIconItem"
               @deleteIconItem="deleteIconItem"
               @changeInfoData="changeInfoData"
@@ -217,6 +215,7 @@ import {
   getInfos,
   saveInfos,
   weChat,
+  getEventList,
 } from "@src/api/myShop";
 
 export default {
@@ -312,12 +311,13 @@ export default {
           { required: true, message: "请输入AppSecret", trigger: "blur" },
         ],
       },
+      eventList: [],
     };
   },
   computed: {},
   created() {
     this.fullscreenLoading = true;
-    Promise.all([this.getSetData(), this.getInfos()])
+    Promise.all([this.getSetData(), getEventList(), this.getInfos()])
       .then((res) => {
         if (res[0].status == 200) {
           this.setData = res[0].data;
@@ -329,10 +329,32 @@ export default {
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H,
           });
+        } else {
+          this.$message({
+            message: res.message,
+            duration: 1500,
+            type: "error",
+          });
         }
-        if (res[1].status == 200) {
-          this.transData(res[1].data).then((res_) => {
+        if (res[1].status == 0) {
+          this.$set(this, 'eventList', res[1].data);
+          console.log(res[1].data, 111)
+        } else {
+          this.$message({
+            message: res.message,
+            duration: 1500,
+            type: "error",
+          });
+        }
+        if (res[2].status == 200) {
+          this.transData(res[2].data).then((res_) => {
             this.$set(this, "dataList", res_);
+          });
+        } else {
+          this.$message({
+            message: res.message,
+            duration: 1500,
+            type: "error",
           });
         }
       })
@@ -528,6 +550,12 @@ export default {
                   type: "success",
                 });
                 this.submitDialog = false;
+              } else {
+                this.$message({
+                  message: res.message,
+                  duration: 1500,
+                  type: "error",
+                });
               }
             })
             .finally(() => {
@@ -558,6 +586,12 @@ export default {
                 message: "发布成功，请前往移动端自助门户查看",
                 duration: 1500,
                 type: "success",
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                duration: 1500,
+                type: "error",
               });
             }
           })
@@ -650,6 +684,8 @@ export default {
       left: 12px;
       top: -12px;
       z-index: 99;
+      font-size: 16px;
+      font-weight: 500;
     }
     .setting-show-box-submit {
       position: absolute;

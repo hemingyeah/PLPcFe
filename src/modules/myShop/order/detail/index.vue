@@ -43,7 +43,7 @@
         <div class="flex-x mar-b-14">
           <div class="flex-1 font-w-500">订单信息</div>
           <div class="flex-x">
-            <el-button @click="outStock">出库</el-button>
+            <el-button @click="outStock" v-if="dataInfo.repertoryState == 1">出库</el-button>
             <el-button type="primary" @click="goods" v-if="dataInfo.logisticsState == 1">发货</el-button>
           </div>
         </div>
@@ -82,7 +82,7 @@
           <template slot-scope="scope">
             <template v-if="column.field=='thumbnailUrl'">
               <div class="flex-x">
-                <img :src="scope.row.thumbnailUrl" class="goods-img" />
+                <img :src="scope.row.thumbnailUrl" class="goods-img" @click.stop="previewImg" />
                 <div>{{scope.row.name}}</div>
               </div>
             </template>
@@ -110,6 +110,8 @@
 import { orderDetail } from "@src/api/myShop";
 import { formatDate } from "@src/util/lang";
 import componentMixin from "../component/index";
+
+
 
 // 页面刷新记住当前页面信息
 const MY_SHOP_ORDER_SEARCH_MODEL = "my_shop_order_search_model";
@@ -166,13 +168,13 @@ export default {
         },
         {
           label: "小记",
-          field: "data_5",
+          field: "payamount",
           fixed: true,
           show: true,
         },
         {
           label: "买家备注",
-          field: "data_6",
+          field: "remarks",
           fixed: true,
           show: true,
         },
@@ -225,6 +227,12 @@ export default {
                 item.value = res.data[item.key];
               }
               return item;
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              duration: 1500,
+              type: "error",
             });
           }
         })
@@ -347,6 +355,7 @@ export default {
     .goods-img {
       width: 56px;
       height: 56px;
+      cursor: pointer;
     }
   }
   .price-total {

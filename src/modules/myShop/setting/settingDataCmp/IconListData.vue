@@ -40,8 +40,12 @@
       <div class="form-label">关联事件模板</div>
       <el-form-item>
         <el-select style="width:100%" v-model="dataInfo.eventTempId" placeholder="请选择">
-          <el-option label="区域一" value="007f81de-a49d-11ea-a340-00163e304a25"></el-option>
-          <el-option label="区域二" value="2"></el-option>
+          <el-option
+            :label="item.name"
+            v-for="(item, index) in eventList"
+            :key="index"
+            :value="item.id"
+          ></el-option>
         </el-select>
       </el-form-item>
     </el-form>
@@ -74,7 +78,7 @@ import img_15 from "@src/assets/img/myShop/icon15.png";
 import img_16 from "@src/assets/img/myShop/icon16.png";
 export default {
   name: "icon-list-data",
-  props: ["infoData", "cmpId", "iconSetId"],
+  props: ["infoData", "cmpId", "iconSetId", "eventList"],
   components: {
     draggable,
   },
@@ -142,12 +146,15 @@ export default {
       this.$refs["ruleForm"].validate((valid) => {
         if (valid) {
           for (var i = 0; i < this.infoData.length; i++) {
-            if (this.dataInfo.name == this.infoData[i].name && this.iconSetId != this.infoData[i].id) {
+            if (
+              this.dataInfo.name == this.infoData[i].name &&
+              this.iconSetId != this.infoData[i].id
+            ) {
               break;
             }
           }
           if (i < this.infoData.length) {
-            let res_ = this.$confirm("已经存在相同名称", "提示", {
+            this.$confirm("已经存在相同名称", "提示", {
               confirmButtonText: "确定",
               type: "warning",
             })

@@ -1,6 +1,11 @@
 import GoodsDialog from './GoodsDialog.vue'
 import OutStockDialog from './OutStockDialog.vue'
 
+import BaseGallery from '../../../../../packages/BaseGallery';
+import {
+  method
+} from 'lodash';
+
 
 
 export default {
@@ -25,5 +30,11 @@ export default {
   components: {
     [GoodsDialog.name]: GoodsDialog,
     [OutStockDialog.name]: OutStockDialog,
+  },
+  methods: {
+
+    previewImg(event) {
+      BaseGallery.preview(event.target);
+    },
   }
 }

@@ -13,13 +13,14 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <base-button type="ghost" @event="outStockDialog = false">取消</base-button>
-      <base-button type="primary" @event="confirm">确定</base-button>
+      <el-button type="ghost" @event="outStockDialog = false">取消</el-button>
+      <el-button type="primary" @event="confirm" :loading="loading">确定</el-button>
     </div>
   </el-dialog>
   <!-- 发货弹窗 end-->
 </template>
 <script>
+import { orderDeliver } from "@src/api/myShop";
 export default {
   name: "out-stock-dialog",
   props: {
@@ -32,11 +33,25 @@ export default {
     return {
       outStockDialog: false,
       remark: "",
+      loading: false,
     };
   },
   methods: {
     confirm() {
-      this.$emit("confirm");
+      this.loading = true;
+      orderDeliver({
+        orderId: this.infoData.id,
+        trackingNum: this.trackingNum,
+      })
+        .then((res) => {
+          if (res.status == 200) {
+            this.changeDialog(false);
+            this.$emit("confirm");
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     changeDialog(e) {
       this.outStockDialog = e;

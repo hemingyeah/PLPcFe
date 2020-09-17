@@ -45,6 +45,9 @@
               <i class="iconfont icon-yanjing"></i>
               <span>{{item.readTimes}}</span>
             </span>
+            <span class="readNum" v-if="item.circleState == 1">
+              <i class="iconfont icon-quanziguanli"></i>
+            </span>
           </div>
 
         </div>
@@ -380,6 +383,12 @@ export default {
           .icon-yanjing {
             font-size: 8px;
             color: #B0BCC3;
+            margin-left: 8px;
+          }
+
+          .icon-quanziguanli{
+            font-size: 8px;
+            color: #38A6A6;
             margin-left: 8px;
           }
 

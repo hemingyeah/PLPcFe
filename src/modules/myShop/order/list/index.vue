@@ -5,7 +5,9 @@
       <div class="flex-x search-input-box">
         <div class="flex-1"></div>
         <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="searchModel.keyword">
-          <i class="iconfont icon-search" slot="append"></i>
+          <el-button slot="append" @click="search">
+            <i class="iconfont icon-search"></i>
+          </el-button>
         </el-input>
       </div>
 
@@ -180,6 +182,7 @@
                           v-for="(item, index) in scope.row[column.field]"
                           :key="index"
                           :src="item.thumbnailUrl"
+                          @click.stop="previewImg"
                         />
                         <div
                           class="flex-1 overHideCon-1"
@@ -332,6 +335,7 @@ import { formatDate } from "@src/util/lang";
 
 import { orderList, orderNum } from "@src/api/myShop";
 import componentMixin from "../component/index";
+import BaseGallery from "../../../../../packages/BaseGallery";
 
 // import SearchPanel from "../components/SearchPanel.vue";
 import AuthUtil from "@src/util/auth";
@@ -578,12 +582,12 @@ export default {
             {
               name: "出库",
               styleType: (obj) => {
-                return obj.isMain
+                return obj.repertoryState != 1
                   ? "color:#999;cursor: not-allowed;"
                   : "color:#55b7b4";
               },
               click: (obj) => {
-                if (pending) return;
+                if (pending || obj.repertoryState != 1) return;
                 this.outStockInfo = obj;
                 this.$refs.outStockDialog.changeDialog(true);
               },
@@ -827,6 +831,12 @@ export default {
         .then((res) => {
           if (res.status == 200) {
             this.page = res.data;
+          } else {
+            this.$message({
+              message: res.message,
+              duration: 1500,
+              type: "error",
+            });
           }
         })
         .catch((err) => {
@@ -1151,6 +1161,12 @@ export default {
       return orderNum().then((res) => {
         if (res.status == 200) {
           this.stateNumObj = res.data;
+        } else {
+          this.$message({
+            message: res.message,
+            duration: 1500,
+            type: "error",
+          });
         }
       });
     },
@@ -1173,6 +1189,7 @@ label {
       width: 32px;
       height: 32px;
       margin-right: 4px;
+      cursor: pointer;
     }
   }
 }

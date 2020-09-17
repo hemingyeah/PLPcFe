@@ -32,3 +32,12 @@ export function orderNum() {
 export function orderDetail(params) {
   return http.get(`${headeUrl}/linkc/order/detail`, params)
 }
+
+export function orderDeliver(params) {
+  return http.post(`${headeUrl}/linkc/order/deliver`, params)
+}
+
+export function getEventList(params) {
+  return http.get(`${headeUrl}/linkc/getEventList`, params)
+}
+
