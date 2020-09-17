@@ -235,7 +235,7 @@
                       type="text"
                       @click="createTransTab('event', scope.row.userId)"
                     >去转交</el-button>
-                    <el-button type="text" @click="resume(scope.row.userId)" v-if="!isWeChat">恢复</el-button>
+                    <el-button type="text" @click="resume(scope.row.userId)" v-if="isWeChat!=2">恢复</el-button>
                   </template>
                 </el-table-column>
               </template>
