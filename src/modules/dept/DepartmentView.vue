@@ -3,8 +3,13 @@
   <div class="department-container" v-loading.fullscreen.lock="loading">
     <!-- start 主要内容 -->
     <div class="department-main">
-      <div    :class="{'department-left': true, 'department-state': !isWeChat}">
-        <el-button type="primary" @click="synchronousWeChat"  :loading="synchronousState" class="base-button" >{{synchronousState?'同步中':'同步企业微信通讯录'}}</el-button>
+      <div :class="{'department-left': true, 'department-state': !isWeChat}">
+        <el-button
+          type="primary"
+          @click="synchronousWeChat"
+          :loading="synchronousState"
+          class="base-button"
+        >{{synchronousState?'同步中':'同步企业微信通讯录'}}</el-button>
         <el-tabs type="card" v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="组织架构" name="tag">
             <!-- 部门搜索框 -->
@@ -348,7 +353,14 @@
 
             <div class="form-view-row">
               <label>部门位置：</label>
-              <div class="form-view-row-content" v-if="deptInfo.tagAddress">{{deptInfo.tagAddress | fmt_address }}<i v-if="deptInfo.tagAddress.longitude && deptInfo.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text" ></i></div>
+              <div class="form-view-row-content" v-if="deptInfo.tagAddress">
+                {{deptInfo.tagAddress | fmt_address }}
+                <i
+                  v-if="deptInfo.tagAddress.longitude && deptInfo.tagAddress.latitude"
+                  @click="openMap"
+                  class="iconfont icon-address team-address-icon link-text"
+                ></i>
+              </div>
             </div>
           </div>
           <!-- TODO: 面包屑列表 -->
@@ -535,7 +547,11 @@
                     @click="deleteDeptUser(scope.row)"
                     v-if="!isWeChat"
                   >删除</el-button>
-                  <el-button type="text" @click="userResetPwdConfirm(scope.row.userId)" v-if="!isWeChat">重置密码</el-button>
+                  <el-button
+                    type="text"
+                    @click="userResetPwdConfirm(scope.row.userId)"
+                    v-if="!isWeChat"
+                  >重置密码</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -788,7 +804,7 @@ export default {
       selectedDept: {}, // 选中的部门
       userPage: new Page(), // 用户列表
       rolePage: new Page(),
-      synchronousState:false //同步状态
+      synchronousState: false, //同步状态
     };
   },
   computed: {
@@ -879,23 +895,28 @@ export default {
   methods: {
     synchronousWeChat() {
       this.synchronousState = true;
+      let timeout = setTimeout(() => {
+        this.$platform.alert("同步时间较长，系统将在后台继续为您尝试同步");
+        this.synchronousState = false;
+      }, 30000);
       this.$http
         .get("/login/synContact")
         .then((res) => {
-          console.log('同步通讯录',res)
-          
+          console.log("同步通讯录", res);
+          clearTimeout(timeout);
+          this.synchronousState = false;
+          timeout = null;
+          if(res.status == 0){
+            this.$platform.alert(res.message);
+            window.location.reload()
+          }else{
+            this.$platform.alert(res.message);
+          }
         })
         .catch((err) => {
           row.pending = false;
           console.error("toggleStatus catch err", err);
         });
-      let timeout = setTimeout(()=>{
-        this.$platform.alert("同步时间较长，系统将在后台继续为您尝试同步");
-        this.synchronousState = false;
-      },30000);
-
-
-
     },
     debounce: _.debounce(async function () {
       // 部门模糊搜索
@@ -2174,18 +2195,17 @@ body {
     background-color: #fafafa;
   }
 }
-.el-tabs{
+.el-tabs {
   height: calc(100% - 50px);
 }
-.department-left{
-  .base-button{
+.department-left {
+  .base-button {
     margin: 10px 0 10px 20px;
     width: 280px;
   }
 }
-.department-state{
+.department-state {
   .el-tabs__content {
-   
     height: calc(100% - 50px);
   }
 }
