@@ -147,13 +147,16 @@ export default {
 
 <style lang="scss">
 .multiple-card-table {
-  margin-bottom: 20px;
-  
   .base-table-row-v3 td {
     .column-attachment {
       .iconfont {
         font-size: 12px;
       }
+    }
+
+    .el-button {
+      min-width: auto !important;
+      padding: 0;
     }
   }
 }

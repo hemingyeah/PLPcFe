@@ -1,6 +1,6 @@
 <template>
   <div class="single-card-container">
-    <form-view :fields="fields" :value="value">
+    <form-view class="form-view-two-column" :fields="fields" :value="value">
       <!-- start 操作时间 -->
       <template slot="updateTime" slot-scope="{ field, value }">
         <div class="form-view-row">
@@ -12,16 +12,18 @@
     </form-view>
 
     <!-- start 按钮组 -->
-    <div class="btn-group">
+    <div class="btn-group" v-if="showDeleteBtn || showCreateBtn || showEditBtn">
       <el-button
         type="danger"
-        size="small"
+        size="mini"
+        plain
         v-if="showDeleteBtn"
         @click="deleteCard(cardInstanceId)"
       >删除</el-button>
 
       <el-button
-        size="small"
+        size="mini"
+        plain
         @click="openDialog"
         v-if="showCreateBtn || showEditBtn"
       >编辑</el-button>
@@ -108,3 +110,15 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.single-card-container {
+  .form-view {
+    padding: 0 12px 12px;
+  }
+
+  .btn-group {
+    padding-top: 0 !important;
+  }
+}
+</style>

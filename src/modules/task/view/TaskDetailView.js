@@ -4,6 +4,8 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 /* util */
 import AuthUtil from '@src/util/auth';
 import { getRootWindow } from '@src/util/dom';
+import TaskStateEnum from '@model/enum/TaskStateEnum';
+import Filter from '@src/filter/filter.js';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -17,9 +19,12 @@ import TaskReceiptEditView from './components/TaskReceipt/Edit/TaskReceiptEditVi
 import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
+import TaskView from './components/TaskView.vue';
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+
+const ENCRYPT_FIELD_VALUE = '***';
 
 export default {
   name: 'task-detail-view',
@@ -28,18 +33,12 @@ export default {
     return {
       loading: false,
       pending: false,
+      collapse: true,
       task: this.initData?.task || {},
+      taskState: this.initData?.task?.state || '',
       fields: [], // 工单表单字段
       tabs: [], // 工单关联数据tab
       currTab: 'task-info-record', // 当前选中的tab
-      // TODO: 工单状态从移动端拷贝的数据
-      stateText: {
-        created: '待分配',
-        allocated: '已指派',
-        processing: '进行中',
-        finished: '已完成',
-        offed: '已取消',
-      },
       // 回退工单弹窗
       backDialog: {
         visible: false,
@@ -55,21 +54,48 @@ export default {
         visible: false,
         reason: ''
       },
-      receiptFields: [] // 自定义回执字段
+      receiptFields: [], // 自定义回执字段
+      customerRelationTaskCountData: {}, // 客户关联工单数量
+      hasCallCenterModule: localStorage.getItem('call_center_module') == 1,
+      stateButtonData: [], // 工单当前状态下主操作按钮
+      leftActiveTab: 'task-view',
+      rightActiveTab: ''
     }
   },
   computed: {
-    /* 客户字段 */
+    /** 
+    * @description 客户字段 
+    */
     customerField() {
       return this.fields.filter(f => f.fieldName === 'customer')[0];
     },
-    /* 客户字段配置 */
+    /** 
+    * @description 客户字段配置 
+    */
     customerOption() {
-      return (this.customerField.setting && this.customerField.setting.customerOption) || {};
+      return this.customerField?.setting?.customerOption || {};
+    },
+    /* 是否可以查看客户详情 */
+    canSeeCustomer() {
+      return this.initData.canSeeCus;
     },
     /* 计划时间字段 */
     planTimeField() {
       return this.fields.filter(f => f.fieldName === 'planTime')[0];
+    },
+    /** 
+    * @description 重点显示的自定义字段
+    * 默认显示工单类型、计划时间、服务内容
+    */
+    keyFields() {
+      let defaultFields = this.fields.filter(f => f.fieldName === 'planTime' || f.fieldName === 'serviceContent');
+      return [{
+        displayName: '工单类型',
+        fieldName: 'templateName',
+        isSystem: 1
+      },
+      ...defaultFields
+      ]
     },
     /** 工单设置 */
     taskConfig() {
@@ -360,7 +386,7 @@ export default {
     * 3. 或 工单处于完成审批中
     */
     showReceipt() {
-      return this.finishedState || this.allowFinishTask || this.approvingForComplete;
+      return this.finishedState || this.approvingForComplete;
     },
     /** 
     * @description 是否显示 [回执信息]tab
@@ -412,6 +438,44 @@ export default {
 
       return allowDing;
     },
+    /** 
+    * @description 是否显示复制工单按钮
+    * 1. 当前登录用户有新建工单权限TASK_ADD
+    * 2. 允许复制工单 canCopyTask
+    */
+    allowCopyTask() {
+      return this.hasAuth('TASK_EDIT') && this.initData.canCopyTask;
+    },
+    /** 
+    * @description 是否显示回访按钮
+    * 1. 当前登录账户有工单回访权限TASK_FEEDBACK
+    * 2. 且 不是审批状态
+    * 3. 且 未回访过
+    */
+    allowReviewTask() {
+      let { inApprove, isReviewed, isReview } = this.task;
+      let feedbackAuth = this.hasAuth('TASK_FEEDBACK');
+
+      return feedbackAuth && inApprove != 1 && isReviewed == 0 && isReview == 0;
+    },
+    /** 
+    * @description 是否显示结算按钮
+    * 1. 工单状态是已完成finished
+    * 2. 且 不是审批状态
+    * 3. 且 未结算过
+    * 4. 且 允许回退工单 canRollBack
+    */
+    allowBalanceTask() {
+      let { state, inApprove, isSettled } = this.task;
+
+      return state === 'finished' && inApprove != 1 && isSettled == 0 && this.initData.canRollBack;
+    },
+    /** 
+    * @description 是否显示附加组件tab
+    */
+    viewTaskCardTab() {
+      return this.initData?.cardInfo?.length;
+    },
     /** 子组件所需的数据 */
     propsForSubComponents() {
       return {
@@ -421,6 +485,74 @@ export default {
         isFinishApproving: this.approvingForComplete
       }
     },
+    /** 
+    * @description 客户
+    */
+    customer() {
+      return this.task?.customer || {};
+    },
+    /** 
+    * @description 允许打开客户详情
+    */
+    allowOpenCustomerView() {
+      return !this.isEncryptField(this.customer.name) && this.canSeeCustomer;
+    },
+    /** 
+    * @description 联系人
+    */
+    lmName() {
+      let lmName = this.task.tlmName || this.customer.lmName;
+
+      if (lmName) return this.isEncryptField(lmName) ? ENCRYPT_FIELD_VALUE : lmName;
+
+      return '';
+    },
+    /** 
+    * @description 联系电话
+    */
+    lmPhone() {
+      let lmPhone = this.task.tlmPhone || this.customer.lmPhone;
+
+      if (this.lmName) return this.isEncryptField(this.lmName) ? ENCRYPT_FIELD_VALUE : lmPhone;
+
+      return '';
+    },
+    /** 
+    * @description 显示拨打电话
+    */
+    showCallPhone() {
+      return this.lmPhone && this.hasCallCenterModule;
+    },
+    /** 
+    * @description 地址
+    */
+    address() {
+      let { validAddress, taddress, isEncryptTaddress } = this.task;
+
+      if (validAddress) return isEncryptTaddress ? ENCRYPT_FIELD_VALUE : Filter.prettyAddress(taddress);
+
+      return '';
+    },
+    /** 
+    * @description 显示查看地图icon
+    * 1. 地址未加密
+    * 2. 经纬度
+    */
+    showMap() {
+      let { taddress, isEncryptTaddress } = this.task;
+      let { longitude, latitude } = taddress;
+      return longitude && latitude && !isEncryptTaddress;
+    },
+    /** 
+    * @description 是否显示客户关联的工单数量
+    * 1. 客户存在
+    * 2. 且全部数量>0
+    * 3. 客户未加密
+    */
+    showCustomerRelationTaskCount() {
+      let { all } = this.customerRelationTaskCountData;
+      return this.customer?.id && Number(all) > 0 && !this.isEncryptField(this.customer.name);
+    }
   },
   methods: {
     // 构建工单关联tabs
@@ -453,17 +585,6 @@ export default {
         }
       ].filter(tab => tab.show);
     },
-    // 格式化地址显示
-    prettyAddress(address) {
-      if (!address || Object.keys(address).length === 0) return '';
-
-      let province = address.province || '';
-      let city = address.city || '';
-      let dist = address.dist || '';
-      let adr = address.address || '';
-
-      return [province, city, dist, adr].filter(a => a).join('-');
-    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
@@ -472,6 +593,10 @@ export default {
     goEdit() {
       const id = this.task.id;
       window.location.href = this.editAuth ? `/task/edit/${id}` : `/task/noFilterEdit/${id}`;
+    },
+    // 复制工单
+    goCopyTask() {
+      window.location.href = `/task/copyTask?taskId=${this.task.id}`;
     },
     // 删除工单
     async deleteTask() {
@@ -726,16 +851,128 @@ export default {
         this.backDialog.visible = true;
       } else if (action === 'finish') {
         this.$refs.taskReceiptEdit.openDialog();
+      } else if (action === 'balance') {
+        this.$refs.taskAccount.openDialog('create');
+      } else if (action === 'feedback') {
+        this.$refs.taskFeedback.feedback();
       }
     },
     // 发起审批
     proposeApprove(data) {
       this.$refs.proposeApprove.openDialog(data);
+    },
+    changeTaskProcessState(state) {
+      this.taskState = state;
+    },
+    /** 
+    * @description 获取客户关联的工单数量
+    */
+    getCountForCreate() {
+      const params = { module: 'customer', id: this.customer.id };
+      TaskApi.getCountForCreate(params).then((result = {}) => {
+        this.customerRelationTaskCountData = result;
+      })
+    },
+    /** 
+    * @description 打开客户详情
+    */
+    openCustomerView() {
+      if (!this.allowOpenCustomerView) return;
+      
+      let fromId = window.frameElement.getAttribute('id');
+      const customerId = this.customer.id;
+
+      if(!customerId) return;
+
+      this.$platform.openTab({
+        id: `customer_view_${customerId}`,
+        title: '客户详情',
+        close: true,
+        url: `/customer/view/${customerId}?noHistory=1`,
+        fromId
+      })
+    },
+    /**
+    * @description 拨打电话
+    */
+    async makePhoneCall() {
+      // 未开通呼叫中心
+      if (!this.hasCallCenterModule) return;
+
+      let phone = this.task.tlmPhone || this.customer.lmPhone;
+
+      if (!phone) return;
+
+      const result = await TaskApi.dialout({ taskType:'task', phone });
+      if (result.code != 0) {
+        return this.$platform.notification({
+          title: '呼出失败',
+          message: result.message || '',
+          type: 'error',
+        })
+      }
+    },
+    /**
+    * @description 是否加密字段
+    */
+    isEncryptField(value) {
+      return value === ENCRYPT_FIELD_VALUE;
+    },
+    /** 
+    * @description 工单状态
+    */
+    getTaskStateName() {
+      return TaskStateEnum.getNameForTask(this.task);
+    },
+    /** 
+    * @description 工单状态备件色
+    */
+    getTaskStateColor() {
+      return TaskStateEnum.getColorForTask(this.task);
+    },
+    buildButtonData() {
+      // TODO：结算、回访操作
+      let stateBtnMap = {
+        created: [
+          { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
+          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
+          { name: '继续', type: 'primary', show: this.allowGoOnTask, event: this.unpause },
+          { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
+          { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
+        ],
+        allocated: [
+          { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
+          { name: '拒绝', type: 'danger', show: this.allowRefuseTask, event: () => { this.openDialog('refuse') } },
+          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } }
+        ],
+        accepted: [
+          { name: '开始', type: 'primary', show: this.allowStartTask, event: this.start },
+          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
+          { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
+          { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
+        ],
+        processing: [
+          { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
+          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
+          { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
+          { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
+        ],
+        finished: [
+          { name: '回退', type: 'primary', show: this.allowBackTask, event: () => this.backTask },
+          { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
+          { name: '回访', type: 'primary', show: this.viewFeedbackTab && this.allowReviewTask, event: () => { this.openDialog('feedback') } }
+        ]
+      }
+
+      return stateBtnMap[this.task.state];
     }
   },
   async mounted() {
     try {
       this.loading = true;
+
+      // 查询客户关联工单数量
+      if (this.canSeeCustomer) this.getCountForCreate();
 
       let { templateId } = this.task;
 
@@ -766,10 +1003,6 @@ export default {
         displayName: '满意度',
         fieldName: 'degree'
       }, {
-        displayName: '工单状态',
-        fieldName: 'state',
-        isSystem: 1
-      }, {
         displayName: '创建人',
         fieldName: 'createUser',
         formType: 'user',
@@ -779,10 +1012,18 @@ export default {
         fieldName: 'createTime',
         formType: 'timestamp',
         isSystem: 1,
+      }, {
+        displayName: '派单人',
+        fieldName: 'allotUser',
+        formType: 'user',
+        isSystem: 1,
       }];
 
       this.receiptFields = result[1] || [];
       this.tabs = this.buildTabs();
+      this.stateButtonData = this.buildButtonData();
+
+      this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'card-tab';
 
       this.loading = false;
 
@@ -801,5 +1042,41 @@ export default {
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
+    [TaskView.name]: TaskView,
+    'biz-process-exception': {
+      name: 'biz-process-exception',
+      props: {
+        data: Object,
+        default: () => ({})
+      },
+      render(h) {
+        // 曾超时
+        let onceOverTime = this.data.onceOverTime === 1
+        // 曾暂停
+        let oncePaused = this.data.oncePaused === 1
+        // 位置异常
+        let positionException = this.data.positionException === 1
+        // 是否是异常
+        let isException = onceOverTime || oncePaused || positionException
+        // 提示内容
+        let content = []
+        onceOverTime && content.push('曾超时')
+        oncePaused && content.push('曾暂停')
+        positionException && content.push('位置异常')
+
+        let exceptionDom = (
+          <div class="biz-process-exception-text">
+            <el-tooltip content={ content.join(', ') } placement="top">
+              <div>
+                <i class="iconfont icon-info"></i>
+                <span>工单异常</span>
+              </div>
+            </el-tooltip>
+          </div>
+        )
+
+        return isException ? exceptionDom : ''
+      }
+    }
   }
 }

@@ -1,9 +1,10 @@
 import _ from 'lodash';
+import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 // 单行最大长度
-export const SINGLE_LINE_MAX_LEN = 1000;
+export const SINGLE_LINE_MAX_LEN = FORM_FIELD_TEXT_MAX_LENGTH;
 // 多行最大长度
-export const MULTI_LINE_MAX_LEN = 2000;
+export const MULTI_LINE_MAX_LEN = FORM_FIELD_TEXTAREA_MAX_LENGTH;
 // 电话
 export const TEL_REG = /^(((0\d{2,3}-{0,1})?\d{7,8})|(\d{6}))$/;
 // 手机号

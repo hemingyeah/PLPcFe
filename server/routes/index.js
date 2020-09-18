@@ -99,96 +99,81 @@ router.get("/window", async (ctx) => {
   ctx.body = Template.renderWithData("window", {}, script);
 });
 
-router.use("/outside/weixin/*", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.56.211",
-    port: 10007,
-    headers: {
-      cookie:
-        "VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E",
-    },
-  })
-);
+router.use('/outside/weixin/*', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.56.211',
+  port: 10007,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E'
+  },
+}))
 
-router.use("/outside/es/task/search", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
-    port: 10006,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=593d511c-e54e-4709-ba01-65671a0c4cb2",
-    },
-  })
-);
+router.use('/outside/es/task/search', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10006,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=840df68a-e3cd-47c2-9348-fb1c31c0aa21'
+  },
+}))
 
-router.use("/outside/pc/task/editBatchTask", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
-    port: 10012,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=2bacf42d-74dc-46da-8b7b-769da7807331",
-    },
-  })
-);
+router.use('/outside/pc/task/editBatchTask', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=2bacf42d-74dc-46da-8b7b-769da7807331'
+  },
+}))
 
-router.use("/outside/pc/view/getUserViews", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
-    port: 10012,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
-    },
-  })
-);
+router.use('/outside/pc/view/getUserViews', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
+  },
+}))
+router.use('/outside/es/task/getTaskCountByState', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10006,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=840df68a-e3cd-47c2-9348-fb1c31c0aa21'
+  },
+}))
 
-router.use("/outside/es/task/getTaskCountByState", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
-    port: 10006,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=840df68a-e3cd-47c2-9348-fb1c31c0aa21",
-    },
-  })
-);
 
-router.use("/outside/pc/view/createTaskView", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
-    port: 10012,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
-    },
-  })
-);
 
-router.use("/outside/pc/view/editTaskView", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
-    port: 10012,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
-    },
-  })
-);
+router.use('/outside/pc/view/createTaskView', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
+  },
+}))
 
-router.use("/outside/pc/view/deleteOneView", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
-    port: 10012,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
-    },
-  })
-);
+router.use('/outside/pc/view/editTaskView', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
+  },
+}))
 
-router.use("/outside/pc/task/delete", (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: "30.40.59.137",
-    port: 10012,
-    headers: {
-      cookie: "VIPPUBLINKJSESSIONID=316e588e-fe61-486d-9cb8-d90e9afa5d91",
-    },
-  })
-);
+router.use('/outside/pc/view/deleteOneView', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.58.199',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede'
+  },
+}))
+
+
+
+
+router.use('/outside/pc/task/delete', ctx => HttpClient.proxy(ctx, {
+  host: '30.40.59.137',
+  port: 10012,
+  headers: {
+    'cookie': 'VIPPUBLINKJSESSIONID=316e588e-fe61-486d-9cb8-d90e9afa5d91'
+  },
+}))
 
 // 通知中心改造
 router.use("/outside/*", (ctx) =>

@@ -236,7 +236,7 @@ export function pauseApproveCheck(params: {} | undefined) {
  * @description 审核结算时校验是否需要审批
  */
 export function balanceApproveCheck(params: {} | undefined) {
-  return http.post("/balance/approve/confirm", params, false);
+  return http.post("/balance/approve/confirm", params, false, { headers: { indices: true } });
 }
 
 /**
@@ -605,6 +605,13 @@ export function editReceipt(params: {} | undefined) {
  */
 export function receiptDraft(params: {} | undefined) {
   return http.post(`${fixedPrefixTaskPath}/outside/pc/task/receiptDraft/save`, params);
+}
+
+/**
+ * @description 修改协同人
+ */
+export function updateSynergies(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`, params);
 }
 
 /**

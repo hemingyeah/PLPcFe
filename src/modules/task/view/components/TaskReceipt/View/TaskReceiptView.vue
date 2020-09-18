@@ -75,7 +75,7 @@
 
     <!-- start 按钮组 -->
     <div class="btn-group">
-      <el-button size="small" @click="openDialog" v-if="allowEditReceipt">编辑回执</el-button>
+      <el-button size="mini" @click="openDialog" v-if="allowEditReceipt">编辑回执</el-button>
     </div>
     <!-- end 按钮组 -->
 

@@ -516,7 +516,7 @@ export default {
     openDemo() {
       this.openForFrame({
         id: 'demo',
-        url: '/payment/paymentBillOnline',
+        url: '/demo',
         title: 'demo'
       });
     },

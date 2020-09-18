@@ -62,9 +62,15 @@ const TaskAllowSelect = {
       const { allotType, synergies, executors } = data;
 
       if (allotType) this.allotType = allotType;
-      if (synergies && Array.isArray(synergies)) this.value.synergies = synergies;
-      if (executors && Array.isArray(executors)) this.value.executors = executors;
+      if (synergies && Array.isArray(synergies)) this.value.synergies = synergies.filter(synergie => !!synergie.userId);
+      if (executors && Array.isArray(executors)) this.value.executors = executors.filter(executor => !!executor.userId);
 
+    },
+    clearExecutors() {
+      this.value.executors = [];
+    },
+    deleteSynergie(index) {
+      this.value.synergies.splice(index, 1);
     },
     /** 根据客户id获取客户信息和客户负责人信息和开关 */
     fetchExeinsynWithCustomerManager(customerId = '') {
@@ -85,7 +91,7 @@ const TaskAllowSelect = {
     selectSynergiesUser() {
       let choose = 'dept';
       let options = {
-        max: -1,
+        max: 14,
         isHideTeam: true,
         selected: this.value.synergies
       }

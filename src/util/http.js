@@ -27,7 +27,8 @@ const axiosIns = axios.create({
   transformRequest: [function (data, headers) {
     let copyData = data;
     if (headers['Content-Type'] == 'application/x-www-form-urlencoded' && _.isPlainObject(copyData)) {
-      copyData = querystring.stringify(copyData)
+      let isArrayIndices = headers.indices === true;
+      copyData = querystring.stringify(copyData, isArrayIndices)
     }
 
     if (headers['Content-Type'] == 'application/json') {

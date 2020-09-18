@@ -64,6 +64,12 @@ class TaskStateEnum extends BaseEnum{
       value: 'offed',
       color: '#cecece'
     }
+
+    this.PSUSED = {
+      name: '暂停中',
+      value: 'paused',
+      color: '#ef6b6b'
+    }
   }
 
   getColor(value){
@@ -71,6 +77,30 @@ class TaskStateEnum extends BaseEnum{
       let o = this[prop];
       if(o.value == value) return o.color;
     }
+  }
+
+  getNameForTask(task = {}) {
+    if(task.isPaused) return this.PSUSED.name;
+
+    let { state } = task;
+    
+    return this.getName(state);
+  }
+
+  getColorForTask(task = {}) {
+    if(task.isPaused) return this.PSUSED.color;
+
+    let { state } = task;
+    
+    return this.getColor(state);
+  }
+
+  getValueForTask(task = {}) {
+    if(task.isPaused) return this.PSUSED.value;
+
+    let { state } = task;
+    
+    return this.getValue(state);
   }
 }
 

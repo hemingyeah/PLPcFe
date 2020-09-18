@@ -6,8 +6,8 @@
       @compositionstart="compositionstart"
       @compositionend="compositionend"
       @input="inputEvent"
-      :placeholder="field.placeholder?field.placeholder:placeholder"
-      :maxlength="field.maxlength?field.maxlength:1000"
+      :placeholder="field.placeholder ?field.placeholder : placeholder"
+      :maxlength="field.maxlength ? field.maxlength : maxlength"
       :id="`form_${field.fieldName}`" 
       autocomplete="off"
       :disabled="field.disabled"/>
@@ -16,6 +16,7 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
+import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 export default {
   name: 'form-text',
@@ -30,6 +31,7 @@ export default {
     return {
       // 是否是输入中文
       $isInputZh: false,
+      maxlength: FORM_FIELD_TEXT_MAX_LENGTH
     }
   },
   methods: {

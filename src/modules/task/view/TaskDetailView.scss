@@ -1,202 +1,442 @@
-$color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
-
-html, body, .page-container {
+html, body, .task-detail-container {
   height: 100%;
 }
 
 body {
-  padding: 10px;
-  min-width: 1100px;
+  padding: 12px 16px;
+  min-width: 1200px;
+  background-color: $bg-color-l1;
   overflow-x: auto;
-}
-
-.page-container {
-  background: #fff;
-  border-radius: 3px;
-  box-shadow: 0 1px 4px rgba(216,216,216, .65);
-  display: flex;
-  flex-flow: column nowrap;
-}
-
-.task-tool-bar {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: $text-color-regular;
-  border-bottom: 1px solid #f2f2f2;
-
-  .task-toolbar-left{
-    padding: 10px 5px 10px 10px;
-  }
-
-  .task-toolbar-right {
-    padding: 10px 10px 10px 5px;
-  }
-
-  .btn-text {
-    padding: 5px 12px;
-    .iconfont{
-      font-size: 14px;
-    }
-  }
-
-  .task-isDelete {
-    color: red;
-    font-size: 20px;
-    line-height: 35px;
-    padding: 10px;
-  }
-}
-
-.main-content {
-  display: flex;
-  flex-flow: row nowrap;
-  flex: 1;
-  position: relative;
-
-  .task-detail {
-    flex: 3;
-    min-width: 420px;
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-
-    .form-view{
-      flex: 1;
-      padding-top: 5px;
-      overflow-y: auto;
-      border-right: 1px solid #f2f2f2;
-
-      .form-view-row {
-        .row-item-margin {
-          margin-right: 10px;
-        }
-      }
-
-      .form-view-row-plantime {
-        white-space: nowrap;
-
-        .icon-edit {
-          font-weight: bold;
-        }
-      }
-    }
-  }
-
-  .task-relation {
-    height: 100%;
-    flex: 7;
-    background: #fff;
-    min-width: 500px;
-
-    .task-relation-content {
-      height: calc(100% - 50px);
-      overflow: auto;
-    }
-  }
+  overflow-y: hidden;
 }
 
 .task-detail-container {
-  .base-modal-body {
-    padding: 15px 30px;
+  display: flex;
+  flex-flow: column nowrap;
+  overflow: hidden;
 
-    .base-modal-content {
-      textarea {
-        width: 100%;
+  // 弹窗
+  .base-modal {
+    .base-modal-body {
+      padding: 15px 30px;
+  
+      .base-modal-content {
+        textarea {
+          width: 100%;
+        }
+        
+        p {
+          margin-bottom: 8px;
+  
+          &.tips {
+            color: #999;
+            font-size: 12px;
+          }
+        }
       }
-      
-      p {
-        margin-bottom: 8px;
+    }
+  
+    .base-modal-footer {
+      text-align: right;
+    }
 
-        &.tips {
-          color: #999;
-          font-size: 12px;
+    .task-back-dialog {
+      p {
+        font-size: 12px;
+      }
+    }
+  }
+
+  // 按钮
+  .el-button {
+    max-width: 74px;
+    min-width: 60px;
+
+    padding-left: 0;
+    padding-right: 0;
+
+    font-weight: normal;
+    border-radius: 4px;
+
+    &.el-button--small {
+      font-size: $font-size-base;
+      padding: 8px;
+    }
+  }
+
+  // form-view
+  .form-view {
+    padding: 0;
+
+    &.form-view-two-column {
+      .items-of-group {
+        display: flex;
+        flex-wrap: wrap;
+  
+        .form-view-row {
+          width: 50%;
+  
+          &:nth-child(odd) {
+            padding-right: 12px;
+          }
+  
+          &:nth-child(even) {
+            padding-left: 12px;
+          }
         }
       }
     }
   }
 
-  .base-modal-footer {
-    text-align: right;
+  .form-view-row {
+    padding: 4px 0;
   }
 
-  .task-back-dialog {
-    p {
-      font-size: 12px;
-      
+  // 客户、产品关联工单数量
+  .relation-count-button {
+    height: 18px;
+    line-height: 18px;
+    padding: 0 6px;
+    margin-left: 8px;
+
+    font-size: $font-size-small;
+    color: $text-color-regular;
+
+    background: $color-border-l2;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+}
+
+// 顶部操作区
+.task-detail-header {
+  padding: 0 12px;
+  margin-bottom: 10px;
+
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
+
+  .form-view-row {
+    padding: 0;
+
+    label {
+      width: auto !important;
+    }
+
+    .form-view-row-content {
+      white-space: normal;
+      @include text-ellipsis;
     }
   }
 
-  .action-btn {
-    .el-dropdown-btn {
-      padding: 0 15px;
-      line-height: 34px;
-      display: inline-block;
-      background: $color-primary;
-      color: #fff;
-      margin-left: 10px;
-      border-radius: 2px;
+  &-top {
+    min-height: 60px;
+    max-height: 84px;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+
+    // 折叠按钮
+    .collapse-btn {
+      width: 28px;
+      height: 28px;
+      margin-right: 12px;
+      text-align: center;
+      cursor: pointer;
+
+      border-radius: 4px;
+      border: 1px solid $color-border-l1;
+
       .iconfont {
-        line-height: 12px;
-        margin-right: 3px;
-        font-size: 12px;
-      }
+        font-size: 20px;
+        color: $text-color-regular;
+        display: inline-block;
+        transition: transform .3s;
 
-      &:hover {
-        cursor: pointer;
-        color: #fff;
-        background: $color-primary;
+        &.active {
+          transform: rotate(-90deg);
+        }
       }
     }
 
-    .base-button {
-      min-width: 86px;
-      margin-left: 10px;
+    // 工单流程
+    .progress-wrap {
+      flex: 1;
+      overflow: hidden;
+    }
 
-      &.once-printed {
-        background: #696969;
-        border-color: #696969;
+    // 工单状态
+    .task-state {
+      width: 52px;
+      min-width: 52px;
+      height: 22px;
+      line-height: 22px;
+      margin-left: 30px;
+
+      color: #fff;
+      font-size: $font-size-small;
+      text-align: center;
+
+      border: 1px solid;
+      border-radius: 11px;
+    }
+
+    .linkman-name {
+      max-width: 140px;
+      min-width: 85px;
+      margin-right: 16px;
+    }
+
+    .linkman-phone {
+      max-width: 160px;
+    }
+
+    // 按钮组
+    &-btn {
+      font-size: 0;
+
+      .el-button {
+        margin-left: 8px;
+
+        // 打印工单
+        &.once-printed {
+          background: $text-color-regular;
+          border-color: $text-color-regular;
+          color: #fff;
+        }
       }
+      
+      .current-state-button {
+        display: inline-block;
+      }
+    }
+  }
+
+  // 客户信息
+  .customer-info-wrap {
+    margin-right: 30px;
+    overflow: hidden;
+
+    flex: 1;
+    display: flex;
+    align-items: center;
+
+    .customer-name {
+      font-size: $font-size-large;
+      @include text-ellipsis;
+      margin-right: 16px;
+    }
+  }
+
+  // 联系人
+  .linkman-info {
+    display: flex;
+    align-items: center;
+
+    .linkman-phone {
+      .call-phone {
+        display: flex;
+        cursor: pointer;
+
+        span {
+          @include text-ellipsis;
+        }
+
+        .iconfont {
+          margin-left: 6px;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  &-bottom {
+    transition-duration: 300ms;
+    height: 132px;
+    overflow: hidden;
+
+    &.active {
+      height: 0;
+    }
+
+    // 客户
+    .customer-info-wrap {
+      margin-right: 0;
+      padding: 4px 0;
+      
+      .customer-name {
+        margin-right: 0;
+      }
+    }
+
+    &-list {
+      display: flex;
+
+      &-item {
+        flex: 1;
+        height: 90px;
+        padding: 10px 20px 6px;
+        overflow: hidden;
+
+        &:first-child {
+          padding-left: 0;
+        }
+
+        &:last-child {
+          padding-right: 0;
+        }
+
+        &:not(:last-child) {
+          border-right: 1px solid $color-border-l2;
+        }
+
+        // 联系人
+        .linkman-info {
+          .linkman-name,
+          .linkman-phone {
+            flex: 1;
+            overflow: hidden;
+          }
+        }
+
+        // 地址
+        .address-info {
+          .form-view-row-content {
+            max-height: 40px;
+            display: -webkit-box;
+            white-space: normal;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+          }
+        }
+
+        .biz-process-time {
+          margin-bottom: 12px;
+
+          .biz-process-time-block-label {
+            color: $text-color-regular;
+          }
+        }
+      }
+    }
+
+    .form-view-row-content {
+      margin-bottom: 6px;
     }
   }
 }
 
+// 工单详情
+.task-detail-main-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+  flex-flow: row nowrap;
+
+  // tabs标签页
+  .el-tabs {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+      margin: 0;
+
+      .el-tabs__item {
+        padding: 0 24px !important;
+        color: $text-color-regular;
+        font-weight: normal;
+  
+        &.is-active {
+          color: $color-primary;
+        }
+      }
+    }
+
+    &__content {
+      flex: 1;
+      overflow: auto;
+
+      .el-tab-pane {
+        height: 100%;
+      }
+    }
+  }
+
+  &-left,
+  &-right {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 4px;
+  }
+
+  &-left {
+    position: relative;
+
+    .task-detail-btn-group {
+      position: absolute;
+      right: 12px;
+      top: 8px;
+
+      font-size: 0;
+      z-index: 999;
+
+      .iconfont {
+        margin-left: 16px;
+        color: $text-color-secondary;
+        cursor: pointer;
+
+        &.icon-bianji1 {
+          color: $color-primary;
+        }
+
+        &.icon-shanchu-copy {
+          margin-left: 14px;
+        }
+      }
+    }
+  }
+
+  &-right {
+    margin-left: 12px;
+  }
+
+  // 审批中图片
+  .approving-img {
+    width: 75px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+
+    img {
+      width: 100%;
+    }
+  }
+
+  .task-tab-container {
+    position: relative;
+    padding: 12px;
+    
+    .btn-group {
+      font-size: 0;
+      padding: 12px 0;
+      text-align: right;
+    }
+  }
+}
+
+// 服务报告
 .link-of-dropdown {
   color: $text-color-primary;
   display: block;
 
   &:hover {
     text-decoration: none;
-  }
-}
-
-.task-relation-content {
-  .task-tab-container {
-    position: relative;
-    padding: 10px;
-
-    .no-text {
-      padding: 10px 15px;
-    }
-
-    .approving-img {
-      width: 75px;
-      position: absolute;
-      right: 20px;
-      top: 10px;
-
-      img {
-        width: 100%;
-      }
-    }
-
-    .btn-group {
-      text-align: right;
-      padding-right: 20px;
-
-      button {
-        min-width: 86px;
-      }
-    }
   }
 }

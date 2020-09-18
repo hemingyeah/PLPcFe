@@ -4,7 +4,7 @@
     <!-- <tsx-comp/> -->
     <!-- <base-datatable-demo/> -->
     <!-- <biz-team-select-demo/> -->
-    <img @click="contact" :src="imgUrl" >
+    <!-- <img @click="contact" :src="imgUrl" >
     <base-cascader :options="options" v-model="typeValue">
     </base-cascader>
     {{typeValue}}
@@ -20,7 +20,11 @@
       <div slot="footer">
         新建类别
       </div>
-    </base-cascader>
+    </base-cascader> -->
+    <biz-select-column ref="bizSelectColumn"></biz-select-column>
+    <base-button type="primary" @event="openS">
+      选择列
+    </base-button>
 
   </div>
 </template>
@@ -406,6 +410,9 @@ export default {
       if (size > 1) return existParams ? `${ ossUrl }&x-oss-process=image/resize,p_70` : `${ ossUrl }?x-oss-process=image/resize,p_70`;
       return ossUrl;
     },
+    openS() {
+      this.$refs.bizSelectColumn.open();
+    }
   },
   components: {
     // [BaseDatatableDemo.name]: BaseDatatableDemo,

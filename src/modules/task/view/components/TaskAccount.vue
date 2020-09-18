@@ -5,17 +5,17 @@
 
       <!-- start 审批中 -->
       <template v-if="isApproving">
-        <div class="no-text" v-if="!openUserDefinedBalance">未配置任何审核结算字段</div>
+        <no-data-view-new v-if="!task.balanceConfirm" notice-msg="未配置任何审核结算字段"></no-data-view-new>
         <form-view :fields="balanceAvailableFields" :value="balanceJson" v-else></form-view>
         <div class="approving-img"><img :src="getApprovingImg()" /></div>
       </template>
       <!-- end 审批中 -->
 
       <!-- start 未结算 -->
-      <template v-else-if="!task.balanceConfirm">
-        <div class="no-text" v-if="!openUserDefinedBalance">未配置任何审核结算字段</div>
-        <div class="no-text" v-else>暂无审核结算数据</div>
-      </template>
+      <no-data-view-new
+        v-else-if="!task.balanceConfirm"
+        :notice-msg="!openUserDefinedBalance?'未配置任何审核结算字段':'暂无审核结算数据'"
+      ></no-data-view-new>
       <!-- start 未结算 -->
 
       <!-- start 已结算 -->
@@ -39,9 +39,9 @@
     <!-- end 审核结算字段 -->
 
     <div class="btn-group">
-      <base-button type="primary" @event="openDialog('create')" :disabled="pending" v-if="allowBalanceTask">结算</base-button>
-      <base-button type="ghost" @event="openDialog('edit')" :disabled="pending" v-if="allowEditBalance">编辑</base-button>
-      <base-button type="ghost" @event="openDialog('back')" :disabled="pending" v-if="allowRollBack">回退</base-button>
+      <el-button type="primary" size="mini" plain @click="openDialog('create')" :disabled="pending" v-if="allowBalanceTask">结算</el-button>
+      <el-button size="mini" @click="openDialog('edit')" :disabled="pending" v-if="allowEditBalance">编辑</el-button>
+      <el-button size="mini" @click="openDialog('back')" :disabled="pending" v-if="allowRollBack">回退</el-button>
     </div>
 
     <!-- start 结算弹窗 -->
@@ -62,6 +62,9 @@
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
 
+/* components */
+import NoDataViewNew from '@src/component/common/NoDataViewNew';
+
 /* util */
 import * as Utils from '@src/component/form/util';
 
@@ -70,12 +73,9 @@ import APPROVING_IMG from '@src/assets/img/task/approving.png';
 
 export default {
   name: 'task-account',
+  inject: ['initData'],
   props: {
     shareData: {
-      type: Object,
-      default: () => ({})
-    },
-    initData: {
       type: Object,
       default: () => ({})
     }
@@ -285,6 +285,9 @@ export default {
         this.pending = false;
       })
     }
+  },
+  components: {
+    [NoDataViewNew.name]: NoDataViewNew
   }
 }
 </script>

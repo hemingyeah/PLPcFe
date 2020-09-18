@@ -1,6 +1,5 @@
 import http from '@src/util/http';
-
-const CustomerPreFixedPath = '';
+import GrayUtil from '@src/util/gray';  
 
 /** 
  * 获取客户信息，用于客户编辑
@@ -159,7 +158,8 @@ export function batchEditCustomer(params) {
  * @returns {*}
  */
 export function getCustomerListAsyn(params) {
-  return http.get(`${CustomerPreFixedPath}/customer/getListAsyn`, params);
+  let customerPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${customerPreFixedPath}/customer/getListAsyn`, params);
 }
 
 /**
@@ -176,5 +176,6 @@ export function getCustomerExeinsyn(params) {
  * @param {Object} params - 参数
  */
 export function getCustomerList(params) {
-  return http.post(`${CustomerPreFixedPath}/customer/list`, params);
+  let customerPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${customerPreFixedPath}/customer/list`, params);
 }
