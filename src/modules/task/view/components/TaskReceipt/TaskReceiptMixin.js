@@ -10,11 +10,8 @@ import BANK_IMG from '@src/assets/img/task/bankCard.png';
 import PAY_SUCCESS_IMG from '@src/assets/img/task/paySuccess.png';
 
 export default {
+  inject: ['initData'],
   props: {
-    initData: {
-      type: Object,
-      default: () => ({})
-    },
     shareData: {
       type: Object,
       default: () => ({})

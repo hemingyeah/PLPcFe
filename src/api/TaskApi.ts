@@ -237,7 +237,7 @@ export function pauseApproveCheck(params: {} | undefined) {
  * @description 审核结算时校验是否需要审批
  */
 export function balanceApproveCheck(params: {} | undefined) {
-  return http.post("/balance/approve/confirm", params, false);
+  return http.post("/balance/approve/confirm", params, false, { headers: { indices: true } });
 }
 
 /**

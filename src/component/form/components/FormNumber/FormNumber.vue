@@ -1,6 +1,14 @@
 <template>
   <div class="form-number">
-    <input :id="`form_${field.fieldName}`" ref="input" type="number" @input="input" :value="value" :placeholder="placeholder" autocomplete="off">
+    <input 
+      autocomplete="off"
+      ref="input" 
+      type="number" 
+      :id="`form_${field.fieldName}`"
+      :placeholder="placeholder" 
+      :value="value"
+      @input="input" 
+    >
   </div>
 </template>
 
@@ -59,8 +67,8 @@ export default {
 <style lang="scss">
 .form-number{
   width: 100%;
-   input{
-     width: 100%;
-   }
+  input{
+    width: 100%;
+  }
 }
 </style>

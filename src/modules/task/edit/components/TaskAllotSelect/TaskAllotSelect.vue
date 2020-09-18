@@ -21,17 +21,22 @@
         @click.native="selectExecutorUser"
         placeholder="请选择工单负责人"
       >
+        <div slot="suffix" @click.stop="clearExecutors" v-if="value.executors.length > 0">
+          <i class="iconfont icon-yemianshanchu"></i>
+        </div>
       </el-input>
       <!-- end 负责人员选择 -->
 
       <!-- start 协同人员选择 -->
-      <el-input 
-        readonly
-        :value="value.synergies.map(({displayName}) => displayName).join(', ')"
-        @click.native="selectSynergiesUser"
-        placeholder="请选择协同人，协同人可查看、接收工单通知，支持多选"
-      >
-      </el-input>
+      <div class="task-allot-select-synergies" @click="selectSynergiesUser">
+        <span class="task-allot-select-synergies-placeholder" v-if="value.synergies.length <= 0">请选择协同人，协同人可查看、接收工单通知，支持多选</span>
+        <template v-else>
+          <div class="task-allot-select-synergie" v-for="(synergie, index) in value.synergies" :key="synergie.userId">
+            <span>{{ synergie.displayName }}</span>
+            <i class="iconfont icon-yemianshanchu" @click.stop="deleteSynergie(index)"></i>
+          </div>
+        </template>
+      </div>
       <!-- end 协同人员选择 -->
 
     </div>

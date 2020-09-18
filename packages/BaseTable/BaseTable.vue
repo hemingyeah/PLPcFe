@@ -32,8 +32,8 @@
 </template>
 
 <script>
-//TODO: 分页
-//TODO: 排序
+// TODO: 分页
+// TODO: 排序
 import _ from 'lodash';
 import DEFAULT_OPTION from './DefaultOption';
 import util from './util';

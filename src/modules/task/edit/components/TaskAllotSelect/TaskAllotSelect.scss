@@ -9,5 +9,68 @@
     .el-input {
       padding: 5px 0;
     }
+    .el-input__suffix {
+      cursor: pointer;
+      height: 32px;
+      top: 5px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      &:hover i { 
+        color: #ed3f14;
+      }
+    }
   }
+}
+
+.task-allot-select-synergies {
+  border-radius: 2px;
+  border: 1px solid $border-color-base;
+  line-height: 32px;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  &:hover {
+    border-color: #7ddddd;
+    cursor: text;  
+  }
+
+  &-placeholder {
+    color: rgb(193, 196, 203);
+    font-size: 13px;
+    padding: 0 10px;
+  }
+
+}
+
+.task-allot-select-synergie {
+  background-color: #f0f2f5;
+  height: 22px;
+  margin: 3px;
+  padding: 0 5px;
+  color: #909399;
+  border-radius: 4px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+
+  span{
+    display: inline-block;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    line-height: 100%;
+  }
+  
+  i{
+    cursor: pointer;
+    margin-left: 2px;
+    font-size: 13px;
+    line-height: 13px;
+  }
+
 }
