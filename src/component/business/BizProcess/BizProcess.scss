@@ -1,6 +1,6 @@
 $progress-height: 40px;
 $proccess-border-height: 40px;
-$progress-state-common-bg-color: #E6E6E6;
+$progress-state-common-bg-color: #F2F2F2;
 $progress-state-before-bg-color: #E1F3D8;
 
 @mixin triangle-border-color($color, $backgroundColor: '') {
@@ -49,12 +49,13 @@ $progress-state-before-bg-color: #E1F3D8;
   overflow: hidden;
 
   &-state {
-    margin-right: 42px;
     background-color: $progress-state-common-bg-color;
+    color: #999;
     cursor: pointer;
-
+    
     height: $progress-height;
     width: 120px;
+    margin-right: 42px;
 
     line-height: $progress-height;
     text-align: center;
@@ -362,7 +363,7 @@ $progress-state-before-bg-color: #E1F3D8;
 /* 已取消 */
 .biz-process-offed {
   border-radius: 11px;
-  border: 1px solid #E6E6E6;
+  border: 1px solid $progress-state-common-bg-color;
   color: #fff;
 
   height: 22px;
