@@ -103,7 +103,6 @@ export default {
     columns.forEach(column => {
       checkedMap[column.value] = [];
     });
-
     return {
       checkedMap,
       checkedGroupArr: [],
@@ -162,6 +161,7 @@ export default {
       let checkedMap = this.checkedMap;
 
       this.checkedGroupArr = [];
+      console.log(this.checkedMap)
 
       for(let key in checkedMap) {
         let item = checkedMap[key];

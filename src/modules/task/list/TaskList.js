@@ -67,6 +67,7 @@ export default {
       selectColumnState: "", //视图选择列状态存储
       planTimeType: "", //判断计划时间展示的样式
       keyword_select: "表单内容", // 搜索筛选条件
+      exportColumnList: [],
       selectList: [
         { name: "全部", id: "all" },
         { name: "我创建的", id: "create" },
@@ -305,9 +306,10 @@ export default {
   mounted() {
     console.log("taskView", this.initData);
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
-    this.currentTaskType = this.taskTypeList.length === 1 ? this.taskTypes[1] : this.taskTypes[0];
-    if(this.taskTypeList.length === 1) {
-      this.getCardDetailList(this.taskTypes[1].id)
+    this.currentTaskType =
+      this.taskTypeList.length === 1 ? this.taskTypes[1] : this.taskTypes[0];
+    if (this.taskTypeList.length === 1) {
+      this.getCardDetailList(this.taskTypes[1].id);
     }
 
     this.getUserViews();
@@ -338,7 +340,24 @@ export default {
      * 获取附件
      */
     async getCardDetailList(typeId) {
-      const {} = await TaskApi.getCardDetailList({typeId})
+      const res = await TaskApi.getCardDetailList({ typeId });
+      let list = res.map((item) => {
+        let columns = item.fields.map((v) => {
+          return {
+            export: item.canRead,
+            displayName: v.displayName,
+            label: v.displayName
+          };
+        });
+        return {
+          value: "annexChecked",
+          label: `附加组件：${item.cardName}`,
+          inputType: item.inputType,
+          columns,
+        };
+      });
+      console.log(list, this.exportColumns)
+      this.exportColumnList = [...this.exportColumns, ...list];
     },
     /**
      * 获取视图
@@ -497,14 +516,13 @@ export default {
       const { advanceds } = this;
     },
     // 最高事件
-    allEvent() {
-    },
+    allEvent() {},
     /**
      * 顶部筛选, 状态数据展示
      */
     getTaskCountByState(searchModel = {}) {
       // 如果没有缓存时间或者超过1小时
-      // var now = new Date().getTime();
+      var now = new Date().getTime();
       // const localData = JSON.parse(localStorage.getItem("getTaskCountByState"));
       // if (!localData || now - localData.date > 60 * 60 * 1000) {
       TaskApi.getTaskCountByState(searchModel).then((res) => {
@@ -722,6 +740,7 @@ export default {
 
       // S 高级搜索
       this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
+      console.log("高级搜索", this.advanceds);
       // E 高级搜索
 
       this.columns = fields
@@ -923,7 +942,7 @@ export default {
      */
     changeTaskType(taskType) {
       this.currentTaskType = taskType;
-      this.getCardDetailList(taskType.id)
+      this.getCardDetailList(taskType.id);
       this.initialize();
     },
     /**
@@ -1150,10 +1169,9 @@ export default {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
         .then((res) => {
           let searchModel;
-          this.planTimeType =
-            res[0].filter((item) => {
-              return item.displayName === "计划时间";
-            })[0].setting.dateType;
+          this.planTimeType = res[0].filter((item) => {
+            return item.displayName === "计划时间";
+          })[0].setting.dateType;
           this.buildColumns();
           this.taskView.map((item) => {
             if (item.id === this.filterId) {

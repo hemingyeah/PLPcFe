@@ -341,11 +341,7 @@
           <div class="top-btn-group task-span1 task-flex task-ai">
             <!-- 新建 -->
             <el-dropdown>
-              <base-button
-                type="primary"
-                icon="icon-add"
-                >新建</base-button
-              >
+              <base-button type="primary" icon="icon-add">新建</base-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
                   v-for="(item, index) in initData.tagTaskTypeList"
@@ -428,7 +424,7 @@
                     导入工单
                     <div class="import-task-item">
                       <div
-                        v-for="(item, index) in taskTypes"
+                        v-for="(item, index) in taskTypeList"
                         :key="index"
                         @click="imporTask(item)"
                       >
@@ -832,7 +828,7 @@
       <base-export-group
         ref="exportPanel"
         :alert="exportAlert"
-        :columns="exportColumns"
+        :columns="exportColumnList"
         :build-params="buildExportParams"
         :group="true"
         :validate="checkExportCount"
