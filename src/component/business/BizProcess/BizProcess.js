@@ -68,13 +68,19 @@ const BizProcess = {
       return index;
     },
     genExceptionStyle() {
+      let genCurrentStateIndex = this.genCurrentStateIndex;
+      let left = ProcessItemWidth * this.genCurrentStateIndex;
       return {
-        left: `${ProcessItemWidth * this.genCurrentStateIndex}px`
+        left: `${ genCurrentStateIndex == 1 ? left + 66 : left }px`
       }
     },
     // 判断是否是以取消
     isOffed() {
       return this.value === TaskStateEnum.OFFED.value
+    },
+    isException() {
+      let { isPaused, isOverTime } = this.data
+      return isPaused === 1 || isOverTime === 1
     },
     // 是否曾回退
     onceRollback() {
@@ -208,8 +214,9 @@ const BizProcess = {
     },
     /* 渲染工单状态超时 */
     renderProcessOverTime() {
+      let index = this.genCurrentStateIndex == 0 ? 0 : this.genCurrentStateIndex + .5
       let style = {
-        left: `${ProcessItemWidth * (this.genCurrentStateIndex + .5)}px`,
+        left: `${ProcessItemWidth * index}px`,
         color: TaskStateEnum.PSUSED.color
       }
       let overTime = this.genOverTime();
@@ -254,9 +261,15 @@ const BizProcess = {
         <div class="biz-process">
           { this.genStateProcess.map((state, index) => this.renderProcessStateItem(h, state, index)) }
         </div>
-        <div class="biz-process-exception">
-          { this.renderProcessException(h) }
-        </div>
+        { 
+          this.isException 
+            ? (
+              <div class="biz-process-exception">
+                { this.renderProcessException(h) }
+              </div>
+            )
+            : null
+        }
       </div>
     )
   }
