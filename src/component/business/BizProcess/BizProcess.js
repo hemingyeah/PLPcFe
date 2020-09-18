@@ -175,7 +175,7 @@ const BizProcess = {
       // 曾暂停
       let oncePaused = this.data.oncePaused === 1
       // 位置异常
-      let positionException = this.positionException === 1
+      let positionException = this.data.positionException === 1
       // 是否是异常
       let isException = onceOverTime || oncePaused || positionException
       // 提示内容
@@ -253,7 +253,6 @@ const BizProcess = {
       <div class="biz-process-block">
         <div class="biz-process">
           { this.genStateProcess.map((state, index) => this.renderProcessStateItem(h, state, index)) }
-          { this.renderProcessExceptionTextAndIcon(h) }
         </div>
         <div class="biz-process-exception">
           { this.renderProcessException(h) }

@@ -88,6 +88,8 @@
         <!-- end 顶部按钮组 -->
       </div>
 
+      <biz-process-exception :data="task" v-if="collapse" />
+
       <div class="task-detail-header-bottom" :class="{'active': !collapse}">
         <div class="customer-info-wrap">
           <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">{{ customer.name }}</div>

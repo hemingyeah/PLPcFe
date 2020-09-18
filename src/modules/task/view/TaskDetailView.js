@@ -1043,5 +1043,40 @@ export default {
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
     [TaskView.name]: TaskView,
+    'biz-process-exception': {
+      name: 'biz-process-exception',
+      props: {
+        data: Object,
+        default: () => ({})
+      },
+      render(h) {
+        // 曾超时
+        let onceOverTime = this.data.onceOverTime === 1
+        // 曾暂停
+        let oncePaused = this.data.oncePaused === 1
+        // 位置异常
+        let positionException = this.data.positionException === 1
+        // 是否是异常
+        let isException = onceOverTime || oncePaused || positionException
+        // 提示内容
+        let content = []
+        onceOverTime && content.push('曾超时')
+        oncePaused && content.push('曾暂停')
+        positionException && content.push('位置异常')
+
+        let exceptionDom = (
+          <div class="biz-process-exception-text">
+            <el-tooltip content={ content.join(', ') } placement="top">
+              <div>
+                <i class="iconfont icon-info"></i>
+                <span>工单异常</span>
+              </div>
+            </el-tooltip>
+          </div>
+        )
+
+        return isException ? exceptionDom : ''
+      }
+    }
   }
 }
