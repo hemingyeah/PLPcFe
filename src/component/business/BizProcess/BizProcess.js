@@ -214,13 +214,13 @@ const BizProcess = {
     },
     /* 渲染工单状态超时 */
     renderProcessOverTime() {
-      let index = this.genCurrentStateIndex == 0 ? 0 : this.genCurrentStateIndex + .5
+      let index = this.genCurrentStateIndex + .5
       let style = {
         left: `${ProcessItemWidth * index}px`,
         color: TaskStateEnum.PSUSED.color
       }
       let overTime = this.genOverTime();
-      let overTimeDom = <div>{`时限: ${overTime}小时`}</div>
+      let overTimeDom = <div class="biz-process-exception-time">{`时限: ${overTime}小时`}</div>
 
       return (
         <div style={ style }> 
@@ -265,6 +265,7 @@ const BizProcess = {
           this.isException 
             ? (
               <div class="biz-process-exception">
+                { this.renderProcessExceptionTextAndIcon(h) }
                 { this.renderProcessException(h) }
               </div>
             )

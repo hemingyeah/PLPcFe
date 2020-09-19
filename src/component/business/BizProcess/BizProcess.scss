@@ -360,6 +360,16 @@ $progress-state-before-bg-color: #E1F3D8;
   justify-content: flex-start;
 }
 
+.biz-process-exception-time {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 100%;
+  @include text-ellipsis();
+}
+
 /* 已取消 */
 .biz-process-offed {
   border-radius: 11px;
