@@ -123,7 +123,11 @@ export default {
         // 绑定产品
         this.updateProductValue(productArr);
         // 更新产品信息
-        this.updateProduct(productArr);
+        this.updateProduct(productArr, {
+          isForceUpdateCustomer: false,
+          isUpdateCustomerProduct: true,
+          isSilentUpdateLinkmanAndAddress: true
+        });
         // 关闭弹窗
         this.addProductDialog = false;
 
@@ -423,8 +427,8 @@ export default {
       address = address[0] || {};
 
       // 是否是相同的 联系人/地址
-      let isSameLinkman = productLinkman.id === linkman.id;
-      let isSameAddress = productAddress.id === address.id;
+      let isSameLinkman = productLinkman.id === linkman.id || !productLinkman.id;
+      let isSameAddress = productAddress.id === address.id || !productAddress.id;
 
       let confirm = false;
       
@@ -669,7 +673,7 @@ export default {
      * @param {Array[Product]} value 产品数据
      * @param {Object} options 配置
     */
-    async updateProduct(value, options = { 
+    async updateProduct(value, options = {
       isForceUpdateCustomer: false,
       isUpdateCustomerProduct: true,
       isSilentUpdateLinkmanAndAddress: false

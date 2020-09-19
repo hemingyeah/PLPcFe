@@ -4,7 +4,7 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 /* util */
 import AuthUtil from '@src/util/auth';
 import { getRootWindow } from '@src/util/dom';
-import TaskStateEnum from '@model/enum/TaskStateEnum';
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import Filter from '@src/filter/filter.js';
 
 /* component */
