@@ -37,8 +37,6 @@ export default {
       task: this.initData?.task || {},
       taskState: this.initData?.task?.state || '',
       fields: [], // 工单表单字段
-      tabs: [], // 工单关联数据tab
-      currTab: 'task-info-record', // 当前选中的tab
       // 回退工单弹窗
       backDialog: {
         visible: false,
@@ -83,19 +81,25 @@ export default {
     planTimeField() {
       return this.fields.filter(f => f.fieldName === 'planTime')[0];
     },
-    /** 
-    * @description 重点显示的自定义字段
-    * 默认显示工单类型、计划时间、服务内容
-    */
-    keyFields() {
-      let defaultFields = this.fields.filter(f => f.fieldName === 'planTime' || f.fieldName === 'serviceContent');
-      return [{
-        displayName: '工单类型',
-        fieldName: 'templateName',
-        isSystem: 1
-      },
-      ...defaultFields
-      ]
+    /* 计划时间 */
+    planTime() {
+      let { dateType } = this.planTimeField?.setting || {};
+      let { isEncryptPlanTime, planTime } = this.task;
+
+      if (planTime) {
+        if (isEncryptPlanTime) return ENCRYPT_FIELD_VALUE;
+
+        // 计划时间格式为日期时需格式化
+        if (dateType == 'date') return planTime.slice(0, 10);
+
+        return planTime;
+      }
+
+      return '';
+    },
+    /* 服务内容字段 */
+    serviceContentField() {
+      return this.fields.filter(f => f.fieldName === 'serviceContent')[0];
     },
     /** 工单设置 */
     taskConfig() {
@@ -157,7 +161,7 @@ export default {
     * 5. 满足以上条件就会显示编辑按钮 无论是否有工单编辑权限TASK_EDIT
     */
     allowEditTask() {
-      return !this.isApproving && !this.isPaused && this.initData.canEditTask && this.initData.isAllowUpdate;
+      return !this.isApproving && !this.isPaused && this.initData.canEditTask && this.initData.isAllowUpdate && !this.isDelete;
     },
     /** 
     * @description 是否显示删除按钮
@@ -167,7 +171,7 @@ export default {
     * 4. 且 工单允许删除 canDeleteTask
     */
     allowDeleteTask() {
-      return !this.isApproving && !this.isPaused && this.hasAuth('TASK_DELETE') && this.initData.canDeleteTask;
+      return !this.isApproving && !this.isPaused && this.hasAuth('TASK_DELETE') && this.initData.canDeleteTask && !this.isDelete;
     },
     /** 
     * @description 是否显示回退工单按钮
@@ -326,10 +330,6 @@ export default {
       let { state } = this.task;
 
       return this.isExecutor && !this.isApproving && !this.isPaused && ((state === 'accepted' && !startFlow) || (state === 'processing' && startFlow));
-    },
-    /* 是否显示添加备注按钮 */
-    allowRemark() {
-      return this.initData.canViewTask;
     },
     /** 
      * @description 是否显示 [审核结算]tab
@@ -552,39 +552,21 @@ export default {
     showCustomerRelationTaskCount() {
       let { all } = this.customerRelationTaskCountData;
       return this.customer?.id && Number(all) > 0 && !this.isEncryptField(this.customer.name);
+    },
+    /** 
+    * @description 工单状态
+    */
+    stateText() {
+      return TaskStateEnum.getNameForTask(this.task);
+    },
+    /** 
+    * @description 工单状态颜色
+    */
+    stateColor() {
+      return TaskStateEnum.getColorForTask(this.task);
     }
   },
   methods: {
-    // 构建工单关联tabs
-    buildTabs() {
-      return [
-        {
-          displayName: '工单进度',
-          component: TaskInfoRecord.name,
-          show: true
-        },
-        {
-          displayName: '回执信息',
-          component: TaskReceiptView.name,
-          show: this.viewReceiptTab
-        },
-        {
-          displayName: '审核结算',
-          component: TaskAccount.name,
-          show: this.viewBalanceTab
-        },
-        {
-          displayName: '客户评价',
-          component: TaskFeedback.name,
-          show: this.viewFeedbackTab
-        },
-        {
-          displayName: '附加组件',
-          component: TaskCard.name,
-          show: this.initData?.cardInfo?.length
-        }
-      ].filter(tab => tab.show);
-    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
@@ -689,7 +671,7 @@ export default {
       const result = await TaskApi.pauseApproveCheck({ id: taskId, reason });
       if (!result.succ && result.message == '需要审批') {
         this.pauseDialog.visible = false;
-        this.$refs.proposeApprove.openDialog(result.data);
+        this.proposeApprove(result.data);
         this.pending = false;
         return;
       }
@@ -752,7 +734,7 @@ export default {
       // 开始是否需要审批
       const result = await TaskApi.startApproveCheck({ id: this.task.id });
       if (!result.succ && result.message == '需要审批') {
-        this.$refs.proposeApprove.openDialog(result.data);
+        this.proposeApprove(result.data);
         this.pending = false;
         return;
       }
@@ -852,8 +834,10 @@ export default {
       } else if (action === 'finish') {
         this.$refs.taskReceiptEdit.openDialog();
       } else if (action === 'balance') {
+        this.rightActiveTab = 'balance-tab';
         this.$refs.taskAccount.openDialog('create');
       } else if (action === 'feedback') {
+        this.rightActiveTab = 'feedback-tab';
         this.$refs.taskFeedback.feedback();
       }
     },
@@ -918,53 +902,22 @@ export default {
     isEncryptField(value) {
       return value === ENCRYPT_FIELD_VALUE;
     },
-    /** 
-    * @description 工单状态
-    */
-    getTaskStateName() {
-      return TaskStateEnum.getNameForTask(this.task);
-    },
-    /** 
-    * @description 工单状态备件色
-    */
-    getTaskStateColor() {
-      return TaskStateEnum.getColorForTask(this.task);
-    },
     buildButtonData() {
-      // TODO：结算、回访操作
-      let stateBtnMap = {
-        created: [
-          { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
-          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
-          { name: '继续', type: 'primary', show: this.allowGoOnTask, event: this.unpause },
-          { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
-          { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
-        ],
-        allocated: [
-          { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
-          { name: '拒绝', type: 'danger', show: this.allowRefuseTask, event: () => { this.openDialog('refuse') } },
-          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } }
-        ],
-        accepted: [
-          { name: '开始', type: 'primary', show: this.allowStartTask, event: this.start },
-          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
-          { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
-          { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
-        ],
-        processing: [
-          { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
-          { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
-          { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
-          { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
-        ],
-        finished: [
-          { name: '回退', type: 'primary', show: this.allowBackTask, event: () => this.backTask },
-          { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
-          { name: '回访', type: 'primary', show: this.viewFeedbackTab && this.allowReviewTask, event: () => { this.openDialog('feedback') } }
-        ]
-      }
-
-      return stateBtnMap[this.task.state];
+      return [
+        { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
+        { name: '接单', type: 'primary', show: this.allowPoolTask, event: () => { this.openDialog('acceptFromPool') } },
+        { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
+        { name: '开始', type: 'primary', show: this.allowStartTask, event: this.start },
+        { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
+        { name: '回退', type: 'primary', show: this.allowBackTask, event: this.backTask },
+        { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
+        { name: '回访', type: 'primary', show: this.viewFeedbackTab && this.allowReviewTask, event: () => { this.openDialog('feedback') } },
+        { name: '拒绝', type: 'danger', show: this.allowRefuseTask, event: () => { this.openDialog('refuse') } },
+        { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
+        { name: '继续', type: 'primary', show: this.allowGoOnTask, event: this.unpause },
+        { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
+        { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
+      ]
     }
   },
   async mounted() {
@@ -981,7 +934,7 @@ export default {
       ];
 
       // 显示回执时获取回执字段信息
-      if (this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: 'task_receipt' }));
+      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: 'task_receipt' }));
 
       const result = await Promise.all(subtask);
 
@@ -1003,6 +956,9 @@ export default {
         displayName: '满意度',
         fieldName: 'degree'
       }, {
+        displayName: '工单状态',
+        fieldName: 'state'
+      }, {
         displayName: '创建人',
         fieldName: 'createUser',
         formType: 'user',
@@ -1020,7 +976,6 @@ export default {
       }];
 
       this.receiptFields = result[1] || [];
-      this.tabs = this.buildTabs();
       this.stateButtonData = this.buildButtonData();
 
       this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'card-tab';

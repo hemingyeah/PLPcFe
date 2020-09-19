@@ -195,7 +195,11 @@ export default {
 
       TaskApi[API](params).then(res => {
         if (res.success) {
-          this.$platform.alert('保存成功');
+          this.$platform.notification({
+            type: 'success',
+            title: '保存成功'
+          })
+
           window.location.reload();
         } else {
           this.$platform.alert(res.message);
@@ -230,7 +234,11 @@ export default {
 
         TaskApi[API](params).then(res => {
           if (res.success) {
-            this.$platform.alert('删除成功');
+            this.$platform.notification({
+              type: 'success',
+              title: '删除成功'
+            })
+
             window.location.reload();
           } else {
             this.$platform.alert(res.message);

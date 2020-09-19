@@ -207,7 +207,7 @@ class TaskStateEnum extends BaseEnum {
 
     return {
       color: TaskStateEnum.getColor(state),
-      bgColor: TaskStateEnum.getBgColor(state)
+      bgColor: TaskStateEnum.getBgColor(state, 0.2)
     }
   }
 

@@ -200,7 +200,11 @@ export default {
       
       TaskApi.reviewTask(params).then((res) => {
         if (res.success) {
-          this.$platform.alert('回访成功');
+          this.$platform.notification({
+            type: 'success',
+            title: '回访成功'
+          })
+
           window.location.reload();
         } else {
           this.$platform.alert(res.message);
