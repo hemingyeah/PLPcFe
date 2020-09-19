@@ -48,12 +48,12 @@ export default {
       const list = [];
       fields.map((item) => {
         if (
-          item.enabled != 0 &&
-          item.formType != "taskNo" &&
-          item.formType != "attachment" &&
-          item.formType != "customer" &&
-          item.formType != "relationProduct" &&
-          item.formType != "relationCustomer"
+          item.enabled &&
+          item.field != "taskNo" &&
+          item.field != "attachment" &&
+          item.field != "customer" &&
+          item.field != "relationProduct" &&
+          item.field != "relationCustomer"
         ) {
           list.push(item);
         }
@@ -139,17 +139,21 @@ export default {
     async onSubmit() {
       const { selectedIds, config } = this;
       const buildParams = this.buildParams();
-      console.log(config.currentTaskType)
+      console.log(config.currentTaskType);
       let params = {
         taskIds: selectedIds,
         templateId: config.currentTaskType.id,
-        fieldType: buildParams.fieldType,
+        fieldType: buildParams.fieldType ? 0 : 1,
         fieldName: "",
         value: "",
       };
       for (let key in JSON.parse(buildParams.mapJson)) {
         params.fieldName = key;
         params.value = JSON.parse(buildParams.mapJson)[key];
+      }
+      if (!params.value) {
+        this.$platform.alert("值不能为空");
+        return;
       }
       const { status, message, data } = await TaskApi.editBatchTask(params);
       if (status === 1) {
@@ -163,14 +167,14 @@ export default {
               msg += ",";
             }
           });
-          msg += '。成功修改'+succ.length+'个';
+          msg += "。成功修改" + succ.length + "个";
         }
         this.$platform.alert(msg);
       } else {
         this.$platform.alert(message);
       }
       this.visible = false;
-      this.$emit('update')
+      this.$emit("update");
     },
   },
   components: {
@@ -231,7 +235,7 @@ export default {
           }
 
           const f = event.field;
-          this.form[f.fieldName] = event.newValue;
+          this.form = { [f.fieldName]: event.newValue };
         },
         selectField(val) {
           this.selectedField = this.fields.filter(
@@ -314,7 +318,6 @@ export default {
               update: (event) => this.update(event),
             },
           };
-
           // if (sf.formType === 'address' && !sf.isSystem) {
           //   data.props.disableMap = true;
           // }

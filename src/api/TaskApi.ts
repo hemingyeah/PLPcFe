@@ -4,12 +4,13 @@ import {
   PlanTaskCreateAndEditModel,
 } from "@model/param/in/Task";
 
-const fixedPrefixTaskPath = "/api/task";
-const ElASTICSEARCH =  "/api/elasticsearch";
+// const fixedPrefixTaskPath = "/api/task";
+// const ElASTICSEARCH =  "/api/elasticsearch";
+// const fixedPrefixPaymentPath = '/api/payment';
 
-// const fixedPrefixTaskPath = "";
-// const ElASTICSEARCH =  "";
-const fixedPrefixPaymentPath = '/api/payment';
+const fixedPrefixTaskPath = "";
+const ElASTICSEARCH = "";
+const fixedPrefixPaymentPath = "";
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -478,7 +479,10 @@ export function balanceTask(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  */
 export function editBalance(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/editBalance`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/editBalance`,
+    params
+  );
 }
 
 /**
@@ -539,7 +543,10 @@ export function taskEditCard(params: {} | undefined) {
  * @param {String} params.taskId 工单id
  */
 export function taskDeleteCard(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/card/delete`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/card/delete`,
+    params
+  );
 }
 
 /**
@@ -549,7 +556,10 @@ export function taskDeleteCard(params: {} | undefined) {
  * @param {String} params.orderId 工单id
  */
 export function getHoursRecordList(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/getMainList`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/tasktime/getMainList`,
+    params
+  );
 }
 
 /**
@@ -557,7 +567,10 @@ export function getHoursRecordList(params: {} | undefined) {
  * @param {String} params.id 工时记录附加组件实例id
  */
 export function updateHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/updateWorkTimeRecord`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/tasktime/updateWorkTimeRecord`,
+    params
+  );
 }
 
 /**
@@ -567,7 +580,10 @@ export function updateHoursRecord(params: {} | undefined) {
  * @param {String} params.recordFromType 默认1
  */
 export function createHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/createWorkTimeRecordForweb`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/tasktime/createWorkTimeRecordForweb`,
+    params
+  );
 }
 
 /**
@@ -575,7 +591,11 @@ export function createHoursRecord(params: {} | undefined) {
  * @param {String} params.mainId 工时记录附加组件实例id
  */
 export function deleteHoursRecord(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/deleteWorkTimeRecord`, params, false);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/tasktime/deleteWorkTimeRecord`,
+    params,
+    false
+  );
 }
 
 /**
@@ -583,7 +603,11 @@ export function deleteHoursRecord(params: {} | undefined) {
  * @param {String} params.mainId 工时记录附加组件实例id
  */
 export function hoursRecordLocation(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/tasktime/getDetailList`, params, false);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/tasktime/getDetailList`,
+    params,
+    false
+  );
 }
 
 /**
@@ -597,21 +621,30 @@ export function finishTask(params: {} | undefined) {
  * @description 编辑回执
  */
 export function editReceipt(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/editReceipt`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/editReceipt`,
+    params
+  );
 }
 
 /**
  * @description 暂存回执
  */
 export function receiptDraft(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/receiptDraft/save`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/receiptDraft/save`,
+    params
+  );
 }
 
 /**
  * @description 修改协同人
  */
 export function updateSynergies(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`,
+    params
+  );
 }
 
 /**
@@ -619,8 +652,11 @@ export function updateSynergies(params: {} | undefined) {
  * @param {Object} params 参数
  * @param {String} params.taskId 工单id
  */
-export function getPaymentOrder(params: {} | undefined){
-  return http.get(`${fixedPrefixPaymentPath}/outside/payment/order/query`, params);
+export function getPaymentOrder(params: {} | undefined) {
+  return http.get(
+    `${fixedPrefixPaymentPath}/outside/payment/order/query`,
+    params
+  );
 }
 
 /**
@@ -628,8 +664,11 @@ export function getPaymentOrder(params: {} | undefined){
  * @param {Object} params 参数
  * @param {String} params.taskId 工单id
  */
-export function getPaymentDetail(params: {} | undefined){
-  return http.get(`${fixedPrefixPaymentPath}/outside/paymentBill/online/getByTaskId`, params);
+export function getPaymentDetail(params: {} | undefined) {
+  return http.get(
+    `${fixedPrefixPaymentPath}/outside/paymentBill/online/getByTaskId`,
+    params
+  );
 }
 
 /**
@@ -712,7 +751,10 @@ export function getTaskCardDetailList(params: {} | undefined) {
  * 顶部筛选, 状态数据展示
  */
 export function getTaskCountByState(params: {} | undefined) {
-  return http.post(`${ElASTICSEARCH}/outside/es/task/getTaskCountByState`, params);
+  return http.post(
+    `${ElASTICSEARCH}/outside/es/task/getTaskCountByState`,
+    params
+  );
 }
 /**
  * 存为视图
@@ -753,7 +795,7 @@ export function editView(params: {} | undefined) {
  */
 export function deleteView(params: {} | undefined) {
   return http.get(
-    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView/${params}`,
+    `${fixedPrefixTaskPath}/outside/pc/view/deleteOneView/${params}`
   );
 }
 
@@ -937,7 +979,10 @@ export function withPart(params: Object = {}) {
  * @description 批量更新
  */
 export function editBatchTask(params: Object = {}) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/editBatchTask`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/editBatchTask`,
+    params
+  );
 }
 
 /**
@@ -951,14 +996,20 @@ export function redeployBatch(params: Object = {}) {
  * @description 新建计划任务
  */
 export function createPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/planTask/create`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/planTask/create`,
+    params
+  );
 }
 
 /**
  * @description 编辑计划任务
  */
 export function editPlanTask(params: PlanTaskCreateAndEditModel) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/planTask/update`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/planTask/update`,
+    params
+  );
 }
 
 /**
@@ -972,7 +1023,10 @@ export function editPlanTask(params: PlanTaskCreateAndEditModel) {
  * @param {Number} params.cusNotice - 向客户发送短信
  */
 export function taskRecordCreate(params: any) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/taskrecord/create`, params);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/taskrecord/create`,
+    params
+  );
 }
 
 /**
@@ -981,7 +1035,11 @@ export function taskRecordCreate(params: any) {
  * @param {String} params.taskId - 工单Id
  */
 export function taskRecordList(params: any) {
-  return http.get(`${fixedPrefixTaskPath}/outside/pc/taskrecord/list`, params, false);
+  return http.get(
+    `${fixedPrefixTaskPath}/outside/pc/taskrecord/list`,
+    params,
+    false
+  );
 }
 
 /**
@@ -990,7 +1048,11 @@ export function taskRecordList(params: any) {
  * @param {String} params.id -  工单备注Id
  */
 export function taskRecordDelete(params: any) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/taskrecord/logicDelete`, params, false);
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/taskrecord/logicDelete`,
+    params,
+    false
+  );
 }
 
 /**
@@ -1004,7 +1066,17 @@ export function dialout(params: object) {
  * @description 获取视图
  */
 export function getUserViews(params: object) {
-  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getUserViews`, params);
+  return http.get(
+    `${fixedPrefixTaskPath}/outside/pc/view/getUserViews`,
+    params
+  );
+}
+
+/**
+ * @description 获取附件
+ */
+export function getCardDetailList(params: object) {
+  return http.get(`${fixedPrefixTaskPath}/task/getCardDetailList`, params);
 }
 
 /* -------------  end  新工单api ---------------- */

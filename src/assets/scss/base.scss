@@ -62,19 +62,126 @@ textarea {
   &-font12 {
     font-size: 12px;
   }
+  &-font14 {
+    font-size: 14px;
+  }
   &-font16 {
-    font-size: 12px;
+    font-size: 16px;
   }
   &-font24 {
     font-size: 24px;
   }
   // 加粗
-  &-fw6{
+  &-fw6 {
     font-weight: 600;
   }
   // 颜色
   &-c6 {
     color: #666;
   }
+  &-c3 {
+    color: #333;
+  }
+  &-cef {
+    color: #ef6b6b;
+  }
+  &-c06 {
+    color: rgba(0, 0, 0, 0.65);
+  }
+  &-cfa {
+    color: #FAAE14;
+  }
+  &-c2 {
+    color: #13c2c2!important;
+    font-weight: 500;
+  }
+  // 边距
+  &-ml12 {
+    margin-left: 12px;
+  }
+  &-mr4 {
+    margin-right: 4px;
+  }
+  &-ml4 {
+    margin-left: 4px;
+  }
+  &-mt8 {
+    margin-top: 8px;
+  }
+  &-mtb13 {
+    margin-top: 13px;
+    margin-bottom: 13px;
+  }
+  //
+  &-pointer {
+    cursor: pointer;
+  }
+  // top
+  &-top2 {
+    position: relative;
+    top: 2px;
+  }
 }
 // E 工单列表
+
+// element
+.base-button {
+  border-radius: 4px !important;
+  padding: 4px 15px !important;
+}
+
+.task-with-input {
+  width: 300px !important;
+}
+.task-with-select {
+  width: 100px !important;
+}
+.table-footer-select {
+  width: 60px;
+  margin: 0 4px;
+}
+.task-header-tr {
+  height: 40px;
+}
+.task-list-view {
+  .task-list-section th {
+    padding: 3px 0 !important;
+    border-bottom: 1px solid #ebebeb !important;
+    border-right: 1px solid #ebebeb !important;
+    &:first-child {
+      border-right: none !important;
+    }
+    > div {
+      font-size: 14px !important;
+    }
+  }
+  .task-list-section td {
+    padding: 4px 0 !important;
+    border-bottom: 1px solid #ebebeb !important;
+    border-right: 1px solid #ebebeb !important;
+    &:first-child {
+      border-right: none !important;
+    }
+    > div {
+      font-size: 14px !important;
+      line-height: 31px !important;
+      color: #666 !important;
+    }
+  }
+  .ascending {
+    border-bottom-color: #333!important;
+  }
+  .descending {
+    border-top-color: #333!important;
+  }
+  .el-table .ascending .sort-caret.ascending {
+    border-bottom-color:#55B7B4!important;
+  }
+  .el-table .descending .sort-caret.descending {
+    border-top-color:#55B7B4!important;
+  }
+  .el-table--border {
+    border: none;
+    padding: 0;
+  }
+}

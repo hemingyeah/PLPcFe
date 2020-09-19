@@ -1,11 +1,17 @@
 .task-state-block {
-  border-radius: 3px;
-  color: #fff;
-  font-weight: 700;
-  text-align: center;
-  padding: 3px;
+  width: 52px;
+  height: 22px;
+  border-radius: 11px;
   margin-left: 5px;
-
+  margin-top: 5px;
+  text-align: center;
+  line-height: 22px;
+  &-overtime,
+  &-approve {
+    display: inline-block;
+    border-radius: 4px;
+    color: #fff;
+  }
   &-overtime {
     background-color: #ff9100;
   }
@@ -20,6 +26,11 @@
 
 // S 顶部筛选
 .common-list {
+  &-section {
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 16px;
+  }
   &-filter {
     padding-bottom: 10px;
     &-flow {
@@ -94,10 +105,6 @@
       }
     }
   }
-}
-//颜色
-.ce6 {
-  color: #ef6b6b;
 }
 // E 顶部筛选
 
@@ -194,4 +201,96 @@
   &:hover {
     text-decoration: underline;
   }
+}
+
+.task-list {
+  &-header {
+    background: #ffffff;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.06);
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    border-top: none;
+    &-seach {
+      padding: 6px 0;
+      .seach {
+        justify-content: flex-end;
+        padding-right: 16px;
+        .advanced-search-visible-btn {
+          width: 98px;
+          height: 32px;
+          background: #e9f9f9;
+          border-radius: 4px;
+          border: 1px solid #d0f3f4;
+          font-size: 14px;
+          color: #13c2c2;
+          line-height: 32px;
+          text-align: center;
+          cursor: pointer;
+        }
+      }
+    }
+    &-nav {
+      > div {
+        cursor: pointer;
+        height: 32px;
+        line-height: 32px;
+        border-top: 1px solid #e6e6e6;
+        .state {
+          height: 31px;
+          padding-left: 11px;
+          width: 10%;
+          font-weight: 500;
+          background-color: #f2f2f2;
+        }
+        .list {
+          width: 90%;
+          height: 31px;
+          overflow: hidden;
+          overflow-x: scroll;
+          &::-webkit-scrollbar {
+            display: none;
+          }
+          .list-item {
+            > div {
+              height: 31px;
+              padding-left: 11px;
+              font-size: 14px;
+              width: 130px;
+              color: #666;
+              &:hover {
+                color: #333;
+              }
+            }
+          }
+        }
+        .list-crate {
+          overflow-x: hidden;
+        }
+      }
+    }
+  }
+}
+.task-list-del {
+  cursor: pointer;
+  width: 88px;
+  text-align: center;
+}
+.task-width103 {
+  padding: 0 25px;
+  text-align: center;
+}
+.table-footer {
+  margin-top: 50px;
+}
+.task-ic19 {
+  width: 19px;
+  height: 16px;
+  margin-right: 9px;
+}
+.task-list-wd252 {
+  width: 170px;
+}
+.task-list-dropdown-item {
+  width: 100px;
 }

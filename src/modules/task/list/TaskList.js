@@ -55,21 +55,19 @@ export default {
       selectIds, // id
       taskView: [], // 顶部筛选列表
       otherList: [], //其他列表
-      filterId: selectIds.createdId, //顶部筛选选中的状态id
-      allShow: false, // 全部工单
-      otherShow: false, //其他
-      addShow: false, //新建
-      otherText: "其他", //其他文案
+      filterId: selectIds.allId, //顶部筛选选中的状态id
+      otherText: "自定义筛选视图", //其他文案
       filterData: {}, //状态数据
       region: {}, //保存视图的数据
       isViewModel: "默认", //视图是否保存过
       advanceds: advancedList, //高级搜索列表
       searchParams: {}, //筛选列表的参数
-      allSearchParams: {}, //全部工单搜索条件
       dropDownInfo: "", //顶部下拉
       mapShow: true, //地图预览
       selectColumnState: "", //视图选择列状态存储
       planTimeType: "", //判断计划时间展示的样式
+      keyword_select: "表单内容", // 搜索筛选条件
+      exportColumnList: [],
       selectList: [
         { name: "全部", id: "all" },
         { name: "我创建的", id: "create" },
@@ -283,6 +281,15 @@ export default {
 
       return taskTypeFilterFields;
     },
+    /*批量编辑过滤后的字段 */
+    taskFieldList() {
+      let fields = this.taskFields || [];
+      let taskTypeFilterFields = fields.filter((field) =>
+        this.filterFieldFuncHandle(field)
+      );
+
+      return taskTypeFilterFields;
+    },
   },
   filters: {
     displaySelect(value) {
@@ -299,12 +306,15 @@ export default {
   mounted() {
     console.log("taskView", this.initData);
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
-    this.currentTaskType = this.taskTypes[0];
+    this.currentTaskType =
+      this.taskTypeList.length === 1 ? this.taskTypes[1] : this.taskTypes[0];
+    if (this.taskTypeList.length === 1) {
+      this.getCardDetailList(this.taskTypes[1].id);
+    }
 
     this.getUserViews();
     this.getTaskCountByState();
     this.revertStorage();
-    this.isAdvanced();
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     window.__exports__refresh = this.searchList;
@@ -314,8 +324,8 @@ export default {
      * @description 高级搜索列表匹配
      */
     isAdvanced(list = "") {
-      const { initData } = this;
-      let selects = list ? list : initData.allFieldInfo;
+      if (!list) return;
+      let selects = list;
       selects.map((v, i) => {
         if (v.displayName === "优先级") {
           this.advanceds[8].setting = v.setting;
@@ -327,6 +337,29 @@ export default {
       });
     },
     /**
+     * 获取附件
+     */
+    async getCardDetailList(typeId) {
+      const res = await TaskApi.getCardDetailList({ typeId });
+      let list = res.map((item) => {
+        let columns = item.fields.map((v) => {
+          return {
+            export: item.canRead,
+            displayName: v.displayName,
+            label: v.displayName
+          };
+        });
+        return {
+          value: "annexChecked",
+          label: `附加组件：${item.cardName}`,
+          inputType: item.inputType,
+          columns,
+        };
+      });
+      console.log(list, this.exportColumns)
+      this.exportColumnList = [...this.exportColumns, ...list];
+    },
+    /**
      * 获取视图
      */
     async getUserViews() {
@@ -335,19 +368,6 @@ export default {
         this.taskView = result;
         this.otherLists(result);
         this.initialize();
-        console.log("视图", result);
-        result.map((item) => {
-          if (item.id === selectIds.allId) {
-            this.allSearchParams["all"] = item.searchModel;
-            this.allSearchParams["id"] = item.id;
-          } else if (item.id === selectIds.unfinishedId) {
-            this.allSearchParams["unfinished"] = item.searchModel;
-            this.allSearchParams["id"] = item.id;
-          } else if (item.id === selectIds.finished) {
-            this.allSearchParams["finished"] = item.searchModel;
-            this.allSearchParams["id"] = item.id;
-          }
-        });
       }
     },
     /**
@@ -392,6 +412,12 @@ export default {
         close: true,
         fromId,
       });
+    },
+    /**
+     * @description 选择展示模式
+     */
+    taskMode(type) {
+      this.mapShow = type === "列表模式" ? 1 : 0;
     },
     /**
      * @description 删除工单列表人员
@@ -448,6 +474,24 @@ export default {
       this.allShow = false;
       this.selectColumnState = title;
       this.params = this.initParams();
+
+      if (searchModel.createUser) {
+        this.selectId = "create";
+      } else if (searchModel.executor) {
+        this.selectId = "execute";
+      } else if (searchModel.synergyId) {
+        this.selectId = "synergy";
+      } else {
+        this.selectId = "all";
+      }
+      this.taskTypes.forEach((item) => {
+        if (item.id === searchModel.templateId) {
+          this.currentTaskType = item;
+        }
+      });
+      if (!searchModel.templateId) {
+        this.currentTaskType = { id: "", name: "全部" };
+      }
       this.search(searchModel);
       this.buildColumns();
     },
@@ -456,12 +500,8 @@ export default {
       this.isViewModel = "默认";
       this.region["viewId"] = id;
       this.filterId = id;
-      this.otherText = "其他";
+      this.otherText = "自定义筛选视图";
       this.selectColumnState = title;
-
-      if (["all", "unfinished", "finished"].indexOf(title) === -1) {
-        this.dropDownInfo = "";
-      }
       this.getTaskCountByState(searchModel);
       this.params = this.initParams();
       this.search(searchModel);
@@ -469,41 +509,20 @@ export default {
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
-    /*全部工单 */
-    checkAll({ searchModel, id, name, title }) {
-      console.log(id, name, searchModel, title);
-      this.selectColumnState = title;
-      this.dropDownInfo = {
-        id,
-        name,
-        searchModel,
-        title,
-      };
-      this.otherText = "其他";
-      this.filterId = id;
-      this.params = this.initParams();
-      this.getTaskCountByState(searchModel);
-      this.search(searchModel);
-      this.buildColumns();
-    },
     /**
      * @description 根据视图匹配高级筛选
      */
     advancedFilter(searchModel) {
-      const {advanceds} = this
+      const { advanceds } = this;
     },
     // 最高事件
-    allEvent() {
-      this.allShow = false;
-      this.otherShow = false;
-      this.addShow = false;
-    },
+    allEvent() {},
     /**
      * 顶部筛选, 状态数据展示
      */
     getTaskCountByState(searchModel = {}) {
       // 如果没有缓存时间或者超过1小时
-      // var now = new Date().getTime();
+      var now = new Date().getTime();
       // const localData = JSON.parse(localStorage.getItem("getTaskCountByState"));
       // if (!localData || now - localData.date > 60 * 60 * 1000) {
       TaskApi.getTaskCountByState(searchModel).then((res) => {
@@ -658,7 +677,7 @@ export default {
           // 把选中的匹配出来
           // this.matchSelected();
           console.log("工单列表渲染数据", this.taskPage);
-          this.multipleSelection = []
+          this.multipleSelection = [];
           return data;
         })
         .then(() => {
@@ -676,6 +695,26 @@ export default {
      */
     timestamp(value) {
       return formatDate(value * 1000, "HH小时mm分钟");
+    },
+    /**
+     * @description 表头更改
+     */
+    headerDragend(newWidth, oldWidth, column, event) {
+      let data = this.columns
+        .map((item) => {
+          if (item.displayName === column.label) {
+            item.width = column.width;
+          }
+          return item;
+        })
+        .map((item) => {
+          return {
+            field: item.field,
+            show: item.show,
+            width: item.width,
+          };
+        });
+      this.modifyColumnStatus({ type: "column", data });
     },
     /**
      * @description 构建列
@@ -701,6 +740,7 @@ export default {
 
       // S 高级搜索
       this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
+      console.log("高级搜索", this.advanceds);
       // E 高级搜索
 
       this.columns = fields
@@ -775,10 +815,8 @@ export default {
           col.show = show;
           col.width = width;
           col.type = "column";
-
           return col;
         });
-
       // 根据版本号判断是否需要支付方式
       if (!paymentConfig.version) {
         this.advanceds = this.advanceds.filter((item) => {
@@ -904,6 +942,7 @@ export default {
      */
     changeTaskType(taskType) {
       this.currentTaskType = taskType;
+      this.getCardDetailList(taskType.id);
       this.initialize();
     },
     /**
@@ -956,7 +995,6 @@ export default {
         templateId: this.currentTaskType.id || "",
         tableName: "task",
       };
-      console.log(params);
       return TaskApi.getTaskTemplateFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task";
@@ -1131,10 +1169,9 @@ export default {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
         .then((res) => {
           let searchModel;
-          this.planTimeType =
-            res[0].filter((item) => {
-              return item.displayName === "计划时间";
-            })[0].setting.dateType || this.initData.planTimeType;
+          this.planTimeType = res[0].filter((item) => {
+            return item.displayName === "计划时间";
+          })[0].setting.dateType;
           this.buildColumns();
           this.taskView.map((item) => {
             if (item.id === this.filterId) {
@@ -1153,7 +1190,7 @@ export default {
     initPage() {
       this.taskPage = new Page();
       this.taskPage.list = [];
-      this.params.pageNum = 1;
+      this.params.page = 1;
     },
     /**
      * @description 初始化参数
@@ -1375,6 +1412,7 @@ export default {
      */
     search(searchModel = "") {
       const params = this.buildSearchParams();
+      console.log("列表参数", params);
       const { selectId, initData, searchParams } = this;
       let mySearch;
       this.loading = true;
@@ -1543,53 +1581,48 @@ export default {
 
         const par = {
           ...citys,
-          conditions: [...paymentMethod, ...conditions].length
-            ? [...paymentMethod, ...conditions]
-            : searchParams.conditions, //支付方式
-          customerId: params.customerId || searchParams.customerId,
-          customerLinkman: params.tlmName || searchParams.customerLinkman,
-          cusAddress: params.cusAddress || searchParams.cusAddress,
-          productId: params.productId || searchParams.productId,
-          serviceType: params.serviceType || searchParams.serviceType,
-          serviceContent: params.serviceContent || searchParams.serviceContent,
-          level: params.level || searchParams.level,
-          createUser: params.createUser || searchParams.createUser,
-          allotUser: params.allotUser || searchParams.allotUser,
-          executor: params.executor || searchParams.executor,
-          synergyId: params.synergyId || searchParams.synergyId,
-          state: params.state || searchParams.state,
-          createTimeStart: createTimeStart || searchParams.createTimeStart,
-          createTimeEnd: createTimeEnd || searchParams.createTimeEnd,
-          planTimeStart: planTimeStart || searchParams.planTimeStart,
-          planTimeEnd: planTimeEnd || searchParams.planTimeEnd,
-          allotTimeStart: allotTimeStart || searchParams.allotTimeStart,
-          allotTimeEnd: allotTimeEnd || searchParams.allotTimeEnd,
-          acceptTimeStart: acceptTimeStart || searchParams.acceptTimeStart,
-          acceptTimeEnd: acceptTimeEnd || searchParams.acceptTimeEnd,
-          startTimeStart: startTimeStart || searchParams.startTimeStart,
-          startTimeEnd: startTimeEnd || searchParams.startTimeEnd,
-          completeTimeStart:
-            completeTimeStart || searchParams.completeTimeStart,
-          completeTimeEnd: completeTimeEnd || searchParams.completeTimeEnd,
-          updateTimeStart: updateTimeStart || searchParams.updateTimeStart,
-          updateTimeEnd: updateTimeEnd || searchParams.updateTimeEnd,
-          reviewTimeStart: reviewTimeStart || searchParams.reviewTimeStart,
-          reviewTimeEnd: reviewTimeEnd || searchParams.reviewTimeEnd,
-          balanceTimeStart: balanceTimeStart || searchParams.balanceTimeStart,
-          balanceTimeEnd: balanceTimeEnd || searchParams.balanceTimeEnd,
-          closeTimeStart: closeTimeStart || searchParams.closeTimeStart,
-          closeTimeEnd: closeTimeEnd || searchParams.closeTimeEnd,
-          allotType: allotType || searchParams.allotType,
-          onceException: onceException || searchParams.onceException,
-          onceReallot: onceReallot || searchParams.onceReallot,
-          inApprove: inApprove || searchParams.inApprove,
-          sorts: sorts || searchParams.sorts,
-          tagId: params.tagId || searchParams.tagId,
-          keyword: params.keyword || searchParams.keyword,
-          page: params.page || searchParams.page,
-          pageSize: params.pageSize || searchParams.pageSize,
-          templateId: this.currentTaskType.id || searchParams.templateId,
-          ...mySearch,
+          conditions: [...paymentMethod, ...conditions], //支付方式
+          customerId: params.customerId,
+          customerLinkman: params.tlmName,
+          cusAddress: params.cusAddress,
+          productId: params.productId,
+          serviceType: params.serviceType,
+          serviceContent: params.serviceContent,
+          level: params.level,
+          createUser: mySearch.createUser || params.createUser,
+          allotUser: params.allotUser,
+          executor: mySearch.executor || params.executor,
+          synergyId: mySearch.synergyId || params.synergyId,
+          createTimeStart,
+          createTimeEnd,
+          planTimeStart,
+          planTimeEnd,
+          allotTimeStart,
+          allotTimeEnd,
+          acceptTimeStart,
+          acceptTimeEnd,
+          startTimeStart,
+          startTimeEnd,
+          completeTimeStart,
+          completeTimeEnd,
+          updateTimeStart,
+          updateTimeEnd,
+          reviewTimeStart,
+          reviewTimeEnd,
+          balanceTimeStart,
+          balanceTimeEnd,
+          closeTimeStart,
+          closeTimeEnd,
+          allotType,
+          onceException,
+          onceReallot,
+          inApprove,
+          sorts,
+          tagId: params.tagId,
+          keyword: params.keyword,
+          page: params.page,
+          pageSize: params.pageSize,
+          templateId: this.currentTaskType.id,
         };
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/

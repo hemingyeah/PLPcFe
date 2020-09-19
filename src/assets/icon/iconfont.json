@@ -6,34 +6,6 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "17264584",
-      "name": "电话",
-      "font_class": "dianhua2",
-      "unicode": "e6a1",
-      "unicode_decimal": 59041
-    },
-    {
-      "icon_id": "17263824",
-      "name": "复制 ",
-      "font_class": "fuzhi",
-      "unicode": "e6a0",
-      "unicode_decimal": 59040
-    },
-    {
-      "icon_id": "9059911",
-      "name": "圈子管理",
-      "font_class": "quanziguanli",
-      "unicode": "e69c",
-      "unicode_decimal": 59036
-    },
-    {
-      "icon_id": "17194149",
-      "name": "微信消息设置",
-      "font_class": "weixinxiaoxishezhi",
-      "unicode": "e732",
-      "unicode_decimal": 59186
-    },
-    {
       "icon_id": "17171793",
       "name": "列表模式",
       "font_class": "liebiaoshitu",

@@ -23,7 +23,7 @@
         </p>
       </div>
     </div>
-    <div class="dialog-footer">
+    <div class="dialog-footer" slot="footer">
       <el-button @click="sendMessageDialog = false">取 消</el-button>
       <el-button type="primary" @click="onSubmit">确 定</el-button>
     </div>
@@ -86,7 +86,7 @@ export default {
         }
         $platform.alert(msg);
       }
-      window.__exports__refresh = ''
+      window.__exports__refresh = "";
       this.sendMessageDialog = false;
       $platform.refreshTab(fromId);
     },
@@ -127,9 +127,8 @@ export default {
 .send-message-to-customer-dialog {
   padding: 0 10px;
   .dialog-body {
-    height: 300px;
     padding: 15px;
-    background-color: rgba(211, 214, 217, 0.69);
+    padding-bottom: 30px;
     margin: 10px auto;
     width: 96%;
     &-content {
@@ -151,7 +150,6 @@ export default {
   .dialog-footer {
     display: flex;
     justify-content: flex-end;
-    padding: 0 30px 10px 0;
   }
 }
 </style>

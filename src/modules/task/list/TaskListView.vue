@@ -8,254 +8,311 @@
       @click="allEvent"
       v-loading.fullscreen.lock="loading"
     >
-      <!-- S 顶部筛选 -->
-      <div class="common-list-filter">
-        <div class="common-list-header-search">
-          <div class="common-list-filter-flow common-list-filter-span1">
-            <!-- 待指派 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '待指派工单',
-                  searchModel: item.searchModel,
-                  title: 'created'
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.createdId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `待指派(${filterData.created || 0})` }}
-            </div>
-            <!-- 已指派 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '已指派工单',
-                  searchModel: item.searchModel,
-                  title: 'allocated'
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.allocatedId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `已指派(${filterData.allocated || 0})` }}
-            </div>
-            <!-- 已接受 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '已接受工单',
-                  searchModel: item.searchModel,
-                  title: 'accepted'
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.acceptedId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `已接受(${filterData.accepted || 0})` }}
-            </div>
-            <!-- 进行中 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '进行中工单',
-                  searchModel: item.searchModel,
-                  title: 'processing'
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              v-show="item.id === selectIds.processingId"
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `进行中(${filterData.processing || 0})` }}
-            </div>
-            <!-- 异常工单 -->
-            <div
-              v-for="item in taskView"
-              :key="`${item.createTime}${Math.random() * 1000}`"
-              @click="
-                checkFilter({
-                  id: item.id,
-                  name: '异常工单',
-                  searchModel: item.searchModel,
-                  title: 'exception'
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item extion ce6"
-              v-show="
-                item.id === selectIds.exceptionId &&
-                  initData.tenantVersion === 2
-              "
-              :class="{
-                'common-list-filter-flow-active': item.id === filterId,
-              }"
-            >
-              {{ `异常工单(${filterData.exception || 0})` }}
-            </div>
-            <!-- 全部工单 -->
-            <div
-              v-if="dropDownInfo"
-              @click="checkFilter(dropDownInfo)"
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              :class="{
-                'common-list-filter-flow-active': dropDownInfo.id === filterId,
-              }"
-            >{{dropDownInfo.name}}</div>
-            <div
-              v-else
-              @click="
-                checkFilter({
-                  id: selectIds.allId,
-                  name: '全部工单',
-                  searchModel: allSearchParams.all,
-                  title: 'all'
-                })
-              "
-              class="common-list-filter-span1 common-list-filter-flow-item"
-              :class="{
-                'common-list-filter-flow-active': selectIds.allId === filterId,
-              }"
-            >
-              {{ initData.allDropdownView && initData.allDropdownView.name }}({{
-                filterData.all || 0
-              }})
-            </div>
+      <div class="task-list-header">
+        <!-- 搜索 -->
+        <div class="task-list-header-seach">
+          <form onsubmit="return false;">
+            <div class="seach task-span1 task-flex task-ai">
+              <el-dropdown>
+                <div
+                  class="task-list-customize task-font16 task-c3 task-flex task-ai"
+                >
+                  <img
+                    src="../../../assets/img/customize.png"
+                    class="task-ic19"
+                  />
+                  {{ otherText }}
+                  <i class="iconfont icon-triangle-down task-c3"></i>
+                </div>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item
+                    v-for="(item, index) in otherList"
+                    :key="index"
+                  >
+                    <div
+                      @click="checkOther(item)"
+                      class="task-flex task-ai task-list-wd252 task-pointer"
+                    >
+                      <span class="task-list-dropdown-item">{{
+                        item.name
+                      }}</span>
+                      <i class="iconfont icon-yanjing task-font12"></i>
+                      <i
+                        class="iconfont icon-bianji1 task-ml12 task-font12"
+                        v-if="
+                          initData.loginUser &&
+                            item.id === initData.loginUser.userId
+                        "
+                      ></i>
+                      <i
+                        class="iconfont icon-shanchu-copy task-ml12 task-font12"
+                        v-if="
+                          initData.loginUser &&
+                            item.id === initData.loginUser.userId
+                        "
+                      ></i>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <div
+                      class="task-flex task-ai task-cfa task-pointer task-list-wd252"
+                      @click="panelSearchAdvancedToggle"
+                    >
+                      <i class="iconfont icon-add task-mr4 task-font12"></i>
+                      新建视图
+                    </div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <el-input
+                v-model="params.keyword"
+                placeholder="请输入工单编号或工单信息"
+                class="task-with-input task-ml12"
+              >
+                <el-select
+                  v-model="keyword_select"
+                  slot="prepend"
+                  placeholder="请选择"
+                  class="task-with-select"
+                >
+                  <el-option label="表单内容" value="1"></el-option>
+                  <el-option label="备注" value="2"></el-option>
+                  <el-option label="附加组件" value="3"></el-option>
+                </el-select>
+              </el-input>
 
-            <!--  -->
-            <div
-              class="common-list-filter-flow-dropdown"
-              @click.stop="
-                allShow = true;
-                otherShow = false;
-                addShow = false;
-              "
-              :class="{ 'common-list-filter-flow-active': allShow }"
-            >
-              <i class="icon-down"></i>
+              <base-button
+                type="primary"
+                @event="searchBefore"
+                native-type="submit"
+                class="task-ml12"
+              >
+                搜索
+              </base-button>
+              <base-button type="ghost" @event="resetParams" class="task-ml12">
+                重置
+              </base-button>
+              <div
+                class="advanced-search-visible-btn task-ml12"
+                @click.self="panelSearchAdvancedToggle"
+              >
+                <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
+                高级搜索
+              </div>
             </div>
-            <!-- 其他筛选列表 -->
-            <TaskSelect
-              :list="[
-                {
-                  name: `全部完工(${this.filterData.all || 0})`,
-                  searchModel: this.allSearchParams.all,
-                  title: 'all',
-                  id: this.allSearchParams.id
-                },
-                {
-                  name: `未完成工单(${this.filterData.unfinished || 0})`,
-                  searchModel: this.allSearchParams.unfinished,
-                  title: 'unfinished',
-                  id: this.allSearchParams.id
-                },
-                {
-                  name: `已完成工单(${this.filterData.finished || 0})`,
-                  searchModel: this.allSearchParams.finished,
-                  title: 'finished',
-                  id: this.allSearchParams.id
-                },
-              ]"
-              :show="allShow"
-              :right="true"
-              @checkOther="checkAll"
-            />
+          </form>
+        </div>
+        <!-- 筛选 -->
+        <div class="task-list-header-nav">
+          <div class="task-flex task-ai">
+            <div class="task-font14 task-c6 state">工单状态：</div>
+            <div class="list">
+              <div
+                class="list-item task-flex task-ai"
+                :style="`width:${8 * 130}px`"
+              >
+                <!-- 全部工单 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '全部工单',
+                      searchModel: item.searchModel,
+                      title: 'all',
+                    })
+                  "
+                  v-show="item.id === selectIds.allId"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `全部工单(${filterData.all || 0})` }}
+                </div>
+                <!-- 待指派 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '待指派工单',
+                      searchModel: item.searchModel,
+                      title: 'created',
+                    })
+                  "
+                  v-show="item.id === selectIds.createdId"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `待指派(${filterData.created || 0})` }}
+                </div>
+                <!-- 已指派 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '已指派工单',
+                      searchModel: item.searchModel,
+                      title: 'allocated',
+                    })
+                  "
+                  v-show="item.id === selectIds.allocatedId"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `已指派(${filterData.allocated || 0})` }}
+                </div>
+                <!-- 已接受 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '已接受工单',
+                      searchModel: item.searchModel,
+                      title: 'accepted',
+                    })
+                  "
+                  v-show="item.id === selectIds.acceptedId"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `已接受(${filterData.accepted || 0})` }}
+                </div>
+                <!-- 进行中 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '进行中工单',
+                      searchModel: item.searchModel,
+                      title: 'processing',
+                    })
+                  "
+                  v-show="item.id === selectIds.processingId"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `进行中(${filterData.processing || 0})` }}
+                </div>
+                <!-- 异常工单 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '异常工单',
+                      searchModel: item.searchModel,
+                      title: 'exception',
+                    })
+                  "
+                  v-show="item.id === selectIds.exceptionId"
+                  class="task-cef"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `异常工单(${filterData.exception || 0})` }}
+                </div>
+                <!-- 未完成工单 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '未完成工单',
+                      searchModel: item.searchModel,
+                      title: 'unfinished',
+                    })
+                  "
+                  v-show="item.id === selectIds.unfinishedId"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `未完成(${filterData.unfinished || 0})` }}
+                </div>
+                <!-- 已完成工单 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '已完成工单',
+                      searchModel: item.searchModel,
+                      title: 'finished',
+                    })
+                  "
+                  v-show="item.id === selectIds.finished"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `已完成(${filterData.finished || 0})` }}
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="common-list-filter-other">
-            <div
-              class="common-list-filter-other-item"
-              @click.stop="
-                otherShow = true;
-                allShow = false;
-                addShow = false;
-              "
-              :class="{
-                'common-list-filter-flow-active':
-                  otherShow || otherText !== '其他',
-              }"
-            >
-              {{ otherText }}
-              <i class="iconfont icon-more"></i>
+          <!-- 创建 -->
+          <div class="task-flex task-ai">
+            <div class="task-font14 task-c6 state">创建视角：</div>
+            <div class="list list-crate">
+              <div class="list-item task-flex task-ai">
+                <div
+                  v-for="(item, index) in selectList"
+                  :key="index"
+                  class="task-nav-create"
+                  :class="{ 'task-c2': selectId === item.id }"
+                  @click="
+                    loading = true;
+                    selectId = item.id;
+                    search(searchParams);
+                  "
+                >
+                  {{ item.name }}
+                </div>
+              </div>
             </div>
-            <!-- 其他筛选列表 -->
-            <TaskSelect
-              :show="otherShow"
-              :list="otherList"
-              @checkOther="checkOther"
-            />
+          </div>
+          <div class="task-flex task-ai">
+            <div class="task-font14 task-c6 state">
+              工单类型：
+            </div>
+            <div class="list">
+              <div
+                class="list-item task-flex task-ai"
+                :style="`width:${taskTypes.length * 130}px`"
+              >
+                <div
+                  v-for="item in taskTypes"
+                  :key="item.id"
+                  class="task-nav-create"
+                  :class="{ 'task-c2': currentTaskType.name === item.name }"
+                  @click="changeTaskType(item)"
+                >
+                  {{ item.name }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <!-- E 顶部筛选 -->
 
       <!-- start header -->
-      <div class="common-list-header">
-        <form class="common-list-header-search" onsubmit="return false;">
-          <div class="task-font12 select-list task-flex">
-            <div
-              v-for="(item, index) in selectList"
-              :key="index"
-              class="select-list-item"
-              :class="{ 'select-list-active': selectId === item.id }"
-              @click="
-                loading = true;
-                selectId = item.id;
-                search();
-              "
-            >
-              {{ item.name }}
-            </div>
-          </div>
-          <div class="common-list-header-search-group">
-            <el-input
-              v-model="params.keyword"
-              placeholder="请输入工单编号或工单信息"
-            >
-              <i slot="prefix" class="el-input__icon el-icon-search"></i>
-            </el-input>
-
-            <base-button
-              type="primary"
-              @event="searchBefore"
-              native-type="submit"
-            >
-              搜索
-            </base-button>
-            <base-button type="ghost" @event="resetParams">
-              重置
-            </base-button>
-          </div>
-          <span
-            class="advanced-search-visible-btn"
-            @click.self="panelSearchAdvancedToggle"
-          >
-            <i class="iconfont icon-add"></i>
-            高级搜索
-          </span>
-        </form>
-      </div>
       <!-- end header -->
       <!-- start 高级搜索 -->
       <task-search-panel
@@ -280,67 +337,73 @@
       <!-- end 高级搜索 -->
       <div class="common-list-section">
         <!--operation bar start-->
-        <div class="operation-bar-container task-list-operation-bar-container">
-          <div class="top-btn-group task-span1 task-flex">
-            <base-button
-              type="primary"
-              icon="icon-add"
-              @event.stop="
-                addShow = true;
-                otherShow = false;
-                allShow = false;
-              "
-              >新建</base-button
-            >
-            <TaskSelect
-              :show="addShow"
-              :list="taskTypes"
-              @checkOther="addView"
-            />
-            <base-button
-              type="ghost"
-              icon="icon-qingkongshanchu"
-              v-if="exportPermissionTaskEdit"
-              @event="delTask"
-              >删除</base-button
-            >
-          </div>
-
-          <div class="action-button-group">
-            <!-- S 地图视图 -->
-            <span
-              class="el-dropdown-link el-dropdown-btn"
-              @click="mapShow = false"
-              >地图视图</span
-            >
-            <!-- E 地图视图 -->
-            <!-- 批量编辑 S-->
-            <!-- initData.loginUser.authorities.TASK_EDIT === 3 -->
-            <span
-              class="el-dropdown-link el-dropdown-btn"
-              @click="Alledit"
-              v-if="exportPermissionTaskEdit"
-              >批量编辑</span
-            >
-            <!-- 批量编辑 E-->
-            <!-- start 工单类型 -->
-            <el-dropdown trigger="click">
-              <span
-                class="el-dropdown-link el-dropdown-btn"
-                @click="trackEventHandler('moreAction')"
-              >
-                工单类型：{{ currentTaskType.name }}
-                <i class="iconfont icon-nav-down"></i>
-              </span>
+        <div class="task-list-operation-bar-container task-flex task-ai">
+          <div class="top-btn-group task-span1 task-flex task-ai">
+            <!-- 新建 -->
+            <el-dropdown>
+              <base-button type="primary" icon="icon-add">新建</base-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-for="type in taskTypes" :key="type.id">
-                  <div @click="changeTaskType(type)">
-                    {{ type.name }}
-                  </div>
+                <el-dropdown-item
+                  v-for="(item, index) in initData.tagTaskTypeList"
+                  :key="index"
+                >
+                  <div @click="addView(item)">{{ item.name }}</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <!-- end 工单类型 -->
+            <!-- 删除 -->
+            <div
+              class="task-list-del task-font14 task-c06"
+              v-if="exportPermissionTaskEdit"
+              @click="delTask"
+            >
+              <i class="iconfont icon-qingkongshanchu task-font12 task-c06"></i>
+              删除
+            </div>
+            <!-- 批量编辑 -->
+            <div
+              class="task-list-del task-font14 task-c06"
+              @click="Alledit"
+              v-if="exportPermissionTaskEdit"
+            >
+              <i class="iconfont icon-bianji1 task-font12 task-c06"></i>
+              批量编辑
+            </div>
+          </div>
+
+          <div class="action-button-group task-flex task-ai">
+            <!-- 模式 -->
+            <el-dropdown>
+              <div class="task-ai task-flex task-font14 task-c6 task-pointer">
+                <i
+                  class="iconfont task-font12 task-top2"
+                  :class="{
+                    'icon-liebiaoshitu': mapShow,
+                    'icon-ditu': !mapShow,
+                  }"
+                ></i>
+                <span class="task-mr4 task-ml4">{{
+                  mapShow ? "列表模式" : "地图模式"
+                }}</span>
+                <i class="iconfont icon-triangle-down"></i>
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <div @click="taskMode('列表模式')">列表模式</div>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <div @click="taskMode('地图模式')">地图模式</div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <!-- 选择列 -->
+            <div
+              class="task-ai task-flex task-font14 task-c6 task-pointer task-width103"
+              @click="showAdvancedSetting"
+            >
+              <span class="task-mr4 task-ml4">选择列</span>
+              <i class="iconfont icon-triangle-down"></i>
+            </div>
 
             <!-- start 更多操作 -->
             <!-- v-if="exportPermission" -->
@@ -348,20 +411,20 @@
               trigger="click"
               v-if="exportPermission || exportPermissionTaskEdit"
             >
-              <span
-                class="el-dropdown-link el-dropdown-btn"
+              <div
+                class="task-ai task-flex task-font14 task-c6 task-pointer"
                 @click="trackEventHandler('moreAction')"
               >
-                更多操作
-                <i class="iconfont icon-nav-down"></i>
-              </span>
+                <span class="task-mr4 task-ml4">更多操作</span>
+                <i class="iconfont icon-triangle-down"></i>
+              </div>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item v-if="exportPermission">
                   <div class="import-task">
                     导入工单
                     <div class="import-task-item">
                       <div
-                        v-for="(item, index) in taskTypes"
+                        v-for="(item, index) in taskTypeList"
                         :key="index"
                         @click="imporTask(item)"
                       >
@@ -386,168 +449,185 @@
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <!-- end 更多操作 -->
-            <span
-              class="el-dropdown-link el-dropdown-btn"
-              @click="showAdvancedSetting"
-              >选择列 <i class="iconfont icon-nav-down"></i
-            ></span>
           </div>
         </div>
-      </div>
-
-      <!-- <div style="background: #fff;padding: 0 10px">
-      <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection" @toggle-selection="toggleSelection" @show-panel="() => multipleSelectionPanelShow = true" />
-    </div> -->
-
-      <!-- start content 列表表格 -->
-      <div class="task-list-section common-list-table-view">
-        <el-table
-          stripe
-          :data="taskPage.list"
-          :highlight-current-row="false"
-          :key="tableKey"
-          :row-key="getRowKey"
-          @select="handleSelection"
-          @select-all="handleSelection"
-          @sort-change="sortChange"
-          class="task-list-table common-list-table"
-          header-row-class-name="common-list-table-header taks-list-table-header"
-          ref="multipleTable"
+        <!-- 选中的条数 -->
+        <div
+          class="task-c6 task-font14 task-mt8"
+          v-show="multipleSelection.length"
         >
-          <el-table-column
-            type="selection"
-            width="48"
-            align="center"
-            class-name="select-column"
-          ></el-table-column>
-
-          <el-table-column
-            v-for="column in columns"
-            v-if="column.show"
-            :align="column.align"
-            :class-name="
-              column.field == 'name'
-                ? 'common-list-table-name-superscript-td'
-                : ''
-            "
-            :key="column.field"
-            :label="column.label"
-            :min-width="column.minWidth || '120px'"
-            :prop="column.field"
-            :sortable="column.sortable"
-            :show-overflow-tooltip="column.field !== 'name'"
-            :width="column.width"
+          已选择
+          <span class="task-c2" @click="openSelectionPanel">
+            {{ multipleSelection.length }}
+          </span>
+          条
+          <span class="task-c2" @click="toggleSelection">清空</span>
+        </div>
+        <!-- start content 列表表格 -->
+        <div class="task-list-section common-list-table-view">
+          <el-table
+            stripe
+            :data="taskPage.list"
+            :highlight-current-row="false"
+            :key="tableKey"
+            :row-key="getRowKey"
+            :border="true"
+            @select="handleSelection"
+            @select-all="handleSelection"
+            @sort-change="sortChange"
+            @header-dragend="headerDragend"
+            class="task-list-table common-list-table"
+            header-row-class-name="common-list-table-header taks-list-table-header"
+            ref="multipleTable"
           >
-            <template slot-scope="scope">
-              <!-- 工单编号 -->
-              <div
-                v-if="column.field === 'taskNo'"
-                :class="{ superscript: scope.row.guideData }"
-              >
-                <a
-                  href=""
-                  class="view-detail-btn"
-                  @click.stop.prevent="
-                    openTaskTab(scope.row.id, scope.row[column.field])
-                  "
-                >
-                  {{ scope.row[column.field] }}
-                </a>
-                <!-- TODO: 曾超时 审批中标签 -->
-                <!-- 暂停中 -->
-                <span
-                  class="task-state-block task-state-block-approve task-font12"
-                  v-if="scope.row.inApprove == 1"
-                >
-                  审批中
-                </span>
-                <!-- 暂停中 -->
-                <span
-                  class="task-state-block task-state-block-overtime task-font12"
-                  v-if="scope.row.onceOverTime == 1"
-                >
-                  超时
-                </span>
-              </div>
+            <el-table-column
+              type="selection"
+              width="48"
+              align="center"
+              class-name="select-column"
+            ></el-table-column>
 
-              <!-- 客户  TODO: 客户查看权限 -->
-              <template v-else-if="column.field === 'customer'">
+            <el-table-column
+              v-for="column in columns"
+              v-if="column.show"
+              :align="column.align"
+              :class-name="
+                column.field == 'name'
+                  ? 'common-list-table-name-superscript-td'
+                  : ''
+              "
+              :key="column.field"
+              :label="column.label"
+              :min-width="column.minWidth || '120px'"
+              :prop="column.field"
+              :sortable="column.sortable"
+              :show-overflow-tooltip="column.field !== 'name'"
+              :width="column.width || '125px'"
+              :resizable="true"
+            >
+              <template slot-scope="scope">
+                <!-- 工单编号 -->
                 <div
-                  :class="{ 'view-detail-btn task-client': scope.row.linkAuth }"
-                  @click.stop="openClientTab(scope.row)"
+                  v-if="column.field === 'taskNo'"
+                  :class="{ superscript: scope.row.guideData }"
                 >
-                  {{ scope.row["customerEntity"].name }}
-                </div>
-              </template>
-
-              <!-- 联系人 -->
-              <template v-else-if="column.field === 'tlmName'">
-                <div>
-                  {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
-                </div>
-              </template>
-              <!-- 电话 -->
-              <template v-else-if="column.field === 'tlmPhone'">
-                <div>
-                  {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
-                </div>
-              </template>
-              <!-- 自定义的选择类型字段显示， 与type 区别-->
-              <template
-                v-else-if="column.formType === 'select' && !column.isSystem"
-              >
-                {{ scope.row.attribute[column.field] | displaySelect }}
-              </template>
-
-              <!-- 更新时间 -->
-              <template v-else-if="column.field === 'updateTime'">
-                <template v-if="scope.row.latesetUpdateRecord">
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    :content="scope.row.latesetUpdateRecord"
-                    placement="top"
-                  >
-                    <div @mouseover="showLatestUpdateRecord(scope.row)">
-                      {{ scope.row.updateTime | fmt_datetime }}
-                    </div>
-                  </el-tooltip>
-                </template>
-                <template v-else>
-                  <div @mouseover="showLatestUpdateRecord(scope.row)">
-                    {{ scope.row.updateTime | fmt_datetime }}
-                  </div>
-                </template>
-              </template>
-
-              <!-- 产品 -->
-              <template v-else-if="column.field === 'product'">
-                {{
-                  scope.row.products &&
-                    scope.row.products.map((product) => product.name).join(", ")
-                }}
-              </template>
-
-              <!-- 创建人 和 负责人 -->
-              <template
-                v-else-if="
-                  column.field === 'createUserName' ||
-                    column.field === 'executorName'
-                "
-              >
-                <template v-if="permissionTaskView">
                   <a
                     href=""
                     class="view-detail-btn"
                     @click.stop.prevent="
-                      openUserTab(
-                        column.field === 'createUserName'
-                          ? scope.row.createUser.userId
-                          : scope.row.executorUser.userId
-                      )
+                      openTaskTab(scope.row.id, scope.row[column.field])
                     "
                   >
+                    {{ scope.row[column.field] }}
+                  </a>
+                  <!-- TODO: 曾超时 审批中标签 -->
+                  <!-- 暂停中 -->
+                  <span
+                    class="task-state-block task-state-block-approve task-font12"
+                    v-if="scope.row.inApprove == 1"
+                  >
+                    审批中
+                  </span>
+                  <!-- 暂停中 -->
+                  <span
+                    class="task-state-block task-state-block-overtime task-font12"
+                    v-if="scope.row.onceOverTime == 1"
+                  >
+                    超时
+                  </span>
+                </div>
+
+                <!-- 客户  TODO: 客户查看权限 -->
+                <template v-else-if="column.field === 'customer'">
+                  <div
+                    :class="{
+                      'view-detail-btn task-client': scope.row.linkAuth,
+                    }"
+                    @click.stop="openClientTab(scope.row)"
+                  >
+                    {{ scope.row["customerEntity"].name }}
+                  </div>
+                </template>
+
+                <!-- 联系人 -->
+                <template v-else-if="column.field === 'tlmName'">
+                  <div>
+                    {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
+                  </div>
+                </template>
+                <!-- 电话 -->
+                <template v-else-if="column.field === 'tlmPhone'">
+                  <div>
+                    {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                  </div>
+                </template>
+                <!-- 自定义的选择类型字段显示， 与type 区别-->
+                <template
+                  v-else-if="column.formType === 'select' && !column.isSystem"
+                >
+                  {{ scope.row.attribute[column.field] | displaySelect }}
+                </template>
+
+                <!-- 更新时间 -->
+                <template v-else-if="column.field === 'updateTime'">
+                  <template v-if="scope.row.latesetUpdateRecord">
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      :content="scope.row.latesetUpdateRecord"
+                      placement="top"
+                    >
+                      <div @mouseover="showLatestUpdateRecord(scope.row)">
+                        {{ scope.row.updateTime | fmt_datetime }}
+                      </div>
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
+                    <div @mouseover="showLatestUpdateRecord(scope.row)">
+                      {{ scope.row.updateTime | fmt_datetime }}
+                    </div>
+                  </template>
+                </template>
+
+                <!-- 产品 -->
+                <template v-else-if="column.field === 'product'">
+                  {{
+                    scope.row.products &&
+                      scope.row.products
+                        .map((product) => product.name)
+                        .join(", ")
+                  }}
+                </template>
+
+                <!-- 创建人 和 负责人 -->
+                <template
+                  v-else-if="
+                    column.field === 'createUserName' ||
+                      column.field === 'executorName'
+                  "
+                >
+                  <template v-if="permissionTaskView">
+                    <a
+                      href=""
+                      class="view-detail-btn"
+                      @click.stop.prevent="
+                        openUserTab(
+                          column.field === 'createUserName'
+                            ? scope.row.createUser.userId
+                            : scope.row.executorUser.userId
+                        )
+                      "
+                    >
+                      {{
+                        column.field === "executorName"
+                          ? scope.row.executorUser &&
+                            scope.row.executorUser.displayName
+                          : scope.row.createUser &&
+                            scope.row.createUser.displayName
+                      }}
+                    </a>
+                  </template>
+                  <template v-else>
                     {{
                       column.field === "executorName"
                         ? scope.row.executorUser &&
@@ -555,173 +635,177 @@
                         : scope.row.createUser &&
                           scope.row.createUser.displayName
                     }}
-                  </a>
+                  </template>
                 </template>
-                <template v-else>
-                  {{
-                    column.field === "executorName"
-                      ? scope.row.executorUser &&
-                        scope.row.executorUser.displayName
-                      : scope.row.createUser && scope.row.createUser.displayName
-                  }}
-                </template>
-              </template>
 
-              <!-- 协同人 -->
-              <template v-else-if="column.field === 'synergies'">
-                {{
-                  scope.row[column.field] &&
-                    scope.row[column.field]
-                      .map((synergie) => synergie.displayName)
-                      .join(", ")
-                }}
-              </template>
-
-              <!-- 派单方式 -->
-              <template v-else-if="column.field === 'allotTypeStr'">
-                {{ allotTypeText(scope.row.allotType) }}
-              </template>
-
-              <!-- 工单状态 -->
-              <template v-else-if="column.field === 'state'">
-                <!-- 暂停中 -->
-                <div
-                  class="task-state-block"
-                  v-if="scope.row.isPaused == 1"
-                  style="background-color: #ef6b6b"
-                >
-                  已暂停
-                </div>
-                <!-- 其他状态 -->
-                <div
-                  v-else
-                  class="task-state-block"
-                  :style="{
-                    backgroundColor: taskStateEnum.getColor(
-                      scope.row[column.field]
-                    ),
-                  }"
-                >
+                <!-- 协同人 -->
+                <template v-else-if="column.field === 'synergies'">
                   {{
                     scope.row[column.field] &&
-                      taskStateEnum.getName(scope.row[column.field])
+                      scope.row[column.field]
+                        .map((synergie) => synergie.displayName)
+                        .join(", ")
                   }}
-                </div>
-              </template>
+                </template>
 
-              <!-- 曾.. -->
-              <template v-else-if="taskStatusFields.indexOf(column.field) > -1">
-                {{ Number(scope.row[column.field]) === 1 ? "是" : "否" }}
-              </template>
+                <!-- 派单方式 -->
+                <template v-else-if="column.field === 'allotTypeStr'">
+                  {{ allotTypeText(scope.row.allotType) }}
+                </template>
 
-              <!-- 地址 -->
-              <template v-else-if="column.formType === 'address'">
-                {{ formatCustomizeAddress(scope.row[column.formType]) }}
-              </template>
+                <!-- 工单状态 -->
+                <template v-else-if="column.field === 'state'">
+                  <!-- 暂停中 -->
+                  <div
+                    class="task-state-block task-font12"
+                    v-if="scope.row.isPaused == 1"
+                    style="color: rgba(153, 153, 153);background-color: rgba(153, 153, 153, .2)"
+                  >
+                    已暂停
+                  </div>
+                  <!-- 其他状态 -->
+                  <div
+                    v-else
+                    class="task-state-block task-font12"
+                    :style="{
+                      backgroundColor: taskStateEnum.getColor(
+                        scope.row[column.field]
+                      ),
+                      color: taskStateEnum.getColorText(
+                        scope.row[column.field]
+                      ),
+                    }"
+                  >
+                    {{
+                      scope.row[column.field] &&
+                        taskStateEnum.getName(scope.row[column.field])
+                    }}
+                  </div>
+                </template>
 
-              <!-- 用户 -->
-              <template
-                v-else-if="
-                  column.formType === 'user' &&
-                    scope.row.attribute[column.field]
-                "
-              >
-                {{
-                  scope.row.attribute[column.field].displayName ||
-                    scope.row.attribute[column.field].name
-                }}
-              </template>
+                <!-- 曾.. -->
+                <template
+                  v-else-if="taskStatusFields.indexOf(column.field) > -1"
+                >
+                  {{ Number(scope.row[column.field]) === 1 ? "是" : "否" }}
+                </template>
 
-              <!-- 位置 -->
-              <template v-else-if="column.formType === 'location'">
-                {{
-                  scope.row.attribute[column.field] &&
-                    scope.row.attribute[column.field].address
-                }}
-              </template>
+                <!-- 地址 -->
+                <template v-else-if="column.formType === 'address'">
+                  {{ formatCustomizeAddress(scope.row[column.formType]) }}
+                </template>
 
-              <!-- 时间 -->
-              <template v-else-if="column.formType === 'datetime'">
-                {{ scope.row[column.field] | fmt_datetime }}
-              </template>
+                <!-- 用户 -->
+                <template
+                  v-else-if="
+                    column.formType === 'user' &&
+                      scope.row.attribute[column.field]
+                  "
+                >
+                  {{
+                    scope.row.attribute[column.field].displayName ||
+                      scope.row.attribute[column.field].name
+                  }}
+                </template>
 
-              <div
-                v-else-if="column.formType === 'textarea'"
-                v-html="buildTextarea(scope.row.attribute[column.field])"
-                @click="openOutsideLink"
-              ></div>
+                <!-- 位置 -->
+                <template v-else-if="column.formType === 'location'">
+                  {{
+                    scope.row.attribute[column.field] &&
+                      scope.row.attribute[column.field].address
+                  }}
+                </template>
 
-              <template v-else-if="!column.isSystem">
-                {{ scope.row.attribute[column.field] }}
-              </template>
-              <!-- 接单用时 -->
-              <template v-else-if="column.field === 'acceptUsedTimeStr'">
-                {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
-              </template>
-              <!-- 工单用时 -->
-              <template v-else-if="column.field === 'taskUsedTimeStr'">
-                {{ scope.row.taskUsedTime && scope.row.taskUsedTime }}
-              </template>
-              <!-- 工作用时 -->
-              <template v-else-if="column.field === 'workUsedTimeStr'">
-                {{ scope.row.workUsedTime && scope.row.workUsedTime }}
-              </template>
-              <!-- 响应用时 -->
-              <template v-else-if="column.field === 'taskResponseTimeStr'">
-                {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
-              </template>
-              <!-- 支付方式 -->
-              <template
-                v-else-if="
-                  column.field === 'paymentMethod' &&
-                    initData.paymentConfig &&
-                    initData.paymentConfig.version === 1
-                "
-              >
-                {{
-                  scope.row.attribute["paymentMethod"] &&
-                    scope.row.attribute["paymentMethod"]
-                }}
-              </template>
-              <template v-else>
-                {{ scope.row[column.field] }}
-              </template>
-            </template>
-          </el-table-column>
-        </el-table>
+                <!-- 时间 -->
+                <template v-else-if="column.formType === 'datetime'">
+                  {{ scope.row[column.field] | fmt_datetime }}
+                </template>
 
-        <div class="table-footer comment-list-table-footer">
-          <div class="comment-list-table-footer-info">
-            共<span class="level-padding">{{ taskPage.totalElements || 0 }}</span
-            >记录， 已选中
-            <span
-              class="task-list-selected-count common-selected-count"
-              @click="openSelectionPanel"
+                <div
+                  v-else-if="column.formType === 'textarea'"
+                  v-html="buildTextarea(scope.row.attribute[column.field])"
+                  @click="openOutsideLink"
+                ></div>
+
+                <template v-else-if="!column.isSystem">
+                  {{ scope.row.attribute[column.field] }}
+                </template>
+                <!-- 接单用时 -->
+                <template v-else-if="column.field === 'acceptUsedTimeStr'">
+                  {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
+                </template>
+                <!-- 工单用时 -->
+                <template v-else-if="column.field === 'taskUsedTimeStr'">
+                  {{ scope.row.taskUsedTime && scope.row.taskUsedTime }}
+                </template>
+                <!-- 工作用时 -->
+                <template v-else-if="column.field === 'workUsedTimeStr'">
+                  {{ scope.row.workUsedTime && scope.row.workUsedTime }}
+                </template>
+                <!-- 响应用时 -->
+                <template v-else-if="column.field === 'taskResponseTimeStr'">
+                  {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
+                </template>
+                <!-- 支付方式 -->
+                <template
+                  v-else-if="
+                    column.field === 'paymentMethod' &&
+                      initData.paymentConfig &&
+                      initData.paymentConfig.version === 1
+                  "
+                >
+                  {{
+                    scope.row.attribute["paymentMethod"] &&
+                      scope.row.attribute["paymentMethod"]
+                  }}
+                </template>
+                <template v-else>
+                  {{ scope.row[column.field] }}
+                </template>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <div class="table-footer comment-list-table-footer">
+            <div class="comment-list-table-footer-info task-flex task-ai">
+              共<span class="level-padding">{{
+                taskPage.totalElements || 0
+              }}</span
+              >条
+              <div class="task-font14 task-c6 task-ml12">
+                每页
+                <el-select
+                  v-model="params.pageSize"
+                  placeholder="请选择"
+                  @change="search()"
+                  class="table-footer-select"
+                >
+                  <el-option :label="10" :value="10"></el-option>
+                  <el-option :label="20" :value="20"></el-option>
+                  <el-option :label="50" :value="50"></el-option>
+                </el-select>
+                条
+              </div>
+            </div>
+            <el-pagination
+              class="comment-list-table-footer-pagination"
+              background
+              @current-change="jump"
+              @size-change="handleSizeChange"
+              :page-size="taskPage.pageSize"
+              :current-page="taskPage.pageNum"
+              layout="prev, pager, next, jumper"
+              :total="taskPage.totalElements"
             >
-              {{ multipleSelection.length }}
-            </span>
-            条
-            <span
-              class="task-list-selected-count common-selected-count"
-              @click="toggleSelection"
-              >清空</span
-            >
+            </el-pagination>
           </div>
-          <el-pagination
-            class="comment-list-table-footer-pagination"
-            background
-            @current-change="jump"
-            @size-change="handleSizeChange"
-            :page-sizes="[10, 20, 50]"
-            :page-size="taskPage.pageSize"
-            :current-page="taskPage.pageNum"
-            layout="prev, pager, next, sizes, jumper"
-            :total="taskPage.totalElements"
-          >
-          </el-pagination>
         </div>
+        <!-- end content 列表表格 -->
       </div>
-      <!-- end content 列表表格 -->
+
+      <!-- <div style="background: #fff;padding: 0 10px">
+      <base-selection-bar ref="baseSelectionBar" v-model="multipleSelection" @toggle-selection="toggleSelection" @show-panel="() => multipleSelectionPanelShow = true" />
+    </div> -->
 
       <!-- start 选择列设置 -->
       <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" />
@@ -744,7 +828,7 @@
       <base-export-group
         ref="exportPanel"
         :alert="exportAlert"
-        :columns="exportColumns"
+        :columns="exportColumnList"
         :build-params="buildExportParams"
         :group="true"
         :validate="checkExportCount"
@@ -765,7 +849,7 @@
       <batch-editing-customer-dialog
         ref="batchEditingCustomerDialog"
         :config="{
-          fields: initData.allFieldInfo,
+          fields: taskFieldList,
           currentTaskType: currentTaskType,
         }"
         :selectedIds="selectedIds"
@@ -777,17 +861,8 @@
         :title="`导入工单-${checkImportTask.name}`"
         ref="importCustomerModal"
         :action="`/excels/task/import?typeId=${checkImportTask.id}`"
+        :templateUrl="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
       >
-        <div slot="tip">
-          <div class="base-import-warn">
-            请先下载
-            <a
-              :href="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
-              target="_blank"
-              >导入模版文档</a
-            >，填写完成后再上传导入。
-          </div>
-        </div>
       </base-import>
       <!-- E 导入工单 -->
       <!-- S 工单转换 -->
