@@ -91,9 +91,6 @@ const PlanTaskEditForm = {
       }
     }
   },
-  mounted() {
-    // 
-  },
   methods: {
     /* 更改派单类型 */
     changeAllotType(value) {
@@ -178,10 +175,14 @@ const PlanTaskEditForm = {
     onSubmit: _.debounce(function(){
       // 效验是否必填
       let validated = this.validate();
-      if (!validated) return;
+      if (!validated) {
+        return console.warn('Caused: onSubmit validated is false')
+      }
 
       validated = this.validateDataCorrectly();
-      if (!validated) return;
+      if (!validated) {
+        return console.warn('Caused: onSubmit validated validateDataCorrectly return value is false')
+      }
       
       // 判断是否选择工单负责人
       let params = this.unPackDataToParams();
@@ -304,8 +305,7 @@ const PlanTaskEditForm = {
      * @description 效验数据正确性
      */
     validateDataCorrectly() {
-      let { advance = '', allotSetting = {}, endSetting = {}, id = '', name = '', periodSetting = {} } = this.form;
-      let { allotType = 'normal', synergies = [], executorId = '', executorName = '' } = allotSetting;
+      let { advance = '', endSetting = {}, periodSetting = {} } = this.form;
       let { num, time = '', select = '' } = endSetting;
       let { period, periodUnit = '天' } = periodSetting;
       let IsEndTime = select == 'date';
