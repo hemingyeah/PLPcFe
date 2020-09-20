@@ -151,7 +151,7 @@ const BizProcess = {
       }
 
       this.selected = state.value;
-      this.$emit('change', state.value);
+      this.$emit('change', state);
     },
     /* 渲染流程信息状态 */
     renderProcessStateItem(h, state, index) {

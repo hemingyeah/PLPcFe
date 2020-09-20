@@ -147,7 +147,7 @@
 
             <!-- start 当前工单状态操作按钮 -->
             <template v-if="!isDelete">
-              <div class="state-button-group" v-show="taskState == task.state">
+              <div class="state-button-group" v-show="taskState.value == task.state || (Array.isArray(taskState.value) && taskState.value.indexOf(task.state) > -1) ">
                 <template v-for="(item, index) in stateButtonData">
                   <el-button
                     :key="index"

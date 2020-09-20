@@ -383,3 +383,39 @@ $progress-state-before-bg-color: #E1F3D8;
   font-size: $font-size-small;
   line-height: 22px;
 }
+
+/* 适配样式 */
+.biz-process-state-first,
+.biz-process-state-last {
+  border: 1px solid $progress-state-before-bg-color;
+}
+
+.biz-process-state-after {
+  &.biz-process-state-last {
+    border: none;
+  }
+}
+
+.biz-process-state-current {
+  &.biz-process-state-first,
+  &.biz-process-state-last {
+    border: 1px solid $color-primary;
+  }
+  &.biz-process-state-last {
+    &:before {
+      left: -28px !important;
+    }
+    .biz-process-left-triangle-bottom {
+      :before {
+        top: 9px !important;
+      }
+    }
+  }
+}
+
+.biz-process-state-last {
+  .biz-process-left-triangle-top {
+    left: -19px;
+    top: -21px;
+  }
+}

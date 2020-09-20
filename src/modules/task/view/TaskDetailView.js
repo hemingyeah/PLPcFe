@@ -35,7 +35,7 @@ export default {
       pending: false,
       collapse: true,
       task: this.initData?.task || {},
-      taskState: this.initData?.task?.state || '',
+      taskState: { value: this.initData?.task?.state || '' },
       fields: [], // 工单表单字段
       tabs: [], // 工单关联数据tab
       currTab: 'task-info-record', // 当前选中的tab
