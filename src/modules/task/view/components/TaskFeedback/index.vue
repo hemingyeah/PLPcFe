@@ -135,7 +135,7 @@ export default {
     },
     // 发起审批
     proposeApprove(data) {
-      this.$parent.$refs.proposeApprove.openDialog(data);
+      this.$emit('proposeApprove', data);
     }
   },
   components: {

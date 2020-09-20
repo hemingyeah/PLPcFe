@@ -254,7 +254,7 @@ export default {
     */
     async finish(params) {
       // 回访是否需要审批
-      const result = await TaskApi.finishApproveCheck(params);
+      const result = await TaskApi.finishApproveCheck(util.packToReceipt(this.fields, this.form));
       if (!result.succ && result.message == '需要审批') {
         this.visible = false;
         this.pending = false;

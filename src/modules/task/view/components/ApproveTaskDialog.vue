@@ -119,7 +119,10 @@ export default {
       TaskApi.saveApprove({ id: approveId, result, approveRemark })
         .then((res) => {
           if (res.status == 0) {
-            this.$platform.alert('审批成功');
+            this.$platform.notification({
+              type: 'success',
+              title: '审批成功'
+            })
 
             let fromId = window.frameElement.getAttribute('fromid');
             this.$platform.refreshTab(fromId);
