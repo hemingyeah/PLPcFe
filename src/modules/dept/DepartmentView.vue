@@ -354,14 +354,7 @@
 
             <div class="form-view-row">
               <label>部门位置：</label>
-              <div class="form-view-row-content" v-if="deptInfo.tagAddress">
-                {{deptInfo.tagAddress | fmt_address }}
-                <i
-                  v-if="deptInfo.tagAddress.longitude && deptInfo.tagAddress.latitude"
-                  @click="openMap"
-                  class="iconfont icon-address team-address-icon link-text"
-                ></i>
-              </div>
+              <div class="form-view-row-content" v-if="deptInfo.tagAddress"> {{deptInfo.tagAddress | fmt_address }}<i v-if="deptInfo.tagAddress.longitude && deptInfo.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i></div>
             </div>
           </div>
           <!-- TODO: 面包屑列表 -->
@@ -894,31 +887,44 @@ export default {
     }
   },
   methods: {
-    synchronousWeChat() {
-      this.synchronousState = true;
-      let timeout = setTimeout(() => {
-        this.$platform.alert("同步时间较长，系统将在后台继续为您尝试同步");
-        this.synchronousState = false;
-      }, 30000);
-      this.$http
-        .get("/login/synContact")
-        .then((res) => {
-          console.log("同步通讯录", res);
-          clearTimeout(timeout);
+    //同步企业微信通讯录
+    async synchronousWeChat() {
+      try {
+        this.synchronousState = true;
+        //获取token
+        const token = await this.$http.get("/account/synToken");
+
+        let timeout = setTimeout(() => {
+          this.$platform.alert("同步时间较长，系统将在后台继续为您尝试同步");
           this.synchronousState = false;
-          timeout = null;
-          if(res.status == 0){
-            this.$platform.alert(res.message);
-            window.location.reload()
-          }else{
-            this.$platform.alert(res.message);
-          }
-        })
-        .catch((err) => {
-          row.pending = false;
-          console.error("toggleStatus catch err", err);
-        });
+        }, 30000);
+        this.$http
+          .get("/login/synContact", { token: token })
+          .then((res) => {
+            this.synchronousState = false;
+            
+            clearTimeout(timeout);
+            timeout = null;
+            if (res.status == 0) {
+              this.$platform.alert("同步成功！");
+              window.location.reload(); 
+            } else {
+              this.$platform.alert("同步失败！");
+            }
+          })
+          .catch((err) => {
+            clearTimeout(timeout);
+            timeout = null;
+            this.synchronousState = false;
+            console.error("toggleStatus catch err", err);
+          });
+      } catch (error) {
+        clearTimeout(timeout);
+        this.synchronousState = false;
+        console.error(error);
+      }
     },
+
     debounce: _.debounce(async function () {
       // 部门模糊搜索
       try {
