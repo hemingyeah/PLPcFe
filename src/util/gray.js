@@ -24,7 +24,7 @@ function getCustomerApiPath (){
     isGrayCustomer = false;
   }
 
-  return isGrayCustomer ? '/outside/pc' : '';
+  return isGrayCustomer ? '' : '';
 }
 
 function getProductApiPath (){
@@ -37,7 +37,7 @@ function getProductApiPath (){
     isGrayProduct = false;
   }
 
-  return isGrayProduct ? '/outside/pc' : '';
+  return isGrayProduct ? '' : '';
 }
 
 export default {
