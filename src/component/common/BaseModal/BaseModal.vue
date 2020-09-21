@@ -153,6 +153,7 @@ export default {
 
 .base-modal-mask {
   @include mask();
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
   overflow: auto;
 }

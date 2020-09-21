@@ -172,7 +172,7 @@ body {
     width: 90px;
     position: absolute;
     top: 70px;
-    right: 40px;
+    right: 60px;
     z-index: 99;
 
     img {
@@ -381,11 +381,21 @@ body {
 // 工单详情
 .task-detail-main-content {
   flex: 1;
-  position: relative;
-  overflow: hidden;
 
-  display: flex;
-  flex-flow: row nowrap;
+  &-left,
+  &-right {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .collapse-left,
+  .collapse-right {
+    height: 40px;
+    line-height: 40px;
+    padding-left: 12px;
+    color: $text-color-regular;
+    border-bottom: 2px solid $color-border-l2;
+  }
 
   // tabs标签页
   .el-tabs {
@@ -417,44 +427,27 @@ body {
     }
   }
 
-  &-left,
-  &-right {
-    flex: 1;
-    height: 100%;
-    overflow: hidden;
-    background-color: #fff;
-    border-radius: 4px;
-  }
+  .task-detail-btn-group {
+    position: absolute;
+    right: 12px;
+    top: 8px;
 
-  &-left {
-    position: relative;
+    font-size: 0;
+    z-index: 999;
 
-    .task-detail-btn-group {
-      position: absolute;
-      right: 12px;
-      top: 8px;
+    .iconfont {
+      margin-left: 16px;
+      color: $text-color-secondary;
+      cursor: pointer;
 
-      font-size: 0;
-      z-index: 999;
+      &.icon-bianji1 {
+        color: $color-primary;
+      }
 
-      .iconfont {
-        margin-left: 16px;
-        color: $text-color-secondary;
-        cursor: pointer;
-
-        &.icon-bianji1 {
-          color: $color-primary;
-        }
-
-        &.icon-shanchu-copy {
-          margin-left: 14px;
-        }
+      &.icon-shanchu-copy {
+        margin-left: 13px;
       }
     }
-  }
-
-  &-right {
-    margin-left: 12px;
   }
 
   // 审批中图片

@@ -329,6 +329,7 @@ export default {
       }
 
       &-relation {
+        margin-top: 8px;
         padding: 6px 10px;
         background-color: $bg-color-l3;
         border-radius: $border-radius-base;

@@ -23,6 +23,7 @@ import BaseSteps from './common/BaseSteps';
 import BaseCascader from './common/BaseCascader';
 import BaseSelectionBar from './common/BaseSelectionBar';
 import BaseServiceStar from './common/BaseServiceStar';
+import BaseCollapse from './common/BaseCollapse';
 
 
 // 可快速调用的组件
@@ -92,7 +93,8 @@ const components = [
   BaseCascader,
   BaseSelectionBar,
   BaseEditor,
-  BaseServiceStar
+  BaseServiceStar,
+  BaseCollapse
 ];
 
 export default {
