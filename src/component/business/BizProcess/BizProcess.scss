@@ -1,6 +1,6 @@
 $progress-height: 40px;
 $proccess-border-height: 40px;
-$progress-state-common-bg-color: #E6E6E6;
+$progress-state-common-bg-color: #F2F2F2;
 $progress-state-before-bg-color: #E1F3D8;
 
 @mixin triangle-border-color($color, $backgroundColor: '') {
@@ -49,12 +49,13 @@ $progress-state-before-bg-color: #E1F3D8;
   overflow: hidden;
 
   &-state {
-    margin-right: 42px;
     background-color: $progress-state-common-bg-color;
+    color: #999;
     cursor: pointer;
-
+    
     height: $progress-height;
     width: 120px;
+    margin-right: 42px;
 
     line-height: $progress-height;
     text-align: center;
@@ -359,10 +360,20 @@ $progress-state-before-bg-color: #E1F3D8;
   justify-content: flex-start;
 }
 
+.biz-process-exception-time {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 100%;
+  @include text-ellipsis();
+}
+
 /* 已取消 */
 .biz-process-offed {
   border-radius: 11px;
-  border: 1px solid #E6E6E6;
+  border: 1px solid $progress-state-common-bg-color;
   color: #fff;
 
   height: 22px;
@@ -371,4 +382,40 @@ $progress-state-before-bg-color: #E1F3D8;
   text-align: center;
   font-size: $font-size-small;
   line-height: 22px;
+}
+
+/* 适配样式 */
+.biz-process-state-first,
+.biz-process-state-last {
+  border: 1px solid $progress-state-before-bg-color;
+}
+
+.biz-process-state-after {
+  &.biz-process-state-last {
+    border: none;
+  }
+}
+
+.biz-process-state-current {
+  &.biz-process-state-first,
+  &.biz-process-state-last {
+    border: 1px solid $color-primary;
+  }
+  &.biz-process-state-last {
+    &:before {
+      left: -28px !important;
+    }
+    .biz-process-left-triangle-bottom {
+      :before {
+        top: 9px !important;
+      }
+    }
+  }
+}
+
+.biz-process-state-last {
+  .biz-process-left-triangle-top {
+    left: -19px;
+    top: -21px;
+  }
 }

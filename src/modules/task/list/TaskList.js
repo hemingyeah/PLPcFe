@@ -10,7 +10,7 @@ import TaskTransfer from "./components/TaskTransfer.vue";
 import TaskMap from "./components/TaskMap.vue";
 
 /** model */
-import TaskStateEnum from "@model/enum/TaskStateEnum";
+import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
 import { fields, selectIds, advancedList } from "./TaskFieldModel";
 import { LINK_REG } from "@src/model/reg";
 

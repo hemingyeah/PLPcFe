@@ -2,12 +2,16 @@
   <div class="task-detail-container" v-loading="loading">
     <!-- start 顶部操作区 -->
     <div class="task-detail-header">
-      <div class="task-detail-header-top">
+      <div class="task-detail-header-top" :class="{'active': !collapse}">
         <!-- start 折叠按钮 -->
         <div class="collapse-btn" @click="collapse = !collapse">
-          <i class="iconfont icon-more" :class="{'active': !collapse}"></i>
+          <el-tooltip :content="collapse?'收起':'展开'" placement="top">
+            <i class="iconfont icon-more"></i>
+          </el-tooltip>
         </div>
         <!-- end 折叠按钮 -->
+
+        <div class="task-delete-status" v-if="isDelete">已删除</div>
 
         <!-- start 工单流程信息 -->
         <div class="progress-wrap" v-show="collapse">
@@ -35,8 +39,8 @@
             </div>
           </div>
           
-          <!-- TODO：工单状态 样式待修改 -->
-          <div class="task-state" :style="{'background-color': getTaskStateColor()}">{{ getTaskStateName() }}</div>
+          <!-- 工单状态 -->
+          <div class="task-state" v-if="!isDelete" :style="{'background-color': stateColor.bgColor, 'border-color': stateColor.bgColor, 'color': stateColor.color}">{{ stateText }}</div>
         </div>
         <!-- end 折叠时客户信息 -->
 
@@ -88,7 +92,11 @@
         <!-- end 顶部按钮组 -->
       </div>
 
-      <biz-process-exception :data="task" v-if="collapse" />
+      <!-- start 审批中icon -->
+      <div class="approving-img" v-show="collapse && isApproving">
+        <img src="../../../assets/img/task/approving.png" />
+      </div>
+      <!-- end 审批中icon -->
 
       <div class="task-detail-header-bottom" :class="{'active': !collapse}">
         <div class="customer-info-wrap">
@@ -122,34 +130,43 @@
             <div class="form-view-row address-info" v-if="customerOption.address">
               <label>地址：</label>
               <div class="form-view-row-content">
+                <i v-if="showMap" class="iconfont icon-address" @click="openMap"></i>
                 {{ address }}
-                <!-- <i v-if="showMap" class="iconfont icon-address" @click="openMap"></i> -->
               </div>
             </div>
           </div>
           <!-- end 联系人信息 -->
 
-          <!-- start 已设置的显示项 -->
-          <div class="task-detail-header-bottom-list-item" id="keyFieldsView">
-            <task-view
-              :task="task"
-              :fields="keyFields"
-              :is-paused="isPaused"
-              :task-edit-auth="editAuth"
-              :finished-state="finishedState"
-              :customer-option="customerOption"
-              :can-see-customer="canSeeCustomer"
-              :allow-modify-plan-time="allowModifyPlanTime"
-            />
+          <!-- start 默认显示项：工单类型、计划时间、服务内容 -->
+          <div class="task-detail-header-bottom-list-item">
+            <div class="form-view-row">
+              <label>工单类型：</label>
+              <div class="form-view-row-content">{{ task.templateName }}</div>
+            </div>
+            <div class="form-view-row" v-if="serviceContentField">
+              <label>{{ serviceContentField.displayName }}：</label>
+              <div class="form-view-row-content">{{ task.serviceContent }}</div>
+            </div>
+            <div class="form-view-row" v-if="planTimeField">
+              <label>{{ planTimeField.displayName }}：</label>
+              <div class="form-view-row-content form-view-row-plantime">
+                {{ planTime }}
+                <template v-if="allowModifyPlanTime">
+                  <el-tooltip class="item" effect="dark" content="修改计划时间" placement="top">
+                    <i class="iconfont icon-bianji1" @click="openDialog('modifyPlanTime')"></i>
+                  </el-tooltip>
+                </template>
+              </div>
+            </div>
           </div>
-          <!-- end 已设置的显示项 -->
+          <!-- end 默认显示项：工单类型、计划时间、服务内容 -->
 
           <div class="task-detail-header-bottom-list-item">
             <biz-process-time :data="task" :state="taskState"></biz-process-time>
 
             <!-- start 当前工单状态操作按钮 -->
             <template v-if="!isDelete">
-              <div class="state-button-group" v-show="taskState == task.state">
+              <div class="state-button-group" v-show="taskState.value == task.state || (Array.isArray(taskState.value) && taskState.value.indexOf(task.state) > -1) ">
                 <template v-for="(item, index) in stateButtonData">
                   <el-button
                     :key="index"
@@ -168,66 +185,89 @@
     </div>
     <!-- end 顶部操作区 -->
 
-    <div class="task-detail-main-content">
-      <div class="task-detail-main-content-left">
-        <div class="task-detail-btn-group">
-          <el-tooltip content="编辑工单" placement="top" v-if="allowEditTask">
-            <i class="iconfont icon-bianji1" @click="goEdit"></i>
-          </el-tooltip>
-          <el-tooltip content="复制工单" placement="top" v-if="allowCopyTask">
-            <i class="iconfont icon-fuzhi" @click="goCopyTask"></i>
-          </el-tooltip>
-          <el-tooltip content="删除工单" placement="top" v-if="allowDeleteTask">
-            <i class="iconfont icon-shanchu-copy" @click="deleteTask"></i>
-          </el-tooltip>
-        </div>
-        
-        <el-tabs v-model="leftActiveTab">
-          <el-tab-pane label="工单详情" name="task-view">
-            <task-view
-              :task="task"
-              :fields="fields"
-              :is-paused="isPaused"
-              :task-edit-auth="editAuth"
-              :finished-state="finishedState"
-              :customer-option="customerOption"
-              :can-see-customer="canSeeCustomer"
-              :allow-modify-plan-time="allowModifyPlanTime"
-            />
-          </el-tab-pane>
-          <el-tab-pane :label="finishedState?'回执信息':'完成回执'" name="receipt-view" v-if="viewReceiptTab">
-            <task-receipt-detail-view :share-data="propsForSubComponents" />
-          </el-tab-pane>
-          <el-tab-pane label="动态信息" name="record">
-            <task-info-record :share-data="propsForSubComponents" />
-          </el-tab-pane>
-        </el-tabs>
-      </div>
+    <!-- start 工单详情折叠面板 -->
+    <base-collapse
+      class="task-detail-main-content"
+      :show-collapse="showCollapse"
+      :direction.sync="collapseDirection">
 
-      <div class="task-detail-main-content-right" v-if="viewBalanceTab || viewFeedbackTab || viewTaskCardTab">
-        <el-tabs v-model="rightActiveTab">
-          <el-tab-pane label="审核结算" name="balance-tab" v-if="viewBalanceTab">
-            <task-account ref="taskAccount" :share-data="propsForSubComponents" />
-          </el-tab-pane>
-          <el-tab-pane label="客户评价" name="feedback-tab" v-if="viewFeedbackTab">
-            <task-feedback ref="taskFeedback" :share-data="propsForSubComponents" />
-          </el-tab-pane>
-          <el-tab-pane label="附加组件" name="card-tab" v-if="viewTaskCardTab">
-            <task-detail-card :share-data="propsForSubComponents" />
-          </el-tab-pane>
-        </el-tabs>
-        <!-- start 关联数据 -->
-        <!-- <div class="task-relation" v-if="task.id">
-          <base-tabbar :tabs="tabs" v-model="currTab" ></base-tabbar>
-          <div class="task-relation-content">
-            <keep-alive>
-              <component :is="currTab" :share-data="propsForSubComponents" :init-data="initData"></component>
-            </keep-alive>
+      <!-- start 工单详情 -->
+      <template slot="left">
+        <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'">
+          <div class="task-detail-btn-group">
+            <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
+              <i class="iconfont icon-bianji1" @click="goEdit"></i>
+            </el-tooltip>
+            <el-tooltip :popper-options="popperOptions" content="复制工单" placement="top" v-if="allowCopyTask">
+              <i class="iconfont icon-fuzhi" @click="goCopyTask"></i>
+            </el-tooltip>
+            <el-tooltip :popper-options="popperOptions" content="删除工单" placement="top" v-if="allowDeleteTask">
+              <i class="iconfont icon-shanchu-copy" @click="deleteTask"></i>
+            </el-tooltip>
           </div>
-        </div> -->
-        <!-- end 关联数据 -->
-      </div>
-    </div>
+
+          <el-tabs v-model="leftActiveTab">
+            <el-tab-pane label="工单详情" name="task-view">
+              <task-view
+                :task="task"
+                :fields="fields"
+                :plan-time="planTime"
+                :is-paused="isPaused"
+                :state-text="stateText"
+                :state-color="stateColor"
+                :task-edit-auth="editAuth"
+                :finished-state="finishedState"
+                :customer-option="customerOption"
+                :can-see-customer="canSeeCustomer"
+                :allow-modify-plan-time="allowModifyPlanTime"
+                @modifyPlanTime="openDialog('modifyPlanTime')"
+              />
+            </el-tab-pane>
+            <el-tab-pane :label="finishedState?'回执信息':'完成回执'" name="receipt-view" v-if="viewReceiptTab">
+              <task-receipt-detail-view :share-data="propsForSubComponents" />
+            </el-tab-pane>
+            <el-tab-pane label="动态信息" name="record">
+              <task-info-record :share-data="propsForSubComponents" />
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+
+        <div class="collapse-left" v-show="collapseDirection == 'left'">工单详情</div>
+      </template>
+      <!-- end 工单详情 -->
+
+      <!-- start 附加组件 -->
+      <template slot="right">
+        <div class="task-detail-main-content-right" v-show="collapseDirection != 'right'">
+          <el-tabs v-model="rightActiveTab">
+            <el-tab-pane label="审核结算" name="balance-tab" v-if="viewBalanceTab">
+              <task-account
+                ref="taskAccount"
+                :share-data="propsForSubComponents"
+                @back="openDialog('back')"
+                @proposeApprove="proposeApprove"
+              />
+            </el-tab-pane>
+            <el-tab-pane label="客户评价" name="feedback-tab" v-if="viewFeedbackTab">
+              <task-feedback
+                ref="taskFeedback"
+                :share-data="propsForSubComponents"
+                @proposeApprove="proposeApprove"
+              />
+            </el-tab-pane>
+            <el-tab-pane label="附加组件" name="card-tab" v-if="viewTaskCardTab">
+              <task-detail-card :share-data="propsForSubComponents" />
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+
+        <div class="collapse-right" v-show="collapseDirection == 'right'">
+          {{ viewBalanceTab ? '审核结算' : viewFeedbackTab ? '客户评价' : '附加组件' }}
+        </div>
+      </template>
+      <!-- end 附加组件 -->
+    </base-collapse>
+    <!-- end 工单详情折叠面板 -->
 
     <!-- start 回退工单弹窗 -->
     <base-modal title="回退工单" :show.sync="backDialog.visible" width="700px" class="task-back-dialog">
@@ -271,6 +311,7 @@
     <cancel-task-dialog
       ref="cancelTaskDialog"
       :task-id="task.id"
+      @proposeApprove="proposeApprove"
     />
     <!-- end 取消工单弹窗 -->
 

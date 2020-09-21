@@ -153,6 +153,7 @@ export default {
 
 .base-modal-mask {
   @include mask();
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
   overflow: auto;
 }
@@ -243,6 +244,8 @@ export default {
 
 //TODO: 统一边距
 .base-modal-footer {
+  display: flex;
+  justify-content: flex-end;
   padding: 9px 20px;
   border-top: 1px solid $color-border-l2;
 }

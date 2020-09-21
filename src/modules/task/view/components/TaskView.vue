@@ -38,7 +38,7 @@
                 </div>
               </el-tooltip>
             </div>
-            <div class="product-item-relation" v-if="products.length == 1">
+            <div class="product-item-relation" v-if="products.length == 1 && relationProductfields.length">
               <form-view class="form-view-two-column" :fields="relationProductfields" :value="task"></form-view>
             </div>
           </div>
@@ -52,7 +52,7 @@
       <div class="form-view-row">
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content form-view-row-plantime">
-          {{ getPlanTimeValue(field) }}
+          {{ planTime }}
           <template v-if="allowModifyPlanTime">
             <el-tooltip class="item" effect="dark" content="修改计划时间" placement="top">
               <i class="iconfont icon-bianji1" @click="modifyPlanTime"></i>
@@ -80,6 +80,17 @@
       </div>
     </template>
     <!-- end 满意度 -->
+
+    <!-- start 工单状态 -->
+    <template slot="state" slot-scope="{ field }">
+      <div class="form-view-row">
+        <label>{{ field.displayName }}</label>
+        <div class="form-view-row-content">
+          <div class="task-state" :style="{'background-color': stateColor.bgColor, 'border-color': stateColor.bgColor, 'color': stateColor.color}">{{ stateText }}</div>
+        </div>
+      </div>
+    </template>
+    <!-- end 工单状态 -->
 
     <!-- start 协同人 -->
     <template slot="synergies" slot-scope="{ field, value }">
@@ -142,6 +153,18 @@ export default {
     customerOption: {
       type: Object,
       default: () => ({})
+    },
+    planTime: {
+      type: String,
+      default: ''
+    },
+    stateColor: {
+      type: Object,
+      default: () => ({})
+    },
+    stateText: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -179,7 +202,7 @@ export default {
     * @description 修改计划时间
     */
     modifyPlanTime() {
-      this.$parent.openDialog('modifyPlanTime');
+      this.$emit('modifyPlanTime');
     },
     /** 
     * @description 打开产品详情
@@ -232,24 +255,6 @@ export default {
       if (product && product.id) return productsArr.push(product);
 
       return productsArr;
-    },
-    /** 
-    * @description 计划时间
-    */
-    getPlanTimeValue(field) {
-      let { dateType } = field?.setting || {};
-      let { isEncryptPlanTime, planTime} = this.task;
-
-      if (planTime) {
-        if (isEncryptPlanTime) return ENCRYPT_FIELD_VALUE;
-
-        // 计划时间格式为日期时需格式化
-        if (dateType == 'date') return planTime.slice(0, 10);
-
-        return planTime;
-      }
-
-      return '';
     },
     /** 
     * @description 修改协同人
@@ -335,6 +340,10 @@ export default {
       }
 
       &:not(:last-child) {
+        .product-item-name {
+          margin-bottom: 8px;
+        }
+
         .product-item-relation {
           margin-bottom: 16px;
         }

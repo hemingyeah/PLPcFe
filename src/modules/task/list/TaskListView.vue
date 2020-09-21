@@ -668,10 +668,10 @@
                     v-else
                     class="task-state-block task-font12"
                     :style="{
-                      backgroundColor: taskStateEnum.getColor(
-                        scope.row[column.field]
+                      backgroundColor: taskStateEnum.getBgColor(
+                        scope.row[column.field], 0.2
                       ),
-                      color: taskStateEnum.getColorText(
+                      color: taskStateEnum.getColor(
                         scope.row[column.field]
                       ),
                     }"

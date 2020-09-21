@@ -23,6 +23,7 @@ import BaseSteps from './common/BaseSteps';
 import BaseCascader from './common/BaseCascader';
 import BaseSelectionBar from './common/BaseSelectionBar';
 import BaseServiceStar from './common/BaseServiceStar';
+import BaseCollapse from './common/BaseCollapse';
 
 
 // 可快速调用的组件
@@ -41,6 +42,7 @@ import BizSearchCustomerSelect from './business/BizSearchCustomerSelect';
 import BizSearchProductSelect from './business/BizSearchProductSelect';
 import BizProcess from './business/BizProcess';
 import BizProcessTime from './business/BizProcessTime';
+import BizSelectColumn from './business/BizSelectColumn';
 
 import SampleTooltip from './common/SampleTooltip';
 
@@ -84,13 +86,15 @@ const components = [
   BizSearchProductSelect,
   BizProcess,
   BizProcessTime,
+  BizSelectColumn,
   
   BaseWindow,
   SampleTooltip,
   BaseCascader,
   BaseSelectionBar,
   BaseEditor,
-  BaseServiceStar
+  BaseServiceStar,
+  BaseCollapse
 ];
 
 export default {

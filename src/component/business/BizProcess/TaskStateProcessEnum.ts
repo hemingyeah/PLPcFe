@@ -1,4 +1,4 @@
-import TaskStateEnum from './../../../../model/enum/TaskStateEnum';
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 
 type TaskState = {
   name: string,

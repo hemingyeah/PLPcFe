@@ -2,7 +2,7 @@
   <base-modal title="调整计划时间" :show.sync="visible" width="500px" class="task-plantime-dialog">
     <div class="base-modal-content">
       <form-item :label="field.displayName" v-if="field.id">
-        <form-plantime :field="field" :value="planTime" @update="update"></form-plantime>
+        <form-plantime :picker-options="planTimeDatePickeroptions" :field="field" :value="planTime" @update="update"></form-plantime>
       </form-item>
       <el-checkbox class="task-planTime-notice" v-model="sendSMS" v-if="action == 'modifyPlanTime'">发送短信预约通知</el-checkbox>
     </div>
@@ -16,6 +16,9 @@
 <script>
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
+
+/* util */
+import DateUtil from '@src/util/date';
 
 export default {
   name: 'plantime-dialog',
@@ -39,7 +42,12 @@ export default {
       pending: false,
       action: '',
       planTime: '',
-      sendSMS: false
+      sendSMS: false,
+      planTimeDatePickeroptions: {
+        disabledDate(time) {
+          return time.getTime() < new Date(new Date().toLocaleDateString()).getTime()
+        }
+      }
     }
   },
   computed: {
@@ -48,9 +56,15 @@ export default {
     }
   },
   methods: {
+    /**
+    * @description 更新计划时间
+    */
     update({ field, newValue, oldValue }) {
       this.$set(this, 'planTime', newValue);
     },
+    /**
+    * @description 打开计划时间弹窗
+    */
     async openDialog(action) {
       this.action = action;
 
@@ -77,6 +91,14 @@ export default {
     },
     submit() {
       if (!this.planTime) return this.$platform.alert('请填写计划时间');
+
+      // 校验计划时间是否早于当前时间
+      if (this.dateType == 'dateTime') {
+        let planTime = DateUtil.parseDateTime(this.planTime).getTime();
+        let nowTime = new Date().getTime();
+        
+        if (planTime < nowTime) return this.$platform.alert('计划时间不能早于现在');
+      }
 
       let newPlanTime = this.planTime;
       if(this.dateType == 'date') newPlanTime += ' 00:00:00';
