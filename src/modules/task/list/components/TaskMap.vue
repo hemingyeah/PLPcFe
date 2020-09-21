@@ -115,6 +115,7 @@ export default {
     mapShow(v) {
       if (!v) {
         this.mapList = [];
+        this.page = 1
         this.search();
       }
     },

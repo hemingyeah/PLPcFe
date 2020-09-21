@@ -86,7 +86,6 @@ router.get('/window', async (ctx) => {
   ctx.body = Template.renderWithData('window', {}, script);
 });
 
-<<<<<<< HEAD
 router.use("/outside/weixin/*", (ctx) =>
   HttpClient.proxy(ctx, {
     host: "30.40.56.211",
@@ -215,26 +214,6 @@ router.use("", taskRouter.routes(), taskRouter.allowedMethods());
 router.use("", sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all("/*", (ctx) => {
-=======
-router.use('', performanceRouter.routes());
-router.use('', customerRouter.routes(), customerRouter.allowedMethods());
-router.use('', openRouter.routes(), openRouter.allowedMethods());
-router.use('', settingRouter.routes(), settingRouter.allowedMethods());
-router.use('', teamRouter.routes(), teamRouter.allowedMethods());
-router.use('', productRouter.routes(), productRouter.allowedMethods());
-router.use('', approveRouter.routes(), productRouter.allowedMethods());
-router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
-router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
-router.use('', BillRouter.routes(), BillRouter.allowedMethods());
-router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
-router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
-router.use('', doMyselft.routes(), doMyselft.allowedMethods());
-router.use('', customerContact.routes(), customerContact.allowedMethods());
-router.use('', taskRouter.routes(), taskRouter.allowedMethods());
-router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
-
-router.all('/*', (ctx) => {
->>>>>>> 8af221200f1c80497e443cc3934eae51316f2214
   return HttpClient.proxy(ctx);
 });
 
