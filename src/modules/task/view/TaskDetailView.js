@@ -57,7 +57,12 @@ export default {
       hasCallCenterModule: localStorage.getItem('call_center_module') == 1,
       stateButtonData: [], // 工单当前状态下主操作按钮
       leftActiveTab: 'task-view',
-      rightActiveTab: ''
+      rightActiveTab: '',
+      collapseDirection: '',
+      popperOptions: {
+        boundariesElement: 'viewport',
+        removeOnDestroy: true
+      }
     }
   },
   computed: {
@@ -474,7 +479,7 @@ export default {
     * @description 是否显示附加组件tab
     */
     viewTaskCardTab() {
-      return this.initData?.cardInfo?.length;
+      return this.initData?.cardInfo?.length > 0;
     },
     /** 子组件所需的数据 */
     propsForSubComponents() {
@@ -564,6 +569,13 @@ export default {
     */
     stateColor() {
       return TaskStateEnum.getColorForTask(this.task);
+    },
+    /**
+    * @description 显示折叠按钮
+    * 审核结算、客户评价、附加组件有任一存在即显示
+    */
+    showCollapse() {
+      return this.viewBalanceTab || this.viewFeedbackTab || this.viewTaskCardTab;
     }
   },
   methods: {
@@ -896,6 +908,20 @@ export default {
         })
       }
     },
+    /** 
+    * @description 打开地图
+    */
+    openMap() {
+      let address = this.task.taddress;
+      let longitude = address.longitude;
+      let latitude = address.latitude;
+
+      if(!longitude || !latitude) return;
+      
+      this.$fast.map
+        .display({ ...address })
+        .catch(err => console.error('openMap catch an err: ', err));
+    },
     /**
     * @description 是否加密字段
     */
@@ -974,6 +1000,13 @@ export default {
         formType: 'user',
         isSystem: 1,
       }];
+
+      this.fields.forEach(field => {
+        // 系统附件加密
+        if (field.fieldName == 'attachment' && this.task?.isEncryptAttachment) {
+          this.task.attachment = ENCRYPT_FIELD_VALUE;
+        }
+      })
 
       this.receiptFields = result[1] || [];
       this.stateButtonData = this.buildButtonData();
