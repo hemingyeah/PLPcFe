@@ -828,7 +828,7 @@
       <base-export-group
         ref="exportPanel"
         :alert="exportAlert"
-        :columns="exportColumnList"
+        :columns="exportColumnList.length ? exportColumnList : exportColumns"
         :build-params="buildExportParams"
         :group="true"
         :validate="checkExportCount"
