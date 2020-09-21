@@ -17,7 +17,7 @@
     </div>
 
     <div slot="footer" class="import-footer">
-      <button type="button" class="btn btn-text" @click="visible = false">关闭</button>
+      <el-button  @click="visible = false">关闭</el-button>
       <el-button type="primary" :disabled="pending" @click="upload" :loading="pending">{{pending ? '正在导入' : '导入'}}</el-button>
     </div>
   </base-modal>
@@ -137,7 +137,6 @@ export default {
       padding: 15px;
     }
     .base-modal-footer {
-      padding: 15px;
       .import-footer {
         display: flex;
         justify-content: flex-end;
@@ -179,12 +178,10 @@ export default {
     flex: 1;
     line-height: 24px;
     padding: 3px 6px;
-
     border: 1px solid #d5d5d5;
-    background-color: #f0f0f0;
     border-right: none;
     margin: 0;
-    border-radius: 2px 0 0 2px;
+    border-radius: 4px 0 0 4px;
   }
 
   .el-button{

@@ -48,15 +48,14 @@
     <!-- end 分组 -->
 
     <div slot="footer" class="export-footer">
-      <button type="button" class="btn base-modal-text-btn" @click="visible = false">关闭</button>
-      <button
-        type="button"
-        class="btn btn-primary"
+      <el-button @click="visible = false">关闭</el-button>
+      <el-button
+        type="primary"
         :disabled="pending"
         @click="exportData(true)"
       >
         {{pending ? '正在导出' : '导出'}}
-      </button>
+      </el-button>
     </div>
 
     <div class="base-export-bridge" ref="bridge"></div>
@@ -104,7 +103,6 @@ export default {
     columns.forEach(column => {
       checkedMap[column.value] = [];
     });
-
     return {
       checkedMap,
       checkedGroupArr: [],
@@ -163,6 +161,7 @@ export default {
       let checkedMap = this.checkedMap;
 
       this.checkedGroupArr = [];
+      console.log(this.checkedMap)
 
       for(let key in checkedMap) {
         let item = checkedMap[key];

@@ -764,7 +764,7 @@ const advancedList = [
     fieldName: "tlmName",
     displayName: "联系人",
     exportAlias: "customerLinkman",
-    formType: "user",
+    formType: "select",
     defaultValue: null,
     isNull: 1,
     isSearch: 1,

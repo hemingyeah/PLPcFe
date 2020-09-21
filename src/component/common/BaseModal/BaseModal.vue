@@ -243,6 +243,8 @@ export default {
 
 //TODO: 统一边距
 .base-modal-footer {
+  display: flex;
+  justify-content: flex-end;
   padding: 9px 20px;
   border-top: 1px solid $color-border-l2;
 }

@@ -447,7 +447,9 @@ export default {
      * @description 计划任务提交
     */
     submitWithPlanTask: _.debounce(function (planTaskParams = {}) {
-      if(this.pending) return;
+      if (this.pending) {
+        return console.warn('Caused: can not submitWithPlanTask action, because this.pending is true');
+      }
 
       this.togglePending(true);
       // 计划任务元素

@@ -1,7 +1,7 @@
 /* util */
 import qs from '@src/util/querystring'
 /* model */
-import TaskStateEnum from '@model/enum/TaskStateEnum';
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 
 export default {
   /* 权限 */

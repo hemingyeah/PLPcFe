@@ -2,7 +2,7 @@ import './BizProcess.scss'
 
 import _ from 'lodash'
 /* 工单流程信息状态 */
-import TaskStateEnum from '@model/enum/TaskStateEnum';
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import TaskStateProcessEnum from './TaskStateProcessEnum.ts'
 
 const TaskStateProcessArray = [
@@ -82,6 +82,10 @@ const BizProcess = {
       let { isPaused, isOverTime } = this.data
       return isPaused === 1 || isOverTime === 1
     },
+    isOnceException() {
+      let { onceOverTime, oncePaused, positionException } = this.data
+      return onceOverTime || oncePaused || positionException
+    },
     // 是否曾回退
     onceRollback() {
       return this.data.onceRollback == 1
@@ -147,7 +151,7 @@ const BizProcess = {
       }
 
       this.selected = state.value;
-      this.$emit('change', state.value);
+      this.$emit('change', state);
     },
     /* 渲染流程信息状态 */
     renderProcessStateItem(h, state, index) {
@@ -214,13 +218,13 @@ const BizProcess = {
     },
     /* 渲染工单状态超时 */
     renderProcessOverTime() {
-      let index = this.genCurrentStateIndex == 0 ? 0 : this.genCurrentStateIndex + .5
+      let index = this.genCurrentStateIndex + .5
       let style = {
         left: `${ProcessItemWidth * index}px`,
         color: TaskStateEnum.PSUSED.color
       }
       let overTime = this.genOverTime();
-      let overTimeDom = <div>{`时限: ${overTime}小时`}</div>
+      let overTimeDom = <div class="biz-process-exception-time">{`时限: ${overTime}小时`}</div>
 
       return (
         <div style={ style }> 
@@ -236,6 +240,8 @@ const BizProcess = {
   created() {
     // 已取消，且 未回退过
     if(this.isOffed && !this.onceRollback) {
+      // 根据是否有接单时间判断 是否包含流程 已指派
+      let allotTime = this.data.allotTime
       // 根据是否有接单时间判断 是否包含流程 已接受
       let acceptTime = this.data.acceptTime
       // 根据是否有接单时间判断 是否包含流程 进行中
@@ -243,6 +249,7 @@ const BizProcess = {
 
       this.taskStateProcessArray = TaskStateProcessArray.slice();
 
+      !allotTime && this.stateFilterHandler(TaskStateEnum.ALLOCATED.value)
       !acceptTime && this.stateFilterHandler(TaskStateEnum.ACCEPTED.value)
       !startTime && this.stateFilterHandler(TaskStateEnum.PROCESSING.value)
 
@@ -262,9 +269,10 @@ const BizProcess = {
           { this.genStateProcess.map((state, index) => this.renderProcessStateItem(h, state, index)) }
         </div>
         { 
-          this.isException 
+          this.isException || this.isOnceException
             ? (
               <div class="biz-process-exception">
+                { this.renderProcessExceptionTextAndIcon(h) }
                 { this.renderProcessException(h) }
               </div>
             )

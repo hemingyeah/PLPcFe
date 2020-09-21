@@ -1,5 +1,5 @@
 <template>
-  <div
+  <!-- <div
     class="common-list-filter-select"
     v-if="show"
     :class="{ postion: right, left: !right }"
@@ -12,7 +12,12 @@
     >
       {{ item.name }}
     </div>
-  </div>
+  </div> -->
+  <el-dropdown-menu slot="dropdown">
+    <el-dropdown-item v-for="(item, index) in list" :key="index"
+      >{{item.name}}</el-dropdown-item
+    >
+  </el-dropdown-menu>
 </template>
 <script>
 // :class="{ 'common-list-filter-select-active': id === index }"
@@ -29,7 +34,7 @@ export default {
     right: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   name: "TaskSelect",
   data() {
@@ -74,7 +79,7 @@ export default {
   }
 }
 .postion {
-  right: 0 ;
+  right: 0;
 }
 .left {
   left: 0;

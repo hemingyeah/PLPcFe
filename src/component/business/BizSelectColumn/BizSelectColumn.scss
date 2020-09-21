@@ -1,0 +1,15 @@
+.biz-select-column-tree-parent {
+  padding: 0 20px;
+}
+
+.biz-select-column-tree-child {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 20px;
+
+  .biz-select-column-field {
+    width: 120px;
+    @include text-ellipsis();
+  }
+
+}

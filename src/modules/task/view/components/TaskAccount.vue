@@ -5,7 +5,7 @@
 
       <!-- start 审批中 -->
       <template v-if="isApproving">
-        <no-data-view-new v-if="!task.balanceConfirm" notice-msg="未配置任何审核结算字段"></no-data-view-new>
+        <no-data-view-new v-if="!openUserDefinedBalance" notice-msg="未配置任何审核结算字段"></no-data-view-new>
         <form-view :fields="balanceAvailableFields" :value="balanceJson" v-else></form-view>
         <div class="approving-img"><img :src="getApprovingImg()" /></div>
       </template>
@@ -188,7 +188,7 @@ export default {
         }
         
       } else if (action === 'back') {
-        this.$parent.openDialog(action);
+        this.$emit('back');
       }
     },
     update({ field, newValue, oldValue }) {
@@ -246,7 +246,7 @@ export default {
       // 审核结算是否需要审批
       const result = await TaskApi.balanceApproveCheck(params);
       if (!result.succ && result.message == '需要审批') {
-        this.$parent.$refs.proposeApprove.openDialog(result.data);
+        this.$emit('proposeApprove', result.data);
         this.balanceDialog.visible = false;
         this.pending = false;
         return;
@@ -254,7 +254,10 @@ export default {
 
       TaskApi.balanceTask(params).then(res => {
         if (res.success) {
-          this.$platform.alert('审核结算成功');
+          this.$platform.notification({
+            type: 'success',
+            title: '审核结算成功'
+          })
 
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
@@ -271,7 +274,10 @@ export default {
     edit(params) {
       TaskApi.editBalance(params).then(res => {
         if (res.success) {
-          this.$platform.alert('编辑成功');
+          this.$platform.notification({
+            type: 'success',
+            title: '编辑成功'
+          })
 
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
