@@ -86,6 +86,136 @@ router.get('/window', async (ctx) => {
   ctx.body = Template.renderWithData('window', {}, script);
 });
 
+<<<<<<< HEAD
+router.use("/outside/weixin/*", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.56.211",
+    port: 10007,
+    headers: {
+      cookie:
+        "VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E",
+    },
+  })
+);
+
+router.use("/outside/es/task/search", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.199",
+    port: 10006,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=5d35d0dd-9f80-4d5d-8c29-1b33a350f7b9",
+    },
+  })
+);
+
+router.use("/outside/pc/task/editBatchTask", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.199",
+    port: 10012,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=2bacf42d-74dc-46da-8b7b-769da7807331",
+    },
+  })
+);
+
+router.use("/outside/pc/view/getUserViews", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.199",
+    port: 10012,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+    },
+  })
+);
+
+router.use("/outside/es/task/getTaskCountByState", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.199",
+    port: 10006,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=840df68a-e3cd-47c2-9348-fb1c31c0aa21",
+    },
+  })
+);
+
+router.use("/outside/pc/view/createTaskView", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.199",
+    port: 10012,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+    },
+  })
+);
+
+router.use("/outside/pc/view/editTaskView", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.199",
+    port: 10012,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+    },
+  })
+);
+
+router.use("/outside/pc/view/deleteOneView", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.199",
+    port: 10012,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+    },
+  })
+);
+
+router.use("/outside/pc/task/delete", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.59.137",
+    port: 10012,
+    headers: {
+      cookie: "VIPPUBLINKJSESSIONID=316e588e-fe61-486d-9cb8-d90e9afa5d91",
+    },
+  })
+);
+
+// 通知中心改造
+router.use("/outside/*", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.59.106",
+    port: 10002,
+    headers: {
+      cookie:
+        "VIPPUBLINKJSESSIONID=f560fed5-4bc4-4ff0-8638-e6666c18a31a; JSESSIONID=5442CD36355252A20E2CC1DAB778E536; __wpkreporterwid_=a99f79d5-3645-407a-3bf8-d6774e411773",
+    },
+  })
+);
+
+router.use("/approve/search", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "47.98.255.79",
+    port: 10002,
+  })
+);
+
+router.use("", performanceRouter.routes());
+router.use("", customerRouter.routes(), customerRouter.allowedMethods());
+router.use("", openRouter.routes(), openRouter.allowedMethods());
+router.use("", settingRouter.routes(), settingRouter.allowedMethods());
+router.use("", teamRouter.routes(), teamRouter.allowedMethods());
+router.use("", productRouter.routes(), productRouter.allowedMethods());
+router.use("", approveRouter.routes(), productRouter.allowedMethods());
+router.use("", dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
+router.use("", repositoryRouter.routes(), repositoryRouter.allowedMethods());
+router.use("", BillRouter.routes(), BillRouter.allowedMethods());
+router.use("", jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
+router.use("", callCenterRouter.routes(), callCenterRouter.allowedMethods());
+router.use("", doMyselft.routes(), doMyselft.allowedMethods());
+router.use("", customerContact.routes(), customerContact.allowedMethods());
+router.use("", taskRouter.routes(), taskRouter.allowedMethods());
+router.use("", sparePartRouter.routes(), sparePartRouter.allowedMethods());
+
+router.all("/*", (ctx) => {
+=======
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
 router.use('', openRouter.routes(), openRouter.allowedMethods());
@@ -104,6 +234,7 @@ router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', (ctx) => {
+>>>>>>> 8af221200f1c80497e443cc3934eae51316f2214
   return HttpClient.proxy(ctx);
 });
 

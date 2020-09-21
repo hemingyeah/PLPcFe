@@ -4,13 +4,13 @@ import {
   PlanTaskCreateAndEditModel,
 } from "@model/param/in/Task";
 
-// const fixedPrefixTaskPath = "/api/task";
-// const ElASTICSEARCH =  "/api/elasticsearch";
-// const fixedPrefixPaymentPath = '/api/payment';
+const fixedPrefixTaskPath = "/api/task";
+const ElASTICSEARCH =  "/api/elasticsearch";
+const fixedPrefixPaymentPath = '/api/payment';
 
-const fixedPrefixTaskPath = "";
-const ElASTICSEARCH = "";
-const fixedPrefixPaymentPath = "";
+// const fixedPrefixTaskPath = "";
+// const ElASTICSEARCH = "";
+// const fixedPrefixPaymentPath = "";
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -631,20 +631,14 @@ export function editReceipt(params: {} | undefined) {
  * @description 暂存回执
  */
 export function receiptDraft(params: {} | undefined) {
-  return http.post(
-    `${fixedPrefixTaskPath}/outside/pc/task/receiptDraft/save`,
-    params
-  );
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/receiptDraft/save`, params);
 }
 
 /**
  * @description 修改协同人
  */
 export function updateSynergies(params: {} | undefined) {
-  return http.post(
-    `${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`,
-    params
-  );
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateSynergies`, params);
 }
 
 /**

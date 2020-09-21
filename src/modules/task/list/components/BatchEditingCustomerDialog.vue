@@ -147,6 +147,8 @@ export default {
         fieldName: "",
         value: "",
       };
+      // console.log(JSON.parse(buildParams.mapJson))
+      // return
       for (let key in JSON.parse(buildParams.mapJson)) {
         params.fieldName = key;
         params.value = JSON.parse(buildParams.mapJson)[key];

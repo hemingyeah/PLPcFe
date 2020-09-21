@@ -341,22 +341,24 @@ export default {
      */
     async getCardDetailList(typeId) {
       const res = await TaskApi.getCardDetailList({ typeId });
-      let list = res.map((item) => {
-        let columns = item.fields.map((v) => {
+      let list = res.map((item, index) => {
+        if (item.canRead) {
+          let columns = item.fields.map((v) => {
+            return {
+              export: item.canRead,
+              label: v.displayName,
+              ...v,
+            };
+          });
           return {
-            export: item.canRead,
-            displayName: v.displayName,
-            label: v.displayName
+            value: `annexChecked${index}`,
+            label: `附加组件：${item.cardName}`,
+            inputType: item.inputType,
+            columns,
           };
-        });
-        return {
-          value: "annexChecked",
-          label: `附加组件：${item.cardName}`,
-          inputType: item.inputType,
-          columns,
-        };
+        }
       });
-      console.log(list, this.exportColumns)
+      console.log("导出工单", list, this.exportColumns);
       this.exportColumnList = [...this.exportColumns, ...list];
     },
     /**
@@ -458,6 +460,7 @@ export default {
             // 删除工单
             const { success } = await TaskApi.deleteTask(selectedIds);
             if (success) {
+              $platform.alert("删除成功");
               this.initialize();
             }
           }
@@ -874,9 +877,15 @@ export default {
       let exportSearchModel = {
         typeId: this.currentTaskType.id,
       };
-
       let params = {
-        exportSearchModel: exportAll ? JSON.stringify(all) : JSON.stringify({}),
+        exportSearchModel: JSON.stringify({
+          ...all,
+          ...{
+            exportTotal: exportAll
+              ? this.taskPage.totalElements
+              : this.selectedIds.length,
+          },
+        }),
       };
       params["data"] = exportAll ? "" : this.selectedIds.join(",");
       params["typeId"] = exportSearchModel.typeId;
@@ -1568,10 +1577,10 @@ export default {
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
-          case "是":
+          case "审批中":
             inApprove = 1;
             break;
-          case "否":
+          case "无审批":
             inApprove = 0;
             break;
           default:
@@ -1616,6 +1625,7 @@ export default {
           allotType,
           onceException,
           onceReallot,
+          oncePrinted,
           inApprove,
           sorts,
           tagId: params.tagId,
@@ -1666,6 +1676,7 @@ export default {
 
         this.searchParams = { ...searchModel, ...mySearch };
       }
+      console.log("参数", params);
       this.searchList();
     },
     /**
