@@ -13,3 +13,33 @@
   }
 
 }
+
+.biz-select-column-modal {
+  .base-modal {
+    width: 886px !important;
+  }
+  .base-modal-body {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    .biz-select-column-body {
+      flex: 1;
+    }
+    .biz-select-column-sort {
+      width: 240px;
+      overflow: auto;
+    }
+  }
+}
+
+.biz-select-column-sort-title {
+  color: $text-color-regular;
+  font-size: $font-size-small;
+  line-height: 40px;
+  &-text {
+    color: $color-primary;
+    font-size: $font-size-base;
+    font-weight: 500;
+    margin-right: 12px;
+  }
+}
