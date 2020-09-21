@@ -960,7 +960,7 @@ export default {
      */
     checkExportCount(ids, max) {
       let exportAll = !ids || ids.length == 0;
-      return exportAll && this.taskPage.total > max
+      return exportAll && this.taskPage.totalElements > max
         ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
         : null;
     },
@@ -968,17 +968,17 @@ export default {
      * @description 导出提示
      */
     exportAlert(result, params = {}) {
-      let taskQueryInputString = params?.taskQueryInput || "{}";
-      let taskQueryInput = JSON.parse(taskQueryInputString);
-      let ids = taskQueryInput.ids || [];
-      let idsArr = ids;
-      let exportNum =
-        idsArr.length > 0 && ids.length > 0
-          ? idsArr.length
-          : this.taskPage.total;
-      let message = `您已选择${exportNum}条数据进行导出，导出进行中，导出完成后，您可以到右上角后台任务中查看导出数据，关闭本窗口不影响数据导出。`;
+      // let taskQueryInputString = params?.taskQueryInput || "{}";
+      // let taskQueryInput = JSON.parse(taskQueryInputString);
+      // let ids = taskQueryInput.ids || [];
+      // let idsArr = ids;
+      // let exportNum =
+      //   idsArr.length > 0 && ids.length > 0
+      //     ? idsArr.length
+      //     : this.taskPage.totalElements;
+      // let message = `您已选择${exportNum}条数据进行导出，导出进行中，导出完成后，您可以到右上角后台任务中查看导出数据，关闭本窗口不影响数据导出。`;
 
-      this.$platform.alert(message);
+      this.$platform.alert(result.message);
     },
     /**
      * @description 导出工单
