@@ -103,7 +103,7 @@ export default {
     right: -20px;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 999;
+    z-index: 9;
 
     &-left,
     &-right {

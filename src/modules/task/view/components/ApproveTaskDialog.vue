@@ -38,7 +38,7 @@
       </div>
       <div class="form-view-row">
         <label>审批结果：</label>
-        <div class="form-view-row-content">
+        <div class="form-view-row-content result-content">
           <el-radio-group v-model="result">
             <el-radio label="success">通过</el-radio>
             <el-radio label="fail">拒绝</el-radio>
@@ -207,15 +207,25 @@ export default {
 .task-approve-dialog {
   .form-view-row {
     padding: 6px 0px;
+
+    .result-content {
+      height: 24px;
+      overflow-y: hidden;
+    }
   }
 
   .dialog-footer {
     text-align: left;
     display: flex;
+    flex: 1;
 
     .dialog-footer-left {
       flex: 1;
       font-size: 12px;
+
+      .tips {
+        color: $text-color-regular;
+      }
     }
 
     .dialog-footer-right {
