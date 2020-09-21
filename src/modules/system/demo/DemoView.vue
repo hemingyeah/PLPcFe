@@ -5,7 +5,6 @@
     <base-button type="primary" @event="openS">
       选择列
     </base-button>
-
   </div>
 </template>
 
@@ -21,7 +20,7 @@ export default {
   methods: {
     openS() {
       this.$refs.bizSelectColumn.open();
-    }
+    },
   },
   mounted() {
     this.openS();

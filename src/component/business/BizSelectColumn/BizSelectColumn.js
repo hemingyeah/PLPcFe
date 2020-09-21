@@ -1,8 +1,14 @@
-import _ from 'lodash';
-
 import './BizSelectColumn.scss'
+
+import BizSelectColumnSort from './BizSelectColumnSort'
+
 import { typeOf } from '@src/util/assist';
 import Columns from './columnData'
+
+function convertDisplayNameToName(field = {}) {
+  field.name = field.displayName
+  return field
+}
 
 /** 
  * 第一版：暂时支持现在的需求，如需支持其他的，后续拓展 
@@ -11,6 +17,7 @@ const BizSelectColumn = {
   name: 'biz-select-column',
   data() {
     return {
+      columnSortList: [],
       columnTree: {},
       show: false
     }
@@ -21,12 +28,16 @@ const BizSelectColumn = {
      * 目前是按照 templateId 工单类型id 分组的
     */
     columnsDataGrouped(columns = []) {
-      // 字段树🌲
-      let columnsTree = {};
       // 系统字段组
-      let systemFieldsGroup = [];
+      let systemFieldsGroup = []
       // 自定义字段组
-      let attributeFieldsGroup = {};
+      let attributeFieldsGroup = {}
+      // 字段树🌲
+      let columnsTree = {
+        system: { name: '系统字段', columns: systemFieldsGroup, checked: false, root: true },
+        attribute: { name: '自定义字段', columns: attributeFieldsGroup, checked: false, root: true }
+      }
+      
 
       columns.forEach(column => {
         // 是否是系统字段 TODO: && column.isSystem == 1
@@ -39,17 +50,19 @@ const BizSelectColumn = {
           let { templateName, templateId } = column
           // 判断是否 自定义字段组存在 此类型数据
           if (!attributeFieldsGroup[templateId]) {
-            attributeFieldsGroup[templateId] = { name: templateName, columns: [], checked: false }
+            attributeFieldsGroup[templateId] = { name: templateName, columns: [] }
           }
           attributeFieldsGroup[templateId].columns.push(column)
         }
 
       })
 
-      columnsTree = {
-        system: { name: '系统字段', columns: systemFieldsGroup, checked: false, root: true },
-        attribute: { name: '自定义字段', columns: attributeFieldsGroup, checked: false, root: true }
+      // 初始化选中
+      for(let key in columnsTree) {
+        this.toggleTreeChecked(columnsTree[key])
       }
+      
+      this.initColumnSortList(columns)
 
       return columnsTree
     },
@@ -90,6 +103,7 @@ const BizSelectColumn = {
         parentOfParent.checked = false;
       }
 
+      this.columnFieldChangeWithSort(value, field, parent)
     },
     /** 
      * @description 父级复选框 变化
@@ -104,6 +118,74 @@ const BizSelectColumn = {
         this.toggleCheckedWithDown(treeNode)
         this.toggleCheckedWithUp(treeNode, parent)
       }
+
+      this.$nextTick(() => {
+        this.buildColumnSortList()
+      })
+    },
+    columnFieldChangeWithSort(checked, field, parent) {
+      let isParentRoot = parent.root
+      let sortList = this.columnSortList.slice()
+
+      if (isParentRoot) {
+        checked
+          ? this.columnSortList.push(field)
+          : this.columnSortList = sortList.filter(item => item.fieldName != field.fieldName)
+      } else {
+        let templateGroup = {}
+        let templateIndex = 0
+
+        for (let i = 0; i < sortList.length; i++) {
+          let item = sortList[i];
+          if (item.name == parent.name) {
+            templateGroup = item
+            templateIndex = i
+            break
+          }
+        }
+
+        let templateColumns = templateGroup.lists || []
+
+        checked
+          ? templateColumns.push(field)
+          : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
+        
+        this.columnSortList[templateIndex] = templateColumns;
+      }
+
+    },
+    /** 
+     * @description 初始化排序列表
+    */
+    initColumnSortList(originColumns) {
+      const TemplateMap = {}
+      let sortList = []
+
+      originColumns.filter(column => column.show).forEach((column, index) => {
+        let isSystemFiled = !column.templateId
+
+        if (isSystemFiled) {
+          return sortList.push(convertDisplayNameToName(column)) 
+        } 
+
+        let { templateId, templateName } = column
+        let templateData = TemplateMap[templateId]
+        if (!templateData) {
+          TemplateMap[templateId] = { index, name: templateName, columns: [] }
+        }
+        
+        TemplateMap[templateId].columns.push(convertDisplayNameToName(column))
+      })
+
+      for (let key in TemplateMap) {
+        let { columns, index, name } = TemplateMap[key]
+        sortList.splice(index, 1, {
+          name,
+          lists: columns
+        })
+      }
+
+      this.columnSortList = sortList
     },
     /** 
      * @description 列数据 是否是 对象
@@ -208,19 +290,45 @@ const BizSelectColumn = {
 
         parent.checked = isChildAllChecked;
       }
+    },
+    /** 
+     * @description 切换树的选中
+    */
+    toggleTreeChecked(treeNode) {
+      let isColumnsObject = this.isColumnsObject(treeNode.columns);
+      let checked = false;
+
+      if (isColumnsObject) {
+        checked = Object.keys(treeNode.columns).every(key => this.toggleTreeChecked(treeNode.columns[key]))
+      } else {
+        checked = treeNode.columns.every(column => column.show)
+      }
+
+      treeNode.checked = checked
+
+      return checked
     }
+
   },
   render(h) {
     return (
       <base-modal
-        title="选择列" class="biz-select-column-modal"
         appendToBody={ true }
+        class="biz-select-column-modal"
+        title="选择列" 
         show={ this.show } 
         onClose={ this.close }
       >
         <div class="biz-select-column-body">
           { this.renderTreeDom(h) }
         </div>
+
+        <biz-select-column-sort lists={ this.columnSortList }>
+          <div slot="title" class="biz-select-column-sort-title">
+            <span class="biz-select-column-sort-title-text">可视字段</span>
+            可视字段支持拖拽排序
+          </div>
+        </biz-select-column-sort>
         
         <template slot="footer">
           <button type="button" class="btn btn-text" onClick={ this.close }>关闭</button>
@@ -229,6 +337,9 @@ const BizSelectColumn = {
 
       </base-modal>
     )
+  },
+  components: {
+    [BizSelectColumnSort.name]: BizSelectColumnSort
   }
 }
 

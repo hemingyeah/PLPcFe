@@ -131,7 +131,7 @@ const PlanTaskEditForm = {
 
       if(key == 'period') return periodSetting.period
       else if(key == 'periodUnit') return periodSetting.periodUnit
-      else if(key == 'endTime') return endSetting.time
+      else if(key == 'endTime') return endSetting.select == 'date' ? endSetting.time : true
       else if(key == 'endNum') return endSetting.num
       
       return this.form[key];
