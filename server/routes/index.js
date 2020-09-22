@@ -1,60 +1,68 @@
 /** development server @author dongls */
 
 // 当前用户的配置
-const argv = require('../../script/argv')(process.argv.slice(2));
-const user = argv.user || 'dongls';
+const argv = require("../../script/argv")(process.argv.slice(2));
+const user = argv.user || "dongls";
 const USER_CONFIG = require(`../../script/config/${user}`);
 
-const KoaRouter = require('koa-router');
-const HttpClient = require('../util/HttpClient');
-const Template = require('../util/Template');
+const KoaRouter = require("koa-router");
+const HttpClient = require("../util/HttpClient");
+const Template = require("../util/Template");
 
-const modules = require('../../modules');
+const modules = require("../../modules");
 const router = new KoaRouter();
 
-const customerRouter = require('./customer');
-const openRouter = require('./open');
-const settingRouter = require('./setting');
-const teamRouter = require('./team');
-const performanceRouter = require('./performance');
-const productRouter = require('./product');
-const approveRouter = require('./approve');
-const dataScreenRouter = require('./dataScreen');
+const customerRouter = require("./customer");
+const openRouter = require("./open");
+const settingRouter = require("./setting");
+const teamRouter = require("./team");
+const performanceRouter = require("./performance");
+const productRouter = require("./product");
+const approveRouter = require("./approve");
+const dataScreenRouter = require("./dataScreen");
 
-const repositoryRouter = require('./repository');
-const BillRouter = require('./bill');
-const jobtransferRouter = require('./jobtransfer');
-const callCenterRouter = require('./callcenter');
-const doMyselft = require('./doMyself');
-const customerContact = require('./customerContact');
-const taskRouter = require('./task');
-const sparePartRouter = require('./sparePart');
+const repositoryRouter = require("./repository");
+const BillRouter = require("./bill");
+const jobtransferRouter = require("./jobtransfer");
+const callCenterRouter = require("./callcenter");
+const doMyselft = require("./doMyself");
+const customerContact = require("./customerContact");
+const taskRouter = require("./task");
+const sparePartRouter = require("./sparePart");
 
-router.get('/', async (ctx) => {
-  let modConfig = modules['system.frame'];
-  let script = ['/system.frame.js'];
+router.get("/", async (ctx) => {
+  let modConfig = modules["system.frame"];
+  let script = ["/system.frame.js"];
   let reqHeaders = ctx.request.headers;
   let headers = {};
   let body = null;
-  let result = await HttpClient.request('/', 'get', null, { headers: reqHeaders });
+  let result = await HttpClient.request("/", "get", null, {
+    headers: reqHeaders,
+  });
 
   // 请求失败,模拟登陆
   if (!result.status) {
-    console.warn('请求失败');
+    console.warn("请求失败");
     let mockUser = USER_CONFIG.loginUser;
-    let userToken = 'dev_corpId';
+    let userToken = "dev_corpId";
     if (null != mockUser) {
       userToken = `${mockUser.userId}_${mockUser.tenantId}`;
     }
 
-    let loginRes = await HttpClient.request(`/dd/mockLogin?code=dev_code&corpId=${userToken}`, 'get', null);
+    let loginRes = await HttpClient.request(
+      `/dd/mockLogin?code=dev_code&corpId=${userToken}`,
+      "get",
+      null
+    );
     if (loginRes.status) {
-      let cookie = loginRes.headers['set-cookie'] || {};
-      headers['set-cookie'] = cookie;
-      reqHeaders['cookie'] = cookie[0];
+      let cookie = loginRes.headers["set-cookie"] || {};
+      headers["set-cookie"] = cookie;
+      reqHeaders["cookie"] = cookie[0];
 
       // 再次请求
-      result = await HttpClient.request('/', 'get', null, { headers: reqHeaders });
+      result = await HttpClient.request("/", "get", null, {
+        headers: reqHeaders,
+      });
     } else {
       console.log(loginRes);
     }
@@ -69,21 +77,26 @@ router.get('/', async (ctx) => {
   }
 
   // 返回html
-  ctx.body = Template.renderWithHtml('售后宝', body, script, modConfig.template);
+  ctx.body = Template.renderWithHtml(
+    "售后宝",
+    body,
+    script,
+    modConfig.template
+  );
 });
 
-router.get('/demo', async (ctx) => {
-  let script = ['/system.demo.js'];
-  ctx.body = Template.renderWithData('demo', {}, script);
+router.get("/demo", async (ctx) => {
+  let script = ["/system.demo.js"];
+  ctx.body = Template.renderWithData("demo", {}, script);
 });
 
-router.get('/performance/list', async (ctx) => {
-  ctx.redirect('/performance/v2/report');
+router.get("/performance/list", async (ctx) => {
+  ctx.redirect("/performance/v2/report");
 });
 
-router.get('/window', async (ctx) => {
-  let script = ['/window.js'];
-  ctx.body = Template.renderWithData('window', {}, script);
+router.get("/window", async (ctx) => {
+  let script = ["/window.js"];
+  ctx.body = Template.renderWithData("window", {}, script);
 });
 
 router.use("/outside/weixin/*", (ctx) =>
@@ -102,7 +115,7 @@ router.use("/outside/es/task/search", (ctx) =>
     host: "30.40.58.199",
     port: 10006,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5d35d0dd-9f80-4d5d-8c29-1b33a350f7b9",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );
@@ -112,7 +125,7 @@ router.use("/outside/pc/task/editBatchTask", (ctx) =>
     host: "30.40.58.199",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=2bacf42d-74dc-46da-8b7b-769da7807331",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );
@@ -122,7 +135,7 @@ router.use("/outside/pc/view/getUserViews", (ctx) =>
     host: "30.40.58.199",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );
@@ -132,7 +145,7 @@ router.use("/outside/es/task/getTaskCountByState", (ctx) =>
     host: "30.40.58.199",
     port: 10006,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=840df68a-e3cd-47c2-9348-fb1c31c0aa21",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );
@@ -142,7 +155,7 @@ router.use("/outside/pc/view/createTaskView", (ctx) =>
     host: "30.40.58.199",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );
@@ -152,7 +165,7 @@ router.use("/outside/pc/view/editTaskView", (ctx) =>
     host: "30.40.58.199",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );
@@ -162,7 +175,7 @@ router.use("/outside/pc/view/deleteOneView", (ctx) =>
     host: "30.40.58.199",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=5ca6f94e-acd4-410e-82b2-5bba3fb31ede",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );
@@ -172,7 +185,7 @@ router.use("/outside/pc/task/delete", (ctx) =>
     host: "30.40.59.137",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=316e588e-fe61-486d-9cb8-d90e9afa5d91",
+      cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
     },
   })
 );

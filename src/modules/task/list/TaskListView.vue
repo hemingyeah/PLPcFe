@@ -340,7 +340,7 @@
         <div class="task-list-operation-bar-container task-flex task-ai">
           <div class="top-btn-group task-span1 task-flex task-ai">
             <!-- 新建 -->
-            <el-dropdown>
+            <el-dropdown v-if="auth.TASK_ADD">
               <base-button type="primary" icon="icon-add">新建</base-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
