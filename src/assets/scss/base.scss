@@ -148,22 +148,23 @@ textarea {
     padding: 3px 0 !important;
     border-bottom: 1px solid #ebebeb !important;
     border-right: 1px solid #ebebeb !important;
-    &:first-child {
+    &:first-child, &:last-child {
       border-right: none !important;
     }
     > div {
       font-size: 14px !important;
+      font-weight: 500 !important;
     }
   }
   .task-list-section td {
     padding: 4px 0 !important;
     border-bottom: 1px solid #ebebeb !important;
     border-right: 1px solid #ebebeb !important;
-    &:first-child {
+    &:first-child, &:last-child {
       border-right: none !important;
     }
     > div {
-      font-size: 14px !important;
+      font-size: 13px !important;
       line-height: 31px !important;
       color: #666 !important;
     }
@@ -183,5 +184,8 @@ textarea {
   .el-table--border {
     border: none;
     padding: 0;
+    &::after {
+      width: 0 !important;
+    }
   }
 }

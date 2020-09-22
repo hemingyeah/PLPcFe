@@ -91,7 +91,7 @@ export default {
       const f = {
         ...Object.freeze(field),
       };
-      let comp = FormFieldMap[f.formType];
+      let comp = FormFieldMap.get(f.formType);
 
       if (!comp || f.formType === "area") {
         return null;
@@ -184,6 +184,7 @@ export default {
               value: this.form[f.fieldName],
               disableMap: true,
               placeholder: Utils.genPlaceholder(f),
+              seo: true
             },
             on: {
               update: (event) => this.update(event),

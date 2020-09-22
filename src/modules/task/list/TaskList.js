@@ -105,6 +105,10 @@ export default {
           name: "全部",
           id: "",
         },
+        {
+          name: "擦擦擦",
+          id: "9ccd6a25-23db-4130-bae5-9ed0591a50ec",
+        },
       ],
       taskFields: [],
       taskReceiptFields: [],
@@ -461,6 +465,7 @@ export default {
             const { success } = await TaskApi.deleteTask(selectedIds);
             if (success) {
               $platform.alert("删除成功");
+              this.getTaskCountByState(this.searchParams)
               this.initialize();
             }
           }
@@ -1181,13 +1186,13 @@ export default {
           this.planTimeType = res[0].filter((item) => {
             return item.displayName === "计划时间";
           })[0].setting.dateType;
-          this.buildColumns();
           this.taskView.map((item) => {
             if (item.id === this.filterId) {
               searchModel = item.searchModel;
             }
           });
           this.search(searchModel);
+          this.buildColumns();
         })
         .catch((err) => {
           console.warn(err);
@@ -1675,7 +1680,7 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
-          state: state || searchModel.state,
+          state: state || this.searchParams.state,
         };
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/

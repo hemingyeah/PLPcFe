@@ -239,7 +239,7 @@
         .state {
           height: 31px;
           padding-left: 11px;
-          width: 10%;
+          width: 90px;
           font-weight: 500;
           background-color: #f2f2f2;
         }
@@ -255,9 +255,9 @@
             > div {
               height: 31px;
               padding-left: 11px;
-              font-size: 14px;
+              font-size: 13px;
               width: 130px;
-              color: #666;
+              color: #808080;
               &:hover {
                 color: #333;
               }
@@ -284,9 +284,9 @@
   margin-top: 50px;
 }
 .task-ic19 {
-  width: 19px;
-  height: 16px;
-  margin-right: 9px;
+  width: 18px;
+  height: 15px;
+  margin-right: 3px;
 }
 .task-list-wd252 {
   width: 170px;
