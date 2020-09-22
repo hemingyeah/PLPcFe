@@ -1,6 +1,6 @@
 import http from '@src/util/http';
-let headeUrl = ''
-// let headeUrl = '/api/linkc'
+// let headeUrl = ''
+let headeUrl = '/api/linkc'
 
 export function getRules(params) {
   return http.get(`${headeUrl}/linkc/getRules`, params)
