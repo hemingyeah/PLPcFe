@@ -185,7 +185,7 @@ export default {
 }
 
 .base-modal-header {
-  height: 50px;
+  min-height: 50px;
   position: relative;
   padding: 13px 15px 13px 20px;
   background-color: $bg-color-l2;
@@ -245,7 +245,7 @@ export default {
 
 //TODO: 统一边距
 .base-modal-footer {
-  height: 50px;
+  min-height: 50px;
   display: flex;
   justify-content: flex-end;
   padding: 9px 20px;
