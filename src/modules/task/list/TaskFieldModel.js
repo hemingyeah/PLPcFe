@@ -1031,6 +1031,7 @@ const advancedList = [
     setting: {isMulti: false, dataSource:[
       '全部',
       '待指派',
+      "已指派",
       '已接受',
       '进行中',
       '已完成',

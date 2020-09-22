@@ -1587,6 +1587,48 @@ export default {
             inApprove = "";
             break;
         }
+        // 工单类型
+        let state;
+        switch (params.state) {
+          case "全部":
+            state = "";
+            break;
+          case "待指派":
+            state = "created";
+            break;
+          case "已指派":
+            state = "allocated";
+            break;
+          case "已接受":
+            state = "accepted";
+            break;
+          case "进行中":
+            state = "processing";
+            break;
+          case "已完成":
+            state = "finished";
+            break;
+          case "已拒绝":
+            state = "refused";
+            break;
+          case "已结算":
+            state = "costed";
+            break;
+          case "已关闭":
+            state = "closed";
+            break;
+          case "已取消":
+            state = "offed";
+            break;
+          case "工单池":
+            state = "taskPool";
+            break;
+          case "未完成":
+            state = "unfinished";
+            break;
+          default:
+            break;
+        }
 
         const par = {
           ...citys,
@@ -1633,6 +1675,7 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
+          state: state || searchModel.state,
         };
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/
