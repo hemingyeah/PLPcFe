@@ -15,7 +15,7 @@
             <div class="seach task-span1 task-flex task-ai">
               <el-dropdown>
                 <div
-                  class="task-list-customize task-font16 task-c3 task-flex task-ai"
+                  class="task-list-customize task-font14 task-c3 task-flex task-ai"
                 >
                   <img
                     src="../../../assets/img/customize.png"

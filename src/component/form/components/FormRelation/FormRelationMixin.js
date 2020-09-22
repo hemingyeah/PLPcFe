@@ -3,6 +3,7 @@
 import { getTaskRelatedInfo } from '@src/api/TaskApi.ts';
 /* utils */
 import _ from 'lodash';
+import { boolean } from 'mathjs';
 
 export default {
   name: 'form-relation-mixin',
@@ -18,6 +19,9 @@ export default {
     placeholder: {
       type: String,
       default: ''
+    },
+    seo: {
+      type: Boolean,
     }
   },
   data() {

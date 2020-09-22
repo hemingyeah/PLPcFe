@@ -156,13 +156,143 @@ export default {
         {
           id: 5460,
           isSystem: 1,
-          fieldName: "sysReceiptContent",
-          field: "sysReceiptContent",
-          displayName: "回执内容",
-          label: "回执内容",
+          fieldName: "spare_name",
+          field: "spare_name",
+          displayName: "备件",
+          label: "备件",
           formType: "text",
           isNull: 1,
           isSearch: 0,
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "spare_serialNumber",
+          field: "spare_serialNumber",
+          displayName: "备件编号",
+          label: "备件编号",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "spare_type",
+          field: "spare_type",
+          displayName: "备件类别",
+          label: "备件类别",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "spare_number",
+          field: "spare_number",
+          displayName: "备件数量",
+          label: "备件数量",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "spare_cost",
+          field: "spare_cost",
+          displayName: "备件价格",
+          label: "备件价格",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "service_name",
+          field: "service_name",
+          displayName: "服务项目",
+          label: "服务项目",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "service_type",
+          field: "service_type",
+          displayName: "服务类别",
+          label: "服务类别",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "service_number",
+          field: "service_number",
+          displayName: "服务项目数量",
+          label: "服务项目数量",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "service_cost",
+          field: "service_cost",
+          displayName: "服务项目金额",
+          label: "服务项目金额",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "balance_total",
+          field: "balance_total",
+          displayName: "费用信息",
+          label: "费用信息",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "balance_discount",
+          field: "balance_discount",
+          displayName: "折扣费用",
+          label: "折扣费用",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "balance_sum",
+          field: "balance_sum",
+          displayName: "工单合计",
+          label: "工单合计",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+          bool: true
         },
       ];
 
@@ -461,6 +591,7 @@ export default {
             const { success } = await TaskApi.deleteTask(selectedIds);
             if (success) {
               $platform.alert("删除成功");
+              this.getTaskCountByState(this.searchParams)
               this.initialize();
             }
           }
@@ -1181,13 +1312,13 @@ export default {
           this.planTimeType = res[0].filter((item) => {
             return item.displayName === "计划时间";
           })[0].setting.dateType;
-          this.buildColumns();
           this.taskView.map((item) => {
             if (item.id === this.filterId) {
               searchModel = item.searchModel;
             }
           });
           this.search(searchModel);
+          this.buildColumns();
         })
         .catch((err) => {
           console.warn(err);
@@ -1656,7 +1787,7 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
-          state: state || searchModel.state,
+          state: state || this.searchParams.state,
         };
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/

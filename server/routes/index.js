@@ -112,7 +112,7 @@ router.use("/outside/weixin/*", (ctx) =>
 
 router.use("/outside/es/task/search", (ctx) =>
   HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
+    host: "30.40.57.130",
     port: 10006,
     headers: {
       cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
@@ -122,7 +122,7 @@ router.use("/outside/es/task/search", (ctx) =>
 
 router.use("/outside/pc/task/editBatchTask", (ctx) =>
   HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
+    host: "30.40.57.130",
     port: 10012,
     headers: {
       cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
@@ -132,7 +132,7 @@ router.use("/outside/pc/task/editBatchTask", (ctx) =>
 
 router.use("/outside/pc/view/getUserViews", (ctx) =>
   HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
+    host: "30.40.57.130",
     port: 10012,
     headers: {
       cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
@@ -142,7 +142,7 @@ router.use("/outside/pc/view/getUserViews", (ctx) =>
 
 router.use("/outside/es/task/getTaskCountByState", (ctx) =>
   HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
+    host: "30.40.57.130",
     port: 10006,
     headers: {
       cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
@@ -152,7 +152,7 @@ router.use("/outside/es/task/getTaskCountByState", (ctx) =>
 
 router.use("/outside/pc/view/createTaskView", (ctx) =>
   HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
+    host: "30.40.57.130",
     port: 10012,
     headers: {
       cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
@@ -162,7 +162,7 @@ router.use("/outside/pc/view/createTaskView", (ctx) =>
 
 router.use("/outside/pc/view/editTaskView", (ctx) =>
   HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
+    host: "30.40.57.130",
     port: 10012,
     headers: {
       cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
@@ -172,7 +172,7 @@ router.use("/outside/pc/view/editTaskView", (ctx) =>
 
 router.use("/outside/pc/view/deleteOneView", (ctx) =>
   HttpClient.proxy(ctx, {
-    host: "30.40.58.199",
+    host: "30.40.57.130",
     port: 10012,
     headers: {
       cookie: "VIPPUBLINKJSESSIONID=bfce6b16-fa04-4a0b-a402-f4f1cc7d7c5c",
