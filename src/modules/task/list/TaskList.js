@@ -1231,10 +1231,7 @@ export default {
      * @param {Object} event 事件对象
      */
     modifyColumnStatus(event) {
-      const localStorageData = this.getLocalStorageData();
-
       let columns = event.data || [],
-        columnsStatus,
         colMap = columns.reduce(
           (acc, col) => (acc[col.field] = col) && acc,
           {}
@@ -1247,23 +1244,7 @@ export default {
         }
       });
 
-      // 判断是否存储选择列
-      const columnsList = this.columns.map((c) => ({
-        field: c.field,
-        show: c.show,
-        width: c.width,
-      }));
-      if (localStorageData.columnStatus) {
-        localStorageData.columnStatus[
-          `${this.selectColumnState}`
-        ] = columnsList;
-        columnsStatus = localStorageData.columnStatus;
-      } else {
-        columnsStatus = {
-          [`${this.selectColumnState}`]: columnsList,
-        };
-      }
-      this.saveDataToStorage("columnStatus", columnsStatus);
+      this.saveColumnStatusToStorage()
     },
     /**
      * @description 打开外部链接
@@ -1874,6 +1855,49 @@ export default {
       if (!eventName) return;
       window.TDAPP.onEvent(eventName);
     },
+    /**
+     * @description 修改选择列设置
+     * @param {Object} event 事件对象
+     */
+    saveColumnStatus(event) {
+      let columns = event.data || []
+      let columnMap = columns.reduce((acc, col) => (acc[col.field] = col) && acc, {})
+
+      this.columns.forEach(column => {
+        let newColumn = columnMap[column.field];
+        if (newColumn) {
+          this.$set(column, 'width', newColumn.width);
+        }
+
+        this.$set(column, 'show', newColumn ? newColumn.show : false)
+      })
+
+      this.saveColumnStatusToStorage()
+    },
+    saveColumnStatusToStorage() {
+      const localStorageData = this.getLocalStorageData();
+      let columnsStatus = null
+
+      // 判断是否存储选择列
+      const columnsList = this.columns.map(c => ({
+        field: c.field,
+        show: c.show,
+        width: c.width,
+      }));
+
+      if (localStorageData.columnStatus) {
+        localStorageData.columnStatus[
+          `${this.selectColumnState}`
+        ] = columnsList;
+        columnsStatus = localStorageData.columnStatus;
+      } else {
+        columnsStatus = {
+          [`${this.selectColumnState}`]: columnsList,
+        };
+      }
+
+      this.saveDataToStorage('columnStatus', columnsStatus);
+    }
   },
   components: {
     [TaskMap.name]: TaskMap,

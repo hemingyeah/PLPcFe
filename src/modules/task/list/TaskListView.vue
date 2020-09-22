@@ -808,7 +808,8 @@
     </div> -->
 
       <!-- start 选择列设置 -->
-      <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" />
+      <biz-select-column ref="advanced" @save="saveColumnStatus" />
+      <!-- <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" /> -->
       <!-- end 选择列设置 -->
 
       <!-- start 已选择面板 -->

@@ -10,6 +10,15 @@ function convertDisplayNameToName(field = {}) {
   return field
 }
 
+function convertColumnWithSave(field = {}) {
+  let column = {
+    field: field.fieldName,
+    show: field.show,
+    width: field.width
+  }
+  return column
+}
+
 /** 
  * 第一版：暂时支持现在的需求，如需支持其他的，后续拓展 
 */
@@ -194,11 +203,18 @@ const BizSelectColumn = {
           for (let key in treeNode.columns) {
             let item = treeNode.columns[key]
             let { templateGroup = {}, templateIndex } = this.columnSortListGetGroup(sortList)
+
             let isFindedTemplate = templateIndex >= 0
+            templateIndex = isFindedTemplate ? templateIndex : sortList.length
+
             isFindedTemplate 
               ? this.columnSortListFieldPush(item.columns, templateGroup.lists)
               : templateGroup.lists = this.buildSortLists(item)
-            sortList[templateIndex] = templateGroup.lists
+
+            sortList[templateIndex] = {
+              name: item.name,
+              lists: templateGroup.lists
+            }
           }
         } else {
           sortList = sortList.filter(item => !Array.isArray(item.lists))
@@ -326,7 +342,21 @@ const BizSelectColumn = {
      * @description 保存
     */
     save() {
-      // 
+      let data = [];
+
+      this.columnSortList.forEach(column => {
+        if (Array.isArray(column.lists)) {
+          column.lists.forEach(item => {
+            data.push(convertColumnWithSave(item))
+          })
+        } else {
+          data.push(convertColumnWithSave(column))
+        }
+      })
+
+      console.log({ type: 'column', data })
+      this.close();
+      this.$emit('save', { type: 'column', data })
     },
     /** 
      * @description 向下 -> 切换 是否选中
