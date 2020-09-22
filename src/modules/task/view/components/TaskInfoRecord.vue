@@ -134,7 +134,7 @@ export default {
 
         let params = {
           taskId: this.taskId,
-          attachments: form.attachments,
+          attachment: form.attachments,
           showInOwn: form.showInOwn,
           toCustomer: form.toCustomer,
           cusNotice: form.cusNotice,

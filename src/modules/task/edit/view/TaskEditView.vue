@@ -1,6 +1,6 @@
 <template>
   <div class="task-container" v-loading.fullscreen.lock="loadingPage">
-    <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
+    <form class="base-form" v-if="init" novalidate>
 
       <div class="page-title">
         <div class="title">
@@ -14,7 +14,7 @@
           <!-- start 新建按钮组 -->
           <template v-if="isShowTaskButtonGroup">
 
-            <button type="button" class="btn btn-primary" :disabled="disabled" @click="submit" v-if="isShowSaveButton">
+            <button type="button" class="btn btn-primary" :disabled="disabled" @click="submit(false)" v-if="isShowSaveButton">
               保存
             </button>
 

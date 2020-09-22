@@ -2,8 +2,8 @@ import './BizSelectColumn.scss'
 
 import BizSelectColumnSort from './BizSelectColumnSort'
 
+import _ from 'lodash'
 import { typeOf } from '@src/util/assist';
-import Columns from './columnData'
 
 function convertDisplayNameToName(field = {}) {
   field.name = field.displayName
@@ -152,7 +152,7 @@ const BizSelectColumn = {
       if (isParentRoot) {
         return (
           checked
-            ? this.columnSortList.push(field)
+            ? this.columnSortList.push(convertDisplayNameToName(field))
             : this.columnSortList = sortList.filter(item => item.fieldName != field.fieldName)
         )
       }
@@ -179,7 +179,7 @@ const BizSelectColumn = {
       let templateColumns = templateGroup.lists || []
 
       checked
-        ? templateColumns.push(field)
+        ? templateColumns.push(convertDisplayNameToName(field))
         : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
         
       this.columnSortList[templateIndex] = templateColumns
@@ -287,7 +287,7 @@ const BizSelectColumn = {
      * @description 显示 设置窗
     */
     open(columns) {
-      this.columnTree = this.columnsDataGrouped(Columns.slice())
+      this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
       this.show = true
     },
     /** 
@@ -354,7 +354,6 @@ const BizSelectColumn = {
         }
       })
 
-      console.log({ type: 'column', data })
       this.close();
       this.$emit('save', { type: 'column', data })
     },

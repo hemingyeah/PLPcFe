@@ -7,6 +7,7 @@ export * from './validate';
 
 const DEFAULT_PLACEHOLDER = {
   text: `最多${FORM_FIELD_TEXT_MAX_LENGTH}字`,
+  description: `最多${FORM_FIELD_TEXTAREA_MAX_LENGTH}字`,
   textarea: `最多${FORM_FIELD_TEXTAREA_MAX_LENGTH}字`,
   number: '请输入数字',
   customerAddress: '请填写详细地址',
@@ -18,7 +19,7 @@ const DEFAULT_PLACEHOLDER = {
   select: '请选择',
   location: '请输入',
   phone: '请输入电话号码',
-  scan: '请通过移动端扫码或手动输入'
+  code: '请通过移动端扫码或手动输入'
 }
 
 /** 

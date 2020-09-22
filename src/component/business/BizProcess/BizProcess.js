@@ -214,6 +214,13 @@ const BizProcess = {
         ...this.genExceptionStyle,
         color: TaskStateEnum.PSUSED.color
       }
+
+      // 特殊适配
+      if (this.isOnceException && this.genCurrentStateIndex == 0) {
+        style.top = '2px'
+        style.left = '30px'
+      }
+
       return <div style={ style }> 已暂停 </div>
     },
     /* 渲染工单状态超时 */

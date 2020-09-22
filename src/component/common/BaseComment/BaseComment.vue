@@ -54,7 +54,7 @@
 
           <el-checkbox v-model="form.showInOwn" @input="showInOwnChangeHandler" :disabled="checkboxDisabled.showInOwn" :true-label="1" :false-label="0">仅自己可见</el-checkbox>
           <template v-if="showCustomerAction">
-            <el-checkbox v-model="form.toCustomer" @input="toCustomerChangeHandler" :disabled="checkboxDisabled.toCustomer" :true-label="1" :false-label="0">仅客户可见</el-checkbox>
+            <el-checkbox v-model="form.toCustomer" @input="toCustomerChangeHandler" :disabled="checkboxDisabled.toCustomer" :true-label="1" :false-label="0">对客户可见</el-checkbox>
             <el-checkbox v-model="form.cusNotice" @input="cusNoticeChangeHandler" :disabled="checkboxDisabled.cusNotice" :true-label="1" :false-label="0">向客户发送通知</el-checkbox>
           </template>
           <button type="button" class="btn btn-primary base-comment-submit" @click="submit" :disabled="!allowOperate">
@@ -294,7 +294,7 @@ export default {
       }
       
     },
-    /* 仅客户可见 变化处理 */
+    /* 对客户可见 变化处理 */
     toCustomerChangeHandler(value) {
       let isDisabled = Boolean(value)
       this.checkboxDisabled.showInOwn = isDisabled

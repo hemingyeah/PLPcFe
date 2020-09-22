@@ -4,8 +4,7 @@
       :options="options" 
       :props="props" 
       :value="value"
-      @blur="cascaderBlurHandler"
-      @focus="cascaderFocusHandler"
+      @visible-change="cascaderVisibleHandler"
       @input="inputForValueWithCascader"
       clearable/>
   </div>
@@ -38,11 +37,10 @@ export default {
     }
   },
   methods: {
-    cascaderFocusHandler() {
-      addClass(document.body, CascaderFocusClassName);
-    },
-    cascaderBlurHandler() { 
-      removeClass(document.body, CascaderFocusClassName);
+    cascaderVisibleHandler(visible) {
+      visible
+        ? addClass(document.body, CascaderFocusClassName)
+        : removeClass(document.body, CascaderFocusClassName)
     },
     inputForValueWithCascader(value) {
       this.cascaderBlurHandler();

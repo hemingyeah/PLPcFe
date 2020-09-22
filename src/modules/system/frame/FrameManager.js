@@ -98,7 +98,7 @@ const FrameManager = {
 
       this.frameTabs.forEach(item => item.show = false);
       this.frameTabs.push(tab);
-      console.log('tab', tab)
+      
       if (tab.id == 'M_VIP_SPAREPART_LIST') {
         this.currUrl = '/bill';
       } else {

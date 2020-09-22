@@ -187,7 +187,7 @@
     <!-- end 联系人弹窗 -->
 
     <!-- start 地址弹窗 -->
-    <edit-address-dialog ref="EditAddressDialog" :customer-id="selectedCustomer.id" :default-address="customerInitData.customerAddress"/>
+    <edit-address-dialog ref="EditAddressDialog" :customer-id="selectedCustomer.id || selectedCustomer.value" :default-address="customerInitData.customerAddress"/>
     <!-- end 地址弹窗 -->
 
   </div>
