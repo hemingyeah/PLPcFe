@@ -7,12 +7,12 @@
       <div class="base-collapse-btn" v-if="showCollapse">
         <el-tooltip content="收起" placement="left">
           <div class="base-collapse-btn-left" v-show="collapse != 'left'" @click="expand('left')">
-            <i class="iconfont icon-arrow-right"></i>
+            <i class="iconfont icon-icon_arrow"></i>
           </div>
         </el-tooltip>
         <el-tooltip content="展开" placement="right">
           <div class="base-collapse-btn-right" v-show="collapse != 'right'" @click="expand('right')">
-            <i class="iconfont icon-arrow-right"></i>
+            <i class="iconfont icon-icon_arrow"></i>
           </div>
         </el-tooltip>
       </div>
@@ -98,9 +98,9 @@ export default {
   }
 
   &-btn {
-    width: 20px;
+    width: 16px;
     position: absolute;
-    right: -20px;
+    right: -16px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 9;
@@ -108,13 +108,14 @@ export default {
     &-left,
     &-right {
       width: 100%;
-      height: 72px;
+      height: 36px;
 
       background-color: #fff;
       border: 1px solid $color-border-l2;
       border-left: none;
       box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
 
       display: flex;
       align-items: center;
@@ -135,7 +136,7 @@ export default {
     }
 
     &-left {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
 
       .iconfont {
         transform: rotate(-180deg);

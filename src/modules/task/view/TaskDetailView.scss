@@ -94,7 +94,7 @@ body {
   }
 
   .form-view-row {
-    padding: 4px 0;
+    padding: 6px 0;
   }
 
   // 客户、产品关联工单数量
@@ -282,10 +282,13 @@ body {
     .linkman-phone {
       .call-phone {
         display: flex;
-        cursor: pointer;
 
         span {
           @include text-ellipsis;
+
+          &.call-active {
+            cursor: pointer;
+          }
         }
 
         .iconfont {

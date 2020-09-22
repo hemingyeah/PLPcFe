@@ -20,6 +20,24 @@
               >
                 <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
               </button>
+
+              <!-- start 工单列表切换新旧版 -->
+              <template v-if="allowChangeTaskVersion">
+                <el-button
+                  @click="changeTaskVersion(false)"
+                  class="task-version-btn"
+                  type="primary"
+                  v-if="isUserTaskGray"
+                >返回旧版</el-button>
+
+                <el-button
+                  @click="changeTaskVersion(true)"
+                  class="task-version-btn task-new-version"
+                  type="primary"
+                  v-else
+                >切换新版</el-button>
+              </template>
+              <!-- end 工单列表切换新旧版 -->
             </div>
 
             <div class="frame-quick-notification" v-show="notificationShow">
@@ -344,6 +362,9 @@ import NotificationCenter from './component/NotificationCenter.vue';
 import * as NotificationApi from '@src/api/NotificationApi';
 import * as CallCenterApi from '@src/api/CallCenterApi';
 
+/* util */
+import _ from 'lodash';
+
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
 // const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
@@ -403,7 +424,8 @@ export default {
           }, this.timeout);
         }
       },
-      has_call_center_module: false
+      has_call_center_module: false,
+      isUserTaskGray: this.initData.isUserTaskGrayFunction // 用户选择新旧版工单标识
     };
   },
   computed: {
@@ -438,6 +460,17 @@ export default {
     },
     releaseVersion() {
       return this.initData.releaseVersion || '';
+    },
+    /** 激活状态的工单列表 */
+    currentTaskListTab() {
+      let taskList = this.frameTabs.filter(tab => tab.id === 'M_TASK_ALL' && tab.show);
+      return taskList[0] || {};
+    },
+    /** 允许切换工单新旧版本 */
+    allowChangeTaskVersion() {
+      // 企业是否开启工单灰度功能
+      let isTaskGray = this.initData.isTaskGrayFunction;
+      return isTaskGray && this.currentTaskListTab.id;
     }
   },
   methods: {
@@ -944,7 +977,17 @@ export default {
         this.initWebSocket();
         lockReconnect = false;
       }, 4000);
-    }
+    },
+    /** 
+    * @description 切换工单新旧版本
+    */
+    changeTaskVersion: _.debounce(function (version) {
+      // 工单列表重定向
+      this.currentTaskListTab.url = `/task?newVersion=${version}`;
+      this.reloadFrameTab(this.currentTaskListTab, true);
+
+      this.isUserTaskGray = !this.isUserTaskGray;
+    }, 1000)
   },
   created() {
     // TODO: 迁移完成后删除

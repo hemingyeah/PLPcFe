@@ -31,7 +31,7 @@
             <div class="form-view-row linkman-phone">
               <label>电话：</label>
               <div class="form-view-row-content call-phone" @click.stop="makePhoneCall">
-                <span>{{ lmPhone }}</span>
+                <span :class="{'call-active': hasCallCenterModule}">{{ lmPhone }}</span>
                 <el-tooltip content="拨打电话" placement="top" v-if="showCallPhone">
                   <i class="iconfont icon-dianhua2"></i>
                 </el-tooltip>
@@ -120,7 +120,7 @@
               <div class="form-view-row linkman-phone">
                 <label>电话：</label>
                 <div class="form-view-row-content call-phone" @click.stop="makePhoneCall">
-                  <span>{{ lmPhone }}</span>
+                  <span :class="{'call-active': hasCallCenterModule}">{{ lmPhone }}</span>
                   <el-tooltip content="拨打电话" placement="top" v-if="showCallPhone">
                     <i class="iconfont icon-dianhua2"></i>
                   </el-tooltip>
@@ -215,10 +215,10 @@
                 :is-paused="isPaused"
                 :state-text="stateText"
                 :state-color="stateColor"
-                :task-edit-auth="editAuth"
                 :finished-state="finishedState"
                 :customer-option="customerOption"
                 :can-see-customer="canSeeCustomer"
+                :allow-edit-synergy="allowEditSynergy"
                 :allow-modify-plan-time="allowModifyPlanTime"
                 @modifyPlanTime="openDialog('modifyPlanTime')"
               />

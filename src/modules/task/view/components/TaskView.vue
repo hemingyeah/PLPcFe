@@ -146,7 +146,7 @@ export default {
       type: Boolean,
       default: false
     },
-    taskEditAuth: {
+    allowEditSynergy: {
       type: Boolean,
       default: false
     },
@@ -186,15 +186,6 @@ export default {
     */
     relationProductfields() {
       return this.fields.filter(field => field.formType == 'relationProduct');
-    },
-    /** 
-    * @description 允许修改协同人
-    */
-    allowEditSynergy() {
-      let stateArr = ['allocated', 'accepted', 'processing', 'refused', 'taskPool', 'created'];
-      let { isDelete, state } = this.task;
-
-      return this.taskEditAuth && isDelete == 0 && stateArr.indexOf(state) > -1;
     }
   },
   methods: {

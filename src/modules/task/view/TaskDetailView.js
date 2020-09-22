@@ -123,6 +123,11 @@ export default {
       let executor = this.task.executor || {};
       return executor.userId == this.loginUser.userId;
     },
+    /* 该登录账户是否是工单创建人 */
+    isCreator(){
+      let createUser = this.task.createUser || {};
+      return createUser.userId == this.loginUser.userId;
+    },
     /** 当前用户的权限 */
     permission() {
       return this.loginUser.authorities || {};
@@ -410,6 +415,18 @@ export default {
       return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.initData.canApprove || canLookCompleteReceipt);
     },
     /** 
+    * @description 允许修改协同人
+    * 1. 工单状态
+    * 2. PC端开启允许修改协同人，并且是负责人
+    * 3. 工单创建人或者允许编辑工单
+    */
+    allowEditSynergy() {
+      let state = ['allocated', 'accepted', 'processing', 'taskPool'];
+      let allowModify = this.taskConfig.taskSynergy;
+
+      return state.indexOf(this.task.state) >= 0 && ((allowModify && this.isExecutor) || this.isCreator || this.editAuth);
+    },
+    /** 
     * @description 工单信息中计划时间是否可以修改
     * 1. 工单状态是accepted/processing其中一种
     * 2. 当前登录账户是工单负责人
@@ -524,9 +541,12 @@ export default {
     },
     /** 
     * @description 显示拨打电话
+    * 1. 开通呼叫中心
+    * 2. 且联系人未加密
     */
     showCallPhone() {
-      return this.lmPhone && this.hasCallCenterModule;
+      let notEncrypt = !this.isEncryptField(this.lmName);
+      return this.lmPhone && this.hasCallCenterModule && notEncrypt;
     },
     /** 
     * @description 地址

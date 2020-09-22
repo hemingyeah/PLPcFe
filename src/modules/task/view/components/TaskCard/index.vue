@@ -193,10 +193,10 @@ export default {
       .card-name {
         padding: 12px 12px 0 34px;
         color: $text-color-primary;
-        font-size: $font-size-large;
+        font-size: $font-size-base;
         font-weight: 500;
 
-        background: url(../../../../../assets/img/task/card_icon.png) no-repeat 12px 16px;
+        background: url(../../../../../assets/img/task/card_icon.png) no-repeat 12px 15px;
         background-size: 14px 14px;
       }
 

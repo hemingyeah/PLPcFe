@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "17360732",
+      "name": "icon_arrow",
+      "font_class": "icon_arrow",
+      "unicode": "e6a3",
+      "unicode_decimal": 59043
+    },
+    {
       "icon_id": "6446462",
       "name": "三道杠",
       "font_class": "daohang",
