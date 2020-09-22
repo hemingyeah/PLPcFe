@@ -105,10 +105,6 @@ export default {
           name: "全部",
           id: "",
         },
-        {
-          name: "擦擦擦",
-          id: "9ccd6a25-23db-4130-bae5-9ed0591a50ec",
-        },
       ],
       taskFields: [],
       taskReceiptFields: [],
