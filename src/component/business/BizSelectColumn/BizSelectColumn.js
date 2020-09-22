@@ -23,6 +23,21 @@ const BizSelectColumn = {
     }
   },
   methods: {
+    buildSortLists(treeNode = {}) {
+      let { columns } = treeNode;
+      let isColumnsObject = this.isColumnsObject(columns)
+      let lists = []
+
+      if (isColumnsObject) {
+        lists = Object.keys(columns).map(key => {
+          return { name: columns[key].name, lists: this.buildSortLists(columns[key]) }
+        })
+      } else {
+        lists = columns.filter(column => column.show)
+      }
+
+      return lists
+    },
     /** 
      * @description 列数据分组处理
      * 目前是按照 templateId 工单类型id 分组的
@@ -40,7 +55,7 @@ const BizSelectColumn = {
       
 
       columns.forEach(column => {
-        // 是否是系统字段 TODO: && column.isSystem == 1
+        // 是否是系统字段
         let isSystemFiled = !column.templateId 
 
         if (isSystemFiled) {
@@ -70,7 +85,7 @@ const BizSelectColumn = {
      * @description 关闭设置窗 
     */
     close() {
-      this.show = false;
+      this.show = false
     },
     /** 
      * @description 字段复选框 变化
@@ -119,40 +134,99 @@ const BizSelectColumn = {
         this.toggleCheckedWithUp(treeNode, parent)
       }
 
-      this.$nextTick(() => {
-        this.buildColumnSortList()
-      })
+      this.columnParentChangeWithSort(value, treeNode, parent)
     },
     columnFieldChangeWithSort(checked, field, parent) {
       let isParentRoot = parent.root
       let sortList = this.columnSortList.slice()
 
       if (isParentRoot) {
-        checked
-          ? this.columnSortList.push(field)
-          : this.columnSortList = sortList.filter(item => item.fieldName != field.fieldName)
-      } else {
-        let templateGroup = {}
-        let templateIndex = 0
-
-        for (let i = 0; i < sortList.length; i++) {
-          let item = sortList[i];
-          if (item.name == parent.name) {
-            templateGroup = item
-            templateIndex = i
-            break
-          }
-        }
-
-        let templateColumns = templateGroup.lists || []
-
-        checked
-          ? templateColumns.push(field)
-          : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
-        
-        this.columnSortList[templateIndex] = templateColumns;
+        return (
+          checked
+            ? this.columnSortList.push(field)
+            : this.columnSortList = sortList.filter(item => item.fieldName != field.fieldName)
+        )
       }
 
+      this.columnSortListMerge(checked, field, parent, sortList);
+    },
+    columnSortListGetGroup(sortList) {
+      let templateGroup = {}
+      let templateIndex = -1
+
+      for (let i = 0; i < sortList.length; i++) {
+        let item = sortList[i]
+        if (item.name == parent.name) {
+          templateGroup = item
+          templateIndex = i
+          break
+        }
+      }
+      
+      return { templateGroup, templateIndex }
+    },
+    columnSortListMerge(checked, field, parent, sortList) {
+      let { templateGroup = {}, templateIndex = 0 } = this.columnSortListGetGroup(sortList)
+      let templateColumns = templateGroup.lists || []
+
+      checked
+        ? templateColumns.push(field)
+        : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
+        
+      this.columnSortList[templateIndex] = templateColumns
+    },
+    columnSortListFieldPush(columns, sortList) {
+      columns.forEach(column => {
+        let isHave = sortList.some(list => list.fieldName == column.fieldName)
+        if (!isHave) {
+          sortList.push(convertDisplayNameToName(column))
+        }
+      })
+    },
+    columnParentChangeWithSort(checked, treeNode, parent) {
+      let isTreeNodeRoot = treeNode.root
+      let sortList = this.columnSortList.slice()
+      let isColumnsObject = this.isColumnsObject(treeNode.columns)
+
+      // eslint-disable-next-line no-empty
+      if (isTreeNodeRoot && isColumnsObject) {
+        if (checked) {
+          for (let key in treeNode.columns) {
+            let item = treeNode.columns[key]
+            let { templateGroup = {}, templateIndex } = this.columnSortListGetGroup(sortList)
+            let isFindedTemplate = templateIndex >= 0
+            isFindedTemplate 
+              ? this.columnSortListFieldPush(item.columns, templateGroup.lists)
+              : templateGroup.lists = this.buildSortLists(item)
+            sortList[templateIndex] = templateGroup.lists
+          }
+        } else {
+          sortList = sortList.filter(item => !Array.isArray(item.lists))
+        }
+      }
+      else if(isTreeNodeRoot && !isColumnsObject) {
+        if (checked) {
+          let lists = this.buildSortLists(treeNode);
+          this.columnSortListFieldPush(lists, sortList)
+        } else {
+          sortList = sortList.filter(item => Array.isArray(item.lists))
+        }
+      }
+      else {
+        if (checked) {
+          let templateIndex = sortList.findIndex(item => item.name == treeNode.name)
+          templateIndex <= -1 ? templateIndex = sortList.length : null
+          
+          sortList[templateIndex] = {
+            name: treeNode.name,
+            lists: this.buildSortLists(treeNode)
+          }
+        } else {
+          sortList = sortList.filter(item => item.name != treeNode.name)
+        }
+      }
+      
+      this.columnSortList = sortList
     },
     /** 
      * @description 初始化排序列表
@@ -197,8 +271,8 @@ const BizSelectColumn = {
      * @description 显示 设置窗
     */
     open(columns) {
-      this.columnTree = this.columnsDataGrouped(Columns.slice());
-      this.show = true;
+      this.columnTree = this.columnsDataGrouped(Columns.slice())
+      this.show = true
     },
     /** 
      * @description 渲染字段
