@@ -44,7 +44,7 @@ import img_16 from "@src/assets/img/myShop/icon16.png";
 
 export default {
   name: "icon-list",
-  props: ["infoData", "cmpId", "nowSettingDataId"],
+  props: ["infoData", "cmpId", "nowSettingDataId", "eventList"],
   components: {
     draggable,
   },
@@ -92,10 +92,11 @@ export default {
       let id_ = new Date().getTime();
       let item = {
         iconType: "1",
-        name: "",
+        name: "快捷入口",
         type: "",
         id: id_,
         cmpId: this.cmpId,
+        eventTempId: this.eventList.length > 0 ? this.eventList[0].id : "",
       };
       this.$emit("pushIcon", { id: this.cmpId, item });
 
@@ -103,7 +104,7 @@ export default {
     },
     changeThis(item) {
       if (this.nowId == item.id) {
-        this.nowId = "";
+        // this.nowId = "";
         this.cancelInfoData();
         return;
       }

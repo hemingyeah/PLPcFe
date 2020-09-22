@@ -39,7 +39,13 @@
         </el-form-item>
         <div class="form-label">企业地址</div>
         <el-form-item>
-          <el-input type="textarea" rows="4" v-model="dataInfo.address" placeholder="请输入" maxlength="1000" ></el-input>
+          <el-input
+            type="textarea"
+            rows="4"
+            v-model="dataInfo.address"
+            placeholder="请输入"
+            maxlength="1000"
+          ></el-input>
         </el-form-item>
       </el-form>
 
@@ -134,6 +140,7 @@ export default {
             url: file.ossUrl || file.url || `/files/get?fileId=${file.id}`,
             fileSize: file.fileSizeStr,
           };
+          this.dataInfo.logoUrl = item.url;
           console.log(item, "uploadImg");
         })
         .catch((err) => {
@@ -142,8 +149,9 @@ export default {
         .finally(() => {});
     },
     fileChange(file) {
-      this.$refs.upload.clearFiles(); //清除文件对象
-      this.logo = file.raw; // 取出上传文件的对象，在其它地方也可以使用
+      return
+      this.$refs.upload.clearFiles();  //清除文件对象
+      this.logo = file.raw;  // 取出上传文件的对象，在其它地方也可以使用
       this.fileList = [{ name: file.name, url: file.url }]; // 重新手动赋值filstList， 免得自定义上传成功了, 而fileList并没有动态改变， 这样每次都是上传一个对象
     },
     changeImgCover(e) {

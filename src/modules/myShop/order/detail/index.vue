@@ -82,7 +82,11 @@
           <template slot-scope="scope">
             <template v-if="column.field=='thumbnailUrl'">
               <div class="flex-x">
-                <img :src="scope.row.thumbnailUrl" class="goods-img" @click.stop="previewImg" />
+                <img
+                  :src="scope.row.thumbnailUrl ? `${scope.row.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_56,w_56` : ''"
+                  class="goods-img"
+                  @click.stop="previewImg(scope.row.thumbnailUrl)"
+                />
                 <div>{{scope.row.name}}</div>
               </div>
             </template>
@@ -111,13 +115,17 @@ import { orderDetail } from "@src/api/myShop";
 import { formatDate } from "@src/util/lang";
 import componentMixin from "../component/index";
 
-
-
 // 页面刷新记住当前页面信息
 const MY_SHOP_ORDER_SEARCH_MODEL = "my_shop_order_search_model";
 
 const MY_SHOP_ORDER_SEARCH_MODEL_REAL = "my_shop_order_search_model_real";
 export default {
+  props: {
+    initData: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
   mixins: [componentMixin],
   data() {
     return {
@@ -133,6 +141,16 @@ export default {
         { label: "支付订单号：", value: "", key: "payNum" },
         { label: "支付方式：", value: "", key: "payState" },
         { label: "支付时间：", value: "", key: "payTime" },
+        {
+          label: "买家备注：",
+          value: "",
+          key: "remarks",
+        },
+        {
+          label: "物流单号：",
+          value: "",
+          key: "trackingNum",
+        },
       ],
       columns: [
         {
@@ -172,12 +190,6 @@ export default {
           fixed: true,
           show: true,
         },
-        {
-          label: "买家备注",
-          field: "remarks",
-          fixed: true,
-          show: true,
-        },
       ],
       searchData: {},
       dataInfo: {
@@ -205,8 +217,12 @@ export default {
     goods() {
       this.$refs.goodsDialog.changeDialog(true);
     },
-    goodsConfirm() {},
-    outStockConfirm() {},
+    goodsConfirm() {
+      this.needReloadList();
+    },
+    outStockConfirm() {
+      this.needReloadList();
+    },
     getData() {
       this.fullscreenLoading = true;
       orderDetail({
@@ -229,10 +245,11 @@ export default {
               return item;
             });
           } else {
-            this.$message({
+            this.$notify.close();
+            this.$notify.error({
+              title: "网络错误",
               message: res.message,
-              duration: 1500,
-              type: "error",
+              duration: 2000,
             });
           }
         })
@@ -241,8 +258,9 @@ export default {
         });
     },
     needReloadList() {
+      let fromId = window.frameElement.getAttribute("fromid") || "";
+      if (!fromId) return;
       localStorage.setItem(MY_SHOP_ORDER_SEARCH_MODEL_REAL, "true");
-      let fromId = window.frameElement.getAttribute("fromid");
       this.$platform.refreshTab(fromId);
     },
   },

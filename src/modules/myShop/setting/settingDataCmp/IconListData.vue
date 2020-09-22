@@ -38,7 +38,7 @@
         <el-input v-model="dataInfo.name" placeholder="请输入"></el-input>
       </el-form-item>
       <div class="form-label">关联事件模板</div>
-      <el-form-item>
+      <el-form-item prop="eventTempId">
         <el-select style="width:100%" v-model="dataInfo.eventTempId" placeholder="请选择">
           <el-option
             :label="item.name"
@@ -99,6 +99,9 @@ export default {
         name: [
           { required: true, message: "请输入名称", trigger: "blur" },
           { max: 4, message: "最多4个字符", trigger: "blur" },
+        ],
+        eventTempId: [
+          { required: true, message: "请选择模板", trigger: "blur" },
         ],
       },
       imgObj: {

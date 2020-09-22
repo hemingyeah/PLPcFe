@@ -20,7 +20,7 @@
   <!-- 发货弹窗 end-->
 </template>
 <script>
-import { orderDeliver } from "@src/api/myShop";
+import { repertoryOut } from "@src/api/myShop";
 export default {
   name: "out-stock-dialog",
   props: {
@@ -39,9 +39,10 @@ export default {
   methods: {
     confirm() {
       this.loading = true;
-      orderDeliver({
-        orderId: this.infoData.id,
-        trackingNum: this.trackingNum,
+      repertoryOut({
+        orderNum: this.infoData.id,
+        remrk:this.remrks
+        // orderNum: this.trackingNum,
       })
         .then((res) => {
           if (res.status == 200) {

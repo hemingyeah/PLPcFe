@@ -21,7 +21,7 @@
             v-model="setData.serviceStationConfig.loginValidate"
             @change="change($event,'loginValidate')"
           >
-            <el-radio class="mar-r-16" :label="false">网页门户验证方式</el-radio>
+            <el-radio class="mar-r-16" :label="false">图片验证码</el-radio>
             <el-radio :label="true">手机验证码</el-radio>
           </el-radio-group>
         </div>
@@ -109,8 +109,14 @@
         <a class="mar-l-16" href="javascript:;" @click="openLink()">
           <i class="iconfont icon-fabu1 mar-r-6"></i>小程序发布指引
         </a>
-        <el-button class="mar-l-16" type="primary" @click="submitWx">填写微信授权资料</el-button>
+        <el-button
+          v-if="!setData.weChatQRCodeUrl"
+          class="mar-l-16"
+          type="primary"
+          @click="submitWx"
+        >填写微信授权资料</el-button>
       </div>
+      <div class="mar-b-20 color-primary" v-if="setData.weChatQRCodeUrl">您已提交了微信授权资料，如需变更请联系售后宝管理员</div>
     </div>
     <!-- info-box end -->
 
@@ -140,6 +146,7 @@
                     :info-data="item.data"
                     :cmp-id="item.id"
                     :now-setting-data-id="nowSettingDataId"
+                    :event-list="eventList"
                     @changeThis="changeThis"
                     @pushIcon="pushIcon"
                   ></component>
@@ -177,20 +184,27 @@
         :rules="wxRuler"
         label-position="left"
         ref="wxRulerForm"
-        label-width="100px"
+        label-width="120px"
         class="demo-ruleForm"
       >
+        <el-form-item label="APPSecret" prop="secret">
+          <el-input v-model.number="wxRulerFormData.secret" autocomplete="off" placeholder="请输入"></el-input>
+        </el-form-item>
         <el-form-item label="APPID" prop="appId">
           <el-input v-model.number="wxRulerFormData.appId" autocomplete="off" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label="公众号APPID" prop="publicAppId">
+          <el-input
+            v-model.number="wxRulerFormData.publicAppId"
+            autocomplete="off"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
         <el-form-item label="mch_id" prop="matchId">
           <el-input v-model.number="wxRulerFormData.matchId" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="API密钥" prop="apiSecret">
           <el-input v-model.number="wxRulerFormData.apiSecret" autocomplete="off" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="APPSecret" prop="secret">
-          <el-input v-model.number="wxRulerFormData.secret" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -300,6 +314,7 @@ export default {
         matchId: "",
         apiSecret: "",
         secret: "",
+        publicAppId: "",
       },
       wxRuler: {
         appId: [{ required: true, message: "请输入APPID", trigger: "blur" }],
@@ -309,6 +324,9 @@ export default {
         ],
         secret: [
           { required: true, message: "请输入AppSecret", trigger: "blur" },
+        ],
+        publicAppId: [
+          { required: true, message: "请输入公众号APPID", trigger: "blur" },
         ],
       },
       eventList: [],
@@ -330,20 +348,21 @@ export default {
             correctLevel: QRCode.CorrectLevel.H,
           });
         } else {
-          this.$message({
+          this.$notify.close();
+          this.$notify.error({
+            title: "网络错误",
             message: res.message,
-            duration: 1500,
-            type: "error",
+            duration: 2000,
           });
         }
         if (res[1].status == 0) {
-          this.$set(this, 'eventList', res[1].data);
-          console.log(res[1].data, 111)
+          this.$set(this, "eventList", res[1].data);
         } else {
-          this.$message({
+          this.$notify.close();
+          this.$notify.error({
+            title: "网络错误",
             message: res.message,
-            duration: 1500,
-            type: "error",
+            duration: 2000,
           });
         }
         if (res[2].status == 200) {
@@ -351,10 +370,11 @@ export default {
             this.$set(this, "dataList", res_);
           });
         } else {
-          this.$message({
+          this.$notify.close();
+          this.$notify.error({
+            title: "网络错误",
             message: res.message,
-            duration: 1500,
-            type: "error",
+            duration: 2000,
           });
         }
       })
@@ -551,10 +571,11 @@ export default {
                 });
                 this.submitDialog = false;
               } else {
-                this.$message({
+                this.$notify.close();
+                this.$notify.error({
+                  title: "网络错误",
                   message: res.message,
-                  duration: 1500,
-                  type: "error",
+                  duration: 2000,
                 });
               }
             })
@@ -588,10 +609,11 @@ export default {
                 type: "success",
               });
             } else {
-              this.$message({
+              this.$notify.close();
+              this.$notify.error({
+                title: "网络错误",
                 message: res.message,
-                duration: 1500,
-                type: "error",
+                duration: 2000,
               });
             }
           })

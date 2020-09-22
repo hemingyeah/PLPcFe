@@ -115,6 +115,8 @@ import note_img_9 from "@src/assets/img/noteCenter/info.png";
 import note_img_10 from "@src/assets/img/noteCenter/wiki.png";
 import note_img_11 from "@src/assets/img/noteCenter/system.png";
 import note_img_12 from "@src/assets/img/noteCenter/attention.png";
+// to do 
+import note_img_13 from "@src/assets/img/noteCenter/shopOrder.png";
 
 export default {
   name: "notification-center",
@@ -182,7 +184,13 @@ export default {
         attention: {
           img: note_img_12,
           title: "售后宝"
-        }
+        },
+        // to do 
+        shopOrder: {
+          img: note_img_13,
+          title: "商城订单"
+        },
+        
       },
       note_arr: [],
       note_index: -1,

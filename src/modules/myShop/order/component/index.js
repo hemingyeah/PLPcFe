@@ -33,8 +33,11 @@ export default {
   },
   methods: {
 
-    previewImg(event) {
-      BaseGallery.preview(event.target);
+    previewImg(url) {
+      if (!url) return
+      let imgDom = document.createElement('img');
+      imgDom.src = url;
+      BaseGallery.preview(imgDom);
     },
   }
 }

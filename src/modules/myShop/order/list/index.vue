@@ -181,8 +181,8 @@
                         <img
                           v-for="(item, index) in scope.row[column.field]"
                           :key="index"
-                          :src="item.thumbnailUrl"
-                          @click.stop="previewImg"
+                          :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_32,w_32` : ''"
+                          @click.stop="previewImg(item.thumbnailUrl)"
                         />
                         <div
                           class="flex-1 overHideCon-1"
@@ -370,6 +370,12 @@ export default {
   },
   mixins: [componentMixin],
   data() {
+    let weekTime = [];
+
+    weekTime.push(
+      formatDate(new Date() - 7 * 24 * 60 * 60 * 1000, "YYYY-MM-DD")
+    );
+    weekTime.push(formatDate(new Date(), "YYYY-MM-DD"));
     return {
       fullscreenLoading: false,
       search_checkbox: [
@@ -424,7 +430,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: "",
+          orderTime: weekTime,
         },
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
@@ -832,10 +838,11 @@ export default {
           if (res.status == 200) {
             this.page = res.data;
           } else {
-            this.$message({
+            this.$notify.close();
+            this.$notify.error({
+              title: "网络错误",
               message: res.message,
-              duration: 1500,
-              type: "error",
+              duration: 2000,
             });
           }
         })
@@ -1162,10 +1169,11 @@ export default {
         if (res.status == 200) {
           this.stateNumObj = res.data;
         } else {
-          this.$message({
+          this.$notify.close();
+          this.$notify.error({
+            title: "网络错误",
             message: res.message,
-            duration: 1500,
-            type: "error",
+            duration: 2000,
           });
         }
       });

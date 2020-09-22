@@ -52,7 +52,7 @@
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
 
-            <span class="open" v-if="allowEdit" @click="changeRelease();trackEventHandler('share')">
+            <span class="open" v-if="allowEdit && linkControl" @click="changeRelease();trackEventHandler('share')">
               <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
               {{approveData.circleState == 1 ? '取消发布' : '发布到圈子'}}
             </span>
@@ -660,6 +660,10 @@ export default {
             if (res.status == 200) {
               this.approveData.circleState =
                 1 - this.approveData.circleState * 1;
+              this.$emit("releaseCircle", {
+                id: this.approveData.id,
+                circleState: 1 - this.approveData.circleState * 1,
+              });
             } else {
               this.$message({
                 message: res.message,
@@ -683,6 +687,11 @@ export default {
 
     fontClass() {
       return document.body.clientWidth > 1800 ? "font-class" : "";
+    },
+
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
     },
   },
 };

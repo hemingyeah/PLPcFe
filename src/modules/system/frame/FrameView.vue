@@ -112,7 +112,7 @@
                   <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
-                  <!-- <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
+                  <!-- <a href="javascript:;" @click="goDoMyself">消息中心</a>
                   <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a>-->
@@ -774,7 +774,7 @@ export default {
     goDoMyself() {
       platform.openTab({
         id: "do_myself",
-        title: "自助门户设置",
+        title: "消息中心",
         url: "/setting/doMyself/wxSet",
         reload: true,
       });

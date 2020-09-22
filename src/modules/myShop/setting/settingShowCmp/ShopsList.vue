@@ -4,12 +4,7 @@
       <div class="shops-title">商城橱窗</div>
       <!-- <draggable class="flex-x flex-w" v-model="dataInfo"> 可拖动-->
       <div class="flex-x flex-w">
-        <div
-          class="flex-x"
-          v-for="(item, index) in dataInfo"
-          :key="index"
-          draggable="draggable"
-        >
+        <div class="flex-x" v-for="(item, index) in dataInfo" :key="index" draggable="draggable">
           <div class="shops-list-item">
             <img :src="item.url" class="shops-list-item-img" />
             <div class="shops-info">
@@ -28,7 +23,11 @@
       <!-- </draggable> -->
       <div class="flex-x" v-if="dataInfo.length < 1">
         <div class="shops-list-item">
-          <img class="shops-tag-img" :src="tagImg" alt />
+          <img
+            class="shops-tag-img"
+            :src="tagImg"
+            alt
+          />
           <img :src="goodsImg" class="shops-list-item-img" />
           <div class="shops-info">
             <div class="overHideCon-2 mar-b-30 font-12">示例商品</div>
