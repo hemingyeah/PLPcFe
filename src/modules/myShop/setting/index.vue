@@ -569,6 +569,7 @@ export default {
                   duration: 1500,
                   type: "success",
                 });
+                this.setData.weChatQRCodeUrl = res.data;
                 this.submitDialog = false;
               } else {
                 this.$notify.close();
