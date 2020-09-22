@@ -58,8 +58,8 @@ const BizSelectColumn = {
       let attributeFieldsGroup = {}
       // 字段树🌲
       let columnsTree = {
-        system: { name: '系统字段', columns: systemFieldsGroup, checked: false, root: true },
-        attribute: { name: '自定义字段', columns: attributeFieldsGroup, checked: false, root: true }
+        system: { name: '系统字段', columns: systemFieldsGroup, checked: false, root: true, toggle: true },
+        attribute: { name: '自定义字段', columns: attributeFieldsGroup, checked: false, root: true, toggle: true}
       }
       
 
@@ -80,6 +80,10 @@ const BizSelectColumn = {
         }
 
       })
+
+      if (Object.keys(columnsTree.attribute.columns).length == 0) {
+        delete columnsTree.attribute
+      }
 
       // 初始化选中
       for(let key in columnsTree) {
@@ -306,21 +310,36 @@ const BizSelectColumn = {
      * @description 渲染树节点
     */
     renderTreeNode(treeNode = {}, parent = {}) {
-      let isHaveChildren = Array.isArray(treeNode.columns);
+      let isHaveChildren = Array.isArray(treeNode.columns)
+      let isRoot = treeNode.root
+      let isToggle = isRoot ? treeNode.toggle : true
       return (
         <div class="biz-select-column-tree-parent">
-          <span>
+          <div class="biz-select-column-tree-parent-header">
             <el-checkbox value={ treeNode.checked } label={ treeNode.name } onInput={ value => this.checkboxParentChange(value, treeNode, parent) }>
               { treeNode.name }
             </el-checkbox>
-          </span>
-          <div class="biz-select-column-tree-child">
-            { 
-              isHaveChildren
-                ? treeNode.columns.map(column => this.renderField(column, treeNode, parent))
-                : treeNode.columns && Object.keys(treeNode.columns).map(key => this.renderTreeNode(treeNode.columns[key], treeNode))
+            {
+              isRoot && (
+                <div class={['collapse-btn', isToggle ? 'biz-select-column-tree-parent-active' : '']} onClick={e => treeNode.toggle = !treeNode.toggle }>
+                  <i class="iconfont icon-more"></i>
+                </div>
+              )
             }
           </div>
+          {
+            isToggle && (
+              <transition name="slide-down">
+                <div class="biz-select-column-tree-child">
+                  { 
+                    isHaveChildren
+                      ? treeNode.columns.map(column => this.renderField(column, treeNode, parent))
+                      : treeNode.columns && Object.keys(treeNode.columns).map(key => this.renderTreeNode(treeNode.columns[key], treeNode))
+                  }
+                </div>
+              </transition>
+            )
+          }
         </div>
       )
     },

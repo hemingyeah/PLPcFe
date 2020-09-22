@@ -46,3 +46,22 @@
     margin-right: 12px;
   }
 }
+
+.biz-select-column-tree-parent {
+  &-header {
+    display: flex;
+    align-items: center;
+    .iconfont {
+      cursor: pointer;
+      position: relative;
+      top: -4px;
+      transition: .3s;
+    }
+  }
+  &-active {
+    .iconfont {
+      display: inline-block;
+      transform: rotate(-180deg);
+    }
+  }
+}
