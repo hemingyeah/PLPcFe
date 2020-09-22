@@ -52,6 +52,7 @@
           <el-checkbox
             v-for="(col, index) in item.columns"
             :key="`${col.field}_${index}`"
+            v-if="!col.bool"
             :label="col.exportAlias ? col.exportAlias : col.field"
           >
             {{ col.label }} 
@@ -128,7 +129,7 @@ export default {
       pending: false,
       checkedArr: [],
       isCheckedAll: true,
-      tooltip: true,
+      tooltip: false,
       isDownloadNow: false, // 导出是否是立刻下载模式
 
       checked: "",
