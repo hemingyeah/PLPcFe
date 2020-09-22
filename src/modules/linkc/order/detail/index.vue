@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { orderDetail } from "@src/api/myShop";
+import { orderDetail } from "@src/api/linkc";
 import { formatDate } from "@src/util/lang";
 import componentMixin from "../component/index";
 

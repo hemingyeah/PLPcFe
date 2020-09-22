@@ -5,41 +5,41 @@ const Template = require('../util/Template')
 const router = new KoaRouter();
 const modules = require('../../modules');
 
-router.get('/myShop/setting', async ctx => {
-  let script = ['/myShop.setting.js'];
-  let modConfig = modules['myShop.setting'];
+router.get('/linkc/setting', async ctx => {
+  let script = ['/linkc.setting.js'];
+  let modConfig = modules['linkc.setting'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/myShop/setting', 'get', null, {
+  let result = await HttpClient.request('/linkc/setting', 'get', null, {
     headers: reqHeaders
   });
   let body = result.body;
   ctx.body = Template.renderWithHtml('门户设置', body, script, modConfig.template)
 });
-router.get('/myShop/goods', async ctx => {
-  let script = ['/myShop.goods.js'];
-  let modConfig = modules['myShop.goods'];
+router.get('/linkc/goods', async ctx => {
+  let script = ['/linkc.goods.js'];
+  let modConfig = modules['linkc.goods'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/myShop/goods', 'get', null, {
+  let result = await HttpClient.request('/linkc/goods', 'get', null, {
     headers: reqHeaders
   });
   let body = result.body;
   ctx.body = Template.renderWithHtml('商品设置', body, script, modConfig.template)
 });
-router.get('/myShop/order/list', async ctx => {
-  let script = ['/myShop.order.list.js'];
-  let modConfig = modules['myShop.order.list'];
+router.get('/linkc/order/list', async ctx => {
+  let script = ['/linkc.order.list.js'];
+  let modConfig = modules['linkc.order.list'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/myShop/order/list', 'get', null, {
+  let result = await HttpClient.request('/linkc/order/list', 'get', null, {
     headers: reqHeaders
   });
   let body = result.body;
   ctx.body = Template.renderWithHtml('订单管理', body, script, modConfig.template)
 });
-router.get('/myShop/order/detail', async ctx => {
-  let script = ['/myShop.order.detail.js'];
-  let modConfig = modules['myShop.order.detail'];
+router.get('/linkc/order/detail', async ctx => {
+  let script = ['/linkc.order.detail.js'];
+  let modConfig = modules['linkc.order.detail'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/myShop/order/detail', 'get', null, {
+  let result = await HttpClient.request('/linkc/order/detail', 'get', null, {
     headers: reqHeaders
   });
   let body = result.body;

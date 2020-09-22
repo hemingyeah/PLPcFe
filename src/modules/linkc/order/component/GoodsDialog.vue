@@ -34,7 +34,7 @@
 </template>
 <script>
 import goodsImg from "@src/assets/img/no-data.png";
-import { orderDeliver } from "@src/api/myShop";
+import { orderDeliver } from "@src/api/linkc";
 export default {
   name: "goods-dialog",
   props: {

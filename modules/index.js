@@ -14,7 +14,7 @@ const doMyself = require('./doMyself')
 const customerContact = require('./customerContact')
 
 const sparePart = require('./sparePart')
-const myShop = require('./myShop')
+const linkc = require('./linkc')
 
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
@@ -55,5 +55,5 @@ module.exports = {
   ...doMyself,
   ...customerContact,
   ...sparePart,
-  ...myShop
+  ...linkc
 }

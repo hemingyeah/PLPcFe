@@ -807,7 +807,7 @@ export default {
       platform.openTab({
         id: "my_shop",
         title: "门户设置",
-        url: "/myShop/setting",
+        url: "/linkc/setting",
         reload: true,
       });
     },
@@ -815,7 +815,7 @@ export default {
       platform.openTab({
         id: "my_shop_order_list",
         title: "订单列表",
-        url: "/myShop/order/list",
+        url: "/linkc/order/list",
         reload: true,
       });
     },

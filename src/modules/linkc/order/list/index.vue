@@ -333,7 +333,7 @@ import Page from "@model/Page";
 import platform from "@src/platform";
 import { formatDate } from "@src/util/lang";
 
-import { orderList, orderNum } from "@src/api/myShop";
+import { orderList, orderNum } from "@src/api/linkc";
 import componentMixin from "../component/index";
 import BaseGallery from "../../../../../packages/BaseGallery";
 
@@ -496,7 +496,7 @@ export default {
       platform.openTab({
         id: "my_shop_order_detail",
         title: "订单详情",
-        url: `/myShop/order/detail?id=${id}`,
+        url: `/linkc/order/detail?id=${id}`,
         reload: true,
         fromId,
       });
