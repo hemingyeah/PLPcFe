@@ -8,8 +8,8 @@
         <div class="ruler-set-item mar-r-56">
           <div class="ruler-set-item-title">门户访问权限:</div>
           <el-radio-group
-            v-model="setData.serviceStationConfig.validateBySms"
-            @change="change($event,'validateBySms')"
+            v-model="setData.serviceStationConfig.loginValidate"
+            @change="change($event,'loginValidate')"
           >
             <el-radio class="mar-r-16" :label="false">所有用户均可访问(短信、图片验证码或小程序授权)</el-radio>
             <el-radio :label="true">仅允许客户列表下手机号码访问</el-radio>
@@ -18,8 +18,8 @@
         <div class="ruler-set-item mar-r-56">
           <div class="ruler-set-item-title">网页门户验证方式：:</div>
           <el-radio-group
-            v-model="setData.serviceStationConfig.loginValidate"
-            @change="change($event,'loginValidate')"
+            v-model="setData.serviceStationConfig.validateBySms"
+            @change="change($event,'validateBySms')"
           >
             <el-radio class="mar-r-16" :label="false">图片验证码</el-radio>
             <el-radio :label="true">手机验证码</el-radio>
