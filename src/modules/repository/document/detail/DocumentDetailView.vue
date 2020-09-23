@@ -52,7 +52,11 @@
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
 
-            <span class="open" v-if="allowEdit && linkControl" @click="changeRelease();trackEventHandler('share')">
+            <span
+              class="open"
+              v-if="allowEdit && linkControl"
+              @click="changeRelease();trackEventHandler('share')"
+            >
               <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
               {{detail.circleState == 1 ? '取消发布' : '发布到圈子'}}
             </span>
@@ -657,9 +661,13 @@ export default {
             id: this.detail.id,
             circleState: 1 - this.detail.circleState * 1,
           }).then((res) => {
-            if (res.status == 200) {
-              this.detail.circleState =
-                1 - this.detail.circleState * 1;
+            if (res.code == 0) {
+              this.$message({
+                message: res.message,
+                duration: 1500,
+                type: "success",
+              });
+              this.detail.circleState = 1 - this.detail.circleState * 1;
               this.$emit("releaseCircle", {
                 id: this.detail.id,
                 circleState: 1 - this.detail.circleState * 1,
