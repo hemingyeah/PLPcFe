@@ -75,6 +75,7 @@ export default {
     };
     return {
       userImg,
+      fileArr:[],
       dataInfo: {
         name: "",
         mobile: "",
@@ -107,6 +108,7 @@ export default {
   },
   methods: {
     onBeforeUploadImage(file) {
+      console.log(file.raw, 'file')
       const isJPG = file.type === "image/jpeg" || file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -116,12 +118,11 @@ export default {
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
+      this.fileArr.push(file.raw)
       return isJPG && isLt2M;
     },
     UploadImage(param) {
-      const formData = new FormData();
-      formData.append("file", param.file);
-      Uploader.upload(formData, "/files/upload")
+      Uploader.upload(param.file, "/files/upload")
         .then((result) => {
           if (result.status != 0) {
             this.$message({
@@ -149,9 +150,9 @@ export default {
         .finally(() => {});
     },
     fileChange(file) {
-      return
-      this.$refs.upload.clearFiles();  //清除文件对象
-      this.logo = file.raw;  // 取出上传文件的对象，在其它地方也可以使用
+      return;
+      this.$refs.upload.clearFiles(); //清除文件对象
+      this.logo = file.raw; // 取出上传文件的对象，在其它地方也可以使用
       this.fileList = [{ name: file.name, url: file.url }]; // 重新手动赋值filstList， 免得自定义上传成功了, 而fileList并没有动态改变， 这样每次都是上传一个对象
     },
     changeImgCover(e) {
