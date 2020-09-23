@@ -42,7 +42,7 @@
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="visible = false" v-if="!evaluateConfig.autoCloseTask">取 消</el-button>
-      <el-button @click="submit(true)" :disabled="pending" v-else>回访并关闭工单</el-button>
+      <el-button class="close-task-btn" @click="submit(true)" :disabled="pending" v-else>回访并关闭工单</el-button>
       <el-button type="primary" @click="submit(false)" :disabled="pending">回 访</el-button>
     </div>
   </base-modal>
@@ -233,6 +233,10 @@ export default {
     .tag-item {
       margin-right: 0px;
     }
+  }
+
+  .close-task-btn {
+    max-width: 120px;
   }
 }
 </style>

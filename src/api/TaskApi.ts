@@ -4,13 +4,9 @@ import {
   PlanTaskCreateAndEditModel,
 } from "@model/param/in/Task";
 
-// const fixedPrefixTaskPath = "/api/task";
-// const ElASTICSEARCH =  "/api/elasticsearch";
-// const fixedPrefixPaymentPath = '/api/payment';
-
-const fixedPrefixTaskPath = "";
-const ElASTICSEARCH = "";
-const fixedPrefixPaymentPath = "";
+const fixedPrefixTaskPath = '/api/task';
+const ElASTICSEARCH = '/api/elasticsearch';
+const fixedPrefixPaymentPath = '/api/payment';
 
 /* ------------- start 旧工单api ---------------- */
 
