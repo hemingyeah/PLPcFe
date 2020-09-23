@@ -1992,18 +1992,13 @@ export default {
      */
     saveColumnStatus(event) {
       let columns = event.data || []
-      let columnMap = columns.reduce((acc, col) => (acc[col.field] = col) && acc, {})
 
-      this.columns.forEach(column => {
-        let newColumn = columnMap[column.field];
-        if (newColumn) {
-          this.$set(column, 'width', newColumn.width);
-        }
+      this.columns = []
 
-        this.$set(column, 'show', newColumn ? newColumn.show : false)
+      this.$nextTick(() => {
+        this.$set(this, 'columns', columns.slice());
+        this.saveColumnStatusToStorage()
       })
-
-      this.saveColumnStatusToStorage()
     },
     saveColumnStatusToStorage() {
       const localStorageData = this.getLocalStorageData();
