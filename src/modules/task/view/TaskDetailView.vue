@@ -119,10 +119,10 @@
               </div>
               <div class="form-view-row linkman-phone">
                 <label>电话：</label>
-                <div class="form-view-row-content call-phone" @click.stop="makePhoneCall">
-                  <span :class="{'call-active': hasCallCenterModule}">{{ lmPhone }}</span>
+                <div class="form-view-row-content call-phone">
+                  <span :class="{'call-active': hasCallCenterModule}" @click.stop="makePhoneCall">{{ lmPhone }}</span>
                   <el-tooltip content="拨打电话" placement="top" v-if="showCallPhone">
-                    <i class="iconfont icon-dianhua2"></i>
+                    <i class="iconfont icon-dianhua2" @click.stop="makePhoneCall"></i>
                   </el-tooltip>
                 </div>
               </div>

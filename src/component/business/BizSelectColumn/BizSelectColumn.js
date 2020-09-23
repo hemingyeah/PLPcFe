@@ -12,9 +12,8 @@ function convertDisplayNameToName(field = {}) {
 
 function convertColumnWithSave(field = {}) {
   let column = {
-    field: field.fieldName,
+    ...field,
     show: field.show,
-    width: field.width
   }
   return column
 }
@@ -35,14 +34,12 @@ const BizSelectColumn = {
     buildSortLists(treeNode = {}) {
       let { columns } = treeNode;
       let isColumnsObject = this.isColumnsObject(columns)
-      let lists = []
+      let lists = columns
 
       if (isColumnsObject) {
         lists = Object.keys(columns).map(key => {
           return { name: columns[key].name, lists: this.buildSortLists(columns[key]) }
         })
-      } else {
-        lists = columns.filter(column => column.show)
       }
 
       return lists
@@ -107,7 +104,7 @@ const BizSelectColumn = {
       field.show = value;
 
       // 判断当前父级下的子级是否全选
-      const isCheckedAll = parent.columns.every(column => column.show == true)
+      const isCheckedAll = parent.columns.every(column => column.show)
       parent.checked = isCheckedAll
 
       // 判断如果父级全选，则去寻找父级的兄弟层级，进而判断 父父级的状态
@@ -255,7 +252,7 @@ const BizSelectColumn = {
       const TemplateMap = {}
       let sortList = []
 
-      originColumns.filter(column => column.show).forEach((column, index) => {
+      originColumns.forEach((column, index) => {
         let isSystemFiled = !column.templateId
 
         if (isSystemFiled) {

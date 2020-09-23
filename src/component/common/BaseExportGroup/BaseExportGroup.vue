@@ -80,14 +80,14 @@
 </template>
 
 <script>
-import baseExportMixin from "@src/mixins/baseExportMixin";
+import baseExportMixin from '@src/mixins/baseExportMixin';
 
 let filterColumnsExpandLength = 0;
 let filterColumnsExpand = [];
 let filterColumnsMap = {};
 
 export default {
-  name: "base-export-group",
+  name: 'base-export-group',
   mixins: [baseExportMixin],
   props: {
     action: String,
@@ -101,11 +101,11 @@ export default {
     },
     title: {
       type: String,
-      default: "导出列选择",
+      default: '导出列选择',
     },
     method: {
       type: String,
-      default: "get",
+      default: 'get',
     },
     /**
      * 函数必须返回Promise对象
@@ -124,7 +124,7 @@ export default {
       checkedMap,
       checkedGroupArr: [],
       ids: [],
-      fileName: "",
+      fileName: '',
       visible: false,
       pending: false,
       checkedArr: [],
@@ -132,12 +132,11 @@ export default {
       tooltip: false,
       isDownloadNow: false, // 导出是否是立刻下载模式
 
-      checked: "",
+      checked: '',
     };
   },
   watch: {
     columns(columns) {
-      console.log(columns);
       let checkedMap = {};
       columns.forEach((column) => {
         checkedMap[column.value] = [];
@@ -164,9 +163,7 @@ export default {
         let columns = item.columns || [];
 
         if (Array.isArray(columns) || columns.length < 1) {
-          console.warn(
-            "Caused: base-export-group filter columns item has no columns"
-          );
+          console.warn('Caused: base-export-group filter columns item has no columns');
         }
 
         item.columns = columns.filter((column) => column.export);
@@ -181,9 +178,9 @@ export default {
   },
   methods: {
     buildParamsFunc() {
-      return typeof this.buildParams == "function"
+      return typeof this.buildParams == 'function'
         ? this.buildParams(this.checkedMap, this.ids)
-        : { checked: this.checkedArr.join(","), ids: this.ids.join(",") };
+        : { checked: this.checkedArr.join(','), ids: this.ids.join(',') };
     },
     checkedAll(checkedAll = true) {
       let checkedMap = this.checkedMap;
@@ -220,7 +217,6 @@ export default {
         let checkedArr = [];
 
         if (value.indexOf(key) > -1) {
-          let item = checkedMap[key];
           let columns = filterColumnsMap[key];
 
           checkedArr = columns.map((item) =>
@@ -238,7 +234,7 @@ export default {
     isCheckedEmpty() {
       return filterColumnsExpandLength == 0;
     },
-    open(ids = [], fileName = "导出数据.xlsx", isDownloadNow = false) {
+    open(ids = [], fileName = '导出数据.xlsx', isDownloadNow = false) {
       this.pending = false;
       this.ids = ids;
       this.fileName = fileName;

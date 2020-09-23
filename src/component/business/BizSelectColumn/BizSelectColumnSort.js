@@ -17,7 +17,7 @@ const NestedDraggable = {
     return (
       <draggable tag="div" list={ this.lists } class="nested-draggable">
         {
-          this.lists.map(item => {
+          this.lists.filter(item => item.show).map(item => {
             return (
               <div key={ uuid() } class="nested-draggable-block">
                 <div class="nested-draggable-name">
