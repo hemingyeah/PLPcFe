@@ -18,19 +18,25 @@
         </el-dropdown-menu>
       </el-dropdown>
     </h3>
-    <!-- S 搜索条件 -->
-    <el-form class="advanced-search-form" onsubmit="return false;">
-      <task-search-form
-        :fields="fields"
-        ref="searchForm"
-        :form-backup="formBackup"
-        :column-num="columnNum"
-      >
-      </task-search-form>
-      <!-- 搜索操作按钮 -->
-      <slot name="footer"></slot>
-    </el-form>
-    <!-- E 搜索条件 -->
+    <!--  -->
+      <div class="task-search-panel-title">
+        <i class="iconfont icon-triangle-down task-c3"></i>
+        <span class="task-font16">常用字段</span>
+        spa
+      </div>
+      <!-- S 搜索条件 -->
+      <el-form class="advanced-search-form" onsubmit="return false;">
+        <task-search-form
+          :fields="fields"
+          ref="searchForm"
+          :form-backup="formBackup"
+          :column-num="columnNum"
+        >
+        </task-search-form>
+        <!-- 搜索操作按钮 -->
+        <slot name="footer"></slot>
+      </el-form>
+      <!-- E 搜索条件 -->
   </base-panel>
 </template>
 
@@ -321,7 +327,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .advanced-search-form {
   overflow: auto;
   padding: 10px 15px 63px 15px;
@@ -362,5 +368,10 @@ export default {
       margin: 0 10px;
     }
   }
+}
+.task-search-panel-title {
+    height: 54px;
+    line-height: 54px;
+    padding: 0 15px;
 }
 </style>
