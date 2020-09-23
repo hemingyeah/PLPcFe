@@ -351,7 +351,7 @@ export default {
           this.$notify.close();
           this.$notify.error({
             title: "网络错误",
-            message: res.message,
+            message: res[0].message,
             duration: 2000,
           });
         }
@@ -361,7 +361,7 @@ export default {
           this.$notify.close();
           this.$notify.error({
             title: "网络错误",
-            message: res.message,
+            message: res[1].message,
             duration: 2000,
           });
         }
@@ -373,7 +373,7 @@ export default {
           this.$notify.close();
           this.$notify.error({
             title: "网络错误",
-            message: res.message,
+            message: res[2].message,
             duration: 2000,
           });
         }
@@ -537,7 +537,7 @@ export default {
         id: "createTask",
         title: "商品列表",
         close: true,
-        url: "/setting/serviceStation/markSpare",
+        url: "/setting/serviceStation/markSpareGray",
       });
       // window.location = "/setting/serviceStation/markSpare";
     },
