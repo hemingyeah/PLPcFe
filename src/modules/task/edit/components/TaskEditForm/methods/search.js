@@ -49,8 +49,10 @@ export default {
    * @description 搜索客户
   */
   async searchCustomerByPhone(params = {}) {
+    let parameter = { phone: params.keyword }
+    
     try {
-      const result = await TaskApi.getCustomerByPhone(params);
+      const result = await TaskApi.getCustomerByPhone(parameter);
 
       if (!result || !result.data) return;
 

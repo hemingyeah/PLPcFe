@@ -7,6 +7,7 @@ import * as FormUtil from '@src/component/form/util'
 import DateUtil from '@src/util/date'
 import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts'
+import ObjectUtil from '@src/util/object';
 import { 
   customerAddressSelectConversion,
   linkmanSelectConversion,
@@ -562,7 +563,6 @@ export default {
       let customerId = this.selectedCustomer?.value || '';
       
       params.customerId = this.selectedCustomer?.value || '';
-      params.phone = customerId ? params.keyword : '';
 
       return customerId ? this.searchLinkman(params) : this.searchCustomerByPhone(params);
     },
@@ -641,6 +641,10 @@ export default {
      * @description 更新联系人信息
     */
     async updateLinkman(linkman = {}) {
+      if (ObjectUtil.isEmpty(linkman)) {
+        return console.warn('Caused: linkman is not object or is empty')
+      }
+      
       let isHaveCustomer = this.value.customer && this.value.customer.length;
       let linkmanCustomer = linkman?.customer || {};
 

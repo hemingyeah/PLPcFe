@@ -88,6 +88,7 @@
               @input="updateLinkman(value.linkman[0])"
               placeholder="请输入关键字搜索联系人"
               :disabled="isCreateCustomer"
+              :cleared="true"
             >
             </biz-form-remote-select>
             <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer">新建</el-button>
@@ -100,6 +101,7 @@
           <div class="input-and-btn">
             <biz-form-remote-select
               v-model="value.address"
+              :cleared="true"
               :remote-method="searchAddressOuterHandler"
               placeholder="请输入关键字搜索地址">
             </biz-form-remote-select>

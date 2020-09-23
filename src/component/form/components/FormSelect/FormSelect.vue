@@ -5,6 +5,7 @@
       :placeholder="placeholder"
       :clearable="clearable"
       :multiple="isMulti"
+      no-match-text=""
       ref="elSelect"
       filterable
       :value="value" @change="input">
