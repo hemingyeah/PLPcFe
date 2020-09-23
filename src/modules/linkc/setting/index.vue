@@ -188,23 +188,23 @@
         class="demo-ruleForm"
       >
         <el-form-item label="APPSecret" prop="secret">
-          <el-input v-model.number="wxRulerFormData.secret" autocomplete="off" placeholder="请输入"></el-input>
+          <el-input v-model="wxRulerFormData.secret" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="APPID" prop="appId">
-          <el-input v-model.number="wxRulerFormData.appId" autocomplete="off" placeholder="请输入"></el-input>
+          <el-input v-model="wxRulerFormData.appId" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="公众号APPID" prop="publicAppId">
           <el-input
-            v-model.number="wxRulerFormData.publicAppId"
+            v-model="wxRulerFormData.publicAppId"
             autocomplete="off"
             placeholder="请输入"
           ></el-input>
         </el-form-item>
         <el-form-item label="mch_id" prop="matchId">
-          <el-input v-model.number="wxRulerFormData.matchId" autocomplete="off" placeholder="请输入"></el-input>
+          <el-input v-model="wxRulerFormData.matchId" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="API密钥" prop="apiSecret">
-          <el-input v-model.number="wxRulerFormData.apiSecret" autocomplete="off" placeholder="请输入"></el-input>
+          <el-input v-model="wxRulerFormData.apiSecret" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
