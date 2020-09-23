@@ -15,7 +15,17 @@ export default {
     return {};
   },
   methods: {
-    goToWiki() {},
+    goToWiki() {
+      let fromId = window.frameElement.getAttribute("id");
+      this.$platform.openTab({
+        id: "M_INFO_DOC",
+        title: "知识库列表",
+        url: "/wiki",
+        reload: true,
+        close: true,
+        fromId,
+      });
+    },
   },
 };
 </script>
