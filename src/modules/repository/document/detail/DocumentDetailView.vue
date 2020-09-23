@@ -54,7 +54,7 @@
 
             <span class="open" v-if="allowEdit && linkControl" @click="changeRelease();trackEventHandler('share')">
               <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
-              {{approveData.circleState == 1 ? '取消发布' : '发布到圈子'}}
+              {{detail.circleState == 1 ? '取消发布' : '发布到圈子'}}
             </span>
 
             <span class="open" @click="openFrame();trackEventHandler('open')" v-if="isList">新页面打开</span>
@@ -646,7 +646,7 @@ export default {
     },
     changeRelease() {
       this.$confirm(
-        this.approveData.circleState == 1 ? "是否取消发布" : "是否发布到圈子",
+        this.detail.circleState == 1 ? "是否取消发布" : "是否发布到圈子",
         "提示",
         {
           confirmButtonText: "确定",
@@ -654,15 +654,15 @@ export default {
       )
         .then(() => {
           RepositoryApi.releaseCircle({
-            id: this.approveData.id,
-            circleState: 1 - this.approveData.circleState * 1,
+            id: this.detail.id,
+            circleState: 1 - this.detail.circleState * 1,
           }).then((res) => {
             if (res.status == 200) {
-              this.approveData.circleState =
-                1 - this.approveData.circleState * 1;
+              this.detail.circleState =
+                1 - this.detail.circleState * 1;
               this.$emit("releaseCircle", {
-                id: this.approveData.id,
-                circleState: 1 - this.approveData.circleState * 1,
+                id: this.detail.id,
+                circleState: 1 - this.detail.circleState * 1,
               });
             } else {
               this.$message({

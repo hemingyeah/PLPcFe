@@ -23,6 +23,11 @@
           <span class="management" v-if="allowEdit">
             <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('delete')"></i>
           </span>
+          
+          <span class="open" v-if="allowEdit && linkControl" @click="changeRelease();trackEventHandler('share')">
+            <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
+            {{detail.circleState == 1 ? '取消发布' : '发布到圈子'}}
+          </span>
 
           <span class="open" @click="openFrame" v-if="isList">新页面打开</span>
 
@@ -365,7 +370,36 @@ export default {
         window.TDAPP.onEvent('pc：信息公告详情-删除事件');
         return;
       }
-    }
+    },
+    changeRelease() {
+      this.$confirm(
+        this.detail.circleState == 1 ? '是否取消发布' : '是否发布到圈子',
+        '提示',
+        {
+          confirmButtonText: '确定',
+        }
+      )
+        .then(() => {
+          RepositoryApi.releaseCircle({
+            id: this.detail.id,
+            circleState: 1 - this.detail.circleState * 1,
+          }).then((res) => {
+            if (res.status == 200) {
+              this.detail.circleState = 1 - this.detail.circleState * 1;
+              let fromId = window.frameElement.getAttribute('fromid') || '';
+              if (!fromId) return;
+              this.$platform.refreshTab(fromId);
+            } else {
+              this.$message({
+                message: res.message,
+                duration: 1500,
+                type: 'error',
+              });
+            }
+          });
+        })
+        .catch(() => {});
+    },
   },
   computed: {
     height () {
@@ -378,7 +412,12 @@ export default {
 
     marginLeft () {
       return this.reads.reads.length > 0 ? '20px' : '0'
-    }
+    },
+
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
+    },
   }
 }
 </script>
