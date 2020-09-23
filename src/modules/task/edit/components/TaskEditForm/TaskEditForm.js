@@ -109,8 +109,13 @@ export default {
      * @description 添加产品 提交
     */
     addProductSubmit() {
+      let selectedCustomer = this.selectedCustomer
+      let customer = {
+        ...selectedCustomer,
+        id: selectedCustomer.id || selectedCustomer.value
+      }
       // 提交
-      this.productFormDom.submit(this.value.customer[0], data => {
+      this.productFormDom.submit(customer, data => {
 
         let productArr = this.value.product?.length ? _.cloneDeep(this.value.product) : [];
         productArr.push({
