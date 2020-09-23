@@ -209,13 +209,14 @@ export default {
     },
     releaseCircle(e) {
       if (e.id) {
-        let list_ = this.listMsg.list.map((item) => {
+        let data = this.listMsg;
+        data.list = this.listMsg.list.map((item) => {
           if (item.id == e.id) {
             item.circleState = e.circleState;
-            return item;
           }
+          return item;
         });
-        this.$set(this.listMsg, "list", list_);
+        this.$set(this, "listMsg", data);
       }
     },
   },

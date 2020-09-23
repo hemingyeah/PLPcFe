@@ -670,7 +670,7 @@ export default {
               this.detail.circleState = 1 - this.detail.circleState * 1;
               this.$emit("releaseCircle", {
                 id: this.detail.id,
-                circleState: 1 - this.detail.circleState * 1,
+                circleState: this.detail.circleState * 1,
               });
             } else {
               this.$message({

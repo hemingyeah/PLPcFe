@@ -45,7 +45,7 @@
               <i class="iconfont icon-yanjing"></i>
               <span>{{item.readTimes}}</span>
             </span>
-            <span class="readNum" v-if="item.circleState == 1 && linkControl">
+            <span class="readNum" v-if="item.circleState == 1 ">
               <i class="iconfont icon-quanziguanli"></i>
             </span>
           </div>
