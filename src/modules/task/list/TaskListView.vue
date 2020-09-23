@@ -322,16 +322,16 @@
         v-if="advanceds.length"
       >
         <div class="advanced-search-btn-group" slot="footer">
-          <base-button type="primary" @event="editView">{{
-            isViewModel === "默认" ? "存为视图" : "编辑视图"
-          }}</base-button>
+          <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button
             type="primary"
             @event="advancedSearch"
             native-type="submit"
             >搜索</base-button
           >
-          <base-button type="ghost" @event="resetParams">重置</base-button>
+          <base-button type="primary" @event="editView">{{
+            isViewModel === "默认" ? "保存视图" : "编辑视图"
+          }}</base-button>
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->

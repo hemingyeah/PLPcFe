@@ -283,15 +283,8 @@ export default {
       padding: 13px 15px 13px 46px;
     }
 
-    &.frame-subMenu-active:before{
-      content: "";
-      position: absolute;
-      left: 25px;
-      top: 20px;
-      width: 6px;
-      height: 6px;
-      background-color: $color-primary;
-      border-radius: 50%;
+    &:hover {
+      background-color: $color-nav-hover;
     }
   }
 
@@ -336,8 +329,6 @@ export default {
   transition: background-color ease .3s;
 
   &:hover{
-    background-color: lighten($color-primary, 3%);
-
     .frame-float-menu{
       display: block !important;
     }
@@ -350,6 +341,10 @@ export default {
     align-items: center;
     color: #fff;
     font-size: 14px;
+
+    &:hover {
+      background-color: $color-nav-hover;
+    }
 
     i.iconfont{
       font-size: 16px;
@@ -407,10 +402,13 @@ export default {
   transition: background-color ease .3s,
               color ease .3s;
   
-  &:hover,
+  &:hover {
+    background-color: $color-td-hover;
+  }
+
   &.frame-subMenu-active{
     // background: mix(#fff, $color-primary, 89.88%);
-    background-color: $color-primary;
+    background-color: $color-primary !important;
     color: #fff !important;
   }
   

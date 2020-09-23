@@ -11,7 +11,7 @@ import TaskMap from "./components/TaskMap.vue";
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
-import { fields, selectIds, advancedList } from "./TaskFieldModel";
+import { fields, selectIds, advancedList, allExport } from "./TaskFieldModel";
 import { LINK_REG } from "@src/model/reg";
 
 /** utils */
@@ -43,6 +43,8 @@ const TASK_SELF_FIELD_NAMES = [
   "serviceContent",
   "planTime",
   "description",
+  "product",
+  "level"
 ];
 // 导出过来字段类型
 const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
@@ -295,7 +297,6 @@ export default {
           bool: true
         },
       ];
-
       this.columns.forEach((field) => {
         field.export = true;
 
@@ -308,17 +309,17 @@ export default {
       let taskFields = this.taskFields;
       let taskReceiptFields = this.taskReceiptFields;
 
-      taskFields = taskFields.filter((field) =>
-        this.filterFieldFuncHandle(field)
-      );
+      taskFields = taskFields.filter((field) =>{
+         this.filterFieldFuncHandle(field)
+      });
       taskReceiptFields = taskReceiptFields.filter((field) =>
         this.filterFieldFuncHandle(field)
       );
 
-      taskSelfFields = [...taskSelfFields, ...taskFields].map((field) => {
-        field.export = true;
-        return field;
-      });
+      // taskSelfFields = [...taskSelfFields, ...taskFields].map((field) => {
+      //   field.export = true;
+      //   return field;
+      // });
 
       taskReceiptSystemFields = [
         ...taskReceiptSystemFields,
@@ -342,7 +343,11 @@ export default {
         {
           label: "系统信息",
           value: "systemChecked",
-          columns: taskSystemFields,
+          columns: allExport.map(item => {
+            item.export = true
+            item.label = item.displayName
+            return item
+          }),
         },
       ];
     },
@@ -473,10 +478,43 @@ export default {
       const res = await TaskApi.getCardDetailList({ typeId });
       let list = res.map((item, index) => {
         if (item.canRead) {
-          let columns = item.fields.map((v) => {
+          let columns, endAddress = {
+            displayName: '位置',
+            fieldName: `${item.cardId}_endAddress`,
+          },startAddress = {
+            displayName: '位置',
+            fieldName: `${item.cardId}_startAddress`,
+          }
+          if (item.specialfrom === '工时记录') {
+            // 添加固定导出参数
+            item.fields.splice(item.fields.map((v, i) => {
+              if (v.fieldName === 'endTime') {
+                return i + 1
+              }
+            }).filter(v => {
+              return v
+            })[0], 0, endAddress)
+
+            item.fields.splice(item.fields.map((v, i) => {
+              if (v.fieldName === 'startTime') {
+                return i + 1
+              }
+            }).filter(v => {
+              return v
+            })[0], 0, startAddress)
+
+            item.fields = [...item.fields, ...[{displayName: '行程距离',
+            fieldName: `${item.cardId}_distance`}]]
+          } else {
+            item.fields = [...item.fields, ...[{displayName: '操作人',
+            fieldName: `cu_${item.cardId}`}, {displayName: '操作时间',
+            fieldName: `ct_${item.cardId}`}]]
+          }
+          columns = item.fields.map((v, i) => {
             return {
               export: item.canRead,
               label: v.displayName,
+              exportAlias: v.fieldName,
               ...v,
             };
           });
@@ -874,7 +912,6 @@ export default {
 
       // S 高级搜索
       this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
-      console.log("高级搜索", this.advanceds);
       // E 高级搜索
 
       this.columns = fields
@@ -992,7 +1029,8 @@ export default {
      * @description 构建导出参数
      * @return {Object} 导出参数
      */
-    buildExportParams({ receiptChecked, systemChecked, taskChecked }, ids) {
+    buildExportParams( checkedMap, ids) {
+      const { receiptChecked, systemChecked, taskChecked } = checkedMap
       const Params = Object.assign({}, this.params);
       const rootWindow = getRootWindow(window);
       const { loginUser } = this.initData;
@@ -1018,6 +1056,14 @@ export default {
           },
         }),
       };
+      let cardFieldChecked = []
+      for(let key in checkedMap) {
+        if (key.indexOf('annexChecked') !== -1) {
+          cardFieldChecked = [...cardFieldChecked, ...checkedMap[key]]
+        }
+      }
+      console.log('附加', cardFieldChecked)
+
       params["data"] = exportAll ? "" : this.selectedIds.join(",");
       params["typeId"] = exportSearchModel.typeId;
       params["receiptChecked"] = receiptChecked
@@ -1032,10 +1078,13 @@ export default {
         .join(",");
       params["checked"] = taskChecked
         .map((item) => {
+          if (item === 'product') {
+            item = 'product, productSN'
+          }
           return item;
         })
         .join(",");
-
+      params['cardFieldChecked'] = cardFieldChecked.join(',')
       return params;
     },
     /**
