@@ -1079,7 +1079,7 @@ export default {
       params["checked"] = taskChecked
         .map((item) => {
           if (item === 'product') {
-            item = 'product, productSN'
+            item = 'product,productSN'
           }
           return item;
         })

@@ -19,10 +19,10 @@
       </el-dropdown>
     </h3>
     <!--  -->
-      <div class="task-search-panel-title">
+      <div class="task-search-panel-title task-pointer">
         <i class="iconfont icon-triangle-down task-c3"></i>
         <span class="task-font16">常用字段</span>
-        spa
+        <span class="task-font14 task-c2 task-ml12">设置</span>
       </div>
       <!-- S 搜索条件 -->
       <el-form class="advanced-search-form" onsubmit="return false;">
@@ -37,6 +37,10 @@
         <slot name="footer"></slot>
       </el-form>
       <!-- E 搜索条件 -->
+      <div class="task-search-panel-title task-pointer">
+        <span class="task-font16">设置查询条件</span>
+        <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
+      </div>
   </base-panel>
 </template>
 
@@ -369,6 +373,11 @@ export default {
     }
   }
 }
+  .hide {
+    padding: 0;
+    height: 0;
+    width: 0;
+  }
 .task-search-panel-title {
     height: 54px;
     line-height: 54px;
