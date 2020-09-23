@@ -31,7 +31,7 @@ export function orderNum() {
 }
 
 export function orderDetail(params) {
-  return http.get(`${headeUrl}/linkc/order/detail`, params)
+  return http.get(`${headeUrl}/linkc/order/view`, params)
 }
 
 export function orderDeliver(params) {
