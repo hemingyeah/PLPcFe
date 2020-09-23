@@ -798,7 +798,7 @@ export default {
     // 打印工单
     printTask() {
       this.pending = true;
-      TaskApi.printTask({ id: this.task.id }).then(res => {
+      TaskApi.printTask({ taskId: this.task.id }).then(res => {
         if (res.status == 0) {
           let url = `${window.location.origin}/print/printTaskDispatcher?token=${res.data}`;
           parent.openHelp(url);
