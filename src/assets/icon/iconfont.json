@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "17394560",
+      "name": "面板箭头",
+      "font_class": "mianbanjiantou",
+      "unicode": "e6a7",
+      "unicode_decimal": 59047
+    },
+    {
       "icon_id": "17387403",
       "name": "菜单-备件",
       "font_class": "caidan-beijian",

@@ -236,7 +236,7 @@ export default {
   }
 
   .close-task-btn {
-    max-width: 120px;
+    max-width: 120px !important;
   }
 }
 </style>
