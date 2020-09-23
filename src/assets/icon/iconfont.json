@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "17387403",
+      "name": "菜单-备件",
+      "font_class": "caidan-beijian",
+      "unicode": "e6a6",
+      "unicode_decimal": 59046
+    },
+    {
+      "icon_id": "17387138",
+      "name": "菜单-客户",
+      "font_class": "caidan-kehu",
+      "unicode": "e6a4",
+      "unicode_decimal": 59044
+    },
+    {
       "icon_id": "17360732",
       "name": "icon_arrow",
       "font_class": "icon_arrow",
