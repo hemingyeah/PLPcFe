@@ -45,7 +45,7 @@
               <i class="iconfont icon-yanjing"></i>
               <span>{{item.readTimes}}</span>
             </span>
-            <span class="readNum" v-if="item.circleState == 1">
+            <span class="readNum" v-if="item.circleState == 1 && linkControl">
               <i class="iconfont icon-quanziguanli"></i>
             </span>
           </div>
@@ -92,7 +92,17 @@ export default {
     id: {
       type: String,
       default: ''
-    }
+    },
+    initData: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  computed:{
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
+    },
   },
   data () {
     return {
