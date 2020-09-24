@@ -672,6 +672,9 @@ export default {
                 id: this.detail.id,
                 circleState: this.detail.circleState * 1,
               });
+              let fromId = window.frameElement.getAttribute("fromid") || "";
+              if (!fromId) return;
+              this.$platform.refreshTab(fromId);
             } else {
               this.$message({
                 message: res.message,

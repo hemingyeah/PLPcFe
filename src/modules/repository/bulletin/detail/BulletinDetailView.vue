@@ -455,9 +455,11 @@ export default {
                 type: "success",
               });
               this.detail.circleState = 1 - this.detail.circleState * 1;
-              let fromId = window.frameElement.getAttribute("fromid") || "";
-              if (!fromId) return;
-              this.$platform.refreshTab(fromId);
+
+              this.$emit("releaseCircle", {
+                id: this.detail.id,
+                circleState: this.detail.circleState * 1,
+              });
             } else {
               this.$message({
                 message: res.message,
