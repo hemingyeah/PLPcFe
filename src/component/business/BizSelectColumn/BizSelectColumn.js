@@ -163,7 +163,7 @@ const BizSelectColumn = {
 
       this.columnSortListMerge(checked, field, parent, sortList);
     },
-    columnSortListGetGroup(sortList) {
+    columnSortListGetGroup(sortList, parent) {
       let templateGroup = {}
       let templateIndex = -1
 
@@ -179,14 +179,14 @@ const BizSelectColumn = {
       return { templateGroup, templateIndex }
     },
     columnSortListMerge(checked, field, parent, sortList) {
-      let { templateGroup = {}, templateIndex = 0 } = this.columnSortListGetGroup(sortList)
+      let { templateGroup = {}, templateIndex = 0 } = this.columnSortListGetGroup(sortList, parent)
       let templateColumns = templateGroup.lists || []
 
       checked
         ? templateColumns.push(convertDisplayNameToName(field))
         : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
-        
-      this.columnSortList[templateIndex] = templateColumns
+      
+      this.$set(this.columnSortList, templateIndex, { ...templateGroup, lists: templateColumns })
     },
     columnSortListFieldPush(columns, sortList) {
       columns.forEach(column => {
@@ -206,7 +206,7 @@ const BizSelectColumn = {
         if (checked) {
           for (let key in treeNode.columns) {
             let item = treeNode.columns[key]
-            let { templateGroup = {}, templateIndex } = this.columnSortListGetGroup(sortList)
+            let { templateGroup = {}, templateIndex } = this.columnSortListGetGroup(sortList, item)
 
             let isFindedTemplate = templateIndex >= 0
             templateIndex = isFindedTemplate ? templateIndex : sortList.length
