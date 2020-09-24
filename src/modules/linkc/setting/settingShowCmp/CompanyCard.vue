@@ -3,8 +3,8 @@
     <div class="company-card-box">
       <div class="flex-x">
         <img class="company-card-img" :src="infoData.logoUrl || ''" />
-        <div class="flex-x font-12 font-w-500">
-          <div class="overHideCon-1">{{infoData.name}}</div>
+        <div class="flex-x font-12 font-w-500 flex-1">
+          <div class="">{{infoData.name}}</div>
         </div>
       </div>
       <div class="company-info">
@@ -36,7 +36,7 @@ export default {
         };
       }, // primary、plain、only-text、ghost、danger
     },
-  },
+  }
 };
 </script>
 

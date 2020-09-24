@@ -449,12 +449,12 @@ export default {
             circleState: 1 - this.detail.circleState * 1,
           }).then((res) => {
             if (res.code == 0) {
+              this.detail.circleState = 1 - this.detail.circleState * 1;
               this.$message({
-                message: res.message,
+                message: this.detail.circleState == 1 ? "发布成功" : "取消成功",
                 duration: 1500,
                 type: "success",
               });
-              this.detail.circleState = 1 - this.detail.circleState * 1;
 
               this.$emit("releaseCircle", {
                 id: this.detail.id,

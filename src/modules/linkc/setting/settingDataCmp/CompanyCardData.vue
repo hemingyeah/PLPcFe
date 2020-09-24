@@ -28,10 +28,10 @@
       <el-form ref="ruleForm" :model="dataInfo" :rules="rules">
         <div class="form-label">
           门户名称
-          <span>最多10个字符</span>
+          <span>最多50个字符</span>
         </div>
         <el-form-item prop="name">
-          <el-input v-model="dataInfo.name" placeholder="请输入" maxlength="10"></el-input>
+          <el-input v-model="dataInfo.name" placeholder="请输入" maxlength="50"></el-input>
         </el-form-item>
         <div class="form-label">联系电话</div>
         <el-form-item prop="mobile">
@@ -89,7 +89,7 @@ export default {
         logoUrl: userImg,
       },
       rules: {
-        name: [{ max: 10, message: "最多10个字符", trigger: "change" }],
+        name: [{ max: 50, message: "最多50个字符", trigger: "change" }],
         mobile: [
           {
             validator: validatePhone,

@@ -3,10 +3,15 @@
     <div class="shops-list-box">
       <div class="shops-title">商城橱窗</div>
       <!-- <draggable class="flex-x flex-w" v-model="dataInfo"> 可拖动-->
-      <div class="flex-x flex-w">
-        <div class="flex-x" v-for="(item, index) in dataInfo" :key="index" draggable="draggable">
+      <div class="flex-x flex-w shops-list-box-con">
+        <div
+          class="flex-x flex-1 shops-list-box-item-box"
+          v-for="(item, index) in dataInfo"
+          :key="index"
+          draggable="draggable"
+        >
           <div class="shops-list-item">
-            <img :src="item.url" class="shops-list-item-img" />
+            <img :src="item.url ? `${item.url}?x-oss-process=image/resize,m_fill,h_165,w_142` : defaultImg" class="shops-list-item-img" />
             <div class="shops-info">
               <div class="overHideCon-2 mar-b-30 font-12">{{item.name}}</div>
               <div class="flex-x">
@@ -23,11 +28,7 @@
       <!-- </draggable> -->
       <div class="flex-x" v-if="dataInfo.length < 1">
         <div class="shops-list-item">
-          <img
-            class="shops-tag-img"
-            :src="tagImg"
-            alt
-          />
+          <img class="shops-tag-img" :src="tagImg" alt />
           <img :src="goodsImg" class="shops-list-item-img" />
           <div class="shops-info">
             <div class="overHideCon-2 mar-b-30 font-12">示例商品</div>
@@ -49,6 +50,7 @@ import draggable from "vuedraggable";
 import _ from "lodash";
 import goodsImg from "@src/assets/img/no-data.png";
 import tagImg from "@src/assets/img/myShop/tag.png";
+import defaultImg from "@src/assets/img/myShop/default.png";
 export default {
   name: "shops-list",
   components: {
@@ -60,6 +62,7 @@ export default {
       dataInfo: [],
       goodsImg,
       tagImg,
+      defaultImg,
     };
   },
   watch: {
@@ -91,7 +94,19 @@ export default {
     padding: 0 14px;
   }
   .shops-list-box {
+    .shops-list-box-con {
+      width: 100%;
+      position: relative;
+      .shops-list-box-item-box {
+        &:nth-child(even) {
+          justify-content: flex-end;
+        }
+      }
+    }
     .shops-list-item {
+      // &:nth-child(even) {
+      //   margin-left: 3px;
+      // }
       display: flex;
       flex-direction: column;
       margin-bottom: 5px;
