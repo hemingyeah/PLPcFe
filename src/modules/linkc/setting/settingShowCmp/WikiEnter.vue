@@ -82,6 +82,8 @@ export default {
     .wiki-info {
       position: relative;
       padding: 10px 12px 8px 12px;
+      border-bottom: 1px solid #f2f2f2;
+
       .shops-tag-img {
         position: absolute;
         left: 0;
