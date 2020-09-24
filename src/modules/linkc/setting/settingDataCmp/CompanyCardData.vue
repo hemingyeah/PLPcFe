@@ -25,7 +25,7 @@
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </div>
-      <el-form ref="ruleForm" :model="dataInfo" :rules="rules">
+      <el-form ref="ruleForm" :model="dataInfo" :rules="rules" status-icon>
         <div class="form-label">
           门户名称
           <span>最多50个字符</span>
@@ -38,7 +38,7 @@
           <el-input v-model="dataInfo.mobile" :autofocus="false" placeholder="请输入"></el-input>
         </el-form-item>
         <div class="form-label">企业地址</div>
-        <el-form-item>
+        <el-form-item prop="address">
           <el-input
             type="textarea"
             rows="4"
@@ -101,6 +101,7 @@ export default {
             trigger: "change",
           },
         ],
+        address:[{ required: true, message: "请输入地址", trigger: "blur" },]
       },
 
       imgCover: false,

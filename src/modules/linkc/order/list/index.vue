@@ -13,7 +13,7 @@
 
       <div class="search-more">
         <div class="search-checkbox flex-x">
-          <div class="flex-x min-w-620 pad-b-20">
+          <div class="flex-x min-w-500 pad-b-20">
             <div class="mar-r-38">订单状态：</div>
             <el-select
               v-model="searchModel.moreConditions.stateList"

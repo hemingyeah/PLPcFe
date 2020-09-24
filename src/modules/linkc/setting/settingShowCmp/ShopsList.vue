@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-show-cmp-box mar-b-32">
+  <div class="setting-show-cmp-box">
     <div class="shops-list-box">
       <div></div>
       <div class="shops-title">

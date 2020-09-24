@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-show-cmp-box mar-b-32">
+  <div class="setting-show-cmp-box">
     <div class="wiki-box">
       <div class="flex-x wiki-header">
         <div class="flex-1 wiki-title">企业圈子</div>
