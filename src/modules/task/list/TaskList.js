@@ -928,7 +928,7 @@ export default {
             minWidth = 200;
           }
 
-          if (["level", "updateTime"].indexOf(field.fieldName) >= 0) {
+          if (["level", "updateTime", 'createUserName', 'executorName', 'state'].indexOf(field.fieldName) >= 0) {
             sortable = "custom";
           }
 
@@ -1956,8 +1956,13 @@ export default {
      * @param {Object} option 配置
      */
     sortChange(option) {
+      const UserNameConvertMap = {
+        'createUserName': 'createUser',
+        'executorName': 'executorUser'
+      }
+
       try {
-        const { prop, order } = option;
+        let { prop, order } = option;
 
         if (!order) {
           this.params.orderDetail = {};
@@ -1967,11 +1972,17 @@ export default {
           this.taskListFields.filter((sf) => sf.fieldName === prop)[0] || {};
 
         let isSystem = 0;
+        let isConvertedProp = Object.keys(UserNameConvertMap).indexOf(prop) > -1
 
-        if (prop === "createTime" || prop === "updateTime") {
+        if (prop === "createTime" || prop === "updateTime" || isConvertedProp) {
           isSystem = 1;
-        } else {
+        } 
+        else {
           isSystem = sortedField.isSystem;
+        }
+
+        if (isConvertedProp) {
+          prop = UserNameConvertMap[prop]
         }
 
         let sortModel = {

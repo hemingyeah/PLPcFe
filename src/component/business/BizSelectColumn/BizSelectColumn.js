@@ -27,7 +27,8 @@ const BizSelectColumn = {
     return {
       columnSortList: [],
       columnTree: {},
-      show: false
+      originColumns: [],
+      show: false,
     }
   },
   methods: {
@@ -40,6 +41,8 @@ const BizSelectColumn = {
         lists = Object.keys(columns).map(key => {
           return { name: columns[key].name, lists: this.buildSortLists(columns[key]) }
         })
+      } else {
+        lists = columns.filter(column => column.show)
       }
 
       return lists
@@ -252,7 +255,7 @@ const BizSelectColumn = {
       const TemplateMap = {}
       let sortList = []
 
-      originColumns.forEach((column, index) => {
+      originColumns.filter(column => column.show).forEach((column, index) => {
         let isSystemFiled = !column.templateId
 
         if (isSystemFiled) {
@@ -288,6 +291,7 @@ const BizSelectColumn = {
      * @description 显示 设置窗
     */
     open(columns) {
+      this.originColumns = _.cloneDeep(columns);
       this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
       this.show = true
     },
@@ -358,20 +362,32 @@ const BizSelectColumn = {
      * @description 保存
     */
     save() {
-      let data = [];
+      let columns = [];
 
       this.columnSortList.forEach(column => {
         if (Array.isArray(column.lists)) {
           column.lists.forEach(item => {
-            data.push(convertColumnWithSave(item))
+            columns.push(convertColumnWithSave(item))
           })
         } else {
-          data.push(convertColumnWithSave(column))
+          columns.push(convertColumnWithSave(column))
         }
       })
 
+      let columnMap = columns.reduce((acc, column) => (acc[column.fieldName] = column) && acc, {});
+
+      this.originColumns.forEach(originColumn => {
+        let { fieldName } = originColumn
+        let sortColumn = columnMap[fieldName]
+        if (!sortColumn) {
+          originColumn.show = false
+          columns.push(originColumn)
+        }
+
+      })
+
       this.close();
-      this.$emit('save', { type: 'column', data })
+      this.$emit('save', { type: 'column', data: columns })
     },
     /** 
      * @description 向下 -> 切换 是否选中
