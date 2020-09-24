@@ -125,7 +125,7 @@
           <i class="iconfont icon-fd-link mar-r-6"></i>
           绑定微信或钉钉服务窗
         </a>
-        <a class="mar-l-16" href="javascript:;" @click="openLink()">
+        <a class="mar-l-16" href="javascript:;" @click="openLink('https://www.yuque.com/shb/help/XCX')">
           <i class="iconfont icon-fabu1 mar-r-6"></i>小程序发布指引
         </a>
         <el-button
