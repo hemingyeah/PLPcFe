@@ -41,26 +41,10 @@ export default {
   mounted() {
     const InputEl = this.$refs.input;
 
-    InputEl.addEventListener('paste', event => {
-      try {
-        let number = event.clipboardData.getData('text')
-        let newValue = number
-        
-        if (number.length > FORM_FIELD_TEXT_MAX_LENGTH) {
-          newValue = number.slice(0, FORM_FIELD_TEXT_MAX_LENGTH)
-        }
-
-        this.$emit('update', { newValue, field: this.field });
-        this.$emit('input', newValue);
-
-      } catch (error) {
-        console.warn('form-number: paste -> error', error)
-      }
-    })
-
+    InputEl.addEventListener('paste', this.pasteEventHandler)
   },
   beforeDestroy() {
-    this.$refs.input.removeEventListener('paste');
+    this.$refs.input.removeEventListener('paste', this.pasteEventHandler);
   },
   methods: {
     input(event){
@@ -86,6 +70,22 @@ export default {
 
       input.value = this.nativeInputValue;
     },
+    pasteEventHandler(event) {
+      try {
+        let number = event.clipboardData.getData('text')
+        let newValue = number
+        
+        if (number.length > FORM_FIELD_TEXT_MAX_LENGTH) {
+          newValue = number.slice(0, FORM_FIELD_TEXT_MAX_LENGTH)
+        }
+
+        this.$emit('update', { newValue, field: this.field });
+        this.$emit('input', newValue);
+
+      } catch (error) {
+        console.warn('form-number: paste -> error', error)
+      }
+    }
   }
 }
 </script>

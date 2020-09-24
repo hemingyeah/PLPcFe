@@ -18,8 +18,7 @@ import {
 import { 
   isSelect 
 } from './util'
-import http from "@src/util/http";
-import {checkUser, deleteComponent} from "@src/api/TaskApi.ts";
+import {checkUser, deleteComponent} from '@src/api/TaskApi.ts';
 
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
@@ -247,10 +246,6 @@ const FormDesign = {
     },
     /** 更新字段依赖 */
     updateDependencies(target){
-
-      console.log("更新字段依赖")
-      console.log(target)
-
       let fieldMap = {};
       for(let i = 0; i < this.value.length; i++) {
         fieldMap[this.value[i].fieldName] = this.value[i];
@@ -570,14 +565,14 @@ const FormDesign = {
       let tip = item.isSystem == 0 ? '删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除？' : '该字段为系统内置字段，请确认是否删除？'
       if (!await Platform.confirm(tip)) return;
       let isNext = true;
-      //mode:task为工单设置form
-      //mode:task_receipt为回执工单设置form
+      // mode:task为工单设置form
+      // mode:task_receipt为回执工单设置form
 
-      if((this.mode == "task" || this.mode == "task_receipt") && item.id) {
-        //item.id表明该字段已经在后端存储过，不是本次的新增字段
-        if(item.formType == "user") {
-          //删除的是人员，先check是否在审批流程中
-          isNext = await this.deleteUser(item,this.deleteFormField);
+      if((this.mode == 'task' || this.mode == 'task_receipt') && item.id) {
+        // item.id表明该字段已经在后端存储过，不是本次的新增字段
+        if(item.formType == 'user') {
+          // 删除的是人员，先check是否在审批流程中
+          isNext = await this.deleteUser(item, this.deleteFormField);
         }else{
           isNext = await this.deleteFormField(item);
         }
@@ -605,42 +600,32 @@ const FormDesign = {
         this.emitInput(value)
       }
     },
-    async deleteUser(item,callback) {
-      let result = await checkUser({id : item.id});
-      if(result.status == 0) {
-        if(result.data && result.data.show == 1) {
-          //是审批人
-          let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果删除，对应的审批流程将设置为“无需审批”，确定要删除吗？');
-          if(confirm) {
-            //取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
-            return callback(item);
-            // let result = await deleteComponent({ id : item.id });
-            // if(result.code) {
-            //   this.$platform.alert(result.message);
-            //   return false;
-            // }else{
-            //   return true;
-            // }
-          }else{
-            return false;
-          }
-        }else{
-          return true;
-        }
-      }else{
-        return false;
+    async deleteUser(item, callback) {
+      let result = await checkUser({ id : item.id })
+      let isSuccess = result.status == 0
+      // 是否成功
+      if (!isSuccess) {
+        console.warn('Caused: checkUser Function result is fail')
+        return false
       }
+      // 是否需要审批
+      let isNeedApproval = result.data && result.data.show == 1
+      if (!isNeedApproval) return true
 
+      // 是审批人
+      let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果删除，对应的审批流程将设置为“无需审批”，确定要删除吗？');
+      // 取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
+      if(confirm) return callback(item)
     },
-
+    
     async deleteFormField(item) {
       let result = await deleteComponent({ id : item.id });
       if(result.code) {
         this.$platform.alert(result.message);
         return false;
-      }else{
-        return true;
       }
+      
+      return true;
     },
 
     /** 添加新字段 */
@@ -679,16 +664,16 @@ const FormDesign = {
     },
     renderTabHeader(){
       if(!this.hasSystemField) return (
-          <div class="form-design-tabs">
-            <div class="form-design-tab">基础字段</div>
-          </div>
+        <div class="form-design-tabs">
+          <div class="form-design-tab">基础字段</div>
+        </div>
       );
 
       return (
-          <div class="form-design-tabs form-design-withSys">
-            <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
-            <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
-          </div>
+        <div class="form-design-tabs form-design-withSys">
+          <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
+          <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
+        </div>
       )
     },
     renderFieldList(fields){
@@ -698,21 +683,21 @@ const FormDesign = {
 
       return fields.map(field => {
         return (
-            <div class="form-design-field-wrap"
-                 onMousedown={e => this.beginInsert(field, e)}
-                 onClick={e => this.immediateInsert(field, e)}>
-              <div class="form-design-field form-design__ghost">
-                {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
-              </div>
+          <div class="form-design-field-wrap"
+            onMousedown={e => this.beginInsert(field, e)}
+            onClick={e => this.immediateInsert(field, e)}>
+            <div class="form-design-field form-design__ghost">
+              {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
             </div>
+          </div>
         )
       });
     },
     renderPreviewList(h){
       if(this.isEmpty) return (
-          <div class="form-design-tip">
-            <p>选择左侧控件拖动到此处</p>
-          </div>
+        <div class="form-design-tip">
+          <p>选择左侧控件拖动到此处</p>
+        </div>
       )
 
       return this.value.map(f => createPreviewComp.call(this, h, f))
@@ -722,32 +707,36 @@ const FormDesign = {
       if(null == fieldSetting) return null;
 
       return (
-          <div class="form-design-setting" key="form-design-setting">
-            {fieldSetting}
-          </div>
+        <div class="form-design-setting" key="form-design-setting">
+          {fieldSetting}
+        </div>
       )
     },
+    updateOptions(field, event) {
+      if(!field.setting.customerOption) return;
+      field.setting.customerOption[event.prop] = event.value;
+    }
   },
   render(h){
     return (
-        <div class="form-design">
-          <div class="form-design-panel">
-            { this.renderTabHeader() }
-            <div class="form-design-tabs-content">
-              { this.renderFieldList(this.filterFields) }
-            </div>
-          </div>
-          <div class="form-design-main">
-            <div class={['form-design-list', this.silence ? 'form-design-silence' : null]}>
-              { this.renderPreviewList(h) }
-            </div>
-          </div>
-          { this.renderSettingPanel(h) }
-          <div class="form-design-ghost" key="form-design-ghost" onWheel={this.scrollPreviewList}>
-            <div class="form-design__template"></div>
-            <div class="form-design-cover"></div>
+      <div class="form-design">
+        <div class="form-design-panel">
+          { this.renderTabHeader() }
+          <div class="form-design-tabs-content">
+            { this.renderFieldList(this.filterFields) }
           </div>
         </div>
+        <div class="form-design-main">
+          <div class={['form-design-list', this.silence ? 'form-design-silence' : null]}>
+            { this.renderPreviewList(h) }
+          </div>
+        </div>
+        { this.renderSettingPanel(h) }
+        <div class="form-design-ghost" key="form-design-ghost" onWheel={this.scrollPreviewList}>
+          <div class="form-design__template"></div>
+          <div class="form-design-cover"></div>
+        </div>
+      </div>
     );
   },
   mounted(){
