@@ -31,11 +31,11 @@
           <span>最多50个字符</span>
         </div>
         <el-form-item prop="name">
-          <el-input v-model="dataInfo.name" placeholder="请输入" maxlength="50"></el-input>
+          <el-input v-model="dataInfo.name" :autofocus="false" placeholder="请输入" maxlength="50"></el-input>
         </el-form-item>
         <div class="form-label">联系电话</div>
         <el-form-item prop="mobile">
-          <el-input v-model="dataInfo.mobile" placeholder="请输入"></el-input>
+          <el-input v-model="dataInfo.mobile" :autofocus="false" placeholder="请输入"></el-input>
         </el-form-item>
         <div class="form-label">企业地址</div>
         <el-form-item>
@@ -75,7 +75,7 @@ export default {
     };
     return {
       userImg,
-      fileArr:[],
+      fileArr: [],
       dataInfo: {
         name: "",
         mobile: "",
@@ -89,8 +89,12 @@ export default {
         logoUrl: userImg,
       },
       rules: {
-        name: [{ max: 50, message: "最多50个字符", trigger: "change" }],
+        name: [
+          { required: true, message: "请输入门户名称", trigger: "blur" },
+          { max: 50, message: "最多50个字符", trigger: "change" },
+        ],
         mobile: [
+          { required: true, message: "请输入电话", trigger: "blur" },
           {
             validator: validatePhone,
             message: "请输入正确的电话",
@@ -105,10 +109,13 @@ export default {
   activated() {
     this.$set(this, "dataInfo", _.cloneDeep(this.infoData));
     this.$set(this, "dataInforReturn", _.cloneDeep(this.infoData));
+    this.$nextTick(() => {
+      this.$refs["ruleForm"].clearValidate();
+    });
   },
   methods: {
     onBeforeUploadImage(file) {
-      console.log(file.raw, 'file')
+      console.log(file.raw, "file");
       const isJPG = file.type === "image/jpeg" || file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -118,7 +125,7 @@ export default {
       if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
-      this.fileArr.push(file.raw)
+      this.fileArr.push(file.raw);
       return isJPG && isLt2M;
     },
     UploadImage(param) {
