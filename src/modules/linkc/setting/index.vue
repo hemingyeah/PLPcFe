@@ -125,7 +125,11 @@
           <i class="iconfont icon-fd-link mar-r-6"></i>
           绑定微信或钉钉服务窗
         </a>
-        <a class="mar-l-16" href="javascript:;" @click="openLink('https://www.yuque.com/shb/help/XCX')">
+        <a
+          class="mar-l-16"
+          href="javascript:;"
+          @click="openLink('https://www.yuque.com/shb/help/XCX')"
+        >
           <i class="iconfont icon-fabu1 mar-r-6"></i>小程序发布指引
         </a>
         <el-button
@@ -153,22 +157,25 @@
               <!-- <draggable class="menu-box" v-model="dataList"> 可拖动-->
               <div class="menu-box">
                 <div
-                  :class="['menu-box-item',nowSettingDataId == item.id?'menu-box-item-check':'']"
+                  
                   v-for="(item, index) in dataList"
                   :key="index"
                   draggable="false"
                   @click="chooseNowSet(item)"
                 >
-                  <component
-                    :is="item.type"
-                    ref="setShow"
-                    :info-data="item.data"
-                    :cmp-id="item.id"
-                    :now-setting-data-id="nowSettingDataId"
-                    :event-list="eventList"
-                    @changeThis="changeThis"
-                    @pushIcon="pushIcon"
-                  ></component>
+                  <div :class="['menu-box-item',nowSettingDataId == item.id?'menu-box-item-check':'']" >
+                    <component
+                      :is="item.type"
+                      ref="setShow"
+                      :info-data="item.data"
+                      :cmp-id="item.id"
+                      :now-setting-data-id="nowSettingDataId"
+                      :event-list="eventList"
+                      @changeThis="changeThis"
+                      @pushIcon="pushIcon"
+                    ></component>
+                  </div>
+                  <div v-if="index == 2 || index == 3" style="height:32px"></div>
                 </div>
               </div>
               <!-- </draggable> -->

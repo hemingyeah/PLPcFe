@@ -29,7 +29,7 @@
         <i class="iconfont icon-right-circle-fill"></i>
       </div>
     </div>
-    <el-form ref="ruleForm" :model="dataInfo" :rules="rules">
+    <el-form ref="ruleForm" :model="dataInfo" :rules="rules" status-icon>
       <div class="form-label">
         入口名称
         <span>最多4个字符</span>

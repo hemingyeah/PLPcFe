@@ -118,7 +118,7 @@ export default {
 .setting-show-cmp-box {
   width: 100%;
   .icon-list-box {
-    padding: 12px 9.5px;
+    padding: 32px 9.5px 13px;
     .icon-list-item {
       display: flex;
       flex-direction: column;
