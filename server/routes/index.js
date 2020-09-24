@@ -28,6 +28,8 @@ const callCenterRouter = require('./callcenter')
 const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact')
 const sparePartRouter = require('./sparePart')
+const linkcRouter = require('./linkc')
+
 
 
 router.get('/', async ctx => {
@@ -145,6 +147,9 @@ router.use('/approve/search', ctx => HttpClient.proxy(ctx, {
   port: 10002,
 }))
 
+
+
+
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
 router.use('', openRouter.routes(), openRouter.allowedMethods());
@@ -160,6 +165,7 @@ router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
 router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', ctx => {
   return HttpClient.proxy(ctx)

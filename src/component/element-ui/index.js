@@ -46,6 +46,7 @@ import {
   Autocomplete,
   Col,
   Notification,
+  Upload
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
@@ -97,6 +98,8 @@ const ElementUI = {
     
     Vue.component(Autocomplete.name, Autocomplete);
     Vue.component(CollapseTransition.name, CollapseTransition);
+    Vue.use(Upload);
+    
 
     Vue.prototype.$loading = Loading.service;
     Vue.prototype.$message = Message;

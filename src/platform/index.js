@@ -1,13 +1,20 @@
 /** 用于抹平浏览器和钉钉之间的差异 @author dongls */
-import { getRootWindow } from '../util/dom';
+import {
+  getRootWindow
+} from '../util/dom';
 import dingtalk from '@src/util/dingtalk';
 import BaseGallery from '@src/component/common/BaseGallery';
 
-import {alert, confirm, notification, toast} from './message';
+import {
+  alert,
+  confirm,
+  notification,
+  toast
+} from './message';
 
 /** 在新的窗口打开链接，链接必须是全路径 */
-function openLink(url){
-  if(!dingtalk.inDingTalk) return window.open(url)
+function openLink(url) {
+  if (!dingtalk.inDingTalk) return window.open(url)
 
   return dingtalk.biz.openLink(url);
 }
@@ -25,10 +32,10 @@ function openLink(url){
  * @param {string} options.url - tab对应的url
  * @param {string} options.fromId - 打开该tab的源tab的id
  */
-function openTab(options){
+function openTab(options) {
   let win = getRootWindow(window);
   let origin = window.location.origin;
-  
+
   let message = {
     action: 'shb.system.openFrameTab',
     data: options
@@ -38,10 +45,10 @@ function openTab(options){
 }
 
 /** 根据tab刷新tab */
-function refreshTab(id){
+function refreshTab(id) {
   let win = getRootWindow(window);
   let origin = window.location.origin;
-  
+
   let message = {
     action: 'shb.system.realodFrameById',
     data: id
@@ -63,7 +70,7 @@ function closeTab(id) {
   win.postMessage(message, origin)
 }
 
-function setTabLoadingStatus (options) {
+function setTabLoadingStatus(options) {
   let win = getRootWindow(window);
   let origin = window.location.origin;
   let message = {
@@ -74,12 +81,24 @@ function setTabLoadingStatus (options) {
   win.postMessage(message, origin)
 }
 
-function changeWindowTitle (options) {
+function changeWindowTitle(options) {
   let win = getRootWindow(window);
   let origin = window.location.origin;
   let message = {
     action: 'shb.system.changeWindowTitle',
     data: options
+  }
+
+  win.postMessage(message)
+}
+
+function dataTelevision(options) {
+  let win = getRootWindow(window);
+  let message = {
+    action: 'shb.system.dataTelevision',
+    data: {
+      name: 'lj'
+    }
   }
 
   win.postMessage(message)
@@ -91,7 +110,11 @@ function changeWindowTitle (options) {
  * @param {*} imageDom - img dom
  * @param {*} imgUrl - 图片链接
  */
-function imagePreview({ imageDom, urls, currIndex = 0}) {
+function imagePreview({
+  imageDom,
+  urls,
+  currIndex = 0
+}) {
   return BaseGallery.preview(imageDom, currIndex, urls.length > 1);
   // return dingtalk.biz.previewImage(urls, urls[currIndex])
 }
@@ -112,7 +135,8 @@ export const platform = {
   openLink,
   imagePreview,
 
-  changeWindowTitle
+  changeWindowTitle,
+  dataTelevision
 };
 
 export default platform;

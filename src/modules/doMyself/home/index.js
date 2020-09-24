@@ -19,9 +19,9 @@ try {
   console.error('no init data')
 }
 
-const homeView = Vue.extend(index);
+const HomeView = Vue.extend(index);
 
-const app = new homeView({
+const app = new HomeView({
   propsData: {
     initData
   }

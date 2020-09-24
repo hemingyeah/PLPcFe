@@ -3,10 +3,10 @@ const { isNotLocalEnv } = require('./proxyConfigModel');
 const https = require(isNotLocalEnv ? 'https' : 'http');
 // 默认配置
 const DEFAULT_OPIONS = {
-  host: '30.40.56.82',
+  host: '30.40.59.106',
   port: 8080,
   headers:{
-    'cookie':'__wpkreporterwid_=00f66f69-f62c-4df9-1a2d-39474a7b4b5f; VIPPUBLINKJSESSIONID=485bec42-47d7-4984-b8e8-6fa3097b142b; JSESSIONID=343A8FB9BC7B13607214E3AD7DBEB1CC'
+    'cookie':'VIPPUBLINKJSESSIONID=e048e7e1-8204-406f-9f03-d8ff78fe84d0'
   }
 };
 // https agent
