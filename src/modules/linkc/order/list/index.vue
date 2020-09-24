@@ -4,7 +4,7 @@
     <div class="search-modal-box">
       <div class="flex-x search-input-box">
         <div class="flex-1"></div>
-        <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="searchModel.keyword">
+        <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="searchModel.keyWord">
           <el-button slot="append" @click="search">
             <i class="iconfont icon-search"></i>
           </el-button>
@@ -414,7 +414,7 @@ export default {
         productFields: [],
       }, // 产品配置项
       searchModel: {
-        keyword: "",
+        keyWord: "",
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
@@ -494,7 +494,7 @@ export default {
     buildParams() {
       const sm = _.cloneDeep(this.searchModel);
       let params = {
-        keyword: sm.keyword,
+        keyWord: sm.keyWord,
         pageSize: sm.pageSize,
         pageNum: sm.pageNum,
       };
@@ -915,7 +915,7 @@ export default {
       window.TDAPP.onEvent("pc：订单管理-重置事件");
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
-        keyword: "",
+        keyWord: "",
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
