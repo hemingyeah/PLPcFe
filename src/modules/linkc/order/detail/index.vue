@@ -232,12 +232,13 @@ export default {
           if (res.status == 200) {
             this.dataInfo = res.data;
             this.orderInfoArr = this.orderInfoArr.map((item) => {
-              if (item.key == "payTime" || item.key == "createTime") {
-                item.value = formatDate(
-                  res.data[item.key],
-                  "YYYY-MM-DD HH:mm:ss"
-                );
-              } else if (item.key == "payState") {
+              //  if (item.key == "payTime" || item.key == "createTime") {
+              //   item.value = formatDate(
+              //     res.data[item.key],
+              //     "YYYY-MM-DD HH:mm:ss"
+              //   );
+              // } else
+              if (item.key == "payState") {
                 item.value = this.stateObj[res.data[item.key]].name;
               } else {
                 item.value = res.data[item.key];
