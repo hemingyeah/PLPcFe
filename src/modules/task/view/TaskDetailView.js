@@ -1028,9 +1028,15 @@ export default {
       }];
 
       this.fields.forEach(field => {
-        // 系统附件加密
-        if (field.fieldName == 'attachment' && this.task?.isEncryptAttachment) {
-          this.task.attachment = ENCRYPT_FIELD_VALUE;
+        if (field.fieldName == 'attachment') {
+          let { isEncryptAttachment, attachment } = this.task
+          
+          // 系统附件加密
+          if (isEncryptAttachment) {
+            this.task.attachment = ENCRYPT_FIELD_VALUE;
+          } else {
+            this.task.attachment = attachment.filter(item => !item.receipt);
+          }
         }
       })
 

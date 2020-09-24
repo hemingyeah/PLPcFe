@@ -403,41 +403,25 @@ export default {
   .edit-contact-form-container {
     width: 100%;
     margin: 0 auto;
+
+    .edit-contact-form {
+      width: 100%;
+      padding: 10px 0 5px;
+    }
+
+    .form-item label {
+      /*text-align: right;*/
+      width: 80px;
+    }
+
+    .form-item-control {
+      max-width: calc(100% - 80px);
+    }
   }
 
-  .edit-contact-dialog {
-    .base-modal-body {
-      padding: 15px 30px 0;
-    }
-
-
-    .edit-contact-form-container {
-      width: 100%;
-      margin: 0 auto;
-
-      .edit-contact-form {
-        width: 100%;
-        padding: 10px 0 5px;
-      }
-
-      .edit-contact-form {
-        padding: 10px 0 5px;
-      }
-
-      .form-item label {
-        /*text-align: right;*/
-        width: 80px;
-      }
-
-      .form-item-control {
-        max-width: calc(100% - 80px);
-      }
-    }
-
-    .dialog-footer {
-      text-align: right;
-      padding: 0px 0px 15px;
-    }
+  .dialog-footer {
+    text-align: right;
+    padding: 0px 0px 15px;
   }
 }
 </style>

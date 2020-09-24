@@ -62,7 +62,7 @@
           <!-- start 仓库 -->
           <template slot="repertory" slot-scope="{ field }" v-if="showRepertory">
             <form-item :label="field.displayName">
-              <form-select :field="field" :source="repertoryList" :value="repertoryId" @update="updateRepertory" :clearable="false"/>
+              <form-select :field="field" :source="repertoryList" v-model="repertoryId" @update="updateRepertory" :clearable="false"/>
             </form-item>
           </template>
           <!-- end 仓库 -->
