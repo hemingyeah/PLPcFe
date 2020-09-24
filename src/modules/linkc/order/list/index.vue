@@ -171,7 +171,7 @@
                         <template v-for="(item, index) in scope.row[column.field]">
                           <img
                             :key="index"
-                            :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_32,w_32` : ''"
+                            :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_32,w_32` : defaultImg"
                             @click.stop="previewImg(item.thumbnailUrl)"
                           />
                           <div
@@ -330,6 +330,7 @@ import BaseGallery from "../../../../../packages/BaseGallery";
 
 // import SearchPanel from "../components/SearchPanel.vue";
 import AuthUtil from "@src/util/auth";
+import defaultImg from "@src/assets/img/myShop/default.png";
 
 /* 高级搜索面板 列数 */
 const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER =
@@ -368,6 +369,7 @@ export default {
     );
     weekTime.push(formatDate(new Date(), "YYYY-MM-DD"));
     return {
+      defaultImg,
       fullscreenLoading: false,
       search_checkbox: [
         { label: "待发货", value: 1, num: 0 },

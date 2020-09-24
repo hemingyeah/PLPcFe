@@ -83,7 +83,7 @@
             <template v-if="column.field=='thumbnailUrl'">
               <div class="flex-x">
                 <img
-                  :src="scope.row.thumbnailUrl ? `${scope.row.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_56,w_56` : ''"
+                  :src="scope.row.thumbnailUrl ? `${scope.row.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_56,w_56` : defaultImg"
                   class="goods-img"
                   @click.stop="previewImg(scope.row.thumbnailUrl)"
                 />
@@ -115,6 +115,8 @@ import { orderDetail } from "@src/api/Linkc";
 import { formatDate } from "@src/util/lang";
 import componentMixin from "../component/index";
 
+import defaultImg from "@src/assets/img/myShop/default.png";
+
 // 页面刷新记住当前页面信息
 const MY_SHOP_ORDER_SEARCH_MODEL = "my_shop_order_search_model";
 
@@ -129,6 +131,7 @@ export default {
   mixins: [componentMixin],
   data() {
     return {
+      defaultImg,
       fullscreenLoading: false,
       statusArr: ["待发货", "待收货", "已完成"],
       orderInfoArr: [
