@@ -258,6 +258,10 @@ export default {
       let { eventId = '', flow = '' } = this.urlParams;
       window.location.href = `/event/convent2Task/jump?eventId=${eventId}&defaultTypeId=${templateId}&flow=${flow}`
     },
+    convertCustomerOfSelect(customer = {}) {
+      customer.id = customer.id || customer.value || ''
+      return customer
+    },
     /**
      * @description 关闭弹窗
      * @param {String} 动作 customer/product 

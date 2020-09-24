@@ -185,7 +185,7 @@
     <!-- end 新建产品弹窗 -->
 
     <!-- start 联系人弹窗 -->
-    <edit-contact-dialog ref="EditContactDialog" :customer="selectedCustomer" :is-phone-unique="customerInitData.isPhoneUnique"/>
+    <edit-contact-dialog ref="EditContactDialog" :customer="convertCustomerOfSelect(selectedCustomer)" :is-phone-unique="customerInitData.isPhoneUnique"/>
     <!-- end 联系人弹窗 -->
 
     <!-- start 地址弹窗 -->
