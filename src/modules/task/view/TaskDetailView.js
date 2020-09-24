@@ -596,6 +596,12 @@ export default {
     */
     showCollapse() {
       return this.viewBalanceTab || this.viewFeedbackTab || this.viewTaskCardTab;
+    },
+    messageConfig() {
+      return this.initData?.messageConfig || {};
+    },
+    showTaskRecordTemplate() {
+      return this.messageConfig.taskRemark === true
     }
   },
   methods: {

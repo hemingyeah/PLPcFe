@@ -47,6 +47,10 @@ export default {
   name: 'task-info-record',
   inject: ['initData'],
   props: {
+    showTemplate: {
+      type: Boolean,
+      default: true
+    },
     shareData: {
       type: Object,
       default: () => ({})
@@ -101,7 +105,7 @@ export default {
       return this.task?.taskNo;
     },
     remarkTemplateList() {
-      return this.initData.remarkList || [];
+      return this.showTemplate ? this.initData.remarkList : [];
     }
   },
   mounted() {
