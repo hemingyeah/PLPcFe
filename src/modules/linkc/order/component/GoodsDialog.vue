@@ -7,7 +7,7 @@
         v-for="(item, index) in infoData.goodsInfos"
         :key="index"
       >
-        <img class="mar-r-10" :src="`${goodsImg}?x-oss-process=image/resize,m_fill,h_52,w_52`" />
+        <img class="mar-r-10" :src="`${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_52,w_52`" />
         <div class="goods-dialog-item-info flex-1">
           <div class="flex-x">
             <div class="font-12 overHideCon-2 flex-1 al-start mar-r-10">{{item.name}}</div>
