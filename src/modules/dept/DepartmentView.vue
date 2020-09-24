@@ -152,7 +152,7 @@
             >移除成员</base-button>
             <!-- <base-button v-if="isCustomeRole" type="primary" @event="createRole">新建角色</base-button> -->
             <base-button
-              v-if="selectedRole.id == 0"
+              v-if="selectedRole.id == 0 && isWeChat != 1"
               type="primary"
               @event="roleDialogVisible = true"
             >自动分配角色</base-button>
