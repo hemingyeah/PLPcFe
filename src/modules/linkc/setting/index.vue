@@ -533,13 +533,7 @@ export default {
       this.$platform.openLink(e);
     },
     goToShopCenter() {
-      this.$platform.openTab({
-        id: "createTask",
-        title: "商品列表",
-        close: true,
-        url: "/setting/serviceStation/markSpareGray",
-      });
-      // window.location = "/setting/serviceStation/markSpare";
+      window.location = "/setting/serviceStation/markSpareGray";
     },
     copyUrl() {
       if (!this.setData.protalUrl) return;
