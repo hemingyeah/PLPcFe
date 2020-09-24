@@ -20,7 +20,7 @@
               @change="changeOrderState"
               placeholder="请选择"
               multiple
-              style="width:400px"
+              style="width:350px"
             >
               <el-option
                 v-for="(item, index) in search_checkbox"
@@ -1205,7 +1205,6 @@ label {
 
   .search-input-box {
     padding: 8px 12px;
-    border-bottom: 1px solid #e6e6e6;
     .search-input {
       width: 272px;
       height: 32px;

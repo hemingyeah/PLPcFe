@@ -91,7 +91,7 @@ export default {
     flex-wrap: wrap;
     font-weight: 500;
     align-items: center;
-    padding: 0 14px;
+    padding: 0 9px;
   }
   .shops-list-box {
     .shops-list-box-con {
