@@ -20,6 +20,7 @@
           @tag="setTag"
           :keyword="params.keyword"
           @toDetail="toDetail"
+          :init-data="initData"
           :value="listMsg"
           :id.sync="info.id"
           ref="list"

@@ -11,58 +11,48 @@
         </el-input>
       </div>
 
-      <div class="search-more min-w-700">
-        <div class="search-checkbox flex-x mar-b-12">
-          <div class="mar-r-38">订单状态：</div>
-          <el-select
-            v-model="searchModel.moreConditions.stateList"
-            @change="changeOrderState"
-            placeholder="请选择"
-            multiple
-            collapse-tags
-            style="width:400px"
-          >
-            <el-option
-              v-for="(item, index) in search_checkbox"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
+      <div class="search-more">
+        <div class="search-checkbox flex-x">
+          <div class="flex-x min-w-620 pad-b-20">
+            <div class="mar-r-38">订单状态：</div>
+            <el-select
+              v-model="searchModel.moreConditions.stateList"
+              @change="changeOrderState"
+              placeholder="请选择"
+              multiple
+              style="width:400px"
             >
-              <span style="float: left">{{ item.label }}</span>
-              <span
-                style="float: left; color: #8492a6; font-size: 13px; margin-left:12px;"
-              >{{ stateNumObj[stateObj[item.value].key]}}</span>
-            </el-option>
-          </el-select>
-          <!-- <el-checkbox-group
-            v-model="searchModel.moreConditions.stateList"
-            @change="changeOrderState"
-          >
-            <el-checkbox
-              class="w-128"
-              v-for="(item, index) in search_checkbox"
-              :key="index"
-              :label="item.label"
-            ></el-checkbox>
-          </el-checkbox-group>-->
-        </div>
-        <div class="search-datecheck min-w-700 flex-x">
-          <div class="mar-r-38">下单时间：</div>
-          <div class="search-date">
-            <el-date-picker
-              v-model="searchModel.moreConditions.orderTime"
-              type="daterange"
-              align="right"
-              unlink-panels
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :picker-options="pickerOptions"
-              value-format="yyyy-MM-dd"
-            ></el-date-picker>
+              <el-option
+                v-for="(item, index) in search_checkbox"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              >
+                <span style="float: left">{{ item.label }}</span>
+                <span
+                  style="float: left; color: #8492a6; font-size: 13px; margin-left:12px;"
+                >{{ stateNumObj[stateObj[item.value].key]}}</span>
+              </el-option>
+            </el-select>
           </div>
-          <el-button class="mar-l-32" type="primary" @click="search">查询</el-button>
-          <el-button @click="resetParams">重置</el-button>
+          <div class="search-datecheck min-w-650 flex-x pad-b-20">
+            <div class="mar-r-38">下单时间：</div>
+            <div class="search-date">
+              <el-date-picker
+                v-model="searchModel.moreConditions.orderTime"
+                type="daterange"
+                align="right"
+                unlink-panels
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                :picker-options="pickerOptions"
+                value-format="yyyy-MM-dd"
+              ></el-date-picker>
+            </div>
+            <el-button class="mar-l-32" type="primary" @click="search">查询</el-button>
+            <el-button @click="resetParams">重置</el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -1237,15 +1227,13 @@ label {
   .search-more {
     padding: 0 12px;
     .search-checkbox {
-      height: 32px;
-      padding-top: 20px;
-      margin-bottom: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
       .el-checkbox {
         margin-right: 0;
       }
     }
     .search-datecheck {
-      padding-bottom: 20px;
       .search-date {
         height: 32px;
         width: 400px;
