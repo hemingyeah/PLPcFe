@@ -11,13 +11,15 @@ const BaseMapDisplayComp = Vue.extend(BaseMapDisplay);
  * @param {*} address
  * @param {*} options
  */
-function display(address, options = {}){
+function display(address, options = {}, markerDom, infoDom){
   // let defaultArea = options.defaultArea;
   
   let instance = new BaseMapDisplayComp({
     propsData: {
       address,
       options,
+      markerDom,
+      infoDom
     }
   });
   
