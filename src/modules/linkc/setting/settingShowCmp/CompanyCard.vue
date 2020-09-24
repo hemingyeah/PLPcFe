@@ -55,7 +55,7 @@ export default {
       overflow: hidden;
     }
     .company-info {
-      padding: 8px 13px 0 13px;
+      padding: 8px 0 0;
       color: #737F7B;
     }
   }

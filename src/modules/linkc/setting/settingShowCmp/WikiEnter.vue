@@ -2,7 +2,7 @@
   <div class="setting-show-cmp-box">
     <div class="wiki-box">
       <div class="flex-x wiki-header">
-        <div class="flex-1">企业圈子</div>
+        <div class="flex-1 wiki-title">企业圈子</div>
         <div class="font-12">
           更多
           <i class="iconfont icon-right font-12"></i>
@@ -74,7 +74,10 @@ export default {
         rgba(255, 255, 255, 0) 100%
       );
       height: 53px;
-      padding: 0 12px;
+      padding: 0 9px;
+      .wiki-title{
+        font-weight: 500;
+      }
     }
     .wiki-info {
       position: relative;
