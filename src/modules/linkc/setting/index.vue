@@ -5,37 +5,55 @@
       <div class="mar-b-17 font-16 font-w-500">规则配置</div>
       <!-- ruler-set-list start -->
       <div class="flex-x ruler-set-list">
-        <div class="ruler-set-item mar-r-56">
+        <!-- 1 -->
+        <div class="ruler-set-item mar-r-140">
           <div class="ruler-set-item-title">门户访问权限:</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.loginValidate"
             @change="change($event,'loginValidate')"
           >
-            <el-radio class="mar-r-16" :label="false">所有用户均可访问(短信、图片验证码或小程序授权)</el-radio>
-            <el-radio :label="true">仅允许客户列表下手机号码访问</el-radio>
+            <div class="mar-b-12">
+              <el-radio class="mar-r-16" :label="false">所有用户均可访问(短信、图片验证码或小程序授权)</el-radio>
+            </div>
+            <div>
+              <el-radio :label="true">仅允许客户列表下手机号码访问</el-radio>
+            </div>
           </el-radio-group>
         </div>
-        <div class="ruler-set-item mar-r-56">
-          <div class="ruler-set-item-title">网页门户验证方式：:</div>
+        <!-- 2 -->
+        <div class="ruler-set-item mar-r-140">
+          <div class="ruler-set-item-title">网页门户验证方式：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.validateBySms"
             @change="change($event,'validateBySms')"
           >
-            <el-radio class="mar-r-16" :label="false">图片验证码</el-radio>
-            <el-radio :label="true">手机验证码</el-radio>
+            <div class="mar-b-12">
+              <el-radio class="mar-r-16" :label="false">图片验证码</el-radio>
+            </div>
+            <div>
+              <el-radio :label="true">手机验证码</el-radio>
+            </div>
           </el-radio-group>
         </div>
-        <div class="ruler-set-item mar-r-56">
+        <!-- 3 -->
+        <div class="ruler-set-item mar-r-140 flex-1">
           <div class="ruler-set-item-title">允许用户查看的服务事件：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.showAllEvent"
             @change="change($event,'showAllEvent')"
           >
-            <el-radio class="mar-r-16" :label="false">仅显示用户在线发起的事件</el-radio>
-            <el-radio :label="true">显示所有与该用户相关的服务事件</el-radio>
+            <div class="mar-b-12">
+              <el-radio class="mar-r-16" :label="false">仅显示用户在线发起的事件</el-radio>
+            </div>
+            <div>
+              <el-radio :label="true">显示所有与该用户相关的服务事件</el-radio>
+            </div>
           </el-radio-group>
         </div>
-        <div class="ruler-set-item">
+      </div>
+
+      <div class="flex-x flex-w">
+        <div class="ruler-set-item mar-r-140">
           <div class="ruler-set-item-title">是否允许用户取消未完成的服务事件：</div>
           <el-switch
             v-model="setData.serviceStationConfig.eventCancel"
@@ -43,26 +61,27 @@
             active-text="开启后允许从自助门户取消尚未完成的服务事件"
           ></el-switch>
         </div>
-      </div>
-      <div class="pad-b-34">
-        <div class="ruler-set-item-title">设置服务商城显示内容：</div>
-        <div class="flex-x">
-          <el-select
-            class="w-228"
-            v-model="setData.serviceStationConfig.showAllItem"
-            @change="change($event,'showAllItem')"
-            placeholder="仅显示选择的备件和服务项目"
-          >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-          <el-button class="mar-l-9" type="primary" @click="goToShopCenter">查看商城已选项目</el-button>
+        <div class="pad-b-34">
+          <div class="ruler-set-item-title">设置服务商城显示内容：</div>
+          <div class="flex-x">
+            <el-select
+              class="w-228"
+              v-model="setData.serviceStationConfig.showAllItem"
+              @change="change($event,'showAllItem')"
+              placeholder="仅显示选择的备件和服务项目"
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-button class="mar-l-9" type="primary" @click="goToShopCenter">查看商城已选项目</el-button>
+          </div>
         </div>
       </div>
+
       <!-- ruler-set-list end -->
     </div>
     <!-- ruler-box end -->
@@ -194,11 +213,7 @@
           <el-input v-model="wxRulerFormData.appId" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="公众号APPID" prop="publicAppId">
-          <el-input
-            v-model="wxRulerFormData.publicAppId"
-            autocomplete="off"
-            placeholder="请输入"
-          ></el-input>
+          <el-input v-model="wxRulerFormData.publicAppId" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="mch_id" prop="matchId">
           <el-input v-model="wxRulerFormData.matchId" autocomplete="off" placeholder="请输入"></el-input>
