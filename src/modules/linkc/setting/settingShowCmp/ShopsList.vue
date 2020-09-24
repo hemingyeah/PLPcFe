@@ -1,7 +1,14 @@
 <template>
   <div class="setting-show-cmp-box">
     <div class="shops-list-box">
-      <div class="shops-title">商城橱窗</div>
+      <div></div>
+      <div class="shops-title">
+        <div class="font-w-500 flex-1">商城橱窗</div>
+        <div class="font-12">
+          更多
+          <i class="iconfont icon-right font-12"></i>
+        </div>
+      </div>
       <!-- <draggable class="flex-x flex-w" v-model="dataInfo"> 可拖动-->
       <div class="flex-x flex-w shops-list-box-con">
         <div
@@ -11,7 +18,10 @@
           draggable="draggable"
         >
           <div class="shops-list-item">
-            <img :src="item.url ? `${item.url}?x-oss-process=image/resize,m_fill,h_165,w_142` : defaultImg" class="shops-list-item-img" />
+            <img
+              :src="item.url ? `${item.url}?x-oss-process=image/resize,m_fill,h_165,w_142` : defaultImg"
+              class="shops-list-item-img"
+            />
             <div class="shops-info">
               <div class="overHideCon-2 mar-b-30 font-12">{{item.name}}</div>
               <div class="flex-x">
@@ -88,10 +98,8 @@ export default {
   .shops-title {
     height: 57px;
     display: flex;
-    flex-wrap: wrap;
-    font-weight: 500;
     align-items: center;
-    padding: 0 9px;
+    padding: 0 14px;
   }
   .shops-list-box {
     .shops-list-box-con {
