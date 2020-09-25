@@ -25,6 +25,11 @@ export default {
           key: 'completedCount',
         },
       },
+      payObj: {
+        1: {
+          name: '微信支付'
+        }
+      }
     }
   },
   components: {

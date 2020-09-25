@@ -545,6 +545,7 @@ export default {
         {
           label: "订单号",
           field: "orderNum",
+          width: "220px",
           show: true,
         },
         {
@@ -584,12 +585,12 @@ export default {
             {
               name: "出库",
               styleType: (obj) => {
-                return obj.repertoryState != 1
+                return obj.repertoryState != 2
                   ? "color:#999;cursor: not-allowed;"
                   : "color:#55b7b4";
               },
               click: (obj) => {
-                if (pending || obj.repertoryState != 1) return;
+                if (pending || obj.repertoryState != 2) return;
                 this.outStockInfo = obj;
                 this.$refs.outStockDialog.changeDialog(true);
               },

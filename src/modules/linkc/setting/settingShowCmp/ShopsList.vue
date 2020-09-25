@@ -99,7 +99,7 @@ export default {
     height: 57px;
     display: flex;
     align-items: center;
-    padding: 0 14px;
+    padding: 0 9px;
   }
   .shops-list-box {
     .shops-list-box-con {
