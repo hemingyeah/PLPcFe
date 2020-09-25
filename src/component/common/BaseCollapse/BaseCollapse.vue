@@ -108,7 +108,7 @@ export default {
     &-left,
     &-right {
       width: 100%;
-      height: 24px;
+      height: 34px;
 
       background-color: #fff;
       border: 1px solid $color-border-l2;

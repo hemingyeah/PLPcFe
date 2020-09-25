@@ -365,14 +365,19 @@ body {
         }
 
         .biz-process-time {
+          max-height: 46px;
           margin-bottom: 6px;
+          overflow: auto;
 
           &-block {
             line-height: 20px;
-            margin-bottom: 6px;
 
             &-label {
               color: $text-color-regular;
+            }
+
+            &:not(:last-child) {
+              margin-bottom: 6px;
             }
           }
         }
