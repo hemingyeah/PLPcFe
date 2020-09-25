@@ -16,6 +16,7 @@
 import platform from '@src/platform';
 
 let map = null;
+let infoWindow = null;
 
 export default {
   name: 'base-map-display',
@@ -32,6 +33,14 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    markerDom: {
+      type: String,
+      default: ''
+    },
+    infoDom: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -66,8 +75,10 @@ export default {
       let position = new AMap.LngLat(this.lng, this.lat);
       let marker = new AMap.Marker({
         position,
-        content: '<i class="bm-location-dot"></i>'
+        content: this.markerDom || '<i class="bm-location-dot"></i>'
       });
+
+      if (this.infoDom) marker.on('mouseover', this.showInfoWindow);
 
       marker.on('click', this.jumpToAmap)
 
@@ -113,6 +124,16 @@ export default {
         type: 'error',
       });
     },
+    showInfoWindow(event) {
+      infoWindow = new AMap.InfoWindow({
+        closeWhenClickMap: true,
+        isCustom: true,
+        offset: new AMap.Pixel(0, -34),
+        content: this.infoDom
+      })
+
+      infoWindow.open(map, event.target.getPosition());
+    }
   },
   destroyed(){
     map && map.destroy();

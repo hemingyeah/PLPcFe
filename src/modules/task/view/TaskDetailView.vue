@@ -227,7 +227,7 @@
               <task-receipt-detail-view :share-data="propsForSubComponents" />
             </el-tab-pane>
             <el-tab-pane label="动态信息" name="record">
-              <task-info-record :share-data="propsForSubComponents" />
+              <task-info-record :share-data="propsForSubComponents" :show-template="showTaskRecordTemplate" />
             </el-tab-pane>
           </el-tabs>
         </div>

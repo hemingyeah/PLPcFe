@@ -7,12 +7,12 @@
       <div class="base-collapse-btn" v-if="showCollapse">
         <el-tooltip content="收起" placement="left">
           <div class="base-collapse-btn-left" v-show="collapse != 'left'" @click="expand('left')">
-            <i class="iconfont icon-icon_arrow"></i>
+            <i class="iconfont icon-mianbanjiantou"></i>
           </div>
         </el-tooltip>
         <el-tooltip content="展开" placement="right">
           <div class="base-collapse-btn-right" v-show="collapse != 'right'" @click="expand('right')">
-            <i class="iconfont icon-icon_arrow"></i>
+            <i class="iconfont icon-mianbanjiantou"></i>
           </div>
         </el-tooltip>
       </div>
@@ -98,9 +98,9 @@ export default {
   }
 
   &-btn {
-    width: 16px;
+    width: 10px;
     position: absolute;
-    right: -16px;
+    right: -10px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 9;
@@ -108,12 +108,11 @@ export default {
     &-left,
     &-right {
       width: 100%;
-      height: 36px;
+      height: 24px;
 
       background-color: #fff;
       border: 1px solid $color-border-l2;
       border-left: none;
-      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
 
@@ -129,6 +128,9 @@ export default {
       }
 
       &:hover {
+        background-color: #e9f9f9;
+        border-color: #d0f3f4;
+
         .iconfont {
           color: $color-primary;
         }
@@ -139,7 +141,7 @@ export default {
       margin-bottom: 8px;
 
       .iconfont {
-        transform: rotate(-180deg);
+        transform: rotate(-180deg) translateX(1px);
       }
     }
   }

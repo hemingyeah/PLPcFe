@@ -258,6 +258,10 @@ export default {
       let { eventId = '', flow = '' } = this.urlParams;
       window.location.href = `/event/convent2Task/jump?eventId=${eventId}&defaultTypeId=${templateId}&flow=${flow}`
     },
+    convertCustomerOfSelect(customer = {}) {
+      customer.id = customer.id || customer.value || ''
+      return customer
+    },
     /**
      * @description 关闭弹窗
      * @param {String} 动作 customer/product 
@@ -714,15 +718,11 @@ export default {
         let isOnlyOneProduct = value.length === 1;
         
         if(isOnlyOneProduct && isSilentUpdateLinkmanAndAddress) {
-          // 产品关联字段数据
-          this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
           // 静默绑定联系人/地址
           this.bindProductLinkmanAndAddress(product);
         }
         // 只有一个产品 且 客户存在
         else if (isOnlyOneProduct && isHaveCustomer) {
-          // 产品关联字段数据
-          this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
           // 产品关联联系人地址
           this.productBindLinkmanAndAddressHandler(product);
         }
@@ -730,14 +730,15 @@ export default {
         else if(isOnlyOneProduct && !isHaveCustomer) {
           this.bindProductLinkmanAndAddress(product);
         }
-        else {
-          // 清空产品关联字段数据
-          this.relationFieldClear(TaskFieldNameMappingEnum.Product);
-        }
 
-        if(isOnlyOneProduct) {
+        if (isOnlyOneProduct) {
+          // 产品关联字段数据
+          this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
           // 查询关联工单数量
           this.fetchCountForCreate({ module: TaskFieldNameMappingEnum.Product, id: product.id });
+        } else {
+          // 清空产品关联字段数据
+          this.relationFieldClear(TaskFieldNameMappingEnum.Product);
         }
 
       } catch (error) {

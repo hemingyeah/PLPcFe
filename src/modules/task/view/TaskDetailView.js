@@ -596,6 +596,12 @@ export default {
     */
     showCollapse() {
       return this.viewBalanceTab || this.viewFeedbackTab || this.viewTaskCardTab;
+    },
+    messageConfig() {
+      return this.initData?.messageConfig || {};
+    },
+    showTaskRecordTemplate() {
+      return this.messageConfig.taskRemark === true
     }
   },
   methods: {
@@ -937,10 +943,27 @@ export default {
       let latitude = address.latitude;
 
       if(!longitude || !latitude) return;
+
+      let markerDom = this.buildMapMarkerContent();
+      let infoDom = this.buildMapInfoContent();
       
       this.$fast.map
-        .display({ ...address })
+        .display({ ...address }, {}, markerDom, infoDom)
         .catch(err => console.error('openMap catch an err: ', err));
+    },
+    buildMapMarkerContent() {
+      return '<i class="bm-location-dot"></i><div class="map-address-title">客户地址</div>';
+    },
+    buildMapInfoContent() {
+      return `
+        <div class="map-info-window-content">
+          <div class="customer-name">${ this.customer.name }</div>
+          <p><label>联系人：</label>${ this.lmName }</p>
+          <p><label>电话：</label>${ this.lmPhone }</p>
+          <p><label>地址：</label>${ this.address }</p>
+          <div class="info-window-arrow"></div>
+        </div>
+      `;
     },
     /**
     * @description 是否加密字段
@@ -1022,9 +1045,15 @@ export default {
       }];
 
       this.fields.forEach(field => {
-        // 系统附件加密
-        if (field.fieldName == 'attachment' && this.task?.isEncryptAttachment) {
-          this.task.attachment = ENCRYPT_FIELD_VALUE;
+        if (field.fieldName == 'attachment') {
+          let { isEncryptAttachment, attachment } = this.task
+          
+          // 系统附件加密
+          if (isEncryptAttachment) {
+            this.task.attachment = ENCRYPT_FIELD_VALUE;
+          } else {
+            this.task.attachment = attachment.filter(item => !item.receipt);
+          }
         }
       })
 

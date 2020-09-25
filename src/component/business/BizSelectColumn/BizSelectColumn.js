@@ -27,7 +27,8 @@ const BizSelectColumn = {
     return {
       columnSortList: [],
       columnTree: {},
-      show: false
+      originColumns: [],
+      show: false,
     }
   },
   methods: {
@@ -40,6 +41,8 @@ const BizSelectColumn = {
         lists = Object.keys(columns).map(key => {
           return { name: columns[key].name, lists: this.buildSortLists(columns[key]) }
         })
+      } else {
+        lists = columns.filter(column => column.show)
       }
 
       return lists
@@ -146,6 +149,9 @@ const BizSelectColumn = {
 
       this.columnParentChangeWithSort(value, treeNode, parent)
     },
+    /** 
+     * @description 字段复选框 变化 排序
+    */
     columnFieldChangeWithSort(checked, field, parent) {
       let isParentRoot = parent.root
       let sortList = this.columnSortList.slice()
@@ -160,7 +166,10 @@ const BizSelectColumn = {
 
       this.columnSortListMerge(checked, field, parent, sortList);
     },
-    columnSortListGetGroup(sortList) {
+    /** 
+     * @description 获取字段排序列表下 子分类
+    */
+    columnSortListGetGroup(sortList, parent) {
       let templateGroup = {}
       let templateIndex = -1
 
@@ -175,16 +184,22 @@ const BizSelectColumn = {
       
       return { templateGroup, templateIndex }
     },
+    /** 
+     * @description 字段排序列表合并
+    */
     columnSortListMerge(checked, field, parent, sortList) {
-      let { templateGroup = {}, templateIndex = 0 } = this.columnSortListGetGroup(sortList)
+      let { templateGroup = {}, templateIndex = 0 } = this.columnSortListGetGroup(sortList, parent)
       let templateColumns = templateGroup.lists || []
 
       checked
         ? templateColumns.push(convertDisplayNameToName(field))
         : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
-        
-      this.columnSortList[templateIndex] = templateColumns
+      
+      this.$set(this.columnSortList, templateIndex, { ...templateGroup, lists: templateColumns })
     },
+    /** 
+     * @description 字段排序列表添加字段列
+    */
     columnSortListFieldPush(columns, sortList) {
       columns.forEach(column => {
         let isHave = sortList.some(list => list.fieldName == column.fieldName)
@@ -193,6 +208,9 @@ const BizSelectColumn = {
         }
       })
     },
+    /** 
+     * @description 父级复选框 变化排序
+    */
     columnParentChangeWithSort(checked, treeNode, parent) {
       let isTreeNodeRoot = treeNode.root
       let sortList = this.columnSortList.slice()
@@ -203,7 +221,7 @@ const BizSelectColumn = {
         if (checked) {
           for (let key in treeNode.columns) {
             let item = treeNode.columns[key]
-            let { templateGroup = {}, templateIndex } = this.columnSortListGetGroup(sortList)
+            let { templateGroup = {}, templateIndex } = this.columnSortListGetGroup(sortList, item)
 
             let isFindedTemplate = templateIndex >= 0
             templateIndex = isFindedTemplate ? templateIndex : sortList.length
@@ -252,9 +270,10 @@ const BizSelectColumn = {
       const TemplateMap = {}
       let sortList = []
 
-      originColumns.forEach((column, index) => {
+      originColumns.filter(column => column.show).forEach((column, index) => {
         let isSystemFiled = !column.templateId
 
+        // 系统字段直接添加至 根级
         if (isSystemFiled) {
           return sortList.push(convertDisplayNameToName(column)) 
         } 
@@ -270,7 +289,7 @@ const BizSelectColumn = {
 
       for (let key in TemplateMap) {
         let { columns, index, name } = TemplateMap[key]
-        sortList.splice(index, 1, {
+        sortList.splice(index, 0, {
           name,
           lists: columns
         })
@@ -288,6 +307,7 @@ const BizSelectColumn = {
      * @description 显示 设置窗
     */
     open(columns) {
+      this.originColumns = _.cloneDeep(columns);
       this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
       this.show = true
     },
@@ -358,20 +378,32 @@ const BizSelectColumn = {
      * @description 保存
     */
     save() {
-      let data = [];
+      let columns = [];
 
       this.columnSortList.forEach(column => {
         if (Array.isArray(column.lists)) {
           column.lists.forEach(item => {
-            data.push(convertColumnWithSave(item))
+            columns.push(convertColumnWithSave(item))
           })
         } else {
-          data.push(convertColumnWithSave(column))
+          columns.push(convertColumnWithSave(column))
         }
       })
 
+      let columnMap = columns.reduce((acc, column) => (acc[column.fieldName] = column) && acc, {});
+
+      this.originColumns.forEach(originColumn => {
+        let { fieldName } = originColumn
+        let sortColumn = columnMap[fieldName]
+        if (!sortColumn) {
+          originColumn.show = false
+          columns.push(originColumn)
+        }
+
+      })
+
       this.close();
-      this.$emit('save', { type: 'column', data })
+      this.$emit('save', { type: 'column', data: columns })
     },
     /** 
      * @description 向下 -> 切换 是否选中
