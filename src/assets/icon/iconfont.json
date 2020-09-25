@@ -6,6 +6,76 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "17409584",
+      "name": "门户设置",
+      "font_class": "menhushezhi",
+      "unicode": "e733",
+      "unicode_decimal": 59187
+    },
+    {
+      "icon_id": "17430755",
+      "name": "备件管理",
+      "font_class": "beijianguanli3",
+      "unicode": "e73f",
+      "unicode_decimal": 59199
+    },
+    {
+      "icon_id": "17430756",
+      "name": "客户管理",
+      "font_class": "kehuguanli",
+      "unicode": "e742",
+      "unicode_decimal": 59202
+    },
+    {
+      "icon_id": "17394560",
+      "name": "面板箭头",
+      "font_class": "mianbanjiantou",
+      "unicode": "e6a7",
+      "unicode_decimal": 59047
+    },
+    {
+      "icon_id": "17387403",
+      "name": "菜单-备件",
+      "font_class": "caidan-beijian",
+      "unicode": "e6a6",
+      "unicode_decimal": 59046
+    },
+    {
+      "icon_id": "17387138",
+      "name": "菜单-客户",
+      "font_class": "caidan-kehu",
+      "unicode": "e6a4",
+      "unicode_decimal": 59044
+    },
+    {
+      "icon_id": "17360732",
+      "name": "icon_arrow",
+      "font_class": "icon_arrow",
+      "unicode": "e6a3",
+      "unicode_decimal": 59043
+    },
+    {
+      "icon_id": "6446462",
+      "name": "三道杠",
+      "font_class": "daohang",
+      "unicode": "e6a2",
+      "unicode_decimal": 59042
+    },
+    {
+      "icon_id": "17264584",
+      "name": "电话",
+      "font_class": "dianhua2",
+      "unicode": "e6a1",
+      "unicode_decimal": 59041
+    },
+    {
+      "icon_id": "17263824",
+      "name": "复制 ",
+      "font_class": "fuzhi",
+      "unicode": "e6a0",
+      "unicode_decimal": 59040
+    },
+    {
       "icon_id": "9059911",
       "name": "圈子管理",
       "font_class": "quanziguanli",
