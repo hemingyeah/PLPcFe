@@ -9,7 +9,7 @@
       >
         <img
           class="mar-r-10"
-          :src="item.thumbnailUrl ?`${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_52,w_52` :defaultImg"
+          :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_52,w_52` : defaultImg"
         />
         <div class="goods-dialog-item-info flex-1">
           <div class="flex-x">
@@ -24,12 +24,16 @@
       </div>
 
       <div class="trackingNum-box">
-        <div class="mar-b-12">添加物流信息：</div>
-        <el-input v-model="trackingNum" placeholder="请输入"></el-input>
+        <el-form ref="ruleForm" :model="formData" :rules="rules" status-icon>
+          <el-form-item prop="trackingNum">
+            <div class="mar-b-12">添加物流信息：</div>
+            <el-input v-model="formData.trackingNum" placeholder="请输入"></el-input>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="goodsDialog = false">取消</el-button>
+      <el-button @click="changeDialog(false)">取消</el-button>
       <el-button type="primary" @click="confirm" :loading="loading">确认发货</el-button>
     </div>
   </el-dialog>
@@ -52,26 +56,42 @@ export default {
       defaultImg,
       goodsDialog: false,
       goodsImg,
-      trackingNum: "",
+      formData: {
+        trackingNum: "",
+      },
       loading: false,
+      rules: {
+        trackingNum: [
+          { required: true, message: "请输入物流信息", trigger: "blur" },
+        ],
+      },
     };
+  },
+  watch: {
+    goodsDialog(val) {
+      if (val == false) {
+        this.$refs["ruleForm"].resetFields();
+      }
+    },
   },
   methods: {
     confirm() {
-      this.loading = true;
-      orderDeliver({
-        orderId: this.infoData.id,
-        trackingNum: this.trackingNum,
-      })
-        .then((res) => {
-          if (res.status == 200) {
-            this.changeDialog(false);
-            this.$emit("confirm");
-          }
+      this.$refs["ruleForm"].validate((valid) => {
+        this.loading = true;
+        orderDeliver({
+          orderId: this.infoData.orderId,
+          trackingNum: this.formData.trackingNum,
         })
-        .finally(() => {
-          this.loading = false;
-        });
+          .then((res) => {
+            if (res.status == 200) {
+              this.changeDialog(false);
+              this.$emit("confirm");
+            }
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      });
     },
     changeDialog(e) {
       this.goodsDialog = e;

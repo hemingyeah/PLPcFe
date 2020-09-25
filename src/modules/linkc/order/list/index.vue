@@ -362,12 +362,6 @@ export default {
   },
   mixins: [componentMixin],
   data() {
-    let weekTime = [];
-
-    weekTime.push(
-      formatDate(new Date() - 7 * 24 * 60 * 60 * 1000, "YYYY-MM-DD")
-    );
-    weekTime.push(formatDate(new Date(), "YYYY-MM-DD"));
     return {
       defaultImg,
       fullscreenLoading: false,
@@ -423,7 +417,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: weekTime,
+          orderTime: this.findWeekTime(),
         },
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
@@ -480,6 +474,15 @@ export default {
     },
   },
   methods: {
+    findWeekTime() {
+      let weekTime = [];
+
+      weekTime.push(
+        formatDate(new Date() - 7 * 24 * 60 * 60 * 1000, "YYYY-MM-DD")
+      );
+      weekTime.push(formatDate(new Date(), "YYYY-MM-DD"));
+      return weekTime;
+    },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");
       this.$refs.advanced.open(this.columns);
@@ -542,6 +545,7 @@ export default {
         {
           label: "订单号",
           field: "orderNum",
+          width: "220px",
           show: true,
         },
         {
@@ -581,13 +585,15 @@ export default {
             {
               name: "出库",
               styleType: (obj) => {
-                return obj.repertoryState != 1
+                return obj.repertoryState != 2
                   ? "color:#999;cursor: not-allowed;"
                   : "color:#55b7b4";
               },
               click: (obj) => {
-                if (pending || obj.repertoryState != 1) return;
-                this.outStockInfo = obj;
+                if (pending || obj.repertoryState != 2) return;
+                this.infoDataoutStockInfo = obj;
+
+                console.log(obj)
                 this.$refs.outStockDialog.changeDialog(true);
               },
             },
@@ -924,7 +930,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: "",
+          orderTime: this.findWeekTime(),
         },
       };
 

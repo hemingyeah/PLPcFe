@@ -13,8 +13,8 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button type="ghost" @event="outStockDialog = false">取消</el-button>
-      <el-button type="primary" @event="confirm" :loading="loading">确定</el-button>
+      <el-button type="ghost" @click="changeDialog(false)">取消</el-button>
+      <el-button type="primary" @click="confirm" :loading="loading">确定</el-button>
     </div>
   </el-dialog>
   <!-- 发货弹窗 end-->
@@ -36,12 +36,18 @@ export default {
       loading: false,
     };
   },
+
+  watch: {
+    outStockDialog() {
+      this.remark = "";
+    },
+  },
   methods: {
     confirm() {
       this.loading = true;
       repertoryOut({
-        orderNum: this.infoData.id,
-        remrk:this.remrks
+        orderNum: this.infoData.orderId,
+        remrk: this.remrks,
         // orderNum: this.trackingNum,
       })
         .then((res) => {

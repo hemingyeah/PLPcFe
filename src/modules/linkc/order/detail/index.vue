@@ -43,7 +43,7 @@
         <div class="flex-x mar-b-14">
           <div class="flex-1 font-w-500">订单信息</div>
           <div class="flex-x">
-            <el-button @click="outStock" v-if="dataInfo.repertoryState == 1">出库</el-button>
+            <el-button @click="outStock" v-if="dataInfo.repertoryState == 2">出库</el-button>
             <el-button type="primary" @click="goods" v-if="dataInfo.logisticsState == 1">发货</el-button>
           </div>
         </div>
@@ -51,7 +51,7 @@
         <div class="flex-x order-info-list">
           <div class="flex-x order-info-item" v-for="(item, index) in orderInfoArr" :key="index">
             <div class="order-info-item-title">{{item.label}}</div>
-            <div class="flex-1">{{item.value}}</div>
+            <div class="flex-1 mar-r-12">{{item.value}}</div>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@
               <div class="flex-x">
                 <img
                   :src="scope.row.thumbnailUrl ? `${scope.row.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_56,w_56` : defaultImg"
-                  class="goods-img"
+                  class="goods-img mar-r-4"
                   @click.stop="previewImg(scope.row.thumbnailUrl)"
                 />
                 <div>{{scope.row.name}}</div>
@@ -142,7 +142,7 @@ export default {
         { label: "联系方式：", value: "", key: "linkmanPhone" },
         { label: "收货地址：", value: "", key: "address" },
         { label: "支付订单号：", value: "", key: "payNum" },
-        { label: "支付方式：", value: "", key: "payState" },
+        { label: "支付方式：", value: "", key: "payType" },
         { label: "支付时间：", value: "", key: "payTime" },
         {
           label: "买家备注：",
@@ -189,7 +189,7 @@ export default {
         },
         {
           label: "小记",
-          field: "payamount",
+          field: "payAmount",
           fixed: true,
           show: true,
         },
@@ -241,8 +241,8 @@ export default {
               //     "YYYY-MM-DD HH:mm:ss"
               //   );
               // } else
-              if (item.key == "payState") {
-                item.value = this.stateObj[res.data[item.key]].name;
+              if (item.key == "payType") {
+                item.value = this.payObj[res.data[item.key]].name;
               } else {
                 item.value = res.data[item.key];
               }
