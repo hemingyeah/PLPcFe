@@ -14,7 +14,7 @@
       <div class="search-more">
         <div class="search-checkbox flex-x">
           <div class="flex-x min-w-500 pad-b-20">
-            <div class="">订单状态：</div>
+            <div class>订单状态：</div>
             <el-select
               v-model="searchModel.moreConditions.stateList"
               @change="changeOrderState"
@@ -36,7 +36,7 @@
             </el-select>
           </div>
           <div class="search-datecheck min-w-650 flex-x pad-b-20">
-            <div class="">下单时间：</div>
+            <div class>下单时间：</div>
             <div class="search-date">
               <el-date-picker
                 v-model="searchModel.moreConditions.orderTime"
@@ -592,15 +592,12 @@ export default {
               click: (obj) => {
                 if (pending || obj.repertoryState != 2) return;
                 this.outStockInfo = obj;
-
-                console.log(obj)
                 this.$refs.outStockDialog.changeDialog(true);
               },
             },
             {
               name: "发货",
               styleType: (obj) => {
-                console.log(obj);
                 return obj.logisticsState != 1
                   ? "color:#999;cursor: not-allowed;"
                   : "color:#55b7b4";
@@ -1158,8 +1155,12 @@ export default {
         this.toggleSelection(selected);
       });
     },
-    goodsConfirm() {},
-    outStockConfirm() {},
+    goodsConfirm() {
+      this.search();
+    },
+    outStockConfirm() {
+      this.search();
+    },
     changeOrderState() {
       this.search();
     },

@@ -121,8 +121,8 @@
     margin-right: 57px;
 }
 
-.mar-r-122 {
-    margin-right: 122px;
+.mar-r-128 {
+    margin-right: 128px;
 }
 
 .mar-r-140 {
@@ -299,4 +299,19 @@
 
 .el-input__suffix {
     right: 0;
+}
+
+.el-dialog__header {
+    padding: 10px;
+    position: relative;
+}
+
+.el-dialog__footer {
+    padding: 10px;
+}
+
+.el-dialog__headerbtn {
+    top: 0;
+    bottom: 0;
+    margin: auto;
 }
