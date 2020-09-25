@@ -86,7 +86,7 @@ textarea {
     color: #333;
   }
   &-cef {
-    color: #ef6b6b;
+    color: #ef6b6b!important;
   }
   &-c06 {
     color: rgba(0, 0, 0, 0.65);
@@ -97,6 +97,9 @@ textarea {
   &-c2 {
     color: #13c2c2!important;
     font-weight: 500;
+  }
+  &-c13 {
+    color: #13c2c2;
   }
   // 边距
   &-ml12 {
@@ -110,6 +113,15 @@ textarea {
   }
   &-mt8 {
     margin-top: 8px;
+  }
+  &-mt15 {
+    margin-top: 15px;
+  }
+  &-mt12 {
+    margin-top: 12px;
+  }
+  &-ml15 {
+    margin-left: 15px;
   }
   &-mtb13 {
     margin-top: 13px;

@@ -19,28 +19,45 @@
       </el-dropdown>
     </h3>
     <!--  -->
-      <div class="task-search-panel-title task-pointer">
-        <i class="iconfont icon-triangle-down task-c3"></i>
+      <div class="task-search-panel-title task-pointer" @click="show =!show">
+        <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
+        <i class="iconfont icon-up task-c3" v-else></i>
         <span class="task-font16">常用字段</span>
-        <span class="task-font14 task-c2 task-ml12">设置</span>
+        <span class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
       </div>
       <!-- S 搜索条件 -->
       <el-form class="advanced-search-form" onsubmit="return false;">
         <task-search-form
+          class="task-search-forms"
+          :class="{'hide': show}"
           :fields="fields"
           ref="searchForm"
           :form-backup="formBackup"
           :column-num="columnNum"
         >
         </task-search-form>
+          <div class=" task-pointer">
+            <span class="task-font16">设置查询条件</span>
+            <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
+          </div>
+        <!-- 设置查询条件 -->
+          <task-inquire 
+          ref="taskInquireParams" 
+          :columnNum="columnNum" 
+          :config="taskInquireList || [...config, ...taskTypeFilterFields]" 
+          @setting="_setting"
+          />
         <!-- 搜索操作按钮 -->
         <slot name="footer"></slot>
       </el-form>
       <!-- E 搜索条件 -->
-      <div class="task-search-panel-title task-pointer">
-        <span class="task-font16">设置查询条件</span>
-        <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
-      </div>
+      <!-- 设置弹框 -->
+      <task-search-pupal ref="taskSearchPupal" 
+        :taskTypeFilterFields="taskTypeFilterFields" 
+        :config="config" 
+        :taskInquireList="taskInquireList"
+        @taskPupal="_taskPupal"
+      />
   </base-panel>
 </template>
 
@@ -50,6 +67,8 @@ import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* components */
 import TaskSearchForm from "./TaskSearchForm.vue";
+import TaskSearchPupal from './TaskSearchPupal'
+import TaskInquire from './TaskInquire'
 
 /* utils */
 import _ from "lodash";
@@ -63,6 +82,10 @@ const TASK_HISTORY_KEY = "task_history_list";
 export default {
   name: "task-search-panel",
   props: {
+    taskTypeFilterFields: {
+      type: Array,
+      default: []
+    },
     config: {
       type: Array,
       default: [],
@@ -72,19 +95,23 @@ export default {
       default: () => ({}),
     },
   },
+  watch: {
+    taskTypeFilterFields() {
+      this._taskInquireList()
+    },
+    config() {
+      this._taskInquireList()
+    },
+  },
   data() {
     return {
       columnNum: 1,
       formBackup: {},
-      selfFields: this.buildSelfFields(),
+      selfFields: [],
+      taskInquireList: '',
       visible: false,
+      show: false
     };
-  },
-  watch: {
-    config(value) {
-      this.selfFields = value
-      this.fields
-    }
   },
   computed: {
     fields() {
@@ -120,15 +147,22 @@ export default {
   },
   mounted() {
     const { column_number } = this.getLocalStorageData();
+    const searchField = localStorage.getItem('task-search-field')
     if (column_number) this.columnNum = Number(column_number);
+    if (searchField) {
+      this.selfFields = JSON.parse(searchField).list
+      this._taskInquireList()
+    } else {
+      this.selfFields = []
+    }
   },
   methods: {
     buildParams() {
-      const form = this.$refs.searchForm.returnData();
-
+      const {fields, taskInquireList} = this
+      const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()};
       this.formBackup = Object.assign({}, form);
-      const isSystemFields = this.fields.filter((f) => f.isSystem);
-      const notSystemFields = this.fields.filter((f) => !f.isSystem);
+      const isSystemFields = taskInquireList.length ? [...fields, ...taskInquireList].filter((f) => f.isSystem) : this.fields.filter((f) => f.isSystem);
+      const notSystemFields = taskInquireList.length ? [...fields, ...taskInquireList].filter((f) => !f.isSystem) : this.fields.filter((f) => !f.isSystem);
       let params = {
         conditions: [],
       };
@@ -149,7 +183,7 @@ export default {
           continue;
         }
 
-        if (fn == "area") {
+        if (fn == "area" && form[fn]) {
           params.productAddress = {
             ...(params.productAddress || {}),
             province: form[fn].province,
@@ -228,7 +262,6 @@ export default {
         }
 
         if (tv.formType === "address") {
-          console.log(form[fn]);
           let address = {
             property: fn,
             operator: tv.operator,
@@ -254,10 +287,6 @@ export default {
       }
       // 返回接口数据
       return params;
-    },
-    buildSelfFields() {
-      let fields = this.config;
-      return fields;
     },
     getLocalStorageData() {
       const dataStr = storageGet(TASK_HISTORY_KEY, "{}");
@@ -324,19 +353,87 @@ export default {
       this.columnNum = Number(command);
       this.saveDataToStorage("column_number", command);
     },
+    _taskPupal({list, checkSystemList, checkCustomizeList}) {
+      this.selfFields = list
+      this.fields
+      this._taskInquireList(JSON.stringify({checkSystemList, checkCustomizeList}))
+    } ,
+    _taskInquireList(field = '') {
+      const searchField = field || localStorage.getItem('task-search-field')
+      if (searchField){
+        this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((item, index) => {
+          let bool = [...JSON.parse(searchField).checkSystemList, ...JSON.parse(searchField).checkCustomizeList].some(v => {
+              return v === item.displayName 
+          })
+          if (!bool) {
+            return item
+          }
+        })
+      }
+    },
+    //设置查询条件
+    _setting({item, list}) {
+      const searchField = localStorage.getItem('task-search-field')
+      let loc;
+      let bool = this.selfFields.some(value => {
+        return value.displayName === item.displayName
+      })
+
+      if (!bool) {
+        this.selfFields.push(item)
+      }
+      // 设置查询条件的select字段
+      if (searchField) {
+        this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
+          let bool = [...JSON.parse(searchField).checkSystemList, ...JSON.parse(searchField).checkCustomizeList, ...list].some(v => {
+              return v === value.displayName 
+          })
+          if (!bool) {
+            return value
+          }
+        });
+        loc = {
+          list: this.selfFields,
+          checkSystemList: [...JSON.parse(searchField).checkSystemList, ...list],
+          checkCustomizeList: JSON.parse(searchField).checkCustomizeList
+        }
+      } else {
+        this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
+          let bool = list.some(v => {
+              return v === value.displayName 
+          })
+          if (!bool) {
+            return value
+          }
+        })
+        loc = {
+          list: this.selfFields,
+          checkSystemList: list,
+          checkCustomizeList: []
+        }
+      }
+      localStorage.setItem('task-search-field', JSON.stringify(loc))
+    }
   },
   components: {
     [TaskSearchForm.name]: TaskSearchForm,
+    [TaskSearchPupal.name]: TaskSearchPupal,
+    [TaskInquire.name]: TaskInquire
   },
 };
 </script>
 
+<style lang="scss">
+.task-search-forms {
+    transition: height .5s;
+}
+</style>
 <style lang="scss" scoped>
 .advanced-search-form {
   overflow: auto;
-  padding: 10px 15px 63px 15px;
+  padding: 10px 15px 150px 15px;
 
-  height: calc(100% - 52px);
+  height: calc(100% - 57);
   justify-content: space-between;
 
   .two-columns {
@@ -373,11 +470,12 @@ export default {
     }
   }
 }
-  .hide {
+.hide {
+    overflow: hidden;
     padding: 0;
     height: 0;
     width: 0;
-  }
+}
 .task-search-panel-title {
     height: 54px;
     line-height: 54px;

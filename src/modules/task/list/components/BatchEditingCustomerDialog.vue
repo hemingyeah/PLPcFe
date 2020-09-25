@@ -343,6 +343,7 @@ export default {
       [FormItem.name]: FormItem,
     },
   },
+
 };
 </script>
 

@@ -911,7 +911,7 @@ export default {
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
       // S 高级搜索
-      this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
+      // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
 
       this.columns = fields

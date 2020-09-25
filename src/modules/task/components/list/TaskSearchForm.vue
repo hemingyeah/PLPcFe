@@ -37,6 +37,11 @@ export default {
       product: {},
     };
   },
+  watch: {
+    fields() {
+      this.buildForm()
+    }
+  },
   mounted() {
     this.buildForm();
   },
@@ -92,7 +97,6 @@ export default {
         ...Object.freeze(field),
       };
       let comp = FormFieldMap.get(f.formType);
-
       if (!comp || f.formType === "area") {
         return null;
       }
@@ -202,7 +206,8 @@ export default {
         },
         [childComp]
       );
-    },
+   
+   },
     returnData() {
       let data = Object.assign({}, this.form);
       data.backUp = {
@@ -259,6 +264,7 @@ export default {
       const f = event.field;
       this.form[f.fieldName] = event.newValue;
     },
+  
   },
   render(h) {
     return (

@@ -318,6 +318,7 @@
       <task-search-panel
         :init-data="initData"
         :config="advanceds"
+        :taskTypeFilterFields="taskTypeFilterFields"
         ref="searchPanel"
         v-if="advanceds.length"
       >
