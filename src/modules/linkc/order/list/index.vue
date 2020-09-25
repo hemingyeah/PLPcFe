@@ -20,7 +20,7 @@
               @change="changeOrderState"
               placeholder="请选择"
               multiple
-              style="width:350px"
+              style="width:340px"
             >
               <el-option
                 v-for="(item, index) in search_checkbox"
@@ -1244,7 +1244,7 @@ label {
     .search-datecheck {
       .search-date {
         height: 32px;
-        width: 400px;
+        width: 340px;
       }
     }
   }
