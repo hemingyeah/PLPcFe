@@ -648,6 +648,12 @@ export default {
 </script>
 <style lang="scss">
 @import url("../assets/public.scss");
+.el-radio {
+  font-weight: 400;
+}
+.el-switch__label {
+  font-weight: 400;
+}
 .my-shop-box {
   min-width: 730px;
 }

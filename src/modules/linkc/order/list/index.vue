@@ -14,7 +14,7 @@
       <div class="search-more">
         <div class="search-checkbox flex-x">
           <div class="flex-x min-w-500 pad-b-20">
-            <div class="mar-r-38">订单状态：</div>
+            <div class="">订单状态：</div>
             <el-select
               v-model="searchModel.moreConditions.stateList"
               @change="changeOrderState"
@@ -36,7 +36,7 @@
             </el-select>
           </div>
           <div class="search-datecheck min-w-650 flex-x pad-b-20">
-            <div class="mar-r-38">下单时间：</div>
+            <div class="">下单时间：</div>
             <div class="search-date">
               <el-date-picker
                 v-model="searchModel.moreConditions.orderTime"

@@ -276,7 +276,7 @@ export default {
 .info-box {
   background: #fff;
   margin-bottom: 12px;
-  border: 1px solid #d9d9d9;
+  border-radius: 4px;
   box-sizing: border-box;
   .status-tips {
     padding: 3px 8px;
@@ -354,7 +354,7 @@ export default {
 
 .table-box {
   background: #fff;
-  border: 1px solid #d9d9d9;
+  border-radius: 4px;
   box-sizing: border-box;
 
   padding-left: 16px;
