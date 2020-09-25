@@ -903,12 +903,22 @@ export default {
           }
         }
       }
-
       let localColumns = columnStatus
         .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
-        .reduce((acc, col) => (acc[col.field] = col) && acc, {});
+        .reduce((acc, col, currentIndex) => {
+          acc[col.field] = {
+            field: col,
+            index: currentIndex
+          }
+          return acc
+        }, {});
+
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
+
+      if (Array.isArray(columnStatus) && columnStatus.length > 0) {
+        fields = this.buildSortFields(fields, localColumns)
+      }
 
       // S 高级搜索
       this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
@@ -971,7 +981,7 @@ export default {
         .map((col) => {
           let show = col.show === true;
           let width = col.width;
-          let localField = localColumns[col.field];
+          let localField = localColumns[col.field]?.field || null;
 
           if (null != localField) {
             width =
@@ -997,6 +1007,25 @@ export default {
           return item.fieldName !== "paymentMethod";
         });
       }
+    },
+    buildSortFields(originFields = [], fieldsMap = {}) {
+      let fields = [];
+      let unsortedFields = []
+
+      originFields.forEach(originField => {
+        let { fieldName } = originField
+        let field = fieldsMap[fieldName]
+
+        if (field) {
+          let { index } = field
+          fields[index] = originField
+        } else {
+          unsortedFields.push(originField)
+        }
+
+      })
+
+      return fields.concat(unsortedFields)
     },
     /**
      * @description 构建导出参数

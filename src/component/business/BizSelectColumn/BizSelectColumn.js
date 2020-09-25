@@ -149,6 +149,9 @@ const BizSelectColumn = {
 
       this.columnParentChangeWithSort(value, treeNode, parent)
     },
+    /** 
+     * @description 字段复选框 变化 排序
+    */
     columnFieldChangeWithSort(checked, field, parent) {
       let isParentRoot = parent.root
       let sortList = this.columnSortList.slice()
@@ -163,6 +166,9 @@ const BizSelectColumn = {
 
       this.columnSortListMerge(checked, field, parent, sortList);
     },
+    /** 
+     * @description 获取字段排序列表下 子分类
+    */
     columnSortListGetGroup(sortList, parent) {
       let templateGroup = {}
       let templateIndex = -1
@@ -178,6 +184,9 @@ const BizSelectColumn = {
       
       return { templateGroup, templateIndex }
     },
+    /** 
+     * @description 字段排序列表合并
+    */
     columnSortListMerge(checked, field, parent, sortList) {
       let { templateGroup = {}, templateIndex = 0 } = this.columnSortListGetGroup(sortList, parent)
       let templateColumns = templateGroup.lists || []
@@ -188,6 +197,9 @@ const BizSelectColumn = {
       
       this.$set(this.columnSortList, templateIndex, { ...templateGroup, lists: templateColumns })
     },
+    /** 
+     * @description 字段排序列表添加字段列
+    */
     columnSortListFieldPush(columns, sortList) {
       columns.forEach(column => {
         let isHave = sortList.some(list => list.fieldName == column.fieldName)
@@ -196,6 +208,9 @@ const BizSelectColumn = {
         }
       })
     },
+    /** 
+     * @description 父级复选框 变化排序
+    */
     columnParentChangeWithSort(checked, treeNode, parent) {
       let isTreeNodeRoot = treeNode.root
       let sortList = this.columnSortList.slice()
@@ -258,6 +273,7 @@ const BizSelectColumn = {
       originColumns.filter(column => column.show).forEach((column, index) => {
         let isSystemFiled = !column.templateId
 
+        // 系统字段直接添加至 根级
         if (isSystemFiled) {
           return sortList.push(convertDisplayNameToName(column)) 
         } 
@@ -273,7 +289,7 @@ const BizSelectColumn = {
 
       for (let key in TemplateMap) {
         let { columns, index, name } = TemplateMap[key]
-        sortList.splice(index, 1, {
+        sortList.splice(index, 0, {
           name,
           lists: columns
         })
