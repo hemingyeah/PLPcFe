@@ -591,7 +591,7 @@ export default {
               },
               click: (obj) => {
                 if (pending || obj.repertoryState != 2) return;
-                this.infoDataoutStockInfo = obj;
+                this.outStockInfo = obj;
 
                 console.log(obj)
                 this.$refs.outStockDialog.changeDialog(true);
