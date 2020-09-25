@@ -26,7 +26,7 @@
       <div class="trackingNum-box">
         <el-form ref="ruleForm" :model="formData" :rules="rules" status-icon>
           <el-form-item prop="trackingNum">
-            <div >添加物流信息：</div>
+            <div>添加物流信息：</div>
             <el-input v-model="formData.trackingNum" placeholder="请输入"></el-input>
           </el-form-item>
         </el-form>
@@ -85,7 +85,15 @@ export default {
           .then((res) => {
             if (res.status == 200) {
               this.changeDialog(false);
+              this.$message.success(res.data);
               this.$emit("confirm");
+            } else {
+              this.$notify.close();
+              this.$notify.error({
+                title: "网络错误",
+                message: res.message,
+                duration: 2000,
+              });
             }
           })
           .finally(() => {

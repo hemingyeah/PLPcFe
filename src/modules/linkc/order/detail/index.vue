@@ -214,7 +214,6 @@ export default {
     }
     this.searchData = obj;
     this.getData();
-    console.log(obj);
   },
   methods: {
     outStock() {
@@ -224,9 +223,11 @@ export default {
       this.$refs.goodsDialog.changeDialog(true);
     },
     goodsConfirm() {
+      this.getData();
       this.needReloadList();
     },
     outStockConfirm() {
+      this.getData();
       this.needReloadList();
     },
     getData() {

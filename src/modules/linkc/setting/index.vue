@@ -231,7 +231,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <base-button type="ghost" @event="outStockDialog = false">取消</base-button>
+        <base-button type="ghost" @event="submitDialog = false">取消</base-button>
         <base-button type="primary" @event="submitWxData">确定</base-button>
       </div>
     </el-dialog>

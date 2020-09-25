@@ -6,25 +6,81 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "17409584",
-      "name": "门户设置",
-      "font_class": "menhushezhi",
-      "unicode": "e733",
-      "unicode_decimal": 59187
+      "icon_id": "17436239",
+      "name": "菜单_财务模块",
+      "font_class": "caidan_caiwumokuai",
+      "unicode": "e734",
+      "unicode_decimal": 59188
     },
     {
-      "icon_id": "17430755",
-      "name": "备件管理",
-      "font_class": "beijianguanli3",
-      "unicode": "e73f",
-      "unicode_decimal": 59199
+      "icon_id": "17436240",
+      "name": "菜单_服务管理",
+      "font_class": "caidan_fuwuguanli",
+      "unicode": "e735",
+      "unicode_decimal": 59189
     },
     {
-      "icon_id": "17430756",
-      "name": "客户管理",
-      "font_class": "kehuguanli",
-      "unicode": "e742",
-      "unicode_decimal": 59202
+      "icon_id": "17436241",
+      "name": "菜单_备件管理",
+      "font_class": "caidan_beijianguanli",
+      "unicode": "e737",
+      "unicode_decimal": 59191
+    },
+    {
+      "icon_id": "17436242",
+      "name": "菜单_工单模块",
+      "font_class": "caidan_gongdanmokuai",
+      "unicode": "e738",
+      "unicode_decimal": 59192
+    },
+    {
+      "icon_id": "17436243",
+      "name": "菜单_门户设置",
+      "font_class": "caidan_menhushezhi",
+      "unicode": "e73a",
+      "unicode_decimal": 59194
+    },
+    {
+      "icon_id": "17436244",
+      "name": "菜单_信息管理",
+      "font_class": "caidan_xinxiguanli",
+      "unicode": "e73c",
+      "unicode_decimal": 59196
+    },
+    {
+      "icon_id": "17436245",
+      "name": "菜单_设置",
+      "font_class": "caidan_shezhi",
+      "unicode": "e73d",
+      "unicode_decimal": 59197
+    },
+    {
+      "icon_id": "17436246",
+      "name": "菜单_服务台",
+      "font_class": "caidan_fuwutai",
+      "unicode": "e73e",
+      "unicode_decimal": 59198
+    },
+    {
+      "icon_id": "17436247",
+      "name": "菜单_运营统计",
+      "font_class": "caidan_yunyingtongji",
+      "unicode": "e743",
+      "unicode_decimal": 59203
+    },
+    {
+      "icon_id": "17436248",
+      "name": "菜单_账号权限",
+      "font_class": "caidan_zhanghaoquanxian",
+      "unicode": "e744",
+      "unicode_decimal": 59204
+    },
+    {
+      "icon_id": "17436275",
+      "name": "菜单_客户模块",
+      "font_class": "caidan_kehumokuai",
+      "unicode": "e745",
+      "unicode_decimal": 59205
     },
     {
       "icon_id": "17394560",
@@ -32,20 +88,6 @@
       "font_class": "mianbanjiantou",
       "unicode": "e6a7",
       "unicode_decimal": 59047
-    },
-    {
-      "icon_id": "17387403",
-      "name": "菜单-备件",
-      "font_class": "caidan-beijian",
-      "unicode": "e6a6",
-      "unicode_decimal": 59046
-    },
-    {
-      "icon_id": "17387138",
-      "name": "菜单-客户",
-      "font_class": "caidan-kehu",
-      "unicode": "e6a4",
-      "unicode_decimal": 59044
     },
     {
       "icon_id": "17360732",

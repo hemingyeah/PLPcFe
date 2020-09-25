@@ -52,7 +52,15 @@ export default {
         .then((res) => {
           if (res.status == 200) {
             this.changeDialog(false);
+            this.$message.success(res.data);
             this.$emit("confirm");
+          } else {
+            this.$notify.close();
+            this.$notify.error({
+              title: "网络错误",
+              message: res.message,
+              duration: 2000,
+            });
           }
         })
         .finally(() => {
