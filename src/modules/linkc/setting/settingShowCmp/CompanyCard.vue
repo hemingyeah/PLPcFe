@@ -2,7 +2,7 @@
   <div class="setting-show-cmp-box">
     <div class="company-card-box">
       <div class="flex-x">
-        <img class="company-card-img" :src="infoData.logoUrl || ''" />
+        <img class="company-card-img" :src="infoData.logoUrl ? `${infoData.logoUrl}?x-oss-process=image/resize,m_fill,h_24,w_24` : ''" />
         <div class="flex-x font-12 font-w-500 flex-1">
           <div class="">{{infoData.name}}</div>
         </div>

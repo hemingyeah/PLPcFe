@@ -774,6 +774,7 @@ export default {
     width: 330px;
     background: #fff;
     height: 691px;
+    border-radius: 4px;
   }
 }
 .el-switch__label {
