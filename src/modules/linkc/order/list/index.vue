@@ -362,12 +362,6 @@ export default {
   },
   mixins: [componentMixin],
   data() {
-    let weekTime = [];
-
-    weekTime.push(
-      formatDate(new Date() - 7 * 24 * 60 * 60 * 1000, "YYYY-MM-DD")
-    );
-    weekTime.push(formatDate(new Date(), "YYYY-MM-DD"));
     return {
       defaultImg,
       fullscreenLoading: false,
@@ -423,7 +417,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: weekTime,
+          orderTime: this.findWeekTime(),
         },
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
@@ -480,6 +474,15 @@ export default {
     },
   },
   methods: {
+    findWeekTime() {
+      let weekTime = [];
+
+      weekTime.push(
+        formatDate(new Date() - 7 * 24 * 60 * 60 * 1000, "YYYY-MM-DD")
+      );
+      weekTime.push(formatDate(new Date(), "YYYY-MM-DD"));
+      return weekTime;
+    },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：客户联系人-选择列事件");
       this.$refs.advanced.open(this.columns);
@@ -924,7 +927,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: "",
+          orderTime: this.findWeekTime(),
         },
       };
 
