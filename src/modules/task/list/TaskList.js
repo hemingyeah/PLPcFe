@@ -1838,7 +1838,7 @@ export default {
 
         const par = {
           ...citys,
-          conditions: [...paymentMethod, ...conditions], //支付方式
+          conditions: [...conditions], //支付方式
           customerId: params.customerId,
           customerLinkman: params.tlmName,
           cusAddress: params.cusAddress,
@@ -1846,10 +1846,10 @@ export default {
           serviceType: params.serviceType,
           serviceContent: params.serviceContent,
           level: params.level,
-          createUser: mySearch.createUser || params.createUser,
-          allotUser: params.allotUser,
-          executor: mySearch.executor || params.executor,
-          synergyId: mySearch.synergyId || params.synergyId,
+          // createUser: mySearch.createUser || params.createUser,
+          // allotUser: params.allotUser,
+          // executor: mySearch.executor || params.executor,
+          // synergyId: mySearch.synergyId || params.synergyId,
           createTimeStart,
           createTimeEnd,
           planTimeStart,
@@ -1876,7 +1876,7 @@ export default {
           oncePrinted,
           inApprove,
           sorts,
-          tagId: params.tagId,
+          // tagId: params.tagId,
           keyword: params.keyword,
           page: params.page,
           pageSize: params.pageSize,
@@ -1889,7 +1889,14 @@ export default {
           searchStateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
           allotTypes: params.allotTypeStrs && params.allotTypeStrs.map(type => AllotTypeConvertMap[type]),
           flags: params.onceExceptions && params.onceExceptions.map(exception => FlagConvertMap[exception] || '') ,
+          createUserIds: mySearch.createUser ? params.createUser ? params.createUser.push(mySearch.createUser) : [] : params.createUser,
+          executorUserIds: mySearch.executor ? params.executor ? params.executor.push(mySearch.executor) : [] : params.executor,
+          synergyUserIds: mySearch.synergyId ? params.synergyId ? params.synergyId.push(mySearch.synergyId) : [] : params.synergyId,
+          allotUserIds: params.allotUser,
+          payTypes: params.paymentMethods,
+          searchTagIds: params.tags && params.tags.map(({ id }) => id)
         };
+        
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/
       } else {

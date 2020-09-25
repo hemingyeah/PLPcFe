@@ -490,7 +490,7 @@
 
             <el-table-column
               v-for="column in columns"
-              v-if="column.show"
+              v-if="column && column.show"
               :align="column.align"
               :class-name="
                 column.field == 'name'

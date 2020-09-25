@@ -15,7 +15,7 @@ import {
 import SearchProductSelect from "./SearchProductSelect.vue";
 import SearchCustomerSelect from "./SearchCustomerSelect.vue";
 
-const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException']
+const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod']
 
 export default {
   name: "task-search-form",
@@ -45,7 +45,7 @@ export default {
       this.buildForm()
     }
   },
-  mounted() {
+  created() {
     this.buildForm();
   },
   methods: {
@@ -73,11 +73,15 @@ export default {
         if (field.formType === "link") {
           tv = {};
         }
-        if (field.formType === "tags") {
+        if (field.fieldName === "tags") {
           tv = [];
         }
         if (field.formType === "area") {
           tv = [];
+        }
+
+        if (field.formType === "user") {
+          tv = []
         }
 
         if (MultiFieldNames.indexOf(field.fieldName) > -1) {
@@ -152,25 +156,21 @@ export default {
       } else if (f.formType === "user") {
         childComp = h("user-search", {
           props: {
+            multiple: true,
             field: f,
             value: this.form[f.fieldName],
             disableMap: true,
           },
           on: {
             update: (event) => this.update(event),
-            input: (event) => {
-              if (event && event.length > 1) {
-                this.$set(this, "product", event[0]);
-              }
-              // this.form[f.fieldName] = event.keyword;
-            },
           },
         });
       } else if (f.fieldName === "tags") {
         let value = this.form[f.fieldName];
         childComp = h("biz-team-select", {
           props: {
-            value: value ? value : [],
+            multiple: true,
+            value: value || [],
           },
           on: {
             input: (event) => this.update(event, "tags"),
