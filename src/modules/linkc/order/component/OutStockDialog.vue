@@ -47,8 +47,7 @@ export default {
       this.loading = true;
       repertoryOut({
         orderNum: this.infoData.orderId,
-        remrk: this.remrks,
-        // orderNum: this.trackingNum,
+        remrk: this.remark,
       })
         .then((res) => {
           if (res.status == 200) {
