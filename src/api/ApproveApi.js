@@ -69,11 +69,21 @@ function getApplyApproveDetail (params) {
   return http.get('/approve/get', params)
 }
 
+/**
+ * 我能审核-转交接口
+ * @param {String | Id} params.userId - 转交给的人id
+ * @param {String} params.approveIds - 审核id列表
+ */
+function approversDeliver (params) {
+  return http.post('/approve/approvers/deliver', params)
+}
+
 export {
   getInitiatorList,
   getEventTypeList,
   getTaskTypeList,
   getApproveList,
   applyApprove,
-  getApplyApproveDetail
+  getApplyApproveDetail,
+  approversDeliver
 }

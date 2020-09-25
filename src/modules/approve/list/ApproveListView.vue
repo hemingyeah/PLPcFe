@@ -110,7 +110,45 @@
                 </template>
               </base-select>
             </el-form-item>
+            
+            <!-- start 转交人 -->
+            <el-form-item label-width="100px" label="转交人">
+              <base-select v-model="paramsForSelector.operators" :remote-method="inputSearchInitiator" placeholder="请选择" clearable>
+                <template slot="option" slot-scope="{option}">
+                  <div class="initiator-option-row">
+                    <img :src="getInitiatorAvatar(option.head)" class="initiator-avatar"/><span class="initiator-display-name">{{option.label}}</span>
+                  </div>
+                </template>
+              </base-select>
+            </el-form-item>
+            <!-- end 转交人 -->
 
+            <!-- start 转交时间 -->
+            <el-form-item label-width="100px" label="转交时间">
+              <el-date-picker
+                v-model="params.handoverTime"
+                type="daterange"
+                align="right"
+                unlink-panels
+                range-separator="-"
+                start-placeholder="请输入开始时间"
+                end-placeholder="请输入结束时间"
+                :picker-options="approveTimePickerOptions"
+              ></el-date-picker>
+            </el-form-item>
+            <!-- end 转交时间 -->
+
+            <!-- start 原审批人 -->
+            <el-form-item label-width="100px" label="原审批人">
+              <base-select v-model="paramsForSelector.oldHandovers" :remote-method="inputSearchInitiator" placeholder="请选择" clearable>
+                <template slot="option" slot-scope="{option}">
+                  <div class="initiator-option-row">
+                    <img :src="getInitiatorAvatar(option.head)" class="initiator-avatar"/><span class="initiator-display-name">{{option.label}}</span>
+                  </div>
+                </template>
+              </base-select>
+            </el-form-item>
+            <!-- end 原审批人 -->
           </div>
           <div class="advanced-search-btn-group">
             <base-button type="ghost" @event="resetParams">重置</base-button>
@@ -142,6 +180,14 @@
         </div>
 
         <div class="right-btn-group">
+          <!-- start 转交 -->
+          <el-button
+            type="primary"
+            @click="openTransferDialog"
+            v-if="params.mySearch == 'approve'"
+          >转交</el-button>
+          <!-- end 转交 -->
+
           <el-dropdown v-if="exportPermission" trigger="click">
             <!-- <el-dropdown trigger="click"> -->
             <span class="el-dropdown-link el-dropdown-btn">
@@ -218,6 +264,9 @@
             <template v-else-if="column.field === 'approvalTime'">
               {{ scope.row[column.field] | getFormatApproveTime }}
             </template>
+            <template v-else-if="column.field === 'handoverTime'">
+              {{ scope.row[column.field] | getFormatDate }}
+            </template>
             <template v-else>
               {{ scope.row[column.field] }}
             </template>
@@ -291,6 +340,24 @@
       </div>
     </base-panel>
 
+
+    <!-- start 转交弹窗 -->
+    <base-modal title="转交办理" :show.sync="transferDialog.visible" width="600px" class="transfer-approve-dialog">
+      <div class="base-modal-content">
+        <div class="tips">审批转交适用于当前审批人无法对该事项做审批时，转交给上级领导进行审批的场景</div>
+        <form-user
+          :field="{ displayName: '转交人' }"
+          placeholder="请选择新的审批人"
+          v-model="transferDialog.approver"
+          :see-all-org="true"
+        />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="transferDialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="transferApprove" :disabled="transferDialog.pending">确 定</el-button>
+      </div>
+    </base-modal>
+    <!-- end 转交弹窗 -->
   </div>
 </template>
 
@@ -346,6 +413,9 @@ export default {
         pageNum: 1,
         pageSize: '',
         approversId: '',
+        operatorId: '', // 转交人id
+        handoverTime: '', // 转交时间
+        oldHandover: '' // 原审批人id
       },
       paramsBackup: {
         keyword: '',
@@ -356,6 +426,8 @@ export default {
         taskType: [],
         state: '待审批',
         approvers: [],
+        operators: [],
+        oldHandovers: []
       },
       proposer: [],
       sources: [
@@ -414,6 +486,11 @@ export default {
       multipleSelection: [],
       auth: {},
       selectedLimit: 200,
+      transferDialog: { // 审批转交弹窗
+        visible: false,
+        pending: false,
+        approver: {}
+      }
     }
   },
   methods: {
@@ -430,6 +507,9 @@ export default {
         action: '',
         pageNum: 1,
         approversId: '',
+        operatorId: '', // 转交人
+        handoverTime: '', // 转交时间
+        oldHandover: '' // 原审批人id
       }
     },
     buildParams () {
@@ -448,6 +528,14 @@ export default {
       } else {
         delete this.params.completeTimeStart;
         delete this.params.completeTimeEnd;
+      }
+
+      if (this.params.handoverTime && this.params.handoverTime.length) {
+        this.params.handoverTimeStart = formatDate(this.params.handoverTime[0]);
+        this.params.handoverTimeEnd = `${formatDate(this.params.handoverTime[1]).replace('00:00:00', '23:59:59')}`;
+      } else {
+        delete this.params.handoverTimeStart;
+        delete this.params.handoverTimeEnd;
       }
 
       this.params.keyword = this.paramsBackup.keyword || '';
@@ -472,6 +560,14 @@ export default {
       // 审批人
       let approvers = this.paramsForSelector.approvers;
       this.params.approversId = (approvers && approvers.length) ? approvers[0].userId : '';
+
+      // 转交人
+      let operators = this.paramsForSelector.operators;
+      this.params.operatorId = (operators && operators.length) ? operators[0].userId : '';
+
+      // 原审批人
+      let oldHandovers = this.paramsForSelector.oldHandovers;
+      this.params.oldHandover = (oldHandovers && oldHandovers.length) ? oldHandovers[0].userId : '';
 
     },
     btnSearchHandler () {
@@ -758,7 +854,10 @@ export default {
         { label: '审批人', field: 'approverName', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '审批时间', field: 'completeTime', show: true, fixed: true, export: true, sortable: 'custom' },
         { label: '审批备注', field: 'approveRemark', show: true, fixed: true, export: true },
-        { label: '审批用时', field: 'approvalTime', show: true, fixed: true, export: true, sortable: 'custom' }
+        { label: '审批用时', field: 'approvalTime', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '转交人', field: 'operatorName', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '转交时间', field: 'handoverTime', show: true, fixed: true, export: true, sortable: 'custom' },
+        { label: '原审批人', field: 'oldHandoverName', show: true, fixed: true, export: true, sortable: 'custom' }
       ]
     },
     /**
@@ -1050,6 +1149,56 @@ export default {
       let isApprover = approvers.some(approve => approve.userId === this.userId);
 
       return isApprover;
+    },
+    /** 
+    * @description 打开审批转交弹窗
+    */
+    openTransferDialog() {
+      // 未选择数据
+      if (!this.multipleSelection.length) return this.$platform.alert('请选择要转交的数据');
+
+      this.transferDialog.approver = {};
+      this.transferDialog.visible = true;
+    },
+    /** 
+    * @description 审批转交
+    */
+    transferApprove() {
+      let { approver } = this.transferDialog;
+
+      // 未选择新审批人
+      if (!approver.userId) return this.$platform.alert('请选择新的审批人');
+
+      this.transferDialog.pending = true;
+      
+      let approveIds = [];
+      this.multipleSelection.forEach(item => {
+        approveIds.push(item.uuId);
+      })
+
+      const params = {
+        userId: approver.userId,
+        approveIds
+      }
+
+      ApproveApi.approversDeliver(params).then(res => {
+        if (res.succ) {
+          this.$platform.notification({
+            message: '转交成功',
+            type: 'success',
+          })
+
+          this.doSearch();
+          this.multipleSelection = [];
+          this.transferDialog.visible = false;
+        } else {
+          this.$platform.alert(res.message);
+        }
+
+        this.transferDialog.pending = false;
+      }).catch(err => {
+        this.transferDialog.pending = false;
+      })
     }
   },
   computed: {
@@ -1528,4 +1677,20 @@ export default {
     }
   }
   // 同page层级 结束
+
+// 审批转交
+.transfer-approve-dialog {
+  .base-modal-body {
+    padding: 20px;
+
+    .tips {
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #666;
+    }
+  }
+  .base-modal-footer {
+    text-align: right;
+  }
+}
 </style>
