@@ -4,7 +4,12 @@
     <div class="search-modal-box">
       <div class="flex-x search-input-box">
         <div class="flex-1"></div>
-        <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="searchModel.keyWord" @keyup.enter.native="search">
+        <el-input
+          class="search-input"
+          placeholder="搜索订单编号商品名称"
+          v-model="searchModel.keyWord"
+          @keyup.enter.native="search"
+        >
           <el-button slot="append" @click="search">
             <i class="iconfont icon-search"></i>
           </el-button>
@@ -168,7 +173,7 @@
                   <template v-if="column.conType === 'goods'">
                     <div class="flex-x">
                       <div class="flex-x goods-img-list flex-1">
-                        <template v-for="(item, index) in scope.row[column.field]">
+                        <template v-for="(item, index) in scope.row[column.field]" v-if="index <= 4">
                           <img
                             :key="index"
                             :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_32,w_32` : defaultImg"
