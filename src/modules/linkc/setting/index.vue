@@ -213,6 +213,7 @@
         ref="wxRulerForm"
         label-width="120px"
         class="demo-ruleForm"
+        status-icon
       >
         <el-form-item label="APPSecret" prop="secret">
           <el-input v-model="wxRulerFormData.secret" autocomplete="off" placeholder="请输入"></el-input>
