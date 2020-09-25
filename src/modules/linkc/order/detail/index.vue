@@ -20,13 +20,13 @@
               <div class="status-item-index status-item-index-ready mar-r-15 flex-x">{{index+1}}</div>
               <span class="font-16">{{item}}</span>
             </div>
-            <div class="status-item flex-x" v-if="index == dataInfo.logisticsState-1">
+            <div class="status-item flex-x" v-if="index == dataInfo.logisticsState-1 && dataInfo.logisticsState != 3">
               <div class="status-item-index status-item-index-now mar-r-15 flex-x">{{index+1}}</div>
               <span class="font-16">{{item}}</span>
             </div>
             <div
               class="status-item status-item-pass flex-x"
-              v-if="index < dataInfo.logisticsState-1"
+              v-if="index < dataInfo.logisticsState-1 || dataInfo.logisticsState == 3"
             >
               <div class="status-item-index status-item-index-pass mar-r-15 flex-x">
                 <i class="el-icon-check"></i>
@@ -276,7 +276,7 @@ export default {
 .info-box {
   background: #fff;
   margin-bottom: 12px;
-  border: 1px solid #d9d9d9;
+  border-radius: 4px;
   box-sizing: border-box;
   .status-tips {
     padding: 3px 8px;
@@ -354,7 +354,7 @@ export default {
 
 .table-box {
   background: #fff;
-  border: 1px solid #d9d9d9;
+  border-radius: 4px;
   box-sizing: border-box;
 
   padding-left: 16px;

@@ -46,7 +46,7 @@ export default {
     confirm() {
       this.loading = true;
       repertoryOut({
-        orderNum: this.infoData.orderId,
+        orderId: this.infoData.orderId,
         remark: this.remark,
       })
         .then((res) => {

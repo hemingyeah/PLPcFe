@@ -1,6 +1,7 @@
 <template>
   <div class="setting-data-cmp-box">
     <div class="form-info">
+      <div class="font-16 font-w-500 mar-b-20">门户设置</div>
       <div class="flex-x al-start mar-b-18">
         <div class="mar-r-20">logo</div>
         <el-upload
@@ -101,7 +102,7 @@ export default {
             trigger: "change",
           },
         ],
-        address:[{ required: true, message: "请输入地址", trigger: "blur" },]
+        address: [{ required: true, message: "请输入地址", trigger: "blur" }],
       },
 
       imgCover: false,
