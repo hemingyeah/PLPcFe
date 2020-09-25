@@ -10,15 +10,16 @@
           id=""
           maxlength="6"
           v-model="view.viewName"
+          placeholder="请输入视图"
         />
       </div>
       <!-- 按钮 -->
-      <div class="view-modal-button">
-        <el-checkbox v-model="checked">全员可见</el-checkbox>
-        <base-button type="danger" @event="deleteViewBtn" v-show="isViewModel !== '默认'"
-          >删除视图</base-button
-        >
-        <base-button type="primary" @event="saveViewBtn">保存</base-button>
+      <el-checkbox v-model="checked">全员可见</el-checkbox>
+      <div class="task-flex task-ai task-jend">
+          <el-button type="danger" @event="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button>
+          <el-button @click="visible = false">取消</el-button>
+          <el-button type="primary" @event="saveViewBtn"
+          >保存</el-button>
       </div>
     </div>
   </base-modal>
@@ -121,10 +122,9 @@ export default {
 // S 存为视图弹框
 .view-modal {
   font-size: 12px;
-  height: 105px;
-  padding: 0px 118px;
+  padding: 20px 118px;
   &-name {
-    padding: 14px 0;
+    padding: 5px 0;
     display: flex;
     align-items: center;
     input {
