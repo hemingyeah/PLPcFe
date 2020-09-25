@@ -20,13 +20,13 @@
               <div class="status-item-index status-item-index-ready mar-r-15 flex-x">{{index+1}}</div>
               <span class="font-16">{{item}}</span>
             </div>
-            <div class="status-item flex-x" v-if="index == dataInfo.logisticsState-1">
+            <div class="status-item flex-x" v-if="index == dataInfo.logisticsState-1 && dataInfo.logisticsState != 3">
               <div class="status-item-index status-item-index-now mar-r-15 flex-x">{{index+1}}</div>
               <span class="font-16">{{item}}</span>
             </div>
             <div
               class="status-item status-item-pass flex-x"
-              v-if="index < dataInfo.logisticsState-1"
+              v-if="index < dataInfo.logisticsState-1 || dataInfo.logisticsState == 3"
             >
               <div class="status-item-index status-item-index-pass mar-r-15 flex-x">
                 <i class="el-icon-check"></i>
