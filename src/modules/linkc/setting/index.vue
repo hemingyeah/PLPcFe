@@ -6,7 +6,7 @@
       <!-- ruler-set-list start -->
       <div class="flex-x ruler-set-list">
         <!-- 1 -->
-        <div class="ruler-set-item mar-r-140">
+        <div class="ruler-set-item mar-r-122">
           <div class="ruler-set-item-title">门户访问权限:</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.loginValidate"
@@ -21,7 +21,7 @@
           </el-radio-group>
         </div>
         <!-- 2 -->
-        <div class="ruler-set-item mar-r-140">
+        <div class="ruler-set-item mar-r-190">
           <div class="ruler-set-item-title">网页门户验证方式：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.validateBySms"
@@ -157,13 +157,14 @@
               <!-- <draggable class="menu-box" v-model="dataList"> 可拖动-->
               <div class="menu-box">
                 <div
-                  
                   v-for="(item, index) in dataList"
                   :key="index"
                   draggable="false"
                   @click="chooseNowSet(item)"
                 >
-                  <div :class="['menu-box-item',nowSettingDataId == item.id?'menu-box-item-check':'']" >
+                  <div
+                    :class="['menu-box-item',nowSettingDataId == item.id?'menu-box-item-check':'']"
+                  >
                     <component
                       :is="item.type"
                       ref="setShow"
@@ -662,6 +663,8 @@ export default {
   background: #fff;
   padding: 12px 12px 0 12px;
   border-radius: 4px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   margin-bottom: 1px;
   .ruler-set-list {
     flex-wrap: wrap;
@@ -677,6 +680,9 @@ export default {
   background: #fff;
   padding: 26px 11px 0 11px;
   border-radius: 4px;
+
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
   flex-wrap: wrap;
   margin-bottom: 12px;
   .info-link-box {
