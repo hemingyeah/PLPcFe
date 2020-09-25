@@ -4,7 +4,7 @@
     <div class="search-modal-box">
       <div class="flex-x search-input-box">
         <div class="flex-1"></div>
-        <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="searchModel.keyWord">
+        <el-input class="search-input" placeholder="搜索订单编号商品名称" v-model="searchModel.keyWord" @keyup.enter.native="search">
           <el-button slot="append" @click="search">
             <i class="iconfont icon-search"></i>
           </el-button>
