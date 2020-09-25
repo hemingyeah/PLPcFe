@@ -6,7 +6,7 @@
       <!-- ruler-set-list start -->
       <div class="flex-x ruler-set-list">
         <!-- 1 -->
-        <div class="ruler-set-item mar-r-122">
+        <div class="ruler-set-item mar-r-128">
           <div class="ruler-set-item-title">门户访问权限:</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.loginValidate"
@@ -61,7 +61,7 @@
             active-text="开启后允许从自助门户取消尚未完成的服务事件"
           ></el-switch>
         </div>
-        <div class="pad-b-34">
+        <div class="ruler-set-item">
           <div class="ruler-set-item-title">设置服务商城显示内容：</div>
           <div class="flex-x">
             <el-select
@@ -96,7 +96,7 @@
 
       <div class="flex-x al-start mar-r-57 mar-b-20">
         门户二维码：
-        <div class="flex-y code-box mar-l-19" v-show="setData.protalUrl">
+        <div class="flex-y code-box" v-show="setData.protalUrl">
           <div class="qrcode" ref="qrCodeUrl"></div>
           <div class="code-des">网页入口</div>
         </div>
@@ -679,12 +679,12 @@ export default {
     margin-bottom: 13px;
   }
   .ruler-set-item {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
   }
 }
 .info-box {
   background: #fff;
-  padding: 26px 11px 0 11px;
+  padding: 24px 11px 0 11px;
   border-radius: 4px;
 
   border-top-left-radius: 0;

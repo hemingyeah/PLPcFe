@@ -26,7 +26,7 @@
       <div class="trackingNum-box">
         <el-form ref="ruleForm" :model="formData" :rules="rules" status-icon>
           <el-form-item prop="trackingNum">
-            <div class="mar-b-12">添加物流信息：</div>
+            <div >添加物流信息：</div>
             <el-input v-model="formData.trackingNum" placeholder="请输入"></el-input>
           </el-form-item>
         </el-form>
