@@ -68,8 +68,10 @@ export default {
     };
   },
   watch: {
-    goodsDialog() {
-      this.formData.trackingNum = "";
+    goodsDialog(val) {
+      if (val == false) {
+        this.$refs["ruleForm"].resetFields();
+      }
     },
   },
   methods: {
@@ -77,7 +79,7 @@ export default {
       this.$refs["ruleForm"].validate((valid) => {
         this.loading = true;
         orderDeliver({
-          orderId: this.infoData.id,
+          orderId: this.infoData.orderId,
           trackingNum: this.formData.trackingNum,
         })
           .then((res) => {
