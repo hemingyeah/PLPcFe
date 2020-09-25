@@ -49,6 +49,22 @@ const TASK_SELF_FIELD_NAMES = [
 // 导出过来字段类型
 const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
 
+const AllotTypeConvertMap = {
+  '全部': 0,
+  '手动派单': 1,
+  '工单池派单': 2,
+  '自动派单': 3
+}
+
+const FlagConvertMap = {
+  '不筛选': '',
+  '曾超时': 'ONCEOVERTIME',
+  '曾拒绝': 'ONCEREFUSED',
+  '曾暂停': 'ONCEPAUSED',
+  '曾回退': 'ONCEROLLBACK',
+  '位置异常': 'POSITIONEXCEPTION'
+}
+
 export default {
   name: "task-list",
   inject: ["initData"],
@@ -1866,6 +1882,13 @@ export default {
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
           state: state || this.searchParams.state,
+
+          serviceTypes: params.serviceTypes,
+          serviceContents: params.serviceContents,
+          levels: params.levels,
+          searchStateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
+          allotTypes: params.allotTypeStrs && params.allotTypeStrs.map(type => AllotTypeConvertMap[type]),
+          flags: params.onceExceptions && params.onceExceptions.map(exception => FlagConvertMap[exception] || '') ,
         };
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/

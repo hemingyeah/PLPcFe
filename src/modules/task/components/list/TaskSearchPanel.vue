@@ -82,6 +82,7 @@ import { storageGet, storageSet } from "@src/util/storage";
 
 /* constants */
 const TASK_HISTORY_KEY = "task_history_list";
+const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException']
 
 export default {
   name: "task-search-panel",
@@ -225,6 +226,10 @@ export default {
 
         if (tv.fieldName === "tags") {
           params.tagId = form[fn].map(({ id }) => id).join("");
+        }
+
+        if (MultiFieldNames.indexOf(fn) > -1) {
+          params[`${fn}s`] = form[fn]
         }
       }
 

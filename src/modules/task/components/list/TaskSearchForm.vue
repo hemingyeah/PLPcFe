@@ -4,6 +4,7 @@ import * as TaskApi from "@src/api/TaskApi.ts";
 import * as CustomerApi from "@src/api/CustomerApi";
 
 /* utils */
+import _ from 'lodash';
 import * as Utils from "@src/component/form/util";
 
 /* components */
@@ -13,6 +14,8 @@ import {
 } from "@src/component/form/components";
 import SearchProductSelect from "./SearchProductSelect.vue";
 import SearchCustomerSelect from "./SearchCustomerSelect.vue";
+
+const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException']
 
 export default {
   name: "task-search-form",
@@ -77,6 +80,10 @@ export default {
           tv = [];
         }
 
+        if (MultiFieldNames.indexOf(field.fieldName) > -1) {
+          tv = []
+        }
+
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
         this.$set(
           this.form,
@@ -93,16 +100,19 @@ export default {
       return form;
     },
     renderInput(h, field) {
-      const f = {
-        ...Object.freeze(field),
-      };
+      const f = _.cloneDeep(field)
+
       let comp = FormFieldMap.get(f.formType);
       if (!comp || f.formType === "area") {
         return null;
       }
 
       if (f.formType === "select") {
-        f.setting.isMulti = false;
+        f.setting.isMulti = false
+      }
+
+      if (MultiFieldNames.indexOf(field.fieldName) > -1) {
+        f.setting.isMulti = true
       }
 
       let childComp = null;
