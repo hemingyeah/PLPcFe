@@ -80,8 +80,8 @@ export default {
         loc() {
             const searchField = localStorage.getItem('task-search-field')
             if (searchField) {
-                this.checkSystemList = JSON.parse(searchField).checkSystemList
-                this.checkCustomizeList = JSON.parse(searchField).checkCustomizeList
+                this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
+                this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
             }
         },
         open() {

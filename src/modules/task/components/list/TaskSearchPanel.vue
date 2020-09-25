@@ -23,7 +23,11 @@
         <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
         <i class="iconfont icon-up task-c3" v-else></i>
         <span class="task-font16">常用字段</span>
-        <span class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
+        <el-popconfirm
+          title="这是一段内容确定删除吗？"
+        >
+          <span slot="reference" class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
+        </el-popconfirm>
       </div>
       <!-- S 搜索条件 -->
       <el-form class="advanced-search-form" onsubmit="return false;">
