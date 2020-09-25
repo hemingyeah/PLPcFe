@@ -9,7 +9,7 @@
       >
         <img
           class="mar-r-10"
-          :src="item.thumbnailUrl ?`${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_52,w_52` :defaultImg"
+          :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_52,w_52` : defaultImg"
         />
         <div class="goods-dialog-item-info flex-1">
           <div class="flex-x">

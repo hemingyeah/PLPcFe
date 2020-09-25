@@ -84,7 +84,7 @@
               <div class="flex-x">
                 <img
                   :src="scope.row.thumbnailUrl ? `${scope.row.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_56,w_56` : defaultImg"
-                  class="goods-img"
+                  class="goods-img mar-r-4"
                   @click.stop="previewImg(scope.row.thumbnailUrl)"
                 />
                 <div>{{scope.row.name}}</div>
