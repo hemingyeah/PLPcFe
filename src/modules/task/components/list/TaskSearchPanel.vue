@@ -89,11 +89,11 @@ export default {
   props: {
     taskTypeFilterFields: {
       type: Array,
-      default: []
+      default: () => []
     },
     config: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     initData: {
       type: Object,
@@ -113,7 +113,7 @@ export default {
       columnNum: 1,
       formBackup: {},
       selfFields: [],
-      taskInquireList: '',
+      taskInquireList: [],
       visible: false,
       show: false
     };
