@@ -119,7 +119,7 @@
               :field="productField"
               v-model="value.product"
               :remote-method="searchProductOuterHandler"
-              @input="updateProduct"
+              @input="updateProductForProductSelect"
               placeholder="请输入关键字搜索产品"
               multiple>
               <div class="product-template-option" slot="option" slot-scope="{ option }">

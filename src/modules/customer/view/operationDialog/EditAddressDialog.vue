@@ -69,9 +69,6 @@ export default {
       return this.action === 'create' ? '添加地址' : '编辑地址';
     }
   },
-  created () {
-    console.log('defaultAddress', this.defaultAddress)
-  },
   methods: {
     reset() {
       this.form = {

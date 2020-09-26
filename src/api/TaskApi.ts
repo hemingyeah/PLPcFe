@@ -3,6 +3,7 @@ import {
   TaskCreateAndEditModel,
   PlanTaskCreateAndEditModel,
 } from "@model/param/in/Task";
+import GrayUtil from '@src/util/gray';
 
 const fixedPrefixTaskPath = '/api/task';
 const ElASTICSEARCH = '/api/elasticsearch';
@@ -130,7 +131,8 @@ export function getTaskDefaultInfo(params: {} | undefined) {
  * @param {String} params.id -- 产品id
  */
 export function getCustomerByProduct(params: {} | undefined) {
-  return http.get("/customer/product/detail/data", params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/detail/data`, params);
 }
 
 /**
