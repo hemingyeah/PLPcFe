@@ -22,6 +22,8 @@ import { formatDate } from "@src/util/lang";
 import { getRootWindow } from "@src/util/dom";
 
 /* constants */
+import { AllotTypeConvertMap, FlagConvertMap, TaskSearchInputPlaceholderMap } from '@src/modules/task/model/TaskConvertMap.ts';
+
 const TASK_LIST_KEY = "task_list";
 // 埋点事件对象
 const TRACK_EVENT_MAP = {
@@ -48,28 +50,6 @@ const TASK_SELF_FIELD_NAMES = [
 ];
 // 导出过来字段类型
 const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
-// 派单方式 数据转换
-const AllotTypeConvertMap = {
-  '全部': 0,
-  '手动派单': 1,
-  '工单池派单': 2,
-  '自动派单': 3
-}
-// 工单标记 数据转换
-const FlagConvertMap = {
-  '不筛选': '',
-  '曾超时': 'ONCEOVERTIME',
-  '曾拒绝': 'ONCEREFUSED',
-  '曾暂停': 'ONCEPAUSED',
-  '曾回退': 'ONCEROLLBACK',
-  '位置异常': 'POSITIONEXCEPTION'
-}
-
-const TaskSearchInputPlaceholderMap = {
-  default: '请输入工单编号或工单信息',
-  '按工单备注': '请输入工单备注内容',
-  '按附加组件': '请输入附加组件字段值'
-}
 
 export default {
   name: "task-list",
@@ -1685,6 +1665,8 @@ export default {
             cusDist: dist,
           };
         }
+        // 系统字段查询条件
+        const { systemConditions = [] } = params
         // 自定义
         const conditions = params.conditions || [];
         const paymentMethod = params.paymentMethod
@@ -1902,6 +1884,7 @@ export default {
           allotUserIds: params.allotUser,
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
+          systemConditions
         };
         
         // 工单搜索分类型

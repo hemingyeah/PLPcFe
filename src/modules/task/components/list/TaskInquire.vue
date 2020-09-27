@@ -20,25 +20,22 @@ import SearchProductSelect from './SearchProductSelect.vue';
 import SearchCustomerSelect from './SearchCustomerSelect.vue';
 import { typeOf } from '@src/util/assist';
 
+const TaskInquireFiltersFieldNames = ['cusAddress', 'area', 'tags']
 const OperatorSelectOptionsMap = {
   'input': [
-    { label: '包含', value: 'like'},
+    { label: '包含', value: 'contain'},
     { label: '等于', value: 'eq'},
-    { label: '大于', value: 'lt'},
-    { label: '大于等于', value: 'wa'},
-    { label: '小于', value: 'hh'},
-    { label: '小于等于', value: 'lp'}
+    { label: '大于', value: 'gt'},
+    { label: '大于等于', value: 'ge'},
+    { label: '小于', value: 'lt'},
+    { label: '小于等于', value: 'le'}
   ],
   'text': [    
-    { label: '包含', value: 'like'},
+    { label: '包含', value: 'contain'},
     { label: '等于', value: 'eq'}
   ],
   'date': [
-    { label: '等于', value: 'eq'},
-    { label: '大于', value: 'lt'},
-    { label: '大于等于', value: 'wa'},
-    { label: '小于', value: 'hh'},
-    { label: '小于等于', value: 'lp'}
+    { label: '介于', value: 'between'}
   ],
   'select': [
     { label: '等于', value: 'eq'}
@@ -50,6 +47,9 @@ function setFieldOperateHandler(field = {}) {
 
   if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice()
+  }
+  else if (fieldName == 'customer' || fieldName == 'product') {
+    field.operatorOptions = OperatorSelectOptionsMap.select.slice()
   }
   else if (formType == 'text' || formType == 'textarea') {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice()
@@ -90,7 +90,9 @@ export default {
       const searchField = localStorage.getItem('task-search-field')
       let f = {};
       let fields = [...this.config]
-        .filter((f) => f.isSearch)
+        .filter((f) => {
+          return f.isSearch && TaskInquireFiltersFieldNames.indexOf(f.fieldName) < 0
+        })
         .map((field) => {
           f = _.cloneDeep(field);
 
@@ -106,13 +108,14 @@ export default {
 
           setFieldOperateHandler(f)
 
-          return Object.freeze({
+          return {
             ...f,
             isNull: 1,
             formType,
             originalFormType: f.formType,
             operator: this.matchOperator(f),
-          });
+          };
+
         })
         .sort((a, b) => a.orderId - b.orderId);
       return fields;
@@ -123,7 +126,7 @@ export default {
       let data = {}
       this.$refs.batchForm.forEach(item => {
         for(let key in item.returnDatas()) {
-          if (typeOf(item.returnDatas()[key]) === 'string' && item.returnDatas()[key] ) {
+          if (item.returnDatas()[key] ) {
             data[key] = item.returnDatas()[key]
           }
           if (key === 'tags' && item.returnDatas()[key].length) {
@@ -132,6 +135,15 @@ export default {
         }
       })
       return data
+    },
+    returnInquireFields() {
+      let inquireFields = []
+
+      this.$refs.batchForm.forEach(batchFormEl => {
+        inquireFields.push(batchFormEl.selectedField)
+      })
+
+      return inquireFields
     },
     matchOperator(field) {
       let formType = field.formType;
@@ -285,7 +297,9 @@ export default {
         selectField(val) {
           this.selectedField = this.fields.filter(
             (f) => f.fieldName === val
-          )[0];  
+          )[0];
+
+          this.form[val] = val == 'tags' ? [] : ''
         },
         renderSelector() {
           if (!this.fields) return null
