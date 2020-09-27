@@ -293,11 +293,11 @@ export default {
       options: [
         {
           label: "上架全部备件和服务项目",
-          value: false,
+          value: true,
         },
         {
           label: "仅显示选择的备件和服务项目",
-          value: true,
+          value: false,
         },
       ],
       options_value: 1,
