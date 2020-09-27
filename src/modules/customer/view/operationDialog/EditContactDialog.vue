@@ -283,7 +283,8 @@ export default {
       this.createOriginalValue = createOriginalValue;
 
       this.fetchAddress();
-      this.action === 'edit' ? this.fetchEditProducts() : this.fetchProducts();
+      // this.action === 'edit' ? this.fetchEditProducts() : this.fetchProducts();
+      this.fetchProducts();
       this.init = true;
     },
     matchValueToForm(val) {

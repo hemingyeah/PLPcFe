@@ -9,5 +9,13 @@
 </head>
 <body>
   <div id="app"></div>
+
+  <script>
+    const hasRemove=localStorage.getItem('remove_worktime_time');
+    if(!hasRemove){
+      localStorage.removeItem('shb_pc_setting');
+      localStorage.setItem('remove_worktime_time',1);
+    }
+  </script>
 </body>
 </html>

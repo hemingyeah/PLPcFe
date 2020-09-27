@@ -370,7 +370,7 @@
               :label="column.label"
               :width="column.width"
             >
-              <template slot-scope="scope" >{{repertoryCount(scope.row.repertoryCount, scope.row.applyBacking)}} </template>
+              <template slot-scope="scope" >{{Number(repertoryCount(scope.row.repertoryCount, scope.row.applyBacking))}} </template>
             </el-table-column>
 
             <!-- 不可用数量 -->

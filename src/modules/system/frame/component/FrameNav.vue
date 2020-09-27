@@ -22,6 +22,7 @@
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
                 <i class="iconfont icon-nav-down" v-if="menu.children && menu.children.length > 0"></i>
+                <i class="red-dot" id="worktime_dot" v-if="menu.menuKey==='M_SYSTEM' && worktimeNoEnter"></i>
               </template>
             </a>
 
@@ -50,6 +51,7 @@ import MenuIcon from '../model/MenuIcon';
 
 import Logo from '@src/assets/img/logo.png';
 import MiniLogo from '@src/assets/svg/logo.svg';
+import { storageGet } from '@src/util/storage';
 export default {
   name: 'frame-nav',
   props: {
@@ -75,7 +77,8 @@ export default {
       menus,
       menuIcon: MenuIcon,
       currMenu: null,
-      bodyHeight: 0
+      bodyHeight: 0,
+      worktimeNoEnter:true
     };
   },
   computed: {
@@ -225,6 +228,10 @@ export default {
   mounted() {
     this.setMenuOffsetData();
     this.registerResizeListener();
+    const hasEntered=storageGet('worktime_guid');
+    if(hasEntered){
+      this.worktimeNoEnter=false;
+    }
   },
   watch: {
     callcenter: {
@@ -353,6 +360,14 @@ export default {
     i.icon-nav-down{
       margin-right: 15px;
       font-size: 12px;
+    }
+
+    i.red-dot{
+      margin-right: 15px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: red;
     }
   }
 }
