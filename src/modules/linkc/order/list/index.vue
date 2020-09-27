@@ -546,7 +546,7 @@ export default {
           field: "goodsInfos",
           conType: "goods",
           show: true,
-          width: "450px",
+          minWidth: "450px",
         },
         {
           label: "订单号",
@@ -563,11 +563,13 @@ export default {
         {
           label: "实付金额",
           field: "payAmount",
+          width: "140px",
           show: true,
         },
         {
           label: "订单状态",
           field: "logisticsState",
+          width: "100px",
           show: true,
         },
         {
