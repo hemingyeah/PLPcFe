@@ -1070,7 +1070,14 @@ export function getUserViews(params: object) {
  * @description 获取附件
  */
 export function getCardDetailList(params: object) {
-  return http.get(`${fixedPrefixTaskPath}/task/getCardDetailList`, params);
+  return http.get(`/task/getCardDetailList`, params);
+}
+
+/**
+ * @description 查询一个视图
+ */
+export function getOneView(params: string) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getOneView/${params}`);
 }
 
 /* -------------  end  新工单api ---------------- */

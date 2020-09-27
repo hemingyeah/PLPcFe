@@ -10,15 +10,15 @@
           id=""
           maxlength="6"
           v-model="view.viewName"
-          placeholder="请输入视图"
+          placeholder="请输入视图名称"
         />
       </div>
       <!-- 按钮 -->
       <el-checkbox v-model="checked">全员可见</el-checkbox>
       <div class="task-flex task-ai task-jend">
-          <el-button type="danger" @event="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button>
+          <el-button type="danger" @click="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button>
           <el-button @click="visible = false">取消</el-button>
-          <el-button type="primary" @event="saveViewBtn"
+          <el-button type="primary" @click="saveViewBtn"
           >保存</el-button>
       </div>
     </div>
@@ -67,6 +67,10 @@ export default {
     saveViewBtn() {
       const { view, region, checked, isViewModel } = this;
 
+      if (!view.viewName) {
+        this.$platform.alert("请输入视图名称");
+        return
+      }
       view.viewRegion = checked ? "所有用户" : "只有我";
 
       const params = {
@@ -81,10 +85,13 @@ export default {
         });
         return;
       }
+      let searchModel = region.searchModel
+      searchModel['timeStart'] = searchModel.createTimeStart
+      searchModel['timeEnd'] = searchModel.createTimeEnd
       // 保存
       TaskApi.createView({
         ...view,
-        searchModel: region.searchModel,
+        searchModel,
         selectedCols: region.selectedCols
       }).then((res) => {
         this.success(res);

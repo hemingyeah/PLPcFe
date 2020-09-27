@@ -36,9 +36,10 @@
                       <span class="task-list-dropdown-item">{{
                         item.name
                       }}</span>
-                      <i class="iconfont icon-yanjing task-font12"></i>
+                      <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id)"></i>
                       <i
                         class="iconfont icon-bianji1 task-ml12 task-font12"
+                        @click="editView"
                         v-if="
                           initData.loginUser &&
                             item.id === initData.loginUser.userId
@@ -46,6 +47,7 @@
                       ></i>
                       <i
                         class="iconfont icon-shanchu-copy task-ml12 task-font12"
+                        @click="editView"
                         v-if="
                           initData.loginUser &&
                             item.id === initData.loginUser.userId
@@ -106,7 +108,7 @@
         <div class="task-list-header-nav">
           <div class="task-flex task-ai">
             <div class="task-font14 task-c6 state">工单状态：</div>
-            <div class="list">
+            <div class="list" :style="`width: ${navWidth}px`">
               <div
                 class="list-item task-flex task-ai"
                 :style="`width:${8 * 130}px`"
@@ -270,7 +272,7 @@
           <!-- 创建 -->
           <div class="task-flex task-ai">
             <div class="task-font14 task-c6 state">创建视角：</div>
-            <div class="list list-crate">
+            <div class="list list-crate" :style="`width: ${navWidth}px`">
               <div class="list-item task-flex task-ai">
                 <div
                   v-for="(item, index) in selectList"
@@ -292,7 +294,7 @@
             <div class="task-font14 task-c6 state">
               工单类型：
             </div>
-            <div class="list">
+            <div class="list" :style="`width: ${navWidth}px`">
               <div
                 class="list-item task-flex task-ai"
                 :style="`width:${taskTypes.length * 130}px`"
@@ -465,7 +467,7 @@
           <span class="task-c2" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
-        <div class="task-list-section common-list-table-view">
+        <div class="task-list-section common-list-table-view" v-if="columns.length">
           <el-table
             stripe
             :data="taskPage.list"
@@ -487,7 +489,6 @@
               align="center"
               class-name="select-column"
             ></el-table-column>
-
             <el-table-column
               v-for="column in columns"
               v-if="column.show"
@@ -851,7 +852,7 @@
       <batch-editing-customer-dialog
         ref="batchEditingCustomerDialog"
         :config="{
-          fields: taskFieldList,
+          fields: columns,
           currentTaskType: currentTaskType,
         }"
         :selectedIds="selectedIds"
@@ -880,6 +881,8 @@
       :config="{ selectedIds: selectedIds, searchParams: searchParams }"
     />
     <!-- E 地图预览 -->
+    <!-- 视图展示 -->
+    <task-view ref="taskView" />
   </div>
 </template>
 
