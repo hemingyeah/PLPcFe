@@ -29,7 +29,7 @@ export function getDocumentList (params) {
  * 
  * @returns Promise<Object>
  */
-export function getDocumentViewCount () {
+export function getDocumentViewCount() {
   return http.get(`${ prefixAppPath }/outside/wiki/viewCount`);
 }
 
@@ -38,7 +38,7 @@ export function getDocumentViewCount () {
  * 
  * @returns Promise<Object>
  */
-export function getDocumentTypes () {
+export function getDocumentTypes() {
   return http.get(`${ prefixAppPath }/outside/wiki/types`);
 }
 
@@ -50,7 +50,7 @@ export function getDocumentTypes () {
  * 
  * @returns Promise<Boolean>
  */
-export function addDocumentType (params) {
+export function addDocumentType(params) {
   return http.post(`${ prefixAppPath }/outside/wiki/type/create`, params);
 }
 
@@ -63,7 +63,7 @@ export function addDocumentType (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function updateDocumentType (params) {
+export function updateDocumentType(params) {
   return http.post(`${ prefixAppPath }/outside/wiki/type/update`, params);
 }
 
@@ -73,7 +73,7 @@ export function updateDocumentType (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function deleteDocumentType (typeId) {
+export function deleteDocumentType(typeId) {
   return http.get(`${ prefixAppPath }/outside/wiki/type/delete`, typeId);
 }
 
@@ -83,7 +83,7 @@ export function deleteDocumentType (typeId) {
  * 
  * @returns Promise<List>
  */
-export function getTypesCount (params) {
+export function getTypesCount(params) {
   return http.get(`${ prefixAppPath }/outside/wiki/typesCount`, params);
 }
 
@@ -113,7 +113,7 @@ export function getInlineDetail (wikiId) {
  * 
  * @returns Promise<Object>
  */
-export function deleteDocument (wikiId) {
+export function deleteDocument(wikiId) {
   return http.get(`${ prefixAppPath }/outside/wiki/delete`, wikiId);
 }
 
@@ -125,7 +125,7 @@ export function deleteDocument (wikiId) {
  * 
  * @returns Promise<List>
  */
-export function getRecord (params) {
+export function getRecord(params) {
   return http.get(`${ prefixAppPath }/outside/wiki/record/list`, params);
 }
 
@@ -143,7 +143,7 @@ export function getRecord (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function saveDraft (params) {
+export function saveDraft(params) {
   return http.post(`${ prefixAppPath }/outside/wiki/draft/save`, params);
 }
 
@@ -160,7 +160,7 @@ export function saveDraft (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function saveAndSumbit (params) {
+export function saveAndSumbit(params) {
   return http.post(`${ prefixAppPath }/outside/wiki/submit`, params);
 }
 
@@ -170,7 +170,7 @@ export function saveAndSumbit (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function approveSetting (state) {
+export function approveSetting(state) {
   return http.get(`${ prefixAppPath }/outside/wiki/setting/approve`, state)
 }
 
@@ -180,15 +180,20 @@ export function approveSetting (state) {
  * 
  * @returns Promise<Boolean>
  */
-export function shareSetting (state) {
+export function shareSetting(state) {
   return http.get(`${ prefixAppPath }/outside/wiki/setting/share`, state)
 }
 
 /**
  * 分享接口-推送钉钉工作通知使用协同人选人框，推送给人
  */
-export function shareDocument (wikiId, params) {
+export function shareDocument(wikiId, params) {
   return http.post(`${ prefixAppPath }/outside/wiki/share?wikiId=${ wikiId }`, params)
+}
+
+
+export function releaseCircle(params) {
+  return http.post(`${ prefixAppPath }/outside/wiki/releaseCircle`, params);
 }
 
 /**
@@ -198,7 +203,7 @@ export function shareDocument (wikiId, params) {
  * 
  * @returns Promise<Boolean>
  */
-export function createApprove (params) {
+export function createApprove(params) {
   return http.post(`${ prefixAppPath }/outside/approve/create`, params)
 }
 
@@ -211,7 +216,7 @@ export function createApprove (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function operateApprove (params) {
+export function operateApprove(params) {
   return http.post(`${ prefixAppPath }/outside/approve/operate`, params)
 }
 
@@ -222,7 +227,7 @@ export function operateApprove (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function getApprove (params) {
+export function getApprove(params) {
   return http.get(`${ prefixAppPath }/outside/approve/pending`, params)
 }
 
@@ -231,7 +236,7 @@ export function getApprove (params) {
  * @param {Object} params 
  * @param {String} params.id - 审批id
  */
-export function revoke (params) {
+export function revoke(params) {
   return http.post(`${ prefixAppPath }/outside/approve/revoke`, params)
 }
 
@@ -239,7 +244,7 @@ export function revoke (params) {
  * 获取外部分享链接
  * @param {String} originalUrl - 原始拼接链接
  */
-export function getShareLink (originalUrl) {
+export function getShareLink(originalUrl) {
   return http.get(`${ prefixAppPath }/outside/wiki/short/url?originalUrl=${ originalUrl }`)
 }
 
@@ -258,7 +263,7 @@ export function getShareLink (originalUrl) {
  * 
  * @returns Promise<List>
  */
-export function getBulletinList (params) {
+export function getBulletinList(params) {
   return http.post(`${ prefixSearchPath }/outside/es/notice/search`, params);
   // return http.post('/api/search/outside/es/notice/search', params);
 }
@@ -269,7 +274,7 @@ export function getBulletinList (params) {
  * 
  * @returns Promise<Object>
  */
-export function getBulletinTypes () {
+export function getBulletinTypes() {
   return http.get(`${ prefixAppPath }/outside/noticeType/types`);
 }
 
@@ -280,7 +285,7 @@ export function getBulletinTypes () {
  * 
  * @returns Promise<Boolean>
  */
-export function addBulletinType (params) {
+export function addBulletinType(params) {
   return http.post(`${ prefixAppPath }/outside/noticeType/create`, params);
 }
 
@@ -291,7 +296,7 @@ export function addBulletinType (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function updateBulletinType (params) {
+export function updateBulletinType(params) {
   return http.post(`${ prefixAppPath }/outside/noticeType/update`, params);
 }
 
@@ -301,7 +306,7 @@ export function updateBulletinType (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function deleteBulletinType (typeId) {
+export function deleteBulletinType(typeId) {
   return http.get(`${ prefixAppPath }/outside/noticeType/delete`, typeId);
 }
 
@@ -310,7 +315,7 @@ export function deleteBulletinType (typeId) {
  * 
  * @returns Promise<List>
  */
-export function getBulletinTypesCount () {
+export function getBulletinTypesCount() {
   return http.get(`${ prefixAppPath }/outside/notice/typesCount`);
 }
 
@@ -320,7 +325,7 @@ export function getBulletinTypesCount () {
  * 
  * @returns Promise<Object>
  */
-export function getBulletinDetail (noticeId) {
+export function getBulletinDetail(noticeId) {
   return http.get(`${ prefixAppPath }/outside/notice/get`, noticeId);
 }
 
@@ -330,7 +335,7 @@ export function getBulletinDetail (noticeId) {
  * 
  * @returns Promise<Object>
  */
-export function deleteBulletin (noticeId) {
+export function deleteBulletin(noticeId) {
   return http.get(`${ prefixAppPath }/outside/notice/delete`, noticeId);
 }
 
@@ -347,7 +352,7 @@ export function deleteBulletin (noticeId) {
  * 
  * @returns Promise<Boolean>
  */
-export function createBulletin (params) {
+export function createBulletin(params) {
   return http.post(`${ prefixAppPath }/outside/notice/create`, params);
 }
 
@@ -364,7 +369,7 @@ export function createBulletin (params) {
  * 
  * @returns Promise<Boolean>
  */
-export function updateBulletin (params) {
+export function updateBulletin(params) {
   return http.post(`${ prefixAppPath }/outside/notice/update`, params);
 }
 
@@ -374,7 +379,7 @@ export function updateBulletin (params) {
  * 
  * @returns Promise<Object>
  */
-export function getReadOrNotLatest (noticeId) {
+export function getReadOrNotLatest(noticeId) {
   return http.get(`${ prefixAppPath }/outside/noticeRead/latest`, noticeId);
 }
 
@@ -384,7 +389,7 @@ export function getReadOrNotLatest (noticeId) {
  * 
  * @returns Promise<Object>
  */
-export function getReadPerson (noticeId) {
+export function getReadPerson(noticeId) {
   return http.get(`${ prefixAppPath }/outside/noticeRead/read`, noticeId);
 }
 
@@ -394,6 +399,7 @@ export function getReadPerson (noticeId) {
  * 
  * @returns Promise<Object>
  */
-export function getUnreadPerson (noticeId) {
+export function getUnreadPerson(noticeId) {
   return http.get(`${ prefixAppPath }/outside/noticeRead/unread`, noticeId);
 }
+

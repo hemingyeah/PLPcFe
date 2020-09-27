@@ -18,7 +18,7 @@
               :href="menu.url ? menu.url : 'javascript:;'" 
               @click.prevent="open(menu)" 
               :class="{'': menu.active}"> 
-              <span class="frame-menu-icon"><i :class="['iconfont', menuIcon[menu.menuKey]]"></i></span>
+              <span class="frame-menu-icon"><i :class="['iconfont', menu.menuIcon]"></i></span>
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
                 <i class="iconfont icon-nav-down" v-if="menu.children && menu.children.length > 0"></i>
