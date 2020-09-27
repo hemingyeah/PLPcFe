@@ -8,9 +8,9 @@
           class="search-input"
           placeholder="搜索订单编号商品名称"
           v-model="searchModel.keyWord"
-          @keyup.enter.native="search"
+          @keyup.enter.native="searchModel.pageNum=1,search()"
         >
-          <el-button slot="append" @click="search">
+          <el-button slot="append" @click="searchModel.pageNum=1,search()">
             <i class="iconfont icon-search"></i>
           </el-button>
         </el-input>
@@ -55,7 +55,7 @@
                 value-format="yyyy-MM-dd"
               ></el-date-picker>
             </div>
-            <el-button class="mar-l-32" type="primary" @click="search">查询</el-button>
+            <el-button class="mar-l-32" type="primary" @click="searchModel.pageNum=1,search()">查询</el-button>
             <el-button @click="resetParams">重置</el-button>
           </div>
         </div>
