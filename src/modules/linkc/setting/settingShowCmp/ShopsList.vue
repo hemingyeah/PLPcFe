@@ -17,7 +17,7 @@
           :key="index"
           draggable="draggable"
         >
-          <div class="shops-list-item">
+          <div :class="['shops-list-item', index <= dataInfo.length -3 ? 'mar-b-5' : '']">
             <img
               :src="item.url ? `${item.url}?x-oss-process=image/resize,m_fill,h_165,w_142` : defaultImg"
               class="shops-list-item-img"
@@ -117,7 +117,6 @@ export default {
       // }
       display: flex;
       flex-direction: column;
-      margin-bottom: 5px;
       position: relative;
       border-radius: 2px;
       overflow: hidden;
