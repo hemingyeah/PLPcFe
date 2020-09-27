@@ -29,7 +29,6 @@
         <div></div>
         <div>
           您还未设置常用字段，快去试试吧
-          <span @click="guide = false" class="task-pointer">x</span>
         </div>
       </div>
       <!-- S 搜索条件 -->
@@ -49,11 +48,19 @@
           </div>
         <!-- 设置查询条件 -->
           <task-inquire 
+            v-if="taskInquireList.length"
+            ref="taskInquireParams" 
+            :columnNum="columnNum" 
+            :config="taskInquireList" 
+            @setting="_setting"
+          />
+        <task-inquire 
+          v-else
           ref="taskInquireParams" 
           :columnNum="columnNum" 
-          :config="taskInquireList || [...config, ...taskTypeFilterFields]" 
+          :config="[...config, ...taskTypeFilterFields]" 
           @setting="_setting"
-          />
+        />
         <!-- 搜索操作按钮 -->
         <slot name="footer"></slot>
       </el-form>

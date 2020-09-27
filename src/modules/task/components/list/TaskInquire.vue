@@ -127,8 +127,9 @@ export default {
         for(let key in item.returnDatas()) {
           if (typeOf(item.returnDatas()[key]) === 'string' && item.returnDatas()[key] ) {
             data[key] = item.returnDatas()[key]
-          }
-          if (key === 'tags' && item.returnDatas()[key].length) {
+          } else if(key === 'tags' && item.returnDatas()[key].length) {
+            data[key] = item.returnDatas()[key] 
+          } else {
             data[key] = item.returnDatas()[key] 
           }
         }

@@ -332,9 +332,7 @@
             native-type="submit"
             >搜索</base-button
           >
-          <base-button type="primary" @event="editView">{{
-            isViewModel === "默认" ? "保存视图" : "编辑视图"
-          }}</base-button>
+          <base-button type="primary" @event="editView">保存视图</base-button>
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->
