@@ -1,42 +1,94 @@
 <template>
-    <div>
-        <div v-for="(item, index) in list" :key="index">
-            <batch-form :fields="fields" :columnNum="columnNum" ref="batchForm" @add="add" @setting="setting" />
-        </div>
+  <div>
+    <div v-for="(item, index) in list" :key="index">
+      <batch-form :fields="fields" :column-num="columnNum" ref="batchForm" @add="add" @setting="setting" />
     </div>
+  </div>
 </template>
 
 <script>
-import { FormFieldMap, SettingComponents } from "@src/component/form/components";
+import { FormFieldMap, SettingComponents } from '@src/component/form/components';
 /* api */
-import * as TaskApi from "@src/api/TaskApi.ts";
-import * as CustomerApi from "@src/api/CustomerApi";
+import * as TaskApi from '@src/api/TaskApi.ts';
+import * as CustomerApi from '@src/api/CustomerApi';
 
 /* utils */
-import _ from "lodash";
-import * as Utils from "@src/component/form/util";
+import _ from 'lodash';
+import * as Utils from '@src/component/form/util';
 
-import SearchProductSelect from "./SearchProductSelect.vue";
-import SearchCustomerSelect from "./SearchCustomerSelect.vue";
+import SearchProductSelect from './SearchProductSelect.vue';
+import SearchCustomerSelect from './SearchCustomerSelect.vue';
 import { typeOf } from '@src/util/assist';
 
+const OperatorSelectOptionsMap = {
+  'input': [
+    { label: '包含', value: 'like'},
+    { label: '等于', value: 'eq'},
+    { label: '大于', value: 'lt'},
+    { label: '大于等于', value: 'wa'},
+    { label: '小于', value: 'hh'},
+    { label: '小于等于', value: 'lp'}
+  ],
+  'text': [    
+    { label: '包含', value: 'like'},
+    { label: '等于', value: 'eq'}
+  ],
+  'date': [
+    { label: '等于', value: 'eq'},
+    { label: '大于', value: 'lt'},
+    { label: '大于等于', value: 'wa'},
+    { label: '小于', value: 'hh'},
+    { label: '小于等于', value: 'lp'}
+  ],
+  'select': [
+    { label: '等于', value: 'eq'}
+  ]
+}
+
+function setFieldOperateHandler(field = {}) {
+  let { fieldName, formType } = field
+
+  if (formType == 'number') {
+    field.operatorOptions = OperatorSelectOptionsMap.input.slice()
+  }
+  else if (formType == 'text' || formType == 'textarea') {
+    field.operatorOptions = OperatorSelectOptionsMap.text.slice()
+  }
+  else if (formType == 'date' || formType == 'datetime') {
+    field.operatorOptions = OperatorSelectOptionsMap.date.slice()
+  }
+  else if (formType == 'select') {
+    field.operatorOptions = OperatorSelectOptionsMap.select.slice()
+  }
+  else {
+    field.operatorOptions = OperatorSelectOptionsMap.select.slice()
+  }
+
+  field.operatorValue = field.operatorOptions[0].value
+}
+
 export default {
-  name: "task-inquire",
+  name: 'task-inquire',
   props: {
     config: {
       type: Array,
       default: () => ({}),
     },
     columnNum: {
-        type: Number,
-        default: 1
+      type: Number,
+      default: 1
     },
   },
   data() {
     return {
+<<<<<<< HEAD
         list: [1],
         checkSystemList: [], //系统
         checkCustomizeList: [], //自定义
+=======
+      list: [1],
+      setting_list: []
+>>>>>>> 99ae839d6c975bb7c6fb14aec9c538383223ec67
     }
   },
   computed: {
@@ -50,13 +102,16 @@ export default {
 
           let formType = f.formType;
 
-          if (formType === "datetime") {
-            formType = "date";
+          if (formType === 'datetime') {
+            formType = 'date';
           }
 
-          if (formType === "updateTime") {
-            f.displayName = "更新时间";
+          if (formType === 'updateTime') {
+            f.displayName = '更新时间';
           }
+
+          setFieldOperateHandler(f)
+
           return Object.freeze({
             ...f,
             isNull: 1,
@@ -66,68 +121,69 @@ export default {
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
-        return fields;
+      return fields;
     },
   },
   methods: {
     returnData() {
-        let data = {}
-        this.$refs.batchForm.forEach(item => {
-           for(let key in item.returnDatas()) {
-               if (typeOf(item.returnDatas()[key]) === 'string' && item.returnDatas()[key] ) {
-                data[key] = item.returnDatas()[key]
-               }
-               if (key === 'tags' && item.returnDatas()[key].length) {
-                  data[key] = item.returnDatas()[key] 
-               }
-           }
-        })
-        return data
+      let data = {}
+      this.$refs.batchForm.forEach(item => {
+        for(let key in item.returnDatas()) {
+          if (typeOf(item.returnDatas()[key]) === 'string' && item.returnDatas()[key] ) {
+            data[key] = item.returnDatas()[key]
+          }
+          if (key === 'tags' && item.returnDatas()[key].length) {
+            data[key] = item.returnDatas()[key] 
+          }
+        }
+      })
+      return data
     },
     matchOperator(field) {
       let formType = field.formType;
-      let operator = "";
+      let operator = '';
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case 'date': {
+        operator = 'between';
+        break;
+      }
+      case 'datetime': {
+        operator = 'between';
+        break;
+      }
+      case 'select': {
+        if (field.setting && field.setting.isMulti) {
+          operator = 'contain';
+        } else {
+          operator = 'eq';
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case 'user': {
+        operator = 'user';
+        break;
+      }
+      case 'address': {
+        operator = 'address';
+        break;
+      }
+      case 'location': {
+        operator = 'location';
+        break;
+      }
+      default: {
+        operator = 'like';
+        break;
+      }
       }
       return operator;
     },
     add() {
-        this.list.push(1)
+      this.list.push(1)
     },
     setting(item) {
+<<<<<<< HEAD
         if (item.isSystem) {
             this.checkSystemList.push(item.displayName)
         } else {
@@ -138,27 +194,37 @@ export default {
         const check_customize_list = new Set(this.checkCustomizeList)
         const list = [...check_system_list, ...check_customize_list]
         this.$emit('setting', {item, list, check_system_list, check_customize_list})
+=======
+      this.setting_list.push(item.displayName)
+
+      const set_list = new Set(this.setting_list)
+      const list = []
+      for(let key of set_list) {
+        list.push(key)
+      }
+      this.$emit('setting', {item, list})
+>>>>>>> 99ae839d6c975bb7c6fb14aec9c538383223ec67
     }
   },
   components: {
     BatchForm: {
-      name: "batch-form",
+      name: 'batch-form',
       props: {
         fields: {
           type: Array,
           default: () => [],
         },
         columnNum: {
-            type: Number,
-            default: 1
+          type: Number,
+          default: 1
         }
       },
       data: () => {
         return {
           selectedField: {},
-            customer: {},
-            form: {},
-            product: {},
+          customer: {},
+          form: {},
+          product: {},
         };
       },
       mounted() {
@@ -167,12 +233,12 @@ export default {
       },
       methods: {
         returnDatas() {
-            let data = Object.assign({}, this.form);
-            data.backUp = {
-                customer: this.customer,
-                product: this.product,
-            };
-            return data;
+          let data = Object.assign({}, this.form);
+          data.backUp = {
+            customer: this.customer,
+            product: this.product,
+          };
+          return data;
         },
         reset() {
           this.form = {};
@@ -183,58 +249,57 @@ export default {
           this.form = Utils.initialize(this.fields);
 
           this.fields.forEach((f) => {
-            if (f.fieldName === "tags" && f.formType === "select") {
+            if (f.fieldName === 'tags' && f.formType === 'select') {
               this.form[f.fieldName] = [];
             }
           });
         },
         searchCustomer(params) {
-        const pms = params || {};
+          const pms = params || {};
 
-        return CustomerApi.getCustomerListAsyn(pms)
+          return CustomerApi.getCustomerListAsyn(pms)
             .then((res) => {
-            if (!res || !res.list) return;
+              if (!res || !res.list) return;
 
-            res.list = res.list.map((custoner) =>
+              res.list = res.list.map((custoner) =>
                 Object.freeze({
-                label: custoner.name,
-                value: custoner.id,
-                ...custoner,
+                  label: custoner.name,
+                  value: custoner.id,
+                  ...custoner,
                 })
-            );
-            return res;
+              );
+              return res;
             })
             .catch((e) => console.error(e));
         },
         searchProduct(params) {
-        const pms = params || {};
+          const pms = params || {};
 
-        pms.customerId = this.form.customer || "";
-        return TaskApi.getTaskCustonerProductList(pms)
+          pms.customerId = this.form.customer || '';
+          return TaskApi.getTaskCustonerProductList(pms)
             .then((res) => {
-            if (!res || !res.list) return;
-            res.list = res.list.map((product) =>
+              if (!res || !res.list) return;
+              res.list = res.list.map((product) =>
                 Object.freeze({
-                label: product.name,
-                value: product.id,
-                ...product,
+                  label: product.name,
+                  value: product.id,
+                  ...product,
                 })
-            );
-            return res;
+              );
+              return res;
             })
             .catch((e) => console.error(e));
         },
         update(event, action) {
-        if (action === "tags") {
+          if (action === 'tags') {
             return (this.form.tags = event);
-        }
+          }
 
-        if (action === "dist") {
+          if (action === 'dist') {
             return (this.form.area = event);
-        }
-        const f = event.field;
-        this.form[f.fieldName] = event.newValue;
-        console.log(event.newValue)
+          }
+          const f = event.field;
+          this.form[f.fieldName] = event.newValue;
         },
         selectField(val) {
           this.selectedField = this.fields.filter(
@@ -242,159 +307,186 @@ export default {
           )[0];  
         },
         renderSelector() {
-          if (!this.fields) return null;
+          if (!this.fields) return null
+
           return (
             <el-select
-                value={this.selectedField.fieldName}
-                onChange={this.selectField}
-                >
-                {this.fields.map((f) => (
-                    <el-option
+              value={this.selectedField.fieldName}
+              onChange={this.selectField}
+            >
+              {
+                this.fields.map((f) => (
+                  <el-option
                     key={f.fieldName}
                     label={f.displayName}
                     value={f.fieldName}
-                    ></el-option>
-                ))}
+                  ></el-option>
+                ))
+              }
             </el-select>
-          );
+          )
+        },
+        renderOperateSelect() {
+          if (!this.selectedField.operatorOptions) return
+
+          return (
+            <el-select 
+              class='task-inquire-operator-select'
+              value={ this.selectedField.operatorValue }
+              onInput={ value => this.selectedField.operatorValue = value }
+            >
+              {
+                this.selectedField.operatorOptions.map((operatorItem) => (
+                  <el-option 
+                    key={ operatorItem.value }
+                    label={ operatorItem.label }
+                    value={ operatorItem.value }
+                  >
+                  </el-option>
+                ))
+              }
+            </el-select>
+          )
         },
         renderInput(h) {
           const f = this.selectedField;
           const comp = FormFieldMap.get(f.formType);
-            if (!comp || f.formType === "area") {
-                return null;
-            }
+          if (!comp || f.formType === 'area') {
+            return null;
+          }
 
-            if (f.formType === "select") {
-                f.setting.isMulti = false;
-            }
+          if (f.formType === 'select') {
+            f.setting.isMulti = false;
+          }
 
-            let childComp = null;
+          let childComp = null;
 
-            if (f.fieldName == "customer") {
-                let value = this.form[f.fieldName];
-                childComp = h("search-customer-select", {
+          if (f.fieldName == 'customer') {
+            let value = this.form[f.fieldName];
+            childComp = h('search-customer-select', {
+              props: {
+                placeholder: '请选择客户',
+                field: f,
+                value: value ? [{ label: this.customer.name || '', value }] : [],
+                remoteMethod: this.searchCustomer,
+              },
+              on: {
+                input: (event) => {
+                  this.customer = event && event.length > 0 ? event[0] : {};
+                  this.form[f.fieldName] = this.customer.id;
+                },
+              },
+            });
+          } else if (f.fieldName == 'product') {
+            let value = this.form[f.fieldName];
+            childComp = h('search-product-select', {
+              props: {
+                placeholder: '请选择产品',
+                field: f,
+                value: value ? [{ label: this.product.name || '', value }] : [],
+                remoteMethod: this.searchProduct,
+              },
+              on: {
+                input: (event) => {
+                  this.product = event && event.length > 0 ? event[0] : {};
+                  this.form[f.fieldName] = this.product.id;
+                },
+              },
+            });
+          } else if (f.formType === 'user') {
+            childComp = h('user-search', {
+              props: {
+                field: f,
+                value: this.form[f.fieldName],
+                disableMap: true,
+              },
+              on: {
+                update: (event) => this.update(event),
+                input: (event) => {
+                  if (event && event.length > 1) {
+                    this.$set(this, 'product', event[0]);
+                  }
+                  // this.form[f.fieldName] = event.keyword;
+                },
+              },
+            });
+          } else if (f.fieldName === 'tags') {
+            let value = this.form[f.fieldName];
+            childComp = h('biz-team-select', {
+              props: {
+                value: value ? value : [],
+              },
+              on: {
+                input: (event) => this.update(event, 'tags'),
+              },
+            });
+          } else if (f.fieldName === 'tlmName') {
+            childComp = h('linkman-search', {
+              props: {
+                field: f,
+                value: this.form[f.fieldName],
+                disableMap: true,
+              },
+              on: {
+                update: (event) => this.update(event),
+              },
+            });
+          } else {
+            childComp = h(
+              comp.extend && comp.extend[`${f.formType}_search`]
+                ? comp.extend[`${f.formType}_search`]
+                : comp.build,
+              {
                 props: {
-                    placeholder: "请选择客户",
-                    field: f,
-                    value: value ? [{ label: this.customer.name || "", value }] : [],
-                    remoteMethod: this.searchCustomer,
+                  field: f,
+                  value: this.form[f.fieldName],
+                  disableMap: true,
+                  placeholder: Utils.genPlaceholder(f),
+                  seo: true
                 },
                 on: {
-                    input: (event) => {
-                    this.customer = event && event.length > 0 ? event[0] : {};
-                    this.form[f.fieldName] = this.customer.id;
-                    },
+                  update: (event) => this.update(event),
                 },
-                });
-            } else if (f.fieldName == "product") {
-                let value = this.form[f.fieldName];
-                childComp = h("search-product-select", {
-                props: {
-                    placeholder: "请选择产品",
-                    field: f,
-                    value: value ? [{ label: this.product.name || "", value }] : [],
-                    remoteMethod: this.searchProduct,
-                },
-                on: {
-                    input: (event) => {
-                    this.product = event && event.length > 0 ? event[0] : {};
-                    this.form[f.fieldName] = this.product.id;
-                    },
-                },
-                });
-            } else if (f.formType === "user") {
-                childComp = h("user-search", {
-                props: {
-                    field: f,
-                    value: this.form[f.fieldName],
-                    disableMap: true,
-                },
-                on: {
-                    update: (event) => this.update(event),
-                    input: (event) => {
-                    if (event && event.length > 1) {
-                        this.$set(this, "product", event[0]);
-                    }
-                    // this.form[f.fieldName] = event.keyword;
-                    },
-                },
-                });
-            } else if (f.fieldName === "tags") {
-                let value = this.form[f.fieldName];
-                childComp = h("biz-team-select", {
-                props: {
-                    value: value ? value : [],
-                },
-                on: {
-                    input: (event) => this.update(event, "tags"),
-                },
-                });
-            } else if (f.fieldName === "tlmName") {
-                childComp = h("linkman-search", {
-                props: {
-                    field: f,
-                    value: this.form[f.fieldName],
-                    disableMap: true,
-                },
-                on: {
-                    update: (event) => this.update(event),
-                },
-                });
-            } else {
-                childComp = h(
-                comp.extend && comp.extend[`${f.formType}_search`]
-                    ? comp.extend[`${f.formType}_search`]
-                    : comp.build,
-                {
-                    props: {
-                    field: f,
-                    value: this.form[f.fieldName],
-                    disableMap: true,
-                    placeholder: Utils.genPlaceholder(f),
-                    seo: true
-                    },
-                    on: {
-                    update: (event) => this.update(event),
-                    },
-                }
-                );
-            }
-            return h(
-                "form-item",
-                {
-                props: {
-                    label: f.displayName,
-                    needValidate: false,
-                },
-                },
-                [childComp]
+              }
             );
+          }
+          return h(
+            'form-item',
+            {
+              props: {
+                label: f.displayName,
+                needValidate: false,
+              },
+            },
+            [childComp]
+          );
 
         },
       },
       render(h) {
         return (
-         <div>
+          <div>
             <div class={this.columnNum === 2 ? 'task-flex task-ai task-mt12' : 'task-mt12'}>
-            <div>
-            {this.renderSelector()}
+              <div>
+                { this.renderSelector() }
+                { this.renderOperateSelect() }
+              </div>
+              
+              <div class={this.columnNum === 2 ? 'task-inquire-two task-flex task-ai' : 'task-inquire task-flex task-ai'}>
+                {this.renderInput(h)}
+                <div class="task-font14 task-c13 task-inquire-add task-ml15 task-pointer" onClick={() => {
+                  this.$emit('add')
+                }}>添加</div>
+              </div>
+
             </div>
-                {/*<div class="task-inquire">
-                    <el-select
-                    >
-                    </el-select>
-                </div>*/}
-                <div class={this.columnNum === 2 ? 'task-inquire-two task-flex task-ai' : 'task-inquire task-flex task-ai'}>
-                    {this.renderInput(h)}
-                    <div class="task-font14 task-c13 task-inquire-add task-ml15 task-pointer" onClick={() => {
-                        this.$emit('add')
-                    }}>添加</div>
-                </div>
-            </div>
+
             <div class="task-font14 task-c2 task-mt15 task-pointer" onClick={() => {
-                this.$emit('setting', this.selectedField)
-            }}>设为常用搜索字段</div>
+              this.$emit('setting', this.selectedField)
+            }}>
+              设为常用搜索字段
+            </div>
+            
           </div>
         );
       },
@@ -461,5 +553,9 @@ export default {
     display: flex;
     justify-content: flex-end;
   }
+}
+
+.task-inquire-operator-select {
+  margin-left: 12px;
 }
 </style>

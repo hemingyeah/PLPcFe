@@ -188,14 +188,16 @@ const BizSelectColumn = {
      * @description 字段排序列表合并
     */
     columnSortListMerge(checked, field, parent, sortList) {
-      let { templateGroup = {}, templateIndex = 0 } = this.columnSortListGetGroup(sortList, parent)
+      let { templateGroup = {}, templateIndex } = this.columnSortListGetGroup(sortList, parent)
       let templateColumns = templateGroup.lists || []
 
       checked
         ? templateColumns.push(convertDisplayNameToName(field))
         : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
-      
-      this.$set(this.columnSortList, templateIndex, { ...templateGroup, lists: templateColumns })
+      // 未找到类型
+      templateIndex == -1 
+        ? this.columnSortList.push({ name: parent.name, lists: [convertDisplayNameToName(field)] })
+        : this.$set(this.columnSortList, templateIndex, { ...templateGroup, lists: templateColumns })
     },
     /** 
      * @description 字段排序列表添加字段列

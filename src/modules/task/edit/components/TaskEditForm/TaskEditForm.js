@@ -745,6 +745,9 @@ export default {
         console.warn('task-edit-form: updateProduct -> error', error);
       }
     },
+    updateProductForProductSelect(value = []) {
+      this.updateProduct(value, { isForceUpdateCustomer: true })
+    },
     /** 
      * @description 效验
     */

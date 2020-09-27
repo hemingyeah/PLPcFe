@@ -85,17 +85,18 @@ import { storageGet, storageSet } from "@src/util/storage";
 
 /* constants */
 const TASK_HISTORY_KEY = "task_history_list";
+const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod', 'tag']
 
 export default {
   name: "task-search-panel",
   props: {
     taskTypeFilterFields: {
       type: Array,
-      default: []
+      default: () => []
     },
     config: {
       type: Array,
-      default: [],
+      default: () => [],
     },
     initData: {
       type: Object,
@@ -227,9 +228,15 @@ export default {
           continue;
         }
 
+        if (MultiFieldNames.indexOf(fn) > -1) {
+          params[`${fn}s`] = form[fn]
+        }
+
         if (tv.fieldName === "tags") {
           params.tagId = form[fn].map(({ id }) => id).join("");
         }
+
+        params[fn] = form[fn]
       }
 
       // 自定义条件

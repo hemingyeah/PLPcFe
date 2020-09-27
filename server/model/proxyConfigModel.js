@@ -7,7 +7,7 @@ let isNotLocalEnv = Boolean(SHB_ENV);
 const ENV_MAP = {
   'test': {
     user: LOGIN_USER.test || {},
-    location: 'https://docker.shb.ltd',
+    location: 'https://pubapp.shb.ltd',
     host: 'docker.shb.ltd',
     port: 443
   },

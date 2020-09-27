@@ -68,7 +68,7 @@
               </el-dropdown>
               <el-input
                 v-model="params.keyword"
-                placeholder="请输入工单编号或工单信息"
+                :placeholder="taskSearchInputPlaceholderMap[keyword_select] || taskSearchInputPlaceholderMap.default"
                 class="task-with-input task-ml12"
               >
                 <el-select
@@ -77,9 +77,9 @@
                   placeholder="请选择"
                   class="task-with-select"
                 >
-                  <el-option label="表单内容" value="1"></el-option>
-                  <el-option label="备注" value="2"></el-option>
-                  <el-option label="附加组件" value="3"></el-option>
+                  <el-option label="表单内容" value=""></el-option>
+                  <el-option label="备注" value="按工单备注"></el-option>
+                  <el-option label="附加组件" value="按附加组件"></el-option>
                 </el-select>
               </el-input>
 
@@ -491,7 +491,7 @@
             ></el-table-column>
             <el-table-column
               v-for="column in columns"
-              v-if="column.show"
+              v-if="column && column.show"
               :align="column.align"
               :class-name="
                 column.field == 'name'

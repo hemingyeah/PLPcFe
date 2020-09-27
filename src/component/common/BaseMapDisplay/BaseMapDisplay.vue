@@ -11,7 +11,6 @@
 </template>
 
 <script>
-// TODO: 支持地图选点  用于更新客户地址
 /* global AMap */
 import platform from '@src/platform';
 
@@ -62,9 +61,6 @@ export default {
     }
   },
   mounted() {
-    if (!this.lng || !this.lat) {
-      return this.geoCode();
-    }
 
     this.geoCode();
   },
