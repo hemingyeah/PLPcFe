@@ -414,7 +414,7 @@ export default {
     /** 是否显示devtool */
     showDevTool() {
       return (
-        this.$appConfig.env != 'prod' || this.initData.env != 'prod'
+        this.$appConfig.env != 'production' || this.initData.env != 'prod'
       );
     },
     /** 用户工作状态颜色配置 */
