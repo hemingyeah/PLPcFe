@@ -43,7 +43,7 @@ export default {
         : removeClass(document.body, CascaderFocusClassName)
     },
     inputForValueWithCascader(value) {
-      this.cascaderBlurHandler();
+      // this.cascaderBlurHandler();
       this.inputForValue(value);
     }
   }

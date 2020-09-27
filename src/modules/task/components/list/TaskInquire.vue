@@ -81,8 +81,10 @@ export default {
   },
   data() {
     return {
-      list: [1],
-      setting_list: []
+        list: [1],
+        checkSystemList: [], //系统
+        checkCustomizeList: [], //自定义
+        setting_list: []
     }
   },
   computed: {
@@ -128,8 +130,9 @@ export default {
         for(let key in item.returnDatas()) {
           if (item.returnDatas()[key] ) {
             data[key] = item.returnDatas()[key]
-          }
-          if (key === 'tags' && item.returnDatas()[key].length) {
+          } else if(key === 'tags' && item.returnDatas()[key].length) {
+            data[key] = item.returnDatas()[key] 
+          } else {
             data[key] = item.returnDatas()[key] 
           }
         }
@@ -189,14 +192,17 @@ export default {
       this.list.push(1)
     },
     setting(item) {
-      this.setting_list.push(item.displayName)
+        if (item.isSystem) {
+            this.checkSystemList.push(item.displayName)
+        } else {
+            this.checkCustomizeList.push(item.displayName)
+        }
 
-      const set_list = new Set(this.setting_list)
-      const list = []
-      for(let key of set_list) {
-        list.push(key)
-      }
-      this.$emit('setting', {item, list})
+        const check_system_list = new Set(this.checkSystemList)
+        const check_customize_list = new Set(this.checkCustomizeList)
+        const list = [...check_system_list, ...check_customize_list]
+        this.$emit('setting', {item, list, check_system_list, check_customize_list})
+        this.setting_list.push(item.displayName)
     }
   },
   components: {

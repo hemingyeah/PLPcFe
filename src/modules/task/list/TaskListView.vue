@@ -15,7 +15,7 @@
             <div class="seach task-span1 task-flex task-ai">
               <el-dropdown>
                 <div
-                  class="task-list-customize task-font14 task-c3 task-flex task-ai"
+                  class="task-list-customize task-font14 task-c3 task-flex task-ai task-pointer"
                 >
                   <img
                     src="../../../assets/img/customize.png"
@@ -26,19 +26,21 @@
                 </div>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
-                    v-for="(item, index) in otherList"
-                    :key="index"
+                  class="task-view-customize"
                   >
                     <div
+                    v-for="(item, index) in otherList"
+                    :key="index"
                       @click="checkOther(item)"
-                      class="task-flex task-ai task-list-wd252 task-pointer"
+                      class="task-flex task-ai task-pointer"
                     >
                       <span class="task-list-dropdown-item">{{
                         item.name
                       }}</span>
-                      <i class="iconfont icon-yanjing task-font12"></i>
+                      <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
                       <i
                         class="iconfont icon-bianji1 task-ml12 task-font12"
+                        @click="editView"
                         v-if="
                           initData.loginUser &&
                             item.id === initData.loginUser.userId
@@ -46,6 +48,7 @@
                       ></i>
                       <i
                         class="iconfont icon-shanchu-copy task-ml12 task-font12"
+                        @click="editView"
                         v-if="
                           initData.loginUser &&
                             item.id === initData.loginUser.userId
@@ -106,7 +109,7 @@
         <div class="task-list-header-nav">
           <div class="task-flex task-ai">
             <div class="task-font14 task-c6 state">工单状态：</div>
-            <div class="list">
+            <div class="list" :style="`width: ${navWidth}px`">
               <div
                 class="list-item task-flex task-ai"
                 :style="`width:${8 * 130}px`"
@@ -270,7 +273,7 @@
           <!-- 创建 -->
           <div class="task-flex task-ai">
             <div class="task-font14 task-c6 state">创建视角：</div>
-            <div class="list list-crate">
+            <div class="list list-crate" :style="`width: ${navWidth}px`">
               <div class="list-item task-flex task-ai">
                 <div
                   v-for="(item, index) in selectList"
@@ -292,7 +295,7 @@
             <div class="task-font14 task-c6 state">
               工单类型：
             </div>
-            <div class="list">
+            <div class="list" :style="`width: ${navWidth}px`">
               <div
                 class="list-item task-flex task-ai"
                 :style="`width:${taskTypes.length * 130}px`"
@@ -318,21 +321,20 @@
       <task-search-panel
         :init-data="initData"
         :config="advanceds"
+        :task_view_list="task_view_list"
         :taskTypeFilterFields="taskTypeFilterFields"
         ref="searchPanel"
         v-if="advanceds.length"
       >
         <div class="advanced-search-btn-group" slot="footer">
           <base-button type="ghost" @event="resetParams">重置</base-button>
+          <base-button type="primary" @event="editView">保存视图</base-button>
           <base-button
             type="primary"
             @event="advancedSearch"
             native-type="submit"
             >搜索</base-button
           >
-          <base-button type="primary" @event="editView">{{
-            isViewModel === "默认" ? "保存视图" : "编辑视图"
-          }}</base-button>
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->
@@ -465,7 +467,7 @@
           <span class="task-c2" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
-        <div class="task-list-section common-list-table-view">
+        <div class="task-list-section common-list-table-view" v-if="columns.length">
           <el-table
             stripe
             :data="taskPage.list"
@@ -487,7 +489,6 @@
               align="center"
               class-name="select-column"
             ></el-table-column>
-
             <el-table-column
               v-for="column in columns"
               v-if="column && column.show"
@@ -851,7 +852,7 @@
       <batch-editing-customer-dialog
         ref="batchEditingCustomerDialog"
         :config="{
-          fields: taskFieldList,
+          fields: columns,
           currentTaskType: currentTaskType,
         }"
         :selectedIds="selectedIds"
@@ -880,6 +881,8 @@
       :config="{ selectedIds: selectedIds, searchParams: searchParams }"
     />
     <!-- E 地图预览 -->
+    <!-- 视图展示 -->
+    <task-view ref="taskView"  @_searchModel="_searchModel" />
   </div>
 </template>
 

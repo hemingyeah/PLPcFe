@@ -93,6 +93,7 @@ export default {
             userId: tv.userId,
             displayName: tv.displayName,
             staffId: tv.staffId,
+            head: tv.head
           },
         });
       }
@@ -139,7 +140,6 @@ export default {
     async onSubmit() {
       const { selectedIds, config } = this;
       const buildParams = this.buildParams();
-      console.log(config.currentTaskType);
       let params = {
         taskIds: selectedIds,
         templateId: config.currentTaskType.id,
@@ -243,7 +243,6 @@ export default {
           this.selectedField = this.fields.filter(
             (f) => f.fieldName === val
           )[0];
-
           /**
            * 1、切换的字段是系统地址时，根据默认值设置
            * 2、切换字段的时候，重新注册一遍，是因为： 切换前后两个字段类型相同，不会触发字段的组件的重新注册，form-item 的 field 就不会更新，还是切换之前的 field
@@ -315,6 +314,7 @@ export default {
               field: sf,
               value: this.form[sf.fieldName],
               placeholder: Utils.genPlaceholder(sf),
+              seo: true
             },
             on: {
               update: (event) => this.update(event),

@@ -10,15 +10,15 @@
           id=""
           maxlength="6"
           v-model="view.viewName"
-          placeholder="请输入视图"
+          placeholder="请输入视图名称"
         />
       </div>
       <!-- 按钮 -->
       <el-checkbox v-model="checked">全员可见</el-checkbox>
       <div class="task-flex task-ai task-jend">
-          <el-button type="danger" @event="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button>
+          <el-button type="danger" @click="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button>
           <el-button @click="visible = false">取消</el-button>
-          <el-button type="primary" @event="saveViewBtn"
+          <el-button type="primary" @click="saveViewBtn"
           >保存</el-button>
       </div>
     </div>
@@ -27,6 +27,7 @@
 <script>
 /* Api */
 import * as TaskApi from "@src/api/TaskApi.ts";
+import { formatDate } from "@src/util/lang";
 
 export default {
   name: "view-model",
@@ -67,6 +68,10 @@ export default {
     saveViewBtn() {
       const { view, region, checked, isViewModel } = this;
 
+      if (!view.viewName) {
+        this.$platform.alert("请输入视图名称");
+        return
+      }
       view.viewRegion = checked ? "所有用户" : "只有我";
 
       const params = {
@@ -81,10 +86,41 @@ export default {
         });
         return;
       }
+      let searchModel = region.searchModel
+      // 创建时间
+      searchModel['timeStart'] = formatDate(searchModel.createTimeStart, "YYYY/MM/DD")
+      searchModel['timeEnd'] = formatDate(searchModel.createTimeEnd, "YYYY/MM/DD")
+      // 计划时间
+      searchModel.planTimeStart = formatDate(searchModel.planTimeStart, "YYYY/MM/DD")
+      searchModel.planTimeEnd = formatDate(searchModel.planTimeEnd, "YYYY/MM/DD")
+      //派单时间
+      searchModel.allotTimeStart = formatDate(searchModel.allotTimeStart, "YYYY/MM/DD")
+      searchModel.allotTimeEnd = formatDate(searchModel.allotTimeEnd, "YYYY/MM/DD")
+      //派单时间
+      searchModel.acceptTimeStart = formatDate(searchModel.acceptTimeStart, "YYYY/MM/DD")
+      searchModel.acceptTimeEnd = formatDate(searchModel.acceptTimeEnd, "YYYY/MM/DD")
+      //派单时间
+      searchModel.startTimeStart = formatDate(searchModel.startTimeStart, "YYYY/MM/DD")
+      searchModel.startTimeEnd = formatDate(searchModel.startTimeEnd, "YYYY/MM/DD")
+      //完成时间
+      searchModel.completeTimeStart = formatDate(searchModel.completeTimeStart, "YYYY/MM/DD")
+      searchModel.completeTimeEnd = formatDate(searchModel.completeTimeEnd, "YYYY/MM/DD")
+      //更新时间
+      searchModel.updateTimeStart = formatDate(searchModel.updateTimeStart, "YYYY/MM/DD")
+      searchModel.updateTimeEnd = formatDate(searchModel.updateTimeEnd, "YYYY/MM/DD")
+      //
+      searchModel.reviewTimeStart = formatDate(searchModel.reviewTimeStart, "YYYY/MM/DD")
+      searchModel.reviewTimeEnd = formatDate(searchModel.reviewTimeEnd, "YYYY/MM/DD")
+      //
+      searchModel.balanceTimeStart = formatDate(searchModel.balanceTimeStart, "YYYY/MM/DD")
+      searchModel.balanceTimeEnd = formatDate(searchModel.balanceTimeEnd, "YYYY/MM/DD")
+      //
+      searchModel.closeTimeStart = formatDate(searchModel.closeTimeStart, "YYYY/MM/DD")
+      searchModel.closeTimeEnd = formatDate(searchModel.closeTimeEnd, "YYYY/MM/DD")
       // 保存
       TaskApi.createView({
         ...view,
-        searchModel: region.searchModel,
+        searchModel,
         selectedCols: region.selectedCols
       }).then((res) => {
         this.success(res);

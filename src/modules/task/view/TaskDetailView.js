@@ -6,6 +6,7 @@ import AuthUtil from '@src/util/auth';
 import { getRootWindow } from '@src/util/dom';
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import Filter from '@src/filter/filter.js';
+import { parse } from '@src/util/querystring';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -1059,8 +1060,15 @@ export default {
 
       this.receiptFields = result[1] || [];
       this.stateButtonData = this.buildButtonData();
-
-      this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'card-tab';
+      
+      let query = parse(window.location.search) || {};
+      
+      // 来自审核结算列表并且非审批中的工单
+      if (query.active == 'balance' && !this.isApproving && this.task.state != 'costed') {
+        this.openDialog('balance');
+      } else {
+        this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'card-tab';
+      }
 
       this.loading = false;
 
