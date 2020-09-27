@@ -3,6 +3,7 @@
     :placeholder="placeholder"
     :remote-method="remoteMethod"
     :value="selectValue"
+    cleared
     @input="updateSelectValue"
   >
     <div class="service-template-option" slot="option" slot-scope="{ option }">
