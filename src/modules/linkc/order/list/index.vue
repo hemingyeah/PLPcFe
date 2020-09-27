@@ -173,17 +173,18 @@
                   <template v-if="column.conType === 'goods'">
                     <div class="flex-x">
                       <div class="flex-x goods-img-list flex-1">
-                        <template v-for="(item, index) in scope.row[column.field]" v-if="index <= 4">
+                        <template v-for="(item, index) in scope.row[column.field]">
                           <img
                             :key="index"
+                            v-if="index <= 4"
                             :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_32,w_32` : defaultImg"
                             @click.stop="previewImg(item.thumbnailUrl)"
                           />
-                          <div
-                            class="flex-1 overHideCon-1"
-                            v-if="scope.row[column.field].length==1"
-                          >{{item.name}}</div>
                         </template>
+                        <div
+                          class="flex-1 overHideCon-1"
+                          v-if="scope.row[column.field].length==1"
+                        >{{scope.row[column.field][0].name}}</div>
                         <div>{{scope.row[column.field].length>5?`+${scope.row[column.field].length-5}`:''}}</div>
                       </div>
                       <div>共{{scope.row.goodsCount}}件</div>
