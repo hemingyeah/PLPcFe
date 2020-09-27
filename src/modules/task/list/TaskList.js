@@ -135,11 +135,8 @@ export default {
       taskReceiptFields: [],
       taskPage: new Page(),
       totalItems: 0,
-<<<<<<< HEAD
-      navWidth: window.innerWidth - 120
-=======
+      navWidth: window.innerWidth - 120,
       taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap
->>>>>>> 99ae839d6c975bb7c6fb14aec9c538383223ec67
     };
   },
   computed: {
@@ -439,15 +436,23 @@ export default {
     taskTypeFilterFields() {
       let fields = this.taskFields.concat(this.taskReceiptFields) || [];
       let taskTypeFilterFields = fields.filter((field) => {
-       this.filterFieldFuncHandle(field)
+        return (
+          EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1 &&
+          field.isSystem == 0
+        )
+      // return field.isSystem == 0
       });
       return taskTypeFilterFields;
     },
     /*批量编辑过滤后的字段 */
     taskFieldList() {
       let fields = this.taskFields || [];
-      let taskTypeFilterFields = fields.filter((field) =>
-        this.filterFieldFuncHandle(field)
+      let taskTypeFilterFields = fields.filter((field) =>{
+        return (
+          EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1 &&
+          field.isSystem == 0
+        )
+      }
       );
 
       return taskTypeFilterFields;
@@ -476,7 +481,7 @@ export default {
     }
     window.onresize = () => {
       return (() => {
-        that.navWidth = window.innerWidth -120;
+        that.navWidth = window.innerWidth - 120;
       })();
     };
 
