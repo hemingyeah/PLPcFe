@@ -48,14 +48,14 @@ const TASK_SELF_FIELD_NAMES = [
 ];
 // 导出过来字段类型
 const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
-
+// 派单方式 数据转换
 const AllotTypeConvertMap = {
   '全部': 0,
   '手动派单': 1,
   '工单池派单': 2,
   '自动派单': 3
 }
-
+// 工单标记 数据转换
 const FlagConvertMap = {
   '不筛选': '',
   '曾超时': 'ONCEOVERTIME',
@@ -63,6 +63,12 @@ const FlagConvertMap = {
   '曾暂停': 'ONCEPAUSED',
   '曾回退': 'ONCEROLLBACK',
   '位置异常': 'POSITIONEXCEPTION'
+}
+
+const TaskSearchInputPlaceholderMap = {
+  default: '请输入工单编号或工单信息',
+  '按工单备注': '请输入工单备注内容',
+  '按附加组件': '请输入附加组件字段值'
 }
 
 export default {
@@ -84,7 +90,7 @@ export default {
       mapShow: true, //地图预览
       selectColumnState: "", //视图选择列状态存储
       planTimeType: "", //判断计划时间展示的样式
-      keyword_select: "表单内容", // 搜索筛选条件
+      keyword_select: "", // 搜索筛选条件
       exportColumnList: [],
       selectList: [
         { name: "全部", id: "all" },
@@ -128,6 +134,7 @@ export default {
       taskReceiptFields: [],
       taskPage: new Page(),
       totalItems: 0,
+      taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap
     };
   },
   computed: {
@@ -1894,8 +1901,13 @@ export default {
           synergyUserIds: mySearch.synergyId ? params.synergyId ? params.synergyId.push(mySearch.synergyId) : [] : params.synergyId,
           allotUserIds: params.allotUser,
           payTypes: params.paymentMethods,
-          searchTagIds: params.tags && params.tags.map(({ id }) => id)
+          searchTagIds: params.tags && params.tags.map(({ id }) => id),
         };
+        
+        // 工单搜索分类型
+        if (this.keyword_select) {
+          par.searchCondition = this.keyword_select
+        }
         
         this.searchParams = { ...this.searchParams, ...par };
         /* E 高级搜索条件*/
