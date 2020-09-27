@@ -9,13 +9,13 @@
       </div>
     </div>
     <div class="form-preview-group" v-if="address">
-      <label>地址</label>
+      <label>地址<span class="form-preview-notNull" v-if="field.setting.customerOption && field.setting.customerOption.addressNotNull">*</span></label>
       <div class="form-preview-mock">
         <p class="form-preview-control form-preview-withIcon"></p>
       </div>
     </div>
     <div class="form-preview-group" v-if="linkman">
-      <label>联系人</label>
+      <label>联系人<span class="form-preview-notNull" v-if="field.setting.customerOption && field.setting.customerOption.linkmanNotNull">*</span></label>
       <div class="form-preview-mock">
         <p class="form-preview-control form-preview-withIcon"></p>
       </div>
