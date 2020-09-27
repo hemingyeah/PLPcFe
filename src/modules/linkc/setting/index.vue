@@ -31,7 +31,7 @@
               <el-radio class="mar-r-16" :label="false">图片验证码</el-radio>
             </div>
             <div>
-              <el-radio :label="true">手机验证码</el-radio>
+              <el-radio :label="true">手机验证码(推荐)</el-radio>
             </div>
           </el-radio-group>
         </div>
