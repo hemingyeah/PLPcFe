@@ -77,6 +77,7 @@ export default {
   methods: {
     confirm() {
       this.$refs["ruleForm"].validate((valid) => {
+        if(!valid) return
         this.loading = true;
         orderDeliver({
           orderId: this.infoData.orderId,
