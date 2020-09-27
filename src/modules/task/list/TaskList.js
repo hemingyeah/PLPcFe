@@ -990,8 +990,9 @@ export default {
             minWidth = 200;
           }
 
-          if (["taskNo"].indexOf(field.fieldName) !== -1) {
+          if (["taskNo", 'customer'].indexOf(field.fieldName) !== -1) {
             minWidth = 250;
+            sortable = "custom";
           }
           return {
             ...field,
@@ -2034,7 +2035,8 @@ export default {
     sortChange(option) {
       const UserNameConvertMap = {
         'createUserName': 'createUser',
-        'executorName': 'executorUser'
+        'executorName': 'executorUser',
+        'customer': 'customerName'
       }
 
       try {
