@@ -1167,6 +1167,7 @@ export default {
       this.search();
     },
     changeOrderState() {
+      this.searchModel.pageNum = 1;
       this.search();
     },
     getStateNum() {
