@@ -23,7 +23,7 @@
             <el-checkbox :label="item.displayName" v-for="(item, index) in systemList" :key="index" class="wh150"></el-checkbox>
         </el-checkbox-group>
         <!-- 自定义字段 -->
-        <h3>自定义字段</h3>
+        <h3 v-if="customizeList.length">自定义字段</h3>
         <el-checkbox-group v-model="checkCustomizeList">
             <el-checkbox :label="item.displayName" v-for="(item, index) in customizeList" :key="index" class="wh150" v-if="item.isSearch"></el-checkbox>
         </el-checkbox-group>

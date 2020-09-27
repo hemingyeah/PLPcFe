@@ -2,8 +2,8 @@
   <div class="task-map" v-show="!mapShow">
     <!-- 头部 -->
     <div class="task-flex task-map-header">
-      <div class="task-span1" @click="$emit('hide')">
-        <base-button type="ghost">返回列表</base-button>
+      <div class="task-span1">
+        <base-button type="ghost" @event="$emit('hide')">返回列表</base-button>
       </div>
       <span class="task-font16 task-c6 task-fw6 task-ai"
         >列表仅显示有客户定位信息的工单。</span

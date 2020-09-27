@@ -15,7 +15,7 @@
             <div class="seach task-span1 task-flex task-ai">
               <el-dropdown>
                 <div
-                  class="task-list-customize task-font14 task-c3 task-flex task-ai"
+                  class="task-list-customize task-font14 task-c3 task-flex task-ai task-pointer"
                 >
                   <img
                     src="../../../assets/img/customize.png"
@@ -26,17 +26,18 @@
                 </div>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
-                    v-for="(item, index) in otherList"
-                    :key="index"
+                  class="task-view-customize"
                   >
                     <div
+                    v-for="(item, index) in otherList"
+                    :key="index"
                       @click="checkOther(item)"
-                      class="task-flex task-ai task-list-wd252 task-pointer"
+                      class="task-flex task-ai task-pointer"
                     >
                       <span class="task-list-dropdown-item">{{
                         item.name
                       }}</span>
-                      <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id)"></i>
+                      <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
                       <i
                         class="iconfont icon-bianji1 task-ml12 task-font12"
                         @click="editView"
@@ -320,19 +321,20 @@
       <task-search-panel
         :init-data="initData"
         :config="advanceds"
+        :task_view_list="task_view_list"
         :taskTypeFilterFields="taskTypeFilterFields"
         ref="searchPanel"
         v-if="advanceds.length"
       >
         <div class="advanced-search-btn-group" slot="footer">
           <base-button type="ghost" @event="resetParams">重置</base-button>
+          <base-button type="primary" @event="editView">保存视图</base-button>
           <base-button
             type="primary"
             @event="advancedSearch"
             native-type="submit"
             >搜索</base-button
           >
-          <base-button type="primary" @event="editView">保存视图</base-button>
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->
@@ -880,7 +882,7 @@
     />
     <!-- E 地图预览 -->
     <!-- 视图展示 -->
-    <task-view ref="taskView" />
+    <task-view ref="taskView"  @_searchModel="_searchModel" />
   </div>
 </template>
 

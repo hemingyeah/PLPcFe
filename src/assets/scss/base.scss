@@ -210,3 +210,22 @@ textarea {
     background-color: #fafafa!important;
   }
 }
+.task-view-customize{
+  height: 400px;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding: 0!important;
+  width: 200px;
+  &:hover {
+    color: #333!important;
+    background-color: #fff!important;
+  }
+  > div{
+    width: 100%;
+    padding-left: 15px;
+    &:hover {
+      background-color: #e7f9f9;
+      color: #42cece;
+    }
+  }
+}

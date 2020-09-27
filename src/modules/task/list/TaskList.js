@@ -108,6 +108,7 @@ export default {
       multipleSelection: [],
       multipleSelectionPanelShow: false,
       params: this.initParams(),
+
       selectPanelColumns: [
         {
           key: "taskNo",
@@ -136,7 +137,8 @@ export default {
       taskPage: new Page(),
       totalItems: 0,
       navWidth: window.innerWidth - 120,
-      taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap
+      taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap,
+      task_view_list: []
     };
   },
   computed: {
@@ -702,8 +704,15 @@ export default {
       if (!searchModel.templateId) {
         this.currentTaskType = { id: "", name: "全部" };
       }
+      this.$refs.taskView.open(id)
       this.search(searchModel);
       this.buildColumns();
+    },
+    /*
+      查看视图
+     */
+    _searchModel(list) {
+      this.task_view_list = list
     },
     /* 顶部筛选 */
     checkFilter({ id, name, searchModel, title }) {
@@ -1396,7 +1405,6 @@ export default {
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
-
       this.multipleSelection = tv;
 
       // this.$refs.baseSelectionBar.openTooltip();
@@ -1581,15 +1589,17 @@ export default {
      * @description 重置参数
      */
     resetParams() {
-      this.trackEventHandler("reset");
+      // this.trackEventHandler("reset");
 
-      this.currentTaskType = this.taskTypes[0];
-      this.$refs.searchPanel.resetParams();
+      // this.currentTaskType = this.taskTypes[0];
+      // this.$refs.searchPanel.resetParams();
 
-      let pageSize = this.params.pageSize;
-      this.params = this.initParams(pageSize);
-
-      this.search();
+      // let pageSize = this.params.pageSize;
+      // this.params = this.initParams(pageSize);
+      // this.search();
+      window.__exports__refresh = "";
+      const fromId = window.frameElement.getAttribute("id");
+      this.$platform.refreshTab(fromId);
     },
     /**
      * @description 还原本地存储

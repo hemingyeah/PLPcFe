@@ -30,10 +30,18 @@ export default {
         }
     },
     methods: {
-        async open(viewId) {
+        async open(viewId, type) {
            this.searchModelCN = []
+           let searchModel = []
            const {success, result} = await TaskApi.getOneView(viewId)
-           this.visible = true 
+           if (type) {
+            this.visible = true 
+           } else  {
+              for(let key in result.searchModelCN) {
+                   searchModel.push({displayNmae: key, value: `${result.searchModelCN[key]}`})
+              }
+              this.$emit('_searchModel', searchModel)
+           }
            if (success) {
                for(let key in result.searchModelCN) {
                    this.searchModelCN.push(`${key}：${result.searchModelCN[key]}`)
