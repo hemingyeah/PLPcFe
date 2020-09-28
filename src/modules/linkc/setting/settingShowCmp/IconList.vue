@@ -77,7 +77,7 @@ export default {
     infoData: {
       deep: true,
       handler(value) {
-        console.log(value, "3333");
+        // console.log(value, "3333");
         this.dataInfo = value;
       },
     },

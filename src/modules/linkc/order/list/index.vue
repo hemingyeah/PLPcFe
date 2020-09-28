@@ -730,7 +730,7 @@ export default {
       }
 
       this.multipleSelection = tv;
-      console.log(this.multipleSelection, "select");
+      // console.log(this.multipleSelection, "select");
 
       this.$refs.baseSelectionBar.openTooltip();
     },
@@ -835,7 +835,7 @@ export default {
     // 搜索
     search() {
       const params = this.buildParams();
-      console.log(params, "searchP");
+      // console.log(params, "searchP");
       this.fullscreenLoading = true;
       return orderList(params)
         .then((res) => {
@@ -1092,7 +1092,7 @@ export default {
           return this.$platform.alert("请选择要导出的数据");
         ids = this.selectedIds;
       }
-      console.log(ids, "export");
+      // console.log(ids, "export");
       this.$refs.exportProductTemplatePanel.open(ids, fileName);
     },
     // 导出 列

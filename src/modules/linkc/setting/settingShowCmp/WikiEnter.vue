@@ -50,7 +50,7 @@ export default {
     infoData: {
       deep: true,
       handler(value) {
-        console.log(value, "22222");
+        // console.log(value, "22222");
         this.dataInfo = value;
       },
     },
