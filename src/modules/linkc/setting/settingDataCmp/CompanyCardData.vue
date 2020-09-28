@@ -118,7 +118,7 @@ export default {
   },
   methods: {
     onBeforeUploadImage(file) {
-      console.log(file.raw, "file");
+      // console.log(file.raw, "file");
       const isJPG = file.type === "image/jpeg" || file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -152,7 +152,7 @@ export default {
             fileSize: file.fileSizeStr,
           };
           this.dataInfo.logoUrl = item.url;
-          console.log(item, "uploadImg");
+          // console.log(item, "uploadImg");
         })
         .catch((err) => {
           console.warn(err);

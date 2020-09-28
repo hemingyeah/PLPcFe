@@ -433,7 +433,7 @@ export default {
             arr[item.index - 1] = items;
           }
           resolve(arr);
-          console.log(arr, "transData");
+          // console.log(arr, "transData");
         } catch (error) {
           reject(error);
         }
@@ -469,7 +469,7 @@ export default {
             }
           });
           resolve(obj);
-          console.log(obj, "reverData");
+          // console.log(obj, "reverData");
         } catch (error) {
           reject(error);
         }
