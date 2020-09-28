@@ -930,8 +930,7 @@ export default {
     /**
      * 存为视图和编辑视图
      */
-    editView({region}) {
-      this.isViewModel = region || '默认';
+    editView({region, id}) {
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
@@ -940,6 +939,12 @@ export default {
       });
       this.region["searchModel"] = this.searchParams;
       this.region["selectedCols"] = selectCols.join(",");
+      if (id) {
+        this.region["viewId"] = id;
+        this.isViewModel = region;
+        this.$refs.searchPanel.open()
+        return
+      }
       this.$refs.viewModel.open();
     },
     /**
