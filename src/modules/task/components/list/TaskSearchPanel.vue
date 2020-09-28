@@ -107,7 +107,7 @@ const TaskInquireConvertFieldNamesToConditionsMap = {
 export default {
   name: "task-search-panel",
   props: {
-    taskTypeFilterFields: {
+    customizeList: {
       type: Array,
       default: () => []
     },
@@ -121,7 +121,8 @@ export default {
     },
   },
   watch: {
-    taskTypeFilterFields() {
+    customizeList() {
+      this.taskTypeFilterFields
       this._taskInquireList()
     },
     config() {
@@ -140,6 +141,12 @@ export default {
     };
   },
   computed: {
+    taskTypeFilterFields() {
+      const { customizeList } = this
+      return customizeList.filter(item => {
+        return (item.isSystem == 0 && item.isSearch)
+      })
+    },
     fields() {
       let f = {};
       let fields = [...this.selfFields]

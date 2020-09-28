@@ -158,7 +158,6 @@ export default {
     },
     filterColumns() {
       filterColumnsExpandLength = 0;
-
       return this.columns.map((item) => {
         let columns = item.columns || [];
 
@@ -171,7 +170,6 @@ export default {
         filterColumnsExpandLength += item.columns.length;
         filterColumnsExpand.push(...item.columns);
         filterColumnsMap[item.value] = item.columns;
-
         return item;
       });
     },
@@ -186,7 +184,6 @@ export default {
       let checkedMap = this.checkedMap;
 
       this.checkedGroupArr = [];
-      console.log(this.checkedMap);
 
       for (let key in checkedMap) {
         let item = checkedMap[key];
