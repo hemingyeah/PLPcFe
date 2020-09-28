@@ -546,7 +546,10 @@ export default {
       });
       return taskTypeFilterFields;
     },
-    /*批量编辑过滤后的字段 */
+    taskAllFields() {
+      return this.taskFields.concat(this.taskReceiptFields)
+    },
+    /* 批量编辑过滤后的字段 */
     taskFieldList() {
       let fields = this.taskFields || [];
       let taskTypeFilterFields = fields.filter((field) =>{
@@ -1766,6 +1769,8 @@ export default {
      */
     panelSearchAdvancedToggle() {
       this.trackEventHandler("avvancedSearch");
+
+      this.$refs.searchPanel.mergeTaskFields(this.taskAllFields)
       this.$refs.searchPanel.open();
 
       this.$nextTick(() => {
