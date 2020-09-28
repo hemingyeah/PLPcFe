@@ -259,8 +259,10 @@ export default {
       window.location.href = `/event/convent2Task/jump?eventId=${eventId}&defaultTypeId=${templateId}&flow=${flow}`
     },
     convertCustomerOfSelect(customer = {}) {
-      customer.id = customer.id || customer.value || ''
-      return customer
+      let customerCloneData = _.cloneDeep(customer)
+      customerCloneData.id = (customer.id || customer.value || '')
+
+      return customerCloneData
     },
     /**
      * @description 关闭弹窗
@@ -502,7 +504,8 @@ export default {
      * @param {string} type customer/product
     */
     async relationFieldSelectHandler(type = TaskFieldNameMappingEnum.Customer) {
-      let relationFields = this.relationFieldsFilter(type);
+      let relationFields = this.relationFieldsFilter(type)
+      if (relationFields.length <= 0) return
       
       try {
         let params = {
