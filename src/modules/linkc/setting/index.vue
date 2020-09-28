@@ -118,20 +118,14 @@
           <i class="iconfont icon-setting mar-r-6"></i>
           发布我的门户小程序
         </div>-->
+
+        <i class="iconfont icon-fd-link mar-r-6 color-primary"></i>
         <a
           href="javascript:;"
           @click="openLink('https://register.shb.ltd/VIP/WechatAndDing.html#DingService_setting')"
-        >
-          <i class="iconfont icon-fd-link mar-r-6"></i>
-          绑定微信或钉钉服务窗
-        </a>
-        <a
-          class="mar-l-16"
-          href="javascript:;"
-          @click="openLink('https://www.yuque.com/shb/help/XCX')"
-        >
-          <i class="iconfont icon-fabu1 mar-r-6"></i>小程序发布指引
-        </a>
+        >绑定微信或钉钉服务窗</a>
+        <i class="iconfont icon-fabu1 mar-r-6 mar-l-16 color-primary"></i>
+        <a class href="javascript:;" @click="openLink('https://www.yuque.com/shb/help/XCX')">小程序发布指引</a>
         <el-button
           v-if="!setData.weChatQRCodeUrl"
           class="mar-l-16"
@@ -694,6 +688,9 @@ export default {
   margin-bottom: 12px;
   .info-link-box {
     a {
+      color: $color-primary;
+    }
+    i {
       color: $color-primary;
     }
   }
