@@ -191,7 +191,7 @@ export default {
           show: true,
         },
         {
-          label: "小记",
+          label: "小计",
           field: "payAmount",
           fixed: true,
           show: true,
