@@ -19,84 +19,85 @@
       </el-dropdown>
     </h3>
     <!--  -->
-      <div class="task-search-panel-title task-pointer" @click="show =!show">
-        <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
-        <i class="iconfont icon-up task-c3" v-else></i>
-        <span class="task-font16">常用字段</span>
-        <span slot="reference" class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
+    <div class="task-search-panel-title task-pointer" @click="show =!show">
+      <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
+      <i class="iconfont icon-up task-c3" v-else></i>
+      <span class="task-font16">常用字段</span>
+      <span slot="reference" class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
+    </div>
+    <div class="task-search-guide" v-show="!fields.length && guide">
+      <div></div>
+      <div>
+        您还未设置常用字段，快去试试吧
       </div>
-      <div class="task-search-guide" v-show="!fields.length && guide">
-        <div></div>
-        <div>
-          您还未设置常用字段，快去试试吧
-        </div>
+    </div>
+    <!-- S 搜索条件 -->
+    <el-form class="advanced-search-form" onsubmit="return false;">
+      <task-search-form
+        class="task-search-forms"
+        :class="{'hide': show}"
+        :fields="fields"
+        ref="searchForm"
+        :form-backup="formBackup"
+        :column-num="columnNum"
+      >
+      </task-search-form>
+      <div class=" task-pointer">
+        <span class="task-font16">设置查询条件</span>
+        <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
       </div>
-      <!-- S 搜索条件 -->
-      <el-form class="advanced-search-form" onsubmit="return false;">
-        <task-search-form
-          class="task-search-forms"
-          :class="{'hide': show}"
-          :fields="fields"
-          ref="searchForm"
-          :form-backup="formBackup"
-          :column-num="columnNum"
-        >
-        </task-search-form>
-          <div class=" task-pointer">
-            <span class="task-font16">设置查询条件</span>
-            <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
-          </div>
-        <!-- 设置查询条件 -->
-          <task-inquire 
-            v-if="taskInquireList.length"
-            ref="taskInquireParams" 
-            :columnNum="columnNum" 
-            :config="taskInquireList" 
-            @setting="_setting"
-          />
-        <task-inquire 
-          v-else
-          ref="taskInquireParams" 
-          :columnNum="columnNum" 
-          :config="[...config, ...taskTypeFilterFields]" 
-          @setting="_setting"
-        />
-        <!-- 搜索操作按钮 -->
-        <slot name="footer"></slot>
-      </el-form>
-      <!-- E 搜索条件 -->
-      <!-- 设置弹框 -->
-      <task-search-pupal ref="taskSearchPupal" 
-        :taskTypeFilterFields="taskTypeFilterFields" 
-        :config="config" 
-        :taskInquireList="taskInquireList"
-        @taskPupal="_taskPupal"
+      <!-- 设置查询条件 -->
+      <task-inquire 
+        v-if="taskInquireList.length"
+        ref="taskInquireParams" 
+        :column-num="columnNum" 
+        :config="taskInquireList" 
+        @setting="_setting"
       />
+      <task-inquire 
+        v-else
+        ref="taskInquireParams" 
+        :column-num="columnNum" 
+        :config="[...config, ...taskTypeFilterFields]" 
+        @setting="_setting"
+      />
+      <!-- 搜索操作按钮 -->
+      <slot name="footer"></slot>
+    </el-form>
+    <!-- E 搜索条件 -->
+    <!-- 设置弹框 -->
+    <task-search-pupal 
+      ref="taskSearchPupal" 
+      :config="config" 
+      :task-type-filter-fields="taskTypeFilterFields" 
+      :task-inquire-list="taskInquireList"
+      @taskPupal="_taskPupal"
+    />
   </base-panel>
 </template>
 
 <script>
 /* api */
-import * as TaskApi from "@src/api/TaskApi.ts";
+import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* components */
-import TaskSearchForm from "./TaskSearchForm.vue";
+import TaskSearchForm from './TaskSearchForm.vue';
 import TaskSearchPupal from './TaskSearchPupal'
 import TaskInquire from './TaskInquire'
 
 /* utils */
-import _ from "lodash";
-import { formatDate } from "@src/util/lang";
-import { isEmptyStringObject } from "@src/util/function";
-import { storageGet, storageSet } from "@src/util/storage";
+import _ from 'lodash';
+import { formatDate } from '@src/util/lang';
+import { isEmptyStringObject } from '@src/util/function';
+import { storageGet, storageSet } from '@src/util/storage';
 
 /* enum */
 
-import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 /* constants */
 import { AllotTypeConvertMap, FlagConvertMap, TaskOnceConvertMap, TaskApproveConvertMap } from '@src/modules/task/model/TaskConvertMap.ts';
 
-const TASK_HISTORY_KEY = "task_history_list";
+const TASK_HISTORY_KEY = 'task_history_list';
 const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod', 'tag']
 const TaskInquireConvertFieldNamesToConditionsMap = {
   customer: 'customerId',
@@ -105,7 +106,7 @@ const TaskInquireConvertFieldNamesToConditionsMap = {
 }
 
 export default {
-  name: "task-search-panel",
+  name: 'task-search-panel',
   props: {
     customizeList: {
       type: Array,
@@ -136,6 +137,8 @@ export default {
       visible: false,
       show: false,
       guide: true,
+      taskAllFields: [],
+      taskAllFieldsMap: {}
     };
   },
   computed: {
@@ -148,19 +151,22 @@ export default {
     },
     fields() {
       let f = {};
+      let selfFields = []
+
       let fields = [...this.selfFields]
-        .filter((f) => f.isSearch)
-        .map((field) => {
+        .filter((f) => {
+          return f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )
+        }).map((field) => {
           f = _.cloneDeep(field);
 
           let formType = f.formType;
 
-          if (formType === "datetime") {
-            formType = "date";
+          if (formType === 'datetime') {
+            formType = 'date';
           }
 
-          if (formType === "updateTime") {
-            f.displayName = "更新时间";
+          if (formType === 'updateTime') {
+            f.displayName = '更新时间';
           }
           return Object.freeze({
             ...f,
@@ -171,7 +177,15 @@ export default {
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
-      return fields;
+
+      fields.forEach(field => {
+        let { fieldName } = field
+        let originField = this.taskAllFieldsMap[fieldName]
+        
+        selfFields.push(originField ? originField : field)
+      })
+
+      return selfFields;
     },
     panelWidth() {
       return `${420 * this.columnNum}px`;
@@ -180,7 +194,9 @@ export default {
   mounted() {
     const { column_number } = this.getLocalStorageData();
     const searchField = localStorage.getItem('task-search-field')
-    if (column_number) this.columnNum = Number(column_number);
+
+    if (column_number) this.columnNum = Number(column_number)
+
     if (searchField) {
       this.selfFields = JSON.parse(searchField).list
       this._taskInquireList()
@@ -200,23 +216,23 @@ export default {
         conditions: [],
       };
       let tv = null;
-      let fn = "";
+      let fn = '';
       // 固定条件
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
         // hasRemind
-        if (fn === "hasRemind" && form[fn] !== "") {
+        if (fn === 'hasRemind' && form[fn] !== '') {
           params.hasRemind = form[fn] == 2 ? 0 : form[fn];
           continue;
         }
 
-        if (fn === "qrcodeState" && form[fn] !== "") {
+        if (fn === 'qrcodeState' && form[fn] !== '') {
           params.qrcodeState = form[fn] == 2 ? 0 : form[fn];
           continue;
         }
 
-        if (fn == "area" && form[fn]) {
+        if (fn == 'area' && form[fn]) {
           params.productAddress = {
             ...(params.productAddress || {}),
             province: form[fn].province,
@@ -226,7 +242,7 @@ export default {
           continue;
         }
 
-        if (fn === "addressDetail") {
+        if (fn === 'addressDetail') {
           params.productAddress = {
             ...(params.productAddress || {}),
             address: form[fn],
@@ -238,17 +254,17 @@ export default {
           continue;
         }
 
-        if (typeof form[fn] === "string") {
-          let fieldNamsMap = { customer: "customerId", product: "productId" };
+        if (typeof form[fn] === 'string') {
+          let fieldNamsMap = { customer: 'customerId', product: 'productId' };
 
           params[fieldNamsMap[fn] ? fieldNamsMap[fn] : fn] = form[fn];
           continue;
         }
 
-        if (tv.formType === "date" || tv.formType === "datetime") {
+        if (tv.formType === 'date' || tv.formType === 'datetime') {
           params[fn] = form[fn]
-            .map((t) => formatDate(t, "YYYY/MM/DD"))
-            .join("-");
+            .map((t) => formatDate(t, 'YYYY/MM/DD'))
+            .join('-');
           continue;
         }
 
@@ -256,8 +272,8 @@ export default {
           params[`${fn}s`] = form[fn]
         }
 
-        if (tv.fieldName === "tags") {
-          params.tagId = form[fn].map(({ id }) => id).join("");
+        if (tv.fieldName === 'tags') {
+          params.tagId = form[fn].map(({ id }) => id).join('');
         }
 
         params[fn] = form[fn]
@@ -273,34 +289,34 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === 'object'
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
-        if (tv.originalFormType === "date") {
+        if (tv.originalFormType === 'date') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD"),
-            betweenValue2: formatDate(form[fn][1], "YYYY-MM-DD"),
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
+            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD'),
           });
           continue;
         }
 
-        if (tv.originalFormType === "datetime") {
+        if (tv.originalFormType === 'datetime') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
 
-        if (tv.formType === "address") {
+        if (tv.formType === 'address') {
           let address = {
             property: fn,
             operator: tv.operator,
@@ -308,11 +324,10 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            address.value = (form[fn].province || '')
+              + (form[fn].city || '')
+              + (form[fn].dist || '')
+              + (form[fn].address || '');
           }
           params.conditions.push(address);
           continue;
@@ -342,7 +357,7 @@ export default {
       params.systemConditions = []
 
       let tv = null;
-      let fn = "";
+      let fn = '';
       // 固定条件
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
@@ -354,14 +369,14 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === 'object'
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
-        if (tv.formType === "address") {
+        if (tv.formType === 'address') {
           let address = {
             property: fn,
             operator: tv.operatorValue,
@@ -369,11 +384,10 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            address.value = (form[fn].province || '')
+              + (form[fn].city || '')
+              + (form[fn].dist || '')
+              + (form[fn].address || '');
           }
           params.systemConditions.push(address);
           continue;
@@ -476,14 +490,14 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === 'object'
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
-        if (tv.formType === "address") {
+        if (tv.formType === 'address') {
           let address = {
             property: fn,
             operator: tv.operatorValue,
@@ -491,11 +505,10 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            address.value = (form[fn].province || '')
+              + (form[fn].city || '')
+              + (form[fn].dist || '')
+              + (form[fn].address || '');
           }
           params.conditions.push(address);
           continue;
@@ -510,46 +523,46 @@ export default {
 
     },
     getLocalStorageData() {
-      const dataStr = storageGet(TASK_HISTORY_KEY, "{}");
+      const dataStr = storageGet(TASK_HISTORY_KEY, '{}');
       return JSON.parse(dataStr);
     },
     matchOperator(field) {
       let formType = field.formType;
-      let operator = "";
+      let operator = '';
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case 'date': {
+        operator = 'between';
+        break;
+      }
+      case 'datetime': {
+        operator = 'between';
+        break;
+      }
+      case 'select': {
+        if (field.setting && field.setting.isMulti) {
+          operator = 'contain';
+        } else {
+          operator = 'eq';
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case 'user': {
+        operator = 'user';
+        break;
+      }
+      case 'address': {
+        operator = 'address';
+        break;
+      }
+      case 'location': {
+        operator = 'location';
+        break;
+      }
+      default: {
+        operator = 'like';
+        break;
+      }
       }
       return operator;
     },
@@ -572,19 +585,24 @@ export default {
     },
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
-      this.saveDataToStorage("column_number", command);
+      this.saveDataToStorage('column_number', command);
     },
     _taskPupal({list, checkSystemList, checkCustomizeList}) {
       this.selfFields = list
-      this.fields
+
       this._taskInquireList(JSON.stringify({checkSystemList, checkCustomizeList}))
-    } ,
+
+      this.$nextTick(() => {
+        this.mergeTaskFieldsForTaskInquire()
+      })
+
+    },
     _taskInquireList(field = '') {
       const searchField = field || localStorage.getItem('task-search-field')
       if (searchField){
         this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((item, index) => {
           let bool = [...JSON.parse(searchField).checkSystemList, ...JSON.parse(searchField).checkCustomizeList].some(v => {
-              return v === item.displayName 
+            return v === item.displayName 
           })
           if (!bool) {
             return item
@@ -592,7 +610,7 @@ export default {
         })
       }
     },
-    //设置查询条件
+    // 设置查询条件
     _setting({item, list, check_system_list, check_customize_list}) {
       const searchField = localStorage.getItem('task-search-field')
       let loc;
@@ -607,7 +625,7 @@ export default {
       if (searchField) {
         this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
           let bool = [...JSON.parse(searchField).checkSystemList, ...JSON.parse(searchField).checkCustomizeList, ...list].some(v => {
-              return v === value.displayName 
+            return v === value.displayName 
           })
           if (!bool) {
             return value
@@ -621,7 +639,7 @@ export default {
       } else {
         this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
           let bool = list.some(v => {
-              return v === value.displayName 
+            return v === value.displayName 
           })
           if (!bool) {
             return value
@@ -634,6 +652,38 @@ export default {
         }
       }
       localStorage.setItem('task-search-field', JSON.stringify(loc))
+    },
+    mergeTaskFields(taskAllFields = []) {
+      // 临时这种用法
+      this.taskAllFields = taskAllFields.slice()
+      this.taskAllFieldsMap = taskAllFields.reduce((acc, field) => ( acc[field.fieldName] = field) && acc, {})
+
+      let selfFields = []
+
+      this.selfFields.forEach(field => {
+        let { fieldName } = field
+        let originField = this.taskAllFieldsMap[fieldName]
+        
+        selfFields.push(originField ? originField : field)
+      })
+      
+      this.selfFields = selfFields.slice()
+      
+      this.$nextTick(() => {
+        this.mergeTaskFieldsForTaskInquire()
+      })
+    },
+    mergeTaskFieldsForTaskInquire() {
+      let selfFields = []
+
+      this.taskInquireList.forEach(field => {
+        let { fieldName } = field
+        let originField = this.taskAllFieldsMap[fieldName]
+        
+        selfFields.push(originField ? originField : field)
+      })
+      console.log(this.taskInquireList.slice())
+      this.taskInquireList = selfFields.slice()
     }
   },
   components: {

@@ -89,11 +89,10 @@ export default {
   },
   computed: {
     fields() {
-      const searchField = localStorage.getItem('task-search-field')
       let f = {};
       let fields = [...this.config]
         .filter((f) => {
-          return f.isSearch && TaskInquireFiltersFieldNames.indexOf(f.fieldName) < 0
+          return (f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )) && TaskInquireFiltersFieldNames.indexOf(f.fieldName) < 0
         })
         .map((field) => {
           f = _.cloneDeep(field);
@@ -304,6 +303,8 @@ export default {
           }
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
+
+          this.$forceUpdate()
         },
         selectField(val) {
           this.selectedField = this.fields.filter(
