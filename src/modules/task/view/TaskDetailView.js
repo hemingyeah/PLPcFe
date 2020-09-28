@@ -631,7 +631,7 @@ export default {
         * 如果使用了备件，需要提示
         */
         if (this.unFinishedState) {
-          const res = await TaskApi.finishedWithPart({ taskIds: this.task.id });
+          const res = await TaskApi.finishedWithPart({ taskId: this.task.id });
           if (!res.success) {
             warningMsg = '获取工单的结算单失败，无法判断工单是否添加了备件，确定要删除所选工单吗？';
           } else if (res.success && res.result) {
