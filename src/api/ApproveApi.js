@@ -78,6 +78,16 @@ function approversDeliver (params) {
   return http.post('/approve/approvers/deliver', params)
 }
 
+/**
+ * 待审核转交（批量）
+ * @param {String | Id} params.userId - 转交给的人id
+ * @param {String | Id} params.oldUserId - 被转交人id
+ * @param {String} params.approveIds - 审核id列表
+ */
+function approversUpdate (params) {
+  return http.post('/approve/approvers/update', params)
+}
+
 export {
   getInitiatorList,
   getEventTypeList,
@@ -85,5 +95,6 @@ export {
   getApproveList,
   applyApprove,
   getApplyApproveDetail,
-  approversDeliver
+  approversDeliver,
+  approversUpdate
 }

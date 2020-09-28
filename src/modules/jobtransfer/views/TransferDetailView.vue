@@ -6,6 +6,7 @@
         <el-radio-button label="未完成工单" name="task"></el-radio-button>
         <el-radio-button label="负责客户" name="customer"></el-radio-button>
         <el-radio-button label="个人备件库" name="stock"></el-radio-button>
+        <el-radio-button label="待审批事项" name="approve"></el-radio-button>
       </el-radio-group>
       <base-button v-if="activeName!='个人备件库'" type="primary" @event="handleClick" id="v-step-1">转交</base-button>
     </div>
@@ -223,6 +224,32 @@
             </el-table-column>
           </template>
 
+          <template v-else-if="tap === 'approve'">
+            <el-table-column
+              v-for="column in columns"
+              :key="column.field"
+              :label="column.label"
+              :prop="column.field"
+              :width="column.width"
+              :min-width="column.minWidth || '120px'"
+              :show-overflow-tooltip="column.field !== 'operate'">
+              <template slot-scope="scope">
+                <template v-if="column.field === 'objNo'">
+                  <el-button type="text" class="no-padding" @click="goToApproveDetail(scope.row)">{{ scope.row[column.field] }}</el-button>
+                </template>
+                <template v-else-if="column.field === 'createTimeL'">
+                  {{ scope.row[column.field] | formatDate }}
+                </template>
+                <template v-else-if="column.field === 'operate'">
+                  <el-button type="text" class="no-padding" @click="openTransferDialog(false, scope.row)">转交</el-button>
+                </template>
+                <template v-else>
+                  {{ scope.row[column.field] }}
+                </template>
+              </template>
+            </el-table-column>
+          </template>
+
         </el-table>
 
       </div>
@@ -260,7 +287,24 @@
       </batch-editing-dialog>
     </div>
     <!-- end content -->
-   
+
+    <!-- start 转交弹窗 -->
+    <base-modal title="转交办理" :show.sync="transferDialog.visible" width="600px" class="transfer-approve-dialog">
+      <div class="base-modal-content">
+        <div class="tips">审批转交适用于当前审批人无法对该事项做审批时，转交给上级领导进行审批的场景</div>
+        <form-user
+          :field="{ displayName: '转交人' }"
+          placeholder="请选择新的审批人"
+          v-model="transferDialog.approver"
+          :see-all-org="true"
+        />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="transferDialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="transferApprove" :disabled="transferDialog.pending">确 定</el-button>
+      </div>
+    </base-modal>
+    <!-- end 转交弹窗 -->
   </div>
 </template>
 
@@ -273,6 +317,7 @@ const TRANSFER_LIST_DATA = 'transfer-list-data';
 import {parse} from '@src/util/querystring';
 import BatchEditingDialog from '../component/BatchEditingDialog.vue';
 import PartBackForm from '../component/PartBackForm.vue'; 
+import * as ApproveApi from '@src/api/ApproveApi';
 let query;
 export default {
   name: 'transfer-detai-view',
@@ -333,6 +378,14 @@ export default {
         'defaultValue':null,
         'isNull':1,
         'isSearch':1}],
+
+      transferDialog: { // 审批转交弹窗
+        visible: false,
+        pending: false,
+        batch: false,
+        approver: {},
+        approveIds: []
+      }
     }
   },
   computed: {
@@ -414,6 +467,12 @@ export default {
         params.userId = this.userId;
         params.with_OOS = false;
         break;
+      case 'approve':
+        this.columns = this.buildApproveColumns();
+        url = '/approve/unApproveList';
+        method = 'post';
+        params.userId = this.userId;
+        break;
       default:
         break;
       }
@@ -424,7 +483,7 @@ export default {
       let loading = this.$loading();
       try {
         let result = await this.$http.axios(method, url, params);
-        if(this.activeName === '未完成工单') result = (result && result.data) || {}; 
+        if(this.activeName === '未完成工单' || this.activeName === '待审批事项') result = (result && result.data) || {}; 
         // console.info('list:', result);
         this.page = result || {};
         this.model.pageNum = this.page.pageNum;
@@ -475,6 +534,12 @@ export default {
       })
     },
     handleClick(){
+      // 待审批事项批量转交
+      if (this.activeName == '待审批事项') {
+        this.openTransferDialog(true);
+        return;
+      }
+
       // 处理事件 工单 客户转交
       this.$refs.batchEditingDialog.open();
     },
@@ -541,6 +606,9 @@ export default {
       case 'stock':
         this.activeName = '个人备件库';
         break;
+      case 'approve':
+        this.activeName = '待审批事项';
+        break;
       default:
         break;
       }
@@ -566,6 +634,10 @@ export default {
       case '个人备件库':
         this.tap = 'stock';
         this.columns = this.buildStockColumns();
+        break;
+      case '待审批事项':
+        this.tap = 'approve';
+        this.columns = this.buildApproveColumns();
         break;
       default:
         break;
@@ -774,6 +846,55 @@ export default {
         }
       ];
     },
+    buildApproveColumns() {
+      return [
+        {
+          label: '来源',
+          field: 'sourceRemark',
+          show: true,
+          width: 100
+        },
+        {
+          label: '编号',
+          field: 'objNo',
+          show: true,
+          width: 140
+        },
+        {
+          label: '类型',
+          field: 'typeName',
+          show: true
+        },
+        {
+          label: '流程',
+          field: 'action',
+          show: true
+        },
+        {
+          label: '发起人',
+          field: 'proposerName',
+          show: true,
+          sortable: 'custom'
+        },
+        {
+          label: '发起时间',
+          field: 'createTimeL',
+          show: true,
+          width: 160
+        },
+        {
+          label: '备注',
+          field: 'applyRemark',
+          show: true
+        },
+        {
+          label: '操作',
+          field: 'operate',
+          show: true,
+          width: 80
+        }
+      ];
+    },
     async partBack(stock){
       // this.trackEventHandler('listBack');
       this.$refs.partBackForm.open(stock)
@@ -866,6 +987,75 @@ export default {
     formatCustomerName(cusName){
       if(!cusName) return '';
       return cusName.replace(/<[^>]+>/g, '');
+    },
+    goToApproveDetail(row) {
+      // TODO: 知识库、绩效报告跳转
+      let { objId, source } = row;
+
+      switch (source) {
+      case 'task':
+        this.createTaskTab(objId);
+        break;
+      case 'event':
+        this.createEventTab(objId);
+        break;
+      default:
+        break;
+      }
+    },
+    /** 
+    * @description 打开审批转交弹窗
+    */
+    openTransferDialog(batch, data) {
+      // 批量转交时未选择数据
+      if (batch && !this.multipleSelection.length) return this.$platform.alert('请选择要转交的数据');
+
+      if (batch) {
+        this.transferDialog.approveIds = this.multipleSelection.map(item => item.approveId) || [];
+      } else {
+        this.transferDialog.approveIds = [data.approveId];
+      }
+
+      this.transferDialog.batch = batch;
+      this.transferDialog.approver = {};
+      this.transferDialog.visible = true;
+      
+    },
+    /** 
+    * @description 审批转交
+    */
+    transferApprove() {
+      let { approver, batch, approveIds } = this.transferDialog;
+
+      // 未选择新审批人
+      if (!approver.userId) return this.$platform.alert('请选择新的审批人');
+
+      this.transferDialog.pending = true;
+
+      const params = {
+        userId: approver.userId,
+        oldUserId: this.userId,
+        approveIds
+      }
+
+      ApproveApi.approversUpdate(params).then(res => {
+        if (res.succ) {
+          this.$platform.notification({
+            message: '转交成功',
+            type: 'success',
+          })
+
+          this.init();
+          this.multipleSelection = [];
+          this.transferDialog.visible = false;
+        } else {
+          this.$platform.alert(res.message);
+        }
+
+        this.transferDialog.pending = false;
+      }).catch(err => {
+        this.transferDialog.pending = false;
+      })
     }
   },
   components: {
@@ -1014,6 +1204,22 @@ export default {
   }
   .el-dialog__footer{
     padding: 0px 20px 10px;
+  }
+}
+
+// 审批转交
+.transfer-approve-dialog {
+  .base-modal-body {
+    padding: 20px;
+
+    .tips {
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #666;
+    }
+  }
+  .base-modal-footer {
+    text-align: right;
   }
 }
 </style>
