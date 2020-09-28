@@ -2040,10 +2040,10 @@ export default {
           searchStateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
           allotTypes: params.allotTypeStrs && params.allotTypeStrs.map(type => AllotTypeConvertMap[type]),
           flags: params.onceExceptions && params.onceExceptions.map(exception => FlagConvertMap[exception] || '') ,
-          createUserIds: mySearch.createUser ? params.createUser ? params.createUser.push(mySearch.createUser) : [] : params.createUser,
-          executorUserIds: mySearch.executor ? params.executor ? params.executor.push(mySearch.executor) : [] : params.executor,
-          synergyUserIds: mySearch.synergyId ? params.synergyId ? params.synergyId.push(mySearch.synergyId) : [] : params.synergyId,
-          allotUserIds: params.allotUser,
+          createUserIds: this.getUserIdsWithSubmit(mySearch.createUser, params, 'createUser'),
+          executorUserIds: this.getUserIdsWithSubmit(mySearch.executor, params, 'executor'),
+          synergyUserIds: this.getUserIdsWithSubmit(mySearch.synergyId, params, 'synergyId'),
+          allotUserIds: this.getUserIdsWithSubmit(null, params, 'allotUser'),
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
           systemConditions
@@ -2098,6 +2098,19 @@ export default {
       }
       console.log("参数", this.searchParams);
       this.searchList();
+    },
+    getUserIdsWithSubmit(user, params, userKey) {
+      let users = params[userKey]
+      let isUserArray = Array.isArray(users) 
+      return (
+        user 
+        ? isUserArray
+          ? users.push(user) 
+          : [] 
+        : isUserArray
+          ? users
+          : []
+      )
     },
     /**
      * @description 时间字符串切割
