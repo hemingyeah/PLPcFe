@@ -22,7 +22,7 @@
       <div class="task-search-panel-title task-pointer" @click="show =!show">
         <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
         <i class="iconfont icon-up task-c3" v-else></i>
-        <span class="task-font16">常用字段</span>
+        <span class="task-font16">常用查询条件</span>
         <span slot="reference" class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
       </div>
       <div class="task-search-guide" v-show="!fields.length && guide">
@@ -46,14 +46,14 @@
             <span class="task-font16">设置查询条件</span>
             <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
           </div>
-        <!-- 设置查询条件 -->
-          <task-inquire 
-            v-if="taskInquireList.length"
-            ref="taskInquireParams" 
-            :columnNum="columnNum" 
-            :config="taskInquireList" 
-            @setting="_setting"
-          />
+      <!-- 设置查询条件 -->
+        <task-inquire 
+          v-if="taskInquireList.length"
+          ref="taskInquireParams" 
+          :columnNum="columnNum" 
+          :config="taskInquireList" 
+          @setting="_setting"
+        />
         <task-inquire 
           v-else
           ref="taskInquireParams" 
@@ -123,7 +123,6 @@ export default {
   watch: {
     customizeList() {
       this.taskTypeFilterFields
-      this.advanceds
       this._taskInquireList()
     },
   },
@@ -149,7 +148,6 @@ export default {
     fields() {
       let f = {};
       let fields = [...this.selfFields]
-        .filter((f) => f.isSearch)
         .map((field) => {
           f = _.cloneDeep(field);
 
@@ -192,10 +190,9 @@ export default {
     buildParams() {
       const form = { ...this.$refs.searchForm.returnData(), ...this.$refs.taskInquireParams.returnData() }
       this.formBackup = Object.assign({}, form)
-      console.log(form)
-
-      const isSystemFields = [...this.fields, ...this.taskInquireList].filter((f) => f.isSystem)
-      const notSystemFields = [...this.fields, ...this.taskInquireList].filter((f) => !f.isSystem)
+      const taskInquireList = this.taskInquireList.length ? this.taskInquireList : [...this.config, ...this.taskTypeFilterFields]
+      const isSystemFields = [...this.fields, ...taskInquireList].filter((f) => f.isSystem)
+      const notSystemFields = [...this.fields, ...taskInquireList].filter((f) => !f.isSystem)
       let params = {
         conditions: [],
       };
