@@ -18,8 +18,11 @@
             @mouseover="changeImgCover(true)"
             @mouseleave="changeImgCover(false)"
           >
-            <img :src="dataInfo.logoUrl ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96
-` : ''" class="avatar" />
+            <img
+              :src="dataInfo.logoUrl ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96
+` : ''"
+              class="avatar"
+            />
             <div class="img-cover" v-show="imgCover" @click.stop>
               <i @click.stop="clear()" class="iconfont icon-shanchu"></i>
             </div>
@@ -169,15 +172,14 @@ export default {
       this.imgCover = e;
     },
     saveData() {
-      this.dataInforReturn = _.cloneDeep(this.dataInfo);
-      this.$emit("changeInfoData", {
-        item: this.dataInforReturn,
+      this.$refs["ruleForm"].validate((valid) => {
+        if (!valid) return;
+        this.dataInforReturn = _.cloneDeep(this.dataInfo);
+        this.$emit("changeInfoData", {
+          item: this.dataInforReturn,
+        });
+        this.cancelInfoData();
       });
-      this.cancelInfoData();
-      // this.changeFullscreenLoading(true);
-      // setTimeout(() => {
-      //   this.changeFullscreenLoading(false);
-      // }, 1000);
     },
     resetData() {
       this.$refs["ruleForm"].clearValidate();
