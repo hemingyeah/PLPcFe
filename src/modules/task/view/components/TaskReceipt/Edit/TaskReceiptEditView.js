@@ -202,7 +202,7 @@ export default {
             title: '暂存成功'
           })
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -272,7 +272,7 @@ export default {
             title: '提交成功'
           })
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -294,7 +294,7 @@ export default {
             title: '编辑成功'
           })
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;

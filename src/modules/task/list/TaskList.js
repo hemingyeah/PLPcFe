@@ -8,6 +8,7 @@ import TaskViewModel from "./components/TaskViewModel.vue";
 import BatchEditingCustomerDialog from "./components/BatchEditingCustomerDialog.vue";
 import TaskTransfer from "./components/TaskTransfer.vue";
 import TaskMap from "./components/TaskMap.vue";
+import TaskView from './components/TaskView.vue'
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
@@ -22,6 +23,8 @@ import { formatDate } from "@src/util/lang";
 import { getRootWindow } from "@src/util/dom";
 
 /* constants */
+import { AllotTypeConvertMap, FlagConvertMap, TaskSearchInputPlaceholderMap } from '@src/modules/task/model/TaskConvertMap.ts';
+
 const TASK_LIST_KEY = "task_list";
 // 埋点事件对象
 const TRACK_EVENT_MAP = {
@@ -48,28 +51,6 @@ const TASK_SELF_FIELD_NAMES = [
 ];
 // 导出过来字段类型
 const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
-// 派单方式 数据转换
-const AllotTypeConvertMap = {
-  '全部': 0,
-  '手动派单': 1,
-  '工单池派单': 2,
-  '自动派单': 3
-}
-// 工单标记 数据转换
-const FlagConvertMap = {
-  '不筛选': '',
-  '曾超时': 'ONCEOVERTIME',
-  '曾拒绝': 'ONCEREFUSED',
-  '曾暂停': 'ONCEPAUSED',
-  '曾回退': 'ONCEROLLBACK',
-  '位置异常': 'POSITIONEXCEPTION'
-}
-
-const TaskSearchInputPlaceholderMap = {
-  default: '请输入工单编号或工单信息',
-  '按工单备注': '请输入工单备注内容',
-  '按附加组件': '请输入附加组件字段值'
-}
 
 export default {
   name: "task-list",
@@ -107,6 +88,7 @@ export default {
       multipleSelection: [],
       multipleSelectionPanelShow: false,
       params: this.initParams(),
+
       selectPanelColumns: [
         {
           key: "taskNo",
@@ -134,7 +116,9 @@ export default {
       taskReceiptFields: [],
       taskPage: new Page(),
       totalItems: 0,
-      taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap
+      navWidth: window.innerWidth - 120,
+      taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap,
+      task_view_list: []
     };
   },
   computed: {
@@ -433,17 +417,24 @@ export default {
     /** 工单类型过滤后的字段 */
     taskTypeFilterFields() {
       let fields = this.taskFields.concat(this.taskReceiptFields) || [];
-      let taskTypeFilterFields = fields.filter((field) =>
-        this.filterFieldFuncHandle(field)
-      );
-
+      let taskTypeFilterFields = fields.filter((field) => {
+        return (
+          EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1 &&
+          field.isSystem == 0
+        )
+      // return field.isSystem == 0
+      });
       return taskTypeFilterFields;
     },
     /*批量编辑过滤后的字段 */
     taskFieldList() {
       let fields = this.taskFields || [];
-      let taskTypeFilterFields = fields.filter((field) =>
-        this.filterFieldFuncHandle(field)
+      let taskTypeFilterFields = fields.filter((field) =>{
+        return (
+          EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1 &&
+          field.isSystem == 0
+        )
+      }
       );
 
       return taskTypeFilterFields;
@@ -462,6 +453,7 @@ export default {
     },
   },
   mounted() {
+    const that = this
     console.log("taskView", this.initData);
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
     this.currentTaskType =
@@ -469,6 +461,11 @@ export default {
     if (this.taskTypeList.length === 1) {
       this.getCardDetailList(this.taskTypes[1].id);
     }
+    window.onresize = () => {
+      return (() => {
+        that.navWidth = window.innerWidth - 120;
+      })();
+    };
 
     this.getUserViews();
     this.getTaskCountByState();
@@ -687,8 +684,15 @@ export default {
       if (!searchModel.templateId) {
         this.currentTaskType = { id: "", name: "全部" };
       }
+      this.$refs.taskView.open(id)
       this.search(searchModel);
       this.buildColumns();
+    },
+    /*
+      查看视图
+     */
+    _searchModel(list) {
+      this.task_view_list = list
     },
     /* 顶部筛选 */
     checkFilter({ id, name, searchModel, title }) {
@@ -819,7 +823,7 @@ export default {
           selectCols.push(item.fieldName);
         }
       });
-      this.region["searchModel"] = this.$refs.searchPanel.buildParams();
+      this.region["searchModel"] = this.searchParams;
       this.region["selectedCols"] = selectCols.join(",");
       this.$refs.viewModel.open();
     },
@@ -931,22 +935,20 @@ export default {
         .reduce((acc, col, currentIndex) => {
           acc[col.field] = {
             field: col,
-            index: currentIndex
+            index: currentIndex,
           }
           return acc
         }, {});
-
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
-      if (Array.isArray(columnStatus) && columnStatus.length > 0) {
-        fields = this.buildSortFields(fields, localColumns)
-      }
+      // if (Array.isArray(columnStatus) && columnStatus.length > 0) {
+      //   fields = this.buildSortFields(fields, localColumns)
+      // }
 
       // S 高级搜索
       // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
-
       this.columns = fields
         .map((field) => {
           let sortable = false;
@@ -988,8 +990,9 @@ export default {
             minWidth = 200;
           }
 
-          if (["taskNo"].indexOf(field.fieldName) !== -1) {
+          if (["taskNo", 'customer'].indexOf(field.fieldName) !== -1) {
             minWidth = 250;
+            sortable = "custom";
           }
           return {
             ...field,
@@ -1256,7 +1259,6 @@ export default {
         templateId: this.currentTaskType.id || "",
         tableName: "task_receipt",
       };
-      console.log(params);
       return TaskApi.getTaskTemplateFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task_receipt";
@@ -1384,7 +1386,6 @@ export default {
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
-
       this.multipleSelection = tv;
 
       // this.$refs.baseSelectionBar.openTooltip();
@@ -1569,15 +1570,17 @@ export default {
      * @description 重置参数
      */
     resetParams() {
-      this.trackEventHandler("reset");
+      // this.trackEventHandler("reset");
 
-      this.currentTaskType = this.taskTypes[0];
-      this.$refs.searchPanel.resetParams();
+      // this.currentTaskType = this.taskTypes[0];
+      // this.$refs.searchPanel.resetParams();
 
-      let pageSize = this.params.pageSize;
-      this.params = this.initParams(pageSize);
-
-      this.search();
+      // let pageSize = this.params.pageSize;
+      // this.params = this.initParams(pageSize);
+      // this.search();
+      window.__exports__refresh = "";
+      const fromId = window.frameElement.getAttribute("id");
+      this.$platform.refreshTab(fromId);
     },
     /**
      * @description 还原本地存储
@@ -1685,6 +1688,8 @@ export default {
             cusDist: dist,
           };
         }
+        // 系统字段查询条件
+        const { systemConditions = [] } = params
         // 自定义
         const conditions = params.conditions || [];
         const paymentMethod = params.paymentMethod
@@ -1902,6 +1907,7 @@ export default {
           allotUserIds: params.allotUser,
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
+          systemConditions
         };
         
         // 工单搜索分类型
@@ -1951,7 +1957,7 @@ export default {
 
         this.searchParams = { ...searchModel, ...mySearch };
       }
-      console.log("参数", params);
+      console.log("参数", this.searchParams);
       this.searchList();
     },
     /**
@@ -2029,7 +2035,8 @@ export default {
     sortChange(option) {
       const UserNameConvertMap = {
         'createUserName': 'createUser',
-        'executorName': 'executorUser'
+        'executorName': 'executorUser',
+        'customer': 'customerName'
       }
 
       try {
@@ -2158,6 +2165,7 @@ export default {
   },
   components: {
     [TaskMap.name]: TaskMap,
+    [TaskView.name]: TaskView,
     [TaskTransfer.name]: TaskTransfer,
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,

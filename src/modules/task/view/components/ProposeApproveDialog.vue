@@ -42,6 +42,10 @@ export default {
     remarkRequired: {
       type: Boolean,
       default: false
+    },
+    taskId: {
+      type: String,
+      default: '',
     }
   },
   data: () => {
@@ -91,7 +95,7 @@ export default {
         if (res.status == 0) {
           this.$platform.alert('已发起审批，请等待审批结果，结果会以钉钉消息的方式通知');
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.taskId}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;

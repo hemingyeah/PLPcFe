@@ -328,6 +328,7 @@
     <task-approve-dialog
       ref="approveTaskDialog"
       :approve-id="unFinishedAppr.id"
+      :task-id="task.id"
     />
     <!-- end 审批弹窗 -->
 
@@ -335,6 +336,7 @@
     <propose-approve-dialog
       ref="proposeApprove"
       :remark-required="taskConfig.approveRemark"
+      :task-id="task.id"
     />
     <!-- end 工单发起审批弹窗 -->
 

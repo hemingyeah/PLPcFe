@@ -430,6 +430,12 @@
     content: none;
   }
 
+  .cell {
+    &.el-tooltip {
+      min-width: auto !important;
+    }
+  }
+
   .base-table-header th {
     background: #F5F5F5;
     color: $text-color-primary;
