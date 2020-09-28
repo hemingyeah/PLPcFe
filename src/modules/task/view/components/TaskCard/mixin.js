@@ -200,7 +200,7 @@ export default {
             title: '保存成功'
           })
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -239,7 +239,7 @@ export default {
               title: '删除成功'
             })
 
-            window.location.reload();
+            window.location.href = `/task/view/${this.task.id}`;
           } else {
             this.$platform.alert(res.message);
           }

@@ -689,7 +689,7 @@ export default {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -717,7 +717,7 @@ export default {
 
       TaskApi.pauseTask({ taskId, reason }).then(res => {
         if (res.success) {
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -732,7 +732,7 @@ export default {
 
       TaskApi.unpauseTask({ taskId: this.task.id }).then(res => {
         if (res.success) {
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -783,7 +783,7 @@ export default {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -830,7 +830,7 @@ export default {
       this.pending = true;
       TaskApi.offApprove({ apprId: this.unFinishedAppr.id }).then(res => {
         if (res.status == 0) {
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -1063,8 +1063,8 @@ export default {
       
       let query = parse(window.location.search) || {};
       
-      // 来自审核结算列表并且非审批中的工单
-      if (query.active == 'balance' && !this.isApproving && this.task.state != 'costed') {
+      // 来自审核结算列表的结算操作
+      if (query.active == 'balance' && this.viewBalanceTab && this.allowBalanceTask) {
         this.openDialog('balance');
       } else {
         this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'card-tab';

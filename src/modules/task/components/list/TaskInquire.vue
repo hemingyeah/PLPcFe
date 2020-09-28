@@ -20,25 +20,22 @@ import SearchProductSelect from './SearchProductSelect.vue';
 import SearchCustomerSelect from './SearchCustomerSelect.vue';
 import { typeOf } from '@src/util/assist';
 
+const TaskInquireFiltersFieldNames = ['cusAddress', 'area', 'tags']
 const OperatorSelectOptionsMap = {
   'input': [
-    { label: '包含', value: 'like'},
+    { label: '包含', value: 'contain'},
     { label: '等于', value: 'eq'},
-    { label: '大于', value: 'lt'},
-    { label: '大于等于', value: 'wa'},
-    { label: '小于', value: 'hh'},
-    { label: '小于等于', value: 'lp'}
+    { label: '大于', value: 'gt'},
+    { label: '大于等于', value: 'ge'},
+    { label: '小于', value: 'lt'},
+    { label: '小于等于', value: 'le'}
   ],
   'text': [    
-    { label: '包含', value: 'like'},
+    { label: '包含', value: 'contain'},
     { label: '等于', value: 'eq'}
   ],
   'date': [
-    { label: '等于', value: 'eq'},
-    { label: '大于', value: 'lt'},
-    { label: '大于等于', value: 'wa'},
-    { label: '小于', value: 'hh'},
-    { label: '小于等于', value: 'lp'}
+    { label: '介于', value: 'between'}
   ],
   'select': [
     { label: '等于', value: 'eq'}
@@ -50,6 +47,9 @@ function setFieldOperateHandler(field = {}) {
 
   if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice()
+  }
+  else if (fieldName == 'customer' || fieldName == 'product') {
+    field.operatorOptions = OperatorSelectOptionsMap.select.slice()
   }
   else if (formType == 'text' || formType == 'textarea') {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice()
@@ -81,10 +81,10 @@ export default {
   },
   data() {
     return {
-        list: [1],
-        checkSystemList: [], //系统
-        checkCustomizeList: [], //自定义
-        setting_list: []
+      list: [1],
+      checkSystemList: [], // 系统
+      checkCustomizeList: [], // 自定义
+      setting_list: []
     }
   },
   computed: {
@@ -92,7 +92,9 @@ export default {
       const searchField = localStorage.getItem('task-search-field')
       let f = {};
       let fields = [...this.config]
-        .filter((f) => f.isSearch)
+        .filter((f) => {
+          return f.isSearch && TaskInquireFiltersFieldNames.indexOf(f.fieldName) < 0
+        })
         .map((field) => {
           f = _.cloneDeep(field);
 
@@ -108,13 +110,14 @@ export default {
 
           setFieldOperateHandler(f)
 
-          return Object.freeze({
+          return {
             ...f,
             isNull: 1,
             formType,
             originalFormType: f.formType,
             operator: this.matchOperator(f),
-          });
+          };
+
         })
         .sort((a, b) => a.orderId - b.orderId);
       return fields;
@@ -125,7 +128,7 @@ export default {
       let data = {}
       this.$refs.batchForm.forEach(item => {
         for(let key in item.returnDatas()) {
-          if (typeOf(item.returnDatas()[key]) === 'string' && item.returnDatas()[key] ) {
+          if (item.returnDatas()[key] ) {
             data[key] = item.returnDatas()[key]
           } else if(key === 'tags' && item.returnDatas()[key].length) {
             data[key] = item.returnDatas()[key] 
@@ -135,6 +138,15 @@ export default {
         }
       })
       return data
+    },
+    returnInquireFields() {
+      let inquireFields = []
+
+      this.$refs.batchForm.forEach(batchFormEl => {
+        inquireFields.push(batchFormEl.selectedField)
+      })
+
+      return inquireFields
     },
     matchOperator(field) {
       let formType = field.formType;
@@ -180,17 +192,22 @@ export default {
       this.list.push(1)
     },
     setting(item) {
-        if (item.isSystem) {
-            this.checkSystemList.push(item.displayName)
-        } else {
-            this.checkCustomizeList.push(item.displayName)
-        }
+      if (item.isSystem) {
+        this.checkSystemList.push(item.displayName)
+      } else {
+        this.checkCustomizeList.push(item.displayName)
+      }
 
-        const check_system_list = new Set(this.checkSystemList)
-        const check_customize_list = new Set(this.checkCustomizeList)
-        const list = [...check_system_list, ...check_customize_list]
-        this.$emit('setting', {item, list, check_system_list, check_customize_list})
-        this.setting_list.push(item.displayName)
+      const check_system_list = new Set(this.checkSystemList)
+      const check_customize_list = new Set(this.checkCustomizeList)
+      const list = [...check_system_list, ...check_customize_list]
+      this.$emit('setting', {item, list, check_system_list, check_customize_list})
+      this.setting_list.push(item.displayName)
+    },
+    initFormVal() {
+      this.$refs.batchForm.forEach(el => {
+        el.buildForm()
+      })
     }
   },
   components: {
@@ -291,7 +308,9 @@ export default {
         selectField(val) {
           this.selectedField = this.fields.filter(
             (f) => f.fieldName === val
-          )[0];  
+          )[0];
+
+          this.form[val] = val == 'tags' ? [] : ''
         },
         renderSelector() {
           if (!this.fields) return null

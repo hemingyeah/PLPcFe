@@ -120,7 +120,7 @@ export default {
           let fromId = window.frameElement.getAttribute('fromid');
           this.$platform.refreshTab(fromId);
 
-          window.location.reload();
+          window.location.href = `/task/view/${this.task.id}`;
         } else {
           this.$platform.alert(res.message);
           this.pending = false;

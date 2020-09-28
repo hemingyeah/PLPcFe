@@ -90,9 +90,19 @@ import { formatDate } from "@src/util/lang";
 import { isEmptyStringObject } from "@src/util/function";
 import { storageGet, storageSet } from "@src/util/storage";
 
+/* enum */
+
+import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
 /* constants */
+import { AllotTypeConvertMap, FlagConvertMap, TaskOnceConvertMap, TaskApproveConvertMap } from '@src/modules/task/model/TaskConvertMap.ts';
+
 const TASK_HISTORY_KEY = "task_history_list";
 const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod', 'tag']
+const TaskInquireConvertFieldNamesToConditionsMap = {
+  customer: 'customerId',
+  product: 'productId',
+  tlmName: 'tlmId'
+}
 
 export default {
   name: "task-search-panel",
@@ -181,11 +191,11 @@ export default {
   },
   methods: {
     buildParams() {
-      const {fields, taskInquireList} = this
-      const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()};
-      this.formBackup = Object.assign({}, form);
-      const isSystemFields = taskInquireList.length ? [...fields, ...taskInquireList].filter((f) => f.isSystem) : this.fields.filter((f) => f.isSystem);
-      const notSystemFields = taskInquireList.length ? [...fields, ...taskInquireList].filter((f) => !f.isSystem) : this.fields.filter((f) => !f.isSystem);
+      const form = { ...this.$refs.searchForm.returnData() }
+      this.formBackup = Object.assign({}, form)
+
+      const isSystemFields = this.fields.filter((f) => f.isSystem)
+      const notSystemFields = this.fields.filter((f) => !f.isSystem)
       let params = {
         conditions: [],
       };
@@ -314,8 +324,190 @@ export default {
           value: form[fn],
         });
       }
+
+      this.buildTaskInquireParams(params)
+
       // 返回接口数据
       return params;
+    },
+    buildTaskInquireParams(params) {
+      const taskInquireList = this.$refs.taskInquireParams.returnInquireFields()
+      const form = this.$refs.taskInquireParams.returnData()
+
+      this.formBackup = Object.assign(this.formBackup, form);
+
+      const isSystemFields = taskInquireList.filter((f) => f.isSystem);
+      const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
+      
+      params.systemConditions = []
+
+      let tv = null;
+      let fn = "";
+      // 固定条件
+      for (let i = 0; i < isSystemFields.length; i++) {
+        tv = isSystemFields[i];
+        fn = tv.fieldName;
+        
+        if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
+          continue;
+        }
+
+        // 空对象
+        if (
+          typeof form[fn] === "object" &&
+          !Array.isArray(form[fn]) &&
+          !Object.keys(form[fn]).length
+        ) {
+          continue;
+        }
+
+        if (tv.formType === "address") {
+          let address = {
+            property: fn,
+            operator: tv.operatorValue,
+          };
+          let isEmpty = isEmptyStringObject(form[fn]);
+
+          if (!isEmpty) {
+            address.value =
+              (form[fn].province || "") +
+              (form[fn].city || "") +
+              (form[fn].dist || "") +
+              (form[fn].address || "");
+          }
+          params.systemConditions.push(address);
+          continue;
+        }
+
+        if (tv.fieldName == 'tags') {
+          let condition = {
+            property: fn,
+            operator: tv.operatorValue,
+            value: form[fn].map(tag => tag.id)[0]
+          }
+          params.systemConditions.push(condition);
+          continue;
+        }
+
+        if (tv.fieldName == 'state') {
+          let condition = {
+            property: fn,
+            operator: tv.operatorValue,
+            value: TaskStateEnum.getValue(form[fn])
+          }
+          params.systemConditions.push(condition);
+          continue;
+        }
+
+        if (tv.fieldName == 'product') {
+          params.systemConditions.push({
+            property: 'productId',
+            operator: tv.operatorValue,
+            value: form[fn],
+          })
+          continue
+        }
+
+        if (tv.fieldName == 'allotTypeStr') {
+          params.systemConditions.push({
+            property: 'allotType',
+            operator: tv.operatorValue,
+            value: AllotTypeConvertMap[form[fn]],
+          })
+          continue
+        }
+
+        if (tv.fieldName == 'onceException') {
+          params.systemConditions.push({
+            property: 'flag',
+            operator: tv.operatorValue,
+            value: FlagConvertMap[form[fn]],
+          })
+          continue
+        }
+
+        if (tv.formType == 'date') {
+          params.systemConditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
+            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD')
+          })
+          continue
+        }
+
+
+        if (tv.formType === 'datetime') {
+          params.systemConditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`
+          })
+          continue
+        }
+
+        if (TaskInquireConvertFieldNamesToConditionsMap[fn]) {
+          params.systemConditions.push({
+            property: TaskInquireConvertFieldNamesToConditionsMap[fn],
+            operator: tv.operatorValue,
+            value: form[fn],
+          })
+          continue
+        }
+
+        let value = TaskOnceConvertMap[form[fn]] != undefined ? TaskOnceConvertMap[form[fn]] : form[fn]
+        value = TaskApproveConvertMap[value] != undefined ? TaskApproveConvertMap[value] : value
+
+        params.systemConditions.push({
+          property: fn,
+          operator: tv.operatorValue,
+          value
+        });
+      }
+
+      // 自定义条件
+      for (let i = 0; i < notSystemFields.length; i++) {
+        tv = notSystemFields[i];
+        fn = tv.fieldName;
+        if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
+          continue;
+        }
+
+        // 空对象
+        if (
+          typeof form[fn] === "object" &&
+          !Array.isArray(form[fn]) &&
+          !Object.keys(form[fn]).length
+        ) {
+          continue;
+        }
+
+        if (tv.formType === "address") {
+          let address = {
+            property: fn,
+            operator: tv.operatorValue,
+          };
+          let isEmpty = isEmptyStringObject(form[fn]);
+
+          if (!isEmpty) {
+            address.value =
+              (form[fn].province || "") +
+              (form[fn].city || "") +
+              (form[fn].dist || "") +
+              (form[fn].address || "");
+          }
+          params.conditions.push(address);
+          continue;
+        }
+
+        params.conditions.push({
+          property: fn,
+          operator: tv.operatorValue,
+          value: form[fn],
+        });
+      }
+
     },
     getLocalStorageData() {
       const dataStr = storageGet(TASK_HISTORY_KEY, "{}");
@@ -369,8 +561,8 @@ export default {
     },
     resetParams() {
       this.formBackup = {};
-      this.$refs.searchForm &&
-        this.$nextTick(this.$refs.searchForm.initFormVal);
+      this.$refs.searchForm && this.$nextTick(this.$refs.searchForm.initFormVal)
+      this.$refs.taskInquireParams && this.$nextTick(this.$refs.taskInquireParams.initFormVal)
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
