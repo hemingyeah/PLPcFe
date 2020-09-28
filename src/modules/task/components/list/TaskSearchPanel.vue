@@ -28,19 +28,6 @@
     </div>
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <task-search-form
-        class="task-search-forms"
-        :class="{'hide': show}"
-        :fields="fields"
-        ref="searchForm"
-        :form-backup="formBackup"
-        :column-num="columnNum"
-      >
-      </task-search-form>
-      <div class=" task-pointer">
-        <span class="task-font16">设置查询条件</span>
-        <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
-      </div>
       <!-- S 搜索条件 -->
       <el-form class="advanced-search-form" onsubmit="return false;">
         <task-search-form
@@ -289,6 +276,8 @@ export default {
 
         if (MultiFieldNames.indexOf(fn) > -1) {
           params[`${fn}s`] = form[fn]
+          delete params[fn]
+          continue;
         }
 
         if (tv.fieldName === 'tags') {
