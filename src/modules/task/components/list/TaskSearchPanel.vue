@@ -554,8 +554,8 @@ export default {
     },
     resetParams() {
       this.formBackup = {};
-      this.$refs.searchForm &&
-        this.$nextTick(this.$refs.searchForm.initFormVal);
+      this.$refs.searchForm && this.$nextTick(this.$refs.searchForm.initFormVal)
+      this.$refs.taskInquireParams && this.$nextTick(this.$refs.taskInquireParams.initFormVal)
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();

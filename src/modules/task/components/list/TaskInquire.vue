@@ -81,10 +81,10 @@ export default {
   },
   data() {
     return {
-        list: [1],
-        checkSystemList: [], //系统
-        checkCustomizeList: [], //自定义
-        setting_list: []
+      list: [1],
+      checkSystemList: [], // 系统
+      checkCustomizeList: [], // 自定义
+      setting_list: []
     }
   },
   computed: {
@@ -192,17 +192,22 @@ export default {
       this.list.push(1)
     },
     setting(item) {
-        if (item.isSystem) {
-            this.checkSystemList.push(item.displayName)
-        } else {
-            this.checkCustomizeList.push(item.displayName)
-        }
+      if (item.isSystem) {
+        this.checkSystemList.push(item.displayName)
+      } else {
+        this.checkCustomizeList.push(item.displayName)
+      }
 
-        const check_system_list = new Set(this.checkSystemList)
-        const check_customize_list = new Set(this.checkCustomizeList)
-        const list = [...check_system_list, ...check_customize_list]
-        this.$emit('setting', {item, list, check_system_list, check_customize_list})
-        this.setting_list.push(item.displayName)
+      const check_system_list = new Set(this.checkSystemList)
+      const check_customize_list = new Set(this.checkCustomizeList)
+      const list = [...check_system_list, ...check_customize_list]
+      this.$emit('setting', {item, list, check_system_list, check_customize_list})
+      this.setting_list.push(item.displayName)
+    },
+    initFormVal() {
+      this.$refs.batchForm.forEach(el => {
+        el.buildForm()
+      })
     }
   },
   components: {
