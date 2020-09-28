@@ -758,7 +758,7 @@
                 </template>
 
                 <template v-else-if="!column.isSystem">
-                  {{ scope.row.attribute[column.field] }}
+                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
                 </template>
 
                 <template v-else>
