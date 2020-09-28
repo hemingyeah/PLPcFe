@@ -20,8 +20,15 @@ export function isSafeNumber(value) {
 }
 
 /** 格式化时间 */
-export function formatDate(date, tmp) {
-  if (!date && date != 0) return ''
+export function formatDate(originDate, tmp){
+  let date = '';
+
+  try {
+    date = new Date(originDate).getTime();
+  } catch (error) {
+    date = originDate;
+  }
+
   return DateUtil.format(date, tmp);
 }
 

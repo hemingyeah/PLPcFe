@@ -124,7 +124,7 @@ body,
   justify-content: space-between;
   overflow: hidden;
   user-select: none;
-  background: mix(#fff, $color-primary, 89.88%);
+  background: #fff;
   border-bottom: 1px solid #f2f2f2;
 }
 
@@ -724,3 +724,16 @@ button.export-operate-btn{
   }
 }
 /* --------  end 用户向导 ---------------- */
+
+.task-version-btn {
+  width: 88px;
+  padding: 7px 0;
+  font-size: $font-size-small;
+  font-weight: normal;
+
+  &.task-new-version {
+    padding: 8px 0;
+    border: none;
+    background: linear-gradient(135deg, #FF5858 0%, #F09819 100%);
+  }
+}

@@ -82,7 +82,6 @@ function getRequestOptions(path, method, options = {}) {
     
   requestOptions.path = path;
   requestOptions.method = method;
-
   requestOptions.headers = Object.assign({}, isNotLocalEnv ? options.headers : DEFAULT_OPIONS.headers);
 
   setBaseOptions(requestOptions, options);

@@ -1,6 +1,10 @@
 <template>
   <div class="form-preview-group form-textarea-preview">
-    <label>{{field.displayName}} <span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
+    <label>
+      {{field.displayName}} 
+      <span class="form-preview-notNull" v-if="field.isNull == 0">*</span>
+      <i class="iconfont icon-yidongduanxianshi" v-if="field.isAppShow === 1"></i>
+    </label>
     <div class="form-preview-mock">
       <p class="form-preview-control">{{field.placeHolder}}</p>
     </div>
@@ -8,18 +12,11 @@
 </template>
 
 <script>
+import { previewProps } from '@src/component/form/components/props';
+
 export default {
   name: 'form-textarea-preview',
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    }
-  }
+  props: previewProps
 }
 </script>
 

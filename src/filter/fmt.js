@@ -61,7 +61,7 @@ export function dateFormat(date, formatStr) {
   let dateObj = {},
     rStr = /\{([^}]+)\}/,
     mons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-   
+  
   dateObj['Y'] = date.getFullYear();
   dateObj['M'] = date.getMonth() + 1;
   dateObj['MM'] = parseNumber(dateObj['M']);
@@ -77,7 +77,7 @@ export function dateFormat(date, formatStr) {
   dateObj['ii'] = parseNumber(dateObj['i']);
   dateObj['s'] = date.getSeconds();
   dateObj['ss'] = parseNumber(dateObj['s']);
- 
+
   while(rStr.test(formatStr)) {
     formatStr = formatStr.replace(rStr, dateObj[RegExp.$1]);
   }

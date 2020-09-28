@@ -7,6 +7,13 @@ export const FILE_MAX_SIZE = 10 * 1024 * 1024; // 单位字节(Byte)
 export const WIKI_FILE_MAX_SIZE = 50 * 1024 * 1024; // 50M
 export const FILE_MAX_NUM = 9;
 
+export const fileTypeObj = {
+  xlsx : {
+    fileName : 'xlsx',
+    errMsg : "只支持[xlsx]格式的文件，请重新选择"
+  }
+};
+
 /** 
  * 验证文件是否符合以下条件
  * 1. 10m以内
@@ -203,7 +210,8 @@ const uploader = {
   batchUploadWithParse,
   validate,
   FILE_MAX_SIZE,
-  FILE_MAX_NUM
+  FILE_MAX_NUM,
+  fileTypeObj
 }
 
 export default uploader;

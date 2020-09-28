@@ -674,8 +674,7 @@ export default {
 
       this.loadingListData = true;
 
-      return this.$http
-        .post('/customer/list', params)
+      return CustomerApi.getCustomerList(params)
         .then(res => {
           if (!res || !res.list) {
             this.customers = [];

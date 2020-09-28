@@ -17,7 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
-      "@model/*": ["model/*"]
+      "@model/*": ["model/*"],
+      "@service/*": ["service/*"]
     },
     
     "lib": [
@@ -29,10 +30,23 @@
   },
   //此处和jsconfig冲突
   "include": [ 
+    "model/*.ts",
+    "model/*.tsx",
+    "model/**/*.ts",
+    "model/**/*.tsx",
+    "model/**/**/*.ts",
+    "model/**/**/*.tsx",
+    "service/**/*.ts",
+    "service/**/*.tsx",
+    "service/*.ts",
+    "service/*.tsx",
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "src/**/**/*.ts",
+    "src/**/**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
   ]
 }

@@ -411,25 +411,6 @@ export default {
       });
       this.deleteRecord(item);
     },
-    /** @deprecated */
-    openTab(module) {
-      let menus = JSON.parse(window._init).menus || [];
-      let tab = {};
-
-      if(module == 'customer') { 
-        tab = menus.filter(m => m.order == 301)[0];
-      } else if(module == 'task') {
-        tab = menus.filter(m => m.order == 201)[0];
-      }
-
-      this.$platform.openTab({
-        id: tab.menuKey,
-        title: tab.name,
-        close: true,
-        reload: true,
-        url: tab.url,
-      })
-    },
     /** 打开  失败的弹窗   */
     openErrorDialog(item, action) {
       let reasons = item?.importInfo?.reasons;

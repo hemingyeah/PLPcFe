@@ -41,7 +41,8 @@
 </template>
 
 <script>
-import SettingMixin from "@src/component/form/mixin/setting";
+import SettingMixin from '@src/component/form/mixin/setting';
+import { settingProps } from '@src/component/form/components/props';
 /** *
  *  高级搜索组件  关联的搜索 1对多
  * extendData  String 关联的数据
@@ -49,27 +50,20 @@ import SettingMixin from "@src/component/form/mixin/setting";
  */
 
 export default {
-  name: "customer-extend",
+  name: 'customer-extend',
   mixins: [SettingMixin],
   props: {
+    ...settingProps,
     values: {
       type: String,
-      default: () => ""
-    },
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
+      default: () => ''
     },
     extendData: {
       type: Object
     },
     extendDisplayName: {
       type: String,
-      default: () => ""
+      default: () => ''
     },
     /** 用于获取FormDesign实例 */
     getContext: Function
@@ -94,14 +88,14 @@ export default {
     return {
       options: [],
       loading: false,
-      extend_data: ""
+      extend_data: ''
     };
   },
   mounted() {},
   methods: {
     remoteMethod() {
       this.loading = true;
-      this.$http[this.field.searchType === "GET" ? "get" : "post"](
+      this.$http[this.field.searchType === 'GET' ? 'get' : 'post'](
         this.field.searchUrl,
         this.extendData || {}
       ).then(res => {
@@ -112,7 +106,7 @@ export default {
             }
             return res_;
           });
-          this.$set(this, "options", res.list);
+          this.$set(this, 'options', res.list);
         } else {
           this.options = [];
         }
@@ -120,7 +114,7 @@ export default {
       });
     },
     update(value) {
-      this.$emit("update", { newValue: value, field: this.field });
+      this.$emit('update', { newValue: value, field: this.field });
     },
     visibleChange(val) {
       if (!val) {
@@ -128,7 +122,9 @@ export default {
         input.blur();
       }
     },
-    filterBlur() {}
+    filterBlur() {
+      //
+    }
   }
 };
 </script>

@@ -20,6 +20,24 @@
               >
                 <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
               </button>
+
+              <!-- start 工单列表切换新旧版 -->
+              <template v-if="allowChangeTaskVersion">
+                <el-button
+                  @click="changeTaskVersion(false)"
+                  class="task-version-btn"
+                  type="primary"
+                  v-if="isUserTaskGray"
+                >返回旧版</el-button>
+
+                <el-button
+                  @click="changeTaskVersion(true)"
+                  class="task-version-btn task-new-version"
+                  type="primary"
+                  v-else
+                >切换新版</el-button>
+              </template>
+              <!-- end 工单列表切换新旧版 -->
             </div>
 
             <div class="frame-quick-notification" v-show="notificationShow">
@@ -107,17 +125,20 @@
                 <div class="dev-tool-menu">
                   <a href="javascript:;" @click="clearStorage">清空缓存</a>
                   <a href="javascript:;" @click="openDemo">demo</a>
-                  <a href="javascript:;" @click="goRoleTeam">团队管理</a>
-                  <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
+                  <!-- <a href="javascript:;" @click="goRoleTeam">团队管理</a> -->
+                  <!-- <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
                   <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
-                  <!-- <a href="javascript:;" @click="goDoMyself">消息中心</a>
-                  <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
+                  <a href="javascript:;" @click="goDoMyself">自助门户设置</a> -->
+                  <a href="javascript:;" @click="goTaskSetting">工单表单设置</a>
+                  <a href="javascript:;" @click="goTaskReceiptSetting">工单回执表单设置</a>
+                  <a href="javascript:;" @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;" @click="goCreateTaskForCallcenter">新建工单呼叫中心</a>
+                  <a href="javascript:;" @click="goTaskList">工单列表</a>
+                  <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
-                  <a href="javascript:;" @click="goCallCenter">呼叫中心</a>-->
-                  <a href="javascript:;" @click="goMyShop">门户设置new</a>
-                  <a href="javascript:;" @click="goMyShopOrder">订单管理</a>
+                  <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
                 </div>
               </el-popover>
 
@@ -341,6 +362,9 @@ import NotificationCenter from "./component/NotificationCenter.vue";
 import * as NotificationApi from "@src/api/NotificationApi";
 import * as CallCenterApi from "@src/api/CallCenterApi";
 
+/* util */
+import _ from 'lodash';
+
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
 // const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
@@ -401,6 +425,7 @@ export default {
         },
       },
       has_call_center_module: false,
+      isUserTaskGray: this.initData.isUserTaskGrayFunction // 用户选择新旧版工单标识
     };
   },
   computed: {
@@ -434,8 +459,19 @@ export default {
       return this.loginUser.head || DefaultHead;
     },
     releaseVersion() {
-      return this.initData.releaseVersion || "";
+      return this.initData.releaseVersion || '';
     },
+    /** 激活状态的工单列表 */
+    currentTaskListTab() {
+      let taskList = this.frameTabs.filter(tab => tab.id === 'M_TASK_ALL' && tab.show);
+      return taskList[0] || {};
+    },
+    /** 允许切换工单新旧版本 */
+    allowChangeTaskVersion() {
+      // 企业是否开启工单灰度功能
+      let isTaskGray = this.initData.isTaskGrayFunction;
+      return isTaskGray && this.currentTaskListTab.id;
+    }
   },
   methods: {
     async hangUpCall() {
@@ -512,9 +548,9 @@ export default {
     },
     openDemo() {
       this.openForFrame({
-        id: "demo",
-        url: "/payment/paymentBillOnline",
-        title: "demo",
+        id: 'demo',
+        url: '/demo',
+        title: 'demo'
       });
     },
     /** @deprecated */
@@ -779,6 +815,46 @@ export default {
         reload: true,
       });
     },
+    goTaskSetting() {
+      platform.openTab({
+        id: 'task_fields_setting',
+        title: '工单表单设置',
+        url: '/setting/task/field/task',
+        reload: true,
+      });
+    },
+    goTaskReceiptSetting() {
+      platform.openTab({
+        id: 'task_receipt_fields_setting',
+        title: '工单回执表单设置',
+        url: '/setting/task/field/taskReceipt',
+        reload: true,
+      });
+    },
+    goCreateTask() {
+      platform.openTab({
+        id: 'task_create',
+        title: '新建工单',
+        url: '/task/edit',
+        reload: true,
+      });
+    },
+    goCreateTaskForCallcenter() {
+      platform.openTab({
+        id: 'task_create',
+        title: '新建工单呼叫中心',
+        close: true,
+        url: '/task/edit4CallCenter?callRecordId=1&linkmanId=e8540bd4-e5eb-11ea-9929-00163e304a25',
+      });
+    },
+    goTaskList() {
+      platform.openTab({
+        id: 'task_list',
+        title: '工单列表',
+        url: '/task',
+        reload: true,
+      });
+    },
     goCallCenterSetting() {
       platform.openTab({
         id: "callcenter_setting",
@@ -920,6 +996,16 @@ export default {
         lockReconnect = false;
       }, 4000);
     },
+    /** 
+    * @description 切换工单新旧版本
+    */
+    changeTaskVersion: _.debounce(function (version) {
+      // 工单列表重定向
+      this.currentTaskListTab.url = `/task?newVersion=${version}`;
+      this.reloadFrameTab(this.currentTaskListTab, true);
+
+      this.isUserTaskGray = !this.isUserTaskGray;
+    }, 1000)
   },
   created() {
     // TODO: 迁移完成后删除

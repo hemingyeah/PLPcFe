@@ -71,7 +71,7 @@
 
 <script>
 import {formatDate,} from '@src/util/lang';
-import TaskStateEnum from '@model/enum/TaskStateEnum';
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import platform from '@src/platform'
 
 export default {

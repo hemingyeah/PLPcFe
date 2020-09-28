@@ -1,4 +1,5 @@
 import http from '@src/util/http';
+import GrayUtil from '@src/util/gray';
 
 /** ------------ start 产品 ----------------------- */
 /**
@@ -7,7 +8,8 @@ import http from '@src/util/http';
  * @returns {*}
  */
 function getProduct(params) {
-  return http.post('/customer/product/list/data', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/list/data`, params)
 }
 
 /**
@@ -16,7 +18,8 @@ function getProduct(params) {
  * @returns {*}
  */
 function createProduct(params) {
-  return http.post('/customer/product/create/action', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/create/action`, params);
 }
 
 /**
@@ -25,7 +28,8 @@ function createProduct(params) {
  * @returns {*}
  */
 function updateProduct(params) {
-  return http.post('/customer/product/updateProduct', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/updateProduct`, params);
 }
 
 /**
@@ -34,7 +38,8 @@ function updateProduct(params) {
  * @returns {*}
  */
 function deleteProductByIds(ids) {
-  return http.post('/customer/product/deleteBatch', { ids})
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/deleteBatch`, { ids})
 }
 
 /**
@@ -45,7 +50,8 @@ function deleteProductByIds(ids) {
  * @returns {*}
  */
 function checkSerialNumber(params) {
-  return http.post('/customer/product/checkUniqueForSerialNumber', params, false);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/checkUniqueForSerialNumber`, params, false);
 }
 
 /**
@@ -57,7 +63,8 @@ function checkSerialNumber(params) {
  * @param {Date} params.sendTime - 发送时间
  */
 function sendSmsBatch(params) {
-  return http.post('/customer/product/sendSmsBatch', params, false)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/sendSmsBatch`, params, false)
 }
 
 /**
@@ -67,7 +74,8 @@ function sendSmsBatch(params) {
  * @param {Number} params.isAllLm - 是否是全部联系人
  */
 function computeSendNumForProduct(params) {
-  return http.post('/customer/product/computeSendNum', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/computeSendNum`, params)
 }
 
 /**
@@ -77,14 +85,16 @@ function computeSendNumForProduct(params) {
  * @param {Number} params.isAllLm - 是否是全部联系人
  */
 function editBatchProduct(params) {
-  return http.post('/customer/product/editBatch', params, false)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/editBatch`, params, false)
 }
 
 /**
  * 获取产品提醒模板
  */
 function getProductRemindTemplate() {
-  return http.get('/customer/product/remind/list')
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/remind/list`)
 }
 
 /**
@@ -93,7 +103,8 @@ function getProductRemindTemplate() {
  * @param {String} params.id - 产品id
  */
 function getProductDetail(params) {
-  return http.get('/customer/product/detail/data', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/detail/data`, params)
 }
 
 /**
@@ -102,7 +113,8 @@ function getProductDetail(params) {
  * @param {String} params.id - 产品id
  */
 function getEventOfProduct(params) {
-  return http.get('/customer/product/event/list', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/event/list`, params)
 }
 
 /**
@@ -111,7 +123,8 @@ function getEventOfProduct(params) {
  * @param {String} params.id - 产品id
  */
 function getTaskOfProduct(params) {
-  return http.get('/customer/product/task/list', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/task/list`, params)
 }
 
 /**
@@ -120,8 +133,10 @@ function getTaskOfProduct(params) {
  * @param {String} params.id - 产品id
  */
 function getPlanOfProduct(params) {
-  return http.get('/customer/product/plantask/list', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/plantask/list`, params)
 }
+
 
 /**
  * 获取产品记录
@@ -131,7 +146,8 @@ function getPlanOfProduct(params) {
  * @param {Number} params.pageSize - 页面大小
  */
 function getRecordOfProduct(params) {
-  return http.get('/customer/product/record/list', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/record/list`, params)
 }
 
 /**
@@ -146,7 +162,8 @@ function getRecordOfProduct(params) {
  * @param {Object} params.content.updateType - 'pRecord'
  */
 function commentProduct(params) {
-  return http.post('/customer/product/record/create', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/customer/product/record/create`, params)
 }
 
 /**
@@ -155,7 +172,8 @@ function commentProduct(params) {
  * @param {String} params.productId - 产品id
  */
 function getUpdateRecord(params) {
-  return http.get('/customer/product/getLatestOne', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/getLatestOne`, params)
 }
 
 /**
@@ -198,7 +216,8 @@ function downloadQrcode(params) {
  */
 
 function productStatisticsInit(params) {
-  return http.get('/customer/product/statistics/init', params)
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/customer/product/statistics/init`, params)
 }
 
 /** ------------ end 产品 ----------------------- */
@@ -213,7 +232,8 @@ function productStatisticsInit(params) {
  * @returns Promise<>
  */
 function getProductTemplateList(params) {
-  return http.post('/product/list/data', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/product/list/data`, params);
 }
 
 /**
@@ -223,7 +243,8 @@ function getProductTemplateList(params) {
  */
 function productTemplateDelete(ids) {
   let params = (ids || '').split(',');
-  return http.post('/product/delete', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/product/delete`, params);
 }
 
 /**
@@ -233,7 +254,8 @@ function productTemplateDelete(ids) {
  * @returns Promise<>
  */
 function productTemplateEditBatch(params) {
-  return http.post('/product/editBatch', params, false);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/product/editBatch`, params, false);
 }
 
 /**
@@ -242,7 +264,8 @@ function productTemplateEditBatch(params) {
  * @returns Promise<>
  */
 function productTemplateCreate(params) {
-  return http.post('/product/create/action', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/product/create/action`, params);
 }
 
 /**
@@ -251,7 +274,8 @@ function productTemplateCreate(params) {
  * @returns Promise<>
  */
 function productTemplateUpdate(params) {
-  return http.post('/product/update', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/product/update`, params);
 }
 
 /**
@@ -260,7 +284,8 @@ function productTemplateUpdate(params) {
  * @returns Promise<>
  */
 function getProductTemplate(id) {
-  return http.get(`/product/detail/data/${id}`);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/product/detail/data/${id}`);
 }
 
 
@@ -272,7 +297,8 @@ function getProductTemplate(id) {
  * @returns Promise<>
  */
 function getProductTemplateRecord(params) {
-  return http.get('/product/record/list', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/product/record/list`, params);
 }
 
 /**
@@ -280,7 +306,8 @@ function getProductTemplateRecord(params) {
  * @returns Promise<>
  */
 function productTemplateCreateRecord(params) {
-  return http.post('/product/record/create', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${productPreFixedPath}/product/record/create`, params);
 }
 
 /**
@@ -300,8 +327,26 @@ function productTemplateDeleteRecord(params) {
  * @returns Promise<>
  */
 function productTemplateRelatedProducts(params) {
-  return http.get('/product/relatedProducts', params);
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/product/relatedProducts`, params);
 }
+
+/**
+ * 编辑产品时搜索客户地址
+ */
+function searchCustomerAddressForProduct(params) {
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/product/address`, params);
+}
+
+/**
+ * 编辑产品时搜索客户联系人
+ */
+function searchCustomerLinkmanForProduct(params) {
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/product/linkmanRelation`, params);
+}
+
 
 /** ------------ end 产品模板 ----------------------- */
 
@@ -336,4 +381,6 @@ export {
   deleteProductByIds,
   editBatchProduct,
   getProductRemindTemplate,
+  searchCustomerAddressForProduct,
+  searchCustomerLinkmanForProduct
 };

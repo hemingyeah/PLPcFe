@@ -606,7 +606,6 @@ export default {
           color: "#55b7b4",
           needAuth: true,
           click: obj => {
-            console.log(this.hasViewCustomerAuth(obj));
             if (!this.hasViewCustomerAuth(obj)) return;
             let fromId = window.frameElement.getAttribute("id");
             this.$platform.openTab({

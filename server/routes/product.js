@@ -45,7 +45,6 @@ router.get('/customer/product/edit/:id', async ctx => {
   let script = ['/product.edit.js'];
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
-  // let result = await HttpClient.request('/customer/product/list/page', 'get', null, {headers: reqHeaders});
   let body = result.body;
 
   ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)

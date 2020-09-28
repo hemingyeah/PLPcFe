@@ -1,0 +1,17 @@
+.biz-form-remote-select {
+  flex: 1;
+  position: relative;
+
+  &-clear {
+    position: absolute;
+    right: 10px;
+    top: 6px;
+
+    &:hover {
+      cursor: pointer;
+      color: #ed3f14;
+    }
+
+  }
+
+}

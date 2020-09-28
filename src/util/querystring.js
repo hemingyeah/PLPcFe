@@ -15,8 +15,8 @@ export function parse(str = ''){
  * 序列化对象
  * {a: 1} => a = 1
  */
-export function stringify(params){
-  return qs.stringify(params, {arrayFormat: 'brackets'})
+export function stringify(params, isArrayIndices = false){
+  return qs.stringify(params, {arrayFormat: isArrayIndices ? 'indices' : 'brackets'})
 }
 
 const querystring = {

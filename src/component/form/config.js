@@ -16,3 +16,5 @@ export const SELECT_OPTION_LENGTH_MAX = 50;
 // 信息字段最长文本限制
 export const INFO_FIELD_LENGTH_MAX = 2000;
 
+// 工单移动端展示最大数量
+export const TASK_MOBILE_SHOW_MAX_LENGTH_MAX = 5;
