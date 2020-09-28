@@ -123,9 +123,7 @@ export default {
   watch: {
     customizeList() {
       this.taskTypeFilterFields
-      this._taskInquireList()
-    },
-    config() {
+      this.advanceds
       this._taskInquireList()
     },
   },
@@ -142,10 +140,11 @@ export default {
   },
   computed: {
     taskTypeFilterFields() {
-      const { customizeList } = this
-      return customizeList.filter(item => {
+      let { customizeList } = this
+      let taskTypeFilterFields = customizeList.filter(item => {
         return (item.isSystem == 0 && item.isSearch)
       })
+      return taskTypeFilterFields
     },
     fields() {
       let f = {};
@@ -191,11 +190,12 @@ export default {
   },
   methods: {
     buildParams() {
-      const form = { ...this.$refs.searchForm.returnData() }
+      const form = { ...this.$refs.searchForm.returnData(), ...this.$refs.taskInquireParams.returnData() }
       this.formBackup = Object.assign({}, form)
+      console.log(form)
 
-      const isSystemFields = this.fields.filter((f) => f.isSystem)
-      const notSystemFields = this.fields.filter((f) => !f.isSystem)
+      const isSystemFields = [...this.fields, ...this.taskInquireList].filter((f) => f.isSystem)
+      const notSystemFields = [...this.fields, ...this.taskInquireList].filter((f) => !f.isSystem)
       let params = {
         conditions: [],
       };

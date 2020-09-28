@@ -40,7 +40,7 @@
                       <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
                       <i
                         class="iconfont icon-bianji1 task-ml12 task-font12"
-                        @click="editView"
+                        @click.stop="editView(item)"
                         v-if="
                           initData.loginUser &&
                             item.id === initData.loginUser.userId
@@ -48,7 +48,7 @@
                       ></i>
                       <i
                         class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                        @click="editView"
+                        @click.stop="editView(item)"
                         v-if="
                           initData.loginUser &&
                             item.id === initData.loginUser.userId
@@ -758,7 +758,7 @@
                   "
                 >
                   {{
-                    scope.row.attribute.paymentMethod &&
+                    scope.row.attribute &&
                       scope.row.attribute.paymentMethod
                   }}
                 </template>
