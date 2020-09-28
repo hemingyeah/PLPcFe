@@ -996,7 +996,7 @@ export default {
           // 把选中的匹配出来
           // this.matchSelected();
           console.log("工单列表渲染数据", this.taskPage);
-          this.multipleSelection = [];
+          // this.multipleSelection = [];
           return data;
         })
         .then(() => {
@@ -1008,6 +1008,7 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+        
     },
     /**
      * @description 时间戳转换
@@ -1485,9 +1486,9 @@ export default {
      * @description 表格选择操作
      * @param {Array} selection 选择的数据
      */
-    handleSelection(selection, row) {
-      console.log(selection, row)
+    handleSelection(selection) {
       let tv = this.selectionCompute(selection);
+      console.log(selection)
 
       let original = this.multipleSelection.filter((ms) =>
         this.taskPage.list.some((cs) => cs.id === ms.id)
@@ -1507,8 +1508,7 @@ export default {
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
-      this.multipleSelection = tv;
-
+        this.multipleSelection = tv;
       // this.$refs.baseSelectionBar.openTooltip();
     },
     /**
