@@ -407,6 +407,7 @@ export default {
             tableName: "customer",
             isSystem: 1,
             fieldName: "templateName",
+            exportAlias: "templateName",
             displayName: "工单类型",
             formType: "text",
             defaultValue: null,
@@ -429,10 +430,10 @@ export default {
             taskSelfFields.splice(index + 1, 0, linkman_list[0], linkman_list[1])
           }
           if (address_list) {
-            taskSelfFields.splice(index + 3, 0, address_list[0])
+            taskSelfFields.splice(index + linkman_list.length + 1, 0, address_list[0])
           }
           if (product_list) {
-            taskSelfFields.splice(index + 4, 0, product_list[0])
+            taskSelfFields.splice(index + linkman_list.length + address_list.length + 1, 0, product_list[0])
           }
         }
       })
@@ -1197,6 +1198,7 @@ export default {
      */
     buildExportParams( checkedMap, ids) {
       const { receiptChecked, systemChecked, taskChecked } = checkedMap
+      console.log(taskChecked)
       const Params = Object.assign({}, this.params);
       const rootWindow = getRootWindow(window);
       const { loginUser } = this.initData;
@@ -1475,7 +1477,8 @@ export default {
      * @description 表格选择操作
      * @param {Array} selection 选择的数据
      */
-    handleSelection(selection) {
+    handleSelection(selection, row) {
+      console.log(selection, row)
       let tv = this.selectionCompute(selection);
 
       let original = this.multipleSelection.filter((ms) =>
