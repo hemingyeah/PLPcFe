@@ -4,6 +4,7 @@
     :show.sync="visible"
     width="886px"
     class="batch-editing-customer-dialog"
+    @cancel="loc()"
   >
     <div class="task-search-content">
         <!-- 搜索 -->
@@ -29,7 +30,7 @@
         </el-checkbox-group>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取 消</el-button>
+      <el-button @click="loc();visible = false">取 消</el-button>
       <el-button type="primary" @click="onSubmit"
         >确 定</el-button
       >

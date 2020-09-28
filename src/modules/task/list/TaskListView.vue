@@ -43,7 +43,7 @@
                         @click.stop="editView(item)"
                         v-if="
                           initData.loginUser &&
-                            item.id === initData.loginUser.userId
+                            item.userId === initData.loginUser.userId
                         "
                       ></i>
                       <i
@@ -51,7 +51,7 @@
                         @click.stop="editView(item)"
                         v-if="
                           initData.loginUser &&
-                            item.id === initData.loginUser.userId
+                            item.userId === initData.loginUser.userId
                         "
                       ></i>
                     </div>
@@ -320,8 +320,8 @@
       <!-- start 高级搜索 -->
       <task-search-panel
         :init-data="initData"
-        :config="advanceds"
-        :search-params="searchParams"
+        :config="seoSetList"
+        :searchParams="searchParams"
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
@@ -534,7 +534,7 @@
                   <!-- 暂停中 -->
                   <span
                     class="task-state-block task-state-block-overtime task-font12"
-                    v-if="scope.row.onceOverTime == 1"
+                    v-if="new Date(scope.row.overTime).getTime() > new Date().getTime()"
                   >
                     超时
                   </span>

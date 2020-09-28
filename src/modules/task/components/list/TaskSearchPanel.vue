@@ -19,16 +19,11 @@
       </el-dropdown>
     </h3>
     <!--  -->
-    <div class="task-search-panel-title task-pointer" @click="show =!show">
-      <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
-      <i class="iconfont icon-up task-c3" v-else></i>
-      <span class="task-font16">常用字段</span>
-      <span slot="reference" class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
-    </div>
-    <div class="task-search-guide" v-show="!fields.length && guide">
-      <div></div>
-      <div>
-        您还未设置常用字段，快去试试吧
+      <div class="task-search-panel-title task-pointer" @click="show =!show">
+        <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
+        <i class="iconfont icon-up task-c3" v-else></i>
+        <span class="task-font16">常用查询条件</span>
+        <span slot="reference" class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
       </div>
     </div>
     <!-- S 搜索条件 -->
@@ -46,20 +41,46 @@
         <span class="task-font16">设置查询条件</span>
         <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
       </div>
+      <!-- S 搜索条件 -->
+      <el-form class="advanced-search-form" onsubmit="return false;">
+        <task-search-form
+          class="task-search-forms"
+          :class="{'hide': show}"
+          :fields="fields"
+          ref="searchForm"
+          :form-backup="formBackup"
+          :column-num="columnNum"
+        >
+        </task-search-form>
+          <div class=" task-pointer">
+            <span class="task-font16">设置查询条件</span>
+            <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
+          </div>
       <!-- 设置查询条件 -->
-      <task-inquire 
-        v-if="taskInquireList.length"
-        ref="taskInquireParams" 
-        :column-num="columnNum" 
-        :config="taskInquireList" 
-        @setting="_setting"
-      />
-      <task-inquire 
-        v-else
-        ref="taskInquireParams" 
-        :column-num="columnNum" 
-        :config="[...config, ...taskTypeFilterFields]" 
-        @setting="_setting"
+        <task-inquire 
+          v-if="taskInquireList.length"
+          ref="taskInquireParams" 
+          :columnNum="columnNum" 
+          :config="taskInquireList" 
+          @setting="_setting"
+        />
+        <task-inquire 
+          v-else
+          ref="taskInquireParams" 
+          :columnNum="columnNum" 
+          :config="[...config, ...taskTypeFilterFields]" 
+          @setting="_setting"
+        />
+        <!-- 搜索操作按钮 -->
+        <slot name="footer"></slot>
+      </el-form>
+      <!-- E 搜索条件 -->
+      <!-- 设置弹框 -->
+      <task-search-pupal ref="taskSearchPupal" 
+        :taskTypeFilterFields="taskTypeFilterFields" 
+        :config="config" 
+        :taskInquireList="taskInquireList"
+        @taskPupal="_taskPupal"
       />
       <!-- 搜索操作按钮 -->
       <slot name="footer"></slot>
@@ -124,7 +145,6 @@ export default {
   watch: {
     customizeList() {
       this.taskTypeFilterFields
-      this.advanceds
       this._taskInquireList()
     },
   },
@@ -208,10 +228,9 @@ export default {
     buildParams() {
       const form = { ...this.$refs.searchForm.returnData(), ...this.$refs.taskInquireParams.returnData() }
       this.formBackup = Object.assign({}, form)
-      console.log(form)
-
-      const isSystemFields = [...this.fields, ...this.taskInquireList].filter((f) => f.isSystem)
-      const notSystemFields = [...this.fields, ...this.taskInquireList].filter((f) => !f.isSystem)
+      const taskInquireList = this.taskInquireList.length ? this.taskInquireList : [...this.config, ...this.taskTypeFilterFields]
+      const isSystemFields = [...this.fields, ...taskInquireList].filter((f) => f.isSystem)
+      const notSystemFields = [...this.fields, ...taskInquireList].filter((f) => !f.isSystem)
       let params = {
         conditions: [],
       };

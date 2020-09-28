@@ -12,7 +12,7 @@ import TaskView from './components/TaskView.vue'
 
 /** model */
 import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
-import { fields, selectIds, advancedList, allExport } from "./TaskFieldModel";
+import { fields, selectIds, advancedList, allExport,Inquire } from "./TaskFieldModel";
 import { LINK_REG } from "@src/model/reg";
 
 /** utils */
@@ -119,7 +119,8 @@ export default {
       totalItems: 0,
       navWidth: window.innerWidth - 120,
       taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap,
-      task_view_list: []
+      task_view_list: [],
+      seoSetList: []
     };
   },
   computed: {
@@ -158,70 +159,6 @@ export default {
     /** 导出列 */
     exportColumns() {
       let {taskFields, taskReceiptFields} = this
-      let columnList = [{
-        id: 476,
-        tableName: "customer",
-        isSystem: 1,
-        fieldName: "taskNo",
-        exportAlias: 'taskNo',
-        displayName: "工单编号",
-        formType: "text",
-        defaultValue: null,
-        isNull: 0,
-        isSearch: 1,
-        placeHolder: null,
-        setting: {
-          customerNameDuplicate: false,
-        },
-        show: true,
-        orderId: 0,
-        isDelete: 0,
-        guideProfessions: [],
-        isGuideData: false,
-        guideData: false,
-      },
-      {
-        id: 476,
-        tableName: "customer",
-        isSystem: 1,
-        fieldName: "templateName",
-        exportAlias: 'templateName',
-        displayName: "工单类型",
-        formType: "text",
-        defaultValue: null,
-        isNull: 0,
-        isSearch: 1,
-        placeHolder: null,
-        setting: {
-          customerNameDuplicate: false,
-        },
-        orderId: 0,
-        isDelete: 0,
-        guideProfessions: [],
-        show: true,
-        isGuideData: false,
-        guideData: false,
-      },
-      {
-        id: 5460,
-        tableName: "customer",
-        isSystem: 1,
-        fieldName: "customer",
-        exportAlias: 'customer',
-        displayName: "客户",
-        formType: "text",
-        defaultValue: null,
-        isNull: 1,
-        isSearch: 1,
-        show: true,
-        placeHolder: null,
-        setting: {},
-        orderId: 1,
-        isDelete: 0,
-        guideProfessions: [],
-        isGuideData: false,
-        guideData: false,
-      }]
       // 工单信息
       let taskSelfFields = [];
       // 回执信息
@@ -370,13 +307,13 @@ export default {
       ];
 
       // 工单信息逻辑
-      let linkman_list = [], address_list = [], product_list = []
+      let linkman_list = '', address_list = '', product_list = ''
       taskSelfFields = taskFields.filter(item => {
         return item.formType !== 'attachment'
       })
-      if (taskFields.length && taskFields[1].setting.customerOption) {
-        console.log(taskFields[1].setting.customerOption)
-        if (taskFields[1].setting.customerOption.linkman) {
+      if (taskFields.length) {
+        let first = taskFields.filter(item => {return item.displayName === '客户'})[0]
+        if (first.setting.customerOption.linkman) {
           linkman_list = [{
             id: 5460,
             tableName: "customer",
@@ -418,7 +355,7 @@ export default {
             guideData: false,
           }]
         }
-        if (taskFields[1].setting.customerOption.address) {
+        if (first.setting.customerOption.address) {
           address_list = [{
             id: 5460,
             tableName: "customer",
@@ -440,7 +377,7 @@ export default {
             guideData: false,
           }]
         } 
-        if (taskSelfFields[1].setting.customerOption.product) {
+        if (first.setting.customerOption.product) {
           product_list = [{
             id: 5460,
             tableName: "customer",
@@ -463,12 +400,47 @@ export default {
           }]
         }
       }
-      taskSelfFields.splice(0,2)
-      taskSelfFields = [...columnList, ...linkman_list, ...address_list,...product_list, ...taskSelfFields].map(item => {
-        item.label = item.displayName
-        item.export = true
-        return item
+      taskSelfFields.forEach((item, index) => {
+        if (item.displayName === '工单编号') {
+          taskSelfFields.splice(index + 1, 0,{
+            id: 476,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "templateName",
+            displayName: "工单类型",
+            formType: "text",
+            defaultValue: null,
+            isNull: 0,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {
+              customerNameDuplicate: false,
+            },
+            orderId: 0,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          })
+        }
+        if (item.displayName === '客户') {
+          if (linkman_list) {
+            taskSelfFields.splice(index + 1, 0, linkman_list[0], linkman_list[1])
+          }
+          if (address_list) {
+            taskSelfFields.splice(index + 3, 0, address_list[0])
+          }
+          if (product_list) {
+            taskSelfFields.splice(index + 4, 0, product_list[0])
+          }
+        }
       })
+       taskSelfFields.map(item => {
+          item.label = item.displayName
+          item.export = true
+          return item
+        })
 
 
       // 回执信息逻辑
@@ -634,10 +606,10 @@ export default {
         if (item.canRead) {
           let columns, endAddress = {
             displayName: '位置',
-            fieldName: `${item.cardId}_endAddress`,
+            fieldName: `endAddress`,
           },startAddress = {
             displayName: '位置',
-            fieldName: `${item.cardId}_startAddress`,
+            fieldName: `startAddress`,
           }
           if (item.specialfrom === '工时记录') {
             let list = []
@@ -1560,13 +1532,109 @@ export default {
               searchModel = item.searchModel;
             }
           });
-
           this.search(searchModel);
           this.buildColumns();
+          this.seoSet()
         })
         .catch((err) => {
           console.warn(err);
         });
+    },
+    /**
+     * @description 高级搜索里面设置的值
+     */
+    seoSet() {
+      const {taskFields} = this
+      let linkman_list =[], address_list =[],product_list =[]
+      if (taskFields.length) {
+        let first = taskFields.filter(item => {return item.displayName === '客户'})[0]
+        if (first.setting.customerOption.linkman) {
+          linkman_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "tlmName",
+            displayName: "联系人",
+            exportAlias: "customerLinkman",
+            formType: "select",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            show: true,
+            guideProfessions: [],
+            isGuideData: false,
+            guideData: false,
+          }]
+        }
+        if (first.setting.customerOption.address) {
+          address_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "area",
+            exportAlias: "customerAddress",
+            displayName: "区域",
+            formType: "address",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          },
+          {
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "cusAddress",
+            displayName: "详细地址",
+            formType: "text",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        } 
+        if (first.setting.customerOption.product) {
+          product_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "product",
+            displayName: "产品",
+            formType: "text",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        }
+      }
+      
+      this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}),...linkman_list, ...address_list, ...product_list, ...Inquire]
     },
     /**
      * @description 初始化page

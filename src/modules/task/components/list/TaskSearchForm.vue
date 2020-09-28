@@ -177,6 +177,7 @@ export default {
           },
         });
       } else if (f.fieldName === "tlmName") {
+        f.clearable = true
         childComp = h("linkman-search", {
           props: {
             field: f,

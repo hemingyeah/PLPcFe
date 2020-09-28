@@ -87,6 +87,11 @@ export default {
       setting_list: []
     }
   },
+  watch: {
+    config() {
+      this.fields
+    }
+  },
   computed: {
     fields() {
       let f = {};
