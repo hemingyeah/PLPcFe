@@ -26,11 +26,11 @@
                 </div>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
-                  class="task-view-customize"
+                    class="task-view-customize"
                   >
                     <div
-                    v-for="(item, index) in otherList"
-                    :key="index"
+                      v-for="(item, index) in otherList"
+                      :key="index"
                       @click="checkOther(item)"
                       class="task-flex task-ai task-pointer"
                     >
@@ -321,9 +321,9 @@
       <task-search-panel
         :init-data="initData"
         :config="advanceds"
-        :searchParams="searchParams"
+        :search-params="searchParams"
         :task_view_list="task_view_list"
-        :customizeList="[...taskFields, ...taskReceiptFields]"
+        :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
         v-if="advanceds.length"
       >
@@ -334,7 +334,7 @@
             type="primary"
             @event="advancedSearch"
             native-type="submit"
-            >搜索</base-button
+          >搜索</base-button
           >
         </div>
       </task-search-panel>
@@ -729,10 +729,7 @@
                   v-html="buildTextarea(scope.row.attribute[column.field])"
                   @click="openOutsideLink"
                 ></div>
-
-                <template v-else-if="!column.isSystem">
-                  {{ scope.row.attribute[column.field] }}
-                </template>
+                
                 <!-- 接单用时 -->
                 <template v-else-if="column.field === 'acceptUsedTimeStr'">
                   {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
@@ -757,14 +754,17 @@
                       initData.paymentConfig.version === 1
                   "
                 >
-                  {{
-                    scope.row.attribute &&
-                      scope.row.attribute.paymentMethod
-                  }}
+                  {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
                 </template>
+
+                <template v-else-if="!column.isSystem">
+                  {{ scope.row.attribute[column.field] }}
+                </template>
+
                 <template v-else>
                   {{ scope.row[column.field] }}
                 </template>
+
               </template>
             </el-table-column>
           </el-table>
@@ -844,8 +844,8 @@
       <view-model
         ref="viewModel"
         :region="region"
-        :isViewModel="isViewModel"
-        :otherText="otherText"
+        :is-view-model="isViewModel"
+        :other-text="otherText"
       />
       <!-- E 存为视图弹框 -->
       <!-- S 批量编辑 -->
@@ -856,7 +856,7 @@
           fields: taskFields,
           currentTaskType: currentTaskType,
         }"
-        :selectedIds="selectedIds"
+        :selected-ids="selectedIds"
         @update="updatEedit"
       ></batch-editing-customer-dialog>
       <!-- E 批量编辑 -->
@@ -865,30 +865,30 @@
         :title="`导入工单-${checkImportTask.name}`"
         ref="importCustomerModal"
         :action="`/excels/task/import?typeId=${checkImportTask.id}`"
-        :templateUrl="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
+        :template-url="`/task/importTemplate?way=1&typeId=${checkImportTask.id}`"
       >
       </base-import>
       <!-- E 导入工单 -->
       <!-- S 工单转换 -->
-      <task-transfer ref="TaskTransfer" :taskIdList="selectedIds" />
+      <task-transfer ref="TaskTransfer" :task-id-list="selectedIds" />
       <!-- E 工单转换 -->
     </div>
     <!-- E 列表展示 -->
 
     <!-- S 地图预览 -->
     <task-map
-      :mapShow="mapShow"
+      :map-show="mapShow"
       @hide="mapShow = true"
       :config="{ selectedIds: selectedIds, searchParams: searchParams }"
     />
     <!-- E 地图预览 -->
     <!-- 视图展示 -->
-    <task-view ref="taskView"  @_searchModel="_searchModel" />
+    <task-view ref="taskView" @_searchModel="_searchModel" />
   </div>
 </template>
 
 <script>
-import TaskList from "./TaskList";
+import TaskList from './TaskList';
 export default TaskList;
 </script>
 
