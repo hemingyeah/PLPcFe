@@ -321,8 +321,9 @@
       <task-search-panel
         :init-data="initData"
         :config="advanceds"
+        :searchParams="searchParams"
         :task_view_list="task_view_list"
-        :taskTypeFilterFields="taskTypeFilterFields"
+        :customizeList="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
         v-if="advanceds.length"
       >
@@ -757,8 +758,8 @@
                   "
                 >
                   {{
-                    scope.row.attribute["paymentMethod"] &&
-                      scope.row.attribute["paymentMethod"]
+                    scope.row.attribute.paymentMethod &&
+                      scope.row.attribute.paymentMethod
                   }}
                 </template>
                 <template v-else>
@@ -852,7 +853,7 @@
       <batch-editing-customer-dialog
         ref="batchEditingCustomerDialog"
         :config="{
-          fields: columns,
+          fields: taskFields,
           currentTaskType: currentTaskType,
         }"
         :selectedIds="selectedIds"

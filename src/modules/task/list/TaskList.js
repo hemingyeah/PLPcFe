@@ -21,6 +21,7 @@ import Page from "@model/Page";
 import { storageGet, storageSet } from "@src/util/storage";
 import { formatDate } from "@src/util/lang";
 import { getRootWindow } from "@src/util/dom";
+import * as FormUtil from '@src/component/form/util'
 
 /* constants */
 const TASK_LIST_KEY = "task_list";
@@ -176,11 +177,74 @@ export default {
     },
     /** 导出列 */
     exportColumns() {
-      // 工单自身字段
+      let {taskFields, taskReceiptFields} = this
+      let columnList = [{
+        id: 476,
+        tableName: "customer",
+        isSystem: 1,
+        fieldName: "taskNo",
+        exportAlias: 'taskNo',
+        displayName: "工单编号",
+        formType: "text",
+        defaultValue: null,
+        isNull: 0,
+        isSearch: 1,
+        placeHolder: null,
+        setting: {
+          customerNameDuplicate: false,
+        },
+        show: true,
+        orderId: 0,
+        isDelete: 0,
+        guideProfessions: [],
+        isGuideData: false,
+        guideData: false,
+      },
+      {
+        id: 476,
+        tableName: "customer",
+        isSystem: 1,
+        fieldName: "templateName",
+        exportAlias: 'templateName',
+        displayName: "工单类型",
+        formType: "text",
+        defaultValue: null,
+        isNull: 0,
+        isSearch: 1,
+        placeHolder: null,
+        setting: {
+          customerNameDuplicate: false,
+        },
+        orderId: 0,
+        isDelete: 0,
+        guideProfessions: [],
+        show: true,
+        isGuideData: false,
+        guideData: false,
+      },
+      {
+        id: 5460,
+        tableName: "customer",
+        isSystem: 1,
+        fieldName: "customer",
+        exportAlias: 'customer',
+        displayName: "客户",
+        formType: "text",
+        defaultValue: null,
+        isNull: 1,
+        isSearch: 1,
+        show: true,
+        placeHolder: null,
+        setting: {},
+        orderId: 1,
+        isDelete: 0,
+        guideProfessions: [],
+        isGuideData: false,
+        guideData: false,
+      }]
+      // 工单信息
       let taskSelfFields = [];
-      // 工单系统字段
-      let taskSystemFields = [];
-      // 工单回执字段
+      // 回执信息
       let taskReceiptSystemFields = [
         {
           id: 5460,
@@ -324,37 +388,120 @@ export default {
           bool: true
         },
       ];
-      this.columns.forEach((field) => {
-        field.export = true;
 
-        let isTaskSeldField =
-          TASK_SELF_FIELD_NAMES.indexOf(field.fieldName) > -1;
-        let fields = isTaskSeldField ? taskSelfFields : taskSystemFields;
-        fields.push(field);
-      });
+      // 工单信息逻辑
+      let linkman_list = [], address_list = [], product_list = []
+      taskSelfFields = taskFields.filter(item => {
+        return item.formType !== 'attachment'
+      })
+      if (taskFields.length && taskFields[1].setting.customerOption) {
+        console.log(taskFields[1].setting.customerOption)
+        if (taskFields[1].setting.customerOption.linkman) {
+          linkman_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "tlmName",
+            displayName: "联系人",
+            exportAlias: "customerLinkman",
+            formType: "select",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            show: true,
+            guideProfessions: [],
+            isGuideData: false,
+            guideData: false,
+          },
+          {
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "tlmPhone",
+            exportAlias: "customerPhone",
+            displayName: "电话",
+            formType: "text",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        }
+        if (taskFields[1].setting.customerOption.address) {
+          address_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "taddress",
+            exportAlias: "customerAddress",
+            displayName: "客户地址",
+            formType: "address",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        } 
+        if (taskSelfFields[1].setting.customerOption.product) {
+          product_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "product",
+            exportAlias: "product",
+            displayName: "产品",
+            formType: "text",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        }
+      }
+      taskSelfFields.splice(0,2)
+      taskSelfFields = [...columnList, ...linkman_list, ...address_list,...product_list, ...taskSelfFields].map(item => {
+        item.label = item.displayName
+        item.export = true
+        return item
+      })
 
-      let taskFields = this.taskFields;
-      let taskReceiptFields = this.taskReceiptFields;
 
-      taskFields = taskFields.filter((field) =>{
-         this.filterFieldFuncHandle(field)
-      });
-      taskReceiptFields = taskReceiptFields.filter((field) =>
-        this.filterFieldFuncHandle(field)
-      );
-
-      // taskSelfFields = [...taskSelfFields, ...taskFields].map((field) => {
-      //   field.export = true;
-      //   return field;
-      // });
-
+      // 回执信息逻辑
       taskReceiptSystemFields = [
         ...taskReceiptSystemFields,
-        ...taskReceiptFields,
+        ...taskReceiptFields.filter(item => {
+          return (item.isSystem === 0 && item.formType !== 'attachment')
+        })
       ].map((field) => {
         field.export = true;
         return field;
       });
+
 
       return [
         {
@@ -496,22 +643,6 @@ export default {
   },
   methods: {
     /**
-     * @description 高级搜索列表匹配
-     */
-    isAdvanced(list = "") {
-      if (!list) return;
-      let selects = list;
-      selects.map((v, i) => {
-        if (v.displayName === "优先级") {
-          this.advanceds[8].setting = v.setting;
-        } else if (v.displayName === "服务类型") {
-          this.advanceds[5].setting = v.setting;
-        } else if (v.displayName === "服务内容") {
-          this.advanceds[6].setting = v.setting;
-        }
-      });
-    },
-    /**
      * 获取附件
      */
     async getCardDetailList(typeId) {
@@ -526,6 +657,7 @@ export default {
             fieldName: `${item.cardId}_startAddress`,
           }
           if (item.specialfrom === '工时记录') {
+            let list = []
             // 添加固定导出参数
             item.fields.splice(item.fields.map((v, i) => {
               if (v.fieldName === 'endTime') {
@@ -542,8 +674,17 @@ export default {
             }).filter(v => {
               return v
             })[0], 0, startAddress)
+            
+            item.fields.forEach(v => {
+              if (v.fieldName !== "remark" && v.fieldName !== "attachment" ){
+                list.push(v)
+              }
+            })
+            list.map((v, i) => {
+              v.fieldName = `${item.cardId}_${v.fieldName}`
+            })
 
-            item.fields = [...item.fields, ...[{displayName: '行程距离',
+            item.fields = [...list, ...[{displayName: '行程距离',
             fieldName: `${item.cardId}_distance`}]]
           } else {
             item.fields = [...item.fields, ...[{displayName: '操作人',
@@ -704,7 +845,8 @@ export default {
       if (!searchModel.templateId) {
         this.currentTaskType = { id: "", name: "全部" };
       }
-      this.$refs.taskView.open(id)
+      // console.log(FormUtil.initialize(this.advanceds, searchModel))
+      // this.$refs.taskView.open(id)
       this.search(searchModel);
       this.buildColumns();
     },
@@ -731,9 +873,6 @@ export default {
     /**
      * @description 根据视图匹配高级筛选
      */
-    advancedFilter(searchModel) {
-      const { advanceds } = this;
-    },
     // 最高事件
     allEvent() {},
     /**
@@ -1265,7 +1404,6 @@ export default {
           field.field = field.fieldName;
         });
         this.$set(this, "taskFields", result || []);
-        this.isAdvanced(result);
         return result;
       });
     },
@@ -1419,7 +1557,7 @@ export default {
       this.params.pageSize = pageSize;
       this.params.pageNum = 1;
 
-      this.search();
+      this.search(this.searchParams);
     },
     /**
      * @description 初始化
@@ -1476,7 +1614,7 @@ export default {
     jump(pageNum) {
       this.params.pageNum = pageNum;
       this.taskPage.list = [];
-      this.search();
+      this.search(this.searchParams);
     },
     /**
      * @description 修改选择列设置
