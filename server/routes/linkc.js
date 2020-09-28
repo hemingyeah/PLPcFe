@@ -13,7 +13,7 @@ router.get('/linkc/setting', async ctx => {
     headers: reqHeaders
   });
   let body = result.body;
-  ctx.body = Template.renderWithHtml('门户设置', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('门户配置', body, script, modConfig.template)
 });
 router.get('/linkc/goods', async ctx => {
   let script = ['/linkc.goods.js'];
