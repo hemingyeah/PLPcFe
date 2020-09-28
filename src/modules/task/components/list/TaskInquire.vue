@@ -87,14 +87,15 @@ export default {
       setting_list: []
     }
   },
+  watch: {
+    config() {
+      this.fields
+    }
+  },
   computed: {
     fields() {
-      const searchField = localStorage.getItem('task-search-field')
       let f = {};
       let fields = [...this.config]
-        .filter((f) => {
-          return f.isSearch && TaskInquireFiltersFieldNames.indexOf(f.fieldName) < 0
-        })
         .map((field) => {
           f = _.cloneDeep(field);
 
