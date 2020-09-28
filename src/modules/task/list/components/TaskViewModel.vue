@@ -67,18 +67,15 @@ export default {
      */
     saveViewBtn() {
       const { view, region, checked, isViewModel } = this;
-
       if (!view.viewName) {
         this.$platform.alert("请输入视图名称");
         return
       }
       view.viewRegion = checked ? "所有用户" : "只有我";
-
       const params = {
         ...view,
         ...region,
       };
-
       // 编辑
       if (isViewModel !== "默认") {
         TaskApi.editView(params).then((res) => {
@@ -88,35 +85,35 @@ export default {
       }
       let searchModel = region.searchModel
       // 创建时间
-      searchModel['timeStart'] = formatDate(searchModel.createTimeStart, "YYYY/MM/DD")
-      searchModel['timeEnd'] = formatDate(searchModel.createTimeEnd, "YYYY/MM/DD")
+      searchModel['timeStart'] = this._time(searchModel.createTimeStart)
+      searchModel['timeEnd'] = this._time(searchModel.createTimeEnd)
       // 计划时间
-      searchModel.planTimeStart = formatDate(searchModel.planTimeStart, "YYYY/MM/DD")
-      searchModel.planTimeEnd = formatDate(searchModel.planTimeEnd, "YYYY/MM/DD")
+      searchModel.planTimeStart = this._time(searchModel.planTimeStart)
+      searchModel.planTimeEnd = this._time(searchModel.planTimeEnd)
       //派单时间
-      searchModel.allotTimeStart = formatDate(searchModel.allotTimeStart, "YYYY/MM/DD")
-      searchModel.allotTimeEnd = formatDate(searchModel.allotTimeEnd, "YYYY/MM/DD")
+      searchModel.allotTimeStart = this._time(searchModel.allotTimeStart)
+      searchModel.allotTimeEnd = this._time(searchModel.allotTimeEnd)
       //派单时间
-      searchModel.acceptTimeStart = formatDate(searchModel.acceptTimeStart, "YYYY/MM/DD")
-      searchModel.acceptTimeEnd = formatDate(searchModel.acceptTimeEnd, "YYYY/MM/DD")
+      searchModel.acceptTimeStart = this._time(searchModel.acceptTimeStart)
+      searchModel.acceptTimeEnd = this._time(searchModel.acceptTimeEnd)
       //派单时间
-      searchModel.startTimeStart = formatDate(searchModel.startTimeStart, "YYYY/MM/DD")
-      searchModel.startTimeEnd = formatDate(searchModel.startTimeEnd, "YYYY/MM/DD")
+      searchModel.startTimeStart = this._time(searchModel.startTimeStart)
+      searchModel.startTimeEnd = this._time(searchModel.startTimeEnd)
       //完成时间
-      searchModel.completeTimeStart = formatDate(searchModel.completeTimeStart, "YYYY/MM/DD")
-      searchModel.completeTimeEnd = formatDate(searchModel.completeTimeEnd, "YYYY/MM/DD")
+      searchModel.completeTimeStart = this._time(searchModel.completeTimeStart)
+      searchModel.completeTimeEnd = this._time(searchModel.completeTimeEnd)
       //更新时间
-      searchModel.updateTimeStart = formatDate(searchModel.updateTimeStart, "YYYY/MM/DD")
-      searchModel.updateTimeEnd = formatDate(searchModel.updateTimeEnd, "YYYY/MM/DD")
+      searchModel.updateTimeStart = this._time(searchModel.updateTimeStart)
+      searchModel.updateTimeEnd = this._time(searchModel.updateTimeEnd)
       //
-      searchModel.reviewTimeStart = formatDate(searchModel.reviewTimeStart, "YYYY/MM/DD")
-      searchModel.reviewTimeEnd = formatDate(searchModel.reviewTimeEnd, "YYYY/MM/DD")
+      searchModel.reviewTimeStart = this._time(searchModel.reviewTimeStart)
+      searchModel.reviewTimeEnd = this._time(searchModel.reviewTimeEnd)
       //
-      searchModel.balanceTimeStart = formatDate(searchModel.balanceTimeStart, "YYYY/MM/DD")
-      searchModel.balanceTimeEnd = formatDate(searchModel.balanceTimeEnd, "YYYY/MM/DD")
+      searchModel.balanceTimeStart = this._time(searchModel.balanceTimeStart)
+      searchModel.balanceTimeEnd = this._time(searchModel.balanceTimeEnd)
       //
-      searchModel.closeTimeStart = formatDate(searchModel.closeTimeStart, "YYYY/MM/DD")
-      searchModel.closeTimeEnd = formatDate(searchModel.closeTimeEnd, "YYYY/MM/DD")
+      searchModel.closeTimeStart = this._time(searchModel.closeTimeStart)
+      searchModel.closeTimeEnd = this._time(searchModel.closeTimeEnd)
       // 保存
       TaskApi.createView({
         ...view,
@@ -125,6 +122,9 @@ export default {
       }).then((res) => {
         this.success(res);
       });
+    },
+    _time(time) {
+      return time ? formatDate(time) : ''
     },
     // 删除
     deleteViewBtn() {

@@ -799,8 +799,7 @@ export default {
     },
     /* 其他, 选择 */
     checkOther(params) {
-      const { name, region, id, searchModel, title } = params;
-      this.isViewModel = region;
+      const { name, id, searchModel, title } = params;
       this.region["viewId"] = id;
       this.otherText = name;
       this.filterId = "";
@@ -955,7 +954,8 @@ export default {
     /**
      * 存为视图和编辑视图
      */
-    editView() {
+    editView({region}) {
+      this.isViewModel = region || '默认';
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
@@ -1557,6 +1557,7 @@ export default {
               searchModel = item.searchModel;
             }
           });
+
           this.search(searchModel);
           this.buildColumns();
         })
