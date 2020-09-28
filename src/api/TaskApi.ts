@@ -1055,7 +1055,7 @@ export function taskRecordDelete(params: any) {
  * @description 拨打电话
  */
 export function dialout(params: object) {
-  return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params);
+  return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params, false);
 }
 
 /**
