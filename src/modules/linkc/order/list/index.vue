@@ -1255,6 +1255,9 @@ label {
       .search-date {
         height: 32px;
         width: 340px;
+        .el-range-separator{
+          padding: 0;
+        }
       }
     }
   }
