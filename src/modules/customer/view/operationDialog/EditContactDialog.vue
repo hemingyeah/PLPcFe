@@ -36,6 +36,7 @@
 <script>
 import * as FormUtil from '@src/component/form/util';
 import * as LinkmanApi from '@src/api/LinkmanApi';
+import * as ProductApi from '@src/api/ProductApi';
 import { createRemoteValidate } from '@src/util/validator';
 
 export default {
@@ -73,14 +74,6 @@ export default {
         productId: [] // 数组，包含产品对象
       },
       loadData: false,
-      validation: this.isPhoneUnique
-        ? createRemoteValidate(LinkmanApi.checkUnique4Phone, (value, field) => {
-          return {
-            id: this.originalValue.id || '',
-            phone: value
-          };
-        })
-        : true,
       createOriginalValue: {},
     };
   },
@@ -176,6 +169,14 @@ export default {
     },
     modalTitle() {
       return this.originalValue.name ? '编辑联系人' : '添加联系人';
+    },
+    validation() {
+      return this.isPhoneUnique ? createRemoteValidate(LinkmanApi.checkUnique4Phone, (value, field) => {
+        return {
+          id: this.originalValue.id || '',
+          phone: value
+        }
+      }) : true
     }
   },
   methods: {
@@ -221,6 +222,10 @@ export default {
 
         this.pending = false;
         this.addContactDialog = false;
+
+        // 新建、编辑工单页面新建联系人
+        this.$eventBus.$emit('task_create_or_edit.update_linkman', { ...this.form, id: result.data });
+
         this.reset();
         this.$eventBus.$emit('customer_contact_table.update_linkman_list');
         this.$eventBus.$emit('customer_info_record.update_record_list');
@@ -270,6 +275,7 @@ export default {
     openDialog(createOriginalValue = {}) {
       this.addContactDialog = true;
 
+      // console.log(this.originalValue, "asdadsa");
       if (this.action === 'edit') {
         this.matchValueToForm(this.originalValue);
       }
@@ -360,14 +366,15 @@ export default {
         .catch(err => console.error('fetchProducts catch err', err));
     },
     fetchEditProducts() {
-      return this.$http.get('/product/linkmanRelation', {
+      return ProductApi.searchCustomerLinkmanForProduct({
         linkmanId: this.linkmanId,
         customerId: this.customer.id,
         pageSize: 0,
         pageNum: 1,
       })
         .then(res => {
-          this.products = res.list.map(p => ({
+          let list = res.list || []
+          this.products = list.map(p => ({
             text: p.name,
             value: p.id
           }));
@@ -399,6 +406,7 @@ export default {
     margin: 0 auto;
 
     .edit-contact-form {
+      width: 100%;
       padding: 10px 0 5px;
     }
 

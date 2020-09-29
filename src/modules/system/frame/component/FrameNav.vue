@@ -18,7 +18,7 @@
               :href="menu.url ? menu.url : 'javascript:;'" 
               @click.prevent="open(menu)" 
               :class="{'': menu.active}"> 
-              <span class="frame-menu-icon"><i :class="['iconfont', menuIcon[menu.menuKey]]"></i></span>
+              <span class="frame-menu-icon"><i :class="['iconfont', menu.menuIcon]"></i></span>
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
                 <i class="iconfont icon-nav-down" v-if="menu.children && menu.children.length > 0"></i>
@@ -253,7 +253,7 @@ export default {
 .frame-nav{
   width: 50px;
   height: 100%;
-  background-color: $color-primary;
+  background-color: $color-nav-primary;
   box-shadow: 1px 0 8px rgba(0,0,0,.125);
   transition: width ease .2s;
   position: relative;
@@ -290,15 +290,8 @@ export default {
       padding: 13px 15px 13px 46px;
     }
 
-    &.frame-subMenu-active:before{
-      content: "";
-      position: absolute;
-      left: 25px;
-      top: 20px;
-      width: 6px;
-      height: 6px;
-      background-color: $color-primary;
-      border-radius: 50%;
+    &:hover {
+      background-color: $color-nav-hover;
     }
   }
 
@@ -343,8 +336,6 @@ export default {
   transition: background-color ease .3s;
 
   &:hover{
-    background-color: lighten($color-primary, 3%);
-
     .frame-float-menu{
       display: block !important;
     }
@@ -357,6 +348,10 @@ export default {
     align-items: center;
     color: #fff;
     font-size: 14px;
+
+    &:hover {
+      background-color: $color-nav-hover;
+    }
 
     i.iconfont{
       font-size: 16px;
@@ -406,7 +401,7 @@ export default {
 }
 
 .frame-subMenu{
-  background-color: #4AA09E;
+  background-color: $color-nav-secondary;
   margin: 0;
   padding: 0;
 }
@@ -422,10 +417,14 @@ export default {
   transition: background-color ease .3s,
               color ease .3s;
   
-  &:hover,
+  &:hover {
+    background-color: $color-td-hover;
+  }
+
   &.frame-subMenu-active{
-    background: mix(#fff, $color-primary, 89.88%);
-    color: $color-primary !important;
+    // background: mix(#fff, $color-primary, 89.88%);
+    background-color: $color-primary !important;
+    color: #fff !important;
   }
   
   & > a{

@@ -1,5 +1,5 @@
-import FormDatetimeSetting from './FormDatetimeSetting.vue';
-import FormDatetimePreview from './FormDatetimePreview.vue';
+import FormDatetimeSetting from './FormDatetimeSetting.vue'
+import FormDatetimePreview from './FormDatetimePreview.vue'
 import FormDatetime from './FormDatetime.vue'
 
 let FormDatetimeField = {
@@ -11,6 +11,6 @@ let FormDatetimeField = {
     preview: FormDatetimePreview,
     build: FormDatetime
   }
-};
+}
 
-export default FormDatetimeField;
+export default FormDatetimeField

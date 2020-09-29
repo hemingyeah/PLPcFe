@@ -1,9 +1,18 @@
 {
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "model/**/*",
+    "server/**/*",
+    "script/**/*",
+    "config/**/*",
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
   ],
 
   "compilerOptions": {
+    "target": "esnext",
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],

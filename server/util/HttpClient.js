@@ -1,6 +1,7 @@
 /** 请求代理 
  * @author dongls 
 */
+const colors = require('colors')
 // utils
 const { isNotLocalEnv } = require('../model/proxyConfigModel');
 const https = require(isNotLocalEnv ? 'https' : 'http');
@@ -19,6 +20,8 @@ module.exports = {
   request(path, method, rawBody, options = {}){
     
     let requestOptions = getRequestOptions(path, method, options);
+
+    console.log(`${colors.bgYellow('request -> requestOptions')}`, requestOptions)
 
     return new Promise((resolve, reject) => {
       let req = https.request(requestOptions, res => {
@@ -69,6 +72,8 @@ module.exports = {
     let isMultipart = request.is('multipart/form-data');
 
     let proxyOptions = getProxyOptions(ctx, options);
+
+    console.log(`${colors.bgYellow('proxy -> proxyOptions')}`, proxyOptions);
 
     return new Promise((resolve, reject) => {
       let req = https.request(proxyOptions, res => {

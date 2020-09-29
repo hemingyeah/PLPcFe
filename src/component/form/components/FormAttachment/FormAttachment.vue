@@ -36,7 +36,10 @@ export default {
   width: 100%;
 
   .base-upload-btn{
-    padding: 4px 12px;
+    padding: 7px 12px;
+    font-size: $font-size-small;
+    border-radius: $button-radius-base;
+    border-color: $color-primary;
   }
 }
 </style>

@@ -35,7 +35,7 @@ module.exports = {
 
     //Stylistic Issues
     "indent": ["error", 2], // 两空格缩进
-    "brace-style": "warn", // 一致的大括号风格, 将else 放在与if块的右括号相同的行上
+    "brace-style": "off", // 一致的大括号风格, 将else 放在与if块的右括号相同的行上
     "no-multi-spaces": "warn", //禁止使用多个空格
     "no-multiple-empty-lines": ["warn",{max: 3}], //禁止出现多行空行,
     "newline-per-chained-call": ["warn",{"ignoreChainWithDepth": 3}], //方法链中每个调用都有一个换行符

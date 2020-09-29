@@ -1,4 +1,5 @@
 import http from '@src/util/http';
+import GrayUtil from '@src/util/gray';  
 
 /** 
  * 获取客户信息，用于客户编辑
@@ -151,4 +152,30 @@ export function batchEditCustomer(params) {
   return http.post('/customer/editBatch', params, false);
 }
 
+/**
+ * 获取客户列表
+ * @param {Object} params - 参数
+ * @returns {*}
+ */
+export function getCustomerListAsyn(params) {
+  let customerPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${customerPreFixedPath}/customer/getListAsyn`, params);
+}
 
+/**
+ * 根据客户id获取客户信息和客户负责人信息和开关
+ * @param {Object} params - 参数
+ * @param {String} params.id - 客户di
+ */
+export function getCustomerExeinsyn(params) {
+  return http.get('/customer/exeinsyn/get', params, false);
+}
+
+/**
+ * 查询客户列表
+ * @param {Object} params - 参数
+ */
+export function getCustomerList(params) {
+  let customerPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.post(`${customerPreFixedPath}/customer/list`, params);
+}

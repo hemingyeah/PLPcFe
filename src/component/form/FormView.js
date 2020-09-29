@@ -1,11 +1,11 @@
 import { toArray } from '@src/util/lang';
-import { fmt_address } from '@src/filter/fmt';
-import { isHiddenField } from './util';
-import { FormFieldMap } from './components';
-import platform from '@src/platform'
+import { fmt_address, fmt_datetime, fmt_date } from '@src/filter/fmt';
+import * as FormUtil from './util';
+import { FieldManager } from './components';
 import http from '@src/util/http';
+import platform from '@src/platform';
 
-const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
+const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 const FormView = {
   name: 'form-view',
@@ -28,11 +28,34 @@ const FormView = {
     toggleDisplay(id) {
       this.sectionState[id] = !this.sectionState[id];
     },
+    /** 格式化值 */
+    formatValue(field, value){
+      // 多选
+      if (FormUtil.isMultiSelect(field)) {
+        return toArray(value).join('，')
+      }
+
+      // 日期
+      if(FormUtil.isDate(field)){
+        return fmt_date(value)
+      }
+
+      // 日期时间
+      if(FormUtil.isDatetime(field)){
+        return fmt_datetime(value)
+      }
+      
+      // 人员
+      if (field.formType === 'user') {
+        return value && (value.displayName || value.name)
+      }
+      
+      return value;
+    },
     buildCommonDom({displayName, value, formType}) {
       let className = {
         'form-view-row-content': true,
-        'form-view-textarea-preview': formType === 'textarea',
-        'base-file__preview': formType === 'attachment',
+        'form-view-textarea-preview': formType === 'textarea'
       };
       
       return (
@@ -91,8 +114,7 @@ const FormView = {
 
     buildTextarea({displayName, value, formType}) {
       const newVal = value ? value.replace(link_reg, (match) => {
-        // return `<a href=${match} traget="_blank" >${match}</a>`
-        return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
+        return `<a href="javascript:;" url="${match}">${match}</a>`
       }) : '';
 
       return (
@@ -118,6 +140,16 @@ const FormView = {
         <div class="form-view-row">
           <div class="form-view-row-content form-view-info-content">
             {value}
+          </div>
+        </div>
+      )
+    },
+    buildAutoGraph({displayName, value}) {
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+          <div class="form-view-row-content">
+            { value && <div class="form-view-autograph-content"><img src={value} /></div> }
           </div>
         </div>
       )
@@ -154,17 +186,29 @@ const FormView = {
 
       // return slot
       if (this.$scopedSlots[fieldName]) {
-        return this.$scopedSlots[fieldName](params);
+        return this.$scopedSlots[fieldName]({displayName, value, formType, field});
+      }
+
+      // 加密字段
+      if (value == '***') return this.buildCommonDom(params);
+      
+      // 电子签名、客户签名
+      if (formType === 'autograph' || formType === 'systemAutograph') {
+        params = {
+          ...params,
+          value
+        };
+        return this.buildAutoGraph(params);
       }
 
       // 组件默认视图
-      let FormField = FormFieldMap.get(field.formType);
+      let FormField = FieldManager.findField(field.formType);
       if(FormField && FormField.view){
         let attrs = {props: {field, value}}
         return createElement(FormField.view, attrs);
       }
       
-      if (formType === 'attachment') {
+      if (formType === 'attachment' || formType === 'receiptAttachment') {
         params = {
           ...params,
           value: toArray(value).map(a => <base-file-item file={a} readonly key={a.id}/>)
@@ -240,20 +284,28 @@ const FormView = {
         return this.buildInfoDom(params);
       }
 
-      if(formType === 'textarea') {
+      // 多行文本、客户关联字段、产品关联字段
+      if(formType === 'textarea' || formType === 'relationCustomer' || formType === 'relationProduct') {
         params = {
           ...params,
-          value: value
+          value
         };
         return this.buildTextarea(params);
       }
 
-      // if(formType === 'icon' && ) {
-      //   params = {
-      //     ...params,
-      //     value: <i class="iconfont icon-weixin" style="color:#55b7b4"></i>
-      //   };
-      // }
+      if (formType === 'cascader') {
+        params = {
+          ...params,
+          value: toArray(value).join('/')
+        };
+      }
+
+      if (formType === 'timestamp') {
+        params = {
+          ...params,
+          value: fmt_datetime(value)
+        };
+      }
       
       // other types: text date number datetime phone
       return this.buildCommonDom(params);
@@ -264,7 +316,7 @@ const FormView = {
       
       fields
         // 隐藏不显示逻辑项
-        .filter(item => !isHiddenField(item, this.value, fields, false))
+        .filter(item => !FormUtil.isHiddenField(item, this.value, fields, false))
         // 隐藏无内容的分割线
         .filter((field, index, arr) => {
           if(field.formType != 'separator') return true;
@@ -287,7 +339,7 @@ const FormView = {
       return newArr;
     }
   },
-  render(h) {
+  render(createElement) {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     let groups = this.groupField(this.fields);
     console.log(groups, 'form-view')
@@ -299,10 +351,11 @@ const FormView = {
         if (this.sectionState[currentGroupId] === undefined) {
           this.$set(this.sectionState, currentGroupId, true);
         }
-        return this.mapFieldToDom(item, h);
+        return this.mapFieldToDom(item, createElement);
       });
 
-      let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, h));
+      let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, createElement));
+      
       return (
         <div class="view-group">
           {title}

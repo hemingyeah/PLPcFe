@@ -14,6 +14,7 @@ try {
   console.error(error)
   console.error('no init data')
 }
+console.log(initData);
 
 
 const app = new Vue({

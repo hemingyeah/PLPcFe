@@ -2,19 +2,20 @@
   <div class="form-date">
     <el-date-picker
       :id="`form_${field.fieldName}`"
-      type="date" 
+      type="date"
       prefix-icon="iconfont icon-fd-date"
       :editable="false"
       clearable
       :placeholder="placeholder"
       value-format="yyyy-MM-dd"
-      :value="value" @input="choose"/>
+      :value="value"
+      @input="choose"
+    />
   </div>
 </template>
 
 <script>
-import FormMixin from '@src/component/form/mixin/form';
-
+import FormMixin from '@src/component/form/mixin/form'
 export default {
   name: 'form-date',
   mixins: [FormMixin],
@@ -25,27 +26,27 @@ export default {
     }
   },
   methods: {
-    choose(newValue){
-      let oldValue = null;
-      this.$emit('update', {newValue, oldValue, field: this.field});
-      this.$emit('input', newValue);
+    choose(newValue) {
+      let oldValue = null
+      this.$emit('update', { newValue, oldValue, field: this.field })
+      this.$emit('input', newValue)
     }
   }
 }
 </script>
 
 <style lang="scss">
-.form-date{
+.form-date {
   width: 100%;
-  .el-input__inner{
+  .el-input__inner {
     cursor: pointer;
-    
-    &:hover{
+
+    &:hover {
       border-color: #00ac97;
     }
   }
 
-  .el-date-editor{
+  .el-date-editor {
     width: 100%;
   }
 }

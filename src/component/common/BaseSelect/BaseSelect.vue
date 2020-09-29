@@ -94,6 +94,10 @@ export default {
     placeholder: {
       type: String,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -137,8 +141,10 @@ export default {
   },
   methods: {
     focusInput() {
-      this.isFocus = true;
-      this.initList();
+      if (!this.disabled) {
+        this.isFocus = true;
+        this.initList();
+      }
     },
     closeList(e) {
       this.showList = false;
@@ -230,13 +236,11 @@ export default {
       this.keyword = keyword || '';
       this.page = new Page();
     },
+    close() {
+      this.showList = false;
+    }
   },
   directives: { Clickoutside },
-  watch: {
-    'value'(n) {
-      console.log('value select', n)
-    }
-  }
 }
 </script>
 

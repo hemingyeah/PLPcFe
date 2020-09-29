@@ -1,10 +1,9 @@
 import './common.scss';
 
 import {BuildComponents, ViewComponents} from './components';
-
 import FormDesign from './FormDesign';
 import FormBuilder from './FormBuilder';
-import FormView from './FormView'
+import FormView from './FormView';
 import FormItem from './FormItem.vue';
 
 const Form = {

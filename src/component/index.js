@@ -7,6 +7,7 @@ import BaseUpload from './common/BaseUpload';
 import BaseTree from './common/BaseTree';
 import BaseImport from './common/BaseImport';
 import BaseExport from './common/BaseExport';
+import BaseExportGroup from './common/BaseExportGroup';
 import BaseFileItem from './common/BaseFileItem';
 import BaseTabBar from './common/BaseTabBar';
 import BaseTimeline from './common/BaseTimeline';
@@ -20,7 +21,9 @@ import BaseDistPicker from './common/BaseDistPicker';
 import BaseWindow from './common/BaseWindow';
 import BaseSteps from './common/BaseSteps';
 import BaseCascader from './common/BaseCascader';
-import BaseSelectionBar from './common/BaseSelectionBar'
+import BaseSelectionBar from './common/BaseSelectionBar';
+import BaseServiceStar from './common/BaseServiceStar';
+import BaseCollapse from './common/BaseCollapse';
 
 
 // 可快速调用的组件
@@ -29,51 +32,73 @@ import BaseMapPicker from './common/BaseMapPicker';
 import BaseContact from './common/BaseContact';
 
 // 业务组件
-import BizUserSelect from './business/BizUserSelect'
-import BizTeamSelect from './business/BizTeamSelect'
-import SampleTooltip from './common/SampleTooltip'
+import BizUserSelect from './business/BizUserSelect';
+import BizTeamSelect from './business/BizTeamSelect';
+import BizFormRemoteSelect from './business/BizFormRemoteSelect';
+import BizSearchForm from './business/BizSearchForm';
+import BizSearchPanel from './business/BizSearchPanel';
+import BizSelectionPanel from './business/BizSelectionPanel';
+import BizSearchCustomerSelect from './business/BizSearchCustomerSelect';
+import BizSearchProductSelect from './business/BizSearchProductSelect';
+import BizProcess from './business/BizProcess';
+import BizProcessTime from './business/BizProcessTime';
+import BizSelectColumn from './business/BizSelectColumn';
 
-import BaseEditor from './lessUsed/BaseEditor'
+import SampleTooltip from './common/SampleTooltip';
+
+import BaseEditor from './common/BaseEditor'
 
 import Form from './form';
 
 const components = [
-    ElementUI,
-    BaseModal,
-    BasePanel,
-    BaseUpload,
-    BaseTree,
-    BaseContact,
-    BaseMapPicker,
-    BaseDistPicker,
-    BaseMapDisplay,
-    Form,
-    BaseImport,
-    BaseExport,
-    BaseFileItem,
-    BaseTabBar,
-    BaseTimeline,
-    BaseComment,
-    BaseSpin,
-    BaseButton,
-    BaseSelect,
-    BaseSteps,
+  ElementUI,
+  BaseModal,
+  BasePanel,
+  BaseUpload,
+  BaseTree,
+  BaseContact,
+  BaseMapPicker,
+  BaseDistPicker,
+  BaseMapDisplay,
+  Form,
+  BaseImport,
+  BaseExport,
+  BaseExportGroup,
+  BaseFileItem,
+  BaseTabBar,
+  BaseTimeline,
+  BaseComment,
+  BaseSpin,
+  BaseButton,
+  BaseSelect,
+  BaseSteps,
 
-
-    BaseContextMenu,
-    BaseTable,
-
-    BizUserSelect,
-    BizTeamSelect,
-    BaseWindow,
-    SampleTooltip,
-    BaseCascader,
-    BaseSelectionBar,
-    BaseEditor
+  BaseContextMenu,
+  BaseTable,
+  
+  BizUserSelect,
+  BizTeamSelect,
+  BizFormRemoteSelect,
+  BizSearchForm,
+  BizSearchPanel,
+  BizSelectionPanel,
+  BizSearchCustomerSelect,
+  BizSearchProductSelect,
+  BizProcess,
+  BizProcessTime,
+  BizSelectColumn,
+  
+  BaseWindow,
+  SampleTooltip,
+  BaseCascader,
+  BaseSelectionBar,
+  BaseEditor,
+  BaseServiceStar,
+  BaseCollapse
 ];
 
 export default {
-    install(Vue) {
-        components.forEach(component => Vue.use(component))
-    }
+  install(Vue) {
+    components.forEach(component => Vue.use(component))
+  }
 }

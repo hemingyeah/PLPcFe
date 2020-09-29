@@ -11,7 +11,10 @@
         <div class="base-modal-header">
           <slot name="header">
             <slot name="title">
-              <h3 v-if="title">{{title}}</h3>
+              <h3 v-if="title">
+                {{title}}
+                <slot name="describe"></slot>
+              </h3>
             </slot>
             <button type="button" v-if="allowFullscreen" @click="isFullscreen = !isFullscreen">
               <i class="iconfont icon-quanping"></i>
@@ -123,8 +126,7 @@ export default {
         removeClass(document.body, 'overflow-body-for-modal');
       }
       this.withoutHiddenClass = true;
-    },
-    
+    }
   },
   mounted() {
     //document.addEventL.body-heightistener('keydown', this.escClose)
@@ -151,6 +153,7 @@ export default {
 
 .base-modal-mask {
   @include mask();
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
   overflow: auto;
 }
@@ -161,6 +164,14 @@ export default {
   background-color: #fff;
   border-radius: 1px;
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+
+  max-height: calc(100% - 100px);
+  max-height: calc(100vh - 100px);
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
 
   &.base-modal-fullscreen{
     position: absolute;
@@ -174,10 +185,10 @@ export default {
 }
 
 .base-modal-header {
+  min-height: 44px;
   position: relative;
-  padding: 8px 10px;
-  border-bottom: 1px solid #e9ecef;
-  background: #f8f8f8;
+  padding: 10px 15px 10px 20px;
+  background-color: $bg-color-l2;
   font-size: 16px;
   color: $text-color-primary;
   font-weight: normal;
@@ -192,6 +203,7 @@ export default {
     line-height: 24px;
     font-size: 16px;
     font-weight: 400;
+    font-size: 18px;
 
     @include text-ellipsis()
   }
@@ -227,9 +239,17 @@ export default {
   }
 }
 
+.base-modal-body {
+  overflow: auto;
+}
+
 //TODO: 统一边距
 .base-modal-footer {
-  padding: 15px 30px;
+  min-height: 52px;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  border-top: 1px solid $color-border-l2;
 }
 
 .base-modal-text-btn{

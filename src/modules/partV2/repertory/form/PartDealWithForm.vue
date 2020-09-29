@@ -357,20 +357,24 @@ export default {
           item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
         });
       }else{
-        if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
-          this.propData.arr.forEach(item=>{
-            item.checked=true;
-            // item.disabled=true;
-            const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
-            item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
-            this.$refs.selectTable.toggleRowSelection(item,true);
-          });
-        }else{
-          this.propData.arr.forEach(item=>{
-            item.checked=false;
-            item.handleNum='';
-          });
-        }
+        // if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=true;
+        //     item.disabled=true;
+        //     const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+        //     item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
+        //     this.$refs.selectTable.toggleRowSelection(item,true);
+        //   });
+        // }else{
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=false;
+        //     item.handleNum='';
+        //   });
+        // }
+        this.propData.arr.forEach(item=>{
+          item.checked=false;
+          item.handleNum='';
+        });
       }
       this.selects=[...selection];
     },
