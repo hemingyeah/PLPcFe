@@ -382,7 +382,6 @@ export default {
       transferDialog: { // 审批转交弹窗
         visible: false,
         pending: false,
-        batch: false,
         approver: {},
         approveIds: []
       }
@@ -530,6 +529,26 @@ export default {
         title: '事件详情',
         close: true,
         url: `/event/view/${id}?noHistory=1`,
+        fromId
+      })
+    },
+    createWikiTab(id) {
+      let fromId = window.frameElement.getAttribute('id');
+      this.$platform.openTab({
+        id: `document_detail_${id}`,
+        title: '知识库详情',
+        close: true,
+        url: `/wiki/detail/page?objId=${id}`,
+        fromId
+      })
+    },
+    createReportTab(id) {
+      let fromId = window.frameElement.getAttribute('id');
+      this.$platform.openTab({
+        id: `performance_report_${id}`,
+        title: '服务报告详情',
+        close: true,
+        url: `/performance/v2/report/desc/${id}`,
         fromId
       })
     },
@@ -989,7 +1008,6 @@ export default {
       return cusName.replace(/<[^>]+>/g, '');
     },
     goToApproveDetail(row) {
-      // TODO: 知识库、绩效报告跳转
       let { objId, source } = row;
 
       switch (source) {
@@ -998,6 +1016,12 @@ export default {
         break;
       case 'event':
         this.createEventTab(objId);
+        break;
+      case 'wiki':
+        this.createWikiTab(objId);
+        break;
+      case '绩效报告':
+        this.createReportTab(objId);
         break;
       default:
         break;
@@ -1016,7 +1040,6 @@ export default {
         this.transferDialog.approveIds = [data.approveId];
       }
 
-      this.transferDialog.batch = batch;
       this.transferDialog.approver = {};
       this.transferDialog.visible = true;
       
@@ -1025,7 +1048,7 @@ export default {
     * @description 审批转交
     */
     transferApprove() {
-      let { approver, batch, approveIds } = this.transferDialog;
+      let { approver, approveIds } = this.transferDialog;
 
       // 未选择新审批人
       if (!approver.userId) return this.$platform.alert('请选择新的审批人');

@@ -372,6 +372,7 @@ import DEFAULT_INITIATOR_AVATAR from '../../../assets/img/avatar.png';
 import ApproveExport from '../components/approveExport'
 import platform from '../../../platform';
 
+import { parse } from '@src/util/querystring';
 
 const KEY_MAP = {
   APPROVE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER: 'approve_list_advance_search_column_number',
@@ -1222,6 +1223,13 @@ export default {
     } catch (e) {
       this.auth = {};
       this.userId = '';
+    }
+
+    let query = parse(window.location.search) || {};
+      
+    // 转交时间降序
+    if (query.sort == 'handoverTime') {
+      this.params.sorts = [{ property: 'handoverTime', direction: 'DESC' }];
     }
 
     // 根据auth设置不同权限
