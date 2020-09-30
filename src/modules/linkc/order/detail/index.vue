@@ -362,8 +362,7 @@ export default {
   background: #fff;
   border-radius: 4px;
   box-sizing: border-box;
-
-  padding-left: 16px;
+  padding:0 16px;
   .el-table {
     .myShop-order-detail-heard th {
       background: #f5f5f5;

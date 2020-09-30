@@ -36,7 +36,7 @@
           </el-radio-group>
         </div>
         <!-- 3 -->
-        <div class="ruler-set-item mar-r-140 flex-1">
+        <div class="ruler-set-item  flex-1">
           <div class="ruler-set-item-title">允许用户查看的服务事件：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.showAllEvent"
