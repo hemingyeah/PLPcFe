@@ -18,38 +18,34 @@
                 class="btn-text frame-header-btn frame-collapse frame-header-btn-bg"
                 @click="collapse = !collapse"
               >
-                <i :class="['iconfont', collapse ? 'icon-open': 'icon-Takeup']"></i>
+                <i :class="['iconfont', collapse ? 'icon-open' : 'icon-Takeup']"></i>
               </button>
             </div>
 
             <div class="frame-quick-notification" v-show="notificationShow">
               <div class="frame-quick-notification-info" ref="notificationInfo">
                 <div class="frame-quick-notification-content" ref="notificationContent">
-                  <p
-                    ref="notificationText"
-                    class="frame-quick-notification-text"
-                  >{{ notification.title }}</p>
+                  <p ref="notificationText" class="frame-quick-notification-text">{{ notification.title }}</p>
                 </div>
               </div>
-              <button type="button" @click="closeNotification" class="frame-quick-notification-btn">
+              <button type="button" @click="closeNotification" class="frame-quick-notification-btn" >
                 <i class="iconfont icon-chahao"></i>
               </button>
             </div>
 
             <!-- profile -->
             <div class="frame-quick-right">
-              <button
-                v-if="has_call_center_module"
-                type="button"
-                class="btn-text frame-header-btn"
-                @click="handleCallCenterClick"
-              >
+              <button v-if="has_call_center_module" type="button" class="btn-text frame-header-btn" @click="handleCallCenterClick">
                 <i class="iconfont icon-dianhua1"></i>
               </button>
               <div v-if="showCallCenter" class="call-center-box">
-                <p class="customer-name" v-if="!callData.linkmanName">未知联系人</p>
-                <p class="customer-name" v-if="callData.linkmanName">{{callData.linkmanName}}</p>
-                <p v-if="callData.linkmanName">{{callData.customerName}}</p>
+                <p class="customer-name" v-if="!callData.linkmanName">
+                  未知联系人
+                </p>
+                <p class="customer-name" v-if="callData.linkmanName">
+                  {{ callData.linkmanName }}
+                </p>
+                <p v-if="callData.linkmanName">{{ callData.customerName }}</p>
                 <div class="divider"></div>
                 <div class="call-ripple">
                   <div class="icon-ripple">
@@ -58,22 +54,26 @@
                     <div class="ripple2"></div>
                   </div>
                 </div>
-                <p style="margin-top:10px;font-size: 26px;">{{callData.callPhone}}</p>
-                <el-button type="danger" @click="hangUpCall" style="margin-bottom: 20px;">挂断</el-button>
+                <p style="margin-top: 10px; font-size: 26px">
+                  {{ callData.callPhone }}
+                </p>
+                <el-button
+                  type="danger"
+                  @click="hangUpCall"
+                  style="margin-bottom: 20px"
+                  >挂断</el-button
+                >
                 <!-- 呼入 -->
-                <template v-if="callData.callType=='normal'">
+                <template v-if="callData.callType == 'normal'">
                   <div class="call-in">
                     <p class="today">
-                      今日已来电（
-                      <span>{{callData.dialCount || 0}}</span>）
+                      今日已来电（<span>{{ callData.dialCount || 0 }}</span>）
                     </p>
                     <p>
-                      未完成工单（
-                      <span>{{callData.taskCount || 0}}</span>）
+                      未完成工单（<span>{{ callData.taskCount || 0 }}</span>）
                     </p>
                     <p>
-                      未完成事件（
-                      <span>{{callData.eventCount || 0}}</span>）
+                      未完成事件（ <span>{{ callData.eventCount || 0 }}</span>）
                     </p>
                   </div>
                 </template>
@@ -81,26 +81,23 @@
                   <!-- 呼出 -->
                   <div class="call-out">
                     <p>
-                      今日已来电（
-                      <span>{{callData.dialCount || 0}}</span>）
+                      今日已来电（<span>{{ callData.dialCount || 0 }}</span >）
                     </p>
                     <div class="unfinsh">
                       <p>
-                        未完成工单（
-                        <span>{{callData.taskCount || 0}}</span>）
+                        未完成工单（<span>{{ callData.taskCount || 0 }}</span >）
                       </p>
                       <p>
-                        未完成事件（
-                        <span>{{callData.eventCount || 0}}</span>）
+                        未完成事件（<span>{{ callData.eventCount || 0 }}</span>）
                       </p>
                     </div>
                   </div>
                 </template>
-                <p class="last">{{callData.message}}</p>
+                <p class="last">{{ callData.message }}</p>
               </div>
 
               <el-popover v-if="showDevTool">
-                <button type="button" class="btn-text frame-header-btn dev-tool" slot="reference">
+                <button type="button" class="btn-text frame-header-btn dev-tool"  slot="reference" >
                   <i class="iconfont icon-experiment"></i>
                 </button>
 
@@ -171,30 +168,27 @@
                 title="通知中心"
                 v-tooltip
               >
-                <span
-                  class="notification-new"
-                  v-show="notification.count && notification.count > 0"
-                >{{ notification.count>99?99:notification.count }}</span>
+                <span class="notification-new" v-show="notification.count && notification.count > 0">{{ notification.count > 99 ? 99 : notification.count }}</span>
                 <i class="iconfont">&#xe624;</i>
               </button>
 
               <!-- 个人信息 -->
-              <el-popover popper-class="user-profile-menu" v-model="profilePopperVisible">
-                <div class="frame-user-profile" slot="reference">
+              <el-popover
+                popper-class="user-profile-menu"
+                v-model="profilePopperVisible"
+              >
+                <div class="frame-user-profile" slot="reference"   id="v-step-0">
                   <a
                     class="user-avatar"
                     :href="`/mine/` + loginUser.userId"
                     @click.stop.prevent="openUserView"
                   >
                     <img :src="userAvatar" />
-                    <span
-                      class="user-color-icon user-color-icon-mini"
-                      :style="{backgroundColor: userStateColor}"
-                    ></span>
+                    <span class="user-color-icon user-color-icon-mini" :style="{ backgroundColor: userStateColor }"></span>
                   </a>
                   <div class="user-info">
-                    <h4>{{loginUser.displayName}}</h4>
-                    <p>{{loginUser.state}}</p>
+                    <h4>{{ loginUser.displayName }}</h4>
+                    <p>{{ loginUser.state }}</p>
                   </div>
                   <i class="iconfont icon-nav-down user-profile-down"></i>
                 </div>
@@ -216,15 +210,26 @@
                       :key="state"
                       @click="chooseUserState(state)"
                     >
-                      <span class="user-color-icon" :style="{backgroundColor: color}"></span>
-                      <span>{{state}}</span>
+                      <span
+                        class="user-color-icon"
+                        :style="{ backgroundColor: color }"
+                      ></span>
+                      <span>{{ state }}</span>
                     </div>
                   </div>
                 </el-popover>
 
                 <div class="user-profile-item">
-                  <a :href="`/mine/` + loginUser.userId" @click.prevent.self="openUserView">
+                  <a
+                    :href="`/mine/` + loginUser.userId"
+                    @click.prevent.self="openUserView"
+                  >
                     <i class="iconfont icon-people"></i>个人中心
+                  </a>
+                </div>
+                <div class="user-profile-item" v-if="tenantInform.multi">
+                  <a @click.prevent.self="openUserEnterprise">
+                    <i class="iconfont icon-qiehuan1"></i>切换企业
                   </a>
                 </div>
 
@@ -241,7 +246,7 @@
             <button
               type="button"
               class="btn-text frame-tabs-prev"
-              :class="{'frame-tab-highlight': prevBtnEnable}"
+              :class="{ 'frame-tab-highlight': prevBtnEnable }"
               @click="prev"
             >
               <i class="iconfont icon-zuoyidong"></i>
@@ -251,8 +256,8 @@
             <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
               <div
                 ref="list"
-                :class="{'frame-tabs-list': true,'frame-tab-transition': offsetTransition}"
-                :style="{transform: `translateX(${-offset}px)`}"
+                :class="{ 'frame-tabs-list': true,'frame-tab-transition': offsetTransition,}"
+                :style="{ transform: `translateX(${-offset}px)` }"
                 @transitionend="tabTransitionEnd"
               >
                 <frame-tab
@@ -270,7 +275,7 @@
             <button
               type="button"
               class="btn-text frame-tabs-next"
-              :class="{'frame-tab-highlight': nextBtnEnable}"
+              :class="{ 'frame-tab-highlight': nextBtnEnable }"
               @click="next"
             >
               <i class="iconfont icon-youyidong"></i>
@@ -291,7 +296,7 @@
                 :fromid="tab.fromId"
                 :data-id="tab.id"
                 :src="tab.url"
-                @load="updateFrameTab($event,tab)"
+                @load="updateFrameTab($event, tab)"
                 allowfullscreen
               />
             </div>
@@ -317,26 +322,73 @@
     <!-- start 用户向导 -->
     <user-guide ref="userGuideView"></user-guide>
     <!-- end 用户向导 -->
+
+    <!--start 切换企业 -->
+    <switchcompanies-dialog
+      ref="switchcompaniesToast"
+      @handleClose="handleClose"
+      v-if="switchcompaniesState"
+      @refresh="refresh"
+      :tenantInform="tenantInform"
+    ></switchcompanies-dialog>
+    <!--end 切换企业 -->
+
+    <!--start 提醒存在多个企业-->
+    <v-tour v-if="showTour" name="myTour" :steps="steps" :options="options">
+      <template slot-scope="tour">
+        <transition name="fade">
+          <v-step
+            v-if="tour.currentStep === index"
+            v-for="(step, index) of tour.steps"
+            :key="index"
+            :step="step"
+            :previous-step="tour.previousStep"
+            :next-step="tour.nextStep"
+            :stop="tour.stop"
+            :is-first="tour.isFirst"
+            :is-last="tour.isLast"
+            :labels="tour.labels"
+          >
+            <template>
+              <div slot="actions" class="option-btns">
+                <button class="btn btn-transfer btn-disabled" disabled>
+                  « 上一步
+                </button>
+                <button class="btn btn-transfer btn-disabled" disabled>
+                  下一步 »
+                </button>
+                <button @click="stopStep" class="btn btn-transfer">
+                  好,知道了
+                </button>
+              </div>
+            </template>
+          </v-step>
+        </transition>
+      </template>
+    </v-tour>
+    <!--end 提醒存在多个企业-->
+
   </div>
 </template>
 
 <script>
-import platform from '@src/platform';
-import http from '@src/util/http';
-import FrameManager from './FrameManager';
+import platform from "@src/platform";
+import http from "@src/util/http";
+import FrameManager from "./FrameManager";
 
-import FrameTab from './component/FrameTab.vue';
-import FrameNav from './component/FrameNav.vue';
-import Version from './component/Version.vue';
-import SaleManager from './component/SaleManager.vue';
-import UserGuide from './component/UserGuide.vue';
+import FrameTab from "./component/FrameTab.vue";
+import FrameNav from "./component/FrameNav.vue";
+import Version from "./component/Version.vue";
+import SaleManager from "./component/SaleManager.vue";
+import UserGuide from "./component/UserGuide.vue";
+import switchCompaniesDialog from "./component/switchCompaniesDialog.vue";
 
-import ImportAndExport from './component/ImportAndExport.vue';
+import ImportAndExport from "./component/ImportAndExport.vue";
 
-import DefaultHead from '@src/assets/img/user-avatar.png';
-import NotificationCenter from './component/NotificationCenter.vue';
-import * as NotificationApi from '@src/api/NotificationApi';
-import * as CallCenterApi from '@src/api/CallCenterApi';
+import DefaultHead from "@src/assets/img/user-avatar.png";
+import NotificationCenter from "./component/NotificationCenter.vue";
+import * as NotificationApi from "@src/api/NotificationApi";
+import * as CallCenterApi from "@src/api/CallCenterApi";
 
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
@@ -347,15 +399,34 @@ let webSocketClient = null,
 
 export default {
   mixins: [FrameManager],
-  name: 'frame-view',
-  inject: ['initData'],
+  name: "frame-view",
+  inject: ["initData"],
   data() {
     return {
+      tenantInform:{},
+      showTour: false,
+      options: {
+        labels: {
+          buttonPrevious: "« 上一步",
+          buttonNext: "下一步 »",
+          buttonStop: "好,知道了",
+        },
+      },
+      steps: [
+        {
+          target: "#v-step-0",
+          content:"当前账号存在多个企业，点击此处【切换企业】按钮可进行切换！",
+          header: {
+            title: "温馨提示",
+          },
+        },
+      ],
+      switchcompaniesState: false,
       notificationInfo: {},
       notification: {
-        count: 0
+        count: 0,
       },
-      systemMsg: '',
+      systemMsg: "",
       notificationShow: false,
       notificationStyle: {},
       loginUser: this.initData.user || {}, // 当前登录的用户
@@ -373,7 +444,7 @@ export default {
       operationList: [],
 
       // 后台任务
-      backgroundTaskTitle: '后台任务',
+      backgroundTaskTitle: "后台任务",
 
       showCallCenter: false,
       callData: {},
@@ -389,15 +460,15 @@ export default {
           this.timeoutObj = setTimeout(() => {
             // 这里发送一个心跳，后端收到后，返回一个心跳消息，
             // onmessage拿到返回的心跳就说明连接正常
-            webSocketClient.send(JSON.stringify({ action: 'ping' }));
+            webSocketClient.send(JSON.stringify({ action: "ping" }));
             _num--;
             if (_num === 0) {
               webSocketClient.colse();
             }
           }, this.timeout);
-        }
+        },
       },
-      has_call_center_module: false
+      has_call_center_module: false,
     };
   },
   computed: {
@@ -405,17 +476,15 @@ export default {
       // websocket连接地址
       // return `ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25`
       const currentProtocol = window.location.protocol;
-      let protocol = 'ws';
-      if (currentProtocol === 'https:') {
-        protocol = 'wss';
+      let protocol = "ws";
+      if (currentProtocol === "https:") {
+        protocol = "wss";
       }
       return `${protocol}://${window.location.hostname}/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`;
     },
     /** 是否显示devtool */
     showDevTool() {
-      return (
-        this.$appConfig.env != 'production' || this.initData.env != 'prod'
-      );
+      return this.$appConfig.env != "production" || this.initData.env != "prod";
     },
     /** 用户工作状态颜色配置 */
     userStateMap() {
@@ -431,42 +500,70 @@ export default {
       return this.loginUser.head || DefaultHead;
     },
     releaseVersion() {
-      return this.initData.releaseVersion || '';
-    }
+      return this.initData.releaseVersion || "";
+    },
   },
   methods: {
-    async hangUpCall(){
+    //获取多租户信息
+    getTenantInform() {
+      http.post("/ismulti").then((res)=>{
+        this.tenantInform = res.data;
+        const detailTour = localStorage.getItem('user-switch-companies-tour');
+        //打开提示框
+        if(!detailTour && res.data.multi) {
+          this.$tours['myTour'].start();
+        }
+        }).catch();
+    },
+    //关闭提示框
+    stopStep(){
+      localStorage.setItem('user-switch-companies-tour', true);
+      this.showTour = false;
+    },
+    //切换企业
+    openUserEnterprise() {
+      this.switchcompaniesState = true;
+      this.$nextTick(() => {
+        this.$refs.switchcompaniesToast.openDialog();
+        this.$refs.tenantInform = this.tenantInform;
+      });
+    },
+    handleClose() {
+      this.switchcompaniesState = false;
+    },
+    refresh() {},
+    async hangUpCall() {
       try {
-        let {code, message} = await CallCenterApi.hangUpCall();
-        if(code != 0) this.$message.error(message || '内部错误')
-        console.log('res:', code, message);
-      } catch(error) {
+        let { code, message } = await CallCenterApi.hangUpCall();
+        if (code != 0) this.$message.error(message || "内部错误");
+        console.log("res:", code, message);
+      } catch (error) {
         console.error(error);
       }
     },
     // 判断当前租户是否开启呼叫中心灰度功能
     async judgeCallCenterGray() {
-      localStorage.setItem('call_center_gray', 0);
-      localStorage.setItem('call_center_module', 0);
+      localStorage.setItem("call_center_gray", 0);
+      localStorage.setItem("call_center_module", 0);
       try {
-        const { status, data } = await http.get('/setting/callCenterGray');
+        const { status, data } = await http.get("/setting/callCenterGray");
         if (status !== 0 || !data) {
           return;
         }
         if (data.callcenter) {
           // 说明开启呼叫中心灰度
-          localStorage.setItem('call_center_gray', 1);
+          localStorage.setItem("call_center_gray", 1);
           this.getAccountInfo();
         } else {
-          localStorage.setItem('call_center_module', 0);
-          localStorage.setItem('call_center_gray', 0);
+          localStorage.setItem("call_center_module", 0);
+          localStorage.setItem("call_center_gray", 0);
         }
       } catch (error) {
         console.error(error);
       }
     },
     async getAccountInfo() {
-      localStorage.setItem('call_center_module', 0);
+      localStorage.setItem("call_center_module", 0);
       try {
         const { code, result } = await CallCenterApi.getAccountInfo();
         // result为null未申请开通
@@ -476,11 +573,11 @@ export default {
         // 审核状态：0待审核，1已审核
         if (result.verifyStatus == 1) {
           this.has_call_center_module = true;
-          localStorage.setItem('call_center_module', 1);
-          if ('WebSocket' in window) {
-              this.initWebSocket();
+          localStorage.setItem("call_center_module", 1);
+          if ("WebSocket" in window) {
+            this.initWebSocket();
           } else {
-            alert('当前浏览器 Not support websocket');
+            alert("当前浏览器 Not support websocket");
           }
         }
       } catch (error) {
@@ -492,10 +589,10 @@ export default {
         <base-context-menu-item command="other">
           关闭其他
         </base-context-menu-item>,
-        <base-context-menu-item command="all">关闭全部</base-context-menu-item>
+        <base-context-menu-item command="all">关闭全部</base-context-menu-item>,
       ];
 
-      if (target && target.id != 'tab_HOME') {
+      if (target && target.id != "tab_HOME") {
         menus.unshift(
           <base-context-menu-item command="itself">关闭</base-context-menu-item>
         );
@@ -504,14 +601,14 @@ export default {
       return menus;
     },
     adjustOpenTab() {
-      let tab = this.frameTabs.find(item => item.show);
+      let tab = this.frameTabs.find((item) => item.show);
       this.adjustFrameTabs(tab);
     },
     openDemo() {
       this.openForFrame({
-        id: 'demo',
-        url: '/payment/paymentBillOnline',
-        title: 'demo'
+        id: "demo",
+        url: "/payment/paymentBillOnline",
+        title: "demo",
       });
     },
     /** @deprecated */
@@ -534,7 +631,7 @@ export default {
       this.profilePopperVisible = false;
       try {
         let result = await http.post(
-          '/security/user/updateState',
+          "/security/user/updateState",
           { state },
           false
         );
@@ -551,21 +648,21 @@ export default {
       this.loginUser.state = state;
     },
     async logout() {
-      if (await platform.confirm('您确定要退出系统吗？')) {
+      if (await platform.confirm("您确定要退出系统吗？")) {
         window.location.href = platform.inDingTalk
-          ? '/smlogin/pc/logout'
-          : '/logout';
+          ? "/smlogin/pc/logout"
+          : "/logout";
       }
     },
     openHelpDoc(event) {
-      platform.openLink('https://www.yuque.com/shb/help');
+      platform.openLink("https://www.yuque.com/shb/help2");
       this.profilePopperVisible = false;
     },
     openUserView(event) {
       this.openForFrame({
-        id: 'userCenter',
+        id: "userCenter",
         url: `/mine/${this.loginUser.userId}`,
-        title: '个人中心'
+        title: "个人中心",
       });
       this.profilePopperVisible = false;
     },
@@ -580,23 +677,24 @@ export default {
     /** 检测是否有导出 */
     async checkExports() {
       try {
-        this.exportList = (await http.get('/excels/getList')) || []; // 报错
+        this.exportList = (await http.get("/excels/getList")) || []; // 报错
         // 更新操作列表
         if (!Array.isArray(this.exportList)) this.exportList = [];
         // 更新操作列表
-        this.operationList = this.operationList.filter(item => {
+        this.operationList = this.operationList.filter((item) => {
           return (
-            item.operate == 'cancel'
-            || (item.operate == 'download'
-              && this.exportList.some(exp => exp.id == item.id))
+            item.operate == "cancel" ||
+            (item.operate == "download" &&
+              this.exportList.some((exp) => exp.id == item.id))
           );
         });
 
         // 以下情况需要刷新列表
         // 1. 有为导出完成的文件
         // 2. 操作列表中仍有下载的文件
-        let autoFetchExportList = this.exportList.some(item => item.isFinished == 0)
-          || this.operationList.some(item => item.operate == 'download');
+        let autoFetchExportList =
+          this.exportList.some((item) => item.isFinished == 0) ||
+          this.operationList.some((item) => item.operate == "download");
 
         // 如果不需要更新，清空定时器
         if (!autoFetchExportList) {
@@ -625,12 +723,12 @@ export default {
     },
     /** @deprecated */
     clearCachedIds() {
-      let cachedKey = localStorage.getItem('cachedKey');
+      let cachedKey = localStorage.getItem("cachedKey");
       let cachedKeyArray = [];
 
-      if (cachedKey) cachedKeyArray = cachedKey.split(',');
-      cachedKeyArray.forEach(key => localStorage.setItem(key, []));
-      localStorage.removeItem('cachedKey');
+      if (cachedKey) cachedKeyArray = cachedKey.split(",");
+      cachedKeyArray.forEach((key) => localStorage.setItem(key, []));
+      localStorage.removeItem("cachedKey");
     },
     // popover manage
     exportPopoverToggle(visible) {
@@ -643,16 +741,16 @@ export default {
     },
     goRoleTeam() {
       platform.openTab({
-        id: 'team',
-        title: '团队管理',
-        url: '/security/tag',
-        reload: true
+        id: "team",
+        title: "团队管理",
+        url: "/security/tag",
+        reload: true,
       });
     },
     closeNotification() {
       this.notificationShow = false;
       sessionStorage.setItem(
-        'shb_systemMsg',
+        "shb_systemMsg",
         this.notificationInfo.msgSystem.id
       );
       this.clearAnimation();
@@ -686,11 +784,11 @@ export default {
 
           this.notificationInfo = info.data;
           this.notification.count = info.data.unReadTotalCount;
-          let msgSystem = sessionStorage.getItem('shb_systemMsg');
+          let msgSystem = sessionStorage.getItem("shb_systemMsg");
 
           if (
-            this.notificationInfo.lastMessage
-            && (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
+            this.notificationInfo.lastMessage &&
+            (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
           ) {
             this.notification.title = info.data.lastMessage.title;
             this.notificationShow = true;
@@ -717,7 +815,7 @@ export default {
       });
     },
     clearAnimation() {
-      this.$refs.notificationContent.style.animation = '';
+      this.$refs.notificationContent.style.animation = "";
     },
 
     /** 删除未读消息或消息已读后更新新通知数量 */
@@ -726,7 +824,7 @@ export default {
       let count_ = this.notification.count - e.count;
       // 通知总数风险把控不把非正整数暴露给用户
       if (count_ < 0) {
-        console.warn('通知消息总数为负数');
+        console.warn("通知消息总数为负数");
         count_ = 0;
       }
       count_ = Math.round(count_);
@@ -737,58 +835,58 @@ export default {
     },
     goDepartment() {
       platform.openTab({
-        id: 'department_view',
-        title: '组织架构管理',
-        url: '/security/department/view',
+        id: "department_view",
+        title: "组织架构管理",
+        url: "/security/department/view",
         reload: true,
       });
     },
     goDepartment2() {
       platform.openTab({
-        id: 'dept_view',
-        title: '组织架构管理',
-        url: '/security/dept/view',
+        id: "dept_view",
+        title: "组织架构管理",
+        url: "/security/dept/view",
         reload: true,
       });
     },
     goCustomerContact() {
       platform.openTab({
-        id: 'customer_contact',
-        title: '产品设置',
-        url: '/customerContact',
-        reload: true
+        id: "customer_contact",
+        title: "产品设置",
+        url: "/customerContact",
+        reload: true,
       });
     },
     goDoMyself() {
       platform.openTab({
-        id: 'do_myself',
-        title: '自助门户设置',
-        url: '/setting/doMyself/wxSet',
-        reload: true
+        id: "do_myself",
+        title: "自助门户设置",
+        url: "/setting/doMyself/wxSet",
+        reload: true,
       });
     },
     goCallCenterSetting() {
       platform.openTab({
-        id: 'callcenter_setting',
-        title: '呼叫中心设置',
-        url: '/setting/callcenter/setting',
-        reload: true
+        id: "callcenter_setting",
+        title: "呼叫中心设置",
+        url: "/setting/callcenter/setting",
+        reload: true,
       });
     },
     goCallCenter() {
       platform.openTab({
-        id: 'callcenter_stage',
-        title: '呼叫中心',
-        url: '/setting/callcenter/stage',
-        reload: true
+        id: "callcenter_stage",
+        title: "呼叫中心",
+        url: "/setting/callcenter/stage",
+        reload: true,
       });
     },
     goCallCenterWorkbench() {
       platform.openTab({
-        id: 'M_CALLCENTER_WORKBENCH_LIST',
-        title: '呼叫中心工作台',
-        url: '/setting/callcenter/workbench',
-        reload: true
+        id: "M_CALLCENTER_WORKBENCH_LIST",
+        title: "呼叫中心工作台",
+        url: "/setting/callcenter/workbench",
+        reload: true,
       });
     },
     handleCallCenterClick() {
@@ -797,14 +895,15 @@ export default {
     },
     openCallCenterWorkbench(data) {
       // console.info('data::', data);
-      let url = data && data.id
-        ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}`
-        : '/setting/callcenter/workbench';
+      let url =
+        data && data.id
+          ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}`
+          : "/setting/callcenter/workbench";
       platform.openTab({
-        id: 'M_CALLCENTER_WORKBENCH_LIST',
-        title: '呼叫中心工作台',
+        id: "M_CALLCENTER_WORKBENCH_LIST",
+        title: "呼叫中心工作台",
         url,
-        reload: true
+        reload: true,
       });
     },
     initWebSocket() {
@@ -824,25 +923,25 @@ export default {
       // this.heartCheck.start();
 
       setTimeout(() => {
-        this.send(JSON.stringify({ action: 'ping' }));
+        this.send(JSON.stringify({ action: "ping" }));
       }, 500);
     },
     async webSocketOnMessage(e) {
       this.heartCheck.start();
       // console.info('数据内容：{0}', e.data)
       // pong 是心跳
-      if (e.data === 'pong') return;
+      if (e.data === "pong") return;
       // 这里处理接受到来电的消息
       try {
         const data = JSON.parse(e.data);
         // {"callPhone":"15267183070","callState":"Hangup","callType":"dialout","ringTime":1592636121000}
         // console.info('data:', data.callType, data.callState);
 
-        if (data.callType === 'normal' || data.callType === 'dialout') {
-          if (data.callState === 'Hangup') {
+        if (data.callType === "normal" || data.callType === "dialout") {
+          if (data.callState === "Hangup") {
             // 没接听
             this.showCallCenter = false;
-          } else if (data.callState === 'Unlink' || data.callState === 'Link') {
+          } else if (data.callState === "Unlink" || data.callState === "Link") {
             // 接听了和接听然后挂断了
             this.callData = data;
             this.showCallCenter = false;
@@ -850,7 +949,7 @@ export default {
           } else {
             this.callData = data;
             const res = await CallCenterApi.getLinkmanInfo({
-              linkmanPhone: data.callPhone
+              linkmanPhone: data.callPhone,
             });
             if (res.status == 0 && res.data) {
               this.callData.taskCount = res.data.unfinishedTaskCount;
@@ -868,7 +967,7 @@ export default {
         // console.info('readyState:', webSocketClient.readyState)
         webSocketClient.send(param);
       } catch (err) {
-        console.error('error', err);
+        console.error("error", err);
       }
     },
     webSocketClose(e) {
@@ -890,19 +989,20 @@ export default {
         this.initWebSocket();
         lockReconnect = false;
       }, 4000);
-    }
+    },
   },
   created() {
+    this.showTour = true;
     // TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
     window.exportPopoverToggle = this.exportPopoverToggle;
 
-    window.resizeFrame = function() {
-      console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
+    window.resizeFrame = function () {
+      console.warn("此方法只用于兼容旧页面，无实际效果，不推荐调用");
     };
     this.clearCachedIds();
-    sessionStorage.removeItem('shb_systemMsg');
+    sessionStorage.removeItem("shb_systemMsg");
     this.getSystemMsg();
     setInterval(() => {
       this.getSystemMsg();
@@ -916,6 +1016,8 @@ export default {
       this.$refs.userGuideView.show();
     }
     this.checkExports();
+   
+    this.getTenantInform();
   },
   components: {
     [FrameNav.name]: FrameNav,
@@ -924,8 +1026,9 @@ export default {
     [SaleManager.name]: SaleManager,
     [NotificationCenter.name]: NotificationCenter,
     [ImportAndExport.name]: ImportAndExport,
-    [UserGuide.name]: UserGuide
-  }
+    [UserGuide.name]: UserGuide,
+    [switchCompaniesDialog.name]: switchCompaniesDialog,
+  },
 };
 </script>
 

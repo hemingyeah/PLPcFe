@@ -521,6 +521,11 @@
 
               <el-table-column label="操作" width="150px">
                 <template slot-scope="scope">
+                   <el-button
+                    :disabled="scope.row.pending"
+                    type="text"
+                    @click="toggleEditor(scope.row)"
+                  >编辑</el-button>
                   <el-button
                     :disabled="scope.row.pending"
                     v-if="scope.row.enabled == 1"
@@ -674,6 +679,10 @@
         <el-button type="primary" :disabled="pending" :loading="pending" @click="resetUserPwd">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!--start 编辑账号名称 -->
+    <modifyname-dialog ref="ModifyNameToast" @handleClose="handleClose" v-if="showModifynameDialog"  @refresh="refresh"></modifyname-dialog>
+    <!--end 编辑账号名称 -->
   </div>
   <!-- end 选择组织架构页面 -->
 </template>
@@ -697,9 +706,12 @@ import {
 
 import * as TeamApi from "@src/api/TeamApi";
 import md5 from "js-md5";
+
 /* components */
 import CreateUserPanel from "./component/CreateUserPanel.vue";
 import DepartmentEditPanel from "./component/DepartmentEditPanel.vue";
+import ModifyName from "./component/ModifyName";
+
 /* utils */
 import _ from "lodash";
 import http from "@src/util/http";
@@ -713,6 +725,7 @@ export default {
   inject: ["initData"],
   data() {
     return {
+      showModifynameDialog:false,
       deptKeyword: "",
       activeName: "tag",
       dept_role_data: [],
@@ -887,6 +900,22 @@ export default {
     }
   },
   methods: {
+    //编辑账号名称功能
+    toggleEditor(row) {
+      this.showModifynameDialog = true;
+      this.$nextTick(()=>{
+        this.$refs.ModifyNameToast.form.userId = row.userId;
+        this.$refs.ModifyNameToast.form.name = row.displayName;
+        this.$refs.ModifyNameToast.openDialog();
+      })
+
+    },
+    handleClose(){
+      this.showModifynameDialog = false
+    },
+    refresh(){
+      this.initialize(false);
+    },
     //同步企业微信通讯录
     async synchronousWeChat() {
       try {
@@ -1897,6 +1926,7 @@ export default {
   components: {
     [CreateUserPanel.name]: CreateUserPanel,
     [DepartmentEditPanel.name]: DepartmentEditPanel,
+    [ModifyName.name]: ModifyName,
   },
 };
 </script>

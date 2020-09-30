@@ -4,6 +4,10 @@ import FrameView from './FrameView.vue';
 import { Notification } from 'shb-element-ui';
 import mtracker from '@src/util/mtracker';
 
+import VueTour from 'vue-tour';
+require('vue-tour/dist/vue-tour.css');
+Vue.use(VueTour);
+
 mtracker();
 
 

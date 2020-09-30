@@ -724,3 +724,46 @@ button.export-operate-btn{
   }
 }
 /* --------  end 用户向导 ---------------- */
+
+/* --------  start 温馨提示 ---------------- */
+.v-step[data-v-7c9c03f0] {
+  background: #fff!important;
+  color: #333!important;
+}
+
+.v-step .v-step__arrow--dark[data-v-7c9c03f0]{
+  border-color: #55B7B4!important;
+  border-left-color: transparent!important;
+  border-right-color: transparent!important;
+  border-top-color: transparent!important;
+}
+
+.v-step__header[data-v-7c9c03f0] {
+  text-align: left;
+  background: #55B7B4!important;
+  color: #fff;
+}
+
+.v-step__content[data-v-7c9c03f0] {
+  color: #333;
+}
+
+.nextSteps{
+  left: 10;
+  right: 0!important;
+}
+.btn-transfer{
+  background-color: #fff;
+  color: $text-color-primary;
+  border: 1px solid #E2E2E2;
+  border-radius: 2px;
+  padding: 4px 15px;
+  margin-left: -5px;
+}
+
+.btn-disabled{
+  background: #eee;
+  color: #999;
+}
+
+/* --------  end 温馨提示 ---------------- */
