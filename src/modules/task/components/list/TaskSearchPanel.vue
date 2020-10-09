@@ -712,8 +712,9 @@ export default {
   overflow: auto;
   padding: 10px 15px 150px 15px;
 
-  height: calc(100% - 57);
+  height: calc(100% - 57px);
   justify-content: space-between;
+  overflow-x: hidden;
 
   .two-columns {
     display: flex;

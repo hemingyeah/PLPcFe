@@ -534,7 +534,7 @@
                   <!-- 暂停中 -->
                   <span
                     class="task-state-block task-state-block-overtime task-font12"
-                    v-if="new Date(scope.row.overTime).getTime() > new Date().getTime()"
+                    v-if="new Date().getTime() > new Date(scope.row.overTime).getTime()"
                   >
                     超时
                   </span>
@@ -568,7 +568,7 @@
                 <template
                   v-else-if="column.formType === 'select' && !column.isSystem"
                 >
-                  {{ scope.row.attribute && scope.row.attribute[column.field] | displaySelect }}
+                  {{ scope.row.attribute[column.field] | displaySelect }}
                 </template>
 
                 <!-- 更新时间 -->
@@ -702,16 +702,20 @@
                 <template
                   v-else-if="
                     column.formType === 'user' &&
-                      scope.row.attribute && scope.row.attribute[column.field]
+                      scope.row.attribute[column.field]
                   "
                 >
-                  {{ scope.row.attribute && (scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name) }}
+                  {{
+                    scope.row.attribute[column.field].displayName ||
+                      scope.row.attribute[column.field].name
+                  }}
                 </template>
 
                 <!-- 位置 -->
                 <template v-else-if="column.formType === 'location'">
                   {{
-                    scope.row.attribute && scope.row.attribute[column.field] && scope.row.attribute[column.field].address
+                    scope.row.attribute[column.field] &&
+                      scope.row.attribute[column.field].address
                   }}
                 </template>
 
@@ -722,7 +726,7 @@
 
                 <div
                   v-else-if="column.formType === 'textarea'"
-                  v-html="buildTextarea(scope.row.attribute && scope.row.attribute[column.field])"
+                  v-html="buildTextarea(scope.row.attribute[column.field])"
                   @click="openOutsideLink"
                 ></div>
                 

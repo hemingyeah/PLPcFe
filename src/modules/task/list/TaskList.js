@@ -177,54 +177,6 @@ export default {
         {
           id: 5460,
           isSystem: 1,
-          fieldName: "spare_serialNumber",
-          field: "spare_serialNumber",
-          displayName: "备件编号",
-          label: "备件编号",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "spare_type",
-          field: "spare_type",
-          displayName: "备件类别",
-          label: "备件类别",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "spare_number",
-          field: "spare_number",
-          displayName: "备件数量",
-          label: "备件数量",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "spare_cost",
-          field: "spare_cost",
-          displayName: "备件价格",
-          label: "备件价格",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
           fieldName: "service_name",
           field: "service_name",
           displayName: "服务项目",
@@ -236,42 +188,6 @@ export default {
         {
           id: 5460,
           isSystem: 1,
-          fieldName: "service_type",
-          field: "service_type",
-          displayName: "服务类别",
-          label: "服务类别",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "service_number",
-          field: "service_number",
-          displayName: "服务项目数量",
-          label: "服务项目数量",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "service_cost",
-          field: "service_cost",
-          displayName: "服务项目金额",
-          label: "服务项目金额",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
           fieldName: "balance_total",
           field: "balance_total",
           displayName: "费用信息",
@@ -279,30 +195,6 @@ export default {
           formType: "text",
           isNull: 1,
           isSearch: 0,
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "balance_discount",
-          field: "balance_discount",
-          displayName: "折扣费用",
-          label: "折扣费用",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "balance_sum",
-          field: "balance_sum",
-          displayName: "工单合计",
-          label: "工单合计",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-          bool: true
         },
       ];
 
@@ -637,7 +529,9 @@ export default {
               }
             })
             list.map((v, i) => {
-              v.fieldName = `${item.cardId}_${v.fieldName}`
+              if (!v.map) {
+                v.fieldName = `${item.cardId}_${v.fieldName}`
+              }
             })
 
             item.fields = [...list, ...[{displayName: '行程距离',
@@ -995,7 +889,18 @@ export default {
 
           // 把选中的匹配出来
           // this.matchSelected();
-          console.log("工单列表渲染数据", this.taskPage);
+          // console.log("工单列表渲染数据", this.taskPage);
+          if (this.multipleSelection.length) {
+            this.$nextTick(() => {
+              this.multipleSelection.forEach(item => {
+                this.taskPage.list.forEach(v => {
+                  if (v.id === item.id) {
+                    this.$refs.multipleTable.toggleRowSelection(v);
+                  }
+                  })
+                })
+            })
+          }
           // this.multipleSelection = [];
           return data;
         })
@@ -1202,12 +1107,52 @@ export default {
     //   return params;
     // },
     /**
+     * 导出数据
+     */
+    exportData(number, list = []) {
+      const export_list = this.exportColumnList.length ? this.exportColumnList : this.exportColumns
+      if (number === 3) {
+        let cardField = []
+        export_list.filter((item, index) => {
+          return index > 2
+        }).forEach(v => {
+          v.columns.forEach(item => {
+            cardField.push(item)
+          })
+        })
+        return cardField.map(v => {
+          let bool = list.some(item => {
+            if (v.exportAlias) {
+              return v.exportAlias === item
+            } else {
+              return v.fieldName === item
+            }
+          })
+          if (bool) {
+            return v.exportAlias ? v.exportAlias : v.fieldName
+          }
+        }).filter(item => {return item})
+      }
+
+      return export_list[number].columns.map(v => {
+        let bool = list.some(item => {
+          if (v.exportAlias) {
+            return v.exportAlias === item
+          } else {
+            return v.fieldName === item
+          }
+        })
+        if (bool) {
+          return v.exportAlias ? v.exportAlias : v.fieldName
+        }
+      }).filter(item => {return item})
+    },
+    /**
      * @description 构建导出参数
      * @return {Object} 导出参数
      */
     buildExportParams( checkedMap, ids) {
       const { receiptChecked, systemChecked, taskChecked } = checkedMap
-      console.log(taskChecked)
       const Params = Object.assign({}, this.params);
       const rootWindow = getRootWindow(window);
       const { loginUser } = this.initData;
@@ -1233,27 +1178,47 @@ export default {
           },
         }),
       };
+      // 附加
       let cardFieldChecked = []
       for(let key in checkedMap) {
         if (key.indexOf('annexChecked') !== -1) {
           cardFieldChecked = [...cardFieldChecked, ...checkedMap[key]]
         }
       }
-      console.log('附加', cardFieldChecked)
+      cardFieldChecked = cardFieldChecked.filter(item => {return item})
+      /*********************** *********************/
+      // 工单信息
+      let export_task = this.exportData(0, taskChecked)
+      // 回执信息
+      let export_receipt_task = this.exportData(1, receiptChecked)
+      //系统信息
+      let export_sys_task = this.exportData(2, systemChecked)
+      //附加信息
+      let export_card_fiel_task = cardFieldChecked.length ? this.exportData(3, cardFieldChecked) : cardFieldChecked
+      console.log('导出数据----附加', export_card_fiel_task)
 
       params["data"] = exportAll ? "" : this.selectedIds.join(",");
       params["typeId"] = exportSearchModel.typeId;
-      params["receiptChecked"] = receiptChecked
+      params["receiptChecked"] = export_receipt_task
+        .map((item) => {
+          if (item === 'spare_name') {
+            item = 'spare_name,spare_serialNumber,spare_type,spare_number,spare_cost'
+          } 
+          if (item === 'service_name') {
+            item = 'service_name,service_type,service_number,service_cost'
+          } 
+          if (item === 'balance_total') {
+            item = 'balance_total,balance_discount,balance_sum'
+          }
+          return item;
+        })
+        .join(",");
+      params["sysChecked"] = export_sys_task
         .map((item) => {
           return item;
         })
         .join(",");
-      params["sysChecked"] = systemChecked
-        .map((item) => {
-          return item;
-        })
-        .join(",");
-      params["checked"] = taskChecked
+      params["checked"] = export_task
         .map((item) => {
           if (item === 'product') {
             item = 'product,productSN'
@@ -1261,7 +1226,9 @@ export default {
           return item;
         })
         .join(",");
-      params['cardFieldChecked'] = cardFieldChecked.join(',')
+      params['cardFieldChecked'] = export_card_fiel_task.filter(item => {
+        return item
+      }).join(',')
       return params;
     },
     /**
@@ -1488,7 +1455,6 @@ export default {
      */
     handleSelection(selection) {
       let tv = this.selectionCompute(selection);
-      console.log(selection)
 
       let original = this.multipleSelection.filter((ms) =>
         this.taskPage.list.some((cs) => cs.id === ms.id)

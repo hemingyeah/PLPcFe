@@ -343,7 +343,7 @@ export default {
 
           return (
             <el-select 
-              class='task-inquire-operator-select'
+              class={this.columnNum === 2 ? 'task-inquire-operator-select' : 'task-mt12'}
               value={ this.selectedField.operatorValue }
               onInput={ value => this.selectedField.operatorValue = value }
             >
