@@ -13,9 +13,28 @@ const NestedDraggable = {
       default: () => []
     }
   },
+  data() {
+    return {
+      drag: false
+    }
+  },
+  methods: {
+    sortListDragStartEventHandler(event) {
+      this.drag = true
+    },
+    sortListDragEndEventHandler(event) {
+      this.drag = false
+    }
+  },
   render(h) {
     return (
-      <draggable tag="div" list={ this.lists } class="nested-draggable">
+      <draggable 
+        class="nested-draggable"
+        tag="div" 
+        list={ this.lists }
+        onStart={ (event) => this.sortListDragStartEventHandler(event) }
+        onEnd={ (event) => this.sortListDragEndEventHandler(event) }
+      >
         {
           this.lists.map(item => {
             return (
