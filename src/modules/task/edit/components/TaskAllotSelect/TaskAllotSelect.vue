@@ -7,6 +7,8 @@
       <el-radio v-if="taskPoolOn" v-model="allotType" :label="allotTypeMap.pool.value"> {{ allotTypeMap.pool.text }}</el-radio>
       <el-radio v-model="allotType" :label="allotTypeMap.normal.value"> {{ allotTypeMap.normal.text }}</el-radio>
       <el-radio v-if="autoDispatch" v-model="allotType" :label="allotTypeMap.auto.value"> {{ allotTypeMap.auto.text }}</el-radio>
+      <!-- 保存至待分配列表 -->
+      <el-radio v-if="true" v-model="allotType" :label="allotTypeMap.allot.value"> {{ allotTypeMap.allot.text }}</el-radio>
     </div>
     <!-- end 选择派单 -->
 

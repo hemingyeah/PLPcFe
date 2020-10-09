@@ -4,6 +4,7 @@ import * as TaskApi from '@src/api/TaskApi.ts'
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm/PlanTaskEditForm.vue'
 /* utils */
+import {parse} from '@src/util/querystring';
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
 import _ from 'lodash'
@@ -57,6 +58,13 @@ export default {
       // 关联项查询处理
       this.relationFieldHandler();
 
+      // 是否打开派单设置弹窗
+      this.$nextTick(async () => {
+        let query = parse(window.location.search) || {}
+        if(!!query.openAllotSetting) {
+          await this.planTaskEditDialogOpen();
+        }
+      });
     } catch (error) {
       console.warn('error ', error)
     }

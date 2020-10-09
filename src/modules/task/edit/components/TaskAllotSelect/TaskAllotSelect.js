@@ -23,6 +23,10 @@ const TaskAllowSelect = {
         auto: {
           text: '自动分配',
           value: 'auto'
+        },
+        allot: {
+          text: '保存至待分配列表',
+          value: 'waitDistribution'
         }
       },
       value: {
