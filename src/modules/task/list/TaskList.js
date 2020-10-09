@@ -1063,14 +1063,14 @@ export default {
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
-      // if (Array.isArray(columnStatus) && columnStatus.length > 0) {
-      //   fields = this.buildSortFields(fields, localColumns)
-      // }
+      if (Array.isArray(columnStatus) && columnStatus.length > 0) {
+        fields = this.buildSortFields(fields, localColumns)
+      }
 
       // S 高级搜索
       // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
-      this.columns = fields
+      let columns = fields
         .map((field) => {
           let sortable = false;
           let minWidth = null;
@@ -1145,15 +1145,23 @@ export default {
           col.type = "column";
           return col;
         });
-      // 根据版本号判断是否需要支付方式
-      if (!paymentConfig.version) {
-        this.advanceds = this.advanceds.filter((item) => {
-          return item.fieldName !== "paymentMethod";
-        });
-        this.columns = this.columns.filter((item) => {
-          return item.fieldName !== "paymentMethod";
-        });
-      }
+      
+      this.columns = []
+      
+      this.$nextTick(() => {
+        this.$set(this, 'columns', columns.slice())
+        
+        // 根据版本号判断是否需要支付方式
+        if (!paymentConfig.version) {
+          this.advanceds = this.advanceds.filter((item) => {
+            return item.fieldName !== "paymentMethod";
+          });
+          this.columns = this.columns.filter((item) => {
+            return item.fieldName !== "paymentMethod";
+          });
+        }
+        
+      })
     },
     buildSortFields(originFields = [], fieldsMap = {}) {
       let fields = [];
