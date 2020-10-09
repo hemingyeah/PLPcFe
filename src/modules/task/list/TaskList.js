@@ -548,7 +548,7 @@ export default {
               exportAlias: v.fieldName,
               ...v,
             };
-          });
+          }).filter(v => {return v.formType !== 'attachment'});
           return {
             value: `annexChecked${index}`,
             label: `附加组件：${item.cardName}`,
