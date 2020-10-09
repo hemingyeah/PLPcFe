@@ -72,7 +72,7 @@ export default {
         this.visible = false;
       }
 
-      this.$http.get(`/performance/v2/export/report/desc/detail?${qs.stringify(model)}`, {}, {responseType: 'blob'}).then(blob => {
+      this.$http.post(`/performance/v2/export/report/desc/detail`, model, false, {responseType: 'blob'}).then(blob => {
         let link = document.createElement('a');
         let url = URL.createObjectURL(blob);
         link.download = fileName;
