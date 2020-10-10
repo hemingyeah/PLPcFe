@@ -58,7 +58,9 @@ export default {
             this.customizeList = v
         },
         config(v) {
-            this.systemList = v
+            this.systemList = v.filter((f) => {
+                return f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )
+            })
         },
         taskInquireList() {
             this.loc()
@@ -70,11 +72,14 @@ export default {
            seoText: '',
            checkSystemList: [], //选中系统字段
            checkCustomizeList: [], //选中自定义字段
-           systemList: this.config, //系统字段
+           systemList: [], //系统字段
            customizeList: this.taskTypeFilterFields, //自定义字段
         }
     },
     mounted() {
+        this.systemList = this.config.filter((f) => {
+            return f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )
+        })
         this.loc()
     },
     methods: {

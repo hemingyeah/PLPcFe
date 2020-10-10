@@ -225,7 +225,6 @@ export default {
         customer: this.customer,
         product: this.product,
       };
-
       return data;
     },
     searchCustomer(params) {

@@ -207,6 +207,7 @@ export default {
         },
         reset() {
           this.form = {};
+          if (!this.fields.length) return
           this.selectField(this.fields[0].fieldName);
         },
         dispatch({ type, bubbles = false, params = {} }) {

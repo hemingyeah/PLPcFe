@@ -123,7 +123,6 @@ export default {
           };
 
         })
-        .sort((a, b) => a.orderId - b.orderId);
       return fields;
     },
   },
@@ -254,7 +253,7 @@ export default {
         },
         buildForm() {
           if (Object.keys(this.form).length === this.fields.length) return;
-          this.form = Utils.initialize(this.fields);
+          // this.form = Utils.initialize(this.fields);
 
           this.fields.forEach((f) => {
             if (f.fieldName === 'tags' && f.formType === 'select') {
@@ -299,6 +298,7 @@ export default {
             .catch((e) => console.error(e));
         },
         update(event, action) {
+          this.form = {}
           if (action === 'tags') {
             return (this.form.tags = event);
           }
@@ -308,7 +308,6 @@ export default {
           }
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
-
           this.$forceUpdate()
         },
         selectField(val) {
@@ -372,7 +371,6 @@ export default {
           }
 
           let childComp = null;
-
           if (f.fieldName == 'customer') {
             let value = this.form[f.fieldName];
             childComp = h('search-customer-select', {
@@ -384,6 +382,7 @@ export default {
               },
               on: {
                 input: (event) => {
+                  this.form = {}
                   this.customer = event && event.length > 0 ? event[0] : {};
                   this.form[f.fieldName] = this.customer.id;
                 },
@@ -400,6 +399,7 @@ export default {
               },
               on: {
                 input: (event) => {
+                  this.form = {}
                   this.product = event && event.length > 0 ? event[0] : {};
                   this.form[f.fieldName] = this.product.id;
                 },

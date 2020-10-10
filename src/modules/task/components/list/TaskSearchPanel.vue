@@ -45,7 +45,7 @@
           </div>
       <!-- 设置查询条件 -->
         <task-inquire 
-          v-if="taskInquireList.length"
+          v-if="fields.length"
           ref="taskInquireParams" 
           :columnNum="columnNum" 
           :config="taskInquireList" 
@@ -62,13 +62,6 @@
         <slot name="footer"></slot>
       </el-form>
       <!-- E 搜索条件 -->
-      <!-- 设置弹框 -->
-      <task-search-pupal ref="taskSearchPupal" 
-        :taskTypeFilterFields="taskTypeFilterFields" 
-        :config="config" 
-        :taskInquireList="taskInquireList"
-        @taskPupal="_taskPupal"
-      />
       <!-- 搜索操作按钮 -->
       <slot name="footer"></slot>
     </el-form>
@@ -159,13 +152,11 @@ export default {
     fields() {
       let f = {};
       let selfFields = []
-
       let fields = [...this.selfFields]
         .filter((f) => {
           return f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )
         }).map((field) => {
           f = _.cloneDeep(field);
-
           let formType = f.formType;
 
           if (formType === 'datetime') {
@@ -183,7 +174,7 @@ export default {
             operator: this.matchOperator(f),
           });
         })
-        .sort((a, b) => a.orderId - b.orderId);
+        // .sort((a, b) => a.orderId - b.orderId);
 
       fields.forEach(field => {
         let { fieldName } = field
@@ -291,6 +282,7 @@ export default {
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
+        tv['operator'] = this.matchOperator(tv)
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
@@ -340,14 +332,13 @@ export default {
           params.conditions.push(address);
           continue;
         }
-
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
         });
       }
-
+      console.log(params.conditions)
       this.buildTaskInquireParams(params)
 
       // 返回接口数据
@@ -653,10 +644,11 @@ export default {
             return value
           }
         })
+        console.log(check_system_list, check_customize_list)
         loc = {
           list: this.selfFields,
-          checkSystemList: check_system_list,
-          checkCustomizeList: check_customize_list
+          checkSystemList: [...check_system_list],
+          checkCustomizeList: [...check_customize_list]
         }
       }
       localStorage.setItem('task-search-field', JSON.stringify(loc))
@@ -690,7 +682,6 @@ export default {
         
         selfFields.push(originField ? originField : field)
       })
-      console.log(this.taskInquireList.slice())
       this.taskInquireList = selfFields.slice()
     }
   },
@@ -705,6 +696,9 @@ export default {
 <style lang="scss">
 .task-search-forms {
     transition: height .5s;
+    .form-item {
+      width: 340px!important;
+    }
 }
 </style>
 <style lang="scss" scoped>
