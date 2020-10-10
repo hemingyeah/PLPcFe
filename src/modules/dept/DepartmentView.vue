@@ -519,7 +519,7 @@
                 <template slot-scope="scope">{{scope.row.enabled == 1 ? '启用' : '禁用'}}</template>
               </el-table-column>
 
-              <el-table-column label="操作" width="150px">
+              <el-table-column label="操作" width="210px">
                 <template slot-scope="scope">
                    <el-button
                     :disabled="scope.row.pending"
