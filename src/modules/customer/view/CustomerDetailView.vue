@@ -12,7 +12,7 @@
           <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer">
             <i class="iconfont icon-yemianshanchu"></i> 删除
           </button>
-          <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable">
+          <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable && isShowCustomerRemind">
             <i class="iconfont icon-notification"></i> 添加提醒
           </button>
 
@@ -132,6 +132,8 @@ import CustomerAttention from './components/CustomerAttention.vue'
 import EditAddressDialog from './operationDialog/EditAddressDialog.vue'
 import EditContactDialog from './operationDialog/EditContactDialog.vue'
 import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue'
+
+import { isShowCustomerRemind } from '@src/util/version.ts'
 
 import AuthUtil from '@src/util/auth'
 import qs from '@src/util/querystring'
@@ -424,6 +426,9 @@ export default {
     /** 是否关注该客户 */
     isAttention() {
       return this.attentionUsers.some(u => u.userId == this.loginUser.userId)
+    },
+    isShowCustomerRemind() {
+      return isShowCustomerRemind()
     }
   },
   filters: {
