@@ -23,7 +23,7 @@ import { typeOf } from '@src/util/assist';
 const TaskInquireFiltersFieldNames = ['cusAddress', 'area', 'tags']
 const OperatorSelectOptionsMap = {
   'input': [
-    { label: '包含', value: 'contain'},
+    { label: '包含', value: 'like'},
     { label: '等于', value: 'eq'},
     { label: '大于', value: 'gt'},
     { label: '大于等于', value: 'ge'},
@@ -31,7 +31,7 @@ const OperatorSelectOptionsMap = {
     { label: '小于等于', value: 'le'}
   ],
   'text': [    
-    { label: '包含', value: 'contain'},
+    { label: '包含', value: 'like'},
     { label: '等于', value: 'eq'}
   ],
   'date': [
@@ -39,11 +39,17 @@ const OperatorSelectOptionsMap = {
   ],
   'select': [
     { label: '等于', value: 'eq'}
+  ],
+  "cascader": [
+    {label: '包含', value: 'cascader'}
+  ],
+  "many": [
+    {label: '包含', value: 'contain'}
   ]
 }
 
 function setFieldOperateHandler(field = {}) {
-  let { fieldName, formType } = field
+  let { fieldName, formType, setting } = field
 
   if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice()
@@ -51,14 +57,20 @@ function setFieldOperateHandler(field = {}) {
   else if (fieldName == 'customer' || fieldName == 'product') {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice()
   }
-  else if (formType == 'text' || formType == 'textarea') {
+  else if (formType == 'text' || formType == 'textarea' || formType === 'code') {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice()
   }
   else if (formType == 'date' || formType == 'datetime') {
     field.operatorOptions = OperatorSelectOptionsMap.date.slice()
   }
-  else if (formType == 'select') {
+  else if (formType == 'select' && !setting.isMult) {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice()
+  }
+  else if (formType == 'select' && setting.isMult) {
+    field.operatorOptions = OperatorSelectOptionsMap.many.slice()
+  }
+  else if (formType === 'cascader') {
+    field.operatorOptions = OperatorSelectOptionsMap.cascader.slice()
   }
   else {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice()
@@ -179,6 +191,10 @@ export default {
       case 'address': {
         operator = 'address';
         break;
+      }
+      case 'cascader': {
+        operator = 'cascader';
+        break
       }
       case 'location': {
         operator = 'location';

@@ -132,7 +132,6 @@ export default {
         : this.ajaxExport(params);
     },
     exportAlert(result, params) {
-      console.log(result, params)
       let isAlertFunction = typeof this.alert == 'function';
       let isSuccess = result.status == 0;
 

@@ -1151,7 +1151,7 @@ export default {
      * @description 构建导出参数
      * @return {Object} 导出参数
      */
-    buildExportParams( checkedMap, ids) {
+    buildExportParams( checkedMap, ids, exportOneRow) {
       const { receiptChecked, systemChecked, taskChecked } = checkedMap
       const Params = Object.assign({}, this.params);
       const rootWindow = getRootWindow(window);
@@ -1197,6 +1197,7 @@ export default {
       let export_card_fiel_task = cardFieldChecked.length ? this.exportData(3, cardFieldChecked) : cardFieldChecked
       console.log('导出数据----附加', export_card_fiel_task)
 
+      params['exportOneRow'] = exportOneRow
       params["data"] = exportAll ? "" : this.selectedIds.join(",");
       params["typeId"] = exportSearchModel.typeId;
       params["receiptChecked"] = export_receipt_task

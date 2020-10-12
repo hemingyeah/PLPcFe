@@ -177,7 +177,7 @@ export default {
   methods: {
     buildParamsFunc() {
       return typeof this.buildParams == 'function'
-        ? this.buildParams(this.checkedMap, this.ids)
+        ? this.buildParams(this.checkedMap, this.ids, this.tooltip)
         : { checked: this.checkedArr.join(','), ids: this.ids.join(',') };
     },
     checkedAll(checkedAll = true) {

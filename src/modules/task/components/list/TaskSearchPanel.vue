@@ -282,7 +282,7 @@ export default {
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
-        tv['operator'] = this.matchOperator(tv)
+        !tv.operator ? tv['operator'] = this.matchOperator(tv) : ''
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
@@ -306,6 +306,15 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'cascader') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            inValue: form[fn]
+          });
+          continue;
+        }
+
         if (tv.originalFormType === 'datetime') {
           params.conditions.push({
             property: fn,
@@ -315,30 +324,12 @@ export default {
           });
           continue;
         }
-
-        if (tv.formType === 'address') {
-          let address = {
-            property: fn,
-            operator: tv.operator,
-          };
-          let isEmpty = isEmptyStringObject(form[fn]);
-
-          if (!isEmpty) {
-            address.value = (form[fn].province || '')
-              + (form[fn].city || '')
-              + (form[fn].dist || '')
-              + (form[fn].address || '');
-          }
-          params.conditions.push(address);
-          continue;
-        }
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
         });
       }
-      console.log(params.conditions)
       this.buildTaskInquireParams(params)
 
       // 返回接口数据
@@ -449,7 +440,6 @@ export default {
           continue
         }
 
-
         if (tv.formType === 'datetime') {
           params.systemConditions.push({
             property: fn,
@@ -513,11 +503,52 @@ export default {
           continue;
         }
 
-        params.conditions.push({
-          property: fn,
-          operator: tv.operatorValue,
-          value: form[fn],
-        });
+        if (tv.formType === 'date') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
+            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD'),
+          });
+          continue;
+        }
+
+        if (tv.formType === 'cascader') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            inValue: form[fn]
+          });
+          continue;
+        }
+
+        if (tv.formType === 'datetime') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
+          });
+          continue;
+        }
+        
+        // 
+        if (params.conditions && params.conditions.length) {
+          params.conditions = params.conditions.filter(item => {
+            return fn !== item.property
+          })
+          params.conditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            value: form[fn],
+          });
+        } else {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            value: form[fn],
+          });
+        }
       }
 
     },
@@ -549,6 +580,10 @@ export default {
       case 'user': {
         operator = 'user';
         break;
+      }
+      case 'cascader': {
+        operator = 'cascader';
+        break
       }
       case 'address': {
         operator = 'address';
