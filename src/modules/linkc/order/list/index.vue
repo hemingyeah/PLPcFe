@@ -55,7 +55,7 @@
                 value-format="yyyy-MM-dd"
               ></el-date-picker>
             </div>
-            <el-button class="mar-l-32" type="primary" @click="searchModel.pageNum=1,search()">查询</el-button>
+            <el-button class="mar-l-20" type="primary" @click="searchModel.pageNum=1,search()">查询</el-button>
             <el-button @click="resetParams">重置</el-button>
           </div>
         </div>

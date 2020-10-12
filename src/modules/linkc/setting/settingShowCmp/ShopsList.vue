@@ -23,11 +23,11 @@
               class="shops-list-item-img"
             />
             <div class="shops-info">
-              <div class="overHideCon-2 mar-b-30 font-12">{{item.name}}</div>
-              <div class="flex-x">
+              <div class="overHideCon-1 mar-b-14 font-13">{{item.name}}</div>
+              <div class="flex-x al-end">
                 <div class="flex-1 price-tag">
-                  <span>¥</span>
-                  {{item.price}}
+                  <span class="font-12">¥</span>
+                  <span class="font-18">{{item.price}}</span>
                 </div>
                 <div>{{item.num | usual-num}}件已售</div>
               </div>
@@ -36,16 +36,16 @@
         </div>
       </div>
       <!-- </draggable> -->
-      <div class="flex-x" v-if="dataInfo.length < 1">
+      <div class="flex-x" v-if="dataInfo.length < 1" style="width:50%">
         <div class="shops-list-item">
           <img class="shops-tag-img" :src="tagImg" alt />
           <img :src="goodsImg" class="shops-list-item-img" />
           <div class="shops-info">
-            <div class="overHideCon-2 mar-b-30 font-12">示例商品</div>
-            <div class="flex-x">
+            <div class="overHideCon-1 mar-b-14 font-13">示例商品</div>
+            <div class="flex-x al-end">
               <div class="flex-1 price-tag">
                 <span class="font-12">¥</span>
-                <span class="font-15">66.66</span>
+                <span class="font-18">66.66</span>
               </div>
               <div class="font-12">3.5万件已售</div>
             </div>
@@ -58,7 +58,7 @@
 <script>
 import draggable from "vuedraggable";
 import _ from "lodash";
-import goodsImg from "@src/assets/img/no-data.png";
+import goodsImg from "@src/assets/img/myShop/noGood.png";
 import tagImg from "@src/assets/img/myShop/tag.png";
 import defaultImg from "@src/assets/img/myShop/default.png";
 export default {
@@ -137,9 +137,8 @@ export default {
         background: #fff;
         flex-direction: column;
         justify-content: space-between;
-        height: 77px;
         box-sizing: border-box;
-        padding: 7px;
+        padding: 12px 8px 8px;
         .price-tag {
           color: #fb602c;
         }
