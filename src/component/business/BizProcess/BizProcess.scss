@@ -4,6 +4,9 @@ $progress-state-common-bg-color: #F2F2F2;
 $progress-state-before-bg-color: #E1F3D8;
 
 @mixin triangle-color($backgroundColor: '', $borderColor: '') {
+  & {
+    border: 1px solid $backgroundColor;
+  }
   .biz-process-left-triangle {
     &:before {
       background-color: $backgroundColor;
@@ -73,7 +76,7 @@ $progress-state-before-bg-color: #E1F3D8;
 
   &-state {
     background-color: $progress-state-common-bg-color;
-    border: 1px solid $progress-state-before-bg-color;
+    border: 1px solid $progress-state-common-bg-color;
     color: #999;
     cursor: pointer;
     
@@ -249,6 +252,14 @@ $progress-state-before-bg-color: #E1F3D8;
   @include triangle-selected();
   
   &:hover{
+    .biz-process-left-triangle {
+      &:before {
+        background-color: $color-primary;
+      }
+      &:after {
+        background-color: $color-primary;
+      }
+    }
     .biz-process-right-triangle {
       &:before {
         background-color: $color-primary;
@@ -262,7 +273,7 @@ $progress-state-before-bg-color: #E1F3D8;
 }
 
 .biz-process-state-before.biz-process-state-selected.biz-process-state-first {
-  border-left: 1px solid $color-primary !important;
+  border: 1px solid $color-primary !important;
 }
 
 /* 流程信息 三角形 */
