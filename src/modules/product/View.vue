@@ -36,7 +36,7 @@
           </el-dropdown-menu>
         </el-dropdown>
 
-        <el-dropdown trigger="click" v-if="allowCreatePlanTask">
+        <el-dropdown trigger="click" v-if="allowCreatePlanTask && isShowPlanTask">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>计划任务
           </span>
@@ -160,7 +160,7 @@ import DownloadCodeDialog from './components/DownloadCodeDialog.vue';
 import EditContactDialog from './components/EditContactDialog.vue';
 import ProductContactTable from './components/ProductContactTable.vue';
 
-import { isShowCustomerRemind } from '@src/util/version.ts'
+import { isShowCustomerRemind, isShowPlanTask } from '@src/util/version.ts'
 
 import qs from '@src/util/querystring';
 import AuthUtil from '@src/util/auth';
@@ -458,8 +458,13 @@ export default {
         }
       );
     },
+    /* 是否显示客户提醒 */
     isShowCustomerRemind() {
       return isShowCustomerRemind()
+    },
+    /* 是否显示计划任务 */
+    isShowPlanTask() {
+      return isShowPlanTask()
     }
   },
   mounted() {
@@ -668,11 +673,11 @@ export default {
         }, {
           displayName: `计划任务(${plantaskQuantity || 0})`,
           component: PlanTable.name,
-          show: this.allowCreatePlanTask,
+          show: this.allowCreatePlanTask && this.isShowPlanTask,
         }, {
           displayName: `产品提醒(${remindQuantity || 0})`,
           component: RemindTable.name,
-          show: true,
+          show: this.isShowCustomerRemind,
         }
       ].filter(tab => tab.show)
     },

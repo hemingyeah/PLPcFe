@@ -109,3 +109,23 @@ export function isShowCustomerRemind(): boolean {
 export function isShowDashboardScreen(): boolean {
   return commonJudgeShow()
 }
+
+/** 
+ * 是否显示 计划任务
+ * 1. 老版本vip版 支持
+ * 2. 标准版 不支持
+ * 3. 企业版 原生支持
+*/
+export function isShowPlanTask(): boolean {
+  return commonJudgeShow()
+}
+
+/** 
+ * 是否显示 自定义服务报告
+ * 1. 老版本vip版 支持
+ * 2. 标准版 不支持
+ * 3. 企业版 原生支持
+*/
+export function isShowCustomReport(): boolean {
+  return commonJudgeShow()
+}
