@@ -2,10 +2,8 @@
   <div id="menu-set-box">
     <p class="set-des">
       您可以在此将自助门户功能配置到您的公众号菜单，也可以将
-      <a
-        class="color-b"
-        href="/setting/serviceStation/customerPortal#protalUrl"
-      >客户自助门户</a>内的链接嵌入到您的公众号菜单。
+      <a class="color-b" href="#" @click="fastTab">客户自助门户</a
+      >内的链接嵌入到您的公众号菜单。
       <br />在配置公众号菜单前，请先确认您的公众号已经经过认证
     </p>
     <div class="set-box">
@@ -20,21 +18,27 @@
             <img class="bottom-icon-img" src="@src/assets/img/wx/wxKey.png" />
           </div>
           <!-- move-menu-box start -->
-          <draggable class="menu-box" v-model="menu_arr" v-if="edit_type===2">
+          <draggable class="menu-box" v-model="menu_arr" v-if="edit_type === 2">
             <div
-              v-for="(item,index) in menu_arr"
+              v-for="(item, index) in menu_arr"
               :key="index"
               class="menu-item can-move"
               draggable="true"
             >
-              <i v-if="item.type==='add'" class="iconfont icon-add"></i>
-              <p class="overHideCon_1" v-else>{{item.name}}</p>
+              <i v-if="item.type === 'add'" class="iconfont icon-add"></i>
+              <p class="overHideCon_1" v-else>{{ item.name }}</p>
 
               <draggable
                 :class="[`popTopMenuBox-${index}`, 'pop-top-menu-box']"
-                :group="{name:'shared'}"
-                :disabled="(nowMoveBox>-1 && nowMoveBox!==index && item.sub_button.length>4)?true:false"
-                v-if="item.shb_type!=='add'"
+                :group="{ name: 'shared' }"
+                :disabled="
+                  nowMoveBox > -1 &&
+                  nowMoveBox !== index &&
+                  item.sub_button.length > 4
+                    ? true
+                    : false
+                "
+                v-if="item.shb_type !== 'add'"
                 v-model="item.sub_button"
                 :fallback-on-body="true"
                 swap-threshold="1"
@@ -43,43 +47,59 @@
                 @unchoose="onMenuMoveUnchoose"
               >
                 <div
-                  v-for="(items,indexs) in item.sub_button"
+                  v-for="(items, indexs) in item.sub_button"
                   :key="indexs"
                   class="menu-items can-move"
                   draggable="true"
                 >
-                  <i v-if="items.shb_type==='add'" class="iconfont icon-add"></i>
-                  <p class="overHideCon_1" v-else>{{items.name}}</p>
+                  <i
+                    v-if="items.shb_type === 'add'"
+                    class="iconfont icon-add"
+                  ></i>
+                  <p class="overHideCon_1" v-else>{{ items.name }}</p>
                 </div>
-                <div :class="['hide_virtual',item.sub_button.length<=0?'show_virtual':'']"></div>
-                <div class="arrow-css" v-if="item.sub_button.length>0"></div>
+                <div
+                  :class="[
+                    'hide_virtual',
+                    item.sub_button.length <= 0 ? 'show_virtual' : '',
+                  ]"
+                ></div>
+                <div class="arrow-css" v-if="item.sub_button.length > 0"></div>
               </draggable>
             </div>
           </draggable>
           <!-- move-menu-box end -->
           <!-- menu-box start -->
-          <div class="menu-box" v-model="menu_arr" v-if="edit_type!==2">
+          <div class="menu-box" v-model="menu_arr" v-if="edit_type !== 2">
             <div
-              v-for="(item,index) in menu_arr"
+              v-for="(item, index) in menu_arr"
               :key="index"
               :class="main_menu_class(index)"
               @click="valid_menu_form(index)"
             >
-              <i v-if="item.shb_type==='add'" class="iconfont icon-add"></i>
-              <p class="overHideCon_1" v-else>{{item.name}}</p>
+              <i v-if="item.shb_type === 'add'" class="iconfont icon-add"></i>
+              <p class="overHideCon_1" v-else>{{ item.name }}</p>
 
               <div
                 class="pop-top-menu-box"
-                v-if="item.shb_type!=='add' && now_main_menu===index &&item.sub_button && item.sub_button.length>0"
+                v-if="
+                  item.shb_type !== 'add' &&
+                  now_main_menu === index &&
+                  item.sub_button &&
+                  item.sub_button.length > 0
+                "
               >
                 <div
-                  v-for="(items,indexs) in item.sub_button"
+                  v-for="(items, indexs) in item.sub_button"
                   :key="indexs"
                   :class="child_menu_class(index, indexs)"
-                  @click.stop="valid_menu_form(index,indexs)"
+                  @click.stop="valid_menu_form(index, indexs)"
                 >
-                  <i v-if="items.shb_type==='add'" class="iconfont icon-add"></i>
-                  <p class="overHideCon_1" v-else>{{items.name}}</p>
+                  <i
+                    v-if="items.shb_type === 'add'"
+                    class="iconfont icon-add"
+                  ></i>
+                  <p class="overHideCon_1" v-else>{{ items.name }}</p>
                 </div>
                 <div class="arrow-css"></div>
               </div>
@@ -91,9 +111,9 @@
       </div>
       <!-- box-left end -->
       <!-- box-right start -->
-      <div class="box-right" v-show="now_chooseed_menu && edit_type===1">
+      <div class="box-right" v-show="now_chooseed_menu && edit_type === 1">
         <div class="flex-x box-head">
-          <p class="flex-1 overHideCon_1">{{ruleForm.name}}</p>
+          <p class="flex-1 overHideCon_1">{{ ruleForm.name }}</p>
           <p @click="deleteMenu()">删除菜单</p>
         </div>
         <el-form
@@ -105,11 +125,24 @@
           label-position="left"
         >
           <el-form-item label="菜单名称" prop="name">
-            <el-input v-model="ruleForm.name" class="name-input" size="small" placeholder="菜单名称"></el-input>
-            <p class="tips-con" v-if="now_chooseed_menu.indexs<0">仅支持中英文和数字，字数不超过4个汉字或8个字母</p>
-            <p class="tips-con" v-else>仅支持中英文和数字，字数不超过8个汉字或16个字母</p>
+            <el-input
+              v-model="ruleForm.name"
+              class="name-input"
+              size="small"
+              placeholder="菜单名称"
+            ></el-input>
+            <p class="tips-con" v-if="now_chooseed_menu.indexs < 0">
+              仅支持中英文和数字，字数不超过4个汉字或8个字母
+            </p>
+            <p class="tips-con" v-else>
+              仅支持中英文和数字，字数不超过8个汉字或16个字母
+            </p>
           </el-form-item>
-          <el-form-item label="菜单内容" prop="menuType" v-show="!now_chooseed_menu.onlyName">
+          <el-form-item
+            label="菜单内容"
+            prop="menuType"
+            v-show="!now_chooseed_menu.onlyName"
+          >
             <el-radio-group v-model="ruleForm.menuType">
               <el-radio label="售后宝功能"></el-radio>
               <el-radio label="跳转页面"></el-radio>
@@ -120,9 +153,11 @@
             <el-radio-group
               class="change-con-radio-group"
               v-model="ruleForm.menuTypeArr"
-              v-if="ruleForm.menuType==='售后宝功能'"
+              v-if="ruleForm.menuType === '售后宝功能'"
             >
-              <p class="tips-con">选择需要为此菜单配置的售后宝功能，订阅者点击后通过登录验证将打开对应页面</p>
+              <p class="tips-con">
+                选择需要为此菜单配置的售后宝功能，订阅者点击后通过登录验证将打开对应页面
+              </p>
               <div class="flex-x change-con-radio">
                 <div>
                   <el-radio label="服务请求" value="www.baidu1.com"></el-radio>
@@ -145,9 +180,13 @@
                 </div>
               </div>
             </el-radio-group>
-            <div v-if="ruleForm.menuType==='跳转页面'">
+            <div v-if="ruleForm.menuType === '跳转页面'">
               <p class="tips-con mar-b-12">订阅者点击该菜单会跳到以下链接</p>
-              <el-form-item label="页面地址" prop="input_url" v-show="!now_chooseed_menu.onlyName">
+              <el-form-item
+                label="页面地址"
+                prop="input_url"
+                v-show="!now_chooseed_menu.onlyName"
+              >
                 <el-input
                   v-model="ruleForm.input_url"
                   class="url-input"
@@ -171,7 +210,7 @@
             </div>
 
             <el-input
-              v-if="ruleForm.menuType==='回复文本消息'"
+              v-if="ruleForm.menuType === '回复文本消息'"
               type="textarea"
               resize="none"
               maxlength="200"
@@ -186,16 +225,47 @@
     </div>
 
     <div class="bottom-btn">
-      <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(2)">菜单排序</button>
+      <button
+        class="btn btn-ghost"
+        v-if="edit_type === 1"
+        @click="change_edit_type(2)"
+      >
+        菜单排序
+      </button>
 
-      <button class="btn btn-primary" v-if="edit_type===0" @click="change_edit_type(1)">编辑菜单</button>
-      <button class="btn btn-primary" v-if="edit_type===0" @click="getMenuList(false)">同步菜单</button>
       <button
         class="btn btn-primary"
-        v-if="edit_type===1||edit_type===2"
-        @click="change_edit_type(edit_type===1?0:1,edit_type===1?true:false)"
-      >{{edit_type===1?'保存并发布':'继续编辑'}}</button>
-      <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(0)">取消编辑</button>
+        v-if="edit_type === 0"
+        @click="change_edit_type(1)"
+      >
+        编辑菜单
+      </button>
+      <button
+        class="btn btn-primary"
+        v-if="edit_type === 0"
+        @click="getMenuList(false)"
+      >
+        同步菜单
+      </button>
+      <button
+        class="btn btn-primary"
+        v-if="edit_type === 1 || edit_type === 2"
+        @click="
+          change_edit_type(
+            edit_type === 1 ? 0 : 1,
+            edit_type === 1 ? true : false
+          )
+        "
+      >
+        {{ edit_type === 1 ? "保存并发布" : "继续编辑" }}
+      </button>
+      <button
+        class="btn btn-ghost"
+        v-if="edit_type === 1"
+        @click="change_edit_type(0)"
+      >
+        取消编辑
+      </button>
     </div>
   </div>
 </template>
@@ -313,6 +383,7 @@ export default {
       default: () => [],
     },
   },
+  inject: ["initData"],
   watch: {
     ruleForm: {
       handler(newValue, oldValue) {
@@ -388,12 +459,29 @@ export default {
             ],
           };
     },
+    linkControl() {
+      return this.initData.openLinkC;
+    },
   },
   mounted() {
     this.menu_arr = this.menuArr;
     menu_arr_stash = this.menuArr;
   },
   methods: {
+    fastTab() {
+      let e = this.linkControl
+        ? "/linkc/setting#protalUrl"
+        : "/setting/serviceStation/customerPortal#protalUrl";
+      if (this.linkControl) {
+        this.$platform.openTab({
+          title: "门户设置",
+          close: true,
+          url: e,
+        });
+      } else {
+        window.location = e;
+      }
+    },
     main_menu_class(index) {
       if (this.now_chooseed_menu && this.now_chooseed_menu.indexs < 0)
         return `menu-item ${this.edit_type === 1 ? "can-point" : ""} ${

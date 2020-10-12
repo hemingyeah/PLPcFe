@@ -3,9 +3,18 @@ const chalk = require('chalk');
 const chalkError = chalk.red;
 // model
 const MODEL_PATH = './../model';
-const { proxyConfig, isNotLocalEnv, envMap } = require(`${MODEL_PATH}/proxyConfigModel`);
-const { SHB_ENV } = require(`${MODEL_PATH}/userConfigModel`);
-const { DEFAULT_OPIONS, AGENT } = require(`${MODEL_PATH}/httpConfigModel`);
+const {
+  proxyConfig,
+  isNotLocalEnv,
+  envMap
+} = require(`${MODEL_PATH}/proxyConfigModel`);
+const {
+  SHB_ENV
+} = require(`${MODEL_PATH}/userConfigModel`);
+const {
+  DEFAULT_OPIONS,
+  AGENT
+} = require(`${MODEL_PATH}/httpConfigModel`);
 
 /** 如果解析失败返回原值 */
 function toJSON(data) {
@@ -23,16 +32,22 @@ function toJSON(data) {
  * @param {*} body 返回的数据
  * @param {*} error 
  */
-function getBody(response, body, error){  
+function getBody(response, body, error) {
   let statusCode = error ? 500 : response.statusCode;
   let status = statusCode >= 200 && statusCode < 300;
 
   let headers = {};
-  if(response && response.headers) {
+  if (response && response.headers) {
     headers = response.headers;
   }
 
-  return {statusCode, status, headers, body, error};
+  return {
+    statusCode,
+    status,
+    headers,
+    body,
+    error
+  };
 }
 
 /**
@@ -79,7 +94,7 @@ function getPort(options = {}) {
  */
 function getRequestOptions(path, method, options = {}) {
   let requestOptions = {};
-    
+
   requestOptions.path = path;
   requestOptions.method = method;
 
@@ -125,7 +140,10 @@ function setBaseOptions(originOptions = {}, options = {}) {
 
 function getCookie() {
   let envMapData = envMap[SHB_ENV];
-  let { user, location } = envMapData;
+  let {
+    user,
+    location
+  } = envMapData;
 
   let params = new URLSearchParams({
     uid: user.userId,
@@ -134,25 +152,59 @@ function getCookie() {
   });
   let url = `${location}/smlogin/login?${params.toString()}`;
 
+  const options = {
+    hostname: envMap[SHB_ENV].host,
+    port: '',
+    path: `/smlogin/login?${params.toString()}`,
+    method: 'GET',
+    headers: {
+      cookie: 'shbversion=shbvip;'
+    }
+  };
+
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    const req = https.request(options, (res) => {
+      // console.log('状态码:', res.statusCode);
+      // console.log('请求头:', res.headers);
+
       let headers = res.headers;
       let cookies = headers['set-cookie'] || [];
-      let cookie = cookies[0] || '';
+      let cookie = `${cookies[0]};shbversion=shbvip;` || '';
 
-      if(!cookie) {
+      if (!cookie) {
         console.log(chalkError(`cannot get cookie form the ${SHB_ENV} environment`))
       }
 
       resolve(cookie);
-  
-    }).on('error', (err) => {
-      console.log(err);
-      reject(err);
+
     });
 
+
+    req.on('error', (e) => {
+      console.log('nodeLoginErro', e);
+    });
+    req.end();
   })
-  
+
+  // return new Promise((resolve, reject) => {
+  //   https.get(url, (res) => {
+  //     let headers = res.headers;
+  //     let cookies = headers['set-cookie'] || [];
+  //     let cookie = cookies[0] || '';
+
+  //     if (!cookie) {
+  //       console.log(chalkError(`cannot get cookie form the ${SHB_ENV} environment`))
+  //     }
+
+  //     resolve(cookie);
+
+  //   }).on('error', (err) => {
+  //     console.log(err);
+  //     reject(err);
+  //   });
+
+  // })
+
 }
 
 
