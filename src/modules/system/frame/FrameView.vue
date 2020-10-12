@@ -392,7 +392,7 @@ import * as NotificationApi from "@src/api/NotificationApi";
 import * as CallCenterApi from "@src/api/CallCenterApi";
 import * as SettingApi from "@src/api/SettingApi";
 
-import { isShowDashboardScreen } from '@src/util/version.ts'
+import { isShowDashboardScreen, isShowPlanTask } from '@src/util/version.ts'
 
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
@@ -1017,11 +1017,25 @@ export default {
     },
     buildNavbarMenus() {
       let menus = this.initData?.menus || []
-      let showDashboardScreen = isShowDashboardScreen()
+      // 需要被过滤掉的菜单key对象
+      let filterMeunKeyMap = {
+        'M_DASHBOARD_SCREEN': isShowDashboardScreen(),
+        'M_TASK_PLAN': isShowPlanTask()
+      }
+      let isFilter = false
+      let filterMenuKeys = []
       
-      // 是否显示数据大屏
-      if (!showDashboardScreen) {
-        let filterMenuKeys = ['M_DASHBOARD_SCREEN', 'M_DASHBOARD_FWXM']
+      for (let key in filterMeunKeyMap) {
+        let menuShow = filterMeunKeyMap[key] === true
+        
+        if (!menuShow) {
+          isFilter = true
+          filterMenuKeys.push(key)
+        }
+      }
+      
+      // 是否过滤掉不能查看的菜单
+      if (isFilter) {
         menus = menus.filter(menu => {
           return filterMenuKeys.indexOf(menu.menuKey) < 0
         })
