@@ -127,6 +127,9 @@ export default {
       this.taskTypeFilterFields
       this._taskInquireList()
     },
+    selfFields() {
+      this.fields
+    }
   },
   data() {
     return {
@@ -204,7 +207,7 @@ export default {
   },
   methods: {
     buildParams() {
-      const form = { ...this.$refs.searchForm.returnData(), ...this.$refs.taskInquireParams.returnData() }
+      const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()}
       this.formBackup = Object.assign({}, form)
       const taskInquireList = this.taskInquireList.length ? this.taskInquireList : [...this.config, ...this.taskTypeFilterFields]
       const isSystemFields = [...this.fields, ...taskInquireList].filter((f) => f.isSystem)
@@ -296,7 +299,7 @@ export default {
           continue;
         }
 
-        if (tv.originalFormType === 'date') {
+        if (tv.formType === 'date') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
@@ -306,7 +309,7 @@ export default {
           continue;
         }
 
-        if (tv.originalFormType === 'cascader') {
+        if (tv.formType === 'cascader') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
@@ -315,7 +318,7 @@ export default {
           continue;
         }
 
-        if (tv.originalFormType === 'datetime') {
+        if (tv.formType === 'datetime') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
@@ -679,7 +682,6 @@ export default {
             return value
           }
         })
-        console.log(check_system_list, check_customize_list)
         loc = {
           list: this.selfFields,
           checkSystemList: [...check_system_list],
