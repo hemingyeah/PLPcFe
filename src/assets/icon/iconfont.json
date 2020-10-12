@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "17614610",
+      "name": "菜单箭头-折叠",
+      "font_class": "caidanjiantou-zhedie",
+      "unicode": "e690",
+      "unicode_decimal": 59024
+    },
+    {
+      "icon_id": "17614583",
+      "name": "菜单箭头-展开",
+      "font_class": "caidanjiantou-zhankai",
+      "unicode": "e68f",
+      "unicode_decimal": 59023
+    },
+    {
+      "icon_id": "1604034",
+      "name": "切换",
+      "font_class": "qiehuan1",
+      "unicode": "e696",
+      "unicode_decimal": 59030
+    },
+    {
+      "icon_id": "17491509",
+      "name": "解释说明",
+      "font_class": "jieshishuoming",
+      "unicode": "e68c",
+      "unicode_decimal": 59020
+    },
+    {
       "icon_id": "17436239",
       "name": "菜单_财务模块",
       "font_class": "caidan_caiwumokuai",

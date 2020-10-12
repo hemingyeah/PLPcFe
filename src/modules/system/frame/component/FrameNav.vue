@@ -21,7 +21,7 @@
               <span class="frame-menu-icon"><i :class="['iconfont', menu.menuIcon]"></i></span>
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
-                <i class="iconfont icon-nav-down" v-if="menu.children && menu.children.length > 0"></i>
+                <i class="iconfont icon-caidanjiantou-zhankai" v-if="menu.children && menu.children.length > 0"></i>
                 <i class="red-dot" id="worktime_dot" v-if="menu.menuKey==='M_SYSTEM' && worktimeNoEnter"></i>
               </template>
             </a>
@@ -250,6 +250,8 @@ export default {
 </script>
 
 <style lang="scss">
+$frame-nav-width: 190px;
+
 .frame-nav{
   width: 50px;
   height: 100%;
@@ -265,7 +267,7 @@ export default {
 }
 
 .frame-nav.frame-nav-expand{
-  width: 220px;
+  width: $frame-nav-width;
   overflow: hidden;
 
   .frame-menu-scroll{
@@ -275,11 +277,11 @@ export default {
   }
 
   .frame-menu{
-    width: 220px;
+    width: $frame-nav-width;
   }
 
   .frame-menu-item{
-    width: 220px;
+    width: $frame-nav-width;
     overflow: hidden;
   }
 
@@ -357,13 +359,12 @@ export default {
       font-size: 16px;
     }
 
-    i.icon-nav-down{
-      margin-right: 15px;
-      font-size: 12px;
+    i.icon-caidanjiantou-zhankai {
+      margin-right: 16px;
     }
 
     i.red-dot{
-      margin-right: 15px;
+      margin-right: 20px;
       width: 8px;
       height: 8px;
       border-radius: 50%;
@@ -382,7 +383,7 @@ export default {
   background-color: #fff;
 }
 
-.frame-menu-expand .icon-nav-down{
+.frame-menu-expand .icon-caidanjiantou-zhankai {
   transform: rotateZ(180deg);
 }
 

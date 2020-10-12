@@ -20,7 +20,7 @@
         <!-- end 工单流程信息 -->
 
         <!-- start 折叠时客户信息 -->
-        <div class="customer-info-wrap" v-show="!collapse && customerField.id">
+        <div class="customer-info-wrap" v-show="!collapse && customerField && customerField.id">
           <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">{{ customer.name }}</div>
           
           <div class="linkman-info" v-if="customerOption.linkman">
