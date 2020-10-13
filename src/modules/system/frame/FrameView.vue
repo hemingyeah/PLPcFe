@@ -323,8 +323,7 @@
           </div>
         </div>
       </div>
-
-      <version :version="releaseVersion" />
+      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" />
       <sale-manager
         :service-group-url="initData.serviceGroupUrl"
         :qrcode="initData.saleManagerQRCode"
@@ -431,7 +430,9 @@ export default {
       has_call_center_module: false,
       isUserTaskGray: this.initData.isUserTaskGrayFunction, // 用户选择新旧版工单标识
       navBarMenus: [],
-      showNavBar: false
+      showNavBar: false,
+      loadedEdition: false,
+      shbEdition: 1
     };
   },
   computed: {
@@ -1012,6 +1013,8 @@ export default {
       
       window.shbEdition = shbEdition
       
+      this.loadedEdition = true
+      this.shbEdition = shbEdition
       this.buildNavbarMenus()
     },
     buildNavbarMenus() {
