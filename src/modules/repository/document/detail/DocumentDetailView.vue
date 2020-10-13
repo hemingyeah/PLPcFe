@@ -40,6 +40,15 @@
               <i class="iconfont icon-share icon-article-share"></i>
             </span>
 
+            <span
+              class="open"
+              v-if="allowEdit && linkControl && isShowSelfServicePortal"
+              @click="changeRelease();trackEventHandler('share')"
+            >
+              <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
+              {{detail.circleState == 1 ? '取消发布' : '发布到圈子'}}
+            </span>
+
             <span class="open" @click="openFrame();trackEventHandler('open')" v-if="isList">新页面打开</span>
 
             <button class="base-button green-btn" @click="approve" v-if="showDetailApprove && detail.examineState == 1">审批</button>
@@ -120,6 +129,8 @@ import * as Lang from '@src/util/lang/index.js'
 
 import ApproveDialog from './component/ApproveDialog.vue'
 import Clipboard from 'clipboard';
+
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 
 export default {
   name: 'document-detail',
@@ -597,13 +608,18 @@ export default {
     height () {
       return this.isList ? '100%' : '100vh';
     },
-
     padding () {
       return this.isList ? '0 50px' : '0 100px';
     },
-
     fontClass () {
       return document.body.clientWidth > 1800 ? 'font-class' : '';
+    },
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
+    },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
     }
   }
 }
