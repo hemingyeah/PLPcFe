@@ -8,7 +8,6 @@ process.env.NODE_ENV = 'production';
 
 const argv = require('./argv')(process.argv.slice(2))
 const user = argv.user;
-const config = require(`./config/${user}`);
 
 const fs = require('fs');
 const path = require('path');
@@ -35,6 +34,7 @@ function searchWeb(path_) {
 }
 let ROOT_PATH
 if (user) {
+  const config = require(`./config/${user}`);
   ROOT_PATH = config.targetRootPath;
 } else {
   let userPath = path.resolve(__dirname, '../../')
