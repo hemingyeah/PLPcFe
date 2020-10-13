@@ -364,7 +364,7 @@ import * as NotificationApi from "@src/api/NotificationApi";
 import * as CallCenterApi from "@src/api/CallCenterApi";
 import * as SettingApi from "@src/api/SettingApi";
 
-import { isShowDashboardScreen, isShowPlanTask } from '@src/util/version.ts'
+import { isShowDashboardScreen, isShowPlanTask, isShowLinkC } from '@src/util/version.ts'
 
 /* util */
 import _ from 'lodash';
@@ -1019,7 +1019,10 @@ export default {
       // 需要被过滤掉的菜单key对象
       let filterMeunKeyMap = {
         'M_DASHBOARD_SCREEN': isShowDashboardScreen(),
-        'M_TASK_PLAN': isShowPlanTask()
+        'M_TASK_PLAN': isShowPlanTask(),
+        'M_PORTAL': isShowLinkC(),
+        'M_PORTAL_SETTING': isShowLinkC(),
+        'M_PORTAL_ORDER': isShowLinkC()
       }
       let isFilter = false
       let filterMenuKeys = []
