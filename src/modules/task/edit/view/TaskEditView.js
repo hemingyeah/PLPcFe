@@ -64,6 +64,24 @@ export default {
   methods: {
     ...methods,
     /** 
+     * 关闭并打开新的Tab
+    */
+    closeAndOpenTab(url, newTabId) {
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id)
+
+      let fromId = window.frameElement.getAttribute('id')
+      
+      this.$platform.openTab({
+        id: newTabId,
+        title: '',
+        url,
+        reload: true,
+        close: true,
+        fromId
+      });
+    },
+    /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
     */
     callCenterWithTaskDataHandler() {
@@ -108,10 +126,11 @@ export default {
           let taskId = res.result;
           let taskDetailPath = `/task/view/${taskId}`;
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
+          let url = isAllot ? taskAllotPath : taskDetailPath;
+          let id = isAllot ? 'task_allot' : 'task_view'
 
-          window.location.href = isAllot ? taskAllotPath : taskDetailPath;
-
-          this.togglePending();
+          this.closeAndOpenTab(url, id)
+          this.togglePending()
 
         })
         .catch(err => {
@@ -152,13 +171,13 @@ export default {
       if(this.isCopyTask) {
         let { taskId = '' } = this.urlParams;
         this.pending = true;
-        return window.location.href = `/task/view/${taskId}`;
+        return this.closeAndOpenTab(`/task/view/${taskId}`, 'task_view')
       }
       // 事件转工单
       else if(this.isFromEvent) {
         let { eventId = '' } = this.urlParams;
         this.pending = true;
-        return window.location.href = `/event/view/${eventId}`;
+        return this.closeAndOpenTab(`/event/view/${eventId}`, 'event_view');
       }
       // 工单新建
       else if (this.isTaskCreate) {
@@ -226,7 +245,7 @@ export default {
           this.$platform.refreshTab(isFromId);
           this.$platform.closeTab(closeId);
         } else {
-          location.href = '/task/planTask/list';
+          this.closeAndOpenTab('/task/planTask/list', 'task_plan_list')
         }
         
       } catch (error) {
@@ -498,9 +517,11 @@ export default {
           let taskId = this.editId;
           let taskDetailPath = `/task/view/${taskId}`;
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
-          
-          window.location.href = isAllot ? taskAllotPath : taskDetailPath;
-          this.togglePending();
+          let url = isAllot ? taskAllotPath : taskDetailPath;
+          let id = isAllot ? 'task_allot' : 'task_view'
+
+          this.closeAndOpenTab(url, id)
+          this.togglePending()
 
         })
         .catch(err => {
