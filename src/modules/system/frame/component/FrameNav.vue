@@ -223,15 +223,18 @@ export default {
       if (remindHeight < (minHeight / 2)) return ''; 
 
       return `max-height: ${remindHeight}px; overflow-y: auto;`;
+    },
+    init() {
+      this.setMenuOffsetData();
+      this.registerResizeListener();
+      let hasEntered = storageGet('worktime_guid');
+      if(hasEntered){
+        this.worktimeNoEnter = false;
+      }
     }
   },
   mounted() {
-    this.setMenuOffsetData();
-    this.registerResizeListener();
-    const hasEntered=storageGet('worktime_guid');
-    if(hasEntered){
-      this.worktimeNoEnter=false;
-    }
+    this.init()
   },
   watch: {
     callcenter: {
@@ -244,7 +247,7 @@ export default {
           this.menus = _.cloneDeep(m);          
         }
       }
-    }
+    },
   },
 }
 </script>

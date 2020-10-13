@@ -2,16 +2,12 @@
   <div id="doMyself-box">
     <div class="flex-x">
       <div class="left-menu">
-        <div class="menu-title">
-          {{ linkControl ? "消息中心" : "自助门户设置" }}
-        </div>
+        <div class="menu-title">{{linkControl && isShowSelfServicePortal ? '消息中心' : '自助门户设置'}}</div>
         <template v-for="(item, index) in menuList">
           <nav
             :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
             :key="index"
-            v-if="
-              linkControl ? (item.name == '客户自助门户' ? false : true) : true
-            "
+            v-if="linkControl && isShowSelfServicePortal ? item.name == '客户自助门户' ? false : true : true"
             @click="changePage(index)"
           >
             <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
@@ -35,6 +31,7 @@
 <script>
 import toastList from "../toastList/toastList";
 import wxSet from "../wxSet/wxSet";
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 export default {
   name: "do-myself-view",
   props: {
@@ -76,6 +73,9 @@ export default {
     linkControl() {
       return this.initData.openLinkC;
     },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
+    }
   },
   created() {
     let type = window.location.href.split("/")[

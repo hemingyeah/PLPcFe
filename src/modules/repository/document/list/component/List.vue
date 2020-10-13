@@ -45,7 +45,7 @@
               <i class="iconfont icon-yanjing"></i>
               <span>{{item.readTimes}}</span>
             </span>
-            <span class="readNum" v-if="item.circleState == 1 && linkControl">
+            <span class="readNum" v-if="item.circleState == 1 && linkControl && isShowSelfServicePortal">
               <i class="iconfont icon-quanziguanli"></i>
             </span>
           </div>
@@ -77,6 +77,7 @@
 <script>
 import * as RepositoryApi from '@src/api/Repository';
 import Clipboard from 'clipboard';
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 
 export default {
   name: 'list',
@@ -103,6 +104,9 @@ export default {
     linkControl() {
       return this.initData.openLinkC;
     },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
+    }
   },
   data () {
     return {

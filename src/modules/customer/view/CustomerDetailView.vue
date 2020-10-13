@@ -12,7 +12,7 @@
           <button type="button" class="btn btn-text" @click="deleteCustomer" v-if="allowDeleteCustomer">
             <i class="iconfont icon-yemianshanchu"></i> 删除
           </button>
-          <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable">
+          <button type="button" class="btn btn-text" @click="openDialog('remind')" v-if="!isDisable && isShowCustomerRemind">
             <i class="iconfont icon-notification"></i> 添加提醒
           </button>
 
@@ -53,7 +53,7 @@
           </el-dropdown-menu>
         </el-dropdown>
 
-        <el-dropdown trigger="click" v-if="allowCreatePlanTask">
+        <el-dropdown trigger="click" v-if="allowCreatePlanTask && isShowPlanTask">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>计划任务
           </span>
@@ -132,6 +132,8 @@ import CustomerAttention from './components/CustomerAttention.vue'
 import EditAddressDialog from './operationDialog/EditAddressDialog.vue'
 import EditContactDialog from './operationDialog/EditContactDialog.vue'
 import RemindCustomerDialog from './operationDialog/RemindCustomerDialog.vue'
+
+import { isShowCustomerRemind, isShowPlanTask } from '@src/util/version.ts'
 
 import AuthUtil from '@src/util/auth'
 import qs from '@src/util/querystring'
@@ -424,6 +426,14 @@ export default {
     /** 是否关注该客户 */
     isAttention() {
       return this.attentionUsers.some(u => u.userId == this.loginUser.userId)
+    },
+    /* 是否显示客户提醒 */
+    isShowCustomerRemind() {
+      return isShowCustomerRemind()
+    },
+    /* 是否显示计划任务 */
+    isShowPlanTask() {
+      return isShowPlanTask()
     }
   },
   filters: {
@@ -633,12 +643,12 @@ export default {
         {
           displayName: `计划任务(${plantaskQuantity || 0})`,
           component: CustomerPlanTable.name,
-          show: this.allowCreatePlanTask
+          show: this.allowCreatePlanTask && this.isShowPlanTask
         },
         {
           displayName: `客户提醒(${remindQuantity || 0})`,
           component: CustomerRemindTable.name,
-          show: !this.isDelete && !this.isDisable
+          show: !this.isDelete && !this.isDisable && this.isShowCustomerRemind
         }
       ].filter(tab => tab.show)
     },
