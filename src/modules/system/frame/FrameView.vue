@@ -391,7 +391,7 @@ import * as NotificationApi from "@src/api/NotificationApi";
 import * as CallCenterApi from "@src/api/CallCenterApi";
 import * as SettingApi from "@src/api/SettingApi";
 
-import { isShowDashboardScreen, isShowPlanTask, isShowLinkC } from '@src/util/version.ts'
+import { isShowDashboardScreen, isShowPlanTask, isShowLinkC, isShowMoreSperaParts } from '@src/util/version.ts'
 
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
@@ -1026,7 +1026,8 @@ export default {
         'M_TASK_PLAN': isShowPlanTask(),
         'M_PORTAL': isShowLinkC(),
         'M_PORTAL_SETTING': isShowLinkC(),
-        'M_PORTAL_ORDER': isShowLinkC()
+        'M_PORTAL_ORDER': isShowLinkC(),
+        'M_VIP_SPAREPART_PERSON': isShowMoreSperaParts()
       }
       let isFilter = false
       let filterMenuKeys = []
