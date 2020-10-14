@@ -611,6 +611,23 @@ export default {
      * 存为视图和编辑视图
      */
     editView({region, id}) {
+      const {moreConditions} = this.params
+      let bool, bool_text;
+      for(let key in moreConditions) {
+        if (key !== 'conditions' && key !== 'productAddress' && key !== 'systemConditions') {
+          bool_text = key
+        }
+      }
+      for(let key in moreConditions) {
+        if((JSON.stringify(moreConditions[key]) === '[]' || JSON.stringify(moreConditions[key]) === '{}') && !bool_text) {
+          bool = true
+        }
+      }
+      if (bool) {
+        this.$platform.alert('请设置查询条件');
+        return
+      }
+
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {

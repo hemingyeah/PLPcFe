@@ -103,20 +103,25 @@ export default {
 
 
       let backUp = this.formBackup.backUp || {};
-      let inPar = [] // 初始化的参数
-      
+
       this.$set(this, "customer", backUp.customer || {});
       this.$set(this, "product", backUp.product || {});
 
+      return form;
+    },
+    /**
+     * 自定义初始化参数
+     */
+    _inPar() {
+      let inPar = [] // 初始化的参数
       for(let key in this.searchParams) {
-        if (this.searchParams[key]) {
+        if (JSON.stringify(this.searchParams[key]) !== '[]' && this.searchParams[key] && key !== 'pageSize' && key !== 'page' && key !== 'pageNum' && key !== 'stateList' && key !== 'whoseInfo' && key !== 'isPermission') {
           inPar.push({key, value: this.searchParams[key]})
         }
       }
-      console.log(inPar)
-
-      return form;
+      console.log('初始化的参数', inPar)
     },
+    
     renderInput(h, field) {
       const f = _.cloneDeep(field)
       let comp = FormFieldMap.get(f.formType);

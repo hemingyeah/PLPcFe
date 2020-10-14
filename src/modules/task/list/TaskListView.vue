@@ -721,7 +721,12 @@
 
                 <!-- 时间 -->
                 <template v-else-if="column.formType === 'datetime'">
+                <template v-if="!column.isSystem">
+                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                </template>
+                <template v-else>
                   {{ scope.row[column.field] | fmt_datetime }}
+                </template>
                 </template>
 
                 <div
@@ -756,9 +761,13 @@
                 >
                   {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
                 </template>
-
                 <template v-else-if="!column.isSystem">
-                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                  <template v-if="scope.row.attribute && scope.row.attribute[column.field] instanceof Array">
+                    {{scope.row.attribute[column.field].join(',')}}
+                  </template>
+                  <template v-else>
+                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                  </template>
                 </template>
 
                 <template v-else>
