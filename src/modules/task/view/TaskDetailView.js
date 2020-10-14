@@ -7,7 +7,7 @@ import { getRootWindow } from '@src/util/dom';
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import Filter from '@src/filter/filter.js';
 import { parse } from '@src/util/querystring';
-import { isShowCustomReport } from '@src/util/version.ts'
+import { isShowReport } from '@src/util/version.ts'
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -606,8 +606,8 @@ export default {
       return this.messageConfig.taskRemark === true
     },
     /* 是否显示服务报告 根据版本控制的 */
-    isShowCustomReport() {
-      return isShowCustomReport()
+    isShowReport() {
+      return isShowReport()
     }
   },
   methods: {

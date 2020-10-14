@@ -363,7 +363,7 @@ import * as NotificationApi from "@src/api/NotificationApi";
 import * as CallCenterApi from "@src/api/CallCenterApi";
 import * as SettingApi from "@src/api/SettingApi";
 
-import { isShowDashboardScreen, isShowPlanTask, isShowLinkC } from '@src/util/version.ts'
+import { isShowDashboardScreen, isShowPlanTask, isShowLinkC, isShowMoreSperaParts } from '@src/util/version.ts'
 
 /* util */
 import _ from 'lodash';
@@ -502,11 +502,12 @@ export default {
         if (data.callcenter) {
           // 说明开启呼叫中心灰度
           localStorage.setItem("call_center_gray", 1);
-          this.getAccountInfo();
-        } else {
-          localStorage.setItem("call_center_module", 0);
-          localStorage.setItem("call_center_gray", 0);
+          return await this.getAccountInfo()
         }
+
+        localStorage.setItem("call_center_module", 0);
+        localStorage.setItem("call_center_gray", 0);
+        
       } catch (error) {
         console.error(error);
       }
@@ -528,6 +529,8 @@ export default {
           } else {
             alert("当前浏览器 Not support websocket");
           }
+
+          return true
         }
       } catch (error) {
         console.error(error);
@@ -1025,7 +1028,11 @@ export default {
         'M_TASK_PLAN': isShowPlanTask(),
         'M_PORTAL': isShowLinkC(),
         'M_PORTAL_SETTING': isShowLinkC(),
-        'M_PORTAL_ORDER': isShowLinkC()
+        'M_PORTAL_ORDER': isShowLinkC(),
+        'M_VIP_SPAREPART_PERSON': isShowMoreSperaParts(),
+        'M_CALLCENTER_WORKBENCH_LIST': this.has_call_center_module,
+        'M_CALLCENTER_STATISTICS': this.has_call_center_module,
+        'M_CALLCENTER_STAGE': this.has_call_center_module
       }
       let isFilter = false
       let filterMenuKeys = []
@@ -1067,7 +1074,7 @@ export default {
     }, NOTIFICATION_TIME);
   },
   async mounted() {
-    this.judgeCallCenterGray();
+    await this.judgeCallCenterGray();
     let userGuide = this?.initData?.userGuide === true || false;
 
     if (userGuide) {
