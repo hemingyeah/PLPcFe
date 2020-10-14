@@ -131,7 +131,7 @@ export default {
     open(menu){
       // 如果有子菜单，展开子菜单
       if(menu.children && menu.children.length > 0) {
-        this.currMenu = this.currMenu == menu ? null : menu;
+        this.currMenu = this.currMenu?.menuKey == menu.menuKey ? null : menu;
         this.$emit('update:collapse', false);
         return
       }
@@ -244,7 +244,7 @@ export default {
         if(newValue) {
           let originMenus = _.cloneDeep(this.source);
           let m = this.buildMenus(originMenus, null).menus || []; 
-          this.menus = _.cloneDeep(m);          
+          this.menus = _.cloneDeep(m);
         }
       }
     },
