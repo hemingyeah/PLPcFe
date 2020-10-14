@@ -120,7 +120,8 @@ export default {
       navWidth: window.innerWidth - 120,
       taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap,
       task_view_list: [],
-      seoSetList: []
+      seoSetList: [],
+      exportColumns: []
     };
   },
   computed: {
@@ -155,220 +156,6 @@ export default {
       }
 
       return customerSetting;
-    },
-    /** 导出列 */
-    exportColumns() {
-      let {taskFields, taskReceiptFields} = this
-      // 工单信息
-      let taskSelfFields = [];
-      // 回执信息
-      let taskReceiptSystemFields = [
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "spare_name",
-          field: "spare_name",
-          displayName: "备件",
-          label: "备件",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "service_name",
-          field: "service_name",
-          displayName: "服务项目",
-          label: "服务项目",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: "balance_total",
-          field: "balance_total",
-          displayName: "费用信息",
-          label: "费用信息",
-          formType: "text",
-          isNull: 1,
-          isSearch: 0,
-        },
-      ];
-
-      // 工单信息逻辑
-      let linkman_list = '', address_list = '', product_list = ''
-      taskSelfFields = taskFields.filter(item => {
-        return item.formType !== 'attachment'
-      })
-      if (taskFields.length) {
-        let first = taskFields.filter(item => {return item.displayName === '客户'})[0]
-        if (first.setting.customerOption.linkman) {
-          linkman_list = [{
-            id: 5460,
-            tableName: "customer",
-            isSystem: 1,
-            fieldName: "tlmName",
-            displayName: "联系人",
-            exportAlias: "customerLinkman",
-            formType: "select",
-            defaultValue: null,
-            isNull: 1,
-            isSearch: 1,
-            placeHolder: null,
-            setting: {},
-            orderId: 1,
-            isDelete: 0,
-            show: true,
-            guideProfessions: [],
-            isGuideData: false,
-            guideData: false,
-          },
-          {
-            id: 5460,
-            tableName: "customer",
-            isSystem: 1,
-            fieldName: "tlmPhone",
-            exportAlias: "customerPhone",
-            displayName: "电话",
-            formType: "text",
-            defaultValue: null,
-            isNull: 1,
-            isSearch: 1,
-            placeHolder: null,
-            setting: {},
-            orderId: 1,
-            isDelete: 0,
-            guideProfessions: [],
-            show: true,
-            isGuideData: false,
-            guideData: false,
-          }]
-        }
-        if (first.setting.customerOption.address) {
-          address_list = [{
-            id: 5460,
-            tableName: "customer",
-            isSystem: 1,
-            fieldName: "taddress",
-            exportAlias: "customerAddress",
-            displayName: "客户地址",
-            formType: "address",
-            defaultValue: null,
-            isNull: 1,
-            isSearch: 1,
-            placeHolder: null,
-            setting: {},
-            orderId: 1,
-            isDelete: 0,
-            guideProfessions: [],
-            show: true,
-            isGuideData: false,
-            guideData: false,
-          }]
-        } 
-        if (first.setting.customerOption.product) {
-          product_list = [{
-            id: 5460,
-            tableName: "customer",
-            isSystem: 1,
-            fieldName: "product",
-            exportAlias: "product",
-            displayName: "产品",
-            formType: "text",
-            defaultValue: null,
-            isNull: 1,
-            isSearch: 1,
-            placeHolder: null,
-            setting: {},
-            orderId: 1,
-            isDelete: 0,
-            guideProfessions: [],
-            show: true,
-            isGuideData: false,
-            guideData: false,
-          }]
-        }
-      }
-      taskSelfFields.forEach((item, index) => {
-        if (item.displayName === '工单编号') {
-          taskSelfFields.splice(index + 1, 0,{
-            id: 476,
-            tableName: "customer",
-            isSystem: 1,
-            fieldName: "templateName",
-            exportAlias: "templateName",
-            displayName: "工单类型",
-            formType: "text",
-            defaultValue: null,
-            isNull: 0,
-            isSearch: 1,
-            placeHolder: null,
-            setting: {
-              customerNameDuplicate: false,
-            },
-            orderId: 0,
-            isDelete: 0,
-            guideProfessions: [],
-            show: true,
-            isGuideData: false,
-            guideData: false,
-          })
-        }
-        if (item.displayName === '客户') {
-          if (linkman_list) {
-            taskSelfFields.splice(index + 1, 0, linkman_list[0], linkman_list[1])
-          }
-          if (address_list) {
-            taskSelfFields.splice(index + linkman_list.length + 1, 0, address_list[0])
-          }
-          if (product_list) {
-            taskSelfFields.splice(index + linkman_list.length + address_list.length + 1, 0, product_list[0])
-          }
-        }
-      })
-       taskSelfFields.map(item => {
-          item.label = item.displayName
-          item.export = true
-          return item
-        })
-
-
-      // 回执信息逻辑
-      taskReceiptSystemFields = [
-        ...taskReceiptSystemFields,
-        ...taskReceiptFields.filter(item => {
-          return (item.isSystem === 0 && item.formType !== 'attachment')
-        })
-      ].map((field) => {
-        field.export = true;
-        return field;
-      });
-
-
-      return [
-        {
-          label: "工单信息",
-          value: "taskChecked",
-          columns: taskSelfFields,
-        },
-        {
-          label: "回执信息",
-          value: "receiptChecked",
-          columns: taskReceiptSystemFields,
-        },
-        {
-          label: "系统信息",
-          value: "systemChecked",
-          columns: allExport.map(item => {
-            item.export = true
-            item.label = item.displayName
-            return item
-          }),
-        },
-      ];
     },
     /** 导出权限 */
     exportPermission() {
@@ -557,7 +344,6 @@ export default {
           };
         }
       });
-      console.log("导出工单", list, this.exportColumns);
       this.exportColumnList = [...this.exportColumns, ...list];
     },
     /**
@@ -857,11 +643,12 @@ export default {
           }
 
           let data = result?.result || {};
-          let { number, content, totalPages, totalElements } = data;
+          let { number, content, totalPages, totalElements, size } = data;
 
           data["list"] = content;
           data["total"] = totalPages;
           data["pageNum"] = number;
+          data['pageSize'] = size
           content.map((item) => {
             item.pending = false;
             if (item.acceptUsedTime) {
@@ -886,6 +673,7 @@ export default {
           this.taskPage.list = [];
           this.taskPage.merge(Page.as(data));
           this.params.pageNum = number;
+          console.log(this.taskPage)
 
           // 把选中的匹配出来
           // this.matchSelected();
@@ -1276,7 +1064,6 @@ export default {
      */
     changeTaskType(taskType) {
       this.currentTaskType = taskType;
-      this.getCardDetailList(taskType.id);
       this.initialize();
     },
     /**
@@ -1488,7 +1275,7 @@ export default {
       this.params.pageSize = pageSize;
       this.params.pageNum = 1;
 
-      this.search(this.searchParams);
+      this.search();
     },
     /**
      * @description 初始化
@@ -1510,6 +1297,7 @@ export default {
           this.search(searchModel);
           this.buildColumns();
           this.seoSet()
+          this._exportColumns()
         })
         .catch((err) => {
           console.warn(err);
@@ -1608,8 +1396,7 @@ export default {
           }]
         }
       }
-      
-      this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}),...linkman_list, ...address_list, ...product_list, ...Inquire]
+      this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}).map(item => {if (item.fieldName === 'planTime'){item.formType = 'date'; item.isNull = 1} return item}),...linkman_list, ...address_list, ...product_list, ...Inquire]
     },
     /**
      * @description 初始化page
@@ -1618,6 +1405,8 @@ export default {
       this.taskPage = new Page();
       this.taskPage.list = [];
       this.params.page = 1;
+      this.params.pageNum = 1;
+      this.params.pageSize = 10
     },
     /**
      * @description 初始化参数
@@ -1774,9 +1563,9 @@ export default {
      */
     revertStorage() {
       const { pageSize, column_number } = this.getLocalStorageData();
-      if (pageSize) {
-        this.params.pageSize = pageSize;
-      }
+      // if (pageSize) {
+      //   this.params.pageSize = pageSize;
+      // }
       if (column_number) this.columnNum = Number(column_number);
     },
     /**
@@ -2045,6 +1834,7 @@ export default {
           serviceType: params.serviceType,
           serviceContent: params.serviceContent,
           level: params.level,
+          description: params.description,
           // createUser: mySearch.createUser || params.createUser,
           // allotUser: params.allotUser,
           // executor: mySearch.executor || params.executor,
@@ -2080,7 +1870,7 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
-          state: state || this.searchParams.state,
+          state: state,
 
           serviceTypes: params.serviceTypes,
           serviceContents: params.serviceContents,
@@ -2100,6 +1890,10 @@ export default {
         // 工单搜索分类型
         if (this.keyword_select) {
           par.searchCondition = this.keyword_select
+        } else {
+          if (this.searchParams.searchCondition) {
+            delete this.searchParams.searchCondition
+          }
         }
         
         this.searchParams = { ...this.searchParams, ...par };
@@ -2170,6 +1964,219 @@ export default {
       } else {
         return new Date(params);
       }
+    },
+    /** 导出列 */
+    _exportColumns() {
+      let {taskFields, taskReceiptFields} = this
+      // 工单信息
+      let taskSelfFields = [];
+      // 回执信息
+      let taskReceiptSystemFields = [
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "spare_name",
+          field: "spare_name",
+          displayName: "备件",
+          label: "备件",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "service_name",
+          field: "service_name",
+          displayName: "服务项目",
+          label: "服务项目",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+        },
+        {
+          id: 5460,
+          isSystem: 1,
+          fieldName: "balance_total",
+          field: "balance_total",
+          displayName: "费用信息",
+          label: "费用信息",
+          formType: "text",
+          isNull: 1,
+          isSearch: 0,
+        },
+      ];
+
+      // 工单信息逻辑
+      let linkman_list = '', address_list = '', product_list = ''
+      taskSelfFields = taskFields.filter(item => {
+        return item.formType !== 'attachment'
+      })
+      if (taskFields.length) {
+        let first = taskFields.filter(item => {return item.displayName === '客户'})[0]
+        if (first.setting.customerOption.linkman) {
+          linkman_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "tlmName",
+            displayName: "联系人",
+            exportAlias: "customerLinkman",
+            formType: "select",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            show: true,
+            guideProfessions: [],
+            isGuideData: false,
+            guideData: false,
+          },
+          {
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "tlmPhone",
+            exportAlias: "customerPhone",
+            displayName: "电话",
+            formType: "text",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        }
+        if (first.setting.customerOption.address) {
+          address_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "taddress",
+            exportAlias: "customerAddress",
+            displayName: "客户地址",
+            formType: "address",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        } 
+        if (first.setting.customerOption.product) {
+          product_list = [{
+            id: 5460,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "product",
+            exportAlias: "product",
+            displayName: "产品",
+            formType: "text",
+            defaultValue: null,
+            isNull: 1,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {},
+            orderId: 1,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          }]
+        }
+      }
+      taskSelfFields.forEach((item, index) => {
+        if (item.displayName === '工单编号') {
+          taskSelfFields.splice(index + 1, 0,{
+            id: 476,
+            tableName: "customer",
+            isSystem: 1,
+            fieldName: "templateName",
+            exportAlias: "templateName",
+            displayName: "工单类型",
+            formType: "text",
+            defaultValue: null,
+            isNull: 0,
+            isSearch: 1,
+            placeHolder: null,
+            setting: {
+              customerNameDuplicate: false,
+            },
+            orderId: 0,
+            isDelete: 0,
+            guideProfessions: [],
+            show: true,
+            isGuideData: false,
+            guideData: false,
+          })
+        }
+        if (item.displayName === '客户') {
+          if (linkman_list) {
+            taskSelfFields.splice(index + 1, 0, linkman_list[0], linkman_list[1])
+          }
+          if (address_list) {
+            taskSelfFields.splice(index + linkman_list.length + 1, 0, address_list[0])
+          }
+          if (product_list) {
+            taskSelfFields.splice(index + linkman_list.length + address_list.length + 1, 0, product_list[0])
+          }
+        }
+      })
+       taskSelfFields.map(item => {
+          item.label = item.displayName
+          item.export = true
+          return item
+        })
+
+
+      // 回执信息逻辑
+      taskReceiptSystemFields = [
+        ...taskReceiptSystemFields,
+        ...taskReceiptFields.filter(item => {
+          return (item.isSystem === 0 && item.formType !== 'attachment')
+        })
+      ].map((field) => {
+        field.export = true;
+        return field;
+      });
+      this.exportColumns = [
+        {
+          label: "工单信息",
+          value: "taskChecked",
+          columns: taskSelfFields,
+        },
+        {
+          label: "回执信息",
+          value: "receiptChecked",
+          columns: taskReceiptSystemFields,
+        },
+        {
+          label: "系统信息",
+          value: "systemChecked",
+          columns: allExport.map(item => {
+            item.export = true
+            item.label = item.displayName
+            return item
+          }),
+        },
+      ];
+      this.getCardDetailList(this.currentTaskType.id);
     },
     /**
      * @description 已选择面板数据变化

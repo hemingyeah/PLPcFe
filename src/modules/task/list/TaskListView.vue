@@ -780,7 +780,7 @@
                 <el-select
                   v-model="params.pageSize"
                   placeholder="请选择"
-                  @change="search()"
+                  @change="handleSizeChange(params.pageSize)"
                   class="table-footer-select"
                 >
                   <el-option :label="10" :value="10"></el-option>
@@ -791,6 +791,7 @@
               </div>
             </div>
             <el-pagination
+              v-if="this.taskPage.list.length"
               class="comment-list-table-footer-pagination"
               background
               @current-change="jump"
@@ -891,7 +892,19 @@
 import TaskList from './TaskList';
 export default TaskList;
 </script>
-
+<style lang="scss">
+// .biz-form-remote-select-clear {
+//   i {
+//     background-color: #f0f0f0;
+//     width: 16px;
+//     height: 16px;
+//     border-radius: 16px;
+//     &::before {
+//       content: "x";
+//     }
+//   }
+// }
+</style>
 <style lang="scss" scoped>
 @import "./TaskList.scss";
 </style>

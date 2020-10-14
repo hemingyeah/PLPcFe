@@ -32,6 +32,10 @@ export default {
       type: Number,
       default: 1,
     },
+    searchParams: {
+      type: Object,
+      default: () => []
+    }
   },
   data() {
     return {
@@ -50,6 +54,7 @@ export default {
   },
   methods: {
     buildForm() {
+      console.log(this.fields)
       if (Object.keys(this.form).length === this.fields.length) return;
       this.initFormVal();
     },
@@ -96,16 +101,24 @@ export default {
         );
       });
 
-      let backUp = this.formBackup.backUp || {};
 
+      let backUp = this.formBackup.backUp || {};
+      let inPar = [] // 初始化的参数
+      
       this.$set(this, "customer", backUp.customer || {});
       this.$set(this, "product", backUp.product || {});
+
+      for(let key in this.searchParams) {
+        if (this.searchParams[key]) {
+          inPar.push({key, value: this.searchParams[key]})
+        }
+      }
+      console.log(inPar)
 
       return form;
     },
     renderInput(h, field) {
       const f = _.cloneDeep(field)
-
       let comp = FormFieldMap.get(f.formType);
       if (!comp || f.formType === "area") {
         return null;

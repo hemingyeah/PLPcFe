@@ -8,7 +8,7 @@
           type="text"
           name=""
           id=""
-          maxlength="6"
+          maxlength="20"
           v-model="view.viewName"
           placeholder="请输入视图名称"
         />

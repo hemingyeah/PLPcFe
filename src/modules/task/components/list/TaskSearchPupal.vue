@@ -58,9 +58,7 @@ export default {
             this.customizeList = v
         },
         config(v) {
-            this.systemList = v.filter((f) => {
-                return f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )
-            })
+            this.systemList = v
         },
         taskInquireList() {
             this.loc()
@@ -77,9 +75,7 @@ export default {
         }
     },
     mounted() {
-        this.systemList = this.config.filter((f) => {
-            return f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )
-        })
+        this.systemList = this.config
         this.loc()
     },
     methods: {
@@ -112,6 +108,7 @@ export default {
         reset() {
            this.systemList= this.config
            this.customizeList= this.taskTypeFilterFields
+           this.seoText = ''
         },
         onSubmit() {
             const {checkSystemList, checkCustomizeList, config, taskTypeFilterFields} = this

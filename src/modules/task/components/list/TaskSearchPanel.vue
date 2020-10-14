@@ -35,6 +35,7 @@
           :class="{'hide': show}"
           :fields="fields"
           ref="searchForm"
+          :searchParams="searchParams"
           :form-backup="formBackup"
           :column-num="columnNum"
         >
@@ -121,6 +122,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    searchParams: {
+      type: Object,
+      default: () => []
+    }
   },
   watch: {
     customizeList() {
@@ -155,10 +160,7 @@ export default {
     fields() {
       let f = {};
       let selfFields = []
-      let fields = [...this.selfFields]
-        .filter((f) => {
-          return f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )
-        }).map((field) => {
+      let fields = [...this.selfFields].map((field) => {
           f = _.cloneDeep(field);
           let formType = f.formType;
 
@@ -743,7 +745,7 @@ export default {
   overflow: auto;
   padding: 10px 15px 150px 15px;
 
-  height: calc(100% - 57px);
+  height: calc(100%);
   justify-content: space-between;
   overflow-x: hidden;
 

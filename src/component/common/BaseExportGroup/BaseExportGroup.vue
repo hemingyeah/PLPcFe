@@ -137,6 +137,7 @@ export default {
   },
   watch: {
     columns(columns) {
+      console.log(columns)
       let checkedMap = {};
       columns.forEach((column) => {
         checkedMap[column.value] = [];

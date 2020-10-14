@@ -57,7 +57,7 @@ function setFieldOperateHandler(field = {}) {
   else if (fieldName == 'customer' || fieldName == 'product') {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice()
   }
-  else if (formType == 'text' || formType == 'textarea' || formType === 'code') {
+  else if (formType == 'text' || formType == 'textarea' || formType === 'code' || formType === 'description') {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice()
   }
   else if (formType == 'date' || formType == 'datetime') {
@@ -108,9 +108,6 @@ export default {
     fields() {
       let f = {};
       let fields = [...this.config]
-        .filter((f) => {
-          return (f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )) && TaskInquireFiltersFieldNames.indexOf(f.fieldName) < 0
-        })
         .map((field) => {
           f = _.cloneDeep(field);
 
