@@ -91,13 +91,13 @@ export function isShowPartBack(): boolean {
 }
 
 /** 
- * 是否显示 客户批量提醒
+ * 是否显示 客户批量提醒 (都支持)
  * 1. 老版本vip版 支持
  * 2. 标准版 不支持
  * 3. 企业版 原生支持
 */
 export function isShowCustomerRemind(): boolean {
-  return commonJudgeShow()
+  return true
 }
 
 /** 
@@ -121,12 +121,12 @@ export function isShowPlanTask(): boolean {
 }
 
 /** 
- * 是否显示 自定义服务报告
+ * 是否显示 服务报告
  * 1. 老版本vip版 支持
  * 2. 标准版 不支持
  * 3. 企业版 原生支持
 */
-export function isShowCustomReport(): boolean {
+export function isShowReport(): boolean {
   return commonJudgeShow()
 }
 
