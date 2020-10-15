@@ -369,7 +369,7 @@
               <span>下级部门</span>
             </div>
 
-            <div class="department-child-block-header-btn dept-edit-del">
+            <div class="department-child-block-header-btn dept-edit-del" v-if="isShowCreateChildrenTeam">
               <base-button type="ghost" @event="addDepartment">添加子部门</base-button>
               <!-- <base-button type="danger" @event="delDepartment" v-if="subDepartments.length > 0"> 删除 </base-button> -->
             </div>
@@ -713,6 +713,7 @@ import DepartmentEditPanel from "./component/DepartmentEditPanel.vue";
 import ModifyName from "./component/ModifyName";
 
 /* utils */
+import { isShowCreateChildrenTeam } from '@src/util/version.ts'
 import _ from "lodash";
 import http from "@src/util/http";
 import Page from "@model/Page";
@@ -882,6 +883,9 @@ export default {
       // 主部门下面成员不能移除
       return this.selectedDept.parentId;
     },
+    isShowCreateChildrenTeam() {
+      return isShowCreateChildrenTeam()
+    }
   },
   mounted() {
     this.initialize();
