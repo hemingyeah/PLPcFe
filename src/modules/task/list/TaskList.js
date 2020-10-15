@@ -2258,7 +2258,7 @@ export default {
     showAdvancedSetting() {
       this.trackEventHandler("columns");
 
-      this.$refs.advanced.open(this.columns);
+      this.$refs.advanced.open(this.columns, this.currentTaskType);
     },
     /**
      * @description 排序变化
