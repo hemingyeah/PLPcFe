@@ -383,7 +383,7 @@ export default {
         </div>,
         // 是否地理位置异常
         <div>
-          { isPositionException && <span>距离客户位置：{ content.distance ? `${content.distance} 公里` : '位置异常' }</span> }
+          { isPositionException && <span>距离客户位置：{ content.distance ? `${content.distance} 公里` : '位置异常，未获取到位置信息' }</span> }
         </div>
       ];
 
