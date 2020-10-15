@@ -362,7 +362,7 @@
         <!-- end 部门 header -->
 
         <!-- start 下级部门 -->
-        <div class="department-child-block">
+        <div class="department-child-block" v-if="isShowCreateChildrenTeam">
           <div class="department-child-block-header">
             <div class="department-child-block-header-text">
               <i class="iconfont icon-bumen"></i>
@@ -713,6 +713,7 @@ import DepartmentEditPanel from "./component/DepartmentEditPanel.vue";
 import ModifyName from "./component/ModifyName";
 
 /* utils */
+import { isShowCreateChildrenTeam } from '@src/util/version.ts'
 import _ from "lodash";
 import http from "@src/util/http";
 import Page from "@model/Page";
@@ -882,6 +883,9 @@ export default {
       // 主部门下面成员不能移除
       return this.selectedDept.parentId;
     },
+    isShowCreateChildrenTeam() {
+      return isShowCreateChildrenTeam()
+    }
   },
   mounted() {
     this.initialize();
