@@ -14,6 +14,7 @@ import {
 } from "@src/component/form/components";
 import SearchProductSelect from "./SearchProductSelect.vue";
 import SearchCustomerSelect from "./SearchCustomerSelect.vue";
+import { formatDate } from "@src/util/lang";
 
 const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod']
 
@@ -163,9 +164,21 @@ export default {
         } else if (key === 'onceReallot') {
           this.form.onceReallot = this.initialParams(key, value)
         } else if (key === 'acceptTimeStart') {
-          this.form.acceptTime[0] = this.initialParams(key, value)
+          this.form.acceptTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
         } else if (key === 'acceptTimeEnd') {
-          this.form.acceptTime[1] = this.initialParams(key, value)
+          this.form.acceptTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
+        } else if (key === 'allotTimeStart') {
+          this.form.allotTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
+        } else if (key === 'allotTimeEnd') {
+          this.form.allotTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
+        } else if (key === 'serviceTypes') {
+          this.form.serviceType = value
+        } else if (key === 'serviceType') {
+          this.form.serviceType = [value]
+        } else if (key === 'serviceContents') {
+          this.form.serviceContent = value
+        } else if (key === 'serviceContent') {
+          this.form.serviceContent = [value]
         } else {
           this.form[key] = value
         }
