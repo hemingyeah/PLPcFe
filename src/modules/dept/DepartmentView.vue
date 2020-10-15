@@ -884,7 +884,7 @@ export default {
       return this.selectedDept.parentId;
     },
     isShowCreateChildrenTeam() {
-      return isShowCreateChildrenTeam()
+      return isShowCreateChildrenTeam(this.initData)
     }
   },
   mounted() {

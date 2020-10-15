@@ -227,7 +227,7 @@ export default {
       return this.selectedDept.subDepartments || [];
     },
     isShowCreateChildrenTeam() {
-      return isShowCreateChildrenTeam()
+      return isShowCreateChildrenTeam(this.initData)
     }
   },
   mounted() {
