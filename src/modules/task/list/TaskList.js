@@ -624,7 +624,7 @@ export default {
         }
       }
       if (bool) {
-        this.$platform.alert('请设置查询条件');
+        this.$platform.alert('请您先设置条件进行查询，再保存【筛选视图】！');
         return
       }
 
