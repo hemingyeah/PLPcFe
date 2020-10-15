@@ -138,7 +138,7 @@ export function isShowReport(): boolean {
  * @return {Boolean} 是否支持开启显示
  */
 export function isShowSelfServicePortal(): boolean {
-  return commonJudgeShow()
+  return true
 }
 
 /**
