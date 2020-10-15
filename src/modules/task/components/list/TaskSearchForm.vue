@@ -32,6 +32,10 @@ export default {
       type: Number,
       default: 1,
     },
+    searchParams: {
+      type: Object,
+      default: () => []
+    }
   },
   data() {
     return {
@@ -50,6 +54,7 @@ export default {
   },
   methods: {
     buildForm() {
+      console.log(this.fields)
       if (Object.keys(this.form).length === this.fields.length) return;
       this.initFormVal();
     },
@@ -97,15 +102,26 @@ export default {
       });
 
       let backUp = this.formBackup.backUp || {};
-
       this.$set(this, "customer", backUp.customer || {});
       this.$set(this, "product", backUp.product || {});
 
       return form;
     },
+    /**
+     * 自定义初始化参数
+     */
+    _inPar() {
+      let inPar = [] // 初始化的参数
+      for(let key in this.searchParams) {
+        if (JSON.stringify(this.searchParams[key]) !== '[]' && this.searchParams[key] && key !== 'pageSize' && key !== 'page' && key !== 'pageNum' && key !== 'stateList' && key !== 'whoseInfo' && key !== 'isPermission') {
+          inPar.push({key, value: this.searchParams[key]})
+        }
+      }
+      console.log('初始化的参数', inPar)
+    },
+    
     renderInput(h, field) {
       const f = _.cloneDeep(field)
-
       let comp = FormFieldMap.get(f.formType);
       if (!comp || f.formType === "area") {
         return null;
@@ -123,6 +139,7 @@ export default {
 
       if (f.fieldName == "customer") {
         let value = this.form[f.fieldName];
+        console.log('请选择客户', this.customer.name)
         childComp = h("search-customer-select", {
           props: {
             placeholder: "请选择客户",
@@ -225,7 +242,6 @@ export default {
         customer: this.customer,
         product: this.product,
       };
-
       return data;
     },
     searchCustomer(params) {

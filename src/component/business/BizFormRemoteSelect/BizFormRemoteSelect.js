@@ -43,7 +43,7 @@ const BizFormRemoteSelect = {
     // 清除按钮
     let clearButton = (
       <div class="biz-form-remote-select-clear" onClick={event => this.clear(event)} >
-        <i class="iconfont icon-yemianshanchu"></i>
+        <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);"></i>
       </div>
     )
 
