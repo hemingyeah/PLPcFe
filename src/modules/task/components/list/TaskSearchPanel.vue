@@ -20,7 +20,7 @@
     </h3>
     <!--  -->
       <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
-        <i class="iconfont icon-triangle-down task-icon" v-if="!show"></i>
+        <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
         <i class="iconfont icon-up task-icon" v-else></i>
         <span class="task-font16">常用查询条件</span>
         <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
@@ -29,6 +29,12 @@
             <i class="iconfont icon-question task-icon"></i>
           </el-tooltip>
         </span>
+      </div>
+      <div class="task-search-guide" v-show="!fields.length && guide">
+        <div></div>
+        <div>
+          您还未设置常用字段，快去试试吧
+        </div>
       </div>
     </div>
     <!-- S 搜索条件 -->
@@ -809,7 +815,7 @@ export default {
 }
 .task-search-guide {
     position: relative;
-    left: 110px;
+    left: 120px;
     margin-bottom: 20px;
   >div {
     &:first-child {
