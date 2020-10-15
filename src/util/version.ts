@@ -162,3 +162,14 @@ export function isShowLinkC(): boolean {
 export function isShowMoreSperaParts(): boolean {
   return commonJudgeShow()
 }
+
+/**
+ * @description 是否显示 工时记录
+ * 1. 老版本vip版 支持
+ * 2. 标准版 不支持
+ * 3. 企业版 原生支持
+ * @return {Boolean} 是否支持开启显示
+ */
+export function isShowCardWorkTime(): boolean {
+  return commonJudgeShow()
+}

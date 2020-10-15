@@ -22,7 +22,7 @@
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
                 <i class="iconfont icon-nav-down" v-if="menu.children && menu.children.length > 0"></i>
-                <i class="red-dot" id="worktime_dot" v-if="menu.menuKey==='M_SYSTEM' && worktimeNoEnter"></i>
+                <i class="red-dot" id="worktime_dot" v-if="menu.menuKey==='M_SYSTEM' && worktimeNoEnter && isShowCardWorkTime"></i>
               </template>
             </a>
 
@@ -52,6 +52,7 @@ import MenuIcon from '../model/MenuIcon';
 import Logo from '@src/assets/img/logo.png';
 import MiniLogo from '@src/assets/svg/logo.svg';
 import { storageGet } from '@src/util/storage';
+import { isShowCardWorkTime } from '@src/util/version.ts'
 export default {
   name: 'frame-nav',
   props: {
