@@ -29,6 +29,7 @@ const BizSelectColumn = {
       columnTree: {},
       originColumns: [],
       show: false,
+      taskType: {}
     }
   },
   methods: {
@@ -72,6 +73,7 @@ const BizSelectColumn = {
         } else {
           // 按工单类型分组 ( 工单类型是不可以重名的，所以可以用 工单类型名字 为 key )
           let { templateName, templateId } = column
+          templateName = this.getTemplateName(templateId) || templateName
           // 判断是否 自定义字段组存在 此类型数据
           if (!attributeFieldsGroup[templateId]) {
             attributeFieldsGroup[templateId] = { name: templateName, columns: [] }
@@ -265,6 +267,13 @@ const BizSelectColumn = {
       
       this.columnSortList = sortList
     },
+    getTemplateName(templateId) {
+      let { taskType } = this
+      
+      if (templateId == taskType.id) return taskType.name
+      
+      return null
+    },
     /** 
      * @description 初始化排序列表
     */
@@ -308,8 +317,9 @@ const BizSelectColumn = {
     /** 
      * @description 显示 设置窗
     */
-    open(columns) {
-      this.originColumns = _.cloneDeep(columns);
+    open(columns, taskType) {
+      this.originColumns = _.cloneDeep(columns)
+      this.taskType = taskType
       this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
       this.show = true
     },

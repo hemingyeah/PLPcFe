@@ -127,7 +127,7 @@ export default {
           let taskDetailPath = `/task/view/${taskId}`;
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
           let url = isAllot ? taskAllotPath : taskDetailPath;
-          let id = isAllot ? 'task_allot' : 'task_view'
+          let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
 
           this.closeAndOpenTab(url, id)
           this.togglePending()
@@ -171,13 +171,13 @@ export default {
       if(this.isCopyTask) {
         let { taskId = '' } = this.urlParams;
         this.pending = true;
-        return this.closeAndOpenTab(`/task/view/${taskId}`, 'task_view')
+        return this.closeAndOpenTab(`/task/view/${taskId}`, `task_view${taskId}`)
       }
       // 事件转工单
       else if(this.isFromEvent) {
         let { eventId = '' } = this.urlParams;
         this.pending = true;
-        return this.closeAndOpenTab(`/event/view/${eventId}`, 'event_view');
+        return this.closeAndOpenTab(`/event/view/${eventId}`, `event_view${eventId}`);
       }
       // 工单新建
       else if (this.isTaskCreate) {
@@ -518,7 +518,7 @@ export default {
           let taskDetailPath = `/task/view/${taskId}`;
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
           let url = isAllot ? taskAllotPath : taskDetailPath;
-          let id = isAllot ? 'task_allot' : 'task_view'
+          let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
 
           this.closeAndOpenTab(url, id)
           this.togglePending()
