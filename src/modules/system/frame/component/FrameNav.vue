@@ -85,6 +85,9 @@ export default {
   computed: {
     logoImg(){
       return this.collapse ? MiniLogo : Logo;
+    },
+    isShowCardWorkTime() {
+      return isShowCardWorkTime()
     }
   },
   methods: {

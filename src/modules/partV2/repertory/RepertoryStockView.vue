@@ -121,7 +121,7 @@
         <base-button v-if="allowInout" type="primary" @event="outstockBatch();trackEventHandler('outStock')" native-type="submit">出库</base-button>
         <base-button v-if="allowInout" type="primary" @event="instockBatch($event);trackEventHandler('inStock')" native-type="submit">入库</base-button>
         <base-button v-if="allowInout && isShowPartTransfer" type="primary" @event="transferBatch($event);trackEventHandler('transfer')" native-type="submit">调拨</base-button>
-        <base-button v-if="allowInout && isPersonalRepertory !== false" type="primary" @event="partSparesBatchDialog($event);trackEventHandler('spare')" native-type="submit">分配</base-button>
+        <base-button v-if="allowInout && isPersonalRepertory !== false && isShowMoreSperaParts" type="primary" @event="partSparesBatchDialog($event);trackEventHandler('spare')" native-type="submit">分配</base-button>
         <base-button v-if="allowInout" type="primary" @event="openDialogForSetSafetyStock(selected);trackEventHandler('setSafeStock')" native-type="submit">设置安全库存</base-button>
 
         <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
@@ -231,7 +231,7 @@
               <el-button type="text" class="no-padding" size="medium" @click="outstock(scope.row);tableTrackEventHandler('outStock')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">出库</el-button>
               <el-button type="text" class="no-padding" size="medium" @click="instock(scope.row);tableTrackEventHandler('inStock')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">入库</el-button>
               <el-button type="text" class="no-padding" size="medium" @click="allocation(scope.row);tableTrackEventHandler('allocation')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isShowPartTransfer">调拨</el-button>
-              <el-button type="text" class="no-padding" size="medium" @click="partSparesDialog(scope.row);tableTrackEventHandler('spare')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isPersonalRepertory !== false">分配</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="partSparesDialog(scope.row);tableTrackEventHandler('spare')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isPersonalRepertory !== false && isShowMoreSperaParts">分配</el-button>
               <el-button type="text" class="no-padding" size="medium" @click="apply(scope.row);tableTrackEventHandler('apply')" v-if="isEnableSparePart(scope.row) && allowApply && isShowPartApply">申领</el-button>
             </template>
             <template v-else>
@@ -543,7 +543,7 @@ import DateUtil from '@src/util/date'
 import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
 
-import { isShowPartTransfer, isShowPartApply } from '@src/util/version.ts'
+import { isShowPartTransfer, isShowPartApply, isShowMoreSperaParts } from '@src/util/version.ts'
 
 const STORAGE_COLNUM_KEY = 'repertory_list_column';
 const STORAGE_PAGESIZE_KEY = 'repertory_list_pagesize';
@@ -713,6 +713,9 @@ export default {
     isShowPartApply() {
       return isShowPartApply()
     },
+    isShowMoreSperaParts() {
+      return isShowMoreSperaParts()
+    }
   },
   methods: {
     cancelSelectPart(part) {
