@@ -20,7 +20,7 @@
     </h3>
     <!--  -->
       <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
-        <i class="iconfont icon-triangle-down task-icon" v-if="show"></i>
+        <i class="iconfont icon-triangle-down task-icon" v-if="!show"></i>
         <i class="iconfont icon-up task-icon" v-else></i>
         <span class="task-font16">常用查询条件</span>
         <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
@@ -34,8 +34,9 @@
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form" onsubmit="return false;">
       <!-- S 搜索条件 -->
-      <el-form class="advanced-search-form" onsubmit="return false;" v-show="show">
+      <el-form class="advanced-search-form" onsubmit="return false;">
         <task-search-form
+          v-show="show"
           class="task-search-forms"
           :fields="fields"
           ref="searchForm"
@@ -168,7 +169,10 @@ export default {
     fields() {
       let f = {};
       let selfFields = []
-      let fields = [...this.selfFields].map((field) => {
+      let fields = [...this.selfFields].filter(item => {
+        let bool = [...this.taskTypeFilterFields, ...this.config].some(v => {return item.displayName === v.displayName})
+        if (bool) return item
+      }).map((field) => {
           f = _.cloneDeep(field);
           let formType = f.formType;
 
@@ -195,7 +199,6 @@ export default {
         
         selfFields.push(originField ? originField : field)
       })
-
       return selfFields;
     },
     panelWidth() {
@@ -203,19 +206,22 @@ export default {
     },
   },
   mounted() {
-    const { column_number } = this.getLocalStorageData();
-    const searchField = localStorage.getItem('task-search-field')
-
-    if (column_number) this.columnNum = Number(column_number)
-
-    if (searchField) {
-      this.selfFields = JSON.parse(searchField).list
-      this._taskInquireList()
-    } else {
-      this.selfFields = []
-    }
+    this._selfFields()
   },
   methods: {
+    _selfFields() {
+      const { column_number } = this.getLocalStorageData();
+      const searchField = localStorage.getItem('task-search-field')
+
+      if (column_number) this.columnNum = Number(column_number)
+
+      if (searchField) {
+        this.selfFields = JSON.parse(searchField).list
+        this._taskInquireList()
+      } else {
+        this.selfFields = []
+      }
+    },
     buildParams() {
       const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()}
       this.formBackup = Object.assign({}, form)

@@ -54,7 +54,6 @@ export default {
   },
   methods: {
     buildForm() {
-      console.log(this.fields)
       if (Object.keys(this.form).length === this.fields.length) return;
       this.initFormVal();
     },
