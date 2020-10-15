@@ -362,7 +362,7 @@
         <!-- end 部门 header -->
 
         <!-- start 下级部门 -->
-        <div class="department-child-block">
+        <div class="department-child-block" v-if="isShowCreateChildrenTeam">
           <div class="department-child-block-header">
             <div class="department-child-block-header-text">
               <i class="iconfont icon-bumen"></i>
