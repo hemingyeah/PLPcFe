@@ -101,9 +101,7 @@ export default {
         );
       });
 
-
       let backUp = this.formBackup.backUp || {};
-
       this.$set(this, "customer", backUp.customer || {});
       this.$set(this, "product", backUp.product || {});
 
@@ -141,6 +139,7 @@ export default {
 
       if (f.fieldName == "customer") {
         let value = this.form[f.fieldName];
+        console.log('请选择客户', this.customer.name)
         childComp = h("search-customer-select", {
           props: {
             placeholder: "请选择客户",

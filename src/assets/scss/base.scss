@@ -188,10 +188,10 @@ textarea {
     }
   }
   .ascending {
-    border-bottom-color: #333!important;
+    border-bottom-color: #999!important;
   }
   .descending {
-    border-top-color: #333!important;
+    border-top-color: #999!important;
   }
   .el-table .ascending .sort-caret.ascending {
     border-bottom-color:#55B7B4!important;
@@ -226,6 +226,9 @@ textarea {
     &:hover {
       background-color: #e7f9f9;
       color: #42cece;
+    }
+    &:hover .task-list-dropdown-icon {
+      display: block;
     }
   }
 }

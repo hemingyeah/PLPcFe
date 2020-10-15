@@ -10,7 +10,7 @@
         <!-- 搜索 -->
         <div class="task-search-seo task-flex task-ai">
             <div class="task-search-input">
-                <el-input placeholder="请输入内容" v-model="seoText" class="input-with-select">
+                <el-input placeholder="请输入字段名称" v-model="seoText" class="input-with-select">
                     <el-button slot="append" icon="el-icon-search" @click="taskSearch"></el-button>
                 </el-input>
             </div>

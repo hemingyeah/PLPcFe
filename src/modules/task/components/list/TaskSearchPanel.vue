@@ -41,8 +41,8 @@
         >
         </task-search-form>
           <div class=" task-pointer">
-            <span class="task-font16">设置查询条件</span>
-            <span class="task-font14 task-c9 task-ml12">请添加查询条件</span>
+            <span class="task-font16">添加查询条件</span>
+            <span class="task-font14 task-c9 task-ml12"></span>
           </div>
       <!-- 设置查询条件 -->
         <task-inquire 
@@ -342,9 +342,8 @@ export default {
     },
     buildTaskInquireParams(params) {
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields()
-      const form = this.$refs.taskInquireParams.returnData()
-
-      this.formBackup = Object.assign(this.formBackup, form);
+      const form = this.$refs.taskInquireParams.returnData() 
+      this.formBackup = Object.assign(this.formBackup, {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()});
 
       const isSystemFields = taskInquireList.filter((f) => f.isSystem);
       const notSystemFields = taskInquireList.filter((f) => !f.isSystem);

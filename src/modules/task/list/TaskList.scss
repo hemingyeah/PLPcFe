@@ -2,7 +2,7 @@
   width: 52px;
   height: 22px;
   border-radius: 11px;
-  margin-left: 5px;
+  margin-left: 8px;
   margin-top: 5px;
   text-align: center;
   line-height: 22px;
@@ -287,4 +287,21 @@
 }
 .task-list-dropdown-item {
   width: 100px;
+}
+.task-list-dropdown-icon {
+  display: none;
+}
+.task-list-numbering {
+  display: inline-block;
+  min-width: 100px;
+}
+.task-buttom {
+  > button {
+  margin: 0!important;
+  margin-right: 10px!important;
+  }
+}
+.task-icon {
+  font-size: 12px!important;
+  color: #999!important;
 }
