@@ -78,6 +78,8 @@ const BizSelectColumn = {
           if (!attributeFieldsGroup[templateId]) {
             attributeFieldsGroup[templateId] = { name: templateName, columns: [] }
           }
+          
+          column.templateName = templateName
           attributeFieldsGroup[templateId].columns.push(column)
         }
 
