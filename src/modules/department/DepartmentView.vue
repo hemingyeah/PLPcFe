@@ -41,7 +41,7 @@
         <!-- end 部门 header -->
 
         <!-- start 下级部门 -->
-        <div class="department-child-block">
+        <div class="department-child-block" v-if="isShowCreateChildrenTeam">
           
           <div class="department-child-block-header">
 
@@ -68,7 +68,7 @@
           </div>
           <!-- end 下级部门列表 -->
 
-          <div class="no-data-block" v-else>
+          <div class="no-data-block" v-else-if="isShowCreateChildrenTeam">
             当前部门不包含下级部门 <span class="active-btn" @click="addDepartment">添加子部门</span>
           </div>
 
@@ -194,6 +194,7 @@ import {
 import CreateUserPanel from './component/CreateUserPanel.vue';
 import DepartmentEditPanel from './component/DepartmentEditPanel.vue';
 /* utils */
+import { isShowCreateChildrenTeam } from '@src/util/version.ts'
 import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
@@ -225,6 +226,9 @@ export default {
     subDepartments() {      
       return this.selectedDept.subDepartments || [];
     },
+    isShowCreateChildrenTeam() {
+      return isShowCreateChildrenTeam(this.initData)
+    }
   },
   mounted() {
     this.initialize();
