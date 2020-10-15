@@ -105,7 +105,46 @@ export default {
       this.$set(this, "customer", backUp.customer || {});
       this.$set(this, "product", backUp.product || {});
 
+      // this._inPar()
       return form;
+    },
+    /**
+     * 初始参数转换
+     */
+    initialParams(key, item) {
+      let value;
+      if (key === "onceReallot") {
+        switch (item) {
+          case 1:
+            value = '是';
+            break;
+          default:
+            value = "全部";
+            break;
+        }
+      }
+
+        // switch (item) {
+        //   case 1:
+        //     value = '曾超时';
+        //     break;
+        //   case 2:
+        //     value = '曾拒绝';
+        //     break;
+        //   case 3:
+        //     value = '曾暂停';
+        //     break;
+        //   case 4:
+        //     value = '曾回退';
+        //     break;
+        //   case 5:
+        //     value = '位置异常';
+        //     break;
+        //   default:
+        //     value = "";
+        //     break;
+        // }
+      return value
     },
     /**
      * 自定义初始化参数
@@ -113,13 +152,29 @@ export default {
     _inPar() {
       let inPar = [] // 初始化的参数
       for(let key in this.searchParams) {
-        if (JSON.stringify(this.searchParams[key]) !== '[]' && this.searchParams[key] && key !== 'pageSize' && key !== 'page' && key !== 'pageNum' && key !== 'stateList' && key !== 'whoseInfo' && key !== 'isPermission') {
+        if (JSON.stringify(this.searchParams[key]) !== '[]' && this.searchParams[key] && key !== 'pageSize' && key !== 'page' && key !== 'pageNum' && key !== 'stateList' && key !== 'whoseInfo' && key !== 'isPermission' && key !== 'distance' && key !== 'orderDetail' && key !== 'sortBy') {
           inPar.push({key, value: this.searchParams[key]})
         }
       }
-      console.log('初始化的参数', inPar)
+      inPar.forEach(({key, value}) => {
+        if (key === 'levels') {
+          this.form.level = value
+        } else if (key === 'level') {
+          this.form.level = [value]
+        } else if (key === 'onceReallot') {
+          this.form.onceReallot = this.initialParams(key, value)
+        } else if (key === 'acceptTimeStart') {
+          this.form.acceptTime[0] = this.initialParams(key, value)
+        } else if (key === 'acceptTimeEnd') {
+          this.form.acceptTime[1] = this.initialParams(key, value)
+        } else {
+          this.form[key] = value
+        }
+      })
+
+      console.log('初始化的参数', inPar, this.form)
     },
-    
+
     renderInput(h, field) {
       const f = _.cloneDeep(field)
       let comp = FormFieldMap.get(f.formType);
@@ -139,7 +194,6 @@ export default {
 
       if (f.fieldName == "customer") {
         let value = this.form[f.fieldName];
-        console.log('请选择客户', this.customer.name)
         childComp = h("search-customer-select", {
           props: {
             placeholder: "请选择客户",

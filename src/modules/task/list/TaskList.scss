@@ -293,15 +293,11 @@
 }
 .task-list-numbering {
   display: inline-block;
-  min-width: 100px;
+  min-width: 110px;
 }
 .task-buttom {
   > button {
   margin: 0!important;
   margin-right: 10px!important;
   }
-}
-.task-icon {
-  font-size: 12px!important;
-  color: #999!important;
 }

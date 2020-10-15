@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="(item, index) in list" :key="index">
-      <batch-form :fields="fields" :column-num="columnNum" ref="batchForm" @add="add" @setting="setting" />
+      <batch-form :fields="fields" :column-num="columnNum" :list="list" :index="index" ref="batchForm" @add="add" @del="del" @setting="setting" />
     </div>
   </div>
 </template>
@@ -207,6 +207,9 @@ export default {
     add() {
       this.list.push(1)
     },
+    del (index) {
+      this.list = this.list.filter((item, i) => {return index !== i})
+    },
     setting(item) {
       if (item.isSystem) {
         this.checkSystemList.push(item.displayName)
@@ -234,6 +237,14 @@ export default {
           type: Array,
           default: () => [],
         },
+        list: {
+          type: Array,
+          default: [],
+        },
+        index: {
+          type: Number,
+          default: 0
+        },       
         columnNum: {
           type: Number,
           default: 1
@@ -337,6 +348,7 @@ export default {
             <el-select
               value={this.selectedField.fieldName}
               onChange={this.selectField}
+              filterable
             >
               {
                 this.fields.map((f) => (
@@ -495,14 +507,19 @@ export default {
               <div>
                 { this.renderSelector() }
                 { this.renderOperateSelect() }
-              </div>
+              </div>             
+                <div class={this.columnNum === 2 ? 'task-inquire-two task-flex task-ai' : 'task-inquire task-flex task-ai'}>
+                  {this.renderInput(h)}
+                  {
+                    this.list.length - 1 === this.index ?  
+                      <div class="task-font14 task-c13 task-inquire-add task-ml15 task-pointer" onClick={() => {
+                        this.$emit('add')
+                      }}>添加</div>  : <i class="iconfont icon-yemianshanchu task-pointer task-ml15" onClick={() => {
+                        this.$emit('del', this.index)
+                      }}></i>
+                  }
+                </div>
               
-              <div class={this.columnNum === 2 ? 'task-inquire-two task-flex task-ai' : 'task-inquire task-flex task-ai'}>
-                {this.renderInput(h)}
-                <div class="task-font14 task-c13 task-inquire-add task-ml15 task-pointer" onClick={() => {
-                  this.$emit('add')
-                }}>添加</div>
-              </div>
 
             </div>
 

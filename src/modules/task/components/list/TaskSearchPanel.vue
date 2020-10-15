@@ -19,20 +19,24 @@
       </el-dropdown>
     </h3>
     <!--  -->
-      <div class="task-search-panel-title task-pointer" @click="show =!show">
-        <i class="iconfont icon-triangle-down task-c3" v-if="show"></i>
-        <i class="iconfont icon-up task-c3" v-else></i>
+      <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
+        <i class="iconfont icon-triangle-down task-icon" v-if="show"></i>
+        <i class="iconfont icon-up task-icon" v-else></i>
         <span class="task-font16">常用查询条件</span>
-        <span slot="reference" class="task-font14 task-c2 task-ml12" @click.stop="$refs.taskSearchPupal.open()">设置</span>
+        <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
+        <span>
+          <el-tooltip content="常用查询条件可以通过“设置”功能，进行添加和修改" placement="top">
+            <i class="iconfont icon-question task-icon"></i>
+          </el-tooltip>
+        </span>
       </div>
     </div>
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form" onsubmit="return false;">
       <!-- S 搜索条件 -->
-      <el-form class="advanced-search-form" onsubmit="return false;">
+      <el-form class="advanced-search-form" onsubmit="return false;" v-show="show">
         <task-search-form
           class="task-search-forms"
-          :class="{'hide': show}"
           :fields="fields"
           ref="searchForm"
           :searchParams="searchParams"
@@ -40,9 +44,13 @@
           :column-num="columnNum"
         >
         </task-search-form>
-          <div class=" task-pointer">
-            <span class="task-font16">添加查询条件</span>
-            <span class="task-font14 task-c9 task-ml12"></span>
+          <div class="task-pointer task-flex task-ai">
+            <span class="task-font16 task-mr4">添加查询条件</span>
+            <span>
+                <el-tooltip content="您可以通过“添加”按钮设置更多的查询条件" placement="top">
+                  <i class="iconfont icon-question task-icon"></i>
+                </el-tooltip>
+            </span>
           </div>
       <!-- 设置查询条件 -->
         <task-inquire 
@@ -143,7 +151,7 @@ export default {
       selfFields: [],
       taskInquireList: [],
       visible: false,
-      show: false,
+      show: true,
       guide: true,
       taskAllFields: [],
       taskAllFieldsMap: {}
