@@ -43,7 +43,7 @@ const BizSelectColumn = {
           return { name: columns[key].name, lists: this.buildSortLists(columns[key]) }
         })
       } else {
-        lists = columns.filter(column => column.show)
+        lists = columns.filter(column => column?.show)
       }
 
       return lists
@@ -65,8 +65,10 @@ const BizSelectColumn = {
       
 
       columns.forEach(column => {
+        if (!column) return false
+        
         // 是否是系统字段
-        let isSystemFiled = !column.templateId 
+        let isSystemFiled = !(column?.templateId)
 
         if (isSystemFiled) {
           systemFieldsGroup.push(column)
@@ -111,7 +113,7 @@ const BizSelectColumn = {
       field.show = value;
 
       // 判断当前父级下的子级是否全选
-      const isCheckedAll = parent.columns.every(column => column.show)
+      const isCheckedAll = parent.columns.every(column => column?.show)
       parent.checked = isCheckedAll
 
       // 判断如果父级全选，则去寻找父级的兄弟层级，进而判断 父父级的状态
@@ -208,7 +210,7 @@ const BizSelectColumn = {
     */
     columnSortListFieldPush(columns, sortList) {
       columns.forEach(column => {
-        let isHave = sortList.some(list => list.fieldName == column.fieldName)
+        let isHave = sortList.some(list => list.fieldName == column?.fieldName)
         if (!isHave) {
           sortList.push(convertDisplayNameToName(column))
         }
@@ -283,8 +285,8 @@ const BizSelectColumn = {
       const TemplateMap = {}
       let sortList = []
 
-      originColumns.filter(column => column.show).forEach((column, index) => {
-        let isSystemFiled = !column.templateId
+      originColumns.filter(column => column && column?.show).forEach((column, index) => {
+        let isSystemFiled = !(column?.templateId)
 
         // 系统字段直接添加至 根级
         if (isSystemFiled) {
@@ -403,10 +405,12 @@ const BizSelectColumn = {
           columns.push(convertColumnWithSave(column))
         }
       })
-
+      
       let columnMap = columns.reduce((acc, column) => (acc[column.fieldName] = column) && acc, {});
 
       this.originColumns.forEach(originColumn => {
+        if (!originColumn) return false
+        
         let { fieldName } = originColumn
         let sortColumn = columnMap[fieldName]
         if (!sortColumn) {
@@ -448,7 +452,7 @@ const BizSelectColumn = {
       if (isColumnsObject) {
         for(let key in parent.columns) {
           let column = parent.columns[key]
-          isChildAllChecked = column.checked
+          isChildAllChecked = Boolean(column?.checked)
   
           if (!isChildAllChecked) break;
         }
@@ -466,7 +470,7 @@ const BizSelectColumn = {
       if (isColumnsObject) {
         checked = Object.keys(treeNode.columns).every(key => this.toggleTreeChecked(treeNode.columns[key]))
       } else {
-        checked = treeNode.columns.every(column => column.show)
+        checked = treeNode.columns.every(column => column?.show)
       }
 
       treeNode.checked = checked
