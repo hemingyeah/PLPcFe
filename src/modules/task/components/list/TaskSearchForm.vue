@@ -124,26 +124,45 @@ export default {
         }
       }
 
-        // switch (item) {
-        //   case 1:
-        //     value = '曾超时';
-        //     break;
-        //   case 2:
-        //     value = '曾拒绝';
-        //     break;
-        //   case 3:
-        //     value = '曾暂停';
-        //     break;
-        //   case 4:
-        //     value = '曾回退';
-        //     break;
-        //   case 5:
-        //     value = '位置异常';
-        //     break;
-        //   default:
-        //     value = "";
-        //     break;
-        // }
+      if(key === 'flags') {
+        value = []
+        item.forEach(v => {
+          if (v === 'ONCEOVERTIME') {
+            value.push('曾超时')
+          } else if (v === 'ONCEREFUSED') {
+            value.push('曾拒绝')
+          } else if (v === 'ONCEPAUSED') {
+            value.push('曾暂停')
+          } else if (v === 'ONCEROLLBACK') {
+            value.push('曾回退')
+          } else {
+            value.push('位置异常')
+          }
+        })
+      }
+
+      if (key === 'createUser') {
+        switch (item) {
+          case 1:
+            value = '曾超时';
+            break;
+          case 2:
+            value = '曾拒绝';
+            break;
+          case 3:
+            value = '曾暂停';
+            break;
+          case 4:
+            value = '曾回退';
+            break;
+          case 5:
+            value = '位置异常';
+            break;
+          default:
+            value = "";
+            break;
+        }
+      }
       return value
     },
     /**
@@ -179,11 +198,36 @@ export default {
           this.form.serviceContent = value
         } else if (key === 'serviceContent') {
           this.form.serviceContent = [value]
+        } else if (key === "cusProvince") {
+          this.form.area['province'] = value
+        } else if (key === "cusCity") {
+          this.form.area['city'] = value
+        } else if (key === "cusDist") {
+          this.form.area['dist'] = value
+        } else if (key === "payTypes") {
+          this.form.paymentMethod = value
+        } else if (key === "paymentMethod") {
+          this.form.paymentMethod = [value]
+        } else if (key === 'flags') {
+          this.form.onceException = this.initialParams(key, value)
+        } else if (key === 'onceException') {
+          this.form.onceException = this.initialParams(key, value)
+        } else if (key === 'createUserIds') {
+          this.form.createUser = value
+        } else if (key === 'createUser') {
+          this.form.createUser = [value]
+        } else if (key === 'allotUserIds') {
+          this.form.allotUser = value
+        } else if (key === 'allotUser') {
+          this.form.allotUser = [value]
+        } else if (key === 'executorUserIds') {
+          this.form.executor = value
+        } else if (key === 'executor') {
+          this.form.executor = [value]
         } else {
           this.form[key] = value
         }
       })
-
       console.log('初始化的参数', inPar, this.form)
     },
 
@@ -356,6 +400,7 @@ export default {
       }
       const f = event.field;
       this.form[f.fieldName] = event.newValue;
+      console.log(this.form)
     },
   
   },

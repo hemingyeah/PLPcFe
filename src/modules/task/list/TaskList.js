@@ -1913,7 +1913,11 @@ export default {
           }
         }
         
-        this.searchParams = { ...this.searchParams, ...par };
+        for(let key in par) {
+          if (par[key] && JSON.stringify(par[key]) !== '[]' && JSON.stringify(par[key]) !== '{}') {
+            this.searchParams[key] = par[key]
+          }
+        }
         /* E 高级搜索条件*/
       } else {
         this.$refs.searchPanel.resetParams();
