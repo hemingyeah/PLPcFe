@@ -42,7 +42,7 @@
 <script>
 import goodsImg from "@src/assets/img/no-data.png";
 import defaultImg from "@src/assets/img/myShop/default.png";
-import { orderDeliver } from "@src/api/Linkc";
+import { orderDeliver } from "@src/api/LinkcApi";
 export default {
   name: "goods-dialog",
   props: {

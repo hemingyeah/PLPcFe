@@ -248,7 +248,7 @@ import {
   saveInfos,
   weChat,
   getEventList,
-} from "@src/api/Linkc";
+} from "@src/api/LinkcApi";
 
 export default {
   name: "my-shop",

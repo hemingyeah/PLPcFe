@@ -330,7 +330,7 @@ import Page from "@model/Page";
 import platform from "@src/platform";
 import { formatDate } from "@src/util/lang";
 
-import { orderList, orderNum } from "@src/api/Linkc";
+import { orderList, orderNum } from "@src/api/LinkcApi";
 import componentMixin from "../component/index";
 import BaseGallery from "../../../../../packages/BaseGallery";
 
