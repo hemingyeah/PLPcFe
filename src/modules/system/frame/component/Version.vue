@@ -74,7 +74,7 @@ export default {
       return false;
     },
     seeHelp(){
-      platform.openLink(`https://www.yuque.com/shb/updatelog/${this.version.replace(' ', '')}`);
+      platform.openLink(`https://www.yuque.com/shb/updatelog2/${this.version.replace(' ', '')}`);
       this.show = false;
     }
   },
