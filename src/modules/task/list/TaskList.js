@@ -68,6 +68,7 @@ export default {
       isViewModel: "默认", //视图是否保存过
       advanceds: advancedList, //高级搜索列表
       searchParams: {}, //筛选列表的参数
+      searchParams_spare: {},
       dropDownInfo: "", //顶部下拉
       mapShow: true, //地图预览
       selectColumnState: "", //视图选择列状态存储
@@ -461,6 +462,8 @@ export default {
       this.filterId = "";
       this.allShow = false;
       this.selectColumnState = title;
+      this.searchParams = searchModel
+      this.searchParams_spare = searchModel
       this.params = this.initParams();
 
       if (searchModel.createUser) {
@@ -498,6 +501,8 @@ export default {
       this.filterId = id;
       this.otherText = "自定义筛选视图";
       this.selectColumnState = title;
+      this.searchParams = searchModel
+      this.searchParams_spare = searchModel
       this.getTaskCountByState(searchModel);
       this.params = this.initParams();
       this.search(searchModel);
@@ -1310,16 +1315,10 @@ export default {
       // this.loading = true;
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
         .then((res) => {
-          let searchModel;
           this.planTimeType = res[0].filter((item) => {
             return item.displayName === "计划时间";
           })[0].setting.dateType;
-          this.taskView.map((item) => {
-            if (item.id === this.filterId) {
-              searchModel = item.searchModel;
-            }
-          });
-          this.search(searchModel);
+          this.search(this.searchParams);
           this.buildColumns();
           this.seoSet()
           this._exportColumns()
@@ -1921,9 +1920,11 @@ export default {
           }
         }
         
-        for(let key in par) {
-          if (par[key] && JSON.stringify(par[key]) !== '[]' && JSON.stringify(par[key]) !== '{}') {
-            this.searchParams[key] = par[key]
+        this.searchParams = {...this.searchParams, ...par}
+        
+        for(let key in this.searchParams_spare) {
+          if (this.searchParams_spare[key] && JSON.stringify(this.searchParams_spare[key]) !== '[]' && JSON.stringify(this.searchParams_spare[key]) !== '{}') {
+            this.searchParams[key] = this.searchParams_spare[key]
           }
         }
         /* E 高级搜索条件*/
