@@ -665,7 +665,7 @@ export default {
       if (await platform.confirm("您确定要退出系统吗？")) {
         window.location.href = platform.inDingTalk
           ? "/smlogin/pc/logout"
-          : "/logout?tenantId="+this.initData.tenantId;
+          : "/logout";
       }
     },
     openHelpDoc(event) {
