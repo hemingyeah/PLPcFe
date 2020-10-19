@@ -17,6 +17,12 @@ export default class Field{
     this.isAdd = options.isAdd || 1;
     this.isAppShow = options.isAppShow || 0;
 
+    this.isDuplicateEntry = options.isDuplicateEntry || 0;
+    this.isVisibility = options.isVisibility || 0;
+    this.isPublic = options.isPublic || 0;
+    this.isScancode = options.isScancode || 0;
+    
+    
     this.placeHolder = options.placeHolder;
     this.setting = options.setting || {};
     this.defaultValue = options.defaultValue;

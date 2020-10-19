@@ -67,7 +67,7 @@ export default {
 
         let message = FormUtil.validate(fields);
         if(!FormUtil.notification(message, this.$createElement)) return;
-
+        
         this.pending = true;
         let result = await http.post('/setting/customer/saveFields', fields);
         if(result.status == 0){

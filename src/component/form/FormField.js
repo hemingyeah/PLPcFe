@@ -59,6 +59,19 @@ export default class FormField{
     this.displayName = params.displayName || '标题'; 
     // 是否必填   0 - 必填，1 - 非必填
     this.isNull = typeof params.isNull == 'number' ? params.isNull : 1; 
+    
+    // 是否允许重复录入   0 - 不允许，1 - 允许
+    this.isDuplicateEntry = typeof params.isDuplicateEntry == 'number' ? params.isDuplicateEntry : 1; 
+
+    // 是否可见性  0 - 不可见，1 - 可见
+    this.isVisibility = typeof params.isVisibility == 'number' ? params.isVisibility : 1; 
+    
+    // 是否设为公用字段  0 - 非公用，1 - 公用
+    this.isPublic = typeof params.isPublic == 'number' ? params.isPublic : 1; 
+    
+    // 是否支持扫码  0 - 不支持，1 - 支持
+    this.isScancode = typeof params.isScancode == 'number' ? params.isScancode : 1; 
+
     // 是否允许搜索 0 - 不允许，1 - 允许
     this.isSearch = typeof params.isSearch == 'number' ? params.isSearch : 0; 
     this.placeHolder = params.placeHolder; // 提示信息
@@ -113,6 +126,11 @@ export default class FormField{
     option.placeHolder = field.placeHolder;
     option.isSystem = field.isSystem;
     option.isAppShow = field.isAppShow;
+
+    option.isDuplicateEntry = field.isDuplicateEntry;
+    option.isVisibility = field.isVisibility;
+    option.isPublic = field.isPublic;
+    option.isScancode = field.isScancode;
 
     if(field.relation_options) {
       option.relation_options = field.relation_options;
