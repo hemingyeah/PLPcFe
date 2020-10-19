@@ -1,5 +1,6 @@
 /* Api */
 import * as TaskApi from "@src/api/TaskApi.ts";
+import { createServiceReportBatch } from "@src/api/ExcelsApi"
 
 /* components */
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";
@@ -2398,6 +2399,28 @@ export default {
       }
 
       this.saveDataToStorage('columnStatus', columnsStatus);
+    },
+    /**
+     * @description 批量下载服务报告
+    */
+    serviceReportBatchDownload() {
+      // 验证
+      if (this.selectedIds.length <= 0) {
+        return this.$platform.alert('请选择需要批量下载的数据')
+      }
+      // 构建参数
+      let params = { isPdf: true, taskIds: this.selectedIds }
+      // 创建下载
+      createServiceReportBatch(params)
+        .then(result => {
+          this.$platform.alert(result.message || '')
+          // 打开后台任务弹窗
+          window.parent.showExportList()
+          window.parent.exportPopoverToggle(true)
+        })
+        .catch(err => {
+          console.error(err)
+        })
     }
   },
   components: {

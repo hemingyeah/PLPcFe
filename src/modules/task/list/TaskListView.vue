@@ -422,7 +422,6 @@
             <!-- v-if="exportPermission" -->
             <el-dropdown
               trigger="click"
-              v-if="exportPermission || exportPermissionTaskEdit"
             >
               <div
                 class="task-ai task-flex task-font14 task-c6 task-pointer"
@@ -459,6 +458,9 @@
                   "
                 >
                   <div @click="reallotBatch">工单转派</div>
+                </el-dropdown-item>
+                <el-dropdown-item v-if="exportPermissionTaskEdit">
+                  <div @click="serviceReportBatchDownload">批量下载服务报告</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
