@@ -119,8 +119,8 @@ import platform from '@src/platform'
 import http from '@src/util/http';
 /** constants */
 
-// 支持下载的actions
-const SupportDownloadActions = ['export', 'taskServiceReportBatch']
+// 支持下载的actions  导出/批量生成服务报告/批量打印服务报告
+const SupportDownloadActions = ['export', 'taskServiceReportBatch', 'taskServicePrintBatch']
 
 export default {
   name: 'import-and-export-view',
@@ -158,7 +158,7 @@ export default {
       
       switch (itemAction) {
         case 'export': {
-          url = 'excels/cancel';
+          url = '/excels/cancel';
           break;
         }
         case 'import': {
@@ -173,11 +173,8 @@ export default {
           url = '/excels/performance/cancel';
           break;
         }
-        case 'taskServiceReportBatch': {
-          url = '/excels/delete/manual';
-          break;
-        }      
         default: {
+          url = '/excels/cancel';
           break;
         }
       }
@@ -207,8 +204,10 @@ export default {
     /** @deprecated */
     async execExportFile(item){
       let action = item.action == 'import' ? '导入' : '更新';
+      const Finished = item.isFinished == 1
+
       // 导出 取消下载文件
-      if((item.action == 'export' || !item.action) && item.isFinished == 0) {
+      if(this.showOperateButton(item) && !Finished) {
         if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
           
           this.operationList.push({id: item.id, operate: 'cancel'})
@@ -232,7 +231,7 @@ export default {
         }
       }
       // 导出 下载文件
-      if((item.action == 'export' || !item.action) && item.isFinished == 1){
+      if((item.action == 'export' || !item.action) && Finished){
         let frame = document.createElement('iframe');
         frame.style.display = 'none';
         frame.src = `/excels/download?id=${item.id}`;
@@ -243,7 +242,7 @@ export default {
         return
       }
       // 导入或批量更新 取消
-      if((item.action == 'import' || item.action == 'update') && item.isFinished == 0) {
+      if((item.action == 'import' || item.action == 'update') && !Finished) {
         if(await platform.confirm(`确定要取消文件[${item.name}]的${action}？`)){
           
           this.operationList.push({id: item.id, operate: 'cancel'})

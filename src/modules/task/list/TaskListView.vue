@@ -382,6 +382,16 @@
               <i class="iconfont icon-bianji1 task-icon"></i>
               批量编辑
             </div>
+            <!-- start 批量生成服务报告 -->
+            <div class="task-list-batch-button task-font14 task-c06" @click="batchCreateServiceReport">
+              批量生成服务报告
+            </div>
+            <!-- end 批量生成服务报告 -->
+            <!-- start 批量打印服务报告 -->
+            <div class="task-list-batch-button task-font14 task-c06" @click="batchPrintServiceReport">
+              批量打印服务报告
+            </div>
+            <!-- end 批量打印服务报告 -->
           </div>
 
           <div class="action-button-group task-flex task-ai">
@@ -458,9 +468,6 @@
                   "
                 >
                   <div @click="reallotBatch">工单转派</div>
-                </el-dropdown-item>
-                <el-dropdown-item v-if="exportPermissionTaskEdit">
-                  <div @click="serviceReportBatchDownload">批量下载服务报告</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -773,7 +780,7 @@
                   {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
                 </template>
                 <template v-else-if="!column.isSystem">
-                  <template v-if="scope.row.attribute && scope.row.attribute[column.field] instanceof Array">
+                  <template v-if="scope.row.attribute && Array.isArray(scope.row.attribute[column.field])">
                     {{scope.row.attribute[column.field].join(',')}}
                   </template>
                   <template v-else>
