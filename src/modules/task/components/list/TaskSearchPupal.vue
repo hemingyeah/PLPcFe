@@ -10,7 +10,7 @@
         <!-- 搜索 -->
         <div class="task-search-seo task-flex task-ai">
             <div class="task-search-input">
-                <el-input placeholder="请输入内容" v-model="seoText" class="input-with-select">
+                <el-input placeholder="请输入字段名称" v-model="seoText" class="input-with-select" @keyup.enter.native="taskSearch">
                     <el-button slot="append" icon="el-icon-search" @click="taskSearch"></el-button>
                 </el-input>
             </div>
@@ -70,11 +70,12 @@ export default {
            seoText: '',
            checkSystemList: [], //选中系统字段
            checkCustomizeList: [], //选中自定义字段
-           systemList: this.config, //系统字段
+           systemList: [], //系统字段
            customizeList: this.taskTypeFilterFields, //自定义字段
         }
     },
     mounted() {
+        this.systemList = this.config
         this.loc()
     },
     methods: {
@@ -107,6 +108,7 @@ export default {
         reset() {
            this.systemList= this.config
            this.customizeList= this.taskTypeFilterFields
+           this.seoText = ''
         },
         onSubmit() {
             const {checkSystemList, checkCustomizeList, config, taskTypeFilterFields} = this

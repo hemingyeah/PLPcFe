@@ -7,7 +7,6 @@ export const AllotTypeConvertMap = {
 }
 // 工单标记 数据转换
 export const FlagConvertMap = {
-  '不筛选': '',
   '曾超时': 'ONCEOVERTIME',
   '曾拒绝': 'ONCEREFUSED',
   '曾暂停': 'ONCEPAUSED',

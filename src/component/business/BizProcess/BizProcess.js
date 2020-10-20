@@ -12,7 +12,7 @@ const TaskStateProcessArray = [
   TaskStateProcessEnum.PROCESSING,
   TaskStateProcessEnum.FINISHED
 ]
-const ProcessItemWidth = 162;
+const ProcessItemWidth = 108;
 
 const BizProcess = {
   name: 'biz-process',
@@ -56,7 +56,7 @@ const BizProcess = {
     genCurrentStateIndex() {
       let index = 0;
       let state = null;
-
+      
       for(let i = 0; i < this.genStateProcess.length; i++) {
         state = this.genStateProcess[i]
         if (this.isCurrentState(state)) {
@@ -71,7 +71,7 @@ const BizProcess = {
       let genCurrentStateIndex = this.genCurrentStateIndex;
       let left = ProcessItemWidth * this.genCurrentStateIndex;
       return {
-        left: `${ genCurrentStateIndex == 1 ? left + 66 : left }px`
+        left: `${ genCurrentStateIndex == 1 ? left + 39 : left }px`
       }
     },
     // 判断是否是以取消
@@ -96,26 +96,26 @@ const BizProcess = {
     genStateProcessClassName(state, index) {
       let className = ['biz-process-state']
       let isSelected = Array.isArray(this.selected) ? _.isEqual(this.selected, state.value) : this.selected == state.value;
-
+      
       state.isCurrent = this.genCurrentStateIndex == index
       state.isBefore = this.genCurrentStateIndex > index
       state.isAfter = this.genCurrentStateIndex < index
       state.isFirst = index == 0;
       state.isLast = index == this.genStateProcess.length - 1;
       state.isSelected = isSelected;
-
+      
       state.isSelected && className.push('biz-process-state-selected')
       state.isCurrent && className.push('biz-process-state-current')
       state.isBefore && className.push('biz-process-state-before')
       state.isAfter && className.push('biz-process-state-after')
       state.isFirst && className.push('biz-process-state-first')
       state.isLast && className.push('biz-process-state-last')
-
+      
       return className
     },
     genOverTime() {
       let { allot = {}, accept = {}, finish = {}, start = {} } = this.flowSetting;
-
+      
       // 待分配
       let isCreated = this.judgeContainsState(TaskStateProcessEnum.CREATED.value)
       if(isCreated) {
@@ -135,7 +135,7 @@ const BizProcess = {
       if(this.value == TaskStateProcessEnum.PROCESSING.value) {
         return finish.overTime
       }
-
+      
     },
     /* 判断是否是当前状态 */
     isCurrentState(state) {
@@ -149,7 +149,7 @@ const BizProcess = {
       if(state.isAfter) {
         return console.warn('Caused: because state is the after process state, So can not click')
       }
-
+      
       this.selected = state.value;
       this.$emit('change', state);
     },
@@ -161,10 +161,8 @@ const BizProcess = {
             <span class="biz-process-left-triangle-top"></span>
             <span class="biz-process-left-triangle-bottom"></span>
           </span>
-          { state.name }
+          <span class="biz-process-state-name">{ state.name }</span>
           <span class="biz-process-right-triangle">
-            <span class="biz-process-right-triangle-top"></span>
-            <span class="biz-process-right-triangle-bottom"></span>
           </span>
         </div>
       )
@@ -175,7 +173,7 @@ const BizProcess = {
       let isPaused = this.data.isPaused == 1;
       // 超时
       let isOverTime = this.data.isOverTime == 1;
-
+      
       if(isPaused) return this.renderProcessPaused();
       if(isOverTime) return this.renderProcessOverTime();
     },
@@ -193,7 +191,7 @@ const BizProcess = {
       onceOverTime && content.push('曾超时')
       oncePaused && content.push('曾暂停')
       positionException && content.push('位置异常')
-
+      
       let exceptionDom = (
         <div class="biz-process-exception-text">
           <el-tooltip content={ content.join(', ') } placement="top">
@@ -204,9 +202,9 @@ const BizProcess = {
           </el-tooltip>
         </div>
       )
-
+      
       return isException ? exceptionDom : ''
-
+      
     },
     /* 渲染工单状态暂停 */
     renderProcessPaused() {
@@ -214,13 +212,13 @@ const BizProcess = {
         ...this.genExceptionStyle,
         color: TaskStateEnum.PSUSED.color
       }
-
+      
       // 特殊适配
       if (this.isOnceException && this.genCurrentStateIndex == 0) {
         style.top = '2px'
         style.left = '30px'
       }
-
+      
       return <div style={ style }> 已暂停 </div>
     },
     /* 渲染工单状态超时 */
@@ -232,7 +230,7 @@ const BizProcess = {
       }
       let overTime = this.genOverTime();
       let overTimeDom = <div class="biz-process-exception-time">{`时限: ${overTime}小时`}</div>
-
+      
       return (
         <div style={ style }> 
           已超时 
@@ -253,13 +251,13 @@ const BizProcess = {
       let acceptTime = this.data.acceptTime
       // 根据是否有接单时间判断 是否包含流程 进行中
       let startTime = this.data.startTime
-
+      
       this.taskStateProcessArray = TaskStateProcessArray.slice();
-
+      
       !allotTime && this.stateFilterHandler(TaskStateEnum.ALLOCATED.value)
       !acceptTime && this.stateFilterHandler(TaskStateEnum.ACCEPTED.value)
       !startTime && this.stateFilterHandler(TaskStateEnum.PROCESSING.value)
-
+      
       this.taskStateProcessArray.pop()
       this.taskStateProcessArray.push(TaskStateProcessEnum.OFFED)
     }
@@ -269,7 +267,7 @@ const BizProcess = {
     if(this.isOffed && this.onceRollback) {
       return <div class="biz-process-offed" style={{ backgroundColor: TaskStateEnum.OFFED.color }}>{ TaskStateEnum.OFFED.name }</div>
     }
-
+    
     return (
       <div class="biz-process-block">
         <div class="biz-process">

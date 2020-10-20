@@ -360,7 +360,7 @@
               :label="column.label"
               :width="column.width">
 
-              <template slot-scope="scope" v-if="scope.row.userId == userId && (scope.row.repertoryCount - scope.row.occupyNum) > 0 ">
+              <template slot-scope="scope" v-if="scope.row.userId == userId && (scope.row.repertoryCount - scope.row.occupyNum) > 0 && isShowPartBack">
                 <el-button type="text" class="no-padding" @click="partBack(scope.row)">退回</el-button>
               </template>
             </el-table-column>
@@ -648,6 +648,8 @@ import StorageUtil from '@src/util/storageUtil';
 import PartBackForm from './form/PartBackForm.vue';  
 import PartReceiveRejectFom from './form/PartReceiveRejectFom.vue';
 
+import { isShowPartBack } from '@src/util/version.ts'
+
 const STORAGE_PART_COLNUM_KEY = 'repe_person_part_list_column';
 const STORAGE_STOCK_COLNUM_KEY = 'repe_person_stock_list_column';
 const STORAGE_USE_COLNUM_KEY = 'repe_person_use_list_column';
@@ -800,6 +802,10 @@ export default {
       if(this.listType == 'part') action = '/partV2/repertory/person/exportSparepartUser';
       return action;
     },
+    /* 是否显示备件退回 */
+    isShowPartBack() {
+      return isShowPartBack()
+    }
     // filteredTeams() {
     //   if (this.personDataLevel <= 1) return [];
     //   if (this.personDataLevel === 2) {

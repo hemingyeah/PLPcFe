@@ -6,21 +6,30 @@
       prefix-icon="iconfont icon-fd-datetime"
       value-format="yyyy-MM-dd HH:mm:ss"
       :placeholder="placeholder"
-      :value="value" @input="choose"/>
+      :value="time" @input="choose"/>
   </div>
 </template>
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
+import { typeOf } from '@src/util/assist';
 
 export default {
   name: 'form-datetime',
   mixins: [FormMixin],
-  props: {
-    value: {
-      type: String,
-      default: ''
+  props: ['value'],
+  watch: {
+    value(v) {
+      this.time = typeOf(v) === 'string' ? v : ''
     }
+  },
+  data() {
+    return {
+      time: ''
+    }
+  },
+  mounted() {
+    this.time = typeOf(this.value) === 'string' ? v : ''
   },
   methods: {
     choose(newValue){    

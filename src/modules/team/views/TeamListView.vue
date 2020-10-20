@@ -149,6 +149,7 @@ import qs from 'qs';
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi';
 import {fmt_address} from '@src/filter/fmt';
+import { isShowCreateChildrenTeam } from '@src/util/version.ts'
 
 export default {
   name: 'team-list-view',
@@ -176,7 +177,7 @@ export default {
   },
   computed: {
     showNewTeam() {
-      return this.initData.showNewTeam === true;
+      return isShowCreateChildrenTeam(this.initData)
     }
   },
   methods: {

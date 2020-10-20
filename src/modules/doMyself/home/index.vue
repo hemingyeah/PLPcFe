@@ -2,31 +2,36 @@
   <div id="doMyself-box">
     <div class="flex-x">
       <div class="left-menu">
-        <div class="menu-title">{{linkControl ? '消息中心' : '自助门户设置'}}</div>
+        <div class="menu-title">{{linkControl && isShowSelfServicePortal ? '消息中心' : '自助门户设置'}}</div>
         <template v-for="(item, index) in menuList">
           <nav
-            :class="`menu-list ${nowMenu==index?'menu-checked':''}`"
+            :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
             :key="index"
-            v-if="linkControl ? item.name == '客户自助门户' ? false : true : true"
+            v-if="linkControl && isShowSelfServicePortal ? item.name == '客户自助门户' ? false : true : true"
             @click="changePage(index)"
           >
             <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
             <div class="icon-box">
-              <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16 font-w-600':'font-14'}`"></i>
+              <i
+                :class="`iconfont ${item.icon} ${
+                  nowMenu == index ? 'font-16 font-w-600' : 'font-14'
+                }`"
+              ></i>
             </div>
-            <span>{{item.name}}</span>
+            <span>{{ item.name }}</span>
           </nav>
         </template>
       </div>
 
-      <wx-set v-if="nowMenu===1"></wx-set>
-      <toast-list v-if="nowMenu===3"></toast-list>
+      <wx-set v-if="nowMenu === 1"></wx-set>
+      <toast-list v-if="nowMenu === 3"></toast-list>
     </div>
   </div>
 </template>
 <script>
 import toastList from "../toastList/toastList";
 import wxSet from "../wxSet/wxSet";
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 export default {
   name: "do-myself-view",
   props: {
@@ -34,6 +39,11 @@ export default {
       type: Object,
       default: () => ({}),
     },
+  },
+  provide() {
+    return {
+      initData: this.initData,
+    };
   },
   data() {
     return {
@@ -63,6 +73,9 @@ export default {
     linkControl() {
       return this.initData.openLinkC;
     },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
+    }
   },
   created() {
     let type = window.location.href.split("/")[

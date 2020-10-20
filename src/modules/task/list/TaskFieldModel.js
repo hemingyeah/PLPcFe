@@ -1812,7 +1812,6 @@ const advancedList = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '不筛选',
       '曾超时',
       '曾拒绝',
       '曾暂停',
@@ -2262,7 +2261,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '不筛选',
       '曾超时',
       '曾拒绝',
       '曾暂停',

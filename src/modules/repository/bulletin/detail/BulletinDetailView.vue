@@ -33,7 +33,7 @@
 
           <span
             class="open"
-            v-if="allowEdit && linkControl"
+            v-if="allowEdit && linkControl && isShowSelfServicePortal"
             @click="changeRelease();trackEventHandler('share')"
           >
             <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
@@ -164,6 +164,7 @@
 <script>
 import * as RepositoryApi from "@src/api/Repository";
 import * as Lang from "@src/util/lang/index.js";
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 
 export default {
   name: "bullet-detail",
@@ -489,6 +490,9 @@ export default {
     linkControl() {
       return this.initData.openLinkC;
     },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
+    }
   },
 };
 </script>

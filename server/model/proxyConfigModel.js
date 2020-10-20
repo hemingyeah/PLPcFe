@@ -8,7 +8,7 @@ const ENV_MAP = {
   'test': {
     user: LOGIN_USER.test || {},
     location: 'https://pubapp.shb.ltd',
-    host: 'docker.shb.ltd',
+    host: 'pubapp.shb.ltd',
     port: 443
   },
   'pre': {

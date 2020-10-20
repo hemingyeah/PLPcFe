@@ -5,7 +5,7 @@
         <div class="version-banner">
           <img src="../../../../assets/img/version-banner-v2.png">
         </div>
-        <h3 class="version-title">售后宝 | {{versionNum}} 更新说明</h3>
+        <h3 class="version-title">售后宝 | {{ editionText }} {{versionNum}} 更新说明</h3>
         <div class="version-description" v-html="description"></div>
         <div class="version-bottom">
           <button type="button" class="btn btn-text" @click="show = false">知道了</button>
@@ -21,17 +21,30 @@ import http from '@src/util/http';
 import platform from '@src/platform'
 
 const VERSION_NUM_KEY = 'shb_version_num';
+const EditionMap = {
+  '1': 'VIP版',
+  '2': '标准版',
+  '3': '企业版'
+}
 
 export default {
   name: 'version',
   props: {
+    edition: {
+      type: Number
+    },
     version: String
   },
   data(){
     return {
       show: false,
       versionNum: '',
-      description: ''
+      description: '',
+    }
+  },
+  computed: {
+    editionText() {
+      return EditionMap[this.edition] || EditionMap[1]
     }
   },
   methods: {
@@ -40,7 +53,7 @@ export default {
       let currVersion = localStorage.getItem(VERSION_NUM_KEY);
       let version = this.version;
       if(version && (!currVersion || currVersion != version)){
-        //只有在显示提示信息后，才更新本地缓存
+        // 只有在显示提示信息后，才更新本地缓存
         if(await this.showVersion()) localStorage.setItem(VERSION_NUM_KEY, this.version);       
       }
     },

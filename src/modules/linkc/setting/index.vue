@@ -36,7 +36,7 @@
           </el-radio-group>
         </div>
         <!-- 3 -->
-        <div class="ruler-set-item mar-r-140 flex-1">
+        <div class="ruler-set-item  flex-1">
           <div class="ruler-set-item-title">允许用户查看的服务事件：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.showAllEvent"
@@ -90,7 +90,7 @@
     <div class="info-box flex-x al-start">
       <div class="flex-x min-w-406 mar-r-53 mar-b-20">
         门户网页地址：
-        <el-input class="flex-1" readonly placeholder="请输入内容" v-model="setData.protalUrl"></el-input>
+        <el-input id="protalUrl" class="flex-1" readonly placeholder="请输入内容" v-model="setData.protalUrl"></el-input>
         <el-button class type="primary" @click="copyUrl">复制</el-button>
       </div>
 

@@ -3,10 +3,11 @@
     <div class="frame">
       <frame-nav
         :collapse.sync="collapse"
-        :source="initData.menus"
+        :source="navBarMenus"
         :callcenter="has_call_center_module"
         @open="openForNav"
         @collapse-changed="adjustOpenTab"
+        v-if="showNavBar"
       />
 
       <div class="frame-content">
@@ -322,8 +323,7 @@
           </div>
         </div>
       </div>
-
-      <version :version="releaseVersion" />
+      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" />
       <sale-manager
         :service-group-url="initData.serviceGroupUrl"
         :qrcode="initData.saleManagerQRCode"
@@ -361,6 +361,9 @@ import DefaultHead from "@src/assets/img/user-avatar.png";
 import NotificationCenter from "./component/NotificationCenter.vue";
 import * as NotificationApi from "@src/api/NotificationApi";
 import * as CallCenterApi from "@src/api/CallCenterApi";
+import * as SettingApi from "@src/api/SettingApi";
+
+import { isShowDashboardScreen, isShowPlanTask, isShowLinkC, isShowMoreSperaParts } from '@src/util/version.ts'
 
 /* util */
 import _ from 'lodash';
@@ -425,7 +428,11 @@ export default {
         },
       },
       has_call_center_module: false,
-      isUserTaskGray: this.initData.isUserTaskGrayFunction // 用户选择新旧版工单标识
+      isUserTaskGray: this.initData.isUserTaskGrayFunction, // 用户选择新旧版工单标识
+      navBarMenus: [],
+      showNavBar: false,
+      loadedEdition: false,
+      shbEdition: 1
     };
   },
   computed: {
@@ -471,7 +478,7 @@ export default {
       // 企业是否开启工单灰度功能
       let isTaskGray = this.initData.isTaskGrayFunction;
       return isTaskGray && this.currentTaskListTab.id;
-    }
+    },
   },
   methods: {
     async hangUpCall() {
@@ -495,11 +502,12 @@ export default {
         if (data.callcenter) {
           // 说明开启呼叫中心灰度
           localStorage.setItem("call_center_gray", 1);
-          this.getAccountInfo();
-        } else {
-          localStorage.setItem("call_center_module", 0);
-          localStorage.setItem("call_center_gray", 0);
+          return await this.getAccountInfo()
         }
+
+        localStorage.setItem("call_center_module", 0);
+        localStorage.setItem("call_center_gray", 0);
+        
       } catch (error) {
         console.error(error);
       }
@@ -521,6 +529,8 @@ export default {
           } else {
             alert("当前浏览器 Not support websocket");
           }
+
+          return true
         }
       } catch (error) {
         console.error(error);
@@ -703,27 +713,6 @@ export default {
       try {
         let info = await NotificationApi.newGetMessage();
         if (info.status == 0) {
-          // this.notificationInfo = info.data;
-          // this.notification.count = info.data.systemMsg + info.data.workMsg;
-          // let msgSystem = sessionStorage.getItem("shb_systemMsg");
-
-          // if (this.notification.count > 99) {
-          //   this.msgCount = "99+";
-          // } else {
-          //   this.msgCount = "";
-          // }
-          // if (
-          //   this.notificationInfo.msgSystem &&
-          //   (!msgSystem || msgSystem != this.notificationInfo.msgSystem.id)
-          // ) {
-          //   this.notification.title = info.data.msgSystem.title;
-          //   this.notificationShow = true;
-          //   this.setAnimation();
-          // } else {
-          //   this.notification.title = null;
-          //   this.notificationShow = false;
-          // }
-
           this.notificationInfo = info.data;
           this.notification.count = info.data.unReadTotalCount;
           let msgSystem = sessionStorage.getItem("shb_systemMsg");
@@ -1005,7 +994,68 @@ export default {
       this.reloadFrameTab(this.currentTaskListTab, true);
 
       this.isUserTaskGray = !this.isUserTaskGray;
-    }, 1000)
+    }, 1000),
+    /** 
+     * 获取售后宝版本号
+    */
+    async getShbEdition() {
+      const DefaultEdition = 1
+      let shbEdition = DefaultEdition
+      
+      try {
+        const Result = await SettingApi.getSettingEdition()
+        const IsSuccess = Result.status == 0
+        const Edition = Result?.data?.edition || DefaultEdition
+        
+        shbEdition = IsSuccess ? Edition : DefaultEdition
+        
+      } catch (error) {
+        shbEdition = DefaultEdition
+        console.error('Caused: getShbEdition -> error', error)
+      }
+      
+      window.shbEdition = shbEdition
+      
+      this.loadedEdition = true
+      this.shbEdition = shbEdition
+      this.buildNavbarMenus()
+    },
+    buildNavbarMenus() {
+      let menus = this.initData?.menus || []
+      // 需要被过滤掉的菜单key对象
+      let filterMeunKeyMap = {
+        'M_DASHBOARD_SCREEN': isShowDashboardScreen(),
+        'M_TASK_PLAN': isShowPlanTask(),
+        'M_PORTAL': isShowLinkC(),
+        'M_PORTAL_SETTING': isShowLinkC(),
+        'M_PORTAL_ORDER': isShowLinkC(),
+        'M_VIP_SPAREPART_PERSON': isShowMoreSperaParts(),
+        'M_CALLCENTER_WORKBENCH_LIST': this.has_call_center_module,
+        'M_CALLCENTER_STATISTICS': this.has_call_center_module,
+        'M_CALLCENTER_STAGE': this.has_call_center_module
+      }
+      let isFilter = false
+      let filterMenuKeys = []
+      
+      for (let key in filterMeunKeyMap) {
+        let menuShow = filterMeunKeyMap[key] === true
+        
+        if (!menuShow) {
+          isFilter = true
+          filterMenuKeys.push(key)
+        }
+      }
+      
+      // 是否过滤掉不能查看的菜单
+      if (isFilter) {
+        menus = menus.filter(menu => {
+          return filterMenuKeys.indexOf(menu.menuKey) < 0
+        })
+      }
+      
+      this.navBarMenus = menus
+      this.showNavBar = true
+    }
   },
   created() {
     // TODO: 迁移完成后删除
@@ -1024,13 +1074,14 @@ export default {
     }, NOTIFICATION_TIME);
   },
   async mounted() {
-    this.judgeCallCenterGray();
+    await this.judgeCallCenterGray();
     let userGuide = this?.initData?.userGuide === true || false;
 
     if (userGuide) {
       this.$refs.userGuideView.show();
     }
     this.checkExports();
+    this.getShbEdition()
   },
   components: {
     [FrameNav.name]: FrameNav,

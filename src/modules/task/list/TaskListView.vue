@@ -22,7 +22,7 @@
                     class="task-ic19"
                   />
                   {{ otherText }}
-                  <i class="iconfont icon-triangle-down task-c3"></i>
+                  <i class="iconfont icon-triangle-down task-icon"></i>
                 </div>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
@@ -37,23 +37,31 @@
                       <span class="task-list-dropdown-item">{{
                         item.name
                       }}</span>
-                      <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
-                      <i
-                        class="iconfont icon-bianji1 task-ml12 task-font12"
-                        @click.stop="editView(item)"
-                        v-if="
-                          initData.loginUser &&
-                            item.userId === initData.loginUser.userId
-                        "
-                      ></i>
-                      <i
-                        class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                        @click.stop="editView(item)"
-                        v-if="
-                          initData.loginUser &&
-                            item.userId === initData.loginUser.userId
-                        "
-                      ></i>
+                      <div class="task-list-dropdown-icon">
+                          <el-tooltip content="查看筛选条件" placement="top">
+                            <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
+                          </el-tooltip>
+                          <el-tooltip content="编辑视图" placement="top">
+                            <i
+                              class="iconfont icon-bianji1 task-ml12 task-font12"
+                              @click.stop="editView(item)"
+                              v-if="
+                                initData.loginUser &&
+                                  item.userId === initData.loginUser.userId
+                              "
+                            ></i>
+                          </el-tooltip>
+                          <el-tooltip content="删除视图" placement="top">
+                            <i
+                              class="iconfont icon-shanchu-copy task-ml12 task-font12"
+                              @click.stop="editView(item)"
+                              v-if="
+                                initData.loginUser &&
+                                  item.userId === initData.loginUser.userId
+                              "
+                            ></i>
+                          </el-tooltip>
+                      </div>
                     </div>
                   </el-dropdown-item>
                   <el-dropdown-item>
@@ -327,9 +335,10 @@
         ref="searchPanel"
         v-if="advanceds.length"
       >
-        <div class="advanced-search-btn-group" slot="footer">
+        <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
+          <base-button type="primary" @event="editView">存为视图</base-button>
+          <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
-          <base-button type="primary" @event="editView">保存视图</base-button>
           <base-button
             type="primary"
             @event="advancedSearch"
@@ -361,7 +370,7 @@
               v-if="exportPermissionTaskEdit"
               @click="delTask"
             >
-              <i class="iconfont icon-qingkongshanchu task-font12 task-c06"></i>
+              <i class="iconfont icon-qingkongshanchu task-icon"></i>
               删除
             </div>
             <!-- 批量编辑 -->
@@ -370,7 +379,7 @@
               @click="Alledit"
               v-if="exportPermissionTaskEdit"
             >
-              <i class="iconfont icon-bianji1 task-font12 task-c06"></i>
+              <i class="iconfont icon-bianji1 task-icon"></i>
               批量编辑
             </div>
           </div>
@@ -380,7 +389,7 @@
             <el-dropdown>
               <div class="task-ai task-flex task-font14 task-c6 task-pointer">
                 <i
-                  class="iconfont task-font12 task-top2"
+                  class="iconfont task-icon"
                   :class="{
                     'icon-liebiaoshitu': mapShow,
                     'icon-ditu': !mapShow,
@@ -389,7 +398,7 @@
                 <span class="task-mr4 task-ml4">{{
                   mapShow ? "列表模式" : "地图模式"
                 }}</span>
-                <i class="iconfont icon-triangle-down"></i>
+                <i class="iconfont icon-triangle-down task-icon"></i>
               </div>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
@@ -406,7 +415,7 @@
               @click="showAdvancedSetting"
             >
               <span class="task-mr4 task-ml4">选择列</span>
-              <i class="iconfont icon-triangle-down"></i>
+              <i class="iconfont icon-triangle-down task-icon"></i>
             </div>
 
             <!-- start 更多操作 -->
@@ -420,7 +429,7 @@
                 @click="trackEventHandler('moreAction')"
               >
                 <span class="task-mr4 task-ml4">更多操作</span>
-                <i class="iconfont icon-triangle-down"></i>
+                <i class="iconfont icon-triangle-down task-icon"></i>
               </div>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item v-if="exportPermission">
@@ -516,7 +525,7 @@
                 >
                   <a
                     href=""
-                    class="view-detail-btn"
+                    class="view-detail-btn task-list-numbering"
                     @click.stop.prevent="
                       openTaskTab(scope.row.id, scope.row[column.field])
                     "
@@ -534,7 +543,7 @@
                   <!-- 暂停中 -->
                   <span
                     class="task-state-block task-state-block-overtime task-font12"
-                    v-if="new Date(scope.row.overTime).getTime() > new Date().getTime()"
+                    v-if="new Date().getTime() > new Date(scope.row.overTime).getTime()"
                   >
                     超时
                   </span>
@@ -548,7 +557,7 @@
                     }"
                     @click.stop="openClientTab(scope.row)"
                   >
-                    {{ scope.row["customerEntity"].name }}
+                    {{ scope.row["customerEntity"] && scope.row["customerEntity"].name }}
                   </div>
                 </template>
 
@@ -568,7 +577,7 @@
                 <template
                   v-else-if="column.formType === 'select' && !column.isSystem"
                 >
-                  {{ scope.row.attribute && scope.row.attribute[column.field] | displaySelect }}
+                  {{ scope.row.attribute[column.field] | displaySelect }}
                 </template>
 
                 <!-- 更新时间 -->
@@ -702,27 +711,36 @@
                 <template
                   v-else-if="
                     column.formType === 'user' &&
-                      scope.row.attribute && scope.row.attribute[column.field]
+                      scope.row.attribute[column.field]
                   "
                 >
-                  {{ scope.row.attribute && (scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name) }}
+                  {{
+                    scope.row.attribute[column.field].displayName ||
+                      scope.row.attribute[column.field].name
+                  }}
                 </template>
 
                 <!-- 位置 -->
                 <template v-else-if="column.formType === 'location'">
                   {{
-                    scope.row.attribute && scope.row.attribute[column.field] && scope.row.attribute[column.field].address
+                    scope.row.attribute[column.field] &&
+                      scope.row.attribute[column.field].address
                   }}
                 </template>
 
                 <!-- 时间 -->
                 <template v-else-if="column.formType === 'datetime'">
+                <template v-if="!column.isSystem">
+                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                </template>
+                <template v-else>
                   {{ scope.row[column.field] | fmt_datetime }}
+                </template>
                 </template>
 
                 <div
                   v-else-if="column.formType === 'textarea'"
-                  v-html="buildTextarea(scope.row.attribute && scope.row.attribute[column.field])"
+                  v-html="buildTextarea(scope.row.attribute[column.field])"
                   @click="openOutsideLink"
                 ></div>
                 
@@ -752,9 +770,13 @@
                 >
                   {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
                 </template>
-
                 <template v-else-if="!column.isSystem">
-                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                  <template v-if="scope.row.attribute && scope.row.attribute[column.field] instanceof Array">
+                    {{scope.row.attribute[column.field].join(',')}}
+                  </template>
+                  <template v-else>
+                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                  </template>
                 </template>
 
                 <template v-else>
@@ -776,7 +798,7 @@
                 <el-select
                   v-model="params.pageSize"
                   placeholder="请选择"
-                  @change="search()"
+                  @change="handleSizeChange(params.pageSize)"
                   class="table-footer-select"
                 >
                   <el-option :label="10" :value="10"></el-option>
@@ -787,6 +809,7 @@
               </div>
             </div>
             <el-pagination
+              v-if="this.taskPage.list.length"
               class="comment-list-table-footer-pagination"
               background
               @current-change="jump"
@@ -887,7 +910,19 @@
 import TaskList from './TaskList';
 export default TaskList;
 </script>
-
+<style lang="scss">
+// .biz-form-remote-select-clear {
+//   i {
+//     background-color: #f0f0f0;
+//     width: 16px;
+//     height: 16px;
+//     border-radius: 16px;
+//     &::before {
+//       content: "x";
+//     }
+//   }
+// }
+</style>
 <style lang="scss" scoped>
 @import "./TaskList.scss";
 </style>
