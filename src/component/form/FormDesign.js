@@ -20,6 +20,12 @@ import {
 } from './util'
 import {checkUser, deleteComponent} from '@src/api/TaskApi.ts';
 
+/**
+ * 展示是否必填项的字段
+ * manager:  客户负责人
+ */
+const SHOW_IS_NULL_FIELD_COMP = ["manager"];
+
 /** 创建字段预览组件 */
 function createPreviewComp(h, field){
   let currFieldId = field._id;
@@ -83,12 +89,13 @@ function createSettingComp(h, field){
   let comp = FieldManager.findField(formType);
   if(null == comp) return null;
 
-  let compName = getSettingComp.call(this, field, comp)
+  let compName = getSettingComp.call(this, field, comp);
   
   if(null == compName) return (
     <div class="form-setting-panel">
       <h3>系统字段 -- {field.displayName}</h3>   
       <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
+      {SHOW_IS_NULL_FIELD_COMP.includes(field.fieldName) && createRequired(h, field)}
     </div> 
   );
 
@@ -123,6 +130,24 @@ function createSettingComp(h, field){
       }
     }
   });
+}
+
+/**
+ * 创建必填项
+ */
+function createRequired(h, field) {
+  return h("el-checkbox", {
+    props: {
+      value: field.isNull,
+      trueLabel: 0,
+      falseLabel: 1,
+    },
+    on: {
+      input: (value, prop) => {
+        field.isNull = value;
+      }
+    },
+  },["必填"]);
 }
 
 /**
