@@ -8,7 +8,7 @@
         @command="setAdvanceSearchColumn"
       >
         <i
-          class="iconfont icon-xitongguanli customer-panel-btn"
+          class="iconfont icon-xitongshezhi customer-panel-btn"
           style="float: none;"
         ></i>
 
@@ -20,15 +20,15 @@
     </h3>
     <!--  -->
       <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
-        <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
-        <i class="iconfont icon-up task-icon" v-else></i>
         <span class="task-font16">常用查询条件</span>
         <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
-        <span>
+        <span class="task-span1">
           <el-tooltip content="常用查询条件可以通过“设置”功能，进行添加和修改" placement="top">
             <i class="iconfont icon-question task-icon"></i>
           </el-tooltip>
         </span>
+        <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
+        <i class="iconfont icon-up task-icon" v-else></i>
       </div>
       <div class="task-search-guide" v-show="!fields.length && guide">
         <div></div>
@@ -669,16 +669,24 @@ export default {
       }
     },
     // 设置查询条件
-    _setting({item, list, check_system_list, check_customize_list}) {
+    _setting({list, check_system_list, check_customize_list}) {
       const searchField = localStorage.getItem('task-search-field')
       let loc;
-      let bool = this.selfFields.some(value => {
-        return value.displayName === item.displayName
+      [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
+        let bool = list.some((v) => {
+          return value.displayName === v
+        })
+        if (bool) {
+          this.selfFields.push(value)
+        }
       })
-
-      if (!bool) {
-        this.selfFields.push(item)
-      }
+      this.selfFields = [...new Set(this.selfFields.map(item => {
+        item = JSON.stringify(item)
+        return item
+      }))].map(item => {
+        item = JSON.parse(item)
+        return item
+      })
       // 设置查询条件的select字段
       if (searchField) {
         this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {

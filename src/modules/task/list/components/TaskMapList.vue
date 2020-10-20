@@ -38,7 +38,7 @@
           v-if="!allowReallot(item)"
         >
           <el-tooltip :content="getErrorNotice(item)" placement="top">
-            <i class="iconfont icon-info task-font24"></i>
+            <i class="iconfont icon-question task-icon"></i>
           </el-tooltip>
         </div>
       </div>

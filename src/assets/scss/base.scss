@@ -85,6 +85,9 @@ textarea {
   &-c9 {
     color: #999;
   }
+  &-c80 {
+    color: #808080;
+  }
   &-c3 {
     color: #333;
   }
@@ -187,11 +190,20 @@ textarea {
       color: #666 !important;
     }
   }
-  .ascending {
-    border-bottom-color: #999!important;
+  .el-table .sort-caret {
+    width: 0;
+    height: 0;
+    border: solid 4px transparent;
+    position: absolute;
+    left: 7px;
   }
-  .descending {
+  .el-table .sort-caret.ascending {
+    border-bottom-color: #999!important;
+    top: 7px!important;
+  }
+  .el-table .sort-caret.descending {
     border-top-color: #999!important;
+    bottom: 9px!important;
   }
   .el-table .ascending .sort-caret.ascending {
     border-bottom-color:#55B7B4!important;

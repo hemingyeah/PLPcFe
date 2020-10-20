@@ -16,10 +16,14 @@
       <!-- 按钮 -->
       <el-checkbox v-model="checked">全员可见</el-checkbox>
       <div class="task-flex task-ai task-jend">
-          <el-button type="danger" @click="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button>
-          <el-button @click="visible = false">取消</el-button>
-          <el-button type="primary" @click="saveViewBtn"
-          >保存</el-button>
+        <el-button
+          type="danger"
+          @click="deleteViewBtn"
+          v-show="isViewModel !== '默认'"
+          >删除视图</el-button
+        >
+        <el-button @click="visible = false">取消</el-button>
+        <el-button type="primary" @click="saveViewBtn">保存</el-button>
       </div>
     </div>
   </base-modal>
@@ -33,13 +37,13 @@ export default {
   name: "view-model",
   props: {
     region: {
-      type: Object, //保存参数
+      type: Object, // 保存参数
     },
     isViewModel: {
-      type: String, //判断是否保存过
+      type: String, // 判断是否保存过
     },
     otherText: {
-      type: String, //视图文案
+      type: String, // 视图文案
     },
   },
   watch: {
@@ -53,7 +57,7 @@ export default {
   },
   data() {
     return {
-      visible: false, //存为视图显示
+      visible: false, // 存为视图显示
       checked: false,
       view: {
         viewName: "",
@@ -69,7 +73,7 @@ export default {
       const { view, region, checked, isViewModel } = this;
       if (!view.viewName) {
         this.$platform.alert("请输入视图名称");
-        return
+        return;
       }
       view.viewRegion = checked ? "所有用户" : "只有我";
       const params = {
@@ -83,48 +87,48 @@ export default {
         });
         return;
       }
-      let searchModel = region.searchModel
+      let searchModel = region.searchModel;
       // 创建时间
-      searchModel['timeStart'] = this._time(searchModel.createTimeStart)
-      searchModel['timeEnd'] = this._time(searchModel.createTimeEnd)
+      searchModel["timeStart"] = this._time(searchModel.createTimeStart);
+      searchModel["timeEnd"] = this._time(searchModel.createTimeEnd);
       // 计划时间
-      searchModel.planTimeStart = this._time(searchModel.planTimeStart)
-      searchModel.planTimeEnd = this._time(searchModel.planTimeEnd)
-      //派单时间
-      searchModel.allotTimeStart = this._time(searchModel.allotTimeStart)
-      searchModel.allotTimeEnd = this._time(searchModel.allotTimeEnd)
-      //派单时间
-      searchModel.acceptTimeStart = this._time(searchModel.acceptTimeStart)
-      searchModel.acceptTimeEnd = this._time(searchModel.acceptTimeEnd)
-      //派单时间
-      searchModel.startTimeStart = this._time(searchModel.startTimeStart)
-      searchModel.startTimeEnd = this._time(searchModel.startTimeEnd)
-      //完成时间
-      searchModel.completeTimeStart = this._time(searchModel.completeTimeStart)
-      searchModel.completeTimeEnd = this._time(searchModel.completeTimeEnd)
-      //更新时间
-      searchModel.updateTimeStart = this._time(searchModel.updateTimeStart)
-      searchModel.updateTimeEnd = this._time(searchModel.updateTimeEnd)
+      searchModel.planTimeStart = this._time(searchModel.planTimeStart);
+      searchModel.planTimeEnd = this._time(searchModel.planTimeEnd);
+      // 派单时间
+      searchModel.allotTimeStart = this._time(searchModel.allotTimeStart);
+      searchModel.allotTimeEnd = this._time(searchModel.allotTimeEnd);
+      // 派单时间
+      searchModel.acceptTimeStart = this._time(searchModel.acceptTimeStart);
+      searchModel.acceptTimeEnd = this._time(searchModel.acceptTimeEnd);
+      // 派单时间
+      searchModel.startTimeStart = this._time(searchModel.startTimeStart);
+      searchModel.startTimeEnd = this._time(searchModel.startTimeEnd);
+      // 完成时间
+      searchModel.completeTimeStart = this._time(searchModel.completeTimeStart);
+      searchModel.completeTimeEnd = this._time(searchModel.completeTimeEnd);
+      // 更新时间
+      searchModel.updateTimeStart = this._time(searchModel.updateTimeStart);
+      searchModel.updateTimeEnd = this._time(searchModel.updateTimeEnd);
       //
-      searchModel.reviewTimeStart = this._time(searchModel.reviewTimeStart)
-      searchModel.reviewTimeEnd = this._time(searchModel.reviewTimeEnd)
+      searchModel.reviewTimeStart = this._time(searchModel.reviewTimeStart);
+      searchModel.reviewTimeEnd = this._time(searchModel.reviewTimeEnd);
       //
-      searchModel.balanceTimeStart = this._time(searchModel.balanceTimeStart)
-      searchModel.balanceTimeEnd = this._time(searchModel.balanceTimeEnd)
+      searchModel.balanceTimeStart = this._time(searchModel.balanceTimeStart);
+      searchModel.balanceTimeEnd = this._time(searchModel.balanceTimeEnd);
       //
-      searchModel.closeTimeStart = this._time(searchModel.closeTimeStart)
-      searchModel.closeTimeEnd = this._time(searchModel.closeTimeEnd)
+      searchModel.closeTimeStart = this._time(searchModel.closeTimeStart);
+      searchModel.closeTimeEnd = this._time(searchModel.closeTimeEnd);
       // 保存
       TaskApi.createView({
         ...view,
         searchModel,
-        selectedCols: region.selectedCols
+        selectedCols: region.selectedCols,
       }).then((res) => {
         this.success(res);
       });
     },
     _time(time) {
-      return time ? formatDate(time) : ''
+      return time ? formatDate(time) : "";
     },
     // 删除
     deleteViewBtn() {
@@ -134,7 +138,7 @@ export default {
     },
     // 成功后的操作
     success({ success, message }, type) {
-      window.__exports__refresh = ''
+      window.__exports__refresh = "";
       if (success) {
         this.visible = false;
         const fromId = window.frameElement.getAttribute("id");

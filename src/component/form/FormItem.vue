@@ -164,7 +164,7 @@ export default {
 
     label {
       display: block;
-      width: 110px;
+      width: 85px;
       padding: 4px 0 0 10px;
       line-height: 24px;
       margin: 0;

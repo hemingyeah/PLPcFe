@@ -3,11 +3,11 @@ import {
   TaskCreateAndEditModel,
   PlanTaskCreateAndEditModel,
 } from "@model/param/in/Task";
-import GrayUtil from '@src/util/gray';
+import GrayUtil from "@src/util/gray";
 
-const fixedPrefixTaskPath = '/api/task';
-const ElASTICSEARCH = '/api/elasticsearch';
-const fixedPrefixPaymentPath = '/api/payment';
+const fixedPrefixTaskPath = "/api/task";
+const ElASTICSEARCH = "/api/elasticsearch";
+const fixedPrefixPaymentPath = "/api/payment";
 
 // const fixedPrefixTaskPath = '';
 // const ElASTICSEARCH = '';
@@ -1055,7 +1055,7 @@ export function taskRecordDelete(params: any) {
  * @description 拨打电话
  */
 export function dialout(params: object) {
-  return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params, false);
+  return http.post("/api/callcenter/outside/callcenter/api/dialout", params, false);
 }
 
 /**
@@ -1072,7 +1072,7 @@ export function getUserViews(params: object) {
  * @description 获取附件
  */
 export function getCardDetailList(params: object) {
-  return http.get(`/task/getCardDetailList`, params);
+  return http.get("/task/getCardDetailList", params);
 }
 
 /**

@@ -38,36 +38,30 @@
                         item.name
                       }}</span>
                       <div class="task-list-dropdown-icon">
-                          <el-tooltip content="查看筛选条件" placement="top">
-                            <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
-                          </el-tooltip>
-                          <el-tooltip content="编辑视图" placement="top">
-                            <i
-                              class="iconfont icon-bianji1 task-ml12 task-font12"
-                              @click.stop="editView(item)"
-                              v-if="
-                                initData.loginUser &&
-                                  item.userId === initData.loginUser.userId
-                              "
-                            ></i>
-                          </el-tooltip>
-                          <el-tooltip content="删除视图" placement="top">
-                            <i
-                              class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                              @click.stop="editView(item)"
-                              v-if="
-                                initData.loginUser &&
-                                  item.userId === initData.loginUser.userId
-                              "
-                            ></i>
-                          </el-tooltip>
+                        <el-tooltip content="查看筛选条件" placement="top">
+                          <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
+                        </el-tooltip>
+                        <el-tooltip content="编辑视图" placement="top">
+                          <i
+                            class="iconfont icon-bianji1 task-ml12 task-font12"
+                            @click.stop="editView(item)"
+                            v-if="item.authEdit"
+                          ></i>
+                        </el-tooltip>
+                        <el-tooltip content="删除视图" placement="top">
+                          <i
+                            class="iconfont icon-shanchu-copy task-ml12 task-font12"
+                            @click.stop="delView(item)"
+                            v-if="item.authEdit"
+                          ></i>{{item.authEdit}}
+                        </el-tooltip>
                       </div>
                     </div>
                   </el-dropdown-item>
                   <el-dropdown-item>
                     <div
                       class="task-flex task-ai task-cfa task-pointer task-list-wd252"
-                      @click="panelSearchAdvancedToggle"
+                      @click="panelSearchAdvancedToggle('create')"
                     >
                       <i class="iconfont icon-add task-mr4 task-font12"></i>
                       新建视图
@@ -105,7 +99,7 @@
               </base-button>
               <div
                 class="advanced-search-visible-btn task-ml12"
-                @click.self="panelSearchAdvancedToggle"
+                @click.self="panelSearchAdvancedToggle('search')"
               >
                 <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
                 高级搜索
@@ -116,7 +110,7 @@
         <!-- 筛选 -->
         <div class="task-list-header-nav">
           <div class="task-flex task-ai">
-            <div class="task-font14 task-c6 state">工单状态：</div>
+            <div class="task-font14 task-c80 state">工单状态：</div>
             <div class="list" :style="`width: ${navWidth}px`">
               <div
                 class="list-item task-flex task-ai"
@@ -280,7 +274,7 @@
           </div>
           <!-- 创建 -->
           <div class="task-flex task-ai">
-            <div class="task-font14 task-c6 state">创建视角：</div>
+            <div class="task-font14 task-c80 state">创建视角：</div>
             <div class="list list-crate" :style="`width: ${navWidth}px`">
               <div class="list-item task-flex task-ai">
                 <div
@@ -300,7 +294,7 @@
             </div>
           </div>
           <div class="task-flex task-ai">
-            <div class="task-font14 task-c6 state">
+            <div class="task-font14 task-c80 state">
               工单类型：
             </div>
             <div class="list" :style="`width: ${navWidth}px`">
@@ -329,7 +323,7 @@
       <task-search-panel
         :init-data="initData"
         :config="seoSetList"
-        :searchParams="searchParams"
+        :search-params="searchParams"
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
@@ -370,7 +364,7 @@
               v-if="exportPermissionTaskEdit"
               @click="delTask"
             >
-              <i class="iconfont icon-qingkongshanchu task-icon"></i>
+              <i class="iconfont icon-shanchu-copy task-icon"></i>
               删除
             </div>
             <!-- 批量编辑 -->
@@ -730,12 +724,12 @@
 
                 <!-- 时间 -->
                 <template v-else-if="column.formType === 'datetime'">
-                <template v-if="!column.isSystem">
-                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
-                </template>
-                <template v-else>
-                  {{ scope.row[column.field] | fmt_datetime }}
-                </template>
+                  <template v-if="!column.isSystem">
+                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                  </template>
+                  <template v-else>
+                    {{ scope.row[column.field] | fmt_datetime }}
+                  </template>
                 </template>
 
                 <div
@@ -907,7 +901,7 @@
 </template>
 
 <script>
-import TaskList from './TaskList';
+import TaskList from "./TaskList";
 export default TaskList;
 </script>
 <style lang="scss">

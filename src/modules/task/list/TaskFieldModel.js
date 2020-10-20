@@ -1420,15 +1420,17 @@ const advancedList = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '在线支付-支付宝',
-      '支付宝收款码',
-      '微信收款码',
-      '银行卡收款',
-      '其他支付-统一收款',
-      '其他支付-月结',
-      '其他支付-周结'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "在线支付-支付宝",
+        "支付宝收款码",
+        "微信收款码",
+        "银行卡收款",
+        "其他支付-统一收款",
+        "其他支付-月结",
+        "其他支付-周结"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1461,7 +1463,7 @@ const advancedList = [
     isSystem: 1,
     fieldName: "tags",
     displayName: "选择团队",
-    formType: 'select',
+    formType: "select",
     defaultValue: null,
     isNull: 1,
     isSearch: 1,
@@ -1564,20 +1566,22 @@ const advancedList = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '待指派',
-      "已指派",
-      '已接受',
-      '进行中',
-      '已完成',
-      '已拒绝',
-      '已结算',
-      '已关闭',
-      '已取消',
-      '工单池',
-      '未完成'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "待指派",
+        "已指派",
+        "已接受",
+        "进行中",
+        "已完成",
+        "已拒绝",
+        "已结算",
+        "已关闭",
+        "已取消",
+        "工单池",
+        "未完成"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1786,12 +1790,14 @@ const advancedList = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '手动派单',
-      '工单池派单',
-      '自动派单',
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "手动派单",
+        "工单池派单",
+        "自动派单",
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1811,13 +1817,15 @@ const advancedList = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '曾超时',
-      '曾拒绝',
-      '曾暂停',
-      '曾回退',
-      '位置异常',
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "曾超时",
+        "曾拒绝",
+        "曾暂停",
+        "曾回退",
+        "位置异常",
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1836,10 +1844,12 @@ const advancedList = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '是',
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "是",
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1858,11 +1868,13 @@ const advancedList = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '是',
-      '否'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "是",
+        "否"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1881,11 +1893,13 @@ const advancedList = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '审批中',
-      '无审批'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "审批中",
+        "无审批"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1907,15 +1921,17 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '在线支付-支付宝',
-      '支付宝收款码',
-      '微信收款码',
-      '银行卡收款',
-      '其他支付-统一收款',
-      '其他支付-月结',
-      '其他支付-周结'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "在线支付-支付宝",
+        "支付宝收款码",
+        "微信收款码",
+        "银行卡收款",
+        "其他支付-统一收款",
+        "其他支付-月结",
+        "其他支付-周结"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -1928,8 +1944,8 @@ const Inquire = [
     tableName: "customer",
     isSystem: 1,
     fieldName: "tags",
-    displayName: "选择团队",
-    formType: 'select',
+    displayName: "服务团队",
+    formType: "select",
     defaultValue: null,
     isNull: 1,
     isSearch: 1,
@@ -2032,20 +2048,22 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '待指派',
-      "已指派",
-      '已接受',
-      '进行中',
-      '已完成',
-      '已拒绝',
-      '已结算',
-      '已关闭',
-      '已取消',
-      '工单池',
-      '未完成'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "待指派",
+        "已指派",
+        "已接受",
+        "进行中",
+        "已完成",
+        "已拒绝",
+        "已结算",
+        "已关闭",
+        "已取消",
+        "工单池",
+        "未完成"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2235,12 +2253,14 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '手动派单',
-      '工单池派单',
-      '自动派单',
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "手动派单",
+        "工单池派单",
+        "自动派单",
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2260,13 +2280,15 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '曾超时',
-      '曾拒绝',
-      '曾暂停',
-      '曾回退',
-      '位置异常',
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "曾超时",
+        "曾拒绝",
+        "曾暂停",
+        "曾回退",
+        "位置异常",
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2285,10 +2307,12 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '是',
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "是",
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2307,11 +2331,13 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '是',
-      '否'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "是",
+        "否"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2330,11 +2356,13 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {isMulti: false, dataSource:[
-      '全部',
-      '审批中',
-      '无审批'
-    ]},
+    setting: {
+      isMulti: false, dataSource: [
+        "全部",
+        "审批中",
+        "无审批"
+      ]
+    },
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2345,14 +2373,14 @@ const Inquire = [
 ];
 // 顶部筛选id
 const selectIds = {
-  createdId: "133d2ef7-19a8-11e7-8d4e-00163e304a25", //待指派
-  allocatedId: "12fcb144-1ea3-11e7-8d4e-00163e304a25", //已指派
-  acceptedId: "475e3328-1e63-11e7-8d4e-00163e304a25", //已接受
-  processingId: "06db63fe-5017-11e7-a318-00163e304a25", //进行中
-  exceptionId: "a78cbfec-d7d2-420f-9a56-32a503702f2d", //异常工单
-  allId: "998620df-0d55-11e7-8d4e-00163e304a25", //全部工单
-  unfinishedId: 'wangyue6-6666-6666-6666-666666666666', //未完成工单
-  finished: '5ac722d9-1e63-11e7-8d4e-00163e304a25', //已完成工单 
+  createdId: "133d2ef7-19a8-11e7-8d4e-00163e304a25", // 待指派
+  allocatedId: "12fcb144-1ea3-11e7-8d4e-00163e304a25", // 已指派
+  acceptedId: "475e3328-1e63-11e7-8d4e-00163e304a25", // 已接受
+  processingId: "06db63fe-5017-11e7-a318-00163e304a25", // 进行中
+  exceptionId: "a78cbfec-d7d2-420f-9a56-32a503702f2d", // 异常工单
+  allId: "998620df-0d55-11e7-8d4e-00163e304a25", // 全部工单
+  unfinishedId: "wangyue6-6666-6666-6666-666666666666", // 未完成工单
+  finished: "5ac722d9-1e63-11e7-8d4e-00163e304a25", // 已完成工单 
 };
 module.exports = {
   fields,
