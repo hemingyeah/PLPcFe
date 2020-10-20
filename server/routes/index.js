@@ -30,6 +30,8 @@ const customerContact = require("./customerContact");
 const taskRouter = require("./task");
 const sparePartRouter = require("./sparePart");
 
+const linkcRouter = require('./linkc')
+
 router.get("/", async (ctx) => {
   let modConfig = modules["system.frame"];
   let script = ["/system.frame.js"];
@@ -235,6 +237,7 @@ router.use("", doMyselft.routes(), doMyselft.allowedMethods());
 router.use("", customerContact.routes(), customerContact.allowedMethods());
 router.use("", taskRouter.routes(), taskRouter.allowedMethods());
 router.use("", sparePartRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all("/*", (ctx) => {
   return HttpClient.proxy(ctx);

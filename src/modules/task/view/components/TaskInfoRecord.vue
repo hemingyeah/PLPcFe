@@ -383,7 +383,7 @@ export default {
         </div>,
         // 是否地理位置异常
         <div>
-          { isPositionException && <span>距离客户位置：{ content.distance ? `${content.distance} 公里` : '位置异常' }</span> }
+          { isPositionException && <span>距离客户位置：{ content.distance ? `${content.distance} 公里` : '位置异常，未获取到位置信息' }</span> }
         </div>
       ];
 
@@ -586,6 +586,11 @@ export default {
         content.synergy && <div>协同人改为：{ content.synergy }</div>
       ]
     },
+    /* 渲染工单审批转交dom */
+    renderTaskApproveTransferDom(record = {}) {
+      let { operatorName, handoverName } = record?.content;
+      return <h5><strong>{ operatorName }</strong> 将该审批转交至新审批人 <strong>{ handoverName }</strong> 进行处理。</h5>
+    },
     /** 根据记录的action渲染对应的内容，支持jsx和render函数 */
     renderRecord(h, record) {
       let { action, userName, content, attachments, taskNo } = record;
@@ -615,6 +620,7 @@ export default {
       if (action === '服务报告') return this.renderTaskServiceReportDom(record)
       if (action == '电话日志') return this.renderPhoneLogDom(record)
       if (action == '支付') return this.renderTaskPaymentDom(record)
+      if (action == '审核转交') return this.renderTaskApproveTransferDom(record)
 
       const { isGoBack, synergy, updateType, updateContent } = content;
 

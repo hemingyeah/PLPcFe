@@ -1,12 +1,17 @@
 <template>
-  <div class="bulletin-list-detail" ref="bulletinDetail" :style="{height: height}" v-if="detailShow" v-loading.fullscreen.lock="loading">
+  <div
+    class="bulletin-list-detail"
+    ref="bulletinDetail"
+    :style="{height: height}"
+    v-if="detailShow"
+    v-loading.fullscreen.lock="loading"
+  >
     <template v-if="detail && detail.title">
       <!-- 详情头部 -->
       <div class="detail-top">
-
         <div class="author">
-          <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead">
-          <img class="author-img" src="../../../../assets/img/avatar.png" v-else>
+          <img class="author-img" :src="detail.createUserHead" v-if="detail.createUserHead" />
+          <img class="author-img" src="../../../../assets/img/avatar.png" v-else />
           <div class="author-info">
             <p class="name">{{detail.createUserName}}</p>
             <p class="time">发布于：{{detail.createTime | fmt_datehour}}</p>
@@ -14,24 +19,33 @@
         </div>
 
         <div class="operating">
-
           <!-- <div class="common">
             <span class="item-num">已读（{{detail.readNum}}）</span>
             <span class="item-num">未读（{{detail.unreadNum}}）</span>
-          </div> -->
+          </div>-->
 
           <span class="management" v-if="allowEdit">
-            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('delete')"></i>
+            <i
+              class="iconfont icon-qingkongshanchu icon-operating"
+              @click="deleteArticle();trackEventHandler('delete')"
+            ></i>
+          </span>
+
+          <span
+            class="open"
+            v-if="allowEdit && linkControl && isShowSelfServicePortal"
+            @click="changeRelease();trackEventHandler('share')"
+          >
+            <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
+            {{detail.circleState == 1 ? '取消发布' : '发布到圈子'}}
           </span>
 
           <span class="open" @click="openFrame" v-if="isList">新页面打开</span>
-
         </div>
       </div>
 
       <!-- 文章详情 -->
       <div class="detail-content" :style="{padding: padding}">
-
         <div class="info">
           <p class="title">{{detail.title}}</p>
           <div class="ql-container ql-snow content" style="border:none">
@@ -41,23 +55,43 @@
           </div>
         </div>
         <!-- 详情页脚部分 -->
-        <div class="footer" v-if="(reads.reads.length > 0 || reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)">
+        <div
+          class="footer"
+          v-if="(reads.reads.length > 0 || reads.unreads.length > 0) || (detail.attachment && detail.attachment.length > 0)"
+        >
           <!-- 已读、未读人员显示 -->
           <div class="person">
-
             <div class="read-person" v-if="reads.reads.length > 0">
               <span class="title">已读</span>
               <div class="read-img">
-                <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
-                  <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
-                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
+                <el-tooltip
+                  :content="item.displayName"
+                  placement="top"
+                  v-for="(item, index) in reads.reads"
+                  :key="index"
+                >
+                  <img class="person-img" :src="item.head" v-if="index < 5 && item.head" />
+                  <img
+                    class="person-img"
+                    src="../../../../assets/img/avatar.png"
+                    v-if="index < 5 && !item.head"
+                  />
                 </el-tooltip>
                 <div class="more-preson" v-if="reads.reads.length > 5" @click="seeMore('read')">
                   <span class="more-point">···</span>
                   <div class="see-more" v-if="showMoreRead" ref="seeMore">
-                    <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.reads" :key="index">
-                      <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
-                      <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
+                    <el-tooltip
+                      :content="item.displayName"
+                      placement="top"
+                      v-for="(item, index) in reads.reads"
+                      :key="index"
+                    >
+                      <img class="person-img" :src="item.head" v-if="index >= 5 && item.head" />
+                      <img
+                        class="person-img"
+                        src="../../../../assets/img/avatar.png"
+                        v-if="index >= 5 && !item.head"
+                      />
                     </el-tooltip>
                   </div>
                 </div>
@@ -67,108 +101,133 @@
             <div class="read-person" v-if="reads.unreads.length > 0">
               <span class="title right" :style="{marginLeft: marginLeft}">未读</span>
               <div class="read-img">
-                <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
-                  <img class="person-img" :src="item.head" v-if="index < 5 && item.head">
-                  <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index < 5 && !item.head">
+                <el-tooltip
+                  :content="item.displayName"
+                  placement="top"
+                  v-for="(item, index) in reads.unreads"
+                  :key="index"
+                >
+                  <img class="person-img" :src="item.head" v-if="index < 5 && item.head" />
+                  <img
+                    class="person-img"
+                    src="../../../../assets/img/avatar.png"
+                    v-if="index < 5 && !item.head"
+                  />
                 </el-tooltip>
                 <div class="more-preson" v-if="reads.unreads.length > 5" @click="seeMore('noRead')">
                   <span class="more-point">···</span>
                   <div class="see-more right" v-if="showMoreNoRead" ref="seeMore">
-                    <el-tooltip :content="item.displayName" placement="top" v-for="(item, index) in reads.unreads" :key="index">
-                      <img class="person-img" :src="item.head" v-if="index >= 5 && item.head">
-                      <img class="person-img" src="../../../../assets/img/avatar.png" v-if="index >= 5 && !item.head">
+                    <el-tooltip
+                      :content="item.displayName"
+                      placement="top"
+                      v-for="(item, index) in reads.unreads"
+                      :key="index"
+                    >
+                      <img class="person-img" :src="item.head" v-if="index >= 5 && item.head" />
+                      <img
+                        class="person-img"
+                        src="../../../../assets/img/avatar.png"
+                        v-if="index >= 5 && !item.head"
+                      />
                     </el-tooltip>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
           <!-- 附件部分 -->
           <div class="annex" v-if="detail.attachment && detail.attachment.length > 0">
             <span class="annex-left">附件：</span>
             <div class="annex-right">
               <div class="base-comment-attachment base-file__preview">
-                <base-file-item v-for="file in detail.attachment" :key="file.id" :file="file" size="small"></base-file-item>
+                <base-file-item
+                  v-for="file in detail.attachment"
+                  :key="file.id"
+                  :file="file"
+                  size="small"
+                ></base-file-item>
               </div>
             </div>
           </div>
-        
         </div>
       </div>
     </template>
   </div>
   <div v-else class="bulletin-list-detail empty">
     <div>
-      <img class="empty-img" src="../../../../assets/img/empty.png">
+      <img class="empty-img" src="../../../../assets/img/empty.png" />
     </div>
     <span class="empty-msg">{{deleteMsg || '暂无数据'}}</span>
   </div>
 </template>
 
 <script>
-import * as RepositoryApi from '@src/api/Repository'
-import * as Lang from '@src/util/lang/index.js';
+import * as RepositoryApi from "@src/api/Repository";
+import * as Lang from "@src/util/lang/index.js";
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 
 export default {
-  name: 'bullet-detail',
+  name: "bullet-detail",
   props: {
     info: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     initData: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     infoEdit: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     isList: {
       type: Boolean,
       default: false,
-    }
+    },
   },
-  data () {
+  data() {
     return {
-      allowEdit: this.infoEdit ? (this.infoEdit.VIP_INFO_NOTICE_CREATE && this.infoEdit.VIP_INFO_NOTICE_CREATE == 3) : (this.initData.userInfo.authorities.VIP_INFO_NOTICE_CREATE && this.initData.userInfo.authorities.VIP_INFO_NOTICE_CREATE == 3),
+      allowEdit: this.infoEdit
+        ? this.infoEdit.VIP_INFO_NOTICE_CREATE &&
+          this.infoEdit.VIP_INFO_NOTICE_CREATE == 3
+        : this.initData.userInfo.authorities.VIP_INFO_NOTICE_CREATE &&
+          this.initData.userInfo.authorities.VIP_INFO_NOTICE_CREATE == 3,
       // allowShow: this.infoEdit ? (this.infoEdit.INFO_VIEW ? this.infoEdit.INFO_VIEW : false) : (this.initData.userInfo.authorities.INFO_VIEW ? this.initData.userInfo.authorities.INFO_VIEW : false),
-      noticeId: '',
+      noticeId: "",
       form: this.buildForm(), // 附件存储格式
       params: {
-        noticeId: ''
+        noticeId: "",
       },
       detail: {}, // 文章详情
       reads: {
         reads: [],
-        unreads: []
+        unreads: [],
       },
       showMoreRead: false, // 是否显示已读人员浮框
       showMoreNoRead: false, // 是否显示未读人员浮框
       loading: false,
       deleteMsg: null,
       detailShow: true,
-    }
+    };
   },
-  mounted () {
+  mounted() {
     this.getId();
   },
   methods: {
-    getId () {
-      if(window.location.href.indexOf('?') != -1) {
-        let array = window.location.href.split('?')[1].split('&');
+    getId() {
+      if (window.location.href.indexOf("?") != -1) {
+        let array = window.location.href.split("?")[1].split("&");
         let params = [];
 
-        array.forEach(item => {
-          params.push({name: item.split('=')[0],
-            value: item.split('=')[1]})
-        })
-        params.forEach(item => {
-          if(item.name == 'noticeId') {
+        array.forEach((item) => {
+          params.push({ name: item.split("=")[0], value: item.split("=")[1] });
+        });
+        params.forEach((item) => {
+          if (item.name == "noticeId") {
             this.noticeId = item.value;
           }
-        })
+        });
         // if(!this.allowEdit && !this.allowShow) {
         //   this.detailShow = false;
         //   this.deleteMsg = '您没有权限查看该页面';
@@ -180,13 +239,17 @@ export default {
       }
     },
     // 获取通知公告详情
-    async getBulletinDetail () {
+    async getBulletinDetail() {
       try {
         this.detailShow = true;
         this.showMoreNoRead = false;
         this.showMoreRead = false;
-        this.params.noticeId = this.info.id ? this.info.id : this.noticeId ? this.noticeId : null;
-        if(!this.params.noticeId) {
+        this.params.noticeId = this.info.id
+          ? this.info.id
+          : this.noticeId
+          ? this.noticeId
+          : null;
+        if (!this.params.noticeId) {
           this.detail = null;
           this.detailShow = false;
           return;
@@ -196,10 +259,10 @@ export default {
         let res = await RepositoryApi.getBulletinDetail(this.params);
         this.loading = false;
 
-        if(res.success) {
-          if(res.message == '已删除') {
+        if (res.success) {
+          if (res.message == "已删除") {
             this.detail = null;
-            this.deleteMsg = '已被删除';
+            this.deleteMsg = "已被删除";
             this.detailShow = false;
           } else {
             this.detail = res.result;
@@ -209,149 +272,156 @@ export default {
         } else {
           this.$platform.notification({
             title: res.message,
-            type: 'error',
+            type: "error",
           });
         }
       } catch (err) {
-        console.error(err)
+        console.error(err);
         this.loading = false;
       }
     },
 
     // 获取最近5条已读未读用户
-    async getReadOrNotLatest () {
+    async getReadOrNotLatest() {
       try {
         let res = await RepositoryApi.getReadOrNotLatest(this.params);
-        if(res.success) {
+        if (res.success) {
           this.reads.reads = res.result.reads;
           this.reads.unreads = res.result.unreads;
         } else {
           this.$platform.notification({
             title: res.message,
-            type: 'error',
+            type: "error",
           });
         }
       } catch (err) {
-        console.error(err)
+        console.error(err);
       }
     },
 
     // 获取所有已读用户,点击加号时获取
-    async getReadPerson () {
+    async getReadPerson() {
       try {
         let res = await RepositoryApi.getReadPerson(this.params);
-        if(res.success) {
+        if (res.success) {
           this.reads.reads = res.result;
         } else {
           this.$platform.notification({
             title: res.message,
-            type: 'error',
+            type: "error",
           });
         }
       } catch (err) {
-        console.error(err)
+        console.error(err);
       }
     },
 
     // 获取所有未读用户，点击加号时获取
-    async getUnreadPerson () {
+    async getUnreadPerson() {
       try {
         let res = await RepositoryApi.getUnreadPerson(this.params);
-        if(res.success) {
+        if (res.success) {
           this.reads.unreads = res.result;
         } else {
           this.$platform.notification({
             title: res.message,
-            type: 'error',
+            type: "error",
           });
         }
       } catch (err) {
-        console.error(err)
+        console.error(err);
       }
     },
 
-    buildForm(){
+    buildForm() {
       return {
-        content: '',
+        content: "",
         attachments: [],
         showInOwn: 0,
-      }
+      };
     },
 
     // 新页面打开通知公告详情
-    openFrame () {
-      let fromId = window.frameElement.getAttribute('id');
-      
+    openFrame() {
+      let fromId = window.frameElement.getAttribute("id");
+
       this.$platform.openTab({
-        id: `bulletin_detail_${ this.params.noticeId }`,
-        title: '信息公告详情',
-        url: `/info/notice/detail/page?noticeId=${ this.params.noticeId }`,
+        id: `bulletin_detail_${this.params.noticeId}`,
+        title: "信息公告详情",
+        url: `/info/notice/detail/page?noticeId=${this.params.noticeId}`,
         reload: true,
         close: true,
-        fromId
+        fromId,
       });
     },
 
     // 打开已读、未读人员浮框
-    seeMore (value) {
-      if (value == 'read') this.showMoreRead = true;
-      if (value == 'noRead') this.showMoreNoRead = true;
+    seeMore(value) {
+      if (value == "read") this.showMoreRead = true;
+      if (value == "noRead") this.showMoreNoRead = true;
 
       this.toggleSeeMore();
     },
 
     // 监听click事件，根据条件关闭已读、未读人员浮框
-    toggleSeeMore () {
-      if(this.showMoreRead || this.showMoreNoRead) {
-        document.addEventListener('click', (e) => {
-          if(!this.$refs.seeMore || !this.$refs.bulletinDetail) return;
-          if(!this.$refs.seeMore.contains(e.target) && this.$refs.bulletinDetail.contains(e.target)) {
-            this.showMoreRead = this.showMoreRead ? !this.showMoreRead : this.showMoreRead;
-            this.showMoreNoRead = this.showMoreNoRead ? !this.showMoreNoRead : this.showMoreNoRead;
+    toggleSeeMore() {
+      if (this.showMoreRead || this.showMoreNoRead) {
+        document.addEventListener("click", (e) => {
+          if (!this.$refs.seeMore || !this.$refs.bulletinDetail) return;
+          if (
+            !this.$refs.seeMore.contains(e.target) &&
+            this.$refs.bulletinDetail.contains(e.target)
+          ) {
+            this.showMoreRead = this.showMoreRead
+              ? !this.showMoreRead
+              : this.showMoreRead;
+            this.showMoreNoRead = this.showMoreNoRead
+              ? !this.showMoreNoRead
+              : this.showMoreNoRead;
           }
-        })
+        });
       } else {
-        document.removeEventListener('click', (e) => {
-          console.log('取消')
-        })
+        document.removeEventListener("click", (e) => {
+          console.log("取消");
+        });
       }
     },
 
     // 删除通知公告
-    async deleteArticle () {
+    async deleteArticle() {
       try {
-        if (!await this.$platform.confirm('确定删除该文章吗？')) return;
+        if (!(await this.$platform.confirm("确定删除该文章吗？"))) return;
         let res = await RepositoryApi.deleteBulletin(this.params);
-        if(res.success) {
+        if (res.success) {
           this.$platform.notification({
-            title: '文章已删除成功。',
-            type: 'success',
+            title: "文章已删除成功。",
+            type: "success",
           });
 
-          if(!this.isList) {
+          if (!this.isList) {
             let id = window.frameElement.dataset.id;
             this.$platform.closeTab(id);
 
-            let fromId = window.frameElement.getAttribute('id');
+            let fromId = window.frameElement.getAttribute("id");
             this.$platform.openTab({
-              id: 'M_INFO_NOTICE',
-              title: '信息公告',
-              url: '/info/notice',
+              id: "M_INFO_NOTICE",
+              title: "信息公告",
+              url: "/info/notice",
               reload: true,
               close: true,
-              fromId
+              fromId,
             });
           } else {
-            if(this.info.isLast) {
+            if (this.info.isLast) {
               this.$parent.resetPageNum();
             } else {
-              this.$emit('search');
+              this.$emit("search");
             }
           }
         } else {
           this.$platform.notification({
             title: res.message,
-            type: 'error',
+            type: "error",
           });
         }
       } catch (e) {
@@ -360,27 +430,71 @@ export default {
     },
 
     // TalkingData事件埋点
-    trackEventHandler (type) {
-      if (type === 'delete') {
-        window.TDAPP.onEvent('pc：信息公告详情-删除事件');
+    trackEventHandler(type) {
+      if (type === "delete") {
+        window.TDAPP.onEvent("pc：信息公告详情-删除事件");
         return;
       }
-    }
+    },
+    changeRelease() {
+      this.$confirm(
+        this.detail.circleState == 1 ? "是否取消发布" : "是否发布到圈子",
+        "提示",
+        {
+          confirmButtonText: "确定",
+        }
+      )
+        .then(() => {
+          RepositoryApi.releaseCircle({
+            id: this.detail.id,
+            circleState: 1 - this.detail.circleState * 1,
+          }).then((res) => {
+            if (res.code == 0) {
+              this.detail.circleState = 1 - this.detail.circleState * 1;
+              this.$message({
+                message: this.detail.circleState == 1 ? "发布成功" : "取消成功",
+                duration: 1500,
+                type: "success",
+              });
+
+              this.$emit("releaseCircle", {
+                id: this.detail.id,
+                circleState: this.detail.circleState * 1,
+              });
+            } else {
+              this.$message({
+                message: res.message,
+                duration: 1500,
+                type: "error",
+              });
+            }
+          });
+        })
+        .catch(() => {});
+    },
   },
   computed: {
-    height () {
-      return this.isList ? '100%' : '100vh';
+    height() {
+      return this.isList ? "100%" : "100vh";
     },
 
-    padding () {
-      return this.isList ? '0 50px' : '0 100px';
+    padding() {
+      return this.isList ? "0 50px" : "0 100px";
     },
 
-    marginLeft () {
-      return this.reads.reads.length > 0 ? '20px' : '0'
+    marginLeft() {
+      return this.reads.reads.length > 0 ? "20px" : "0";
+    },
+
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
+    },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
     }
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
@@ -396,7 +510,7 @@ export default {
     justify-content: space-between;
     height: 60px;
     padding: 10px 24px 10px 16px;
-    border-bottom: 1px solid #E8EFF0;
+    border-bottom: 1px solid #e8eff0;
 
     .author {
       font-size: 0;
@@ -409,7 +523,7 @@ export default {
         border-radius: 50%;
         margin-right: 15px;
       }
-      
+
       .author-info {
         vertical-align: middle;
         display: inline-block;
@@ -440,13 +554,12 @@ export default {
       }
 
       .management {
-
         .icon-edit {
           display: inline-block;
           width: 25px;
           height: 25px;
           font-size: 14px;
-          color: #38A6A6;
+          color: #38a6a6;
         }
 
         .icon-delete {
@@ -454,7 +567,7 @@ export default {
           width: 25px;
           height: 25px;
           font-size: 14px;
-          color: #38A6A6;
+          color: #38a6a6;
         }
       }
 
@@ -465,7 +578,7 @@ export default {
         line-height: 30px;
         text-align: center;
         font-size: 14px;
-        color: #38A6A6;
+        color: #38a6a6;
 
         cursor: pointer;
       }
@@ -475,7 +588,7 @@ export default {
         height: 30px;
         line-height: 30px;
         margin-left: 10px;
-        color: #55B7B4;
+        color: #55b7b4;
 
         cursor: pointer;
       }
@@ -487,12 +600,11 @@ export default {
     overflow: auto;
 
     .info {
-
       .title {
         margin: 0;
         padding: 16px 0;
         text-align: center;
-        font-size: 20  px;
+        font-size: 20 px;
       }
 
       .content {
@@ -510,7 +622,7 @@ export default {
 
     .footer {
       padding: 12px;
-      box-shadow:0px 2px 8px 0px rgba(144,171,184,0.5);
+      box-shadow: 0px 2px 8px 0px rgba(144, 171, 184, 0.5);
       border-radius: 4px;
       font-size: 0;
       margin-bottom: 50px;
@@ -563,7 +675,7 @@ export default {
 
             margin-bottom: 5px;
             border-radius: 50%;
-            border: 1px solid #E2E2EA;
+            border: 1px solid #e2e2ea;
 
             cursor: pointer;
 

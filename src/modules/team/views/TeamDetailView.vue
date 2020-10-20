@@ -162,6 +162,8 @@ import qs from 'qs';
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi'
 
+import { isShowCreateChildrenTeam } from '@src/util/version.ts'
+
 export default {
   name: 'team-detail-view',
   props: {
@@ -208,7 +210,7 @@ export default {
       return true
     },
     showNewTeam() {
-      return this.initData.showNewTeam === true;
+      return isShowCreateChildrenTeam(this.initData)
     }
   },
   mounted() {

@@ -4,6 +4,7 @@ import * as TaskApi from '@src/api/TaskApi.ts'
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm/PlanTaskEditForm.vue'
 /* utils */
+import {parse} from '@src/util/querystring';
 import * as FormUtil from '@src/component/form/util'
 import * as util from '@src/modules/task/util/task'
 import _ from 'lodash'
@@ -57,12 +58,37 @@ export default {
       // 关联项查询处理
       this.relationFieldHandler();
 
+      // 是否打开派单设置弹窗
+      this.$nextTick(async () => {
+        let query = parse(window.location.search) || {}
+        if(!!query.openAllotSetting) {
+          await this.planTaskEditDialogOpen();
+        }
+      });
     } catch (error) {
       console.warn('error ', error)
     }
   },
   methods: {
     ...methods,
+    /** 
+     * 关闭并打开新的Tab
+    */
+    closeAndOpenTab(url, newTabId) {
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id)
+
+      let fromId = window.frameElement.getAttribute('id')
+      
+      this.$platform.openTab({
+        id: newTabId,
+        title: '',
+        url,
+        reload: true,
+        close: true,
+        fromId
+      });
+    },
     /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
     */
@@ -108,10 +134,11 @@ export default {
           let taskId = res.result;
           let taskDetailPath = `/task/view/${taskId}`;
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
+          let url = isAllot ? taskAllotPath : taskDetailPath;
+          let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
 
-          window.location.href = isAllot ? taskAllotPath : taskDetailPath;
-
-          this.togglePending();
+          this.closeAndOpenTab(url, id)
+          this.togglePending()
 
         })
         .catch(err => {
@@ -152,13 +179,13 @@ export default {
       if(this.isCopyTask) {
         let { taskId = '' } = this.urlParams;
         this.pending = true;
-        return window.location.href = `/task/view/${taskId}`;
+        return this.closeAndOpenTab(`/task/view/${taskId}`, `task_view${taskId}`)
       }
       // 事件转工单
       else if(this.isFromEvent) {
         let { eventId = '' } = this.urlParams;
         this.pending = true;
-        return window.location.href = `/event/view/${eventId}`;
+        return this.closeAndOpenTab(`/event/view/${eventId}`, `event_view${eventId}`);
       }
       // 工单新建
       else if (this.isTaskCreate) {
@@ -226,7 +253,7 @@ export default {
           this.$platform.refreshTab(isFromId);
           this.$platform.closeTab(closeId);
         } else {
-          location.href = '/task/planTask/list';
+          this.closeAndOpenTab('/task/planTask/list', 'task_plan_list')
         }
         
       } catch (error) {
@@ -498,9 +525,11 @@ export default {
           let taskId = this.editId;
           let taskDetailPath = `/task/view/${taskId}`;
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
-          
-          window.location.href = isAllot ? taskAllotPath : taskDetailPath;
-          this.togglePending();
+          let url = isAllot ? taskAllotPath : taskDetailPath;
+          let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
+
+          this.closeAndOpenTab(url, id)
+          this.togglePending()
 
         })
         .catch(err => {

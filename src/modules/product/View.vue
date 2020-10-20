@@ -6,7 +6,10 @@
         <template>
           <button type="button" class="btn btn-text" @click="editProduct" v-if="allowEditProduct"><i class="iconfont icon-edit"></i> 编辑</button>
           <button type="button" class="btn btn-text" @click="deleteProduct" v-if="allowDeleteProduct"><i class="iconfont icon-yemianshanchu"></i> 删除</button>
-          <button type="button" class="btn btn-text" @click="openRemindDialog('remind')"><i class="iconfont icon-notification"></i> 添加提醒</button>
+          <button type="button" class="btn btn-text" @click="openRemindDialog('remind')" v-if="isShowCustomerRemind">
+            <i class="iconfont icon-notification"></i> 
+            添加提醒
+          </button>
         </template>
       </div>
       <div class="product-toolbar-right action-btn" v-if="!isDelete">
@@ -33,7 +36,7 @@
           </el-dropdown-menu>
         </el-dropdown>
 
-        <el-dropdown trigger="click" v-if="allowCreatePlanTask">
+        <el-dropdown trigger="click" v-if="allowCreatePlanTask && isShowPlanTask">
           <span class="el-dropdown-link el-dropdown-btn">
             <i class="iconfont icon-add"></i>计划任务
           </span>
@@ -157,6 +160,7 @@ import DownloadCodeDialog from './components/DownloadCodeDialog.vue';
 import EditContactDialog from './components/EditContactDialog.vue';
 import ProductContactTable from './components/ProductContactTable.vue';
 
+import { isShowCustomerRemind, isShowPlanTask } from '@src/util/version.ts'
 
 import qs from '@src/util/querystring';
 import AuthUtil from '@src/util/auth';
@@ -374,9 +378,6 @@ export default {
 
       return allow;
     },
-    isDelete(){
-      return this.product.isDelete == null || this.product.isDelete === 1;
-    },
 
     allowDeleteProduct() {
       return this.allowEditProduct && this.permission.PRODUCT_DELETE;
@@ -457,6 +458,14 @@ export default {
         }
       );
     },
+    /* 是否显示客户提醒 */
+    isShowCustomerRemind() {
+      return isShowCustomerRemind()
+    },
+    /* 是否显示计划任务 */
+    isShowPlanTask() {
+      return isShowPlanTask()
+    }
   },
   mounted() {
     this.updateProductNameStyle();
@@ -664,11 +673,11 @@ export default {
         }, {
           displayName: `计划任务(${plantaskQuantity || 0})`,
           component: PlanTable.name,
-          show: this.allowCreatePlanTask,
+          show: this.allowCreatePlanTask && this.isShowPlanTask,
         }, {
           displayName: `产品提醒(${remindQuantity || 0})`,
           component: RemindTable.name,
-          show: true,
+          show: this.isShowCustomerRemind,
         }
       ].filter(tab => tab.show)
     },

@@ -2,59 +2,80 @@
   <div id="doMyself-box">
     <div class="flex-x">
       <div class="left-menu">
-        <div class="menu-title">自助门户设置</div>
-        <nav
-          :class="`menu-list ${nowMenu==index?'menu-checked':''}`"
-          v-for="(item,index) in menuList"
-          :key="index"
-          @click="changePage(index)"
-        >
-          <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
-          <div class="icon-box">
-            <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16 font-w-600':'font-14'}`"></i>
-          </div>
-          <span>{{item.name}}</span>
-        </nav>
+        <div class="menu-title">{{linkControl && isShowSelfServicePortal ? '消息中心' : '自助门户设置'}}</div>
+        <template v-for="(item, index) in menuList">
+          <nav
+            :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
+            :key="index"
+            v-if="linkControl && isShowSelfServicePortal ? item.name == '客户自助门户' ? false : true : true"
+            @click="changePage(index)"
+          >
+            <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
+            <div class="icon-box">
+              <i
+                :class="`iconfont ${item.icon} ${
+                  nowMenu == index ? 'font-16 font-w-600' : 'font-14'
+                }`"
+              ></i>
+            </div>
+            <span>{{ item.name }}</span>
+          </nav>
+        </template>
       </div>
 
-      <wx-set v-if="nowMenu===1"></wx-set>
-      <toast-list v-if="nowMenu===3"></toast-list>
+      <wx-set v-if="nowMenu === 1"></wx-set>
+      <toast-list v-if="nowMenu === 3"></toast-list>
     </div>
   </div>
 </template>
 <script>
 import toastList from "../toastList/toastList";
 import wxSet from "../wxSet/wxSet";
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 export default {
   name: "do-myself-view",
   props: {
     initData: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
+  },
+  provide() {
+    return {
+      initData: this.initData,
+    };
   },
   data() {
     return {
       menuList: [
         {
           name: "客户自助门户",
-          icon: "icon-Gateway"
+          icon: "icon-Gateway",
         },
         {
           name: "公众号设置",
-          icon: "icon-weixin2"
+          icon: "icon-weixin2",
         },
         {
           name: "短信消息设置",
-          icon: "icon-duanxin3"
+          icon: "icon-duanxin3",
         },
         {
           name: "消息记录",
-          icon: "icon-message"
-        }
+          icon: "icon-message",
+        },
       ],
-      nowMenu: 1 // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
+      nowMenu: 1, // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
     };
+  },
+  computed: {
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
+    },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
+    }
   },
   created() {
     let type = window.location.href.split("/")[
@@ -62,7 +83,7 @@ export default {
     ];
     let typeObj = {
       wxSet: 1,
-      toastList: 3
+      toastList: 3,
     };
     this.nowMenu = typeObj[type];
   },
@@ -81,12 +102,12 @@ export default {
         window.location.href = "/setting/doMyself/toastList";
       }
       this.nowMenu === index;
-    }
+    },
   },
   components: {
     [toastList.name]: toastList,
-    [wxSet.name]: wxSet
-  }
+    [wxSet.name]: wxSet,
+  },
 };
 </script>
 <style lang="scss">
@@ -108,7 +129,7 @@ export default {
 .font-16 {
   font-size: 16px;
 }
-.font-w-600{
+.font-w-600 {
   font-weight: 500;
 }
 .al-c {

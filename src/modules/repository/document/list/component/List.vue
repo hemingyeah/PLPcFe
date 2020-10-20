@@ -45,6 +45,9 @@
               <i class="iconfont icon-yanjing"></i>
               <span>{{item.readTimes}}</span>
             </span>
+            <span class="readNum" v-if="item.circleState == 1 && linkControl && isShowSelfServicePortal">
+              <i class="iconfont icon-quanziguanli"></i>
+            </span>
           </div>
 
         </div>
@@ -74,6 +77,7 @@
 <script>
 import * as RepositoryApi from '@src/api/Repository';
 import Clipboard from 'clipboard';
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 
 export default {
   name: 'list',
@@ -89,6 +93,19 @@ export default {
     id: {
       type: String,
       default: ''
+    },
+    initData: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  computed:{
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
+    },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
     }
   },
   data () {
@@ -380,6 +397,12 @@ export default {
           .icon-yanjing {
             font-size: 8px;
             color: #B0BCC3;
+            margin-left: 8px;
+          }
+
+          .icon-quanziguanli{
+            font-size: 8px;
+            color: #38A6A6;
             margin-left: 8px;
           }
 

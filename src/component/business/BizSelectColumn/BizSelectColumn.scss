@@ -12,7 +12,7 @@
 
 .biz-select-column-modal {
   .base-modal {
-    width: 886px !important;
+    width: 935px !important;
   }
   .base-modal-body {
     display: flex;
@@ -23,15 +23,15 @@
       border-right: 1px solid #E6E6E6;
       flex: 1;
       overflow: auto;
-      margin-right: 20px;
+      .el-checkbox__label {
+        color: $text-color-primary;
+        font-weight: normal;
+      }
     }
     .biz-select-column-sort {
-      width: 240px;
+      width: 260px;
       overflow: auto;
     }
-  }
-  .base-modal-footer {
-    background-color: #F2F0F0;
   }
 }
 
@@ -45,6 +45,11 @@
     font-weight: 500;
     margin-right: 12px;
   }
+}
+
+.biz-select-column-sort-title,
+.biz-select-column-sort-row {
+  margin-left: 20px;
 }
 
 .biz-select-column-tree-parent {
