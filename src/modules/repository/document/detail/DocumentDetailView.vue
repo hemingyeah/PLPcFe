@@ -54,7 +54,7 @@
 
             <span
               class="open"
-              v-if="allowEdit && linkControl"
+              v-if="allowEdit && linkControl && isShowSelfServicePortal"
               @click="changeRelease();trackEventHandler('share')"
             >
               <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
@@ -152,6 +152,8 @@ import * as Lang from "@src/util/lang/index.js";
 
 import ApproveDialog from "./component/ApproveDialog.vue";
 import Clipboard from "clipboard";
+
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 
 export default {
   name: "document-detail",
@@ -704,6 +706,9 @@ export default {
     linkControl() {
       return this.initData.openLinkC;
     },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
+    }
   },
 };
 </script>

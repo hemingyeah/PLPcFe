@@ -13,15 +13,34 @@ const NestedDraggable = {
       default: () => []
     }
   },
+  data() {
+    return {
+      drag: false
+    }
+  },
+  methods: {
+    sortListDragStartEventHandler(event) {
+      this.drag = true
+    },
+    sortListDragEndEventHandler(event) {
+      this.drag = false
+    }
+  },
   render(h) {
     return (
-      <draggable tag="div" list={ this.lists } class="nested-draggable">
+      <draggable 
+        class="nested-draggable"
+        tag="div" 
+        list={ this.lists }
+        onStart={ (event) => this.sortListDragStartEventHandler(event) }
+        onEnd={ (event) => this.sortListDragEndEventHandler(event) }
+      >
         {
           this.lists.map(item => {
             return (
               <div key={ uuid() } class="nested-draggable-block">
                 <div class="nested-draggable-name">
-                  <span class="nested-draggable-name-label"><i class="iconfont icon-daohang"></i></span>
+                  <span class="nested-draggable-name-label"><i class="iconfont icon-paixu"></i></span>
                   <span class="nested-draggable-name-text">{ item.name }</span>
                 </div>
                 <nested-draggable lists={ item.lists }></nested-draggable>

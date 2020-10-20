@@ -1,35 +1,25 @@
-$progress-height: 40px;
-$proccess-border-height: 40px;
+$progress-height: 32px;
+$proccess-border-height: 32px;
 $progress-state-common-bg-color: #F2F2F2;
 $progress-state-before-bg-color: #E1F3D8;
 
-@mixin triangle-border-color($color, $backgroundColor: '') {
+@mixin triangle-color($backgroundColor: '', $borderColor: '') {
+  & {
+    border: 1px solid $backgroundColor;
+  }
   .biz-process-left-triangle {
-    &-top {
-      background-color: $color;
-      &:before {
-        background-color: $backgroundColor;
-      }
+    &:before {
+      background-color: $backgroundColor;
     }
-    &-bottom {
-      background-color: $color;
-      &:before {
-        background-color: $backgroundColor;
-      }
+    &:after {
+      background-color: $backgroundColor;
     }
   }
   .biz-process-right-triangle {
-    &-top {
-      background-color: $color;
-      &:before {
-        background-color: $backgroundColor;
-      }
-    }
-    &-bottom {
-      background-color: $color;
-      &:before {
-        background-color: $backgroundColor;
-      }
+    &:before {
+      border-right: 1px solid $borderColor;
+      border-top: 1px solid $borderColor;
+      background-color: $backgroundColor;
     }
   }
 }
@@ -40,6 +30,42 @@ $progress-state-before-bg-color: #E1F3D8;
     &:after {
       background-color: $color;
     }
+    .biz-process-right-triangle {
+      &:before {
+        background-color: $color;
+      }
+    }
+  }
+}
+
+@mixin triangle-selected {
+  & {
+    border-left: none !important;
+  }
+  .biz-process-left-triangle-top {
+    background: $color-primary;
+    
+    display: block;
+    width: 28px;
+    height: 1px;
+    transform: rotate(67deg);
+    
+    position: absolute;
+    top: 4px;
+    left: -19px;
+  }
+  .biz-process-left-triangle-bottom {
+    background: $color-primary;
+
+    display: block;
+    width: 18px;
+    height: 1px;
+    transform: rotate(293deg);
+
+    position: absolute;
+    bottom: -25px;
+    left: -12px;
+    z-index: 1;
   }
 }
 
@@ -50,17 +76,22 @@ $progress-state-before-bg-color: #E1F3D8;
 
   &-state {
     background-color: $progress-state-common-bg-color;
+    border: 1px solid $progress-state-common-bg-color;
     color: #999;
     cursor: pointer;
     
     height: $progress-height;
-    width: 120px;
-    margin-right: 42px;
+    width: 98px;
+    margin-right: 12px;
 
     line-height: $progress-height;
     text-align: center;
 
     position: relative;
+
+    &:hover {
+      border-left: none;
+    }
 
     &-current {
       background-color: $color-primary;
@@ -75,6 +106,10 @@ $progress-state-before-bg-color: #E1F3D8;
     &-first {
       border-top-left-radius: ($progress-height / 2);
       border-bottom-left-radius: ($progress-height / 2);
+
+      &:hover {
+        border-left: 1px;
+      }
     }
 
     &-last {
@@ -82,7 +117,6 @@ $progress-state-before-bg-color: #E1F3D8;
       border-bottom-right-radius: ($progress-height / 2);
       border-right: 0;
     }
-
   }
 
 }
@@ -96,19 +130,12 @@ $progress-state-before-bg-color: #E1F3D8;
     background-color: #fff;
     border: 1px solid $color-primary;
     color: $color-primary;
-    @include triangle-border-color($color-primary);
-  }
-
-  &:before {
-    left: 107px !important;
-    top: -1px !important;
-    width: 20px !important;
-  }
-
-  &:after {
-    left: 107px !important;
-    bottom: -1px !important;
-    width: 22px !important;
+    & {
+      &:before,
+      &:after {
+        width: 80px;
+      }
+    }
   }
 
 }
@@ -122,56 +149,49 @@ $progress-state-before-bg-color: #E1F3D8;
 
 /* 流程信息状态 */
 .biz-process-state {
-  @include triangle-border-color($progress-state-common-bg-color);
 
   &:hover {
     background-color: $color-primary;
     color: #fff;
-    @include triangle-border-color($color-primary);
   }
 
   &:before {
-    border-radius: 1px;
     content: '';
 
     position: absolute;
-    top: 0px;
-    left: -29px;
-    z-index: 1; 
-    
-    height: 1px;
-    width: 159px;
-  }
-
-  &:after {
-    border-radius: 1px;
-    content: '';
-
-    position: absolute;
-    left: -28px;
-    bottom: 0px;
+    top: -1px;
+    right: -2px;
     z-index: 1;
 
     height: 1px;
-    width: 158px;
+    width: 106px;
   }
 
+  &:after {
+    content: '';
+
+    position: absolute;
+    bottom: -1px;
+    right: -3px;
+    z-index: 1;
+
+    height: 1px;
+    width: 105px;
+  }
+  
 }
 
 /* 流程信息 当前的 */
 .biz-process-state-current {
-  @include triangle-border-color($color-primary);
+  @include triangle-color($color-primary);
 }
 
 /* 流程信息 之前的 */
 .biz-process-state-before {
-  @include triangle-border-color($progress-state-before-bg-color);
-
+  @include triangle-color($progress-state-before-bg-color);
   &:hover {
-    background-color: #fff;
-    color: $color-primary;
-    @include triangle-border-color(#fff, $color-primary);
     @include process-state-border-color($color-primary);
+    @include triangle-color($color-primary);
   }
 }
 
@@ -182,7 +202,6 @@ $progress-state-before-bg-color: #E1F3D8;
   &:hover {
     background-color: $progress-state-common-bg-color;
     color: $text-color-primary;
-    @include triangle-border-color($progress-state-common-bg-color);
   }
 
 }
@@ -192,33 +211,69 @@ $progress-state-before-bg-color: #E1F3D8;
     border: 1px solid $color-primary;
     background-color: #fff;
     color: $color-primary;
-    @include triangle-border-color(#fff, $color-primary);
+    @include triangle-color(#fff, $color-primary);
     @include process-state-border-color($color-primary);
+    @include triangle-selected();
   }
 
   &:before {
-    left: -30px !important;
+    left: -7px !important;
     top: -1px !important;
     width: 60px !important;
   }
 
   &:after {
-    left: -27px !important;
+    left: -6px !important;
     bottom: -1px !important;
     width: 60px !important;
   }
 }
 
-.biz-process-state-selected {
-  background-color: #fff;
-  color: $color-primary;
-  @include triangle-border-color(#fff, $color-primary);
-  @include process-state-border-color($color-primary);
+.biz-process-state-first,
+.biz-process-state-last {
+  border: 1px solid $progress-state-before-bg-color;
 }
 
-.biz-process-state-selected.biz-process-state-first,
-.biz-process-state-selected.biz-process-state-last {
-  border: 1px solid;
+.biz-process-state-selected {
+  background-color: #fff;
+  border: 1px solid $color-primary;
+  color: $color-primary;
+  @include process-state-border-color($color-primary);
+  @include triangle-color(#fff, $color-primary);
+
+  &.biz-process-state-first,
+  &.biz-process-state-lst {
+    &:before,
+    &:after {
+      width: 80px;
+    }
+  }
+  
+  @include triangle-selected();
+  
+  &:hover{
+    .biz-process-left-triangle {
+      &:before {
+        background-color: $color-primary;
+      }
+      &:after {
+        background-color: $color-primary;
+      }
+    }
+    .biz-process-right-triangle {
+      &:before {
+        background-color: $color-primary;
+      }
+    }
+  }
+}
+
+.biz-process-state-before.biz-process-state-selected {
+  border-left: none;
+}
+
+.biz-process-state-before.biz-process-state-selected.biz-process-state-first {
+  border: 1px solid $color-primary !important;
 }
 
 /* 流程信息 三角形 */
@@ -233,109 +288,50 @@ $progress-state-before-bg-color: #E1F3D8;
   position: absolute;
   left: 0;
   top: 0;
-
-  &-top {
-    width: $proccess-border-height;
-    height: $proccess-border-height;
-
+  
+  &:before { 
+    background-color: $progress-state-common-bg-color;
+    content: ' ';
+    display: block;
     position: absolute;
-    left: -$proccess-border-height / 2;
-    top: -$proccess-border-height / 2;
-
-    transform: rotate(45deg);
-
-    &:before {
-      content: '';
-
-      position: absolute;
-      top: $proccess-border-height;
-      left: -10px;
-
-      width: $proccess-border-height;
-      height: 1px;
-    }
-
+    left: 3px;
+    top: -2px;
+    width: $progress-height + 11px;
+    height: $progress-height + 13px;
+    transform: rotateZ(250deg) skew(-38deg, -2deg);
   }
-
-  &-bottom {
-    width: $proccess-border-height;
-    height: $proccess-border-height;
-
+  
+  &:after { 
+    background-color: $progress-state-common-bg-color;
+    content: ' ';
+    display: block;
     position: absolute;
-    left: -$proccess-border-height / 2;
-    top: $proccess-border-height / 2;
-
-    transform: rotate(-135deg);
-
-    &:before {
-      border-radius: 1px;
-      content: '';
-
-      position: absolute;
-      top: 7.8px;
-      left: $proccess-border-height / 2;
-
-      width: $proccess-border-height;
-      height: 1px;
-
-      transform: rotate(90deg);
-    }
+    left: 0px;
+    top: 0;
+    width: $progress-height + 8px;
+    height: $progress-height + 8px;
+    transform: rotateZ(210deg) skew(5deg, -11deg);
   }
-
 }
 
 .biz-process-right-triangle {
   position: absolute;
   right: 0;
   top: 0;
-
-  &-top {
-    width: $proccess-border-height;
-    height: $proccess-border-height;
-
-    position: absolute;
-    right: (-$proccess-border-height / 2) - 1;
-    top: 0;
-
-    transform: rotate(315deg);
-
-    &:before {
-      border-radius: 1px;
-      content: '';
-
-      position: absolute;
-      top: $proccess-border-height / 2;
-      left: $proccess-border-height / 2;
-
-      width: $proccess-border-height;
-      height: 1px;
-
-      transform: rotate(90deg);
-    }
-  }
-
-  &-bottom {
-    width: $proccess-border-height;
-    height: $proccess-border-height;
+  
+  &:before {
+    background-color: $progress-state-common-bg-color;
+    content: ' ';
+    display: block;
 
     position: absolute;
-    right: -$proccess-border-height / 2;
+    left: -20px;
     top: 0;
 
-    transform: rotate(-45deg);
-
-    &:before {
-      content: '';
-
-      position: absolute;
-      top: $proccess-border-height;
-      left: 1px;
-
-      width: $proccess-border-height;
-      height: 1px;
-    }
+    width: $progress-height;
+    height: $progress-height;
+    transform: rotateZ(45deg) skew(22deg, 22deg);
   }
-
 }
 
 /* 流程信息 异常状态 */
@@ -385,11 +381,6 @@ $progress-state-before-bg-color: #E1F3D8;
 }
 
 /* 适配样式 */
-.biz-process-state-first,
-.biz-process-state-last {
-  border: 1px solid $progress-state-before-bg-color;
-}
-
 .biz-process-state-after {
   &.biz-process-state-last {
     border: none;
@@ -399,12 +390,9 @@ $progress-state-before-bg-color: #E1F3D8;
 .biz-process-state-current {
   &.biz-process-state-first,
   &.biz-process-state-last {
-    border: 1px solid $color-primary;
+    border: 1px solid $color-primary !important;
   }
   &.biz-process-state-last {
-    &:before {
-      left: -28px !important;
-    }
     .biz-process-left-triangle-bottom {
       :before {
         top: 9px !important;
@@ -413,9 +401,7 @@ $progress-state-before-bg-color: #E1F3D8;
   }
 }
 
-.biz-process-state-last {
-  .biz-process-left-triangle-top {
-    left: -19px;
-    top: -21px;
-  }
+.biz-process-state-name {
+  position: relative;
+  z-index: 9;
 }

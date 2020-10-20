@@ -23,6 +23,10 @@ const TaskAllowSelect = {
         auto: {
           text: '自动分配',
           value: 'auto'
+        },
+        allot: {
+          text: '保存至待分配列表',
+          value: 'waitDistribution'
         }
       },
       value: {
@@ -54,17 +58,14 @@ const TaskAllowSelect = {
       this.$emit('update:type', newValue);
     }
   },
-  mounted() {
-    // 
-  },
   methods: {
     changeAllotData(data = {}) {
       const { allotType, synergies, executors } = data;
-
+      
       if (allotType) this.allotType = allotType;
       if (synergies && Array.isArray(synergies)) this.value.synergies = synergies.filter(synergie => !!synergie.userId);
       if (executors && Array.isArray(executors)) this.value.executors = executors.filter(executor => !!executor.userId);
-
+      
     },
     clearExecutors() {
       this.value.executors = [];
@@ -75,17 +76,17 @@ const TaskAllowSelect = {
     /** 根据客户id获取客户信息和客户负责人信息和开关 */
     fetchExeinsynWithCustomerManager(customerId = '') {
       if(!customerId) return console.warn('fetchExeinsynWithCustomerManager paramer not have customerId')
-
+      
       getCustomerExeinsyn({ id: customerId}).then(result => {
         let exeInSynOfTaskOrEvent = result?.data?.exeInSynOfTaskOrEvent;
         // 允许自动将客户负责人带入工单或事件协同人
         if(exeInSynOfTaskOrEvent) {
           let synergies = this.value.synergies.slice();
-          let isHaveSynergies = synergies.some(synergies => synergies.userId === result?.data?.userId);
-          !isHaveSynergies && this.value.synergies.push(result.data);
+          let isHaveSynergies = synergies.some(synergies => synergies.userId === result?.data?.userId)
+          !isHaveSynergies && result.data.userId && this.value.synergies.push(result.data)
         }
       })
-
+      
     },
     /** 选择协同人人员  */
     selectSynergiesUser() {
@@ -118,7 +119,7 @@ const TaskAllowSelect = {
             : this.value.executors
         )
       }
-    
+      
       this.$fast.contact.choose(choose, options)
         .then(res => {
           if(res.status != 0) return

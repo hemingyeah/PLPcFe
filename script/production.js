@@ -7,8 +7,7 @@
 process.env.NODE_ENV = 'production';
 
 const argv = require('./argv')(process.argv.slice(2))
-const user = argv.user || 'dongls';
-// const config = require(`./config/${user}`);
+const user = argv.user;
 
 const fs = require('fs');
 const path = require('path');
@@ -16,6 +15,7 @@ const shell = require('shelljs');
 
 const webpack = require('webpack')
 const webpackConfig = require('../config/webpack.prod.conf');
+
 function searchWeb(path_) {
   let files = fs.readdirSync(path_);
   let haveWeb = {
@@ -32,15 +32,18 @@ function searchWeb(path_) {
   return haveWeb
 
 }
-
-let userPath = path.resolve(__dirname, '../../')
-let searchResult = searchWeb(`${userPath }/`);
-if (searchResult.have == false) {
-  return console.log('未找到同级文件中的web文件夹，打包失败')
+let ROOT_PATH
+if (user) {
+  const config = require(`./config/${user}`);
+  ROOT_PATH = config.targetRootPath;
+} else {
+  let userPath = path.resolve(__dirname, '../../')
+  let searchResult = searchWeb(`${userPath }/`);
+  if (searchResult.have == false) {
+    return console.log('未找到同级文件中的web文件夹，打包失败')
+  }
+  ROOT_PATH = searchResult.url;
 }
-const ROOT_PATH = searchResult.url;
-
-// const ROOT_PATH = config.targetRootPath;
 const monitorScript = '<script>!(function(c,i,e,b){var h=i.createElement("script");var f=i.getElementsByTagName("script")[0];h.type="text/javascript";h.defer=true;h.crossorigin=true;h.onload=function(){c[b]||(c[b]=new c.wpkReporter({bid:window.location.host=="app.shb.ltd"||window.location.href.indexOf("dingtalk")>-1?"dta_2_3144":"dta_2_3397"}));c[b].installAll()};f.parentNode.insertBefore(h,f);h.src=e})(window,document,"https://g.alicdn.com/woodpeckerx/jssdk??wpkReporter.js","__wpk");</script>'
 
 // 编译
@@ -62,7 +65,7 @@ webpack(webpackConfig, function (err, stats) {
   copyResource()
 });
 
-function copyResource(){
+function copyResource() {
   let targetPath = `${ROOT_PATH}/shb-web/src/main/webapp/resource/pc-fe-static`;
   let originPath = path.resolve(__dirname, '../public/resource/pc-fe-static');
 
@@ -72,7 +75,7 @@ function copyResource(){
   console.log(`copy resource => ${targetPath}`)
 }
 
-async function genJSP(directory){
+async function genJSP(directory) {
   let files = fs.readdirSync(directory);
   // 过滤html
   let htmls = files.filter(file => file.endsWith('.html'));
@@ -93,7 +96,7 @@ async function genJSP(directory){
   shell.cp('-r', `${distOriginPath}/jsp/*`, jspTargetPath);
   // 清空jsp
   shell.rm('-rf', `${distOriginPath}/jsp`);
-  
+
   // 复制静态资源
   shell.rm('-rf', distTargetPath);
   shell.mkdir('-p', distTargetPath);
@@ -102,15 +105,15 @@ async function genJSP(directory){
   console.log(`build on ${new Date().toLocaleString()}`)
 }
 
-function gen(directory, fileName){
+function gen(directory, fileName) {
   return new Promise((resolve, reject) => {
     let jspName = `${fileName.substring(0, fileName.lastIndexOf('.'))}.jsp`;
 
     // 1.读取html
     fs.readFile(path.resolve(directory, fileName), (err, data) => {
-      if(err) reject(err)
+      if (err) reject(err)
       let template = data.toString();
-  
+
       // 2.生成jsp内容
       // #{} => ${}
       template = template.replace(/#\{(.*?)\}/g, '${$1}');
@@ -120,15 +123,15 @@ function gen(directory, fileName){
       // template += `\n<!-- build on ${new Date().toLocaleString()}. -->`;
       // 注入监控脚本
       template = template.replace('</head>', `${monitorScript}</head>`);
-      
+
       let dirPath = path.resolve(directory, 'jsp');
-      if(!existsSync(dirPath)) {
+      if (!existsSync(dirPath)) {
         fs.mkdirSync(dirPath)
       }
-    
+
       // 3.写入文件
       fs.writeFile(path.resolve(dirPath, jspName), template, () => {
-        if(err) reject(err);
+        if (err) reject(err);
         resolve();
       });
     });
@@ -136,9 +139,9 @@ function gen(directory, fileName){
 }
 
 function existsSync(path) {
-  try{
+  try {
     fs.accessSync(path, fs.F_OK);
-  }catch(e){
+  } catch (e) {
     return false;
   }
   return true;

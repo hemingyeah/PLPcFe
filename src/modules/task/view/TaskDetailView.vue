@@ -20,7 +20,7 @@
         <!-- end 工单流程信息 -->
 
         <!-- start 折叠时客户信息 -->
-        <div class="customer-info-wrap" v-show="!collapse && customerField.id">
+        <div class="customer-info-wrap" v-show="!collapse && customerField && customerField.id">
           <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">{{ customer.name }}</div>
           
           <div class="linkman-info" v-if="customerOption.linkman">
@@ -66,7 +66,7 @@
             <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
 
             <!-- start 服务报告 -->
-            <template v-if="allowServiceReport">
+            <template v-if="allowServiceReport && isShowReport">
               <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null" size="mini">服务报告</el-button>
 
               <el-dropdown trigger="click" v-if="!srSysTemplate && srSysTemplate != null">

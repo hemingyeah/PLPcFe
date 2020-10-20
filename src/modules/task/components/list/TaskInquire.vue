@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="(item, index) in list" :key="index">
-      <batch-form :fields="fields" :column-num="columnNum" ref="batchForm" @add="add" @setting="setting" />
+      <batch-form :fields="fields" :column-num="columnNum" :list="list" :index="index" ref="batchForm" @add="add" @del="del" @setting="setting" />
     </div>
   </div>
 </template>
@@ -23,7 +23,7 @@ import { typeOf } from '@src/util/assist';
 const TaskInquireFiltersFieldNames = ['cusAddress', 'area', 'tags']
 const OperatorSelectOptionsMap = {
   'input': [
-    { label: '包含', value: 'contain'},
+    { label: '包含', value: 'like'},
     { label: '等于', value: 'eq'},
     { label: '大于', value: 'gt'},
     { label: '大于等于', value: 'ge'},
@@ -31,7 +31,7 @@ const OperatorSelectOptionsMap = {
     { label: '小于等于', value: 'le'}
   ],
   'text': [    
-    { label: '包含', value: 'contain'},
+    { label: '包含', value: 'like'},
     { label: '等于', value: 'eq'}
   ],
   'date': [
@@ -39,11 +39,17 @@ const OperatorSelectOptionsMap = {
   ],
   'select': [
     { label: '等于', value: 'eq'}
+  ],
+  "cascader": [
+    {label: '包含', value: 'cascader'}
+  ],
+  "many": [
+    {label: '包含', value: 'contain'}
   ]
 }
 
 function setFieldOperateHandler(field = {}) {
-  let { fieldName, formType } = field
+  let { fieldName, formType, setting } = field
 
   if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice()
@@ -51,14 +57,20 @@ function setFieldOperateHandler(field = {}) {
   else if (fieldName == 'customer' || fieldName == 'product') {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice()
   }
-  else if (formType == 'text' || formType == 'textarea') {
+  else if (formType == 'text' || formType == 'textarea' || formType === 'code' || formType === 'description') {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice()
   }
   else if (formType == 'date' || formType == 'datetime') {
     field.operatorOptions = OperatorSelectOptionsMap.date.slice()
   }
-  else if (formType == 'select') {
+  else if (formType == 'select' && !setting.isMult) {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice()
+  }
+  else if (formType == 'select' && setting.isMult) {
+    field.operatorOptions = OperatorSelectOptionsMap.many.slice()
+  }
+  else if (formType === 'cascader') {
+    field.operatorOptions = OperatorSelectOptionsMap.cascader.slice()
   }
   else {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice()
@@ -96,9 +108,6 @@ export default {
     fields() {
       let f = {};
       let fields = [...this.config]
-        .filter((f) => {
-          return (f.isSearch || ( !f.isSearch && (f.fieldName == 'serviceContent' || f.fieldName == 'serviceType' || f.fieldName == 'level') )) && TaskInquireFiltersFieldNames.indexOf(f.fieldName) < 0
-        })
         .map((field) => {
           f = _.cloneDeep(field);
 
@@ -123,7 +132,6 @@ export default {
           };
 
         })
-        .sort((a, b) => a.orderId - b.orderId);
       return fields;
     },
   },
@@ -181,6 +189,10 @@ export default {
         operator = 'address';
         break;
       }
+      case 'cascader': {
+        operator = 'cascader';
+        break
+      }
       case 'location': {
         operator = 'location';
         break;
@@ -194,6 +206,9 @@ export default {
     },
     add() {
       this.list.push(1)
+    },
+    del (index) {
+      this.list = this.list.filter((item, i) => {return index !== i})
     },
     setting(item) {
       if (item.isSystem) {
@@ -222,6 +237,14 @@ export default {
           type: Array,
           default: () => [],
         },
+        list: {
+          type: Array,
+          default: [],
+        },
+        index: {
+          type: Number,
+          default: 0
+        },       
         columnNum: {
           type: Number,
           default: 1
@@ -254,7 +277,7 @@ export default {
         },
         buildForm() {
           if (Object.keys(this.form).length === this.fields.length) return;
-          this.form = Utils.initialize(this.fields);
+          // this.form = Utils.initialize(this.fields);
 
           this.fields.forEach((f) => {
             if (f.fieldName === 'tags' && f.formType === 'select') {
@@ -299,6 +322,7 @@ export default {
             .catch((e) => console.error(e));
         },
         update(event, action) {
+          this.form = {}
           if (action === 'tags') {
             return (this.form.tags = event);
           }
@@ -308,7 +332,6 @@ export default {
           }
           const f = event.field;
           this.form[f.fieldName] = event.newValue;
-
           this.$forceUpdate()
         },
         selectField(val) {
@@ -325,6 +348,7 @@ export default {
             <el-select
               value={this.selectedField.fieldName}
               onChange={this.selectField}
+              filterable
             >
               {
                 this.fields.map((f) => (
@@ -343,7 +367,7 @@ export default {
 
           return (
             <el-select 
-              class='task-inquire-operator-select'
+              class={this.columnNum === 2 ? 'task-inquire-operator-select' : 'task-mt12'}
               value={ this.selectedField.operatorValue }
               onInput={ value => this.selectedField.operatorValue = value }
             >
@@ -372,7 +396,6 @@ export default {
           }
 
           let childComp = null;
-
           if (f.fieldName == 'customer') {
             let value = this.form[f.fieldName];
             childComp = h('search-customer-select', {
@@ -384,6 +407,7 @@ export default {
               },
               on: {
                 input: (event) => {
+                  this.form = {}
                   this.customer = event && event.length > 0 ? event[0] : {};
                   this.form[f.fieldName] = this.customer.id;
                 },
@@ -400,6 +424,7 @@ export default {
               },
               on: {
                 input: (event) => {
+                  this.form = {}
                   this.product = event && event.length > 0 ? event[0] : {};
                   this.form[f.fieldName] = this.product.id;
                 },
@@ -482,14 +507,19 @@ export default {
               <div>
                 { this.renderSelector() }
                 { this.renderOperateSelect() }
-              </div>
+              </div>             
+                <div class={this.columnNum === 2 ? 'task-inquire-two task-flex task-ai' : 'task-inquire task-flex task-ai'}>
+                  {this.renderInput(h)}
+                  {
+                    this.list.length - 1 === this.index ?  
+                      <div class="task-font14 task-c13 task-inquire-add task-ml15 task-pointer" onClick={() => {
+                        this.$emit('add')
+                      }}>添加</div>  : <i class="iconfont icon-yemianshanchu task-pointer task-ml15" onClick={() => {
+                        this.$emit('del', this.index)
+                      }}></i>
+                  }
+                </div>
               
-              <div class={this.columnNum === 2 ? 'task-inquire-two task-flex task-ai' : 'task-inquire task-flex task-ai'}>
-                {this.renderInput(h)}
-                <div class="task-font14 task-c13 task-inquire-add task-ml15 task-pointer" onClick={() => {
-                  this.$emit('add')
-                }}>添加</div>
-              </div>
 
             </div>
 
