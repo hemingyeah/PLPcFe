@@ -1,5 +1,8 @@
 <template>
-  <div class="">
+  <div class="task-box">
+    <div class="guide-model-box" v-if="nowGuideStep < 5">
+      
+    </div>
     <!-- s 列表展示 -->
     <div
       class="task-list-view common-list-container"
@@ -12,34 +15,50 @@
         <!-- 搜索 -->
         <div class="task-list-header-seach">
           <form onsubmit="return false;">
-            <div class="seach task-span1 task-flex task-ai">
-              <el-dropdown>
-                <div
-                  class="task-list-customize task-font14 task-c3 task-flex task-ai task-pointer"
-                >
-                  <img
-                    src="../../../assets/img/customize.png"
-                    class="task-ic19"
-                  />
-                  {{ otherText }}
-                  <i class="iconfont icon-triangle-down task-icon"></i>
-                </div>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    class="task-view-customize"
+            <div :class="['seach', 'task-span1', 'task-flex', 'task-ai', 'guide-box']">
+             
+              <div style="position: relative;" >
+                <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
+                <div itemid="" @mouseenter="guideDropdownMenu_enter">  
+                <el-dropdown id="v-task-step-3" >
+                  <div
+                    :class="['task-list-customize', 'task-font14', 'task-c3', 'task-flex', 'task-ai', 'task-pointer', nowGuideStep == 4? 'guide-point bg-w':'']"
                   >
-                    <div
-                      v-for="(item, index) in otherList"
-                      :key="index"
-                      @click="checkOther(item)"
-                      class="task-flex task-ai task-pointer"
-                    >
-                      <span class="task-list-dropdown-item">{{
-                        item.name
-                      }}</span>
-                      <div class="task-list-dropdown-icon">
+                    <img
+                      src="../../../assets/img/customize.png"
+                      class="task-ic19"
+                    />
+                    {{ otherText }}
+                    <i class="iconfont icon-triangle-down task-icon"></i>
+                  </div>
+                  <el-dropdown-menu slot="dropdown">
+                    <template v-if="guideDropdownMenu">
+                      <guide-compoment
+                        :content="'你保存的查询视图都在这里，可以一键查询哦！'"
+                        :only-one="true"
+                        :have-step="false"
+                        :finish-btn="'OK'"
+                        :g-style="'width:240px;top:100px;margin:auto;left:0;right:0;'"
+                        :stop-step="guideDropdownMenu_stopStep"
+                        :finish-btn-fn="guideDropdownMenu_finishBtnFn"
+                      ></guide-compoment>
+                    </template>
+                    <el-dropdown-item class="task-view-customize">
+                      <div
+                        v-for="(item, index) in otherList"
+                        :key="index"
+                        @click="checkOther(item)"
+                        class="task-flex task-ai task-pointer"
+                      >
+                        <span class="task-list-dropdown-item">{{
+                          item.name
+                        }}</span>
+                        <div class="task-list-dropdown-icon">
                           <el-tooltip content="查看筛选条件" placement="top">
-                            <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
+                            <i
+                              class="iconfont icon-yanjing task-font12"
+                              @click.stop="$refs.taskView.open(item.id, 1)"
+                            ></i>
                           </el-tooltip>
                           <el-tooltip content="编辑视图" placement="top">
                             <i
@@ -61,23 +80,27 @@
                               "
                             ></i>
                           </el-tooltip>
+                        </div>
                       </div>
-                    </div>
-                  </el-dropdown-item>
-                  <el-dropdown-item>
-                    <div
-                      class="task-flex task-ai task-cfa task-pointer task-list-wd252"
-                      @click="panelSearchAdvancedToggle"
-                    >
-                      <i class="iconfont icon-add task-mr4 task-font12"></i>
-                      新建视图
-                    </div>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
+
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <div
+                        class="task-flex task-ai task-cfa task-pointer task-list-wd252"
+                        @click="panelSearchAdvancedToggle"
+                      >
+                        <i class="iconfont icon-add task-mr4 task-font12"></i>
+                        新建视图
+                      </div>
+                    </el-dropdown-item>
+              </el-dropdown-menu></el-dropdown></div></div>
+              
               <el-input
                 v-model="params.keyword"
-                :placeholder="taskSearchInputPlaceholderMap[keyword_select] || taskSearchInputPlaceholderMap.default"
+                :placeholder="
+                  taskSearchInputPlaceholderMap[keyword_select] ||
+                    taskSearchInputPlaceholderMap.default
+                "
                 class="task-with-input task-ml12"
               >
                 <el-select
@@ -103,12 +126,16 @@
               <base-button type="ghost" @event="resetParams" class="task-ml12">
                 重置
               </base-button>
-              <div
-                class="advanced-search-visible-btn task-ml12"
-                @click.self="panelSearchAdvancedToggle"
-              >
-                <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
-                高级搜索
+              <div class="guide-box">
+                <div class="guide-disable-cover" v-if="nowGuideStep == 3"></div>
+                <div
+                  id="v-task-step-2"
+                  :class="['advanced-search-visible-btn', 'task-ml12', nowGuideStep == 3? 'guide-point':'']"
+                  @click.self="panelSearchAdvancedToggle"
+                >
+                  <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
+                  高级搜索
+                </div>
               </div>
             </div>
           </form>
@@ -300,9 +327,7 @@
             </div>
           </div>
           <div class="task-flex task-ai">
-            <div class="task-font14 task-c6 state">
-              工单类型：
-            </div>
+            <div class="task-font14 task-c6 state">工单类型：</div>
             <div class="list" :style="`width: ${navWidth}px`">
               <div
                 class="list-item task-flex task-ai"
@@ -329,14 +354,32 @@
       <task-search-panel
         :init-data="initData"
         :config="seoSetList"
-        :searchParams="searchParams"
+        :search-params="searchParams"
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
         v-if="advanceds.length"
       >
-        <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
-          <base-button type="primary" @event="editView">存为视图</base-button>
+        <div
+          class="advanced-search-btn-group task-flex task-buttom"
+          slot="footer"
+        >
+          <template>
+            <base-button type="primary" @event="editView">存为视图</base-button>
+            <template 
+              v-if="guideSearchModelSave">
+              <guide-compoment
+                :content="'您可以把查询条件组合“存为视图”，下次就无需重复在编辑条件啦'"
+                :only-one="true"
+                :have-step="false"
+                :finish-btn="'试一试'"
+                :g-style="'width:240px;bottom:100%;left:20px;'"
+                :arrow-style="'top: 100%;border-bottom-width:0;border-top-width:0.5rem;left:-144px'"
+                :stop-step="guideSearchModelSave_stopStep"
+                :finish-btn-fn="guideSearchModelSave_finishBtnFn"
+              ></guide-compoment>
+            </template>
+          </template>
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button
@@ -410,12 +453,16 @@
               </el-dropdown-menu>
             </el-dropdown>
             <!-- 选择列 -->
-            <div
-              class="task-ai task-flex task-font14 task-c6 task-pointer task-width103"
-              @click="showAdvancedSetting"
-            >
-              <span class="task-mr4 task-ml4">选择列</span>
-              <i class="iconfont icon-triangle-down task-icon"></i>
+            <div class="guide-box">
+              <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
+              <div
+                :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', nowGuideStep==2 ? 'guide-point bg-w' :'']"
+                id="v-task-step-1"
+                @click="showAdvancedSetting"
+              >
+                <span class="task-mr4 task-ml4">选择列</span>
+                <i class="iconfont icon-triangle-down task-icon"></i>
+              </div>
             </div>
 
             <!-- start 更多操作 -->
@@ -477,159 +524,179 @@
           <span class="task-c2" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
-        <div class="task-list-section common-list-table-view" v-if="columns.length">
-          <el-table
-            stripe
-            :data="taskPage.list"
-            :highlight-current-row="false"
-            :key="tableKey"
-            :row-key="getRowKey"
-            :border="true"
-            @select="handleSelection"
-            @select-all="handleSelection"
-            @sort-change="sortChange"
-            @header-dragend="headerDragend"
-            class="task-list-table common-list-table"
-            header-row-class-name="common-list-table-header taks-list-table-header"
-            ref="multipleTable"
+        <div class="guide-box">
+          <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
+          <div
+            id="v-task-step-0"
+            class="task-list-section common-list-table-view"
+            v-if="columns.length"
           >
-            <el-table-column
-              type="selection"
-              width="48"
-              align="center"
-              class-name="select-column"
-            ></el-table-column>
-            <el-table-column
-              v-for="column in columns"
-              v-if="column && column.show"
-              :align="column.align"
-              :class-name="
-                column.field == 'name'
-                  ? 'common-list-table-name-superscript-td'
-                  : ''
-              "
-              :key="column.field"
-              :label="column.label"
-              :min-width="column.minWidth || '120px'"
-              :prop="column.field"
-              :sortable="column.sortable"
-              :show-overflow-tooltip="column.field !== 'name'"
-              :width="column.width || '125px'"
-              :resizable="true"
+            <el-table
+              stripe
+              :data="taskPage.list"
+              :highlight-current-row="false"
+              :key="tableKey"
+              :row-key="getRowKey"
+              :border="true"
+              @select="handleSelection"
+              @select-all="handleSelection"
+              @sort-change="sortChange"
+              @header-dragend="headerDragend"
+              :class="['task-list-table', 'common-list-table', nowGuideStep == 1 ? 'guide-point' : '']"
+              header-row-class-name="common-list-table-header taks-list-table-header "
+              ref="multipleTable"
             >
-              <template slot-scope="scope">
-                <!-- 工单编号 -->
-                <div
-                  v-if="column.field === 'taskNo'"
-                  :class="{ superscript: scope.row.guideData }"
-                >
-                  <a
-                    href=""
-                    class="view-detail-btn task-list-numbering"
-                    @click.stop.prevent="
-                      openTaskTab(scope.row.id, scope.row[column.field])
-                    "
-                  >
-                    {{ scope.row[column.field] }}
-                  </a>
-                  <!-- TODO: 曾超时 审批中标签 -->
-                  <!-- 暂停中 -->
-                  <span
-                    class="task-state-block task-state-block-approve task-font12"
-                    v-if="scope.row.inApprove == 1"
-                  >
-                    审批中
-                  </span>
-                  <!-- 暂停中 -->
-                  <span
-                    class="task-state-block task-state-block-overtime task-font12"
-                    v-if="new Date().getTime() > new Date(scope.row.overTime).getTime()"
-                  >
-                    超时
-                  </span>
-                </div>
-
-                <!-- 客户  TODO: 客户查看权限 -->
-                <template v-else-if="column.field === 'customer'">
+              <el-table-column
+                type="selection"
+                width="48"
+                align="center"
+                class-name="select-column"
+              ></el-table-column>
+              <el-table-column
+                v-for="column in columns"
+                v-if="column && column.show"
+                :align="column.align"
+                :class-name="
+                  column.field == 'name'
+                    ? 'common-list-table-name-superscript-td'
+                    : ''
+                "
+                :key="column.field"
+                :label="column.label"
+                :min-width="column.minWidth || '120px'"
+                :prop="column.field"
+                :sortable="column.sortable"
+                :show-overflow-tooltip="column.field !== 'name'"
+                :width="column.width || '125px'"
+                :resizable="true"
+              >
+                <template slot-scope="scope">
+                  <!-- 工单编号 -->
                   <div
-                    :class="{
-                      'view-detail-btn task-client': scope.row.linkAuth,
-                    }"
-                    @click.stop="openClientTab(scope.row)"
+                    v-if="column.field === 'taskNo'"
+                    :class="{ superscript: scope.row.guideData }"
                   >
-                    {{ scope.row["customerEntity"] && scope.row["customerEntity"].name }}
-                  </div>
-                </template>
-
-                <!-- 联系人 -->
-                <template v-else-if="column.field === 'tlmName'">
-                  <div>
-                    {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
-                  </div>
-                </template>
-                <!-- 电话 -->
-                <template v-else-if="column.field === 'tlmPhone'">
-                  <div>
-                    {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
-                  </div>
-                </template>
-                <!-- 自定义的选择类型字段显示， 与type 区别-->
-                <template
-                  v-else-if="column.formType === 'select' && !column.isSystem"
-                >
-                  {{ scope.row.attribute[column.field] | displaySelect }}
-                </template>
-
-                <!-- 更新时间 -->
-                <template v-else-if="column.field === 'updateTime'">
-                  <template v-if="scope.row.latesetUpdateRecord">
-                    <el-tooltip
-                      class="item"
-                      effect="dark"
-                      :content="scope.row.latesetUpdateRecord"
-                      placement="top"
+                    <a
+                      href=""
+                      class="view-detail-btn task-list-numbering"
+                      @click.stop.prevent="
+                        openTaskTab(scope.row.id, scope.row[column.field])
+                      "
                     >
+                      {{ scope.row[column.field] }}
+                    </a>
+                    <!-- TODO: 曾超时 审批中标签 -->
+                    <!-- 暂停中 -->
+                    <span
+                      class="task-state-block task-state-block-approve task-font12"
+                      v-if="scope.row.inApprove == 1"
+                    >
+                      审批中
+                    </span>
+                    <!-- 暂停中 -->
+                    <span
+                      class="task-state-block task-state-block-overtime task-font12"
+                      v-if="
+                        new Date().getTime() >
+                          new Date(scope.row.overTime).getTime()
+                      "
+                    >
+                      超时
+                    </span>
+                  </div>
+
+                  <!-- 客户  TODO: 客户查看权限 -->
+                  <template v-else-if="column.field === 'customer'">
+                    <div
+                      :class="{
+                        'view-detail-btn task-client': scope.row.linkAuth,
+                      }"
+                      @click.stop="openClientTab(scope.row)"
+                    >
+                      {{
+                        scope.row["customerEntity"] &&
+                          scope.row["customerEntity"].name
+                      }}
+                    </div>
+                  </template>
+
+                  <!-- 联系人 -->
+                  <template v-else-if="column.field === 'tlmName'">
+                    <div>
+                      {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
+                    </div>
+                  </template>
+                  <!-- 电话 -->
+                  <template v-else-if="column.field === 'tlmPhone'">
+                    <div>
+                      {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                    </div>
+                  </template>
+                  <!-- 自定义的选择类型字段显示， 与type 区别-->
+                  <template
+                    v-else-if="column.formType === 'select' && !column.isSystem"
+                  >
+                    {{ scope.row.attribute[column.field] | displaySelect }}
+                  </template>
+
+                  <!-- 更新时间 -->
+                  <template v-else-if="column.field === 'updateTime'">
+                    <template v-if="scope.row.latesetUpdateRecord">
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        :content="scope.row.latesetUpdateRecord"
+                        placement="top"
+                      >
+                        <div @mouseover="showLatestUpdateRecord(scope.row)">
+                          {{ scope.row.updateTime | fmt_datetime }}
+                        </div>
+                      </el-tooltip>
+                    </template>
+                    <template v-else>
                       <div @mouseover="showLatestUpdateRecord(scope.row)">
                         {{ scope.row.updateTime | fmt_datetime }}
                       </div>
-                    </el-tooltip>
+                    </template>
                   </template>
-                  <template v-else>
-                    <div @mouseover="showLatestUpdateRecord(scope.row)">
-                      {{ scope.row.updateTime | fmt_datetime }}
-                    </div>
+
+                  <!-- 产品 -->
+                  <template v-else-if="column.field === 'product'">
+                    {{
+                      scope.row.products &&
+                        scope.row.products.map((product) => product.name).join(", ")
+                    }}
                   </template>
-                </template>
 
-                <!-- 产品 -->
-                <template v-else-if="column.field === 'product'">
-                  {{
-                    scope.row.products &&
-                      scope.row.products
-                        .map((product) => product.name)
-                        .join(", ")
-                  }}
-                </template>
-
-                <!-- 创建人 和 负责人 -->
-                <template
-                  v-else-if="
-                    column.field === 'createUserName' ||
-                      column.field === 'executorName'
-                  "
-                >
-                  <template v-if="permissionTaskView">
-                    <a
-                      href=""
-                      class="view-detail-btn"
-                      @click.stop.prevent="
-                        openUserTab(
-                          column.field === 'createUserName'
-                            ? scope.row.createUser.userId
-                            : scope.row.executorUser.userId
-                        )
-                      "
-                    >
+                  <!-- 创建人 和 负责人 -->
+                  <template
+                    v-else-if="
+                      column.field === 'createUserName' ||
+                        column.field === 'executorName'
+                    "
+                  >
+                    <template v-if="permissionTaskView">
+                      <a
+                        href=""
+                        class="view-detail-btn"
+                        @click.stop.prevent="
+                          openUserTab(
+                            column.field === 'createUserName'
+                              ? scope.row.createUser.userId
+                              : scope.row.executorUser.userId
+                          )
+                        "
+                      >
+                        {{
+                          column.field === "executorName"
+                            ? scope.row.executorUser &&
+                              scope.row.executorUser.displayName
+                            : scope.row.createUser &&
+                              scope.row.createUser.displayName
+                        }}
+                      </a>
+                    </template>
+                    <template v-else>
                       {{
                         column.field === "executorName"
                           ? scope.row.executorUser &&
@@ -637,192 +704,193 @@
                           : scope.row.createUser &&
                             scope.row.createUser.displayName
                       }}
-                    </a>
+                    </template>
                   </template>
-                  <template v-else>
-                    {{
-                      column.field === "executorName"
-                        ? scope.row.executorUser &&
-                          scope.row.executorUser.displayName
-                        : scope.row.createUser &&
-                          scope.row.createUser.displayName
-                    }}
-                  </template>
-                </template>
 
-                <!-- 协同人 -->
-                <template v-else-if="column.field === 'synergies'">
-                  {{
-                    scope.row[column.field] &&
-                      scope.row[column.field]
-                        .map((synergie) => synergie.displayName)
-                        .join(", ")
-                  }}
-                </template>
-
-                <!-- 派单方式 -->
-                <template v-else-if="column.field === 'allotTypeStr'">
-                  {{ allotTypeText(scope.row.allotType) }}
-                </template>
-
-                <!-- 工单状态 -->
-                <template v-else-if="column.field === 'state'">
-                  <!-- 暂停中 -->
-                  <div
-                    class="task-state-block task-font12"
-                    v-if="scope.row.isPaused == 1"
-                    style="color: rgba(153, 153, 153);background-color: rgba(153, 153, 153, .2)"
-                  >
-                    已暂停
-                  </div>
-                  <!-- 其他状态 -->
-                  <div
-                    v-else
-                    class="task-state-block task-font12"
-                    :style="{
-                      backgroundColor: taskStateEnum.getBgColor(
-                        scope.row[column.field], 0.2
-                      ),
-                      color: taskStateEnum.getColor(
-                        scope.row[column.field]
-                      ),
-                    }"
-                  >
+                  <!-- 协同人 -->
+                  <template v-else-if="column.field === 'synergies'">
                     {{
                       scope.row[column.field] &&
-                        taskStateEnum.getName(scope.row[column.field])
+                        scope.row[column.field]
+                          .map((synergie) => synergie.displayName)
+                          .join(", ")
                     }}
-                  </div>
-                </template>
-
-                <!-- 曾.. -->
-                <template
-                  v-else-if="taskStatusFields.indexOf(column.field) > -1"
-                >
-                  {{ Number(scope.row[column.field]) === 1 ? "是" : "否" }}
-                </template>
-
-                <!-- 地址 -->
-                <template v-else-if="column.formType === 'address'">
-                  {{ formatCustomizeAddress(scope.row[column.formType]) }}
-                </template>
-
-                <!-- 用户 -->
-                <template
-                  v-else-if="
-                    column.formType === 'user' &&
-                      scope.row.attribute[column.field]
-                  "
-                >
-                  {{
-                    scope.row.attribute[column.field].displayName ||
-                      scope.row.attribute[column.field].name
-                  }}
-                </template>
-
-                <!-- 位置 -->
-                <template v-else-if="column.formType === 'location'">
-                  {{
-                    scope.row.attribute[column.field] &&
-                      scope.row.attribute[column.field].address
-                  }}
-                </template>
-
-                <!-- 时间 -->
-                <template v-else-if="column.formType === 'datetime'">
-                <template v-if="!column.isSystem">
-                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
-                </template>
-                <template v-else>
-                  {{ scope.row[column.field] | fmt_datetime }}
-                </template>
-                </template>
-
-                <div
-                  v-else-if="column.formType === 'textarea'"
-                  v-html="buildTextarea(scope.row.attribute[column.field])"
-                  @click="openOutsideLink"
-                ></div>
-                
-                <!-- 接单用时 -->
-                <template v-else-if="column.field === 'acceptUsedTimeStr'">
-                  {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
-                </template>
-                <!-- 工单用时 -->
-                <template v-else-if="column.field === 'taskUsedTimeStr'">
-                  {{ scope.row.taskUsedTime && scope.row.taskUsedTime }}
-                </template>
-                <!-- 工作用时 -->
-                <template v-else-if="column.field === 'workUsedTimeStr'">
-                  {{ scope.row.workUsedTime && scope.row.workUsedTime }}
-                </template>
-                <!-- 响应用时 -->
-                <template v-else-if="column.field === 'taskResponseTimeStr'">
-                  {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
-                </template>
-                <!-- 支付方式 -->
-                <template
-                  v-else-if="
-                    column.field === 'paymentMethod' &&
-                      initData.paymentConfig &&
-                      initData.paymentConfig.version === 1
-                  "
-                >
-                  {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
-                </template>
-                <template v-else-if="!column.isSystem">
-                  <template v-if="scope.row.attribute && scope.row.attribute[column.field] instanceof Array">
-                    {{scope.row.attribute[column.field].join(',')}}
                   </template>
+
+                  <!-- 派单方式 -->
+                  <template v-else-if="column.field === 'allotTypeStr'">
+                    {{ allotTypeText(scope.row.allotType) }}
+                  </template>
+
+                  <!-- 工单状态 -->
+                  <template v-else-if="column.field === 'state'">
+                    <!-- 暂停中 -->
+                    <div
+                      class="task-state-block task-font12"
+                      v-if="scope.row.isPaused == 1"
+                      style="
+                      color: rgba(153, 153, 153);
+                      background-color: rgba(153, 153, 153, 0.2);
+                    "
+                    >
+                      已暂停
+                    </div>
+                    <!-- 其他状态 -->
+                    <div
+                      v-else
+                      class="task-state-block task-font12"
+                      :style="{
+                        backgroundColor: taskStateEnum.getBgColor(
+                          scope.row[column.field],
+                          0.2
+                        ),
+                        color: taskStateEnum.getColor(scope.row[column.field]),
+                      }"
+                    >
+                      {{
+                        scope.row[column.field] &&
+                          taskStateEnum.getName(scope.row[column.field])
+                      }}
+                    </div>
+                  </template>
+
+                  <!-- 曾.. -->
+                  <template
+                    v-else-if="taskStatusFields.indexOf(column.field) > -1"
+                  >
+                    {{ Number(scope.row[column.field]) === 1 ? "是" : "否" }}
+                  </template>
+
+                  <!-- 地址 -->
+                  <template v-else-if="column.formType === 'address'">
+                    {{ formatCustomizeAddress(scope.row[column.formType]) }}
+                  </template>
+
+                  <!-- 用户 -->
+                  <template
+                    v-else-if="
+                      column.formType === 'user' &&
+                        scope.row.attribute[column.field]
+                    "
+                  >
+                    {{
+                      scope.row.attribute[column.field].displayName ||
+                        scope.row.attribute[column.field].name
+                    }}
+                  </template>
+
+                  <!-- 位置 -->
+                  <template v-else-if="column.formType === 'location'">
+                    {{
+                      scope.row.attribute[column.field] &&
+                        scope.row.attribute[column.field].address
+                    }}
+                  </template>
+
+                  <!-- 时间 -->
+                  <template v-else-if="column.formType === 'datetime'">
+                    <template v-if="!column.isSystem">
+                      {{
+                        scope.row.attribute && scope.row.attribute[column.field]
+                      }}
+                    </template>
+                    <template v-else>
+                      {{ scope.row[column.field] | fmt_datetime }}
+                    </template>
+                  </template>
+
+                  <div
+                    v-else-if="column.formType === 'textarea'"
+                    v-html="buildTextarea(scope.row.attribute[column.field])"
+                    @click="openOutsideLink"
+                  ></div>
+
+                  <!-- 接单用时 -->
+                  <template v-else-if="column.field === 'acceptUsedTimeStr'">
+                    {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
+                  </template>
+                  <!-- 工单用时 -->
+                  <template v-else-if="column.field === 'taskUsedTimeStr'">
+                    {{ scope.row.taskUsedTime && scope.row.taskUsedTime }}
+                  </template>
+                  <!-- 工作用时 -->
+                  <template v-else-if="column.field === 'workUsedTimeStr'">
+                    {{ scope.row.workUsedTime && scope.row.workUsedTime }}
+                  </template>
+                  <!-- 响应用时 -->
+                  <template v-else-if="column.field === 'taskResponseTimeStr'">
+                    {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
+                  </template>
+                  <!-- 支付方式 -->
+                  <template
+                    v-else-if="
+                      column.field === 'paymentMethod' &&
+                        initData.paymentConfig &&
+                        initData.paymentConfig.version === 1
+                    "
+                  >
+                    {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
+                  </template>
+                  <template v-else-if="!column.isSystem">
+                    <template
+                      v-if="
+                        scope.row.attribute &&
+                          scope.row.attribute[column.field] instanceof Array
+                      "
+                    >
+                      {{ scope.row.attribute[column.field].join(",") }}
+                    </template>
+                    <template v-else>
+                      {{
+                        scope.row.attribute && scope.row.attribute[column.field]
+                      }}
+                    </template>
+                  </template>
+
                   <template v-else>
-                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                    {{ scope.row[column.field] }}
                   </template>
                 </template>
+              </el-table-column>
+            </el-table>
 
-                <template v-else>
-                  {{ scope.row[column.field] }}
-                </template>
-
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <div class="table-footer comment-list-table-footer">
-            <div class="comment-list-table-footer-info task-flex task-ai">
-              共<span class="level-padding">{{
-                taskPage.totalElements || 0
-              }}</span
-              >条
-              <div class="task-font14 task-c6 task-ml12">
-                每页
-                <el-select
-                  v-model="params.pageSize"
-                  placeholder="请选择"
-                  @change="handleSizeChange(params.pageSize)"
-                  class="table-footer-select"
-                >
-                  <el-option :label="10" :value="10"></el-option>
-                  <el-option :label="20" :value="20"></el-option>
-                  <el-option :label="50" :value="50"></el-option>
-                </el-select>
-                条
+            <div class="table-footer comment-list-table-footer">
+              <div class="comment-list-table-footer-info task-flex task-ai">
+                共<span class="level-padding">{{
+                  taskPage.totalElements || 0
+                }}</span
+                >条
+                <div class="task-font14 task-c6 task-ml12">
+                  每页
+                  <el-select
+                    v-model="params.pageSize"
+                    placeholder="请选择"
+                    @change="handleSizeChange(params.pageSize)"
+                    class="table-footer-select"
+                  >
+                    <el-option :label="10" :value="10"></el-option>
+                    <el-option :label="20" :value="20"></el-option>
+                    <el-option :label="50" :value="50"></el-option>
+                  </el-select>
+                  条
+                </div>
               </div>
+              <el-pagination
+                v-if="this.taskPage.list.length"
+                class="comment-list-table-footer-pagination"
+                background
+                @current-change="jump"
+                @size-change="handleSizeChange"
+                :page-size="taskPage.pageSize"
+                :current-page="taskPage.pageNum"
+                layout="prev, pager, next, jumper"
+                :total="taskPage.totalElements"
+              >
+              </el-pagination>
             </div>
-            <el-pagination
-              v-if="this.taskPage.list.length"
-              class="comment-list-table-footer-pagination"
-              background
-              @current-change="jump"
-              @size-change="handleSizeChange"
-              :page-size="taskPage.pageSize"
-              :current-page="taskPage.pageNum"
-              layout="prev, pager, next, jumper"
-              :total="taskPage.totalElements"
-            >
-            </el-pagination>
           </div>
-        </div>
         <!-- end content 列表表格 -->
+        </div>
       </div>
 
       <!-- <div style="background: #fff;padding: 0 10px">
@@ -903,6 +971,66 @@
     <!-- E 地图预览 -->
     <!-- 视图展示 -->
     <task-view ref="taskView" @_searchModel="_searchModel" />
+
+    <v-tour
+      v-if="showTour"
+      name="myTour"
+      :steps="steps"
+      :options="options"
+      :callbacks="myCallbacks"
+    >
+      <template slot-scope="tour">
+        <transition name="fade">
+          <template v-for="(step, index) of tour.steps">
+            <v-step
+              v-if="tour.currentStep === index"
+              :key="index"
+              :step="step"
+              :previous-step="tour.previousStep"
+              :next-step="tour.nextStep"
+              :stop="tour.stop"
+              :is-first="tour.isFirst"
+              :is-last="tour.isLast"
+              :labels="tour.labels"
+            >
+              <template>
+                <div slot="content" class="tour-content-box">
+                  <div class="tour-left-tips">
+                    {{ `${index + 1}/${steps.length}` }}
+                  </div>
+                  <div class="tour-content">
+                    <div class="flex-x tour-content-head">
+                      <i @click="tour.stop" class="iconfont icon-fe-close"></i>
+                    </div>
+                    <div class="tour-content-con">
+                      {{ steps[index].content }}
+                    </div>
+                  </div>
+                </div>
+                <div slot="actions" class="tour-bottom">
+                  <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
+                    上一步
+                  </div> -->
+                  <div
+                    class="btns"
+                    v-if="index < steps.length - 1"
+                    @click="tour.nextStep"
+                  >
+                    下一步
+                  </div>
+                  <div
+                    class="btns"
+                    @click="tour.stop"
+                  >
+                    ok
+                  </div>
+                </div>
+              </template>
+            </v-step>
+          </template>
+        </transition>
+      </template>
+    </v-tour>
   </div>
 </template>
 
@@ -925,4 +1053,117 @@ export default TaskList;
 </style>
 <style lang="scss" scoped>
 @import "./TaskList.scss";
+</style>
+
+<style lang="scss">
+.task-box {
+  .v-step[data-v-7c9c03f0] {
+    background: #fff !important;
+    color: #333 !important;
+    -webkit-filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
+    filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
+    padding: 0 !important;
+  }
+  .v-step .v-step__arrow[data-v-7c9c03f0] {
+    border-color: #fff !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+  .tour-content-box {
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+    border-radius: 4px;
+    .tour-left-tips {
+      width: 80px;
+      height: 32px;
+      background: $color-primary;
+      color: #fff;
+      position: absolute;
+      left: -40px;
+      top: 0px;
+      line-height: 40px;
+      font-size: 12px;
+      transform-origin: center top;
+      transform: rotateZ(-45deg);
+      text-align: center;
+    }
+    .tour-content {
+      .tour-content-head {
+        justify-content: flex-end;
+        padding-top: 16px;
+        .iconfont {
+          font-size: 10px;
+          margin-bottom: 2px;
+          color: #999;
+          cursor: pointer;
+        }
+      }
+      .tour-content-con {
+        text-align: start;
+        padding-bottom: 12px;
+      }
+    }
+  }
+
+  .tour-bottom {
+    height: 52px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .btns {
+      width: 60px;
+      height: 28px;
+      background: $color-primary;
+      color: #fff;
+      text-align: center;
+      line-height: 28px;
+      border-radius: 4px;
+    }
+    .text {
+      color: $color-primary;
+    }
+    :nth-child(n) {
+      cursor: pointer;
+    }
+    :not(:last-child) {
+      margin-right: 12px;
+    }
+  }
+
+  /* 向上的箭头 */
+
+  .normal-arrow-top {
+    font-size: 0;
+    line-height: 0;
+    border-width: 0.5rem;
+    border-color: #fff;
+    width: 0;
+    border-top-width: 0;
+    border-style: dashed;
+    border-bottom-style: solid;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    position: absolute;
+    top: -0.5rem;
+  }
+
+  .guide-model-box{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left:0 ;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 996;
+  }
+  .guide-point{
+    z-index: 997;
+    position: sticky;
+  }
+  .bg-w{
+    background: #fff;
+  }
+}
 </style>

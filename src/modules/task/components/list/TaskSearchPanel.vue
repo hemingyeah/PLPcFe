@@ -1,5 +1,7 @@
 <template>
   <base-panel :show.sync="visible" :width="panelWidth">
+  
+
     <h3 slot="title">
       <span>高级搜索</span>
       <el-dropdown
@@ -30,12 +32,18 @@
           </el-tooltip>
         </span>
       </div>
+
+
+      <div id="v-task-step-6"></div>
       <div class="task-search-guide" v-show="!fields.length && guide">
         <div></div>
         <div>
           您还未设置常用字段，快去试试吧
         </div>
       </div>
+
+
+    </div>
     </div>
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form" onsubmit="return false;">
@@ -46,11 +54,12 @@
           class="task-search-forms"
           :fields="fields"
           ref="searchForm"
-          :searchParams="searchParams"
+          :search-params="searchParams"
           :form-backup="formBackup"
           :column-num="columnNum"
         >
         </task-search-form>
+        <div style="position: relative">
           <div class="task-pointer task-flex task-ai">
             <span class="task-font16 task-mr4">添加查询条件</span>
             <span>
@@ -58,24 +67,31 @@
                   <i class="iconfont icon-question task-icon"></i>
                 </el-tooltip>
             </span>
+
+            
           </div>
-      <!-- 设置查询条件 -->
+          <div id="v-task-step-7"></div>
+          </div>
+
+          
+        </div>
+        <!-- 设置查询条件 -->
         <task-inquire 
           v-if="fields.length"
           ref="taskInquireParams" 
-          :columnNum="columnNum" 
+          :column-num="columnNum" 
           :config="taskInquireList" 
           @setting="_setting"
         />
         <task-inquire 
           v-else
           ref="taskInquireParams" 
-          :columnNum="columnNum" 
+          :column-num="columnNum" 
           :config="[...config, ...taskTypeFilterFields]" 
           @setting="_setting"
         />
         <!-- 搜索操作按钮 -->
-        <slot name="footer"></slot>
+        <!-- <slot name="footer"></slot> -->
       </el-form>
       <!-- E 搜索条件 -->
       <!-- 搜索操作按钮 -->
@@ -95,32 +111,55 @@
 
 <script>
 /* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
+
+import Vue from "vue";
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* components */
-import TaskSearchForm from './TaskSearchForm.vue';
-import TaskSearchPupal from './TaskSearchPupal'
-import TaskInquire from './TaskInquire'
+import TaskSearchForm from "./TaskSearchForm.vue";
+import TaskSearchPupal from "./TaskSearchPupal";
+import TaskInquire from "./TaskInquire";
+
+import guideCompoment from "@src/modules/task/list/components/guide";
+
+let guideCompoments = Vue.extend(guideCompoment);
 
 /* utils */
-import _ from 'lodash';
-import { formatDate } from '@src/util/lang';
-import { isEmptyStringObject } from '@src/util/function';
-import { storageGet, storageSet } from '@src/util/storage';
+import _ from "lodash";
+import { formatDate } from "@src/util/lang";
+import { isEmptyStringObject } from "@src/util/function";
+import { storageGet, storageSet } from "@src/util/storage";
 
 /* enum */
 
-import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
+import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
 /* constants */
-import { AllotTypeConvertMap, FlagConvertMap, TaskOnceConvertMap, TaskApproveConvertMap } from '@src/modules/task/model/TaskConvertMap.ts';
+import {
+  AllotTypeConvertMap,
+  FlagConvertMap,
+  TaskOnceConvertMap,
+  TaskApproveConvertMap,
+} from "@src/modules/task/model/TaskConvertMap.ts";
 
-const TASK_HISTORY_KEY = 'task_history_list';
-const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod', 'tag']
+const TASK_HISTORY_KEY = "task_history_list";
+const MultiFieldNames = [
+  "serviceType",
+  "serviceContent",
+  "level",
+  "paymentMethod",
+  "state",
+  "allotTypeStr",
+  "onceException",
+  "paymentMethod",
+  "tag",
+];
 const TaskInquireConvertFieldNamesToConditionsMap = {
-  customer: 'customerId',
-  product: 'productId',
-  tlmName: 'tlmId'
-}
+  customer: "customerId",
+  product: "productId",
+  tlmName: "tlmId",
+};
+
+const TASK_GUIDE_SEARCH_MODEL = 'guide-task-tasklistsearchmodel';
 
 export default {
   name: 'task-search-panel',
@@ -741,7 +780,55 @@ export default {
         selfFields.push(originField ? originField : field)
       })
       this.taskInquireList = selfFields.slice()
-    }
+    },
+    createGuide(id, obj = {}) {
+      new guideCompoments({
+        data() {
+          return {};
+        },
+        propsData: {
+          ...obj,
+          stopStep:this.stopStep,
+          finishBtnFn:this.finishBtnFn
+        },
+        methods: {
+          previousStep: this.previousStep,
+          nextStep: this.nextStep,
+        },
+      }).$mount(`#${id}`);
+    },
+    previousStep(e) {
+      this.createGuide("v-task-step-6", {
+        content: "测试",
+        haveStep: true,
+        nowStep: 1,
+        totalStep: 2,
+        id: "v-task-step-6",
+        gStyle: "left:30px",
+        onlyOne: true,
+        finishBtn: "OK",
+      });
+    },
+    nextStep(e) {
+      this.createGuide("v-task-step-7", {
+        content:
+          "工单表单中所有可被搜索的字段都隐藏在这儿，当您需要用某些条件查询时，也可以在这里搜索",
+        haveStep: true,
+        nowStep: 2,
+        totalStep: 2,
+        gStyle: "top:35px",
+        id: "v-task-step-7",
+        arrowStyle:'left:-140px',
+        onlyOne: true,
+        finishBtn: "OK",
+      });
+    },
+    stopStep(){
+      storageSet(TASK_GUIDE_SEARCH_MODEL, '2')
+    },
+    finishBtnFn(){
+      this.stopStep();
+    },
   },
   components: {
     [TaskSearchForm.name]: TaskSearchForm,
@@ -753,10 +840,10 @@ export default {
 
 <style lang="scss">
 .task-search-forms {
-    transition: height .5s;
-    .form-item {
-      width: 340px!important;
-    }
+  transition: height 0.5s;
+  .form-item {
+    width: 340px !important;
+  }
 }
 </style>
 <style lang="scss" scoped>
@@ -803,15 +890,15 @@ export default {
   }
 }
 .hide {
-    overflow: hidden;
-    padding: 0;
-    height: 0;
-    width: 0;
+  overflow: hidden;
+  padding: 0;
+  height: 0;
+  width: 0;
 }
 .task-search-panel-title {
-    height: 54px;
-    line-height: 54px;
-    padding: 0 15px;
+  height: 54px;
+  line-height: 54px;
+  padding: 0 15px;
 }
 .task-search-guide {
     position: relative;
@@ -823,7 +910,7 @@ export default {
       height: 0;
       border-left: 4px solid transparent;
       border-right: 4px solid transparent;
-      border-bottom: 6px solid #13C2C2;
+      border-bottom: 6px solid #13c2c2;
       margin-left: 15px;
     }
     &:last-child {
@@ -833,8 +920,9 @@ export default {
       font-size: 14px;
       color: #fff;
       line-height: 50px;
-      background-color: #13C2C2;
-      box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12);
+      background-color: #13c2c2;
+      box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.08),
+        0px 3px 6px -4px rgba(0, 0, 0, 0.12);
       text-align: center;
       border-radius: 4px;
       > span {
