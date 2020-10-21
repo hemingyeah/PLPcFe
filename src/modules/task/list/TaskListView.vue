@@ -382,16 +382,6 @@
               <i class="iconfont icon-bianji1 task-icon"></i>
               批量编辑
             </div>
-            <!-- start 批量生成服务报告 -->
-            <div class="task-list-batch-button task-font14 task-c06" @click="batchCreateServiceReport">
-              批量生成服务报告
-            </div>
-            <!-- end 批量生成服务报告 -->
-            <!-- start 批量打印服务报告 -->
-            <div class="task-list-batch-button task-font14 task-c06" @click="batchPrintServiceReport">
-              批量打印服务报告
-            </div>
-            <!-- end 批量打印服务报告 -->
           </div>
 
           <div class="action-button-group task-flex task-ai">
@@ -469,6 +459,16 @@
                 >
                   <div @click="reallotBatch">工单转派</div>
                 </el-dropdown-item>
+                <!-- start 批量生成服务报告 -->
+                <el-dropdown-item v-if="isSystemAdmin">
+                  <div @click="batchCreateServiceReport">批量生成服务报告</div>
+                </el-dropdown-item>
+                <!-- end 批量生成服务报告 -->
+                <!-- start 批量打印服务报告 -->
+                <el-dropdown-item v-if="isSystemAdmin">
+                  <div @click="batchPrintServiceReport">批量打印服务报告</div>
+                </el-dropdown-item>
+                <!-- end 批量打印服务报告 -->
               </el-dropdown-menu>
             </el-dropdown>
           </div>

@@ -244,6 +244,11 @@ export default {
 
       return taskTypeFilterFields;
     },
+    /* 是否是系统管理员 */
+    isSystemAdmin() {
+      let roles = this.initData?.roles || []
+      return roles.some(role => role == '1')
+    }
   },
   filters: {
     displaySelect(value) {
