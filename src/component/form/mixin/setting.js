@@ -4,12 +4,10 @@ import * as config from '@src/component/form/config';
 import MobileShowSetting from '@src/component/form/common/setting/MobileShowSetting.vue';
 import FormTitleSetting from '@src/component/form/common/setting/FormTitleSetting.vue';
 import FormDescribeSetting from '@src/component/form/common/setting/FormDescribeSetting.vue';
-import FormMandatorySetting from '@src/component/form/common/setting/FormMandatorySetting.vue';
+import FormRequiredSetting from '@src/component/form/common/setting/FormRequiredSetting.vue';
 import FormSearchSetting from '@src/component/form/common/setting/FormSearchSetting.vue';
-import FormNorepeatSetting from '@src/component/form/common/setting/FormNorepeatSetting.vue';
-import FormVisibilitySetting from '@src/component/form/common/setting/FormVisibilitySetting.vue';
-import FormPublicField from '@src/component/form/common/setting/FormPublicField.vue';
-import FormScanCode from '@src/component/form/common/setting/FormScanCode.vue';
+import FormRepeatSetting from '@src/component/form/common/setting/FormRepeatSetting.vue';
+import FormVisibleSetting from '@src/component/form/common/setting/FormVisibleSetting.vue';
 
 const SettingMixin = {
   computed: {
@@ -38,13 +36,10 @@ const SettingMixin = {
     [MobileShowSetting.name]: MobileShowSetting,
     [FormTitleSetting.name]: FormTitleSetting,
     [FormDescribeSetting.name]: FormDescribeSetting,
-    [FormMandatorySetting.name]: FormMandatorySetting,
+    [FormRequiredSetting.name]: FormRequiredSetting,
     [FormSearchSetting.name]: FormSearchSetting,
-    [FormNorepeatSetting.name]: FormNorepeatSetting,
-    [FormVisibilitySetting.name]: FormVisibilitySetting,
-    [FormPublicField.name]: FormPublicField,
-    [FormScanCode.name]: FormScanCode,
-    
+    [FormRepeatSetting.name]: FormRepeatSetting,
+    [FormVisibleSetting.name]: FormVisibleSetting,
   }
 }
 

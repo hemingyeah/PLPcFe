@@ -121,7 +121,8 @@
 }
 
 .form-design-setting {
-  width: 320px;
+  min-width: 330px;
+  width: 330px;
   height: 100%;
   background-color: #fff;
 }
@@ -156,10 +157,19 @@
     border-bottom: 1px solid #ddd;
     margin: 0 0 8px 0;
   }
+
+  .icon-question {
+    font-size: $font-size-small;
+    color: $text-color-secondary;
+  }
 }
 
 .form-setting-group {
-  margin-bottom: 10px;
+  margin-bottom: 24px;
+
+  &-small {
+    margin-bottom: 12px;
+  }
 
   input[type='text'],
   textarea {
@@ -167,7 +177,7 @@
   }
 
   label {
-    margin: 5px 5px 0 0;
+    margin: 8px 5px 0 0;
     vertical-align: middle;
     cursor: pointer;
   }
@@ -179,6 +189,40 @@
   textarea {
     display: block;
   }
+
+  &.form-setting-item {
+    .form-item-title {
+      margin-bottom: 0px;
+    }
+  
+    label.el-checkbox {
+      margin-top: 8px;
+    }
+  }
+}
+ 
+.form-common-setting {
+  &-panel {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-title {
+    &-name {
+      margin-right: 4px;
+    }
+
+    &-remind,
+    .iconfont {
+      font-size: $font-size-small;
+      color: $text-color-secondary;
+      font-weight: normal;
+    }
+
+    .iconfont {
+      margin-right: 4px;
+    }
+  } 
 }
 
 // ------------ preview ------------
