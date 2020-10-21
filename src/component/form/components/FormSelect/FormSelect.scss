@@ -44,7 +44,7 @@
 }
 
 .form-select-setting-defaultValue{
-  background-color: #00ac97;
+  background-color:  $color-primary;
   color: #fff;
   padding: 2px 4px;
   border-radius: 2px;
@@ -74,12 +74,18 @@
     font-size: 18px;
   }
 }
+.btn-active{
+  color: $color-primary !important;
+}
 
 .form-select-setting-delete{
   color: #F56C6C;
+  .iconfont{
+    color: #F56C6C;
+  }
 }
 .form-select-setting-default{
-  color: $color-primary
+  color:#999999;
 }
 
 .form-select-tips{

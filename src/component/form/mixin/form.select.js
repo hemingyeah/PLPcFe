@@ -41,8 +41,17 @@ const FORM_SELECT = {
       this.$emit('input', {value: this.options, prop: 'options'})
       this.$emit('input', {value: option.value, prop: 'defaultValue'});
     },
+    //下拉多级菜单
+    showMultiBatchModal(option,index){
+      console.log(index)
+      this.optionText = option.children.map(item => item.value).join('\n');
+      this.batchModalShow = true;
+      this.errMessage = null;
+      this.currentLevel = index;
+    },
     showBatchModal(){
       this.optionText = this.field.options.map(item => item.value).join('\n');
+      console.log(this.optionText)
       this.batchModalShow = true;
       this.errMessage = null;
     },

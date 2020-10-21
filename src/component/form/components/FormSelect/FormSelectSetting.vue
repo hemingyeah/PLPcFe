@@ -17,26 +17,23 @@
       <el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
     </h3>
     <div class="form-select-setting-list">
-      <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
-        <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
-        <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
-        <template v-if="!field.isMulti">
-<!--          <button-->
-<!--            type="button" class="btn-text form-select-setting-default"-->
-<!--            @click="setDefaultOption(option)" v-if="!option.isDefault">-->
-<!--            <i class="iconfont icon-check-fill"></i>-->
-<!--          </button>-->
-<!--          <span class="form-select-setting-defaultValue" @click="setDefaultOption(option)" v-else>默认</span>-->
+      <draggable tag="div" :list="options">
+        <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
+          <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
+          <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
+          <template v-if="!field.isMulti">
+  <!--          <button-->
+  <!--            type="button" class="btn-text form-select-setting-default"-->
+  <!--            @click="setDefaultOption(option)" v-if="!option.isDefault">-->
+  <!--            <i class="iconfont icon-check-fill"></i>-->
+  <!--          </button>-->
+  <!--          <span class="form-select-setting-defaultValue" @click="setDefaultOption(option)" v-else>默认</span>-->
 
-          <button
-              type="button" class="btn-text form-select-setting-default"
-              @click="setDefaultOption(option)">
-            <i class="iconfont icon-check-fill"></i>
-          </button>
-          <span class="form-select-setting-defaultValue" v-if="option.isDefault">默认</span>
-
-        </template>
-      </div>
+            <button type="button" :class="['btn-text', 'form-select-setting-default',option.isDefault && 'btn-active']" @click="setDefaultOption(option)"> <i class="iconfont icon-check-fill"></i></button>
+            <span class="form-select-setting-defaultValue" v-if="option.isDefault">默认</span>
+          </template>
+        </div>
+      </draggable> 
     </div>
     <div class="form-setting-group form-select-setting-operation">
       <button type="button" class="btn-text" @click="addOption">增加选项</button>
@@ -71,6 +68,7 @@ import {
 } from '../../config'
 
 import _ from 'lodash';
+import draggable from 'vuedraggable';
 import LogicalFieldModal from './components/LogicalFieldModal';
 import SettingMixin from '@src/component/form/mixin/setting';
 import FormSelectMixin from '@src/component/form/mixin/form.select';
@@ -149,7 +147,8 @@ export default {
       index: this.field.options.length,
       batchModalShow: false, 
       optionText: '', // 批量编辑文本
-      errMessage: null
+      errMessage: null,
+      drag: false
     }
   },
   created() {
@@ -204,7 +203,6 @@ export default {
           }
         }
       }
-      
       this.$emit('input', {value: newOptions, prop: 'options'})
       this.$emit('input', {value: this.field, prop: 'dependencies', operate: 'delete'})
 
@@ -212,6 +210,7 @@ export default {
     }
   },
   components: {
+    draggable,
     [LogicalFieldModal.name]: LogicalFieldModal,
     'form-select-logical': {
       name: 'form-select-logical',

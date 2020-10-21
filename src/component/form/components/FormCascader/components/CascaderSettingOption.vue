@@ -30,7 +30,7 @@ export default {
   },
   data(){
     return {
-      deepZhChar: ['一', '二', '三', '四']
+      deepZhChar: ['一', '二', '三', '四','五']
     }
   },
   methods: {
@@ -80,8 +80,6 @@ export default {
 .cascader-setting-option{
   position: relative;
   padding: 5px 0;
-  background-color: #fff;
-
   input[type='text']{
     width: 100%;
     margin: 0;

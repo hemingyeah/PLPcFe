@@ -13,6 +13,8 @@
               <select :value="maxDeep" @change="changeMaxDeep" >
                 <option value="2">两级</option>
                 <option value="3">三级</option>
+                <option value="4">四级</option>
+                <option value="5">五级</option>
               </select>
             </div>  
           </h3>
@@ -23,23 +25,32 @@
         </div>
 
         <div class="cascader-setting-modal-body">
-          <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" 
-               v-for="(option, index) in selectedOption" :key="option.id">
-            <h3>{{deepZhChar[index]}}级选项</h3>
-            <div class="cascader-setting-option-list" ref="list" @keyup.enter="addChildrenOption(option)">
-              <cascader-setting-option v-for="item in option.children" :key="item.id" 
-                                       v-model="item.value" :option="item" :allow-remove="option.children.length > 1" :active="item.active"
-                                       @choose="chooseOption" @remove="removeOption" @change-default="changeDefaultOption"/>
-            </div>
-            
-            <div class="cascader-setting-option">
-              <a @click="addChildrenOption(option)" href="javascript:;" class="cascader-setting-add">增加选项</a>
+          <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" v-for="(option, index) in selectedOption" :key="option.id">
+            <h3>{{deepZhChar[index]}}级选项</h3>        
+              <div class="cascader-setting-option-list" ref="list" @keyup.enter="addChildrenOption(option)">
+                <draggable tag="div" :list="option.children">
+                  <cascader-setting-option 
+                    v-for="item in option.children" 
+                    :key="item.id" 
+                    v-model="item.value" 
+                    :option="item" 
+                    :allow-remove="option.children.length > 1" 
+                    :active="item.active"
+                    @choose="chooseOption"
+                    @remove="removeOption" 
+                    @change-default="changeDefaultOption"/>
+                  </draggable>
+              </div>          
+            <div class="cascader-setting-option cascader-setting-operation">
+              <a @click="addChildrenOption(option)" href="javascript:;" class="cascader-setting-btn">增加选项</a>
+              <a @click="showMultiBatchModal(option,index)" href="javascript:;" class="cascader-setting-btn">批量编辑</a>
             </div>
           </div>  
         </div>
 
         <div class="cascader-setting-modal-footer">
           <div class="cascader-setting-default-text">
+            <span class="btn-text" @click="openImportDialog()">批量导入</span>
             <span>默认选项:</span> 
             <span>{{defaultValueText}}</span>
           </div>
@@ -47,21 +58,60 @@
           <button type="button" class="cascader-setting-choose" @click="submit">确定</button>
         </div>
       </div>  
+      <!-- start 批量编辑 -->
+      <base-modal 
+        title="批量编辑选项" width="520px" class="form-select-setting-modal"
+        :show.sync="batchModalShow" :mask-closeable="false">
+        <div class="form-select-setting-batch">
+          <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
+          <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
+        </div>
+        <template slot="footer">
+          <span class="form-select-tips">每行对应一个选项</span>
+          <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
+        </template>
+      </base-modal>
+      <!-- end 批量编辑 -->
+
+      <!-- start 批量导入 -->
+      <base-import
+        title="批量导入"
+        ref="bulkImport"
+        @success="importSucc"
+        action="/api/trane/outside/import/elevenCategoryNumberExcel"
+      >
+        <div slot="tip">
+          <div class="base-import-warn">
+            <p style="margin: 0">
+              在导入前，请先下载
+              <a href="/resource/excelTemplate/11Num.xlsx">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。。
+            </p>
+          </div>
+        </div>
+      </base-import>
+      <!-- 批量导入 -->
+
+
+
+
     </div>  
   </transition>
 </template>
 
 <script>
 import _ from 'lodash';
-import platform from '@src//platform';
+import draggable from 'vuedraggable';
+import platform from '@src/platform';
 import Option from './Option.js';
 import CascaderSettingOption from './CascaderSettingOption.vue';
-
+import SettingMixin from '@src/component/form/mixin/setting';
+import FormSelectMixin from '@src/component/form/mixin/form.select';
 // TODO: 根据最大级数选择选项，保证每一级至少有一个选项
 // TODO: 切换级数时，超出级数的选项删除，不满足的补全
 
 export default {
   name: 'cascader-setting',
+  mixins: [SettingMixin, FormSelectMixin],
   props: {
     show: {
       type: Boolean,
@@ -79,13 +129,60 @@ export default {
   data(){
     return {
       defaultValueText: '--',
-      deepZhChar: ['一', '二', '三', '四'],
+      deepZhChar: ['一', '二', '三', '四','五'],
       source: null,
       selectedOption: [],
-      maxDeep: 2
+      maxDeep: 2,
+      batchModalShow: false, 
+      optionText: '', // 批量编辑文本
+      errMessage: null,
+      currentLevel: null //当前级别下标
     }
   },
   methods: {
+    //批量导入
+    openImportDialog(){
+      this.$refs.bulkImport.open();
+    },
+    importSucc(){
+
+    },
+    //批量编辑
+    batchEdit(){
+      let newValues = this.optionText.split('\n').filter(option => option);
+      console.log(newValues)
+      const parent = this.selectedOption[this.currentLevel]
+      if(!newValues.length) {
+        platform.alert("至少要有一个选项");
+        return false;
+      }
+
+      this.errMessage = this.validateOptions(newValues);
+      if(this.errMessage) return;
+      let newOptions = newValues.map(item =>new Option(item, false, parent))
+      // let newOptions = newValues.map((item,index) =>{
+       
+      //   let options = new Option(item, false, parent)
+      //   if(options.deep < this.maxDeep){
+      //     console.log(555555)
+      //   } 
+      //   options.children = this.selectedOption[this.currentLevel].children[index];
+      //   return options;
+
+      // } );
+      //更新数据
+      this.selectedOption[this.currentLevel].children = newOptions;
+
+      // this.$emit('input', {value: newOptions, prop: 'setting'})
+      this.batchModalShow = false;
+
+    },
+    addOption(parent,value){
+      let option = new Option(value, false, parent);
+        if(option.deep < this.maxDeep) this.addOption(option)
+        console.log(value,parent,option)
+        parent.children.push(option);
+    },
     /** 修改默认值 */
     changeDefaultOption(option){
       this.chooseOption(option);
@@ -190,9 +287,8 @@ export default {
       let value = `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
       let option = new Option(value, false, parent);
       if(option.deep < this.maxDeep) this.addChildrenOption(option)
-
       parent.children.push(option);
-
+     
       this.chooseOption(option, true)
     },
     /** 根据id选中对应的选项 */
@@ -347,6 +443,7 @@ export default {
     }
   },
   components: {
+    draggable,
     [CascaderSettingOption.name]: CascaderSettingOption
   }
 }
@@ -510,12 +607,13 @@ export default {
   min-width: 65px;
 }
 
-.cascader-setting-add{
+.cascader-setting-btn{
   line-height: 24px;
   font-size: 14px;
   text-decoration: none;
   color: #55b7b4;
   user-select: none;
+  display: block;
 }
 
 .cascader-setting-default-text{
@@ -524,6 +622,12 @@ export default {
   font-size: 14px;
   line-height: 32px;
   color: #666;
+  .btn-text{
+    color: #13C2C2;
+    padding: 0;
+    margin-right: 5px;
+    cursor: pointer;
+  }
 }
 </style>
 
