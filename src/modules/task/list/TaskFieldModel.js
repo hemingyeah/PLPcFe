@@ -1928,7 +1928,7 @@ const Inquire = [
     tableName: "customer",
     isSystem: 1,
     fieldName: "tags",
-    displayName: "选择团队",
+    displayName: "服务团队",
     formType: 'select',
     defaultValue: null,
     isNull: 1,

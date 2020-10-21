@@ -355,6 +355,11 @@ export default {
       if (success) {
         this.taskView = result;
         this.otherLists(result);
+        result.forEach(item => {
+          if (item.id === this.selectIds.allId) {
+            this.searchParams = item.searchModel
+          }
+        })
         this.initialize();
       }
     },
@@ -628,7 +633,7 @@ export default {
           bool = true
         }
       }
-      if (bool) {
+      if (bool && !id) {
         this.$platform.alert('请您先设置条件进行查询，再保存【筛选视图】！');
         return
       }
@@ -1922,11 +1927,14 @@ export default {
         
         this.searchParams = {...this.searchParams, ...par}
         
-        for(let key in this.searchParams_spare) {
-          if (this.searchParams_spare[key] && JSON.stringify(this.searchParams_spare[key]) !== '[]' && JSON.stringify(this.searchParams_spare[key]) !== '{}') {
+        for(let key in par) {
+          if (par[key] && JSON.stringify(par[key]) !== '[]' && JSON.stringify(par[key]) !== '{}') {
+            this.searchParams[key] = par[key]
+          } else {
             this.searchParams[key] = this.searchParams_spare[key]
           }
         }
+
         /* E 高级搜索条件*/
       } else {
         this.$refs.searchPanel.resetParams();
@@ -1990,7 +1998,13 @@ export default {
     _time(params, num) {
       if (!params) return;
       if (params && !isNaN(num)) {
-        return new Date(params.split("-")[num]);
+        let S, E;
+        if (num === 1) {
+          E = `${params.split("-")[1]} 23:59:59`
+        } else {
+          S = `${params.split("-")[0]} 00:00:00`
+        }
+        return new Date([S, E][num]);
       } else {
         return new Date(params);
       }
