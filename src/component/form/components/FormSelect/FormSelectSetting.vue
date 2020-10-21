@@ -17,26 +17,21 @@
       <el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
     </h3>
     <div class="form-select-setting-list">
-      <draggable tag="div" :list="options">
-        <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
-          <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
-          <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
-          <template v-if="!field.isMulti">
-  <!--          <button-->
-  <!--            type="button" class="btn-text form-select-setting-default"-->
-  <!--            @click="setDefaultOption(option)" v-if="!option.isDefault">-->
-  <!--            <i class="iconfont icon-check-fill"></i>-->
-  <!--          </button>-->
-  <!--          <span class="form-select-setting-defaultValue" @click="setDefaultOption(option)" v-else>默认</span>-->
-
-            <button type="button" :class="['btn-text', 'form-select-setting-default',option.isDefault && 'btn-active']" @click="setDefaultOption(option)"> <i class="iconfont icon-check-fill"></i></button>
-            <span class="form-select-setting-defaultValue" v-if="option.isDefault">默认</span>
-          </template>
-        </div>
+      <draggable tag="div" class="list-group" :list="options" :options="{animation:380}" handle=".handle">
+          <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
+            <button type="button" class="btn-text handle"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
+            <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
+            <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
+            <template v-if="!field.isMulti">
+              <button type="button" :class="['btn-text', 'form-select-setting-default',option.isDefault && 'btn-active']" @click="setDefaultOption(option)"> <i class="iconfont icon-check-fill"></i></button>
+              <span class="form-select-setting-defaultValue" v-if="option.isDefault">默认</span>
+            </template>
+          </div>
       </draggable> 
     </div>
     <div class="form-setting-group form-select-setting-operation">
       <button type="button" class="btn-text" @click="addOption">增加选项</button>
+      <div class="btn-divider"></div>
       <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
     </div>
     
@@ -147,8 +142,7 @@ export default {
       index: this.field.options.length,
       batchModalShow: false, 
       optionText: '', // 批量编辑文本
-      errMessage: null,
-      drag: false
+      errMessage: null
     }
   },
   created() {

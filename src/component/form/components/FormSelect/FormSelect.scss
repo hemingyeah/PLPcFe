@@ -16,7 +16,15 @@
   white-space: nowrap;
 
   input[type="text"]{
-    width: 220px;
+    width: 185px;
+    border-radius: 4px;
+  }
+  .icon-tuozhuaipaixu{
+    font-size: 12px;
+  }
+  .handle{
+    padding: 0;
+    margin-right: 9px;
   }
 }
 
@@ -54,11 +62,21 @@
 }
 
 .form-select-setting-operation {
+  margin-top: 12px;
+  padding-left: 25px;
   .btn-text{
     color: $color-primary;
     padding: 0;
-
-    margin-right: 5px;
+  }
+  .btn-divider{
+    position: relative;
+    top: -.06em;
+    display: inline-block;
+    width: 1px;
+    height: .9em;
+    margin: 0 5px;
+    vertical-align: middle;
+    background: #e8e8e8;
   }
 }
 
@@ -138,4 +156,7 @@
 .form-select-logical-tip{
   margin-top: 10px 0 0 0;
   color: #666;
+}
+.flip-list-move {
+  transition: transform 0.5s;
 }
