@@ -1,7 +1,7 @@
 <template>
   <base-panel :show.sync="visible" :width="panelWidth" @close="hide()">
     <h3 slot="title">
-      <span>高级搜索</span>
+      <span>{{region.viewName || '新建视图'}}</span>
       <el-dropdown
         class="pull-right"
         trigger="click"
@@ -9,7 +9,7 @@
       >
         <i
           class="iconfont icon-xitongshezhi customer-panel-btn"
-          style="float: none;"
+          style="float: none"
         ></i>
 
         <el-dropdown-menu slot="dropdown" class="customer-advance-setting">
@@ -18,92 +18,70 @@
         </el-dropdown-menu>
       </el-dropdown>
     </h3>
-    <!--  -->
-    <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
-      <span class="task-font16">常用查询条件</span>
-      <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
-      <span class="task-span1">
-        <el-tooltip content="常用查询条件可以通过“设置”功能，进行添加和修改" placement="top">
-          <i class="iconfont icon-question task-icon"></i>
-        </el-tooltip>
-      </span>
-      <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
-      <i class="iconfont icon-up task-icon" v-else></i>
-    </div>
-    <div class="task-search-guide" v-show="!fields.length && guide">
-      <div></div>
-      <div>
-        您还未设置常用字段，快去试试吧
-      </div>
-    </div>
-    </div>
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <!-- S 搜索条件 -->
-      <el-form class="advanced-search-form" onsubmit="return false;">
-        <task-search-form
-          v-show="show"
-          class="task-search-forms"
-          :fields="fields"
-          ref="searchForm"
-          :search-params="searchParams"
-          :form-backup="formBackup"
-          :column-num="columnNum"
-        >
-        </task-search-form>
+      <!-- 查看视图 -->
+      <div class="task-flex task-ai">
+        <div class="task-view-name task-view-view task-flex" v-show="type === 'view'" v-for="(item, index) in searchModelCN" :key="index">
+          <span class="task-f14">{{item.key}} :</span>
+          <div>
+            {{item.value}}
+          </div>
+        </div>
+      </div>
+      <!-- S 视图名称 -->
+      <div class="task-view-name task-flex task-ai" v-show="type !== 'view'">
+        <span class="task-f14">视图名称</span>
+        <div>
+          <el-input
+            placeholder="请输入视图名称"
+            v-model="viewName"
+          >
+        </el-input></div>
+        </el-input>
+      </div>
+      <!-- E 视图名称 -->
+      <!-- S 搜索 -->
+      <el-form class="advanced-search-form" onsubmit="return false;" v-show="type !== 'view'">
         <div class="task-pointer task-flex task-ai">
           <span class="task-font16 task-mr4">添加查询条件</span>
           <span>
-            <el-tooltip content="您可以通过“添加”按钮设置更多的查询条件" placement="top">
+            <el-tooltip
+              content="您可以通过“添加”按钮设置更多的查询条件"
+              placement="top"
+            >
               <i class="iconfont icon-question task-icon"></i>
             </el-tooltip>
           </span>
         </div>
-        <!-- 设置查询条件 -->
-        <task-inquire 
-          v-if="fields.length"
-          ref="taskInquireParams" 
-          :column-num="columnNum" 
-          :config="taskInquireList" 
-          @setting="_setting"
-        />
-        <task-inquire 
-          v-else
-          ref="taskInquireParams" 
-          :column-num="columnNum" 
-          :config="[...config, ...taskTypeFilterFields]" 
+        <task-inquire
+          ref="taskInquireParams"
+          type="creat"
+          :column-num="columnNum"
+          :config="[...config, ...taskTypeFilterFields]"
           @setting="_setting"
         />
         <!-- 搜索操作按钮 -->
         <slot name="footer"></slot>
       </el-form>
-      <!-- E 搜索条件 -->
+      <!-- E 搜索 -->
+      <!-- 全员可见 -->
+      <el-checkbox v-model="viewRegion" class="task-view-region" v-show="type !== 'view'">设为全员可见</el-checkbox>
       <!-- 搜索操作按钮 -->
       <slot name="footer"></slot>
     </el-form>
     <!-- E 搜索条件 -->
-    <!-- 设置弹框 -->
-    <task-search-pupal 
-      ref="taskSearchPupal" 
-      :config="config" 
-      :task-type-filter-fields="taskTypeFilterFields" 
-      :task-inquire-list="taskInquireList"
-      @taskPupal="_taskPupal"
-    />
   </base-panel>
 </template>
 
 <script>
 /* api */
-// import * as TaskApi from "@src/api/TaskApi.ts";
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* components */
-import TaskSearchForm from "./TaskSearchForm.vue";
-import TaskSearchPupal from "./TaskSearchPupal";
 import TaskInquire from "./TaskInquire";
 
 /* utils */
-import _ from "lodash";
 import { formatDate } from "@src/util/lang";
 import { isEmptyStringObject } from "@src/util/function";
 import { storageGet, storageSet } from "@src/util/storage";
@@ -120,17 +98,6 @@ import {
 } from "@src/modules/task/model/TaskConvertMap.ts";
 
 const TASK_HISTORY_KEY = "task_history_list";
-const MultiFieldNames = [
-  "serviceType",
-  "serviceContent",
-  "level",
-  "paymentMethod",
-  "state",
-  "allotTypeStr",
-  "onceException",
-  "paymentMethod",
-  "tag",
-];
 const TaskInquireConvertFieldNamesToConditionsMap = {
   customer: "customerId",
   product: "productId",
@@ -138,8 +105,11 @@ const TaskInquireConvertFieldNamesToConditionsMap = {
 };
 
 export default {
-  name: "task-search-panel",
+  name: "task-view-panel",
   props: {
+    region: {
+      type: Object,
+    },
     customizeList: {
       type: Array,
       default: () => [],
@@ -162,8 +132,13 @@ export default {
       this.taskTypeFilterFields;
       this._taskInquireList();
     },
-    selfFields() {
-      this.fields;
+    region(v) {
+      if (!this.region.viewRegion || this.region.viewRegion === "只有我") {
+        this.viewRegion = false;
+      } else {
+        this.viewRegion = true;
+      }
+      this.viewName = this.region.viewName;
     },
   },
   data() {
@@ -173,10 +148,13 @@ export default {
       selfFields: [],
       taskInquireList: [],
       visible: false,
-      show: true,
       guide: true,
       taskAllFields: [],
       taskAllFieldsMap: {},
+      viewRegion: false,
+      viewName: this.region.viewName,
+      searchModelCN: [],
+      type: "",
     };
   },
   computed: {
@@ -187,55 +165,66 @@ export default {
       });
       return taskTypeFilterFields;
     },
-    fields() {
-      let f = {};
-      let selfFields = [];
-      let fields = [...this.selfFields]
-        .filter((item) => {
-          let bool = [...this.taskTypeFilterFields, ...this.config].some(
-            (v) => {
-              return item.displayName === v.displayName;
-            }
-          );
-          if (bool) return item;
-        })
-        .map((field) => {
-          f = _.cloneDeep(field);
-          let formType = f.formType;
-
-          if (formType === "datetime") {
-            formType = "date";
-          }
-
-          if (formType === "updateTime") {
-            f.displayName = "更新时间";
-          }
-          return Object.freeze({
-            ...f,
-            isNull: 1,
-            formType,
-            originalFormType: f.formType,
-            operator: this.matchOperator(f),
-          });
-        });
-      // .sort((a, b) => a.orderId - b.orderId);
-
-      fields.forEach((field) => {
-        let { fieldName } = field;
-        let originField = this.taskAllFieldsMap[fieldName];
-
-        selfFields.push(originField ? originField : field);
-      });
-      return selfFields;
-    },
     panelWidth() {
       return `${420 * this.columnNum}px`;
     },
   },
   mounted() {
+    if (!this.region.viewRegion || this.region.viewRegion === "只有我") {
+      this.viewRegion = false;
+    } else {
+      this.viewRegion = true;
+    }
     this._selfFields();
   },
   methods: {
+    /**
+     * @description 保存视图 and 编辑视图
+     */
+    saveViewBtn(fn) {
+      const { region } = this;
+      region.searchModel.systemConditions = this.buildTaskInquireParams().systemConditions;
+      if (!this.viewName) {
+        this.$platform.alert("请输入视图名称");
+        return;
+      }
+      region.viewRegion = this.viewRegion ? "所有用户" : "只有我";
+      const params = {
+        ...region,
+        viewName: this.viewName,
+      };
+      // 编辑
+      if (region.viewId) {
+        TaskApi.editView(params).then((res) => {
+          fn()
+        });
+        return;
+      }
+
+      // 保存
+      TaskApi.createView({
+        ...region,
+        viewName: this.viewName,
+      }).then((res) => {
+        fn()
+      });
+    },
+    /**
+     * 查看视图
+     */
+    async getOneView(viewId) {
+      this.searchModelCN = []
+      const { success, result } = await TaskApi.getOneView(viewId);
+      if (success) {
+        for (let key in result.searchModelCN) {
+          this.searchModelCN.push({ key, value: result.searchModelCN[key] });
+        }
+      }
+    },
+    _time(time) {
+      return time ? formatDate(time) : "";
+    },
+
     _selfFields() {
       const { column_number } = this.getLocalStorageData();
       const searchField = localStorage.getItem("task-search-field");
@@ -249,159 +238,19 @@ export default {
         this.selfFields = [];
       }
     },
-    buildParams() {
-      const form = {
-        ...this.$refs.taskInquireParams.returnData(),
-        ...this.$refs.searchForm.returnData(),
-      };
-      this.formBackup = Object.assign({}, form);
-      const taskInquireList = this.taskInquireList.length
-        ? this.taskInquireList
-        : [...this.config, ...this.taskTypeFilterFields];
-      const isSystemFields = [...this.fields, ...taskInquireList].filter(
-        (f) => f.isSystem
-      );
-      const notSystemFields = [...this.fields, ...taskInquireList].filter(
-        (f) => !f.isSystem
-      );
+
+    buildTaskInquireParams() {
       let params = {
-        conditions: [],
+        systemConditions: [],
       };
-      let tv = null;
-      let fn = "";
-      // 固定条件
-      for (let i = 0; i < isSystemFields.length; i++) {
-        tv = isSystemFields[i];
-        fn = tv.fieldName;
-        // hasRemind
-        if (fn === "hasRemind" && form[fn] !== "") {
-          params.hasRemind = form[fn] == 2 ? 0 : form[fn];
-          continue;
-        }
-
-        if (fn === "qrcodeState" && form[fn] !== "") {
-          params.qrcodeState = form[fn] == 2 ? 0 : form[fn];
-          continue;
-        }
-
-        if (fn == "area" && form[fn]) {
-          params.productAddress = {
-            ...(params.productAddress || {}),
-            province: form[fn].province,
-            city: form[fn].city,
-            dist: form[fn].dist,
-          };
-          continue;
-        }
-
-        if (fn === "addressDetail") {
-          params.productAddress = {
-            ...(params.productAddress || {}),
-            address: form[fn],
-          };
-          continue;
-        }
-
-        if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
-          continue;
-        }
-
-        if (typeof form[fn] === "string") {
-          let fieldNamsMap = { customer: "customerId", product: "productId" };
-
-          params[fieldNamsMap[fn] ? fieldNamsMap[fn] : fn] = form[fn];
-          continue;
-        }
-
-        if (tv.formType === "date" || tv.formType === "datetime") {
-          params[fn] = form[fn]
-            .map((t) => formatDate(t, "YYYY/MM/DD"))
-            .join("-");
-          continue;
-        }
-
-        if (MultiFieldNames.indexOf(fn) > -1) {
-          params[`${fn}s`] = form[fn];
-          delete params[fn];
-          continue;
-        }
-
-        if (tv.fieldName === "tags") {
-          params.tagId = form[fn].map(({ id }) => id).join("");
-        }
-
-        params[fn] = form[fn];
-      }
-
-      // 自定义条件
-      for (let i = 0; i < notSystemFields.length; i++) {
-        tv = notSystemFields[i];
-        fn = tv.fieldName;
-        !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
-        if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
-          continue;
-        }
-
-        // 空对象
-        if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
-        ) {
-          continue;
-        }
-
-        if (tv.formType === "date") {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
-          });
-          continue;
-        }
-
-        if (tv.formType === "cascader") {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operator,
-            inValue: form[fn],
-          });
-          continue;
-        }
-
-        if (tv.formType === "datetime") {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
-          });
-          continue;
-        }
-        params.conditions.push({
-          property: fn,
-          operator: tv.operator,
-          value: form[fn],
-        });
-      }
-      this.buildTaskInquireParams(params);
-
-      // 返回接口数据
-      return params;
-    },
-    buildTaskInquireParams(params) {
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields();
       const form = this.$refs.taskInquireParams.returnData();
       this.formBackup = Object.assign(this.formBackup, {
         ...this.$refs.taskInquireParams.returnData(),
-        ...this.$refs.searchForm.returnData(),
       });
 
       const isSystemFields = taskInquireList.filter((f) => f.isSystem);
       const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
-
-      params.systemConditions = [];
 
       let tv = null;
       let fn = "";
@@ -531,13 +380,6 @@ export default {
           operator: tv.operatorValue,
           value,
         });
-        params.systemConditions = [...new Set(params.systemConditions.map(item => {
-          item = JSON.stringify(item)
-          return item
-        }))].map(item => {
-          item = JSON.parse(item)
-          return item
-        })
       }
 
       // 自定义条件
@@ -622,7 +464,10 @@ export default {
           });
         }
       }
+
+      return params;
     },
+
     getLocalStorageData() {
       const dataStr = storageGet(TASK_HISTORY_KEY, "{}");
       return JSON.parse(dataStr);
@@ -671,19 +516,16 @@ export default {
       }
       return operator;
     },
-    open() {
+    open(type = "", id) {
       this.visible = true;
+      this.type = type;
+      if (type === "view") {
+        this.getOneView(id);
+      }
     },
     hide() {
       this.visible = false;
-      this.$emit("bj", false);
-    },
-    resetParams() {
-      this.formBackup = {};
-      this.$refs.searchForm &&
-        this.$nextTick(this.$refs.searchForm.initFormVal);
-      this.$refs.taskInquireParams &&
-        this.$nextTick(this.$refs.taskInquireParams.initFormVal);
+      this.$emit("bj", false)
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
@@ -694,17 +536,6 @@ export default {
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
       this.saveDataToStorage("column_number", command);
-    },
-    _taskPupal({ list, checkSystemList, checkCustomizeList }) {
-      this.selfFields = list;
-
-      this._taskInquireList(
-        JSON.stringify({ checkSystemList, checkCustomizeList })
-      );
-
-      this.$nextTick(() => {
-        this.mergeTaskFieldsForTaskInquire();
-      });
     },
     _taskInquireList(field = "") {
       const searchField = field || localStorage.getItem("task-search-field");
@@ -832,21 +663,11 @@ export default {
     },
   },
   components: {
-    [TaskSearchForm.name]: TaskSearchForm,
-    [TaskSearchPupal.name]: TaskSearchPupal,
     [TaskInquire.name]: TaskInquire,
   },
 };
 </script>
 
-<style lang="scss">
-.task-search-forms {
-  transition: height 0.5s;
-  .form-item {
-    width: 340px !important;
-  }
-}
-</style>
 <style lang="scss" scoped>
 .advanced-search-form {
   overflow: auto;
@@ -936,5 +757,23 @@ export default {
       }
     }
   }
+}
+.task-view-name {
+  padding: 15px 15px 20px 15px;
+  > div {
+    width: 225px;
+  }
+  span {
+    display: inline-block;
+    min-width: 85px;
+  }
+}
+.task-view-region {
+  position: absolute;
+  bottom: 70px;
+  left: 30px;
+}
+.task-view-view {
+  padding: 15px 15px 0 15px;
 }
 </style>

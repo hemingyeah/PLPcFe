@@ -69,7 +69,7 @@
     <!-- end 分组 -->
 
     <div slot="footer" class="export-footer">
-      <el-button @click="visible = false">关闭</el-button>
+      <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" :disabled="pending" @click="exportData(true)">
         {{ pending ? "正在导出" : "导出" }}
       </el-button>

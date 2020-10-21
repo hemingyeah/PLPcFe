@@ -86,7 +86,6 @@ export default {
   box-shadow: -1px 0 8px rgba(0, 0, 0, 0.125);
   overflow: hidden;
 }
-
 .base-panel-title {
   display: flex;
   flex-flow: row nowrap;

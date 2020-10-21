@@ -3,6 +3,7 @@ import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* components */
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";
+import TaskViewPanel from "@src/modules/task/components/list/TaskViewPanel.vue"
 import TaskSelect from "./components/TaskSelect.vue";
 import TaskViewModel from "./components/TaskViewModel.vue";
 import BatchEditingCustomerDialog from "./components/BatchEditingCustomerDialog.vue";
@@ -75,6 +76,7 @@ export default {
       planTimeType: "", // 判断计划时间展示的样式
       keyword_select: "", // 搜索筛选条件
       exportColumnList: [],
+      viewType: "",
       selectList: [
         { name: "全部", id: "all" },
         { name: "我创建的", id: "create" },
@@ -122,7 +124,8 @@ export default {
       taskSearchInputPlaceholderMap: TaskSearchInputPlaceholderMap,
       task_view_list: [],
       seoSetList: [],
-      exportColumns: []
+      exportColumns: [],
+      showBj: false
     };
   },
   computed: {
@@ -355,7 +358,7 @@ export default {
     /**
      * 获取视图
      */
-    async getUserViews() {
+    async getUserViews(type) {
       const { success, result } = await TaskApi.getUserViews();
       if (success) {
         this.taskView = result;
@@ -365,6 +368,9 @@ export default {
           }
         })
         this.otherLists(result);
+        if (type) {
+          return
+        }
         this.initialize();
       }
     },
@@ -376,9 +382,27 @@ export default {
       this.taskPage.list = [];
 
       this.params.moreConditions = this.$refs.searchPanel.buildParams();
-      // this.$refs.searchPanel.hide();
+      this.$refs.searchPanel.hide();
 
       this.search();
+    },
+    /**
+     * 保存视图
+     */
+    saveView() {
+      this.searchParams.systemConditions = this.$refs.viewPanel.buildTaskInquireParams().systemConditions
+      if (!this.searchParams.systemConditions.length) {
+        this.$platform.alert("请您先设置查询条件");
+        return
+      }
+      this.params.pageNum = 1;
+      this.taskPage.list = [];
+
+      this.$refs.viewPanel.saveViewBtn(() => {
+        this.$refs.viewPanel.hide();
+        this.getUserViews("saveView")
+        this.search(this.searchParams);
+      })
     },
     /**
      * @description 头部筛选
@@ -525,8 +549,6 @@ export default {
     /**
      * @description 根据视图匹配高级筛选
      */
-    // 最高事件
-    allEvent() { },
     /**
      * 顶部筛选, 状态数据展示
      */
@@ -631,7 +653,7 @@ export default {
       const confirm = await this.$platform.confirm("确定要删除视图吗？");
       if (confirm) {
         TaskApi.deleteView(id).then((res) => {
-          this.getUserViews();
+          this.getUserViews("saveView");
         });
       }
     },
@@ -801,14 +823,14 @@ export default {
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
-      if (Array.isArray(columnStatus) && columnStatus.length > 0) {
-        fields = this.buildSortFields(fields, localColumns)
-      }
+      // if (Array.isArray(columnStatus) && columnStatus.length > 0) {
+      //   fields = this.buildSortFields(fields, localColumns)
+      // }
 
       // S 高级搜索
       // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
-      let columns = fields
+      this.columns = fields
         .map((field) => {
           let sortable = false;
           let minWidth = null;
@@ -881,23 +903,15 @@ export default {
           col.type = "column";
           return col;
         });
-      
-      this.columns = []
-      
-      this.$nextTick(() => {
-        this.$set(this, 'columns', columns.slice())
-        
-        // 根据版本号判断是否需要支付方式
-        if (!paymentConfig.version) {
-          this.advanceds = this.advanceds.filter((item) => {
-            return item.fieldName !== "paymentMethod";
-          });
-          this.columns = this.columns.filter((item) => {
-            return item.fieldName !== "paymentMethod";
-          });
-        }
-        
-      })
+      // 根据版本号判断是否需要支付方式
+      if (!paymentConfig.version) {
+        this.advanceds = this.advanceds.filter((item) => {
+          return item.fieldName !== "paymentMethod";
+        });
+        this.columns = this.columns.filter((item) => {
+          return item.fieldName !== "paymentMethod";
+        });
+      }
     },
     buildSortFields(originFields = [], fieldsMap = {}) {
       let fields = [];
@@ -1571,14 +1585,39 @@ export default {
       });
     },
     /**
+     * 新建视图展示
+     */
+    creatViewPanel({ region, id, name }, type) {
+      const selectCols = [];
+      this.columns.map((item, index) => {
+        if (item.show) {
+          selectCols.push(item.fieldName);
+        }
+      });
+      this.region = {
+        viewName: name || "",
+        searchModel: this.searchParams,
+        selectedCols: selectCols.join(","),
+        viewRegion: region
+      }
+      if (id) {
+        this.region["viewId"] = id;
+        this.isViewModel = region;
+      }
+      this.viewType = type
+      this.$refs.viewPanel.mergeTaskFields(this.taskAllFields)
+      this.$refs.viewPanel.open(type, id);
+      this.showBj = true
+    },
+    /**
      * @description 高级搜索切换
      */
-    panelSearchAdvancedToggle(type) {
-      // type creat 新建视图 search 高级搜索
+    panelSearchAdvancedToggle() {
       this.trackEventHandler("avvancedSearch");
 
       this.$refs.searchPanel.mergeTaskFields(this.taskAllFields)
       this.$refs.searchPanel.open();
+      this.showBj = true
 
       this.$nextTick(() => {
         let forms = document.getElementsByClassName("advanced-search-form");
@@ -2014,7 +2053,13 @@ export default {
     _time(params, num) {
       if (!params) return;
       if (params && !isNaN(num)) {
-        return new Date(params.split("-")[num]);
+        let S, E;
+        if (num === 1) {
+          E = `${params.split("-")[1]} 23:59:59`
+        } else {
+          S = `${params.split("-")[0]} 00:00:00`
+        }
+        return new Date([S, E][num]);
       }
       return new Date(params);
 
@@ -2287,7 +2332,7 @@ export default {
     showAdvancedSetting() {
       this.trackEventHandler("columns");
 
-      this.$refs.advanced.open(this.columns, this.currentTaskType);
+      this.$refs.advanced.open(this.columns);
     },
     /**
      * @description 排序变化
@@ -2430,6 +2475,7 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
+    [TaskViewPanel.name]: TaskViewPanel,
     TaskSelect,
   },
 };

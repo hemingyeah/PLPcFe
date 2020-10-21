@@ -5,7 +5,6 @@
       class="task-list-view common-list-container"
       ref="taskListPage"
       v-show="mapShow"
-      @click="allEvent"
       v-loading.fullscreen.lock="loading"
     >
       <div class="task-list-header">
@@ -39,12 +38,12 @@
                       }}</span>
                       <div class="task-list-dropdown-icon">
                         <el-tooltip content="查看筛选条件" placement="top">
-                          <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
+                          <i class="iconfont icon-yanjing task-font12" @click.stop="creatViewPanel(item, 'view')"></i>
                         </el-tooltip>
                         <el-tooltip content="编辑视图" placement="top">
                           <i
                             class="iconfont icon-bianji1 task-ml12 task-font12"
-                            @click.stop="editView(item)"
+                            @click.stop="creatViewPanel(item, 'edit')"
                             v-if="item.authEdit"
                           ></i>
                         </el-tooltip>
@@ -61,7 +60,7 @@
                   <el-dropdown-item>
                     <div
                       class="task-flex task-ai task-cfa task-pointer task-list-wd252"
-                      @click="panelSearchAdvancedToggle('create')"
+                      @click="creatViewPanel"
                     >
                       <i class="iconfont icon-add task-mr4 task-font12"></i>
                       新建视图
@@ -99,7 +98,7 @@
               </base-button>
               <div
                 class="advanced-search-visible-btn task-ml12"
-                @click.self="panelSearchAdvancedToggle('search')"
+                @click.self="panelSearchAdvancedToggle"
               >
                 <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
                 高级搜索
@@ -327,10 +326,11 @@
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
+        @bj="showBj = false"
         v-if="advanceds.length"
       >
         <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
-          <base-button type="primary" @event="editView">存为视图</base-button>
+          <!-- <base-button type="primary" @event="editView">存为视图</base-button> -->
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button
@@ -342,6 +342,30 @@
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->
+      <!-- S 新建视图 -->
+      <task-view-panel
+        :init-data="initData"
+        :config="seoSetList"
+        :search-params="searchParams"
+        :task_view_list="task_view_list"
+        :region="region"
+        @bj="showBj = false"
+        :customize-list="[...taskFields, ...taskReceiptFields]"
+        ref="viewPanel"
+      >
+        <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
+          <div class="task-span1"></div>
+          <base-button type="ghost" @event="$refs.viewPanel.hide()">{{viewType === 'view' ? '关闭' : '取消'}}</base-button>
+          <base-button
+            v-if="viewType !== 'view'"
+            type="primary"
+            native-type="submit"
+            @event="saveView"
+          >保存视图</base-button
+          >
+        </div>
+      </task-view-panel>
+      <!-- E 新建视图 -->
       <div class="common-list-section">
         <!--operation bar start-->
         <div class="task-list-operation-bar-container task-flex task-ai">
@@ -415,7 +439,6 @@
             <!-- start 更多操作 -->
             <!-- v-if="exportPermission" -->
             <el-dropdown
-              trigger="click"
               v-if="exportPermission || exportPermissionTaskEdit"
             >
               <div
@@ -897,6 +920,8 @@
     <!-- E 地图预览 -->
     <!-- 视图展示 -->
     <task-view ref="taskView" @_searchModel="_searchModel" />
+
+    <div class="task-bj" v-show="showBj"></div>
   </div>
 </template>
 

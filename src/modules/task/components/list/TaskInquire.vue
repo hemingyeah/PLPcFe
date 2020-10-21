@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="fields.length">
     <div v-for="(item, index) in list" :key="index">
       <batch-form
         :fields="fields"
@@ -13,7 +13,11 @@
         :item="item"
       />
     </div>
-    <div class="task-font14 task-c2 task-mt15 task-pointer" @click="create">
+    <div
+      class="task-font14 task-c2 task-mt15 task-pointer"
+      @click="create"
+      v-if="!type"
+    >
       设为常用搜索字段
     </div>
   </div>
@@ -94,6 +98,10 @@ export default {
     columnNum: {
       type: Number,
       default: 1,
+    },
+    type: {
+      type: String,
+      default: "",
     },
   },
   data() {
@@ -328,7 +336,15 @@ export default {
           product: {},
         };
       },
+      watch: {
+        fields(v) {
+          if(v.length === Number(localStorage.getItem("fieldNum"))) return
+          this.reset();
+          this.buildForm();
+        },
+      },
       mounted() {
+        localStorage.setItem("fieldNum", this.fields.length)
         this.reset();
         this.buildForm();
       },
