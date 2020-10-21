@@ -198,7 +198,7 @@
                 >
                   <div v-if="item.type == 'company-card'" class="head-phone-box">
                     <img :src="headPhone" class="head-phone" alt="" />
-                    <div :class="['head-phone-con', 'overHideCon-1', nowSettingDataId == item.id ? 'menu-box-item-check' : '']">{{item.data.companyName}}</div>
+                    <div :class="['head-phone-con', 'overHideCon-1', nowSettingDataId == item.id ? 'menu-box-item-check' : '']">{{item.data.name}}</div>
                   </div>
                   <div
                     :class="[
