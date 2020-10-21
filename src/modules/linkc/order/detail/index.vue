@@ -138,7 +138,7 @@ export default {
       fullscreenLoading: false,
       statusArr: ["待发货", "待收货", "已完成"],
       orderInfoArr: [
-        { label: "订单号：", value: "", key: "orderNum" },
+        { label: "订单编号：", value: "", key: "orderNum" },
         { label: "订单时间：", value: "", key: "createTime" },
         { label: "买家：", value: "", key: "nickName" },
         { label: "收货人：", value: "", key: "name" },
@@ -147,10 +147,17 @@ export default {
         { label: "支付订单号：", value: "", key: "payNum" },
         { label: "支付方式：", value: "", key: "payType" },
         { label: "支付时间：", value: "", key: "payTime" },
+        { label: "发货时间：", value: "", key: "deliveryTime" },
+        { label: "完成时间：", value: "", key: "completeTime" },
         {
           label: "买家备注：",
           value: "",
           key: "remarks",
+        },
+        {
+          label: "物流公司：",
+          value: "",
+          key: "deliveryCompany",
         },
         {
           label: "物流单号：",
