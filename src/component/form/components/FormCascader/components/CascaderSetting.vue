@@ -150,38 +150,36 @@ export default {
     //批量编辑
     batchEdit(){
       let newValues = this.optionText.split('\n').filter(option => option);
-      console.log(newValues)
-      const parent = this.selectedOption[this.currentLevel]
+      const parent = this.selectedOption[this.currentLevel];
       if(!newValues.length) {
         platform.alert("至少要有一个选项");
         return false;
       }
-
       this.errMessage = this.validateOptions(newValues);
       if(this.errMessage) return;
-      let newOptions = newValues.map(item =>new Option(item, false, parent))
-      // let newOptions = newValues.map((item,index) =>{
-       
-      //   let options = new Option(item, false, parent)
-      //   if(options.deep < this.maxDeep){
-      //     console.log(555555)
-      //   } 
-      //   options.children = this.selectedOption[this.currentLevel].children[index];
-      //   return options;
-
-      // } );
+      let newOptions = newValues.map((item,index) =>{
+        let optionSelect;
+        let currentOption = parent.children[index]; //当前节点
+        if(currentOption){ //如果原option列表有这个节点，只改名称
+          currentOption.value=item;
+          optionSelect = currentOption;
+        } else {  //新增节点，递归插入数据
+           optionSelect = this.addNewOption(parent,item);
+        }
+        return optionSelect
+      });
       //更新数据
       this.selectedOption[this.currentLevel].children = newOptions;
-
-      // this.$emit('input', {value: newOptions, prop: 'setting'})
       this.batchModalShow = false;
 
     },
-    addOption(parent,value){
-      let option = new Option(value, false, parent);
-        if(option.deep < this.maxDeep) this.addOption(option)
-        console.log(value,parent,option)
-        parent.children.push(option);
+    addNewOption(parent,name){ //递归创建新节点
+       let value = name ? name:`${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
+       let optionSelect = new Option(value, false, parent);
+        if(optionSelect.deep < this.maxDeep) this.addNewOption(optionSelect)
+        parent.children.push(optionSelect);
+        this.chooseOption(optionSelect, true); //将新生成节点记录选择项
+        return optionSelect;
     },
     /** 修改默认值 */
     changeDefaultOption(option){
@@ -217,6 +215,7 @@ export default {
     changeMaxDeep(event){
       this.maxDeep = event.target.value;
       // 重置数据
+      console.log(' this.source', this.source)
       this.source = this.initSource(null, false, this.source.children, null)
       this.initselectedOption();
     },
@@ -371,6 +370,7 @@ export default {
         this.selectedOption.push(option);
         option = option.children[0];
       }
+      console.log('selectedOption',this.selectedOption)
 
 
     },
