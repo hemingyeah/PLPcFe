@@ -454,11 +454,6 @@ export default {
             task,
             tick,
           };
-
-          const addrItem=this.fields.find((item=>item.fieldName==="customer"));
-          if(addrItem && !addrItem.setting.customerOption.address){
-            params.address={};
-          }
         
           this.togglePending(true);
 
