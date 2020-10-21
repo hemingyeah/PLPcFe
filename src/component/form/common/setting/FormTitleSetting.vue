@@ -1,5 +1,5 @@
 <template>
-  <div class="form-common-setting">
+  <div class="form-setting-group form-setting-group-smallform-common-setting">
     <div class="form-common-setting-panel">
       <h4 class="form-common-setting-title">
         <span class="form-common-setting-title-name">标题</span>

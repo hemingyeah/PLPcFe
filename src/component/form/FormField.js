@@ -142,7 +142,7 @@ export default class FormField{
       option.placeHolder = option.placeHolder || FormInfoConfig.PLACE_HOLDER;
     }
 
-    if(field.formType === 'cascader') {
+    if(field.formType === 'cascader' || field.formType === 'text' || field.formType === 'textarea' || field.formType === 'number') {
       defaultValue = field.defaultValue;
     }
     
