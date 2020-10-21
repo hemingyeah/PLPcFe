@@ -5,8 +5,6 @@
 </template>
 
 <script>
-/* config */
-import * as config from '@src/component/form/config';
 /* props */
 import { settingProps } from '@src/component/form/components/props';
 
@@ -17,12 +15,8 @@ export default {
   },
   methods: {
     update(value) {
-      this.$emit('input',value, 'isSearch');
+      this.$emit('input', value, 'isSearch');
     }
   }
 }
 </script>
-
-<style>
-
-</style>
