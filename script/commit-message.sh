@@ -1,4 +1,7 @@
 #! /bin/bash
+# 获取node路径
+nodePath=`which node`
+PATH="$nodePath"
 
 # 获取提交信息
 if [[ $CI_COMMIT_MESSAGE ]]; then
