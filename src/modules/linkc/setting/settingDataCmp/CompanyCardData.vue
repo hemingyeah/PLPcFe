@@ -19,8 +19,12 @@
             @mouseleave="changeImgCover(false)"
           >
             <img
-              :src="dataInfo.logoUrl ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96
-` : ''"
+              :src="
+                dataInfo.logoUrl
+                  ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96
+`
+                  : ''
+              "
               class="avatar"
             />
             <div class="img-cover" v-show="imgCover" @click.stop>
@@ -36,11 +40,39 @@
           <span>最多50个字符</span>
         </div>
         <el-form-item prop="name">
-          <el-input v-model="dataInfo.name" :autofocus="false" placeholder="请输入" maxlength="50"></el-input>
+          <el-input
+            v-model="dataInfo.name"
+            :autofocus="false"
+            placeholder="请输入"
+            maxlength="50"
+          ></el-input>
+        </el-form-item>
+        <div class="form-label">
+          公司名称
+          <!-- <el-tooltip
+            class="item"
+            effect="dark"
+            content="请前往系统管理-信息账户-公司信息配置配置公司简称"
+            placement="bottom"
+          >
+            <i class="iconfont icon-help cur-point"></i>
+          </el-tooltip> -->
+        </div>
+        <el-form-item>
+          <el-input
+            v-model="dataInfo.companyName"
+            :autofocus="false"
+            :readonly="true"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
         <div class="form-label">联系电话</div>
         <el-form-item prop="mobile">
-          <el-input v-model="dataInfo.mobile" :autofocus="false" placeholder="请输入"></el-input>
+          <el-input
+            v-model="dataInfo.mobile"
+            :autofocus="false"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
         <div class="form-label">企业地址</div>
         <el-form-item prop="address">
@@ -62,7 +94,7 @@
   </div>
 </template>
 <script>
-import _ from "lodash";
+import _, { reject } from "lodash";
 import Uploader from "../../../../../packages/BaseUpload/uploader";
 import userImg from "@src/assets/img/myShop/logo.png";
 let reg_phone = /^(((0\d{2,3}-){0,1}\d{7,8})|(1[345678]\d{9}))$/;
@@ -73,7 +105,7 @@ export default {
   inject: ["cancelInfoData", "changeFullscreenLoading"],
   data() {
     let validatePhone = (rule, value, callback) => {
-      if (value !== "" && !reg_phone.test(value)) {
+      if (!reg_phone.test(value)) {
         callback(new Error("请输入正确的电话"));
       }
       callback();
@@ -86,12 +118,14 @@ export default {
         mobile: "",
         address: "",
         logoUrl: userImg,
+        companyName: "",
       },
       dataInforReturn: {
         name: "",
         mobile: "",
         address: "",
         logoUrl: userImg,
+        companyName: "",
       },
       rules: {
         name: [
@@ -99,7 +133,6 @@ export default {
           { max: 50, message: "最多50个字符", trigger: "change" },
         ],
         mobile: [
-          { required: true, message: "请输入电话", trigger: "blur" },
           {
             validator: validatePhone,
             message: "请输入正确的电话",
@@ -172,13 +205,18 @@ export default {
       this.imgCover = e;
     },
     saveData() {
-      this.$refs["ruleForm"].validate((valid) => {
-        if (!valid) return;
-        this.dataInforReturn = _.cloneDeep(this.dataInfo);
-        this.$emit("changeInfoData", {
-          item: this.dataInforReturn,
+      return new Promise((resolve, reject) => {
+        this.$refs["ruleForm"].validate((valid) => {
+          if (!valid) return reject();
+          this.dataInforReturn = _.cloneDeep(this.dataInfo);
+          this.$emit("changeInfoData", {
+            item: this.dataInforReturn,
+          });
+          this.$nextTick(() => {
+            resolve();
+          });
+          this.cancelInfoData();
         });
-        this.cancelInfoData();
       });
     },
     resetData() {

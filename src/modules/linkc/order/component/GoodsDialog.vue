@@ -25,6 +25,10 @@
 
       <div class="trackingNum-box">
         <el-form ref="ruleForm" :model="formData" :rules="rules" status-icon>
+          <el-form-item prop="deliveryCompany">
+            <div>添加物流公司：</div>
+            <el-input v-model="formData.deliveryCompany" placeholder="请输入"></el-input>
+          </el-form-item>
           <el-form-item prop="trackingNum">
             <div>添加物流信息：</div>
             <el-input v-model="formData.trackingNum" placeholder="请输入"></el-input>
@@ -58,9 +62,13 @@ export default {
       goodsImg,
       formData: {
         trackingNum: "",
+        deliveryCompany:""
       },
       loading: false,
       rules: {
+        deliveryCompany:[
+          { required: true, message: "请输入物流公司", trigger: "blur" },
+        ],
         trackingNum: [
           { required: true, message: "请输入物流信息", trigger: "blur" },
         ],
@@ -81,7 +89,7 @@ export default {
         this.loading = true;
         orderDeliver({
           orderId: this.infoData.orderId,
-          trackingNum: this.formData.trackingNum,
+          ...this.formData
         })
           .then((res) => {
             if (res.status == 200) {
