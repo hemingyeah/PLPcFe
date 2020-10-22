@@ -45,6 +45,9 @@
         </div>
       </template>
       <!-- end 产品 -->
+
+      <!-- TODO: 临时解决客户字段设置产品未勾选时隐藏 -->
+      <template v-else><div class="hide"></div></template>
     </template>
 
     <!-- start 计划时间 -->

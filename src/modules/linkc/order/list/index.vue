@@ -423,7 +423,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: this.findWeekTime(),
+          orderTime: '',
         },
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
@@ -516,9 +516,12 @@ export default {
       }
 
       if (Object.keys(sm.moreConditions).length > 0) {
-        if (sm.moreConditions.orderTime.length > 0) {
+        if (sm.moreConditions.orderTime && sm.moreConditions.orderTime.length > 0) {
           sm.moreConditions["startTime"] = sm.moreConditions.orderTime[0];
           sm.moreConditions["endTime"] = sm.moreConditions.orderTime[1];
+        }else{
+          sm.moreConditions["startTime"] = '';
+          sm.moreConditions["endTime"] = '';
         }
         delete sm.moreConditions.orderTime;
         params = {
@@ -549,7 +552,7 @@ export default {
           minWidth: "450px",
         },
         {
-          label: "订单号",
+          label: "订单编号",
           field: "orderNum",
           width: "220px",
           show: true,
@@ -935,7 +938,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: this.findWeekTime(),
+          orderTime: '',
         },
       };
 

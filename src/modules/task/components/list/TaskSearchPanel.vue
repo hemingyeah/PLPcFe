@@ -325,8 +325,8 @@ export default {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
-            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD'),
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
@@ -458,8 +458,8 @@ export default {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
-            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD')
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           })
           continue
         }
@@ -531,8 +531,8 @@ export default {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD'),
-            betweenValue2: formatDate(form[fn][1], 'YYYY-MM-DD'),
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
