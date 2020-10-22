@@ -219,7 +219,7 @@
                     <div class="flex-x">
                       <div
                         :class="[`status-tips-${scope.row.logisticsState}`,'status-tips-box']"
-                      >{{stateObj[scope.row.logisticsState].name}}</div>
+                      >{{scope.row.logisticsState ? stateObj[scope.row.logisticsState].name : ''}}</div>
                     </div>
                   </template>
 
