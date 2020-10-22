@@ -57,7 +57,9 @@
         <task-inquire
           ref="taskInquireParams"
           type="creat"
+          :search-model-cn="searchModelCN"
           :column-num="columnNum"
+          :search-model="region.searchModel"
           :config="[...config, ...taskTypeFilterFields]"
           @setting="_setting"
         />
@@ -265,9 +267,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -280,11 +282,10 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            address.value = (form[fn].province || "")
+              + (form[fn].city || "")
+              + (form[fn].dist || "")
+              + (form[fn].address || "");
           }
           params.systemConditions.push(address);
           continue;
@@ -294,7 +295,7 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            value: form[fn].map((tag) => tag.id)[0],
+            inValue: form[fn].map((tag) => tag.id),
           };
           params.systemConditions.push(condition);
           continue;
@@ -304,7 +305,9 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            value: TaskStateEnum.getValue(form[fn]),
+            inValue: form[fn].map((exception) =>
+              TaskStateEnum.getValue(exception)
+            ),
           };
           params.systemConditions.push(condition);
           continue;
@@ -323,7 +326,9 @@ export default {
           params.systemConditions.push({
             property: "allotType",
             operator: tv.operatorValue,
-            value: AllotTypeConvertMap[form[fn]],
+            inValue: form[fn].map(
+              (exception) => AllotTypeConvertMap[exception] || ""
+            ),
           });
           continue;
         }
@@ -332,7 +337,43 @@ export default {
           params.systemConditions.push({
             property: "flag",
             operator: tv.operatorValue,
-            value: FlagConvertMap[form[fn]],
+            inValue: form[fn].map(
+              (exception) => FlagConvertMap[exception] || ""
+            ),
+          });
+          continue;
+        }
+
+        if (
+          tv.fieldName == "level"
+          || tv.fieldName == "serviceType"
+          || tv.fieldName == "serviceContent"
+          || tv.fieldName == "paymentMethod"
+          || tv.fieldName === "createUser"
+          || tv.fieldName === "allotUser"
+        ) {
+          params.systemConditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.fieldName === "executor") {
+          params.systemConditions.push({
+            property: "executorUser",
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.fieldName === "synergyId") {
+          params.systemConditions.push({
+            property: "synergies",
+            operator: tv.operatorValue,
+            inValue: form[fn],
           });
           continue;
         }
@@ -366,19 +407,28 @@ export default {
           continue;
         }
 
-        let value =
-          TaskOnceConvertMap[form[fn]] != undefined
-            ? TaskOnceConvertMap[form[fn]]
-            : form[fn];
-        value =
-          TaskApproveConvertMap[value] != undefined
-            ? TaskApproveConvertMap[value]
-            : value;
+        let value = TaskOnceConvertMap[form[fn]] != undefined
+          ? TaskOnceConvertMap[form[fn]]
+          : form[fn];
+        value = TaskApproveConvertMap[value] != undefined
+          ? TaskApproveConvertMap[value]
+          : value;
 
         params.systemConditions.push({
           property: fn,
           operator: tv.operatorValue,
           value,
+        });
+        params.systemConditions = [
+          ...new Set(
+            params.systemConditions.map((item) => {
+              item = JSON.stringify(item);
+              return item;
+            })
+          ),
+        ].map((item) => {
+          item = JSON.parse(item);
+          return item;
         });
       }
 
@@ -392,9 +442,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -407,11 +457,10 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            address.value = (form[fn].province || "")
+              + (form[fn].city || "")
+              + (form[fn].dist || "")
+              + (form[fn].address || "");
           }
           params.conditions.push(address);
           continue;
@@ -477,51 +526,49 @@ export default {
       let operator = "";
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case "date": {
+        operator = "between";
+        break;
+      }
+      case "datetime": {
+        operator = "between";
+        break;
+      }
+      case "select": {
+        if (field.setting && field.setting.isMulti) {
+          operator = "contain";
+        } else {
+          operator = "eq";
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "cascader": {
-          operator = "cascader";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case "user": {
+        operator = "user";
+        break;
+      }
+      case "cascader": {
+        operator = "cascader";
+        break;
+      }
+      case "address": {
+        operator = "address";
+        break;
+      }
+      case "location": {
+        operator = "location";
+        break;
+      }
+      default: {
+        operator = "like";
+        break;
+      }
       }
       return operator;
     },
     open(type = "", id) {
       this.visible = true;
       this.type = type;
-      if (type === "view") {
-        this.getOneView(id);
-      }
+      this.getOneView(id);
     },
     hide() {
       this.visible = false;

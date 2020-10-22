@@ -44,7 +44,7 @@
                           <i
                             class="iconfont icon-bianji1 task-ml12 task-font12"
                             @click.stop="creatViewPanel(item, 'edit')"
-                            v-if="item.authEdit"
+                           
                           ></i>
                         </el-tooltip>
                         <el-tooltip content="删除视图" placement="top">

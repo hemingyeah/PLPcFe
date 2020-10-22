@@ -4,7 +4,7 @@ import * as TaskApi from "@src/api/TaskApi.ts";
 import * as CustomerApi from "@src/api/CustomerApi";
 
 /* utils */
-import _ from 'lodash';
+import _ from "lodash";
 import * as Utils from "@src/component/form/util";
 
 /* components */
@@ -16,7 +16,15 @@ import SearchProductSelect from "./SearchProductSelect.vue";
 import SearchCustomerSelect from "./SearchCustomerSelect.vue";
 import { formatDate } from "@src/util/lang";
 
-const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod']
+const MultiFieldNames = [
+  "serviceType",
+  "serviceContent",
+  "level",
+  "paymentMethod",
+  "state",
+  "allotTypeStr",
+  "onceException",
+];
 
 export default {
   name: "task-search-form",
@@ -35,8 +43,8 @@ export default {
     },
     searchParams: {
       type: Object,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -47,8 +55,8 @@ export default {
   },
   watch: {
     fields() {
-      this.buildForm()
-    }
+      this.buildForm();
+    },
   },
   created() {
     this.buildForm();
@@ -86,11 +94,11 @@ export default {
         }
 
         if (field.formType === "user") {
-          tv = []
+          tv = [];
         }
 
         if (MultiFieldNames.indexOf(field.fieldName) > -1) {
-          tv = []
+          tv = [];
         }
 
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
@@ -111,139 +119,135 @@ export default {
     /**
      * 初始参数转换
      */
-    initialParams(key, item) {
-      let value;
-      if (key === "onceReallot") {
-        switch (item) {
-          case 1:
-            value = '是';
-            break;
-          default:
-            value = "全部";
-            break;
-        }
-      }
+    // initialParams(key, item) {
+    //   let value;
+    //   if (key === "onceReallot") {
+    //     switch (item) {
+    //       case 1:
+    //         value = '是';
+    //         break;
+    //       default:
+    //         value = "全部";
+    //         break;
+    //     }
+    //   }
 
-      if(key === 'flags') {
-        value = []
-        item.forEach(v => {
-          if (v === 'ONCEOVERTIME') {
-            value.push('曾超时')
-          } else if (v === 'ONCEREFUSED') {
-            value.push('曾拒绝')
-          } else if (v === 'ONCEPAUSED') {
-            value.push('曾暂停')
-          } else if (v === 'ONCEROLLBACK') {
-            value.push('曾回退')
-          } else {
-            value.push('位置异常')
-          }
-        })
-      }
+    //   if(key === 'flags') {
+    //     value = []
+    //     item.forEach(v => {
+    //       if (v === 'ONCEOVERTIME') {
+    //         value.push('曾超时')
+    //       } else if (v === 'ONCEREFUSED') {
+    //         value.push('曾拒绝')
+    //       } else if (v === 'ONCEPAUSED') {
+    //         value.push('曾暂停')
+    //       } else if (v === 'ONCEROLLBACK') {
+    //         value.push('曾回退')
+    //       } else {
+    //         value.push('位置异常')
+    //       }
+    //     })
+    //   }
 
-      if (key === 'createUser') {
-        switch (item) {
-          case 1:
-            value = '曾超时';
-            break;
-          case 2:
-            value = '曾拒绝';
-            break;
-          case 3:
-            value = '曾暂停';
-            break;
-          case 4:
-            value = '曾回退';
-            break;
-          case 5:
-            value = '位置异常';
-            break;
-          default:
-            value = "";
-            break;
-        }
-      }
-      return value
-    },
+    //   if (key === 'createUser') {
+    //     switch (item) {
+    //       case 1:
+    //         value = '曾超时';
+    //         break;
+    //       case 2:
+    //         value = '曾拒绝';
+    //         break;
+    //       case 3:
+    //         value = '曾暂停';
+    //         break;
+    //       case 4:
+    //         value = '曾回退';
+    //         break;
+    //       case 5:
+    //         value = '位置异常';
+    //         break;
+    //       default:
+    //         value = "";
+    //         break;
+    //     }
+    //   }
+    //   return value
+    // },
     /**
      * 自定义初始化参数
      */
-    _inPar() {
-      let inPar = [] // 初始化的参数
-      for(let key in this.searchParams) {
-        if (JSON.stringify(this.searchParams[key]) !== '[]' && this.searchParams[key] && key !== 'pageSize' && key !== 'page' && key !== 'pageNum' && key !== 'stateList' && key !== 'whoseInfo' && key !== 'isPermission' && key !== 'distance' && key !== 'orderDetail' && key !== 'sortBy') {
-          inPar.push({key, value: this.searchParams[key]})
-        }
-      }
-      inPar.forEach(({key, value}) => {
-        if (key === 'levels') {
-          this.form.level = value
-        } else if (key === 'level') {
-          this.form.level = [value]
-        } else if (key === 'onceReallot') {
-          this.form.onceReallot = this.initialParams(key, value)
-        } else if (key === 'acceptTimeStart') {
-          this.form.acceptTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'acceptTimeEnd') {
-          this.form.acceptTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'allotTimeStart') {
-          this.form.allotTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'allotTimeEnd') {
-          this.form.allotTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'serviceTypes') {
-          this.form.serviceType = value
-        } else if (key === 'serviceType') {
-          this.form.serviceType = [value]
-        } else if (key === 'serviceContents') {
-          this.form.serviceContent = value
-        } else if (key === 'serviceContent') {
-          this.form.serviceContent = [value]
-        } else if (key === "cusProvince") {
-          this.form.area['province'] = value
-        } else if (key === "cusCity") {
-          this.form.area['city'] = value
-        } else if (key === "cusDist") {
-          this.form.area['dist'] = value
-        } else if (key === "payTypes") {
-          this.form.paymentMethod = value
-        } else if (key === "paymentMethod") {
-          this.form.paymentMethod = [value]
-        } else if (key === 'flags') {
-          this.form.onceException = this.initialParams(key, value)
-        } else if (key === 'onceException') {
-          this.form.onceException = this.initialParams(key, value)
-        } else if (key === 'createUserIds') {
-          this.form.createUser = value
-        } else if (key === 'createUser') {
-          this.form.createUser = [value]
-        } else if (key === 'allotUserIds') {
-          this.form.allotUser = value
-        } else if (key === 'allotUser') {
-          this.form.allotUser = [value]
-        } else if (key === 'executorUserIds') {
-          this.form.executor = value
-        } else if (key === 'executor') {
-          this.form.executor = [value]
-        } else {
-          this.form[key] = value
-        }
-      })
-      console.log('初始化的参数', inPar, this.form)
-    },
+    // _inPar() {
+    //   let inPar = [] // 初始化的参数
+    //   for(let key in this.searchParams) {
+    //     if (JSON.stringify(this.searchParams[key]) !== '[]' && this.searchParams[key] && key !== 'pageSize' && key !== 'page' && key !== 'pageNum' && key !== 'stateList' && key !== 'whoseInfo' && key !== 'isPermission' && key !== 'distance' && key !== 'orderDetail' && key !== 'sortBy') {
+    //       inPar.push({key, value: this.searchParams[key]})
+    //     }
+    //   }
+    //   inPar.forEach(({key, value}) => {
+    //     if (key === 'levels') {
+    //       this.form.level = value
+    //     } else if (key === 'level') {
+    //       this.form.level = [value]
+    //     } else if (key === 'onceReallot') {
+    //       this.form.onceReallot = this.initialParams(key, value)
+    //     } else if (key === 'acceptTimeStart') {
+    //       this.form.acceptTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
+    //     } else if (key === 'acceptTimeEnd') {
+    //       this.form.acceptTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
+    //     } else if (key === 'allotTimeStart') {
+    //       this.form.allotTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
+    //     } else if (key === 'allotTimeEnd') {
+    //       this.form.allotTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
+    //     } else if (key === 'serviceTypes') {
+    //       this.form.serviceType = value
+    //     } else if (key === 'serviceType') {
+    //       this.form.serviceType = [value]
+    //     } else if (key === 'serviceContents') {
+    //       this.form.serviceContent = value
+    //     } else if (key === 'serviceContent') {
+    //       this.form.serviceContent = [value]
+    //     } else if (key === "cusProvince") {
+    //       this.form.area['province'] = value
+    //     } else if (key === "cusCity") {
+    //       this.form.area['city'] = value
+    //     } else if (key === "cusDist") {
+    //       this.form.area['dist'] = value
+    //     } else if (key === "payTypes") {
+    //       this.form.paymentMethod = value
+    //     } else if (key === "paymentMethod") {
+    //       this.form.paymentMethod = [value]
+    //     } else if (key === 'flags') {
+    //       this.form.onceException = this.initialParams(key, value)
+    //     } else if (key === 'onceException') {
+    //       this.form.onceException = this.initialParams(key, value)
+    //     } else if (key === 'createUserIds') {
+    //       this.form.createUser = value
+    //     } else if (key === 'createUser') {
+    //       this.form.createUser = [value]
+    //     } else if (key === 'allotUserIds') {
+    //       this.form.allotUser = value
+    //     } else if (key === 'allotUser') {
+    //       this.form.allotUser = [value]
+    //     } else if (key === 'executorUserIds') {
+    //       this.form.executor = value
+    //     } else if (key === 'executor') {
+    //       this.form.executor = [value]
+    //     } else {
+    //       this.form[key] = value
+    //     }
+    //   })
+    //   console.log('初始化的参数', inPar, this.form)
+    // },
 
     renderInput(h, field) {
-      const f = _.cloneDeep(field)
+      const f = _.cloneDeep(field);
       let comp = FormFieldMap.get(f.formType);
       if (!comp || f.formType === "area") {
         return null;
       }
 
-      if (f.formType === "select") {
-        f.setting.isMulti = false
-      }
-
       if (MultiFieldNames.indexOf(field.fieldName) > -1) {
-        f.setting.isMulti = true
+        f.setting.isMulti = true;
       }
 
       let childComp = null;
@@ -304,7 +308,7 @@ export default {
           },
         });
       } else if (f.fieldName === "tlmName") {
-        f.clearable = true
+        f.clearable = true;
         childComp = h("linkman-search", {
           props: {
             field: f,
@@ -326,7 +330,7 @@ export default {
               value: this.form[f.fieldName],
               disableMap: true,
               placeholder: Utils.genPlaceholder(f),
-              seo: true
+              seo: true,
             },
             on: {
               update: (event) => this.update(event),
@@ -344,8 +348,7 @@ export default {
         },
         [childComp]
       );
-   
-   },
+    },
     returnData() {
       let data = Object.assign({}, this.form);
       data.backUp = {
@@ -400,9 +403,7 @@ export default {
       }
       const f = event.field;
       this.form[f.fieldName] = event.newValue;
-      console.log(this.form)
     },
-  
   },
   render(h) {
     return (

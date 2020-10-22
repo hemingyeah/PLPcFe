@@ -66,11 +66,13 @@
           :column-num="columnNum" 
           :config="taskInquireList" 
           @setting="_setting"
+          :search-model-cn="[]"
         />
         <task-inquire 
           v-else
           ref="taskInquireParams" 
           :column-num="columnNum" 
+          :search-model-cn="[]"
           :config="[...config, ...taskTypeFilterFields]" 
           @setting="_setting"
         />
@@ -387,6 +389,35 @@ export default {
       }
       this.buildTaskInquireParams(params);
 
+      if (params.systemConditions) {
+        params.systemConditions.forEach((item) => {
+          if (item.property === "serviceContent") {
+            params.serviceContents = [];
+          } else if (item.property === "serviceType") {
+            params.serviceTypes = [];
+          } else if (item.property === "level") {
+            params.levels = [];
+          } else if (item.property === "paymentMethod") {
+            params.paymentMethods = [];
+          } else if (item.property === "state") {
+            params.states = [];
+          } else if (item.property === "allotType") {
+            params.allotTypeStrs = [];
+          } else if (item.property === "flag") {
+            params.onceExceptions = [];
+          } else if (item.property === "allotUser") {
+            params.allotUser = [];
+          } else if (item.property === "createUser") {
+            params.createUser = [];
+          } else if (item.property === "executorUser") {
+            params.executor = [];
+          } else if (item.property === "synergies") {
+            params.synergyId = [];
+          } else if (item.property === "tags") {
+            params.tags = [];
+          }
+        });
+      }
       // 返回接口数据
       return params;
     },
@@ -445,7 +476,7 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            value: form[fn].map((tag) => tag.id)[0],
+            inValue: form[fn].map((tag) => tag.id),
           };
           params.systemConditions.push(condition);
           continue;
@@ -455,7 +486,9 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            value: TaskStateEnum.getValue(form[fn]),
+            inValue: form[fn].map((exception) =>
+              TaskStateEnum.getValue(exception)
+            ),
           };
           params.systemConditions.push(condition);
           continue;
@@ -474,7 +507,9 @@ export default {
           params.systemConditions.push({
             property: "allotType",
             operator: tv.operatorValue,
-            value: AllotTypeConvertMap[form[fn]],
+            inValue: form[fn].map(
+              (exception) => AllotTypeConvertMap[exception] || ""
+            ),
           });
           continue;
         }
@@ -483,7 +518,43 @@ export default {
           params.systemConditions.push({
             property: "flag",
             operator: tv.operatorValue,
-            value: FlagConvertMap[form[fn]],
+            inValue: form[fn].map(
+              (exception) => FlagConvertMap[exception] || ""
+            ),
+          });
+          continue;
+        }
+
+        if (
+          tv.fieldName == "level" ||
+          tv.fieldName == "serviceType" ||
+          tv.fieldName == "serviceContent" ||
+          tv.fieldName == "paymentMethod" ||
+          tv.fieldName === "createUser" ||
+          tv.fieldName === "allotUser"
+        ) {
+          params.systemConditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.fieldName === "executor") {
+          params.systemConditions.push({
+            property: "executorUser",
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.fieldName === "synergyId") {
+          params.systemConditions.push({
+            property: "synergies",
+            operator: tv.operatorValue,
+            inValue: form[fn],
           });
           continue;
         }
@@ -531,13 +602,17 @@ export default {
           operator: tv.operatorValue,
           value,
         });
-        params.systemConditions = [...new Set(params.systemConditions.map(item => {
-          item = JSON.stringify(item)
-          return item
-        }))].map(item => {
-          item = JSON.parse(item)
-          return item
-        })
+        params.systemConditions = [
+          ...new Set(
+            params.systemConditions.map((item) => {
+              item = JSON.stringify(item);
+              return item;
+            })
+          ),
+        ].map((item) => {
+          item = JSON.parse(item);
+          return item;
+        });
       }
 
       // 自定义条件

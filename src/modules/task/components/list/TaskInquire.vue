@@ -11,6 +11,8 @@
         @del="del"
         @setting="setting"
         :item="item"
+        :search-model="searchModel"
+        :search-model-cn="searchModelCN"
       />
     </div>
     <div
@@ -53,24 +55,42 @@ const OperatorSelectOptionsMap = {
     { label: "包含", value: "like" },
     { label: "等于", value: "eq" },
   ],
+  multiple: [{ label: "介于", value: "in" }],
   date: [{ label: "介于", value: "between" }],
   select: [{ label: "等于", value: "eq" }],
   cascader: [{ label: "包含", value: "cascader" }],
   many: [{ label: "包含", value: "contain" }],
 };
 
+const MultiFieldNames = [
+  "serviceType",
+  "serviceContent",
+  "level",
+  "paymentMethod",
+  "state",
+  "allotTypeStr",
+  "onceException",
+  "allotUser",
+  "tags",
+  "synergyId",
+  "createUser",
+  "executor"
+];
+
 function setFieldOperateHandler(field = {}) {
   let { fieldName, formType, setting } = field;
 
   if (formType == "number") {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice();
+  } else if (MultiFieldNames.indexOf(fieldName) > -1) {
+    field.operatorOptions = OperatorSelectOptionsMap.multiple.slice();
   } else if (fieldName == "customer" || fieldName == "product") {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
   } else if (
-    formType == "text" ||
-    formType == "textarea" ||
-    formType === "code" ||
-    formType === "description"
+    formType == "text"
+    || formType == "textarea"
+    || formType === "code"
+    || formType === "description"
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
   } else if (formType == "date" || formType == "datetime") {
@@ -91,6 +111,14 @@ function setFieldOperateHandler(field = {}) {
 export default {
   name: "task-inquire",
   props: {
+    searchModel: {
+      type: Object,
+      default: () => ({}),
+    },
+    searchModelCN: {
+      type: Array,
+      default: () => [],
+    },
     config: {
       type: Array,
       default: () => ({}),
@@ -117,6 +145,15 @@ export default {
   watch: {
     config() {
       this.fields;
+    },
+    searchModelCN(v) {
+      if (v.length) {
+        this.list = v.map((item, index) => {
+          return index + 1;
+        });
+      } else {
+        this.list = [1];
+      }
     },
   },
   computed: {
@@ -151,6 +188,7 @@ export default {
   methods: {
     returnData() {
       let data = {};
+      if (!this.$refs.batchForm) return {}
       this.$refs.batchForm.forEach((item) => {
         for (let key in item.returnDatas()) {
           if (item.returnDatas()[key]) {
@@ -167,6 +205,7 @@ export default {
     returnInquireFields() {
       let inquireFields = [];
 
+      if (!this.$refs.batchForm) return []
       this.$refs.batchForm.forEach((batchFormEl) => {
         inquireFields.push(batchFormEl.selectedField);
       });
@@ -186,42 +225,42 @@ export default {
       let operator = "";
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case "date": {
+        operator = "between";
+        break;
+      }
+      case "datetime": {
+        operator = "between";
+        break;
+      }
+      case "select": {
+        if (field.setting && field.setting.isMulti) {
+          operator = "contain";
+        } else {
+          operator = "eq";
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "cascader": {
-          operator = "cascader";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case "user": {
+        operator = "user";
+        break;
+      }
+      case "address": {
+        operator = "address";
+        break;
+      }
+      case "cascader": {
+        operator = "cascader";
+        break;
+      }
+      case "location": {
+        operator = "location";
+        break;
+      }
+      default: {
+        operator = "like";
+        break;
+      }
       }
       return operator;
     },
@@ -298,6 +337,7 @@ export default {
       ];
     },
     initFormVal() {
+      if (!this.$refs.batchForm) return
       this.$refs.batchForm.forEach((el) => {
         el.buildForm();
       });
@@ -307,6 +347,14 @@ export default {
     BatchForm: {
       name: "batch-form",
       props: {
+        searchModel: {
+          type: Object,
+          default: () => ({}),
+        },
+        searchModelCN: {
+          type: Array,
+          default: () => [],
+        },
         fields: {
           type: Array,
           default: () => [],
@@ -338,17 +386,54 @@ export default {
       },
       watch: {
         fields(v) {
-          if(v.length === Number(localStorage.getItem("fieldNum"))) return
+          if (v.length === Number(localStorage.getItem("fieldNum"))) return;
           this.reset();
           this.buildForm();
         },
+        searchModelCN(v) {
+          if (JSON.stringify(this.searchModel) !== "{}") {
+            this._inPar(this.searchModel);
+          }
+        },
       },
       mounted() {
-        localStorage.setItem("fieldNum", this.fields.length)
+        localStorage.setItem("fieldNum", this.fields.length);
         this.reset();
         this.buildForm();
       },
       methods: {
+        _inPar(searchParams) {
+          let inPar = []; // 初始化的参数
+          for (let key in searchParams) {
+            if (
+              JSON.stringify(searchParams[key]) !== "[]"
+              && searchParams[key]
+              && key !== "pageSize"
+              && key !== "page"
+              && key !== "pageNum"
+              && key !== "stateList"
+              && key !== "whoseInfo"
+              && key !== "isPermission"
+              && key !== "distance"
+              && key !== "orderDetail"
+              && key !== "sortBy"
+            ) {
+              inPar.push({ key, value: searchParams[key] });
+            }
+          }
+          console.log(inPar);
+          inPar.forEach((item) => {
+            if (item.key === "customerId") {
+              this.form["customer"] = item.value;
+              this.customer["id"] = item.value;
+            }
+          });
+          this.searchModelCN.forEach((item) => {
+            if (item.key === "客户") {
+              this.customer["name"] = item.value;
+            }
+          });
+        },
         returnDatas() {
           let data = Object.assign({}, this.form);
           data.backUp = {
@@ -366,7 +451,7 @@ export default {
           // this.form = Utils.initialize(this.fields);
 
           this.fields.forEach((f) => {
-            if (f.fieldName === "tags" && f.formType === "select") {
+            if (MultiFieldNames.indexOf(f.fieldName) > -1) {
               this.form[f.fieldName] = [];
             }
           });
@@ -429,6 +514,10 @@ export default {
             index: this.index,
           });
           this.form[val] = val == "tags" ? [] : "";
+
+          if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
+            this.form[val] = [];
+          }
         },
         renderSelector() {
           if (!this.fields) return null;
@@ -479,8 +568,8 @@ export default {
             return null;
           }
 
-          if (f.formType === "select") {
-            f.setting.isMulti = false;
+          if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
+            f.setting.isMulti = true;
           }
 
           let childComp = null;
@@ -523,6 +612,7 @@ export default {
           } else if (f.formType === "user") {
             childComp = h("user-search", {
               props: {
+                multiple: true,
                 field: f,
                 value: this.form[f.fieldName],
                 disableMap: true,
@@ -541,12 +631,14 @@ export default {
             let value = this.form[f.fieldName];
             childComp = h("biz-team-select", {
               props: {
+                multiple: true,
                 value: value ? value : [],
               },
               on: {
                 input: (event) => this.update(event, "tags"),
               },
             });
+            
           } else if (f.fieldName === "tlmName") {
             childComp = h("linkman-search", {
               props: {

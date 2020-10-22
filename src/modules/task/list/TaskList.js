@@ -395,10 +395,10 @@ export default {
         this.$platform.alert("请您先设置查询条件");
         return
       }
-      this.params.pageNum = 1;
-      this.taskPage.list = [];
 
       this.$refs.viewPanel.saveViewBtn(() => {
+        this.params.pageNum = 1;
+        this.taskPage.list = [];
         this.$refs.viewPanel.hide();
         this.getUserViews("saveView")
         this.search(this.searchParams);
@@ -1587,7 +1587,7 @@ export default {
     /**
      * 新建视图展示
      */
-    creatViewPanel({ region, id, name }, type) {
+    creatViewPanel({ region, id, name, searchModel }, type) {
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
@@ -1602,6 +1602,7 @@ export default {
       }
       if (id) {
         this.region["viewId"] = id;
+        this.region["searchModel"] = searchModel
         this.isViewModel = region;
       }
       this.viewType = type
