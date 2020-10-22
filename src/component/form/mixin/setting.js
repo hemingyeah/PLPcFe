@@ -8,6 +8,7 @@ import FormRequiredSetting from '@src/component/form/common/setting/FormRequired
 import FormSearchSetting from '@src/component/form/common/setting/FormSearchSetting.vue';
 import FormRepeatSetting from '@src/component/form/common/setting/FormRepeatSetting.vue';
 import FormVisibleSetting from '@src/component/form/common/setting/FormVisibleSetting.vue';
+import FormDisplaymodeSetting from '@src/component/form/common/setting/FormDisplaymodeSetting.vue';
 
 const SettingMixin = {
   computed: {
@@ -40,6 +41,8 @@ const SettingMixin = {
     [FormSearchSetting.name]: FormSearchSetting,
     [FormRepeatSetting.name]: FormRepeatSetting,
     [FormVisibleSetting.name]: FormVisibleSetting,
+    [FormDisplaymodeSetting.name]: FormDisplaymodeSetting
+    
   }
 }
 

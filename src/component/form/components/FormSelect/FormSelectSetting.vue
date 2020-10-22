@@ -1,21 +1,19 @@
 <template>
-  <div class="form-setting-panel form-select-setting">
-    <h3>基础字段 -- {{setting.name}}</h3>
-    <div class="form-setting-group">
-      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
+  <div class="form-setting-panel">
+    <div class="form-setting-group form-setting-group-small">
+      <form-title-setting :field="field" :setting="setting" @input="updateForDom"></form-title-setting>
     </div>
     <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+      <form-describe-setting :field="field" @input="updateForDom"></form-describe-setting>
     </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-      <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
-      <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+       <div class="form-item-box">
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+        <form-repeat-setting :field="field" @input="update"></form-repeat-setting>
+      </div>
     </div>
-    <h3>
-      选项
-      <el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox>
-    </h3>
+    <h4>选项<el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox> </h4>
     <div class="form-select-setting-list">
       <draggable tag="div" class="list-group" :list="options" :options="{animation:380}" handle=".handle">
           <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
@@ -36,11 +34,21 @@
     </div>
     
     <template v-if="allowLogical">
-      <h3>显示逻辑 <button type="button" class="btn-text form-select-logical-btn" @click="showLogicalModal">配置</button></h3>
+      <h4>显示逻辑 <button type="button" class="btn-text form-select-logical-btn" @click="showLogicalModal">配置</button></h4>
       <form-select-logical :logical="logical"/>
       <logical-field-modal @submit="updateDependencies" ref="logical" />
     </template>
-
+    <div class="form-setting-group form-setting-item">
+      <form-displaymode-setting :field="field" @input="update"></form-displaymode-setting>
+    </div>
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">字段权限</h4>
+      <div class="form-item-box">
+        <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
+        <form-visible-setting :field="field" @input="update"></form-visible-setting>
+        <form-search-setting :field="field" @input="update"></form-search-setting>
+      </div>
+    </div>
     <base-modal 
       title="批量编辑选项" width="520px" class="form-select-setting-modal"
       :show.sync="batchModalShow" :mask-closeable="false">

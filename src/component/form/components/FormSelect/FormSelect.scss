@@ -63,7 +63,7 @@
 
 .form-select-setting-operation {
   margin-top: 12px;
-  padding-left: 25px;
+  // padding-left: 25px;
   .btn-text{
     color: $color-primary;
     padding: 0;
@@ -155,7 +155,8 @@
 }
 .form-select-logical-tip{
   margin-top: 10px 0 0 0;
-  color: #666;
+  color: #999;
+  font-size: 12px;
 }
 .flip-list-move {
   transition: transform 0.5s;

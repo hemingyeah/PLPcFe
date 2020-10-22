@@ -43,7 +43,6 @@ const FORM_SELECT = {
     },
     //下拉多级菜单
     showMultiBatchModal(option,index){
-      console.log(index)
       this.optionText = option.children.map(item => item.value).join('\n');
       this.batchModalShow = true;
       this.errMessage = null;
