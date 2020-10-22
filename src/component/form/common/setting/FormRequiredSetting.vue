@@ -1,6 +1,6 @@
 <template>
   <div class="form-required-setting">
-    <el-checkbox :value="field.isNull" @input="update" :true-label="0" :false-label="1">是否必填</el-checkbox>
+    <el-checkbox :value="field.isNull" @input="update" :true-label="0" :false-label="1">必填</el-checkbox>
   </div>
 </template>
 

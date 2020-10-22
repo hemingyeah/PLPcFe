@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import MathUtil from '@src/util/math';
 import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 // 单行最大长度
@@ -123,7 +124,31 @@ function planTime(value, field = {}) {
 }
 
 function number(value, field = {}) {
+  let { decimalConfig, limitConig } = field.setting;
+
   return new Promise(resolve => {
+    // 校验小数位数
+    if (typeof decimalConfig == 'object') {
+      let { digit, isLimit } = decimalConfig;
+      let decimal = MathUtil.decimalNumber(value);
+
+      if (isLimit == 1 && digit != '' && decimal > Number(digit)) return resolve(`仅允许输入${digit}位小数`);
+    }
+
+    // 校验数值范围
+    if (typeof limitConig == 'object') {
+      let { isLimit, type, max, min } = limitConig;
+
+      if (isLimit == 1) {
+        // 自定义范围
+        if (type == 1 && (max || min)) {
+          if (min && !max && Number(value) < Number(min)) return resolve(`输入的值必须>=${min}`);
+          if (!min && max && Number(value) > Number(max)) return resolve(`输入的值必须<=${max}`);
+          if (min && max && (Number(value) > Number(max) || Number(value) < Number(min))) return resolve(`输入的值必须>=${min}且<=${max}`);
+        }
+      }
+    }
+
     if (field.isNull === 1) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请输入${field.displayName}`);
     if (typeof Number(value) !== 'number') return resolve('请输入数字');
