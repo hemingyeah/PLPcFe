@@ -1,13 +1,13 @@
 <template>
-  <div class="form-displaymode-setting">
+  <div class="form-displaymode-setting form-setting-group form-setting-item">
     <div class="form-displaymode-setting-panel">
       <h4 class="form-displaymode-setting-title">
         <span class="form-displaymode-setting-title-name">选项显示模式</span>
         <el-tooltip placement="top" popper-class="form-displaymode-setting-tooltip" >
           <div slot="content">
               <div>平铺</div>
-              <div class="form-displaymode-setting-item">未勾选“多选”时，平铺的显示效果为：<span class="circle"></span>选择1 <span class="circle"></span>选择2</div>
-              <div class="form-displaymode-setting-item">勾选“多选”时，平铺的显示效果为：<span class="square"></span>选项1 <span class="square"></span>选项2</div>
+              <div class="form-displaymode-setting-item">未勾选“多选”时，平铺的显示效果为：<span class="circle"></span>选择1  <span class="circle"></span>选择2</div>
+              <div class="form-displaymode-setting-item">勾选“多选”时，平铺的显示效果为：<span class="square"></span>选项1  <span class="square"></span>选项2</div>
           </div>
           <i class="iconfont icon-question"></i>
         </el-tooltip>
@@ -15,10 +15,9 @@
     </div>
     <div class="form-displaymode-setting-type">
       <div class="type-btn-group">
-        {{selectType}}
-        <el-radio-group  v-model="selectType" @change="update(selectType,'selectType',true)" size="medium">
-          <el-radio-button label="1" >下拉模式</el-radio-button>
-          <el-radio-button label="2" >平铺模式</el-radio-button>
+        <el-radio-group  v-model="selectType" @change="update" size="medium" >
+          <el-radio-button :label="1" >下拉模式</el-radio-button>
+          <el-radio-button :label="2" >平铺模式</el-radio-button>
         </el-radio-group>
        </div>
     </div>
@@ -34,16 +33,17 @@ import { settingProps } from '@src/component/form/components/props';
 export default {
   name: 'form-displaymode-setting',
   props: {
-    ...settingProps
+    ...settingProps,
+
   },
-  computed: {
-    selectType() {
-      return this.field.setting.selectType || 1;
+  data() {
+    return{
+      selectType: this.field.setting.selectType || 1
     }
   },
   methods: {
-    update(value,prop,isSetting = false) {
-      this.$emit('input', value, prop, isSetting);
+    update(value) {
+      this.$emit('input', value, 'selectType', true);
     }
   }
 }

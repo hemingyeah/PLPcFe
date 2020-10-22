@@ -1,101 +1,91 @@
 <template>
-  <transition 
-    name="slide-down"
-    @after-leave="destroyElement">
-    <div class="cascader-setting-modal-mask" v-show="show">
-      <div class="cascader-setting-modal transition-container">
-        <div class="cascader-setting-modal-header">
-          <h3>
-            <span>配置选择项</span>
-            <small>点击每个选项里的<i class="iconfont icon-check-fill"></i>按钮设置默认选项</small>
-            <div class="cascader-setting-deep">
-              <label>级数： </label>
-              <select :value="maxDeep" @change="changeMaxDeep" >
-                <option value="2">两级</option>
-                <option value="3">三级</option>
-                <option value="4">四级</option>
-                <option value="5">五级</option>
-              </select>
-            </div>  
-          </h3>
-          
-          <button type="button" class="cascader-setting-modal-header-close" @click="close">
-            <i class="iconfont icon-fe-close"></i>
-          </button>
-        </div>
+  <base-modal  name="slide-down" :show.sync="show" width="800px" class="cascader-setting-modal">
+    <div  slot="title" class="cascader-setting-modal-header">
+      <div class="cascader-setting-msg">
+        <span>配置选择项</span>
+        <small>点击每个选项里的<i class="iconfont icon-check-fill"></i>按钮设置默认选项</small>
+      </div>
+        <div class="cascader-setting-deep">
+          <label>级数： </label>
+          <el-select v-model="maxDeep" placeholder="请选择" @change="changeMaxDeep">
+            <el-option label="两级" value="2"></el-option>
+            <el-option label="三级" value="3"></el-option>
+            <el-option label="四级" value="4"></el-option>
+            <el-option label="五级" value="5"></el-option>
+          </el-select>
+        </div>  
+    </div>
 
-        <div class="cascader-setting-modal-body">
-          <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" v-for="(option, index) in selectedOption" :key="option.id">
-            <h3>{{deepZhChar[index]}}级选项</h3>        
-              <div class="cascader-setting-option-list" ref="list" @keyup.enter="addChildrenOption(option)">
-                <draggable tag="div" :list="option.children">
-                  <cascader-setting-option 
-                    v-for="item in option.children" 
-                    :key="item.id" 
-                    v-model="item.value" 
-                    :option="item" 
-                    :allow-remove="option.children.length > 1" 
-                    :active="item.active"
-                    @choose="chooseOption"
-                    @remove="removeOption" 
-                    @change-default="changeDefaultOption"/>
-                  </draggable>
-              </div>          
-            <div class="cascader-setting-option cascader-setting-operation">
-              <a @click="addChildrenOption(option)" href="javascript:;" class="cascader-setting-btn">增加选项</a>
-              <a @click="showMultiBatchModal(option,index)" href="javascript:;" class="cascader-setting-btn">批量编辑</a>
-            </div>
-          </div>  
-        </div>
-
-        <div class="cascader-setting-modal-footer">
-          <div class="cascader-setting-default-text">
-            <span class="btn-text" @click="openImportDialog()">批量导入</span>
-            <span>默认选项:</span> 
-            <span>{{defaultValueText}}</span>
-          </div>
-          <button type="button" class="cascader-setting-close" @click="close">关闭</button>
-          <button type="button" class="cascader-setting-choose" @click="submit">确定</button>
+    <div class="cascader-setting-modal-body">
+      <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" v-for="(option, index) in selectedOption" :key="option.id">
+        <h3>{{deepZhChar[index]}}级选项</h3>        
+          <div class="cascader-setting-option-list" ref="list" @keyup.enter="addChildrenOption(option)">
+            <draggable tag="div" :list="option.children" :options="{animation:380}">
+              <cascader-setting-option 
+                v-for="item in option.children" 
+                :key="item.id" 
+                v-model="item.value" 
+                :option="item" 
+                :allow-remove="option.children.length > 1" 
+                :active="item.active"
+                @choose="chooseOption"
+                @remove="removeOption" 
+                @change-default="changeDefaultOption"/>
+              </draggable>
+          </div>          
+        <div class="cascader-setting-option cascader-setting-operation">
+          <a @click="addChildrenOption(option)" href="javascript:;" class="cascader-setting-btn">增加选项</a>
+          <a @click="showMultiBatchModal(option,index)" href="javascript:;" class="cascader-setting-btn">批量编辑</a>
         </div>
       </div>  
-      <!-- start 批量编辑 -->
-      <base-modal 
-        title="批量编辑选项" width="520px" class="form-select-setting-modal"
-        :show.sync="batchModalShow" :mask-closeable="false">
-        <div class="form-select-setting-batch">
-          <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
-          <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
+    </div>
+    <div class="cascader-setting-default-text">
+        <!-- <span class="btn-text" @click="openImportDialog()">批量导入</span> -->
+        <span>默认选项:</span> 
+        <span>{{defaultValueText}}</span>
+      </div>
+
+    <div class="cascader-setting-modal-footer dialog-footer" slot="footer">
+      <div class="cascader-setting-import-btn">
+        <span class="btn-text" @click="openImportDialog()">批量导入</span>
+      </div>
+      <el-button @click="close">取 消</el-button>
+      <el-button type="primary" @click="submit">保 存</el-button>
+    </div>
+
+    <!-- start 批量编辑 -->
+    <base-modal 
+      title="批量编辑选项" width="520px" class="form-select-setting-modal"
+      :show.sync="batchModalShow" :mask-closeable="false">
+      <div class="form-select-setting-batch">
+        <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
+        <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
+      </div>
+      <template slot="footer">
+        <span class="form-select-tips">每行对应一个选项</span>
+        <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
+      </template>
+    </base-modal>
+    <!-- end 批量编辑 -->
+
+    <!-- start 批量导入 -->
+    <base-import
+      title="批量导入"
+      ref="bulkImport"
+      @success="importSucc"
+      action="/api/trane/outside/import/elevenCategoryNumberExcel"
+    >
+      <div slot="tip">
+        <div class="base-import-warn">
+          <p style="margin: 0">
+            在导入前，请先下载
+            <a href="/resource/excelTemplate/11Num.xlsx">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。。
+          </p>
         </div>
-        <template slot="footer">
-          <span class="form-select-tips">每行对应一个选项</span>
-          <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
-        </template>
-      </base-modal>
-      <!-- end 批量编辑 -->
-
-      <!-- start 批量导入 -->
-      <base-import
-        title="批量导入"
-        ref="bulkImport"
-        @success="importSucc"
-        action="/api/trane/outside/import/elevenCategoryNumberExcel"
-      >
-        <div slot="tip">
-          <div class="base-import-warn">
-            <p style="margin: 0">
-              在导入前，请先下载
-              <a href="/resource/excelTemplate/11Num.xlsx">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。。
-            </p>
-          </div>
-        </div>
-      </base-import>
-      <!-- 批量导入 -->
-
-
-
-
-    </div>  
-  </transition>
+      </div>
+    </base-import>
+    <!-- 批量导入 -->
+  </base-modal>
 </template>
 
 <script>
@@ -150,38 +140,36 @@ export default {
     //批量编辑
     batchEdit(){
       let newValues = this.optionText.split('\n').filter(option => option);
-      console.log(newValues)
-      const parent = this.selectedOption[this.currentLevel]
+      const parent = this.selectedOption[this.currentLevel];
       if(!newValues.length) {
         platform.alert("至少要有一个选项");
         return false;
       }
-
       this.errMessage = this.validateOptions(newValues);
       if(this.errMessage) return;
-      let newOptions = newValues.map(item =>new Option(item, false, parent))
-      // let newOptions = newValues.map((item,index) =>{
-       
-      //   let options = new Option(item, false, parent)
-      //   if(options.deep < this.maxDeep){
-      //     console.log(555555)
-      //   } 
-      //   options.children = this.selectedOption[this.currentLevel].children[index];
-      //   return options;
-
-      // } );
+      let newOptions = newValues.map((item,index) =>{
+        let optionSelect;
+        let currentOption = parent.children[index]; //当前节点
+        if(currentOption){ //如果原option列表有这个节点，只改名称
+          currentOption.value=item;
+          optionSelect = currentOption;
+        } else {  //新增节点，递归插入数据
+           optionSelect = this.addNewOption(parent,item);
+        }
+        return optionSelect
+      });
       //更新数据
       this.selectedOption[this.currentLevel].children = newOptions;
-
-      // this.$emit('input', {value: newOptions, prop: 'setting'})
       this.batchModalShow = false;
 
     },
-    addOption(parent,value){
-      let option = new Option(value, false, parent);
-        if(option.deep < this.maxDeep) this.addOption(option)
-        console.log(value,parent,option)
-        parent.children.push(option);
+    addNewOption(parent,name){ //递归创建新节点
+       let value = name ? name:`${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
+       let optionSelect = new Option(value, false, parent);
+        if(optionSelect.deep < this.maxDeep) this.addNewOption(optionSelect)
+        parent.children.push(optionSelect);
+        this.chooseOption(optionSelect, true); //将新生成节点记录选择项
+        return optionSelect;
     },
     /** 修改默认值 */
     changeDefaultOption(option){
@@ -214,9 +202,10 @@ export default {
       }
     },
     /** 修改最大级数 */
-    changeMaxDeep(event){
-      this.maxDeep = event.target.value;
+    changeMaxDeep(value){
+      this.maxDeep = value;
       // 重置数据
+      console.log(' this.source', this.source)
       this.source = this.initSource(null, false, this.source.children, null)
       this.initselectedOption();
     },
@@ -371,6 +360,7 @@ export default {
         this.selectedOption.push(option);
         option = option.children[0];
       }
+      console.log('selectedOption',this.selectedOption)
 
 
     },
@@ -450,47 +440,13 @@ export default {
 </script>
 
 <style lang="scss">
-.cascader-setting-modal-mask{
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,.35);
-  z-index: 9999;
-  overflow: auto;
-}
-
-.cascader-setting-modal{
-  position: relative;
-  width: 800px;
-  margin: 50px auto;
-  background-color: #fff;
-  border-radius: 1px;
-  box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
-  color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
-}
-
 .cascader-setting-modal-header{
   position: relative;
-  padding: 8px 40px 8px 8px;
-  border-bottom: 1px solid #e9ecef;
-
   align-items: center;
-
-  h3{
-    flex: 1;
-    margin: 0;
-    height: 24px;
-    line-height: 24px;
-    font-size: 16px;
-    font-weight: 400;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
+  flex: 1;
+  .cascader-setting-msg{
+    float: left;
+    line-height: 33px;
     small{
       font-size: 12px;
       color: #9a9a9a;
@@ -498,22 +454,18 @@ export default {
       i.iconfont{
         font-size: 13px;
         margin: 0 2px;
-        color: #159E7E;
+        color: $color-primary;
         width: 16px;
         text-align: center;
       }
     }
   }
-
   .cascader-setting-deep{
     float: right;
     font-size: 14px;
-
-    select{
-      font-size: 14px;
-      height: 24px;
-      width: 60px;
-      line-height: 22px;
+    margin-right: 12px;
+    .el-select{
+      width: 80px;
     }
   }
 
@@ -552,7 +504,7 @@ export default {
 
 .cascader-setting-panel{
   padding: 0 15px;
-  border-left: 1px solid #ddd;
+  border-left: 1px solid #e5e5e5;
 
   h3{
     margin: 0;
@@ -566,10 +518,27 @@ export default {
 }
 
 .cascader-setting-modal-footer{
-  padding: 8px;
-  border-top: 1px solid #e9ecef;
   display: flex;
   flex-flow: row nowrap;
+  .cascader-setting-import-btn{
+    flex: 1;
+    .btn-text{
+      width: 98px;
+      height: 32px;
+      line-height: 32px;
+      color: $color-primary;
+      padding: 0;
+      display: inline-block;
+      text-align: center;
+      margin-right: 5px;
+      cursor: pointer;
+      background: #E9F9F9;
+      border-radius: 4px;
+      border: 1px solid #D0F3F4;
+      background: #D0F3F4;
+    }
+  }
+
 }
 
 .cascader-setting-choose,
@@ -611,23 +580,17 @@ export default {
   line-height: 24px;
   font-size: 14px;
   text-decoration: none;
-  color: #55b7b4;
+  color: $color-primary;
   user-select: none;
   display: block;
 }
 
 .cascader-setting-default-text{
   flex: 1;
-  padding: 0 8px;
+  padding: 0 20px;
   font-size: 14px;
-  line-height: 32px;
   color: #666;
-  .btn-text{
-    color: #13C2C2;
-    padding: 0;
-    margin-right: 5px;
-    cursor: pointer;
-  }
+  margin: 32px 0;
 }
 </style>
 

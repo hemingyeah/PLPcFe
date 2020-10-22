@@ -1,54 +1,83 @@
 <template>
   <div class="form-setting-panel">
-    <div class="form-setting-group form-setting-group-small">
-      <form-title-setting :field="field" :setting="setting" @input="updateForDom"></form-title-setting>
-    </div>
-    <div class="form-setting-group">
-      <form-describe-setting :field="field" @input="updateForDom"></form-describe-setting>
-    </div>
+    <!-- start 标题 -->
+    <form-title-setting
+      :field="field"
+      :setting="setting"
+      @input="updateForDom"
+    ></form-title-setting>
+    <!-- end 标题 -->
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+  <!-- start 校验 -->
     <div class="form-setting-group form-setting-item">
       <h4 class="form-item-title">校验</h4>
-       <div class="form-item-box">
+      <div class="form-item-box">
+        <!-- 必填 -->
         <form-required-setting :field="field" @input="update"></form-required-setting>
+        <!-- 不允许重复值 -->
         <form-repeat-setting :field="field" @input="update"></form-repeat-setting>
       </div>
     </div>
-    <h4>选项<el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox> </h4>
-    <div class="form-select-setting-list">
-      <draggable tag="div" class="list-group" :list="options" :options="{animation:380}" handle=".handle">
-          <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
-            <button type="button" class="btn-text handle"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
-            <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
-            <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
-            <template v-if="!field.isMulti">
-              <button type="button" :class="['btn-text', 'form-select-setting-default',option.isDefault && 'btn-active']" @click="setDefaultOption(option)"> <i class="iconfont icon-check-fill"></i></button>
-              <span class="form-select-setting-defaultValue" v-if="option.isDefault">默认</span>
-            </template>
-          </div>
-      </draggable> 
+    <!-- end 校验 -->
+
+    <!-- start 选项 -->
+    <div class="form-setting-options">
+      <h4>选项<el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox> </h4>
+      <div class="form-select-setting-list">
+        <draggable tag="div" class="list-group" :list="options" :options="{animation:380}" handle=".handle">
+            <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
+              <button type="button" class="btn-text handle"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
+              <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
+              <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
+              <template v-if="!field.isMulti">
+                <button type="button" :class="['btn-text', 'form-select-setting-default',option.isDefault && 'btn-active']" @click="setDefaultOption(option)"> <i class="iconfont icon-check-fill"></i></button>
+                <span class="form-select-setting-defaultValue" v-if="option.isDefault">默认</span>
+              </template>
+            </div>
+        </draggable> 
+      </div>
+      <div class="form-setting-group form-select-setting-operation">
+        <button type="button" class="btn-text" @click="addOption">增加选项</button>
+        <div class="btn-divider"></div>
+        <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
+      </div>
     </div>
-    <div class="form-setting-group form-select-setting-operation">
-      <button type="button" class="btn-text" @click="addOption">增加选项</button>
-      <div class="btn-divider"></div>
-      <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
-    </div>
-    
-    <template v-if="allowLogical">
+    <!-- end 选项 -->
+
+    <!-- start 显示逻辑 -->
+    <div v-if="allowLogical">
       <h4>显示逻辑 <button type="button" class="btn-text form-select-logical-btn" @click="showLogicalModal">配置</button></h4>
       <form-select-logical :logical="logical"/>
       <logical-field-modal @submit="updateDependencies" ref="logical" />
-    </template>
-    <div class="form-setting-group form-setting-item">
-      <form-displaymode-setting :field="field" @input="update"></form-displaymode-setting>
     </div>
+    <!-- end 显示逻辑 -->
+
+    <!-- start 选项显示模式 -->
+    <form-displaymode-setting :field="field" @input="update"></form-displaymode-setting>
+    <!-- end 选项显示模式 -->
+
+    <!-- start 字段权限 -->
     <div class="form-setting-group form-setting-item">
       <h4 class="form-item-title">字段权限</h4>
       <div class="form-item-box">
+        <!-- 移动端列表展示 -->
         <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
+        <!-- 可见性 -->
         <form-visible-setting :field="field" @input="update"></form-visible-setting>
+        <!-- 支持高级搜索 -->
         <form-search-setting :field="field" @input="update"></form-search-setting>
       </div>
     </div>
+    <!-- end 字段权限 -->
+   
+    <!-- start 批量编辑选项 -->
     <base-modal 
       title="批量编辑选项" width="520px" class="form-select-setting-modal"
       :show.sync="batchModalShow" :mask-closeable="false">
@@ -56,11 +85,13 @@
         <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
         <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
       </div>
-      <template slot="footer">
+      <div slot="footer" class="dialog-footer">
         <span class="form-select-tips">每行对应一个选项</span>
-        <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
-      </template>
+        <el-button @click="batchModalShow = false">取 消</el-button>
+        <el-button type="primary" @click="batchEdit">保 存</el-button>
+      </div>
     </base-modal>
+    <!-- end 批量编辑选项 -->
   </div>
 </template>
 

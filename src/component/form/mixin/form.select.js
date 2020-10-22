@@ -50,11 +50,10 @@ const FORM_SELECT = {
     },
     showBatchModal(){
       this.optionText = this.field.options.map(item => item.value).join('\n');
-      console.log(this.optionText)
       this.batchModalShow = true;
       this.errMessage = null;
     },
-    update(value, prop){
+    update(value, prop, isSetting = false){
       if(prop == 'isMulti') {
         // 如果是多选，清空默认值
         this.options.forEach(item => item.isDefault = false);
@@ -62,7 +61,7 @@ const FORM_SELECT = {
         this.$emit('input', {value: null, prop: 'defaultValue'});
       }
 
-      this.$emit('input', {value, prop})
+      this.$emit('input', {value, prop, isSetting})
     },
     updateForDom(event){
       let el = event.target;

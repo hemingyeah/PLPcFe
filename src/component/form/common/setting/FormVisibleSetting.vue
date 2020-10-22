@@ -8,7 +8,7 @@
         </el-tooltip>
       </el-checkbox>
     </div>
-    <div class="form-setting-item">
+    <div class="form-setting-item" v-if="visibleConfig.visible == 1">
       <el-select v-model="visibleConfig.role" @change="update" placeholder="请选择授权角色" multiple>
         <el-option label="角色1" value="角色1"></el-option>
         <el-option label="角色2" value="角色2"></el-option>

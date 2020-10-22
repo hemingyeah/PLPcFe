@@ -1,5 +1,5 @@
 <template>
-  <div class="form-common-setting">
+  <div class="form-setting-group form-common-setting">
     <h4 class="form-common-setting-title">
       <span class="form-common-setting-title-name">描述信息</span>
       <span class="form-common-setting-title-remind">最多128个字</span>
