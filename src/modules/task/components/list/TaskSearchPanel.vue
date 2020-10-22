@@ -1,5 +1,5 @@
 <template>
-  <base-panel :show.sync="visible" :width="panelWidth">
+  <base-panel :show.sync="visible" :width="panelWidth" @close="hide()">
     <h3 slot="title">
       <span>高级搜索</span>
       <el-dropdown
@@ -8,7 +8,7 @@
         @command="setAdvanceSearchColumn"
       >
         <i
-          class="iconfont icon-xitongguanli customer-panel-btn"
+          class="iconfont icon-xitongshezhi customer-panel-btn"
           style="float: none;"
         ></i>
 
@@ -19,23 +19,23 @@
       </el-dropdown>
     </h3>
     <!--  -->
-      <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
-        <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
-        <i class="iconfont icon-up task-icon" v-else></i>
-        <span class="task-font16">常用查询条件</span>
-        <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
-        <span>
-          <el-tooltip content="常用查询条件可以通过“设置”功能，进行添加和修改" placement="top">
-            <i class="iconfont icon-question task-icon"></i>
-          </el-tooltip>
-        </span>
+    <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
+      <span class="task-font16">常用查询条件</span>
+      <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
+      <span class="task-span1">
+        <el-tooltip content="常用查询条件可以通过“设置”功能，进行添加和修改" placement="top">
+          <i class="iconfont icon-question task-icon"></i>
+        </el-tooltip>
+      </span>
+      <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
+      <i class="iconfont icon-up task-icon" v-else></i>
+    </div>
+    <div class="task-search-guide" v-show="!fields.length && guide">
+      <div></div>
+      <div>
+        您还未设置常用字段，快去试试吧
       </div>
-      <div class="task-search-guide" v-show="!fields.length && guide">
-        <div></div>
-        <div>
-          您还未设置常用字段，快去试试吧
-        </div>
-      </div>
+    </div>
     </div>
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form" onsubmit="return false;">
@@ -46,31 +46,31 @@
           class="task-search-forms"
           :fields="fields"
           ref="searchForm"
-          :searchParams="searchParams"
+          :search-params="searchParams"
           :form-backup="formBackup"
           :column-num="columnNum"
         >
         </task-search-form>
-          <div class="task-pointer task-flex task-ai">
-            <span class="task-font16 task-mr4">添加查询条件</span>
-            <span>
-                <el-tooltip content="您可以通过“添加”按钮设置更多的查询条件" placement="top">
-                  <i class="iconfont icon-question task-icon"></i>
-                </el-tooltip>
-            </span>
-          </div>
-      <!-- 设置查询条件 -->
+        <div class="task-pointer task-flex task-ai">
+          <span class="task-font16 task-mr4">添加查询条件</span>
+          <span>
+            <el-tooltip content="您可以通过“添加”按钮设置更多的查询条件" placement="top">
+              <i class="iconfont icon-question task-icon"></i>
+            </el-tooltip>
+          </span>
+        </div>
+        <!-- 设置查询条件 -->
         <task-inquire 
           v-if="fields.length"
           ref="taskInquireParams" 
-          :columnNum="columnNum" 
+          :column-num="columnNum" 
           :config="taskInquireList" 
           @setting="_setting"
         />
         <task-inquire 
           v-else
           ref="taskInquireParams" 
-          :columnNum="columnNum" 
+          :column-num="columnNum" 
           :config="[...config, ...taskTypeFilterFields]" 
           @setting="_setting"
         />
@@ -179,25 +179,25 @@ export default {
         let bool = [...this.taskTypeFilterFields, ...this.config].some(v => {return item.displayName === v.displayName})
         if (bool) return item
       }).map((field) => {
-          f = _.cloneDeep(field);
-          let formType = f.formType;
+        f = _.cloneDeep(field);
+        let formType = f.formType;
 
-          if (formType === 'datetime') {
-            formType = 'date';
-          }
+        if (formType === 'datetime') {
+          formType = 'date';
+        }
 
-          if (formType === 'updateTime') {
-            f.displayName = '更新时间';
-          }
-          return Object.freeze({
-            ...f,
-            isNull: 1,
-            formType,
-            originalFormType: f.formType,
-            operator: this.matchOperator(f),
-          });
-        })
-        // .sort((a, b) => a.orderId - b.orderId);
+        if (formType === 'updateTime') {
+          f.displayName = '更新时间';
+        }
+        return Object.freeze({
+          ...f,
+          isNull: 1,
+          formType,
+          originalFormType: f.formType,
+          operator: this.matchOperator(f),
+        });
+      })
+      // .sort((a, b) => a.orderId - b.orderId);
 
       fields.forEach(field => {
         let { fieldName } = field
@@ -629,6 +629,7 @@ export default {
     },
     hide() {
       this.visible = false;
+      this.$emit('bj', false);
     },
     resetParams() {
       this.formBackup = {};
@@ -669,48 +670,77 @@ export default {
       }
     },
     // 设置查询条件
-    _setting({item, list, check_system_list, check_customize_list}) {
-      const searchField = localStorage.getItem('task-search-field')
+    _setting({ list, check_system_list, check_customize_list }) {
+      const searchField = localStorage.getItem('task-search-field');
       let loc;
-      let bool = this.selfFields.some(value => {
-        return value.displayName === item.displayName
-      })
-
-      if (!bool) {
-        this.selfFields.push(item)
-      }
+      [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
+        let bool = list.some((v) => {
+          return value.displayName === v;
+        });
+        if (bool) {
+          this.selfFields.push(value);
+        }
+      });
+      this.selfFields = [
+        ...new Set(
+          this.selfFields.map((item) => {
+            item = JSON.stringify(item);
+            return item;
+          })
+        ),
+      ].map((item) => {
+        item = JSON.parse(item);
+        return item;
+      });
       // 设置查询条件的select字段
       if (searchField) {
-        this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
-          let bool = [...JSON.parse(searchField).checkSystemList, ...JSON.parse(searchField).checkCustomizeList, ...list].some(v => {
-            return v === value.displayName 
-          })
+        this.taskInquireList = [
+          ...this.config,
+          ...this.taskTypeFilterFields,
+        ].filter((value, index) => {
+          let bool = [
+            ...JSON.parse(searchField).checkSystemList,
+            ...JSON.parse(searchField).checkCustomizeList,
+            ...list,
+          ].some((v) => {
+            return v === value.displayName;
+          });
           if (!bool) {
-            return value
+            return value;
           }
         });
         loc = {
           list: this.selfFields,
-          checkSystemList: [...JSON.parse(searchField).checkSystemList, ...check_system_list],
-          checkCustomizeList: [...JSON.parse(searchField).checkCustomizeList, ...check_customize_list]
-        }
+          checkSystemList: [
+            ...JSON.parse(searchField).checkSystemList,
+            ...check_system_list,
+          ],
+          checkCustomizeList: [
+            ...JSON.parse(searchField).checkCustomizeList,
+            ...check_customize_list,
+          ],
+        };
       } else {
-        this.taskInquireList = [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
-          let bool = list.some(v => {
-            return v === value.displayName 
-          })
+        this.taskInquireList = [
+          ...this.config,
+          ...this.taskTypeFilterFields,
+        ].filter((value, index) => {
+          let bool = list.some((v) => {
+            return v === value.displayName;
+          });
           if (!bool) {
-            return value
+            return value;
           }
-        })
+        });
         loc = {
           list: this.selfFields,
           checkSystemList: [...check_system_list],
-          checkCustomizeList: [...check_customize_list]
-        }
+          checkCustomizeList: [...check_customize_list],
+        };
       }
-      localStorage.setItem('task-search-field', JSON.stringify(loc))
+      localStorage.setItem('task-search-field', JSON.stringify(loc));
     },
+   
     mergeTaskFields(taskAllFields = []) {
       // 临时这种用法
       this.taskAllFields = taskAllFields.slice()

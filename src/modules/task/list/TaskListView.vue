@@ -13,7 +13,7 @@
         <div class="task-list-header-seach">
           <form onsubmit="return false;">
             <div class="seach task-span1 task-flex task-ai">
-              <el-dropdown>
+              <!-- <el-dropdown>
                 <div
                   class="task-list-customize task-font14 task-c3 task-flex task-ai task-pointer"
                 >
@@ -74,7 +74,8 @@
                     </div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
-              </el-dropdown>
+              </el-dropdown> -->
+              
               <el-input
                 v-model="params.keyword"
                 :placeholder="taskSearchInputPlaceholderMap[keyword_select] || taskSearchInputPlaceholderMap.default"
@@ -329,14 +330,15 @@
       <task-search-panel
         :init-data="initData"
         :config="seoSetList"
-        :searchParams="searchParams"
+        :search-params="searchParams"
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
         v-if="advanceds.length"
+        @bj="showBj = false"
       >
         <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
-          <base-button type="primary" @event="editView">存为视图</base-button>
+          <!-- <base-button type="primary" @event="editView">存为视图</base-button> -->
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button
@@ -421,7 +423,6 @@
             <!-- start 更多操作 -->
             <!-- v-if="exportPermission" -->
             <el-dropdown
-              trigger="click"
               v-if="exportPermission || exportPermissionTaskEdit"
             >
               <div
@@ -730,12 +731,12 @@
 
                 <!-- 时间 -->
                 <template v-else-if="column.formType === 'datetime'">
-                <template v-if="!column.isSystem">
-                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
-                </template>
-                <template v-else>
-                  {{ scope.row[column.field] | fmt_datetime }}
-                </template>
+                  <template v-if="!column.isSystem">
+                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                  </template>
+                  <template v-else>
+                    {{ scope.row[column.field] | fmt_datetime }}
+                  </template>
                 </template>
 
                 <div
@@ -903,6 +904,8 @@
     <!-- E 地图预览 -->
     <!-- 视图展示 -->
     <task-view ref="taskView" @_searchModel="_searchModel" />
+
+    <div class="task-bj" v-show="showBj"></div>
   </div>
 </template>
 
