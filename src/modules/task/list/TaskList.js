@@ -1,5 +1,7 @@
 /* Api */
 import * as TaskApi from "@src/api/TaskApi.ts";
+import { createServiceReportBatch } from '@src/api/ExcelsApi'
+import { createServicePrintBatch } from '@src/api/PrintApi'
 
 /* components */
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";
@@ -242,6 +244,11 @@ export default {
 
       return taskTypeFilterFields;
     },
+    /* 是否是系统管理员 */
+    isSystemAdmin() {
+      let roles = this.initData?.roles || []
+      return roles.some(role => role == '1')
+    }
   },
   filters: {
     displaySelect(value) {
@@ -2412,6 +2419,50 @@ export default {
       }
 
       this.saveDataToStorage('columnStatus', columnsStatus);
+    },
+    /** 
+     * @description 批量创建服务报告
+    */ 
+    batchCreateServiceReport() {
+      // 验证
+      if (this.selectedIds.length <= 0) {
+        return this.$platform.alert('请先选择需要批量生成服务报告的数据')
+      }
+      // 构建参数
+      let params = { isPdf: true, taskIds: this.selectedIds }
+      // 创建下载
+      createServiceReportBatch(params)
+        .then(result => {
+          this.$platform.alert(result.message || '')
+          // 打开后台任务弹窗
+          window.parent.showExportList()
+          window.parent.exportPopoverToggle(true)
+        })
+        .catch(err => {
+          console.error(err)
+        })
+    },
+    /** 
+     * @description 批量打印服务报告
+    */ 
+    batchPrintServiceReport() {
+      // 验证
+      if (this.selectedIds.length <= 0) {
+        return this.$platform.alert('请先选择需要批量打印服务报告的数据')
+      }
+      // 构建参数
+      let params = { taskIds: this.selectedIds }
+      // 打印
+      createServicePrintBatch(params)
+        .then(result => {
+          this.$platform.alert(result.message || '')
+          // 打开后台任务弹窗
+          window.parent.showExportList()
+          window.parent.exportPopoverToggle(true)
+        })
+        .catch(err => {
+          console.error(err)
+        })
     }
   },
   components: {
