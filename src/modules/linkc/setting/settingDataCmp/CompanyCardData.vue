@@ -2,39 +2,9 @@
   <div class="setting-data-cmp-box">
     <div class="form-info">
       <div class="font-16 font-w-500 mar-b-20">门户设置</div>
-      <div class="flex-x al-start mar-b-18">
-        <div class="mar-r-20">logo</div>
-        <el-upload
-          class="avatar-uploader"
-          ref="upload"
-          action="string"
-          :show-file-list="false"
-          :before-upload="onBeforeUploadImage"
-          :http-request="UploadImage"
-          :on-change="fileChange"
-        >
-          <div
-            v-if="dataInfo.logoUrl"
-            @mouseover="changeImgCover(true)"
-            @mouseleave="changeImgCover(false)"
-          >
-            <img
-              :src="
-                dataInfo.logoUrl
-                  ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96
-`
-                  : ''
-              "
-              class="avatar"
-            />
-            <div class="img-cover" v-show="imgCover" @click.stop>
-              <i @click.stop="clear()" class="iconfont icon-shanchu"></i>
-            </div>
-          </div>
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload>
-      </div>
+
       <el-form ref="ruleForm" :model="dataInfo" :rules="rules" status-icon>
+
         <div class="form-label">
           门户名称
           <span>最多50个字符</span>
@@ -47,6 +17,38 @@
             maxlength="50"
           ></el-input>
         </el-form-item>
+        <div class="flex-x al-start mar-b-18">
+          <div class="mar-r-20">logo</div>
+          <el-upload
+            class="avatar-uploader"
+            ref="upload"
+            action="string"
+            :show-file-list="false"
+            :before-upload="onBeforeUploadImage"
+            :http-request="UploadImage"
+            :on-change="fileChange"
+          >
+            <div
+              v-if="dataInfo.logoUrl"
+              @mouseover="changeImgCover(true)"
+              @mouseleave="changeImgCover(false)"
+            >
+              <img
+                :src="
+                  dataInfo.logoUrl
+                    ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96
+`
+                    : ''
+                "
+                class="avatar"
+              />
+              <div class="img-cover" v-show="imgCover" @click.stop>
+                <i @click.stop="clear()" class="iconfont icon-shanchu"></i>
+              </div>
+            </div>
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </div>
         <div class="form-label">
           公司名称
           <!-- <el-tooltip
@@ -129,7 +131,7 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: "请输入门户名称", trigger: "blur" },
+          { required: true, message: "请输入门户名称", trigger: "change" },
           { max: 50, message: "最多50个字符", trigger: "change" },
         ],
         mobile: [
@@ -139,7 +141,7 @@ export default {
             trigger: "change",
           },
         ],
-        address: [{ required: true, message: "请输入地址", trigger: "blur" }],
+        address: [{ required: true, message: "请输入地址", trigger: "change" }],
       },
 
       imgCover: false,

@@ -40,7 +40,7 @@
               </el-option>
             </el-select>
           </div>
-          <div class="search-datecheck min-w-650 flex-x pad-b-20">
+          <div class="search-datecheck flex-x pad-b-20">
             <div class>下单时间：</div>
             <div class="search-date">
               <el-date-picker
@@ -55,7 +55,7 @@
                 value-format="yyyy-MM-dd"
               ></el-date-picker>
             </div>
-            <el-button class="mar-l-20" type="primary" @click="searchModel.pageNum=1,search()">查询</el-button>
+            <el-button class="mar-l-10" type="primary" @click="searchModel.pageNum=1,search()">查询</el-button>
             <el-button @click="resetParams">重置</el-button>
           </div>
         </div>
