@@ -2,6 +2,9 @@ import _ from 'lodash';
 import MathUtil from '@src/util/math';
 import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
 
+// TODO: 接口联调
+import * as LinkmanApi from '@src/api/LinkmanApi';
+
 // 单行最大长度
 export const SINGLE_LINE_MAX_LEN = FORM_FIELD_TEXT_MAX_LENGTH;
 // 多行最大长度
@@ -19,6 +22,9 @@ export const EMAIL_REG = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Z
 // 链接格式
 export const LINK_REG = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
 
+const fieldUniqueMap = {
+  customer: LinkmanApi.checkUnique4Phone
+}
 
 const RuleMap = {
   text,
@@ -123,15 +129,24 @@ function planTime(value, field = {}) {
   });
 }
 
-function number(value, field = {}) {
-  let { decimalConfig, limitConig } = field.setting;
+function number(value, field = {}, origin = {}, mode, changeStatus) {
+  let { decimalConfig, limitConig, defaultValueConfig, isRepeat } = field.setting || {};
 
-  return new Promise(resolve => {
+  let validate = new Promise(resolve => {
+    // 默认值
+    if (typeof defaultValueConfig == 'object') {
+      let { isNotModify } = defaultValueConfig;
+
+      // 不允许修改
+      if (isNotModify == 1 && !!field.defaultValue) return resolve(null);
+    }
+
     // 校验小数位数
     if (typeof decimalConfig == 'object') {
       let { digit, isLimit } = decimalConfig;
       let decimal = MathUtil.decimalNumber(value);
 
+      // 勾选小数位数且设置了小数位数
       if (isLimit == 1 && digit != '' && decimal > Number(digit)) return resolve(`仅允许输入${digit}位小数`);
     }
 
@@ -139,12 +154,15 @@ function number(value, field = {}) {
     if (typeof limitConig == 'object') {
       let { isLimit, type, max, min } = limitConig;
 
+      // 勾选限制数值输入范围
       if (isLimit == 1) {
-        // 自定义范围
-        if (type == 1 && (max || min)) {
-          if (min && !max && Number(value) < Number(min)) return resolve(`输入的值必须>=${min}`);
-          if (!min && max && Number(value) > Number(max)) return resolve(`输入的值必须<=${max}`);
-          if (min && max && (Number(value) > Number(max) || Number(value) < Number(min))) return resolve(`输入的值必须>=${min}且<=${max}`);
+        if (max || min) {
+          let minValue = min ? (type == 1 ? min : origin[min]) : '';
+          let maxValue = max ? (type == 1 ? max : origin[max]) : '';
+
+          if (minValue && !maxValue && Number(value) < Number(minValue)) return resolve(`输入的值必须>=${minValue}`);
+          if (!minValue && maxValue && Number(value) > Number(maxValue)) return resolve(`输入的值必须<=${maxValue}`);
+          if (minValue && maxValue && (Number(value) > Number(maxValue) || Number(value) < Number(minValue))) return resolve(`输入的值必须>=${minValue}且<=${maxValue}`);
         }
       }
     }
@@ -154,6 +172,15 @@ function number(value, field = {}) {
     if (typeof Number(value) !== 'number') return resolve('请输入数字');
     resolve(null);
   });
+
+  // 不需要校验重复性
+  if (!isRepeat || !mode) return validate;
+
+  return new Promise((resolve, reject) => {
+    validate.then((res) => {
+      res === null ? resolve(remoteValidateFieldRepeat(fieldUniqueMap[mode], field, value, changeStatus)) : resolve(res)
+    })
+  })
 }
 
 function attachment(value, field = {}) {
@@ -230,9 +257,9 @@ function extend(value, field = {}) {
  * @param {*} formType 字段类型 
  * @returns Promise<message> 
  */
-function validate(value, field){
+function validate(value, field, origin = {}, mode, changeStatus){
   let fn = RuleMap[field.formType];
-  if(typeof fn == 'function') return fn(value, field);
+  if(typeof fn == 'function') return fn(value, field, origin, mode, changeStatus);
 
   return Promise.resolve(null)
 }
@@ -257,6 +284,26 @@ export function createRemoteValidate(api, build, delay = 500){
     let params = typeof build == 'function' ? build(value, field) : {};
     return new Promise(resolve => invoke(params, resolve, changeStatus))
   }
+}
+
+// 远程验证字段是否重复方法
+export function remoteValidateFieldRepeat(api, field, value, changeStatus){
+  let remote = _.debounce(function(params, resolve, changeStatus){
+    changeStatus(true);
+    return api(params).then(res => {
+      changeStatus(false);
+      return resolve(res.error ? res.error : null);
+    })
+      .catch(err => console.error(err))
+  }, 500);
+
+  // TODO：接口联调
+  let params = {
+    id: '',
+    phone: value
+  }
+
+  return new Promise((resolve, reject) => remote(params, resolve, changeStatus));
 }
 
 const Validator = {

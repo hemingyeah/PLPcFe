@@ -7,7 +7,7 @@
       </el-tooltip>
     </h4>
     <div class="form-item-box">
-      <input type="text" placeholder="请输入默认值" v-model="field.defaultValue" @input="update(field.defaultValue, 'defaultValue')" />
+      <input :type="type" placeholder="请输入默认值" v-model="field.defaultValue" @input="update(field.defaultValue, 'defaultValue')" />
       <el-checkbox v-model="defaultValueConfig.isNotModify" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0" :disabled="modifyDefaultValueDisabled">不允许修改</el-checkbox>
     </div>
   </div>
@@ -20,7 +20,11 @@ import { settingProps } from '@src/component/form/components/props';
 export default {
   name: 'form-default-value-setting',
   props: {
-    ...settingProps
+    ...settingProps,
+    type: {
+      type: String,
+      default: 'text'
+    }
   },
   computed: {
     defaultValueConfig() {
@@ -31,8 +35,7 @@ export default {
     * 必填时且无默认值时不可勾选
     */
     modifyDefaultValueDisabled() {
-      let { isNull, defaultValue } = this.field;
-      return isNull == 0 && !defaultValue;
+      return !this.field.defaultValue;
     }
   },
   methods: {
@@ -55,6 +58,12 @@ export default {
 .form-default-value-setting {
   .form-item-title {
     margin-bottom: 8px;
+  }
+
+  .form-item-box {
+    input {
+      width: 100%;
+    }
   }
 }
 </style>

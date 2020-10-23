@@ -8,6 +8,7 @@
       :placeholder="placeholder" 
       :value="value"
       @input="input"
+      :disabled="disabled"
     >
   </div>
 </template>
@@ -30,6 +31,17 @@ export default {
     nativeInputValue() {
       return this.value === null || this.value === undefined ? '' : String(this.value);
     },
+    /** 
+    * @description 不允许修改
+    * 1.有默认值
+    * 2.且 设置不允许修改
+    */
+    disabled() {
+      let { defaultValueConfig } = this.field.setting || {};
+      let { isNotModify } = defaultValueConfig || {};
+
+      return typeof defaultValueConfig == 'object' && isNotModify == 1 && !!this.field.defaultValue;
+    }
   },
   watch: {
     // native input value is set explicitly

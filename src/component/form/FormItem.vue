@@ -74,7 +74,9 @@ export default {
       this.status = false;
 
       let value = this.valueFn();
-      return Validator.validate(value, this.field)
+      let parent = this.$parent;
+
+      return Validator.validate(value, this.field, parent.value, parent.mode, this.changeStatus)
         .then(res => {
           let validator = this.getValidator();
           return res == null && typeof validator == 'function' 

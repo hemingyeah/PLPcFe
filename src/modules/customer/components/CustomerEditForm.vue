@@ -1,5 +1,5 @@
 <template>
-  <form-builder ref="form" :fields="fields" :value="value" @update="update">
+  <form-builder ref="form" :fields="fields" :value="value" mode="customer" @update="update">
     <template slot="serialNumber" slot-scope="{field}">
       <form-item :label="field.displayName" :validation="validation.serialNumber">
         <form-text

@@ -36,6 +36,10 @@ const FormBuilder = {
     value: {
       type: Object,
       default: () => ({})
+    },
+    mode: {
+      type: String,
+      default: ''
     }
   },
   data(){

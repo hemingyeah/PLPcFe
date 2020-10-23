@@ -88,7 +88,3 @@ $--select-border-color-hover: $input-border-hover-color !default;
 .el-form-item.is-success .el-textarea__inner:focus {
   border-color: $color-primary;
 }
-
-.el-select-dropdown__empty {
-  display: none;
-}
