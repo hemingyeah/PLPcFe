@@ -64,7 +64,7 @@
           <el-input
             v-model="dataInfo.companyName"
             :autofocus="false"
-            :readonly="true"
+            disabled
             placeholder="请输入"
           ></el-input>
         </el-form-item>
