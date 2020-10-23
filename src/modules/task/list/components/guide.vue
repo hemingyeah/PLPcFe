@@ -82,7 +82,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .tour-content-out-box {
   position: absolute;
   -webkit-filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5)) !important;
@@ -90,8 +90,8 @@ export default {
   z-index: 999;
   border-radius: 4px;
   background: #fff;
-  min-width: 120px;
-  max-width: 240px;
+  min-width: 240px;
+  max-width: 350px;
   .tour-arrow {
     position: absolute;
     left: 0;

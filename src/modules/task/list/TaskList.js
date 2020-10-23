@@ -316,7 +316,7 @@ export default {
     this.$nextTick(() => {
       setTimeout(() => {
         if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
-        if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
+        // if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
       }, 1000)
     })
 
@@ -325,8 +325,8 @@ export default {
   },
   methods: {
     guideDropdownMenu_enter(){
-      if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
-      storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
+      // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
+      // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
     },
     previousStep() {},
     nextStep() {
@@ -451,7 +451,7 @@ export default {
       this.params.moreConditions = this.$refs.searchPanel.buildParams();
       // this.$refs.searchPanel.hide();
 
-      if (!storageGet(TASK_GUIDE_SEARCH_MODEL_SAVE)) this['guideSearchModelSave'] = true, storageSet(TASK_GUIDE_SEARCH_MODEL_SAVE, '1');
+      // if (!storageGet(TASK_GUIDE_SEARCH_MODEL_SAVE)) this['guideSearchModelSave'] = true, storageSet(TASK_GUIDE_SEARCH_MODEL_SAVE, '1');
 
       this.search();
     },

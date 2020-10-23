@@ -1,6 +1,6 @@
 <template>
   <div class="task-box">
-    <div class="guide-model-box" v-if="nowGuideStep < 5">
+    <div class="guide-model-box" v-if="nowGuideStep < listSteps.length + 1">
       
     </div>
     <!-- s 列表展示 -->
@@ -32,7 +32,7 @@
                     <i class="iconfont icon-triangle-down task-icon"></i>
                   </div>
                   <el-dropdown-menu slot="dropdown">
-                    <template v-if="guideDropdownMenu">
+                    <!-- <template v-if="guideDropdownMenu">
                       <guide-compoment
                         :content="'你保存的查询视图都在这里，可以一键查询哦！'"
                         :only-one="true"
@@ -42,7 +42,7 @@
                         :stop-step="guideDropdownMenu_stopStep"
                         :finish-btn-fn="guideDropdownMenu_finishBtnFn"
                       ></guide-compoment>
-                    </template>
+                    </template> -->
                     <el-dropdown-item class="task-view-customize">
                       <div
                         v-for="(item, index) in otherList"
@@ -366,7 +366,7 @@
         >
           <template>
             <base-button type="primary" @event="editView">存为视图</base-button>
-            <template 
+            <!-- <template 
               v-if="guideSearchModelSave">
               <guide-compoment
                 :content="'您可以把查询条件组合“存为视图”，下次就无需重复在编辑条件啦'"
@@ -378,7 +378,7 @@
                 :stop-step="guideSearchModelSave_stopStep"
                 :finish-btn-fn="guideSearchModelSave_finishBtnFn"
               ></guide-compoment>
-            </template>
+            </template> -->
           </template>
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
@@ -975,8 +975,8 @@
     <v-tour
       v-if="showTour"
       name="myTour"
-      :steps="steps"
-      :options="options"
+      :steps="listSteps"
+      :options="listOptions"
       :callbacks="myCallbacks"
     >
       <template slot-scope="tour">
@@ -996,14 +996,14 @@
               <template>
                 <div slot="content" class="tour-content-box">
                   <div class="tour-left-tips">
-                    {{ `${index + 1}/${steps.length}` }}
+                    {{ `${index + 1}/${listSteps.length}` }}
                   </div>
                   <div class="tour-content">
                     <div class="flex-x tour-content-head">
                       <i @click="tour.stop" class="iconfont icon-fe-close"></i>
                     </div>
                     <div class="tour-content-con">
-                      {{ steps[index].content }}
+                      {{ listSteps[index].content }}
                     </div>
                   </div>
                 </div>
@@ -1013,7 +1013,7 @@
                   </div> -->
                   <div
                     class="btns"
-                    v-if="index < steps.length - 1"
+                    v-if="index < listSteps.length - 1"
                     @click="tour.nextStep"
                   >
                     下一步
@@ -1063,6 +1063,8 @@ export default TaskList;
     -webkit-filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
     filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
     padding: 0 !important;
+    min-width: 240px !important;
+    max-width: 350px !important;
   }
   .v-step .v-step__arrow[data-v-7c9c03f0] {
     border-color: #fff !important;
