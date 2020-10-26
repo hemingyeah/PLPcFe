@@ -9,6 +9,14 @@ import '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllot
 /* util */
 import { findComponentUpward } from '@src/util/assist'
 
+/* 用户状态 */
+interface UserState {
+  key: string,
+  value: string,
+  label: string,
+  color: string,
+}
+
 type ElSelectOption = {[x: string]: string}
 
 @Component({ name: 'task-allot-user-table' })
@@ -37,6 +45,28 @@ export default class TaskAllotUserTable extends Vue {
   /* 是否是按团队派单 */
   get isAllotByTag() {
     return this.TaskAllotModalComponent.isAllotByTag === true
+  }
+  
+  /* 用户状态 对象 */
+  get userStateMap() {
+    return this.TaskAllotModalComponent.userStateMap || {}
+  }
+  
+  /* 用户状态 列表 */
+  get userStateList(): UserState[] {
+    let list: UserState[] = []
+    
+    for (let userStateKey of this.userStateMap) {
+      let userState: UserState = {
+        key: userStateKey,
+        value: userStateKey,
+        label: userStateKey,
+        color: this.userStateMap[userStateKey]
+      }
+      list.push(userState)
+    }
+    
+    return list
   }
   
   private fetchTeamUser(): Promise<any> {

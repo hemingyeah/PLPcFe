@@ -1,6 +1,6 @@
 /* vue */
 import Component from 'vue-class-component'
-import { Vue } from 'vue-property-decorator'
+import { Vue, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* components */
 import TaskAllotType from '@src/modules/task/components/TaskAllotModal/TaskAllotType.tsx'
@@ -19,7 +19,6 @@ interface User {
   staffId?: string
   userId: string
 }
-
 /* 部门多选选人返回结果 */
 type DepeMultiUserResult = { status: number, data: { users: User[] } }
 
@@ -33,6 +32,9 @@ type DepeMultiUserResult = { status: number, data: { users: User[] } }
 })
 
 export default class TaskAllotModal extends Vue {
+  
+  /* 用户状态 */
+  @Prop() userStateMap: any | undefined
   
   /* 派单方式 */
   private allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
