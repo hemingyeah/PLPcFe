@@ -611,11 +611,12 @@
                   }}
                 </template>
 
-                <!-- 创建人 和 负责人 -->
+                <!-- 创建人 和 负责人 、派单人 -->
                 <template
                   v-else-if="
                     column.field === 'createUserName' ||
-                      column.field === 'executorName'
+                    column.field === 'executorName' ||
+                    column.field === 'allotName'
                   "
                 >
                   <template v-if="permissionTaskView">
@@ -624,28 +625,18 @@
                       class="view-detail-btn"
                       @click.stop.prevent="
                         openUserTab(
-                          column.field === 'createUserName'
-                            ? scope.row.createUser.userId
-                            : scope.row.executorUser.userId
+                          presonDisplayObj('useId', column.field, scope.row)
                         )
                       "
                     >
                       {{
-                        column.field === "executorName"
-                          ? scope.row.executorUser &&
-                            scope.row.executorUser.displayName
-                          : scope.row.createUser &&
-                            scope.row.createUser.displayName
+                        presonDisplayObj('displayName', column.field, scope.row)
                       }}
                     </a>
                   </template>
                   <template v-else>
                     {{
-                      column.field === "executorName"
-                        ? scope.row.executorUser &&
-                          scope.row.executorUser.displayName
-                        : scope.row.createUser &&
-                          scope.row.createUser.displayName
+                      presonDisplayObj('displayName', column.field, scope.row)
                     }}
                   </template>
                 </template>
