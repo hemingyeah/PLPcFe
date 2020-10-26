@@ -508,7 +508,7 @@ export default {
       return this.loginUser.head || DefaultHead;
     },
     releaseVersion() {
-      return this.initData.releaseVersion || "";
+      return (this.initData.releaseVersion && this.initData.releaseVersion.toLocaleLowerCase().replace('vip', '')) || '';
     },
     /** 允许切换工单新旧版本 */
     allowChangeTaskVersion() {
