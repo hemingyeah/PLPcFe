@@ -2,8 +2,8 @@ import _ from 'lodash';
 import MathUtil from '@src/util/math';
 import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
 
-// TODO: 接口联调
-import * as LinkmanApi from '@src/api/LinkmanApi';
+import * as CustomerApi from '@src/api/CustomerApi';
+import * as ProductApi from '@src/api/ProductApi';
 
 // 单行最大长度
 export const SINGLE_LINE_MAX_LEN = FORM_FIELD_TEXT_MAX_LENGTH;
@@ -22,8 +22,9 @@ export const EMAIL_REG = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Z
 // 链接格式
 export const LINK_REG = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
 
-const fieldUniqueMap = {
-  customer: LinkmanApi.checkUnique4Phone
+export const fieldUniqueMap = {
+  customer: CustomerApi.fieldRepeatCustomer,
+  product: ProductApi.fieldRepeatProduct
 }
 
 const RuleMap = {
@@ -174,11 +175,13 @@ function number(value, field = {}, origin = {}, mode, changeStatus) {
   });
 
   // 不需要校验重复性
-  if (!isRepeat || !mode) return validate;
+  if (!isRepeat || !mode || !value) return validate;
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? resolve(remoteValidateFieldRepeat(fieldUniqueMap[mode], field, value, changeStatus)) : resolve(res)
+      res === null ? resolve(remoteValidateFieldRepeat(mode, field, value, changeStatus)) : resolve(res);
+    }).catch(err => {
+      console.error('number validate err', err);
     })
   })
 }
@@ -287,23 +290,20 @@ export function createRemoteValidate(api, build, delay = 500){
 }
 
 // 远程验证字段是否重复方法
-export function remoteValidateFieldRepeat(api, field, value, changeStatus){
-  let remote = _.debounce(function(params, resolve, changeStatus){
+function remoteValidateFieldRepeat(mode, field, value, changeStatus) {
+  let api = fieldUniqueMap[mode];
+  let params = { fieldName: field.fieldName, fieldValue: value };
+
+  let remote = _.debounce(function(resolve, changeStatus) {
     changeStatus(true);
     return api(params).then(res => {
       changeStatus(false);
-      return resolve(res.error ? res.error : null);
+      return resolve(res.succ ? (res.data == 1 ? '已存在' : null) : null);
     })
       .catch(err => console.error(err))
   }, 500);
 
-  // TODO：接口联调
-  let params = {
-    id: '',
-    phone: value
-  }
-
-  return new Promise((resolve, reject) => remote(params, resolve, changeStatus));
+  return new Promise((resolve, reject) => remote(resolve, changeStatus));
 }
 
 const Validator = {

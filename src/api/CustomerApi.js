@@ -1,6 +1,8 @@
 import http from '@src/util/http';
 import GrayUtil from '@src/util/gray';  
 
+const fixedPrefixPath = '/api/app';
+
 /** 
  * 获取客户信息，用于客户编辑
  * @param {string} id - 客户id
@@ -178,4 +180,15 @@ export function getCustomerExeinsyn(params) {
 export function getCustomerList(params) {
   let customerPreFixedPath = GrayUtil.getCustomerApiPath();
   return http.post(`${customerPreFixedPath}/customer/list`, params);
+}
+
+/**
+ * 客户自定义字段唯一校验
+ * @param {Object} params - 参数
+ * @param {String} params params.fieldName - 自定义字段fieldName
+ * @param {String} params params.fieldValue - 自定义字段value
+ * @returns {*}
+ */
+export function fieldRepeatCustomer(params) {
+  return http.post(`${fixedPrefixPath}/outside/pc/customer/field/repeat`, params);
 }
