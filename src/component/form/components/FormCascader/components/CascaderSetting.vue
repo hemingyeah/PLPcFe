@@ -1,5 +1,5 @@
 <template>
-  <base-modal  name="slide-down" :show.sync="show" :width="modalWidth" class="cascader-setting-modal">
+  <base-modal  name="slide-down" :show.sync="show" :width="maxDeep>3?'935px':'800px'" class="cascader-setting-modal">
     <div  slot="title" class="cascader-setting-modal-header">
       <div class="cascader-setting-msg">
         <span>配置选择项</span>
@@ -21,7 +21,7 @@
       <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" v-for="(option, index) in selectedOption" :key="option.id">
         <h3>{{deepZhChar[index]}}级选项</h3>        
           <div class="cascader-setting-option-list" ref="list" @keyup.enter="addChildrenOption(option)">
-            <draggable tag="div" :list="option.children" :options="{ animation:380 }"  handle=".handle">
+            <draggable tag="div" :list="option.children" v-bind="{ animation:380, handle:'.handle' }">
               <cascader-setting-option 
                 v-for="item in option.children" 
                 :key="item.id" 
@@ -123,7 +123,6 @@ export default {
   data(){
     return {
       isImportNow: true, // 是否是导入立刻刷新
-      modalWidth:"800px",
       defaultValueText: '--',
       deepZhChar: ['一', '二', '三', '四','五'],
       source: null,
@@ -151,13 +150,12 @@ export default {
       const { value ,children } = item;
       let name = value ?  value: `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
       let option = new Option(name, false, parent);
-      if( children && children.length ){
+      if( Array.isArray(children) && children.length>0 ){
         children.forEach(element=>{
-          this.addChildrenOption(option,element.value)
+          this.mergeTreeOption(option,element);
         })
       } 
       parent.children.push(option);
-      this.chooseOption(option, true)
     },
     //批量编辑
     batchEdit(){
@@ -227,7 +225,6 @@ export default {
     changeMaxDeep(value){
       this.maxDeep = value;
       // 重置数据
-      this.modalWidth = value > 3 ? '935px':'800px'
       this.source = this.initSource(null, false, this.source.children, null)
       this.initselectedOption();
     },
@@ -293,9 +290,9 @@ export default {
         .catch(err => console.log(err))
     },
     /** 添加选项 */
-    addChildrenOption(parent,name){
+    addChildrenOption(parent){
       // 根据当前最大级数，补全数据
-      let value = name ? name :`${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
+      let value = `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
       let option = new Option(value, false, parent);
       if(option.deep < this.maxDeep) this.addChildrenOption(option)
       parent.children.push(option);

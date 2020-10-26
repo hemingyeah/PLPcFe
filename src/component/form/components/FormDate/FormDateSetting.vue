@@ -25,6 +25,31 @@
     </div>
     <!-- end 校验 -->
 
+    <!-- start 日期格式 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">日期格式</h4>
+      <div class="form-item-box form-date-type">
+        <div class="form-setting-item" >
+          <el-select v-model="field.setting.dateType" @change="update(field.setting.dateType, 'dateType', true)" placeholder="请选择日期格式">
+            <el-option label="年-月-日" value="yyyy-MM-dd"></el-option>
+            <el-option label="年-月-日 时:分" value="yyyy-MM-dd HH:mm"></el-option>
+            <el-option label="年-月-日 时:分:秒" value="yyyy-MM-dd HH:mm:ss"></el-option>
+            <el-option label="年-月" value="month"></el-option>
+          </el-select>
+        </div>
+      </div>
+    </div>
+    <!-- end 日期格式 -->
+
+    <!-- start 默认当前时间 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">默认当前时间</h4>
+      <div class="form-item-box form-date-type">
+        <el-checkbox v-model="defaultValueConfig.isCurrentDate" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0">默认当前时间</el-checkbox>
+      </div>
+    </div>
+    <!-- end 默认当前时间 -->
+
     <!-- start 字段权限 -->
     <div class="form-setting-group form-setting-item">
       <h4 class="form-item-title">字段权限</h4>
@@ -49,6 +74,14 @@ export default {
   name: 'form-date-setting',
   mixins: [SettingMixin],
   props: settingProps,
+  computed: {
+    /** 
+    * @description 默认选择当前时间
+    */
+    defaultValueConfig() {
+      return this.field.setting.defaultValueConfig || { isCurrentDate: 0};
+    },
+  },
   methods: {
     updateForDom(event){
       let el = event.target;

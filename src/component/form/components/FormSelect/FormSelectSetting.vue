@@ -29,7 +29,7 @@
     <div class="form-setting-options">
       <h4>选项<el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox> </h4>
       <div class="form-select-setting-list">
-        <draggable tag="div" class="list-group" :list="options" :options="{ animation:380 }" handle=".handle">
+        <draggable tag="div" class="list-group" :list="options" v-bind="{ animation:380 }" handle=".handle">
             <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
               <button type="button" class="btn-text handle"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
               <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
