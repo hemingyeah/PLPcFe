@@ -49,3 +49,26 @@ npm run build
 # 导出组件用于web项目和sm4-pc
 npm run comp
 ```
+
+## Git 提交
+提供选择的提交信息类别，快速生成提交说明的工具。
+
+安装
+``` bash
+# use npm
+npm install -g commitizen
+
+# use cnpm
+cnpm install -g commitizen
+
+# use pnpm
+pnpm install -g commitizen
+
+# use yarn
+yarn global add commitizen
+```
+
+使用
+``` bash
+git cz
+```
