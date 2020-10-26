@@ -1,0 +1,27 @@
+.user-add-button {
+  border: 1px dashed $color-primary;
+  cursor: pointer;
+  border-radius: 50%;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  height: 40px;
+  width: 40px;
+  
+  i {
+    color: $color-primary;
+    font-size: 20px;
+  }
+}
+
+.user-button {
+  width: 40px;
+  
+  img {
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+  }
+}

@@ -1,0 +1,48 @@
+/* start 弹窗 */
+.task-allot-modal {
+  display: flex;
+  
+  .base-modal {
+    width: 1000px !important;
+  }
+  
+  .base-modal-body {
+    display: flex;
+  }
+  
+  .task-allot-nav {
+    width: 178px;
+    padding: 0 16px;
+  }
+  
+  .task-allot-content {
+    flex: 1;
+  }
+  
+}
+/* end 弹窗 */
+
+/* start 派单 导航 */
+.task-allot-nav {
+  &-title {
+    display: inline-block;
+    font-size: $font-size-large;
+    font-weight: 600;
+    line-height: 22px;
+    padding: 16px 0 10px;
+  }
+}
+/* end 派单 导航 */
+
+/* start 协同人 */
+.task-allot-synergy {
+  &-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    .user-button {
+      margin: 0 5px 5px 0;
+    }
+  }
+}
+/* end 协同人 */
