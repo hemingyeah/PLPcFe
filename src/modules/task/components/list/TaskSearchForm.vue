@@ -1,25 +1,25 @@
 <script>
 /* api */
-import * as TaskApi from "@src/api/TaskApi.ts";
-import * as CustomerApi from "@src/api/CustomerApi";
+import * as TaskApi from '@src/api/TaskApi.ts';
+import * as CustomerApi from '@src/api/CustomerApi';
 
 /* utils */
 import _ from 'lodash';
-import * as Utils from "@src/component/form/util";
+import * as Utils from '@src/component/form/util';
 
 /* components */
 import {
   FormFieldMap,
   SettingComponents,
-} from "@src/component/form/components";
-import SearchProductSelect from "./SearchProductSelect.vue";
-import SearchCustomerSelect from "./SearchCustomerSelect.vue";
-import { formatDate } from "@src/util/lang";
+} from '@src/component/form/components';
+import SearchProductSelect from './SearchProductSelect.vue';
+import SearchCustomerSelect from './SearchCustomerSelect.vue';
+import { formatDate } from '@src/util/lang';
 
 const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod']
 
 export default {
-  name: "task-search-form",
+  name: 'task-search-form',
   props: {
     fields: {
       type: Array,
@@ -68,24 +68,24 @@ export default {
     initFormVal() {
       let fields = this.fields;
       let form = {};
-      let tv = "";
+      let tv = '';
       fields.forEach((field) => {
-        tv = "";
+        tv = '';
         // 地址的默认值初始化为对象
-        if (field.formType == "customerAddress" || field.formType == "address")
+        if (field.formType == 'customerAddress' || field.formType == 'address')
           tv = {};
-        if (field.formType == "date" || field.formType == "datetime") tv = [];
-        if (field.formType === "link") {
+        if (field.formType == 'date' || field.formType == 'datetime') tv = [];
+        if (field.formType === 'link') {
           tv = {};
         }
-        if (field.fieldName === "tags") {
+        if (field.fieldName === 'tags') {
           tv = [];
         }
-        if (field.formType === "area") {
+        if (field.formType === 'area') {
           tv = [];
         }
 
-        if (field.formType === "user") {
+        if (field.formType === 'user') {
           tv = []
         }
 
@@ -102,143 +102,19 @@ export default {
       });
 
       let backUp = this.formBackup.backUp || {};
-      this.$set(this, "customer", backUp.customer || {});
-      this.$set(this, "product", backUp.product || {});
+      this.$set(this, 'customer', backUp.customer || {});
+      this.$set(this, 'product', backUp.product || {});
 
-      // this._inPar()
       return form;
     },
-    /**
-     * 初始参数转换
-     */
-    initialParams(key, item) {
-      let value;
-      if (key === "onceReallot") {
-        switch (item) {
-          case 1:
-            value = '是';
-            break;
-          default:
-            value = "全部";
-            break;
-        }
-      }
-
-      if(key === 'flags') {
-        value = []
-        item.forEach(v => {
-          if (v === 'ONCEOVERTIME') {
-            value.push('曾超时')
-          } else if (v === 'ONCEREFUSED') {
-            value.push('曾拒绝')
-          } else if (v === 'ONCEPAUSED') {
-            value.push('曾暂停')
-          } else if (v === 'ONCEROLLBACK') {
-            value.push('曾回退')
-          } else {
-            value.push('位置异常')
-          }
-        })
-      }
-
-      if (key === 'createUser') {
-        switch (item) {
-          case 1:
-            value = '曾超时';
-            break;
-          case 2:
-            value = '曾拒绝';
-            break;
-          case 3:
-            value = '曾暂停';
-            break;
-          case 4:
-            value = '曾回退';
-            break;
-          case 5:
-            value = '位置异常';
-            break;
-          default:
-            value = "";
-            break;
-        }
-      }
-      return value
-    },
-    /**
-     * 自定义初始化参数
-     */
-    _inPar() {
-      let inPar = [] // 初始化的参数
-      for(let key in this.searchParams) {
-        if (JSON.stringify(this.searchParams[key]) !== '[]' && this.searchParams[key] && key !== 'pageSize' && key !== 'page' && key !== 'pageNum' && key !== 'stateList' && key !== 'whoseInfo' && key !== 'isPermission' && key !== 'distance' && key !== 'orderDetail' && key !== 'sortBy') {
-          inPar.push({key, value: this.searchParams[key]})
-        }
-      }
-      inPar.forEach(({key, value}) => {
-        if (key === 'levels') {
-          this.form.level = value
-        } else if (key === 'level') {
-          this.form.level = [value]
-        } else if (key === 'onceReallot') {
-          this.form.onceReallot = this.initialParams(key, value)
-        } else if (key === 'acceptTimeStart') {
-          this.form.acceptTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'acceptTimeEnd') {
-          this.form.acceptTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'allotTimeStart') {
-          this.form.allotTime[0] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'allotTimeEnd') {
-          this.form.allotTime[1] = formatDate(new Date(value), "YYYY-MM-DD")
-        } else if (key === 'serviceTypes') {
-          this.form.serviceType = value
-        } else if (key === 'serviceType') {
-          this.form.serviceType = [value]
-        } else if (key === 'serviceContents') {
-          this.form.serviceContent = value
-        } else if (key === 'serviceContent') {
-          this.form.serviceContent = [value]
-        } else if (key === "cusProvince") {
-          this.form.area['province'] = value
-        } else if (key === "cusCity") {
-          this.form.area['city'] = value
-        } else if (key === "cusDist") {
-          this.form.area['dist'] = value
-        } else if (key === "payTypes") {
-          this.form.paymentMethod = value
-        } else if (key === "paymentMethod") {
-          this.form.paymentMethod = [value]
-        } else if (key === 'flags') {
-          this.form.onceException = this.initialParams(key, value)
-        } else if (key === 'onceException') {
-          this.form.onceException = this.initialParams(key, value)
-        } else if (key === 'createUserIds') {
-          this.form.createUser = value
-        } else if (key === 'createUser') {
-          this.form.createUser = [value]
-        } else if (key === 'allotUserIds') {
-          this.form.allotUser = value
-        } else if (key === 'allotUser') {
-          this.form.allotUser = [value]
-        } else if (key === 'executorUserIds') {
-          this.form.executor = value
-        } else if (key === 'executor') {
-          this.form.executor = [value]
-        } else {
-          this.form[key] = value
-        }
-      })
-      console.log('初始化的参数', inPar, this.form)
-    },
-
     renderInput(h, field) {
       const f = _.cloneDeep(field)
       let comp = FormFieldMap.get(f.formType);
-      if (!comp || f.formType === "area") {
+      if (!comp || f.formType === 'area') {
         return null;
       }
 
-      if (f.formType === "select") {
+      if (f.formType === 'select') {
         f.setting.isMulti = false
       }
 
@@ -248,13 +124,13 @@ export default {
 
       let childComp = null;
 
-      if (f.fieldName == "customer") {
+      if (f.fieldName == 'customer') {
         let value = this.form[f.fieldName];
-        childComp = h("search-customer-select", {
+        childComp = h('search-customer-select', {
           props: {
-            placeholder: "请选择客户",
+            placeholder: '请选择客户',
             field: f,
-            value: value ? [{ label: this.customer.name || "", value }] : [],
+            value: value ? [{ label: this.customer.name || '', value }] : [],
             remoteMethod: this.searchCustomer,
           },
           on: {
@@ -264,13 +140,13 @@ export default {
             },
           },
         });
-      } else if (f.fieldName == "product") {
+      } else if (f.fieldName == 'product') {
         let value = this.form[f.fieldName];
-        childComp = h("search-product-select", {
+        childComp = h('search-product-select', {
           props: {
-            placeholder: "请选择产品",
+            placeholder: '请选择产品',
             field: f,
-            value: value ? [{ label: this.product.name || "", value }] : [],
+            value: value ? [{ label: this.product.name || '', value }] : [],
             remoteMethod: this.searchProduct,
           },
           on: {
@@ -280,8 +156,8 @@ export default {
             },
           },
         });
-      } else if (f.formType === "user") {
-        childComp = h("user-search", {
+      } else if (f.formType === 'user') {
+        childComp = h('user-search', {
           props: {
             multiple: true,
             field: f,
@@ -292,20 +168,20 @@ export default {
             update: (event) => this.update(event),
           },
         });
-      } else if (f.fieldName === "tags") {
+      } else if (f.fieldName === 'tags') {
         let value = this.form[f.fieldName];
-        childComp = h("biz-team-select", {
+        childComp = h('biz-team-select', {
           props: {
             multiple: true,
             value: value || [],
           },
           on: {
-            input: (event) => this.update(event, "tags"),
+            input: (event) => this.update(event, 'tags'),
           },
         });
-      } else if (f.fieldName === "tlmName") {
+      } else if (f.fieldName === 'tlmName') {
         f.clearable = true
-        childComp = h("linkman-search", {
+        childComp = h('linkman-search', {
           props: {
             field: f,
             value: this.form[f.fieldName],
@@ -335,7 +211,7 @@ export default {
         );
       }
       return h(
-        "form-item",
+        'form-item',
         {
           props: {
             label: f.displayName,
@@ -345,7 +221,7 @@ export default {
         [childComp]
       );
    
-   },
+    },
     returnData() {
       let data = Object.assign({}, this.form);
       data.backUp = {
@@ -375,7 +251,7 @@ export default {
     searchProduct(params) {
       const pms = params || {};
 
-      pms.customerId = this.form.customer || "";
+      pms.customerId = this.form.customer || '';
       return TaskApi.getTaskCustonerProductList(pms)
         .then((res) => {
           if (!res || !res.list) return;
@@ -391,16 +267,15 @@ export default {
         .catch((e) => console.error(e));
     },
     update(event, action) {
-      if (action === "tags") {
+      if (action === 'tags') {
         return (this.form.tags = event);
       }
 
-      if (action === "dist") {
+      if (action === 'dist') {
         return (this.form.area = event);
       }
       const f = event.field;
       this.form[f.fieldName] = event.newValue;
-      console.log(this.form)
     },
   
   },
@@ -408,7 +283,7 @@ export default {
     return (
       <div
         class={`form-item-container ${
-          this.columnNum == 2 ? "two-columns" : ""
+          this.columnNum == 2 ? 'two-columns' : ''
         }`}
       >
         {this.fields.map((f) => this.renderInput(h, f))}
