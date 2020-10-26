@@ -629,6 +629,7 @@ export default {
      */
     editView({region, id}) {
       const moreConditions = this.$refs.searchPanel.buildParams().params
+      this.search('', true, true)
       let bool, bool_text;
       for(let key in moreConditions) {
         if (key !== 'conditions' && key !== 'productAddress' && key !== 'systemConditions') {
@@ -636,17 +637,17 @@ export default {
         }
       }
       for(let key in moreConditions) {
-        if((JSON.stringify(moreConditions[key]) === '[]' || JSON.stringify(moreConditions[key]) === '{}') && !bool_text) {
+        if(!bool_text) {
           bool = true
+          if (moreConditions['conditions'].length || moreConditions['systemConditions'].length || (moreConditions['productAddress'] && moreConditions['productAddress'].city)) {
+            bool = false
+          }
         }
       }
       if (bool && !id) {
         this.$platform.alert('请您先设置筛选条件后再保存视图');
         return
       }
-
-      this.params.moreConditions = moreConditions;
-      this.search('', true, true)
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
@@ -2435,17 +2436,17 @@ export default {
     presonDisplayObj(attr, fieldName, row) {
       let obj = {};
       switch(fieldName) {
-        case 'createUserName':
-          obj = row.createUser;
-          break;
-        case 'executorName':
-          obj = row.executorUser;
-          break;
-        case 'allotName':
-          obj = row.allotUser;
-          break;
-        default:
-          break;
+      case 'createUserName':
+        obj = row.createUser;
+        break;
+      case 'executorName':
+        obj = row.executorUser;
+        break;
+      case 'allotName':
+        obj = row.allotUser;
+        break;
+      default:
+        break;
       }
 
       obj = obj || {};

@@ -287,6 +287,10 @@
 }
 .task-list-dropdown-item {
   width: 100px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
 }
 .task-list-dropdown-icon {
   display: none;
