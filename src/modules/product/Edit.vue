@@ -152,7 +152,6 @@ export default {
                 let fromId = window.frameElement.getAttribute('fromid');
                 this.$platform.refreshTab(fromId);
               }
-
               if (this.customer) {
                 window.location.href = `/customer/view/${this.customer.id}`;
               } else {

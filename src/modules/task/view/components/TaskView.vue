@@ -107,6 +107,17 @@
       </div>
     </template>
     <!-- end 协同人 -->
+    <!-- 关联工单 -->
+    <template slot="relevance" slot-scope="{ field }">
+      <div class="form-view-row">
+        <label>{{ field.displayName }}</label>
+        <div class="form-view-row-content">
+          {{task.source}}
+          <div class="link-text" @click="openEventView(task.eventId)">{{task.eventNo}}</div>
+        </div>
+      </div>
+    </template>
+    <!-- end 关联工单 -->
   </form-view>
 </template>
 
@@ -189,6 +200,16 @@ export default {
     }
   },
   methods: {
+    /** 
+    * @description 打开事件详情
+    */
+    openEventView(id) {
+      this.$platform.openTab({
+        title: '事件详情',
+        close: true,
+        url: `/event/view/${id}`,
+      })
+    },
     /** 
     * @description 修改计划时间
     */
