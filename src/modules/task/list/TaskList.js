@@ -2413,6 +2413,27 @@ export default {
       }
 
       this.saveDataToStorage('columnStatus', columnsStatus);
+    },
+    /** @return 人员userId和展示字段 */
+    presonDisplayObj(attr, fieldName, row) {
+      let obj = {};
+      switch(fieldName) {
+        case 'createUserName':
+          obj = row.createUser;
+          break;
+        case 'executorName':
+          obj = row.executorUser;
+          break;
+        case 'allotName':
+          obj = row.allotUser;
+          break;
+        default:
+          break;
+      }
+
+      obj = obj || {};
+
+      return obj[attr];
     }
   },
   components: {
