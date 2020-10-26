@@ -1,8 +1,6 @@
 import http from '@src/util/http';
 import GrayUtil from '@src/util/gray';
 
-const fixedPrefixPath = '/api/app';
-
 /** ------------ start 产品 ----------------------- */
 /**
  * 获取产品列表
@@ -349,17 +347,6 @@ function searchCustomerLinkmanForProduct(params) {
   return http.get(`${productPreFixedPath}/product/linkmanRelation`, params);
 }
 
-/**
- * 产品自定义字段唯一校验
- * @param {Object} params - 参数
- * @param {String} params params.fieldName - 自定义字段fieldName
- * @param {String} params params.fieldValue - 自定义字段value
- * @returns {*}
- */
-function fieldRepeatProduct(params) {
-  return http.post(`${fixedPrefixPath}/outside/pc/product/field/repeat`, params);
-}
-
 
 /** ------------ end 产品模板 ----------------------- */
 
@@ -395,6 +382,5 @@ export {
   editBatchProduct,
   getProductRemindTemplate,
   searchCustomerAddressForProduct,
-  searchCustomerLinkmanForProduct,
-  fieldRepeatProduct
+  searchCustomerLinkmanForProduct
 };

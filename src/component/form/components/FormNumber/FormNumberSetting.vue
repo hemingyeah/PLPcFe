@@ -94,6 +94,8 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
 
+const DECIMAL_MAX_LENGTH = 5;
+
 export default {
   name: 'form-number-setting',
   mixins: [SettingMixin],
@@ -134,18 +136,18 @@ export default {
     },
     /** 
     * @description 小数位数
-    * 仅可输入正整数，10位以内
+    * 仅可输入正整数，5位以内
     */
     decimalLimit(event) {
       let value = event.target.value;
 
-      if (Number(value) > 10) {
+      if (Number(value) > DECIMAL_MAX_LENGTH) {
         value = '';
 
         this.$platform.notification({
           type: 'error',
           title: '提示',
-          message: '小数位数仅能10位以内'
+          message: `小数位数仅能${DECIMAL_MAX_LENGTH}位以内`
         })
       }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="product-edit-form">
-    <form-builder ref="form" :fields="fields" :value="value" @update="update" >
+    <form-builder ref="form" :fields="fields" :value="value" mode="product" @update="update" >
       <template slot="template" slot-scope="{field}">
         <form-item :label="field.displayName">
           <base-select
