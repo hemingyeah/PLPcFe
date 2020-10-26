@@ -446,10 +446,12 @@
             <div class="page-row">
               <div class="page-row-left">图片：</div>
               <div class="page-row-right part-info-dialog-img">
-                <template v-if="partInfo.image">
-                  <!--<img class="part-image" :src="partInfo.image" @click="preview" alt="备件图片">-->
-                  <img class="part-image" :src="partInfo.image" alt="备件图片">
-
+                <template v-if="Array.isArray(partInfo.imageList) && partInfo.imageList.length > 0">
+                  <img class="part-image" v-for="(img, idx) in partInfo.imageList" :key="idx" :src="img" @click="preview($event)" alt="备件图片">
+                </template>
+                <template v-else-if="partInfo.image">
+                  <img class="part-image" :src="partInfo.image" @click="preview($event)" alt="备件图片">
+                  <!-- <img class="part-image" :src="partInfo.image" alt="备件图片"> -->
                 </template>
               </div>
             </div>
@@ -542,6 +544,8 @@ import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
 import DateUtil from '@src/util/date'
 import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
+
+import BaseGallery from 'packages/BaseGallery/index'
 
 import { isShowPartTransfer, isShowPartApply, isShowMoreSperaParts } from '@src/util/version.ts'
 
@@ -923,6 +927,10 @@ export default {
       if(!this.allowImportAndExport || !this.allowEdit || !this.allowInout) return;
       let instance = this.$refs.importStock;
       instance.open();
+    },
+    //备件图片预览
+    preview(event){
+      BaseGallery.preview(event.currentTarget);
     },
     isEnableSparePart(row){
       let part = row.sparepart || {};
@@ -1802,6 +1810,13 @@ export default {
       img {
         width: inherit;
       }
+    }
+
+    .part-image {
+      display: block;
+      max-width: 128px;
+      max-height: 128px;
+      cursor: pointer;
     }
   }
   .part-spares-batch-dialog {
