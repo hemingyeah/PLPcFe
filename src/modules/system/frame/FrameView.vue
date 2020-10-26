@@ -23,12 +23,6 @@
               </button>
 
               <!-- start 工单列表切换新旧版 -->
-                              <el-button
-                  @click="changeTaskVersion(false)"
-                  class="task-version-btn"
-                  type="primary"
-                  v-if="isUserTaskGray"
-                >返回旧版</el-button>
               <template v-if="allowChangeTaskVersion">
                 <el-button
                   @click="changeTaskVersion(false)"

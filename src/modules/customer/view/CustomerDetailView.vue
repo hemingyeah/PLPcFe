@@ -84,10 +84,7 @@
             </el-tooltip>
           </template>
         </sample-tooltip>
-        ---
-        {{customer}}
-        ---
- 
+
         <form-view :fields="fields" :value="customer">
           <div slot="name"></div>
 
@@ -95,12 +92,6 @@
             <div class="form-view-row" v-if="isDivideByTag">
               <label>服务团队</label>
               <div class="form-view-row-content">{{value | fmt_tag}}</div>
-            </div>
-          </template>
-          <template slot="aaa">
-            <div class="form-view-row" >
-              <label>创建方式</label>
-              <div class="form-view-row-content">1212</div>
             </div>
           </template>
         </form-view>
@@ -249,12 +240,6 @@ export default {
         {
           displayName: '系统编号',
           fieldName: 'id',
-          formType: 'text',
-          isSystem: 1
-        },
-        {
-          displayName: '创建方式',
-          fieldName: 'aaa',
           formType: 'text',
           isSystem: 1
         }

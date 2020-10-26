@@ -113,7 +113,7 @@
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content">
           {{task.source}}
-          <div class="link-text" @click="openEventView(task.eventId)">{{task.eventNo}}</div>
+          <a class="link-text" :href="`/event/view/${task.eventId}`">{{task.eventNo}}</a>
         </div>
       </div>
     </template>
