@@ -32,7 +32,7 @@
           </el-radio-group>
         </div>
         <!-- 3 -->
-        <div class="ruler-set-item mar-r-245">
+        <div class="ruler-set-item flex-1">
           <div class="ruler-set-item-title">网页门户验证方式：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.validateBySms"
@@ -77,7 +77,7 @@
             active-text="开启后允许从自助门户取消尚未完成的服务事件"
           ></el-switch>
         </div>
-        <div class="ruler-set-item">
+        <div class="ruler-set-item flex-1">
           <div class="ruler-set-item-title">设置服务商城显示内容：</div>
           <div class="flex-x">
             <el-select
@@ -198,7 +198,7 @@
                 >
                   <div v-if="item.type == 'company-card'" class="head-phone-box">
                     <img :src="headPhone" class="head-phone" alt="" />
-                    <div :class="['head-phone-con', 'overHideCon-1', nowSettingDataId == item.id ? 'menu-box-item-check' : '']">{{item.data.companyName}}</div>
+                    <div :class="['head-phone-con', 'overHideCon-1', nowSettingDataId == item.id ? 'menu-box-item-check' : '']">{{item.data.name}}</div>
                   </div>
                   <div
                     :class="[
@@ -744,7 +744,7 @@ export default {
   font-weight: 400;
 }
 .my-shop-box {
-  min-width: 730px;
+  min-width: 1015px;
 }
 
 .el-dialog__body {
@@ -882,7 +882,8 @@ export default {
             font-weight: 600;
             border: 1px dashed transparent;
             border-bottom: none;
-            width: 280px;
+            width: 100%;
+            padding: 0 30px;
           }
         }
       }

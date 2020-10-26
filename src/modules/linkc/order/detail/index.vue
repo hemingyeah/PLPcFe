@@ -8,35 +8,64 @@
           <span class="font-16 font-w-500 mar-r-12">订单状态</span>
 
           <div
-            :class="[`status-tips-${dataInfo.logisticsState}`,'status-tips']"
-          >{{stateObj[dataInfo.logisticsState]? stateObj[dataInfo.logisticsState].name : ''}}</div>
+            :class="[`status-tips-${dataInfo.logisticsState}`, 'status-tips']"
+          >
+            {{
+              stateObj[dataInfo.logisticsState]
+                ? stateObj[dataInfo.logisticsState].name
+                : ""
+            }}
+          </div>
         </div>
         <div class="flex-1 flex-x flex-w">
-          <div class="flex-x mar-b-15" v-for="(item, index) in statusArr" :key="index">
+          <div
+            class="flex-x mar-b-15"
+            v-for="(item, index) in statusArr"
+            :key="index"
+          >
             <div
               class="status-item status-item-ready flex-x"
-              v-if="index > dataInfo.logisticsState-1"
+              v-if="index > dataInfo.logisticsState - 1"
             >
-              <div class="status-item-index status-item-index-ready mar-r-15 flex-x">{{index+1}}</div>
-              <span class="font-16">{{item}}</span>
+              <div
+                class="status-item-index status-item-index-ready mar-r-15 flex-x"
+              >
+                {{ index + 1 }}
+              </div>
+              <span class="font-16">{{ item }}</span>
             </div>
             <div
               class="status-item flex-x"
-              v-if="index == dataInfo.logisticsState-1 && dataInfo.logisticsState != 3"
+              v-if="
+                index == dataInfo.logisticsState - 1 &&
+                dataInfo.logisticsState != 3
+              "
             >
-              <div class="status-item-index status-item-index-now mar-r-15 flex-x">{{index+1}}</div>
-              <span class="font-16">{{item}}</span>
+              <div
+                class="status-item-index status-item-index-now mar-r-15 flex-x"
+              >
+                {{ index + 1 }}
+              </div>
+              <span class="font-16">{{ item }}</span>
             </div>
             <div
               class="status-item status-item-pass flex-x"
-              v-if="index < dataInfo.logisticsState-1 || dataInfo.logisticsState == 3"
+              v-if="
+                index < dataInfo.logisticsState - 1 ||
+                dataInfo.logisticsState == 3
+              "
             >
-              <div class="status-item-index status-item-index-pass mar-r-15 flex-x">
+              <div
+                class="status-item-index status-item-index-pass mar-r-15 flex-x"
+              >
                 <i class="el-icon-check"></i>
               </div>
-              <span class="font-16">{{item}}</span>
+              <span class="font-16">{{ item }}</span>
             </div>
-            <i class="iconfont icon-right font-size-16 color-ccc" v-if="index < statusArr.length-1"></i>
+            <i
+              class="iconfont icon-right font-size-16 color-ccc"
+              v-if="index < statusArr.length - 1"
+            ></i>
           </div>
         </div>
       </div>
@@ -46,16 +75,25 @@
         <div class="flex-x mar-b-14">
           <div class="flex-1 font-w-500">订单信息</div>
           <div class="flex-x">
-            <el-button @click="outStock" v-if="dataInfo.repertoryState == 2">出库</el-button>
-            <el-button type="primary" @click="goods" v-if="dataInfo.logisticsState == 1">发货</el-button>
+            <el-button @click="outStock" v-if="dataInfo.repertoryState == 2"
+              >出库</el-button
+            >
+            <el-button
+              type="primary"
+              @click="goods"
+              v-if="dataInfo.logisticsState == 1"
+              >发货</el-button
+            >
           </div>
         </div>
 
         <div class="flex-x order-info-list">
-          <div class="flex-x order-info-item" v-for="(item, index) in orderInfoArr" :key="index">
-            <div class="order-info-item-title">{{item.label}}</div>
-            <div class="flex-1 mar-r-12">{{item.value}}</div>
-          </div>
+          <template v-for="(item, index) in orderInfoArr">
+            <div class="flex-x order-info-item" :key="index" v-if="!item.hide">
+              <div class="order-info-item-title">{{ item.label }}</div>
+              <div class="flex-1 mar-r-12">{{ item.value }}</div>
+            </div>
+          </template>
         </div>
       </div>
       <!-- order-box start -->
@@ -83,17 +121,21 @@
           :align="column.align"
         >
           <template slot-scope="scope">
-            <template v-if="column.field=='thumbnailUrl'">
+            <template v-if="column.field == 'thumbnailUrl'">
               <div class="flex-x">
                 <img
-                  :src="scope.row.thumbnailUrl ? `${scope.row.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_56,w_56` : defaultImg"
+                  :src="
+                    scope.row.thumbnailUrl
+                      ? `${scope.row.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_56,w_56`
+                      : defaultImg
+                  "
                   class="goods-img mar-r-4"
                   @click.stop="previewImg(scope.row.thumbnailUrl)"
                 />
-                <div>{{scope.row.name}}</div>
+                <div>{{ scope.row.name }}</div>
               </div>
             </template>
-            <template v-else>{{scope.row[column.field]}}</template>
+            <template v-else>{{ scope.row[column.field] }}</template>
           </template>
         </el-table-column>
       </el-table>
@@ -103,13 +145,23 @@
         <div class="mar-r-14 mar-b-14 price-total">
           总计：
           <span>¥</span>
-          <span class="font-24 font-w-500 color-">{{dataInfo.payAmount}}</span>
+          <span class="font-24 font-w-500 color-">{{
+            dataInfo.payAmount
+          }}</span>
         </div>
       </div>
     </div>
     <!-- table-box end -->
-    <goods-dialog ref="goodsDialog" :info-data="dataInfo" @confirm="goodsConfirm"></goods-dialog>
-    <out-stock-dialog ref="outStockDialog" :info-data="dataInfo" @confirm="outStockConfirm"></out-stock-dialog>
+    <goods-dialog
+      ref="goodsDialog"
+      :info-data="dataInfo"
+      @confirm="goodsConfirm"
+    ></goods-dialog>
+    <out-stock-dialog
+      ref="outStockDialog"
+      :info-data="dataInfo"
+      @confirm="outStockConfirm"
+    ></out-stock-dialog>
   </div>
 </template>
 
@@ -139,21 +191,15 @@ export default {
       statusArr: ["待发货", "待收货", "已完成"],
       orderInfoArr: [
         { label: "订单编号：", value: "", key: "orderNum" },
-        { label: "订单时间：", value: "", key: "createTime" },
         { label: "买家：", value: "", key: "nickName" },
         { label: "收货人：", value: "", key: "name" },
         { label: "联系方式：", value: "", key: "linkmanPhone" },
         { label: "收货地址：", value: "", key: "address" },
-        { label: "支付订单号：", value: "", key: "payNum" },
-        { label: "支付方式：", value: "", key: "payType" },
+        { label: "订单时间：", value: "", key: "createTime" },
         { label: "支付时间：", value: "", key: "payTime" },
+        { label: "支付方式：", value: "", key: "payType" },
+        { label: "交易单号：", value: "", key: "payNum" },
         { label: "发货时间：", value: "", key: "deliveryTime" },
-        { label: "完成时间：", value: "", key: "completeTime" },
-        {
-          label: "买家备注：",
-          value: "",
-          key: "remarks",
-        },
         {
           label: "物流公司：",
           value: "",
@@ -163,6 +209,12 @@ export default {
           label: "物流单号：",
           value: "",
           key: "trackingNum",
+        },
+        { label: "完成时间：", value: "", key: "completeTime" },
+        {
+          label: "描述信息：",
+          value: "",
+          key: "remarks",
         },
       ],
       columns: [
@@ -252,10 +304,31 @@ export default {
               //     "YYYY-MM-DD HH:mm:ss"
               //   );
               // } else
+              item["hide"] = false;
               if (item.key == "payType") {
                 try {
                   item.value = this.payObj[res.data[item.key]].name;
                 } catch (error) {}
+              } else if (
+                item.key == "deliveryTime" &&
+                res.data.logisticsState * 1 < 2
+              ) {
+                item["hide"] = true;
+              } else if (
+                item.key == "deliveryCompany" &&
+                res.data.logisticsState * 1 < 2
+              ) {
+                item["hide"] = true;
+              } else if (
+                item.key == "trackingNum" &&
+                res.data.logisticsState * 1 < 2
+              ) {
+                item["hide"] = true;
+              } else if (
+                item.key == "completeTime" &&
+                res.data.logisticsState * 1 < 3
+              ) {
+                item["hide"] = true;
               } else {
                 item.value = res.data[item.key];
               }
@@ -369,7 +442,7 @@ export default {
   background: #fff;
   border-radius: 4px;
   box-sizing: border-box;
-  padding:0 16px;
+  padding: 0 16px;
   .el-table {
     .myShop-order-detail-heard th {
       background: #f5f5f5;
