@@ -95,6 +95,13 @@ class TaskStateEnum extends BaseEnum {
     value: 'paused',
   };
 
+  static UNFINISHED: TaskState = {
+    bgColor: '245, 108, 108',
+    color: '#F56C6C',
+    name: '未完成',
+    value: 'unfinished',
+  };
+
   constructor() {
     super();
   }

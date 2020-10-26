@@ -13,7 +13,7 @@
         <div class="task-list-header-seach">
           <form onsubmit="return false;">
             <div class="seach task-span1 task-flex task-ai">
-              <!-- <el-dropdown>
+              <el-dropdown>
                 <div
                   class="task-list-customize task-font14 task-c3 task-flex task-ai task-pointer"
                 >
@@ -41,24 +41,18 @@
                           <el-tooltip content="查看筛选条件" placement="top">
                             <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
                           </el-tooltip>
-                          <el-tooltip content="编辑视图" placement="top">
+                          <!-- <el-tooltip content="编辑视图" placement="top">
                             <i
                               class="iconfont icon-bianji1 task-ml12 task-font12"
                               @click.stop="editView(item)"
-                              v-if="
-                                initData.loginUser &&
-                                  item.userId === initData.loginUser.userId
-                              "
+                              v-if="item.authEdit"
                             ></i>
-                          </el-tooltip>
+                          </el-tooltip> -->
                           <el-tooltip content="删除视图" placement="top">
                             <i
                               class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                              @click.stop="editView(item)"
-                              v-if="
-                                initData.loginUser &&
-                                  item.userId === initData.loginUser.userId
-                              "
+                              @click.stop="$refs.viewModel.deleteViewBtn(item.id)"
+                              v-if="item.authEdit"
                             ></i>
                           </el-tooltip>
                       </div>
@@ -74,7 +68,7 @@
                     </div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
-              </el-dropdown> -->
+              </el-dropdown>
               
               <el-input
                 v-model="params.keyword"
@@ -116,12 +110,11 @@
         </div>
         <!-- 筛选 -->
         <div class="task-list-header-nav">
-          <div class="task-flex task-ai">
+          <div class="task-flex">
             <div class="task-font14 task-c6 state">工单状态：</div>
-            <div class="list" :style="`width: ${navWidth}px`">
+            <div class="list task-flex" :style="stateHeight">
               <div
                 class="list-item task-flex task-ai"
-                :style="`width:${8 * 130}px`"
               >
                 <!-- 全部工单 -->
                 <div
@@ -278,9 +271,13 @@
                 </div>
               </div>
             </div>
+            <div class="element-icon" v-if="910 > navWidth" @click="stateHeight = stateHeight === `height:30px` ? `height:auto` : `height:30px`">
+              <i class="el-icon-arrow-down task-icon" v-if="stateHeight === 'height:30px'"></i>
+              <i class="el-icon-arrow-up task-icon" v-else></i>
+            </div>
           </div>
           <!-- 创建 -->
-          <div class="task-flex task-ai">
+          <div class="task-flex">
             <div class="task-font14 task-c6 state">创建视角：</div>
             <div class="list list-crate" :style="`width: ${navWidth}px`">
               <div class="list-item task-flex task-ai">
@@ -289,10 +286,10 @@
                   :key="index"
                   class="task-nav-create"
                   :class="{ 'task-c2': selectId === item.id }"
-                  @click="
+                  @click.stop="
                     loading = true;
                     selectId = item.id;
-                    search(searchParams);
+                    search(searchParams, false);
                   "
                 >
                   {{ item.name }}
@@ -300,14 +297,13 @@
               </div>
             </div>
           </div>
-          <div class="task-flex task-ai">
+          <div class="task-flex">
             <div class="task-font14 task-c6 state">
               工单类型：
             </div>
-            <div class="list" :style="`width: ${navWidth}px`">
+            <div class="list" :style="typeHeight">
               <div
                 class="list-item task-flex task-ai"
-                :style="`width:${taskTypes.length * 130}px`"
               >
                 <div
                   v-for="item in taskTypes"
@@ -319,6 +315,10 @@
                   {{ item.name }}
                 </div>
               </div>
+            </div>
+            <div class="element-icon" v-if="taskTypes.length * 130 > navWidth" @click="typeHeight = typeHeight === `height:30px` ? `height:auto` : `height:30px`">
+              <i class="el-icon-arrow-down task-icon" v-if="typeHeight === 'height:30px'"></i>
+              <i class="el-icon-arrow-up task-icon" v-else></i>
             </div>
           </div>
         </div>
@@ -338,7 +338,7 @@
         @bj="showBj = false"
       >
         <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
-          <!-- <base-button type="primary" @event="editView">存为视图</base-button> -->
+          <base-button type="primary" @event="editView">存为视图</base-button>
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button
@@ -484,7 +484,6 @@
             :data="taskPage.list"
             :highlight-current-row="false"
             :key="tableKey"
-            :row-key="getRowKey"
             :border="true"
             @select="handleSelection"
             @select-all="handleSelection"
@@ -823,7 +822,7 @@
             </el-pagination>
           </div>
         </div>
-        <!-- end content 列表表格 -->
+      <!-- end content 列表表格 -->
       </div>
 
       <!-- <div style="background: #fff;padding: 0 10px">
@@ -891,7 +890,7 @@
       <!-- E 导入工单 -->
       <!-- S 工单转换 -->
       <task-transfer ref="TaskTransfer" :task-id-list="selectedIds" />
-      <!-- E 工单转换 -->
+    <!-- E 工单转换 -->
     </div>
     <!-- E 列表展示 -->
 

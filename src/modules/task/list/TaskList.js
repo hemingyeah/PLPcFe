@@ -123,7 +123,9 @@ export default {
       task_view_list: [],
       seoSetList: [],
       exportColumns: [],
-      showBj: false
+      showBj: false,
+      typeHeight: '',
+      stateHeight: ''
     };
   },
   computed: {
@@ -275,7 +277,7 @@ export default {
     this.revertStorage();
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
-    window.__exports__refresh = this.searchList;
+    // window.__exports__refresh = this.searchList;
   },
   methods: {
     /**
@@ -367,12 +369,17 @@ export default {
      * @description 高级搜索
      */
     advancedSearch() {
+      const {params, repeatBool} = this.$refs.searchPanel.buildParams()
       this.params.pageNum = 1;
       this.taskPage.list = [];
 
-      this.params.moreConditions = this.$refs.searchPanel.buildParams();
+      this.params.moreConditions = params;
       this.$refs.searchPanel.hide();
-
+      if (repeatBool) {
+        this.taskPage.list = []
+        return
+      }
+      
       this.search();
     },
     /**
@@ -621,7 +628,7 @@ export default {
      * 存为视图和编辑视图
      */
     editView({region, id}) {
-      const {moreConditions} = this.params
+      const moreConditions = this.$refs.searchPanel.buildParams().params
       let bool, bool_text;
       for(let key in moreConditions) {
         if (key !== 'conditions' && key !== 'productAddress' && key !== 'systemConditions') {
@@ -634,10 +641,12 @@ export default {
         }
       }
       if (bool && !id) {
-        this.$platform.alert('请您先设置条件进行查询，再保存【筛选视图】！');
+        this.$platform.alert('请您先设置筛选条件后再保存视图');
         return
       }
 
+      this.params.moreConditions = moreConditions;
+      this.search('', true, true)
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
@@ -678,18 +687,10 @@ export default {
           data['pageSize'] = size
           content.map((item) => {
             item.pending = false;
-            if (item.acceptUsedTime) {
-              item.acceptUsedTime = this.timestamp(item.acceptUsedTime);
-            }
-            if (item.taskUsedTime) {
-              item.taskUsedTime = this.timestamp(item.taskUsedTime);
-            }
-            if (item.workUsedTime) {
-              item.workUsedTime = this.timestamp(item.workUsedTime);
-            }
-            if (item.taskResponseTime) {
-              item.taskResponseTime = this.timestamp(item.taskResponseTime);
-            }
+            item.acceptUsedTime = this.timestamp(item.acceptUsedTime);
+            item.taskUsedTime = this.timestamp(item.taskUsedTime);
+            item.workUsedTime = this.timestamp(item.workUsedTime);
+            item.taskResponseTime = this.timestamp(item.taskResponseTime);
             if (item.planTime && this.planTimeType === 'date') {
               item.planTime = formatDate(new Date(item.planTime), 'YYYY-MM-DD');
             }
@@ -700,7 +701,6 @@ export default {
           this.taskPage.list = [];
           this.taskPage.merge(Page.as(data));
           this.params.pageNum = number;
-          console.log(this.taskPage)
 
           // 把选中的匹配出来
           // this.matchSelected();
@@ -734,7 +734,17 @@ export default {
      * @description 时间戳转换
      */
     timestamp(value) {
-      return formatDate(value * 1000, 'HH小时mm分钟');
+      if (value) {
+        let h = value / 3600 < 0 ? 0 : parseInt(value / 3600), m;
+        if (h > 0) {
+          m = (value % 3600) ? parseInt((value % 3600) / 60) : value % 3600
+        } else {
+          m = parseInt(value / 60)
+        }
+        return `${h}小时${m}分钟`;
+      } 
+      return ''
+      
     },
     /**
      * @description 表头更改
@@ -860,7 +870,6 @@ export default {
           } else {
             show = true;
           }
-
           col.show = show;
           col.width = width;
           col.type = 'column';
@@ -1099,6 +1108,7 @@ export default {
      * @description 工单类型改变
      */
     changeTaskType(taskType) {
+      this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       this.initialize();
     },
@@ -1642,12 +1652,15 @@ export default {
      * @description 搜索
      * @return {Promise}
      */
-    search(searchModel = '') {
+    search(searchModel = '', bool = true, searchBool) {
       const params = this.buildSearchParams();
       console.log('列表参数', params);
       const { selectId, initData, searchParams } = this;
       let mySearch;
-      this.loading = true;
+      let resetParamBool = bool
+      if (!searchBool) {
+        this.loading = true;
+      }
       switch (selectId) {
       case 'all':
         mySearch = {};
@@ -1939,7 +1952,9 @@ export default {
 
         /* E 高级搜索条件*/
       } else {
-        this.$refs.searchPanel.resetParams();
+        if (resetParamBool) {
+          this.$refs.searchPanel.resetParams();
+        }
         this.params.keyword = '';
         searchModel['page'] = params.page;
         searchModel.createTimeStart = this._time(searchModel.createTimeStart);
@@ -1979,7 +1994,9 @@ export default {
         this.searchParams = { ...searchModel, ...mySearch };
       }
       console.log('参数', this.searchParams);
-      this.searchList();
+      if (!searchBool) {
+        this.searchList();
+      }
     },
     getUserIdsWithSubmit(user, params, userKey) {
       let users = params[userKey]

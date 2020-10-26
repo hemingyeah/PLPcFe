@@ -114,6 +114,13 @@ export default {
       } else {
         this.isIndeterminateSys = true
       }
+      if (this.systemList.length === this.checkSystemList.length) {
+        this.sysCheckAll = true
+      }
+
+      if (this.customizeList.length === this.checkCustomizeList.length) {
+        this.cusCheckAll = true
+      }
 
       if (!this.checkCustomizeList.length || this.customizeList.length === this.checkCustomizeList.length) {
         this.isIndeterminateCus = false

@@ -372,18 +372,7 @@ export default {
           product: {},
         };
       },
-      watch: {
-        fields(v) {
-          if (v.length === Number(localStorage.getItem('fieldNum'))) return;
-          this.reset();
-          this.buildForm();
-        },
-        searchModelCN(v) {
-          if (JSON.stringify(this.searchModel) !== '{}') {
-            this._inPar(this.searchModel);
-          }
-        },
-      },
+
       mounted() {
         localStorage.setItem('fieldNum', this.fields.length);
         this.reset();

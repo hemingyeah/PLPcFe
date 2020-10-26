@@ -61,14 +61,6 @@
         </div>
         <!-- 设置查询条件 -->
         <task-inquire 
-          v-if="fields.length"
-          ref="taskInquireParams" 
-          :column-num="columnNum" 
-          :config="taskInquireList" 
-          @setting="_setting"
-        />
-        <task-inquire 
-          v-else
           ref="taskInquireParams" 
           :column-num="columnNum" 
           :config="[...config, ...taskTypeFilterFields]" 
@@ -229,6 +221,20 @@ export default {
       }
     },
     buildParams() {
+      // 判断是否有重复选择
+      let searchFormData = this.$refs.searchForm.returnData(), inPar = [], repeatBool;
+      for(let key in searchFormData) {
+        if (JSON.stringify(searchFormData[key]) !== '[]' && searchFormData[key] && key !== 'backUp') {
+          inPar.push(key)
+        }
+      }
+      for(let key in this.$refs.taskInquireParams.returnData()) {
+        if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key]) {
+          repeatBool = true
+        }
+      }
+
+
       const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()}
       this.formBackup = Object.assign({}, form)
       const taskInquireList = this.taskInquireList.length ? this.taskInquireList : [...this.config, ...this.taskTypeFilterFields]
@@ -358,7 +364,7 @@ export default {
       this.buildTaskInquireParams(params)
 
       // 返回接口数据
-      return params;
+      return {params, repeatBool};
     },
     buildTaskInquireParams(params) {
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields()
