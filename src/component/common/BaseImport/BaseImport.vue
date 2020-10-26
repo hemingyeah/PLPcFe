@@ -94,7 +94,7 @@ export default {
 
             Platform.alert(message);
             this.visible = false;
-            this.$emit('success');
+            this.$emit('success',result);
 
           } else {
             Platform.alert(result.message);

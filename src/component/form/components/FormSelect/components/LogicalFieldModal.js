@@ -117,9 +117,9 @@ const LogicalFieldModal = {
           <h4 class="logical-field-panel-header">那么显示以下字段：</h4>
           <div class="logical-field-panel-body">{ this.logicalFields.map(f => this.renderTargetItem(f)) }</div>
         </div>
-        <div slot="footer">
-          <button type="button" class="btn btn-text" onClick={this.cancel}>取消</button>
-          <button type="button" class="btn btn-primary" onClick={this.submit}>确定</button>
+        <div slot="footer" class="dialog-footer">
+          <el-button  onClick={this.cancel}>取 消</el-button>
+          <el-button type="primary" onClick={this.submit}>保 存</el-button>
         </div>
       </base-modal>
     )

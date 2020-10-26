@@ -1,5 +1,5 @@
 <template>
-  <base-modal  name="slide-down" :show.sync="show" width="800px" class="cascader-setting-modal">
+  <base-modal  name="slide-down" :show.sync="show" :width="modalWidth" class="cascader-setting-modal">
     <div  slot="title" class="cascader-setting-modal-header">
       <div class="cascader-setting-msg">
         <span>配置选择项</span>
@@ -8,19 +8,20 @@
         <div class="cascader-setting-deep">
           <label>级数： </label>
           <el-select v-model="maxDeep" placeholder="请选择" @change="changeMaxDeep">
-            <el-option label="两级" value="2"></el-option>
-            <el-option label="三级" value="3"></el-option>
-            <el-option label="四级" value="4"></el-option>
-            <el-option label="五级" value="5"></el-option>
+            <el-option label="两级" :value="2"></el-option>
+            <el-option label="三级" :value="3"></el-option>
+            <el-option label="四级" :value="4"></el-option>
+            <el-option label="五级" :value="5"></el-option>
           </el-select>
         </div>  
     </div>
-
+    
+    <!-- start 配置选项区域 -->
     <div class="cascader-setting-modal-body">
       <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" v-for="(option, index) in selectedOption" :key="option.id">
         <h3>{{deepZhChar[index]}}级选项</h3>        
           <div class="cascader-setting-option-list" ref="list" @keyup.enter="addChildrenOption(option)">
-            <draggable tag="div" :list="option.children" :options="{animation:380}">
+            <draggable tag="div" :list="option.children" :options="{ animation:380 }"  handle=".handle">
               <cascader-setting-option 
                 v-for="item in option.children" 
                 :key="item.id" 
@@ -33,17 +34,18 @@
                 @change-default="changeDefaultOption"/>
               </draggable>
           </div>          
-        <div class="cascader-setting-option cascader-setting-operation">
+        <div class="cascader-setting-operation">
           <a @click="addChildrenOption(option)" href="javascript:;" class="cascader-setting-btn">增加选项</a>
           <a @click="showMultiBatchModal(option,index)" href="javascript:;" class="cascader-setting-btn">批量编辑</a>
         </div>
       </div>  
     </div>
+    <!-- end 配置选项区域 -->
+
     <div class="cascader-setting-default-text">
-        <!-- <span class="btn-text" @click="openImportDialog()">批量导入</span> -->
-        <span>默认选项:</span> 
-        <span>{{defaultValueText}}</span>
-      </div>
+      <span>默认选项:</span> 
+      <span>{{defaultValueText}}</span>
+    </div>
 
     <div class="cascader-setting-modal-footer dialog-footer" slot="footer">
       <div class="cascader-setting-import-btn">
@@ -61,10 +63,11 @@
         <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
         <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
       </div>
-      <template slot="footer">
+      <div slot="footer" class="dialog-footer">
         <span class="form-select-tips">每行对应一个选项</span>
-        <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
-      </template>
+        <el-button @click="batchModalShow = false">取 消</el-button>
+        <el-button type="primary" @click="batchEdit">保 存</el-button>
+      </div>
     </base-modal>
     <!-- end 批量编辑 -->
 
@@ -72,14 +75,15 @@
     <base-import
       title="批量导入"
       ref="bulkImport"
+      :is-import-now="isImportNow"
       @success="importSucc"
-      action="/api/trane/outside/import/elevenCategoryNumberExcel"
+      :action="`/excels/multileve/menu/import?maxDeep=${maxDeep}`"
     >
       <div slot="tip">
         <div class="base-import-warn">
           <p style="margin: 0">
             在导入前，请先下载
-            <a href="/resource/excelTemplate/11Num.xlsx">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。。
+            <a href="/customer/import/templateNew">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。
           </p>
         </div>
       </div>
@@ -118,11 +122,13 @@ export default {
   },
   data(){
     return {
+      isImportNow: true, // 是否是导入立刻刷新
+      modalWidth:"800px",
       defaultValueText: '--',
       deepZhChar: ['一', '二', '三', '四','五'],
       source: null,
       selectedOption: [],
-      maxDeep: 2,
+      maxDeep: "2",
       batchModalShow: false, 
       optionText: '', // 批量编辑文本
       errMessage: null,
@@ -134,8 +140,24 @@ export default {
     openImportDialog(){
       this.$refs.bulkImport.open();
     },
-    importSucc(){
-
+    importSucc(res){
+      let { data } = res;
+      data.forEach(item=>{
+        this.mergeTreeOption(this.source,item);
+      })
+    },
+    mergeTreeOption(parent,item){
+      // 递归合并树节点
+      const { value ,children } = item;
+      let name = value ?  value: `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
+      let option = new Option(name, false, parent);
+      if( children && children.length ){
+        children.forEach(element=>{
+          this.addChildrenOption(option,element.value)
+        })
+      } 
+      parent.children.push(option);
+      this.chooseOption(option, true)
     },
     //批量编辑
     batchEdit(){
@@ -151,7 +173,7 @@ export default {
         let optionSelect;
         let currentOption = parent.children[index]; //当前节点
         if(currentOption){ //如果原option列表有这个节点，只改名称
-          currentOption.value=item;
+          currentOption.value = item;
           optionSelect = currentOption;
         } else {  //新增节点，递归插入数据
            optionSelect = this.addNewOption(parent,item);
@@ -205,7 +227,7 @@ export default {
     changeMaxDeep(value){
       this.maxDeep = value;
       // 重置数据
-      console.log(' this.source', this.source)
+      this.modalWidth = value > 3 ? '935px':'800px'
       this.source = this.initSource(null, false, this.source.children, null)
       this.initselectedOption();
     },
@@ -271,9 +293,9 @@ export default {
         .catch(err => console.log(err))
     },
     /** 添加选项 */
-    addChildrenOption(parent){
+    addChildrenOption(parent,name){
       // 根据当前最大级数，补全数据
-      let value = `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
+      let value = name ? name :`${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
       let option = new Option(value, false, parent);
       if(option.deep < this.maxDeep) this.addChildrenOption(option)
       parent.children.push(option);
@@ -360,9 +382,6 @@ export default {
         this.selectedOption.push(option);
         option = option.children[0];
       }
-      console.log('selectedOption',this.selectedOption)
-
-
     },
     initSource(value, isDefault, children, parent){
       let source = new Option(value, isDefault, parent);
@@ -386,6 +405,12 @@ export default {
 
       return source;
     },
+    initDataSource(data=[]){
+      let defaultValue = _.cloneDeep(this.defaultValue);
+      let origin = _.cloneDeep([...this.data,...data]);
+      this.initDefaultValue(origin, defaultValue);
+      this.source = this.initSource(null, false, origin, null);
+   },
     toArray(arr){
       return Array.isArray(arr) ? arr : [];
     },
@@ -403,11 +428,7 @@ export default {
     }
   },
   created(){
-    let defaultValue = _.cloneDeep(this.defaultValue);
-    let origin = _.cloneDeep(this.data);
-    
-    this.initDefaultValue(origin, defaultValue);
-    this.source = this.initSource(null, false, origin, null);
+    this.initDataSource();
   },
   mounted(){
     this.initselectedOption();
@@ -466,6 +487,9 @@ export default {
     margin-right: 12px;
     .el-select{
       width: 80px;
+      .el-input__inner{
+        border-radius: 4px;
+      }
     }
   }
 
@@ -583,6 +607,7 @@ export default {
   color: $color-primary;
   user-select: none;
   display: block;
+  margin-left: 8px;
 }
 
 .cascader-setting-default-text{

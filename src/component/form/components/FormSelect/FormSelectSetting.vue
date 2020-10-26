@@ -21,8 +21,6 @@
       <div class="form-item-box">
         <!-- 必填 -->
         <form-required-setting :field="field" @input="update"></form-required-setting>
-        <!-- 不允许重复值 -->
-        <form-repeat-setting :field="field" @input="update"></form-repeat-setting>
       </div>
     </div>
     <!-- end 校验 -->
@@ -31,7 +29,7 @@
     <div class="form-setting-options">
       <h4>选项<el-checkbox :disabled="!!field.id" class="form-select-setting-isMulti" :value="field.isMulti" @input="update($event, 'isMulti')">多选</el-checkbox> </h4>
       <div class="form-select-setting-list">
-        <draggable tag="div" class="list-group" :list="options" :options="{animation:380}" handle=".handle">
+        <draggable tag="div" class="list-group" :list="options" :options="{ animation:380 }" handle=".handle">
             <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
               <button type="button" class="btn-text handle"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
               <input type="text" :value="option.value" @input="updateOption($event, option)" :maxlength="optionMaxLength">
@@ -43,7 +41,7 @@
             </div>
         </draggable> 
       </div>
-      <div class="form-setting-group form-select-setting-operation">
+      <div class="form-setting-group form-select-setting-operation form-select-setting-btnbox">
         <button type="button" class="btn-text" @click="addOption">增加选项</button>
         <div class="btn-divider"></div>
         <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
@@ -52,7 +50,7 @@
     <!-- end 选项 -->
 
     <!-- start 显示逻辑 -->
-    <div v-if="allowLogical">
+    <div class="form-setting-group" v-if="allowLogical">
       <h4>显示逻辑 <button type="button" class="btn-text form-select-logical-btn" @click="showLogicalModal">配置</button></h4>
       <form-select-logical :logical="logical"/>
       <logical-field-modal @submit="updateDependencies" ref="logical" />

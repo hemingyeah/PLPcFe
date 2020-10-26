@@ -60,10 +60,12 @@
   display: inline-block;
   vertical-align: middle;
 }
-
+.form-select-setting-btnbox{
+  margin-left: 25px;
+}
 .form-select-setting-operation {
   margin-top: 12px;
-  // padding-left: 25px;
+  
   .btn-text{
     color: $color-primary;
     padding: 0;
@@ -103,7 +105,7 @@
   }
 }
 .form-select-setting-default{
-  color:#999999;
+  color:$text-color-secondary;
 }
 
 .form-select-tips{

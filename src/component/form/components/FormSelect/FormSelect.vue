@@ -1,6 +1,6 @@
 <template>
   <div class="form-select">
-     <!-- start 下拉模式 -->
+    <!-- start 下拉模式 -->
     <el-select
       v-if="selectType==1"
       :id="`form_${field.fieldName}`"
@@ -147,6 +147,9 @@ export default {
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
+    label{
+      padding: 0;
+    }
   }
 }
 </style>

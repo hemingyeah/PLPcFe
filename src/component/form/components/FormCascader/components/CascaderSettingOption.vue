@@ -1,8 +1,8 @@
 <template>
   <div class="cascader-setting-option" :class="{'cascader-setting-option-default': option.isDefault, 'cascader-setting-option-active': active}" :data-option-id="option.id">
-    <!-- <button type="button" class="btn-text handle"> <i class="iconfont icon-tuozhuaipaixu"></i></button> -->
+    <button type="button" class="btn-text handle" v-if="option.deep == 1"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
     <input type="text" :value="option.value" @input="input" @click="choose" maxlength="30" @blur="validate">
-    <button type="button" class="cascader-setting-option-default-btn" tabindex="-1" title="默认选项"
+    <button type="button" class="cascader-setting-option-default-btn btn-text" tabindex="-1" title="默认选项"
             @click="changeDefault">
       <i class="iconfont icon-check-fill"></i>
     </button>
@@ -81,6 +81,7 @@ export default {
 .cascader-setting-option{
   position: relative;
   padding: 5px 0;
+  display: flex;
   input[type='text']{
     width: 100%;
     margin: 0;
@@ -94,7 +95,7 @@ export default {
 
     &:hover,
     &:focus{
-      border-bottom-color: #9a9a9a;
+      border-bottom-color:  $color-primary;
     }
   }
 
@@ -104,6 +105,12 @@ export default {
       display: block;
     }
   }
+  .btn-text{
+    padding-left: 0 3px 0 0;
+    .icon-tuozhuaipaixu{
+      font-size: 12px;
+    }
+  } 
 }
 
 .cascader-setting-option-remove-btn,
@@ -129,7 +136,7 @@ export default {
 }
 
 .cascader-setting-option-default-btn{
-  color: $color-primary;
+  color: $text-color-secondary;
   right: 21px;
   top: 5px;
 }
@@ -137,6 +144,7 @@ export default {
 .cascader-setting-option-default{
   .cascader-setting-option-default-btn{
     display: block !important;
+    color: $color-primary;
   }
 }
 
