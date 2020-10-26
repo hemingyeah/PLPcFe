@@ -412,6 +412,7 @@
                     下一步
                   </div>
                   <div
+                    v-if="index == detailSteps.length - 1"
                     class="btns"
                     @click="tour.stop"
                   >
