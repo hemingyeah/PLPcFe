@@ -8,7 +8,7 @@
         <div v-else-if="item.lable==='目标仓库'" class="form-only-see-input">
           {{item.value}}
           <el-popover
-            v-if="propData.data.type==='退回'"
+            v-if="propData.data.type==='退回' && (propData.data.state==='suspending' || propData.data.state==='dealing')"
             width="50%"
             trigger="click"
             v-model="show"
@@ -34,7 +34,7 @@
                 <base-button
                   type="primary"
                   style="float:right;"
-                  @event="show=false"
+                  @event="submitEditTarget"
                 >确 定</base-button>
                 <base-button
                   class="mar-r-15"
@@ -46,6 +46,10 @@
             </div>
             <i slot="reference" @click="editTargetRepertory" class="iconfont icon-bianji"></i>
           </el-popover>
+        </div>
+        <div v-else-if="item.lable==='申请人'">
+          {{item.value}}
+          <span v-if="propData.data.type==='退回' && loginUserId!==propData.arr[0].propser" class="form-only-see-state form-only-see-suspending">非本人发起</span>
         </div>
         <div v-else class="form-only-see-input">{{item.value}}</div>
       </div>
@@ -176,6 +180,7 @@
 <script>
 import { mathMul, mathAccSub } from "@src/util/math";
 import { forEach } from 'lodash';
+import { updateBackTarget } from '@src/api/SparePart';
 
 export default {
   name: "part-deal-with-form",
@@ -186,7 +191,8 @@ export default {
     partDealKey:{
       type:Number
     },
-    targetList:Array
+    targetList:Array,
+    loginUserId:String
   },
   watch:{
     partDealKey(newVal){
@@ -195,6 +201,16 @@ export default {
             this.selects=[];
             this.$refs.selectTable.toggleAllSelection();
          }
+        this.formArr=[
+          { lable: "申请日期", value: this.propData.data.prosperTime },
+          { lable: "申请编号", value: this.propData.data.approveNo },
+          { lable: "申请类型", value: this.propData.data.type },
+          { lable: "申请人", value: this.propData.data.prosperName },
+          { lable: "目标仓库", value: this.propData.data.targetName },
+          { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
+        ];
+        console.log(111,this.propData);
+         this.formArr[4].value=this.propData.data.targetName;
       })
     }
   },
@@ -207,17 +223,17 @@ export default {
     })
   },
   computed: {
-    formArr() {
-      let arr = [
-        { lable: "申请日期", value: this.propData.data.prosperTime },
-        { lable: "申请编号", value: this.propData.data.approveNo },
-        { lable: "申请类型", value: this.propData.data.type },
-        { lable: "申请人", value: this.propData.data.prosperName },
-        { lable: "目标仓库", value: this.propData.data.targetName },
-        { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
-      ];
-      return arr;
-    },
+    // formArr() {
+    //   let arr = [
+    //     { lable: "申请日期", value: this.propData.data.prosperTime },
+    //     { lable: "申请编号", value: this.propData.data.approveNo },
+    //     { lable: "申请类型", value: this.propData.data.type },
+    //     { lable: "申请人", value: this.propData.data.prosperName },
+    //     { lable: "目标仓库", value: this.propData.data.targetName },
+    //     { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
+    //   ];
+    //   return arr;
+    // },
     total(){
       let price=0;
       this.propData.arr.forEach(item=>{
@@ -365,11 +381,34 @@ export default {
       inputonlyread,
       selects,
       show:false,
-      targetId:''
+      targetId:'',
+      formArr:[
+        { lable: "申请日期", value: this.propData.data.prosperTime },
+        { lable: "申请编号", value: this.propData.data.approveNo },
+        { lable: "申请类型", value: this.propData.data.type },
+        { lable: "申请人", value: this.propData.data.prosperName },
+        { lable: "目标仓库", value: this.propData.data.targetName },
+        { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
+      ]
     };
   },
   methods: {
-    // 修改目标仓库
+    // 确认修改目标仓库
+    submitEditTarget(){
+      const params={
+        approveNo:this.propData.data.approveNo,
+        repertoryId:this.targetId
+      }
+      updateBackTarget(params).then(res=>{
+        if(res.code===0){
+          this.show=false;
+          this.$emit('updateDetail',this.propData.data);
+        }else{
+          this.$platform.alert(res.message);
+        }
+      });
+    },
+    // 修改目标仓库 弹出
     editTargetRepertory(){
       this.show=true;
       this.targetId=this.propData.data.targetId;
