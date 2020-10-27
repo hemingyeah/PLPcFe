@@ -22,6 +22,7 @@ import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
 import TaskView from './components/TaskView.vue';
+import TaskTimeDialog from './components/TaskTimeDialog.vue';
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
@@ -53,6 +54,10 @@ export default {
       refuseDialog: {
         visible: false,
         reason: ''
+      },
+      // 时间轴弹窗
+      timeDialog: {
+        visible: false
       },
       receiptFields: [], // 自定义回执字段
       customerRelationTaskCountData: {}, // 客户关联工单数量
@@ -860,6 +865,7 @@ export default {
     },
     // 打开弹窗
     openDialog(action) {
+      console.log(action);
       if (action === 'cancel') {
         this.$refs.cancelTaskDialog.openDialog();
       } else if (action === 'acceptFromPool' || action === 'accept' || action === 'modifyPlanTime') {
@@ -883,6 +889,8 @@ export default {
       } else if (action === 'feedback') {
         this.rightActiveTab = 'feedback-tab';
         this.$refs.taskFeedback.feedback();
+      } else if (action === 'timeAxis') {
+        this.$refs.timeAxis.openDialog();
       }
     },
     // 发起审批
@@ -1113,6 +1121,7 @@ export default {
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
-    [TaskView.name]: TaskView
+    [TaskView.name]: TaskView,
+    [TaskTimeDialog.name]: TaskTimeDialog
   }
 }

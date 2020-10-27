@@ -694,6 +694,15 @@
                   {{ allotTypeText(scope.row.allotType) }}
                 </template>
 
+                 <!-- 服务团队(负责人所在的团队) -->
+                <template v-else-if="column.field === 'executorTags'">
+                  {{ formatExecutorTags(scope.row[column.field]) }}
+                </template>
+
+                <!-- 审批状态 -->
+                <template v-else-if="column.field === 'inApprove'">
+                  {{ scope.row.inApprove | displayApprove}}
+                </template>
                 <!-- 工单状态 -->
                 <template v-else-if="column.field === 'state'">
                   <!-- 暂停中 -->

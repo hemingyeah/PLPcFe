@@ -264,6 +264,10 @@ export default {
       }
       return null;
     },
+    /** 审批状态 */
+    displayApprove(value) {
+      return value == 0 ? '无审批' : '审批中'
+    }
   },
   mounted() {
     const that = this
@@ -1275,6 +1279,14 @@ export default {
 
       const { province, city, dist, address } = customizeAddress;
       return [province, city, dist, address].filter((d) => !!d).join('-');
+    },
+    /**
+     * @description 格式化服务团队
+     */
+    formatExecutorTags(executorTags) {
+      if (null == executorTags) return '';
+      
+      return executorTags.map(item => item.name).join('、');
     },
     /**
      * @description 获取本地存储数据
