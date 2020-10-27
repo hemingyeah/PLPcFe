@@ -75,12 +75,14 @@ export default {
         }
     },
     mounted() {
+        console.log(11111,this.config);
         this.systemList = this.config
         this.loc()
     },
     methods: {
         loc() {
             const searchField = localStorage.getItem('task-search-field')
+            console.log(222,searchField);
             if (searchField) {
                 this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
                 this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]

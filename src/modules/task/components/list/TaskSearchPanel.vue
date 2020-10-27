@@ -356,7 +356,6 @@ export default {
         });
       }
       this.buildTaskInquireParams(params)
-
       // 返回接口数据
       return params;
     },
