@@ -992,7 +992,6 @@ export default {
       // 工单列表重定向
       this.currentTaskListTab.url = `/task?newVersion=${version}`;
       this.reloadFrameTab(this.currentTaskListTab, true);
-
       this.isUserTaskGray = !this.isUserTaskGray;
     }, 1000),
     /** 

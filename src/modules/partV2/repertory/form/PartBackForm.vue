@@ -3,7 +3,8 @@
     <el-form :model="form" :rules="rules" ref="form" 
       label-width="100px" class="common-form">
       <el-form-item label="申请人：">
-        {{part.displayName}}
+        {{loginUser.user.displayName}}
+        <span class="notSelf" v-if="backUser.userId!==initData.userId">非本人发起</span>
       </el-form-item>
       <el-form-item label="备件名称：">
         {{part.name}}
@@ -45,6 +46,7 @@
 
 <script>
 import MathUtil from '@src/util/math';
+import { getRootWindow } from '@src/util/dom';
 
 export default {
   name: 'part-back-form',
@@ -54,6 +56,10 @@ export default {
       type: Array,
       default: []
     },
+    backUser:{
+      type:Object,
+      default:{}
+    }
   },
   data(){
     return {
@@ -96,6 +102,10 @@ export default {
     }
   },
   computed:{
+    loginUser(){
+      let rootWindow = getRootWindow(window);
+      return JSON.parse(rootWindow._init) || {};
+    },
     // TODO: 支持小数 提示
     minVariation () {
       let initData = this.initData;
@@ -143,7 +153,9 @@ export default {
           type: '退回',
           variation: this.form.count,
           repertoryId:this.form.repertoryId,
-          remark: this.form.remark
+          userId:this.backUser.userId,
+          remark: this.form.remark,
+          userName:this.backUser.userName
         }
 
         let result = await this.$http.post('/partV2/approve/apply', params)
@@ -173,3 +185,17 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.notSelf{
+  display: inline-block;
+  height: 22px;
+  line-height: 19px;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 11px;
+  color:#FAAE14;
+  background: rgba(250,174,20,.2);
+  border:1px solid rgba(250,174,20,.16);
+}
+</style>

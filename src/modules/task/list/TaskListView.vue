@@ -483,6 +483,16 @@
                 >
                   <div @click="reallotBatch">工单转派</div>
                 </el-dropdown-item>
+                <!-- start 批量生成服务报告 -->
+                <el-dropdown-item v-if="isSystemAdmin">
+                  <div @click="batchCreateServiceReport">批量生成服务报告</div>
+                </el-dropdown-item>
+                <!-- end 批量生成服务报告 -->
+                <!-- start 批量打印服务报告 -->
+                <el-dropdown-item v-if="isSystemAdmin">
+                  <div @click="batchPrintServiceReport">批量打印服务报告</div>
+                </el-dropdown-item>
+                <!-- end 批量打印服务报告 -->
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -795,13 +805,8 @@
                   {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
                 </template>
                 <template v-else-if="!column.isSystem">
-                  <template
-                    v-if="
-                      scope.row.attribute &&
-                        scope.row.attribute[column.field] instanceof Array
-                    "
-                  >
-                    {{ scope.row.attribute[column.field].join(",") }}
+                  <template v-if="scope.row.attribute && Array.isArray(scope.row.attribute[column.field])">
+                    {{scope.row.attribute[column.field].join(',')}}
                   </template>
                   <template v-else>
                     {{

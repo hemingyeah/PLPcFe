@@ -127,7 +127,6 @@
         </div>
       </div>
     </div>
-
     <remind-dialog ref="addRemindDialog" :product="product"></remind-dialog>
 
     <bind-code :product-id="productId" ref="bindCodeDialog"></bind-code>

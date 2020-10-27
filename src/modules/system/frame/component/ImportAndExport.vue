@@ -29,22 +29,22 @@
         <template v-else>
 
           <!-- start 导出 -->
-          <button type="button" class="btn btn-text export-operate-btn" v-if="item.action == 'export' || !item.action" @click="operateExport(item)">
+          <button type="button" class="btn btn-text export-operate-btn" v-if="showOperateButton(item)" @click="operateExport(item)">
             {{ item.isFinished == 0 ? '取消' : '下载' }}
           </button>
           <!-- end 导出 -->
 
           <!-- start 导入 或 批量更新 -->
           <button type="button" class="btn btn-text export-operate-btn" v-if="item.action == 'import' || item.action == 'update' " @click="operateImportAndUpdate(item)">
-              <span v-if="item.isFinished == 0 && isImportDelete(item.createTime, 30)">
-                取消
-              </span>
-              <span v-if="item.isFinished == 1">
-                确定
-              </span>
-              <span v-if="item.isFinished == 2">
-                查看原因
-              </span>
+            <span v-if="item.isFinished == 0 && isImportDelete(item.createTime, 30)">
+              取消
+            </span>
+            <span v-if="item.isFinished == 1">
+              确定
+            </span>
+            <span v-if="item.isFinished == 2">
+              查看原因
+            </span>
           </button>
           <!-- end 导入 或 批量更新 -->
 
@@ -114,10 +114,13 @@
 </template>
 
 <script>
+/* eslint-disable indent */
 import platform from '@src/platform'
 import http from '@src/util/http';
+/** constants */
 
-import FrameManager from './../FrameManager';
+// 支持下载的actions  导出/批量生成服务报告/批量打印服务报告
+const SupportDownloadActions = ['export', 'taskServiceReportBatch', 'taskServicePrintBatch']
 
 export default {
   name: 'import-and-export-view',
@@ -152,10 +155,10 @@ export default {
       let url = '';
       let itemAction = item.action;
       let subTitle = item.action == 'calculation' ? '生成' : '文件';
-
+      
       switch (itemAction) {
         case 'export': {
-          url = 'excels/cancel';
+          url = '/excels/cancel';
           break;
         }
         case 'import': {
@@ -169,90 +172,94 @@ export default {
         case 'calculation': {
           url = '/excels/performance/cancel';
           break;
-        }        
-        default:
+        }
+        default: {
+          url = '/excels/cancel';
           break;
+        }
       }
-
+      
       if(await platform.confirm(`确定要取消${subTitle}[${item.name}]的${action}？`)){
-
+          
         this.operationList.push({id: item.id, operate: 'cancel'})
         try {
           let result = await http.get(url, {id: item.id});
-
+          
           this.operationList = this.operationList.filter(i => i.id != item.id)
-
-          if(result.status == 0) {
-            // 
-          } else {
+          
+          let isSuccess = result.status == 0
+          if(!isSuccess) {
             platform.alert(result.message);
           }
+          
           this.$emit('change', this.operationList);
-
+          
           return
-
+          
         } catch (error) {
-          console.log('error: ', error);
+          console.error('error: ', error);
         }
       }
     },
     /** @deprecated */
     async execExportFile(item){
       let action = item.action == 'import' ? '导入' : '更新';
-      // 导出 取消下载文件
-      if((item.action == 'export' || !item.action) && item.isFinished == 0) {
-        if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
-      
-          this.operationList.push({id: item.id, operate: 'cancel'})
+      const Finished = item.isFinished == 1
 
+      // 导出 取消下载文件
+      if(this.showOperateButton(item) && !Finished) {
+        if(await platform.confirm(`确定要取消文件[${item.name}]的导出？`)){
+          
+          this.operationList.push({id: item.id, operate: 'cancel'})
+          
           try {
             let result = await http.post('excels/cancel', {id: item.id}, false);
-
+            
             if(result.status == 0) {
               this.operationList = this.operationList.filter(i => i.id != item.id)
             } else {
               platform.alert(result.message);
             }
             this.$emit('change', this.operationList);
-
+            
             return
-
+            
           } catch (error) {
             console.error(error);
           }
-
+          
         }
       }
       // 导出 下载文件
-      if((item.action == 'export' || !item.action) && item.isFinished == 1){
+      if((item.action == 'export' || !item.action) && Finished){
         let frame = document.createElement('iframe');
         frame.style.display = 'none';
         frame.src = `/excels/download?id=${item.id}`;
         document.body.appendChild(frame);
-
+        
         this.operationList.push({id: item.id, operate: 'download'});
         this.$emit('change', this.operationList);
         return
       }
       // 导入或批量更新 取消
-      if((item.action == 'import' || item.action == 'update') && item.isFinished == 0) {
+      if((item.action == 'import' || item.action == 'update') && !Finished) {
         if(await platform.confirm(`确定要取消文件[${item.name}]的${action}？`)){
-
+          
           this.operationList.push({id: item.id, operate: 'cancel'})
           try {
             let result = await http.get('/excels/delete/manual', {id: item.id});
-
+            
             this.operationList = this.operationList.filter(i => i.id != item.id)
-
+            
             if(result.status == 0) {
               // 
             } else {
               platform.alert(result.message);
             }
             this.$emit('change', this.operationList);
-
+            
             return
-
+            
           } catch (error) {
             console.error(error);
           }
@@ -313,12 +320,12 @@ export default {
         
         this.$emit('change', this.operationList);
       } catch (error) {
-        console.log('deleteRecord -> error', error)
+        console.error('deleteRecord -> error', error)
       }
     },
     /** 当前状态显示的文字  */
     getStatusText(item) {
-      let { action, isFinished }  = item;
+      let { action, isFinished } = item;
       let text = '';
 
       switch (action) {
@@ -434,23 +441,23 @@ export default {
       let fn = () => ({ });
 
       switch (isFinished) {
-        case 0: {
-          fn = this.cancelOperation;
-          break;
-        }
-        case 1: {
-          fn = this.importAndUpdateDone;
-          break;
-        }
-        case 2: {
-          fn = this.openErrorDialog;
-          break;
-        }
-        default: {
-          break;
-        }
+      case 0: {
+        fn = this.cancelOperation;
+        break;
       }
-
+      case 1: {
+        fn = this.importAndUpdateDone;
+        break;
+      }
+      case 2: {
+        fn = this.openErrorDialog;
+        break;
+      }
+      default: {
+        break;
+      }
+      }
+      
       fn(item, action);
     },
     /** 绩效 按钮操作  */
@@ -458,25 +465,25 @@ export default {
       let action = '绩效报告';
       let { isFinished } = item;
       let fn = () => ({ });
-
+      
       this.item = item;
-
+      
       switch (isFinished) {
-        case 0: {
-          fn = this.cancelOperation;
-          break;
-        }
-        case 1: {
-          fn = this.performanceDone;
-          break;
-        }
-        case 2: {
-          fn = this.openErrorDialog;
-          break;
-        }
-        default: {
-          break;
-        }
+      case 0: {
+        fn = this.cancelOperation;
+        break;
+      }
+      case 1: {
+        fn = this.performanceDone;
+        break;
+      }
+      case 2: {
+        fn = this.openErrorDialog;
+        break;
+      }
+      default: {
+        break;
+      }
       }
 
       fn(item, action);
@@ -499,6 +506,12 @@ export default {
 
       this.deleteRecord(this.item);
     },
+    /** 
+     * @description 是否显示操作按钮 下载/取消
+    */
+    showOperateButton(listItem = {}) {
+      return SupportDownloadActions.indexOf(listItem.action) > -1 || !listItem.action
+    }
   },
 }
 </script>
