@@ -1806,9 +1806,12 @@ export default {
     }
 
     .part-info-dialog-img {
+      display: flex;
+      flex-wrap: wrap;
       width: 100%;
       img {
         width: inherit;
+        padding: 5px;
       }
     }
 
