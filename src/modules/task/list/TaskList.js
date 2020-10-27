@@ -1543,6 +1543,14 @@ export default {
         fromId,
       });
     },
+    openEventTab(clientInfo){
+      let id=clientInfo.eventId;
+      this.$platform.openTab({
+        title: "事件信息",
+        close: true,
+        url: `/event/view/${id}`,
+      });
+    },  
     /**
      * @description 打开工单详情tab
      * @param {String} taskId 工单id
@@ -1633,6 +1641,7 @@ export default {
      * @description 搜索之前处理
      */
     searchBefore() {
+     
       this.params.pageNum = 1;
       this.taskPage.list = [];
 
@@ -1940,9 +1949,9 @@ export default {
           allotUserIds: this.getUserIdsWithSubmit(null, params, 'allotUser'),
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
-          systemConditions
+          systemConditions,
+          eventNo: params.eventNo,
         };
-        
         // 工单搜索分类型
         if (this.keyword_select) {
           par.searchCondition = this.keyword_select
