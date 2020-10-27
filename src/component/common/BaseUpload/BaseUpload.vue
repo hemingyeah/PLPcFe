@@ -1,6 +1,6 @@
 <template>
   <div class="base-upload-container">
-    <input type="file" ref="input" @change="handleChange" :multiple="multiple">
+    <input type="file" ref="input" @change="handleChange" :multiple="multiple" :accept="accept">
 
     <div class="base-file-list base-file__preview" >
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
@@ -63,6 +63,10 @@ export default {
     fileType : {
       type : String,
       default: null
+    },
+    accept: {
+      type: String,
+      default: ""
     }
   },
   computed: {
