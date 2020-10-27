@@ -225,7 +225,13 @@ export default {
       let searchFormData = this.$refs.searchForm.returnData(), inPar = [], repeatBool;
       for(let key in searchFormData) {
         if (JSON.stringify(searchFormData[key]) !== '[]' && searchFormData[key] && key !== 'backUp') {
-          inPar.push(key)
+          if (key !== 'area') {
+            inPar.push(key)
+          } else {
+            if (JSON.stringify(searchFormData[key]) !== '{}' && searchFormData[key].city) {
+              inPar.push('area')
+            }
+          }
         }
       }
       for(let key in this.$refs.taskInquireParams.returnData()) {
@@ -233,6 +239,7 @@ export default {
           repeatBool = true
         }
       }
+
 
 
       const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()}
@@ -397,19 +404,25 @@ export default {
         }
 
         if (tv.formType === 'address') {
-          let address = {
-            property: fn,
-            operator: tv.operatorValue,
-          };
+          let address = []
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value = (form[fn].province || '')
-              + (form[fn].city || '')
-              + (form[fn].dist || '')
-              + (form[fn].address || '');
+            address = [{
+              property: 'city',
+              operator: tv.operatorValue,
+              value: form[fn].city
+            }, {
+              property: 'dist',
+              operator: tv.operatorValue,
+              value: form[fn].dist
+            }, {
+              property: 'province',
+              operator: tv.operatorValue,
+              value: form[fn].province
+            }];
           }
-          params.systemConditions.push(address);
+          params.systemConditions = [...params.systemConditions, ...address];
           continue;
         }
 

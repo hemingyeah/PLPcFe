@@ -202,7 +202,8 @@ export default {
               value: this.form[f.fieldName],
               disableMap: true,
               placeholder: Utils.genPlaceholder(f),
-              seo: true
+              seo: true,
+              toggle: true
             },
             on: {
               update: (event) => this.update(event),

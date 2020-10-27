@@ -632,6 +632,7 @@ export default {
                   disableMap: true,
                   placeholder: Utils.genPlaceholder(f),
                   seo: true,
+                  toggle: true
                 },
                 on: {
                   update: (event) => this.update(event),
