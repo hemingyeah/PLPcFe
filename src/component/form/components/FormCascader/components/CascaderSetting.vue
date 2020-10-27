@@ -83,7 +83,7 @@
         <div class="base-import-warn">
           <p style="margin: 0">
             在导入前，请先下载
-            <a href="/customer/import/templateNew">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。
+            <a href="/excels/multileve/menu/import">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。
           </p>
         </div>
       </div>

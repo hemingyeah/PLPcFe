@@ -194,6 +194,8 @@ const FormDesign = {
     })
 
     return {
+      //角色列表
+      roleList:[],
       // 当前模式下可用字段
       availableFields,
       // 是否显示系统字段tab
@@ -662,6 +664,13 @@ const FormDesign = {
       let {pixelY} = normalizeWheel(e);
       containerEl.scrollTop += pixelY;
     },
+    //获取角色列表
+    getRoleListreq() {
+      this.$http.get('/setting/role/list', {pageSize: 0 }).then(res => {
+        const { list } = res;
+        this.roleList = list;
+      }).catch(err => console.error('err', err));
+    },
     renderTabHeader(){
       if(!this.hasSystemField) return (
         <div class="form-design-tabs">
@@ -742,6 +751,7 @@ const FormDesign = {
   mounted(){
     this.$data.$dragEvent.ghostEl = this.$el.querySelector('.form-design-ghost');
     this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-list');
+    this.getRoleListreq();
   },
   components: {...PreviewComponents, ...SettingComponents}
 };

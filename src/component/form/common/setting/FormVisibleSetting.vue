@@ -10,8 +10,7 @@
     </div>
     <div class="form-setting-item" v-if="visibleConfig.visible == 1">
       <el-select v-model="visibleConfig.role" @change="update" placeholder="请选择授权角色" multiple>
-        <el-option label="角色1" value="角色1"></el-option>
-        <el-option label="角色2" value="角色2"></el-option>
+        <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id"></el-option>
       </el-select>
     </div>
   </div>
@@ -21,6 +20,8 @@
 /* props */
 import { settingProps } from '@src/component/form/components/props';
 
+import { findComponentUpward } from '@src/util/assist';
+
 export default {
   name: 'form-visible-setting',
   props: {
@@ -29,6 +30,13 @@ export default {
   computed: {
     visibleConfig() {
       return this.field.setting.visibleConfig || { visible: 0, role: [] }
+    },
+   /** 
+    * @description 获取角色列表
+    */
+    roleList() {
+      let parent = findComponentUpward(this, 'form-design');
+      return parent.roleList;
     }
   },
   methods: {
