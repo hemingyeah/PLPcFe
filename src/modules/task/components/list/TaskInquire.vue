@@ -398,7 +398,6 @@ export default {
               inPar.push({ key, value: searchParams[key] });
             }
           }
-          console.log(inPar);
           inPar.forEach((item) => {
             if (item.key === 'customerId') {
               this.form['customer'] = item.value;
@@ -690,7 +689,7 @@ export default {
                     </div>
                   ) : (
                     <i
-                      class="iconfont icon-yemianshanchu task-pointer task-ml15 task-icon"
+                      class="iconfont icon-shanchu1 task-pointer task-ml15 task-icon"
                       onClick={() => {
                         this.$emit('del', {
                           index: this.index,

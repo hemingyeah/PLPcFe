@@ -396,7 +396,7 @@
               v-if="exportPermissionTaskEdit"
               @click="delTask"
             >
-              <i class="iconfont icon-qingkongshanchu task-icon"></i>
+              <i class="iconfont icon-shanchu1 task-icon"></i>
               删除
             </div>
             <!-- 批量编辑 -->
