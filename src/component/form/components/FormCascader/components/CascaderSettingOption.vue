@@ -1,15 +1,17 @@
 <template>
   <div class="cascader-setting-option" :class="{'cascader-setting-option-default': option.isDefault, 'cascader-setting-option-active': active}" :data-option-id="option.id">
-    <button type="button" class="btn-text handle" v-if="option.deep == 1"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
-    <input type="text" :value="option.value" @input="input" @click="choose" maxlength="30" @blur="validate">
-    <button type="button" class="cascader-setting-option-default-btn btn-text" tabindex="-1" title="默认选项"
-            @click="changeDefault">
-      <i class="iconfont icon-check-fill"></i>
-    </button>
-    <button type="button" class="cascader-setting-option-remove-btn" tabindex="-1" title="删除选项"
-            @click="remove" v-if="allowRemove">
-      <i class="iconfont icon-minus-fill"></i>
-    </button>
+    <div class="cascader-setting-left">
+      <button type="button" class="btn-text handle" v-show="option.deep == 1"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
+      <input type="text" :value="option.value" @input="input" @click="choose" maxlength="30" @blur="validate">
+    </div>
+    <div class="cascader-setting-right">
+      <button type="button" class="cascader-setting-option-default-btn btn-text" tabindex="-1" title="默认选项" @click="changeDefault">
+        <i class="iconfont icon-check-fill"></i>
+      </button>
+      <button type="button" class="cascader-setting-option-remove-btn" tabindex="-1" title="删除选项" @click="remove" v-if="allowRemove">
+        <i class="iconfont icon-minus-fill"></i>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -82,20 +84,31 @@ export default {
   position: relative;
   padding: 5px 0;
   display: flex;
+  .cascader-setting-left{
+    display: flex;
+    justify-content: flex-start;
+  }
+  .cascader-setting-right{
+    display: flex;
+    justify-content: flex-start;
+    width: 58px;
+    margin-left: 8px;
+  }
   input[type='text']{
     width: 100%;
     margin: 0;
-    padding: 0 50px 0px 8px;
+    // padding: 0 50px 0px 8px;
     line-height: 24px;
     border: none;
     outline: none;
-    border-bottom: 1px solid transparent;
+    border: 1px solid transparent;
     font-size: 14px;
     background-color: transparent;
+    border-radius: 4px;
 
     &:hover,
     &:focus{
-      border-bottom-color:  $color-primary;
+      border-color:  $color-primary;
     }
   }
 
@@ -106,7 +119,7 @@ export default {
     }
   }
   .btn-text{
-    padding-left: 0 3px 0 0;
+    padding: 0 3px 0 0;
     .icon-tuozhuaipaixu{
       font-size: 12px;
     }
@@ -115,9 +128,9 @@ export default {
 
 .cascader-setting-option-remove-btn,
 .cascader-setting-option-default-btn{
-    position: absolute;
+    // position: absolute;
     width: 20px;
-    height: 24px;
+    height: 32px;
     text-align: center;
     padding: 0;
     margin: 0;

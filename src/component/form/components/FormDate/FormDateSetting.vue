@@ -90,7 +90,11 @@ export default {
       
       this.update(value, prop)
     },
-    update(value, prop, isSetting = false){
+    update(value, prop, isSetting = false){   
+      if(prop == 'defaultValueConfig') {
+        let newDate = this.defaultValueConfig.isCurrentDate == 1 ? new Date() : null;
+        this.$emit('input', {value: newDate, prop: 'defaultValue'});
+      }
       this.$emit('input', {value, prop, isSetting})
     }
   }
