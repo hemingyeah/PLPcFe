@@ -236,7 +236,17 @@ export default {
       }
       for(let key in this.$refs.taskInquireParams.returnData()) {
         if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key]) {
-          repeatBool = true
+          if (key !== 'customer' && key !== 'tags') {
+            repeatBool = true
+          } else {
+            if (this.$refs.taskInquireParams.returnData()['tags'].length) {
+              repeatBool = true
+            }
+            if (this.$refs.taskInquireParams.returnData()['customer']) {
+              repeatBool = true
+            }
+          }
+          
         }
       }
 
