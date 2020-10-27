@@ -460,12 +460,12 @@
                   <div @click="reallotBatch">工单转派</div>
                 </el-dropdown-item>
                 <!-- start 批量生成服务报告 -->
-                <el-dropdown-item v-if="isSystemAdmin">
+                <el-dropdown-item v-if="isShowBatchCreateOrPrintReport">
                   <div @click="batchCreateServiceReport">批量生成服务报告</div>
                 </el-dropdown-item>
                 <!-- end 批量生成服务报告 -->
                 <!-- start 批量打印服务报告 -->
-                <el-dropdown-item v-if="isSystemAdmin">
+                <el-dropdown-item v-if="isShowBatchCreateOrPrintReport">
                   <div @click="batchPrintServiceReport">批量打印服务报告</div>
                 </el-dropdown-item>
                 <!-- end 批量打印服务报告 -->

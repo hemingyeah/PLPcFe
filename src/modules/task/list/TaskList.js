@@ -248,6 +248,10 @@ export default {
     isSystemAdmin() {
       let roles = this.initData?.roles || []
       return roles.some(role => role == '1')
+    },
+    /* 是否显示 批量创建/生成服务报告 */
+    isShowBatchCreateOrPrintReport() {
+      return this.isSystemAdmin && this.selectColumnState == TaskStateEnum.FINISHED.value
     }
   },
   filters: {
@@ -2410,12 +2414,13 @@ export default {
      * @description 批量创建服务报告
     */ 
     batchCreateServiceReport() {
+      let taskIds = this.getTaskIdsForBatchReport()
       // 验证
-      if (this.selectedIds.length <= 0) {
-        return this.$platform.alert('请先选择需要批量生成服务报告的数据')
+      if (taskIds.length <= 0) {
+        return this.$platform.alert('请先选择正确的需要批量生成服务报告的数据')
       }
       // 构建参数
-      let params = { isPdf: true, taskIds: this.selectedIds }
+      let params = { isPdf: true, taskIds }
       // 创建下载
       createServiceReportBatch(params)
         .then(result => {
@@ -2432,12 +2437,13 @@ export default {
      * @description 批量打印服务报告
     */ 
     batchPrintServiceReport() {
+      let taskIds = this.getTaskIdsForBatchReport()
       // 验证
-      if (this.selectedIds.length <= 0) {
-        return this.$platform.alert('请先选择需要批量打印服务报告的数据')
+      if (taskIds.length <= 0) {
+        return this.$platform.alert('请先选择正确的需要批量打印服务报告的数据')
       }
       // 构建参数
-      let params = { taskIds: this.selectedIds }
+      let params = { taskIds }
       // 打印
       createServicePrintBatch(params)
         .then(result => {
@@ -2449,6 +2455,18 @@ export default {
         .catch(err => {
           console.error(err)
         })
+    },
+    getTaskIdsForBatchReport() {
+      let { multipleSelection } = this
+      let finishedStates = [TaskStateEnum.FINISHED.value, TaskStateEnum.COSTED.value, TaskStateEnum.CLOSED.value]
+
+      return (
+        this.multipleSelection
+          .filter(task => {
+            return finishedStates.indexOf(task.state) >= 0
+          })
+          .map(task => task.id)
+      )
     }
   },
   components: {
