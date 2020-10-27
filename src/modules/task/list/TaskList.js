@@ -1118,6 +1118,7 @@ export default {
     changeTaskType(taskType) {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
+      this.params = this.initParams();
       this.initialize();
     },
     /**
