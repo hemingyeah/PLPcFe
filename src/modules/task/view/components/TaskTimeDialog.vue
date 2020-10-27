@@ -6,25 +6,25 @@
                 <el-tooltip effect="dark" content="从派单到接单用时" placement="left">
                     <label>接单用时：</label>
                 </el-tooltip>
-                <span>{{receiptTaskForUpdate.acceptUsedTimeStr}}</span>
+                <span>{{receiptTaskForUpdate.acceptUsedTimeStr | filterTimeSpent}}</span>
             </div>
-            <div class="time-axis-item">
+            <div class="time-axis-item" v-if="taskType.flowSetting.start.state">
                 <el-tooltip effect="dark" content="从开始到完成用时" placement="left">
                     <label> 工作用时：</label>
                 </el-tooltip>
-                <span>{{receiptTaskForUpdate.workUsedTimeStr}}</span>
+                <span>{{receiptTaskForUpdate.workUsedTimeStr | filterTimeSpent}}</span>
             </div>
             <div class="time-axis-item">
                 <el-tooltip effect="dark" content="从接单到完成用时" placement="left">
                     <label>工作用时：</label>
                 </el-tooltip>
-                <span>{{receiptTaskForUpdate.taskUsedTimeStr}}</span>
+                <span>{{receiptTaskForUpdate.taskUsedTimeStr | filterTimeSpent}}</span>
             </div>
             <div class="time-axis-item">
                 <el-tooltip effect="dark" content="从工单创建到工单开始用时" placement="left">
                     <label>响应用时：</label>
                 </el-tooltip>
-                <span>{{receiptTaskForUpdate.taskResponseTimeStr}}</span>
+                <span>{{receiptTaskForUpdate.taskResponseTimeStr | filterTimeSpent}}</span>
             </div>
         </div>
     </div>
@@ -46,6 +46,14 @@ export default {
   computed: {
     receiptTaskForUpdate() {
         return this.initData.receiptTaskForUpdate || {};
+    },
+    taskType(){
+        return this.initData.taskType || {};
+    }
+  },
+  filters: {
+    filterTimeSpent(val) {
+        return val || "--";
     }
   },
   methods: {

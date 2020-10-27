@@ -163,7 +163,9 @@
 
           <div class="task-detail-header-bottom-list-item">
             <biz-process-time :data="task" :state="taskState"></biz-process-time>
-            <p class="state-all-btn" @click="openDialog('timeAxis')">查看全部时间点</p>
+            <p class="state-all-btn" v-show="initData.receiptTaskForUpdate.completeTime" @click="openDialog('timeAxis')">
+              查看全部时间点
+            </p>
             <!-- start 当前工单状态操作按钮 -->
             <template v-if="!isDelete">
               <div class="state-button-group" v-show="taskState.value == task.state || (Array.isArray(taskState.value) && taskState.value.indexOf(task.state) > -1) ">
