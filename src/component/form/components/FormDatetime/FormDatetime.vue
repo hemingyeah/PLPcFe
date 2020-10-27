@@ -12,15 +12,15 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-import { typeOf } from '@src/util/assist';
+import { isString } from '@src/util/type'
 
 export default {
   name: 'form-datetime',
   mixins: [FormMixin],
   props: ['value'],
   watch: {
-    value(v) {
-      this.time = typeOf(v) === 'string' ? v : ''
+    value(newValue) {
+      this.time = isString(newValue) ? newValue : ''
     }
   },
   data() {
@@ -29,7 +29,7 @@ export default {
     }
   },
   mounted() {
-    this.time = typeOf(this.value) === 'string' ? v : ''
+    this.time = isString(this.value) ? this.value : ''
   },
   methods: {
     choose(newValue){    
