@@ -15,10 +15,7 @@
         :search-model-cn="searchModelCN"
       />
     </div>
-    <div
-      class="task-font14 task-c2 task-mt15 task-pointer"
-      @click="create"
-    >
+    <div class="task-font14 task-c2 task-mt15 task-pointer" @click="create">
       设为常用搜索字段
     </div>
   </div>
@@ -72,6 +69,8 @@ function setFieldOperateHandler(field = {}) {
     || formType == 'textarea'
     || formType === 'code'
     || formType === 'description'
+    || formType === 'relationProduct'
+    || formType === 'relationCustomer'
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
   } else if (formType == 'date' || formType == 'datetime') {
@@ -170,7 +169,7 @@ export default {
     // 高级搜索选中的值
     returnData() {
       let data = {};
-      if (!this.$refs.batchForm) return {}
+      if (!this.$refs.batchForm) return {};
       this.$refs.batchForm.forEach((item) => {
         for (let key in item.returnDatas()) {
           if (item.returnDatas()[key]) {
@@ -187,7 +186,7 @@ export default {
     returnInquireFields() {
       let inquireFields = [];
 
-      if (!this.$refs.batchForm) return []
+      if (!this.$refs.batchForm) return [];
       this.$refs.batchForm.forEach((batchFormEl) => {
         inquireFields.push(batchFormEl.selectedField);
       });
@@ -202,7 +201,7 @@ export default {
         check_system_list,
         check_customize_list,
       });
-      this.list = [1]
+      this.list = [1];
     },
     matchOperator(field) {
       let formType = field.formType;
@@ -275,7 +274,7 @@ export default {
           }
         });
 
-      console.log(this.checkSystemList)
+      console.log(this.checkSystemList);
       this.check_system_list = new Set(this.checkSystemList);
       this.check_customize_list = new Set(this.checkCustomizeList);
       this.list = this.list.map((v, i) => {
@@ -325,7 +324,7 @@ export default {
       ];
     },
     initFormVal() {
-      if (!this.$refs.batchForm) return
+      if (!this.$refs.batchForm) return;
       this.$refs.batchForm.forEach((el) => {
         el.buildForm();
       });
@@ -371,6 +370,12 @@ export default {
           form: {},
           product: {},
         };
+      },
+      watch: {
+        item() {
+          this.reset();
+          this.buildForm();
+        },
       },
 
       mounted() {
@@ -490,7 +495,6 @@ export default {
             index: this.index,
           });
           this.form[val] = val == 'tags' ? [] : '';
-
         },
         renderSelector() {
           if (!this.fields) return null;
@@ -608,7 +612,6 @@ export default {
                 input: (event) => this.update(event, 'tags'),
               },
             });
-            
           } else if (f.fieldName === 'tlmName') {
             childComp = h('linkman-search', {
               props: {
@@ -632,7 +635,7 @@ export default {
                   disableMap: true,
                   placeholder: Utils.genPlaceholder(f),
                   seo: true,
-                  toggle: true
+                  toggle: true,
                 },
                 on: {
                   update: (event) => this.update(event),
@@ -717,7 +720,7 @@ export default {
 
 <style lang="scss">
 .task-type > div {
-  width: 210px!important;
+  width: 210px !important;
 }
 </style>
 <style lang="scss">
