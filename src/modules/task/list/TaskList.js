@@ -1,5 +1,7 @@
 /* Api */
 import * as TaskApi from "@src/api/TaskApi.ts";
+import { createServiceReportBatch } from '@src/api/ExcelsApi'
+import { createServicePrintBatch } from '@src/api/PrintApi'
 
 /* components */
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";
@@ -242,6 +244,15 @@ export default {
 
       return taskTypeFilterFields;
     },
+    /* 是否是系统管理员 */
+    isSystemAdmin() {
+      let roles = this.initData?.roles || []
+      return roles.some(role => role == '1')
+    },
+    /* 是否显示 批量创建/生成服务报告 */
+    isShowBatchCreateOrPrintReport() {
+      return this.isSystemAdmin && this.selectColumnState == TaskStateEnum.FINISHED.value
+    }
   },
   filters: {
     displaySelect(value) {
@@ -2398,6 +2409,64 @@ export default {
       }
 
       this.saveDataToStorage('columnStatus', columnsStatus);
+    },
+    /** 
+     * @description 批量创建服务报告
+    */ 
+    batchCreateServiceReport() {
+      let taskIds = this.getTaskIdsForBatchReport()
+      // 验证
+      if (taskIds.length <= 0) {
+        return this.$platform.alert('请先选择正确的需要批量生成服务报告的数据')
+      }
+      // 构建参数
+      let params = { isPdf: true, taskIds }
+      // 创建下载
+      createServiceReportBatch(params)
+        .then(result => {
+          this.$platform.alert(result.message || '')
+          // 打开后台任务弹窗
+          window.parent.showExportList()
+          window.parent.exportPopoverToggle(true)
+        })
+        .catch(err => {
+          console.error(err)
+        })
+    },
+    /** 
+     * @description 批量打印服务报告
+    */ 
+    batchPrintServiceReport() {
+      let taskIds = this.getTaskIdsForBatchReport()
+      // 验证
+      if (taskIds.length <= 0) {
+        return this.$platform.alert('请先选择正确的需要批量打印服务报告的数据')
+      }
+      // 构建参数
+      let params = { taskIds }
+      // 打印
+      createServicePrintBatch(params)
+        .then(result => {
+          this.$platform.alert(result.message || '')
+          // 打开后台任务弹窗
+          window.parent.showExportList()
+          window.parent.exportPopoverToggle(true)
+        })
+        .catch(err => {
+          console.error(err)
+        })
+    },
+    getTaskIdsForBatchReport() {
+      let { multipleSelection } = this
+      let finishedStates = [TaskStateEnum.FINISHED.value, TaskStateEnum.COSTED.value, TaskStateEnum.CLOSED.value]
+
+      return (
+        this.multipleSelection
+          .filter(task => {
+            return finishedStates.indexOf(task.state) >= 0
+          })
+          .map(task => task.id)
+      )
     }
   },
   components: {
