@@ -600,12 +600,12 @@
                 </template>
 
                 <!-- 创建方式 -->
-                <template v-else-if="column.field === 'source'">
+                <!-- <template v-else-if="column.field === 'source'">
                   <span>{{ scope.row["source"]}}</span>
-                </template>
+                </template> -->
 
                 <!-- 关联事件 -->
-                <template v-else-if="column.field === 'eventNo'">
+                <!-- <template v-else-if="column.field === 'eventNo'">
                   <div
                     :class="{
                       'view-detail-btn task-client': scope.row.linkAuth,
@@ -614,7 +614,7 @@
                   >
                     {{ scope.row["eventNo"]}}
                   </div>
-                </template>
+                </template> -->
 
                 <!-- 联系人 -->
                 <template v-else-if="column.field === 'tlmName'">

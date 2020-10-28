@@ -108,7 +108,7 @@ export default {
         "onceRollback",
         "onceReallot",
         "oncePrinted",
-        "source",
+        // "source",
         "positionException",
       ],
       taskTypes: [
@@ -1850,28 +1850,28 @@ export default {
           oncePrinted = '';
           break;
         }
-        //创建方式
-        let source;
-        switch (params.source) {
-          case "由事件创建":
-            source = '由事件创建';
-            break;
-          case "API创建":
-            source = '开放API';
-            break;
-          case "导入创建":
-            source = '导入创建';
-            break;
-          case "手动创建":
-            source = '手动创建';
-            break;
-          case "计划任务创建":
-            source = '计划任务创建';
-            break;
-          default:
-            source = "";
-            break;
-        }
+        // //创建方式
+        // let source;
+        // switch (params.source) {
+        //   case "由事件创建":
+        //     source = '由事件创建';
+        //     break;
+        //   case "API创建":
+        //     source = '开放API';
+        //     break;
+        //   case "导入创建":
+        //     source = '导入创建';
+        //     break;
+        //   case "手动创建":
+        //     source = '手动创建';
+        //     break;
+        //   case "计划任务创建":
+        //     source = '计划任务创建';
+        //     break;
+        //   default:
+        //     source = "";
+        //     break;
+        // }
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
@@ -1967,7 +1967,7 @@ export default {
           onceException,
           onceReallot,
           oncePrinted,
-          source,
+          // source,
           inApprove,
           sorts,
           exceptionType,
@@ -1991,7 +1991,7 @@ export default {
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
           systemConditions,
-          eventNo: params.eventNo,
+          // eventNo: params.eventNo,
         };
         console.log(111,par)
         // 工单搜索分类型
