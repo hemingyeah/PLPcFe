@@ -102,13 +102,14 @@ export default {
       tableKey: (Math.random() * 1000) >> 2,
       taskStateEnum: TaskStateEnum,
       taskStatusFields: [
-        'onceOverTime',
-        'onceRefused',
-        'oncePaused',
-        'onceRollback',
-        'onceReallot',
-        'oncePrinted',
-        'positionException',
+        "onceOverTime",
+        "onceRefused",
+        "oncePaused",
+        "onceRollback",
+        "onceReallot",
+        "oncePrinted",
+        "source",
+        "positionException",
       ],
       taskTypes: [
         {
@@ -729,6 +730,7 @@ export default {
             })
           }
           // this.multipleSelection = [];
+          console.log(33333,data);
           return data;
         })
         .then(() => {
@@ -1834,6 +1836,28 @@ export default {
           oncePrinted = '';
           break;
         }
+        //创建方式
+        let source;
+        switch (params.source) {
+          case "由事件创建":
+            source = '由事件创建';
+            break;
+          case "API创建":
+            source = '开放API';
+            break;
+          case "导入创建":
+            source = '导入创建';
+            break;
+          case "手动创建":
+            source = '手动创建';
+            break;
+          case "计划任务创建":
+            source = '计划任务创建';
+            break;
+          default:
+            source = "";
+            break;
+        }
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
@@ -1929,6 +1953,7 @@ export default {
           onceException,
           onceReallot,
           oncePrinted,
+          source,
           inApprove,
           sorts,
           // tagId: params.tagId,
@@ -1953,6 +1978,7 @@ export default {
           systemConditions,
           eventNo: params.eventNo,
         };
+        console.log(111,par)
         // 工单搜索分类型
         if (this.keyword_select) {
           par.searchCondition = this.keyword_select
