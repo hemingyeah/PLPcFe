@@ -1,5 +1,5 @@
 /* Api */
-import * as TaskApi from "@src/api/TaskApi.ts";
+import * as TaskApi from '@src/api/TaskApi.ts';
 import { createServiceReportBatch } from '@src/api/ExcelsApi'
 import { createServicePrintBatch } from '@src/api/PrintApi'
 
@@ -491,17 +491,9 @@ export default {
       this.selectColumnState = title;
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
+      this.selectId = 'all'
       this.params = this.initParams();
 
-      if (searchModel.createUser) {
-        this.selectId = 'create';
-      } else if (searchModel.executor) {
-        this.selectId = 'execute';
-      } else if (searchModel.synergyId) {
-        this.selectId = 'synergy';
-      } else {
-        this.selectId = 'all';
-      }
       this.taskTypes.forEach((item) => {
         if (item.id === searchModel.templateId) {
           this.currentTaskType = item;
@@ -510,8 +502,8 @@ export default {
       if (!searchModel.templateId) {
         this.currentTaskType = { id: '', name: '全部' };
       }
-      // console.log(FormUtil.initialize(this.advanceds, searchModel))
-      // this.$refs.taskView.open(id)
+      // // console.log(FormUtil.initialize(this.advanceds, searchModel))
+      // // this.$refs.taskView.open(id)
       this.search(searchModel);
       this.buildColumns();
     },
@@ -529,6 +521,7 @@ export default {
       this.otherText = '自定义筛选视图';
       this.selectColumnState = title;
       this.searchParams = searchModel
+      this.selectId = 'all'
       this.searchParams_spare = searchModel
       this.getTaskCountByState(searchModel);
       this.params = this.initParams();
@@ -1126,6 +1119,7 @@ export default {
     changeTaskType(taskType) {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
+      this.selectId = 'all'
       this.params = this.initParams();
       this.initialize();
     },
@@ -1346,7 +1340,7 @@ export default {
       this.params.pageSize = pageSize;
       this.params.pageNum = 1;
 
-      this.search();
+      this.search('', false);
     },
     /**
      * @description 初始化
@@ -1496,7 +1490,7 @@ export default {
     jump(pageNum) {
       this.params.pageNum = pageNum;
       this.taskPage.list = [];
-      this.search(this.searchParams);
+      this.search(this.searchParams, false);
     },
     /**
      * @description 修改选择列设置
@@ -1557,9 +1551,9 @@ export default {
       });
     },
     openEventTab(clientInfo){
-      let id=clientInfo.eventId;
+      let id = clientInfo.eventId;
       this.$platform.openTab({
-        title: "事件信息",
+        title: '事件信息',
         close: true,
         url: `/event/view/${id}`,
       });
@@ -1683,42 +1677,46 @@ export default {
       return text;
     },
     /**
-     * @description 搜索
-     * @return {Promise}
+     * 创建视角
      */
-    search(searchModel = '', bool = true, searchBool) {
-      const params = this.buildSearchParams();
-      console.log('列表参数', params);
-      const { selectId, initData, searchParams } = this;
-      let mySearch;
-      let resetParamBool = bool
-      if (!searchBool) {
-        this.loading = true;
-      }
-      switch (selectId) {
+    createPerspective(item){
+      this.loading = true;
+      this.selectId = item.id;
+      const {initData} = this
+      switch (item.id) {
       case 'all':
-        mySearch = {};
         this.searchParams.createUser = '';
         this.searchParams.executor = '';
         this.searchParams.synergyId = '';
         break;
       case 'create':
-        mySearch = { createUser: initData.currentUserId };
+        this.searchParams.createUser = initData.currentUserId;
         this.searchParams.executor = '';
         this.searchParams.synergyId = '';
         break;
       case 'execute':
-        mySearch = { executor: initData.currentUserId };
         this.searchParams.createUser = '';
+        this.searchParams.executor = initData.currentUserId;
         this.searchParams.synergyId = '';
         break;
       default:
-        mySearch = { synergyId: initData.currentUserId };
         this.searchParams.createUser = '';
         this.searchParams.executor = '';
+        this.searchParams.synergyId = initData.currentUserId;
         break;
       }
-
+      this.search(this.searchParams, false);
+    },
+    /**
+     * @description 搜索
+     * @return {Promise}
+     */
+    search(searchModel = '', bool = true, searchBool) {
+      const params = this.buildSearchParams();
+      let resetParamBool = bool
+      if (!searchBool) {
+        this.loading = true;
+      }
       if (!searchModel) {
         /* S 高级搜索条件 */
         // 排序条件
@@ -1746,15 +1744,6 @@ export default {
         const { systemConditions = [] } = params
         // 自定义
         const conditions = params.conditions || [];
-        const paymentMethod = params.paymentMethod
-          ? [
-            {
-              property: 'paymentMethod',
-              value: params.paymentMethod,
-              operator: 'eq',
-            },
-          ]
-          : [];
         // 创建时间
         const createTimeStart = this._time(params.createTime, 0);
         const createTimeEnd = this._time(params.createTime, 1);
@@ -1831,6 +1820,19 @@ export default {
           break;
         default:
           onceReallot = '';
+          break;
+        }
+        // 超时工单
+        let exceptionType;
+        switch (params.exceptionType) {
+        case '暂停':
+          exceptionType = 1;
+          break;
+        case '超时':
+          exceptionType = 2;
+          break;
+        default:
+          exceptionType = 0;
           break;
         }
         // 曾打印
@@ -1943,6 +1945,7 @@ export default {
           oncePrinted,
           inApprove,
           sorts,
+          exceptionType,
           // tagId: params.tagId,
           keyword: params.keyword,
           page: params.page,
@@ -1956,9 +1959,9 @@ export default {
           searchStateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
           allotTypes: params.allotTypeStrs && params.allotTypeStrs.map(type => AllotTypeConvertMap[type]),
           flags: params.onceExceptions && params.onceExceptions.map(exception => FlagConvertMap[exception] || ''),
-          createUserIds: this.getUserIdsWithSubmit(mySearch.createUser, params, 'createUser'),
-          executorUserIds: this.getUserIdsWithSubmit(mySearch.executor, params, 'executor'),
-          synergyUserIds: this.getUserIdsWithSubmit(mySearch.synergyId, params, 'synergyId'),
+          createUserIds: this.getUserIdsWithSubmit(searchModel.createUser, params, 'createUser'),
+          executorUserIds: this.getUserIdsWithSubmit(searchModel.executor, params, 'executor'),
+          synergyUserIds: this.getUserIdsWithSubmit(searchModel.synergyId, params, 'synergyId'),
           allotUserIds: this.getUserIdsWithSubmit(null, params, 'allotUser'),
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
@@ -2025,9 +2028,9 @@ export default {
 
         searchModel.templateId = this.currentTaskType.id;
 
-        this.searchParams = { ...searchModel, ...mySearch };
+        this.searchParams = { ...searchModel };
       }
-      console.log('参数', this.searchParams);
+
       if (!searchBool) {
         this.searchList();
       }

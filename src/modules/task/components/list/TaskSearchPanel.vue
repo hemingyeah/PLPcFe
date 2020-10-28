@@ -464,6 +464,15 @@ export default {
           continue
         }
 
+        if (tv.fieldName === 'paymentMethod') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            value: form[fn]
+          });
+          continue;
+        }
+
         if (tv.fieldName == 'allotTypeStr') {
           params.systemConditions.push({
             property: 'allotType',

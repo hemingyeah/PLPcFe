@@ -36,7 +36,7 @@
                         @click="checkOther(item)"
                       >
                         {{ item.name }}</span
-                      >
+                        >
                       <div class="task-list-dropdown-icon">
                         <el-tooltip content="查看筛选条件" placement="top">
                           <i
@@ -77,7 +77,7 @@
                 v-model="params.keyword"
                 :placeholder="
                   taskSearchInputPlaceholderMap[keyword_select] ||
-                  taskSearchInputPlaceholderMap.default
+                    taskSearchInputPlaceholderMap.default
                 "
                 class="task-with-input task-ml12"
               >
@@ -301,9 +301,7 @@
                   class="task-nav-create"
                   :class="{ 'task-c2': selectId === item.id }"
                   @click.stop="
-                    loading = true;
-                    selectId = item.id;
-                    search(searchParams, false);
+                    createPerspective(item)
                   "
                 >
                   {{ item.name }}
@@ -368,7 +366,7 @@
             type="primary"
             @event="advancedSearch"
             native-type="submit"
-            >搜索</base-button
+          >搜索</base-button
           >
         </div>
       </task-search-panel>
@@ -477,7 +475,7 @@
                 <el-dropdown-item
                   v-if="
                     exportPermissionTaskEdit ||
-                    exportPermissionTaskBatchDispatch
+                      exportPermissionTaskBatchDispatch
                   "
                 >
                   <div @click="reallotBatch">工单转派</div>
@@ -579,7 +577,7 @@
                     class="task-state-block task-state-block-overtime task-font12"
                     v-if="
                       new Date().getTime() >
-                      new Date(scope.row.overTime).getTime()
+                        new Date(scope.row.overTime).getTime()
                     "
                   >
                     超时
@@ -596,7 +594,7 @@
                   >
                     {{
                       scope.row["customerEntity"] &&
-                      scope.row["customerEntity"].name
+                        scope.row["customerEntity"].name
                     }}
                   </div>
                 </template>
@@ -657,7 +655,7 @@
                 <template v-else-if="column.field === 'product'">
                   {{
                     scope.row.products &&
-                    scope.row.products.map((product) => product.name).join(", ")
+                      scope.row.products.map((product) => product.name).join(", ")
                   }}
                 </template>
 
@@ -665,8 +663,8 @@
                 <template
                   v-else-if="
                     column.field === 'createUserName' ||
-                    column.field === 'executorName' ||
-                    column.field === 'allotName'
+                      column.field === 'executorName' ||
+                      column.field === 'allotName'
                   "
                 >
                   <template v-if="permissionTaskView">
@@ -695,9 +693,9 @@
                 <template v-else-if="column.field === 'synergies'">
                   {{
                     scope.row[column.field] &&
-                    scope.row[column.field]
-                      .map((synergie) => synergie.displayName)
-                      .join(", ")
+                      scope.row[column.field]
+                        .map((synergie) => synergie.displayName)
+                        .join(", ")
                   }}
                 </template>
 
@@ -706,7 +704,7 @@
                   {{ allotTypeText(scope.row.allotType) }}
                 </template>
 
-                 <!-- 服务团队(负责人所在的团队) -->
+                <!-- 服务团队(负责人所在的团队) -->
                 <template v-else-if="column.field === 'executorTags'">
                   {{ formatExecutorTags(scope.row[column.field]) }}
                 </template>
@@ -742,7 +740,7 @@
                   >
                     {{
                       scope.row[column.field] &&
-                      taskStateEnum.getName(scope.row[column.field])
+                        taskStateEnum.getName(scope.row[column.field])
                     }}
                   </div>
                 </template>
@@ -763,12 +761,12 @@
                 <template
                   v-else-if="
                     column.formType === 'user' &&
-                    scope.row.attribute[column.field]
+                      scope.row.attribute[column.field]
                   "
                 >
                   {{
                     scope.row.attribute[column.field].displayName ||
-                    scope.row.attribute[column.field].name
+                      scope.row.attribute[column.field].name
                   }}
                 </template>
 
@@ -776,7 +774,7 @@
                 <template v-else-if="column.formType === 'location'">
                   {{
                     scope.row.attribute[column.field] &&
-                    scope.row.attribute[column.field].address
+                      scope.row.attribute[column.field].address
                   }}
                 </template>
 
@@ -818,8 +816,8 @@
                 <template
                   v-else-if="
                     column.field === 'paymentMethod' &&
-                    initData.paymentConfig &&
-                    initData.paymentConfig.version === 1
+                      initData.paymentConfig &&
+                      initData.paymentConfig.version === 1
                   "
                 >
                   {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
@@ -828,7 +826,7 @@
                   <template
                     v-if="
                       scope.row.attribute &&
-                      Array.isArray(scope.row.attribute[column.field])
+                        Array.isArray(scope.row.attribute[column.field])
                     "
                   >
                     {{ scope.row.attribute[column.field].join(",") }}
@@ -969,7 +967,7 @@
 </template>
 
 <script>
-import TaskList from "./TaskList";
+import TaskList from './TaskList';
 export default TaskList;
 </script>
 <style lang="scss">
