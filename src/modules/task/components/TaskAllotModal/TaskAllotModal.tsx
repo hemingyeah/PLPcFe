@@ -2,14 +2,19 @@
 import Component from 'vue-class-component'
 import { Vue, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
+/* api */
+import { getCustomer } from '@src/api/CustomerApi.ts'
 /* components */
 import TaskAllotType from '@src/modules/task/components/TaskAllotModal/TaskAllotType.tsx'
 import TaskAllotUserTable from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTable.tsx'
 import UserButton from '@src/modules/task/components/TaskAllotModal/UserButton/UserButton.tsx'
 /* entity */
+import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+/* model */
+import { getCustomerDetailResult } from '@model/param/out/Customer'
 /* scss */
 import './TaskAllotModal.scss'
 
@@ -33,11 +38,15 @@ type DepeMultiUserResult = { status: number, data: { users: User[] } }
 
 export default class TaskAllotModal extends Vue {
   
+  /* 客户id */
+  @Prop() customerId: string | undefined
   /* 用户工作状态 */
   @Prop() userStateMap: any | undefined
   
   /* 派单方式 */
   private allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
+  /* 客户信息 */
+  private customer: Customer = {}
   /* 是否是按团队派单 */
   private isAllotByTag: boolean = true
   /* 是否显示派单弹窗 */
@@ -68,6 +77,26 @@ export default class TaskAllotModal extends Vue {
       .catch((err: any) => {
         console.error(err)
       })
+  }
+  
+  /**
+   * @description 获取客户信息
+  */
+  fetchCustomer() {
+    let id = this.customerId
+    if (!id) {
+      return console.warn('Caused: TaskAllotModal fetchCustomer not have customerId')
+    }
+    
+    getCustomer(id).then((result: getCustomerDetailResult) => {
+      let isSuccess = result.status == 0
+      if (!isSuccess) return
+      
+      this.customer = Object.freeze(result.data || {})
+      
+    }).catch(err => {
+      console.error(err)
+    })
   }
   
   /** 
@@ -104,6 +133,10 @@ export default class TaskAllotModal extends Vue {
         </div>
       </div>
     )
+  }
+  
+  mounted() {
+    this.fetchCustomer()
   }
   
   render(h: CreateElement) {

@@ -1,12 +1,10 @@
 /* entity */
+import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
 /* model */
 import Page from '@model/Page'
 import { TaskAllotUserTableColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableModel'
-/* vue */
-import { Vue, Component, Prop, Emit, Ref } from 'vue-property-decorator'
-import { CreateElement } from 'vue'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTable.scss'
 /* types */
@@ -14,6 +12,9 @@ import Column from '@model/types/Column'
 /* util */
 import { uuid } from '@src/util/string'
 import { findComponentUpward, findComponentDownward } from '@src/util/assist'
+/* vue */
+import { Vue, Component, Prop, Emit, Ref } from 'vue-property-decorator'
+import { CreateElement } from 'vue'
 /* const */
 // 表格列默认宽度
 const TableColumnDefaultWidth = '120px'
@@ -75,6 +76,11 @@ export default class TaskAllotUserTable extends Vue {
   /* 选择列 组件 */
   get BaseTableAdvancedSettingComponent() { 
     return findComponentDownward(this, 'base-table-advanced-setting')
+  }
+
+  /* 客户地址 */
+  get customerAddress(): CustomerAddress {
+    return this.TaskAllotModalComponent.customerAddress || new CustomerAddress()
   }
   
   /* 是否是按团队派单 */
@@ -309,6 +315,7 @@ export default class TaskAllotUserTable extends Vue {
               this.columns.filter((column: Column) => column.show).map((column: Column) => {
                 return (
                   <el-table-column
+                    fixed={column.fixed}
                     label={column.label}
                     key={column.field}
                     minWidth={column.minWidth || TableColumnDefaultWidth}

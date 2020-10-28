@@ -1,7 +1,7 @@
 <script>
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 
 /* components */
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';

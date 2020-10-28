@@ -1,17 +1,26 @@
-import http from "@src/util/http";
+import http from "@src/util/http"
 import {
   TaskCreateAndEditModel,
   PlanTaskCreateAndEditModel,
-} from "@model/param/in/Task";
-import GrayUtil from '@src/util/gray';
+  TaskSearchListModel,
+  TaskGetCardDetailListModel,
+  TaskAllotUserListByTagModel
+} from "@model/param/in/Task"
 
-const fixedPrefixTaskPath = '/api/task';
-const ElASTICSEARCH = '/api/elasticsearch';
-const fixedPrefixPaymentPath = '/api/payment';
+import { 
+  getUserViewsResult, 
+  getTaskCountByStateResult, 
+  getTaskSearchListResult,
+  getTaskFilterWithPartResult,
+  getLatestRecordResult,
+  getUserListByTagResult
+} from '@model/param/out/Task'
 
-// const fixedPrefixTaskPath = '';
-// const ElASTICSEARCH = '';
-// const fixedPrefixPaymentPath = '';
+import GrayUtil from '@src/util/gray'
+
+const fixedPrefixTaskPath = '/api/task'
+const ElASTICSEARCH = '/api/elasticsearch'
+const fixedPrefixPaymentPath = '/api/payment'
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -262,8 +271,8 @@ export function finishApproveCheck(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  * @return {MsgModal<String>} 最近更新记录
  */
-export function getTaskUpdateRecord(params: {} | undefined) {
-  return http.get("/task/getLatestRecord", params, false);
+export function getTaskUpdateRecord(params: { taskId: string }): Promise<getLatestRecordResult> {
+  return http.get("/task/getLatestRecord", params, false)
 }
 
 /**
@@ -746,12 +755,10 @@ export function getTaskCardDetailList(params: {} | undefined) {
 /**
  * 顶部筛选, 状态数据展示
  */
-export function getTaskCountByState(params: {} | undefined) {
-  return http.post(
-    `${ElASTICSEARCH}/outside/es/task/getTaskCountByState`,
-    params
-  );
+export function getTaskCountByState(params: {} | undefined): Promise<getTaskCountByStateResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/getTaskCountByState`, params)
 }
+
 /**
  * 存为视图
  * @param {Object} params -对象参数
@@ -895,9 +902,10 @@ export function getTaskTemplate(params: {} | undefined) {
  * @param {string} params.searchCondition	 - 关键词搜索类型
  * @param {string} params.view	 - 视图
  */
-export function search(params: {} | undefined) {
-  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
+export function search(params: TaskSearchListModel): Promise<getTaskSearchListResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params)
 }
+
 /*
  * 工单设置，回执合规设置模块 保存自定义打印模板
  * @param {Object} params - 参数对象
@@ -964,11 +972,11 @@ export function getRelatedInfo(params: {} | undefined) {
 }
 
 /**
- * @description 是否删除工单列表
- * @param {Object} 删除对象id
+ * @description 筛选已经关联过备件的工单
+ * @param {String} taskIds 查询的工单ids example: taskIds=1&taskIds=2
  */
-export function withPart(params: Object = {}) {
-  return http.get(`/task/filter/withPart?${params}`);
+export function withPart(taskIds: string): Promise<getTaskFilterWithPartResult> {
+  return http.get(`/task/filter/withPart?${taskIds}`)
 }
 
 /**
@@ -1060,26 +1068,31 @@ export function dialout(params: object) {
 
 /**
  * @description 获取视图
+ * @return {getUserViewsResult} 视图列表
  */
-export function getUserViews(params: object) {
-  return http.get(
-    `${fixedPrefixTaskPath}/outside/pc/view/getUserViews`,
-    params
-  );
+export function getUserViews(): Promise<getUserViewsResult> {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getUserViews`)
 }
 
 /**
- * @description 获取附件
+ * @description 根据工单类型id获取其附加组件信息
  */
-export function getCardDetailList(params: object) {
-  return http.get(`/task/getCardDetailList`, params);
+export function getCardDetailList(params: TaskGetCardDetailListModel): Promise<Map<string, any>[]> {
+  return http.get(`/task/getCardDetailList`, params)
 }
 
 /**
  * @description 查询一个视图
  */
 export function getOneView(params: string) {
-  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getOneView/${params}`);
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getOneView/${params}`)
+}
+
+/**
+ * @description 查询指派人员列表
+ */
+export function getUserListByTag(params: TaskAllotUserListByTagModel): Promise<getUserListByTagResult> {
+  return http.post('/task/allotMap/userListByTag', params)
 }
 
 /**

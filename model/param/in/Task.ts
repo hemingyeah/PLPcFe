@@ -1,7 +1,7 @@
-import Address from './../../entity/Address';
-import Customer from './../../entity/Customer';
-import Linkman from './../../entity/Linkman';
-import Task from './../../entity/Task';
+import Address from '@model/entity/Address'
+import EsTaskSearchInput from '@model/types/EsTaskSearchInput'
+import Linkman from '@model/entity/Linkman'
+import Task from '@model/entity/Task'
 
 /** 
  * @description 工单创建编辑模型
@@ -10,7 +10,10 @@ export interface TaskCreateAndEditModel {
   // 地址
   address ?: Address;
   // 客户
-  customer ?: Customer;
+  customer ?: {
+    id: string,
+    name: string
+  };
   // 事件id(事件转工单用)
   eventId ?: string;
   // 事件编号(事件转工单用)
@@ -59,4 +62,49 @@ export interface PlanTaskCreateAndEditModel {
   };
   // 工单表单数据
   task ?: Task;
+}
+
+export interface TaskGetCardDetailListModel {
+  // 工单类型id
+  typeId: string
+}
+
+/* 工单搜索列表model */
+export interface TaskSearchListModel extends EsTaskSearchInput {
+  // 以下都是前端使用的，不涉及后端
+  orderDetail?: {
+    // 是否是系统字段
+    isSystem?: boolean
+    // 排序方式
+    sequence?: string
+    // 列名
+    column?: string
+  } | null
+  productAddress?: any
+  createTime?: string
+  planTime?: string
+  allotTime?: string
+  acceptTime?: string
+  startTime?: string
+  completeTime?: string
+  updateTime?: string
+  reviewTime?: string
+  balanceTime?: string
+  closeTime?: string
+  allotTypeStr?: string
+  tlmName?: string | null
+  paymentMethods?: string[]
+  tags?: any[]
+  states?: string[]
+  allotTypeStrs?: string[]
+  onceExceptions?: string[]
+  searchCondition?: string
+}
+
+/* 工单指派 查询人员列表model */
+export interface TaskAllotUserListByTagModel {
+  customerId: string
+  lat: string
+  lng: string
+  tagId: string
 }

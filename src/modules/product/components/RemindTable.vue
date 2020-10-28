@@ -44,7 +44,7 @@
 
 <script>
 import {formatDate, } from '@src/util/lang';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 import {deleteScheduler} from '@src/api/CommonApi';
 
 export default {

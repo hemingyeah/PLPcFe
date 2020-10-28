@@ -9,6 +9,8 @@ interface Column {
   export?: boolean
   // 字段
   field?: string
+  // 固定列
+  fixed?: boolean | 'left' | 'right'
   // 分组用的
   group?: string
   id?: string | number

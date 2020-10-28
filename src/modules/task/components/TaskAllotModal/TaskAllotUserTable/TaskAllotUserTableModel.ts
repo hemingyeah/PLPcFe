@@ -12,7 +12,7 @@ export const TaskAllotUserTableColumns = [
     "label": "员工",
     "field": "user",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "minWidth": "150px",
     "type": "column"
   },
@@ -20,7 +20,7 @@ export const TaskAllotUserTableColumns = [
     "label": "员工角色",
     "field": "userRole",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "minWidth": "150px",
     "type": "column"
   },
@@ -28,7 +28,7 @@ export const TaskAllotUserTableColumns = [
     "label": "未完成工单",
     "field": "unFinishedTask",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
@@ -37,7 +37,7 @@ export const TaskAllotUserTableColumns = [
     "label": "今日已完成",
     "field": "todayFinishedTask",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
@@ -46,7 +46,7 @@ export const TaskAllotUserTableColumns = [
     "label": "计划时间当天工单量",
     "field": "plantimeTodayTaskNum",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
@@ -55,7 +55,7 @@ export const TaskAllotUserTableColumns = [
     "label": "好评率",
     "field": "favorableRating",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
@@ -64,7 +64,7 @@ export const TaskAllotUserTableColumns = [
     "label": "距客户(KM)",
     "field": "location",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
@@ -73,7 +73,7 @@ export const TaskAllotUserTableColumns = [
     "label": "距客户车程",
     "field": "drive",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
@@ -82,7 +82,7 @@ export const TaskAllotUserTableColumns = [
     "label": "工作状态",
     "field": "userState",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
