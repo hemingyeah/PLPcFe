@@ -1,3 +1,4 @@
+//导出列选项
 const allExport = [
   {
     exportAlias: "state",
@@ -530,8 +531,30 @@ const allExport = [
     isGuideData: false,
     guideData: false,
   },
-]
+  {
+    id: 5460,
+    tableName: "customer",
+    isSystem: 1,
+    fieldName: "source",
+    exportAlias: "source",
+    displayName: "创建方式",
+    formType: "text",
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  }
 
+  
+]
+// 选择列数据or表哥title
 let fields = [
   {
     id: 476,
@@ -1273,6 +1296,25 @@ let fields = [
     id: 5460,
     tableName: "customer",
     isSystem: 1,
+    fieldName: "source",
+    displayName: "创建方式",
+    formType: "user",
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
+  {
+    id: 5460,
+    tableName: "customer",
+    isSystem: 1,
     fieldName: "eventNo",
     displayName: "关联事件",
     formType: "text",
@@ -1912,8 +1954,34 @@ const advancedList = [
     isGuideData: false,
     guideData: false,
   },
+  {
+    id: 5460,
+    tableName: "customer",
+    isSystem: 1,
+    fieldName: "source",
+    displayName: "创建方式",
+    formType: "select",
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {isMulti: false, dataSource:[
+      '全部',
+      '导入创建',
+      '手动创建',
+      'API创建',
+      '由事件创建',
+    ]},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
 ];
 
+//搜索显示字段
 const Inquire = [
   {
     id: 5460,
@@ -2361,7 +2429,31 @@ const Inquire = [
     isGuideData: false,
     guideData: false,
   },
-
+  {
+    id: 5460,
+    tableName: "customer",
+    isSystem: 1,
+    fieldName: "source",
+    displayName: "创建方式",
+    formType: "select",
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {isMulti: false, dataSource:[
+      '全部',
+      '导入创建',
+      '手动创建',
+      'API创建',
+      '由事件创建',
+    ]},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
   {
     id: 5460,
     tableName: "customer",
@@ -2369,7 +2461,6 @@ const Inquire = [
     fieldName: "eventNo",
     displayName: "关联事件",
     formType: "text",
-    // formType: "user",
     defaultValue: null,
     isNull: 1,
     isSearch: 1,
