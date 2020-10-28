@@ -239,7 +239,7 @@ export default {
           if (key !== 'customer' && key !== 'tags') {
             repeatBool = true
           } else {
-            if (this.$refs.taskInquireParams.returnData()['tags'].length) {
+            if (this.$refs.taskInquireParams.returnData()['tags'] && this.$refs.taskInquireParams.returnData()['tags'].length) {
               repeatBool = true
             }
             if (this.$refs.taskInquireParams.returnData()['customer']) {
