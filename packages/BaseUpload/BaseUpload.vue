@@ -107,7 +107,7 @@ export default {
     },
     validateFile(file){
       //验证文件大小
-      if(file.size > FileConfig.MAX_SIZE) return '只支持小于100m的文件';
+      if(file.size > FileConfig.MAX_SIZE) return '只支持小于50m的文件';
 
       //验证文件类型
       //let fileName = file.name;      
