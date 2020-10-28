@@ -483,12 +483,12 @@
                   <div @click="reallotBatch">工单转派</div>
                 </el-dropdown-item>
                 <!-- start 批量生成服务报告 -->
-                <el-dropdown-item v-if="isSystemAdmin">
+                <el-dropdown-item v-if="isShowBatchCreateOrPrintReport">
                   <div @click="batchCreateServiceReport">批量生成服务报告</div>
                 </el-dropdown-item>
                 <!-- end 批量生成服务报告 -->
                 <!-- start 批量打印服务报告 -->
-                <el-dropdown-item v-if="isSystemAdmin">
+                <el-dropdown-item v-if="isShowBatchCreateOrPrintReport">
                   <div @click="batchPrintServiceReport">批量打印服务报告</div>
                 </el-dropdown-item>
                 <!-- end 批量打印服务报告 -->
@@ -598,6 +598,18 @@
                       scope.row["customerEntity"] &&
                       scope.row["customerEntity"].name
                     }}
+                  </div>
+                </template>
+
+                <!-- 关联事件 -->
+                <template v-else-if="column.field === 'eventNo'">
+                  <div
+                    :class="{
+                      'view-detail-btn task-client': scope.row.linkAuth,
+                    }"
+                    @click.stop="openEventTab(scope.row)"
+                  >
+                    {{ scope.row["eventNo"]}}
                   </div>
                 </template>
 
