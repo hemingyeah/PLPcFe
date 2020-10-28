@@ -3,7 +3,7 @@ $proccess-border-height: 32px;
 $progress-state-common-bg-color: #F2F2F2;
 $progress-state-before-bg-color: #E1F3D8;
 
-@mixin triangle-color($backgroundColor: '', $borderColor: '') {
+@mixin triangle-color($backgroundColor: '', $borderColor: 'none') {
   & {
     border: 1px solid $backgroundColor;
   }
