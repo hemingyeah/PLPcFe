@@ -82,7 +82,7 @@ export default {
 <style lang="scss">
 .cascader-setting-option{
   position: relative;
-  padding: 5px 0;
+  padding: 3px 0;
   display: flex;
   .cascader-setting-left{
     display: flex;
@@ -163,7 +163,7 @@ export default {
 
 .cascader-setting-option-active{
  input[type='text']{
-   background-color: #F5F7FA;
+  //  background-color: #F5F7FA;
  } 
 }
 </style>

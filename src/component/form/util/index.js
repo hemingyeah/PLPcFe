@@ -1,5 +1,7 @@
 import { assign } from 'lodash'
 import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
+/* utils */
+import { formatDate } from '@src/util/lang'; 
 
 import FormField from '../FormField';
 
@@ -121,6 +123,8 @@ export function initialize(fields = [], origin = {}, callback){
     let fieldName = field.fieldName;
     let dataSource = setting.dataSource || [];
     let defaultValue = field.defaultValue || '';
+    let { defaultValueConfig } = setting || {};
+    let { isCurrentDate } = defaultValueConfig || {};
     
     // 客户和编号类型不出初始化值
     if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
@@ -169,7 +173,11 @@ export function initialize(fields = [], origin = {}, callback){
     if(isMultiSelect(field) && !Array.isArray(formData)) {
       formData = formData ? [formData] : [];
     }
-    
+    // 日期 若设置默认值，将系统时间设为默认值
+    if( formType == 'date' && ( JSON.stringify(defaultValueConfig) !== '{}' && isCurrentDate == 1)){
+      defaultValue = formatDate(new Date());
+    }
+
     result[fieldName] = formData == null ? defaultValue : formData;
   });
 

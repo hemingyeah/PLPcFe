@@ -30,11 +30,8 @@
       <h4 class="form-item-title">日期格式</h4>
       <div class="form-item-box form-date-type">
         <div class="form-setting-item" >
-          <el-select v-model="field.setting.dateType" @change="update(field.setting.dateType, 'dateType', true)" placeholder="请选择日期格式">
-            <el-option label="年-月-日" value="yyyy-MM-dd"></el-option>
-            <el-option label="年-月-日 时:分" value="yyyy-MM-dd HH:mm"></el-option>
-            <el-option label="年-月-日 时:分:秒" value="yyyy-MM-dd HH:mm:ss"></el-option>
-            <el-option label="年-月" value="month"></el-option>
+          <el-select v-model="dateType" @change="update(dateType, 'dateType', true)" placeholder="请选择日期格式">
+            <el-option  v-for="item in pickerMapOption" :label="item.lable" :value="item.format" :key="item.format"></el-option>
           </el-select>
         </div>
       </div>
@@ -69,12 +66,23 @@
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
-
+import pickerOption from './pickerOption';
 export default {
   name: 'form-date-setting',
   mixins: [SettingMixin],
   props: settingProps,
+  data() {
+    return{
+      dateType: this.field.setting.dateType || "yyyy-MM-dd"
+    }
+  },
   computed: {
+    /** 
+    * @description 获取日期格式选择项
+    */
+    pickerMapOption() {
+      return pickerOption;
+    },
     /** 
     * @description 默认选择当前时间
     */
@@ -90,12 +98,9 @@ export default {
       
       this.update(value, prop)
     },
-    update(value, prop, isSetting = false){   
-      if(prop == 'defaultValueConfig') {
-        let newDate = this.defaultValueConfig.isCurrentDate == 1 ? new Date() : null;
-        this.$emit('input', {value: newDate, prop: 'defaultValue'});
-      }
+    update(value, prop, isSetting = false){ 
       this.$emit('input', {value, prop, isSetting})
+
     }
   }
 }
