@@ -7,7 +7,7 @@ export function customerAddressSelectConversion(customerAddress: any): any {
   let { province, city, dist, address, id } = customerAddress;
 
   return Object.freeze({
-    label: `${province}${city}${dist}${address}`,
+    label: `${province || ''}${city || ''}${dist || ''}${address || ''}`,
     value: id,
     ...customerAddress
   })
