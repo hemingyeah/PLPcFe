@@ -3,8 +3,8 @@ import {notification} from '@src/platform/message';
 import Exception from '@model/Exception';
 import http from '@src/util/http';
 
-export const FILE_MAX_SIZE = 100 * 1024 * 1024; // 单位字节(Byte) 【原先10MB，需求1102改成100MB】
-export const WIKI_FILE_MAX_SIZE = 100 * 1024 * 1024; // 100M
+export const FILE_MAX_SIZE = 50 * 1024 * 1024; // 单位字节(Byte) 【原先10MB，需求1102改成50MB】
+export const WIKI_FILE_MAX_SIZE = 50 * 1024 * 1024; // 50M
 export const FILE_MAX_NUM = 9;
 
 export const fileTypeObj = {
@@ -24,10 +24,10 @@ export function validate(file, source){
   console.log('source', source)
   if(source == 'wiki') {
     // 验证文件大小
-    if(file.size > WIKI_FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过100MB，系统暂不支持上传`);
+    if(file.size > WIKI_FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过50MB，系统暂不支持上传`);
   } else  {
     // 验证文件大小
-    if(file.size > FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过100MB，系统暂不支持上传`);
+    if(file.size > FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过50MB，系统暂不支持上传`);
   }
 
   

@@ -1,5 +1,5 @@
-//文件最大为50m 【注：原先10MB，需求1102改成100MB】
-const MAX_SIZE = 100 * 1024 * 1024;
+//文件最大为50m 【注：原先10MB，需求1102改成50MB】
+const MAX_SIZE = 50 * 1024 * 1024;
 
 //允许的图片类型
 const IMG_TYPE = ['png', 'bmp', 'gif', 'jpg', 'jpeg', 'jpg', 'tiff'];
