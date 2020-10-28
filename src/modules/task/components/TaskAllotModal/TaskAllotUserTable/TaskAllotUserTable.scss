@@ -1,0 +1,13 @@
+.task-allot-user-filter {
+  display: flex;
+  
+  .biz-team-select,
+  .base-select-container,
+  .el-select {
+    width: 150px;
+  }
+  
+  .biz-form-remote-select {
+    flex: none;
+  }
+}

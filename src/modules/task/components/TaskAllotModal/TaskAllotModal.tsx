@@ -33,7 +33,7 @@ type DepeMultiUserResult = { status: number, data: { users: User[] } }
 
 export default class TaskAllotModal extends Vue {
   
-  /* 用户状态 */
+  /* 用户工作状态 */
   @Prop() userStateMap: any | undefined
   
   /* 派单方式 */
