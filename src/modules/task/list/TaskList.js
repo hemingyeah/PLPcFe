@@ -1806,16 +1806,19 @@ export default {
         let source;
         switch (params.source) {
           case "由事件创建":
-            source = 3;
+            source = '由事件创建';
             break;
           case "API创建":
-            source = 2;
+            source = '开放API';
             break;
           case "导入创建":
-            source = 1;
+            source = '导入创建';
             break;
           case "手动创建":
-            source = 0;
+            source = '手动创建';
+            break;
+          case "计划任务创建":
+            source = '计划任务创建';
             break;
           default:
             source = "";

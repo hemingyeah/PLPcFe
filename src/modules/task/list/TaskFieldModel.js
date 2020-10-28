@@ -1971,6 +1971,7 @@ const advancedList = [
       '手动创建',
       'API创建',
       '由事件创建',
+      '计划任务创建'
     ]},
     orderId: 1,
     isDelete: 0,
@@ -2446,6 +2447,7 @@ const Inquire = [
       '手动创建',
       'API创建',
       '由事件创建',
+      '计划任务创建'
     ]},
     orderId: 1,
     isDelete: 0,
