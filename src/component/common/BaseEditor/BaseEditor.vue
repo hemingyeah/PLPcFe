@@ -106,7 +106,7 @@ export default {
 
       const file = files[0];
       if (!file) return;
-      if (file.size > Uploader.FILE_MAX_SIZE) return platform.alert('系统暂不支持大小超过10M的图片上传')
+      if (file.size > Uploader.FILE_MAX_SIZE) return platform.alert('系统暂不支持大小超过50M的图片上传')
 
       this.pending = true;
       this.loading = true;
