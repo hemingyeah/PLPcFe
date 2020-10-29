@@ -59,9 +59,12 @@
           </div>
           <div class="page-row">
             <div class="page-row-left">图片：</div>
-            <div class="page-row-right">
-              <template v-if="part.image">
-                <img class="part-image" :src="part.image" @click="preview" alt="备件图片">
+            <div class="page-row-right" style="flex-wrap: wrap; display: flex;">
+              <template v-if="Array.isArray(part.imageList) && part.imageList.length > 0">
+                <img class="part-image" style="padding: 5px" v-for="(img, idx) in part.imageList" :key="idx" :src="img" @click="preview($event)" alt="备件图片">
+              </template>
+              <template v-else-if="part.image">
+                <img class="part-image" :src="part.image" @click="preview($event)" alt="备件图片">
               </template>
             </div>
           </div>
@@ -327,9 +330,9 @@ export default {
       this.pending = false;
     },
     //备件图片预览
-    preview(){
-      let imgs = this.$el.querySelectorAll('.part-image');
-      BaseGallery.preview(imgs[0])
+    preview(event){
+      // let imgs = this.$el.querySelectorAll('.part-image');
+      BaseGallery.preview(event.currentTarget);
     },
     switchTab(tab){
       if(this.activeTab == tab) return;
