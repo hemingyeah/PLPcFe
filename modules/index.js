@@ -34,7 +34,8 @@ module.exports = {
     template: 'src/modules/system/frame/index.html'
   },
   'system.demo': {
-    entry: './src/modules/system/demo/index.js'
+    entry: './src/modules/system/demo/index.js',
+    template: 'src/templates/map.html'
   },
 
   // ------------ 订阅通知日报 ------------

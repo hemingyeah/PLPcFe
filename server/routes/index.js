@@ -87,9 +87,11 @@ router.get('/', async (ctx) => {
   );
 });
 
-router.get('/demo', async (ctx) => {
-  let script = ['/system.demo.js'];
-  ctx.body = Template.renderWithData('demo', {}, script);
+router.get("/demo", async (ctx) => {
+  let script = ["/system.demo.js"];
+  let modConfig = modules['system.demo']
+
+  ctx.body = Template.renderWithData("demo", {}, script, modConfig.template);
 });
 
 router.get('/performance/list', async (ctx) => {
