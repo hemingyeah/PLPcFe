@@ -16,7 +16,8 @@
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
     "comp": "node script/component.js",
     "tag": "./script/tag.sh ${1} ${2}",
-    "br": "./script/br.sh ${1} ${2} ${3}"
+    "br": "./script/br.sh ${1} ${2} ${3}",
+    "commit-lint": "./script/commit-message.sh"
   },
   "author": "dongls",
   "license": "ISC",
@@ -113,6 +114,11 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint --config .commitlintrc.js -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run commit-lint"
     }
   }
 }

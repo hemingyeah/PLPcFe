@@ -25,42 +25,39 @@
                   <i class="iconfont icon-triangle-down task-icon"></i>
                 </div>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    class="task-view-customize"
-                  >
+                  <el-dropdown-item class="task-view-customize">
                     <div
                       v-for="(item, index) in otherList"
                       :key="index"
-                      @click="checkOther(item)"
                       class="task-flex task-ai task-pointer"
                     >
-                      <span class="task-list-dropdown-item">{{
-                        item.name
-                      }}</span>
+                      <span
+                        class="task-list-dropdown-item"
+                        @click="checkOther(item)"
+                      >
+                        {{ item.name }}</span
+                        >
                       <div class="task-list-dropdown-icon">
-                          <el-tooltip content="查看筛选条件" placement="top">
-                            <i class="iconfont icon-yanjing task-font12" @click.stop="$refs.taskView.open(item.id, 1)"></i>
-                          </el-tooltip>
-                          <el-tooltip content="编辑视图" placement="top">
+                        <el-tooltip content="查看筛选条件" placement="top">
+                          <i
+                            class="iconfont icon-yanjing task-font12"
+                            @click="$refs.taskView.open(item.id, item.name, 1)"
+                          ></i>
+                        </el-tooltip>
+                        <!-- <el-tooltip content="编辑视图" placement="top">
                             <i
                               class="iconfont icon-bianji1 task-ml12 task-font12"
                               @click.stop="editView(item)"
-                              v-if="
-                                initData.loginUser &&
-                                  item.userId === initData.loginUser.userId
-                              "
+                              v-if="item.authEdit"
                             ></i>
-                          </el-tooltip>
-                          <el-tooltip content="删除视图" placement="top">
-                            <i
-                              class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                              @click.stop="editView(item)"
-                              v-if="
-                                initData.loginUser &&
-                                  item.userId === initData.loginUser.userId
-                              "
-                            ></i>
-                          </el-tooltip>
+                          </el-tooltip> -->
+                        <el-tooltip content="删除视图" placement="top">
+                          <i
+                            class="iconfont icon-shanchu-copy task-ml12 task-font12"
+                            @click.stop="$refs.viewModel.deleteViewBtn(item.id)"
+                            v-if="item.authEdit"
+                          ></i>
+                        </el-tooltip>
                       </div>
                     </div>
                   </el-dropdown-item>
@@ -75,9 +72,13 @@
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
+
               <el-input
                 v-model="params.keyword"
-                :placeholder="taskSearchInputPlaceholderMap[keyword_select] || taskSearchInputPlaceholderMap.default"
+                :placeholder="
+                  taskSearchInputPlaceholderMap[keyword_select] ||
+                    taskSearchInputPlaceholderMap.default
+                "
                 class="task-with-input task-ml12"
               >
                 <el-select
@@ -115,13 +116,10 @@
         </div>
         <!-- 筛选 -->
         <div class="task-list-header-nav">
-          <div class="task-flex task-ai">
+          <div class="task-flex">
             <div class="task-font14 task-c6 state">工单状态：</div>
-            <div class="list" :style="`width: ${navWidth}px`">
-              <div
-                class="list-item task-flex task-ai"
-                :style="`width:${8 * 130}px`"
-              >
+            <div class="list task-flex" :style="stateHeight">
+              <div class="list-item task-flex task-ai">
                 <!-- 全部工单 -->
                 <div
                   v-for="item in taskView"
@@ -277,9 +275,23 @@
                 </div>
               </div>
             </div>
+            <div
+              class="element-icon"
+              v-if="910 > navWidth"
+              @click="
+                stateHeight =
+                  stateHeight === `height:30px` ? `height:auto` : `height:30px`
+              "
+            >
+              <i
+                class="el-icon-arrow-down task-icon"
+                v-if="stateHeight === 'height:30px'"
+              ></i>
+              <i class="el-icon-arrow-up task-icon" v-else></i>
+            </div>
           </div>
           <!-- 创建 -->
-          <div class="task-flex task-ai">
+          <div class="task-flex">
             <div class="task-font14 task-c6 state">创建视角：</div>
             <div class="list list-crate" :style="`width: ${navWidth}px`">
               <div class="list-item task-flex task-ai">
@@ -288,10 +300,8 @@
                   :key="index"
                   class="task-nav-create"
                   :class="{ 'task-c2': selectId === item.id }"
-                  @click="
-                    loading = true;
-                    selectId = item.id;
-                    search(searchParams);
+                  @click.stop="
+                    createPerspective(item)
                   "
                 >
                   {{ item.name }}
@@ -299,15 +309,10 @@
               </div>
             </div>
           </div>
-          <div class="task-flex task-ai">
-            <div class="task-font14 task-c6 state">
-              工单类型：
-            </div>
-            <div class="list" :style="`width: ${navWidth}px`">
-              <div
-                class="list-item task-flex task-ai"
-                :style="`width:${taskTypes.length * 130}px`"
-              >
+          <div class="task-flex">
+            <div class="task-font14 task-c6 state">工单类型：</div>
+            <div class="list" :style="typeHeight">
+              <div class="list-item task-flex task-ai">
                 <div
                   v-for="item in taskTypes"
                   :key="item.id"
@@ -319,6 +324,20 @@
                 </div>
               </div>
             </div>
+            <div
+              class="element-icon"
+              v-if="taskTypes.length * 130 > navWidth"
+              @click="
+                typeHeight =
+                  typeHeight === `height:30px` ? `height:auto` : `height:30px`
+              "
+            >
+              <i
+                class="el-icon-arrow-down task-icon"
+                v-if="typeHeight === 'height:30px'"
+              ></i>
+              <i class="el-icon-arrow-up task-icon" v-else></i>
+            </div>
           </div>
         </div>
       </div>
@@ -329,13 +348,17 @@
       <task-search-panel
         :init-data="initData"
         :config="seoSetList"
-        :searchParams="searchParams"
+        :search-params="searchParams"
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
         v-if="advanceds.length"
+        @bj="showBj = false"
       >
-        <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
+        <div
+          class="advanced-search-btn-group task-flex task-buttom"
+          slot="footer"
+        >
           <base-button type="primary" @event="editView">存为视图</base-button>
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
@@ -370,7 +393,7 @@
               v-if="exportPermissionTaskEdit"
               @click="delTask"
             >
-              <i class="iconfont icon-qingkongshanchu task-icon"></i>
+              <i class="iconfont icon-shanchu1 task-icon"></i>
               删除
             </div>
             <!-- 批量编辑 -->
@@ -420,9 +443,7 @@
 
             <!-- start 更多操作 -->
             <!-- v-if="exportPermission" -->
-            <el-dropdown
-              trigger="click"
-            >
+            <el-dropdown v-if="exportPermission || exportPermissionTaskEdit">
               <div
                 class="task-ai task-flex task-font14 task-c6 task-pointer"
                 @click="trackEventHandler('moreAction')"
@@ -486,13 +507,15 @@
           <span class="task-c2" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
-        <div class="task-list-section common-list-table-view" v-if="columns.length">
+        <div
+          class="task-list-section common-list-table-view"
+          v-if="columns.length"
+        >
           <el-table
             stripe
             :data="taskPage.list"
             :highlight-current-row="false"
             :key="tableKey"
-            :row-key="getRowKey"
             :border="true"
             @select="handleSelection"
             @select-all="handleSelection"
@@ -552,7 +575,10 @@
                   <!-- 暂停中 -->
                   <span
                     class="task-state-block task-state-block-overtime task-font12"
-                    v-if="new Date().getTime() > new Date(scope.row.overTime).getTime()"
+                    v-if="
+                      new Date().getTime() >
+                        new Date(scope.row.overTime).getTime()
+                    "
                   >
                     超时
                   </span>
@@ -566,9 +592,29 @@
                     }"
                     @click.stop="openClientTab(scope.row)"
                   >
-                    {{ scope.row["customerEntity"] && scope.row["customerEntity"].name }}
+                    {{
+                      scope.row["customerEntity"] &&
+                        scope.row["customerEntity"].name
+                    }}
                   </div>
                 </template>
+
+                <!-- 创建方式 -->
+                <!-- <template v-else-if="column.field === 'source'">
+                  <span>{{ scope.row["source"]}}</span>
+                </template> -->
+
+                <!-- 关联事件 -->
+                <!-- <template v-else-if="column.field === 'eventNo'">
+                  <div
+                    :class="{
+                      'view-detail-btn task-client': scope.row.linkAuth,
+                    }"
+                    @click.stop="openEventTab(scope.row)"
+                  >
+                    {{ scope.row["eventNo"]}}
+                  </div>
+                </template> -->
 
                 <!-- 联系人 -->
                 <template v-else-if="column.field === 'tlmName'">
@@ -614,17 +660,16 @@
                 <template v-else-if="column.field === 'product'">
                   {{
                     scope.row.products &&
-                      scope.row.products
-                        .map((product) => product.name)
-                        .join(", ")
+                      scope.row.products.map((product) => product.name).join(", ")
                   }}
                 </template>
 
-                <!-- 创建人 和 负责人 -->
+                <!-- 创建人 和 负责人 、派单人 -->
                 <template
                   v-else-if="
                     column.field === 'createUserName' ||
-                      column.field === 'executorName'
+                      column.field === 'executorName' ||
+                      column.field === 'allotName'
                   "
                 >
                   <template v-if="permissionTaskView">
@@ -633,28 +678,18 @@
                       class="view-detail-btn"
                       @click.stop.prevent="
                         openUserTab(
-                          column.field === 'createUserName'
-                            ? scope.row.createUser.userId
-                            : scope.row.executorUser.userId
+                          presonDisplayObj('useId', column.field, scope.row)
                         )
                       "
                     >
                       {{
-                        column.field === "executorName"
-                          ? scope.row.executorUser &&
-                            scope.row.executorUser.displayName
-                          : scope.row.createUser &&
-                            scope.row.createUser.displayName
+                        presonDisplayObj("displayName", column.field, scope.row)
                       }}
                     </a>
                   </template>
                   <template v-else>
                     {{
-                      column.field === "executorName"
-                        ? scope.row.executorUser &&
-                          scope.row.executorUser.displayName
-                        : scope.row.createUser &&
-                          scope.row.createUser.displayName
+                      presonDisplayObj("displayName", column.field, scope.row)
                     }}
                   </template>
                 </template>
@@ -674,13 +709,25 @@
                   {{ allotTypeText(scope.row.allotType) }}
                 </template>
 
+                <!-- 服务团队(负责人所在的团队) -->
+                <template v-else-if="column.field === 'executorTags'">
+                  {{ formatExecutorTags(scope.row[column.field]) }}
+                </template>
+
+                <!-- 审批状态 -->
+                <template v-else-if="column.field === 'inApprove'">
+                  {{ scope.row.inApprove | displayApprove}}
+                </template>
                 <!-- 工单状态 -->
                 <template v-else-if="column.field === 'state'">
                   <!-- 暂停中 -->
                   <div
                     class="task-state-block task-font12"
                     v-if="scope.row.isPaused == 1"
-                    style="color: rgba(153, 153, 153);background-color: rgba(153, 153, 153, .2)"
+                    style="
+                      color: rgba(153, 153, 153);
+                      background-color: rgba(153, 153, 153, 0.2);
+                    "
                   >
                     已暂停
                   </div>
@@ -690,11 +737,10 @@
                     class="task-state-block task-font12"
                     :style="{
                       backgroundColor: taskStateEnum.getBgColor(
-                        scope.row[column.field], 0.2
+                        scope.row[column.field],
+                        0.2
                       ),
-                      color: taskStateEnum.getColor(
-                        scope.row[column.field]
-                      ),
+                      color: taskStateEnum.getColor(scope.row[column.field]),
                     }"
                   >
                     {{
@@ -739,12 +785,14 @@
 
                 <!-- 时间 -->
                 <template v-else-if="column.formType === 'datetime'">
-                <template v-if="!column.isSystem">
-                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
-                </template>
-                <template v-else>
-                  {{ scope.row[column.field] | fmt_datetime }}
-                </template>
+                  <template v-if="!column.isSystem">
+                    {{
+                      scope.row.attribute && scope.row.attribute[column.field]
+                    }}
+                  </template>
+                  <template v-else>
+                    {{ scope.row[column.field] | fmt_datetime }}
+                  </template>
                 </template>
 
                 <div
@@ -752,7 +800,7 @@
                   v-html="buildTextarea(scope.row.attribute[column.field])"
                   @click="openOutsideLink"
                 ></div>
-                
+
                 <!-- 接单用时 -->
                 <template v-else-if="column.field === 'acceptUsedTimeStr'">
                   {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
@@ -780,18 +828,24 @@
                   {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
                 </template>
                 <template v-else-if="!column.isSystem">
-                  <template v-if="scope.row.attribute && Array.isArray(scope.row.attribute[column.field])">
-                    {{scope.row.attribute[column.field].join(',')}}
+                  <template
+                    v-if="
+                      scope.row.attribute &&
+                        Array.isArray(scope.row.attribute[column.field])
+                    "
+                  >
+                    {{ scope.row.attribute[column.field].join(",") }}
                   </template>
                   <template v-else>
-                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                    {{
+                      scope.row.attribute && scope.row.attribute[column.field]
+                    }}
                   </template>
                 </template>
 
                 <template v-else>
                   {{ scope.row[column.field] }}
                 </template>
-
               </template>
             </el-table-column>
           </el-table>
@@ -912,6 +966,8 @@
     <!-- E 地图预览 -->
     <!-- 视图展示 -->
     <task-view ref="taskView" @_searchModel="_searchModel" />
+
+    <div class="task-bj" v-show="showBj"></div>
   </div>
 </template>
 

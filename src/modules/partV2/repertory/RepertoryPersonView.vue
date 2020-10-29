@@ -360,7 +360,7 @@
               :label="column.label"
               :width="column.width">
 
-              <template slot-scope="scope" v-if="scope.row.userId == userId && (scope.row.repertoryCount - scope.row.occupyNum) > 0 && isShowPartBack">
+              <template slot-scope="scope" v-if="scope.row.back">
                 <el-button type="text" class="no-padding" @click="partBack(scope.row)">退回</el-button>
               </template>
             </el-table-column>
@@ -464,11 +464,13 @@
             >
               <template slot-scope="scope">
                 <a
+                  v-if="scope.row.canViewTask"
                   class="no-padding el-button no-padding el-button--text"
                   style="color: #55B7B4;text-decoration: none;"
-                  @click.prevent="openTaskDetail2(scope.row.taskNo)">
+                  @click.prevent="openTaskDetail2(scope.row)">
                   {{scope.row.taskNo}}
                 </a>
+                <span v-else>{{scope.row.taskNo}}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -481,11 +483,13 @@
             >
               <template slot-scope="scope">
                 <a
+                  v-if="scope.row.canViewCustomer"
                   class="no-padding el-button no-padding el-button--text"
                   style="color: #55B7B4;text-decoration: none;"
                   @click.prevent="openCustomerDetail(scope.row.customer)">
                   {{scope.row.customerNumber}}
                 </a>
+                <span v-else>{{scope.row.customerNumber}}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -589,7 +593,7 @@
                  :action="exportAction"
                  :method="'post'"></base-export>
 
-    <part-back-form ref="partBackForm" @success="loadData" :repertory="repertory" ></part-back-form>
+    <part-back-form ref="partBackForm" @success="loadData" :backUser='backUser' :repertory="repertory" ></part-back-form>
 
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title" style="display: flex;justify-content: space-between;align-items: center">
@@ -776,7 +780,9 @@ export default {
       updateTimeValue:'',
       modelOther: _.assign({}, processModel),
       isTooltipShow: false,
-      applyBackingTask: {}
+      applyBackingTask: {},
+
+      backUser:{},
     }
   },
   computed: {
@@ -851,9 +857,15 @@ export default {
         fromId
       })
     },
-    async openTaskDetail2(taskNo){
-      const result=await this.$http.get('http://30.40.56.82:3000/mock/59/outside/pc/task/getTaskIdByNo');
-      console.log(result);
+    async openTaskDetail2(item){
+      let fromId = window.frameElement.getAttribute('id');
+      this.$platform.openTab({
+        id: `task_view_${item.taskId}`,
+        title: `工单${item.taskNo}`,
+        close: true,
+        url: `/task/view/${item.taskId}?noHistory=1`,
+        fromId,
+      });
     },
     openCustomerDetail(customerId){
       let fromId = window.frameElement.getAttribute('id');
@@ -1006,6 +1018,8 @@ export default {
     },
     async partBack(stock){
       this.trackEventHandler('listBack');
+      this.backUser=stock;
+      console.log(stock);
 
       this.$refs.partBackForm.open(stock)
     },

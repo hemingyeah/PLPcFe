@@ -843,7 +843,7 @@
         @open='partDearOpen'
         :close-on-click-modal="false"
       >
-        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' @getTargetList='getTargetList' :targetList='targetList' :prop-data="partDealData"></part-deal-with-form>
+        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' @updateDetail='updateDetail' @getTargetList='getTargetList' :targetList='targetList' :loginUserId='userId' :prop-data="partDealData"></part-deal-with-form>
 
         <div
           slot="footer"
@@ -1310,7 +1310,7 @@ export default {
   methods: {
     // 获取目标仓库
     getTargetList(){
-      this.$http.get('/partV2/repertory/listForTeam').then(result => {
+      return this.$http.get('/partV2/repertory/listForTeam').then(result => {
         this.targetList = result || [];
       })
     },
@@ -2862,7 +2862,10 @@ export default {
         this.partDealData.data.approveNo
       );
     },
-    showPartDealDetail(obj) {
+    updateDetail(obj){
+      this.showPartDealDetail(obj,true);
+    },
+    showPartDealDetail(obj,flag=false) {
       console.log('hbc: showPartDealDetail -> obj', obj)
       getRelationListByApproveNo({
         approveNo: obj.approveNo
@@ -2912,7 +2915,7 @@ export default {
             approveNo,
             type,
             prosperName,
-            targetName,
+            targetName:flag?result.relations[0].targetName:targetName,
             sourceTargetName,
             state,
             cancel,
@@ -2923,14 +2926,18 @@ export default {
             remark: result.list.remark || '',
             staffs: result.staffs
           },
-          progress:result.progress
+          progress:result.progress.filter(item=>item.state<7)
         };
         if(this.partDealData.data.state==='suspending' || this.partDealData.data.state==='dealing'){
           this.partDealTitle=`申请单-${this.partDealData.data.type}`;
         }else{
           this.partDealTitle='出入库单详情';
         }
-        this.partDealDialog = true;
+        if(!flag) this.partDealDialog=true;
+        if(flag){
+          this.partDealKey++;
+          this.loadData();
+        }
       });
     },
   },
