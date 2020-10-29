@@ -1,10 +1,10 @@
-import PageInput from './PageInput'
-import Condition from './Condition'
-import EsSort from './EsSort'
+import PageInput from '@model/types/PageInput'
+import Condition from '@model/types/Condition'
+import EsSort from '@model/types/EsSort'
 
-import TaskListViewEnum from './../enum/TaskViewEnum'
-import TaskFlagEnum from './../enum/TaskFlagEnum'
-import TaskSearchConditionEnum from './../enum/TaskSearchConditionEnum'
+import TaskListViewEnum from '@model/enum/TaskViewEnum'
+import TaskFlagEnum from '@model/enum/TaskFlagEnum'
+import TaskSearchConditionEnum from '@model/enum/TaskSearchConditionEnum'
 
 /* 工单搜索对象 */
 class EsTaskSearchInput extends PageInput {

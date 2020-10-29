@@ -1,6 +1,6 @@
 /* vue */
 import Component from 'vue-class-component'
-import { Vue, Prop } from 'vue-property-decorator'
+import { Vue, Prop, Ref } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* api */
 import { getCustomer } from '@src/api/CustomerApi.ts'
@@ -12,6 +12,7 @@ import UserButton from '@src/modules/task/components/TaskAllotModal/UserButton/U
 import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* enum */
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* model */
 import { getCustomerDetailResult } from '@model/param/out/Customer'
@@ -28,7 +29,7 @@ interface User {
 type DepeMultiUserResult = { status: number, data: { users: User[] } }
 
 @Component({
-  name: 'task-allot-modal',
+  name: ComponentNameEnum.TaskAllotModal,
   components: {
     [TaskAllotType.name]: TaskAllotType,
     [TaskAllotUserTable.name]: TaskAllotUserTable,
@@ -37,7 +38,6 @@ type DepeMultiUserResult = { status: number, data: { users: User[] } }
 })
 
 export default class TaskAllotModal extends Vue {
-  
   /* 客户id */
   @Prop() customerId: string | undefined
   /* 用户工作状态 */
@@ -64,7 +64,7 @@ export default class TaskAllotModal extends Vue {
       selected: this.synergyUserList,
       max: 14
     }
-
+    
     // @ts-ignore
     this.$fast.contact.choose('dept', options)
       .then((result: DepeMultiUserResult) => {
@@ -93,6 +93,9 @@ export default class TaskAllotModal extends Vue {
       if (!isSuccess) return
       
       this.customer = Object.freeze(result.data || {})
+      
+      // @ts-ignore
+      this.$refs.TaskAllotUserTableComponent.outsideFetchTeamUsers()
       
     }).catch(err => {
       console.error(err)
@@ -165,7 +168,7 @@ export default class TaskAllotModal extends Vue {
           {this.renderSynergy()}
         </div>
         <div class='task-allot-content'>
-          <task-allot-user-table />
+          <task-allot-user-table ref='TaskAllotUserTableComponent' />
         </div>
       </base-modal>
     )

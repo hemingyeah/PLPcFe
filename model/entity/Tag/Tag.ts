@@ -3,30 +3,30 @@ import TagPlace from '@model/entity/Tag/TagPlace'
 
 class Tag {
   
-  private static serialVersionUID: any
+  public static serialVersionUID: any
   
-  private id: String = ''
-  private tenantId: String= ''
+  public id?: String = ''
+  public tenantId?: String= ''
   // 标签名字
-  private tagName: String = ''
+  public tagName?: String = ''
   // 标签颜色
-  private tagColor: String = ''
+  public tagColor?: String = ''
   // 创建时间
-  private createTime: Date | string = ''
+  public createTime?: Date | string = ''
   // 团队主管
-  private teamLeaders: any[] = []
+  public teamLeaders?: any[] = []
   // 主团队
-  private parent: Tag = new Tag()
+  public parent?: Tag = new Tag()
   // 子团队
-  private children: Tag[] = []
+  public children?: Tag[] = []
   // 描述
-  private description: string = ''
+  public description?: string = ''
   //联系方式
-  private phone: string = ''
+  public phone?: string = ''
   //团队位置
-  private tagAddress: TagAddress = new TagAddress()
+  public tagAddress?: TagAddress = new TagAddress()
   //负责区域
-  private tagPlaceList: TagPlace[] = []
+  public tagPlaceList?: TagPlace[] = []
 }
 
 export default Tag

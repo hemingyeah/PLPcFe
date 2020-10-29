@@ -1,10 +1,15 @@
+/* api */
+import { getUserListByTag } from '@src/api/TaskApi'
+/* enum */
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
-import CustomerAddress from '@model/entity/CustomerAddress'
+import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
 /* model */
 import Page from '@model/Page'
 import { TaskAllotUserTableColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableModel'
+import { getUserListByTagResult } from '@model/param/out/Task'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTable.scss'
 /* types */
@@ -30,7 +35,7 @@ interface UserState {
 type ElSelectOption = {[x: string]: string}
 
 @Component({ 
-  name: 'task-allot-user-table'
+  name: ComponentNameEnum.TaskAllotUserTable
 })
 
 export default class TaskAllotUserTable extends Vue {
@@ -70,17 +75,17 @@ export default class TaskAllotUserTable extends Vue {
   
   /* 工单派单组件 */
   get TaskAllotModalComponent() {
-    return findComponentUpward(this, 'task-allot-modal') || {}
+    return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
   }
   
   /* 选择列 组件 */
   get BaseTableAdvancedSettingComponent() { 
-    return findComponentDownward(this, 'base-table-advanced-setting')
+    return findComponentDownward(this, ComponentNameEnum.BaseTableAdvancedSetting)
   }
 
-  /* 客户地址 */
-  get customerAddress(): CustomerAddress {
-    return this.TaskAllotModalComponent.customerAddress || new CustomerAddress()
+  /* 客户 */
+  get customer(): Customer {
+    return this.TaskAllotModalComponent.customer || {}
   }
   
   /* 是否是按团队派单 */
@@ -111,10 +116,36 @@ export default class TaskAllotUserTable extends Vue {
     return list
   }
   
-  private fetchTeamUser(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      resolve({})
-    })
+  /** 
+   * @description 获取团队用户
+   * -- 支持外部调用的
+  */
+  public outsideFetchTeamUsers(): Promise<any> {
+    return this.fetchTeamUsers()
+  }
+  
+  /** 
+   * @description 获取团队用户
+   * -- 内部调用的
+  */
+  private fetchTeamUsers(): Promise<any> {
+    let params = {
+      customerId: this.customer.id || '',
+      lat: String(this.customer?.customerAddress?.adLatitude) || '',
+      lng: String(this.customer?.customerAddress?.adLongitude) || '',
+      tagId: this.selectTeams.map(team => team.id).join()
+    }
+    
+    this.userPage = new Page()
+
+    return (
+      getUserListByTag(params).then((result: getUserListByTagResult) => {
+        let isSuccess = result.status == 0
+        if (!isSuccess) return
+        
+        this.userPage.list = result.data || []
+      })
+    )
   }
   
   /**
@@ -175,7 +206,7 @@ export default class TaskAllotUserTable extends Vue {
     return (
       <biz-form-remote-select
         placeholder='请选择工单负责人'
-        remoteMethod={this.fetchTeamUser}
+        remoteMethod={this.fetchTeamUsers}
         value={this.selectTeamUsers}
         onInput={this.handlerTeamUsersChange}
         scopedSlots={scopedSlots}
