@@ -401,30 +401,30 @@ export default {
           if (Object.keys(this.form).length === this.fields.length) return;
 
           this.fields.forEach((f) => {
-            let tv = ''
-            // 地址的默认值初始化为对象
-            if (f.formType == 'customerAddress' || f.formType == 'address')
-              tv = {};
-            if (f.formType == 'date' || f.formType == 'datetime') tv = [];
-            if (f.formType === 'link') {
-              tv = {};
-            }
-            if (f.fieldName === 'tags') {
-              tv = [];
-            }
-            if (f.formType === 'area') {
-              tv = [];
-            }
+            // let tv = ''
+            // // 地址的默认值初始化为对象
+            // if (f.formType == 'customerAddress' || f.formType == 'address')
+            //   tv = {};
+            // if (f.formType == 'date' || f.formType == 'datetime') tv = [];
+            // if (f.formType === 'link') {
+            //   tv = {};
+            // }
+            // if (f.fieldName === 'tags') {
+            //   tv = [];
+            // }
+            // if (f.formType === 'area') {
+            //   tv = [];
+            // }
 
-            if (f.formType === 'user') {
-              tv = []
-            }
+            // if (f.formType === 'user') {
+            //   tv = []
+            // }
 
             if (f.fieldName === 'tags' && f.formType === 'select') {
               this.form[f.fieldName] = [];
             }
 
-            this.form[f.fieldName] = this.inquireFormBackup[f.fieldName] || tv
+            // this.form[f.fieldName] = this.inquireFormBackup[f.fieldName] || tv
           });
         },
         searchCustomer(params) {

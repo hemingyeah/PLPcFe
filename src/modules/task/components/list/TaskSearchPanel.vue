@@ -225,7 +225,6 @@ export default {
     buildParams() {
       // 判断是否有重复选择
       let searchFormData = this.$refs.searchForm.returnData(), inPar = [], repeatBool;
-      console.log(this.$refs.taskInquireParams.returnData())
       for(let key in searchFormData) {
         if (JSON.stringify(searchFormData[key]) !== '[]' && searchFormData[key] && key !== 'backUp') {
           if (key !== 'area') {
