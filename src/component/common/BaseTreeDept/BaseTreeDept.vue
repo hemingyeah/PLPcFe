@@ -6,6 +6,7 @@
       @node-click="$emit('node-selected', $event)" 
       @node-check="$emit('node-check', $event)"
       @selected-change="selectedChange"
+      :expand="expand"
       :node-render="nodeRender">
     </base-tree-dept-node>
   </div>  
@@ -33,7 +34,11 @@ export default {
       type: Boolean,
       default: false
     },
-    nodeRender: Function
+    nodeRender: Function,
+    expand: {
+      type: Boolean,
+      default: false
+    },
   },
   methods: {
     selectedChange() {

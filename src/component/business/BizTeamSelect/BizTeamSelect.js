@@ -5,6 +5,7 @@ import Popper from 'popper.js';
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi'
 import {isEnterprise} from '@src/util/Platform';
+import BaseTreeDept from '../../common/BaseTreeDept';
 /**
  * TODO: item option render(jsx、template)
 */
@@ -378,10 +379,14 @@ const BizTeamSelect = {
             onInput={this.handleInput} />
           <div class="biz-team-select-panel" {...panelAttrs} ref="selectPanel">
             {content}
-            {this.renderTree(h, this.page.list)}
+            {/* {this.renderTree(h, this.page.list)} */}
+            <base-tree-dept data={this.page.list} expand={true} on-node-selected={this.choose} nodeRender={this.nodeRender}/>
           </div>
         </div>
       )
+    },
+    nodeRender(h, node) {
+      return (<span>{node.tagName}</span>);
     },
     /** 清除按钮 */
     renderClear() {
@@ -470,6 +475,9 @@ const BizTeamSelect = {
   },
   destroyed() {
     document.removeEventListener('click', this.onClose, true);
+  },
+  components: {
+    [BaseTreeDept.name]: BaseTreeDept
   }
 }
 

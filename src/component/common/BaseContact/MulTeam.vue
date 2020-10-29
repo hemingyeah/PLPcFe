@@ -453,7 +453,6 @@ export default {
     /** 抓取团队数据 */
     fetchTeam(){
       let params = {
-        onlyParent: true,
         pageNum: this.params.pageNum,
         pageSize: 0
       };
