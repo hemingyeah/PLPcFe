@@ -352,7 +352,7 @@
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
-        v-if="advanceds.length"
+        v-show="advanceds.length"
         @bj="showBj = false"
       >
         <div

@@ -63,6 +63,7 @@
         <task-inquire 
           ref="taskInquireParams" 
           :column-num="columnNum" 
+          :inquire-form-backup="inquireFormBackup"
           :config="[...config, ...taskTypeFilterFields]" 
           @setting="_setting"
         />
@@ -147,6 +148,7 @@ export default {
     return {
       columnNum: 1,
       formBackup: {},
+      inquireFormBackup: {},
       selfFields: [],
       taskInquireList: [],
       visible: false,
@@ -223,6 +225,7 @@ export default {
     buildParams() {
       // 判断是否有重复选择
       let searchFormData = this.$refs.searchForm.returnData(), inPar = [], repeatBool;
+      console.log(this.$refs.taskInquireParams.returnData())
       for(let key in searchFormData) {
         if (JSON.stringify(searchFormData[key]) !== '[]' && searchFormData[key] && key !== 'backUp') {
           if (key !== 'area') {
@@ -236,9 +239,12 @@ export default {
       }
       for(let key in this.$refs.taskInquireParams.returnData()) {
         if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key]) {
-          if (key !== 'customer' && key !== 'tags') {
+          if (key !== 'customer' && key !== 'tags' && key !== 'area') {
             repeatBool = true
           } else {
+            if (this.$refs.taskInquireParams.returnData()['area'] && this.$refs.taskInquireParams.returnData()['area'].province) {
+              repeatBool = true
+            }
             if (this.$refs.taskInquireParams.returnData()['tags'] && this.$refs.taskInquireParams.returnData()['tags'].length) {
               repeatBool = true
             }
@@ -251,9 +257,9 @@ export default {
       }
 
 
-
       const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()}
-      this.formBackup = Object.assign({}, form)
+      this.formBackup = Object.assign({}, this.$refs.searchForm.returnData())
+      this.inquireFormBackup = Object.assign({}, this.$refs.taskInquireParams.returnData())
       const taskInquireList = this.taskInquireList.length ? this.taskInquireList : [...this.config, ...this.taskTypeFilterFields]
       const isSystemFields = [...this.fields, ...taskInquireList].filter((f) => f.isSystem)
       const notSystemFields = [...this.fields, ...taskInquireList].filter((f) => !f.isSystem)
@@ -385,7 +391,8 @@ export default {
     buildTaskInquireParams(params) {
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields()
       const form = this.$refs.taskInquireParams.returnData() 
-      this.formBackup = Object.assign(this.formBackup, {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()});
+      this.formBackup = Object.assign(this.formBackup, {...this.$refs.searchForm.returnData()});
+      this.inquireFormBackup = Object.assign(this.inquireFormBackup, form)
 
       const isSystemFields = taskInquireList.filter((f) => f.isSystem);
       const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
@@ -678,6 +685,7 @@ export default {
     },
     resetParams() {
       this.formBackup = {};
+      this.inquireFormBackup = {}
       this.$refs.searchForm && this.$nextTick(this.$refs.searchForm.initFormVal)
       this.$refs.taskInquireParams && this.$nextTick(this.$refs.taskInquireParams.initFormVal)
     },

@@ -637,18 +637,17 @@ export default {
      * 存为视图和编辑视图
      */
     editView({region, id}) {
-      const moreConditions = this.$refs.searchPanel.buildParams().params
-      this.search('', true, true)
+      const {params, repeatBool} = this.$refs.searchPanel.buildParams()
       let bool, bool_text;
-      for(let key in moreConditions) {
+      for(let key in params) {
         if (key !== 'conditions' && key !== 'productAddress' && key !== 'systemConditions') {
           bool_text = key
         }
       }
-      for(let key in moreConditions) {
+      for(let key in params) {
         if(!bool_text) {
           bool = true
-          if (moreConditions['conditions'].length || moreConditions['systemConditions'].length || (moreConditions['productAddress'] && moreConditions['productAddress'].city)) {
+          if (params['conditions'].length || params['systemConditions'].length || (params['productAddress'] && params['productAddress'].city)) {
             bool = false
           }
         }
@@ -657,6 +656,14 @@ export default {
         this.$platform.alert('请您先设置筛选条件后再保存视图');
         return
       }
+
+      if (repeatBool) {
+        this.$platform.alert('筛选条件条件不能相同');
+        return
+      }
+
+      this.params.moreConditions = params;
+      this.search('', true, true)
       const selectCols = [];
       this.columns.map((item, index) => {
         if (item.show) {
@@ -727,7 +734,6 @@ export default {
             })
           }
           // this.multipleSelection = [];
-          console.log(33333,data);
           return data;
         })
         .then(() => {
@@ -1993,7 +1999,6 @@ export default {
           systemConditions,
           // eventNo: params.eventNo,
         };
-        console.log(111,par)
         // 工单搜索分类型
         if (this.keyword_select) {
           par.searchCondition = this.keyword_select

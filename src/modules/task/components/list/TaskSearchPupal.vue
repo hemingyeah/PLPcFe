@@ -43,11 +43,11 @@ export default {
   props: {
     taskTypeFilterFields: { // 自定义
       type: Array,
-      default: []
+      default: () => {[]}
     },
     config: { // 系统
       type: Array,
-      default: [],
+      default: () => {[]},
     },
     taskInquireList: {
       type: Array, // 用于判断
@@ -64,18 +64,10 @@ export default {
       this.loc()
     },
     checkSystemList() {
-      if (!this.checkSystemList.length || this.systemList.length === this.checkSystemList.length) {
-        this.isIndeterminateSys = false
-      } else {
-        this.isIndeterminateSys = true
-      }
+      this.checkList()
     },
     checkCustomizeList() {
-      if (!this.checkCustomizeList.length || this.customizeList.length === this.checkCustomizeList.length) {
-        this.isIndeterminateCus = false
-      } else {
-        this.isIndeterminateCus = true
-      }
+      this.checkList()
     }
   },
   data() {
@@ -109,6 +101,9 @@ export default {
         this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
         this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
       }
+    },
+
+    checkList() {
       if (!this.checkSystemList.length || this.systemList.length === this.checkSystemList.length) {
         this.isIndeterminateSys = false
       } else {
@@ -116,10 +111,14 @@ export default {
       }
       if (this.systemList.length === this.checkSystemList.length) {
         this.sysCheckAll = true
+      } else {
+        this.sysCheckAll = false
       }
 
       if (this.customizeList.length === this.checkCustomizeList.length) {
         this.cusCheckAll = true
+      } else {
+        this.cusCheckAll = false
       }
 
       if (!this.checkCustomizeList.length || this.customizeList.length === this.checkCustomizeList.length) {

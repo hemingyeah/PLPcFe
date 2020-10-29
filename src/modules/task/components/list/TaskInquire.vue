@@ -1,5 +1,5 @@
 <template>
-  <div v-if="fields.length">
+  <div v-show="fields.length">
     <div v-for="(item, index) in list" :key="index">
       <batch-form
         :fields="fields"
@@ -10,6 +10,7 @@
         @add="add"
         @del="del"
         @setting="setting"
+        :inquire-form-backup="inquireFormBackup"
         :item="item"
         :search-model="searchModel"
         :search-model-cn="searchModelCN"
@@ -91,6 +92,10 @@ function setFieldOperateHandler(field = {}) {
 export default {
   name: 'task-inquire',
   props: {
+    inquireFormBackup: {
+      type: Object,
+      default: () => ({})
+    },
     searchModel: {
       type: Object,
       default: () => ({}),
@@ -274,7 +279,6 @@ export default {
           }
         });
 
-      console.log(this.checkSystemList);
       this.check_system_list = new Set(this.checkSystemList);
       this.check_customize_list = new Set(this.checkCustomizeList);
       this.list = this.list.map((v, i) => {
@@ -323,17 +327,15 @@ export default {
         ...this.check_customize_list,
       ];
     },
-    initFormVal() {
-      if (!this.$refs.batchForm) return;
-      this.$refs.batchForm.forEach((el) => {
-        el.buildForm();
-      });
-    },
   },
   components: {
     BatchForm: {
       name: 'batch-form',
       props: {
+        inquireFormBackup: {
+          type: Object,
+          default: () => ({})
+        },
         searchModel: {
           type: Object,
           default: () => ({}),
@@ -379,42 +381,10 @@ export default {
       },
 
       mounted() {
-        localStorage.setItem('fieldNum', this.fields.length);
         this.reset();
         this.buildForm();
       },
       methods: {
-        _inPar(searchParams) {
-          let inPar = []; // 初始化的参数
-          for (let key in searchParams) {
-            if (
-              JSON.stringify(searchParams[key]) !== '[]'
-              && searchParams[key]
-              && key !== 'pageSize'
-              && key !== 'page'
-              && key !== 'pageNum'
-              && key !== 'stateList'
-              && key !== 'whoseInfo'
-              && key !== 'isPermission'
-              && key !== 'distance'
-              && key !== 'orderDetail'
-              && key !== 'sortBy'
-            ) {
-              inPar.push({ key, value: searchParams[key] });
-            }
-          }
-          inPar.forEach((item) => {
-            if (item.key === 'customerId') {
-              this.form['customer'] = item.value;
-              this.customer['id'] = item.value;
-            }
-          });
-          this.searchModelCN.forEach((item) => {
-            if (item.key === '客户') {
-              this.customer['name'] = item.value;
-            }
-          });
-        },
         returnDatas() {
           let data = Object.assign({}, this.form);
           data.backUp = {
@@ -429,12 +399,32 @@ export default {
         },
         buildForm() {
           if (Object.keys(this.form).length === this.fields.length) return;
-          // this.form = Utils.initialize(this.fields);
 
           this.fields.forEach((f) => {
+            let tv = ''
+            // 地址的默认值初始化为对象
+            if (f.formType == 'customerAddress' || f.formType == 'address')
+              tv = {};
+            if (f.formType == 'date' || f.formType == 'datetime') tv = [];
+            if (f.formType === 'link') {
+              tv = {};
+            }
+            if (f.fieldName === 'tags') {
+              tv = [];
+            }
+            if (f.formType === 'area') {
+              tv = [];
+            }
+
+            if (f.formType === 'user') {
+              tv = []
+            }
+
             if (f.fieldName === 'tags' && f.formType === 'select') {
               this.form[f.fieldName] = [];
             }
+
+            this.form[f.fieldName] = this.inquireFormBackup[f.fieldName] || tv
           });
         },
         searchCustomer(params) {

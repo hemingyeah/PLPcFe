@@ -92,7 +92,6 @@ export default {
         if (MultiFieldNames.indexOf(field.fieldName) > -1) {
           tv = []
         }
-
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
         this.$set(
           this.form,

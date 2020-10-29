@@ -1072,7 +1072,6 @@ export default {
 
       this.fields.forEach(field => {
         if (field.fieldName == 'attachment') {
-          console.log(111,field);
           let { isEncryptAttachment, attachment } = this.task
           
           // 系统附件加密
