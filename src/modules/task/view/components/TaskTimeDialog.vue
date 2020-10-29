@@ -16,7 +16,7 @@
             </div>
             <div class="time-axis-item">
                 <el-tooltip effect="dark" content="从接单到完成用时" placement="left">
-                    <label>工作用时：</label>
+                    <label>工单用时：</label>
                 </el-tooltip>
                 <span>{{receiptTaskForUpdate.taskUsedTimeStr | filterTimeSpent}}</span>
             </div>
