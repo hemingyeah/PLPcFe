@@ -62,7 +62,7 @@ export default {
         let result = await http.get('/getLastVersion');
         let lastVersion = result.data || {};
         
-        this.versionNum = lastVersion.versionNum;
+        this.versionNum = lastVersion.versionNum && lastVersion.versionNum.toLocaleLowerCase().replace('vip', '');
         this.description = lastVersion.description;
         this.show = true;
         
