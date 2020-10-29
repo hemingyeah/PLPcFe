@@ -5,13 +5,13 @@ import {
 } from "@model/param/in/Task";
 import GrayUtil from "@src/util/gray";
 
-const fixedPrefixTaskPath = "/api/task";
-const ElASTICSEARCH = "/api/elasticsearch";
-const fixedPrefixPaymentPath = "/api/payment";
+// const fixedPrefixTaskPath = "/api/task";
+// const ElASTICSEARCH = "/api/elasticsearch";
+// const fixedPrefixPaymentPath = "/api/payment";
 
-// const fixedPrefixTaskPath = '';
-// const ElASTICSEARCH = '';
-// const fixedPrefixPaymentPath = '';
+const fixedPrefixTaskPath = '';
+const ElASTICSEARCH = '';
+const fixedPrefixPaymentPath = '';
 
 /* ------------- start 旧工单api ---------------- */
 

@@ -131,8 +131,8 @@ export default {
       return time ? formatDate(time) : "";
     },
     // 删除
-    deleteViewBtn() {
-      TaskApi.deleteView(this.region.viewId).then((res) => {
+    deleteViewBtn(id) {
+      TaskApi.deleteView(id).then((res) => {
         this.success(res, "del");
       });
     },

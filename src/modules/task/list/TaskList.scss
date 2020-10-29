@@ -230,39 +230,39 @@
     }
     &-nav {
       > div {
+        position: relative;
         cursor: pointer;
-        height: 32px;
-        line-height: 32px;
-        border-top: 1px solid #F2F2F2;
+        border-top: 1px solid #F5F5F5;
         .state {
-          height: 32px;
+          padding-top: 4px;
           padding-left: 11px;
           width: 90px;
           font-weight: 500;
           background-color: #FAFAFA;
         }
+        .element-icon i {
+          position: absolute;
+          right: 12px;
+          top: 6px;
+        }
         .list {
-          height: 32px;
+          width: 90%;
           overflow: hidden;
-          overflow-x: scroll;
-          &::-webkit-scrollbar {
-            display: none;
-          }
+          // height: 30px;
           .list-item {
             > div {
-              height: 32px;
               padding-left: 11px;
               font-size: 13px;
               width: 130px;
+              height: 30px;
+              overflow-y: hidden;
               color: #808080;
+              line-height: 30px;
               &:hover {
                 color: #333;
               }
             }
           }
-        }
-        .list-crate {
-          overflow-x: hidden;
         }
       }
     }
@@ -273,12 +273,17 @@
   width: 88px;
   text-align: center;
 }
+.task-list-batch-button {
+  cursor: pointer;
+  width: 120px;
+  text-align: center;
+}
 .task-width103 {
   padding: 0 25px;
   text-align: center;
 }
 .table-footer {
-  margin-top: 50px;
+  margin-top: 20px;
 }
 .task-ic19 {
   width: 18px;
@@ -287,6 +292,10 @@
 }
 .task-list-dropdown-item {
   width: 100px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
 }
 .task-list-dropdown-icon {
   display: none;

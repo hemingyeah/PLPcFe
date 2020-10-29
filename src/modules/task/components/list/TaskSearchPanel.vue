@@ -69,7 +69,6 @@
           :search-model-cn="[]"
         />
         <task-inquire 
-          v-else
           ref="taskInquireParams" 
           :column-num="columnNum" 
           :search-model-cn="[]"
@@ -252,20 +251,42 @@ export default {
       }
     },
     buildParams() {
-      const form = {
-        ...this.$refs.taskInquireParams.returnData(),
-        ...this.$refs.searchForm.returnData(),
-      };
-      this.formBackup = Object.assign({}, form);
-      const taskInquireList = this.taskInquireList.length
-        ? this.taskInquireList
-        : [...this.config, ...this.taskTypeFilterFields];
-      const isSystemFields = [...this.fields, ...taskInquireList].filter(
-        (f) => f.isSystem
-      );
-      const notSystemFields = [...this.fields, ...taskInquireList].filter(
-        (f) => !f.isSystem
-      );
+      // 判断是否有重复选择
+      let searchFormData = this.$refs.searchForm.returnData(), inPar = [], repeatBool;
+      for(let key in searchFormData) {
+        if (JSON.stringify(searchFormData[key]) !== "[]" && searchFormData[key] && key !== "backUp") {
+          if (key !== "area") {
+            inPar.push(key)
+          } else {
+            if (JSON.stringify(searchFormData[key]) !== "{}" && searchFormData[key].city) {
+              inPar.push("area")
+            }
+          }
+        }
+      }
+      for(let key in this.$refs.taskInquireParams.returnData()) {
+        if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key]) {
+          if (key !== "customer" && key !== "tags") {
+            repeatBool = true
+          } else {
+            if (this.$refs.taskInquireParams.returnData()["tags"] && this.$refs.taskInquireParams.returnData()["tags"].length) {
+              repeatBool = true
+            }
+            if (this.$refs.taskInquireParams.returnData()["customer"]) {
+              repeatBool = true
+            }
+          }
+          
+        }
+      }
+
+
+
+      const form = {...this.$refs.taskInquireParams.returnData(), ...this.$refs.searchForm.returnData()}
+      this.formBackup = Object.assign({}, form)
+      const taskInquireList = this.taskInquireList.length ? this.taskInquireList : [...this.config, ...this.taskTypeFilterFields]
+      const isSystemFields = [...this.fields, ...taskInquireList].filter((f) => f.isSystem)
+      const notSystemFields = [...this.fields, ...taskInquireList].filter((f) => !f.isSystem)
       let params = {
         conditions: [],
       };
@@ -346,9 +367,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -419,7 +440,7 @@ export default {
         });
       }
       // 返回接口数据
-      return params;
+      return {params, repeatBool};
     },
     buildTaskInquireParams(params) {
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields();
@@ -447,28 +468,33 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
         if (tv.formType === "address") {
-          let address = {
-            property: fn,
-            operator: tv.operatorValue,
-          };
+          let address = []
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            address = [{
+              property: "city",
+              operator: tv.operatorValue,
+              value: form[fn].city
+            }, {
+              property: "dist",
+              operator: tv.operatorValue,
+              value: form[fn].dist
+            }, {
+              property: "province",
+              operator: tv.operatorValue,
+              value: form[fn].province
+            }];
           }
-          params.systemConditions.push(address);
+          params.systemConditions = [...params.systemConditions, ...address];
           continue;
         }
 
@@ -503,6 +529,15 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === "paymentMethod") {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            value: form[fn]
+          });
+          continue;
+        }
+
         if (tv.fieldName == "allotTypeStr") {
           params.systemConditions.push({
             property: "allotType",
@@ -526,28 +561,20 @@ export default {
         }
 
         if (
-          tv.fieldName == "level" ||
-          tv.fieldName == "serviceType" ||
-          tv.fieldName == "serviceContent" ||
-          tv.fieldName == "paymentMethod" ||
-          tv.fieldName === "createUser" ||
-          tv.fieldName === "allotUser"
+          tv.fieldName == "level"
+          || tv.fieldName == "serviceType"
+          || tv.fieldName == "serviceContent"
+          || tv.fieldName == "paymentMethod"
+          || tv.fieldName === "createUser"
+          || tv.fieldName === "allotUser"
         ) {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            inValue: form[fn],
-          });
-          continue;
-        }
-
-        if (tv.fieldName === "executor") {
-          params.systemConditions.push({
-            property: "executorUser",
-            operator: tv.operatorValue,
-            inValue: form[fn],
-          });
-          continue;
+            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
+            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+          })
+          continue
         }
 
         if (tv.fieldName === "synergyId") {
@@ -588,14 +615,12 @@ export default {
           continue;
         }
 
-        let value =
-          TaskOnceConvertMap[form[fn]] != undefined
-            ? TaskOnceConvertMap[form[fn]]
-            : form[fn];
-        value =
-          TaskApproveConvertMap[value] != undefined
-            ? TaskApproveConvertMap[value]
-            : value;
+        let value = TaskOnceConvertMap[form[fn]] != undefined
+          ? TaskOnceConvertMap[form[fn]]
+          : form[fn];
+        value = TaskApproveConvertMap[value] != undefined
+          ? TaskApproveConvertMap[value]
+          : value;
 
         params.systemConditions.push({
           property: fn,
@@ -625,9 +650,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -640,11 +665,10 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            address.value = (form[fn].province || "")
+              + (form[fn].city || "")
+              + (form[fn].dist || "")
+              + (form[fn].address || "");
           }
           params.conditions.push(address);
           continue;
@@ -707,42 +731,42 @@ export default {
       let operator = "";
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case "date": {
+        operator = "between";
+        break;
+      }
+      case "datetime": {
+        operator = "between";
+        break;
+      }
+      case "select": {
+        if (field.setting && field.setting.isMulti) {
+          operator = "contain";
+        } else {
+          operator = "eq";
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "cascader": {
-          operator = "cascader";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case "user": {
+        operator = "user";
+        break;
+      }
+      case "cascader": {
+        operator = "cascader";
+        break;
+      }
+      case "address": {
+        operator = "address";
+        break;
+      }
+      case "location": {
+        operator = "location";
+        break;
+      }
+      default: {
+        operator = "like";
+        break;
+      }
       }
       return operator;
     },
@@ -755,10 +779,10 @@ export default {
     },
     resetParams() {
       this.formBackup = {};
-      this.$refs.searchForm &&
-        this.$nextTick(this.$refs.searchForm.initFormVal);
-      this.$refs.taskInquireParams &&
-        this.$nextTick(this.$refs.taskInquireParams.initFormVal);
+      this.$refs.searchForm
+        && this.$nextTick(this.$refs.searchForm.initFormVal);
+      this.$refs.taskInquireParams
+        && this.$nextTick(this.$refs.taskInquireParams.initFormVal);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
@@ -871,6 +895,7 @@ export default {
       }
       localStorage.setItem("task-search-field", JSON.stringify(loc));
     },
+   
     mergeTaskFields(taskAllFields = []) {
       // 临时这种用法
       this.taskAllFields = taskAllFields.slice();

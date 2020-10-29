@@ -30,7 +30,7 @@ const customerContact = require("./customerContact");
 const taskRouter = require("./task");
 const sparePartRouter = require("./sparePart");
 
-const linkcRouter = require('./linkc')
+const linkcRouter = require("./linkc")
 
 router.get("/", async (ctx) => {
   let modConfig = modules["system.frame"];
@@ -117,7 +117,7 @@ router.use("/outside/es/task/search", (ctx) =>
     host: "30.40.57.130",
     port: 10006,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -127,7 +127,7 @@ router.use("/outside/pc/task/editBatchTask", (ctx) =>
     host: "30.40.57.130",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -137,7 +137,7 @@ router.use("/outside/pc/view/getUserViews", (ctx) =>
     host: "30.40.57.130",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -147,7 +147,7 @@ router.use("/outside/es/task/getTaskCountByState", (ctx) =>
     host: "30.40.57.130",
     port: 10006,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -157,7 +157,7 @@ router.use("/outside/pc/view/getOneView", (ctx) =>
     host: "30.40.57.130",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -167,7 +167,7 @@ router.use("/outside/pc/view/createTaskView", (ctx) =>
     host: "30.40.57.130",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -177,7 +177,7 @@ router.use("/outside/pc/view/editTaskView", (ctx) =>
     host: "30.40.57.130",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -187,7 +187,7 @@ router.use("/outside/pc/view/deleteOneView", (ctx) =>
     host: "30.40.57.130",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -197,7 +197,7 @@ router.use("/outside/pc/task/delete", (ctx) =>
     host: "30.40.59.137",
     port: 10012,
     headers: {
-      cookie: "VIPPUBLINKJSESSIONID=b77b2283-60a8-491a-863a-80b578b8d70a",
+      cookie: "VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c",
     },
   })
 );
@@ -237,7 +237,7 @@ router.use("", doMyselft.routes(), doMyselft.allowedMethods());
 router.use("", customerContact.routes(), customerContact.allowedMethods());
 router.use("", taskRouter.routes(), taskRouter.allowedMethods());
 router.use("", sparePartRouter.routes(), sparePartRouter.allowedMethods());
-router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
+router.use("", linkcRouter.routes(), sparePartRouter.allowedMethods());
 
 router.all("/*", (ctx) => {
   return HttpClient.proxy(ctx);

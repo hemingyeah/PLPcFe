@@ -666,7 +666,7 @@ export default {
             if (res.code == 0) {
               this.detail.circleState = 1 - this.detail.circleState * 1;
               this.$message({
-                message: this.detail.circleState == 1 ? "发布成功" : "取消成功",
+                message: this.detail.circleState == 1 ? "发布成功，请前往门户设置企业圈子查看!" : "取消成功",
                 duration: 1500,
                 type: "success",
               });

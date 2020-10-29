@@ -45,6 +45,9 @@
         </div>
       </template>
       <!-- end 产品 -->
+
+      <!-- TODO: 临时解决客户字段设置产品未勾选时隐藏 -->
+      <template v-else><div class="hide"></div></template>
     </template>
 
     <!-- start 计划时间 -->
@@ -107,20 +110,31 @@
       </div>
     </template>
     <!-- end 协同人 -->
+    <!-- 关联工单 -->
+    <template slot="relevance" slot-scope="{ field }">
+      <div class="form-view-row">
+        <label>{{ field.displayName }}</label>
+        <div class="form-view-row-content">
+          {{task.source}}
+          <a class="link-text" :href="`/event/view/${task.eventId}`">{{task.eventNo}}</a>
+        </div>
+      </div>
+    </template>
+    <!-- end 关联工单 -->
   </form-view>
 </template>
 
 <script>
 /* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* enum */
-import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
 
-const ENCRYPT_FIELD_VALUE = '***';
+const ENCRYPT_FIELD_VALUE = "***";
 
 export default {
-  name: 'task-view',
+  name: "task-view",
   props: {
     task: {
       type: Object,
@@ -156,7 +170,7 @@ export default {
     },
     planTime: {
       type: String,
-      default: ''
+      default: ""
     },
     stateColor: {
       type: Object,
@@ -164,7 +178,7 @@ export default {
     },
     stateText: {
       type: String,
-      default: ''
+      default: ""
     }
   },
   data() {
@@ -179,33 +193,43 @@ export default {
     * 过滤产品关联字段，需给每个产品显示对应产品关联字段
     */
     taskfields() {
-      return this.fields.filter(field => field.formType != 'relationProduct');
+      return this.fields.filter(field => field.formType != "relationProduct");
     },
     /** 
     * @description 产品关联字段
     */
     relationProductfields() {
-      return this.fields.filter(field => field.formType == 'relationProduct');
+      return this.fields.filter(field => field.formType == "relationProduct");
     }
   },
   methods: {
     /** 
+    * @description 打开事件详情
+    */
+    openEventView(id) {
+      this.$platform.openTab({
+        title: "事件详情",
+        close: true,
+        url: `/event/view/${id}`,
+      })
+    },
+    /** 
     * @description 修改计划时间
     */
     modifyPlanTime() {
-      this.$emit('modifyPlanTime');
+      this.$emit("modifyPlanTime");
     },
     /** 
     * @description 打开产品详情
     */
     openProductView(productId) {
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       if(!productId) return;
       
       this.$platform.openTab({
         id: `product_view_${productId}`,
-        title: '产品详情',
+        title: "产品详情",
         close: true,
         url: `/customer/product/view/${productId}?noHistory=1`,
         fromId
@@ -252,13 +276,13 @@ export default {
     */
     modifySynergies() {
       let options = {
-        title: '修改协同人',
+        title: "修改协同人",
         selected: this.task.synergies,
         seeAllOrg: true,
         max: 14
       };
       
-      return this.$fast.contact.choose('dept', options).then(result => {
+      return this.$fast.contact.choose("dept", options).then(result => {
         if(result.status == 0) {
           let synergies = result?.data?.users || [];
 
@@ -282,7 +306,7 @@ export default {
     if (this.canSeeCustomer) {
       this.products.map(item => {
         this.$set(this.productRelationCount, item.id, { all: 0, unfinished: 0 });
-        this.getCountForCreate({ module: 'product', id: item.id });
+        this.getCountForCreate({ module: "product", id: item.id });
       })
     }
   }

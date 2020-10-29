@@ -91,6 +91,8 @@ function setFieldOperateHandler(field = {}) {
     || formType == "textarea"
     || formType === "code"
     || formType === "description"
+    || formType === 'relationProduct'
+    || formType === 'relationCustomer'
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
   } else if (formType == "date" || formType == "datetime") {
@@ -186,6 +188,7 @@ export default {
     },
   },
   methods: {
+    // 高级搜索选中的值
     returnData() {
       let data = {};
       if (!this.$refs.batchForm) return {}
@@ -219,6 +222,7 @@ export default {
         check_system_list,
         check_customize_list,
       });
+      this.list = [1];
     },
     matchOperator(field) {
       let formType = field.formType;
@@ -264,6 +268,7 @@ export default {
       }
       return operator;
     },
+    // 添加
     add() {
       this.list.push(1);
     },
@@ -662,6 +667,7 @@ export default {
                   disableMap: true,
                   placeholder: Utils.genPlaceholder(f),
                   seo: true,
+                  toggle: true,
                 },
                 on: {
                   update: (event) => this.update(event),

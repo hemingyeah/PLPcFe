@@ -55,7 +55,7 @@
           loc();
           visible = false;
         "
-        >取 消</el-button
+      >取 消</el-button
       >
       <el-button type="primary" @click="onSubmit">确 定</el-button>
     </div>
@@ -68,12 +68,12 @@ export default {
     taskTypeFilterFields: {
       // 自定义
       type: Array,
-      default: [],
+      default: () => {[]},
     },
     config: {
       // 系统
       type: Array,
-      default: [],
+      default: () => {[]},
     },
     taskInquireList: {
       type: Array, // 用于判断

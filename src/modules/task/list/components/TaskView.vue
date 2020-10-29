@@ -1,14 +1,14 @@
 
 <template>
   <base-modal
-    title="快捷查询条件"
+    :title="name"
     :show.sync="visible"
     width="500px"
     class="batch-editing-customer-dialog"
   >
     <div class="task-content">
       <p v-for="(item, index) in searchModelCN" :key="index">
-        {{ item }}
+        {{item}}
       </p>
     </div>
     <div slot="footer" class="dialog-footer">
@@ -27,32 +27,31 @@ export default {
       info: "",
       visible: false,
       searchModelCN: [],
-    };
+      name: ""
+    }
   },
   methods: {
-    async open(viewId, type) {
-      this.searchModelCN = [];
-      let searchModel = [];
-      const { success, result } = await TaskApi.getOneView(viewId);
+    async open(viewId, name, type) {
+      this.name = name
+      this.searchModelCN = []
+      let searchModel = []
+      const {success, result} = await TaskApi.getOneView(viewId)
       if (type) {
-        this.visible = true;
+        this.visible = true 
       } else {
-        for (let key in result.searchModelCN) {
-          searchModel.push({
-            displayNmae: key,
-            value: `${result.searchModelCN[key]}`,
-          });
+        for(let key in result.searchModelCN) {
+          searchModel.push({displayNmae: key, value: `${result.searchModelCN[key]}`})
         }
-        this.$emit("_searchModel", searchModel);
+        this.$emit("_searchModel", searchModel)
       }
       if (success) {
-        for (let key in result.searchModelCN) {
-          this.searchModelCN.push(`${key}：${result.searchModelCN[key]}`);
+        for(let key in result.searchModelCN) {
+          this.searchModelCN.push(`${key}：${result.searchModelCN[key]}`)
         }
       }
     },
-  },
-};
+  }
+}
 </script>
 <style lang="scss" scoped>
 </style>

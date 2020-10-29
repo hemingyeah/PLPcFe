@@ -44,7 +44,7 @@
             <el-input style="width: 66.6666667%" type="textarea" placeholder="备件说明" :autosize="{minRows:2, maxRows: 4}" v-model="part.description"></el-input>
           </el-form-item>
           <el-form-item label="图片：" class="category-edit-form-item-upload">
-            <base-upload style="width: 66.6666667%" :value="attachments" @input="uploadImg" :limit="1" accept="image/*">
+            <base-upload style="width: 66.6666667%" :value="attachments" @input="uploadImg" :limit="9" accept="image/*">
               <template slot="preview">
                 <div class="part-image-preview" v-show="partImg">
                   <img :src="partImg" @click="preview">
@@ -162,7 +162,11 @@ export default {
     partImg(){
       if(!this.attachments || this.attachments.length == 0) return null;
 
-      return this.attachments[0].url;
+      if(Array.isArray(this.attachments) && this.attachments.length > 0) {
+        return this.attachments.map(item => item.url);
+      }else {
+        return this.attachments[0].url;
+      }
     },
     allowEdit(){
       return this.action == 'create' ? AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_CREATE') : AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_EDIT')
@@ -212,7 +216,14 @@ export default {
       this.pending = true;
 
       try {
-        if(this.partImg) part.image = this.partImg;
+        if(this.partImg) {
+          if(Array.isArray(this.partImg)) {
+            part.imageList = this.partImg;
+            part.image = null;
+          }else {
+            part.image = this.partImg;
+          }
+        }
 
         let url = this.action == 'edit' ? '/partV2/category/update' : '/partV2/category/create';
         let result = await this.$http.post(url, part);

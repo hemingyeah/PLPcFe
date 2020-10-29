@@ -466,7 +466,7 @@ export default {
       return this.loginUser.head || DefaultHead;
     },
     releaseVersion() {
-      return this.initData.releaseVersion || '';
+      return (this.initData.releaseVersion && this.initData.releaseVersion.toLocaleLowerCase().replace('vip', '')) || '';
     },
     /** 激活状态的工单列表 */
     currentTaskListTab() {
@@ -992,7 +992,6 @@ export default {
       // 工单列表重定向
       this.currentTaskListTab.url = `/task?newVersion=${version}`;
       this.reloadFrameTab(this.currentTaskListTab, true);
-
       this.isUserTaskGray = !this.isUserTaskGray;
     }, 1000),
     /** 

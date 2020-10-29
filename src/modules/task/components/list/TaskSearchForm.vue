@@ -113,7 +113,6 @@ export default {
       this.$set(this, "customer", backUp.customer || {});
       this.$set(this, "product", backUp.product || {});
 
-      // this._inPar()
       return form;
     },
     /**
@@ -331,6 +330,7 @@ export default {
               disableMap: true,
               placeholder: Utils.genPlaceholder(f),
               seo: true,
+              toggle: true
             },
             on: {
               update: (event) => this.update(event),
