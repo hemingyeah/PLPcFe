@@ -44,7 +44,7 @@ export default {
       return this.value;
     },
     allowUpload(){
-      return !(this.limit && this.queue.length >= this.limit);
+      return !(this.limit && this.queue.length > this.limit);
     }
   },
   data(){
