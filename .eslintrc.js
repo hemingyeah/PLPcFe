@@ -91,7 +91,6 @@ module.exports = {
     "computed-property-spacing": ["error", "never"], // 禁止属性内的空格
     "rules": {
       'import/extensions': [
-        ERROR,
         'ignorePackages',
         {
           ts: 'never',
