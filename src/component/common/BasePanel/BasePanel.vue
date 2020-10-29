@@ -7,7 +7,23 @@
     </template>
     <template v-else>
       <!-- <div v-show="show" class="base-panel-mask" @click.self="close"> -->
-      <aside v-if="show" class="base-panel" :style="{width: width}" @click.stop>
+      <aside v-if="show && !re" class="base-panel" :style="{width: width}" @click.stop>
+        <slot name="header">
+          <header class="base-panel-title">
+            <slot name="title">
+              <h3>{{title}}</h3>
+            </slot>
+            <button type="button" @click="close" class="base-panel-close">
+              <i class="iconfont icon-fe-close"></i>
+            </button>
+          </header>
+        </slot>
+
+        <slot></slot>
+
+        <slot name="footer"></slot>
+      </aside>
+      <aside v-show="show && re" class="base-panel" :style="{width: width}" @click.stop>
         <slot name="header">
           <header class="base-panel-title">
             <slot name="title">
@@ -31,29 +47,34 @@
 
 <script>
 export default {
-  name: "base-panel",
+  name: 'base-panel',
   props: {
     title: String,
+    re: {
+      //显示方式 v-if 或者 V-show
+      type: Boolean,
+      default: false
+    },
     show: {
-      //是否显示组件
+      // 是否显示组件
       type: Boolean,
       default: false
     },
     diyTransfer: {
-      //是否显示组件
+      // 是否显示组件
       type: Boolean,
       default: false
     },
     width: {
       type: String,
-      default: "360px"
+      default: '360px'
     }
   },
   methods: {
     close() {
-      this.$emit("close");
-      //兼容sync
-      this.$emit("update:show", false);
+      this.$emit('close');
+      // 兼容sync
+      this.$emit('update:show', false);
     },
     /** 监听文档的点击事件，如果点击组件外的元素，关闭组件 */
     handleClickOutside(e) {
@@ -64,10 +85,10 @@ export default {
     }
   },
   mounted() {
-    document.addEventListener("click", this.handleClickOutside, false);
+    document.addEventListener('click', this.handleClickOutside, false);
   },
   destroyed() {
-    document.removeEventListener("click", this.handleClickOutside);
+    document.removeEventListener('click', this.handleClickOutside);
   }
 };
 </script>

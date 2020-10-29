@@ -10,8 +10,8 @@
         @add="add"
         @del="del"
         @setting="setting"
-        :inquire-form-backup="inquireFormBackup"
         :item="item"
+        :inquire-form-backup="inquireFormBackup"
         :search-model="searchModel"
         :search-model-cn="searchModelCN"
       />
@@ -93,7 +93,7 @@ export default {
   name: 'task-inquire',
   props: {
     inquireFormBackup: {
-      type: Object,
+      type:Object,
       default: () => ({})
     },
     searchModel: {
@@ -130,6 +130,11 @@ export default {
   watch: {
     config() {
       this.fields;
+    },
+    inquireFormBackup(v) {
+      if (JSON.stringify(v) === '{}') {
+        this.list = [1] 
+      } 
     },
     searchModelCN(v) {
       if (v.length) {
@@ -333,7 +338,7 @@ export default {
       name: 'batch-form',
       props: {
         inquireFormBackup: {
-          type: Object,
+          type:Object,
           default: () => ({})
         },
         searchModel: {
@@ -378,6 +383,18 @@ export default {
           this.reset();
           this.buildForm();
         },
+        inquireFormBackup(v) {
+          if (JSON.stringify(v) === '{}') {
+            this.reset();
+            this.buildForm();  
+          } 
+        },
+        fields(v) {
+          if (JSON.stringify(this.form) === '{}') {
+            this.reset();
+            this.buildForm();  
+          } 
+        }
       },
 
       mounted() {
@@ -398,33 +415,15 @@ export default {
           this.selectField(this.fields[0].fieldName);
         },
         buildForm() {
+          localStorage.setItem('fields_length', this.fields.length)
           if (Object.keys(this.form).length === this.fields.length) return;
 
           this.fields.forEach((f) => {
-            // let tv = ''
-            // // 地址的默认值初始化为对象
-            // if (f.formType == 'customerAddress' || f.formType == 'address')
-            //   tv = {};
-            // if (f.formType == 'date' || f.formType == 'datetime') tv = [];
-            // if (f.formType === 'link') {
-            //   tv = {};
-            // }
-            // if (f.fieldName === 'tags') {
-            //   tv = [];
-            // }
-            // if (f.formType === 'area') {
-            //   tv = [];
-            // }
-
-            // if (f.formType === 'user') {
-            //   tv = []
-            // }
 
             if (f.fieldName === 'tags' && f.formType === 'select') {
               this.form[f.fieldName] = [];
             }
 
-            // this.form[f.fieldName] = this.inquireFormBackup[f.fieldName] || tv
           });
         },
         searchCustomer(params) {
