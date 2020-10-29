@@ -50,7 +50,8 @@ function deptWithUser(options){
 
   let showLocation = !!options.allotMap;
   let action = '/security/tag/userList';
-  if(showLocation || options.allot) action = '/task/department/user/dispatch/list';
+  // 多端工单选择负责人接口也改成/security/tag/userList
+  // if(showLocation || options.allot) action = '/task/department/user/dispatch/list';
   if(options.action) action = options.action;
 
   let instance = new DepartmentAndUserComponent({
