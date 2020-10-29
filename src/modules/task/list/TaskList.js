@@ -6,6 +6,7 @@ import { createServicePrintBatch } from "@src/api/PrintApi"
 /* components */
 import TaskSearchPanel from "@src/modules/task/components/list/TaskSearchPanel.vue";
 import TaskSelect from "./components/TaskSelect.vue";
+import TaskViewPanel from "@src/modules/task/components/list/TaskViewPanel.vue"
 import TaskViewModel from "./components/TaskViewModel.vue";
 import BatchEditingCustomerDialog from "./components/BatchEditingCustomerDialog.vue";
 import TaskTransfer from "./components/TaskTransfer.vue";
@@ -77,6 +78,7 @@ export default {
       planTimeType: "", // 判断计划时间展示的样式
       keyword_select: "", // 搜索筛选条件
       exportColumnList: [],
+      viewType: "",
       selectList: [
         { name: "全部", id: "all" },
         { name: "我创建的", id: "create" },
@@ -507,6 +509,50 @@ export default {
       // // this.$refs.taskView.open(id)
       this.search(searchModel);
       this.buildColumns();
+    },
+    /**
+     * 新建视图展示
+     */
+    creatViewPanel({ region, id, name, searchModel }, type) {
+      const selectCols = [];
+      this.columns.map((item, index) => {
+        if (item.show) {
+          selectCols.push(item.fieldName);
+        }
+      });
+      this.region = {
+        viewName: name || "",
+        searchModel: this.searchParams,
+        selectedCols: selectCols.join(","),
+        viewRegion: region
+      }
+      if (id) {
+        this.region["viewId"] = id;
+        this.region["searchModel"] = searchModel
+        this.isViewModel = region;
+      }
+      this.viewType = type
+      this.$refs.viewPanel.mergeTaskFields(this.taskAllFields)
+      this.$refs.viewPanel.open(type, id);
+      this.showBj = true
+    },
+    /**
+     * 保存视图
+     */
+    saveView() {
+      this.searchParams.systemConditions = this.$refs.viewPanel.buildTaskInquireParams().systemConditions
+      if (!this.searchParams.systemConditions.length) {
+        this.$platform.alert("请您先设置查询条件");
+        return
+      }
+
+      this.$refs.viewPanel.saveViewBtn(() => {
+        this.params.pageNum = 1;
+        this.taskPage.list = [];
+        this.$refs.viewPanel.hide();
+        this.getUserViews("saveView")
+        this.search(this.searchParams);
+      })
     },
     /*
       查看视图
@@ -2580,6 +2626,7 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
+    [TaskViewPanel.name]: TaskViewPanel,
     TaskSelect,
   },
 };

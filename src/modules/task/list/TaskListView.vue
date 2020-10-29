@@ -350,7 +350,6 @@
         ref="searchPanel"
         @bj="showBj = false"
         v-if="advanceds.length"
-        @bj="showBj = false"
       >
         <div
           class="advanced-search-btn-group task-flex task-buttom"
