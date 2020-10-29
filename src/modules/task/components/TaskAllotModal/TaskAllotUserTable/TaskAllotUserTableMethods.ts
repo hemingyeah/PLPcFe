@@ -5,6 +5,7 @@ import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotMo
 /* enum */
 import EventNameEnum from '@model/enum/EventNameEnum'
 /* entity */
+import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* image */
 // @ts-ignore
@@ -60,6 +61,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public buildCustomerAddressMapMarkerInfo(): string {
     let { lmName, lmPhone, customerAddress, name } = this.customer
+    customerAddress = new CustomerAddress(customerAddress)
+    
     return (
       `
         <div class="map-info-window-content">
@@ -115,7 +118,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       center = [116.397428, 39.90923]
     }
     
-    return center as Array<number>
+    // return center as Array<number>
+    return [116.397428, 39.90923]
   }
   
   /** 
@@ -186,7 +190,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       center: this.getMapCenter(),
       zoom: 10
     })
-    console.log('hbc: TaskAllotUserTableMethods -> mapInit -> this.getMapCenter()', this.getMapCenter())
     
     // 构建客户地址标记
     this.buildCusomterAddressMarker()

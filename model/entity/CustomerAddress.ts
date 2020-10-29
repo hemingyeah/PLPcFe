@@ -27,6 +27,20 @@ class CustomerAddress {
     const AddressList = [this.adProvince, this.adCity, this.adDist, this.adAddress]
     return AddressList.filter((item: string | undefined) => Boolean(item)).join()
   }
+  
+  constructor(customerAddress?: CustomerAddress) {
+    let { adCountry, adDist, adProvince, adCity, adAddress, adLongitude, adLatitude, addressType } = customerAddress || {}
+    
+    this.adCountry = adCountry || ''
+    this.adDist = adDist || ''
+    this.adProvince = adProvince || ''
+    this.adCity = adCity || ''
+    this.adAddress = adAddress || ''
+    this.adLongitude = adLongitude || null
+    this.adLatitude = adLatitude || null
+    this.addressType = addressType || 0
+  }
+
 }
 
 export default CustomerAddress
