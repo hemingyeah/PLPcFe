@@ -135,7 +135,7 @@ export function packToForm(fields, data){
       if (data?.taddress?.id) {
         task.address = [{
           value: data.taddress.id,
-          label: data.taddress.province + data.taddress.city + data.taddress.dist + data.taddress.address,
+          label: (data.taddress?.province || '') + (data.taddress?.city || '') + (data.taddress?.dist || '') + (data.taddress?.address || ''),
           ...data.taddress
         }];
       }
