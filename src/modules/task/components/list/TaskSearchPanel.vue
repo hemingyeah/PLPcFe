@@ -480,19 +480,27 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address = [{
-              property: "city",
-              operator: tv.operatorValue,
-              value: form[fn].city
-            }, {
-              property: "dist",
-              operator: tv.operatorValue,
-              value: form[fn].dist
-            }, {
-              property: "province",
-              operator: tv.operatorValue,
-              value: form[fn].province
-            }];
+            if (form[fn].province) {
+              address.push({
+                property: "province",
+                operator: tv.operatorValue,
+                value: form[fn].province
+              })
+            }
+            if (form[fn].city) {
+              address.push({
+                property: "city",
+                operator: tv.operatorValue,
+                value: form[fn].city
+              })            
+            }
+            if (form[fn].dist) {
+              address.push({
+                property: "dist",
+                operator: tv.operatorValue,
+                value: form[fn].dist
+              })            
+            }
           }
           params.systemConditions = [...params.systemConditions, ...address];
           continue;

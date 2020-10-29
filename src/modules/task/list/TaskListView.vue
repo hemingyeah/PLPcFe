@@ -355,7 +355,6 @@
           class="advanced-search-btn-group task-flex task-buttom"
           slot="footer"
         >
-          <base-button type="primary" @event="editView">存为视图</base-button>
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button
