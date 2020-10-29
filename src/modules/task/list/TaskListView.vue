@@ -464,11 +464,11 @@
                   <div @click="batchCreateServiceReport">批量生成服务报告</div>
                 </el-dropdown-item>
                 <!-- end 批量生成服务报告 -->
-                <!-- start 批量打印服务报告 -->
+                <!-- start 批量打印工单 -->
                 <el-dropdown-item v-if="isShowBatchCreateOrPrintReport">
-                  <div @click="batchPrintServiceReport">批量打印服务报告</div>
+                  <div @click="batchPrintServiceReport">批量打印工单</div>
                 </el-dropdown-item>
-                <!-- end 批量打印服务报告 -->
+                <!-- end 批量打印工单 -->
               </el-dropdown-menu>
             </el-dropdown>
           </div>

@@ -2434,13 +2434,13 @@ export default {
         })
     },
     /** 
-     * @description 批量打印服务报告
+     * @description 批量打印工单
     */ 
     batchPrintServiceReport() {
       let taskIds = this.getTaskIdsForBatchReport()
       // 验证
       if (taskIds.length <= 0) {
-        return this.$platform.alert('请先选择正确的需要批量打印服务报告的数据')
+        return this.$platform.alert('请先选择正确的需要批量打印工单的数据')
       }
       // 构建参数
       let params = { taskIds }
