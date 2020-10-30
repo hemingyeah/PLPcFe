@@ -5,7 +5,7 @@
         <!--<el-button type="primary" icon="el-icon-edit" @click="edit" :disabled="pending" v-if="allowEdit"> 编辑</el-button>-->
         <!--<el-button icon="el-icon-delete" @click="remove" :disabled="pending" v-if="allowEdit"> 删除</el-button>-->
 
-        <base-button type="primary" icon="el-icon-edit"  @event="edit" :disabled="pending" v-if="allowEdit">编辑</base-button>
+        <base-button type="primary" icon="icon-edit"  @event="edit" :disabled="pending" v-if="allowEdit">编辑</base-button>
         <base-button type="ghost" icon="el-icon-delete" @event="remove" :disabled="pending" v-if="allowEdit">删除</base-button>
 
         <div class="pull-right">

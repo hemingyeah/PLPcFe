@@ -191,6 +191,7 @@ export default {
       statusArr: ["待发货", "待收货", "已完成"],
       orderInfoArr: [
         { label: "订单编号：", value: "", key: "orderNum" },
+        { label: "客户名称：", value: "", key: "customerName" },
         { label: "买家：", value: "", key: "nickName" },
         { label: "收货人：", value: "", key: "name" },
         { label: "联系方式：", value: "", key: "linkmanPhone" },

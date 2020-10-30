@@ -160,7 +160,7 @@ export default {
     customerConfig() {
       let initData = this.initData;
       return {
-        fieldInfo: (initData.fieldInfo || []).sort(
+        fieldInfo: (initData.productFields || []).sort(
           (a, b) => a.orderId - b.orderId
         )
       };
