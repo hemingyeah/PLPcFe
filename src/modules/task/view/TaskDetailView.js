@@ -1064,11 +1064,13 @@ export default {
         fieldName: 'allotUser',
         formType: 'user',
         isSystem: 1,
-      }, {
-        displayName: '创建方式',
-        fieldName: 'relevance',
-        isSystem: 1,
-      }];
+      }, 
+      // {
+      //   displayName: '创建方式',
+      //   fieldName: 'relevance',
+      //   isSystem: 1,
+      // }
+    ];
 
       this.fields.forEach(field => {
         if (field.fieldName == 'attachment') {
