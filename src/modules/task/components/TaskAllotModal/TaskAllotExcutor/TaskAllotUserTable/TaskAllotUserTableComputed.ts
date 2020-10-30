@@ -1,12 +1,12 @@
 /* data */
-import TaskAllotUserTableData from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableData'
+import TaskAllotUserTableData from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableData'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
 import Customer from '@model/entity/Customer'
 import CustomerAddress from '@model/entity/CustomerAddress'
 /* interface */
-import { UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableInterface'
+import { UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* util */
 import { findComponentUpward, findComponentDownward } from '@src/util/assist'
 
@@ -38,7 +38,7 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   
   /* 用户状态 对象 */
   get userStateMap() {
-    return this.TaskAllotModalComponent?.$props?.userStateMap || {}
+    return this.TaskAllotModalComponent?.userStateMap || {}
   }
   
   /* 用户状态 列表 */

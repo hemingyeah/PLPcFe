@@ -1,7 +1,7 @@
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* scss */
-import '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTable.scss'
+import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTable.scss'
 /* types */
 import Column from '@model/types/Column'
 /* util */
@@ -9,7 +9,7 @@ import { uuid } from '@src/util/string'
 /* vue */
 import { Component } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
-import TaskAllotUserTableRender from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableRender.tsx'
+import TaskAllotUserTableRender from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableRender.tsx'
 /* const */
 // 表格列默认宽度
 const TableColumnDefaultWidth = '120px'

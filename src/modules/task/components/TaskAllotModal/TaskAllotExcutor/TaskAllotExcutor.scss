@@ -1,23 +1,8 @@
-// 工单指派人员筛选
-.task-allot-user-filter {
-  display: flex;
-  
-  .biz-team-select,
-  .base-select-container,
-  .el-select {
-    width: 150px;
-  }
-  
-  .biz-form-remote-select {
-    flex: none;
-  }
-}
-
 // 指派地图内容
 .task-allot-user-content {
   #MapContainer {
     height: 500px;
-    width: calc(100% - 400px);
+    width: calc(100% - 450px);
     .staff-header {
       border-radius: 50%;
       box-sizing: content-box;

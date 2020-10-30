@@ -1,9 +1,9 @@
 /* types */
 import Column from '@model/types/Column'
 /* interface */
-import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableInterface'
+import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* methods */
-import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableMethods'
+import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 

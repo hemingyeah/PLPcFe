@@ -1,3 +1,48 @@
 .user-card {
   padding: 20px 0 20px 20px;
 }
+
+.user-card-header {
+  border-bottom: 1px solid $border-color-base;
+  display: flex;
+  padding: 12px;
+  &-head {
+    display: flex;
+    align-items: center;
+    img {
+      border-radius: 50%;
+      height: 40px;
+      width: 40px;
+    }
+  }
+  &-head,
+  &-content,
+  &-button-group {
+    margin-left: 10px;
+  }
+}
+
+.user-card-header-content {
+  &-name {
+    font-size: $font-size-base;
+    font-weight: 500;
+    line-height: 20px;
+  }
+  &-state {
+    span {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+  &-name, &-state, &-team {
+    line-height: 20px;
+  }
+}
+
+.user-card-detail {
+  &-row {
+    &-item {
+      
+    }
+  }
+}

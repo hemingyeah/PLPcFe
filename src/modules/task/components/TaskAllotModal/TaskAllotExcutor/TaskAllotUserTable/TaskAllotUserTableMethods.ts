@@ -1,7 +1,7 @@
 /* api */
 import { getUserListByTag } from '@src/api/TaskApi'
 /* computed */
-import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableComputed'
+import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableComputed'
 /* enum */
 import EventNameEnum from '@model/enum/EventNameEnum'
 /* entity */

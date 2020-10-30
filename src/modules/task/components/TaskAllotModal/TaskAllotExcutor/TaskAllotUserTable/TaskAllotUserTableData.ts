@@ -1,13 +1,13 @@
 /* component */
-import TaskAllotUserTableComponents from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableComponents'
+import TaskAllotUserTableComponents from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableComponents'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
 /* interface */
-import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableInterface'
+import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* model */
 import Page from '@model/Page'
-import { TaskAllotUserTableColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableModel'
+import { TaskAllotUserTableColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
 import Column from '@model/types/Column'
 

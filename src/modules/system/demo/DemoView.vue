@@ -36,7 +36,6 @@ export default {
     }
   },
   mounted() {
-    console.log(TaskAllotModal)
     this.openAllotDialog()
   },
   components: {

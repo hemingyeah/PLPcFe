@@ -4,7 +4,13 @@ enum ComponentNameEnum {
   // 工单指派弹窗
   TaskAllotModal = 'task-allot-modal',
   // 工单指派人员表格
-  TaskAllotUserTable = 'task-allot-user-table'
+  TaskAllotUserTable = 'task-allot-user-table',
+  // 工单自动分配
+  TaskAllotAuto = 'task-allot-auto',
+  // 工单分配给负责人
+  TaskAllotExcutor = 'task-allot-excutor',
+  // 工单分配到工单池
+  TaskAllotPool = 'task-allot-pool'
 }
 
 export default ComponentNameEnum

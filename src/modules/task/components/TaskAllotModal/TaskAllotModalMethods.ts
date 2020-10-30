@@ -40,7 +40,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 获取客户信息
   */
   public fetchCustomer() {
-    let id = this.$props.customerId
+    let id = this.customerId
     if (!id) {
       return console.warn('Caused: TaskAllotModal fetchCustomer not have customerId')
     }
@@ -52,7 +52,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       this.customer = Object.freeze(result.data || {})
       
       // @ts-ignore
-      this.$refs.TaskAllotUserTableComponent.outsideFetchTeamUsers()
+      this.$refs.TaskAllotExcutorComponent.outsideFetchTeamUsers()
       
     }).catch(err => {
       console.error(err)
